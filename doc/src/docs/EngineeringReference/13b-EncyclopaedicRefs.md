@@ -219,7 +219,7 @@ Coils <a name="Coils"></a>
 
 The input object Coil:Cooling:Water is simpler than the detailed geometry model.  The simple model provides a good prediction of the air and water outlet conditions without requiring the detailed geometric input required for the detailed model.  A greatly simplified schematic of enthalpy and temperature conditions in a counter flow cooling/dehumidifying coil is shown in the schematic Figure 162.  The input required to model the coil includes only a set of thermodynamic design inputs, which require no specific manufacturer's data.  The coil simulation model is essentially a modification of one presented by Elmahdy and Mitalas (1977), TRNSYS, 1990 and Threlkeld, J.L. 1970.  The model calculates the UA values required for a Dry, Wet and Part Wet & Part Dry Coil and iterates between the Dry and Wet Coil to output the fraction wet.  There are two modes of flow operation for this model: Cross Flow, which is widely applicable in HVAC systems and the second being Counter flow mode. The default value in program is set up for Counter Flow.  In addition the coil has two modes of analysis: Simple Analysis and Detailed Analysis. The Simple analysis mode operates the coil as either wet or dry while the detailed mode simulates the coil as part wet part-dry. While the detailed mode provides more accurate results, it is significantly slower than the simple model. The simple mode gives good results for an annual simulation but will not be adequate for a time step performance analysis.
 
-![](EngineeringReference/media/image3304.svg.png)
+![](media/image3304.svg.png)
 
 Figure 162.  Simplified Schematic of Cooling/Dehumidifying Coil
 
@@ -559,7 +559,7 @@ Effectiveness η used in equation is defined in equation and Condensation Temper
 
 <div>$$\eta  = 1 - Exp\left\{ { - \frac{{CoilU{A_{\,External}}}}{{Capacitanc{e_{Air}}}}} \right\}$$</div>
 
-<span>$Condensatio{n_{Temp}} = {\rm{PsyTsatFnHPb(Ent}}{{\rm{h}}_{{\rm{AirCondensateTemp}}}}{\rm{,Patm) }}$</span>                <span>$Ent{h_{\,AirCondensateTemp}} = Ent{h_{\,AirInlet}} - \frac{{\left( {Ent{h_{\,AirInlet}} - Ent{h_{\,AirOutlet}}} \right)}}{\eta }$</span>
+<span>\(Condensatio{n_{Temp}} = {\rm{PsyTsatFnHPb(Ent}}{{\rm{h}}_{{\rm{AirCondensateTemp}}}}{\rm{,Patm) }}\)</span>                <span>\(Ent{h_{\,AirCondensateTemp}} = Ent{h_{\,AirInlet}} - \frac{{\left( {Ent{h_{\,AirInlet}} - Ent{h_{\,AirOutlet}}} \right)}}{\eta }\)</span>
 
 Once the air outlet temperature are known, then sensible load is calculated as a product of capacitance of air and temperature difference at inlet and outlet, as in equation
 
@@ -573,7 +573,7 @@ This problem is solved utilizing the fact that the Exit conditions from the Dry 
 
 n Iterate between the Dry Coil and the Wet Coil. First calculate Coil Completely Dry performance by estimating the wet dry interface water temperature using equation and inputting this variable as the water inlet temperature to dry Coil.
 
-<span>$WetDryInterfac{e_{WaterTemp}} = {\rm{WaterTem}}{{\rm{p}}_{{\rm{Inlet}}}}{\rm{ + Are}}{{\rm{a}}_{{\rm{WetFraction}}}}{\rm{*(WaterTem}}{{\rm{p}}_{{\rm{Outlet}}}}{\rm{ - WaterTem}}{{\rm{p}}_{{\rm{Inlet}}}}{\rm{)}}$</span>    
+<span>\(WetDryInterfac{e_{WaterTemp}} = {\rm{WaterTem}}{{\rm{p}}_{{\rm{Inlet}}}}{\rm{ + Are}}{{\rm{a}}_{{\rm{WetFraction}}}}{\rm{*(WaterTem}}{{\rm{p}}_{{\rm{Outlet}}}}{\rm{ - WaterTem}}{{\rm{p}}_{{\rm{Inlet}}}}{\rm{)}}\)</span>    
 
 The value of Surface Area Wet fraction is estimated initially as follows
 
@@ -631,25 +631,25 @@ If equation is satisfied then Coil is Dry and simply output the value for Dry Co
 
 Graphs Showing the Performance of the coil model at optimum operating conditions are shown below. All values of variable used have been normalized.
 
-![](EngineeringReference/media/image3348.png)
+![](media/image3348.png)
 
 Figure 163.  Air Outlet Temperature Vs Air Mass Flow Rate
 
 
 
-![](EngineeringReference/media/image3349.png)
+![](media/image3349.png)
 
 Figure 164.  Sensible Load variations Vs Air mass Flow Rate
 
 
 
-![](EngineeringReference/media/image3350.png)
+![](media/image3350.png)
 
 Figure 165.  Total and Sensible Load variations Vs Air Mass Flow Rate
 
 
 
-![](EngineeringReference/media/image3351.png)
+![](media/image3351.png)
 
 Figure 166.  Surface Area Fraction Wet Vs Air Mass Flow Rate
 
@@ -679,7 +679,7 @@ Elmahdy, A.H., and Mitalas, G.P. 1977. "A Simple Model for Cooling and Dehumidif
 
 The input object Coil:Cooling:Water:DetailedGeometry provides a coil model that predicts changes in air and water flow variables across the coil based on the coil geometry. A greatly simplified schematic of enthalpy and temperature conditions in a counterflow cooling/dehumidifying coil is shown in the following schematic figure. In addition, the variables required to model a cooling/dehumidifying coils and their definitions are extensively listed in “Table 55. Coil Geometry and Flow Variables for Coils”. The input required to model the coil includes a complete geometric description that, in most cases, should be derivable from specific manufacturer's data.  The coil simulation model is essentially the one presented by Elmahdy and Mitalas (1977) and implemented in HVACSIM+ (Clark 1985), a modular program also designed for energy analysis of building systems. The model solves the equations for the dry and wet sections of the coil using log mean temperature and log mean enthalpy differences between the liquid and the air streams.  Elmahdy and Mitalas state that crossflow counterflow coils with at four rows or more are approximated well by this model.  This does not constitute a major limitation since cooling and dehumidifying coils typically have more than four rows.
 
-![](EngineeringReference/media/image3352.svg.png)
+![](media/image3352.svg.png)
 
 Figure 167.  Simplified Schematic of Cooling/Dehumidifying Coil
 
@@ -709,7 +709,7 @@ Table 55. Coil Geometry and Flow Variables for Coils
 <tr>
 <td>aa, bb</td>
 <td>coeff. in enthalpy approximation</td>
-<td><span>$\dot m$</span></td>
+<td><span>\(\dot m\)</span></td>
 <td>mass flow rate</td>
 </tr>
 <tr>
@@ -739,7 +739,7 @@ Table 55. Coil Geometry and Flow Variables for Coils
 <tr>
 <td>D</td>
 <td>dry region</td>
-<td><span>$\dot Q$</span></td>
+<td><span>\(\dot Q\)</span></td>
 <td>heat transfer rate</td>
 </tr>
 <tr>
@@ -835,7 +835,7 @@ Table 55. Coil Geometry and Flow Variables for Coils
 
 </table>
 
-Equations through represent two sets of three equations with 7 unknowns: <span>${\dot Q_d}$</span>, Ta,1, Ta,2, Tw,2, Tw,3, <span>${\dot m_a}$</span>, <span>${\dot m_w}$</span>. However, normally at least four of these variables are specified, for example: inlet water temperature, outlet air temperature, water flow rate, air flow rate, so that the system of equations is effectively closed.
+Equations through represent two sets of three equations with 7 unknowns: <span>\({\dot Q_d}\)</span>, Ta,1, Ta,2, Tw,2, Tw,3, <span>\({\dot m_a}\)</span>, <span>\({\dot m_w}\)</span>. However, normally at least four of these variables are specified, for example: inlet water temperature, outlet air temperature, water flow rate, air flow rate, so that the system of equations is effectively closed.
 
 <div>$${\dot Q_d} = {m_a}C{p_a}\left( {{T_{a,1}} - {T_{a,2}}} \right)$$</div>
 
@@ -998,7 +998,7 @@ The effectiveness is:
 
 <div>$$\varepsilon  = 1 - \exp (\frac{{{e^{ - NTU \cdot Z \cdot \eta }} - 1}}{{Z \cdot \eta }})$$</div>
 
-Where <span>$\eta  = NT{U^{ - 0.22}}$</span>.
+Where <span>\(\eta  = NT{U^{ - 0.22}}\)</span>.
 
 The outlet conditions are then:
 
@@ -1018,7 +1018,7 @@ User input for the ratio of convective heat transfers at the nominal or rated op
 
 where,
 
-      <span>${\eta_f}$</span> is the fin efficiency, (dimensionless)
+      <span>\({\eta_f}\)</span> is the fin efficiency, (dimensionless)
 
       *h* is the surface convection heat transfer coefficient
 
@@ -1082,9 +1082,9 @@ Note: The data used to develop the total cooling capacity modifier curve (functi
 
 where
 
-<span>${T_{wb,i}}$</span> = x values = wet-bulb temperature of the air entering the cooling coil, °C
+<span>\({T_{wb,i}}\)</span> = x values = wet-bulb temperature of the air entering the cooling coil, °C
 
-<span>${T_{c,i}}$</span> = y values = dry-bulb temperature of the air entering an air-cooled condenser or wet-bulb temperature of the air entering an evaporative-cooled condenser, °C
+<span>\({T_{c,i}}\)</span> = y values = dry-bulb temperature of the air entering an air-cooled condenser or wet-bulb temperature of the air entering an evaporative-cooled condenser, °C
 
 * The total cooling capacity modifier curve (function of flow fraction) is a curve with one independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the rated total cooling capacity and the total cooling capacity modifier curve (function of temperature) to give the total cooling capacity at the specific temperature and air flow conditions at which the DX unit is operating.  This curve is typically a quadratic but any curve or table with one independent variable can be used.
 
@@ -1104,9 +1104,9 @@ Note: The data used to develop the energy input ratio (EIR) modifier curve (func
 
 where
 
-<span>${T_{wb,i}}$</span> = x values = wet-bulb temperature of the air entering the cooling coil, °C
+<span>\({T_{wb,i}}\)</span> = x values = wet-bulb temperature of the air entering the cooling coil, °C
 
-<span>${T_{c,i}}$</span> = y values = dry-bulb temperature of the air entering an air-cooled condenser or wet-bulb temperature of the air entering an evaporative-cooled condenser, °C
+<span>\({T_{c,i}}\)</span> = y values = dry-bulb temperature of the air entering an air-cooled condenser or wet-bulb temperature of the air entering an evaporative-cooled condenser, °C
 
 * The energy input ratio (EIR) modifier curve (function of flow fraction) is a curve with one independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the rated EIR (inverse of the rated COP) and the EIR modifier curve (function of temperature) to give the EIR at the specific temperature and air flow conditions at which the DX unit is operating.  This curve is typically a quadratic but any curve or table with one independent variable can be used.
 
@@ -1146,11 +1146,11 @@ In a similar fashion, the electrical power consumed by the DX unit (compressors 
 
 where
 
-<span>${\mathop Q\limits^ \bullet_{total}}$</span>= Total cooling capacity, W -- ref. equation (455)
+<span>\({\mathop Q\limits^ \bullet_{total}}\)</span>= Total cooling capacity, W -- ref. equation (455)
 
 <div>$$EIR = \,Energy\,input\,ratio\, = \,\left( {\frac{1}{{CO{P_{rated}}}}} \right)\left( {EIRTempModFac} \right)\left( {EIRFlowModFac} \right)$$</div>
 
-<span>$CO{P_{rated}}$</span> = Coefficient of performance at rated conditions (user input)
+<span>\(CO{P_{rated}}\)</span> = Coefficient of performance at rated conditions (user input)
 
 <div>$$RTF{\rm{ }} = {\rm{ }}\left( {{\raise0.7ex\hbox{${PLR}$} \!\mathord{\left/ {\vphantom {{PLR} {PartLoadFrac}}}\right.}\!\lower0.7ex\hbox{${PartLoadFrac}$}}} \right)\,\, = \,\,runtime fraction of the cooling coil$$</div>
 
@@ -1160,7 +1160,7 @@ The total amount of heat rejected by the condenser is then calculated and stored
 
 where
 
-<span>${\mathop Q\limits^ \bullet_{cond}}$</span> = total amount of heat rejected by the condenser (W)
+<span>\({\mathop Q\limits^ \bullet_{cond}}\)</span> = total amount of heat rejected by the condenser (W)
 
 The crankcase heater is assumed to operate when the cooling coil’s compressor is OFF and the outdoor dry-bulb temperature is below the maximum outdoor temperature for crankcase heater operation. The average crankcase heater power for the simulation time step is calculated as follows:
 
@@ -1168,9 +1168,9 @@ The crankcase heater is assumed to operate when the cooling coil’s compressor 
 
 where
 
-<span>${P_{crankcase}}$</span> = DX cooling coil crankcase heater power, W
+<span>\({P_{crankcase}}\)</span> = DX cooling coil crankcase heater power, W
 
-<span>${\mathop Q\limits^ \bullet_{cap,crankcase}}$</span>= crankcase heater capacity, W
+<span>\({\mathop Q\limits^ \bullet_{cap,crankcase}}\)</span>= crankcase heater capacity, W
 
 If this cooling coil is used as part of an air-to-air heat pump (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir), the crankcase heater defined for this DX cooling coil is disregarded and the associated output variable is omitted. Instead, the crankcase heater defined for the DX heating coil (Coil:Heating:DX:SingleSpeed) is enabled during the time that the compressor is not running for either heating or cooling. In this instance, RTF in the above equations would be the runtime fraction of the heat pump’s heating coil or cooling coil, whichever is greater.
 
@@ -1214,13 +1214,13 @@ For each simulation time step when the DX air conditioner operates to meet a coo
 
 where
 
-<span>${h_{in}}$</span>          = enthalpy of the air entering the cooling coil, J/kg
+<span>\({h_{in}}\)</span>          = enthalpy of the air entering the cooling coil, J/kg
 
-<span>${h_{ADP}}$</span>       = enthalpy of air at the apparatus dewpoint condition, J/kg
+<span>\({h_{ADP}}\)</span>       = enthalpy of air at the apparatus dewpoint condition, J/kg
 
-<span>${h_{Tin,wADP}}$</span> = enthalpy of air at the entering coil dry-bulb temperature and humidity ratio at ADP, J/kg
+<span>\({h_{Tin,wADP}}\)</span> = enthalpy of air at the entering coil dry-bulb temperature and humidity ratio at ADP, J/kg
 
-<span>$\dot m$</span>            = air mass flow rate, kg/s
+<span>\(\dot m\)</span>            = air mass flow rate, kg/s
 
 With the SHR for the coil at the current operating conditions, the properties of the air leaving the cooling coil are calculated using the following equations:
 
@@ -1234,13 +1234,13 @@ With the SHR for the coil at the current operating conditions, the properties of
 
 where
 
-<span>${h_{out}}$</span>         = enthalpy of the air leaving the cooling coil, J/kg
+<span>\({h_{out}}\)</span>         = enthalpy of the air leaving the cooling coil, J/kg
 
-<span>${h_{Tin,\,\omega out}}$</span>  = enthalpy of air at the entering coil dry-bulb temperature and leaving air humidity ratio, J/kg
+<span>\({h_{Tin,\,\omega out}}\)</span>  = enthalpy of air at the entering coil dry-bulb temperature and leaving air humidity ratio, J/kg
 
-<span>$\,{\omega_{out}}$</span>        = leaving air humidity ratio, kg/kg
+<span>\(\,{\omega_{out}}\)</span>        = leaving air humidity ratio, kg/kg
 
-<span>$\,{T_{db,out}}$</span>    = leaving air dry-bulb temperature, °C
+<span>\(\,{T_{db,out}}\)</span>    = leaving air dry-bulb temperature, °C
 
 *PsyWFnTdbH* = EnergyPlus psychrometric function, returns humidity ratio given dry-bulb temperature and enthalpy
 
@@ -1284,11 +1284,11 @@ The DX cooling coil outlet air dry-bulb temperature is determined as follows:
 
 where
 
-<span>$SHRFT$</span>  = sensible heat ratio modifier normalized biquadratic curve as a function of coil entering air wet-bulb and dry-bulb temperatures, (-). The DX cooling coil entering air temperature can be the outdoor air condition or pretreated outdoor air when the DX cooling coil is placed after an exhaust heat recovery heat exchangers.
+<span>\(SHRFT\)</span>  = sensible heat ratio modifier normalized biquadratic curve as a function of coil entering air wet-bulb and dry-bulb temperatures, (-). The DX cooling coil entering air temperature can be the outdoor air condition or pretreated outdoor air when the DX cooling coil is placed after an exhaust heat recovery heat exchangers.
 
-<span>$SHRFFF$</span>= sensible heat ratio modifier normalized quadratic curve as a function of air mass flow fraction.  Flow fraction is the ratio of actual to rated mass flow rate of air through the DX cooling coil, (-).
+<span>\(SHRFFF\)</span>= sensible heat ratio modifier normalized quadratic curve as a function of air mass flow fraction.  Flow fraction is the ratio of actual to rated mass flow rate of air through the DX cooling coil, (-).
 
-<span>$SH{R_{rated}}$</span>  = sensible heat ratio at rated condition, (-).
+<span>\(SH{R_{rated}}\)</span>  = sensible heat ratio at rated condition, (-).
 
 #### Condenser Options: AirCooled vs. EvaporativelyCooled
 
@@ -1318,9 +1318,9 @@ If an evaporatively-cooled condenser is modeled, the power requirements for the 
 
 where
 
-<span>${P_{evapcondpump}}$</span> = DX cooling coil evap condenser pump electric power, W
+<span>\({P_{evapcondpump}}\)</span> = DX cooling coil evap condenser pump electric power, W
 
-<span>${\mathop Q\limits^ \bullet_{cap,evapcondpump}}$</span>= evaporative condenser pump rated power consumption, W
+<span>\({\mathop Q\limits^ \bullet_{cap,evapcondpump}}\)</span>= evaporative condenser pump rated power consumption, W
 
 Water consumption for the evaporative-cooled condenser is calculated using the difference in air humidity level across the evaporative media and the condenser air mass flow rate:
 
@@ -1328,15 +1328,15 @@ Water consumption for the evaporative-cooled condenser is calculated using the d
 
 where
 
-<span>${V_{water}}$</span>         = DX cooling coil evap condenser water consumption, m<sup>3</sup>
+<span>\({V_{water}}\)</span>         = DX cooling coil evap condenser water consumption, m<sup>3</sup>
 
-<span>${\mathop m\limits^ \bullet_{_{air}}}$</span>          = evaporative condenser air mass flow rate, kg/s
+<span>\({\mathop m\limits^ \bullet_{_{air}}}\)</span>          = evaporative condenser air mass flow rate, kg/s
 
- <span>${\omega_{evapcond,in}}$</span>  = humidity ratio of outdoor air entering the evap condenser, kg/kg
+ <span>\({\omega_{evapcond,in}}\)</span>  = humidity ratio of outdoor air entering the evap condenser, kg/kg
 
-<span>${\omega_{evapcond,out}}$</span> = humidity ratio of air leaving the evap condenser, kg/kg
+<span>\({\omega_{evapcond,out}}\)</span> = humidity ratio of air leaving the evap condenser, kg/kg
 
-<span>${\rho_{water}}$</span>         = density of water at the outdoor dry-bulb temperature, kg/m<sup>3</sup>
+<span>\({\rho_{water}}\)</span>         = density of water at the outdoor dry-bulb temperature, kg/m<sup>3</sup>
 
 *TimeStepSys* = HVAC system simulation time step, hr
 
@@ -1376,19 +1376,19 @@ EnergyPlus is able to model latent capacity degradation based on algorithms deve
 
 The following discussion applies to both cycling fan and continuous fan operation when the fan operates for a longer period of time than the compressor and air continues to flow over the moisture laden cooling coil after compressor operation has terminated.
 
-![](EngineeringReference/media/image3484.png)
+![](media/image3484.png)
 
 Figure 168.  Transient Sensible and Latent Capacity of a Cooling Coil Over an Operating Cycle
 
 
 
-![](EngineeringReference/media/image3485.png)
+![](media/image3485.png)
 
 Figure 169. Field Data Showing the Net Impact of Part-Load Operation on Sensible Heat Ratio
 
 
 
-![](EngineeringReference/media/image3486.png)
+![](media/image3486.png)
 
 
 
@@ -1396,7 +1396,7 @@ Figure 170.  Concepts of Moisture Buildup and Evaporation
 
 Figure 170 graphically depicts the latent degradation concepts and defines several key model parameters. After the cooling coil starts to operate, the coil temperature is eventually reduced below the dewpoint temperature of the entering air. Moisture from the air then builds on the surface of the coil until time t<sub>o</sub> has elapsed and the total moisture mass on the coil is M<sub>o</sub>. After this time (t<sub>o</sub>), moisture begins to fall from the coil and all of the latent capacity provided by the coil is “useful” since this condensate is collected and removed from the unit. When the coil cycles off and the supply air fan continues to operate, the initial moisture mass buildup on the coil (M<sub>o</sub>) evaporates back into the supply air stream. If the cooling coil cycles back on before all of the moisture has evaporated, then the time until the first condensate removal (t<sub>o</sub>) is shorter for this cooling cycle since the coil is already partially wetted.
 
-Figure 170 also shows several parameters that are used in the latent degradation model. The ratio of the coil’s moisture holding capacity (M<sub>o</sub>) and the steady-state latent capacity (<span>${\mathop Q\limits^ \bullet_L}$</span>) is defined as *t<sub>wet</sub>* : the nominal time for moisture to fall from the coil (ignoring transient effects at startup and starting with a dry coil). The ratio of the initial moisture evaporation rate (<span>${\mathop Q\limits^ \bullet_e}$</span>) and the steady-state latent capacity (<span>${\mathop Q\limits^ \bullet_L}$</span>) is defined as <span>$\gamma $</span>. Both *t<sub>wet</sub>*and <span>$\gamma $</span> at the rated air volume flow rate and temperature conditions are required model inputs. Two other model inputs are the Maximum ON/OFF Cycling Rate (cycles per hour, *N<sub>max</sub>*) and the time constant (<span>$\tau $</span>, in seconds) for the cooling coil’s latent capacity to reach steady state after startup. The development of the latent degradation model is fully described by Henderson and Rengarajan (1996). The model implemented in EnergyPlus is for their “linear decay” evaporation model.
+Figure 170 also shows several parameters that are used in the latent degradation model. The ratio of the coil’s moisture holding capacity (M<sub>o</sub>) and the steady-state latent capacity (<span>\({\mathop Q\limits^ \bullet_L}\)</span>) is defined as *t<sub>wet</sub>* : the nominal time for moisture to fall from the coil (ignoring transient effects at startup and starting with a dry coil). The ratio of the initial moisture evaporation rate (<span>\({\mathop Q\limits^ \bullet_e}\)</span>) and the steady-state latent capacity (<span>\({\mathop Q\limits^ \bullet_L}\)</span>) is defined as <span>\(\gamma \)</span>. Both *t<sub>wet</sub>*and <span>\(\gamma \)</span> at the rated air volume flow rate and temperature conditions are required model inputs. Two other model inputs are the Maximum ON/OFF Cycling Rate (cycles per hour, *N<sub>max</sub>*) and the time constant (<span>\(\tau \)</span>, in seconds) for the cooling coil’s latent capacity to reach steady state after startup. The development of the latent degradation model is fully described by Henderson and Rengarajan (1996). The model implemented in EnergyPlus is for their “linear decay” evaporation model.
 
 During the simulation, all of the steady-state calculations described previously in equations (449) through (462) are completed. The latent degradation model then modifies the steady-state sensible heat ratio for the coil as shown below. The value of *t<sub>wet</sub>* at the current air volume flow rate and entering air conditions is first calculated based on the rated value of *t<sub>wet</sub>* entered by the user:
 
@@ -1408,23 +1408,23 @@ where
 
 *t<sub>wet,rated</sub>* = nominal time for condensate removal to begin at the coil’s rated airflow and entering air conditions, starting with a dry coil (sec)
 
-<span>${\mathop Q\limits^ \bullet_{latent,rated}}$</span>= cooling coil latent capacity at the rated airflow and temperature conditions, W
+<span>\({\mathop Q\limits^ \bullet_{latent,rated}}\)</span>= cooling coil latent capacity at the rated airflow and temperature conditions, W
 
-<span>${\mathop Q\limits^ \bullet_{latent}}$</span>= cooling coil latent capacity at the current airflow and temperature conditions, W
+<span>\({\mathop Q\limits^ \bullet_{latent}}\)</span>= cooling coil latent capacity at the current airflow and temperature conditions, W
 
 *t<sub>wet,max</sub>* = maximum allowed value for *t<sub>wet</sub>* (9999.0 sec)
 
 
 
-Likewise, the value of <span>$\gamma $</span>at the current air volume flow rate and entering air conditions is calculated based on the rated value of <span>$\gamma $</span>entered by the user:
+Likewise, the value of <span>\(\gamma \)</span>at the current air volume flow rate and entering air conditions is calculated based on the rated value of <span>\(\gamma \)</span>entered by the user:
 
 <div>$$\gamma  = {\gamma_{rated}}\left( {\frac{{{{\mathop Q\limits^ \bullet  }_{latent,rated}}}}{{{{\mathop Q\limits^ \bullet  }_{latent}}}}} \right)\left( {\frac{{{T_{db,i}} - {T_{wb,i}}}}{{{T_{db,rated}} - {T_{wb,rated}}}}} \right)$$</div>
 
 where:
 
-<span>$\gamma $</span>         = ratio of the initial moisture evaporation rate from the cooling coil (when the compressor first turns off, in Watts) and the coil’s steady-state latent capacity (Watts) at the current air volume flow rate and entering air conditions
+<span>\(\gamma \)</span>         = ratio of the initial moisture evaporation rate from the cooling coil (when the compressor first turns off, in Watts) and the coil’s steady-state latent capacity (Watts) at the current air volume flow rate and entering air conditions
 
-<span>${\gamma_{rated}}$</span>   = <span>$\gamma $</span> at rated air flow and entering air conditions
+<span>\({\gamma_{rated}}\)</span>   = <span>\(\gamma \)</span> at rated air flow and entering air conditions
 
 *T<sub>db,i</sub>*            = dry-bulb temperature of the air entering the cooling coil, °C
 
@@ -1478,13 +1478,13 @@ The equation for calculating the time *t<sub>o</sub>* when moisture first begins
 
 where
 
-<span>${t_o}$</span>  = time where condensate removal begins (sec)
+<span>\({t_o}\)</span>  = time where condensate removal begins (sec)
 
-<span>$\tau $</span>   = latent capacity time constant at start-up (sec)
+<span>\(\tau \)</span>   = latent capacity time constant at start-up (sec)
 
 *j*     = iteration number
 
-The part-load latent heat ratio of the cooling coil is then calculated with <span>$t_o^{}$</span>, *t<sub>on</sub>* and <span>$\tau $</span>, which is in turn used to calculate the “effective” sensible heat ratio of the cooling including part-load latent degradation effects.
+The part-load latent heat ratio of the cooling coil is then calculated with <span>\(t_o^{}\)</span>, *t<sub>on</sub>* and <span>\(\tau \)</span>, which is in turn used to calculate the “effective” sensible heat ratio of the cooling including part-load latent degradation effects.
 
 <div>$$\frac{{LHR}}{{LH{R_{ss}}}} = Maximum\left( {\left( {\frac{{{t_{on}} - {t_o}}}{{{t_{on}} + \tau \left( {{e^{\left( {\frac{{ - {t_{on}}}}{\tau }} \right)}}\,\, - \,\,1} \right)}}} \right),0.0} \right)$$</div>
 
@@ -1492,13 +1492,13 @@ The part-load latent heat ratio of the cooling coil is then calculated with <spa
 
 where
 
-<span>$LHR$</span> = part-load latent heat ratio
+<span>\(LHR\)</span> = part-load latent heat ratio
 
-<span>$LH{R_{ss}}$</span> = latent heat ratio at steady-state conditions (<span>$1 - SH{R_{ss}}$</span> with <span>$SH{R_{ss}}$</span> from eqn. (462))
+<span>\(LH{R_{ss}}\)</span> = latent heat ratio at steady-state conditions (<span>\(1 - SH{R_{ss}}\)</span> with <span>\(SH{R_{ss}}\)</span> from eqn. (462))
 
-<span>$SH{R_{eff}}$</span> = part-load sensible heat ratio**(<span>$SH{R_{ss}}$</span>* ≤<span>$SH{R_{eff}}$</span> ≤* 1.0)
+<span>\(SH{R_{eff}}\)</span> = part-load sensible heat ratio**(<span>\(SH{R_{ss}}\)</span>* ≤<span>\(SH{R_{eff}}\)</span> ≤* 1.0)
 
-<span>$SH{R_{ss}}$</span> = steady-state sensible heat ratio (from eqn. (462))
+<span>\(SH{R_{ss}}\)</span> = steady-state sensible heat ratio (from eqn. (462))
 
 With the “effective” SHR for the coil at the current operating conditions, including the impacts of latent degradation, equations (463) through (466) are then used to calculate the properties of the air leaving the cooling coil when it operates. Finally, equations (467) through (469) are used to calculate the average leaving air conditions (average when the coil is on and off) for the simulation time step.
 
@@ -1516,17 +1516,17 @@ $$</div>
 
 where:
 
-<span>$\mathop P\nolimits_{basinheater} $</span>             = DX coil basin heater electric power (W)
+<span>\(\mathop P\nolimits_{basinheater} \)</span>             = DX coil basin heater electric power (W)
 
-<span>$\mathop E\nolimits_{basinheater} $</span>            = DX coil basin heater electric consumption (J)
+<span>\(\mathop E\nolimits_{basinheater} \)</span>            = DX coil basin heater electric consumption (J)
 
-<span>$\mathop T\nolimits_{setpoint,basin} $</span>           = Basin heater setpoint temperature (<sup>o</sup>C)
+<span>\(\mathop T\nolimits_{setpoint,basin} \)</span>           = Basin heater setpoint temperature (<sup>o</sup>C)
 
-<span>$\mathop T\nolimits_{db,outdoor} $</span>              = Outdoor air dry-bulb temperature (<sup>o</sup>C)
+<span>\(\mathop T\nolimits_{db,outdoor} \)</span>              = Outdoor air dry-bulb temperature (<sup>o</sup>C)
 
-<span>$\mathop {CAP}\nolimits_{basinheater} $</span>         = Basin heater capacity (W/K)
+<span>\(\mathop {CAP}\nolimits_{basinheater} \)</span>         = Basin heater capacity (W/K)
 
-<span>$RTF$</span>                        = Run time fraction of DX cooling coil
+<span>\(RTF\)</span>                        = Run time fraction of DX cooling coil
 
 #### Special Calculations for Coil:Cooling:DX:TwoStageWithHumidityControlMode with CoilPerformance:DX:Cooling
 
@@ -1558,17 +1558,17 @@ The standard rating cooling capacity (AHRI 2007, AHRI 2008) is calculated as fol
 
 where,
 
-<span>${\dot Q_{StandardRating}}$</span> = Standard Rating (Net) Cooling Capacity (W)
+<span>\({\dot Q_{StandardRating}}\)</span> = Standard Rating (Net) Cooling Capacity (W)
 
-<span>${\dot Q_{Total,Rated}}$</span> = Rated Total (Gross) Cooling Capacity, user input (W)
+<span>\({\dot Q_{Total,Rated}}\)</span> = Rated Total (Gross) Cooling Capacity, user input (W)
 
-<span>$TotCapTempModFa{c_{Rated}}$</span>= Total Cooling Capacity Function of Temperature Curve evaluated with 19.44°C wet-bulb temperature air entering the cooling coil and 35.0°C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
+<span>\(TotCapTempModFa{c_{Rated}}\)</span>= Total Cooling Capacity Function of Temperature Curve evaluated with 19.44°C wet-bulb temperature air entering the cooling coil and 35.0°C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
 
-<span>$TotCapFlowModFa{c_{Rated}}$</span>= Total Cooling Capacity Function of Flow Fraction Curve evaluated at a flow fraction of 1.0 (dimensionless)
+<span>\(TotCapFlowModFa{c_{Rated}}\)</span>= Total Cooling Capacity Function of Flow Fraction Curve evaluated at a flow fraction of 1.0 (dimensionless)
 
-<span>$FanPowerPerVolFlowRate$</span>= Rated Evaporator Fan Power Per Volume Flow Rate, user input ( W/(m<sup>3</sup>/s) )
+<span>\(FanPowerPerVolFlowRate\)</span>= Rated Evaporator Fan Power Per Volume Flow Rate, user input ( W/(m<sup>3</sup>/s) )
 
-<span>${\dot V_{Rated}}$</span>= Rated Air Volume Flow Rate, user input (m<sup>3</sup>/s)
+<span>\({\dot V_{Rated}}\)</span>= Rated Air Volume Flow Rate, user input (m<sup>3</sup>/s)
 
 The Rated Evaporator Fan Power Per Volume Flow rate is a user-entered value, with a default of 773.3 W/(m<sup>3</sup>/s)) if the user leaves this input field blank. The default value is taken from ANSI/AHRI Standards 210/240 and 340/360 where it is defined for systems which do not have a cooling coil fan furnished as part of the system (e.g., a DX cooling coil mounted in the ductwork downstream of a gas furnace where the furnace contains the fan used for air distribution across the gas heating coil and the downstream DX cooling coil). The test conditions in ANSI/AHRI Standards 210/240 and 340/360 vary the external static pressure (i.e., pressure drop associated with ductwork and other devices external to the indoor fan/coil section) seen by the supply air fan based on the standard rating cooling capacity. Note, however, that external static pressure in actual installations is typically much higher. Further details regarding indoor fan power per volume flow rate can be found in Walker and Lutz (2005) and Walker (2007), including differences between Permanent Split Capacitor (PSC) and Brushless Permanent Magnet (BPM) fan motors. Especially at the low external static pressures defined in the ANSI/AHRI Standards, BPM motors (e.g., Electronically Commutated Motors (ECMs)) can draw significantly less power (e.g., 50-75% less) than PSC motors.
 
@@ -1580,7 +1580,7 @@ The seasonal energy efficiency ratio (SEER) is calculated as follows:
 
 <div>$$\begin{array}{l}{{\dot Q}_{Total,Net,TestB}} = {{\dot Q}_{Total,Rated}}(TotCapTempModFa{c_{TestB}})(TotCapFlowModFa{c_{Rated}})\\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, - \,\,\left( {FanPowerPerVolFlowRate \cdot {{\dot V}_{Rated}}} \right)\end{array}$$</div>
 
-<span>$\begin{array}{l}Powe{r_{Total,TestB}} = \left( {{{\dot Q}_{Total,Rated}}(TotCapTempModFa{c_{TestB}})(TotCapFlowModFa{c_{Rated}})} \right)\, \cdot EI{R_{TestB}}\\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, + \,\,\left( {FanPowerPerVolFlowRate \cdot {{\dot V}_{Rated}}} \right)\end{array}$</span><span>$EI{R_{TestB}} = \left( {\frac{1}{{CO{P_{rated}}}}} \right)(EIRTempModFa{c_{TestB}})(EIRFlowModFa{c_{Rated}})$</span>
+<span>\(\begin{array}{l}Powe{r_{Total,TestB}} = \left( {{{\dot Q}_{Total,Rated}}(TotCapTempModFa{c_{TestB}})(TotCapFlowModFa{c_{Rated}})} \right)\, \cdot EI{R_{TestB}}\\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, + \,\,\left( {FanPowerPerVolFlowRate \cdot {{\dot V}_{Rated}}} \right)\end{array}\)</span><span>\(EI{R_{TestB}} = \left( {\frac{1}{{CO{P_{rated}}}}} \right)(EIRTempModFa{c_{TestB}})(EIRFlowModFa{c_{Rated}})\)</span>
 
 where,
 
@@ -1588,17 +1588,17 @@ where,
 
 *EER<sub>TestB</sub>*<sub></sub> = Energy efficiency ratio with 19.44°C wet-bulb temperature air entering the cooling coil, 27.78°C dry-bulb temperature air entering the air-cooled (outdoor) condenser, and rated air volume flow through the cooling coil (W/W)
 
-<span>${\dot Q_{Total,Net,TestB}}$</span>= Net total cooling capacity with 19.44°C wet-bulb temperature air entering the cooling coil, 27.78°C dry-bulb temperature air entering the air-cooled (outdoor) condenser, and rated air volume flow through the cooling coil (W)
+<span>\({\dot Q_{Total,Net,TestB}}\)</span>= Net total cooling capacity with 19.44°C wet-bulb temperature air entering the cooling coil, 27.78°C dry-bulb temperature air entering the air-cooled (outdoor) condenser, and rated air volume flow through the cooling coil (W)
 
-<span>$TotCapTempModFa{c_{TestB}}$</span> = Total Cooling Capacity Function of Temperature Curve evaluated with 19.44°C wet-bulb temperature air entering the cooling coil and 27.78°C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
+<span>\(TotCapTempModFa{c_{TestB}}\)</span> = Total Cooling Capacity Function of Temperature Curve evaluated with 19.44°C wet-bulb temperature air entering the cooling coil and 27.78°C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
 
-<span>$Powe{r_{Total,TestB}}$</span> = Total electric power (compressors, condenser fans and evaporator fan) with 19.44°C wet-bulb temperature air entering the cooling coil, 27.78°C dry-bulb temperature air entering the air-cooled (outdoor) condenser, and rated air volume flow through the cooling coil (W)
+<span>\(Powe{r_{Total,TestB}}\)</span> = Total electric power (compressors, condenser fans and evaporator fan) with 19.44°C wet-bulb temperature air entering the cooling coil, 27.78°C dry-bulb temperature air entering the air-cooled (outdoor) condenser, and rated air volume flow through the cooling coil (W)
 
-<span>$CO{P_{rated}}$</span> = Coefficient of Performance at Rated Conditions, user input (W/W)
+<span>\(CO{P_{rated}}\)</span> = Coefficient of Performance at Rated Conditions, user input (W/W)
 
-<span>$EIRTempModFa{c_{TestB}}$</span> = Energy Input Ratio Function of Temperature Curve evaluated with 19.44°C wet-bulb temperature air entering the cooling coil and 27.78°C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
+<span>\(EIRTempModFa{c_{TestB}}\)</span> = Energy Input Ratio Function of Temperature Curve evaluated with 19.44°C wet-bulb temperature air entering the cooling coil and 27.78°C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
 
-<span>$EIRFlowModFa{c_{Rated}}$</span>= Energy Input Ratio Function of Flow Fraction Curve evaluated at a flow fraction of 1.0 (dimensionless).
+<span>\(EIRFlowModFa{c_{Rated}}\)</span>= Energy Input Ratio Function of Flow Fraction Curve evaluated at a flow fraction of 1.0 (dimensionless).
 
 Energy Efficiency Ratio (EER) is another standard rating (AHRI 2007), and it is defined as the ratio of the total cooling capacity to the total power input at any given set of rating conditions, expressed in W/W (or Btu/W-h). For this class of air-cooled DX cooling coils, EER is calculated at rated test conditions as follows:
 
@@ -1612,11 +1612,11 @@ where,
 
 *EER*  = Energy Efficiency Ratio (W/W)
 
-<span>$Powe{r_{Total,Rated}}$</span>= Total electric power (compressors, condenser fans and evaporator fan) with 19.44°C wet-bulb temperature air entering the cooling coil, 35.0°C dry-bulb temperature air entering the air-cooled (outdoor) condenser, and air flow rate across the evaporator at the Rated Air Volume Flow Rate (W).
+<span>\(Powe{r_{Total,Rated}}\)</span>= Total electric power (compressors, condenser fans and evaporator fan) with 19.44°C wet-bulb temperature air entering the cooling coil, 35.0°C dry-bulb temperature air entering the air-cooled (outdoor) condenser, and air flow rate across the evaporator at the Rated Air Volume Flow Rate (W).
 
-<span>$TotCapTempModFa{c_{Rated}}$</span> = Total Cooling Capacity Function of Temperature Curve evaluated with 19.44°C wet-bulb temperature air entering the cooling coil and 35.0°C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
+<span>\(TotCapTempModFa{c_{Rated}}\)</span> = Total Cooling Capacity Function of Temperature Curve evaluated with 19.44°C wet-bulb temperature air entering the cooling coil and 35.0°C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
 
-<span>$EIRTempModFa{c_{Rated}}$</span> = Energy Input Ratio Function of Temperature Curve evaluated with 19.44°C wet-bulb temperature air entering the cooling coil and 35.0°C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
+<span>\(EIRTempModFa{c_{Rated}}\)</span> = Energy Input Ratio Function of Temperature Curve evaluated with 19.44°C wet-bulb temperature air entering the cooling coil and 35.0°C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
 
 The Integrated Energy Efficiency Ratio (IEER) is intended to be a measure of merit for the cooling coil’s part-load efficiency. IEER replaced Integrated Part-Load Value (IPLV) as the part-load performance metric in Std. 340/360 as of January 1, 2010. Full details regarding the IEER calculation are available in ANSI/AHRI Std. 340/360 (AHRI 2007). A summary of the IEER calculations made by EnergyPlus for single-speed air-cooled DX cooling coils is provided below:
 
@@ -1624,13 +1624,13 @@ The Integrated Energy Efficiency Ratio (IEER) is intended to be a measure of mer
 
 where,
 
-<span>$EE{R_A}$</span> =     *EER* at 100% net capacity at AHRI standard rating conditions (same as EER calculation shown above)
+<span>\(EE{R_A}\)</span> =     *EER* at 100% net capacity at AHRI standard rating conditions (same as EER calculation shown above)
 
-<span>$EE{R_B}$</span> =     *EER* at 75% net capacity and reduced outdoor air temperature
+<span>\(EE{R_B}\)</span> =     *EER* at 75% net capacity and reduced outdoor air temperature
 
-<span>$EE{R_C}$</span> =     *EER* at 50% net capacity and reduced outdoor air temperature
+<span>\(EE{R_C}\)</span> =     *EER* at 50% net capacity and reduced outdoor air temperature
 
-<span>$EE{R_D}$</span>=      *EER* at 25% net capacity and reduced outdoor air temperature
+<span>\(EE{R_D}\)</span>=      *EER* at 25% net capacity and reduced outdoor air temperature
 
 <div>$$EE{R_{B - D}} = \frac{{LF \cdot {{\dot Q}_{Total,Net,PartLoad}}}}{{Powe{r_{Total,{\kern 1pt} PartLoad}}}}$$</div>
 
@@ -1642,15 +1642,15 @@ where,
 
 where,
 
-<span>${\dot Q_{Total,Net,PartLoad}}$</span> =     Net total cooling capacity with 19.44°C wet-bulb temperature air entering the cooling coil rated air volume flow through the cooling coil (W). The dry-bulb temperature of air entering the air-cooled condenser varies (B = 27.5°C, C = 20.0°C, D = 18.3°C).
+<span>\({\dot Q_{Total,Net,PartLoad}}\)</span> =     Net total cooling capacity with 19.44°C wet-bulb temperature air entering the cooling coil rated air volume flow through the cooling coil (W). The dry-bulb temperature of air entering the air-cooled condenser varies (B = 27.5°C, C = 20.0°C, D = 18.3°C).
 
-<span>$Powe{r_{Total,PartLoad}}$</span> = Total electric power (compressors, condenser fans and evaporator fan) with 19.44°C wet-bulb temperature air entering the cooling coil and air flow rate across the evaporator at the Rated Air Volume Flow Rate (W). The dry-bulb temperature of air entering the air-cooled condenser varies (B = 27.5°C, C = 20.0°C, D = 18.3°C).<span>$Powe{r_{CompCondFan,{\kern 1pt} PartLoad}}$</span> = Electric power of the compressor and condenser fan at the various part-load ratios, with 19.44°C wet-bulb temperature air entering the cooling coil and rated supply air volume flow rate (W). The dry-bulb temperature of air entering the air-cooled condenser varies per the part-load ratio (B = 27.5°C, C = 20.0°C, D = 18.3°C).
+<span>\(Powe{r_{Total,PartLoad}}\)</span> = Total electric power (compressors, condenser fans and evaporator fan) with 19.44°C wet-bulb temperature air entering the cooling coil and air flow rate across the evaporator at the Rated Air Volume Flow Rate (W). The dry-bulb temperature of air entering the air-cooled condenser varies (B = 27.5°C, C = 20.0°C, D = 18.3°C).<span>\(Powe{r_{CompCondFan,{\kern 1pt} PartLoad}}\)</span> = Electric power of the compressor and condenser fan at the various part-load ratios, with 19.44°C wet-bulb temperature air entering the cooling coil and rated supply air volume flow rate (W). The dry-bulb temperature of air entering the air-cooled condenser varies per the part-load ratio (B = 27.5°C, C = 20.0°C, D = 18.3°C).
 
-<span>$EIRTempModFa{c_{PartLoad}}$</span> = Energy Input Ratio Function of Temperature Curve evaluated with 19.44°C wet-bulb temperature air entering the cooling coil and dry-bulb temperature of air entering the air-cooled condenser corresponding to the reduced part-load ratio (B = 27.5°C, C = 20.0°C, D = 18.3°C) (dimensionless).
+<span>\(EIRTempModFa{c_{PartLoad}}\)</span> = Energy Input Ratio Function of Temperature Curve evaluated with 19.44°C wet-bulb temperature air entering the cooling coil and dry-bulb temperature of air entering the air-cooled condenser corresponding to the reduced part-load ratio (B = 27.5°C, C = 20.0°C, D = 18.3°C) (dimensionless).
 
-<span>${C_D}$</span>= degradation coefficient to account for cycling of the compressor = 1.13 – 0.13*LF*.
+<span>\({C_D}\)</span>= degradation coefficient to account for cycling of the compressor = 1.13 – 0.13*LF*.
 
-<span>$LF$</span> = fractional “on” time at the desired load point
+<span>\(LF\)</span> = fractional “on” time at the desired load point
 
 The load factor (*LF*) is the fractional “on” time for the desired reduced load points (75%, 50%, or 25%) calculated from the following equation:
 
@@ -1658,7 +1658,7 @@ The load factor (*LF*) is the fractional “on” time for the desired reduced l
 
 where,
 
-*<span>$\% Load$</span>* = Part-load operating points, i.e., 75% (B), 50% (C), 25% (D)
+*<span>\(\% Load\)</span>* = Part-load operating points, i.e., 75% (B), 50% (C), 25% (D)
 
 The calculations for *Q<sub>Total,Net,PartLoad</sub>* and *Power<sub>Total,PartLoad</sub>* are calculated in nearly the same way as *Q<sub>Total,Net,TestB</sub>* and *Power<sub>Total,TestB</sub>* are calculated for SEER (defined above). The only difference is that these cooling capacity and power values, used for calculating EER<sub>B</sub>/EER<sub>C</sub>/EER<sub>D</sub> for IEER, are calculated for a series of dry-bulb temperatures of air entering the air-cooled condenser (B = 27.5°C, C = 20.0°C, D = 18.3°C) and part-load performance degradiation correction is also applied to the condensing unit electric power calculation.
 
@@ -1731,17 +1731,17 @@ The standard rating net total cooling capacity is calculated as follows:
 
 where:
 
-* <span>$ \dot{Q}_{StandardRating} $</span> = Standard Rating (Net) Cooling Capacity (W)
+* <span>\(\dot{Q}_{StandardRating} \)</span> = Standard Rating (Net) Cooling Capacity (W)
 
-* <span>$ \dot{Q}_{Total,Rated} $</span> = Rated Total (Gross) Cooling Capacity, user input (W)
+* <span>\(\dot{Q}_{Total,Rated} \)</span> = Rated Total (Gross) Cooling Capacity, user input (W)
 
-* <span>$ \text{TotCapTempModFac}_{Rated} $</span> = Total Cooling Capacity Function of Temperature Curve evaluated at wet-bulb temperature of air entering the cooling coil and dry-bulb temperature of air entering the air-cooled (outdoor) condenser (dimensionless)
+* <span>\(\text{TotCapTempModFac}_{Rated} \)</span> = Total Cooling Capacity Function of Temperature Curve evaluated at wet-bulb temperature of air entering the cooling coil and dry-bulb temperature of air entering the air-cooled (outdoor) condenser (dimensionless)
 
-* <span>$ \text{TotCapFlowModFac}_{Rated} $</span> = Total Cooling Capacity Function of Flow Fraction Curve evaluated at a flow fraction of 1.0 (dimensionless)
+* <span>\(\text{TotCapFlowModFac}_{Rated} \)</span> = Total Cooling Capacity Function of Flow Fraction Curve evaluated at a flow fraction of 1.0 (dimensionless)
 
-* <span>$ \text{FanPowerPerVolFlowRate} $</span> = Rated Evaporator Fan Power Per Volume Flow Rate, user input ( W/(m3/s) )
+* <span>\(\text{FanPowerPerVolFlowRate} \)</span> = Rated Evaporator Fan Power Per Volume Flow Rate, user input ( W/(m3/s) )
 
-* <span>$ \dot{V}_{Rated} $</span> = Rated Air Volume Flow Rate, user input (m3/s)
+* <span>\(\dot{V}_{Rated} \)</span> = Rated Air Volume Flow Rate, user input (m3/s)
 
 The standard rating net total cooling electric power input is calculated as follows:
 
@@ -1751,17 +1751,17 @@ The standard rating net total cooling electric power input is calculated as foll
 
 where:
 
-* <span>$ EER $</span> = Energy efficiency ratio at wet-bulb temperature of air entering the cooling coil, dry-bulb temperature of air entering the air-cooled (outdoor) condenser, and rated air volume flow through the cooling coil (W/W)
+* <span>\(EER \)</span> = Energy efficiency ratio at wet-bulb temperature of air entering the cooling coil, dry-bulb temperature of air entering the air-cooled (outdoor) condenser, and rated air volume flow through the cooling coil (W/W)
 
-* <span>$ \text{TotCapTempModFac} $</span> = Total Cooling Capacity Function of Temperature Curve evaluated at the test condition of wet-bulb temperature of air entering the cooling coil and dry-bulb temperature of air entering the air-cooled (outdoor) condenser (dimensionless)
+* <span>\(\text{TotCapTempModFac} \)</span> = Total Cooling Capacity Function of Temperature Curve evaluated at the test condition of wet-bulb temperature of air entering the cooling coil and dry-bulb temperature of air entering the air-cooled (outdoor) condenser (dimensionless)
 
-* <span>$ \text{Power}_{Total} $</span> = Total electric power (compressors, condenser fans and evaporator fan) at the test conditions of wet-bulb temperature of air entering the cooling coil, and dry-bulb temperature of air entering the air-cooled (outdoor) condenser, and rated air volume flow through the cooling coil (W)
+* <span>\(\text{Power}_{Total} \)</span> = Total electric power (compressors, condenser fans and evaporator fan) at the test conditions of wet-bulb temperature of air entering the cooling coil, and dry-bulb temperature of air entering the air-cooled (outdoor) condenser, and rated air volume flow through the cooling coil (W)
 
-* <span>$ COP_{Rated} $</span> = Coefficient of Performance at Rated Conditions, user input (W/W)
+* <span>\(COP_{Rated} \)</span> = Coefficient of Performance at Rated Conditions, user input (W/W)
 
-* <span>$ \text{EIRTempModFac} $</span> = Energy Input Ratio Function of Temperature Curve evaluated at the test condition of wet-bulb temperature of air entering the cooling coil and dry-bulb temperature of air entering the air-cooled (outdoor) condenser (dimensionless)
+* <span>\(\text{EIRTempModFac} \)</span> = Energy Input Ratio Function of Temperature Curve evaluated at the test condition of wet-bulb temperature of air entering the cooling coil and dry-bulb temperature of air entering the air-cooled (outdoor) condenser (dimensionless)
 
-* <span>$ \text{EIRFlowModFac}_{Rated} $</span> = Energy Input Ratio Function of Flow Fraction Curve evaluated at a flow fraction of 1.0 (dimensionless).
+* <span>\(\text{EIRFlowModFac}_{Rated} \)</span> = Energy Input Ratio Function of Flow Fraction Curve evaluated at a flow fraction of 1.0 (dimensionless).
 
 Reference:
 
@@ -1831,7 +1831,7 @@ where,
 
 *Q<sub>coil,cyclingl</sub>*      = delivered total cooling capacity for Speed 1 operating at a specific cycling ratio [W]
 
-<span>${\mathop m\limits^\cdot_{Speed\,\,1}}$</span>      = air mass flow rate through cooling coil at Speed 1 as set by the parent object [kg/s]
+<span>\({\mathop m\limits^\cdot_{Speed\,\,1}}\)</span>      = air mass flow rate through cooling coil at Speed 1 as set by the parent object [kg/s]
 
 *h<sub>outlet,full</sub>*      = specific enthalpy of the coil outlet air during full-load operation at Speed 1 (no cycling) [J/kg]
 
@@ -1855,7 +1855,7 @@ h<sub>inlet</sub>             = specific enthalpy at the coil inlet 
 
 Q<sub>coil,cycling</sub>      = total capacity at full load [W]
 
-<span>${\mathop m\limits^\cdot_{inlet}}$</span>         = mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the cooling coil is ON and the specified flow rate when the cooling coil is OFF for the time step being simulated.
+<span>\({\mathop m\limits^\cdot_{inlet}}\)</span>         = mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the cooling coil is ON and the specified flow rate when the cooling coil is OFF for the time step being simulated.
 
 n Sensible capacity
 
@@ -1935,7 +1935,7 @@ The bypass factor at Speed n is a function of the bypass factor at the rated con
 
 n Total capacity at Speed n-1 and Speed n
 
-<span>$TotCa{p_{n - 1}} = f(RatedCa{p_{n - 1}},TotCapTempModFa{c_{n - 1}},TotCapFlowModFa{c_{n - 1}},BypassFacto{r_{n - 1}})$</span><span>$TotCa{p_n} = f(RatedCa{p_n},TotCapTempModFa{c_n},TotCapFlowModFa{c_n},BypassFacto{r_n})$</span>
+<span>\(TotCa{p_{n - 1}} = f(RatedCa{p_{n - 1}},TotCapTempModFa{c_{n - 1}},TotCapFlowModFa{c_{n - 1}},BypassFacto{r_{n - 1}})\)</span><span>\(TotCa{p_n} = f(RatedCa{p_n},TotCapTempModFa{c_n},TotCapFlowModFa{c_n},BypassFacto{r_n})\)</span>
 
 where
 
@@ -1981,11 +1981,11 @@ n Effective total cooling capacity
 
 where
 
-<span>${Q_{coil,SpeedRatio}}$</span><sub>                       </sub> = delivered sensible cooling capacity at a given speed ratio between two consecutive speeds [W]
+<span>\({Q_{coil,SpeedRatio}}\)</span><sub>                       </sub> = delivered sensible cooling capacity at a given speed ratio between two consecutive speeds [W]
 
-<span>${\mathop m\limits^\cdot_{Speed\,n}}$</span>      = air mass flow rate through cooling coil at Speed n as set by the parent object [kg/s]
+<span>\({\mathop m\limits^\cdot_{Speed\,n}}\)</span>      = air mass flow rate through cooling coil at Speed n as set by the parent object [kg/s]
 
-<span>${\mathop m\limits^\cdot_{Speed\,\,n - 1}}$</span>    = air mass flow rate through cooling coil at Speed 1 as set by the parent object [kg/s]
+<span>\({\mathop m\limits^\cdot_{Speed\,\,n - 1}}\)</span>    = air mass flow rate through cooling coil at Speed 1 as set by the parent object [kg/s]
 
 h<sub>inlet</sub>             = specific enthalpy at the coil inlet [J/kg]
 
@@ -2003,7 +2003,7 @@ h<sub>outlet,average</sub>    = averaged specific enthalpy at the coil outlet
 
 h<sub>inlet</sub>             = specific enthalpy at the coil inlet [J/kg]
 
-<span>${\mathop m\limits^\cdot_{inlet}}$</span>         = mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the heating coil is at Speed n and the specified flow rate when the heating coil is at Speed n-1 for the time step being simulated.
+<span>\({\mathop m\limits^\cdot_{inlet}}\)</span>         = mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the heating coil is at Speed n and the specified flow rate when the heating coil is at Speed n-1 for the time step being simulated.
 
 n Effective sensible cooling capacity
 
@@ -2047,7 +2047,7 @@ n Calculate combined energy input
 
 When the input for the field ‘Apply Part Load Fraction to Speeds Greater than 1’ is No in the object (equivalent to a single compressor), the combined energy output is calculated as follows:
 
-<span>$CoolingPower = (TotCa{p_n})(EI{R_n})(SpeedRatio) + (TotCa{p_{n - 1}})(EI{R_{n - 1}})(1.0 - SpeedRatio)$</span> When the input for the field ’Apply Part Load Fraction to Speeds Greater than 1’ is Yes in the object (equivalent to multiple compressors), the combined energy output is calculated as follows:
+<span>\(CoolingPower = (TotCa{p_n})(EI{R_n})(SpeedRatio) + (TotCa{p_{n - 1}})(EI{R_{n - 1}})(1.0 - SpeedRatio)\)</span> When the input for the field ’Apply Part Load Fraction to Speeds Greater than 1’ is Yes in the object (equivalent to multiple compressors), the combined energy output is calculated as follows:
 
 <div>$$CoolingPower = (TotCa{p_n})(EI{R_n})(RTF) + (TotCa{p_{n - 1}})(EI{R_{n - 1}})(1.0 - RTF)$$</div>
 
@@ -2099,21 +2099,21 @@ The standard net cooling capacity of multi-speed DX cooling coil is reported at 
 
 where,
 
-<span>${\dot Q_{StandardRating\,Net}}$</span> =    total standard **(net)** cooling capacity (W) of the air-conditioning or heat pump equipment in cooling mode determined from ANSI/AHRI Standard 210/240 and A2 test conditions shown in Table 56. The standard cooling test conditions for air-cooled condenser are: indoor coil entering air dry-bulb and wet-bulb temperatures 26.7°C/19.4°C and outdoor coil entering air dry-bulb and wet-bulb temperatures 35.0°C/23.9°C.
+<span>\({\dot Q_{StandardRating\,Net}}\)</span> =    total standard **(net)** cooling capacity (W) of the air-conditioning or heat pump equipment in cooling mode determined from ANSI/AHRI Standard 210/240 and A2 test conditions shown in Table 56. The standard cooling test conditions for air-cooled condenser are: indoor coil entering air dry-bulb and wet-bulb temperatures 26.7°C/19.4°C and outdoor coil entering air dry-bulb and wet-bulb temperatures 35.0°C/23.9°C.
 
-<span>${\dot Q_{StandardRating}}$</span> =        total standard cooling capacity (W) of the air-conditioning or heat pump equipment determined from ANSI/AHRI Standard 210/240 and A2 test conditions shown in Table 56. The standard cooling test conditions for air-cooled are: indoor coil entering air dry-bulb and wet-bulb temperatures 26.7°C/19.4°C and outdoor coil entering air dry-bulb and wet-bulb temperatures 35.0°C/23.9°C.
+<span>\({\dot Q_{StandardRating}}\)</span> =        total standard cooling capacity (W) of the air-conditioning or heat pump equipment determined from ANSI/AHRI Standard 210/240 and A2 test conditions shown in Table 56. The standard cooling test conditions for air-cooled are: indoor coil entering air dry-bulb and wet-bulb temperatures 26.7°C/19.4°C and outdoor coil entering air dry-bulb and wet-bulb temperatures 35.0°C/23.9°C.
 
-<span>$\dot Q_{T,\,CRated}^{k = 2}$</span> = Rated total cooling capacity at maximum speed, user input (W)
+<span>\(\dot Q_{T,\,CRated}^{k = 2}\)</span> = Rated total cooling capacity at maximum speed, user input (W)
 
-<span>$CAPFT_{TestA2}^{k = 2}$</span>= User-specified bi-quadratic curve evaluated at the indoor coil entering air wet-bulb temperature (19.4°C) and outdoor coil entering air dry-bulb temperature (35.0°C) for air-cooled condenser per A2 test condition as specified in Table 56, (dimensionless).
+<span>\(CAPFT_{TestA2}^{k = 2}\)</span>= User-specified bi-quadratic curve evaluated at the indoor coil entering air wet-bulb temperature (19.4°C) and outdoor coil entering air dry-bulb temperature (35.0°C) for air-cooled condenser per A2 test condition as specified in Table 56, (dimensionless).
 
-<span>$CAPFFF_{TestA2}^{k = 2}$</span>= User-specified quadratic or cubic curve modifying the total cooling capacity as function of flow fraction, (dimensionless).  This curve is evaluated at a flow fraction of 1.0.
+<span>\(CAPFFF_{TestA2}^{k = 2}\)</span>= User-specified quadratic or cubic curve modifying the total cooling capacity as function of flow fraction, (dimensionless).  This curve is evaluated at a flow fraction of 1.0.
 
-<span>$Fa{n_{Power,\,Rated}}$</span>= Supply air fan power at rated conditions at high (maximum) compressor speed, (W).
+<span>\(Fa{n_{Power,\,Rated}}\)</span>= Supply air fan power at rated conditions at high (maximum) compressor speed, (W).
 
-<span>$\dot V_{_{CRated}}^{k = 2}$</span>= Rated Air Volume Flow Rate at high (maximum) compressor speed, user input (m<sup>3</sup>/s)
+<span>\(\dot V_{_{CRated}}^{k = 2}\)</span>= Rated Air Volume Flow Rate at high (maximum) compressor speed, user input (m<sup>3</sup>/s)
 
-<span>$FanPowerPerVolFlowRat{e^{k = 2}}$</span>= The Rated Indoor Coil Fan Power Per Volume Flow rate is a user-entered value, with a default of 773.3 W/(m<sup>3</sup>/s)) if the user leaves this input field blank. The default value is taken from ANSI/ASHRAE Standard 210/240 -2008 where it is defined for systems which do not have an indoor coil fan furnished as part of the system. See the description given below how this value is calculated. User input ( W/(m<sup>3</sup>/s)).
+<span>\(FanPowerPerVolFlowRat{e^{k = 2}}\)</span>= The Rated Indoor Coil Fan Power Per Volume Flow rate is a user-entered value, with a default of 773.3 W/(m<sup>3</sup>/s)) if the user leaves this input field blank. The default value is taken from ANSI/ASHRAE Standard 210/240 -2008 where it is defined for systems which do not have an indoor coil fan furnished as part of the system. See the description given below how this value is calculated. User input ( W/(m<sup>3</sup>/s)).
 
 The Rated Evaporator (Indoor Coil) Fan Power Per Volume Flow rate is a user-entered value, with a default of 773.3 W/(m<sup>3</sup>/s)) if the user leaves this input field blank. The default value is taken from ANSI/ASHRAE Standard 210/240-2008 where it is defined for systems which do not have an Indoor Coil (Evaporator) fan furnished as part of the system. The test conditions in ANSI/AHRI Standard 210/240 vary the external static pressure (i.e., pressure drop associated with ductwork and other devices external to the indoor fan/coil section) seen by the supply air fan based on the standard rating cooling capacity.
 
@@ -2155,31 +2155,31 @@ The steady-state cooling capacities and electric power inputs at the minimum spe
 
 Where,
 
-<span>$\dot Q_{T,\,CRated}^{k = 1}$</span>=   rated total cooling capacity at minimum compressor speed specified by users, (W)
+<span>\(\dot Q_{T,\,CRated}^{k = 1}\)</span>=   rated total cooling capacity at minimum compressor speed specified by users, (W)
 
-<span>$COP_{CRated}^{k = 1}$</span>=            rated gross COP at minimum compressor speed specified by users, (-)
+<span>\(COP_{CRated}^{k = 1}\)</span>=            rated gross COP at minimum compressor speed specified by users, (-)
 
-<span>$CAPFT_{TestB1}^{k = 1}$</span>=cooling capacities modifier curve for temperature at minimum compressor speed and B1 test condition, (-)
+<span>\(CAPFT_{TestB1}^{k = 1}\)</span>=cooling capacities modifier curve for temperature at minimum compressor speed and B1 test condition, (-)
 
-<span>$CAPFFF_{TestB1}^{k = 1}$</span>=      cooling capacities modifier curve for flow fraction at minimum compressor speed and B1 test condition, (-)
+<span>\(CAPFFF_{TestB1}^{k = 1}\)</span>=      cooling capacities modifier curve for flow fraction at minimum compressor speed and B1 test condition, (-)
 
-<span>$EIRFT_{TestB1}^{k = 1}$</span>=EIR modifier curve for temperature at minimum compressor speed and B1 test condition, (-)
+<span>\(EIRFT_{TestB1}^{k = 1}\)</span>=EIR modifier curve for temperature at minimum compressor speed and B1 test condition, (-)
 
-<span>$EIRFFF_{TestB1}^{k = 1}$</span>=EIR modifier curve for flow fraction at minimum compressor speed and B1 test condition, (-)
+<span>\(EIRFFF_{TestB1}^{k = 1}\)</span>=EIR modifier curve for flow fraction at minimum compressor speed and B1 test condition, (-)
 
-<span>$CAPFT_{TestF1}^{k = 1}$</span>=cooling capacities modifier curve for temperature at minimum compressor speed and F1 test condition, (-)
+<span>\(CAPFT_{TestF1}^{k = 1}\)</span>=cooling capacities modifier curve for temperature at minimum compressor speed and F1 test condition, (-)
 
-<span>$CAPFFF_{TestF1}^{k = 1}$</span>=cooling capacities modifier curve for flow fraction at minimum compressor speed and F1 test condition, (-)
+<span>\(CAPFFF_{TestF1}^{k = 1}\)</span>=cooling capacities modifier curve for flow fraction at minimum compressor speed and F1 test condition, (-)
 
-<span>$EIRFT_{TestF1}^{k = 1}$</span>=EIR modifier curve for temperature at minimum compressor speed and F1 test condition, (-)
+<span>\(EIRFT_{TestF1}^{k = 1}\)</span>=EIR modifier curve for temperature at minimum compressor speed and F1 test condition, (-)
 
-<span>$EIRFFF_{TestF1}^{k = 1}$</span>=EIR modifier curve for flow fraction at minimum compressor speed and F1 test condition, (-)
+<span>\(EIRFFF_{TestF1}^{k = 1}\)</span>=EIR modifier curve for flow fraction at minimum compressor speed and F1 test condition, (-)
 
-<span>$FanPower_{CRated}^{k = 1}$</span>=the rated supply air fan power when the unit is operating at minimum compressor speed, (W)
+<span>\(FanPower_{CRated}^{k = 1}\)</span>=the rated supply air fan power when the unit is operating at minimum compressor speed, (W)
 
-<span>$V_{CRated}^{k = 1}$</span>=rated cooling supply air volume flow rate at minimum compressor speed specified by users, (-)
+<span>\(V_{CRated}^{k = 1}\)</span>=rated cooling supply air volume flow rate at minimum compressor speed specified by users, (-)
 
-<span>$FanPowerPerVolFlowRat{e^{k = 1}}$</span> =  the rated Indoor Coil fan power per volume flow rate at low (minimum) compressor speed specified value by the user, (W/(m3/s))
+<span>\(FanPowerPerVolFlowRat{e^{k = 1}}\)</span> =  the rated Indoor Coil fan power per volume flow rate at low (minimum) compressor speed specified value by the user, (W/(m3/s))
 
 The steady-state cooling capacity delivered and the electric power inputs when the DX cooling coil is operating at maximum (high) compressor speed (*k=2*), and outdoor air temperature *T<sub>j</sub>*, are determined as follows:
 
@@ -2193,37 +2193,37 @@ The steady-state cooling capacities and electric power input at the maximum spee
 
 <div>$$\dot E_c^{k = 2}(35.0) = \left[ {\frac{{\dot Q_c^{k = 2}(35.0)}}{{COP_{CRated}^{k = 2}}}} \right] \cdot EIRFT_{TestA2}^{k = 2} \cdot EIRFFF_{TestA2}^{k = 2} + FanPower_{CRated}^{k = 2}$$</div>
 
-<span>$\dot Q_c^{k = 2}(27.78) = \dot Q_{T,\,CRated}^{k = 2} \cdot CAPFT_{TestB2}^{k = 2} \cdot CAPFFF_{TestB2}^{k = 2} - FanPower_{CRated}^{k = 2}$</span> <span>$\dot E_c^{k = 2}(27.78) = \left[ {\frac{{\dot Q_c^{k = 2}(19.44)}}{{COP_{CRated}^{k = 2}}}} \right] \cdot EIRFT_{TestB2}^{k = 2} \cdot EIRFFF_{TestB2}^{k = 2} + FanPower_{CRated}^{k = 2}$</span>
+<span>\(\dot Q_c^{k = 2}(27.78) = \dot Q_{T,\,CRated}^{k = 2} \cdot CAPFT_{TestB2}^{k = 2} \cdot CAPFFF_{TestB2}^{k = 2} - FanPower_{CRated}^{k = 2}\)</span> <span>\(\dot E_c^{k = 2}(27.78) = \left[ {\frac{{\dot Q_c^{k = 2}(19.44)}}{{COP_{CRated}^{k = 2}}}} \right] \cdot EIRFT_{TestB2}^{k = 2} \cdot EIRFFF_{TestB2}^{k = 2} + FanPower_{CRated}^{k = 2}\)</span>
 
 <div>$$FanPower_{CRated}^{k = 2} = FanPowerPerVolFlowRat{e^{k = 2}} \cdot {\rm{\dot V}}_{CRated}^{k = 2}$$</div>
 
 Where,
 
-<span>$\dot Q_{T,\,CRated}^{k = 2}$</span> = rated total cooling capacity at maximum (high) compressor speed specified by users, (W)
+<span>\(\dot Q_{T,\,CRated}^{k = 2}\)</span> = rated total cooling capacity at maximum (high) compressor speed specified by users, (W)
 
-<span>$COP_{CRated}^{k = 2}$</span> = rated gross COP at maximum (high) compressor speed specified by users, (-)
+<span>\(COP_{CRated}^{k = 2}\)</span> = rated gross COP at maximum (high) compressor speed specified by users, (-)
 
-<span>$CAPFT_{TestA2}^{k = 2}$</span> = cooling capacity modifier curve for temperature at maximum (high) compressor speed and *A*<sub>2</sub> test condition, (-)
+<span>\(CAPFT_{TestA2}^{k = 2}\)</span> = cooling capacity modifier curve for temperature at maximum (high) compressor speed and *A*<sub>2</sub> test condition, (-)
 
-<span>$CAPFFF_{TestA2}^{k = 2}$</span>        =cooling capacity modifier curve for flow fraction at maximum (high) compressor speed and *A*<sub>2</sub> test condition, (-)
+<span>\(CAPFFF_{TestA2}^{k = 2}\)</span>        =cooling capacity modifier curve for flow fraction at maximum (high) compressor speed and *A*<sub>2</sub> test condition, (-)
 
-<span>$EIRFT_{TestA2}^{k = 2}$</span> = EIR modifier curve for temperature at maximum (high) compressor speed and *A*<sub>2</sub> test condition, (-)
+<span>\(EIRFT_{TestA2}^{k = 2}\)</span> = EIR modifier curve for temperature at maximum (high) compressor speed and *A*<sub>2</sub> test condition, (-)
 
-<span>$EIRFFF_{TestA2}^{k = 2}$</span> = EIR modifier curve for flow fraction at maximum (high)  compressor speed and *A*<sub>2</sub> test condition, (-)
+<span>\(EIRFFF_{TestA2}^{k = 2}\)</span> = EIR modifier curve for flow fraction at maximum (high)  compressor speed and *A*<sub>2</sub> test condition, (-)
 
-<span>$CAPFT_{TestB2}^{k = 2}$</span> = cooling capacity modifier curve for temperature at maximum (high) compressor speed and *B*<sub>2</sub> test condition, (-)
+<span>\(CAPFT_{TestB2}^{k = 2}\)</span> = cooling capacity modifier curve for temperature at maximum (high) compressor speed and *B*<sub>2</sub> test condition, (-)
 
-<span>$CAPFFF_{TestB2}^{k = 2}$</span>        =cooling capacity modifier curve for flow fraction at maximum (high) compressor speed and *B*<sub>2</sub> test condition, (-)
+<span>\(CAPFFF_{TestB2}^{k = 2}\)</span>        =cooling capacity modifier curve for flow fraction at maximum (high) compressor speed and *B*<sub>2</sub> test condition, (-)
 
-<span>$EIRFT_{TestB2}^{k = 2}$</span> = EIR modifier curve for temperature at maximum (high) compressor speed and *B*<sub>2</sub> test condition, (-)
+<span>\(EIRFT_{TestB2}^{k = 2}\)</span> = EIR modifier curve for temperature at maximum (high) compressor speed and *B*<sub>2</sub> test condition, (-)
 
-<span>$EIRFFF_{TestB2}^{k = 2}$</span> = EIR modifier curve for flow fraction at maximum (high) compressor speed and *B*<sub>2</sub> test condition, (-)
+<span>\(EIRFFF_{TestB2}^{k = 2}\)</span> = EIR modifier curve for flow fraction at maximum (high) compressor speed and *B*<sub>2</sub> test condition, (-)
 
-<span>$FanPower_{CRated}^{k = 2}$</span> = the rated supply air fan power when the unit is operating at maximum (high) compressor speed, (W)
+<span>\(FanPower_{CRated}^{k = 2}\)</span> = the rated supply air fan power when the unit is operating at maximum (high) compressor speed, (W)
 
-<span>$V_{CRated}^{k = 2}$</span> = rated supply air volume flow rate at maximum (high) compressor speed specified by users, (-)
+<span>\(V_{CRated}^{k = 2}\)</span> = rated supply air volume flow rate at maximum (high) compressor speed specified by users, (-)
 
-<span>$FanPowerPerVolFlowRate{k^{k = 2}}$</span> =the Rated Evaporator (Indoor Coil) Fan Power Per Volume Flow rate at maximum (high) compressor speed specified value by the user, (W/(m3/s))
+<span>\(FanPowerPerVolFlowRate{k^{k = 2}}\)</span> =the Rated Evaporator (Indoor Coil) Fan Power Per Volume Flow rate at maximum (high) compressor speed specified value by the user, (W/(m3/s))
 
 The above steps show how the cooling capacity and electric power inputs are determined when the DX cooling coil is operating at minimum (low) and maximum (high) compressor speeds.  But the unit may operate at minimum (low) speed capacity, cycle on–off, cycle between successiave lower and higher compressor speed capacity, or operate at maximum (high) speed capacity depending on the building cooling load. The operating range of the DX cooling coil is determined based on the building cooling load for each binned outside air temperature. The building cooling load at an outdoor air temperature *T<sub>j</sub>*, is calculated as follows:
 
@@ -2233,7 +2233,7 @@ Where,
 
 *BL(T<sub>j</sub>)*          =the building space cooling load corresponding to outdoor temperature of *T<sub>j</sub>*, (W).
 
-<span>$\dot Q_c^{k = 2}(35.0)$</span>=the cooling capacity determined from the standard A2 test, (W)
+<span>\(\dot Q_c^{k = 2}(35.0)\)</span>=the cooling capacity determined from the standard A2 test, (W)
 
 The temperatures 35.0 °C and 18.3 °C in the building load calculation equation represent the outdoor design air temperature, and zero-load base temperature, respectively (ANSI/ASHRAE, 2008).  1.1 is a sizing factor.
 
@@ -2257,13 +2257,13 @@ Where,
 
 n<sub>i</sub>/N = fractional bin hours for the cooling season; the ratio of the number of hours during the cooling season when the outdoor temperature fell within the range represented by bin temperature *T<sub>j</sub>* to the total number of hours in the cooling season, (-). (see Table 57)
 
-<span>$C_D^c$</span> = cooling coefficient of degradation, default value is 0.25.
+<span>\(C_D^c\)</span> = cooling coefficient of degradation, default value is 0.25.
 
 *Case 2*:  The unit cycles between successive the minimum (low) and maximum (high) compressor speed capacity to meet the building cooling load at outdoor air temperature *T<sub>j</sub>*.  That is, the cooling building load is between the units successive minimum (low) and maximum (high) compressor speed capacities:
 
-<div>$$\dot Q_c^{k = 1}({T_j}) < BL({T_j}) < \dot Q_c^{k = 2}({T_j})$$</div>
+<div>$$\dot Q_c^{k = 1}({T_j}) &lt; BL({T_j}) &lt; \dot Q_c^{k = 2}({T_j})$$</div>
 
-<span>$\frac{{{q_c}({T_j})}}{N} = \left[ {{X^{k = 1}}({T_j}) \cdot \dot Q_c^{k = 1}({T_j}) + \left( {1 - {X^{k = 1}}({T_j})} \right) \cdot \dot Q_c^{k = 2}({T_j})} \right] \cdot \frac{{{n_j}}}{N}$</span><span>$\frac{{{e_c}({T_j})}}{N} = \left[ {{X^{k = 1}}({T_j}) \cdot \dot E_c^{k = 1}({T_j}) + \left( {1 - {X^{k = 1}}({T_j})} \right) \cdot \dot E_c^{k = 2}({T_j})} \right] \cdot \frac{{{n_j}}}{N}$</span>
+<span>\(\frac{{{q_c}({T_j})}}{N} = \left[ {{X^{k = 1}}({T_j}) \cdot \dot Q_c^{k = 1}({T_j}) + \left( {1 - {X^{k = 1}}({T_j})} \right) \cdot \dot Q_c^{k = 2}({T_j})} \right] \cdot \frac{{{n_j}}}{N}\)</span><span>\(\frac{{{e_c}({T_j})}}{N} = \left[ {{X^{k = 1}}({T_j}) \cdot \dot E_c^{k = 1}({T_j}) + \left( {1 - {X^{k = 1}}({T_j})} \right) \cdot \dot E_c^{k = 2}({T_j})} \right] \cdot \frac{{{n_j}}}{N}\)</span>
 
 <div>$${X^{k = 1}}({T_j}) = \frac{{\dot Q_c^{k = 2}({T_j}) - BL({T_j})}}{{\dot Q_c^{k = 2}({T_j}) - \dot Q_c^{k = 1}({T_j})}}$$</div>
 
@@ -2483,25 +2483,25 @@ The standard rating cooling capacity is calculated as follows:
 
 where,
 
-<span>${\dot Q_{StandardRating}}$</span> = Standard Rating (Net) Cooling Capacity (W)
+<span>\({\dot Q_{StandardRating}}\)</span> = Standard Rating (Net) Cooling Capacity (W)
 
-<span>${\dot Q_{Total,Rated}}$</span> = Rated Total (Gross) Cooling Capacity, user input (W)
+<span>\({\dot Q_{Total,Rated}}\)</span> = Rated Total (Gross) Cooling Capacity, user input (W)
 
-<span>$TotCapTempModFa{c_{Rated}}$</span>= Total Cooling Capacity Function of Temperature Curve evaluated with 19.4°C wet-bulb temperature air entering the cooling coil and 35.0°C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
+<span>\(TotCapTempModFa{c_{Rated}}\)</span>= Total Cooling Capacity Function of Temperature Curve evaluated with 19.4°C wet-bulb temperature air entering the cooling coil and 35.0°C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
 
-<span>$TotCapFlowModFa{c_{Rated}}$</span>= Total Cooling Capacity Function of Flow Fraction Curve evaluated at a flow fraction of 1.0 (dimensionless)
+<span>\(TotCapFlowModFa{c_{Rated}}\)</span>= Total Cooling Capacity Function of Flow Fraction Curve evaluated at a flow fraction of 1.0 (dimensionless)
 
-<span>$FanHeatCorrection$</span>= The rate that air is heated by the supply fan ( W )
+<span>\(FanHeatCorrection\)</span>= The rate that air is heated by the supply fan ( W )
 
 
 
-<span>$FanHeatCorrection$</span> is calculated in one of two ways depending on the user’s input for the field called Unit Internal Static Air Pressure.  If this field was left blank then the fan heat is calculated using
+<span>\(FanHeatCorrection\)</span> is calculated in one of two ways depending on the user’s input for the field called Unit Internal Static Air Pressure.  If this field was left blank then the fan heat is calculated using
 
 <div>$$FanHeatCorrection = {\dot V_{RatedHighSpeed}}*773.3$$</div>
 
 where
 
-<span>${\dot V_{RatedHighSpeed}}$</span>= Rated Air Volume Flow Rate at high speed, user input (m<sup>3</sup>/s)
+<span>\({\dot V_{RatedHighSpeed}}\)</span>= Rated Air Volume Flow Rate at high speed, user input (m<sup>3</sup>/s)
 
 The value of 773.3 W/(m<sup>3</sup>/s) (365 W/1000cfm) is specified by ANSI/AHRI 340/360 for indoor-coil-only units that are not provided with a supply fan.
 
@@ -2521,15 +2521,15 @@ where,
 
 *EER*  = Energy Efficiency Ratio (W/W)
 
-<span>$Powe{r_{Total,Rated}}$</span>= Total electric power (compressors, condenser fans and evaporator fan) with 19.4°C wet-bulb temperature air entering the cooling coil, 35.0°C dry-bulb temperature air entering the air-cooled (outdoor) condenser, and air flow rate across the evaporator at the rated high speed air flow rate. Similar to the fan heat correction, the fan power correction is calculated in one of two ways depending on the input for internal static pressure.  If no internal static is provided, fan power is calculated using:
+<span>\(Powe{r_{Total,Rated}}\)</span>= Total electric power (compressors, condenser fans and evaporator fan) with 19.4°C wet-bulb temperature air entering the cooling coil, 35.0°C dry-bulb temperature air entering the air-cooled (outdoor) condenser, and air flow rate across the evaporator at the rated high speed air flow rate. Similar to the fan heat correction, the fan power correction is calculated in one of two ways depending on the input for internal static pressure.  If no internal static is provided, fan power is calculated using:
 
 <div>$$FanPowerCorrection = {\dot V_{RatedHighSpeed}}*773.3$$</div>
 
 If the internal static pressure is provided, then the entire VAV fan model in EnergyPlus is evaluated at the rated high speed air flow rate and the total static pressure for rating and the then the fan power calculated by the fan model is used for the fan power correction.
 
-<span>$TotCapTempModFa{c_{Rated}}$</span> = Total Cooling Capacity Function of Temperature Curve evaluated with 19.44°C wet-bulb temperature air entering the cooling coil and 35.0°C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
+<span>\(TotCapTempModFa{c_{Rated}}\)</span> = Total Cooling Capacity Function of Temperature Curve evaluated with 19.44°C wet-bulb temperature air entering the cooling coil and 35.0°C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
 
-<span>$EIRTempModFa{c_{Rated}}$</span> = Energy Input Ratio Function of Temperature Curve evaluated with 19.44°C wet-bulb temperature air entering the cooling coil and 35.0°C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
+<span>\(EIRTempModFa{c_{Rated}}\)</span> = Energy Input Ratio Function of Temperature Curve evaluated with 19.44°C wet-bulb temperature air entering the cooling coil and 35.0°C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
 
 The Integrated Energy Efficiency Ratio (IEER) is intended to be a measure of merit for the cooling coil’s part-load efficiency. IEER replaced Integrated Part-Load Value (IPLV) as the part-load performance metric in Std. 340/360 as of January 1, 2010. Full details regarding the IEER calculation are available in ANSI/AHRI Std. 340/360 (AHRI 2007). A summary of the IEER calculations made by EnergyPlus for two-speed air-cooled DX cooling coils is provided below:
 
@@ -2537,13 +2537,13 @@ The Integrated Energy Efficiency Ratio (IEER) is intended to be a measure of mer
 
 where,
 
-<span>$EE{R_A}$</span> =     *EER* at 100% net capacity at AHRI standard rating conditions (same as EER calculation shown above but in Btu/h)
+<span>\(EE{R_A}\)</span> =     *EER* at 100% net capacity at AHRI standard rating conditions (same as EER calculation shown above but in Btu/h)
 
-<span>$EE{R_B}$</span> =     *EER* at 75% net capacity and reduced outdoor air temperature Btu/h
+<span>\(EE{R_B}\)</span> =     *EER* at 75% net capacity and reduced outdoor air temperature Btu/h
 
-<span>$EE{R_C}$</span> =     *EER* at 50% net capacity and reduced outdoor air temperature Btu/h
+<span>\(EE{R_C}\)</span> =     *EER* at 50% net capacity and reduced outdoor air temperature Btu/h
 
-<span>$EE{R_D}$</span>=      *EER* at 25% net capacity and reduced outdoor air temperature Btu/h
+<span>\(EE{R_D}\)</span>=      *EER* at 25% net capacity and reduced outdoor air temperature Btu/h
 
 The following table summarizes the test points.
 
@@ -2640,7 +2640,7 @@ And the loop volumetric air flow rates in the parent objects are calculated as b
 
 If the volumetric air flow rate at one speed level is higher than the flow rate allowed by the fan in the parent object, the flow rate will be set back to the fan flow rate.
 
-If <span>${\rm{AirFlowScaleFactor}}$</span> equals to unity, the loop air flow rate become the design flow rates of the original unit (after scaled by the rated total cooling capacity). The Rated Volumetric Air Flow Rate is introduced here to correlate with the actual flow rate in the air loop, in case that these differ from the design specifications. Certainly, it is recommended that the Rated Volumetric Air Flow Rate is selected in the way that <span>${\rm{AirFlowScaleFactor}}$</span> is unity, so as to get more accurate results from the performance curves.
+If <span>\({\rm{AirFlowScaleFactor}}\)</span> equals to unity, the loop air flow rate become the design flow rates of the original unit (after scaled by the rated total cooling capacity). The Rated Volumetric Air Flow Rate is introduced here to correlate with the actual flow rate in the air loop, in case that these differ from the design specifications. Certainly, it is recommended that the Rated Volumetric Air Flow Rate is selected in the way that <span>\({\rm{AirFlowScaleFactor}}\)</span> is unity, so as to get more accurate results from the performance curves.
 
 If the condenser is evaporatively cooled, it is necessary to know the condenser air flow rate, so as to calculate the water evaporation rate. We will have fields for specifying the Reference Unit condenser volumetric air flow rates at individual speed levels, and these inputs are optional. If the condenser air flow rates are not inputted by the user, default values of condenser volumetric air flow rate as a function of the rated total cooling capacity will be used. Condenser air flow rates of the simulated unit are calculated as below,
 
@@ -2690,7 +2690,7 @@ where
 
 ff<sub>a</sub> = actual air mass flow rate/design air mass flow rate, at one speed level.
 
-          <span>$\begin{array}{l}{\rm{DesignAirMassFlowRate}}@{\rm{SpeedLevel}}({\rm{x}}) = {\rm{}}\\\quad \quad \quad {\rm{ReferenceUnitAirMassFlowRate}}@{\rm{SpeedLevel}}({\rm{x}}) \times {\rm{CapacityScaleFactor}}\end{array}$</span>
+          <span>\(\begin{array}{l}{\rm{DesignAirMassFlowRate}}@{\rm{SpeedLevel}}({\rm{x}}) = {\rm{}}\\\quad \quad \quad {\rm{ReferenceUnitAirMassFlowRate}}@{\rm{SpeedLevel}}({\rm{x}}) \times {\rm{CapacityScaleFactor}}\end{array}\)</span>
 
 a-d = regression curve fit coefficients, if no data for correction, the user can simply put a = 1.0, and the other coefficients as 0.0.
 
@@ -2750,7 +2750,7 @@ The design air flow rate at the speed ratio are given as following:
 
 And the fraction of air flow is given:
 
-<span>${\rm{f}}{{\rm{f}}_{{\rm{a}},{\rm{x}} - 1}}$</span>=<span>${\rm{f}}{{\rm{f}}_{{\rm{a}},{\rm{x}}}}$</span>= actual air mass flow rate/DesignAirFlowRateSpeedRatio
+<span>\({\rm{f}}{{\rm{f}}_{{\rm{a}},{\rm{x}} - 1}}\)</span>=<span>\({\rm{f}}{{\rm{f}}_{{\rm{a}},{\rm{x}}}}\)</span>= actual air mass flow rate/DesignAirFlowRateSpeedRatio
 
 The total cooling capacities and EIRs at Speed x-1 and Speed x are calculated:
 
@@ -2804,11 +2804,11 @@ The interpolated effectiveness at the speed ratio is used to calculate the air t
 
 Where
 
-<span>${{\rm{T}}_{{\rm{c}},{\rm{i}}}}$</span> is the condenser entering air temperature, °C.
+<span>\({{\rm{T}}_{{\rm{c}},{\rm{i}}}}\)</span> is the condenser entering air temperature, °C.
 
-<span>${{\rm{T}}_{{\rm{wb}},{\rm{o}}}}$</span> is the outdoor air wet bulb temperature, °C.
+<span>\({{\rm{T}}_{{\rm{wb}},{\rm{o}}}}\)</span> is the outdoor air wet bulb temperature, °C.
 
-<span>${{\rm{T}}_{{\rm{db}},{\rm{o}}}}$</span> is the outdoor air dry bulb temperature, °C.
+<span>\({{\rm{T}}_{{\rm{db}},{\rm{o}}}}\)</span> is the outdoor air dry bulb temperature, °C.
 
 And the water consumption rate is calculated based on the interpolated condenser air flow rate at the speed ratio, i.e. the condenser flow rate at the speed ratio,
 
@@ -2952,7 +2952,7 @@ where,
 
 *Q<sub>coil,cycling</sub>*      = delivered sensible heating capacity for Stage 1 operating at a specific cycling ratio [W]
 
-<span>${\mathop m\limits^\cdot_{Speed\,\,1}}$</span>      = air mass flow rate through heating coil at Speed 1 as set by the parent object [kg/s]
+<span>\({\mathop m\limits^\cdot_{Speed\,\,1}}\)</span>      = air mass flow rate through heating coil at Speed 1 as set by the parent object [kg/s]
 
 *h<sub>outlet,full</sub>*      = specific enthalpy of the coil outlet air during full-load operation at Stage 1 (no cycling) [J/kg]
 
@@ -2972,7 +2972,7 @@ where,
 
 *h<sub>outlet,average</sub>*  = average specific enthalpy at the coil outlet [J/kg]
 
-<span>${\mathop m\limits^\cdot_{inlet}}$</span>         = mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiStage, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the heating coil is ON and the specified flow rate when the heating coil is OFF for the time step being simulated.
+<span>\({\mathop m\limits^\cdot_{inlet}}\)</span>         = mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiStage, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the heating coil is ON and the specified flow rate when the heating coil is OFF for the time step being simulated.
 
 n Outlet air temperature
 
@@ -3018,11 +3018,11 @@ n Effective total heating capacity
 
 where,
 
-<span>${{Q_{coil,SpeedRatio}}}$</span><sub>                       </sub> = delivered sensible heating capacity at a given Stage ratio between two consecutive Stages [W]
+<span>\({{Q_{coil,SpeedRatio}}}\)</span><sub>                       </sub> = delivered sensible heating capacity at a given Stage ratio between two consecutive Stages [W]
 
-<span>${\mathop {{\rm{ }}m}\limits_{Speed{\kern 1pt} n}^ \cdot  }$</span>      = air mass flow rate through heating coil at Stage n as set by the parent object [kg/s]
+<span>\({\mathop {{\rm{ }}m}\limits_{Speed{\kern 1pt} n}^ \cdot  }\)</span>      = air mass flow rate through heating coil at Stage n as set by the parent object [kg/s]
 
-<span>${\mathop {{\rm{ }}m}\limits_{Speed{\kern 1pt} n - 1}^ \cdot  }$</span>    = air mass flow rate through heating coil at Stage 1 as set by the parent object [kg/s]
+<span>\({\mathop {{\rm{ }}m}\limits_{Speed{\kern 1pt} n - 1}^ \cdot  }\)</span>    = air mass flow rate through heating coil at Stage 1 as set by the parent object [kg/s]
 
 
 
@@ -3036,7 +3036,7 @@ where,
 
 *h<sub>inlet</sub>           *            = specific enthalpy of the coil inlet air [J/kg]
 
-<span>${\dot m_{inlet}}$</span>         = Mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiStage, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the heating coil is at Stage n and the specified flow rate when the heating coil is at Stage n-1 for the time step being simulated.
+<span>\({\dot m_{inlet}}\)</span>         = Mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiStage, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the heating coil is at Stage n and the specified flow rate when the heating coil is at Stage n-1 for the time step being simulated.
 
 n Average outlet air temperature
 
@@ -3088,9 +3088,9 @@ or
 
 where
 
-<span>${T_{db,i}}$</span>     = dry-bulb temperature of the air entering the indoor coil, °C
+<span>\({T_{db,i}}\)</span>     = dry-bulb temperature of the air entering the indoor coil, °C
 
-<span>${T_{db,o}}$</span>     = dry-bulb temperature of the air entering the outdoor coil, °C
+<span>\({T_{db,o}}\)</span>     = dry-bulb temperature of the air entering the outdoor coil, °C
 
 n The total heating capacity modifier curve (function of flow fraction) is a quadratic or cubic curve with the independent variable being the ratio of the actual air flow rate across the heating coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the rated total heating capacity and the total heating capacity modifier curve (function of temperature) to give the total heating capacity at the specific temperature and air flow conditions at which the coil is operating.
 
@@ -3154,9 +3154,9 @@ n The defrost energy input ratio (EIR) modifier curve (function of temperature)
 
 where
 
-<span>${T_{wb,i}}$</span>      = wet-bulb temperature of the air entering the indoor heating coil, °C
+<span>\({T_{wb,i}}\)</span>      = wet-bulb temperature of the air entering the indoor heating coil, °C
 
-<span>${T_{db,o}}$</span>     = dry-bulb temperature of the air entering the outdoor coil, °C
+<span>\({T_{db,o}}\)</span>     = dry-bulb temperature of the air entering the outdoor coil, °C
 
 All six curves are accessed through EnergyPlus’ built-in performance curve equation manager (curve:quadratic, curve:cubic and curve:biquadratic). It is not imperative that the user utilize all coefficients shown in the preceding equations { through } in items (1) through (6) if their performance equation has fewer terms (e.g., if the user’s PartLoadFrac performance curve is linear instead of quadratic or cubic, simply enter the appropriate values for the coefficients a and b, and set the remaining coefficients to zero).
 
@@ -3188,7 +3188,7 @@ The difference between the outdoor air humidity ratio (from the weather file) an
 
 <div>$$\Delta {\omega_{\,coil,out}}\, = \,MAX\left[ {1.0E - 6,\,\,\,{\omega_{outdoor}}\, - \,\,{\omega_{sat}}\left( {{T_{coil,out}}\,,{\rm{OutBaroPress}}} \right)} \right]$$</div>
 
-Frost formation on the outdoor coil must be periodically removed. The fraction of compressor runtime when the coil is being defrosted is either entered by the user (for timed defrost) or is calculated by the model (for on-demand defrost) using an empirical equation and <span>$\Delta {\omega_{\,coil,out}}$</span>. Adjustment factors to total heating coil capacity and input power due to frost formation on the outdoor coil are also calculated by empirical models with <span>$\Delta {\omega_{\,coil,out}}$</span> or fractional defrost time period as the independent variable. The defrost time period fraction and adjustment factors due to frost formation on the outdoor coil vary depending on the defrost control type as shown below.
+Frost formation on the outdoor coil must be periodically removed. The fraction of compressor runtime when the coil is being defrosted is either entered by the user (for timed defrost) or is calculated by the model (for on-demand defrost) using an empirical equation and <span>\(\Delta {\omega_{\,coil,out}}\)</span>. Adjustment factors to total heating coil capacity and input power due to frost formation on the outdoor coil are also calculated by empirical models with <span>\(\Delta {\omega_{\,coil,out}}\)</span> or fractional defrost time period as the independent variable. The defrost time period fraction and adjustment factors due to frost formation on the outdoor coil vary depending on the defrost control type as shown below.
 
 *Timed Defrost*:
 
@@ -3226,13 +3226,13 @@ If the fractional defrost time period is greater than zero for the simulation ti
 
 where:
 
-<span>${Q_{defrost}}$</span>        = additional indoor heating load due to reverse-cycle defrost (*W*)
+<span>\({Q_{defrost}}\)</span>        = additional indoor heating load due to reverse-cycle defrost (*W*)
 
-<span>${Q_{total,rated}}$</span>    = total full-load heating capacity of the coil at rated conditions (W)
+<span>\({Q_{total,rated}}\)</span>    = total full-load heating capacity of the coil at rated conditions (W)
 
-<span>${P_{defrost}}$</span>        = average defrost power for the simulation time step (W)
+<span>\({P_{defrost}}\)</span>        = average defrost power for the simulation time step (W)
 
-<span>${Q_{cap,defrost}}$</span>   = capacity of the resistive defrost heating element (W)
+<span>\({Q_{cap,defrost}}\)</span>   = capacity of the resistive defrost heating element (W)
 
 *DefrostEIRTempModFac* = energy input ratio modifier curve applicable during defrost
 
@@ -3260,13 +3260,13 @@ In a similar fashion, the electrical power draw by the DX unit (compressors plus
 
 where
 
-      <span>${P_{heating}}$</span>  = average compressor and outdoor fan power for the simulation time step(W)
+      <span>\({P_{heating}}\)</span>  = average compressor and outdoor fan power for the simulation time step(W)
 
-<span>${Q_{total}}$</span>    = total heating capacity W, Eqn.
+<span>\({Q_{total}}\)</span>    = total heating capacity W, Eqn.
 
 <div>$$EIR = \,Energy\,input\,ratio\, = \,\left( {\frac{1}{{CO{P_{rated}}}}} \right)\left( {EIRTempModFac} \right)\left( {EIRFlowModFac} \right)$$</div>
 
-<span>$CO{P_{rated}}$</span> = coefficient of performance at rated conditions (user input)
+<span>\(CO{P_{rated}}\)</span> = coefficient of performance at rated conditions (user input)
 
 *InputPowerMultiplier* = power adjustment due to frost if applicable -Eqn. or
 
@@ -3274,13 +3274,13 @@ The crankcase heater is assumed to operate when the heating coil’s compressor 
 
 <div>$${P_{crankcase}} = {Q_{cap,crankcase}}\left( {1 - RTF} \right)$$</div>
 
-<span>${\rm{RTF  =  }}\left( {{\raise0.7ex\hbox{${{\rm{PLR}}}$} \!\mathord{\left/ {\vphantom {{{\rm{PLR}}} {{\rm{PartLoadFrac}}}}}\right.}\!\lower0.7ex\hbox{${{\rm{PartLoadFrac}}}$}}} \right)\,\,{\rm{ = }}\,\,runtime fraction of the heating coil$</span>   
+<span>\({\rm{RTF  =  }}\left( {{\raise0.7ex\hbox{${{\rm{PLR}}}$} \!\mathord{\left/ {\vphantom {{{\rm{PLR}}} {{\rm{PartLoadFrac}}}}}\right.}\!\lower0.7ex\hbox{${{\rm{PartLoadFrac}}}$}}} \right)\,\,{\rm{ = }}\,\,runtime fraction of the heating coil\)</span>   
 
 where
 
-<span>${P_{crankcase}}$</span> = average crankcase heater power for the simulation time step (W)
+<span>\({P_{crankcase}}\)</span> = average crankcase heater power for the simulation time step (W)
 
-<span>${Q_{cap,crankcase}}$</span>= crankcase heater capacity (W)
+<span>\({Q_{cap,crankcase}}\)</span>= crankcase heater capacity (W)
 
 If this heating coil is used as part of an air-to-air heat pump (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir), the crankcase heater defined for this DX heating coil is enabled during the time that the compressor is not running for either heating or cooling (and the crankcase heater power defined in the DX cooling coil object is disregarded in this case). In this instance, RTF in the above equations would be the runtime fraction of the heat pump’s heating coil or cooling coil, whichever is greater.
 
@@ -3294,11 +3294,11 @@ The properties of the air leaving the heating coil at full-load operation are ca
 
 where
 
-<span>${h_{outlet}}$</span>         = enthalpy of the air leaving the heating coil (J/kg)
+<span>\({h_{outlet}}\)</span>         = enthalpy of the air leaving the heating coil (J/kg)
 
-<span>$\,{\omega_{outlet}}$</span>        = leaving air humidity ratio (kg/kg)
+<span>\(\,{\omega_{outlet}}\)</span>        = leaving air humidity ratio (kg/kg)
 
-<span>$\,{T_{db,outlet}}$</span>    = leaving air dry-bulb temperature (°C)
+<span>\(\,{T_{db,outlet}}\)</span>    = leaving air dry-bulb temperature (°C)
 
 *PsyTdbFnHW* = EnergyPlus psychrometric function, returns dry-bulb temp given enthalpy and humidity ratio
 
@@ -3350,15 +3350,15 @@ The procedure for calculating the Standard Rating Heating Capacity is given by:
 
 where,
 
-<span>${\dot Q_{HighStandardRating\,Net}}$</span> = Total standard (net) heating capacity (W) of the air-source heat pump equipment in heating mode determined from ANSI/AHRI Standard 210/240 and test conditions shown in Table 59. The standard heating test conditions for air-cooled condenser are: indoor coil entering air dry-bulb 21.1°C and outdoor coil entering air dry-bulb 8.33°C.
+<span>\({\dot Q_{HighStandardRating\,Net}}\)</span> = Total standard (net) heating capacity (W) of the air-source heat pump equipment in heating mode determined from ANSI/AHRI Standard 210/240 and test conditions shown in Table 59. The standard heating test conditions for air-cooled condenser are: indoor coil entering air dry-bulb 21.1°C and outdoor coil entering air dry-bulb 8.33°C.
 
-<span>${\dot Q_{HighStandardRating}}$</span> = Total standard heating capacity (W) of the air-source heat pump equipment in heating mode determined from ANSI/AHRI Standard 210/240 and test conditions shown in Table 60. The standard heating test conditions for air-cooled condenser are: indoor coil entering air dry-bulb 21.1°C and outdoor coil entering air dry-bulb 8.33°C.
+<span>\({\dot Q_{HighStandardRating}}\)</span> = Total standard heating capacity (W) of the air-source heat pump equipment in heating mode determined from ANSI/AHRI Standard 210/240 and test conditions shown in Table 60. The standard heating test conditions for air-cooled condenser are: indoor coil entering air dry-bulb 21.1°C and outdoor coil entering air dry-bulb 8.33°C.
 
-<span>${\dot Q_{total,Rated}}$</span> = Rated total heating capacity, user input (W)
+<span>\({\dot Q_{total,Rated}}\)</span> = Rated total heating capacity, user input (W)
 
-<span>$TotCapTempModFa{c_{Rated}}$</span>= User-specified bi-quadratic curve evaluated at the indoor coil entering air dry-bulb 21.1°C and outdoor coil entering air dry-bulb 8.33°C for air-cooled condenser as specified in Table 59, (dimensionless).
+<span>\(TotCapTempModFa{c_{Rated}}\)</span>= User-specified bi-quadratic curve evaluated at the indoor coil entering air dry-bulb 21.1°C and outdoor coil entering air dry-bulb 8.33°C for air-cooled condenser as specified in Table 59, (dimensionless).
 
-<span>$Fa{n_{Power,Rated}}$</span>= Supply air fan power at rated conditions, (W). The Rated Indoor Coil Fan Power Per Volume Flow rate is a user-entered value, with a default of 773.3 W/(m3/s)) if the user leaves this input field blank. The default value is taken from ANSI/ASHRAE Standard 210/240-2008 where it is defined for systems which do not have an Indoor Coil fan furnished as part of the system. See the description given at the end of this section for how this value is calculated.
+<span>\(Fa{n_{Power,Rated}}\)</span>= Supply air fan power at rated conditions, (W). The Rated Indoor Coil Fan Power Per Volume Flow rate is a user-entered value, with a default of 773.3 W/(m3/s)) if the user leaves this input field blank. The default value is taken from ANSI/ASHRAE Standard 210/240-2008 where it is defined for systems which do not have an Indoor Coil fan furnished as part of the system. See the description given at the end of this section for how this value is calculated.
 
 #### Low Temperature Heating Standard (Net) Rating Capacity
 
@@ -3370,15 +3370,15 @@ The procedure for calculating the Low Temperature Standard Rating Heating Capaci
 
 where,
 
-<span>${\dot Q_{LowStandardRating\,Net}}$</span> = Total standard (net) heating capacity (W) of the air-source heat pump equipment in heating mode determined from ANSI/AHRI Standard 210/240 and test conditions shown in Table 60. The standard heating test conditions for air-cooled condenser are: indoor coil entering air dry-bulb 21.1°C and outdoor coil entering air dry-bulb (-8.33) °C.
+<span>\({\dot Q_{LowStandardRating\,Net}}\)</span> = Total standard (net) heating capacity (W) of the air-source heat pump equipment in heating mode determined from ANSI/AHRI Standard 210/240 and test conditions shown in Table 60. The standard heating test conditions for air-cooled condenser are: indoor coil entering air dry-bulb 21.1°C and outdoor coil entering air dry-bulb (-8.33) °C.
 
-<span>${\dot Q_{LowStandardRating}}$</span> =    Total standard heating capacity (W) of the air-source heat pump equipment in heating mode determined from ANSI/AHRI Standard 210/240 and test conditions shown in Table 59. The standard heating test conditions for air-cooled condenser are: indoor coil entering air dry-bulb 21.1°C and outdoor coil entering air dry-bulb (-8.33) °C.
+<span>\({\dot Q_{LowStandardRating}}\)</span> =    Total standard heating capacity (W) of the air-source heat pump equipment in heating mode determined from ANSI/AHRI Standard 210/240 and test conditions shown in Table 59. The standard heating test conditions for air-cooled condenser are: indoor coil entering air dry-bulb 21.1°C and outdoor coil entering air dry-bulb (-8.33) °C.
 
-<span>${\dot Q_{total,Rated}}$</span> = Rated total heating capacity, user input (W)
+<span>\({\dot Q_{total,Rated}}\)</span> = Rated total heating capacity, user input (W)
 
-<span>$TotCapTempModFa{c_{H3Test}}$</span>= User-specified bi-quadratic curve evaluated at the indoor coil entering air dry-bulb 21.1°C and outdoor coil entering air dry-bulb (-8.33) °C for air-cooled condenser as specified in Table 60, (dimensionless).
+<span>\(TotCapTempModFa{c_{H3Test}}\)</span>= User-specified bi-quadratic curve evaluated at the indoor coil entering air dry-bulb 21.1°C and outdoor coil entering air dry-bulb (-8.33) °C for air-cooled condenser as specified in Table 60, (dimensionless).
 
-<span>$Fa{n_{Power,Rated}}$</span>= Supply air fan power at rated conditions, (W). The Rated Indoor Coil Fan Power Per Volume Flow rate is a user-entered value, with a default of 773.3 W/(m3/s)) if the user leaves this input field blank. The default value is taken from ANSI/ASHRAE Standard 210/240-2008 where it is defined for systems which do not have an Indoor Coil fan furnished as part of the system. See the description given at the end of this section for how this value is calculated.
+<span>\(Fa{n_{Power,Rated}}\)</span>= Supply air fan power at rated conditions, (W). The Rated Indoor Coil Fan Power Per Volume Flow rate is a user-entered value, with a default of 773.3 W/(m3/s)) if the user leaves this input field blank. The default value is taken from ANSI/ASHRAE Standard 210/240-2008 where it is defined for systems which do not have an Indoor Coil fan furnished as part of the system. See the description given at the end of this section for how this value is calculated.
 
 #### Heating Seasonal Performance Factor (HSPF)
 
@@ -3390,21 +3390,21 @@ Calculations of HSPF of a heat pump having a single-speed compressor that was te
 
 Where,
 
-<span>$\frac{{{e_h}({T_j})}}{N}$</span> = The ratio of the electrical energy consumed by the heat pump during periods of the  space heating season when the outdoor temperature fell within the range represented by bin temperature <span>${T_j}$</span> to the total number of hours in the heating season (N), W.
+<span>\(\frac{{{e_h}({T_j})}}{N}\)</span> = The ratio of the electrical energy consumed by the heat pump during periods of the  space heating season when the outdoor temperature fell within the range represented by bin temperature <span>\({T_j}\)</span> to the total number of hours in the heating season (N), W.
 
-<span>$\frac{{RH({T_j})}}{N}$</span>= The ratio of the electrical energy used for resistive space heating during periods when the outdoor temperature fell within the range represented by bin temperature <span>${T_j}$</span> to the total number of hours in the heating season (N),W.
+<span>\(\frac{{RH({T_j})}}{N}\)</span>= The ratio of the electrical energy used for resistive space heating during periods when the outdoor temperature fell within the range represented by bin temperature <span>\({T_j}\)</span> to the total number of hours in the heating season (N),W.
 
-<span>${T_j}$</span>= The outdoor bin temperature, °C. Outdoor temperatures are “binned” such that calculations are only performed based one temperature within the bin. Bins of 2.78 °C are used.
+<span>\({T_j}\)</span>= The outdoor bin temperature, °C. Outdoor temperatures are “binned” such that calculations are only performed based one temperature within the bin. Bins of 2.78 °C are used.
 
-<span>$\frac{{{n_j}}}{N}$</span>= Fractional bin hours for the heating season; the ratio of the number of hours during the heating season when the outdoor temperature fell within the range represented by bin temperature <span>${T_j}$</span> to the total number of hours in the heating season, dimensionless. Obtain <span>$\frac{{{n_j}}}{N}$</span> values from Table # 17 of AHRI Std. 210/240-2008 (Table 60 below).
+<span>\(\frac{{{n_j}}}{N}\)</span>= Fractional bin hours for the heating season; the ratio of the number of hours during the heating season when the outdoor temperature fell within the range represented by bin temperature <span>\({T_j}\)</span> to the total number of hours in the heating season, dimensionless. Obtain <span>\(\frac{{{n_j}}}{N}\)</span> values from Table # 17 of AHRI Std. 210/240-2008 (Table 60 below).
 
 <div>$$j$$</div>= The bin number, dimensionless.
 
-<span>$J$</span>= For each generalized climatic region, the total number of temperature bins, dimensionless. Referring to Table # 17, <span>$J$</span> is the highest bin number (<div>$$j$$</div>) having a nonzero entry for the fractional bin hours for the generalized climatic region of interest.
+<span>\(J\)</span>= For each generalized climatic region, the total number of temperature bins, dimensionless. Referring to Table # 17, <span>\(J\)</span> is the highest bin number (<div>$$j$$</div>) having a nonzero entry for the fractional bin hours for the generalized climatic region of interest.
 
-<span>${F_{def}}$</span>= The demand defrost credit described in section 3.9.2 of AHRI Std. 210/240-2008, dimensionless.  For simplification, assigned a value of 1 for timed defrost control and a value of 1.03 for demand defrost control.
+<span>\({F_{def}}\)</span>= The demand defrost credit described in section 3.9.2 of AHRI Std. 210/240-2008, dimensionless.  For simplification, assigned a value of 1 for timed defrost control and a value of 1.03 for demand defrost control.
 
-<span>$BL({T_j})$</span>= The building space conditioning load corresponding to an outdoor temperature of<span>${T_j}$</span>; the heating season building load also depends on the generalized climatic region's outdoor design temperature and the design heating requirement, W.
+<span>\(BL({T_j})\)</span>= The building space conditioning load corresponding to an outdoor temperature of<span>\({T_j}\)</span>; the heating season building load also depends on the generalized climatic region's outdoor design temperature and the design heating requirement, W.
 
 Building heating load can be evaluated by using the following equation
 
@@ -3412,13 +3412,13 @@ Building heating load can be evaluated by using the following equation
 
 Where,
 
-<span>${T_{OD}}$</span>= The outdoor design temperature, °C. An outdoor design temperature is specified for each generalized climatic region in Table # 17 of AHRI Std. 210/240-2008 (Table 60 below).
+<span>\({T_{OD}}\)</span>= The outdoor design temperature, °C. An outdoor design temperature is specified for each generalized climatic region in Table # 17 of AHRI Std. 210/240-2008 (Table 60 below).
 
 
 
-<span>$C$</span>= 0.77, a correction factor which tends to improve the agreement between calculated and measured building loads, dimensionless.
+<span>\(C\)</span>= 0.77, a correction factor which tends to improve the agreement between calculated and measured building loads, dimensionless.
 
-<span>$DHR$</span> = Design Heating Requirement, W. This is the amount of heating required to maintain a given indoor temperature at a particular outdoor design temperature.
+<span>\(DHR\)</span> = Design Heating Requirement, W. This is the amount of heating required to maintain a given indoor temperature at a particular outdoor design temperature.
 
 For a single speed heat pump with a fixed speed indoor fan installed, a constant-air-volume-rate indoor fan installed, or with no indoor fan installed, the minimum and maximum design heating requirements for each generalized climatic region can be calculated as follows:
 
@@ -3433,7 +3433,7 @@ $$</div>
 
 <div>$$DH{R_{\max }} = \left\{ \begin{array}{l}2 \cdot {\mathop Q\limits^ \cdot_h}(8.33) \cdot (1.8) \cdot \left[ {\frac{{18.33 - {T_{OD}}}}{{60}}} \right],{\rm{ for regions I,II,III,IV, and VI}}\\\\2.2 \cdot {\mathop Q\limits^ \cdot_h}(8.33),{\rm{                     for regions V}}\end{array} \right\}$$</div>
 
-Both <span>$DH{R_{\min }}$</span>and <span>$DH{R_{\max }}$</span>above should be rounded to the nearest standardized DHR given in Table 61.
+Both <span>\(DH{R_{\min }}\)</span>and <span>\(DH{R_{\max }}\)</span>above should be rounded to the nearest standardized DHR given in Table 61.
 
 The intermediate term used in the calculations of HSPF can be calculated using the equations described below.
 
@@ -3455,13 +3455,13 @@ $$</div>
 
 whichever is less; the heating mode load factor for temperature bin <div>$$j$$</div>, dimensionless.
 
-<span>$\mathop {{Q_h}}\limits^ \cdot  ({T_j})$</span>= the space heating capacity of the heat pump when operating at outdoor temperature <span>${T_j}$</span>,  W.
+<span>\(\mathop {{Q_h}}\limits^ \cdot  ({T_j})\)</span>= the space heating capacity of the heat pump when operating at outdoor temperature <span>\({T_j}\)</span>,  W.
 
-<span>$\mathop {{E_h}}\limits^ \cdot  ({T_j})$</span>= the electrical power consumption of the heat pump when operating at outdoor temperature <span>${T_j}$</span>, W.
+<span>\(\mathop {{E_h}}\limits^ \cdot  ({T_j})\)</span>= the electrical power consumption of the heat pump when operating at outdoor temperature <span>\({T_j}\)</span>, W.
 
-<span>$\delta ({T_j})$</span>= the heat pump low temperature cut-out factor, dimensionless.
+<span>\(\delta ({T_j})\)</span>= the heat pump low temperature cut-out factor, dimensionless.
 
-<span>$PL{F_j}$</span> = the part load factor, dimensionless.
+<span>\(PL{F_j}\)</span> = the part load factor, dimensionless.
 
 Part load factor is determined as follows:
 
@@ -3469,15 +3469,15 @@ Part load factor is determined as follows:
 
 Where,
 
-<span>${C_{{D^h}}}$</span>= Degradation coefficient which is defaulted to the value of 0.25
+<span>\({C_{{D^h}}}\)</span>= Degradation coefficient which is defaulted to the value of 0.25
 
-Low temperature cut-out factor <span>$\delta ({T_j})$</span>is determined as follows:
+Low temperature cut-out factor <span>\(\delta ({T_j})\)</span>is determined as follows:
 
 <div>$$
   \delta ({T_j}) = \left\{ 
     \begin{array}{l}
-      {\rm{0, if }}{T_j} \le {T_{off}}{\rm{ or }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} < 1 \\
-      {\rm{1/2, if }}{T_{off}} < {T_j} \le {T_{on}}{\rm{ and }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} \ge 1 \\
+      {\rm{0, if }}{T_j} \le {T_{off}}{\rm{ or }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} &lt; 1 \\
+      {\rm{1/2, if }}{T_{off}} &lt; {T_j} \le {T_{on}}{\rm{ and }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} \ge 1 \\
       {\rm{1, if }}{T_j} > {T_{on}}{\rm{ and }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} \ge 1
     \end{array}
   \right.
@@ -3485,17 +3485,17 @@ $$</div>
 
 where,
 
-<span>${T_{off}}$</span> = the outdoor temperature when the compressor is automatically shut off, °C. (If no such temperature exists, <span>${T_j}$</span>is always greater than <span>${T_{off}}$</span>and<span>${T_{on}}$</span>).
+<span>\({T_{off}}\)</span> = the outdoor temperature when the compressor is automatically shut off, °C. (If no such temperature exists, <span>\({T_j}\)</span>is always greater than <span>\({T_{off}}\)</span>and<span>\({T_{on}}\)</span>).
 
-<span>${T_{on}}$</span>= the outdoor temperature when the compressor is automatically turned back on, if applicable, following an automatic shut-off, °C.
+<span>\({T_{on}}\)</span>= the outdoor temperature when the compressor is automatically turned back on, if applicable, following an automatic shut-off, °C.
 
-Calculate <span>$\mathop {{Q_h}}\limits^ \cdot  ({T_j})$</span>and <span>$\mathop {{E_h}}\limits^ \cdot  ({T_j})$</span> using,
+Calculate <span>\(\mathop {{Q_h}}\limits^ \cdot  ({T_j})\)</span>and <span>\(\mathop {{E_h}}\limits^ \cdot  ({T_j})\)</span> using,
 
-<div>$$\mathop {{Q_h}}\limits^ \cdot  ({T_j}) = \left\{ \begin{array}{l}\mathop {{Q_h}}\limits^ \cdot  ( - 8.33) + \frac{{\left[ {\mathop {{Q_h}}\limits^ \cdot  (8.33) - \mathop {{Q_h}}\limits^ \cdot  ( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{16.67}}{\rm{, if }}{T_j} \ge 7.22^\circ {\rm{C or }}{T_j} \le  - 8.33^\circ {\rm{C}}\\\mathop {{Q_h}}\limits^ \cdot  ( - 8.33) + \frac{{\left[ {\mathop {{Q_h}}\limits^ \cdot  (1.67) - \mathop {{Q_h}}\limits^ \cdot  ( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{10}}{\rm{, if }} - 8.33^\circ {\rm{C}} < {T_j} < 7.22^\circ {\rm{C}}\end{array} \right.$$</div>
+<div>$$\mathop {{Q_h}}\limits^ \cdot  ({T_j}) = \left\{ \begin{array}{l}\mathop {{Q_h}}\limits^ \cdot  ( - 8.33) + \frac{{\left[ {\mathop {{Q_h}}\limits^ \cdot  (8.33) - \mathop {{Q_h}}\limits^ \cdot  ( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{16.67}}{\rm{, if }}{T_j} \ge 7.22^\circ {\rm{C or }}{T_j} \le  - 8.33^\circ {\rm{C}}\\\mathop {{Q_h}}\limits^ \cdot  ( - 8.33) + \frac{{\left[ {\mathop {{Q_h}}\limits^ \cdot  (1.67) - \mathop {{Q_h}}\limits^ \cdot  ( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{10}}{\rm{, if }} - 8.33^\circ {\rm{C}} &lt; {T_j} &lt; 7.22^\circ {\rm{C}}\end{array} \right.$$</div>
 
-<div>$$\mathop {{E_h}}\limits^ \cdot  ({T_j}) = \left\{ \begin{array}{l}\mathop {{E_h}}\limits^ \cdot  ( - 8.33) + \frac{{\left[ {\mathop {{E_h}}\limits^ \cdot  (8.33) - \mathop {{E_h}}\limits^ \cdot  ( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{16.67}}{\rm{, if }}{T_j} \ge 7.22^\circ {\rm{C or }}{T_j} \le  - 8.33^\circ {\rm{C}}\\\mathop {{E_h}}\limits^ \cdot  ( - 8.33) + \frac{{\left[ {\mathop {{E_h}}\limits^ \cdot  (1.67) - \mathop {{E_h}}\limits^ \cdot  ( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{10}}{\rm{, if }} - 8.33^\circ {\rm{C}} < {T_j} < 7.22^\circ {\rm{C}}\end{array} \right.$$</div>
+<div>$$\mathop {{E_h}}\limits^ \cdot  ({T_j}) = \left\{ \begin{array}{l}\mathop {{E_h}}\limits^ \cdot  ( - 8.33) + \frac{{\left[ {\mathop {{E_h}}\limits^ \cdot  (8.33) - \mathop {{E_h}}\limits^ \cdot  ( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{16.67}}{\rm{, if }}{T_j} \ge 7.22^\circ {\rm{C or }}{T_j} \le  - 8.33^\circ {\rm{C}}\\\mathop {{E_h}}\limits^ \cdot  ( - 8.33) + \frac{{\left[ {\mathop {{E_h}}\limits^ \cdot  (1.67) - \mathop {{E_h}}\limits^ \cdot  ( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{10}}{\rm{, if }} - 8.33^\circ {\rm{C}} &lt; {T_j} &lt; 7.22^\circ {\rm{C}}\end{array} \right.$$</div>
 
-<span>$\mathop {{Q_h}}\limits^ \cdot  ( - 8.33),\mathop {{Q_h}}\limits^ \cdot  (1.67),\mathop {{Q_h}}\limits^ \cdot  (8.33),\mathop {{E_h}}\limits^ \cdot  ( - 8.33),\mathop {{E_h}}\limits^ \cdot  (1.67)$</span> and <span>$\mathop {{E_h}}\limits^ \cdot  (8.33)$</span> are the **(net)** values calculated using performance curves entered by the user and supply fan power per rated air flow rate.
+<span>\(\mathop {{Q_h}}\limits^ \cdot  ( - 8.33),\mathop {{Q_h}}\limits^ \cdot  (1.67),\mathop {{Q_h}}\limits^ \cdot  (8.33),\mathop {{E_h}}\limits^ \cdot  ( - 8.33),\mathop {{E_h}}\limits^ \cdot  (1.67)\)</span> and <span>\(\mathop {{E_h}}\limits^ \cdot  (8.33)\)</span> are the **(net)** values calculated using performance curves entered by the user and supply fan power per rated air flow rate.
 
 Table 59. Heating Mode Test Conditions for Units Having a Single-Speed Compressor and a Fixed-Speed Indoor Fan, a Constant Air Volume Rate Indoor Fan, or No Indoor Fan
 
@@ -3577,7 +3577,7 @@ Table 60. Generalized Climatic Region Information
     <td>*2750</td>
   </tr>
   <tr>
-    <th colspan="2">Outdoor Design Temperature, <span>${T_{OD}}$</span>(&deg;C)</th>
+    <th colspan="2">Outdoor Design Temperature, <span>\({T_{OD}}\)</span>(&deg;C)</th>
     <td>2.78</td>
     <td>-2.78</td>
     <td>-8.33</td>
@@ -3587,8 +3587,8 @@ Table 60. Generalized Climatic Region Information
   </tr>
   <tr>
     <td><div>$$j$$</div></td>
-    <td><span>${T_j}$</span>(&deg;C)</td>
-    <td colspan="6">Fractional Bin Hours <span>$\frac{{{n_j}}}{N}$</span></td>
+    <td><span>\({T_j}\)</span>(&deg;C)</td>
+    <td colspan="6">Fractional Bin Hours <span>\(\frac{{{n_j}}}{N}\)</span></td>
   </tr>
   <tr>
     <td>1</td>
@@ -3835,7 +3835,7 @@ where,
 
 *Q<sub>coil,cycling</sub>*      = delivered sensible heating capacity for Speed 1 operating at a specific cycling ratio [W]
 
-<span>$\mathop {{\rm{ }}m}\limits_{Speed{\kern 1pt} 1}^ \cdot  $</span>      = air mass flow rate through heating coil at Speed 1 as set by the parent object [kg/s]
+<span>\(\mathop {{\rm{ }}m}\limits_{Speed{\kern 1pt} 1}^ \cdot  \)</span>      = air mass flow rate through heating coil at Speed 1 as set by the parent object [kg/s]
 
 *h<sub>outlet,full</sub>*      = specific enthalpy of the coil outlet air during full-load operation at Speed 1 (no cycling) [J/kg]
 
@@ -3855,7 +3855,7 @@ where,
 
 *h<sub>outlet,average</sub>*  = average specific enthalpy at the coil outlet [J/kg]
 
-<span>${\dot m_{inlet}}$</span>         = mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the heating coil is ON and the specified flow rate when the heating coil is OFF for the time step being simulated.
+<span>\({\dot m_{inlet}}\)</span>         = mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the heating coil is ON and the specified flow rate when the heating coil is OFF for the time step being simulated.
 
 n Outlet air temperature
 
@@ -3871,7 +3871,7 @@ This section describes how higher speed operation is simulated. When the require
 
 n Total delivered heating capacity at Speed n-1 and Speed n
 
-<span>$TotCa{p_{n - 1}} = RatedCa{p_{n - 1}}\left( {TotCapTempModFa{c_{n - 1}}} \right)\left( {TotCapFlowModFa{c_{n - 1}}} \right)$</span><span>$TotCa{p_n} = RatedCa{p_n}\left( {TotCapTempModFa{c_n}} \right)\left( {TotCapFlowModFa{c_n}} \right)$</span>
+<span>\(TotCa{p_{n - 1}} = RatedCa{p_{n - 1}}\left( {TotCapTempModFa{c_{n - 1}}} \right)\left( {TotCapFlowModFa{c_{n - 1}}} \right)\)</span><span>\(TotCa{p_n} = RatedCa{p_n}\left( {TotCapTempModFa{c_n}} \right)\left( {TotCapFlowModFa{c_n}} \right)\)</span>
 
 where,
 
@@ -3923,11 +3923,11 @@ n Effective total heating capacity
 
 where,
 
-<span>${{Q_{coil,SpeedRatio}}}$</span><sub>                       </sub> = delivered sensible heating capacity at a given speed ratio between two consecutive speeds [W]
+<span>\({{Q_{coil,SpeedRatio}}}\)</span><sub>                       </sub> = delivered sensible heating capacity at a given speed ratio between two consecutive speeds [W]
 
-<span>${\mathop {{\rm{ }}m}\limits_{Speed{\kern 1pt} n}^ \cdot  }$</span>      = air mass flow rate through heating coil at Speed n as set by the parent object [kg/s]
+<span>\({\mathop {{\rm{ }}m}\limits_{Speed{\kern 1pt} n}^ \cdot  }\)</span>      = air mass flow rate through heating coil at Speed n as set by the parent object [kg/s]
 
-<span>${\mathop {{\rm{ }}m}\limits_{Speed{\kern 1pt} n - 1}^ \cdot  }$</span>    = air mass flow rate through heating coil at Speed 1 as set by the parent object [kg/s]
+<span>\({\mathop {{\rm{ }}m}\limits_{Speed{\kern 1pt} n - 1}^ \cdot  }\)</span>    = air mass flow rate through heating coil at Speed 1 as set by the parent object [kg/s]
 
 
 
@@ -3941,7 +3941,7 @@ where,
 
 *h<sub>inlet</sub>           *            = specific enthalpy of the coil inlet air [J/kg]
 
-<span>${\dot m_{inlet}}$</span>         = Mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the heating coil is at Speed n and the specified flow rate when the heating coil is at Speed n-1 for the time step being simulated.
+<span>\({\dot m_{inlet}}\)</span>         = Mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the heating coil is at Speed n and the specified flow rate when the heating coil is at Speed n-1 for the time step being simulated.
 
 n Average outlet air temperature
 
@@ -3985,17 +3985,17 @@ When the defrost strategy is resistive, the power calculation is the same as Spe
 
 where:
 
-<span>${Q_{defrost,n}}$</span>     = additional indoor heating load due to reverse-cycle defrost at Speed n (*W*)
+<span>\({Q_{defrost,n}}\)</span>     = additional indoor heating load due to reverse-cycle defrost at Speed n (*W*)
 
-<span>${Q_{total,rated,n}}$</span>  = total full-load heating capacity of the coil at rated conditions at Speed n (W)
+<span>\({Q_{total,rated,n}}\)</span>  = total full-load heating capacity of the coil at rated conditions at Speed n (W)
 
-<span>${P_{defrost,n - 1}}$</span>    = full load defrost power for the simulation time step at Speed n-1 (W)
+<span>\({P_{defrost,n - 1}}\)</span>    = full load defrost power for the simulation time step at Speed n-1 (W)
 
-<span>${P_{defrost,n}}$</span>      = full load defrost power for the simulation time step at Speed n (W)
+<span>\({P_{defrost,n}}\)</span>      = full load defrost power for the simulation time step at Speed n (W)
 
-<span>${Q_{total,rated,n - 1}}$</span>= capacity of the resistive defrost heating element at Speed n-1 (W)
+<span>\({Q_{total,rated,n - 1}}\)</span>= capacity of the resistive defrost heating element at Speed n-1 (W)
 
-<span>${Q_{total,rated,n}}$</span>= capacity of the resistive defrost heating element at Speed n (W)
+<span>\({Q_{total,rated,n}}\)</span>= capacity of the resistive defrost heating element at Speed n (W)
 
 DefrostEIRTempModFac     = defrost energy input ratio (EIR) modifier curve (Ref. Coil:Heating:DX:SingleSpeed).
 
@@ -4011,7 +4011,7 @@ When the input for the field ’Apply Part Load Fraction to Speeds Greater than 
 
 where,
 
-<span>${P_{defrost}}$</span>        = average defrost power used in Watt
+<span>\({P_{defrost}}\)</span>        = average defrost power used in Watt
 
 RTF            = Run time fraction (SpeedRatio/Part-load Fraction) at Speed n
 
@@ -4065,7 +4065,7 @@ j     =          the bin number, dimensionless.
 
 M   =          for each generalized climatic region, the total number of temperature bins, dimensionless. Referring to Table 60, M is the highest bin number (j) having a nonzero entry for the fractional bin hours for the generalized climatic region of interest.
 
-<span>${F_{def}}$</span>= The demand defrost credit described in section 3.9.2 of AHRI Std. 210/240-2008, dimensionless.  For simplification, assigned a value of 1 for timed defrost control and a value of 1.03 for demand defrost control.
+<span>\({F_{def}}\)</span>= The demand defrost credit described in section 3.9.2 of AHRI Std. 210/240-2008, dimensionless.  For simplification, assigned a value of 1 for timed defrost control and a value of 1.03 for demand defrost control.
 
 The building heating load is calculated as follows:
 
@@ -4099,7 +4099,7 @@ C    =          0.77, a correction factor which tends to improve the 
 
 DHR           =          the design heating requirement for each generalized climate region, Btu/h.
 
-<span>$\dot Q_h^{k = 2}(8.33)$</span>=          the heating capacity determined from H1<sub>2</sub> test, (W)
+<span>\(\dot Q_h^{k = 2}(8.33)\)</span>=          the heating capacity determined from H1<sub>2</sub> test, (W)
 
 The heating capacity delivered and electric power input of the heat pump when operating at minimum (low) compressor capacity and outdoor air temperature of *T<sub>j</sub>* is given by:
 
@@ -4107,8 +4107,8 @@ The heating capacity delivered and electric power input of the heat pump when op
   {\rm{\dot Q}}_h^{k = 1}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ 
     \begin{array}{l}
       {\rm{\dot Q}}_h^{k = 1}(8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(16}}{\rm{.67) - \dot Q}}_h^{k = 1}{\rm{(8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} - 8.33} \right)}}{{\left( {16.67 - 8.33} \right)}}\,{\rm{if}}\,{{\rm{T}}_{\rm{j}}} \ge 4.44{\rm{^\circ C}} \\
-      {\rm{\dot Q}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(1}}{\rm{.67) - \dot Q}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {1.67 + 8.33} \right)}}\,{\rm{if}}\, - 8.33{\rm{^\circ C}} \le {{\rm{T}}_{\rm{j}}} < 4.44{\rm{^\circ C}} \\
-      {\rm{\dot Q}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(8}}{\rm{.33) - \dot Q}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {8.33 + 8.33} \right)}}\,{\rm{if }}{{\rm{T}}_{\rm{j}}} <  - 8.33{\rm{^\circ C}}\,
+      {\rm{\dot Q}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(1}}{\rm{.67) - \dot Q}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {1.67 + 8.33} \right)}}\,{\rm{if}}\, - 8.33{\rm{^\circ C}} \le {{\rm{T}}_{\rm{j}}} &lt; 4.44{\rm{^\circ C}} \\
+      {\rm{\dot Q}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(8}}{\rm{.33) - \dot Q}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {8.33 + 8.33} \right)}}\,{\rm{if }}{{\rm{T}}_{\rm{j}}} &lt;  - 8.33{\rm{^\circ C}}\,
     \end{array}
   \right\}
 $$</div>
@@ -4117,21 +4117,21 @@ $$</div>
   {\rm{\dot E}}_h^{k = 1}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{
     \begin{array}{l}
       {\rm{\dot E}}_h^{k = 1}(8.33) + \;\frac{{\left[ {{\rm{\dot E}}_h^{k = 1}{\rm{(16}}{\rm{.67) - \dot E}}_h^{k = 1}{\rm{(8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} - 8.33} \right)}}{{\left( {16.67 - 8.33} \right)}}\,{\rm{if}}\,{{\rm{T}}_{\rm{j}}} \ge 4.44{\rm{^\circ C}} \\
-      {\rm{\dot E}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot E}}_h^{k = 1}{\rm{(1}}{\rm{.67) - \dot E}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {1.67 + 8.33} \right)}}\,{\rm{if}}\, - 8.33{\rm{^\circ C}} \le {{\rm{T}}_{\rm{j}}} < 4.44{\rm{^\circ C}} \\
-      {\rm{\dot E}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot E}}_h^{k = 1}{\rm{(8}}{\rm{.33) - \dot E}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {8.33 + 8.33} \right)}}\,{\rm{if }}{{\rm{T}}_{\rm{j}}} <  - 8.33{\rm{^\circ C}}\,
+      {\rm{\dot E}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot E}}_h^{k = 1}{\rm{(1}}{\rm{.67) - \dot E}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {1.67 + 8.33} \right)}}\,{\rm{if}}\, - 8.33{\rm{^\circ C}} \le {{\rm{T}}_{\rm{j}}} &lt; 4.44{\rm{^\circ C}} \\
+      {\rm{\dot E}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot E}}_h^{k = 1}{\rm{(8}}{\rm{.33) - \dot E}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {8.33 + 8.33} \right)}}\,{\rm{if }}{{\rm{T}}_{\rm{j}}} &lt;  - 8.33{\rm{^\circ C}}\,
     \end{array}
   \right\}
 $$</div>
 
 Where,
 
-<span>${\rm{\dot Q}}_h^{k = 1}\left( {{\rm{16}}{\rm{.67}}} \right),\,{\rm{and}}\,{\rm{\dot E}}_h^{k = 1}\left( {{\rm{16}}{\rm{.67}}} \right)$</span> are determined from H0<sub>1</sub> test and
+<span>\({\rm{\dot Q}}_h^{k = 1}\left( {{\rm{16}}{\rm{.67}}} \right),\,{\rm{and}}\,{\rm{\dot E}}_h^{k = 1}\left( {{\rm{16}}{\rm{.67}}} \right)\)</span> are determined from H0<sub>1</sub> test and
 
-<span>${\rm{\dot Q}}_h^{k = 1}\left( {{\rm{8}}{\rm{.33}}} \right),\,{\rm{and}}\,{\rm{\dot E}}_h^{k = 1}\left( {{\rm{8}}{\rm{.33}}} \right)$</span> are determined from H1<sub>1</sub> test and
+<span>\({\rm{\dot Q}}_h^{k = 1}\left( {{\rm{8}}{\rm{.33}}} \right),\,{\rm{and}}\,{\rm{\dot E}}_h^{k = 1}\left( {{\rm{8}}{\rm{.33}}} \right)\)</span> are determined from H1<sub>1</sub> test and
 
-<span>${\rm{\dot Q}}_h^{k = 1}\left( {{\rm{1}}{\rm{.67}}} \right),\,{\rm{and}}\,{\rm{\dot E}}_h^{k = 1}\left( {{\rm{1}}{\rm{.67}}} \right)$</span> are determined from H2<sub>1</sub> test, and
+<span>\({\rm{\dot Q}}_h^{k = 1}\left( {{\rm{1}}{\rm{.67}}} \right),\,{\rm{and}}\,{\rm{\dot E}}_h^{k = 1}\left( {{\rm{1}}{\rm{.67}}} \right)\)</span> are determined from H2<sub>1</sub> test, and
 
-<span>${\rm{\dot Q}}_h^{k = 1}\left( {{\rm{ - 8}}{\rm{.33}}} \right),\,{\rm{and}}\,{\rm{\dot E}}_h^{k = 1}\left( {{\rm{ - 8}}{\rm{.33}}} \right)$</span> are determined from H3<sub>1</sub> test.
+<span>\({\rm{\dot Q}}_h^{k = 1}\left( {{\rm{ - 8}}{\rm{.33}}} \right),\,{\rm{and}}\,{\rm{\dot E}}_h^{k = 1}\left( {{\rm{ - 8}}{\rm{.33}}} \right)\)</span> are determined from H3<sub>1</sub> test.
 
 An alternative to conducting or evaluating the performance at H2<sub>1</sub> test is to approximate the capacity and electric power inputs as follows:
 
@@ -4141,17 +4141,17 @@ An alternative to conducting or evaluating the performance at H2<sub>1</sub> tes
 
 The heating capacity delivered and electric power input of the heat pump when operating at maximum (high) compressor speed and outdoor air temperature of *T<sub>j</sub>* is given by:
 
-<div>$$\dot Q_h^{k = 2}({T_j}) = \left\{ \begin{array}{l}\dot Q_h^{k = 2}( - 8.33) + \frac{{\left[ {\dot Q_h^{k = 2}(8.33) - \dot Q_h^{k = 2}( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{8.33 + 8.33}},\quad IF\,{T_j} \ge 7.2^\circ C\,or\,{T_j} \le  - 8.33^\circ C\\\dot Q_h^{k = 2}( - 8.33) + \frac{{\left[ {\dot Q_h^{k = 2}(1.67) - \dot Q_h^{k = 2}( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{1.67 + 8.33}},\quad IF\, - 8.33^\circ C < {T_j} < 7.2^\circ C\end{array} \right.$$</div>
+<div>$$\dot Q_h^{k = 2}({T_j}) = \left\{ \begin{array}{l}\dot Q_h^{k = 2}( - 8.33) + \frac{{\left[ {\dot Q_h^{k = 2}(8.33) - \dot Q_h^{k = 2}( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{8.33 + 8.33}},\quad IF\,{T_j} \ge 7.2^\circ C\,or\,{T_j} \le  - 8.33^\circ C\\\dot Q_h^{k = 2}( - 8.33) + \frac{{\left[ {\dot Q_h^{k = 2}(1.67) - \dot Q_h^{k = 2}( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{1.67 + 8.33}},\quad IF\, - 8.33^\circ C &lt; {T_j} &lt; 7.2^\circ C\end{array} \right.$$</div>
 
-<div>$$\dot E_h^{k = 2}({T_j}) = \left\{ \begin{array}{l}\dot E_h^{k = 2}( - 8.33) + \frac{{\left[ {\dot E_h^{k = 2}(8.33) - \dot E_h^{k = 2}( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{8.33 + 8.33}},\quad IF\,{T_j} \ge 7.2^\circ C\,or\,{T_j} \le  - 8.33^\circ C\\\dot E_h^{k = 2}( - 8.33) + \frac{{\left[ {\dot E_h^{k = 2}(1.67) - \dot E_h^{k = 2}( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{1.67 + 8.33}},\quad IF\, - 8.33^\circ C < {T_j} < 7.2^\circ C\end{array} \right.$$</div>
+<div>$$\dot E_h^{k = 2}({T_j}) = \left\{ \begin{array}{l}\dot E_h^{k = 2}( - 8.33) + \frac{{\left[ {\dot E_h^{k = 2}(8.33) - \dot E_h^{k = 2}( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{8.33 + 8.33}},\quad IF\,{T_j} \ge 7.2^\circ C\,or\,{T_j} \le  - 8.33^\circ C\\\dot E_h^{k = 2}( - 8.33) + \frac{{\left[ {\dot E_h^{k = 2}(1.67) - \dot E_h^{k = 2}( - 8.33)} \right] \cdot \left( {{T_j} + 8.33} \right)}}{{1.67 + 8.33}},\quad IF\, - 8.33^\circ C &lt; {T_j} &lt; 7.2^\circ C\end{array} \right.$$</div>
 
 Where,
 
-<span>$\dot Q_h^{k = 2}\left( {{\rm{8}}{\rm{.33}}} \right),\,{\rm{and}}\,\dot E_h^{k = 2}\left( {{\rm{8}}{\rm{.33}}} \right)$</span>are determined from H1<sub>2</sub> test
+<span>\(\dot Q_h^{k = 2}\left( {{\rm{8}}{\rm{.33}}} \right),\,{\rm{and}}\,\dot E_h^{k = 2}\left( {{\rm{8}}{\rm{.33}}} \right)\)</span>are determined from H1<sub>2</sub> test
 
-<span>$\dot Q_h^{k = 2}\left( {{\rm{1}}{\rm{.67}}} \right),\,{\rm{and}}\,\dot E_h^{k = 2}\left( {{\rm{1}}{\rm{.67}}} \right)$</span>are determined from H2<sub>2</sub> test
+<span>\(\dot Q_h^{k = 2}\left( {{\rm{1}}{\rm{.67}}} \right),\,{\rm{and}}\,\dot E_h^{k = 2}\left( {{\rm{1}}{\rm{.67}}} \right)\)</span>are determined from H2<sub>2</sub> test
 
-<span>$\dot Q_h^{k = 2}\left( {{\rm{ - 8}}{\rm{.33}}} \right),\,{\rm{and}}\,\dot E_h^{k = 2}\left( {{\rm{ - 8}}{\rm{.33}}} \right)$</span>are determined from H3<sub>2</sub> test
+<span>\(\dot Q_h^{k = 2}\left( {{\rm{ - 8}}{\rm{.33}}} \right),\,{\rm{and}}\,\dot E_h^{k = 2}\left( {{\rm{ - 8}}{\rm{.33}}} \right)\)</span>are determined from H3<sub>2</sub> test
 
 The electric energy used by the heat pumps differs depending up on whether the heat pump would operate at low (minimum) capacity, cycle between successive lower and higher speed capacities, or operate at high speed capacity in responding to the building load.  The procedure for each operation cases is described next.
 
@@ -4165,7 +4165,7 @@ The electric energy used by the heat pumps differs depending up on whether the h
 
 <div>$${{\rm{X}}^{k = 1}}\left( {{{\rm{T}}_{\rm{j}}}} \right){\rm{ = MIN}}\left\{ \begin{array}{l}BL\left( {{{\rm{T}}_{\rm{j}}}} \right){\rm{/\dot Q}}_h^{k = 1}\left( {{{\rm{T}}_{\rm{j}}}} \right)\\1.0\end{array} \right\}$$</div>
 
-<div>$${\delta ^\prime}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,\\1/2,\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} < {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\\1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\end{array} \right\}$$</div>
+<div>$${\delta ^\prime}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,\\1/2,\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} &lt; {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\\1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\end{array} \right\}$$</div>
 
 <div>$$PL{F_{\rm{j}}}{\rm{ = 1 - }}C_D^h \cdot \left[ {{\rm{1 - }}{{\rm{X}}^{k = 1}}{\rm{(}}{T_j}{\rm{)}}} \right]$$</div>
 
@@ -4173,13 +4173,13 @@ The electric energy used by the heat pumps differs depending up on whether the h
 
 *Case 2*:  The unit cycles between the low (minimum) and high (maximum) compressor capacity to meet the building heating load at outdoor air temperature *T<sub>j</sub>*.  That is, the heating building load is between the unit low and high compressor capacities:
 
-<div>$$\dot Q_h^{k = 1}({T_j}) < BL({T_j}) < \dot Q_h^{k = 2}({T_j})$$</div>
+<div>$$\dot Q_h^{k = 1}({T_j}) &lt; BL({T_j}) &lt; \dot Q_h^{k = 2}({T_j})$$</div>
 
 <div>$$\frac{{{e_c}({T_j})}}{N} = \left[ {{X^{k = 1}}({T_j}) \cdot \dot E_h^{k = 1}({T_j}) + {X^{k = 2}}({T_j}) \cdot \dot E_h^{k = 2}({T_j})} \right] \cdot {\delta ^\prime}({T_j}) \cdot \frac{{{n_j}}}{N}$$</div>
 
 <div>$$\frac{{RH\left( {{{\rm{T}}_{\rm{j}}}} \right)}}{{\rm{N}}}{\rm{ = BL}}\left( {{{\rm{T}}_{\rm{j}}}} \right) \cdot \left[ {{\rm{1 - }}{{\rm{\delta }}^\prime}\left( {{{\rm{T}}_{\rm{j}}}} \right)} \right] \cdot \frac{{{n_j}}}{N}$$</div>
 
-<div>$${\delta ^\prime}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,\\ {\textstyle{1 \over 2}},\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} < {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\\ 1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\end{array} \right\}$$</div>
+<div>$${\delta ^\prime}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,\\ {\textstyle{1 \over 2}},\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} &lt; {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\\ 1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\end{array} \right\}$$</div>
 
 <div>$${X^{k = 1}}({T_j}) = \frac{{\dot Q_h^{k = 2}({T_j}) - BL({T_j})}}{{\dot Q_h^{k = 2}({T_j}) - \dot Q_h^{k = 1}({T_j})}}$$</div>
 
@@ -4195,15 +4195,15 @@ For units when operating continuously at maximum compressor speed (k=2) speed at
 
 <div>$$\frac{{RH\left( {{T_j}} \right)}}{N}{\rm{ = }}\left\{ {BL\left( {{{\rm{T}}_{\rm{j}}}} \right) - \left[ {{\rm{\dot Q}}_h^{k = 2}\left( {{{\rm{T}}_{\rm{j}}}} \right) \cdot {{\rm{\delta }}^``}\left( {{{\rm{T}}_{\rm{j}}}} \right)} \right]} \right\} \cdot \frac{{{n_j}}}{N}$$</div>
 
-<div>$${\delta ^``}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,{\rm{or}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}\, < \,1\\ {\textstyle{1 \over 2}},\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} < {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\,{\rm{and}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}} \ge \,1\;\\1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\,{\rm{and}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}} \ge \,1\;\end{array} \right\}$$</div>
+<div>$${\delta ^``}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,{\rm{or}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}\, &lt; \,1\\ {\textstyle{1 \over 2}},\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} &lt; {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\,{\rm{and}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}} \ge \,1\;\\1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\,{\rm{and}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}} \ge \,1\;\end{array} \right\}$$</div>
 
 X(T<sub>j</sub>)            =          the heating mode load factor for temperature bin j, (-)
 
-<span>${{\rm{\dot Q}}_{\rm{h}}}\left( {{{\rm{T}}_{\rm{j}}}} \right)$</span>     =          space heating capacity of the heat pump when operating at outdoor temperature T<sub>j</sub>, W
+<span>\({{\rm{\dot Q}}_{\rm{h}}}\left( {{{\rm{T}}_{\rm{j}}}} \right)\)</span>     =          space heating capacity of the heat pump when operating at outdoor temperature T<sub>j</sub>, W
 
-<span>${{\rm{\dot E}}_{\rm{h}}}\left( {{{\rm{T}}_{\rm{j}}}} \right)$</span>      =          electrical power consumption of the heat pump when operating at outdoor temperature T<sub>j</sub>, W
+<span>\({{\rm{\dot E}}_{\rm{h}}}\left( {{{\rm{T}}_{\rm{j}}}} \right)\)</span>      =          electrical power consumption of the heat pump when operating at outdoor temperature T<sub>j</sub>, W
 
-<span>${\rm{\delta }}\left( {{{\rm{T}}_{\rm{j}}}} \right)$</span>        =          the heat pump low temperature cut-off factor, (-)
+<span>\({\rm{\delta }}\left( {{{\rm{T}}_{\rm{j}}}} \right)\)</span>        =          the heat pump low temperature cut-off factor, (-)
 
 T<sub>off</sub>  =          the outdoor temperature when the compressor is automatically shut off, °C. (If no such temperature exists, Tj is always greater than T<sub>off</sub> and T<sub>on</sub>).
 
@@ -4352,7 +4352,7 @@ And the loop volumetric air flow rates at various speed levels in the parent obj
 
 If the volumetric air flow rate at one speed level is higher than the flow rate allowed by the fan in the parent object, the flow rate will be set back to the fan flow rate.
 
-If <span>${\rm{AirFlowScaleFactor}}$</span> equals unity, the loop air flow rate becomes the design flow rate of the Reference Unit (after scaled by the rated heating capacity). The Rated Volumetric Air Flow Rate is introduced here to correlate with the actual flow rate in the air loop, in case that it differs from the design specification. Certainly, it is recommended that the Rated Volumetric Air Flow Rate is selected in the way that <span>${\rm{AirFlowScaleFactor}}$</span> is unity, so as to get more accurate results from the performance curves.
+If <span>\({\rm{AirFlowScaleFactor}}\)</span> equals unity, the loop air flow rate becomes the design flow rate of the Reference Unit (after scaled by the rated heating capacity). The Rated Volumetric Air Flow Rate is introduced here to correlate with the actual flow rate in the air loop, in case that it differs from the design specification. Certainly, it is recommended that the Rated Volumetric Air Flow Rate is selected in the way that <span>\({\rm{AirFlowScaleFactor}}\)</span> is unity, so as to get more accurate results from the performance curves.
 
 #### Performance curves:
 
@@ -4466,7 +4466,7 @@ The design air flow rate at the speed ratio are given as following:
 
 And the fractions of air flow is given:
 
-<span>${\rm{f}}{{\rm{f}}_{{\rm{a}},{\rm{x}} - 1}}$</span>=<span>${\rm{f}}{{\rm{f}}_{{\rm{a}},{\rm{x}}}}$</span>= actual air mass flow rate/DesignAirFlowRateSpeedRatio
+<span>\({\rm{f}}{{\rm{f}}_{{\rm{a}},{\rm{x}} - 1}}\)</span>=<span>\({\rm{f}}{{\rm{f}}_{{\rm{a}},{\rm{x}}}}\)</span>= actual air mass flow rate/DesignAirFlowRateSpeedRatio
 
 The total heating capacities and EIRs at Speed x-1 and Speed x are given:
 
@@ -4542,7 +4542,7 @@ The desuperheater heating coil can be used in air loop simulations for various a
 
 The desuperheater heating coil can also be used with cooling/heating systems that maintain specific air loop (deck) temperatures. For example, Figure 171 shows a schematic diagram of the desuperheater heating coil used in conjunction with the CoilSystem:Cooling:DX object. The desuperheater heating coil must be placed downstream of the DX cooling coil when reclaiming heat from that cooling coil’s compressor(s). Desuperheating heating coil placement is unrestricted when reclaiming heat from a refrigeration compressor rack or refrigeration condenser. The configuration in Figure 171 shows the heating coil being controlled via a temperature-based strategy. In this example, the DX cooling coil could be used to the maintain its discharge air temperature at 11°C for zone dehumidification. The desuperheater heating coil could then raise the air dry-bulb temperature to 16°C providing a dry supply air stream at a temperature which does not require much additional heating by terminal units to meet the zone temperature setpoint.
 
-![Schematic\_DesuperheaterHeatingCoil](EngineeringReference/media/image4016.png)
+![Schematic\_DesuperheaterHeatingCoil](media/image4016.png)
 
 Figure 171. Desuperheater Heating Coil Used as a Reheat Coil with CoilSystem:Cooling:DX
 
@@ -4572,11 +4572,11 @@ When load-based operation is selected, a load to be met by the heating coil is r
 
 where:
 
-<span>${\dot Q_{coil}}$</span>          = heating capacity of the desuperheater coil (W)
+<span>\({\dot Q_{coil}}\)</span>          = heating capacity of the desuperheater coil (W)
 
-<span>${\dot Q_{cond}}$</span>         = total amount of condenser waste heat rejected by the heating source (W)
+<span>\({\dot Q_{cond}}\)</span>         = total amount of condenser waste heat rejected by the heating source (W)
 
-<span>${\varepsilon_{reclaim}}$</span>       = heat reclaim recovery efficiency
+<span>\({\varepsilon_{reclaim}}\)</span>       = heat reclaim recovery efficiency
 
 The model then compares the coil’s heating capacity to the heating load being requested. If the heating capacity is greater than the heating load, then the amount of reclaimed heat (average heating rate over the simulation time step) is set equal to the requested load and the desuperheater heating coil will cycle off when the requested load is satisfied.
 
@@ -4592,15 +4592,15 @@ In either case, the coil’s leaving air temperature is then calculated based on
 
 where:
 
-<span>${T_{out}}$</span>= coil outlet air temperature (°C)
+<span>\({T_{out}}\)</span>= coil outlet air temperature (°C)
 
-<span>${T_{in}}$</span>= coil inlet air temperature (°C)
+<span>\({T_{in}}\)</span>= coil inlet air temperature (°C)
 
-                                                     <span>$$</span>
+                                                     <span>\(\)</span>
 
-<span>$\dot m$</span>  = air mass flow rate through the heating coil (kg/s)
+<span>\(\dot m\)</span>  = air mass flow rate through the heating coil (kg/s)
 
-<span>${C_p}$</span> = specific heat of air entering the heating coil (J/kg-C)
+<span>\({C_p}\)</span> = specific heat of air entering the heating coil (J/kg-C)
 
 A final calculation is made to determine the runtime fraction of the desuperheater heating coil. Since the maximum amount of reclaim heat available is dependent on the runtime fraction of the waste heat source, the runtime fraction of the desuperheater heating coil is the product of the waste heat source’s runtime fraction and the ratio of the amount of heat reclaimed to the desuperheater coil’s heating capacity.
 
@@ -4608,9 +4608,9 @@ A final calculation is made to determine the runtime fraction of the desuperheat
 
 where:
 
-<span>$RT{F_{coil}}$</span>      = runtime fraction of the desuperheater heating coil
+<span>\(RT{F_{coil}}\)</span>      = runtime fraction of the desuperheater heating coil
 
-<span>$RT{F_{source}}$</span>    = runtime fraction of the desuperheater heating source
+<span>\(RT{F_{source}}\)</span>    = runtime fraction of the desuperheater heating source
 
 The heating coil’s outlet air humidity ratio and air mass flow rate are simply set equal to the coil inlet air values. The outlet air enthalpy is calculated based on the outlet air dry-bulb temperature and the outlet air humidity ratio.
 
@@ -4618,9 +4618,9 @@ The heating coil’s outlet air humidity ratio and air mass flow rate are simply
 
 where
 
-<span>${h_{out}}$</span>         = enthalpy of the air leaving the heating coil, J/kg
+<span>\({h_{out}}\)</span>         = enthalpy of the air leaving the heating coil, J/kg
 
-<span>$\,{\omega_{out}}$</span>        = humidity ratio of the air leaving the heating coil, kg/kg
+<span>\(\,{\omega_{out}}\)</span>        = humidity ratio of the air leaving the heating coil, kg/kg
 
 *PsyHFnTdbW* = EnergyPlus psychrometric function, returns enthalpy given dry-bulb temperature and humidity ratio
 
@@ -4636,9 +4636,9 @@ The model then calculates the heating load required to reach the desired setpoin
 
 where:
 
-<span>${\dot Q_{load}}$</span>          = heating load to meet the desired dry-bulb temperature setpoint (W)
+<span>\({\dot Q_{load}}\)</span>          = heating load to meet the desired dry-bulb temperature setpoint (W)
 
-<span>${T_{setpoint}}$</span>       = desired dry-bulb temperature setpoint (°C)
+<span>\({T_{setpoint}}\)</span>       = desired dry-bulb temperature setpoint (°C)
 
 A comparison is then made to determine if the desuperheater heating coil should be energized. If the calculated load is less than or equal to 0, the coil’s inlet air dry-bulb temperature is at or above the setpoint. In this case the desuperheater heating coil is not active and the outlet air dry-bulb temperature is set equal to the inlet air dry-bulb temperature.
 
@@ -4668,7 +4668,7 @@ The heating coil’s outlet air humidity ratio and air mass flow rate are simply
 
 #### Parasitic Electric Load
 
-The parasitic electric load attributed to the desuperheater heating coil is calculated using the user-supplied input value (<span>${P_{parasitic}}$</span>) and the desuperheater heating coil runtime fraction calculated above.
+The parasitic electric load attributed to the desuperheater heating coil is calculated using the user-supplied input value (<span>\({P_{parasitic}}\)</span>) and the desuperheater heating coil runtime fraction calculated above.
 
 <div>$${P_{elec}} = {P_{parasitic}} \times RT{F_{coil}}$$</div>
 
@@ -4714,7 +4714,7 @@ To model a desuperheater water heating coil, the input data file must include th
 
 A schematic diagram showing the desuperheater water heating coil with its water heater and DX system condenser is shown below.
 
-![DesuperheaterSchematic\_DS](EngineeringReference/media/image4049.png)
+![DesuperheaterSchematic\_DS](media/image4049.png)
 
 Figure 172.  Schematic of Desuperheater Water Heating Coil
 
@@ -4726,11 +4726,11 @@ The desuperheater heating coil input requires a setpoint temperature schedule an
 
 where:
 
-<span>${T_{cut - in}}$</span>         = Cut-in temperature (°C)
+<span>\({T_{cut - in}}\)</span>         = Cut-in temperature (°C)
 
-<span>${T_{set\,point}}$</span>       = Setpoint temperature (°C)
+<span>\({T_{set\,point}}\)</span>       = Setpoint temperature (°C)
 
-<span>${T_{dead\,band}}$</span>     = Dead band temperature difference (°C)
+<span>\({T_{dead\,band}}\)</span>     = Dead band temperature difference (°C)
 
 Desuperheater water heating coils are typically used to offset energy consumption by the water tank’s heater (element or burner). Therefore, the cut-in temperature of the desuperheater coil should always be higher than the water heater tank’s setpoint temperature. At times when the water heater tank’s setpoint temperature is greater than or equal to the cut-in temperature of the desuperheater coil, the desuperheater is disabled and the water heater tank heating element is used to heat the water. An additional input parameter sets the maximum inlet water temperature allowed for desuperheater heat reclaim. Any time the inlet water temperature to the desuperheater coil is above this maximum allowed temperature, heat reclaim is restricted so that the tank water does exceed this temperature.
 
@@ -4740,11 +4740,11 @@ When the desuperheater coil is scheduled off by its availability schedule, the w
 
 where:
 
-<span>$HEffFTemp$</span>= Heat reclaim efficiency modifier
+<span>\(HEffFTemp\)</span>= Heat reclaim efficiency modifier
 
-<span>${T_{water,inlet}}$</span>     = Desuperheater coil inlet water temperature (°C)
+<span>\({T_{water,inlet}}\)</span>     = Desuperheater coil inlet water temperature (°C)
 
-<span>${T_{DB,outdoor}}$</span>    = Outdoor air dry-bulb temperature (°C)
+<span>\({T_{DB,outdoor}}\)</span>    = Outdoor air dry-bulb temperature (°C)
 
 Except for the detailed condenser source, heat reclaim recovery efficiencies higher than 30% may cause the refrigerant gas to condense which in turn impacts the performance of the refrigeration system. The model is unable to account for this refrigeration system impact, so the product of the rated heat reclaim recovery efficiency and heat reclaim efficiency modifier is not allowed to exceed 0.3.  For the detailed refrigeration condenser, the limit for the heat reclaim efficiency has been set at 0.9 as follows:
 
@@ -4754,7 +4754,7 @@ where:
 
 Limit           = 0.3 for most sources, =0.9 for detailed condensers
 
-<span>${\varepsilon_{reclaim,rated}}$</span> = rated heat reclaim recovery efficiency
+<span>\({\varepsilon_{reclaim,rated}}\)</span> = rated heat reclaim recovery efficiency
 
 The heating capacity of the desuperheater coil is then calculated based on the product of total amount of condenser waste heat rejected by the heating source, the desuperheater coil’s rated heat reclaim recovery efficiency, and the heat reclaim efficiency modifier.
 
@@ -4762,11 +4762,11 @@ The heating capacity of the desuperheater coil is then calculated based on the p
 
 where:
 
-<span>${\dot Q_{coil}}$</span>          = water heating capacity of the desuperheater coil (W)
+<span>\({\dot Q_{coil}}\)</span>          = water heating capacity of the desuperheater coil (W)
 
-<span>${\dot Q_{cond}}$</span>         = average rate of condenser waste heat rejected by the heating source (W)
+<span>\({\dot Q_{cond}}\)</span>         = average rate of condenser waste heat rejected by the heating source (W)
 
-<span>$DXSystemPLR$</span> = part load ratio for the desuperheater coil heating source (1.0 for refrigerated case compressor rack and detailed refrigeration condenser)
+<span>\(DXSystemPLR\)</span> = part load ratio for the desuperheater coil heating source (1.0 for refrigerated case compressor rack and detailed refrigeration condenser)
 
 The desuperheater is assumed to have a water circulation pump located downstream of the refrigerant-to-water coil. Pump heat is added to the desuperheater water heating capacity based on a user-defined fraction as follows:
 
@@ -4774,15 +4774,15 @@ The desuperheater is assumed to have a water circulation pump located downstream
 
 where:
 
-<span>${P_{pump}}$</span>                     = water pump power (W)
+<span>\({P_{pump}}\)</span>                     = water pump power (W)
 
-<span>$Fra{c_{pumptowater}}$</span>        = fraction of pump heat to water
+<span>\(Fra{c_{pumptowater}}\)</span>        = fraction of pump heat to water
 
 The temperature of the water leaving the desuperheater is then calculated as
 
-<span>${T_{water,outlet}} = {T_{water,inlet}} + \frac{{{Q_{coil}}}}{{{{\dot m}_{water}}\cdot {C_{p,water}}}}$</span> for <span>${\dot m_{water}}$</span> &gt; 0
+<span>\({T_{water,outlet}} = {T_{water,inlet}} + \frac{{{Q_{coil}}}}{{{{\dot m}_{water}}\cdot {C_{p,water}}}}\)</span> for <span>\({\dot m_{water}}\)</span> &gt; 0
 
-<span>${T_{water,outlet}} = {T_{water,inlet}}$</span> for <span>${\dot m_{water}}$</span> = 0
+<span>\({T_{water,outlet}} = {T_{water,inlet}}\)</span> for <span>\({\dot m_{water}}\)</span> = 0
 
 Simulation of the desuperheater heating coil is based on its current mode of operation. This mode of operation is either floating (heating coil off and tank water temperature has not fallen below the heater cut-in temperature) or heating (tank water temperature dropped below the heater cut-in temperature on a previous time step but was unable to reach the heater setpoint temperature). Each mode is handled differently and they will be discussed separately.
 
@@ -4794,11 +4794,11 @@ When the water heater tank temperature is floating between the desuperheater coi
 
 where:
 
-<span>$PLR$</span>         = part load ratio of desuperheater heating coil
+<span>\(PLR\)</span>         = part load ratio of desuperheater heating coil
 
-<span>${T_{tank,float}}$</span>     = tank temperature in float mode when heating capacity is set to zero (°C)
+<span>\({T_{tank,float}}\)</span>     = tank temperature in float mode when heating capacity is set to zero (°C)
 
-<span>${T_{tank,initial}}$</span>    = tank water temperature at the beginning of a simulation time step (°C)
+<span>\({T_{tank,initial}}\)</span>    = tank water temperature at the beginning of a simulation time step (°C)
 
 Since the water pump is assumed to cycle on and off with the desuperheater coil, the average water mass flow rate through the desuperheater coil is then set proportional to the PLR calculated above:
 
@@ -4806,7 +4806,7 @@ Since the water pump is assumed to cycle on and off with the desuperheater coil,
 
 where:
 
-<span>$\dot mwater,avg$</span>       = average desuperheater water mass flow rate for the time step (kg/s)
+<span>\(\dot mwater,avg\)</span>       = average desuperheater water mass flow rate for the time step (kg/s)
 
 The water tank temperature is then calculated based on desuperheater heating coil operation (outlet water temperature and average water mass flow rate as calculated above) and with the water tank’s heater element enabled. If the resulting water tank temperature is above the desuperheater coil’s setpoint temperature, then the part-load ratio is reduced in the same manner described in the heating mode section below.
 
@@ -4814,7 +4814,7 @@ The water tank temperature is then calculated based on desuperheater heating coi
 
 When the desuperheater heating coil is in heating mode at the end of the previous simulation time step (i.e., desuperheater coil operated during the previous simulation time step but was unable to achieve the setpoint temperature), both the desuperheater and the water heater tank’s heating element are enabled. The desuperheater coil outlet water temperature is calculated (as described above) and the water mass flow rate through the desuperheater coil is set to the maximum operating flow rate:
 
-**<span>$\dot mwater,avg = \dot mwater\left( {DXSystemPLR} \right)$</span>**
+**<span>\(\dot mwater,avg = \dot mwater\left( {DXSystemPLR} \right)\)</span>**
 
 If the resulting tank water temperature is above the desuperheater coil’s setpoint (cut-out) temperature, the part load ratio of the desuperheater coil is reduced and the water heater tank is simulated again. The process is performed iteratively until the part load ratio of the desuperheater coil achieves the desired setpoint temperature.
 
@@ -4846,11 +4846,11 @@ After completing the float mode or heating mode calculations and the final desup
 
 where:
 
-<span>${P_{parasiticload,on}}$</span>           = on-cycle parasitic electric load (W)
+<span>\({P_{parasiticload,on}}\)</span>           = on-cycle parasitic electric load (W)
 
-<span>${P_{parasiticload,off}}$</span>          = off-cycle parasitic electric load (W)
+<span>\({P_{parasiticload,off}}\)</span>          = off-cycle parasitic electric load (W)
 
-<span>${t_{sys}}$</span>                         = HVAC system simulation time step (hours)
+<span>\({t_{sys}}\)</span>                         = HVAC system simulation time step (hours)
 
 
 
@@ -4864,7 +4864,7 @@ As shown in Figure 173, the air-to-air heat exchanger pre-conditions the air ent
 
 
 
-![GenericHXAssisted](EngineeringReference/media/image4091.png)
+![GenericHXAssisted](media/image4091.png)
 
 Figure 173. Schematic of a Heat Exchanger Assisted Cooling Coil
 
@@ -4876,13 +4876,13 @@ Note that while the HeatExchanger:AirToAir:SensibleAndLatent and HeatExchanger:D
 
 
 
-![PsychChart\_SensibleHXAssisted](EngineeringReference/media/image4092.png)
+![PsychChart\_SensibleHXAssisted](media/image4092.png)
 
 Figure 174. Psychrometric Process for Heat Exchanger Assisted Cooling Coil (Sensible HX Only)
 
 
 
-![PsychChart\_SensPlusLatHXAssisted](EngineeringReference/media/image4093.png)
+![PsychChart\_SensPlusLatHXAssisted](media/image4093.png)
 
 Figure 175. Psychrometric Process for Heat Exchanger Assisted Cooling Coil (Sensible+Latent HX)
 
@@ -4894,7 +4894,7 @@ For the CoilSystem:Cooling:DX:HeatExchangerAssisted object, heat exchanger opera
 
 The heat exchanger assisted DX cooling coil may be used with furnaces or unitary systems located in an air loop (ref. AirLoopHVAC:Unitary:Furnace:HeatCool or AirLoopHVAC:UnitaryHeatCool). These system objects have three options for dehumidification control (None, Multimode, and CoolReheat). When no dehumidification control is specified in the furnace or unitary system object (None), the heat exchanger is always active when the cooling coil is operating. When multimode or coolreheat dehumidification control is specified, a humidistat is required as shown in Figure 176. For the case of multimode dehumidification control, the heat exchanger is only active when the zone air humidity level is above the humidistat setpoint (i.e., the system’s cooling coil can’t meet the latent cooling load when operating without heat exchanger energy transfer) while the AC system operates to meet the sensible (dry-bulb cooling thermostat) load. For the case of coolreheat dehumidification control, the heat exchanger is always active when the cooling coil operates and this system tries to meet both the sensible (thermostat) and latent (humidistat) loads.
 
-![GenericHXAssisted\_humidistat](EngineeringReference/media/image4094.png)
+![GenericHXAssisted\_humidistat](media/image4094.png)
 
 Figure 176. Schematic of a heat exchanger assisted DX cooling coil with optional humidistat
 
@@ -4902,7 +4902,7 @@ The heat exchanger assisted DX cooling coil may also be used with a DX system lo
 
 When the heat exchanger assisted cooling coil is used with a furnace or unitary system (ref. AirLoopHVAC:Unitary:Furnace:HeatCool or AirLoopHVAC:UnitaryHeatCool) or DX system (ref. CoilSystem:Cooling:DX) located in an air loop (or DX system used in an outside air system), an ecomizier function may be customized as necessary. For economizer control, an outdoor air controller (ref. Controller:OutdoorAir) is used to define the economizer control inputs and determine when economizer mode is active. The heat exchanger (ref. HeatExchanger:\*) object provides an economizer lockout feature which disables heat recovery any time the economizer is active. This feature can be turned on and off using the heat exchanger lockout input. Heat exchanger assisted cooling coils used with the zone equipment described below disregard this economizer control feature.
 
-![GenericHXAssisted\_humidistat\_Plus\_Setpointmanager](EngineeringReference/media/image4095.png)
+![GenericHXAssisted\_humidistat\_Plus\_Setpointmanager](media/image4095.png)
 
 Figure 177. Schematic of Heat Exchanger Assisted DX Coil with Humidistat and Setpoint Manager
 
@@ -4926,13 +4926,13 @@ The input object `Coil:WaterHeating:AirToWaterHeatPump:\*` provides a model used
 
 
 
-![HPWHSchematic\_EAplusOA](EngineeringReference/media/image4096.png)
+![HPWHSchematic\_EAplusOA](media/image4096.png)
 
 Figure 178. Schematic of a Heat Pump Water Heater using Optional Mixer/Splitter Nodes
 
 The heat pump water heater DX coil model described here determines the thermal performance and energy consumption of the DX compression system, which includes a water heating coil (condenser), a coil used to extract heat from air (evaporator), and the compressor. This model also simulates the performance of a condenser water pump that is assumed to cycle on and off with the compressor.
 
-![HeatPumpWaterHeater\_Schematic2](EngineeringReference/media/image4097.png)
+![HeatPumpWaterHeater\_Schematic2](media/image4097.png)
 
 Figure 179. Schematic of the Heat Pump Water Heater DX Coil
 
@@ -4968,9 +4968,9 @@ or
 
 where:
 
-<span>${T_{evap,in}}$</span>  = dry-bulb or wet-bulb temperature of the air entering the evaporator coil/fan assembly based on the Evaporator Air Temperature Type for Curve Objects specified by the user (°C)
+<span>\({T_{evap,in}}\)</span>  = dry-bulb or wet-bulb temperature of the air entering the evaporator coil/fan assembly based on the Evaporator Air Temperature Type for Curve Objects specified by the user (°C)
 
-<span>${T_{cond,in}}$</span>  = temperature of the water entering the DX coil condenser (°C)
+<span>\({T_{cond,in}}\)</span>  = temperature of the water entering the DX coil condenser (°C)
 
 The heating capacity as a function of air flow fraction modifier curve is a quadratic or cubic curve that defines the variation in DX coil heating capacity as a function of the ratio of actual air flow rate across the evaporator coil to the rated evaporator air flow rate (i.e., fraction of full load air flow rate). When used, the output of this curve should be normalized to have the value of 1.0  at an air flow fraction of 1.
 
@@ -5066,15 +5066,15 @@ where:
 
 
 
-<span>${\mathop Q\limits^ \bullet_{heating}}$</span>       = water heating capacity at the current operating conditions (W)
+<span>\({\mathop Q\limits^ \bullet_{heating}}\)</span>       = water heating capacity at the current operating conditions (W)
 
-<span>${\mathop Q\limits^ \bullet_{heating,rated}}$</span> = water heating capacity at rated conditions, user input (W)
+<span>\({\mathop Q\limits^ \bullet_{heating,rated}}\)</span> = water heating capacity at rated conditions, user input (W)
 
-<span>$CO{P_{heating}}$</span>  = coefficient of performance at the current operating conditions (W/W)
+<span>\(CO{P_{heating}}\)</span>  = coefficient of performance at the current operating conditions (W/W)
 
-<span>$CO{P_{heating,rated}}$</span>= coefficient of performance at rated conditions, user input (W/W)
+<span>\(CO{P_{heating,rated}}\)</span>= coefficient of performance at rated conditions, user input (W/W)
 
-<span>${P_{heating}}$</span>        = DX heating coil power (electricity consumption rate) at the current                                   operating conditions (W)
+<span>\({P_{heating}}\)</span>        = DX heating coil power (electricity consumption rate) at the current                                   operating conditions (W)
 
 The heating capacity calculated above may or may not include the impact of pump heat. For this reason, the user input Condenser Pump Heat Included in Rated Heating Capacity and Rated COP is used to determine the total water heating capacity including pump heat.
 
@@ -5082,11 +5082,11 @@ The heating capacity calculated above may or may not include the impact of pump 
 
 where:
 
-<span>${\mathop Q\limits^ \bullet_{heating,total}}$</span>  = total water heating capacity including condenser pump heat (W)
+<span>\({\mathop Q\limits^ \bullet_{heating,total}}\)</span>  = total water heating capacity including condenser pump heat (W)
 
-<span>${P_{pump}}$</span>         = condenser water pump power, user input (W)
+<span>\({P_{pump}}\)</span>         = condenser water pump power, user input (W)
 
-<span>$Fra{c_{pumptowater}}$</span>= fraction of condenser pump heat to water, user input
+<span>\(Fra{c_{pumptowater}}\)</span>= fraction of condenser pump heat to water, user input
 
 Compressor power (electricity consumption rate) is then calculated based on two additional inputs provided by the user. The first input specifies if the condenser pump heat is included in the rated heating capacity and rated COP. If the condenser pump heat is included in the rated heating capacity and COP, then condenser pump power must be subtracted from the DX heating coil power calculated above to determine the compressor power.
 
@@ -5096,9 +5096,9 @@ The second of these inputs specifies if the evaporator fan power is included in 
 
 where:
 
-<span>${P_{comp}}$</span> = Compressor power (electric consumption rate) at the current operating conditions (W)
+<span>\({P_{comp}}\)</span> = Compressor power (electric consumption rate) at the current operating conditions (W)
 
-<span>${P_{fan}}$</span>  = Fan power, specified in Fan:OnOff object (W)
+<span>\({P_{fan}}\)</span>  = Fan power, specified in Fan:OnOff object (W)
 
 If fan power is not included in the rated heating COP, then the calculation of compressor power only includes condenser pump power and does not involve the fan:
 
@@ -5110,7 +5110,7 @@ The model assumes that all compressor power is rejected as heat via the DX heati
 
 where:
 
-<span>${\mathop Q\limits^ \bullet_{evap}}$</span> = Total evaporator cooling capacity at the current operating conditions (W)
+<span>\({\mathop Q\limits^ \bullet_{evap}}\)</span> = Total evaporator cooling capacity at the current operating conditions (W)
 
 
 
@@ -5126,13 +5126,13 @@ Finally, the condenser water outlet temperature is calculated based on the total
 
 where:
 
-<span>${T_{cond,out}}$</span> = condenser outlet water temperature when the DX coil is operating (˚C)
+<span>\({T_{cond,out}}\)</span> = condenser outlet water temperature when the DX coil is operating (˚C)
 
-<span>${T_{cond,in}}$</span> = condenser inlet water temperature (˚C)
+<span>\({T_{cond,in}}\)</span> = condenser inlet water temperature (˚C)
 
-<span>${C_p}$</span> = specific heat of water entering the condenser coil (J/kg-C)
+<span>\({C_p}\)</span> = specific heat of water entering the condenser coil (J/kg-C)
 
-<span>$\mathop m\limits^ \bullet  cond$</span> = actual condenser water mass flow rate when the coil is operating, defined in the WaterHeater:HeatPump:PumpedCondenser parent object (kg/s)
+<span>\(\mathop m\limits^ \bullet  cond\)</span> = actual condenser water mass flow rate when the coil is operating,                                 defined in the WaterHeater:HeatPump:PumpedCondenser parent object (kg/s)
 
 
 
@@ -5212,9 +5212,9 @@ Total cooling capacity modifier curve (function of flow fractionl)
 
 where
 
-<span>${{T_{wb,i}}}$</span> = wet-bulb temperature of the air entering the cooling coil, °C
+<span>\({{T_{wb,i}}}\)</span> = wet-bulb temperature of the air entering the cooling coil, °C
 
-<span>${{T_{c,i}}}$</span> = dry-bulb temperature of the air entering an air-cooled condenser
+<span>\({{T_{c,i}}}\)</span> = dry-bulb temperature of the air entering an air-cooled condenser
 
 or wet-bulb temperature of the air entering an evaporative-cooled condenser, °C
 
@@ -5234,9 +5234,9 @@ For any simulation time step, the total (gross) cooling capacity of the DX unit 
 
 where
 
-<span>${\mathop Q\limits^ \bullet_{total}}$</span>= Total available cooling capacity, W
+<span>\({\mathop Q\limits^ \bullet_{total}}\)</span>= Total available cooling capacity, W
 
-<span>${\mathop Q\limits^ \bullet_{reference}}$</span>= Total reference (rated) cooling capacity, W
+<span>\({\mathop Q\limits^ \bullet_{reference}}\)</span>= Total reference (rated) cooling capacity, W
 
 In addition to calculating the total cooling capacity provided by the DX cooling coil, it is important to properly determine the break down of total cooling capacity into its sensible (temperature) and latent (dehumidification) components. The model computes the sensible/ latent split using the SHR and ADP/BF approach (Carrier et al. 1959). When the DX coil model is initially called during an EnergyPlus simulation, the rated total capacity and rated SHR are used to calculate the coil bypass factor (BF) at rated conditions. The rated total capacity and rated SHR are first used to determine the ratio of change in air humidity ratio to air dry-bulb temperature:
 
@@ -5272,21 +5272,21 @@ For a given coil geometry, the bypass factor is only a function of air mass flow
 
 For each simulation time step when the DX cooling coil operates, the total cooling capacity and coil bypass factor at the actual operating conditions are calculated. The coil bypass factor is used to calculate the operating sensible heat ratio (SHR) of the cooling coil using the following equations. Here is where the differnce in models occur for the VRF DX cooling coil and single-speed DX cooling coil. The original coil model (ref: Coil:Cooling:DX:SingleSpeed) calculates the full load outlet air enthalpy and, considering the bypass factor, finds the coil surface temperture (h<sub>ADP</sub>) at full load (i.e., PLR = 1). Conversely, the VRF coil model modulates refrigerant flow to the VRF DX cooling coil which is why this model uses the full load coil capacity multipled by the part-load ratio (the modulated refrigerant flow). The effectively finds the coil surface temperature for a variable refrigerant flow DX cooling coil and the operating sensible heat ratio (SHR) can be calculated.
 
-<span>${h_{ADP}} = {h_{in}} - \frac{{\left( {{{\mathop Q\limits^ \bullet  }_{total}}\,\,/\,\mathop m\limits^ \bullet  } \right)}}{{1 - BF}}$</span>            ;  single-speed DX coil model (h<sub>ADP1</sub> in figure below),
+<span>\({h_{ADP}} = {h_{in}} - \frac{{\left( {{{\mathop Q\limits^ \bullet  }_{total}}\,\,/\,\mathop m\limits^ \bullet  } \right)}}{{1 - BF}}\)</span>            ;  single-speed DX coil model (h<sub>ADP1</sub> in figure below),
 
-<span>${h_{ADP}} = {h_{in}} - \frac{{\left( {{{\mathop Q\limits^ \bullet  }_{total}}\,x\,PLR} \right)\,/\,\mathop m\limits^ \bullet  }}{{1 - BF}}$</span>  ;  variable refrigerant flow DX coil model
+<span>\({h_{ADP}} = {h_{in}} - \frac{{\left( {{{\mathop Q\limits^ \bullet  }_{total}}\,x\,PLR} \right)\,/\,\mathop m\limits^ \bullet  }}{{1 - BF}}\)</span>  ;  variable refrigerant flow DX coil model
 
 <div>$$SHR = Minimum\left( {\left( {\frac{{{h_{Tin,wADP}} - {h_{ADP}}}}{{{h_{in}} - {h_{ADP}}}}} \right),1} \right)$$</div>
 
 where
 
-<span>${{h_{in}}}$</span>          = enthalpy of the air entering the cooling coil, J/kg
+<span>\({{h_{in}}}\)</span>          = enthalpy of the air entering the cooling coil, J/kg
 
-<span>${{h_{ADP}}}$</span>       = enthalpy of air at the apparatus dew point condition, J/kg
+<span>\({{h_{ADP}}}\)</span>       = enthalpy of air at the apparatus dew point condition, J/kg
 
-<span>${{h_{Tin,wADP}}}$</span> = enthalpy of air at the entering coil dry-bulb temperature and humidity ratio at ADP, J/kg
+<span>\({{h_{Tin,wADP}}}\)</span> = enthalpy of air at the entering coil dry-bulb temperature and humidity ratio at ADP, J/kg
 
-<span>$\dot m$</span>            = air mass flow rate, kg/s
+<span>\(\dot m\)</span>            = air mass flow rate, kg/s
 
 With the SHR for the coil at the current operating conditions, the properties of the air leaving the cooling coil are calculated using the following equations:
 
@@ -5300,13 +5300,13 @@ With the SHR for the coil at the current operating conditions, the properties of
 
 where
 
-<span>${{h_{out}}}$</span>         = enthalpy of the air leaving the cooling coil, J/kg
+<span>\({{h_{out}}}\)</span>         = enthalpy of the air leaving the cooling coil, J/kg
 
-<span>${{h_{Tin,\omega out}}}$</span>  = enthalpy of air at the entering coil dry-bulb temperature and leaving air humidity ratio, J/kg
+<span>\({{h_{Tin,\omega out}}}\)</span>  = enthalpy of air at the entering coil dry-bulb temperature and leaving air humidity ratio, J/kg
 
-<span>${{\omega_{out}}}$</span>        = leaving air humidity ratio, kg/kg
+<span>\({{\omega_{out}}}\)</span>        = leaving air humidity ratio, kg/kg
 
-<span>${T_{db,out}}$</span>    = leaving air dry-bulb temperature, °C
+<span>\({T_{db,out}}\)</span>    = leaving air dry-bulb temperature, °C
 
 *PsyWFnTdbH* = EnergyPlus psychrometric function, returns humidity ratio given dry-bulb temperature and enthalpy
 
@@ -5314,7 +5314,7 @@ where
 
 The following figure shows this process on a psychrometric chart. This variable refrigerant flow DX cooling coil model follows the dotted process line from h<sub>in</sub> towards the outlet air enthalpy (the clear circles, ο) based on the modulated refrigerant flow (PLR). The coil surface temperature (ADP, apparatus dew point) is found by drawing a straight line through these points. The process line from h<sub>in</sub> to h<sub>ADP1</sub> represents the full load (PLR=1). This would be what the original DX cooling coil model calculates. At this point the sensible heat ratio is at the design point (assuming h<sub>in</sub> is the rating point and the coil operates at the rated air mass flow rate). As the coil load is reduced, the refrigerant flow rate is restricted and the outlet air condition rides up the dotted line. The outlet air condition and associated h<sub>ADP2</sub> is shown for a PLR of 0.7 (for example purposes only). Here the sensible heat ratio is higher than that found at full load operation. As the load continues to reduce, the refrigerant flow rate continues to throttle back and there comes a point where the coil’s ADP is equal to the inlet air dew point temperature (h<sub>ADP3</sub>). At this point, and for all other PLR’s less than this value, the coil surface becomes dry (at PLR=0.4 in this example) and the coil’s sensible heat ratio = 1. Between this PLR and PLR=0, the coil outlet air condition follows the dotted line back towards H<sub>in</sub>.
 
-<span>$ \cdot $</span> ![](EngineeringReference/media/image4182.png)
+<span>\(\cdot \)</span> ![](media/image4182.png)
 
 Figure 180. Process on psychrometric chart
 
@@ -5378,19 +5378,19 @@ The average supply air and outdoor air mass flow rates through the heat pump for
 
 where:
 
-<span>$\mathop m\limits^ \bullet  {\,_{SA,\,\,avg}}$</span>      = average supply air mass flow rate during the time step, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{SA,\,\,avg}}\)</span>      = average supply air mass flow rate during the time step, kg/s
 
-<span>$\mathop m\limits^ \bullet  {\,_{SA,coil\,\,on}}$</span>   = supply air mass flow rate when the coil is ON, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{SA,coil\,\,on}}\)</span>   = supply air mass flow rate when the coil is ON, kg/s
 
 *CyclingRatio*  = cycling ratio of the coil (heating or cooling)
 
-<span>$\mathop m\limits^ \bullet  {\,_{SA,\,\,coil\,\,off}}$</span>  = supply air mass flow rate when the coil is OFF, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{SA,\,\,coil\,\,off}}\)</span>  = supply air mass flow rate when the coil is OFF, kg/s
 
-<span>$\mathop m\limits^ \bullet  {\,_{OA,\,\,avg\,\,}}$</span>     = average outside air mass flow rate during the time step, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{OA,\,\,avg\,\,}}\)</span>     = average outside air mass flow rate during the time step, kg/s
 
-<span>$\mathop m\limits^ \bullet  {\,_{OA,\,\,coil\,\,on}}$</span>  = average outside air mass flow rate when the coil is ON, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{OA,\,\,coil\,\,on}}\)</span>  = average outside air mass flow rate when the coil is ON, kg/s
 
-<span>$\mathop m\limits^ \bullet  {\,_{OA,\,\,coil\,\,off}}$</span> = average outside air mass flow rate when the coil is OFF, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{OA,\,\,coil\,\,off}}\)</span> = average outside air mass flow rate when the coil is OFF, kg/s
 
 The supply air and outside air flow rates when the DX cooling or DX heating coil is ON are specified by the user (e.g., supply air volumetric flow rate during cooling operation, supply air volumetric flow rate during heating operation, outside air volumetric air flow rate during cooling operation, and outside air volumetric air flow rate during heating operation) and are converted from volumetric to mass flow rate. If the user has specified cycling fan operation, then the supply air and outside air mass flow rates when the coil is OFF are zero. If the user has specified constant fan operation, then the user-defined air flow rates when no cooling or heating is needed are used when the coil is OFF.
 
@@ -5446,7 +5446,7 @@ And the required volumetric water flow rates in the parent objects are calculate
 
 The required volumetric water flow rate as above should be restricted by the pump in the water loop.
 
-If <span>$AirFlowScaleFactor$</span> and <span>$WaterFlowScaleFactor$</span> equal unity, the loop flow rates become the design flow rates of the Reference Unit (after scaled by the rated heating capacity). The Rated Volumetric Air Flow Rate and Rated Volumetric Water Flow Rate are introduced here to correlate with the actual flow rates in the air and water loops, in case that these differ from the design specification. Certainly, it is recommended that the Rated Volumetric Air Flow Rate and Rated Volumetric Water Flow Rate are selected in the way that <span>$AirFlowScaleFactor$</span> and <span>$WaterFlowScaleFactor$</span> are unity, so as to get more accurate results from the performance curves.
+If <span>\(AirFlowScaleFactor\)</span> and <span>\(WaterFlowScaleFactor\)</span> equal unity, the loop flow rates become the design flow rates of the Reference Unit (after scaled by the rated heating capacity). The Rated Volumetric Air Flow Rate and Rated Volumetric Water Flow Rate are introduced here to correlate with the actual flow rates in the air and water loops, in case that these differ from the design specification. Certainly, it is recommended that the Rated Volumetric Air Flow Rate and Rated Volumetric Water Flow Rate are selected in the way that <span>\(AirFlowScaleFactor\)</span> and <span>\(WaterFlowScaleFactor\)</span> are unity, so as to get more accurate results from the performance curves.
 
 Performance curves:
 
@@ -5578,7 +5578,7 @@ Lowest Speed Operation:
 
 The lowest speed operation of the VS WSHP is similar to the single speed DX heating coil. The total (gross) heating capacity of the WSHP unit is calculated as follows:
 
-<span>$\begin{array}{l}{Q_{total,1}} = RatedTotalHeatingCapacity@SpeedLevel\left( 1 \right)\\\quad \quad \quad *TotCapTemModFa{c_1}\\\quad \quad \quad *TotCapAirFlowModFa{c_1}\\\quad \quad \quad *TotCapWaterFlowModFa{c_1}\end{array}$</span>* *
+<span>\(\begin{array}{l}{Q_{total,1}} = RatedTotalHeatingCapacity@SpeedLevel\left( 1 \right)\\\quad \quad \quad *TotCapTemModFa{c_1}\\\quad \quad \quad *TotCapAirFlowModFa{c_1}\\\quad \quad \quad *TotCapWaterFlowModFa{c_1}\end{array}\)</span>* *
 
 And the EIR is calculated as:
 
@@ -5594,7 +5594,7 @@ The waste heat generated by this coil object is calculated as:
 
 where
 
-<span>$ReferenceUnitWasteHeatFractionofEnergyInput@SpeedLevel\left( 1 \right)$</span> = waste heat fraction of the energy input at Speed 1, from the Reference Unit data.
+<span>\(ReferenceUnitWasteHeatFractionofEnergyInput@SpeedLevel\left( 1 \right)\)</span> = waste heat fraction of the energy input at Speed 1, from the Reference Unit data.
 
 The total amount of heat absorbed by the evaporator is calculated as:
 
@@ -5606,7 +5606,7 @@ The fraction of the actual air mass flow to the design air mass flow rate is cal
 
 The fraction of the actual water mass flow to the design water mass flow rate is calculated:
 
-<span>$\begin{array}{l}f{f_{w,1}} = actualwatermassflowrate/\\\quad \quad \quad (ReferenceUnitWaterMassFlowRate@SpeedLevel(1)\\\quad \quad \quad  \times CapacityScaleFactor)\end{array}$</span>* *
+<span>\(\begin{array}{l}f{f_{w,1}} = actualwatermassflowrate/\\\quad \quad \quad (ReferenceUnitWaterMassFlowRate@SpeedLevel(1)\\\quad \quad \quad  \times CapacityScaleFactor)\end{array}\)</span>* *
 
 Higher Speed Operation:
 
@@ -5614,15 +5614,15 @@ At the speed level between the lowest and the highest, there is no part-load los
 
 The design air and water flow rate at the speed ratio are given as following:
 
- <span>$\begin{array}{l}{\rm{DesignAirFlowRateSpeedRatio}} = ReferenceUnitAirMassFlowRate@SpeedLevel\left( {x - 1} \right)\\\quad \quad \quad *CapacityScaleFactor\\\quad \quad \quad {\rm{*}}\left( {1{\rm{}}--{\rm{SpeedRatio}}} \right)\\\quad \quad \quad  + ReferenceUnitAirMassFlowRate@SpeedLevel\left( x \right)\\\quad \quad \quad *CapacityScaleFactor\\\quad \quad \quad *SpeedRatio{\rm{}}\end{array}$</span>
+ <span>\(\begin{array}{l}{\rm{DesignAirFlowRateSpeedRatio}} = ReferenceUnitAirMassFlowRate@SpeedLevel\left( {x - 1} \right)\\\quad \quad \quad *CapacityScaleFactor\\\quad \quad \quad {\rm{*}}\left( {1{\rm{}}--{\rm{SpeedRatio}}} \right)\\\quad \quad \quad  + ReferenceUnitAirMassFlowRate@SpeedLevel\left( x \right)\\\quad \quad \quad *CapacityScaleFactor\\\quad \quad \quad *SpeedRatio{\rm{}}\end{array}\)</span>
 
 <div>$$\begin{array}{l}{\rm{DesignWaterFlowRateSpeedRatio}} = ReferenceUnitWaterMassFlowRate@SpeedLevel\left( {x - 1} \right)\\\quad \quad \quad *CapacityScaleFactor\\\quad \quad \quad {\rm{*}}\left( {1{\rm{}}--{\rm{SpeedRatio}}} \right)\\\quad \quad \quad  + ReferenceUnitWaterMassFlowRate@SpeedLevel\left( x \right)\\\quad \quad \quad *CapacityScaleFactor\\\quad \quad \quad *SpeedRatio\end{array}$$</div>
 
 And the fractions of air flow and water flow are given:
 
-<span>$f{f_{a,x - 1}}$</span>= <span>$f{f_{a,x}}$</span>= actual air mass flow rate/DesignAirFlowRateSpeedRatio
+<span>\(f{f_{a,x - 1}}\)</span>= <span>\(f{f_{a,x}}\)</span>= actual air mass flow rate/DesignAirFlowRateSpeedRatio
 
-<span>$f{f_{w,x - 1}}$</span>= <span>$f{f_{w,x}}$</span>= actual water mass flow rate/DesignWaterFlowRateSpeedRatio
+<span>\(f{f_{w,x - 1}}\)</span>= <span>\(f{f_{w,x}}\)</span>= actual water mass flow rate/DesignWaterFlowRateSpeedRatio
 
 The total heating capacities and EIRs at Speed x-1 and Speed x are given:
 
@@ -5630,7 +5630,7 @@ The total heating capacities and EIRs at Speed x-1 and Speed x are given:
 
 <div>$$\begin{array}{l}{Q_{total,x}} = RatedTotalHeatingCapacity@SpeedLevel\left( x \right)\\\quad \quad \quad *TotCapTempModFa{c_x}\\\quad \quad \quad *TotCapAirFlowModFa{c_x}\\\quad \quad \quad *TotCapWaterFlowModFa{c_x}\end{array}$$</div>
 
-<span>$\begin{array}{l}EI{R_{x - 1}} = \frac{{1.0}}{{ReferenceUnitCOP@Speed(x - 1)}}EIRTempModFa{c_{x - 1}}\\\quad \quad \quad *EIRAirFlowModFa{c_{x - 1}}\\\quad \quad \quad *EIRWaterFlowModFa{c_{x - 1}}\end{array}$</span>* *
+<span>\(\begin{array}{l}EI{R_{x - 1}} = \frac{{1.0}}{{ReferenceUnitCOP@Speed(x - 1)}}EIRTempModFa{c_{x - 1}}\\\quad \quad \quad *EIRAirFlowModFa{c_{x - 1}}\\\quad \quad \quad *EIRWaterFlowModFa{c_{x - 1}}\end{array}\)</span>* *
 
 <div>$$\begin{array}{l}EI{R_x} = \frac{{1.0}}{{ReferenceUnitCOP@Speed(x)}}EIRTempModFa{c_x}\\\quad \quad \quad *EIRAirFlowModFa{c_x}\\\quad \quad \quad *EIRWaterFlowModFa{c_x}\end{array}$$</div>
 
@@ -5644,7 +5644,7 @@ And the power consumption is
 
 The waste heat generated by this coil object is calculated as:
 
-<span>$\begin{array}{l}{Q_{RecoverHeat,SpeedRatio}} = \left( {1.0 - SpeedRatio} \right)\\\quad \quad \quad *ReferenceUnitWasteHeatFractionofEnergyInput@SpeedLevel\left( {x - 1} \right)\\\quad \quad \quad *WasteHeatTempModFa{c_{x - 1}}*{Q_{total,x - 1}}*EI{R_{x - 1}}\\\quad \quad \quad  + SpeedRatio\\\quad \quad \quad *ReferenceUnitWasteHeatFractionofEnergyInput@SpeedLevel\left( x \right)\\\quad \quad \quad *WasteHeatTempModFa{c_x}\\\quad \quad \quad *{Q_{total,x}}*EI{R_x}\end{array}$</span>* *
+<span>\(\begin{array}{l}{Q_{RecoverHeat,SpeedRatio}} = \left( {1.0 - SpeedRatio} \right)\\\quad \quad \quad *ReferenceUnitWasteHeatFractionofEnergyInput@SpeedLevel\left( {x - 1} \right)\\\quad \quad \quad *WasteHeatTempModFa{c_{x - 1}}*{Q_{total,x - 1}}*EI{R_{x - 1}}\\\quad \quad \quad  + SpeedRatio\\\quad \quad \quad *ReferenceUnitWasteHeatFractionofEnergyInput@SpeedLevel\left( x \right)\\\quad \quad \quad *WasteHeatTempModFa{c_x}\\\quad \quad \quad *{Q_{total,x}}*EI{R_x}\end{array}\)</span>* *
 
 The total amount of heat absorbed by the evaporator is calculated as:
 
@@ -5668,11 +5668,11 @@ TheDOE/ORNL Heat Pump Design Model(HPDM) is a steady-state vapor compression equ
 
 And then, we plotted the resultant A<sub>o</sub> as a function of indoor air flow rate and compressor speed, as below:
 
-![](EngineeringReference/media/image4240.svg.png)
+![](media/image4240.svg.png)
 
 Figure 181. Effective Surface Area (Ao) Changing with Compressor Speed and Indoor SCFM
 
-![](EngineeringReference/media/image4241.svg.png)
+![](media/image4241.svg.png)
 
 Figure 182. Bypass Factor (BF) Changing with Compressor Speed and Indoor SCFM
 
@@ -5714,7 +5714,7 @@ And the required volumetric water flow rates in the parent objects are calculate
 
 The required volumetric water flow rate as above is restricted by the pump in the parent object.
 
-If <span>$AirFlowScaleFactor$</span> and <span>$WaterFlowScaleFactor$</span> are equal to unity, the loop flow rates become the design flow rates of the original unit (after scaled by the rated total cooling capacity). The Rated Volumetric Air Flow Rate and Rated Volumetric Water Flow Rate are introduced here to correlate with the actual flow rates in the air and water loops, in case that these differ from the design specifications. Certainly, it is recommended that the Rated Volumetric Air Flow Rate and Rated Volumetric Water Flow Rate are selected in the way that <span>$AirFlowScaleFactor$</span> and <span>$WaterFlowScaleFactor$</span> are unity, so as to get more accurate results from the performance curves.
+If <span>\(AirFlowScaleFactor\)</span> and <span>\(WaterFlowScaleFactor\)</span> are equal to unity, the loop flow rates become the design flow rates of the original unit (after scaled by the rated total cooling capacity). The Rated Volumetric Air Flow Rate and Rated Volumetric Water Flow Rate are introduced here to correlate with the actual flow rates in the air and water loops, in case that these differ from the design specifications. Certainly, it is recommended that the Rated Volumetric Air Flow Rate and Rated Volumetric Water Flow Rate are selected in the way that <span>\(AirFlowScaleFactor\)</span> and <span>\(WaterFlowScaleFactor\)</span> are unity, so as to get more accurate results from the performance curves.
 
 Performance Curves:
 
@@ -5838,7 +5838,7 @@ The lowest speed operation of the VS WSHP is similar to the single speed DX cool
 
 And the EIR is calculated as:
 
-<span>$\begin{array}{l}EI{R_1} = \frac{{1.0}}{{ReferenceUnitCOP@Speed(1)}}EIRTempModFa{c_1}\\\quad \quad \quad *EIRAirFlowModFa{c_1}\\\quad \quad \quad *EIRWaterFlowModWaterFa{c_1}\end{array}$</span>* *
+<span>\(\begin{array}{l}EI{R_1} = \frac{{1.0}}{{ReferenceUnitCOP@Speed(1)}}EIRTempModFa{c_1}\\\quad \quad \quad *EIRAirFlowModFa{c_1}\\\quad \quad \quad *EIRWaterFlowModWaterFa{c_1}\end{array}\)</span>* *
 
 And the power consumption excluding the indoor fan and the water pump is,
 
@@ -5852,9 +5852,9 @@ The recoverable waste heat is:
 
 And the net heat discharged to the water loop is calculated as following:
 
-<span>${Q_{cond,1}} = Powe{r_1} + {Q_{total,1}} - {Q_{RecoverHeat,1}}$</span>.
+<span>\({Q_{cond,1}} = Powe{r_1} + {Q_{total,1}} - {Q_{RecoverHeat,1}}\)</span>.
 
-At the lowest speed, the dehumidification calculation is exactly the same as the single speed DX coil. That is to use the rated SHR and the design air flow rate at the lowest speed to calculate rated bypass factor of BF<sub>rated,1</sub>, and the corresponding effective surface area of A<sub>o,1</sub>. Wh A<sub>o,1</sub> known, the coil BF can be adjusted for non-rated air flow rates. It shall be noted if choosing to add hot gas reheating to the supply side,  <span>${Q_{RecoverHeat,1}}$</span> should be subtracted from bh the total cooling capacity and the sensible cooling capacity.
+At the lowest speed, the dehumidification calculation is exactly the same as the single speed DX coil. That is to use the rated SHR and the design air flow rate at the lowest speed to calculate rated bypass factor of BF<sub>rated,1</sub>, and the corresponding effective surface area of A<sub>o,1</sub>. Wh A<sub>o,1</sub> known, the coil BF can be adjusted for non-rated air flow rates. It shall be noted if choosing to add hot gas reheating to the supply side,  <span>\({Q_{RecoverHeat,1}}\)</span> should be subtracted from bh the total cooling capacity and the sensible cooling capacity.
 
 And the part load ratio for sensible cooling is,
 
@@ -5862,7 +5862,7 @@ And the part load ratio for sensible cooling is,
 
 For latent cooling,
 
-<span>$PLR = LatentCoolingLoad/[{Q_{total,1}}*(1.0 - SH{R_1})]$</span>*.*
+<span>\(PLR = LatentCoolingLoad/[{Q_{total,1}}*(1.0 - SH{R_1})]\)</span>*.*
 
 Higher Speed Operation:
 
@@ -5874,21 +5874,21 @@ the design air and water flow rate at the speed ratio are given as following:
 
 <div>$$\begin{array}{l}{\rm{DesignAirFlowRateSpeedRatio}} = ReferenceUnitAirMassFlowRate@SpeedLevel\left( {x - 1} \right)\\\quad \quad \quad *CapacityScaleFactor{\rm{*}}\left( {1{\rm{}}--{\rm{SpeedRatio}}} \right)\\\quad \quad \quad  + ReferenceUnitAirMassFlowRate@SpeedLevel\left( x \right)\\\quad \quad \quad *CapacityScaleFactor*SpeedRatio\end{array}$$</div>
 
-<span>$\begin{array}{l}{\rm{DesignWaterFlowRateSpeedRatio}} = ReferenceUnitWaterMassFlowRate@SpeedLevel\left( {x - 1} \right)\\\quad \quad \quad *CapacityScaleFactor{\rm{*}}\left( {1{\rm{}}--{\rm{SpeedRatio}}} \right)\\\quad \quad \quad  + ReferenceUnitWaterMassFlowRate@SpeedLevel\left( x \right)\\\quad \quad \quad *CapacityScaleFactor*SpeedRatio\end{array}$</span>.
+<span>\(\begin{array}{l}{\rm{DesignWaterFlowRateSpeedRatio}} = ReferenceUnitWaterMassFlowRate@SpeedLevel\left( {x - 1} \right)\\\quad \quad \quad *CapacityScaleFactor{\rm{*}}\left( {1{\rm{}}--{\rm{SpeedRatio}}} \right)\\\quad \quad \quad  + ReferenceUnitWaterMassFlowRate@SpeedLevel\left( x \right)\\\quad \quad \quad *CapacityScaleFactor*SpeedRatio\end{array}\)</span>.
 
 And the fractions of air flow and water flow are given:
 
-<span>$f{f_{a,x - 1}}$</span>. = <span>$f{f_{a,x}}$</span>= actual air mass flow rate/DesignAirFlowRateSpeedRatio
+<span>\(f{f_{a,x - 1}}\)</span>. = <span>\(f{f_{a,x}}\)</span>= actual air mass flow rate/DesignAirFlowRateSpeedRatio
 
-<span>$f{f_{w,x - 1}}$</span><span>$f{f_{w,x}}$</span>= actual water mass flow rate/DesignWaterFlowRateSpeedRatio
+<span>\(f{f_{w,x - 1}}\)</span><span>\(f{f_{w,x}}\)</span>= actual water mass flow rate/DesignWaterFlowRateSpeedRatio
 
 The total cooling capacities and EIRs at Speed x-1 and Speed x are calculated:
 
-<span>$\begin{array}{l}{Q_{total,x - 1}} = RatedTotalCoolingCapacity@SpeedLevel\left( {x - 1} \right)\\\quad \quad \quad *TotCapTempModFa{c_{x - 1}}\\\quad \quad \quad *TotCapAirFlowModFa{c_{x - 1}}\\\quad \quad \quad *TotCapWaterFlowModFa{c_{x - 1}}\end{array}$</span>* *
+<span>\(\begin{array}{l}{Q_{total,x - 1}} = RatedTotalCoolingCapacity@SpeedLevel\left( {x - 1} \right)\\\quad \quad \quad *TotCapTempModFa{c_{x - 1}}\\\quad \quad \quad *TotCapAirFlowModFa{c_{x - 1}}\\\quad \quad \quad *TotCapWaterFlowModFa{c_{x - 1}}\end{array}\)</span>* *
 
-<span>$\begin{array}{l}{Q_{total,x}} = RatedTotalCoolingCapacity@SpeedLevel\left( x \right)\\\quad \quad \quad *TotCapTempModFa{c_x}\\\quad \quad \quad *TotCapAirFlowModFa{c_x}\\\quad \quad \quad *TotCapWaterFlowModFa{c_x}\end{array}$</span>* *
+<span>\(\begin{array}{l}{Q_{total,x}} = RatedTotalCoolingCapacity@SpeedLevel\left( x \right)\\\quad \quad \quad *TotCapTempModFa{c_x}\\\quad \quad \quad *TotCapAirFlowModFa{c_x}\\\quad \quad \quad *TotCapWaterFlowModFa{c_x}\end{array}\)</span>* *
 
-<span>$\begin{array}{l}EI{R_{x - 1}} = \frac{{1.0}}{{ReferenceUnitCOP@Speed(x - 1)}}EIRTempModFa{c_{x - 1}}\\\quad \quad \quad *EIRAirFlowModFa{c_{x - 1}}\\\quad \quad \quad *EIRWaterFlowModFa{c_{x - 1}}\end{array}$</span>* *
+<span>\(\begin{array}{l}EI{R_{x - 1}} = \frac{{1.0}}{{ReferenceUnitCOP@Speed(x - 1)}}EIRTempModFa{c_{x - 1}}\\\quad \quad \quad *EIRAirFlowModFa{c_{x - 1}}\\\quad \quad \quad *EIRWaterFlowModFa{c_{x - 1}}\end{array}\)</span>* *
 
 The total heating capacity at the corresponding speed ratio is:
 
@@ -5914,7 +5914,7 @@ Using A<sub>o,SpeedRatio</sub> in the same BF and SHR calculation procedure as t
 
 <div>$${Q_{sensible,SpeedRatio}} = {Q_{total,SpeedRatio}}*SH{R_{SpeedRatio}}$$</div>
 
-It should be noted if choosing to add hot gas reheating to the supply side, <span>${Q_{RecoverHeat,SpeedRatio}}$</span> should be subtracted from both the total cooling capacity and the sensible cooling capacity.
+It should be noted if choosing to add hot gas reheating to the supply side, <span>\({Q_{RecoverHeat,SpeedRatio}}\)</span> should be subtracted from both the total cooling capacity and the sensible cooling capacity.
 
 At last, if the VS WSHP is used to match the sensible cooling load,
 
@@ -5938,7 +5938,7 @@ S.A. Klein 2011, User Manual of Engineering Equation Solver V8
 
 Secondary coils reject to or remove heat from a secondary zone. Secondary coil refers to a condenser of a DX system or a heat pump in cooling operating mode or an evaporator of a heat pump in heating mode. The secondary coil (e.g. condenser) of DX system or heat pumps is commonly installed outdoor but when installed indoor either heat is dumped to or extracted from the secondary zone. A secondary zone is a conditioned or unconditioned zone where the secondary coil is installed. Secondary coils are not standalone DX coil objects but they are add-on features on existing DX coil objects. A secondary DX coil is modelled by specifying additional inputs in single speed and multi speed DX coil objects: The additional inputs allow us to model the heat rejected or extracted by the secondary coil while the primary coil serves another controlled zone as shown in [Figure](#SchematicDXCoil).  A secondary coil is not controlled directly but responds to the requirements of the primary DX coil. The operating mode of a secondary DX coil is determined by the primary DX coil serving the conditioned zone. If the primary DX coil is in cooling mode, then the secondary coil is rejecting heat (heating mode) to the secondary zone, or else if the  primary DX coil is in heating mode, then the secondary coil is extracting heat (cooling mode) from the secondary zone. Heat rejected to a secondary zone by a condenser of a DX system or a heat pump is considered as sensible only. Whereas energy extracted from a secondary zone may contain sensible and latent components. The condenser type of the primary DX coils should be AirCooled. There is no need to specify the condenser air inlet node. The model uses zone air node as the secondary coil air inlet node. Air drawn by the secondary coil fan passes through the secondary coil and dumped back into the secondary zone. The previous time step zone condition is used as an inlet condition to the current time for the secondary DX coil model.
 
-![SchematicDXCoil](EngineeringReference/media/image8002.png)<a name="SchematicDXCoil"></a>
+![SchematicDXCoil](media/image8002.png)<a name="SchematicDXCoil"></a>
 
 Figure: Schematic of DX System in cooling operating mode
 
@@ -5959,7 +5959,7 @@ where
 
 Heat rejected by a secondary coil (condenser) calculated at each time step becomes internal gain of the secondary zone as shown in [Figure](#SchematicDXAndSecondary). Whenever a secondary zone name is specified in DX cooling coil objects, the secondary DX coil model calculation is invoked.  New input field required as add-on to the DX cooling coil objects is "_Zone Name for Secondary Coil (condenser) Placement_".
 
-![SchematicDXAndSecondary](EngineeringReference/media/image8003.png)<a name="SchematicDXCoil"></a>
+![SchematicDXAndSecondary](media/image8003.png)<a name="SchematicDXCoil"></a>
 
 Figure: Schematic of DX system and secondary coil (condenser)
 
@@ -6040,7 +6040,7 @@ Reference: Dixon, Erin Elizabeth, "Energy Model Development and Heating Energy I
 
 The DX cooling coil model for Coil:Cooling:DX:SingleSpeed:ThermalStorage is described in this section. The following diagram shows the main aspects of the model for packaged thermal energy storage cooling coil.  This model allows charging and discharging to shift cooling energy use. The dashed line shows the boundary of the empirical "black box" model.  The main parts are the Condenser, Evaporator, Compressor, and Thermal Energy Storage (TES) tank.  The model interacts with the surroundings via a condenser inlet and outlet nodes, evaporator inlet and outlet nodes, heat transfer between TES tank and surrounding ambient environment, and optional added plant connection to the TES tank.
 
-![](EngineeringReference/media/image4287.png)
+![](media/image4287.png)
 
 Figure 183. Highlights of Packaged Thermal Storage Cooling Coil
 
@@ -6048,15 +6048,15 @@ Depending on the operating mode, different parts are active.  There are six mod
 
 **Off Mode** is when the unit is not running but the TES tank still interacts with ambient and the model needs to track the state of charge in the tank.
 
-![](EngineeringReference/media/image4288.png)
+![](media/image4288.png)
 
 Figure 184. Thermal Storage Cooling Coil Off Mode
 
 Governing equations for Off Mode include:
 
-<span>$ - M{c_p}\frac{{DT}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} = 0$</span>      (water tank)
+<span>\(- M{c_p}\frac{{DT}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} = 0\)</span>      (water tank)
 
-<span>$ - M{h_{fs}}\frac{{DF}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} = 0$</span>     (ice tank)
+<span>\(- M{h_{fs}}\frac{{DF}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} = 0\)</span>     (ice tank)
 
 <div>$${\dot Q_{Amb}} = {\left( {UA} \right)_{Tank}}\left( {{T_{TES}} - {T_{Amb}}} \right)$$</div>
 
@@ -6066,7 +6066,7 @@ Governing equations for Off Mode include:
 
 **Cooling Only Mode** is when the unit is running but since it is neither charging nor discharging the TES tank, the model is essentially the same as a normal single speed DX cooling coil.  The latent degradation model is not available.  The model uses SHR curves  from user input.
 
-![](EngineeringReference/media/image4293.png)
+![](media/image4293.png)
 
 Figure 185. Thermal Storage Coil Cooling Only Modee
 
@@ -6074,9 +6074,9 @@ Figure 185. Thermal Storage Coil Cooling Only Modee
 
 The governing equations for Cooling Only Mode include:
 
-<span>$ - M{c_p}\frac{{DT}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} = 0$</span>      (water tank)
+<span>\(- M{c_p}\frac{{DT}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} = 0\)</span>      (water tank)
 
-<span>$ - M{h_{fs}}\frac{{DF}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} = 0$</span>    (ice tank)
+<span>\(- M{h_{fs}}\frac{{DF}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} = 0\)</span>    (ice tank)
 
 <div>$$\dot W + {\dot Q_{Evap}} + {\dot Q_{Cond}} = 0$$</div>
 
@@ -6128,25 +6128,25 @@ The results of the performance curves are applied as follows to determine SHR:
 
 Cool and Charge Mode is when the unit is both cooling and charging the TES, then all the parts are active. The electric power into the compressor is split into two terms to accommodate devices that actually have dual compressors.
 
-![](EngineeringReference/media/image4309.png)
+![](media/image4309.png)
 
 Figure 186. Thermal Storage Coil Cool and Charge Modes
 
 Governing Equations for “Cool and Charge Mode”
 
-<span>$ - M{c_p}\frac{{DT}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} + {\dot Q_{TES}} = 0$</span>      (water tank)
+<span>\(- M{c_p}\frac{{DT}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} + {\dot Q_{TES}} = 0\)</span>      (water tank)
 
-<span>$ - M{h_{fs}}\frac{{DF}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} + {\dot Q_{TES}} = 0$</span>    (ice tank)
+<span>\(- M{h_{fs}}\frac{{DF}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} + {\dot Q_{TES}} = 0\)</span>    (ice tank)
 
 <div>$${\dot W_{Evap}} + {\dot W_{TES}} + {\dot Q_{Evap}} + {\dot Q_{Cond}} + {\dot Q_{TES}} = 0$$</div>
 
 <div>$${\dot Q_{Amb}} = {\left( {UA} \right)_{Tank}}\left( {{T_{TES}} - {T_{Amb}}} \right)$$</div>
 
-<span>${\dot Q_{Plant}} = \dot m{c_p}\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)$</span><div>$${\dot Q_{Plant}} = \dot m\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)$$</div>
+<span>\({\dot Q_{Plant}} = \dot m{c_p}\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)\)</span><div>$${\dot Q_{Plant}} = \dot m\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)$$</div>
 
 The input correlations are used in the following manner to determine cooling capacity, chargine capacity, and energy consumption for a given set of operationg conditions.
 
-One total evaporator cooling capacity modifier curve is a function of evaporator inlet wetbulb and condenser inlet drybulb temperatures and state of TES, <span>${S_{TES}}$</span> (temperature of water or fraction of ice).
+One total evaporator cooling capacity modifier curve is a function of evaporator inlet wetbulb and condenser inlet drybulb temperatures and state of TES, <span>\({S_{TES}}\)</span> (temperature of water or fraction of ice).
 
 <div>$$EvapCapTempModFac = f\left( {{T_{evap,wb}},{T_{cond,db}},{S_{TES}}} \right)$$</div>
 
@@ -6182,7 +6182,7 @@ The results of the performance curves are applied as follows to determine coolin
 
 <div>$${\dot W_{Evap,elec}} = \frac{{\left( {{{\dot Q}_{Evap}}} \right)\left( {EIRTempModFac} \right)\left( {EIRFlowModFac} \right)\left( {EvapPLR} \right)}}{{\left( {CO{P_{Rated,Cooling}}} \right)\left( {EvapPartLoadFac} \right)}}$$</div>
 
-<span>${\dot W_{TES,elec}} = \frac{{\left( {{{\dot Q}_{TES}}} \right)\left( {EIRStorTempModFac} \right)\left( {EIRStorFlowModFac} \right)\left( {StorPLR} \right)}}{{\left( {CO{P_{Rated,Charging}}} \right)\left( {StorPartLoadFac} \right)}}$</span>.
+<span>\({\dot W_{TES,elec}} = \frac{{\left( {{{\dot Q}_{TES}}} \right)\left( {EIRStorTempModFac} \right)\left( {EIRStorFlowModFac} \right)\left( {StorPLR} \right)}}{{\left( {CO{P_{Rated,Charging}}} \right)\left( {StorPartLoadFac} \right)}}\)</span>.
 
 The sensible heat ratio (SHR) is determined by a rated SHR and two performance curves. There are two options for the SHR temperature modifying factor, it can either be a function of evaporator entering wetbulb and evaporator entering drybulb temperature or it can add a third independent variable for the state of charge of TES.
 
@@ -6204,7 +6204,7 @@ The results of the performance curves are applied as follows to determine SHR:
 
 
 
-![](EngineeringReference/media/image4331.png)
+![](media/image4331.png)
 
 Figure 187. Thermal Storage Coil Cool and Discharge Modes
 
@@ -6212,15 +6212,15 @@ Figure 187. Thermal Storage Coil Cool and Discharge Modes
 
 Governing Equations for “Cool and Discharge Mode”
 
-<span>$ - M{c_p}\frac{{DT}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} + {\dot Q_{TES}} = 0$</span>      (water tank)
+<span>\(- M{c_p}\frac{{DT}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} + {\dot Q_{TES}} = 0\)</span>      (water tank)
 
-<span>$ - M{h_{fs}}\frac{{DF}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} + {\dot Q_{TES}} = 0$</span>    (ice tank)
+<span>\(- M{h_{fs}}\frac{{DF}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} + {\dot Q_{TES}} = 0\)</span>    (ice tank)
 
 <div>$${\dot W_{Evap}} + {\dot W_{TES}} + {\dot Q_{Evap}} + {\dot Q_{Cond}} + {\dot Q_{TES}} = 0$$</div>
 
 <div>$${\dot Q_{Amb}} = {\left( {UA} \right)_{Tank}}\left( {{T_{TES}} - {T_{Amb}}} \right)$$</div>
 
-<span>${\dot Q_{Plant}} = \dot m{c_p}\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)$</span><div>$${\dot Q_{Plant}} = \dot m\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)$$</div>
+<span>\({\dot Q_{Plant}} = \dot m{c_p}\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)\)</span><div>$${\dot Q_{Plant}} = \dot m\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)$$</div>
 
 The input correlations are used in the following manner.
 
@@ -6294,7 +6294,7 @@ The results of the performance curves are applied as follows to determine SHR:
 
 
 
-![](EngineeringReference/media/image4355.png)
+![](media/image4355.png)
 
 Figure 188. Thermal Storage Coil Charge Only Mode
 
@@ -6302,15 +6302,15 @@ Figure 188. Thermal Storage Coil Charge Only Mode
 
 The governing equations for “Charge Only Mode”
 
-<span>$ - M{c_p}\frac{{DT}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} + {\dot Q_{TES}} = 0$</span>      (water tank)
+<span>\(- M{c_p}\frac{{DT}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} + {\dot Q_{TES}} = 0\)</span>      (water tank)
 
-<span>$ - M{h_{fs}}\frac{{DF}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} + {\dot Q_{TES}} = 0$</span>    (ice tank)
+<span>\(- M{h_{fs}}\frac{{DF}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} + {\dot Q_{TES}} = 0\)</span>    (ice tank)
 
 <div>$$\dot W + {\dot Q_{Cond}} + {\dot Q_{TES}} = 0$$</div>
 
 <div>$${\dot Q_{Amb}} = {\left( {UA} \right)_{Tank}}\left( {{T_{TES}} - {T_{Amb}}} \right)$$</div>
 
-<span>${\dot Q_{Plant}} = \dot m{c_p}\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)$</span><div>$${\dot Q_{Plant}} = \dot m\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)$$</div>
+<span>\({\dot Q_{Plant}} = \dot m{c_p}\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)\)</span><div>$${\dot Q_{Plant}} = \dot m\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)$$</div>
 
 The input correlations are used in the following manner.
 
@@ -6334,21 +6334,21 @@ Energy input ratio modifier factor is a function of evaporator inlet wetbulb and
 
 **Discharge Only Mode** is when the unit is only discharging, there is no heat flow at the condenser. The rate of discharge will modulate to meet part loading at the evaporator.
 
-![](EngineeringReference/media/image4366.png)
+![](media/image4366.png)
 
 Figure 189. Thermal Storage Coil Discharge Only Mode
 
 The governing equations for “Discharge Only Mode”
 
-<span>$ - M{c_p}\frac{{DT}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} + {\dot Q_{TES}} = 0$</span>      (water tank)
+<span>\(- M{c_p}\frac{{DT}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} + {\dot Q_{TES}} = 0\)</span>      (water tank)
 
-<span>$ - M{h_{fs}}\frac{{DF}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} + {\dot Q_{TES}} = 0$</span>    (ice tank)
+<span>\(- M{h_{fs}}\frac{{DF}}{{Dt}} + {\dot Q_{Amb}} + {\dot Q_{Plant}} + {\dot Q_{TES}} = 0\)</span>    (ice tank)
 
 <div>$$\dot W + {\dot Q_{Evap}} + {\dot Q_{TES}} = 0$$</div>
 
 <div>$${\dot Q_{Amb}} = {\left( {UA} \right)_{Tank}}\left( {{T_{TES}} - {T_{Amb}}} \right)$$</div>
 
-<span>${\dot Q_{Plant}} = \dot m{c_p}\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)$</span><span>${\dot Q_{Plant}} = \dot m\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)$</span>
+<span>\({\dot Q_{Plant}} = \dot m{c_p}\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)\)</span><span>\({\dot Q_{Plant}} = \dot m\varepsilon \left( {{T_{TES}} - {T_{w,in}}} \right)\)</span>
 
 The input correlations are used in the following manner.
 
@@ -6374,7 +6374,7 @@ Part load degradation curve is a function of evaporator part load ratio.
 
 <div>$$EvapPartLoadFac = f\left( {EvapPLR} \right)$$</div>
 
-<span>${\dot Q_{Evap}} = \left( {{{\dot Q}_{Evap,RatedDischargeOnly}}} \right)\left( {EvapCapTempModFac} \right)\left( {EvapCapFlowModFac} \right)$</span>. <span>${\dot W_{elec}} = \frac{{\left( {{{\dot Q}_{evap}}} \right)\left( {EIRStorTempModFac} \right)\left( {EIRStorFlowModFac} \right)\left( {EvapPLR} \right)}}{{\left( {CO{P_{Rated,DischargeOnly}}} \right)\left( {EvapPartLoadFac} \right)}}$</span>
+<span>\({\dot Q_{Evap}} = \left( {{{\dot Q}_{Evap,RatedDischargeOnly}}} \right)\left( {EvapCapTempModFac} \right)\left( {EvapCapFlowModFac} \right)\)</span>. <span>\({\dot W_{elec}} = \frac{{\left( {{{\dot Q}_{evap}}} \right)\left( {EIRStorTempModFac} \right)\left( {EIRStorFlowModFac} \right)\left( {EvapPLR} \right)}}{{\left( {CO{P_{Rated,DischargeOnly}}} \right)\left( {EvapPartLoadFac} \right)}}\)</span>
 
 <div>$${\dot Q_{TES}} = {\dot Q_{Evap}} + {\dot W_{elec}}$$</div>
 
@@ -6403,7 +6403,7 @@ The input object Controller:WaterCoil provides a simple controller model for adj
 
 The figure below illustrates the use of a simple controller used with a central chilled water coil (control variable Temperature). The controller reads the desired temperature setpoint from the control node (established by a SetpointManager) and modulates the chilled water flow rate at the actuator node in order to meet the desired supply (coil outlet) air temperature.
 
-![TemperatureControlledWaterCoil](EngineeringReference/media/image4384.png)
+![TemperatureControlledWaterCoil](media/image4384.png)
 
 Figure 190. Controller:WaterCoil used with Central Chilled Water Coil
 
@@ -6411,7 +6411,7 @@ In this case, the controller simply senses the temperature at the control node a
 
 The simple controller may also be used to control both high temperature and high humidity levels by controlling the water flow rate through a chilled water coil. Setting the controller’s control variable to TemperatureAndHumidityRatio enables this feature. In this case, the controller monitors two setpoint values, one for temperature control and the other for high humidity control. Note that two setpoint managers must be used to establish these setpoints as shown in the figure below. The limiting case for either temperature or high humidity control (i.e., the minimum supply air temperature required to meet both setpoints) is used for controlling the water flow rate through the chilled water coil. If high humidity control is the limiting case then colder supply air will be delivered by the cooling coil to achieve proper dehumidification and some form of air reheat may be required to avoid overcooling of the zones being served by this air loop.
 
-![TempHumRatControlledWaterCoil](EngineeringReference/media/image4385.png)
+![TempHumRatControlledWaterCoil](media/image4385.png)
 
 Figure 191. Two Setpoint managers used in Controller:WaterCoil
 
@@ -6425,17 +6425,17 @@ The model first calculates the approach temperature using the dry-bulb temperatu
 
 where:
 
-<span>${T_{approach}}$</span>= approach temperature, ˚C
+<span>\({T_{approach}}\)</span>= approach temperature, ˚C
 
-<span>${\omega_{SA}}$</span> = supply (outlet) air humidity ratio, kg/kg
+<span>\({\omega_{SA}}\)</span> = supply (outlet) air humidity ratio, kg/kg
 
-<span>$P$</span>   = outdoor barometric pressure, Pa
+<span>\(P\)</span>   = outdoor barometric pressure, Pa
 
-<span>${T_{dp}}$</span>  = supply (outlet) air dewpoint temperature, ˚C
+<span>\({T_{dp}}\)</span>  = supply (outlet) air dewpoint temperature, ˚C
 
-<span>${T_{SA}}$</span> = supply (outlet) air dry-bulb temperature, ˚C
+<span>\({T_{SA}}\)</span> = supply (outlet) air dry-bulb temperature, ˚C
 
-<span>${\rm{PsyTdpFnWPb}}$</span>= EnergyPlus psychrometric function, returns dewpoint temperature given humidity ratio and barometric pressure
+<span>\({\rm{PsyTdpFnWPb}}\)</span>= EnergyPlus psychrometric function, returns dewpoint temperature given humidity ratio and barometric pressure
 
 The supply air dewpoint temperature required to meet the humidity ratio setpoint (placed on the control node by SetpointManager:SingleZone:Humidity:Maximum, SetpointManager:MultiZone:MaximumHumidity:Average  or SetpointManager:MultiZone:Humidity:Maximum) is then calculated as a function of the humidity ratio setpoint and barometric pressure as follows:
 
@@ -6443,17 +6443,17 @@ The supply air dewpoint temperature required to meet the humidity ratio setpoint
 
 where:
 
-<span>${T_{dp,SP}}$</span>= dewpoint temperature corresponding to *w<sub>SP</sub>*, ˚C
+<span>\({T_{dp,SP}}\)</span>= dewpoint temperature corresponding to *w<sub>SP</sub>*, ˚C
 
-<span>${\omega_{SP}}$</span>= humidity ratio setpoint, kg/kg
+<span>\({\omega_{SP}}\)</span>= humidity ratio setpoint, kg/kg
 
-In order for the dewpoint temperature of the coil’s supply (outlet) air to reach <span>${T_{dp,SP}}$</span> the dry-bulb temperature of air leaving the cooling coil must be at <span>${T_{dp,SP}} + {T_{approach}}$</span>:
+In order for the dewpoint temperature of the coil’s supply (outlet) air to reach <span>\({T_{dp,SP}}\)</span> the dry-bulb temperature of air leaving the cooling coil must be at <span>\({T_{dp,SP}} + {T_{approach}}\)</span>:
 
 <div>$${T_{HR,SP}} = {T_{dp,SP}} + {T_{approach}}$$</div>
 
 where:
 
-<span>${T_{HR,SP}}$</span>= supply air dry-bulb temperature setpoint required to achieve the specified humidity ratio setpoint, ˚C
+<span>\({T_{HR,SP}}\)</span>= supply air dry-bulb temperature setpoint required to achieve the specified humidity ratio setpoint, ˚C
 
 The supply air temperature setpoint required to achieve the specified humidity ratio setpoint is then compared to the setpoint temperature required for zone temperature control, and the minimum of these two setpoint values is used as the setpoint temperature for controlling the chilled water coil.
 
@@ -6461,9 +6461,9 @@ The supply air temperature setpoint required to achieve the specified humidity r
 
 where:
 
-<span>${T_{SP}}$</span>= chilled water coil supply air temperature setpoint, ˚C
+<span>\({T_{SP}}\)</span>= chilled water coil supply air temperature setpoint, ˚C
 
-<span>${T_{Temp,SP}}$</span>= supply air temperature setpoint required for zone temperature control, ˚C
+<span>\({T_{Temp,SP}}\)</span>= supply air temperature setpoint required for zone temperature control, ˚C
 
 As described previously, the controller varies the chilled water flow rate through the coil using a root finding technique until the actual supply air temperature reaches *T<sub>sp</sub>*within the specified tolerance:
 
@@ -6471,7 +6471,7 @@ As described previously, the controller varies the chilled water flow rate throu
 
 where:
 
-<span>${T_{Actual}}$</span>= actual air temperature leaving the cooling coil, ˚C
+<span>\({T_{Actual}}\)</span>= actual air temperature leaving the cooling coil, ˚C
 
 ### Outdoor Air Damper Controller for Air Systems
 
@@ -6491,21 +6491,21 @@ When the heat exchanger assisted cooling coil is used with a furnace or unitary 
 
 § Minimum outside air flow rate (at design) [m<sup>3</sup>/s]
 
-§ Maximum outside air flow rate  (<span>${\dot V_{oa,\max }}$</span>) [m<sup>3</sup>/s]
+§ Maximum outside air flow rate  (<span>\({\dot V_{oa,\max }}\)</span>) [m<sup>3</sup>/s]
 
 § EconomizerChoice: *FixedDryBulbr* | *FixedEnthalpy* | * DifferentialDryBulb * | * DifferentialEnthalpy* | *  ElectronicEnthalpy* | *  FixedDewPointAndDryBulb   * | *DifferentialDryBulbAndEnthalpy * | *NoEconomizer*
 
 § Bypasschoice: *MinimumFlowWithBypass* | *ModulateFlow*
 
-§ High temperature limit (<span>${T_{high}}$</span>) [C]
+§ High temperature limit (<span>\({T_{high}}\)</span>) [C]
 
-§ High specific enthalpy limit (<span>${h_{high}}$</span> ) [J/kg]
+§ High specific enthalpy limit (<span>\({h_{high}}\)</span> ) [J/kg]
 
-§ High dewpoint temperature limit (<span>${T_{DP,high}}$</span>) [C]
+§ High dewpoint temperature limit (<span>\({T_{DP,high}}\)</span>) [C]
 
 § Electronic Enthalpy limit (quadratic or cubic curve object)
 
-§ Low temperature limit (<span>${T_{low}}$</span>) [C]
+§ Low temperature limit (<span>\({T_{low}}\)</span>) [C]
 
 § Lockout: *LockoutWithHeating* | *LockoutWithCompressor*
 
@@ -6537,7 +6537,7 @@ Economizer limits may be used to create single-point or multi-point controllers.
 
 Economizer limits may also be used to create multi-point controllers where two or more limits specify the economizer operating region. The economizer is disabled (OFF) if any single multi-point economizer limit is exceeded.
 
-![EconomizerLimitContrrol](EngineeringReference/media/image4411.png)
+![EconomizerLimitContrrol](media/image4411.png)
 
 Figure 192. Economizer Limit Controls
 
@@ -6547,35 +6547,35 @@ The simulation contains 4 steps.
 
 #### Step 1: calculate the minimum outside air flow rate
 
-The user inputs the minimum outside air flow rate (or it is automatically calculated by the program from the user’s design inputs). This is converted to a mass flow rate <span>${\dot m_{oa,\min ,des}}$</span>using the density of dry air at 20 degrees C. If the economizer is on an air loop then the minimum outside air flow fraction is initialized to:
+The user inputs the minimum outside air flow rate (or it is automatically calculated by the program from the user’s design inputs). This is converted to a mass flow rate <span>\({\dot m_{oa,\min ,des}}\)</span>using the density of dry air at 20 degrees C. If the economizer is on an air loop then the minimum outside air flow fraction is initialized to:
 
 <div>$${f_{oa,\min }} = {\dot m_{oa,\min ,des}}/{\dot m_{s,des}}$$</div>
 
-Where <span>${\dot m_{s,des}}$</span>is the design supply air mass flow rate. If the economizer is not on an air loop the minimum outside air flow fraction is initialized to:
+Where <span>\({\dot m_{s,des}}\)</span>is the design supply air mass flow rate. If the economizer is not on an air loop the minimum outside air flow fraction is initialized to:
 
 <div>$${f_{oa,\min }} = {\dot m_{oa,\min ,des}}/{\dot m_{oa,\max ,des}}$$</div>
 
-where <span>${\dot m_{oa,\max ,des}}$</span>is the user input maximum outside air volumetric flow rate converted to mass flow rate in the same manner as for the minimum outside air flow rate. If a minimum outside air schedule has been input, <span>${f_{oa,\min }}$</span>is multiplied by the current schedule value.
+where <span>\({\dot m_{oa,\max ,des}}\)</span>is the user input maximum outside air volumetric flow rate converted to mass flow rate in the same manner as for the minimum outside air flow rate. If a minimum outside air schedule has been input, <span>\({f_{oa,\min }}\)</span>is multiplied by the current schedule value.
 
 #### Step 2: calculate an initial outside air signal
 
-We now define an initial outside air signal <span>${S_{oa,init}}$</span>.
+We now define an initial outside air signal <span>\({S_{oa,init}}\)</span>.
 
-If <span>$\left| {{T_{_r}} - {T_{in}}} \right| > \Delta {T_{small}}$</span>then:
+If <span>\(\left| {{T_{_r}} - {T_{in}}} \right| > \Delta {T_{small}}\)</span>then:
 
-<span>${S_{oa,init}} = ({T_r} - {T_{mix,set}})/({T_r} - {T_i})$</span>.
+<span>\({S_{oa,init}} = ({T_r} - {T_{mix,set}})/({T_r} - {T_i})\)</span>.
 
 Otherwise:
 
-if <span>${T_r} < {T_{mix,set}}$</span>and <span>${T_r} \ge {T_i}$</span> , <span>${S_{oa,init}}$</span>is set to -1;
+if <span>\({T_r} &lt; {T_{mix,set}}\)</span>and <span>\({T_r} \ge {T_i}\)</span> , <span>\({S_{oa,init}}\)</span>is set to -1;
 
-if <span>${T_r} < {T_{mix,set}}$</span> and <span>${T_r} < {T_i}$</span>, <span>${S_{oa,init}}$</span>  is set to 1;
+if <span>\({T_r} &lt; {T_{mix,set}}\)</span> and <span>\({T_r} &lt; {T_i}\)</span>, <span>\({S_{oa,init}}\)</span>  is set to 1;
 
-if <span>${T_r} \ge {T_{mix,set}}$</span>and <span>${T_r} \ge {T_i}$</span>, <span>${S_{oa,init}}$</span> is set to 1;
+if <span>\({T_r} \ge {T_{mix,set}}\)</span>and <span>\({T_r} \ge {T_i}\)</span>, <span>\({S_{oa,init}}\)</span> is set to 1;
 
-if <span>${T_r} \ge {T_{mix,set}}$</span> and <span>${T_r} < {T_i}$</span>, <span>${S_{oa,init}}$</span> is set to -1.
+if <span>\({T_r} \ge {T_{mix,set}}\)</span> and <span>\({T_r} &lt; {T_i}\)</span>, <span>\({S_{oa,init}}\)</span> is set to -1.
 
-Finally, <span>${S_{oa,init}}$</span>is constrained to be: <span>${f_{oa,\min }} \le {S_{oa,init}} \le 1$</span>. Basically, if the outside air can not accomplish cooling, <span>${S_{oa,init}}$</span> is set to <span>${f_{oa,\min }}$</span>. If it can do cooling, <span>${S_{oa,init}}$</span> is greater than the minimum outside air flow fraction but not greater than1. Here
+Finally, <span>\({S_{oa,init}}\)</span>is constrained to be: <span>\({f_{oa,\min }} \le {S_{oa,init}} \le 1\)</span>. Basically, if the outside air can not accomplish cooling, <span>\({S_{oa,init}}\)</span> is set to <span>\({f_{oa,\min }}\)</span>. If it can do cooling, <span>\({S_{oa,init}}\)</span> is greater than the minimum outside air flow fraction but not greater than1. Here
 
       *T<sub>r</sub>*  is the return air temperature [C];
 
@@ -6583,27 +6583,27 @@ Finally, <span>${S_{oa,init}}$</span>is constrained to be: <span>${f_{oa,\min }}
 
 *      T<sub>mix,set</sub>* is the mixed air setpoint [C];
 
-*      <span>$\Delta {T_{small}}$</span>*is a small temperature difference [delta C], equal to .00001.
+*      <span>\(\Delta {T_{small}}\)</span>*is a small temperature difference [delta C], equal to .00001.
 
 #### Step 3: do the on/off and limit checks
 
-·        If *EconomizerChoice* = *No Economizer*, <span>${S_{oa,init}} = {f_{oa,\min }}$</span>.
+·        If *EconomizerChoice* = *No Economizer*, <span>\({S_{oa,init}} = {f_{oa,\min }}\)</span>.
 
-·        If <span>${\dot V_{oa,\max }} < {\dot V_{small}}$</span>, <span>${S_{oa,init}} = {f_{oa,\min }}$</span>; <span>${\dot V_{small}}$</span>is.001 m<sup>3</sup>/s.
+·        If <span>\({\dot V_{oa,\max }} &lt; {\dot V_{small}}\)</span>, <span>\({S_{oa,init}} = {f_{oa,\min }}\)</span>; <span>\({\dot V_{small}}\)</span>is.001 m<sup>3</sup>/s.
 
-·        If the economizer is locked out, <span>${S_{oa,init}} = {f_{oa,\min }}$</span>.
+·        If the economizer is locked out, <span>\({S_{oa,init}} = {f_{oa,\min }}\)</span>.
 
 Note: the above three checks also set the *EconomizerOperationFlag* and *HighHumidityControlFlag* to *false* (economizer and high humidity control not operating).
 
-·        If <span>${T_i} > {T_{mix,set}}$</span> , <span>${S_{oa,init}} = 1$</span>.
+·        If <span>\({T_i} > {T_{mix,set}}\)</span> , <span>\({S_{oa,init}} = 1\)</span>.
 
-·        If Differential dry-bulb was input as Economizer choiceand <span>${T_i} > {T_r}$</span>, then <span>${S_{oa,init}} = {f_{oa,\min }}$</span>.
+·        If Differential dry-bulb was input as Economizer choiceand <span>\({T_i} > {T_r}\)</span>, then <span>\({S_{oa,init}} = {f_{oa,\min }}\)</span>.
 
-·        If Differential Enthalpy was input as Economizer choiceand <span>${h_i} > {h_r}$</span>, then <span>${S_{oa,init}} = {f_{oa,\min }}$</span>, where *h<sub>i</sub>* and *h<sub>r</sub>* are the outside air inlet and return air enthalpies.
+·        If Differential Enthalpy was input as Economizer choiceand <span>\({h_i} > {h_r}\)</span>, then <span>\({S_{oa,init}} = {f_{oa,\min }}\)</span>, where *h<sub>i</sub>* and *h<sub>r</sub>* are the outside air inlet and return air enthalpies.
 
 Setpoints are checked after this which include check for Fixed dry-bulb temperature  limit, Enthalpy Limit, Dewpoint Limit and Humidity ratio limit if specified.
 
-·        If Differential Enthalpy was input as Economizer choiceand <span>${h_i} > {h_r}$</span>, then <span>${S_{oa,init}} = {f_{oa,\min }}$</span>, where *h<sub>i</sub>* and *h<sub>r</sub>* are the outside air inlet and return air enthalpies.
+·        If Differential Enthalpy was input as Economizer choiceand <span>\({h_i} > {h_r}\)</span>, then <span>\({S_{oa,init}} = {f_{oa,\min }}\)</span>, where *h<sub>i</sub>* and *h<sub>r</sub>* are the outside air inlet and return air enthalpies.
 
 Setpoints are checked after this which include check for Fixed dry-bulb temperature limit, Enthalpy Limit, Dewpoint Limit and Humidity ratio limit if specified.
 
@@ -6611,17 +6611,17 @@ Setpoints are checked after this which include check for Fixed dry-bulb temperat
 
 ·        Limits are checked as follows
 
-o   If a high temperature limit was input and <span>${T_{oa}} > {T_{high}}$</span>, <span>${S_{oa,init}} = {f_{oa,\min }}$</span>; where *T<sub>oa</sub>* is the outside air temperature.
+o   If a high temperature limit was input and <span>\({T_{oa}} > {T_{high}}\)</span>, <span>\({S_{oa,init}} = {f_{oa,\min }}\)</span>; where *T<sub>oa</sub>* is the outside air temperature.
 
-o   If an enthalpy limit was input and <span>${h_{oa}} > {h_{high}}$</span>, <span>${S_{oa,init}} = {f_{oa,\min }}$</span>; where *h<sub>oa</sub>* is the outside air specific enthalpy.
+o   If an enthalpy limit was input and <span>\({h_{oa}} > {h_{high}}\)</span>, <span>\({S_{oa,init}} = {f_{oa,\min }}\)</span>; where *h<sub>oa</sub>* is the outside air specific enthalpy.
 
-o   If a dewpoint temperature limit was input and <span>${T_{DP,OA}} > {T_{DP,high}}$</span>, <span>${S_{oa,init}} = {f_{oa,\min }}$</span>; where T<sub>DP,OA</sub> is the outside air dewpoint temperature and T<sub>DP,high</sub> is dewpoint temperature limit.
+o   If a dewpoint temperature limit was input and <span>\({T_{DP,OA}} > {T_{DP,high}}\)</span>, <span>\({S_{oa,init}} = {f_{oa,\min }}\)</span>; where T<sub>DP,OA</sub> is the outside air dewpoint temperature and T<sub>DP,high</sub> is dewpoint temperature limit.
 
-o   If an electronic enthalpy curve was input and <span>${w_{OA}} > {w_{CurveOutput}}$</span>, <span>${S_{oa,init}} = {f_{oa,\min }}$</span>; where *w*<sub>OA</sub> is the outside air humidity ratio and *w*<sub>CurveOutput</sub> is the curve’s humidity ratio output as a function of outdoor air dry-bulb temperature.
+o   If an electronic enthalpy curve was input and <span>\({w_{OA}} > {w_{CurveOutput}}\)</span>, <span>\({S_{oa,init}} = {f_{oa,\min }}\)</span>; where *w*<sub>OA</sub> is the outside air humidity ratio and *w*<sub>CurveOutput</sub> is the curve’s humidity ratio output as a function of outdoor air dry-bulb temperature.
 
 ·        Another Economizer choice called DifferentialDryBulbAndEnthalpy checks the outside air temperature against return temperature and outside air enthalpy against return air enthalpy and also checks the setpoints.
 
-·        If a low temperature limit was input and <span>${T_{oa}} < {T_{low}}$</span>, <span>${S_{oa,init}} = {f_{oa,\min }}$</span>.
+·        If a low temperature limit was input and <span>\({T_{oa}} &lt; {T_{low}}\)</span>, <span>\({S_{oa,init}} = {f_{oa,\min }}\)</span>.
 
 Note: the above nine cases set the *EconomizerOperationFlag* to *false*       (economizer not operating), otherwise the economizer is active.
 
@@ -6631,23 +6631,23 @@ The economizer schedule is then checked to determine if a “push-button” type
 
 #### Step 4: calculate the final outside air signal
 
-If *S<sub>oa,init</sub>* is greater than <span>${f_{oa,\min }}$</span>and less than 1 and the mixed air mass flow rate is greater than <span>${\dot m_{verysmall}}$</span>(<span>${10^{ - 30}}$</span>) and night venting is not occuring and *HighHumidityOperationFlag* is false then
+If *S<sub>oa,init</sub>* is greater than <span>\({f_{oa,\min }}\)</span>and less than 1 and the mixed air mass flow rate is greater than <span>\({\dot m_{verysmall}}\)</span>(<span>\({10^{ - 30}}\)</span>) and night venting is not occuring and *HighHumidityOperationFlag* is false then
 
-·        we calculate a final outside air signal *S<sub>oa</sub>* by using the regula falsi method routine *SolveRegulaFalsi* to zero the residual <span>${T_{mix,set}} - {T_{mix}}$</span>by varying the outside air mass flow rate <span>${S_{oa}}\cdot {\dot m_{mix}}$</span>. Mass and energy balance are used to obtain the mixed air humidity ratio and enthalpy from the recirculated air and outside air inlet conditions. The psychrometric function *PsyTdbFnHW* is used to obtain *T<sub>mix</sub>* from the mixed air enthalpy and humidity ratio.
+·        we calculate a final outside air signal *S<sub>oa</sub>* by using the regula falsi method routine *SolveRegulaFalsi* to zero the residual <span>\({T_{mix,set}} - {T_{mix}}\)</span>by varying the outside air mass flow rate <span>\({S_{oa}}\cdot {\dot m_{mix}}\)</span>. Mass and energy balance are used to obtain the mixed air humidity ratio and enthalpy from the recirculated air and outside air inlet conditions. The psychrometric function *PsyTdbFnHW* is used to obtain *T<sub>mix</sub>* from the mixed air enthalpy and humidity ratio.
 
 Otherwise
 
-·        <span>${S_{oa}} = {S_{oa,init}}$</span>.
+·        <span>\({S_{oa}} = {S_{oa,init}}\)</span>.
 
 #### Step 5: calculate the outside air flow rate and apply final constraints
 
-·        If *BypassChoice* =*True and HighHumidityOperationFlag = false*, <span>${S_{oa}} = {f_{oa,\min }}$</span>.
+·        If *BypassChoice* =*True and HighHumidityOperationFlag = false*, <span>\({S_{oa}} = {f_{oa,\min }}\)</span>.
 
 1)   If the *HighHumidityOperationFlag* is *true* then
 
 <div>$${S_{oa}} = MAX\left[ {{f_{oa,\min }},OAFlowRati{o_{HighRH}}\left( {{\raise0.7ex\hbox{${{{\dot m}_{oa,\max ,des}}}$} \!\mathord{\left/ {\vphantom {{{{\dot m}_{oa,\max ,des}}} {{{\dot m}_{mix}}}}}\right.}\!\lower0.7ex\hbox{${{{\dot m}_{mix}}}$}}} \right)} \right]$$</div>
 
-·        If night ventilation is occuring, <span>${S_{oa}} = 1$</span>.(Night Ventilation has priority over the above constraints)
+·        If night ventilation is occuring, <span>\({S_{oa}} = 1\)</span>.(Night Ventilation has priority over the above constraints)
 
 ·        If the Minimum Outside air flow Schedule and the Maximum outside air flow schedule is available , Out Air signal *S oa*,*init*  is checked against those fractions from the schedule.
 
@@ -6671,13 +6671,13 @@ Otherwise
 
 Then the following constraints are applied.
 
-·        <span>${\dot m_{oa}}$</span> must be greater than or equal to the air primary loop total exhaust air mass flow rate (<span>${\dot m_{exhaust}}$</span>).
+·        <span>\({\dot m_{oa}}\)</span> must be greater than or equal to the air primary loop total exhaust air mass flow rate (<span>\({\dot m_{exhaust}}\)</span>).
 
-·        If *MinimumLimit* = *Fixed Minimum*, <span>${\dot m_{oa}}$</span> must be greater than or equal to the minimum outside air mass flow rate.
+·        If *MinimumLimit* = *Fixed Minimum*, <span>\({\dot m_{oa}}\)</span> must be greater than or equal to the minimum outside air mass flow rate.
 
-·        <span>${\dot m_{oa}}$</span> must be <span>$ \le {\dot m_{mix}}$</span>.
+·        <span>\({\dot m_{oa}}\)</span> must be <span>\(\le {\dot m_{mix}}\)</span>.
 
-·        <span>${\dot m_{oa}}$</span> must be <span>$ \le $</span> the maximum outside air mass flow rate.
+·        <span>\({\dot m_{oa}}\)</span> must be <span>\(\le \)</span> the maximum outside air mass flow rate.
 
 If heat recovery bypass control is selected, the type of control determines how heat recovery is simulated. If BypassWhenWithinEconomizerLimits is selected, heat recovery is only active when the EconomizerOperationFlag is false. If BypassWhenOAFlowGreaterThanMinimum is selected *and* the EconomizerOperationFlag is true *and* the outside air mass flow rate is greater than the minimum flow rate, heat recovery is disabled, otherwise heat recovery is active. The heat recovery bypass control option is used to optimize heat recovery in heating mode. Heat recovery is commonly used to reduce the cooling load when outdoor conditions are higher than indoor conditions, however, when outdoor conditions are favorable the heat exchanger can be turned off and the economizer may be used to also reduce the cooling load. Economizer mode is typically involves increasing the outdoor air flow rate. At some point the outdoor air flow rate must be reduced and the heat exchanger should be turned back on to reduce or avoid an indoor heating requirement. This option will typically be used with some form of supply air temperature control used with the heat recovery equipment (Ref. HeatExchanger).
 
@@ -6691,7 +6691,7 @@ If heat recovery bypass control is selected, the type of control determines how 
 
 The stand alone energy recovery ventilator (ERV) controller is used solely in conjunction with a stand alone energy recovery ventilator (see figure below).
 
-![Schematic\_StandAloneERV](EngineeringReference/media/image4482.png)
+![Schematic\_StandAloneERV](media/image4482.png)
 
 Figure 193. Schematic of the ZoneHVAC:EnergyRecoveryVentilator Compound Object
 
@@ -6818,21 +6818,21 @@ The simulation of the main algorithm of this water baseboard model with radiatio
 
 This model initializes all the conditions at the inlet node such as mass flow rates, temperatures, and specific heat capacities. It calculates the UA value once from standard conditions of the air and water during initialization and it is kept throughout the simulation of the unit.
 
-In case that the user has manufacturer’s information regarding the rated capacity, the rated water flow rate, and the rated average water temperature, standard conditions such as the rated heating capacity, *q<sub>std</sub>*, average water temperature, <span>${T_{w,avg}}$</span>, and water mass flow rate, <span>$\dot m{}_w$</span>, are known from the user inputs. The standard water inlet temperature, <span>${T_{w,in}}$</span>, and outlet temperature, <span>${T_{w,out}}$</span>, are thus obtained from expressions
+In case that the user has manufacturer’s information regarding the rated capacity, the rated water flow rate, and the rated average water temperature, standard conditions such as the rated heating capacity, *q<sub>std</sub>*, average water temperature, <span>\({T_{w,avg}}\)</span>, and water mass flow rate, <span>\(\dot m{}_w\)</span>, are known from the user inputs. The standard water inlet temperature, <span>\({T_{w,in}}\)</span>, and outlet temperature, <span>\({T_{w,out}}\)</span>, are thus obtained from expressions
 
 <div>$${T_{w,in}} = \frac{{{q_{std}}}}{{2\dot m{}_w{c_{p,w}}}} + {T_{w,avg}}$$</div>
 
 <div>$${T_{w,out}} = 2{T_{w,avg}} - {T_{w,in}}$$</div>
 
-where <span>${c_{p,w}}$</span> is the specific heat capacity of the water.
+where <span>\({c_{p,w}}\)</span> is the specific heat capacity of the water.
 
-The model then assumes the air mass flow rate is twice the rated water mass flow rate. Since the inlet air temperature, <span>${T_{a,in}}$</span>, of 18°C and the heating capacity of the unit, i.e. rated capacity, are known, the outlet air temperature, <span>${T_{a,out}}$</span>, can be obtained from expression
+The model then assumes the air mass flow rate is twice the rated water mass flow rate. Since the inlet air temperature, <span>\({T_{a,in}}\)</span>, of 18°C and the heating capacity of the unit, i.e. rated capacity, are known, the outlet air temperature, <span>\({T_{a,out}}\)</span>, can be obtained from expression
 
 <div>$${T_{a,out}} = \frac{{{q_{std}}}}{{2\dot m{}_w{c_{p,a}}}} + {T_{a,in}}$$</div>
 
-where <span>${c_{p,a}}$</span> is the specific heat capacity of the air.
+where <span>\({c_{p,a}}\)</span> is the specific heat capacity of the air.
 
-All temperatures at each node are now known. The mean temperature difference, <span>$\Delta {T_{lm}}$</span>, is thus obtained from the following expressions:
+All temperatures at each node are now known. The mean temperature difference, <span>\(\Delta {T_{lm}}\)</span>, is thus obtained from the following expressions:
 
 <div>$$\Delta {T_1} = {T_{w,in}} - {T_{a,out}}$$</div>
 
@@ -6852,7 +6852,7 @@ In case that the user requests autosizing the rated capacity, the model employs 
 
 <div>$${T_{w,out}} = 2{T_{w,avg}} - {T_{w,in}}$$</div>
 
-where <span>${q_{design}}$</span> is the design heating load estimated by EnergyPlus in the zone.
+where <span>\({q_{design}}\)</span> is the design heating load estimated by EnergyPlus in the zone.
 
 Similarly, the model estimates the air outlet temperature assuming the air mass flow rate is twice the rated water mass flow rate as
 
@@ -6953,7 +6953,7 @@ The simulation of the main algorithm of this steam baseboard model with radiatio
 
 <div>$$q = {\dot m_5}({h_{fg}} + {c_{pw}}\Delta t)$$</div>
 
-where <span>${\dot m_s}$</span>is the mass flow rate of steam in kg/s, <span>${h_{fg}}$</span>is the heat of vaporization of steam in J/kg, <span>${c_{pw}}$</span>is the specific heat of water in J/kg.K, and <span>$\Delta t$</span> is the degree of subcooling in degree C.
+where <span>\({\dot m_s}\)</span>is the mass flow rate of steam in kg/s, <span>\({h_{fg}}\)</span>is the heat of vaporization of steam in J/kg, <span>\({c_{pw}}\)</span>is the specific heat of water in J/kg.K, and <span>\(\Delta t\)</span> is the degree of subcooling in degree C.
 
 The outlet steam temperature is thus
 

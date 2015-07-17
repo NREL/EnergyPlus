@@ -3168,7 +3168,8 @@ namespace PlantCondLoopOperation {
 						UniqueIDName = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Name;
 						ActuatorType = "On/Off Supervisory";
 						SetupEMSActuator( ActuatorName, UniqueIDName, ActuatorType, Units, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).EMSCtrlOverrideOn, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).EMSCtrlOverrideValue );
-					} else if ( LoopSideNum == DemandSide ) {
+					}
+					else if ( LoopSideNum == DemandSide ) {
 						ActuatorName = "Demand Side Branch";
 						UniqueIDName = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Name;
 						ActuatorType = "On/Off Supervisory";

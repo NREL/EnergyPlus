@@ -5703,6 +5703,11 @@ namespace DataHeatBalance {
 
 	// Functions
 
+	// Clears the global data in DataHeatBalance.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	void
 	CheckAndSetConstructionProperties(
 		int const ConstrNum, // Construction number to be set/checked
