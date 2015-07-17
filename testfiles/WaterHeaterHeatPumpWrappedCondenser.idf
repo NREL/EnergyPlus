@@ -351,7 +351,7 @@
     1,                                  !- Skin Loss Fraction to Zone
     ,                                   !- Off Cycle Flue Loss Coefficient to Ambient Temperature {W/K}
     1,                                  !- Off Cycle Flue Loss Fraction to Zone
-    0.001,                              !- Peak Use Flow Rate {m3/s}
+    ,                                   !- Peak Use Flow Rate {m3/s}
     ,                                   !- Use Flow Rate Fraction Schedule Name
     ,                                   !- Cold Water Supply Temperature Schedule Name
     Water Heater Use Inlet Node,        !- Use Side Inlet Node Name
