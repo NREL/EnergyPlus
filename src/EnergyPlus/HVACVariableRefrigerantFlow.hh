@@ -1569,6 +1569,12 @@ namespace HVACVariableRefrigerantFlow {
 		int const VRFCond, // index to VRF condenser
 		bool const FirstHVACIteration // flag for first time through HVAC system simulation
 	);
+	
+	Real64 
+	CompResidual( 
+		Real64 const Te, // Outdoor unit evaporating temperature
+		Array1< Real64 > const & Par        // parameters
+	);
 
 	// End of Methods for New VRF Model: Fluid Temperature Control
 	// *****************************************************************************

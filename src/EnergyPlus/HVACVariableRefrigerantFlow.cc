@@ -219,7 +219,7 @@ namespace HVACVariableRefrigerantFlow {
 		// SUBROUTINE INFORMATION:
 		// AUTHOR         Richard Raustad, FSEC
 		// DATE WRITTEN   August 2010
-		// MODIFIED       na
+		// MODIFIED       Jul 2015, RP Zhang (LBNL), XF Pang (LBNL), Y Yura (Daikin Inc). Add a physics based VRF model appliable for Fluid Temperature Co
 		// RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -237,6 +237,11 @@ namespace HVACVariableRefrigerantFlow {
 		using General::TrimSigDigits;
 		using DXCoils::DXCoilTotalCooling;
 		using DXCoils::DXCoilTotalHeating;
+		// Followings for FluidTCtrl @@ Check the modification in this method
+		using DXCoils::CalcVRFIUEvapCondTemp;
+		using DXCoils::DXCoilSH;
+		using DXCoils::DXCoilSC;
+		using DXCoils::DXCoil_InletAirDBT;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -258,6 +263,12 @@ namespace HVACVariableRefrigerantFlow {
 		int DXCoolingCoilIndex; // index to this terminal units DX cooling coil
 		int DXHeatingCoilIndex; // index to this terminal units DX heating coil
 		Real64 QZnReq;
+		// Followings for FluidTCtrl Only
+		Array1D< Real64 >  EvapTemp;
+		Array1D< Real64 >  CondTemp;
+		Real64 IUMinEvapTemp;
+		Real64 IUMaxCondTemp;
+		
 		// FLOW:
 
 		// Obtains and Allocates VRF system related parameters from input file
@@ -320,6 +331,25 @@ namespace HVACVariableRefrigerantFlow {
 			TerminalUnitList( TUListNum ).TotalHeatLoad( IndexToTUInTUList ) = 0.0;
 		}
 
+		// @@ This is for FluidTCtrl only
+		if ( VRF( VRFCondenser ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) {
+			if( DXCoolingCoilIndex > 0 ) {
+				TerminalUnitList( TUListNum ).TU_SH( IndexToTUInTUList ) = DXCoilSH( DXCoolingCoilIndex );
+			} else {
+				TerminalUnitList( TUListNum ).TU_SH( IndexToTUInTUList ) = 0.0;
+			}
+			if( DXHeatingCoilIndex > 0 ) {
+				TerminalUnitList( TUListNum ).TU_SC( IndexToTUInTUList ) = DXCoilSC( DXHeatingCoilIndex );
+			} else {
+				TerminalUnitList( TUListNum ).TU_SC( IndexToTUInTUList ) = 0.0;
+			}
+			if(( DXCoolingCoilIndex > 0 ) || ( DXHeatingCoilIndex > 0 ) ) {
+				TerminalUnitList( TUListNum ).TU_IADT( IndexToTUInTUList ) = DXCoil_InletAirDBT( DXHeatingCoilIndex );
+			} else {
+				TerminalUnitList( TUListNum ).TU_IADT( IndexToTUInTUList ) = 0.0;
+			}
+		}
+
 		// Update the current VRF terminal unit to the outlet nodes
 		//  CALL UpdateVRF(VRFTUNum)
 
@@ -340,6 +370,36 @@ namespace HVACVariableRefrigerantFlow {
 			}
 		
 			ReportVRFCondenser( VRFCondenser );
+			    
+			// @@ This is for FluidTCtrl only
+			if ( VRF( VRFCondenser ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) {
+				// XP_Calculate the VRF outdoor unit minimum evaporating temperature ?? For next iteration_zrp
+				//*************************************************************************
+				EvapTemp.allocate( TerminalUnitList( TUListNum ).NumTUInList );
+				CondTemp.allocate( TerminalUnitList( TUListNum ).NumTUInList );
+				IUMinEvapTemp = 100.0;
+				IUMaxCondTemp = 0.0;
+
+				if ( VRF( VRFCondenser ).Algorithm == 1) { 
+				// 1. HIGHSENSIBLE 2. TETCCONSTANT
+					int VRFTUNumi;
+					for (int i = 1; i <= TerminalUnitList(TUListNum).NumTUInList; i++) {
+						VRFTUNumi = TerminalUnitList( TUListNum ).ZoneTUPtr( i );
+						CalcVRFIUEvapCondTemp( VRFTU( VRFTUNumi ).CoolCoilIndex, VRFTU( VRFTUNumi ).HeatCoilIndex, VRFTU( VRFTUNumi ).ZoneNum, EvapTemp( i ), CondTemp( i ) );
+
+						IUMinEvapTemp = min( IUMinEvapTemp, EvapTemp( i ), 15.0);
+						IUMaxCondTemp = max( IUMaxCondTemp, CondTemp( i ), 42.0);
+					}
+					
+					VRF( VRFCondenser ).MinEvaporatingTemp = max( IUMinEvapTemp, 4.0 ); // Step 1.3_zrp
+					VRF( VRFCondenser ).MaxCondensingTemp = min( IUMaxCondTemp, 46.0 );
+				} else {
+					VRF( VRFCondenser ).MinEvaporatingTemp = VRF( VRFCondenser ).EvapTempFixed;
+					VRF( VRFCondenser ).MaxCondensingTemp  = VRF( VRFCondenser ).CondTempFixed;
+				}
+				//*************************************************************************
+			}
+			
 			if ( VRF( VRFCondenser ).CondenserType == WaterCooled ) UpdateVRFCondenser( VRFCondenser );
 		}
 
@@ -7818,6 +7878,44 @@ namespace HVACVariableRefrigerantFlow {
 
 	}
 
+	Real64 
+	CompResidual( 
+		Real64 const Te, // Outdoor unit evaporating temperature
+		Array1< Real64 > const & Par        // parameters
+	)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Xiufeng Pang (XP)
+		//       DATE WRITTEN   Mar 2013
+		//       MODIFIED       Jul 2015, RP Zhang, LBNL
+		//       RE-ENGINEERED
+		//
+		// PURPOSE OF THIS FUNCTION:
+		//  	 Calculates residual function ((VRV terminal unit cooling output - Zone sensible cooling load)
+		//
+		// METHODOLOGY EMPLOYED:          
+		//
+		// REFERENCES:
+		// na
+		//
+		// USE STATEMENTS:
+		using CurveManager::CurveValue;
+
+		Real64 Tdis;
+		Real64 CondHeat;
+		Real64 CAPSpd;
+		Real64 CompResidual;
+		int CAPFT;
+		
+		Tdis     = Par( 1 );
+		CondHeat = Par( 2 );
+		CAPFT    = Par( 3 );
+		
+		CAPSpd = CurveValue( CAPFT, Tdis, Te );
+		CompResidual = ( CondHeat - CAPSpd ) / CAPSpd;
+ 
+		return CompResidual;
+	}
 	
 
 	// End of Utility subroutines for the Module
