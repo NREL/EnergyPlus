@@ -15226,7 +15226,7 @@ Label50: ;
                 SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, 0.5, 1.5, Par);
 				FanSpdRatio = max( min( Ratio1, 1.0 ), 0.0);
                 
-                if( FanSpdRatio >= FanSpdRatioMin ) {
+                if( Wout > 0 ) { // Wout = -1 for blank
 				// No need to update SH (SHact = SH)
                     
                     TcIn = TairInlet + Qfan *  pow_2( FanSpdRatio ) / Garate / 1005; // FanSpdRatio is updated
@@ -15244,12 +15244,14 @@ Label50: ;
                     SCact = 999.0;
                     SHact = SH;
                     
-                } else {
-                // Need to update SH to further reduce QinSenMin1
-				// That is, SHact is updated (different from SH) while using FanSpdRatio = FanSpdRatioMin.
+                } 
+			} else {
+			// Need to update SH to further reduce QinSenMin1
+			// That is, SHact is updated (different from SH) while using FanSpdRatio = FanSpdRatioMin.
+			
+				FanSpdRatio = FanSpdRatioMin;
 				
-                    FanSpdRatio = FanSpdRatioMin;
-                    
+				if ( Wout > 0 ){
 					TcIn = TcoilIn; // TcoilIn = f(FanSpdRatioMin)
 					Toutlet = TcoilIn - QZnReqSenCoolingLoad / 1005.0 / FanSpdRatio / Garate;
 					Th2 = TcoilIn - ( TcoilIn - Toutlet ) / ( 1 - BF );
@@ -15282,7 +15284,7 @@ Label50: ;
 					Houtlet = PsyHFnTdbW( Toutlet, Wout );
 					HcoilIn = PsyHFnTdbW( TcoilIn, Win ); 
 					SCact = 999.0;
-                }
+				}
             }
         
         } else if( Mode == 1 && QZnReqSenHeatingLoad > 0.0 ) {
@@ -15323,7 +15325,7 @@ Label50: ;
                 SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, 0.5, 1.5, Par);
 				FanSpdRatio = max( min( Ratio1, 1.0 ), 0.0);
                 
-                if( FanSpdRatio >= FanSpdRatioMin ) {	
+                if( Wout > 0 ) {	
 				// No need to update SC (SCact = SC )
 				
                     TcIn = TairInlet + Qfan *  pow_2( FanSpdRatio )/Garate/1005.0;// FanSpdRatio is updated
@@ -15334,13 +15336,15 @@ Label50: ;
                     HcoilIn = PsyHFnTdbW( TcIn, Win  );
                     SHact = 999.0;
                     SCact = SC;
+				}
 					
-                } else {
-				// Need to update SC to further reduce QinSenMin1
-				// That is, SCact is updated (different from SC ) while using FanSpdRatio = FanSpdRatioMin.
-				
-					FanSpdRatio = FanSpdRatioMin;
-				
+			} else {
+			// Need to update SC to further reduce QinSenMin1
+			// That is, SCact is updated (different from SC ) while using FanSpdRatio = FanSpdRatioMin.
+			
+				FanSpdRatio = FanSpdRatioMin;
+			
+                if( Wout > 0 ) {	
 					TcIn = TcoilIn; // TcoilIn = f(FanSpdRatioMin)
 					Toutlet = TairInlet + QZnReqSenHeatingLoad / 1005.0 / FanSpdRatio / Garate;
 					Th2 = TcoilIn + ( Toutlet - TcoilIn ) / ( 1 - BF  );
@@ -15376,13 +15380,16 @@ Label50: ;
             Hin       = DXCoil( CoolCoil ).InletAirEnthalpy;
 			
             FanSpdRatio = 0.0;
-			SHact = 999.0;
-			SCact = 999.0;
-			Toutlet = TairInlet;
-			TcIn = TairInlet;
-			Houtlet = Hin;
-			HcoilIn = Hin;
-			Wout = Win;
+			
+			if( Wout > 0 ) { // Wout = -1 for blank
+				SHact = 999.0;
+				SCact = 999.0;
+				Toutlet = TairInlet;
+				TcIn = TairInlet;
+				Houtlet = Hin;
+				HcoilIn = Hin;
+				Wout = Win;
+			}
         }
         
     }
