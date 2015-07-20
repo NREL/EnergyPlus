@@ -116,21 +116,22 @@ namespace GroundTemps {
 		do {
 		
 			// loop over all days
-			for ( int day = 1; day >= daysInYear; ++day ) {
+			for ( int day = 1; day <= daysInYear; ++day ) {
 
-				
 				bool iterationConverged = false;
+
+				doStartOfTimeStepInits();
 
 				// Loop until iteration temperature converges
 				do {
 			
 					// For all cells
-					for ( int cell = 1; cell >= totalNumCells; ++cell ) {
+					for ( int cell = 1; cell <= totalNumCells; ++cell ) {
 
 						if ( cell == 1 ) {
 							updateSurfaceCellTemperature();
 						} else if ( cell > 1 && cell < totalNumCells ) {
-							updateGeneralDomainCellTemperature();
+							updateGeneralDomainCellTemperature( cell );
 						} else if ( cell == totalNumCells ) {
 							updateBottomCellTemperature();
 						}
@@ -159,14 +160,41 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::updateSurfaceCellTemperature()
 	{
-		cellArray( 1 ).temperature = 20.0;
+		cellArray( 1 ).temperature = 20.0; // Just for testing
 	}
 
 	//******************************************************************************
 
 	void
-	FiniteDiffGroundTempsModel::updateGeneralDomainCellTemperature()
+	FiniteDiffGroundTempsModel::updateGeneralDomainCellTemperature( 
+		Real64 const cell
+	)
 	{
+
+		// Set up once-per-cell items
+		Real64 numerator = 0.0;
+		Real64 denominator = 0.0;
+
+		auto & thisCell( cellArray( cell ) );
+
+		// add effect from cell history
+		numerator += thisCell.temperature_prevTimeStep;
+		++denominator;
+
+		// loop across each direction in the simulation
+		for ( int curDirection = 1; curDirection <= 2; ++curDirection ) {
+
+			Real64 neighborTemp = 0.0;
+			Real64 resistance = 0.0;
+
+			//'evaluate the transient expression terms
+			evaluateNeighborResistance( thisCell, curDirection, neighborTemp, resistance );
+			numerator += ( thisCell.beta / resistance ) * neighborTemp;
+			denominator += thisCell.beta / resistance;
+		}
+
+		//'now that we have passed all directions, update the temperature
+		thisCell.temperature = numerator / denominator;
 
 	}
 
@@ -175,7 +203,7 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::updateBottomCellTemperature()
 	{
-		cellArray( totalNumCells ).temperature = 15.0;
+		cellArray( totalNumCells ).temperature = 15.0; // Just for testing
 	}
 
 	//******************************************************************************
@@ -241,7 +269,7 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::updateIterationTemperatures()
 	{
-		for ( int cell = 1; totalNumCells; ++cell ) {
+		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
 			cellArray( cell ).temperature_prevIteration = cellArray( cell ).temperature;
 		}
 	}
@@ -251,9 +279,34 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::updateTimeStepTemperatures()
 	{
-		for ( int cell = 1; totalNumCells; ++cell ) {
+		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
 			cellArray( cell ).temperature_prevTimeStep = cellArray( cell ).temperature;
 		}
+	}
+
+	//******************************************************************************
+
+	void
+	FiniteDiffGroundTempsModel::doStartOfTimeStepInits()
+	{
+		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
+			
+			//inits here
+
+		}
+	}
+
+	//******************************************************************************
+
+	void
+	FiniteDiffGroundTempsModel::evaluateNeighborResistance(
+		cell curCell,
+		int const currDirection,
+		Real64 neighborTemp,
+		Real64 resistance
+	)
+	{
+	
 	}
 
 	//******************************************************************************

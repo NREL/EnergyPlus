@@ -116,6 +116,7 @@ namespace GroundTemps {
 			Real64 temperature;
 			Real64 temperature_prevIteration;
 			Real64 temperature_prevTimeStep;
+			Real64 beta;
 	
 		};
 
@@ -134,7 +135,9 @@ namespace GroundTemps {
 		updateSurfaceCellTemperature();
 
 		void
-		updateGeneralDomainCellTemperature();
+		updateGeneralDomainCellTemperature(
+			Real64 const cell
+		);
 
 		void
 		updateBottomCellTemperature();
@@ -153,6 +156,17 @@ namespace GroundTemps {
 
 		void
 		updateTimeStepTemperatures();
+
+		void
+		evaluateNeighborResistance(
+			cell curCell,
+			int const currDirection,
+			Real64 neighborTemp,
+			Real64 resistance
+		);
+
+		void
+		doStartOfTimeStepInits();
 
 		Real64
 		getGroundTemp();
