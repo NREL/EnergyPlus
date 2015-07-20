@@ -44,7 +44,7 @@ namespace EnergyPlus {
 
 			EXPECT_TRUE( compare_idf( "VERSION", 1, 0, 1, { "8.3" }, { false }, {}, {} ) );
 
-			EXPECT_TRUE( compare_idf( "OUTPUT:SQLITE", 1, 0, 739, { "SIMPLEANDTABULAR" }, { false }, {}, {} ) );
+			EXPECT_TRUE( compare_idf( "OUTPUT:SQLITE", 1, 0, 741, { "SIMPLEANDTABULAR" }, { false }, {}, {} ) );
 
 			EXPECT_TRUE( compare_idf( 
 				"BUILDINGSURFACE:DETAILED", 
@@ -68,7 +68,7 @@ namespace EnergyPlus {
 
 			ASSERT_FALSE( process_idd( idd_objects, errors_found ) );
 
-			EXPECT_EQ( 745, NumObjectDefs );
+			EXPECT_EQ( 747, NumObjectDefs );
 			ASSERT_EQ( static_cast<unsigned long>( NumObjectDefs ), ListOfObjects.size() );
 
 			std::string const name( "OUTPUT:SQLITE" );
@@ -188,7 +188,7 @@ namespace EnergyPlus {
 			EXPECT_EQ( sqlite_name, IDFRecords( index ).Name );
 			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-			EXPECT_EQ( 739, IDFRecords( index ).ObjectDefPtr );
+			EXPECT_EQ( 741, IDFRecords( index ).ObjectDefPtr );
 			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SIMPLEANDTABULAR" } ), IDFRecords( index ).Alphas ) );
 			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
 			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
@@ -256,7 +256,7 @@ namespace EnergyPlus {
 			EXPECT_EQ( sqlite_name, IDFRecords( index ).Name );
 			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-			EXPECT_EQ( 739, IDFRecords( index ).ObjectDefPtr );
+			EXPECT_EQ( 741, IDFRecords( index ).ObjectDefPtr );
 			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SIMPLEANDTABULAR" } ), IDFRecords( index ).Alphas ) );
 			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
 			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
@@ -651,7 +651,7 @@ namespace EnergyPlus {
 			EXPECT_EQ( sqlite_name, IDFRecords( index ).Name );
 			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-			EXPECT_EQ( 739, IDFRecords( index ).ObjectDefPtr );
+			EXPECT_EQ( 741, IDFRecords( index ).ObjectDefPtr );
 			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SIMPLEANDTABULAR" } ), IDFRecords( index ).Alphas ) );
 			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
 			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
