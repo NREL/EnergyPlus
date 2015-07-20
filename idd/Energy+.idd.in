@@ -6411,8 +6411,8 @@ WindowMaterial:Glazing:EquivalentLayer,
   A2 , \field Optical Data Type
        \required-field
        \type choice
-       \key SpectralAverage
-       \key Spectral (not supported now)
+       \default SpectralAverage
+       \note Spectral is no longer supported and SpectralAverage is now the default.
   A3 , \field Window Glass Spectral Data Set Name
        \note Used only when Optical Data Type = Spectral
        \type object-list

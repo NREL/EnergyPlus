@@ -2795,7 +2795,7 @@ Crack flow is assumed when the window or door is closed. The units for this air 
 
 #### Field: Air Mass Flow Exponent When Opening Is Closed
 
-Crack flow is assumed when the window or door is closed. In this case, the value of this field is the exponent,* n*, in the crack air flow equation. The valid range for this exponent is 0.5 to 1.0, with the default value being 0.65.
+Crack flow is assumed when the window or door is closed. In this case, the value of this field is the exponent,* n*, in the crack air flow equation. The valid range for this exponent is 0.5 to 1.0, with the default value being 0.65. Mass Flow Rate = Air Mass Flow Coefficient * (deltaP)^Air Mass Flow Exponent.
 
 #### Field: Type of Rectanguler Large Vertical Opening (LVO)
 
@@ -2946,7 +2946,7 @@ The value of the air mass flow coefficient, <span>\({C_{Q,\;unit\;length}}\)</sp
 
 #### Field: Air Mass Flow Exponent When Opening is Closed
 
-The value of the exponent,* n*, in the crack air flow equation. The valid range is 0.5 to 1.0, with the default value being 0.65.
+The value of the exponent,* n*, in the crack air flow equation. The valid range is 0.5 to 1.0, with the default value being 0.65. Mass Flow Rate = Air Mass Flow Coefficient * (deltaP)^Air Mass Flow Exponent.
 
 #### Field: Minimum Density Difference for Two-Way Flow
 
