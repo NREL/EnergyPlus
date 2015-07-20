@@ -24,6 +24,7 @@
 #include <DataZoneControls.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
+#include <EMSManager.hh>
 #include <FaultsManager.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
@@ -2075,6 +2076,13 @@ namespace ZoneTempPredictorCorrector {
 				SetupOutputVariable( "Zone Thermostat Cooling Setpoint Temperature [C]", ZoneThermostatSetPointHi( Loop ), "Zone", "Average", Zone( Loop ).Name );
 
 				SetupOutputVariable( "Zone Predicted Sensible Load Room Air Correction Factor [ ]", LoadCorrectionFactor( Loop ), "System", "Average", Zone( Loop ).Name );
+
+				if ( AnyEnergyManagementSystemInModel ) {
+					SetupEMSInternalVariable( "Zone Sensible Load to Heating Setpoint", Zone( Loop ).Name, "[W]", ZoneSysEnergyDemand( Loop ).OutputRequiredToHeatingSP );
+					SetupEMSInternalVariable( "Zone Sensible Load to Cooling Setpoint", Zone( Loop ).Name, "[W]", ZoneSysEnergyDemand( Loop ).OutputRequiredToCoolingSP );
+					SetupEMSInternalVariable( "Zone Latent Load to Humidifying Setpoint", Zone( Loop ).Name, "[kg/s]", ZoneSysMoistureDemand( Loop ).OutputRequiredToHumidifyingSP );
+					SetupEMSInternalVariable( "Zone Latent Load to Dehumidifying Setpoint", Zone( Loop ).Name, "[kg/s]", ZoneSysMoistureDemand( Loop ).OutputRequiredToDehumidifyingSP );
+				}
 
 				if ( allocated( StageZoneLogic ) ) {
 					if ( StageZoneLogic( Loop ) ) {

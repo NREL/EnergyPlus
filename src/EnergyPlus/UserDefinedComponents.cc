@@ -1995,6 +1995,198 @@ namespace UserDefinedComponents {
 
 	}
 
+	void
+	GetUserDefinedCoilIndex(
+		std::string const & CoilName,
+		int & CoilIndex,
+		bool & ErrorsFound,
+		std::string const CurrentModuleObject
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   August 2013
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine sets an index for a given user defined Cooling Coil -- issues error message if that
+		// coil is not a legal user defined Cooling Coil.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItem;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		// na
+
+		// Obtains and allocates TESCoil related parameters from input file
+		if ( GetInput ) { // First time subroutine has been called, get input data
+			GetUserDefinedComponents();
+			GetInput = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
+		}
+
+		if ( NumUserCoils > 0 ) {
+			CoilIndex = FindItem( CoilName, UserCoil.Name(), NumUserCoils );
+		} else {
+			CoilIndex = 0;
+		}
+
+		if ( CoilIndex == 0 ) {
+			ShowSevereError( CurrentModuleObject + ", GetUserDefinedCoilIndex: User Defined Cooling Coil not found=" + CoilName );
+			ErrorsFound = true;
+		}
+
+	}
+
+	void
+	GetUserDefinedCoilAirInletNode(
+		std::string const & CoilName,
+		int & CoilAirInletNode,
+		bool & ErrorsFound,
+		std::string const CurrentModuleObject
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   July 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine gets a given user defined Cooling Coil's air inlet node -- issues error message if that
+		// coil is not a legal user defined Cooling Coil and sets air node to 0, otherwise, returns inlet air node number.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItem;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int CoilIndex;
+
+		// Obtains and allocates TESCoil related parameters from input file
+		if ( GetInput ) { // First time subroutine has been called, get input data
+			GetUserDefinedComponents();
+			GetInput = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
+		}
+
+		if ( NumUserCoils > 0 ) {
+			CoilIndex = FindItem( CoilName, UserCoil.Name(), NumUserCoils );
+		} else {
+			CoilIndex = 0;
+		}
+
+		if ( CoilIndex == 0 ) {
+			ShowSevereError( CurrentModuleObject + ", GetTESCoilIndex: TES Cooling Coil not found=" + CoilName );
+			ErrorsFound = true;
+			CoilAirInletNode = 0;
+		} else {
+			CoilAirInletNode = UserCoil( CoilIndex ).Air( 1 ).InletNodeNum;
+		}
+
+	}
+
+	void
+	GetUserDefinedCoilAirOutletNode(
+		std::string const & CoilName,
+		int & CoilAirOutletNode,
+		bool & ErrorsFound,
+		std::string const CurrentModuleObject
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   July 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine gets a given user defined Cooling Coil's air outlet node -- issues error message if that
+		// coil is not a legal user defined Cooling Coil and sets air node to 0, otherwise, returns outlet air node number.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItem;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int CoilIndex;
+
+		// Obtains and allocates TESCoil related parameters from input file
+		if ( GetInput ) { // First time subroutine has been called, get input data
+			GetUserDefinedComponents();
+			GetInput = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
+		}
+
+		if ( NumUserCoils > 0 ) {
+			CoilIndex = FindItem( CoilName, UserCoil.Name(), NumUserCoils );
+		} else {
+			CoilIndex = 0;
+		}
+
+		if ( CoilIndex == 0 ) {
+			ShowSevereError( CurrentModuleObject + ", GetTESCoilIndex: TES Cooling Coil not found=" + CoilName );
+			ErrorsFound = true;
+			CoilAirOutletNode = 0;
+		} else {
+			CoilAirOutletNode = UserCoil( CoilIndex ).Air( 1 ).OutletNodeNum;
+		}
+
+	}
+
 	//     NOTICE
 
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

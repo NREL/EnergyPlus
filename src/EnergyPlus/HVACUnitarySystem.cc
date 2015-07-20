@@ -50,6 +50,8 @@
 #include <WaterToAirHeatPump.hh>
 #include <WaterToAirHeatPumpSimple.hh>
 #include <SimAirServingZones.hh>
+#include <PackagedThermalStorageCoil.hh>
+#include <UserDefinedComponents.hh>
 
 namespace EnergyPlus {
 
@@ -2560,6 +2562,12 @@ namespace HVACUnitarySystem {
 		using EMSManager::ManageEMS;
 		using SetPointManager::NodeHasSPMCtrlVarType;
 		using SetPointManager::iCtrlVarType_Temp;
+		using PackagedThermalStorageCoil::GetTESCoilIndex;
+		using PackagedThermalStorageCoil::GetTESCoilAirInletNode;
+		using PackagedThermalStorageCoil::GetTESCoilAirOutletNode;
+		using UserDefinedComponents::GetUserDefinedCoilIndex;
+		using UserDefinedComponents::GetUserDefinedCoilAirInletNode;
+		using UserDefinedComponents::GetUserDefinedCoilAirOutletNode;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3615,6 +3623,12 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = CoilDX_CoolingSingleSpeed;
 				} else if ( SameString( CoolingCoilType, "Coil:Cooling:DX:TwoSpeed" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = CoilDX_CoolingTwoSpeed;
+				} else if ( SameString( CoolingCoilType, "Coil:UserDefined" ) ) {
+					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = Coil_UserDefined;
+//					SimCoilUserDefined( CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive );
+				} else if ( SameString( CoolingCoilType, "Coil:Cooling:DX:SingleSpeed:ThermalStorage" ) ) {
+					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = CoilDX_PackagedThermalStorageCooling;
+//					SimTESCoil( CompName, CompIndex, FanOpMode, TESOpMode, PartLoadFrac );
 				} else {
 					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Illegal " + cAlphaFields( iCoolingCoilTypeAlphaNum ) + " = " + Alphas( iCoolingCoilTypeAlphaNum ) );
@@ -4159,6 +4173,106 @@ namespace HVACUnitarySystem {
 						if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHP || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
 							UnitarySystem( UnitarySysNum ).HeatPump = true;
 						}
+					}
+
+				} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_UserDefined ) {
+					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, CurrentModuleObject );
+					if ( IsNotOK ) {
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ErrorsFound = true;
+					} else { // mine data from Cooling coil object
+
+						errFlag = false;
+						UnitarySystem( UnitarySysNum ).CoolingCoilAvailSchPtr = ScheduleAlwaysOn;
+						if ( errFlag ) {
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ErrorsFound = true;
+							errFlag = false;
+						}
+
+						GetUserDefinedCoilIndex( CoolingCoilName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, errFlag, CurrentModuleObject );
+						if ( UnitarySystem( UnitarySysNum ).CoolingCoilIndex == 0 ) {
+							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ShowContinueError( "Illegal " + cAlphaFields( iCoolingCoilNameAlphaNum ) + " = " + CoolingCoilName );
+							ErrorsFound = true;
+							errFlag = false;
+						}
+
+// **** How to get this info ****
+//						UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = GetWtoAHPCoilCapacity( CoolingCoilType, CoolingCoilName, errFlag );
+//						if ( errFlag ) {
+//							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+//							ErrorsFound = true;
+//							errFlag = false;
+//						}
+
+						// Get the Cooling Coil Inlet Node
+						errFlag = false;
+						GetUserDefinedCoilAirInletNode( CoolingCoilName, CoolingCoilInletNode, errFlag, CurrentModuleObject );
+						if ( errFlag ) {
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ErrorsFound = true;
+							errFlag = false;
+						}
+
+						// Get the Cooling Coil Outlet Node
+						GetUserDefinedCoilAirOutletNode( CoolingCoilName, CoolingCoilOutletNode, errFlag, CurrentModuleObject );
+						if ( errFlag ) {
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ErrorsFound = true;
+							errFlag = false;
+						}
+
+					}
+
+				} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_PackagedThermalStorageCooling ) {
+					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, CurrentModuleObject );
+					if ( IsNotOK ) {
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ErrorsFound = true;
+					} else { // mine data from Cooling coil object
+
+						errFlag = false;
+						UnitarySystem( UnitarySysNum ).CoolingCoilAvailSchPtr = ScheduleAlwaysOn;
+						if ( errFlag ) {
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ErrorsFound = true;
+							errFlag = false;
+						}
+
+						GetTESCoilIndex( CoolingCoilName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, errFlag, CurrentModuleObject );
+						if ( UnitarySystem( UnitarySysNum ).CoolingCoilIndex == 0 ) {
+							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ShowContinueError( "Illegal " + cAlphaFields( iCoolingCoilNameAlphaNum ) + " = " + CoolingCoilName );
+							ErrorsFound = true;
+							errFlag = false;
+						}
+
+// **** How to get this info ****
+//						UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = GetWtoAHPCoilCapacity( CoolingCoilType, CoolingCoilName, errFlag );
+//						if ( errFlag ) {
+//							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+//							ErrorsFound = true;
+//							errFlag = false;
+//						}
+
+						// Get the Cooling Coil Inlet Node
+						errFlag = false;
+						GetTESCoilAirInletNode( CoolingCoilName, CoolingCoilInletNode, errFlag, CurrentModuleObject );
+						if ( errFlag ) {
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ErrorsFound = true;
+							errFlag = false;
+						}
+
+						// Get the Cooling Coil Outlet Node
+						GetTESCoilAirOutletNode( CoolingCoilName, CoolingCoilOutletNode, errFlag, CurrentModuleObject );
+						if ( errFlag ) {
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ErrorsFound = true;
+							errFlag = false;
+						}
+
 					}
 
 				} else { // IF(.NOT. lAlphaBlanks(16))THEN
@@ -5480,6 +5594,8 @@ namespace HVACUnitarySystem {
 				SetupEMSActuator( "AirLoopHVAC:UnitarySystem", UnitarySystem( UnitarySysNum ).Name, "Autosized Supply Air Flow Rate During Cooling Operation", "[m3/s]", UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlowEMSOverrideOn, UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlowEMSOverrideValue );
 				SetupEMSActuator( "AirLoopHVAC:UnitarySystem", UnitarySystem( UnitarySysNum ).Name, "Autosized Supply Air Flow Rate During Heating Operation", "[m3/s]", UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlowEMSOverrideOn, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlowEMSOverrideValue );
 				SetupEMSActuator( "AirLoopHVAC:UnitarySystem", UnitarySystem( UnitarySysNum ).Name, "Autosized Supply Air Flow Rate During No Heating or Cooling Operation", "[m3/s]", UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlowEMSOverrideOn, UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlowEMSOverrideValue );
+
+				SetupEMSInternalVariable( "Unitary System Control Zone Mass Flow Fraction", UnitarySystem( UnitarySysNum ).Name, "[]", UnitarySystem( UnitarySysNum ).ControlZoneMassFlowFrac );
 			}
 
 		}
@@ -7007,6 +7123,7 @@ namespace HVACUnitarySystem {
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 		using WaterToAirHeatPump::SimWatertoAirHP;
+		using UserDefinedComponents::SimCoilUserDefined;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -7027,6 +7144,13 @@ namespace HVACUnitarySystem {
 		Real64 QActual; // actual coil output (W)
 		Real64 OutdoorPressure; // Outdoor barometric pressure at condenser (Pa)
 		bool errFlag; // returned flag from called routine
+		int AirLoopNum;
+		bool HeatingActive;
+		bool CoolingActive;
+
+		AirLoopNum = 1;
+		HeatingActive = false;
+		CoolingActive = true;
 
 		// Simulate the coil component
 		CompName = UnitarySystem( UnitarySysNum ).CoolingCoilName;
@@ -7097,6 +7221,9 @@ namespace HVACUnitarySystem {
 
 			SimDXCoilMultiMode( CompName, CompOn, FirstHVACIteration, PartLoadRatio, UnitarySystem( UnitarySysNum ).DehumidificationMode, CompIndex, UnitarySystem( UnitarySysNum ).FanOpMode );
 			UnitarySystem( UnitarySysNum ).CoolCompPartLoadRatio = PartLoadRatio * double( CompOn );
+
+		} else if ( SELECT_CASE_var == Coil_UserDefined ) {
+			SimCoilUserDefined( CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive );
 
 		} else if ( ( SELECT_CASE_var == Coil_CoolingWater ) || ( SELECT_CASE_var == Coil_CoolingWaterDetailed ) ) {
 			mdot = min( Node( UnitarySystem( UnitarySysNum ).CoolCoilFluidOutletNodeNum ).MassFlowRateMaxAvail, UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow * PartLoadRatio );

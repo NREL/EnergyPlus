@@ -50,6 +50,9 @@ namespace PackagedThermalStorageCoil {
 	extern int NumTESCoils;
 	extern Array1D_bool CheckEquipName;
 	extern bool GetTESInputFlag;
+
+	extern int const DehumidControl_CoolReheat;
+
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
 	// Types
@@ -973,6 +976,39 @@ namespace PackagedThermalStorageCoil {
 	CalcTESIceStorageTank( int const TESCoilNum );
 
 	void
+	ControlTESIceStorageTankCoil(
+		std::string const CoilName,
+		int CoilIndex,
+		std::string SystemType,
+		int const FanOpMode,
+		Real64 const DesiredOutletTemp,
+		Real64 const DesiredOutletHumRat,
+		Real64 & PartLoadFrac,
+		int & TESOpMode,
+		int & ControlType,
+		int & SensPLRIter,
+		int & SensPLRIterIndex,
+		int & SensPLRFail,
+		int & SensPLRFailIndex,
+		int & LatPLRIter,
+		int & LatPLRIterIndex,
+		int & LatPLRFail,
+		int & LatPLRFailIndex
+	);
+
+	Real64
+	TESCoilResidualFunction(
+		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+		Array1< Real64 > const & Par // par(1) = DX coil number
+	);
+
+	Real64
+	TESCoilHumRatResidualFunction(
+		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+		Array1< Real64 > const & Par // par(1) = DX coil number
+	);
+
+	void
 	UpdateColdWeatherProtection( int const TESCoilNum );
 
 	void
@@ -991,6 +1027,22 @@ namespace PackagedThermalStorageCoil {
 		int & CoilIndex,
 		bool & ErrorsFound,
 		Optional_string_const CurrentModuleObject = _
+	);
+
+	void
+	GetTESCoilAirInletNode(
+		std::string const & CoilName,
+		int & CoilAirInletNode,
+		bool & ErrorsFound,
+		std::string const CurrentModuleObject
+	);
+
+	void
+	GetTESCoilAirOutletNode(
+		std::string const & CoilName,
+		int & CoilAirOutletNode,
+		bool & ErrorsFound,
+		std::string const CurrentModuleObject
 	);
 
 	//     NOTICE
