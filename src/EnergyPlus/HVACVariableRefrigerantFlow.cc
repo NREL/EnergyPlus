@@ -7398,7 +7398,6 @@ namespace HVACVariableRefrigerantFlow {
 		if ( VRF( VRFCond ).CondenserType == AirCooled ) {
 			CondInletTemp = OutdoorDryBulb; // Outdoor dry-bulb temp
 		} else if ( VRF( VRFCond ).CondenserType == EvapCooled ) {
-			RhoAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat );
 			CondAirMassFlow = RhoAir * VRF( VRFCond ).EvapCondAirVolFlowRate;
 			// (Outdoor wet-bulb temp from DataEnvironment) + (1.0-EvapCondEffectiveness) * (drybulb - wetbulb)
 			CondInletTemp = OutdoorWetBulb + ( OutdoorDryBulb - OutdoorWetBulb ) * ( 1.0 - VRF( VRFCond ).EvapCondEffectiveness );
@@ -7442,542 +7441,832 @@ namespace HVACVariableRefrigerantFlow {
 		// 2. HEATING MODE
 		// 3. Yoshi_Stop running
 		
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-// @@@@@ 1. COOLING MODE 
-if( CoolingLoad( VRFCond ) && ( TUCoolingLoad > 0.0 ) ) {
-
-	TUCoolingLoad_temp = TUCoolingLoad; // TUCoolingLoad_temp is the real indoor cooling load; TUCoolingLoad will be updated below by including Pipe_Q, so meaning is changed
-	CondFlowRatio = 1.0;
-
-	//*************************************************&&1Need to be re-considered****************************************************************
-	MaxOutdoorUnitPc = min( Psuction + VRF( VRFCond ).CompMaxDeltaP * 1000, 4000000.0 );  
-	MaxOutdoorUnitTc = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, MaxOutdoorUnitPc, RefrigerantIndex, RoutineName );
-	MinOutdoorUnitTc = OutdoorDryBulb + VRF( VRFCond ).SC;
-	MinOutdoorUnitPc = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, MinOutdoorUnitTc, RefrigerantIndex, RoutineName );
-
-	// the following 3 paraemters may be updated below_zrp
-	MinRefriPe = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, -15, RefrigerantIndex, RoutineName );	//150129 @@ Yoshi -1,5d1 will be obtained from idf
-	MinOutdoorUnitPe = max( MinOutdoorUnitPc - VRF( VRFCond ).CompMaxDeltaP * 1000, MinRefriPe );
-	MinOutdoorUnitTe = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, MinOutdoorUnitPe, RefrigerantIndex, RoutineName );
-
-	CompEvaporatingCAPSpdMin = CurveValue( VRF( VRFCond ).OUCoolingCAPFT( 1 ), MinOutdoorUnitTc, MinOutdoorUnitTe ); //MinOutdoorUnitTc is provisional ?? Yoshi: only used for deciding cycle or not; fake
-	CompEvaporatingPWRSpdMin = CurveValue( VRF( VRFCond ).OUCoolingPWRFT( 1 ), MinOutdoorUnitTc, MinOutdoorUnitTe ); //MinOutdoorUnitTc is provisional ??
-
-	//********************************************************************************************************************************************
+		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		// @@@@@ 1. COOLING MODE 
+		if( CoolingLoad( VRFCond ) && ( TUCoolingLoad > 0.0 ) ) {
 		
-	// Yoshi_ start( New Piping Loss Algorithm_Cooling_1, 0920 )
-	//--- Calculate Pipe_T_room 
-	Pipe_T_room = 0;
-	NumIUActivated = 0; //Count IU that are activated
-	for ( NumTU = 1; NumTU <= NumTUInList; NumTU++ ) {
-		if( TerminalUnitList( TUListNum ).TU_SH( NumTU ) < 20 ){
-			Pipe_T_room = Pipe_T_room + TerminalUnitList( TUListNum ).TU_IADT( NumTU );
-			NumIUActivated = NumIUActivated + 1;
-		}
-	} 
-	if( NumIUActivated > 0 ) 
-		Pipe_T_room = Pipe_T_room/NumIUActivated;
-	else
-		Pipe_T_room = 24;
-
-	VRF( VRFCond ).EvaporatingTemp = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, Pevap, RefrigerantIndex, RoutineName );
-
-	Pipe_h_IU_in_low = GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, OutdoorDryBulb - VRF( VRFCond ).SC, 0.0,   RefrigerantIndex, RoutineName ); // Tc = Tamb
-	Pipe_h_IU_in_up  = GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, MaxOutdoorUnitTc - VRF( VRFCond ).SC, 0.0,   RefrigerantIndex, RoutineName ); // Tc = MaxOutdoorUnitTc
-	Pipe_h_IU_in     = GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, OutdoorDryBulb + 10 - VRF( VRFCond ).SC,  0.0, RefrigerantIndex, RoutineName ); // Tc = Tamb+10
-
-	NumIteHIUIn = 1; //0924
-	// @@ Assume H_A( enthalpy of refrigerant at the inlet of IU coils )
-	Label12: ;
-	Pipe_m_ref = 0; // Total Ref Flow Rate( kg/s )
-	Pipe_h_IU_out = 0;    // Enthalpy_before pipe loss
-
-	Pipe_h_IU_out_i = 0;   // hB_i: Enthalpy_before pipe loss( for each IU )
-	Pipe_m_ref_i = 0; // m_i: Ref Flow Rate in each IU( kg/s )
-	Pipe_SH_merged = 0; // SH_merged
-
-	//--- Calculate total refrigerant flow rate, Step 2.1
-	for ( NumTU = 1; NumTU <= NumTUInList; NumTU++ ){ // Calc total refrigerant flow rate		   
-	    if( TerminalUnitList( TUListNum ).TU_SH( NumTU ) < 20  ) { //?? if( TerminalUnitList( TUListNum ).TotalHeatLoad( NumTU ) > 0  ) @@
-	        Pipe_h_IU_out_i = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp + TerminalUnitList( TUListNum ).TU_SH( NumTU ), Pevap, RefrigerantIndex, RoutineName );
-	    
-		    if( Pipe_h_IU_out_i > Pipe_h_IU_in  ) {
-		        Pipe_m_ref_i = TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU ) /( Pipe_h_IU_out_i - Pipe_h_IU_in ); //Ref Flow Rate in the IU( kg/s )
-		        Pipe_m_ref  = Pipe_m_ref + Pipe_m_ref_i;
-		        Pipe_h_IU_out = Pipe_h_IU_out + Pipe_m_ref_i * Pipe_h_IU_out_i;
-		        Pipe_SH_merged = Pipe_SH_merged + Pipe_m_ref_i * TerminalUnitList( TUListNum ).TU_SH( NumTU );
-		    }
-	    }
-	}     
-
-	if( Pipe_m_ref > 0 ) {
-		Pipe_h_IU_out = Pipe_h_IU_out/Pipe_m_ref;
-		Pipe_SH_merged = Pipe_SH_merged / Pipe_m_ref; //SH_merged  0923: theoreticaly, it is not correct. It should be calculated from Pipe_h_IU_out & Pe
-	} else {
-		Pipe_h_IU_out = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp + VRF( VRFCond ).SH, Pevap, RefrigerantIndex, RoutineName ); 
-		Pipe_SH_merged = VRF( VRFCond ).SH; //0923 Wrong. It will be upadated later. @@
-	}
-
-	if( VRF( VRFCond ).RefPipDia <= 0 ) VRF( VRFCond ).RefPipDia = 0.025;  
-	
-	//0312 Yoshi start
-	Ref_Coe_v1 = Pevap/1000000/ 4.926;
-	Ref_Coe_v2 = Pipe_h_IU_out / 383.5510343;
-	Ref_Coe_v3 =( VRF( VRFCond ).EvaporatingTemp+Pipe_SH_merged + 273.15 ) / 344.39; 
-	Pipe_viscosity_ref = 4.302 * Ref_Coe_v1 + 0.81622 * pow_2( Ref_Coe_v1 ) - 120.98 * Ref_Coe_v2 + 139.17 * pow_2( Ref_Coe_v2 ) + 118.76 * Ref_Coe_v3 + 81.04 * pow_2( Ref_Coe_v3 ) + 5.7858 * Ref_Coe_v1 * Ref_Coe_v2 - 8.3817 * Ref_Coe_v1 * Ref_Coe_v3 - 218.48 * Ref_Coe_v2 * Ref_Coe_v3 + 21.58;
-	//0312 Yoshi end
-	
-	Pipe_v_ref  = Pipe_m_ref / ( 3.141593 * pow_2( VRF( VRFCond ).RefPipDia ) * 0.25 ) / GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp+Pipe_SH_merged, Pevap, RefrigerantIndex, RoutineName );
-	Pipe_Num_Re = Pipe_m_ref / ( 3.141593 * pow_2( VRF( VRFCond ).RefPipDia ) * 0.25 ) * VRF( VRFCond ).RefPipDia / Pipe_viscosity_ref * 1000000;
-	Pipe_Num_Pr = Pipe_viscosity_ref * Pipe_cp_ref * 0.001 / Pipe_conductivity_ref;
-	Pipe_Num_Nu = 0.023 * std::pow( Pipe_Num_Re, 0.8) * std::pow( Pipe_Num_Pr, 0.3 );
-	Pipe_Num_St = Pipe_Num_Nu / Pipe_Num_Re / Pipe_Num_Pr;
-	
-	Pipe_DeltP = 8 * Pipe_Num_St * std::pow( Pipe_Num_Pr, 0.6667 ) * VRF( VRFCond ).RefPipLen / VRF( VRFCond ).RefPipDia * GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp + Pipe_SH_merged, Pevap, RefrigerantIndex, RoutineName ) * pow_2( Pipe_v_ref ) / 2 - VRF( VRFCond ).RefPipHei*GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp + Pipe_SH_merged, Pevap, RefrigerantIndex, RoutineName ) *9.80665;
-	
-	Pipe_Coe_k1 = Pipe_Num_Nu * Pipe_viscosity_ref;
-	Pipe_Coe_k3 = VRF( VRFCond ).RefPipInsH *( VRF( VRFCond ).RefPipDia + 2 * VRF( VRFCond ).RefPipInsThi );
-	if(  VRF( VRFCond ).RefPipInsThi >= 0.0 )
-		Pipe_Coe_k2 = 2 * VRF( VRFCond ).RefPipInsCon / std::log(  1.0 + 2 * VRF( VRFCond ).RefPipInsThi / VRF( VRFCond ).RefPipDia  );
-	else
-		Pipe_Coe_k2 = 9999.9; // 1/k2 is close to 0
-
-	Pipe_Q = ( 3.141593 * VRF( VRFCond ).RefPipLen ) * ( OutdoorDryBulb / 2 + Pipe_T_room / 2 - VRF( VRFCond ).EvaporatingTemp - Pipe_SH_merged ) / ( 1 / Pipe_Coe_k1 + 1 / Pipe_Coe_k2 + 1 / Pipe_Coe_k3  ); // [W] 
-
-	Tsuction = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, Pevap - Pipe_DeltP, RefrigerantIndex, RoutineName );
-	//0923_Start: suction SH'( Pipe_T_comp_in - Tsuction ) is calculated, then  Modifi_SH will be updated 
-
-		Pipe_h_comp_in = Pipe_h_IU_out + Pipe_Q / Pipe_m_ref; //Pipe_h_comp_in is the enthalpy at the inlet of compressor
+			TUCoolingLoad_temp = TUCoolingLoad; // TUCoolingLoad_temp is the real indoor cooling load; TUCoolingLoad will be updated below by including Pipe_Q, so meaning is changed
+			CondFlowRatio = 1.0;
 		
-		//0923: Perform iteration to calculate Pipe_T_Suction
-		for ( Pipe_T_comp_in = Tsuction + 3; Pipe_T_comp_in <= Tsuction + 30; Pipe_T_comp_in++ ){
-			Pipe_h_comp_in_assumed = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Pipe_T_comp_in, Pevap - Pipe_DeltP, RefrigerantIndex, RoutineName );	
+			//*************************************************&&1Need to be re-considered****************************************************************
+			MaxOutdoorUnitPc = min( Psuction + VRF( VRFCond ).CompMaxDeltaP * 1000, 4000000.0 );  
+			MaxOutdoorUnitTc = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, MaxOutdoorUnitPc, RefrigerantIndex, RoutineName );
+			MinOutdoorUnitTc = OutdoorDryBulb + VRF( VRFCond ).SC;
+			MinOutdoorUnitPc = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, MinOutdoorUnitTc, RefrigerantIndex, RoutineName );
+		
+			// the following 3 paraemters may be updated below_zrp
+			MinRefriPe = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, -15, RefrigerantIndex, RoutineName );	//150129 @@ Yoshi -1,5d1 will be obtained from idf
+			MinOutdoorUnitPe = max( MinOutdoorUnitPc - VRF( VRFCond ).CompMaxDeltaP * 1000, MinRefriPe );
+			MinOutdoorUnitTe = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, MinOutdoorUnitPe, RefrigerantIndex, RoutineName );
+		
+			CompEvaporatingCAPSpdMin = CurveValue( VRF( VRFCond ).OUCoolingCAPFT( 1 ), MinOutdoorUnitTc, MinOutdoorUnitTe ); //MinOutdoorUnitTc is provisional ?? Yoshi: only used for deciding cycle or not; fake
+			CompEvaporatingPWRSpdMin = CurveValue( VRF( VRFCond ).OUCoolingPWRFT( 1 ), MinOutdoorUnitTc, MinOutdoorUnitTe ); //MinOutdoorUnitTc is provisional ??
+		
+			//********************************************************************************************************************************************
+				
+			// Yoshi_ start( New Piping Loss Algorithm_Cooling_1, 0920 )
+			//--- Calculate Pipe_T_room 
+			Pipe_T_room = 0;
+			NumIUActivated = 0; //Count IU that are activated
+			for ( NumTU = 1; NumTU <= NumTUInList; NumTU++ ) {
+				if( TerminalUnitList( TUListNum ).TU_SH( NumTU ) < 20 ){
+					Pipe_T_room = Pipe_T_room + TerminalUnitList( TUListNum ).TU_IADT( NumTU );
+					NumIUActivated = NumIUActivated + 1;
+				}
+			} 
+			if( NumIUActivated > 0 ) 
+				Pipe_T_room = Pipe_T_room / NumIUActivated;
+			else
+				Pipe_T_room = 24;
+		
+			VRF( VRFCond ).EvaporatingTemp = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, Pevap, RefrigerantIndex, RoutineName );
+		
+			Pipe_h_IU_in_low = GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, OutdoorDryBulb - VRF( VRFCond ).SC, 0.0,   RefrigerantIndex, RoutineName ); // Tc = Tamb
+			Pipe_h_IU_in_up  = GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, MaxOutdoorUnitTc - VRF( VRFCond ).SC, 0.0,   RefrigerantIndex, RoutineName ); // Tc = MaxOutdoorUnitTc
+			Pipe_h_IU_in     = GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, OutdoorDryBulb + 10 - VRF( VRFCond ).SC,  0.0, RefrigerantIndex, RoutineName ); // Tc = Tamb+10
+		
+			NumIteHIUIn = 1; //0924
+			// @@ Assume H_A( enthalpy of refrigerant at the inlet of IU coils )
+			Label12: ;
+			Pipe_m_ref = 0; // Total Ref Flow Rate( kg/s )
+			Pipe_h_IU_out = 0;    // Enthalpy_before pipe loss
+		
+			Pipe_h_IU_out_i = 0;   // hB_i: Enthalpy_before pipe loss( for each IU )
+			Pipe_m_ref_i = 0; // m_i: Ref Flow Rate in each IU( kg/s )
+			Pipe_SH_merged = 0; // SH_merged
+		
+			//--- Calculate total refrigerant flow rate, Step 2.1
+			for ( NumTU = 1; NumTU <= NumTUInList; NumTU++ ){ // Calc total refrigerant flow rate		   
+			    if( TerminalUnitList( TUListNum ).TU_SH( NumTU ) < 20  ) { //?? if( TerminalUnitList( TUListNum ).TotalHeatLoad( NumTU ) > 0  ) @@
+			        Pipe_h_IU_out_i = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp + TerminalUnitList( TUListNum ).TU_SH( NumTU ), Pevap, RefrigerantIndex, RoutineName );
+			    
+				    if( Pipe_h_IU_out_i > Pipe_h_IU_in  ) {
+				        Pipe_m_ref_i = TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU ) /( Pipe_h_IU_out_i - Pipe_h_IU_in ); //Ref Flow Rate in the IU( kg/s )
+				        Pipe_m_ref  = Pipe_m_ref + Pipe_m_ref_i;
+				        Pipe_h_IU_out = Pipe_h_IU_out + Pipe_m_ref_i * Pipe_h_IU_out_i;
+				        Pipe_SH_merged = Pipe_SH_merged + Pipe_m_ref_i * TerminalUnitList( TUListNum ).TU_SH( NumTU );
+				    }
+			    }
+			}     
+		
+			if( Pipe_m_ref > 0 ) {
+				Pipe_h_IU_out = Pipe_h_IU_out/Pipe_m_ref;
+				Pipe_SH_merged = Pipe_SH_merged / Pipe_m_ref; //SH_merged  0923: theoreticaly, it is not correct. It should be calculated from Pipe_h_IU_out & Pe
+			} else {
+				Pipe_h_IU_out = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp + VRF( VRFCond ).SH, Pevap, RefrigerantIndex, RoutineName ); 
+				Pipe_SH_merged = VRF( VRFCond ).SH; //0923 Wrong. It will be upadated later. @@
+			}
+		
+			if( VRF( VRFCond ).RefPipDia <= 0 ) VRF( VRFCond ).RefPipDia = 0.025;  
 			
-			if( Pipe_h_comp_in_assumed > Pipe_h_comp_in )  break; 
-		}
-		if( Pipe_T_comp_in > ( Tsuction +30 ) ) Pipe_T_comp_in = Tsuction + 3;
+			//0312 Yoshi start
+			Ref_Coe_v1 = Pevap/1000000/ 4.926;
+			Ref_Coe_v2 = Pipe_h_IU_out / 383.5510343;
+			Ref_Coe_v3 =( VRF( VRFCond ).EvaporatingTemp+Pipe_SH_merged + 273.15 ) / 344.39; 
+			Pipe_viscosity_ref = 4.302 * Ref_Coe_v1 + 0.81622 * pow_2( Ref_Coe_v1 ) - 120.98 * Ref_Coe_v2 + 139.17 * pow_2( Ref_Coe_v2 ) + 118.76 * Ref_Coe_v3 + 81.04 * pow_2( Ref_Coe_v3 ) + 5.7858 * Ref_Coe_v1 * Ref_Coe_v2 - 8.3817 * Ref_Coe_v1 * Ref_Coe_v3 - 218.48 * Ref_Coe_v2 * Ref_Coe_v3 + 21.58;
+			//0312 Yoshi end
+			
+			Pipe_v_ref  = Pipe_m_ref / ( 3.141593 * pow_2( VRF( VRFCond ).RefPipDia ) * 0.25 ) / GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp+Pipe_SH_merged, Pevap, RefrigerantIndex, RoutineName );
+			Pipe_Num_Re = Pipe_m_ref / ( 3.141593 * pow_2( VRF( VRFCond ).RefPipDia ) * 0.25 ) * VRF( VRFCond ).RefPipDia / Pipe_viscosity_ref * 1000000;
+			Pipe_Num_Pr = Pipe_viscosity_ref * Pipe_cp_ref * 0.001 / Pipe_conductivity_ref;
+			Pipe_Num_Nu = 0.023 * std::pow( Pipe_Num_Re, 0.8) * std::pow( Pipe_Num_Pr, 0.3 );
+			Pipe_Num_St = Pipe_Num_Nu / Pipe_Num_Re / Pipe_Num_Pr;
+			
+			Pipe_DeltP = 8 * Pipe_Num_St * std::pow( Pipe_Num_Pr, 0.6667 ) * VRF( VRFCond ).RefPipLen / VRF( VRFCond ).RefPipDia * GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp + Pipe_SH_merged, Pevap, RefrigerantIndex, RoutineName ) * pow_2( Pipe_v_ref ) / 2 - VRF( VRFCond ).RefPipHei*GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp + Pipe_SH_merged, Pevap, RefrigerantIndex, RoutineName ) *9.80665;
+			
+			Pipe_Coe_k1 = Pipe_Num_Nu * Pipe_viscosity_ref;
+			Pipe_Coe_k3 = VRF( VRFCond ).RefPipInsH *( VRF( VRFCond ).RefPipDia + 2 * VRF( VRFCond ).RefPipInsThi );
+			if(  VRF( VRFCond ).RefPipInsThi >= 0.0 )
+				Pipe_Coe_k2 = 2 * VRF( VRFCond ).RefPipInsCon / std::log(  1.0 + 2 * VRF( VRFCond ).RefPipInsThi / VRF( VRFCond ).RefPipDia  );
+			else
+				Pipe_Coe_k2 = 9999.9; // 1/k2 is close to 0
 		
-		Modifi_SH = Pipe_T_comp_in - Tsuction; //0923 This Modifi_SH is used for rps > 18; will be updated for rps = 18 //0130 right//
-		Modifi_Pe = Pevap - Pipe_DeltP; //0923  This Modifi_Pe is used for rps > 18; will be updated for rps = 18  
-
-	//0923_End: suction SH'( Pipe_T_comp_in - Tsuction ) is calculated, then  Modifi_SH will be updated
-
-	TUCoolingLoad = TUCoolingLoad_temp + Pipe_Q;
-
-	// Yoshi_ end( New Piping Loss Algorithm_Cooling_1, 09/20 )  
-
-	
-	//150127_Yoshi
-	C_cap_density = GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + 8,         Modifi_Pe, RefrigerantIndex, RoutineName )   
-				  / GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + Modifi_SH, Modifi_Pe, RefrigerantIndex, RoutineName );  
-				  
-	C_cap_enthalpy =( GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + 8,      Modifi_Pe, RefrigerantIndex, RoutineName ) 
-					- GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName,  MinOutdoorUnitTc - 5, 0.0, RefrigerantIndex, RoutineName ) ) 
-					/( Pipe_h_comp_in - Pipe_h_IU_in );
+			Pipe_Q = ( 3.141593 * VRF( VRFCond ).RefPipLen ) * ( OutdoorDryBulb / 2 + Pipe_T_room / 2 - VRF( VRFCond ).EvaporatingTemp - Pipe_SH_merged ) / ( 1 / Pipe_Coe_k1 + 1 / Pipe_Coe_k2 + 1 / Pipe_Coe_k3  ); // [W] 
+		
+			Tsuction = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, Pevap - Pipe_DeltP, RefrigerantIndex, RoutineName );
+			//0923_Start: suction SH'( Pipe_T_comp_in - Tsuction ) is calculated, then  Modifi_SH will be updated 
+		
+				Pipe_h_comp_in = Pipe_h_IU_out + Pipe_Q / Pipe_m_ref; //Pipe_h_comp_in is the enthalpy at the inlet of compressor
+				
+				//0923: Perform iteration to calculate Pipe_T_Suction
+				for ( Pipe_T_comp_in = Tsuction + 3; Pipe_T_comp_in <= Tsuction + 30; Pipe_T_comp_in++ ){
+					Pipe_h_comp_in_assumed = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Pipe_T_comp_in, Pevap - Pipe_DeltP, RefrigerantIndex, RoutineName );	
 					
-	C_cap_operation = C_cap_density * C_cap_enthalpy;
-	//150127_Yoshi_end
-
-	
-	if( TUCoolingLoad*C_cap_operation <= CompEvaporatingCAPSpdMin ) { //compressor cycling ?? 
-	//Yoshi 0710: This part would be updated later: CompEvaporatingCAPSpdMin is a fake value, so it should be dealt with
-		// TUCoolingLoad*C_cap_operation is Q_rps_modify, zrp, 0312
-		Path = 1;
-	
-		//150129 Yoshi
-		CyclingRatio = TUCoolingLoad * C_cap_operation / CompEvaporatingCAPSpdMin;
-
-		NcompCooling = CompEvaporatingPWRSpd( 1 ) * CyclingRatio;
-		CompSpdActual = VRF( VRFCond ).CompressorSpeed( 1 );
+					if( Pipe_h_comp_in_assumed > Pipe_h_comp_in )  break; 
+				}
+				if( Pipe_T_comp_in > ( Tsuction +30 ) ) Pipe_T_comp_in = Tsuction + 3;
+				
+				Modifi_SH = Pipe_T_comp_in - Tsuction; //0923 This Modifi_SH is used for rps > 18; will be updated for rps = 18 //0130 right//
+				Modifi_Pe = Pevap - Pipe_DeltP; //0923  This Modifi_Pe is used for rps > 18; will be updated for rps = 18  
 		
-		VRF( VRFCond ).CondensingTemp = MinOutdoorUnitTc;
-		//150129 Yosh end
-	  
-	} else {//compressor not cycling :Determine Tc( VRF( VRFCond ).CondensingTemp )
-		// Since: if( TUCoolingLoad <= CompEvaporatingCAPSpdMin )
-
-
-	}
-
-	
-	if( TUCoolingLoad*C_cap_operation <= CompEvaporatingCAPSpdMin ) { //compressor cycling ?? 
-	//Yoshi 0710: This part would be updated later: CompEvaporatingCAPSpdMin is a fake value, so it should be dealt with
-		// TUCoolingLoad*C_cap_operation is Q_rps_modify, zrp, 0312
-		Path = 1;
-		// ...
-	  
-	} else {//compressor not cycling :Determine Tc( VRF( VRFCond ).CondensingTemp )
-		// Since: if( TUCoolingLoad <= CompEvaporatingCAPSpdMin )
-
-		Label10: ;
-		CondHeatRel = TUCoolingLoad + NcompPriCooling; //&&+ Pipe_Q was added into TUCoolingLoad
+			//0923_End: suction SH'( Pipe_T_comp_in - Tsuction ) is calculated, then  Modifi_SH will be updated
 		
-		TcondOut = OutdoorDryBulb + CondHeatRel / 1005.0 / VRF( VRFCond ).MaxCondFlow / RhoAir;
-		Tcondh2  = OutdoorDryBulb + ( TcondOut-OutdoorDryBulb ) / ( 1 - VRF( VRFCond ).BFC );
-		deltaT = VRF( VRFCond ).C3Tc * pow_2( VRF( VRFCond ).SC ) + VRF( VRFCond ).C2Tc * VRF( VRFCond ).SC + VRF( VRFCond ).C1Tc;
-		VRF( VRFCond ).CondensingTemp = Tcondh2 + deltaT; // @@ Tc _ zrp, 0310
-		// VRF( VRFCond ).CondensingTemp = min( VRF( VRFCond ).CondensingTemp, MaxOutdoorUnitTc ) // @@ Tc _ zrp, 0310 ??? It is fine to use it 
-
-		for ( CounterCompSpdTemp = 1; CounterCompSpdTemp <= NumOfCompSpdInput; CounterCompSpdTemp++ ){
-		// DoName1: Do CounterCompSpdTemp = 1, NumOfCompSpdInput
-								
-			CompEvaporatingPWRSpd( CounterCompSpdTemp ) = CurveValue( VRF( VRFCond ).OUCoolingPWRFT( CounterCompSpdTemp ), VRF( VRFCond ).CondensingTemp, Tsuction );
-			CompEvaporatingCAPSpd( CounterCompSpdTemp ) = CurveValue( VRF( VRFCond ).OUCoolingCAPFT( CounterCompSpdTemp ), VRF( VRFCond ).CondensingTemp, Tsuction );
-		  
-			//150127_Yoshi, C_cap_operation is re-calculated due to the update of Tc( from MinOutdoorUnitTc to  VRF( VRFCond ).CondensingTemp ), Modifi_SH, ...
-			C_cap_density = GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + 8,         Modifi_Pe, RefrigerantIndex, RoutineName )  
-						  / GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + Modifi_SH, Modifi_Pe, RefrigerantIndex, RoutineName );
-
-			C_cap_enthalpy =( GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + 8,      Modifi_Pe, RefrigerantIndex, RoutineName )
-							- GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).CondensingTemp - 5 ,  0.0, RefrigerantIndex, RoutineName ) )
-							/( Pipe_h_comp_in - Pipe_h_IU_in ); //VRF( VRFCond ).CondensingTemp is updated
-
+			TUCoolingLoad = TUCoolingLoad_temp + Pipe_Q;
+		
+			// Yoshi_ end( New Piping Loss Algorithm_Cooling_1, 09/20 )  
+		
+			
+			//150127_Yoshi
+			C_cap_density = GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + 8,         Modifi_Pe, RefrigerantIndex, RoutineName )   
+						  / GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + Modifi_SH, Modifi_Pe, RefrigerantIndex, RoutineName );  
+						  
+			C_cap_enthalpy =( GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + 8,      Modifi_Pe, RefrigerantIndex, RoutineName ) 
+							- GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName,  MinOutdoorUnitTc - 5, 0.0, RefrigerantIndex, RoutineName ) ) 
+							/( Pipe_h_comp_in - Pipe_h_IU_in );
+							
 			C_cap_operation = C_cap_density * C_cap_enthalpy;
 			//150127_Yoshi_end
-		 
-// NG( rps=18 ) 
-			// if( TUCoolingLoad <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) ) 
-			if( TUCoolingLoad * C_cap_operation <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) ) {
-			// Compressor speed stage CounterCompSpdTemp need not to be increased
-			Path = 2; //0924
-			  
-				if( CounterCompSpdTemp <= 1 ) {
-				//rps = 18
-				
-// 150201 Yoshi					
-					//*******************150130 New Iteration*******************
-					Pipe_Q0 = Pipe_Q;
-					C_cap_operation0 = C_cap_operation;
-					Tc0 = VRF( VRFCond ).CondensingTemp;
-					NumIteCcap = 1;
-					
-					//@@ Update the C_cap_operation
-					Label13: ;
-					TUCoolingLoad = TUCoolingLoad_temp + Pipe_Q0; //Pipe_Q0 is updated during the iteration //150130 Yoshi
-					
-					Pipe_h_IU_in  = GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Tc0-VRF( VRFCond ).SC,  0.0, RefrigerantIndex, RoutineName );
-// 150201 Yoshi end		
-					CompSpdActual = VRF( VRFCond ).CompressorSpeed( 1 );
-					//Par( 1 ) = VRF( VRFCond ).CondensingTemp
-					Par( 1 ) = Tc0;
-					//Par( 2 ) = TUCoolingLoad
-					Par( 2 ) = TUCoolingLoad*C_cap_operation0;  // 150130 To be confirmed
-					Par( 3 ) = VRF( VRFCond ).OUCoolingCAPFT( CounterCompSpdTemp );
-					
-					// Update Te'( MinOutdoorUnitTe ) to meet the required evaporator capacity
-					MinOutdoorUnitTe = 6; //0916  Range:in the case of small load, minimum Te could be less than 6 and should be bigger than Tc-dT( Pc-dp ) 
-					Pdischarge = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).CondensingTemp, RefrigerantIndex, RoutineName );
-					
-					MinRefriPe = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, -15, RefrigerantIndex, RoutineName );
-					MinOutdoorUnitPe = max( Pdischarge - VRF( VRFCond ).CompMaxDeltaP * 1000, MinRefriPe );
-					MinOutdoorUnitTe = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, MinOutdoorUnitPe, RefrigerantIndex, RoutineName );
-					
-					SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual, MinOutdoorUnitTe, Tsuction, Par ); // SmallLoadTe is the updated Te'
-					if( SolFla < 0 ) SmallLoadTe = MinOutdoorUnitTe; //SmallLoadTe( Te'_new ) is constant during iterations
-					
-					//Yoshi_ start( N_comp Modification Algorithm 1 ) // ?Yoshi_double check
-					
-					//@@@@@@@@@@@@@ Iteration_Te Start @@@@@@@@@@@@@
-					
-					NumIteTe = 1;//0924
-					Pipe_Te_assumed = VRF( VRFCond ).EvaporatingTemp - 0.1; // Assumed Te  -initial value
-					
-					// Assumed Te
-					Label11: ;
-					Pipe_m_ref = 0; // Total Ref Flow Rate( kg/s )
-					
-					//@ Re-calculate Piping loss due to the Te and SH updates_start
-					Pipe_h_IU_out = 0;
-					Pipe_h_IU_out_i = 0;  // hB_i: Enthalpy_before pipe loss( for each IU )
-					Pipe_m_ref_i = 0; // m_i: Ref Flow Rate in each IU( kg/s )
-					Pipe_SH_merged = 0; // SH_merged
-					Pipe_Pe_assumed = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, Pipe_Te_assumed, RefrigerantIndex, RoutineName ); // Pe corresponding to Assumed Te
-					
-					for ( NumTU = 1; NumTU <= NumTUInList; NumTU++ ){
-					// DO NumTU = 1, NumTUInList // Calc total refrigerant flow rate
-					    if( TerminalUnitList( TUListNum ).TU_SH( NumTU ) < 20 ) { //?? if( TerminalUnitList( TUListNum ).TotalHeatLoad( NumTU ) > 0 )
-						  	Tfs = VRF( VRFCond ).EvaporatingTemp +( VRF( VRFCond ).C3Te * pow_2( TerminalUnitList( TUListNum ).TU_SH( NumTU ) ) + VRF( VRFCond ).C2Te*TerminalUnitList( TUListNum ).TU_SH( NumTU ) + VRF( VRFCond ).C1Te );
-						  	
-						  	// Modifi_SH is the updated SH for a specific IU
-						  	if( VRF( VRFCond ).C3Te == 0 )  
-						  		Modifi_SHin = -( VRF( VRFCond ).C1Te - Tfs + Pipe_Te_assumed )/VRF( VRFCond ).C2Te; //150130 Modifi_SH>Modifi_SHin
-						  	else
-						  		Modifi_SHin = ( -VRF( VRFCond ).C2Te +( pow_2( VRF( VRFCond ).C2Te ) - 4 * ( VRF( VRFCond ).C1Te - Tfs + Pipe_Te_assumed ) * std::pow( VRF( VRFCond ).C3Te , 0.5 ) ) ) / ( 2*VRF( VRFCond ).C3Te );
-						  	
-//150201 Yoshi	??		  		Modifi_SHin = max( 3.0, min( 30.0, Modifi_SHin ) ) // 15 will be obtained from idf in near future _ Yoshi  This Modifi_SH is from the last order's indoor unit 
-						  	
-						  	
-						   Pipe_h_IU_out_i = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Pipe_Te_assumed + Modifi_SHin, Pipe_Pe_assumed, RefrigerantIndex, RoutineName ); // hB_i for the IU 
-						   //print *, "GetSupHeatEnthalpyRefrig@Pipe_h_IU_out_i:", char( 9 ), Pipe_h_comp_in_assumed
-						   
-						   if( Pipe_h_IU_out_i > Pipe_h_IU_in ) {
-						     Pipe_m_ref_i = TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU ) /( Pipe_h_IU_out_i - Pipe_h_IU_in ); //Ref Flow Rate in the IU( kg/s )
-						     Pipe_m_ref = Pipe_m_ref + Pipe_m_ref_i;
-						     Pipe_SH_merged = Pipe_SH_merged + Pipe_m_ref_i * Modifi_SHin;
-						     Pipe_h_IU_out = Pipe_h_IU_out + Pipe_m_ref_i * Pipe_h_IU_out_i;							   
-						   } 
-				        
-					    } //if( TerminalUnitList( TUListNum ).TU_SH( NumTU ) < 20 )
-					} //END DO     
-
-					if( Pipe_m_ref > 0 ) {
-						Pipe_h_IU_out = Pipe_h_IU_out/Pipe_m_ref;
-						Pipe_SH_merged = Pipe_SH_merged /Pipe_m_ref;
-//150201 Yoshi	??			Pipe_SH_merged = max( 3.0, min( 30.0, Pipe_SH_merged ) )  //151030 merged SH  check the range 
-					} else {
-						Pipe_SH_merged = VRF( VRFCond ).SH; //SH_merged_new  150130 Nedds to be confirmed
-						Pipe_h_IU_out = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Pipe_Te_assumed + Pipe_SH_merged, Pipe_Pe_assumed, RefrigerantIndex, RoutineName );
-						//print *, "GetSupHeatEnthalpyRefrig@Pipe_h_IU_out:", char( 9 ), Pipe_h_IU_out		
-					}
-
-					if( VRF( VRFCond ).RefPipDia <= 0 ) VRF( VRFCond ).RefPipDia = 0.025; // Default value, [m] 
-					
-					//0312 Yoshi start
-					Ref_Coe_v1 = Pipe_Pe_assumed / 1000000 / 4.926;
-					Ref_Coe_v2 = Pipe_h_IU_out / 383.5510343;   
-					Ref_Coe_v3 =( Pipe_Te_assumed + Pipe_SH_merged + 273.15 ) / 344.39;  
-					Pipe_viscosity_ref = 4.302 * Ref_Coe_v1 + 0.81622 * pow_2( Ref_Coe_v1 ) - 120.98 * Ref_Coe_v2+ 139.17 * pow_2( Ref_Coe_v2 ) + 118.76 * Ref_Coe_v3 + 81.04 * pow_2( Ref_Coe_v3 ) + 5.7858 * Ref_Coe_v1 * Ref_Coe_v2- 8.3817 * Ref_Coe_v1 * Ref_Coe_v3 - 218.48 * Ref_Coe_v2* Ref_Coe_v3 + 21.58;
-					//0312 Yoshi end
-
-					Pipe_v_ref  = Pipe_m_ref /( 3.141593 * pow_2( VRF( VRFCond ).RefPipDia ) * 0.25 ) / GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Pipe_Te_assumed + Pipe_SH_merged, 				Pipe_Pe_assumed, RefrigerantIndex, RoutineName );
-					Pipe_Num_Re = Pipe_m_ref /( 3.141593 * pow_2( VRF( VRFCond ).RefPipDia ) * 0.25 ) * VRF( VRFCond ).RefPipDia / Pipe_viscosity_ref * 1000000;
-					Pipe_Num_Pr = Pipe_viscosity_ref * Pipe_cp_ref * 0.001 / Pipe_conductivity_ref;
-					Pipe_Num_Nu = 0.023 * std::pow( Pipe_Num_Re, 0.8 ) * std::pow( Pipe_Num_Pr, 0.3 );
-					Pipe_Num_St = Pipe_Num_Nu/Pipe_Num_Re/Pipe_Num_Pr;
-					
-					Pipe_DeltP = 8 * Pipe_Num_St * std::pow( Pipe_Num_Pr, 0.6667 ) * VRF( VRFCond ).RefPipLen
-								/ VRF( VRFCond ).RefPipDia * GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Pipe_Te_assumed+Pipe_SH_merged, Pipe_Pe_assumed, RefrigerantIndex, RoutineName )
-								* pow_2( Pipe_v_ref ) / 2 - VRF( VRFCond ).RefPipHei*GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Pipe_Te_assumed+Pipe_SH_merged, Pipe_Pe_assumed, RefrigerantIndex, RoutineName ) *9.80665;
-
-					Pipe_Coe_k1 = Pipe_Num_Nu * Pipe_viscosity_ref;
-					Pipe_Coe_k3 = VRF( VRFCond ).RefPipInsH *( VRF( VRFCond ).RefPipDia + 2*VRF( VRFCond ).RefPipInsThi );
-	
-					if( VRF( VRFCond ).RefPipInsThi >= 0.0 ) 
-						Pipe_Coe_k2 = 2 * VRF( VRFCond ).RefPipInsCon / std::log( 1.0 + 2 * VRF( VRFCond ).RefPipInsThi / VRF( VRFCond ).RefPipDia );
-					else
-						Pipe_Coe_k2 = 9999.9; //1/k2 is close to 0
-
-					Pipe_Q =( 3.141593*VRF( VRFCond ).RefPipLen ) *(  OutdoorDryBulb/2 + Pipe_T_room/2 - Pipe_Te_assumed - Pipe_SH_merged ) /( 1/Pipe_Coe_k1 +1/Pipe_Coe_k2 + 1/Pipe_Coe_k3 ); // [W] 
-					//0923: Tsuction( Te'_new2 )
-					Tsuction = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, Pipe_Pe_assumed - Pipe_DeltP, RefrigerantIndex, RoutineName );
-
-				    MaxNumIteTe = ( VRF( VRFCond ).EvaporatingTemp - SmallLoadTe ) / 0.1 + 1; //0924 Max No. of Iterations for the Te calculations
-					
-					if( ( abs( Tsuction - SmallLoadTe ) > 0.5 ) && ( Pipe_Te_assumed < VRF( VRFCond ).EvaporatingTemp ) && ( Pipe_Te_assumed > SmallLoadTe ) && ( NumIteTe < MaxNumIteTe ) ){
-						Pipe_Te_assumed = Pipe_Te_assumed - 0.1; //0924 *( VRF( VRFCond ).EvaporatingTemp - SmallLoadTe ) // Update assumed Te
-					    NumIteTe = NumIteTe + 1;//0924
-					    goto Label11;
-					} 
-					
-					//if( abs( CompEvaporatingCAPSpd_new1 - Cap_Eva1 ) > Tolerance*Cap_Eva1 )  //Not converged
-					if( abs( Tsuction - SmallLoadTe ) > 0.5 ) {  //Not converged
-						NumIteTe = 999;
-						Tsuction = SmallLoadTe;
-						Pipe_SH_merged = 3.0;
-						Pipe_Te_assumed = SmallLoadTe + 1; // Assumed Te 0924 ??
-					}
-					
-					//@@@@@@@@@@@@@ Iteration_Te End @@@@@@@@@@@@@
-					
-					//Post-process with new Te( Pipe_Te_assumed ) and Tsuction( Te'_new2 ), Pipe_h_IU_out, Pipe_Q, Pipe_m_ref
-					
-					//0923 SH'_Start: suction SH'( Pipe_T_comp_in - Tsuction ) is calculated, then  Modifi_SH will be updated 
-					Pipe_h_comp_in = Pipe_h_IU_out + Pipe_Q/Pipe_m_ref; //Pipe_h_comp_in is the enthalpy at the inlet of compressor
-				
-					//Perform iteration to calculate Pipe_T_comp_in( Te'+SH' )
-					for ( Pipe_T_comp_in = Tsuction +3; Pipe_T_comp_in <= Tsuction +30; Pipe_T_comp_in++ ) {
-					//Do_Pipe_T_comp_in2: DO Pipe_T_comp_in = Tsuction+3, Tsuction +30 
-						Pipe_h_comp_in_assumed = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Pipe_T_comp_in, Pipe_Pe_assumed - Pipe_DeltP, RefrigerantIndex, RoutineName );
-						if( Pipe_h_comp_in_assumed > Pipe_h_comp_in ) break; //EXIT Do_Pipe_T_comp_in2  
-					} //END DO Do_Pipe_T_comp_in2
-					
-					if( Pipe_T_comp_in >( Tsuction +30 ) ) Pipe_T_comp_in = Tsuction + 3; // Pipe_T_comp_in: Tsuction + SH'_new2 
-					//0923 SH'_End: suction SH'( Pipe_T_comp_in - Tsuction ) is calculated, then  Modifi_SH will be updated 
-					
-					Modifi_SH = Pipe_T_comp_in - Tsuction;  //SH'_new2
-					Modifi_Pe = Pipe_Pe_assumed - Pipe_DeltP;  
-//150131 Yoshi end		
-//150130 Yoshi  Tc_update
-					CondHeatRel = TUCoolingLoad_temp + Pipe_Q + NcompPriCooling; //150130 Pipe_Q is changed when Tsuction is changed ->Tc is also changed
-					TcondOut = OutdoorDryBulb + CondHeatRel / 1005.0 / VRF( VRFCond ).MaxCondFlow / RhoAir;
-					Tcondh2  = OutdoorDryBulb + ( TcondOut-OutdoorDryBulb ) / ( 1 - VRF( VRFCond ).BFC );
-					deltaT = VRF( VRFCond ).C3Tc * pow_2( VRF( VRFCond ).SC ) + VRF( VRFCond ).C2Tc * VRF( VRFCond ).SC + VRF( VRFCond ).C1Tc;
-					VRF( VRFCond ).CondensingTemp = min( Tcondh2 + deltaT, MaxOutdoorUnitTc );  //0923:Tc
-					
-					//150130 Yoshi  C_cap_operation_update
-					C_cap_density = GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + 8,Modifi_Pe, RefrigerantIndex, RoutineName ) 
-									/ GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + Modifi_SH, Modifi_Pe, RefrigerantIndex, RoutineName );
-					  
-					C_cap_enthalpy =( GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + 8,Modifi_Pe, RefrigerantIndex, RoutineName ) 
-									  - GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).CondensingTemp - 5 ,  0.0, RefrigerantIndex, RoutineName ) )  
-									  /( Pipe_h_comp_in - Pipe_h_IU_in );
-					C_cap_operation = C_cap_density * C_cap_enthalpy; // C_cap_operation is updated due to the update of: Tsuction( Te' ), Modifi_SH, and VRF( VRFCond ).CondensingTemp( Tc, only for cooling )
-					
-					
-					Cap_Eva0 =( TUCoolingLoad_temp + Pipe_Q ) * C_cap_operation; //150130 New Pipe_Q & C_cap_operation
-					Cap_Eva1 = CurveValue( VRF( VRFCond ).OUCoolingCAPFT( CounterCompSpdTemp ), VRF( VRFCond ).CondensingTemp, Tsuction );  //150130 New Tc
-					
-					CapDiff = abs( Cap_Eva1 - Cap_Eva0 );
 		
-					if( ( CapDiff > ( Tolerance*Cap_Eva0 ) ) && ( NumIteCcap < 30 ) ) {    //150130 Check the Capacity difference considering New Tc & Pipe Q & C_cap_operation
-						Pipe_Q0 = Pipe_Q;
-						C_cap_operation0 = C_cap_operation; // C_cap_operation is updated due to the update of: Tsuction( Te' ), Modifi_SH, and VRF( VRFCond ).CondensingTemp( Tc, only for cooling )
-						Tc0 = VRF( VRFCond ).CondensingTemp;
-						NumIteCcap = NumIteCcap + 1;
-						goto Label13;  
-					}
-						
-					if( CapDiff >( Tolerance*Cap_Eva0 ) )  //Not converged ??? NcompCooling is not updated
-						NumIteCcap = 999;
-					else
-						NcompCooling  = CurveValue( VRF( VRFCond ).OUCoolingPWRFT( CounterCompSpdTemp ), VRF( VRFCond ).CondensingTemp, Tsuction ); //150130 Comp Input update
-						//150130_Yoshi_end 
-					
-//150130 Yoshi end						
-					
-					break; //EXIT DoName1      
-
-// OK( rps>18 )					
-				} else {// Since: if( CounterCompSpdTemp <= 1 ) 
-				//0924 Need to be updated//
-				//rps > 18
-				Path = 3;//0924
-				
-					CompSpdLB = CounterCompSpdTemp - 1;
-					CompSpdUB = CounterCompSpdTemp;
-					
-					//150127 start
-					//CompSpdActual = VRF( VRFCond ).CompressorSpeed( CompSpdLB ) +( VRF( VRFCond ).CompressorSpeed( CompSpdUB ) - VRF( VRFCond ).CompressorSpeed( CompSpdLB ) )&
-					//                 /( CompEvaporatingCAPSpd( CompSpdUB ) - CompEvaporatingCAPSpd( CompSpdLB ) ) *( TUCoolingLoad - CompEvaporatingCAPSpd( CompSpdLB ) )
-					CompSpdActual = VRF( VRFCond ).CompressorSpeed( CompSpdLB ) +( VRF( VRFCond ).CompressorSpeed( CompSpdUB ) - VRF( VRFCond ).CompressorSpeed( CompSpdLB ) ) 
-									  /( CompEvaporatingCAPSpd( CompSpdUB ) - CompEvaporatingCAPSpd( CompSpdLB ) ) *( TUCoolingLoad*C_cap_operation - CompEvaporatingCAPSpd( CompSpdLB ) );
-									  // TUCoolingLoad*C_cap_operation is used to represent the test conditions, instead of the real conditions
-					
-					NcompCooling = CompEvaporatingPWRSpd( CompSpdLB ) +( CompEvaporatingPWRSpd( CompSpdUB ) - CompEvaporatingPWRSpd( CompSpdLB ) ) /  
-								  ( VRF( VRFCond ).CompressorSpeed( CompSpdUB ) - VRF( VRFCond ).CompressorSpeed( CompSpdLB ) ) *  
-								  ( CompSpdActual - VRF( VRFCond ).CompressorSpeed( CompSpdLB ) );
-					break; //EXIT DoName1  	  
-				
-				} // End: if( CounterCompSpdTemp <= 1 ) 
-				
-			}// End: if( TUCoolingLoad <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) ) 
 			
-		} // END DO DoName1
+			if( TUCoolingLoad*C_cap_operation <= CompEvaporatingCAPSpdMin ) { //compressor cycling ?? 
+			//Yoshi 0710: This part would be updated later: CompEvaporatingCAPSpdMin is a fake value, so it should be dealt with
+				// TUCoolingLoad*C_cap_operation is Q_rps_modify, zrp, 0312
+				Path = 1;
+			
+				//150129 Yoshi
+				CyclingRatio = TUCoolingLoad * C_cap_operation / CompEvaporatingCAPSpdMin;
 		
-		CompEvaporatingCAPSpd( NumOfCompSpdInput ) = CurveValue( VRF( VRFCond ).OUCoolingCAPFT( NumOfCompSpdInput ), VRF( VRFCond ).CondensingTemp, Tsuction );
+				NcompCooling = CompEvaporatingPWRSpd( 1 ) * CyclingRatio;
+				CompSpdActual = VRF( VRFCond ).CompressorSpeed( 1 );
+				
+				VRF( VRFCond ).CondensingTemp = MinOutdoorUnitTc;
+				//150129 Yosh end
+			  
+			} else {//compressor not cycling :Determine Tc( VRF( VRFCond ).CondensingTemp )
+				// Since: if( TUCoolingLoad <= CompEvaporatingCAPSpdMin )
 		
-		if( TUCoolingLoad > CompEvaporatingCAPSpd( NumOfCompSpdInput ) ) {   //150130 Needs to be confirmed TUCoolingLoad->( TUCoolingLoad_temp+Pipe_Q )*C_cap_operation?
-		// Required cooling load is beyond the maximum system capacity
-			NcompCooling = CompEvaporatingPWRSpd( NumOfCompSpdInput );
-			CompSpdActual = VRF( VRFCond ).CompressorSpeed( NumOfCompSpdInput );
+		
+			}
+		
+			
+			if( TUCoolingLoad*C_cap_operation <= CompEvaporatingCAPSpdMin ) { //compressor cycling ?? 
+			//Yoshi 0710: This part would be updated later: CompEvaporatingCAPSpdMin is a fake value, so it should be dealt with
+				// TUCoolingLoad*C_cap_operation is Q_rps_modify, zrp, 0312
+				Path = 1;
+				// ...
+			  
+			} else {//compressor not cycling :Determine Tc( VRF( VRFCond ).CondensingTemp )
+				// Since: if( TUCoolingLoad <= CompEvaporatingCAPSpdMin )
+		
+				Label10: ;
+				CondHeatRel = TUCoolingLoad + NcompPriCooling; //&&+ Pipe_Q was added into TUCoolingLoad
+				
+				TcondOut = OutdoorDryBulb + CondHeatRel / 1005.0 / VRF( VRFCond ).MaxCondFlow / RhoAir;
+				Tcondh2  = OutdoorDryBulb + ( TcondOut-OutdoorDryBulb ) / ( 1 - VRF( VRFCond ).BFC );
+				deltaT = VRF( VRFCond ).C3Tc * pow_2( VRF( VRFCond ).SC ) + VRF( VRFCond ).C2Tc * VRF( VRFCond ).SC + VRF( VRFCond ).C1Tc;
+				VRF( VRFCond ).CondensingTemp = Tcondh2 + deltaT; // @@ Tc _ zrp, 0310
+				// VRF( VRFCond ).CondensingTemp = min( VRF( VRFCond ).CondensingTemp, MaxOutdoorUnitTc ) // @@ Tc _ zrp, 0310 ??? It is fine to use it 
+		
+				for ( CounterCompSpdTemp = 1; CounterCompSpdTemp <= NumOfCompSpdInput; CounterCompSpdTemp++ ){
+				// DoName1: Do CounterCompSpdTemp = 1, NumOfCompSpdInput
+										
+					CompEvaporatingPWRSpd( CounterCompSpdTemp ) = CurveValue( VRF( VRFCond ).OUCoolingPWRFT( CounterCompSpdTemp ), VRF( VRFCond ).CondensingTemp, Tsuction );
+					CompEvaporatingCAPSpd( CounterCompSpdTemp ) = CurveValue( VRF( VRFCond ).OUCoolingCAPFT( CounterCompSpdTemp ), VRF( VRFCond ).CondensingTemp, Tsuction );
+				  
+					//150127_Yoshi, C_cap_operation is re-calculated due to the update of Tc( from MinOutdoorUnitTc to  VRF( VRFCond ).CondensingTemp ), Modifi_SH, ...
+					C_cap_density = GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + 8,         Modifi_Pe, RefrigerantIndex, RoutineName )  
+								  / GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + Modifi_SH, Modifi_Pe, RefrigerantIndex, RoutineName );
+		
+					C_cap_enthalpy =( GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + 8,      Modifi_Pe, RefrigerantIndex, RoutineName )
+									- GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).CondensingTemp - 5 ,  0.0, RefrigerantIndex, RoutineName ) )
+									/( Pipe_h_comp_in - Pipe_h_IU_in ); //VRF( VRFCond ).CondensingTemp is updated
+		
+					C_cap_operation = C_cap_density * C_cap_enthalpy;
+					//150127_Yoshi_end
+				 
+		// NG( rps=18 ) 
+					// if( TUCoolingLoad <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) ) 
+					if( TUCoolingLoad * C_cap_operation <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) ) {
+					// Compressor speed stage CounterCompSpdTemp need not to be increased
+					Path = 2; //0924
+					  
+						if( CounterCompSpdTemp <= 1 ) {
+						//rps = 18
+						
+		// 150201 Yoshi					
+							//*******************150130 New Iteration*******************
+							Pipe_Q0 = Pipe_Q;
+							C_cap_operation0 = C_cap_operation;
+							Tc0 = VRF( VRFCond ).CondensingTemp;
+							NumIteCcap = 1;
+							
+							//@@ Update the C_cap_operation
+							Label13: ;
+							TUCoolingLoad = TUCoolingLoad_temp + Pipe_Q0; //Pipe_Q0 is updated during the iteration //150130 Yoshi
+							
+							Pipe_h_IU_in  = GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Tc0-VRF( VRFCond ).SC,  0.0, RefrigerantIndex, RoutineName );
+		// 150201 Yoshi end		
+							CompSpdActual = VRF( VRFCond ).CompressorSpeed( 1 );
+							//Par( 1 ) = VRF( VRFCond ).CondensingTemp
+							Par( 1 ) = Tc0;
+							//Par( 2 ) = TUCoolingLoad
+							Par( 2 ) = TUCoolingLoad*C_cap_operation0;  // 150130 To be confirmed
+							Par( 3 ) = VRF( VRFCond ).OUCoolingCAPFT( CounterCompSpdTemp );
+							
+							// Update Te'( MinOutdoorUnitTe ) to meet the required evaporator capacity
+							MinOutdoorUnitTe = 6; //0916  Range:in the case of small load, minimum Te could be less than 6 and should be bigger than Tc-dT( Pc-dp ) 
+							Pdischarge = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).CondensingTemp, RefrigerantIndex, RoutineName );
+							
+							MinRefriPe = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, -15, RefrigerantIndex, RoutineName );
+							MinOutdoorUnitPe = max( Pdischarge - VRF( VRFCond ).CompMaxDeltaP * 1000, MinRefriPe );
+							MinOutdoorUnitTe = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, MinOutdoorUnitPe, RefrigerantIndex, RoutineName );
+							
+							SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual, MinOutdoorUnitTe, Tsuction, Par ); // SmallLoadTe is the updated Te'
+							if( SolFla < 0 ) SmallLoadTe = MinOutdoorUnitTe; //SmallLoadTe( Te'_new ) is constant during iterations
+							
+							//Yoshi_ start( N_comp Modification Algorithm 1 ) // ?Yoshi_double check
+							
+							//@@@@@@@@@@@@@ Iteration_Te Start @@@@@@@@@@@@@
+							
+							NumIteTe = 1;//0924
+							Pipe_Te_assumed = VRF( VRFCond ).EvaporatingTemp - 0.1; // Assumed Te  -initial value
+							
+							// Assumed Te
+							Label11: ;
+							Pipe_m_ref = 0; // Total Ref Flow Rate( kg/s )
+							
+							//@ Re-calculate Piping loss due to the Te and SH updates_start
+							Pipe_h_IU_out = 0;
+							Pipe_h_IU_out_i = 0;  // hB_i: Enthalpy_before pipe loss( for each IU )
+							Pipe_m_ref_i = 0; // m_i: Ref Flow Rate in each IU( kg/s )
+							Pipe_SH_merged = 0; // SH_merged
+							Pipe_Pe_assumed = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, Pipe_Te_assumed, RefrigerantIndex, RoutineName ); // Pe corresponding to Assumed Te
+							
+							for ( NumTU = 1; NumTU <= NumTUInList; NumTU++ ){
+							// DO NumTU = 1, NumTUInList // Calc total refrigerant flow rate
+							    if( TerminalUnitList( TUListNum ).TU_SH( NumTU ) < 20 ) { //?? if( TerminalUnitList( TUListNum ).TotalHeatLoad( NumTU ) > 0 )
+								  	Tfs = VRF( VRFCond ).EvaporatingTemp +( VRF( VRFCond ).C3Te * pow_2( TerminalUnitList( TUListNum ).TU_SH( NumTU ) ) + VRF( VRFCond ).C2Te*TerminalUnitList( TUListNum ).TU_SH( NumTU ) + VRF( VRFCond ).C1Te );
+								  	
+								  	// Modifi_SH is the updated SH for a specific IU
+								  	if( VRF( VRFCond ).C3Te == 0 )  
+								  		Modifi_SHin = -( VRF( VRFCond ).C1Te - Tfs + Pipe_Te_assumed )/VRF( VRFCond ).C2Te; //150130 Modifi_SH>Modifi_SHin
+								  	else
+								  		Modifi_SHin = ( -VRF( VRFCond ).C2Te +( pow_2( VRF( VRFCond ).C2Te ) - 4 * ( VRF( VRFCond ).C1Te - Tfs + Pipe_Te_assumed ) * std::pow( VRF( VRFCond ).C3Te , 0.5 ) ) ) / ( 2*VRF( VRFCond ).C3Te );
+								  	
+		//150201 Yoshi	??		  		Modifi_SHin = max( 3.0, min( 30.0, Modifi_SHin ) ) // 15 will be obtained from idf in near future _ Yoshi  This Modifi_SH is from the last order's indoor unit 
+								  	
+								  	
+								   Pipe_h_IU_out_i = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Pipe_Te_assumed + Modifi_SHin, Pipe_Pe_assumed, RefrigerantIndex, RoutineName ); // hB_i for the IU 
+								   //print *, "GetSupHeatEnthalpyRefrig@Pipe_h_IU_out_i:", char( 9 ), Pipe_h_comp_in_assumed
+								   
+								   if( Pipe_h_IU_out_i > Pipe_h_IU_in ) {
+								     Pipe_m_ref_i = TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU ) /( Pipe_h_IU_out_i - Pipe_h_IU_in ); //Ref Flow Rate in the IU( kg/s )
+								     Pipe_m_ref = Pipe_m_ref + Pipe_m_ref_i;
+								     Pipe_SH_merged = Pipe_SH_merged + Pipe_m_ref_i * Modifi_SHin;
+								     Pipe_h_IU_out = Pipe_h_IU_out + Pipe_m_ref_i * Pipe_h_IU_out_i;							   
+								   } 
+						        
+							    } //if( TerminalUnitList( TUListNum ).TU_SH( NumTU ) < 20 )
+							} //END DO     
+		
+							if( Pipe_m_ref > 0 ) {
+								Pipe_h_IU_out = Pipe_h_IU_out/Pipe_m_ref;
+								Pipe_SH_merged = Pipe_SH_merged /Pipe_m_ref;
+		//150201 Yoshi	??			Pipe_SH_merged = max( 3.0, min( 30.0, Pipe_SH_merged ) )  //151030 merged SH  check the range 
+							} else {
+								Pipe_SH_merged = VRF( VRFCond ).SH; //SH_merged_new  150130 Nedds to be confirmed
+								Pipe_h_IU_out = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Pipe_Te_assumed + Pipe_SH_merged, Pipe_Pe_assumed, RefrigerantIndex, RoutineName );
+								//print *, "GetSupHeatEnthalpyRefrig@Pipe_h_IU_out:", char( 9 ), Pipe_h_IU_out		
+							}
+		
+							if( VRF( VRFCond ).RefPipDia <= 0 ) VRF( VRFCond ).RefPipDia = 0.025; // Default value, [m] 
+							
+							//0312 Yoshi start
+							Ref_Coe_v1 = Pipe_Pe_assumed / 1000000 / 4.926;
+							Ref_Coe_v2 = Pipe_h_IU_out / 383.5510343;   
+							Ref_Coe_v3 =( Pipe_Te_assumed + Pipe_SH_merged + 273.15 ) / 344.39;  
+							Pipe_viscosity_ref = 4.302 * Ref_Coe_v1 + 0.81622 * pow_2( Ref_Coe_v1 ) - 120.98 * Ref_Coe_v2+ 139.17 * pow_2( Ref_Coe_v2 ) + 118.76 * Ref_Coe_v3 + 81.04 * pow_2( Ref_Coe_v3 ) + 5.7858 * Ref_Coe_v1 * Ref_Coe_v2- 8.3817 * Ref_Coe_v1 * Ref_Coe_v3 - 218.48 * Ref_Coe_v2* Ref_Coe_v3 + 21.58;
+							//0312 Yoshi end
+		
+							Pipe_v_ref  = Pipe_m_ref /( 3.141593 * pow_2( VRF( VRFCond ).RefPipDia ) * 0.25 ) / GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Pipe_Te_assumed + Pipe_SH_merged, 				Pipe_Pe_assumed, RefrigerantIndex, RoutineName );
+							Pipe_Num_Re = Pipe_m_ref /( 3.141593 * pow_2( VRF( VRFCond ).RefPipDia ) * 0.25 ) * VRF( VRFCond ).RefPipDia / Pipe_viscosity_ref * 1000000;
+							Pipe_Num_Pr = Pipe_viscosity_ref * Pipe_cp_ref * 0.001 / Pipe_conductivity_ref;
+							Pipe_Num_Nu = 0.023 * std::pow( Pipe_Num_Re, 0.8 ) * std::pow( Pipe_Num_Pr, 0.3 );
+							Pipe_Num_St = Pipe_Num_Nu/Pipe_Num_Re/Pipe_Num_Pr;
+							
+							Pipe_DeltP = 8 * Pipe_Num_St * std::pow( Pipe_Num_Pr, 0.6667 ) * VRF( VRFCond ).RefPipLen
+										/ VRF( VRFCond ).RefPipDia * GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Pipe_Te_assumed+Pipe_SH_merged, Pipe_Pe_assumed, RefrigerantIndex, RoutineName )
+										* pow_2( Pipe_v_ref ) / 2 - VRF( VRFCond ).RefPipHei*GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Pipe_Te_assumed+Pipe_SH_merged, Pipe_Pe_assumed, RefrigerantIndex, RoutineName ) *9.80665;
+		
+							Pipe_Coe_k1 = Pipe_Num_Nu * Pipe_viscosity_ref;
+							Pipe_Coe_k3 = VRF( VRFCond ).RefPipInsH *( VRF( VRFCond ).RefPipDia + 2*VRF( VRFCond ).RefPipInsThi );
+			
+							if( VRF( VRFCond ).RefPipInsThi >= 0.0 ) 
+								Pipe_Coe_k2 = 2 * VRF( VRFCond ).RefPipInsCon / std::log( 1.0 + 2 * VRF( VRFCond ).RefPipInsThi / VRF( VRFCond ).RefPipDia );
+							else
+								Pipe_Coe_k2 = 9999.9; //1/k2 is close to 0
+		
+							Pipe_Q =( 3.141593*VRF( VRFCond ).RefPipLen ) *(  OutdoorDryBulb/2 + Pipe_T_room/2 - Pipe_Te_assumed - Pipe_SH_merged ) /( 1/Pipe_Coe_k1 +1/Pipe_Coe_k2 + 1/Pipe_Coe_k3 ); // [W] 
+							//0923: Tsuction( Te'_new2 )
+							Tsuction = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, Pipe_Pe_assumed - Pipe_DeltP, RefrigerantIndex, RoutineName );
+		
+						    MaxNumIteTe = ( VRF( VRFCond ).EvaporatingTemp - SmallLoadTe ) / 0.1 + 1; //0924 Max No. of Iterations for the Te calculations
+							
+							if( ( abs( Tsuction - SmallLoadTe ) > 0.5 ) && ( Pipe_Te_assumed < VRF( VRFCond ).EvaporatingTemp ) && ( Pipe_Te_assumed > SmallLoadTe ) && ( NumIteTe < MaxNumIteTe ) ){
+								Pipe_Te_assumed = Pipe_Te_assumed - 0.1; //0924 *( VRF( VRFCond ).EvaporatingTemp - SmallLoadTe ) // Update assumed Te
+							    NumIteTe = NumIteTe + 1;//0924
+							    goto Label11;
+							} 
+							
+							//if( abs( CompEvaporatingCAPSpd_new1 - Cap_Eva1 ) > Tolerance*Cap_Eva1 )  //Not converged
+							if( abs( Tsuction - SmallLoadTe ) > 0.5 ) {  //Not converged
+								NumIteTe = 999;
+								Tsuction = SmallLoadTe;
+								Pipe_SH_merged = 3.0;
+								Pipe_Te_assumed = SmallLoadTe + 1; // Assumed Te 0924 ??
+							}
+							
+							//@@@@@@@@@@@@@ Iteration_Te End @@@@@@@@@@@@@
+							
+							//Post-process with new Te( Pipe_Te_assumed ) and Tsuction( Te'_new2 ), Pipe_h_IU_out, Pipe_Q, Pipe_m_ref
+							
+							//0923 SH'_Start: suction SH'( Pipe_T_comp_in - Tsuction ) is calculated, then  Modifi_SH will be updated 
+							Pipe_h_comp_in = Pipe_h_IU_out + Pipe_Q/Pipe_m_ref; //Pipe_h_comp_in is the enthalpy at the inlet of compressor
+						
+							//Perform iteration to calculate Pipe_T_comp_in( Te'+SH' )
+							for ( Pipe_T_comp_in = Tsuction +3; Pipe_T_comp_in <= Tsuction +30; Pipe_T_comp_in++ ) {
+							//Do_Pipe_T_comp_in2: DO Pipe_T_comp_in = Tsuction+3, Tsuction +30 
+								Pipe_h_comp_in_assumed = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Pipe_T_comp_in, Pipe_Pe_assumed - Pipe_DeltP, RefrigerantIndex, RoutineName );
+								if( Pipe_h_comp_in_assumed > Pipe_h_comp_in ) break; //EXIT Do_Pipe_T_comp_in2  
+							} //END DO Do_Pipe_T_comp_in2
+							
+							if( Pipe_T_comp_in >( Tsuction +30 ) ) Pipe_T_comp_in = Tsuction + 3; // Pipe_T_comp_in: Tsuction + SH'_new2 
+							//0923 SH'_End: suction SH'( Pipe_T_comp_in - Tsuction ) is calculated, then  Modifi_SH will be updated 
+							
+							Modifi_SH = Pipe_T_comp_in - Tsuction;  //SH'_new2
+							Modifi_Pe = Pipe_Pe_assumed - Pipe_DeltP;  
+		//150131 Yoshi end		
+		//150130 Yoshi  Tc_update
+							CondHeatRel = TUCoolingLoad_temp + Pipe_Q + NcompPriCooling; //150130 Pipe_Q is changed when Tsuction is changed ->Tc is also changed
+							TcondOut = OutdoorDryBulb + CondHeatRel / 1005.0 / VRF( VRFCond ).MaxCondFlow / RhoAir;
+							Tcondh2  = OutdoorDryBulb + ( TcondOut-OutdoorDryBulb ) / ( 1 - VRF( VRFCond ).BFC );
+							deltaT = VRF( VRFCond ).C3Tc * pow_2( VRF( VRFCond ).SC ) + VRF( VRFCond ).C2Tc * VRF( VRFCond ).SC + VRF( VRFCond ).C1Tc;
+							VRF( VRFCond ).CondensingTemp = min( Tcondh2 + deltaT, MaxOutdoorUnitTc );  //0923:Tc
+							
+							//150130 Yoshi  C_cap_operation_update
+							C_cap_density = GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + 8,Modifi_Pe, RefrigerantIndex, RoutineName ) 
+											/ GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + Modifi_SH, Modifi_Pe, RefrigerantIndex, RoutineName );
+							  
+							C_cap_enthalpy =( GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + 8,Modifi_Pe, RefrigerantIndex, RoutineName ) 
+											  - GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).CondensingTemp - 5 ,  0.0, RefrigerantIndex, RoutineName ) )  
+											  /( Pipe_h_comp_in - Pipe_h_IU_in );
+							C_cap_operation = C_cap_density * C_cap_enthalpy; // C_cap_operation is updated due to the update of: Tsuction( Te' ), Modifi_SH, and VRF( VRFCond ).CondensingTemp( Tc, only for cooling )
+							
+							
+							Cap_Eva0 =( TUCoolingLoad_temp + Pipe_Q ) * C_cap_operation; //150130 New Pipe_Q & C_cap_operation
+							Cap_Eva1 = CurveValue( VRF( VRFCond ).OUCoolingCAPFT( CounterCompSpdTemp ), VRF( VRFCond ).CondensingTemp, Tsuction );  //150130 New Tc
+							
+							CapDiff = abs( Cap_Eva1 - Cap_Eva0 );
+				
+							if( ( CapDiff > ( Tolerance*Cap_Eva0 ) ) && ( NumIteCcap < 30 ) ) {    //150130 Check the Capacity difference considering New Tc & Pipe Q & C_cap_operation
+								Pipe_Q0 = Pipe_Q;
+								C_cap_operation0 = C_cap_operation; // C_cap_operation is updated due to the update of: Tsuction( Te' ), Modifi_SH, and VRF( VRFCond ).CondensingTemp( Tc, only for cooling )
+								Tc0 = VRF( VRFCond ).CondensingTemp;
+								NumIteCcap = NumIteCcap + 1;
+								goto Label13;  
+							}
+								
+							if( CapDiff >( Tolerance*Cap_Eva0 ) )  //Not converged ??? NcompCooling is not updated
+								NumIteCcap = 999;
+							else
+								NcompCooling  = CurveValue( VRF( VRFCond ).OUCoolingPWRFT( CounterCompSpdTemp ), VRF( VRFCond ).CondensingTemp, Tsuction ); //150130 Comp Input update
+								//150130_Yoshi_end 
+							
+		//150130 Yoshi end						
+							
+							break; //EXIT DoName1      
+		
+		// OK( rps>18 )					
+						} else {// Since: if( CounterCompSpdTemp <= 1 ) 
+						//0924 Need to be updated//
+						//rps > 18
+						Path = 3;//0924
+						
+							CompSpdLB = CounterCompSpdTemp - 1;
+							CompSpdUB = CounterCompSpdTemp;
+							
+							//150127 start
+							//CompSpdActual = VRF( VRFCond ).CompressorSpeed( CompSpdLB ) +( VRF( VRFCond ).CompressorSpeed( CompSpdUB ) - VRF( VRFCond ).CompressorSpeed( CompSpdLB ) )&
+							//                 /( CompEvaporatingCAPSpd( CompSpdUB ) - CompEvaporatingCAPSpd( CompSpdLB ) ) *( TUCoolingLoad - CompEvaporatingCAPSpd( CompSpdLB ) )
+							CompSpdActual = VRF( VRFCond ).CompressorSpeed( CompSpdLB ) +( VRF( VRFCond ).CompressorSpeed( CompSpdUB ) - VRF( VRFCond ).CompressorSpeed( CompSpdLB ) ) 
+											  /( CompEvaporatingCAPSpd( CompSpdUB ) - CompEvaporatingCAPSpd( CompSpdLB ) ) *( TUCoolingLoad*C_cap_operation - CompEvaporatingCAPSpd( CompSpdLB ) );
+											  // TUCoolingLoad*C_cap_operation is used to represent the test conditions, instead of the real conditions
+							
+							NcompCooling = CompEvaporatingPWRSpd( CompSpdLB ) +( CompEvaporatingPWRSpd( CompSpdUB ) - CompEvaporatingPWRSpd( CompSpdLB ) ) /  
+										  ( VRF( VRFCond ).CompressorSpeed( CompSpdUB ) - VRF( VRFCond ).CompressorSpeed( CompSpdLB ) ) *  
+										  ( CompSpdActual - VRF( VRFCond ).CompressorSpeed( CompSpdLB ) );
+							break; //EXIT DoName1  	  
+						
+						} // End: if( CounterCompSpdTemp <= 1 ) 
+						
+					}// End: if( TUCoolingLoad <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) ) 
+					
+				} // END DO DoName1
+				
+				CompEvaporatingCAPSpd( NumOfCompSpdInput ) = CurveValue( VRF( VRFCond ).OUCoolingCAPFT( NumOfCompSpdInput ), VRF( VRFCond ).CondensingTemp, Tsuction );
+				
+				if( TUCoolingLoad > CompEvaporatingCAPSpd( NumOfCompSpdInput ) ) {   //150130 Needs to be confirmed TUCoolingLoad->( TUCoolingLoad_temp+Pipe_Q )*C_cap_operation?
+				// Required cooling load is beyond the maximum system capacity
+					NcompCooling = CompEvaporatingPWRSpd( NumOfCompSpdInput );
+					CompSpdActual = VRF( VRFCond ).CompressorSpeed( NumOfCompSpdInput );
+				}
+				
+				NcompDiff =( NcompCooling - NcompPriCooling ) / NcompPriCooling;
+				
+				if( ( abs( NcompDiff ) > Tolerance ) && ( Counter < 30 ) ) {
+				// Perform another round of Ncomp iteration
+					NcompPriCooling = NcompCooling;
+					Counter = Counter + 1;
+					goto Label10;  
+				}
+		
+			} //if( TUCoolingLoad <= CompEvaporatingCAPSpdMin ) 
+		
+			// @@@@
+			// Yoshi_ start( New Piping Loss Algorithm_Cooling_2, 0920 )
+		
+			Pipe_h_IU_in_new  = GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).CondensingTemp-VRF( VRFCond ).SC,  0.0, RefrigerantIndex, RoutineName ); // Tc
+		
+			if( ( abs( Pipe_h_IU_in - Pipe_h_IU_in_new ) > 0.05*Pipe_h_IU_in ) &&( Pipe_h_IU_in < Pipe_h_IU_in_up ) &&( Pipe_h_IU_in > Pipe_h_IU_in_low ) ) { 
+				Pipe_h_IU_in = Pipe_h_IU_in_new;
+				NumIteHIUIn = NumIteHIUIn + 1;
+				goto Label12; 
+			}
+			
+			if( ( abs( Pipe_h_IU_in - Pipe_h_IU_in_new ) > 0.05*Pipe_h_IU_in ) )  { 
+				Pipe_h_IU_in = 0.5*( Pipe_h_IU_in_low + Pipe_h_IU_in_up );
+				NumIteHIUIn = 100;
+			} else {
+				Pipe_h_IU_in =( Pipe_h_IU_in + Pipe_h_IU_in_new ) / 2;
+				NumIteHIUIn = 200;
+			}
+			
+			if( Pipe_h_IU_in > Pipe_h_IU_in_up ) { 
+				Pipe_h_IU_in = Pipe_h_IU_in_up ;
+				NumIteHIUIn = 300;
+			} else if( Pipe_h_IU_in < Pipe_h_IU_in_low ) {
+				Pipe_h_IU_in = Pipe_h_IU_in_low;
+				NumIteHIUIn = 400; //0924;
+			}
+		
+			// Yoshi_ end( New Piping Loss Algorithm_Cooling_2, 0920 ) 
+			// @@
+			VRF( VRFCond ).CompActSpeed = max( CompSpdActual,0.0 );
+			VRF( VRFCond ).NcompCooling = max( NcompCooling,0.0 ) / 0.95; // 0.95 is the efficiency of the compressor inverter, coming from IDF input 
+			VRF( VRFCond ).CondFanPower = VRF( VRFCond ).RatedCondFanPower * pow_3( CondFlowRatio );
+			VRF( VRFCond ).VRFCondCyclingRatio = CyclingRatio; // report variable for cycling rate
+			VRF( VRFCond ).MinEvaporatingTemp = Tsuction; 
+		
+		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		// @@@@@ 2. HEATING MODE
+		} else if ( HeatingLoad( VRFCond ) && ( TUHeatingLoad > 0.0 ) ) {
+		  
+			// Yoshi_ start( New Piping Loss Algorithm_heating_1 )
+			
+			TUHeatingLoad_temp = TUHeatingLoad;
+			
+			// Calculate avrage room temperature
+			Pipe_T_room = 0;
+			NumIUActivated = 0; //Count IU that are activated
+			for ( NumTU = 1; NumTU <= NumTUInList; NumTU++ ) {
+				if( TerminalUnitList( TUListNum ).TU_SC( NumTU ) < 20 ){
+					Pipe_T_room = Pipe_T_room + TerminalUnitList( TUListNum ).TU_IADT( NumTU );
+					NumIUActivated = NumIUActivated + 1;
+				}
+			} 
+			if( NumIUActivated > 0 ) 
+				Pipe_T_room = Pipe_T_room / NumIUActivated;
+			else
+				Pipe_T_room = 18;
+				
+			Pipe_h_IU_in_low = GetSatEnthalpyRefrig ( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).MaxCondensingTemp, 1.0,  RefrigerantIndex, RoutineName ); // Quality=1
+			Pipe_h_IU_in_up = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).MaxCondensingTemp + 50, Pcond, RefrigerantIndex, RoutineName );
+		
+			Pipe_h_IU_in = Pipe_h_IU_in_low;
+		
+		Label23: ;
+		    Pipe_m_ref = 0; //( kg/s )
+			Pipe_h_out_ave = 0;
+			SC_ave = 0;
+			
+			// Calc total refrigerant flow rate
+			for ( NumTU = 1; NumTU <= NumTUInList; NumTU++ ) {
+			   if( TerminalUnitList( TUListNum ).TotalHeatLoad( NumTU ) > 0 ) { // ?? if( TerminalUnitList( TUListNum ).TU_SC( NumTU ) < 20 ) 
+				
+			//0312 Yoshi start to get the merged SC & enthalpy for modification factor
+					Pipe_h_out_i = GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, Pcond, RefrigerantIndex,
+								  RoutineName ) - 	TerminalUnitList( TUListNum ).TU_SC( NumTU ),0.0, RefrigerantIndex, RoutineName ); //Quality=0 		
+					Pipe_m_ref_i = TerminalUnitList( TUListNum ).TotalHeatLoad( NumTU ) /( Pipe_h_IU_in - Pipe_h_out_i );  //Gi
+					Pipe_m_ref = Pipe_m_ref + Pipe_m_ref_i; //Sigma_Gtot
+					
+					Pipe_h_out_ave = Pipe_h_out_ave + Pipe_m_ref_i * Pipe_h_out_i; //Sigma_Gi*hi
+					SC_ave = SC_ave + Pipe_m_ref_i * TerminalUnitList( TUListNum ).TU_SC( NumTU ); //Sigma_Gi*SCi
+					   
+				}
+			} // END DO
+		
+			if( Pipe_m_ref > 0 ) {
+				Pipe_h_out_ave = Pipe_h_out_ave / Pipe_m_ref; //h_merge
+				SC_ave = SC_ave / Pipe_m_ref; //SC_merged  0923: theoreticaly, it is not correct. It should be calculated from Pipe_h_IU_out & Pe
+			} else {
+				Pipe_h_out_ave = GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, Pcond, RefrigerantIndex,  
+								RoutineName ) - TerminalUnitList( TUListNum ).TU_SC( NumTU ), 0.0, RefrigerantIndex, RoutineName );  //Quality=0 
+				SC_ave = VRF( VRFCond ).SC; //0923 Wrong. It will be upadated later.
+			}
+		
+			//0312 Yoshi end to get the merged SC & enthalpy for modification factor
+		
+			//Perform iteration to calculate Pipe_T_IU_in using assumed Pipe_h_IU_in
+			for ( Pipe_T_IU_in = VRF( VRFCond ).MaxCondensingTemp; Pipe_T_IU_in <= VRF( VRFCond ).MaxCondensingTemp + 50; Pipe_T_IU_in++ ) {
+				Pipe_h_IU_in_temp = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Pipe_T_IU_in, Pcond, RefrigerantIndex, RoutineName );		
+				if( Pipe_h_IU_in_temp > Pipe_h_IU_in ) break; //EXIT Do_Pipe_T_IU_in
+			} //END DO Do_Pipe_T_IU_in
+			if( Pipe_T_IU_in > ( VRF( VRFCond ).MaxCondensingTemp + 50 ) ) {				  
+				Pipe_T_IU_in = VRF( VRFCond ).MaxCondensingTemp;
+			}
+				
+			//0312 Yoshi start //??? New added from V3
+			Ref_Coe_v1 = Pcond /1000000/ 4.926;
+			Ref_Coe_v2= Pipe_h_IU_in / 383.5510343;
+			Ref_Coe_v3 =( Pipe_T_IU_in + 273.15 ) / 344.39;
+			Pipe_viscosity_ref = 4.302 * Ref_Coe_v1 + 0.81622 * pow_2( Ref_Coe_v1 ) - 120.98 * Ref_Coe_v2+ 139.17 * pow_2( Ref_Coe_v2 ) + 118.76 * Ref_Coe_v3 + 81.04 * pow_2( Ref_Coe_v3 ) + 5.7858 * Ref_Coe_v1 * Ref_Coe_v2- 8.3817 * Ref_Coe_v1 * Ref_Coe_v3 - 218.48 * Ref_Coe_v2* Ref_Coe_v3 + 21.58;
+			//0312 Yoshi end				
+			
+			Pipe_v_ref = Pipe_m_ref /( 3.141593 * pow_2( VRF( VRFCond ).RefPipDia ) * 0.25 ) / GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Pipe_T_IU_in, Pcond, RefrigerantIndex, RoutineName );
+			Pipe_Num_Re = Pipe_m_ref /( 3.141593 * pow_2( VRF( VRFCond ).RefPipDia ) * 0.25 ) * VRF( VRFCond ).RefPipDia / Pipe_viscosity_ref * 1000000;
+			Pipe_Num_Pr = Pipe_viscosity_ref * Pipe_cp_ref * 0.001 / Pipe_conductivity_ref;
+			Pipe_Num_Nu = 0.023 * std::pow( Pipe_Num_Re, 0.8) * std::pow( Pipe_Num_Pr, 0.4);
+			Pipe_Num_St = Pipe_Num_Nu/Pipe_Num_Re/Pipe_Num_Pr;
+		
+			Pipe_Coe_k1 = Pipe_Num_Nu * Pipe_viscosity_ref;
+			Pipe_Coe_k2 = VRF( VRFCond ).RefPipInsCon * ( VRF( VRFCond ).RefPipDia + VRF( VRFCond ).RefPipInsThi )/VRF( VRFCond ).RefPipInsThi;
+			Pipe_Coe_k3 = VRF( VRFCond ).RefPipInsH   * ( VRF( VRFCond ).RefPipDia + 2 * VRF( VRFCond ).RefPipInsThi );
+			// @@ Pipe_T_room << 24
+			Pipe_Q = ( 3.141593 * VRF( VRFCond ).RefPipLen ) * ( Pipe_T_IU_in - OutdoorDryBulb/2 - Pipe_T_room/2 ) / ( 1/Pipe_Coe_k1 + 1/Pipe_Coe_k2 + 1/Pipe_Coe_k3 ); // [W] 
+			Pipe_DeltP = 8 * Pipe_Num_St * std::pow( Pipe_Num_Pr, 0.6667) * VRF( VRFCond ).RefPipLen / VRF( VRFCond ).RefPipDia * GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, 
+						Pipe_T_IU_in, Pcond, RefrigerantIndex, RoutineName )
+						* pow_2( Pipe_v_ref ) / 2 - VRF( VRFCond ).RefPipHei*GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Pipe_T_IU_in, Pcond, RefrigerantIndex, RoutineName ) * 9.80665;
+			
+			Pipe_h_comp_out = Pipe_h_IU_in + Pipe_Q/Pipe_m_ref/3600; // [J/kg/K]
+		
+			Pdischarge = max( Pcond + Pipe_DeltP, Pcond ); //Pcond is Pc, Pdischarge is Pc'
+			Tdischarge = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, Pdischarge, RefrigerantIndex, RoutineName );
+		
+			// Yoshi_ end( New Piping Loss Algorithm_heating_1, cont )
+		
+			CondFlowRatio = 1.0;
+			MinRefriPe = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, -15, RefrigerantIndex, RoutineName );   //@@ -15 should be upadted _Yoshi 0312
+			MinOutdoorUnitPe = min( Pdischarge - VRF( VRFCond ).CompMaxDeltaP * 1000, MinRefriPe ); // Yoshi will think about this 20150712
+			MinOutdoorUnitTe = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, MinOutdoorUnitPe, RefrigerantIndex, RoutineName );
+			CompEvaporatingCAPSpdMin = CurveValue( VRF( VRFCond ).OUCoolingCAPFT( 1 ), Tdischarge, MinOutdoorUnitTe );
+			CompEvaporatingPWRSpdMin = CurveValue( VRF( VRFCond ).OUCoolingPWRFT( 1 ), Tdischarge, MinOutdoorUnitTe );
+		
+			TUHeatingLoad = TUHeatingLoad_temp + Pipe_Q; //Yoshi_
+			CondHeatExtract = TUHeatingLoad - CompEvaporatingPWRSpdMin;
+		
+		//0312 Yoshi start1 0312
+				C_cap_density = GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, MinOutdoorUnitTe + 8,   MinOutdoorUnitPe, RefrigerantIndex, RoutineName ) 
+								/ GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, MinOutdoorUnitTe + VRF( VRFCond ).SH, MinOutdoorUnitPe, RefrigerantIndex, RoutineName );   
+				
+				//Pipe_h_out_ave are used here, IUMaxCondTemp( Tc ) is used here
+				C_cap_enthalpy =( GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName,  MinOutdoorUnitTe  + 8, MinOutdoorUnitPe, RefrigerantIndex, RoutineName ) 
+								- GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName,  IUMaxCondTemp - 5  , 0.0, RefrigerantIndex, RoutineName ) )
+								/ ( GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName,  MinOutdoorUnitTe  + VRF( VRFCond ).SH, MinOutdoorUnitPe, RefrigerantIndex, RoutineName ) - Pipe_h_out_ave );
+		
+				C_cap_operation = C_cap_density * C_cap_enthalpy;
+		//0312 Yoshi end1 0312
+			if( ( CondHeatExtract*C_cap_operation ) <= CompEvaporatingCAPSpdMin ) { 
+			//compressor cycling
+			
+				CyclingRatio = CondHeatExtract*C_cap_operation / CompEvaporatingCAPSpdMin;
+				NcompHeating = CompEvaporatingPWRSpdMin * CyclingRatio;
+				CompSpdActual = VRF( VRFCond ).CompressorSpeed( 1 );
+				VRF( VRFCond ).EvaporatingTemp = MinOutdoorUnitTe;
+			  
+			} else {
+			// compressor not cycling 
+		
+				Label20: ;
+				CondHeatExtract = TUHeatingLoad - NcompPriHeating;
+				Houtdoor = PsyHFnTdbW( OutdoorDryBulb, OutdoorHumRat );
+				Hfs = Houtdoor - CondHeatExtract / ( VRF( VRFCond ).MaxCondFlow * RhoAir ) / ( 1 - VRF( VRFCond ).BFH );
+				if( Hfs < 0.01 ) Hfs = 0.01;
+				TfsSat = PsyTsatFnHPb( Hfs, OutdoorPressure, "CalcVRFCondenser_FluidTCtrl" );
+				WfsSat = PsyWFnTdbH( TfsSat, Hfs, "CalcVRFCondenser_FluidTCtrl" );
+				
+				if( WfsSat < OutdoorHumRat ) 
+				   Tfs = TfsSat;
+				else
+				   Tfs = PsyTdbFnHW( Hfs, OutdoorHumRat );
+				
+				deltaT = VRF( VRFCond ).C3Te * pow_2( VRF( VRFCond ).SH ) + VRF( VRFCond ).C2Te * VRF( VRFCond ).SH + VRF( VRFCond ).C1Te;
+				VRF( VRFCond ).EvaporatingTemp = Tfs - deltaT;
+				// VRF( VRFCond ).EvaporatingTemp = max( VRF( VRFCond ).EvaporatingTemp, MinOutdoorUnitTe )  // ??? 
+		
+				//VRF( VRFCond ).EvaporatingTemp = OutdoorDryBulb - CondHeatExtract /( CondHeatExtNom * VRF( VRFCond ).CoeffCdeltaToutHeat )  
+				// XP_need to determine the compressor speed based on the cooling load, and  solve the compressor power, finally iterate to get the condensing temperature and the power.
+				// CoolingCOPFac = CurveValue( VRF( VRFCond ).CoolingCOPFT, VRF( VRFCond ).CondensingTemp, Tsuction ) 
+				for ( CounterCompSpdTemp = 1; CounterCompSpdTemp <= NumOfCompSpdInput; CounterCompSpdTemp++ ) { // DoName2: to get Te and CompSpdActual( rps ), NcompHeating
+				
+					CompEvaporatingPWRSpd( CounterCompSpdTemp ) = CurveValue( VRF( VRFCond ).OUCoolingPWRFT( CounterCompSpdTemp ), Tdischarge, VRF( VRFCond ).EvaporatingTemp ); // Tdischarge is Tc
+					CompEvaporatingCAPSpd( CounterCompSpdTemp ) = CurveValue( VRF( VRFCond ).OUCoolingCAPFT( CounterCompSpdTemp ), Tdischarge, VRF( VRFCond ).EvaporatingTemp );
+		
+			//0312 Yoshi start2 0312
+			// C_cap_operation is calculated for the 2nd time, since VRF( VRFCond ).EvaporatingTemp( Te ) is updated
+		
+					MinOutdoorUnitPe = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp, RefrigerantIndex, RoutineName );
+		
+					C_cap_density = GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp + 8,   MinOutdoorUnitPe, RefrigerantIndex, RoutineName ) 
+								  / GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp + VRF( VRFCond ).SH, MinOutdoorUnitPe, RefrigerantIndex, RoutineName );
+					
+					//Pipe_h_out_ave are used here, IUMaxCondTemp( Tc ) is used here
+					C_cap_enthalpy = ( GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName,  VRF( VRFCond ).EvaporatingTemp  + 8, MinOutdoorUnitPe, RefrigerantIndex, RoutineName ) 
+									  - GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName,  IUMaxCondTemp - 5 , 0.0, RefrigerantIndex, RoutineName ) ) 
+									  /( GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName,  VRF( VRFCond ).EvaporatingTemp  + VRF( VRFCond ).SH,MinOutdoorUnitPe, RefrigerantIndex, RoutineName ) - Pipe_h_out_ave );
+		
+					C_cap_operation = C_cap_density * C_cap_enthalpy; 
+			//0312 Yoshi end2 0312
+			 
+					if( ( CondHeatExtract*C_cap_operation ) <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) ) {
+					// Compressor Capacity GE required          
+		
+						if( CounterCompSpdTemp <= 1 ) {
+						//rps = 18, CounterCompSpdTemp = 1 ?
+											
+							// C_cap_operation is calculated for the 3rd time
+							NumIteCcap = 1;
+							
+							Label19: ;
+							CondHeatExtract = TUHeatingLoad - NcompPriHeating; 
+							
+							CompSpdActual = VRF( VRFCond ).CompressorSpeed( 1 );
+							Par( 1 ) = Tdischarge;
+							Par( 2 ) = CondHeatExtract * C_cap_operation;
+							Par( 3 ) = VRF( VRFCond ).OUCoolingCAPFT( CounterCompSpdTemp );
+		
+							SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual, MinOutdoorUnitTe, VRF( VRFCond ).EvaporatingTemp, Par );
+												 
+							if( SolFla < 0 ) SmallLoadTe = MinOutdoorUnitTe; // Not converged
+							
+							VRF( VRFCond ).EvaporatingTemp = SmallLoadTe;  //?? SmallLoadTe( Te' ), Te' = Te for heating
+							
+							//Yoshi_ start( N_comp Modification Algorithm 1 )
+							//Update SH and Pe to calculate Modification Factor, which is used to update rps to for N_comp calculations  
+							if( VRF( VRFCond ).C3Te == 0 ) 
+								Modifi_SH = -( VRF( VRFCond ).C1Te - Tfs + VRF( VRFCond ).EvaporatingTemp ) / VRF( VRFCond ).C2Te;
+							else
+								Modifi_SH = ( -VRF( VRFCond ).C2Te +( pow_2( VRF( VRFCond ).C2Te ) - 4 * ( VRF( VRFCond ).C1Te - Tfs + VRF( VRFCond ).EvaporatingTemp ) * std::pow( VRF( VRFCond ).C3Te, 0.5 ) ) ) / ( 2*VRF( VRFCond ).C3Te ); 
+		
+							Modifi_Pe = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp, RefrigerantIndex, RoutineName ); 
+							
+							//0312 Yoshi start3
+							C_cap_density = GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp + 8, Modifi_Pe, RefrigerantIndex, RoutineName )  
+											 / GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp + Modifi_SH, Modifi_Pe, RefrigerantIndex, RoutineName );
+							C_cap_enthalpy =( GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName,  VRF( VRFCond ).EvaporatingTemp  + 8,MinOutdoorUnitPe, RefrigerantIndex, RoutineName )  
+											  - GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, IUMaxCondTemp - 5  , 0.0, RefrigerantIndex, RoutineName ) )  
+											  /( GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName,  VRF( VRFCond ).EvaporatingTemp  + Modifi_SH ,Modifi_Pe, RefrigerantIndex, RoutineName ) - Pipe_h_out_ave ); 
+							C_cap_operation = C_cap_density * C_cap_enthalpy;
+		
+							Cap_Eva0 = ( TUHeatingLoad - NcompPriHeating ) * C_cap_operation;
+							Cap_Eva1 = CurveValue( VRF( VRFCond ).OUCoolingCAPFT( CounterCompSpdTemp ), Tdischarge, VRF( VRFCond ).EvaporatingTemp );
+							CapDiff = abs( Cap_Eva1 - Cap_Eva0 );
+				
+							if( ( CapDiff > ( Tolerance * Cap_Eva0 ) ) && ( NumIteCcap < 30 ) ) {    //150130 Check the Capacity difference considering 
+								NumIteCcap = NumIteCcap + 1;
+								goto Label19;
+							}
+								
+							if( CapDiff >( Tolerance*Cap_Eva0 ) )  //Not converged ??? NcompCooling is not updated
+								NumIteCcap = 999;
+							else							
+								NcompHeating = CurveValue( VRF( VRFCond ).OUCoolingPWRFT( CounterCompSpdTemp ), Tdischarge, VRF( VRFCond ).EvaporatingTemp ); //150130 Comp Input update
+								//150130_Yoshi_end
+								
+							//0312 Yoshi end3
+									
+							break; // EXIT DoName2            
+							
+						} else {
+						//Since: if( CounterCompSpdTemp <= 1 )
+						//rps > 18, CounterCompSpdTemp > 1
+							CompSpdLB = CounterCompSpdTemp - 1;
+							CompSpdUB = CounterCompSpdTemp;
+		
+							// C_cap_operation is used here
+							CompSpdActual = VRF( VRFCond ).CompressorSpeed( CompSpdLB ) +( VRF( VRFCond ).CompressorSpeed( CompSpdUB ) - VRF( VRFCond ).CompressorSpeed( CompSpdLB ) )  
+											/ ( CompEvaporatingCAPSpd( CompSpdUB ) - CompEvaporatingCAPSpd( CompSpdLB ) ) *( CondHeatExtract*C_cap_operation - CompEvaporatingCAPSpd( CompSpdLB ) );
+																	
+							////Yoshi_ start( N_comp Modification Algorithm 2 )
+							////Update SH and Pe to calculate Modification Factor, which is used to update rps to for N_comp calculations 
+							Modifi_SH = VRF( VRFCond ).SH;
+							
+							NcompHeating = CompEvaporatingPWRSpd( CompSpdLB ) +( CompEvaporatingPWRSpd( CompSpdUB ) - CompEvaporatingPWRSpd( CompSpdLB ) ) /  
+										  ( VRF( VRFCond ).CompressorSpeed( CompSpdUB ) - VRF( VRFCond ).CompressorSpeed( CompSpdLB ) ) *   
+										  ( CompSpdActual - VRF( VRFCond ).CompressorSpeed( CompSpdLB ) );
+							
+							break; // EXIT DoName2 
+							
+						} //Since: if( CounterCompSpdTemp <= 1 )
+						
+					} //Since: if( CondHeatExtract <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) )
+				 
+				} //END DO DoName2
+		
+				CompEvaporatingCAPSpd( NumOfCompSpdInput ) = CurveValue( VRF( VRFCond ).OUCoolingCAPFT( NumOfCompSpdInput ), Tdischarge, VRF( VRFCond ).EvaporatingTemp );
+				if( CondHeatExtract > CompEvaporatingCAPSpd( NumOfCompSpdInput ) ) {
+					NcompHeating = CompEvaporatingPWRSpd( NumOfCompSpdInput );
+					CompSpdActual = VRF( VRFCond ).CompressorSpeed( NumOfCompSpdInput );
+				}
+				
+				NcompDiff =( NcompHeating - NcompPriHeating ) / NcompPriHeating;
+				if( ( abs( NcompDiff ) > Tolerance ) && ( Counter < 30 ) ) {
+					NcompPriHeating = NcompHeating;
+					Counter = Counter + 1;
+					goto Label20; 
+				}
+		
+				// Yoshi_ start( New Piping Loss Algorithm_heating_2 )
+				
+				Pipe_p_IU_out = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp, RefrigerantIndex, RoutineName );
+				
+				// Modifi_SH is used here
+				Pipe_h_comp_out_new = NcompHeating / Pipe_m_ref + GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Modifi_SH + VRF( VRFCond ).EvaporatingTemp, Pipe_p_IU_out,  RefrigerantIndex, RoutineName ); 
+		
+				if( ( abs( Pipe_h_comp_out - Pipe_h_comp_out_new ) > 0.05 * Pipe_h_comp_out ) && ( Pipe_h_IU_in < Pipe_h_IU_in_up ) ) {
+					Pipe_h_IU_in = Pipe_h_IU_in + 0.1 * ( Pipe_h_IU_in_up - Pipe_h_IU_in_low );
+					goto Label23;  
+				}
+				
+				if( Pipe_h_IU_in > Pipe_h_IU_in_up ) {
+					Pipe_h_IU_in = 0.5 * ( Pipe_h_IU_in_up + Pipe_h_IU_in_low );
+				}
+		
+			} //compressor cycling
+			 
+			VRF( VRFCond ).CompActSpeed = max( CompSpdActual, 0.0 );
+			VRF( VRFCond ).NcompHeating = max( NcompHeating, 0.0 ) / 0.95; // 0.95 is the efficiency of the compressor inverter, coming from IDF input 
+			VRF( VRFCond ).CondFanPower = VRF( VRFCond ).RatedCondFanPower * pow_3( CondFlowRatio );
+			VRF( VRFCond ).VRFCondCyclingRatio = CyclingRatio ;// report variable for cycling rate
+		
+		
+		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		// @@@@@ 3. Yoshi_Stop running
+		} else { // Since: if( CoolingLoad( VRFCond ) &&( TUCoolingLoad > 0.0 ) ) 
+		
+			Path = 4; 
+			NcompCooling = 0.0;
+			NcompHeating = 0.0;
+			VRF( VRFCond ).CompActSpeed = 0.0;
+			VRF( VRFCond ).NcompCooling = 0.0;
+			VRF( VRFCond ).NcompHeating = 0.0;
+			VRF( VRFCond ).CondFanPower = 0.0;
+			VRF( VRFCond ).VRFCondCyclingRatio = 0.0;
+			VRF( VRFCond ).CondensingTemp  = OutDryBulbTemp;
+			VRF( VRFCond ).EvaporatingTemp = OutDryBulbTemp;
+		
 		}
 		
-		NcompDiff =( NcompCooling - NcompPriCooling ) / NcompPriCooling;
+		// 0924: For Debug purposes
+		VRF( VRFCond ).Path = Path; 
+		VRF( VRFCond ).NumIteNcomp = Counter; // Number of Ncomp itarations
+		VRF( VRFCond ).NumIteTe = NumIteTe; // Number of Te itarations
+		VRF( VRFCond ).NumIteHIUIn = NumIteHIUIn; // Number of Pipe_h_IU_in itarations
+		VRF( VRFCond ).Modifi_SH = Modifi_SH;  
+		VRF( VRFCond ).Modifi_Pe = Modifi_Pe; 
+		VRF( VRFCond ).Modifi_factor  =  C_cap_operation; 
+		//150129 Yoshi end 
 		
-		if( ( abs( NcompDiff ) > Tolerance ) && ( Counter < 30 ) ) {
-		// Perform another round of Ncomp iteration
-			NcompPriCooling = NcompCooling;
-			Counter = Counter + 1;
-			goto Label10;  
-		}
-
-	} //if( TUCoolingLoad <= CompEvaporatingCAPSpdMin ) 
-
-	// @@@@
-	// Yoshi_ start( New Piping Loss Algorithm_Cooling_2, 0920 )
-
-	Pipe_h_IU_in_new  = GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).CondensingTemp-VRF( VRFCond ).SC,  0.0, RefrigerantIndex, RoutineName ); // Tc
-
-	if( ( abs( Pipe_h_IU_in - Pipe_h_IU_in_new ) > 0.05*Pipe_h_IU_in ) &&( Pipe_h_IU_in < Pipe_h_IU_in_up ) &&( Pipe_h_IU_in > Pipe_h_IU_in_low ) ) { 
-		Pipe_h_IU_in = Pipe_h_IU_in_new;
-		NumIteHIUIn = NumIteHIUIn + 1;
-		goto Label12; 
-	}
-	
-	if( ( abs( Pipe_h_IU_in - Pipe_h_IU_in_new ) > 0.05*Pipe_h_IU_in ) )  { 
-		Pipe_h_IU_in = 0.5*( Pipe_h_IU_in_low + Pipe_h_IU_in_up );
-		NumIteHIUIn = 100;
-	} else {
-		Pipe_h_IU_in =( Pipe_h_IU_in + Pipe_h_IU_in_new ) / 2;
-		NumIteHIUIn = 200;
-	}
-	
-	if( Pipe_h_IU_in > Pipe_h_IU_in_up ) { 
-		Pipe_h_IU_in = Pipe_h_IU_in_up ;
-		NumIteHIUIn = 300;
-	} else if( Pipe_h_IU_in < Pipe_h_IU_in_low ) {
-		Pipe_h_IU_in = Pipe_h_IU_in_low;
-		NumIteHIUIn = 400; //0924;
-	}
-
-	// Yoshi_ end( New Piping Loss Algorithm_Cooling_2, 0920 ) 
-	// @@
-	VRF( VRFCond ).CompActSpeed = max( CompSpdActual,0.0 );
-	VRF( VRFCond ).NcompCooling = max( NcompCooling,0.0 ) / 0.95; // 0.95 is the efficiency of the compressor inverter, coming from IDF input 
-	VRF( VRFCond ).CondFanPower = VRF( VRFCond ).RatedCondFanPower * pow_3( CondFlowRatio );
-	VRF( VRFCond ).VRFCondCyclingRatio = CyclingRatio; // report variable for cycling rate
-	VRF( VRFCond ).MinEvaporatingTemp = Tsuction; 
-
-
-
-// ...
-
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-// @@@@@ 2. HEATING MODE
-} else if( HeatingLoad( VRFCond ) &&( TUHeatingLoad > 0.0 ) ) {
-		
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-// @@@@@ 3. Yoshi_Stop running
-} else { // Since: if( CoolingLoad( VRFCond ) &&( TUCoolingLoad > 0.0 ) ) 
-
-	Path = 4; 
-	NcompCooling = 0.0;
-	NcompHeating = 0.0;
-	VRF( VRFCond ).CompActSpeed = 0.0;
-	VRF( VRFCond ).NcompCooling = 0.0;
-	VRF( VRFCond ).NcompHeating = 0.0;
-	VRF( VRFCond ).CondFanPower = 0.0;
-	VRF( VRFCond ).VRFCondCyclingRatio = 0.0;
-	VRF( VRFCond ).CondensingTemp  = OutDryBulbTemp;
-	VRF( VRFCond ).EvaporatingTemp = OutDryBulbTemp;
-
-}
-
-// 0924: For Debug purposes
-VRF( VRFCond ).Path = Path; 
-VRF( VRFCond ).NumIteNcomp = Counter; // Number of Ncomp itarations
-VRF( VRFCond ).NumIteTe = NumIteTe; // Number of Te itarations
-VRF( VRFCond ).NumIteHIUIn = NumIteHIUIn; // Number of Pipe_h_IU_in itarations
-VRF( VRFCond ).Modifi_SH = Modifi_SH;  
-VRF( VRFCond ).Modifi_Pe = Modifi_Pe; 
-VRF( VRFCond ).Modifi_factor  =  C_cap_operation; 
-//150129 Yoshi end 
-
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		// @@! zrp: Main modification ends here
 		
 		
 		// calculate capacities and energy use
 		if ( CoolingLoad( VRFCond ) && TerminalUnitList( TUListNum ).CoolingCoilPresent( NumTUInList ) ) {
 			InletAirWetBulbC = SumCoolInletWB;
-			TotCoolCapTempModFac = CurveValue( VRF( VRFCond ).CoolCapFT, InletAirWetBulbC, CondInletTemp );
-			TotCoolEIRTempModFac = CurveValue( VRF( VRFCond ).CoolEIRFT, InletAirWetBulbC, CondInletTemp );
+			TotCoolCapTempModFac = 1; // @@ CurveValue( VRF( VRFCond ).CoolCapFT, InletAirWetBulbC, CondInletTemp );
+			TotCoolEIRTempModFac = 1; // @@ CurveValue( VRF( VRFCond ).CoolEIRFT, InletAirWetBulbC, CondInletTemp );
 
 			// recalculate cooling Cap and EIR curve output if using boundary curve along with dual Cap and EIR curves.
 			if ( VRF( VRFCond ).CoolBoundaryCurvePtr > 0 ) {
-				CoolOABoundary = CurveValue( VRF( VRFCond ).CoolBoundaryCurvePtr, InletAirWetBulbC );
+				CoolOABoundary = 1; // @@ CurveValue( VRF( VRFCond ).CoolBoundaryCurvePtr, InletAirWetBulbC );
 				if ( OutdoorDryBulb > CoolOABoundary ) {
-					if ( VRF( VRFCond ).CoolCapFTHi > 0 ) TotCoolCapTempModFac = CurveValue( VRF( VRFCond ).CoolCapFTHi, InletAirWetBulbC, CondInletTemp );
-					if ( VRF( VRFCond ).CoolEIRFTHi > 0 ) TotCoolEIRTempModFac = CurveValue( VRF( VRFCond ).CoolEIRFTHi, InletAirWetBulbC, CondInletTemp );
+					if ( VRF( VRFCond ).CoolCapFTHi > 0 ) TotCoolCapTempModFac = 1; // @@ CurveValue( VRF( VRFCond ).CoolCapFTHi, InletAirWetBulbC, CondInletTemp );
+					if ( VRF( VRFCond ).CoolEIRFTHi > 0 ) TotCoolEIRTempModFac = 1; // @@ CurveValue( VRF( VRFCond ).CoolEIRFTHi, InletAirWetBulbC, CondInletTemp );
 				}
 			}
+			
+			// @@
+			if ( TUCoolingLoad > CompEvaporatingCAPSpd( NumOfCompSpdInput ) ) 
+				TotalCondCoolingCapacity = CompEvaporatingCAPSpd( NumOfCompSpdInput );
+			else
+				TotalCondCoolingCapacity = TUCoolingLoad;
 
-			TotalCondCoolingCapacity = VRF( VRFCond ).CoolingCapacity * CoolCombinationRatio( VRFCond ) * TotCoolCapTempModFac;
-			TotalTUCoolingCapacity = TotalCondCoolingCapacity * VRF( VRFCond ).PipingCorrectionCooling;
+			// TotalCondCoolingCapacity = VRF( VRFCond ).CoolingCapacity * CoolCombinationRatio( VRFCond ) * TotCoolCapTempModFac;
+			// TotalTUCoolingCapacity = TotalCondCoolingCapacity * VRF( VRFCond ).PipingCorrectionCooling;
 
 			if ( TotalCondCoolingCapacity > 0.0 ) {
 				CoolingPLR = ( TUCoolingLoad / VRF( VRFCond ).PipingCorrectionCooling ) / TotalCondCoolingCapacity;
@@ -8102,8 +8391,14 @@ VRF( VRFCond ).Modifi_factor  =  C_cap_operation;
 				}
 			}
 
-			TotalCondHeatingCapacity = VRF( VRFCond ).HeatingCapacity * HeatCombinationRatio( VRFCond ) * TotHeatCapTempModFac * HeatingCapacityMultiplier;
-			TotalTUHeatingCapacity = TotalCondHeatingCapacity * VRF( VRFCond ).PipingCorrectionHeating;
+			// @@ 
+			// TotalCondHeatingCapacity = VRF( VRFCond ).HeatingCapacity * HeatCombinationRatio( VRFCond ) * TotHeatCapTempModFac * HeatingCapacityMultiplier;
+			// TotalTUHeatingCapacity = TotalCondHeatingCapacity * VRF( VRFCond ).PipingCorrectionHeating;
+			if( TUHeatingLoad > CompEvaporatingCAPSpd( NumOfCompSpdInput ) )
+				TotalCondHeatingCapacity = CompEvaporatingCAPSpd( NumOfCompSpdInput );
+			else
+				TotalCondHeatingCapacity = TUHeatingLoad;
+  
 			if ( TotalCondHeatingCapacity > 0.0 ) {
 				HeatingPLR = ( TUHeatingLoad / VRF( VRFCond ).PipingCorrectionHeating ) / TotalCondHeatingCapacity;
 				HeatingPLR += LoadDueToDefrost / TotalCondHeatingCapacity;
@@ -8303,12 +8598,14 @@ VRF( VRFCond ).Modifi_factor  =  C_cap_operation;
 		VRF( VRFCond ).TotalHeatingCapacity = TotalCondHeatingCapacity * HeatingPLR;
 
 		if ( VRF( VRFCond ).MinPLR > 0.0 ) {
-			CyclingRatio = min( 1.0, VRF( VRFCond ).VRFCondPLR / VRF( VRFCond ).MinPLR );
+			//@@ XP_comment out the following line of code because the cycling ratio is calculated differently
+			// CyclingRatio = min( 1.0, VRF( VRFCond ).VRFCondPLR / VRF( VRFCond ).MinPLR );
 			if ( VRF( VRFCond ).VRFCondPLR < VRF( VRFCond ).MinPLR && VRF( VRFCond ).VRFCondPLR > 0.0 ) {
 				VRF( VRFCond ).VRFCondPLR = VRF( VRFCond ).MinPLR;
 			}
 		}
-		VRF( VRFCond ).VRFCondCyclingRatio = CyclingRatio; // report variable for cycling rate
+		//@@ XP_comment out the following line of code because the cycling ratio is calculated differently
+		// VRF( VRFCond ).VRFCondCyclingRatio = CyclingRatio; // report variable for cycling rate
 
 		VRF( VRFCond ).OperatingMode = 0; // report variable for heating or cooling mode
 		EIRFPLRModFac = 1.0;
@@ -8328,8 +8625,10 @@ VRF( VRFCond ).Modifi_factor  =  C_cap_operation;
 				PartLoadFraction = 1.0;
 			}
 			VRFRTF = min( 1.0, ( CyclingRatio / PartLoadFraction ) );
-
-			VRF( VRFCond ).ElecCoolingPower = ( VRF( VRFCond ).RatedCoolingPower * TotCoolCapTempModFac ) * TotCoolEIRTempModFac * EIRFPLRModFac * VRFRTF;
+			
+			// @@ XP_need to update the code to use new euqation to caculate the compressor power
+			VRF( VRFCond ).ElecCoolingPower = VRF(VRFCond).NcompCooling; // NcompCooling, updated by zrp on 03/01
+			//VRF( VRFCond ).ElecCoolingPower = ( VRF( VRFCond ).RatedCoolingPower * TotCoolCapTempModFac ) * TotCoolEIRTempModFac * EIRFPLRModFac * VRFRTF;
 		}
 		if ( HeatingLoad( VRFCond ) && HeatingPLR > 0.0 ) {
 			VRF( VRFCond ).OperatingMode = 2;
@@ -8346,7 +8645,9 @@ VRF( VRFCond ).Modifi_factor  =  C_cap_operation;
 			}
 			VRFRTF = min( 1.0, ( CyclingRatio / PartLoadFraction ) );
 
-			VRF( VRFCond ).ElecHeatingPower = ( VRF( VRFCond ).RatedHeatingPower * TotHeatCapTempModFac ) * TotHeatEIRTempModFac * EIRFPLRModFac * VRFRTF * InputPowerMultiplier;
+			// @@ XP_need to update the code to use new euqation to caculate the compressor power
+			VRF( VRFCond ).ElecHeatingPower = VRF( VRFCond ).NcompHeating;
+			// VRF( VRFCond ).ElecHeatingPower = ( VRF( VRFCond ).RatedHeatingPower * TotHeatCapTempModFac ) * TotHeatEIRTempModFac * EIRFPLRModFac * VRFRTF * InputPowerMultiplier;
 		}
 		VRF( VRFCond ).VRFCondRTF = VRFRTF;
 
@@ -8467,16 +8768,18 @@ VRF( VRFCond ).Modifi_factor  =  C_cap_operation;
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Richard Raustad
-		//       DATE WRITTEN   July 2005
-		//       MODIFIED       July 2012, Chandan Sharma - FSEC: Added zone sys avail managers
+		//       AUTHOR         RP Zhang (LBNL), XF Pang (LBNL), Y Yura (Daikin Inc)
+		//       DATE WRITTEN   June 2015
+		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Simulate the components making up the VRF terminal unit.
+		// 		This subroutine is part of the new VRF model based on physics, appliable for Fluid Temperature Control.
+		// 		This is adapted from subroutine CalcVRF, which is part of the VRF model based on system curves.
+		// 		This subroutine simulates the components making up the VRF indoor terminal unit.
 
 		// METHODOLOGY EMPLOYED:
-		// Simulates the unit components sequentially in the air flow direction.
+		//		A new physics based VRF model appliable for Fluid Temperature Control.
 
 		// REFERENCES:
 		// na
@@ -8516,6 +8819,8 @@ VRF( VRFCond ).Modifi_factor  =  C_cap_operation;
 		Real64 SpecHumIn; // specific humidity ratio at inlet node
 		int TUListIndex; // index to TU list for this VRF system
 		int IndexToTUInTUList; // index to TU in specific list for the VRF system
+		Real64 EvapTemp; //evaporating temperature
+		Real64 CondTemp; //condensing temperature
 
 		// FLOW
 
@@ -8525,9 +8830,12 @@ VRF( VRFCond ).Modifi_factor  =  C_cap_operation;
 		VRFTUOutletNodeNum = VRFTU( VRFTUNum ).VRFTUOutletNodeNum;
 		VRFTUInletNodeNum = VRFTU( VRFTUNum ).VRFTUInletNodeNum;
 		OpMode = VRFTU( VRFTUNum ).OpMode;
+		EvapTemp = VRF(VRFCond).MinEvaporatingTemp;
+		CondTemp = VRF(VRFCond).MaxCondensingTemp;
 
 		// Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
-		SetAverageAirFlow( VRFTUNum, PartLoadRatio, OnOffAirFlowRatio );
+		// @@
+		// SetAverageAirFlow( VRFTUNum, PartLoadRatio, OnOffAirFlowRatio );
 
 		AirMassFlow = Node( VRFTUInletNodeNum ).MassFlowRate;
 		if ( VRFTU( VRFTUNum ).OAMixerUsed ) SimOAMixer( VRFTU( VRFTUNum ).OAMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).OAMixerIndex );
@@ -8539,7 +8847,9 @@ VRF( VRFCond ).Modifi_factor  =  C_cap_operation;
 
 		if ( VRFTU( VRFTUNum ).CoolingCoilPresent ) {
 			// above condition for heat pump mode, below condition for heat recovery mode
-			if ( ( ! VRF( VRFCond ).HeatRecoveryUsed && CoolingLoad( VRFCond ) ) || ( VRF( VRFCond ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList ) ) ) {
+			//@@
+			// if ( ( ! VRF( VRFCond ).HeatRecoveryUsed && CoolingLoad( VRFCond ) ) || ( VRF( VRFCond ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList ) ) ) {
+			if ( CoolingLoad( VRFCond ) ) {
 				SimDXCoil( "", On, FirstHVACIteration, VRFTU( VRFTUNum ).CoolCoilIndex, OpMode, PartLoadRatio, OnOffAirFlowRatio, _, MaxCoolingCapacity( VRFCond ), VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFCondCyclingRatio );
 			} else { // cooling coil is off
 				SimDXCoil( "", Off, FirstHVACIteration, VRFTU( VRFTUNum ).CoolCoilIndex, OpMode, 0.0, OnOffAirFlowRatio );
@@ -8549,10 +8859,10 @@ VRF( VRFCond ).Modifi_factor  =  C_cap_operation;
 			LoopDXCoolCoilRTF = 0.0;
 		}
 
-		if ( VRFTU( VRFTUNum ).HeatingCoilPresent ) {
+		if ( HeatingLoad( VRFCond ) ) {
 			// above condition for heat pump mode, below condition for heat recovery mode
 			if ( ( ! VRF( VRFCond ).HeatRecoveryUsed && HeatingLoad( VRFCond ) ) || ( VRF( VRFCond ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList ) ) ) {
-				SimDXCoil( "", Off, FirstHVACIteration, VRFTU( VRFTUNum ).HeatCoilIndex, OpMode, PartLoadRatio, OnOffAirFlowRatio, _, MaxHeatingCapacity( VRFCond ) );
+				SimDXCoil( "", Off, FirstHVACIteration, VRFTU( VRFTUNum ).HeatCoilIndex, 1.0, PartLoadRatio, OnOffAirFlowRatio, _, MaxHeatingCapacity( VRFCond ) );
 			} else {
 				SimDXCoil( "", Off, FirstHVACIteration, VRFTU( VRFTUNum ).HeatCoilIndex, OpMode, 0.0, OnOffAirFlowRatio );
 			}
