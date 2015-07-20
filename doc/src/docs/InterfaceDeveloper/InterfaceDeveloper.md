@@ -972,7 +972,7 @@ The “data dictionary” for EnergyPlus Weather Data is shown in the Auxiliary 
 Running EnergyPlus
 ==================
 
-EnergyPlus is written in language conforming to Fortran Standard 90/95.  It runs as a 32 bit console (non-Windows) application on Intel compatible computers (Windows NT, Windows 95/98).  More explicit details on running EnergyPlus are available in a separate document (Running EnergyPlus in Auxiliary Programs document).  The following files are used to run EnergyPlus:
+EnergyPlus is written in C++ and runs as a console application. More explicit details on running EnergyPlus are available in a separate document (Running EnergyPlus in Auxiliary Programs document). Optional command-line arguments are available (energyplus --help, or man energyplus on Linux systems). The following files are used to run EnergyPlus:
 
 * EnergyPlus.exe (the executable file)
 
