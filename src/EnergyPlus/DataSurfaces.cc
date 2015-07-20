@@ -512,7 +512,7 @@ namespace DataSurfaces {
 		WinSysSolTransmittance.deallocate();
 		WinSysSolReflectance.deallocate();
 		WinSysSolAbsorptance.deallocate();
-		SUNCOSHR = Array2D< Real64 >( 24, 3, 0.0 );
+		SUNCOSHR.dimension( 24, 3, 0.0 );
 		ReflFacBmToDiffSolObs.deallocate();
 		ReflFacBmToDiffSolGnd.deallocate();
 		ReflFacBmToBmSolObs.deallocate();

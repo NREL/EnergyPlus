@@ -377,7 +377,6 @@ namespace EnergyPlus {
 		std::string const & name, 
 		int const num_alphas, 
 		int const num_numbers, 
-		int const object_def_ptr, 
 		std::vector< std::string > const & alphas, 
 		std::vector< bool > const & alphas_blank, 
 		std::vector< Real64 > const & numbers, 
@@ -385,6 +384,8 @@ namespace EnergyPlus {
 	)
 	{
 		using namespace InputProcessor;
+
+		bool has_error = OverallErrorFlag;
 
 		EXPECT_FALSE( OverallErrorFlag );
 
@@ -397,15 +398,17 @@ namespace EnergyPlus {
 		index = ObjectStartRecord( index );
 
 		EXPECT_EQ( name, IDFRecords( index ).Name );
+		if ( name != IDFRecords( index ).Name ) has_error = true;
 		EXPECT_EQ( num_alphas, IDFRecords( index ).NumAlphas );
+		if ( num_alphas != IDFRecords( index ).NumAlphas ) has_error = true;
 		EXPECT_EQ( num_numbers, IDFRecords( index ).NumNumbers );
-		EXPECT_EQ( object_def_ptr, IDFRecords( index ).ObjectDefPtr );
-		EXPECT_TRUE( compare_containers( alphas, IDFRecords( index ).Alphas ) );
-		EXPECT_TRUE( compare_containers( alphas_blank, IDFRecords( index ).AlphBlank ) );
-		EXPECT_TRUE( compare_containers( numbers, IDFRecords( index ).Numbers ) );
-		EXPECT_TRUE( compare_containers( numbers_blank, IDFRecords( index ).NumBlank ) );
+		if ( num_numbers != IDFRecords( index ).NumNumbers ) has_error = true;
+		if ( ! compare_containers( alphas, IDFRecords( index ).Alphas ) ) has_error = true;
+		if ( ! compare_containers( alphas_blank, IDFRecords( index ).AlphBlank ) ) has_error = true;
+		if ( ! compare_containers( numbers, IDFRecords( index ).Numbers ) ) has_error = true;
+		if ( ! compare_containers( numbers_blank, IDFRecords( index ).NumBlank ) ) has_error = true;
 
-		return ! ::testing::Test::HasFailure();
+		return ! has_error;
 	}
 
 	InputProcessorCache::InputProcessorCache()

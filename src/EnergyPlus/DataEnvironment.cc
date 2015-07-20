@@ -209,7 +209,7 @@ namespace DataEnvironment {
 		GroundTempFC = Real64();
 		GroundTemp_Surface = Real64();
 		GroundTemp_Deep = Real64();
-		PubGroundTempSurface = Array1D< Real64 >( 12 );
+		PubGroundTempSurface.dimension( 12 );
 		PubGroundTempSurfFlag = bool();
 		HolidayIndex = int();
 		HolidayIndexTomorrow = int();
@@ -247,7 +247,7 @@ namespace DataEnvironment {
 		WaterMainsTemp = Real64();
 		Year = int();
 		YearTomorrow = int();
-		SOLCOS = Array1D< Real64 >( 3 );
+		SOLCOS.dimension( 3 );
 		CloudFraction = Real64();
 		HISKF = Real64();
 		HISUNF = Real64();

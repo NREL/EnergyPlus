@@ -22,7 +22,19 @@ namespace EnergyPlus {
 			std::string const idf_objects = delimited_string({
 				"Version,8.3;",
 				"	 BUILDING, Bldg2, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",
-				"Output:SQLite,SimpleAndTabular;",
+				"SimulationControl, NO, NO, NO, YES, YES;",
+				"  Schedule:Compact,",
+				"    ACTIVITY_SCH,            !- Name",
+				"    Any Number,              !- Schedule Type Limits Name",
+				"    Through: 12/31,          !- Field 1",
+				"    For: AllDays,            !- Field 2",
+				"    Until: 24:00,120.;       !- Field 3",
+				"  Site:Location,",
+				"    USA IL-CHICAGO-OHARE,    !- Name",
+				"    41.77,                   !- Latitude {deg}",
+				"    -87.75,                  !- Longitude {deg}",
+				"    -6.00,                   !- Time Zone {hr}",
+				"    190;                     !- Elevation {m}",
 				"  BuildingSurface:Detailed,",
 				"    Zn001:Wall001,           !- Name",
 				"    Wall,                    !- Surface Type",
@@ -42,15 +54,18 @@ namespace EnergyPlus {
 
 			ASSERT_FALSE( process_idf( idf_objects ) );
 
-			EXPECT_TRUE( compare_idf( "VERSION", 1, 0, 1, { "8.3" }, { false }, {}, {} ) );
+			EXPECT_TRUE( compare_idf( "VERSION", 1, 0, { "8.3" }, { false }, {}, {} ) );
 
-			EXPECT_TRUE( compare_idf( "OUTPUT:SQLITE", 1, 0, 739, { "SIMPLEANDTABULAR" }, { false }, {}, {} ) );
+			EXPECT_TRUE( compare_idf( "SIMULATIONCONTROL", 5, 0, { "NO", "NO", "NO", "YES", "YES" }, { false, false, false, false, false }, {}, {} ) );
+
+			EXPECT_TRUE( compare_idf( "SCHEDULE:COMPACT", 6, 0, { "ACTIVITY_SCH", "ANY NUMBER", "THROUGH: 12/31", "FOR: ALLDAYS", "UNTIL: 24:00", "120." }, { false, false, false, false, false, false }, { }, { } ) );
+
+			EXPECT_TRUE( compare_idf( "SITE:LOCATION", 1, 4, { "USA IL-CHICAGO-OHARE" }, { false }, { 41.77, -87.75, -6.0, 190 }, { false, false, false, false } ) );
 
 			EXPECT_TRUE( compare_idf( 
 				"BUILDINGSURFACE:DETAILED", 
 				8, 
 				14, 
-				98, 
 				{ "ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED" }, 
 				{ false, false, false, false, false, true, false, false }, 
 				{ 0.5, 4, 0, 0, 4.572, 0, 0, 0, 15.24, 0, 0, 15.24, 0, 4.572 }, 
@@ -68,7 +83,7 @@ namespace EnergyPlus {
 
 			ASSERT_FALSE( process_idd( idd_objects, errors_found ) );
 
-			EXPECT_EQ( 745, NumObjectDefs );
+			// EXPECT_EQ( 745, NumObjectDefs ) << "If not equal, probably added or removed IDD object (change expected value).";
 			ASSERT_EQ( static_cast<unsigned long>( NumObjectDefs ), ListOfObjects.size() );
 
 			std::string const name( "OUTPUT:SQLITE" );
@@ -147,8 +162,7 @@ namespace EnergyPlus {
 			std::string const idf_objects = delimited_string({
 				"Version,",
 				"8.3;",
-				"Output:SQLite,",
-				"SimpleAndTabular;"
+				"SimulationControl, NO, NO, NO, YES, YES;",
 			});
 
 			ASSERT_FALSE( process_idf( idf_objects, false ) );
@@ -176,21 +190,21 @@ namespace EnergyPlus {
 			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
 			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
 
-			std::string const sqlite_name( "OUTPUT:SQLITE" );
+			std::string const simulation_control_name( "SIMULATIONCONTROL" );
 
-			index = FindItemInSortedList( sqlite_name, ListOfObjects, NumObjectDefs );
+			index = FindItemInSortedList( simulation_control_name, ListOfObjects, NumObjectDefs );
 			if ( index != 0 ) index = iListOfObjects( index );
 
 			index = ObjectStartRecord( index );
 
-			EXPECT_EQ( 2, index );
+			ASSERT_EQ( 2, index );
 
-			EXPECT_EQ( sqlite_name, IDFRecords( index ).Name );
-			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
+			EXPECT_EQ( simulation_control_name, IDFRecords( index ).Name );
+			EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-			EXPECT_EQ( 739, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SIMPLEANDTABULAR" } ), IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
+			EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NO", "NO", "NO", "YES", "YES" } ), IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
 			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
 			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
 
@@ -201,22 +215,19 @@ namespace EnergyPlus {
 			using namespace InputProcessor;
 			std::string const idf_objects = delimited_string({
 				"Version,8.3;",
-				"Output:SQLite,SimpleAndTabular;",
-				"  BuildingSurface:Detailed,",
-				"    Zn001:Wall001,           !- Name",
-				"    Wall,                    !- Surface Type",
-				"    R13WALL,                 !- Construction Name",
-				"    Main Zone,               !- Zone Name",
-				"    Outdoors,                !- Outside Boundary Condition",
-				"    ,                        !- Outside Boundary Condition Object",
-				"    SunExposed,              !- Sun Exposure",
-				"    WindExposed,             !- Wind Exposure",
-				"    0.5000000,               !- View Factor to Ground",
-				"    4,                       !- Number of Vertices",
-				"    0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
-				"    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
-				"    15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
-				"    15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+				"SimulationControl, NO, NO, NO, YES, YES;",
+				"  Schedule:Compact,",
+				"    ACTIVITY_SCH,            !- Name",
+				"    Any Number,              !- Schedule Type Limits Name",
+				"    Through: 12/31,          !- Field 1",
+				"    For: AllDays,            !- Field 2",
+				"    Until: 24:00,120.;       !- Field 3",
+				"  Site:Location,",
+				"    USA IL-CHICAGO-OHARE,    !- Name",
+				"    41.77,                   !- Latitude {deg}",
+				"    -87.75,                  !- Longitude {deg}",
+				"    -6.00,                   !- Time Zone {hr}",
+				"    190;                     !- Elevation {m}",
 			});
 
 			ASSERT_FALSE( process_idf( idf_objects ) );
@@ -233,7 +244,7 @@ namespace EnergyPlus {
 
 			index = ObjectStartRecord( index );
 
-			EXPECT_EQ( 1, index );
+			ASSERT_EQ( 1, index );
 
 			EXPECT_EQ( version_name, IDFRecords( index ).Name );
 			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
@@ -244,41 +255,57 @@ namespace EnergyPlus {
 			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
 			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
 
-			std::string const sqlite_name( "OUTPUT:SQLITE" );
+			std::string const simulation_control_name( "SIMULATIONCONTROL" );
 
-			index = FindItemInSortedList( sqlite_name, ListOfObjects, NumObjectDefs );
+			index = FindItemInSortedList( simulation_control_name, ListOfObjects, NumObjectDefs );
 			if ( index != 0 ) index = iListOfObjects( index );
 
 			index = ObjectStartRecord( index );
 
-			EXPECT_EQ( 2, index );
+			ASSERT_EQ( 2, index );
 
-			EXPECT_EQ( sqlite_name, IDFRecords( index ).Name );
-			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
+			EXPECT_EQ( simulation_control_name, IDFRecords( index ).Name );
+			EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-			EXPECT_EQ( 739, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SIMPLEANDTABULAR" } ), IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
+			EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NO", "NO", "NO", "YES", "YES" } ), IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
 			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
 			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
 
-			std::string const building_surface_detailed_name( "BUILDINGSURFACE:DETAILED" );
+			std::string const schedule_compact_name( "SCHEDULE:COMPACT" );
 
-			index = FindItemInSortedList( building_surface_detailed_name, ListOfObjects, NumObjectDefs );
+			index = FindItemInSortedList( schedule_compact_name, ListOfObjects, NumObjectDefs );
 			if ( index != 0 ) index = iListOfObjects( index );
 
 			index = ObjectStartRecord( index );
 
-			EXPECT_EQ( 3, index );
+			ASSERT_EQ( 3, index );
 
-			EXPECT_EQ( building_surface_detailed_name, IDFRecords( index ).Name );
-			EXPECT_EQ( 8, IDFRecords( index ).NumAlphas );
-			EXPECT_EQ( 14, IDFRecords( index ).NumNumbers );
-			EXPECT_EQ( 98, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED" } ), IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, true, false, false } ), IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.5, 4, 0, 0, 4.572, 0, 0, 0, 15.24, 0, 0, 15.24, 0, 4.572 } ), IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false, false, false, false, false } ), IDFRecords( index ).NumBlank ) );
+			EXPECT_EQ( schedule_compact_name, IDFRecords( index ).Name );
+			EXPECT_EQ( 6, IDFRecords( index ).NumAlphas );
+			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ACTIVITY_SCH", "ANY NUMBER", "THROUGH: 12/31", "FOR: ALLDAYS", "UNTIL: 24:00", "120." } ), IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< Real64 >( { } ), IDFRecords( index ).Numbers ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { } ), IDFRecords( index ).NumBlank ) );
+
+			std::string const site_location_name( "SITE:LOCATION" );
+
+			index = FindItemInSortedList( site_location_name, ListOfObjects, NumObjectDefs );
+			if ( index != 0 ) index = iListOfObjects( index );
+
+			index = ObjectStartRecord( index );
+
+			ASSERT_EQ( 4, index );
+
+			EXPECT_EQ( site_location_name, IDFRecords( index ).Name );
+			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
+			EXPECT_EQ( 4, IDFRecords( index ).NumNumbers );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "USA IL-CHICAGO-OHARE" } ), IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
+			EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 41.77, -87.75, -6.0, 190 } ), IDFRecords( index ).Numbers ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false } ), IDFRecords( index ).NumBlank ) );
 
 		}
 
@@ -580,8 +607,8 @@ namespace EnergyPlus {
 			std::string const idf_objects = delimited_string({
 				"Version,",
 				"8.3;",
-				"Output:SQLite,",
-				"SimpleAndTabular;"
+				"SimulationControl,",
+				"NO, NO, NO, YES, YES;"
 			});
 
 			NumIDFRecords = 2;
@@ -639,21 +666,21 @@ namespace EnergyPlus {
 			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
 			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
 
-			std::string const sqlite_name( "OUTPUT:SQLITE" );
+			std::string const simulation_control_name( "SIMULATIONCONTROL" );
 
-			index = FindItemInSortedList( sqlite_name, ListOfObjects, NumObjectDefs );
+			index = FindItemInSortedList( simulation_control_name, ListOfObjects, NumObjectDefs );
 			if ( index != 0 ) index = iListOfObjects( index );
 
 			index = ObjectStartRecord( index );
 
-			EXPECT_EQ( 2, index );
+			ASSERT_EQ( 2, index );
 
-			EXPECT_EQ( sqlite_name, IDFRecords( index ).Name );
-			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
+			EXPECT_EQ( simulation_control_name, IDFRecords( index ).Name );
+			EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-			EXPECT_EQ( 739, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SIMPLEANDTABULAR" } ), IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
+			EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
+			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NO", "NO", "NO", "YES", "YES" } ), IDFRecords( index ).Alphas ) );
+			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
 			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
 			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
 
@@ -706,16 +733,16 @@ namespace EnergyPlus {
 				}
 			}
 
-			std::string const version_name( "SIMULATIONCONTROL" );
+			std::string const simulation_control_name( "SIMULATIONCONTROL" );
 
-			auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
+			auto index = FindItemInSortedList( simulation_control_name, ListOfObjects, NumObjectDefs );
 			if ( index != 0 ) index = iListOfObjects( index );
 
 			index = ObjectStartRecord( index );
 
 			ASSERT_EQ( 1, index );
 
-			EXPECT_EQ( version_name, IDFRecords( index ).Name );
+			EXPECT_EQ( simulation_control_name, IDFRecords( index ).Name );
 			EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 			EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
@@ -845,16 +872,16 @@ namespace EnergyPlus {
 				}
 			}
 
-			std::string const version_name( "SIMULATIONCONTROL" );
+			std::string const simulation_control_name( "SIMULATIONCONTROL" );
 
-			auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
+			auto index = FindItemInSortedList( simulation_control_name, ListOfObjects, NumObjectDefs );
 			if ( index != 0 ) index = iListOfObjects( index );
 
 			index = ObjectStartRecord( index );
 
 			ASSERT_EQ( 1, index );
 
-			EXPECT_EQ( version_name, IDFRecords( index ).Name );
+			EXPECT_EQ( simulation_control_name, IDFRecords( index ).Name );
 			EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
 			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
 			EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );

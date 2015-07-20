@@ -288,7 +288,7 @@ namespace OutputProcessor {
 		ReportList.deallocate();
 		NumReportList = 0;
 		NumExtraVars = 0;
-		FreqNotice = Array2D_string( {1,2}, {-1,4} );
+		FreqNotice.dimension( {1,2}, {-1,4} );
 		NumOfReqVariables = 0;
 		NumVarMeterArrays = 0;
 		NumEnergyMeters = 0;
