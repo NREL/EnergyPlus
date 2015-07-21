@@ -4280,7 +4280,7 @@ namespace DXCoils {
 						if ( DXCoil( DXCoilNum ).MSSecCoilSHRFT( I ) == 0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 							ShowContinueError( "...not found " + cAlphaFields( 35 + ( I - 1 ) * 2 ) + "=\"" + Alphas( 35 + ( I - 1 ) * 2 ) + "\"." );
-						} 	
+						}
 					}
 					// Read SHR modifier curve function of flow fraction
 					if ( !lAlphaBlanks( 36 + ( I - 1 ) * 2 ) ) {
@@ -5518,7 +5518,7 @@ namespace DXCoils {
 					DataFractionUsedForSizing = 0.0;
 				}
 
-				if ( SizeSecDXCoil ) { // autosize secondary coil air flow rate for AirCooled condenser type			
+				if ( SizeSecDXCoil ) { // autosize secondary coil air flow rate for AirCooled condenser type
 					IsAutoSize = false;
 					if ( DXCoil( DXCoilNum ).SecCoilAirFlow == AutoSize ) {
 						IsAutoSize = true;
@@ -6721,7 +6721,7 @@ namespace DXCoils {
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using General::CreateSysTimeIntervalString;
-		using DataWater::WaterStorage;	
+		using DataWater::WaterStorage;
 		using DataHeatBalance::Zone;
 
 		// Locals
@@ -7521,7 +7521,7 @@ namespace DXCoils {
 		DXCoilFanOpMode( DXCoilNum ) = FanOpMode;
 		DXCoil( DXCoilNum ).CondInletTemp = CondInletTemp;
 
-		// calc secondary coil if specified 
+		// calc secondary coil if specified
 		if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
 			CalcSecondaryDXCoils( DXCoilNum );
 		}
@@ -8240,7 +8240,7 @@ Label50: ;
 		Real64 OutletAirTemp; // Supply air temperature (average value if constant fan, full output if cycling fan)
 		Real64 OutletAirHumRat; // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
 		Real64 OutletAirEnthalpy; // Supply air enthalpy (average value if constant fan, full output if cycling fan)
-		
+
 		if ( present( OnOffAirFlowRatio ) ) {
 			AirFlowRatio = OnOffAirFlowRatio;
 		} else {
@@ -8530,7 +8530,7 @@ Label50: ;
 				DXCoil( DXCoilNum ).CrankcaseHeaterPower = CrankcaseHeatingPower;
 			} else {
 				DXCoil( DXCoilNum ).CrankcaseHeaterPower = CrankcaseHeatingPower * ( 1.0 - DXCoil( DXCoil( DXCoilNum ).CompanionUpstreamDXCoil ).CoolingCoilRuntimeFraction );
-			}	
+			}
 			DXCoil( DXCoilNum ).CompressorPartLoadRatio = 0.0;
 
 		} // end of on/off if - else
@@ -8542,8 +8542,8 @@ Label50: ;
 		DXCoilTotalHeating( DXCoilNum ) = DXCoil( DXCoilNum ).TotalHeatingEnergyRate;
 		DXCoilHeatInletAirDBTemp( DXCoilNum ) = InletAirDryBulbTemp;
 		DXCoilHeatInletAirWBTemp( DXCoilNum ) = InletAirWetBulbC;
-	
-		// calc secondary coil if specified 
+
+		// calc secondary coil if specified
 		if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
 			CalcSecondaryDXCoils( DXCoilNum );
 		}
@@ -9002,7 +9002,7 @@ Label50: ;
 		DXCoilOutletHumRat( DXCoilNum ) = DXCoil( DXCoilNum ).OutletAirHumRat;
 		DXCoil( DXCoilNum ).CondInletTemp = CondInletTemp; // Save condenser inlet temp in the data structure
 
-		// calc secondary coil if specified 
+		// calc secondary coil if specified
 		if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
 			CalcSecondaryDXCoils( DXCoilNum );
 		}
@@ -10342,7 +10342,7 @@ Label50: ;
 		DXCoilFanOpMode( DXCoilNum ) = FanOpMode;
 		DXCoil( DXCoilNum ).CondInletTemp = CondInletTemp; // Save condenser inlet temp in the data structure
 
-		// calc secondary coil if specified 
+		// calc secondary coil if specified
 		if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
 			CalcSecondaryDXCoils( DXCoilNum );
 		}
@@ -10967,7 +10967,7 @@ Label50: ;
 		DXCoil( DXCoilNum ).MSSpeedRatio = SpeedRatio;
 		DXCoil( DXCoilNum ).MSCycRatio = CycRatio;
 
-		// calc secondary coil if specified 
+		// calc secondary coil if specified
 		if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
 			CalcSecondaryDXCoils( DXCoilNum );
 		}
@@ -13310,10 +13310,10 @@ Label50: ;
 		// Calculates secondary zone heat gain from secondary DX coils placed in a zone.
 
 		// METHODOLOGY EMPLOYED:
-		// Energy balance:  
+		// Energy balance:
 		//  (1) Condenser placed in a zone, the zone total (sensible) heat
 		//      gain rate is given Qcond = QEvap + WcompPluscondFanPower
-		//  (2) Evaporator placed in a zone, the zone total heat removal 
+		//  (2) Evaporator placed in a zone, the zone total heat removal
 		//      rate is given Qevap = Qcond - WcompPluscondFanPower
 		//      Furthermore, the evaporator total heat removal is split into
 		//      latent and sensible components using user specified SHR
@@ -13362,8 +13362,8 @@ Label50: ;
 		int MSSpeedNumHS; // current high speed number of multspeed HP
 		Real64 MSSpeedRatio; // current speed ratio of multspeed HP
 		Real64 MSCycRatio; // current cycling ratio of multspeed HP
-		Real64 SHRHighSpeed; // sensible heat ratio at high speed 
-		Real64 SHRLowSpeed; // sensible heat ratio at low speed 
+		Real64 SHRHighSpeed; // sensible heat ratio at high speed
+		Real64 SHRLowSpeed; // sensible heat ratio at low speed
 
 		EvapAirMassFlow = 0.0;
 
@@ -13377,10 +13377,10 @@ Label50: ;
 				} else {
 					TotalHeatRejectionRate = 0.0;
 					return;
-				}				
+				}
 				DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate = TotalHeatRejectionRate;
 			} else if ( SELECT_CASE_var == CoilDX_HeatingEmpirical ) {
-				// evaporator coil in the secondary zone 
+				// evaporator coil in the secondary zone
 				if ( DXCoil( DXCoilNum ).ElecHeatingPower > 0.0 ) {
 					TotalHeatRemovalRate = max( 0.0, DXCoil( DXCoilNum ).TotalHeatingEnergyRate - DXCoil( DXCoilNum ).ElecHeatingPower );
 				} else {
@@ -13442,7 +13442,7 @@ Label50: ;
 					EvapAirMassFlow = RhoAir * ( DXCoil( DXCoilNum ).MSSecCoilAirFlow( MSSpeedNumHS ) * MSSpeedRatio + DXCoil( DXCoilNum ).MSSecCoilAirFlow( MSSpeedNumLS ) * ( 1.0 - MSSpeedRatio) );
 				} else if ( MSCycRatio > 0.0 ) {
 					EvapAirMassFlow = RhoAir * DXCoil( DXCoilNum ).MSSecCoilAirFlow( MSSpeedNumLS );
-				}  
+				}
 				if ( DXCoil( DXCoilNum ).ElecHeatingPower > 0.0 ) {
 					TotalHeatRemovalRate = max( 0.0, DXCoil( DXCoilNum ).TotalHeatingEnergyRate - DXCoil( DXCoilNum ).ElecHeatingPower );
 				} else {
@@ -13457,7 +13457,7 @@ Label50: ;
 					EvapInletEnthalpy = PsyHFnTdbW( EvapInletDryBulb, EvapInletHumRat );
 					// determine the current SHR
 					if ( MSSpeedRatio > 0.0 ) {
-						// calculate SHR for the higher speed 
+						// calculate SHR for the higher speed
 						PartLoadRatio = 1.0;
 						SecCoilFlowFraction = 1.0;
 						SecCoilSHRFT = DXCoil( DXCoilNum ).MSSecCoilSHRFT( MSSpeedNumHS );
@@ -13522,16 +13522,16 @@ Label50: ;
 		int const EP_UNUSED( DXCoilNum ),
 		Real64 const EvapAirMassFlow,
 		Real64 const TotalHeatRemovalRate,
-		Real64 const PartLoadRatio, 
+		Real64 const PartLoadRatio,
 		Real64 const SecCoilRatedSHR,
-		Real64 const EvapInletDryBulb, 
-		Real64 const EvapInletHumRat, 
-		Real64 const EvapInletWetBulb, 
+		Real64 const EvapInletDryBulb,
+		Real64 const EvapInletHumRat,
+		Real64 const EvapInletWetBulb,
 		Real64 const EvapInletEnthalpy,
 		Real64 const CondInletDryBulb,
 		Real64 const SecCoilFlowFraction,
 		int const SecCoilSHRFT,
-		int const SecCoilSHRFF	
+		int const SecCoilSHRFF
 		) {
 
 		// SUBROUTINE INFORMATION:
@@ -13544,11 +13544,11 @@ Label50: ;
 		// Calculates secondary coil (evaporator) sensible heat ratio.
 
 		// METHODOLOGY EMPLOYED:
-		// Energy balance:  
+		// Energy balance:
 		//  (1) checks if the seconday coil operation is dry and calculates appliavle SHR.
-		//  (2) determines SHR from user specified rated SHR values and SHR modifier curves for 
+		//  (2) determines SHR from user specified rated SHR values and SHR modifier curves for
 		//      temperature and flor fraction.
-		//  (3) if secondary coil operates dry then the larger of the user SHR value and dry 
+		//  (3) if secondary coil operates dry then the larger of the user SHR value and dry
 		//      coil operation SHR is selected.
 
 		// REFERENCES:
@@ -13587,7 +13587,7 @@ Label50: ;
 		Real64 wADP; // humidity ratio of air at secondary coil at ADP
 		Real64 HumRatError; // humidity ratio error
 		bool CoilMightBeDry; // TRUE means the secondary DX coi runs dry
-		int Counter; // iteration counter 
+		int Counter; // iteration counter
 		bool Converged; // convergence flag
 		Real64 SHR; // current time step sensible heat ratio of secondary coil
 
@@ -13644,7 +13644,7 @@ Label50: ;
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

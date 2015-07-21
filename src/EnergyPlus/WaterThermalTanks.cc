@@ -7708,7 +7708,7 @@ namespace WaterThermalTanks {
 
 		// USE STATEMENTS:
 		// Using/Aliasing
-		
+
 		// Return value
 		Real64 PLRResidualMixedTank;
 
@@ -7771,7 +7771,7 @@ namespace WaterThermalTanks {
 
 		// USE STATEMENTS:
 		// Using/Aliasing
-		
+
 		// Return value
 		Real64 PLRResidualStratifiedTank;
 
@@ -10073,7 +10073,7 @@ namespace WaterThermalTanks {
 		return SensedTemp;
 
 	}
-	
+
 	Real64
 	WaterThermalTankData::getDeadBandTemp()
 	{
@@ -10087,7 +10087,7 @@ namespace WaterThermalTanks {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
