@@ -424,6 +424,7 @@ namespace ZoneAirLoopEquipmentManager {
 					for ( InletNum = 1; InletNum <= ZoneEquipConfig( ZoneEqNum ).NumInletNodes; ++InletNum ) {
 						if ( ZoneEquipConfig( ZoneEqNum ).InletNode( InletNum ) == AirDistUnit( AirDistUnitNum ).OutletNodeNum ) {
 							AirDistUnit( AirDistUnitNum ).ZoneEqNum = ZoneEqNum;
+							ZoneEquipConfig( ZoneEqNum ).ADUNum = AirDistUnitNum;
 						}
 					}
 				}
@@ -697,8 +698,8 @@ namespace ZoneAirLoopEquipmentManager {
 		CpAirSys = PsyCpAirFnWTdb( Node( AirDistUnit( AirDistUnitNum ).OutletNodeNum ).HumRat, Node( AirDistUnit( AirDistUnitNum ).OutletNodeNum ).Temp );
 		SysOutputProvided = Node( AirDistUnit( AirDistUnitNum ).OutletNodeNum ).MassFlowRate *
 			( CpAirSys * Node( AirDistUnit( AirDistUnitNum ).OutletNodeNum ).Temp - CpAirZn * Node( ZoneEquipConfig( ControlledZoneNum ).ZoneNode ).Temp );
-		AirDistUnit( AirDistUnitNum ).HeatRate = max( 0.0, SysOutputProvided );
-		AirDistUnit( AirDistUnitNum ).CoolRate = std::abs( min( 0.0, SysOutputProvided ));
+		// AirDistUnit( AirDistUnitNum ).HeatRate = max( 0.0, SysOutputProvided );
+		// AirDistUnit( AirDistUnitNum ).CoolRate = std::abs( min( 0.0, SysOutputProvided ));
 		if ( ProvideSysOutput ) {
 			// Sign convention: LatOutputProvided <0 Zone is dehumidified
 			//                  LatOutputProvided >0 Zone is humidified
@@ -769,8 +770,8 @@ namespace ZoneAirLoopEquipmentManager {
 		using DataHVACGlobals::TimeStepSys;
 
 		//report the Direct Air Output
-		AirDistUnit( AirDistUnitNum ).HeatGain = AirDistUnit( AirDistUnitNum ).HeatRate * TimeStepSys * SecInHour;
-		AirDistUnit( AirDistUnitNum ).CoolGain = AirDistUnit( AirDistUnitNum ).CoolRate * TimeStepSys * SecInHour;
+		// AirDistUnit( AirDistUnitNum ).HeatGain = AirDistUnit( AirDistUnitNum ).HeatRate * TimeStepSys * SecInHour;
+		// AirDistUnit( AirDistUnitNum ).CoolGain = AirDistUnit( AirDistUnitNum ).CoolRate * TimeStepSys * SecInHour;
 	}
 
 	//     NOTICE

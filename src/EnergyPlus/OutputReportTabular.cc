@@ -5737,8 +5737,12 @@ namespace OutputReportTabular {
 
 		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
 			//annual
-			PreDefTableEntry( pdchSHGSAnHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacHt * convertJtoGJ, 3 );
-			PreDefTableEntry( pdchSHGSAnHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacCl * convertJtoGJ, 3 );
+			// PreDefTableEntry( pdchSHGSAnHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacHt * convertJtoGJ, 3 );
+			// PreDefTableEntry( pdchSHGSAnHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacCl * convertJtoGJ, 3 );
+			PreDefTableEntry( pdchSHGSAnHvacHt, Zone( iZone ).Name, ( ZonePreDefRep( iZone ).SHGSAnHvacHt - 
+				ZonePreDefRep( iZone ).SHGSAnHvacATUHt ) * convertJtoGJ, 3 );
+			PreDefTableEntry( pdchSHGSAnHvacCl, Zone( iZone ).Name, ( ZonePreDefRep( iZone ).SHGSAnHvacCl - 
+				ZonePreDefRep( iZone ).SHGSAnHvacATUCl ) * convertJtoGJ, 3 );
 			PreDefTableEntry( pdchSHGSAnHvacATUHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacATUHt * convertJtoGJ, 3 );
 			PreDefTableEntry( pdchSHGSAnHvacATUCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacATUCl * convertJtoGJ, 3 );
 			PreDefTableEntry( pdchSHGSAnSurfHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnSurfHt * convertJtoGJ, 3 );
@@ -5757,8 +5761,10 @@ namespace OutputReportTabular {
 			PreDefTableEntry( pdchSHGSAnOtherRem, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnOtherRem * convertJtoGJ, 3 );
 			//peak cooling
 			PreDefTableEntry( pdchSHGSClTimePeak, Zone( iZone ).Name, DateToString( ZonePreDefRep( iZone ).clPtTimeStamp ) );
-			PreDefTableEntry( pdchSHGSClHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSClHvacHt );
-			PreDefTableEntry( pdchSHGSClHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSClHvacCl );
+			// PreDefTableEntry( pdchSHGSClHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSClHvacHt );
+			// PreDefTableEntry( pdchSHGSClHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSClHvacCl );
+			PreDefTableEntry( pdchSHGSClHvacHt, Zone( iZone ).Name, ( ZonePreDefRep( iZone ).SHGSClHvacHt - ZonePreDefRep( iZone ).SHGSClHvacATUHt ) );
+			PreDefTableEntry( pdchSHGSClHvacCl, Zone( iZone ).Name, ( ZonePreDefRep( iZone ).SHGSClHvacCl - ZonePreDefRep( iZone ).SHGSClHvacATUCl ) );
 			PreDefTableEntry( pdchSHGSClHvacATUHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSClHvacATUHt );
 			PreDefTableEntry( pdchSHGSClHvacATUCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSClHvacATUCl );
 			PreDefTableEntry( pdchSHGSClSurfHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSClSurfHt );
@@ -5777,8 +5783,10 @@ namespace OutputReportTabular {
 			PreDefTableEntry( pdchSHGSClOtherRem, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSClOtherRem );
 			//peak heating
 			PreDefTableEntry( pdchSHGSHtTimePeak, Zone( iZone ).Name, DateToString( ZonePreDefRep( iZone ).htPtTimeStamp ) );
-			PreDefTableEntry( pdchSHGSHtHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSHtHvacHt );
-			PreDefTableEntry( pdchSHGSHtHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSHtHvacCl );
+			// PreDefTableEntry( pdchSHGSHtHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSHtHvacHt );
+			// PreDefTableEntry( pdchSHGSHtHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSHtHvacCl );
+			PreDefTableEntry( pdchSHGSHtHvacHt, Zone( iZone ).Name, ( ZonePreDefRep( iZone ).SHGSHtHvacHt - ZonePreDefRep( iZone ).SHGSHtHvacATUHt ) );
+			PreDefTableEntry( pdchSHGSHtHvacCl, Zone( iZone ).Name, ( ZonePreDefRep( iZone ).SHGSHtHvacCl - ZonePreDefRep( iZone ).SHGSHtHvacATUCl ) );
 			PreDefTableEntry( pdchSHGSHtHvacATUHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSHtHvacATUHt );
 			PreDefTableEntry( pdchSHGSHtHvacATUCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSHtHvacATUCl );
 			PreDefTableEntry( pdchSHGSHtSurfHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSHtSurfHt );
@@ -5817,8 +5825,10 @@ namespace OutputReportTabular {
 			totalInfilRem += ZonePreDefRep( iZone ).SHGSAnInfilRem;
 			totalOtherRem += ZonePreDefRep( iZone ).SHGSAnOtherRem;
 		}
-		PreDefTableEntry( pdchSHGSAnHvacHt, "Total Facility", totalHvacHt * convertJtoGJ, 3 );
-		PreDefTableEntry( pdchSHGSAnHvacCl, "Total Facility", totalHvacCl * convertJtoGJ, 3 );
+		// PreDefTableEntry( pdchSHGSAnHvacHt, "Total Facility", totalHvacHt * convertJtoGJ, 3 );
+		// PreDefTableEntry( pdchSHGSAnHvacCl, "Total Facility", totalHvacCl * convertJtoGJ, 3 );
+		PreDefTableEntry( pdchSHGSAnHvacHt, "Total Facility", ( totalHvacHt - totalHvacATUHt ) * convertJtoGJ, 3 );
+		PreDefTableEntry( pdchSHGSAnHvacCl, "Total Facility", ( totalHvacCl - totalHvacATUCl ) * convertJtoGJ, 3 );
 		PreDefTableEntry( pdchSHGSAnHvacATUHt, "Total Facility", totalHvacATUHt * convertJtoGJ, 3 );
 		PreDefTableEntry( pdchSHGSAnHvacATUCl, "Total Facility", totalHvacATUCl * convertJtoGJ, 3 );
 		PreDefTableEntry( pdchSHGSAnSurfHt, "Total Facility", totalSurfHt * convertJtoGJ, 3 );
@@ -5837,8 +5847,10 @@ namespace OutputReportTabular {
 		PreDefTableEntry( pdchSHGSAnOtherRem, "Total Facility", totalOtherRem * convertJtoGJ, 3 );
 		// building level results for peak cooling
 		PreDefTableEntry( pdchSHGSClTimePeak, "Total Facility", DateToString( BuildingPreDefRep.clPtTimeStamp ) );
-		PreDefTableEntry( pdchSHGSClHvacHt, "Total Facility", BuildingPreDefRep.SHGSClHvacHt );
-		PreDefTableEntry( pdchSHGSClHvacCl, "Total Facility", BuildingPreDefRep.SHGSClHvacCl );
+		// PreDefTableEntry( pdchSHGSClHvacHt, "Total Facility", BuildingPreDefRep.SHGSClHvacHt );
+		// PreDefTableEntry( pdchSHGSClHvacCl, "Total Facility", BuildingPreDefRep.SHGSClHvacCl );
+		PreDefTableEntry( pdchSHGSClHvacHt, "Total Facility", ( BuildingPreDefRep.SHGSClHvacHt - BuildingPreDefRep.SHGSClHvacATUHt ) );
+		PreDefTableEntry( pdchSHGSClHvacCl, "Total Facility", ( BuildingPreDefRep.SHGSClHvacCl - BuildingPreDefRep.SHGSClHvacATUCl ) );
 		PreDefTableEntry( pdchSHGSClHvacATUHt, "Total Facility", BuildingPreDefRep.SHGSClHvacATUHt );
 		PreDefTableEntry( pdchSHGSClHvacATUCl, "Total Facility", BuildingPreDefRep.SHGSClHvacATUCl );
 		PreDefTableEntry( pdchSHGSClSurfHt, "Total Facility", BuildingPreDefRep.SHGSClSurfHt );
@@ -5857,8 +5869,10 @@ namespace OutputReportTabular {
 		PreDefTableEntry( pdchSHGSClOtherRem, "Total Facility", BuildingPreDefRep.SHGSClOtherRem );
 		// building level results for peak heating
 		PreDefTableEntry( pdchSHGSHtTimePeak, "Total Facility", DateToString( BuildingPreDefRep.htPtTimeStamp ) );
-		PreDefTableEntry( pdchSHGSHtHvacHt, "Total Facility", BuildingPreDefRep.SHGSHtHvacHt );
-		PreDefTableEntry( pdchSHGSHtHvacCl, "Total Facility", BuildingPreDefRep.SHGSHtHvacCl );
+		// PreDefTableEntry( pdchSHGSHtHvacHt, "Total Facility", BuildingPreDefRep.SHGSHtHvacHt );
+		// PreDefTableEntry( pdchSHGSHtHvacCl, "Total Facility", BuildingPreDefRep.SHGSHtHvacCl );
+		PreDefTableEntry( pdchSHGSHtHvacHt, "Total Facility", ( BuildingPreDefRep.SHGSHtHvacHt - BuildingPreDefRep.SHGSHtHvacATUHt ) );
+		PreDefTableEntry( pdchSHGSHtHvacCl, "Total Facility", ( BuildingPreDefRep.SHGSHtHvacCl - BuildingPreDefRep.SHGSHtHvacATUCl ) );
 		PreDefTableEntry( pdchSHGSHtHvacATUHt, "Total Facility", BuildingPreDefRep.SHGSHtHvacATUHt );
 		PreDefTableEntry( pdchSHGSHtHvacATUCl, "Total Facility", BuildingPreDefRep.SHGSHtHvacATUCl );
 		PreDefTableEntry( pdchSHGSHtSurfHt, "Total Facility", BuildingPreDefRep.SHGSHtSurfHt );
@@ -11092,6 +11106,7 @@ namespace OutputReportTabular {
 		using DataSizing::NumTimeStepsInAvg;
 		using DataSizing::CoolPeakDateHrMin;
 		using DataSizing::HeatPeakDateHrMin;
+		using DataSizing::CalcZoneSizing;
 		using DataGlobals::NumOfTimeStepInHour;
 		using DataGlobals::CompLoadReportIsReq;
 		using DataGlobals::ShowDecayCurvesInEIO;
@@ -11122,27 +11137,28 @@ namespace OutputReportTabular {
 		int const rHvacLoss( 6 );
 		int const rPowerGen( 7 );
 		//misc
-		int const rInfil( 8 );
-		int const rZoneVent( 9 );
-		int const rIntZonMix( 10 );
+		int const rDOAS( 8 );
+		int const rInfil( 9 );
+		int const rZoneVent( 10 );
+		int const rIntZonMix( 11 );
 		//opaque surfaces
-		int const rRoof( 11 );
-		int const rIntZonCeil( 12 );
-		int const rOtherRoof( 13 );
-		int const rExtWall( 14 );
-		int const rIntZonWall( 15 );
-		int const rGrdWall( 16 );
-		int const rOtherWall( 17 );
-		int const rExtFlr( 18 );
-		int const rIntZonFlr( 19 );
-		int const rGrdFlr( 20 );
-		int const rOtherFlr( 21 );
+		int const rRoof( 12 );
+		int const rIntZonCeil( 13 );
+		int const rOtherRoof( 14 );
+		int const rExtWall( 15 );
+		int const rIntZonWall( 16 );
+		int const rGrdWall( 17 );
+		int const rOtherWall( 18 );
+		int const rExtFlr( 19 );
+		int const rIntZonFlr( 20 );
+		int const rGrdFlr( 21 );
+		int const rOtherFlr( 22 );
 		//subsurfaces
-		int const rFeneCond( 22 );
-		int const rFeneSolr( 23 );
-		int const rOpqDoor( 24 );
+		int const rFeneCond( 23 );
+		int const rFeneSolr( 24 );
+		int const rOpqDoor( 25 );
 		//total
-		int const rGrdTot( 25 );
+		int const rGrdTot( 26 );
 
 		// na
 
@@ -11248,6 +11264,7 @@ namespace OutputReportTabular {
 				rowHead( rHvacLoss ) = "HVAC Equipment Losses";
 				rowHead( rRefrig ) = "Refrigeration";
 				//misc
+				rowHead( rDOAS ) = "DOAS Direct to Zone";
 				rowHead( rInfil ) = "Infiltration";
 				rowHead( rZoneVent ) = "Zone Ventilation";
 				rowHead( rIntZonMix ) = "Interzone Mixing";
@@ -11392,6 +11409,15 @@ namespace OutputReportTabular {
 					tableBody( cSensDelay, rPowerGen ) = RealToStr( AvgData( timeCoolMax ), 2 );
 					totalColumn( rPowerGen ) += AvgData( timeCoolMax );
 					grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+
+					//DOAS
+					tableBody( cSensInst, rDOAS ) = RealToStr( CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeCoolMax ), 2 );
+					totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeCoolMax );
+					grandTotalRow( cSensInst ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeCoolMax );
+
+					tableBody( cLatent, rDOAS ) = RealToStr( CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeCoolMax ), 2 );
+					totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeCoolMax );
+					grandTotalRow( cLatent ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeCoolMax );
 
 					//INFILTRATION
 					seqData = infilInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
@@ -11720,6 +11746,7 @@ namespace OutputReportTabular {
 				rowHead( rHvacLoss ) = "HVAC Equipment Losses";
 				rowHead( rRefrig ) = "Refrigeration";
 				//misc
+				rowHead( rDOAS ) = "DOAS";
 				rowHead( rInfil ) = "Infiltration";
 				rowHead( rZoneVent ) = "Zone Ventilation";
 				rowHead( rIntZonMix ) = "Interzone Mixing";
@@ -11864,6 +11891,15 @@ namespace OutputReportTabular {
 					tableBody( cSensDelay, rPowerGen ) = RealToStr( AvgData( timeHeatMax ), 2 );
 					totalColumn( rPowerGen ) += AvgData( timeHeatMax );
 					grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+
+					//DOAS
+					tableBody( cSensInst, rDOAS ) = RealToStr( CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax ), 2 );
+					totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
+					grandTotalRow( cSensDelay ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
+
+					tableBody( cLatent, rDOAS ) = RealToStr( CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax ), 2 );
+					totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
+					grandTotalRow( cLatent ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
 
 					//INFILTRATION
 					seqData = infilInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;

@@ -35,6 +35,7 @@
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
 #include <ZonePlenum.hh>
+#include <DirectAirManager.hh>
 
 namespace EnergyPlus {
 
@@ -4819,6 +4820,7 @@ namespace ZoneTempPredictorCorrector {
 		using namespace DataHeatBalSurface;
 		using DataLoopNode::Node;
 		using DataZoneEquipment::ZoneEquipConfig;
+		using DataDefineEquip::AirDistUnit;
 		using ZonePlenum::ZoneRetPlenCond;
 		using ZonePlenum::ZoneSupPlenCond;
 		using ZonePlenum::NumZoneReturnPlenums;
@@ -4827,6 +4829,7 @@ namespace ZoneTempPredictorCorrector {
 		using General::RoundSigDigits;
 		using InternalHeatGains::SumAllInternalConvectionGains;
 		using InternalHeatGains::SumAllReturnAirConvectionGains;
+		using DirectAirManager::DirectAir;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4854,10 +4857,13 @@ namespace ZoneTempPredictorCorrector {
 		int ADUNum;
 		int ADUInNode;
 		int ADUOutNode;
+		int SDUNum;
 		Real64 SumSysMCp;
 		Real64 SumSysMCpT;
 		Real64 Threshold;
 		Real64 SumRetAirGains;
+		Real64 ADUHeatAddRate;
+		Real64 SDUHeatAddRate;
 
 		SumIntGains = 0.0; // Zone sum of convective internal gains
 		SumHADTsurfs = 0.0; // Zone sum of Hc*Area*(Tsurf - Tz)
@@ -4869,6 +4875,10 @@ namespace ZoneTempPredictorCorrector {
 		imBalance = 0.0;
 		SumSysMCp = 0.0;
 		SumSysMCpT = 0.0;
+		ADUHeatAddRate = 0.0;
+		SDUHeatAddRate = 0.0;
+		ADUNum = 0;
+		SDUNum = 0;
 
 		// Sum all convective internal gains: SumIntGain
 		SumAllInternalConvectionGains( ZoneNum, SumIntGains );
@@ -4933,6 +4943,30 @@ namespace ZoneTempPredictorCorrector {
 				SumMCpDTsystem += MassFlowRate * CpAir * ( NodeTemp - MAT( ZoneNum ) );
 
 			} // NodeNum
+
+			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ADUNum > 0 ) {
+				ADUNum = ZoneEquipConfig( ZoneEquipConfigNum ).ADUNum;
+				NodeTemp = Node( AirDistUnit( ADUNum ).OutletNodeNum ).Temp;
+				MassFlowRate = Node( AirDistUnit( ADUNum ).OutletNodeNum ).MassFlowRate;
+				CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
+				ADUHeatAddRate = MassFlowRate * CpAir * ( NodeTemp - MAT( ZoneNum ) );
+				AirDistUnit( ADUNum ).HeatRate = max( 0.0, ADUHeatAddRate );
+				AirDistUnit( ADUNum ).CoolRate = std::abs( min( 0.0, ADUHeatAddRate ) );
+				AirDistUnit( ADUNum ).HeatGain = AirDistUnit( ADUNum ).HeatRate * TimeStepSys * SecInHour;
+				AirDistUnit( ADUNum ).CoolGain = AirDistUnit( ADUNum ).CoolRate * TimeStepSys * SecInHour;
+			}
+
+			if ( ZoneEquipConfig( ZoneEquipConfigNum ).SDUNum > 0 ) {
+				SDUNum = ZoneEquipConfig( ZoneEquipConfigNum ).SDUNum;
+				NodeTemp = Node( DirectAir( SDUNum ).ZoneSupplyAirNode ).Temp;
+				MassFlowRate = Node( DirectAir( SDUNum ).ZoneSupplyAirNode ).MassFlowRate;
+				CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
+				SDUHeatAddRate = MassFlowRate * CpAir * ( NodeTemp - MAT( ZoneNum ) );
+				DirectAir( SDUNum ).HeatRate = max( SDUHeatAddRate, 0.0 );
+				DirectAir( SDUNum ).CoolRate = std::abs( min( SDUHeatAddRate, 0.0 ) );
+				DirectAir( SDUNum ).HeatEnergy = DirectAir( SDUNum ).HeatRate * TimeStepSys * SecInHour;
+				DirectAir( SDUNum ).CoolEnergy = DirectAir( SDUNum ).CoolRate * TimeStepSys * SecInHour;
+			}
 
 		} else if ( ZoneRetPlenumAirFlag ) {
 			for ( NodeNum = 1; NodeNum <= ZoneRetPlenCond( ZoneRetPlenumNum ).NumInletNodes; ++NodeNum ) {

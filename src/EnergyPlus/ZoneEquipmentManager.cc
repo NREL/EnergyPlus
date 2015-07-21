@@ -613,6 +613,7 @@ namespace ZoneEquipmentManager {
 				Node( SupplyAirNode1 ).MassFlowRate = DOASMassFlowRate;
 				Node( SupplyAirNode1 ).Enthalpy = PsyHFnTdbW( DOASSupplyTemp, DOASSupplyHumRat );
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).DOASHeatAdd = DOASSysOutputProvided;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).DOASLatAdd = TotDOASSysOutputProvided - DOASSysOutputProvided;
 				SupplyAirNode = SupplyAirNode2;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).DOASSupMassFlow = DOASMassFlowRate;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).DOASSupTemp = DOASSupplyTemp;
@@ -1125,6 +1126,7 @@ namespace ZoneEquipmentManager {
 				ZoneSizing( DesDayNum, CtrlZoneNum ).DOASHeatLoadSeq.allocate( NumOfTimeStepInDay );
 				ZoneSizing( DesDayNum, CtrlZoneNum ).DOASCoolLoadSeq.allocate( NumOfTimeStepInDay );
 				ZoneSizing( DesDayNum, CtrlZoneNum ).DOASHeatAddSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DOASLatAddSeq.allocate( NumOfTimeStepInDay );
 				ZoneSizing( DesDayNum, CtrlZoneNum ).DOASSupMassFlowSeq.allocate( NumOfTimeStepInDay );
 				ZoneSizing( DesDayNum, CtrlZoneNum ).DOASSupTempSeq.allocate( NumOfTimeStepInDay );
 				ZoneSizing( DesDayNum, CtrlZoneNum ).DOASSupHumRatSeq.allocate( NumOfTimeStepInDay );
@@ -1148,6 +1150,7 @@ namespace ZoneEquipmentManager {
 				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASHeatLoadSeq.allocate( NumOfTimeStepInDay );
 				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASCoolLoadSeq.allocate( NumOfTimeStepInDay );
 				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASHeatAddSeq.allocate( NumOfTimeStepInDay );
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASLatAddSeq.allocate( NumOfTimeStepInDay );
 				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASSupMassFlowSeq.allocate( NumOfTimeStepInDay );
 				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASSupTempSeq.allocate( NumOfTimeStepInDay );
 				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASSupHumRatSeq.allocate( NumOfTimeStepInDay );
@@ -1174,6 +1177,7 @@ namespace ZoneEquipmentManager {
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DOASHeatLoadSeq( TimeStepIndex ) = 0.0;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DOASCoolLoadSeq( TimeStepIndex ) = 0.0;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DOASHeatAddSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DOASLatAddSeq( TimeStepIndex ) = 0.0;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DOASSupMassFlowSeq( TimeStepIndex ) = 0.0;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DOASSupTempSeq( TimeStepIndex ) = 0.0;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DOASSupHumRatSeq( TimeStepIndex ) = 0.0;
@@ -1197,6 +1201,7 @@ namespace ZoneEquipmentManager {
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASHeatLoadSeq( TimeStepIndex ) = 0.0;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASCoolLoadSeq( TimeStepIndex ) = 0.0;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASHeatAddSeq( TimeStepIndex ) = 0.0;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASLatAddSeq( TimeStepIndex ) = 0.0;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASSupMassFlowSeq( TimeStepIndex ) = 0.0;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASSupTempSeq( TimeStepIndex ) = 0.0;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DOASSupHumRatSeq( TimeStepIndex ) = 0.0;
@@ -1360,6 +1365,7 @@ namespace ZoneEquipmentManager {
 			FinalZoneSizing( CtrlZoneNum ).DOASHeatLoadSeq.allocate( NumOfTimeStepInDay );
 			FinalZoneSizing( CtrlZoneNum ).DOASCoolLoadSeq.allocate( NumOfTimeStepInDay );
 			FinalZoneSizing( CtrlZoneNum ).DOASHeatAddSeq.allocate( NumOfTimeStepInDay );
+			FinalZoneSizing( CtrlZoneNum ).DOASLatAddSeq.allocate( NumOfTimeStepInDay );
 			FinalZoneSizing( CtrlZoneNum ).DOASSupMassFlowSeq.allocate( NumOfTimeStepInDay );
 			FinalZoneSizing( CtrlZoneNum ).DOASSupTempSeq.allocate( NumOfTimeStepInDay );
 			FinalZoneSizing( CtrlZoneNum ).DOASSupHumRatSeq.allocate( NumOfTimeStepInDay );
@@ -1383,6 +1389,7 @@ namespace ZoneEquipmentManager {
 			CalcFinalZoneSizing( CtrlZoneNum ).DOASHeatLoadSeq.allocate( NumOfTimeStepInDay );
 			CalcFinalZoneSizing( CtrlZoneNum ).DOASCoolLoadSeq.allocate( NumOfTimeStepInDay );
 			CalcFinalZoneSizing( CtrlZoneNum ).DOASHeatAddSeq.allocate( NumOfTimeStepInDay );
+			CalcFinalZoneSizing( CtrlZoneNum ).DOASLatAddSeq.allocate( NumOfTimeStepInDay );
 			CalcFinalZoneSizing( CtrlZoneNum ).DOASSupMassFlowSeq.allocate( NumOfTimeStepInDay );
 			CalcFinalZoneSizing( CtrlZoneNum ).DOASSupTempSeq.allocate( NumOfTimeStepInDay );
 			CalcFinalZoneSizing( CtrlZoneNum ).DOASSupHumRatSeq.allocate( NumOfTimeStepInDay );
@@ -1407,6 +1414,7 @@ namespace ZoneEquipmentManager {
 				FinalZoneSizing( CtrlZoneNum ).DOASHeatLoadSeq( TimeStepIndex ) = 0.0;
 				FinalZoneSizing( CtrlZoneNum ).DOASCoolLoadSeq( TimeStepIndex ) = 0.0;
 				FinalZoneSizing( CtrlZoneNum ).DOASHeatAddSeq( TimeStepIndex ) = 0.0;
+				FinalZoneSizing( CtrlZoneNum ).DOASLatAddSeq( TimeStepIndex ) = 0.0;
 				FinalZoneSizing( CtrlZoneNum ).DOASSupMassFlowSeq( TimeStepIndex ) = 0.0;
 				FinalZoneSizing( CtrlZoneNum ).DOASSupTempSeq( TimeStepIndex ) = 0.0;
 				FinalZoneSizing( CtrlZoneNum ).DOASSupHumRatSeq( TimeStepIndex ) = 0.0;
@@ -1430,6 +1438,7 @@ namespace ZoneEquipmentManager {
 				CalcFinalZoneSizing( CtrlZoneNum ).DOASHeatLoadSeq( TimeStepIndex ) = 0.0;
 				CalcFinalZoneSizing( CtrlZoneNum ).DOASCoolLoadSeq( TimeStepIndex ) = 0.0;
 				CalcFinalZoneSizing( CtrlZoneNum ).DOASHeatAddSeq( TimeStepIndex ) = 0.0;
+				CalcFinalZoneSizing( CtrlZoneNum ).DOASLatAddSeq( TimeStepIndex ) = 0.0;
 				CalcFinalZoneSizing( CtrlZoneNum ).DOASSupMassFlowSeq( TimeStepIndex ) = 0.0;
 				CalcFinalZoneSizing( CtrlZoneNum ).DOASSupTempSeq( TimeStepIndex ) = 0.0;
 				CalcFinalZoneSizing( CtrlZoneNum ).DOASSupHumRatSeq( TimeStepIndex ) = 0.0;
@@ -1627,6 +1636,7 @@ namespace ZoneEquipmentManager {
 						ZoneSizing( DesDayNum, CtrlZoneNum ).DOASHeatLoadSeq( TimeStepIndex ) = 0.0;
 						ZoneSizing( DesDayNum, CtrlZoneNum ).DOASCoolLoadSeq( TimeStepIndex ) = 0.0;
 						ZoneSizing( DesDayNum, CtrlZoneNum ).DOASHeatAddSeq( TimeStepIndex ) = 0.0;
+						ZoneSizing( DesDayNum, CtrlZoneNum ).DOASLatAddSeq( TimeStepIndex ) = 0.0;
 						ZoneSizing( DesDayNum, CtrlZoneNum ).DOASSupTempSeq( TimeStepIndex ) = 0.0;
 						ZoneSizing( DesDayNum, CtrlZoneNum ).DOASSupHumRatSeq( TimeStepIndex ) = 0.0;
 						ZoneSizing( DesDayNum, CtrlZoneNum ).DOASTotCoolLoadSeq( TimeStepIndex ) = 0.0;
@@ -1804,6 +1814,7 @@ namespace ZoneEquipmentManager {
 					FinalZoneSizing( CtrlZoneNum ).DOASHeatLoadSeq( TimeStepIndex ) = 0.0;
 					FinalZoneSizing( CtrlZoneNum ).DOASCoolLoadSeq( TimeStepIndex ) = 0.0;
 					FinalZoneSizing( CtrlZoneNum ).DOASHeatAddSeq( TimeStepIndex ) = 0.0;
+					FinalZoneSizing( CtrlZoneNum ).DOASLatAddSeq( TimeStepIndex ) = 0.0;
 					FinalZoneSizing( CtrlZoneNum ).DOASSupTempSeq( TimeStepIndex ) = 0.0;
 					FinalZoneSizing( CtrlZoneNum ).DOASSupHumRatSeq( TimeStepIndex ) = 0.0;
 					FinalZoneSizing( CtrlZoneNum ).DOASTotCoolLoadSeq( TimeStepIndex ) = 0.0;
@@ -2116,6 +2127,7 @@ namespace ZoneEquipmentManager {
 				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASHeatLoadSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASHeatLoad * FracTimeStepZone;
 				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASCoolLoadSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASCoolLoad * FracTimeStepZone;
 				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASHeatAddSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASHeatAdd * FracTimeStepZone;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASLatAddSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASLatAdd * FracTimeStepZone;
 				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASSupMassFlowSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASSupMassFlow * FracTimeStepZone;
 				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASSupTempSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASSupTemp * FracTimeStepZone;
 				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASSupHumRatSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASSupHumRat * FracTimeStepZone;
@@ -2159,6 +2171,18 @@ namespace ZoneEquipmentManager {
 				AvgData = 0.0;
 				MovingAvg( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneRetTempSeq, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
 				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneRetTempSeq = AvgData;
+			}
+			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
+				if ( !ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
+				AvgData = 0.0;
+				MovingAvg( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASHeatAddSeq, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASHeatAddSeq = AvgData;
+			}
+			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
+				if ( !ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
+				AvgData = 0.0;
+				MovingAvg( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASLatAddSeq, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASLatAddSeq = AvgData;
 			}
 
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {

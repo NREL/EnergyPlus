@@ -1172,10 +1172,10 @@ namespace OutputReportPredefined {
 
 		pdstSHGSannual = newPreDefSubTable( pdrSensibleGain, "Annual Building Sensible Heat Gain Components" );
 
-		pdchSHGSAnHvacHt = newPreDefColumn( pdstSHGSannual, "HVAC Input Sensible Air Heating [GJ]" );
-		pdchSHGSAnHvacCl = newPreDefColumn( pdstSHGSannual, "HVAC Input Sensible Air Cooling [GJ]" );
-		pdchSHGSAnHvacATUHt = newPreDefColumn( pdstSHGSannual, "HVAC Air Terminal Sensible Air Heating [GJ]" );
-		pdchSHGSAnHvacATUCl = newPreDefColumn( pdstSHGSannual, "HVAC Air Terminal Sensible Air Cooling [GJ]" );
+		pdchSHGSAnHvacHt = newPreDefColumn( pdstSHGSannual, "HVAC Zone Eq & Other Sensible Air Heating [GJ]" );
+		pdchSHGSAnHvacCl = newPreDefColumn( pdstSHGSannual, "HVAC Zone Eq & Other Sensible Air Cooling [GJ]" );
+		pdchSHGSAnHvacATUHt = newPreDefColumn( pdstSHGSannual, "HVAC Terminal Unit Sensible Air Heating [GJ]" );
+		pdchSHGSAnHvacATUCl = newPreDefColumn( pdstSHGSannual, "HVAC Terminal Unit Sensible Air Cooling [GJ]" );
 		pdchSHGSAnSurfHt = newPreDefColumn( pdstSHGSannual, "HVAC Input Heated Surface Heating [GJ]" );
 		pdchSHGSAnSurfCl = newPreDefColumn( pdstSHGSannual, "HVAC Input Cooled Surface Cooling [GJ]" );
 		pdchSHGSAnPeoplAdd = newPreDefColumn( pdstSHGSannual, "People Sensible Heat Addition [GJ]" );
@@ -1194,10 +1194,10 @@ namespace OutputReportPredefined {
 		pdstSHGSpkCl = newPreDefSubTable( pdrSensibleGain, "Peak Cooling Sensible Heat Gain Components" );
 
 		pdchSHGSClTimePeak = newPreDefColumn( pdstSHGSpkCl, "Time of Peak" );
-		pdchSHGSClHvacHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Input Sensible Air Heating [W]" );
-		pdchSHGSClHvacCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Input Sensible Air Cooling [W]" );
-		pdchSHGSClHvacATUHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Air Terminal Sensible Air Heating [W]" );
-		pdchSHGSClHvacATUCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Air Terminal Sensible Air Cooling [W]" );
+		pdchSHGSClHvacHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Zone Eq & Other Sensible Air Heating [W]" );
+		pdchSHGSClHvacCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Zone Eq & Other Sensible Air Cooling [W]" );
+		pdchSHGSClHvacATUHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Terminal Unit Sensible Air Heating [W]" );
+		pdchSHGSClHvacATUCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Terminal Unit Sensible Air Cooling [W]" );
 		pdchSHGSClSurfHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Input Heated Surface Heating [W]" );
 		pdchSHGSClSurfCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Input Cooled Surface Cooling [W]" );
 		pdchSHGSClPeoplAdd = newPreDefColumn( pdstSHGSpkCl, "People Sensible Heat Addition [W]" );
@@ -1216,10 +1216,10 @@ namespace OutputReportPredefined {
 		pdstSHGSpkHt = newPreDefSubTable( pdrSensibleGain, "Peak Heating Sensible Heat Gain Components" );
 
 		pdchSHGSHtTimePeak = newPreDefColumn( pdstSHGSpkHt, "Time of Peak" );
-		pdchSHGSHtHvacHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Input Sensible Air Heating [W]" );
-		pdchSHGSHtHvacCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Input Sensible Air Cooling [W]" );
-		pdchSHGSHtHvacATUHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Air Terminal Sensible Air Heating [W]" );
-		pdchSHGSHtHvacATUCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Air Terminal Sensible Air Cooling [W]" );
+		pdchSHGSHtHvacHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Zone Eq & Other Sensible Air Heating [W]" );
+		pdchSHGSHtHvacCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Zone Eq & Other Sensible Air Cooling [W]" );
+		pdchSHGSHtHvacATUHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Terminal Unit Sensible Air Heating [W]" );
+		pdchSHGSHtHvacATUCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Terminal Unit Sensible Air Cooling [W]" );
 		pdchSHGSHtSurfHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Input Heated Surface Heating [W]" );
 		pdchSHGSHtSurfCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Input Cooled Surface Cooling [W]" );
 		pdchSHGSHtPeoplAdd = newPreDefColumn( pdstSHGSpkHt, "People Sensible Heat Addition [W]" );

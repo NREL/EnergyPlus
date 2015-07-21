@@ -646,7 +646,7 @@ namespace SizingManager {
 			}
 			// Deallocate arrays no longer needed
 			ZoneSizing.deallocate();
-			CalcZoneSizing.deallocate();
+			// CalcZoneSizing.deallocate();
 		}
 		if ( SysSizingRunDone ) {
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {

@@ -466,6 +466,8 @@ namespace DataZoneEquipment {
 		bool InWallActiveElement; // Convection adapation, true if zone has in-wall HVAC
 		bool InCeilingActiveElement; // Convection adapation,
 		// true when zone has in-ceiling HVAC
+		int ADUNum; // index of Air Distribution Unit
+		int SDUNum; // index of Single Duct Uncontrolled
 
 		// Default Constructor
 		EquipConfiguration() :
@@ -488,7 +490,9 @@ namespace DataZoneEquipment {
 			SupLeakToRetPlen( false ),
 			InFloorActiveElement( false ),
 			InWallActiveElement( false ),
-			InCeilingActiveElement( false )
+			InCeilingActiveElement( false ),
+			ADUNum( 0 ),
+			SDUNum( 0 )
 		{}
 
 		// Member Constructor
@@ -518,7 +522,9 @@ namespace DataZoneEquipment {
 			bool const SupLeakToRetPlen, // True if there is supply duct leak to the
 			bool const InFloorActiveElement, // Convection adapation, true if zone has in-floor HVAC
 			bool const InWallActiveElement, // Convection adapation, true if zone has in-wall HVAC
-			bool const InCeilingActiveElement // Convection adapation,
+			bool const InCeilingActiveElement, // Convection adapation
+			int const ADUNum, // index of Air Distribution Unit
+			int const SDUNum // index of Single Duct Uncontrolled
 		) :
 			ZoneName( ZoneName ),
 			ActualZoneNum( ActualZoneNum ),
@@ -545,7 +551,9 @@ namespace DataZoneEquipment {
 			SupLeakToRetPlen( SupLeakToRetPlen ),
 			InFloorActiveElement( InFloorActiveElement ),
 			InWallActiveElement( InWallActiveElement ),
-			InCeilingActiveElement( InCeilingActiveElement )
+			InCeilingActiveElement( InCeilingActiveElement ),
+			ADUNum( ADUNum ),
+			SDUNum( SDUNum )
 		{}
 
 	};

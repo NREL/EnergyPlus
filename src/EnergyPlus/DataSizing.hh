@@ -577,6 +577,7 @@ namespace DataSizing {
 		Real64 DOASHeatLoad; // current heating load from DOAS supply air [W]
 		Real64 DOASCoolLoad; // current cooling load from DOAS supply air [W]
 		Real64 DOASHeatAdd; // current heat addition rate from DOAS supply air [W]
+		Real64 DOASLatAdd; // current latent heat addition rate from DOAS supply air [W]
 		Real64 DOASSupMassFlow; // current mass flow rate of DOAS supply air [kg/s]
 		Real64 DOASSupTemp; // current DOAS supply air temperature [C]
 		Real64 DOASSupHumRat; // current DOAS supply air humidity ratio [kg H2O / kg dry air]
@@ -584,6 +585,7 @@ namespace DataSizing {
 		Array1D< Real64 > DOASHeatLoadSeq; // daily sequence of zone DOAS heating load (zone time step) [W]
 		Array1D< Real64 > DOASCoolLoadSeq; // daily sequence of zone DOAS cooling load (zone time step) [W]
 		Array1D< Real64 > DOASHeatAddSeq; // daily sequence of zone DOAS heat addition rate (zone time step) [W]
+		Array1D< Real64 > DOASLatAddSeq; // daily sequence of zone DOAS latent heat addition rate (zone time step) [W]
 		Array1D< Real64 > DOASSupMassFlowSeq; // daily sequence of zone DOAS supply mass flow rate (zone time step) [Kg/s]
 		Array1D< Real64 > DOASSupTempSeq; // daily sequence of zone DOAS supply temperature (zone time step) [C]
 		Array1D< Real64 > DOASSupHumRatSeq; // daily sequence of zone DOAS supply humidity ratio (zone time step) [kg H2O / kg dry air]
@@ -706,6 +708,7 @@ namespace DataSizing {
 			DOASHeatLoad( 0.0 ),
 			DOASCoolLoad( 0.0 ),
 			DOASHeatAdd(0.0),
+			DOASLatAdd(0.0),
 			DOASSupMassFlow( 0.0 ),
 			DOASSupTemp( 0.0 ),
 			DOASSupHumRat( 0.0 ),
@@ -853,6 +856,7 @@ namespace DataSizing {
 			Real64 const DOASHeatLoad, // current heating load from DOAS supply air [W]
 			Real64 const DOASCoolLoad, // current cooling load from DOAS supply air [W]
 			Real64 const DOASHeatAdd, // current heat addition rate from DOAS supply air [W]
+			Real64 const DOASLatAdd, // current latent heat addition rate from DOAS supply air [W]
 			Real64 const DOASSupMassFlow, // current mass flow rate of DOAS supply air [kg/s]
 			Real64 const DOASSupTemp, // current DOAS supply air temperature [C]
 			Real64 const DOASSupHumRat, // current DOAS supply air humidity ratio [kg H2O / kg dry air]
@@ -860,6 +864,7 @@ namespace DataSizing {
 			Array1D< Real64 > const & DOASHeatLoadSeq, // daily sequence of zone DOAS heating load (zone time step) [W]
 			Array1D< Real64 > const & DOASCoolLoadSeq, // daily sequence of zone DOAS cooling load (zone time step) [W]
 			Array1D< Real64 > const & DOASHeatAddSeq, // daily sequence of zone DOAS heat addition rate (zone time step) [W]
+			Array1D< Real64 > const & DOASLatAddSeq, // daily sequence of zone DOAS latent heat addition rate (zone time step) [W]
 			Array1D< Real64 > const & DOASSupMassFlowSeq, // daily sequence of zone DOAS supply mass flow rate (zone time step) [Kg/s]
 			Array1D< Real64 > const & DOASSupTempSeq, // daily sequence of zone DOAS supply temperature (zone time step) [C]
 			Array1D< Real64 > const & DOASSupHumRatSeq, // daily sequence of zone DOAS supply humidity ratio (zone time step) [kg H2O / kg dry air]
@@ -1003,10 +1008,19 @@ namespace DataSizing {
 			DOASHeatLoad( DOASHeatLoad ),
 			DOASCoolLoad( DOASCoolLoad ),
 			DOASHeatAdd( DOASHeatAdd ),
+			DOASLatAdd( DOASLatAdd ),
 			DOASSupMassFlow( DOASSupMassFlow ),
 			DOASSupTemp( DOASSupTemp ),
 			DOASSupHumRat( DOASSupHumRat ),
-			DOASTotCoolLoad( DOASTotCoolLoad )
+			DOASTotCoolLoad( DOASTotCoolLoad ),
+			DOASHeatLoadSeq( DOASHeatLoadSeq ),
+			DOASCoolLoadSeq( DOASCoolLoadSeq ),
+			DOASHeatAddSeq( DOASHeatAddSeq ),
+			DOASLatAddSeq( DOASLatAddSeq ),
+			DOASSupMassFlowSeq( DOASSupMassFlowSeq ),
+			DOASSupTempSeq( DOASSupTempSeq ),
+			DOASSupHumRatSeq( DOASSupHumRatSeq ),
+			DOASTotCoolLoadSeq( DOASTotCoolLoadSeq )
 		{}
 
 	};

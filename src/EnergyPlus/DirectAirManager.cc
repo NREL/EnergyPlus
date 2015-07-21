@@ -265,6 +265,7 @@ namespace DirectAirManager {
 						if ( DirectAir( DirectAirNum ).ZoneSupplyAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
+							ZoneEquipConfig( CtrlZone ).SDUNum = DirectAirNum;
 						}
 					}
 				}
@@ -641,10 +642,10 @@ namespace DirectAirManager {
 		using DataHVACGlobals::TimeStepSys;
 
 		//report the Direct Air Output
-		DirectAir( DirectAirNum ).HeatRate = max( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 );
-		DirectAir( DirectAirNum ).CoolRate = std::abs( min( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 ) );
-		DirectAir( DirectAirNum ).HeatEnergy = max( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 ) * TimeStepSys * SecInHour;
-		DirectAir( DirectAirNum ).CoolEnergy = std::abs( min( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 ) * TimeStepSys * SecInHour );
+		// DirectAir( DirectAirNum ).HeatRate = max( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 );
+		// DirectAir( DirectAirNum ).CoolRate = std::abs( min( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 ) );
+		// DirectAir( DirectAirNum ).HeatEnergy = max( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 ) * TimeStepSys * SecInHour;
+		// DirectAir( DirectAirNum ).CoolEnergy = std::abs( min( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 ) * TimeStepSys * SecInHour );
 
 	}
 
