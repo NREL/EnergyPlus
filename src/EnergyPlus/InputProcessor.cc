@@ -103,7 +103,7 @@ namespace InputProcessor {
 	// MODULE VARIABLE DECLARATIONS:
 
 	namespace {
-		// These were static variables within different functions. They were hoisted into the namespace 
+		// These were static variables within different functions. They were hoisted into the namespace
 		// to facilitate easier unit testing of those functions.
 		// These are purposefully not in the header file as an extern variable. No one outside of InputProcessor should
 		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
@@ -6020,7 +6020,7 @@ namespace InputProcessor {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
