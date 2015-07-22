@@ -43,3 +43,5 @@ Builds
 *.geany
 .project
 .cproject
+.idea
+

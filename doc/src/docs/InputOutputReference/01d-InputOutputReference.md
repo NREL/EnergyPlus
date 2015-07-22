@@ -8134,11 +8134,11 @@ Coil:Cooling:Water:DetailedGeometry,
 
 No variables are reported for this compound object. However, outputs are provided by the cooling coil and heat exchanger that are specified.
 
-### Coil:WaterHeating:AirToWaterHeatPump
+### Coil:WaterHeating:AirToWaterHeatPump:Pumped
 
-EnergyPlus can model a heat pump water heater (HPWH) consisting of a water heater tank (e.g., WaterHeater:Mixed), a direct expansion (DX)    coil    (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source.
+EnergyPlus can model a heat pump water heater (HPWH) consisting of a water heater tank (e.g., `WaterHeater:Mixed`), a direct expansion (DX) coil (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source.
 
-The WaterHeater:HeatPump compound object, water heater tank object (e.g., WaterHeater:Mixed), and fan object (e.g., Fan:OnOff) are defined elsewhere in this reference document. Coil:WaterHeating:AirToWaterHeatPump object described here models an air-to-water DX compression system to determine its air-side and water-side performance. This DX coil object calculates the air-side sensible and latent cooling capacity at the specific operating conditions for each simulation timestep, as well as the condenser   s water-side temperature difference at a given condenser water flow rate.
+The `WaterHeater:HeatPump:PumpedCondenser` compound object, water heater tank object (e.g., `WaterHeater:Mixed`), and fan object (e.g., `Fan:OnOff`) are defined elsewhere in this reference document. `Coil:WaterHeating:AirToWaterHeatPump:Pumped` object described here models an air-to-water DX compression system to determine its air-side and water-side performance. This DX coil object calculates the air-side sensible and latent cooling capacity at the specific operating conditions for each simulation timestep, as well as the condenser's water-side temperature difference at a given condenser water flow rate.
 
 The heat pump water heater DX coil model performs the following major functions:
 
@@ -8146,7 +8146,7 @@ The heat pump water heater DX coil model performs the following major functions:
 
 - calculates the amount of heat delivered to the water tank
 
-- calculates the electric consumption of the compressor   s crankcase heater
+- calculates the electric consumption of the compressor's crankcase heater
 
 - calculates the air-side performance of the DX coil
 
@@ -8154,7 +8154,7 @@ The input fields for this object are described below in detail:
 
 #### Field: Name
 
-This alpha field defines a unique user-assigned name for an instance of a heat pump water heater DX coil. Any reference to this coil by another object (e.g., WaterHeater:HeatPump) will use this name.
+This alpha field defines a unique user-assigned name for an instance of a heat pump water heater DX coil. Any reference to this coil by another object (e.g., `WaterHeater:HeatPump:PumpedCondenser`) will use this name.
 
 #### Field: Rated Heating Capacity
 
@@ -8162,7 +8162,7 @@ This numeric field defines the DX coil heating capacity in Watts at the rated ev
 
 #### Field: Rated COP
 
-This numeric field defines the DX coil   s water heating coefficient of performance (COP=water heating capacity in watts divided by electrical power input in watts) at rated conditions (rated inlet temperatures and flow rates specified below). This input not only determines the electric energy use of the heat pump DX coil, but also the amount of total air cooling provided by the evaporator. The rated COP includes compressor power, and may or may not include condenser pump power or evaporator fan power (see field Evaporator Fan Power Included in Rated COP and field Condenser Pump Power Included in Rated COP). Values must be greater than 0. If this field is left blank, the default value is 3.2.
+This numeric field defines the DX coil's water heating coefficient of performance (COP=water heating capacity in watts divided by electrical power input in watts) at rated conditions (rated inlet temperatures and flow rates specified below). This input not only determines the electric energy use of the heat pump DX coil, but also the amount of total air cooling provided by the evaporator. The rated COP includes compressor power, and may or may not include condenser pump power or evaporator fan power (see field Evaporator Fan Power Included in Rated COP and field Condenser Pump Power Included in Rated COP). Values must be greater than 0. If this field is left blank, the default value is 3.2.
 
 #### Field: Rated Sensible Heat Ratio
 
@@ -8182,7 +8182,7 @@ This numeric field defines the condenser inlet water temperature, in degrees Cel
 
 #### Field: Rated Evaporator Air Flow Rate
 
-This numeric field defines the evaporator air volume flow rate in cubic meters per second at rated conditions. Values must be greater than 0. If this field is left blank or autocalculated   (field value = **autocalculate**), the default value is 5.035E-5 m<sup>3</sup>/s/W (31.25 cfm/MBH) multiplied by the Rated Heating Capacity specified above. When autocalculating the rated evaporator air volumetric flow rate, a zone sizing object is not required.
+This numeric field defines the evaporator air volume flow rate in cubic meters per second at rated conditions. Values must be greater than 0. If this field is left blank or autocalculated (field value = **autocalculate**), the default value is 5.035E-5 m<sup>3</sup>/s/W (31.25 cfm/MBH) multiplied by the Rated Heating Capacity specified above. When autocalculating the rated evaporator air volumetric flow rate, a zone sizing object is not required.
 
 #### Field: Rated Condenser Water Flow Rate
 
@@ -8190,19 +8190,19 @@ This numeric field defines the condenser water volumetric flow rate in cubic met
 
 #### Field: Evaporator Fan Power Included in Rated COP
 
-This choice field specifies if evaporator fan power is included in the rated COP defined above. This input impacts the calculation of compressor electric power and total air cooling provided by the evaporator for each simulation timestep. If Yes is selected, the evaporator fan power is subtracted from the total electric heating power when calculating total evaporator cooling capacity. If No is selected, it is assumed that the total heating power does not include evaporator fan power. If this field is left blank, the default is Yes. See the Engineering Reference section for Coil:WaterHeating:AirToWaterHeatPump for further details.
+This choice field specifies if evaporator fan power is included in the rated COP defined above. This input impacts the calculation of compressor electric power and total air cooling provided by the evaporator for each simulation timestep. If Yes is selected, the evaporator fan power is subtracted from the total electric heating power when calculating total evaporator cooling capacity. If No is selected, it is assumed that the total heating power does not include evaporator fan power. If this field is left blank, the default is Yes. See the Engineering Reference section for `Coil:WaterHeating:AirToWaterHeatPump:\*` for further details.
 
 #### Field: Condenser Pump Power Included in Rated COP
 
-This choice field specifies if condenser pump power is included in the rated COP defined above. This input impacts the calculation of compressor electric power which then impacts the total air cooling provided by the evaporator for each simulation timestep. If Yes is selected, the condenser pump power is subtracted from the total electric heating power when calculating total evaporator cooling capacity. If No is selected, it is assumed that the total heating power does not include the condenser pump. If this field is left blank, the default is No. See Engineering Reference section for Coil:WaterHeating:AirToWaterHeatPump for further details.
+This choice field specifies if condenser pump power is included in the rated COP defined above. This input impacts the calculation of compressor electric power which then impacts the total air cooling provided by the evaporator for each simulation timestep. If Yes is selected, the condenser pump power is subtracted from the total electric heating power when calculating total evaporator cooling capacity. If No is selected, it is assumed that the total heating power does not include the condenser pump. If this field is left blank, the default is No. See Engineering Reference section for `Coil:WaterHeating:AirToWaterHeatPump:\*` for further details.
 
 #### Field: Condenser Pump Heat Included in Rated Heating Capacity and Rated COP
 
-This choice field specifies if condenser pump heat is included in the rated heating capacity and rated COP defined above. This input impacts the calculation of compressor electric power and total air cooling provided by the evaporator for each simulation timestep. If Yes is selected, the condenser pump heat is already included in the rated heating capacity and rated COP. If No is selected, it is assumed that the rated heating capacity and rated COP do not include the condenser pump heat, and pump heat is added to the total water heating capacity based on the Condenser Water Pump Power and Fraction of Condenser Pump Heat to Water fields below. If this field is left blank, the default is No. See Engineering Reference section for Coil:WaterHeating:AirToWaterHeatPump for further details.
+This choice field specifies if condenser pump heat is included in the rated heating capacity and rated COP defined above. This input impacts the calculation of compressor electric power and total air cooling provided by the evaporator for each simulation timestep. If Yes is selected, the condenser pump heat is already included in the rated heating capacity and rated COP. If No is selected, it is assumed that the rated heating capacity and rated COP do not include the condenser pump heat, and pump heat is added to the total water heating capacity based on the Condenser Water Pump Power and Fraction of Condenser Pump Heat to Water fields below. If this field is left blank, the default is No. See Engineering Reference section for `Coil:WaterHeating:AirToWaterHeatPump:\*` for further details.
 
 #### Field: Condenser Water Pump Power
 
-This numeric field defines the DX coil   s condenser pump power in Watts. This is the operating pump power as installed. Values must be greater than or equal to 0. If this field is left blank, the default value is 0. A warning message will be issued if the ratio of Condenser Water Pump Power to Rated Heating Capacity exceeds 0.1422 W/W (41.67 Watts/MBH), but the simulation will continue.
+This numeric field defines the DX coil's condenser pump power in Watts. This is the operating pump power as installed. Values must be greater than or equal to 0. If this field is left blank, the default value is 0. A warning message will be issued if the ratio of Condenser Water Pump Power to Rated Heating Capacity exceeds 0.1422 W/W (41.67 Watts/MBH), but the simulation will continue.
 
 #### Field: Fraction of Condenser Pump Heat to Water
 
@@ -8226,11 +8226,11 @@ This alpha field defines the name of the node to which the heat pump condenser s
 
 #### Field: Crankcase Heater Capacity
 
-This numeric field defines the compressor   s crankcase heater capacity in Watts. The crankcase heater only operates when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation specified below.
+This numeric field defines the compressor's crankcase heater capacity in Watts. The crankcase heater only operates when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation specified below.
 
 #### Field: Maximum Ambient Temperature for Crankcase Heater Operation
 
-This numeric field defines the maximum ambient temperature for crankcase heater operation in degree Celsius. The crankcase heater only operates when the air surrounding the compressor is below this maximum temperature value and the compressor is off   The ambient temperature surrounding the compressor is set by the Heat Pump:Water Heater parent object (field Compressor Location).
+This numeric field defines the maximum ambient temperature for crankcase heater operation in degree Celsius. The crankcase heater only operates when the air surrounding the compressor is below this maximum temperature value and the compressor is off. The ambient temperature surrounding the compressor is set by the Heat Pump:Water Heater parent object (field Compressor Location).
 
 #### Field: Evaporator Air Temperature Type for Curve Objects
 
@@ -8262,7 +8262,7 @@ This alpha field specifies the name of a **quadratic** or **cubic** performance 
 
 #### Field: Part Load Fraction Correlation Curve Name
 
-This alpha field defines the name of a **quadratic** or **cubic** performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the    effective    EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.
+This alpha field defines the name of a **quadratic** or **cubic** performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.
 
 The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep). For PLR values between 0 and 1 (0 &lt;= PLR &lt; 1), the following rules apply:
 
@@ -8278,41 +8278,41 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
 
            PLF = 1.0 + 0.0(PLR)
 
-Following is an example input for the Coil:WaterHeating:AirToWaterHeatPump object.
+Following is an example input for the `Coil:WaterHeating:AirToWaterHeatPump:Pumped` object:
 
 ```idf
-Coil:WaterHeating:AirToWaterHeatPump,
-       Zone4HPWHDXCoil,                         !- Coil Name
-       4000.0,                                           !- Heating Capacity {W}
-       3.2,                                                 !- Rated COP {W/W}
-       0.6956,                                           !- Rated SHR (gross)
-       19.7,                                               !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}
-       13.5,                                               !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}
-       57.5,                                               !- Rated Condenser Inlet Water Temperature {C}
-       autocalculate,                             !- Rated Evaporator Air Volumetric Flow Rate {m3/s}
-       autocalculate,                             !- Rated Condenser Water Volumetric Flow Rate {m3/s}
-       No,                                                   !- Evaporator Fan Power Included in Rated COP
-       No,                                                   !- Condenser Pump Power Included in Rated COP
-       No,                                                   !- Condenser Pump Heat Included in Rated Heating Capacity and Rated COP
-       150.0,                                             !- Condenser Water Pump Power {W}
-       0.1,                                                 !- Fraction of Condenser Pump Heat to Water
-       Zone4AirOutletNode,                   !- Evaporator Air Inlet Node Name
-       Zone4DXCoilAirOutletNode,       !- Evaporator Air Outlet Node Name
-       Zone4WaterInletNode,                 !- Condenser Water Inlet Node Name
-       Zone4WaterOutletNode,               !- Condenser Water Outlet Node Name
-       100.0,                                             !- Crankcase Heater Capacity {W}
-       5.0,                                                 !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
-       wet-bulb temperature,               !- Evaporator Air Temperature Type for Curve Objects
-       HPWHHeatingCapFTemp,                 !- Heating Capacity Modifier Curve Name (function of temperature)
-       ,                                                       !- Heating Capacity Modifier Curve Name (function of air flow fraction)
-       ,                                                       !- Heating Capacity Modifier Curve Name (function of water flow fraction)
-       HPWHHeatingCOPFTemp,                 !- Heating COP Modifier Curve Name (function of temperature)
-       ,                                                       !- Heating COP Modifier Curve Name (function of air flow fraction)
-       ,                                                       !- Heating COP Modifier Curve Name (function of water flow fraction)
-       HPWHPLFFPLR;                                 !- Part Load Fraction Correlation Name (function of part load ratio)
+Coil:WaterHeating:AirToWaterHeatPump:Pumped,
+       Zone4HPWHDXCoil,           !- Coil Name
+       4000.0,                    !- Heating Capacity {W}
+       3.2,                       !- Rated COP {W/W}
+       0.6956,                    !- Rated SHR (gross)
+       19.7,                      !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}
+       13.5,                      !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}
+       57.5,                      !- Rated Condenser Inlet Water Temperature {C}
+       autocalculate,             !- Rated Evaporator Air Volumetric Flow Rate {m3/s}
+       autocalculate,             !- Rated Condenser Water Volumetric Flow Rate {m3/s}
+       No,                        !- Evaporator Fan Power Included in Rated COP
+       No,                        !- Condenser Pump Power Included in Rated COP
+       No,                        !- Condenser Pump Heat Included in Rated Heating Capacity and Rated COP
+       150.0,                     !- Condenser Water Pump Power {W}
+       0.1,                       !- Fraction of Condenser Pump Heat to Water
+       Zone4AirOutletNode,        !- Evaporator Air Inlet Node Name
+       Zone4DXCoilAirOutletNode,  !- Evaporator Air Outlet Node Name
+       Zone4WaterInletNode,       !- Condenser Water Inlet Node Name
+       Zone4WaterOutletNode,      !- Condenser Water Outlet Node Name
+       100.0,                     !- Crankcase Heater Capacity {W}
+       5.0,                       !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
+       wet-bulb temperature,      !- Evaporator Air Temperature Type for Curve Objects
+       HPWHHeatingCapFTemp,       !- Heating Capacity Modifier Curve Name (function of temperature)
+       ,                          !- Heating Capacity Modifier Curve Name (function of air flow fraction)
+       ,                          !- Heating Capacity Modifier Curve Name (function of water flow fraction)
+       HPWHHeatingCOPFTemp,       !- Heating COP Modifier Curve Name (function of temperature)
+       ,                          !- Heating COP Modifier Curve Name (function of air flow fraction)
+       ,                          !- Heating COP Modifier Curve Name (function of water flow fraction)
+       HPWHPLFFPLR;               !- Part Load Fraction Correlation Name (function of part load ratio)
 ```
 
-### Coil:WaterHeating:AirToWaterHeatPump Outputs
+### Coil:WaterHeating:AirToWaterHeatPump:Pumped Outputs
 
 * HVAC,Average,Cooling Coil Total Cooling Rate [W]
 
@@ -8370,11 +8370,11 @@ This output field is the average runtime fraction of the DX coil compressor for 
 
 #### Cooling Coil Crankcase Heater Electric Power[W]
 
-This output field is the average electricity consumption rate of the DX coil compressor   s crankcase heater in Watts for the timestep being reported. The crankcase heater operates only when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation, otherwise this output variable is set equal to 0.
+This output field is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. The crankcase heater operates only when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation, otherwise this output variable is set equal to 0.
 
 #### Cooling Coil Crankcase Heater Electric Energy [J]
 
-This output field is the total electricity consumption of the DX coil compressor   s crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
+This output field is the total electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
 #### Cooling Coil Total Water Heating Rate [W]
 
@@ -8392,9 +8392,221 @@ This output field is the average electricity consumption rate of the DX coil com
 
 This output field is the electricity consumption of the DX coil compressor and condenser pump in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
+### Coil:WaterHeating:AirToWaterHeatPump:Wrapped
+
+EnergyPlus can model a heat pump water heater (HPWH) consisting of a water heater tank (e.g., `WaterHeater:Stratified`), a direct expansion (DX) coil (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source.
+
+The `WaterHeater:HeatPump:WrappedCondenser` compound object, water heater tank object (e.g., `WaterHeater:Mixed`), and fan object (e.g., `Fan:OnOff`) are defined elsewhere in this reference document. `Coil:WaterHeating:AirToWaterHeatPump:Wrapped` object described here models an air-to-water DX compression system to determine its air-side and water-side performance. This DX coil object calculates the air-side sensible and latent cooling capacity at the specific operating conditions for each simulation timestep, as well as the condenser's water-side temperature difference at a given condenser water flow rate.
+
+The heat pump water heater DX coil model performs the following major functions:
+
+- calculates the electric consumption of the DX compressor
+
+- calculates the amount of heat delivered to the water tank
+
+- calculates the electric consumption of the compressor's crankcase heater
+
+- calculates the air-side performance of the DX coil
+
+#### Field: Name
+
+This alpha field defines a unique user-assigned name for an instance of a heat pump water heater DX coil. Any reference to this coil by another object (e.g., `WaterHeater:HeatPump:WrappedCondenser`) will use this name.
+
+#### Field: Rated Heating Capacity
+
+This numeric field defines the DX coil heating capacity in Watts at the rated evaporator inlet air temperatures, rated condenser inlet water temperature, rated evaporator air flow rate, and rated condenser water flow rate specified below. Values must be greater than 0. This value represents water heating capacity, and it may or may not include the impact of condenser pump heat (see field Condenser Pump Heat Included in Rated Heating Capacity below).
+
+#### Field: Rated COP
+
+This numeric field defines the DX coil's water heating coefficient of performance (COP=water heating capacity in watts divided by electrical power input in watts) at rated conditions (rated inlet temperatures and flow rates specified below). This input not only determines the electric energy use of the heat pump DX coil, but also the amount of total air cooling provided by the evaporator. The rated COP includes compressor power, and may or may not include condenser pump power or evaporator fan power (see field Evaporator Fan Power Included in Rated COP and field Condenser Pump Power Included in Rated COP). Values must be greater than 0. If this field is left blank, the default value is 3.2.
+
+#### Field: Rated Sensible Heat Ratio
+
+This numeric field defines the air-side sensible heat ratio (SHR=sensible cooling capacity divided by total cooling capacity) of the DX coil at rated conditions (rated inlet temperatures and flow rates specified below). This value should not include the effect of evaporator fan heat. Values must be greater than or equal to 0.5, and less than or equal to 1.0. The default value is 0.85.
+
+#### Field: Rated Evaporator Inlet Air Dry-Bulb Temperature
+
+This numeric field defines the evaporator inlet air dry-bulb temperature, in degrees Celsius, that corresponds to rated coil performance (heating capacity, COP and SHR). Values must be greater than 5 &deg;C. If this field is left blank, the default value is 19.7 &deg;C.
+
+#### Field: Rated Evaporator Inlet Air Wet-Bulb Temperature
+
+This numeric field defines the evaporator inlet air wet-bulb temperature, in degrees Celsius, that corresponds to rated coil performance (heating capacity, COP and SHR). Values must be greater than 5 &deg;C. If this field is left blank, the default value is 13.5 &deg;C.
+
+#### Field: Rated Condenser Water Temperature
+
+This numeric field defines the condenser inlet water temperature, in degrees Celsius, that corresponds to rated coil performance (heating capacity, COP and SHR). Values must be greater than 25 &deg;C. If this field is left blank, the default value is 57.5 &deg;C.
+
+#### Field: Rated Evaporator Air Flow Rate
+
+This numeric field defines the evaporator air volume flow rate in cubic meters per second at rated conditions. Values must be greater than 0. If this field is left blank or autocalculated (field value = **autocalculate**), the default value is 5.035E-5 m<sup>3</sup>/s/W (31.25 cfm/MBH) multiplied by the Rated Heating Capacity specified above. When autocalculating the rated evaporator air volumetric flow rate, a zone sizing object is not required.
+
+#### Field: Evaporator Fan Power Included in Rated COP
+
+This choice field specifies if evaporator fan power is included in the rated COP defined above. This input impacts the calculation of compressor electric power and total air cooling provided by the evaporator for each simulation timestep. If Yes is selected, the evaporator fan power is subtracted from the total electric heating power when calculating total evaporator cooling capacity. If No is selected, it is assumed that the total heating power does not include evaporator fan power. If this field is left blank, the default is Yes. See the Engineering Reference section for `Coil:WaterHeating:AirToWaterHeatPump:\*` for further details.
+
+#### Field: Evaporator Air Inlet Node Name
+
+This alpha field defines the name of the air node from which the evaporator coil draws its inlet air.
+
+#### Field: Evaporator Air Outlet Node Name
+
+This alpha field defines the name of the air node to which the evaporator coil sends its outlet air.
+
+#### Field: Crankcase Heater Capacity
+
+This numeric field defines the compressor's crankcase heater capacity in Watts. The crankcase heater only operates when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation specified below.
+
+#### Field: Maximum Ambient Temperature for Crankcase Heater Operation
+
+This numeric field defines the maximum ambient temperature for crankcase heater operation in degree Celsius. The crankcase heater only operates when the air surrounding the compressor is below this maximum temperature value and the compressor is off. The ambient temperature surrounding the compressor is set by the Heat Pump:Water Heater parent object (field Compressor Location).
+
+#### Field: Evaporator Air Temperature Type for Curve Objects
+
+This choice field specifies the air temperature type used for the heating capacity and COP modifier curve objects below. The valid selections are Dry-bulb Temperature and Wet-bulb Temperature. If dry-bulb temperature is selected, the inlet air dry-bulb temperature entering the heat pump DX coil and fan section is used to evaluate the curve objects. If wet-bulb temperature is selected, the inlet air wet-bulb temperature entering the heat pump DX coil and fan section is used to evaluate the curve objects. If this field is left blank and the following curve names are defined, the default value is wet-bulb temperature. If the following curve names are not defined, this field is not used.
+
+#### Field: Heating Capacity Function of Temperature Curve Name
+
+This alpha field specifies the name of a **biquadratic** or **cubic** performance curve object (ref: Performance Curves) that defines the variation in DX coil heating capacity as a function of inlet fluid (air and water) temperatures. The biquadratic curve uses evaporator inlet air temperature (dry-bulb or wet-bulb temperature based on the field Evaporator Air Temperature Type for Curve Objects defined above) and condenser inlet water temperature as the independent variables. The cubic curve uses evaporator inlet air (dry-bulb or wet-bulb) temperature as the independent variable. The output of this curve is multiplied by the rated heating capacity to give the heating capacity at specific operating conditions (i.e., at temperatures different from the rating point temperatures). The curve should be normalized to have the value of 1.0 at the rating point temperatures. If this field is left blank, the heating capacity remains constant (curve value assumed to be 1.0 for all conditions).
+
+#### Field: Heating Capacity Function of Air Flow Fraction Curve Name
+
+This alpha field specifies the name of a **quadratic** or **cubic** performance curve object (ref: Performance Curves) that defines the variation in DX coil heating capacity as a function of the ratio of actual air flow rate across the evaporator coil to the rated evaporator air flow rate. The output of this curve is multiplied by the rated heating capacity and the heating capacity modifier curve (function of temperature) to give the DX coil heating capacity at the specific inlet fluid temperatures and air flow rate at which the coil is operating. The curve should be normalized to have the value of 1.0 at the rated evaporator air flow rate (air flow fraction of 1.0). If this field is left blank, the heating capacity remains constant (curve value assumed to be 1.0 for all air flow rates).
+
+#### Field: Heating COP Function of Temperature Curve Name
+
+This alpha field specifies the name of a **biquadratic** or **cubic** performance curve object (ref: Performance Curves) that defines the variation in DX coil heating COP as a function of inlet fluid (air and water) temperatures. The biquadratic curve uses evaporator inlet air temperature (dry-bulb or wet-bulb temperature based on the field Evaporator Air Temperature Type for Curve Objects defined above) and condenser inlet water temperature as the independent variables. The cubic curve uses evaporator inlet air (dry-bulb or wet-bulb) temperature as the independent variable. The output of this curve is multiplied by the rated COP to give the heating COP at specific operating conditions (i.e., at temperatures different from the rating point temperatures). The curve should be normalized to have the value of 1.0 at the rating point temperatures. If this field is left blank, the COP remains constant (curve value assumed to be 1.0 for all conditions).
+
+#### Field: Heating COP Function of Air Flow Fraction Curve Name
+
+This alpha field specifies the name of a **quadratic** or **cubic** performance curve object (ref: Performance Curves) that defines the variation in DX coil heating COP as a function of the ratio of actual air flow rate across the evaporator coil to the rated evaporator air flow rate. The output of this curve is multiplied by the rated COP and the heating COP modifier curve (function of temperature) to give the heating COP at the specific inlet fluid temperatures and air flow rate at which the coil is operating. The curve should be normalized to have the value of 1.0 at the rated evaporator air flow rate (air flow fraction of 1.0). If this field is left blank, the heating COP remains constant (curve value assumed to be 1.0 for all air flow rates).
+
+#### Field: Part Load Fraction Correlation Curve Name
+
+This alpha field defines the name of a **quadratic** or **cubic** performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.
+
+The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep). For PLR values between 0 and 1 (0 &lt;= PLR &lt; 1), the following rules apply:
+
+PLF &gt;= 0.7     and     PLF &gt;= PLR
+
+If PLF &lt; 0.7 a warning message is issued, the program resets the PLF value to 0.7, and the simulation proceeds. The runtime fraction of the coil is defined as PLR/PLF. If PLF &lt; PLR, then a warning message is issued and the runtime fraction of the coil is limited to 1.0.
+
+A typical part load fraction correlation for a conventional, single-speed DX cooling coil (e.g., residential unit) would be:
+
+           PLF = 0.85 + 0.15(PLR)
+
+If the user wishes to model no efficiency degradation due to compressor cycling, the part load fraction correlation should be defined as follows:
+
+           PLF = 1.0 + 0.0(PLR)
+
+Following is an example input for the `Coil:WaterHeating:AirToWaterHeatPump:Wrapped` object:
+
+```idf
+Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
+    HPWH Coil,               !- Name
+    2349.6,                  !- Rated Heating Capacity {W}
+    2.4,                     !- Rated COP {W/W}
+    0.981,                   !- Rated Sensible Heat Ratio
+    19.72,                   !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}
+    13.5,                    !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}
+    48.89,                   !- Rated Condenser Water Temperature {C}
+    0.189,                   !- Rated Evaporator Air Flow Rate {m3/s}
+    Yes,                     !- Evaporator Fan Power Included in Rated COP
+    HPWH Air Inlet,          !- Evaporator Air Inlet Node Name
+    HPWH Coil Outlet Fan Inlet,  !- Evaporator Air Outlet Node Name
+    0,                       !- Crankcase Heater Capacity {W}
+    10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
+    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
+    HPWH-Htg-Cap-fT,         !- Heating Capacity Function of Temperature Curve Name
+    ,                        !- Heating Capacity Function of Air Flow Fraction Curve Name
+    HPWH-Htg-COP-fT,         !- Heating COP Function of Temperature Curve Name
+    ,                        !- Heating COP Function of Air Flow Fraction Curve Name
+    HPWH-COP-fPLR;           !- Part Load Fraction Correlation Curve Name
+```
+
+### Coil:WaterHeating:AirToWaterHeatPump:Wrapped Outputs
+
+* HVAC,Average,Cooling Coil Total Cooling Rate [W]
+
+* HVAC,Sum,Cooling Coil Total Cooling Energy [J]
+
+* HVAC,Average,Cooling Coil Sensible Cooling Rate [W]
+
+* HVAC,Sum,Cooling Coil Sensible Cooling Energy [J]
+
+* HVAC,Average,Cooling Coil Latent Cooling Rate [W]
+
+* HVAC,Sum,Cooling Coil Latent Cooling Energy [J]
+
+* HVAC,Average, Cooling Coil Runtime Fraction []
+
+* HVAC,Average,DX Cooling Coil Crankcase Heater Electric Power [W]
+
+* HVAC,Sum, Cooling Coil Crankcase Heater Electric Energy [J]
+
+* HVAC,Average,Cooling Coil Total Water Heating Rate [W]
+
+* HVAC,Sum,Cooling Coil Total Water Heating Energy [J]
+
+* HVAC,Average,Cooling Coil Water Heating Electric Power[W]
+
+* HVAC,Sum,Cooling Coil Water Heating Electric Energy [J]
+
+#### Cooling Coil Total Cooling Rate [W]
+
+This output field is the average total (sensible and latent) cooling rate output of the DX coil in Watts for the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Total Cooling Energy [J]
+
+This output field is the total (sensible plus latent) cooling output of the DX coil in Joules for the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Sensible Cooling Rate [W]
+
+This output field is the average moist air sensible cooling rate output of the DX coil in Watts for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Sensible Cooling Energy [J]
+
+This output field is the moist air sensible cooling output of the DX coil in Joules for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### DX Coil Latent Cooling Rate [W]
+
+This output field is the average latent cooling rate output of the DX coil in Watts for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Latent Cooling Energy [J]
+
+This output field is the latent cooling output of the DX coil in Joules for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Runtime Fraction   []
+
+This output field is the average runtime fraction of the DX coil compressor for the timestep being reported. This also represents the runtime fraction of the condenser water pump.
+
+#### Cooling Coil Crankcase Heater Electric Power[W]
+
+This output field is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. The crankcase heater operates only when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation, otherwise this output variable is set equal to 0.
+
+#### Cooling Coil Crankcase Heater Electric Energy [J]
+
+This output field is the total electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
+
+#### Cooling Coil Total Water Heating Rate [W]
+
+This output field is the average water heating rate output of the DX coil (condenser coil plus condenser water pump) in Watts for the timestep being reported.
+
+#### Cooling Coil Total Water Heating Energy [J]
+
+This output field is the total water heating output of the DX coil (condenser coil plus condenser water pump) in Joules for the timestep being reported.
+
+#### Cooling Coil Water Heating Electric Power[W]
+
+This output field is the average electricity consumption rate of the DX coil compressor in Watts for the timestep being reported.
+
+#### Cooling Coil Water Heating Electric Energy [J]
+
+This output field is the electricity consumption of the DX coil compressor in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
+
+
 ### Coil:Cooling:WaterToAirHeatPump:ParameterEstimation
 
-The **Coil:Cooling:WaterToAirHeatPump:ParameterEstimation** coil is a deterministic model that requires parameters to describe the operating conditions of the heat pump   s components. The parameters are generated from the manufacturer catalog data using multi-variable optimization method. In addition, the cooling coil model can be used for 3 type of compressors: **reciprocating**, **rotary** and **scroll**. Descriptions and strength of each respective model is available in the following references:
+The **Coil:Cooling:WaterToAirHeatPump:ParameterEstimation** coil is a deterministic model that requires parameters to describe the operating conditions of the heat pump's components. The parameters are generated from the manufacturer catalog data using multi-variable optimization method. In addition, the cooling coil model can be used for 3 type of compressors: **reciprocating**, **rotary** and **scroll**. Descriptions and strength of each respective model is available in the following references:
 
 Jin, Hui. 2002. Parameter Estimation Based Models of Water Source Heat Pumps. Phd. Thesis, Department of Mechanical and Aerospace Engineering, Oklahoma State University. (downloadable from [http://www.hvac.okstate.edu/](http://www.hvac.okstate.edu))
 
