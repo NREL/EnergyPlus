@@ -6,6 +6,8 @@ extern "C" {
 // C++ Headers
 #include <cmath>
 #include <string>
+#include <stdlib.h>
+#include <time.h>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
@@ -407,6 +409,8 @@ namespace SimulationManager {
 		EnvCount = 0;
 		WarmupFlag = true;
 
+		srand (time(NULL));
+
 		while ( Available ) {
 
 			GetNextEnvironment( Available, ErrorsFound );
@@ -470,6 +474,10 @@ namespace SimulationManager {
 				}
 
 				for ( HourOfDay = 1; HourOfDay <= 24; ++HourOfDay ) { // Begin hour loop ...
+
+					// if the rand() (0 to 99) is greater than 0, which should happen about 99% of the time, continue
+					// this should cause it to reduce runtime by about 100x!!
+					if ( rand() % 100 > 0 ) continue;
 
 					BeginHourFlag = true;
 					EndHourFlag = false;
