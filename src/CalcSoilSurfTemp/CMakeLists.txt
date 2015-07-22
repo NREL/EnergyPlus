@@ -41,5 +41,5 @@ set(SKIP_BUILD_RPATH true)
 ADD_EXECUTABLE( CalcSoilSurfTemp ${SRC} )
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-install_and_fixup_exe_target( CalcSoilSurfTemp PreProcess/CalcSoilSurfTemp )
+install_and_fixup_exe_target( CalcSoilSurfTemp "./PreProcess/CalcSoilSurfTemp" )
 
