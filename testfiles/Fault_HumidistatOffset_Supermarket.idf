@@ -3,11 +3,11 @@
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
-! Supermarket.idf
+! Fault_HumidistatOffset_Supermarket.idf
 ! Basic file description: 1 story building divided into 2 interior conditioned zones. Roof with no plenum.
 !                         Floor in contact with the ground.
 !
-! Highlights:             Example of refrigerated display cases and compressor racks.
+! Highlights:             Illustrates modeling of humidistat offset fault (thermostat independent)
 !
 ! Refrigeration:          (compressor location) Rack name:            Display case names on rack:
 !                         Rack 1 (indoors) :    SelfContainedDisplay  SelfContainedDisplayCase (located in zone SalesFloor)

@@ -6411,8 +6411,8 @@ WindowMaterial:Glazing:EquivalentLayer,
   A2 , \field Optical Data Type
        \required-field
        \type choice
-       \key SpectralAverage
-       \key Spectral (not supported now)
+       \default SpectralAverage
+       \note Spectral is no longer supported and SpectralAverage is now the default.
   A3 , \field Window Glass Spectral Data Set Name
        \note Used only when Optical Data Type = Spectral
        \type object-list
@@ -38974,7 +38974,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
        \required-field
   A3 , \field Zone Equipment 1 Name
        \required-field
@@ -39018,7 +39019,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A5 , \field Zone Equipment 2 Name
   N3 , \field Zone Equipment 2 Cooling Sequence
        \type integer
@@ -39058,7 +39060,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A7 , \field Zone Equipment 3 Name
   N5 , \field Zone Equipment 3 Cooling Sequence
        \type integer
@@ -39098,7 +39101,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A9 , \field Zone Equipment 4 Name
   N7 , \field Zone Equipment 4 Cooling Sequence
        \type integer
@@ -39138,7 +39142,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A11, \field Zone Equipment 5 Name
   N9 , \field Zone Equipment 5 Cooling Sequence
        \type integer
@@ -39178,7 +39183,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A13, \field Zone Equipment 6 Name
   N11, \field Zone Equipment 6 Cooling Sequence
        \type integer
@@ -39218,7 +39224,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A15, \field Zone Equipment 7 Name
   N13, \field Zone Equipment 7 Cooling Sequence
        \type integer
@@ -39258,7 +39265,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A17, \field Zone Equipment 8 Name
   N15, \field Zone Equipment 8 Cooling Sequence
        \type integer
@@ -39298,7 +39306,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A19, \field Zone Equipment 9 Name
   N17, \field Zone Equipment 9 Cooling Sequence
        \type integer
@@ -39338,7 +39347,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A21, \field Zone Equipment 10 Name
   N19, \field Zone Equipment 10 Cooling Sequence
        \type integer
@@ -39378,7 +39388,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A23, \field Zone Equipment 11 Name
   N21, \field Zone Equipment 11 Cooling Sequence
        \type integer
@@ -39418,7 +39429,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A25, \field Zone Equipment 12 Name
   N23, \field Zone Equipment 12 Cooling Sequence
        \type integer
@@ -39458,7 +39470,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A27, \field Zone Equipment 13 Name
   N25, \field Zone Equipment 13 Cooling Sequence
        \type integer
@@ -39498,7 +39511,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A29, \field Zone Equipment 14 Name
   N27, \field Zone Equipment 14 Cooling Sequence
        \type integer
@@ -39538,7 +39552,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A31, \field Zone Equipment 15 Name
   N29, \field Zone Equipment 15 Cooling Sequence
        \type integer
@@ -39578,7 +39593,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A33, \field Zone Equipment 16 Name
   N31, \field Zone Equipment 16 Cooling Sequence
        \type integer
@@ -39618,7 +39634,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A35, \field Zone Equipment 17 Name
   N33, \field Zone Equipment 17 Cooling Sequence
        \type integer
@@ -39658,7 +39675,8 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A37, \field Zone Equipment 18 Name
   N35, \field Zone Equipment 18 Cooling Sequence
        \type integer
@@ -46868,15 +46886,15 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note db = entering air dry-bulb temperature (C)
         \note ewt = water entering temperature seen by the evaporator (C)
 
-Coil:WaterHeating:AirToWaterHeatPump,
+Coil:WaterHeating:AirToWaterHeatPump:Pumped,
        \memo Heat pump water heater (HPWH) heating coil, air-to-water direct-expansion (DX)
        \memo system which includes a water heating coil, evaporator air coil, evaporator
-       \memo fan, electric compressor, and water pump. Part of a WaterHeater:HeatPump system.
+       \memo fan, electric compressor, and water pump. Part of a WaterHeater:HeatPump:PumpedCondenser system.
        \min-fields 21
   A1 , \field Name
        \required-field
        \type alpha
-       \reference HeatPumpWaterHeaterDXCoils
+       \reference HeatPumpWaterHeaterDXCoilsPumped
        \note Unique name for this instance of a heat pump water heater DX coil.
   N1 , \field Rated Heating Capacity
        \required-field
@@ -47007,7 +47025,7 @@ Coil:WaterHeating:AirToWaterHeatPump,
        \note The compressor crankcase heater only operates when the dry-bulb temperature of air
        \note surrounding the compressor is below the Maximum Ambient Temperature for Crankcase
        \note Heater Operation and the DX coil is off.  The ambient temperature surrounding the
-       \note compressor is set by the WaterHeater:HeatPump parent object (field Compressor Location).
+       \note compressor is set by the WaterHeater:HeatPump:PumpedCondenser parent object (field Compressor Location).
   N12, \field Maximum Ambient Temperature for Crankcase Heater Operation
        \type real
        \minimum 0
@@ -47016,7 +47034,7 @@ Coil:WaterHeating:AirToWaterHeatPump,
        \note The compressor crankcase heater only operates when the dry-bulb temperature of air
        \note surrounding the compressor is below the Maximum Outdoor Temperature for Crankcase
        \note Heater Operation and the unit is off. The ambient temperature surrounding the
-       \note compressor is set by the WaterHeater:HeatPump parent object (field Compressor Location).
+       \note compressor is set by the WaterHeater:HeatPump:PumpedCondenser parent object (field Compressor Location).
   A9 , \field Evaporator Air Temperature Type for Curve Objects
        \type choice
        \key DryBulbTemperature
@@ -47088,6 +47106,165 @@ Coil:WaterHeating:AirToWaterHeatPump,
        \note Use curve coefficients of 1,0,0 or leave this field blank when neglecting performance impacts
        \note due to variations in water flow rate fraction.
   A16; \field Part Load Fraction Correlation Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \object-list UniVariateTables
+       \note Part Load Fraction Correlation (function of part load ratio) should be quadratic or cubic.
+       \note Quadratic curve = a + b(PLR) + c(PLR)^2.
+       \note Cubic curve = a + b(PLR) + c(PLR)^2 + d(PLR)^3.
+       \note PLR = part load ratio (heating delivered/steady state heating capacity).
+       \note Use curve coefficients of 1,0,0 or leave this field blank when neglecting performance impacts
+       \note due to variations in part load ratio.
+
+Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
+       \memo Heat pump water heater (HPWH) heating coil, air-to-water direct-expansion (DX)
+       \memo system which includes a water heating coil, evaporator air coil, evaporator
+       \memo fan, electric compressor, and water pump. Part of a WaterHeater:HeatPump:WrappedCondenser system.
+       \min-fields 14
+  A1 , \field Name
+       \required-field
+       \type alpha
+       \reference HeatPumpWaterHeaterDXCoilsWrapped
+       \note Unique name for this instance of a heat pump water heater DX coil.
+  N1 , \field Rated Heating Capacity
+       \required-field
+       \type real
+       \units W
+       \minimum> 0
+       \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
+       \note water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump heat.
+  N2 , \field Rated COP
+       \type real
+       \units W/W
+       \minimum> 0
+       \default 3.2
+       \note Heating coefficient of performance at the rated inlet air temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump power and evaporator fan power (see fields below).
+  N3 , \field Rated Sensible Heat Ratio
+       \type real
+       \minimum 0.5
+       \maximum 1
+       \default 0.85
+       \note Gross air-side sensible heat ratio at the rated inlet air temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Sensible heat ratio equals gross sensible cooling capacity divided by gross total cooling
+       \note capacity. Rated SHR (gross) should not include evaporator fan heat, only sensible cooling
+       \note and dehumidification by the coil alone.
+  N4 , \field Rated Evaporator Inlet Air Dry-Bulb Temperature
+       \type real
+       \units C
+       \minimum> 5
+       \default 19.7
+       \note Evaporator inlet air dry-bulb temperature corresponding to rated coil performance
+       \note (heating capacity, COP and SHR).
+  N5 , \field Rated Evaporator Inlet Air Wet-Bulb Temperature
+       \type real
+       \units C
+       \minimum> 5
+       \default 13.5
+       \note Evaporator inlet air wet-bulb temperature corresponding to rated coil performance
+       \note (heating capacity, COP and SHR).
+  N6 , \field Rated Condenser Water Temperature
+       \type real
+       \units C
+       \minimum> 25
+       \default 57.5
+       \note Condenser inlet water temperature corresponding to rated coil performance
+       \note (heating capacity, COP and SHR).
+  N7 , \field Rated Evaporator Air Flow Rate
+       \type real
+       \units m3/s
+       \minimum> 0
+       \autocalculatable
+       \note Evaporator air flow rate corresponding to rated coil performance
+       \note (heating capacity, COP and SHR).
+       \note Default is 5.035E-5 m3/s/W (31.25 cfm/MBH) of rated heating capacity when autocalculated.
+  A2 , \field Evaporator Fan Power Included in Rated COP
+       \type choice
+       \key Yes
+       \key No
+       \default Yes
+       \note Select Yes if the evaporator fan power is included in the rated COP. This choice field
+       \note impacts the calculation of compressor electric power.
+  A3,  \field Evaporator Air Inlet Node Name
+       \required-field
+       \type node
+       \note The node from which the DX coil draws its inlet air.
+  A4,  \field Evaporator Air Outlet Node Name
+       \required-field
+       \type node
+       \note The node to which the DX coil sends its outlet air.
+  N8,  \field Crankcase Heater Capacity
+       \type real
+       \minimum 0
+       \default 0
+       \units W
+       \note The compressor crankcase heater only operates when the dry-bulb temperature of air
+       \note surrounding the compressor is below the Maximum Ambient Temperature for Crankcase
+       \note Heater Operation and the DX coil is off.  The ambient temperature surrounding the
+       \note compressor is set by the WaterHeater:HeatPump:WrappedCondenser parent object (field Compressor Location).
+  N9,  \field Maximum Ambient Temperature for Crankcase Heater Operation
+       \type real
+       \minimum 0
+       \default 10
+       \units C
+       \note The compressor crankcase heater only operates when the dry-bulb temperature of air
+       \note surrounding the compressor is below the Maximum Outdoor Temperature for Crankcase
+       \note Heater Operation and the unit is off. The ambient temperature surrounding the
+       \note compressor is set by the WaterHeater:HeatPump:WrappedCondenser parent object (field Compressor Location).
+  A5,  \field Evaporator Air Temperature Type for Curve Objects
+       \type choice
+       \key DryBulbTemperature
+       \key WetBulbTemperature
+       \default WetBulbTemperature
+       \note Determines temperature type for heating capacity curves and
+       \note heating COP curves. This input determines whether
+       \note the inlet air dry-bulb or wet-bulb temperature is used to evaluate these curves.
+  A6,  \field Heating Capacity Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCubicCurves
+       \object-list BiVariateTables
+       \note Heating capacity modifier curve (function of temperature) should be biquadratic or cubic.
+       \note Biquadratic curve = a + b(ta) + c(ta)^2 + d(tw) + e(tw)^2 + f(ta)(tw).
+       \note Cubic curve = a + b(ta) + c(ta)^2 + d(ta)^3.
+       \note ta = evaporator inlet air [dry-bulb or wet-bulb] temperature (C).
+       \note tw = condenser inlet water temperature (C).
+       \note The field Evaporator Air Temperature Type for Curve Objects determines if dry-bulb or wet-bulb
+       \note is used as the evaporator inlet air temperature (ta).
+  A7,  \field Heating Capacity Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \object-list UniVariateTables
+       \note Heating capacity modifier curve (function of air flow fraction) should be quadratic or cubic.
+       \note Quadratic curve = a + b(ff) + c(ff)^2.
+       \note Cubic curve = a + b(ff) + c(ff)^2 + d(ff)^3.
+       \note ff = fraction of the rated evaporator air flow rate.
+       \note Use curve coefficients of 1,0,0 or leave this field blank when neglecting performance impacts
+       \note due to variations in air flow rate fraction.
+  A8,  \field Heating COP Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCubicCurves
+       \object-list BiVariateTables
+       \note Heating COP modifier curve (function of temperature) should be biquadratic or cubic.
+       \note Biquadratic curve = a + b(ta) + c(ta)^2 + d(tw) + e(tw)^2 + f(ta)(tw).
+       \note Cubic curve = a + b(ta) + c(ta)^2 + d(ta)^3.
+       \note ta = evaporator inlet air [dry-bulb or wet-bulb] temperature (C).
+       \note tw = condenser inlet water temperature (C).
+       \note The field Evaporator Air Temperature Type for Curve Objects determines if dry-bulb or wet-bulb
+       \note is used as the evaporator inlet air temperature (ta).
+  A9,  \field Heating COP Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \object-list UniVariateTables
+       \note Heating COP modifier curve (function of air flow fraction) should be quadratic or cubic.
+       \note Quadratic curve = a + b(ff) + c(ff)^2.
+       \note Cubic curve = a + b(ff) + c(ff)^2 + d(ff)^3.
+       \note ff = fraction of the rated evaporator air flow rate.
+       \note Use curve coefficients of 1,0,0 or leave this field blank when neglecting performance impacts
+       \note due to variations in air flow rate fraction.
+  A10; \field Part Load Fraction Correlation Curve Name
        \type object-list
        \object-list QuadraticCubicCurves
        \object-list UniVariateTables
@@ -52435,7 +52612,7 @@ AirConditioner:VariableRefrigerantFlow,
        \key No
        \key Yes
        \default No
-       \note This field is reserved for future use. The only valid choice is No.
+       \note This field enables heat recovery operation within this VRF outdoor unit.
   N11, \field Equivalent Piping Length used for Piping Correction Factor in Cooling Mode
        \type real
        \units m
@@ -64052,7 +64229,7 @@ HeatExchanger:FluidToFluid,
 WaterHeater:Mixed,
        \memo Water heater with well-mixed, single-node water tank. May be used to model a tankless
        \memo water heater (small tank volume), a hot water storage tank (zero heater capacity), or
-       \memo a heat pump water heater (see WaterHeater:HeatPump.)
+       \memo a heat pump water heater (see WaterHeater:HeatPump:PumpedCondenser.)
   A1 , \field Name
        \required-field
        \type alpha
@@ -64280,11 +64457,12 @@ WaterHeater:Mixed,
 WaterHeater:Stratified,
        \memo Water heater with stratified, multi-node water tank. May be used to model a tankless
        \memo water heater (small tank volume), a hot water storage tank (zero heater capacity), or
-       \memo a heat pump water heater (see WaterHeater:HeatPump.)
+       \memo a heat pump water heater (see WaterHeater:HeatPump:*.)
   A1 , \field Name
        \required-field
        \type alpha
        \reference WaterHeaterNames
+       \reference WaterHeaterStratifiedNames
   A2 , \field End-Use Subcategory
        \type alpha
        \retaincase
@@ -64567,7 +64745,7 @@ WaterHeater:Stratified,
   N32, \field Number of Nodes
        \type integer
        \minimum 1
-       \maximum 10
+       \maximum 12
        \default 1
   N33, \field Additional Destratification Conductivity
        \type real
@@ -64611,6 +64789,14 @@ WaterHeater:Stratified,
        \units W/m2-K
        \default 0.0
   N43, \field Node 10 Additional Loss Coefficient
+       \type real
+       \units W/m2-K
+       \default 0.0
+  N44, \field Node 11 Additional Loss Coefficient
+       \type real
+       \units W/m2-K
+       \default 0.0
+  N45, \field Node 12 Additional Loss Coefficient
        \type real
        \units W/m2-K
        \default 0.0
@@ -64711,12 +64897,14 @@ WaterHeater:Sizing,
        \note only used if for WaterHeater:Stratified
        \minimum 0.0
 
-WaterHeater:HeatPump,
-       \min-fields 31
-       \memo This object models an air-source heat pump for water heating.
-       \memo WaterHeater:HeatPump is a compound object that references other component objects -
-       \memo Coil:WaterHeating:AirToWaterHeatPump, Fan:OnOff, WaterHeater:Mixed
-	   \memo Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed, Fan:OnOff, WaterHeater:Mixed
+WaterHeater:HeatPump:PumpedCondenser,
+       \min-fields 32
+       \memo This object models an air-source heat pump for water heating where the water is pumped out of the tank,
+       \memo through a heating coil and returned to the tank. 
+       \memo For wrapped condenser HPWHs, see WaterHeater:HeatPump:WrappedCondenser.
+       \memo see 
+       \memo WaterHeater:HeatPump:PumpedCondenser is a compound object that references other component objects -
+       \memo Coil:WaterHeating:AirToWaterHeatPump:*, Fan:OnOff, WaterHeater:Mixed or WaterHeater:Stratified
   A1 , \field Name
        \required-field
        \type alpha
@@ -64841,24 +65029,32 @@ WaterHeater:HeatPump,
   A18, \field DX Coil Object Type
        \required-field
        \type choice
-       \key Coil:WaterHeating:AirToWaterHeatPump
+       \key Coil:WaterHeating:AirToWaterHeatPump:Pumped
 	   \key Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed
-       \default Coil:WaterHeating:AirToWaterHeatPump
+       \default Coil:WaterHeating:AirToWaterHeatPump:Pumped
        \note Specify the type of DX coil used by this heat pump water heater. The only
-       \note valid choice is Coil:WaterHeating:AirToWaterHeatPump and Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed.
+       \note valid choice is Coil:WaterHeating:AirToWaterHeatPump:Pumped and Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed.
   A19, \field DX Coil Name
        \required-field
        \type object-list
-       \object-list HeatPumpWaterHeaterDXCoils
-	   \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
-       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump and Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.
+       \object-list HeatPumpWaterHeaterDXCoilsPumped
+       \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
+       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:* object.
   N4 , \field Minimum Inlet Air Temperature for Compressor Operation
        \type real
        \units C
-       \minimum 5
+       \minimum -5
        \default 10
        \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
        \note is below this value.
+  N5 , \field Maximum Inlet Air Temperature for Compressor Operation
+       \type real
+       \units C
+       \default 48.88888888889
+       \minimum 26
+       \maximum 94
+       \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
+       \note is above this value.
   A20, \field Compressor Location
        \required-field
        \type choice
@@ -64891,14 +65087,14 @@ WaterHeater:HeatPump,
        \default DrawThrough
        \note BlowThrough means the fan is located before the air coil (upstream).
        \note DrawThrough means the fan is located after the air coil (downstream).
-  N5 , \field On Cycle Parasitic Electric Load
+  N6 , \field On Cycle Parasitic Electric Load
        \type real
        \units W
        \minimum 0.0
        \default 0.0
        \note Parasitic electric power consumed when the heat pump compressor operates.
        \note Does not contribute to water heating but can impact the zone air heat balance.
-  N6 , \field Off Cycle Parasitic Electric Load
+  N7 , \field Off Cycle Parasitic Electric Load
        \type real
        \units W
        \minimum 0.0
@@ -64931,17 +65127,284 @@ WaterHeater:HeatPump,
        \note A schedule value of 0 denotes inlet air is drawn only from the zone.
        \note A schedule value of 1 denotes inlet air is drawn only from outdoors.
        \note Schedule values between 0 and 1 denote a mixture of zone and outdoor air
-       \note proportional to the schedule value.
-  A29; \field Control Sensor Location In Stratified Tank
-       \note Used to indicate height of control sensor if Tank Object Type is WaterHeater:Stratified
+       \note proportional to the schedule value (i.e. 0.4 = 40% outdoor air, 60% zone air).
+  A29, \field Tank Element Control Logic
        \type choice
-       \key Heater1
-       \key Heater2
-       \key SourceInlet
-       \key SourceOutlet
-       \key UseInlet
-       \key UseOutlet
-       \default Heater1
+       \key MutuallyExlcusive
+       \key Simultaneous
+       \default Simultaneous
+       \note MutuallyExclusive means that once the tank heating element is active the
+       \note heat pump is shut down until setpoint is reached.
+       \note Simultaneous (default) means that both the tank heating element and
+       \note heat pump are used at the same time recover the tank temperature.
+  N8,  \field Control Sensor 1 Height In Stratified Tank
+       \note Used to indicate height of control sensor for Tank Object Type = WaterHeater:Stratified
+       \note If left blank, it will default to the height of Heater1
+       \type real
+       \units m
+       \minimum 0.0
+  N9,  \field Control Sensor 1 Weight
+       \note Weight to give Control Sensor 1 temperature
+       \note The weight of Control Sensor 2 will be 1 - (wt. of control sensor 1)
+       \units dimensionless
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
+  N10; \field Control Sensor 2 Height In Stratified Tank
+       \note Used to indicate height of control sensor for Tank Object Type = WaterHeater:Stratified
+       \note If left blank, it will default to the height of Heater2
+       \type real
+       \units m
+       \minimum 0.0
+
+WaterHeater:HeatPump:WrappedCondenser,
+       \min-fields 31
+       \memo This object models an air-source heat pump for water heating where the heating coil is wrapped around
+       \memo the tank, which is typical of residential HPWHs. 
+       \memo For pumped condenser HPWHs, see WaterHeater:HeatPump:PumpedCondenser.
+       \memo WaterHeater:HeatPump:WrappedCondenser is a compound object that references other component objects -
+       \memo Coil:WaterHeating:AirToWaterHeatPump:Pumped, Fan:OnOff, WaterHeater:Mixed
+  A1 , \field Name
+       \required-field
+       \type alpha
+       \note Unique name for this instance of a heat pump water heater.
+  A2 , \field Availability Schedule Name
+       \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+       \note If this field is blank, the system is always available.
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values of 0 denote the heat pump compressor is off and the parasitic electric
+       \note energy is also off.
+  A3,  \field Compressor Setpoint Temperature Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+       \note Defines the cut-out temperature where the heat pump compressor turns off.
+       \note The heat pump compressor setpoint temperature should always be greater
+       \note than the water tank's heater (element or burner) setpoint temperature.
+  N1 , \field Dead Band Temperature Difference
+       \type real
+       \units deltaC
+       \minimum> 0.0
+       \maximum 20
+       \default 5.0
+       \note Setpoint temperature minus the dead band temperature difference defines
+       \note the cut-in temperature where the heat pump compressor turns on.
+       \note The water tank's heater (element or burner) setpoint temperature
+       \note should always be less than the heat pump compressor cut-in temperature.
+  N2,  \field Condenser Bottom Location
+       \type real
+       \units m
+       \minimum 0
+       \default 0
+       \note Distance from the bottom of the tank to the bottom of the wrapped condenser.
+  N3,  \field Condenser Top Location
+       \required-field
+       \type real
+       \units m
+       \minimum 0
+       \note Distance from the bottom of the tank to the top of the wrapped condenser.
+  N4 , \field Evaporator Air Flow Rate
+       \type real
+       \units m3/s
+       \minimum> 0
+       \autocalculatable
+       \note Actual air flow rate across the heat pump's air coil (evaporator).
+       \note If autocalculated, the air flow rate is set equal to 5.035E-5 m3/s/W times
+       \note the rated heating capacity of the heat pump's DX coil.
+  A4 , \field Inlet Air Configuration
+       \required-field
+       \type choice
+       \key Schedule
+       \key ZoneAirOnly
+       \key OutdoorAirOnly
+       \key ZoneAndOutdoorAir
+       \note Defines the configuration of the airflow path through the air coil and fan section.
+  A5 , \field Air Inlet Node Name
+       \type node
+       \note Zone air exhaust node name if Inlet Air Configuration is ZoneAirOnly or
+       \note ZoneAndOutdoorAir.
+       \note Simply a unique Node Name if Inlet Air Configuration is Schedule.
+       \note Otherwise, leave field blank.
+  A6 , \field Air Outlet Node Name
+       \type node
+       \note Zone Air Inlet Node Name if Inlet Air Configuration is ZoneAirOnly or
+       \note ZoneAndOutdoorAir.
+       \note Simply a unique Node Name if Inlet Air Configuration is Schedule.
+       \note Otherwise, leave field blank.
+  A7 , \field Outdoor Air Node Name
+       \type node
+       \note Outdoor air node name if inlet air configuration is ZoneAndOutdoorAir
+       \note or OutdoorAirOnly, otherwise leave field blank.
+  A8 , \field Exhaust Air Node Name
+       \type node
+       \note Simply a unique Node Name if Inlet Air Configuration is ZoneAndOutdoorAir
+       \note or OutdoorAirOnly, otherwise leave field blank.
+  A9 , \field Inlet Air Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Used only if Inlet Air Configuration is Schedule, otherwise leave blank.
+       \note Schedule values should be degrees C.
+  A10, \field Inlet Air Humidity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Used only if Inlet Air Configuration is Schedule, otherwise leave blank.
+       \note Schedule values are entered as a fraction (e.g. 0.5 is equal to 50%RH)
+  A11, \field Inlet Air Zone Name
+       \type object-list
+       \object-list ZoneNames
+       \note Used only if Inlet Air Configuration is ZoneAirOnly or ZoneAndOutdoorAir.
+       \note Otherwise, leave field blank.
+  A12, \field Tank Object Type
+       \required-field
+       \type choice
+       \key WaterHeater:Stratified
+       \default WaterHeater:Stratified
+       \note Specify the type of water heater tank used by this heat pump water heater.
+  A13, \field Tank Name
+       \required-field
+       \type object-list
+       \object-list WaterHeaterStratifiedNames
+       \note Needs to match the name used in the corresponding Water Heater object. 
+       \note Must be a WaterHeater:Stratified tank.
+  A14, \field Tank Use Side Inlet Node Name
+       \type node
+       \note Used only when the heat pump water heater is connected to a plant loop,
+       \note otherwise leave blank. Needs to match the name used in the corresponding
+       \note Water Heater object when connected to a plant loop.
+  A15, \field Tank Use Side Outlet Node Name
+       \type node
+       \note Used only when the heat pump water heater is connected to a plant loop,
+       \note otherwise leave blank. Needs to match the name used in the corresponding
+       \note Water Heater object when connected to a plant loop.
+  A16, \field DX Coil Object Type
+       \required-field
+       \type choice
+       \key Coil:WaterHeating:AirToWaterHeatPump:Wrapped
+       \default Coil:WaterHeating:AirToWaterHeatPump:Wrapped
+       \note Specify the type of DX coil used by this heat pump water heater. The only
+       \note valid choice is Coil:WaterHeating:AirToWaterHeatPump:Wrapped
+  A17, \field DX Coil Name
+       \required-field
+       \type object-list
+       \object-list HeatPumpWaterHeaterDXCoilsWrapped
+       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:Wrapped object.
+  N5 , \field Minimum Inlet Air Temperature for Compressor Operation
+       \type real
+       \units C
+       \minimum -5
+       \default 10
+       \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
+       \note is below this value.
+  N6 , \field Maximum Inlet Air Temperature for Compressor Operation
+       \type real
+       \units C
+       \default 48.88888888889
+       \minimum 26
+       \maximum 94
+       \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
+       \note is above this value.
+  A18, \field Compressor Location
+       \required-field
+       \type choice
+       \key Schedule
+       \key Zone
+       \key Outdoors
+       \note If Zone is selected, Inlet Air Configuration must be ZoneAirOnly or
+       \note ZoneAndOutdoorAir. If Schedule is selected, then you must provide a
+       \note Compressor Ambient Temperature Schedule Name below.
+  A19, \field Compressor Ambient Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Used only if Compressor Location is Schedule, otherwise leave field blank.
+  A20, \field Fan Object Type
+       \required-field
+       \type choice
+       \key Fan:OnOff
+       \default Fan:OnOff
+       \note Specify the type of fan used by this heat pump water heater. The only
+       \note valid choice is Fan:OnOff.
+  A21, \field Fan Name
+       \required-field
+       \type object-list
+       \object-list FansOnOff
+       \note Needs to match the name used in the corresponding Fan:OnOff object.
+  A22, \field Fan Placement
+       \type choice
+       \key BlowThrough
+       \key DrawThrough
+       \default DrawThrough
+       \note BlowThrough means the fan is located before the air coil (upstream).
+       \note DrawThrough means the fan is located after the air coil (downstream).
+  N7 , \field On Cycle Parasitic Electric Load
+       \type real
+       \units W
+       \minimum 0.0
+       \default 0.0
+       \note Parasitic electric power consumed when the heat pump compressor operates.
+       \note Does not contribute to water heating but can impact the zone air heat balance.
+  N8 , \field Off Cycle Parasitic Electric Load
+       \type real
+       \units W
+       \minimum 0.0
+       \default 0.0
+       \note Parasitic electric power consumed when the heat pump compressor is off.
+       \note Does not contribute to water heating but can impact the zone air heat balance.
+       \note Off-cycle parasitic power is 0 when the availability schedule is 0.
+  A23, \field Parasitic Heat Rejection Location
+       \type choice
+       \key Zone
+       \key Outdoors
+       \default Outdoors
+       \note This field determines if the parasitic electric load impacts the zone air
+       \note heat balance. If Zone is selected, Inlet Air Configuration must be
+       \note ZoneAirOnly or ZoneAndOutdoorAir.
+  A24, \field Inlet Air Mixer Node Name
+       \type node
+       \note Required only if Inlet Air Configuration is ZoneAndOutdoorAir, otherwise
+       \note leave field blank.
+  A25, \field Outlet Air Splitter Node Name
+       \type node
+       \note Required only if Inlet Air Configuration is ZoneAndOutdoorAir, otherwise
+       \note leave field blank.
+  A26, \field Inlet Air Mixer Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Required only if Inlet Air Configuration is ZoneAndOutdoorAir, otherwise
+       \note leave field blank. Schedule values define whether the heat pump draws its
+       \note inlet air from the zone, outdoors or a combination of zone and outdoor air.
+       \note A schedule value of 0 denotes inlet air is drawn only from the zone.
+       \note A schedule value of 1 denotes inlet air is drawn only from outdoors.
+       \note Schedule values between 0 and 1 denote a mixture of zone and outdoor air
+       \note proportional to the schedule value.
+  A27, \field Tank Element Control Logic
+       \type choice
+       \key MutuallyExlcusive
+       \key Simultaneous
+       \default Simultaneous
+       \note MutuallyExclusive means that once the tank heating element is active the
+       \note heat pump is shut down until setpoint is reached.
+       \note Simultaneous (default) means that both the tank heating element and
+       \note heat pump are used at the same time recover the tank temperature.
+  N9,  \field Control Sensor 1 Height In Stratified Tank
+       \note Used to indicate height of control sensor if Tank Object Type is WaterHeater:Stratified
+       \note If left blank, it will default to the height of Heater1
+       \type real
+       \units m
+       \minimum 0.0
+  N10, \field Control Sensor 1 Weight
+       \note Weight to give Control Sensor 1 temperature
+       \units dimensionless
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
+  N11; \field Control Sensor 2 Height In Stratified Tank
+       \note Used to indicate height of control sensor if Tank Object Type is WaterHeater:Stratified
+       \note If left blank, it will default to the height of Heater2
+       \note The weight of this control sensor will be 1 - (wt. of control sensor 1)
+       \type real
+       \units m
+       \minimum 0.0
 
 ThermalStorage:Ice:Simple,
       \min-fields 5
@@ -76019,7 +76482,10 @@ WaterUse:RainCollector,
 !
 FaultModel:TemperatureSensorOffset:OutdoorAir,
    \memo This object describes outdoor air temperature sensor offset
+   \min-fields 3
    A1, \field Name
+       \note Enter the name of the fault
+       \required-field
        \type alpha
    A2, \field Availability Schedule Name
        \type object-list
@@ -76044,7 +76510,9 @@ FaultModel:TemperatureSensorOffset:OutdoorAir,
 
 FaultModel:HumiditySensorOffset:OutdoorAir,
    \memo This object describes outdoor air humidity sensor offset
+   \min-fields 3
    A1, \field Name
+       \note Enter the name of the fault
        \required-field
        \type alpha
    A2, \field Availability Schedule Name
@@ -76070,7 +76538,9 @@ FaultModel:HumiditySensorOffset:OutdoorAir,
 
 FaultModel:EnthalpySensorOffset:OutdoorAir,
    \memo This object describes outdoor air enthalpy sensor offset
+   \min-fields 3
    A1, \field Name
+       \note Enter the name of the fault
        \required-field
        \type alpha
    A2, \field Availability Schedule Name
@@ -76096,7 +76566,9 @@ FaultModel:EnthalpySensorOffset:OutdoorAir,
 
 FaultModel:PressureSensorOffset:OutdoorAir,
    \memo This object describes outdoor air pressure sensor offset
+   \min-fields 3
    A1, \field Name
+       \note Enter the name of the fault
        \required-field
        \type alpha
    A2, \field Availability Schedule Name
@@ -76122,7 +76594,9 @@ FaultModel:PressureSensorOffset:OutdoorAir,
 
 FaultModel:TemperatureSensorOffset:ReturnAir,
    \memo This object describes return air temperature sensor offset
+   \min-fields 3
    A1, \field Name
+       \note Enter the name of the fault
        \required-field
        \type alpha
    A2, \field Availability Schedule Name
@@ -76148,7 +76622,9 @@ FaultModel:TemperatureSensorOffset:ReturnAir,
 	   
 FaultModel:EnthalpySensorOffset:ReturnAir,
    \memo This object describes return air enthalpy sensor offset
+   \min-fields 3
    A1, \field Name
+       \note Enter the name of the fault
        \required-field
        \type alpha
    A2, \field Availability Schedule Name
@@ -76174,7 +76650,9 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
 
 FaultModel:ThermostatOffset,
    \memo This object describes fault of thermostat offset
+   \min-fields 3
    A1, \field Name
+       \note Enter the name of the fault
        \required-field
        \type alpha
        \reference ThermostatOffsetFaults
@@ -76199,7 +76677,9 @@ FaultModel:ThermostatOffset,
 
 FaultModel:HumidistatOffset, 
    \memo This object describes fault of humidistat offset
+   \min-fields 4
    A1, \field Name
+       \note Enter the name of the fault
        \required-field
        \type alpha
    A2, \field Humidistat Name
@@ -76235,6 +76715,42 @@ FaultModel:HumidistatOffset,
        \note Required field for Type ThermostatOffsetDependent
        \type object-list
        \object-list ThermostatOffsetFaults   
+	   
+FaultModel:Fouling:AirFilter,
+   \memo This object describes fault of dirty air filters
+   \min-fields 4
+   A1, \field Name
+       \note Enter the name of the fault
+       \required-field
+       \type alpha
+   A2, \field Fan Object Type
+       \note Choose the type of the fan
+       \required-field
+       \type choice
+       \key Fan:OnOff
+       \key Fan:ConstantVolume
+       \key Fan:VariableVolume
+   A3, \field Fan Name
+       \note Enter the name of a fan object
+       \required-field
+       \type object-list
+       \object-list FansCVandOnOffandVAV 
+   A4, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A5, \field Pressure Fraction Schedule Name 
+       \note Enter the name of a schedule 
+       \note describing the variations of the fan pressure rise 
+       \note in terms of multipliers to the fan design pressure rise
+       \type object-list
+       \object-list ScheduleNames   
+   A6; \field Fan Curve Name
+       \note The curve describes the relationship between 
+       \note the fan pressure rise and air flow rate
+       \required-field
+       \type object-list 
+       \object-list CubicCurves
+       \object-list UniVariateTables
 
 FaultModel:Fouling:Coil,
    \memo This object describes fouling water heating or cooling coils

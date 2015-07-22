@@ -1961,6 +1961,11 @@ namespace DataSizing {
 	extern Array1D< SysSizPeakDDNumData > SysSizPeakDDNum; // data array for peak des day indices
 	extern Array1D< ZoneHVACSizingData > ZoneHVACSizing; // Input data for zone HVAC sizing
 
+	// Clears the global data in DataSizing.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 } // DataSizing
 
 } // EnergyPlus

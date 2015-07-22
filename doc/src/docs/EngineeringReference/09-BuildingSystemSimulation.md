@@ -105,7 +105,7 @@ The logical flags *SimAirLoops* and *SimZoneEquipment* are used to signal whethe
 
 
 
-*ResolveAirLoopFlowLimits* is invoked to deal with zone equipment – primary air system flow mismatches. For instance the zone air terminal units (ATUs) may be asking for more air than the central fan can supply. In this case *ResolveAirLoopFlowLimits* takes the air flow that the fan can supply and apportions it among the ATUs in proportion to their design maximum air flow rates (*ResolveAirLoopFlowLimits* sets the <span>${\dot m_{\max avail,node}}$</span> at the entering node of each ATU in the system).
+*ResolveAirLoopFlowLimits* is invoked to deal with zone equipment – primary air system flow mismatches. For instance the zone air terminal units (ATUs) may be asking for more air than the central fan can supply. In this case *ResolveAirLoopFlowLimits* takes the air flow that the fan can supply and apportions it among the ATUs in proportion to their design maximum air flow rates (*ResolveAirLoopFlowLimits* sets the <span>\({\dot m_{\max avail,node}}\)</span> at the entering node of each ATU in the system).
 
 At the end of the air loop simulation *ResolveLockoutFlags* is called. This subroutine checks if any air system component has requested that the economizer be locked out. If such a request has been made and if the economizer is active, *ResolveLockoutFlags* sets *SimAirLoops* to *true* and the *EconoLockout* flag to *true* to ensure that the air loop will be resimulated with the economizer forced off.
 
@@ -213,7 +213,7 @@ For each air loop, loop over all the branches in the loop. Initialize each branc
 
 <div>$${\dot m_{br,\min }} = {\rho_{std}} \cdot {\dot V_{br,\min }}$$</div>
 
-where <span>${\rho_{std}}$</span> is the density of air at 20 degrees C, humidity ratio = 0, standard pressure.
+where <span>\({\rho_{std}}\)</span> is the density of air at 20 degrees C, humidity ratio = 0, standard pressure.
 
 For each branch, loop over all the nodes on the branch and set the node data to the following values:
 
@@ -239,13 +239,13 @@ For each branch, loop over all the nodes on the branch and set the node data to 
 
 <div>$$Q{u_{node}} = 0.0$$</div>
 
-where <span>${W_{oa}}$</span> is the humidity ratio of the outside air; <span>${\rm{PsyHFnTdbW}}$</span>is the EnergyPlus psychrometric function for enthalpy *h*, given temperature and humidity ratio; and *Qu* is quality.
+where <span>\({W_{oa}}\)</span> is the humidity ratio of the outside air; <span>\({\rm{PsyHFnTdbW}}\)</span>is the EnergyPlus psychrometric function for enthalpy *h*, given temperature and humidity ratio; and *Qu* is quality.
 
 #### System Time Step Initializations
 
-For each branch in each air loop, loop over all the nodes on the branch and set <span>${\dot m_{setpt,node}} = 0.0$</span>; if it is the start of an HVAC solution sequence set <span>${\dot m_{\max avail,node}} = {\dot m_{\max ,node}}$</span>. Then set the mass flow rate setpoints for the air loop nodes.
+For each branch in each air loop, loop over all the nodes on the branch and set <span>\({\dot m_{setpt,node}} = 0.0\)</span>; if it is the start of an HVAC solution sequence set <span>\({\dot m_{\max avail,node}} = {\dot m_{\max ,node}}\)</span>. Then set the mass flow rate setpoints for the air loop nodes.
 
-1)    On each air loop, loop over the outlet branches and find the loop outlet nodes. If it is the start of an HVAC solution sequence, set <span>${\dot m_{setpt,outletnode}} = {\dot m_{outletbr,\max }}$</span>. This will insure that during the first pass through the full loop that the mass flow rate will be at the maximum. Otherwise, set <span>${\dot m_{setpt,outletnode}} = {\dot m_{zone{\rm{ }}eq{\rm{ }}inletnode}}$</span>. This sets the air loop flow rate to the total zone requirement.
+1)    On each air loop, loop over the outlet branches and find the loop outlet nodes. If it is the start of an HVAC solution sequence, set <span>\({\dot m_{setpt,outletnode}} = {\dot m_{outletbr,\max }}\)</span>. This will insure that during the first pass through the full loop that the mass flow rate will be at the maximum. Otherwise, set <span>\({\dot m_{setpt,outletnode}} = {\dot m_{zone{\rm{ }}eq{\rm{ }}inletnode}}\)</span>. This sets the air loop flow rate to the total zone requirement.
 
 2)    Pass the mass flow rate setpoint upstream to the start of the outlet branches; through the splitter, if one exists; and upstream to the beginning node of the splitter inlet branch.
 
@@ -382,7 +382,7 @@ For each controlled zone initialize the zone inlet, exhaust and zone nodes to st
 
 <div>$${p_{node}} = {p_{oa}}$$</div>
 
-where *W<sub>oa</sub>* is the humidity of the outside air; <span>${\rm{PsyHFnTdbW}}$</span>is the EnergyPlus psychrometric function for enthalpy *h*, given temperature and humidity ratio; *p<sub>oa</sub>* is the pressure of the outside air; and *Qu* is quality.
+where *W<sub>oa</sub>* is the humidity of the outside air; <span>\({\rm{PsyHFnTdbW}}\)</span>is the EnergyPlus psychrometric function for enthalpy *h*, given temperature and humidity ratio; *p<sub>oa</sub>* is the pressure of the outside air; and *Qu* is quality.
 
 #### System Time Step Initializations
 
@@ -467,7 +467,7 @@ The AirLoopHVAC:ZoneMixer combines multiple inlet air streams into a single outl
 
 <div>$${T_{air,out}} = PsyTdbFnHW({h_{air,out}},{W_{air,out}})$$</div>
 
-Where <span>$\dot m$</span>is air mass flow rate, *W* is humidity ratio, *h* is specific enthalpy, *P* is pressure, and *T* is temperature. *PsyTdbFnHW* is the EnergyPlus psychrometric function for drybulb temperature as a function of enthalpy and humidity ratio. The air mass flow rate calculation is also done for the maximum and minimum available mass flow rates.
+Where <span>\(\dot m\)</span>is air mass flow rate, *W* is humidity ratio, *h* is specific enthalpy, *P* is pressure, and *T* is temperature. *PsyTdbFnHW* is the EnergyPlus psychrometric function for drybulb temperature as a function of enthalpy and humidity ratio. The air mass flow rate calculation is also done for the maximum and minimum available mass flow rates.
 
 ### Zone Return Plenum
 
@@ -500,15 +500,15 @@ The LoadProfile:Plant object calculates the outlet water temperature based on th
 
 where
 
-<span>${T_{out}}$</span> = the outlet water temperature
+<span>\({T_{out}}\)</span> = the outlet water temperature
 
-<span>${T_{in}}$</span> = the inlet water temperature
+<span>\({T_{in}}\)</span> = the inlet water temperature
 
-<span>${Q_{load}}$</span> = the scheduled plant load
+<span>\({Q_{load}}\)</span> = the scheduled plant load
 
-<span>$\dot m$</span> = the water mass flow rate
+<span>\(\dot m\)</span> = the water mass flow rate
 
-<span>${c_p}$</span> = the specific heat of water
+<span>\({c_p}\)</span> = the specific heat of water
 
 The user requested flow rate is not always available from the plant loop.  The actual flow rate used in the calculation is the lesser of the user requested value and the plant available value.
 
@@ -520,11 +520,11 @@ For reporting purposes the energy consumption of the object is calculated using 
 
 where
 
-<span>$E$</span> = the energy consumption
+<span>\(E\)</span> = the energy consumption
 
-<span>${Q_{load}}$</span> = the scheduled plant load
+<span>\({Q_{load}}\)</span> = the scheduled plant load
 
-<span>$\Delta t$</span> = the time step interval
+<span>\(\Delta t\)</span> = the time step interval
 
 Plant/Condenser Loops
 ---------------------
@@ -539,7 +539,7 @@ There are two main types of loops within the HVAC simulation in EnergyPlus: an a
 
 Plant loops are further divided into “half-loops” or “semi-loops” for organizational clarity and simulation logistics (see Figure “Connections between the Main HVAC Simulation Loops and Half-Loops”). These sub-loops, or half-loop sides, are matched pairs that consist of half of a main plant loop. Plant loops are broken into supply and demand sides. The plant demand side half-loop contains equipment that places a load on the primary equipment. This might include coils, baseboards, radiant systems, etc. The load is met by primary equipment such as chillers or boilers on the supply side half-loop. Each supply side half-loop must be connected to a demand side half-loop and vice versa. A similar breakdown is present on condenser loops where the demand side includes the water side of chiller’s condensers while the supply side includes condenser equipment such as cooling towers.
 
-![](EngineeringReference/media/image1957.svg.png)
+![](media/image1957.svg.png)
 
 Figure 120. Connections between the Main HVAC Simulation Loops and Half-Loops.
 
@@ -551,7 +551,7 @@ Each half-loop may only have one splitter and one mixer. Thus, equipment may be 
 
 In addition, to avoid the need for overly complex solver routines, there are some restrictions on the placement of pumps within a particular half-loop. There are two general types of pumps, loop pumps and branch pumps. A pump that is the first component on the first branch (between A and B) is termed a “loop pump” while any pump in the parallel section (between Ci and Di) is termed a “branch pump”.   The simplest and most common arrangement is to have one loop pump on the supply side inlet.  In plant demand half-loops pumps can be placed only in the inlet branch. This will allow simulation of primary-secondary systems. For more information on pumps and pump placement rules, see the section on PipingSystem:Underground Simulation Pumps in this document.
 
-![](EngineeringReference/media/image1958.svg.png)
+![](media/image1958.svg.png)
 
 Figure 121. Branch Layout for Individual Plant Half-Loops
 
@@ -625,7 +625,7 @@ In order to achieve these design criteria without resorting to a pressure based 
 
 The flow resolver employs a simple predictor-corrector algorithm to enforce mass continuity across the plant loop splitter as shown in the following figure.
 
-![](EngineeringReference/media/image1959.png)
+![](media/image1959.png)
 
 Figure 122. Plant/Condenser Supply Side Solution Scheme.
 
@@ -670,7 +670,7 @@ Plant loops include a simple loop capacitance model to simulate these effects ba
 
 
 
-![Loop Capacitance.tif](EngineeringReference/media/image1962.png)
+![Loop Capacitance.tif](media/image1962.png)
 
 Figure 123. Loop Capacitance Tank Models
 
@@ -688,19 +688,19 @@ The tank temperature at the end of the simulation timestep is solved by the anal
 
 where:
 
-<span>$T_{tank}^{t - \delta t}$</span>          = Previous system time-step tank temperature [°C]
+<span>\(T_{tank}^{t - \delta t}\)</span>          = Previous system time-step tank temperature [°C]
 
-<span>$T_{tank}^t$</span>           = Current tank and tank outlet temperature [°C]
+<span>\(T_{tank}^t\)</span>           = Current tank and tank outlet temperature [°C]
 
-<span>$\dot m$</span>              = Current fluid mass flow rate through the tank [kg/s]
+<span>\(\dot m\)</span>              = Current fluid mass flow rate through the tank [kg/s]
 
-<span>$\delta t$</span>             = Duration of system time step [second]
+<span>\(\delta t\)</span>             = Duration of system time step [second]
 
-<span>${c_P}$</span>             = Heat capacity of fluid [J/kg]
+<span>\({c_P}\)</span>             = Heat capacity of fluid [J/kg]
 
-<span>${M_{tank}}$</span>         = Mass of the water in the tank [kg]
+<span>\({M_{tank}}\)</span>         = Mass of the water in the tank [kg]
 
-<span>${\dot Q_{pumpheat}}$</span>    = Heat generated by a pump in the tank [W]
+<span>\({\dot Q_{pumpheat}}\)</span>    = Heat generated by a pump in the tank [W]
 
 When modeling plants using one of the common pipe modes for plant loops, the same tank model is used but the tanks are situated differently and account for extra connections.  For common pipe situation, the tanks are located on the outlet of a half loop with common pipe interactions downstream of the tank.
 
@@ -718,7 +718,7 @@ The Branch definition is input in simulation and connection order for all of the
 
 Five load distribution schemes are employed in EnergyPlus. The figure below illustrates the plant load distribution algorithm. The total loop demand is calculated and used in the **ManagePlantLoopOperation** routine to determine which equipment is available based on the supervisory control scheme specified by the user. Once all available components have been identified the loop demand is distributed to the available components based on the user specified load distribution scheme.
 
- ![](EngineeringReference/media/image1974.png)
+ ![](media/image1974.png)
 
 Figure 124. Load Distribution Scheme
 
@@ -835,7 +835,7 @@ Common pipe feature eliminates the need of specifying two different EnergyPlus l
 
 * The pumps can have different schedules and any loop can be shut off when the other loop is still running.
 
-![CommonPipe](EngineeringReference/media/image1975.png)
+![CommonPipe](media/image1975.png)
 
 Figure 125. Common Pipe Layout Schematic
 
@@ -881,7 +881,7 @@ Figure 126 shows a schematic of the Two-Way Common Pipe. There are two common pi
 
 * When the Two Way Common Pipe is controlling conditions at the secondary-side, or demand side, inlet node, then the loop capacitance model usually used for the conditions at the demand inlet is not used as it would interfere with control.
 
-![](EngineeringReference/media/image1976.svg.png)
+![](media/image1976.svg.png)
 
 Figure 126. Schematic of a Two-Way Common Pipe used in Primary-Secondary System.
 
@@ -889,7 +889,7 @@ Figure 126. Schematic of a Two-Way Common Pipe used in Primary-Secondary System.
 
 Heat Recovery is accomplished by specifying another set of supply and demand loops. Each of the heat recovery components, i.e. engine driven and combustion turbine chillers, and internal combustion and combustion turbine generators is designed to use the existing component/loop/solution structure to facilitate the simulation with the existing demand side manager and the supply side manager. Heat recovery normally contains components that produce heat that can be recovered, and the ability to store or use that heat elsewhere in the system. The component that can store the excess heat and allow it to be used elsewhere in the system or for domestic hot water is the Water Heater:Simple and is defined in the Input/Output Reference.
 
-![](EngineeringReference/media/image1977.png).
+![](media/image1977.png).
 
 Figure 127. Example of a Heat Recovery Loop Simulation
 
@@ -947,7 +947,7 @@ Beginning at demand side outlet (linked to supply inlet), and working backwards,
 
 When a parallel system is encountered, a special operation is performed. Since we are not resolving flows with this version of the pressure simulation, the parallel system is set to use the largest value of pressure drop found on the parallel branches. In this manner, the highest pressure drop component essentially governs the set of parallel branches, and the other components must match the pressure drop in order to achieve their desired flow rate. This is performed by placing “imaginary” valves in the splitter. This allows individual branches to report their own pressure information, while the splitter accounts for the required pressure drop to match the governing branch. This is shown graphically in the figure below.
 
-![SplitterValves](EngineeringReference/media/image1978.png)
+![SplitterValves](media/image1978.png)
 
 Figure 128: Explanation of valves inherently built into Splitter object
 
@@ -1007,9 +1007,9 @@ C<sub>1-4</sub> are curve coefficients with last mandatory non-zero constant ter
 
 The nondimensional variables in the previous equation are defined in terms of the following expressions:
 
-Ψ – Non-dimensional pressure rise:  <span>$\psi  = \frac{{\Delta P}}{{\rho {N^2}{D^2}}}$</span>
+Ψ – Non-dimensional pressure rise:  <span>\(\psi  = \frac{{\Delta P}}{{\rho {N^2}{D^2}}}\)</span>
 
-φ - Non-dimensional flow:  <span>$\varphi  = \frac{{\dot m}}{{\rho N{D^3}}}$</span>
+φ - Non-dimensional flow:  <span>\(\varphi  = \frac{{\dot m}}{{\rho N{D^3}}}\)</span>
 
 The user preprocesses mass flow and pressure values into these nondimensional forms in order to generate the curve fit.  The program then resolves the nondimensional forms into actual values based on the pump speed, diameter, and fluid density.  This gives the proper pressure-flow relationship for the simulation.
 
@@ -1056,7 +1056,7 @@ The following figure describes the Temperature Entropy Ts diagram based on which
 
 
 
-![SteamSchematic](EngineeringReference/media/image1986.png)
+![SteamSchematic](media/image1986.png)
 
 Figure 129. Schematic of Temperature – Entropy Diagram for Steam loop
 
@@ -1228,7 +1228,7 @@ The following equations calculate the outlet condensate-water and outlet air tem
 
 
 
-<span>$END\,\,IF$</span> End IF for the zone load controlled coil.
+<span>\(END\,\,IF\)</span> End IF for the zone load controlled coil.
 
 
 
@@ -1246,7 +1246,7 @@ Calculate the heating load on the coil using setpoint and inlet air temperatures
 
 The logic loop for temperature-controlled coil begins here.  In case the heating load on the coil is negative, which might occur if the setpoint is below the air inlet temperature, the coil operation needs to be shut off.
 
-<div>$$IF\,\,({Q_{al}}\,\,\, < \,\,\,\,0.0)\,\,\,\,THEN$$</div>
+<div>$$IF\,\,({Q_{al}}\,\,\, &lt; \,\,\,\,0.0)\,\,\,\,THEN$$</div>
 
 Assigning the inlet to outlet and mass flows to zero shuts off the coil operation.
 
@@ -1290,11 +1290,11 @@ The ideal case where the coils can meet the required setpoint temperature.  Set
 
 <div>$${Q_{al}}\,\, = \,\,\,{\dot m_a}\, \times \,\,\,{c_{p,a}}\,\, \times \,\,\,\,[\,\,{T_{sp}}\,\, - \,\,\,{T_a}]$$</div>
 
-<span>$END\,\,IF$</span>   End IF statement, for the air coil heating loop.
+<span>\(END\,\,IF\)</span>   End IF statement, for the air coil heating loop.
 
-<span>$END\,\,IF$</span>         End IF statement for the operating condition loop
+<span>\(END\,\,IF\)</span>         End IF statement for the operating condition loop
 
-<span>$END\,\,IF$</span>   End IF statement for the Temperature Setpoint Controlled Coil
+<span>\(END\,\,IF\)</span>   End IF statement for the Temperature Setpoint Controlled Coil
 
 The steam coil model encapsulates the above described control logic along with the other necessary simulation code for reading the user inputs and the code for reporting the simulation results.
 
@@ -1326,7 +1326,7 @@ A simple schematic describing the coil framework, inlet and outlet conditions to
 
 
 
-![SchematicSteamCoil](EngineeringReference/media/image2032.png)
+![SchematicSteamCoil](media/image2032.png)
 
 Figure 130. Schematic of Steam Coil Connection to the Steam Loop
 
@@ -1386,7 +1386,7 @@ Pump control is an important part of the steam loop.  Existing control structur
 
 A simple schematic describing the flow across the pump is shown in the following figure
 
-![SchmaticCondensatePump](EngineeringReference/media/image2040.png)
+![SchmaticCondensatePump](media/image2040.png)
 
 Figure 131.  Schematic of Condensate Pump in Steam Loop
 
