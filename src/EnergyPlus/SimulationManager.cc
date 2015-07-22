@@ -300,6 +300,8 @@ namespace SimulationManager {
 		CheckIfAnyBasements();
 		CheckIfAnyIdealCondEntSetPoint();
 
+		SetLocalization();
+
 		ManageBranchInput(); // just gets input and returns.
 
 		DoingSizing = true;
@@ -2675,6 +2677,26 @@ namespace SimulationManager {
 		}
 
 	}
+
+	void
+	SetLocalization()
+	{
+		using namespace DataIPShortCuts;
+		GetObjectItem("Site:Location", 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, ios, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		Real64 lat = rNumericArgs(1);
+		Real64 lon = rNumericArgs(2);
+		
+		// get country by lat/lon similar to this, but in C++
+		//$url = 'http://maps.googleapis.com/maps/api/geocode/json?latlng='.trim($lat).','.trim($lng).'&sensor=false';
+		//$json = @file_get_contents($url);$data=json_decode($json);
+		//echo $data->results[0]->formatted_address;
+		
+		// then get dominant language for this country by looking up from this table:
+		//http://www.infoplease.com/ipa/A0855611.html
+		
+		DataGlobals::outLanguage = "Spanish"; // overwrite with result from table lookup
+	}
+
 
 } // SimulationManager
 

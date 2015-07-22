@@ -78,6 +78,9 @@ namespace SimulationManager {
 	void
 	CheckThreading();
 
+	void
+	SetLocalization();
+
 } // SimulationManager
 
 // EXTERNAL SUBROUTINES:

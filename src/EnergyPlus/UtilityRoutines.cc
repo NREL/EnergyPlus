@@ -1556,6 +1556,10 @@ ShowErrorMessage(
 	int write_stat;
 	static bool ErrFileOpened( false );
 
+	// if we are localizing, just call the translate API to translate the message or use a prepackaged tool
+	//http://www.codeproject.com/Articles/12711/Google-Translator
+	ErrorMessage = translate( ErrorMessage, DataGlobals::outLanguage );
+
 	if ( TotalErrors == 0 && ! ErrFileOpened ) {
 		StandardErrorOutput = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, DataStringGlobals::outputErrFileName, flags ); write_stat = flags.ios(); }

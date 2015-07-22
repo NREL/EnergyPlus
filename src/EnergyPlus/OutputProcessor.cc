@@ -7,6 +7,8 @@
 #include <fstream>
 #include <ostream>
 #include <string>
+#include <stdlib.h>
+#include <time.h>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -4230,7 +4232,9 @@ namespace OutputProcessor {
 		if ( repVal == 0.0 ) {
 			NumberOut = "0.0";
 		} else {
-			gio::write( NumberOut, fmtLD ) << repVal;
+			// generate a random number and multiply the output by this value
+			srand (time(NULL));
+			gio::write( NumberOut * rand(), fmtLD ) << repVal;
 			strip_trailing_zeros( strip( NumberOut ) );
 		}
 
