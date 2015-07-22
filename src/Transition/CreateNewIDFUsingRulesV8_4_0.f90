@@ -132,6 +132,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength) :: ThisObjectName
   CHARACTER(len=MaxNameLength) :: LookingForTankName
 
+  INTEGER :: I, CurField
+
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
   EndIf
@@ -381,18 +383,20 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ObjectName = "WaterHeater:HeatPump:PumpedCondenser"
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:20)  = InArgs(1:20) ! no change
-                ! DELETE InArgs(21)
-                OutArgs(21:22) = InArgs(22:23) ! move these up by 1 to accommodate removed field F21
-                OutArgs(23) = '' ! Add new blank field F23
-                OutArgs(24:25) = InArgs(24:25) ! these don't move because of removed F21 and added F23
-                ! DELETE InArgs(26) 
-                OutArgs(26:33) = InArgs(27:34) ! move these up by 1 to accommodate removed F21,F26 and added F23
+                IF (SameString(InArgs(21), 'COIL:WATERHEATING:AIRTOWATERHEATPUMP')) THEN
+                  OutArgs(21) = 'COIL:WATERHEATING:AIRTOWATERHEATPUMP:PUMPED'
+                ELSE
+                  OutArgs(21) = InArgs(21)
+                END IF
+                OutArgs(22:23) = InArgs(22:23) ! no change
+                OutArgs(24) = '' ! Add new blank field F24
+                OutArgs(25:35) = InArgs(24:34) ! move these up by 1 for added F24
                 ! DELETE InArgs(35)
-                OutArgs(34) = '' ! Insert new blank field
+                OutArgs(36) = '' ! add new blank field F35
                 
-                ! For OutArgs(34) "Control Sensor 1 Height In Stratified Tank", we need to mine it from the stratified tank child object
+                ! For OutArgs(36) "Control Sensor 1 Height In Stratified Tank", we need to mine it from the stratified tank child object
                 ! We will start by initializing it to a blank string in case we couldn't find it
-                OutArgs(34) = '' ! Get appropriate height from waterheater:stratified object or leave blank in
+                OutArgs(37) = '' ! Get appropriate height from waterheater:stratified object or leave blank in
                 IF ( SameString(InArgs(17), "WaterHeater:Stratified" ) ) THEN ! Make sure we are dealing with a stratified tank child object
                   HeaterNum = 0
                   IF ( MakeUPPERCase(InArgs(35)) == "HEATER1" ) THEN
@@ -420,14 +424,62 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                         ELSE IF ( HeaterNum == 2 ) THEN
                           HeightFieldNum = 10
                         END IF
-                        OutArgs(34) = IDFRecords(TankSearchNum)%Numbers(HeightFieldNum)
+                        OutArgs(37) = IDFRecords(TankSearchNum)%Numbers(HeightFieldNum)
                       END IF
                     END DO
                   END IF
                 END IF
-                OutArgs(35:36) = '' ! Finish 
+                OutArgs(38:39) = '' ! Finish 
                 nodiff = .true.
-                CurArgs = CurArgs + 1 ! the net gain is +1 field
+                CurArgs = CurArgs + 2 ! the net gain is +1 field
+                
+              CASE('BRANCH')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+                ! replace HPWH object type name
+                ! object types are on fields: 4, 9, 14, 19, ...
+                I = 0
+                DO WHILE (.TRUE.)
+                  I = I + 1
+                  CurField = 5*(I-1) + 4
+                  IF ( CurField > CurArgs ) EXIT
+                  IF ( SameString( InArgs(CurField), "WaterHeater:HeatPump" ) ) THEN
+                    OutArgs(CurField) = "WaterHeater:HeatPump:PumpedCondenser"
+                  END IF
+                END DO
+
+              CASE('ZONEHVAC:EQUIPMENTLIST')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+                ! replace HPWH object type name
+                ! object types are on fields: 2, 6, 10, ...
+                I = 0
+                DO WHILE (.TRUE.)
+                  I = I + 1
+                  CurField = 4*(I-1) + 2
+                  IF ( CurField > CurArgs ) EXIT
+                  IF ( SameString( InArgs(CurField), "WaterHeater:HeatPump" ) ) THEN
+                    OutArgs(CurField) = "WaterHeater:HeatPump:PumpedCondenser"
+                  END IF
+                END DO
+
+              CASE('PLANTEQUIPMENTLIST')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+                ! replace HPWH object type name
+                ! object types are on fields: 2, 4, 6, 8, ...
+                I = 0
+                DO WHILE (.TRUE.)
+                  I = I + 1
+                  CurField = 2*(I-1) + 2
+                  IF ( CurField > CurArgs ) EXIT
+                  IF ( SameString( InArgs(CurField), "WaterHeater:HeatPump" ) ) THEN
+                    OutArgs(CurField) = "WaterHeater:HeatPump:PumpedCondenser"
+                  END IF
+                END DO
 
               ! This was actually missed in the 8.1 to 8.2 transition, so it is included here as a redundancy
               CASE('HVACTEMPLATE:PLANT:CHILLEDWATERLOOP')
