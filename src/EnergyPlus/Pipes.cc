@@ -126,7 +126,7 @@ namespace Pipes {
 
 		//GET INPUT
 		if ( GetPipeInputFlag ) {
-			GetPipeInput();
+			iCanHazPipes();
 			GetPipeInputFlag = false;
 		}
 
@@ -198,7 +198,7 @@ namespace Pipes {
 	//******************************************************************************
 
 	void
-	GetPipeInput()
+	iCanHazPipes()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Dan Fisher
@@ -353,7 +353,7 @@ namespace Pipes {
 		// na
 
 		if ( GetPipeInputFlag ) {
-			GetPipeInput();
+			iCanHazPipes();
 			GetPipeInputFlag = false;
 		}
 

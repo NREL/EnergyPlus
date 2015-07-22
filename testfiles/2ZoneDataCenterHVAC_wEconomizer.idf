@@ -96,7 +96,7 @@
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
 ! Air Terminal Unit Type:         AirTerminal:SingleDuct:VAV:NoReheat
-! Evaporative Cooler:             EvaporativeCooler:Direct:ResearchSpecial, EvaporativeCooler:Indirect:ResearchSpecial
+! Evaporative Cooler:             EvaporativeCooler:Direct:ResearchEspecial, EvaporativeCooler:Indirect:ResearchEspecial
 ! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Cooling:Water
 ! Pumps:                          Pump:VariableSpeed
 ! Boilers:                        None
@@ -887,12 +887,12 @@
     West Zone Mixed Air Node, !- Component 2 Inlet Node Name
     West Zone Supply Fan Outlet Node,  !- Component 2 Outlet Node Name
     ACTIVE,                   !- Component 2 Branch Control Type
-    EvaporativeCooler:Direct:ResearchSpecial,  !- Component 3 Object Type
+    EvaporativeCooler:Direct:ResearchEspecial,  !- Component 3 Object Type
     West Data Center DEC ,  !- Component 3 Name
     West Zone Supply Fan Outlet Node,  !- Component 3 Inlet Node Name
     West Zone DEC Outlet Node,         !- Component 3 Outlet Node Name
     ACTIVE,                   !- Component 3 Branch Control Type
-    EvaporativeCooler:Indirect:ResearchSpecial, !- Component 4 Object Type
+    EvaporativeCooler:Indirect:ResearchEspecial, !- Component 4 Object Type
     West Data Center IEC,        !- Component 4 Name
     West Zone DEC Outlet Node,   !- Component 4 Inlet Node Name
     West Zone IEC Outlet Node,   !- Component 4 Outlet Node Name
@@ -1057,7 +1057,7 @@
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     ;                        !- Mechanical Ventilation Controller Name
 
-  EvaporativeCooler:Direct:ResearchSpecial,
+  EvaporativeCooler:Direct:ResearchEspecial,
     West Data Center DEC,    !- Name
     ALWAYS_ON,              !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
@@ -1075,7 +1075,7 @@
     18.0,                    !- Evaporative Operation Maximum Limit Wetbulb Temperature
     20.0;                    !- Evaporative Operation Maximum Limit Drybulb Temperature
 
-  EvaporativeCooler:Indirect:ResearchSpecial,
+  EvaporativeCooler:Indirect:ResearchEspecial,
     West Data Center IEC,         !- Name
     ALWAYS_ON,                    !- Availability Schedule Name
     0.70,                         !- Cooler Wetbulb Design Effectiveness
@@ -1454,12 +1454,12 @@
     East Zone Mixed Air Node, !- Component 2 Inlet Node Name
     East Zone Supply Fan Outlet Node,  !- Component 2 Outlet Node Name
     ACTIVE,                   !- Component 2 Branch Control Type
-    EvaporativeCooler:Direct:ResearchSpecial,  !- Component 3 Object Type
+    EvaporativeCooler:Direct:ResearchEspecial,  !- Component 3 Object Type
     East Data Center DEC ,  !- Component 3 Name
     East Zone Supply Fan Outlet Node,  !- Component 3 Inlet Node Name
     East Zone DEC Outlet Node,         !- Component 3 Outlet Node Name
     ACTIVE,                   !- Component 3 Branch Control Type
-    EvaporativeCooler:Indirect:ResearchSpecial, !- Component 4 Object Type
+    EvaporativeCooler:Indirect:ResearchEspecial, !- Component 4 Object Type
     East Data Center IEC,        !- Component 4 Name
     East Zone DEC Outlet Node,   !- Component 4 Inlet Node Name
     East Zone IEC Outlet Node,   !- Component 4 Outlet Node Name
@@ -1622,7 +1622,7 @@
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     ;                        !- Mechanical Ventilation Controller Name
 
-  EvaporativeCooler:Direct:ResearchSpecial,
+  EvaporativeCooler:Direct:ResearchEspecial,
     East Data Center DEC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
@@ -1640,7 +1640,7 @@
     20.0,                    !- Evaporative Operation Maximum Limit Wetbulb Temperature
     22.0;                    !- Evaporative Operation Maximum Limit Drybulb Temperature
 
-  EvaporativeCooler:Indirect:ResearchSpecial,
+  EvaporativeCooler:Indirect:ResearchEspecial,
     East Data Center IEC,         !- Name
     ALWAYS_ON,                    !- Availability Schedule Name
     0.70,                         !- Cooler Wetbulb Design Effectiveness

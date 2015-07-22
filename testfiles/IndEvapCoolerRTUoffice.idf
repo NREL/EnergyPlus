@@ -3845,7 +3845,7 @@
     Air Loop Inlet Node ZN1, !- Component 1 Inlet Node Name
     Mixed Air Node ZN1,      !- Component 1 Outlet Node Name
     PASSIVE,                 !- Component 1 Branch Control Type
-    EvaporativeCooler:Indirect:ResearchSpecial,  !- Component 2 Object Type
+    EvaporativeCooler:Indirect:ResearchEspecial,  !- Component 2 Object Type
     Indirect Evap ZN1,       !- Component 2 Name
     Mixed Air Node ZN1,      !- Component 2 Inlet Node Name
     Evap Cooler Outlet Node ZN1,  !- Component 2 Outlet Node Name
@@ -3988,7 +3988,7 @@
     Heating Coil Air Outlet Node ZN1,  !- Air Outlet Node Name
     Air Loop Outlet Node ZN1;!- Temperature Setpoint Node Name
 
-  EvaporativeCooler:Indirect:ResearchSpecial,
+  EvaporativeCooler:Indirect:ResearchEspecial,
     Indirect Evap ZN1,       !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
     0.7,                     !- Cooler Wetbulb Design Effectiveness
@@ -4176,7 +4176,7 @@
     Air Loop Inlet Node ZN3, !- Component 1 Inlet Node Name
     Mixed Air Node ZN3,      !- Component 1 Outlet Node Name
     PASSIVE,                 !- Component 1 Branch Control Type
-    EvaporativeCooler:Indirect:ResearchSpecial,  !- Component 2 Object Type
+    EvaporativeCooler:Indirect:ResearchEspecial,  !- Component 2 Object Type
     Indirect Evap ZN3,       !- Component 2 Name
     Mixed Air Node ZN3,      !- Component 2 Inlet Node Name
     Evap Cooler Outlet Node ZN3,  !- Component 2 Outlet Node Name
@@ -4319,7 +4319,7 @@
     Heating Coil Air Outlet Node ZN3,  !- Air Outlet Node Name
     Air Loop Outlet Node ZN3;!- Temperature Setpoint Node Name
 
-  EvaporativeCooler:Indirect:ResearchSpecial,
+  EvaporativeCooler:Indirect:ResearchEspecial,
     Indirect Evap ZN3,       !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
     0.7,                     !- Cooler Wetbulb Design Effectiveness
@@ -4507,7 +4507,7 @@
     Air Loop Inlet Node ZN5, !- Component 1 Inlet Node Name
     Mixed Air Node ZN5,      !- Component 1 Outlet Node Name
     PASSIVE,                 !- Component 1 Branch Control Type
-    EvaporativeCooler:Indirect:ResearchSpecial,  !- Component 2 Object Type
+    EvaporativeCooler:Indirect:ResearchEspecial,  !- Component 2 Object Type
     Indirect Evap ZN5,       !- Component 2 Name
     Mixed Air Node ZN5,      !- Component 2 Inlet Node Name
     Evap Cooler Outlet Node ZN5,  !- Component 2 Outlet Node Name
@@ -4650,7 +4650,7 @@
     Heating Coil Air Outlet Node ZN5,  !- Air Outlet Node Name
     Air Loop Outlet Node ZN5;!- Temperature Setpoint Node Name
 
-  EvaporativeCooler:Indirect:ResearchSpecial,
+  EvaporativeCooler:Indirect:ResearchEspecial,
     Indirect Evap ZN5,       !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
     0.7,                     !- Cooler Wetbulb Design Effectiveness
@@ -4838,7 +4838,7 @@
     Air Loop Inlet Node ZN7, !- Component 1 Inlet Node Name
     Mixed Air Node ZN7,      !- Component 1 Outlet Node Name
     PASSIVE,                 !- Component 1 Branch Control Type
-    EvaporativeCooler:Indirect:ResearchSpecial,  !- Component 2 Object Type
+    EvaporativeCooler:Indirect:ResearchEspecial,  !- Component 2 Object Type
     Indirect Evap ZN7,       !- Component 2 Name
     Mixed Air Node ZN7,      !- Component 2 Inlet Node Name
     Evap Cooler Outlet Node ZN7,  !- Component 2 Outlet Node Name
@@ -4981,7 +4981,7 @@
     Heating Coil Air Outlet Node ZN7,  !- Air Outlet Node Name
     Air Loop Outlet Node ZN7;!- Temperature Setpoint Node Name
 
-  EvaporativeCooler:Indirect:ResearchSpecial,
+  EvaporativeCooler:Indirect:ResearchEspecial,
     Indirect Evap ZN7,       !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
     0.7,                     !- Cooler Wetbulb Design Effectiveness
@@ -5169,7 +5169,7 @@
     Air Loop Inlet Node ZN9, !- Component 1 Inlet Node Name
     Mixed Air Node ZN9,      !- Component 1 Outlet Node Name
     PASSIVE,                 !- Component 1 Branch Control Type
-    EvaporativeCooler:Indirect:ResearchSpecial,  !- Component 2 Object Type
+    EvaporativeCooler:Indirect:ResearchEspecial,  !- Component 2 Object Type
     Indirect Evap ZN9,       !- Component 2 Name
     Mixed Air Node ZN9,      !- Component 2 Inlet Node Name
     Evap Cooler Outlet Node ZN9,  !- Component 2 Outlet Node Name
@@ -5312,7 +5312,7 @@
     Heating Coil Air Outlet Node ZN9,  !- Air Outlet Node Name
     Air Loop Outlet Node ZN9;!- Temperature Setpoint Node Name
 
-  EvaporativeCooler:Indirect:ResearchSpecial,
+  EvaporativeCooler:Indirect:ResearchEspecial,
     Indirect Evap ZN9,       !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
     0.7,                     !- Cooler Wetbulb Design Effectiveness
@@ -5500,7 +5500,7 @@
     Air Loop Inlet Node ZN11,!- Component 1 Inlet Node Name
     Mixed Air Node ZN11,     !- Component 1 Outlet Node Name
     PASSIVE,                 !- Component 1 Branch Control Type
-    EvaporativeCooler:Indirect:ResearchSpecial,  !- Component 2 Object Type
+    EvaporativeCooler:Indirect:ResearchEspecial,  !- Component 2 Object Type
     Indirect Evap ZN11,      !- Component 2 Name
     Mixed Air Node ZN11,     !- Component 2 Inlet Node Name
     Evap Cooler Outlet Node ZN11,  !- Component 2 Outlet Node Name
@@ -5643,7 +5643,7 @@
     Heating Coil Air Outlet Node ZN11,  !- Air Outlet Node Name
     Air Loop Outlet Node ZN11;  !- Temperature Setpoint Node Name
 
-  EvaporativeCooler:Indirect:ResearchSpecial,
+  EvaporativeCooler:Indirect:ResearchEspecial,
     Indirect Evap ZN11,      !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
     0.7,                     !- Cooler Wetbulb Design Effectiveness
@@ -5831,7 +5831,7 @@
     Air Loop Inlet Node ZN13,!- Component 1 Inlet Node Name
     Mixed Air Node ZN13,     !- Component 1 Outlet Node Name
     PASSIVE,                 !- Component 1 Branch Control Type
-    EvaporativeCooler:Indirect:ResearchSpecial,  !- Component 2 Object Type
+    EvaporativeCooler:Indirect:ResearchEspecial,  !- Component 2 Object Type
     Indirect Evap ZN13,      !- Component 2 Name
     Mixed Air Node ZN13,     !- Component 2 Inlet Node Name
     Evap Cooler Outlet Node ZN13,  !- Component 2 Outlet Node Name
@@ -5974,7 +5974,7 @@
     Heating Coil Air Outlet Node ZN13,  !- Air Outlet Node Name
     Air Loop Outlet Node ZN13;  !- Temperature Setpoint Node Name
 
-  EvaporativeCooler:Indirect:ResearchSpecial,
+  EvaporativeCooler:Indirect:ResearchEspecial,
     Indirect Evap ZN13,      !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
     0.7,                     !- Cooler Wetbulb Design Effectiveness
@@ -6162,7 +6162,7 @@
     Air Loop Inlet Node ZN15,!- Component 1 Inlet Node Name
     Mixed Air Node ZN15,     !- Component 1 Outlet Node Name
     PASSIVE,                 !- Component 1 Branch Control Type
-    EvaporativeCooler:Indirect:ResearchSpecial,  !- Component 2 Object Type
+    EvaporativeCooler:Indirect:ResearchEspecial,  !- Component 2 Object Type
     Indirect Evap ZN15,      !- Component 2 Name
     Mixed Air Node ZN15,     !- Component 2 Inlet Node Name
     Evap Cooler Outlet Node ZN15,  !- Component 2 Outlet Node Name
@@ -6305,7 +6305,7 @@
     Heating Coil Air Outlet Node ZN15,  !- Air Outlet Node Name
     Air Loop Outlet Node ZN15;  !- Temperature Setpoint Node Name
 
-  EvaporativeCooler:Indirect:ResearchSpecial,
+  EvaporativeCooler:Indirect:ResearchEspecial,
     Indirect Evap ZN15,      !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
     0.7,                     !- Cooler Wetbulb Design Effectiveness
@@ -6493,7 +6493,7 @@
     Air Loop Inlet Node ZN17,!- Component 1 Inlet Node Name
     Mixed Air Node ZN17,     !- Component 1 Outlet Node Name
     PASSIVE,                 !- Component 1 Branch Control Type
-    EvaporativeCooler:Indirect:ResearchSpecial,  !- Component 2 Object Type
+    EvaporativeCooler:Indirect:ResearchEspecial,  !- Component 2 Object Type
     Indirect Evap ZN17,      !- Component 2 Name
     Mixed Air Node ZN17,     !- Component 2 Inlet Node Name
     Evap Cooler Outlet Node ZN17,  !- Component 2 Outlet Node Name
@@ -6636,7 +6636,7 @@
     Heating Coil Air Outlet Node ZN17,  !- Air Outlet Node Name
     Air Loop Outlet Node ZN17;  !- Temperature Setpoint Node Name
 
-  EvaporativeCooler:Indirect:ResearchSpecial,
+  EvaporativeCooler:Indirect:ResearchEspecial,
     Indirect Evap ZN17,      !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
     0.7,                     !- Cooler Wetbulb Design Effectiveness
@@ -6824,7 +6824,7 @@
     Air Loop Inlet Node ZN19,!- Component 1 Inlet Node Name
     Mixed Air Node ZN19,     !- Component 1 Outlet Node Name
     PASSIVE,                 !- Component 1 Branch Control Type
-    EvaporativeCooler:Indirect:ResearchSpecial,  !- Component 2 Object Type
+    EvaporativeCooler:Indirect:ResearchEspecial,  !- Component 2 Object Type
     Indirect Evap ZN19,      !- Component 2 Name
     Mixed Air Node ZN19,     !- Component 2 Inlet Node Name
     Evap Cooler Outlet Node ZN19,  !- Component 2 Outlet Node Name
@@ -6967,7 +6967,7 @@
     Heating Coil Air Outlet Node ZN19,  !- Air Outlet Node Name
     Air Loop Outlet Node ZN19;  !- Temperature Setpoint Node Name
 
-  EvaporativeCooler:Indirect:ResearchSpecial,
+  EvaporativeCooler:Indirect:ResearchEspecial,
     Indirect Evap ZN19,      !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
     0.7,                     !- Cooler Wetbulb Design Effectiveness

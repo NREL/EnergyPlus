@@ -1458,7 +1458,7 @@ namespace ZoneTempPredictorCorrector {
 		if ( allocated( TComfortControlTypes ) ) TComfortControlTypes.deallocate();
 
 		// Get the Zone Air Capacitance Multiplier for use in the Predictor-Corrrector Procedure
-		cCurrentModuleObject = "ZoneCapacitanceMultiplier:ResearchSpecial";
+		cCurrentModuleObject = "ZoneCapacitanceMultiplier:ResearchEspecial";
 		NumNums = GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumNums == 0 ) {
 			ZoneVolCapMultpSens = 1.0;

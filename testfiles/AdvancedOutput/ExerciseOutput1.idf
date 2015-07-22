@@ -42,7 +42,7 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE VOLUME CAPACITANCE MULTIPLIER ===========
 
-  ZoneCapacitanceMultiplier:ResearchSpecial,
+  ZoneCapacitanceMultiplier:ResearchEspecial,
     1,                       !- Temperature Capacity Multiplier
     1,                       !- Humidity Capacity Multiplier
     1,                       !- Carbon Dioxide Capacity Multiplier

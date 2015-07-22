@@ -1153,9 +1153,9 @@ namespace SimAirServingZones {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = EvapCooler;
 					} else if ( componentType == "EVAPORATIVECOOLER:INDIRECT:WETCOIL" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = EvapCooler;
-					} else if ( componentType == "EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL" ) {
+					} else if ( componentType == "EVAPORATIVECOOLER:INDIRECT:RESEARCHESPECIAL" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = EvapCooler;
-					} else if ( componentType == "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL" ) {
+					} else if ( componentType == "EVAPORATIVECOOLER:DIRECT:RESEARCHESPECIAL" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = EvapCooler;
 
 						// Desiccant Dehumidifier Types for the air system simulation

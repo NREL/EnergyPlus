@@ -707,7 +707,7 @@ ZoneAirMassFlowConservation,
        \note is assumed self-balanced. If the above input field specified as "No", then this input
        \note field has no impact on the simulation.
 
-ZoneCapacitanceMultiplier:ResearchSpecial,
+ZoneCapacitanceMultiplier:ResearchEspecial,
        \unique-object
        \format singleLine
        \memo Multiplier altering the relative capacitance of the air compared to an empty zone
@@ -33108,10 +33108,10 @@ ZoneHVAC:EvaporativeCoolerUnit,
         \required-field
         \type choice
         \key EvaporativeCooler:Direct:CelDekPad
-        \key EvaporativeCooler:Direct:ResearchSpecial
+        \key EvaporativeCooler:Direct:ResearchEspecial
         \key EvaporativeCooler:Indirect:CelDekPad
         \key EvaporativeCooler:Indirect:WetCoil
-        \key EvaporativeCooler:Indirect:ResearchSpecial
+        \key EvaporativeCooler:Indirect:ResearchEspecial
    A12, \field First Evaporative Cooler Object Name
         \required-field
         \type object-list
@@ -33121,10 +33121,10 @@ ZoneHVAC:EvaporativeCoolerUnit,
         \note second cooler must be immediately downstream of first cooler, if present
         \type choice
         \key EvaporativeCooler:Direct:CelDekPad
-        \key EvaporativeCooler:Direct:ResearchSpecial
+        \key EvaporativeCooler:Direct:ResearchEspecial
         \key EvaporativeCooler:Indirect:CelDekPad
         \key EvaporativeCooler:Indirect:WetCoil
-        \key EvaporativeCooler:Indirect:ResearchSpecial
+        \key EvaporativeCooler:Indirect:ResearchEspecial
    A14, \field Second Evaporative Cooler Name
         \note optional, used for direct/indirect configurations
         \type object-list
@@ -49470,7 +49470,7 @@ EvaporativeCooler:Indirect:WetCoil,
        \type node
        \note Enter the name of an outdoor air node
 
-EvaporativeCooler:Indirect:ResearchSpecial,
+EvaporativeCooler:Indirect:ResearchEspecial,
        \memo Indirect evaporative cooler with user-specified effectiveness (can represent rigid pad
        \memo or wetted coil), recirculating water pump, and secondary air fan. This model is
        \memo controlled to meet the primary air outlet temperature setpoint.
@@ -49635,7 +49635,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \note limits then specify very high maximum drybulb temperature limit value (e.g. 99.0 C).
 
 
-EvaporativeCooler:Direct:ResearchSpecial,
+EvaporativeCooler:Direct:ResearchEspecial,
        \memo Direct evaporative cooler with user-specified effectiveness (can represent rigid pad
        \memo or similar media), and recirculating water pump, and secondary air fan. This model is
        \memo controlled to meet the primary air outlet temperature setpoint.
@@ -76801,6 +76801,33 @@ FaultModel:Fouling:Coil,
        \type real
        \minimum> 0.0
        \default 0.07
+
+FaultModel:Termites,
+   \memo This object describes fouling due to termite infestation
+   \memo This is used to adjust the wall thermal properties due to termite activity as well as
+   \memo internal gains in the space due to additional load
+   A1, \field Name
+       \required-field
+       \type alpha
+   A2, \field Zone or ZoneList Name
+       \required-field
+       \type object-list
+       \object-list ZoneAndZoneListNames
+   A3, \field Number of Termites Schedule Name
+       \required-field
+       \type object-list
+       \note units in schedule should be fraction applied to number of termites (0.0 - 1.0)
+       \object-list ScheduleNames
+   A4, \field Termite Activity Level Schedule Name
+       \required-field
+       \note Note that W has to be converted to mets in TC routine
+       \type object-list
+       \note units in schedule are W/person
+       \object-list ScheduleNames
+   N1; \field Coefficient of Wall Degradation for Termites
+       \required-field
+       \note epsilon_{termite} in equation (12)
+       \default 0.3
 
 \group General Data Entry
 

@@ -101,7 +101,7 @@
 
   Timestep,6;
 
-  ZoneCapacitanceMultiplier:ResearchSpecial,
+  ZoneCapacitanceMultiplier:ResearchEspecial,
     1.0,                     !- Temperature Capacity Multiplier
     1.0,                     !- Humidity Capacity Multiplier
     1.0,                     !- Carbon Dioxide Capacity Multiplier

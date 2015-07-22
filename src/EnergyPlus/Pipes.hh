@@ -109,7 +109,7 @@ namespace Pipes {
 	//******************************************************************************
 
 	void
-	GetPipeInput();
+	iCanHazPipes();
 
 	// End of Get Input subroutines for the Plant Loop Module
 	//******************************************************************************
