@@ -6270,9 +6270,16 @@ namespace WaterThermalTanks {
 		// Calculate the heating rate from the heat pump.
 		if ( Tank.HeatPumpNum > 0 ) {
 			HeatPumpWaterHeaterData const & HPWH = HPWaterHeater(Tank.HeatPumpNum);
-			DXCoils::DXCoilData const & Coil = DXCoils::DXCoil( HPWH.DXCoilNum );
+			if ( HPWH.NumofSpeed > 0 ) {
+				// VSHPWH
+				VariableSpeedCoils::VariableSpeedCoilData const & Coil = VariableSpeedCoils::VarSpeedCoil( HPWH.DXCoilNum );
+				Qheatpump = Coil.TotalHeatingEnergyRate * Tank.SourceEffectiveness * HeatPumpPartLoadRatio;
+			} else {
+				// Single speed HPWH
+				DXCoils::DXCoilData const & Coil = DXCoils::DXCoil( HPWH.DXCoilNum );
+				Qheatpump = Coil.TotalHeatingEnergyRate * Tank.SourceEffectiveness * HeatPumpPartLoadRatio;
+			}
 			HPWHCondenserConfig = HPWH.TypeNum;
-			Qheatpump = Coil.TotalHeatingEnergyRate * Tank.SourceEffectiveness * HeatPumpPartLoadRatio;
 		}
 
 		SetPointTemp1 = Tank.SetPointTemp;
