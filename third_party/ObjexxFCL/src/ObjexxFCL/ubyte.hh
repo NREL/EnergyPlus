@@ -224,8 +224,8 @@ public: // Math
 	}
 
 	// ubyte + ubyte
-	inline
 	friend
+	inline
 	ubyte
 	operator +( ubyte const & i, ubyte const & j )
 	{
@@ -233,8 +233,8 @@ public: // Math
 	}
 
 	// ubyte - ubyte
-	inline
 	friend
+	inline
 	ubyte
 	operator -( ubyte const & i, ubyte const & j )
 	{
@@ -242,8 +242,8 @@ public: // Math
 	}
 
 	// ubyte * ubyte
-	inline
 	friend
+	inline
 	ubyte
 	operator *( ubyte const & i, ubyte const & j )
 	{
@@ -251,8 +251,8 @@ public: // Math
 	}
 
 	// ubyte / ubyte
-	inline
 	friend
+	inline
 	ubyte
 	operator /( ubyte const & i, ubyte const & j )
 	{
@@ -330,8 +330,8 @@ public: // Bitwise Logical
 	}
 
 	// ubyte & ubyte
-	inline
 	friend
+	inline
 	ubyte
 	operator &( ubyte const & i, ubyte const & j )
 	{
@@ -339,8 +339,8 @@ public: // Bitwise Logical
 	}
 
 	// ubyte | ubyte
-	inline
 	friend
+	inline
 	ubyte
 	operator |( ubyte const & i, ubyte const & j )
 	{
@@ -348,8 +348,8 @@ public: // Bitwise Logical
 	}
 
 	// ubyte ^ ubyte
-	inline
 	friend
+	inline
 	ubyte
 	operator ^( ubyte const & i, ubyte const & j )
 	{
@@ -359,8 +359,8 @@ public: // Bitwise Logical
 public: // Comparison
 
 	// ubyte == ubyte
-	inline
 	friend
+	inline
 	bool
 	operator ==( ubyte const & i, ubyte const & j )
 	{
@@ -368,8 +368,8 @@ public: // Comparison
 	}
 
 	// ubyte != ubyte
-	inline
 	friend
+	inline
 	bool
 	operator !=( ubyte const & i, ubyte const & j )
 	{
@@ -377,8 +377,8 @@ public: // Comparison
 	}
 
 	// ubyte < ubyte
-	inline
 	friend
+	inline
 	bool
 	operator <( ubyte const & i, ubyte const & j )
 	{
@@ -386,8 +386,8 @@ public: // Comparison
 	}
 
 	// ubyte <= ubyte
-	inline
 	friend
+	inline
 	bool
 	operator <=( ubyte const & i, ubyte const & j )
 	{
@@ -395,8 +395,8 @@ public: // Comparison
 	}
 
 	// ubyte > ubyte
-	inline
 	friend
+	inline
 	bool
 	operator >( ubyte const & i, ubyte const & j )
 	{
@@ -404,8 +404,8 @@ public: // Comparison
 	}
 
 	// ubyte >= ubyte
-	inline
 	friend
+	inline
 	bool
 	operator >=( ubyte const & i, ubyte const & j )
 	{
@@ -415,8 +415,8 @@ public: // Comparison
 public: // I/O
 
 	// Stream >> ubyte
-	inline
 	friend
+	inline
 	std::istream &
 	operator >>( std::istream & stream, ubyte & b )
 	{
@@ -429,8 +429,8 @@ public: // I/O
 	}
 
 	// Stream << ubyte
-	inline
 	friend
+	inline
 	std::ostream &
 	operator <<( std::ostream & stream, ubyte const & b )
 	{
