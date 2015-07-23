@@ -4,124 +4,11 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/SQLiteProcedures.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-
-using namespace EnergyPlus;
-using namespace ObjexxFCL;
+#include "Fixtures/SQLiteFixture.hh"
 
 namespace EnergyPlus {
 
-	class SQLiteFixture : public testing::Test
-	{
-
-	protected:
-		static void SetUpTestCase() { }
-
-		static void TearDownTestCase() { }
-
-		std::unique_ptr<SQLite> sqlite_test;
-		std::shared_ptr<std::ostringstream> ss = std::make_shared<std::ostringstream>();
-
-		virtual void SetUp() {
-			ASSERT_NO_THROW(sqlite_test = std::unique_ptr<SQLite>(new SQLite( ss, ":memory:", "std::ostringstream", true, true )));
-			ASSERT_TRUE(sqlite_test->writeOutputToSQLite());
-			ASSERT_TRUE(sqlite_test->writeTabularDataToSQLite());
-			sqlite_test->sqliteExecuteCommand("PRAGMA foreign_keys = ON;");
-			EXPECT_EQ("SQLite3 message, std::ostringstream open for processing!\n", ss->str());
-			ss->str(std::string());
-		}
-
-		virtual void TearDown() {
-			// don't know if this is needed...
-			sqlite_test.reset();
-			sqlite_test = nullptr;
-		}
-
-		std::string storageType( const int storageTypeIndex ) {
-			return sqlite_test->storageType( storageTypeIndex );
-		}
-
-		std::string timestepTypeName( const int timestepType ) {
-			return sqlite_test->timestepTypeName( timestepType );
-		}
-
-		std::string reportingFreqName( const int reportingFreqIndex ) {
-			return sqlite_test->reportingFreqName( reportingFreqIndex );
-		}
-
-		std::string columnText( const unsigned char* column ) {
-			return std::string( reinterpret_cast<const char*>( column ) );
-		}
-
-		int logicalToInteger( const bool value ) {
-			return sqlite_test->logicalToInteger(value);
-		}
-
-		void adjustReportingHourAndMinutes( int & hour, int & minutes ) {
-			sqlite_test->adjustReportingHourAndMinutes( hour, minutes );
-		}
-
-		bool indexExists( const std::string& indexName ) {
-			sqlite3_stmt* sqlStmtPtr;
-			std::string sql("pragma index_info(" + indexName + ");");
-			bool success = false;
-			int rc = sqlite3_prepare_v2(sqlite_test->m_db.get(), sql.c_str(), -1, &sqlStmtPtr, nullptr);
-			if ( SQLITE_OK != rc ) {
-				sqlite3_finalize(sqlStmtPtr);
-				return success;
-			}
-			if ( SQLITE_ROW == sqlite3_step( sqlStmtPtr ) ) {
-				success = true;
-			}
-			sqlite3_finalize(sqlStmtPtr);
-			return success;
-		}
-
-		int columnCount( const std::string& tableName ) {
-			sqlite3_stmt* sqlStmtPtr;
-			std::string sql("pragma table_info(" + tableName + ");");
-			int rc = sqlite3_prepare_v2(sqlite_test->m_db.get(), sql.c_str(), -1, &sqlStmtPtr, nullptr);
-			if ( SQLITE_OK != rc ) {
-				sqlite3_finalize(sqlStmtPtr);
-				return -1;
-			}
-			int rowCount = 0;
-			while ( SQLITE_ROW == sqlite3_step( sqlStmtPtr ) ) {
-				++rowCount;
-			}
-			sqlite3_finalize(sqlStmtPtr);
-			return rowCount;
-		}
-
-		std::vector < std::vector < std::string > > queryResult( const std::string& statement, const std::string& tableName ) {
-			std::vector < std::vector < std::string > > queryVector;
-
-			int rowCount = columnCount( tableName );
-			if ( rowCount < 1 ) return queryVector;
-
-			sqlite3_stmt* sqlStmtPtr;
-
-			sqlite3_prepare_v2(sqlite_test->m_db.get(), statement.c_str(), -1, &sqlStmtPtr, nullptr);
-			while ( SQLITE_ROW == sqlite3_step( sqlStmtPtr ) ) {
-				std::vector < std::string > valueVector;
-				for ( int i = 0; i < rowCount; ++i ) {
-					auto sqlite_value = sqlite3_column_text(sqlStmtPtr, i);
-					if (nullptr == sqlite_value) {
-						valueVector.push_back("");
-					} else {
-						valueVector.push_back(columnText(sqlite_value));
-					}
-				}
-				queryVector.push_back(valueVector);
-			}
-			sqlite3_finalize(sqlStmtPtr);
-			return queryVector;
-		}
-	};
-
-	TEST_F( SQLiteFixture, sqliteWriteMessage ) {
-		ShowMessage( "Begin Test: SQLiteFixture, sqliteWriteMessage" );
+	TEST_F( SQLiteFixture, SQLiteProcedures_sqliteWriteMessage ) {
 		sqlite_test->sqliteWriteMessage( "" );
 		EXPECT_EQ("SQLite3 message, \n", ss->str());
 		ss->str(std::string());
@@ -130,8 +17,7 @@ namespace EnergyPlus {
 		ss->str(std::string());
 	}
 
-	TEST_F( SQLiteFixture, initializeIndexes ) {
-		ShowMessage( "Begin Test: SQLiteFixture, initializeIndexes" );
+	TEST_F( SQLiteFixture, SQLiteProcedures_initializeIndexes ) {
 		sqlite_test->sqliteBegin();
 		sqlite_test->initializeIndexes();
 		sqlite_test->sqliteCommit();
@@ -143,8 +29,7 @@ namespace EnergyPlus {
 		EXPECT_FALSE(indexExists("tdI"));
 	}
 
-	TEST_F( SQLiteFixture, simulationRecords ) {
-		ShowMessage( "Begin Test: SQLiteFixture, simulationRecords" );
+	TEST_F( SQLiteFixture, SQLiteProcedures_simulationRecords ) {
 		sqlite_test->sqliteBegin();
 		// There needs to be a simulation record otherwise updateSQLiteSimulationRecord will fail
 		sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
@@ -174,8 +59,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(testResult3, result[0]);
 	}
 
-	TEST_F( SQLiteFixture, createSQLiteEnvironmentPeriodRecord ) {
-		ShowMessage( "Begin Test: SQLiteFixture, createSQLiteEnvironmentPeriodRecord" );
+	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteEnvironmentPeriodRecord ) {
 		sqlite_test->sqliteBegin();
 		// There needs to be a simulation record otherwise the foreign key constraint will fail
 		sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
@@ -207,8 +91,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(4ul, result.size());
 	}
 
-	TEST_F( SQLiteFixture, errorRecords ) {
-		ShowMessage( "Begin Test: SQLiteFixture, errorRecords" );
+	TEST_F( SQLiteFixture, SQLiteProcedures_errorRecords ) {
 		sqlite_test->sqliteBegin();
 		// There needs to be a simulation record otherwise the foreign key constraint will fail
 		sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
@@ -254,9 +137,8 @@ namespace EnergyPlus {
 		EXPECT_EQ(3ul, result.size());
 	}
 
-	TEST_F( SQLiteFixture, createSQLiteReportDictionaryRecord )
+	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord )
 	{
-		ShowMessage( "Begin Test: SQLiteFixture, createSQLiteReportDictionaryRecord" );
 		sqlite_test->sqliteBegin();
 		sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 		sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
@@ -304,8 +186,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(9ul, result.size());
 	}
 
-	TEST_F( SQLiteFixture, createSQLiteTimeIndexRecord ) {
-		ShowMessage( "Begin Test: SQLiteFixture, createSQLiteTimeIndexRecord" );
+	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteTimeIndexRecord ) {
 		sqlite_test->sqliteBegin();
 		sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 		sqlite_test->createSQLiteTimeIndexRecord( 3, 1, 1, 0, 1 );
@@ -364,8 +245,7 @@ namespace EnergyPlus {
 		sqlite_test->sqliteCommit();
 	}
 
-	TEST_F( SQLiteFixture, createSQLiteReportDataRecord ) {
-		ShowMessage( "Begin Test: SQLiteFixture, createSQLiteReportDataRecord" );
+	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteReportDataRecord ) {
 		sqlite_test->sqliteBegin();
 		sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 		sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
@@ -409,8 +289,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(2ul, reportExtendedData.size());
 	}
 
-	TEST_F( SQLiteFixture, addSQLiteZoneSizingRecord ) {
-		ShowMessage( "Begin Test: SQLiteFixture, addSQLiteZoneSizingRecord" );
+	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteZoneSizingRecord ) {
 		sqlite_test->sqliteBegin();
 		sqlite_test->addSQLiteZoneSizingRecord( "FLOOR 1 IT HALL", "Cooling", 175, 262, 0.013, 0.019, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00", 20.7, 0.0157, 0.0033 );
 		auto result = queryResult("SELECT * FROM ZoneSizes;", "ZoneSizes");
@@ -421,8 +300,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(testResult0, result[0]);
 	}
 
-	TEST_F( SQLiteFixture, addSQLiteSystemSizingRecord ) {
-		ShowMessage( "Begin Test: SQLiteFixture, addSQLiteSystemSizingRecord" );
+	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteSystemSizingRecord ) {
 		sqlite_test->sqliteBegin();
 		sqlite_test->addSQLiteSystemSizingRecord( "VAV_1", "Calculated Cooling Design Air Flow Rate [m3/s]", 6.37 );
 		sqlite_test->addSQLiteSystemSizingRecord( "VAV_2", "User Cooling Design Air Flow Rate", 5.1 );
@@ -436,8 +314,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(testResult1, result[1]);
 	}
 
-	TEST_F( SQLiteFixture, addSQLiteComponentSizingRecord ) {
-		ShowMessage( "Begin Test: SQLiteFixture, addSQLiteComponentSizingRecord" );
+	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteComponentSizingRecord ) {
 		sqlite_test->sqliteBegin();
 		sqlite_test->addSQLiteComponentSizingRecord( "AirTerminal:SingleDuct:VAV:Reheat", "CORE_BOTTOM VAV BOX COMPONENT", "Design Size Maximum Air Flow Rate [m3/s]", 3.23 );
 		sqlite_test->addSQLiteComponentSizingRecord( "Coil:Heating:Electric", "CORE_BOTTOM VAV BOX REHEAT COIL", "Design Size Nominal Capacity", 38689.18 );
@@ -451,8 +328,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(testResult1, result[1]);
 	}
 
-	TEST_F( SQLiteFixture, privateMethods ) {
-		ShowMessage( "Begin Test: SQLiteFixture, privateMethods" );
+	TEST_F( SQLiteFixture, SQLiteProcedures_privateMethods ) {
 		// test storageType
 		EXPECT_EQ( "Avg", storageType( 1 ) );
 		EXPECT_EQ( "Sum", storageType( 2 ) );
@@ -492,8 +368,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( 65, minutes );
 	}
 
-	TEST_F( SQLiteFixture, DaylightMaping ) {
-		ShowMessage( "Begin Test: SQLiteFixture, DaylightMaping" );
+	TEST_F( SQLiteFixture, SQLiteProcedures_DaylightMaping ) {
 		auto const & zone = std::unique_ptr<DataHeatBalance::ZoneData>( new DataHeatBalance::ZoneData() );
 		zone->Name = "DAYLIT ZONE";
 		zone->CeilingHeight = 3;
@@ -554,8 +429,7 @@ namespace EnergyPlus {
 		ASSERT_EQ(4ul, daylightMapHourlyData.size());
 	}
 
-	TEST_F( SQLiteFixture, createZoneExtendedOutput ) {
-		ShowMessage( "Begin Test: SQLiteFixture, createZoneExtendedOutput" );
+	TEST_F( SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput ) {
 		auto const & zoneData0 = std::unique_ptr<DataHeatBalance::ZoneData>( new DataHeatBalance::ZoneData() );
 		zoneData0->Name = "test zone 1";
 		zoneData0->CeilingHeight = 1;
@@ -997,8 +871,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(roomAirModel1, roomAirModels[1]);
 	}
 
-	TEST_F( SQLiteFixture, createSQLiteTabularDataRecords ) {
-		ShowMessage( "Begin Test: SQLiteFixture, createSQLiteTabularDataRecords" );
+	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteTabularDataRecords ) {
 		Array1D_string const rowLabels( { "Heating", "Cooling" } );
 		Array1D_string const columnLabels( { "Electricity [GJ]", "Natural Gas [GJ]" } );
 		Array2D_string const body( 2, 2, { "216.38", "869.08", "1822.42", "0.00" } );

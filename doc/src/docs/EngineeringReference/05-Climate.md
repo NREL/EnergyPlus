@@ -19,7 +19,7 @@ The ASHRAE Handbook of Fundamentals describes their criteria in creating design 
 
 In EnergyPlus, the typical design day input includes a “high” and a “low” dry-bulb temperature for the day. As these two temperatures are insufficient to represent a full 24 hour period, the program uses a “range multiplier” profile to represent the full day’s temperatures:
 
-![](EngineeringReference/media/image563.svg.png)
+![](media/image563.svg.png)
 
 Figure 36. Default Daily Temperature Range Profile
 
@@ -249,7 +249,7 @@ The model requires air mass, m, calculated as follows --
 
 <div>$$m = {1 \mathord{\left/ {\vphantom {1 {\left[ {\sin \beta  + 0.50572 \cdot {{\left( {6.07995 + \beta } \right)}^{ - 1.6364}}} \right]}}} \right. } {\left[ {\sin \beta  + 0.50572 \cdot {{\left( {6.07995 + \beta } \right)}^{ - 1.6364}}} \right]}}$$</div>
 
-where <span>$\beta $</span> = solar altitude, degrees.
+where <span>\(\beta \)</span> = solar altitude, degrees.
 
 Direct and diffuse irradiance are determined with the following relationships,
 
@@ -259,21 +259,21 @@ Direct and diffuse irradiance are determined with the following relationships,
 
 where:
 
-<span>${E_b}$</span> = beam normal irradiance, W/m<sup>2</sup>
+<span>\({E_b}\)</span> = beam normal irradiance, W/m<sup>2</sup>
 
-<span>${E_d}$</span> = diffuse horizontal irradiance,
+<span>\({E_d}\)</span> = diffuse horizontal irradiance,
 
-<span>${E_o}$</span> = extraterrestrial normal irradiance,
+<span>\({E_o}\)</span> = extraterrestrial normal irradiance,
 
-*<span>$m$</span>* = air mass
+*<span>\(m\)</span>* = air mass
 
 t<sub>b</sub> and t<sub>d</sub> = beam and diffuse optical depths (from ASHRAE climatic design data)
 
-<span>$ab$</span> and <span>$ad$</span> = beam and diffuse air mass exponents (see below)
+<span>\(ab\)</span> and <span>\(ad\)</span> = beam and diffuse air mass exponents (see below)
 
 Values of t<sub>b</sub> and t<sub>d</sub> are location-specific and vary during the year. They embody the dependence of clear sky solar radiation upon local conditions, such as elevation, precipitable water content, and aerosols.
 
-The air mass exponents <span>$ab$</span> and <span>$ad$</span> were correlated to t<sub>b</sub> and t<sub>d</sub> through the following empirical relationships:
+The air mass exponents <span>\(ab\)</span> and <span>\(ad\)</span> were correlated to t<sub>b</sub> and t<sub>d</sub> through the following empirical relationships:
 
 <div>$$ab = 1.219 - 0.043 \cdot {\tau_b} - 0.151 \cdot {\tau_d} - 0.204 \cdot {\tau_b} \cdot {\tau_d}$$</div>
 
@@ -297,13 +297,13 @@ h=solar altitude angle, i.e, the angle between the horizontal and the line to th
 
 CC = cloud cover
 
-<span>$\varphi $</span> = relative humidity, %
+<span>\(\varphi \)</span> = relative humidity, %
 
-<span>${T_n},{T_{n - 3}}$</span> = dry-bulb temperature at hours n (current) and n-3, respectively
+<span>\({T_n},{T_{n - 3}}\)</span> = dry-bulb temperature at hours n (current) and n-3, respectively
 
-<span>${V_w}$</span> = Wind speed, m/s
+<span>\({V_w}\)</span> = Wind speed, m/s
 
-<span>${c_0},{c_1},{c_2},{c_3},{c_4},{c_5},d,k$</span> = regression coefficients
+<span>\({c_0},{c_1},{c_2},{c_3},{c_4},{c_5},d,k\)</span> = regression coefficients
 
 The constants were determined by analysis from measured data and are as follows:
 
@@ -366,7 +366,7 @@ The sky radiance distribution is based on an empirical model based on radiance m
 
 (3) A horizon brightening.
 
-![](EngineeringReference/media/image589.png)
+![](media/image589.png)
 
 Figure 37. Schematic view of sky showing solar radiance distribution as a superposition of three components: dome with isotropic radiance, circumsolar brightening represented as a point source at the sun, and horizon brightening represented as a line source at the horizon.
 
@@ -776,7 +776,7 @@ The shadow algorithm is based on coordinate transformation methods similar to Gr
 
 Using the **ShadowCalculation** object, you can set how often the shadowing calculations are performed. Having them calculated each day is obviously the most accurate but may also be the most time consuming.  Using a greater length of time (number of days) before calculating again can yield speedier results.  For lengths of time greater than one day, the solar position values (e.g. equation of time, sun position angles) are averaged over that time period for the shadowing calculations.
 
-![](EngineeringReference/media/image601.png)
+![](media/image601.png)
 
 Figure 38.  Overall Shadowing Scheme Depiction
 
@@ -824,7 +824,7 @@ Table 23.  Relationship of Angles (degrees) to Time
 
 The Solar Altitude Angle (b) is the angle of the sun above the horizontal (degrees).  The Solar Azimuth Angle (f) is measured from the North (clockwise) and is expressed in degrees.  This is shown more clearly in the following figure.
 
-![](EngineeringReference/media/image604.png)
+![](media/image604.png)
 
 Figure 39.  Solar Position Illustration
 
@@ -842,7 +842,7 @@ Resolution of 1mm or less – near collinear points.
 
 Note that the resolution on surfaces/shadowing is 1 mm – using resolution beyond that will result in truncation of the shadowing.
 
-![](EngineeringReference/media/image605.png)
+![](media/image605.png)
 
 Figure 40.  EnergyPlus Coordinate System
 
@@ -908,7 +908,7 @@ All architectural forms are represented by plane polygons. This can give good ac
 
 Surfaces 1, 4, and 5 are in sunlight; 2 and 3 are in shade. It is possible to think of the structure's shadow as the combination of shadows cast by surfaces 1, 2, 3, 4 and 5 or by 1, 4 and 5, or by surfaces 2 and 3.  This last combination of shadow casting surfaces is the simplest. In the EnergyPlus shadow algorithm every surface is considered to be one of the surfaces that enclose a solid, and only those surfaces that are not sunlit at a given hour are considered shadowing surfaces.
 
-![](EngineeringReference/media/image622.png)
+![](media/image622.png)
 
 Figure 41.  Basic shadowing concept structure
 
@@ -924,11 +924,11 @@ The cosine of the angle of incidence of the sun's rays on the surface are given 
 
 <div>$$\cos \theta  = C{S_1}\cdot C{W_1} + C{S_2}\cdot C{W_2} + C{S_3}\cdot C{W_3}$$</div>
 
-If <span>$\cos \theta $</span> is less than zero, the sun is behind the surface.
+If <span>\(\cos \theta \)</span> is less than zero, the sun is behind the surface.
 
 A shadow is projected from the vertices of the shadowing polygon (SP) along the direction of the sun's rays to the plane of the shadow receiving polygon (RP).  If any vertices of the SP are below the plane of the RP (z &lt; 0), a false shadow is cast as in Figure 42.  The "submerged" portion of the SP must be clipped off before projection.
 
-![](EngineeringReference/media/image628.png)
+![](media/image628.png)
 
 Figure 42.  Illustration of Shadow Clipping
 
@@ -1008,19 +1008,19 @@ The vertices that define the overlap between two convex polygons, A and B, consi
 
 In Figure 43, point a is the result of rule 1, point c is the result of rule 2, and points b and d result from rule 3. The overlap of A and B is the polygon a-b-c-d. Figure 44 shows an overlap where all of the vertices of B are enclosed by A.  Figure 45 shows an overlap defined only by the intercepts of A and B. Figure 46 shows a more complex overlap.
 
-![](EngineeringReference/media/image637.png)
+![](media/image637.png)
 
 Figure 43.  Point a – Vertex of A Enclosed by B
 
 Coordinate transformation retains the order of the vertices of a polygon, while a projection reverses the order. The sequence of vertices of the receiving polygons should be reversed so it and all shadow polygons will have the same sequence.
 
-![](EngineeringReference/media/image638.png)
+![](media/image638.png)
 
 Figure 44.  Surface A Totally Overlaps Surface B.
 
 A point is enclosed by a clockwise, convex polygon if the point lies to the right of all sides (or does not lie to the left of any side) of the polygon.  The intercept of two sides may not lie beyond the ends of either side. These are "line segments" rather than "lines". It is possible to tell if line segments A and B intercept within their end points by noting that the ends of A must lie on both sides of B, and the ends of B must lie on both sides of A. This should be done before the intercept is calculated.
 
-![](EngineeringReference/media/image639.png)
+![](media/image639.png)
 
 Figure 45.  Figure Formed from Intercept Overlaps Between A and B
 
@@ -1032,7 +1032,7 @@ where (x<sub>n+1</sub>,y<sub>n+1</sub>)= (x<sub>1</sub>, y<sub>1</sub>)
 
 The area is positive if the vertices are counter-clockwise and negative if they are clockwise.
 
-![](EngineeringReference/media/image641.png)
+![](media/image641.png)
 
 Figure 46.  Complex Overlapping Condition
 
@@ -1066,7 +1066,7 @@ Table 24.  Surface / Area Characteristic / Convention
 
 and so on through multiple overlaps where the sign of the overlap area is the product of the signs of the overlapping areas.
 
-![](EngineeringReference/media/image642.png)
+![](media/image642.png)
 
 Figure 47.  Multiple Shadow Overlaps
 
@@ -1146,7 +1146,7 @@ This case is the same interior distribution as the preceding option but uses ext
 
 
 
-![](EngineeringReference/media/image646.png)
+![](media/image646.png)
 
 Figure 48. Illustration of Convex and Non-convex Zones
 
@@ -1196,7 +1196,7 @@ where
 
 *A<sub>i</sub>* = surface area [m<sup>2</sup>]
 
-<span>${\alpha_i}$</span>= inside solar absorptance for an opaque surface, or, for a window, = back diffuse transmittance plus back diffuse system absorptance of glass layers and shading device layers (if present)
+<span>\({\alpha_i}\)</span>= inside solar absorptance for an opaque surface, or, for a window, = back diffuse transmittance plus back diffuse system absorptance of glass layers and shading device layers (if present)
 
 Solving this equation for *QS* gives:
 
@@ -1276,7 +1276,7 @@ Here,
 
 *                        + Beam absorbed by inside daylighting shelves*
 
-![](EngineeringReference/media/image656.png)
+![](media/image656.png)
 
 Figure 49. Vertical section through a two-zone building showing where transmitted beam solar falls. Some of the beam solar from exterior window EW is absorbed by the floor, D, interior wall, B, and interior window, IW. Some is transmitted by IW to the adjacent zone, Z2. Aoverlap is the irradiated area of a surface projected back onto the plane of EW. Beam reflected by D, B and IW contributes to the interior short-wave radiation flux in Z1.
 
@@ -1300,7 +1300,7 @@ The inside beam solar irradiance factor[[4]](#_ftn4) in is given by:
 
 
 
-<span>$AISurf(SurfNum) = \frac{{AbsIntSurf(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)*CosIn{c_i}} $</span>where
+<span>\(AISurf(SurfNum) = \frac{{AbsIntSurf(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)*CosIn{c_i}} \)</span>where
 
 *i* = exterior window number
 
@@ -1322,11 +1322,11 @@ The interior short-wave radiation absorbed by layer *l* (glass, shade or blind) 
 
 
 
-<span>$\begin{array}{l}QS(ZoneNum)*\alpha_{l,back}^{dif}(SurfNum) + \\BeamSolarRad*\frac{{\alpha_{l,back}^{beam}(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)} *CosIn{c_i}{\rm{  [W/}}{{\rm{m}}^{\rm{2}}}]\end{array}$</span>where
+<span>\(\begin{array}{l}QS(ZoneNum)*\alpha_{l,back}^{dif}(SurfNum) + \\BeamSolarRad*\frac{{\alpha_{l,back}^{beam}(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)} *CosIn{c_i}{\rm{  [W/}}{{\rm{m}}^{\rm{2}}}]\end{array}\)</span>where
 
-<span>$\alpha_{l,back}^{dif}$</span>= the system diffuse solar absorptance of layer* l* for irradiance from the back side
+<span>\(\alpha_{l,back}^{dif}\)</span>= the system diffuse solar absorptance of layer* l* for irradiance from the back side
 
-<span>$\alpha_{l,back}^{beam}$</span>= the system beam solar absorptance of layer* l* for irradiance from the back side
+<span>\(\alpha_{l,back}^{beam}\)</span>= the system beam solar absorptance of layer* l* for irradiance from the back side
 
 *A(SurfNum)*= glazing area [m<sup>2</sup>]
 
@@ -1342,7 +1342,7 @@ The interior diffuse short-wave radiation transmitted by an interior window to t
 
 where
 
-<span>${\tau ^{dif}}(SurfNum)$</span>= diffuse transmittance of the interior window
+<span>\({\tau ^{dif}}(SurfNum)\)</span>= diffuse transmittance of the interior window
 
 ##### Interior Beam Radiation Transmitted by Interior Windows
 
@@ -1350,7 +1350,7 @@ The interior beam solar radiation transmitted by an interior window to the adjac
 
 <div>$$BeamSolarRad*{\tau ^{beam}}(SurfNum)\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)*CosIn{c_i}{\rm{    [W}}]} $$</div>
 
-where <span>${\tau ^{beam}}(SurfNum)$</span>is the beam-to-beam transmittance of the interior window at the angle of incidence of beam solar from the exterior window on the interior window. The program does not track where this radiation falls in the adjacent zone: it is counted as diffuse radiation in that zone. Therefore,
+where <span>\({\tau ^{beam}}(SurfNum)\)</span>is the beam-to-beam transmittance of the interior window at the angle of incidence of beam solar from the exterior window on the interior window. The program does not track where this radiation falls in the adjacent zone: it is counted as diffuse radiation in that zone. Therefore,
 
 <div>$$QS(ZoneNum) \to QS(ZoneNum) + [{\rm{beam solar from adjacent zones]}}*VMULT(ZoneNum)$$</div>
 

@@ -67,6 +67,16 @@ namespace OutAirNodeManager {
 
 	// Functions
 
+	// Clears the global data in OutAirNodeManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		OutsideAirNodeList.deallocate();
+		NumOutsideAirNodes = 0;
+		GetOutAirNodesInputFlag = true;
+	}
+
 	void
 	SetOutAirNodes()
 	{
@@ -505,7 +515,7 @@ namespace OutAirNodeManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

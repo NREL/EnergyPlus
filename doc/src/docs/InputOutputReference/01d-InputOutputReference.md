@@ -334,19 +334,19 @@ ThermostatSetpoint:DualSetpoint, VAV Setpoints, Heating Setpoints, Cooling Setpo
 
 This object is used to modify the program   s behavior for ZoneControl:Thermostat objects. One input object is used for each thermal zone to indicate if that zone   s thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. Zone Control:Thermostatic and related set point objects also need to be included in the input file. When this object is used, the zone can be controlled by a weighted mixture of radiant and air temperatures (rather than just air temperatures).
 
-This thermostatic operative temperature, <span>${T_{OP}}$</span>, is defined as:
+This thermostatic operative temperature, <span>\({T_{OP}}\)</span>, is defined as:
 
 <div>\[{T_{OP}} = \gamma {T_{MRT}} + (1 - \gamma ){T_{drybulb}}\]</div>
 
 where,
 
-<span>$\gamma $</span>   is the radiative fraction,
+<span>\(\gamma \)</span>   is the radiative fraction,
 
-<span>${T_{MRT}}$</span>  is the mean radiant temperature for the thermal zone, and
+<span>\({T_{MRT}}\)</span>  is the mean radiant temperature for the thermal zone, and
 
-<span>${T_{drybulb}}$</span>is the mean zone air temperature.
+<span>\({T_{drybulb}}\)</span>is the mean zone air temperature.
 
-The radiative fraction <span>$\gamma $</span>  is selected by the user and can be scheduled to vary during the simulation. A typical value is 0.5. The maximum value needs to be less than 0.9 and the minimum is 0.0. A value of 0.0 is the same as controlling on only zone air temperature. If air velocities are higher than 0.2 m/s, then lower values for radiative fraction might apply. Niu and Burnett (1998) cite International Standard ISO 77300 in recommending the values for this fraction listed in the following table.
+The radiative fraction <span>\(\gamma \)</span>  is selected by the user and can be scheduled to vary during the simulation. A typical value is 0.5. The maximum value needs to be less than 0.9 and the minimum is 0.0. A value of 0.0 is the same as controlling on only zone air temperature. If air velocities are higher than 0.2 m/s, then lower values for radiative fraction might apply. Niu and Burnett (1998) cite International Standard ISO 77300 in recommending the values for this fraction listed in the following table.
 
 Table 28. Radiative Fraction vs Air Velocity (Operative Temperature Control)
 
@@ -358,7 +358,7 @@ Table 28. Radiative Fraction vs Air Velocity (Operative Temperature Control)
 <th>0.6 to 1.0</th>
 </tr>
 <tr>
-<td><span>$\gamma $</span></td>
+<td><span>\(\gamma \)</span></td>
 <td>0.5</td>
 <td>0.4</td>
 <td>0.3</td>
@@ -379,11 +379,11 @@ This field controls whether the input for radiative fraction is a constant value
 
 #### Field: Fixed Radiative Fraction
 
-This is the fraction, <span>$\gamma $</span>, of the operative temperature that is due to the mean radiant temperature in the zone. This field is used by the program if the previous field is set to **Constant**.
+This is the fraction, <span>\(\gamma \)</span>, of the operative temperature that is due to the mean radiant temperature in the zone. This field is used by the program if the previous field is set to **Constant**.
 
 #### Field: Radiative Fraction Schedule Name
 
-This field contains the name of a schedule, defined elsewhere, that determines the value for radiative fraction <span>$\gamma $</span>  during the simulation period. This schedule should have fractional values from 0.0 to 0.9. When the value of this schedule is 0.0, the controlling will be equivalent to control based only on zone air temperature. This field is used by the program if the Input Mode field is set to **Scheduled**.
+This field contains the name of a schedule, defined elsewhere, that determines the value for radiative fraction <span>\(\gamma \)</span>  during the simulation period. This schedule should have fractional values from 0.0 to 0.9. When the value of this schedule is 0.0, the controlling will be equivalent to control based only on zone air temperature. This field is used by the program if the Input Mode field is set to **Scheduled**.
 
 Note that by setting the values in this schedule separately for design days, the user can control how operative temperature control is applied during autosizing. (Operative temperature control tends to increase the equipment capacities calculated during sizing.)
 
@@ -1146,7 +1146,7 @@ AirLoopHVAC:ReturnPath,
 
 The simple building shown in the figure below consists of a controlled zone and a return plenum zone that is used for the return air. This simple configuration contains a ground floor controlled zone with a window and a return plenum zone which handles the roof load. The return air plenum is a special type of component since there is both a heat balance connection and building description and a system airflow connection that transfers the airflow directly from the controlled zone to the return plenum zone in the system air simulation. The input described in this section is mainly just for the system airflow connections in the HVAC algorithms. In addition the return plenum zone must be fully input as a zone object for the heat balance calculation. The zone description needs to contain the wall descriptions - the interzone ceiling and floor, and for this simple case the roof. All the other attributes of a zone that can be specified in the building description can be used with a return plenum zone if necessary: scheduled loads, windows, etc.
 
-![](InputOutputReference/media/image337.svg)
+![](media/image337.svg)
 
 Figure 130. Illustration of Zone Return Plenum
 
@@ -1221,7 +1221,7 @@ Below is an example of the AirLoopHVAC:ReturnPath for the simple case shown abov
 
 The building shown in the figure below consists of three controlled zones served by an AirLoopHVAC:SupplyPlenum beneath the floor.
 
-![](InputOutputReference/media/image338.png)
+![](media/image338.png)
 
 Figure 131. Illustration of AirLoopHVAC:SupplyPlenum
 
@@ -1978,7 +1978,7 @@ This section provides an overview of how to model solar heating systems.   A sol
 
 If the solar heating system is for domestic hot water (or service water heating) usage only, the field *Use Flow Rate Fraction Schedule Name* of the WaterHeater:Mixed object can be used to avoid additional plant connections. If the system has more complicated hot water requirements or if the system is for space heating, the *Use Side Inlet* and *Use Side Outlet* nodes must be connected to another plant loop to serve zone and non-zone equipment. (See the WaterHeater:Mixed object documentation for more information.)
 
-![](InputOutputReference/media/image339.png)
+![](media/image339.png)
 
 Figure 132. Solar Collector Plant Loop Connection Diagram
 
@@ -1986,7 +1986,7 @@ NOTE:   The EnergyPlus plant simulation requires the pump to be the first compon
 
 In order to realize energy savings with a solar heating system, it is best to use a two-tank system with a storage tank and auxiliary water heater. The storage tank gathers heat directly from the solar collectors and stores it for later use. The storage tank is modeled using a WaterHeater:Mixed object with the *Heater Maximum Capacity* set to zero. The auxiliary water heater is positioned downstream of the storage tank on the supply side of the main plant loop. The auxiliary water heater, or booster water heater, provides additional heat if the storage tank water is not hot enough. The auxiliary water heater can be modeled as an instantaneous/tankless water heater or as a standard tanked water heater with heating source (see WaterHeater:Mixed).
 
-![](InputOutputReference/media/image340.png)
+![](media/image340.png)
 
 Figure 133. Two-Tank Solar Heating System Connection Diagram
 
@@ -1994,7 +1994,7 @@ Another strategy to consider for solar heating systems is to allow the storage t
 
 A complete two-tank solar heating system with tempering valve is shown below.
 
-![](InputOutputReference/media/image341.png)
+![](media/image341.png)
 
 Figure 134. Two-Tank Solar Heating System with Tempering Valve
 
@@ -2358,7 +2358,7 @@ In addition to related output that can be obtained for air nodes and surfaces, t
 
 #### Solar Collector Heat Exchanger Effectiveness []
 
-The results from UTSC correlations defined by <span>${\varepsilon_{HX}} = \frac{{{T_{a,HX}} - {T_{amb}}}}{{{T_{s,coll}} - {T_{amb}}}}$</span>.
+The results from UTSC correlations defined by <span>\({\varepsilon_{HX}} = \frac{{{T_{a,HX}} - {T_{amb}}}}{{{T_{s,coll}} - {T_{amb}}}}\)</span>.
 
 #### Solar Collector Leaving Air Temperature [C]
 
@@ -3366,7 +3366,7 @@ Group     Heating and Cooling Coils
 
 Several different coils may be added to zone equipment and air loops. This includes simple heating (gas, electric, and hot water) and a simple water-cooling coil as well as a more detailed flat fin water-cooling coil model. In general, the heating coil description can be used for a heating coil, a reheat coil, or a preheat coil in the air loop simulation or for zone equipment. Figure 135 is an example of a heating and cooling coil in the air loop simulation in a dual duct system. This does show the basic node structure that will be referenced in the input description. The figure does show water coils since they are the most complex to input in the simulation compared to the Electric and Gas coils which only have air connections.
 
-![Figure103\_ExampleAirLoopHeatingandCoolingCoil](InputOutputReference/media/image349.png)
+![Figure103\_ExampleAirLoopHeatingandCoolingCoil](media/image349.png)
 
 Figure 135. Example Air Loop Heating & Cooling Coil
 
@@ -3611,7 +3611,7 @@ This is the ratio of convective heat transfers between air side and water side o
 
 where,
 
-<span>${\eta_f}$</span>  is the fin efficiency, (dimensionless)
+<span>\({\eta_f}\)</span>  is the fin efficiency, (dimensionless)
 
 *h* is the surface convection heat transfer coefficient
 
@@ -4564,13 +4564,13 @@ This detailed flat fin coil model is for continuous plate fins. First, found in 
 
 The following figures illustrate the geometry and circuits in a cooling coil.
 
-![Figure104\_GeometryofaCoolingCoilCC](InputOutputReference/media/image353.png)
+![Figure104\_GeometryofaCoolingCoilCC](media/image353.png)
 
 Figure 136. Geometry of a Cooling Coil (CC)
 
 
 
-![Figure105\_NumberofCoolantCircuiteCCNCC](InputOutputReference/media/image354.png)
+![Figure105\_NumberofCoolantCircuiteCCNCC](media/image354.png)
 
 Figure 137. Number of Coolant Circuits (CCNCC)
 
@@ -7192,7 +7192,7 @@ This numeric field contains the rated volumetric air flow rate on the load side 
 
 And the volumetric air flow rates in the parent objects are calculated as below,
 
-#### <span>$\begin{array}{l}{\rm{LoopVolumetricAirFlowRate}}@{\rm{SpeedLevel}}\left( {\rm{x}} \right) = \\\quad \quad \quad {\rm{AirFlowScaleFactor}} \times \\\quad \quad \quad {\rm{ReferenceUnitVolAirFlowRate}}@{\rm{SpeedLevel}}({\rm{x}}) \times \\\quad {\kern 1pt} {\kern 1pt} \quad \quad {\rm{CapacityScaleFactor}}\end{array}$</span>
+#### <span>\(\begin{array}{l}{\rm{LoopVolumetricAirFlowRate}}@{\rm{SpeedLevel}}\left( {\rm{x}} \right) = \\\quad \quad \quad {\rm{AirFlowScaleFactor}} \times \\\quad \quad \quad {\rm{ReferenceUnitVolAirFlowRate}}@{\rm{SpeedLevel}}({\rm{x}}) \times \\\quad {\kern 1pt} {\kern 1pt} \quad \quad {\rm{CapacityScaleFactor}}\end{array}\)</span>
 
 #### Field: Part Load Fraction Correlation Curve Name
 
@@ -7694,7 +7694,7 @@ The CoilSystem:Cooling:DX object is a virtual container component that consists 
 
 This component may be used as a cooling coil in constant volume or variable volume systems, as blow through or draw through, with or without humidity controls. Unlike AirLoopHVAC:Unitary system types, this component controls only the DX coil, not the supply fan.   CoilSystem:Cooling:DX is added to a system by placing it in an air loop branch (see Branch object) or in an AirLoopHVAC:OutdoorAirSystem:EquipmentList or in a ZoneHVAC:OutdoorAirUnit:EquipmentList . It requires one or more setpoint manager (see SetpointManager:\*) objects to specify temperature and/or humidity setpoints (unless it is used in a ZoneHVAC:OutdoorAirUnit which has its own temperature setpoints).   This object is the one that is listed in the Branch or equipment list object rather than the coil itself.   A constant volume or variable volume fan is modeled separately from this cooling system. These are the only fan types allowed for this system type (ref. Fan:ConstantVolume and Fan:VariableVolume).   Cycling fan operation is not available with this model. The CoilSystem:Cooling:DX object can also be placed on dedicated outdoor air system (DOAS) airloop branches or in arloop branches where the air flow to capacity ratio range is between 100     300 cfm/ton. 100% DOAS DX cooling coils operate in lower flow to capacity ratio range compared to regular DX cooling coils. The CoilSystem:Cooling:DX is selected to operate in DOAS application or in low flow to capacity ratio range by specifying    YES    to the input field    Use Outdoor Air DX Cooling Coil   . If this optional input field is left blank or specified as    NO   , then the coil is modeled as regular DX cooling coil. If the CoilSystem:Cooling:DX object is in an AirLoopHVAC:OutdoorAirSystem:EquipmentList or in a ZoneHVAC:OutdoorAirUnit:EquipmentList then it is treated as 100% DOAS DX cooling coil only if the choice input field    Use Outdoor Air DX Cooling Coil    is set too    YES   . All the control options of the regular DX cooling coils are available to DOAS DX coils as well. Heating DX coils in DOAS airloop operate at the same flow to capacity ratio limits as the DOAS DX cooling coils.
 
-![DXAirLoop](InputOutputReference/media/image368.svg)
+![DXAirLoop](media/image368.svg)
 
 Figure 138. Schematic of CoilSystem:Cooling:DX Object in an Air Loop for a Blow Through Application
 
@@ -7938,7 +7938,7 @@ In terms of controlling the operation of the heat exchanger, the heat exchanger 
 
 Links to the cooling coil and air-to-air heat exchanger specifications are provided in the input data syntax for this compound object. A description of each input field for this compound object is provided below.
 
-![GenericHXAssisted](InputOutputReference/media/image369.png)
+![GenericHXAssisted](media/image369.png)
 
 Figure 139. Schematic of the CoilSystem:Cooling:DX:HeatExchangerAssisted compound object
 
@@ -8028,7 +8028,7 @@ No variables are reported for this compound object. However, outputs are provide
 
 The heat exchanger-assisted water cooling coil is a    virtual    component consisting of a chilled-water cooling coil and an air-to-air heat exchanger as shown in Figure 140 below. The air-to-air heat exchanger precools the air entering the cooling coil, and reuses this energy to reheat the supply air leaving the cooling coil. This heat exchange process improves the latent removal performance of the cooling coil by allowing it to dedicate more of its cooling capacity toward dehumidification (lower sensible heat ratio).
 
-![GenericHXAssisted](InputOutputReference/media/image370.png)
+![GenericHXAssisted](media/image370.png)
 
 Figure 140. Schematic of the CoilSystem:Cooling:Water:HeatExchangerAssisted compound object
 
@@ -8134,11 +8134,11 @@ Coil:Cooling:Water:DetailedGeometry,
 
 No variables are reported for this compound object. However, outputs are provided by the cooling coil and heat exchanger that are specified.
 
-### Coil:WaterHeating:AirToWaterHeatPump
+### Coil:WaterHeating:AirToWaterHeatPump:Pumped
 
-EnergyPlus can model a heat pump water heater (HPWH) consisting of a water heater tank (e.g., WaterHeater:Mixed), a direct expansion (DX)    coil    (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source.
+EnergyPlus can model a heat pump water heater (HPWH) consisting of a water heater tank (e.g., `WaterHeater:Mixed`), a direct expansion (DX) coil (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source.
 
-The WaterHeater:HeatPump compound object, water heater tank object (e.g., WaterHeater:Mixed), and fan object (e.g., Fan:OnOff) are defined elsewhere in this reference document. Coil:WaterHeating:AirToWaterHeatPump object described here models an air-to-water DX compression system to determine its air-side and water-side performance. This DX coil object calculates the air-side sensible and latent cooling capacity at the specific operating conditions for each simulation timestep, as well as the condenser   s water-side temperature difference at a given condenser water flow rate.
+The `WaterHeater:HeatPump:PumpedCondenser` compound object, water heater tank object (e.g., `WaterHeater:Mixed`), and fan object (e.g., `Fan:OnOff`) are defined elsewhere in this reference document. `Coil:WaterHeating:AirToWaterHeatPump:Pumped` object described here models an air-to-water DX compression system to determine its air-side and water-side performance. This DX coil object calculates the air-side sensible and latent cooling capacity at the specific operating conditions for each simulation timestep, as well as the condenser's water-side temperature difference at a given condenser water flow rate.
 
 The heat pump water heater DX coil model performs the following major functions:
 
@@ -8146,7 +8146,7 @@ The heat pump water heater DX coil model performs the following major functions:
 
 - calculates the amount of heat delivered to the water tank
 
-- calculates the electric consumption of the compressor   s crankcase heater
+- calculates the electric consumption of the compressor's crankcase heater
 
 - calculates the air-side performance of the DX coil
 
@@ -8154,7 +8154,7 @@ The input fields for this object are described below in detail:
 
 #### Field: Name
 
-This alpha field defines a unique user-assigned name for an instance of a heat pump water heater DX coil. Any reference to this coil by another object (e.g., WaterHeater:HeatPump) will use this name.
+This alpha field defines a unique user-assigned name for an instance of a heat pump water heater DX coil. Any reference to this coil by another object (e.g., `WaterHeater:HeatPump:PumpedCondenser`) will use this name.
 
 #### Field: Rated Heating Capacity
 
@@ -8162,7 +8162,7 @@ This numeric field defines the DX coil heating capacity in Watts at the rated ev
 
 #### Field: Rated COP
 
-This numeric field defines the DX coil   s water heating coefficient of performance (COP=water heating capacity in watts divided by electrical power input in watts) at rated conditions (rated inlet temperatures and flow rates specified below). This input not only determines the electric energy use of the heat pump DX coil, but also the amount of total air cooling provided by the evaporator. The rated COP includes compressor power, and may or may not include condenser pump power or evaporator fan power (see field Evaporator Fan Power Included in Rated COP and field Condenser Pump Power Included in Rated COP). Values must be greater than 0. If this field is left blank, the default value is 3.2.
+This numeric field defines the DX coil's water heating coefficient of performance (COP=water heating capacity in watts divided by electrical power input in watts) at rated conditions (rated inlet temperatures and flow rates specified below). This input not only determines the electric energy use of the heat pump DX coil, but also the amount of total air cooling provided by the evaporator. The rated COP includes compressor power, and may or may not include condenser pump power or evaporator fan power (see field Evaporator Fan Power Included in Rated COP and field Condenser Pump Power Included in Rated COP). Values must be greater than 0. If this field is left blank, the default value is 3.2.
 
 #### Field: Rated Sensible Heat Ratio
 
@@ -8182,7 +8182,7 @@ This numeric field defines the condenser inlet water temperature, in degrees Cel
 
 #### Field: Rated Evaporator Air Flow Rate
 
-This numeric field defines the evaporator air volume flow rate in cubic meters per second at rated conditions. Values must be greater than 0. If this field is left blank or autocalculated   (field value = **autocalculate**), the default value is 5.035E-5 m<sup>3</sup>/s/W (31.25 cfm/MBH) multiplied by the Rated Heating Capacity specified above. When autocalculating the rated evaporator air volumetric flow rate, a zone sizing object is not required.
+This numeric field defines the evaporator air volume flow rate in cubic meters per second at rated conditions. Values must be greater than 0. If this field is left blank or autocalculated (field value = **autocalculate**), the default value is 5.035E-5 m<sup>3</sup>/s/W (31.25 cfm/MBH) multiplied by the Rated Heating Capacity specified above. When autocalculating the rated evaporator air volumetric flow rate, a zone sizing object is not required.
 
 #### Field: Rated Condenser Water Flow Rate
 
@@ -8190,19 +8190,19 @@ This numeric field defines the condenser water volumetric flow rate in cubic met
 
 #### Field: Evaporator Fan Power Included in Rated COP
 
-This choice field specifies if evaporator fan power is included in the rated COP defined above. This input impacts the calculation of compressor electric power and total air cooling provided by the evaporator for each simulation timestep. If Yes is selected, the evaporator fan power is subtracted from the total electric heating power when calculating total evaporator cooling capacity. If No is selected, it is assumed that the total heating power does not include evaporator fan power. If this field is left blank, the default is Yes. See the Engineering Reference section for Coil:WaterHeating:AirToWaterHeatPump for further details.
+This choice field specifies if evaporator fan power is included in the rated COP defined above. This input impacts the calculation of compressor electric power and total air cooling provided by the evaporator for each simulation timestep. If Yes is selected, the evaporator fan power is subtracted from the total electric heating power when calculating total evaporator cooling capacity. If No is selected, it is assumed that the total heating power does not include evaporator fan power. If this field is left blank, the default is Yes. See the Engineering Reference section for `Coil:WaterHeating:AirToWaterHeatPump:\*` for further details.
 
 #### Field: Condenser Pump Power Included in Rated COP
 
-This choice field specifies if condenser pump power is included in the rated COP defined above. This input impacts the calculation of compressor electric power which then impacts the total air cooling provided by the evaporator for each simulation timestep. If Yes is selected, the condenser pump power is subtracted from the total electric heating power when calculating total evaporator cooling capacity. If No is selected, it is assumed that the total heating power does not include the condenser pump. If this field is left blank, the default is No. See Engineering Reference section for Coil:WaterHeating:AirToWaterHeatPump for further details.
+This choice field specifies if condenser pump power is included in the rated COP defined above. This input impacts the calculation of compressor electric power which then impacts the total air cooling provided by the evaporator for each simulation timestep. If Yes is selected, the condenser pump power is subtracted from the total electric heating power when calculating total evaporator cooling capacity. If No is selected, it is assumed that the total heating power does not include the condenser pump. If this field is left blank, the default is No. See Engineering Reference section for `Coil:WaterHeating:AirToWaterHeatPump:\*` for further details.
 
 #### Field: Condenser Pump Heat Included in Rated Heating Capacity and Rated COP
 
-This choice field specifies if condenser pump heat is included in the rated heating capacity and rated COP defined above. This input impacts the calculation of compressor electric power and total air cooling provided by the evaporator for each simulation timestep. If Yes is selected, the condenser pump heat is already included in the rated heating capacity and rated COP. If No is selected, it is assumed that the rated heating capacity and rated COP do not include the condenser pump heat, and pump heat is added to the total water heating capacity based on the Condenser Water Pump Power and Fraction of Condenser Pump Heat to Water fields below. If this field is left blank, the default is No. See Engineering Reference section for Coil:WaterHeating:AirToWaterHeatPump for further details.
+This choice field specifies if condenser pump heat is included in the rated heating capacity and rated COP defined above. This input impacts the calculation of compressor electric power and total air cooling provided by the evaporator for each simulation timestep. If Yes is selected, the condenser pump heat is already included in the rated heating capacity and rated COP. If No is selected, it is assumed that the rated heating capacity and rated COP do not include the condenser pump heat, and pump heat is added to the total water heating capacity based on the Condenser Water Pump Power and Fraction of Condenser Pump Heat to Water fields below. If this field is left blank, the default is No. See Engineering Reference section for `Coil:WaterHeating:AirToWaterHeatPump:\*` for further details.
 
 #### Field: Condenser Water Pump Power
 
-This numeric field defines the DX coil   s condenser pump power in Watts. This is the operating pump power as installed. Values must be greater than or equal to 0. If this field is left blank, the default value is 0. A warning message will be issued if the ratio of Condenser Water Pump Power to Rated Heating Capacity exceeds 0.1422 W/W (41.67 Watts/MBH), but the simulation will continue.
+This numeric field defines the DX coil's condenser pump power in Watts. This is the operating pump power as installed. Values must be greater than or equal to 0. If this field is left blank, the default value is 0. A warning message will be issued if the ratio of Condenser Water Pump Power to Rated Heating Capacity exceeds 0.1422 W/W (41.67 Watts/MBH), but the simulation will continue.
 
 #### Field: Fraction of Condenser Pump Heat to Water
 
@@ -8226,11 +8226,11 @@ This alpha field defines the name of the node to which the heat pump condenser s
 
 #### Field: Crankcase Heater Capacity
 
-This numeric field defines the compressor   s crankcase heater capacity in Watts. The crankcase heater only operates when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation specified below.
+This numeric field defines the compressor's crankcase heater capacity in Watts. The crankcase heater only operates when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation specified below.
 
 #### Field: Maximum Ambient Temperature for Crankcase Heater Operation
 
-This numeric field defines the maximum ambient temperature for crankcase heater operation in degree Celsius. The crankcase heater only operates when the air surrounding the compressor is below this maximum temperature value and the compressor is off   The ambient temperature surrounding the compressor is set by the Heat Pump:Water Heater parent object (field Compressor Location).
+This numeric field defines the maximum ambient temperature for crankcase heater operation in degree Celsius. The crankcase heater only operates when the air surrounding the compressor is below this maximum temperature value and the compressor is off. The ambient temperature surrounding the compressor is set by the Heat Pump:Water Heater parent object (field Compressor Location).
 
 #### Field: Evaporator Air Temperature Type for Curve Objects
 
@@ -8262,7 +8262,7 @@ This alpha field specifies the name of a **quadratic** or **cubic** performance 
 
 #### Field: Part Load Fraction Correlation Curve Name
 
-This alpha field defines the name of a **quadratic** or **cubic** performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the    effective    EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.
+This alpha field defines the name of a **quadratic** or **cubic** performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.
 
 The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep). For PLR values between 0 and 1 (0 &lt;= PLR &lt; 1), the following rules apply:
 
@@ -8278,41 +8278,41 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
 
            PLF = 1.0 + 0.0(PLR)
 
-Following is an example input for the Coil:WaterHeating:AirToWaterHeatPump object.
+Following is an example input for the `Coil:WaterHeating:AirToWaterHeatPump:Pumped` object:
 
 ```idf
-Coil:WaterHeating:AirToWaterHeatPump,
-       Zone4HPWHDXCoil,                         !- Coil Name
-       4000.0,                                           !- Heating Capacity {W}
-       3.2,                                                 !- Rated COP {W/W}
-       0.6956,                                           !- Rated SHR (gross)
-       19.7,                                               !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}
-       13.5,                                               !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}
-       57.5,                                               !- Rated Condenser Inlet Water Temperature {C}
-       autocalculate,                             !- Rated Evaporator Air Volumetric Flow Rate {m3/s}
-       autocalculate,                             !- Rated Condenser Water Volumetric Flow Rate {m3/s}
-       No,                                                   !- Evaporator Fan Power Included in Rated COP
-       No,                                                   !- Condenser Pump Power Included in Rated COP
-       No,                                                   !- Condenser Pump Heat Included in Rated Heating Capacity and Rated COP
-       150.0,                                             !- Condenser Water Pump Power {W}
-       0.1,                                                 !- Fraction of Condenser Pump Heat to Water
-       Zone4AirOutletNode,                   !- Evaporator Air Inlet Node Name
-       Zone4DXCoilAirOutletNode,       !- Evaporator Air Outlet Node Name
-       Zone4WaterInletNode,                 !- Condenser Water Inlet Node Name
-       Zone4WaterOutletNode,               !- Condenser Water Outlet Node Name
-       100.0,                                             !- Crankcase Heater Capacity {W}
-       5.0,                                                 !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
-       wet-bulb temperature,               !- Evaporator Air Temperature Type for Curve Objects
-       HPWHHeatingCapFTemp,                 !- Heating Capacity Modifier Curve Name (function of temperature)
-       ,                                                       !- Heating Capacity Modifier Curve Name (function of air flow fraction)
-       ,                                                       !- Heating Capacity Modifier Curve Name (function of water flow fraction)
-       HPWHHeatingCOPFTemp,                 !- Heating COP Modifier Curve Name (function of temperature)
-       ,                                                       !- Heating COP Modifier Curve Name (function of air flow fraction)
-       ,                                                       !- Heating COP Modifier Curve Name (function of water flow fraction)
-       HPWHPLFFPLR;                                 !- Part Load Fraction Correlation Name (function of part load ratio)
+Coil:WaterHeating:AirToWaterHeatPump:Pumped,
+       Zone4HPWHDXCoil,           !- Coil Name
+       4000.0,                    !- Heating Capacity {W}
+       3.2,                       !- Rated COP {W/W}
+       0.6956,                    !- Rated SHR (gross)
+       19.7,                      !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}
+       13.5,                      !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}
+       57.5,                      !- Rated Condenser Inlet Water Temperature {C}
+       autocalculate,             !- Rated Evaporator Air Volumetric Flow Rate {m3/s}
+       autocalculate,             !- Rated Condenser Water Volumetric Flow Rate {m3/s}
+       No,                        !- Evaporator Fan Power Included in Rated COP
+       No,                        !- Condenser Pump Power Included in Rated COP
+       No,                        !- Condenser Pump Heat Included in Rated Heating Capacity and Rated COP
+       150.0,                     !- Condenser Water Pump Power {W}
+       0.1,                       !- Fraction of Condenser Pump Heat to Water
+       Zone4AirOutletNode,        !- Evaporator Air Inlet Node Name
+       Zone4DXCoilAirOutletNode,  !- Evaporator Air Outlet Node Name
+       Zone4WaterInletNode,       !- Condenser Water Inlet Node Name
+       Zone4WaterOutletNode,      !- Condenser Water Outlet Node Name
+       100.0,                     !- Crankcase Heater Capacity {W}
+       5.0,                       !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
+       wet-bulb temperature,      !- Evaporator Air Temperature Type for Curve Objects
+       HPWHHeatingCapFTemp,       !- Heating Capacity Modifier Curve Name (function of temperature)
+       ,                          !- Heating Capacity Modifier Curve Name (function of air flow fraction)
+       ,                          !- Heating Capacity Modifier Curve Name (function of water flow fraction)
+       HPWHHeatingCOPFTemp,       !- Heating COP Modifier Curve Name (function of temperature)
+       ,                          !- Heating COP Modifier Curve Name (function of air flow fraction)
+       ,                          !- Heating COP Modifier Curve Name (function of water flow fraction)
+       HPWHPLFFPLR;               !- Part Load Fraction Correlation Name (function of part load ratio)
 ```
 
-### Coil:WaterHeating:AirToWaterHeatPump Outputs
+### Coil:WaterHeating:AirToWaterHeatPump:Pumped Outputs
 
 * HVAC,Average,Cooling Coil Total Cooling Rate [W]
 
@@ -8370,11 +8370,11 @@ This output field is the average runtime fraction of the DX coil compressor for 
 
 #### Cooling Coil Crankcase Heater Electric Power[W]
 
-This output field is the average electricity consumption rate of the DX coil compressor   s crankcase heater in Watts for the timestep being reported. The crankcase heater operates only when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation, otherwise this output variable is set equal to 0.
+This output field is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. The crankcase heater operates only when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation, otherwise this output variable is set equal to 0.
 
 #### Cooling Coil Crankcase Heater Electric Energy [J]
 
-This output field is the total electricity consumption of the DX coil compressor   s crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
+This output field is the total electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
 #### Cooling Coil Total Water Heating Rate [W]
 
@@ -8392,9 +8392,221 @@ This output field is the average electricity consumption rate of the DX coil com
 
 This output field is the electricity consumption of the DX coil compressor and condenser pump in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
+### Coil:WaterHeating:AirToWaterHeatPump:Wrapped
+
+EnergyPlus can model a heat pump water heater (HPWH) consisting of a water heater tank (e.g., `WaterHeater:Stratified`), a direct expansion (DX) coil (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source.
+
+The `WaterHeater:HeatPump:WrappedCondenser` compound object, water heater tank object (e.g., `WaterHeater:Mixed`), and fan object (e.g., `Fan:OnOff`) are defined elsewhere in this reference document. `Coil:WaterHeating:AirToWaterHeatPump:Wrapped` object described here models an air-to-water DX compression system to determine its air-side and water-side performance. This DX coil object calculates the air-side sensible and latent cooling capacity at the specific operating conditions for each simulation timestep, as well as the condenser's water-side temperature difference at a given condenser water flow rate.
+
+The heat pump water heater DX coil model performs the following major functions:
+
+- calculates the electric consumption of the DX compressor
+
+- calculates the amount of heat delivered to the water tank
+
+- calculates the electric consumption of the compressor's crankcase heater
+
+- calculates the air-side performance of the DX coil
+
+#### Field: Name
+
+This alpha field defines a unique user-assigned name for an instance of a heat pump water heater DX coil. Any reference to this coil by another object (e.g., `WaterHeater:HeatPump:WrappedCondenser`) will use this name.
+
+#### Field: Rated Heating Capacity
+
+This numeric field defines the DX coil heating capacity in Watts at the rated evaporator inlet air temperatures, rated condenser inlet water temperature, rated evaporator air flow rate, and rated condenser water flow rate specified below. Values must be greater than 0. This value represents water heating capacity, and it may or may not include the impact of condenser pump heat (see field Condenser Pump Heat Included in Rated Heating Capacity below).
+
+#### Field: Rated COP
+
+This numeric field defines the DX coil's water heating coefficient of performance (COP=water heating capacity in watts divided by electrical power input in watts) at rated conditions (rated inlet temperatures and flow rates specified below). This input not only determines the electric energy use of the heat pump DX coil, but also the amount of total air cooling provided by the evaporator. The rated COP includes compressor power, and may or may not include condenser pump power or evaporator fan power (see field Evaporator Fan Power Included in Rated COP and field Condenser Pump Power Included in Rated COP). Values must be greater than 0. If this field is left blank, the default value is 3.2.
+
+#### Field: Rated Sensible Heat Ratio
+
+This numeric field defines the air-side sensible heat ratio (SHR=sensible cooling capacity divided by total cooling capacity) of the DX coil at rated conditions (rated inlet temperatures and flow rates specified below). This value should not include the effect of evaporator fan heat. Values must be greater than or equal to 0.5, and less than or equal to 1.0. The default value is 0.85.
+
+#### Field: Rated Evaporator Inlet Air Dry-Bulb Temperature
+
+This numeric field defines the evaporator inlet air dry-bulb temperature, in degrees Celsius, that corresponds to rated coil performance (heating capacity, COP and SHR). Values must be greater than 5 &deg;C. If this field is left blank, the default value is 19.7 &deg;C.
+
+#### Field: Rated Evaporator Inlet Air Wet-Bulb Temperature
+
+This numeric field defines the evaporator inlet air wet-bulb temperature, in degrees Celsius, that corresponds to rated coil performance (heating capacity, COP and SHR). Values must be greater than 5 &deg;C. If this field is left blank, the default value is 13.5 &deg;C.
+
+#### Field: Rated Condenser Water Temperature
+
+This numeric field defines the condenser inlet water temperature, in degrees Celsius, that corresponds to rated coil performance (heating capacity, COP and SHR). Values must be greater than 25 &deg;C. If this field is left blank, the default value is 57.5 &deg;C.
+
+#### Field: Rated Evaporator Air Flow Rate
+
+This numeric field defines the evaporator air volume flow rate in cubic meters per second at rated conditions. Values must be greater than 0. If this field is left blank or autocalculated (field value = **autocalculate**), the default value is 5.035E-5 m<sup>3</sup>/s/W (31.25 cfm/MBH) multiplied by the Rated Heating Capacity specified above. When autocalculating the rated evaporator air volumetric flow rate, a zone sizing object is not required.
+
+#### Field: Evaporator Fan Power Included in Rated COP
+
+This choice field specifies if evaporator fan power is included in the rated COP defined above. This input impacts the calculation of compressor electric power and total air cooling provided by the evaporator for each simulation timestep. If Yes is selected, the evaporator fan power is subtracted from the total electric heating power when calculating total evaporator cooling capacity. If No is selected, it is assumed that the total heating power does not include evaporator fan power. If this field is left blank, the default is Yes. See the Engineering Reference section for `Coil:WaterHeating:AirToWaterHeatPump:\*` for further details.
+
+#### Field: Evaporator Air Inlet Node Name
+
+This alpha field defines the name of the air node from which the evaporator coil draws its inlet air.
+
+#### Field: Evaporator Air Outlet Node Name
+
+This alpha field defines the name of the air node to which the evaporator coil sends its outlet air.
+
+#### Field: Crankcase Heater Capacity
+
+This numeric field defines the compressor's crankcase heater capacity in Watts. The crankcase heater only operates when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation specified below.
+
+#### Field: Maximum Ambient Temperature for Crankcase Heater Operation
+
+This numeric field defines the maximum ambient temperature for crankcase heater operation in degree Celsius. The crankcase heater only operates when the air surrounding the compressor is below this maximum temperature value and the compressor is off. The ambient temperature surrounding the compressor is set by the Heat Pump:Water Heater parent object (field Compressor Location).
+
+#### Field: Evaporator Air Temperature Type for Curve Objects
+
+This choice field specifies the air temperature type used for the heating capacity and COP modifier curve objects below. The valid selections are Dry-bulb Temperature and Wet-bulb Temperature. If dry-bulb temperature is selected, the inlet air dry-bulb temperature entering the heat pump DX coil and fan section is used to evaluate the curve objects. If wet-bulb temperature is selected, the inlet air wet-bulb temperature entering the heat pump DX coil and fan section is used to evaluate the curve objects. If this field is left blank and the following curve names are defined, the default value is wet-bulb temperature. If the following curve names are not defined, this field is not used.
+
+#### Field: Heating Capacity Function of Temperature Curve Name
+
+This alpha field specifies the name of a **biquadratic** or **cubic** performance curve object (ref: Performance Curves) that defines the variation in DX coil heating capacity as a function of inlet fluid (air and water) temperatures. The biquadratic curve uses evaporator inlet air temperature (dry-bulb or wet-bulb temperature based on the field Evaporator Air Temperature Type for Curve Objects defined above) and condenser inlet water temperature as the independent variables. The cubic curve uses evaporator inlet air (dry-bulb or wet-bulb) temperature as the independent variable. The output of this curve is multiplied by the rated heating capacity to give the heating capacity at specific operating conditions (i.e., at temperatures different from the rating point temperatures). The curve should be normalized to have the value of 1.0 at the rating point temperatures. If this field is left blank, the heating capacity remains constant (curve value assumed to be 1.0 for all conditions).
+
+#### Field: Heating Capacity Function of Air Flow Fraction Curve Name
+
+This alpha field specifies the name of a **quadratic** or **cubic** performance curve object (ref: Performance Curves) that defines the variation in DX coil heating capacity as a function of the ratio of actual air flow rate across the evaporator coil to the rated evaporator air flow rate. The output of this curve is multiplied by the rated heating capacity and the heating capacity modifier curve (function of temperature) to give the DX coil heating capacity at the specific inlet fluid temperatures and air flow rate at which the coil is operating. The curve should be normalized to have the value of 1.0 at the rated evaporator air flow rate (air flow fraction of 1.0). If this field is left blank, the heating capacity remains constant (curve value assumed to be 1.0 for all air flow rates).
+
+#### Field: Heating COP Function of Temperature Curve Name
+
+This alpha field specifies the name of a **biquadratic** or **cubic** performance curve object (ref: Performance Curves) that defines the variation in DX coil heating COP as a function of inlet fluid (air and water) temperatures. The biquadratic curve uses evaporator inlet air temperature (dry-bulb or wet-bulb temperature based on the field Evaporator Air Temperature Type for Curve Objects defined above) and condenser inlet water temperature as the independent variables. The cubic curve uses evaporator inlet air (dry-bulb or wet-bulb) temperature as the independent variable. The output of this curve is multiplied by the rated COP to give the heating COP at specific operating conditions (i.e., at temperatures different from the rating point temperatures). The curve should be normalized to have the value of 1.0 at the rating point temperatures. If this field is left blank, the COP remains constant (curve value assumed to be 1.0 for all conditions).
+
+#### Field: Heating COP Function of Air Flow Fraction Curve Name
+
+This alpha field specifies the name of a **quadratic** or **cubic** performance curve object (ref: Performance Curves) that defines the variation in DX coil heating COP as a function of the ratio of actual air flow rate across the evaporator coil to the rated evaporator air flow rate. The output of this curve is multiplied by the rated COP and the heating COP modifier curve (function of temperature) to give the heating COP at the specific inlet fluid temperatures and air flow rate at which the coil is operating. The curve should be normalized to have the value of 1.0 at the rated evaporator air flow rate (air flow fraction of 1.0). If this field is left blank, the heating COP remains constant (curve value assumed to be 1.0 for all air flow rates).
+
+#### Field: Part Load Fraction Correlation Curve Name
+
+This alpha field defines the name of a **quadratic** or **cubic** performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.
+
+The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep). For PLR values between 0 and 1 (0 &lt;= PLR &lt; 1), the following rules apply:
+
+PLF &gt;= 0.7     and     PLF &gt;= PLR
+
+If PLF &lt; 0.7 a warning message is issued, the program resets the PLF value to 0.7, and the simulation proceeds. The runtime fraction of the coil is defined as PLR/PLF. If PLF &lt; PLR, then a warning message is issued and the runtime fraction of the coil is limited to 1.0.
+
+A typical part load fraction correlation for a conventional, single-speed DX cooling coil (e.g., residential unit) would be:
+
+           PLF = 0.85 + 0.15(PLR)
+
+If the user wishes to model no efficiency degradation due to compressor cycling, the part load fraction correlation should be defined as follows:
+
+           PLF = 1.0 + 0.0(PLR)
+
+Following is an example input for the `Coil:WaterHeating:AirToWaterHeatPump:Wrapped` object:
+
+```idf
+Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
+    HPWH Coil,               !- Name
+    2349.6,                  !- Rated Heating Capacity {W}
+    2.4,                     !- Rated COP {W/W}
+    0.981,                   !- Rated Sensible Heat Ratio
+    19.72,                   !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}
+    13.5,                    !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}
+    48.89,                   !- Rated Condenser Water Temperature {C}
+    0.189,                   !- Rated Evaporator Air Flow Rate {m3/s}
+    Yes,                     !- Evaporator Fan Power Included in Rated COP
+    HPWH Air Inlet,          !- Evaporator Air Inlet Node Name
+    HPWH Coil Outlet Fan Inlet,  !- Evaporator Air Outlet Node Name
+    0,                       !- Crankcase Heater Capacity {W}
+    10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
+    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
+    HPWH-Htg-Cap-fT,         !- Heating Capacity Function of Temperature Curve Name
+    ,                        !- Heating Capacity Function of Air Flow Fraction Curve Name
+    HPWH-Htg-COP-fT,         !- Heating COP Function of Temperature Curve Name
+    ,                        !- Heating COP Function of Air Flow Fraction Curve Name
+    HPWH-COP-fPLR;           !- Part Load Fraction Correlation Curve Name
+```
+
+### Coil:WaterHeating:AirToWaterHeatPump:Wrapped Outputs
+
+* HVAC,Average,Cooling Coil Total Cooling Rate [W]
+
+* HVAC,Sum,Cooling Coil Total Cooling Energy [J]
+
+* HVAC,Average,Cooling Coil Sensible Cooling Rate [W]
+
+* HVAC,Sum,Cooling Coil Sensible Cooling Energy [J]
+
+* HVAC,Average,Cooling Coil Latent Cooling Rate [W]
+
+* HVAC,Sum,Cooling Coil Latent Cooling Energy [J]
+
+* HVAC,Average, Cooling Coil Runtime Fraction []
+
+* HVAC,Average,DX Cooling Coil Crankcase Heater Electric Power [W]
+
+* HVAC,Sum, Cooling Coil Crankcase Heater Electric Energy [J]
+
+* HVAC,Average,Cooling Coil Total Water Heating Rate [W]
+
+* HVAC,Sum,Cooling Coil Total Water Heating Energy [J]
+
+* HVAC,Average,Cooling Coil Water Heating Electric Power[W]
+
+* HVAC,Sum,Cooling Coil Water Heating Electric Energy [J]
+
+#### Cooling Coil Total Cooling Rate [W]
+
+This output field is the average total (sensible and latent) cooling rate output of the DX coil in Watts for the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Total Cooling Energy [J]
+
+This output field is the total (sensible plus latent) cooling output of the DX coil in Joules for the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Sensible Cooling Rate [W]
+
+This output field is the average moist air sensible cooling rate output of the DX coil in Watts for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Sensible Cooling Energy [J]
+
+This output field is the moist air sensible cooling output of the DX coil in Joules for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### DX Coil Latent Cooling Rate [W]
+
+This output field is the average latent cooling rate output of the DX coil in Watts for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Latent Cooling Energy [J]
+
+This output field is the latent cooling output of the DX coil in Joules for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Runtime Fraction   []
+
+This output field is the average runtime fraction of the DX coil compressor for the timestep being reported. This also represents the runtime fraction of the condenser water pump.
+
+#### Cooling Coil Crankcase Heater Electric Power[W]
+
+This output field is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. The crankcase heater operates only when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation, otherwise this output variable is set equal to 0.
+
+#### Cooling Coil Crankcase Heater Electric Energy [J]
+
+This output field is the total electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
+
+#### Cooling Coil Total Water Heating Rate [W]
+
+This output field is the average water heating rate output of the DX coil (condenser coil plus condenser water pump) in Watts for the timestep being reported.
+
+#### Cooling Coil Total Water Heating Energy [J]
+
+This output field is the total water heating output of the DX coil (condenser coil plus condenser water pump) in Joules for the timestep being reported.
+
+#### Cooling Coil Water Heating Electric Power[W]
+
+This output field is the average electricity consumption rate of the DX coil compressor in Watts for the timestep being reported.
+
+#### Cooling Coil Water Heating Electric Energy [J]
+
+This output field is the electricity consumption of the DX coil compressor in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
+
+
 ### Coil:Cooling:WaterToAirHeatPump:ParameterEstimation
 
-The **Coil:Cooling:WaterToAirHeatPump:ParameterEstimation** coil is a deterministic model that requires parameters to describe the operating conditions of the heat pump   s components. The parameters are generated from the manufacturer catalog data using multi-variable optimization method. In addition, the cooling coil model can be used for 3 type of compressors: **reciprocating**, **rotary** and **scroll**. Descriptions and strength of each respective model is available in the following references:
+The **Coil:Cooling:WaterToAirHeatPump:ParameterEstimation** coil is a deterministic model that requires parameters to describe the operating conditions of the heat pump's components. The parameters are generated from the manufacturer catalog data using multi-variable optimization method. In addition, the cooling coil model can be used for 3 type of compressors: **reciprocating**, **rotary** and **scroll**. Descriptions and strength of each respective model is available in the following references:
 
 Jin, Hui. 2002. Parameter Estimation Based Models of Water Source Heat Pumps. Phd. Thesis, Department of Mechanical and Aerospace Engineering, Oklahoma State University. (downloadable from [http://www.hvac.okstate.edu/](http://www.hvac.okstate.edu))
 
@@ -10006,7 +10218,7 @@ This field is used to assign the environmental conditions surrounding the TES co
 
 #### Field:   Storage Tank to Ambient U-value Times Area Heat Transfer Coefficient [W/K]
 
-This field is used to characterize the rate at which heat is exchanged between the TES tank and the surrounding ambient conditions, in W/K.   This is an overall    UA    value for the tank where the U-factor and surface area are combined into one coefficient.   Heat loss or gain to the TES tank is modeled using <span>$\dot Q = {\left( {UA} \right)_{Tank}}\left( {{T_{TES}} - {T_{Amb}}} \right)$</span>. This field is required.
+This field is used to characterize the rate at which heat is exchanged between the TES tank and the surrounding ambient conditions, in W/K.   This is an overall    UA    value for the tank where the U-factor and surface area are combined into one coefficient.   Heat loss or gain to the TES tank is modeled using <span>\(\dot Q = {\left( {UA} \right)_{Tank}}\left( {{T_{TES}} - {T_{Amb}}} \right)\)</span>. This field is required.
 
 #### Field:   Fluid Storage Tank Rating Temperature [C]
 
@@ -10376,11 +10588,11 @@ This field is the wetbulb effectiveness for the evaporatively-cooled condenser. 
 
 where
 
-           <span>${T_{cond\;inlet}}$</span>= the temperature of air entering the condenser section, in  &deg;C. This value will be used when evaluating performance curves that depend on the drybulb entering the condenser section.
+           <span>\({T_{cond\;inlet}}\)</span>= the temperature of air entering the condenser section, in  &deg;C. This value will be used when evaluating performance curves that depend on the drybulb entering the condenser section.
 
-           <span>${T_{wb,o}}$</span>= the wetbulb temperature of outdoor air, in  &deg;C
+           <span>\({T_{wb,o}}\)</span>= the wetbulb temperature of outdoor air, in  &deg;C
 
-           <span>${T_{db,o}}$</span>= the drybulb temperature of outdoor air, in  &deg;C.
+           <span>\({T_{db,o}}\)</span>= the drybulb temperature of outdoor air, in  &deg;C.
 
 This field is required if the condenser type is set to EvaporativelyCooled. If the field is left blank then a default of 0.7 is used.
 
@@ -10625,7 +10837,7 @@ These are the power and energy outputs for the TES tank   s heat exchange with t
 
 Secondary Coils reject to or remove heat from a secondary zone as part of a DX system or an air-to-air heat pump. Secondary coil refers to a condenser of a DX system or a heat pump in cooling operating mode or an evaporator of a heat pump in heating mode. The secondary coil (e.g. condenser) of DX system or heat pumps is commonly installed outdoor but when installed inside a zone either heat is dumped to or extracted from a secondary zone. A secondary zone is a conditioned or unconditioned zone where the secondary coil is installed. Secondary coils are not standalone DX coils but they are add-on features on existing DX coil objects. A secondary DX coil is modeled by specifying additional inputs in one of the following DX coil objects: Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:MultiSpeed, and Coil:Heating:DX:MultiSpeed. These additional inputs allow us to model the heat rejected or extracted by the secondary coil while the primary (active) coil is serving another controlled zone as shown in [Figure](#SecondaryCoilsFigure1).  A secondary coil is not controlled directly but responds to the requirements of the primary DX coil. Heat is rejected or extracted depending on the primary DX coil operating modes.  For instance, heat rejected to a secondary zone by a condenser of a DX system or a heat pump is considered as sensible only whereas the energy extracted from a secondary zone may contain sensible and latent components.
 
-![](InputOutputReference/media/image903.png)
+![](media/image903.png)
 
 Figure: Schematic of DX System and heat pump in cooling operating mode <a name="SecondaryCoilsFigure1"></a>
 
@@ -10637,7 +10849,7 @@ Applications of this technology include: inter-zone heat pump in NTED (Dixon, 20
 
 This input field is name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed.  This is an optional input field specified only when user desires to reject the condenser heat into this zone.  The heat rejected is modeled as sensible internal gain of a secondary zone. 
 
-![](InputOutputReference/media/image904.png)
+![](media/image904.png)
 
 Figure: Schematic of DX system and secondary coil in cooling mode <a name="SecondaryCoilsFigure2"></a>
 
@@ -11594,7 +11806,7 @@ The required numeric outlet area of the fan (*A<sub>fan,out</sub>*, m<sup>2</sup
 
 #### Field: Maximum Fan Static Efficiency
 
-The required numeric maximum ratio (<span>$\eta_{fan,max}$</span>) between the power delivered to the air (*H<sub>air</sub>*, W) and the fan shaft input power (*H<sub>fan</sub>*, W). For this parameter, *H<sub>air</sub>* is the volumetric airflow through the fan multiplied by the fan static pressure rise. Maximum fan static efficiency is determined from analyses of manufacturers data using:
+The required numeric maximum ratio (<span>\(\eta_{fan,max}\)</span>) between the power delivered to the air (*H<sub>air</sub>*, W) and the fan shaft input power (*H<sub>fan</sub>*, W). For this parameter, *H<sub>air</sub>* is the volumetric airflow through the fan multiplied by the fan static pressure rise. Maximum fan static efficiency is determined from analyses of manufacturers data using:
 
 <div>\[{\eta_{fan,\max }} = \max \left[ {\frac{{\left( {\Delta {P_{fan}} * {Q_{fan}}} \right)}}{{{H_{fan}}}}} \right]\]</div>
 
@@ -11612,11 +11824,11 @@ where *P<sub>fan</sub>* is fan static pressure rise (Pa; see *Fan Pressure Rise 
 
 #### Field: Maximum Dimensionless Fan Airflow
 
-The required numeric maximum dimensionless airflow (<span>$\psi_{max}$</span>) through the fan, which corresponds to the maximum ratio between the airflow through the fan (*Q<sub>fan</sub>*, m<sup>3</sup>/sec) and the fan shaft rotational speed (<span>$\omega$</span><sub>fan</sub>*, rpm) for the specified fan wheel diameter (*D<sub>fan</sub>*, m). *φ<sub>max</sub>* is determined from manufacturers data using:
+The required numeric maximum dimensionless airflow (<span>\(\psi_{max}\)</span>) through the fan, which corresponds to the maximum ratio between the airflow through the fan (*Q<sub>fan</sub>*, m<sup>3</sup>/sec) and the fan shaft rotational speed (<span>\(\omega\)</span><sub>fan</sub>*, rpm) for the specified fan wheel diameter (*D<sub>fan</sub>*, m). *φ<sub>max</sub>* is determined from manufacturers data using:
 
 <div>\[{\varphi_{\max }} = \frac{{30}}{{\pi D_{fan}^3}}*\max \left( {\frac{{{Q_{fan}}}}{{{\omega_{fan}}}}} \right)\]</div>
 
-<sub>max</sub>* occurs at minimum *Eu*, which corresponds to maximum speed (high flow) with zero pressure rise. The factor (<span>$30/\pi$</span>) converts revolutions per minute (rpm) to rad/s. Must be greater than zero.
+<sub>max</sub>* occurs at minimum *Eu*, which corresponds to maximum speed (high flow) with zero pressure rise. The factor (<span>\(30/\pi\)</span>) converts revolutions per minute (rpm) to rad/s. Must be greater than zero.
 
 #### Field: Motor Fan Pulley Ratio
 
@@ -11626,7 +11838,7 @@ Specified or autosized motor/fan pulley diameter ratio is reported in the .eio f
 
 #### Field: Belt Maximum Torque
 
-The required numeric maximum output torque capacity of the fan drive belt (<span>$\tau_{belt,max}$</span> [N-m]). If specified, must be greater than zero. Can be autosized. Use autosize if no belt (i.e., direct drive).
+The required numeric maximum output torque capacity of the fan drive belt (<span>\(\tau_{belt,max}\)</span> [N-m]). If specified, must be greater than zero. Can be autosized. Use autosize if no belt (i.e., direct drive).
 
 Specified or autosized belt maximum output torque (including effects of scaling by Field: Belt Sizing Factor) is reported in the .eio file as Design Belt Output Torque [N -m]. Also, calculated maximum belt efficiency corresponding to Design Fan Shaft Power, along with belt efficiency at design flow condition (including part-load effects of oversized belt), are reported in the .eio file as, respectively, Maximum Belt Efficiency [-] and Design Belt Efficiency [-].
 
@@ -11684,7 +11896,7 @@ For an ad hoc linear duct static pressure reset scheme, the relation (ref: Curve
 
 <div>\[{P_{sm}} = {P_{sm,\min }} + \left( {{P_{sm,\max }} - {P_{sm,\min }}} \right)*\frac{{\left( {{Q_{fan}} - {Q_{fan,\min }}} \right)}}{{\left( {{Q_{fan,\max }} - {Q_{fan,\min }}} \right)}} = {C_1} + {C_2}*{Q_{fan}}\]</div>
 
-where <span>${C_1} = {P_{sm,\min }} - {C_2}*{Q_{fan,\min }}$</span>  and <span>${C_2} = \frac{{\left( {{P_{sm,\max }} - {P_{sm,\min }}} \right)}}{{\left( {{Q_{fan,\max }} - {Q_{fan,\min }}} \right)}}$</span>
+where <span>\({C_1} = {P_{sm,\min }} - {C_2}*{Q_{fan,\min }}\)</span>  and <span>\({C_2} = \frac{{\left( {{P_{sm,\max }} - {P_{sm,\min }}} \right)}}{{\left( {{Q_{fan,\max }} - {Q_{fan,\min }}} \right)}}\)</span>
 
 
 
@@ -11724,7 +11936,7 @@ The output of this curve is used to calculate the dimensionless airflow *φ* (*x
 
 The alpha name of the quartic polynomial performance curve (ref: Curve:Quartic in Performance Curves) that determines the maximum fan drive belt efficiency in logarithmic space (*-<sub>belt,max,ln</sub>*) as a function of *x<sub>belt,max</sub>*. The curve is:
 
-*<span>${\eta_{belt,\max ,\ln }} = {C_1} + {C_2} \cdot {x_{belt,\max }} + {C_3} \cdot x_{_{belt,\max }}^2 + {C_4} \cdot x_{_{belt,\max }}^3 + {C_5} \cdot x_{_{belt,\max }}^4$</span>*
+*<span>\({\eta_{belt,\max ,\ln }} = {C_1} + {C_2} \cdot {x_{belt,\max }} + {C_3} \cdot x_{_{belt,\max }}^2 + {C_4} \cdot x_{_{belt,\max }}^3 + {C_5} \cdot x_{_{belt,\max }}^4\)</span>*
 
 where *x<sub>belt,max</sub>* *= ln*(*F<sub>belt</sub>\*H<sub>fan,max</sub>*) with *H<sub>fan,max</sub>* expressed in terms of hp.
 
@@ -12470,7 +12682,7 @@ The Dehumidifier:Desiccant:System object in EnergyPlus is a compound object that
 
 It is important to note that the optional exhaust air fan is modeled internal to the Dehumidifier:Desiccant:System and a separate fan object should *not* be added to the input data file (idf) for this fan. On the other hand, a separate fan object *is* required in the input data file for the regeneration air fan.
 
-![DesiccantDehumidifier\_DrawThrough](InputOutputReference/media/image409.png)
+![DesiccantDehumidifier\_DrawThrough](media/image409.png)
 
 Figure 141. Schematic of Dehumidifier:Desiccant:System with Draw Through Regeneration Fan Placement
 
@@ -12484,7 +12696,7 @@ NOTE: As with any air loop compound object, the Dehumidifier:Desiccant:System ob
 
 
 
-![DesiccantDehumidifier\_BlowThrough](InputOutputReference/media/image410.png)
+![DesiccantDehumidifier\_BlowThrough](media/image410.png)
 
 Figure 142. Schematic of Dehumidifier:Desiccant:System with Blow Through Regeneration Fan Placement
 
@@ -12851,7 +13063,7 @@ Example IDF input objects follow.
 ```idf
 EnergyManagementSystem:Program,
    RH_OpeningController ,         ! Name
-   IF ZoneRH < 25,
+   IF ZoneRH &lt; 25,
        SET MyOpenFactor = 0.0 ,
    ELSEIF ZoneRH > 60,
        SET MyOpenFactor = 1.0 ,
@@ -12907,7 +13119,7 @@ EnergyManagementSystem:Subroutine,
 
 EnergyManagementSystem:Subroutine,
    manage_solar_collector,                             !- Name
-   IF Tout_F < 32,                                             !- EnergyPlus Runtime Language
+   IF Tout_F &lt; 32,                                             !- EnergyPlus Runtime Language
        SET pump_pwr = On,
        EXIT,
    ENDIF,
@@ -16894,7 +17106,7 @@ This controller object is used exclusively by the stand alone energy recovery ve
 
 In addition, the outdoor air flow rate may be modified and heat exchange suspended in response to high indoor relative humidities. When the indoor relative humidity exceeds the zone humidistat   s relative humidity set point, high humidity control is activated. When activated, if high humidity control is based on the outdoor air humidity ratio and the outdoor humidity ratio is greater than the indoor humidity ratio, high humidity control is terminated.
 
-![Schematic\_StandAloneERV](InputOutputReference/media/image414.svg)
+![Schematic\_StandAloneERV](media/image414.svg)
 
 Figure 143. Schematic of the ZoneHVAC:EnergyRecoveryVentilator compound object
 
@@ -16988,17 +17200,17 @@ This group of objects describes the properties and configuration for the evapora
 
 The direct stage, shown in the figure below, consists of a rigid media evaporative pad, with water recirculated from a reservoir.   The water is pumped from the reservoir to a water distribution header, for water feed by gravity from above the media.   The evaporative pad provides the area for the adiabatic saturation of the air.   While the process provides a lower dry-bulb temperature, the moisture content of the leaving air is higher than the entering condition.   The direct stage is used for comfort cooling in a building where adding humidity to the air can be tolerated.
 
-![](InputOutputReference/media/image415.svg)
+![](media/image415.svg)
 
 Figure 144.   Direct Stage Evaporative Cooler
 
 The thermodynamic process is a simultaneous heat and mass transfer, or adiabatic cooling, and follows a constant enthalpy line on the psychrometric chart, it is shown in the figure below as a process from A to B.   Since the deviation of the constant wet-bulb line and the constant enthalpy line is small, it is assumed that the wet-bulb temperature is constant across the direct evaporative stage.
 
-![](InputOutputReference/media/image416.svg)
+![](media/image416.svg)
 
 Figure 145.   Psychrometric Chart -- Constant Enthalpy
 
-If the direct evaporative process were 100% efficient, the leaving dry-bulb temperature would equal the entering wet-bulb temperature.   The efficiency of the direct evaporative process is less than 100% and by defining saturation efficiency (<span>$\varepsilon $</span>se) for the direct stage or evaporative pad, the leaving dry-bulb temperature can be expressed by the following equation.
+If the direct evaporative process were 100% efficient, the leaving dry-bulb temperature would equal the entering wet-bulb temperature.   The efficiency of the direct evaporative process is less than 100% and by defining saturation efficiency (<span>\(\varepsilon \)</span>se) for the direct stage or evaporative pad, the leaving dry-bulb temperature can be expressed by the following equation.
 
 <div>\[{T_{db\,supout}} = {T_{db\,sup\,in}} - {\varepsilon_{se}}\cdot \left( {{T_{db\,sup\,in}} - {T_{wb\,sup\,in}}} \right)\]</div>
 
@@ -17246,13 +17458,13 @@ This is the source (mains) of water consumed by the evaporative cooler that coul
 
 The dry coil indirect evaporative cooler, shown in the figure below, has a rigid media pad, similar to the direct evaporative stage, where the adiabatic cooling takes place. The secondary air leaves the rigid media pad and enters an air to air heat exchanger where it cools the supply air flowing through the heat exchanger tubes. The moist secondary air is then exhausted to the environment. The secondary air stream has its own fan and consists of a rigid media evaporative pad, with water recirculated from a reservoir. The water is pumped from the reservoir to a water distribution header, for water feed by gravity from above the media. The evaporative pad provides the area for the adiabatic saturation of the air.
 
-![](InputOutputReference/media/image419.svg)
+![](media/image419.svg)
 
 Figure 146. Evaporative Cooler -- Indirect Dry Coil
 
 The process that the secondary air goes through, A to C to D, is shown by the dashed lines in   the following figure. Process A to C is adiabatic cooling in the rigid media pad. Then the air enters the shell side of the heat exchanger and is sensibly heated from C to D by the warm supply air passing through the tube side. The secondary air inlet is modeled as a separate stream of outdoor air and the user has the option of defining the name of an outdoor air node.
 
-![](InputOutputReference/media/image420.svg)
+![](media/image420.svg)
 
 Figure 147. Secondary Air Process -- Indirect Dry Coil Evap Cooler
 
@@ -17394,13 +17606,13 @@ This is the source (mains) of water consumed by the evaporative cooler that coul
 
 The wetted coil evaporative cooler shown in the figure below, has water sprayed directly on the tubes of the heat exchanger where latent cooling takes place. The vaporization of the water on the outside of the heat exchanger tubes allows the simultaneous heat and mass transfer which removes heat from the supply air on the tube side. Then the moist secondary air is exhausted. The secondary air stream has its own fan.
 
-![](InputOutputReference/media/image421.svg)
+![](media/image421.svg)
 
 Figure 148. Evaporative Cooler     Indirect Wet Coil
 
 The process that the secondary air goes through, A to C on the following figure, is a path of simultaneous heat and mass transfer, but it does not follow a line of constant enthalpy as in the direct stage. The process is not adiabatic due to the heat gain from the supply air flowing through the tubes of the heat exchanger.
 
-![](InputOutputReference/media/image422.svg)
+![](media/image422.svg)
 
 Figure 149. Secondary Air Process     Indirect Wet Coil Evap Cooler
 
@@ -17931,7 +18143,7 @@ This output is the electric consumption of the unit in Joules for the timestep b
 
 ### HeatExchanger:AirToAir:SensibleAndLatent
 
-![](InputOutputReference/media/image423.svg)
+![](media/image423.svg)
 
 The sensible and latent air-to-air heat exchanger is an HVAC component typically used for exhaust or relief air heat recovery (Figure 150). Heat exchanger performance can be specified to transfer sensible energy, latent energy or both between the supply and exhaust air streams. The input requires no geometric data. Performance is defined by specifying sensible and/or latent effectiveness at 75% and 100% of the nominal (rated) supply air flow rate at two operating conditions as shown in Table 30.
 
@@ -18444,7 +18656,7 @@ This output is the average fraction of the reporting timestep when frost control
 
 This desiccant heat exchanger object is an HVAC component used to model both temperature (sensible) and moisture (latent) heat exchange between two air streams (Figure 151). The model assumes balanced air flow through the regeneration and process sides of the heat exchanger (i.e., regeneration and process air volume flow rates and face velocities are the same). Heat exchanger performance is specified through a performance data type object (e.g., HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1).
 
-![BalancedFlowDesiccantHeatExchanger\_Schematic](InputOutputReference/media/image424.png)
+![BalancedFlowDesiccantHeatExchanger\_Schematic](media/image424.png)
 
 Figure 151. Schematic of the Balanced Flow Desiccant Heat Exchanger
 
@@ -18604,17 +18816,17 @@ This model predicts the regeneration air stream outlet temperature and humidity 
 
 where,
 
-<span>$RTO$</span>  = Regeneration outlet air dry-bulb temperature (C)
+<span>\(RTO\)</span>  = Regeneration outlet air dry-bulb temperature (C)
 
-<span>$RWI$</span>  = Regeneration inlet air humidity ratio (kgWater/kgDryAir)
+<span>\(RWI\)</span>  = Regeneration inlet air humidity ratio (kgWater/kgDryAir)
 
-<span>$RTI$</span>    = Regeneration inlet air dry-bulb temperature (C)
+<span>\(RTI\)</span>    = Regeneration inlet air dry-bulb temperature (C)
 
-<span>$PWI$</span>  = Process inlet air humidity ratio (kgWater/kgDryAir)
+<span>\(PWI\)</span>  = Process inlet air humidity ratio (kgWater/kgDryAir)
 
-<span>$PTI$</span>   = Process inlet air dry-bulb temperature (C)
+<span>\(PTI\)</span>   = Process inlet air dry-bulb temperature (C)
 
-<span>$RFV$</span>  = Regeneration (and process) face velocity (m/s)
+<span>\(RFV\)</span>  = Regeneration (and process) face velocity (m/s)
 
 - The humidity ratio of the regeneration outlet air is defined using the same empirical equation form; however, different coefficients are used as follows:
 
@@ -18622,7 +18834,7 @@ where,
 
 where,
 
-<span>$RWO$</span>  = Regeneration outlet air humidity ratio (kgWater/kgDryAir)
+<span>\(RWO\)</span>  = Regeneration outlet air humidity ratio (kgWater/kgDryAir)
 
 - The process outlet air conditions are then calculated based on the regeneration outlet air conditions (temperature or humidity ratio) calculated above, the actual regeneration inlet air conditions entering the heat exchanger, and assuming the same amount of sensible and total energy transfer across both the process and regeneration sides of the heat exchanger. The difference between the actual inlet air conditions and RTI/RWI/PTI/PWI is made here because user-defined limits for RTI/RWI/PTI/PWI may result in a difference between the actual conditions and those used in the equations shown above (see the EnergyPlus Engineering Reference for further discussion).
 
@@ -20224,7 +20436,7 @@ This field indicates the open circuit voltage for a fully discharged battery mod
 
 #### Field: Voltage Change Curve Name for Charging
 
-This field specifies the name of a rectangular hyperbola type 2 performance curve (ref: Curve:RectangularHyperbola2 in Performance Curves) that determines the change of open circuit voltage (<span>$\Delta E$</span>) as a function of the battery state of charge in charging. The change of open circuit voltage is relative to a fully discharged battery.
+This field specifies the name of a rectangular hyperbola type 2 performance curve (ref: Curve:RectangularHyperbola2 in Performance Curves) that determines the change of open circuit voltage (<span>\(\Delta E\)</span>) as a function of the battery state of charge in charging. The change of open circuit voltage is relative to a fully discharged battery.
 
 The curve has the following form:
 
@@ -20234,7 +20446,7 @@ where X is the battery charge divided by the maximum capacity at a given current
 
 #### Field: Voltage Change Curve Name for Discharging
 
-This field specifies the name of a rectangular hyperbola type 2 performance curve (ref: Curve:RectangularHyperbola2 in Performance Curves) that determines the change of open circuit voltage (<span>$\Delta E$</span>) as a function of the battery state of charge in discharging. The change of open circuit voltage is relative to a fully charged battery.
+This field specifies the name of a rectangular hyperbola type 2 performance curve (ref: Curve:RectangularHyperbola2 in Performance Curves) that determines the change of open circuit voltage (<span>\(\Delta E\)</span>) as a function of the battery state of charge in discharging. The change of open circuit voltage is relative to a fully charged battery.
 
 The curve has the following form:
 
@@ -21475,19 +21687,19 @@ This is the maximum temperature of cooling water inlet or outlet that can occur 
 
 #### Field: Electrical Efficiency Curve Name
 
-This is the name of Curve:Triquadratic object that defines the steady-state net electrical efficiency.   The electrical efficiency, <span>${\eta_e}$</span>, is a function of   the cooling water mass flow rate, <span>${\dot m_{cw}}$</span>, the temperature of the cooling water at the inlet, <span>${T_{cw}}$</span>, the steady-state net electrical power produced, <span>${P_{net,ss}}$</span>.
+This is the name of Curve:Triquadratic object that defines the steady-state net electrical efficiency.   The electrical efficiency, <span>\({\eta_e}\)</span>, is a function of   the cooling water mass flow rate, <span>\({\dot m_{cw}}\)</span>, the temperature of the cooling water at the inlet, <span>\({T_{cw}}\)</span>, the steady-state net electrical power produced, <span>\({P_{net,ss}}\)</span>.
 
-           <span>${\eta_e} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)$</span>
+           <span>\({\eta_e} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)\)</span>
 
-The associated Curve:Triquadratic object should be defined with the independent variables <span>${P_{net,ss}},{\dot m_{cw}},{T_{cw}}$</span>  corresponding to *x*, *y*, and *z*, respectively.
+The associated Curve:Triquadratic object should be defined with the independent variables <span>\({P_{net,ss}},{\dot m_{cw}},{T_{cw}}\)</span>  corresponding to *x*, *y*, and *z*, respectively.
 
 #### Field: Thermal Efficiency Curve Name
 
-This is the name of a Curve:Triquadratic object that defines the steady-state net thermal efficiency.   The thermal efficiency, <span>${\eta_q}$</span>, is a function of   the cooling water mass flow rate, <span>${\dot m_{cw}}$</span>, the temperature of the cooling water at the inlet, <span>${T_{cw}}$</span>, the steady-state net electrical power produced, <span>${P_{net,ss}}$</span>.
+This is the name of a Curve:Triquadratic object that defines the steady-state net thermal efficiency.   The thermal efficiency, <span>\({\eta_q}\)</span>, is a function of   the cooling water mass flow rate, <span>\({\dot m_{cw}}\)</span>, the temperature of the cooling water at the inlet, <span>\({T_{cw}}\)</span>, the steady-state net electrical power produced, <span>\({P_{net,ss}}\)</span>.
 
-           <span>${\eta_q} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)$</span>
+           <span>\({\eta_q} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)\)</span>
 
-The associated Curve:Triquadratic object should be defined with the independent variables <span>${P_{net,ss}},{\dot m_{cw}},{T_{cw}}$</span>  corresponding to *x*, *y*, and *z*, respectively.
+The associated Curve:Triquadratic object should be defined with the independent variables <span>\({P_{net,ss}},{\dot m_{cw}},{T_{cw}}\)</span>  corresponding to *x*, *y*, and *z*, respectively.
 
 #### Field: Cooling Water Flow Rate Mode
 
@@ -21497,7 +21709,7 @@ For internal control, the following field is used to define a Biquadratic curve 
 
 #### Field: Cooling Water Flow Rate Curve Name
 
-This field contains the name of a Curve:Biquadratic object that defines the mass flow rate of cooling water, <span>${\dot m_{cw}}$</span>.   This field is only used if the prior field is set to    InternalControl.      The mass flow of cooling water is a function of steady-state power, <span>${P_{net,ss}}$</span>, and the inlet temperature of the cooling water, <span>${T_{cw}}$</span>.   The associated Curve:Biquadratic should be defined with the independent variables <span>${P_{net,ss}}$</span>  and <span>${T_{cw}}$</span>  corresponding to *x* and *y*, respectively.
+This field contains the name of a Curve:Biquadratic object that defines the mass flow rate of cooling water, <span>\({\dot m_{cw}}\)</span>.   This field is only used if the prior field is set to    InternalControl.      The mass flow of cooling water is a function of steady-state power, <span>\({P_{net,ss}}\)</span>, and the inlet temperature of the cooling water, <span>\({T_{cw}}\)</span>.   The associated Curve:Biquadratic should be defined with the independent variables <span>\({P_{net,ss}}\)</span>  and <span>\({T_{cw}}\)</span>  corresponding to *x* and *y*, respectively.
 
 #### Field: Air Flow Rate Curve Name
 
@@ -21547,7 +21759,7 @@ This field describes the value for the coefficient used to determine the rate of
 
 #### Field: Nominal Engine Operating Temperature
 
-This field describes the nominal engine temperature during normal, steady-state operation, <span>${T_{eng,nom}}$</span>  [ &deg;C].
+This field describes the nominal engine temperature during normal, steady-state operation, <span>\({T_{eng,nom}}\)</span>  [ &deg;C].
 
 #### Field: Warm Up Power Coefficient
 
@@ -21786,7 +21998,7 @@ This object is used to model small Fuel Cell (FC) generators. IEA/ECBCS Annex 42
 
 There should be one Generator:FuelCell object for each individual FC generator in the model. Multiple fuel cell generators can be included in a given simulation. Because there are a large number of inputs to the FC model and numerous, somewhat separable subsystems within a fuel cell, the EnergyPlus input objects have been organized into a number of separate input objects. This object simply refers to the names of all the other input objects that provide the input details for individual subsystems within the fuel cell cogeneration device. The following figure diagrams these separate subsystems. (not shown is an optional stack cooler with separate connections to heat recovery water loop and surrounding zone air).
 
-![SOFCSchematic](InputOutputReference/media/image467.png)
+![SOFCSchematic](media/image467.png)
 
 Figure 152. Fuel cell subsystems.
 
@@ -22022,15 +22234,15 @@ This variable provides the temperature of the air supplied to the power module a
 
 #### Generator Air Molar Flow Rate [kmol/s]
 
-This variable provides the results for <span>${\dot N_{air}}$</span>, the flow rate of air into the FC.
+This variable provides the results for <span>\({\dot N_{air}}\)</span>, the flow rate of air into the FC.
 
 #### Generator Power Module Entering Air Enthalpy [W]
 
-This variable provides the results for <span>${\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{air}}$</span>, which is the enthalpy flow in the air stream entering the power module relative to 25 &deg;C.
+This variable provides the results for <span>\({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{air}}\)</span>, which is the enthalpy flow in the air stream entering the power module relative to 25 &deg;C.
 
 #### Generator Blower Electric Power [W]
 
-This variable provides the results for <span>${P_{blower - el}}$</span>, which is the electrical power used by the air supply blower.
+This variable provides the results for <span>\({P_{blower - el}}\)</span>, which is the electrical power used by the air supply blower.
 
 #### Generator Blower Electric Energy [J]
 
@@ -22038,7 +22250,7 @@ This variable provides the results for the energy used by the air supply blower.
 
 #### Generator Blower Skin Heat Loss Rate [W]
 
-This variable provides the results for <span>${q_{blower - heat - loss}}$</span>, which is the rate of energy    lost    to the surroundings.
+This variable provides the results for <span>\({q_{blower - heat - loss}}\)</span>, which is the rate of energy    lost    to the surroundings.
 
 #### Generator Fuel Inlet Temperature [C]
 
@@ -22050,15 +22262,15 @@ This variable provides the temperature of the fuel supplied to the power module 
 
 #### Generator Fuel Molar Flow Rate [kmol/s]
 
-This variable provides the results for <span>${\dot N_{fuel}}$</span>, which is the flow rate of fuel into the FC.
+This variable provides the results for <span>\({\dot N_{fuel}}\)</span>, which is the flow rate of fuel into the FC.
 
 #### Generator Power Module Entering Fuel Enthalpy [W]
 
-This variable provides the results for <span>${\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{fuel}}$</span>, which is the enthalpy flow in the fuel stream entering the power module relative to 25 &deg;C.
+This variable provides the results for <span>\({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{fuel}}\)</span>, which is the enthalpy flow in the fuel stream entering the power module relative to 25 &deg;C.
 
 #### Generator Fuel Compressor Electric Power [W]
 
-This variable provides the results for <span>${P_{comp - el}}$</span>, which is the electrical power used by the fuel supply compressor.
+This variable provides the results for <span>\({P_{comp - el}}\)</span>, which is the electrical power used by the fuel supply compressor.
 
 #### Generator Fuel Compressor Electric Energy [J]
 
@@ -22078,11 +22290,11 @@ This variable provides the temperature of the water supplied to the power module
 
 #### Generator Fuel Reformer Water Molar Flow Rate [kmol/s]
 
-This variable provides the results for <span>${\dot N_{water}}$</span>, which the flow rate of reforming water into the FC.
+This variable provides the results for <span>\({\dot N_{water}}\)</span>, which the flow rate of reforming water into the FC.
 
 #### Generator Fuel Reformer Water Pump Electric Power [W]
 
-This variable provides the results for <span>${P_{pump - el}}$</span>, which is the electrical power used by the water pump.
+This variable provides the results for <span>\({P_{pump - el}}\)</span>, which is the electrical power used by the water pump.
 
 #### Generator Fuel Reformer Water Pump Electric Energy [J]
 
@@ -22090,7 +22302,7 @@ This variable provides the results for energy used by the water pump. It is also
 
 #### Generator Power Module Entering Reforming Water Enthalpy [W]
 
-This variable provides the results for <span>${\dot H_{liq - water}}$</span>  which is the enthalpy flow of the water stream entering the power module relative to 25 &deg;C.
+This variable provides the results for <span>\({\dot H_{liq - water}}\)</span>  which is the enthalpy flow of the water stream entering the power module relative to 25 &deg;C.
 
 #### Generator Product Gas Temperature [C]
 
@@ -22098,7 +22310,7 @@ This variable provides the results for the temperature of the product gas stream
 
 #### Generator Product Gas Enthalpy [W]
 
-This variable provides the results for <span>${\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{FCPM - cg}}$</span>, which is the enthalpy flow in the product gas stream leaving the power module relative to 25 &deg;C.
+This variable provides the results for <span>\({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta_f}\hat h_i^0} \right]} \right)}_{FCPM - cg}}\)</span>, which is the enthalpy flow in the product gas stream leaving the power module relative to 25 &deg;C.
 
 #### Generator Product Gas Molar Flow Rate [kmol/s]
 
@@ -22130,11 +22342,11 @@ This variable provides the results for the power losses associated with ineffici
 
 #### Generator Produced DC Electric Power [W]
 
-This variable provides the results for <span>${P_{el}}$</span>, which is the net DC electrical power produced by the fuel cell power module.
+This variable provides the results for <span>\({P_{el}}\)</span>, which is the net DC electrical power produced by the fuel cell power module.
 
 #### Generator DC Power Efficiency [ ]
 
-This variable provides the results for <span>${\varepsilon_{el}}$</span>, which is the electrical efficiency of the fuel cell power module.
+This variable provides the results for <span>\({\varepsilon_{el}}\)</span>, which is the electrical efficiency of the fuel cell power module.
 
 #### Generator Electric Storage Charge State [J]
 
@@ -22158,7 +22370,7 @@ This variable provides the energy drawn from the fuel cell   s electrical storag
 
 #### Generator Ancillary AC Electric Power [W]
 
-This variable provides the results for <span>${P_{el,ancillaries - AC}}$</span>, which is the rate at which ancillary devices within the power module use electricity supplied to the fuel cell by an external source.
+This variable provides the results for <span>\({P_{el,ancillaries - AC}}\)</span>, which is the rate at which ancillary devices within the power module use electricity supplied to the fuel cell by an external source.
 
 #### Generator Ancillary AC Electric Energy [J]
 
@@ -22198,7 +22410,7 @@ This field is used to choose between different modes of inputting the electrical
 
 #### Field: Efficiency Curve Name
 
-This field contains the name of a Curve:Quadratic input object described elsewhere in the input file. The curve is a function of the net DC electric power, <span>${P_{el}}$</span>  (W), produced by the power module and describes either the electrical efficiency or the how the efficiency is modified depending on the mode selected in the previous field. This quadratic curve is just one part of the entire parametric relation used to describe electrical efficiency <span>${\varepsilon_{el}}$</span>. For the Annex42 mode the full relation for efficiency is,
+This field contains the name of a Curve:Quadratic input object described elsewhere in the input file. The curve is a function of the net DC electric power, <span>\({P_{el}}\)</span>  (W), produced by the power module and describes either the electrical efficiency or the how the efficiency is modified depending on the mode selected in the previous field. This quadratic curve is just one part of the entire parametric relation used to describe electrical efficiency <span>\({\varepsilon_{el}}\)</span>. For the Annex42 mode the full relation for efficiency is,
 
 <div>\[{\varepsilon_{el}} = \left[ {{\varepsilon_0} + {\varepsilon_1} \cdot {P_{el}} + {\varepsilon_2} \cdot P_{el}^2} \right] \cdot \left[ {1 - {N_{stops}} \cdot D} \right] \cdot \left[ {1 - (MAX(\int\limits_{} {dt - {t_{threshold}},0.0))}  \cdot L} \right]\]</div>
 
@@ -22206,35 +22418,35 @@ where the Curve:Quadratic input object named in this field serves to define the 
 
 <div>\[{\varepsilon_{el}} = \left[ {{\varepsilon_0} + {\varepsilon_1} \cdot \frac{{{P_{el}}}}{{{P_{nom}}}} + {\varepsilon_2} \cdot {{\left( {\frac{{{P_{el}}}}{{{P_{nom}}}}} \right)}^2}} \right] \cdot {\varepsilon_{nom}} \cdot \left[ {1 - {N_{stops}} \cdot D} \right] \cdot \left[ {1 - (MAX(\int\limits_0 {dt - {t_{threshold}},0.0))}  \cdot L} \right]\]</div>
 
-where <span>${\varepsilon_{nom}}$</span>  is the nominal electrical efficiency at the rating point <span>${P_{nom}}$</span>  which are described in the next two fields. The Normalized mode may be more useful for a simulation study that needs to vary the capacity of the FC.
+where <span>\({\varepsilon_{nom}}\)</span>  is the nominal electrical efficiency at the rating point <span>\({P_{nom}}\)</span>  which are described in the next two fields. The Normalized mode may be more useful for a simulation study that needs to vary the capacity of the FC.
 
 #### Field: Nominal Efficiency
 
-This field is used for the    Normalized    efficiency curve mode and provides the nominal efficiency <span>${\varepsilon_{nom}}$</span>  (dimensionless) at the rating point. This field can be left blank if using the    Annex42    mode.
+This field is used for the    Normalized    efficiency curve mode and provides the nominal efficiency <span>\({\varepsilon_{nom}}\)</span>  (dimensionless) at the rating point. This field can be left blank if using the    Annex42    mode.
 
 #### Field: Nominal Electrical Power
 
-This field is used for the    Normalized    efficiency curve mode and provides the nominal net DC electrical power produced <span>${P_{nom}}$</span>  (W) at the rating point. This field can be left blank if using the    Annex42    mode.
+This field is used for the    Normalized    efficiency curve mode and provides the nominal net DC electrical power produced <span>\({P_{nom}}\)</span>  (W) at the rating point. This field can be left blank if using the    Annex42    mode.
 
 #### Field: Number of Stops at Start of Simulation
 
-This field is used to describe the number of times the FC has been cycled on and off prior to the start of the simulation. FC products might degrade as a result of starting and stopping the fuel cell stack, so the model includes terms to model the degradation effects of cycling FC units on and off. This is the initial value of the <span>${N_{stops}}$</span>*<sub>  </sub>*term in the efficiency relation above.
+This field is used to describe the number of times the FC has been cycled on and off prior to the start of the simulation. FC products might degrade as a result of starting and stopping the fuel cell stack, so the model includes terms to model the degradation effects of cycling FC units on and off. This is the initial value of the <span>\({N_{stops}}\)</span>*<sub>  </sub>*term in the efficiency relation above.
 
 #### Field: Cycling Performance Degradation Coefficient
 
-This field is used to describe the fixed value representing the fractional performance degradation associated with each start and stop cycle. This is the value of <span>$D$</span>  in the efficiency relations above. If there is no degradation from cycling, then D should be 0.0.
+This field is used to describe the fixed value representing the fractional performance degradation associated with each start and stop cycle. This is the value of <span>\(D\)</span>  in the efficiency relations above. If there is no degradation from cycling, then D should be 0.0.
 
 #### Field: Number of Run Hours at Beginning of Simulation
 
-This field is used to describe the amount of time the FC has been operating prior to the start of the simulation. FC products might degrade over time so the model includes terms to model the degradation effects of FC run time. This is the initial value of the integrated run time term <span>$\int\limits_0 {dt} $</span>.
+This field is used to describe the amount of time the FC has been operating prior to the start of the simulation. FC products might degrade over time so the model includes terms to model the degradation effects of FC run time. This is the initial value of the integrated run time term <span>\(\int\limits_0 {dt} \)</span>.
 
 #### Field: Accumulated Run Time Degradation Coefficient
 
-This field is used to describe the fixed value representing the fractional performance degradation associated with the total amount of run time. This is the value of <span>$L$</span>  in the efficiency relations above. If there is no degradation from run time, the L should be 0.0.
+This field is used to describe the fixed value representing the fractional performance degradation associated with the total amount of run time. This is the value of <span>\(L\)</span>  in the efficiency relations above. If there is no degradation from run time, the L should be 0.0.
 
 #### Field: Run Time Degradation Initiation Time Threshold
 
-This field is used to describe the time period for which there is no degradation associated with the amount of run time. This provides the ability to model a system that initially operates without degradation for some period time before it starts to degrade. This is the value of <span>${t_{threshold}}$</span>  in the efficiency relations above.
+This field is used to describe the time period for which there is no degradation associated with the amount of run time. This provides the ability to model a system that initially operates without degradation for some period time before it starts to degrade. This is the value of <span>\({t_{threshold}}\)</span>  in the efficiency relations above.
 
 #### Field: Power Up Transient Limit
 
@@ -22274,15 +22486,15 @@ This field is used to describe the amount of electricity (J) used by ancillary e
 
 #### Field: Ancillary Electricity Constant Term
 
-This field is used to describe the constant term, <span>$an{c_0}$</span>, in a relation that describes the AC electrical power used by ancillary equipment located inside the power module, <span>${P_{el,ancillaries - AC}}$</span>. The model uses this relation,
+This field is used to describe the constant term, <span>\(an{c_0}\)</span>, in a relation that describes the AC electrical power used by ancillary equipment located inside the power module, <span>\({P_{el,ancillaries - AC}}\)</span>. The model uses this relation,
 
 <div>\[{P_{el,ancillaries - AC}} = an{c_0} + an{c_1} \cdot {\dot N_{fuel}}\]</div>
 
-where <span>${\dot N_{fuel}}$</span>  is the rate of fuel use in the power module (kmol/s).
+where <span>\({\dot N_{fuel}}\)</span>  is the rate of fuel use in the power module (kmol/s).
 
 #### Field: Ancillary Electricity Linear Term
 
-This field is used to describe the linear term, <span>$an{c_1}$</span>, in the relation shown in the previous field.
+This field is used to describe the linear term, <span>\(an{c_1}\)</span>, in the relation shown in the previous field.
 
 #### Field: Skin Loss Calculation Mode
 
@@ -22328,11 +22540,11 @@ This field is used to describe the air node where the dilution air is exhausted 
 
 #### Field: Minimum Operating Point
 
-This field is used to describe the minimum operating point for the net DC electric power, <span>${P_{el}}$</span>  (W).
+This field is used to describe the minimum operating point for the net DC electric power, <span>\({P_{el}}\)</span>  (W).
 
 #### Field: Maximum Operating Point
 
-This field is used to describe the maximum operating point for the net DC electric power, <span>${P_{el}}$</span>  (W).
+This field is used to describe the maximum operating point for the net DC electric power, <span>\({P_{el}}\)</span>  (W).
 
 An example input data file (IDF) entry for this object is provided below:
 
@@ -22391,13 +22603,13 @@ This field contains the node name for the water outlet from the stack cooler.
 
 #### Field: Nominal Stack Temperature
 
-This field contains the nominal stack operating temperature for the PEMFC, <span>$T_{stack}^o$</span>. This field and the next five provide values for use in the empirical equation for the rate of heat extracted from the fuel cell power module by the stack cooler using the following relation
+This field contains the nominal stack operating temperature for the PEMFC, <span>\(T_{stack}^o\)</span>. This field and the next five provide values for use in the empirical equation for the rate of heat extracted from the fuel cell power module by the stack cooler using the following relation
 
 <div>\[{q_{s - cool}} = \left[ {{r_0} + {r_1}\left( {{T_{stack}} - T_{stack}^o} \right)} \right] \cdot \left[ {1 + {r_2}{P_{el}} + {r_3}P_{el}^2} \right]\]</div>
 
 #### Field: Actual Stack Temperature]
 
-This field contains the actual stack operating temperature for the PEMFC, <span>${T_{stack}}$</span>.
+This field contains the actual stack operating temperature for the PEMFC, <span>\({T_{stack}}\)</span>.
 
 #### Field: Coefficient r0
 
@@ -22425,27 +22637,27 @@ This is the heat transfer coefficient between the stack and the coolant.
 
 #### Field: Fs-cogen Adjustment Factor
 
-This field provides the value for an adjustment factor, <span>${F_{s - cogen}}$</span>, used in the following relation for the cogeneration heat transfer coefficient, <span>${\left( {UA} \right)_{s - cogen}}$</span>:
+This field provides the value for an adjustment factor, <span>\({F_{s - cogen}}\)</span>, used in the following relation for the cogeneration heat transfer coefficient, <span>\({\left( {UA} \right)_{s - cogen}}\)</span>:
 
 <div>\[{\left( {UA} \right)_{s - cogen}} = {\left[ {\frac{1}{{{{\left( {hA} \right)}_{s - cogen}}}} + {F_{s - cogen}}} \right]^{ - 1}}\]</div>
 
 #### Field: Stack Cogeneration Exchanger Area
 
-This field provides the value for the cogeneration heat exchanger area, <span>${A_{s - cogen}}$</span>
+This field provides the value for the cogeneration heat exchanger area, <span>\({A_{s - cogen}}\)</span>
 
 #### Field: Stack Cogeneration Exchanger Nominal Flow Rate
 
-This field provides the value for <span>$\dot N_{s - cogen}^0$</span>  in the following relation for the cogeneration heat exchanger convection coefficient, <span>${h_{s - cogen}}$</span>:
+This field provides the value for <span>\(\dot N_{s - cogen}^0\)</span>  in the following relation for the cogeneration heat exchanger convection coefficient, <span>\({h_{s - cogen}}\)</span>:
 
 <div>\[{h_{s - cogen}} = h_{s - cogen}^0 \cdot {\left( {\frac{{{{\dot N}_{s - cogen}}}}{{\dot N_{s - cogen}^0}}} \right)^{{n_s}}}\]</div>
 
 #### Field: Stack Cogeneration Exchanger Nominal Heat Transfer Coefficient
 
-This field provides the value for <span>$h_{s - cogen}^0$</span>  in the relation above for the cogeneration heat exchanger convection coefficient, <span>${h_{s - cogen}}$</span>.
+This field provides the value for <span>\(h_{s - cogen}^0\)</span>  in the relation above for the cogeneration heat exchanger convection coefficient, <span>\({h_{s - cogen}}\)</span>.
 
 #### Field: Stack Cogeneration Exchanger Nominal Heat Transfer Coefficient Exponent
 
-This field provides the value for <span>${n_s}$</span>  is the relation above for the cogeneration heat exchanger convection coefficient, <span>${h_{s - cogen}}$</span>.
+This field provides the value for <span>\({n_s}\)</span>  is the relation above for the cogeneration heat exchanger convection coefficient, <span>\({h_{s - cogen}}\)</span>.
 
 #### Field: Stack Cooler Pump Power
 
@@ -22501,19 +22713,19 @@ This field describes the excess air ratio beyond stoichiometric air supply. This
 
 #### Field: Air Rate Function of Electric Power Curve Name
 
-This field contains the name of a QuadraticCurve input object described elsewhere in the input file. This field is only used if the air supply rate calculation mode is QuadraticFunctionofElectricPower. The quadratic curve named here describes the first part of the relation below used to calculate the rate of inlet air, <span>${\dot N_{air}}$</span>(kmol/s). It is a quadratic function of the net DC electrical power, <span>${P_{el}}$</span>  (W).
+This field contains the name of a QuadraticCurve input object described elsewhere in the input file. This field is only used if the air supply rate calculation mode is QuadraticFunctionofElectricPower. The quadratic curve named here describes the first part of the relation below used to calculate the rate of inlet air, <span>\({\dot N_{air}}\)</span>(kmol/s). It is a quadratic function of the net DC electrical power, <span>\({P_{el}}\)</span>  (W).
 
 <div>\[{a_3}\]</div>
 
 #### Field: Air Rate Air Temperature Coefficient
 
-This field is used to describe the air temperature coefficient, <span>${\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]$</span>, used to adjust inlet air flow rate in the relations for inlet air rate.
+This field is used to describe the air temperature coefficient, <span>\({\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]\)</span>, used to adjust inlet air flow rate in the relations for inlet air rate.
 
 #### Field: Air Rate Function of Fuel Rate Curve Name
 
-This field contains the name of a Curve:Quadratic input object described elsewhere in the input file. This field is only used if the air supply rate calculation mode is QuadraticFunctionofFuelRate. The quadratic curve named here describes the first part of the relation used to calculate the rate of inlet air, <span>${\dot N_{air}}$</span>(kmol/s). It is a quadratic function of the fuel flow rate, <span>${\dot N_{fuel}}$</span>.
+This field contains the name of a Curve:Quadratic input object described elsewhere in the input file. This field is only used if the air supply rate calculation mode is QuadraticFunctionofFuelRate. The quadratic curve named here describes the first part of the relation used to calculate the rate of inlet air, <span>\({\dot N_{air}}\)</span>(kmol/s). It is a quadratic function of the fuel flow rate, <span>\({\dot N_{fuel}}\)</span>.
 
-<span>${\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {P_{el}} + {a_2} \cdot P_{el}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]$</span><span>${\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]$</span>
+<span>\({\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {P_{el}} + {a_2} \cdot P_{el}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]\)</span><span>\({\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]\)</span>
 
 #### Field: Air Intake Heat Recovery Mode
 
@@ -22720,13 +22932,13 @@ This field describes the excess air ratio beyond stoichiometric air supply for t
 
 #### Field: Ancillary Power Constant Term
 
-This field describes the constant term, <span>${x_0}$</span>, used to model the auxiliary burner   s ancillary devices such as fans and ignition controls. The electrical power for ancillaries is calculated using,
+This field describes the constant term, <span>\({x_0}\)</span>, used to model the auxiliary burner   s ancillary devices such as fans and ignition controls. The electrical power for ancillaries is calculated using,
 
 <div>\[{P_{el,aux - ancillaries}} = {x_0} + {x_1} \cdot {\dot N_{aux - fuel}}\]</div>
 
 #### Field: Ancillary Power Linear Term
 
-This field describes the linear term, <span>${x_1}$</span>, used to model the auxiliary burner   s ancillary devices.
+This field describes the linear term, <span>\({x_1}\)</span>, used to model the auxiliary burner   s ancillary devices.
 
 #### Field: Skin Loss U-Factor Times Area Value
 
@@ -22734,7 +22946,7 @@ This field describes the    UA    term (W/K) for calculating skin losses in the 
 
 <div>\[{q_{aux - skin - losses}} = {(UA)_{aux}} \cdot ({T_{aux - mix}} - {T_{room}})\]</div>
 
-where, <span>${T_{aux - mix}}$</span>  is temperature of product gases leaving the auxiliary burner and includes the mixing of the product gases from the fuel cell power module. Thus, the input for UA should reflect this choice of reference temperature rather than an exterior surface temperature of the auxiliary burner.
+where, <span>\({T_{aux - mix}}\)</span>  is temperature of product gases leaving the auxiliary burner and includes the mixing of the product gases from the fuel cell power module. Thus, the input for UA should reflect this choice of reference temperature rather than an exterior surface temperature of the auxiliary burner.
 
 #### Field: Skin Loss Destination
 
@@ -22813,89 +23025,89 @@ This field is used to direct how EnergyPlus will calculate heat exchanger perfor
 
 #### Field: Method 1 Heat Exchanger Effectiveness
 
-This field describes constant heat exchanger effectiveness, <span>${\varepsilon_{HX}}$</span>. This field is only used with the    FixedEffectiveness    mode, which corresponds to    method 1    in the Annex 42 specification. For this mode, the heat exchange between the exhaust gases and the heat recovery water are calculated using,
+This field describes constant heat exchanger effectiveness, <span>\({\varepsilon_{HX}}\)</span>. This field is only used with the    FixedEffectiveness    mode, which corresponds to    method 1    in the Annex 42 specification. For this mode, the heat exchange between the exhaust gases and the heat recovery water are calculated using,
 
 <div>\[{q_{HX}} = {\varepsilon_{HX}} \cdot {\left( {\dot N{{\hat c}_p}} \right)_{\min }} \cdot \left( {{T_{aux - mix}} - {T_{water,in}}} \right)\]</div>
 
-where, <span>${\left( {\dot N{{\hat c}_p}} \right)_{\min }}$</span>is the minimum value of <span>${\left( {\dot N{{\hat c}_p}} \right)_{aux - mix}}$</span>and <span>${\left( {\dot N{{\hat c}_p}} \right)_{water}}$</span>.
+where, <span>\({\left( {\dot N{{\hat c}_p}} \right)_{\min }}\)</span>is the minimum value of <span>\({\left( {\dot N{{\hat c}_p}} \right)_{aux - mix}}\)</span>and <span>\({\left( {\dot N{{\hat c}_p}} \right)_{water}}\)</span>.
 
 #### Field: Method 2 Parameter hxs0
 
-This field describes the value of <span>$h{x_{s,0}}$</span>  in the relation below for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   . This method uses the log mean temperature difference (LMTD) approach to calculate the heat exchange:
+This field describes the value of <span>\(h{x_{s,0}}\)</span>  in the relation below for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   . This method uses the log mean temperature difference (LMTD) approach to calculate the heat exchange:
 
 <div>\[{q_{HX}} = {\left( {UA} \right)_{eff}} \cdot \frac{{\left( {{T_{aux - mix}} - {T_{water,out}}} \right) - \left( {{T_{HX - exh}} - {T_{water,in}}} \right)}}{{\ln \left( {\frac{{{T_{aux - mix}} - {T_{water,out}}}}{{{T_{HX - exh}} - {T_{water,in}}}}} \right)}}\]</div>
 
-The user input in this field, and the next four fields, describe coefficients in an empirical relation for <span>${\left( {UA} \right)_{eff}}$</span>:
+The user input in this field, and the next four fields, describe coefficients in an empirical relation for <span>\({\left( {UA} \right)_{eff}}\)</span>:
 
 <div>\[{\left( {UA} \right)_{eff}} = h{x_{s,0}} + h{x_{s,1}} \cdot {\dot N_{water}} + h{x_{s,2}} \cdot \dot N_{water}^2 + h{x_{s,3}} \cdot {\dot N_{aux - mix}} + h{x_{s,4}} \cdot \dot N_{aux - mix}^2\]</div>
 
 #### Field: Method 2 Parameter hxs1
 
-This field describes the value of <span>$h{x_{s,1}}$</span>  in the relation above for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   .
+This field describes the value of <span>\(h{x_{s,1}}\)</span>  in the relation above for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   .
 
 #### Field: Method 2 Parameter hxs2
 
-This field describes the value of <span>$h{x_{s,2}}$</span>  in the relation above for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   .
+This field describes the value of <span>\(h{x_{s,2}}\)</span>  in the relation above for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   .
 
 #### Field: Method 2 Parameter hxs3
 
-This field describes the value of <span>$h{x_{s,3}}$</span>  in the relation above for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   .
+This field describes the value of <span>\(h{x_{s,3}}\)</span>  in the relation above for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   .
 
 #### Field: Method 2 Parameter hxs4
 
-This field describes the value of <span>$h{x_{s,4}}$</span>  in the relation above for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   .
+This field describes the value of <span>\(h{x_{s,4}}\)</span>  in the relation above for effective UA. This field is used with the    EmpiricalUAeff    mode, which corresponds to    method 2    in the Annex 42 specification and with the    Condensing    mode, which corresponds to    method 4   .
 
 #### Field: Method 3 h0Gas Coefficient
 
-This field describes the value of <span>$h_{gas}^0$</span>  in the relation below. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification. For this mode, the heat exchange is calculated using the LMTD method, but the effective UA is determined using:
+This field describes the value of <span>\(h_{gas}^0\)</span>  in the relation below. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification. For this mode, the heat exchange is calculated using the LMTD method, but the effective UA is determined using:
 
 <div>\[{\left( {UA} \right)_{eff}} = {\left[ {\frac{1}{{{{\left( {hA} \right)}_{gas}}}} + \frac{1}{{{{(hA)}_{water}}}} + {F_{HX}}} \right]^{ - 1}}\]</div>
 
 where,
 
-<span>${F_{HX}}$</span>  is an adjustment factor,
+<span>\({F_{HX}}\)</span>  is an adjustment factor,
 
-<span>${h_{gas}} = h_{gas}^0 \cdot {\left( {\frac{{{{\dot N}_{gas}}}}{{\dot N_{gas}^0}}} \right)^n}$</span>,
+<span>\({h_{gas}} = h_{gas}^0 \cdot {\left( {\frac{{{{\dot N}_{gas}}}}{{\dot N_{gas}^0}}} \right)^n}\)</span>,
 
 <div>\[{h_{water}} = h_{water}^0 \cdot {\left( {\frac{{{{\dot N}_{water}}}}{{\dot N_{water}^0}}} \right)^m}\]</div>
 
 #### Field: Method 3 NdotGasRef Coefficient
 
-This field describes the value of <span>$\dot N_{gas}^0$</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
+This field describes the value of <span>\(\dot N_{gas}^0\)</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
 
 #### Field: Method 3 n Coefficient
 
-This field describes the value of <span>$n$</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
+This field describes the value of <span>\(n\)</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
 
 
 
 #### Field: Method 3 Gas Area
 
-This field describes the value of <span>${A_{gas}}$</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
+This field describes the value of <span>\({A_{gas}}\)</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
 
 #### Field: Method 3 h0 Water Coefficient
 
-This field describes the value of <span>$h_{water}^0$</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
+This field describes the value of <span>\(h_{water}^0\)</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
 
 #### Field: Method 3 N dot Water ref Coefficient
 
-This field describes the value of <span>$\dot N_{water}^0$</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
+This field describes the value of <span>\(\dot N_{water}^0\)</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
 
 #### Field: Method 3 m Coefficient
 
-This field describes the value of <span>$m$</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
+This field describes the value of <span>\(m\)</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
 
 #### Field: Method 3 Area Water Coefficient
 
-This field describes the value of <span>${A_{water}}$</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
+This field describes the value of <span>\({A_{water}}\)</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
 
 #### Field: Method 3 F Adjustment Factor
 
-This field describes the value of <span>${F_{HX}}$</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
+This field describes the value of <span>\({F_{HX}}\)</span>  in the relation above. This field is only used with the    FundementalUAeff    mode, which corresponds to    method 3    in the Annex 42 specification.
 
 #### Field: Method 4 hxl1 Coefficient
 
-This field describes the value of <span>$h{x_{l,1}}$</span>  in the relation below for the rate of condensation of water from the gas stream, <span>${\dot N_{{H_2}O - cond}}$</span>. This field is only used with the    Condensing    mode, which corresponds to    method 4    in the Annex 42 specification. This method uses a modified version of the LMTD approach to calculate heat exchange:
+This field describes the value of <span>\(h{x_{l,1}}\)</span>  in the relation below for the rate of condensation of water from the gas stream, <span>\({\dot N_{{H_2}O - cond}}\)</span>. This field is only used with the    Condensing    mode, which corresponds to    method 4    in the Annex 42 specification. This method uses a modified version of the LMTD approach to calculate heat exchange:
 
 <div>\[{q_{HX}} = {\left( {UA} \right)_{eff}} \cdot \frac{{\left( {{T_{aux - mix}} - {T_{water,out}}} \right) - \left( {{T_{HX - exh}} - {T_{water,in}}} \right)}}{{\ln \left( {\frac{{{T_{aux - mix}} - {T_{water,out}}}}{{{T_{HX - exh}} - {T_{water,in}}}}} \right)}} + {\dot N_{{H_2}O - cond}} \cdot {\hat h_{fg}}\]</div>
 
@@ -22905,13 +23117,13 @@ where,
 
 #### Field: Method 4 hxl2 Coefficient
 
-This field describes the value of <span>$h{x_{l,2}}$</span>  in the relation above for the rate of condensation of water from the gas stream, <span>${\dot N_{{H_2}O - cond}}$</span>. This field is only used with the    Condensing    mode, which corresponds to    method 4    in the Annex 42 specification.
+This field describes the value of <span>\(h{x_{l,2}}\)</span>  in the relation above for the rate of condensation of water from the gas stream, <span>\({\dot N_{{H_2}O - cond}}\)</span>. This field is only used with the    Condensing    mode, which corresponds to    method 4    in the Annex 42 specification.
 
 
 
 #### Field: Method 4 Condensation Threshold
 
-This field describes the value of <span>${T_{cond - threshold}}$</span>  in the relation above for the rate of condensation of water from the gas stream, <span>${\dot N_{{H_2}O - cond}}$</span>. This field is only used with the    Condensing    mode, which corresponds to    method 4    in the Annex 42 specification.
+This field describes the value of <span>\({T_{cond - threshold}}\)</span>  in the relation above for the rate of condensation of water from the gas stream, <span>\({\dot N_{{H_2}O - cond}}\)</span>. This field is only used with the    Condensing    mode, which corresponds to    method 4    in the Annex 42 specification.
 
 
 
@@ -22963,7 +23175,7 @@ This field is used to direct how EnergyPlus will model electrical storage. The o
 
 #### Field: Nominal Charging Energetic Efficiency
 
-This field describes the value of <span>${\varepsilon_{charge}}$</span>  in the relation for the State of Charge, <span>$Q_{battery}^{t + \Delta t}$</span>:
+This field describes the value of <span>\({\varepsilon_{charge}}\)</span>  in the relation for the State of Charge, <span>\(Q_{battery}^{t + \Delta t}\)</span>:
 
 <div>\[Q_{battery}^{t + \Delta t} = Q_{battery}^t + {P_{battery - charge}} \cdot {\varepsilon_{charge}} \cdot \Delta t\]</div>
 
@@ -22971,7 +23183,7 @@ This is the energetic efficiency of charging the storage device. A value of 1.0 
 
 #### Field: Nominal Discharging Energetic Efficiency
 
-This field describes the value of <span>${\varepsilon_{discharge}}$</span>  in the relation for the State of Charge, <span>$Q_{battery}^{t + \Delta t}$</span>:
+This field describes the value of <span>\({\varepsilon_{discharge}}\)</span>  in the relation for the State of Charge, <span>\(Q_{battery}^{t + \Delta t}\)</span>:
 
 <div>\[Q_{battery}^{t + \Delta t} = Q_{battery}^t + \frac{{{P_{battery - discharge}} \cdot \Delta t}}{{{\varepsilon_{discharge}}}}\]</div>
 
@@ -24044,15 +24256,15 @@ with
 
 where
 
-<span>$C_p$</span> = power coefficient
+<span>\(C_p\)</span> = power coefficient
 
-<span>$C_{1-6}$</span> = empirical power coefficient parameters
+<span>\(C_{1-6}\)</span> = empirical power coefficient parameters
 
-<span>$\lambda$</span> = tip speed ratio (often known as TSR)
+<span>\(\lambda\)</span> = tip speed ratio (often known as TSR)
 
-<span>$\lambda_i$</span> = tip speed ratio at ith time step
+<span>\(\lambda_i\)</span> = tip speed ratio at ith time step
 
-<span>$\theta$</span> = azimuth angle of the pitch, 0 [degree]
+<span>\(\theta\)</span> = azimuth angle of the pitch, 0 [degree]
 
 
 
@@ -24521,7 +24733,7 @@ The WaterUse:Connections object can be thought of as a subsystem that groups tog
 
 - Internal connections to simulate drainwater heat recovery.
 
-![Water Use Connections IO Diagram](InputOutputReference/media/image579.png)
+![Water Use Connections IO Diagram](media/image579.png)
 
 Figure 153. Diagram of internal connections for WaterUse:Connections
 
@@ -26411,22 +26623,22 @@ This curve is a function of two independent variables. Input consists of the cur
 A user assigned unique name for an instance of a quadratic-linear curve. When a curve is used, it is referenced by this name.
 
 #### Field: Coefficient1 Constant
-The constant coefficient (<span>$C_1$</span>) in the equation.
+The constant coefficient (<span>\(C_1\)</span>) in the equation.
 
 #### Field: Coefficient2 x
-The coefficient <span>$C_2</span> in the equation.
+The coefficient <span>\(C_2</span> in the equation.
 
 #### Field: Coefficient3 x**2
-The coefficient <span>$C_3</span> in the equation.
+The coefficient <span>\(C_3</span> in the equation.
 
 #### Field: Coefficient4 x**3
-The coefficient <span>$C_4</span> in the equation.
+The coefficient <span>\(C_4</span> in the equation.
 
 #### Field: Coefficient5 y
-The coefficient <span>$C_5</span> in the equation.
+The coefficient <span>\(C_5</span> in the equation.
 
 #### Field: Coefficient6 x*y
-The coefficient <span>$C_6</span> in the equation.
+The coefficient <span>\(C_6</span> in the equation.
 
 #### Field: Minimum Value of x
 The minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum.
@@ -27002,7 +27214,7 @@ Input for the fan total pressure rise curve consists of the curve name, the four
 
 <div>\[\Delta {P_{fan,tot}} = {C_1}*Q_{fan}^2 + {C_2}*Q_{fan}^{} + {C_3}*Q_{fan}^{}*\sqrt {{P_{sm}} - {P_o}}  + {C_4}*\left( {{P_{sm}} - {P_o}} \right)\]</div>
 
-where <span>$\Delta P_{fan,tot}$</span> is the fan total pressure rise (Pa) as a function of volumetric flow through the fan (<span>$Q_{fan}, m^3/s$</span>), duct static pressure set point (<span>$P_{sm}$</span>, Pa), and static pressure surrounding the ducts (<span>$P_o$</span>, Pa). <span>$P_o$</span> is assumed to be zero.
+where <span>\(\Delta P_{fan,tot}\)</span> is the fan total pressure rise (Pa) as a function of volumetric flow through the fan (<span>\(Q_{fan}, m^3/s\)</span>), duct static pressure set point (<span>\(P_{sm}\)</span>, Pa), and static pressure surrounding the ducts (<span>\(P_o\)</span>, Pa). <span>\(P_o\)</span> is assumed to be zero.
 
 The first term of the curve looks like the common system curve in which the fan pressure rise is proportional to the square of the fan flow, but here it also depends implicitly on supply and return pressure losses, and in part on the fraction of the fan flow that is outdoor air (essentially "leaks" into and out of the return side of the system). Very often it is the only term considered, but that would only be correct with fixed-position dampers, no distribution system leakage, no linear resistance components, and no duct static pressure control.
 

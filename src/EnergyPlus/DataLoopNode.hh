@@ -308,6 +308,11 @@ namespace DataLoopNode {
 	extern Array1D< MoreNodeData > MoreNodeInfo;
 	extern Array1D< MarkedNodeData > MarkedNode;
 
+	// Clears the global data in DataLoopNode.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 } // DataLoopNode
 
 } // EnergyPlus

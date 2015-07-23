@@ -53,7 +53,6 @@ namespace WaterThermalTanks {
 	// integer parameter for water heater
 	extern int const MixedWaterHeater; // WaterHeater:Mixed
 	extern int const StratifiedWaterHeater; // WaterHeater:Stratified
-	extern int const HeatPumpWaterHeater; // WaterHeater:HeatPump
 	//stovall, next line never used because all desuperheater coils used in mixed water heater types
 	extern int const CoilWaterDesuperHeater; // Coil:WaterHeating:Desuperheater
 	extern int const MixedChilledWaterStorage; // 'ThermalStorage:ChilledWater:Mixed'
@@ -145,6 +144,7 @@ namespace WaterThermalTanks {
 		Real64 MaxCapacity; // For reporting
 		int Inlets;
 		int Outlets;
+		Real64 HPWHWrappedCondenserHeatingFrac; // fraction of the heat from a wrapped condenser that enters into this node, should add up to 1.
 
 		// Default Constructor
 		StratifiedNodeData() :
@@ -170,7 +170,8 @@ namespace WaterThermalTanks {
 			Height( 0.0 ),
 			MaxCapacity( 0.0 ),
 			Inlets( 0 ),
-			Outlets( 0 )
+			Outlets( 0 ),
+			HPWHWrappedCondenserHeatingFrac(0.0)
 		{}
 
 		// Member Constructor
@@ -197,7 +198,8 @@ namespace WaterThermalTanks {
 			Real64 const Height, // Node height from top to bottom (like a thickness)
 			Real64 const MaxCapacity, // For reporting
 			int const Inlets,
-			int const Outlets
+			int const Outlets,
+			Real64 const HPWHWrappedCondenserHeatingFrac
 		) :
 			Mass( Mass ),
 			OnCycLossCoeff( OnCycLossCoeff ),
@@ -221,7 +223,8 @@ namespace WaterThermalTanks {
 			Height( Height ),
 			MaxCapacity( MaxCapacity ),
 			Inlets( Inlets ),
-			Outlets( Outlets )
+			Outlets( Outlets ),
+			HPWHWrappedCondenserHeatingFrac( HPWHWrappedCondenserHeatingFrac )
 		{}
 
 	};
@@ -731,6 +734,7 @@ namespace WaterThermalTanks {
 		std::string DXCoilType; // Type of DX coil (Coil:DX:HeatPumpWaterHeater)
 		std::string DXCoilName; // Name of DX coil
 		int DXCoilNum; // Index of DX coil
+		int DXCoilTypeNum; // Type Number of DX coil
 		int DXCoilAirInletNode; // Inlet air node number of DX coil
 		int DXCoilPLFFPLR; // Index to HPWH's DX Coil PLF as a function of PLR curve
 		std::string FanType; // Type of Fan (Fan:OnOff)
@@ -750,6 +754,7 @@ namespace WaterThermalTanks {
 		Real64 HeatingPLR; // HP PLR used for reporting
 		Real64 SetPointTemp; // set point or cut-out temperature [C]
 		Real64 MinAirTempForHPOperation; // HP does not operate below this ambient temperature
+		Real64 MaxAirTempForHPOperation; // HP does not operate above this ambient temperature
 		int InletAirMixerNode; // Inlet air mixer node number of HP water heater
 		int OutletAirSplitterNode; // Outlet air splitter node number of HP water heater
 		Real64 SourceMassFlowRate; // Maximum mass flow rate on the source side (kg/s)
@@ -783,7 +788,15 @@ namespace WaterThermalTanks {
 		bool ShowSetPointWarning; // Warn when set point is greater than max tank temp limit
 		Real64 HPWaterHeaterSensibleCapacity; // sensible capacity delivered when HPWH is attached to a zone (W)
 		Real64 HPWaterHeaterLatentCapacity; // latent capacity delivered when HPWH is attached to a zone (kg/s)
-		int ControlSensorLocation; // if using stratified tank, indicates control point
+		Real64 WrappedCondenserBottomLocation; // Location of the bottom of the wrapped condenser.
+		Real64 WrappedCondenserTopLocation; // Location of the top of the wrapped condenser.
+		Real64 ControlSensor1Height; // location from bottom of tank of control sensor 1
+		int ControlSensor1Node; // Node number of control sensor 1
+		Real64 ControlSensor1Weight; // weight of control sensor 1
+		Real64 ControlSensor2Height; // location from bottom of tank of control sensor 2
+		int ControlSensor2Node; // Node number of control sensor 2
+		Real64 ControlSensor2Weight; // weight of control sensor 2
+		bool AllowHeatingElementAndHeatPumpToRunAtSameTime; // if false, if the heating element kicks on, it will recover with that before turning the heat pump back on.
 		//variables for variable-speed HPWH
 		int NumofSpeed; //number of speeds for VS HPWH
 		Array1D< Real64 > HPWHAirVolFlowRate; // air volume flow rate during heating operation
@@ -828,6 +841,7 @@ namespace WaterThermalTanks {
 			WHUseOutletNode( 0 ),
 			WHUseSidePlantLoopNum( 0 ),
 			DXCoilNum( 0 ),
+			DXCoilTypeNum( 0 ),
 			DXCoilAirInletNode( 0 ),
 			DXCoilPLFFPLR( 0 ),
 			FanType_Num( 0 ),
@@ -845,6 +859,7 @@ namespace WaterThermalTanks {
 			HeatingPLR( 0.0 ),
 			SetPointTemp( 0.0 ),
 			MinAirTempForHPOperation( 5.0 ),
+			MaxAirTempForHPOperation( 48.8888888889 ),
 			InletAirMixerNode( 0 ),
 			OutletAirSplitterNode( 0 ),
 			SourceMassFlowRate( 0.0 ),
@@ -878,7 +893,15 @@ namespace WaterThermalTanks {
 			ShowSetPointWarning( true ),
 			HPWaterHeaterSensibleCapacity( 0.0 ),
 			HPWaterHeaterLatentCapacity( 0.0 ),
-			ControlSensorLocation( HPWHControlNotSet ),
+			WrappedCondenserBottomLocation( 0.0 ),
+			WrappedCondenserTopLocation( 0.0 ),
+			ControlSensor1Height( -1.0 ),
+			ControlSensor1Node( 1 ),
+			ControlSensor1Weight( 1.0 ),
+			ControlSensor2Height( -1.0 ),
+			ControlSensor2Node( 2 ),
+			ControlSensor2Weight( 0.0 ),
+			AllowHeatingElementAndHeatPumpToRunAtSameTime( true ),
 			NumofSpeed( 0 ),
 			HPWHAirVolFlowRate( MaxSpedLevels, 0.0 ),
 			HPWHAirMassFlowRate( MaxSpedLevels, 0.0 ),
@@ -928,6 +951,7 @@ namespace WaterThermalTanks {
 			std::string const & DXCoilType, // Type of DX coil (Coil:DX:HeatPumpWaterHeater)
 			std::string const & DXCoilName, // Name of DX coil
 			int const DXCoilNum, // Index of DX coil
+			int const DXCoilTypeNum, // DX Coil type number
 			int const DXCoilAirInletNode, // Inlet air node number of DX coil
 			int const DXCoilPLFFPLR, // Index to HPWH's DX Coil PLF as a function of PLR curve
 			std::string const & FanType, // Type of Fan (Fan:OnOff)
@@ -947,6 +971,7 @@ namespace WaterThermalTanks {
 			Real64 const HeatingPLR, // HP PLR used for reporting
 			Real64 const SetPointTemp, // set point or cut-out temperature [C]
 			Real64 const MinAirTempForHPOperation, // HP does not operate below this ambient temperature
+			Real64 const MaxAirTempForHPOperation, // HP does not operate above this ambient temperature
 			int const InletAirMixerNode, // Inlet air mixer node number of HP water heater
 			int const OutletAirSplitterNode, // Outlet air splitter node number of HP water heater
 			Real64 const SourceMassFlowRate, // Maximum mass flow rate on the source side (kg/s)
@@ -980,7 +1005,15 @@ namespace WaterThermalTanks {
 			bool const ShowSetPointWarning, // Warn when set point is greater than max tank temp limit
 			Real64 const HPWaterHeaterSensibleCapacity, // sensible capacity delivered when HPWH is attached to a zone (W)
 			Real64 const HPWaterHeaterLatentCapacity, // latent capacity delivered when HPWH is attached to a zone (kg/s)
-			int const ControlSensorLocation, // if using stratified tank, indicates control point
+			Real64 WrappedCondenserBottomLocation,
+			Real64 WrappedCondenserTopLocation,
+			Real64 ControlSensor1Height, // location from bottom of tank of control sensor 1
+			int ControlSensor1Node,
+			Real64 ControlSensor1Weight, // weight of control sensor 1
+			Real64 ControlSensor2Height, // location from bottom of tank of control sensor 2
+			int ControlSensor2Node,
+			Real64 ControlSensor2Weight, // weight of control sensor 2
+			bool AllowHeatingElementAndHeatPumpToRunAtSameTime,
 			int const NumofSpeed,
 			Array1< Real64 > const & HPWHAirVolFlowRate,
 			Array1< Real64 > const & HPWHAirMassFlowRate,
@@ -1027,6 +1060,7 @@ namespace WaterThermalTanks {
 			DXCoilType( DXCoilType ),
 			DXCoilName( DXCoilName ),
 			DXCoilNum( DXCoilNum ),
+			DXCoilTypeNum( DXCoilTypeNum ),
 			DXCoilAirInletNode( DXCoilAirInletNode ),
 			DXCoilPLFFPLR( DXCoilPLFFPLR ),
 			FanType( FanType ),
@@ -1046,6 +1080,7 @@ namespace WaterThermalTanks {
 			HeatingPLR( HeatingPLR ),
 			SetPointTemp( SetPointTemp ),
 			MinAirTempForHPOperation( MinAirTempForHPOperation ),
+			MaxAirTempForHPOperation( MaxAirTempForHPOperation ),
 			InletAirMixerNode( InletAirMixerNode ),
 			OutletAirSplitterNode( OutletAirSplitterNode ),
 			SourceMassFlowRate( SourceMassFlowRate ),
@@ -1079,7 +1114,15 @@ namespace WaterThermalTanks {
 			ShowSetPointWarning( ShowSetPointWarning ),
 			HPWaterHeaterSensibleCapacity( HPWaterHeaterSensibleCapacity ),
 			HPWaterHeaterLatentCapacity( HPWaterHeaterLatentCapacity ),
-			ControlSensorLocation( ControlSensorLocation ),
+			WrappedCondenserBottomLocation( WrappedCondenserBottomLocation ),
+			WrappedCondenserTopLocation( WrappedCondenserTopLocation ),
+			ControlSensor1Height( ControlSensor1Height ),
+			ControlSensor1Node( ControlSensor1Node ),
+			ControlSensor1Weight( ControlSensor1Weight ),
+			ControlSensor2Height( ControlSensor2Height ),
+			ControlSensor2Node( ControlSensor2Node ),
+			ControlSensor2Weight( ControlSensor2Weight ),
+			AllowHeatingElementAndHeatPumpToRunAtSameTime( AllowHeatingElementAndHeatPumpToRunAtSameTime ),
 			NumofSpeed( NumofSpeed ),
 			HPWHAirVolFlowRate( MaxSpedLevels, HPWHAirVolFlowRate ),
 			HPWHAirMassFlowRate( MaxSpedLevels, HPWHAirMassFlowRate ),
@@ -1448,15 +1491,18 @@ namespace WaterThermalTanks {
 	);
 
 	void
-	CalcWaterThermalTankStratified( int const WaterThermalTankNum ); // Water Heater being simulated
+	CalcWaterThermalTankStratified(
+		int const WaterThermalTankNum, // Water Heater being simulated
+		Real64 const HeatPumpPartLoadRatio = 1.0 // Optional heat pump part load ratio for heat pump water heaters
+	);
 
 	Real64
 	CalcStratifiedTankSourceSideHeatTransferRate(
-		Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if there is no heat pump or if the heat pump is off
+		Real64 Qheatpump, // input, the heat rate from the heat pump (W), zero if there is no heat pump or if the heat pump is off
 		Real64 SourceInletTemp, // input, Source inlet temperature (C)
 		Real64 Cp, // Specific heat of fluid (J/kg deltaC)
 		Real64 SourceMassFlowRate, // source mass flow rate (kg/s)
-		Real64 NodeTemp // temperature of the source inlet node (C)
+		const StratifiedNodeData & StratNode // The stratified node at the source inlet
 	);
 
 	void
@@ -1544,10 +1590,7 @@ namespace WaterThermalTanks {
 	ReportCWTankInits( int const WaterThermalTankNum );
 
 	Real64
-	FindStratifiedTankSensedTemp(
-		int const WaterThermalTankNum,
-		int const ControlLocationType
-	);
+	FindStratifiedTankSensedTemp( WaterThermalTankData const & Tank );
 
 	void
 	SetVSHPWHFlowRates(
@@ -1562,7 +1605,7 @@ namespace WaterThermalTanks {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
