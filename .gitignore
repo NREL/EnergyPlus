@@ -12,7 +12,6 @@
 *.obj
 *.orig
 *.pdb
-*.rc
 *.res
 *.so
 *.so.*
