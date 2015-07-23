@@ -292,7 +292,6 @@ namespace DaylightingManager {
 		int const IConst, // Construction counter
 		Real64 const AZVIEW, // Azimuth of view vector in absolute coord system for glare calculation (radians)
 		Vector3< Real64 > const & RREF2, // Location of virtual reference point in absolute coordinate system
-		int const loopwin,
 		int const IHitIntObs, // = 1 if interior obstruction hit, = 0 otherwise
 		int const IHitExtObs, // 1 if ray from ref pt to ext win hits an exterior obstruction
 		int const CalledFrom, // indicate  which type of routine called this routine
