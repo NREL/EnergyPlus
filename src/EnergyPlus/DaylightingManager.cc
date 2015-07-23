@@ -3156,7 +3156,7 @@ namespace DaylightingManager {
 			DayltgDirectIllumComplexFenestration( IWin, WinEl, iHour, ZoneNum, iRefPoint, CalledFrom, MapNum );
 			// Call direct sun component only once since calculation is done for entire window
 			if ( WinEl == ( NWX * NWY ) ) {
-				DayltgDirectSunDiskComplexFenestration( IWin2, ZoneNum, iHour, loopwin, iRefPoint, WinEl, AZVIEW, CalledFrom, MapNum, MapWindowSolidAngAtRefPtWtd );
+				DayltgDirectSunDiskComplexFenestration( IWin2, ZoneNum, iHour, iRefPoint, WinEl, AZVIEW, CalledFrom, MapNum, MapWindowSolidAngAtRefPtWtd );
 			}
 			return;
 		}
@@ -8135,7 +8135,6 @@ namespace DaylightingManager {
 		int const iWin, // Window index
 		int const EP_UNUSED( ZoneNum ), // Zone number
 		int const iHour, // Hour of day
-		int const LoopWin,
 		int const iRefPoint,
 		int const NumEl, // Total number of window elements
 		Real64 const AZVIEW, // Azimuth of view vector in absolute coord system for

@@ -462,7 +462,6 @@ namespace DaylightingManager {
 		int const iWin, // Window index
 		int const ZoneNum, // Zone number
 		int const iHour, // Hour of day
-		int const LoopWin,
 		int const iRefPoint,
 		int const NumEl, // Total number of window elements
 		Real64 const AZVIEW, // Azimuth of view vector in absolute coord system for
