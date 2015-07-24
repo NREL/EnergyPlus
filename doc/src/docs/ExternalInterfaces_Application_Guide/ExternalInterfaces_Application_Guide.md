@@ -1,4 +1,4 @@
-![](ExternalInterfaces_Application_Guide/media/ep.gif)
+![](media/ep.gif)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
@@ -41,9 +41,9 @@ Coupling EnergyPlus with the Building Controls Virtual Test Bed
 
 The process in which at least two simulators solve initial-value differential equations that are coupled to each other is called co-simulation. Various algorithms are possible for the data exchange. In the BCVTB, data are exchanged between its client programs, including EnergyPlus, using a fixed synchronization time step. There is no iteration between the clients. In the co-simulation literature, this coupling scheme is referred to as *quasi-dynamic coupling*, *loose coupling* or *ping-pong coupling* (Hensen 1999, Zhai and Chen 2005).
 
-The algorithm for exchanging data is as follows: Suppose we have a system with two clients, with client 1 being EnergyPlus and client 2 being, for example, the Simulink program from Mathworks. Suppose each client solves an initial-value ordinary differential equation that is coupled to the differential equation of the other client. Let <span>$N\in\mathbf{N}$</span> denote the number of time steps and let <span>$k\in\left\\{1,...,N\right\\}$</span> denote the time steps. We will use the subscripts *1* and *2* to denote the state variable and the function that computes the next state variable of the simulator *1* and *2*, respectively.
+The algorithm for exchanging data is as follows: Suppose we have a system with two clients, with client 1 being EnergyPlus and client 2 being, for example, the Simulink program from Mathworks. Suppose each client solves an initial-value ordinary differential equation that is coupled to the differential equation of the other client. Let <span>\(N\in\mathbf{N}\)</span> denote the number of time steps and let <span>\(k\in\left\\{1,...,N\right\\}\)</span> denote the time steps. We will use the subscripts *1* and *2* to denote the state variable and the function that computes the next state variable of the simulator *1* and *2*, respectively.
 
-The simulator *1* computes, for <span>$k\in\left\\{1,...,N-1\right\\}$</span> the sequence
+The simulator *1* computes, for <span>\(k\in\left\\{1,...,N-1\right\\}\)</span> the sequence
 
 *x<sub>1</sub>(k+1) = f<sub>1</sub>(x<sub>1</sub>(k), x<sub>2</sub>(k))*
 
@@ -66,7 +66,7 @@ on the time interval *t* *∈ [0, 1]*, the following sequence:
 <table class="table table-striped">
 <tr>
 <td>Step 0:</td>
-<td>Initialize counter k=0 and number of steps <span>$N\in\mathbf{N}$</span>.</td>
+<td>Initialize counter k=0 and number of steps <span>\(N\in\mathbf{N}\)</span>.</td>
 </tr>
 <tr>
 <td> </td>
@@ -91,7 +91,7 @@ In the situation where the differential equation is solved using co-simulation, 
 <table class="table table-striped">
 <tr>
 <td>Step 0:</td>
-<td>Initialize counter k=0 and number of steps <span>$N\in\mathbf{N}$</span>.</td>
+<td>Initialize counter k=0 and number of steps <span>\(N\in\mathbf{N}\)</span>.</td>
 </tr>
 <tr>
 <td> </td>
@@ -122,7 +122,7 @@ BCVTB Examples
 
 The figure below shows the architecture of the connection between EnergyPlus and the BCVTB. The black objects are explained in this application guide, whereas the grey items are not specific to EnergyPlus and are explained in the BCVTB documentation. The BCVTB connects to the external interface in EnergyPlus. In the external interface, the input/output signals that are exchanged between the BCVTB and EnergyPlus are mapped to EnergyPlus objects. The subject of this External Interface Application Guide is how to configure this mapping and how to use these objects. For a detailed explanation of the grey items, we refer to the BCVTB documentation.
 
-![](ExternalInterfaces_Application_Guide/media/image004.png)
+![](media/image004.png)
 
 Figure 1: Architecture of the BCVTB with the EnergyPlus client (black) and other clients (grey).
 
@@ -402,13 +402,13 @@ To start EnergyPlus from the BCVTB, you will need to create a Ptolemy model.
 
 The model bcvtb/example/ePlus40-schedule/system-windows.xml that is part of the BCVTB installation and that is shown below may be used as a starting point. (For Mac and Linux, use the file system.xml.) In this example, the time step is 15 minutes and the simulation period is four days.
 
-![](ExternalInterfaces_Application_Guide/media/image005.png)
+![](media/image005.png)
 
 Figure 2: System model in the BCVTB.
 
 In this model, the Simulator actor that calls EnergyPlus is configured for Windows as follows:
 
-![](ExternalInterfaces_Application_Guide/media/image006.png)
+![](media/image006.png)
 
 Figure 3: Configuration of the Simulator actor that calls EnergyPlus on Windows.
 
@@ -416,7 +416,7 @@ Hence, it calls the file “RunEPlus.bat,” with arguments “EMSWindowShadeCon
 
 For Mac OS X and Linux, the configuration is similar:
 
-![](ExternalInterfaces_Application_Guide/media/image007.png)
+![](media/image007.png)
 
 Figure 4: Configuration of the Simulator actor that calls EnergyPlus on Mac OS X and on Linux.
 
@@ -699,31 +699,31 @@ Prior to describing the data exchange between EnergyPlus and FMUs, some definiti
 
 A variable of a system described by a system of differential algebraic equations (DAE) is defined as differential variable if its derivatives are present in the DAE. A variable of a system described by a system of DAE is defined as algebraic if its derivatives do not appear explicitly in the DAE (Fabian et al., 2008).
 
-![](ExternalInterfaces_Application_Guide/media/image008.png)
+![](media/image008.png)
 
 Figure 5: System with two variables that could be either differential or algebraic variables.
 
-Because in subsequent discussions, it will be distinguished between algebraic and differential variables, a notation for different system of equations that involve algebraic and differential variables will be introduced. Let <span>$q\in\mathbf{N}$</span>, then
+Because in subsequent discussions, it will be distinguished between algebraic and differential variables, a notation for different system of equations that involve algebraic and differential variables will be introduced. Let <span>\(q\in\mathbf{N}\)</span>, then
 
 - If x<sub>1</sub> and x<sub>2</sub> are differential variables, then the system is
 
-<span>$F\left(\dot x_1,x_1,\dot x_2,x_2,u,t\right) = 0$</span> with *F*: ℝ<sup>n</sup> x ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ<sup>m</sup> x ℝ<sup>q</sup> x ℝ → ℝ<sup>n+m</sup>.
+<span>\(F\left(\dot x_1,x_1,\dot x_2,x_2,u,t\right) = 0\)</span> with *F*: ℝ<sup>n</sup> x ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ<sup>m</sup> x ℝ<sup>q</sup> x ℝ → ℝ<sup>n+m</sup>.
 
 - If x<sub>1</sub> is a differential variable and x<sub>2</sub> is an algebraic variable, then the system is
 
-<span>$G\left(\dot x_1,x_1,x_2,u,t\right) = 0$</span> with *G*: ℝ<sup>n</sup> x ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ<sup>q</sup> x ℝ → ℝ<sup>n+m</sup>.
+<span>\(G\left(\dot x_1,x_1,x_2,u,t\right) = 0\)</span> with *G*: ℝ<sup>n</sup> x ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ<sup>q</sup> x ℝ → ℝ<sup>n+m</sup>.
 
 - If x<sub>1</sub> is an algebraic variable and x<sub>2</sub> is a differential variable, then the system is
 
-<span>$H\left(x_1,\dot x_2,x_2,u,t\right) = 0$</span> with *H:* ℝ<sup>n</sup> xℝ<sup>m</sup> xℝ<sup>m</sup> xℝ<sup>q</sup> xℝ →ℝ<sup>n+m</sup>.
+<span>\(H\left(x_1,\dot x_2,x_2,u,t\right) = 0\)</span> with *H:* ℝ<sup>n</sup> xℝ<sup>m</sup> xℝ<sup>m</sup> xℝ<sup>q</sup> xℝ →ℝ<sup>n+m</sup>.
 
 - If x<sub>1</sub> is an algebraic variable and x<sub>2</sub> is an algebraic variable, then the system is
 
-<span>$I\left(x_1,x_2,u,t\right)=0$</span> with *I*: ℝ<sup>n</sup> xℝ<sup>m</sup> xℝ<sup>q</sup> xℝ →ℝ<sup>n+m</sup>.
+<span>\(I\left(x_1,x_2,u,t\right)=0\)</span> with *I*: ℝ<sup>n</sup> xℝ<sup>m</sup> xℝ<sup>q</sup> xℝ →ℝ<sup>n+m</sup>.
 
 Figure 6 shows a case where a FMU is linked to an EnergyPlus model for co-simulation. The FMU and EnergyPlus could be linked through differential or algebraic variables.
 
-![Picture5.png](ExternalInterfaces_Application_Guide/media/image016.png)
+![Picture5.png](media/image016.png)
 
 Figure 6: System with one FMU linked to EnergyPlus.
 HERHERHEHERHERHERHERH
@@ -777,17 +777,17 @@ dx<sub>1</sub>/dt = f<sub>1</sub>(x<sub>1</sub>, x<sub>2</sub>), with x<sub>1</s
 
 dx<sub>2</sub>/dt = f<sub>2</sub>(x<sub>2</sub>, x<sub>1</sub>), with x<sub>2</sub>(0) = x<sub>2,0\\ .</sub>
 
-Let <span>$N\in\textbf{N}$</span> denote the number of time steps and let *t<sub>k</sub>* with <span>$k\in\left\\{1,...,N\right\\}$</span> denote the time steps. We will use the subscripts *1* and *2* to denote the variables and the functions that compute the next state variable of the simulator *1* and *2*, respectively.
+Let <span>\(N\in\textbf{N}\)</span> denote the number of time steps and let *t<sub>k</sub>* with <span>\(k\in\left\\{1,...,N\right\\}\)</span> denote the time steps. We will use the subscripts *1* and *2* to denote the variables and the functions that compute the next state variable of the simulator *1* and *2*, respectively.
 
-The first system computes, for <span>$k\in\left\\{0,...,N-1\right\\}$</span> and some <span>$\tilde{F}_1$</span>: ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ x ℝ → ℝ<sup>n</sup>, the sequence
+The first system computes, for <span>\(k\in\left\\{0,...,N-1\right\\}\)</span> and some <span>\(\tilde{F}_1\)</span>: ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ x ℝ → ℝ<sup>n</sup>, the sequence
 
-x<sub>1</sub>(t<sub>k+1</sub>) = <span>$\tilde{F}_1$</span>(x<sub>1</sub>(t<sub>k</sub>), x<sub>2</sub>(t<sub>k</sub>), t<sub>k</sub>, t<sub>k+1</sub>)
+x<sub>1</sub>(t<sub>k+1</sub>) = <span>\(\tilde{F}_1\)</span>(x<sub>1</sub>(t<sub>k</sub>), x<sub>2</sub>(t<sub>k</sub>), t<sub>k</sub>, t<sub>k+1</sub>)
 
-and, similarly, the simulator *2* computes for some <span>$\tilde{F}_2$</span>: ℝ<sup>m</sup> x ℝ<sup>n</sup> x ℝ x ℝ → ℝ<sup>m</sup> the sequence
+and, similarly, the simulator *2* computes for some <span>\(\tilde{F}_2\)</span>: ℝ<sup>m</sup> x ℝ<sup>n</sup> x ℝ x ℝ → ℝ<sup>m</sup> the sequence
 
-x<sub>2</sub>(t<sub>k+1</sub>) = <span>$\tilde{F}_2$</span>(x<sub>2</sub>(t<sub>k</sub>), x<sub>1</sub>(t<sub>k</sub>), t<sub>k</sub>, t<sub>k+1</sub>)
+x<sub>2</sub>(t<sub>k+1</sub>) = <span>\(\tilde{F}_2\)</span>(x<sub>2</sub>(t<sub>k</sub>), x<sub>1</sub>(t<sub>k</sub>), t<sub>k</sub>, t<sub>k+1</sub>)
 
-with initial conditions *x<sub>1</sub>(0) = x<sub>1,0</sub>* and *x<sub>2</sub>(0) = x<sub>2,0.</sub>* <span>$\tilde{F}_1$</span> and <span>$\tilde{F}_2$</span> *are the functions that are used to compute the value of the state variables at the new time step
+with initial conditions *x<sub>1</sub>(0) = x<sub>1,0</sub>* and *x<sub>2</sub>(0) = x<sub>2,0.</sub>* <span>\(\tilde{F}_1\)</span> and <span>\(\tilde{F}_2\)</span> *are the functions that are used to compute the value of the state variables at the new time step
 
 To advance from time *t<sub>k</sub>* to *t<sub>k+1</sub>*, each system uses its own time integration algorithm. At the end of the time step, EnergyPlus sends the new state *x<sub>1</sub>(t<sub>k+1</sub>)* to the FMU and it receives the state *x<sub>2</sub>(t<sub>k+1</sub>)* from the FMU. The same procedure is done with the FMU.
 
@@ -799,17 +799,17 @@ dx<sub>1</sub>/dt = g<sub>1</sub>(x<sub>1</sub>, x<sub>2</sub>), with x<sub>1</s
 
 0 = g<sub>2</sub>(x<sub>2</sub>, x<sub>1</sub>).
 
-Let <span>$N\in\mathbf{N}$</span> denote the number of time steps and let *t<sub>k</sub>* with <span>$k\in\left\\{1,...,N\right\\}$</span> denote the time steps. We use the same subscripts *1* and *2* as for the first case to denote the variable and the function that computes the next variable of the simulator *1* and *2*, respectively.
+Let <span>\(N\in\mathbf{N}\)</span> denote the number of time steps and let *t<sub>k</sub>* with <span>\(k\in\left\\{1,...,N\right\\}\)</span> denote the time steps. We use the same subscripts *1* and *2* as for the first case to denote the variable and the function that computes the next variable of the simulator *1* and *2*, respectively.
 
-The first system computes, for <span>$k\in\left\\{0,...,N-1\right\\}$</span> and some <span>$\tilde{G}_1$</span>: ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ x ℝ → ℝ<sup>n</sup>, the sequence
+The first system computes, for <span>\(k\in\left\\{0,...,N-1\right\\}\)</span> and some <span>\(\tilde{G}_1\)</span>: ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ x ℝ → ℝ<sup>n</sup>, the sequence
 
-x<sub>1</sub>(t<sub>k+1</sub>) = <span>$\tilde{G}_1$</span>(x<sub>1</sub>(t<sub>k</sub>), x<sub>2</sub>(t<sub>k</sub>), t<sub>k</sub>, t<sub>k+1</sub>)
+x<sub>1</sub>(t<sub>k+1</sub>) = <span>\(\tilde{G}_1\)</span>(x<sub>1</sub>(t<sub>k</sub>), x<sub>2</sub>(t<sub>k</sub>), t<sub>k</sub>, t<sub>k+1</sub>)
 
-and, similarly, the simulator *2* computes for some <span>$\tilde{G}_2$</span>: ℝ<sup>m</sup> x ℝ<sup>n</sup> x ℝ → ℝ<sup>m</sup> the sequence
+and, similarly, the simulator *2* computes for some <span>\(\tilde{G}_2\)</span>: ℝ<sup>m</sup> x ℝ<sup>n</sup> x ℝ → ℝ<sup>m</sup> the sequence
 
-x<sub>2</sub>(t<sub>k+1</sub>) = <span>$\tilde{G}_2$</span>(x<sub>2</sub>(t<sub>k+1</sub>), x<sub>1</sub>(t<sub>k+1</sub>), t<sub>k+1</sub>)
+x<sub>2</sub>(t<sub>k+1</sub>) = <span>\(\tilde{G}_2\)</span>(x<sub>2</sub>(t<sub>k+1</sub>), x<sub>1</sub>(t<sub>k+1</sub>), t<sub>k+1</sub>)
 
-with initial condition *x<sub>1</sub>(0) = x<sub>1,0</sub>*. <span>$\tilde{G}_1$</span> and <span>$\tilde{G}_2$</span> are the functions that compute the value of the variables at the new time step.
+with initial condition *x<sub>1</sub>(0) = x<sub>1,0</sub>*. <span>\(\tilde{G}_1\)</span> and <span>\(\tilde{G}_2\)</span> are the functions that compute the value of the variables at the new time step.
 
 To advance from time *t<sub>k</sub>* to *t<sub>k+1</sub>*, each system uses its own time integration algorithm. At the end of the time step, EnergyPlus sends the new value *x<sub>1</sub>(t<sub>k+1</sub>)* to the FMU and it receives the value *x<sub>2</sub>(t<sub>k+1</sub>)* from the FMU. The same procedure is done with the FMU.
 
@@ -821,13 +821,13 @@ The current implementation for linking EnergyPlus with the FMUs has the followin
 
 - Each FMU is linked to EnergyPlus only through a differential variable in EnergyPlus (see Figure 7 for one FMU).
 
-![](ExternalInterfaces_Application_Guide/media/image033.png)
+![](media/image033.png)
 
 Figure 7:System with one FMU linked to EnergyPlus.
 
 - Two or multiple FMUs are linked together only through differential variables in EnergyPlus (see Figure 8 for two FMUs).
 
-![](ExternalInterfaces_Application_Guide/media/image034.png)
+![](media/image034.png)
 
 Figure 8: System with two FMUs linked to EnergyPlus.
 
@@ -838,7 +838,7 @@ FMU Examples
 
 Figure 9 shows the architecture of the connection between EnergyPlus and two FMUs. EnergyPlus imports the FMUs that connect to its external interface. These FMUs are generated by external simulation environments that implement the FMI Application Programming Interface (API) for co-simulation. See http://www.modelisar.com/tools.html for a list of programs that export FMUs. In the external interface, the input/output signals that are exchanged between the FMUs and EnergyPlus are mapped to EnergyPlus objects. The subject of this External Interface Application Guide is how to configure this mapping and how to use these objects.
 
-![](ExternalInterfaces_Application_Guide/media/image035.png)
+![](media/image035.png)
 
 Figure 9: Architecture of the FMU for co-simulation import.
 
@@ -905,7 +905,7 @@ To use the FMU for co-simulation import, there are two important steps: pre-proc
 
 Figure 10 shows the work flow for pre-processing. First, a FMU Parser parses the FMU files (i.e. xxx.fmu) and generates a temporary EnergyPlus input file (i.e. xxxtmp.idf). The temporary EnergyPlus input file is not complete as it just contains information related to the FMU, such as names of the FMU and properties of each FMU variable including variable name, associated FMU name, input/output type, data type, units and definitions. The user will need to manually copy the FMU information from xxxtmp.idf into the EnergyPlus input file xxx.idf. The user then needs to modify the xxx.idf file to link the FMU variables with EnergyPlus variables.
 
-![](ExternalInterfaces_Application_Guide/media/image036.png)
+![](media/image036.png)
 
 Figure 10: Work flow for pre-processing.
 
@@ -923,7 +923,7 @@ A FMU is a zip file which may contain executable programs for specific platforms
 
 ** **
 
-![](ExternalInterfaces_Application_Guide/media/image037.png)
+![](media/image037.png)
 
 Figure 11: Workflow of FMU parser for pre-processing.
 

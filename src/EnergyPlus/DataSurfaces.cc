@@ -438,6 +438,114 @@ namespace DataSurfaces {
 
 	// Functions
 
+	// Clears the global data in DataSurfaces.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		TotSurfaces = 0;
+		TotWindows = 0;
+		TotComplexWin = 0;
+		TotStormWin = 0;
+		TotWinShadingControl = 0;
+		TotIntConvCoeff = 0;
+		TotExtConvCoeff = 0;
+		TotOSC = 0;
+		TotOSCM = 0;
+		TotExtVentCav = 0;
+		TotSurfIncSolSSG = 0;
+		TotFenLayAbsSSG = 0;
+		Corner = 0;
+		MaxVerticesPerSurface = 4;
+		BuildingShadingCount = 0;
+		FixedShadingCount = 0;
+		AttachedShadingCount = 0;
+		AspectTransform = false;
+		CalcSolRefl = false;
+		CCW = false;
+		WorldCoordSystem = false;
+		DaylRefWorldCoordSystem = false;
+		MaxRecPts = 0;
+		MaxReflRays = 0;
+		GroundLevelZ = 0.0;
+		AirflowWindows = false;
+		ShadingTransmittanceVaries = false;
+		InsideGlassCondensationFlag.deallocate();
+		InsideFrameCondensationFlag.deallocate();
+		InsideDividerCondensationFlag.deallocate();
+		AdjacentZoneToSurface.deallocate();
+		X0.deallocate();
+		Y0.deallocate();
+		Z0.deallocate();
+		DSZone.deallocate();
+		DGZone.deallocate();
+		DBZone.deallocate();
+		DBZoneSSG.deallocate();
+		CBZone.deallocate();
+		AISurf.deallocate();
+		AOSurf.deallocate();
+		BmToBmReflFacObs.deallocate();
+		BmToDiffReflFacObs.deallocate();
+		BmToDiffReflFacGnd.deallocate();
+		AWinSurf.deallocate();
+		AWinCFOverlap.deallocate();
+		AirSkyRadSplit.deallocate();
+		WinTransSolar.deallocate();
+		WinBmSolar.deallocate();
+		WinBmBmSolar.deallocate();
+		WinBmDifSolar.deallocate();
+		WinDifSolar.deallocate();
+		WinDirSolTransAtIncAngle.deallocate();
+		WinHeatGain.deallocate();
+		WinHeatGainRep.deallocate();
+		WinHeatLossRep.deallocate();
+		WinGainConvGlazToZoneRep.deallocate();
+		WinGainIRGlazToZoneRep.deallocate();
+		WinLossSWZoneToOutWinRep.deallocate();
+		WinGainFrameDividerToZoneRep.deallocate();
+		WinGainConvGlazShadGapToZoneRep.deallocate();
+		WinGainConvShadeToZoneRep.deallocate();
+		WinGainIRShadeToZoneRep.deallocate();
+		OtherConvGainInsideFaceToZoneRep.deallocate();
+		WinGapConvHtFlowRep.deallocate();
+		WinShadingAbsorbedSolar.deallocate();
+		WinSysSolTransmittance.deallocate();
+		WinSysSolReflectance.deallocate();
+		WinSysSolAbsorptance.deallocate();
+		SUNCOSHR.dimension( 24, 3, 0.0 );
+		ReflFacBmToDiffSolObs.deallocate();
+		ReflFacBmToDiffSolGnd.deallocate();
+		ReflFacBmToBmSolObs.deallocate();
+		ReflFacSkySolObs.deallocate();
+		ReflFacSkySolGnd.deallocate();
+		CosIncAveBmToBmSolObs.deallocate();
+		DBZoneIntWin.deallocate();
+		SurfSunlitArea.deallocate();
+		SurfSunlitFrac.deallocate();
+		WinTransSolarEnergy.deallocate();
+		WinBmSolarEnergy.deallocate();
+		WinBmBmSolarEnergy.deallocate();
+		WinBmDifSolarEnergy.deallocate();
+		WinDifSolarEnergy.deallocate();
+		WinHeatGainRepEnergy.deallocate();
+		WinHeatLossRepEnergy.deallocate();
+		WinShadingAbsorbedSolarEnergy.deallocate();
+		WinGapConvHtFlowRepEnergy.deallocate();
+		Surface.deallocate();
+		SurfaceWindow.deallocate();
+		FrameDivider.deallocate();
+		StormWindow.deallocate();
+		WindowShadingControl.deallocate();
+		OSC.deallocate();
+		OSCM.deallocate();
+		UserIntConvectionCoeffs.deallocate();
+		UserExtConvectionCoeffs.deallocate();
+		ShadeV.deallocate();
+		ExtVentedCavity.deallocate();
+		SurfIncSolSSG.deallocate();
+		FenLayAbsSSG.deallocate();
+	}
+
 	std::string
 	cSurfaceClass( int const ClassNo )
 	{
@@ -526,7 +634,7 @@ namespace DataSurfaces {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
