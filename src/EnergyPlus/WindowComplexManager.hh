@@ -155,18 +155,15 @@ namespace WindowComplexManager {
 	void
 	CFSShadeAndBeamInitialization(
 		int const iSurf, // Window surface number
-		int const iState, // Window state number
-		BSDFWindowGeomDescr & Window, // Window Geometry
-		BSDFGeomDescr & Geom, // State Geometry
-		BSDFStateDescr & State // State Description
+		int const iState // Window state number
 	);
 
 	void
 	CalculateWindowBeamProperties(
 		int const ISurf, // Window surface number
 		int const IState, // Window state number
-		BSDFWindowGeomDescr & Window, // Window Geometry
-		BSDFGeomDescr & Geom, // State Geometry
+		BSDFWindowGeomDescr const & Window, // Window Geometry
+		BSDFGeomDescr const & Geom, // State Geometry
 		BSDFStateDescr & State, // State Description
 		int const Hour, // Hour number
 		int const TS // Timestep number
@@ -299,18 +296,9 @@ namespace WindowComplexManager {
 		Array1A< Real64 > C
 	);
 
-	void
-	PierceSurfaceVector(
-		int const ISurf, // Surface index
-		Vector const & Orig, // Point from which ray originates
-		Vector const & Dir, // Unit vector along in direction of ray whose
-		int & IPIERC, // =1 if line through point R1 in direction of unit vector
-		Vector & HitPt // Point that ray along RN intersects plane of surface
-	);
-
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

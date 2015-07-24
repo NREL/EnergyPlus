@@ -12,7 +12,7 @@ Portions of the EnergyPlus™ software package have been developed and copyright
 
 Portions of the EnergyPlus weather processor were developed by US Department of Energy, Office of Building Technologies.
 
-Portions of the input processing, output processing, weather processor, BLAST Translator were developed by US Army Corps of Engineers, Construction Engineering Research Laboratories, 2902 Newmark Drive, Champaign IL  61821. [www.cecer.army.mil](http://www.cecer.army.mil)
+Portions of the input processing, output processing, weather processor, BLAST Translator were developed by US Army Corps of Engineers, Construction Engineering Research Laboratories, 2902 Newmark Drive, Champaign IL  61821. [http://www.erdc.usace.army.mil/Locations/ConstructionEngineeringResearchLaboratory.aspx](http://www.erdc.usace.army.mil/Locations/ConstructionEngineeringResearchLaboratory.aspx)
 
 Portions of this software package were developed for Ernest Orlando Lawrence Berkeley National Laboratory and Florida Solar Energy Center by Linda Lawrie of DHL Consulting.
 

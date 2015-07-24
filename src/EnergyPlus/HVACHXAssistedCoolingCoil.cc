@@ -168,7 +168,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 		// Find the correct HXAssistedCoolingCoil number
 		if ( CompIndex == 0 ) {
-			HXAssistedCoilNum = FindItemInList( HXAssistedCoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			HXAssistedCoilNum = FindItemInList( HXAssistedCoilName, HXAssistedCoil );
 			if ( HXAssistedCoilNum == 0 ) {
 				ShowFatalError( "HX Assisted Coil not found=" + HXAssistedCoilName );
 			}
@@ -336,7 +336,7 @@ namespace HVACHXAssistedCoolingCoil {
 			GetObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), HXAssistedCoil.Name(), HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), HXAssistedCoil, HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -457,7 +457,7 @@ namespace HVACHXAssistedCoolingCoil {
 			GetObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), HXAssistedCoil.Name(), HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), HXAssistedCoil, HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -803,7 +803,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			HXDXCoilIndex = FindItem( HXDXCoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			HXDXCoilIndex = FindItem( HXDXCoilName, HXAssistedCoil );
 		} else {
 			HXDXCoilIndex = 0;
 		}
@@ -873,7 +873,7 @@ namespace HVACHXAssistedCoolingCoil {
 		// Find the correct Coil number
 		if ( CompIndex == 0 ) {
 			if ( TotalNumHXAssistedCoils > 0 ) {
-				HXAssistedCoilNum = FindItem( CompName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+				HXAssistedCoilNum = FindItem( CompName, HXAssistedCoil );
 			} else {
 				HXAssistedCoilNum = 0;
 			}
@@ -958,7 +958,7 @@ namespace HVACHXAssistedCoolingCoil {
 		errFlag = false;
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1057,7 +1057,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1139,7 +1139,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1212,7 +1212,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1284,7 +1284,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1363,7 +1363,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1435,7 +1435,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 		//  HXAssistedCoil(HXAssistedCoilNum)%CoolingCoilName            = AlphArray(7)
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1506,7 +1506,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1578,7 +1578,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1646,7 +1646,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1721,7 +1721,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
 
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 
 			if ( SameString( CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 				if ( WhichCoil != 0 ) {
@@ -1809,7 +1809,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
 
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 
 			if ( SameString( CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) || SameString( CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
 				if ( WhichCoil != 0 ) {
@@ -1888,7 +1888,7 @@ namespace HVACHXAssistedCoolingCoil {
 		Found = false;
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( HXName, HXAssistedCoil.HeatExchangerName(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( HXName, HXAssistedCoil, &HXAssistedCoilParameters::HeatExchangerName );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1910,7 +1910,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -168,7 +168,7 @@ namespace HVACDXHeatPumpSystem {
 
 		// Find the correct DXSystemNumber
 		if ( CompIndex == 0 ) {
-			DXSystemNum = FindItemInList( DXHeatPumpSystemName, DXHeatPumpSystem.Name(), NumDXHeatPumpSystems );
+			DXSystemNum = FindItemInList( DXHeatPumpSystemName, DXHeatPumpSystem );
 			if ( DXSystemNum == 0 ) {
 				ShowFatalError( "SimDXHeatPumpSystem: DXUnit not found=" + DXHeatPumpSystemName );
 			}
@@ -323,7 +323,7 @@ namespace HVACDXHeatPumpSystem {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXHeatPumpSystem.Name(), DXHeatSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXHeatPumpSystem, DXHeatSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";

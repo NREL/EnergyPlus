@@ -92,6 +92,8 @@ namespace SwimmingPool {
 		Real64 WaterMassFlowRate; // water mass flow rate
 		Real64 MakeUpWaterMassFlowRate; // makeup water flow rate (addition to the pool)
 		Real64 MakeUpWaterMass; // makeup water mass added to pool
+		Real64 MakeUpWaterVolFlowRate; // makeup water volume flow rate
+		Real64 MakeUpWaterVol; // makeup water volume added to pool
 		Real64 HeatPower; // heating sent to pool in Watts
 		Real64 HeatEnergy; // heating sent to pool in Joules
 		Real64 MiscEquipPower; // power for miscellaneous pool equipment in Watts
@@ -144,6 +146,8 @@ namespace SwimmingPool {
 			WaterMassFlowRate( 0.0 ),
 			MakeUpWaterMassFlowRate( 0.0 ),
 			MakeUpWaterMass( 0.0 ),
+			MakeUpWaterVolFlowRate( 0.0 ),
+			MakeUpWaterVol( 0.0 ),
 			HeatPower( 0.0 ),
 			HeatEnergy( 0.0 ),
 			MiscEquipPower( 0.0 ),
@@ -210,6 +214,8 @@ namespace SwimmingPool {
 			Real64 const WaterMassFlowRate, // water mass flow rate from loop
 			Real64 const MakeUpWaterMassFlowRate, // makeup water flow rate (addition to the pool)
 			Real64 const MakeUpWaterMass, // makeup water mass added to pool
+			Real64 const MakeUpWaterVolFlowRate, //makeup water volume flow rate
+			Real64 const MakeUpWaterVol, //makeup water volume added to pool
 			Real64 const HeatPower, // heating sent to pool in Watts
 			Real64 const HeatEnergy, // heating sent to pool in Joules
 			Real64 const MiscEquipPower, // power for miscellaneous pool equipment in Watts
@@ -271,6 +277,8 @@ namespace SwimmingPool {
 			WaterMassFlowRate( WaterMassFlowRate ),
 			MakeUpWaterMassFlowRate( MakeUpWaterMassFlowRate ),
 			MakeUpWaterMass( MakeUpWaterMass ),
+			MakeUpWaterVolFlowRate( MakeUpWaterVolFlowRate ),
+			MakeUpWaterVol( MakeUpWaterVol ),
 			HeatPower( HeatPower ),
 			HeatEnergy( HeatEnergy ),
 			MiscEquipPower( MiscEquipPower ),
@@ -319,9 +327,15 @@ namespace SwimmingPool {
 	void
 	ReportSwimmingPool();
 
+	Real64
+	MakeUpWaterVolFlowFunct( Real64 MakeUpWaterMassFlowRate, Real64 Density );
+	
+	Real64
+	MakeUpWaterVolFunct( Real64 MakeUpWaterMass, Real64 Density );
+
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
