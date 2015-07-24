@@ -7425,6 +7425,10 @@ This field is the name of a fan (ref: Fan:OnOff, Fan:ConstantVolume, Fan: Variab
 
 This field allows the user to specify the coil operating options as one of the following options: **None**, **Heating**, **Cooling** or **HeatingAndCooling**. If **None** is selected, the unit ventilator does not have any coils, and any other input will be ignored. If either **Heating** or **Cooling** is selected, only a heating or cooling coil, respectively, is present. Thus, only four more inputs will be expected. If **HeatingAndCooling** is selected, both heating and cooling coil input must be entered, and the unit ventilator will have both a heating and a cooling coil.
 
+#### Field: Supply Air Fan Operating Mode Schedule Name
+
+This field is a schedule name (ref: Schedule) that determines whether the operating modes of unit heater’s On:Off fan. A schedule values of 0 indicates cycling fan operation (fan cycles with cooling/heating coil). A schedule values greater than 0 (usually 1 is used) indicate constant fan operation (fan runs continually regardless of coils operation). If this input field is left blank, then the operating mode of the OnOff fan type defaults to cycling operation.
+
 #### Field: Heating Coil Object Type
 
 This field is the type of coil that is used for heating in the unit ventilator system. It is used in conjunction with the heating coil name (see next field) to specify the heating coil present within the system. Allowable heating coil types are:
