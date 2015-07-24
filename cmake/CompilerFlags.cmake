@@ -131,9 +131,9 @@ ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     #  /xHost
 
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
-    ADD_CXX_RELEASE_DEFINITIONS("/Qansi-alias") # Enables more aggressive optimizations on floating-point data
-    ADD_CXX_RELEASE_DEFINITIONS("/fp:fast") # Enables more aggressive optimizations on floating-point data
-    ADD_CXX_RELEASE_DEFINITIONS("/Qprec-div-") # ???If this is equivalent to /Qno-prec-div, it disables the improved division accuracy in favor of speed
+    # ADD_CXX_RELEASE_DEFINITIONS("/Qansi-alias") # Enables more aggressive optimizations on floating-point data
+    # ADD_CXX_RELEASE_DEFINITIONS("/fp:fast") # Enables more aggressive optimizations on floating-point data
+    # ADD_CXX_RELEASE_DEFINITIONS("/Qprec-div-") # ???If this is equivalent to /Qno-prec-div, it disables the improved division accuracy in favor of speed
     ADD_CXX_RELEASE_DEFINITIONS("/Qip") # Enables inter-procedural optimnization within a single file
 
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
@@ -162,7 +162,10 @@ ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     ADD_CXX_DEFINITIONS("-Wall") # Enable "all" warnings
     ADD_CXX_DEFINITIONS("-Wp64") # 64-bit warnings
     ADD_CXX_DEFINITIONS("-diag-disable:177,488,869,1786,2259,3280,11074,11075") # Disable warnings listed above
-    ADD_CXX_DEFINITIONS("-pthread")
+
+    IF(NOT APPLE)
+      ADD_CXX_DEFINITIONS(-pthread)
+    ENDIF()
 
     # Optimization options that had no significant benefit for EnergyPlus
     #  -inline-factor=200
@@ -173,9 +176,9 @@ ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     #  -xHost
 
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
-    ADD_CXX_RELEASE_DEFINITIONS("-ansi-alias") # Enables more aggressive optimizations on floating-point data
-    ADD_CXX_RELEASE_DEFINITIONS("-fp:fast") # Enables more aggressive optimizations on floating-point data
-    ADD_CXX_RELEASE_DEFINITIONS("-prec-div-") # ???If this is equivalent to /Qno-prec-div, it disables the improved division accuracy in favor of speed
+    # ADD_CXX_RELEASE_DEFINITIONS("-ansi-alias") # Enables more aggressive optimizations on floating-point data
+    # ADD_CXX_RELEASE_DEFINITIONS("-fp:fast") # Enables more aggressive optimizations on floating-point data
+    # ADD_CXX_RELEASE_DEFINITIONS("-prec-div-") # ???If this is equivalent to /Qno-prec-div, it disables the improved division accuracy in favor of speed
     ADD_CXX_RELEASE_DEFINITIONS("-ip") # Enables inter-procedural optimnization within a single file
 
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
