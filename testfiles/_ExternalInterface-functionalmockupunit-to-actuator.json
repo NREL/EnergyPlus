@@ -1,8 +1,8 @@
-! _ExternalInterface-functionalmockupunit-to-variable.idf
+! _ExternalInterface-functionalmockupunit-to-actuator.idf
 !
 !
-! Highlights:              Demonstrates using the external interface with an
-!                          ExternalInterface:FunctionalMockupUnitImport:To:Variable to control a window blind.
+! Highlights:              Demonstrates using the external interface with
+!                          an ExternalInterface:FunctionalMockupUnitImport:To:Actuator to control a window blind.
 !
 ! Basic file description:  This file is derived from PurchAirWindowBlind.idf
 !                          1 story building divided into 3 interior conditioned zones. Roof with no plenum.
@@ -101,7 +101,7 @@
 
   Timestep,6;
 
-  ZoneCapacitanceMultiplier:ResearchSpecial,
+  ZoneCapacitanceMultiplier:ResearchEspecial,
     1.0,                     !- Temperature Capacity Multiplier
     1.0,                     !- Humidity Capacity Multiplier
     1.0,                     !- Carbon Dioxide Capacity Multiplier
@@ -1245,6 +1245,8 @@
 
   Output:Variable,*,Zone Mean Radiant Temperature,timestep;
 
+  Output:Variable,*,Surface Shading Device Is On Time Fraction,timestep;
+
   Output:Variable,*,Surface Window Blind Slat Angle,timestep;
 
   Output:Variable,*,Surface Window Transmitted Solar Radiation Rate,timestep;
@@ -1323,11 +1325,6 @@
 
   Output:Variable,WEST ZONE,Zone Air System Sensible Cooling Rate,Timestep;
 
-  EnergyManagementSystem:ProgramCallingManager,
-    Window Shading Device EMS Controller,  !- Name
-    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
-    Set_Shade_Control_State; !- Program Name 1
-
   ExternalInterface,
     FunctionalMockupUnitImport;  !- Name of External Interface
 
@@ -1350,48 +1347,15 @@
     Model1,                  !- FMU Instance Name
     TRoo;                    !- FMU Variable Name
 
-  ExternalInterface:FunctionalMockupUnitImport:To:Variable,
-    Shade_Signal,            !- Name
+  ExternalInterface:FunctionalMockupUnitImport:To:Actuator,
+    Zn001_Wall001_Win001_Shading_Deploy_Status,  !- Name
+    Zn001:Wall001:Win001,    !- Actuated Component Unique Name
+    Window Shading Control,  !- Actuated Component Type
+    Control Status,          !- Actuated Component Control Type
     ..\datasets\FMUs\ShadingController.fmu,  !- FMU File Name
     Model1,                  !- FMU Instance Name
     yShade,                  !- FMU Variable Name
-    1;                       !- Initial Value
-
-! EMS program. The first assignments sets the shading status and converts it into the
-!              EnergyPlus signal (i.e., replace 1 by 6).
-!              The second assignment sets yShade to
-!              an EnergyManagementSystem:OutputVariable
-!              which will be read by the external interface.
-
-  EnergyManagementSystem:Program,
-    Set_Shade_Control_State, !- Name
-    Set Shade_Signal = 6*yShade,  !- Program Line 1
-    Set Shade_Signal = @MIN 6 Shade_Signal,  !- Program Line 2
-    Set Shade_Signal_01 = Shade_Signal+0.1;  !- <none>
-
-! Declare an actuator to which the EnergyManagementSystem:Program will write
-
-  EnergyManagementSystem:Actuator,
-    Shade_Signal,            !- Name
-    Zn001:Wall001:Win001,    !- Actuated Component Unique Name
-    Window Shading Control,  !- Actuated Component Type
-    Control Status;          !- Actuated Component Control Type
-
-! Declare a global variable to which the EnergyManagementSystem:Program will write
-
-  EnergyManagementSystem:GlobalVariable,
-    Shade_Signal_01;         !- Erl Variable 1 Name
-
-! Declare an output variable. This variable is equal to the shading signal + 0.1
-! It will be read by the external interface to demonstrate how to receive variables.
-
-  EnergyManagementSystem:OutputVariable,
-    Erl Shading Control Status,  !- Name
-    Shade_Signal_01,         !- EMS Variable Name
-    Averaged,                !- Type of Data in Variable
-    ZoneTimeStep,            !- Update Frequency
-    ,                        !- EMS Program or Subroutine Name
-    ;                        !- Units
+    6;                       !- Initial Value
 
   EnergyManagementSystem:ProgramCallingManager,
     Init Window Shading Device Control Constants,  !- Name

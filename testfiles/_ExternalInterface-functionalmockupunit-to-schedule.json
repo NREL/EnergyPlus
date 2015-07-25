@@ -382,7 +382,7 @@
     2.7000,                  !- Ceiling Height {m}
     259.2;                   !- Volume {m3}
 
-  ZoneCapacitanceMultiplier:ResearchSpecial,
+  ZoneCapacitanceMultiplier:ResearchEspecial,
     1.2,                     !- Temperature Capacity Multiplier
     1.2,                     !- Humidity Capacity Multiplier
     1.2,                     !- Carbon Dioxide Capacity Multiplier

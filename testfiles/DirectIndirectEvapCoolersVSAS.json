@@ -2,11 +2,8 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! Start SimMetaData
-! WeatherFileName=USA_AZ_Phoenix_TMY2.epw
-! End SimMetaData
 !
-! DirectIndirectEvapCoolers.idf
+! DirectIndirectEvapCoolersVSAS.idf
 ! Basic file description:  1 story building divided into 4 zones.
 !
 ! Highlights:              Single-zone DX packages with direct and indirect evaporative coolers on outdoor air path.
@@ -52,14 +49,14 @@
 ! HVAC:                           PSZ system with outside air, Uses UnitaryHeatCool with DX cooling coils and gas heat.
 !                                 All equipment is autosized. Three of the outdoor air system include direct and indirect
 !                                 evaporative coolers and one demonstrates just an direct cooler.  These are the
-!                                 "ResearchSpecial" coolers that modulate to meet setpoints.
+!                                 "ResearchEspecial" coolers that modulate to meet setpoints.
 !
 ! Zonal Equipment:                AirTerminal:SingleDuct:Uncontrolled
 ! Central Air Handling Equipment: No.
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:VariableSpeed, Coil:Heating:Gas
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -74,6 +71,574 @@
 !
 
   Version,8.3;
+
+  AirLoopHVAC:UnitaryHeatCool,
+    FURNACE_PACU_CAV:1_Unitary_Package,  !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    FURNACE_PACU_CAV:1_OA-FURNACE_PACU_CAV:1_Unitary_PackageNode,  !- Unitary System Air Inlet Node Name
+    FURNACE_PACU_CAV:1 Supply Equipment Outlet Node,  !- Unitary System Air Outlet Node Name
+    AlWAYS_ON,               !- Supply Air Fan Operating Mode Schedule Name
+    AUTOSIZE,                !- Maximum Supply Air Temperature {C}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    units_gr_lf,             !- Controlling Zone or Thermostat Location
+    Fan:OnOff,               !- Supply Fan Object Type
+    FURNACE_PACU_CAV:1_Unitary_Package_fan,  !- Supply Fan Name
+    BlowThrough,             !- Fan Placement
+    Coil:Heating:Gas,        !- Heating Coil Object Type
+    FURNACE_PACU_CAV:1_Unitary_Package_HeatCoil,  !- Heating Coil Name
+    Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
+    FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil,  !- Cooling Coil Name
+    None;                    !- Dehumidification Control Type
+
+  AirLoopHVAC:UnitaryHeatCool,
+    FURNACE_PACU_CAV:2_Unitary_Package,  !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    FURNACE_PACU_CAV:2_OA-FURNACE_PACU_CAV:2_Unitary_PackageNode,  !- Unitary System Air Inlet Node Name
+    FURNACE_PACU_CAV:2 Supply Equipment Outlet Node,  !- Unitary System Air Outlet Node Name
+    AlWAYS_ON,               !- Supply Air Fan Operating Mode Schedule Name
+    AUTOSIZE,                !- Maximum Supply Air Temperature {C}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    units_gr_rt,             !- Controlling Zone or Thermostat Location
+    Fan:OnOff,               !- Supply Fan Object Type
+    FURNACE_PACU_CAV:2_Unitary_Package_fan,  !- Supply Fan Name
+    BlowThrough,             !- Fan Placement
+    Coil:Heating:Gas,        !- Heating Coil Object Type
+    FURNACE_PACU_CAV:2_Unitary_Package_HeatCoil,  !- Heating Coil Name
+    Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
+    FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil,  !- Cooling Coil Name
+    None;                    !- Dehumidification Control Type
+
+  AirLoopHVAC:UnitaryHeatCool,
+    FURNACE_PACU_CAV:3_Unitary_Package,  !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    FURNACE_PACU_CAV:3_OA-FURNACE_PACU_CAV:3_Unitary_PackageNode,  !- Unitary System Air Inlet Node Name
+    FURNACE_PACU_CAV:3 Supply Equipment Outlet Node,  !- Unitary System Air Outlet Node Name
+    AlWAYS_ON,               !- Supply Air Fan Operating Mode Schedule Name
+    AUTOSIZE,                !- Maximum Supply Air Temperature {C}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    unit_s_g,                !- Controlling Zone or Thermostat Location
+    Fan:OnOff,               !- Supply Fan Object Type
+    FURNACE_PACU_CAV:3_Unitary_Package_fan,  !- Supply Fan Name
+    BlowThrough,             !- Fan Placement
+    Coil:Heating:Gas,        !- Heating Coil Object Type
+    FURNACE_PACU_CAV:3_Unitary_Package_HeatCoil,  !- Heating Coil Name
+    Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
+    FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil,  !- Cooling Coil Name
+    None;                    !- Dehumidification Control Type
+
+  AirLoopHVAC:UnitaryHeatCool,
+    FURNACE_PACU_CAV:4_Unitary_Package,  !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    FURNACE_PACU_CAV:4_OA-FURNACE_PACU_CAV:4_Unitary_PackageNode,  !- Unitary System Air Inlet Node Name
+    FURNACE_PACU_CAV:4 Supply Equipment Outlet Node,  !- Unitary System Air Outlet Node Name
+    AlWAYS_ON,               !- Supply Air Fan Operating Mode Schedule Name
+    AUTOSIZE,                !- Maximum Supply Air Temperature {C}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    unit_n_g,                !- Controlling Zone or Thermostat Location
+    Fan:OnOff,               !- Supply Fan Object Type
+    FURNACE_PACU_CAV:4_Unitary_Package_fan,  !- Supply Fan Name
+    BlowThrough,             !- Fan Placement
+    Coil:Heating:Gas,        !- Heating Coil Object Type
+    FURNACE_PACU_CAV:4_Unitary_Package_HeatCoil,  !- Heating Coil Name
+    Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
+    FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil,  !- Cooling Coil Name
+    None;                    !- Dehumidification Control Type
+
+  Coil:Cooling:DX:VariableSpeed,
+    FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil,  !- Name
+    FURNACE_PACU_CAV:1_Unitary_PackageCoolCoil air inlet,  !- Indoor Air Inlet Node Name
+    FURNACE_PACU_CAV:1_Unitary_PackageHeatCoil air inlet,  !- Indoor Air Outlet Node Name
+    10.0,                    !- Number of Speeds {dimensionless}
+    10.0,                    !- Nominal Speed Level {dimensionless}
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
+    AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
+    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
+    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolPLR,  !- Energy Part Load Fraction Curve Name
+    ,                        !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    200.0,                   !- Crankcase Heater Capacity {W}
+    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    0.26,                    !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolCapFT,  !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    0.30,                    !- Speed 2 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolCapFT,  !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+    0.33,                    !- Speed 3 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolCapFT,  !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+    0.38,                    !- Speed 4 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolCapFT,  !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+    0.44,                    !- Speed 5 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolCapFT,  !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+    0.50,                    !- Speed 6 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolCapFT,  !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+    0.57,                    !- Speed 7 Reference Unit Condenser Flow Rate {m3/s}
+    ,                        !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolCapFT,  !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+    0.63,                    !- Speed 8 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolCapFT,  !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+    0.69,                    !- Speed 9 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolCapFT,  !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+    0.74,                    !- Speed 10 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolCapFT,  !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF;  !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
+
+  Coil:Cooling:DX:VariableSpeed,
+    FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil,  !- Name
+    FURNACE_PACU_CAV:2_Unitary_PackageCoolCoil air inlet,  !- Indoor Air Inlet Node Name
+    FURNACE_PACU_CAV:2_Unitary_PackageHeatCoil air inlet,  !- Indoor Air Outlet Node Name
+    10.0,                    !- Number of Speeds {dimensionless}
+    10.0,                    !- Nominal Speed Level {dimensionless}
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
+    AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
+    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
+    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolPLR,  !- Energy Part Load Fraction Curve Name
+    ,                        !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    200.0,                   !- Crankcase Heater Capacity {W}
+    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    0.26,                    !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolCapFT,  !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    0.30,                    !- Speed 2 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolCapFT,  !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+    0.33,                    !- Speed 3 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolCapFT,  !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+    0.38,                    !- Speed 4 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolCapFT,  !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+    0.44,                    !- Speed 5 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolCapFT,  !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+    0.50,                    !- Speed 6 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolCapFT,  !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+    0.57,                    !- Speed 7 Reference Unit Condenser Flow Rate {m3/s}
+    ,                        !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolCapFT,  !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+    0.63,                    !- Speed 8 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolCapFT,  !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+    0.69,                    !- Speed 9 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolCapFT,  !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+    0.74,                    !- Speed 10 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolCapFT,  !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF;  !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
+
+  Coil:Cooling:DX:VariableSpeed,
+    FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil,  !- Name
+    FURNACE_PACU_CAV:3_Unitary_PackageCoolCoil air inlet,  !- Indoor Air Inlet Node Name
+    FURNACE_PACU_CAV:3_Unitary_PackageHeatCoil air inlet,  !- Indoor Air Outlet Node Name
+    10.0,                    !- Number of Speeds {dimensionless}
+    10.0,                    !- Nominal Speed Level {dimensionless}
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
+    AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
+    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
+    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolPLR,  !- Energy Part Load Fraction Curve Name
+    ,                        !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    200.0,                   !- Crankcase Heater Capacity {W}
+    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    0.26,                    !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolCapFT,  !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    0.30,                    !- Speed 2 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolCapFT,  !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+    0.33,                    !- Speed 3 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolCapFT,  !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+    0.38,                    !- Speed 4 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolCapFT,  !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+    0.44,                    !- Speed 5 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolCapFT,  !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+    0.50,                    !- Speed 6 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolCapFT,  !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+    0.57,                    !- Speed 7 Reference Unit Condenser Flow Rate {m3/s}
+    ,                        !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolCapFT,  !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+    0.63,                    !- Speed 8 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolCapFT,  !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+    0.69,                    !- Speed 9 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolCapFT,  !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+    0.74,                    !- Speed 10 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolCapFT,  !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF;  !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
+
+  Coil:Cooling:DX:VariableSpeed,
+    FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil,  !- Name
+    FURNACE_PACU_CAV:4_Unitary_PackageCoolCoil air inlet,  !- Indoor Air Inlet Node Name
+    FURNACE_PACU_CAV:4_Unitary_PackageHeatCoil air inlet,  !- Indoor Air Outlet Node Name
+    10.0,                    !- Number of Speeds {dimensionless}
+    10.0,                    !- Nominal Speed Level {dimensionless}
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
+    AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
+    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
+    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolPLR,  !- Energy Part Load Fraction Curve Name
+    ,                        !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    200.0,                   !- Crankcase Heater Capacity {W}
+    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    0.26,                    !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolCapFT,  !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    0.30,                    !- Speed 2 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolCapFT,  !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+    0.33,                    !- Speed 3 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolCapFT,  !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+    0.38,                    !- Speed 4 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolCapFT,  !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+    0.44,                    !- Speed 5 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolCapFT,  !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+    0.50,                    !- Speed 6 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolCapFT,  !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+    0.57,                    !- Speed 7 Reference Unit Condenser Flow Rate {m3/s}
+    ,                        !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolCapFT,  !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+    0.63,                    !- Speed 8 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolCapFT,  !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+    0.69,                    !- Speed 9 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolCapFT,  !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {w}
+    0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+    0.74,                    !- Speed 10 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolCapFT,  !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF;  !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
   Building,
     barracks2,               !- Name
@@ -106,8 +671,8 @@
     yes,                     !- Do Zone Sizing Calculation
     yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    No,                      !- Run Simulation for Sizing Periods
-    yes;                     !- Run Simulation for Weather File Run Periods
+    yes,                     !- Run Simulation for Sizing Periods
+    No;                      !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
     ,                        !- Name
@@ -3973,9 +4538,9 @@
 
   AirLoopHVAC:OutdoorAirSystem:EquipmentList,
     FURNACE_PACU_CAV:1_OA_Equipment,  !- Name
-    EvaporativeCooler:Indirect:ResearchSpecial,  !- Component 1 Object Type
+    EvaporativeCooler:Indirect:ResearchEspecial,  !- Component 1 Object Type
     FURNACE_PACU_CAV:1_OAIndRDD Evap Cooler,  !- Component 1 Name
-    EvaporativeCooler:Direct:ResearchSpecial,  !- Component 2 Object Type
+    EvaporativeCooler:Direct:ResearchEspecial,  !- Component 2 Object Type
     FURNACE_PACU_CAV:1_OADirect Evap Cooler,  !- Component 2 Name
     OutdoorAir:Mixer,        !- Component 3 Object Type
     FURNACE_PACU_CAV:1_OAMixing Box;  !- Component 3 Name
@@ -4027,7 +4592,7 @@
     FixedMinimum,            !- Minimum Limit Type
     MinOA_Sched;             !- Minimum Outdoor Air Schedule Name
 
-  EvaporativeCooler:Indirect:ResearchSpecial,
+  EvaporativeCooler:Indirect:ResearchEspecial,
     FURNACE_PACU_CAV:1_OAIndRDD Evap Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     0.7500,                  !- Cooler Wetbulb Design Effectiveness
@@ -4040,7 +4605,7 @@
     Autosize,                !- Secondary Air Design Flow Rate {m3/s}
     1.0,                     !- Secondary Air Flow Sizing Factor
     autosize,                !- Secondary Air Fan Design Power
-    207.66666666666666,      !- Secondary Air Fan Sizing Specific Power
+    207.6666666666666667,    !- Secondary Air Fan Sizing Specific Power
     ,                        !- Secondary Fan Power Modifier Curve Name
     FURNACE_PACU_CAV:1_OAInlet Node,  !- Primary Air Inlet Node Name
     FURNACE_PACU_CAV:1_OAIndRDD Evap Cooler-FURNACE_PACU_CAV:1_OADirect Evap CoolerNode,  !- Primary Air Outlet Node Name
@@ -4054,7 +4619,8 @@
     0.2,                     !- Drift Loss Fraction
     3;                       !- Blowdown Concentration Ratio
 
-  EvaporativeCooler:Direct:ResearchSpecial,
+
+  EvaporativeCooler:Direct:ResearchEspecial,
     FURNACE_PACU_CAV:1_OADirect Evap Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
@@ -4081,26 +4647,6 @@
     FURNACE_PACU_CAV:1_Unitary_PackageCoolCoil air inlet,  !- Fan Outlet Node Name
     FURNACE_PACU_CAV:1_OADirect Evap Cooler-FURNACE_PACU_CAV:1_OAMixing BoxNode;  !- Setpoint Node or NodeList Name
 
-  AirLoopHVAC:UnitaryHeatCool,
-    FURNACE_PACU_CAV:1_Unitary_Package,  !- Name
-    ALWAYS_ON,               !- Availability Schedule Name
-    FURNACE_PACU_CAV:1_OA-FURNACE_PACU_CAV:1_Unitary_PackageNode,  !- Unitary System Air Inlet Node Name
-    FURNACE_PACU_CAV:1 Supply Equipment Outlet Node,  !- Unitary System Air Outlet Node Name
-    AlWAYS_ON,               !- Supply Air Fan Operating Mode Schedule Name
-    AUTOSIZE,                !- Maximum Supply Air Temperature {C}
-    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
-    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
-    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
-    units_gr_lf,             !- Controlling Zone or Thermostat Location
-    Fan:OnOff,               !- Supply Fan Object Type
-    FURNACE_PACU_CAV:1_Unitary_Package_fan,  !- Supply Fan Name
-    BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
-    FURNACE_PACU_CAV:1_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
-    FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil,  !- Cooling Coil Name
-    None;                    !- Dehumidification Control Type
-
   Fan:OnOff,
     FURNACE_PACU_CAV:1_Unitary_Package_fan,  !- Name
     HVACOperationSchd,       !- Availability Schedule Name
@@ -4119,22 +4665,6 @@
     AUTOSIZE,                !- Nominal Capacity {W}
     FURNACE_PACU_CAV:1_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:1 Supply Equipment Outlet Node;  !- Air Outlet Node Name
-
-  Coil:Cooling:DX:SingleSpeed,
-    FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil,  !- Name
-    ALWAYS_ON,               !- Availability Schedule Name
-    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
-    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
-    2.6,                     !- Gross Rated Cooling COP {W/W}
-    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    FURNACE_PACU_CAV:1_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
-    FURNACE_PACU_CAV:1_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
-    FURNACE_PACU_CAV:1_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
-    FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
-    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    FURNACE_PACU_CAV:1_Unitary_PackagecoolPLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     FURNACE_PACU_CAV:1_Unitary_PackagecoolCapFT,  !- Name
@@ -4306,7 +4836,7 @@
 
   AirLoopHVAC:OutdoorAirSystem:EquipmentList,
     FURNACE_PACU_CAV:2_OA_Equipment,  !- Name
-    EvaporativeCooler:Direct:ResearchSpecial,  !- Component 1 Object Type
+    EvaporativeCooler:Direct:ResearchEspecial,  !- Component 1 Object Type
     FURNACE_PACU_CAV:2_OADirect Evap Cooler,  !- Component 1 Name
     OutdoorAir:Mixer,        !- Component 2 Object Type
     FURNACE_PACU_CAV:2_OAMixing Box;  !- Component 2 Name
@@ -4358,7 +4888,7 @@
     FixedMinimum,            !- Minimum Limit Type
     MinOA_Sched;             !- Minimum Outdoor Air Schedule Name
 
-  EvaporativeCooler:Direct:ResearchSpecial,
+  EvaporativeCooler:Direct:ResearchEspecial,
     FURNACE_PACU_CAV:2_OADirect Evap Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
@@ -4385,26 +4915,6 @@
     FURNACE_PACU_CAV:2_Unitary_PackageCoolCoil air inlet,  !- Fan Outlet Node Name
     FURNACE_PACU_CAV:2_OADirect Evap Cooler-FURNACE_PACU_CAV:2_OAMixing BoxNode;  !- Setpoint Node or NodeList Name
 
-  AirLoopHVAC:UnitaryHeatCool,
-    FURNACE_PACU_CAV:2_Unitary_Package,  !- Name
-    ALWAYS_ON,               !- Availability Schedule Name
-    FURNACE_PACU_CAV:2_OA-FURNACE_PACU_CAV:2_Unitary_PackageNode,  !- Unitary System Air Inlet Node Name
-    FURNACE_PACU_CAV:2 Supply Equipment Outlet Node,  !- Unitary System Air Outlet Node Name
-    AlWAYS_ON,               !- Supply Air Fan Operating Mode Schedule Name
-    AUTOSIZE,                !- Maximum Supply Air Temperature {C}
-    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
-    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
-    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
-    units_gr_rt,             !- Controlling Zone or Thermostat Location
-    Fan:OnOff,               !- Supply Fan Object Type
-    FURNACE_PACU_CAV:2_Unitary_Package_fan,  !- Supply Fan Name
-    BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
-    FURNACE_PACU_CAV:2_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
-    FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil,  !- Cooling Coil Name
-    None;                    !- Dehumidification Control Type
-
   Fan:OnOff,
     FURNACE_PACU_CAV:2_Unitary_Package_fan,  !- Name
     HVACOperationSchd,       !- Availability Schedule Name
@@ -4423,22 +4933,6 @@
     AUTOSIZE,                !- Nominal Capacity {W}
     FURNACE_PACU_CAV:2_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:2 Supply Equipment Outlet Node;  !- Air Outlet Node Name
-
-  Coil:Cooling:DX:SingleSpeed,
-    FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil,  !- Name
-    ALWAYS_ON,               !- Availability Schedule Name
-    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
-    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
-    2.6,                     !- Gross Rated Cooling COP {W/W}
-    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    FURNACE_PACU_CAV:2_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
-    FURNACE_PACU_CAV:2_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
-    FURNACE_PACU_CAV:2_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
-    FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
-    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    FURNACE_PACU_CAV:2_Unitary_PackagecoolPLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     FURNACE_PACU_CAV:2_Unitary_PackagecoolCapFT,  !- Name
@@ -4610,9 +5104,9 @@
 
   AirLoopHVAC:OutdoorAirSystem:EquipmentList,
     FURNACE_PACU_CAV:3_OA_Equipment,  !- Name
-    EvaporativeCooler:Indirect:ResearchSpecial,  !- Component 1 Object Type
+    EvaporativeCooler:Indirect:ResearchEspecial,  !- Component 1 Object Type
     FURNACE_PACU_CAV:3_OAIndRDD Evap Cooler,  !- Component 1 Name
-    EvaporativeCooler:Direct:ResearchSpecial,  !- Component 2 Object Type
+    EvaporativeCooler:Direct:ResearchEspecial,  !- Component 2 Object Type
     FURNACE_PACU_CAV:3_OADirect Evap Cooler,  !- Component 2 Name
     OutdoorAir:Mixer,        !- Component 3 Object Type
     FURNACE_PACU_CAV:3_OAMixing Box;  !- Component 3 Name
@@ -4664,7 +5158,7 @@
     FixedMinimum,            !- Minimum Limit Type
     MinOA_Sched;             !- Minimum Outdoor Air Schedule Name
 
-  EvaporativeCooler:Indirect:ResearchSpecial,
+  EvaporativeCooler:Indirect:ResearchEspecial,
     FURNACE_PACU_CAV:3_OAIndRDD Evap Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     0.7500,                  !- Cooler Wetbulb Design Effectiveness
@@ -4677,7 +5171,7 @@
     Autosize,                !- Secondary Air Design Air Flow Rate {m3/s}
     1.0,                     !- Secondary Air Flow Sizing Factor
     autosize,                !- Secondary Air Fan Design Power
-    207.66666666666666,      !- Secondary Air Fan Sizing Specific Power W /(m3/s)
+    207.6666666666666667,    !- Secondary Air Fan Sizing Specific Power W /(m3/s)
     ,                        !- Secondary Fan Power Modifier Curve Name
     FURNACE_PACU_CAV:3_OAInlet Node,  !- Primary Air Inlet Node Name
     FURNACE_PACU_CAV:3_OAIndRDD Evap Cooler-FURNACE_PACU_CAV:3_OADirect Evap CoolerNode,  !- Primary Air Outlet Node Name
@@ -4687,7 +5181,7 @@
     FURNACE_PACU_CAV:3_OAIndRDD Evap CoolerOA Outlet Node,  !- Secondary Air Outlet Node Name
     FURNACE_PACU_CAV:3_OADirect Evap Cooler-FURNACE_PACU_CAV:3_OAMixing BoxNode;  !- Sensor Node Name
 
-  EvaporativeCooler:Direct:ResearchSpecial,
+  EvaporativeCooler:Direct:ResearchEspecial,
     FURNACE_PACU_CAV:3_OADirect Evap Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
@@ -4714,26 +5208,6 @@
     FURNACE_PACU_CAV:3_Unitary_PackageCoolCoil air inlet,  !- Fan Outlet Node Name
     FURNACE_PACU_CAV:3_OADirect Evap Cooler-FURNACE_PACU_CAV:3_OAMixing BoxNode;  !- Setpoint Node or NodeList Name
 
-  AirLoopHVAC:UnitaryHeatCool,
-    FURNACE_PACU_CAV:3_Unitary_Package,  !- Name
-    ALWAYS_ON,               !- Availability Schedule Name
-    FURNACE_PACU_CAV:3_OA-FURNACE_PACU_CAV:3_Unitary_PackageNode,  !- Unitary System Air Inlet Node Name
-    FURNACE_PACU_CAV:3 Supply Equipment Outlet Node,  !- Unitary System Air Outlet Node Name
-    AlWAYS_ON,               !- Supply Air Fan Operating Mode Schedule Name
-    AUTOSIZE,                !- Maximum Supply Air Temperature {C}
-    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
-    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
-    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
-    unit_s_g,                !- Controlling Zone or Thermostat Location
-    Fan:OnOff,               !- Supply Fan Object Type
-    FURNACE_PACU_CAV:3_Unitary_Package_fan,  !- Supply Fan Name
-    BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
-    FURNACE_PACU_CAV:3_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
-    FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil,  !- Cooling Coil Name
-    None;                    !- Dehumidification Control Type
-
   Fan:OnOff,
     FURNACE_PACU_CAV:3_Unitary_Package_fan,  !- Name
     HVACOperationSchd,       !- Availability Schedule Name
@@ -4752,22 +5226,6 @@
     AUTOSIZE,                !- Nominal Capacity {W}
     FURNACE_PACU_CAV:3_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:3 Supply Equipment Outlet Node;  !- Air Outlet Node Name
-
-  Coil:Cooling:DX:SingleSpeed,
-    FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil,  !- Name
-    ALWAYS_ON,               !- Availability Schedule Name
-    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
-    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
-    2.6,                     !- Gross Rated Cooling COP {W/W}
-    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    FURNACE_PACU_CAV:3_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
-    FURNACE_PACU_CAV:3_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
-    FURNACE_PACU_CAV:3_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
-    FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
-    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    FURNACE_PACU_CAV:3_Unitary_PackagecoolPLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     FURNACE_PACU_CAV:3_Unitary_PackagecoolCapFT,  !- Name
@@ -4939,9 +5397,9 @@
 
   AirLoopHVAC:OutdoorAirSystem:EquipmentList,
     FURNACE_PACU_CAV:4_OA_Equipment,  !- Name
-    EvaporativeCooler:Indirect:ResearchSpecial,  !- Component 1 Object Type
+    EvaporativeCooler:Indirect:ResearchEspecial,  !- Component 1 Object Type
     FURNACE_PACU_CAV:4_OAIndRDD Evap Cooler,  !- Component 1 Name
-    EvaporativeCooler:Direct:ResearchSpecial,  !- Component 2 Object Type
+    EvaporativeCooler:Direct:ResearchEspecial,  !- Component 2 Object Type
     FURNACE_PACU_CAV:4_OADirect Evap Cooler,  !- Component 2 Name
     OutdoorAir:Mixer,        !- Component 3 Object Type
     FURNACE_PACU_CAV:4_OAMixing Box;  !- Component 3 Name
@@ -4993,7 +5451,7 @@
     FixedMinimum,            !- Minimum Limit Type
     MinOA_Sched;             !- Minimum Outdoor Air Schedule Name
 
-  EvaporativeCooler:Indirect:ResearchSpecial,
+  EvaporativeCooler:Indirect:ResearchEspecial,
     FURNACE_PACU_CAV:4_OAIndRDD Evap Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     0.7500,                  !- Cooler Wetbulb Design Effectiveness
@@ -5001,7 +5459,7 @@
     ,                        !- Cooler Drybulb Design Effectiveness
     ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
     30.0000,                 !- Recirculating Water Pump Design Power {W}
-    ,                        !- Water Pump Power Sizing Factor 
+    ,                        !- Water Pump Power Sizing Factor W /(m3/s)air
     ,                        !- Water Pump Power Modifier Curve Name
     Autosize,                !- Secondary Air Design Flow Rate {m3/s}
     1.0,                     !- Secondary Air Flow Sizing Factor
@@ -5016,7 +5474,7 @@
     FURNACE_PACU_CAV:4_OAIndRDD Evap CoolerOA Outlet Node,     !- Secondary Air Outlet Node Name
     FURNACE_PACU_CAV:4_OADirect Evap Cooler-FURNACE_PACU_CAV:4_OAMixing BoxNode;  !- Sensor Node Name
 
-  EvaporativeCooler:Direct:ResearchSpecial,
+  EvaporativeCooler:Direct:ResearchEspecial,
     FURNACE_PACU_CAV:4_OADirect Evap Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
@@ -5043,26 +5501,6 @@
     FURNACE_PACU_CAV:4_Unitary_PackageCoolCoil air inlet,  !- Fan Outlet Node Name
     FURNACE_PACU_CAV:4_OADirect Evap Cooler-FURNACE_PACU_CAV:4_OAMixing BoxNode;  !- Setpoint Node or NodeList Name
 
-  AirLoopHVAC:UnitaryHeatCool,
-    FURNACE_PACU_CAV:4_Unitary_Package,  !- Name
-    ALWAYS_ON,               !- Availability Schedule Name
-    FURNACE_PACU_CAV:4_OA-FURNACE_PACU_CAV:4_Unitary_PackageNode,  !- Unitary System Air Inlet Node Name
-    FURNACE_PACU_CAV:4 Supply Equipment Outlet Node,  !- Unitary System Air Outlet Node Name
-    AlWAYS_ON,               !- Supply Air Fan Operating Mode Schedule Name
-    AUTOSIZE,                !- Maximum Supply Air Temperature {C}
-    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
-    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
-    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
-    unit_n_g,                !- Controlling Zone or Thermostat Location
-    Fan:OnOff,               !- Supply Fan Object Type
-    FURNACE_PACU_CAV:4_Unitary_Package_fan,  !- Supply Fan Name
-    BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
-    FURNACE_PACU_CAV:4_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
-    FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil,  !- Cooling Coil Name
-    None;                    !- Dehumidification Control Type
-
   Fan:OnOff,
     FURNACE_PACU_CAV:4_Unitary_Package_fan,  !- Name
     HVACOperationSchd,       !- Availability Schedule Name
@@ -5081,22 +5519,6 @@
     AUTOSIZE,                !- Nominal Capacity {W}
     FURNACE_PACU_CAV:4_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:4 Supply Equipment Outlet Node;  !- Air Outlet Node Name
-
-  Coil:Cooling:DX:SingleSpeed,
-    FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil,  !- Name
-    ALWAYS_ON,               !- Availability Schedule Name
-    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
-    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
-    2.6,                     !- Gross Rated Cooling COP {W/W}
-    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    FURNACE_PACU_CAV:4_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
-    FURNACE_PACU_CAV:4_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
-    FURNACE_PACU_CAV:4_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
-    FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
-    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    FURNACE_PACU_CAV:4_Unitary_PackagecoolPLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     FURNACE_PACU_CAV:4_Unitary_PackagecoolCapFT,  !- Name
@@ -5201,70 +5623,6 @@
     HVACSizingSummary,       !- Report 7 Name
     SystemSummary;           !- Report 8 Name
 
-  Output:Table:Monthly,
-    Occupant Comfort Data Summary,  !- Name
-    3,                       !- Digits After Decimal
-    People Occupant Count,   !- Variable or Meter 1 Name
-    HoursNonZero,            !- Aggregation Type for Variable or Meter 1
-    People Air Temperature,  !- Variable or Meter 2 Name
-    SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 2
-    People Air Relative Humidity,  !- Variable or Meter 3 Name
-    SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 3
-    Zone Thermal Comfort Mean Radiant Temperature,  !- Variable or Meter 4 Name
-    SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 4
-    Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time,  !- Variable or Meter 5 Name
-    SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 5
-    Zone Thermal Comfort Fanger Model PMV,  !- Variable or Meter 6 Name
-    SumOrAverageDuringHoursShown;  !- Aggregation Type for Variable or Meter 6
-
-  Output:Table:Monthly,
-    Outdoor Air Summary,     !- Name
-    3,                       !- Digits After Decimal
-    Zone People Occupant Count,  !- Variable or Meter 1 Name
-    HoursNonZero,            !- Aggregation Type for Variable or Meter 1
-    Zone People Occupant Count,  !- Variable or Meter 2 Name
-    SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 2
-    Zone Mechanical Ventilation Air Changes per Hour,  !- Variable or Meter 3 Name
-    SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 3
-    Zone Infiltration Air Change Rate,  !- Variable or Meter 4 Name
-    SumOrAverageDuringHoursShown;  !- Aggregation Type for Variable or Meter 4
-
-  Output:Table:Monthly,
-    Overall HVAC Air System Loads,  !- Name
-    3,                       !- Digits After Decimal
-    Air System Total Heating Energy,  !- Variable or Meter 1 Name
-    SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Air System Total Cooling Energy,  !- Variable or Meter 2 Name
-    SumOrAverage;            !- Aggregation Type for Variable or Meter 2
-
-  Output:Table:Monthly,
-    Overall HVAC System Energy,  !- Name
-    3,                       !- Digits After Decimal
-    Electricity:HVAC,        !- Variable or Meter 1 Name
-    SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Heating:Gas,             !- Variable or Meter 2 Name
-    SumOrAverage;            !- Aggregation Type for Variable or Meter 2
-
-  Output:Table:Monthly,
-    Setpoints Not Met With Temperatures,  !- Name
-    2,                       !- Digits After Decimal
-    Zone Heating Setpoint Not Met Time,  !- Variable or Meter 1 Name
-    HoursNonZero,            !- Aggregation Type for Variable or Meter 1
-    Zone Mean Air Temperature,  !- Variable or Meter 2 Name
-    SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 2
-    Zone Heating Setpoint Not Met While Occupied Time,  !- Variable or Meter 3 Name
-    HoursNonZero,            !- Aggregation Type for Variable or Meter 3
-    Zone Mean Air Temperature,  !- Variable or Meter 4 Name
-    SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 4
-    Zone Cooling Setpoint Not Met Time,  !- Variable or Meter 5 Name
-    HoursNonZero,            !- Aggregation Type for Variable or Meter 5
-    Zone Mean Air Temperature,  !- Variable or Meter 6 Name
-    SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 6
-    Zone Cooling Setpoint Not Met While Occupied Time,  !- Variable or Meter 7 Name
-    HoursNonZero,            !- Aggregation Type for Variable or Meter 7
-    Zone Mean Air Temperature,  !- Variable or Meter 8 Name
-    SumOrAverageDuringHoursShown;  !- Aggregation Type for Variable or Meter 8
-
   Output:Meter,Electricity:Facility,hourly;
 
   Output:Meter,Electricity:Building,hourly;
@@ -5304,8 +5662,6 @@
   Output:Variable,FURNACE_PACU_CAV:1_OADirect Evap Cooler-FURNACE_PACU_CAV:1_OAMixing BoxNode,System Node Temperature,hourly;
 
   Output:Variable,FURNACE_PACU_CAV:1_OADirect Evap Cooler-FURNACE_PACU_CAV:1_OAMixing BoxNode,System Node Setpoint Temperature,hourly;
-
-  Output:Variable,FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil,Cooling Coil Total Cooling Rate,hourly;
 
   Output:Variable,*,Zone Infiltration Air Change Rate,hourly;
 

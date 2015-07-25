@@ -2,7 +2,104 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! Introduction to EnergyPlus - Exercise 2
+
+  Output:Variable,*,Unitary System Fan Part Load Ratio,Hourly;
+
+  Output:Variable,*,Cooling Coil Runtime Fraction,Hourly;
+
+  Output:Variable,*,Heating Coil Runtime Fraction,Hourly;
+
+  HVACTemplate:System:Unitary,
+    North Zone Unitary,      !- Name
+    Office HVAC,             !- System Availability Schedule Name
+    NORTH PERIMETER,         !- Control Zone or Thermostat Location Name
+    autosize,                !- Supply Fan Maximum Flow Rate {m3/s}
+    HVACTemplate:System:UnitaryNorth Zone UnitaryContinuousFanSchedule,  !- Supply Fan Operating Mode Schedule Name
+    0.7,                     !- Supply Fan Total Efficiency
+    600,                     !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    SingleSpeedDX,           !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    ,                        !- Cooling Design Supply Air Temperature {C}
+    autosize,                !- Cooling Coil Gross Rated Total Capacity {W}
+    autosize,                !- Cooling Coil Gross Rated Sensible Heat Ratio
+    3,                       !- Cooling Coil Gross Rated COP {W/W}
+    Gas,                     !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+    ,                        !- Heating Design Supply Air Temperature {C}
+    autosize,                !- Heating Coil Capacity {W}
+    0.8,                     !- Gas Heating Coil Efficiency
+    ,                        !- Gas Heating Coil Parasitic Electric Load {W}
+    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    Office Minimum OA,       !- Minimum Outdoor Air Schedule Name
+    NoEconomizer,            !- Economizer Type
+    NoLockout,               !- Economizer Lockout
+    ,                        !- Economizer Upper Temperature Limit {C}
+    ,                        !- Economizer Lower Temperature Limit {C}
+    ,                        !- Economizer Upper Enthalpy Limit {J/kg}
+    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    BlowThrough,             !- Supply Fan Placement
+    StayOff,                 !- Night Cycle Control
+    ,                        !- Night Cycle Control Zone Name
+    None,                    !- Heat Recovery Type
+    0.7,                     !- Sensible Heat Recovery Effectiveness
+    0.65,                    !- Latent Heat Recovery Effectiveness
+    ,                        !- Dehumidification Control Type
+    ,                        !- Dehumidification Control Zone Name
+    ,                        !- Dehumidification Setpoint {percent}
+    ,                        !- Humidifier Type
+    ,                        !- Humidifier Availability Schedule Name
+    ,                        !- Humidifier Rated Capacity {m3/s}
+    ,                        !- Humidifier Rated Electric Power {W}
+    ,                        !- Humidifier Control Zone Name
+    ,                        !- Humidifier Setpoint {percent}
+    ,                        !- Return Fan
+    ,                        !- Return Fan Total Efficiency
+    ,                        !- Return Fan Delta Pressure {Pa}
+    ,                        !- Return Fan Motor Efficiency
+    ;                        !- Return Fan Motor in Air Stream Fraction
+
+  Schedule:Constant,HVACTemplate:System:UnitaryNorth Zone UnitaryContinuousFanSchedule,Any Number,1;
+
+  Sizing:Parameters,
+    1.2,                     !- Heating Sizing Factor
+    1.2;                     !- Cooling Sizing Factor
+
+  HVACTemplate:Thermostat,
+    Office Thermostat,       !- Name
+    Office Heating Setpoints,!- Heating Setpoint Schedule Name
+    ,                        !- Constant Heating Setpoint {C}
+    Office Cooling Setpoints,!- Cooling Setpoint Schedule Name
+    ;                        !- Constant Cooling Setpoint {C}
+
+  HVACTemplate:Zone:Unitary,
+    NORTH PERIMETER,         !- Zone Name
+    North Zone Unitary,      !- Template Unitary System Name
+    Office Thermostat,       !- Template Thermostat Name
+    autosize,                !- Supply Air Maximum Flow Rate {m3/s}
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    Flow/Person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
+    0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    ,                        !- Supply Plenum Name
+    ,                        !- Return Plenum Name
+    None,                    !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    autosize,                !- Baseboard Heating Capacity {W}
+    SystemSupplyAirTemperature,  !- Zone Cooling Design Supply Air Temperature Input Method
+    ,                        !- Zone Cooling Design Supply Air Temperature {C}
+    ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
+    SystemSupplyAirTemperature,  !- Zone Heating Design Supply Air Temperature Input Method
+    ,                        !- Zone Heating Design Supply Air Temperature {C}
+    ;                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+
+! Introduction to EnergyPlus - Exercise 2A
 !
 ! Building: Single floor rectangular building 30.5 m (100 ft) x 15.2 m (50 ft). 5 zones -
 !           4 exterior, 1 interior, zone height 2.4 m (8 ft). Exterior zone
@@ -25,7 +122,7 @@
 !           1 occupant per 9.3 m2 (100 ft2) of floor area. The
 !           Infiltration is 0.25 air changes per hour.
 !
-! HVAC:     None.
+! HVAC:     Single-zone unitary with DX cooling and gas heating serving NORTH PERIMETER zone.
 !
 ! Environment:  Chicago, IL, USA, Summer and Winter design days
 !
@@ -34,7 +131,7 @@
   VERSION,8.3;
 
   Building,
-    Exercise 2,              !- Name
+    Exercise 2A,             !- Name
     0.0,                     !- North Axis {deg}
     City,                    !- Terrain
     0.04,                    !- Loads Convergence Tolerance Value
@@ -51,16 +148,16 @@
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
-  ZoneCapacitanceMultiplier:ResearchSpecial,
+  ZoneCapacitanceMultiplier:ResearchEspecial,
     1,                       !- Temperature Capacity Multiplier
     1,                       !- Humidity Capacity Multiplier
     1,                       !- Carbon Dioxide Capacity Multiplier
     1.0;                     !- Generic Contaminant Capacity Multiplier
 
   SimulationControl,
-    No,                      !- Do Zone Sizing Calculation
-    No,                      !- Do System Sizing Calculation
-    No,                      !- Do Plant Sizing Calculation
+    Yes,                     !- Do Zone Sizing Calculation
+    Yes,                     !- Do System Sizing Calculation
+    Yes,                     !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
     No;                      !- Run Simulation for Weather File Run Periods
 

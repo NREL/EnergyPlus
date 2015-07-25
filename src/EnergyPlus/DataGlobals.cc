@@ -190,6 +190,8 @@ namespace DataGlobals {
 	bool AnySlabsInModel( false ); // true if there are any zone-coupled ground domains in the input file
 	bool AnyBasementsInModel( false ); // true if there are any basements in the input file
 
+	std::string outLanguage("");
+
 	int Progress( 0 ); // current progress (0-100)
 	void ( *fProgressPtr )( int const );
 	void ( *fMessagePtr )( std::string const & );

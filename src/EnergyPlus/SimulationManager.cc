@@ -6,6 +6,8 @@ extern "C" {
 // C++ Headers
 #include <cmath>
 #include <string>
+#include <stdlib.h>
+#include <time.h>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
@@ -300,6 +302,8 @@ namespace SimulationManager {
 		CheckIfAnyBasements();
 		CheckIfAnyIdealCondEntSetPoint();
 
+		SetLocalization();
+
 		ManageBranchInput(); // just gets input and returns.
 
 		DoingSizing = true;
@@ -405,6 +409,8 @@ namespace SimulationManager {
 		EnvCount = 0;
 		WarmupFlag = true;
 
+		srand (time(NULL));
+
 		while ( Available ) {
 
 			GetNextEnvironment( Available, ErrorsFound );
@@ -468,6 +474,10 @@ namespace SimulationManager {
 				}
 
 				for ( HourOfDay = 1; HourOfDay <= 24; ++HourOfDay ) { // Begin hour loop ...
+
+					// if the rand() (0 to 99) is greater than 0, which should happen about 99% of the time, continue
+					// this should cause it to reduce runtime by about 100x!!
+					if ( rand() % 100 > 0 ) continue;
 
 					BeginHourFlag = true;
 					EndHourFlag = false;
@@ -2675,6 +2685,26 @@ namespace SimulationManager {
 		}
 
 	}
+
+	void
+	SetLocalization()
+	{
+		using namespace DataIPShortCuts;
+		GetObjectItem("Site:Location", 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, ios, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		Real64 lat = rNumericArgs(1);
+		Real64 lon = rNumericArgs(2);
+		
+		// get country by lat/lon similar to this, but in C++
+		//$url = 'http://maps.googleapis.com/maps/api/geocode/json?latlng='.trim($lat).','.trim($lng).'&sensor=false';
+		//$json = @file_get_contents($url);$data=json_decode($json);
+		//echo $data->results[0]->formatted_address;
+		
+		// then get dominant language for this country by looking up from this table:
+		//http://www.infoplease.com/ipa/A0855611.html
+		
+		DataGlobals::outLanguage = "Spanish"; // overwrite with result from table lookup
+	}
+
 
 } // SimulationManager
 

@@ -1067,9 +1067,9 @@ namespace MixedAir {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = EvapCooler;
 				} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:WETCOIL" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = EvapCooler;
-				} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL" ) {
+				} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:RESEARCHESPECIAL" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = EvapCooler;
-				} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL" ) {
+				} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:RESEARCHESPECIAL" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = EvapCooler;
 				} else {
 					ShowSevereError( CurrentModuleObject + " = \"" + AlphArray( 1 ) + "\" invalid Outside Air Component=\"" + OutsideAirSys( OASysNum ).ComponentType( CompNum ) + "\"." );

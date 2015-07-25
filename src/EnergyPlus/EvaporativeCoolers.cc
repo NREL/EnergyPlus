@@ -293,8 +293,8 @@ namespace EvaporativeCoolers {
 		NumDirectEvapCool = GetNumObjectsFound( "EvaporativeCooler:Direct:CelDekPad" );
 		NumDryInDirectEvapCool = GetNumObjectsFound( "EvaporativeCooler:Indirect:CelDekPad" );
 		NumWetInDirectEvapCool = GetNumObjectsFound( "EvaporativeCooler:Indirect:WetCoil" );
-		NumRDDEvapCool = GetNumObjectsFound( "EvaporativeCooler:Indirect:ResearchSpecial" );
-		NumDirectResearchSpecialEvapCool = GetNumObjectsFound( "EvaporativeCooler:Direct:ResearchSpecial" );
+		NumRDDEvapCool = GetNumObjectsFound( "EvaporativeCooler:Indirect:ResearchEspecial" );
+		NumDirectResearchSpecialEvapCool = GetNumObjectsFound( "EvaporativeCooler:Direct:ResearchEspecial" );
 
 		//Sum up all of the Evap Cooler Types
 		NumEvapCool = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + NumRDDEvapCool + NumDirectResearchSpecialEvapCool;
@@ -507,7 +507,7 @@ namespace EvaporativeCoolers {
 		} // end Number of Wet Coil Indirect EvapCooler Loop
 		//**************************************************************
 		//This is the start of the Indirect Research Special Evap Cooler
-		cCurrentModuleObject = "EvaporativeCooler:Indirect:ResearchSpecial";
+		cCurrentModuleObject = "EvaporativeCooler:Indirect:ResearchEspecial";
 		for ( IndEvapCoolNum = 1; IndEvapCoolNum <= NumRDDEvapCool; ++IndEvapCoolNum ) {
 			EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + IndEvapCoolNum;
 			GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -615,7 +615,7 @@ namespace EvaporativeCoolers {
 
 		} // end of Indirect Research Special cooler input loop
 
-		cCurrentModuleObject = "EvaporativeCooler:Direct:ResearchSpecial";
+		cCurrentModuleObject = "EvaporativeCooler:Direct:ResearchEspecial";
 		for ( DirectEvapCoolNum = 1; DirectEvapCoolNum <= NumDirectResearchSpecialEvapCool; ++DirectEvapCoolNum ) {
 			EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + NumRDDEvapCool + DirectEvapCoolNum;
 			GetObjectItem( cCurrentModuleObject, DirectEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -990,26 +990,26 @@ namespace EvaporativeCoolers {
 
 			}
 
-			ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).IndirectVolFlowRate );
+			ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchEspecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).IndirectVolFlowRate );
 		}
 
 		if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial ) {
 			// secondary air fan sizing: Secondary flow Rate (m3/s) * Fan Flow Sizing Factor (W/(m3/s)
 			if ( EvapCond( EvapCoolNum ).IndirectFanPower == AutoSize ) {
 				EvapCond( EvapCoolNum ).IndirectFanPower = EvapCond( EvapCoolNum ).IndirectVolFlowRate * EvapCond( EvapCoolNum ).FanSizingSpecificPower;
-				ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Secondary Fan Power [W]", EvapCond( EvapCoolNum ).IndirectFanPower );
+				ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchEspecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Secondary Fan Power [W]", EvapCond( EvapCoolNum ).IndirectFanPower );
 			}
 			// recirculating water pump sizing: Secondary flow Rate (m3/s) * Pump Sizing Factor (W/(m3/s)
 			if ( EvapCond( EvapCoolNum ).IndirectRecircPumpPower == AutoSize ) {
 				EvapCond( EvapCoolNum ).IndirectRecircPumpPower = EvapCond( EvapCoolNum ).IndirectVolFlowRate * EvapCond( EvapCoolNum ).RecircPumpSizingFactor;
-				ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Recirculating Pump Power [W]", EvapCond( EvapCoolNum ).IndirectRecircPumpPower );
+				ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchEspecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Recirculating Pump Power [W]", EvapCond( EvapCoolNum ).IndirectRecircPumpPower );
 			}
 		}
 		if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerDirectResearchSpecial ) {
 			// recirculating water pump sizing: Primary Air Design flow Rate (m3/s) * Pump Sizing Factor (W/(m3/s)
 			if ( EvapCond( EvapCoolNum ).RecircPumpPower == AutoSize ) {
 				EvapCond( EvapCoolNum ).RecircPumpPower = EvapCond( EvapCoolNum ).VolFlowRate * EvapCond( EvapCoolNum ).RecircPumpSizingFactor;
-				ReportSizingOutput( "EvaporativeCooler:Direct:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Recirculating Pump Power [W]", EvapCond( EvapCoolNum ).RecircPumpPower );
+				ReportSizingOutput( "EvaporativeCooler:Direct:ResearchEspecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Recirculating Pump Power [W]", EvapCond( EvapCoolNum ).RecircPumpPower );
 			}
 		}
 	}
@@ -3139,8 +3139,8 @@ namespace EvaporativeCoolers {
 				if ( SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:CELDEKPAD" ) {
 					ZoneEvapUnit( UnitLoop ).EvapCooler_1_ObjectClassName = "EvaporativeCooler:Direct:CelDekPad";
 					ZoneEvapUnit( UnitLoop ).EvapCooler_1_Type_Num = iEvapCoolerDirectCELDEKPAD;
-				} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL" ) {
-					ZoneEvapUnit( UnitLoop ).EvapCooler_1_ObjectClassName = "EvaporativeCooler:Direct:ResearchSpecial";
+				} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:RESEARCHESPECIAL" ) {
+					ZoneEvapUnit( UnitLoop ).EvapCooler_1_ObjectClassName = "EvaporativeCooler:Direct:ResearchEspecial";
 					ZoneEvapUnit( UnitLoop ).EvapCooler_1_Type_Num = iEvapCoolerDirectResearchSpecial;
 				} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:CELDEKPAD" ) {
 					ZoneEvapUnit( UnitLoop ).EvapCooler_1_ObjectClassName = "EvaporativeCooler:Indirect:CelDekPad";
@@ -3148,8 +3148,8 @@ namespace EvaporativeCoolers {
 				} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:WETCOIL" ) {
 					ZoneEvapUnit( UnitLoop ).EvapCooler_1_ObjectClassName = "EvaporativeCooler:Indirect:WetCoil";
 					ZoneEvapUnit( UnitLoop ).EvapCooler_1_Type_Num = iEvapCoolerInDirectWETCOIL;
-				} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL" ) {
-					ZoneEvapUnit( UnitLoop ).EvapCooler_1_ObjectClassName = "EvaporativeCooler:Indirect:ResearchSpecial";
+				} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:RESEARCHESPECIAL" ) {
+					ZoneEvapUnit( UnitLoop ).EvapCooler_1_ObjectClassName = "EvaporativeCooler:Indirect:ResearchEspecial";
 					ZoneEvapUnit( UnitLoop ).EvapCooler_1_Type_Num = iEvapCoolerInDirectRDDSpecial;
 				} else {
 					ShowSevereError( CurrentModuleObject + "=\"" + ZoneEvapUnit( UnitLoop ).Name + "\" invalid data." );
@@ -3171,8 +3171,8 @@ namespace EvaporativeCoolers {
 					if ( SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:CELDEKPAD" ) {
 						ZoneEvapUnit( UnitLoop ).EvapCooler_2_ObjectClassName = "EvaporativeCooler:Direct:CelDekPad";
 						ZoneEvapUnit( UnitLoop ).EvapCooler_2_Type_Num = iEvapCoolerDirectCELDEKPAD;
-					} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL" ) {
-						ZoneEvapUnit( UnitLoop ).EvapCooler_2_ObjectClassName = "EvaporativeCooler:Direct:ResearchSpecial";
+					} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:RESEARCHESPECIAL" ) {
+						ZoneEvapUnit( UnitLoop ).EvapCooler_2_ObjectClassName = "EvaporativeCooler:Direct:ResearchEspecial";
 						ZoneEvapUnit( UnitLoop ).EvapCooler_2_Type_Num = iEvapCoolerDirectResearchSpecial;
 					} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:CELDEKPAD" ) {
 						ZoneEvapUnit( UnitLoop ).EvapCooler_2_ObjectClassName = "EvaporativeCooler:Indirect:CelDekPad";
@@ -3180,8 +3180,8 @@ namespace EvaporativeCoolers {
 					} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:WETCOIL" ) {
 						ZoneEvapUnit( UnitLoop ).EvapCooler_2_ObjectClassName = "EvaporativeCooler:Indirect:WetCoil";
 						ZoneEvapUnit( UnitLoop ).EvapCooler_2_Type_Num = iEvapCoolerInDirectWETCOIL;
-					} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL" ) {
-						ZoneEvapUnit( UnitLoop ).EvapCooler_2_ObjectClassName = "EvaporativeCooler:Indirect:ResearchSpecial";
+					} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:RESEARCHESPECIAL" ) {
+						ZoneEvapUnit( UnitLoop ).EvapCooler_2_ObjectClassName = "EvaporativeCooler:Indirect:ResearchEspecial";
 						ZoneEvapUnit( UnitLoop ).EvapCooler_2_Type_Num = iEvapCoolerInDirectRDDSpecial;
 					} else {
 						ShowSevereError( CurrentModuleObject + "=\"" + ZoneEvapUnit( UnitLoop ).Name + "\" invalid data." );

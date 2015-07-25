@@ -42,7 +42,7 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE VOLUME CAPACITANCE MULTIPLIER ===========
 
-  ZoneCapacitanceMultiplier:ResearchSpecial,
+  ZoneCapacitanceMultiplier:ResearchEspecial,
     1,                       !- Temperature Capacity Multiplier
     1,                       !- Humidity Capacity Multiplier
     1,                       !- Carbon Dioxide Capacity Multiplier
@@ -1487,26 +1487,6 @@
   Output:Variable,*,Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate,Monthly;
 
   Output:Variable,*,Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate,Annual;
-
-  Output:Variable,*,Zone Windows Total Heat Gain Rate,Timestep;
-
-  Output:Variable,*,Zone Windows Total Heat Gain Rate,Hourly;
-
-  Output:Variable,*,Zone Windows Total Heat Gain Rate,Daily;
-
-  Output:Variable,*,Zone Windows Total Heat Gain Rate,Monthly;
-
-  Output:Variable,*,Zone Windows Total Heat Gain Rate,Annual;
-
-  Output:Variable,*,Zone Windows Total Heat Loss Rate,Timestep;
-
-  Output:Variable,*,Zone Windows Total Heat Loss Rate,Hourly;
-
-  Output:Variable,*,Zone Windows Total Heat Loss Rate,Daily;
-
-  Output:Variable,*,Zone Windows Total Heat Loss Rate,Monthly;
-
-  Output:Variable,*,Zone Windows Total Heat Loss Rate,Annual;
 
   Output:Variable,*,Surface Outside Face Sunlit Area,Timestep;
 

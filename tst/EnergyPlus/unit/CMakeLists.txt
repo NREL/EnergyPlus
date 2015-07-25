@@ -47,6 +47,7 @@ set( test_src
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
+  Termites.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
   WaterCoils.unit.cc

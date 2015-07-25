@@ -132,7 +132,7 @@
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
-  ZoneCapacitanceMultiplier:ResearchSpecial,
+  ZoneCapacitanceMultiplier:ResearchEspecial,
     10,                      !- Temperature Capacity Multiplier
     15,                      !- Humidity Capacity Multiplier
     1,                       !- Carbon Dioxide Capacity Multiplier
