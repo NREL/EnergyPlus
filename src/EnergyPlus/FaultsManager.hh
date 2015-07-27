@@ -175,7 +175,7 @@ namespace FaultsManager {
 
 	bool
 	CheckFaultyAirFilterFanCurve(
-		std::string const CompName, // name of the fan
+		std::string const & CompName, // name of the fan
 		int const FanCurvePtr       // pointer of the fan curve
 	);
 

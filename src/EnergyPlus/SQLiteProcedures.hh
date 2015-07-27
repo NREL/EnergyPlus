@@ -57,10 +57,10 @@ public:
 	// This allows for testing of private methods in SQLite
 	friend class SQLiteFixture;
 
-	void addScheduleData( int const number, std::string const name, std::string const type, double const minValue, double const maxValue );
+	void addScheduleData( int const number, std::string const & name, std::string const & type, double const minValue, double const maxValue );
 	void addZoneData( int const number, DataHeatBalance::ZoneData const & zoneData );
 	void addZoneListData( int const number, DataHeatBalance::ZoneListData const & zoneListData );
-	void addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const surfaceClass );
+	void addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const & surfaceClass );
 	void addZoneGroupData( int const number, DataHeatBalance::ZoneGroupData const & zoneGroupData );
 	void addMaterialData( int const number, DataHeatBalance::MaterialProperties const & materialData );
 	void addConstructionData( int const number, DataHeatBalance::ConstructionData const & constructionData, double const & constructionUValue );
@@ -340,8 +340,8 @@ private:
 	class Schedule : SQLiteData
 	{
 		public:
-			Schedule( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const scheduleNumber, std::string const scheduleName,
-					std::string const scheduleType, double const scheduleMinValue, double const scheduleMaxValue ) :
+			Schedule( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const scheduleNumber, std::string const & scheduleName,
+					std::string const & scheduleType, double const scheduleMinValue, double const scheduleMaxValue ) :
 				SQLiteData( errorStream, db ),
 				number( scheduleNumber ),
 				name( scheduleName ),
@@ -363,7 +363,7 @@ private:
 	class Surface : SQLiteData
 	{
 		public:
-			Surface( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const surfaceNumber, DataSurfaces::SurfaceData const & surfaceData, std::string const surfaceClass ) :
+			Surface( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const surfaceNumber, DataSurfaces::SurfaceData const & surfaceData, std::string const & surfaceClass ) :
 				SQLiteData( errorStream, db ),
 				number( surfaceNumber ),
 				name( surfaceData.Name ),
