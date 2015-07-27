@@ -49,7 +49,7 @@ namespace ObjexxFCL {
 
 	// Has any Character of a std::string?
 	bool
-	Cstring::has_any_of( std::string const s ) const
+	Cstring::has_any_of( std::string const & s ) const
 	{
 		size_type const s_len( s.length() );
 		for ( size_type i = 0; i < std::strlen( str_ ); ++i ) {

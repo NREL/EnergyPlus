@@ -557,7 +557,7 @@ public: // Properties
 	append_on()
 	{
 		append_ = true;
-		if ( append_ ) asis_ = false;
+		asis_ = false;
 		return *this;
 	}
 

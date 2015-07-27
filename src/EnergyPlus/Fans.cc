@@ -3198,7 +3198,7 @@ namespace Fans {
 
 	Real64
 	CalFaultyFanAirFlowReduction(
-		std::string const FanName,            // name of the fan
+		std::string const & FanName,          // name of the fan
 		Real64 const FanDesignAirFlowRate,    // Fan Design Volume Flow Rate [m3/sec]
 		Real64 const FanDesignDeltaPress,     // Fan Design Delta Pressure [Pa]
 		Real64 const FanFaultyDeltaPressInc,  // Increase of Fan Delta Pressure in the Faulty Case [Pa]

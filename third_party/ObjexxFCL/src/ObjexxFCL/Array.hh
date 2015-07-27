@@ -30,6 +30,7 @@
 #include <ObjexxFCL/TypeTraits.hh>
 #include <ObjexxFCL/Vector2.hh>
 #include <ObjexxFCL/Vector3.hh>
+#include <ObjexxFCL/Vector4.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -332,8 +333,8 @@ protected: // Creation
 	 shift_( 0 ),
 	 sdata_( nullptr )
 	{
-		operator []( 0 ) = v[ 0 ];
-		operator []( 1 ) = v[ 1 ];
+		operator []( 0 ) = v.x;
+		operator []( 1 ) = v.y;
 	}
 
 	// Vector3 Constructor Template
@@ -351,9 +352,30 @@ protected: // Creation
 	 shift_( 0 ),
 	 sdata_( nullptr )
 	{
-		operator []( 0 ) = v[ 0 ];
-		operator []( 1 ) = v[ 1 ];
-		operator []( 2 ) = v[ 2 ];
+		operator []( 0 ) = v.x;
+		operator []( 1 ) = v.y;
+		operator []( 2 ) = v.z;
+	}
+
+	// Vector4 Constructor Template
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
+	inline
+	Array( Vector4< U > const & v ) :
+	 capacity_( 4 ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+	 data_( new T[ capacity_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
+	 size_( capacity_ ),
+	 owner_( true ),
+	 shift_( 0 ),
+	 sdata_( nullptr )
+	{
+		operator []( 0 ) = v.x;
+		operator []( 1 ) = v.y;
+		operator []( 2 ) = v.z;
+		operator []( 3 ) = v.w;
 	}
 
 	// Default Proxy Constructor
@@ -494,7 +516,6 @@ protected: // Assignment: Array
 	void
 	operator =( std::initializer_list< U > const l )
 	{
-		assert( size_bounded() );
 		assert( size_ == l.size() );
 		std::copy( l.begin(), l.end(), data_ );
 	}
@@ -505,7 +526,6 @@ protected: // Assignment: Array
 	void
 	operator =( std::array< U, s > const & a )
 	{
-		assert( size_bounded() );
 		assert( size_ == s );
 		std::copy( a.begin(), a.end(), data_ );
 	}
@@ -516,7 +536,6 @@ protected: // Assignment: Array
 	void
 	operator =( std::vector< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == v.size() );
 		std::copy( v.begin(), v.end(), data_ );
 	}
@@ -527,10 +546,9 @@ protected: // Assignment: Array
 	void
 	operator =( Vector2< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 2u );
-		operator []( 0 ) = v[ 0 ];
-		operator []( 1 ) = v[ 1 ];
+		operator []( 0 ) = v.x;
+		operator []( 1 ) = v.y;
 	}
 
 	// Vector3 Assignment Template
@@ -539,11 +557,23 @@ protected: // Assignment: Array
 	void
 	operator =( Vector3< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 3u );
-		operator []( 0 ) = v[ 0 ];
-		operator []( 1 ) = v[ 1 ];
-		operator []( 2 ) = v[ 2 ];
+		operator []( 0 ) = v.x;
+		operator []( 1 ) = v.y;
+		operator []( 2 ) = v.z;
+	}
+
+	// Vector4 Assignment Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator =( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		operator []( 0 ) = v.x;
+		operator []( 1 ) = v.y;
+		operator []( 2 ) = v.z;
+		operator []( 3 ) = v.w;
 	}
 
 	// += Array
@@ -695,7 +725,6 @@ protected: // Assignment: Array
 	void
 	operator +=( std::initializer_list< U > const l )
 	{
-		assert( size_bounded() );
 		assert( size_ == l.size() );
 		auto r( l.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++r ) {
@@ -709,7 +738,6 @@ protected: // Assignment: Array
 	void
 	operator -=( std::initializer_list< U > const l )
 	{
-		assert( size_bounded() );
 		assert( size_ == l.size() );
 		auto r( l.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++r ) {
@@ -723,7 +751,6 @@ protected: // Assignment: Array
 	void
 	operator *=( std::initializer_list< U > const l )
 	{
-		assert( size_bounded() );
 		assert( size_ == l.size() );
 		auto r( l.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++r ) {
@@ -737,7 +764,6 @@ protected: // Assignment: Array
 	void
 	operator /=( std::initializer_list< U > const l )
 	{
-		assert( size_bounded() );
 		assert( size_ == l.size() );
 		auto r( l.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++r ) {
@@ -752,7 +778,6 @@ protected: // Assignment: Array
 	void
 	operator +=( std::array< U, s > const & a )
 	{
-		assert( size_bounded() );
 		assert( size_ == s );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] += a[ i ];
@@ -765,7 +790,6 @@ protected: // Assignment: Array
 	void
 	operator -=( std::array< U, s > const & a )
 	{
-		assert( size_bounded() );
 		assert( size_ == s );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] -= a[ i ];
@@ -778,7 +802,6 @@ protected: // Assignment: Array
 	void
 	operator *=( std::array< U, s > const & a )
 	{
-		assert( size_bounded() );
 		assert( size_ == s );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] *= a[ i ];
@@ -791,7 +814,6 @@ protected: // Assignment: Array
 	void
 	operator /=( std::array< U, s > const & a )
 	{
-		assert( size_bounded() );
 		assert( size_ == s );
 		for ( size_type i = 0; i < size_; ++i ) {
 			assert( a[ i ] != T( 0 ) );
@@ -805,7 +827,6 @@ protected: // Assignment: Array
 	void
 	operator +=( std::vector< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == v.size() );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] += v[ i ];
@@ -818,7 +839,6 @@ protected: // Assignment: Array
 	void
 	operator -=( std::vector< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == v.size() );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] -= v[ i ];
@@ -831,7 +851,6 @@ protected: // Assignment: Array
 	void
 	operator *=( std::vector< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == v.size() );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] *= v[ i ];
@@ -844,7 +863,6 @@ protected: // Assignment: Array
 	void
 	operator /=( std::vector< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == v.size() );
 		for ( size_type i = 0; i < size_; ++i ) {
 			assert( v[ i ] != T( 0 ) );
@@ -858,10 +876,9 @@ protected: // Assignment: Array
 	void
 	operator +=( Vector2< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 2u );
-		data_[ 0 ] += v[ 0 ];
-		data_[ 1 ] += v[ 1 ];
+		data_[ 0 ] += v.x;
+		data_[ 1 ] += v.y;
 	}
 
 	// -= Vector2 Template
@@ -870,10 +887,9 @@ protected: // Assignment: Array
 	void
 	operator -=( Vector2< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 2u );
-		data_[ 0 ] -= v[ 0 ];
-		data_[ 1 ] -= v[ 1 ];
+		data_[ 0 ] -= v.x;
+		data_[ 1 ] -= v.y;
 	}
 
 	// *= Vector2 Template
@@ -882,10 +898,9 @@ protected: // Assignment: Array
 	void
 	operator *=( Vector2< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 2u );
-		data_[ 0 ] *= v[ 0 ];
-		data_[ 1 ] *= v[ 1 ];
+		data_[ 0 ] *= v.x;
+		data_[ 1 ] *= v.y;
 	}
 
 	// /= Vector2 Template
@@ -894,12 +909,11 @@ protected: // Assignment: Array
 	void
 	operator /=( Vector2< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 2u );
-		assert( v[ 0 ] != T( 0 ) );
-		assert( v[ 1 ] != T( 0 ) );
-		data_[ 0 ] /= v[ 0 ];
-		data_[ 1 ] /= v[ 1 ];
+		assert( v.x != T( 0 ) );
+		assert( v.y != T( 0 ) );
+		data_[ 0 ] /= v.x;
+		data_[ 1 ] /= v.y;
 	}
 
 	// += Vector3 Template
@@ -908,11 +922,10 @@ protected: // Assignment: Array
 	void
 	operator +=( Vector3< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 3u );
-		data_[ 0 ] += v[ 0 ];
-		data_[ 1 ] += v[ 1 ];
-		data_[ 2 ] += v[ 2 ];
+		data_[ 0 ] += v.x;
+		data_[ 1 ] += v.y;
+		data_[ 2 ] += v.z;
 	}
 
 	// -= Vector3 Template
@@ -921,11 +934,10 @@ protected: // Assignment: Array
 	void
 	operator -=( Vector3< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 3u );
-		data_[ 0 ] -= v[ 0 ];
-		data_[ 1 ] -= v[ 1 ];
-		data_[ 2 ] -= v[ 2 ];
+		data_[ 0 ] -= v.x;
+		data_[ 1 ] -= v.y;
+		data_[ 2 ] -= v.z;
 	}
 
 	// *= Vector3 Template
@@ -934,11 +946,10 @@ protected: // Assignment: Array
 	void
 	operator *=( Vector3< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 3u );
-		data_[ 0 ] *= v[ 0 ];
-		data_[ 1 ] *= v[ 1 ];
-		data_[ 2 ] *= v[ 2 ];
+		data_[ 0 ] *= v.x;
+		data_[ 1 ] *= v.y;
+		data_[ 2 ] *= v.z;
 	}
 
 	// /= Vector3 Template
@@ -947,14 +958,69 @@ protected: // Assignment: Array
 	void
 	operator /=( Vector3< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 3u );
-		assert( v[ 0 ] != T( 0 ) );
-		assert( v[ 1 ] != T( 0 ) );
-		assert( v[ 2 ] != T( 0 ) );
-		data_[ 0 ] /= v[ 0 ];
-		data_[ 1 ] /= v[ 1 ];
-		data_[ 2 ] /= v[ 2 ];
+		assert( v.x != T( 0 ) );
+		assert( v.y != T( 0 ) );
+		assert( v.z != T( 0 ) );
+		data_[ 0 ] /= v.x;
+		data_[ 1 ] /= v.y;
+		data_[ 2 ] /= v.z;
+	}
+
+	// += Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator +=( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		data_[ 0 ] += v.x;
+		data_[ 1 ] += v.y;
+		data_[ 2 ] += v.z;
+		data_[ 3 ] += v.w;
+	}
+
+	// -= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator -=( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		data_[ 0 ] -= v.x;
+		data_[ 1 ] -= v.y;
+		data_[ 2 ] -= v.z;
+		data_[ 3 ] -= v.w;
+	}
+
+	// *= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator *=( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		data_[ 0 ] *= v.x;
+		data_[ 1 ] *= v.y;
+		data_[ 2 ] *= v.z;
+		data_[ 3 ] *= v.w;
+	}
+
+	// /= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator /=( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		assert( v.x != T( 0 ) );
+		assert( v.y != T( 0 ) );
+		assert( v.z != T( 0 ) );
+		assert( v.w != T( 0 ) );
+		data_[ 0 ] /= v.x;
+		data_[ 1 ] /= v.y;
+		data_[ 2 ] /= v.z;
+		data_[ 3 ] /= v.w;
 	}
 
 public: // Assignment: Value
@@ -1112,7 +1178,6 @@ protected: // Assignment: Logical
 	void
 	and_equals( std::initializer_list< U > const l )
 	{
-		assert( size_bounded() );
 		assert( size_ == l.size() );
 		auto r( l.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++r ) {
@@ -1126,7 +1191,6 @@ protected: // Assignment: Logical
 	void
 	or_equals( std::initializer_list< U > const l )
 	{
-		assert( size_bounded() );
 		assert( size_ == l.size() );
 		auto r( l.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++r ) {
@@ -1140,7 +1204,6 @@ protected: // Assignment: Logical
 	void
 	and_equals( std::array< U, s > const & a )
 	{
-		assert( size_bounded() );
 		assert( size_ == s );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = data_[ i ] && a[ i ];
@@ -1153,7 +1216,6 @@ protected: // Assignment: Logical
 	void
 	or_equals( std::array< U, s > const & a )
 	{
-		assert( size_bounded() );
 		assert( size_ == s );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = data_[ i ] || a[ i ];
@@ -1166,7 +1228,6 @@ protected: // Assignment: Logical
 	void
 	and_equals( std::vector< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == v.size() );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = data_[ i ] && v[ i ];
@@ -1179,7 +1240,6 @@ protected: // Assignment: Logical
 	void
 	or_equals( std::vector< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == v.size() );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = data_[ i ] || v[ i ];
@@ -1192,10 +1252,9 @@ protected: // Assignment: Logical
 	void
 	and_equals( Vector2< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 2u );
-		data_[ 0 ] = data_[ 0 ] && v[ 0 ];
-		data_[ 1 ] = data_[ 1 ] && v[ 1 ];
+		data_[ 0 ] = data_[ 0 ] && v.x;
+		data_[ 1 ] = data_[ 1 ] && v.y;
 	}
 
 	// ||= Vector2 Template
@@ -1204,10 +1263,9 @@ protected: // Assignment: Logical
 	void
 	or_equals( Vector2< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 2u );
-		data_[ 0 ] = data_[ 0 ] || v[ 0 ];
-		data_[ 1 ] = data_[ 1 ] || v[ 1 ];
+		data_[ 0 ] = data_[ 0 ] || v.x;
+		data_[ 1 ] = data_[ 1 ] || v.y;
 	}
 
 	// &&= Vector3 Template
@@ -1216,11 +1274,10 @@ protected: // Assignment: Logical
 	void
 	and_equals( Vector3< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 3u );
-		data_[ 0 ] = data_[ 0 ] && v[ 0 ];
-		data_[ 1 ] = data_[ 1 ] && v[ 1 ];
-		data_[ 2 ] = data_[ 2 ] && v[ 2 ];
+		data_[ 0 ] = data_[ 0 ] && v.x;
+		data_[ 1 ] = data_[ 1 ] && v.y;
+		data_[ 2 ] = data_[ 2 ] && v.z;
 	}
 
 	// ||= Vector3 Template
@@ -1229,11 +1286,36 @@ protected: // Assignment: Logical
 	void
 	or_equals( Vector3< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 3u );
-		data_[ 0 ] = data_[ 0 ] || v[ 0 ];
-		data_[ 1 ] = data_[ 1 ] || v[ 1 ];
-		data_[ 2 ] = data_[ 2 ] || v[ 2 ];
+		data_[ 0 ] = data_[ 0 ] || v.x;
+		data_[ 1 ] = data_[ 1 ] || v.y;
+		data_[ 2 ] = data_[ 2 ] || v.z;
+	}
+
+	// &&= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	and_equals( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		data_[ 0 ] = data_[ 0 ] && v.x;
+		data_[ 1 ] = data_[ 1 ] && v.y;
+		data_[ 2 ] = data_[ 2 ] && v.z;
+		data_[ 3 ] = data_[ 3 ] && v.w;
+	}
+
+	// ||= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	or_equals( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		data_[ 0 ] = data_[ 0 ] || v.x;
+		data_[ 1 ] = data_[ 1 ] || v.y;
+		data_[ 2 ] = data_[ 2 ] || v.z;
+		data_[ 3 ] = data_[ 3 ] || v.w;
 	}
 
 public: // Subscript
