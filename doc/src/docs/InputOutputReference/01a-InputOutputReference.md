@@ -1,5 +1,5 @@
 
-![](InputOutputReference/media/ep.gif)
+![](media/ep.gif)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
@@ -161,7 +161,7 @@ The following is a basic description of the structure of the IDD (it’s actuall
 !
 !  \maximum         Maximum that includes the following value
 !
-!  \maximum&lt;        Maximum that must be &lt; than the following value
+!  \maximum<        Maximum that must be < than the following value
 !
 !  \default         Default for the field (if N/A then omit entire line)
 !
@@ -265,11 +265,11 @@ The following is a basic description of the structure of the IDD (it’s actuall
 !                   appropriate message to the error file.
 !                   usage:  \obsolete New=&gt;[New object name]
 !
-!  \extensible:&lt;\#&gt;  This object is dynamically extensible -- meaning, if you
+!  \extensible:<\#&gt;  This object is dynamically extensible -- meaning, if you
 !           change the IDD appropriately (if the object has a simple list
 !           structure -- just add items to the list arguments (i.e. BRANCH
 !           LIST). These will be automatically redimensioned and used during
-!           the simulation. &lt;\#&gt; should be entered by the developer to signify
+!           the simulation. <\#&gt; should be entered by the developer to signify
 !           how many of the last fields are needed to be extended (and EnergyPlus
 !           will attempt to auto-extend the object).  The first field of the first
 !           instance of the extensible field set is marked with \begin-extensible.
@@ -505,7 +505,7 @@ Site:Location,
   N4 ; \field Elevation
        \units m
        \minimum -300.0
-       \maximum&lt; 8900.0
+       \maximum< 8900.0
        \default 0.0
        \type real
 ```
@@ -728,7 +728,7 @@ The Building North Axis is specified **relative to true North**. Buildings frequ
 
 The figure below shows how the building north axis can be rotated to correspond with one of the major axes of an actual building. The relevance of this field is described more completely under “GlobalGeometryRules”; in particular, the value of “North Axis” is *ignored* if a coordinate system other than “relative” is used.
 
-![](InputOutputReference/media/image001.svg)
+![](media/image001.svg)
 
 Figure 1. Illustration of Building North Axis
 
@@ -807,7 +807,7 @@ If you use **FullInteriorAndExterior** the program will also calculate how much 
 
 
 
-![](InputOutputReference/media/image002.svg)
+![](media/image002.svg)
 
 Figure 2. Illustration of Convex and Non-convex Zones
 
@@ -831,19 +831,19 @@ The building surfaces are assumed to be diffusely reflecting if they are opaque 
 
 
 
-![](InputOutputReference/media/image003.svg)
+![](media/image003.svg)
 
 Figure 3.  Solar reflection from shadowing surfaces. Solid arrows are beam solar radiation; dashed arrows are diffuse solar radiation. (a) Diffuse reflection of beam solar radiation from the top of an overhang. (b) Diffuse reflection of sky solar radiation from the top of an overhang. (c) Beam-to-beam (specular) reflection from the façade of an adjacent highly-glazed building represented by a vertical shadowing surface.
 
 
 
-![](InputOutputReference/media/image004.svg)
+![](media/image004.svg)
 
 Figure 4.  Solar reflection from building surfaces onto other building surfaces. In this example beam solar reflects from a vertical section of the building onto a roof section. The reflection from the window is specular. The reflection from the wall is diffuse.
 
 
 
-![](InputOutputReference/media/image005.svg)
+![](media/image005.svg)
 
 Figure 5. Shadowing from building affects beam solar reflection from the ground. Beam-to-diffuse reflection from the ground onto the building occurs only for sunlit areas, A and C, not from shaded area, B.
 
@@ -1012,15 +1012,15 @@ This field determines the solution scheme used by the Conduction Finite Differen
 
 #### Field: Space Discretization Constant
 
-This field controls the how the model determines spatial discretization, or the count of nodes across each material layer in the construction.  The model calculates the nominal distance associated with a node, <span>$\Delta x$</span>, using
+This field controls the how the model determines spatial discretization, or the count of nodes across each material layer in the construction.  The model calculates the nominal distance associated with a node, <span>\(\Delta x\)</span>, using
 
 <div>\[\Delta x = \sqrt {C\alpha \Delta t} \]</div>
 
 Where
 
-<span>$\alpha $</span>is the thermal diffusivity of the material layer, in m<sup>2</sup>/s
+<span>\(\alpha \)</span>is the thermal diffusivity of the material layer, in m<sup>2</sup>/s
 
-<span>$\Delta t$</span>is the length of the timestep in seconds.
+<span>\(\Delta t\)</span>is the length of the timestep in seconds.
 
 *C* is a constant set by this field.
 
@@ -1268,7 +1268,7 @@ No problems for processing
 
 This object is an advanced feature that can be used to control the effective storage capacity of the zone.  Capacitance multipliers of 1.0 indicate the capacitance is that of the (moist) air in the volume of the specified zone. This multiplier can be increased if the zone air capacitance needs to be increased for stability of the simulation or to allow modeling higher or lower levels of damping of behavior over time. The multipliers are applied to the base value corresponding to the total capacitance for the zone’s volume of air at current zone (moist) conditions.
 
-#### Field: Sensible Heat Capacity Multiplier
+#### Field: Temperature Capacity Multiplier
 
 This field is used to alter the effective heat capacitance of the zone air volume. This affects the transient calculations of zone air temperature. Values greater than 1.0 have the effect of smoothing or damping the rate of change in the temperature of zone air from timestep to timestep.  Note that sensible heat capacity can also be modeled using internal mass surfaces.
 
@@ -1617,7 +1617,7 @@ This numeric field should contain the day’s maximum dry-bulb temperature in de
 
 A design day can have a “high” temperature and a “low” temperature (or can be a constant temperature for each hour of the day). If there is a difference between high and low temperatures, this field should contain the difference from the high to the low. EnergyPlus, by default, distributes this range over the 24 hours in the day as shown in the figure below:
 
-![](InputOutputReference/media/image010.svg)
+![](media/image010.svg)
 
 Figure 6. Default Daily range Multiplier for Design Days
 
@@ -2509,15 +2509,15 @@ Note that using this object overrides the wind speed profile coefficients implie
 
 #### Field: Wind Speed Profile Exponent
 
-The wind speed profile exponent for the terrain surrounding the site. The exponent can be estimated from the table above (see **Site:WeatherStation**) or calculated beforehand using more sophisticated techniques, such as CFD modeling of the site terrain. Note that using this object overrides the wind speed profile coefficients implied by the *Terrain* field of the **Building** object even if this field is left blank.
+The wind speed profile exponent for the terrain surrounding the site. The exponent can be estimated from the table above (see **Site:WeatherStation**) or calculated beforehand using more sophisticated techniques, such as CFD modeling of the site terrain. Note that using this object overrides the wind speed profile coefficients implied by the *Terrain* field of the **Building** object even if this field is left blank. This field can be set to zero to turn off all wind dependence on height.
 
 #### Field: Wind Speed Profile Boundary Layer Thickness
 
-The wind speed profile boundary layer thickness [m] for the terrain surrounding the site. The boundary layer can be estimated from the table above (see **Site:WeatherStation**) or calculated beforehand using more sophisticated techniques, such as CFD modeling of the site terrain. Note that using this object overrides the wind speed profile coefficients implied by the *Terrain* field of the **Building** object even if this field is left blank. This field can be set to zero to turn off all wind dependence on height.
+The wind speed profile boundary layer thickness [m] for the terrain surrounding the site. The boundary layer can be estimated from the table above (see **Site:WeatherStation**) or calculated beforehand using more sophisticated techniques, such as CFD modeling of the site terrain. Note that using this object overrides the wind speed profile coefficients implied by the *Terrain* field of the **Building** object even if this field is left blank.
 
 #### Field: Air Temperature Gradient Coefficient
 
-The air temperature gradient coefficient [K/m] is a research option that allows the user to control the variation in outdoor air temperature as a function of height above ground. The real physical value is 0.0065 K/m. This field can be set to zero to turn off all temperature dependence on height. Note that the *Air Temperature Sensor Height* in the **Site:WeatherStation** object should also be set to zero in order to force the local outdoor air temperatures to match the weather file outdoor air temperature. This change is required because the **Site:WeatherStation** object assumes an air temperature gradient of 0.0065 K/m.
+The air temperature gradient coefficient [K/m] is a research option that allows the user to control the variation in outdoor air temperature as a function of height above ground. The real physical value is 0.0065 K/m. This field can be set to zero to turn off all temperature dependence on height. Note that the *Air Temperature Sensor Height* in the **Site:WeatherStation** object should also be set to zero in order to force the local outdoor air temperatures to match the weather file outdoor air temperature. This change is required because the **Site:WeatherStation** object assumes an air temperature gradient of 0.0065 K/m. This field can be set to zero to turn off all temperature dependence on height.
 
 ```idf
   Site:HeightVariation,
@@ -2578,6 +2578,7 @@ An IDF example:
 ```idf
 Site:GroundTemperature:Deep,  16,16,16,16,16,16,16,16,16,16,16,16;
 ```
+<<<<<<< HEAD
 
 ### Site:GroundDomain:Slab
 
@@ -3218,6 +3219,632 @@ Climate related variables appear in two places for EnergyPlus outputs. Certain o
 Variables related to ambient environment data are available at timestep and higher resolutions. Below is a variable dictionary of these variables and subsequent definitions:
 
 * Zone,Average,Site Outdoor Air Drybulb Temperature [C]
+=======
+>>>>>>> e6b22d2ae9b5522bdb7d176915f857e4ba903111
+
+### Site:GroundDomain:Slab
+
+This section documents the input object used to simulate ground coupled heat transfer with horizontal building surfaces within EnergyPlus. Horizontal ground surfaces within EnergyPlus interact with the Site:GroundDomain object by utilizing the SurfaceProperty:OtherSideConditionsModel object. By utilizing this object, multiple horizontal surfaces can be coupled to the same Site:GroundDomain object. Each horizontal surface may also have its unique ground domain, however, runtime will be adversely affected.
+
+Generally, there are two scenarios which Site:GroundDomain is equipped to model: in-grade slabs, and on-grade slabs.
+
+![](media/image012.png)
+
+Figure 7In-grade configuration.
+
+The in-grade slab option can be used to simulate situations when the upper slab surface is near the ground surface level. For this situation, slab’s upper surface must interact with the zone via an OSCM boundary. Due to this, the FloorConstruction object for the zone floor must include a thin layer of the upper floor material. Horizontal and vertical insulation are modeled by the GroundDomain in this scenario. Horizontal insulation can be modeled as covering the full horizontal surface, or it can be limited to the perimeter regions only. In the latter case, the perimeter insulation width must be specified.
+
+![](media/image013.png)
+
+Figure 8 On-grade configuration
+
+The on-grade slab option can be used to simulate situations when the lower slab surface is near the ground surface level. In this situation, the entire floor must be included within the floor construction object. Vertical insulation is modeled by the GroundDomain in this scenario.  Horizontal insulation can only be modeled as covering the full horizontal surface.
+
+#### Field: Name
+
+Alpha field used as a unique identifier for each ground domain.
+
+#### Field: Ground Domain Depth
+
+Numeric field used to determine the depth of the simulation domain, in meters.
+
+#### Field: Aspect Ratio
+
+Numeric field used to define the height to width ratio of the slab.
+
+#### Field: Perimeter Offset
+
+Numeric field used to determine the distance from the slab perimeter to the domain perimeter, in meters.
+
+#### Field: Soil Thermal Conductivity
+
+The thermal conductivity of the soil, in W/m-K.
+
+#### Field: Soil Density
+
+The bulk density of the soil, in kg/m3.
+
+#### Field: Soil Specific Heat
+
+The specific heat of dry soil, in J/kg-K. If moisture is defined in this object, moisture and freezing effects are accounted for by varying the specific heat value.
+
+#### Field: Soil Moisture Content Volume Fraction
+
+A nominal value of soil moisture content to be used when evaluating soil thermal properties.
+
+#### Field: Soil Moisture Content Volume Fraction at Saturation
+
+A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil.
+
+#### Field: Kusuda-Achebach Average Surface Temperature
+
+The annual average surface temperature to be applied to the Kusuda-Achenbach farfield boundary temperature correlation, in °C
+
+#### Field: Kusuda-Achebach Average Amplitude of Surface Temperature
+
+The annual mean surface temperature variation from average used in determining the farfield boundary conditions.
+
+#### Field: Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
+
+The phase shift of minimum surface temperature, or the day of the year when the minimum surface temperature occurs.
+
+#### Field: Evapotranspiration Ground Cover Parameter
+
+Numeric field specifies the ground cover effects used in the evapotranspiration model at the ground surface heat balance. The values range from 0 (solid, non-permeable ground surface) to 1.5 (wild growth).
+
+#### Field: Slab Boundary Condition Model Name
+
+This is the name of the other side boundary condition model used.
+
+#### Field: Slab Location
+
+Alpha field indicates whether the slab is in-grade (top surface level with ground surface) or on-grade (bottoms surface level with ground surface). Options include “ONGRADE” and “INGRADE”.
+
+#### Field: Slab Material Name
+
+Name of the material object representing the slab material. Only applicable to in-grade situations.
+
+#### Field: Horizontal Insulation
+
+Alpha field indicates whether horizontal insulation is present. Options include “YES” and “NO”. Only applicable to in-grade situations.
+
+#### Field: Horizontal Insulation Material Name
+
+Name of material object representing the horizontal slab insulation. Optional argument only required if horizontal insulation is present.
+
+#### Field: Horizontal Insulation Extents
+
+Alpha field indicates whether the horizontal slab insulation extends to cover the full horizontal area of the slab, or only covers the slab perimeter. Optional argument only required if horizontal insulation is present. Options include “FULL” and “PERIMETER”.
+
+#### Field: Perimeter Insulation Width
+
+Numeric field indicating the width of the perimeter insulation measured from the slab edge. Valid range from &gt; 0 to &lt; half of smallest slab width.
+
+#### Field: Vertical Insulation
+
+Alpha field indicates whether vertical insulation is present. Options include “YES” and “NO”.
+
+#### Field: Vertical Insulation Name
+
+Name of material object representing the vertical slab insulation. Optional argument only required if vertical insulation is present.
+
+#### Field: Vertical Insulation Depth
+
+Numeric field indicates the depth measured in meters from the ground surface to which the vertical perimeter insulation extends. Valid range from &gt; Slab Thickness to &lt; Domain Depth.
+
+#### Field: Simulation Timestep
+
+Alpha field indicating whether the domain will update temperatures at each zone timestep, or at hourly intervals. Options include “timestep” and “hourly”.
+
+An IDF example of an in-grade slab.
+
+```idf
+Site:GroundDomain:Slab,
+    IngradeCoupledSlab, !- Name
+    5,                  !- Ground Domain Depth
+    1,                  !- Aspect Ratio
+    5,                  !- Domain Perimeter Offset
+    1.8,                !- Soil Thermal Conductivity
+    3200,               !- Soil Density
+    836,                !- Soil Specific Heat
+    30,   !- Soil Moisture Content Volume Fraction
+    50,   !- Soil Moisture Content Volume Fraction at Saturation
+    15.5, !- Kusuda-Achenbach Average Surface Temperature
+    12.8, !- Kusuda-Achenbach Average Amplitude of Surface Temperature
+    17.3, !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
+    1,    !- Evapotranspiration Ground Cover Parameter
+    GroundCoupledOSCM,      !- Name of Floor Boundary Condition Model
+    InGrade,                !- Slab Location (InGrade/OnGrade)
+    Slab Material-In-grade, !- Slab Material Name
+    Yes,                    !- Horizontal Insulation
+    Slab Insulation,    !- Horizontal Insulation Material Name
+    Perimeter,          !- Full Horizontal or Perimeter Only
+    1,                  !- Perimeter insulation width
+    Yes,                !- Vertical Insulation
+    Slab Insulation,    !- Vertical Insulation Name
+    2,                  !- Vertical perimeter insulation depth from surface
+    Hourly;             !- Simulation timestep</td>
+```
+
+And IDF example of an on-grade slab
+
+```idf
+Site:GroundDomain:Slab,
+    OngradeCoupledSlab, !- Name
+    5,                  !- Ground Domain Depth {m}
+    1,                  !- Aspect Ratio
+    5,                  !- Domain Perimeter Offset {m}
+    1.8,                !- Soil Thermal Conductivity {W/m-K}
+    3200,               !- Soil Density {kg/m3}
+    836,                !- Soil Specific Heat {J/kg-K}
+    30,          !- Soil Moisture Content Volume Fraction
+    50,          !- Soil Moisture Content Volume Fraction at Saturation
+    15.5,        !- Kusuda-Achenbach Average Surface Temperature
+    12.8,   !- Kusuda-Achenbach Average Amplitude of Surface Temperature
+    17.3,   !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
+    1,           !- Evapotranspiration Ground Cover Parameter
+    GroundCoupledOSCM,  !- Name of Floor Boundary Condition Model
+    OnGrade,            !- Slab Location (InGrade/OnGrade)
+    ,                   !- Slab Material Name
+    ,                   !- Horizontal Insulation (Yes/No)
+    ,                   !- Horizontal Insulation Material Name
+    ,                   !- Full Horizontal or Perimeter Only
+    ,                   !- Perimeter insulation width (m)
+    Yes,                !- Vertical Insulation (Yes/No)
+    Slab Insulation,    !- Vertical Insulation Name
+    2,                  !- Vertical perimeter insulation depth from surface
+    Hourly;             !- Simulation timestep. (Timestep/Hourly)</td>
+```
+
+### Site:GroundDomain Outputs
+
+The following output variables are available.
+
+* Zone, Average, Zone Coupled Surface Heat Flux [W/m2]
+* Zone, Average, Zone Coupled Surface Temperature [C]</td>
+
+#### Zone Coupled Surface Heat Flux [W/m2]
+
+This is the value of the heat flux provided to the GroundDomain as a boundary condition which is determined by taking the average of all surfaces coupled to the domains OtherSideBoudaryCondition model.
+
+#### Zone Coupled Surface Temperature [C]
+
+This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the ground coupled surfaces as an outside boundary condition.
+
+### Site:GroundDomain:Basement
+
+This section documents the input object used to simulate ground coupled heat transfer with underground zones within EnergyPlus. Zone surfaces within EnergyPlus interact with the Site:GroundDomain:Basement object by utilizing the SurfaceProperty:OtherSideConditionsModel object. Two separate OSCM are required for the basement vertical and horizontal surfaces. Vertical wall surfaces will interact with the first OSCM while the horizontal floor surface will interact with the second OSCM. Basement floor and wall surfaces are constructed normally by using the BuildingSurface:Detailed object, with the outside boundary condition being the OtherSideConditionsModel for the basement floor or wall. The outside surface of the wall being the interface between the ground domain and the EnergyPlus zone. Horizontal and vertical ground insulation are simulated by the ground domain, and therefore should not be included in the wall and floor construction objects.
+
+![](media/image012.png)
+
+Figure: Basement Configuration
+
+```idf
+Site:GroundDomain:Basement,
+    CoupledBasement,         !- Name
+    10,                      !- Ground Domain Depth {m}
+    1,                       !- Aspect ratio
+    5,                       !- Perimeter offset {m}
+    1.8,                     !- Soil Thermal Conductivity {W/m-K}
+    3200,                    !- Soil Density {kg/m3}
+    836,                     !- Soil Specific Heat {J/kg-K}
+    30,                      !- Soil Moisture Content Volume Fraction {percent}
+    50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
+    15.5,                    !- Kusuda-Achenbach Average Surface Temperature {C}
+    12.8,                    !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
+    17.3,                    !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
+    1,                       !- Evapotranspiration Ground Cover Parameter
+    BasementFloorOSCM,       !- Name of Basement Floor Boundary Condition Model
+    Yes,                     !- Basement Horizontal Underfloor Insulation Present (Yes/No)
+    Basement Insulation,     !- Basement Horizontal Insulation Underfloor Material Name
+    Full,                    !- Full Horizontal or Perimeter Only (Full/Perimeter)
+    ,                        !- Perimeter width (m)
+    2.5,                     !- Depth of Basement Wall In Ground Domain {m}
+    BasementWallOSCM,        !- Name of Basement Wall Boundary Condition Model
+    Yes,                     !- Basement Wall Vertical Insulation Present(Yes/No)
+    Basement Insulation,     !- Basement Wall Vertical Insulation Material Name
+    2.5,                     !- Vertical insulation depth from surface (m)
+    Hourly;                  !- Domain Update interval. (Timestep, Hourly)
+    4;                       ! Mesh Density Parameter
+```
+
+#### Field: Name
+
+Alpha field used as a unique identifier for each basement domain. Multiple basements domains can be simulated simultaneously, however, each domain must have a unique name. Additionally, despite the ability to simulate multiple domains simultaneously, these domains do not interact with each other and are treated as independent domains with boundary conditions given by the model parameters below.
+
+#### Field: Ground Domain Depth
+
+Numeric field used to determine the depth of the simulation domain, in meters. A value of 10 meters is the default.
+
+#### Field: Aspect Ratio
+
+Numeric field, which is the ratio of basement length to width, used to determine the aspect ratio of the basement. This field along with the total basement floor area, which is taken as the combination of all surfaces connected to the floor OtherSideConditionsModel, are used to determine the size and shape of the basement domain. Aspect ratios and the inverse of aspect ratios should produce identical results. i.e. AR = 2 equals AR = 0.5. This field has units of meters/meters.
+
+#### Field: Domain Perimeter Offset
+
+Numeric field used to determine the distance from the basement perimeter to the domain perimeter, in meters. A value of 5 is default.
+
+#### Field: Soil Thermal Conductivity
+
+The thermal conductivity of the soil, in W/m-K.
+
+#### Field: Soil Density
+
+The bulk density of the soil, in kg/m3.
+
+#### Field: Soil Specific Heat
+
+The specific heat of dry soil, in J/kg-K. If moisture is defined in this object, moisture and freezing effects are accounted for by varying the specific heat value.
+
+#### Field: Soil Moisture Content Volume Fraction
+
+A nominal value of soil moisture content to be used when evaluating soil thermal properties. 
+
+#### Field: Soil Moisture Content Volume Fraction at Saturation
+
+A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil.
+
+#### Field: Kusuda-Achebach Average Ground Surface Temperature
+
+The annual average ground surface temperature to be applied to the Kusuda-Achenbach far-field boundary temperature correlation, in °C. This parameter and the subsequent two parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this, and the following two parameters for the simulation. In which case, this field and the following two can be left blank.
+
+#### Field: Kusuda-Achebach Average Amplitude of Ground Surface Temperature
+
+The annual mean ground surface temperature variation from average used in determining the far-field boundary conditions, in °C. This parameter, as well as the previous and following parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this parameter, as well as the previous and following parameters. In which case, this field, the previous field, and the following field can be left blank.
+
+#### Field: Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature
+
+The phase shift of minimum ground surface temperature, or the day of the year when the minimum ground surface temperature occurs. This parameter, as well as the previous two parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this parameter, as well as the previous two parameters. In which case, this field, the previous two fields can be left blank.
+
+#### Field: Evapotranspiration Ground Cover Parameter
+
+Numeric field specifies the ground cover effects used in the evapotranspiration model at the ground surface heat balance. The values range from 0 (solid, non-permeable ground surface) to 1.5 (wild growth). Model can be sensitive to variations in this parameter, especially in dry climates.
+
+#### Field: Basement Floor Boundary Condition Model Name
+
+This is the name of the other side boundary condition model used for the basement floor surface. 
+
+#### Field: Horizontal Insulation 
+
+Alpha field indicates whether horizontal insulation is present. Options include “YES” and “NO”. 
+
+#### Field: Horizontal Insulation Name
+
+Name of material object representing the horizontal underfloor basement insulation. Optional argument only required if horizontal insulation is present.
+
+#### Field: Horizontal Insulation Extents
+
+Alpha field indicates whether the horizontal underfloor insulation extends to cover the full horizontal area of the basement floor, or only covers the basement floor perimeter. Optional argument only required if horizontal insulation is present. Options include “FULL” and “PERIMETER”.
+
+#### Field: Perimeter Insulation Width
+
+Numeric field indicating the width of the perimeter insulation measured from the basement floor edge. Valid range from > 0 to &lt; half of smallest basement floor width.
+
+#### Field: Basement Depth
+
+Depth of basement floor surface referenced from the ground surface, in meters. This domain should be the distance from the ground surface down to the basement floor surface. In cases where the ground surface is below the main above-ground building level, a separate wall surface should be employed between the basement walls and the main level walls.
+
+#### Field: Basement Wall Boundary Condition Model Name
+
+Name of the other side condition boundary model used for the basement walls.
+
+#### Field: Vertical Insulation 
+
+Alpha field indicates whether vertical insulation is present. Options include “YES” and “NO”.
+
+#### Field: Vertical Insulation Name
+
+Name of material object representing the vertical slab insulation. Optional argument only required if vertical insulation is present.
+
+#### Field: Vertical Insulation Depth
+
+Numeric field indicates the depth measured in meters from the ground surface to which the vertical perimeter insulation extends. Valid range from > 0 to &lt; Basement Depth.
+
+#### Field: Simulation Timestep
+
+Alpha field indicating whether the domain will update temperatures at each zone timestep, or at hourly intervals. Options include “timestep” and “hourly”.
+
+#### Mesh Density Parameter
+
+Integer field indicating the density of the finite difference ground domain cells between the basement and the far field boundaries. Default value is 4. Total number of ground domain cells, insulation cells, and ground surface cells are indicated as outputs to the eio file.
+
+Site:GroundDomain:Basement Output Variables
+
+The following output variables are available.
+
+* Wall Interface Heat Flux
+
+* Wall Interface Temperature
+
+* Floor Interface Heat Flux
+
+* Floor Interface Temperature
+
+#### Wall Interface Heat Flux [W/m2]
+
+This is the value of the heat flux provided to ground domain as a boundary condition for the basement walls. Should be equal to the basement wall outside heat flux.
+
+#### Wall Interface Temperature [C]
+
+This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the basement wall surfaces as an outside boundary condition.
+
+#### Floor Interface Heat Flux [W/m2]
+
+This is the value of the heat flux provided to ground domain as a boundary condition for the basement floor. Should be equal to the basement floor outside heat flux.
+
+#### Floor Interface Temperature [C]
+
+This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the ground coupled floor surfaces as an outside boundary condition.
+
+
+
+### Site:GroundTemperature:FCfactorMethod
+
+Site:GroundTemperature:FCfactorMethod is used only by the underground walls or slabs-on-grade or underground floors defined with C-factor (Construction:CfactorUndergroundWall) and F-factor (Construction:FfactorGroundFloor) method for code compliance calculations where detailed construction layers are unknown. Only one such ground temperature object can be included. The monthly ground temperatures for this object are close to the monthly outside air temperatures delayed by three months. If user does not input this object in the IDF file, it will be defaulted to the 0.5m set of monthly ground temperatures from the weather file if they are available. Entering these will also overwrite any ground temperatures from the weather file in the F and C factor usage. If neither is available, an error will result.
+
+#### Field: Month Temperature(s) – 12 fields in all
+
+Each numeric field is the monthly ground temperature (degrees Celsius) used for the indicated month (January=1<sup>st</sup> field, February=2<sup>nd</sup> field, etc.)
+
+And, the IDF example:
+
+```idf
+Site:GroundTemperature:FCfactorMethod,  9.5, 3.5, -0.7, -1.7, -0.6, 3.6, 9.3, 14, 18.2, 22.7, 21.2, 16.8;
+```
+
+
+### Site:GroundReflectance
+
+Ground reflectance values are used to calculate the ground reflected solar amount. This fractional amount (entered monthly) is used in this equation:
+
+<div>\[{\rm{GroundReflectedSolar = (BeamSolar}} \bullet {\rm{COS(SunZenithAngle) + DiffuseSolar)}} \bullet {\rm{GroundReflectance}}\]</div>
+
+Of course, the Ground Reflected Solar is never allowed to be negative. The ground reflectance can be further modified when snow is on the ground by the Snow Ground Reflectance Modifier. To use no ground reflected solar in your simulation, enter 0.0 for each month.
+
+#### Field: Month Average Ground Reflectance(s) – 12 fields in all
+
+Each numeric field is the monthly average reflectivity of the ground used for the indicated month (January=1<sup>st</sup> field, February=2<sup>nd</sup> field, etc.)
+
+And use in an IDF:
+
+```idf
+  Site:GroundReflectance,
+     0.600,     !January Ground Reflectance
+     0.600,     !February Ground Reflectance
+     0.400,     !March Ground Reflectance
+     0.300,     !April Ground Reflectance
+     0.200,     !May Ground Reflectance
+     0.200,     !June Ground Reflectance
+     0.200,     !July Ground Reflectance
+     0.200,     !August Ground Reflectance
+     0.200,     !September Ground Reflectance
+     0.200,     !October Ground Reflectance
+     0.300,     !November Ground Reflectance
+     0.400;     !December Ground Reflectance
+```
+
+### Site:GroundReflectance:SnowModifier
+
+It is generally accepted that snow resident on the ground increases the basic ground reflectance. EnergyPlus allows the user control over the snow ground reflectance for both “normal ground reflected solar” calculations (see above) and snow ground reflected solar modified for daylighting. These are entered under this object and both default to 1 (same as normal ground reflectance – no special case for snow which is a conservative approach).
+
+#### Field: Ground Reflected Solar Modifier
+
+This field is a decimal number which is used to modified the basic monthly ground reflectance when snow is on the ground (from design day input or weather data values).
+
+<div>\[{\rm{GroundReflectanc}}{{\rm{e}}_{{\rm{used}}}} = {\rm{GroundReflectance}} \bullet Modifie{r_{Snow}}\]</div>
+
+The actual Ground Reflectance is limited to [0.0,1.0].
+
+#### Field: Daylighting Ground Reflected Solar Modifier
+
+This field is a decimal number which is used to modified the basic monthly ground reflectance when snow is on the ground (from design day input or weather data values).
+
+<div>\[{\rm{DaylightingGroundReflectanc}}{{\rm{e}}_{{\rm{used}}}} = {\rm{GroundReflectance}} \bullet Modifie{r_{Snow}}\]</div>
+
+The actual Ground Reflectance is limited to [0.0,1.0].
+
+An IDF example:
+
+```idf
+  Site:GroundReflectance:SnowModifier,
+    1.0;                     !- Ground Reflected Solar Modifier
+```
+
+Outputs will show both the inputs from the above object as well as monthly values for both Snow Ground Reflectance and Snow Ground Reflectance for Daylighting.
+
+### Site:WaterMainsTemperature
+
+The Site:WaterMainsTemperature object is used to calculate water temperatures delivered  by underground water main pipes. The mains temperatures are used as default, make-up water temperature inputs for several plant objects, including:  **WaterUse:Equipment, WaterUse:Connections, WaterHeater:Mixed** and **WaterHeater:Stratified**. The mains temperatures are also used in the water systems objects to model the temperature of cold water supplies.
+
+Water mains temperatures are a function of outdoor climate conditions and vary with time of year. A correlation has been formulated to predict water mains temperatures based on two weather inputs:
+
+- average annual outdoor air temperature (dry-bulb)
+
+- maximum difference in monthly average outdoor air temperatures
+
+These values can be easily calculated from annual weather data using a spreadsheet or from the ".stat" file available with the EnergyPlus weather files at [www.energyplus.gov](http://www.energyplus.gov). Monthly statistics for dry-bulb temperatures are shown with daily averages. The daily averages are averaged to obtain the annual average. The maximum and minimum daily average are subtracted to obtain the maximum difference. For more information on the water mains temperatures correlation, see the *EnergyPlus Engineering Document*.
+
+Alternatively, the Site:WaterMainsTemperature object can read values from a schedule. This is useful for measured data or when water comes from a source other than buried pipes, e.g., a river or lake.
+
+If there is no Site:WaterMainsTemperature object in the input file, a default constant value of 10 C is assumed.
+
+#### Field: Calculation Method
+
+This field selects the calculation method and must have the keyword Schedule or Correlation.
+
+#### Field: Schedule Name
+
+If the calculation method is Schedule, the water mains temperatures are read from the schedule referenced by this field. If the calculation method is Correlation, this field is ignored.
+
+#### Field: Annual Average Outdoor Air Temperature
+
+If the calculation method is Correlation, this field is used in the calculation as the annual average outdoor air temperature (dry-bulb) [C]. If the calculation method is Schedule, this field is ignored.
+
+#### Field: Maximum Difference In Monthly Average Outdoor Air Temperatures
+
+If the calculation method is Correlation, this field is used in the calculation as the maximum difference in monthly average outdoor air temperatures [∆C]. If the calculation method is Schedule, this field is ignored.
+
+```idf
+  Site:WaterMainsTemperature,
+    Correlation,  !- Calculation Method {SCHEDULE | CORRELATION}
+    ,  !- Schedule Name
+    9.69,  !- Annual Average Outdoor Air Temperature {C}
+    28.1;  !- Maximum Difference In Monthly Average Outdoor Air Temperatures
+           !- {deltaC}
+```
+
+### Site:Precipitation
+
+The Site:Precipitation object is used to describe the amount of water precipitation at the building site over the course of the simulation run period. Precipitation includes both rain and the equivalent water content of snow. Precipitation is not yet described well enough in the many building weather data files. So this object can be used to provide the data using Schedule objects that define rates of precipitation in meters per hour.
+
+A set of schedules for site precipitation have been developed for USA weather locations and are provided with EnergyPlus in the data set called PrecipitationSchedulesUSA.idf.  The user can develop schedules however they want. The schedules in the data set were developed using EnergyPlus’ weather file (EPW) observations and the average monthly precipitation for the closest weather site provided by NOAA. EPW files for the USA that were based on TMY or TMY2 include weather observations for Light/Moderate/Heavy rainfall, however most international locations do not include these observations. The values were modeled by taking the middle of the ranges quoted in the EPW data dictionary. The assumed piecewise function is shown below.
+
+<div>\[Amount\,(m/hour) = \,\left\{ {\begin{array}{*{20}{c}}{Light = 0.0125}\\\{Moderate = 0.052}\\\{Heavy = 0.1}\end{array}} \right.\]</div>
+
+The values were inserted on hour by hour basis for the month based on the observations. Then each month was rescaled to meet the average precipitation for the month based on the 30-year average (1971-2000) provided by the NOAA/NCDC. Therefore, the flags in the EPW file match the precipitation schedules for the USA. Note that summing the average monthly precipitation values will not give you the average yearly precipitiation. The resulting value may be lower or higher than the average yearly value.
+
+Once the typical rainfall pattern and rates are scheduled, the Site:Precipitation object provides a method of shifting the total rainfall up or down for design purposes. Wetter or drier conditions can be modeled by changing the Design Annual Precipitation although the timing of precipitation throughout the year will not be changed.
+
+#### Field: Precipitation Model Type
+
+Choose rainfall modeling options. Only available option is ScheduleAndDesignLevel.
+
+#### Field: Design Level for Total Annual Precipitation
+
+Magnitude of total precipitation for an annual period to be used in the model. Value selected by the user to correspond with the amount of precipitation expected or being assumed for design purposes. The units are in meters. This field works with the following two fields to allow easily shifting the amounts without having to generate new schedules.
+
+#### Field: Precipitation Rate Schedule Name
+
+Name of a schedule defined elsewhere that describes the rate of precipitation. The precipitation rate schedule is analogous to weather file data. However, weather files for building simulation do not currently contain adequate data for such calculations. Therefore, EnergyPlus schedules are used to enter the pattern of precipitation events. The values in this schedule are the average rate of precipitation in meters per hour. The integration of these values over an annual schedule should equal the nominal annual precipitation.
+
+#### Field: Average Total Annual Precipitation
+
+Magnitude of annual precipitation associated with the rate schedule. This value is used to normalize the precipitation.
+
+IDF example:
+
+```idf
+Site:Precipitation,
+  ScheduledAndDesignLevel, !- Precipitation Model Type
+  0.75,                    !- Design Level Total Annual Precipitation {m/yr}
+  PrecipitationSchd,       !- Schedule Name for Precipitation Rates
+  0.80771;                 !- Average Total Annual Precipitation {m/yr}
+```
+
+
+### RoofIrrigation
+
+The RoofIrrigation object is used to describe the amount of irrigation on the ecoroof surface over the course of the simulation runperiod. This object is used to provide irrigation data using Schedule objects that define rates of irrigation in meters per hour. These schedules can be one of two types: Schedule, or SmartSchedule.
+
+#### Field: Irrigation Model Type
+
+Choose irrigation modeling options. Available options are **Schedule** and **SmartSchedule**. The **Schedule** type is used to force an irrigation schedule regardless of the current moisture state of the soil. The **SmartSchedule** type allows the precipitation schedule to be overridden if the current moisture state of the soil is greater than 40% saturated.
+
+#### Field: Irrigation Rate Schedule Name
+
+Name of a schedule defined elsewhere that describes the rate of irrigation. The values in this schedule are the average rate of irrigation in meters per hour.
+
+#### Field: Irrigation Maximum Saturation Threshold
+
+Used with the SmartSchedule option in the Irrigation Model Type field to override the default 40% saturation limit for turning off the irrigation: values of 0 to 100 (percent) can be entered with 40% being the default.
+
+IDF example:
+
+```idf
+RoofIrrigation,
+  Schedule, !- Irrigation Model Type
+  IrrigationSchd; !- Schedule Name for Irrigation Rates
+```
+
+
+### Solar and Visible Spectrum Objects
+
+The next two objects enable users to enter solar and visible spectrum which is used to calculate the thermal and visual performance of windows if their glazings are defined with full spectral data. EnergyPlus versions 8.0 and older hard-wired the solar and visible spectrum. The solar spectrum assumes air mass 1.5 terrestrial solar global spectral irradiance values (W/m2-micron) on a 37o tilted surface, based on ISO 9845-1 and ASTM E 892; derived from Optics5 data file ISO-9845GlobalNorm.std, 10-14-99. The visible/photopic spectrum is based on CIE 1931 observer; ISO/CIE 10527, CIE Standard Calorimetric Observers; derived from Optics5 data file "CIE 1931 Color Match from E308.txt", which is the same as WINDOW4 file Cie31t.dat.
+
+### Site:SolarAndVisibleSpectrum
+
+The SolarAndVisibleSpectrum object is used to specify the solar and visible spectrum data which is used as spectral weighting function to calculate the window performance (transmittance and absorptance) in EnergyPlus. This is a unique object, if it is missing from an IDF file, the default (same as EnergyPlus version 8.0) solar and visible spectrum data will be used.
+
+#### Field: Name
+
+This field specifies the name of the SolarAndVisibleSpectrum object.
+
+#### Field: Spectrum Data Method
+
+This field specifies the method used to enter the spectrum data. Two choices are available: Default and UserDefined. The choice Default will continue to use the hard-wired spectrum data in EnergyPlus (for backward compatibility). The choice UserDefined allows users to specify custom solar and visible spectrum data. The default choice is Default.
+
+#### Field: Solar Spectrum Data Name
+
+This field is required if the Spectrum Data Method is set to UserDefined. This field references a spectrum dataset for solar.
+
+#### Field: Visible Spectrum Data Name
+
+This field is required if the Spectrum Data Method is set to UserDefined. This field references a spectrum dataset for visible.
+
+IDF example:
+
+```idf
+Site:SolarAndVisibleSpectrum,
+  LocalSpectrum,             !- Name
+  UserDefined,               !- Spectrum Data Method: Default, UserDefined
+  SolarSpectrum,             !- Solar Spectrum Data Object Name
+  VisibleSpectrum;           !- Visible Spectrum Data Object
+```
+
+
+### Site:SpectrumData
+
+The Site:SpectrumData object holds the user defined solar or visible spectrum data. For solar spectrum, up to 107 pairs of (wavelength, spectrum) can be entered. For visible spectrum, up to 81 pairs can be entered.
+
+#### Field: Name
+
+This field specifies the name of the SpectrumData object. The name must be unique across all SpectrumData objects.
+
+#### Field: Spectrum Data Type
+
+This field specifies the type of spectrum data. Choices are Solar and Visible.
+
+#### Field: Wavelength &lt;n&gt;
+
+This field specifies the nth wavelength in micron.
+
+#### Field: Spectrum &lt;n&gt;
+
+This field specifies the nth spectrum corresponding to the nth wavelength.
+
+IDF example:
+
+```idf
+Site:SpectrumData,
+  SolarSpectrum,             !- Name
+  Solar,                     !- Spectrum Data Type
+  0.3,0,                     !- up to 107 pair of (wavelength, spectrum)
+  0.305,3.4,
+  0.31,15.6,
+  0.315,41.1,
+  0.32,71.2,
+  0.325,100.2,
+  0.33,152.4,
+  0.335,155.6,
+  0.34,179.4,
+  0.345,186.7,
+  0.35,212,
+  0.36,240.5,
+  0.37,324,
+  0.38,362.4,
+  ...;
+```
+
+
+### Climate Group Outputs
+
+Climate related variables appear in two places for EnergyPlus outputs. Certain objects that are invariant throughout a simulation period have lines appear in the eplusout.eio file. For descriptions of this reporting, please see the Output Details and Examples document.
+
+### Weather Data Related Outputs
+
+Variables related to ambient environment data are available at timestep and higher resolutions. Below is a variable dictionary of these variables and subsequent definitions:
+
+* Zone,Average,Site Outdoor Air Drybulb Temperature [C]
 
 * Zone,Average,Site Outdoor Air Dewpoint Temperature [C]
 
@@ -3391,7 +4018,7 @@ Outdoor air density is derived at each timestep from the Site Outdoor Air Barome
 
 The Solar Azimuth Angle (f) is measured from the North (clockwise) and is expressed in degrees. This is shown more clearly in the following figure.
 
-![HorizonCoordinates](InputOutputReference/media/image020.png)
+![HorizonCoordinates](media/image020.png)
 
 Figure 9. Solar Position Illustration
 
@@ -4152,15 +4779,15 @@ This field represents the specific heat of the material layer in units of J/(kg-
 
 #### Field: Thermal Absorptance
 
-The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing “black body” conditions).
+The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing “black body” conditions). The default value for this field is 0.9.
 
 #### Field: Solar Absorptance
 
-The solar absorptance field in the Material input syntax represents the fraction of incident  solar radiation that is absorbed by the material. Solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0.
+The solar absorptance field in the Material input syntax represents the fraction of incident  solar radiation that is absorbed by the material. Solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
 
 #### Field: Visible Absorptance
 
-The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0.
+The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
 
 An IDF example:
 
@@ -4195,15 +4822,15 @@ This field is used to enter the thermal resistance (R-value) of the material lay
 
 #### Field: Thermal Absorptance
 
-The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing “black body” conditions).
+The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing “black body” conditions). The default value for this field is 0.9.
 
 #### Field: Solar Absorptance
 
-The solar absorptance field in the Material input syntax represents the fraction of incident  solar radiation that is absorbed by the material. Solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0.
+The solar absorptance field in the Material input syntax represents the fraction of incident  solar radiation that is absorbed by the material. Solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
 
 #### Field: Visible Absorptance
 
-The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0.
+The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
 
 An IDF example:
 
@@ -4331,7 +4958,7 @@ a,b,c,d               = Coefficients to define the relationship bet
 
 U                      = Moisture content defined as the mass fraction of water contained in a material [kg/kg]
 
-<span>$\varphi $</span>                    = Surface air relative humidity [0 to 1]
+<span>\(\varphi \)</span>                    = Surface air relative humidity [0 to 1]
 
 #### The next four fields are dimensionless coefficients:
 
@@ -4443,7 +5070,7 @@ k<sub>1</sub> is the change in conductivity per degree temperature difference fr
 
 The temperature – enthalpy set of inputs specify a two column tabular temperature-enthalpy function for the basic material. Sixteen pairs can be specified. Specify only the number of pairs necessary. The tabular function must cover the entire temperature range that will be seen by the material in the simulation. It is suggested that the function start at a low temperature, and extend to 100C. Note that the function has no negative slopes and the lowest slope that will occur is the base material specific heat. Temperature values should be strictly increasing. Enthalpy contributions of the phase change are always added to the enthalpy that would result from a constant specific heat base material.  An example of a simple enthalpy temperature function is shown below.
 
-![Temp-Enth Example](InputOutputReference/media/image024.png)
+![Temp-Enth Example](media/image024.png)
 
 #### Field: Temperature x
 
@@ -5059,7 +5686,7 @@ If, in the Building object, Solar Distribution = FullInteriorAndExterior, use of
 
 In a zone with Daylighting:Detailed, translucent glazing---which is often used in skylights---will provide a more uniform daylight illuminance over the zone and will avoid patches of sunlight on the floor.
 
-![](InputOutputReference/media/image025.svg)
+![](media/image025.svg)
 
 Figure 10. Comparison between transmittance properties of transparent glass (Solar Diffusing = No) and translucent glass (Solar Diffusing = Yes).
 
@@ -5783,7 +6410,7 @@ WindowGap:DeflectionState,       !- deflection state of gap
 
 This input object is used to enter data describing support pillar of the gap.  Support pillars are used in vacuum glazing in order to prevent deflection of glass layers.
 
-![](InputOutputReference/media/image029.png)
+![](media/image029.png)
 
 Figure 11. Support Pillar
 
@@ -5956,13 +6583,13 @@ Effective area for air flow at the right side of the shade divided by *sH*, the 
 
 The fraction of the shade surface that is open to air flow, i.e., the total area of openings (“holes”) in the shade surface divided by the shade area, *HW*. If air cannot pass through the shade material, Air-Flow Permeability = 0. For drapery fabric and screens the Air-Flow Permeability can be taken as the “openness” of the fabric (see 2001 ASHRAE Fundamentals, Chapter 30, Fig. 31), which is 0.0 to 0.07 for closed weave, 0.07 to 0.25 for semi-open weave, and 0.25 and higher for open weave.
 
-![](InputOutputReference/media/image033.svg)
+![](media/image033.svg)
 
 Figure 12. Vertical section (a) and perspective view (b) of glass  and interior shade layers  showing variables used in the gap air flow analysis. In (b), the air-flow opening areas *A<sub>bot</sub>*, *A<sub>top</sub>*, *A<sub>l</sub>*, *A<sub>r</sub>* and *A<sub>h</sub>* are shown schematically. See *Engineering Manual* for definition of thermal variables.
 
 
 
-![](InputOutputReference/media/image034.svg)
+![](media/image034.svg)
 
 Figure 13. Examples of air-flow openings for an interior shade covering glass of height *H* and width *W*. Not to scale. (a) Horizontal section through shade with openings on the left and right sides (top view). (b) Vertical section through shade with openings at the top and bottom (side view). In (a) Left-Side Opening Multiplier = *A<sub>l</sub> /sH* = min(*l/s*,1) and Right-Side Opening Multiplier = *A<sub>r</sub> /sH* = min(*r/s*,1). In (b) Top Opening Multiplier = *A<sub>top</sub> /sW* = *t/s* and Bottom Opening Multiplier = *A<sub>bot</sub> /sW = b/s.*
 
@@ -6188,7 +6815,7 @@ WindowMaterial:Blind,
 
 
 
-![](InputOutputReference/media/image035.svg)
+![](media/image035.svg)
 
 Figure 14. (a) Side view of a window blind with horizontal slats  (or top view of blind with vertical slats) showing slat geometry. The front face of a slat is shown by a heavy line. The slat angle is defined as the angle between the glazing outward normal and the slat outward normal, where the outward normal points away from the front face of the slat. (b) Slat orientations for representative slat angles. The slat angle varies from 0<sup>O</sup>, when the front of the slat is parallel to the glazing and faces toward the outdoors,  to 90<sup>O</sup>, when the slat is perpendicular to the glazing, to 180<sup>O</sup>, when the front of the slat is parallel to the glazing and faces toward the indoors. The minimum and maximum slat angles are determined by the slat thickness, width and separation.
 
@@ -6252,7 +6879,7 @@ The top opening multiplier value will depend on the location of the shading devi
 
 In this case the opening multiplier is calculated as the smallest distance between the shading device and the frame (d<sub>top</sub>), divided by the gap width (S).  There are three possible cases for the position of a shading device the on indoor/outdoor side (see Figure 15).
 
-![](InputOutputReference/media/image036.png)     ![](InputOutputReference/media/image037.png)     ![](InputOutputReference/media/image038.png)
+![](media/image036.png)     ![](media/image038.png)
 
 Figure 15. Three cases for the D<sub>top</sub> calculation for an indoor/outdoor shade: Case a) A shading device between the frame; Case b) A shading device outside the frame, covering the frame; Case c) a shading device outside the frame, not covering the frame.
 
@@ -6264,7 +6891,7 @@ A<sub>top</sub> = min(d<sub>top</sub>/S, 1)
 
 In this case the opening multiplier is calculated as the smallest distance between the shading device and the frame or spacer (d<sub>top</sub>), divided by the smaller gap width (the minimum of (S<sub>1</sub> andS<sub>2</sub>)).
 
-![](InputOutputReference/media/image039.png)          ![](InputOutputReference/media/image040.png)
+![](media/image039.png)          ![](media/image040.png)
 
 Figure 16. Calculation of Dtop for a shading device between glass layers
 
@@ -6292,7 +6919,7 @@ The right side opening multiplier (d<sub>right</sub>)  is calcuated in the same
 
 The fraction of glazing system area that is open on the front of the shading layer (see Figure 17). This fraction is calculated as follows: Afront / (W \* H), where Afront = Area of the front of the glazing system that is not covered by the shading system, W = the width of the glazing system (IGU) and H is height of the glazing system (IGU).
 
-![](InputOutputReference/media/image041.png)
+![](media/image041.png)
 
 Figure 17. Front view of shading layer openings.
 
@@ -6320,7 +6947,7 @@ The conductivity (W/mK) of the venetian slats.  Used only for ShadingLayerType 
 
 The curvature radius (m) of the venetian slats.  Setting this value to zero means there is no curvature in the slat (it is flat), while a non-zero value is the radius of the slat curve.  This value cannot be smaller than Slat Width / 2.  Used only for ShadingLayerType = Venetian.
 
-![](InputOutputReference/media/image042.png)
+![](media/image042.png)
 
 Figure 18. Side view of horizontal venetian blind slats or top view of blinds with vertical slats.  Front face of slats is marked with red line.
 
@@ -6376,7 +7003,7 @@ This object specifies the properties of exterior window screen materials. The wi
 
 The beam solar radiation transmitted through a window screen varies with sun angle and is made up of two distinct elements: a direct beam component and a reflected beam component. The direct beam transmittance component is modeled using the geometry of the screen material and the incident angle of the sun to account for shadowing of the window by the screen material. The reflected beam component is an empirical model that accounts for the inward reflection of solar beam off the screen material surface. This component is both highly directional and small in magnitude compared to the direct beam transmittance component (except at higher incident angles, for which case the magnitude of the direct beam component is small or zero and the reflected beam component, though small in absolute terms can be many times larger than the direct beam component). For this reason, the reflected beam transmittance component calculated by the model can be a. disregarded, b. treated as an additive component to direct beam transmittance (and in the same direction), or c. treated as hemispherically-diffuse transmittance based on a user input to the model.
 
-![DirectReflectFigure](InputOutputReference/media/image043.png)
+![DirectReflectFigure](media/image043.png)
 
 Figure 19. Direct beam and reflected beam transmittance components
 
@@ -6454,7 +7081,7 @@ Screen material conductivity (W/m-K). This input value must be greater than 0. T
 
 The spacing, S, of the screen material (m) is the distance from the center of one strand of screen to the center of the adjacent one. The spacing of the screen material is assumed to be the same in both directions (e.g., vertical and horizontal). This input value must be greater than the non-zero screen material diameter. If the spacing is different in the two directions, use the average of the two values.
 
-![AspectRatio](InputOutputReference/media/image044.png)
+![AspectRatio](media/image044.png)
 
 Figure 20. Screen Material Spacing and Diameter
 
@@ -6603,7 +7230,7 @@ Specifies the optical and thermal properties of equivalent layer window drape fa
 
 Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (infrared) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as showsn in Figure 21.For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure 21.  The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.  Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations reqiure that the solar absorptance of the fabric, at normal incidence, is not less than 1%.
 
-![](InputOutputReference/media/image045.svg)
+![](media/image045.svg)
 
 Figure 21. Geometry used for Pleated Drape Analysis
 
@@ -6686,13 +7313,13 @@ WindowMaterial:Drape:EquivalentLayer,
 
 ### WindowMaterial:Blind:EquivalentLayer
 
-This object specifies the properties of an Equivalent Layer window blind consisting of thin and equally-spaced slats. The the model assumes that slats are flat and thin, and applies correction for the slat curvature effect based on the user specified slat crwon.  Slats are assumed to transmit and reflect diffusely.The effective shortwave optical and longwave optical properties of venetian blind layer is estimated analytically. The Equivalent Layer blind model requires optical properties and geometry of the slats shown ![](InputOutputReference/media/image046.svg)
+This object specifies the properties of an Equivalent Layer window blind consisting of thin and equally-spaced slats. The the model assumes that slats are flat and thin, and applies correction for the slat curvature effect based on the user specified slat crwon.  Slats are assumed to transmit and reflect diffusely.The effective shortwave optical and longwave optical properties of venetian blind layer is estimated analytically. The Equivalent Layer blind model requires optical properties and geometry of the slats shown ![](media/image046.svg)
 
 Figure 22. Geometry and Properties used for venetian blind analysis
 
 .  Likewise, effective longwave properties are obtained for the layer knowing longwave properties of the slats.
 
-![](InputOutputReference/media/image047.svg)
+![](media/image047.svg)
 
 Figure 22. Geometry and Properties used for venetian blind analysis
 
@@ -6829,7 +7456,7 @@ WindowMaterial:Blind:EquivalentLayer,
 
 This object specifies the optical and thermal properties of exterior screen materials for Equivalent Layer Window. Can only be placed on the exterior side of window construction. The window screen model assumes the screen is made up of intersecting orthogonally-crossed cylinders. The surface of the cylinders is assumed to be diffusely reflecting. The beam solar radiation transmitted through an equivalent Layer window screen varies with sun angle and is made up of two distinct elements: a beam-beam component and a beam-difuse component. The beam-beam transmittance component is calculated using screen openness area fraction determined from the geometry of the screen and the incident angle of the sun. Empirical correlations are used to obtain the effective off-normal solar and longwave properties of insect screens.  Insect screen geometry is shown in Figure 23.  The calculation of effective solar properties requires a set of properties measured at normal incidence.
 
-![](InputOutputReference/media/image048.svg)
+![](media/image048.svg)
 
 Figure 23. Geometry used for insect screen analysis
 
@@ -7197,15 +7824,15 @@ This field represents the specific heat of the material layer in units of J/(kg-
 
 #### Field: Thermal Absorptance
 
-The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing “black body” conditions). Typical values are from .9 to .98.
+The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing “black body” conditions). Typical values are from .9 to .98. The default value for this field is 0.9.
 
 #### Field: Solar Absorptance
 
-The solar absorptance field in the Material input syntax represents the fraction of incident  solar radiation that is absorbed by the material. Solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. Typical values are from .6 to .85.
+The solar absorptance field in the Material input syntax represents the fraction of incident  solar radiation that is absorbed by the material. Solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. Typical values are from .6 to .85. The default value for this field is 0.7.
 
 #### Field: Visible Absorptance
 
-The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.5 and 1.0.
+The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.5 and 1.0. The default value for this field is 0.75.
 
 #### Field: Saturation Volumetric Moisture Content of the Soil Layer
 
@@ -7445,13 +8072,13 @@ MaterialProperty:GlazingSpectralData,
 
 For walls, roofs, floors, windows, and doors, constructions are “built” from the included materials. Each layer of the construction is a material name listed in order from “outside” to “inside”. Up to ten layers (eight for windows) may be specified (one of the few limitations in EnergyPlus!). “Outside” is the layer furthest away from the Zone air (not necessarily the outside environment). “Inside” is the layer next to the Zone air. In the example floor below, for example, the outside layer is the acoustic tile below the floor, the next layer is the air space above the tile, and the inside layer is the concrete floor deck.
 
-![](InputOutputReference/media/image050.svg)
+![](media/image050.svg)
 
 Figure 24. Example Floor Construction illustration.
 
 Window constructions are similarly built up from items in the Window Materials set using similar layers.. See Figure 25. Illustration for material ordering in windows, which shows the case where an interior shading layer such as a blind is present. The gap between the inside glass layer (layer \#3) and the interior shading layer is not entered. Similarly, for an exterior shading layer, the gap between the outside glass layer and the shading layer is not entered.
 
-![](InputOutputReference/media/image051.svg)
+![](media/image051.svg)
 
 Figure 25. Illustration for material ordering in windows.
 
@@ -7459,7 +8086,7 @@ However, for a between-glass shading device the gaps on either side of the shadi
 
 A maximum of four glass layers and one shading layer is allowed. A gas layer must always separate adjacent glass layers in a multi-pane glazing without a between-glass shading layer.
 
-![](InputOutputReference/media/image052.svg)
+![](media/image052.svg)
 
 Figure 26. Window construction with and without a between-glass shading layer. Shown are gap widths *g*, *g<sub>1</sub>* and *g<sub>2</sub>*, and shading layer width, *w*. An error will result if *g<sub>1</sub>+g<sub>2</sub>+w* is not equal to *g*, where *w* is zero for a blind and greater than zero for a shade.
 
@@ -8231,7 +8858,7 @@ The Zone North Axis is specified **relative to the Building North Axis**. This v
 
 The X,Y,Z coordinates of a zone origin can be specified, for convenience in vertice entry. Depending on the values in “GlobalGeometryRules” (see description later in this section), these will be used to completely specify the building coordinates in “world coordinate” or not. Zone Origin coordinates are specified **relative to the Building Origin (which always 0,0,0)**. The following figure illustrates the use of Zone North Axis as well as Zone Origin values.
 
-![](InputOutputReference/media/image053.svg)
+![](media/image053.svg)
 
 Figure 27. Illustration of Zone North Axis and Origins
 
@@ -8692,7 +9319,7 @@ Some flexibility is allowed in specifying surface vertices. This flexibility is 
 
 In order to perform shadowing calculations, the building surfaces must be specified. EnergyPlus uses a three dimensional (3D) Cartesian coordinate system for surface vertex specification. This Right Hand coordinate system has the X-axis pointing east, the Y-axis pointing north, and the Z-axis pointing up. See figure below.
 
-![](InputOutputReference/media/image054.svg)
+![](media/image054.svg)
 
 Figure 28. EnergyPlus Coordinate System
 
@@ -9675,7 +10302,7 @@ use the same vertex input. The numeric parameters indicated below are taken from
 
 **Note that the resolution on the surface vertex input is 1 millimeter (.001 meter). Therefore, using vertices that are very close together (&lt;1 mm) may result in invalid dot product and fatal errors during shading calculations.**
 
-![](InputOutputReference/media/image055.svg)
+![](media/image055.svg)
 
 Figure 29. Illustration for Surface Vertices
 
@@ -10455,7 +11082,7 @@ Any surface that would logically be described as an interior wall, floor or ceil
 
 When zoning an office building, five west-facing offices have been combined into one zone. All of the offices have interior walls made of the same materials. As shown in the figure below, this zone may be described with 5 exterior walls and 11 internal walls or 1 exterior wall and 1 internal mass. Note that fewer surfaces will speed up the EnergyPlus calculations.
 
-![](InputOutputReference/media/image056.svg)
+![](media/image056.svg)
 
 Figure 30. Representing 11 internal walls as internal mass
 
@@ -11022,7 +11649,7 @@ Beam solar radiation from the exterior windows in a zone incident on the inside 
 
 Beam solar radiation from the interior (i.e., interzone) windows in a zone incident on the inside face of a surface in the zone. This value is calculated only if Solar Distribution in the BUILDING object is equal to FullInteriorExterior. However, the program does not track where this radiation falls. Instead, it is treated by the program as though it were diffuse radiation uniformly distributed over all of the zone surfaces. See **Figure 31**. Different versions of the report are available including the basic incident rate (W), a per unit area flux (W/m2), and an energy version (J).
 
-![](InputOutputReference/media/image057.svg)
+![](media/image057.svg)
 
 Figure 31. Beam solar radiation entering a zone through an interior window is distributed inside the zone as though it were diffuse radiation.
 
@@ -11442,7 +12069,7 @@ If the sun is behind the window, the vertical profile angle is not defined and i
 
 Note that in most texts what we call “vertical profile angle” is called “horizontal profile angle.”
 
-![](InputOutputReference/media/image058.svg)
+![](media/image058.svg)
 
 Figure 32. Vertical exterior window showing solar horizontal profile angle, solar vertical profile angle and solar incidence angle.
 
@@ -12087,7 +12714,7 @@ Note that shading devices only shade solar radiation when the sun is up, which i
 
 The number of sides in the surface (number of X,Y,Z vertex groups). For further information, see the discussion on “Surface Vertices” above. The example below shows the correct input for an overhang (to shade the appropriate portion of the base wall and window).
 
-![](InputOutputReference/media/image059.svg)
+![](media/image059.svg)
 
 Figure 33. Illustration for Attached Shading Surface
 
@@ -12221,7 +12848,7 @@ NOTE: WindowProperty:ShadingControl does not work with complex fenestration syst
 
 As shown in Figure 34, a shading device can be inside the window (Shading Type = InteriorShade or InteriorBlind), outside the window (Shading Type = ExteriorShade or ExteriorBlind), or between panes of glass (Shading Type = BetweenGlassShade or BetweenGlassBlind). The exception is window screens which can only be outside the window (Shading Type = ExteriorScreen).
 
-![](InputOutputReference/media/image060.svg)
+![](media/image060.svg)
 
 Figure 34. Allowed locations of a window shading device.
 
@@ -12566,7 +13193,7 @@ The best source of frame and divider characteristics is the WINDOW program, whic
 
 Note that a window’s frame and divider characteristics, along with other window information, can be read in from the Window Data File (see “Importing Windows from the WINDOW program” and “Construction:WindowDataFile object”). In this case the WindowProperty:FrameAndDivider referenced by the window is not applicable and should be blank unless you want to specify reveal surfaces for beam solar reflection.
 
-![](InputOutputReference/media/image061.svg)
+![](media/image061.svg)
 
 Figure 35. A window with a frame and divider.
 
@@ -12590,7 +13217,7 @@ The amount by which the frame projects outward from the outside surface of the w
 
 The amount by which the frame projects inward from the inside surface of the window glazing. If the inner surface of the frame is flush with the glazing, Frame Inside Projection = 0.0. Used to calculate solar absorbed by frame, IR emitted and absorbed by frame, and convection from frame.
 
-![](InputOutputReference/media/image062.svg)
+![](media/image062.svg)
 
 Figure 36. Illustration showing frame and divider dimensioning.
 
@@ -12622,7 +13249,7 @@ The type of divider (see figure below). Divider Type = Suspended is applicable o
 
 Divider Type = DividedLite means that the divider elements project out from the outside and inside surfaces of the glazing and divide the glazing into individual lites. For multi-pane glazing, this type of divider also has between-glass elements that separate the panes.
 
-![](InputOutputReference/media/image063.svg)
+![](media/image063.svg)
 
 Figure 37. Illustration showing divider types.
 
@@ -12722,7 +13349,7 @@ The depth of the inside reveal surfaces other than the sill, measured from the i
 
 The solar absorptance of the inside reveal surfaces other than the sill.
 
-![](InputOutputReference/media/image064.svg)
+![](media/image064.svg)
 
 Figure 38. (a) Vertical section through a window (with frame) showing outside and inside reveal surfaces and inside sill. (b) Perspective view looking from the outside of a window (without frame) showing reveal surfaces. Note that “Outside Reveal Depth” is not a user input; it is calculated by the program from the window and wall vertices.
 
@@ -12836,7 +13463,7 @@ The name of a schedule with values between 0.0 and 1.0. The timestep value of th
 
 
 
-![](InputOutputReference/media/image065.svg)
+![](media/image065.svg)
 
 Figure 39. Gap airflow configurations for airflow windows. (a) **Air exhaust window**: Airflow Source = InsideAir, Airflow Destination = OutsideAir; (b) **Indoor air curtain window**: Airflow Source = InsideAir, Airflow Destination = InsideAir; (c) **Air supply window**: Airflow Source = OutsideAir, Airflow Destination = InsideAir; (d) **Outdoor air curtain window**: Airflow Source = OutsideAir, Airflow Destination = OutsideAir; (e) **Airflow to Return Air**: Airflow Source = InsideAir, Airflow Destination = ReturnAir. Based on “Active facades,” Version no. 1, Belgian Building Research Institute, June 2002.
 
@@ -12868,7 +13495,7 @@ This object allows you to assign a movable exterior glass layer (“storm window
 
 
 
-![](InputOutputReference/media/image066.svg)
+![](media/image066.svg)
 
 Figure 40. Section through a single-glazed window without (left) and with (right) a storm glass layer. Not to scale.
 
@@ -13384,7 +14011,7 @@ Wspd  = Outdoor wind speed (m/sec)
 
 Tpast  = Other side temperature from previous zone timestep (°C)
 
-![](InputOutputReference/media/image069.svg)
+![](media/image069.svg)
 
 Figure 41. Illustration for Other Side Coefficients
 
@@ -13447,7 +14074,7 @@ This is the string referenced in the Surface statement that is using OtherSideMo
 
 This is a string key selection used to identify the type of model that will be used to determine boundary conditions. The only available choices are ”GapConvectionRadiation” or “UndergroundPipingSystemSurface.”
 
-![OtherSideConditionsFig](InputOutputReference/media/image070.png)
+![OtherSideConditionsFig](media/image070.png)
 
 Figure 42. Illustration for Other Side Conditions Model
 
@@ -15201,7 +15828,7 @@ This field is used to enter the solar absorbtivity of the baffle. This surface p
 
 #### Field: Height Scale for Buoyancy-Driven Ventilation
 
-This field is used to enter a nominal height scale (m) for prediction of ventilation induced by bouancy. This value (<span>$\Delta {H_{NPL}}$</span>) is defined as the height from the midpoint of the lower opening to the neutral pressure level. Increasing the value will increase the ventilation rate due to buoyancy.
+This field is used to enter a nominal height scale (m) for prediction of ventilation induced by bouancy. This value (<span>\(\Delta {H_{NPL}}\)</span>) is defined as the height from the midpoint of the lower opening to the neutral pressure level. Increasing the value will increase the ventilation rate due to buoyancy.
 
 #### Field: Effective Thickness of Cavity Behind Exterior Baffle
 
@@ -15225,11 +15852,11 @@ This field is used to enter a value for the coefficient used to determine natura
 
 This field is used to enter a value for the coefficient used to determine natural air exchanges from buoyancy. Stack or buoyancy effects will cause exterior air to move in and out of the cavity. Cd is an arbitrary discharge coefficient that depends on the geometry of the opening. Cd should probably be in the range 0.1 to 1.0. Increasing Cd will increase the amount of natural ventilation. The following equations show how Cd is used in the program to predict the volume flow rate due to buoyancy:
 
-<span>${{\rm{\dot \rlap{--} V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{a,cav}} - {T_{amb}}} \right)/{T_{a,cav}}} $</span>  (if <span>${T_{a,cav}} > {T_{amb}}$</span>)
+<span>\({{\rm{\dot \rlap{--} V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{a,cav}} - {T_{amb}}} \right)/{T_{a,cav}}} \)</span>  (if <span>\({T_{a,cav}} > {T_{amb}}\)</span>)
 
-<span>${{\rm{\dot \rlap{--} V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{amb}} - {T_{a,cav}}} \right)/{T_{amb}}} $</span>  (if <span>${T_{amb}} > {T_{a,cav}}$</span> and baffle is vertical)
+<span>\({{\rm{\dot \rlap{--} V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{amb}} - {T_{a,cav}}} \right)/{T_{amb}}} \)</span>  (if <span>\({T_{amb}} > {T_{a,cav}}\)</span> and baffle is vertical)
 
-where <span>$\Delta {H_{NPL}}$</span> is the value input into the field above for the height scale for buoyancy-driven ventilation.
+where <span>\(\Delta {H_{NPL}}\)</span> is the value input into the field above for the height scale for buoyancy-driven ventilation.
 
 #### Field(s): Surface &lt;1 thru x&gt; Name
 
@@ -15425,7 +16052,7 @@ Since windows in EnergyPlus need to be rectangular, it is possible to define a h
 
 The object doesn’t create any specific output, but the results of using it can be understood by viewing DXF output files. Figure 43 shows an example of a building that has been morphed using the Aspect Ratio Transform object. Using this object allowed the same geometry input to generate both of the models represented in by their DXF output files.
 
-![transformExample](InputOutputReference/media/image078.png)
+![transformExample](media/image078.png)
 
 Figure 43. Example of Geometry Transform -- Aspect Ratio
 
@@ -15849,7 +16476,7 @@ An example of a vertical temperature pattern is shown in the figure below. The p
 
 In addition to the vertical temperature pattern there are three other parameters included in the pattern that are important. The first two might affect how the air system conditioning the room is operated. The first describes the temperature difference between the mean air temperature and the point where the sensor of a drybulb thermostat is situated. The second describes the temperature difference between the mean and the point where system air is being extracted from the zone. This is considered important because the changes in temperature difference between supply and return can affect how an air system is controlled to meet the loads. The third parameter can affect the zone air heat balance by altering the temperature of the air leaving the zone through exhaust fans.
 
-![](InputOutputReference/media/image079.svg)
+![](media/image079.svg)
 
 Figure 44. Example of a Vertical Air Temperature Pattern
 
@@ -16056,7 +16683,7 @@ This model is applicable to spaces that are served by a low velocity floor-level
 
 - An upper node representing the mixed-layer/outflow temperature (T<sub>MX</sub>) essential for overall energy budget calculations and for modeling comfort effects of the upper layer temperature.
 
-![](InputOutputReference/media/image080.svg)
+![](media/image080.svg)
 
 Figure 45. Schematic representation of the three temperature points and temperature gradients
 
@@ -16141,13 +16768,13 @@ The CV model is used in EnergyPlus in the context of natural ventilation simulat
 
 Each inflow aperture has one jet region while the recirculation regions are treated as a whole, with a single temperature and characteristic velocity. The default EnergyPlus perfectly mixed single temperature node room air approach is not suitable for these partially mixed flows. The proposed CV model uses multiple nodes with distinct air temperature and airflow velocity (one node for the recirculations plus one additional node for each inflow aperture).
 
-![](InputOutputReference/media/image081.png)
+![](media/image081.png)
 
 Figure 46. Schematic representation of room air geometry a) schematic representation of a room geometry that generates cross ventilation airflow. b) the proposed model distinguishes two regions in the flow: jet and recirculation (shown here in a CFD simulation of one half of a symmetrical room).
 
 
 
-![](InputOutputReference/media/image082.png)
+![](media/image082.png)
 
 Figure 47. Schematic top view –possible  airflow patterns in cross-ventilation.
 
@@ -16946,7 +17573,7 @@ With this choice, the method used will be the dynamic predictive clothing insula
 
 With this choice, the method used can be either the ClothingInsulationSchedule or the DynamicClothingModelASHRAE55, depending on a schedule (to be entered as the next field) that determines which method to use in different time of a day. When this option is chosen, the next field “Clothing Insulation Calculation Method Schedule Name” is a required input.
 
-![](InputOutputReference/media/image083.png)
+![](media/image083.png)
 
 Figure 48. Graphical representation fo the dynamic predictive clothing insulation model
 
@@ -17323,7 +17950,7 @@ Table 12. Winter Clothes (1.0 Clo)
 
 
 
-![](InputOutputReference/media/image084.svg)
+![](media/image084.png)
 
 Figure 49. Winter Comfort Range
 
@@ -17355,7 +17982,7 @@ Table 13. Summer Clothes (0.5 Clo)
 </table>
 
 
-![](InputOutputReference/media/image085.svg)
+![](media/image085.png)
 
 Figure 50. Summer Comfort Range
 
@@ -17575,7 +18202,7 @@ Table 14. Approximate values of Return Air Fraction, Fraction Radiant and Fracti
   </tr>
 </table>
 
-![](InputOutputReference/media/image086.svg)
+![](media/image086.svg)
 
 Figure 51. Overhead fluorescent luminaire configurations.
 
@@ -17619,7 +18246,7 @@ The coefficient C<sub>1</sub> in the equation for (Return Air Fraction)<sub>calc
 
 The coefficient C<sub>2</sub>  in the equation for (Return Air Fraction)<sub>calculated</sub>. Its units are 1/<sup>O</sup>C.
 
-![](InputOutputReference/media/image087.svg)
+![](media/image087.svg)
 
 Figure 52. Vertical section through a zone and its return air plenum showing recessed lighting (not to scale). The heat from lights is divided into four fractions, three of which—ReturnAirFraction, FractionRadiant and FractionConvected—depend on plenum air temperature.
 
@@ -19372,7 +19999,7 @@ This output is the average generic contaminant generation rate from each Surface
 
 The ZoneContaminantSourceAndSink:Generic contaminant:CutoffModel object specifies the generic contaminant generation rate based on the cutoff concentration model. The basic equation used to calculate generic contaminant source for the pressure driven constant model is given below:
 
-<div>\[{S_f}(t) = \left\{ \begin{array}{l}{G_f}(t)*{F_G}*\left( {1 - \frac{{{C_f}(t)}}{{{C_{cutoff}}}}} \right)\;\;\;\;\;{C_f} < {C_{cutoff}}\\0\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;{C_f} \ge {C_{cutoff}}\end{array} \right\}\]</div>
+<div>\[{S_f}(t) = \left\{ \begin{array}{l}{G_f}(t)*{F_G}*\left( {1 - \frac{{{C_f}(t)}}{{{C_{cutoff}}}}} \right)\;\;\;\;\;{C_f} &lt; {C_{cutoff}}\\0\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;{C_f} \ge {C_{cutoff}}\end{array} \right\}\]</div>
 
 where
 

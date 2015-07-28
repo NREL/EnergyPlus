@@ -17,7 +17,6 @@
 
 #include <sstream>
 #include <stdexcept>
-#include <map>
 
 namespace EnergyPlus {
 
@@ -1419,12 +1418,9 @@ void SQLite::createSQLiteReportDataRecord(
 )
 {
 	if ( m_writeOutputToSQLite ) {
-		static int dataIndex = 0;
-		static int extendedDataIndex = 0;
+		++m_dataIndex;
 
-		++dataIndex;
-
-		sqliteBindInteger(m_reportDataInsertStmt, 1, dataIndex);
+		sqliteBindInteger(m_reportDataInsertStmt, 1, m_dataIndex);
 		sqliteBindForeignKey(m_reportDataInsertStmt, 2, m_sqlDBTimeIndex);
 		sqliteBindForeignKey(m_reportDataInsertStmt, 3, recordIndex);
 		sqliteBindDouble(m_reportDataInsertStmt, 4, value);
@@ -1448,7 +1444,7 @@ void SQLite::createSQLiteReportDataRecord(
 			adjustReportingHourAndMinutes(minHour, minMinute);
 			adjustReportingHourAndMinutes(maxHour, maxMinute);
 
-			++extendedDataIndex;
+			++m_extendedDataIndex;
 
 			if ( minutesPerTimeStep.present() ) { // This is for data created by a 'Report Meter' statement
 				switch(reportingInterval()) {
@@ -1456,8 +1452,8 @@ void SQLite::createSQLiteReportDataRecord(
 				case LocalReportDaily:
 				case LocalReportMonthly:
 				case LocalReportSim:
-					sqliteBindInteger(m_reportExtendedDataInsertStmt, 1, extendedDataIndex);
-					sqliteBindForeignKey(m_reportExtendedDataInsertStmt, 2, dataIndex);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 1, m_extendedDataIndex);
+					sqliteBindForeignKey(m_reportExtendedDataInsertStmt, 2, m_dataIndex);
 
 					sqliteBindDouble(m_reportExtendedDataInsertStmt, 3, maxValue);
 					sqliteBindInteger(m_reportExtendedDataInsertStmt, 4, maxMonth);
@@ -1478,11 +1474,11 @@ void SQLite::createSQLiteReportDataRecord(
 					break;
 
 				case LocalReportTimeStep:
-					--extendedDataIndex; // Reset the data index to account for the error
+					--m_extendedDataIndex; // Reset the data index to account for the error
 					break;
 
 				default:
-					--extendedDataIndex; // Reset the data index to account for the error
+					--m_extendedDataIndex; // Reset the data index to account for the error
 					std::stringstream ss;
 					ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << reportingInterval;
 					sqliteWriteMessage(ss.str());
@@ -1492,8 +1488,8 @@ void SQLite::createSQLiteReportDataRecord(
 				case LocalReportDaily:
 				case LocalReportMonthly:
 				case LocalReportSim:
-					sqliteBindInteger(m_reportExtendedDataInsertStmt, 1, extendedDataIndex);
-					sqliteBindForeignKey(m_reportExtendedDataInsertStmt, 2, dataIndex);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 1, m_extendedDataIndex);
+					sqliteBindForeignKey(m_reportExtendedDataInsertStmt, 2, m_dataIndex);
 
 					sqliteBindDouble(m_reportExtendedDataInsertStmt, 3, maxValue);
 					sqliteBindInteger(m_reportExtendedDataInsertStmt, 4, maxMonth);
@@ -1514,7 +1510,7 @@ void SQLite::createSQLiteReportDataRecord(
 					break;
 
 				default:
-					--extendedDataIndex; // Reset the data index to account for the error
+					--m_extendedDataIndex; // Reset the data index to account for the error
 					std::stringstream ss;
 					ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << reportingInterval;
 					sqliteWriteMessage(ss.str());
@@ -1550,6 +1546,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 		case LocalReportTimeStep: {
 			if ( !month.present() || !dayOfMonth.present() || !hour.present() ||
 					!endMinute.present() || !startMinute.present() || !dst.present() || !dayType.present() ) {
+				sqliteWriteMessage("Empty month, dayOfMonth, hour, endMinute, startMinute, dst, or dayType passed to CreateSQLiteTimeIndexRecord");
 				break;
 			}
 			++m_sqlDBTimeIndex;
@@ -1580,6 +1577,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 		}
 		case LocalReportHourly: {
 			if ( !month.present() || !dayOfMonth.present() || !hour.present() || !dst.present() || !dayType.present() ) {
+				sqliteWriteMessage("Empty month, dayOfMonth, hour, dst, or dayType passed to CreateSQLiteTimeIndexRecord");
 				break;
 			}
 			++m_sqlDBTimeIndex;
@@ -1602,7 +1600,8 @@ void SQLite::createSQLiteTimeIndexRecord(
 			break;
 		}
 		case LocalReportDaily: {
-			if ( !month.present() || !dayOfMonth.present() || !hour.present() || !dst.present() || !dayType.present() ) {
+			if ( !month.present() || !dayOfMonth.present() || !dst.present() || !dayType.present() ) {
+				sqliteWriteMessage("Empty month, dayOfMonth, dst, or dayType passed to CreateSQLiteTimeIndexRecord");
 				break;
 			}
 			++m_sqlDBTimeIndex;
@@ -1627,6 +1626,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 		}
 		case LocalReportMonthly: {
 			if ( !month.present() ) {
+				sqliteWriteMessage("Empty month passed to CreateSQLiteTimeIndexRecord");
 				break;
 			}
 			++m_sqlDBTimeIndex;
@@ -1693,10 +1693,9 @@ void SQLite::addSQLiteZoneSizingRecord(
 	Real64 const minOAVolFlow // zone design minimum outside air flow rate [m3/s]
 )
 {
-	static int zoneSizingIndex = 0;
 	if ( m_writeOutputToSQLite ) {
-		++zoneSizingIndex;
-		sqliteBindInteger(m_zoneSizingInsertStmt, 1, zoneSizingIndex);
+		++m_zoneSizingIndex;
+		sqliteBindInteger(m_zoneSizingInsertStmt, 1, m_zoneSizingIndex);
 		sqliteBindText(m_zoneSizingInsertStmt, 2, zoneName);
 		sqliteBindText(m_zoneSizingInsertStmt, 3, loadType);
 
@@ -1723,15 +1722,14 @@ void SQLite::addSQLiteSystemSizingRecord(
 	Real64 const varValue // the value from the sizing calculation
 )
 {
-	static int systemSizingIndex = 0;
 	if ( m_writeOutputToSQLite ) {
-		++systemSizingIndex;
+		++m_systemSizingIndex;
 		std::string description;
 		std::string units;
 
 		parseUnitsAndDescription(varDesc,units,description);
 
-		sqliteBindInteger(m_systemSizingInsertStmt, 1, systemSizingIndex);
+		sqliteBindInteger(m_systemSizingInsertStmt, 1, m_systemSizingIndex);
 		sqliteBindText(m_systemSizingInsertStmt, 2, sysName);
 		sqliteBindText(m_systemSizingInsertStmt, 3, description);
 		sqliteBindDouble(m_systemSizingInsertStmt, 4, varValue);
@@ -1749,16 +1747,15 @@ void SQLite::addSQLiteComponentSizingRecord(
 	Real64 const varValue // the value from the sizing calculation
 )
 {
-	static int componentSizingIndex = 0;
 	if ( m_writeOutputToSQLite ) {
-		++componentSizingIndex;
+		++m_componentSizingIndex;
 
 		std::string description;
 		std::string units;
 
 		parseUnitsAndDescription(varDesc,units,description);
 
-		sqliteBindInteger(m_componentSizingInsertStmt, 1, componentSizingIndex);
+		sqliteBindInteger(m_componentSizingInsertStmt, 1, m_componentSizingIndex);
 		sqliteBindText(m_componentSizingInsertStmt, 2, compType);
 		sqliteBindText(m_componentSizingInsertStmt, 3, compName);
 		sqliteBindText(m_componentSizingInsertStmt, 4, description);
@@ -1808,12 +1805,9 @@ void SQLite::createSQLiteDaylightMap(
 	Array2< Real64 > const & illuminance
 )
 {
-	static int hourlyReportIndex = 0;
-	static int hourlyDataIndex = 0;
-
 	if ( m_writeOutputToSQLite ) {
-		++hourlyReportIndex;
-		sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, 1, hourlyReportIndex);
+		++m_hourlyReportIndex;
+		sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, 1, m_hourlyReportIndex);
 		sqliteBindForeignKey(m_daylightMapHourlyTitleInsertStmt, 2, mapNum);
 		sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, 3, month);
 		sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, 4, dayOfMonth);
@@ -1824,9 +1818,9 @@ void SQLite::createSQLiteDaylightMap(
 
 		for ( int yIndex = 1; yIndex <= nY; ++yIndex ) {
 			for ( int xIndex = 1; xIndex <= nX; ++xIndex ) {
-				++hourlyDataIndex;
-				sqliteBindInteger(m_daylightMapHourlyDataInsertStmt, 1, hourlyDataIndex);
-				sqliteBindForeignKey(m_daylightMapHourlyDataInsertStmt, 2, hourlyReportIndex);
+				++m_hourlyDataIndex;
+				sqliteBindInteger(m_daylightMapHourlyDataInsertStmt, 1, m_hourlyDataIndex);
+				sqliteBindForeignKey(m_daylightMapHourlyDataInsertStmt, 2, m_hourlyReportIndex);
 				sqliteBindDouble(m_daylightMapHourlyDataInsertStmt, 3, x(xIndex));
 				sqliteBindDouble(m_daylightMapHourlyDataInsertStmt, 4, y(yIndex));
 				sqliteBindDouble(m_daylightMapHourlyDataInsertStmt, 5, illuminance(xIndex, yIndex));
@@ -1847,7 +1841,6 @@ void SQLite::createSQLiteTabularDataRecords(
 	std::string const & tableName
 )
 {
-	static int tabularDataIndex = 0;
 	if ( m_writeTabularDataToSQLite ) {
 		size_t sizeColumnLabels = columnLabels.size();
 		size_t sizeRowLabels = rowLabels.size();
@@ -1869,7 +1862,7 @@ void SQLite::createSQLiteTabularDataRecords(
 			}
 
 			for ( size_t iRow = 0; iRow < sizeRowLabels; ++iRow ) {
-				++tabularDataIndex;
+				++m_tabularDataIndex;
 				std::string rowUnits;
 				std::string rowDescription;
 				parseUnitsAndDescription(rowLabels[iRow], rowUnits, rowDescription);
@@ -1880,7 +1873,7 @@ void SQLite::createSQLiteTabularDataRecords(
 					unitsIndex = createSQLiteStringTableRecord(rowUnits, UnitsId);
 				}
 
-				sqliteBindInteger(m_tabularDataInsertStmt,1,tabularDataIndex);
+				sqliteBindInteger(m_tabularDataInsertStmt,1,m_tabularDataIndex);
 				sqliteBindForeignKey(m_tabularDataInsertStmt,2,reportNameIndex);
 				sqliteBindForeignKey(m_tabularDataInsertStmt,3,reportForStringIndex);
 				sqliteBindForeignKey(m_tabularDataInsertStmt,4,tableNameIndex);
@@ -1903,18 +1896,15 @@ void SQLite::createSQLiteTabularDataRecords(
 
 int SQLite::createSQLiteStringTableRecord(std::string const & stringValue, int const stringType)
 {
-	static int stringIndex = 1;
 	int rowId = -1;
-	// map of <<stringValue, stringType>, stringIndex>
-	static std::map < std::pair < std::string, int > , int > tabularStrings;
 	if ( m_writeOutputToSQLite ) {
 
-		auto ret = tabularStrings.emplace( make_pair(stringValue, stringType), 0 );
+		auto ret = m_tabularStrings.emplace( make_pair(stringValue, stringType), 0 );
 
 		if ( !ret.second ) {
 			rowId = ret.first->second;
 		} else {
-			sqliteBindInteger(m_stringsInsertStmt, 1, stringIndex);
+			sqliteBindInteger(m_stringsInsertStmt, 1, m_stringIndex);
 			sqliteBindForeignKey(m_stringsInsertStmt, 2, stringType);
 			sqliteBindText(m_stringsInsertStmt, 3, stringValue);
 
@@ -1922,7 +1912,7 @@ int SQLite::createSQLiteStringTableRecord(std::string const & stringValue, int c
 			sqliteResetCommand(m_stringsInsertStmt);
 
 			if ( errorcode != SQLITE_CONSTRAINT ) {
-				rowId = stringIndex++;
+				rowId = m_stringIndex++;
 			} else {
 				sqliteBindInteger(m_stringsLookUpStmt, 1, stringType);
 				sqliteBindText(m_stringsLookUpStmt, 2, stringValue);
@@ -1955,12 +1945,10 @@ void SQLite::createSQLiteErrorRecord(
 	int const cnt
 )
 {
-	static int errorIndex = 0;
-
 	if ( m_writeOutputToSQLite ) {
-		++errorIndex;
+		++m_errorIndex;
 
-		sqliteBindInteger(m_errorInsertStmt, 1, errorIndex);
+		sqliteBindInteger(m_errorInsertStmt, 1, m_errorIndex);
 		sqliteBindForeignKey(m_errorInsertStmt, 2, simulationIndex);
 		sqliteBindInteger(m_errorInsertStmt, 3, errorType);
 		sqliteBindText(m_errorInsertStmt, 4, errorMessage);
@@ -2077,7 +2065,7 @@ void SQLite::createSQLiteEnvironmentPeriodRecord( const int curEnvirNum, const s
 	}
 }
 
-void SQLite::addScheduleData( int const number, std::string const name, std::string const type, double const minValue, double const maxValue )
+void SQLite::addScheduleData( int const number, std::string const & name, std::string const & type, double const minValue, double const maxValue )
 {
 	schedules.push_back(
 		std::unique_ptr<Schedule>(new Schedule(m_errorStream, m_db, number, name, type, minValue, maxValue))
@@ -2098,7 +2086,7 @@ void SQLite::addZoneListData( int const number, DataHeatBalance::ZoneListData co
 	);
 }
 
-void SQLite::addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const surfaceClass )
+void SQLite::addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const & surfaceClass )
 {
 	surfaces.push_back(
 		std::unique_ptr<Surface>(new Surface(m_errorStream, m_db, number, surfaceData, surfaceClass))

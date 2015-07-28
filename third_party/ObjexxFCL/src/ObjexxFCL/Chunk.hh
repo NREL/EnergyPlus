@@ -42,6 +42,9 @@ private: // Friend
 
 public: // Types
 
+	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
+	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
+
 	// STL style
 	typedef  T  value_type;
 	typedef  T &  reference;
@@ -119,7 +122,7 @@ public: // Creation
 	inline
 	Chunk(
 	 size_type const size,
-	 T const & value
+	 Tc value
 	) :
 	 size_( size ),
 	 capacity_( size_ ),
@@ -194,7 +197,7 @@ public: // Assignment
 	Chunk &
 	assign(
 	 size_type const size,
-	 T const & value
+	 Tc value
 	)
 	{
 		if ( size_ != size ) {
@@ -261,7 +264,7 @@ public: // Assignment
 	// = Value
 	inline
 	Chunk &
-	operator =( T const & value )
+	operator =( Tc value )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = value;
@@ -272,7 +275,7 @@ public: // Assignment
 	// += Value
 	inline
 	Chunk &
-	operator +=( T const & value )
+	operator +=( Tc value )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] += value;
@@ -283,7 +286,7 @@ public: // Assignment
 	// -= Value
 	inline
 	Chunk &
-	operator -=( T const & value )
+	operator -=( Tc value )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] -= value;
@@ -294,7 +297,7 @@ public: // Assignment
 	// *= Value
 	inline
 	Chunk &
-	operator *=( T const & value )
+	operator *=( Tc value )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] *= value;
@@ -305,7 +308,7 @@ public: // Assignment
 	// /= Value
 	inline
 	Chunk &
-	operator /=( T const & value )
+	operator /=( Tc value )
 	{
 		assert( value != T( 0 ) );
 		for ( size_type i = 0; i < size_; ++i ) {
@@ -318,7 +321,7 @@ public: // Subscript
 
 	// Chunk[ i ] const: 0-Based Indexing
 	inline
-	T const &
+	Tr
 	operator []( size_type const i ) const
 	{
 		assert( i < size_ );
@@ -370,7 +373,7 @@ public: // Inspector
 
 	// First Element
 	inline
-	T const &
+	Tr
 	front() const
 	{
 		assert( size_ > 0u );
@@ -379,7 +382,7 @@ public: // Inspector
 
 	// Last Element
 	inline
-	T const &
+	Tr
 	back() const
 	{
 		assert( size_ > 0u );
@@ -409,7 +412,7 @@ public: // Modifier
 	// Append an Element
 	inline
 	Chunk &
-	push_back( T const & value )
+	push_back( Tc value )
 	{
 		assert( size_ < max_size() );
 		if ( size_ == capacity_ ) reserve( 2 * capacity_ );
@@ -453,7 +456,7 @@ public: // Modifier
 	Chunk &
 	resize(
 	 size_type const size,
-	 T const & value
+	 Tc value
 	)
 	{
 		if ( size_ != size ) {
@@ -494,7 +497,7 @@ public: // Modifier
 	Chunk &
 	non_preserving_resize(
 	 size_type const size,
-	 T const & value
+	 Tc value
 	)
 	{
 		if ( size_ != size ) {

@@ -5303,7 +5303,7 @@
     TowerWaterSys Loop Operation Scheme List,  !- Condenser Equipment Operation Scheme Name
     TowerWaterSys Supply Outlet Node,  !- Condenser Loop Temperature Setpoint Node Name
     80.0,                    !- Maximum Loop Temperature {C}
-    5.0,                     !- Minimum Loop Temperature {C}
+    4.0,                     !- Minimum Loop Temperature {C}
     AUTOSIZE,                !- Maximum Loop Flow Rate {m3/s}
     0.0,                     !- Minimum Loop Flow Rate {m3/s}
     AUTOSIZE,                !- Condenser Loop Volume {m3}
