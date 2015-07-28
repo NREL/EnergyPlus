@@ -484,7 +484,7 @@ SurfaceProperty:OtherSideConditionsModel,
     4,                      ! - y direction mesh parameter
     4,                      ! - z direction mesh parameter
     geometric,              ! - Mesh Type (Uniform/Geometric)
-    1.3,                    ! - Geometric coefficient
+    1.7,                    ! - Geometric coefficient
     Hourly;                 !- Domain Simulation Interval. (Timestep/Hourly/Daily)
 
 !***********************************************************

@@ -1782,20 +1782,20 @@ Site:GroundDomain:Slab,
         \type real
         \units C
         \note Annual average ground surface temperature.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provide
         \note monthly average ground surface temperatures.
    N10, \field Kusuda-Achenbach Average Amplitude of Ground Surface Temperature
         \type real
         \units deltaC
         \note Annual average ground surface temperature variation from average.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provide
         \note monthly average ground surface temperatures.
    N11, \field Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature
         \type real
         \units days
         \note The phase shift of minimum ground surface temperature, or the day
         \note of the year when the minimum ground surface temperature occurs.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provide
         \note monthly average ground surface temperatures.
    N12, \field Evapotranspiration Ground Cover Parameter
         \type real
@@ -1821,14 +1821,12 @@ Site:GroundDomain:Slab,
    A4,  \field Slab Material Name
         \type object-list
         \object-list MaterialName
-        \note Only applicable for the in-grade case
    A5,  \field Horizontal Insulation
         \type choice
         \key Yes
         \key No
         \default No
         \note This field specifies the presence of insulation beneath the slab.
-        \note Only required for in-grade case.
    A6,  \field Horizontal Insulation Material Name
         \type object-list
         \object-list MaterialName
@@ -1883,7 +1881,7 @@ Site:GroundDomain:Slab,
 		\note optional
         \type real
 		\minimum 1
-        \default 1.3
+        \default 1.7
         \maximum 2
    A11; \field Simulation Timestep
         \type choice
