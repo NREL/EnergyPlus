@@ -54,7 +54,8 @@ namespace HVACVariableRefrigerantFlow {
 	// MODULE INFORMATION:
 	//       AUTHOR         Richard Raustad, FSEC
 	//       DATE WRITTEN   August 2010
-	//       MODIFIED       FSEC - Raustad, Added Heat Recovery Operating Mode, April 2012
+	//       MODIFIED       Apr 2012, R. Raustad, FSEC, Added Heat Recovery Operating Mode
+	//                      Jul 2015, RP Zhang, XF Pang, LBNL, Added a new physics based VRF model applicable for Fluid Temperature Control
 	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS MODULE:
@@ -3150,37 +3151,75 @@ namespace HVACVariableRefrigerantFlow {
 					TerminalUnitList( VRFTU( VRFTUNum ).TUListIndex ).CoolingCoilPresent( VRFTU( VRFTUNum ).IndexToTUInTUList ) = false;
 				}
 			} else {
-				if ( SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXCoolCoilType_Num ), cAllCoilTypes( CoilVRF_Cooling ) ) ) {
-					errFlag = false;
-					TerminalUnitList( VRFTU( VRFTUNum ).TUListIndex ).CoolingCoilAvailSchPtr( VRFTU( VRFTUNum ).IndexToTUInTUList ) = GetDXCoilAvailSchPtr( DXCoolingCoilType, cAlphaArgs( 12 ), errFlag );
-					GetDXCoilIndex( cAlphaArgs( 12 ), VRFTU( VRFTUNum ).CoolCoilIndex, errFlag, cAllCoilTypes( CoilVRF_Cooling ) );
-					CCoilInletNodeNum = GetDXCoilInletNode( cAllCoilTypes( CoilVRF_Cooling ), cAlphaArgs( 12 ), errFlag );
-					CCoilOutletNodeNum = GetDXCoilOutletNode( cAllCoilTypes( CoilVRF_Cooling ), cAlphaArgs( 12 ), errFlag );
+				if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) { 
+				// Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
+				
+					if ( SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXCoolCoilType_Num ), cAllCoilTypes( CoilVRF_FluidTCtrl_Cooling ) ) ) {
+						errFlag = false;
+						TerminalUnitList( VRFTU( VRFTUNum ).TUListIndex ).CoolingCoilAvailSchPtr( VRFTU( VRFTUNum ).IndexToTUInTUList ) = GetDXCoilAvailSchPtr( DXCoolingCoilType, cAlphaArgs( 12 ), errFlag );
+						GetDXCoilIndex( cAlphaArgs( 12 ), VRFTU( VRFTUNum ).CoolCoilIndex, errFlag, cAllCoilTypes( CoilVRF_FluidTCtrl_Cooling ) );
+						CCoilInletNodeNum = GetDXCoilInletNode( cAllCoilTypes( CoilVRF_FluidTCtrl_Cooling ), cAlphaArgs( 12 ), errFlag );
+						CCoilOutletNodeNum = GetDXCoilOutletNode( cAllCoilTypes( CoilVRF_FluidTCtrl_Cooling ), cAlphaArgs( 12 ), errFlag );
 
-					if ( errFlag ) ShowContinueError( "...occurs in " + cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
+						if ( errFlag ) ShowContinueError( "...occurs in " + cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
 
-					if ( VRFTU( VRFTUNum ).VRFSysNum > 0 ) {
-						SetDXCoolingCoilData( VRFTU( VRFTUNum ).CoolCoilIndex, ErrorsFound, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).CondenserType );
-						SetDXCoolingCoilData( VRFTU( VRFTUNum ).CoolCoilIndex, ErrorsFound, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).CondenserNodeNum );
-						SetDXCoolingCoilData( VRFTU( VRFTUNum ).CoolCoilIndex, ErrorsFound, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MaxOATCCHeater );
+						if ( VRFTU( VRFTUNum ).VRFSysNum > 0 ) {
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).CoolCoilIndex, ErrorsFound, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).CondenserType );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).CoolCoilIndex, ErrorsFound, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).CondenserNodeNum );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).CoolCoilIndex, ErrorsFound, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MaxOATCCHeater );
 
-						SetDXCoolingCoilData( VRFTU( VRFTUNum ).CoolCoilIndex, ErrorsFound, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MinOATCooling );
-						SetDXCoolingCoilData( VRFTU( VRFTUNum ).CoolCoilIndex, ErrorsFound, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MaxOATCooling );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).CoolCoilIndex, ErrorsFound, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MinOATCooling );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).CoolCoilIndex, ErrorsFound, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MaxOATCooling );
+						} else {
+							ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
+							ShowContinueError( "... when checking " + cAllCoilTypes( VRFTU( VRFTUNum ).DXCoolCoilType_Num ) + " \"" + cAlphaArgs( 12 ) + "\"" );
+							ShowContinueError( "... terminal unit not connected to condenser." );
+							ShowContinueError( "... check that terminal unit is specified in a terminal unit list object." );
+							ShowContinueError( "... also check that the terminal unit list name is specified in an AirConditioner:VariableRefrigerantFlow object." );
+							ErrorsFound = true;
+						}
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
-						ShowContinueError( "... when checking " + cAllCoilTypes( VRFTU( VRFTUNum ).DXCoolCoilType_Num ) + " \"" + cAlphaArgs( 12 ) + "\"" );
-						ShowContinueError( "... terminal unit not connected to condenser." );
-						ShowContinueError( "... check that terminal unit is specified in a terminal unit list object." );
-						ShowContinueError( "... also check that the terminal unit list name is specified in an AirConditioner:VariableRefrigerantFlow object." );
+						ShowContinueError( "... illegal " + cAlphaFieldNames( 12 ) + " = " + cAlphaArgs( 12 ) );
 						ErrorsFound = true;
 					}
+
 				} else {
-					ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
-					ShowContinueError( "... illegal " + cAlphaFieldNames( 12 ) + " = " + cAlphaArgs( 12 ) );
-					ErrorsFound = true;
+				// Algorithm Type: VRF model based on system curve
+				
+					if ( SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXCoolCoilType_Num ), cAllCoilTypes( CoilVRF_Cooling ) ) ) {
+						errFlag = false;
+						TerminalUnitList( VRFTU( VRFTUNum ).TUListIndex ).CoolingCoilAvailSchPtr( VRFTU( VRFTUNum ).IndexToTUInTUList ) = GetDXCoilAvailSchPtr( DXCoolingCoilType, cAlphaArgs( 12 ), errFlag );
+						GetDXCoilIndex( cAlphaArgs( 12 ), VRFTU( VRFTUNum ).CoolCoilIndex, errFlag, cAllCoilTypes( CoilVRF_Cooling ) );
+						CCoilInletNodeNum = GetDXCoilInletNode( cAllCoilTypes( CoilVRF_Cooling ), cAlphaArgs( 12 ), errFlag );
+						CCoilOutletNodeNum = GetDXCoilOutletNode( cAllCoilTypes( CoilVRF_Cooling ), cAlphaArgs( 12 ), errFlag );
+
+						if ( errFlag ) ShowContinueError( "...occurs in " + cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
+
+						if ( VRFTU( VRFTUNum ).VRFSysNum > 0 ) {
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).CoolCoilIndex, ErrorsFound, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).CondenserType );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).CoolCoilIndex, ErrorsFound, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).CondenserNodeNum );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).CoolCoilIndex, ErrorsFound, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MaxOATCCHeater );
+
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).CoolCoilIndex, ErrorsFound, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MinOATCooling );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).CoolCoilIndex, ErrorsFound, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MaxOATCooling );
+						} else {
+							ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
+							ShowContinueError( "... when checking " + cAllCoilTypes( VRFTU( VRFTUNum ).DXCoolCoilType_Num ) + " \"" + cAlphaArgs( 12 ) + "\"" );
+							ShowContinueError( "... terminal unit not connected to condenser." );
+							ShowContinueError( "... check that terminal unit is specified in a terminal unit list object." );
+							ShowContinueError( "... also check that the terminal unit list name is specified in an AirConditioner:VariableRefrigerantFlow object." );
+							ErrorsFound = true;
+						}
+					} else {
+						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
+						ShowContinueError( "... illegal " + cAlphaFieldNames( 12 ) + " = " + cAlphaArgs( 12 ) );
+						ErrorsFound = true;
+					}
 				}
 			}
-
+				
+				
 			//Get DX heating coil data
 			DXHeatingCoilType = cAlphaArgs( 13 );
 
@@ -3197,52 +3236,108 @@ namespace HVACVariableRefrigerantFlow {
 					TerminalUnitList( VRFTU( VRFTUNum ).TUListIndex ).HeatingCoilPresent( VRFTU( VRFTUNum ).IndexToTUInTUList ) = false;
 				}
 			} else {
-				if ( SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ), cAllCoilTypes( CoilVRF_Heating ) ) ) {
-					errFlag = false;
-					TerminalUnitList( VRFTU( VRFTUNum ).TUListIndex ).HeatingCoilAvailSchPtr( VRFTU( VRFTUNum ).IndexToTUInTUList ) = GetDXCoilAvailSchPtr( DXHeatingCoilType, cAlphaArgs( 14 ), errFlag );
-					GetDXCoilIndex( cAlphaArgs( 14 ), VRFTU( VRFTUNum ).HeatCoilIndex, errFlag, cAllCoilTypes( CoilVRF_Heating ) );
-					HCoilInletNodeNum = GetDXCoilInletNode( cAllCoilTypes( CoilVRF_Heating ), cAlphaArgs( 14 ), errFlag );
-					HCoilOutletNodeNum = GetDXCoilOutletNode( cAllCoilTypes( CoilVRF_Heating ), cAlphaArgs( 14 ), errFlag );
+			
+				if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) { 
+				// Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
+					
+					if ( SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ), cAllCoilTypes( CoilVRF_FluidTCtrl_Heating ) ) ) {
+						errFlag = false;
+						TerminalUnitList( VRFTU( VRFTUNum ).TUListIndex ).HeatingCoilAvailSchPtr( VRFTU( VRFTUNum ).IndexToTUInTUList ) = GetDXCoilAvailSchPtr( DXHeatingCoilType, cAlphaArgs( 14 ), errFlag );
+						GetDXCoilIndex( cAlphaArgs( 14 ), VRFTU( VRFTUNum ).HeatCoilIndex, errFlag, cAllCoilTypes( CoilVRF_FluidTCtrl_Heating ) );
+						HCoilInletNodeNum = GetDXCoilInletNode( cAllCoilTypes( CoilVRF_FluidTCtrl_Heating ), cAlphaArgs( 14 ), errFlag );
+						HCoilOutletNodeNum = GetDXCoilOutletNode( cAllCoilTypes( CoilVRF_FluidTCtrl_Heating ), cAlphaArgs( 14 ), errFlag );
 
-					if ( errFlag ) ShowContinueError( "...occurs in " + cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
+						if ( errFlag ) ShowContinueError( "...occurs in " + cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
 
-					if ( VRFTU( VRFTUNum ).VRFSysNum > 0 ) {
-						SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).CondenserType );
-						SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).CondenserNodeNum );
-						SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MaxOATCCHeater );
+						if ( VRFTU( VRFTUNum ).VRFSysNum > 0 ) {
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).CondenserType );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).CondenserNodeNum );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MaxOATCCHeater );
 
-						SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MinOATHeating );
-						SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MaxOATHeating );
-						SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingPerformanceOATType );
-						// Set defrost controls in child object to trip child object defrost calculations
-						SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).DefrostStrategy );
-						SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).DefrostControl );
-						SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).DefrostEIRPtr );
-						SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).DefrostFraction );
-						SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MaxOATDefrost );
-						// If defrost is disabled in the VRF condenser, it must be disabled in the DX coil
-						// Defrost primarily handled in parent object, set defrost capacity to 1 to avoid autosizing.
-						// Defrost capacity is used for nothing more than setting defrost power/consumption report
-						// variables which are not reported. The coil's defrost algorythm IS used to derate the coil
-						SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, 1.0 ); // DefrostCapacity=1.0
-						// Terminal unit heating to cooling sizing ratio has precedence over VRF system sizing ratio
-						if ( VRFTU( VRFTUNum ).HeatingCapacitySizeRatio > 1.0 ) {
-							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, VRFTU( VRFTUNum ).HeatingCapacitySizeRatio );
-						} else if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingCapacitySizeRatio > 1.0 ) {
-							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingCapacitySizeRatio );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MinOATHeating );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MaxOATHeating );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingPerformanceOATType );
+							// Set defrost controls in child object to trip child object defrost calculations
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).DefrostStrategy );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).DefrostControl );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).DefrostEIRPtr );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).DefrostFraction );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MaxOATDefrost );
+							// If defrost is disabled in the VRF condenser, it must be disabled in the DX coil
+							// Defrost primarily handled in parent object, set defrost capacity to 1 to avoid autosizing.
+							// Defrost capacity is used for nothing more than setting defrost power/consumption report
+							// variables which are not reported. The coil's defrost algorythm IS used to derate the coil
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, 1.0 ); // DefrostCapacity=1.0
+							// Terminal unit heating to cooling sizing ratio has precedence over VRF system sizing ratio
+							if ( VRFTU( VRFTUNum ).HeatingCapacitySizeRatio > 1.0 ) {
+								SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, VRFTU( VRFTUNum ).HeatingCapacitySizeRatio );
+							} else if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingCapacitySizeRatio > 1.0 ) {
+								SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingCapacitySizeRatio );
+							}
+						} else {
+							ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
+							ShowContinueError( "... when checking " + cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ) + " \"" + cAlphaArgs( 14 ) + "\"" );
+							ShowContinueError( "... terminal unit not connected to condenser." );
+							ShowContinueError( "... check that terminal unit is specified in a terminal unit list object." );
+							ShowContinueError( "... also check that the terminal unit list name is specified in an AirConditioner:VariableRefrigerantFlow object." );
+							ErrorsFound = true;
 						}
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
-						ShowContinueError( "... when checking " + cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ) + " \"" + cAlphaArgs( 14 ) + "\"" );
-						ShowContinueError( "... terminal unit not connected to condenser." );
-						ShowContinueError( "... check that terminal unit is specified in a terminal unit list object." );
-						ShowContinueError( "... also check that the terminal unit list name is specified in an AirConditioner:VariableRefrigerantFlow object." );
+						ShowContinueError( "... illegal " + cAlphaFieldNames( 14 ) + " = " + cAlphaArgs( 14 ) );
 						ErrorsFound = true;
 					}
+
 				} else {
-					ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
-					ShowContinueError( "... illegal " + cAlphaFieldNames( 14 ) + " = " + cAlphaArgs( 14 ) );
-					ErrorsFound = true;
+				// Algorithm Type: VRF model based on system curve
+				
+					if ( SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ), cAllCoilTypes( CoilVRF_Heating ) ) ) {
+						errFlag = false;
+						TerminalUnitList( VRFTU( VRFTUNum ).TUListIndex ).HeatingCoilAvailSchPtr( VRFTU( VRFTUNum ).IndexToTUInTUList ) = GetDXCoilAvailSchPtr( DXHeatingCoilType, cAlphaArgs( 14 ), errFlag );
+						GetDXCoilIndex( cAlphaArgs( 14 ), VRFTU( VRFTUNum ).HeatCoilIndex, errFlag, cAllCoilTypes( CoilVRF_Heating ) );
+						HCoilInletNodeNum = GetDXCoilInletNode( cAllCoilTypes( CoilVRF_Heating ), cAlphaArgs( 14 ), errFlag );
+						HCoilOutletNodeNum = GetDXCoilOutletNode( cAllCoilTypes( CoilVRF_Heating ), cAlphaArgs( 14 ), errFlag );
+
+						if ( errFlag ) ShowContinueError( "...occurs in " + cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
+
+						if ( VRFTU( VRFTUNum ).VRFSysNum > 0 ) {
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).CondenserType );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).CondenserNodeNum );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MaxOATCCHeater );
+
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MinOATHeating );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MaxOATHeating );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingPerformanceOATType );
+							// Set defrost controls in child object to trip child object defrost calculations
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).DefrostStrategy );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).DefrostControl );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).DefrostEIRPtr );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).DefrostFraction );
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MaxOATDefrost );
+							// If defrost is disabled in the VRF condenser, it must be disabled in the DX coil
+							// Defrost primarily handled in parent object, set defrost capacity to 1 to avoid autosizing.
+							// Defrost capacity is used for nothing more than setting defrost power/consumption report
+							// variables which are not reported. The coil's defrost algorythm IS used to derate the coil
+							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, 1.0 ); // DefrostCapacity=1.0
+							// Terminal unit heating to cooling sizing ratio has precedence over VRF system sizing ratio
+							if ( VRFTU( VRFTUNum ).HeatingCapacitySizeRatio > 1.0 ) {
+								SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, VRFTU( VRFTUNum ).HeatingCapacitySizeRatio );
+							} else if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingCapacitySizeRatio > 1.0 ) {
+								SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingCapacitySizeRatio );
+							}
+						} else {
+							ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
+							ShowContinueError( "... when checking " + cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ) + " \"" + cAlphaArgs( 14 ) + "\"" );
+							ShowContinueError( "... terminal unit not connected to condenser." );
+							ShowContinueError( "... check that terminal unit is specified in a terminal unit list object." );
+							ShowContinueError( "... also check that the terminal unit list name is specified in an AirConditioner:VariableRefrigerantFlow object." );
+							ErrorsFound = true;
+						}
+					} else {
+						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
+						ShowContinueError( "... illegal " + cAlphaFieldNames( 14 ) + " = " + cAlphaArgs( 14 ) );
+						ErrorsFound = true;
+					}
 				}
 			}
 
@@ -4582,6 +4677,7 @@ namespace HVACVariableRefrigerantFlow {
 		
 		// @@
 		// XP temperarily added to determine operation mode******************************* 
+		if ( VRF( VRFCond ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) {
 		TUListNum = VRFTU(VRFTUNum).TUListIndex;
 		NumCoolingLoads( VRFCond ) = 0;
 		NumHeatingLoads( VRFCond ) = 0;
@@ -4645,6 +4741,7 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		if ( FanSpeedRatio < 0.0 ) FanSpeedRatio = 0.0; 
+		}
 
 		SetAverageAirFlow( VRFTUNum, 0.0, OnOffAirFlowRatio );
 
@@ -5642,7 +5739,7 @@ namespace HVACVariableRefrigerantFlow {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 PartLoadRatio;
+		Real64 PartLoadRatio( 1.0 );
 		//REAL(r64) :: QZnReq        ! cooling or heating output needed by zone [W]
 		//REAL(r64) :: LoadToCoolingSP
 		//REAL(r64) :: LoadToHeatingSP
@@ -6505,8 +6602,8 @@ namespace HVACVariableRefrigerantFlow {
 		int InletNode; // inlet node number
 		int OutsideAirNode; // outside air node number
 		int AirRelNode; // relief air node number
-		Real64 AverageUnitMassFlow; // average supply air mass flow rate over time step
-		Real64 AverageOAMassFlow; // average outdoor air mass flow rate over time step
+		Real64 AverageUnitMassFlow( 0.0 ); // average supply air mass flow rate over time step
+		Real64 AverageOAMassFlow( 0.0 ); // average outdoor air mass flow rate over time step
 
 		InletNode = VRFTU( VRFTUNum ).VRFTUInletNodeNum;
 		OutsideAirNode = VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum;
@@ -6531,7 +6628,7 @@ namespace HVACVariableRefrigerantFlow {
 		// if the terminal unit and fan are scheduled on then set flow rate
 		if ( GetCurrentScheduleValue( VRFTU( VRFTUNum ).SchedPtr ) > 0.0 && ( GetCurrentScheduleValue( VRFTU( VRFTUNum ).FanAvailSchedPtr ) > 0.0 || ZoneCompTurnFansOn ) && ! ZoneCompTurnFansOff ) {
 
-			if ( VRF( VRFTU( VRFTUNum ).VRFSysNum  ).VRFAlgorithmTypeNum != AlgorithmTypeFluidTCtrl ) {
+			if ( VRF( VRFTU( VRFTUNum ).VRFSysNum  ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) {
 				Node( InletNode ).MassFlowRate = CompOnMassFlow * FanSpeedRatio;
 				Node( InletNode ).MassFlowRateMaxAvail = CompOnMassFlow;
 				if ( OutsideAirNode > 0 ) {
@@ -8407,14 +8504,14 @@ namespace HVACVariableRefrigerantFlow {
 		
 		}
 		
-		// 0924: For Debug purposes
-		VRF( VRFCond ).Path = Path; 
-		VRF( VRFCond ).NumIteNcomp = Counter; // Number of Ncomp itarations
-		VRF( VRFCond ).NumIteTe = NumIteTe; // Number of Te itarations
-		VRF( VRFCond ).NumIteHIUIn = NumIteHIUIn; // Number of Pipe_h_IU_in itarations
-		VRF( VRFCond ).Modifi_SH = Modifi_SH;  
-		VRF( VRFCond ).Modifi_Pe = Modifi_Pe; 
-		VRF( VRFCond ).Modifi_factor  =  C_cap_operation; 
+		// 0924: For Debug purposes @@
+		// VRF( VRFCond ).Path = Path; 
+		// VRF( VRFCond ).NumIteNcomp = Counter; // Number of Ncomp itarations
+		// VRF( VRFCond ).NumIteTe = NumIteTe; // Number of Te itarations
+		// VRF( VRFCond ).NumIteHIUIn = NumIteHIUIn; // Number of Pipe_h_IU_in itarations
+		// VRF( VRFCond ).Modifi_SH = Modifi_SH;  
+		// VRF( VRFCond ).Modifi_Pe = Modifi_Pe; 
+		// VRF( VRFCond ).Modifi_factor  =  C_cap_operation; 
 		//150129 Yoshi end 
 		
 		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

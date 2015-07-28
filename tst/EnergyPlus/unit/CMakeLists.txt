@@ -13,7 +13,7 @@ set( test_src
   EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
   Fans.unit.cc
-  FaultFoulingAirFilters.unit.cc
+  FaultsManager.unit.cc
   FluidCoolers.unit.cc
   Furnaces.unit.cc
   GroundHeatExchangers.unit.cc
@@ -22,6 +22,7 @@ set( test_src
   Humidifiers.unit.cc
   HVACSizingSimulationManager.unit.cc 
   HVACStandaloneERV.unit.cc
+  HVACVariableRefrigerantFlow.unit.cc
   ICSCollector.unit.cc
   LowTempRadiantSystem.unit.cc
   ManageElectricPower.unit.cc

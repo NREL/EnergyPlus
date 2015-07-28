@@ -59,7 +59,7 @@ namespace DXCoils {
 	//                      Apr 2010, Chandan Sharma, FSEC, Added basin heater routines for Coil:Cooling:DX:SingleSpeed, Coil:Cooling:DX:TwoSpeed, 
 	//                                Coil:Cooling:DX:MultiSpeed, and Coil:Cooling:DX:TwoStageWithHumidityControlMode
 	//                      Feb 2013, Bereket Nigusse, FSEC, Added DX Coil Model For 100% OA systems
-	//                      Jul 2015, RP Zhang, XF Pang, LBNL, Added new coil type for VRF-FluidTemperatureControl Model
+	//                      Jul 2015, RP Zhang, XF Pang, LBNL, Added new coil type for VRF-FluidTemperatureControl Model 
 	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS MODULE:
@@ -5217,7 +5217,7 @@ namespace DXCoils {
 			SizeDXCoil( DXCoilNum );
 			MySizeFlag( DXCoilNum ) = false;
 
-			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling|| DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling ) {
+			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling) { // @@ || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling 
 
 				Mode = 1;
 				// Check for zero capacity or zero max flow rate
@@ -5277,7 +5277,7 @@ namespace DXCoils {
 
 			}
 
-			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating ) {
+			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) { // @@ || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating 
 			
 				Mode = 1;
 				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) <= 0.0 ) {

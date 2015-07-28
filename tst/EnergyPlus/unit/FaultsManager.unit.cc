@@ -1,5 +1,5 @@
-// EnergyPlus::DXCoils unit tests
-// DX heating coil defrost capacity with electric resistance
+// EnergyPlus::FaultManager unit tests
+// Fouling Air Filter
 
 // Google test headers
 #include <gtest/gtest.h>
@@ -24,7 +24,7 @@ using namespace FaultsManager;
 using namespace CurveManager;
 using namespace Fans;
 
-TEST( FaultFoulingAirFilters, CheckFaultyAirFilterFanCurve )
+TEST( FaultsManager, FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve )
 {
 	// PURPOSE OF THIS SUBROUTINE:
 	// To check whether the fan curve specified in the FaultModel:Fouling:AirFilter object
@@ -83,7 +83,7 @@ TEST( FaultFoulingAirFilters, CheckFaultyAirFilterFanCurve )
 
 }
 
-TEST( FaultFoulingAirFilters, CalFaultyFanAirFlowReduction )
+TEST( FaultsManager, FaultFoulingAirFilters_CalFaultyFanAirFlowReduction )
 {
 	// PURPOSE OF THIS SUBROUTINE:
 	// Calculate the decrease of the fan air flow rate, given the fan curve 
@@ -133,4 +133,3 @@ TEST( FaultFoulingAirFilters, CalFaultyFanAirFlowReduction )
 	Fan.deallocate( ); 
 	
 }
-

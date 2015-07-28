@@ -33424,6 +33424,14 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
         \type choice
         \key Fan:OnOff
         \key Fan:ConstantVolume
+        \key Fan:VariableVolume
+        \note Supply Air Fan Object Type must be 
+        \note Fan:OnOff or Fan:ConstantVolume 
+        \note if AirConditioner:VariableRefrigerantFlow
+        \note is used to model VRF outdoor unit
+        \note Supply Air Fan Object Type must be Fan:VariableVolume if
+        \note AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl
+        \note is used to model VRF outdoor unit
         \default Fan:ConstantVolume
   A8 ,  \field Supply Air Fan Object Name
         \required-field
@@ -33440,7 +33448,14 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
   A11,  \field Cooling Coil Object Type
         \type choice
         \key Coil:Cooling:DX:VariableRefrigerantFlow
+        \key Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl
         \note Cooling Coil Type must be Coil:Cooling:DX:VariableRefrigerantFlow
+        \note if AirConditioner:VariableRefrigerantFlow is used 
+        \note to model VRF outdoor unit
+        \note Cooling Coil Type must be 
+        \note Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl
+        \note if AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl 
+        \note is used to model VRF outdoor unit
         \note This field may be left blank if heating-only mode is used
   A12,  \field Cooling Coil Object Name
         \type object-list
@@ -33450,7 +33465,14 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
   A13,  \field Heating Coil Object Type
         \type choice
         \key Coil:Heating:DX:VariableRefrigerantFlow
+        \key Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl
         \note Heating Coil Type must be Coil:Heating:DX:VariableRefrigerantFlow
+        \note if AirConditioner:VariableRefrigerantFlow is used 
+        \note to model VRF outdoor unit
+        \note Heating Coil Type must be 
+        \note Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl
+        \note if AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl 
+        \note is used to model VRF outdoor unit
         \note This field may be left blank if cooling-only mode is used
   A14,  \field Heating Coil Object Name
         \type object-list
@@ -42718,25 +42740,23 @@ Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \memo Variable refrigerant flow (VRF) direct expansion (DX) cooling coil. Used with
        \memo ZoneHVAC:TerminalUnit:VariableRefrigerantFlow. Condensing unit is modeled separately,
        \memo see AirConditioner:VariableRefrigerantFlow.
-  \min-fields 9
+       \min-fields 10
   A1 , \field Name
        \required-field
        \type alpha
        \reference CoolingCoilsDXVarRefrigFlow
   A2 , \field Availability Schedule Name
-       \note Availability schedule name for this system. Schedule value > 0 means the system is available.
-       \note If this field is blank, the system is always available.
+       \required-field
        \type object-list
        \object-list ScheduleNames
-  N1 , \field Gross Rated Total Cooling Capacity
-       \note Total cooling capacity not accounting for the effect of supply air fan heat
+  N1 , \field Rated Total Cooling Capacity
        \required-field
        \type real
        \units W
        \minimum> 0.0
        \autosizable
        \note Cooling capacity excluding supply air fan heat
-  N2 , \field Gross Rated Sensible Heat Ratio
+  N2 , \field Rated Sensible Heat Ratio
        \required-field
        \type real
        \minimum> 0.0
@@ -42750,32 +42770,37 @@ Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \autosizable
        \note Volume flow rate corresponding to rated total cooling capacity
        \note should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total cooling capacity
-  A3 , \field Cooling Capacity Ratio Modifier Function of Temperature Curve Name
+  N4 , \field Evaporating Temperature Calculation Coefficient C1
        \required-field
-       \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCubicCurves
-       \object-list BiquadraticCurves
-       \object-list UniVariateTables
-       \object-list BiVariateTables
-  A4 , \field Cooling Capacity Modifier Curve Function of Flow Fraction Name
+       \type real  
+  N5 , \field Evaporating Temperature Calculation Coefficient C2
        \required-field
-       \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCubicCurves
-       \object-list UniVariateTables
-       \note quadratic curve = a + b*ff + c*ff**2
-       \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
-       \note ff = fraction of the full load flow
-  A5 , \field Coil Air Inlet Node
+       \type real
+  N6 , \field Evaporating Temperature Calculation Coefficient C3
+       \required-field
+       \type real
+  A3 , \field Coil Air Inlet Node
        \required-field
        \type node
-  A6 , \field Coil Air Outlet Node
+  A4 , \field Coil Air Outlet Node
        \required-field
        \type node
-  A7 ; \field Name of Water Storage Tank for Condensate Collection
+  N7, \field Released Heat by Indoor Unit Fan at Nominal Condition
+       \type real
+       \units W       
+       \default 0.0        
+  A5, \field Name of Water Storage Tank for Condensate Collection
        \type object-list
        \object-list WaterStorageTankNames
+  N8, \field Indoor Unit Bypass Factor
+       \required-field
+	   \type real 
+	   \minimum 0.0
+	   \maximum 1.0
+  N9; \field Superheating Set Point
+       \required-field
+	   \type real
+       \units C
 
 Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \memo Variable refrigerant flow (VRF) direct expansion (DX) heating coil (air-to-air heat
@@ -42789,12 +42814,10 @@ Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \reference HeatingCoilsDXSingleSpeed
        \reference HeatingCoilsDXVarRefrigFlow
   A2 , \field Availability Schedule
-       \note Availability schedule name for this system. Schedule value > 0 means the system is available.
-       \note If this field is blank, the system is always available.
+       \required-field
        \type object-list
        \object-list ScheduleNames
-  N1 , \field Gross Rated Heating Capacity
-       \note Heating capacity not accounting for the effect of supply air fan heat
+  N1 , \field Rated Total Heating Capacity
        \required-field
        \type real
        \units W
@@ -42810,7 +42833,7 @@ Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \minimum> 0.0
        \autosizable
        \note volume flow rate corresponding to rated total capacity
-       \note should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated heating capacity
+       \note should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total heating capacity
   A3 , \field Coil Air Inlet Node
        \required-field
        \type node
@@ -42823,17 +42846,36 @@ Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \object-list LinearCurves
        \object-list QuadraticCubicCurves
        \object-list BiquadraticCurves
-       \object-list UniVariateTables
-       \object-list BiVariateTables
-  A6 ; \field Heating Capacity Modifier Function of Flow Fraction Curve Name
+  A6 , \field Heating Capacity Modifier Function of Flow Fraction Curve Name
        \required-field
        \type object-list
        \object-list LinearCurves
        \object-list QuadraticCubicCurves
-       \object-list UniVariateTables
        \note quadratic curve = a + b*ff + c*ff**2
        \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
        \note ff = fraction of the full load flow
+  N3 , \field Condensing Temperature Calculation C1
+       \required-field
+       \type real  
+  N4 , \field Condensing Temperature Calculation C2
+       \required-field
+       \type real
+  N5 , \field Condensing Temperature Calculation C3
+       \required-field
+       \type real
+  N6, \field Released Heat by Indoor Unit Fan at Nominal Condition
+       \type real
+       \units W       
+       \default 0.0  
+  N7, \field Indoor Unit Bypass Factor
+       \required-field
+	   \type real 
+	   \minimum 0.0
+	   \maximum 1.0
+  N8; \field Subcooling Set Point
+       \required-field
+	   \type real 
+	   \units C
 
 Coil:Heating:Water,
        \memo Hot water heating coil, NTU-effectiveness model, assumes a cross-flow heat exchanger.
@@ -53439,12 +53481,232 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \note approaches the steady-state value according to the inputs for
        \note Heat Recovery Cooling Energy Modifier and Heat Recovery
        \note Cooling Energy Time Constant
-  N38; \field Heat Recovery Heating Energy Time Constant
+  N38, \field Heat Recovery Heating Energy Time Constant
        \type real
        \units hr
        \default 0
        \note Enter the time constant used to model the transition
        \note from cooling only mode to heat recovery mode
+  N39, \field Pressure Drop In Discharge Pipe
+       \type real @@ following fields are new
+       \units Pa
+       \default 0
+  N40, \field Condenser Fan Max Flow Outdoor Temp Limit
+       \required-field
+	   \type real
+       \units C                  
+  N41, \field Condenser Fan Maximum Flow
+       \required-field
+	   \type real
+       \units m3/s       
+  N42, \field Condenser Fan Minimum Flow Outdoor Temp Limit
+       \required-field
+	   \type real
+       \units C
+  N43, \field Condenser Fan Min Flow
+       \required-field
+	   \type real
+       \units m3/s                  
+  N44, \field Outdoor Unit Evaporating Temperature Calculation Coefficient C1
+       \required-field
+	   \type real 
+  N45, \field Outdoor Unit Evaporating Temperature Calculation Coefficient C2
+       \required-field
+	   \type real
+  N46, \field Outdoor Unit Condensing Temperature Calculation Coefficient C1
+       \required-field
+	   \type real 
+  N47, \field Outdoor Unit Condensing Temperature Calculation Coefficient C2
+       \required-field
+	   \type real 	   
+  N48, \field Outdoor Unit Bypass Factor in cooling mode
+       \required-field
+	   \type real 
+	   \minimum 0.0
+	   \maximum 1.0
+  N49, \field Superheating Set Point
+       \required-field
+	   \type real
+       \units C  
+  N50, \field Subcooling Set Point
+       \required-field
+	   \type real 
+	   \units C 
+  N51, \field Rated Condenser Fan Power
+       \required-field
+	   \type real
+       \units W   
+  A44, \field Cooling COP Function of Temperature Curve Name
+       \type alpha
+       \note Not in use
+  A45, \field Refrigerant Type
+       \required-field
+       \type alpha
+       \note Valid choices are R11, R123, R134A, R12, R22, R404A, R507A, or R410A
+  N52, \field Number of Compressor Speed Entries
+       \required-field
+       \type integer
+       \default 2
+  N53, \field Minimum Compressor Speed
+       \required-field
+       \type real
+       \note unit in Rev/Sec	   
+  A46, \field Minimum Speed Cooling Capacity Function of Temperature Curve Name
+       \required-field
+       \type object-list
+       \object-list BiQuadraticCurves
+  A47, \field Minimum Speed Compressor Power Function of Temperature Curve Name
+       \required-field
+       \type object-list
+       \object-list BiQuadraticCurves
+  N54, \field Compressor Speed 1
+       \required-field
+       \type real
+       \note unit in Rev/Sec
+  A48, \field Speed 1 Cooling Capacity Function of Temperature Curve Name
+       \required-field
+       \type object-list
+       \object-list BiQuadraticCurves
+  A49, \field Speed 1 Compressor Power Function of Temperature Curve Name
+       \required-field
+       \type object-list
+       \object-list BiQuadraticCurves
+  N55, \field Compressor Speed 2       
+       \type real
+       \note unit in Rev/Sec
+  A50, \field Speed 2 Cooling Capacity Function of Temperature Curve Name       
+       \type object-list
+       \object-list BiQuadraticCurves
+  A51, \field Speed 2 Compressor Power Function of Temperature Curve Name       
+       \type object-list
+       \object-list BiQuadraticCurves
+  N56, \field Compressor Speed 3       
+       \type real
+       \note unit in Rev/Sec
+  A52, \field Speed 3 Cooling Capacity Function of Temperature Curve Name       
+       \type object-list
+       \object-list BiQuadraticCurves
+  A53, \field Speed 3 Compressor Power Function of Temperature Curve Name       
+       \type object-list
+       \object-list BiQuadraticCurves
+  N57, \field Compressor Speed 4       
+       \type real
+       \note unit in Rev/Sec
+  A54, \field Speed 4 Cooling Capacity Function of Temperature Curve Name       
+       \type object-list
+       \object-list BiQuadraticCurves
+  A55, \field Speed 4 Compressor Power Function of Temperature Curve Name       
+       \type object-list
+       \object-list BiQuadraticCurves
+  N58, \field Compressor Speed 5       
+       \type real
+       \note unit in Rev/Sec
+  A56, \field Speed 5 Cooling Capacity Function of Temperature Curve Name       
+       \type object-list
+       \object-list BiQuadraticCurves
+  A57, \field Speed 5 Compressor Power Function of Temperature Curve Name       
+       \type object-list
+       \object-list BiQuadraticCurves
+  N59, \field Compressor Speed 6       
+       \type real
+       \note unit in Rev/Sec
+  A58, \field Speed 6 Cooling Capacity Function of Temperature Curve Name       
+       \type object-list
+       \object-list BiQuadraticCurves
+  A59, \field Speed 6 Compressor Power Function of Temperature Curve Name       
+       \type object-list
+       \object-list BiQuadraticCurves
+  N60, \field Compressor Speed 7       
+       \type real
+       \note unit in Rev/Sec
+  A60, \field Speed 7 Cooling Capacity Function of Temperature Curve Name       
+       \type object-list
+       \object-list BiQuadraticCurves
+  A61, \field Speed 7 Compressor Power Function of Temperature Curve Name       
+       \type object-list
+       \object-list BiQuadraticCurves
+  N61, \field Compressor Speed 8       
+       \type real
+       \note unit in Rev/Sec
+  A62, \field Speed 8 Cooling Capacity Function of Temperature Curve Name       
+       \type object-list
+       \object-list BiQuadraticCurves
+  A63, \field Speed 8 Compressor Power Function of Temperature Curve Name       
+       \type object-list
+       \object-list BiQuadraticCurves 
+  N62, \field Compressor Speed 9       
+       \type real
+       \note unit in Rev/Sec
+  A64, \field Speed 9 Cooling Capacity Function of Temperature Curve Name       
+       \type object-list
+       \object-list BiQuadraticCurves
+  A65, \field Speed 9 Compressor Power Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves  
+  N63, \field Constant Evaporating Temperature Set Point
+       \type real
+       \units C       
+       \default 6.0
+	   \note This field is required if Constant Te/Tc algorithm is used.
+  N64, \field Constant Condensing Temperature Set Point
+       \type real
+       \units C       
+       \default 30.0
+       \note This field is required if Constant Te/Tc algorithm is used.  
+  A66,  \field Indoor Unit Simulation Algorithm
+        \required-field
+        \type choice
+        \key HighSensible
+        \key TeTcConstant
+		\default HighSensible
+  N65, \field Outdoor Unit Bypass Factor in heating mode
+       \required-field
+	   \type real 
+	   \minimum 0.0
+	   \maximum 1.0
+  N66, \field Outdoor Unit Evaporating Temperature Calculation Coefficient C3
+       \required-field
+	   \type real
+  N67, \field Outdoor Unit Condensing Temperature Calculation Coefficient C3
+       \required-field
+	   \type real 
+  N68, \field Compressor maximum delta P
+       \required-field
+	   \type real 
+	   \units kPa
+	   \default 4500
+	   \minimum 0.0
+	   \maximum 50000
+  N69, \field Diameter of pipe connecting outdoor unit to indoor units
+       \required-field
+	   \type real 
+	   \units m
+	   \minimum 0.0
+  N70, \field Length of pipe connecting outdoor unit to indoor units
+       \required-field
+	   \type real 
+	   \units m
+	   \minimum 0.0
+  N71, \field Height of pipe connecting outdoor unit to indoor units
+       \required-field
+	   \note outdoor height - indoor height
+	   \type real 
+	   \units m
+  N72, \field Thickness of pipe insulation
+       \required-field
+	   \type real 
+	   \units m
+	   \minimum 0.0	
+  N73, \field Thermal conductivity of pipe insulation
+       \required-field
+	   \type real 
+	   \units W/m-K
+	   \minimum 0.0	
+  N74; \field Air-Insulation heat transfer coefficient
+       \required-field
+	   \type real 
+	   \units W/m2-K
+	   \minimum 0.0	 
 
 ZoneTerminalUnitList,
           \memo List of variable refrigerant flow (VRF) terminal units served by a given VRF condensing
