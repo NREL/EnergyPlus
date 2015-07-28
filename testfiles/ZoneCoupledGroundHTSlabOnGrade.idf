@@ -470,7 +470,7 @@ SurfaceProperty:OtherSideConditionsModel,
     17.3,                   !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
     1,                      !- Evapotranspiration Ground Cover Parameter
     GroundCoupledOSCM,      !- Name of Floor Boundary Condition Model
-    InGrade,                !- Slab Location (InGrade/OnGrade)
+    OnGrade,                !- Slab Location (InGrade/OnGrade)
     Slab Material-On-grade, !- Slab Material Name
     yes,                    !- Horizontal Insulation (Yes/No)
     Insulation,             !- Horizontal Insulation Material Name
