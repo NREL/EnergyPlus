@@ -10101,101 +10101,61 @@ namespace SurfaceGeometry {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		int ThisSurf; // working variable for do loop
-		Real64 Tri1Area; // working variable for denominator
-		Real64 Tri2Area; // working variable for denominator
-		Real64 TotalArea; // working variable for denominator
-		Real64 Xcm; // temporary X coord for centriod
-		Real64 Ycm; // temporary Y coord for centriod
-		Real64 Zcm; // temporary Z coord for centriod
-		Real64 XcmTri1; // temporary X coord for centriod of triangle 1
-		Real64 YcmTri1; // temporary Y coord for centriod of triangle 1
-		Real64 ZcmTri1; // temporary Z coord for centriod of triangle 1
-		Real64 XcmTri2; // temporary X coord for centriod of triangle 2
-		Real64 YcmTri2; // temporary Y coord for centriod of triangle 2
-		Real64 ZcmTri2; // temporary Z coord for centriod of triangle 2
-		int vert;
-		int negZcount; // for warning error in surface centroids
-
 		// Object Data
-		Array1D< Vector > Triangle1( 3 ); // working struct for a 3-sided surface
-		Array1D< Vector > Triangle2( 3 ); // working struct for a 3-sided surface
-		Vector VecAvg; // Average (calc for multisided polygons (>4 sides))
+		static Array1D< Vector > Triangle1( 3 ); // working struct for a 3-sided surface
+		static Array1D< Vector > Triangle2( 3 ); // working struct for a 3-sided surface
+		static Vector const zero_vector( 0.0 );
+		Vector centroid;
 
-		negZcount = 0;
+		int negZcount( 0 ); // for warning error in surface centroids
 
 		// loop through all the surfaces
-		for ( ThisSurf = 1; ThisSurf <= TotSurfaces; ++ThisSurf ) {
+		for ( int ThisSurf = 1; ThisSurf <= TotSurfaces; ++ThisSurf ) {
+			auto & surface( Surface( ThisSurf ) );
 
-			//      IF (Surface(ThisSurf)%Class == 'INTMASS') CYCLE
-			if ( Surface( ThisSurf ).Class == SurfaceClass_IntMass ) continue;
+			if ( surface.Class == SurfaceClass_IntMass ) continue;
 
-			//re-init
-			Xcm = 0.0;
-			Ycm = 0.0;
-			Zcm = 0.0;
+			auto const & vertex( surface.Vertex );
 
-			{ auto const SELECT_CASE_var( Surface( ThisSurf ).Sides ); //is this a 3- or 4-sided surface
+			{ auto const SELECT_CASE_var( surface.Sides ); //is this a 3- or 4-sided surface
 
 			if ( SELECT_CASE_var == 3 ) { //3-sided polygon
-				// centriod is simple average
-				Xcm = sum( Surface( ThisSurf ).Vertex.x() ) / 3.0;
-				Ycm = sum( Surface( ThisSurf ).Vertex.y() ) / 3.0;
-				Zcm = sum( Surface( ThisSurf ).Vertex.z() ) / 3.0;
+
+				centroid = cen( vertex( 1 ), vertex( 2 ), vertex( 3 ) );
 
 			} else if ( SELECT_CASE_var == 4 ) { //4-sided polygon
 
-				// re-init
-				Triangle1 = 0.0;
-				Triangle2 = 0.0;
-
-				XcmTri1 = 0.0;
-				YcmTri1 = 0.0;
-				ZcmTri1 = 0.0;
-
-				XcmTri2 = 0.0;
-				YcmTri2 = 0.0;
-				ZcmTri2 = 0.0;
-
-				Tri1Area = 0.0;
-				Tri2Area = 0.0;
-
 				// split into 2 3-sided polygons (Triangle 1 and Triangle 2)
-				Array1D< Vector > const & Vertex( Surface( ThisSurf ).Vertex );
-				Triangle1( 1 ) = Vertex( 1 );
-				Triangle1( 2 ) = Vertex( 2 );
-				Triangle1( 3 ) = Vertex( 3 );
-				Triangle2( 1 ) = Vertex( 1 );
-				Triangle2( 2 ) = Vertex( 3 );
-				Triangle2( 3 ) = Vertex( 4 );
-
-				// get area of triangles.
-				Tri1Area = AreaPolygon( 3, Triangle1 );
-				Tri2Area = AreaPolygon( 3, Triangle2 );
+				Triangle1( 1 ) = vertex( 1 );
+				Triangle1( 2 ) = vertex( 2 );
+				Triangle1( 3 ) = vertex( 3 );
+				Triangle2( 1 ) = vertex( 1 );
+				Triangle2( 2 ) = vertex( 3 );
+				Triangle2( 3 ) = vertex( 4 );
 
 				// get total Area of quad.
-				TotalArea = Surface( ThisSurf ).GrossArea;
-
+				Real64 const TotalArea( surface.GrossArea );
 				if ( TotalArea <= 0.0 ) {
 					//catch a problem....
-					ShowWarningError( "CalcSurfaceCentroid: zero area surface, for surface=" + Surface( ThisSurf ).Name );
+					ShowWarningError( "CalcSurfaceCentroid: zero area surface, for surface=" + surface.Name );
 					continue;
 				}
+
+				// get area fraction of triangles.
+				Real64 const Tri1Area( AreaPolygon( 3, Triangle1 ) / TotalArea );
+				Real64 const Tri2Area( AreaPolygon( 3, Triangle2 ) / TotalArea );
+
 				// get centroid of Triangle 1
-				XcmTri1 = sum( Triangle1.x() ) / 3.0;
-				YcmTri1 = sum( Triangle1.y() ) / 3.0;
-				ZcmTri1 = sum( Triangle1.z() ) / 3.0;
+				Vector cen1( cen( Triangle1( 1 ), Triangle1( 2 ), Triangle1( 3 ) ) );
 
 				// get centroid of Triangle 2
-				XcmTri2 = sum( Triangle2.x() ) / 3.0;
-				YcmTri2 = sum( Triangle2.y() ) / 3.0;
-				ZcmTri2 = sum( Triangle2.z() ) / 3.0;
+				Vector cen2( cen( Triangle2( 1 ), Triangle2( 2 ), Triangle2( 3 ) ) );
 
-				// find area weighted combination of the two centroids.
-
-				Xcm = ( XcmTri1 * Tri1Area + XcmTri2 * Tri2Area ) / TotalArea;
-				Ycm = ( YcmTri1 * Tri1Area + YcmTri2 * Tri2Area ) / TotalArea;
-				Zcm = ( ZcmTri1 * Tri1Area + ZcmTri2 * Tri2Area ) / TotalArea;
+				// find area weighted combination of the two centroids (coded to avoid temporary Vectors)
+				cen1 *= Tri1Area;
+				cen2 *= Tri2Area;
+				centroid = cen1;
+				centroid += cen2;
 
 			} else if ( ( SELECT_CASE_var >= 5 ) ) { //multi-sided polygon
 				// (Maybe triangulate?  For now, use old "z" average method")
@@ -10212,36 +10172,31 @@ namespace SurfaceGeometry {
 				//        Zcm=(Z1+Z2)/2.0d0
 
 				// Calc centroid as average of surfaces
-				VecAvg = Vector( 0.0, 0.0, 0.0 );
-
-				for ( vert = 1; vert <= Surface( ThisSurf ).Sides; ++vert ) {
-					VecAvg += Surface( ThisSurf ).Vertex( vert );
+				centroid = 0.0;
+				for ( int vert = 1; vert <= surface.Sides; ++vert ) {
+					centroid += vertex( vert );
 				}
-				VecAvg /= double( Surface( ThisSurf ).Sides );
-				Xcm = VecAvg.x;
-				Ycm = VecAvg.y;
-				Zcm = VecAvg.z;
+				centroid /= double( surface.Sides );
 
 			} else {
 
-				if ( ! Surface( ThisSurf ).Name.empty() ) {
-					ShowWarningError( "CalcSurfaceCentroid: caught problem with # of sides, for surface=" + Surface( ThisSurf ).Name );
-					ShowContinueError( "... number of sides must be >= 3, this surface # sides=" + RoundSigDigits( Surface( ThisSurf ).Sides ) );
+				if ( ! surface.Name.empty() ) {
+					ShowWarningError( "CalcSurfaceCentroid: caught problem with # of sides, for surface=" + surface.Name );
+					ShowContinueError( "... number of sides must be >= 3, this surface # sides=" + RoundSigDigits( surface.Sides ) );
 				} else {
 					ShowWarningError( "CalcSurfaceCentroid: caught problem with # of sides, for surface=#" + RoundSigDigits( ThisSurf ) );
 					ShowContinueError( "...surface name is blank. Examine surfaces -- this may be a problem with ill-formed interzone surfaces." );
-					ShowContinueError( "... number of sides must be >= 3, this surface # sides=" + RoundSigDigits( Surface( ThisSurf ).Sides ) );
+					ShowContinueError( "... number of sides must be >= 3, this surface # sides=" + RoundSigDigits( surface.Sides ) );
 				}
+				centroid = 0.0;
 
 			}}
 
 			// store result in the surface structure in DataSurfaces
-			Surface( ThisSurf ).Centroid.x = Xcm;
-			Surface( ThisSurf ).Centroid.y = Ycm;
-			Surface( ThisSurf ).Centroid.z = Zcm;
+			surface.Centroid = centroid;
 
-			if ( Zcm < 0.0 ) {
-				if ( Surface( ThisSurf ).ExtWind || Surface( ThisSurf ).ExtBoundCond == ExternalEnvironment ) ++negZcount;
+			if ( centroid.z < 0.0 ) {
+				if ( surface.ExtWind || surface.ExtBoundCond == ExternalEnvironment ) ++negZcount;
 			}
 
 		} //loop through surfaces
@@ -10645,7 +10600,7 @@ namespace SurfaceGeometry {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
