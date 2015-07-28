@@ -1110,6 +1110,7 @@ namespace ZonePlenum {
 		int OutletNode;
 		int InletNode;
 		int ZoneNode;
+		int InletNodeNum;
 		int InducedNode; // the node number of an induced air outlet node
 		int IndNum; // the induced air outlet index in ZoneRetPlenCond
 
@@ -1150,13 +1151,30 @@ namespace ZonePlenum {
 		Node( OutletNode ).Quality = Node( InletNode ).Quality;
 		Node( ZoneNode ).Quality = Node( InletNode ).Quality;
 
-		if ( Contaminant.CO2Simulation ) {
-			Node( OutletNode ).CO2 = Node( ZoneNode ).CO2;
-		}
-
 		// Set the outlet node contaminant properties if needed. The zone contaminant conditions are calculated in ZoneContaminantPredictorCorrector
+		if ( Contaminant.CO2Simulation ) {
+			if ( ZoneRetPlenCond( ZonePlenumNum ).OutletMassFlowRate > 0.0 ) {
+				// CO2 balance to get outlet air CO2
+				Node( OutletNode ).CO2 = 0.0;
+				for ( InletNodeNum = 1; InletNodeNum <= ZoneRetPlenCond( ZonePlenumNum ).NumInletNodes; ++InletNodeNum ) {
+					Node( OutletNode ).CO2 += Node( ZoneRetPlenCond( ZonePlenumNum ).InletNode( InletNodeNum ) ).CO2 * ZoneRetPlenCond( ZonePlenumNum ).InletMassFlowRate( InletNodeNum ) / ZoneRetPlenCond( ZonePlenumNum ).OutletMassFlowRate;
+				}
+				Node( ZoneNode ).CO2 = Node( OutletNode ).CO2;
+			} else {
+				Node( OutletNode ).CO2 = Node( ZoneNode ).CO2;
+			}
+		}
 		if ( Contaminant.GenericContamSimulation ) {
-			Node( OutletNode ).GenContam = Node( ZoneNode ).GenContam;
+			if ( ZoneRetPlenCond( ZonePlenumNum ).OutletMassFlowRate > 0.0 ) {
+				// GenContam balance to get outlet air GenContam
+				Node( OutletNode ).GenContam = 0.0;
+				for ( InletNodeNum = 1; InletNodeNum <= ZoneRetPlenCond( ZonePlenumNum ).NumInletNodes; ++InletNodeNum ) {
+					Node( OutletNode ).GenContam += Node( ZoneRetPlenCond( ZonePlenumNum ).InletNode( InletNodeNum ) ).GenContam * ZoneRetPlenCond( ZonePlenumNum ).InletMassFlowRate( InletNodeNum ) / ZoneRetPlenCond( ZonePlenumNum ).OutletMassFlowRate;
+				}
+				Node( ZoneNode ).GenContam = Node( OutletNode ).GenContam;
+			} else {
+				Node( OutletNode ).GenContam = Node( ZoneNode ).GenContam;
+			}
 		}
 
 	}
