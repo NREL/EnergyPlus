@@ -96,6 +96,7 @@ namespace DataPlantPipingSystems {
 	int const CellType_ZoneGroundInterface( -14 );
 	int const CellType_BasementWallInsu( -15 );
 	int const CellType_BasementFloorInsu( -16 );
+	int const CellType_SlabOnGradeEdgeInsu( -17 );
 
 	// DERIVED TYPE DEFINITIONS:
 

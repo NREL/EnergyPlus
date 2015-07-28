@@ -76,6 +76,7 @@ namespace DataPlantPipingSystems {
 	extern int const CellType_Slab;
 	extern int const CellType_HorizInsulation;
 	extern int const CellType_VertInsulation;
+	extern int const CellType_SlabOnGradeEdgeInsu;
 	extern int const CellType_ZoneGroundInterface;
 	extern int const CellType_BasementWallInsu;
 	extern int const CellType_BasementFloorInsu;
