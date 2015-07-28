@@ -265,7 +265,7 @@ In many of today’s utility rates, the charges for energy or demand are broken 
 
 The categories are combined in following hierarchy:
 
-#### ![](EngineeringReference/media/image7909.png)
+#### ![](media/image7909.png)
 
 Any charges included in the EnergyCharges category are added together. The EnergyCharges, DemandCharges and ServiceCharges are added together to form the Basis. The Basis, Adjustments and Surcharges are added together to form the Subtotal. The Subtotal and Taxes are added together to be the Total.  The total represents the total monthly charges on that tariff for the energy source used.  The combining of categories together is performed automatically unless the user specifies the UtilityCost:Computation.  In addition, each category, which is also a variable, may be used as a source. For example, a tax that is 5% of the subtotal would be shown as:
 

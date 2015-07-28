@@ -294,7 +294,7 @@ namespace DataTimings {
 	}
 
 	void
-	epSummaryTimes( 
+	epSummaryTimes(
 #ifdef EP_NO_Timings
 		Real64 & EP_UNUSED( TimeUsed_CPUTime )
 #endif
@@ -590,7 +590,7 @@ namespace DataTimings {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

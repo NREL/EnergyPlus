@@ -230,7 +230,7 @@ namespace SimulationManager {
 		using DataSystemVariables::FullAnnualRun;
 		using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
 		using Psychrometrics::InitializePsychRoutines;
-		using namespace FaultsManager;
+		using FaultsManager::CheckAndReadFaults;
 		using PlantPipingSystemsManager::InitAndSimGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
@@ -300,12 +300,12 @@ namespace SimulationManager {
 		CheckIfAnyBasements();
 		CheckIfAnyIdealCondEntSetPoint();
 
-		CheckAndReadFaults();
-
 		ManageBranchInput(); // just gets input and returns.
 
 		DoingSizing = true;
 		ManageSizing();
+
+		CheckAndReadFaults();
 
 		BeginFullSimFlag = true;
 		SimsDone = false;
@@ -2804,7 +2804,7 @@ Resimulate(
 }
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

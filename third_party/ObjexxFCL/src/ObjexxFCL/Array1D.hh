@@ -470,6 +470,15 @@ public: // Creation
 		setup_real();
 	}
 
+	// Vector4 Constructor Template
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
+	inline
+	Array1D( Vector4< U > const & v ) :
+	 Super( v )
+	{
+		setup_real();
+	}
+
 	// Range Named Constructor Template
 	template< typename U >
 	inline
@@ -713,6 +722,16 @@ public: // Assignment: Array
 	inline
 	Array1D &
 	operator =( Vector3< U > const & v )
+	{
+		Base::operator =( v );
+		return *this;
+	}
+
+	// Vector4 Assignment Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1D &
+	operator =( Vector4< U > const & v )
 	{
 		Base::operator =( v );
 		return *this;
@@ -1038,6 +1057,46 @@ public: // Assignment: Array
 		return *this;
 	}
 
+	// += Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1D &
+	operator +=( Vector4< U > const & v )
+	{
+		Base::operator +=( v );
+		return *this;
+	}
+
+	// -= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1D &
+	operator -=( Vector4< U > const & v )
+	{
+		Base::operator -=( v );
+		return *this;
+	}
+
+	// *= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1D &
+	operator *=( Vector4< U > const & v )
+	{
+		Base::operator *=( v );
+		return *this;
+	}
+
+	// /= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1D &
+	operator /=( Vector4< U > const & v )
+	{
+		Base::operator /=( v );
+		return *this;
+	}
+
 public: // Assignment: Array: Logical
 
 	// &&= Array Template
@@ -1195,6 +1254,26 @@ public: // Assignment: Array: Logical
 	inline
 	Array1D &
 	or_equals( Vector3< U > const & v )
+	{
+		Super::or_equals( v );
+		return *this;
+	}
+
+	// &&= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1D &
+	and_equals( Vector4< U > const & v )
+	{
+		Super::and_equals( v );
+		return *this;
+	}
+
+	// ||= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1D &
+	or_equals( Vector4< U > const & v )
 	{
 		Super::or_equals( v );
 		return *this;
@@ -3447,29 +3526,228 @@ operator ||( MArray1< A, T > const & a, MArray1< A, T > const & b )
 	return r;
 }
 
-// Cross Product of Two 3-Tuple Vectors
+// Cross Product of 3-Tuples
 template< typename T >
 inline
 Array1D< T >
 cross( Array1< T > const & a, Array1< T > const & b )
 {
 	assert( conformable( a, b ) );
-	assert( a.size() == 3 );
-	Array1D< T > c( Array1D< T >::one_based( a ) );
-	typename Array1D< T >::size_type const x( 0 ), y( 1 ), z( 2 );
-	c[ x ] = ( a[ y ] * b[ z ] ) - ( a[ z ] * b[ y ] );
-	c[ y ] = ( a[ z ] * b[ x ] ) - ( a[ x ] * b[ z ] );
-	c[ z ] = ( a[ x ] * b[ y ] ) - ( a[ y ] * b[ x ] );
+	assert( a.size() == 3u );
+	Array1D< T > c( 3 );
+	c[ 0 ] = ( a[ 1 ] * b[ 2 ] ) - ( a[ 2 ] * b[ 1 ] );
+	c[ 1 ] = ( a[ 2 ] * b[ 0 ] ) - ( a[ 0 ] * b[ 2 ] );
+	c[ 2 ] = ( a[ 0 ] * b[ 1 ] ) - ( a[ 1 ] * b[ 0 ] );
 	return c;
 }
 
-// Cross Product of Two 3-Tuple Vectors
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Array1D< T >
+cross( Array1< T > const & a, Array1S< T > const & b )
+{
+	assert( conformable( a, b ) );
+	assert( a.size() == 3u );
+	Array1D< T > c( 3 );
+	c[ 0 ] = ( a[ 1 ] * b[ 2 ] ) - ( a[ 2 ] * b[ 1 ] );
+	c[ 1 ] = ( a[ 2 ] * b[ 0 ] ) - ( a[ 0 ] * b[ 2 ] );
+	c[ 2 ] = ( a[ 0 ] * b[ 1 ] ) - ( a[ 1 ] * b[ 0 ] );
+	return c;
+}
+
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Array1D< T >
+cross( Array1S< T > const & a, Array1< T > const & b )
+{
+	assert( conformable( a, b ) );
+	assert( a.size() == 3u );
+	Array1D< T > c( 3 );
+	c[ 0 ] = ( a[ 1 ] * b[ 2 ] ) - ( a[ 2 ] * b[ 1 ] );
+	c[ 1 ] = ( a[ 2 ] * b[ 0 ] ) - ( a[ 0 ] * b[ 2 ] );
+	c[ 2 ] = ( a[ 0 ] * b[ 1 ] ) - ( a[ 1 ] * b[ 0 ] );
+	return c;
+}
+
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Array1D< T >
+cross( Array1S< T > const & a, Array1S< T > const & b )
+{
+	assert( conformable( a, b ) );
+	assert( a.size() == 3u );
+	Array1D< T > c( 3 );
+	c[ 0 ] = ( a[ 1 ] * b[ 2 ] ) - ( a[ 2 ] * b[ 1 ] );
+	c[ 1 ] = ( a[ 2 ] * b[ 0 ] ) - ( a[ 0 ] * b[ 2 ] );
+	c[ 2 ] = ( a[ 0 ] * b[ 1 ] ) - ( a[ 1 ] * b[ 0 ] );
+	return c;
+}
+
+// Cross Product of 3-Tuples
 template< typename T >
 inline
 Array1D< T >
 cross_product( Array1< T > const & a, Array1< T > const & b )
 {
 	return cross( a, b );
+}
+
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Array1D< T >
+cross_product( Array1< T > const & a, Array1S< T > const & b )
+{
+	return cross( a, b );
+}
+
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Array1D< T >
+cross_product( Array1S< T > const & a, Array1< T > const & b )
+{
+	return cross( a, b );
+}
+
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Array1D< T >
+cross_product( Array1S< T > const & a, Array1S< T > const & b )
+{
+	return cross( a, b );
+}
+
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Array1D< T >
+cross3( Array1< T > const & a, Array1< T > const & b )
+{
+	return cross( a, b );
+}
+
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Array1D< T >
+cross3( Array1S< T > const & a, Array1< T > const & b )
+{
+	return cross( a, b );
+}
+
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Array1D< T >
+cross3( Array1< T > const & a, Array1S< T > const & b )
+{
+	return cross( a, b );
+}
+
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Array1D< T >
+cross3( Array1S< T > const & a, Array1S< T > const & b )
+{
+	return cross( a, b );
+}
+
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Array1D< T >
+Array_cross( Array1< T > const & a, Vector3< T > const & b )
+{
+	assert( a.size() == 3u );
+	Array1D< T > c( 3 );
+	c[ 0 ] = ( a[ 1 ] * b.z ) - ( a[ 2 ] * b.y );
+	c[ 1 ] = ( a[ 2 ] * b.x ) - ( a[ 0 ] * b.z );
+	c[ 2 ] = ( a[ 0 ] * b.y ) - ( a[ 1 ] * b.x );
+	return c;
+}
+
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Array1D< T >
+Array_cross( Vector3< T > const & a, Array1< T > const & b )
+{
+	assert( b.size() == 3u );
+	Array1D< T > c( 3 );
+	c[ 0 ] = ( a.y * b[ 2 ] ) - ( a.z * b[ 1 ] );
+	c[ 1 ] = ( a.z * b[ 0 ] ) - ( a.x * b[ 2 ] );
+	c[ 2 ] = ( a.x * b[ 1 ] ) - ( a.y * b[ 0 ] );
+	return c;
+}
+
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Array1D< T >
+Array_cross3( Array1< T > const & a, Vector3< T > const & b )
+{
+	return Array_cross( a, b );
+}
+
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Array1D< T >
+Array_cross3( Vector3< T > const & a, Array1< T > const & b )
+{
+	return Array_cross( a, b );
+}
+
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Vector3< T >
+Vector_cross( Array1< T > const & a, Vector3< T > const & b )
+{
+	assert( a.size() == 3u );
+	Vector3< T > c;
+	c.x = ( a[ 1 ] * b.z ) - ( a[ 2 ] * b.y );
+	c.y = ( a[ 2 ] * b.x ) - ( a[ 0 ] * b.z );
+	c.z = ( a[ 0 ] * b.y ) - ( a[ 1 ] * b.x );
+	return c;
+}
+
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Vector3< T >
+Vector_cross( Vector3< T > const & a, Array1< T > const & b )
+{
+	assert( b.size() == 3u );
+	Vector3< T > c;
+	c.x = ( a.y * b[ 2 ] ) - ( a.z * b[ 1 ] );
+	c.y = ( a.z * b[ 0 ] ) - ( a.x * b[ 2 ] );
+	c.z = ( a.x * b[ 1 ] ) - ( a.y * b[ 0 ] );
+	return c;
+}
+
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Vector3< T >
+Vector_cross3( Array1< T > const & a, Vector3< T > const & b )
+{
+	return Vector_cross( a, b );
+}
+
+// Cross Product of 3-Tuples
+template< typename T >
+inline
+Vector3< T >
+Vector_cross3( Vector3< T > const & a, Array1< T > const & b )
+{
+	return Vector_cross( a, b );
 }
 
 } // ObjexxFCL
