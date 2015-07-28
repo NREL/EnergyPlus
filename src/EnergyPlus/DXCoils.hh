@@ -97,7 +97,8 @@ namespace DXCoils {
 	extern int NumVRFCoolingCoils; // number of VRF heat pump cooling coils
 	extern int NumDXHeatingCoils; // number of DX heat pump heating coils
 	extern int NumDoe2DXCoils; // number of doe2 DX  coils
-	extern int NumDXHeatPumpWaterHeaterCoils; // number of DX  water heater coils
+	extern int NumDXHeatPumpWaterHeaterPumpedCoils; // number of DX  water heater coils, pumped
+	extern int NumDXHeatPumpWaterHeaterWrappedCoils; // number of wrapped tank HPWH coils
 	extern int NumDXMulSpeedCoils; // number of DX coils with multi-speed compressor
 	extern int NumDXMulModeCoils; // number of DX coils with multi-mode performance
 
@@ -420,11 +421,11 @@ namespace DXCoils {
 		int SecCoilSHRFT; // index to the secondary coil sensible heat ratio temperature modifier curve
 		int SecCoilSHRFF; // index to the secondary coil sensible heat ratio flor fraction modifier curve
 		Real64 SecCoilAirFlow; // secondary coil air flow rate
-		Real64 SecCoilAirFlowScalingFactor; // secondary coil air flow rate autosize scaling factor 
+		Real64 SecCoilAirFlowScalingFactor; // secondary coil air flow rate autosize scaling factor
 		Real64 SecCoilRatedSHR; // secondary coil nominal or rated sensible heat ratio
 		Real64 SecCoilSHR; // secondary coil current sensible heat ratio
-		int SecZoneAirNodeNum; // secondary zone air node number 
-		Real64 EvapInletWetBulb; // secondary DX coil inlet wet bulb temperature (zone air node wet bulb temp.) 
+		int SecZoneAirNodeNum; // secondary zone air node number
+		Real64 EvapInletWetBulb; // secondary DX coil inlet wet bulb temperature (zone air node wet bulb temp.)
 		Real64 SecCoilSensibleHeatGainRate; // secondary zone sensible heat gain rate [W]
 		Real64 SecCoilTotalHeatRemovalRate; // secondary zone total heat removal rate [W]
 		Real64 SecCoilSensibleHeatRemovalRate; // secondary zone sensible heat removal rate [W]
@@ -434,7 +435,7 @@ namespace DXCoils {
 		Array1D_int MSSecCoilSHRFT; // index to the multi speed secondary coil sensible heat ratio temperature modifier curve
 		Array1D_int MSSecCoilSHRFF; //  index to the multi speed secondary coil sensible heat ratio flow fraction modifier curve
 		Array1D< Real64 > MSSecCoilAirFlow; // multispeed secondary coil air flow rate
-		Array1D< Real64 > MSSecCoilAirFlowScalingFactor; //multispeed secondary coil air flow rate autosize scaling factor 
+		Array1D< Real64 > MSSecCoilAirFlowScalingFactor; //multispeed secondary coil air flow rate autosize scaling factor
 		Array1D< Real64 > MSSecCoilRatedSHR; // multispeed secondary coil nominal or rated sensible heat ratio
 		int MSSpeedNumLS; // current low speed number of multspeed HP
 		int MSSpeedNumHS; // current high speed number of multspeed HP
@@ -904,11 +905,11 @@ namespace DXCoils {
 			int const SecCoilSHRFT, // index to the secondary coil sensible heat ratio temperature modifier curve
 			int const SecCoilSHRFF, // index to the secondary coil sensible heat ratio flor fraction modifier curve
 			Real64 const SecCoilAirFlow, // secondary coil air flow rate
-			Real64 const SecCoilAirFlowScalingFactor, // secondary coil air flow rate autosize scaling factor 
+			Real64 const SecCoilAirFlowScalingFactor, // secondary coil air flow rate autosize scaling factor
 			Real64 const SecCoilRatedSHR, // secondary coil nominal or rated sensible heat ratio
 			Real64 const SecCoilSHR, // secondary coil current sensible heat ratio
-			int const SecZoneAirNodeNum, // secondary zone air node number 
-			Real64 const EvapInletWetBulb, // secondary DX coil inlet wet bulb temperature (zone air node wet bulb temp.) 
+			int const SecZoneAirNodeNum, // secondary zone air node number
+			Real64 const EvapInletWetBulb, // secondary DX coil inlet wet bulb temperature (zone air node wet bulb temp.)
 			Real64 const SecCoilSensibleHeatGainRate, // secondary zone sensible heat gain rate [W]
 			Real64 const SecCoilTotalHeatRemovalRate, // secondary zone total heat removal rate [W]
 			Real64 const SecCoilSensibleHeatRemovalRate, // secondary zone sensible heat removal rate [W]
@@ -918,7 +919,7 @@ namespace DXCoils {
 			Array1_int const & MSSecCoilSHRFT, // index to the multi speed secondary coil sensible heat ratio temperature modifier curve
 			Array1_int const & MSSecCoilSHRFF, //  index to the multi speed secondary coil sensible heat ratio flow fraction modifier curve
 			Array1< Real64 > const & MSSecCoilAirFlow, // multispeed secondary coil air flow rate
-			Array1< Real64 > const & MSSecCoilAirFlowScalingFactor, //multispeed secondary coil air flow rate autosize scaling factor 
+			Array1< Real64 > const & MSSecCoilAirFlowScalingFactor, //multispeed secondary coil air flow rate autosize scaling factor
 			Array1< Real64 > const & MSSecCoilRatedSHR, // multispeed secondary coil nominal or rated sensible heat ratio
 			int const MSSpeedNumLS, // current low speed number of multspeed HP
 			int const MSSpeedNumHS, // current high speed number of multspeed HP
@@ -1595,7 +1596,7 @@ namespace DXCoils {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

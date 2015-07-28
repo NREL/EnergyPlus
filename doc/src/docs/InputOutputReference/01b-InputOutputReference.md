@@ -298,7 +298,7 @@ The X, Y, and Z coordinates, in the same coordinate system, of the second daylig
 
 
 
-![](InputOutputReference/media/image095.svg)
+![](media/image095.svg)
 
 Figure 53. Example showing location of daylighting reference points in the zone coordinate system (relative) of a rectangular zone with three windows. (a) Perspective view, (b) plan view, (c) elevation view. All dimensions are in meters.
 
@@ -436,7 +436,7 @@ Table 19. Recommended Values -- Discomfort Glare Index
 
 For Lighting Control Type = 1 (continuous), the lowest power the lighting system can dim down to, expressed as a fraction of maximum input power (see figure, below). For Lighting Control Type = 3 (continuous/off) this is the power fraction reached just before the lights switch off completely.
 
-![](InputOutputReference/media/image096.svg)
+![](media/image096.svg)
 
 Figure 54. Illustration of continuous dimming relationship
 
@@ -450,7 +450,7 @@ For Lighting Control Type = 1 (continuous), the lowest lighting output the light
 
 The number of steps, excluding off, in a stepped lighting control system (see figure, below). Required and must be &gt;0 if Lighting Control Type = 2. The steps are assumed to be equally spaced.
 
-![](InputOutputReference/media/image097.svg)
+![](media/image097.svg)
 
 Figure 55. Stepped lighting control with Number of Steps = 3.
 
@@ -506,13 +506,13 @@ To correctly calculate both direct and inter-reflected daylight illuminance you 
 
 Interior walls IW-1, IW-2 and IW-3 should be treated as adiabatic, i.e., they should have Outside Boundary Condition = Surface and Outside Boundary Condition Object = IW-1, IW-2, or IW-3, respectively (ref: BuildingSurface:Detailed). Similarly, if the ceiling and floor of Room-1 are interior surfaces, they should be treated as adiabatic.
 
-![](InputOutputReference/media/image098.svg)
+![](media/image098.svg)
 
 Figure 56. For daylighting purposes the thermal zone enclosed by the dashed boundary line should be modeled as a typical zone (Room-1) with a zone multiplier of 4.
 
 Sometimes a representative room cannot be found. Figure 57 shows a section of a building with four rooms having different daylighting characteristics because of different floor area, orientation and/or window size. In this case lumping the rooms into a single thermal zone would give nonsensical daylighting illuminance values because of the presence of the interior walls, which EnergyPlus ignores when calculating illuminance reaching a reference point directly from a window (i.e., without reflection). The solution in this case is to describe each room as a separate thermal zone with its own daylighting reference points, and input the interior walls because these will participate in the calculation of inter-reflected illuminance.
 
-![](InputOutputReference/media/image099.svg)
+![](media/image099.svg)
 
 Figure 57. Rooms A, B, C and D have different daylighting characteristics. If lumped into a single thermal zone the daylighting calculation will be less accurate because the blockage of direct light by the interior walls between these rooms is modeled with some simplifications (see Interior Obstructions below). To get a good daylighting calculation each room should be input as a separate thermal zone.
 
@@ -520,7 +520,7 @@ Figure 57. Rooms A, B, C and D have different daylighting characteristics. If lu
 
 The detailed daylighting calculation allows a thermal zone to be divided into two independently-controlled lighting zones. (See the fields: Fraction of Zone Controlled by First Reference Point, Fraction of Zone Controlled by Second Reference Point, Illuminance SetPoint at First Reference Point, and Illuminance SetPoint at Second Reference Point.) An example is shown in Figure 58, where a relatively deep thermal zone has two lighting zones of equal area.
 
-![](InputOutputReference/media/image100.svg)
+![](media/image100.svg)
 
 Figure 58. Two independently-controlled lighting zones, each with 50% of the area of the thermal zone.
 
@@ -556,7 +556,7 @@ An example of an interior obstruction that is a wall in an L-shaped room is show
 
 
 
-![](InputOutputReference/media/image101.svg)
+![](media/image101.svg)
 
 Figure 59. Wall A (or Wall B) is an interior obstruction that prevents light from directly reaching the daylighting reference point from the window.
 
@@ -576,7 +576,7 @@ PurchAirWithDoubleFacadeDaylighting.idf is an input example of daylighting throu
 
 
 
-![](InputOutputReference/media/image102.svg)
+![](media/image102.svg)
 
 Figure 60. Vertical section through a double-façade building showing daylighting through interior windows. The dashed lines show that (1) reference point RP1 receives direct light from exterior window EW1 via interior window IW1; (2) RP2 receives direct light from EW1 and EW2 via IW2; and (3) RP3 receives direct light from EW2 via IW3.
 
@@ -584,7 +584,7 @@ Figure 60. Vertical section through a double-façade building showing daylightin
 
 Figure 61 shows schematically the general configuration of daylighting through interior windows that can be calculated with EnergyPlus. Here, daylit zone ZD has one or more interior windows that are adjacent to other zones, each of which has one or more exterior windows. ZD itself may or may not have exterior windows. If it does, than the daylight illuminance from its exterior and interior windows will be additive. The zones adjacent to ZD may or may not be daylit and may or may not have other interior windows that are not adjacent to ZD. (The program does not consider the illuminance in ZD from electric lighting in adjacent zones.)
 
-![](InputOutputReference/media/image103.svg)
+![](media/image103.svg)
 
 Figure 61. General configuration of daylighting through interior windows that can be calculated with EnergyPlus. IW = interior window, EW = exterior window.
 
@@ -594,7 +594,7 @@ Figure 62 shows schematically a configuration of daylighting through interior wi
 
 
 
-![](InputOutputReference/media/image104.svg)
+![](media/image104.svg)
 
 Figure 62. Configuration in which daylighting of zone Z through its interior window  cannot be calculated with EnergyPlus. IW = interior window, EW = exterior window.
 
@@ -670,7 +670,7 @@ Lighting Control Type = 3 (continuous/off) is the same as Lighting Control Type 
 
 For Lighting Control Type = 1 (continuous), the lowest power the lighting system can dim down to, expressed as a fraction of maximum input power (see figure, below). For Lighting Control Type = 3 (continuous/off) this is the power fraction reached just before the lights switch off completely.
 
-![](InputOutputReference/media/image105.svg)
+![](media/image105.svg)
 
 Figure 63. Illustration of continuous dimming relationship
 
@@ -684,7 +684,7 @@ For Lighting Control Type = 1 (continuous), the lowest lighting output the light
 
 The number of steps, excluding off, in a stepped lighting control system (see figure, below). Required and must be &gt;0 if Lighting Control Type = 2. The steps are assumed to be equally spaced.
 
-![](InputOutputReference/media/image106.svg)
+![](media/image106.svg)
 
 Figure 64. Stepped lighting control with Number of Steps = 3.
 
@@ -733,7 +733,7 @@ These three fields are the X, Y and Z values of the Reference point in the coord
 
 
 
-![](InputOutputReference/media/image107.svg)
+![](media/image107.svg)
 
 Figure 65. Example showing location of two daylighting reference points in the zone coordinate system (relative) of a rectangular zone with three windows. (a) Perspective view, (b) plan view, (c) elevation view. All dimensions are in meters.
 
@@ -1035,7 +1035,7 @@ Tubular daylighting devices (TDDs), also known as tubular skylights or light pip
 
 TDDs consist of three components: a dome, a pipe, and a diffuser.
 
-![DaylightingTubular](InputOutputReference/media/image108.png)
+![DaylightingTubular](media/image108.png)
 
 Figure 66. Tubular daylighting device diagram.
 
@@ -1065,7 +1065,7 @@ Since commercial TDDs are assumed to be cylindrical in shape, it is recommended 
 
 Note that the TubularDaylightDome surface is allowed to have a different position and tilt from the roof base surface. If the actual TDD projects some height above the roof surface, the TubularDaylightDome coordinates should be located accordingly.
 
-![](InputOutputReference/media/image109.png)
+![](media/image109.png)
 
 Figure 67. Tubular daylighting device DXF output.
 
@@ -1254,7 +1254,7 @@ Daylighting shelves, or simply light shelves, are another device for bringing mo
 
 
 
-![DaylightingShelf](InputOutputReference/media/image110.png)
+![DaylightingShelf](media/image110.png)
 
 Figure 68. Daylighting shelf diagram.
 
@@ -1264,7 +1264,7 @@ The inside shelf redistributes light that would have entered the zone anyway. In
 
 The outside shelf changes the amount of light entering the zone. If the shelf surface is more reflective than the ground, it can increase the amount of light incident on the upper part of the window. However, the shading effect of the outside shelf on the lower part of the window must also be considered as it can easily negate any gain achieved in the upper part of the window. All light reflected from the outside shelf that enters the upper window is assumed to strike the ceiling.
 
-![](InputOutputReference/media/image111.png)
+![](media/image111.png)
 
 Figure 69. Daylighting shelf DXF output.
 
@@ -1422,7 +1422,7 @@ This object is used to model the impacts on daylighting of a “light well” th
 
 The input object describes the light well using basic characteristics of the geometry along with the visible reflectance of the well’s side walls.  The following figure diagrams how the geometry is characterized.
 
-![](InputOutputReference/media/image112.svg)
+![](media/image112.svg)
 
 Figure 70. Skylight with light well: (a) perspective view, (b) vertical section.
  If the bottom of the light well is a rectangle of side lengths c and d, as shown in (a), then the perimeter of the bottom of the well = 2(c+d) and the area = cd (see description of field names for the Light Well object).
@@ -1921,7 +1921,7 @@ ZoneInfiltration:EffectiveLeakageArea model is similar to the other infiltration
 
 <div>\[Infiltration = \left( {{F_{Schedule}}} \right)\frac{{{A_L}}}{{1000}}\sqrt {{C_s}\Delta T + {C_w}{{\left( {WindSpeed} \right)}^2}} \]</div>
 
-where <span>$\Delta T$</span> is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
+where <span>\(\Delta T\)</span> is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
 
 Note that the coefficients for the “EffectiveLeakageArea” model are not interchangeable with the similarly named coefficients in the “FlowCoefficient” model (see ZoneInfiltration:FlowCoefficient object).
 
@@ -1941,11 +1941,11 @@ This field is the name of a schedule (ref: Schedule) that modifies the volume fl
 
 #### Field: Effective Air Leakage Area
 
-This field is the effective air leakage area, in cm<sup>2</sup>, at 4 Pa.  This is the value <span>${A_L}$</span>in the equation above.  Effective leakage area data can be obtained from a whole-building pressure test (eg. blower door test).  ASHRAE Handbook of Fundamentals also lists typical values component leakage areas for low-rise residential (e.g. Table 1 in Chapter 26 of HoF 2001).  The value should correspond to a pressure difference of 4 Pa.
+This field is the effective air leakage area, in cm<sup>2</sup>, at 4 Pa.  This is the value <span>\({A_L}\)</span>in the equation above.  Effective leakage area data can be obtained from a whole-building pressure test (eg. blower door test).  ASHRAE Handbook of Fundamentals also lists typical values component leakage areas for low-rise residential (e.g. Table 1 in Chapter 26 of HoF 2001).  The value should correspond to a pressure difference of 4 Pa.
 
 #### Field: Stack Coefficient
 
-This field is the value of the stack coefficient, <span>${C_s}$</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·K).  Values for the “Basic Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+This field is the value of the stack coefficient, <span>\({C_s}\)</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·K).  Values for the “Basic Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
 
 
@@ -1966,7 +1966,7 @@ This field is the value of the stack coefficient, <span>${C_s}$</span> in the e
 
 #### Field: Wind Coefficient
 
-This field is the value of the wind coefficient, <span>${C_w}$</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·(m/s)<sup>2</sup>).  Values for the “Basic Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 chapter 27; 2001, Chapter 26) depend on the type of shelter and are listed in the following tables.
+This field is the value of the wind coefficient, <span>\({C_w}\)</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·(m/s)<sup>2</sup>).  Values for the “Basic Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 chapter 27; 2001, Chapter 26) depend on the type of shelter and are listed in the following tables.
 
 
 
@@ -2061,7 +2061,7 @@ ZoneInfiltration:FlowCoefficient model is similar to the other infiltration obje
 
 <div>\[Infiltration = \left( {{F_{Schedule}}} \right)\sqrt {{{\left( {c\,{C_s}\Delta {T^n}} \right)}^2} + {{\left( {c\,{C_w}{{\left( {s * WindSpeed} \right)}^{2n}}} \right)}^2}} \]</div>
 
-Where <span>$\Delta T$</span> is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
+Where <span>\(\Delta T\)</span> is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
 
 Note that the coefficients for the “Flow Coefficient” model are not interchangeable with the similarly named coefficients in the “Effective Leakage Area” model (see ZoneInfiltration:EffectiveLeakageArea object).
 
@@ -2081,11 +2081,11 @@ This field is the name of a schedule (ref: Schedule) that modifies the volume fl
 
 #### Field: Flow Coefficient
 
-This field is the flow coefficient in m<sup>3</sup>/(s·Pa<sup>n</sup>).  This is the value <span>$c$</span> in the equation above.  The flow coefficient can be determined from the effective leakage area and whole-building pressure tests (eg. blower door test).
+This field is the flow coefficient in m<sup>3</sup>/(s·Pa<sup>n</sup>).  This is the value <span>\(c\)</span> in the equation above.  The flow coefficient can be determined from the effective leakage area and whole-building pressure tests (eg. blower door test).
 
 #### Field: Stack Coefficient
 
-This field is the value of the stack coefficient, <span>${C_s}$</span> in the equation above.  The coefficient has units of (Pa/K)<sup>n</sup>. Values for the “Enhanced Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+This field is the value of the stack coefficient, <span>\({C_s}\)</span> in the equation above.  The coefficient has units of (Pa/K)<sup>n</sup>. Values for the “Enhanced Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
 
 
@@ -2118,7 +2118,7 @@ This field is the value of the pressure exponent, *n* in the equation above.  T
 
 #### Field: Wind Coefficient
 
-This field is the value of the wind coefficient, <span>${C_w}$</span> in the equation above.  The coefficient has units of (Pa·s<sup>2</sup>/m<sup>2</sup>)<sup>n</sup> .  Values for the “Enhanced Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+This field is the value of the wind coefficient, <span>\({C_w}\)</span> in the equation above.  The coefficient has units of (Pa·s<sup>2</sup>/m<sup>2</sup>)<sup>n</sup> .  Values for the “Enhanced Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
 
 
@@ -2160,7 +2160,7 @@ No Flue</td>
 
 #### Field: Shelter Factor
 
-This field is the value of the wind coefficient, <span>$s$</span> in the equation above.  The coefficient is dimensionless.  Values for the “Enhanced Model Shelter Factor” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+This field is the value of the wind coefficient, <span>\(s\)</span> in the equation above.  The coefficient is dimensionless.  Values for the “Enhanced Model Shelter Factor” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
 <table class="table table-striped">
 <tr>
@@ -7039,7 +7039,7 @@ The positive numeric input for this field is the zone air distribution effective
 
 The positive numeric input for this field is the zone air distribution effectiveness when the zone is in heating mode. Default value of this field is 1.0. ASHRAE Standard 62.1-2010 provides typical values as follows:
 
-![](InputOutputReference/media/image133.svg)
+![](media/image133.svg)
 
 Figure 71. Zone Air Distribution Effectiveness (Source: ASHRAE Standard 62.1-2010)
 
@@ -7560,7 +7560,7 @@ Components are linked together to form various loops within the simulation. Thus
 
 Loop nodes are a key defining feature in EnergyPlus. As a result, it is recommended that one of the first steps taken in defining an HVAC system in EnergyPlus be the definition of a node diagram or map. This is helpful for visualization of the entire system. Such a map could be created electronically within an interface or could be kept in the background out of the sight of the user.
 
-![](InputOutputReference/media/image134.svg)
+![](media/image134.svg)
 
 Figure 72. Example Node Diagram
 
@@ -8762,7 +8762,7 @@ Group – Plant-Condenser Loops
 
 The main elements of the PlantLoop syntax are described in further detail below. A map of how the input for this portion of the HVAC input fits together is provided in the following diagram.
 
-![PlantLoopSyntax (Medium)](InputOutputReference/media/image135.png)
+![PlantLoopSyntax (media/image135.png)
 
 Figure 73. Plant Loop Input Syntax Map
 
@@ -9059,7 +9059,7 @@ This output is available for every component on every branch in a plant (or cond
 
 The condenser loop input is very similar to that for the plant loop. As of version 7, the two loops are modeled the same way and inside the program all condenser loops are just plant loops. (In future versions of the program, this CondenserLoop object might be deprecated and these loops will be described using the PlantLoop object.)  The main differences are the applicable components and operation schemes. This is depicted in the following diagram.
 
-![CondenserLoopSyntax (Medium)](InputOutputReference/media/image136.png)
+![CondenserLoopSyntax (media/image136.png)
 
 Figure 74. Condenser Loop Input Syntax Map
 
@@ -10670,7 +10670,7 @@ This numeric field contains the third coefficient for the capacity ratio curve.
 
 The Power Ratio Curve is a quadratic equation that determines the Ratio of Full Load Power at Available Capacity to Full Load Power at Nominal Capacity. The defining equation is:
 
-<span>$FullLoadPowerRatio = {C_1} + {C_2}AvailToNominalCapRatio + {C_3}AvailToNominalCapRati{o^2}$</span>The following three fields contain the coefficients for the quadratic equation.
+<span>\(FullLoadPowerRatio = {C_1} + {C_2}AvailToNominalCapRatio + {C_3}AvailToNominalCapRati{o^2}\)</span>The following three fields contain the coefficients for the quadratic equation.
 
 #### Field: Coefficient1 of the power ratio curve
 
@@ -11662,7 +11662,7 @@ This numeric field contains the third coefficient for the capacity ratio curve.
 
 The Power Ratio Curve is a quadratic equation that determines the Ratio of Full Load to Power. The defining equation is:
 
-<span>$FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}$</span>The following three fields contain the coefficients for the quadratic equation.
+<span>\(FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}\)</span>The following three fields contain the coefficients for the quadratic equation.
 
 #### Field: Coefficient 1 of Power Ratio Curve
 
@@ -12118,7 +12118,7 @@ This numeric field contains the third coefficient for the capacity ratio curve.
 
 The Power Ratio Curve is a quadratic equation that determines the Ratio of Full Load to Power. The defining equation is:
 
-<span>$FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}$</span>The following three fields contain the coefficients for the quadratic equation.
+<span>\(FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}\)</span>The following three fields contain the coefficients for the quadratic equation.
 
 #### Field: Coefficient 1 of Power Ratio Curve
 
@@ -12196,7 +12196,7 @@ This numeric field contains the third coefficient for the Temperature Based Fuel
 
 The Exhaust Flow Curve is a quadratic equation that determines the Ratio of Exhaust Gas Flow Rate to Engine Capacity. The defining equation is:
 
-*<span>$ExhaustTemperature = ({C_1} + {C_2}RLoad + {C_3}RLoa{d^2}) * (TB{C_1} + TB{C_2}A{T_{air}} + TB{C_3}AT_{air}^2) - 273.15$</span> *
+*<span>\(ExhaustTemperature = ({C_1} + {C_2}RLoad + {C_3}RLoa{d^2}) * (TB{C_1} + TB{C_2}A{T_{air}} + TB{C_3}AT_{air}^2) - 273.15\)</span> *
 
 where GTCapacity is the Combustion Turbine Engine Capacity, and AT<sub>air</sub> is the difference between the current ambient and design ambient temperatures.
 
@@ -12216,7 +12216,7 @@ This numeric field contains the third coefficient for the Exhaust Flow Curve.
 
 The Exhaust Gas Temperature Curve is a polynomial equation that determines the Exhaust Gas Temperature. The equation combines both the Exhaust Gas Temperature Curve Coefficients (Based on the Part Load Ratio) and the (Ambient) Temperature Based Exhaust Gas Temperature Curve Coefficients. The defining equation is:
 
- <span>$RecoveryLubeEnergy = PLoad * ({C_1} + {C_2}RL + {C_3}R{L^2})$</span>
+ <span>\(RecoveryLubeEnergy = PLoad * ({C_1} + {C_2}RL + {C_3}R{L^2})\)</span>
 
 where C represents the Exhaust Gas Temperature Curve Coefficients, TBC are the Temperature Based Exhaust Gas Temperature Curve Coefficients, RLoad is the Ratio of Load to Combustion Turbine Engine Capacity, and AT<sub>air</sub> is the difference between the actual ambient and design ambient temperatures.
 
@@ -13761,7 +13761,7 @@ Tang,C. C. 2005. Modeling Packaged Heat Pumps in Quasi-Steady State Energy Simul
 
 The Supply side of the heat pump is usually connected to a Ground Heat Exchanger. The figure below shows the layout and piping diagram of the water-to-water heat pump.
 
-![](InputOutputReference/media/image184.svg)
+![](media/image184.svg)
 
 Figure 75. Schematic of EnergyPlus Ground Loop Heat Exchanger
 
@@ -14663,19 +14663,19 @@ The order of the multiple chiller-heaters’ operation is assumed to be sequenti
 
 
 
-![](InputOutputReference/media/image185.png)
+![](media/image185.png)
 
 Figure 76. Diagram of a central heat pump system with three chiller-heaters in cooling-only mode (Condensers reject heat to the ground source loop)
 
 
 
-![](InputOutputReference/media/image186.png)
+![](media/image186.png)
 
 Figure 77. Diagram of a central heat pump system with three chiller-heaters in heat recovery mode         (No heat is exchanged with the ground source loop)
 
 
 
-![](InputOutputReference/media/image187.png)
+![](media/image187.png)
 
 Figure 78. Diagram of a central heat pump system with one chiller-heater in heat recovery mode and two chiller-heaters in cooling-only mode
 
@@ -14683,7 +14683,7 @@ In the above example, the cooling load needs 3 chiller-heaters and the heating l
 
 
 
-![](InputOutputReference/media/image188.png)
+![](media/image188.png)
 
 Figure 79. Diagram of a central heat pump system with two chiller-heaters in heat recovery mode and one chiller-heater in heating-only mode
 
@@ -16052,7 +16052,7 @@ When coupled to the plant loop, the water heater has an inlet node and outlet no
 
 However, for a water heater that is indirectly heated (e.g. with a separate boiler), the source side can be used to provide remotely heated water to the tank.  The source side is configured to operate as a component on the demand side of a plant loop.  The design flow rate through the source side can be set by the user or autosized.  If autosized, then a Plant Sizing object is needed elsewhere in the input file for the Plant Loop serving the source side.  The water heater input includes an additional design parameter that describes how rapidly the tank can recover.
 
-![WHFig](InputOutputReference/media/image191.png)
+![WHFig](media/image191.png)
 
 Figure 80. Water Heater Configuration
 
@@ -16066,9 +16066,10 @@ There are currently two water heater objects in EnergyPlus:
 
 - WaterHeater:Stratified
 
-There is also a compound object that uses the WaterHeater:Mixed as part of its strategy:
+There are also compound objects that uses the WaterHeater:Mixed and/or WaterHeater:Stratified as part of their strategy:
 
-- WaterHeater:HeatPump
+- WaterHeater:HeatPump:PumpedCondenser (WaterHeater:Mixed or WaterHeater:Stratified)
+- WaterHeater:HeatPump:WrappedCondenser (WaterHeater:Stratified only)
 
 The WaterHeater:Mixed object simulates a well-mixed, single-node water tank. The WaterHeater:Stratified object simulates a stratified, multi-node water tank. Both water heater objects can be appropriate for simulating many types of water heaters and storage tanks, including gas and electric residential water heaters, and a variety of large commercial water heaters. Both objects share similar features, such as stand-alone operation, on- and off-cycle parasitic loads, and thermal losses to the zone. However, each object has its advantages which may make one water heater object more appropriate than the other depending on the application.
 
@@ -16898,13 +16899,13 @@ This field is optional and is used to provide a design parameter for autosizing 
 
 #### Field: Number Of Nodes
 
-The number of stratified nodes in the tank. There must be at least one node. The maximum number of nodes is 10, although this limit can be increased by editing the IDD.
+The number of stratified nodes in the tank. There must be at least one node. The maximum number of nodes is 12, although this limit can be increased by editing the IDD.
 
 #### Field: Additional Destratification Conductivity
 
 An additional destratification conductivity [W/m-K] is added to the fluid conductivity of water (0.6 W/m-K) to account for vertical conduction effects along the inside of the tank wall, and perhaps other vertical components such as the flue, the cold water inlet pipe (dip tube), and the anode rod.
 
-#### Field: Node 1-10 Additional Loss Coefficient
+#### Field: Node 1-12 Additional Loss Coefficient
 
 An additional loss coefficient [W/m-K] added to the skin losses for a given node to account for thermal shorting due to pipe penetrations, water heater feet, and any other loss effects.
 
@@ -17063,11 +17064,11 @@ The fraction of the time period that Heater 1 was running.
 
 The fraction of the time period that Heater 2 was running.
 
-#### Water Heater Temperature Node 1-10 [C]
+#### Water Heater Temperature Node 1-12 [C]
 
 The average node temperature.
 
-#### Water Heater Final Temperature Node 1-10 [C]
+#### Water Heater Final Temperature Node 1-12 [C]
 
 The final node temperature at the end of the system timestep.
 
@@ -17155,11 +17156,11 @@ This field is used to enter the tank’s storage volume on per-solar-collector-a
 
 This field is used to scale the height of a stratified tank to preserve relative geometry for different size tanks. The Height Aspect Ratio is defined at the length scale in the vertical direction (height) divided by the length scale in the horizontal direction (diameter).  This field is only used if the water heater being sized is a Water Heater:Stratified, the tank height has been set to Autosize, and the tank shape is set to **VerticalCylinder**. This field can be used with any Design Mode.
 
-### WaterHeater:HeatPump
+### WaterHeater:HeatPump:PumpedCondenser
 
-The heat pump water heater (HPWH) is a compound object consisting of a water heater tank (e.g., WaterHeater:Mixed or WaterHeater:Stratified), a direct expansion (DX) “coil” (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source. Numerous configurations of tank location, inlet air source, and DX coil compressor location can be modeled, with one common configuration shown below.
+The heat pump water heater with pumped condenser (HPWH) is a compound object consisting of a water heater tank (e.g., `WaterHeater:Mixed` or `WaterHeater:Stratified`), a direct expansion (DX) “coil” (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source. Numerous configurations of tank location, inlet air source, and DX coil compressor location can be modeled, with one common configuration shown below.
 
-![HPHotWaterHeater](InputOutputReference/media/image192.png)
+![HPHotWaterHeater](media/image192.png)
 
 Figure 81. Schematic diagram for a heat pump water heater located in a zone
 
@@ -17167,19 +17168,19 @@ In this model, the heat pump water heater’s DX coil is considered the primary 
 
 To model a heat pump water heater, the input data file must include some combination of the following objects depending on the configuration to be modeled:
 
-- WaterHeater:HeatPump (required)
+- `WaterHeater:HeatPump:PumpedCondenser` (required)
 
-- WaterHeater:Mixed or WaterHeater:Stratified (required)
+- `WaterHeater:Mixed` or `WaterHeater:Stratified` (required)
 
-- Coil:WaterHeating:AirToWaterHeatPump (required)
+- `Coil:WaterHeating:AirToWaterHeatPump:Pumped` or `Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed` (required)
 
-- Fan:OnOff (required)
+- `Fan:OnOff` (required)
 
-- ZoneHVAC:EquipmentList (when the HPWH draws some or all of its air from the zone, the heat pump water heater type and name must be in this list)
+- `ZoneHVAC:EquipmentList` (when the HPWH draws some or all of its air from the zone, the heat pump water heater type and name must be in this list)
 
-- ZoneHVAC:EquipmentConnections (when the HPWH draws some or all of its air from the zone, the HPWH air inlet and outlet node names must be provided in this object)
+- `ZoneHVAC:EquipmentConnections` (when the HPWH draws some or all of its air from the zone, the HPWH air inlet and outlet node names must be provided in this object)
 
-- OutdoorAir:NodeList (for HPWHs that use outdoor air as all or part of the heat source, the HPWH outdoor air node name must be provided in this list)
+- `OutdoorAir:NodeList` (for HPWHs that use outdoor air as all or part of the heat source, the HPWH outdoor air node name must be provided in this list)
 
 The input fields for the compound object are described in detail below:
 
@@ -17215,7 +17216,7 @@ This numeric field contains the heat pump’s condenser water flow rate in cubic
 
 #### Field: Evaporator Air Flow Rate
 
-This numeric field contains the air flow rate across the heat pump’s air coil (evaporator) in cubic meters per second. It is the actual air flow rate to be simulated, which may differ from the rated evaporator air volumetric flow rate specified for the heat pump’s DX coil (Ref. Coil:WaterHeating:AirToWaterHeatPump). Values must be greater than 0 or this field is autocalculatable. If autocalculated (field value = **autocalculate**), the evaporator air flow rate is set equal to the rated heating capacity of the heat pump’s DX coil multiplied by 5.035E-5 m<sup>3</sup>/s/W. When this flow rate is different from the Rated Evaporator Air Volumetric Flow Rate specified in the heat pump’s DX coil object (Ref. Coil:WaterHeating:AirToWaterHeatPump), the user should also specify a Total Heating Capacity Modifier Curve Name (function of air flow fraction) and a Heating COP Modifier Curve Name (function of air flow fraction) in the associated DX coil object to account for differences in capacity and power consumption at the off-rated air flow rate.
+This numeric field contains the air flow rate across the heat pump’s air coil (evaporator) in cubic meters per second. It is the actual air flow rate to be simulated, which may differ from the rated evaporator air volumetric flow rate specified for the heat pump’s DX coil (Ref. Coil:WaterHeating:AirToWaterHeatPump:Pumped). Values must be greater than 0 or this field is autocalculatable. If autocalculated (field value = **autocalculate**), the evaporator air flow rate is set equal to the rated heating capacity of the heat pump’s DX coil multiplied by 5.035E-5 m<sup>3</sup>/s/W. When this flow rate is different from the Rated Evaporator Air Volumetric Flow Rate specified in the heat pump’s DX coil object (Ref. Coil:WaterHeating:AirToWaterHeatPump:Pumped), the user should also specify a Total Heating Capacity Modifier Curve Name (function of air flow fraction) and a Heating COP Modifier Curve Name (function of air flow fraction) in the associated DX coil object to account for differences in capacity and power consumption at the off-rated air flow rate.
 
 #### Field: Inlet Air Configuration
 
@@ -17255,31 +17256,31 @@ This alpha (choice) field contains the type of water heater tank used by this he
 
 #### Field: Tank Name
 
-This alpha field contains the name of the specific water heater tank (WaterHeater:Mixed object) used by this heat pump water heater.
+This alpha field contains the name of the specific water heater tank used by this heat pump water heater. This must be a tank of type `WaterHeater:Mixed` or `WaterHeater:Stratified`.
 
 #### Field: Tank Use Side Inlet Node Name
 
-This alpha field contains the name of the use side inlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Inlet Node Name in the water heater tank object (Ref. WaterHeater:Mixed). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a WaterHeater:HeatPump object (see branch object example below).
+This alpha field contains the name of the use side inlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Inlet Node Name in the water heater tank object (Ref. `WaterHeater:Mixed`). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a `WaterHeater:HeatPump:PumpedCondenser` object (see branch object example below).
 
 #### Field: Tank Use Side Outlet Node Name
 
-This alpha field contains the name of the use side outlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Outlet Node Name in the water heater tank object (Ref. WaterHeater:Mixed). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a WaterHeater:HeatPump object (see branch object example below).
+This alpha field contains the name of the use side outlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Outlet Node Name in the water heater tank object (Ref. `WaterHeater:Mixed`). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a `WaterHeater:HeatPump:PumpedCondenser` object (see branch object example below).
 
 #### Field: DX Coil Object Type
 
-This alpha (choice) field contains the type of DX coil used by this heat pump water heater. Currently, the only valid choice is Coil:WaterHeating:AirToWaterHeatPump.
+This alpha (choice) field contains the type of DX coil used by this heat pump water heater. Currently, the only valid choice is Coil:WaterHeating:AirToWaterHeatPump:Pumped.
 
 #### Field: DX Coil Name
 
-This alpha field contains the name of the specific DX coil (Coil:WaterHeating:AirToWaterHeatPump object) used by this heat pump water heater.
+This alpha field contains the name of the specific DX coil (`Coil:WaterHeating:AirToWaterHeatPump:Pumped` or `Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed` object) used by this heat pump water heater.
 
 #### Field: Minimum Inlet Air Temperature for Compressor Operation
 
-This numeric field contains the minimum inlet air dry-bulb temperature entering the air coil (evaporator) and fan section, in degrees Celsius, below which the heat pump compressor does not operate. The minimum inlet air dry-bulb temperature should be greater than or equal to 5°C. If this field is left blank, the default value is 10°C.
+This numeric field contains the minimum inlet air dry-bulb temperature entering the air coil (evaporator) and fan section, in degrees Celsius, below which the heat pump compressor does not operate. The minimum inlet air dry-bulb temperature should be greater than or equal to -5°C. If this field is left blank, the default value is 10°C.
 
 #### Field: Compressor Location
 
-This alpha (choice) field contains the location of the heat pump compressor and the air temperature for this location is used to control operation of the compressor’s crankcase heater in the Coil:WaterHeating:AirToWaterHeatPump object. Valid entries are **Schedule**, **Zone**, or **Outdoors**. If ‘Schedule’ is selected, a compressor ambient temperature schedule name must be defined in the field below; otherwise, the field below should be left blank. If ‘Zone’ is selected, the crankcase heater operation is controlled based on the air temperature in the zone defined in the field Inlet Air Zone Name, and the Inlet Air Configuration must be ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’. If ‘Outdoors’ is selected, crankcase heater operation is controlled based on the outdoor air temperature.
+This alpha (choice) field contains the location of the heat pump compressor and the air temperature for this location is used to control operation of the compressor’s crankcase heater in the Coil:WaterHeating:AirToWaterHeatPump:Pumped object. Valid entries are **Schedule**, **Zone**, or **Outdoors**. If ‘Schedule’ is selected, a compressor ambient temperature schedule name must be defined in the field below; otherwise, the field below should be left blank. If ‘Zone’ is selected, the crankcase heater operation is controlled based on the air temperature in the zone defined in the field Inlet Air Zone Name, and the Inlet Air Configuration must be ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’. If ‘Outdoors’ is selected, crankcase heater operation is controlled based on the outdoor air temperature.
 
 #### Field: Compressor Ambient Temperature Schedule Name
 
@@ -17291,7 +17292,7 @@ This alpha (choice) field contains the type of fan used by this heat pump water 
 
 #### Field: Fan Name
 
-This alpha field contains the name of the specific fan (Fan:OnOff object) used by this heat pump water heater.
+This alpha field contains the name of the specific fan (`Fan:OnOff` object) used by this heat pump water heater.
 
 #### Field: Fan Placement
 
@@ -17321,26 +17322,29 @@ This alpha field defines the name of the air node to which the heat pump air coi
 
 This alpha field defines the name of the schedule (ref: Schedule) that denotes whether the heat pump draws its inlet air from the zone, outdoors, or a combination of zone and outdoor air. A schedule value equal to 0 indicates that the heat pump draws its inlet air from the zone. A schedule value equal to 1 denotes that the heat pump draws its inlet air from outdoors. Values between 0 and 1 denote a mixture of zone and outdoor air proportional to the schedule value. The Inlet Air Mixer schedule controls both the inlet air mixer and outlet air splitter nodes in unison to ensure that the operation of the heat pump does not contribute to zone pressurization or depressurization. For example if the Inlet Air Mixer schedule value is 0.4, then the inlet air mixer node is composed of 40% outdoor air and 60% zone air. For this same case, the outlet air splitter directs 60% of the HPWH outlet air back to the zone and 40% of the outlet air flow is exhausted outdoors. This schedule name must be provided if the Inlet Air Configuration field is specified as ‘Zone and Outdoor Air’, otherwise this field should be left blank.
 
-#### Field: Control Sensor Location In Stratified Tank
+#### Field: Tank Element Control Logic
 
-This alpha field defines where the tank temperature is sensed for heat pump control when the tank type is WaterHeater:Stratified.  The stratified tank model produces tank temperature at different nodes in the vertical direction and various options are available for how this temperature should be sensed to control the heat pump.  There are six choices that, when combined with the input for the stratified tank, indicate which of the nodes should be used.  The default is “Heater1”. The choices include:
+This alpha field defines settings for the control logic of when to run the tank element in relation to whether the heat pump is running. 
 
-- **Heater1**.  This indicates the tank node associated with (backup) heater \#1 should be used for tank temperature control.  This is determined by the field called Heater 1 Height in the WaterHeater:Stratified object.
+  - **MutuallyExclusive** means that once the tank heating element(s) are active, the heat pump is shut down until the heating element setpoint is reached. 
+  - **Simultaneous** (default) means that both the tank heating element and heat pump are used at the same time to recover the tank temperature. 
 
-- **Heater2**.  This indicates the tank node associated with (backup) heater \#2 should be used for tank temperature control.  This is determined by the field called Heater 2 Height in the WaterHeater:Stratified object.
+#### Field: Control Sensor 1 Height In Stratified Tank
 
-- **SourceInlet**. This indicates the tank node associated with the source side inlet should be used for tank temperature control.  This is determined by the field called Source Side Inlet Heightin the WaterHeater:Stratified object.
+This alpha field defines where the tank temperature is sensed for heat pump control when the tank type is `WaterHeater:Stratified`.  The stratified tank model produces tank temperature at different nodes in the vertical direction and various options are available for how this temperature should be sensed to control the heat pump.  This is measured in height from the bottom of the tank. Internally the appropriate node is determined based on this height. If omitted, this defaults to the height of Heater1.
 
-- **SourceOutlet**. This indicates the tank node associated with the source side outlet should be used for tank temperature control.  This is determined by the field called Source Side Outlet Heightin the WaterHeater:Stratified object.
+#### Field: Control Sensor 1 Weight
 
-- **UseInlet**. This indicates the tank node associated with the use side inlet should be used for tank temperature control.  This is determined by the field called Use Side Inlet Heightin the WaterHeater:Stratified object.
+The model can optionally use two control sensor locations in stratified tanks. When that is the case, the temperature sensed at each location is weighted. This alpha input specifies the weight associated with Control Sensor 1. It is input as a value between 0 and 1. The weight of Control Sensor 2 is determined by subtracting this weight from 1. The default for this field is 1, indicating that only Control Sensor 1 is used. 
 
-- **UseOutlet**. This indicates the tank node associated with the use side outlet should be used for tank temperature control.  This is determined by the field called Use Side Outlet Heightin the WaterHeater:Stratified object.
+#### Field: Control Sensor 2 Height in Stratified Tank
 
-Following is an example input for the Heat Pump:Water Heater compound object and the other required component objects that it references.
+This alpha field defines the optional second location where the tank temperature is sensed for heat pump control when the tank type is `WaterHeater:Stratified`. If omitted, this defaults to the height of Heater2.
+
+Following is an example input for the `WaterHeater:HeatPump:PumpedCondenser` compound object and the other required component objects that it references.
 
 ```idf
-WaterHeater:HeatPump,
+WaterHeater:HeatPump:PumpedCondenser,
     PlantHeatPumpWaterHeater,!- Name
     PlantHPWHSch,            !- Availability Schedule Name
     PlantHPWHTempSch,        !- Compressor Setpoint Temperature Schedule Name
@@ -17361,7 +17365,7 @@ WaterHeater:HeatPump,
     HPWHPlantTank,           !- Tank Name
     HPWH Use Inlet Node,     !- Tank Use Side Inlet Node Name
     HPWH Use Outlet Node,    !- Tank Use Side Outlet Node Name
-    Coil:WaterHeating:AirToWaterHeatPump,  !- DX Coil Object Type
+    Coil:WaterHeating:AirToWaterHeatPump:Pumped,  !- DX Coil Object Type
     HPWHPlantDXCoil,         !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
@@ -17386,7 +17390,7 @@ NOTE: branch object required only when tank use inlet nodes are used.
     Central HPWH Branch,     !- Name
     0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
-    WaterHeater:HeatPump,    !- Component 1 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,    !- Component 1 Object Type
     PlantHeatPumpWaterHeater,!- Component 1 Name
     HPWH Use Inlet Node,     !- Component 1 Inlet Node Name
     HPWH Use Outlet Node,    !- Component 1 Outlet Node Name
@@ -17439,7 +17443,7 @@ NOTE: branch object required only when tank use inlet nodes are used.
     HPWHPlantTank OA Node;   !- Name
 
 
-  Coil:WaterHeating:AirToWaterHeatPump,
+  Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     HPWHPlantDXCoil,         !- Name
     25000.0,                 !- Rated Heating Capacity {W}
     3.2,                     !- Rated COP {W/W}
@@ -17483,7 +17487,7 @@ NOTE: branch object required only when tank use inlet nodes are used.
 ```
 
 
-### Heat Pump Water Heater  Outputs
+### Pumped Condenser Heat Pump Water Heater Outputs
 
 * **HVAC,Average,Water Heater Compressor Part Load Ratio**
 
@@ -17499,7 +17503,7 @@ NOTE: branch object required only when tank use inlet nodes are used.
 
 #### Water Heater Compressor Part Load Ratio
 
-This output is the average part-load ratio of the heat pump water heater’s compressor (as well as its water pump and fan) for the timestep being reported. This output is independent of the “Water Heater Part Load Ratio” (Ref. Water Heater Outputs) which represents the part- load ratio of the supplemental heater (element or burner) in the water tank. When the water tank’s (supplemental) heater set point temperature is higher than the cut-in temperature of the heat pump water heater’s compressor, the heat pump compressor is disabled and the water tank’s heater (element or burner) is used to heat the water. During these times the Water Heater Compressor Part Load Ratio is equal to 0.
+This output is the average part-load ratio of the heat pump water heater’s compressor (as well as its water pump and fan) for the timestep being reported. This output is independent of the “Water Heater Part Load Ratio” (Ref. Water Heater Outputs) which represents the part-load ratio of the supplemental heater (element or burner) in the water tank. When the water tank’s (supplemental) heater set point temperature is higher than the cut-in temperature of the heat pump water heater’s compressor, the heat pump compressor is disabled and the water tank’s heater (element or burner) is used to heat the water. During these times the Water Heater Compressor Part Load Ratio is equal to 0.
 
 #### Water Heater On Cycle Ancillary Electric Power [W]
 
@@ -17511,8 +17515,355 @@ This output is the average part-load ratio of the heat pump water heater’s com
 
 These outputs are the parasitic electric power and consumption associated with the heat pump water heater. Specific outputs represent parasitic electrical usage during the compressor/fan on and off cycles. These outputs represent electronic controls or other electric component. The model assumes that the parasitic power does not contribute to heating the water, but it can impact the zone air heat balance depending on user inputs. The parasitic electric consumption outputs are also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
+### WaterHeater:HeatPump:WrappedCondenser
+
+The heat pump water heater with wrapped condenser is a compound object very similar to the `WaterHeater:HeatPump:PumpedCondenser` object. It likewise combines a water heater tank, a direct expansion (DX) “coil”, and a fan to provide air flow across the air coil associated with the DX compression system. The primary difference is that instead of pumping water through an external condenser, the heating coils are wrapped around or submerged in the tank. This type of HPWH is most common in packaged units meant for residential applications.
+
+To model a wrapped condenser heat pump water, the input data file must include some combination of the following objects depending on the configuration to be modeled:
+
+- `WaterHeater:HeatPump:WrappedCondenser` (required)
+
+- `WaterHeater:Stratified` (required)
+
+- `Coil:WaterHeating:AirToWaterHeatPump:Wrapped` (required)
+
+- `Fan:OnOff` (required)
+
+- `ZoneHVAC:EquipmentList` (when the HPWH draws some or all of its air from the zone, the heat pump water heater type and name must be in this list)
+
+- `ZoneHVAC:EquipmentConnections` (when the HPWH draws some or all of its air from the zone, the HPWH air inlet and outlet node names must be provided in this object)
+
+- `OutdoorAir:NodeList` (for HPWHs that use outdoor air as all or part of the heat source, the HPWH outdoor air node name must be provided in this list)
+
+The input fields for the compound object are described in detail below:
+
+#### Field: Name
+
+This alpha field contains a unique user-assigned name for an instance of a heat pump water heater. Any reference to this heat pump water heater by another object will use this name.
+
+#### Field: Availability Schedule Name
+
+This alpha field contains the name of the schedule (ref: Schedule) that denotes whether the heat pump compressor is available to operate during a given time period. A schedule value equal to 0 denotes that the heat pump compressor is off for that time period. A value other than 0 denotes that the heat pump compressor is available to operate during that time period. During times when the heat pump compressor is scheduled off, the heater (element or burner) in the water tank object operates based on its tank set point temperature schedule and the heat pump’s parasitic electric power is also off for that time period. If this field is blank, the schedule has values of 1 for all time periods.
+
+#### Field: Compressor Setpoint Temperature Schedule Name
+
+This alpha field contains the name of the schedule (ref: Schedule) that specifies the set point (or “cut-out”) temperature for the heat pump compressor. Temperature values used in this schedule should be in degrees Celsius. The heat pump compressor cycles off when the tank water reaches this set point temperature. Once the heat pump compressor cycles off, the tank water temperature floats downward until it falls below the set point temperature minus the dead band temperature difference defined below (i.e., the “cut-in” temperature). At this point, the heat pump compressor cycles on and remains on until the heat pump compressor set point temperature is reached.
+
+#### Field: Dead Band Temperature Difference
+
+This numeric field contains the dead band temperature difference in degrees Celsius. The heat pump compressor “cut-in” temperature is defined as the compressor set point temperature defined above minus this dead band temperature difference. The heat pump compressor cycles on when the water temperature in the tank falls below the “cut-in” temperature. The heat pump compressor remains on until the water temperature in the tank rises above the compressor set point (“cut-out”) temperature defined above. The dead band temperature difference must be greater than 0°C and less than or equal to 20°C. If this field is left blank, the default value is 5°C.
+
+In this model, the heat pump water heater’s DX compression system is considered the primary heat source and the water tank’s heater (element or burner) provides supplemental heat as necessary. Therefore, the cut-in temperature for the heat pump compressor (set point minus dead band temperature difference) is usually higher than the set point temperature for the heater (element or burner) in the associated water heater tank object. At times when the water heater tank set point temperature is greater than the cut-in temperature of the heat pump compressor, the heat pump compressor is disabled and the tank’s heater is used to heat the water.
+
+#### Field: Condenser Bottom Location
+
+This numeric field contains the distance from the bottom of the tank to the bottom of the wrapped condenser. 
+
+#### Field: Condenser Top Location
+
+This numeric field contains the distance from the bottom of the tank to the top of the wrapped condenser.
+
+#### Field: Evaporator Air Flow Rate
+
+This numeric field contains the air flow rate across the heat pump’s air coil (evaporator) in cubic meters per second. It is the actual air flow rate to be simulated, which may differ from the rated evaporator air volumetric flow rate specified for the heat pump’s DX coil (Ref. Coil:WaterHeating:AirToWaterHeatPump:Wrapped). Values must be greater than 0 or this field is autocalculatable. If autocalculated (field value = **autocalculate**), the evaporator air flow rate is set equal to the rated heating capacity of the heat pump’s DX coil multiplied by 5.035E-5 m<sup>3</sup>/s/W. When this flow rate is different from the Rated Evaporator Air Volumetric Flow Rate specified in the heat pump’s DX coil object (Ref. Coil:WaterHeating:AirToWaterHeatPump:Wrapped), the user should also specify a Total Heating Capacity Modifier Curve Name (function of air flow fraction) and a Heating COP Modifier Curve Name (function of air flow fraction) in the associated DX coil object to account for differences in capacity and power consumption at the off-rated air flow rate.
+
+#### Field: Inlet Air Configuration
+
+This choice field defines the configuration of the air flow path through the heat pump air coil (evaporator) and fan section. Valid entries are **Schedule**, **ZoneAirOnly**, **OutdoorAirOnly**, or **ZoneAndOutdoorAir**. If ‘Schedule’ is selected, names for an inlet air temperature schedule and an inlet air humidity schedule must be defined in the fields below. If ‘ZoneAirOnly’ is selected, the corresponding zone name must be entered in the Inlet Air Zone Name field below. If ‘ZoneAndOutdoorAir’ is selected, the corresponding Inlet Air Zone Name, Inlet Air Mixer Node Name, Outlet Air Splitter Node Name, and an Inlet Air Mixer Schedule Name must be entered in the corresponding fields below.
+
+#### Field: Air Inlet Node Name
+
+This alpha field contains the name of the node from which the heat pump water heater draws its inlet air. If the Inlet Air Configuration field defined above is set to ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’, then this node name should be the name of a zone air exhaust node (Ref. ZoneHVAC:EquipmentConnections). If the Inlet Air Configuration field is set to ‘OutdoorAirOnly’, this node name should be left blank. If the Inlet Air Configuration field is set to ‘Schedule’, this node name should simply be a unique name that allows the user to receive output on conditions at this node for verification purposes.
+
+#### Field: Air Outlet Node Name
+
+This alpha field contains the name of the node to which the heat pump water heater sends its outlet air. If the Inlet Air Configuration field defined above is set to ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’, then this node name should be the name of a zone air inlet node (Ref. ZoneHVAC:EquipmentConnections). If the Inlet Air Configuration field is set to ‘OutdoorAirOnly’, this node name should be left blank. If the Inlet Air Configuration field is set to ‘Schedule’, this node name should simply be a unique name that allows the user to receive output on conditions at this node for verification purposes.
+
+#### Field: Outdoor Air Node Name
+
+This alpha field contains the name of the node from which the heat pump water heater draws its outdoor air. If the Inlet Air Configuration field defined above is set to ‘ZoneAirOnly’ or ‘Schedule’, this node name should be left blank. If the Inlet Air Configuration field is set to ‘ZoneAndOutdoorAir’ or ‘OutdoorAirOnly’, this node name should be the name of an outdoor air node (Ref. OutdoorAir:NodeList).
+
+#### Field: Exhaust Air Node Name
+
+This alpha field contains the name of the node to which the heat pump water heater sends its exhaust air. If the Inlet Air Configuration field defined above is set to ‘ZoneAirOnly’ or ‘Schedule’, this node name should be left blank. If the Inlet Air Configuration field is set to ‘ZoneAndOutdoorAir’ or ‘OutdoorAirOnly’, then this node name should be a unique name that allows the user to receive output on conditions at this node for verification purposes.
+
+#### Field: Inlet Air Temperature Schedule Name
+
+This alpha field contains the name of a schedule used to define the dry-bulb temperature of the inlet air to the heat pump air coil (evaporator) and fan section. Schedule values should be in degrees Celsius. This field is only used when the Inlet Air Configuration defined above is specified as ‘Schedule’, otherwise leave this field blank.
+
+#### Field: Inlet Air Humidity Schedule Name
+
+This alpha field contains the name of a schedule used to define the humidity of the inlet air to the heat pump evaporator and fan section. Schedule values must be entered as relative humidity fraction from 0 to 1 (e.g., a schedule value of 0.5 means 50%RH). This field is only used when the Inlet Air Configuration defined above is specified as ‘Schedule’, otherwise leave this field blank.
+
+#### Field: Inlet Air Zone Name
+
+This alpha field contains the name of the zone from which the heat pump evaporator and fan section draws some or all of its inlet air. This field is only used when the Inlet Air Configuration defined above is specified as ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’.
+
+#### Field: Tank Object Type
+
+This alpha (choice) field contains the type of water heater tank used by this heat pump water heater. Currently, the only valid choice is WaterHeater:Stratified.
+
+#### Field: Tank Name
+
+This alpha field contains the name of the specific water heater tank used by this heat pump water heater. This must be a tank of type `WaterHeater:Stratified`.
+
+#### Field: Tank Use Side Inlet Node Name
+
+This alpha field contains the name of the use side inlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Inlet Node Name in the water heater tank object (Ref. `WaterHeater:Stratified`). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a `WaterHeater:HeatPump:WrappedCondenser` object (see branch object example below).
+
+#### Field: Tank Use Side Outlet Node Name
+
+This alpha field contains the name of the use side outlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Outlet Node Name in the water heater tank object (Ref. `WaterHeater:Stratified`). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a `WaterHeater:HeatPump:WrappedCondenser` object (see branch object example below).
+
+#### Field: DX Coil Object Type
+
+This alpha (choice) field contains the type of DX coil used by this heat pump water heater. Currently, the only valid choice is Coil:WaterHeating:AirToWaterHeatPump:Wrapped.
+
+#### Field: DX Coil Name
+
+This alpha field contains the name of the specific DX coil (`Coil:WaterHeating:AirToWaterHeatPump:Wrapped`) used by this heat pump water heater.
+
+#### Field: Minimum Inlet Air Temperature for Compressor Operation
+
+This numeric field contains the minimum inlet air dry-bulb temperature entering the air coil (evaporator) and fan section, in degrees Celsius, below which the heat pump compressor does not operate. The minimum inlet air dry-bulb temperature should be greater than or equal to -5°C. If this field is left blank, the default value is 10°C.
+
+#### Field: Compressor Location
+
+This alpha (choice) field contains the location of the heat pump compressor and the air temperature for this location is used to control operation of the compressor’s crankcase heater in the Coil:WaterHeating:AirToWaterHeatPump:Wrapped object. Valid entries are **Schedule**, **Zone**, or **Outdoors**. If ‘Schedule’ is selected, a compressor ambient temperature schedule name must be defined in the field below; otherwise, the field below should be left blank. If ‘Zone’ is selected, the crankcase heater operation is controlled based on the air temperature in the zone defined in the field Inlet Air Zone Name, and the Inlet Air Configuration must be ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’. If ‘Outdoors’ is selected, crankcase heater operation is controlled based on the outdoor air temperature.
+
+#### Field: Compressor Ambient Temperature Schedule Name
+
+This alpha field contains the name of a schedule that defines the ambient air temperature surrounding the heat pump compressor, which is used to control the compressor’s crankcase heater operation. This field is only used when the compressor location field defined above is specified as ‘Schedule’, otherwise it should be left blank.
+
+#### Field: Fan Object Type
+
+This alpha (choice) field contains the type of fan used by this heat pump water heater. Currently, the only valid choice is Fan: OnOff.
+
+#### Field: Fan Name
+
+This alpha field contains the name of the specific fan (`Fan:OnOff` object) used by this heat pump water heater.
+
+#### Field: Fan Placement
+
+This alpha (choice) field defines the placement of the fan in the heat pump water heater. Valid choices are **BlowThrough** (fan upstream of the air coil) and **DrawThrough** (fan downstream of the air coil). If this field is left blank, the default value is DrawThrough.
+
+#### Field: On Cycle Parasitic Electric Load
+
+This numeric field contains the on-cycle parasitic electric power in Watts. This is the parasitic electric power consumed by controls or other electrical devices associated with the heat pump water heater. This parasitic electric load is consumed whenever the heat pump compressor is operating and the model assumes that this parasitic power does not contribute to heating the water. This parasitic load does, however, affect the zone air heat balance when the heat pump water heater sends some or all of its outlet air to a zone (i.e., Inlet Air Configuration field specified as ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’) and the Parasitic Heat Rejection Location field is specified as ‘Zone’. The minimum value for this field is 0.0, and the default value is also 0.0 if this field is left blank.
+
+#### Field: Off Cycle Parasitic Electric Load
+
+This numeric field contains the off-cycle parasitic electric power in Watts. This is the parasitic electric power consumed by controls or other electrical devices associated with the heat pump compressor. This parasitic electric load is consumed whenever the heat pump water heater is available but the compressor is not operating, and the model assumes that this parasitic power does not contribute to heating the water. This parasitic load does, however, affect the zone air heat balance when the heat pump water heater sends some or all of its outlet air to a zone (i.e., Inlet Air Configuration field specified as ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’) and the Parasitic Heat Rejection Location field is specified as ‘Zone’. The minimum value for this field is 0.0, and the default value is also 0.0 if this field is left blank.
+
+#### Field: Parasitic Heat Rejection Location
+
+This alpha (choice) field determines where the on-cycle and off-cycle parasitic heat is rejected. Valid choices are Zone and Exterior. If ‘Zone’ is selected, both the on-cycle and off-cycle parasitic heat is rejected to the zone defined in the field Inlet Air Zone Name, and the Inlet Air Configuration must be ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir. If ’Outdoors’ is selected, this parasitic heat is rejected outdoors (does not impact the zone air heat balance) regardless of the specified Inlet Air Configuration. If this field is left blank, the default value is ’Outdoors’.
+
+#### Field: Inlet Air Mixer Node Name
+
+This optional alpha field defines the name of the HVAC node which represents the mixture of outdoor air and zone air that enters the heat pump air coil (evaporator) and fan section. The model mixes outdoor air with zone air and places the result on this inlet air mixer node based on the Inlet Air Mixer Schedule defined below. When the schedule value is equal to 0, 100% zone air enters the evaporator coil and fan section of the heat pump water heater. When the schedule value is equal to 1, 100% outdoor air enters the evaporator coil and fan section. This node name must be provided if the Inlet Air Configuration field above is specified as ‘ZoneAndOutdoor Air’, otherwise this field should be left blank.
+
+#### Field: Outlet Air Splitter Node Name
+
+This alpha field defines the name of the air node to which the heat pump air coil (evaporator) and fan sends all of its outlet air. The supply air flow downstream of this node is split between the zone and outdoors based on the Inlet Air Mixer schedule defined below. When the schedule value is equal to 0, the entire outlet air stream is diverted to the zone. When the schedule value is equal to 1, the entire outlet air stream is exhausted to outdoors. This node name must be provided if the Inlet Air Configuration field above is specified as ‘Zone and Outdoor Air’, otherwise this field should be left blank.
+
+#### Field: Inlet Air Mixer Schedule Name
+
+This alpha field defines the name of the schedule (ref: Schedule) that denotes whether the heat pump draws its inlet air from the zone, outdoors, or a combination of zone and outdoor air. A schedule value equal to 0 indicates that the heat pump draws its inlet air from the zone. A schedule value equal to 1 denotes that the heat pump draws its inlet air from outdoors. Values between 0 and 1 denote a mixture of zone and outdoor air proportional to the schedule value. The Inlet Air Mixer schedule controls both the inlet air mixer and outlet air splitter nodes in unison to ensure that the operation of the heat pump does not contribute to zone pressurization or depressurization. For example if the Inlet Air Mixer schedule value is 0.4, then the inlet air mixer node is composed of 40% outdoor air and 60% zone air. For this same case, the outlet air splitter directs 60% of the HPWH outlet air back to the zone and 40% of the outlet air flow is exhausted outdoors. This schedule name must be provided if the Inlet Air Configuration field is specified as ‘Zone and Outdoor Air’, otherwise this field should be left blank.
+
+#### Field: Tank Element Control Logic
+
+This alpha field defines settings for the control logic of when to run the tank element in relation to whether the heat pump is running. 
+
+  - **MutuallyExclusive** means that once the tank heating element(s) are active, the heat pump is shut down until the heating element setpoint is reached. 
+  - **Simultaneous** (default) means that both the tank heating element and heat pump are used at the same time to recover the tank temperature. 
+
+#### Field: Control Sensor 1 Height In Stratified Tank
+
+This alpha field defines where the tank temperature is sensed for heat pump control when the tank type is `WaterHeater:Stratified`.  The stratified tank model produces tank temperature at different nodes in the vertical direction and various options are available for how this temperature should be sensed to control the heat pump.  This is measured in height from the bottom of the tank. Internally the appropriate node is determined based on this height. If omitted, this defaults to the height of Heater1.
+
+#### Field: Control Sensor 1 Weight
+
+The model can optionally use two control sensor locations in stratified tanks. When that is the case, the temperature sensed at each location is weighted. This alpha input specifies the weight associated with Control Sensor 1. It is input as a value between 0 and 1. The weight of Control Sensor 2 is determined by subtracting this weight from 1. The default for this field is 1, indicating that only Control Sensor 1 is used. 
+
+#### Field: Control Sensor 2 Height in Stratified Tank
+
+This alpha field defines the optional second location where the tank temperature is sensed for heat pump control when the tank type is `WaterHeater:Stratified`. If omitted, this defaults to the height of Heater2.
+
+Following is an example input for the `WaterHeater:HeatPump:WrappedCondenser` compound object and the other required component objects that it references.
+
+```idf
+WaterHeater:HeatPump:WrappedCondenser,
+    PlantHeatPumpWaterHeater,!- Name
+    PlantHPWHSch,            !- Availability Schedule Name
+    PlantHPWHTempSch,        !- Compressor Setpoint Temperature Schedule Name
+    3.89,                    !- Dead Band Temperature Difference {deltaC}
+    0.0664166667,            !- Condenser Bottom Location
+    0.8634166667,            !- Condenser Top Location
+    0.2279,                  !- Evaporator Air Flow Rate {m3/s}
+    OutdoorAirOnly,          !- Inlet Air Configuration
+    ,                        !- Air Inlet Node Name
+    ,                        !- Air Outlet Node Name
+    HPPlantAirInletNode,     !- Outdoor Air Node Name
+    HPPlantAirOutletNode,    !- Exhaust Air Node Name
+    ,                        !- Inlet Air Temperature Schedule Name
+    ,                        !- Inlet Air Humidity Schedule Name
+    ,                        !- Inlet Air Zone Name
+    WaterHeater:Stratified,  !- Tank Object Type
+    HPWHPlantTank,           !- Tank Name
+    HPWH Use Inlet Node,     !- Tank Use Side Inlet Node Name
+    HPWH Use Outlet Node,    !- Tank Use Side Outlet Node Name
+    Coil:WaterHeating:AirToWaterHeatPump:Wrapped,  !- DX Coil Object Type
+    HPWHPlantDXCoil,         !- DX Coil Name
+    7.2,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    Outdoors,                !- Compressor Location
+    ,                        !- Compressor Ambient Temperature Schedule Name
+    Fan:OnOff,               !- Fan Object Type
+    HPWHPlantFan,            !- Fan Name
+    DrawThrough,             !- Fan Placement
+    0,                       !- On Cycle Parasitic Electric Load {W}
+    0,                       !- Off Cycle Parasitic Electric Load {W}
+    ,                        !- Parasitic Heat Rejection Location
+    ,                        !- Inlet Air Mixer Node Name
+    ,                        !- Outlet Air Splitter Node Name
+    ,                        !- Inlet Air Mixer Schedule Name
+    MutuallyExclusive,       !- Tank Element Control Logic
+    1.262,                   !- Control Sensor 1 Height In Stratified Tank
+    0.75,                    !- Control Sensor 1 Weight
+    0.464;                   !- Control Sensor 2 Height In Stratified Tank
+```
+
+NOTE: branch object required only when tank use inlet nodes are used.
+
+```idf
+Branch,
+    Central HPWH Branch,     !- Name
+    0,                       !- Maximum Flow Rate {m3/s}
+    ,                        !- Pressure Drop Curve Name
+    WaterHeater:HeatPump:WrappedCondenser,    !- Component 1 Object Type
+    PlantHeatPumpWaterHeater,!- Component 1 Name
+    HPWH Use Inlet Node,     !- Component 1 Inlet Node Name
+    HPWH Use Outlet Node,    !- Component 1 Outlet Node Name
+    PASSIVE;                 !- Component 1 Branch Control Type
+
+WaterHeater:Stratified,
+    HPWHPlantTank,           !- Name
+    Water Heater,            !- End-Use Subcategory
+    0.287691,                !- Tank Volume {m3}
+    1.594,                   !- Tank Height {m}
+    VerticalCylinder,        !- Tank Shape
+    ,                        !- Tank Perimeter {m}
+    100,                     !- Maximum Temperature Limit {C}
+    MasterSlave,             !- Heater Priority Control
+    Plant Hot Water Setpoint Temp Schedule,  !- Heater 1 Setpoint Temperature Schedule Name
+    18.5,                      !- Heater 1 Deadband Temperature Difference {deltaC}
+    4500,                    !- Heater 1 Capacity {W}
+    1.129,                   !- Heater 1 Height {m}
+    Plant Hot Water Setpoint Temp Schedule,  !- Heater 2 Setpoint Temperature Schedule Name
+    18.5,                      !- Heater 2 Deadband Temperature Difference {deltaC}
+    0,                    !- Heater 2 Capacity {W}
+    0.266,                   !- Heater 2 Height {m}
+    Electricity,             !- Heater Fuel Type
+    1,                       !- Heater Thermal Efficiency
+    8.3,                     !- Off Cycle Parasitic Fuel Consumption Rate {W}
+    Electricity,             !- Off Cycle Parasitic Fuel Type
+    0,                       !- Off Cycle Parasitic Heat Fraction to Tank
+    1,                       !- Off Cycle Parasitic Height {m}
+    8.3,                     !- On Cycle Parasitic Fuel Consumption Rate {W}
+    Electricity,             !- On Cycle Parasitic Fuel Type
+    0,                       !- On Cycle Parasitic Heat Fraction to Tank
+    1,                       !- On Cycle Parasitic Height {m}
+    Outdoors,                !- Ambient Temperature Indicator
+    ,                        !- Ambient Temperature Schedule Name
+    ,                        !- Ambient Temperature Zone Name
+    ,                        !- Ambient Temperature Outdoor Air Node Name
+    0.7878,                  !- Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature {W/m2-K}
+    1,                       !- Skin Loss Fraction to Zone
+    ,                        !- Off Cycle Flue Loss Coefficient to Ambient Temperature {W/K}
+    1,                       !- Off Cycle Flue Loss Fraction to Zone
+    0.001,                   !- Peak Use Flow Rate {m3/s}
+    ,                        !- Use Flow Rate Fraction Schedule Name
+    ,                        !- Cold Water Supply Temperature Schedule Name
+    HPWH Use Inlet Node,     !- Use Side Inlet Node Name
+    HPWH Use Outlet Node,    !- Use Side Outlet Node Name
+    1,                       !- Use Side Effectiveness
+    0,                       !- Use Side Inlet Height {m}
+    autocalculate,           !- Use Side Outlet Height {m}
+    HPPlantWaterOutletNode,  !- Source Side Inlet Node Name
+    HPPlantWaterInletNode,   !- Source Side Outlet Node Name
+    1,                       !- Source Side Effectiveness
+    0.7,                     !- Source Side Inlet Height {m}
+    0,                       !- Source Side Outlet Height {m}
+    Fixed,                   !- Inlet Mode
+    autosize,                !- Use Side Design Flow Rate {m3/s}
+    autosize,                !- Source Side Design Flow Rate {m3/s}
+    1.5,                     !- Indirect Water Heating Recovery Time {hr}
+    12;                      !- Number of Nodes
+
+OutdoorAir:Node,
+    HPWHPlantTank OA Node;   !- Name
+
+Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
+    HPWHPlantDXCoil,               !- Name
+    2349.6,                  !- Rated Heating Capacity {W}
+    2.4,                     !- Rated COP {W/W}
+    0.981,                   !- Rated Sensible Heat Ratio
+    19.72,                   !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}
+    13.5,                    !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}
+    48.89,                   !- Rated Condenser Water Temperature {C}
+    0.189,                   !- Rated Evaporator Air Flow Rate {m3/s}
+    Yes,                     !- Evaporator Fan Power Included in Rated COP
+    HPPlantFanAirOutletNode, !- Evaporator Air Inlet Node Name
+    HPPlantAirOutletNode,    !- Evaporator Air Outlet Node Name
+    0,                       !- Crankcase Heater Capacity {W}
+    10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
+    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
+    HPWH-Htg-Cap-fT,         !- Heating Capacity Function of Temperature Curve Name
+    ,                        !- Heating Capacity Function of Air Flow Fraction Curve Name
+    HPWH-Htg-COP-fT,         !- Heating COP Function of Temperature Curve Name
+    ,                        !- Heating COP Function of Air Flow Fraction Curve Name
+    HPWH-COP-fPLR;           !- Part Load Fraction Correlation Curve Name
+
+Fan:OnOff,
+    HPWHPlantFan,            !- Name
+    PlantHPWHSch,            !- Availability Schedule Name
+    0.1722,                  !- Fan Total Efficiency
+    65,                      !- Pressure Rise {Pa}
+    0.2279,                  !- Maximum Flow Rate {m3/s}
+    1,                       !- Motor Efficiency
+    0,                       !- Motor In Airstream Fraction
+    HPPlantAirInletNode,     !- Air Inlet Node Name
+    HPPlantFanAirOutletNode; !- Air Outlet Node Name
+```
 
 
+### Wrapped Condenser Heat Pump Water Heater Outputs
+
+* **HVAC,Average,Water Heater Compressor Part Load Ratio**
+
+* **HVAC,Average,Water Heater On Cycle Ancillary Electric Power [W]**
+
+* **HVAC,Sum,Water Heater On Cycle Ancillary Electric Energy [J]**
+
+* **HVAC,Average,Water Heater Off Cycle Ancillary Electric Power [W]**
+
+* **HVAC,Sum,Water Heater Off Cycle Ancillary Electric Energy [J]**
+
+
+
+#### Water Heater Compressor Part Load Ratio
+
+This output is the average part-load ratio of the heat pump water heater’s compressor (as well as its water pump and fan) for the timestep being reported. This output is independent of the “Water Heater Part Load Ratio” (Ref. Water Heater Outputs) which represents the part-load ratio of the supplemental heater (element or burner) in the water tank. When the water tank’s (supplemental) heater set point temperature is higher than the cut-in temperature of the heat pump water heater’s compressor, the heat pump compressor is disabled and the water tank’s heater (element or burner) is used to heat the water. During these times the Water Heater Compressor Part Load Ratio is equal to 0.
+
+#### Water Heater On Cycle Ancillary Electric Power [W]
+
+#### Water Heater On Cycle Ancillary Electric Energy [J]
+
+#### Water Heater Off Cycle Ancillary Electric Power [W]
+
+#### Water Heater Off Cycle Ancillary Electric Energy [J]
+
+These outputs are the parasitic electric power and consumption associated with the heat pump water heater. Specific outputs represent parasitic electrical usage during the compressor/fan on and off cycles. These outputs represent electronic controls or other electric component. The model assumes that the parasitic power does not contribute to heating the water, but it can impact the zone air heat balance depending on user inputs. The parasitic electric consumption outputs are also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
 
 Group – Condenser Equipment
@@ -19422,7 +19773,7 @@ The evaporative fluid cooler seeks to maintain the temperature of the water exit
 
 Evaporative fluid coolers consume water through evaporation, drift, and blowdown. The model can be used to predict water consumed by the fluid coolers. For this purpose, the last seven input fields can either be provided in the input or if nothing is specified then the default values for these fields will be used. These fields provide the methods of controlling details of the water consumption calculations. The user can specify connections to the rest of the building’s water system by providing the name of a water storage tanks (i.e. WaterUse:Storage objects). The schematic of the system is shown below:
 
-![EvaporativeFluidCooler](InputOutputReference/media/image201.svg)
+![EvaporativeFluidCooler](media/image201.svg)
 
 Figure 82. Schematic diagram for evaporative fluid cooler
 

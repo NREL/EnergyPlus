@@ -202,6 +202,18 @@ namespace OutputProcessor {
 
 	int MaxNumSubcategories( 1 );
 
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of OutputProcessor should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		int ReportNumberCounter( 0 ); // The report number is used in output reports as a key.
+		int LHourP( -1 ); // Helps set hours for timestamp output
+		Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
+		Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
+	}
+
 	// All routines should be listed here whether private or not
 	//PUBLIC  ReallocateTVar
 	//PUBLIC  SetReportNow
@@ -243,6 +255,77 @@ namespace OutputProcessor {
 	//  UpdateMeterReporting
 
 	// Functions
+
+	// Clears the global data in OutputProcessor.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		InstMeterCacheSize = 1000;
+		InstMeterCacheSizeInc = 1000;
+		InstMeterCache.deallocate();
+		InstMeterCacheLastUsed = 0;
+		CurrentReportNumber = 0;
+		NumVariablesForOutput = 0;
+		MaxVariablesForOutput = 0;
+		NumOfRVariable_Setup = 0;
+		NumTotalRVariable = 0;
+		NumOfRVariable_Sum = 0;
+		NumOfRVariable_Meter = 0;
+		NumOfRVariable = 0;
+		MaxRVariable = 0;
+		NumOfIVariable_Setup = 0;
+		NumTotalIVariable = 0;
+		NumOfIVariable_Sum = 0;
+		NumOfIVariable = 0;
+		MaxIVariable = 0;
+		OutputInitialized = false;
+		ProduceReportVDD = ReportVDD_No;
+		OutputFileMeterDetails = 0;
+		NumHoursInDay = 24;
+		NumHoursInMonth = 0;
+		NumHoursInSim = 0;
+		ReportList.deallocate();
+		NumReportList = 0;
+		NumExtraVars = 0;
+		FreqNotice.dimension( {1,2}, {-1,4} );
+		NumOfReqVariables = 0;
+		NumVarMeterArrays = 0;
+		NumEnergyMeters = 0;
+		MeterValue.deallocate();
+		TimeStepStampReportNbr = 0;
+		TimeStepStampReportChr = "";
+		TrackingHourlyVariables = false;
+		DailyStampReportNbr = 0;
+		DailyStampReportChr = "";
+		TrackingDailyVariables = false;
+		MonthlyStampReportNbr = 0;
+		MonthlyStampReportChr = "";
+		TrackingMonthlyVariables = false;
+		RunPeriodStampReportNbr = 0;
+		RunPeriodStampReportChr = "";
+		TrackingRunPeriodVariables = false;
+		TimeStepZoneSec = 0;
+		ErrorsLogged = false;
+		ProduceVariableDictionary = false;
+		MaxNumSubcategories = 1;
+		ReportNumberCounter = 0;
+		LHourP = -1;
+		LStartMin = -1.0;
+		LEndMin = -1.0;
+		TimeValue.deallocate();
+		RVariableTypes.deallocate();
+		IVariableTypes.deallocate();
+		DDVariableTypes.deallocate();
+		RVariable.deallocate();
+		IVariable.deallocate();
+		RVar.deallocate();
+		IVar.deallocate();
+		ReqRepVars.deallocate();
+		VarMeterArrays.deallocate();
+		EnergyMeters.deallocate();
+		EndUseCategory.deallocate();
+	}
 
 	void
 	InitializeOutput()
@@ -2946,7 +3029,8 @@ namespace OutputProcessor {
 	ReportTSMeters(
 		Real64 const StartMinute, // Start Minute for TimeStep
 		Real64 const EndMinute, // End Minute for TimeStep
-		bool & PrintESOTimeStamp // True if the ESO Time Stamp also needs to be printed
+		bool & PrintESOTimeStamp, // True if the ESO Time Stamp also needs to be printed
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
 	)
 	{
 
@@ -3001,8 +3085,9 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, false, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( PrintESOTimeStamp && ! EnergyMeters( Loop ).RptTSFO && ! EnergyMeters( Loop ).RptAccTSFO ) {
@@ -3010,7 +3095,7 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, false, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintESOTimeStamp && PrintTimeStampToSQL, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 				PrintESOTimeStamp = false;
 			}
 
@@ -3032,7 +3117,9 @@ namespace OutputProcessor {
 	}
 
 	void
-	ReportHRMeters()
+	ReportHRMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3085,8 +3172,9 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, false, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptHR ) {
@@ -3106,7 +3194,9 @@ namespace OutputProcessor {
 	}
 
 	void
-	ReportDYMeters()
+	ReportDYMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3155,8 +3245,9 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, false, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptDY ) {
@@ -3176,7 +3267,9 @@ namespace OutputProcessor {
 	}
 
 	void
-	ReportMNMeters()
+	ReportMNMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3220,8 +3313,9 @@ namespace OutputProcessor {
 		for ( Loop = 1; Loop <= NumEnergyMeters; ++Loop ) {
 			if ( ! EnergyMeters( Loop ).RptMN && ! EnergyMeters( Loop ).RptAccMN ) continue;
 			if ( PrintTimeStamp ) {
-				WriteTimeStampFormatData( mtr_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, false, Month );
+				WriteTimeStampFormatData( mtr_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL, Month );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptMN ) {
@@ -3241,7 +3335,9 @@ namespace OutputProcessor {
 	}
 
 	void
-	ReportSMMeters()
+	ReportSMMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3290,8 +3386,9 @@ namespace OutputProcessor {
 			EnergyMeters( Loop ).LastSMMaxValDate = EnergyMeters( Loop ).SMMaxValDate;
 			if ( ! EnergyMeters( Loop ).RptSM && ! EnergyMeters( Loop ).RptAccSM ) continue;
 			if ( PrintTimeStamp ) {
-				WriteTimeStampFormatData( mtr_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, false );
+				WriteTimeStampFormatData( mtr_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptSM ) {
@@ -3422,64 +3519,71 @@ namespace OutputProcessor {
 		//   Convert the coded date format into a usable
 		//   string
 
-		// Using/Aliasing
-		using General::DecodeMonDayHrMin;
+		if ( codedDate == 0 ) return "-";
 
-		// Return value
-		std::string StringOut;
-
-		// Locals
-		// ((month*100 + day)*100 + hour)*100 + minute
 		static gio::Fmt DateFmt( "(I2.2,'-',A3,'-',I2.2,':',I2.2)" );
 
+		// ((month*100 + day)*100 + hour)*100 + minute
 		int Month; // month in integer format (1-12)
 		int Day; // day in integer format (1-31)
 		int Hour; // hour in integer format (1-24)
 		int Minute; // minute in integer format (0:59)
-		std::string monthName;
 
-		if ( codedDate != 0 ) {
-			monthName = "";
-			DecodeMonDayHrMin( codedDate, Month, Day, Hour, Minute );
-			--Hour;
-			if ( Minute == 60 ) {
-				++Hour;
-				Minute = 0;
-			}
-			if ( Month == 1 ) {
-				monthName = "JAN";
-			} else if ( Month == 2 ) {
-				monthName = "FEB";
-			} else if ( Month == 3 ) {
-				monthName = "MAR";
-			} else if ( Month == 4 ) {
-				monthName = "APR";
-			} else if ( Month == 5 ) {
-				monthName = "MAY";
-			} else if ( Month == 6 ) {
-				monthName = "JUN";
-			} else if ( Month == 7 ) {
-				monthName = "JUL";
-			} else if ( Month == 8 ) {
-				monthName = "AUG";
-			} else if ( Month == 9 ) {
-				monthName = "SEP";
-			} else if ( Month == 10 ) {
-				monthName = "OCT";
-			} else if ( Month == 11 ) {
-				monthName = "NOV";
-			} else if ( Month == 12 ) {
-				monthName = "DEC";
-			} else {
-				monthName = "***";
-			}
-			gio::write( StringOut, DateFmt ) << Day << monthName << Hour << Minute;
-			if ( has( StringOut, "*" ) ) {
-				StringOut = "-";
-			}
-		} else { // codeddate = 0
-			StringOut = "-";
+		General::DecodeMonDayHrMin( codedDate, Month, Day, Hour, Minute );
+
+		if ( Month < 1 || Month > 12 ) return "-";
+		if ( Day < 1 || Day > 31 ) return "-";
+		if ( Hour < 1 || Hour > 24 ) return "-";
+		if ( Minute < 0 || Minute > 60 ) return "-";
+
+		--Hour;
+		if ( Minute == 60 ) {
+			++Hour;
+			Minute = 0;
 		}
+
+		std::string monthName;
+		switch ( Month ) {
+			case 1:
+				monthName = "JAN";
+				break;
+			case 2:
+				monthName = "FEB";
+				break;
+			case 3:
+				monthName = "MAR";
+				break;
+			case 4:
+				monthName = "APR";
+				break;
+			case 5:
+				monthName = "MAY";
+				break;
+			case 6:
+				monthName = "JUN";
+				break;
+			case 7:
+				monthName = "JUL";
+				break;
+			case 8:
+				monthName = "AUG";
+				break;
+			case 9:
+				monthName = "SEP";
+				break;
+			case 10:
+				monthName = "OCT";
+				break;
+			case 11:
+				monthName = "NOV";
+				break;
+			case 12:
+				monthName = "DEC";
+				break;
+		}
+
+		std::string StringOut;
+		gio::write( StringOut, DateFmt ) << Day << monthName << Hour << Minute;
 
 		return StringOut;
 	}
@@ -4771,13 +4875,13 @@ namespace OutputProcessor {
 		} else if ( has( meterName, "Electricity:HVAC" ) ) {
 			indexGroupKey = 301;
 
-			// InteriorLights:Electricity indices are in the 400s
-		} else if ( has( meterName, "InteriorLights:Electricity" ) ) {
-			indexGroupKey = 401;
-
 			// InteriorLights:Electricity:Zone indices are in the 500s
 		} else if ( has( meterName, "InteriorLights:Electricity:Zone" ) ) {
 			indexGroupKey = 501;
+
+			// InteriorLights:Electricity indices are in the 400s
+		} else if ( has( meterName, "InteriorLights:Electricity" ) ) {
+			indexGroupKey = 401;
 
 			// Unknown items have negative indices
 		} else {
@@ -5499,14 +5603,16 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	Real64 CurVal; // Current value for real variables
 	Real64 ICurVal; // Current value for integer variables
 	int MDHM; // Month,Day,Hour,Minute
-	bool TimePrint; // True if the time needs to be printed
+	bool TimePrint( true ); // True if the time needs to be printed
 	Real64 StartMinute; // StartMinute for UpdateData call
 	Real64 MinuteNow; // What minute it is now
 	bool ReportNow; // True if this variable should be reported now
 	int CurDayType; // What kind of day it is (weekday (sunday, etc) or holiday)
-	static int LHourP( -1 ); // Helps set hours for timestamp output
-	static Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
-	static Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
+	//////////// hoisted into namespace ////////////////////////////////////////////////
+	// static int LHourP( -1 ); // Helps set hours for timestamp output
+	// static Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
+	// static Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
+	////////////////////////////////////////////////////////////////////////////////////
 	static bool EndTimeStepFlag( false ); // True when it's the end of the Zone Time Step
 	Real64 rxTime; // (MinuteNow-StartMinute)/REAL(MinutesPerTimeStep,r64) - for execution time
 
@@ -5765,7 +5871,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 		UpdateMeters( MDHM );
 
-		ReportTSMeters( StartMinute, TimeValue( 1 ).CurMinute, TimePrint );
+		ReportTSMeters( StartMinute, TimeValue( 1 ).CurMinute, TimePrint, TimePrint );
 
 	} // TimeStep Block
 
@@ -5777,6 +5883,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 				CurDayType = 7 + HolidayIndex;
 			}
 			WriteTimeStampFormatData( eso_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
+			TimePrint = false;
 		}
 
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
@@ -5835,7 +5942,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			} // Number of I Variables
 		} // IndexType (Zone or HVAC)
 
-		ReportHRMeters();
+		ReportHRMeters( TimePrint );
 
 	} // Hour Block
 
@@ -5849,6 +5956,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 				CurDayType = 7 + HolidayIndex;
 			}
 			WriteTimeStampFormatData( eso_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
+			TimePrint = false;
 		}
 		NumHoursInMonth += 24;
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) {
@@ -5867,7 +5975,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			} // Number of I Variables
 		} // Index type (Zone or HVAC)
 
-		ReportDYMeters();
+		ReportDYMeters( TimePrint );
 
 	} // Day Block
 
@@ -5877,7 +5985,8 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	// Month Block
 	if ( EndMonthFlag || EndEnvrnFlag ) {
 		if ( TrackingMonthlyVariables ) {
-			WriteTimeStampFormatData( eso_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, false, Month );
+			WriteTimeStampFormatData( eso_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, true, Month );
+			TimePrint = false;
 		}
 		NumHoursInSim += NumHoursInMonth;
 		EndMonthFlag = false;
@@ -5897,7 +6006,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			} // Number of I Variables
 		} // IndexType (Zone, HVAC)
 
-		ReportMNMeters();
+		ReportMNMeters( TimePrint );
 
 		NumHoursInMonth = 0;
 	} // Month Block
@@ -5905,7 +6014,8 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	// Sim/Environment Block
 	if ( EndEnvrnFlag ) {
 		if ( TrackingRunPeriodVariables ) {
-			WriteTimeStampFormatData( eso_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, false );
+			WriteTimeStampFormatData( eso_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, true );
+			TimePrint = false;
 		}
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
 			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
@@ -5923,7 +6033,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			} // Number of I Variables
 		} // Index Type (Zone, HVAC)
 
-		ReportSMMeters();
+		ReportSMMeters( TimePrint );
 
 		NumHoursInSim = 0;
 	}
@@ -5951,7 +6061,7 @@ AssignReportNumber( int & ReportNumber )
 	// na
 
 	// USE STATEMENTS:
-	// na
+	using namespace OutputProcessor;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5966,7 +6076,9 @@ AssignReportNumber( int & ReportNumber )
 	// na
 
 	// FUNCTION LOCAL VARIABLE DECLARATIONS:
-	static int ReportNumberCounter( 0 );
+	//////////// hoisted into namespace ////////////
+	// static int ReportNumberCounter( 0 );
+	////////////////////////////////////////////////
 
 	++ReportNumberCounter;
 	ReportNumber = ReportNumberCounter;
@@ -8065,24 +8177,27 @@ AddToOutputVariableList(
 
 }
 
-//     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-//     and The Regents of the University of California through Ernest Orlando Lawrence
-//     Berkeley National Laboratory.  All rights reserved.
-//     Portions of the EnergyPlus software package have been developed and copyrighted
-//     by other individuals, companies and institutions.  These portions have been
-//     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in main.cc.
-//     NOTICE: The U.S. Government is granted for itself and others acting on its
-//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-//     reproduce, prepare derivative works, and perform publicly and display publicly.
-//     Beginning five (5) years after permission to assert copyright is granted,
-//     subject to two possible five year renewals, the U.S. Government is granted for
-//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-//     worldwide license in this data to reproduce, prepare derivative works,
-//     distribute copies to the public, perform publicly and display publicly, and to
-//     permit others to do so.
-//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	//     NOTICE
+	
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     and The Regents of the University of California through Ernest Orlando Lawrence
+	//     Berkeley National Laboratory.  All rights reserved.
+
+	//     Portions of the EnergyPlus software package have been developed and copyrighted
+	//     by other individuals, companies and institutions.  These portions have been
+	//     incorporated into the EnergyPlus software package under license.   For a complete
+	//     list of contributors, see "Notice" located in main.cc.
+
+	//     NOTICE: The U.S. Government is granted for itself and others acting on its
+	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
+	//     reproduce, prepare derivative works, and perform publicly and display publicly.
+	//     Beginning five (5) years after permission to assert copyright is granted,
+	//     subject to two possible five year renewals, the U.S. Government is granted for
+	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
+	//     worldwide license in this data to reproduce, prepare derivative works,
+	//     distribute copies to the public, perform publicly and display publicly, and to
+	//     permit others to do so.
+	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

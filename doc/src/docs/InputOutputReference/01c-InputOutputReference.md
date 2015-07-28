@@ -15,7 +15,7 @@ Further details of the implementation of this model can be found in:
 
 Murugappan, A. *Implementing Ground Source Heat Pump and Ground Loop Heat Exchanger Models in the EnergyPlus Simulation Environment*. M.S. Thesis, Oklahoma State University, December 2002.
 
-![](InputOutputReference/media/image202.svg)
+![](media/image202.svg)
 
 Figure 83. Schematic of EnergyPlus Ground Loop Heat Exchanger
 
@@ -213,11 +213,11 @@ The GroundHeatExchanger:Slinky use the g-functions to calculate the GHX temperat
 
 Horizontal slinky-loop ground heat exchangers (GHXs) consist of coiled tubing, with the individual rings spread out along the direction of the trench either horizontally or vertically, as shown in [Figure](#SlinkyIOFig1). A schematic of a slinky GHX can be seen in [Figure](#SlinkyIOFig2). Compared to conventional straight tube horizontal GHXs, slinky loops have a higher tube density; hence, with the same cooling/heating loads, slinky-loop GHXs require less land area and excavation work than straight tube HGHXs. 
 
-![slinky heat exchanger](InputOutputReference/media/image901.png)
+![slinky heat exchanger](media/image901.png)
 
 Figure: Slinky Ground Heat Exchanger Configurations. <a name="SlinkyIOFig1"></a>
 
-![slinky heat exchanger](InputOutputReference/media/image902.png)
+![slinky heat exchanger](media/image902.png)
 
 Figure: Schematic of Slinky HX. <a name="SlinkyIOFig2"></a>
 
@@ -386,11 +386,11 @@ The pond heat exchanger model represents a shallow pond with submerged hydronic 
 
 This type of heat exchanger is intended to be connected to the supply side of a condenser loop, and can be used with any type of plant loop. The pond may be specified as the only heat exchanger on the condenser loop (as shown in Figure 84) or it may be connected in parallel with other condenser loop heat exchangers (such as cooling towers, ground surface heat exchangers) as shown in the second figure below.
 
-![pond heat exchanger](InputOutputReference/media/image203.svg)
+![pond heat exchanger](media/image203.svg)
 
 Figure 84. Example of Pond Ground Heat Exchanger as only heat exchanger on condenser loop
 
-![pond surface heat exchangers](InputOutputReference/media/image204.svg)
+![pond surface heat exchangers](media/image204.svg)
 
 Figure 85. Pond Ground Heat Exchanger with other heat exchangers on condenser loop
 
@@ -496,13 +496,13 @@ The surface heat exchanger model is to simulate hydronic surface ground heat exc
 
 The heat exchanger may be ground coupled or not. In the latter case the bottom surface is exposed to the wind but not solar gains. This type of heat exchanger is intended to be connected to the supply side of a condenser loop, and can be used with any type of plant loop. The surface heat exchanger may be specified as the only heat exchanger on the condenser loop (as shown in the first figure below) or it may be connected in parallel with other condenser loop heat exchangers (such as cooling towers, ground surface heat exchangers) as shown in the second figure below.
 
-![surface heat exchanger](InputOutputReference/media/image205.svg)
+![surface heat exchanger](media/image205.svg)
 
 Figure 86. Example of Surface Ground Heat Exchanger as only heat exchanger on condenser loop
 
 
 
-![tower surface heat exchangers](InputOutputReference/media/image206.svg)
+![tower surface heat exchangers](media/image206.svg)
 
 Figure 87. Surface Ground Heat Exchanger with other heat exchangers on condenser loop
 
@@ -774,7 +774,7 @@ Heat transfer rate for the heat exchanger, defined as positive for ***fluid heat
 
 A fluid-to-fluid heat exchanger designed to couple the supply side of one plant or condenser loop to the demand side of another plant or condenser loop. This heat exchanger is fairly general and can be configured for use in any application where any two loops need to be connected together. The only constraints are that that one side must be connected to the supply side of one loop and the other side connected to the demand side of a different loop.  Because the heat exchanger is intended to be generic, its two sides are distinguished by the nature of loop side being connected.  One side is called “Loop Supply Side” to indicate the heat exchanger is situated on the supply side of a loop. The other side is called “Loop Demand Side” to indicate it is on the demand side of a loop.  The heat exchanger is intended to act as a supply component for the loop connected to it as the “Loop Supply Side” and as a demand component for the loop connected to it as the “Loop Demand Side.”  From the point of view of the heat exchanger model itself, the Loop Demand Side fluid serves as the source/sink to supply heating/cooling to the fluid in the Loop Supply Side.  Only hydronic “plant” fluids are allowed, no air-side connections are possible with this heat exchanger.
 
-![HX diagram draft.tif](InputOutputReference/media/image207.png)
+![HX diagram draft.tif](media/image207.png)
 
 Figure 88. Plant Fluid-to-Fluid Heat Exchanger
 
@@ -1047,7 +1047,7 @@ This object is used for special cases where plant flow control is needed to make
 
 The TemperingValve object models a temperature-controlled diversion valve. It models a valve on a bypass pipe that can open to divert flow around one or more plant components. It can only be used on one of two branches between a Splitter and a Mixer. The figure below shows the use of the tempering valve with a Water Heater:Mixed component on “Stream 2.”  The tempering valve acts to divert flow through the branch it is on in order to adjust the temperature at the outlet of the mixer. If the temperature at Stream 2 Source Node is warmer than the setpoint and the inlet flow is cooler than the setpoint, then a controller determines how much flow should bypass the storagew tank to achieve the desired setpoint.
 
-![Schematic](InputOutputReference/media/image208.png)
+![Schematic](media/image208.png)
 
 Figure 89. Tempering Valve Schematic
 
@@ -1197,7 +1197,7 @@ These variables are simply counters of how many iterations were executed. The co
 
 This section provides more detailed information on the reporting available for outdoor air ventilation.  Sixteen cooling and heating load variables and eight energy summary variables are available that report the impact of system outdoor air on zone loads, system demand and total energy use. The representative air system shown in the diagram below shows outdoor air (OA), return air (RA), supply air (SA) and mixed air (MA).
 
-![VentRept](InputOutputReference/media/image209.png)
+![VentRept](media/image209.png)
 
 Figure 90. Example System for Ventilation Loads Report
 
@@ -1256,7 +1256,7 @@ The example syntax below shows the basic ventilation flow variables reported on 
 
 #### Ventilation Load Reports
 
-The impact of system outdoor air on a particular zone may be calculated by summing the mass flow weighted <span>${\dot q_{OA}}$</span> over the supply air paths (both cooling and heating) serving the zone as follows:
+The impact of system outdoor air on a particular zone may be calculated by summing the mass flow weighted <span>\({\dot q_{OA}}\)</span> over the supply air paths (both cooling and heating) serving the zone as follows:
 
 <div>\[{\dot q_{OA,Zone\;1}} = \sum\limits_{n = 1}^{AirPathNum} {{{\dot q}_{OA}}\frac{{{{\dot m}_n}}}{{{{\dot m}_{sys}}}}} \]</div>
 
@@ -1405,7 +1405,7 @@ Or, as is shown by example here, perhaps a more readable form is to generate the
 
 
 
-![system](InputOutputReference/media/image213.svg)
+![system](media/image213.svg)
 
 Figure 91. View of System Level Reporting
 
@@ -1631,7 +1631,7 @@ The Standard reports file includes these variables reporting in the Tabular repo
 
 A map for Air Loop input syntax is shown in the following diagram.
 
-![](InputOutputReference/media/image214.svg)
+![](media/image214.svg)
 
 Figure 92. Air Loop Input Syntax Map
 
@@ -2030,7 +2030,7 @@ Figure 93 shows the relationships among AirflowNetwork:Multizone objects and bet
 
 Figure 93 also shows the relationships among AirflowNetwork:Distribution objects and between AirflowNetwork:Distribution objects and regular EnergyPlus objects. The AirflowNetwork:Distribution:Linkage objects link two nodes from AirflowNetwork:Distribution:Node and/or AirflowNetwork:Multizone:Zone objects with a component defined in the object AirflowNetwork:Distribution:Component. The solid arrows show a reference from object A to object B. The dashed arrows indicate the components which can be used in a linkage object. The red arrows pointing to the Zone object indicate the components that interact with the zone air. For example, the temperature in a zone where a supply leak terminates is used to calculate duct leakage energy loss. The temperature in a zone where a duct component is located is also used to calculate duct conduction loss.
 
-![](InputOutputReference/media/image215.png)
+![](media/image215.png)
 
 Figure 93. Relationships among AirflowNetwork objects (right-hand side) and between AirflowNetwork objects and regular EnergyPlus objects. An arrow from object A to object B means that A references B.
 
@@ -2042,7 +2042,7 @@ One possible air flow pattern is shown in this figure. The actual air flow patte
 
 
 
-![](InputOutputReference/media/image216.svg)
+![](media/image216.svg)
 
 Figure 94. Plan view of a simple air flow network showing a possible air flow pattern in which all of the windows and doors are open.
 
@@ -2206,11 +2206,11 @@ Designates which method is used for AirflowNetwork initialization. The choices f
 
 #### Field: Relative Airflow Convergence Tolerance
 
-The solution is assumed to have converged when <span>${{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|} \mathord{\left/ {\vphantom {{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|} {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} }}} \right. } {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} }}$</span>is less than the value specified for this input field. This convergence criteria is equivalent to the ratio of the absolute value of the sum of all network airflows (<span>$\left| {\sum {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|$</span>) to the sum of network airflow magnitudes (<span>$\sum\limits_{}^{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} $</span>). The default value is 1.0x10<sup>-4</sup>.
+The solution is assumed to have converged when <span>\({{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|} \mathord{\left/ {\vphantom {{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|} {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} }}} \right. } {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} }}\)</span>is less than the value specified for this input field. This convergence criteria is equivalent to the ratio of the absolute value of the sum of all network airflows (<span>\(\left| {\sum {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|\)</span>) to the sum of network airflow magnitudes (<span>\(\sum\limits_{}^{} {\left| {{{\mathop m\limits^ \bullet  }_{_i}}} \right|} \)</span>). The default value is 1.0x10<sup>-4</sup>.
 
 #### Field: Absolute Airflow Convergence Tolerance
 
-The solution is assumed to have converged when the summation of the absolute value of all network airflows (<span>$\left| {\sum {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|$</span>) is less than the value specified for this input field. The default value is 1.0x10<sup>-6</sup>.
+The solution is assumed to have converged when the summation of the absolute value of all network airflows (<span>\(\left| {\sum {{{\mathop m\limits^ \bullet  }_{_i}}} } \right|\)</span>) is less than the value specified for this input field. The default value is 1.0x10<sup>-6</sup>.
 
 #### Field: Convergence Acceleration Limit
 
@@ -2226,7 +2226,7 @@ This is the aspect ratio of a rectangular footprint. It is given by the width of
 
 
 
-![](InputOutputReference/media/image221.svg)
+![](media/image221.svg)
 
 Figure 95. Footprint of a rectangular building showing variables used by the program to calculate surface-average wind pressure coefficients. The angle a is the “Azimuth Angle of Long Axis of Building.”  *w<sub>short</sub>*/*w<sub>long</sub>* is the “Ratio of Building Width Along Short Axis to Width Along Long Axis.”
 
@@ -2377,13 +2377,13 @@ The name of an AirlowNetwork:OccupantVentilationControl object. The object is us
 
 **Note:** The Occupant Ventilation Control object can be assigned to a zone (AirflowNetwork:MultiZone:Zone) or a surface (AirflowNetwork:MultiZone:Surface). When the object is assigned to a zone, the Occupant Ventilation Control is assigned to the surfaces belonging to the zone automatically. The surface objects must have an associated AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:HorizontalOpening, or  AirflowNetwork:MultiZone:Component:SimpleOpening component specified in the field of Leakage Component Name. All output variables will be shown under surface names only, and not under zone names.
 
-![](InputOutputReference/media/image222.svg)
+![](media/image222.svg)
 
 Figure 96. Modulation of venting area according to inside-outside temperature difference.
 
 
 
-![](InputOutputReference/media/image223.svg)
+![](media/image223.svg)
 
 Figure 97. Modulation of venting area according to inside-outside enthalpy difference.
 
@@ -2479,7 +2479,7 @@ If, in addition, the window is in a thermal zone for which opening modulation ha
 
 If this linkage is associated with an AirflowNetwork:MultiZone:Surface:Crack object, the following crack air flow equation is used.
 
-<sup><span>$Q = {\rm{(Crack Factor)*}}{C_T}{\rm{*}}{C_Q}{\left( {\Delta P} \right)^n}$</span></sup>
+<sup><span>\(Q = {\rm{(Crack Factor)*}}{C_T}{\rm{*}}{C_Q}{\left( {\Delta P} \right)^n}\)</span></sup>
 
 Where
 
@@ -2489,7 +2489,7 @@ Where
 
 *C<sub>T</sub>* = reference condition temperature correction factor (dimensionless). See AirflowNetwork:MultiZone:Surface:Crack object.
 
-<span>$\Delta P$</span>= pressure difference across crack (Pa)
+<span>\(\Delta P\)</span>= pressure difference across crack (Pa)
 
 *n*   = air flow exponent (dimensionless)
 
@@ -2660,7 +2660,7 @@ AirflowNetwork:MultiZone:ReferenceCrackConditions,
 
 This object specifies the properties of air flow through a crack and the associated measurement conditions. The following power law form is used that gives air flow through the crack as a function of the pressure difference across the crack:
 
-<sup><span>$Q = {\rm{(Crack Factor)*}}{C_T}{\rm{*}}{C_Q}{\left( {\Delta P} \right)^n}$</span></sup>
+<sup><span>\(Q = {\rm{(Crack Factor)*}}{C_T}{\rm{*}}{C_Q}{\left( {\Delta P} \right)^n}\)</span></sup>
 
 Where
 
@@ -2670,7 +2670,7 @@ Where
 
 *C<sub>T</sub>* = reference condition temperature correction factor (dimensionless)
 
-<span>$\Delta P$</span>= pressure difference across crack (Pa)
+<span>\(\Delta P\)</span>= pressure difference across crack (Pa)
 
 *n*   = air flow exponent (dimensionless)
 
@@ -2694,7 +2694,7 @@ This is a name for this AirflowNetwork:MultiZone:Surface:Crack object. It is ref
 
 #### Field: Air Mass Flow Coefficient at Reference Conditions
 
-The value of the air mass flow coefficient,<span>${C_Q}$</span>, in the crack air flow equation. It has units of kg/s at 1Pa. This value must be greater than zero.
+The value of the air mass flow coefficient,<span>\({C_Q}\)</span>, in the crack air flow equation. It has units of kg/s at 1Pa. This value must be greater than zero.
 
 #### Field: Air Mass Flow Exponent
 
@@ -2724,15 +2724,15 @@ five fields. The relationship between pressure and airflow may be expressed as:
 
 where
 
-<span>$\dot m$</span>     = Air mass flow rate [kg/s]
+<span>\(\dot m\)</span>     = Air mass flow rate [kg/s]
 
 *ELA*   = Effective leakage area [m<sup>2</sup>]
 
 ρ       = Air density [kg/m<sup>3</sup>]
 
-<span>$\Delta {P_r}$</span>  = Reference pressure difference [Pa]
+<span>\(\Delta {P_r}\)</span>  = Reference pressure difference [Pa]
 
-<span>$\Delta P$</span>   = Pressure difference across this component [Pa]
+<span>\(\Delta P\)</span>   = Pressure difference across this component [Pa]
 
 C<sub>d           </sub> = Discharge coefficient [dimensionless]
 
@@ -2789,11 +2789,11 @@ The name of this AirflowNetwork:MultiZone:Component:DetailedOpening object. It i
 
 #### Field: Air Mass Flow Coefficient When Opening is Closed
 
-Crack flow is assumed when the window or door is closed. The units for this air mass flow coefficient (<span>${C_{Q,\;unit\;length}}$</span>) are different from the units for <span>${C_Q}$</span>(kg/s at 1 Pa pressure difference) defined in an AirflowNetwork:MultiZone:Surface:Crack object. There is no default but the entered value must be greater than zero. The program will automatically generate four cracks around the perimeter of the window or door--one along the bottom, one along the top, and one on each side. The temperature correction factor used in the AirflowNetwork:MultiZone:Surface:Crack object is not used for this component to calculate air mass flow rate.
+Crack flow is assumed when the window or door is closed. The units for this air mass flow coefficient (<span>\({C_{Q,\;unit\;length}}\)</span>) are different from the units for <span>\({C_Q}\)</span>(kg/s at 1 Pa pressure difference) defined in an AirflowNetwork:MultiZone:Surface:Crack object. There is no default but the entered value must be greater than zero. The program will automatically generate four cracks around the perimeter of the window or door--one along the bottom, one along the top, and one on each side. The temperature correction factor used in the AirflowNetwork:MultiZone:Surface:Crack object is not used for this component to calculate air mass flow rate.
 
 #### Field: Air Mass Flow Exponent When Opening Is Closed
 
-Crack flow is assumed when the window or door is closed. In this case, the value of this field is the exponent,* n*, in the crack air flow equation. The valid range for this exponent is 0.5 to 1.0, with the default value being 0.65.
+Crack flow is assumed when the window or door is closed. In this case, the value of this field is the exponent,* n*, in the crack air flow equation. The valid range for this exponent is 0.5 to 1.0, with the default value being 0.65. Mass Flow Rate = Air Mass Flow Coefficient * (deltaP)^Air Mass Flow Exponent.
 
 #### Field: Type of Rectanguler Large Vertical Opening (LVO)
 
@@ -2845,7 +2845,7 @@ The Start Height Factor of the window or door for Opening Factor 1. The Start He
 
 
 
-![](InputOutputReference/media/image236.svg)
+![](media/image236.svg)
 
 Figure 98. Window (or door) showing geometrical factors associated with an opening through which air flows.
 
@@ -2903,7 +2903,7 @@ This is a name for this AirflowNetwork:MultiZone:Component:HorizontalOpening obj
 
 #### Field: Air Mass Flow Coefficient When Opening is Closed
 
-The value of the air mass flow coefficient, <span>${C_{Q,\;unit\;length}}$</span>, in the horizontal opening air flow equation. It has units of kg/s-m at 1Pa. The temperature correction factor is not applied to the mass flow calculation. This is a required input field and the entered value must be greater than zero.
+The value of the air mass flow coefficient, <span>\({C_{Q,\;unit\;length}}\)</span>, in the horizontal opening air flow equation. It has units of kg/s-m at 1Pa. The temperature correction factor is not applied to the mass flow calculation. This is a required input field and the entered value must be greater than zero.
 
 #### Field: Air Mass Flow Exponent When Opening is Closed
 
@@ -2940,11 +2940,11 @@ This is a name for this AirflowNetwork:MultiZone:Component:SimpleOpening object.
 
 #### Field: Air Mass Flow Coefficient When Opening is Closed
 
-The value of the air mass flow coefficient, <span>${C_{Q,\;unit\;length}}$</span>, in the simple opening air flow equation. It has units of kg/s-m at 1Pa. The temperature correction factor is not applied for mass flow calculation.
+The value of the air mass flow coefficient, <span>\({C_{Q,\;unit\;length}}\)</span>, in the simple opening air flow equation. It has units of kg/s-m at 1Pa. The temperature correction factor is not applied for mass flow calculation.
 
 #### Field: Air Mass Flow Exponent When Opening is Closed
 
-The value of the exponent,* n*, in the crack air flow equation. The valid range is 0.5 to 1.0, with the default value being 0.65.
+The value of the exponent,* n*, in the crack air flow equation. The valid range is 0.5 to 1.0, with the default value being 0.65. Mass Flow Rate = Air Mass Flow Coefficient * (deltaP)^Air Mass Flow Exponent.
 
 #### Field: Minimum Density Difference for Two-Way Flow
 
@@ -2973,7 +2973,7 @@ When the fan is on, the air mass flow rate modeled for the airflow network is ba
 
 When the fan is off, the following power law form is used that gives air flow through the crack as a function of the pressure difference across the crack:
 
-<sup><span>$Q = {\rm{(Crack Factor)*}}{C_T}{\rm{*}}{C_Q}{\left( {\Delta P} \right)^n}$</span></sup>
+<sup><span>\(Q = {\rm{(Crack Factor)*}}{C_T}{\rm{*}}{C_Q}{\left( {\Delta P} \right)^n}\)</span></sup>
 
 Where
 
@@ -2983,7 +2983,7 @@ Where
 
 *C<sub>T</sub>* = reference condition temperature correction factor (dimensionless)
 
-<span>$\Delta P$</span>= pressure difference across crack (Pa)
+<span>\(\Delta P\)</span>= pressure difference across crack (Pa)
 
 *n*   = air flow exponent (dimensionless)
 
@@ -3007,7 +3007,7 @@ This is the name for this instance of the AirflowNetwork:MultiZone:Component:Zon
 
 #### Field: Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions
 
-The value of the air mass flow coefficient,<span>${C_Q}$</span>, in the crack air flow equation. It has units of kg/s at 1Pa. This value must be greater than zero. The value is used when the fan is off.
+The value of the air mass flow coefficient,<span>\({C_Q}\)</span>, in the crack air flow equation. It has units of kg/s at 1Pa. This value must be greater than zero. The value is used when the fan is off.
 
 #### Field: Air Mass Flow Exponent When the Zone Exhaust Fan is Off
 
@@ -3199,7 +3199,7 @@ This field is used to calculate the comfort band as a function of predicted perc
 
 where
 
-* <span>$\Theta$</span> is the comfort band (degC)
+* <span>\(\Theta\)</span> is the comfort band (degC)
 * PPD is predicted percentage person of dissatisfied (%)
 
 #### Field: Occupancy Check
@@ -3329,11 +3329,11 @@ This component may be also called a power law component and is used to represent
 
 where
 
-<span>$\dot m$</span> = Air mass flow rate through the component [kg/s]
+<span>\(\dot m\)</span> = Air mass flow rate through the component [kg/s]
 
 C = Air mass flow coefficient (kg/s at 1 Pa pressure difference)
 
-<span>$\Delta P$</span> = Total pressure loss across the element [Pa]
+<span>\(\Delta P\)</span> = Total pressure loss across the element [Pa]
 
 n = Air mass flow exponent
 
@@ -3392,7 +3392,7 @@ where
 
 r = Air density [kg/m<sup>3</sup>]
 
-<span>$\Delta P$</span> = Total pressure loss across the element [Pa]
+<span>\(\Delta P\)</span> = Total pressure loss across the element [Pa]
 
 n = Air mass flow exponent
 
@@ -3406,7 +3406,7 @@ r = Effective leakage ratio [dimensionless]
 
 Q<sub>r</sub> = Maximum airflow rate [m<sup>3</sup>/s]
 
-<span>$\Delta {P_r}$</span> = Reference pressure difference [Pa]
+<span>\(\Delta {P_r}\)</span> = Reference pressure difference [Pa]
 
 n = Air mass flow exponent [dimensionless]
 
@@ -3456,13 +3456,13 @@ This object represents a duct component and requires 9 input fields, one alpha f
 
 where
 
-<span>$\dot m$</span> = Mass flow rate of air through the component [kg/s]
+<span>\(\dot m\)</span> = Mass flow rate of air through the component [kg/s]
 
 r= Air density [kg/m<sup>3</sup>]
 
 A = Cross sectional area [m<sup>2</sup>]
 
-<span>$\Delta P$</span> = Total pressure loss across the component [Pa]
+<span>\(\Delta P\)</span> = Total pressure loss across the component [Pa]
 
 L = Duct length [m]
 
@@ -3480,7 +3480,7 @@ where
 
 e= Surface roughness [m]
 
-Re = Reynolds number = <span>${\raise0.7ex\hbox{${\rho VD}$} \!\mathord{\left/ {\vphantom {{\rho VD} \mu }}\right.}\!\lower0.7ex\hbox{$\mu $}}$</span>
+Re = Reynolds number = <span>\({\raise0.7ex\hbox{${\rho VD}$} \!\mathord{\left/ {\vphantom {{\rho VD} \mu }}\right.}\!\lower0.7ex\hbox{$\mu $}}\)</span>
 
 #### Field: Name
 
@@ -4521,17 +4521,17 @@ High Temp Radiant System</td>
 </tr>
 </table>
 
-![ZoneEquipmentSyntax (Medium)](InputOutputReference/media/image261.png)
+![ZoneEquipmentSyntax (media/image261.png)
 
 Figure 99. Zone Equipment Input Syntax Map
 
-![](InputOutputReference/media/image262.svg)
+![](media/image262.svg)
 
 Figure 100. Representative Zone Equipment
 
 The following figure (Air Loop/Zone Equipment Node Diagram) illustrates the connection between the zone equipment and the air loop systems.
 
-![](InputOutputReference/media/image263.svg)
+![](media/image263.svg)
 
 Figure 101. Air Loop/Zone Equipment Node Diagram
 
@@ -4689,7 +4689,10 @@ Table 27. Legal Zone Equipment Types (ZoneHVAC:EquipmentList)
 <td>Fan:ZoneExhaust</td>
 </tr>
 <tr>
-<td>WaterHeater:HeatPump</td>
+<td>WaterHeater:HeatPump:PumpedCondenser</td>
+</tr>
+<tr>
+<td>WaterHeater:HeatPump:WrappedCondenser</td>
 </tr>
 <tr>
 <td>ZoneHVAC:AirDistributionUnit</td>
@@ -5040,7 +5043,7 @@ During heating operation, there are two control options for the damper controlli
 
 With **Normal** (the default) action, the damper will remain at the minimum air flow rate during heating operation. As the heating load increases, the water flow rate in the reheat coil will be increased to maintain temperature in the zone until the maximum water flow rate is reached or the user-specified maximum reheat air temperature is reached..  This is sometimes called the single maximum control logic as illustrated below.
 
-![](InputOutputReference/media/image264.svg)
+![](media/image264.svg)
 
 Figure 102. The Single Maximum Control Logic
 
@@ -5048,7 +5051,7 @@ With **Reverse** action, as the heating load increases, the unit starts at minim
 
 The dual-max control currently applies to the AirTerminal:SingleDuct:VAV:Reheat objects with reverse acting dampers and hot-water coils.
 
-![](InputOutputReference/media/image265.svg)
+![](media/image265.svg)
 
 Figure 103.  The Dual Maximum Control Logic
 
@@ -5295,7 +5298,7 @@ This terminal unit is slightly different from the AirTerminal:SingleDuct:VAV:Reh
 
 This terminal unit model was originally developed and tested for use with the changeover-bypass VAV unitary system.
 
-![Damper](InputOutputReference/media/image267.png)
+![Damper](media/image267.png)
 
 Figure 104. Single Duct VAV Heat and Cool Reheat Schematic
 
@@ -5508,7 +5511,7 @@ This terminal unit is slightly different from the AirTerminal:SingleDuct:VAV:NoR
 
 This terminal unit model was originally developed and tested for use with the changeover-bypass VAV unitary system..This object may be used when the central heating coil is sufficient to maintain the heating set point temperature. Additional heating may be provided, if necessary, by use of AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat or ZoneHVAC:Baseboard:\* objects.
 
-![Damper\_NoHeat](InputOutputReference/media/image268.png)
+![Damper\_NoHeat](media/image268.png)
 
 Figure 105. Single Duct VAV Heat and Cool NoReheat Schematic
 
@@ -5562,7 +5565,7 @@ The series powered induction unit is an air system terminal unit that mixes vary
 
 The EnergyPlus model of the series PIU terminal unit is composed of three components: a zone mixer, a constant volume fan, and a heating coil (hot water, electric, or gas).
 
-![SeriesPIUPicture.png](InputOutputReference/media/image269.png)
+![SeriesPIUPicture.png](media/image269.png)
 
 Figure 106. Series PIU Terminal Unit
 
@@ -5706,7 +5709,7 @@ At full cooling load the primary air damper is fully open and the fan is off. Th
 
 The EnergyPlus model of the parallel PIU terminal unit is composed of three components: a constant volume fan, a zone mixer, and a heating coil (hot water, electric, or gas).
 
-![ParallelPIUPicture.png](InputOutputReference/media/image271.png)
+![ParallelPIUPicture.png](media/image271.png)
 
 Figure 107. Parallel PIU Terminal Unit
 
@@ -6206,7 +6209,7 @@ The inlet side mixer air terminal unit provides a means of supplying central sys
 
 The AirTerminal:SingleDuct:InletSideMixer simply mixes two inlet air streams into a single outlet stream. One inlet - designated the primary air stream - is from the DOAS. The other inlet - designated the secondary air stream - is recirculated air from the zone. The outlet air stream of the inlet side mixer is then the inlet to the zone AC unit.
 
-![](InputOutputReference/media/image275.svg)
+![](media/image275.svg)
 
 Figure 108. Inlet Side Mixer Air Terminal Unit with Fan Coil
 
@@ -6252,7 +6255,7 @@ The supply side mixer air terminal unit provides a means of supplying central sy
 
 The AirTerminal:SingleDuct:SupplySideMixer simply mixes two inlet air streams into a single outlet stream. One inlet - designated the primary air stream - is from the DOAS. The other inlet - designated the secondary air stream - is outlet air from the zone AC unit. The outlet air stream from the supply side mixer is then the inlet to the conditioned zone.
 
-![](InputOutputReference/media/image276.svg)
+![](media/image276.svg)
 
 Figure 109. Supply Side Mixer Air Terminal Unit with Fan Coil
 
@@ -7984,7 +7987,7 @@ This output is the availability status of the zone evaporative cooler unit’s f
 
 The zone outdoor air unit (ZoneHVAC:OutdoorAirUnit) in EnergyPlus is intended to model dedicated outdoor air systems (DOAS) and other similar systems which aim to provide either additional outside air or some limited amount of sensible and/or latent conditioning.  The zone outdoor air unit is a piece of zone equipment that can consist of a supply fan, an exhaust fan (optional), heating and cooling coils, and heat recovery.  The outdoor air unit input simply requires information about flow rates, schedules, node names, and a list of component that are part of the unit.  These components require additional input as per the requirements for these components.  In addition, the input includes information about controls for the unit.  It should be noted that the components that make up the zone outdoor air unit do not require additional controls or setpoints.  The unit input defines how the unit outlet temperature is controlled as described below.
 
-![](InputOutputReference/media/image282.png)
+![](media/image282.png)
 
 Figure 110. Zone Outdoor Air Unit Schematic
 
@@ -8454,7 +8457,7 @@ This is the availability status of the window air conditioner fan. This status f
 
 The packaged terminal air conditioner (PTAC) is a compound object made up of other components. Each PTAC consists of an outdoor air mixer, direct expansion (DX) cooling coil, heating coil (gas, electric, hot water, or steam) and a supply air fan. While the figure below shows the PTAC with draw through fan placement, blow through fan placement can also be modeled by positioning the supply air fan between the outdoor air mixer and the DX cooling coil. The packaged terminal air conditioner coordinates the operation of these components and is modeled as a type of zone equipment (Ref. ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections).
 
-![PTAC\_Drawthrough](InputOutputReference/media/image284.png)
+![PTAC\_Drawthrough](media/image284.png)
 
 Figure 111.  Schematic of a packaged terminal air conditioner with draw through fan placement
 
@@ -8764,7 +8767,7 @@ This is the availability status of the packaged terminal air conditioner fan. Th
 
 The packaged terminal heat pump (PTHP) is a compound object made up of other components. Each PTHP consists of an outdoor air mixer, direct expansion (DX) cooling coil, DX heating coil, supply air fan, and a supplemental heating coil as shown in the figure below. These individual components are described elsewhere in this document. The packaged terminal heat pump coordinates the operation of these components and is modeled as a type of zone equipment (Ref. ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections).
 
-![PTPFigure](InputOutputReference/media/image285.png)
+![PTPFigure](media/image285.png)
 
 Figure 112. Schematic of a packaged terminal heat pump (draw through fan placement)
 
@@ -9212,7 +9215,7 @@ For this zone heat pump,there are two types of WaterToAirHeatPump coil model all
 
 * Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit
 
-![Schematic\_ZoneWSHP](InputOutputReference/media/image288.png)
+![Schematic\_ZoneWSHP](media/image288.png)
 
 Figure 113. Zone Water to Air Heat Pump Schematic for a DrawThrough Configuration with Ground Heat Exchanger
 
@@ -9294,19 +9297,19 @@ This alpha field contains the identifying name given to the WaterToAirHeatPump c
 
 This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50% run time fraction. Suggested values are shown below (Henderson et al. 1999):
 
-![](InputOutputReference/media/image289.svg)
+![](media/image289.svg)
 
 #### Field: Heat Pump Time Constant
 
 This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown below (Henderson et al. 1999):
 
-![](InputOutputReference/media/image290.svg)
+![](media/image290.svg)
 
 #### Field: Fraction of On-Cycle Power Use
 
 This numeric field contains the fraction of on-cycle power use to adjust the part load fraction based on the off-cycle power consumption due to crankcase heaters, controls, fans, and etc. Suggested value values are below (Henderson et al. 1999):
 
-![](InputOutputReference/media/image291.svg)
+![](media/image291.svg)
 
 #### Field: Heat Pump Fan Delay Time
 
@@ -9607,7 +9610,7 @@ This is the availability status of the zone water source heat pump  fan. This s
 
 This object can be used for modeling conventional mechanical dehumidifiers. These systems use a direct expansion (DX) cooling coil to cool and dehumidify an airstream. Heat from the DX system’s condenser section is rejected into the cool/dehumidified airstream, resulting in warm dry air being supplied from the unit. In EnergyPlus, this object is modeled as a type of zone equipment (ref. ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections).
 
-![Dehumidifier\_Schematic](InputOutputReference/media/image292.png)
+![Dehumidifier\_Schematic](media/image292.png)
 
 Figure 114. Schematic of a mechanical dehumidifier
 
@@ -9800,7 +9803,7 @@ The ZoneHVAC:EnergyRecoveryVentilator - stand alone energy recovery ventilator (
 
 An optional controller (see object ZoneHVAC:EnergyRecoveryVentilator:Controller) may be used to simulate economizer (free cooling) operation, modify air flow rates based on high indoor humidity, or simulate a “push-button” type economizer controller.
 
-![Schematic\_StandAloneERV](InputOutputReference/media/image293.png)
+![Schematic\_StandAloneERV](media/image293.png)
 
 Figure 115. ZoneHVAC:EnergyRecoveryVentilator compound object Schematic
 
@@ -10656,7 +10659,7 @@ The AirloopHVAC:UnitarySystem object is intended to replace all other air loop e
 
 The AirLoopHVAC:UnitarySystem object is a “virtual” component that consists of a fan component (OnOff, ConstantVolume, or VariableVolume), a cooling coil component, a heating coil component, and a reheat coil as shown in Figure 117. When a draw through configuration is desired, the fan is placed directly after the heating coil. If dehumidification control is selected, a reheat coil component is also required. If the reheat coil is present and the dehumidification control type input is not specified as CoolReheat, the reheat coil will not be active.  All of the fan and coil components are optional which allows the AirLoopHVAC:UnitarySystem object to be configured for heating-only, cooling-only, or both heating and cooling.  It may also be applied without a fan, controlling one or more coils, similar to the function of CoilSystem:Cooling:DX.
 
-![](InputOutputReference/media/image294.png)
+![](media/image294.png)
 
 Figure 1. Schematic of the EnergyPlus Unitary System
 
@@ -10900,19 +10903,19 @@ This alpha field specifies the name of the outdoor node which controls the opera
 
 This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50% run time fraction. Suggested values are shown below (Henderson et al. 1999):
 
-![](InputOutputReference/media/image295.svg)
+![](media/image295.svg)
 
 #### Field: Heat Pump Time Constant
 
 This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown below (Henderson et al. 1999):
 
-![](InputOutputReference/media/image296.svg)
+![](media/image296.svg)
 
 #### Field: Fraction of On-Cycle Power Use
 
 This numeric field contains the fraction of on-cycle power use to adjust the part load fraction based on the off-cycle power consumption due to crankcase heaters, controls, fans, and etc. Suggested value values are below (Henderson et al. 1999):
 
-![](InputOutputReference/media/image297.svg)
+![](media/image297.svg)
 
 #### Field: Heat Pump Fan Delay Time
 
@@ -11237,7 +11240,7 @@ This numeric field defines the ratio of supply air flow rate leaving the unitary
 
 The heat/cool furnace is a “virtual” component that consists of a fan component (OnOff or ConstantVolume), a DX cooling coil component, and a Gas or Electric heating coil component. The blow through furnace configuration is shown in Figure 116 below. When a draw through furnace configuration is desired, the fan is placed directly after the heating coil. If the dehumidification control type is specified as CoolReheat, a reheat coil component is also required. If the reheat coil is present and the dehumidification control type input is not specified as CoolReheat, the reheat coil will not be active,
 
-![FurnaceSchematic\_BlowThru](InputOutputReference/media/image298.png)
+![FurnaceSchematic\_BlowThru](media/image298.png)
 
 Figure 116. Schematic of EnergyPlus Heat/Cool Furnace
 
@@ -11465,7 +11468,7 @@ Unitary System Compressor Part Load Ratio []
 
 The AirLoopHVAC:UnitaryHeatCool object is the identical model to the AirLoopHAVC:Unitary:Furnace:HeatCool object. The heat/cool unitary system is a “virtual” component that consists of a fan component (OnOff or ConstantVolume), a DX cooling coil component and a Gas or Electric heating coil component as shown in Figure 117. When a draw through configuration is desired, the fan is placed directly after the heating coil. If dehumidification control is selected, a reheat coil component is also required. If the reheat coil is present and the dehumidification control type input is not specified as CoolReheat, the reheat coil will not be active,
 
-![FurnaceSchematic\_Unitary\_BlowThru](InputOutputReference/media/image299.png)
+![FurnaceSchematic\_Unitary\_BlowThru](media/image299.png)
 
 Figure 117. Schematic of Blow Through Heat/Cool Unitary System
 
@@ -11698,7 +11701,7 @@ This output variable is the ratio of the sensible cooling load to the steady-sta
 
 The unitary air-to-air heat pump is a “virtual” component that consists of a fan component (OnOff or ConstantVolume), a DX cooling coil component, a DX heating coil component, and a Gas or Electric supplementary heating coil component as shown in the Figure below.
 
- ![FurnaceSchematic\_HeatPump](InputOutputReference/media/image300.png)
+ ![FurnaceSchematic\_HeatPump](media/image300.png)
 
 Figure 118. Schematic of EnergyPlus Unitary Air-to-Air Heat Pump (Blow Through Configuration)
 
@@ -11959,7 +11962,7 @@ Links to the fan, DX multispeed cooling coil, DX multispeed heating coil, and su
 
 If the ZoneControl:Thermostat:StagedDualSetpoint object and other zone control thermostat and humidistat are assigned to the same controlled zone in the Controlling Zone or Thermostat Location field, the ZoneControl:Thermostat:StagedDualSetpoint object takes precedence and the stage number provided by the the ZoneControl:Thermostat:StagedDualSetpoint object is used to set the speed number.
 
-![FurnaceSchematic\_BlowThru\_Multispeed](InputOutputReference/media/image301.png)
+![FurnaceSchematic\_BlowThru\_Multispeed](media/image301.png)
 
 Figure 119. Schematic of EnergyPlus Unitary Air-to-Air Multi Speed Heat Pump
 
@@ -12476,7 +12479,7 @@ For multispeed heat pumps with heat recovery, these outputs are the recoverable 
 
 The EnergyPlus furnace is a “virtual” component that consists of a fan component  (OnOff or ConstantVolume) and a Gas or Electric heating coil component. The blow through furnace configuration is shown in the Figure below.
 
-![](InputOutputReference/media/image302.svg)
+![](media/image302.svg)
 
 Figure 120. Schematic of Blow Through Furnace Model
 
@@ -12640,7 +12643,7 @@ This output variable is the ratio of actual air mass flow rate through the furna
 
 The AirLoopHVAC:UnitaryHeatOnly is identical to the AirLoopHVAC:Unitary:Furnace:HeatOnly model. The heat-only unitary system is a “virtual” component that consists of a fan component (OnOff or ConstantVolume) and a Gas or Electric heating coil component. The blow through unitary system configuraion is shown in the Figure below.
 
-![](InputOutputReference/media/image303.svg)
+![](media/image303.svg)
 
 Figure 121. Schematic of Blow Through Heat-Only Unitary System
 
@@ -12817,7 +12820,7 @@ There are three type of WaterToAirHeatPump coil models available:
 
 * Coil:Heating:WatertoAirHeatPump:VariableSpeedEquationFit
 
-![FurnaceSchematic\_WSHP](InputOutputReference/media/image304.png)
+![FurnaceSchematic\_WSHP](media/image304.png)
 
 Figure 122. Water to Air Heat Pump Schematic for a BlowThrough Configuration with Ground Heat Exchanger
 
@@ -12895,19 +12898,19 @@ This numeric value allows the user to determine how close the air side has to be
 
 This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50% run time fraction. Suggested values are shown below (Henderson et al. 1999):
 
-![](InputOutputReference/media/image305.svg)
+![](media/image305.svg)
 
 #### Field: Heat Pump Time Constant
 
 This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown below (Henderson et al. 1999):
 
-![](InputOutputReference/media/image306.svg)
+![](media/image306.svg)
 
 #### Field: Fraction of On-Cycle Power Use
 
 This numeric field contains the fraction of on-cycle power use to adjust the part load fraction based on the off-cycle power consumption due to crankcase heaters, controls, fans, and etc. Suggested value values are below (Henderson et al. 1999):
 
-![](InputOutputReference/media/image307.svg)
+![](media/image307.svg)
 
 #### Field: Heat Pump Fan Delay Time
 
@@ -13214,11 +13217,11 @@ This output variable is the additional heating demand rate of the supplemental h
 
 The changeover-bypass variable air volume (CBVAV) unitary system is a compound object made up of other components. Each CBVAV system consists of an outdoor air mixer, direct expansion (DX) cooling coil, heating coil, and a supply air fan as shown in the figures below. Zone thermostats and terminal units are required in each zone served by this system. The terminal units are specific to this system type and are either AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat or AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat. A zone humidistat and single zone max humidity set point manager may also be specified to help control high humidity levels. These individual components are described elsewhere in this document. The CBVAV unitary system object coordinates the operation of these components and is modeled as a type of air loop equipment (Ref. AirLoopHVAC).
 
-![DrawthruCBVAV](InputOutputReference/media/image308.png)
+![DrawthruCBVAV](media/image308.png)
 
 Figure 123. Schematic of a CBVAV unitary system (draw through fan placement)
 
-![BlowthruCBVAV](InputOutputReference/media/image309.png)
+![BlowthruCBVAV](media/image309.png)
 
 Figure 124. Schematic of a CBVAV unitary system (blow through fan placement)
 
@@ -13632,13 +13635,13 @@ This model simulates a variable-refrigerant-flow (or variable-refrigerant-volume
 
 The following schematic demonstrates these connection rules.
 
-![VRFSchematic](InputOutputReference/media/image310.png)
+![VRFSchematic](media/image310.png)
 
 Figure 125. Variable Refrigerant Flow Schematic
 
 Energyplus object type and object name, and node name relationships are also shown in the following figure to aid in the assembly of this HVAC system type.
 
-![VRFObjects](InputOutputReference/media/image311.png)
+![VRFObjects](media/image311.png)
 
 Figure 126. Variable Refrigerant Flow Object Links
 
@@ -14319,7 +14322,7 @@ This output applies only when heat recovery is used and represents the multiplie
 
 The zone terminal unit list defines the names of the terminal units connected to a single variable refrigerant flow air-conditioning system. The zone terminal unit list is used exclusively in the variable refrigerant flow (VRF) air conditioner object (ref: AirConditioner:VariableRefrigerantFlow). Up to 20 terminal units may be connected to a single VRF outdoor condensing unit. This list is extensible if additional indoor terminal units are required. The name of this zone terminal unit list object is then input into the corresponding variable refrigerant flow air conditioner object. The following figure demonstrates this concept.
 
-![ZoneTUObjectSchematic](InputOutputReference/media/image313.png)
+![ZoneTUObjectSchematic](media/image313.png)
 
 Figure 127. Zone Terminal Unit List Diagram
 
@@ -15869,7 +15872,7 @@ This field reports the amount of electric energy “burned” in a high temperat
 
 Ventilated slab systems in general use outdoor air to “precool” slabs with colder nighttime air.  This method of precooling the thermal mass of a space can be very effective when nighttime temperatures are low and the mass of the system is high enough to provide a significant amount of cooling potential during the day to counteract internal heat gains within a zone.  Nearly all ventilated slabs are simple systems such as that shown in the right side of Figure 128.  The fan is shown in a blow through position, but the model will allow either a blow or draw through configuration.
 
-![f102\_jpeg](InputOutputReference/media/image321.png)
+![f102\_jpeg](media/image321.png)
 
 Figure 128. Ventilated Slab model - basic system
 
@@ -15881,7 +15884,7 @@ This field is a unique user assigned name for an instance of a ventilated slab s
 
 This field is the name of the schedule (ref: Schedule) that denotes whether the ventilated slab system can run during a given time period. A schedule value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for that time period. A value greater than 0 (usually 1 is used) denotes that the unit is available to operate during that time period. If this field is left blank, the schedule has a value of 1 for all time periods.
 
-![Presentation1](InputOutputReference/media/image322.png)
+![Presentation1](media/image322.png)
 
 Figure 129. Example operating schedule for Ventilated Slab
 
@@ -16448,13 +16451,13 @@ When the condenser type is “EvaporativelyCooled”, this field specifies the e
 
 where:
 
-<span>${T_{effective}}$</span>       = effective dry-bulb temperature of air entering the condenser cooling coil (°C)
+<span>\({T_{effective}}\)</span>       = effective dry-bulb temperature of air entering the condenser cooling coil (°C)
 
-<span>${T_{owb}}$</span>           = outdoor air wet-bulb temperature (°C)
+<span>\({T_{owb}}\)</span>           = outdoor air wet-bulb temperature (°C)
 
-<span>${T_{odb}}$</span>           = outdoor air dry-bulb temperature (°C)
+<span>\({T_{odb}}\)</span>           = outdoor air dry-bulb temperature (°C)
 
-<span>$\varepsilon $</span>               = evaporative condenser effectiveness.
+<span>\(\varepsilon \)</span>               = evaporative condenser effectiveness.
 
 The resulting condenser inlet air temperature is used by the Compressor Rack COP as a Function of Temperature Curve and the Condenser Fan Power as a Function of Temperature Curve. The default value for this field is 0.9, although valid entries can range from 0.0 to 1.0.
 
