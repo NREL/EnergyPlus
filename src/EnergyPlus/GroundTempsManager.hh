@@ -123,6 +123,9 @@ namespace GroundTemps {
 		Array1D< cell > cellArray;
 
 		void
+		getWeatherData();
+
+		void
 		initModel();
 
 		void
