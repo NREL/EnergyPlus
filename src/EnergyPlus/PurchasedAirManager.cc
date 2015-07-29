@@ -197,7 +197,7 @@ namespace PurchasedAirManager {
 
 		// Find the correct PurchasedAir Equipment
 		if ( CompIndex == 0 ) {
-			PurchAirNum = FindItemInList( PurchAirName, PurchAir.Name(), NumPurchAir );
+			PurchAirNum = FindItemInList( PurchAirName, PurchAir );
 			if ( PurchAirNum == 0 ) {
 				ShowFatalError( "SimPurchasedAir: Unit not found=" + PurchAirName );
 			}
@@ -260,7 +260,6 @@ namespace PurchasedAirManager {
 		using namespace DataLoopNode;
 		using namespace DataIPShortCuts;
 		using DataSizing::OARequirements; // to find DesignSpecification:OutdoorAir pointer
-		using DataSizing::NumOARequirements;
 		using DataContaminantBalance::Contaminant;
 		using DataSizing::NumZoneHVACSizing;
 		using DataSizing::ZoneHVACSizing;
@@ -315,7 +314,7 @@ namespace PurchasedAirManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), PurchAir.Name(), PurchAirNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), PurchAir, PurchAirNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -473,7 +472,7 @@ namespace PurchasedAirManager {
 
 				// get Design specification outdoor air object
 				if ( ! lAlphaFieldBlanks( 11 ) ) {
-					PurchAir( PurchAirNum ).OARequirementsPtr = FindItemInList( cAlphaArgs( 11 ), OARequirements.Name(), NumOARequirements );
+					PurchAir( PurchAirNum ).OARequirementsPtr = FindItemInList( cAlphaArgs( 11 ), OARequirements );
 					if ( PurchAir( PurchAirNum ).OARequirementsPtr == 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid data" );
 						ShowContinueError( "Invalid-not found" + cAlphaFieldNames( 11 ) + "=\"" + cAlphaArgs( 11 ) + "\"." );
@@ -578,7 +577,7 @@ namespace PurchasedAirManager {
 
 				PurchAir( PurchAirNum ).HVACSizingIndex = 0;
 				if ( ! lAlphaFieldBlanks( 16 ) ) {
-					PurchAir(PurchAirNum).HVACSizingIndex = FindItemInList(cAlphaArgs(16), ZoneHVACSizing.Name(), NumZoneHVACSizing);
+					PurchAir(PurchAirNum).HVACSizingIndex = FindItemInList( cAlphaArgs( 16 ), ZoneHVACSizing );
 					if ( PurchAir(PurchAirNum).HVACSizingIndex == 0 ) {
 						ShowSevereError( cAlphaFieldNames( 16 ) + " = " + cAlphaArgs( 16 ) + " not found.");
 						ShowContinueError( "Occurs in " + cCurrentModuleObject + " = " + PurchAir( PurchAirNum ).Name);

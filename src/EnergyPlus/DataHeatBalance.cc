@@ -1449,7 +1449,7 @@ namespace DataHeatBalance {
 
 		// maybe it's already there
 		errFlag = false;
-		Found = FindItemInList( "~" + Blind( inBlindNumber ).Name, Blind.Name(), TotBlinds );
+		Found = FindItemInList( "~" + Blind( inBlindNumber ).Name, Blind );
 		if ( Found == 0 ) {
 			// Add a new blind
 			Blind.redimension( ++TotBlinds );

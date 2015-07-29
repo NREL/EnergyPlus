@@ -168,7 +168,7 @@ namespace ZoneDehumidifier {
 
 		// Find the correct zone dehumidifier
 		if ( CompIndex == 0 ) {
-			ZoneDehumidNum = FindItemInList( CompName, ZoneDehumid.Name(), NumDehumidifiers );
+			ZoneDehumidNum = FindItemInList( CompName, ZoneDehumid );
 			if ( ZoneDehumidNum == 0 ) {
 				ShowFatalError( "SimZoneDehumidifier: Unit not found= " + CompName );
 			}
@@ -285,7 +285,7 @@ namespace ZoneDehumidifier {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), ZoneDehumid.Name(), ZoneDehumidIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), ZoneDehumid, ZoneDehumidIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";

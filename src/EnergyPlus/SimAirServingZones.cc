@@ -508,7 +508,7 @@ namespace SimAirServingZones {
 			// Data connecting the air system to the zone equioment goes into AirToZoneNodeInfo (in DataLoopNode).
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PrimaryAirSystem.Name(), AirSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PrimaryAirSystem, AirSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -537,7 +537,7 @@ namespace SimAirServingZones {
 			AirToZoneNodeInfo( AirSysNum ).AirLoopReturnNodeNum( 1 ) = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
 			AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum( 1 ) = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 			// work on unique nodes
-			test = FindItemInList( Alphas( 6 ), TestUniqueNodes.NodeName(), TestUniqueNodesNum );
+			test = FindItemInList( Alphas( 6 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
 			if ( test == 0 ) {
 				++TestUniqueNodesNum;
 				TestUniqueNodes( TestUniqueNodesNum ).NodeName = Alphas( 6 );
@@ -550,7 +550,7 @@ namespace SimAirServingZones {
 				ShowContinueError( "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes( test ).AirLoopName + "\" for " + TestUniqueNodes( test ).FieldName );
 				ErrorsFound = true;
 			}
-			test = FindItemInList( Alphas( 7 ), TestUniqueNodes.NodeName(), TestUniqueNodesNum );
+			test = FindItemInList( Alphas( 7 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
 			if ( test == 0 ) {
 				++TestUniqueNodesNum;
 				TestUniqueNodes( TestUniqueNodesNum ).NodeName = Alphas( 7 );
@@ -563,7 +563,7 @@ namespace SimAirServingZones {
 				ShowContinueError( "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes( test ).AirLoopName + "\" for " + TestUniqueNodes( test ).FieldName );
 				ErrorsFound = true;
 			}
-			test = FindItemInList( Alphas( 8 ), TestUniqueNodes.NodeName(), TestUniqueNodesNum );
+			test = FindItemInList( Alphas( 8 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
 			if ( test == 0 ) {
 				++TestUniqueNodesNum;
 				TestUniqueNodes( TestUniqueNodesNum ).NodeName = Alphas( 8 );
@@ -576,7 +576,7 @@ namespace SimAirServingZones {
 				ShowContinueError( "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes( test ).AirLoopName + "\" for " + TestUniqueNodes( test ).FieldName );
 				ErrorsFound = true;
 			}
-			test = FindItemInList( Alphas( 9 ), TestUniqueNodes.NodeName(), TestUniqueNodesNum );
+			test = FindItemInList( Alphas( 9 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
 			if ( test == 0 ) {
 				++TestUniqueNodesNum;
 				TestUniqueNodes( TestUniqueNodesNum ).NodeName = Alphas( 9 );
@@ -1280,13 +1280,13 @@ namespace SimAirServingZones {
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::StdRhoAir;
 		using SplitterComponent::SplitterCond;
-		using SplitterComponent::NumSplitters;
+		using SplitterComponent::SplitterConditions;
 		using InputProcessor::FindItemInList;
 		using InputProcessor::SameString;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using ZonePlenum::ZoneSupPlenCond;
-		using ZonePlenum::NumZoneSupplyPlenums;
+		using ZonePlenum::ZoneSupplyPlenumConditions;
 		using DataConvergParams::HVACFlowRateToler;
 		using DataConvergParams::AirLoopConvergence;
 		using DataConvergParams::ZoneInletConvergence;
@@ -1407,7 +1407,7 @@ namespace SimAirServingZones {
 				// all nodes (including duplicates)
 				for ( CompNum = 1; CompNum <= SupplyAirPath( SupAirPath ).NumOfComponents; ++CompNum ) {
 					if ( SameString( SupplyAirPath( SupAirPath ).ComponentType( CompNum ), "AirLoopHVAC:ZoneSplitter" ) ) {
-						SplitterNum = FindItemInList( SupplyAirPath( SupAirPath ).ComponentName( CompNum ), SplitterCond.SplitterName(), NumSplitters );
+						SplitterNum = FindItemInList( SupplyAirPath( SupAirPath ).ComponentName( CompNum ), SplitterCond, &SplitterConditions::SplitterName );
 						if ( SplitterNum == 0 ) {
 							ShowSevereError( "AirLoopHVAC:ZoneSplitter not found=" + SupplyAirPath( SupAirPath ).ComponentName( CompNum ) );
 							ShowContinueError( "Occurs in AirLoopHVAC:SupplyPath=" + SupplyAirPath( SupAirPath ).Name );
@@ -1416,7 +1416,7 @@ namespace SimAirServingZones {
 						SupplyAirPath( SupAirPath ).SplitterIndex( CompNum ) = SplitterNum;
 						NumAllSupAirPathNodes += SplitterCond( SplitterNum ).NumOutletNodes + 1;
 					} else if ( SameString( SupplyAirPath( SupAirPath ).ComponentType( CompNum ), "AirLoopHVAC:SupplyPlenum" ) ) {
-						PlenumNum = FindItemInList( SupplyAirPath( SupAirPath ).ComponentName( CompNum ), ZoneSupPlenCond.ZonePlenumName(), NumZoneSupplyPlenums );
+						PlenumNum = FindItemInList( SupplyAirPath( SupAirPath ).ComponentName( CompNum ), ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName );
 						if ( PlenumNum == 0 ) {
 							ShowSevereError( "AirLoopHVAC:SupplyPlenum not found=" + SupplyAirPath( SupAirPath ).ComponentName( CompNum ) );
 							ShowContinueError( "Occurs in AirLoopHVAC:SupplyPath=" + SupplyAirPath( SupAirPath ).Name );
@@ -3510,7 +3510,7 @@ namespace SimAirServingZones {
 		}
 
 		for ( SysSizIndex = 1; SysSizIndex <= NumSysSizInput; ++SysSizIndex ) {
-			PrimAirIndex = FindItemInList( SysSizInput( SysSizIndex ).AirPriLoopName, PrimaryAirSystem.Name(), NumPrimaryAirSys );
+			PrimAirIndex = FindItemInList( SysSizInput( SysSizIndex ).AirPriLoopName, PrimaryAirSystem );
 			if ( PrimAirIndex == 0 ) {
 				ShowSevereError( "Sizing:System: " + SysSizInput( SysSizIndex ).AirPriLoopName + " references unknown AirLoopHVAC" );
 				ErrorsFound = true;
@@ -3532,7 +3532,7 @@ namespace SimAirServingZones {
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 
 				SysSizing( DesDayEnvrnNum, AirLoopNum ).AirPriLoopName = PrimaryAirSystem( AirLoopNum ).Name;
-				SysSizNum = FindItemInList( SysSizing( DesDayEnvrnNum, AirLoopNum ).AirPriLoopName, SysSizInput.AirPriLoopName(), NumSysSizInput );
+				SysSizNum = FindItemInList( SysSizing( DesDayEnvrnNum, AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
 				if ( SysSizNum > 0 ) { // move data from system sizing input
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).LoadSizeType = SysSizInput( SysSizNum ).LoadSizeType;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolingPeakLoadType = SysSizInput( SysSizNum ).CoolingPeakLoadType;
@@ -3612,7 +3612,7 @@ namespace SimAirServingZones {
 
 			FinalSysSizing( AirLoopNum ).AirPriLoopName = PrimaryAirSystem( AirLoopNum ).Name;
 			CalcSysSizing( AirLoopNum ).AirPriLoopName = PrimaryAirSystem( AirLoopNum ).Name;
-			SysSizNum = FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput.AirPriLoopName(), NumSysSizInput );
+			SysSizNum = FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
 			if ( SysSizNum > 0 ) { // move data from system sizing input
 				FinalSysSizing( AirLoopNum ).LoadSizeType = SysSizInput( SysSizNum ).LoadSizeType;
 				FinalSysSizing( AirLoopNum ).CoolingPeakLoadType = SysSizInput( SysSizNum ).CoolingPeakLoadType;
@@ -3900,7 +3900,7 @@ namespace SimAirServingZones {
 			PeakPeople = 0.0;
 			ClgSupplyAirAdjustFactor = 1.0;
 			HtgSupplyAirAdjustFactor = 1.0;
-			SysSizNum = FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput.AirPriLoopName(), NumSysSizInput );
+			SysSizNum = FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
 			if ( SysSizNum == 0 ) SysSizNum = 1; // use first when none applicable
 			if ( FinalSysSizing( AirLoopNum ).OAAutoSized ) {
 				NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;

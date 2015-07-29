@@ -515,19 +515,19 @@ namespace HeatBalanceAirManager {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ZoneAirBalance.Name(), Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ZoneAirBalance, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			ZoneAirBalance( Loop ).Name = cAlphaArgs( 1 );
 			ZoneAirBalance( Loop ).ZoneName = cAlphaArgs( 2 );
-			ZoneAirBalance( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			ZoneAirBalance( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneAirBalance( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
 			}
-			VerifyName( cAlphaArgs( 2 ), ZoneAirBalance.ZoneName(), Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 2 ), ZoneAirBalance, &ZoneAirBalanceData::ZoneName, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", a duplicated object " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" is found." );
 				ShowContinueError( "A zone can only have one " + cCurrentModuleObject + " object." );
@@ -610,16 +610,16 @@ namespace HeatBalanceAirManager {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), InfiltrationObjects.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), InfiltrationObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				errFlag = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			InfiltrationObjects( Item ).Name = cAlphaArgs( 1 );
-			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList.Name(), NumOfZoneLists );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				InfiltrationObjects( Item ).StartPtr = TotDesignFlowInfiltration + 1;
 				++TotDesignFlowInfiltration;
@@ -811,14 +811,14 @@ namespace HeatBalanceAirManager {
 			IsNotOK = false;
 			IsBlank = false;
 			++InfiltCount;
-			VerifyName( cAlphaArgs( 1 ), Infiltration.Name(), InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Infiltration, InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationShermanGrimsrud;
-			Infiltration( InfiltCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Infiltration( InfiltCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Infiltration( InfiltCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -865,14 +865,14 @@ namespace HeatBalanceAirManager {
 			IsNotOK = false;
 			IsBlank = false;
 			++InfiltCount;
-			VerifyName( cAlphaArgs( 1 ), Infiltration.Name(), InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Infiltration, InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationAIM2;
-			Infiltration( InfiltCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Infiltration( InfiltCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Infiltration( InfiltCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -961,7 +961,7 @@ namespace HeatBalanceAirManager {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), VentilationObjects.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), VentilationObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				errFlag = true;
@@ -969,9 +969,9 @@ namespace HeatBalanceAirManager {
 			}
 			VentilationObjects( Item ).Name = cAlphaArgs( 1 );
 
-			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList.Name(), NumOfZoneLists );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				VentilationObjects( Item ).StartPtr = TotDesignFlowVentilation + 1;
 				++TotDesignFlowVentilation;
@@ -1405,7 +1405,7 @@ namespace HeatBalanceAirManager {
 			IsNotOK = false;
 			IsBlank = false;
 			VentiCount = TotDesignFlowVentilation + Loop;
-			VerifyName( cAlphaArgs( 1 ), Ventilation.Name(), VentiCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Ventilation, VentiCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1413,7 +1413,7 @@ namespace HeatBalanceAirManager {
 			Ventilation( VentiCount ).Name = cAlphaArgs( 1 );
 			Ventilation( VentiCount ).ModelType = VentilationWindAndStack;
 
-			Ventilation( VentiCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Ventilation( VentiCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Ventilation( VentiCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -1662,14 +1662,14 @@ namespace HeatBalanceAirManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Mixing.Name(), Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Mixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			Mixing( Loop ).Name = cAlphaArgs( 1 );
 
-			Mixing( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Mixing( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Mixing( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -1747,7 +1747,7 @@ namespace HeatBalanceAirManager {
 				ErrorsFound = true;
 			}}
 
-			Mixing( Loop ).FromZone = FindItemInList( cAlphaArgs( 5 ), Zone.Name(), NumOfZones );
+			Mixing( Loop ).FromZone = FindItemInList( cAlphaArgs( 5 ), Zone );
 			if ( Mixing( Loop ).FromZone == 0 ) {
 				ShowSevereError( RoutineName + cAlphaFieldNames( 5 ) + " not found=" + cAlphaArgs( 5 ) + " for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
@@ -2011,7 +2011,7 @@ namespace HeatBalanceAirManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), CrossMixing.Name(), Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), CrossMixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -2019,7 +2019,7 @@ namespace HeatBalanceAirManager {
 			}
 			CrossMixing( Loop ).Name = cAlphaArgs( 1 );
 
-			CrossMixing( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			CrossMixing( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( CrossMixing( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -2096,7 +2096,7 @@ namespace HeatBalanceAirManager {
 				ErrorsFound = true;
 			}}
 
-			CrossMixing( Loop ).FromZone = FindItemInList( cAlphaArgs( 5 ), Zone.Name(), NumOfZones );
+			CrossMixing( Loop ).FromZone = FindItemInList( cAlphaArgs( 5 ), Zone );
 			if ( CrossMixing( Loop ).FromZone == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 				ErrorsFound = true;
@@ -2301,7 +2301,7 @@ namespace HeatBalanceAirManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), RefDoorMixing.Name(), Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), RefDoorMixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2309,14 +2309,14 @@ namespace HeatBalanceAirManager {
 				NameThisObject = cAlphaArgs( 1 );
 
 				AlphaNum = 2;
-				Zone1Num = FindItemInList( cAlphaArgs( AlphaNum ), Zone.Name(), NumOfZones );
+				Zone1Num = FindItemInList( cAlphaArgs( AlphaNum ), Zone );
 				if ( Zone1Num == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( AlphaNum ) + "=\"" + cAlphaArgs( AlphaNum ) + "\"." );
 					ErrorsFound = true;
 				}
 
 				++AlphaNum; //3
-				Zone2Num = FindItemInList( cAlphaArgs( AlphaNum ), Zone.Name(), NumOfZones );
+				Zone2Num = FindItemInList( cAlphaArgs( AlphaNum ), Zone );
 				if ( Zone2Num == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( AlphaNum ) + "=\"" + cAlphaArgs( AlphaNum ) + "\"." );
 					ErrorsFound = true;
@@ -2837,7 +2837,7 @@ namespace HeatBalanceAirManager {
 
 		for ( AirModelNum = 1; AirModelNum <= NumOfAirModels; ++AirModelNum ) {
 			GetObjectItem( cCurrentModuleObject, AirModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
-			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneNum != 0 ) {
 				if ( ! AirModel( ZoneNum ).AirModelName.empty() ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );

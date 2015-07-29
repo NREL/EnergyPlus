@@ -237,7 +237,7 @@ namespace CondenserLoopTowers {
 
 		// Find the correct CoolingTower
 		if ( CompIndex == 0 ) {
-			TowerNum = FindItemInList( TowerName, SimpleTower.Name(), NumSimpleTowers );
+			TowerNum = FindItemInList( TowerName, SimpleTower );
 			if ( TowerNum == 0 ) {
 				ShowFatalError( "SimTowers: Unit not found=" + TowerName );
 			}
@@ -464,7 +464,7 @@ namespace CondenserLoopTowers {
 			GetObjectItem( cCurrentModuleObject, SingleSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleTower.Name(), TowerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), SimpleTower, TowerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -752,7 +752,7 @@ namespace CondenserLoopTowers {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleTower.Name(), TowerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), SimpleTower, TowerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1068,7 +1068,7 @@ namespace CondenserLoopTowers {
 			GetObjectItem( cCurrentModuleObject, VariableSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleTower.Name(), TowerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), SimpleTower, TowerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1670,7 +1670,7 @@ namespace CondenserLoopTowers {
 			GetObjectItem( cCurrentModuleObject, MerkelVSTowerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleTower.Name(), TowerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), SimpleTower, TowerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";

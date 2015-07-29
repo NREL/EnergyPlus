@@ -158,7 +158,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			CompNum = FindItemInList( EquipName, FluidHX.Name(), NumberOfPlantFluidHXs );
+			CompNum = FindItemInList( EquipName, FluidHX );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimFluidHeatExchanger: HeatExchanger:FluidToFluid not found" );
 			}
@@ -304,7 +304,7 @@ namespace PlantHeatExchangerFluidToFluid {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), FluidHX.Name(), CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), FluidHX, CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";

@@ -122,7 +122,7 @@ namespace HVACDuct {
 
 		// Get the duct component index
 		if ( CompIndex == 0 ) {
-			DuctNum = FindItemInList( CompName, Duct.Name(), NumDucts );
+			DuctNum = FindItemInList( CompName, Duct );
 			if ( DuctNum == 0 ) {
 				ShowFatalError( "SimDuct: Component not found=" + CompName );
 			}
@@ -209,7 +209,7 @@ namespace HVACDuct {
 			GetObjectItem( cCurrentModuleObject, DuctNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Duct.Name(), DuctNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Duct, DuctNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";

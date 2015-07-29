@@ -160,7 +160,7 @@ namespace HVACCooledBeam {
 
 		// Get the  unit index
 		if ( CompIndex == 0 ) {
-			CBNum = FindItemInList( CompName, CoolBeam.Name(), NumCB );
+			CBNum = FindItemInList( CompName, CoolBeam );
 			if ( CBNum == 0 ) {
 				ShowFatalError( "SimCoolBeam: Cool Beam Unit not found=" + CompName );
 			}
@@ -294,7 +294,7 @@ namespace HVACCooledBeam {
 			CBNum = CBIndex;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), CoolBeam.Name(), CBNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), CoolBeam, CBNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";

@@ -754,13 +754,13 @@ namespace ZoneEquipmentManager {
 		static gio::Fmt Format_995( "(' Cooling Sizing Factor Information, Zone ',A,', ',G12.5)" );
 
 		for ( ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSizingInput; ++ZoneSizIndex ) {
-			ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, Zone.Name(), NumOfZones );
+			ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, Zone );
 			if ( ZoneIndex == 0 ) {
 				ShowSevereError( "SetUpZoneSizingArrays: Sizing:Zone=\"" + ZoneSizingInput( ZoneSizIndex ).ZoneName + "\" references unknown zone" );
 				ErrorsFound = true;
 			}
 			if ( any( ZoneEquipConfig.IsControlled() ) ) {
-				ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, ZoneEquipConfig.ZoneName(), NumOfZones );
+				ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 				if ( ZoneIndex == 0 ) {
 					if ( ! isPulseZoneSizing ) {
 						ShowWarningError( "SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + ZoneSizingInput( ZoneSizIndex ).ZoneName + "\", Zone is not found in the Controlled Zones List" );
@@ -826,7 +826,7 @@ namespace ZoneEquipmentManager {
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).SupplyAirNode = ZoneEquipConfig( CtrlZoneNum ).InletNode( 1 );
 				}
 				// For each Zone Sizing object, find the corresponding controlled zone
-				ZoneSizNum = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput.ZoneName(), NumZoneSizingInput );
+				ZoneSizNum = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 				if ( ZoneSizNum > 0 ) { // move data from zone sizing input
 					ZoneSizing( DesDayNum, CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnCoolDgnSAMethod;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).ZnHeatDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnHeatDgnSAMethod;
@@ -1019,7 +1019,7 @@ namespace ZoneEquipmentManager {
 			if ( ZoneEquipConfig( CtrlZoneNum ).NumInletNodes > 0 ) {
 				CalcFinalZoneSizing( CtrlZoneNum ).SupplyAirNode = ZoneEquipConfig( CtrlZoneNum ).InletNode( 1 );
 			}
-			ZoneSizNum = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput.ZoneName(), NumZoneSizingInput );
+			ZoneSizNum = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 			if ( ZoneSizNum > 0 ) { // move data from zone sizing input
 				FinalZoneSizing( CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnCoolDgnSAMethod;
 				FinalZoneSizing( CtrlZoneNum ).ZnHeatDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnHeatDgnSAMethod;

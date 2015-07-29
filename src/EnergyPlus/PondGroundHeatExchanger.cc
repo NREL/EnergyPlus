@@ -186,7 +186,7 @@ namespace PondGroundHeatExchanger {
 		}
 
 		if ( CompIndex == 0 ) {
-			PondGHENum = FindItemInList( CompName, PondGHE.Name(), NumOfPondGHEs );
+			PondGHENum = FindItemInList( CompName, PondGHE );
 			if ( PondGHENum == 0 ) {
 				ShowFatalError( "SimPondGroundHeatExchanger: Unit not found=" + CompName );
 			}

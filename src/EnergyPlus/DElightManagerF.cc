@@ -214,7 +214,7 @@ namespace DElightManagerF {
 			// Get the data items for the current DElight object
 			GetObjectItem( cModuleObjectDElight, iDElight, AlphaArrayDElight, NumAlphasDElight, RealNumArrayDElight, NumNumsDElight, IOSTAT );
 
-			int const izone = FindItemInList( AlphaArrayDElight( 2 ), Zone.Name(), NumOfZones );
+			int const izone = FindItemInList( AlphaArrayDElight( 2 ), Zone );
 			if ( izone == 0 ) {
 				ShowSevereError( "DElightInputGenerator: Illegal Zone Name=" + AlphaArrayDElight( 2 ) );
 				ShowContinueError( "..in Daylighting:DElight, User Supplied DElight Zone Name=" + AlphaArrayDElight( 1 ) );
@@ -313,7 +313,7 @@ namespace DElightManagerF {
 			// Get the data items for the current DElight object
 			GetObjectItem( cModuleObjectDElight, iDElight, AlphaArrayDElight, NumAlphasDElight, RealNumArrayDElight, NumNumsDElight, IOSTAT );
 
-			int const izone = FindItemInList( AlphaArrayDElight( 2 ), Zone.Name(), NumOfZones );
+			int const izone = FindItemInList( AlphaArrayDElight( 2 ), Zone );
 			if ( izone != 0 ) {
 
 				rLightLevel = GetDesignLightingLevelForZone( izone );

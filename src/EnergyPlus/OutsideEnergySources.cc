@@ -138,7 +138,7 @@ namespace OutsideEnergySources {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			EqNum = FindItemInList( EquipName, EnergySource.Name(), NumDistrictUnits );
+			EqNum = FindItemInList( EquipName, EnergySource );
 			if ( EqNum == 0 ) {
 				ShowFatalError( "SimOutsideEnergy: Unit not found=" + EquipName );
 			}
@@ -254,7 +254,7 @@ namespace OutsideEnergySources {
 			if ( EnergySourceNum > 1 ) {
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), EnergySource.Name(), EnergySourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), EnergySource, EnergySourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -317,7 +317,7 @@ namespace OutsideEnergySources {
 			if ( EnergySourceNum > 1 ) {
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), EnergySource.Name(), EnergySourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), EnergySource, EnergySourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";

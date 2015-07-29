@@ -123,7 +123,7 @@ namespace gio {
 		for ( auto const & s : fix_unit_streams_ ) {
 			if ( s.second == &stream ) return s.first;
 		}
-		return -1; // => No such name connected
+		return -1; // => No such stream connected
 	}
 
 	// Add an Input File Stream

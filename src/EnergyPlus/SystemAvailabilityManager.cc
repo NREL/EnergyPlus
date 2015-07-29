@@ -477,7 +477,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), SchedSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), SchedSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -511,7 +511,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), SchedOnSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), SchedOnSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -545,7 +545,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), SchedOffSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), SchedOffSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -580,7 +580,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), NCycSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), NCycSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -622,7 +622,7 @@ namespace SystemAvailabilityManager {
 				}}
 				if ( NCycSysAvailMgrData( SysAvailNum ).CtrlType == CycleOnControlZone ) {
 					NCycSysAvailMgrData( SysAvailNum ).CtrlZoneName = cAlphaArgs( 5 );
-					NCycSysAvailMgrData( SysAvailNum ).ZoneNum = FindItemInList( cAlphaArgs( 5 ), Zone.Name(), NumOfZones );
+					NCycSysAvailMgrData( SysAvailNum ).ZoneNum = FindItemInList( cAlphaArgs( 5 ), Zone );
 					if ( NCycSysAvailMgrData( SysAvailNum ).ZoneNum == 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid" );
 						ShowSevereError( "not found: " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
@@ -649,7 +649,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), OptStartSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), OptStartSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -688,7 +688,7 @@ namespace SystemAvailabilityManager {
 
 				if ( OptStartSysAvailMgrData( SysAvailNum ).CtrlType == ControlZone ) {
 					OptStartSysAvailMgrData( SysAvailNum ).CtrlZoneName = cAlphaArgs( 5 );
-					OptStartSysAvailMgrData( SysAvailNum ).ZoneNum = FindItemInList( cAlphaArgs( 5 ), Zone.Name(), NumOfZones );
+					OptStartSysAvailMgrData( SysAvailNum ).ZoneNum = FindItemInList( cAlphaArgs( 5 ), Zone );
 					if ( OptStartSysAvailMgrData( SysAvailNum ).ZoneNum == 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid" );
 						ShowSevereError( "not found: " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
@@ -707,7 +707,7 @@ namespace SystemAvailabilityManager {
 							}
 						}
 					}
-					OptStartSysAvailMgrData( SysAvailNum ).NumOfZones = FindItemInList( cAlphaArgs( 6 ), ZoneList.Name(), NumOfZoneLists );
+					OptStartSysAvailMgrData( SysAvailNum ).NumOfZones = FindItemInList( cAlphaArgs( 6 ), ZoneList );
 					if ( OptStartSysAvailMgrData( SysAvailNum ).NumOfZones == 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid" );
 						ShowSevereError( "not found: " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"." );
@@ -777,7 +777,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), DiffTSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), DiffTSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -822,7 +822,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), HiTurnOffSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), HiTurnOffSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -854,7 +854,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), HiTurnOnSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), HiTurnOnSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -886,7 +886,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), LoTurnOffSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), LoTurnOffSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -929,7 +929,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), LoTurnOnSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), LoTurnOnSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -961,7 +961,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), NVentSysAvailMgrData.Name(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), NVentSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -993,7 +993,7 @@ namespace SystemAvailabilityManager {
 				NVentSysAvailMgrData( SysAvailNum ).VentTempLowLim = rNumericArgs( 2 );
 				NVentSysAvailMgrData( SysAvailNum ).VentFlowFrac = rNumericArgs( 3 );
 				NVentSysAvailMgrData( SysAvailNum ).CtrlZoneName = cAlphaArgs( 5 );
-				NVentSysAvailMgrData( SysAvailNum ).ZoneNum = FindItemInList( cAlphaArgs( 5 ), Zone.Name(), NumOfZones );
+				NVentSysAvailMgrData( SysAvailNum ).ZoneNum = FindItemInList( cAlphaArgs( 5 ), Zone );
 				if ( NVentSysAvailMgrData( SysAvailNum ).ZoneNum == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid" );
 					ShowContinueError( "not found: " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
@@ -1102,7 +1102,7 @@ namespace SystemAvailabilityManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), SysAvailMgrListData.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), SysAvailMgrListData, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1201,7 +1201,7 @@ namespace SystemAvailabilityManager {
 		}
 
 		Found = 0;
-		if ( NumAvailManagerLists > 0 ) Found = FindItemInList( AvailabilityListName, SysAvailMgrListData.Name(), NumAvailManagerLists );
+		if ( NumAvailManagerLists > 0 ) Found = FindItemInList( AvailabilityListName, SysAvailMgrListData );
 
 		if ( Found != 0 ) {
 			PlantAvailMgr( Loop ).NumAvailManagers = SysAvailMgrListData( Found ).NumItems;
@@ -1304,7 +1304,7 @@ namespace SystemAvailabilityManager {
 		}
 
 		Found = 0;
-		if ( NumAvailManagerLists > 0 ) Found = FindItemInList( AvailabilityListName, SysAvailMgrListData.Name(), NumAvailManagerLists );
+		if ( NumAvailManagerLists > 0 ) Found = FindItemInList( AvailabilityListName, SysAvailMgrListData );
 
 		if ( Found != 0 ) {
 			PriAirSysAvailMgr( Loop ).NumAvailManagers = SysAvailMgrListData( Found ).NumItems;
@@ -1399,7 +1399,7 @@ namespace SystemAvailabilityManager {
 		if ( ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).Input ) { // when both air loop and zone eq avail managers are present, zone avail mngrs list name has not been read in first time through here (see end of if block)
 			AvailabilityListName = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).AvailManagerListName;
 			Found = 0;
-			if ( NumAvailManagerLists > 0 ) Found = FindItemInList( AvailabilityListName, SysAvailMgrListData.Name(), NumAvailManagerLists );
+			if ( NumAvailManagerLists > 0 ) Found = FindItemInList( AvailabilityListName, SysAvailMgrListData );
 			if ( Found != 0 ) {
 				ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).NumAvailManagers = SysAvailMgrListData( Found ).NumItems;
 				CompNumAvailManagers = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).NumAvailManagers;
@@ -1478,7 +1478,6 @@ namespace SystemAvailabilityManager {
 		int ZoneListNum;
 		int ScanZoneListNum;
 		int ZoneNum;
-		static int NumOfZoneLists( 1 );
 		// One time initializations
 
 		if ( MyOneTimeFlag ) {
@@ -1511,7 +1510,7 @@ namespace SystemAvailabilityManager {
 					}
 				} else if ( SELECT_CASE_var == MaximumOfZoneList ) {
 					//a zone list
-					ZoneListNum = FindItemInList( OptStartSysAvailMgrData( SysAvailNum ).ZoneListName, ZoneList.Name(), NumOfZoneLists );
+					ZoneListNum = FindItemInList( OptStartSysAvailMgrData( SysAvailNum ).ZoneListName, ZoneList );
 					if ( ZoneListNum > 0 ) {
 						OptStartSysAvailMgrData( SysAvailNum ).NumOfZones = ZoneList( ZoneListNum ).NumOfZones;
 						if ( ! allocated( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs ) ) {
@@ -1613,7 +1612,7 @@ namespace SystemAvailabilityManager {
 		{ auto const SELECT_CASE_var( SysAvailType );
 		if ( SELECT_CASE_var == SysAvailMgr_Scheduled ) { // 'AvailabilityManager:Scheduled'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, SchedSysAvailMgrData.Name(), NumSchedSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, SchedSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcSchedSysAvailMgr( SysAvailNum, AvailStatus );
@@ -1623,7 +1622,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_ScheduledOn ) { // 'AvailabilityManager:ScheduledOn'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, SchedOnSysAvailMgrData.Name(), NumSchedOnSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, SchedOnSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcSchedOnSysAvailMgr( SysAvailNum, AvailStatus );
@@ -1633,7 +1632,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_ScheduledOff ) { // 'AvailabilityManager:ScheduledOff'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, SchedOffSysAvailMgrData.Name(), NumSchedOffSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, SchedOffSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcSchedOffSysAvailMgr( SysAvailNum, AvailStatus );
@@ -1643,7 +1642,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_NightCycle ) { // 'AvailabilityManager:NightCycle'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, NCycSysAvailMgrData.Name(), NumNCycSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, NCycSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcNCycSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum );
@@ -1653,7 +1652,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_OptimumStart ) { // 'AvailabilityManager:OptimumStart'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, OptStartSysAvailMgrData.Name(), NumOptStartSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, OptStartSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcOptStartSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum );
@@ -1663,7 +1662,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_NightVent ) { // 'AvailabilityManager:NightVentilation'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, NVentSysAvailMgrData.Name(), NumNVentSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, NVentSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcNVentSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType );
@@ -1673,7 +1672,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_DiffThermo ) { // 'AvailabilityManager:DifferentialThermostat'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, DiffTSysAvailMgrData.Name(), NumDiffTSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, DiffTSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcDiffTSysAvailMgr( SysAvailNum, PreviousStatus, AvailStatus );
@@ -1683,7 +1682,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_HiTempTOff ) { // 'AvailabilityManager:HighTemperatureTurnOff'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, HiTurnOffSysAvailMgrData.Name(), NumHiTurnOffSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, HiTurnOffSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcHiTurnOffSysAvailMgr( SysAvailNum, AvailStatus );
@@ -1693,7 +1692,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_HiTempTOn ) { // 'AvailabilityManager:HighTemperatureTurnOn'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, HiTurnOnSysAvailMgrData.Name(), NumHiTurnOnSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, HiTurnOnSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcHiTurnOnSysAvailMgr( SysAvailNum, AvailStatus );
@@ -1703,7 +1702,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_LoTempTOff ) { // 'AvailabilityManager:LowTemperatureTurnOff'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, LoTurnOffSysAvailMgrData.Name(), NumLoTurnOffSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, LoTurnOffSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcLoTurnOffSysAvailMgr( SysAvailNum, AvailStatus );
@@ -1713,7 +1712,7 @@ namespace SystemAvailabilityManager {
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_LoTempTOn ) { // 'AvailabilityManager:LowTemperatureTurnOn'
 			if ( SysAvailNum == 0 ) {
-				SysAvailNum = FindItemInList( SysAvailName, LoTurnOnSysAvailMgrData.Name(), NumLoTurnOnSysAvailMgrs );
+				SysAvailNum = FindItemInList( SysAvailName, LoTurnOnSysAvailMgrData );
 			}
 			if ( SysAvailNum > 0 ) {
 				CalcLoTurnOnSysAvailMgr( SysAvailNum, AvailStatus );
@@ -3864,7 +3863,7 @@ namespace SystemAvailabilityManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), HybridVentSysAvailMgrData.AirLoopName(), SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), HybridVentSysAvailMgrData, &DefineHybridVentSysAvailManager::AirLoopName, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -3879,7 +3878,7 @@ namespace SystemAvailabilityManager {
 			}
 			HybridVentSysAvailMgrData( SysAvailNum ).ControlZoneName = cAlphaArgs( 3 );
 			// Check zone number
-			HybridVentSysAvailMgrData( SysAvailNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
+			HybridVentSysAvailMgrData( SysAvailNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone );
 			if ( HybridVentSysAvailMgrData( SysAvailNum ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid" );
 				ShowContinueError( "not found: " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
@@ -4125,7 +4124,7 @@ namespace SystemAvailabilityManager {
 			if ( HybridVentSysAvailMgrData( SysAvailNum ).SimpleControlTypeSchedPtr > 0 ) {
 				HybridVentSysAvailMgrData( SysAvailNum ).VentilationName = cAlphaArgs( 10 );
 				if ( TotVentilation > 0 ) {
-					HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr = FindItemInList( cAlphaArgs( 10 ), Ventilation.Name(), TotVentilation );
+					HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr = FindItemInList( cAlphaArgs( 10 ), Ventilation );
 					HybridVentSysAvailMaster( SysAvailNum ) = HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr;
 					SchedMax = GetScheduleMaxValue( HybridVentSysAvailMgrData( SysAvailNum ).SimpleControlTypeSchedPtr );
 					if ( HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr <= 0 && int( SchedMax ) == 1 ) {
@@ -4271,7 +4270,7 @@ namespace SystemAvailabilityManager {
 			// Ensure the controlled zone is listed and defined in an HVAC Air Loop
 			for ( SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum ) {
 				if ( HybridVentSysAvailMgrData( SysAvailNum ).SimpleControlTypeSchedPtr > 0 && TotVentilation > 0 && HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr == 0 ) {
-					HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr = FindItemInList( HybridVentSysAvailMgrData( SysAvailNum ).VentilationName, Ventilation.Name(), TotVentilation );
+					HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr = FindItemInList( HybridVentSysAvailMgrData( SysAvailNum ).VentilationName, Ventilation );
 					HybridVentSysAvailMaster( SysAvailNum ) = HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr;
 					SchedMax = GetScheduleMaxValue( HybridVentSysAvailMgrData( SysAvailNum ).SimpleControlTypeSchedPtr );
 					if ( HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr <= 0 && int( SchedMax ) == 1 ) {

@@ -208,7 +208,7 @@ namespace EarthTube {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// First Alpha is Zone Name
-			EarthTubeSys( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
+			EarthTubeSys( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone );
 			if ( EarthTubeSys( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + " not found=" + cAlphaArgs( 1 ) );
 				ErrorsFound = true;

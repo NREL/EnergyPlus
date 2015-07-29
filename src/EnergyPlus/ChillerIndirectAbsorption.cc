@@ -181,7 +181,7 @@ namespace ChillerIndirectAbsorption {
 
 		// Find the correct Chiller
 		if ( CompIndex == 0 ) {
-			ChillNum = FindItemInList( AbsorberName, IndirectAbsorber.Name(), NumIndirectAbsorbers );
+			ChillNum = FindItemInList( AbsorberName, IndirectAbsorber );
 			if ( ChillNum == 0 ) {
 				ShowFatalError( "SimIndirectAbsorber: Specified chiller not one of Valid Absorption Chillers=" + AbsorberName );
 			}
@@ -211,7 +211,7 @@ namespace ChillerIndirectAbsorption {
 				OptCap = 0.0;
 			}
 			if ( GetSizingFactor ) {
-				ChillNum = FindItemInList( AbsorberName, IndirectAbsorber.Name(), NumIndirectAbsorbers );
+				ChillNum = FindItemInList( AbsorberName, IndirectAbsorber );
 				if ( ChillNum != 0 ) {
 					SizingFactor = IndirectAbsorber( ChillNum ).SizFac;
 				}
@@ -319,7 +319,7 @@ namespace ChillerIndirectAbsorption {
 			GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), IndirectAbsorber.Name(), AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), IndirectAbsorber, AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";

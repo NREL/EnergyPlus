@@ -114,7 +114,7 @@ namespace PlantLoadProfile {
 		}
 
 		if ( InitLoopEquip ) {
-			ProfileNum = FindItemInList( EquipName, PlantProfile.Name(), NumOfPlantProfile );
+			ProfileNum = FindItemInList( EquipName, PlantProfile );
 			if ( ProfileNum != 0 ) {
 				InitPlantProfile( ProfileNum );
 				return;
@@ -201,7 +201,7 @@ namespace PlantLoadProfile {
 				// PlantProfile name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), PlantProfile.Name(), ProfileNum - 1, IsNotOK, IsBlank, cCurrentModuleObject );
+				VerifyName( cAlphaArgs( 1 ), PlantProfile, ProfileNum - 1, IsNotOK, IsBlank, cCurrentModuleObject );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";

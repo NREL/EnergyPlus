@@ -560,7 +560,7 @@ namespace OutputReportTabular {
 			IsNotOK = false;
 			IsBlank = false;
 			if ( TabNum - 1 > 0 ) {
-				VerifyName( AlphArray( 1 ), MonthlyInput.name(), TabNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), MonthlyInput, &MonthlyInputType::name, TabNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "RTMBLANK";

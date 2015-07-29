@@ -134,7 +134,7 @@ namespace SplitterComponent {
 
 		// Find the correct SplitterNumber
 		if ( CompIndex == 0 ) {
-			SplitterNum = FindItemInList( CompName, SplitterCond.SplitterName(), NumSplitters );
+			SplitterNum = FindItemInList( CompName, SplitterCond, &SplitterConditions::SplitterName );
 			if ( SplitterNum == 0 ) {
 				ShowFatalError( "SimAirLoopSplitter: Splitter not found=" + CompName );
 			}
@@ -254,7 +254,7 @@ namespace SplitterComponent {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SplitterCond.SplitterName(), SplitterNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), SplitterCond, &SplitterConditions::SplitterName, SplitterNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -758,7 +758,7 @@ namespace SplitterComponent {
 		}
 
 		if ( SplitterNum == 0 ) {
-			WhichSplitter = FindItemInList( SplitterName, SplitterCond.SplitterName(), NumSplitters );
+			WhichSplitter = FindItemInList( SplitterName, SplitterCond, &SplitterConditions::SplitterName );
 		} else {
 			WhichSplitter = SplitterNum;
 		}
@@ -831,7 +831,7 @@ namespace SplitterComponent {
 		}
 
 		if ( SplitterNum == 0 ) {
-			WhichSplitter = FindItemInList( SplitterName, SplitterCond.SplitterName(), NumSplitters );
+			WhichSplitter = FindItemInList( SplitterName, SplitterCond, &SplitterConditions::SplitterName );
 		} else {
 			WhichSplitter = SplitterNum;
 		}

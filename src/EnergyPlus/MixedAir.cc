@@ -295,7 +295,7 @@ namespace MixedAir {
 		}
 
 		if ( OASysNum == 0 ) {
-			OASysNum = FindItemInList( OASysName, OutsideAirSys.Name(), NumOASystems );
+			OASysNum = FindItemInList( OASysName, OutsideAirSys );
 			if ( OASysNum == 0 ) {
 				ShowFatalError( "ManageOutsideAirSystem: AirLoopHVAC:OutdoorAirSystem not found=" + OASysName );
 			}
@@ -397,8 +397,8 @@ namespace MixedAir {
 				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
 				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
 				if ( SameString( CompType, "OutdoorAir:Mixer" ) ) {
-					OAMixerNum = FindItemInList( CompName, OAMixer.Name(), NumOAMixers );
-					OAControllerNum = FindItemInList( CtrlName, OAController.Name(), NumOAControllers );
+					OAMixerNum = FindItemInList( CompName, OAMixer );
+					OAControllerNum = FindItemInList( CtrlName, OAController );
 					if ( OAController( OAControllerNum ).MixNode != OAMixer( OAMixerNum ).MixNode ) {
 						ShowSevereError( "The mixed air node of Controller:OutdoorAir=\"" + OAController( OAControllerNum ).Name + "\"" );
 						ShowContinueError( "should be the same node as the mixed air node of OutdoorAir:Mixer=\"" + OAMixer( OAMixerNum ).Name + "\"." );
@@ -670,7 +670,7 @@ namespace MixedAir {
 		}
 
 		if ( CompIndex == 0 ) {
-			OAMixerNum = FindItemInList( CompName, OAMixer.Name(), NumOAMixers );
+			OAMixerNum = FindItemInList( CompName, OAMixer );
 			CompIndex = OAMixerNum;
 			if ( OAMixerNum == 0 ) {
 				ShowFatalError( "SimOAMixer: OutdoorAir:Mixer not found=" + CompName );
@@ -735,7 +735,7 @@ namespace MixedAir {
 
 		if ( CtrlIndex == 0 ) {
 			if ( NumOAControllers > 0 ) {
-				OAControllerNum = FindItemInList( CtrlName, OAController.Name(), NumOAControllers );
+				OAControllerNum = FindItemInList( CtrlName, OAController );
 			} else {
 				OAControllerNum = 0;
 			}
@@ -858,7 +858,7 @@ namespace MixedAir {
 			GetObjectItem( CurrentModuleObject, Item, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), ControllerLists.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), ControllerLists, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -911,7 +911,7 @@ namespace MixedAir {
 			GetObjectItem( CurrentModuleObject, OASysNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), OutsideAirSys.Name(), OASysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), OutsideAirSys, OASysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -919,7 +919,7 @@ namespace MixedAir {
 			OutsideAirSys( OASysNum ).Name = AlphArray( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 2 ), OutsideAirSys.ControllerListName(), OASysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + ' ' + cAlphaFields( 2 ) + " Name" );
+			VerifyName( AlphArray( 2 ), OutsideAirSys, &OutsideAirSysProps::ControllerListName, OASysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + ' ' + cAlphaFields( 2 ) + " Name" );
 			if ( IsNotOK && AlphArray( 1 ) != "xxxxx" ) {
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = \"" + AlphArray( 1 ) + "\"." );
 				ErrorsFound = true;
@@ -1130,7 +1130,6 @@ namespace MixedAir {
 		using DataZoneEquipment::NumOfZoneEquipLists;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::ZoneList;
-		using DataHeatBalance::NumOfZoneLists;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
 		using namespace OutputReportPredefined;
@@ -1281,7 +1280,7 @@ namespace MixedAir {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), OAController.Name(), OutAirNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), OAController, OutAirNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1409,7 +1408,7 @@ namespace MixedAir {
 				// Check Controller:MechanicalVentilation object name
 				ErrorInName = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), VentilationMechanical.Name(), VentMechNum - 1, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), VentilationMechanical, VentMechNum - 1, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 				if ( ErrorInName ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1526,7 +1525,7 @@ namespace MixedAir {
 					//     Getting OA details from design specification OA object
 					if ( ! lAlphaBlanks( ( groupNum - 1 ) * 3 + 6 ) ) {
 						DesignSpecOAObjName( groupNum ) = AlphArray( ( groupNum - 1 ) * 3 + 6 );
-						ObjIndex = FindItemInList( DesignSpecOAObjName( groupNum ), OARequirements.Name(), NumOARequirements );
+						ObjIndex = FindItemInList( DesignSpecOAObjName( groupNum ), OARequirements );
 						DesignSpecOAObjIndex( groupNum ) = ObjIndex;
 
 						if ( ObjIndex > 0 ) {
@@ -1593,7 +1592,7 @@ namespace MixedAir {
 					// Get zone air distribution details from design specification Zone Air Distribution object
 					if ( ! lAlphaBlanks( ( groupNum - 1 ) * 3 + 7 ) ) {
 						DesignSpecZoneADObjName( groupNum ) = AlphArray( ( groupNum - 1 ) * 3 + 7 );
-						ObjIndex = FindItemInList( DesignSpecZoneADObjName( groupNum ), ZoneAirDistribution.Name(), NumZoneAirDistribution );
+						ObjIndex = FindItemInList( DesignSpecZoneADObjName( groupNum ), ZoneAirDistribution );
 						DesignSpecZoneADObjIndex( groupNum ) = ObjIndex;
 
 						if ( ObjIndex > 0 ) {
@@ -1663,11 +1662,11 @@ namespace MixedAir {
 						//        ENDIF
 					}
 
-					ZoneNum = FindItemInList( VentMechZoneName( groupNum ), Zone.Name(), NumOfZones );
+					ZoneNum = FindItemInList( VentMechZoneName( groupNum ), Zone );
 					if ( ZoneNum > 0 ) {
 						++MechVentZoneCount;
 					} else {
-						ZoneListNum = FindItemInList( VentMechZoneName( groupNum ), ZoneList.Name(), NumOfZoneLists );
+						ZoneListNum = FindItemInList( VentMechZoneName( groupNum ), ZoneList );
 						if ( ZoneListNum > 0 ) {
 							MechVentZoneCount += ZoneList( ZoneListNum ).NumOfZones;
 						} else {
@@ -1706,7 +1705,7 @@ namespace MixedAir {
 
 				//   Loop through zone names and list of zone names and store data
 				for ( groupNum = 1; groupNum <= NumGroups; ++groupNum ) {
-					ZoneNum = FindItemInList( VentMechZoneName( groupNum ), Zone.Name(), NumOfZones );
+					ZoneNum = FindItemInList( VentMechZoneName( groupNum ), Zone );
 					if ( ZoneNum > 0 ) {
 						if ( any_eq( VentilationMechanical( VentMechNum ).Zone, ZoneNum ) ) {
 							//          Disregard duplicate zone names, show warning and do not store data for this zone
@@ -1727,7 +1726,7 @@ namespace MixedAir {
 								VentilationMechanical( VentMechNum ).ZoneOAACH = VentMechZoneOAACH( groupNum );
 							} else {
 								if ( DoZoneSizing ) {
-									ObjIndex = FindItemInList( VentMechZoneName( groupNum ), ZoneSizingInput.ZoneName(), NumZoneSizingInput );
+									ObjIndex = FindItemInList( VentMechZoneName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 									if ( ObjIndex > 0 ) {
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).DesignSpecOAObjName;
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneDesignSpecOAIndex;
@@ -1763,7 +1762,7 @@ namespace MixedAir {
 								VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount ) = DesignSpecZoneADObjIndex( groupNum );
 							} else {
 								if ( DoZoneSizing ) {
-									ObjIndex = FindItemInList( VentMechZoneName( groupNum ), ZoneSizingInput.ZoneName(), NumZoneSizingInput );
+									ObjIndex = FindItemInList( VentMechZoneName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 									if ( ObjIndex > 0 ) {
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistEffObjName;
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistributionIndex;
@@ -1778,7 +1777,7 @@ namespace MixedAir {
 						}
 					} else {
 						//       Not a zone name, must be a zone list
-						ZoneListNum = FindItemInList( VentMechZoneName( groupNum ), ZoneList.Name(), NumOfZoneLists );
+						ZoneListNum = FindItemInList( VentMechZoneName( groupNum ), ZoneList );
 						if ( ZoneListNum > 0 ) {
 							for ( ScanZoneListNum = 1; ScanZoneListNum <= ZoneList( ZoneListNum ).NumOfZones; ++ScanZoneListNum ) {
 								// check to make sure zone name is unique (not listed more than once)...
@@ -1799,7 +1798,7 @@ namespace MixedAir {
 										ObjIndex = VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount );
 									} else {
 										if ( DoZoneSizing ) {
-											ObjIndex = FindItemInList( Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name, ZoneSizingInput.ZoneName(), NumZoneSizingInput );
+											ObjIndex = FindItemInList( Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 											if ( ObjIndex > 0 ) {
 												VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).DesignSpecOAObjName;
 												VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneDesignSpecOAIndex;
@@ -1838,7 +1837,7 @@ namespace MixedAir {
 										ObjIndex = VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount );
 									} else {
 										if ( DoZoneSizing ) {
-											ObjIndex = FindItemInList( Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name, ZoneSizingInput.ZoneName(), NumZoneSizingInput );
+											ObjIndex = FindItemInList( Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 											if ( ObjIndex > 0 ) {
 												VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistEffObjName;
 												VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistributionIndex;
@@ -1977,7 +1976,7 @@ namespace MixedAir {
 
 			// Link OA controller object with mechanical ventilation object
 			for ( OAControllerNum = 1; OAControllerNum <= NumOAControllers; ++OAControllerNum ) {
-				OAController( OAControllerNum ).VentMechObjectNum = FindItemInList( OAController( OAControllerNum ).VentilationMechanicalName, VentilationMechanical.Name(), NumVentMechControllers );
+				OAController( OAControllerNum ).VentMechObjectNum = FindItemInList( OAController( OAControllerNum ).VentilationMechanicalName, VentilationMechanical );
 				if ( OAController( OAControllerNum ).VentMechObjectNum == 0 && ! OAController( OAControllerNum ).VentilationMechanicalName.empty() ) {
 					ShowSevereError( CurrentModuleObject + "=\"" + OAController( OAControllerNum ).VentilationMechanicalName + "\", non-match to Controller:OutdoorAir" );
 					ShowContinueError( "Invalid specified in Controller:OutdoorAir object = " + OAController( OAControllerNum ).Name );
@@ -2111,7 +2110,7 @@ namespace MixedAir {
 				GetObjectItem( CurrentModuleObject, OutAirNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), OAMixer.Name(), OutAirNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), OAMixer, OutAirNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -2206,7 +2205,6 @@ namespace MixedAir {
 		using DataZoneEquipment::NumOfZoneEquipLists;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::ZoneList;
-		using DataHeatBalance::NumOfZoneLists;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
 		using namespace OutputReportPredefined;
@@ -2382,7 +2380,7 @@ namespace MixedAir {
 		//   High humidity control option can be used with any economizer flag
 		if ( SameString( AlphArray( 16 ), "Yes" ) ) {
 
-			OAController( OutAirNum ).HumidistatZoneNum = FindItemInList( AlphArray( 17 ), Zone.Name(), NumOfZones );
+			OAController( OutAirNum ).HumidistatZoneNum = FindItemInList( AlphArray( 17 ), Zone );
 
 			// Get the node number for the zone with the humidistat
 			if ( OAController( OutAirNum ).HumidistatZoneNum > 0 ) {
@@ -2716,7 +2714,7 @@ namespace MixedAir {
 					thisNumForMixer = FindItem( CurrentModuleObjects( CMO_OAMixer ), OutsideAirSys( thisOASys ).ComponentType, isize( OutsideAirSys( thisOASys ).ComponentType ) );
 					if ( thisNumForMixer != 0 ) {
 						equipName = OutsideAirSys( thisOASys ).ComponentName( thisNumForMixer );
-						thisMixerIndex = FindItemInList( equipName, OAMixer.Name(), NumOAMixers );
+						thisMixerIndex = FindItemInList( equipName, OAMixer );
 						if ( thisMixerIndex != 0 ) {
 							OAController( thisOAController ).InletNode = OAMixer( thisMixerIndex ).InletNode;
 						} else {
@@ -4871,7 +4869,7 @@ namespace MixedAir {
 			GetOAMixerInputFlag = false;
 		}
 
-		WhichOAMixer = FindItemInList( OAMixerName, OAMixer.Name(), NumOAMixers );
+		WhichOAMixer = FindItemInList( OAMixerName, OAMixer );
 		if ( WhichOAMixer != 0 ) {
 			OANodeNumbers( 1 ) = OAMixer( WhichOAMixer ).InletNode;
 			OANodeNumbers( 2 ) = OAMixer( WhichOAMixer ).RelNode;
@@ -5336,7 +5334,7 @@ namespace MixedAir {
 			GetOASysInputFlag = false;
 		}
 
-		OASysNumber = FindItemInList( OASysName, OutsideAirSys.Name(), NumOASystems );
+		OASysNumber = FindItemInList( OASysName, OutsideAirSys );
 
 		return OASysNumber;
 
@@ -5393,7 +5391,7 @@ namespace MixedAir {
 		if ( OASysNumber > 0 && OASysNumber <= NumOASystems ) {
 			for ( OACompNum = 1; OACompNum <= OutsideAirSys( OASysNumber ).NumComponents; ++OACompNum ) {
 				if ( SameString( OutsideAirSys( OASysNumber ).ComponentType( OACompNum ), "OUTDOORAIR:MIXER" ) ) {
-					OAMixerNumber = FindItemInList( OutsideAirSys( OASysNumber ).ComponentName( OACompNum ), OAMixer.Name(), NumOAMixers );
+					OAMixerNumber = FindItemInList( OutsideAirSys( OASysNumber ).ComponentName( OACompNum ), OAMixer );
 					break;
 				}
 			}
@@ -5449,7 +5447,7 @@ namespace MixedAir {
 			GetOAMixerInputFlag = false;
 		}
 
-		OAMixerIndex = FindItem( OAMixerName, OAMixer.Name(), NumOAMixers );
+		OAMixerIndex = FindItem( OAMixerName, OAMixer );
 
 		if ( OAMixerIndex == 0 ) {
 			ShowSevereError( "GetOAMixerIndex: Could not find OutdoorAir:Mixer, Name=\"" + OAMixerName + "\"" );
@@ -5770,7 +5768,7 @@ namespace MixedAir {
 			//  Now check AirLoopHVAC and AirLoopHVAC:OutdoorAirSystem
 			Found = 0;
 			if ( NumOASystems > 0 ) {
-				Found = FindItemInList( ControllerListName, OutsideAirSys.ControllerListName(), NumOASystems );
+				Found = FindItemInList( ControllerListName, OutsideAirSys, &OutsideAirSysProps::ControllerListName );
 				if ( Found > 0 ) ++Count;
 			}
 
@@ -6048,7 +6046,7 @@ namespace MixedAir {
 			GetOAControllerInputFlag = false;
 		}
 
-		VerifyName( OAControllerName, OAController.Name(), NumCurrentOAControllers, IsNotOK, IsBlank, SourceID );
+		VerifyName( OAControllerName, OAController, NumCurrentOAControllers, IsNotOK, IsBlank, SourceID );
 
 	}
 
