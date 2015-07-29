@@ -61,6 +61,8 @@ public: // Types
 
 	typedef  std::vector< Chunk< T > >  Chunks;
 	typedef  TypeTraits< T >  Traits;
+	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
+	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
 
 	// STL style
 	typedef  Chunk< T >  Chunk_type;
@@ -231,7 +233,7 @@ public: // Creation
 	ChunkVector(
 	 size_type const size,
 	 ChunkExponent const & exponent,
-	 T const & value
+	 Tc value
 	) :
 	 size_( size ),
 	 chunk_exponent_( exponent ),
@@ -454,7 +456,7 @@ public: // Assignment
 	ChunkVector &
 	assign(
 	 size_type const size,
-	 T const & value
+	 Tc value
 	)
 	{
 		non_preserving_resize( size );
@@ -473,7 +475,7 @@ public: // Assignment
 	assign(
 	 size_type const size,
 	 ChunkExponent const & exponent,
-	 T const & value
+	 Tc value
 	)
 	{
 		if ( chunk_exponent_ == exponent ) { // Call other assign function for efficiency
@@ -596,7 +598,7 @@ public: // Assignment
 	// = Value
 	inline
 	ChunkVector &
-	operator =( T const & value )
+	operator =( Tc value )
 	{
 		for ( Chunks_size_type i = 0, ie = chunks_.size(); i < ie; ++i ) {
 			chunks_[ i ] = value;
@@ -607,7 +609,7 @@ public: // Assignment
 	// += Value
 	inline
 	ChunkVector &
-	operator +=( T const & value )
+	operator +=( Tc value )
 	{
 		for ( Chunks_size_type i = 0, ie = chunks_.size(); i < ie; ++i ) {
 			chunks_[ i ] += value;
@@ -618,7 +620,7 @@ public: // Assignment
 	// -= Value
 	inline
 	ChunkVector &
-	operator -=( T const & value )
+	operator -=( Tc value )
 	{
 		for ( Chunks_size_type i = 0, ie = chunks_.size(); i < ie; ++i ) {
 			chunks_[ i ] -= value;
@@ -629,7 +631,7 @@ public: // Assignment
 	// *= Value
 	inline
 	ChunkVector &
-	operator *=( T const & value )
+	operator *=( Tc value )
 	{
 		for ( Chunks_size_type i = 0, ie = chunks_.size(); i < ie; ++i ) {
 			chunks_[ i ] *= value;
@@ -640,7 +642,7 @@ public: // Assignment
 	// /= Value
 	inline
 	ChunkVector &
-	operator /=( T const & value )
+	operator /=( Tc value )
 	{
 		assert( value != T( 0 ) );
 		for ( Chunks_size_type i = 0, ie = chunks_.size(); i < ie; ++i ) {
@@ -653,7 +655,7 @@ public: // Subscript
 
 	// ChunkVector[ i ] const: 0-Based Indexing
 	inline
-	T const &
+	Tr
 	operator []( size_type const i ) const
 	{
 		assert( i < size_ );
@@ -671,7 +673,7 @@ public: // Subscript
 
 	// ChunkVector( i ) const: 1-Based Indexing
 	inline
-	T const &
+	Tr
 	operator ()( size_type const i ) const
 	{
 		assert( ( i > 0u ) && ( i <= size_ ) );
@@ -739,7 +741,7 @@ public: // Inspector
 
 	// First Element
 	inline
-	T const &
+	Tr
 	front() const
 	{
 		assert( size_ > 0u );
@@ -748,7 +750,7 @@ public: // Inspector
 
 	// Last Element
 	inline
-	T const &
+	Tr
 	back() const
 	{
 		assert( size_ > 0u );
@@ -810,7 +812,7 @@ public: // Modifier
 	// Append an Element
 	inline
 	ChunkVector &
-	push_back( T const & value )
+	push_back( Tc value )
 	{
 		assert( size_ < max_size() );
 		if ( ( size_ == 0 ) || ( last_chunk().size() == chunk_size_ ) ) { // No Chunks or last Chunk is full
@@ -894,7 +896,7 @@ public: // Modifier
 	ChunkVector &
 	resize(
 	 size_type const size,
-	 T const & value = T()
+	 Tc value = T()
 	)
 	{
 		Chunks_size_type const n_chunk_o( n_chunk() );
@@ -960,7 +962,7 @@ public: // Modifier
 	reshape(
 	 size_type const size,
 	 ChunkExponent const & exponent,
-	 T const & value = T()
+	 Tc value = T()
 	)
 	{
 		ChunkVector v( size, exponent, value ); // Temporary with desired shape
@@ -1504,7 +1506,7 @@ operator >( std::vector< T, L > const & a, ChunkVector< T > const & b )
 template< typename T >
 inline
 bool
-operator ==( ChunkVector< T > const & a, T const & t )
+operator ==( ChunkVector< T > const & a, typename ChunkVector< T >::Tc t )
 {
 	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( a[ i ] != t ) return false;
@@ -1516,7 +1518,7 @@ operator ==( ChunkVector< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator !=( ChunkVector< T > const & a, T const & t )
+operator !=( ChunkVector< T > const & a, typename ChunkVector< T >::Tc t )
 {
 	return !( a == t );
 }
@@ -1525,7 +1527,7 @@ operator !=( ChunkVector< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator <( ChunkVector< T > const & a, T const & t )
+operator <( ChunkVector< T > const & a, typename ChunkVector< T >::Tc t )
 {
 	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( a[ i ] < t ) ) return false;
@@ -1537,7 +1539,7 @@ operator <( ChunkVector< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator <=( ChunkVector< T > const & a, T const & t )
+operator <=( ChunkVector< T > const & a, typename ChunkVector< T >::Tc t )
 {
 	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( a[ i ] <= t ) ) return false;
@@ -1549,7 +1551,7 @@ operator <=( ChunkVector< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator >=( ChunkVector< T > const & a, T const & t )
+operator >=( ChunkVector< T > const & a, typename ChunkVector< T >::Tc t )
 {
 	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( a[ i ] >= t ) ) return false;
@@ -1561,7 +1563,7 @@ operator >=( ChunkVector< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator >( ChunkVector< T > const & a, T const & t )
+operator >( ChunkVector< T > const & a, typename ChunkVector< T >::Tc t )
 {
 	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( a[ i ] > t ) ) return false;
@@ -1573,7 +1575,7 @@ operator >( ChunkVector< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator ==( T const & t, ChunkVector< T > const & a )
+operator ==( typename ChunkVector< T >::Tc t, ChunkVector< T > const & a )
 {
 	return ( a == t );
 }
@@ -1582,7 +1584,7 @@ operator ==( T const & t, ChunkVector< T > const & a )
 template< typename T >
 inline
 bool
-operator !=( T const & t, ChunkVector< T > const & a )
+operator !=( typename ChunkVector< T >::Tc t, ChunkVector< T > const & a )
 {
 	return !( a == t );
 }
@@ -1591,7 +1593,7 @@ operator !=( T const & t, ChunkVector< T > const & a )
 template< typename T >
 inline
 bool
-operator <( T const & t, ChunkVector< T > const & a )
+operator <( typename ChunkVector< T >::Tc t, ChunkVector< T > const & a )
 {
 	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( t < a[ i ] ) ) return false;
@@ -1603,7 +1605,7 @@ operator <( T const & t, ChunkVector< T > const & a )
 template< typename T >
 inline
 bool
-operator <=( T const & t, ChunkVector< T > const & a )
+operator <=( typename ChunkVector< T >::Tc t, ChunkVector< T > const & a )
 {
 	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( t <= a[ i ] ) ) return false;
@@ -1615,7 +1617,7 @@ operator <=( T const & t, ChunkVector< T > const & a )
 template< typename T >
 inline
 bool
-operator >=( T const & t, ChunkVector< T > const & a )
+operator >=( typename ChunkVector< T >::Tc t, ChunkVector< T > const & a )
 {
 	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( t >= a[ i ] ) ) return false;
@@ -1627,7 +1629,7 @@ operator >=( T const & t, ChunkVector< T > const & a )
 template< typename T >
 inline
 bool
-operator >( T const & t, ChunkVector< T > const & a )
+operator >( typename ChunkVector< T >::Tc t, ChunkVector< T > const & a )
 {
 	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( t > a[ i ] ) ) return false;

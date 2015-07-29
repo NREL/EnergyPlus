@@ -5833,7 +5833,7 @@ namespace WindowEquivalentLayer {
 		Real64 FSg_db;
 		Real64 FSm_db;
 		Real64 FSg_m;
-		
+
 		//  Calculate 4 emissivities/absorptivities
 
 		Epsg = 1.0 - rhog;
@@ -9326,7 +9326,7 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		
+
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 		// FUNCTION PARAMETER DEFINITIONS:
@@ -9464,7 +9464,7 @@ namespace WindowEquivalentLayer {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

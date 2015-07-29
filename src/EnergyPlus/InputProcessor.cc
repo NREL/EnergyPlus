@@ -102,6 +102,18 @@ namespace InputProcessor {
 
 	// MODULE VARIABLE DECLARATIONS:
 
+	namespace {
+		// These were static variables within different functions. They were hoisted into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of InputProcessor should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		Array1D_string AlphaArgs;
+		Array1D< Real64 > NumberArgs;
+		Array1D_bool AlphaArgsBlank;
+		Array1D_bool NumberArgsBlank;
+	}
+
 	//Integer Variables for the Module
 	int NumObjectDefs( 0 ); // Count of number of object definitions found in the IDD
 	int NumSectionDefs( 0 ); // Count of number of section defintions found in the IDD
@@ -175,6 +187,77 @@ namespace InputProcessor {
 	//*************************************************************************
 
 	// Functions
+
+	// Clears the global data in InputProcessor.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		ObjectDef.deallocate();
+		SectionDef.deallocate();
+		SectionsOnFile.deallocate();
+		ObjectStartRecord.deallocate();
+		ObjectGotCount.deallocate();
+		ObsoleteObjectsRepNames.deallocate();
+		ListOfSections.deallocate();
+		ListOfObjects.deallocate();
+		iListOfObjects.deallocate();
+		IDFRecordsGotten.deallocate();
+		IDFRecords.deallocate();
+		RepObjects.deallocate();
+		LineItem = LineDefinition();
+
+		NumObjectDefs = 0;
+		NumSectionDefs = 0;
+		MaxObjectDefs = 0;
+		MaxSectionDefs = 0;
+		NumLines = 0;
+		MaxIDFRecords = 0;
+		NumIDFRecords = 0;
+		MaxIDFSections = 0;
+		NumIDFSections = 0;
+		EchoInputFile = 0;
+		InputLineLength = 0;
+		MaxAlphaArgsFound = 0;
+		MaxNumericArgsFound = 0;
+		NumAlphaArgsFound = 0;
+		NumNumericArgsFound = 0;
+		MaxAlphaIDFArgsFound = 0;
+		MaxNumericIDFArgsFound = 0;
+		MaxAlphaIDFDefArgsFound = 0;
+		MaxNumericIDFDefArgsFound = 0;
+		NumOutOfRangeErrorsFound = 0;
+		NumBlankReqFieldFound = 0;
+		NumMiscErrorsFound = 0;
+		MinimumNumberOfFields = 0;
+		NumObsoleteObjects = 0;
+		TotalAuditErrors = 0;
+		NumSecretObjects = 0;
+		ProcessingIDD = false;
+
+		InputLine = std::string();
+		CurrentFieldName = std::string();
+		ReplacementName = std::string();
+
+		OverallErrorFlag = false;
+		EchoInputLine = true;
+		ReportRangeCheckErrors = true;
+		FieldSet = false;
+		RequiredField = false;
+		RetainCaseFlag = false;
+		ObsoleteObject = false;
+		RequiredObject = false;
+		UniqueObject = false;
+		ExtensibleObject = false;
+		ExtensibleNumFields = 0;
+
+		AlphaArgs.deallocate();
+		NumberArgs.deallocate();
+		AlphaArgsBlank.deallocate();
+		NumberArgsBlank.deallocate();
+
+		echo_stream = nullptr;
+	}
 
 	void
 	ProcessInput()
@@ -635,8 +718,7 @@ namespace InputProcessor {
 		bool errFlag; // Local Error condition flag, when true, object not added to Global list
 		char TargetChar; // Single character scanned to test for current field type (A or N)
 		bool BlankLine; // True when this line is "blank" (may have comment characters as first character on line)
-		static Array1D_bool AlphaOrNumeric; // Array of argument designations, True is Alpha,
-		// False is numeric, saved in ObjectDef when done
+		static Array1D_bool AlphaOrNumeric; // Array of argument designations, True is Alpha, False is numeric, saved in ObjectDef when done
 		static Array1D_bool RequiredFields; // Array of argument required fields
 		static Array1D_bool AlphRetainCase; // Array of argument for retain case
 		static Array1D_string AlphFieldChecks; // Array with alpha field names
@@ -2163,10 +2245,12 @@ namespace InputProcessor {
 		int LoopIndex;
 		std::string ObjectWord;
 		std::string UCObject;
-		static Array1D_string AlphaArgs;
-		static Array1D< Real64 > NumberArgs;
-		static Array1D_bool AlphaArgsBlank;
-		static Array1D_bool NumberArgsBlank;
+		//////////// hoisted into namespace ////////////
+		// static Array1D_string AlphaArgs;
+		// static Array1D< Real64 > NumberArgs;
+		// static Array1D_bool AlphaArgsBlank;
+		// static Array1D_bool NumberArgsBlank;
+		////////////////////////////////////////////////
 		int MaxAlphas;
 		int MaxNumbers;
 		int Found;
@@ -5936,7 +6020,7 @@ namespace InputProcessor {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

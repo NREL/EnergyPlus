@@ -1687,11 +1687,11 @@ namespace ExternalInterface {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int i, j, k; // Loop counter
-		
+
 		static bool FirstCallDesignDays( true ); // Flag fo first call during warmup
 		static bool FirstCallWUp( true ); // Flag fo first call during warmup
 		static bool FirstCallTStep( true ); // Flag for first call during time stepping
-		
+
 		Array1D_string Alphas( 5 );
 
 		std::string validateErrMsg; // error returned when xml Schema validate failed
@@ -1982,7 +1982,7 @@ namespace ExternalInterface {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const nDblMax( 1024 ); // Maximum number of doubles
-		
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int i; // Loop counter
 		int retVal; // Return value from socket
@@ -2238,7 +2238,7 @@ namespace ExternalInterface {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
