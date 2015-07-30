@@ -2968,7 +2968,6 @@ namespace EvaporativeCoolers {
 		using DataHVACGlobals::FanType_SimpleConstVolume;
 		using DataHVACGlobals::FanType_SimpleOnOff;
 		using BranchNodeConnections::SetUpCompSets;
-		using DataSizing::NumZoneHVACSizing;
 		using DataSizing::ZoneHVACSizing;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataGlobals::NumOfZones;

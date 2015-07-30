@@ -261,7 +261,6 @@ namespace PurchasedAirManager {
 		using namespace DataIPShortCuts;
 		using DataSizing::OARequirements; // to find DesignSpecification:OutdoorAir pointer
 		using DataContaminantBalance::Contaminant;
-		using DataSizing::NumZoneHVACSizing;
 		using DataSizing::ZoneHVACSizing;
 		using DataZoneEquipment::ZoneEquipConfig;
 
