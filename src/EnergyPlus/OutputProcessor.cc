@@ -2969,6 +2969,85 @@ namespace OutputProcessor {
 
 	}
 
+	void 
+	ResetMeterAccumWhenWarmupComplete( bool curWarmupFlag )
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Jason Glazer
+		//       DATE WRITTEN   June 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Resets the accumulating meter values. Needed after warmup period is over to 
+		// reset the totals on meters so that they are not accumulated over the warmup period
+
+		// METHODOLOGY EMPLOYED:
+		// Cycle through the meters and reset all accumulating values
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Meter; // Loop Control
+		bool statusOfWarmupFlag;
+		static bool prevStatusOfWarmupFlag; 
+
+		statusOfWarmupFlag = curWarmupFlag; 
+
+		// only reset the meters if the current warmupflag is false and previous call it was true
+		// this should happen just for one call right after warmup has compeleted
+		if ( !statusOfWarmupFlag && prevStatusOfWarmupFlag ) {
+
+			for ( Meter = 1; Meter <= NumEnergyMeters; ++Meter ) {
+				EnergyMeters( Meter ).HRValue = 0.0;
+				EnergyMeters( Meter ).HRMaxVal = MaxSetValue;
+				EnergyMeters( Meter ).HRMaxValDate = 0;
+				EnergyMeters( Meter ).HRMinVal = MinSetValue;
+				EnergyMeters( Meter ).HRMinValDate = 0;
+
+				EnergyMeters( Meter ).DYValue = 0.0;
+				EnergyMeters( Meter ).DYMaxVal = MaxSetValue;
+				EnergyMeters( Meter ).DYMaxValDate = 0;
+				EnergyMeters( Meter ).DYMinVal = MinSetValue;
+				EnergyMeters( Meter ).DYMinValDate = 0;
+
+				EnergyMeters( Meter ).MNValue = 0.0;
+				EnergyMeters( Meter ).MNMaxVal = MaxSetValue;
+				EnergyMeters( Meter ).MNMaxValDate = 0;
+				EnergyMeters( Meter ).MNMinVal = MinSetValue;
+				EnergyMeters( Meter ).MNMinValDate = 0;
+
+				EnergyMeters( Meter ).SMValue = 0.0;
+				EnergyMeters( Meter ).SMMaxVal = MaxSetValue;
+				EnergyMeters( Meter ).SMMaxValDate = 0;
+				EnergyMeters( Meter ).SMMinVal = MinSetValue;
+				EnergyMeters( Meter ).SMMinValDate = 0;
+
+			}
+
+		}
+		prevStatusOfWarmupFlag = statusOfWarmupFlag; // update for next time routine is called
+	}
+
+
+
+
 	void
 	SetMinMax(
 		Real64 const TestValue, // Candidate new value
