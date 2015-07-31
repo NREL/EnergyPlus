@@ -778,7 +778,7 @@ As shown in an IDF:
 
 This object simulates a packaged terminal air conditioner (PTAC) with a DX cooling coil, a heating coil (electric, gas, or hot water), and an outdoor air mixer. The optional hot water heating coil is served directly by HVACTemplate:Plant:HotWaterLoop and HVACTemplate:Plant:Boiler objects. No HVACTemplate:System object is required. Reference ZoneHVAC:PackagedTerminalAirConditioner for more details about the PTAC model.
 
-![PTAC\_Drawthrough](InputOutputReference/media/image603.png)
+![PTAC\_Drawthrough](media/image603.png)
 
 Figure 154.  Schematic of a packaged terminal air conditioner with draw through fan placement
 
@@ -1012,7 +1012,7 @@ As shown in an IDF:
 
 This object simulates a packaged terminal air-to-air heat pump (PTHP) with a DX cooling coil, a DX air-to-air heat pump heating coil, a supplemental heating coil (electric or gas), and an outdoor air mixer. No HVACTemplate:System object is required. Reference ZoneHVAC:PackagedTerminalHeatPump for more details about the PTHP model.
 
-![PTPFigure](InputOutputReference/media/image604.png)
+![PTPFigure](media/image604.png)
 
 Figure 155. Schematic of a packaged terminal heat pump (draw through fan placement)
 
@@ -1406,19 +1406,19 @@ Enter autosize to allow the sizing algorithm to determine the proper capacity re
 
 This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50% run time fraction. Suggested values are shown below (Henderson et al. 1999):
 
-![](InputOutputReference/media/image605.svg)
+![](media/image605.svg)
 
 #### Field: Heat Pump Time Constant
 
 This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown below (Henderson et al. 1999):
 
-![](InputOutputReference/media/image606.svg)
+![](media/image606.svg)
 
 #### Field: Fraction of On-Cycle Power Use
 
 This numeric field contains the fraction of on-cycle power use to adjust the part load fraction based on the off-cycle power consumption due to crankcase heaters, controls, fans, and etc. Suggested value values are below (Henderson et al. 1999):
 
-![](InputOutputReference/media/image607.svg)
+![](media/image607.svg)
 
 #### Field: Heat Pump Fan Delay Time
 
@@ -2157,13 +2157,13 @@ This object simulates the zone portion of a variable air volume HVAC configurati
 
 The series powered induction unit is an air system terminal unit that mixes varying amounts of secondary (recirculated) air and primary (conditioned supply) air to produce a fixed flow of air to a zone. The unit contains a small fan that acts to induce the secondary air and a heating coil for heating the mixed secondary and primary air. The fan runs at a constant volume flow rate whenever the unit is on (and the fan’s availability schedule is on or it is activated by an availability manager). With HVACTemplate:Zone:VAV:FanPowered, the secondary fan will operate according to the Zone PIU Fan Schedule and any Night Cycle Control specified in the  system it is served by.) The fan is downstream of the primary and secondary air inlets. The variable mixing is accomplished by a damper in the unit’s primary air supply inlet duct. This damper can move from fully open (100% primary air. 0% secondary air) to a minimum stop that is specified in the input description. At full cooling the damper will be fully open. At minimum cooling and for heating the damper will be at the minimum stop and the secondary air flow will be at its maximum. Reference object AirTerminal:SingleDuct:SeriesPIU:Reheat for more details.
 
-![SeriesPIUPicture.png](InputOutputReference/media/image608.png)
+![SeriesPIUPicture.png](media/image608.png)
 
 Figure 156. Series PIU Terminal Unit
 
 The parallel powered induction unit is an air system terminal unit that mixes varying amounts of secondary (recirculated) air and primary (conditioned supply) air to produce a variable total flow of air to a zone. The unit contains a small fan that acts to induce the secondary air and a heating coil for heating the mixed secondary and primary air. The secondary and primary air streams enter the unit in parallel. The fan sits in the secondary air stream and runs only when the primary air flow is below the Parallel Fan On Flow Fraction and the fan’s availability schedule is on or it is activated by an availability manager. With HVACTemplate:Zone:VAV:FanPowered, the secondary fan will operate according to the Zone PIU Fan Schedule and any Night Cycle Control specified in the system it is served by.). The primary air inlet contains a damper that can move from fully open (maximum primary air) to a minimum stop (minimum primary air). At full cooling load the primary air damper is fully open and the fan is off. The primary air flow is at maximum and there is little or no secondary air flow. As the cooling load decreases, the primary air damper gradually closes and the secondary air flow remains close to zero. At some point, usually when the primary air flow has reached the minimum, the fan switches on and secondary air is induced. The heating coil will switch on as needed to meet any heating demand. Reference object AirTerminal:SingleDuct:ParallelPIU:Reheat for more details.
 
-![ParallelPIUPicture.png](InputOutputReference/media/image609.png)
+![ParallelPIUPicture.png](media/image609.png)
 
 Figure 157. Parallel PIU Terminal Unit
 
@@ -4584,7 +4584,7 @@ Select the set of generic pre-defined coefficients to use for the supply fan par
 
 The default is *InletVaneDampers*. The resulting power curves are shown in Figure 158. VAV Supply Fan Part-Load Power Coefficient Options below. The ASHRAE 90.1-2004 Appendix G coefficients are from TABLE G3.1.3.15, Method 2. The other sets of coefficients are from the EnergyPlus Input Output Reference, Fan Coefficient Values table. The *VariableSpeedMotorPressureReset* option is based on Good Static Pressure Reset VSD Fan from Energy Design Resources’: *Design Guidelines: Advanced Variable Air Volume (VAV) Systems* (EDR\_DesignGuidelines\_VAV.pdf).
 
-![](InputOutputReference/media/image611.svg)
+![](media/image611.svg)
 
 Figure 158. VAV Supply Fan Part-Load Power Coefficient Options
 
@@ -5016,7 +5016,7 @@ Select the set of generic pre-defined coefficients to use for the supply fan par
 
 The default is *InletVaneDampers*. The resulting power curves are shown in Figure 159 below. The ASHRAE 90.1-2004 Appendix G coefficients are from TABLE G3.1.3.15, Method 2. The other sets of coefficients are from the EnergyPlus Input Output Reference, Fan Coefficient Values table.  The *VariableSpeedMotorPressureReset* option is based on Good Static Pressure Reset VSD Fan from Energy Design Resources’: *Design Guidelines: Advanced Variable Air Volume (VAV) Systems* (EDR\_DesignGuidelines\_VAV.pdf).
 
-![](InputOutputReference/media/image612.svg)
+![](media/image612.svg)
 
 Figure 159. VAV Supply Fan Part-Load Power Coefficient Options
 
@@ -5766,7 +5766,7 @@ Select the set of generic pre-defined coefficients to use for the supply fan par
 
 The default is *InletVaneDampers*. The resulting power curves are shown in Figure 158. VAV Supply Fan Part-Load Power Coefficient Options below. The ASHRAE 90.1-2004 Appendix G coefficients are from TABLE G3.1.3.15, Method 2. The other sets of coefficients are from the EnergyPlus Input Output Reference, Fan Coefficient Values table. The *VariableSpeedMotorPressureReset* option is based on Good Static Pressure Reset VSD Fan from Energy Design Resources’: *Design Guidelines: Advanced Variable Air Volume (VAV) Systems* (EDR\_DesignGuidelines\_VAV.pdf).
 
-![](InputOutputReference/media/image613.svg)
+![](media/image613.svg)
 
 Figure 160. VAV Supply Fan Part-Load Power Coefficient Options
 
@@ -6364,7 +6364,7 @@ HVACTemplate:Zone:VRF
 
 It is a constant volume dedicated outdoor air system which can serve multiple zones. It may have any combination of heating coil, cooling coil, and heat recovery. It may have dehumidification and humidification controls as well as several supply temperature control types. It supplies 100% outdoor air when the system is available, and assumes an equal volume of return air is available for heat recovery. If the system to be modeled does not have actual return ducts, but collects flow from exhaust fans to a central heat recovery point, then this approach should be equivalent. If the system does not have heat recovery and the air is exhausted or leaves by exfiltration, then the return path of this system will simply be a path to dump the flow as relief air with no impact on energy use.
 
-![](InputOutputReference/media/image614.png)
+![](media/image614.png)
 
 Figure 161. DOAS serving three zones with PTACs.
 

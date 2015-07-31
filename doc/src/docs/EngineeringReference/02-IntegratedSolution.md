@@ -3,7 +3,7 @@ Integrated Solution Manager
 
 EnergyPlus is an integrated simulation. This means that all three of the major parts, building, system, and plant, must be solved simultaneously. In programs with sequential simulation, such as BLAST or DOE-2, the building zones, air handling systems, and central plant equipment are simulated sequentially with no feedback from one to the other. The sequential solution begins with a zone heat balance that updates the zone conditions and determines the heating/cooling loads at all time steps. This information is fed to the air handling simulation to determine the system response; but that response does not affect zone conditions. Similarly, the system information is passed to the plant simulation without feedback. This simulation technique works well when the system response is a well-defined function of the air temperature of the conditioned space. For a cooling situation, a typical supply and demand situation is shown schematically in the Figure 3. Here, the operating point is at the intersection of the supply and demand curves.
 
-![](EngineeringReference/media/image7.png)
+![](media/image7.png)
 
 Figure 3. Sequential Simulation Supply/Demand Relationship.
 
@@ -11,7 +11,7 @@ However, in most situations the system capacity is dependent on outside conditio
 
 To obtain a simulation that is physically realistic, the elements have to be linked in a simultaneous solution scheme. The entire integrated program can be represented as a series of functional elements connected by fluid loops as shown in Figure “Schematic of Simultaneous Solution Scheme”. In EnergyPlus all the elements are integrated and controlled by the Integrated Solution Manager. The loops are divided into supply and demand sides, and the solution scheme generally relies on successive substitution iteration to reconcile supply and demand using the Gauss-Seidell philosophy of continuous updating.
 
-![](EngineeringReference/media/image8.png)
+![](media/image8.png)
 
 Figure 4. Schematic of Simultaneous Solution Scheme
 
@@ -26,17 +26,17 @@ The basis for the zone and air system integration is to formulate energy and moi
 
 where:
 
-<span>$\sum\limits_{i = 1}^{{N_{sl}}} {{{\dot Q}_i}} $</span> = sum of the convective internal loads
+<span>\(\sum\limits_{i = 1}^{{N_{sl}}} {{{\dot Q}_i}} \)</span> = sum of the convective internal loads
 
-<span>$\sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i}\left( {{T_{si}} - {T_z}} \right)$</span> = convective heat transfer from the zone surfaces
+<span>\(\sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i}\left( {{T_{si}} - {T_z}} \right)\)</span> = convective heat transfer from the zone surfaces
 
-<span>${\dot m_{\inf }}{C_p}\left( {{T_\infty } - {T_z}} \right)$</span> = heat transfer due to infiltration of outside air
+<span>\({\dot m_{\inf }}{C_p}\left( {{T_\infty } - {T_z}} \right)\)</span> = heat transfer due to infiltration of outside air
 
-<span>$\sum_{i=1}^{N_{zones}} \dot m_i C_p\left( T_{zi} - {T_z} \right)$</span> = heat transfer due to interzone air mixing
+<span>\(\sum_{i=1}^{N_{zones}} \dot m_i C_p\left( T_{zi} - {T_z} \right)\)</span> = heat transfer due to interzone air mixing
 
-<span>${\dot Q_{sys}}$</span> = air systems output
+<span>\({\dot Q_{sys}}\)</span> = air systems output
 
-<span>${C_z}\frac{{d{T_z}}}{{dt}} = $</span>energy stored in zone air
+<span>\({C_z}\frac{{d{T_z}}}{{dt}} = \)</span>energy stored in zone air
 
 C<sub>z</sub> = ρ<sub>air</sub>C<sub>p</sub>C<sub>T</sub>
 
@@ -138,7 +138,7 @@ Prior to implementing the new heat balance method (3rdOrderBackwardDifference) i
 
 This is Equation without the term due to the air system. In addition, Tz is now the *desired* zone temperature as defined by the control system setpoints that must be specified for each zone. An assumption was made that if the air system has sufficient capacity (based on the desired zone air temperature) to meet the zone conditioning requirements (i.e. Qsys=Qload) at the desired zone air temperature then those requirements will be met. On the other hand, if the air system cannot provide enough conditioning to the zone to maintain the desired temperature, then the air system provides its maximum output to the zone and the zone air temperature is allowed to "float."  Equation was used to calculate the air system output required to maintain the desired zone air temperature; the actual zone temperature update was accomplished using Equation . This method was called *predictive system energy balance*. It has many characteristics of a predictor-corrector method since the air system response is first approximated based on a predicted zone temperature and then the actual change in zone temperature is determined from that air system response. The predictive air system energy balance method required that the system controls on air mass flow rate, supply air temperature, etc., be formulated as a function of the zone air temperature. However, this was not a serious drawback. The first example considered was a single zone draw through air system. Typically, such systems have a cooling coil and heating coil in series, and constant air volume flow rate. Single zone draw through systems run at maximum capacity when turned on; so the only way to regulate net air system output and keep the zone air temperature within the desired range is to turn the air system on and off. A simplified schematic of this system type is shown in Figure 5. Simplified Single Zone Draw Through Air System.
 
-![](EngineeringReference/media/image31.svg.png)
+![](media/image31.svg.png)
 
 Figure 5. Simplified Single Zone Draw Through Air System
 
@@ -150,13 +150,13 @@ where h is the fraction of the time step that the air system is turned on and va
 
 A far more complex, though again simplified, air system is the variable air volume (VAV) system, shown in Figure 6. Simplified Variable Volume Air System. In VAV systems, the supply air temperature, as well as the supply air volume, are continuous functions of zone air temperature. As shown in Figure 7. Idealized Variable Volume System Operation., when the zone air temperature is between Tcl and Tcu, cooling is required and the air system varies the supply air flow rate while maintaining a constant supply air temperature. When the zone air temperature is between Thl and Thu, heating is required and air is supplied at a constant minimum flow rate while the supply air temperature is varied.
 
-![](EngineeringReference/media/image33.svg.png)
+![](media/image33.svg.png)
 
 Figure 6. Simplified Variable Volume Air System.
 
 The next figure (Idealized variable volume system operation) shows idealized behavior of a VAV system; in practice, the air flow rate and temperature are not exact linear functions of zone air temperature.
 
-![](EngineeringReference/media/image34.svg.png)
+![](media/image34.svg.png)
 
 Figure 7. Idealized Variable Volume System Operation.
 
@@ -351,29 +351,29 @@ The transient air mass balance equation for the change in zone air carbon dioxid
 
 where:
 
-<span>$\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}} $</span> = sum of scheduled internal carbon dioxide loads. The zone air density is used to convert the volumetric rate of carbon dioxide generation from user input into mass generation rate [kg/s].The coefficient of 10<sup>6</sup> is used to make the units of carbon dioxide as ppm.
+<span>\(\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}} \)</span> = sum of scheduled internal carbon dioxide loads. The zone air density is used to convert the volumetric rate of carbon dioxide generation from user input into mass generation rate [kg/s].The coefficient of 10<sup>6</sup> is used to make the units of carbon dioxide as ppm.
 
-<span>$ \sum_{i=1}^{N_{zones}} \dot m_i \left( C_{zi} - C_z^t \right) $</span> = carbon dioxide transfer due to interzone air mixing [ppm-kg/s]
+<span>\(\sum_{i=1}^{N_{zones}} \dot m_i \left( C_{zi} - C_z^t \right) \)</span> = carbon dioxide transfer due to interzone air mixing [ppm-kg/s]
 
-<span>${C_{zi}}$</span> = carbon dioxide concentration in the zone air being transferred into this zone [ppm]
+<span>\({C_{zi}}\)</span> = carbon dioxide concentration in the zone air being transferred into this zone [ppm]
 
-<span>${\dot m_{\inf }}\left( {{C_\infty } - C_z^t} \right)$</span> = carbon dioxide transfer due to infiltration and ventilation of outdoor air [ppm-kg/s]
+<span>\({\dot m_{\inf }}\left( {{C_\infty } - C_z^t} \right)\)</span> = carbon dioxide transfer due to infiltration and ventilation of outdoor air [ppm-kg/s]
 
-<span>${C_\infty }$</span> = carbon dioxide concentration in outdoor air [ppm]
+<span>\({C_\infty }\)</span> = carbon dioxide concentration in outdoor air [ppm]
 
-<span>${\dot m_{sys}}\left( {{C_{\sup }} - C_z^t} \right)$</span> = carbon dioxide transfer due to system supply [ppm-kg/s]
+<span>\({\dot m_{sys}}\left( {{C_{\sup }} - C_z^t} \right)\)</span> = carbon dioxide transfer due to system supply [ppm-kg/s]
 
-<span>${C_{\sup }}$</span> = carbon dioxide concentration in the system supply airstream [ppm]
+<span>\({C_{\sup }}\)</span> = carbon dioxide concentration in the system supply airstream [ppm]
 
-<span>${\dot m_{sys}}$</span> = air system supply mass flow rate [kg/s]
+<span>\({\dot m_{sys}}\)</span> = air system supply mass flow rate [kg/s]
 
-<span>${\rho_{air}}{V_z}\frac{{dC_z^t}}{{dt}}$</span>= carbon dioxide storage term in zone air [kg/s]
+<span>\({\rho_{air}}{V_z}\frac{{dC_z^t}}{{dt}}\)</span>= carbon dioxide storage term in zone air [kg/s]
 
-<span>$C_z^t$</span> = zone air carbon dioxide concentration at the current time step [ppm]
+<span>\(C_z^t\)</span> = zone air carbon dioxide concentration at the current time step [ppm]
 
-<span>${\rho_{air}}$</span>= zone air density [kg/m<sup>3</sup>]
+<span>\({\rho_{air}}\)</span>= zone air density [kg/m<sup>3</sup>]
 
-<span>${V_z}$</span>= zone volume [m<sup>3</sup>]
+<span>\({V_z}\)</span>= zone volume [m<sup>3</sup>]
 
 C<sub>CO2</sub> = carbon dioxide capacity multiplier [dimensionless] (See the InputOutput Reference for additional information on the object ZoneCapacitanceMultiplier:ResearchSpecial)
 
@@ -433,7 +433,7 @@ At the prediction point in the simulation, the system air mass flows are not kno
 
 where:
 
-<span>${\dot m_{OA,z}}$</span>= supply outdoor airflow rate into the controlled zone [kg/s]
+<span>\({\dot m_{OA,z}}\)</span>= supply outdoor airflow rate into the controlled zone [kg/s]
 
 The above approximation is based on the assumption that the carbon dioxide concentration at the outdoor air (OA) mixer inlet is equal to the zone air outlet concentration level, and the carbon dioxide level at the zone supply air inlet is equal to the level at the outlet node of the OA mixer.
 
@@ -468,37 +468,37 @@ The transient air mass balance equation for the change in zone air generic conta
 
 where:
 
-<span>$\sum\limits_{i = 1}^{{N_{source}}} {{\rho_{air}}{G_{f,i}}} $</span>=  Sum of internal generic contaminant loads from sources in a zone or interior surfaces.
+<span>\(\sum\limits_{i = 1}^{{N_{source}}} {{\rho_{air}}{G_{f,i}}} \)</span>=  Sum of internal generic contaminant loads from sources in a zone or interior surfaces.
 
 The zone air density is used to convert the volumetric rate of generic contaminant generation from user input into mass generation rate [kg/s].The coefficient of 10<sup>6</sup> is used to make the units of generic contaminant as ppm.
 
-<span>${\rho_{air}}\sum\limits_i^{N{\rm{sink}}} {{R_{f,i}}{C_{f,z}}} $</span>= Sum of removal rate from sinks in a zone or interior surfaces [ppm-kg/s]
+<span>\({\rho_{air}}\sum\limits_i^{N{\rm{sink}}} {{R_{f,i}}{C_{f,z}}} \)</span>= Sum of removal rate from sinks in a zone or interior surfaces [ppm-kg/s]
 
-<span>$\sum_{i=1}^{N_{zones}} \dot m_i \left( C_{f,z,i} - C_{f,z}^t \right)$</span> = Generic contaminant transfer due to interzone air mixing [ppm-kg/s]
+<span>\(\sum_{i=1}^{N_{zones}} \dot m_i \left( C_{f,z,i} - C_{f,z}^t \right)\)</span> = Generic contaminant transfer due to interzone air mixing [ppm-kg/s]
 
-<span>${C_{f,z,i}}$</span> = Generic contaminant concentration in the zone air being transferred into this zone [ppm]
+<span>\({C_{f,z,i}}\)</span> = Generic contaminant concentration in the zone air being transferred into this zone [ppm]
 
-<span>${\dot m_{\inf }}\left( {{C_{f,\infty }} - C_{f,z}^t} \right)$</span>   = Generic contaminant transfer due to infiltration and ventilation of outdoor air [ppm-kg/s]
+<span>\({\dot m_{\inf }}\left( {{C_{f,\infty }} - C_{f,z}^t} \right)\)</span>   = Generic contaminant transfer due to infiltration and ventilation of outdoor air [ppm-kg/s]
 
-<span>${C_{f,\infty }}$</span> = Generic contaminant concentration in outdoor air [ppm]
+<span>\({C_{f,\infty }}\)</span> = Generic contaminant concentration in outdoor air [ppm]
 
-<span>${\dot m_{sys}}\left( {{C_{f,\sup }} - C_{f,z}^t} \right)$</span> = Generic contaminant transfer due to system supply [ppm-kg/s]
+<span>\({\dot m_{sys}}\left( {{C_{f,\sup }} - C_{f,z}^t} \right)\)</span> = Generic contaminant transfer due to system supply [ppm-kg/s]
 
-<span>${C_{f,\sup }}$</span> = Generic contaminant concentration in the system supply airstream [ppm]
+<span>\({C_{f,\sup }}\)</span> = Generic contaminant concentration in the system supply airstream [ppm]
 
-<span>${\dot m_{sys}}$</span> = Air system supply mass flow rate [kg/s]
+<span>\({\dot m_{sys}}\)</span> = Air system supply mass flow rate [kg/s]
 
-<span>${\rho_{air}}{V_z}\frac{{dC_{f,z}^t}}{{dt}}$</span>= Generic contaminant storage term in zone air [ppm-kg/s]
+<span>\({\rho_{air}}{V_z}\frac{{dC_{f,z}^t}}{{dt}}\)</span>= Generic contaminant storage term in zone air [ppm-kg/s]
 
-<span>$C_{f,z}^t$</span> = Zone air generic contaminant concentration at the current time step [ppm]
+<span>\(C_{f,z}^t\)</span> = Zone air generic contaminant concentration at the current time step [ppm]
 
-<span>${\rho_{air}}$</span>= Zone air density [kg/m<sup>3</sup>]
+<span>\({\rho_{air}}\)</span>= Zone air density [kg/m<sup>3</sup>]
 
-<span>${V_z}$</span>= Zone volume [m<sup>3</sup>]
+<span>\({V_z}\)</span>= Zone volume [m<sup>3</sup>]
 
-<span>$\sum\limits_j {{h_j}\rho {A_j}(\frac{{{C_{s,j}}}}{{{k_j}}} - {C_{f,z}})} $</span>       = Generic contaminant transport through diffusion between interior surfaces and zone air
+<span>\(\sum\limits_j {{h_j}\rho {A_j}(\frac{{{C_{s,j}}}}{{{k_j}}} - {C_{f,z}})} \)</span>       = Generic contaminant transport through diffusion between interior surfaces and zone air
 
-<span>${S_f}(C_{f,z}^{t - \delta t})$</span>= Generic contaminant generation or removal rate as a function of zone air generic contaminant level at the previous time step
+<span>\({S_f}(C_{f,z}^{t - \delta t})\)</span>= Generic contaminant generation or removal rate as a function of zone air generic contaminant level at the previous time step
 
 Mfor = Generic contaminant capacity multiplier [dimensionless] (See the InputOutput Reference for additional information on the object ZoneCapacitanceMultiplier:ResearchSpecial)
 
@@ -558,7 +558,7 @@ At the prediction point in the simulation, the system air mass flows are not kno
 
 where:
 
-<span>${\dot m_{OA,z}}$</span>= Supply outdoor airflow rate into the controlled zone [kg/s]
+<span>\({\dot m_{OA,z}}\)</span>= Supply outdoor airflow rate into the controlled zone [kg/s]
 
 The above approximation is based on the assumption that the generic contaminant concentration at the outdoor air (OA) mixer inlet is equal to the zone air outlet concentration level, and the generic contaminant level at the zone supply air inlet is equal to the level at the outlet node of the OA mixer.
 
@@ -599,15 +599,15 @@ The zone air mass flow conservation object is intended to trigger zone air mass 
 
 where,
 
-<span>${\dot m_R}$</span>   =    zone return air mass flow rate, (kg/s)
+<span>\({\dot m_R}\)</span>   =    zone return air mass flow rate, (kg/s)
 
-<span>${\dot m_{EX}}$</span>  =    zone exhaust air mass flow rate from exhaust fans, (kg/s)
+<span>\({\dot m_{EX}}\)</span>  =    zone exhaust air mass flow rate from exhaust fans, (kg/s)
 
-<span>${\dot m_{XR}}$</span>  =    zone mixing mass flow rate as a receiving zone, (kg/s)
+<span>\({\dot m_{XR}}\)</span>  =    zone mixing mass flow rate as a receiving zone, (kg/s)
 
-<span>${\dot m_{XS}}$</span>  =    zone mixing mass flow rate as a source zone, (kg/s)
+<span>\({\dot m_{XS}}\)</span>  =    zone mixing mass flow rate as a source zone, (kg/s)
 
-<span>${\dot m_S}$</span>   =    zone supply air mass flow rate, (kg/s)
+<span>\({\dot m_S}\)</span>   =    zone supply air mass flow rate, (kg/s)
 
 
 
@@ -617,7 +617,7 @@ Figure 8 illustrates the zone mass flow components for an air loop system provid
 
 
 
-![](EngineeringReference/media/image134.svg.png)
+![](media/image134.svg.png)
 
 
 
@@ -696,7 +696,7 @@ EnergyPlus models building performance over time spans of days to years using a 
 
 An EnergyPlus simulation covers a certain period of time, such as a day or a year, that is broken down into a series of discrete bins of time that are referred to as *timesteps*. The program marches through time by recalculating model equations at each timestep. The figure below diagrams some of these basic concepts.
 
-![TimeStepDataDefn](EngineeringReference/media/image141.png)
+![TimeStepDataDefn](media/image141.png)
 
 Figure 9. Diagram of TimeStep Formulation
 

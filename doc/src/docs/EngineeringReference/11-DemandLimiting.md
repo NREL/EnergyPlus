@@ -22,7 +22,7 @@ The demand limiting controls implemented in EnergyPlus are intended to allow som
 
 In EnergyPlus the DemandManagerAssignmentList and DemandManager objects are simulated by the Demand Manager module.  The Demand Manager is built into the overall solution method for the program.  For each zone time step, the program executes three major segments of code:
 
-§ exterior energy use
+* exterior energy use
 
 * zone heat balance (surface heat balances, internal gains, and air flows)
 
@@ -45,33 +45,33 @@ Table 42. Demand Manager Types and Resimulation.
 </tr>
 <tr>
 <td>DemandManager:ExteriorLights</td>
-<td>ü</td>
+<td>X</td>
 <td> </td>
 <td> </td>
 </tr>
 <tr>
 <td>DemandManager:Lights</td>
 <td> </td>
-<td>ü</td>
-<td>ü</td>
+<td>X</td>
+<td>X</td>
 </tr>
 <tr>
 <td>DemandManager:ElectricEquipment</td>
 <td> </td>
-<td>ü</td>
-<td>ü</td>
+<td>X</td>
+<td>X</td>
 </tr>
 <tr>
 <td>DemandManager:Thermostats</td>
 <td> </td>
 <td> </td>
-<td>ü</td>
+<td>X</td>
 </tr>
 <tr>
 <td>DemandManager:Ventilation</td>
 <td> </td>
 <td> </td>
-<td>ü</td>
+<td>X</td>
 </tr>
 
 </table>

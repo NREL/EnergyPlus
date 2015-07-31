@@ -2283,10 +2283,10 @@ namespace HeatBalanceSurfaceManager {
 										// Beam solar on outside of frame
 										FrIncSolarOut += ( BeamFrHorFaceInc + BeamFrVertFaceInc ) * FrProjOut;
 										if ( FrProjIn > 0.0 ) {
-											TransGl = POLYF( CosInc, Construct( ConstrNum ).TransSolBeamCoef( {1,6} ) );
+											TransGl = POLYF( CosInc, Construct( ConstrNum ).TransSolBeamCoef );
 											TransDiffGl = Construct( ConstrNum ).TransDiff;
 											if ( ShadeFlag == SwitchableGlazing ) { // Switchable glazing
-												TransGlSh = POLYF( CosInc, Construct( ConstrNumSh ).TransSolBeamCoef( {1,6} ) );
+												TransGlSh = POLYF( CosInc, Construct( ConstrNumSh ).TransSolBeamCoef );
 												TransGl = InterpSw( SwitchFac, TransGl, TransGlSh );
 												TransDiffGlSh = Construct( ConstrNumSh ).TransDiff;
 												TransDiffGl = InterpSw( SwitchFac, TransDiffGl, TransDiffGlSh );
@@ -2352,10 +2352,10 @@ namespace HeatBalanceSurfaceManager {
 										DivIncSolarOutBm = BeamFaceInc + BeamDivHorFaceInc + BeamDivVertFaceInc;
 										DivIncSolarOutDif = DifSolarFaceInc * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrDivOut );
 										if ( DivProjIn > 0.0 ) {
-											TransGl = POLYF( CosInc, Construct( ConstrNum ).TransSolBeamCoef( {1,6} ) );
+											TransGl = POLYF( CosInc, Construct( ConstrNum ).TransSolBeamCoef );
 											TransDiffGl = Construct( ConstrNum ).TransDiff;
 											if ( ShadeFlag == SwitchableGlazing ) { // Switchable glazing
-												TransGlSh = POLYF( CosInc, Construct( ConstrNumSh ).TransSolBeamCoef( {1,6} ) );
+												TransGlSh = POLYF( CosInc, Construct( ConstrNumSh ).TransSolBeamCoef );
 												TransGl = InterpSw( SwitchFac, TransGl, TransGlSh );
 												TransDiffGlSh = Construct( ConstrNumSh ).TransDiff;
 												TransDiffGl = InterpSw( SwitchFac, TransDiffGl, TransDiffGlSh );
@@ -6075,24 +6075,27 @@ GatherComponentLoadsSurfAbsFact()
 // *****************************************************************************
 // *****************************************************************************
 
-//     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-//     and The Regents of the University of California through Ernest Orlando Lawrence
-//     Berkeley National Laboratory.  All rights reserved.
-//     Portions of the EnergyPlus software package have been developed and copyrighted
-//     by other individuals, companies and institutions.  These portions have been
-//     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in main.cc.
-//     NOTICE: The U.S. Government is granted for itself and others acting on its
-//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-//     reproduce, prepare derivative works, and perform publicly and display publicly.
-//     Beginning five (5) years after permission to assert copyright is granted,
-//     subject to two possible five year renewals, the U.S. Government is granted for
-//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-//     worldwide license in this data to reproduce, prepare derivative works,
-//     distribute copies to the public, perform publicly and display publicly, and to
-//     permit others to do so.
-//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	//     NOTICE
+	
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     and The Regents of the University of California through Ernest Orlando Lawrence
+	//     Berkeley National Laboratory.  All rights reserved.
+	
+	//     Portions of the EnergyPlus software package have been developed and copyrighted
+	//     by other individuals, companies and institutions.  These portions have been
+	//     incorporated into the EnergyPlus software package under license.   For a complete
+	//     list of contributors, see "Notice" located in main.cc.
+	
+	//     NOTICE: The U.S. Government is granted for itself and others acting on its
+	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
+	//     reproduce, prepare derivative works, and perform publicly and display publicly.
+	//     Beginning five (5) years after permission to assert copyright is granted,
+	//     subject to two possible five year renewals, the U.S. Government is granted for
+	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
+	//     worldwide license in this data to reproduce, prepare derivative works,
+	//     distribute copies to the public, perform publicly and display publicly, and to
+	//     permit others to do so.
+	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

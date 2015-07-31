@@ -131,9 +131,9 @@ namespace SetPointManager {
 	int const iCtrlVarType_MinMassFlow( 9 ); // control Type 'MinimumMassFlowRate'
 
 	int const NumValidCtrlTypes( 9 );
-	Array1D_string const cValidCtrlTypes( 
-		NumValidCtrlTypes, { 
-			"Temperature", 
+	Array1D_string const cValidCtrlTypes(
+		NumValidCtrlTypes, {
+			"Temperature",
 			"MaximumTemperature",
 			"MinimumTemperature",
 			"HumidityRatio",
@@ -177,34 +177,34 @@ namespace SetPointManager {
 	int const iSPMType_ReturnWaterResetHW( 29 );
 
 	int const NumValidSPMTypes( 29 );
-	Array1D_string const cValidSPMTypes( 
-		NumValidSPMTypes, { 
-			"SetpointManager:Scheduled", 
-			"SetpointManager:Scheduled:DualSetpoint", 
-			"SetpointManager:OutdoorAirReset", 
-			"SetpointManager:SingleZone:Reheat", 
-			"SetpointManager:SingleZone:Heating", 
-			"SetpointManager:SingleZone:Cooling", 
-			"SetpointManager:SingleZone:Humidity:Minimum", 
-			"SetpointManager:SingleZone:Humidity:Maximum", 
-			"SetpointManager:MixedAir", 
-			"SetpointManager:OutdoorAirPretreat", 
-			"SetpointManager:Warmest", 
-			"SetpointManager:Coldest", 
-			"SetpointManager:WarmestTemperatureFlow", 
-			"SetpointManager:ReturnAirBypassFlow", 
-			"SetpointManager:MultiZone:Cooling:Average", 
-			"SetpointManager:MultiZone:Heating:Average", 
-			"SetpointManager:MultiZone:MinimumHumidity:Average", 
-			"SetpointManager:MultiZone:MaximumHumidity:Average", 
-			"SetpointManager:MultiZone:Humidity:Minimum", 
-			"SetpointManager:MultiZone:Humidity:Maximum", 
-			"SetpointManager:FollowOutdoorAirTemperature", 
-			"SetpointManager:FollowSystemNodeTemperature", 
-			"SetpointManager:FollowGroundTemperature", 
-			"SetpointManager:CondenserEnteringReset", 
-			"SetpointManager:CondenserEnteringReset:Ideal", 
-			"SetpointManager:SingleZone:OneStageCooling", 
+	Array1D_string const cValidSPMTypes(
+		NumValidSPMTypes, {
+			"SetpointManager:Scheduled",
+			"SetpointManager:Scheduled:DualSetpoint",
+			"SetpointManager:OutdoorAirReset",
+			"SetpointManager:SingleZone:Reheat",
+			"SetpointManager:SingleZone:Heating",
+			"SetpointManager:SingleZone:Cooling",
+			"SetpointManager:SingleZone:Humidity:Minimum",
+			"SetpointManager:SingleZone:Humidity:Maximum",
+			"SetpointManager:MixedAir",
+			"SetpointManager:OutdoorAirPretreat",
+			"SetpointManager:Warmest",
+			"SetpointManager:Coldest",
+			"SetpointManager:WarmestTemperatureFlow",
+			"SetpointManager:ReturnAirBypassFlow",
+			"SetpointManager:MultiZone:Cooling:Average",
+			"SetpointManager:MultiZone:Heating:Average",
+			"SetpointManager:MultiZone:MinimumHumidity:Average",
+			"SetpointManager:MultiZone:MaximumHumidity:Average",
+			"SetpointManager:MultiZone:Humidity:Minimum",
+			"SetpointManager:MultiZone:Humidity:Maximum",
+			"SetpointManager:FollowOutdoorAirTemperature",
+			"SetpointManager:FollowSystemNodeTemperature",
+			"SetpointManager:FollowGroundTemperature",
+			"SetpointManager:CondenserEnteringReset",
+			"SetpointManager:CondenserEnteringReset:Ideal",
+			"SetpointManager:SingleZone:OneStageCooling",
 			"SetpointManager:SingleZone:OneStageHeating",
 			"SetpointManager:ReturnTemperature:ChilledWater",
 			"SetpointManager:ReturnTemperature:HotWater"
@@ -246,7 +246,7 @@ namespace SetPointManager {
 	int NumSZOneStageHeatingSetPtMgrs( 0 ); // number of singel zone one stage heating setpoint managers
 	int NumReturnWaterResetChWSetPtMgrs( 0 ); // number of return water reset setpoint managers
 	int NumReturnWaterResetHWSetPtMgrs( 0 ); // number of hot-water return water reset setpoint managers
-	
+
 	bool ManagerOn( false );
 	bool GetInputFlag( true ); // First time, input is "gotten"
 
@@ -293,7 +293,7 @@ namespace SetPointManager {
 	Array1D< DefineSZOneStageHeatingSetPointManager > SZOneStageHeatingSetPtMgr; // single zone 1 stage heat
 	Array1D< DefineReturnWaterChWSetPointManager > ReturnWaterResetChWSetPtMgr; // return water reset
 	Array1D< DefineReturnWaterHWSetPointManager > ReturnWaterResetHWSetPtMgr; // hot-water return water reset
-	
+
 	// Functions
 
 	void
@@ -633,39 +633,39 @@ namespace SetPointManager {
 		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
-		
+
 		cCurrentModuleObject = "SetpointManager:ReturnTemperature:HotWater";
 		NumReturnWaterResetHWSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject );
 		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
-		
-		NumAllSetPtMgrs = NumSchSetPtMgrs 
-						+ NumDualSchSetPtMgrs 
-						+ NumOutAirSetPtMgrs 
-						+ NumSZRhSetPtMgrs 
-						+ NumSZHtSetPtMgrs 
-						+ NumSZClSetPtMgrs 
-						+ NumSZMinHumSetPtMgrs 
-						+ NumSZMaxHumSetPtMgrs 
-						+ NumMixedAirSetPtMgrs 
-						+ NumOAPretreatSetPtMgrs 
-						+ NumWarmestSetPtMgrs 
-						+ NumColdestSetPtMgrs 
-						+ NumWarmestSetPtMgrsTempFlow 
-						+ NumRABFlowSetPtMgrs 
-						+ NumMZClgAverageSetPtMgrs 
-						+ NumMZHtgAverageSetPtMgrs 
-						+ NumMZAverageMinHumSetPtMgrs 
-						+ NumMZAverageMaxHumSetPtMgrs 
-						+ NumMZMinHumSetPtMgrs 
-						+ NumMZMaxHumSetPtMgrs 
-						+ NumFollowOATempSetPtMgrs 
-						+ NumFollowSysNodeTempSetPtMgrs 
-						+ NumGroundTempSetPtMgrs 
-						+ NumCondEntSetPtMgrs 
-						+ NumIdealCondEntSetPtMgrs 
-						+ NumSZOneStageCoolingSetPtMgrs 
+
+		NumAllSetPtMgrs = NumSchSetPtMgrs
+						+ NumDualSchSetPtMgrs
+						+ NumOutAirSetPtMgrs
+						+ NumSZRhSetPtMgrs
+						+ NumSZHtSetPtMgrs
+						+ NumSZClSetPtMgrs
+						+ NumSZMinHumSetPtMgrs
+						+ NumSZMaxHumSetPtMgrs
+						+ NumMixedAirSetPtMgrs
+						+ NumOAPretreatSetPtMgrs
+						+ NumWarmestSetPtMgrs
+						+ NumColdestSetPtMgrs
+						+ NumWarmestSetPtMgrsTempFlow
+						+ NumRABFlowSetPtMgrs
+						+ NumMZClgAverageSetPtMgrs
+						+ NumMZHtgAverageSetPtMgrs
+						+ NumMZAverageMinHumSetPtMgrs
+						+ NumMZAverageMaxHumSetPtMgrs
+						+ NumMZMinHumSetPtMgrs
+						+ NumMZMaxHumSetPtMgrs
+						+ NumFollowOATempSetPtMgrs
+						+ NumFollowSysNodeTempSetPtMgrs
+						+ NumGroundTempSetPtMgrs
+						+ NumCondEntSetPtMgrs
+						+ NumIdealCondEntSetPtMgrs
+						+ NumSZOneStageCoolingSetPtMgrs
 						+ NumSZOneStageHeatingSetPtMgrs
 						+ NumReturnWaterResetChWSetPtMgrs
 						+ NumReturnWaterResetHWSetPtMgrs;
@@ -2817,7 +2817,7 @@ namespace SetPointManager {
 			AllSetPtMgr( AllSetPtMgrNum ).NumCtrlNodes = 1;
 
 		}
-		
+
 		if ( NumReturnWaterResetHWSetPtMgrs > 0 ) ReturnWaterResetHWSetPtMgr.allocate( NumReturnWaterResetHWSetPtMgrs );
 
 		cCurrentModuleObject = "SetpointManager:ReturnTemperature:HotWater";
@@ -4155,7 +4155,7 @@ namespace SetPointManager {
 			for ( SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetChWSetPtMgrs; ++SetPtMgrNum ) {
 				Node( ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).supplyNodeIndex ).TempSetPoint = ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).minimumChilledWaterSetpoint;
 			}
-			
+
 			for ( SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetHWSetPtMgrs; ++SetPtMgrNum ) {
 				Node( ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).supplyNodeIndex ).TempSetPoint = ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).maximumHotWaterSetpoint;
 			}
@@ -6756,7 +6756,7 @@ namespace SetPointManager {
 	}
 
 	void
-	DefineReturnWaterChWSetPointManager::calculate( DataLoopNode::NodeData & returnNode, DataLoopNode::NodeData & supplyNode ) 
+	DefineReturnWaterChWSetPointManager::calculate( DataLoopNode::NodeData & returnNode, DataLoopNode::NodeData & supplyNode )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -6782,7 +6782,7 @@ namespace SetPointManager {
 		//    a. T_supply_setpoint = T_return_target - Q_demand / ( V_dot * rho * C_p )
 		//  3. Constrain this value to limits
 		//    a. T_supply_setpoint will be within: [ Design Chilled Water Supply Temperature, Maximum Supply Water Reset Temperature ]
-		
+
 		// NOTES:
 		// The assumptions related to lagging of setpoint are most suited for smaller timesteps and/or plants that don't vary wildly from one time step to another
 		// The assumptions also become affected by variable flow plants more-so than constant-flow plants
@@ -6817,7 +6817,7 @@ namespace SetPointManager {
 
 		// get the operating flow rate
 		Real64 mdot = supplyNode.MassFlowRate;
-		
+
 		// calculate the current demand
 		Real64 Qdemand = mdot * cp * ( returnNode.Temp - supplyNode.Temp );
 
@@ -6827,7 +6827,7 @@ namespace SetPointManager {
 			return;
 		}
 
-		// Determine a return target, default is to use the constant value, but scheduled or externally 
+		// Determine a return target, default is to use the constant value, but scheduled or externally
 		//  set on the return node TempSetPoint will overwrite it.  Note that the schedule index is only
 		//  greater than zero if the input type is scheduled, and the useReturnTempSetpoint flag is only
 		//  true if the input type is specified as such
@@ -6862,7 +6862,7 @@ namespace SetPointManager {
 
 
 	void
-	DefineReturnWaterHWSetPointManager::calculate( DataLoopNode::NodeData & returnNode, DataLoopNode::NodeData & supplyNode ) 
+	DefineReturnWaterHWSetPointManager::calculate( DataLoopNode::NodeData & returnNode, DataLoopNode::NodeData & supplyNode )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -6888,7 +6888,7 @@ namespace SetPointManager {
 		//    a. T_supply_setpoint = T_return_target + Q_demand / ( V_dot * rho * C_p )
 		//  3. Constrain this value to limits
 		//    a. T_supply_setpoint will be within: [ Minimum Chilled Water Reset Temperature, Design Hot Water Supply Temperature ]
-		
+
 		// NOTES:
 		// The assumptions related to lagging of setpoint are most suited for smaller timesteps and/or plants that don't vary wildly from one time step to another
 		// The assumptions also become affected by variable flow plants more-so than constant-flow plants
@@ -6923,7 +6923,7 @@ namespace SetPointManager {
 
 		// get the operating flow rate
 		Real64 mdot = supplyNode.MassFlowRate;
-		
+
 		// calculate the current demand
 		Real64 Qdemand = mdot * cp * ( supplyNode.Temp - returnNode.Temp );
 
@@ -7995,7 +7995,7 @@ namespace SetPointManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

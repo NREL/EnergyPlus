@@ -706,9 +706,9 @@ namespace Fans {
 		Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
 	);
 
-	Real64 
+	Real64
 	CalFaultyFanAirFlowReduction(
-		std::string const FanName,            // Name of the Fan 
+		std::string const & FanName,          // Name of the Fan
 		Real64 const FanDesignAirFlowRate,    // Fan Design Volume Flow Rate [m3/s]
 		Real64 const FanDesignDeltaPress,     // Fan Design Delta Pressure [Pa]
 		Real64 const FanFaultyDeltaPressInc,  // Increase of Fan Delta Pressure in the Faulty Case [Pa]
@@ -726,7 +726,7 @@ namespace Fans {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
