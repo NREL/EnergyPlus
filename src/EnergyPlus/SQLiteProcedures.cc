@@ -2065,7 +2065,7 @@ void SQLite::createSQLiteEnvironmentPeriodRecord( const int curEnvirNum, const s
 	}
 }
 
-void SQLite::addScheduleData( int const number, std::string const name, std::string const type, double const minValue, double const maxValue )
+void SQLite::addScheduleData( int const number, std::string const & name, std::string const & type, double const minValue, double const maxValue )
 {
 	schedules.push_back(
 		std::unique_ptr<Schedule>(new Schedule(m_errorStream, m_db, number, name, type, minValue, maxValue))
@@ -2086,7 +2086,7 @@ void SQLite::addZoneListData( int const number, DataHeatBalance::ZoneListData co
 	);
 }
 
-void SQLite::addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const surfaceClass )
+void SQLite::addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const & surfaceClass )
 {
 	surfaces.push_back(
 		std::unique_ptr<Surface>(new Surface(m_errorStream, m_db, number, surfaceData, surfaceClass))
