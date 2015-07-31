@@ -397,17 +397,16 @@ EnergyPlusPgm( std::string const & filepath )
 
     if (runReadVars) {
 		std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
-		bool FileExists;
-		{ IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
+		bool FileExists = fileExists(readVarsPath);
 		if (!FileExists) {
       readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + exeExtension;
-      { IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
+      FileExists = fileExists(readVarsPath);
   		if (!FileExists) {
   			DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + "." );
   			exit(EXIT_FAILURE);
       }
 		}
-    
+
 		std::string RVIfile = idfDirPathName + idfFileNameOnly + ".rvi";
     	std::string MVIfile = idfDirPathName + idfFileNameOnly + ".mvi";
 
