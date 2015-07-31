@@ -51,7 +51,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	//      NOTICE
 
-	//      Copyright © 1996-2014 The Board of Trustees of the University of Illinois and The Regents of the
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//      University of California through Ernest Orlando Lawrence Berkeley National Laboratory.  All rights
 	//      reserved.
 

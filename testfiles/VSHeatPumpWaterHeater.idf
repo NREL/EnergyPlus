@@ -125,7 +125,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.2;
+  Version,8.3;
 
   Building,
     Building,                !- Name
@@ -2127,7 +2127,7 @@
 
 !********** Indoor Heat Pump Water Heater Inputs (uses zone and outdoor air) in Zone 5 ****************
 
-  WaterHeater:HeatPump,
+  WaterHeater:HeatPump:PumpedCondenser,
     Zone5HeatPumpWaterHeater,!- Name
     HeatPumpWaterHeaterSch,  !- Availability Schedule Name
     HPWHTempSch,             !- Compressor Setpoint Temperature Schedule Name
@@ -2151,6 +2151,7 @@
     Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,  !- DX Coil Object Type
     HPWHDXCoilVS,            !- VariableSpeed DX Coil Name
     5.0,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Zone,                    !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
     Fan:OnOff,               !- Fan Object Type
@@ -2467,7 +2468,7 @@
 !*********** End of Indoor Heat Pump Water Heater Inputs (uses zone and outdoor air) in Zone 5 ********
 !*********** Indoor Heat Pump Water Heater Inputs (uses no outdoor air) in Zone 4 ******
 
-  WaterHeater:HeatPump,
+  WaterHeater:HeatPump:PumpedCondenser,
     Zone4HeatPumpWaterHeater,!- Name
     HeatPumpWaterHeaterSch,  !- Availability Schedule Name
     HPWHTempSch,             !- Compressor Setpoint Temperature Schedule Name
@@ -2491,6 +2492,7 @@
     Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,  !- DX Coil Object Type
     Zone4HPWHDXCoilVS,       !- DX Coil Name
     5.0,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Zone,                    !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
     Fan:OnOff,               !- Fan Object Type
@@ -2696,7 +2698,7 @@
 
 !*********** Outdoor Heat Pump Water Heater Inputs ***********************
 
-  WaterHeater:HeatPump,
+  WaterHeater:HeatPump:PumpedCondenser,
     OutdoorHeatPumpWaterHeater,  !- Name
     PlantHPWHSch,            !- Availability Schedule Name
     HPWHTempSch,             !- Compressor Setpoint Temperature Schedule Name
@@ -2720,6 +2722,7 @@
     Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,  !- DX Coil Object Type
     HPWHOutdoorDXCoilVS,     !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
     Fan:OnOff,               !- Fan Object Type
@@ -2955,7 +2958,7 @@
     For: AllDays,            !- Field 2
     Until: 24:00,21.0;       !- Field 3
 
-  WaterHeater:HeatPump,
+  WaterHeater:HeatPump:PumpedCondenser,
     ScheduledHeatPumpWaterHeater,  !- Name
     ScheduledHPWHSch,        !- Availability Schedule Name
     HPWHTempSch,             !- Compressor Setpoint Temperature Schedule Name
@@ -2979,6 +2982,7 @@
     Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,  !- DX Coil Object Type
     HPWHScheduledDXCoilVS,   !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Schedule,                !- Compressor Location
     ScheduledCompressorTemp, !- Compressor Ambient Temperature Schedule Name
     Fan:OnOff,               !- Fan Object Type
@@ -3397,14 +3401,14 @@
     SPACE4-1 ATU,            !- Zone Equipment 1 Name
     2,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    WaterHeater:HeatPump,    !- Zone Equipment 2 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,    !- Zone Equipment 2 Object Type
     Zone4HeatPumpWaterHeater,!- Zone Equipment 2 Name
     1,                       !- Zone Equipment 2 Cooling Sequence
     1;                       !- Zone Equipment 2 Heating or No-Load Sequence
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
-    WaterHeater:HeatPump,    !- Zone Equipment 1 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,    !- Zone Equipment 1 Object Type
     Zone5HeatPumpWaterHeater,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
@@ -3934,7 +3938,7 @@
     Central HPWH Branch,     !- Name
     0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
-    WaterHeater:HeatPump,    !- Component 1 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,    !- Component 1 Object Type
     PlantHeatPumpWaterHeater,!- Component 1 Name
     HPWH Use Inlet Node,     !- Component 1 Inlet Node Name
     HPWH Use Outlet Node,    !- Component 1 Outlet Node Name
@@ -4145,12 +4149,12 @@
 
   PlantEquipmentList,
     heating plant,           !- Name
-    WaterHeater:HeatPump,    !- Equipment 1 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,    !- Equipment 1 Object Type
     PlantHeatPumpWaterHeater;!- Equipment 1 Name
 
 !************** Plant Heat Pump Water Heater Inputs ***********************
 
-  WaterHeater:HeatPump,
+  WaterHeater:HeatPump:PumpedCondenser,
     PlantHeatPumpWaterHeater,!- Name
     PlantHPWHSch,            !- Availability Schedule Name
     PlantHPWHTempSch,        !- Compressor Setpoint Temperature Schedule Name
@@ -4174,6 +4178,7 @@
     Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,  !- DX Coil Object Type
     HPWHPlantDXCoilVS,       !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
     Fan:OnOff,               !- Fan Object Type

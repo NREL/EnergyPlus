@@ -1893,7 +1893,7 @@ namespace HeatRecovery {
 			//   (supply air stream bypass mass flow rate proportional to ControlFraction except when frost control is active)
 			if ( ExchCond( ExNum ).ControlToTemperatureSetPoint ) {
 				if ( ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp ) != 0.0 ) {
-					if ( ( ExchCond( ExNum ).SupInTemp < HXTempSetPoint && ExchCond( ExNum ).SupOutTemp > HXTempSetPoint ) || 
+					if ( ( ExchCond( ExNum ).SupInTemp < HXTempSetPoint && ExchCond( ExNum ).SupOutTemp > HXTempSetPoint ) ||
 						( ExchCond( ExNum ).SupInTemp > HXTempSetPoint && ExchCond( ExNum ).SupOutTemp < HXTempSetPoint ) ) {
 						ControlFraction = max( 0.0, min( 1.0, std::abs( ( ExchCond( ExNum ).SupInTemp - HXTempSetPoint ) / ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp ) ) ) );
 					} else if ( ( ExchCond( ExNum ).SupInTemp < ExchCond( ExNum ).SupOutTemp && ExchCond( ExNum ).SupOutTemp < HXTempSetPoint ) ||
@@ -4894,7 +4894,7 @@ namespace HeatRecovery {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

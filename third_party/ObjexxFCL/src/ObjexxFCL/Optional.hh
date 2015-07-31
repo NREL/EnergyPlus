@@ -35,6 +35,8 @@ private: // Friend
 public: // Types
 
 	typedef  T  Value;
+	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
+	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
 
 public: // Creation
 
@@ -157,7 +159,7 @@ public: // Conversion
 
 	// Value Conversion
 	inline
-	operator T const &() const
+	operator Tr() const
 	{
 		assert( ptr_ != nullptr );
 		return *ptr_;
@@ -175,7 +177,7 @@ public: // Operators
 
 	// Value
 	inline
-	T const &
+	Tr
 	operator ()() const
 	{
 		assert( ptr_ != nullptr );
@@ -245,7 +247,7 @@ public: // Comparison
 	friend
 	inline
 	bool
-	operator ==( Optional const & a, T const & b )
+	operator ==( Optional const & a, Tc b )
 	{
 		return ( ( a.ptr_ != nullptr ) && ( *a.ptr_ == b ) );
 	}
@@ -254,7 +256,7 @@ public: // Comparison
 	friend
 	inline
 	bool
-	operator !=( Optional const & a, T const & b )
+	operator !=( Optional const & a, Tc b )
 	{
 		return !( a == b );
 	}
@@ -263,7 +265,7 @@ public: // Comparison
 	friend
 	inline
 	bool
-	operator ==( T const & a, Optional const & b )
+	operator ==( Tc a, Optional const & b )
 	{
 		return ( ( b.ptr_ != nullptr ) && ( a == *b.ptr_ ) );
 	}
@@ -272,7 +274,7 @@ public: // Comparison
 	friend
 	inline
 	bool
-	operator !=( T const & a, Optional const & b )
+	operator !=( Tc a, Optional const & b )
 	{
 		return !( a == b );
 	}
@@ -297,6 +299,8 @@ public: // Types
 
 	typedef  T  Value;
 	typedef  typename std::enable_if< std::is_abstract< T >::value >::type  EnableType;
+	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
+	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
 
 public: // Creation
 
@@ -391,7 +395,7 @@ public: // Conversion
 
 	// Value Conversion
 	inline
-	operator T const &() const
+	operator Tr() const
 	{
 		assert( ptr_ != nullptr );
 		return *ptr_;
@@ -409,7 +413,7 @@ public: // Operators
 
 	// Value
 	inline
-	T const &
+	Tr
 	operator ()() const
 	{
 		assert( ptr_ != nullptr );
@@ -469,7 +473,7 @@ public: // Comparison
 	friend
 	inline
 	bool
-	operator ==( Optional const & a, T const & b )
+	operator ==( Optional const & a, Tc b )
 	{
 		return ( ( a.ptr_ != nullptr ) && ( *a.ptr_ == b ) );
 	}
@@ -478,7 +482,7 @@ public: // Comparison
 	friend
 	inline
 	bool
-	operator !=( Optional const & a, T const & b )
+	operator !=( Optional const & a, Tc b )
 	{
 		return !( a == b );
 	}
@@ -487,7 +491,7 @@ public: // Comparison
 	friend
 	inline
 	bool
-	operator ==( T const & a, Optional const & b )
+	operator ==( Tc a, Optional const & b )
 	{
 		return ( ( b.ptr_ != nullptr ) && ( a == *b.ptr_ ) );
 	}
@@ -496,7 +500,7 @@ public: // Comparison
 	friend
 	inline
 	bool
-	operator !=( T const & a, Optional const & b )
+	operator !=( Tc a, Optional const & b )
 	{
 		return !( a == b );
 	}

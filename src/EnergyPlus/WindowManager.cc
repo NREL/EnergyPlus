@@ -1255,8 +1255,8 @@ namespace WindowManager {
 			// visible transmittance as polynomials in cosine of incidence angle
 
 			if ( ! BlindOn && ! ScreenOn ) { // Bare glass or shade on
-				W5LsqFit( CosPhiIndepVar, tsolPhi, 6, 1, 10, Construct( ConstrNum ).TransSolBeamCoef( {1,6} ) );
-				W5LsqFit( CosPhiIndepVar, rfsolPhi, 6, 1, 10, Construct( ConstrNum ).ReflSolBeamFrontCoef( {1,6} ) );
+				W5LsqFit( CosPhiIndepVar, tsolPhi, 6, 1, 10, Construct( ConstrNum ).TransSolBeamCoef );
+				W5LsqFit( CosPhiIndepVar, rfsolPhi, 6, 1, 10, Construct( ConstrNum ).ReflSolBeamFrontCoef );
 				W5LsqFit( CosPhiIndepVar, rbsolPhi, 6, 1, 10, Construct( ConstrNum ).ReflSolBeamBackCoef( {1,6} ) );
 				W5LsqFit( CosPhiIndepVar, tvisPhi, 6, 1, 10, Construct( ConstrNum ).TransVisBeamCoef );
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
@@ -6439,11 +6439,11 @@ namespace WindowManager {
 			return;
 		}
 
-		TSolNorm = POLYF( 1.0, Construct( ConstrNum ).TransSolBeamCoef( {1,6} ) );
-		TVisNorm = POLYF( 1.0, Construct( ConstrNum ).TransVisBeamCoef( {1,6} ) );
+		TSolNorm = POLYF( 1.0, Construct( ConstrNum ).TransSolBeamCoef );
+		TVisNorm = POLYF( 1.0, Construct( ConstrNum ).TransVisBeamCoef );
 		AbsBeamShadeNorm = 0.0;
 		if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn ) { // Exterior or interior shade on
-			AbsBeamShadeNorm = POLYF( 1.0, Construct( ConstrNum ).AbsBeamShadeCoef( {1,6} ) );
+			AbsBeamShadeNorm = POLYF( 1.0, Construct( ConstrNum ).AbsBeamShadeCoef );
 			// Exterior blind or screen or interior blind on
 		} else if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn ) {
 			// Find unshaded construction that goes with this construction w/blind or screen
@@ -6471,8 +6471,8 @@ namespace WindowManager {
 				return;
 			}
 
-			TBmBm = POLYF( 1.0, Construct( ConstrNumBare ).TransSolBeamCoef( {1,6} ) );
-			TBmBmVis = POLYF( 1.0, Construct( ConstrNumBare ).TransVisBeamCoef( {1,6} ) );
+			TBmBm = POLYF( 1.0, Construct( ConstrNumBare ).TransSolBeamCoef );
+			TBmBmVis = POLYF( 1.0, Construct( ConstrNumBare ).TransVisBeamCoef );
 			if ( ShadeFlag == ExtScreenOn ) {
 				//   Don't need to call subroutine, use normal incident properties (SUBROUTINE CalcNominalWindowCond)
 				//   Last call to CalcScreenTransmittance(ISurf) was done at direct normal angle (0,0) in CalcWindowScreenProperties
@@ -6486,8 +6486,8 @@ namespace WindowManager {
 				RScBackVis = SurfaceScreens( ScNum ).ReflectScreenVis;
 				RScDifBack = SurfaceScreens( ScNum ).DifReflect;
 				RScDifBackVis = SurfaceScreens( ScNum ).DifReflectVis;
-				RGlFront = POLYF( 1.0, Construct( ConstrNumBare ).ReflSolBeamFrontCoef( {1,6} ) );
-				RGlFrontVis = POLYF( 1.0, Construct( ConstrNumBare ).ReflSolBeamFrontCoef( {1,6} ) );
+				RGlFront = POLYF( 1.0, Construct( ConstrNumBare ).ReflSolBeamFrontCoef );
+				RGlFrontVis = POLYF( 1.0, Construct( ConstrNumBare ).ReflSolBeamFrontCoef );
 				RGlDiffFront = Construct( ConstrNumBare ).ReflectSolDiffFront;
 				RGlDiffFrontVis = Construct( ConstrNumBare ).ReflectVisDiffFront;
 				TSolNorm = TScBmBm * ( TBmBm + TDif * RGlFront * RScBack / ( 1 - RGlDiffFront * RScDifBack ) ) + TScBmDif * TDif / ( 1 - RGlDiffFront * RScDifBack );
@@ -6521,8 +6521,8 @@ namespace WindowManager {
 				} // (IntBlind)
 				if ( ShadeFlag == ExtBlindOn ) {
 					TBlBmBm = BlindBeamBeamTrans( 0.0, SlatAng, Blind( BlNum ).SlatWidth, Blind( BlNum ).SlatSeparation, Blind( BlNum ).SlatThickness );
-					RGlFront = POLYF( 1.0, Construct( ConstrNumBare ).ReflSolBeamFrontCoef( {1,6} ) );
-					RGlFrontVis = POLYF( 1.0, Construct( ConstrNumBare ).ReflSolBeamFrontCoef( {1,6} ) );
+					RGlFront = POLYF( 1.0, Construct( ConstrNumBare ).ReflSolBeamFrontCoef );
+					RGlFrontVis = POLYF( 1.0, Construct( ConstrNumBare ).ReflSolBeamFrontCoef );
 					AbsBlFront = InterpProfSlatAng( 0.0, SlatAng, VarSlats, Blind( BlNum ).SolFrontBeamAbs );
 					AbsBlBack = InterpProfSlatAng( 0.0, SlatAng, VarSlats, Blind( BlNum ).SolBackBeamAbs );
 					AbsBlDiffBack = InterpSlatAng( SlatAng, VarSlats, Blind( BlNum ).SolBackDiffAbs );
@@ -8866,7 +8866,7 @@ Label99999: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -528,6 +528,11 @@ namespace DataAirLoop {
 	extern Array1D< OAControllerData > OAControllerInfo;
 	extern Array1D< OutsideAirSysProps > OutsideAirSys;
 
+	// Clears the global data in DataAirLoop.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 } // DataAirLoop
 
 } // EnergyPlus

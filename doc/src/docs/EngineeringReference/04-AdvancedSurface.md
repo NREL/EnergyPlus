@@ -8,9 +8,9 @@ The input object “SurfaceProperty:ExteriorNaturalVentedCavity” allows modeli
 
 ### Baffle Heat Balance
 
-The baffle is assumed to be sufficiently thin and high-conductivity so that it can be modeled using a single temperature (for both sides and along its area).  This temperature <span>${T_{s,baff}}$</span>is determined by formulating a heat balance on a control volume that just encapsulates the baffle surface.  The baffle is assumed to completely cover the underlying surface such that it is opaque to shortwave and longwave radiation.  This assumption means that even though the baffle will have some open area for ventilation, no solar energy passes through these openings. The heat balance is diagrammed in the following figure.
+The baffle is assumed to be sufficiently thin and high-conductivity so that it can be modeled using a single temperature (for both sides and along its area).  This temperature <span>\({T_{s,baff}}\)</span>is determined by formulating a heat balance on a control volume that just encapsulates the baffle surface.  The baffle is assumed to completely cover the underlying surface such that it is opaque to shortwave and longwave radiation.  This assumption means that even though the baffle will have some open area for ventilation, no solar energy passes through these openings. The heat balance is diagrammed in the following figure.
 
-![](EngineeringReference/media/image438.png)
+![](media/image438.png)
 
 Figure 33.  Baffle Surface Heat Balance
 
@@ -20,75 +20,75 @@ The heat balance on the baffle surface’s control volume is:
 
 where:
 
-<sub><span>${q''_{\alpha sol}}$</span> </sub>is absorbed direct and diffuse solar (short wavelength) radiation heat flux.
+<sub><span>\({q''_{\alpha sol}}\)</span> </sub>is absorbed direct and diffuse solar (short wavelength) radiation heat flux.
 
-<span>${q''_{LWR,Env}}$</span> is net long wavelength (thermal) radiation flux exchange with the air and surroundings.
+<span>\({q''_{LWR,Env}}\)</span> is net long wavelength (thermal) radiation flux exchange with the air and surroundings.
 
-<sub><span>${q''_{conv,Env}}$</span> </sub>= surface convection flux exchange with outside air.
+<sub><span>\({q''_{conv,Env}}\)</span> </sub>= surface convection flux exchange with outside air.
 
-<sub><span>${q''_{LWR,cav}}$</span> </sub>is net long wavelength (thermal) radiation flux exchange with the outside face of the underlying surface(s).
+<sub><span>\({q''_{LWR,cav}}\)</span> </sub>is net long wavelength (thermal) radiation flux exchange with the outside face of the underlying surface(s).
 
-<sub><span>${q''_{conv,cav}}$</span> </sub>= surface convection flux exchange with cavity air.
+<sub><span>\({q''_{conv,cav}}\)</span> </sub>= surface convection flux exchange with cavity air.
 
-<span>${q''_{source}}$</span> is a source/sink term that accounts for energy exported out of the control volume when the baffle is a hybrid device such as a photovoltaic panel.
+<span>\({q''_{source}}\)</span> is a source/sink term that accounts for energy exported out of the control volume when the baffle is a hybrid device such as a photovoltaic panel.
 
 All terms are positive for net flux to the baffle.  Each of these heat balance components is introduced briefly below.
 
 #### External SW Radiation
 
-<sub><span>${q''_{\alpha sol}}$</span> </sub> is calculated using procedures presented elsewhere in this manual and includes both direct and diffuse incident solar radiation absorbed by the surface face.  This is influenced by location, surface facing angle and tilt, shading surfaces, surface face material properties, weather conditions, etc.  The baffle blocks all shortwave radiation from reaching the underlying surface.
+<sub><span>\({q''_{\alpha sol}}\)</span> </sub> is calculated using procedures presented elsewhere in this manual and includes both direct and diffuse incident solar radiation absorbed by the surface face.  This is influenced by location, surface facing angle and tilt, shading surfaces, surface face material properties, weather conditions, etc.  The baffle blocks all shortwave radiation from reaching the underlying surface.
 
 #### External LW Radiation
 
-<span>${q''_{LWR,Env}}$</span> is a standard radiation exchange formulation between the surface, the sky, the ground, and the atmosphere.  The radiation heat flux is calculated from the surface absorptivity, surface temperature, sky, air, and ground temperatures, and sky and ground view factors.  Radiation is modeled using linearized coefficients.  The baffle blocks all longwave radiation.
+<span>\({q''_{LWR,Env}}\)</span> is a standard radiation exchange formulation between the surface, the sky, the ground, and the atmosphere.  The radiation heat flux is calculated from the surface absorptivity, surface temperature, sky, air, and ground temperatures, and sky and ground view factors.  Radiation is modeled using linearized coefficients.  The baffle blocks all longwave radiation.
 
 #### External Convection
 
-<span>$q''_{conv,env}$</span> is modeled using the classical formulation: <span>$q''_{conv} = h_{co}(T_{air} - T_{o})$</span> where h<sub>co</sub>, is the convection coefficient.  The h<sub>co</sub> is treated in the same way as an outside face with ExteriorEnvironment conditions.  In addition, when it is raining outside, we assume the baffle gets wet and model the enhanced surface heat transfer using a large value for <span>${h_{co}}$</span>.
+<span>\(q''_{conv,env}\)</span> is modeled using the classical formulation: <span>\(q''_{conv} = h_{co}(T_{air} - T_{o})\)</span> where h<sub>co</sub>, is the convection coefficient.  The h<sub>co</sub> is treated in the same way as an outside face with ExteriorEnvironment conditions.  In addition, when it is raining outside, we assume the baffle gets wet and model the enhanced surface heat transfer using a large value for <span>\({h_{co}}\)</span>.
 
 #### Cavity LW Radiation
 
-<span>${q''_{LWR,cav}}$</span>is a standard radiation exchange formulation between the baffle surface and the underlying heat transfer surface located across the cavity.  Radiation is modeled using linearized coefficients.
+<span>\({q''_{LWR,cav}}\)</span>is a standard radiation exchange formulation between the baffle surface and the underlying heat transfer surface located across the cavity.  Radiation is modeled using linearized coefficients.
 
 #### Cavity Convection
 
-<span>$q''_{conv,cav}$</span> is modeled using the classical formulation: <span>$ q''_{conv} = h_{cp}(T_{air} - T_{o))$</span>  where h<sub>cp</sub>, is the convection coefficient.  The value for h<sub>cp</sub> is obtained from correlations used for window gaps from ISO (2003) standard 15099.
+<span>\(q''_{conv,cav}\)</span> is modeled using the classical formulation: <span>\(q''_{conv} = h_{cp}(T_{air} - T_{o))\)</span>  where h<sub>cp</sub>, is the convection coefficient.  The value for h<sub>cp</sub> is obtained from correlations used for window gaps from ISO (2003) standard 15099.
 
-Substituting models into (113) and solving for <span>${T_{s,baff}}$</span> yields the following equation:
+Substituting models into (113) and solving for <span>\({T_{s,baff}}\)</span> yields the following equation:
 
 <div>$${T_{s,baff}} = \frac{{\left( {{I_s}\alpha  + {h_{co}}{T_{amb}} + {h_{r,atm}}{T_{amb}} + {h_{r,sky}}{T_{sky}} + {h_{r,gnd}}{T_{amb}} + {h_{r,cav}}{T_{so}} + {h_{c,cav}}{T_{a,cav}} + {{q''}_{source}}} \right)}}{{\left( {{h_{co}} + {h_{r,air}} + {h_{r,sky}} + {h_{r,gnd}} + {h_{r,cav}} + {h_{c,cav}}} \right)}}$$</div>
 
 where,
 
-<span>${I_s}$</span> is the incident solar radiation of all types [W/m<sup>2</sup>],
+<span>\({I_s}\)</span> is the incident solar radiation of all types [W/m<sup>2</sup>],
 
-<span>$\alpha $</span> is the solar absorptivity of the baffle [dimensionless],
+<span>\(\alpha \)</span> is the solar absorptivity of the baffle [dimensionless],
 
-<span>${h_{r,atm}}$</span>is the linearized radiation coefficient for the surrounding atmosphere [W/m<sup>2</sup>·K],
+<span>\({h_{r,atm}}\)</span>is the linearized radiation coefficient for the surrounding atmosphere [W/m<sup>2</sup>·K],
 
-<span>${T_{amb}}$</span> is the outdoor drybulb from the weather data, also assumed for ground surface [ºC],
+<span>\({T_{amb}}\)</span> is the outdoor drybulb from the weather data, also assumed for ground surface [ºC],
 
-<span>${h_{r,sky}}$</span> is the linearized radiation coefficient for the sky [W/m<sup>2</sup>·K],
+<span>\({h_{r,sky}}\)</span> is the linearized radiation coefficient for the sky [W/m<sup>2</sup>·K],
 
-<span>${T_{sky}}$</span> is the effective sky temperature [ºC],
+<span>\({T_{sky}}\)</span> is the effective sky temperature [ºC],
 
-<span>${h_{r,gnd}}$</span> is the linearized radiation coefficient for the ground [W/m<sup>2</sup>·K],
+<span>\({h_{r,gnd}}\)</span> is the linearized radiation coefficient for the ground [W/m<sup>2</sup>·K],
 
-<span>${h_{r,cav}}$</span> is the linearized radiation coefficient for the underlying surface [W/m<sup>2</sup>·K],
+<span>\({h_{r,cav}}\)</span> is the linearized radiation coefficient for the underlying surface [W/m<sup>2</sup>·K],
 
-<span>${T_{so}}$</span> is the temperature of the outside face of the underlying heat transfer surface [ºC],
+<span>\({T_{so}}\)</span> is the temperature of the outside face of the underlying heat transfer surface [ºC],
 
-<span>${h_{co}}$</span> is the convection coefficient for the outdoor environment [W/m<sup>2</sup>·K],
+<span>\({h_{co}}\)</span> is the convection coefficient for the outdoor environment [W/m<sup>2</sup>·K],
 
-<span>${h_{c,cav}}$</span> is the convection coefficient for the surfaces facing the plenum [W/m<sup>2</sup>·K], and
+<span>\({h_{c,cav}}\)</span> is the convection coefficient for the surfaces facing the plenum [W/m<sup>2</sup>·K], and
 
-<span>${T_{a,cav}}$</span> is the drybulb temperature for air in the cavity [ºC].
+<span>\({T_{a,cav}}\)</span> is the drybulb temperature for air in the cavity [ºC].
 
 ### Cavity Heat Balance
 
-The *cavity* is the volume of air located between the baffle and the underlying heat transfer surface.  The cavity air is modeled as well-mixed.  The uniform temperature of the cavity air, <span>${T_{a,cav}}$</span>, is determined by formulating a heat balance on a control volume of air as diagrammed below.
+The *cavity* is the volume of air located between the baffle and the underlying heat transfer surface.  The cavity air is modeled as well-mixed.  The uniform temperature of the cavity air, <span>\({T_{a,cav}}\)</span>, is determined by formulating a heat balance on a control volume of air as diagrammed below.
 
-![](EngineeringReference/media/image469.png)
+![](media/image469.png)
 
 Figure 34.  Cavity Air Heat Balance
 
@@ -100,11 +100,11 @@ The heat balance on the cavity air control volume is:
 
 where,
 
-<span>${\dot Q_{vent}}$</span> is the net rate of energy added from natural ventilation – where outdoor ambient air exchanges with the cavity air.
+<span>\({\dot Q_{vent}}\)</span> is the net rate of energy added from natural ventilation – where outdoor ambient air exchanges with the cavity air.
 
-<sub><span>${\dot Q_{co}}$</span> </sub> is the net rate of energy added by surface convection heat transfer with the underlying surface.
+<sub><span>\({\dot Q_{co}}\)</span> </sub> is the net rate of energy added by surface convection heat transfer with the underlying surface.
 
-<span>${\dot Q_{c,baff}}$</span>is the net rate of energy added by surface convection heat transfer with the collector.
+<span>\({\dot Q_{c,baff}}\)</span>is the net rate of energy added by surface convection heat transfer with the collector.
 
 And substituting into yields the following equation:
 
@@ -112,17 +112,17 @@ And substituting into yields the following equation:
 
 where,
 
-<span>${\dot m_{vent}}$</span> is the air mass flow from natural forces [kg/s]
+<span>\({\dot m_{vent}}\)</span> is the air mass flow from natural forces [kg/s]
 
-Modeling natural ventilation air exchanges in a general way is challenging.  Simplistic engineering models are used to model <span>${\dot m_{vent}}$</span> resulting from natural buoyancy and wind forces.  Reasoning that the configuration is similar to single-side natural ventilation, we elect to use correlations for natural ventilation presented as equations (29) and (30) in Chapter 26. of ASHRAE HOF (2001).
+Modeling natural ventilation air exchanges in a general way is challenging.  Simplistic engineering models are used to model <span>\({\dot m_{vent}}\)</span> resulting from natural buoyancy and wind forces.  Reasoning that the configuration is similar to single-side natural ventilation, we elect to use correlations for natural ventilation presented as equations (29) and (30) in Chapter 26. of ASHRAE HOF (2001).
 
 <div>$${\dot m_{vent}} = \rho \,{{\rm{\rlap{--} \dot V}}_{{\rm{tot}}}}$$</div>
 
 where,
 
-<span>$\rho $</span> is the density of air [kg/m<sup>3</sup>], and
+<span>\(\rho \)</span> is the density of air [kg/m<sup>3</sup>], and
 
-<span>$\dot{V}_{tot} = \dot{V}_{wind} + \dot{V}_{thermal} $</span> is the total volumetric flow rate of air ventilating in and out of the cavity.
+<span>\(\dot{V}_{tot} = \dot{V}_{wind} + \dot{V}_{thermal} \)</span> is the total volumetric flow rate of air ventilating in and out of the cavity.
 
 <div>$$\dot{V}_{wind} = C_{v}A_{in}U_{\infty}$$</div>
 
@@ -135,27 +135,27 @@ where,
   \right.
 $$</div>
 
-<span>${{\rm{\rlap{--} \dot V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{a,cav}} - {T_{amb}}} \right)/{T_{a,cav}}} $</span>  (if <span>${T_{a,cav}} > {T_{amb}}$</span>)
+<span>\({{\rm{\rlap{--} \dot V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{a,cav}} - {T_{amb}}} \right)/{T_{a,cav}}} \)</span>  (if <span>\({T_{a,cav}} > {T_{amb}}\)</span>)
 
-<span>${{\rm{\rlap{--} \dot V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{amb}} - {T_{a,cav}}} \right)/{T_{amb}}} $</span>  (if <span>${T_{amb}} > {T_{a,cav}}$</span> and baffle is vertical)
+<span>\({{\rm{\rlap{--} \dot V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{amb}} - {T_{a,cav}}} \right)/{T_{amb}}} \)</span>  (if <span>\({T_{amb}} > {T_{a,cav}}\)</span> and baffle is vertical)
 
-<span>${C_v}$</span> is the effectiveness of the openings that depends on opening geometry and the orientation with respect to the wind.  ASHRAE HoF (2001) indicates values ranging from 0.25 to 0.6.  This value is available for user input.
+<span>\({C_v}\)</span> is the effectiveness of the openings that depends on opening geometry and the orientation with respect to the wind.  ASHRAE HoF (2001) indicates values ranging from 0.25 to 0.6.  This value is available for user input.
 
-<span>${C_D}$</span> is the discharge coefficient for the opening and depends on opening geometry.  This value is available for user input.
+<span>\({C_D}\)</span> is the discharge coefficient for the opening and depends on opening geometry.  This value is available for user input.
 
 Mass continuity arguments lead to modeling the area of the openings as one half of the total area of the openings, so we have:
 
 <div>$${A_{in}} = \frac{{A\,}}{2}$$</div>
 
-<span>$g$</span> is the gravitational constant taken as 9.81 [m/s<sup>2</sup>].
+<span>\(g\)</span> is the gravitational constant taken as 9.81 [m/s<sup>2</sup>].
 
-<span>$\Delta {H_{NPL}}$</span> is the height from midpoint of lower opening to the Neutral Pressure Level.  This is value is available for user input.
+<span>\(\Delta {H_{NPL}}\)</span> is the height from midpoint of lower opening to the Neutral Pressure Level.  This is value is available for user input.
 
-If the cavity is horizontal and <span>${T_{amb}} > {T_{a,cav}}$</span> then <span>${{\rm{\rlap{--} \dot V}}_{{\rm{thermal}}}}{\rm{  =  0}}$</span> because this is a stable situation.
+If the cavity is horizontal and <span>\({T_{amb}} > {T_{a,cav}}\)</span> then <span>\({{\rm{\rlap{--} \dot V}}_{{\rm{thermal}}}}{\rm{  =  0}}\)</span> because this is a stable situation.
 
 ### Underlying Heat Transfer Surface
 
-The exterior baffle and cavity are applied to the outside of a heat transfer surface.  This surface is modeled using the usual EnergyPlus methods for handling heat capacity and transients – typically the CTF method.  These native EnergyPlus heat balance routines are used to calculate <span>${T_{so}}$</span>.  The exterior baffle and cavity system is coupled to the underlying surface using the SurfaceProperty:OtherSideConditionsModel mechanism.  The exterior naturally vented cavity model provides values for <span>${h_{r,cav}}$</span>,<span>${T_{s,baff}}$</span>, <span>${h_{c,cav}}$</span>, and <span>${T_{a,cav}}$</span> for use with the heat balance model calculations for the outside face of the underlying surface (described elsewhere in this manual).
+The exterior baffle and cavity are applied to the outside of a heat transfer surface.  This surface is modeled using the usual EnergyPlus methods for handling heat capacity and transients – typically the CTF method.  These native EnergyPlus heat balance routines are used to calculate <span>\({T_{so}}\)</span>.  The exterior baffle and cavity system is coupled to the underlying surface using the SurfaceProperty:OtherSideConditionsModel mechanism.  The exterior naturally vented cavity model provides values for <span>\({h_{r,cav}}\)</span>,<span>\({T_{s,baff}}\)</span>, <span>\({h_{c,cav}}\)</span>, and <span>\({T_{a,cav}}\)</span> for use with the heat balance model calculations for the outside face of the underlying surface (described elsewhere in this manual).
 
 ### Solar and Shading Calculations
 
@@ -221,15 +221,15 @@ Exterior cavity modeling requires calculating up to three different coefficients
 
 <div>$${h_c} = \frac{{{T_{air}} - {T_{surf}}}}{{{{q''}_{conv}}}}$$</div>
 
-First, <span>${h_{co}}$</span> is the convection coefficient for the baffle surface facing the outdoors.  It is modeled in exactly the same way as elsewhere in EnergyPlus and will depend on the user setting for Outside Convection Algorithm – Outside Surface Heat Balance entry elsewhere in this document.
+First, <span>\({h_{co}}\)</span> is the convection coefficient for the baffle surface facing the outdoors.  It is modeled in exactly the same way as elsewhere in EnergyPlus and will depend on the user setting for Outside Convection Algorithm – Outside Surface Heat Balance entry elsewhere in this document.
 
-Second, <span>${h_{c,cav}}$</span> is the convection coefficient for baffle surfaces facing the cavity.  This coefficient is applied to both the baffle and the underlying surface.  The convection coefficient is modeled in the same way used in EnergyPlus to model air gaps in windows.  These correlations vary by Rayleigh number and surface tilt and are based on the work of various research including Hollands et. al., Elsherbiny et. al., Wright, and Arnold.  The formulations are documented in ISO (2003) standard 15099.  The routines were adapted from Subroutine NusseltNumber in WindowManager.f90 (by F. Winkelmann), which itself was derived from Window5 subroutine “nusselt”.
+Second, <span>\({h_{c,cav}}\)</span> is the convection coefficient for baffle surfaces facing the cavity.  This coefficient is applied to both the baffle and the underlying surface.  The convection coefficient is modeled in the same way used in EnergyPlus to model air gaps in windows.  These correlations vary by Rayleigh number and surface tilt and are based on the work of various research including Hollands et. al., Elsherbiny et. al., Wright, and Arnold.  The formulations are documented in ISO (2003) standard 15099.  The routines were adapted from Subroutine NusseltNumber in WindowManager.f90 (by F. Winkelmann), which itself was derived from Window5 subroutine “nusselt”.
 
 ### Radiation Coefficients
 
 Exterior vented cavity modeling requires calculating up to four different linearized coefficients for radiation heat transfer.  Whereas radiation calculations usually use temperature raised to the fourth power, this greatly complicates solving heat balance equations for a single temperature.  Linearized radiation coefficients have the same units and are used in the same manner as surface convection coefficients and introduce very little error for the temperature levels involved.
 
-The radiation coefficient, <span>${h_{r,cav}}$</span>, is used to model thermal radiation between the collector surface and the outside face of the underlying heat transfer surface.  We assume a view factor of unity.  It is calculated using:
+The radiation coefficient, <span>\({h_{r,cav}}\)</span>, is used to model thermal radiation between the collector surface and the outside face of the underlying heat transfer surface.  We assume a view factor of unity.  It is calculated using:
 
 <div>$${h_{r,cav}} = {\sigma_{SB}}{e_{baff}}{e_{so}}\frac{{\left( {T_{s,baff}^4 - T_{so}^4} \right)}}{{\left( {{T_{s,baff}} - {T_{so}}} \right)}}$$</div>
 
@@ -237,13 +237,13 @@ where,
 
 all temperatures are converted to Kelvin,
 
-<span>${\sigma_{SB}}$</span> is the Stefan-Boltzmann constant,
+<span>\({\sigma_{SB}}\)</span> is the Stefan-Boltzmann constant,
 
-<span>${e_{baff}}$</span> is the longwave thermal emittance of the baffle, and
+<span>\({e_{baff}}\)</span> is the longwave thermal emittance of the baffle, and
 
-<span>${e_{so}}$</span> is the longwave thermal emittance of the underlying heat transfer surface.
+<span>\({e_{so}}\)</span> is the longwave thermal emittance of the underlying heat transfer surface.
 
-The three other coefficients, <span>${h_{r,atm}}$</span>, <span>${h_{r,sky}}$</span>, and <span>${h_{r,gnd}}$</span> are used elsewhere in EnergyPlus for the outside face surface heat balance and are calculated in the same manner as equation .  [This is accomplished by calling subroutine InitExteriorConvectionCoeffs in the file HeatBalanceConvectionCoeffs.f90. ]
+The three other coefficients, <span>\({h_{r,atm}}\)</span>, <span>\({h_{r,sky}}\)</span>, and <span>\({h_{r,gnd}}\)</span> are used elsewhere in EnergyPlus for the outside face surface heat balance and are calculated in the same manner as equation .  [This is accomplished by calling subroutine InitExteriorConvectionCoeffs in the file HeatBalanceConvectionCoeffs.f90. ]
 
 ### References
 
@@ -286,7 +286,7 @@ The detailed energy balance analysis and resulting equations, being rather compl
 
 As with a traditional roof, the energy balance of an green roof is dominated by radiative forcing from the sun. This solar radiation is balanced by sensible (convection) and latent (evaporative) heat flux from soil and plant surfaces combined with conduction of heat into the soil substrate. This energy balance is illustrated in Figure 35. The variables introduced in this figure are defined in the equations that follow.
 
-![Fig1EcoRoof](EngineeringReference/media/image509.png)
+![Fig1EcoRoof](media/image509.png)
 
 Figure 35.  The Energy Balance for a Green Roof.
 
@@ -356,7 +356,7 @@ Here, r<sub>s,min</sub> is the minimum stomatal resistance. The actual stomatal 
  $$
 </div>
 
-Here, Q<sub>r</sub>, is the residual moisture content (defined as the amount of moisture in soil when plants begin to wilt), Q<sub>max</sub> is the maximum moisture content (defined as the maximum amount of moisture a particular type of soil can hold and above which run off occurs), and <span>$\overline \Theta  $</span> is the average soil moisture in the root zone. The residual moisture content is typically around 0.01 m<sup>3</sup>/m<sup>3</sup> (Frankenstein and Koenig). The maximum moisture content depends upon the soil, but generally varies from 0.3 to 0.6 m<sup>3</sup>/m<sup>3</sup> (Guymon et al.). In the expression for f<sub>3</sub>, g<sub>d</sub> is a plant specific characteristic that is only non-zero for trees, e<sub>f,sat</sub> is the saturated vapor pressure at the leaf temperature, and e<sub>a</sub> is the air vapor pressure.
+Here, Q<sub>r</sub>, is the residual moisture content (defined as the amount of moisture in soil when plants begin to wilt), Q<sub>max</sub> is the maximum moisture content (defined as the maximum amount of moisture a particular type of soil can hold and above which run off occurs), and <span>\(\overline \Theta  \)</span> is the average soil moisture in the root zone. The residual moisture content is typically around 0.01 m<sup>3</sup>/m<sup>3</sup> (Frankenstein and Koenig). The maximum moisture content depends upon the soil, but generally varies from 0.3 to 0.6 m<sup>3</sup>/m<sup>3</sup> (Guymon et al.). In the expression for f<sub>3</sub>, g<sub>d</sub> is a plant specific characteristic that is only non-zero for trees, e<sub>f,sat</sub> is the saturated vapor pressure at the leaf temperature, and e<sub>a</sub> is the air vapor pressure.
 
 Resistance to moisture exchange offered by the boundary layer formed on the leaf surface is known as aerodynamic resistance. It is measured in units of (s/m) and is influenced by wind speed, surface roughness and stability of the atmosphere (Oke). It is formulated as:
 
@@ -394,7 +394,7 @@ Sensible heat flux between the soil surface and air in its vicinity is dependent
 
 <div>$${H_g} = {\rho_{ag}}{C_{p,a}}C_h^g{W_{af}}({T_{af}} - {T_g})$$</div>
 
-where <span>$C_h^g$</span> is the bulk transfer coefficient and r<sub>ag</sub> is the density of air near the soil surface (kg/m<sup>3</sup>) given by:
+where <span>\(C_h^g\)</span> is the bulk transfer coefficient and r<sub>ag</sub> is the density of air near the soil surface (kg/m<sup>3</sup>) given by:
 
 <div>$${p_{ag}} = \frac{{{p_a} + {p_g}}}{2}$$</div>
 
@@ -412,7 +412,7 @@ And
 
 <div>$$C_{hn}^f = {\left[ {\frac{{{K_v}}}{{\ln \left( {{\raise0.7ex\hbox{${{Z_a} - {Z_d}}$} \!\mathord{\left/ {\vphantom {{{Z_a} - {Z_d}} {Z_o^f}}}\right.}\!\lower0.7ex\hbox{${Z_o^f}$}}} \right)}}} \right]^2}$$</div>
 
-where<span>$Z_o^g$</span> and <span>$Z_o^f$</span> are the ground and foliage roughness lengths,  r<sub>ch</sub> is turbulent Schmidt number (0.63), and K<sub>v</sub> is the von Karman constant (0.4).
+where<span>\(Z_o^g\)</span> and <span>\(Z_o^f\)</span> are the ground and foliage roughness lengths,  r<sub>ch</sub> is turbulent Schmidt number (0.63), and K<sub>v</sub> is the von Karman constant (0.4).
 
 The condition of the atmosphere (G<sub>h</sub>) is determined as stable or unstable based on the sign of the bulk Richardson number:
 
@@ -435,7 +435,7 @@ Removal of water vapor from the soil surface depends on the difference between t
 
 <div>$${L_R} = C_e^g{l_g}{W_{af}}{\rho_{ag}}\left( {{q_{af}} - {q_g}} \right)$$</div>
 
-Here<span>$C_e^g$</span>is the bulk transfer coefficient, l<sub>g</sub> is the latent heat of vaporization at the ground surface temperature, q<sub>af</sub> is the mixing ratio at the foliage-atmosphere interface, and q<sub>f</sub> is the mixing ratio at the ground surface, given by:
+Here<span>\(C_e^g\)</span>is the bulk transfer coefficient, l<sub>g</sub> is the latent heat of vaporization at the ground surface temperature, q<sub>af</sub> is the mixing ratio at the foliage-atmosphere interface, and q<sub>f</sub> is the mixing ratio at the ground surface, given by:
 
 <div>$${q_g} = {M_g}{q_{g,sat}} + \left( {1 - {M_g}} \right){q_{af}}$$</div>
 
@@ -443,7 +443,7 @@ The bulk transfer coefficient for latent heat exchange is analogous to that for 
 
 <div>$$C_e^g = {\Gamma_e}\left[ {\left( {1 - {\sigma_f}} \right)C_{en}^g + {\sigma_f}C_{hn}^f} \right]$$</div>
 
-where <span>$C_{en}^g$</span> is the near ground bulk transfer coefficient for Latent heat flux and G<sub>e</sub> is the latent heat exchange stability correction factor (assumed to be the same as G<sub>h</sub>).
+where <span>\(C_{en}^g\)</span> is the near ground bulk transfer coefficient for Latent heat flux and G<sub>e</sub> is the latent heat exchange stability correction factor (assumed to be the same as G<sub>h</sub>).
 
 ### Linearization
 
@@ -491,7 +491,7 @@ After linearization the final equations are of the form:
 
 The coefficients in these equations result from the direct combination of the equations from the above development. The interested reader is directed to the papers by Frankenstein and Koenig for the complete and somewhat complicated expressions.
 
-This final set of equations is then solved simultaneously to obtain T*<sub>g</sub>* and T*<sub>f</sub>* . One key difference in our implementation of the FASST algorithm is that the conduction terms in the equations for <span>$C_1^g$</span>and <span>$C_2^g$</span> are solved by inverting the Conduction Transfer Functions (CTF) within the EnergyPlus solution scheme.
+This final set of equations is then solved simultaneously to obtain T*<sub>g</sub>* and T*<sub>f</sub>* . One key difference in our implementation of the FASST algorithm is that the conduction terms in the equations for <span>\(C_1^g\)</span>and <span>\(C_2^g\)</span> are solved by inverting the Conduction Transfer Functions (CTF) within the EnergyPlus solution scheme.
 
 ### Green Roof Nomenclature
 
@@ -527,9 +527,9 @@ H *<sub>f</sub>*               =          foliage sensible
 
 H<sub>g</sub>               =          ground sensible heat flux (W/m<sup>2</sup>)
 
-<span>$I_s^ \downarrow $</span>             =          total incoming short wave radiation (W/m<sup>2</sup>)
+<span>\(I_s^ \downarrow \)</span>             =          total incoming short wave radiation (W/m<sup>2</sup>)
 
-<span>$I_{i\gamma }^ \downarrow $</span>             =          total incoming longwave radiation (W/m<sup>2</sup>)
+<span>\(I_{i\gamma }^ \downarrow \)</span>             =          total incoming longwave radiation (W/m<sup>2</sup>)
 
 K<sub>v</sub>               =          von Karmen constant (0.4)
 
@@ -591,11 +591,11 @@ a<sub>f</sub>                =          albedo (short wav
 
 a<sub>g</sub>               =          albedo (short wave reflectivity) of ground surface
 
-<sub><span>${\varepsilon_1}$</span></sub>              =          <sub><span>${\varepsilon_g} + {\varepsilon_f} - {\varepsilon_f}{\varepsilon_g}$</span></sub>
+<sub><span>\({\varepsilon_1}\)</span></sub>              =          <sub><span>\({\varepsilon_g} + {\varepsilon_f} - {\varepsilon_f}{\varepsilon_g}\)</span></sub>
 
-<sub><span>${\varepsilon_f}$</span>  </sub>             =          emissivity of canopy
+<sub><span>\({\varepsilon_f}\)</span>  </sub>             =          emissivity of canopy
 
-<sub><span>${\varepsilon_g}$</span>  </sub>             =          emissivity of the ground surface
+<sub><span>\({\varepsilon_g}\)</span>  </sub>             =          emissivity of the ground surface
 
 G<sub>h</sub>                    =             stability factor
 
@@ -607,9 +607,9 @@ r<sub>af</sub>               =          density of air at f
 
 r<sub>ag</sub>              =          density of air at ground surface temperature (kg/m<sup>3</sup>)
 
-<span>$\sigma $</span>              =          the Stefan-Boltzmann constant (5.699\*10<sup>-8</sup> W/m<sup>2</sup> ºK<sup>4</sup>)
+<span>\(\sigma \)</span>              =          the Stefan-Boltzmann constant (5.699\*10<sup>-8</sup> W/m<sup>2</sup> ºK<sup>4</sup>)
 
-<span>${\sigma_f}$</span>                        =          fractional vegetation coverage
+<span>\({\sigma_f}\)</span>                        =          fractional vegetation coverage
 
 #### Subscripts and superscripts
 
