@@ -1085,7 +1085,7 @@ namespace OutputProcessor {
 	UpdateMeters( int const TimeStamp ); // Current TimeStamp (for max/min)
 
 	void
-	ResetMeterAccumWhenWarmupComplete(
+	ResetAccumulationWhenWarmupComplete(
 		bool const curWarmupFlag // the current value of the warmup flag
 	);
 

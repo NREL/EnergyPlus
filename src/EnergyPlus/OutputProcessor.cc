@@ -2970,7 +2970,7 @@ namespace OutputProcessor {
 	}
 
 	void 
-	ResetMeterAccumWhenWarmupComplete( bool curWarmupFlag )
+	ResetAccumulationWhenWarmupComplete( bool curWarmupFlag )
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
@@ -3005,6 +3005,7 @@ namespace OutputProcessor {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Meter; // Loop Control
+		int Loop; // Loop Variable
 		bool statusOfWarmupFlag;
 		static bool prevStatusOfWarmupFlag; 
 
@@ -3040,6 +3041,24 @@ namespace OutputProcessor {
 				EnergyMeters( Meter ).SMMinValDate = 0;
 
 			}
+
+			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
+				RVar >>= RVariableTypes( Loop ).VarPtr;
+				auto & rVar( RVar() );
+				if ( rVar.ReportFreq == ReportMonthly || rVar.ReportFreq == ReportSim ) {
+					rVar.StoreValue = 0.0;
+					rVar.NumStored = 0;
+				}
+			} 
+
+			for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
+				IVar >>= IVariableTypes( Loop ).VarPtr;
+				auto & iVar( IVar() );
+				if ( iVar.ReportFreq == ReportMonthly || iVar.ReportFreq == ReportSim ) {
+					iVar.StoreValue = 0;
+					iVar.NumStored = 0;
+				}
+			} 
 
 		}
 		prevStatusOfWarmupFlag = statusOfWarmupFlag; // update for next time routine is called
