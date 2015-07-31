@@ -48,7 +48,7 @@ protected: // Creation
 	// Name Constructor
 	inline
 	explicit
-	Stream( Name name = Name() ) :
+	Stream( Name const & name = Name() ) :
 	 name_( stripped_whitespace( name ) )
 	{
 		flags_.name( name_ );
@@ -56,7 +56,7 @@ protected: // Creation
 
 	// Name + Flags Constructor
 	inline
-	Stream( Name name, IOFlags flags ) :
+	Stream( Name const & name, IOFlags const & flags ) :
 	 name_( stripped_whitespace( name ) ),
 	 flags_( flags )
 	{
