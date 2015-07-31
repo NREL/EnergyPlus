@@ -1581,7 +1581,8 @@ Water Heaters and Thermal Storage
 * WaterHeater:Mixed
 * WaterHeater:Stratified
 * WaterHeater:Sizing
-* WaterHeater:HeatPump
+* WaterHeater:HeatPump:PumpedCondenser
+* WaterHeater:HeatPump:WrappedCondenser
 * ThermalStorage:Ice:Simple
 * ThermalStorage:Ice:Detailed
 * ThermalStorage:ChilledWater:Mixed

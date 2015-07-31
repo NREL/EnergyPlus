@@ -659,7 +659,7 @@ namespace PlantLoopEquip {
 				}
 
 				// HEAT PUMP WATER HEATER
-			} else if ( EquipTypeNum == TypeOf_HeatPumpWtrHeater ) {
+			} else if ( EquipTypeNum == TypeOf_HeatPumpWtrHeaterPumped || EquipTypeNum == TypeOf_HeatPumpWtrHeaterWrapped ) {
 				SimWaterThermalTank( EquipTypeNum, sim_component.Name, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration, LoopNum, LoopSideNum ); //DSU
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;

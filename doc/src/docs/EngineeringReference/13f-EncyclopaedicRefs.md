@@ -2172,7 +2172,55 @@ Under certain input parameters, the rating method will not succeed and a warning
 
 #### Overview
 
-The input object WaterHeater:HeatPump provides a model for a heat pump water heater (HPWH) that is a compound object consisting of a water heater tank (e.g., WaterHeater:Mixed or WaterHeater:Stratified), a direct expansion (DX) “coil” (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source.
+The input objects `WaterHeater:HeatPump:*` provide models for a heat pump water heater (HPWH) that is a compound object consisting of a water heater tank (e.g., `WaterHeater:Mixed` or `WaterHeater:Stratified`), a direct expansion (DX) “coil” (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source.
+
+There are two types of heat pump water heater models available:
+
+1. `WaterHeater:HeatPump:PumpedCondenser`: This model is used to represent a heat pump water heater where water is removed from the tank, pumped through a condenser, and returned to the tank at a higher temperature. 
+2. `WaterHeater:HeatPump:WrappedCondenser`: This model is used for heat pump water heaters that are more typical in the residential building context where the heating coil is wrapped around or submerged in the tank.
+
+Each type of `WaterHeater:HeatPump:*` object is compatible with certain `Coil:WaterHeating:AirToWaterHeatPump:*` objects as shown in the following table:
+
+<table class="table table-striped">
+  <tr>
+    <th>WaterHeater:HeatPump:*</th>
+    <th>Coil:WaterHeating:AirToWaterHeatPump:*</th>
+  </tr>
+  <tr>
+    <td rowspan="2">PumpedCondenser</td>
+    <td>Pumped</td>
+  </tr>
+  <tr>
+    <td>VariableSpeed</td>
+  </tr>
+  <tr>
+    <td>WrappedCondenser</td>
+    <td>Wrapped</td>
+  </tr>
+</table>
+
+Additionally the `WaterHeater:HeatPump:WrappedCondenser` object is only compatible with stratified tanks. Therefore `WaterHeater:HeatPump:*` has the following tank compatibility matrix:
+
+<table class="table table-striped">
+  <tr>
+    <th rowspan="2">WaterHeater:HeatPump:*</th>
+    <th colspan="2">WaterHeater:*<br></th>
+  </tr>
+  <tr>
+    <th>Mixed</th>
+    <th>Stratified</th>
+  </tr>
+  <tr>
+    <td>Pumped</td>
+    <td>X</td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Wrapped</td>
+    <td></td>
+    <td>X</td>
+  </tr>
+</table>
 
 Numerous configurations of tank location, inlet air source, and DX coil compressor location can be modeled. The DX coil compressor may be located in a zone, outdoors, or the ambient temperature surrounding the compressor may be scheduled. The location of the compressor controls the operation of its crankcase heater. The water heater tank location is specified in the water heater tank object and is independent of the compressor location. In addition, the inlet air configuration may be specified in one of several ways. The heat pump water heater air coil and fan assembly may draw its inlet air from the zone and outdoor air using an optional mixer and splitter assembly as shown in the first figure below. When used, the mixer and splitter air streams are controlled by a single inlet air mixer schedule. When the HPWH draws its inlet air solely from a zone, the mixer/splitter assembly is not required as shown in the second figure below. In this case, the inlet air to the evaporator and fan assembly is made up entirely of zone air and the heat pump outlet air is directed back to the zone. The final figure illustrates a HPWH that draws its inlet air solely from outdoors and exhausts its outlet air outdoors as well. Each of these configurations may also be connected to a plant hot water loop (via the water heater tank use nodes).
 
@@ -2258,7 +2306,7 @@ For each simulation time step, the heat pump water heating capacity, energy use,
 
 Otherwise, simulation of the heat pump water heater is based on its current mode of operation. This mode of operation is either floating (heat pump compressor is off and tank water temperature has not fallen below the heat pump compressor cut-in temperature) or heating (tank water temperature dropped below the compressor cut-in temperature on a previous time step but was unable to reach the compressor setpoint temperature). Each mode is handled differently and they will be discussed separately.
 
-If the heat pump water heater is using the stratified tank model, then there is more than one value for the tank temperature.  The model includes input for where the heat pump controls detect the temperature in the form of six options for keyword choices:  Heater1, Heater2, SourceInlet, SourceOutlet, UseInlet, and UseOutlet.  The input data in the associated WaterHeater:Stratified includes the heights of these locations and the nearest stratified tank node is identified based on these heights.  When the heat pump model needs to evaluate the tank temperature of a stratified tank, it evaluates the temperature at the tank node associated with these locations.
+If the heat pump water heater is using the stratified tank model, then there is more than one value for the tank temperature.  The model includes input for where the heat pump controls detect the temperature. The input data in the associated WaterHeater:Stratified includes up to two heights in the tank where the temperature is measured and a weight associated with each. The associated stratified tank nodes are selected based on these heights. When the heat pump model needs to evaluate the tank temperature of a stratified tank, it evaluates the temperature at the tank nodes associated with these locations.
 
 #### Float Mode
 
@@ -2274,7 +2322,7 @@ where:
 
 <span>\({T_{tank,initial}}\)</span>    = tank temperature at the beginning of the simulation time step (°C)
 
-Since the pump and fan are assumed to cycle on and off with the heat pump compressor, the average condenser water and evaporator air mass flow rates for the simulation time step are calculated based on the PLR calculated above:
+Since the pump and fan are assumed to cycle on and off with the heat pump compressor, the average condenser water (for pumped condensers only) and evaporator air mass flow rates for the simulation time step are calculated based on the PLR calculated above:
 
 <div>$${\dot m_{water,avg}} = \dot Vwater\left( {{\rho_{water}}} \right)\left( {PLR} \right)$$</div>
 
@@ -2298,7 +2346,7 @@ The water tank temperature is then calculated based on heat pump operation at th
 
 #### Heating Mode
 
-When the HPWH is in heating mode at the end of the previous simulation time step (i.e., the heat pump compressor operated during the previous simulation time step but was unable to achieve the setpoint temperature), both the heat pump compressor and the water heater tank’s heating element are enabled. The part-load ratio of the heat pump compressor is set to 1, and the condenser water and evaporator air mass flow rates are set to their maximum flow rates.
+When the HPWH is in heating mode at the end of the previous simulation time step (i.e., the heat pump compressor operated during the previous simulation time step but was unable to achieve the setpoint temperature), both the heat pump compressor and the water heater tank’s heating element are enabled. The part-load ratio of the heat pump compressor is set to 1, and the condenser water (for pumped condensers) and evaporator air mass flow rates are set to their maximum flow rates.
 
 <div>$${\dot m_{water,avg}} = {\dot V_{water}}\left( {{\rho_{water}}} \right)$$</div>
 

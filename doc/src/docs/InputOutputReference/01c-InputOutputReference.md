@@ -2332,11 +2332,11 @@ The following five fields can be used to modulate the window/door openings when 
 
 The modulation takes the following form when Ventilation Control Mode = Temperature:
 
-T<sub>zone</sub> - T<sub>out</sub> **„**  [Lower Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor]  **è**  Multiplication factor = 1.0
+**if** T<sub>zone</sub> - T<sub>out</sub>  &lt;=  [Lower Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor]  **then**  Multiplication factor = 1.0
 
-[Lower Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor] &lt; T<sub>zone</sub> - T<sub>out</sub> &lt; [Upper Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor] **è **Multiplication factor varies linearly from 1.0 to [Limit Value on Multiplier for Modulating Venting Open Factor]
+**if** [Lower Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor] &lt; T<sub>zone</sub> - T<sub>out</sub> &lt; [Upper Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor]  **then** Multiplication factor varies linearly from 1.0 to [Limit Value on Multiplier for Modulating Venting Open Factor]
 
-T<sub>zone</sub> - T<sub>out</sub> **…**  [Upper Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor]  ** ****è **Multiplication factor = [Limit Value on Multiplier for Modulating Venting Open Factor]
+**if** T<sub>zone</sub> - T<sub>out</sub> &gt;=  [Upper Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor]  **then**  Multiplication factor = [Limit Value on Multiplier for Modulating Venting Open Factor]
 
 One way of “tuning” the following modulation control parameters is to perform a sensitivity analysis for winter and/or summer design days to determine what combination of values causes the biggest reduction in zone air temperature fluctuations due to venting.
 
@@ -2535,11 +2535,11 @@ The following five fields can be used to modulate this window/door opening when 
 
 The modulation takes the following form when Ventilation Control Mode = Temperature:
 
-T<sub>zone</sub> - T<sub>out</sub> **„**  [Lower Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor]  **è**  Multiplication factor = 1.0
+**if** T<sub>zone</sub> - T<sub>out</sub> &lt;= [Lower Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor]  **then**  Multiplication factor = 1.0
 
-[Lower Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor] &lt; T<sub>zone</sub> - T<sub>out</sub> &lt; [Upper Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor] **è **Multiplication factor varies linearly from 1.0 to [Limit Value on Multiplier for Modulating Venting Open Factor]
+**if** [Lower Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor] &lt; T<sub>zone</sub> - T<sub>out</sub> &lt; [Upper Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor]  **then**  Multiplication factor varies linearly from 1.0 to [Limit Value on Multiplier for Modulating Venting Open Factor]
 
-T<sub>zone</sub> - T<sub>out</sub> **…**  [Upper Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor]  ** ****è **Multiplication factor = [Limit Value on Multiplier for Modulating Venting Open Factor]
+**if** T<sub>zone</sub> - T<sub>out</sub> &gt;=  [Upper Value on Inside/Outside Temperature Difference for Modulating the Venting Open Factor]  **then**  Multiplication factor = [Limit Value on Multiplier for Modulating Venting Open Factor]
 
 One way of “tuning” the following modulation control parameters is to perform a sensitivity analysis for winter and/or summer design days to determine what combination of values causes the biggest reduction in zone air temperature fluctuations due to venting.
 
@@ -4691,7 +4691,10 @@ Table 27. Legal Zone Equipment Types (ZoneHVAC:EquipmentList)
 <td>Fan:ZoneExhaust</td>
 </tr>
 <tr>
-<td>WaterHeater:HeatPump</td>
+<td>WaterHeater:HeatPump:PumpedCondenser</td>
+</tr>
+<tr>
+<td>WaterHeater:HeatPump:WrappedCondenser</td>
 </tr>
 <tr>
 <td>ZoneHVAC:AirDistributionUnit</td>

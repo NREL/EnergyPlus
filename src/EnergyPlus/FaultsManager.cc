@@ -509,7 +509,7 @@ namespace FaultsManager {
 
 	bool
 	CheckFaultyAirFilterFanCurve(
-		std::string const FanName, // name of the fan
+		std::string const & FanName, // name of the fan
 		int const FanCurvePtr      // pointer of the fan curve
 	)
 	{
@@ -572,11 +572,7 @@ namespace FaultsManager {
 
 		FanDeltaPressCal = CurveValue( FanCurvePtr, FanMaxAirFlowRate );
 
-		if ( ( FanDeltaPressCal > 0.95*FanDeltaPress ) && ( FanDeltaPressCal < 1.05*FanDeltaPress ) ) {
-			return true;
-		} else {
-			return false;
-		}
+		return ( ( FanDeltaPressCal > 0.95*FanDeltaPress ) && ( FanDeltaPressCal < 1.05*FanDeltaPress ) );
 	}
 
 
