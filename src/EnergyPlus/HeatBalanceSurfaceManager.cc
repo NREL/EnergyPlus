@@ -2283,10 +2283,10 @@ namespace HeatBalanceSurfaceManager {
 										// Beam solar on outside of frame
 										FrIncSolarOut += ( BeamFrHorFaceInc + BeamFrVertFaceInc ) * FrProjOut;
 										if ( FrProjIn > 0.0 ) {
-											TransGl = POLYF( CosInc, Construct( ConstrNum ).TransSolBeamCoef( {1,6} ) );
+											TransGl = POLYF( CosInc, Construct( ConstrNum ).TransSolBeamCoef );
 											TransDiffGl = Construct( ConstrNum ).TransDiff;
 											if ( ShadeFlag == SwitchableGlazing ) { // Switchable glazing
-												TransGlSh = POLYF( CosInc, Construct( ConstrNumSh ).TransSolBeamCoef( {1,6} ) );
+												TransGlSh = POLYF( CosInc, Construct( ConstrNumSh ).TransSolBeamCoef );
 												TransGl = InterpSw( SwitchFac, TransGl, TransGlSh );
 												TransDiffGlSh = Construct( ConstrNumSh ).TransDiff;
 												TransDiffGl = InterpSw( SwitchFac, TransDiffGl, TransDiffGlSh );
@@ -2352,10 +2352,10 @@ namespace HeatBalanceSurfaceManager {
 										DivIncSolarOutBm = BeamFaceInc + BeamDivHorFaceInc + BeamDivVertFaceInc;
 										DivIncSolarOutDif = DifSolarFaceInc * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrDivOut );
 										if ( DivProjIn > 0.0 ) {
-											TransGl = POLYF( CosInc, Construct( ConstrNum ).TransSolBeamCoef( {1,6} ) );
+											TransGl = POLYF( CosInc, Construct( ConstrNum ).TransSolBeamCoef );
 											TransDiffGl = Construct( ConstrNum ).TransDiff;
 											if ( ShadeFlag == SwitchableGlazing ) { // Switchable glazing
-												TransGlSh = POLYF( CosInc, Construct( ConstrNumSh ).TransSolBeamCoef( {1,6} ) );
+												TransGlSh = POLYF( CosInc, Construct( ConstrNumSh ).TransSolBeamCoef );
 												TransGl = InterpSw( SwitchFac, TransGl, TransGlSh );
 												TransDiffGlSh = Construct( ConstrNumSh ).TransDiff;
 												TransDiffGl = InterpSw( SwitchFac, TransDiffGl, TransDiffGlSh );

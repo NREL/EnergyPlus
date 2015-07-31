@@ -289,6 +289,16 @@ public: // Assignment: Array
 		return *this;
 	}
 
+	// Vector4 Assignment Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1A &
+	operator =( Vector4< U > const & v )
+	{
+		Base::operator =( v );
+		return *this;
+	}
+
 	// += Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
@@ -609,6 +619,46 @@ public: // Assignment: Array
 		return *this;
 	}
 
+	// += Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1A &
+	operator +=( Vector4< U > const & v )
+	{
+		Base::operator +=( v );
+		return *this;
+	}
+
+	// -= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1A &
+	operator -=( Vector4< U > const & v )
+	{
+		Base::operator -=( v );
+		return *this;
+	}
+
+	// *= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1A &
+	operator *=( Vector4< U > const & v )
+	{
+		Base::operator *=( v );
+		return *this;
+	}
+
+	// /= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1A &
+	operator /=( Vector4< U > const & v )
+	{
+		Base::operator /=( v );
+		return *this;
+	}
+
 public: // Assignment: Array: Logical
 
 	// &&= Array Template
@@ -766,6 +816,26 @@ public: // Assignment: Array: Logical
 	inline
 	Array1A &
 	or_equals( Vector3< U > const & v )
+	{
+		Super::or_equals( v );
+		return *this;
+	}
+
+	// &&= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1A &
+	and_equals( Vector4< U > const & v )
+	{
+		Super::and_equals( v );
+		return *this;
+	}
+
+	// ||= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1A &
+	or_equals( Vector4< U > const & v )
 	{
 		Super::or_equals( v );
 		return *this;
