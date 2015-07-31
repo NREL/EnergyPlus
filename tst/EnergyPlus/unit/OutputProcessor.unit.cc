@@ -9,8 +9,11 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/PurchasedAirManager.hh>
 
 #include <map>
+
+using namespace EnergyPlus::PurchasedAirManager;
 
 namespace EnergyPlus {
 
@@ -3169,6 +3172,78 @@ namespace EnergyPlus {
 
 		}
 
+		TEST_F( EnergyPlusFixture, OutputProcessor_ResetAccumulationWhenWarmupComplete )
+		{
+			std::string const idf_objects = delimited_string( {
+				"Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,detailed;",
+				"Output:Meter:MeterFileOnly,DistrictHeating:HVAC,detailed;",
+			} );
+
+			ASSERT_FALSE( process_idf( idf_objects ) );
+
+			GetReportVariableInput();
+			Array1D< ZonePurchasedAir > PurchAir; // Used to specify purchased air parameters
+			PurchAir.allocate( 1 );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Heating Energy [J]", PurchAir( 1 ).TotHeatEnergy, "System", "Sum", PurchAir( 1 ).Name, _, "DISTRICTHEATING", "Heating", _, "System" );
+
+			// Setup so that UpdateDataandReport can be called.
+			DataGlobals::DayOfSim = 365;
+			DataGlobals::DayOfSimChr = "365";
+			DataEnvironment::Month = 12;
+			DataEnvironment::DayOfMonth = 31;
+			DataEnvironment::DSTIndicator = 0;
+			DataEnvironment::DayOfWeek = 3;
+			DataEnvironment::HolidayIndex = 0;
+			DataGlobals::HourOfDay = 24;
+			DataGlobals::NumOfDayInEnvrn = 365;
+			DataGlobals::MinutesPerTimeStep = 10;
+
+			if ( DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour ) {
+				DataGlobals::EndHourFlag = true;
+				if ( DataGlobals::HourOfDay == 24 ) {
+					DataGlobals::EndDayFlag = true;
+					if ( ( !DataGlobals::WarmupFlag ) && ( DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn ) ) {
+						DataGlobals::EndEnvrnFlag = true;
+					}
+				}
+			}
+
+			if ( DataEnvironment::DayOfMonth == WeatherManager::EndDayOfMonth( DataEnvironment::Month ) ) {
+				DataEnvironment::EndMonthFlag = true;
+			}
+			TimeValue.allocate( 2 );
+			auto timeStep = 1.0 / 6;
+			SetupTimePointers( "Zone", timeStep );
+			SetupTimePointers( "HVAC", timeStep );
+			TimeValue( 1 ).CurMinute = 50;
+			TimeValue( 2 ).CurMinute = 50;
+
+
+			DataGlobals::WarmupFlag = true;
+
+			PurchAir( 1 ).TotHeatEnergy = 1.1;
+
+			UpdateMeterReporting();
+
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
+
+			compare_eso_stream( delimited_string( {
+				"1,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+			} ) );
+
+
+
+			PurchAir.deallocate();
+
+
+		}
+	
 	}
 
 }
