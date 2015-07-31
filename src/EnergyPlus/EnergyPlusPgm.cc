@@ -241,7 +241,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 #ifdef _MSC_VER
 #ifndef _DEBUG
-    // If _MSC_VER and not debug then prevent dialogs on error
+	// If _MSC_VER and not debug then prevent dialogs on error
 	SetErrorMode(SEM_NOGPFAULTERRORBOX);
 	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
@@ -372,7 +372,7 @@ EnergyPlusPgm( std::string const & filepath )
 		}
 		ProgramPath = filepath + pathChar;
 		int dummy_argc = 0;
-		const char * dummy_argv[] = { NULL };
+		const char * dummy_argv[] = { nullptr };
 		CommandLineInterface::ProcessArgs( dummy_argc, dummy_argv );
 	}
 
@@ -395,31 +395,31 @@ EnergyPlusPgm( std::string const & filepath )
 	ReportOrphanFluids();
 	ReportOrphanSchedules();
 
-    if (runReadVars) {
+	if (runReadVars) {
 		std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
 		bool FileExists;
 		{ IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
 		if (!FileExists) {
-      readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + exeExtension;
-      { IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
-  		if (!FileExists) {
-  			DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + "." );
-  			exit(EXIT_FAILURE);
-      }
+			readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + exeExtension;
+			{ IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
+			if (!FileExists) {
+				DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + "." );
+				exit(EXIT_FAILURE);
+			}
 		}
-    
-		std::string RVIfile = idfDirPathName + idfFileNameOnly + ".rvi";
-    	std::string MVIfile = idfDirPathName + idfFileNameOnly + ".mvi";
 
-    	int fileUnitNumber;
-    	int iostatus;
-    	bool rviFileExists;
-    	bool mviFileExists;
+		std::string const RVIfile = idfDirPathName + idfFileNameOnly + ".rvi";
+		std::string const MVIfile = idfDirPathName + idfFileNameOnly + ".mvi";
 
-    	gio::Fmt readvarsFmt( "(A)" );
+		int fileUnitNumber;
+		int iostatus;
+		bool rviFileExists;
+		bool mviFileExists;
 
-    	{ IOFlags flags; gio::inquire( RVIfile, flags ); rviFileExists = flags.exists(); }
-    	if (!rviFileExists) {
+		gio::Fmt readvarsFmt( "(A)" );
+
+		{ IOFlags flags; gio::inquire( RVIfile, flags ); rviFileExists = flags.exists(); }
+		if (!rviFileExists) {
 			fileUnitNumber = GetNewUnitNumber();
 			{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, RVIfile, flags ); iostatus = flags.ios(); }
 			if ( iostatus != 0 ) {
@@ -428,10 +428,10 @@ EnergyPlusPgm( std::string const & filepath )
 			gio::write( fileUnitNumber, readvarsFmt ) << outputEsoFileName;
 			gio::write( fileUnitNumber, readvarsFmt ) << outputCsvFileName;
 			gio::close( fileUnitNumber );
-    	}
+		}
 
-    	{ IOFlags flags; gio::inquire( MVIfile, flags ); mviFileExists = flags.exists(); }
-    	if (!mviFileExists) {
+		{ IOFlags flags; gio::inquire( MVIfile, flags ); mviFileExists = flags.exists(); }
+		if (!mviFileExists) {
 			fileUnitNumber = GetNewUnitNumber();
 			{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, MVIfile, flags ); iostatus = flags.ios(); }
 			if ( iostatus != 0 ) {
@@ -440,21 +440,21 @@ EnergyPlusPgm( std::string const & filepath )
 			gio::write( fileUnitNumber, readvarsFmt ) << outputMtrFileName;
 			gio::write( fileUnitNumber, readvarsFmt ) << outputMtrCsvFileName;
 			gio::close( fileUnitNumber );
-    	}
+		}
 
-    	std::string readVarsRviCommand = "\"" + readVarsPath + "\"" + " " + RVIfile + " unlimited";
-    	std::string readVarsMviCommand = "\"" + readVarsPath + "\"" + " " + MVIfile + " unlimited";
+		std::string readVarsRviCommand = "\"" + readVarsPath + "\"" + " " + RVIfile + " unlimited";
+		std::string readVarsMviCommand = "\"" + readVarsPath + "\"" + " " + MVIfile + " unlimited";
 
-    	systemCall(readVarsRviCommand);
-    	systemCall(readVarsMviCommand);
+		systemCall(readVarsRviCommand);
+		systemCall(readVarsMviCommand);
 
-	    if (!rviFileExists)
-	    	removeFile(RVIfile.c_str());
+		if (!rviFileExists)
+			removeFile(RVIfile.c_str());
 
-	    if (!mviFileExists)
-	    	removeFile(MVIfile.c_str());
+		if (!mviFileExists)
+			removeFile(MVIfile.c_str());
 
-	    moveFile("readvars.audit", outputRvauditFileName);
+		moveFile("readvars.audit", outputRvauditFileName);
 
 	}
 
