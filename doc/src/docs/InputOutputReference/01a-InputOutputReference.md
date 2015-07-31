@@ -649,7 +649,7 @@ The choice made for this field has important implications for modeling accuracy 
 
 <table class="table table-striped">
 <tr>
-<th>Demand Winhow</th>
+<th>Demand Window</th>
 <th>Applicable Number of Timesteps per Hour</th>
 </tr>
 <tr>
