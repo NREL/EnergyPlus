@@ -156,7 +156,6 @@ TEST( ReportSizingManager, RequestSizingSystem ) {
 	bool PrintWarning; // true when sizing information is reported in the eio file
 	std::string CallingRoutine; // calling routine
 
-	DataHVACGlobals::CoolingCapacitySizing;
 	DataConstantUsedForSizing = 1.0;
 	DataFractionUsedForSizing = 1.0;
 	DataTotCapCurveIndex = 0;
@@ -243,7 +242,6 @@ TEST( ReportSizingManager, RequestSizingZone ) {
 	bool PrintWarning; // true when sizing information is reported in the eio file
 	std::string CallingRoutine; // calling routine
 
-	DataHVACGlobals::CoolingCapacitySizing;
 	DataConstantUsedForSizing = 1.0;
 	DataFractionUsedForSizing = 1.0;
 	DataTotCapCurveIndex = 0;
