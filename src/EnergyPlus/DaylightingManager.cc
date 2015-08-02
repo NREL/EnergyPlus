@@ -7735,7 +7735,7 @@ namespace DaylightingManager {
 		CurCplxFenState = SurfaceWindow( IWin ).ComplexFen.CurrentState;
 
 		// Calculate luminance from sky and sun excluding exterior obstruction transmittances and obstruction multipliers
-		SolBmIndex = ComplexWind( IWin ).Geom( CurCplxFenState ).SolBmIndex( TimeStep, IHR );
+		SolBmIndex = ComplexWind( IWin ).Geom( CurCplxFenState ).SolBmIndex( IHR, TimeStep );
 		for ( iIncElem = 1; iIncElem <= NBasis; ++iIncElem ) {
 			LambdaInc = ComplexWind( IWin ).Geom( CurCplxFenState ).Inc.Lamda( iIncElem );
 			//COSB = ComplexWind(IWin)%Geom(CurCplxFenState)%CosInc(iIncElem)
@@ -7940,7 +7940,7 @@ namespace DaylightingManager {
 		ComplexFenestrationLuminances( IWin, WinEl, NIncBasis, IHR, iRefPoint, ElementLuminanceSky, ElementLuminanceSun, ElementLuminanceSunDisk, CalledFrom, MapNum );
 
 		// luminance from sun disk needs to include fraction of sunlit area
-		SolBmIndex = ComplexWind( IWin ).Geom( CurCplxFenState ).SolBmIndex( TimeStep, IHR );
+		SolBmIndex = ComplexWind( IWin ).Geom( CurCplxFenState ).SolBmIndex( IHR, TimeStep );
 		if ( SolBmIndex > 0 ) {
 			COSIncSun = ComplexWind( IWin ).Geom( CurCplxFenState ).CosInc( SolBmIndex );
 		} else {
@@ -8186,7 +8186,7 @@ namespace DaylightingManager {
 
 		CurCplxFenState = SurfaceWindow( iWin ).ComplexFen.CurrentState;
 		iConst = SurfaceWindow( iWin ).ComplexFen.State( CurCplxFenState ).Konst;
-		SolBmIndex = ComplexWind( iWin ).Geom( CurCplxFenState ).SolBmIndex( TimeStep, iHour );
+		SolBmIndex = ComplexWind( iWin ).Geom( CurCplxFenState ).SolBmIndex( iHour, TimeStep );
 
 		{ auto const SELECT_CASE_var( CalledFrom );
 		if ( SELECT_CASE_var == CalledForRefPoint ) {

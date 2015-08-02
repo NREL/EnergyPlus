@@ -5,6 +5,7 @@
 #include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Vector3.fwd.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -155,18 +156,15 @@ namespace WindowComplexManager {
 	void
 	CFSShadeAndBeamInitialization(
 		int const iSurf, // Window surface number
-		int const iState, // Window state number
-		BSDFWindowGeomDescr & Window, // Window Geometry
-		BSDFGeomDescr & Geom, // State Geometry
-		BSDFStateDescr & State // State Description
+		int const iState // Window state number
 	);
 
 	void
 	CalculateWindowBeamProperties(
 		int const ISurf, // Window surface number
 		int const IState, // Window state number
-		BSDFWindowGeomDescr & Window, // Window Geometry
-		BSDFGeomDescr & Geom, // State Geometry
+		BSDFWindowGeomDescr const & Window, // Window Geometry
+		BSDFGeomDescr const & Geom, // State Geometry
 		BSDFStateDescr & State, // State Description
 		int const Hour, // Hour number
 		int const TS // Timestep number
@@ -302,10 +300,10 @@ namespace WindowComplexManager {
 	void
 	PierceSurfaceVector(
 		int const ISurf, // Surface index
-		Vector const & Orig, // Point from which ray originates
-		Vector const & Dir, // Unit vector along in direction of ray whose
-		int & IPIERC, // =1 if line through point R1 in direction of unit vector
-		Vector & HitPt // Point that ray along RN intersects plane of surface
+		Vector3< Real64 > const & R1, // Point from which ray originates
+		Vector3< Real64 > const & RN, // Unit vector along in direction of ray whose intersection with surface is to be determined
+		int & IPIERC, // =1 if line through point R1 in direction of unit vector RN intersects surface ISurf; =0 otherwise
+		Vector3< Real64 > & CP // Point that ray along RN intersects plane of surface
 	);
 
 	//     NOTICE
