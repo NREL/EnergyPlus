@@ -7,7 +7,6 @@
 #include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Optional.hh>
-#include <ObjexxFCL/Vector2.fwd.hh>
 #include <ObjexxFCL/Vector3.fwd.hh>
 
 // EnergyPlus Headers
@@ -360,15 +359,6 @@ namespace DaylightingManager {
 	DayltgExtHorizIllum(
 		Array1A< Real64 > HISK, // Horizontal illuminance from sky for different sky types
 		Real64 & HISU // Horizontal illuminance from sun for unit beam normal
-	);
-
-	void
-	DayltgPierceSurface(
-		int const ISurf, // Surface index
-		Vector3< Real64 > const & R1, // Point from which ray originates
-		Vector3< Real64 > const & RN, // Unit vector along in direction of ray whose
-		int & IPIERC, // =1 if line through point R1 in direction of unit vector
-		Vector3< Real64 > & CP // Point that ray along RN intersects plane of surface
 	);
 
 	void

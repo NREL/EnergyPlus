@@ -8,7 +8,6 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Vector3.hh>
 
 // EnergyPlus Headers
 #include <WindowComplexManager.hh>
@@ -26,6 +25,7 @@
 #include <DataZoneEquipment.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
+#include <PierceSurface.hh>
 #include <Psychrometrics.hh>
 #include <TARCOGGassesParams.hh>
 #include <TARCOGMain.hh>
@@ -810,7 +810,7 @@ namespace WindowComplexManager {
 							// skip surfaces that face away from the ground point
 							if ( dot( SunDir, Surface( JSurf ).NewellSurfaceNormalVector ) >= 0.0 ) continue;
 							// Looking for surfaces between GndPt and sun
-							PierceSurfaceVector( JSurf, gndPt, SunDir, IHit, HitPt );
+							PierceSurface( JSurf, gndPt, SunDir, IHit, HitPt );
 							if ( IHit == 0 ) continue;
 							// Are not going into the details of whether a hit surface is transparent
 							// Since this is ultimately simply weighting the transmittance, so great
@@ -860,7 +860,7 @@ namespace WindowComplexManager {
 					// skip surfaces that face away from the ground point
 					if ( dot( SunDir, Surface( JSurf ).NewellSurfaceNormalVector ) >= 0.0 ) continue;
 					// Looking for surfaces between GndPt and sun
-					PierceSurfaceVector( JSurf, gndPt, SunDir, IHit, HitPt );
+					PierceSurface( JSurf, gndPt, SunDir, IHit, HitPt );
 					if ( IHit == 0 ) continue;
 					// Are not going into the details of whether a hit surface is transparent
 					// Since this is ultimately simply weighting the transmittance, so great
@@ -1721,7 +1721,7 @@ namespace WindowComplexManager {
 				//  skip surfaces that face away from the window
 				DotProd = dot( Geom.sInc( IRay ), Surface( JSurf ).NewellSurfaceNormalVector );
 				if ( DotProd >= 0.0 ) continue;
-				PierceSurfaceVector( JSurf, Surface( ISurf ).Centroid, Geom.sInc( IRay ), IHit, HitPt );
+				PierceSurface( JSurf, Surface( ISurf ).Centroid, Geom.sInc( IRay ), IHit, HitPt );
 				if ( IHit <= 0 ) continue;
 				IHit = 0; //A hit, clear the hit flag for the next cycle
 				if ( TotHits == 0 ) {
@@ -1897,7 +1897,7 @@ namespace WindowComplexManager {
 			for ( KBkSurf = 1; KBkSurf <= NBkSurf; ++KBkSurf ) { //back surf loop
 				BaseSurf = Surface( ISurf ).BaseSurf; //ShadowComb is organized by base surface
 				JSurf = ShadowComb( BaseSurf ).BackSurf( KBkSurf ); //these are all proper back surfaces
-				PierceSurfaceVector( JSurf, Surface( ISurf ).Centroid, Geom.sTrn( IRay ), IHit, HitPt );
+				PierceSurface( JSurf, Surface( ISurf ).Centroid, Geom.sTrn( IRay ), IHit, HitPt );
 				if ( IHit <= 0 ) continue;
 				IHit = 0; //A hit, clear the hit flag for the next cycle
 				if ( TotHits == 0 ) {
@@ -4005,103 +4005,6 @@ namespace WindowComplexManager {
 		SearchAscTable = Ih;
 
 		return SearchAscTable;
-
-	}
-
-	void
-	PierceSurfaceVector(
-		int const ISurf, // Surface index
-		Vector3< Real64 > const & R1, // Point from which ray originates
-		Vector3< Real64 > const & RN, // Unit vector along in direction of ray whose intersection with surface is to be determined
-		int & IPIERC, // =1 if line through point R1 in direction of unit vector RN intersects surface ISurf; =0 otherwise
-		Vector3< Real64 > & CP // Point that ray along RN intersects plane of surface
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Fred Winkelmann
-		//       DATE WRITTEN   July 1997
-		//       MODIFIED       Sept 2003, FCW: modification of Daylighting routine DayltgPierceSurface
-		//                             June 2011, JHK: inputs made vector types; copy of routine from
-		//                                        SolarReflectionManager
-		//       RE-ENGINEERED  Aug 2015, Stuart Mentzer: Performance tuned
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Returns point CPhit that line through point R1 in direction of unit vector RN intersects
-		// the plan of surface ISurf. IPIERC = 1 if CPhit is inside the perimeter of ISurf. If not,
-		// IPIERC = 0. This routine works for convex and concave surfaces with 3 or more vertices.
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// Based on DOE-2.1E subroutine DPIERC.
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:na
-		// INTERFACE BLOCK SPECIFICATIONS:na
-		// DERIVED TYPE DEFINITIONS:na
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		// FLOW:
-		IPIERC = 0;
-
-		// Aliases
-		auto const & surface( Surface( ISurf ) );
-		auto const & V( surface.Vertex );
-		Vector3< Real64 > const V2( V( 2 ) );
-
-		// Vertex-to-vertex vectors. A1 is from vertex 1 to 2, etc.
-		Vector3< Real64 > const A1( V2 - V( 1 ) );
-		Vector3< Real64 > const A2( V( 3 ) - V2 );
-
-		// Vector normal to surface (A1 X A2)
-		Vector3< Real64 > const SN( cross( A1, A2 ) );
-
-		// Scale factor, the solution of SN.(CP-V2) = 0 and
-		// CP = R1 + SCALE*RN, where CP is the point that RN,
-		// when extended, intersects the plane of the surface.
-		Real64 const F2 = dot( SN, RN );
-		if ( std::abs( F2 ) < 0.01 ) return; // Skip surfaces that are parallel to RN
-		Real64 const SCALE = dot( SN, V2 - R1 ) / F2; // Scale factor
-		if ( SCALE <= 0.0 ) return; // Skip surfaces that RN points away from
-		// Point that RN intersects plane of surface
-		//Tuned Avoid array temporary and unroll: Was CP = R1 + RN * SCALE
-		CP.x = R1.x + ( RN.x * SCALE );
-		CP.y = R1.y + ( RN.y * SCALE );
-		CP.z = R1.z + ( RN.z * SCALE );
-
-		// Two cases: rectangle and non-rectangle; do rectangle
-		// first since most common shape and faster calculation
-		auto shape( surface.Shape );
-		if ( shape == Rectangle || shape == RectangularDoorWindow || shape == RectangularOverhang || shape == RectangularLeftFin || shape == RectangularRightFin ) { // Surface is rectangular
-			Vector3< Real64 > const CCC( CP - V2 ); // Vector from vertex 2 to CP
-			// Intersection point, CCC, is inside rectangle if
-			// 0 < CCC.A2 < A2.A2 AND 0 < CCC.AAA < AAA.AAA
-			Real64 const DOTCB = dot( CCC, A2 );
-			if ( ( DOTCB < 0.0 ) || ( DOTCB > A2.magnitude_squared() ) ) return;
-			Real64 const DOTCA = -dot( CCC, A1 ); // AAA == -A1
-			if ( ( DOTCA < 0.0 ) || ( DOTCA > A1.magnitude_squared() ) ) return;
-			IPIERC = 1; // Surface is intersected
-		} else { // Surface is not rectangular
-			// If at least one of these dot products is negative intersection point is outside of surface
-			if ( dot( cross( A1, CP - V( 1 ) ), SN ) < 0.0 ) return;
-			if ( dot( cross( A2, CP - V2 ), SN ) < 0.0 ) return;
-			int const NV( surface.Sides ); // Number of vertices (3 or 4)
-			assert( NV >= 3 );
-			if ( NV > 3 ) {
-				if ( NV == 4 ) {
-					if ( dot( cross( V( 4 ) - V( 3 ), CP - V( 3 ) ), SN ) < 0.0 ) return;
-				} else { // NV > 4
-					for ( int N = 3; N < NV; ++N ) {
-						if ( dot( cross( V( N + 1 ) - V( N ), CP - V( N ) ), SN ) < 0.0 ) return;
-					}
-				}
-			}
-			if ( dot( cross( V( 1 ) - V( NV ), CP - V( NV ) ), SN ) < 0.0 ) return; // Last vertex
-			IPIERC = 1; // Surface is intersected
-		}
 
 	}
 

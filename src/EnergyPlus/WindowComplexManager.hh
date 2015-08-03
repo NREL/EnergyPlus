@@ -5,7 +5,6 @@
 #include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2D.hh>
-#include <ObjexxFCL/Vector3.fwd.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -295,15 +294,6 @@ namespace WindowComplexManager {
 		Array1A< Real64 > A, // Vector components: C = A X B
 		Array1A< Real64 > B,
 		Array1A< Real64 > C
-	);
-
-	void
-	PierceSurfaceVector(
-		int const ISurf, // Surface index
-		Vector3< Real64 > const & R1, // Point from which ray originates
-		Vector3< Real64 > const & RN, // Unit vector along in direction of ray whose intersection with surface is to be determined
-		int & IPIERC, // =1 if line through point R1 in direction of unit vector RN intersects surface ISurf; =0 otherwise
-		Vector3< Real64 > & CP // Point that ray along RN intersects plane of surface
 	);
 
 	//     NOTICE
