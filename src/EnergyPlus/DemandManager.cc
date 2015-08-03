@@ -107,14 +107,8 @@ namespace DemandManager {
 		DemandManagerHBIterations = 0;
 		DemandManagerHVACIterations = 0;
 		GetInput = true;
-		if ( DemandManagerList.allocated() )
-		{
-			DemandManagerList.deallocate();
-		}
-		if ( DemandMgr.allocated() )
-		{
-			DemandMgr.deallocate();
-		}
+		DemandManagerList.deallocate();
+		DemandMgr.deallocate();
 	}
 
 	void

@@ -77,46 +77,16 @@ namespace DataZoneControls {
 		AnyOpTempControl = false; // flag set true if any zones have op temp control
 		AnyZoneTempAndHumidityControl = false; // flag set true if any zones have over cool control
 		GetZoneAirStatsInputFlag = true; // True when need to get input
-		if ( StageZoneLogic.allocated() )
-		{
-			StageZoneLogic.deallocate();
-		}
-		if ( OccRoomTSetPointHeat.allocated() )
-		{
-			OccRoomTSetPointHeat.deallocate();
-		}
-		if ( OccRoomTSetPointCool.allocated() )
-		{
-			OccRoomTSetPointCool.deallocate();
-		}
-		if ( HumidityControlZone.allocated() )
-		{
-			HumidityControlZone.deallocate();
-		}
-		if ( TempControlledZone.allocated() )
-		{
-			TempControlledZone.deallocate();
-		}
-		if ( ComfortControlledZone.allocated() )
-		{
-			ComfortControlledZone.deallocate();
-		}
-		if ( TStatObjects.allocated() )
-		{
-			TStatObjects.deallocate();
-		}
-		if ( ComfortTStatObjects.allocated() )
-		{
-			ComfortTStatObjects.deallocate();
-		}
-		if ( StagedTStatObjects.allocated() )
-		{
-			StagedTStatObjects.deallocate();
-		}
-		if ( StageControlledZone.allocated() )
-		{
-			StageControlledZone.deallocate();
-		}
+		StageZoneLogic.deallocate();
+		OccRoomTSetPointHeat.deallocate();
+		OccRoomTSetPointCool.deallocate();
+		HumidityControlZone.deallocate();
+		TempControlledZone.deallocate();
+		ComfortControlledZone.deallocate();
+		TStatObjects.deallocate();
+		ComfortTStatObjects.deallocate();
+		StagedTStatObjects.deallocate();
+		StageControlledZone.deallocate();
 	}
 
 

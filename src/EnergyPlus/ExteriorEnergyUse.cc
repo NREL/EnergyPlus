@@ -92,14 +92,8 @@ namespace ExteriorEnergyUse {
 	{
 		NumExteriorLights = 0;
 		NumExteriorEqs = 0;
-		if ( ExteriorLights.allocated() )
-		{
-			ExteriorLights.deallocate();
-		}
-		if ( ExteriorEquipment.allocated() )
-		{
-			ExteriorEquipment.deallocate();
-		}
+		ExteriorLights.deallocate();
+		ExteriorEquipment.deallocate();
 	}
 	
 	void
