@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -33,7 +33,7 @@ private: // Friend
 
 public: // Types
 
-	typedef  typename Super::Array  Array;
+	typedef  typename Super::ArrayType  ArrayType;
 	typedef  typename Super::Class  Class;
 	typedef  typename Super::MPtr  MPtr;
 	typedef  typename Super::Traits  Traits;
@@ -78,8 +78,8 @@ protected: // Creation
 
 	// Constructor
 	inline
-	MArrayR( A & array, T Class::* pmem ) :
-	 Super( array, pmem )
+	MArrayR( A & a, T Class::* pmem ) :
+	 Super( a, pmem )
 	{}
 
 public: // Creation

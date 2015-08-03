@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -93,8 +93,8 @@ namespace HVACStandAloneERV {
 
 	int NumStandAloneERVs; // Total number of stand alone ERVs defined in the idf
 
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
 	bool GetERVInputFlag( true ); // First time, input is "gotten"
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
@@ -112,7 +112,7 @@ namespace HVACStandAloneERV {
 	// Utility routines for module
 
 	// Object Data
-	FArray1D< StandAloneERVData > StandAloneERV;
+	Array1D< StandAloneERVData > StandAloneERV;
 
 	// Functions
 
@@ -231,7 +231,6 @@ namespace HVACStandAloneERV {
 		using MixedAir::CheckOAControllerName;
 		using DataHeatBalance::Zone;
 		using DataZoneEquipment::ZoneEquipConfig;
-		using DataZoneEquipment::ERVStandAlone_Num;
 		using DataZoneControls::HumidityControlZone;
 		using DataZoneControls::NumHumidityControlZones;
 		using Fans::GetFanAvailSchPtr;
@@ -244,9 +243,7 @@ namespace HVACStandAloneERV {
 		auto & GetGenericSupplyAirFlowRate( HeatRecovery::GetSupplyAirFlowRate );
 		using HeatRecovery::GetHeatExchangerObjectTypeNum;
 		auto & GetHXSupplyInletNode( HeatRecovery::GetSupplyInletNode );
-		auto & GetHXSupplyOutletNode( HeatRecovery::GetSupplyOutletNode );
 		auto & GetHXSecondaryInletNode( HeatRecovery::GetSecondaryInletNode );
-		auto & GetHXSecondaryOutletNode( HeatRecovery::GetSecondaryOutletNode );
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
@@ -268,12 +265,12 @@ namespace HVACStandAloneERV {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int StandAloneERVIndex; // loop index
 		int StandAloneERVNum; // current Stand Alone ERV number
-		FArray1D_string Alphas; // Alpha items for object
-		FArray1D< Real64 > Numbers; // Numeric items for object
-		FArray1D_string cAlphaFields;
-		FArray1D_string cNumericFields;
-		FArray1D_bool lAlphaBlanks;
-		FArray1D_bool lNumericBlanks;
+		Array1D_string Alphas; // Alpha items for object
+		Array1D< Real64 > Numbers; // Numeric items for object
+		Array1D_string cAlphaFields;
+		Array1D_string cNumericFields;
+		Array1D_bool lAlphaBlanks;
+		Array1D_bool lNumericBlanks;
 		std::string CompSetSupplyFanInlet;
 		std::string CompSetSupplyFanOutlet;
 		std::string CompSetExhaustFanInlet;
@@ -1010,7 +1007,7 @@ namespace HVACStandAloneERV {
 		using DataAirLoop::OAControllerInfo;
 
 		// Locals
-		static FArray1D_bool MySizeFlag;
+		static Array1D_bool MySizeFlag;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1029,8 +1026,8 @@ namespace HVACStandAloneERV {
 		int SupInletNode; // supply air inlet node number for Stand Alone ERV 'StandAloneERVNum'
 		Real64 RhoAir; // air density at SupInNode, standard conditions (dry air @ 20C,actual elevation pressure)
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop; // loop counter
 
@@ -1182,7 +1179,6 @@ namespace HVACStandAloneERV {
 		// Using/Aliasing
 		using DataSizing::AutoSize;
 		using DataSizing::CurZoneEqNum;
-		using DataSizing::FinalZoneSizing;
 		using DataSizing::AutoVsHardSizingThreshold;
 		using DataSizing::ZoneEqSizing;
 		using DataHeatBalance::Zone;
@@ -2030,7 +2026,7 @@ namespace HVACStandAloneERV {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

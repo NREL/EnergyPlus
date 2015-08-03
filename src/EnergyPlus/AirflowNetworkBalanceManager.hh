@@ -2,7 +2,7 @@
 #define AirflowNetworkBalanceManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -30,12 +30,12 @@ namespace AirflowNetworkBalanceManager {
 
 	// MODULE VARIABLE DECLARATIONS:
 	// Report variables
-	extern FArray1D< Real64 > PZ;
+	extern Array1D< Real64 > PZ;
 	// Inverse matrix
-	extern FArray1D< Real64 > MA;
-	extern FArray1D< Real64 > MV;
-	extern FArray1D_int IVEC;
-	extern FArray1D_int SplitterNodeNumbers;
+	extern Array1D< Real64 > MA;
+	extern Array1D< Real64 > MV;
+	extern Array1D_int IVEC;
+	extern Array1D_int SplitterNodeNumbers;
 
 	extern bool AirflowNetworkGetInputFlag;
 	extern int VentilationCtrl; // Hybrid ventilation control type
@@ -68,13 +68,14 @@ namespace AirflowNetworkBalanceManager {
 	extern int NumOfExtNodes;
 	extern int AirflowNetworkNumOfExtSurfaces;
 	extern Real64 IncAng; // Wind incidence angle relative to facade normal (deg)
-	extern FArray1D< Real64 > FacadeAng; // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
+	extern Array1D< Real64 > FacadeAng; // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
 	extern int WindDirNum; // Wind direction number
 	extern Real64 WindAng; // Wind direction angle (degrees clockwise from North)
 	extern int SupplyFanInletNode; // Supply air fan inlet node number
 	extern int SupplyFanOutletNode; // Supply air fan outlet node number
 	extern int SupplyFanType; // Supply air fan type
 	extern Real64 OnOffFanRunTimeFraction; // Run time fraction for an On/Off fan flow rate
+	extern int AirflowNetworkNumOfOccuVentCtrls;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE AirflowNetworkBalanceManager:
 	// Name Public routines, optionally name Private routines within this module
@@ -157,7 +158,7 @@ namespace AirflowNetworkBalanceManager {
 	};
 
 	// Object Data
-	extern FArray1D< AirflowNetworkReportVars > AirflowNetworkZnRpt;
+	extern Array1D< AirflowNetworkReportVars > AirflowNetworkZnRpt;
 
 	// Functions
 
@@ -232,9 +233,65 @@ namespace AirflowNetworkBalanceManager {
 	Real64
 	GetZoneInfilAirChangeRate( int const ZoneNum ); // hybrid ventilation system controlled zone number
 
+	// derived class or struct
+	struct OccupantVentilationControlProp {
+
+		std::string Name; // Provide a unique object name
+		Real64 MinOpeningTime; // Minimum Opening Time
+		Real64 MinClosingTime; // Minimum Closing Time
+		std::string ComfortLowTempCurveName; // Thermal Comfort Low Temperature Curve Name
+		std::string ComfortHighTempCurveName; // Thermal Comfort High Temperature Curve Name
+		int ComfortLowTempCurveNum; // Thermal Comfort Low Temperature Curve number
+		int ComfortHighTempCurveNum; // Thermal Comfort high Temperature Curve number
+		int OpeningProbSchNum; // Opening probability schedule pointer
+		int ClosingProbSchNum; // Closing probability schedule pointer
+		Real64 ComfortBouPoint; // Thermal Comfort Temperature Boundary Point
+		bool OccupancyCheck; // Occupancy check
+		std::string OpeningProbSchName; // Opening probability schedule name
+		std::string ClosingProbSchName; // Closing probability schedule name
+		Real64 MaxPPD; // Maximum PPD used to calculate comfort band (%)
+		bool MinTimeControlOnly; // Chach minimum opening and closing time only
+
+		// Default Constructor
+		OccupantVentilationControlProp():
+			MinOpeningTime( 0.0 ),
+			MinClosingTime( 0.0 ),
+			ComfortLowTempCurveNum( 0 ),
+			ComfortHighTempCurveNum( 0 ),
+			OpeningProbSchNum( 0 ),
+			ClosingProbSchNum( 0 ),
+			ComfortBouPoint( 10.0 ),
+			OccupancyCheck( false ),
+			MaxPPD( 10.0 ),
+			MinTimeControlOnly( false )
+		{}
+
+		void calc(
+			int const ZoneNum,
+			int const SurfNum,
+			int const PrevOpeningstatus,
+			Real64 const TimeOpenDuration,
+			Real64 const TimeCloseDuration,
+			int & OpeningStatus,
+			int & OpeningProbStatus,
+			int & ClosingProbStatus
+		); // function to perform calculations
+
+		bool openingProbability(
+			int const ZoneNum,
+			Real64 const TimeCloseDuration
+			); // function to perform calculations of opening probability
+
+		bool closingProbability(
+			Real64 const TimeCloseDuration
+			); // function to perform calculations of closing probability
+	};
+
+	extern Array1D< OccupantVentilationControlProp > OccupantVentilationControl;
+
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

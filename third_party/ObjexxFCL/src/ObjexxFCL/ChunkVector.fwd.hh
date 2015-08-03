@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -24,7 +24,6 @@ namespace ObjexxFCL {
 template< typename > class ChunkVector;
 class byte;
 class ubyte;
-class Fstring;
 
 // Types
 typedef  byte  sbyte;
@@ -54,7 +53,6 @@ typedef  ChunkVector< char >                ChunkVector_char;
 typedef  ChunkVector< unsigned char >       ChunkVector_uchar;
 typedef  ChunkVector< signed char >         ChunkVector_schar;
 typedef  ChunkVector< std::string >         ChunkVector_string;
-typedef  ChunkVector< Fstring >             ChunkVector_Fstring;
 
 } // ObjexxFCL
 

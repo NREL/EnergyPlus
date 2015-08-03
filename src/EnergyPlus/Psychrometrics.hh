@@ -7,9 +7,8 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/bit.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -58,9 +57,9 @@ namespace Psychrometrics {
 	extern int const NumPsychMonitors; // Parameterization of Number of psychrometric routines that
 	extern std::string const blank_string;
 #ifdef EP_psych_stats
-	extern FArray1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 - max iter | 18 - PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw (raw calc)
+	extern Array1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 - max iter | 18 - PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw (raw calc)
 
-	extern FArray1D_bool const PsyReportIt; // PsyTdpFnTdbTwbPb     1 | PsyRhFnTdbWPb        2 | PsyTwbFnTdbWPb       3 | PsyVFnTdbWPb         4 | PsyWFnTdpPb          5 | PsyWFnTdbH           6 | PsyWFnTdbTwbPb       7 | PsyWFnTdbRhPb        8 | PsyPsatFnTemp        9 | PsyTsatFnHPb         10 | PsyTsatFnPb          11 | PsyRhFnTdbRhov       12 | PsyRhFnTdbRhovLBnd0C 13 | PsyTwbFnTdbWPb       14 - HR | PsyTwbFnTdbWPb       15 - max iter | PsyWFnTdbTwbPb       16 - HR | PsyTsatFnPb          17 - max iter | PsyTwbFnTdbWPb_cache 18 - PsyTwbFnTdbWPb_raw (raw calc) | PsyPsatFnTemp_cache  19 - PsyPsatFnTemp_raw (raw calc)
+	extern Array1D_bool const PsyReportIt; // PsyTdpFnTdbTwbPb     1 | PsyRhFnTdbWPb        2 | PsyTwbFnTdbWPb       3 | PsyVFnTdbWPb         4 | PsyWFnTdpPb          5 | PsyWFnTdbH           6 | PsyWFnTdbTwbPb       7 | PsyWFnTdbRhPb        8 | PsyPsatFnTemp        9 | PsyTsatFnHPb         10 | PsyTsatFnPb          11 | PsyRhFnTdbRhov       12 | PsyRhFnTdbRhovLBnd0C 13 | PsyTwbFnTdbWPb       14 - HR | PsyTwbFnTdbWPb       15 - max iter | PsyWFnTdbTwbPb       16 - HR | PsyTsatFnPb          17 - max iter | PsyTwbFnTdbWPb_cache 18 - PsyTwbFnTdbWPb_raw (raw calc) | PsyPsatFnTemp_cache  19 - PsyPsatFnTemp_raw (raw calc)
 #endif
 
 #ifndef EP_psych_errors
@@ -83,10 +82,10 @@ namespace Psychrometrics {
 	// MODULE VARIABLE DEFINITIONS:
 	extern std::string String;
 	extern bool ReportErrors;
-	extern FArray1D_int iPsyErrIndex; // Number of times error occurred
+	extern Array1D_int iPsyErrIndex; // Number of times error occurred
 #ifdef EP_psych_stats
-	extern FArray1D< Int64 > NumTimesCalled;
-	extern FArray1D_int NumIterations;
+	extern Array1D< Int64 > NumTimesCalled;
+	extern Array1D_int NumIterations;
 #endif
 
 	// DERIVED TYPE DEFINITIONS
@@ -153,10 +152,10 @@ namespace Psychrometrics {
 
 	// Object Data
 #ifdef EP_cache_PsyTwbFnTdbWPb
-	extern FArray1D< cached_twb_t > cached_Twb; // DIMENSION(0:twbcache_size)
+	extern Array1D< cached_twb_t > cached_Twb; // DIMENSION(0:twbcache_size)
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
-	extern FArray1D< cached_psat_t > cached_Psat; // DIMENSION(0:psatcache_size)
+	extern Array1D< cached_psat_t > cached_Psat; // DIMENSION(0:psatcache_size)
 #endif
 
 	// Subroutine Specifications for the Module
@@ -176,7 +175,7 @@ namespace Psychrometrics {
 		Real64 const tdb, // dry bulb temperature (Celsius)
 		Real64 const dw, // humidity ratio (kgWater/kgDryAir)
 		Real64 const rhoair, // density of air
-		std::string const & CalledFrom // routine this function was called from (error messages) !unused1208
+		std::string const & CalledFrom = blank_string // routine this function was called from (error messages) !unused1208
 	);
 #endif
 
@@ -217,8 +216,25 @@ namespace Psychrometrics {
 
 	inline
 	Real64
+	PsyRhoAirFnPbTdbW_fast(
+		Real64 const pb, // barometric pressure (Pascals)
+		Real64 const tdb, // dry bulb temperature (Celsius)
+		Real64 const dw // humidity ratio (kgWater/kgDryAir)
+	)
+	{
+		// Faster version with humidity ratio already adjusted
+		assert( dw >= 1.0e-5 );
+		Real64 const rhoair( pb / ( 287.0 * ( tdb + KelvinConv ) * ( 1.0 + 1.6077687 * dw ) ) );
+#ifdef EP_psych_errors
+		if ( rhoair < 0.0 ) PsyRhoAirFnPbTdbW_error( pb, tdb, dw, rhoair );
+#endif
+		return rhoair;
+	}
+
+	inline
+	Real64
 	PsyHfgAirFnWTdb(
-		Real64 const w, // humidity ratio {kgWater/kgDryAir} !unused1208
+		Real64 const EP_UNUSED( w ), // humidity ratio {kgWater/kgDryAir} !unused1208
 		Real64 const T // input temperature {Celsius}
 	)
 	{
@@ -251,7 +267,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	PsyHgAirFnWTdb(
-		Real64 const w, // humidity ratio {kgWater/kgDryAir} !unused1208
+		Real64 const EP_UNUSED( w ), // humidity ratio {kgWater/kgDryAir} !unused1208
 		Real64 const T // input temperature {Celsius}
 	)
 	{
@@ -301,6 +317,20 @@ namespace Psychrometrics {
 
 	inline
 	Real64
+	PsyHFnTdbW_fast(
+		Real64 const TDB, // dry-bulb temperature {C}
+		Real64 const dW // humidity ratio
+	)
+	{
+		// Faster version with humidity ratio already adjusted
+		assert( dW >= 1.0e-5 );
+
+		// calculate enthalpy
+		return 1.00484e3 * TDB + dW * ( 2.50094e6 + 1.85895e3 * TDB ); // enthalpy {J/kg}
+	}
+
+	inline
+	Real64
 	PsyCpAirFnWTdb(
 		Real64 const dw, // humidity ratio {kgWater/kgDryAir}
 		Real64 const T // input temperature {Celsius}
@@ -333,6 +363,35 @@ namespace Psychrometrics {
 		// compute heat capacity of air
 		Real64 const w( max( dw, 1.0e-5 ) );
 		Real64 const cpa( ( PsyHFnTdbW( T + 0.1, w ) - PsyHFnTdbW( T, w ) ) * 10.0 ); // result => heat capacity of air {J/kg-C}
+
+		// save values for next call
+		dwSave = dw;
+		Tsave = T;
+		cpaSave = cpa;
+
+		return cpa;
+	}
+
+	inline
+	Real64
+	PsyCpAirFnWTdb_fast(
+		Real64 const dw, // humidity ratio {kgWater/kgDryAir}
+		Real64 const T // input temperature {Celsius}
+	)
+	{
+		// Faster version with humidity ratio already adjusted
+		assert( dw >= 1.0e-5 );
+
+		// Static locals
+		static Real64 dwSave( -100.0 );
+		static Real64 Tsave( -100.0 );
+		static Real64 cpaSave( -100.0 );
+
+		// check if last call had the same input and if it did just use the saved output
+		if ( ( Tsave == T ) && ( dwSave == dw ) ) return cpaSave;
+
+		// compute heat capacity of air
+		Real64 const cpa( ( PsyHFnTdbW_fast( T + 0.1, dw ) - PsyHFnTdbW_fast( T, dw ) ) * 10.0 ); // result => heat capacity of air {J/kg-C}
 
 		// save values for next call
 		dwSave = dw;
@@ -421,6 +480,19 @@ namespace Psychrometrics {
 
 		Real64 const W( max( dW, 1.0e-5 ) ); // humidity ratio
 		return W * PB / ( 461.52 * ( Tdb + KelvinConv ) * ( W + 0.62198 ) );
+	}
+
+	inline
+	Real64
+	PsyRhovFnTdbWPb_fast(
+		Real64 const Tdb, // dry-bulb temperature {C}
+		Real64 const dW, // humidity ratio
+		Real64 const PB // Barometric Pressure {Pascals}
+	)
+	{
+		// Faster version with humidity ratio already adjusted
+		assert( dW >= 1.0e-5 );
+		return dW * PB / ( 461.52 * ( Tdb + KelvinConv ) * ( dW + 0.62198 ) );
 	}
 
 #ifdef EP_psych_errors
@@ -1160,7 +1232,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	CPCW(
-		Real64 const Temperature // unused1208
+		Real64 const EP_UNUSED( Temperature ) // unused1208
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -1176,7 +1248,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	CPHW(
-		Real64 const Temperature // unused1208
+		Real64 const EP_UNUSED( Temperature ) // unused1208
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -1211,7 +1283,7 @@ namespace Psychrometrics {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

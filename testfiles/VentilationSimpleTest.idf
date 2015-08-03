@@ -24,7 +24,7 @@
 ! Plant:    None.
 ! SolDis=FullExterior, Aniso, Simple Interior and Exterior Convection
 
-  Version,8.2;
+  Version,8.3;
 
   Timestep,4;
 
@@ -2217,4 +2217,7 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
+
+  Output:SQLite,
+    Simple;
 

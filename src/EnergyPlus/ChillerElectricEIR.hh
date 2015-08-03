@@ -2,7 +2,7 @@
 #define ChillerElectricEIR_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -49,7 +49,7 @@ namespace ChillerElectricEIR {
 	extern Real64 ChillerFalseLoadRate; // Chiller false load over and above the water-side load [W]
 	extern Real64 AvgCondSinkTemp; // condenser temperature value for use in curves [C]
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	extern bool GetInputEIR; // When TRUE, calls subroutine to read input file.
 
@@ -66,14 +66,17 @@ namespace ChillerElectricEIR {
 		std::string EIRFPLRName; // EIRPLR curve name
 		int CondenserType; // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
 		Real64 RefCap; // Reference capacity of chiller [W]
+		bool RefCapWasAutoSized; //reference capacity was autosized on input
 		Real64 RefCOP; // Reference coefficient of performance [W/W]
 		int FlowMode; // one of 3 modes for componet flow during operation
 		bool ModulatedFlowSetToLoop; // True if the setpoint is missing at the outlet node
 		bool ModulatedFlowErrDone; // true if setpoint warning issued
 		bool HRSPErrDone; // TRUE if set point warning issued for heat recovery loop
 		Real64 EvapVolFlowRate; // Reference water volumetric flow rate through the evaporator [m3/s]
+		bool EvapVolFlowRateWasAutoSized; // true if previous was autosize input
 		Real64 EvapMassFlowRateMax; // Reference water mass flow rate through evaporator [kg/s]
 		Real64 CondVolFlowRate; // Reference water volumetric flow rate through the condenser [m3/s]
+		bool CondVolFlowRateWasAutoSized; // true if previous was set to autosize on input
 		Real64 CondMassFlowRateMax; // Reference water mass flow rate through condenser [kg/s]
 		Real64 CondenserFanPowerRatio; // Reference power of condenser fan to capacity ratio, W/W
 		Real64 CompPowerToCondenserFrac; // Fraction of compressor electric power rejected by condenser [0 to 1]
@@ -91,6 +94,7 @@ namespace ChillerElectricEIR {
 		// at the chiller evaporator side outlet [C]
 		Real64 TempLowLimitEvapOut; // Low temperature shut off [C]
 		Real64 DesignHeatRecVolFlowRate; // Design water volumetric flow rate through heat recovery loop [m3/s]
+		bool DesignHeatRecVolFlowRateWasAutoSized; //true if previous input was autosize
 		Real64 DesignHeatRecMassFlowRate; // Design water mass flow rate through heat recovery loop [kg/s]
 		Real64 SizFac; // sizing factor
 		Real64 BasinHeaterPowerFTempDiff; // Basin heater capacity per degree C below setpoint (W/C)
@@ -141,21 +145,23 @@ namespace ChillerElectricEIR {
 		int MsgErrorCount; // number of occurrences of warning
 		int ErrCount1; // for recurring error messages
 		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
-		bool IsThisSized; // true if sizing is done
 
 		// Default Constructor
 		ElectricEIRChillerSpecs() :
 			TypeNum( 0 ),
 			CondenserType( 0 ),
 			RefCap( 0.0 ),
+			RefCapWasAutoSized( false ),
 			RefCOP( 0.0 ),
 			FlowMode( FlowModeNotSet ),
 			ModulatedFlowSetToLoop( false ),
 			ModulatedFlowErrDone( false ),
 			HRSPErrDone( false ),
 			EvapVolFlowRate( 0.0 ),
+			EvapVolFlowRateWasAutoSized( false ),
 			EvapMassFlowRateMax( 0.0 ),
 			CondVolFlowRate( 0.0 ),
+			CondVolFlowRateWasAutoSized( false ),
 			CondMassFlowRateMax( 0.0 ),
 			CondenserFanPowerRatio( 0.0 ),
 			CompPowerToCondenserFrac( 0.0 ),
@@ -171,6 +177,7 @@ namespace ChillerElectricEIR {
 			TempRefEvapOut( 0.0 ),
 			TempLowLimitEvapOut( 0.0 ),
 			DesignHeatRecVolFlowRate( 0.0 ),
+			DesignHeatRecVolFlowRateWasAutoSized( false ),
 			DesignHeatRecMassFlowRate( 0.0 ),
 			SizFac( 0.0 ),
 			BasinHeaterPowerFTempDiff( 0.0 ),
@@ -213,162 +220,9 @@ namespace ChillerElectricEIR {
 			PrintMessage( false ),
 			MsgErrorCount( 0 ),
 			ErrCount1( 0 ),
-			PossibleSubcooling( false ),
-			IsThisSized( false )
+			PossibleSubcooling( false )
 		{}
 
-		// Member Constructor
-		ElectricEIRChillerSpecs(
-			std::string const & Name, // User identifier
-			int const TypeNum, // plant loop type identifier
-			std::string const & EIRFPLRName, // EIRPLR curve name
-			int const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
-			Real64 const RefCap, // Reference capacity of chiller [W]
-			Real64 const RefCOP, // Reference coefficient of performance [W/W]
-			int const FlowMode, // one of 3 modes for componet flow during operation
-			bool const ModulatedFlowSetToLoop, // True if the setpoint is missing at the outlet node
-			bool const ModulatedFlowErrDone, // true if setpoint warning issued
-			bool const HRSPErrDone, // TRUE if set point warning issued for heat recovery loop
-			Real64 const EvapVolFlowRate, // Reference water volumetric flow rate through the evaporator [m3/s]
-			Real64 const EvapMassFlowRateMax, // Reference water mass flow rate through evaporator [kg/s]
-			Real64 const CondVolFlowRate, // Reference water volumetric flow rate through the condenser [m3/s]
-			Real64 const CondMassFlowRateMax, // Reference water mass flow rate through condenser [kg/s]
-			Real64 const CondenserFanPowerRatio, // Reference power of condenser fan to capacity ratio, W/W
-			Real64 const CompPowerToCondenserFrac, // Fraction of compressor electric power rejected by condenser [0 to 1]
-			int const EvapInletNodeNum, // Node number on the inlet side of the plant (evaporator side)
-			int const EvapOutletNodeNum, // Node number on the outlet side of the plant (evaporator side)
-			int const CondInletNodeNum, // Node number on the inlet side of the condenser
-			int const CondOutletNodeNum, // Node number on the outlet side of the condenser
-			Real64 const MinPartLoadRat, // Minimum allowed operating fraction of full load
-			Real64 const MaxPartLoadRat, // Maximum allowed operating fraction of full load
-			Real64 const OptPartLoadRat, // Optimal operating fraction of full load
-			Real64 const MinUnloadRat, // Minimum unloading ratio
-			Real64 const TempRefCondIn, // The reference secondary loop fluid temperature
-			Real64 const TempRefEvapOut, // The reference primary loop fluid temperature
-			Real64 const TempLowLimitEvapOut, // Low temperature shut off [C]
-			Real64 const DesignHeatRecVolFlowRate, // Design water volumetric flow rate through heat recovery loop [m3/s]
-			Real64 const DesignHeatRecMassFlowRate, // Design water mass flow rate through heat recovery loop [kg/s]
-			Real64 const SizFac, // sizing factor
-			Real64 const BasinHeaterPowerFTempDiff, // Basin heater capacity per degree C below setpoint (W/C)
-			Real64 const BasinHeaterSetPointTemp, // setpoint temperature for basin heater operation (C)
-			bool const HeatRecActive, // True when entered Heat Rec Vol Flow Rate > 0
-			int const HeatRecInletNodeNum, // Node number for the heat recovery inlet side of the condenser
-			int const HeatRecOutletNodeNum, // Node number for the heat recovery outlet side of the condenser
-			Real64 const HeatRecCapacityFraction, // user input for heat recovery capacity fraction []
-			Real64 const HeatRecMaxCapacityLimit, // Capacity limit for Heat recovery, one time calc [W]
-			int const HeatRecSetPointNodeNum, // index for system node with the heat recover leaving setpoint
-			int const HeatRecInletLimitSchedNum, // index for schedule for the inlet high limit for heat recovery operation
-			int const ChillerCapFT, // Index for the total cooling capacity modifier curve
-			int const ChillerEIRFT, // Index for the energy input ratio modifier curve
-			int const ChillerEIRFPLR, // Index for the EIR vs part-load ratio curve
-			int const ChillerCapFTError, // Used for negative capacity as a function of temp warnings
-			int const ChillerCapFTErrorIndex, // Used for negative capacity as a function of temp warnings
-			int const ChillerEIRFTError, // Used for negative EIR as a function of temp warnings
-			int const ChillerEIRFTErrorIndex, // Used for negative EIR as a function of temp warnings
-			int const ChillerEIRFPLRError, // Used for negative EIR as a function of PLR warnings
-			int const ChillerEIRFPLRErrorIndex, // Used for negative EIR as a function of PLR warnings
-			Real64 const ChillerEIRFPLRMin, // Minimum value of PLR from EIRFPLR curve
-			Real64 const ChillerEIRFPLRMax, // Maximum value of PLR from EIRFPLR curve
-			int const DeltaTErrCount, // Evaporator delta T equals 0 for variable flow chiller warning messages
-			int const DeltaTErrCountIndex, // Index to evaporator delta T = 0 for variable flow chiller warning messages
-			int const CWLoopNum, // chilled water plant loop index number
-			int const CWLoopSideNum, // chilled water plant loop side index
-			int const CWBranchNum, // chilled water plant loop branch index
-			int const CWCompNum, // chilled water plant loop component index
-			int const CDLoopNum, // condenser water plant loop index number
-			int const CDLoopSideNum, // condenser water plant loop side index
-			int const CDBranchNum, // condenser water plant loop branch index
-			int const CDCompNum, // condenser water plant loop component index
-			int const HRLoopNum, // heat recovery water plant loop index
-			int const HRLoopSideNum, // heat recovery water plant loop side index
-			int const HRBranchNum, // heat recovery water plant loop branch index
-			int const HRCompNum, // heat recovery water plant loop component index
-			int const BasinHeaterSchedulePtr, // Pointer to basin heater schedule
-			int const CondMassFlowIndex,
-			std::string const & MsgBuffer1, // - buffer to print warning messages on following time step
-			std::string const & MsgBuffer2, // - buffer to print warning messages on following time step
-			Real64 const MsgDataLast, // value of data when warning occurred (passed to Recurring Warn)
-			bool const PrintMessage, // logical to determine if message is valid
-			int const MsgErrorCount, // number of occurrences of warning
-			int const ErrCount1, // for recurring error messages
-			bool const PossibleSubcooling, // flag to indicate chiller is doing less cooling that requested
-			bool const IsThisSized // true if sizing is done
-		) :
-			Name( Name ),
-			TypeNum( TypeNum ),
-			EIRFPLRName( EIRFPLRName ),
-			CondenserType( CondenserType ),
-			RefCap( RefCap ),
-			RefCOP( RefCOP ),
-			FlowMode( FlowMode ),
-			ModulatedFlowSetToLoop( ModulatedFlowSetToLoop ),
-			ModulatedFlowErrDone( ModulatedFlowErrDone ),
-			HRSPErrDone( HRSPErrDone ),
-			EvapVolFlowRate( EvapVolFlowRate ),
-			EvapMassFlowRateMax( EvapMassFlowRateMax ),
-			CondVolFlowRate( CondVolFlowRate ),
-			CondMassFlowRateMax( CondMassFlowRateMax ),
-			CondenserFanPowerRatio( CondenserFanPowerRatio ),
-			CompPowerToCondenserFrac( CompPowerToCondenserFrac ),
-			EvapInletNodeNum( EvapInletNodeNum ),
-			EvapOutletNodeNum( EvapOutletNodeNum ),
-			CondInletNodeNum( CondInletNodeNum ),
-			CondOutletNodeNum( CondOutletNodeNum ),
-			MinPartLoadRat( MinPartLoadRat ),
-			MaxPartLoadRat( MaxPartLoadRat ),
-			OptPartLoadRat( OptPartLoadRat ),
-			MinUnloadRat( MinUnloadRat ),
-			TempRefCondIn( TempRefCondIn ),
-			TempRefEvapOut( TempRefEvapOut ),
-			TempLowLimitEvapOut( TempLowLimitEvapOut ),
-			DesignHeatRecVolFlowRate( DesignHeatRecVolFlowRate ),
-			DesignHeatRecMassFlowRate( DesignHeatRecMassFlowRate ),
-			SizFac( SizFac ),
-			BasinHeaterPowerFTempDiff( BasinHeaterPowerFTempDiff ),
-			BasinHeaterSetPointTemp( BasinHeaterSetPointTemp ),
-			HeatRecActive( HeatRecActive ),
-			HeatRecInletNodeNum( HeatRecInletNodeNum ),
-			HeatRecOutletNodeNum( HeatRecOutletNodeNum ),
-			HeatRecCapacityFraction( HeatRecCapacityFraction ),
-			HeatRecMaxCapacityLimit( HeatRecMaxCapacityLimit ),
-			HeatRecSetPointNodeNum( HeatRecSetPointNodeNum ),
-			HeatRecInletLimitSchedNum( HeatRecInletLimitSchedNum ),
-			ChillerCapFT( ChillerCapFT ),
-			ChillerEIRFT( ChillerEIRFT ),
-			ChillerEIRFPLR( ChillerEIRFPLR ),
-			ChillerCapFTError( ChillerCapFTError ),
-			ChillerCapFTErrorIndex( ChillerCapFTErrorIndex ),
-			ChillerEIRFTError( ChillerEIRFTError ),
-			ChillerEIRFTErrorIndex( ChillerEIRFTErrorIndex ),
-			ChillerEIRFPLRError( ChillerEIRFPLRError ),
-			ChillerEIRFPLRErrorIndex( ChillerEIRFPLRErrorIndex ),
-			ChillerEIRFPLRMin( ChillerEIRFPLRMin ),
-			ChillerEIRFPLRMax( ChillerEIRFPLRMax ),
-			DeltaTErrCount( DeltaTErrCount ),
-			DeltaTErrCountIndex( DeltaTErrCountIndex ),
-			CWLoopNum( CWLoopNum ),
-			CWLoopSideNum( CWLoopSideNum ),
-			CWBranchNum( CWBranchNum ),
-			CWCompNum( CWCompNum ),
-			CDLoopNum( CDLoopNum ),
-			CDLoopSideNum( CDLoopSideNum ),
-			CDBranchNum( CDBranchNum ),
-			CDCompNum( CDCompNum ),
-			HRLoopNum( HRLoopNum ),
-			HRLoopSideNum( HRLoopSideNum ),
-			HRBranchNum( HRBranchNum ),
-			HRCompNum( HRCompNum ),
-			BasinHeaterSchedulePtr( BasinHeaterSchedulePtr ),
-			CondMassFlowIndex( CondMassFlowIndex ),
-			MsgBuffer1( MsgBuffer1 ),
-			MsgBuffer2( MsgBuffer2 ),
-			MsgDataLast( MsgDataLast ),
-			PrintMessage( PrintMessage ),
-			MsgErrorCount( MsgErrorCount ),
-			ErrCount1( ErrCount1 ),
-			PossibleSubcooling( PossibleSubcooling ),
-			IsThisSized( IsThisSized )
-		{}
 
 	};
 
@@ -440,76 +294,11 @@ namespace ChillerElectricEIR {
 			BasinHeaterConsumption( 0.0 )
 		{}
 
-		// Member Constructor
-		ReportEIRVars(
-			Real64 const ChillerPartLoadRatio, // reporting: Chiller PLR (Load/Capacity)
-			Real64 const ChillerCyclingRatio, // reporting: Chiller cycling ratio (time on/time step)
-			Real64 const ChillerFalseLoadRate, // reporting: Chiller false load over and above water side load [J]
-			Real64 const ChillerFalseLoad, // reporting: Chiller false load over and above water side load [W]
-			Real64 const Power, // reporting: Chiller power, W
-			Real64 const QEvap, // reporting: Evaporator heat transfer rate [W]
-			Real64 const QCond, // reporting: Condenser heat transfer rate [W]
-			Real64 const Energy, // reporting: Chiller electric consumption [J]
-			Real64 const EvapEnergy, // reporting: Evaporator heat transfer energy [J]
-			Real64 const CondEnergy, // reporting: Condenser heat transfer energy [J]
-			Real64 const CondInletTemp, // reporting: Condenser inlet temperature [C]
-			Real64 const EvapInletTemp, // reporting: Evaporator inlet temperature [C]
-			Real64 const CondOutletTemp, // reporting: Condenser outlet temperature [C]
-			Real64 const EvapOutletTemp, // reporting: Evaporator outlet temperature [C]
-			Real64 const Evapmdot, // reporting: Evaporator mass flow rate [kg/s]
-			Real64 const Condmdot, // reporting: Condenser mass flow rate [kg/s]
-			Real64 const ActualCOP, // reporting: Coefficient of performance
-			Real64 const QHeatRecovery, // reporting: Heat recovered from water-cooled condenser [W]
-			Real64 const EnergyHeatRecovery, // reporting: Energy recovered from water-cooled condenser [J]
-			Real64 const HeatRecInletTemp, // reporting: Heat reclaim inlet temperature [C]
-			Real64 const HeatRecOutletTemp, // reporting: Heat reclaim outlet temperature [C]
-			Real64 const HeatRecMassFlow, // reporting: Heat reclaim mass flow rate [kg/s]
-			Real64 const ChillerCondAvgTemp, // reporting: average condenser temp for curves with Heat recovery [C]
-			Real64 const ChillerCapFT, // reporting: Chiller capacity curve output value
-			Real64 const ChillerEIRFT, // reporting: Chiller EIRFT curve output value
-			Real64 const ChillerEIRFPLR, // reporting: Chiller EIRFPLR curve output value
-			Real64 const CondenserFanPowerUse, // reporting: Air-cooled condenser fan power [W]
-			Real64 const CondenserFanEnergyConsumption, // reporting: Air-cooled condenser fan energy [J]
-			Real64 const BasinHeaterPower, // Basin heater power (W)
-			Real64 const BasinHeaterConsumption // Basin heater energy consumption (J)
-		) :
-			ChillerPartLoadRatio( ChillerPartLoadRatio ),
-			ChillerCyclingRatio( ChillerCyclingRatio ),
-			ChillerFalseLoadRate( ChillerFalseLoadRate ),
-			ChillerFalseLoad( ChillerFalseLoad ),
-			Power( Power ),
-			QEvap( QEvap ),
-			QCond( QCond ),
-			Energy( Energy ),
-			EvapEnergy( EvapEnergy ),
-			CondEnergy( CondEnergy ),
-			CondInletTemp( CondInletTemp ),
-			EvapInletTemp( EvapInletTemp ),
-			CondOutletTemp( CondOutletTemp ),
-			EvapOutletTemp( EvapOutletTemp ),
-			Evapmdot( Evapmdot ),
-			Condmdot( Condmdot ),
-			ActualCOP( ActualCOP ),
-			QHeatRecovery( QHeatRecovery ),
-			EnergyHeatRecovery( EnergyHeatRecovery ),
-			HeatRecInletTemp( HeatRecInletTemp ),
-			HeatRecOutletTemp( HeatRecOutletTemp ),
-			HeatRecMassFlow( HeatRecMassFlow ),
-			ChillerCondAvgTemp( ChillerCondAvgTemp ),
-			ChillerCapFT( ChillerCapFT ),
-			ChillerEIRFT( ChillerEIRFT ),
-			ChillerEIRFPLR( ChillerEIRFPLR ),
-			CondenserFanPowerUse( CondenserFanPowerUse ),
-			CondenserFanEnergyConsumption( CondenserFanEnergyConsumption ),
-			BasinHeaterPower( BasinHeaterPower ),
-			BasinHeaterConsumption( BasinHeaterConsumption )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< ElectricEIRChillerSpecs > ElectricEIRChiller; // Dimension to number of machines
-	extern FArray1D< ReportEIRVars > ElectricEIRChillerReport;
+	extern Array1D< ElectricEIRChillerSpecs > ElectricEIRChiller; // Dimension to number of machines
+	extern Array1D< ReportEIRVars > ElectricEIRChillerReport;
 
 	// Functions
 

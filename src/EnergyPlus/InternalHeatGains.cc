@@ -3,8 +3,8 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -218,10 +218,10 @@ namespace InternalHeatGains {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string AlphaName;
+		Array1D_string AlphaName;
 		static bool ErrorsFound( false ); // If errors found in input
 		bool IsNotOK; // Flag to verify name
-		FArray1D< Real64 > IHGNumbers;
+		Array1D< Real64 > IHGNumbers;
 		int IOStat;
 		bool IsBlank;
 		int Loop;
@@ -232,7 +232,7 @@ namespace InternalHeatGains {
 		int MaxNumber;
 		int OptionNum( 0 ); //Autodesk:Init Initialization added to elim poss use uninitialized
 		int lastOption;
-		FArray1D_bool RepVarSet;
+		Array1D_bool RepVarSet;
 		//   Variables for reporting nominal internal gains
 		Real64 LightTot; // Total Lights for calculating lights per square meter
 		Real64 ElecTot; // Total Electric Load for calculating electric per square meter
@@ -258,7 +258,6 @@ namespace InternalHeatGains {
 		int Item;
 		int ZLItem;
 		int Item1;
-		int MaxZoneNameLengthInZoneList;
 
 		// Formats
 		static gio::Fmt Format_720( "(' Zone Internal Gains, ',A,',',A,',',A,',')" );
@@ -2211,10 +2210,10 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				ZoneITEq( Loop ).Name = AlphaName( 1 );
-				ZoneITEq( Loop ).ZonePtr = FindItemInList( AlphaName( 2 ), Zone.Name( ), NumOfZones );
+				ZoneITEq( Loop ).ZonePtr = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
 
 				// IT equipment design level calculation method.
 				{ auto const equipmentLevel( AlphaName( 3 ) );
@@ -2222,6 +2221,9 @@ namespace InternalHeatGains {
 					ZoneITEq( Loop ).DesignTotalPower = IHGNumbers( 1 ) * IHGNumbers( 2 );
 					if ( lNumericFieldBlanks( 1 ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 IT Equipment will result." );
+					}
+					if ( lNumericFieldBlanks( 2 ) ) {
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 IT Equipment will result." );
 					}
 
 				} else if ( equipmentLevel == "WATTS/AREA" ) {
@@ -2241,11 +2243,9 @@ namespace InternalHeatGains {
 					}
 
 				} else {
-					if ( Item1 == 1 ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 4 ) + ", value  =" + AlphaName( 4 ) );
-						ShowContinueError( "...Valid values are \"Watts/Unit\" or \"Watts/Area\"." );
-						ErrorsFound = true;
-					}
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + ", value  =" + AlphaName( 3 ) );
+					ShowContinueError( "...Valid values are \"Watts/Unit\" or \"Watts/Area\"." );
+					ErrorsFound = true;
 				}}
 
 				if ( lAlphaFieldBlanks( 4 ) ) {
@@ -2496,7 +2496,7 @@ namespace InternalHeatGains {
 				// SetupEMSInternalVariable( "Plug and Process Power Design Level", ZoneITEq( Loop ).Name, "[W]", ZoneITEq( Loop ).DesignTotalPower );
 				// } // EMS
 
-				if ( !ErrorsFound ) SetupZoneInternalGain( ZoneITEq( Loop ).ZonePtr, "ElectricEquipment:ITE:AirCooled", ZoneITEq( Loop ).Name, IntGainTypeOf_ElectricEquipment, ZoneITEq( Loop ).ConGainRateToZone );
+				if ( !ErrorsFound ) SetupZoneInternalGain( ZoneITEq( Loop ).ZonePtr, "ElectricEquipment:ITE:AirCooled", ZoneITEq( Loop ).Name, IntGainTypeOf_ElectricEquipmentITEAirCooled, ZoneITEq( Loop ).ConGainRateToZone );
 
 			} // Item - Number of ZoneITEq objects
 		} // Check on number of ZoneITEq
@@ -2698,7 +2698,7 @@ namespace InternalHeatGains {
 			for ( Loop1 = 1; Loop1 <= TotElecEquip; ++Loop1 ) {
 				if ( ZoneElectric( Loop1 ).ZonePtr != Loop ) continue;
 				ElecTot += ZoneElectric( Loop1 ).DesignLevel;
-			} 
+			}
 			for ( Loop1 = 1; Loop1 <= NumZoneITEqStatements; ++Loop1 ) {
 				if ( ZoneITEq( Loop1 ).ZonePtr != Loop ) continue;
 				ElecTot += ZoneITEq( Loop1 ).DesignTotalPower;
@@ -3223,8 +3223,6 @@ namespace InternalHeatGains {
 		using OutputReportTabular::radiantPulseTimestep;
 		using OutputReportTabular::radiantPulseReceived;
 		using DataGlobals::CompLoadReportIsReq;
-		using DataGlobalConstants::endUseHeating;
-		using DataGlobalConstants::endUseCooling;
 		using OutputReportTabular::AllocateLoadComponentArrays;
 		using DataSizing::CurOverallSimDay;
 
@@ -3233,7 +3231,7 @@ namespace InternalHeatGains {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D< Real64 > const C( 9, { 6.4611027, 0.946892, 0.0000255737, 7.139322, -0.0627909, 0.0000589271, -0.198550, 0.000940018, -0.00000149532 } );
+		static Array1D< Real64 > const C( 9, { 6.4611027, 0.946892, 0.0000255737, 7.139322, -0.0627909, 0.0000589271, -0.198550, 0.000940018, -0.00000149532 } );
 		static ZoneCatEUseData const zeroZoneCatEUse; // For initialization
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -3566,7 +3564,7 @@ namespace InternalHeatGains {
 			ZnRpt( NZ ).CO2Rate += ZoneCO2Gen( Loop ).CO2GainRate;
 		}
 
-		if( NumZoneITEqStatements > 0 ) CalcZoneITEq();
+		if ( NumZoneITEqStatements > 0 ) CalcZoneITEq();
 
 		CalcWaterThermalTankZoneGains();
 		CalcZonePipesHeatGain();
@@ -3610,9 +3608,9 @@ namespace InternalHeatGains {
 				// QRadThermInAbs is the thermal radiation absorbed on inside surfaces
 				QRadThermInAbs( SurfNum ) = adjQL * TMULT( NZ ) * ITABSF( SurfNum );
 				// store the magnitude and time of the pulse
-				radiantPulseUsed( NZ, CurOverallSimDay ) = adjQL - curQL;
-				radiantPulseTimestep( NZ, CurOverallSimDay ) = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
-				radiantPulseReceived( SurfNum, CurOverallSimDay ) = ( adjQL - curQL ) * TMULT( NZ ) * ITABSF( SurfNum ) * Surface( SurfNum ).Area;
+				radiantPulseUsed( CurOverallSimDay, NZ ) = adjQL - curQL;
+				radiantPulseTimestep( CurOverallSimDay, NZ ) = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
+				radiantPulseReceived( CurOverallSimDay, SurfNum ) = ( adjQL - curQL ) * TMULT( NZ ) * ITABSF( SurfNum ) * Surface( SurfNum ).Area;
 			}
 		}
 
@@ -3660,12 +3658,12 @@ namespace InternalHeatGains {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// Operating Limits for environmental class: None, A1, A2, A3, A4, B, C
 		// From ASHRAE 2011 Thermal Guidelines environmental classes for Air-Cooled ITE
-		static FArray1D< Real64 > const DBMin( 7, { -99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0 } ); // Minimum dry-bulb temperature [C]
-		static FArray1D< Real64 > const DBMax( 7, { 99.0, 32.0, 35.0, 40.0, 45.0, 35.0, 40.0 } ); // Maximum dry-bulb temperature [C]
-		static FArray1D< Real64 > const DPMax( 7, { 99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0 } ); // Maximum dewpoint temperature [C]
-		static FArray1D< Real64 > const DPMin( 7, { -99.0, -99.0, -99.0, -12.0, -12.0, -99.0, -99.0 } ); // Minimum dewpoint temperature [C]
-		static FArray1D< Real64 > const RHMin( 7, { 0.0, 20.0, 20.0, 8.0, 8.0, 8.0, 8.0 } ); // Minimum relative humidity [%]
-		static FArray1D< Real64 > const RHMax( 7, { 99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0 } );  // Minimum relative humidity [%]
+		static Array1D< Real64 > const DBMin( 7, { -99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0 } ); // Minimum dry-bulb temperature [C]
+		static Array1D< Real64 > const DBMax( 7, { 99.0, 32.0, 35.0, 40.0, 45.0, 35.0, 40.0 } ); // Maximum dry-bulb temperature [C]
+		static Array1D< Real64 > const DPMax( 7, { 99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0 } ); // Maximum dewpoint temperature [C]
+		static Array1D< Real64 > const DPMin( 7, { -99.0, -99.0, -99.0, -12.0, -12.0, -99.0, -99.0 } ); // Minimum dewpoint temperature [C]
+		static Array1D< Real64 > const RHMin( 7, { 0.0, 20.0, 20.0, 8.0, 8.0, 8.0, 8.0 } ); // Minimum relative humidity [%]
+		static Array1D< Real64 > const RHMax( 7, { 99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0 } );  // Minimum relative humidity [%]
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3696,7 +3694,6 @@ namespace InternalHeatGains {
 		Real64 AirVolFlowFrac;		// Air volume flow fraction
 		Real64 AirVolFlowFracDesignT; // Air volume flow fraction at design entering air temperature
 		Real64 AirVolFlowRate;		// Air volume flow rate at current density [m3/s]
-		Real64 AirDensity;			// Air density at inlet [kg/m3]
 		Real64 AirMassFlowRate;		// Air mass flow rate [kg/s]
 		Real64 CPUPower;			// CPU power input [W]
 		Real64 FanPower;			// Fan power input [W]
@@ -3704,8 +3701,8 @@ namespace InternalHeatGains {
 		Real64 UPSPartLoadRatio;	// UPS part load ratio (current total power input / design total power input)
 		Real64 UPSHeatGain;			// UPS convective heat gain to zone [W]
 		int EnvClass;				// Index for environmental class (None=0, A1=1, A2=2, A3=3, A4=4, B=5, C=6)
-		FArray1D< Real64 > ZoneSumTinMinusTSup( NumOfZones ); // Numerator for zone-level sensible heat index (SHI)
-		FArray1D< Real64 > ZoneSumToutMinusTSup( NumOfZones ); // Denominator for zone-level sensible heat index (SHI)
+		Array1D< Real64 > ZoneSumTinMinusTSup( NumOfZones ); // Numerator for zone-level sensible heat index (SHI)
+		Array1D< Real64 > ZoneSumToutMinusTSup( NumOfZones ); // Denominator for zone-level sensible heat index (SHI)
 
 
 		//  Zero out time step variables
@@ -3891,13 +3888,13 @@ namespace InternalHeatGains {
 			ZnRpt( NZ ).ITEqUPSGainRateToZone += ZoneITEq( Loop ).UPSGainRateToZone;
 			ZnRpt( NZ ).ITEqConGainRateToZone += ZoneITEq( Loop ).ConGainRateToZone;
 
-			ZoneITEq( Loop ).CPUConsumption = CPUPower * TimeStepZone * SecInHour;
-			ZoneITEq( Loop ).FanConsumption = FanPower * TimeStepZone * SecInHour;
-			ZoneITEq( Loop ).UPSConsumption = UPSPower * TimeStepZone * SecInHour;
-			ZoneITEq( Loop ).CPUEnergyAtDesign = ZoneITEq( Loop ).CPUPowerAtDesign * TimeStepZone * SecInHour;
-			ZoneITEq( Loop ).FanEnergyAtDesign = ZoneITEq( Loop ).FanPowerAtDesign * TimeStepZone * SecInHour;
-			ZoneITEq( Loop ).UPSGainEnergyToZone = UPSHeatGain * TimeStepZone * SecInHour;
-			ZoneITEq( Loop ).ConGainEnergyToZone = ZoneITEq( Loop ).ConGainRateToZone * TimeStepZone * SecInHour;
+			ZoneITEq( Loop ).CPUConsumption = CPUPower * TimeStepZoneSec;
+			ZoneITEq( Loop ).FanConsumption = FanPower * TimeStepZoneSec;
+			ZoneITEq( Loop ).UPSConsumption = UPSPower * TimeStepZoneSec;
+			ZoneITEq( Loop ).CPUEnergyAtDesign = ZoneITEq( Loop ).CPUPowerAtDesign * TimeStepZoneSec;
+			ZoneITEq( Loop ).FanEnergyAtDesign = ZoneITEq( Loop ).FanPowerAtDesign * TimeStepZoneSec;
+			ZoneITEq( Loop ).UPSGainEnergyToZone = UPSHeatGain * TimeStepZoneSec;
+			ZoneITEq( Loop ).ConGainEnergyToZone = ZoneITEq( Loop ).ConGainRateToZone * TimeStepZoneSec;
 
 			ZnRpt( NZ ).ITEqCPUConsumption += ZoneITEq( Loop ).CPUConsumption;
 			ZnRpt( NZ ).ITEqFanConsumption += ZoneITEq( Loop ).FanConsumption;
@@ -4001,7 +3998,6 @@ namespace InternalHeatGains {
 		// OutputDataStructure.doc (EnergyPlus documentation)
 
 		// Using/Aliasing
-		using DataGlobals::SecInHour;
 		using OutputReportTabular::WriteTabularFiles;
 
 		// Locals
@@ -4020,24 +4016,24 @@ namespace InternalHeatGains {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
 		int ZoneLoop; // Counter for the # of zones (nz)
-		static FArray1D_int TradIntGainTypes( 7, { IntGainTypeOf_People, IntGainTypeOf_Lights, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment } );
+		static Array1D_int TradIntGainTypes( 7, { IntGainTypeOf_People, IntGainTypeOf_Lights, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment } );
 
 		// FLOW:
 		for ( Loop = 1; Loop <= TotPeople; ++Loop ) {
-			People( Loop ).RadGainEnergy = People( Loop ).RadGainRate * TimeStepZone * SecInHour;
-			People( Loop ).ConGainEnergy = People( Loop ).ConGainRate * TimeStepZone * SecInHour;
-			People( Loop ).SenGainEnergy = People( Loop ).SenGainRate * TimeStepZone * SecInHour;
-			People( Loop ).LatGainEnergy = People( Loop ).LatGainRate * TimeStepZone * SecInHour;
-			People( Loop ).TotGainEnergy = People( Loop ).TotGainRate * TimeStepZone * SecInHour;
+			People( Loop ).RadGainEnergy = People( Loop ).RadGainRate * TimeStepZoneSec;
+			People( Loop ).ConGainEnergy = People( Loop ).ConGainRate * TimeStepZoneSec;
+			People( Loop ).SenGainEnergy = People( Loop ).SenGainRate * TimeStepZoneSec;
+			People( Loop ).LatGainEnergy = People( Loop ).LatGainRate * TimeStepZoneSec;
+			People( Loop ).TotGainEnergy = People( Loop ).TotGainRate * TimeStepZoneSec;
 		}
 
 		for ( Loop = 1; Loop <= TotLights; ++Loop ) {
-			Lights( Loop ).Consumption = Lights( Loop ).Power * TimeStepZone * SecInHour;
-			Lights( Loop ).RadGainEnergy = Lights( Loop ).RadGainRate * TimeStepZone * SecInHour;
-			Lights( Loop ).VisGainEnergy = Lights( Loop ).VisGainRate * TimeStepZone * SecInHour;
-			Lights( Loop ).ConGainEnergy = Lights( Loop ).ConGainRate * TimeStepZone * SecInHour;
-			Lights( Loop ).RetAirGainEnergy = Lights( Loop ).RetAirGainRate * TimeStepZone * SecInHour;
-			Lights( Loop ).TotGainEnergy = Lights( Loop ).TotGainRate * TimeStepZone * SecInHour;
+			Lights( Loop ).Consumption = Lights( Loop ).Power * TimeStepZoneSec;
+			Lights( Loop ).RadGainEnergy = Lights( Loop ).RadGainRate * TimeStepZoneSec;
+			Lights( Loop ).VisGainEnergy = Lights( Loop ).VisGainRate * TimeStepZoneSec;
+			Lights( Loop ).ConGainEnergy = Lights( Loop ).ConGainRate * TimeStepZoneSec;
+			Lights( Loop ).RetAirGainEnergy = Lights( Loop ).RetAirGainRate * TimeStepZoneSec;
+			Lights( Loop ).TotGainEnergy = Lights( Loop ).TotGainRate * TimeStepZoneSec;
 			if ( ! WarmupFlag ) {
 				if ( DoOutputReporting && WriteTabularFiles && ( KindOfSim == ksRunPeriodWeather ) ) { //for weather simulations only
 					//for tabular report, accumlate the total electricity used for each Light object
@@ -4051,65 +4047,65 @@ namespace InternalHeatGains {
 		}
 
 		for ( Loop = 1; Loop <= TotElecEquip; ++Loop ) {
-			ZoneElectric( Loop ).Consumption = ZoneElectric( Loop ).Power * TimeStepZone * SecInHour;
-			ZoneElectric( Loop ).RadGainEnergy = ZoneElectric( Loop ).RadGainRate * TimeStepZone * SecInHour;
-			ZoneElectric( Loop ).ConGainEnergy = ZoneElectric( Loop ).ConGainRate * TimeStepZone * SecInHour;
-			ZoneElectric( Loop ).LatGainEnergy = ZoneElectric( Loop ).LatGainRate * TimeStepZone * SecInHour;
-			ZoneElectric( Loop ).LostEnergy = ZoneElectric( Loop ).LostRate * TimeStepZone * SecInHour;
-			ZoneElectric( Loop ).TotGainEnergy = ZoneElectric( Loop ).TotGainRate * TimeStepZone * SecInHour;
+			ZoneElectric( Loop ).Consumption = ZoneElectric( Loop ).Power * TimeStepZoneSec;
+			ZoneElectric( Loop ).RadGainEnergy = ZoneElectric( Loop ).RadGainRate * TimeStepZoneSec;
+			ZoneElectric( Loop ).ConGainEnergy = ZoneElectric( Loop ).ConGainRate * TimeStepZoneSec;
+			ZoneElectric( Loop ).LatGainEnergy = ZoneElectric( Loop ).LatGainRate * TimeStepZoneSec;
+			ZoneElectric( Loop ).LostEnergy = ZoneElectric( Loop ).LostRate * TimeStepZoneSec;
+			ZoneElectric( Loop ).TotGainEnergy = ZoneElectric( Loop ).TotGainRate * TimeStepZoneSec;
 		}
 
 		for ( Loop = 1; Loop <= TotGasEquip; ++Loop ) {
-			ZoneGas( Loop ).Consumption = ZoneGas( Loop ).Power * TimeStepZone * SecInHour;
-			ZoneGas( Loop ).RadGainEnergy = ZoneGas( Loop ).RadGainRate * TimeStepZone * SecInHour;
-			ZoneGas( Loop ).ConGainEnergy = ZoneGas( Loop ).ConGainRate * TimeStepZone * SecInHour;
-			ZoneGas( Loop ).LatGainEnergy = ZoneGas( Loop ).LatGainRate * TimeStepZone * SecInHour;
-			ZoneGas( Loop ).LostEnergy = ZoneGas( Loop ).LostRate * TimeStepZone * SecInHour;
-			ZoneGas( Loop ).TotGainEnergy = ZoneGas( Loop ).TotGainRate * TimeStepZone * SecInHour;
+			ZoneGas( Loop ).Consumption = ZoneGas( Loop ).Power * TimeStepZoneSec;
+			ZoneGas( Loop ).RadGainEnergy = ZoneGas( Loop ).RadGainRate * TimeStepZoneSec;
+			ZoneGas( Loop ).ConGainEnergy = ZoneGas( Loop ).ConGainRate * TimeStepZoneSec;
+			ZoneGas( Loop ).LatGainEnergy = ZoneGas( Loop ).LatGainRate * TimeStepZoneSec;
+			ZoneGas( Loop ).LostEnergy = ZoneGas( Loop ).LostRate * TimeStepZoneSec;
+			ZoneGas( Loop ).TotGainEnergy = ZoneGas( Loop ).TotGainRate * TimeStepZoneSec;
 		}
 
 		for ( Loop = 1; Loop <= TotOthEquip; ++Loop ) {
-			ZoneOtherEq( Loop ).Consumption = ZoneOtherEq( Loop ).Power * TimeStepZone * SecInHour;
-			ZoneOtherEq( Loop ).RadGainEnergy = ZoneOtherEq( Loop ).RadGainRate * TimeStepZone * SecInHour;
-			ZoneOtherEq( Loop ).ConGainEnergy = ZoneOtherEq( Loop ).ConGainRate * TimeStepZone * SecInHour;
-			ZoneOtherEq( Loop ).LatGainEnergy = ZoneOtherEq( Loop ).LatGainRate * TimeStepZone * SecInHour;
-			ZoneOtherEq( Loop ).LostEnergy = ZoneOtherEq( Loop ).LostRate * TimeStepZone * SecInHour;
-			ZoneOtherEq( Loop ).TotGainEnergy = ZoneOtherEq( Loop ).TotGainRate * TimeStepZone * SecInHour;
+			ZoneOtherEq( Loop ).Consumption = ZoneOtherEq( Loop ).Power * TimeStepZoneSec;
+			ZoneOtherEq( Loop ).RadGainEnergy = ZoneOtherEq( Loop ).RadGainRate * TimeStepZoneSec;
+			ZoneOtherEq( Loop ).ConGainEnergy = ZoneOtherEq( Loop ).ConGainRate * TimeStepZoneSec;
+			ZoneOtherEq( Loop ).LatGainEnergy = ZoneOtherEq( Loop ).LatGainRate * TimeStepZoneSec;
+			ZoneOtherEq( Loop ).LostEnergy = ZoneOtherEq( Loop ).LostRate * TimeStepZoneSec;
+			ZoneOtherEq( Loop ).TotGainEnergy = ZoneOtherEq( Loop ).TotGainRate * TimeStepZoneSec;
 		}
 
 		for ( Loop = 1; Loop <= TotHWEquip; ++Loop ) {
-			ZoneHWEq( Loop ).Consumption = ZoneHWEq( Loop ).Power * TimeStepZone * SecInHour;
-			ZoneHWEq( Loop ).RadGainEnergy = ZoneHWEq( Loop ).RadGainRate * TimeStepZone * SecInHour;
-			ZoneHWEq( Loop ).ConGainEnergy = ZoneHWEq( Loop ).ConGainRate * TimeStepZone * SecInHour;
-			ZoneHWEq( Loop ).LatGainEnergy = ZoneHWEq( Loop ).LatGainRate * TimeStepZone * SecInHour;
-			ZoneHWEq( Loop ).LostEnergy = ZoneHWEq( Loop ).LostRate * TimeStepZone * SecInHour;
-			ZoneHWEq( Loop ).TotGainEnergy = ZoneHWEq( Loop ).TotGainRate * TimeStepZone * SecInHour;
+			ZoneHWEq( Loop ).Consumption = ZoneHWEq( Loop ).Power * TimeStepZoneSec;
+			ZoneHWEq( Loop ).RadGainEnergy = ZoneHWEq( Loop ).RadGainRate * TimeStepZoneSec;
+			ZoneHWEq( Loop ).ConGainEnergy = ZoneHWEq( Loop ).ConGainRate * TimeStepZoneSec;
+			ZoneHWEq( Loop ).LatGainEnergy = ZoneHWEq( Loop ).LatGainRate * TimeStepZoneSec;
+			ZoneHWEq( Loop ).LostEnergy = ZoneHWEq( Loop ).LostRate * TimeStepZoneSec;
+			ZoneHWEq( Loop ).TotGainEnergy = ZoneHWEq( Loop ).TotGainRate * TimeStepZoneSec;
 		}
 
 		for ( Loop = 1; Loop <= TotStmEquip; ++Loop ) {
-			ZoneSteamEq( Loop ).Consumption = ZoneSteamEq( Loop ).Power * TimeStepZone * SecInHour;
-			ZoneSteamEq( Loop ).RadGainEnergy = ZoneSteamEq( Loop ).RadGainRate * TimeStepZone * SecInHour;
-			ZoneSteamEq( Loop ).ConGainEnergy = ZoneSteamEq( Loop ).ConGainRate * TimeStepZone * SecInHour;
-			ZoneSteamEq( Loop ).LatGainEnergy = ZoneSteamEq( Loop ).LatGainRate * TimeStepZone * SecInHour;
-			ZoneSteamEq( Loop ).LostEnergy = ZoneSteamEq( Loop ).LostRate * TimeStepZone * SecInHour;
-			ZoneSteamEq( Loop ).TotGainEnergy = ZoneSteamEq( Loop ).TotGainRate * TimeStepZone * SecInHour;
+			ZoneSteamEq( Loop ).Consumption = ZoneSteamEq( Loop ).Power * TimeStepZoneSec;
+			ZoneSteamEq( Loop ).RadGainEnergy = ZoneSteamEq( Loop ).RadGainRate * TimeStepZoneSec;
+			ZoneSteamEq( Loop ).ConGainEnergy = ZoneSteamEq( Loop ).ConGainRate * TimeStepZoneSec;
+			ZoneSteamEq( Loop ).LatGainEnergy = ZoneSteamEq( Loop ).LatGainRate * TimeStepZoneSec;
+			ZoneSteamEq( Loop ).LostEnergy = ZoneSteamEq( Loop ).LostRate * TimeStepZoneSec;
+			ZoneSteamEq( Loop ).TotGainEnergy = ZoneSteamEq( Loop ).TotGainRate * TimeStepZoneSec;
 		}
 
 		for ( Loop = 1; Loop <= TotBBHeat; ++Loop ) {
-			ZoneBBHeat( Loop ).Consumption = ZoneBBHeat( Loop ).Power * TimeStepZone * SecInHour;
-			ZoneBBHeat( Loop ).RadGainEnergy = ZoneBBHeat( Loop ).RadGainRate * TimeStepZone * SecInHour;
-			ZoneBBHeat( Loop ).ConGainEnergy = ZoneBBHeat( Loop ).ConGainRate * TimeStepZone * SecInHour;
-			ZoneBBHeat( Loop ).TotGainEnergy = ZoneBBHeat( Loop ).TotGainRate * TimeStepZone * SecInHour;
+			ZoneBBHeat( Loop ).Consumption = ZoneBBHeat( Loop ).Power * TimeStepZoneSec;
+			ZoneBBHeat( Loop ).RadGainEnergy = ZoneBBHeat( Loop ).RadGainRate * TimeStepZoneSec;
+			ZoneBBHeat( Loop ).ConGainEnergy = ZoneBBHeat( Loop ).ConGainRate * TimeStepZoneSec;
+			ZoneBBHeat( Loop ).TotGainEnergy = ZoneBBHeat( Loop ).TotGainRate * TimeStepZoneSec;
 		}
 
 		for ( ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop ) {
 			// People
 			ZnRpt( ZoneLoop ).PeopleNumOcc = ZoneIntGain( ZoneLoop ).NOFOCC;
-			ZnRpt( ZoneLoop ).PeopleRadGain = ZoneIntGain( ZoneLoop ).QOCRAD * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).PeopleConGain = ZoneIntGain( ZoneLoop ).QOCCON * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).PeopleSenGain = ZoneIntGain( ZoneLoop ).QOCSEN * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).PeopleLatGain = ZoneIntGain( ZoneLoop ).QOCLAT * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).PeopleTotGain = ZoneIntGain( ZoneLoop ).QOCTOT * TimeStepZone * SecInHour;
+			ZnRpt( ZoneLoop ).PeopleRadGain = ZoneIntGain( ZoneLoop ).QOCRAD * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).PeopleConGain = ZoneIntGain( ZoneLoop ).QOCCON * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).PeopleSenGain = ZoneIntGain( ZoneLoop ).QOCSEN * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).PeopleLatGain = ZoneIntGain( ZoneLoop ).QOCLAT * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).PeopleTotGain = ZoneIntGain( ZoneLoop ).QOCTOT * TimeStepZoneSec;
 			ZnRpt( ZoneLoop ).PeopleRadGainRate = ZoneIntGain( ZoneLoop ).QOCRAD;
 			ZnRpt( ZoneLoop ).PeopleConGainRate = ZoneIntGain( ZoneLoop ).QOCCON;
 			ZnRpt( ZoneLoop ).PeopleSenGainRate = ZoneIntGain( ZoneLoop ).QOCSEN;
@@ -4117,11 +4113,11 @@ namespace InternalHeatGains {
 			ZnRpt( ZoneLoop ).PeopleTotGainRate = ZoneIntGain( ZoneLoop ).QOCTOT;
 
 			// General Lights
-			ZnRpt( ZoneLoop ).LtsRetAirGain = ZoneIntGain( ZoneLoop ).QLTCRA * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).LtsRadGain = ZoneIntGain( ZoneLoop ).QLTRAD * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).LtsTotGain = ZoneIntGain( ZoneLoop ).QLTTOT * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).LtsConGain = ZoneIntGain( ZoneLoop ).QLTCON * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).LtsVisGain = ZoneIntGain( ZoneLoop ).QLTSW * TimeStepZone * SecInHour;
+			ZnRpt( ZoneLoop ).LtsRetAirGain = ZoneIntGain( ZoneLoop ).QLTCRA * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).LtsRadGain = ZoneIntGain( ZoneLoop ).QLTRAD * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).LtsTotGain = ZoneIntGain( ZoneLoop ).QLTTOT * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).LtsConGain = ZoneIntGain( ZoneLoop ).QLTCON * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).LtsVisGain = ZoneIntGain( ZoneLoop ).QLTSW * TimeStepZoneSec;
 			ZnRpt( ZoneLoop ).LtsRetAirGainRate = ZoneIntGain( ZoneLoop ).QLTCRA;
 			ZnRpt( ZoneLoop ).LtsRadGainRate = ZoneIntGain( ZoneLoop ).QLTRAD;
 			ZnRpt( ZoneLoop ).LtsTotGainRate = ZoneIntGain( ZoneLoop ).QLTTOT;
@@ -4130,10 +4126,10 @@ namespace InternalHeatGains {
 			ZnRpt( ZoneLoop ).LtsElecConsump = ZnRpt( ZoneLoop ).LtsTotGain;
 
 			// Electric Equipment
-			ZnRpt( ZoneLoop ).ElecConGain = ZoneIntGain( ZoneLoop ).QEECON * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).ElecRadGain = ZoneIntGain( ZoneLoop ).QEERAD * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).ElecLatGain = ZoneIntGain( ZoneLoop ).QEELAT * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).ElecLost = ZoneIntGain( ZoneLoop ).QEELost * TimeStepZone * SecInHour;
+			ZnRpt( ZoneLoop ).ElecConGain = ZoneIntGain( ZoneLoop ).QEECON * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).ElecRadGain = ZoneIntGain( ZoneLoop ).QEERAD * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).ElecLatGain = ZoneIntGain( ZoneLoop ).QEELAT * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).ElecLost = ZoneIntGain( ZoneLoop ).QEELost * TimeStepZoneSec;
 			ZnRpt( ZoneLoop ).ElecConGainRate = ZoneIntGain( ZoneLoop ).QEECON;
 			ZnRpt( ZoneLoop ).ElecRadGainRate = ZoneIntGain( ZoneLoop ).QEERAD;
 			ZnRpt( ZoneLoop ).ElecLatGainRate = ZoneIntGain( ZoneLoop ).QEELAT;
@@ -4143,10 +4139,10 @@ namespace InternalHeatGains {
 			ZnRpt( ZoneLoop ).ElecTotGainRate = ZnRpt( ZoneLoop ).ElecConGainRate + ZnRpt( ZoneLoop ).ElecRadGainRate + ZnRpt( ZoneLoop ).ElecLatGainRate;
 
 			// Gas Equipment
-			ZnRpt( ZoneLoop ).GasConGain = ZoneIntGain( ZoneLoop ).QGECON * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).GasRadGain = ZoneIntGain( ZoneLoop ).QGERAD * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).GasLatGain = ZoneIntGain( ZoneLoop ).QGELAT * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).GasLost = ZoneIntGain( ZoneLoop ).QGELost * TimeStepZone * SecInHour;
+			ZnRpt( ZoneLoop ).GasConGain = ZoneIntGain( ZoneLoop ).QGECON * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).GasRadGain = ZoneIntGain( ZoneLoop ).QGERAD * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).GasLatGain = ZoneIntGain( ZoneLoop ).QGELAT * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).GasLost = ZoneIntGain( ZoneLoop ).QGELost * TimeStepZoneSec;
 			ZnRpt( ZoneLoop ).GasConGainRate = ZoneIntGain( ZoneLoop ).QGECON;
 			ZnRpt( ZoneLoop ).GasRadGainRate = ZoneIntGain( ZoneLoop ).QGERAD;
 			ZnRpt( ZoneLoop ).GasLatGainRate = ZoneIntGain( ZoneLoop ).QGELAT;
@@ -4156,10 +4152,10 @@ namespace InternalHeatGains {
 			ZnRpt( ZoneLoop ).GasTotGainRate = ZnRpt( ZoneLoop ).GasConGainRate + ZnRpt( ZoneLoop ).GasRadGainRate + ZnRpt( ZoneLoop ).GasLatGainRate;
 
 			// Hot Water Equipment
-			ZnRpt( ZoneLoop ).HWConGain = ZoneIntGain( ZoneLoop ).QHWCON * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).HWRadGain = ZoneIntGain( ZoneLoop ).QHWRAD * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).HWLatGain = ZoneIntGain( ZoneLoop ).QHWLAT * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).HWLost = ZoneIntGain( ZoneLoop ).QHWLost * TimeStepZone * SecInHour;
+			ZnRpt( ZoneLoop ).HWConGain = ZoneIntGain( ZoneLoop ).QHWCON * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).HWRadGain = ZoneIntGain( ZoneLoop ).QHWRAD * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).HWLatGain = ZoneIntGain( ZoneLoop ).QHWLAT * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).HWLost = ZoneIntGain( ZoneLoop ).QHWLost * TimeStepZoneSec;
 			ZnRpt( ZoneLoop ).HWConGainRate = ZoneIntGain( ZoneLoop ).QHWCON;
 			ZnRpt( ZoneLoop ).HWRadGainRate = ZoneIntGain( ZoneLoop ).QHWRAD;
 			ZnRpt( ZoneLoop ).HWLatGainRate = ZoneIntGain( ZoneLoop ).QHWLAT;
@@ -4169,10 +4165,10 @@ namespace InternalHeatGains {
 			ZnRpt( ZoneLoop ).HWTotGainRate = ZnRpt( ZoneLoop ).HWConGainRate + ZnRpt( ZoneLoop ).HWRadGainRate + ZnRpt( ZoneLoop ).HWLatGainRate;
 
 			// Steam Equipment
-			ZnRpt( ZoneLoop ).SteamConGain = ZoneIntGain( ZoneLoop ).QSECON * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).SteamRadGain = ZoneIntGain( ZoneLoop ).QSERAD * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).SteamLatGain = ZoneIntGain( ZoneLoop ).QSELAT * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).SteamLost = ZoneIntGain( ZoneLoop ).QSELost * TimeStepZone * SecInHour;
+			ZnRpt( ZoneLoop ).SteamConGain = ZoneIntGain( ZoneLoop ).QSECON * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).SteamRadGain = ZoneIntGain( ZoneLoop ).QSERAD * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).SteamLatGain = ZoneIntGain( ZoneLoop ).QSELAT * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).SteamLost = ZoneIntGain( ZoneLoop ).QSELost * TimeStepZoneSec;
 			ZnRpt( ZoneLoop ).SteamConGainRate = ZoneIntGain( ZoneLoop ).QSECON;
 			ZnRpt( ZoneLoop ).SteamRadGainRate = ZoneIntGain( ZoneLoop ).QSERAD;
 			ZnRpt( ZoneLoop ).SteamLatGainRate = ZoneIntGain( ZoneLoop ).QSELAT;
@@ -4182,10 +4178,10 @@ namespace InternalHeatGains {
 			ZnRpt( ZoneLoop ).SteamTotGainRate = ZnRpt( ZoneLoop ).SteamConGainRate + ZnRpt( ZoneLoop ).SteamRadGainRate + ZnRpt( ZoneLoop ).SteamLatGainRate;
 
 			// Other Equipment
-			ZnRpt( ZoneLoop ).OtherConGain = ZoneIntGain( ZoneLoop ).QOECON * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).OtherRadGain = ZoneIntGain( ZoneLoop ).QOERAD * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).OtherLatGain = ZoneIntGain( ZoneLoop ).QOELAT * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).OtherLost = ZoneIntGain( ZoneLoop ).QOELost * TimeStepZone * SecInHour;
+			ZnRpt( ZoneLoop ).OtherConGain = ZoneIntGain( ZoneLoop ).QOECON * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).OtherRadGain = ZoneIntGain( ZoneLoop ).QOERAD * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).OtherLatGain = ZoneIntGain( ZoneLoop ).QOELAT * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).OtherLost = ZoneIntGain( ZoneLoop ).QOELost * TimeStepZoneSec;
 			ZnRpt( ZoneLoop ).OtherConGainRate = ZoneIntGain( ZoneLoop ).QOECON;
 			ZnRpt( ZoneLoop ).OtherRadGainRate = ZoneIntGain( ZoneLoop ).QOERAD;
 			ZnRpt( ZoneLoop ).OtherLatGainRate = ZoneIntGain( ZoneLoop ).QOELAT;
@@ -4194,8 +4190,8 @@ namespace InternalHeatGains {
 			ZnRpt( ZoneLoop ).OtherTotGainRate = ZnRpt( ZoneLoop ).OtherConGainRate + ZnRpt( ZoneLoop ).OtherRadGainRate + ZnRpt( ZoneLoop ).OtherLatGainRate;
 
 			// Baseboard Heat
-			ZnRpt( ZoneLoop ).BaseHeatConGain = ZoneIntGain( ZoneLoop ).QBBCON * TimeStepZone * SecInHour;
-			ZnRpt( ZoneLoop ).BaseHeatRadGain = ZoneIntGain( ZoneLoop ).QBBRAD * TimeStepZone * SecInHour;
+			ZnRpt( ZoneLoop ).BaseHeatConGain = ZoneIntGain( ZoneLoop ).QBBCON * TimeStepZoneSec;
+			ZnRpt( ZoneLoop ).BaseHeatRadGain = ZoneIntGain( ZoneLoop ).QBBRAD * TimeStepZoneSec;
 			ZnRpt( ZoneLoop ).BaseHeatConGainRate = ZoneIntGain( ZoneLoop ).QBBCON;
 			ZnRpt( ZoneLoop ).BaseHeatRadGainRate = ZoneIntGain( ZoneLoop ).QBBRAD;
 			ZnRpt( ZoneLoop ).BaseHeatTotGain = ZnRpt( ZoneLoop ).BaseHeatConGain + ZnRpt( ZoneLoop ).BaseHeatRadGain;
@@ -4211,16 +4207,16 @@ namespace InternalHeatGains {
 			ZnRpt( ZoneLoop ).TotVisHeatGainRate = ZnRpt( ZoneLoop ).LtsVisGainRate;
 
 			SumInternalRadiationGainsByTypes( ZoneLoop, TradIntGainTypes, ZnRpt( ZoneLoop ).TotRadiantGainRate );
-			ZnRpt( ZoneLoop ).TotRadiantGain = ZnRpt( ZoneLoop ).TotRadiantGainRate * TimeStepZone * SecInHour;
+			ZnRpt( ZoneLoop ).TotRadiantGain = ZnRpt( ZoneLoop ).TotRadiantGainRate * TimeStepZoneSec;
 
 			SumInternalConvectionGainsByTypes( ZoneLoop, TradIntGainTypes, ZnRpt( ZoneLoop ).TotConvectiveGainRate );
-			ZnRpt( ZoneLoop ).TotConvectiveGain = ZnRpt( ZoneLoop ).TotConvectiveGainRate * TimeStepZone * SecInHour;
+			ZnRpt( ZoneLoop ).TotConvectiveGain = ZnRpt( ZoneLoop ).TotConvectiveGainRate * TimeStepZoneSec;
 
 			SumInternalLatentGainsByTypes( ZoneLoop, TradIntGainTypes, ZnRpt( ZoneLoop ).TotLatentGainRate );
-			ZnRpt( ZoneLoop ).TotLatentGain = ZnRpt( ZoneLoop ).TotLatentGainRate * TimeStepZone * SecInHour;
+			ZnRpt( ZoneLoop ).TotLatentGain = ZnRpt( ZoneLoop ).TotLatentGainRate * TimeStepZoneSec;
 
 			ZnRpt( ZoneLoop ).TotTotalHeatGainRate = ZnRpt( ZoneLoop ).TotLatentGainRate + ZnRpt( ZoneLoop ).TotRadiantGainRate + ZnRpt( ZoneLoop ).TotConvectiveGainRate + ZnRpt( ZoneLoop ).TotVisHeatGainRate;
-			ZnRpt( ZoneLoop ).TotTotalHeatGain = ZnRpt( ZoneLoop ).TotTotalHeatGainRate * TimeStepZone * SecInHour;
+			ZnRpt( ZoneLoop ).TotTotalHeatGain = ZnRpt( ZoneLoop ).TotTotalHeatGainRate * TimeStepZoneSec;
 		}
 
 	}
@@ -4515,7 +4511,7 @@ namespace InternalHeatGains {
 	void
 	SumInternalConvectionGainsByTypes(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		FArray1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
 		Real64 & SumConvGainRate
 	)
 	{
@@ -4639,7 +4635,7 @@ namespace InternalHeatGains {
 	void
 	SumReturnAirConvectionGainsByTypes(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		FArray1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
 		Real64 & SumReturnAirGainRate
 	)
 	{
@@ -4763,7 +4759,7 @@ namespace InternalHeatGains {
 	void
 	SumInternalRadiationGainsByTypes(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		FArray1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
 		Real64 & SumRadiationGainRate
 	)
 	{
@@ -4887,7 +4883,7 @@ namespace InternalHeatGains {
 	void
 	SumInternalLatentGainsByTypes(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		FArray1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
 		Real64 & SumLatentGainRate
 	)
 	{
@@ -5067,7 +5063,7 @@ namespace InternalHeatGains {
 	void
 	SumInternalCO2GainsByTypes(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		FArray1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
 		Real64 & SumCO2GainRate
 	)
 	{
@@ -5249,48 +5245,48 @@ namespace InternalHeatGains {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static int iZone( 0 );
 		static int TimeStepInDay( 0 );
-		static FArray1D_int IntGainTypesPeople( 1, { IntGainTypeOf_People } );
-		static FArray1D_int IntGainTypesLight( 1, { IntGainTypeOf_Lights } );
-		static FArray1D_int IntGainTypesEquip( 5, { IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment } );
-		static FArray1D_int IntGainTypesRefrig( 7, { IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
-		static FArray1D_int IntGainTypesWaterUse( 3, { IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified } );
-		static FArray1D_int IntGainTypesHvacLoss( 13, { IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_PipeIndoor, IntGainTypeOf_Pump_VarSpeed, IntGainTypeOf_Pump_ConSpeed, IntGainTypeOf_Pump_Cond, IntGainTypeOf_PumpBank_VarSpeed, IntGainTypeOf_PumpBank_ConSpeed, IntGainTypeOf_PlantComponentUserDefined, IntGainTypeOf_CoilUserDefined, IntGainTypeOf_ZoneHVACForcedAirUserDefined, IntGainTypeOf_AirTerminalUserDefined } );
-		static FArray1D_int IntGainTypesPowerGen( 8, { IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple } );
+		static Array1D_int IntGainTypesPeople( 1, { IntGainTypeOf_People } );
+		static Array1D_int IntGainTypesLight( 1, { IntGainTypeOf_Lights } );
+		static Array1D_int IntGainTypesEquip( 5, { IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment } );
+		static Array1D_int IntGainTypesRefrig( 7, { IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
+		static Array1D_int IntGainTypesWaterUse( 3, { IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified } );
+		static Array1D_int IntGainTypesHvacLoss( 13, { IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_PipeIndoor, IntGainTypeOf_Pump_VarSpeed, IntGainTypeOf_Pump_ConSpeed, IntGainTypeOf_Pump_Cond, IntGainTypeOf_PumpBank_VarSpeed, IntGainTypeOf_PumpBank_ConSpeed, IntGainTypeOf_PlantComponentUserDefined, IntGainTypeOf_CoilUserDefined, IntGainTypeOf_ZoneHVACForcedAirUserDefined, IntGainTypeOf_AirTerminalUserDefined } );
+		static Array1D_int IntGainTypesPowerGen( 8, { IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple } );
 
 		if ( CompLoadReportIsReq && ! isPulseZoneSizing ) {
 			TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
 			for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesPeople, peopleInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalLatentGainsByTypes( iZone, IntGainTypesPeople, peopleLatentSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalRadiationGainsByTypes( iZone, IntGainTypesPeople, peopleRadSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesPeople, peopleInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalLatentGainsByTypes( iZone, IntGainTypesPeople, peopleLatentSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalRadiationGainsByTypes( iZone, IntGainTypesPeople, peopleRadSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesLight, lightInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumReturnAirConvectionGainsByTypes( iZone, IntGainTypesLight, lightRetAirSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalRadiationGainsByTypes( iZone, IntGainTypesLight, lightLWRadSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesLight, lightInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumReturnAirConvectionGainsByTypes( iZone, IntGainTypesLight, lightRetAirSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalRadiationGainsByTypes( iZone, IntGainTypesLight, lightLWRadSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesEquip, equipInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalLatentGainsByTypes( iZone, IntGainTypesEquip, equipLatentSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalRadiationGainsByTypes( iZone, IntGainTypesEquip, equipRadSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesEquip, equipInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalLatentGainsByTypes( iZone, IntGainTypesEquip, equipLatentSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalRadiationGainsByTypes( iZone, IntGainTypesEquip, equipRadSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesRefrig, refrigInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumReturnAirConvectionGainsByTypes( iZone, IntGainTypesRefrig, refrigRetAirSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalLatentGainsByTypes( iZone, IntGainTypesRefrig, refrigLatentSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesRefrig, refrigInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumReturnAirConvectionGainsByTypes( iZone, IntGainTypesRefrig, refrigRetAirSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalLatentGainsByTypes( iZone, IntGainTypesRefrig, refrigLatentSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesWaterUse, waterUseInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalLatentGainsByTypes( iZone, IntGainTypesWaterUse, waterUseLatentSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesWaterUse, waterUseInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalLatentGainsByTypes( iZone, IntGainTypesWaterUse, waterUseLatentSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesHvacLoss, hvacLossInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalRadiationGainsByTypes( iZone, IntGainTypesHvacLoss, hvacLossRadSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesHvacLoss, hvacLossInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalRadiationGainsByTypes( iZone, IntGainTypesHvacLoss, hvacLossRadSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesPowerGen, powerGenInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalRadiationGainsByTypes( iZone, IntGainTypesPowerGen, powerGenRadSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesPowerGen, powerGenInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalRadiationGainsByTypes( iZone, IntGainTypesPowerGen, powerGenRadSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 			}
 		}
 	}
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -9,22 +9,18 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/Array.all.fwd.hh>
+#include <ObjexxFCL/ArrayS.all.fwd.hh>
 #include <ObjexxFCL/byte.fwd.hh>
 #include <ObjexxFCL/CArray.fwd.hh>
 #include <ObjexxFCL/CArrayP.fwd.hh>
 #include <ObjexxFCL/ChunkVector.fwd.hh>
 #include <ObjexxFCL/Cstring.fwd.hh>
-#include <ObjexxFCL/Dimension.fwd.hh>
-#include <ObjexxFCL/DimensionSlice.fwd.hh>
-#include <ObjexxFCL/DynamicIndexRange.fwd.hh>
-#include <ObjexxFCL/FArray.all.fwd.hh>
-#include <ObjexxFCL/FArrayS.all.fwd.hh>
-#include <ObjexxFCL/Fstring.fwd.hh>
 #include <ObjexxFCL/Index.fwd.hh>
 #include <ObjexxFCL/IndexRange.fwd.hh>
 #include <ObjexxFCL/IndexSlice.fwd.hh>
@@ -37,8 +33,6 @@
 #include <ObjexxFCL/Required.fwd.hh>
 #include <ObjexxFCL/sbyte.fwd.hh>
 #include <ObjexxFCL/SetWrapper.fwd.hh>
-#include <ObjexxFCL/Star.fwd.hh>
-#include <ObjexxFCL/StaticIndexRange.fwd.hh>
 #include <ObjexxFCL/Stream.fwd.hh>
 #include <ObjexxFCL/ubyte.fwd.hh>
 #include <ObjexxFCL/Write.fwd.hh>

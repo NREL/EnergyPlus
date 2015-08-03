@@ -15,9 +15,7 @@ if(CPACK_GENERATOR MATCHES "NSIS")
   set(CPACK_PACKAGING_INSTALL_PREFIX "")
 
   set(CPACK_NSIS_MENU_LINKS
-    "@ADDRESSED_ISSUES@" "Addressed Issues V@CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@"
-    "Documentation/EPlusMainMenu.pdf" "EnergyPlus Documentation Main Menu"
-    "@ENHANCEMENT_LIST_ITEMS@" "Enhancement List Items V@CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@"
+    "Documentation/index.html" "EnergyPlus Documentation"
     "PostProcess/EP-Compare/EP-Compare.exe" "EP-Compare" 
     "PreProcess/EPDraw/EPDrawGUI.exe" "EPDrawGUI" 
     "EP-Launch.exe" "EP-Launch"
@@ -25,7 +23,6 @@ if(CPACK_GENERATOR MATCHES "NSIS")
     "ExampleFiles/ExampleFiles-ObjectsLink.xls" "ExampleFiles Link to Objects" 
     "PreProcess/IDFEditor/IDFEditor.exe" "IDFEditor"
     "PreProcess/IDFVersionUpdater/IDFVersionUpdater.exe" "IDFVersionUpdater"
-    "@KNOWN_ISSUES@" "Known Issues V@CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@"
     "readme.html" "Readme Notes" 
     "PreProcess/WeatherConverter/Weather.exe" "Weather Statistics and Conversions" 
   )
@@ -73,39 +70,97 @@ if(CPACK_GENERATOR MATCHES "NSIS")
     StrCpy $0 \"#@CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@-@CPACK_PACKAGE_VERSION_BUILD@\"
     WriteRegStr HKEY_CURRENT_USER \"Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" \"LastAnchor\" $0
     \${If} \${RunningX64}
-      CopyFiles \"$INSTDIR\\temp\\MSCOMCTL.OCX\" \"$WINDIR\\SysWOW64\\MSCOMCTL.OCX\"
-      CopyFiles \"$INSTDIR\\temp\\ComDlg32.OCX\" \"$WINDIR\\SysWOW64\\ComDlg32.OCX\"
-      CopyFiles \"$INSTDIR\\temp\\Msvcrtd.dll\" \"$WINDIR\\SysWOW64\\Msvcrtd.dll\"
-      CopyFiles \"$INSTDIR\\temp\\Dforrt.dll\" \"$WINDIR\\SysWOW64\\Dforrt.dll\"
-      CopyFiles \"$INSTDIR\\temp\\Gswdll32.dll\" \"$WINDIR\\SysWOW64\\Gswdll32.dll\"
-      CopyFiles \"$INSTDIR\\temp\\Gsw32.exe\" \"$WINDIR\\SysWOW64\\Gsw32.exe\"
-      CopyFiles \"$INSTDIR\\temp\\Graph32.ocx\" \"$WINDIR\\SysWOW64\\Graph32.ocx\"
-      CopyFiles \"$INSTDIR\\temp\\MSINET.OCX\" \"$WINDIR\\SysWOW64\\MSINET.OCX\"
-      CopyFiles \"$INSTDIR\\temp\\Vsflex7L.ocx\" \"$WINDIR\\SysWOW64\\Vsflex7L.ocx\"
-      CopyFiles \"$INSTDIR\\temp\\Msflxgrd.ocx\" \"$WINDIR\\SysWOW64\\Msflxgrd.ocx\"
-      RegDLL \"$WINDIR\\SysWOW64\\MSCOMCTL.OCX\"
-      RegDLL \"$WINDIR\\SysWOW64\\ComDlg32.OCX\"
-      RegDLL \"$WINDIR\\SysWOW64\\Graph32.ocx\"
-      RegDLL \"$WINDIR\\SysWOW64\\MSINET.OCX\"
-      RegDLL \"$WINDIR\\SysWOW64\\Vsflex7L.ocx\"
-      RegDLL \"$WINDIR\\SysWOW64\\Msflxgrd.ocx\"
+      \${IfNot} \${FileExists} \"$WINDIR\\SysWOW64\\MSCOMCTL.OCX\"
+        CopyFiles \"$INSTDIR\\temp\\MSCOMCTL.OCX\" \"$WINDIR\\SysWOW64\\MSCOMCTL.OCX\"
+        RegDLL \"$WINDIR\\SysWOW64\\MSCOMCTL.OCX\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\SysWOW64\\ComDlg32.OCX\"
+        CopyFiles \"$INSTDIR\\temp\\ComDlg32.OCX\" \"$WINDIR\\SysWOW64\\ComDlg32.OCX\"
+        RegDLL \"$WINDIR\\SysWOW64\\ComDlg32.OCX\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\SysWOW64\\Msvcrtd.dll\"
+      	CopyFiles \"$INSTDIR\\temp\\Msvcrtd.dll\" \"$WINDIR\\SysWOW64\\Msvcrtd.dll\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\SysWOW64\\Dforrt.dll\"
+      	CopyFiles \"$INSTDIR\\temp\\Dforrt.dll\" \"$WINDIR\\SysWOW64\\Dforrt.dll\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\SysWOW64\\Gswdll32.dll\"
+      	CopyFiles \"$INSTDIR\\temp\\Gswdll32.dll\" \"$WINDIR\\SysWOW64\\Gswdll32.dll\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\SysWOW64\\Gsw32.exe\"
+      	CopyFiles \"$INSTDIR\\temp\\Gsw32.exe\" \"$WINDIR\\SysWOW64\\Gsw32.exe\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\SysWOW64\\Graph32.ocx\"
+      	CopyFiles \"$INSTDIR\\temp\\Graph32.ocx\" \"$WINDIR\\SysWOW64\\Graph32.ocx\"
+      	RegDLL \"$WINDIR\\SysWOW64\\Graph32.ocx\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\SysWOW64\\MSINET.OCX\"
+      	CopyFiles \"$INSTDIR\\temp\\MSINET.OCX\" \"$WINDIR\\SysWOW64\\MSINET.OCX\"
+      	RegDLL \"$WINDIR\\SysWOW64\\MSINET.OCX\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\SysWOW64\\Vsflex7L.ocx\"
+      	CopyFiles \"$INSTDIR\\temp\\Vsflex7L.ocx\" \"$WINDIR\\SysWOW64\\Vsflex7L.ocx\"
+      	RegDLL \"$WINDIR\\SysWOW64\\Vsflex7L.ocx\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\SysWOW64\\Msflxgrd.ocx\"
+      	CopyFiles \"$INSTDIR\\temp\\Msflxgrd.ocx\" \"$WINDIR\\SysWOW64\\Msflxgrd.ocx\"
+      	RegDLL \"$WINDIR\\SysWOW64\\Msflxgrd.ocx\"
+      \${EndIf}
     \${Else}
-      CopyFiles \"$INSTDIR\\temp\\MSCOMCTL.OCX\" \"$WINDIR\\System32\\MSCOMCTL.OCX\"
-      CopyFiles \"$INSTDIR\\temp\\ComDlg32.OCX\" \"$WINDIR\\System32\\ComDlg32.OCX\"
-      CopyFiles \"$INSTDIR\\temp\\Msvcrtd.dll\" \"$WINDIR\\System32\\Msvcrtd.dll\"
-      CopyFiles \"$INSTDIR\\temp\\Dforrt.dll\" \"$WINDIR\\System32\\Dforrt.dll\"
-      CopyFiles \"$INSTDIR\\temp\\Gswdll32.dll\" \"$WINDIR\\System32\\Gswdll32.dll\"
-      CopyFiles \"$INSTDIR\\temp\\Gsw32.exe\" \"$WINDIR\\System32\\Gsw32.exe\"
-      CopyFiles \"$INSTDIR\\temp\\Graph32.ocx\" \"$WINDIR\\System32\\Graph32.ocx\"
-      CopyFiles \"$INSTDIR\\temp\\MSINET.OCX\" \"$WINDIR\\System32\\MSINET.OCX\"
-      CopyFiles \"$INSTDIR\\temp\\Vsflex7L.ocx\" \"$WINDIR\\System32\\Vsflex7L.ocx\"
-      CopyFiles \"$INSTDIR\\temp\\Msflxgrd.ocx\" \"$WINDIR\\System32\\Msflxgrd.ocx\"
-      RegDLL \"$WINDIR\\System32\\MSCOMCTL.OCX\"
-      RegDLL \"$WINDIR\\System32\\ComDlg32.OCX\"
-      RegDLL \"$WINDIR\\System32\\Graph32.ocx\"
-      RegDLL \"$WINDIR\\System32\\MSINET.OCX\"
-      RegDLL \"$WINDIR\\System32\\Vsflex7L.ocx\"
-      RegDLL \"$WINDIR\\System32\\Msflxgrd.ocx\"
+      \${IfNot} \${FileExists} \"$WINDIR\\System32\\MSCOMCTL.OCX\"
+        CopyFiles \"$INSTDIR\\temp\\MSCOMCTL.OCX\" \"$WINDIR\\System32\\MSCOMCTL.OCX\"
+        RegDLL \"$WINDIR\\System32\\MSCOMCTL.OCX\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\System32\\ComDlg32.OCX\"
+        CopyFiles \"$INSTDIR\\temp\\ComDlg32.OCX\" \"$WINDIR\\System32\\ComDlg32.OCX\"
+        RegDLL \"$WINDIR\\System32\\ComDlg32.OCX\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\System32\\Msvcrtd.dll\"
+      	CopyFiles \"$INSTDIR\\temp\\Msvcrtd.dll\" \"$WINDIR\\System32\\Msvcrtd.dll\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\System32\\Dforrt.dll\"
+      	CopyFiles \"$INSTDIR\\temp\\Dforrt.dll\" \"$WINDIR\\System32\\Dforrt.dll\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\System32\\Gswdll32.dll\"
+      	CopyFiles \"$INSTDIR\\temp\\Gswdll32.dll\" \"$WINDIR\\System32\\Gswdll32.dll\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\System32\\Gsw32.exe\"
+      	CopyFiles \"$INSTDIR\\temp\\Gsw32.exe\" \"$WINDIR\\System32\\Gsw32.exe\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\System32\\Graph32.ocx\"
+      	CopyFiles \"$INSTDIR\\temp\\Graph32.ocx\" \"$WINDIR\\System32\\Graph32.ocx\"
+      	RegDLL \"$WINDIR\\System32\\Graph32.ocx\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\System32\\MSINET.OCX\"
+      	CopyFiles \"$INSTDIR\\temp\\MSINET.OCX\" \"$WINDIR\\System32\\MSINET.OCX\"
+      	RegDLL \"$WINDIR\\System32\\MSINET.OCX\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\System32\\Vsflex7L.ocx\"
+      	CopyFiles \"$INSTDIR\\temp\\Vsflex7L.ocx\" \"$WINDIR\\System32\\Vsflex7L.ocx\"
+      	RegDLL \"$WINDIR\\System32\\Vsflex7L.ocx\"
+      \${EndIf}
+
+      \${IfNot} \${FileExists} \"$WINDIR\\System32\\Msflxgrd.ocx\"
+      	CopyFiles \"$INSTDIR\\temp\\Msflxgrd.ocx\" \"$WINDIR\\System32\\Msflxgrd.ocx\"
+      	RegDLL \"$WINDIR\\System32\\Msflxgrd.ocx\"
+      \${EndIf}
     \${EndIf}
     RMDir /r $INSTDIR\\temp
   ")

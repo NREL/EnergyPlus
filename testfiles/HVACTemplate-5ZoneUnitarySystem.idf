@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.2;
+  Version,8.3;
 
   Building,
     Building,                !- Name
@@ -2271,8 +2271,8 @@
     Water,                   !- Fluid Type
     6.67,                    !- Loop Design Delta Temperature {deltaC}
     ,                        !- Minimum Outdoor Dry Bulb Temperature {C}
-    Sequential,              !- Chilled Water Load Distribution Scheme
-    Sequential;              !- Condenser Water Load Distribution Scheme
+    SequentialLoad,          !- Chilled Water Load Distribution Scheme
+    SequentialLoad;          !- Condenser Water Load Distribution Scheme
 
   HVACTemplate:Plant:Chiller,
     ChW Loop Chiller,        !- Name
@@ -2309,7 +2309,7 @@
     Water,                   !- Fluid Type
     11,                      !- Loop Design Delta Temperature {deltaC}
     ,                        !- Maximum Outdoor Dry Bulb Temperature {C}
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   HVACTemplate:Plant:Boiler,
     Hot Water Loop Boiler,   !- Name
@@ -2342,7 +2342,7 @@
     Yes,                     !- Demand Side Bypass Pipe
     Water,                   !- Fluid Type
     5.6,                     !- Loop Design Delta Temperature {deltaC}
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   HVACTemplate:Plant:Tower,
     Heat Pump Loop Tower,    !- Name

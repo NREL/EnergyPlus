@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -110,12 +110,12 @@ namespace PackagedThermalStorageCoil {
 	// MODULE VARIABLE DECLARATIONS:
 
 	int NumTESCoils;
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 	bool GetTESInputFlag( true );
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
 	// Object Data
-	FArray1D< PackagedTESCoolingCoilStruct > TESCoil;
+	Array1D< PackagedTESCoolingCoilStruct > TESCoil;
 
 	// Functions
 
@@ -1683,10 +1683,10 @@ namespace PackagedThermalStorageCoil {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_bool MyFlag; // One time environment flag
-		static FArray1D_bool MySizeFlag; // One time sizing flag
-		static FArray1D_bool MyEnvrnFlag; // flag for init once at start of environment
-		static FArray1D_bool MyWarmupFlag; // flag for init after warmup complete
+		static Array1D_bool MyFlag; // One time environment flag
+		static Array1D_bool MySizeFlag; // One time sizing flag
+		static Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
+		static Array1D_bool MyWarmupFlag; // flag for init after warmup complete
 		static bool MyOneTimeFlag( true ); // One time flag used to allocate MyEnvrnFlag and MySizeFlag
 		bool errFlag;
 		int plloopnum;
@@ -2000,18 +2000,18 @@ namespace PackagedThermalStorageCoil {
 				VolFlowRate = TESCoil( TESCoilNum ).RatedEvapAirVolFlowRate;
 				if ( VolFlowRate >= SmallAirVolFlow ) {
 					if ( CurOASysNum > 0 ) { // coil is in the OA stream
-						MixTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
-						MixHumRat = FinalSysSizing( CurSysNum ).CoolOutHumRat;
+						MixTemp = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
+						MixHumRat = FinalSysSizing( CurSysNum ).OutHumRatAtCoolPeak;
 						SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
 						SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
 					} else { // coil is on the main air loop
-						//     MixTemp = FinalSysSizing(CurSysNum)%CoolMixTemp
-						//     MixHumRat = FinalSysSizing(CurSysNum)%CoolMixHumRat
+						//     MixTemp = FinalSysSizing(CurSysNum)%MixTempAtCoolPeak
+						//     MixHumRat = FinalSysSizing(CurSysNum)%MixHumRatAtCoolPeak
 						SupTemp = FinalSysSizing( CurSysNum ).CoolSupTemp;
 						SupHumRat = FinalSysSizing( CurSysNum ).CoolSupHumRat;
 						if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
-							MixTemp = FinalSysSizing( CurSysNum ).CoolMixTemp;
-							MixHumRat = FinalSysSizing( CurSysNum ).CoolMixHumRat;
+							MixTemp = FinalSysSizing( CurSysNum ).MixTempAtCoolPeak;
+							MixHumRat = FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak;
 						} else { // there is precooling of OA stream
 							if ( VolFlowRate > 0.0 ) {
 								OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / VolFlowRate;
@@ -2019,11 +2019,11 @@ namespace PackagedThermalStorageCoil {
 								OutAirFrac = 1.0;
 							}
 							OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-							MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetTemp;
-							MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetHumRat;
+							MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetTempAtCoolPeak;
+							MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetHumRatAtCoolPeak;
 						}
 					}
-					OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+					OutTemp = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
 					rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
 					MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 					MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
@@ -2237,7 +2237,7 @@ namespace PackagedThermalStorageCoil {
 	void
 	CalcTESCoilCoolingOnlyMode(
 		int const TESCoilNum,
-		int const FanOpMode,
+		int const EP_UNUSED( FanOpMode ),
 		Real64 const PartLoadRatio
 	)
 	{
@@ -2545,7 +2545,7 @@ namespace PackagedThermalStorageCoil {
 	void
 	CalcTESCoilCoolingAndChargeMode(
 		int const TESCoilNum,
-		int const FanOpMode,
+		int const EP_UNUSED( FanOpMode ),
 		Real64 const PartLoadRatio
 	)
 	{
@@ -2979,7 +2979,7 @@ namespace PackagedThermalStorageCoil {
 	void
 	CalcTESCoilCoolingAndDischargeMode(
 		int const TESCoilNum,
-		int const FanOpMode,
+		int const EP_UNUSED( FanOpMode ),
 		Real64 const PartLoadRatio
 	)
 	{
@@ -4327,7 +4327,7 @@ namespace PackagedThermalStorageCoil {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

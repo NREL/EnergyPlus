@@ -12,7 +12,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/Time_Date.hh>
@@ -51,7 +51,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	//      NOTICE
 
-	//      Copyright © 1996-2014 The Board of Trustees of the University of Illinois and The Regents of the
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//      University of California through Ernest Orlando Lawrence Berkeley National Laboratory.  All rights
 	//      reserved.
 
@@ -239,10 +239,13 @@ EnergyPlusPgm( std::string const & filepath )
 #endif
 #endif
 
-#ifdef _WIN32
+#ifdef _MSC_VER
+#ifndef _DEBUG
+    // If _MSC_VER and not debug then prevent dialogs on error
 	SetErrorMode(SEM_NOGPFAULTERRORBOX);
 	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
+#endif
 #endif
 
 	// Locals
@@ -270,7 +273,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	get_environment_variable( DDOnlyEnvVar, cEnvValue );
 	DDOnly = env_var_on( cEnvValue ); // Yes or True
-	if(DDOnlySimulation)
+	if (DDOnlySimulation)
 		DDOnly = true;
 
 	get_environment_variable( ReverseDDEnvVar, cEnvValue );
@@ -278,7 +281,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	get_environment_variable( FullAnnualSimulation, cEnvValue );
 	FullAnnualRun = env_var_on( cEnvValue ); // Yes or True
-	if(AnnualSimulation)
+	if (AnnualSimulation)
 		FullAnnualRun = true;
 
 	get_environment_variable( cDisplayAllWarnings, cEnvValue );
@@ -307,6 +310,9 @@ EnergyPlusPgm( std::string const & filepath )
 
 	get_environment_variable( cReportDuringWarmup, cEnvValue );
 	if ( ! cEnvValue.empty() ) ReportDuringWarmup = env_var_on( cEnvValue ); // Yes or True
+
+	get_environment_variable( cReportDuringHVACSizingSimulation, cEnvValue);
+	if ( ! cEnvValue.empty() ) ReportDuringHVACSizingSimulation = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( cIgnoreSolarRadiation, cEnvValue );
 	if ( ! cEnvValue.empty() ) IgnoreSolarRadiation = env_var_on( cEnvValue ); // Yes or True
@@ -348,7 +354,7 @@ EnergyPlusPgm( std::string const & filepath )
 	get_environment_variable( TraceHVACControllerEnvVar, cEnvValue );
 	if ( ! cEnvValue.empty() ) TraceHVACControllerEnvFlag = env_var_on( cEnvValue ); // Yes or True
 
-	if( ! filepath.empty() ) {
+	if ( ! filepath.empty() ) {
 		// if filepath is not empty, then we are using E+ as a library API call
 		// change the directory to the specified folder, and pass in dummy args to command line parser
 		// this will initialize the paths throughout E+ to the defaults
@@ -389,11 +395,11 @@ EnergyPlusPgm( std::string const & filepath )
 	ReportOrphanFluids();
 	ReportOrphanSchedules();
 
-    if(runReadVars) {
+    if (runReadVars) {
 		std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
 		bool FileExists;
 		{ IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
-		if (!FileExists){
+		if (!FileExists) {
 			DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + "." );
 			exit(EXIT_FAILURE);
 		}
@@ -406,7 +412,7 @@ EnergyPlusPgm( std::string const & filepath )
     	bool rviFileExists;
     	bool mviFileExists;
 
-    	gio::Fmt const readvarsFmt( "(A)" );
+    	gio::Fmt readvarsFmt( "(A)" );
 
     	{ IOFlags flags; gio::inquire( RVIfile, flags ); rviFileExists = flags.exists(); }
     	if (!rviFileExists) {
@@ -498,7 +504,7 @@ CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	FArray1D_int value( 8 );
+	Array1D_int value( 8 );
 	//value(1)   Current year
 	//value(2)   Current month
 	//value(3)   Current day
@@ -509,7 +515,7 @@ CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 	//value(8)   Milliseconds (0-999)
 	std::string datestring; // supposedly returns blank when no date available.
 
-	date_and_time_string( datestring, _, _, value );
+	date_and_time( datestring, _, _, value );
 	if ( ! datestring.empty() ) {
 		gio::write( CurrentDateTimeString, fmtDate ) << value( 1 ) << value( 2 ) << value( 3 ) << value( 5 ) << value( 6 );
 	} else {

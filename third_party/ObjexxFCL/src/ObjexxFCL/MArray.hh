@@ -9,19 +9,23 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/BArray.hh>
-#include <ObjexxFCL/StaticIndexRange.hh>
+#include <ObjexxFCL/fmt.hh>
+#include <ObjexxFCL/IndexRange.hh>
 #include <ObjexxFCL/TypeTraits.hh>
 
 // C++ Headers
 #include <cassert>
 #include <cstddef>
 #include <initializer_list>
+#include <iomanip>
+#include <istream>
+#include <ostream>
 #include <type_traits>
 
 namespace ObjexxFCL {
@@ -33,11 +37,11 @@ class MArray : public BArray
 
 public: // Types
 
-	typedef  A  Array;
+	typedef  A  ArrayType;
 	typedef  typename A::value_type  Class;
 	typedef  T Class::*  MPtr;
 	typedef  TypeTraits< T >  Traits;
-	typedef  StaticIndexRange  IR;
+	typedef  IndexRange  IR;
 
 	// STL style
 	typedef  T  value_type;
@@ -69,8 +73,8 @@ protected: // Creation
 
 	// Constructor
 	inline
-	MArray( A & array, T Class::* pmem ) :
-	 array_( array ),
+	MArray( A & a, T Class::* pmem ) :
+	 array_( a ),
 	 pmem_( pmem )
 	{}
 
@@ -90,14 +94,6 @@ protected: // Assignment
 	operator =( MArray const & a ); // Disallow
 
 public: // Predicate
-
-	// Dimensions Initialized?
-	inline
-	bool
-	dimensions_initialized() const
-	{
-		return array_.dimensions_initialized();
-	}
 
 	// Allocated
 	inline
@@ -124,10 +120,10 @@ public: // Predicate
 	}
 
 	// Conformable?
-	template< class ArrayType >
+	template< class Ar >
 	inline
 	bool
-	conformable( ArrayType const & a ) const
+	conformable( Ar const & a ) const
 	{
 		return array_.conformable( a );
 	}
@@ -304,19 +300,19 @@ protected: // Data
 }; // MArray
 
 // Conformable?
-template< class A, typename T, class ArrayType >
+template< class A, typename T, class Ar >
 inline
 bool
-conformable( MArray< A, T > const & a, ArrayType const & b )
+conformable( MArray< A, T > const & a, Ar const & b )
 {
 	return a.conformable( b );
 }
 
 // Conformable?
-template< class A, typename T, class ArrayType >
+template< class A, typename T, class Ar >
 inline
 bool
-conformable( ArrayType const & a, MArray< A, T > const & b )
+conformable( Ar const & a, MArray< A, T > const & b )
 {
 	return b.conformable( a );
 }

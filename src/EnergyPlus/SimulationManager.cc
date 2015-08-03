@@ -9,8 +9,8 @@ extern "C" {
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -63,6 +63,7 @@ extern "C" {
 #include <HeatBalanceSurfaceManager.hh>
 #include <HVACControllers.hh>
 #include <HVACManager.hh>
+#include <HVACSizingSimulationManager.hh>
 #include <InputProcessor.hh>
 #include <ManageElectricPower.hh>
 #include <MixedAir.hh>
@@ -125,7 +126,6 @@ namespace SimulationManager {
 	// and internal Evolutionary Engineering documentation.
 
 	// Using/Aliasing
-
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
 	using namespace DataSizing;
@@ -227,12 +227,10 @@ namespace SimulationManager {
 		using PlantManager::CheckIfAnyPlant;
 		using CurveManager::InitCurveReporting;
 		using namespace DataTimings;
-		using DataSystemVariables::DeveloperFlag;
-		using DataSystemVariables::TimingFlag;
 		using DataSystemVariables::FullAnnualRun;
 		using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
 		using Psychrometrics::InitializePsychRoutines;
-		using namespace FaultsManager;
+		using FaultsManager::CheckAndReadFaults;
 		using PlantPipingSystemsManager::InitAndSimGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
@@ -264,16 +262,11 @@ namespace SimulationManager {
 		static gio::Fmt Format_700( "('Environment:WarmupDays,',I3)" );
 
 		//CreateSQLiteDatabase();
-		try {
-			EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite());
-		} catch(const std::runtime_error& error) {
-			// Maybe this could be higher in the call stack, and then handle all runtime exceptions this way.
-			ShowFatalError(error.what());
-		}
+		sqlite = EnergyPlus::CreateSQLiteDatabase();
 
-		if ( sqlite->writeOutputToSQLite() ) {
+		if ( sqlite ) {
 			sqlite->sqliteBegin();
-			sqlite->createSQLiteSimulationsRecord( 1 );
+			sqlite->createSQLiteSimulationsRecord( 1, DataStringGlobals::VerString, DataStringGlobals::CurrentDateTime );
 			sqlite->sqliteCommit();
 		}
 
@@ -307,16 +300,16 @@ namespace SimulationManager {
 		CheckIfAnyBasements();
 		CheckIfAnyIdealCondEntSetPoint();
 
-		CheckAndReadFaults();
-
 		ManageBranchInput(); // just gets input and returns.
 
 		DoingSizing = true;
 		ManageSizing();
 
+		CheckAndReadFaults();
+
 		BeginFullSimFlag = true;
 		SimsDone = false;
-		if ( DoDesDaySim || DoWeathSim ) {
+		if ( DoDesDaySim || DoWeathSim || DoHVACSizingSimulation ) {
 			DoOutputReporting = true;
 		}
 		DoingSizing = false;
@@ -391,15 +384,22 @@ namespace SimulationManager {
 			}
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
+		if ( sqlite ) {
 			sqlite->sqliteBegin();
-			sqlite->updateSQLiteSimulationRecord( 1 );
+			sqlite->updateSQLiteSimulationRecord( 1, DataGlobals::NumOfTimeStepInHour );
 			sqlite->sqliteCommit();
 		}
 
 		GetInputForLifeCycleCost(); //must be prior to WriteTabularReports -- do here before big simulation stuff.
 
+		// if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
+		if ( DoHVACSizingSimulation ) {
+			ManageHVACSizingSimulation( ErrorsFound );
+		}
+
 		ShowMessage( "Beginning Simulation" );
+		DisplayString( "Beginning Primary Simulation" );
+
 		ResetEnvironmentCounter();
 
 		EnvCount = 0;
@@ -413,12 +413,15 @@ namespace SimulationManager {
 			if ( ErrorsFound ) break;
 			if ( ( ! DoDesDaySim ) && ( KindOfSim != ksRunPeriodWeather ) ) continue;
 			if ( ( ! DoWeathSim ) && ( KindOfSim == ksRunPeriodWeather ) ) continue;
+			if (KindOfSim == ksHVACSizeDesignDay) continue; // don't run these here, only for sizing simulations
+
+			if (KindOfSim == ksHVACSizeRunPeriodDesign) continue; // don't run these here, only for sizing simulations
 
 			++EnvCount;
 
-			if ( sqlite->writeOutputToSQLite() ) {
+			if ( sqlite ) {
 				sqlite->sqliteBegin();
-				sqlite->createSQLiteEnvironmentPeriodRecord();
+				sqlite->createSQLiteEnvironmentPeriodRecord( DataEnvironment::CurEnvirNum, DataEnvironment::EnvironmentName, DataGlobals::KindOfSim );
 				sqlite->sqliteCommit();
 			}
 
@@ -438,7 +441,7 @@ namespace SimulationManager {
 
 			while ( ( DayOfSim < NumOfDayInEnvrn ) || ( WarmupFlag ) ) { // Begin day loop ...
 
-				if ( sqlite->writeOutputToSQLite() ) sqlite->sqliteBegin(); // setup for one transaction per day
+				if ( sqlite ) sqlite->sqliteBegin(); // setup for one transaction per day
 
 				++DayOfSim;
 				gio::write( DayOfSimChr, fmtLD ) << DayOfSim;
@@ -519,7 +522,7 @@ namespace SimulationManager {
 
 				} // ... End hour loop.
 
-				if ( sqlite->writeOutputToSQLite() ) sqlite->sqliteCommit(); // one transaction per day
+				if ( sqlite ) sqlite->sqliteCommit(); // one transaction per day
 
 			} // ... End day loop.
 
@@ -541,7 +544,7 @@ namespace SimulationManager {
 			}
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) sqlite->sqliteBegin(); // for final data to write
+		if ( sqlite ) sqlite->sqliteBegin(); // for final data to write
 
 #ifdef EP_Detailed_Timings
 		epStartTime( "Closeout Reporting=" );
@@ -569,9 +572,10 @@ namespace SimulationManager {
 #endif
 		CloseOutputFiles();
 
-		sqlite->createZoneExtendedOutput();
+		// sqlite->createZoneExtendedOutput();
+		CreateSQLiteZoneExtendedOutput();
 
-		if ( sqlite->writeOutputToSQLite() ) {
+		if ( sqlite ) {
 			DisplayString( "Writing final SQL reports" );
 			sqlite->sqliteCommit(); // final transactions
 			sqlite->initializeIndexes(); // do not create indexes (SQL) until all is done.
@@ -622,7 +626,7 @@ namespace SimulationManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_int const Div60( 12, { 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60 } );
+		static Array1D_int const Div60( 12, { 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60 } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -631,8 +635,8 @@ namespace SimulationManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string Alphas( 5 );
-		FArray1D< Real64 > Number( 4 );
+		Array1D_string Alphas( 6 );
+		Array1D< Real64 > Number( 4 );
 		int NumAlpha;
 		int NumNumber;
 		int IOStat;
@@ -788,6 +792,7 @@ namespace SimulationManager {
 
 		TimeStepZone = 1.0 / double( NumOfTimeStepInHour );
 		MinutesPerTimeStep = TimeStepZone * 60;
+		TimeStepZoneSec = TimeStepZone * SecInHour;
 
 		CurrentModuleObject = "ConvergenceLimits";
 		Num = GetNumObjectsFound( CurrentModuleObject );
@@ -884,6 +889,8 @@ namespace SimulationManager {
 					TimingFlag = true;
 				} else if ( SameString( Alphas( NumA ), "ReportDetailedWarmupConvergence" ) ) {
 					ReportDetailedWarmupConvergence = true;
+				} else if ( SameString( Alphas( NumA ), "ReportDuringHVACSizingSimulation" ) ) {
+					ReportDuringHVACSizingSimulation = true;
 				} else if ( SameString( Alphas( NumA ), "CreateMinimalSurfaceVariables" ) ) {
 					continue;
 					//        CreateMinimalSurfaceVariables=.TRUE.
@@ -921,6 +928,8 @@ namespace SimulationManager {
 		DoPlantSizing = false;
 		DoDesDaySim = true;
 		DoWeathSim = true;
+		DoHVACSizingSimulation = false;
+		HVACSizingSimMaxIterations = 0;
 		CurrentModuleObject = "SimulationControl";
 		NumRunControl = GetNumObjectsFound( CurrentModuleObject );
 		if ( NumRunControl > 0 ) {
@@ -931,6 +940,9 @@ namespace SimulationManager {
 			if ( Alphas( 3 ) == "YES" ) DoPlantSizing = true;
 			if ( Alphas( 4 ) == "NO" ) DoDesDaySim = false;
 			if ( Alphas( 5 ) == "NO" ) DoWeathSim = false;
+			if (NumAlpha > 5) {
+				if ( Alphas( 6 ) == "YES") DoHVACSizingSimulation = true;
+			}
 		}
 		if ( DDOnly ) {
 			DoDesDaySim = true;
@@ -980,10 +992,18 @@ namespace SimulationManager {
 		} else {
 			Alphas( 5 ) = "No";
 		}
+		if ( DoHVACSizingSimulation ) {
+			Alphas( 6 ) = "Yes";
+			if ( NumNumber >= 1 ) {
+				HVACSizingSimMaxIterations = Number( 1 );
+			}
+		} else {
+			Alphas( 6 ) = "No";
+		}
 
-		gio::write( OutputFileInits, fmtA ) << "! <Simulation Control>, Do Zone Sizing, Do System Sizing, Do Plant Sizing, Do Design Days, Do Weather Simulation";
+		gio::write( OutputFileInits, fmtA ) << "! <Simulation Control>, Do Zone Sizing, Do System Sizing, Do Plant Sizing, Do Design Days, Do Weather Simulation, Do HVAC Sizing Simulation";
 		gio::write( OutputFileInits, Format_741 );
-		for ( Num = 1; Num <= 5; ++Num ) {
+		for ( Num = 1; Num <= 6; ++Num ) {
 			gio::write( OutputFileInits, Format_741_1 ) << Alphas( Num );
 		}
 		gio::write( OutputFileInits );
@@ -1633,7 +1653,7 @@ namespace SimulationManager {
 		int NumNonParents;
 		int NumNonConnected;
 		std::string ChrOut;
-		FArray1D_bool NonConnectedNodes;
+		Array1D_bool NonConnectedNodes;
 		bool ParentComponentFound;
 
 		// Formats
@@ -1760,7 +1780,6 @@ namespace SimulationManager {
 		using DataLoopNode::NumOfNodes;
 		using DataLoopNode::NodeID;
 		using namespace DataHVACGlobals;
-		using DataHeatBalance::Zone;
 		using namespace DataPlant;
 		using namespace DataZoneEquipment;
 		using OutAirNodeManager::OutsideAirNodeList;
@@ -2180,12 +2199,12 @@ namespace SimulationManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
 		int Loop1;
-		FArray1D_string ChildCType;
-		FArray1D_string ChildCName;
-		FArray1D_string ChildInNodeName;
-		FArray1D_string ChildOutNodeName;
-		FArray1D_int ChildInNodeNum;
-		FArray1D_int ChildOutNodeNum;
+		Array1D_string ChildCType;
+		Array1D_string ChildCName;
+		Array1D_string ChildInNodeName;
+		Array1D_string ChildOutNodeName;
+		Array1D_int ChildInNodeNum;
+		Array1D_int ChildOutNodeNum;
 		int NumChildren;
 		bool ErrorsFound;
 
@@ -2267,15 +2286,15 @@ namespace SimulationManager {
 		int Loop;
 		int Loop1;
 		int NumVariables;
-		FArray1D_int VarIndexes;
-		FArray1D_int VarIDs;
-		FArray1D_int IndexTypes;
-		FArray1D_int VarTypes;
-		FArray1D_string UnitsStrings;
-		FArray1D_string VarNames;
-		FArray1D_int ResourceTypes;
-		FArray1D_string EndUses;
-		FArray1D_string Groups;
+		Array1D_int VarIndexes;
+		Array1D_int VarIDs;
+		Array1D_int IndexTypes;
+		Array1D_int VarTypes;
+		Array1D_string UnitsStrings;
+		Array1D_string VarNames;
+		Array1D_int ResourceTypes;
+		Array1D_string EndUses;
+		Array1D_string Groups;
 
 		gio::write( OutputFileDebug, fmtA ) << " CompSet,ComponentType,ComponentName,NumMeteredVariables";
 		gio::write( OutputFileDebug, fmtA ) << " RepVar,ReportIndex,ReportID,ReportName,Units,ResourceType,EndUse,Group,IndexType";
@@ -2468,7 +2487,7 @@ namespace SimulationManager {
 			if ( iostatus != 0 ) break;
 			if ( is_blank( ErrorMessage ) ) continue;
 			ShowErrorMessage( ErrorMessage );
-			if ( sqlite->writeOutputToSQLite() ) {
+			if ( sqlite ) {
 				// Following code relies on specific formatting of Severes, Warnings, and continues
 				// that occur in the IP processing.  Later ones -- i.e. Fatals occur after the
 				// automatic sending of error messages to SQLite are turned on.
@@ -2733,7 +2752,6 @@ Resimulate(
 	using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
 	using DataHeatBalFanSys::iGetZoneSetPoints;
 	using DataHeatBalFanSys::iPredictStep;
-	using DataHeatBalFanSys::iCorrectStep;
 	using HVACManager::SimHVAC;
 	//using HVACManager::CalcAirFlowSimple;
 	using DataHVACGlobals::UseZoneTimeStepHistory; // , InitDSwithZoneHistory
@@ -2786,7 +2804,7 @@ Resimulate(
 }
 
 //     NOTICE
-//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

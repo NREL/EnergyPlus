@@ -2,8 +2,7 @@
 #define UnitVentilator_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -49,9 +48,9 @@ namespace UnitVentilator {
 	extern int NumOfUnitVents; // Number of unit ventilators in the input file
 	extern Real64 OAMassFlowRate; // Outside air mass flow rate for the unit ventilator
 	extern Real64 QZnReq; // heating or cooling needed by zone [watts]
-	extern FArray1D_bool MySizeFlag;
+	extern Array1D_bool MySizeFlag;
 	extern bool GetUnitVentilatorInputFlag; // First time, input is "gotten"
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE UnitVentilator
 	//PRIVATE UpdateUnitVentilator
@@ -439,7 +438,7 @@ namespace UnitVentilator {
 	struct UnitVentNumericFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		UnitVentNumericFieldData()
@@ -447,15 +446,15 @@ namespace UnitVentilator {
 
 		// Member Constructor
 		UnitVentNumericFieldData(
-			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
 			) :
 			FieldNames( FieldNames )
 		{}
 	};
 
 	// Object Data
-	extern FArray1D< UnitVentilatorData > UnitVent;
-	extern FArray1D< UnitVentNumericFieldData > UnitVentNumericFields;
+	extern Array1D< UnitVentilatorData > UnitVent;
+	extern Array1D< UnitVentNumericFieldData > UnitVentNumericFields;
 
 	// Functions
 
@@ -531,12 +530,12 @@ namespace UnitVentilator {
 	Real64
 	CalcUnitVentilatorResidual(
 		Real64 const PartLoadRatio, // Coil Part Load Ratio
-		Optional< FArray1S< Real64 > const > Par = _ // Function parameters
+		Array1< Real64 > const & Par // Function parameters
 	);
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

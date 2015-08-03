@@ -4,8 +4,8 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -310,10 +310,10 @@ namespace RefrigeratedCase {
 	Real64 const FanHalfSpeedRatio( 0.1768 ); // = 1/(2**2.5) for power step for two speed fan
 	Real64 const CapFac60Percent( 0.60 ); // = 60%, load served by half power 2-speed fan
 
-	FArray1D< Real64 > const EuropeanWetCoilFactor( 5, { 1.35, 1.15, 1.05, 1.01, 1.0 } );
-	FArray1D< Real64 > const EuropeanAirInletTemp( 5, { 10.0, 0.0, -18.0, -25.0, -34.0 } );
-	FArray1D< Real64 > const EuropeanEvapTemp( 5, { 0.0, -8.0, -25.0, -31.0, -40.0 } );
-	FArray1D< Real64 > const EuropeanDT1( 5, { 10.0, 8.0, 7.0, 7.0, 6.0 } );
+	Array1D< Real64 > const EuropeanWetCoilFactor( 5, { 1.35, 1.15, 1.05, 1.01, 1.0 } );
+	Array1D< Real64 > const EuropeanAirInletTemp( 5, { 10.0, 0.0, -18.0, -25.0, -34.0 } );
+	Array1D< Real64 > const EuropeanEvapTemp( 5, { 0.0, -8.0, -25.0, -31.0, -40.0 } );
+	Array1D< Real64 > const EuropeanDT1( 5, { 10.0, 8.0, 7.0, 7.0, 6.0 } );
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -347,15 +347,15 @@ namespace RefrigeratedCase {
 
 	// Refrigerated case variables
 	Real64 CaseRAFactor( 0.0 ); // Factor determining case credit allocation (e.g. % to zone or HVAC)
-	FArray1D_bool ShowStockingWarning; // Used for one-time warning message for possible case
+	Array1D_bool ShowStockingWarning; // Used for one-time warning message for possible case
 	// input error regarding stocking
-	FArray1D_bool ShowFrostWarning; // Used for one-time warning message for possible case
+	Array1D_bool ShowFrostWarning; // Used for one-time warning message for possible case
 	// input error regarding frost
-	FArray1D_bool ShowStoreEnergyWarning; // Used for one-time warning message for possible case
+	Array1D_bool ShowStoreEnergyWarning; // Used for one-time warning message for possible case
 	// input error regarding defrost or stocking
 	//  Walk In variables
-	FArray1D_bool ShowUnmetWIEnergyWarning; // Used for one-time warning message
-	FArray1D_bool ShowWIFrostWarning; // Used for one-time warning message
+	Array1D_bool ShowUnmetWIEnergyWarning; // Used for one-time warning message
+	Array1D_bool ShowWIFrostWarning; // Used for one-time warning message
 
 	// Refrigeration compressor rack variables
 	Real64 TotalRackDeliveredCapacity( 0.0 ); // Total capacity of all refrigerated cases attached to rack (W)
@@ -365,7 +365,7 @@ namespace RefrigeratedCase {
 	Real64 RackSenCreditToHVAC( 0.0 ); // Amount of condenser heat applied to HVAC RA duct (W)
 	int InletNode( 0 ); // Water-cooled condenser inlet node number
 	int OutletNode( 0 ); // Water-cooled condenser outlet node number
-	FArray1D_bool ShowCOPWarning; // Used for one-time warning message for possible rack
+	Array1D_bool ShowCOPWarning; // Used for one-time warning message for possible rack
 	// input error regarding COP
 	// Refrigeration condenser variables (used for both racks and detailed systems)
 	Real64 TotalCondenserFanPower( 0.0 ); // Total condenser fan electric power (W)
@@ -375,32 +375,32 @@ namespace RefrigeratedCase {
 	Real64 TotalEvapWaterUseRate( 0.0 ); // Total condenser water use rate (m3/s)
 
 	// Refrigeration system variables
-	FArray1D_bool ShowUnmetEnergyWarning; // Used for one-time warning message for possible
+	Array1D_bool ShowUnmetEnergyWarning; // Used for one-time warning message for possible
 	//compressor input error regarding total system compressor capacity
-	FArray1D_bool ShowHiStageUnmetEnergyWarning; // Used for one-time warning message for possible
+	Array1D_bool ShowHiStageUnmetEnergyWarning; // Used for one-time warning message for possible
 	//high-stage compressor input error regarding high-stage compressor capacity
 
 	// Transcritical refrigeration system variables
 	bool TransCritSysFlag( false ); // Used to indicate whether or not a transcritical refrigeration system has been defined.
-	FArray1D_bool ShowUnmetEnergyWarningTrans; // Used for one-time warning message for possible
+	Array1D_bool ShowUnmetEnergyWarningTrans; // Used for one-time warning message for possible
 	//compressor input error regarding total system compressor capacity
 
 	// Refrigeration Secondary Loop variables
-	FArray1D_bool ShowUnmetSecondEnergyWarning; // Used for one-time warning message for possible
+	Array1D_bool ShowUnmetSecondEnergyWarning; // Used for one-time warning message for possible
 	//compressor input error regarding secondary loop heat exchanger capacity
 	//Refrigerated warehouse coil variables
-	FArray1D_bool CheckChillerName; // used when simrefrigcoil called for a zone
+	Array1D_bool CheckChillerName; // used when simrefrigcoil called for a zone
 	//LOGICAL, ALLOCATABLE,DIMENSION(:) :: CheckZoneNum  !used when simrefrigcoil called for a zone
-	FArray1D_bool ShowCoilFrostWarning; // Used for one-time warning message if defrost cycles insufficient to melt ice
+	Array1D_bool ShowCoilFrostWarning; // Used for one-time warning message if defrost cycles insufficient to melt ice
 
 	// Refrigeration Plant connections checks
-	FArray1D_bool CheckEquipNameRackWaterCondenser;
-	FArray1D_bool CheckEquipNameWaterCondenser;
+	Array1D_bool CheckEquipNameRackWaterCondenser;
+	Array1D_bool CheckEquipNameWaterCondenser;
 
 	//Control variables
-	FArray1D_bool RefrigPresentInZone; // Used when translating rate to energy for reporting
+	Array1D_bool RefrigPresentInZone; // Used when translating rate to energy for reporting
 	//  total refrigeration impact on a zone
-	FArray1D_bool CheckChillerSetName; // used when sim chiller set called form zone equip manager
+	Array1D_bool CheckChillerSetName; // used when sim chiller set called form zone equip manager
 
 	bool GetRefrigerationInputFlag( true ); // Flag to show case input should be read
 	bool HaveRefrigRacks( true ); // Is initialized as TRUE and remains true when
@@ -420,24 +420,24 @@ namespace RefrigeratedCase {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE RefrigeratedCase:
 
 	// Object Data
-	FArray1D< RefrigCaseData > RefrigCase;
-	FArray1D< RefrigRackData > RefrigRack;
-	FArray1D< CaseRAFractionData > CaseRAFraction;
-	FArray1D< RefrigSystemData > System;
-	FArray1D< TransRefrigSystemData > TransSystem;
-	FArray1D< RefrigCondenserData > Condenser;
-	FArray1D< RefrigCompressorData > Compressor;
-	FArray1D< RefrigGasCoolerData > GasCooler;
-	FArray1D< SubcoolerData > Subcooler;
-	FArray1D< CaseAndWalkInListDef > CaseAndWalkInList;
-	FArray1D< CompressorListDef > CompressorLists;
-	FArray1D< SecondaryLoopData > Secondary;
-	FArray1D< TransferLoadListDef > TransferLoadList;
-	FArray1D< WalkInData > WalkIn;
-	FArray1D< WarehouseCoilData > WarehouseCoil;
-	FArray1D< AirChillerSetData > AirChillerSet;
-	FArray1D< CoilCreditData > CoilSysCredit;
-	FArray1D< CaseWIZoneReportData > CaseWIZoneReport;
+	Array1D< RefrigCaseData > RefrigCase;
+	Array1D< RefrigRackData > RefrigRack;
+	Array1D< CaseRAFractionData > CaseRAFraction;
+	Array1D< RefrigSystemData > System;
+	Array1D< TransRefrigSystemData > TransSystem;
+	Array1D< RefrigCondenserData > Condenser;
+	Array1D< RefrigCompressorData > Compressor;
+	Array1D< RefrigGasCoolerData > GasCooler;
+	Array1D< SubcoolerData > Subcooler;
+	Array1D< CaseAndWalkInListDef > CaseAndWalkInList;
+	Array1D< CompressorListDef > CompressorLists;
+	Array1D< SecondaryLoopData > Secondary;
+	Array1D< TransferLoadListDef > TransferLoadList;
+	Array1D< WalkInData > WalkIn;
+	Array1D< WarehouseCoilData > WarehouseCoil;
+	Array1D< AirChillerSetData > AirChillerSet;
+	Array1D< CoilCreditData > CoilSysCredit;
+	Array1D< CaseWIZoneReportData > CaseWIZoneReport;
 
 	// Functions
 
@@ -631,13 +631,13 @@ namespace RefrigeratedCase {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string Alphas; // Alpha items for object
-		FArray1D_string cAlphaFieldNames; // Alpha field names (from input processor)
-		FArray1D_string cNumericFieldNames; // Numeric field names (from input processor)
+		Array1D_string Alphas; // Alpha items for object
+		Array1D_string cAlphaFieldNames; // Alpha field names (from input processor)
+		Array1D_string cNumericFieldNames; // Numeric field names (from input processor)
 		static std::string CurrentModuleObject; // Object type for getting and error messages
 
-		FArray1D_bool lAlphaBlanks; // Logic array, alpha input blank = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logic array, numeric input blank = .TRUE.
+		Array1D_bool lAlphaBlanks; // Logic array, alpha input blank = .TRUE.
+		Array1D_bool lNumericBlanks; // Logic array, numeric input blank = .TRUE.
 		static bool CaseLoads( false ); // Flag to help verify load type with loads served by systems cooled by cascade condensers
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		static bool IsNotOK( false ); // Flag to verify name
@@ -814,8 +814,8 @@ namespace RefrigeratedCase {
 		static Real64 TBrineAverage( 0.0 ); // Rated average of inlet and outlet temps, used for property look up, C
 		static Real64 TempRAFraction( 0.0 ); // Temporary sum of Return Air fraction per zone for reporting
 		static Real64 TestDelta( 0.0 ); // Used to compare secondary loop rated capacity to calculated capacity, fraction
-		FArray1D< Real64 > Numbers; // Numeric items for object
-		FArray2D< Real64 > DayValues; // Array of schedule values
+		Array1D< Real64 > Numbers; // Numeric items for object
+		Array2D< Real64 > DayValues; // Array of schedule values
 
 		NumSimulationCascadeCondensers = GetNumObjectsFound( "Refrigeration:Condenser:Cascade" );
 		NumSimulationCases = GetNumObjectsFound( "Refrigeration:Case" );
@@ -902,7 +902,7 @@ namespace RefrigeratedCase {
 		if ( NumCompressorLists > 0 ) CompressorLists.allocate( NumCompressorLists );
 		if ( NumSimulationTransferLoadLists > 0 ) TransferLoadList.allocate( NumSimulationTransferLoadLists );
 
-		DayValues.allocate( 24, NumOfTimeStepInHour );
+		DayValues.allocate( NumOfTimeStepInHour, 24 );
 		RefrigPresentInZone.dimension( NumOfZones, false );
 
 		GetObjectDefMaxArgs( "Refrigeration:Case", MaxNumArgs, MaxNumAlphasCase, MaxNumNumbersCase );
@@ -1284,7 +1284,7 @@ namespace RefrigeratedCase {
 				GetScheduleValuesForDay( RefrigCase( CaseNum ).DefrostSchedPtr, DayValues, 1 );
 				for ( HRNum = 1; HRNum <= 24; ++HRNum ) {
 					for ( TSNum = 1; TSNum <= NumOfTimeStepInHour; ++TSNum ) {
-						if ( DayValues( HRNum, TSNum ) > 0.0 ) {
+						if ( DayValues( TSNum, HRNum ) > 0.0 ) {
 							if ( ! StartCycle ) {
 								++NumDefCycles;
 								StartCycle = true;
@@ -7527,7 +7527,7 @@ namespace RefrigeratedCase {
 		// only accumulate energy during actual simulation (so same if DD's are switched)
 		StockingLoad = StockingSchedule * Length;
 		if ( ! WarmupFlag ) {
-			DeltaStockingEnergy = ( StockingLoad * TimeStepZone * SecInHour );
+			DeltaStockingEnergy = ( StockingLoad * TimeStepZoneSec );
 			RefrigCase( CaseID ).StockingEnergy += DeltaStockingEnergy;
 		} //warm up
 		// CALCULTE ALL LOADS INFLUENCED BY ZONE TEMPERATURE AND RH
@@ -7588,7 +7588,7 @@ namespace RefrigeratedCase {
 		// FROST:  keep track of frost build up on evaporator coil
 		//avoid accumulation during warm-up to avoid reverse dd test problem
 		if ( ! WarmupFlag ) {
-			DeltaFreezeKgFrost = LatentLoad * TimeStepZone * SecInHour / IcetoVaporEnthalpy;
+			DeltaFreezeKgFrost = LatentLoad * TimeStepZoneSec / IcetoVaporEnthalpy;
 			RefrigCase( CaseID ).KgFrost += DeltaFreezeKgFrost;
 		}
 
@@ -7614,7 +7614,7 @@ namespace RefrigeratedCase {
 					DefrostCap_Actual *= DefrostRatio;
 				}
 				StartFrostKg = RefrigCase( CaseID ).KgFrost;
-				DefrostEnergy = DefrostCap_Actual * TimeStepZone * SecInHour;
+				DefrostEnergy = DefrostCap_Actual * TimeStepZoneSec;
 				FrostMeltedKg = min( DefrostEnergy / IceMeltEnthalpy, StartFrostKg );
 				RefrigCase( CaseID ).KgFrost -= FrostMeltedKg;
 
@@ -7662,7 +7662,7 @@ namespace RefrigeratedCase {
 			TotalCap_Actual = CapAvail;
 			LatentCap_Actual = min( LatentLoad, CapAvail ); //Latent load should never be > capavail, but just in case...
 			SensibleCap_Actual = TotalCap_Actual - LatentCap_Actual;
-			if ( ! WarmupFlag ) RefrigCase( CaseID ).StoredEnergy += ( TotalLoad_Actual - CapAvail ) * TimeStepZone * SecInHour;
+			if ( ! WarmupFlag ) RefrigCase( CaseID ).StoredEnergy += ( TotalLoad_Actual - CapAvail ) * TimeStepZoneSec;
 		} //CapAvail vs Load requested
 
 		// Reset DefrostLoad_Actual to zero for non-electric defrost types, for reporting purposes
@@ -7689,56 +7689,56 @@ namespace RefrigeratedCase {
 
 		// ReportRefrigeratedCase(CaseID)
 		RefrigCase( CaseID ).TotalCoolingLoad = TotalCap_Actual;
-		RefrigCase( CaseID ).TotalCoolingEnergy = TotalCap_Actual * TimeStepZone * SecInHour;
+		RefrigCase( CaseID ).TotalCoolingEnergy = TotalCap_Actual * TimeStepZoneSec;
 		RefrigCase( CaseID ).SensCoolingEnergyRate = SensibleCap_Actual;
-		RefrigCase( CaseID ).SensCoolingEnergy = SensibleCap_Actual * TimeStepZone * SecInHour;
+		RefrigCase( CaseID ).SensCoolingEnergy = SensibleCap_Actual * TimeStepZoneSec;
 		RefrigCase( CaseID ).LatCoolingEnergyRate = LatentCap_Actual;
-		RefrigCase( CaseID ).LatCoolingEnergy = LatentCap_Actual * TimeStepZone * SecInHour;
+		RefrigCase( CaseID ).LatCoolingEnergy = LatentCap_Actual * TimeStepZoneSec;
 
 		RefrigCase( CaseID ).SensZoneCreditRate = CaseSenCreditToZone; // both positive or negative
 		// This rate can be positive or negative, split into separate output variables and always report positive value
 		if ( CaseSenCreditToZone <= 0.0 ) {
 			RefrigCase( CaseID ).SensZoneCreditCoolRate = -CaseSenCreditToZone;
-			RefrigCase( CaseID ).SensZoneCreditCool = -CaseSenCreditToZone * TimeStepZone * SecInHour;
+			RefrigCase( CaseID ).SensZoneCreditCool = -CaseSenCreditToZone * TimeStepZoneSec;
 			RefrigCase( CaseID ).SensZoneCreditHeatRate = 0.0;
 			RefrigCase( CaseID ).SensZoneCreditHeat = 0.0;
 		} else {
 			RefrigCase( CaseID ).SensZoneCreditHeatRate = CaseSenCreditToZone;
-			RefrigCase( CaseID ).SensZoneCreditHeat = CaseSenCreditToZone * TimeStepZone * SecInHour;
+			RefrigCase( CaseID ).SensZoneCreditHeat = CaseSenCreditToZone * TimeStepZoneSec;
 			RefrigCase( CaseID ).SensZoneCreditCoolRate = 0.0;
 			RefrigCase( CaseID ).SensZoneCreditCool = 0.0;
 		}
 
 		// This rate should always be negative
 		RefrigCase( CaseID ).LatZoneCreditRate = CaseLatCreditToZone;
-		RefrigCase( CaseID ).LatZoneCredit = CaseLatCreditToZone * TimeStepZone * SecInHour;
+		RefrigCase( CaseID ).LatZoneCredit = CaseLatCreditToZone * TimeStepZoneSec;
 
 		RefrigCase( CaseID ).SensHVACCreditRate = CaseSenCreditToHVAC;
 		// This rate can be positive or negative, split into separate output variables and always report positive value
 		if ( CaseSenCreditToHVAC <= 0.0 ) {
 			RefrigCase( CaseID ).SensHVACCreditCoolRate = -CaseSenCreditToHVAC;
-			RefrigCase( CaseID ).SensHVACCreditCool = -CaseSenCreditToHVAC * TimeStepZone * SecInHour;
+			RefrigCase( CaseID ).SensHVACCreditCool = -CaseSenCreditToHVAC * TimeStepZoneSec;
 			RefrigCase( CaseID ).SensHVACCreditHeatRate = 0.0;
 			RefrigCase( CaseID ).SensHVACCreditHeat = 0.0;
 		} else {
 			RefrigCase( CaseID ).SensHVACCreditHeatRate = CaseSenCreditToHVAC;
-			RefrigCase( CaseID ).SensHVACCreditHeat = CaseSenCreditToHVAC * TimeStepZone * SecInHour;
+			RefrigCase( CaseID ).SensHVACCreditHeat = CaseSenCreditToHVAC * TimeStepZoneSec;
 			RefrigCase( CaseID ).SensHVACCreditCoolRate = 0.0;
 			RefrigCase( CaseID ).SensHVACCreditCool = 0.0;
 		}
 
 		// This rate should always be negative
 		RefrigCase( CaseID ).LatHVACCreditRate = CaseLatCreditToHVAC;
-		RefrigCase( CaseID ).LatHVACCredit = CaseLatCreditToHVAC * TimeStepZone * SecInHour;
+		RefrigCase( CaseID ).LatHVACCredit = CaseLatCreditToHVAC * TimeStepZoneSec;
 
 		RefrigCase( CaseID ).ElecFanPower = TotalFan;
-		RefrigCase( CaseID ).ElecFanConsumption = TotalFan * TimeStepZone * SecInHour;
+		RefrigCase( CaseID ).ElecFanConsumption = TotalFan * TimeStepZoneSec;
 		RefrigCase( CaseID ).ElecAntiSweatPower = TotalAntiSweat;
-		RefrigCase( CaseID ).ElecAntiSweatConsumption = TotalAntiSweat * TimeStepZone * SecInHour;
+		RefrigCase( CaseID ).ElecAntiSweatConsumption = TotalAntiSweat * TimeStepZoneSec;
 		RefrigCase( CaseID ).ElecLightingPower = TotalLightingLoad;
-		RefrigCase( CaseID ).ElecLightingConsumption = TotalLightingLoad * TimeStepZone * SecInHour;
+		RefrigCase( CaseID ).ElecLightingConsumption = TotalLightingLoad * TimeStepZoneSec;
 		RefrigCase( CaseID ).ElecDefrostPower = DefrostCap_Actual;
-		RefrigCase( CaseID ).ElecDefrostConsumption = DefrostCap_Actual * TimeStepZone * SecInHour;
+		RefrigCase( CaseID ).ElecDefrostConsumption = DefrostCap_Actual * TimeStepZoneSec;
 
 		RefrigCase( CaseID ).DefEnergyCurveValue = DefrostRatio;
 		RefrigCase( CaseID ).LatEnergyCurveValue = LatentRatio;
@@ -7751,7 +7751,7 @@ namespace RefrigeratedCase {
 		// excessively large stored energy
 		if ( ( ZoneTempFactor * CaseCreditFraction ) > 1.0 ) {
 			if ( ! WarmupFlag ) {
-				DeltaWarmEnvEnergy = ( SensibleLoadPrime - RefrigCase( CaseID ).DesignSensCaseCredit ) * TimeStepZone * SecInHour;
+				DeltaWarmEnvEnergy = ( SensibleLoadPrime - RefrigCase( CaseID ).DesignSensCaseCredit ) * TimeStepZoneSec;
 				RefrigCase( CaseID ).WarmEnvEnergy += DeltaWarmEnvEnergy;
 			}
 		}
@@ -8526,9 +8526,9 @@ namespace RefrigeratedCase {
 					// perhaps future interest in reporting percent of installed capacity used(or number of compressors) ?
 					// If the system compressors were unable to meet the current loads, save energy to be met in succeeding time step
 					// Note the unmet energy is turned into a rate and applied to the system load at the start of calccompressor
-					System( SysNum ).UnmetEnergy += ( CurrentLoads - System( SysNum ).TotCompCapacity ) * TimeStepZone * SecInHour;
+					System( SysNum ).UnmetEnergy += ( CurrentLoads - System( SysNum ).TotCompCapacity ) * TimeStepZoneSec;
 					if ( System( SysNum ).NumStages == 2 ) {
-						System( SysNum ).UnmetHiStageEnergy += ( CurrentHiStageLoads - System( SysNum ).TotHiStageCompCapacity ) * TimeStepZone * SecInHour;
+						System( SysNum ).UnmetHiStageEnergy += ( CurrentHiStageLoads - System( SysNum ).TotHiStageCompCapacity ) * TimeStepZoneSec;
 					}
 					if ( System( SysNum ).UnmetEnergy > MyLargeNumber ) {
 						System( SysNum ).UnmetEnergy = MyLargeNumber;
@@ -8803,7 +8803,7 @@ namespace RefrigeratedCase {
 				// perhaps future interest in reporting percent of installed capacity used(or number of compressors) ?
 				// If the system compressors were unable to meet the current loads, save energy to be met in succeeding time step
 				// Note the unmet energy is turned into a rate and applied to the system load at the start of calccompressor
-				TransSystem( SysNum ).UnmetEnergy += ( CurrentLoads - TransSystem( SysNum ).TotCompCapacity ) * TimeStepZone * SecInHour;
+				TransSystem( SysNum ).UnmetEnergy += ( CurrentLoads - TransSystem( SysNum ).TotCompCapacity ) * TimeStepZoneSec;
 
 				if ( TransSystem( SysNum ).UnmetEnergy > MyLargeNumber ) {
 					TransSystem( SysNum ).UnmetEnergy = MyLargeNumber;
@@ -9128,7 +9128,6 @@ namespace RefrigeratedCase {
 		Real64 TotalLoadFromSysID; // total heat rejection load from a single detailed system [W]
 		Real64 TotalLoadFromThisSystem( 0.0 ); // total heat rejection load from the detailed system id'd in subroutine call [W]
 		Real64 TotalLoadFromSystems; // total heat rejection load from all systems served by this condenser [W]
-		Real64 NomCap; // ne "design" capacity when operating evap condenser at reduced air flow [W]
 		Real64 CurMaxCapacity; // current maximum condenser capacity at delta T present for minimum condensing temperature [W]
 
 		LocalTimeStep = TimeStepZone;
@@ -10644,7 +10643,6 @@ namespace RefrigeratedCase {
 		int TransSystemNum;
 		int WalkInID;
 		int WalkInNum;
-		int ZoneNum;
 		int ZoneID;
 		std::string ChrOut;
 		std::string ChrOut2;
@@ -10792,7 +10790,9 @@ namespace RefrigeratedCase {
 				gio::write( OutputFileInits, Format_101 ) << " Refrigeration Compressor Rack," + RefrigRack( RackNum ).Name + ',' + RoundSigDigits( RefrigRack( RackNum ).NumCases ) + ',' + RoundSigDigits( RefrigRack( RackNum ).NumWalkIns ) + ',' + ChrOut + ',' + ChrOut2 + ',' + RoundSigDigits( RefrigRack( RackNum ).RatedCOP, 3 );
 				for ( CaseNum = 1; CaseNum <= RefrigRack( RackNum ).NumCases; ++CaseNum ) {
 					CaseID = RefrigRack( RackNum ).CaseNum( CaseNum );
-					gio::write( OutputFileInits, Format_103 ) << " Refrigeration Case," + RoundSigDigits( CaseID ) + ',' + RefrigCase( CaseID ).Name + ',' + RefrigCase( CaseID ).ZoneName + ',' + RoundSigDigits( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + NodeID( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RateTotCapPerLength, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RatedLHR, 2 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Temperature, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Length, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).OperatingFanPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).LightingPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).AntiSweatPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).DefrostPower, 1 ); //Installed lighting power, may not be rated power
+					if ( RefrigCase( CaseID ).ZoneNodeNum > 0 ) {
+						gio::write( OutputFileInits, Format_103 ) << " Refrigeration Case," + RoundSigDigits( CaseID ) + ',' + RefrigCase( CaseID ).Name + ',' + RefrigCase( CaseID ).ZoneName + ',' + RoundSigDigits( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + NodeID( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RateTotCapPerLength, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RatedLHR, 2 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Temperature, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Length, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).OperatingFanPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).LightingPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).AntiSweatPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).DefrostPower, 1 ); //Installed lighting power, may not be rated power
+					}
 				} //numcases
 
 				for ( WalkInNum = 1; WalkInNum <= RefrigRack( RackNum ).NumWalkIns; ++WalkInNum ) {
@@ -10817,7 +10817,9 @@ namespace RefrigeratedCase {
 
 				for ( CaseNum = 1; CaseNum <= System( SystemNum ).NumCases; ++CaseNum ) {
 					CaseID = System( SystemNum ).CaseNum( CaseNum );
-					gio::write( OutputFileInits, Format_103 ) << " Refrigeration Case," + RoundSigDigits( CaseID ) + ',' + RefrigCase( CaseID ).Name + ',' + RefrigCase( CaseID ).ZoneName + ',' + RoundSigDigits( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + NodeID( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RateTotCapPerLength, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RatedLHR, 2 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Temperature, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Length, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).OperatingFanPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).LightingPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).AntiSweatPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).DefrostPower, 1 );
+					if ( RefrigCase( CaseID ).ZoneNodeNum > 0 ) {
+						gio::write( OutputFileInits, Format_103 ) << " Refrigeration Case," + RoundSigDigits( CaseID ) + ',' + RefrigCase( CaseID ).Name + ',' + RefrigCase( CaseID ).ZoneName + ',' + RoundSigDigits( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + NodeID( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RateTotCapPerLength, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RatedLHR, 2 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Temperature, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Length, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).OperatingFanPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).LightingPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).AntiSweatPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).DefrostPower, 1 );
+					}
 				} //NumCases on system
 				for ( WalkInNum = 1; WalkInNum <= System( SystemNum ).NumWalkIns; ++WalkInNum ) {
 					WalkInID = System( SystemNum ).WalkInNum( WalkInNum );
@@ -10904,11 +10906,15 @@ namespace RefrigeratedCase {
 
 				for ( CaseNum = 1; CaseNum <= TransSystem( TransSystemNum ).NumCasesMT; ++CaseNum ) {
 					CaseID = TransSystem( TransSystemNum ).CaseNumMT( CaseNum );
-					gio::write( OutputFileInits, Format_103 ) << " Medium Temperature Refrigeration Case," + RoundSigDigits( CaseID ) + ',' + RefrigCase( CaseID ).Name + ',' + RefrigCase( CaseID ).ZoneName + ',' + RoundSigDigits( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + NodeID( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RateTotCapPerLength, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RatedLHR, 2 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Temperature, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Length, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).OperatingFanPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).LightingPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).AntiSweatPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).DefrostPower, 1 );
+					if ( RefrigCase( CaseID ).ZoneNodeNum > 0 ) {
+						gio::write( OutputFileInits, Format_103 ) << " Medium Temperature Refrigeration Case," + RoundSigDigits( CaseID ) + ',' + RefrigCase( CaseID ).Name + ',' + RefrigCase( CaseID ).ZoneName + ',' + RoundSigDigits( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + NodeID( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RateTotCapPerLength, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RatedLHR, 2 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Temperature, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Length, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).OperatingFanPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).LightingPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).AntiSweatPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).DefrostPower, 1 );
+					}
 				} //NumCasesMT on system
 				for ( CaseNum = 1; CaseNum <= TransSystem( TransSystemNum ).NumCasesLT; ++CaseNum ) {
 					CaseID = TransSystem( TransSystemNum ).CaseNumLT( CaseNum );
-					gio::write( OutputFileInits, Format_103 ) << " Low Temperature Refrigeration Case," + RoundSigDigits( CaseID ) + ',' + RefrigCase( CaseID ).Name + ',' + RefrigCase( CaseID ).ZoneName + ',' + RoundSigDigits( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + NodeID( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RateTotCapPerLength, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RatedLHR, 2 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Temperature, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Length, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).OperatingFanPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).LightingPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).AntiSweatPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).DefrostPower, 1 );
+					if ( RefrigCase( CaseID ).ZoneNodeNum > 0 ) {
+						gio::write( OutputFileInits, Format_103 ) << " Low Temperature Refrigeration Case," + RoundSigDigits( CaseID ) + ',' + RefrigCase( CaseID ).Name + ',' + RefrigCase( CaseID ).ZoneName + ',' + RoundSigDigits( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + NodeID( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RateTotCapPerLength, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RatedLHR, 2 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Temperature, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Length, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).OperatingFanPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).LightingPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).AntiSweatPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).DefrostPower, 1 );
+					}
 				} //NumCasesLT on system
 				for ( WalkInNum = 1; WalkInNum <= TransSystem( TransSystemNum ).NumWalkInsMT; ++WalkInNum ) {
 					WalkInID = TransSystem( TransSystemNum ).WalkInNumMT( WalkInNum );
@@ -10953,7 +10959,9 @@ namespace RefrigeratedCase {
 				}}
 				for ( CaseNum = 1; CaseNum <= Secondary( SecondaryID ).NumCases; ++CaseNum ) {
 					CaseID = Secondary( SecondaryID ).CaseNum( CaseNum );
-					gio::write( OutputFileInits, Format_103 ) << "Refrigeration Case," + RoundSigDigits( CaseID ) + ',' + RefrigCase( CaseID ).Name + ',' + RefrigCase( CaseID ).ZoneName + ',' + RoundSigDigits( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + NodeID( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RateTotCapPerLength, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RatedLHR, 2 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Temperature, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Length, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).OperatingFanPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).LightingPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).AntiSweatPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).DefrostPower, 1 );
+					if ( RefrigCase( CaseID ).ZoneNodeNum > 0 ) {
+						gio::write( OutputFileInits, Format_103 ) << "Refrigeration Case," + RoundSigDigits( CaseID ) + ',' + RefrigCase( CaseID ).Name + ',' + RefrigCase( CaseID ).ZoneName + ',' + RoundSigDigits( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + NodeID( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RateTotCapPerLength, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RatedLHR, 2 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Temperature, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Length, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).OperatingFanPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).LightingPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).AntiSweatPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).DefrostPower, 1 );
+					}
 				} //NumCases on secondary on secondary system
 
 				for ( WalkInNum = 1; WalkInNum <= Secondary( SecondaryID ).NumWalkIns; ++WalkInNum ) {
@@ -11255,7 +11263,7 @@ namespace RefrigeratedCase {
 					// FROST:  keep track of frost build up on evaporator coil
 					//         avoid accumulation during warm-up to avoid reverse dd test problem
 					if ( ! WarmupFlag ) {
-						FrostChangekg = ( WaterRemovRate * TimeStepZone * SecInHour ) * ( 1.0 - DefrostDripDownSchedule );
+						FrostChangekg = ( WaterRemovRate * TimeStepZoneSec ) * ( 1.0 - DefrostDripDownSchedule );
 						WalkIn( WalkInID ).KgFrost += FrostChangekg;
 					}
 				} //water to ice
@@ -11276,18 +11284,18 @@ namespace RefrigeratedCase {
 			WalkIn( WalkInID ).SensZoneCreditRate( ZoneID ) = ZoneSensLoad;
 			if ( ZoneSensLoad <= 0.0 ) {
 				WalkIn( WalkInID ).SensZoneCreditCoolRate( ZoneID ) = -ZoneSensLoad;
-				WalkIn( WalkInID ).SensZoneCreditCool( ZoneID ) = -ZoneSensLoad * TimeStepZone * SecInHour;
+				WalkIn( WalkInID ).SensZoneCreditCool( ZoneID ) = -ZoneSensLoad * TimeStepZoneSec;
 				WalkIn( WalkInID ).SensZoneCreditHeatRate( ZoneID ) = 0.0;
 				WalkIn( WalkInID ).SensZoneCreditHeat( ZoneID ) = 0.0;
 			} else {
 				WalkIn( WalkInID ).SensZoneCreditHeatRate( ZoneID ) = ZoneSensLoad;
-				WalkIn( WalkInID ).SensZoneCreditHeat( ZoneID ) = ZoneSensLoad * TimeStepZone * SecInHour;
+				WalkIn( WalkInID ).SensZoneCreditHeat( ZoneID ) = ZoneSensLoad * TimeStepZoneSec;
 				WalkIn( WalkInID ).SensZoneCreditCoolRate( ZoneID ) = 0.0;
 				WalkIn( WalkInID ).SensZoneCreditCool( ZoneID ) = 0.0;
 			}
 			// This rate should always be negative
 			WalkIn( WalkInID ).LatZoneCreditRate( ZoneID ) = ZoneLatentLoad;
-			WalkIn( WalkInID ).LatZoneCredit( ZoneID ) = ZoneLatentLoad * TimeStepZone * SecInHour;
+			WalkIn( WalkInID ).LatZoneCredit( ZoneID ) = ZoneLatentLoad * TimeStepZoneSec;
 
 			//Running total over all zones, use later to dispatch capacity
 			SensibleLoadTotal += WalkInSensLoad;
@@ -11310,7 +11318,7 @@ namespace RefrigeratedCase {
 		if ( ( DefrostSchedule > 0.0 ) && ( WalkIn( WalkInID ).DefrostType != WalkInDefrostNone ) && ( WalkIn( WalkInID ).DefrostType != WalkInDefrostOffCycle ) ) {
 			DefrostLoad = DefrostCap * DefrostSchedule; //W
 			StartFrostKg = WalkIn( WalkInID ).KgFrost;
-			DefrostEnergy = DefrostLoad * TimeStepZone * SecInHour; //Joules
+			DefrostEnergy = DefrostLoad * TimeStepZoneSec; //Joules
 			if ( WalkIn( WalkInID ).DefrostControlType == DefrostContTempTerm ) {
 				//  Need to turn defrost system off early if controlled by temperature and all ice melted
 				//  For temperature termination, need to recognize not all defrost heat goes to melt ice
@@ -11343,9 +11351,9 @@ namespace RefrigeratedCase {
 						//  see Aug 8 page 3 notes
 						WalkIn( WalkInID ).KgFrost = 0.0;
 						DefrostEnergyNeeded = ( IceSensHeatNeeded + ( FrostChangekg * IceMeltEnthalpy ) ) / DefEnergyFraction; //Joules - energy needed including E unavail to melt ice
-						DefrostSchedule = min( DefrostSchedule, ( DefrostEnergyNeeded / ( DefrostCap * TimeStepZone * SecInHour ) ) );
+						DefrostSchedule = min( DefrostSchedule, ( DefrostEnergyNeeded / ( DefrostCap * TimeStepZoneSec ) ) );
 						// reduce load on walkin by energy put into ice melting
-						DefrostLoad = max( 0.0, ( DefrostSchedule * DefrostCap - ( IceSensHeatNeeded + ( FrostChangekg * IceMeltEnthalpy ) ) / ( TimeStepZone * SecInHour ) ) );
+						DefrostLoad = max( 0.0, ( DefrostSchedule * DefrostCap - ( IceSensHeatNeeded + ( FrostChangekg * IceMeltEnthalpy ) ) / TimeStepZoneSec ) );
 						WalkIn( WalkInID ).IceTemp = WalkIn( WalkInID ).TEvapDesign;
 
 					} // frost melted during time step less than amount of ice at start
@@ -11368,7 +11376,7 @@ namespace RefrigeratedCase {
 		} //Defrost calculations
 
 		if ( WalkIn( WalkInID ).DefrostType == WalkInDefrostElec ) {
-			WalkIn( WalkInID ).ElecDefrostConsumption = DefrostCap * DefrostSchedule * TimeStepZone * SecInHour;
+			WalkIn( WalkInID ).ElecDefrostConsumption = DefrostCap * DefrostSchedule * TimeStepZoneSec;
 			WalkIn( WalkInID ).ElecDefrostPower = DefrostCap * DefrostSchedule;
 		} else {
 			WalkIn( WalkInID ).ElecDefrostConsumption = 0.0;
@@ -11411,25 +11419,25 @@ namespace RefrigeratedCase {
 			CapApplied = MaxCap;
 			LatentCapApplied = min( LatentLoadTotal, MaxCap ); //Latent load should never be > capavail, but just in case...
 			SensibleCapApplied = CapApplied - LatentCapApplied;
-			if ( ! WarmupFlag ) WalkIn( WalkInID ).StoredEnergy += ( LoadTotal - MaxCap ) * TimeStepZone * SecInHour;
+			if ( ! WarmupFlag ) WalkIn( WalkInID ).StoredEnergy += ( LoadTotal - MaxCap ) * TimeStepZoneSec;
 		} //CapAvail vs Load requested
 
 		// ReportWalkIn( WalkInID)
 		WalkIn( WalkInID ).TotalCoolingLoad = CapApplied;
-		WalkIn( WalkInID ).TotalCoolingEnergy = CapApplied * TimeStepZone * SecInHour;
+		WalkIn( WalkInID ).TotalCoolingEnergy = CapApplied * TimeStepZoneSec;
 		WalkIn( WalkInID ).TotSensCoolingEnergyRate = SensibleCapApplied;
-		WalkIn( WalkInID ).TotSensCoolingEnergy = SensibleCapApplied * TimeStepZone * SecInHour;
+		WalkIn( WalkInID ).TotSensCoolingEnergy = SensibleCapApplied * TimeStepZoneSec;
 		WalkIn( WalkInID ).TotLatCoolingEnergyRate = LatentCapApplied;
-		WalkIn( WalkInID ).TotLatCoolingEnergy = LatentCapApplied * TimeStepZone * SecInHour;
+		WalkIn( WalkInID ).TotLatCoolingEnergy = LatentCapApplied * TimeStepZoneSec;
 
 		WalkIn( WalkInID ).ElecFanPower = FanLoad;
-		WalkIn( WalkInID ).ElecFanConsumption = FanLoad * TimeStepZone * SecInHour;
+		WalkIn( WalkInID ).ElecFanConsumption = FanLoad * TimeStepZoneSec;
 		WalkIn( WalkInID ).ElecHeaterPower = HeaterLoad;
-		WalkIn( WalkInID ).ElecHeaterConsumption = HeaterLoad * TimeStepZone * SecInHour;
+		WalkIn( WalkInID ).ElecHeaterConsumption = HeaterLoad * TimeStepZoneSec;
 		WalkIn( WalkInID ).ElecLightingPower = LightLoad;
-		WalkIn( WalkInID ).ElecLightingConsumption = LightLoad * TimeStepZone * SecInHour;
+		WalkIn( WalkInID ).ElecLightingConsumption = LightLoad * TimeStepZoneSec;
 		WalkIn( WalkInID ).TotalElecPower = FanLoad + HeaterLoad + LightLoad + WalkIn( WalkInID ).ElecDefrostPower;
-		WalkIn( WalkInID ).TotalElecConsumption = WalkIn( WalkInID ).TotalElecPower * TimeStepZone * SecInHour;
+		WalkIn( WalkInID ).TotalElecConsumption = WalkIn( WalkInID ).TotalElecPower * TimeStepZoneSec;
 
 		//**************************************************************************************************
 		// Cap Energy and Kg Frost to avoid floating overflow errors
@@ -11550,7 +11558,7 @@ namespace RefrigeratedCase {
 		Real64 TBrineIn; // Brine temperature going to heat exchanger, C
 		Real64 TCondense; // Condensing temperature for a phase change secondary loop, C
 		Real64 TEvap; // Evaporating temperature in secondary loop heat exchanger (C)
-		Real64 TotalCoolingLoad; // Cooling load reported back to compressor rack or detailed system (W)
+		Real64 TotalCoolingLoad( 0 ); // Cooling load reported back to compressor rack or detailed system (W)
 		Real64 TotalHotDefrostCondCredit; // Used to credit condenser when heat reclaim used for hot gas/brine defrost (W)
 		Real64 TotalPumpPower; // Total Pumping power for loop, W
 		Real64 TotalLoad; // Total Cooling Load on secondary loop, W
@@ -11747,7 +11755,7 @@ namespace RefrigeratedCase {
 				//Don't have as much capacity as needed (likely following defrost periods)
 				TotalCoolingLoad = MaxLoad;
 				RefrigerationLoad -= ( TotalLoad - MaxLoad );
-				if ( ! WarmupFlag ) UnmetEnergy += ( ( TotalLoad - MaxLoad ) * TimeStepZone * SecInHour );
+				if ( ! WarmupFlag ) UnmetEnergy += ( ( TotalLoad - MaxLoad ) * TimeStepZoneSec );
 			} // load requested greater than MaxLoad
 			if ( Secondary( SecondaryNum ).UnmetEnergy > MyLargeNumber ) {
 				Secondary( SecondaryNum ).UnmetEnergy = MyLargeNumber;
@@ -11845,27 +11853,27 @@ namespace RefrigeratedCase {
 		//Can arrive here when load call to refrigeration looks for cases/walkin systems and usetimestep is .FALSE.
 		if ( ( ! UseSysTimeStep ) && ( ( NumSimulationCases > 0 ) || ( NumSimulationWalkIns > 0 ) ) ) {
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-				CaseWIZoneReport( ZoneNum ).SenCaseCreditToZoneEnergy = RefrigCaseCredit( ZoneNum ).SenCaseCreditToZone * TimeStepZone * SecInHour;
+				CaseWIZoneReport( ZoneNum ).SenCaseCreditToZoneEnergy = RefrigCaseCredit( ZoneNum ).SenCaseCreditToZone * TimeStepZoneSec;
 				// Latent always negative
 				CaseWIZoneReport( ZoneNum ).LatCoolingToZoneRate = -RefrigCaseCredit( ZoneNum ).LatCaseCreditToZone;
-				CaseWIZoneReport( ZoneNum ).LatCoolingToZoneEnergy = CaseWIZoneReport( ZoneNum ).LatCoolingToZoneRate * TimeStepZone * SecInHour;
+				CaseWIZoneReport( ZoneNum ).LatCoolingToZoneEnergy = CaseWIZoneReport( ZoneNum ).LatCoolingToZoneRate * TimeStepZoneSec;
 				// Sensible rate can be positive or negative, split into separate output variables and
 				//   always report positive value
 				if ( RefrigCaseCredit( ZoneNum ).SenCaseCreditToZone <= 0.0 ) {
 					CaseWIZoneReport( ZoneNum ).SenCoolingToZoneRate = -RefrigCaseCredit( ZoneNum ).SenCaseCreditToZone;
-					CaseWIZoneReport( ZoneNum ).SenCoolingToZoneEnergy = -RefrigCaseCredit( ZoneNum ).SenCaseCreditToZone * TimeStepZone * SecInHour;
+					CaseWIZoneReport( ZoneNum ).SenCoolingToZoneEnergy = -RefrigCaseCredit( ZoneNum ).SenCaseCreditToZone * TimeStepZoneSec;
 					CaseWIZoneReport( ZoneNum ).HeatingToZoneRate = 0.0;
 					CaseWIZoneReport( ZoneNum ).HeatingToZoneEnergy = 0.0;
 				} else {
 					CaseWIZoneReport( ZoneNum ).SenCoolingToZoneRate = 0.0;
 					CaseWIZoneReport( ZoneNum ).SenCoolingToZoneEnergy = 0.0;
 					CaseWIZoneReport( ZoneNum ).HeatingToZoneRate = RefrigCaseCredit( ZoneNum ).SenCaseCreditToZone;
-					CaseWIZoneReport( ZoneNum ).HeatingToZoneEnergy = RefrigCaseCredit( ZoneNum ).SenCaseCreditToZone * TimeStepZone * SecInHour;
+					CaseWIZoneReport( ZoneNum ).HeatingToZoneEnergy = RefrigCaseCredit( ZoneNum ).SenCaseCreditToZone * TimeStepZoneSec;
 				}
 				CaseWIZoneReport( ZoneNum ).TotCoolingToZoneRate = CaseWIZoneReport( ZoneNum ).SenCoolingToZoneRate + CaseWIZoneReport( ZoneNum ).LatCoolingToZoneRate;
 				CaseWIZoneReport( ZoneNum ).TotCoolingToZoneEnergy = CaseWIZoneReport( ZoneNum ).SenCoolingToZoneEnergy + CaseWIZoneReport( ZoneNum ).LatCoolingToZoneEnergy;
 				CaseWIZoneReport( ZoneNum ).TotHtXferToZoneRate = RefrigCaseCredit( ZoneNum ).SenCaseCreditToZone + RefrigCaseCredit( ZoneNum ).LatCaseCreditToZone;
-				CaseWIZoneReport( ZoneNum ).TotHtXferToZoneEnergy = CaseWIZoneReport( ZoneNum ).TotHtXferToZoneRate * TimeStepZone * SecInHour;
+				CaseWIZoneReport( ZoneNum ).TotHtXferToZoneEnergy = CaseWIZoneReport( ZoneNum ).TotHtXferToZoneRate * TimeStepZoneSec;
 			} // over zones for cases and walkins
 		}
 
@@ -12903,7 +12911,7 @@ namespace RefrigeratedCase {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

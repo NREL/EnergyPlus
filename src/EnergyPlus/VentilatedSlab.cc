@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -143,27 +143,27 @@ namespace VentilatedSlab {
 	bool HCoilOn( false ); // TRUE if the heating coil (gas or electric especially) should be running
 	int NumOfVentSlabs( 0 ); // Number of ventilated slab in the input file
 	Real64 OAMassFlowRate( 0.0 ); // Outside air mass flow rate for the ventilated slab
-	FArray1D_double QRadSysSrcAvg; // Average source over the time step for a particular radiant surfaceD
-	FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+	Array1D_double QRadSysSrcAvg; // Average source over the time step for a particular radiant surfaceD
+	Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
 	int MaxCloNumOfSurfaces( 0 ); // Used to set allocate size in CalcClo routine
 	Real64 QZnReq( 0.0 ); // heating or cooling needed by system [watts]
 
 	// Record keeping variables used to calculate QRadSysSrcAvg locally
 
-	FArray1D_double LastQRadSysSrc; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
-	FArray1D_bool CheckEquipName;
+	Array1D_double LastQRadSysSrc; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	Array1D_bool CheckEquipName;
 
 	// Autosizing variables
-	FArray1D_bool MySizeFlag;
+	Array1D_bool MySizeFlag;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE VentilatedSlab
 	// PRIVATE UpdateVentilatedSlabValAvg
 
 	// Object Data
-	FArray1D< VentilatedSlabData > VentSlab;
-	FArray1D< VentSlabNumericFieldData > VentSlabNumericFields;
+	Array1D< VentilatedSlabData > VentSlab;
+	Array1D< VentSlabNumericFieldData > VentSlabNumericFields;
 
 	// Functions
 
@@ -293,8 +293,6 @@ namespace VentilatedSlab {
 		using DataGlobals::ScheduleAlwaysOn;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::Construct;
-		using DataSizing::AutoSize;
-		using DataZoneEquipment::VentilatedSlab_Num;
 		using ScheduleManager::GetScheduleIndex;
 		using namespace DataLoopNode;
 		using namespace DataSurfaceLists;
@@ -304,7 +302,6 @@ namespace VentilatedSlab {
 		using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
-		using DataHVACGlobals::ZoneComp;
 		using DataSizing::ZoneHVACSizing;
 		using DataSizing::NumZoneHVACSizing;
 
@@ -343,12 +340,12 @@ namespace VentilatedSlab {
 		//unused0309  INTEGER                         :: NumOfSurfListVB  ! Number of surface lists in the user input file
 		int SurfNum; // DO loop counter for surfaces
 		bool IsValid; // Set for outside air node check
-		FArray1D_string cAlphaArgs; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > rNumericArgs; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string cAlphaArgs; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > rNumericArgs; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		bool SteamMessageNeeded;
 
 		// FLOW:
@@ -1080,7 +1077,6 @@ namespace VentilatedSlab {
 		using DataEnvironment::OutBaroPress;
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutHumRat;
-		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::StdRhoAir;
 		using DataGlobals::NumOfZones;
 		using DataGlobals::BeginEnvrnFlag;
@@ -1125,9 +1121,9 @@ namespace VentilatedSlab {
 		int ColdConNode; // cold water control node number in Ventilated Slab loop
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		int HotConNode; // hot water control node number in Ventilated Slab loop
 		int InNode; // inlet node number in Ventilated Slab loop
 		int OutNode; // outlet node number in Ventilated Slab loop
@@ -1429,10 +1425,6 @@ namespace VentilatedSlab {
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
 		int PltSizCoolNum; // index of plant sizing object for 1st cooling loop
 		bool ErrorsFound;
-		Real64 CoilInTemp;
-		Real64 CoilOutTemp;
-		Real64 CoilOutHumRat;
-		Real64 CoilInHumRat;
 		Real64 DesCoilLoad;
 		Real64 TempSteamIn;
 		Real64 EnthSteamInDry;
@@ -1464,7 +1456,6 @@ namespace VentilatedSlab {
 		std::string CompName; // component name
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
-		bool bPRINT = true; // TRUE if sizing is reported to output (eio)
 		Real64 TempSize; // autosized value of coil input field
 		int FieldNum = 2; // IDD numeric field number where input field description is found
 		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
@@ -2043,7 +2034,6 @@ namespace VentilatedSlab {
 		using DataHeatBalance::MRT;
 		using DataHeatBalFanSys::MAT;
 		using DataHeatBalFanSys::ZoneAirHumRat;
-		using DataHVACGlobals::SmallLoad;
 		using DataHVACGlobals::ZoneCompTurnFansOn;
 		using DataHVACGlobals::ZoneCompTurnFansOff;
 		using DataLoopNode::Node;
@@ -2068,7 +2058,6 @@ namespace VentilatedSlab {
 		// (below this value the temperatures are assumed equal)
 		Real64 const LowOAFracDiff( 0.01 ); // Smallest allowed outside air fraction difference for comparison
 		// (below this value the fractions are assumed equal)
-		Real64 const MinFlowAllowed( 0.001 ); // lowest air flow rate allowed [kg/sec]
 
 		// INTERFACE BLOCK SPECIFICATIONS
 
@@ -2210,7 +2199,7 @@ namespace VentilatedSlab {
 		} else if ( SELECT_CASE_var == OWBControl ) {
 			SetPointTemp = OutWetBulbTemp;
 		} else if ( SELECT_CASE_var == SURControl ) {
-			SetPointTemp = TH( VentSlab( Item ).SurfacePtr( RadSurfNum ), 1, 2 );
+			SetPointTemp = TH( 2, 1, VentSlab( Item ).SurfacePtr( RadSurfNum ) );
 		} else if ( SELECT_CASE_var == DPTZControl ) {
 			SetPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress );
 		} else { // Should never get here
@@ -2244,7 +2233,7 @@ namespace VentilatedSlab {
 			HCoilOn = false;
 
 			// Node condition
-			Node( InletNode ).Temp = TH( VentSlab( Item ).SurfacePtr( 1 ), 1, 2 );
+			Node( InletNode ).Temp = TH( 2, 1, VentSlab( Item ).SurfacePtr( 1 ) );
 			Node( FanOutletNode ).Temp = Node( InletNode ).Temp;
 			Node( OutletNode ).Temp = Node( FanOutletNode ).Temp;
 
@@ -2866,7 +2855,7 @@ namespace VentilatedSlab {
 	void
 	CalcVentilatedSlabRadComps(
 		int const Item, // System index in ventilated slab array
-		bool const FirstHVACIteration // flag for 1st HVAV iteration in the time step !unused1208
+		bool const EP_UNUSED( FirstHVACIteration ) // flag for 1st HVAV iteration in the time step !unused1208
 	)
 	{
 
@@ -2921,7 +2910,6 @@ namespace VentilatedSlab {
 		// of a space before the radiant cooling system shuts off the flow.
 		Real64 const ZeroSystemResp( 0.1 ); // Response below which the system response is really zero
 		Real64 const TempCheckLimit( 0.1 ); // Maximum allowed temperature difference between outlet temperature calculations
-		Real64 const VentSlabAirTempToler( 0.001 ); // Maximum allowed temperature difference between the zone and return air
 		static std::string const CurrentModuleObject( "ZoneHVAC:VentilatedSlab" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -2967,7 +2955,7 @@ namespace VentilatedSlab {
 		//unused0309  REAL(r64):: CoreNumber
 		static Real64 Ckj; // Coefficients for individual surfaces within a radiant system
 		static Real64 Cmj;
-		static FArray1D< Real64 > AirTempOut; // Array of outlet air temperatures for each surface in the radiant system
+		static Array1D< Real64 > AirTempOut; // Array of outlet air temperatures for each surface in the radiant system
 		int FanOutletNode; // unit air outlet node
 		int OAInletNode; // unit air outlet node
 		int MixoutNode; // unit air outlet node
@@ -3145,7 +3133,7 @@ namespace VentilatedSlab {
 
 							if ( VentSlab( Item ).SysConfg == SlabOnly ) {
 								//            Node(Returnairnode)%Temp = MAT(Zonenum)
-								Node( ReturnAirNode ).Temp = TH( VentSlab( Item ).SurfacePtr( RadSurfNum ), 1, 2 );
+								Node( ReturnAirNode ).Temp = TH( 2, 1, VentSlab( Item ).SurfacePtr( RadSurfNum ) );
 								Node( FanOutletNode ).Temp = Node( ReturnAirNode ).Temp;
 								Node( SlabInNode ).Temp = Node( FanOutletNode ).Temp;
 							} else if ( VentSlab( Item ).SysConfg == SlabAndZone ) {
@@ -3168,7 +3156,7 @@ namespace VentilatedSlab {
 					if ( OperatingMode == CoolingMode ) {
 						DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress );
 						for ( RadSurfNum2 = 1; RadSurfNum2 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum2 ) {
-							if ( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( DewPointTemp + CondDeltaTemp ) ) {
+							if ( TH( 2, 1, VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ) < ( DewPointTemp + CondDeltaTemp ) ) {
 								// Condensation warning--must shut off radiant system
 								Node( SlabInNode ).MassFlowRate = 0.0;
 								Node( FanOutletNode ).MassFlowRate = 0.0;
@@ -3190,7 +3178,7 @@ namespace VentilatedSlab {
 										ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
 										ShowContinueError( "Surface [" + Surface( VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
 										ShowContinueError( "Flow to the ventilated slab system will be shut-off to avoid condensation" );
-										ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) );
+										ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( 2, 1, VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ), 2 ) );
 										ShowContinueError( "Zone dew-point temperature + safety factor delta= " + RoundSigDigits( DewPointTemp + CondDeltaTemp, 2 ) );
 										ShowContinueErrorTimeStamp( "" );
 									}
@@ -3375,7 +3363,7 @@ namespace VentilatedSlab {
 								QRadSysSource( SurfNum2 ) = 0.0;
 								if ( Surface( SurfNum2 ).ExtBoundCond > 0 && Surface( SurfNum2 ).ExtBoundCond != SurfNum2 ) QRadSysSource( Surface( SurfNum2 ).ExtBoundCond ) = 0.0; // Also zero the other side of an interzone
 							}
-							Node( ReturnAirNode ).Temp = TH( VentSlab( Item ).SurfacePtr( 1 ), 1, 2 );
+							Node( ReturnAirNode ).Temp = TH( 2, 1, VentSlab( Item ).SurfacePtr( 1 ) );
 							Node( FanOutletNode ).Temp = Node( ReturnAirNode ).Temp;
 							Node( SlabInNode ).Temp = Node( FanOutletNode ).Temp;
 							// Each Internal node is reseted at the surface temperature
@@ -3392,7 +3380,7 @@ namespace VentilatedSlab {
 					if ( OperatingMode == CoolingMode ) {
 						DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZPtr( RadSurfNum ) ), OutBaroPress );
 						for ( RadSurfNum2 = 1; RadSurfNum2 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum2 ) {
-							if ( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( DewPointTemp + CondDeltaTemp ) ) {
+							if ( TH( 2, 1, VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ) < ( DewPointTemp + CondDeltaTemp ) ) {
 								// Condensation warning--must shut off radiant system
 								Node( SlabInNode ).MassFlowRate = 0.0;
 								Node( FanOutletNode ).MassFlowRate = 0.0;
@@ -3413,7 +3401,7 @@ namespace VentilatedSlab {
 										ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
 										ShowContinueError( "Surface [" + Surface( VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
 										ShowContinueError( "Flow to the ventilated slab system will be shut-off to avoid condensation" );
-										ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) );
+										ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( 2, 1, VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ), 2 ) );
 										ShowContinueError( "Zone dew-point temperature + safety factor delta= " + RoundSigDigits( DewPointTemp + CondDeltaTemp, 2 ) );
 										ShowContinueErrorTimeStamp( "" );
 									}
@@ -3612,7 +3600,7 @@ namespace VentilatedSlab {
 	void
 	UpdateVentilatedSlab(
 		int const Item, // Index for the ventilated slab under consideration within the derived types
-		bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
+		bool const EP_UNUSED( FirstHVACIteration ) // TRUE if 1st HVAC simulation of system timestep !unused1208
 	)
 	{
 
@@ -3828,10 +3816,10 @@ namespace VentilatedSlab {
 		Real64 const MaxLaminarRe( 2300.0 ); // Maximum Reynolds number for laminar flow
 		int const NumOfPropDivisions( 13 );
 		Real64 const MaxExpPower( 50.0 ); // Maximum power after which EXP argument would be zero for DP variables
-		static FArray1D< Real64 > const Temps( NumOfPropDivisions, { 1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85 } ); // Temperature, in C
-		static FArray1D< Real64 > const Mu( NumOfPropDivisions, { 0.0000088, 0.0000176, 0.00001781, 0.00001802, 0.000018225, 0.00001843, 0.00001865, 0.00001887, 0.00001908, 0.00001929, 0.0000195, 0.00001971, 0.00001992 } ); // Viscosity, in Ns/m2
-		static FArray1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.01275, 0.0255, 0.0258, 0.0261, 0.0264, 0.0267, 0.02705, 0.0274, 0.02775, 0.0281, 0.0284, 0.0287, 0.01435 } ); // Conductivity, in W/mK
-		static FArray1D< Real64 > const Pr( NumOfPropDivisions, 0.69 ); // Prandtl number (dimensionless)
+		static Array1D< Real64 > const Temps( NumOfPropDivisions, { 1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85 } ); // Temperature, in C
+		static Array1D< Real64 > const Mu( NumOfPropDivisions, { 0.0000088, 0.0000176, 0.00001781, 0.00001802, 0.000018225, 0.00001843, 0.00001865, 0.00001887, 0.00001908, 0.00001929, 0.0000195, 0.00001971, 0.00001992 } ); // Viscosity, in Ns/m2
+		static Array1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.01275, 0.0255, 0.0258, 0.0261, 0.0264, 0.0267, 0.02705, 0.0274, 0.02775, 0.0281, 0.0284, 0.0287, 0.01435 } ); // Conductivity, in W/mK
+		static Array1D< Real64 > const Pr( NumOfPropDivisions, 0.69 ); // Prandtl number (dimensionless)
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4075,7 +4063,7 @@ namespace VentilatedSlab {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -84,8 +84,8 @@ namespace MicroCHPElectricGenerator {
 
 	// DERIVED TYPE DEFINITIONS
 	bool GetMicroCHPInput( true ); // When TRUE, calls subroutine to read input file.
-	FArray1D_bool CheckEquipName;
-	FArray1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
+	Array1D_bool MySizeFlag;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Combustion ElectricGenerator
 
@@ -98,7 +98,7 @@ namespace MicroCHPElectricGenerator {
 
 	void
 	SimMicroCHPGenerator(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlagElectCenter, // simulate Generator when TRUE
@@ -126,7 +126,7 @@ namespace MicroCHPElectricGenerator {
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-		using DataPlant::PlantSizeNotComplete;
+		using DataPlant::PlantFirstSizeCompleted;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -171,7 +171,7 @@ namespace MicroCHPElectricGenerator {
 		if ( MicroCHP( GenNum ).ModelTypeAnnex42 ) { // call the non normalize calc routines (set for future extension to normalize ones)
 
 			InitMicroCHPNoNormalizeGenerators( GenNum, FirstHVACIteration );
-			if ( PlantSizeNotComplete ) return;
+			if ( ! PlantFirstSizeCompleted ) return;
 			CalcMicroCHPNoNormalizeGeneratorModel( GenNum, RunFlagElectCenter, RunFlagPlant, MyElectricLoad, MyThermalLoad, FirstHVACIteration );
 
 			CalcUpdateHeatRecovery( GenNum, FirstHVACIteration );
@@ -228,8 +228,8 @@ namespace MicroCHPElectricGenerator {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray( 25 ); // character string data
-		FArray1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
+		Array1D_string AlphArray( 25 ); // character string data
+		Array1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
 		static bool ErrorsFound( false ); // error flag
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -500,7 +500,7 @@ namespace MicroCHPElectricGenerator {
 	void
 	InitMicroCHPNoNormalizeGenerators(
 		int const GeneratorNum, // Generator number
-		bool const FirstHVACIteration
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 
@@ -520,21 +520,18 @@ namespace MicroCHPElectricGenerator {
 
 		// Using/Aliasing
 		using DataHVACGlobals::SysTimeElapsed;
-		using DataHVACGlobals::TimeStepSys;
 		using DataGlobals::TimeStep;
 		using DataGlobals::TimeStepZone;
-		using DataGlobals::SecInHour;
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::HourOfDay;
 		using DataGlobals::SysSizingCalc;
-		using DataGlobals::HoursInDay;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_Generator_MicroCHP;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizeNotComplete;
+		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::SupplySide;
 		using DataPlant::LoopFlowStatus_TakesWhatGets;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::DemandSide;
 		using DataSizing::PlantSizData;
 		using PlantUtilities::SetComponentFlowRate;
@@ -560,8 +557,8 @@ namespace MicroCHPElectricGenerator {
 		static int DynaCntrlNum( 0 );
 		Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 		static bool MyOneTimeFlag( true ); // Initialization flag
-		static FArray1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-		static FArray1D_bool MyPlantScanFlag;
+		static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
+		static Array1D_bool MyPlantScanFlag;
 
 		bool errFlag;
 		Real64 mdot; // local temporary for mass flow rate
@@ -597,7 +594,7 @@ namespace MicroCHPElectricGenerator {
 			MyPlantScanFlag( GeneratorNum ) = false;
 		}
 
-		if ( ! SysSizingCalc && MySizeFlag( GeneratorNum ) && ! MyPlantScanFlag( GeneratorNum ) && ( PlantSizesOkayToFinalize ) ) {
+		if ( ! SysSizingCalc && MySizeFlag( GeneratorNum ) && ! MyPlantScanFlag( GeneratorNum ) && ( PlantFirstSizesOkayToFinalize ) ) {
 			rho = GetDensityGlycol( PlantLoop( MicroCHP( GeneratorNum ).CWLoopNum ).FluidName, Node( MicroCHP( GeneratorNum ).PlantInletNodeID ).Temp, PlantLoop( MicroCHP( GeneratorNum ).CWLoopNum ).FluidIndex, RoutineName );
 			if ( MicroCHP( GeneratorNum ).A42Model.InternalFlowControl ) { // got a curve
 				MicroCHP( GeneratorNum ).PlantMassFlowRateMax = 2.0 * CurveValue( MicroCHP( GeneratorNum ).A42Model.WaterFlowCurveID, MicroCHP( GeneratorNum ).A42Model.MaxElecPower, Node( MicroCHP( GeneratorNum ).PlantInletNodeID ).Temp );
@@ -731,7 +728,6 @@ namespace MicroCHPElectricGenerator {
 		using DataGlobals::TimeStep;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::SecInHour;
-		using DataGlobals::HoursInDay;
 		using CurveManager::CurveValue;
 		using namespace DataGlobalConstants;
 		using FluidProperties::GetSpecificHeatGlycol;
@@ -1339,7 +1335,6 @@ namespace MicroCHPElectricGenerator {
 		// na
 
 		// Using/Aliasing
-		using DataHeatBalance::ZoneIntGain;
 		using DataGlobals::BeginEnvrnFlag;
 
 		// Locals
@@ -1392,7 +1387,7 @@ namespace MicroCHPElectricGenerator {
 	void
 	CalcUpdateHeatRecovery(
 		int const Num, // Generator number
-		bool const FirstHVACIteration
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 
@@ -1449,12 +1444,12 @@ namespace MicroCHPElectricGenerator {
 
 	void
 	SimMicroCHPPlantHeatRecovery(
-		std::string const & CompType,
+		std::string const & EP_UNUSED( CompType ),
 		std::string const & CompName,
 		int & CompNum,
-		bool const RunFlag,
+		bool const EP_UNUSED( RunFlag ),
 		bool & InitLoopEquip,
-		Real64 & MyThermalLoad,
+		Real64 & EP_UNUSED( MyThermalLoad ),
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
@@ -1631,7 +1626,7 @@ namespace MicroCHPElectricGenerator {
 
 	void
 	GetMicroCHPGeneratorResults(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		int const GeneratorIndex,
 		Real64 & GeneratorPower, // electrical power
 		Real64 & GeneratorEnergy, // electrical energy

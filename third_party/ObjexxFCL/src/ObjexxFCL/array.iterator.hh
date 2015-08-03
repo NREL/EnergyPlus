@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -22,18 +22,18 @@ namespace ObjexxFCL {
 template< typename T, std::size_t N >
 inline
 T *
-begin( T (&array)[N] )
+begin( T (&a)[N] )
 {
-	return array + 0;
+	return a + 0;
 }
 
 // End Iterator for C Array
 template< typename T, std::size_t N >
 inline
 T *
-end( T (&array)[N] )
+end( T (&a)[N] )
 {
-	return array + N;
+	return a + N;
 }
 
 } // ObjexxFCL

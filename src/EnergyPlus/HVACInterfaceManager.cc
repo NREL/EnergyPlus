@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -72,7 +72,7 @@ namespace HVACInterfaceManager {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
 
 	// Object Data
-	FArray1D< CommonPipeData > PlantCommonPipe;
+	Array1D< CommonPipeData > PlantCommonPipe;
 
 	// MODULE SUBROUTINES:
 
@@ -122,29 +122,27 @@ namespace HVACInterfaceManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D< Real64 > TmpRealARR( ConvergLogStackDepth ); //Tuned Made static
+		static Array1D< Real64 > TmpRealARR( ConvergLogStackDepth ); //Tuned Made static
 		Real64 DeltaEnergy;
 		// FLOW:
 
 		//Calculate the approximate energy difference across interface for comparison
 		DeltaEnergy = HVACCpApprox * ( ( Node( OutletNode ).MassFlowRate * Node( OutletNode ).Temp ) - ( Node( InletNode ).MassFlowRate * Node( InletNode ).Temp ) );
 
-		AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged = false;
-		AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged = false;
-		AirLoopConvergence( AirLoopNum ).HVACTempNotConverged = false;
-		AirLoopConvergence( AirLoopNum ).HVACEnergyNotConverged = false;
-		AirLoopConvergence( AirLoopNum ).HVACEnthalpyNotConverged = false;
-		AirLoopConvergence( AirLoopNum ).HVACPressureNotConverged = false;
+		if ( CalledFrom == CalledFromAirSystemDemandSide ) {
 
-		{ auto const SELECT_CASE_var( CalledFrom );
-
-		if ( SELECT_CASE_var == CalledFromAirSystemDemandSide ) {
+			AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACTempNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACEnergyNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACEnthalpyNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACPressureNotConverged( 1 ) = false;
 
 			TmpRealARR = AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue;
 			AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue( 1 ) = std::abs( Node( OutletNode ).MassFlowRate - Node( InletNode ).MassFlowRate );
 			AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue( 1 ) > HVACFlowRateToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 1 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
@@ -152,7 +150,7 @@ namespace HVACInterfaceManager {
 			AirLoopConvergence( AirLoopNum ).HVACHumDemandToSupplyTolValue( 1 ) = std::abs( Node( OutletNode ).HumRat - Node( InletNode ).HumRat );
 			AirLoopConvergence( AirLoopNum ).HVACHumDemandToSupplyTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( AirLoopConvergence( AirLoopNum ).HVACHumDemandToSupplyTolValue( 1 ) > HVACHumRatToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 1 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
@@ -160,7 +158,7 @@ namespace HVACInterfaceManager {
 			AirLoopConvergence( AirLoopNum ).HVACTempDemandToSupplyTolValue( 1 ) = std::abs( Node( OutletNode ).Temp - Node( InletNode ).Temp );
 			AirLoopConvergence( AirLoopNum ).HVACTempDemandToSupplyTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( AirLoopConvergence( AirLoopNum ).HVACTempDemandToSupplyTolValue( 1 ) > HVACTemperatureToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACTempNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACTempNotConverged( 1 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
@@ -168,7 +166,7 @@ namespace HVACInterfaceManager {
 			AirLoopConvergence( AirLoopNum ).HVACEnergyDemandToSupplyTolValue( 1 ) = std::abs( DeltaEnergy );
 			AirLoopConvergence( AirLoopNum ).HVACEnergyDemandToSupplyTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( std::abs( DeltaEnergy ) > HVACEnergyToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACEnergyNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACEnergyNotConverged( 1 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
@@ -176,7 +174,7 @@ namespace HVACInterfaceManager {
 			AirLoopConvergence( AirLoopNum ).HVACEnthalpyDemandToSupplyTolValue( 1 ) = std::abs( Node( OutletNode ).Enthalpy - Node( InletNode ).Enthalpy );
 			AirLoopConvergence( AirLoopNum ).HVACEnthalpyDemandToSupplyTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( AirLoopConvergence( AirLoopNum ).HVACEnthalpyDemandToSupplyTolValue( 1 ) > HVACEnthalpyToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACEnthalpyNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACEnthalpyNotConverged( 1 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
@@ -184,17 +182,24 @@ namespace HVACInterfaceManager {
 			AirLoopConvergence( AirLoopNum ).HVACPressureDemandToSupplyTolValue( 1 ) = std::abs( Node( OutletNode ).Press - Node( InletNode ).Press );
 			AirLoopConvergence( AirLoopNum ).HVACPressureDemandToSupplyTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( AirLoopConvergence( AirLoopNum ).HVACPressureDemandToSupplyTolValue( 1 ) > HVACPressToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACPressureNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACPressureNotConverged( 1 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
-		} else if ( SELECT_CASE_var == CalledFromAirSystemSupplySideDeck1 ) {
+		} else if ( CalledFrom == CalledFromAirSystemSupplySideDeck1 ) {
+
+			AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 2 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 2 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACTempNotConverged( 2 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACEnergyNotConverged( 2 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACEnthalpyNotConverged( 2 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACPressureNotConverged( 2 ) = false;
 
 			TmpRealARR = AirLoopConvergence( AirLoopNum ).HVACFlowSupplyDeck1ToDemandTolValue;
 			AirLoopConvergence( AirLoopNum ).HVACFlowSupplyDeck1ToDemandTolValue( 1 ) = std::abs( Node( OutletNode ).MassFlowRate - Node( InletNode ).MassFlowRate );
 			AirLoopConvergence( AirLoopNum ).HVACFlowSupplyDeck1ToDemandTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( AirLoopConvergence( AirLoopNum ).HVACFlowSupplyDeck1ToDemandTolValue( 1 ) > HVACFlowRateToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 2 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
@@ -202,7 +207,7 @@ namespace HVACInterfaceManager {
 			AirLoopConvergence( AirLoopNum ).HVACHumSupplyDeck1ToDemandTolValue( 1 ) = std::abs( Node( OutletNode ).HumRat - Node( InletNode ).HumRat );
 			AirLoopConvergence( AirLoopNum ).HVACHumSupplyDeck1ToDemandTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( AirLoopConvergence( AirLoopNum ).HVACHumSupplyDeck1ToDemandTolValue( 1 ) > HVACHumRatToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 2 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
@@ -210,7 +215,7 @@ namespace HVACInterfaceManager {
 			AirLoopConvergence( AirLoopNum ).HVACTempSupplyDeck1ToDemandTolValue( 1 ) = std::abs( Node( OutletNode ).Temp - Node( InletNode ).Temp );
 			AirLoopConvergence( AirLoopNum ).HVACTempSupplyDeck1ToDemandTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( AirLoopConvergence( AirLoopNum ).HVACTempSupplyDeck1ToDemandTolValue( 1 ) > HVACTemperatureToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACTempNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACTempNotConverged( 2 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
@@ -218,7 +223,7 @@ namespace HVACInterfaceManager {
 			AirLoopConvergence( AirLoopNum ).HVACEnergySupplyDeck1ToDemandTolValue( 1 ) = DeltaEnergy;
 			AirLoopConvergence( AirLoopNum ).HVACEnergySupplyDeck1ToDemandTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( std::abs( DeltaEnergy ) > HVACEnergyToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACEnergyNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACEnergyNotConverged( 2 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
@@ -226,7 +231,7 @@ namespace HVACInterfaceManager {
 			AirLoopConvergence( AirLoopNum ).HVACEnthalpySupplyDeck1ToDemandTolValue( 1 ) = std::abs( Node( OutletNode ).Enthalpy - Node( InletNode ).Enthalpy );
 			AirLoopConvergence( AirLoopNum ).HVACEnthalpySupplyDeck1ToDemandTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( AirLoopConvergence( AirLoopNum ).HVACEnthalpySupplyDeck1ToDemandTolValue( 1 ) > HVACEnthalpyToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACEnthalpyNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACEnthalpyNotConverged( 2 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
@@ -234,17 +239,24 @@ namespace HVACInterfaceManager {
 			AirLoopConvergence( AirLoopNum ).HVACPressureSupplyDeck1ToDemandTolValue( 1 ) = std::abs( Node( OutletNode ).Press - Node( InletNode ).Press );
 			AirLoopConvergence( AirLoopNum ).HVACPressureSupplyDeck1ToDemandTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( AirLoopConvergence( AirLoopNum ).HVACPressureSupplyDeck1ToDemandTolValue( 1 ) > HVACPressToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACPressureNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACPressureNotConverged( 2 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
-		} else if ( SELECT_CASE_var == CalledFromAirSystemSupplySideDeck2 ) {
+		} else if ( CalledFrom == CalledFromAirSystemSupplySideDeck2 ) {
+
+			AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 3 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 3 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACTempNotConverged( 3 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACEnergyNotConverged( 3 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACEnthalpyNotConverged( 3 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACPressureNotConverged( 3 ) = false;
 
 			TmpRealARR = AirLoopConvergence( AirLoopNum ).HVACFlowSupplyDeck2ToDemandTolValue;
 			AirLoopConvergence( AirLoopNum ).HVACFlowSupplyDeck2ToDemandTolValue( 1 ) = std::abs( Node( OutletNode ).MassFlowRate - Node( InletNode ).MassFlowRate );
 			AirLoopConvergence( AirLoopNum ).HVACFlowSupplyDeck2ToDemandTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( AirLoopConvergence( AirLoopNum ).HVACFlowSupplyDeck2ToDemandTolValue( 1 ) > HVACFlowRateToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 3 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
@@ -252,7 +264,7 @@ namespace HVACInterfaceManager {
 			AirLoopConvergence( AirLoopNum ).HVACHumSupplyDeck2ToDemandTolValue( 1 ) = std::abs( Node( OutletNode ).HumRat - Node( InletNode ).HumRat );
 			AirLoopConvergence( AirLoopNum ).HVACHumSupplyDeck2ToDemandTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( AirLoopConvergence( AirLoopNum ).HVACHumSupplyDeck2ToDemandTolValue( 1 ) > HVACHumRatToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 3 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
@@ -260,7 +272,7 @@ namespace HVACInterfaceManager {
 			AirLoopConvergence( AirLoopNum ).HVACTempSupplyDeck2ToDemandTolValue( 1 ) = std::abs( Node( OutletNode ).Temp - Node( InletNode ).Temp );
 			AirLoopConvergence( AirLoopNum ).HVACTempSupplyDeck2ToDemandTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( AirLoopConvergence( AirLoopNum ).HVACTempSupplyDeck2ToDemandTolValue( 1 ) > HVACTemperatureToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACTempNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACTempNotConverged( 3 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
@@ -268,7 +280,7 @@ namespace HVACInterfaceManager {
 			AirLoopConvergence( AirLoopNum ).HVACEnergySupplyDeck2ToDemandTolValue( 1 ) = DeltaEnergy;
 			AirLoopConvergence( AirLoopNum ).HVACEnergySupplyDeck2ToDemandTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( std::abs( DeltaEnergy ) > HVACEnergyToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACEnergyNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACEnergyNotConverged( 3 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
@@ -276,7 +288,7 @@ namespace HVACInterfaceManager {
 			AirLoopConvergence( AirLoopNum ).HVACEnthalpySupplyDeck2ToDemandTolValue( 1 ) = std::abs( Node( OutletNode ).Enthalpy - Node( InletNode ).Enthalpy );
 			AirLoopConvergence( AirLoopNum ).HVACEnthalpySupplyDeck2ToDemandTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( AirLoopConvergence( AirLoopNum ).HVACEnthalpySupplyDeck2ToDemandTolValue( 1 ) > HVACEnthalpyToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACEnthalpyNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACEnthalpyNotConverged( 3 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
@@ -284,11 +296,11 @@ namespace HVACInterfaceManager {
 			AirLoopConvergence( AirLoopNum ).HVACPressueSupplyDeck2ToDemandTolValue( 1 ) = std::abs( Node( OutletNode ).Press - Node( InletNode ).Press );
 			AirLoopConvergence( AirLoopNum ).HVACPressueSupplyDeck2ToDemandTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
 			if ( AirLoopConvergence( AirLoopNum ).HVACPressueSupplyDeck2ToDemandTolValue( 1 ) > HVACPressToler ) {
-				AirLoopConvergence( AirLoopNum ).HVACPressureNotConverged = true;
+				AirLoopConvergence( AirLoopNum ).HVACPressureNotConverged( 3 ) = true;
 				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
 			}
 
-		}}
+		}
 
 		// Always update the new inlet conditions
 		Node( InletNode ).Temp = Node( OutletNode ).Temp;
@@ -314,13 +326,11 @@ namespace HVACInterfaceManager {
 
 	// In-Place Right Shift by 1 of Array Elements
 	void
-	rshift1( FArray1< Real64 > & a )
+	rshift1( Array1< Real64 > & a )
 	{
 		assert( a.size_bounded() );
-		if ( a.dimensions_initialized() ) {
-			for ( int i = a.u(), e = a.l(); i > e; --i ) {
-				a( i ) = a( i - 1 );
-			}
+		for ( int i = a.u(), e = a.l(); i > e; --i ) {
+			a( i ) = a( i - 1 );
 		}
 	}
 
@@ -364,7 +374,6 @@ namespace HVACInterfaceManager {
 		using DataLoopNode::Node;
 		using namespace DataConvergParams;
 		using DataPlant::PlantLoop;
-		using DataPlant::SupplySide;
 		using DataPlant::DemandSide;
 		using FluidProperties::GetSpecificHeatGlycol;
 
@@ -381,14 +390,12 @@ namespace HVACInterfaceManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 DeltaEnergy;
 		Real64 OldTankOutletTemp;
 		Real64 OldOtherLoopSideInletMdot;
 		Real64 TankOutletTemp;
 		Real64 Cp;
 		Real64 MixedOutletTemp;
 		int ThisLoopSideInletNode;
-		int ZoneInSysIndex;
 
 		// FLOW:
 
@@ -858,7 +865,7 @@ namespace HVACInterfaceManager {
 		static int NodeNumPriIn( 0 );
 		static int NodeNumSecIn( 0 );
 		int CPFlowDir; // flow direction in single common pipe
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		static bool OneTimeData( true );
 		Real64 CommonPipeTemp;
 
@@ -984,7 +991,6 @@ namespace HVACInterfaceManager {
 		using DataPlant::DemandSide;
 		using DataPlant::TotNumLoops;
 		using DataPlant::DeltaTempTol;
-		using DataPlant::PlantReport;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataLoopNode::Node;
 		using PlantUtilities::SetActuatedBranchFlowRate;
@@ -997,14 +1003,6 @@ namespace HVACInterfaceManager {
 		int const DemandLedSecondaryInletUpdate( 102 );
 		int const SupplyLedPrimaryInletUpdate( 103 );
 		int const SupplyLedSecondaryInletUpdate( 104 );
-		int const BothLedPrimaryInletUpdate( 105 );
-		int const BothLedSecondaryInletUpdate( 106 );
-
-		int const NeedsMoreFlow( 201 );
-		int const NeedsLessFlow( 202 );
-		int const NeedsSameFlow( 203 );
-
-		Real64 const MdotPerturbFactor( 0.02 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1013,7 +1011,7 @@ namespace HVACInterfaceManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		static bool OneTimeData( true );
 		int CurCallingCase; // local temporary
 		static Real64 MdotPri( 0.0 ); // flow rate on primary side kg/s
@@ -1330,7 +1328,7 @@ namespace HVACInterfaceManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

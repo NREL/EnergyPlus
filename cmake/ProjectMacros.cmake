@@ -10,6 +10,9 @@ include(CMakeParseArguments)
 # If a fifth argument is provided and "TRUE" the file will be saved to the temporary
 # location at ${CMAKE_BINARY_DIR}/install_temp.
 function( install_remote TYPE SOURCE DESTINATION )
+  if( NOT ENABLE_INSTALL_REMOTE )
+    return()
+  endif()
   if( DEFINED ARGV3 )
     set(FILENAME "${ARGV3}")
   else()
@@ -42,6 +45,9 @@ endfunction()
 # This function will configure a unique bundle id based on build number
 # so that packages will not try to relocate the .app to an older version location.
 function( install_remote_plist SOURCE DESTINATION APP_NAME )
+  if( NOT ENABLE_INSTALL_REMOTE )
+    return()
+  endif()
   install(CODE "
     file(DOWNLOAD \"${SOURCE}\" 
       \"${CMAKE_BINARY_DIR}/install_temp/Info.in.plist\" 
@@ -89,6 +95,10 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
   if( BUILD_TESTING )
     add_executable( ${BASE_NAME}_tests ${SRC} )
 
+    if( ENABLE_GTEST_DEBUG_MODE )
+    set_target_properties(${BASE_NAME}_tests PROPERTIES COMPILE_DEFINITIONS ENABLE_GTEST_DEBUG_MODE)
+    endif()
+
     CREATE_SRC_GROUPS( "${SRC}" )
     
     get_target_property(BASE_NAME_TYPE ${BASE_NAME} TYPE)
@@ -103,7 +113,6 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
     target_link_libraries( ${BASE_NAME}_tests 
       ${ALL_DEPENDENCIES} 
       gtest 
-      gtest_main
     )
 
     ADD_GOOGLE_TESTS( ${BASE_NAME}_tests ${SRC} )
@@ -136,9 +145,9 @@ function( ADD_SIMULATION_TEST )
   endif()
 
   if(ANNUAL_SIMULATION)
-   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -a" )
+   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -a -r" )
   else()
-   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -D" )
+   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -D -r" )
   endif()
   
   get_filename_component(IDF_NAME "${ADD_SIM_TEST_IDF_FILE}" NAME_WE)

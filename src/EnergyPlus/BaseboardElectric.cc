@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <BaseboardElectric.hh>
@@ -60,14 +60,14 @@ namespace BaseboardElectric {
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumBaseboards( 0 );
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
 	// Object Data
-	FArray1D< BaseboardParams > Baseboard;
-	FArray1D< BaseboardNumericFieldData > BaseboardNumericFields;
+	Array1D< BaseboardParams > Baseboard;
+	Array1D< BaseboardNumericFieldData > BaseboardNumericFields;
 
 	// Functions
 
@@ -97,7 +97,6 @@ namespace BaseboardElectric {
 		// na
 
 		// Using/Aliasing
-		using DataLoopNode::Node;
 		using InputProcessor::FindItemInList;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using General::TrimSigDigits;
@@ -408,7 +407,7 @@ namespace BaseboardElectric {
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {

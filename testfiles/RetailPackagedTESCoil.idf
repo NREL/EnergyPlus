@@ -41,7 +41,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 5
 
-  Version,8.2;
+  Version,8.3;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -223,7 +223,7 @@
     -6.00,                   !- Time Zone {hr}
     190;                     !- Elevation {m}
 
-! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6Â°C
+! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99.6% Condns DB,  !- Name
@@ -253,7 +253,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2Â°C WB=25.5Â°C
+! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2°C WB=25.5°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg .4% Condns WB=>MDB,  !- Name
@@ -2148,14 +2148,14 @@
     PSZ-AC:1,                !- AirLoop Name
     Sensible,                !- Type of Load to Size On
     AUTOSIZE,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Central Cooling Design Supply Air Temperature {C}
     40.0,                    !- Central Heating Design Supply Air Temperature {C}
-    NonCoincident,           !- Sizing Option
+    NonCoincident,           !- Type of Zone Sum to Use
     No,                      !- 100% Outdoor Air in Cooling
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2171,20 +2171,30 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ZoneSum;                 !- System Outdoor Air Method
+    ZoneSum,                 !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   Sizing:System,
     PSZ-AC:2,                !- AirLoop Name
     Sensible,                !- Type of Load to Size On
     AUTOSIZE,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Central Cooling Design Supply Air Temperature {C}
     40.0,                    !- Central Heating Design Supply Air Temperature {C}
-    NonCoincident,           !- Sizing Option
+    NonCoincident,           !- Type of Zone Sum to Use
     No,                      !- 100% Outdoor Air in Cooling
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2200,20 +2210,30 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ZoneSum;                 !- System Outdoor Air Method
+    ZoneSum,                 !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   Sizing:System,
     PSZ-AC:3,                !- AirLoop Name
     Sensible,                !- Type of Load to Size On
     AUTOSIZE,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Central Cooling Design Supply Air Temperature {C}
     40.0,                    !- Central Heating Design Supply Air Temperature {C}
-    NonCoincident,           !- Sizing Option
+    NonCoincident,           !- Type of Zone Sum to Use
     No,                      !- 100% Outdoor Air in Cooling
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2229,20 +2249,30 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ZoneSum;                 !- System Outdoor Air Method
+    ZoneSum,                 !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   Sizing:System,
     PSZ-AC:4,                !- AirLoop Name
     Sensible,                !- Type of Load to Size On
     AUTOSIZE,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Central Cooling Design Supply Air Temperature {C}
     40.0,                    !- Central Heating Design Supply Air Temperature {C}
-    NonCoincident,           !- Sizing Option
+    NonCoincident,           !- Type of Zone Sum to Use
     No,                      !- 100% Outdoor Air in Cooling
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2258,7 +2288,17 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ZoneSum;                 !- System Outdoor Air Method
+    ZoneSum,                 !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   Controller:OutdoorAir,
     PSZ-AC:1_OA_Controller,  !- Name
@@ -5598,18 +5638,18 @@
 
   Curve:Biquadratic,
     Discharge-SHR-fT,        !- Name
-    -3.129846005,            !- Coefficient1 Constant
-    0.108185126,             !- Coefficient2 x
-    0,                       !- Coefficient3 x**2
-    0.235966025,             !- Coefficient4 y
-    0,                       !- Coefficient5 y**2
-    -0.008227635,            !- Coefficient6 x*y
-    16.1,                    !- Minimum Value of x
-    23.9,                    !- Maximum Value of x
-    23.9,                    !- Minimum Value of y
-    29.4,                    !- Maximum Value of y
+    -76.3312028672366,       !- Coefficient1 Constant
+    3.69083877577677,        !- Coefficient2 x
+    0.00402614182268047,     !- Coefficient3 x**2
+    3.120670734078,          !- Coefficient4 y
+    -0.00297662635327143,    !- Coefficient5 y**2
+    -0.148603418986272,      !- Coefficient6 x*y
+    24.44,                   !- Minimum Value of x
+    26.67,                   !- Maximum Value of x
+    29.44,                   !- Minimum Value of y
+    46.1,                    !- Maximum Value of y
     0.2,                     !- Minimum Curve Output
-    2.0,                     !- Maximum Curve Output
+    1.0,                     !- Maximum Curve Output
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
@@ -5674,8 +5714,8 @@
     ,                        !- Cooling And Discharge Mode Evaporator Energy Input Ratio Function of Temperature Curve Name
     ,                        !- Cooling And Discharge Mode Evaporator Energy Input Ratio Function of Flow Fraction Curve Name
     ,                        !- Cooling And Discharge Mode Evaporator Part Load Fraction Correlation Curve Name
-    ,                        !- Cooling And Discharge Mode Storage Disharge Capacity Function of Temperature Curve Name
-    ,                        !- Cooling And Discharge Mode Storage Disharge Capacity Function of Flow Fraction Curve Name
+    ,                        !- Cooling And Discharge Mode Storage Discharge Capacity Function of Temperature Curve Name
+    ,                        !- Cooling And Discharge Mode Storage Discharge Capacity Function of Flow Fraction Curve Name
     ,                        !- Cooling And Discharge Mode Storage Discharge Capacity Function of Total Evaporator PLR Curve Name
     ,                        !- Cooling And Discharge Mode Storage Energy Input Ratio Function of Temperature Curve Name
     ,                        !- Cooling And Discharge Mode Storage Energy Input Ratio Function of Flow Fraction Curve Name
@@ -7011,8 +7051,8 @@
     ,                        !- Cooling And Discharge Mode Evaporator Energy Input Ratio Function of Temperature Curve Name
     ,                        !- Cooling And Discharge Mode Evaporator Energy Input Ratio Function of Flow Fraction Curve Name
     ,                        !- Cooling And Discharge Mode Evaporator Part Load Fraction Correlation Curve Name
-    ,                        !- Cooling And Discharge Mode Storage Disharge Capacity Function of Temperature Curve Name
-    ,                        !- Cooling And Discharge Mode Storage Disharge Capacity Function of Flow Fraction Curve Name
+    ,                        !- Cooling And Discharge Mode Storage Discharge Capacity Function of Temperature Curve Name
+    ,                        !- Cooling And Discharge Mode Storage Discharge Capacity Function of Flow Fraction Curve Name
     ,                        !- Cooling And Discharge Mode Storage Discharge Capacity Function of Total Evaporator PLR Curve Name
     ,                        !- Cooling And Discharge Mode Storage Energy Input Ratio Function of Temperature Curve Name
     ,                        !- Cooling And Discharge Mode Storage Energy Input Ratio Function of Flow Fraction Curve Name
@@ -7171,8 +7211,8 @@
     ,                        !- Cooling And Discharge Mode Evaporator Energy Input Ratio Function of Temperature Curve Name
     ,                        !- Cooling And Discharge Mode Evaporator Energy Input Ratio Function of Flow Fraction Curve Name
     ,                        !- Cooling And Discharge Mode Evaporator Part Load Fraction Correlation Curve Name
-    ,                        !- Cooling And Discharge Mode Storage Disharge Capacity Function of Temperature Curve Name
-    ,                        !- Cooling And Discharge Mode Storage Disharge Capacity Function of Flow Fraction Curve Name
+    ,                        !- Cooling And Discharge Mode Storage Discharge Capacity Function of Temperature Curve Name
+    ,                        !- Cooling And Discharge Mode Storage Discharge Capacity Function of Flow Fraction Curve Name
     ,                        !- Cooling And Discharge Mode Storage Discharge Capacity Function of Total Evaporator PLR Curve Name
     ,                        !- Cooling And Discharge Mode Storage Energy Input Ratio Function of Temperature Curve Name
     ,                        !- Cooling And Discharge Mode Storage Energy Input Ratio Function of Flow Fraction Curve Name
@@ -7317,8 +7357,8 @@
     EIRTempModFac_CoolandDischarge_SCU,  !- Cooling And Discharge Mode Evaporator Energy Input Ratio Function of Temperature Curve Name
     EIRFlowModFac_coolAndDischarge_SCU,  !- Cooling And Discharge Mode Evaporator Energy Input Ratio Function of Flow Fraction Curve Name
     EvapPartLoadFac_coolAndDischarge_SCU,  !- Cooling And Discharge Mode Evaporator Part Load Fraction Correlation Curve Name
-    TESCapTempModFac_CoolAndDischarge_SCU,  !- Cooling And Discharge Mode Storage Disharge Capacity Function of Temperature Curve Name
-    TESCapFlowModFac_coolAndDischarge_SCU,  !- Cooling And Discharge Mode Storage Disharge Capacity Function of Flow Fraction Curve Name
+    TESCapTempModFac_CoolAndDischarge_SCU,  !- Cooling And Discharge Mode Storage Discharge Capacity Function of Temperature Curve Name
+    TESCapFlowModFac_coolAndDischarge_SCU,  !- Cooling And Discharge Mode Storage Discharge Capacity Function of Flow Fraction Curve Name
     TESPartLoadFac_coolAndDischarge_SCU,  !- Cooling And Discharge Mode Storage Discharge Capacity Function of Total Evaporator PLR Curve Name
     NullTriquadratic,        !- Cooling And Discharge Mode Storage Energy Input Ratio Function of Temperature Curve Name
     constantCubic,           !- Cooling And Discharge Mode Storage Energy Input Ratio Function of Flow Fraction Curve Name

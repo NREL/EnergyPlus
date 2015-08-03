@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -16,7 +16,6 @@
 #include <ObjexxFCL/ubyte.hh>
 #include <ObjexxFCL/char.functions.hh>
 #include <ObjexxFCL/fmt.hh>
-#include <ObjexxFCL/Fstring.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -44,15 +43,6 @@ typedef  std::vector< Format * >  Formats;
 	{ // Default implementation
 		skip_chunk( stream );
 		b = 0;
-		io_err( stream );
-	}
-
-	// Input
-	void
-	Format::in( std::istream & stream, Fstring & s )
-	{ // Default implementation
-		skip_chunk( stream );
-		s.clear();
 		io_err( stream );
 	}
 
@@ -378,28 +368,6 @@ typedef  std::vector< Format * >  Formats;
 
 	// Input
 	void
-	FormatA::in( std::istream & stream, Fstring & s )
-	{
-		std::string::size_type const ls( s.length() ); // Fstring is fixed length
-		std::string const b( read( stream, wid( ls ) ) ); // Buffer string
-		std::string::size_type const lb( b.length() ); // Might be < w_ if hit end of record
-		if ( lb >= ls ) { // Take rightmost ls characters read
-			s = b.substr( lb - ls );
-		} else { // Take all characters read and right-pad with space
-			s = b;
-		}
-	}
-
-	// Output
-	void
-	FormatA::out( std::ostream & stream, Fstring const & s, std::string const & ter )
-	{
-		std::string::size_type const l( s.length() );
-		stream << spc( ter ) << std::string( ( has_w() && ( w_ > l ) ? w_ - l : 0ul ), ' ' ) << s.str();
-	}
-
-	// Input
-	void
 	FormatL::in( std::istream & stream, bool & b )
 	{
 		std::string const s( read( stream, wid( 2ul ) ) );
@@ -717,7 +685,7 @@ typedef  std::vector< Format * >  Formats;
 	void
 	FormatG::in( std::istream & stream, bool & b )
 	{
-		std::string const s( read( stream, wid( TraitsG< bool >::w() ) ) );
+		std::string const s( read( stream, wid( TraitsG< bool >::w ) ) );
 		if ( has_prefix( s, "T", false ) || has_prefix( s, ".T", false ) ) {
 			b = true;
 		} else if ( has_prefix( s, "F", false ) || has_prefix( s, ".F", false ) || is_blank( s ) ) { // Blank is Intel Fortran extension
@@ -731,26 +699,12 @@ typedef  std::vector< Format * >  Formats;
 	void
 	FormatG::in( std::istream & stream, char & c )
 	{
-		std::string const b( read( stream, wid( TraitsG< char >::w() ) ) ); // Buffer string
+		std::string const b( read( stream, wid( TraitsG< char >::w ) ) ); // Buffer string
 		std::string::size_type const lb( b.length() ); // Might be < w() if hit end of record
 		if ( lb >= 1 ) { // Take rightmost character read
 			c = b.back();
 		} else { // No characters read: Set to space
 			c = ' ';
-		}
-	}
-
-	// Input
-	void
-	FormatG::in( std::istream & stream, Fstring & s )
-	{
-		std::string::size_type const ls( s.length() ); // Fstring is fixed length
-		std::string const b( read( stream, wid( ls ) ) ); // Buffer string
-		std::string::size_type const lb( b.length() ); // Might be < w() if hit end of record
-		if ( lb >= ls ) { // Take rightmost ls characters read
-			s = b.substr( lb - ls );
-		} else { // Take all characters read and right-pad with space
-			s = b;
 		}
 	}
 
@@ -931,13 +885,6 @@ typedef  std::vector< Format * >  Formats;
 
 	// Input
 	void
-	FormatLD::in( std::istream & stream, Fstring & s )
-	{
-		read_string( stream, s );
-	}
-
-	// Input
-	void
 	FormatLD::read_bool( std::istream & stream, bool & b )
 	{
 		if ( entry_.r == 0ul ) entry_ = read_ld( stream ); // Get a new entry if no repeats left on current entry
@@ -1061,13 +1008,6 @@ typedef  std::vector< Format * >  Formats;
 	// Output
 	void
 	FormatLD::out( std::ostream & stream, std::string const & s, std::string const & ter )
-	{
-		stream << spc_spacer( ter ) << fmt::LD( s );
-	}
-
-	// Output
-	void
-	FormatLD::out( std::ostream & stream, Fstring const & s, std::string const & ter )
 	{
 		stream << spc_spacer( ter ) << fmt::LD( s );
 	}
@@ -1753,14 +1693,8 @@ alpha_token( Tokens const & tokens )
 		}
 	}
 
-// Static Data Member Definitions
-
-#ifndef MSC_EXTENSIONS // Define when compiling with Visual C++ extensions (not using /Za)
-
-	Format::Size const Format::NOSIZE;
-
-#endif
-
+	// Static Data Member Definitions
+	Format::Size const Format::NOSIZE = static_cast< Size >( -1 );
 	std::string const Format::LF = std::string( "\n" );
 
 } // ObjexxFCL

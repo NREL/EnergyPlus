@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -139,14 +139,14 @@ namespace WaterCoils {
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumWaterCoils( 0 ); // The Number of WaterCoils found in the Input
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool MyUAAndFlowCalcFlag;
-	FArray1D_bool MyCoilDesignFlag;
-	FArray1D_bool CoilWarningOnceFlag;
-	FArray1D_int WaterTempCoolCoilErrs; // error counting for detailed coils
-	FArray1D_int PartWetCoolCoilErrs; // error counting for detailed coils
+	Array1D_bool MySizeFlag;
+	Array1D_bool MyUAAndFlowCalcFlag;
+	Array1D_bool MyCoilDesignFlag;
+	Array1D_bool CoilWarningOnceFlag;
+	Array1D_int WaterTempCoolCoilErrs; // error counting for detailed coils
+	Array1D_int PartWetCoolCoilErrs; // error counting for detailed coils
 	bool GetWaterCoilsInputFlag( true ); // Flag set to make sure you get input once
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -164,8 +164,8 @@ namespace WaterCoils {
 	// Other routines
 
 	// Object Data
-	FArray1D< WaterCoilEquipConditions > WaterCoil;
-	FArray1D< WaterCoilNumericFieldData > WaterCoilNumericFields;
+	Array1D< WaterCoilEquipConditions > WaterCoil;
+	Array1D< WaterCoilNumericFieldData > WaterCoilNumericFields;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -315,8 +315,6 @@ namespace WaterCoils {
 		using namespace DataIPShortCuts;
 		using GlobalNames::VerifyUniqueCoilName;
 		using SetPointManager::NodeHasSPMCtrlVarType;
-		using SetPointManager::iCtrlVarType_Temp;
-		using SetPointManager::iCtrlVarType_HumRat;
 		using namespace FaultsManager;
 
 		// Locals
@@ -344,12 +342,12 @@ namespace WaterCoils {
 		int NumNums;
 		int IOStat;
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > NumArray; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > NumArray; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -785,7 +783,6 @@ namespace WaterCoils {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const SmallNo( 1.e-9 ); // SmallNo number in place of zero
-		Real64 const LargeNo( 1.e20 ); // Large number in place of infinity
 		int const itmax( 10 );
 		int const MaxIte( 500 ); // Maximum number of iterations
 		Real64 const Acc( 0.0001 ); // Accuracy of result
@@ -825,15 +822,15 @@ namespace WaterCoils {
 		int WaterInletNode;
 		int WaterOutletNode;
 
-		static FArray1D< Real64 > DesCpAir; // CpAir at Design Inlet Air Temp
-		static FArray1D< Real64 > DesUARangeCheck; // Value for range check based on Design Inlet Air Humidity Ratio
+		static Array1D< Real64 > DesCpAir; // CpAir at Design Inlet Air Temp
+		static Array1D< Real64 > DesUARangeCheck; // Value for range check based on Design Inlet Air Humidity Ratio
 
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyCoilReportFlag;
-		static FArray1D_bool PlantLoopScanFlag;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyCoilReportFlag;
+		static Array1D_bool PlantLoopScanFlag;
 
-		static FArray1D< Real64 > CoefSeries( 5 ); //Tuned Changed to static: High call count: Set before use
+		static Array1D< Real64 > CoefSeries( 5 ); //Tuned Changed to static: High call count: Set before use
 		Real64 FinDiamVar;
 		Real64 TubeToFinDiamRatio;
 
@@ -843,7 +840,7 @@ namespace WaterCoils {
 		Real64 UA0; // lower bound for UA
 		Real64 UA1; // upper bound for UA
 		Real64 UA;
-		static FArray1D< Real64 > Par( 4 ); //Tuned Changed to static: High call count: Set before use
+		static Array1D< Real64 > Par( 4 ); //Tuned Changed to static: High call count: Set before use
 
 		static bool NoSatCurveIntersect( false ); // TRUE if failed to find appatatus dew-point
 		static bool BelowInletWaterTemp( false ); // TRUE if apparatus dew-point below design inlet water temperature
@@ -857,7 +854,7 @@ namespace WaterCoils {
 		static Real64 CoilEffectiveness( 0.0 ); // effectiveness of the coil (rated)
 		static Real64 SurfaceArea( 0.0 ); // heat exchanger surface area, [m2]
 		static Real64 UATotal( 0.0 ); // heat exchanger UA total, [W/C]
-		static FArray1D_bool RptCoilHeaderFlag( 2, true );
+		static Array1D_bool RptCoilHeaderFlag( 2, true );
 		Real64 x_a; // result of Eq.70 in Wetter 1999
 		Real64 x_w; // result of Eq.72 in Wetter 1999
 		Real64 AirConvectTerm; // result of Eq.71 in Wetter 1999
@@ -920,10 +917,10 @@ namespace WaterCoils {
 
 			MySizeFlag( CoilNum ) = false;
 		}
-		rho = GetDensityGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
 
 		// Do the Begin Environment initializations
 		if ( BeginEnvrnFlag && MyEnvrnFlag( CoilNum ) ) {
+			rho = GetDensityGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
 			//Initialize all report variables to a known state at beginning of simulation
 			WaterCoil( CoilNum ).TotWaterHeatingCoilEnergy = 0.0;
 			WaterCoil( CoilNum ).TotWaterCoolingCoilEnergy = 0.0;
@@ -1115,7 +1112,7 @@ namespace WaterCoils {
 				BelowInletWaterTemp = false;
 				CBFTooLarge = false;
 				NoExitCondReset = false;
-				Inlet_Conditions_Loop: for ( Ipass = 1; Ipass <= 2; ++Ipass ) {
+				for ( Ipass = 1; Ipass <= 2; ++Ipass ) {
 					if ( Ipass == 2 ) {
 						if ( ! NoSatCurveIntersect && ! BelowInletWaterTemp && ! CBFTooLarge ) {
 							goto Inlet_Conditions_Loop_exit; // coil UA calcs OK
@@ -1187,7 +1184,7 @@ namespace WaterCoils {
 						DesAirTempApparatusDewPt = PsyTdpFnWPb( WaterCoil( CoilNum ).DesOutletAirHumRat, OutBaroPress );
 
 						// Iterating to calculate Apparatus Dew Point Temperature at Design Conditions
-						App_DewPoint_Loop1: for ( iter = 1; iter <= itmax; ++iter ) {
+						for ( iter = 1; iter <= itmax; ++iter ) {
 
 							// Calculate apparatus dewpoint and compare with predicted value
 							// using entering conditions and SlopeTempVsHumRatio
@@ -1214,8 +1211,7 @@ namespace WaterCoils {
 								goto App_DewPoint_Loop1_exit;
 							}
 
-							// End of Do Loop for Iteration
-							App_DewPoint_Loop1_loop: ;
+							// End of Loop for Iteration
 						}
 						App_DewPoint_Loop1_exit: ;
 
@@ -1613,12 +1609,11 @@ namespace WaterCoils {
 		//  USE BranchInputManager, ONLY: MyPlantSizingIndex
 		using ReportSizingManager::ReportSizingOutput;
 		using ReportSizingManager::RequestSizing;
+		using ReportSizingManager::GetCoilDesFlowT;
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIte( 500 ); // Maximum number of iterations
-		Real64 const Acc( 0.0001 ); // Accuracy of result
 		static std::string const InitWaterCoil( "InitWaterCoil" );
 		static std::string const RoutineName( "SizeWaterCoil" );
 
@@ -1642,12 +1637,18 @@ namespace WaterCoils {
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
 		bool bPRINT = true; // TRUE if sizing is reported to output (eio)
 		Real64 TempSize; // autosized value
+		Real64 CpAirStd; // specific heat of air at standard conditions
+		Real64 DesCoilAirFlow; // design air flow rate for the coil [m3/s]
+		Real64 DesCoilExitTemp; // design coil exit temperature [C]
 
 		ErrorsFound = false;
 		PltSizCoolNum = 0;
 		PltSizHeatNum = 0;
 		PltSizNum = 0;
+		DesCoilAirFlow = 0.0;
+		DesCoilExitTemp = 0.0;
 		LoopErrorsFound = false;
+		CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
 
 		// cooling coils
 		if ( WaterCoil( CoilNum ).WaterCoilType == CoilType_Cooling && WaterCoil( CoilNum ).RequestingAutoSize ) {
@@ -1679,9 +1680,18 @@ namespace WaterCoils {
 				bPRINT = true;
 				if ( WaterCoil ( CoilNum ).MaxWaterVolFlowRate != AutoSize ) bPRINT = false;
 				if ( CurSysNum == 0 ) bPRINT = false;
+				if ( CurSysNum > 0 && CurOASysNum == 0 ) {
+					GetCoilDesFlowT( CurSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp );
+					DataAirFlowUsedForSizing = DesCoilAirFlow;
+					DataFlowUsedForSizing = DesCoilAirFlow;
+					DataDesOutletAirTemp = DesCoilExitTemp;
+					DataDesOutletAirHumRat = PsyWFnTdbRhPb( DataDesOutletAirTemp, 0.9, StdBaroPress, RoutineName );
+				}
+
 				SizingString = "Design Coil Load [W]"; // there is no input field for this value and this is not the rated capacity (we should always print this!)
 				RequestSizing( CompType, CompName, CoolingCapacitySizing, SizingString, TempSize, bPRINT, RoutineName );
 				WaterCoil( CoilNum ).DesWaterCoolingCoilRate = TempSize;
+				WaterCoil( CoilNum ).InletAirMassFlowRate = StdRhoAir * DataFlowUsedForSizing; // inlet air mass flow rate is the autosized value
 				DataCapacityUsedForSizing = WaterCoil( CoilNum ).DesWaterCoolingCoilRate;
 
 				// Why isn't the water volume flow rate based on the user inputs for inlet/outlet air/water temps? Water volume flow rate is always based on autosized inputs.
@@ -1878,10 +1888,13 @@ namespace WaterCoils {
 				DataWaterLoopNum = 0;
 				DataConstantUsedForSizing = 0.0;
 				DataFractionUsedForSizing = 0.0;
+				DataAirFlowUsedForSizing = 0.0;
 				DataFlowUsedForSizing = 0.0;
+				DataWaterFlowUsedForSizing = 0.0;
 				DataCapacityUsedForSizing = 0.0;
 				DataDesInletAirTemp = 0.0;
 				DataDesOutletAirTemp = 0.0;
+				DataDesOutletAirHumRat = 0.0;
 				DataDesInletAirHumRat = 0.0;
 				DataDesInletWaterTemp = 0.0;
 
@@ -2240,7 +2253,6 @@ namespace WaterCoils {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxCoolCoilErrs( 5 );
 		static Real64 const exp_47( std::exp( -0.41718 ) );
 		static Real64 const exp_35( std::exp( -0.3574 ) );
 		static std::string const RoutineName( "CalcDetailFlatFinCoolingCoil" );
@@ -3200,8 +3212,6 @@ namespace WaterCoils {
 		// Calculates out put variable for  the completely wet coil
 		WetCoilOutletCondition( CoilNum, AirTempIn, EnthAirInlet, EnthAirOutlet, UAExternalTotal, OutletAirTemp, OutletAirHumRat, SenWaterCoilLoad );
 
-Label999: ;
-		return;
 	}
 
 	// Coil Part Wet Part Dry Subroutine for Cooling Coil
@@ -3465,7 +3475,6 @@ Label999: ;
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		Real64 const SmallNo( 1.e-9 );
-		Real64 const LargeNo( 1.e9 );
 		int const itmax( 12 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -3948,7 +3957,7 @@ Label999: ;
 	void
 	CalcDryFinEffCoef(
 		Real64 const OutTubeEffFinDiamRatio,
-		FArray1< Real64 > & PolynomCoef
+		Array1< Real64 > & PolynomCoef
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -3985,7 +3994,7 @@ Label999: ;
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray2D< Real64 > OrderedPair( 2, MaxOrderedPairs ); //Tuned Changed to static: Set before use
+		static Array2D< Real64 > OrderedPair( MaxOrderedPairs, 2 ); //Tuned Changed to static: Set before use
 		Real64 FAI;
 		Real64 FED;
 		Real64 FEDnumerator;
@@ -4025,8 +4034,8 @@ Label999: ;
 				FED = 0.0;
 			}
 			//      FED = RO * (R1I1 * R2K1 - R2I1 * R1K1) / (R2I0 * R1K1 + R1I1 * R2K0)
-			OrderedPair( 1, I ) = FAI;
-			OrderedPair( 2, I ) = FED;
+			OrderedPair( I, 1 ) = FAI;
+			OrderedPair( I, 2 ) = FED;
 		}
 		CalcPolynomCoef( OrderedPair, PolynomCoef );
 	}
@@ -4197,7 +4206,7 @@ Label999: ;
 		Real64 G1;
 		Real64 GJ;
 		Real64 HJ;
-		FArray1D< Real64 > T( 12 );
+		Array1D< Real64 > T( 12 );
 		Real64 X2J;
 
 		KBessFunc = 0.0;
@@ -4307,8 +4316,8 @@ Label999: ;
 
 	void
 	CalcPolynomCoef(
-		FArray2< Real64 > const & OrderedPair,
-		FArray1< Real64 > & PolynomCoef
+		Array2< Real64 > const & OrderedPair,
+		Array1< Real64 > & PolynomCoef
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -4339,8 +4348,8 @@ Label999: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool Converged;
-		static FArray2D< Real64 > OrdPairSum( 2, 10 ); //Tuned Changed to static and whole array zero-initialized
-		static FArray2D< Real64 > OrdPairSumMatrix( 10, 10 ); //Tuned Changed to static
+		static Array2D< Real64 > OrdPairSum( 10, 2 ); //Tuned Changed to static and whole array zero-initialized
+		static Array2D< Real64 > OrdPairSumMatrix( 10, 10 ); //Tuned Changed to static
 		Real64 B;
 		int I;
 		int II;
@@ -4355,70 +4364,70 @@ Label999: ;
 		OrdPairSum( 1, 1 ) = MaxOrderedPairs;
 		PolynomCoef = 0.0;
 		for ( CurrentOrdPair = 1; CurrentOrdPair <= MaxOrderedPairs; ++CurrentOrdPair ) {
-			OrdPairSum( 1, 2 ) += OrderedPair( 1, CurrentOrdPair );
-			OrdPairSum( 1, 3 ) += OrderedPair( 1, CurrentOrdPair ) * OrderedPair( 1, CurrentOrdPair );
-			OrdPairSum( 2, 1 ) += OrderedPair( 2, CurrentOrdPair );
-			OrdPairSum( 2, 2 ) += OrderedPair( 1, CurrentOrdPair ) * OrderedPair( 2, CurrentOrdPair );
+			OrdPairSum( 2, 1 ) += OrderedPair( CurrentOrdPair, 1 );
+			OrdPairSum( 3, 1 ) += OrderedPair( CurrentOrdPair, 1 ) * OrderedPair( CurrentOrdPair, 1 );
+			OrdPairSum( 1, 2 ) += OrderedPair( CurrentOrdPair, 2 );
+			OrdPairSum( 2, 2 ) += OrderedPair( CurrentOrdPair, 1 ) * OrderedPair( CurrentOrdPair, 2 );
 		}
 		PolynomOrder = 1;
 		Converged = false;
 		while ( ! Converged ) {
 			for ( CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder ) {
 				for ( J = 1; J <= PolynomOrder + 1; ++J ) {
-					OrdPairSumMatrix( CurrentOrder, J ) = OrdPairSum( 1, J - 1 + CurrentOrder );
+					OrdPairSumMatrix( J, CurrentOrder ) = OrdPairSum( J - 1 + CurrentOrder, 1 );
 				} //End of J loop
-				OrdPairSumMatrix( CurrentOrder, PolynomOrder + 2 ) = OrdPairSum( 2, CurrentOrder );
+				OrdPairSumMatrix( PolynomOrder + 2, CurrentOrder ) = OrdPairSum( CurrentOrder, 2 );
 			} //End of CurrentOrder loop
 
 			for ( CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder ) {
-				OrdPairSumMatrix( PolynomOrder + 2, CurrentOrder ) = -1.0;
+				OrdPairSumMatrix( CurrentOrder, PolynomOrder + 2 ) = -1.0;
 				for ( J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J ) {
-					OrdPairSumMatrix( PolynomOrder + 2, J ) = 0.0;
+					OrdPairSumMatrix( J, PolynomOrder + 2 ) = 0.0;
 				} //End of J loop
 
 				for ( II = 2; II <= PolynomOrder + 2; ++II ) {
 					for ( J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J ) {
-						OrdPairSumMatrix( II, J ) -= OrdPairSumMatrix( 1, J ) * OrdPairSumMatrix( II, CurrentOrder ) / OrdPairSumMatrix( 1, CurrentOrder );
+						OrdPairSumMatrix( J, II ) -= OrdPairSumMatrix( J, 1 ) * OrdPairSumMatrix( CurrentOrder, II ) / OrdPairSumMatrix( CurrentOrder, 1 );
 					} //End of J loop
 				} //End of II loop
 				for ( II = 1; II <= PolynomOrder + 1; ++II ) {
 					for ( J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J ) {
-						OrdPairSumMatrix( II, J ) = OrdPairSumMatrix( II + 1, J );
+						OrdPairSumMatrix( J, II ) = OrdPairSumMatrix( J, II + 1 );
 					} //End of J loop
 				} //End of II loop
 			} //End of CurrentOrder loop
 
 			S2 = 0.0;
 			for ( CurrentOrdPair = 1; CurrentOrdPair <= MaxOrderedPairs; ++CurrentOrdPair ) {
-				S1 = OrdPairSumMatrix( 1, PolynomOrder + 2 );
-				auto const OrderedPair1C( OrderedPair( 1, CurrentOrdPair ) );
+				S1 = OrdPairSumMatrix( PolynomOrder + 2, 1 );
+				auto const OrderedPair1C( OrderedPair( CurrentOrdPair, 1 ) );
 				auto OrderedPair1C_pow( 1.0 );
 				for ( CurrentOrder = 1; CurrentOrder <= PolynomOrder; ++CurrentOrder ) {
 					OrderedPair1C_pow *= OrderedPair1C;
-					S1 += OrdPairSumMatrix( CurrentOrder + 1, PolynomOrder + 2 ) * OrderedPair1C_pow;
+					S1 += OrdPairSumMatrix( PolynomOrder + 2, CurrentOrder + 1 ) * OrderedPair1C_pow;
 				} //End of CurrentOrder loop
-				S2 += ( S1 - OrderedPair( 2, CurrentOrdPair ) ) * ( S1 - OrderedPair( 2, CurrentOrdPair ) );
+				S2 += ( S1 - OrderedPair( CurrentOrdPair, 2 ) ) * ( S1 - OrderedPair( CurrentOrdPair, 2 ) );
 			} //End of CurrentOrdPair loop
 			B = MaxOrderedPairs - ( PolynomOrder + 1 );
 			if ( S2 > 0.0001 ) S2 = std::sqrt( S2 / B );
 			for ( CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder ) {
-				PolynomCoef( CurrentOrder ) = OrdPairSumMatrix( CurrentOrder, PolynomOrder + 2 );
+				PolynomCoef( CurrentOrder ) = OrdPairSumMatrix( PolynomOrder + 2, CurrentOrder );
 			} //End of CurrentOrder loop
 
 			if ( ( PolynomOrder - MaxPolynomOrder < 0 ) && ( S2 - PolyConvgTol > 0.0 ) ) {
 				++PolynomOrder;
 				J = 2 * PolynomOrder;
-				OrdPairSum( 1, J ) = OrdPairSum( 1, J + 1 ) = 0.0;
-				auto OrdPairSum2P = OrdPairSum( 2, PolynomOrder + 1 ) = 0.0;
+				OrdPairSum( J, 1 ) = OrdPairSum( J + 1, 1 ) = 0.0;
+				auto OrdPairSum2P = OrdPairSum( PolynomOrder + 1, 2 ) = 0.0;
 				for ( I = 1; I <= MaxOrderedPairs; ++I ) {
-					auto const OrderedPair1I( OrderedPair( 1, I ) );
+					auto const OrderedPair1I( OrderedPair( I, 1 ) );
 					auto OrderedPair_pow( std::pow( OrderedPair1I, J - 1 ) );
-					OrdPairSum( 1, J ) += OrderedPair_pow;
+					OrdPairSum( J, 1 ) += OrderedPair_pow;
 					OrderedPair_pow *= OrderedPair1I;
-					OrdPairSum( 1, J + 1 ) += OrderedPair_pow;
-					OrdPairSum2P += OrderedPair( 2, I ) * std::pow( OrderedPair1I, PolynomOrder );
+					OrdPairSum( J + 1, 1 ) += OrderedPair_pow;
+					OrdPairSum2P += OrderedPair( I, 2 ) * std::pow( OrderedPair1I, PolynomOrder );
 				}
-				OrdPairSum( 2, PolynomOrder + 1 ) = OrdPairSum2P;
+				OrdPairSum( PolynomOrder + 1, 2 ) = OrdPairSum2P;
 			} else {
 				Converged = true;
 			}
@@ -4430,7 +4439,7 @@ Label999: ;
 	Real64
 	SimpleHeatingCoilUAResidual(
 		Real64 const UA, // UA of coil
-		Optional< FArray1S< Real64 > const > Par // par(1) = design coil load [W]
+		Array1< Real64 > const & Par // par(1) = design coil load [W]
 	)
 	{
 
@@ -4475,16 +4484,12 @@ Label999: ;
 		int FanOpMode;
 		Real64 PartLoadRatio;
 
-		CoilIndex = int( Par()( 2 ) );
-		if ( Par()( 3 ) == 1.0 ) {
-			FanOpMode = CycFanCycCoil;
-		} else {
-			FanOpMode = ContFanCycCoil;
-		}
-		PartLoadRatio = Par()( 4 );
+		CoilIndex = int( Par( 2 ) );
+		FanOpMode = ( Par( 3 ) == 1.0 ? CycFanCycCoil : ContFanCycCoil );
+		PartLoadRatio = Par( 4 );
 		WaterCoil( CoilIndex ).UACoilVariable = UA;
 		CalcSimpleHeatingCoil( CoilIndex, FanOpMode, PartLoadRatio, SimCalc );
-		Residuum = ( Par()( 1 ) - WaterCoil( CoilIndex ).TotWaterHeatingCoilRate ) / Par()( 1 );
+		Residuum = ( Par( 1 ) - WaterCoil( CoilIndex ).TotWaterHeatingCoilRate ) / Par( 1 );
 		DataDesignCoilCapacity = WaterCoil ( CoilIndex ).TotWaterHeatingCoilRate;
 
 		return Residuum;
@@ -4493,7 +4498,7 @@ Label999: ;
 	Real64
 	SimpleCoolingCoilUAResidual(
 		Real64 const UA, // UA of coil
-		Optional< FArray1S< Real64 > const > Par // par(1) = design coil load [W]
+		Array1< Real64 > const & Par // par(1) = design coil load [W]
 	)
 	{
 
@@ -4538,13 +4543,9 @@ Label999: ;
 		int FanOpMode;
 		Real64 PartLoadRatio;
 
-		CoilIndex = int( Par()( 2 ) );
-		if ( Par()( 3 ) == 1.0 ) {
-			FanOpMode = CycFanCycCoil;
-		} else {
-			FanOpMode = ContFanCycCoil;
-		}
-		PartLoadRatio = Par()( 4 );
+		CoilIndex = int( Par( 2 ) );
+		FanOpMode = ( Par( 3 ) == 1.0 ? CycFanCycCoil : ContFanCycCoil );
+		PartLoadRatio = Par( 4 );
 		WaterCoil( CoilIndex ).UACoilExternal = UA;
 		WaterCoil( CoilIndex ).UACoilInternal = WaterCoil( CoilIndex ).UACoilExternal * 3.3;
 		WaterCoil( CoilIndex ).UACoilTotal = 1.0 / ( 1.0 / WaterCoil( CoilIndex ).UACoilExternal + 1.0 / WaterCoil( CoilIndex ).UACoilInternal );
@@ -4555,7 +4556,7 @@ Label999: ;
 
 		CoolingCoil( CoilIndex, true, DesignCalc, FanOpMode, PartLoadRatio );
 
-		Residuum = ( Par()( 1 ) - WaterCoil( CoilIndex ).TotWaterCoolingCoilRate ) / Par()( 1 );
+		Residuum = ( Par( 1 ) - WaterCoil( CoilIndex ).TotWaterCoolingCoilRate ) / Par( 1 );
 
 		return Residuum;
 	}
@@ -4755,7 +4756,7 @@ Label10: ;
 
 	void
 	CheckWaterCoilSchedule(
-		std::string const & CompType, // unused1208
+		std::string const & EP_UNUSED( CompType ), // unused1208
 		std::string const & CompName,
 		Real64 & Value,
 		int & CompIndex
@@ -5348,7 +5349,6 @@ Label10: ;
 		// Using/Aliasing
 		using SetPointManager::NodeHasSPMCtrlVarType;
 		using SetPointManager::iCtrlVarType_Temp;
-		using SetPointManager::iCtrlVarType_HumRat;
 		using SetPointManager::iCtrlVarType_MaxHumRat;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 		using EMSManager::iTemperatureSetPoint;
@@ -5487,7 +5487,6 @@ Label10: ;
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		int const itmax( 10 );
 		int const MaxIte( 500 ); // Maximum number of iterations
 		Real64 const Acc( 1.0 ); // Accuracy of result
 
@@ -5502,7 +5501,7 @@ Label10: ;
 		Real64 T0; // lower bound for Tprov [C]
 		Real64 T1; // upper bound for Tprov [C]
 		static Real64 Tprov( 0.0 ); // provisional value of drybulb temperature [C]
-		FArray1D< Real64 > Par( 3 ); // Par(1) = desired enthaply H [J/kg]
+		Array1D< Real64 > Par( 3 ); // Par(1) = desired enthaply H [J/kg]
 		// Par(2) = desired relative humidity (0.0 - 1.0)
 		// Par(3) = barometric pressure [N/m2 (Pascals)]
 
@@ -5534,7 +5533,7 @@ Label10: ;
 	Real64
 	EnthalpyResidual(
 		Real64 const Tprov, // test value of Tdb [C]
-		Optional< FArray1S< Real64 > const > Par // Par(1) = desired enthaply H [J/kg]
+		Array1< Real64 > const & Par // Par(1) = desired enthaply H [J/kg]
 	)
 	{
 
@@ -5576,7 +5575,7 @@ Label10: ;
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		Residuum = Par()( 1 ) - PsyHFnTdbRhPb( Tprov, Par()( 2 ), Par()( 3 ) );
+		Residuum = Par( 1 ) - PsyHFnTdbRhPb( Tprov, Par( 2 ), Par( 3 ) );
 
 		return Residuum;
 	}
@@ -5802,11 +5801,11 @@ Label10: ;
 	UpdateWaterToAirCoilPlantConnection(
 		int const CoilTypeNum,
 		std::string const & CoilName,
-		int const EquipFlowCtrl, // Flow control mode for the equipment
+		int const EP_UNUSED( EquipFlowCtrl ), // Flow control mode for the equipment
 		int const LoopNum, // Plant loop index for where called from
 		int const LoopSide, // Plant loop side index for where called from
 		int & CompIndex, // Chiller number pointer
-		bool const FirstHVACIteration,
+		bool const EP_UNUSED( FirstHVACIteration ),
 		bool & InitLoopEquip // If not zero, calculate the max load for operating conditions
 	)
 	{
@@ -5990,7 +5989,7 @@ Label10: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

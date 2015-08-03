@@ -106,7 +106,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.2;
+  Version,8.3;
 
   Timestep,6;
 
@@ -2396,4 +2396,7 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
+
+  Output:SQLite,
+    Simple;
 

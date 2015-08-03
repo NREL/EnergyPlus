@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -130,14 +130,14 @@ namespace SingleDuct {
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
-	FArray1D< Real64 > MassFlow1; // previous value of the terminal unit mass flow rate
-	FArray1D< Real64 > MassFlow2; // previous value of the previous value of the mass flow rate
-	FArray1D< Real64 > MassFlow3;
-	FArray1D< Real64 > MassFlowDiff;
+	Array1D< Real64 > MassFlow1; // previous value of the terminal unit mass flow rate
+	Array1D< Real64 > MassFlow2; // previous value of the previous value of the mass flow rate
+	Array1D< Real64 > MassFlow3;
+	Array1D< Real64 > MassFlowDiff;
 	bool GetInputFlag( true ); // Flag set to make sure you get input once
 	bool GetATMixerFlag( true ); // Flag set to make sure you get input once
 	int NumConstVolSys( 0 );
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// INTERFACE BLOCK SPECIFICATIONS
 
@@ -157,10 +157,10 @@ namespace SingleDuct {
 	// Reporting routines for module
 
 	// Object Data
-	FArray1D< SysDesignParams > Sys;
-	FArray1D< SysFlowConditions > SysInlet;
-	FArray1D< SysFlowConditions > SysOutlet;
-	FArray1D< AirTerminalMixerData > SysATMixer;
+	Array1D< SysDesignParams > Sys;
+	Array1D< SysFlowConditions > SysInlet;
+	Array1D< SysFlowConditions > SysOutlet;
+	Array1D< AirTerminalMixerData > SysATMixer;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -349,7 +349,6 @@ namespace SingleDuct {
 		int NumZoneSiz;
 		int ZoneSizIndex;
 		int IOStat;
-		int ZoneNum; // Index to actual zone number
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -357,12 +356,12 @@ namespace SingleDuct {
 		int SupAirIn; // controlled zone supply air inlet index
 		int ADUNum; // air distribution unit index
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -1388,7 +1387,7 @@ namespace SingleDuct {
 		NumZoneSiz = GetNumObjectsFound( "Sizing:Zone" );
 		if ( NumZoneSiz > 0 ) {
 			for ( SysIndex = 1; SysIndex <= NumSys; ++SysIndex ) {
-				SizLoop: for ( ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSiz; ++ZoneSizIndex ) {
+				for ( ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSiz; ++ZoneSizIndex ) {
 					if ( DoZoneSizing ) {
 						if ( FinalZoneSizing( ZoneSizIndex ).ActualZoneNum == Sys( SysIndex ).ActualZoneNum ) {
 							if ( FinalZoneSizing( ZoneSizIndex ).ZoneSecondaryRecirculation > 0.0 ) {
@@ -1400,7 +1399,6 @@ namespace SingleDuct {
 							}
 						}
 					}
-					SizLoop_loop: ;
 				}
 				SizLoop_exit: ;
 			}
@@ -1484,15 +1482,15 @@ namespace SingleDuct {
 		int SysIndex;
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
-		static FArray1D_bool GetGasElecHeatCoilCap; // Gets autosized value of coil capacity
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MySizeFlag;
+		static Array1D_bool GetGasElecHeatCoilCap; // Gets autosized value of coil capacity
 		Real64 SteamTemp;
 		Real64 SteamDensity;
 		Real64 rho;
 		bool errFlag;
 
-		static FArray1D_bool PlantLoopScanFlag;
+		static Array1D_bool PlantLoopScanFlag;
 
 		// FLOW:
 
@@ -3116,7 +3114,7 @@ namespace SingleDuct {
 		Real64 UnitFlowToler; // flow rate tolerance
 		Real64 QDelivered;
 		Real64 FracDelivered;
-		FArray1D< Real64 > Par( 11 );
+		Array1D< Real64 > Par( 11 );
 		int SolFlag;
 		Real64 ErrTolerance;
 		Real64 MaxSteamCap; // steam coil capacity at full load
@@ -3644,7 +3642,7 @@ namespace SingleDuct {
 		int const SysNum, // Unit index
 		bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
 		int const ZoneNode, // zone node number
-		int const HCoilType, // type of hot water coil !unused1208
+		int const EP_UNUSED( HCoilType ), // type of hot water coil !unused1208
 		Real64 const HWFlow, // hot water flow (kg/s)
 		Real64 const HCoilReq, // gas or elec coil demand requested
 		int const FanType, // type of fan
@@ -3746,7 +3744,7 @@ namespace SingleDuct {
 	Real64
 	VAVVSCoolingResidual(
 		Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-		Optional< FArray1S< Real64 > const > Par // Par(1) = REAL(SysNum)
+		Array1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	)
 	{
 
@@ -3803,20 +3801,16 @@ namespace SingleDuct {
 		int FanOp; // fan operation; 0=off, 1=on.
 		Real64 UnitOutput; // cooling output [W] (cooling is negative)
 
-		UnitIndex = int( Par()( 1 ) );
-		if ( Par()( 2 ) > 0.0 ) {
-			FirstHVACSoln = true;
-		} else {
-			FirstHVACSoln = false;
-		}
-		ZoneNodeIndex = int( Par()( 3 ) );
-		HCType = int( Par()( 4 ) );
-		MinHWFlow = Par()( 5 );
-		FanType = int( Par()( 6 ) );
-		FanOp = int( Par()( 7 ) );
+		UnitIndex = int( Par( 1 ) );
+		FirstHVACSoln = ( Par( 2 ) > 0.0 );
+		ZoneNodeIndex = int( Par( 3 ) );
+		HCType = int( Par( 4 ) );
+		MinHWFlow = Par( 5 );
+		FanType = int( Par( 6 ) );
+		FanOp = int( Par( 7 ) );
 		CalcVAVVS( UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, MinHWFlow, 0.0, FanType, SupplyAirMassFlow, FanOp, UnitOutput );
 
-		Residuum = ( Par()( 8 ) - UnitOutput ) / Par()( 8 );
+		Residuum = ( Par( 8 ) - UnitOutput ) / Par( 8 );
 
 		return Residuum;
 	}
@@ -3824,7 +3818,7 @@ namespace SingleDuct {
 	Real64
 	VAVVSHWNoFanResidual(
 		Real64 const HWMassFlow, // hot water mass flow rate [kg/s]
-		Optional< FArray1S< Real64 > const > Par // Par(1) = REAL(SysNum)
+		Array1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	)
 	{
 
@@ -3887,33 +3881,29 @@ namespace SingleDuct {
 		Real64 MaxSteamFlow;
 		Real64 MaxSteamCoilCapacity;
 
-		UnitIndex = int( Par()( 1 ) );
-		if ( Par()( 2 ) > 0.0 ) {
-			FirstHVACSoln = true;
-		} else {
-			FirstHVACSoln = false;
-		}
-		ZoneNodeIndex = int( Par()( 3 ) );
-		HCType = int( Par()( 4 ) );
-		AirMassFlow = Par()( 5 );
-		FanType = int( Par()( 6 ) );
-		FanOp = int( Par()( 7 ) );
+		UnitIndex = int( Par( 1 ) );
+		FirstHVACSoln = ( Par( 2 ) > 0.0 );
+		ZoneNodeIndex = int( Par( 3 ) );
+		HCType = int( Par( 4 ) );
+		AirMassFlow = Par( 5 );
+		FanType = int( Par( 6 ) );
+		FanOp = int( Par( 7 ) );
 		QSteamLoad = 0.0;
 		// vary the load to be met by the steam coil to converge on a steam flow rate to meet the load
 		if ( HCType == HCoilType_SteamAirHeating ) {
 			//   backwards way of varying steam flow rate. Steam coil calculates a flow rate to meet a load.
-			MinSteamFlow = Par()( 9 );
-			MaxSteamFlow = Par()( 10 );
-			MaxSteamCoilCapacity = Par()( 11 );
+			MinSteamFlow = Par( 9 );
+			MaxSteamFlow = Par( 10 );
+			MaxSteamCoilCapacity = Par( 11 );
 			if ( ( MaxSteamFlow - MinSteamFlow ) == 0.0 ) {
-				QSteamLoad = Par()( 8 ); // Use QTotLoad, bad starting value error for RegulaFalsi will occur
+				QSteamLoad = Par( 8 ); // Use QTotLoad, bad starting value error for RegulaFalsi will occur
 			} else {
 				QSteamLoad = MaxSteamCoilCapacity * HWMassFlow / ( MaxSteamFlow - MinSteamFlow );
 			}
 		}
 		CalcVAVVS( UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, HWMassFlow, QSteamLoad, FanType, AirMassFlow, FanOp, UnitOutput );
 
-		Residuum = ( Par()( 8 ) - UnitOutput ) / Par()( 8 );
+		Residuum = ( Par( 8 ) - UnitOutput ) / Par( 8 );
 
 		return Residuum;
 	}
@@ -3921,7 +3911,7 @@ namespace SingleDuct {
 	Real64
 	VAVVSHWFanOnResidual(
 		Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-		Optional< FArray1S< Real64 > const > Par // Par(1) = REAL(SysNum)
+		Array1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	)
 	{
 
@@ -3978,20 +3968,16 @@ namespace SingleDuct {
 		int FanOp; // fan operation; 0=off, 1=on.
 		Real64 UnitOutput; // heating output [W]
 
-		UnitIndex = int( Par()( 1 ) );
-		if ( Par()( 2 ) > 0.0 ) {
-			FirstHVACSoln = true;
-		} else {
-			FirstHVACSoln = false;
-		}
-		ZoneNodeIndex = int( Par()( 3 ) );
-		HCType = int( Par()( 4 ) );
-		HWMassFlow = Par()( 5 );
-		FanType = int( Par()( 6 ) );
-		FanOp = int( Par()( 7 ) );
-		CalcVAVVS( UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, HWMassFlow, Par()( 8 ), FanType, SupplyAirMassFlow, FanOp, UnitOutput );
+		UnitIndex = int( Par( 1 ) );
+		FirstHVACSoln = ( Par( 2 ) > 0.0 );
+		ZoneNodeIndex = int( Par( 3 ) );
+		HCType = int( Par( 4 ) );
+		HWMassFlow = Par( 5 );
+		FanType = int( Par( 6 ) );
+		FanOp = int( Par( 7 ) );
+		CalcVAVVS( UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, HWMassFlow, Par( 8 ), FanType, SupplyAirMassFlow, FanOp, UnitOutput );
 
-		Residuum = ( Par()( 8 ) - UnitOutput ) / Par()( 8 );
+		Residuum = ( Par( 8 ) - UnitOutput ) / Par( 8 );
 
 		return Residuum;
 	}
@@ -3999,7 +3985,7 @@ namespace SingleDuct {
 	Real64
 	VAVVSHCFanOnResidual(
 		Real64 const HeatingFrac, // fraction of maximum heating output
-		Optional< FArray1S< Real64 > const > Par // Par(1) = REAL(SysNum)
+		Array1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	)
 	{
 
@@ -4058,23 +4044,19 @@ namespace SingleDuct {
 		Real64 AirMassFlowRate; // [kg/s]
 		Real64 HeatOut; // heating coil output [W]
 
-		UnitIndex = int( Par()( 1 ) );
-		if ( Par()( 2 ) > 0.0 ) {
-			FirstHVACSoln = true;
-		} else {
-			FirstHVACSoln = false;
-		}
-		ZoneNodeIndex = int( Par()( 3 ) );
-		HCType = int( Par()( 4 ) );
-		MaxHeatOut = Par()( 5 );
-		FanType = int( Par()( 6 ) );
-		FanOp = int( Par()( 7 ) );
+		UnitIndex = int( Par( 1 ) );
+		FirstHVACSoln = ( Par( 2 ) > 0.0 );
+		ZoneNodeIndex = int( Par( 3 ) );
+		HCType = int( Par( 4 ) );
+		MaxHeatOut = Par( 5 );
+		FanType = int( Par( 6 ) );
+		FanOp = int( Par( 7 ) );
 		HeatOut = HeatingFrac * MaxHeatOut;
 		AirMassFlowRate = max( HeatingFrac * Sys( UnitIndex ).HeatAirMassFlowRateMax, SysInlet( UnitIndex ).AirMassFlowRateMaxAvail * Sys( UnitIndex ).ZoneMinAirFrac );
 
 		CalcVAVVS( UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, 0.0, HeatOut, FanType, AirMassFlowRate, FanOp, UnitOutput );
 
-		Residuum = ( Par()( 8 ) - UnitOutput ) / Par()( 8 );
+		Residuum = ( Par( 8 ) - UnitOutput ) / Par( 8 );
 
 		return Residuum;
 	}
@@ -4161,7 +4143,7 @@ namespace SingleDuct {
 	// *****************************************************************************
 
 	void
-	ReportSys( int const SysNum ) // unused1208
+	ReportSys( int const EP_UNUSED( SysNum ) ) // unused1208
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4358,7 +4340,6 @@ namespace SingleDuct {
 		using InputProcessor::FindItemInList;
 		using NodeInputManager::GetOnlySingleNode;
 		using DataZoneEquipment::ZoneEquipConfig;
-		using DataZoneEquipment::ZoneEquipList;
 		using DataZoneEquipment::EquipmentData;
 		using DataZoneEquipment::SubEquipmentData;
 		using namespace DataLoopNode;
@@ -4366,9 +4347,6 @@ namespace SingleDuct {
 		using BranchNodeConnections::TestCompSet;
 		using BranchNodeConnections::SetUpCompSets;
 		using DataGlobals::NumOfZones;
-		//  USE DataDefineEquip,   ONLY: AirDistUnit, NumAirDistUnits
-		//  USE PackagedTerminalHeatPump, ONLY: GetPTUnitZoneInletAirNode, GetPTUnitIndex, GetPTUnitInletAirNode
-		//  USE FanCoilUnits, ONLY: GetFanCoilIndex, GetFanCoilZoneInletAirNode, GetFanCoilInletAirNode
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -4395,8 +4373,6 @@ namespace SingleDuct {
 		int NodeNum; // Index to node number
 		int CtrlZone; // Index to control zone
 		bool ZoneNodeNotFound; // Flag for error checking
-		bool ZoneEquipNodeNotFound; // Flag for error checking
-		int ADUNum; // Air distribution unit index
 		int SupAirIn; // Supply air inlet node index
 		bool errFlag; // error flag from component validation
 
@@ -4449,7 +4425,7 @@ namespace SingleDuct {
 
 			// Air Terminal inlet node must be the same as a zone exhaust node
 			ZoneNodeNotFound = true;
-			ControlledZoneLoop: for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+			for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
 				if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
 				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumExhaustNodes; ++NodeNum ) {
 					if ( SysATMixer( InletATMixerNum ).SecInNode == ZoneEquipConfig( CtrlZone ).ExhaustNode( NodeNum ) ) {
@@ -4465,7 +4441,6 @@ namespace SingleDuct {
 						goto ControlledZoneLoop_exit;
 					}
 				}
-				ControlledZoneLoop_loop: ;
 			}
 			ControlledZoneLoop_exit: ;
 			if ( ZoneNodeNotFound ) {
@@ -4524,7 +4499,7 @@ namespace SingleDuct {
 
 			// Air Terminal outlet node must be the same as a zone inlet node
 			ZoneNodeNotFound = true;
-			ControlZoneLoop: for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+			for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
 				if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
 				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
 					if ( SysATMixer( SupplyATMixerNum ).MixedAirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
@@ -4540,7 +4515,6 @@ namespace SingleDuct {
 						goto ControlZoneLoop_exit;
 					}
 				}
-				ControlZoneLoop_loop: ;
 			}
 			ControlZoneLoop_exit: ;
 			if ( ZoneNodeNotFound ) {
@@ -4647,19 +4621,16 @@ namespace SingleDuct {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		static Real64 PriMassFlowRate( 0.0 );
-		static Real64 PriPressure( 0.0 );
 		static Real64 PriEnthalpy( 0.0 );
 		static Real64 PriHumRat( 0.0 );
 		static Real64 PriTemp( 0.0 );
 
 		static Real64 SecAirMassFlowRate( 0.0 );
-		static Real64 SecAirPressure( 0.0 );
 		static Real64 SecAirEnthalpy( 0.0 );
 		static Real64 SecAirHumRat( 0.0 );
 		static Real64 SecAirTemp( 0.0 );
 
 		static Real64 MixedAirMassFlowRate( 0.0 );
-		static Real64 MixedAirPressure( 0.0 );
 		static Real64 MixedAirEnthalpy( 0.0 );
 		static Real64 MixedAirHumRat( 0.0 );
 		static Real64 MixedAirTemp( 0.0 );
@@ -4966,7 +4937,6 @@ namespace SingleDuct {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ATMixerIndex; // local air terminal mixer index
 
-		bool ErrorsFound; // for error trapping
 
 		if ( GetATMixerFlag ) {
 			// CALL GetZoneAirLoopEquipment
@@ -5061,7 +5031,7 @@ namespace SingleDuct {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

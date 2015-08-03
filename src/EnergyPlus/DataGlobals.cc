@@ -1,13 +1,11 @@
 // C++ Headers
 #include <ostream>
-#include <string>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/numeric.hh>
 
 // EnergyPlus Headers
 #include <DataGlobals.hh>
-#include <DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -36,7 +34,6 @@ namespace DataGlobals {
 	// na
 
 	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -56,6 +53,8 @@ namespace DataGlobals {
 	int const ksDesignDay( 1 );
 	int const ksRunPeriodDesign( 2 );
 	int const ksRunPeriodWeather( 3 );
+	int const ksHVACSizeDesignDay ( 4 );  // a regular design day run during HVAC Sizing Simulation
+	int const ksHVACSizeRunPeriodDesign( 5 ); // a weather period design day run during HVAC Sizing Simulation
 
 	int const ZoneTSReporting( 1 ); // value for Zone Time Step Reporting (UpdateDataAndReport)
 	int const HVACTSReporting( 2 ); // value for HVAC Time Step Reporting (UpdateDataAndReport)
@@ -153,10 +152,13 @@ namespace DataGlobals {
 	bool DoPlantSizing( false ); // User input in SimulationControl object
 	bool DoDesDaySim( false ); // User input in SimulationControl object
 	bool DoWeathSim( false ); // User input in SimulationControl object
+	bool DoHVACSizingSimulation( false ); // User input in SimulationControl object
+	int HVACSizingSimMaxIterations( 0 ); // User input in SimulationControl object
 	bool WeathSimReq( false ); // Input has a RunPeriod request
 	int KindOfSim( 0 ); // See parameters. (ksDesignDay, ksRunPeriodDesign, ksRunPeriodWeather)
 	bool DoOutputReporting( false ); // TRUE if variables to be written out
 	bool DoingSizing( false ); // TRUE when "sizing" is being performed (some error messages won't be displayed)
+	bool DoingHVACSizingSimulations( false ); // true when HVAC Sizing Simulations are being performed.
 	bool DoingInputProcessing( false ); // TRUE when "IP" is being performed (some error messages are cached)
 	bool DisplayAllWarnings( false ); // True when selection for  "DisplayAllWarnings" is entered (turns on other warning flags)
 	bool DisplayExtraWarnings( false ); // True when selection for  "DisplayExtraWarnings" is entered
@@ -168,10 +170,13 @@ namespace DataGlobals {
 	bool CreateMinimalSurfaceVariables( false ); // True when selection for  "CreateMinimalSurfaceVariables" is entered
 	Real64 CurrentTime( 0.0 ); // CurrentTime, in fractional hours, from start of day. Uses Loads time step.
 	int SimTimeSteps( 0 ); // Number of (Loads) timesteps since beginning of run period (environment).
-	int MinutesPerTimeStep; // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
+	int MinutesPerTimeStep( 0 ); // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
+	Real64 TimeStepZoneSec( 0.0 ); // Seconds per time step
 	bool MetersHaveBeenInitialized( false );
 	bool KickOffSimulation( false ); // Kick off simulation -- meaning run each environment for 1 or 2 time steps.
 	bool KickOffSizing( false ); // Kick off sizing -- meaning run each environment for 1 or 2 time steps.
+	bool RedoSizesHVACSimulation( false ); // doing kick off simulation for redoing sizes as part of sizing
+	bool FinalSizingHVACSizingSimIteration( false ); //when doing HVAC sizing Simulation
 	bool AnyEnergyManagementSystemInModel( false ); // true if there is any EMS or Erl in model.  otherwise false
 	bool AnyPlantInModel( false ); // true if there are any plant or condenser loops in model, otherwise false
 	int CacheIPErrorFile( 0 ); // Cache IP errors until IDF processing done.
@@ -189,8 +194,96 @@ namespace DataGlobals {
 	void ( *fProgressPtr )( int const );
 	void ( *fMessagePtr )( std::string const & );
 
+	// Clears the global data in DataGlobals.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		runReadVars = false;
+		DDOnlySimulation = false;
+		AnnualSimulation = false;
+		BeginDayFlag = false;
+		BeginEnvrnFlag = false;
+		BeginHourFlag = false;
+		BeginSimFlag = false;
+		BeginFullSimFlag = false;
+		BeginTimeStepFlag = false;
+		DayOfSim = 0;
+		DayOfSimChr = "0";
+		EndEnvrnFlag = false;
+		EndDesignDayEnvrnsFlag = false;
+		EndDayFlag = false;
+		EndHourFlag = false;
+		PreviousHour = 0;
+		HourOfDay = 0;
+		WeightPreviousHour = 0.0;
+		WeightNow = 0.0;
+		NumOfDayInEnvrn = 0;
+		NumOfTimeStepInHour = 0;
+		NumOfZones = 0;
+		TimeStep = 0;
+		TimeStepZone = 0.0;
+		WarmupFlag = false;
+		OutputFileStandard = 0;
+		StdOutputRecordCount = 0;
+		OutputFileInits = 0;
+		OutputFileDebug = 0;
+		OutputFileZoneSizing = 0;
+		OutputFileSysSizing = 0;
+		OutputFileMeters = 0;
+		StdMeterRecordCount = 0;
+		OutputFileBNDetails = 0;
+		ZoneSizingCalc = false;
+		SysSizingCalc = false;
+		DoZoneSizing = false;
+		DoSystemSizing = false;
+		DoPlantSizing = false;
+		DoDesDaySim = false;
+		DoWeathSim = false;
+		DoHVACSizingSimulation = false;
+		HVACSizingSimMaxIterations = 0;
+		WeathSimReq = false;
+		KindOfSim = 0;
+		DoOutputReporting = false;
+		DoingSizing = false;
+		DoingHVACSizingSimulations = false;
+		DoingInputProcessing = false;
+		DisplayAllWarnings = false;
+		DisplayExtraWarnings = false;
+		DisplayUnusedObjects = false;
+		DisplayUnusedSchedules = false;
+		DisplayAdvancedReportVariables = false;
+		DisplayZoneAirHeatBalanceOffBalance = false;
+		DisplayInputInAudit = false;
+		CreateMinimalSurfaceVariables = false;
+		CurrentTime = 0.0;
+		SimTimeSteps = 0;
+		MinutesPerTimeStep = 0;
+		TimeStepZoneSec = 0.0;
+		MetersHaveBeenInitialized = false;
+		KickOffSimulation = false;
+		KickOffSizing = false;
+		RedoSizesHVACSimulation = false;
+		FinalSizingHVACSizingSimIteration = false;
+		AnyEnergyManagementSystemInModel = false;
+		AnyPlantInModel = false;
+		CacheIPErrorFile = 0;
+		AnyIdealCondEntSetPointInModel = false;
+		RunOptCondEntTemp = false;
+		CompLoadReportIsReq = false;
+		isPulseZoneSizing = false;
+		OutputFileZonePulse = 0;
+		doLoadComponentPulseNow = false;
+		ShowDecayCurvesInEIO = false;
+		AnySlabsInModel = false;
+		AnyBasementsInModel = false;
+		Progress = 0;
+		eso_stream = nullptr;
+		mtr_stream = nullptr;
+	}
+
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

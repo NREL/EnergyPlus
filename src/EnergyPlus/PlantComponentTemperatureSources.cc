@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -71,7 +71,7 @@ namespace PlantComponentTemperatureSources {
 	//MODULE ROUTINES
 
 	// Object Data
-	FArray1D< WaterSourceSpecs > WaterSource; // dimension to number of machines
+	Array1D< WaterSourceSpecs > WaterSource; // dimension to number of machines
 
 	// Functions
 
@@ -151,9 +151,7 @@ namespace PlantComponentTemperatureSources {
 		}
 
 		if ( InitLoopEquip ) {
-			WaterSource( SourceNum ).IsThisSized = false;
 			InitWaterSource( SourceNum, RunFlag, MyLoad, FirstHVACIteration );
-			WaterSource( SourceNum ).IsThisSized = true;
 			SizeWaterSource( SourceNum );
 			if ( GetSizingFactor ) {
 				SizingFactor = WaterSource( SourceNum ).SizFac;
@@ -203,6 +201,7 @@ namespace PlantComponentTemperatureSources {
 		using NodeInputManager::GetOnlySingleNode;
 		using ScheduleManager::GetScheduleIndex;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
+		using DataSizing::AutoSize;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -254,6 +253,9 @@ namespace PlantComponentTemperatureSources {
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Chilled Water Nodes" );
 
 			WaterSource( SourceNum ).DesVolFlowRate = rNumericArgs( 1 );
+			if ( WaterSource( SourceNum ).DesVolFlowRate == AutoSize ) {
+				WaterSource( SourceNum ).DesVolFlowRateWasAutoSized = true;
+			}
 
 			if ( cAlphaArgs( 4 ) == "CONSTANT" ) {
 				WaterSource( SourceNum ).TempSpecType = TempSpecType_Constant;
@@ -296,9 +298,9 @@ namespace PlantComponentTemperatureSources {
 	void
 	InitWaterSource(
 		int const SourceNum, // number of the current component being simulated
-		bool const RunFlag, // TRUE when component operating
+		bool const EP_UNUSED( RunFlag ), // TRUE when component operating
 		Real64 const MyLoad,
-		bool const FirstHVACIteration // initialize variables when TRUE
+		bool const EP_UNUSED( FirstHVACIteration ) // initialize variables when TRUE
 	)
 	{
 
@@ -319,11 +321,9 @@ namespace PlantComponentTemperatureSources {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::WarmupFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantSizeNotComplete;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
 		using FluidProperties::GetDensityGlycol;
@@ -361,8 +361,8 @@ namespace PlantComponentTemperatureSources {
 		}
 
 		//Initialize critical Demand Side Variables at the beginning of each environment
-		if ( WaterSource( SourceNum ).MyEnvironFlag && BeginEnvrnFlag && ( PlantSizesOkayToFinalize ) ) {
-			if ( PlantSizeNotComplete ) SizeWaterSource( SourceNum );
+		if ( WaterSource( SourceNum ).MyEnvironFlag && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
+
 			rho = GetDensityGlycol( PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidName, InitConvTemp, PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidIndex, RoutineName );
 			WaterSource( SourceNum ).MassFlowRateMax = WaterSource( SourceNum ).DesVolFlowRate * rho;
 			InitComponentNodes( 0.0, WaterSource( SourceNum ).MassFlowRateMax, WaterSource( SourceNum ).InletNodeNum, WaterSource( SourceNum ).OutletNodeNum, WaterSource( SourceNum ).Location.LoopNum, WaterSource( SourceNum ).Location.LoopSideNum, WaterSource( SourceNum ).Location.BranchNum, WaterSource( SourceNum ).Location.CompNum );
@@ -449,7 +449,9 @@ namespace PlantComponentTemperatureSources {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToReport;
+		using DataPlant::PlantFinalSizesOkayToReport;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
@@ -472,40 +474,40 @@ namespace PlantComponentTemperatureSources {
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		bool ErrorsFound; // If errors detected in input
 		Real64 tmpVolFlowRate; // local design volume flow rate
-		bool IsAutoSize; // Indicator to autosize for reporting
 		Real64 DesVolFlowRateUser; // Hardsized design volume flow rate for reporting
 
 		PltSizNum = 0;
 		ErrorsFound = false;
 		tmpVolFlowRate = WaterSource( SourceNum ).DesVolFlowRate;
-		IsAutoSize = false;
 		DesVolFlowRateUser = 0.0;
 
 		PltSizNum = PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).PlantSizNum;
 
-		if ( WaterSource( SourceNum ).DesVolFlowRate == AutoSize ) {
-			IsAutoSize = true;
-		}
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate; //* WaterSource(SourceNum)%SizFac
-				if ( ! IsAutoSize ) tmpVolFlowRate = WaterSource( SourceNum ).DesVolFlowRate;
-				//IF (PlantSizesOkayToFinalize) WaterSource(SourceNum)%DesVolFlowRate = tmpVolFlowRate
+				if ( ! WaterSource( SourceNum ).DesVolFlowRateWasAutoSized ) tmpVolFlowRate = WaterSource( SourceNum ).DesVolFlowRate;
 			} else {
-				if ( IsAutoSize ) tmpVolFlowRate = 0.0;
-				//IF (PlantSizesOkayToFinalize)  WaterSource(SourceNum)%DesVolFlowRate = tmpVolFlowRate
+				if ( WaterSource( SourceNum ).DesVolFlowRateWasAutoSized ) tmpVolFlowRate = 0.0;
 			}
-			if ( PlantSizesOkayToFinalize ) {
-				if ( IsAutoSize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( WaterSource( SourceNum ).DesVolFlowRateWasAutoSized ) {
 					WaterSource( SourceNum ).DesVolFlowRate = tmpVolFlowRate;
-					if ( ! WaterSource( SourceNum ).IsThisSized ) {
-						ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name, "Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name,
+							"Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name,
+							"Initial Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate );
 					}
 				} else {
 					if ( WaterSource( SourceNum ).DesVolFlowRate > 0.0 && tmpVolFlowRate > 0.0 ) {
 						DesVolFlowRateUser = WaterSource( SourceNum ).DesVolFlowRate;
-						if ( ! WaterSource( SourceNum ).IsThisSized ) {
-							ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name, "Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate, "User-Specified Design Fluid Flow Rate [m3/s]", DesVolFlowRateUser );
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name,
+							"Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate,
+							"User-Specified Design Fluid Flow Rate [m3/s]", DesVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpVolFlowRate - DesVolFlowRateUser ) / DesVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " + WaterSource( SourceNum ).Name );
@@ -521,20 +523,20 @@ namespace PlantComponentTemperatureSources {
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
+			if ( WaterSource( SourceNum ).DesVolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				ShowSevereError( "Autosizing of plant component temperature source flow rate requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in PlantComponent:TemperatureSource object=" + WaterSource( SourceNum ).Name );
 				ErrorsFound = true;
-			} else {
-				if ( ! WaterSource( SourceNum ).IsThisSized ) {
-					if ( WaterSource( SourceNum ).DesVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name, "User-Specified Design Fluid Flow Rate [m3/s]", WaterSource( SourceNum ).DesVolFlowRate );
-					}
+			}
+			if ( ! WaterSource( SourceNum ).DesVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport ) {
+				if ( WaterSource( SourceNum ).DesVolFlowRate > 0.0 ) {
+					ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name,
+						"User-Specified Design Fluid Flow Rate [m3/s]", WaterSource( SourceNum ).DesVolFlowRate );
 				}
 			}
 		}
 
-		RegisterPlantCompDesignFlow( WaterSource( SourceNum ).InletNodeNum, WaterSource( SourceNum ).DesVolFlowRate );
+		RegisterPlantCompDesignFlow( WaterSource( SourceNum ).InletNodeNum, tmpVolFlowRate );
 
 		if ( ErrorsFound ) {
 			ShowFatalError( "Preceding sizing errors cause program termination" );
@@ -579,10 +581,6 @@ namespace PlantComponentTemperatureSources {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int InletNode;
-		int OutletNode;
-		int LoopNum;
-		int LoopSideNum;
 		Real64 Cp;
 		Real64 rDummy;
 		int iDummy;

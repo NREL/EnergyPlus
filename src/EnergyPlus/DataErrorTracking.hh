@@ -2,7 +2,7 @@
 #define DataErrorTracking_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -17,8 +17,8 @@ namespace DataErrorTracking {
 
 	// MODULE PARAMETER DEFINITIONS:
 	extern int const SearchCounts;
-	extern FArray1D_string const MessageSearch;
-	extern FArray1D_string const Summaries;
+	extern Array1D_string const MessageSearch;
+	extern Array1D_string const Summaries;
 	// in below -- simple line end <CR>.  End of Whole message <CRE>
 	extern std::string const MoreDetails_1; // InterZone Surface Areas -- mismatch
 	extern std::string const MoreDetails_2; // Interzone surfaces - different zones
@@ -39,7 +39,7 @@ namespace DataErrorTracking {
 	extern std::string const MoreDetails_18; // Nominally unused constructions
 	extern std::string const MoreDetails_19; // InfraredTransparent constructions in non-interzone surfaces
 	extern std::string const MoreDetails_20; // No reporting elements requested
-	extern FArray1D_string const MoreDetails; // Details 16 applies to both temperature out of bounds | errors.
+	extern Array1D_string const MoreDetails; // Details 16 applies to both temperature out of bounds | errors.
 
 	extern int const MaxRecurringErrorMsgLength; // Maximum error message length for recurring error messages
 
@@ -49,7 +49,7 @@ namespace DataErrorTracking {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern FArray1D_int MatchCounts;
+	extern Array1D_int MatchCounts;
 	extern bool AbortProcessing; // Flag used to if currently in "abort processing"
 	extern int NumRecurringErrors; // Number of stored recurring error messages
 	extern int TotalSevereErrors; // Counter
@@ -137,7 +137,7 @@ namespace DataErrorTracking {
 	};
 
 	// Object Data
-	extern FArray1D< RecurringErrorData > RecurringErrors;
+	extern Array1D< RecurringErrorData > RecurringErrors;
 
 } // DataErrorTracking
 

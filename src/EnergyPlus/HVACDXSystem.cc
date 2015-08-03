@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -100,7 +100,7 @@ namespace HVACDXSystem {
 	bool EconomizerFlag( false ); // holds air loop economizer status
 
 	// Make this type allocatable
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -110,7 +110,7 @@ namespace HVACDXSystem {
 	// Update routine to check convergence and update nodes
 
 	// Object Data
-	FArray1D< DXCoolingConditions > DXCoolingSystem;
+	Array1D< DXCoolingConditions > DXCoolingSystem;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -305,7 +305,6 @@ namespace HVACDXSystem {
 		// Using/Aliasing
 		using namespace InputProcessor;
 		using NodeInputManager::GetOnlySingleNode;
-		using DataHeatBalance::Zone;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
@@ -345,12 +344,12 @@ namespace HVACDXSystem {
 		bool DXErrorsFound; // flag returned on DX coil name check
 		std::string HXDXCoolCoilName; // Name of DX cooling coil used with Heat Exchanger Assisted Cooling Coil
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		//  certain object in the input file
 
@@ -858,7 +857,7 @@ namespace HVACDXSystem {
 		Real64 OutletHumRatHS; // Actual outlet humrat of the variable speed DX cooling coil at high speed
 		Real64 OutletHumRatDXCoil; // Actual outlet humidity ratio of the DX cooling coil
 		int SolFla; // Flag of solver
-		FArray1D< Real64 > Par( 5 ); // Parameter array passed to solver
+		Array1D< Real64 > Par( 5 ); // Parameter array passed to solver
 		bool SensibleLoad; // True if there is a sensible cooling load on this system
 		bool LatentLoad; // True if there is a latent   cooling load on this system
 		int DehumidMode; // Dehumidification mode (0=normal, 1=enhanced)
@@ -2079,7 +2078,7 @@ namespace HVACDXSystem {
 	Real64
 	DXCoilVarSpeedResidual(
 		Real64 const SpeedRatio, // compressor speed ratio (1.0 is max, 0.0 is min)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2124,10 +2123,10 @@ namespace HVACDXSystem {
 		int CoilIndex; // index of this coil
 		Real64 OutletAirTemp; // outlet air temperature [C]
 
-		CoilIndex = int( Par()( 1 ) );
+		CoilIndex = int( Par( 1 ) );
 		CalcMultiSpeedDXCoil( CoilIndex, SpeedRatio, 1.0 );
 		OutletAirTemp = DXCoilOutletTemp( CoilIndex );
-		Residuum = Par()( 2 ) - OutletAirTemp;
+		Residuum = Par( 2 ) - OutletAirTemp;
 
 		return Residuum;
 	}
@@ -2135,7 +2134,7 @@ namespace HVACDXSystem {
 	Real64
 	DXCoilVarSpeedHumRatResidual(
 		Real64 const SpeedRatio, // compressor speed ratio (1.0 is max, 0.0 is min)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2180,10 +2179,10 @@ namespace HVACDXSystem {
 		int CoilIndex; // index of this coil
 		Real64 OutletAirHumRat; // outlet air humidity ratio [kg/kg]
 
-		CoilIndex = int( Par()( 1 ) );
+		CoilIndex = int( Par( 1 ) );
 		CalcMultiSpeedDXCoil( CoilIndex, SpeedRatio, 1.0 );
 		OutletAirHumRat = DXCoilOutletHumRat( CoilIndex );
-		Residuum = Par()( 2 ) - OutletAirHumRat;
+		Residuum = Par( 2 ) - OutletAirHumRat;
 
 		return Residuum;
 	}
@@ -2191,7 +2190,7 @@ namespace HVACDXSystem {
 	Real64
 	DXCoilCyclingResidual(
 		Real64 const CycRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2236,10 +2235,10 @@ namespace HVACDXSystem {
 		int CoilIndex; // index of this coil
 		Real64 OutletAirTemp; // outlet air temperature [C]
 
-		CoilIndex = int( Par()( 1 ) );
+		CoilIndex = int( Par( 1 ) );
 		CalcMultiSpeedDXCoil( CoilIndex, 0.0, CycRatio );
 		OutletAirTemp = DXCoilOutletTemp( CoilIndex );
-		Residuum = Par()( 2 ) - OutletAirTemp;
+		Residuum = Par( 2 ) - OutletAirTemp;
 
 		return Residuum;
 	}
@@ -2247,7 +2246,7 @@ namespace HVACDXSystem {
 	Real64
 	DXCoilCyclingHumRatResidual(
 		Real64 const CycRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2292,10 +2291,10 @@ namespace HVACDXSystem {
 		int CoilIndex; // index of this coil
 		Real64 OutletAirHumRat; // outlet air humidity ratio [kg/kg]
 
-		CoilIndex = int( Par()( 1 ) );
+		CoilIndex = int( Par( 1 ) );
 		CalcMultiSpeedDXCoil( CoilIndex, 0.0, CycRatio );
 		OutletAirHumRat = DXCoilOutletHumRat( CoilIndex );
-		Residuum = Par()( 2 ) - OutletAirHumRat;
+		Residuum = Par( 2 ) - OutletAirHumRat;
 
 		return Residuum;
 	}
@@ -2303,7 +2302,7 @@ namespace HVACDXSystem {
 	Real64
 	DOE2DXCoilResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2350,11 +2349,11 @@ namespace HVACDXSystem {
 		Real64 OutletAirTemp; // outlet air temperature [C]
 		int FanOpMode; // Supply air fan operating mode
 
-		CoilIndex = int( Par()( 1 ) );
-		FanOpMode = int( Par()( 5 ) );
+		CoilIndex = int( Par( 1 ) );
+		FanOpMode = int( Par( 5 ) );
 		CalcDoe2DXCoil( CoilIndex, On, true, PartLoadRatio, FanOpMode );
 		OutletAirTemp = DXCoilOutletTemp( CoilIndex );
-		Residuum = Par()( 2 ) - OutletAirTemp;
+		Residuum = Par( 2 ) - OutletAirTemp;
 
 		return Residuum;
 	}
@@ -2362,7 +2361,7 @@ namespace HVACDXSystem {
 	Real64
 	DOE2DXCoilHumRatResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2409,11 +2408,11 @@ namespace HVACDXSystem {
 		Real64 OutletAirHumRat; // outlet air humidity ratio [kg/kg]
 		int FanOpMode; // Supply air fan operating mode
 
-		CoilIndex = int( Par()( 1 ) );
-		FanOpMode = int( Par()( 5 ) );
+		CoilIndex = int( Par( 1 ) );
+		FanOpMode = int( Par( 5 ) );
 		CalcDoe2DXCoil( CoilIndex, On, true, PartLoadRatio, FanOpMode );
 		OutletAirHumRat = DXCoilOutletHumRat( CoilIndex );
-		Residuum = Par()( 2 ) - OutletAirHumRat;
+		Residuum = Par( 2 ) - OutletAirHumRat;
 
 		return Residuum;
 	}
@@ -2421,7 +2420,7 @@ namespace HVACDXSystem {
 	Real64
 	MultiModeDXCoilResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2471,12 +2470,12 @@ namespace HVACDXSystem {
 		int DehumidMode; // dehumidification mode (par3)
 		int FanOpMode; // supply air fan operating mode
 
-		CoilIndex = int( Par()( 1 ) );
-		DehumidMode = int( Par()( 3 ) );
-		FanOpMode = int( Par()( 4 ) );
+		CoilIndex = int( Par( 1 ) );
+		DehumidMode = int( Par( 3 ) );
+		FanOpMode = int( Par( 4 ) );
 		SimDXCoilMultiMode( "", On, false, PartLoadRatio, DehumidMode, CoilIndex, FanOpMode );
 		OutletAirTemp = DXCoilOutletTemp( CoilIndex );
-		Residuum = Par()( 2 ) - OutletAirTemp;
+		Residuum = Par( 2 ) - OutletAirTemp;
 
 		return Residuum;
 	}
@@ -2484,7 +2483,7 @@ namespace HVACDXSystem {
 	Real64
 	MultiModeDXCoilHumRatResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2533,12 +2532,12 @@ namespace HVACDXSystem {
 		int DehumidMode; // dehumidification mode (par3)
 		int FanOpMode; // supply air fan operating mode
 
-		CoilIndex = int( Par()( 1 ) );
-		DehumidMode = int( Par()( 3 ) );
-		FanOpMode = int( Par()( 4 ) );
+		CoilIndex = int( Par( 1 ) );
+		DehumidMode = int( Par( 3 ) );
+		FanOpMode = int( Par( 4 ) );
 		SimDXCoilMultiMode( "", On, false, PartLoadRatio, DehumidMode, CoilIndex, FanOpMode );
 		OutletAirHumRat = DXCoilOutletHumRat( CoilIndex );
-		Residuum = Par()( 2 ) - OutletAirHumRat;
+		Residuum = Par( 2 ) - OutletAirHumRat;
 
 		return Residuum;
 	}
@@ -2546,7 +2545,7 @@ namespace HVACDXSystem {
 	Real64
 	HXAssistedCoolCoilTempResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2597,22 +2596,14 @@ namespace HVACDXSystem {
 		bool HXUnitOn; // flag to enable heat exchanger heat recovery
 		int FanOpMode; // Supply air fan operating mode
 
-		CoilIndex = int( Par()( 1 ) );
+		CoilIndex = int( Par( 1 ) );
 		// FirstHVACIteration is a logical, Par is REAL(r64), so make 1=TRUE and 0=FALSE
-		if ( Par()( 3 ) == 1.0 ) {
-			FirstHVACIteration = true;
-		} else {
-			FirstHVACIteration = false;
-		}
-		if ( Par()( 4 ) == 1.0 ) {
-			HXUnitOn = true;
-		} else {
-			HXUnitOn = false;
-		}
-		FanOpMode = int( Par()( 5 ) );
+		FirstHVACIteration = ( Par( 3 ) == 1.0 );
+		HXUnitOn = ( Par( 4 ) == 1.0 );
+		FanOpMode = int( Par( 5 ) );
 		CalcHXAssistedCoolingCoil( CoilIndex, FirstHVACIteration, On, PartLoadRatio, HXUnitOn, FanOpMode );
 		OutletAirTemp = HXAssistedCoilOutletTemp( CoilIndex );
-		Residuum = Par()( 2 ) - OutletAirTemp;
+		Residuum = Par( 2 ) - OutletAirTemp;
 		return Residuum;
 
 	}
@@ -2620,7 +2611,7 @@ namespace HVACDXSystem {
 	Real64
 	HXAssistedCoolCoilHRResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2671,22 +2662,14 @@ namespace HVACDXSystem {
 		bool HXUnitOn; // flag to enable heat exchanger heat recovery
 		int FanOpMode; // Supply air fan operating mode
 
-		CoilIndex = int( Par()( 1 ) );
+		CoilIndex = int( Par( 1 ) );
 		// FirstHVACIteration is a logical, Par is REAL(r64), so make 1=TRUE and 0=FALSE
-		if ( Par()( 3 ) == 1.0 ) {
-			FirstHVACIteration = true;
-		} else {
-			FirstHVACIteration = false;
-		}
-		if ( Par()( 4 ) == 1.0 ) {
-			HXUnitOn = true;
-		} else {
-			HXUnitOn = false;
-		}
-		FanOpMode = int( Par()( 5 ) );
+		FirstHVACIteration = ( Par( 3 ) == 1.0 );
+		HXUnitOn = ( Par( 4 ) == 1.0 );
+		FanOpMode = int( Par( 5 ) );
 		CalcHXAssistedCoolingCoil( CoilIndex, FirstHVACIteration, On, PartLoadRatio, HXUnitOn, FanOpMode, _, EconomizerFlag );
 		OutletAirHumRat = HXAssistedCoilOutletHumRat( CoilIndex );
-		Residuum = Par()( 2 ) - OutletAirHumRat;
+		Residuum = Par( 2 ) - OutletAirHumRat;
 		return Residuum;
 
 	}
@@ -2694,7 +2677,7 @@ namespace HVACDXSystem {
 	Real64
 	TESCoilResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2748,10 +2731,10 @@ namespace HVACDXSystem {
 		int TESOpMode;
 		int OutletNodeNum;
 
-		CoilIndex = int( Par()( 1 ) );
-		FanOpMode = int( Par()( 5 ) );
-		OutletNodeNum = int( Par()( 4 ) );
-		TESOpMode = int( Par()( 3 ) );
+		CoilIndex = int( Par( 1 ) );
+		FanOpMode = int( Par( 5 ) );
+		OutletNodeNum = int( Par( 4 ) );
+		TESOpMode = int( Par( 3 ) );
 
 		{ auto const SELECT_CASE_var( TESOpMode );
 		if ( SELECT_CASE_var == CoolingOnlyMode ) {
@@ -2765,7 +2748,7 @@ namespace HVACDXSystem {
 		}}
 
 		OutletAirTemp = Node( OutletNodeNum ).Temp;
-		Residuum = Par()( 2 ) - OutletAirTemp;
+		Residuum = Par( 2 ) - OutletAirTemp;
 
 		return Residuum;
 	}
@@ -2773,7 +2756,7 @@ namespace HVACDXSystem {
 	Real64
 	TESCoilHumRatResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2827,10 +2810,10 @@ namespace HVACDXSystem {
 		int TESOpMode;
 		int OutletNodeNum;
 
-		CoilIndex = int( Par()( 1 ) );
-		FanOpMode = int( Par()( 5 ) );
-		OutletNodeNum = int( Par()( 4 ) );
-		TESOpMode = int( Par()( 3 ) );
+		CoilIndex = int( Par( 1 ) );
+		FanOpMode = int( Par( 5 ) );
+		OutletNodeNum = int( Par( 4 ) );
+		TESOpMode = int( Par( 3 ) );
 
 		{ auto const SELECT_CASE_var( TESOpMode );
 		if ( SELECT_CASE_var == CoolingOnlyMode ) {
@@ -2844,7 +2827,7 @@ namespace HVACDXSystem {
 		}}
 
 		OutletAirHumRat = Node( OutletNodeNum ).HumRat;
-		Residuum = Par()( 2 ) - OutletAirHumRat;
+		Residuum = Par( 2 ) - OutletAirHumRat;
 
 		return Residuum;
 	}
@@ -2962,7 +2945,7 @@ namespace HVACDXSystem {
 		int & CoolCoilType,
 		int & CoolCoilIndex,
 		std::string & CoolCoilName,
-		bool & ErrFound
+		bool & EP_UNUSED( ErrFound )
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -3017,7 +3000,7 @@ namespace HVACDXSystem {
 	Real64
 	VSCoilCyclingResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -3061,13 +3044,13 @@ namespace HVACDXSystem {
 		static Real64 OnOffAirFlowRatio( 1.0 ); // ratio of compressor on flow to average flow over time step
 		static Real64 SpeedRatio( 0.0 ); // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 
-		CoilIndex = int( Par()( 1 ) );
-		FanOpMode = int( Par()( 5 ) );
+		CoilIndex = int( Par( 1 ) );
+		FanOpMode = int( Par( 5 ) );
 
 		SimVariableSpeedCoils( "", CoilIndex, FanOpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, PartLoadRatio, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
 
 		OutletAirTemp = VarSpeedCoil( CoilIndex ).OutletAirDBTemp;
-		Residuum = Par()( 2 ) - OutletAirTemp;
+		Residuum = Par( 2 ) - OutletAirTemp;
 
 		return Residuum;
 
@@ -3078,7 +3061,7 @@ namespace HVACDXSystem {
 	Real64
 	VSCoilSpeedResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -3130,14 +3113,14 @@ namespace HVACDXSystem {
 		static Real64 OnOffAirFlowRatio( 1.0 ); // ratio of compressor on flow to average flow over time step
 		static Real64 PartLoadRatio( 1.0 ); // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 
-		CoilIndex = int( Par()( 1 ) );
-		FanOpMode = int( Par()( 5 ) );
-		SpeedNum = int( Par()( 3 ) );
+		CoilIndex = int( Par( 1 ) );
+		FanOpMode = int( Par( 5 ) );
+		SpeedNum = int( Par( 3 ) );
 
 		SimVariableSpeedCoils( "", CoilIndex, FanOpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, PartLoadRatio, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
 
 		OutletAirTemp = VarSpeedCoil( CoilIndex ).OutletAirDBTemp;
-		Residuum = Par()( 2 ) - OutletAirTemp;
+		Residuum = Par( 2 ) - OutletAirTemp;
 
 		return Residuum;
 
@@ -3146,7 +3129,7 @@ namespace HVACDXSystem {
 	Real64
 	VSCoilCyclingHumResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -3198,13 +3181,13 @@ namespace HVACDXSystem {
 		static Real64 OnOffAirFlowRatio( 1.0 ); // ratio of compressor on flow to average flow over time step
 		static Real64 SpeedRatio( 0.0 ); // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 
-		CoilIndex = int( Par()( 1 ) );
-		FanOpMode = int( Par()( 5 ) );
+		CoilIndex = int( Par( 1 ) );
+		FanOpMode = int( Par( 5 ) );
 
 		SimVariableSpeedCoils( "", CoilIndex, FanOpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, PartLoadRatio, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
 
 		OutletAirHumRat = VarSpeedCoil( CoilIndex ).OutletAirHumRat;
-		Residuum = Par()( 2 ) - OutletAirHumRat;
+		Residuum = Par( 2 ) - OutletAirHumRat;
 
 		return Residuum;
 
@@ -3215,7 +3198,7 @@ namespace HVACDXSystem {
 	Real64
 	VSCoilSpeedHumResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -3268,14 +3251,14 @@ namespace HVACDXSystem {
 		static Real64 OnOffAirFlowRatio( 1.0 ); // ratio of compressor on flow to average flow over time step
 		static Real64 PartLoadRatio( 1.0 ); // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 
-		CoilIndex = int( Par()( 1 ) );
-		FanOpMode = int( Par()( 5 ) );
-		SpeedNum = int( Par()( 3 ) );
+		CoilIndex = int( Par( 1 ) );
+		FanOpMode = int( Par( 5 ) );
+		SpeedNum = int( Par( 3 ) );
 
 		SimVariableSpeedCoils( "", CoilIndex, FanOpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, PartLoadRatio, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
 
 		OutletAirHumRat = VarSpeedCoil( CoilIndex ).OutletAirHumRat;
-		Residuum = Par()( 2 ) - OutletAirHumRat;
+		Residuum = Par( 2 ) - OutletAirHumRat;
 
 		return Residuum;
 
@@ -3286,7 +3269,7 @@ namespace HVACDXSystem {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -72,13 +72,13 @@ namespace CTElectricGenerator {
 	int NumCTGenerators( 0 ); // number of CT Generators specified in input
 	bool GetCTInput( true ); // then TRUE, calls subroutine to read input file.
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 
 	// Object Data
-	FArray1D< CTGeneratorSpecs > CTGenerator; // dimension to number of machines
-	FArray1D< ReportVars > CTGeneratorReport;
+	Array1D< CTGeneratorSpecs > CTGenerator; // dimension to number of machines
+	Array1D< ReportVars > CTGeneratorReport;
 
 	// MODULE SUBROUTINES:
 	// Beginning of CT Generator Module Driver Subroutines
@@ -88,7 +88,7 @@ namespace CTElectricGenerator {
 
 	void
 	SimCTGenerator(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlag, // simulate Generator when TRUE
@@ -161,17 +161,17 @@ namespace CTElectricGenerator {
 
 	void
 	SimCTPlantHeatRecovery(
-		std::string const & CompType, // unused1208
+		std::string const & EP_UNUSED( CompType ), // unused1208
 		std::string const & CompName,
-		int const CompTypeNum, // unused1208
+		int const EP_UNUSED( CompTypeNum ), // unused1208
 		int & CompNum,
-		bool const RunFlag,
+		bool const EP_UNUSED( RunFlag ),
 		bool & InitLoopEquip,
-		Real64 & MyLoad,
+		Real64 & EP_UNUSED( MyLoad ),
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
-		bool const FirstHVACIteration // TRUE if First iteration of simulation
+		bool const EP_UNUSED( FirstHVACIteration ) // TRUE if First iteration of simulation
 	)
 	{
 
@@ -266,8 +266,8 @@ namespace CTElectricGenerator {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray( 12 ); // character string data
-		FArray1D< Real64 > NumArray( 12 ); // numeric data
+		Array1D_string AlphArray( 12 ); // character string data
+		Array1D< Real64 > NumArray( 12 ); // numeric data
 		static bool ErrorsFound( false ); // error flag
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -512,7 +512,6 @@ namespace CTElectricGenerator {
 		// REFERENCES: na
 
 		// Using/Aliasing
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using DataHVACGlobals::TimeStepSys;
 
 		using DataEnvironment::OutDryBulbTemp;
@@ -737,7 +736,7 @@ namespace CTElectricGenerator {
 	InitCTGenerators(
 		int const GeneratorNum, // Generator number
 		bool const RunFlag, // TRUE when Generator operating
-		Real64 const MyLoad, // Generator demand
+		Real64 const EP_UNUSED( MyLoad ), // Generator demand
 		bool const FirstHVACIteration
 	)
 	{
@@ -782,9 +781,9 @@ namespace CTElectricGenerator {
 		int HeatRecOutletNode; // outlet node number in heat recovery loop
 		static bool MyOneTimeFlag( true ); // Initialization flag
 
-		static FArray1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MySizeAndNodeInitFlag;
+		static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MySizeAndNodeInitFlag;
 		Real64 mdot;
 		Real64 rho;
 		bool errFlag;
@@ -867,7 +866,7 @@ namespace CTElectricGenerator {
 
 	void
 	UpdateCTGeneratorRecords(
-		bool const RunFlag, // TRUE if Generator operating
+		bool const EP_UNUSED( RunFlag ), // TRUE if Generator operating
 		int const Num // Generator number
 	)
 	{
@@ -927,7 +926,7 @@ namespace CTElectricGenerator {
 
 	void
 	GetCTGeneratorResults(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		int const GeneratorIndex,
 		Real64 & GeneratorPower, // electrical power
 		Real64 & GeneratorEnergy, // electrical energy

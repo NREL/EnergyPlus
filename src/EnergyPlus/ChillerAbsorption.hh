@@ -2,7 +2,7 @@
 #define ChillerAbsorption_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -43,7 +43,7 @@ namespace ChillerAbsorption {
 	extern Real64 QCondenser; // W - rate of heat transfer to the condenser coil
 	extern Real64 CondenserEnergy; // J - heat transfer to the condenser coil
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 
@@ -56,12 +56,16 @@ namespace ChillerAbsorption {
 		bool Available; // need an array of logicals--load identifiers of available equipment
 		bool ON; // simulate the machine at it's operating part load ratio
 		Real64 NomCap; // W - design nominal capacity of Absorber
+		bool NomCapWasAutoSized; //true if Nominal capacity was autosize on input
 		Real64 NomPumpPower; // W - design nominal capacity of Absorber
+		bool NomPumpPowerWasAutoSized; // true if nominal pump power was autosize on input
 		int FlowMode; // one of 3 modes for componet flow during operation
 		bool ModulatedFlowSetToLoop; // True if the setpoint is missing at the outlet node
 		bool ModulatedFlowErrDone; // true if setpoint warning issued
 		Real64 EvapVolFlowRate; // m3/s - design water volumetric flow rate through the evaporator
+		bool EvapVolFlowRateWasAutoSized; //true if evaporator flow rate was autosize on input
 		Real64 CondVolFlowRate; // m3/s - design water volumetric flow rate through the condenser
+		bool CondVolFlowRateWasAutoSized; //true if condenser flow rate was autosize on input
 		Real64 EvapMassFlowRateMax; // Max Design Evaporator Mass Flow Rate converted from Volume Flow Rate
 		Real64 CondMassFlowRateMax; // Max Design Condeneser Mass Flow Rate [kg/s]
 		Real64 GenMassFlowRateMax; // Max Design Generator Mass Flow Rate converted from Volume Flow Rate
@@ -77,15 +81,17 @@ namespace ChillerAbsorption {
 		Real64 OptPartLoadRat; // (BLAST BEST) optimal operating frac full load
 		Real64 TempDesCondIn; // C - (BLAST ADJTC(1)The design secondary loop fluid
 		// temperature at the Absorber condenser side inlet
-		FArray1D< Real64 > SteamLoadCoef; // (BLAST RPWRC() ) coeff of full load poly. fit
-		FArray1D< Real64 > PumpPowerCoef; // coeff of pumping power poly. fit
+		Array1D< Real64 > SteamLoadCoef; // (BLAST RPWRC() ) coeff of full load poly. fit
+		Array1D< Real64 > PumpPowerCoef; // coeff of pumping power poly. fit
 		Real64 TempLowLimitEvapOut; // C - low temperature shut off
 		int ErrCount2; // error counter
 		int GenHeatSourceType; // Generator heat source type, NodeType_Steam=3 or NodeType_Water=2
 		Real64 GeneratorVolFlowRate; // m3/s - hot water volumetric flow rate through generator
+		bool GeneratorVolFlowRateWasAutoSized; //true if hot water flow was autosize on input
 		Real64 GeneratorSubcool; // amount of subcooling in steam generator
 		int SteamFluidIndex; // index to generator fluid type
 		Real64 GeneratorDeltaTemp; // C - generator fluid temperature difference (water only)
+		bool GeneratorDeltaTempWasAutoSized; // true if generator delta T was autosize on input
 		int CWLoopNum; // chilled water plant loop index number
 		int CWLoopSideNum; // chilled water plant loop side index
 		int CWBranchNum; // chilled water plant loop branch index
@@ -99,19 +105,22 @@ namespace ChillerAbsorption {
 		int GenBranchNum; // generator water plant loop branch index
 		int GenCompNum; // generator water plant loop component index
 		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
-		bool IsThisSized; // TRUE if sizing is done
 
 		// Default Constructor
 		BLASTAbsorberSpecs() :
 			Available( false ),
 			ON( false ),
 			NomCap( 0.0 ),
+			NomCapWasAutoSized( false ),
 			NomPumpPower( 0.0 ),
+			NomPumpPowerWasAutoSized( false ),
 			FlowMode( FlowModeNotSet ),
 			ModulatedFlowSetToLoop( false ),
 			ModulatedFlowErrDone( false ),
 			EvapVolFlowRate( 0.0 ),
+			EvapVolFlowRateWasAutoSized( false ),
 			CondVolFlowRate( 0.0 ),
+			CondVolFlowRateWasAutoSized( false ),
 			EvapMassFlowRateMax( 0.0 ),
 			CondMassFlowRateMax( 0.0 ),
 			GenMassFlowRateMax( 0.0 ),
@@ -132,9 +141,11 @@ namespace ChillerAbsorption {
 			ErrCount2( 0 ),
 			GenHeatSourceType( 0 ),
 			GeneratorVolFlowRate( 0.0 ),
+			GeneratorVolFlowRateWasAutoSized( false ),
 			GeneratorSubcool( 0.0 ),
 			SteamFluidIndex( 0 ),
 			GeneratorDeltaTemp( -99999.0 ),
+			GeneratorDeltaTempWasAutoSized( true ),
 			CWLoopNum( 0 ),
 			CWLoopSideNum( 0 ),
 			CWBranchNum( 0 ),
@@ -147,107 +158,7 @@ namespace ChillerAbsorption {
 			GenLoopSideNum( 0 ),
 			GenBranchNum( 0 ),
 			GenCompNum( 0 ),
-			PossibleSubcooling( false ),
-			IsThisSized( false )
-		{}
-
-		// Member Constructor
-		BLASTAbsorberSpecs(
-			std::string const & Name, // user identifier
-			bool const Available, // need an array of logicals--load identifiers of available equipment
-			bool const ON, // simulate the machine at it's operating part load ratio
-			Real64 const NomCap, // W - design nominal capacity of Absorber
-			Real64 const NomPumpPower, // W - design nominal capacity of Absorber
-			int const FlowMode, // one of 3 modes for componet flow during operation
-			bool const ModulatedFlowSetToLoop, // True if the setpoint is missing at the outlet node
-			bool const ModulatedFlowErrDone, // true if setpoint warning issued
-			Real64 const EvapVolFlowRate, // m3/s - design water volumetric flow rate through the evaporator
-			Real64 const CondVolFlowRate, // m3/s - design water volumetric flow rate through the condenser
-			Real64 const EvapMassFlowRateMax, // Max Design Evaporator Mass Flow Rate converted from Volume Flow Rate
-			Real64 const CondMassFlowRateMax, // Max Design Condeneser Mass Flow Rate [kg/s]
-			Real64 const GenMassFlowRateMax, // Max Design Generator Mass Flow Rate converted from Volume Flow Rate
-			Real64 const SizFac, // Sizing factor
-			int const EvapInletNodeNum, // Node number on the inlet side of the plant
-			int const EvapOutletNodeNum, // Node number on the outlet side of the plant
-			int const CondInletNodeNum, // Node number on the inlet side of the condenser
-			int const CondOutletNodeNum, // Node number on the outlet side of the condenser
-			int const GeneratorInletNodeNum, // absorber steam inlet node number, water side
-			int const GeneratorOutletNodeNum, // absorber steam outlet node number, water side
-			Real64 const MinPartLoadRat, // (BLAST MIN) min allowed operating frac full load
-			Real64 const MaxPartLoadRat, // (BLAST MAX) max allowed operating frac full load
-			Real64 const OptPartLoadRat, // (BLAST BEST) optimal operating frac full load
-			Real64 const TempDesCondIn, // C - (BLAST ADJTC(1)The design secondary loop fluid
-			FArray1< Real64 > const & SteamLoadCoef, // (BLAST RPWRC() ) coeff of full load poly. fit
-			FArray1< Real64 > const & PumpPowerCoef, // coeff of pumping power poly. fit
-			Real64 const TempLowLimitEvapOut, // C - low temperature shut off
-			int const ErrCount2, // error counter
-			int const GenHeatSourceType, // Generator heat source type, NodeType_Steam=3 or NodeType_Water=2
-			Real64 const GeneratorVolFlowRate, // m3/s - hot water volumetric flow rate through generator
-			Real64 const GeneratorSubcool, // amount of subcooling in steam generator
-			int const SteamFluidIndex, // index to generator fluid type
-			Real64 const GeneratorDeltaTemp, // C - generator fluid temperature difference (water only)
-			int const CWLoopNum, // chilled water plant loop index number
-			int const CWLoopSideNum, // chilled water plant loop side index
-			int const CWBranchNum, // chilled water plant loop branch index
-			int const CWCompNum, // chilled water plant loop component index
-			int const CDLoopNum, // condenser water plant loop index number
-			int const CDLoopSideNum, // condenser water plant loop side index
-			int const CDBranchNum, // condenser water plant loop branch index
-			int const CDCompNum, // condenser water plant loop component index
-			int const GenLoopNum, // generator water plant loop index number
-			int const GenLoopSideNum, // generator water plant loop side index
-			int const GenBranchNum, // generator water plant loop branch index
-			int const GenCompNum, // generator water plant loop component index
-			bool const PossibleSubcooling, // flag to indicate chiller is doing less cooling that requested
-			bool const IsThisSized // TRUE if sizing is done
-		) :
-			Name( Name ),
-			Available( Available ),
-			ON( ON ),
-			NomCap( NomCap ),
-			NomPumpPower( NomPumpPower ),
-			FlowMode( FlowMode ),
-			ModulatedFlowSetToLoop( ModulatedFlowSetToLoop ),
-			ModulatedFlowErrDone( ModulatedFlowErrDone ),
-			EvapVolFlowRate( EvapVolFlowRate ),
-			CondVolFlowRate( CondVolFlowRate ),
-			EvapMassFlowRateMax( EvapMassFlowRateMax ),
-			CondMassFlowRateMax( CondMassFlowRateMax ),
-			GenMassFlowRateMax( GenMassFlowRateMax ),
-			SizFac( SizFac ),
-			EvapInletNodeNum( EvapInletNodeNum ),
-			EvapOutletNodeNum( EvapOutletNodeNum ),
-			CondInletNodeNum( CondInletNodeNum ),
-			CondOutletNodeNum( CondOutletNodeNum ),
-			GeneratorInletNodeNum( GeneratorInletNodeNum ),
-			GeneratorOutletNodeNum( GeneratorOutletNodeNum ),
-			MinPartLoadRat( MinPartLoadRat ),
-			MaxPartLoadRat( MaxPartLoadRat ),
-			OptPartLoadRat( OptPartLoadRat ),
-			TempDesCondIn( TempDesCondIn ),
-			SteamLoadCoef( 3, SteamLoadCoef ),
-			PumpPowerCoef( 3, PumpPowerCoef ),
-			TempLowLimitEvapOut( TempLowLimitEvapOut ),
-			ErrCount2( ErrCount2 ),
-			GenHeatSourceType( GenHeatSourceType ),
-			GeneratorVolFlowRate( GeneratorVolFlowRate ),
-			GeneratorSubcool( GeneratorSubcool ),
-			SteamFluidIndex( SteamFluidIndex ),
-			GeneratorDeltaTemp( GeneratorDeltaTemp ),
-			CWLoopNum( CWLoopNum ),
-			CWLoopSideNum( CWLoopSideNum ),
-			CWBranchNum( CWBranchNum ),
-			CWCompNum( CWCompNum ),
-			CDLoopNum( CDLoopNum ),
-			CDLoopSideNum( CDLoopSideNum ),
-			CDBranchNum( CDBranchNum ),
-			CDCompNum( CDCompNum ),
-			GenLoopNum( GenLoopNum ),
-			GenLoopSideNum( GenLoopSideNum ),
-			GenBranchNum( GenBranchNum ),
-			GenCompNum( GenCompNum ),
-			PossibleSubcooling( PossibleSubcooling ),
-			IsThisSized( IsThisSized )
+			PossibleSubcooling( false )
 		{}
 
 	};
@@ -293,51 +204,11 @@ namespace ChillerAbsorption {
 			SteamMdot( 0.0 ),
 			ActualCOP( 0.0 )
 		{}
-
-		// Member Constructor
-		ReportVars(
-			Real64 const PumpingPower, // reporting: electric pumping power
-			Real64 const QGenerator, // reporting: steam heat transfer rate
-			Real64 const QEvap, // reporting: evaporator heat transfer rate
-			Real64 const QCond, // reporting: condensor heat transfer rate
-			Real64 const PumpingEnergy, // reporting: electric pumping power
-			Real64 const GeneratorEnergy, // reporting: steam heat transfer rate
-			Real64 const EvapEnergy, // reporting: evaporator heat transfer rate
-			Real64 const CondEnergy, // reporting: condensor heat transfer rate
-			Real64 const CondInletTemp, // reporting: condenser inlet temperature
-			Real64 const EvapInletTemp, // reporting: evaporator inlet temperature
-			Real64 const CondOutletTemp, // reporting: condenser outlet temperature
-			Real64 const EvapOutletTemp, // reporting: evaporator outlet temperature
-			Real64 const Evapmdot, // reporting: evaporator mass flow rate
-			Real64 const Condmdot, // reporting: condenser mass flow rate
-			Real64 const Genmdot, // reporting: generatore mass flow rate when connected to plant
-			Real64 const SteamMdot, // reporting: steam mass flow rate
-			Real64 const ActualCOP // reporting: coefficient of performance = QEvap/QGenerator
-		) :
-			PumpingPower( PumpingPower ),
-			QGenerator( QGenerator ),
-			QEvap( QEvap ),
-			QCond( QCond ),
-			PumpingEnergy( PumpingEnergy ),
-			GeneratorEnergy( GeneratorEnergy ),
-			EvapEnergy( EvapEnergy ),
-			CondEnergy( CondEnergy ),
-			CondInletTemp( CondInletTemp ),
-			EvapInletTemp( EvapInletTemp ),
-			CondOutletTemp( CondOutletTemp ),
-			EvapOutletTemp( EvapOutletTemp ),
-			Evapmdot( Evapmdot ),
-			Condmdot( Condmdot ),
-			Genmdot( Genmdot ),
-			SteamMdot( SteamMdot ),
-			ActualCOP( ActualCOP )
-		{}
-
 	};
 
 	// Object Data
-	extern FArray1D< BLASTAbsorberSpecs > BLASTAbsorber; // dimension to number of machines
-	extern FArray1D< ReportVars > BLASTAbsorberReport;
+	extern Array1D< BLASTAbsorberSpecs > BLASTAbsorber; // dimension to number of machines
+	extern Array1D< ReportVars > BLASTAbsorberReport;
 
 	// Functions
 

@@ -2,7 +2,7 @@
 #define OutputReportPredefined_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -79,6 +79,17 @@ namespace OutputReportPredefined {
 	extern int pdchDXCoolCoilSEERIP; // SEER value in IP unit at AHRI std. 210/240 conditions [Btu/W-hr]
 	extern int pdchDXCoolCoilEERIP; // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
 	extern int pdchDXCoolCoilIEERIP; // IEER value in IP unit at AHRI std. 340/360 conditions
+
+	// DX Cooling Coil subtable per ANSI/ASHRAE Std 127 for Tests A, B, C and D
+	extern int pdstDXCoolCoil2;
+	extern int pdchDXCoolCoilNetCapSIA; // Standard Rated (Net) Cooling Capacity [W], Test A
+	extern int pdchDXCoolCoilElecPowerA; // Standard Rated Electric Power [W], Test A
+	extern int pdchDXCoolCoilNetCapSIB; // Standard Rated (Net) Cooling Capacity [W], Test B
+	extern int pdchDXCoolCoilElecPowerB; // Standard Rated Electric Power [W], Test B
+	extern int pdchDXCoolCoilNetCapSIC; // Standard Rated (Net) Cooling Capacity [W], Test C
+	extern int pdchDXCoolCoilElecPowerC; // Standard Rated Electric Power [W], Test C
+	extern int pdchDXCoolCoilNetCapSID; // Standard Rated (Net) Cooling Capacity [W], Test D
+	extern int pdchDXCoolCoilElecPowerD; // Standard Rated Electric Power [W], Test D
 
 	// VAV DX Cooling Ratings Details
 	extern int pdstVAVDXCoolCoil; // details for Packaged VAV rating under AHRI 340/360
@@ -255,6 +266,16 @@ namespace OutputReportPredefined {
 	extern int pdchSysSizUserClAir;
 	extern int pdchSysSizCalcHtAir;
 	extern int pdchSysSizUserHtAir;
+	extern int pdstPlantSize;
+	extern int pdchPlantSizCalcVdot;
+	extern int pdchPlantSizMeasVdot;
+	extern int pdchPlantSizPrevVdot;
+//	extern int pdchPlantSizPass;
+	extern int pdchPlantSizCoincYesNo;
+	extern int pdchPlantSizDesDay;
+	extern int pdchPlantSizPkTimeDayOfSim;
+	extern int pdchPlantSizPkTimeHour;
+	extern int pdchPlantSizPkTimeMin;
 
 	//System summary
 	extern int pdrSystem;
@@ -808,12 +829,12 @@ namespace OutputReportPredefined {
 	};
 
 	// Object Data
-	extern FArray1D< reportNameType > reportName;
-	extern FArray1D< SubTableType > subTable;
-	extern FArray1D< ColumnTagType > columnTag;
-	extern FArray1D< TableEntryType > tableEntry;
-	extern FArray1D< CompSizeTableEntryType > CompSizeTableEntry;
-	extern FArray1D< ShadowRelateType > ShadowRelate;
+	extern Array1D< reportNameType > reportName;
+	extern Array1D< SubTableType > subTable;
+	extern Array1D< ColumnTagType > columnTag;
+	extern Array1D< TableEntryType > tableEntry;
+	extern Array1D< CompSizeTableEntryType > CompSizeTableEntry;
+	extern Array1D< ShadowRelateType > ShadowRelate;
 
 	// Functions
 
@@ -887,7 +908,7 @@ namespace OutputReportPredefined {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

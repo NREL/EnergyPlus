@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <ExteriorEnergyUse.hh>
@@ -43,6 +43,7 @@ namespace ExteriorEnergyUse {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::TimeStepZone;
+	using DataGlobals::TimeStepZoneSec;
 
 	// Use statements for access to subroutines in other modules
 
@@ -79,8 +80,8 @@ namespace ExteriorEnergyUse {
 	// Name Public routines, optionally name Private routines within this module
 
 	// Object Data
-	FArray1D< ExteriorLightUsage > ExteriorLights; // Structure for Exterior Light reporting
-	FArray1D< ExteriorEquipmentUsage > ExteriorEquipment; // Structure for Exterior Equipment Reporting
+	Array1D< ExteriorLightUsage > ExteriorLights; // Structure for Exterior Light reporting
+	Array1D< ExteriorEquipmentUsage > ExteriorEquipment; // Structure for Exterior Equipment Reporting
 
 	// Functions
 
@@ -545,7 +546,6 @@ namespace ExteriorEnergyUse {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::SecInHour;
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::DoOutputReporting;
 		using DataGlobals::KindOfSim;
@@ -574,7 +574,7 @@ namespace ExteriorEnergyUse {
 
 			if ( SELECT_CASE_var == ScheduleOnly ) {
 				ExteriorLights( Item ).Power = ExteriorLights( Item ).DesignLevel * GetCurrentScheduleValue( ExteriorLights( Item ).SchedPtr );
-				ExteriorLights( Item ).CurrentUse = ExteriorLights( Item ).Power * TimeStepZone * SecInHour;
+				ExteriorLights( Item ).CurrentUse = ExteriorLights( Item ).Power * TimeStepZoneSec;
 
 			} else if ( SELECT_CASE_var == AstroClockOverride ) {
 
@@ -583,7 +583,7 @@ namespace ExteriorEnergyUse {
 					ExteriorLights( Item ).CurrentUse = 0.0;
 				} else {
 					ExteriorLights( Item ).Power = ExteriorLights( Item ).DesignLevel * GetCurrentScheduleValue( ExteriorLights( Item ).SchedPtr );
-					ExteriorLights( Item ).CurrentUse = ExteriorLights( Item ).Power * TimeStepZone * SecInHour;
+					ExteriorLights( Item ).CurrentUse = ExteriorLights( Item ).Power * TimeStepZoneSec;
 				}
 
 			} else {
@@ -594,12 +594,12 @@ namespace ExteriorEnergyUse {
 			// Reduce lighting power due to demand limiting
 			if ( ExteriorLights( Item ).ManageDemand && ( ExteriorLights( Item ).Power > ExteriorLights( Item ).DemandLimit ) ) {
 				ExteriorLights( Item ).Power = ExteriorLights( Item ).DemandLimit;
-				ExteriorLights( Item ).CurrentUse = ExteriorLights( Item ).Power * TimeStepZone * SecInHour;
+				ExteriorLights( Item ).CurrentUse = ExteriorLights( Item ).Power * TimeStepZoneSec;
 			}
 			// EMS controls
 			if ( ExteriorLights( Item ).PowerActuatorOn ) ExteriorLights( Item ).Power = ExteriorLights( Item ).PowerActuatorValue;
 
-			ExteriorLights( Item ).CurrentUse = ExteriorLights( Item ).Power * TimeStepZone * SecInHour;
+			ExteriorLights( Item ).CurrentUse = ExteriorLights( Item ).Power * TimeStepZoneSec;
 
 			//gather for tabular reports
 			if ( ! WarmupFlag ) {
@@ -618,14 +618,14 @@ namespace ExteriorEnergyUse {
 
 		for ( Item = 1; Item <= NumExteriorEqs; ++Item ) {
 			ExteriorEquipment( Item ).Power = ExteriorEquipment( Item ).DesignLevel * GetCurrentScheduleValue( ExteriorEquipment( Item ).SchedPtr );
-			ExteriorEquipment( Item ).CurrentUse = ExteriorEquipment( Item ).Power * TimeStepZone * SecInHour;
+			ExteriorEquipment( Item ).CurrentUse = ExteriorEquipment( Item ).Power * TimeStepZoneSec;
 		}
 
 	}
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

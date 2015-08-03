@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -33,14 +33,7 @@ struct TraitsA
 	typedef  T  traits_type;
 	typedef  std::size_t  Size;
 
-	// Field Width
-	inline
-	static
-	Size
-	w()
-	{
-		return 0; // No minimum width for generic types
-	}
+	static Size const w = 0; // No minimum width for generic types
 
 }; // TraitsA
 
@@ -51,14 +44,7 @@ struct TraitsA< char >
 	typedef  char  traits_type;
 	typedef  std::size_t  Size;
 
-	// Field Width
-	inline
-	static
-	Size
-	w()
-	{
-		return 1;
-	}
+	static Size const w = 1;
 
 }; // TraitsA
 
@@ -69,14 +55,7 @@ struct TraitsA< bool >
 	typedef  bool  traits_type;
 	typedef  std::size_t  Size;
 
-	// Field Width
-	inline
-	static
-	Size
-	w()
-	{
-		return 4;
-	}
+	static Size const w = 4;
 
 }; // TraitsA
 
@@ -87,14 +66,7 @@ struct TraitsA< byte >
 	typedef  byte  traits_type;
 	typedef  std::size_t  Size;
 
-	// Field Width
-	inline
-	static
-	Size
-	w()
-	{
-		return 1;
-	}
+	static Size const w = 1;
 
 }; // TraitsA
 
@@ -105,14 +77,7 @@ struct TraitsA< ubyte >
 	typedef  ubyte  traits_type;
 	typedef  std::size_t  Size;
 
-	// Field Width
-	inline
-	static
-	Size
-	w()
-	{
-		return 1;
-	}
+	static Size const w = 1;
 
 }; // TraitsA
 
@@ -123,14 +88,7 @@ struct TraitsA< short int >
 	typedef  short int  traits_type;
 	typedef  std::size_t  Size;
 
-	// Field Width
-	inline
-	static
-	Size
-	w()
-	{
-		return 2;
-	}
+	static Size const w = 2;
 
 }; // TraitsA
 
@@ -141,14 +99,7 @@ struct TraitsA< unsigned short int >
 	typedef  unsigned short int  traits_type;
 	typedef  std::size_t  Size;
 
-	// Field Width
-	inline
-	static
-	Size
-	w()
-	{
-		return 2;
-	}
+	static Size const w = 2;
 
 }; // TraitsA
 
@@ -159,14 +110,7 @@ struct TraitsA< int >
 	typedef  int  traits_type;
 	typedef  std::size_t  Size;
 
-	// Field Width
-	inline
-	static
-	Size
-	w()
-	{
-		return 4;
-	}
+	static Size const w = 4;
 
 }; // TraitsA
 
@@ -177,14 +121,7 @@ struct TraitsA< unsigned int >
 	typedef  unsigned int  traits_type;
 	typedef  std::size_t  Size;
 
-	// Field Width
-	inline
-	static
-	Size
-	w()
-	{
-		return 4;
-	}
+	static Size const w = 4;
 
 }; // TraitsA
 
@@ -195,14 +132,7 @@ struct TraitsA< long int >
 	typedef  long int  traits_type;
 	typedef  std::size_t  Size;
 
-	// Field Width
-	inline
-	static
-	Size
-	w()
-	{
-		return 8;
-	}
+	static Size const w = 8;
 
 }; // TraitsA
 
@@ -213,14 +143,7 @@ struct TraitsA< unsigned long int >
 	typedef  unsigned long int  traits_type;
 	typedef  std::size_t  Size;
 
-	// Field Width
-	inline
-	static
-	Size
-	w()
-	{
-		return 8;
-	}
+	static Size const w = 8;
 
 }; // TraitsA
 
@@ -231,14 +154,7 @@ struct TraitsA< long long int >
 	typedef  long long int  traits_type;
 	typedef  std::size_t  Size;
 
-	// Field Width
-	inline
-	static
-	Size
-	w()
-	{
-		return 8;
-	}
+	static Size const w = 8;
 
 }; // TraitsA
 
@@ -249,14 +165,7 @@ struct TraitsA< unsigned long long int >
 	typedef  unsigned long long int  traits_type;
 	typedef  std::size_t  Size;
 
-	// Field Width
-	inline
-	static
-	Size
-	w()
-	{
-		return 8;
-	}
+	static Size const w = 8;
 
 }; // TraitsA
 
@@ -267,14 +176,7 @@ struct TraitsA< float >
 	typedef  float  traits_type;
 	typedef  std::size_t  Size;
 
-	// Field Width
-	inline
-	static
-	Size
-	w()
-	{
-		return 4;
-	}
+	static Size const w = 4;
 
 }; // TraitsA
 
@@ -285,14 +187,7 @@ struct TraitsA< double >
 	typedef  double  traits_type;
 	typedef  std::size_t  Size;
 
-	// Field Width
-	inline
-	static
-	Size
-	w()
-	{
-		return 8;
-	}
+	static Size const w = 8;
 
 }; // TraitsA
 
@@ -303,14 +198,7 @@ struct TraitsA< long double >
 	typedef  long double  traits_type;
 	typedef  std::size_t  Size;
 
-	// Field Width
-	inline
-	static
-	Size
-	w()
-	{
-		return 16;
-	}
+	static Size const w = 16;
 
 }; // TraitsA
 

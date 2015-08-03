@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <Pipes.hh>
@@ -63,7 +63,7 @@ namespace Pipes {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
 
 	// Object Data
-	FArray1D< LocalPipeData > LocalPipe; // dimension to number of pipes
+	Array1D< LocalPipeData > LocalPipe; // dimension to number of pipes
 
 	// MODULE SUBROUTINES:
 
@@ -77,9 +77,9 @@ namespace Pipes {
 		int const CompType,
 		std::string & PipeName,
 		int & CompIndex,
-		Real64 const MaxVolFlowRate,
-		bool const InitLoopEquip,
-		bool const FirstHVACIteration
+		Real64 const EP_UNUSED( MaxVolFlowRate ),
+		bool const EP_UNUSED( InitLoopEquip ),
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -311,10 +311,10 @@ namespace Pipes {
 
 	void
 	InitializePipes(
-		int const PipeType, // Type of Pipe
+		int const EP_UNUSED( PipeType ), // Type of Pipe
 		std::string const & PipeName, // Name of Pipe
 		int & PipeNum, // Index into pipe structure for name
-		Real64 const MaxVolFlowRate // unused at present time
+		Real64 const EP_UNUSED( MaxVolFlowRate ) // unused at present time
 	)
 	{
 
@@ -392,7 +392,7 @@ namespace Pipes {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

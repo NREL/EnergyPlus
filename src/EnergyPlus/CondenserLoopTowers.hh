@@ -2,9 +2,7 @@
 #define CondenserLoopTowers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -77,7 +75,7 @@ namespace CondenserLoopTowers {
 	extern Real64 WaterUsage; // Tower water usage (m3/s)
 	extern Real64 FanCyclingRatio; // cycling ratio of tower fan when min fan speed provide to much capacity
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE CondenserLoopTowers
 
@@ -103,25 +101,34 @@ namespace CondenserLoopTowers {
 		bool Available; // need an array of logicals--load identifiers of available equipment
 		bool ON; // Simulate the machine at it's operating part load ratio
 		Real64 DesignWaterFlowRate; // Design water flow rate through the tower [m3/s]
+		bool DesignWaterFlowRateWasAutoSized; //true if previous was autosize on input
 		Real64 DesignWaterFlowPerUnitNomCap; // scalable sizing factor for water flow per capacity [m3/s/W]
 		Real64 DesWaterMassFlowRate; // Design water flow rate through the entire tower [kg/s]
 		Real64 DesWaterMassFlowRatePerCell; // Design water flow rate per cell [Kg/s]
 		Real64 HighSpeedAirFlowRate; // Air flow rate through tower at high speed [m3/s]
+		bool HighSpeedAirFlowRateWasAutoSized; //true if previous was autosize on input
 		Real64 DesignAirFlowPerUnitNomCap; // scalable sizing factor for air flow per capacity [m3/s/W]
 		bool DefaultedDesignAirFlowScalingFactor; // true if user left input field blank for DesignAirFlowPerUnitNomCap
 		Real64 HighSpeedFanPower; // Fan power at high fan speed [W]
+		bool HighSpeedFanPowerWasAutoSized; //true if fan power was autosize on input
 		Real64 DesignFanPowerPerUnitNomCap; // scalable sizing factor for fan power per capacity [W/W]
-		bool UAvaluesCompleted;
+
 		Real64 HighSpeedTowerUA; // UA of tower at high fan speed [W/C]
+		bool HighSpeedTowerUAWasAutoSized; // true if previous was autosize on input
 		Real64 LowSpeedAirFlowRate; // Air flow rate through tower at low speed [m3/s]
+		bool LowSpeedAirFlowRateWasAutoSized; // true if previous was autosize on input
 		Real64 LowSpeedAirFlowRateSizingFactor; // sizing factor for low speed flow rate [ ]
 		Real64 LowSpeedFanPower; // Fan power at low fan speed [W]
+		bool LowSpeedFanPowerWasAutoSized;// true if low speed fan power was autosized on input
 		Real64 LowSpeedFanPowerSizingFactor; // sizing factor for low speed fan power []
 		Real64 LowSpeedTowerUA; // UA of tower at low fan speed [W/C]
+		bool LowSpeedTowerUAWasAutoSized; //ture if low speed UA was autosize on input
 		Real64 LowSpeedTowerUASizingFactor; // sizing factor for UA at low fan speed []
 		Real64 FreeConvAirFlowRate; // Air flow rate through tower with fan off [m3/s]
+		bool FreeConvAirFlowRateWasAutoSized; //true if previous was autosize on input
 		Real64 FreeConvAirFlowRateSizingFactor; // sizing factor for air flow at free conv []
 		Real64 FreeConvTowerUA; // UA of tower with fan off [W/C]
+		bool FreeConvTowerUAWasAutoSized; // true if previous was autosize on input
 		Real64 FreeConvTowerUASizingFactor; // sizing factor for UA at fre convection []
 		Real64 DesignInletWB; // Design inlet air wet-bulb temperature (C)
 		Real64 DesignApproach; // Design approach (outlet water temp minus inlet air wet-bulb temp (C)
@@ -138,15 +145,18 @@ namespace CondenserLoopTowers {
 		//  leaving water at 29.44C (85F), entering air at 25.56C (78F) wet-bulb
 		//  temp and 35C (95F) dry-bulb temp, and water flow
 		//  rate of 5.382E-8 m3/s per watt (3 gpm/ton)
+		bool TowerNominalCapacityWasAutoSized; //true if tower nominal capacity was autosized on input
 		Real64 TowerLowSpeedNomCap; // Nominal capacity of the tower [W] with entering water at 35C (95F),
 		//  leaving water at 29.44C (85F), entering air at 25.56C (78F) wet-bulb
 		//  temp and 35C (95F) dry-bulb temp, and water flow
 		//  rate of 5.382E-8 m3/s per nominal capacity watt (3 gpm/ton)
+		bool TowerLowSpeedNomCapWasAutoSized; // true if previous was autosize on input
 		Real64 TowerLowSpeedNomCapSizingFactor; // sizing factor for low speed capacity []
 		Real64 TowerFreeConvNomCap; // Nominal capacity of the tower [W] with entering water at 35C (95F),
 		//  leaving water at 29.44C (85F), entering air at 25.56C (78F) wet-bulb
 		//  temp and 35C (95F) dry-bulb temp, and water flow
 		//  rate of 5.382E-8 m3/s per nominal capacity watt (3 gpm/ton)
+		bool TowerFreeConvNomCapWasAutoSized; // true if previous was autosize on Input
 		Real64 TowerFreeConvNomCapSizingFactor; // sizing factor for free conv capacity []
 		Real64 SizFac; // sizing factor
 		int WaterInletNodeNum; // Node number on the water inlet side of the tower
@@ -213,25 +223,33 @@ namespace CondenserLoopTowers {
 			Available( true ),
 			ON( true ),
 			DesignWaterFlowRate( 0.0 ),
+			DesignWaterFlowRateWasAutoSized( false ),
 			DesignWaterFlowPerUnitNomCap( 0.0 ),
 			DesWaterMassFlowRate( 0.0 ),
 			DesWaterMassFlowRatePerCell( 0.0 ),
 			HighSpeedAirFlowRate( 0.0 ),
+			HighSpeedAirFlowRateWasAutoSized( false ),
 			DesignAirFlowPerUnitNomCap( 0.0 ),
 			DefaultedDesignAirFlowScalingFactor( false ),
 			HighSpeedFanPower( 0.0 ),
+			HighSpeedFanPowerWasAutoSized( false ),
 			DesignFanPowerPerUnitNomCap( 0.0 ),
-			UAvaluesCompleted( false ),
 			HighSpeedTowerUA( 0.0 ),
+			HighSpeedTowerUAWasAutoSized( false ),
 			LowSpeedAirFlowRate( 0.0 ),
+			LowSpeedAirFlowRateWasAutoSized( false ),
 			LowSpeedAirFlowRateSizingFactor( 0.0 ),
 			LowSpeedFanPower( 0.0 ),
+			LowSpeedFanPowerWasAutoSized( false ),
 			LowSpeedFanPowerSizingFactor( 0.0 ),
 			LowSpeedTowerUA( 0.0 ),
+			LowSpeedTowerUAWasAutoSized( false ),
 			LowSpeedTowerUASizingFactor( 0.0 ),
 			FreeConvAirFlowRate( 0.0 ),
+			FreeConvAirFlowRateWasAutoSized( false ),
 			FreeConvAirFlowRateSizingFactor( 0.0 ),
 			FreeConvTowerUA( 0.0 ),
+			FreeConvTowerUAWasAutoSized( false ),
 			FreeConvTowerUASizingFactor( 0.0 ),
 			DesignInletWB( 0.0 ),
 			DesignApproach( 0.0 ),
@@ -245,9 +263,12 @@ namespace CondenserLoopTowers {
 			TowerMassFlowRateMultiplier( 0.0 ),
 			HeatRejectCapNomCapSizingRatio( 1.25 ),
 			TowerNominalCapacity( 0.0 ),
+			TowerNominalCapacityWasAutoSized( false ),
 			TowerLowSpeedNomCap( 0.0 ),
+			TowerLowSpeedNomCapWasAutoSized( false ),
 			TowerLowSpeedNomCapSizingFactor( 0.0 ),
 			TowerFreeConvNomCap( 0.0 ),
+			TowerFreeConvNomCapWasAutoSized( false ),
 			TowerFreeConvNomCapSizingFactor( 0.0 ),
 			SizFac( 0.0 ),
 			WaterInletNodeNum( 0 ),
@@ -298,198 +319,6 @@ namespace CondenserLoopTowers {
 			VSMerkelAFRErrorIter( 0 ),
 			VSMerkelAFRErrorFail( 0 )
 		{}
-
-		// Member Constructor
-		Towerspecs(
-			std::string const & Name, // User identifier
-			std::string const & TowerType, // Type of cooling tower
-			int const TowerType_Num,
-			int const PerformanceInputMethod_Num, // Method of entering tower performance: UA and Design Water
-			std::string const & ModelCoeffObjectName, // Cooling Tower:Variable Speed Model Coefficient Object name
-			bool const Available, // need an array of logicals--load identifiers of available equipment
-			bool const ON, // Simulate the machine at it's operating part load ratio
-			Real64 const DesignWaterFlowRate, // Design water flow rate through the tower [m3/s]
-			Real64 const DesignWaterFlowPerUnitNomCap, // scalable sizing factor for water flow per capacity [m3/s/W]
-			Real64 const DesWaterMassFlowRate, // Design water flow rate through the entire tower [kg/s]
-			Real64 const DesWaterMassFlowRatePerCell, // Design water flow rate per cell [Kg/s]
-			Real64 const HighSpeedAirFlowRate, // Air flow rate through tower at high speed [m3/s]
-			Real64 const DesignAirFlowPerUnitNomCap, // scalable sizing factor for air flow per capacity [m3/s/W]
-			bool const DefaultedDesignAirFlowScalingFactor, // true if user left input field blank for DesignAirFlowPerUnitNomCap
-			Real64 const HighSpeedFanPower, // Fan power at high fan speed [W]
-			Real64 const DesignFanPowerPerUnitNomCap, // scalable sizing factor for fan power per capacity [W/W]
-			bool const UAvaluesCompleted,
-			Real64 const HighSpeedTowerUA, // UA of tower at high fan speed [W/C]
-			Real64 const LowSpeedAirFlowRate, // Air flow rate through tower at low speed [m3/s]
-			Real64 const LowSpeedAirFlowRateSizingFactor, // sizing factor for low speed flow rate [ ]
-			Real64 const LowSpeedFanPower, // Fan power at low fan speed [W]
-			Real64 const LowSpeedFanPowerSizingFactor, // sizing factor for low speed fan power []
-			Real64 const LowSpeedTowerUA, // UA of tower at low fan speed [W/C]
-			Real64 const LowSpeedTowerUASizingFactor, // sizing factor for UA at low fan speed []
-			Real64 const FreeConvAirFlowRate, // Air flow rate through tower with fan off [m3/s]
-			Real64 const FreeConvAirFlowRateSizingFactor, // sizing factor for air flow at free conv []
-			Real64 const FreeConvTowerUA, // UA of tower with fan off [W/C]
-			Real64 const FreeConvTowerUASizingFactor, // sizing factor for UA at fre convection []
-			Real64 const DesignInletWB, // Design inlet air wet-bulb temperature (C)
-			Real64 const DesignApproach, // Design approach (outlet water temp minus inlet air wet-bulb temp (C)
-			Real64 const DesignRange, // Design range temperature (inlet water temp minus outlet water temp (C)
-			Real64 const MinimumVSAirFlowFrac, // Min air flow ratio (used for VS tower only, point where free conv occurs)
-			Real64 const CalibratedWaterFlowRate, // Water flow ratio required for model calibration
-			Real64 const BasinHeaterPowerFTempDiff, // Basin heater capacity per degree C below setpoint (W/C)
-			Real64 const BasinHeaterSetPointTemp, // setpoint temperature for basin heater operation (C)
-			Real64 const MakeupWaterDrift, // Makeup water flow rate fraction due to drift
-			Real64 const FreeConvectionCapacityFraction, // Percentage of tower capacity in free convection regime
-			Real64 const TowerMassFlowRateMultiplier, // Maximum tower flow rate is this multiplier times design flow rate
-			Real64 const HeatRejectCapNomCapSizingRatio, // ratio of actual cap to nominal capacity []
-			Real64 const TowerNominalCapacity, // Nominal capacity of the tower [W] with entering water at 35C (95F),
-			Real64 const TowerLowSpeedNomCap, // Nominal capacity of the tower [W] with entering water at 35C (95F),
-			Real64 const TowerLowSpeedNomCapSizingFactor, // sizing factor for low speed capacity []
-			Real64 const TowerFreeConvNomCap, // Nominal capacity of the tower [W] with entering water at 35C (95F),
-			Real64 const TowerFreeConvNomCapSizingFactor, // sizing factor for free conv capacity []
-			Real64 const SizFac, // sizing factor
-			int const WaterInletNodeNum, // Node number on the water inlet side of the tower
-			int const WaterOutletNodeNum, // Node number on the water outlet side of the tower
-			int const OutdoorAirInletNodeNum, // Node number of outdoor air inlet for the tower
-			int const TowerModelType, // Type of empirical model (1=CoolTools)
-			int const VSTower, // Index to a variable speed tower (otherwise = 0)
-			int const FanPowerfAirFlowCurve, // Index to fan power correlation curve for VS Towers
-			int const BlowDownSchedulePtr, // Pointer to blow down schedule
-			int const BasinHeaterSchedulePtr, // Pointer to basin heater schedule
-			int const HighMassFlowErrorCount, // Counter when mass flow rate is > Design*TowerMassFlowRateMultiplier
-			int const HighMassFlowErrorIndex, // Index for high mass flow recurring error message
-			int const OutletWaterTempErrorCount, // Counter when outlet water temperature is < minimum allowed temperature
-			int const OutletWaterTempErrorIndex, // Index for outlet water temperature recurring error message
-			int const SmallWaterMassFlowErrorCount, // Counter when water mass flow rate is very small
-			int const SmallWaterMassFlowErrorIndex, // Index for very small water mass flow rate recurring error message
-			int const WMFRLessThanMinAvailErrCount, // Counter when water mass flow rate is less than minimum available
-			int const WMFRLessThanMinAvailErrIndex, // Index for water mass flow rate less than minavail recurring message
-			int const WMFRGreaterThanMaxAvailErrCount, // Counter when water mass flow rate is greater than minimum available
-			int const WMFRGreaterThanMaxAvailErrIndex, // Index for water mass flow rate > minavail recurring message
-			int const CoolingTowerAFRRFailedCount, // Counter for air flow rate ratio out of bounds error
-			int const CoolingTowerAFRRFailedIndex, // Index for air flow rate ratio out of bounds error
-			int const SpeedSelected, // speed of the two-speed fan selected (0:ON;1:LOW;2:HIGH)
-			int const CapacityControl, // Type of capacity control for single speed cooling tower:
-			Real64 const BypassFraction, // Fraction of fluid bypass as a ratio of total fluid flow
-			int const NumCell, // Number of cells in the cooling tower
-			std::string const & CellCtrl, // Cell control type : either MaxCell or MinCell
-			int const CellCtrl_Num,
-			int const NumCellOn, // number of cells working
-			Real64 const MinFracFlowRate, // Minimal fraction of design flow/cell allowable
-			Real64 const MaxFracFlowRate, // Maximal ratio of design flow/cell allowable
-			int const EvapLossMode, // sets how tower water evaporation is modeled
-			Real64 const UserEvapLossFactor, // simple model [%/Delt C]
-			Real64 const DriftLossFraction,
-			int const BlowdownMode, // sets how tower water blowdown is modeled
-			Real64 const ConcentrationRatio, // ratio of solids in blowdown vs make up water
-			int const SchedIDBlowdown, // index "pointer" to schedule of blowdown in [m3/s]
-			bool const SuppliedByWaterSystem,
-			int const WaterTankID, // index "pointer" to WaterStorage structure
-			int const WaterTankDemandARRID, // index "pointer" to demand array inside WaterStorage structure
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum,
-			int const UAModFuncAirFlowRatioCurvePtr, // curve index for UA modifier as a function of air flow ratio
-			int const UAModFuncWetBulbDiffCurvePtr, // curve index for UA modifier as a function of local wetbulb
-			int const UAModFuncWaterFlowRatioCurvePtr, // curve index for UA modifier as a function of water flow ratio
-			bool const SetpointIsOnOutlet, // if true look to outlet node of tower, if flase look to overall loop setpoint
-			int const VSMerkelAFRErrorIter, // error counter for regula falsi failed with max iterations, vs merkel model
-			int const VSMerkelAFRErrorFail // error counter for regula falsi failed with limits exceeded, vs merkel model
-		) :
-			Name( Name ),
-			TowerType( TowerType ),
-			TowerType_Num( TowerType_Num ),
-			PerformanceInputMethod_Num( PerformanceInputMethod_Num ),
-			ModelCoeffObjectName( ModelCoeffObjectName ),
-			Available( Available ),
-			ON( ON ),
-			DesignWaterFlowRate( DesignWaterFlowRate ),
-			DesignWaterFlowPerUnitNomCap( DesignWaterFlowPerUnitNomCap ),
-			DesWaterMassFlowRate( DesWaterMassFlowRate ),
-			DesWaterMassFlowRatePerCell( DesWaterMassFlowRatePerCell ),
-			HighSpeedAirFlowRate( HighSpeedAirFlowRate ),
-			DesignAirFlowPerUnitNomCap( DesignAirFlowPerUnitNomCap ),
-			DefaultedDesignAirFlowScalingFactor( DefaultedDesignAirFlowScalingFactor ),
-			HighSpeedFanPower( HighSpeedFanPower ),
-			DesignFanPowerPerUnitNomCap( DesignFanPowerPerUnitNomCap ),
-			UAvaluesCompleted( UAvaluesCompleted ),
-			HighSpeedTowerUA( HighSpeedTowerUA ),
-			LowSpeedAirFlowRate( LowSpeedAirFlowRate ),
-			LowSpeedAirFlowRateSizingFactor( LowSpeedAirFlowRateSizingFactor ),
-			LowSpeedFanPower( LowSpeedFanPower ),
-			LowSpeedFanPowerSizingFactor( LowSpeedFanPowerSizingFactor ),
-			LowSpeedTowerUA( LowSpeedTowerUA ),
-			LowSpeedTowerUASizingFactor( LowSpeedTowerUASizingFactor ),
-			FreeConvAirFlowRate( FreeConvAirFlowRate ),
-			FreeConvAirFlowRateSizingFactor( FreeConvAirFlowRateSizingFactor ),
-			FreeConvTowerUA( FreeConvTowerUA ),
-			FreeConvTowerUASizingFactor( FreeConvTowerUASizingFactor ),
-			DesignInletWB( DesignInletWB ),
-			DesignApproach( DesignApproach ),
-			DesignRange( DesignRange ),
-			MinimumVSAirFlowFrac( MinimumVSAirFlowFrac ),
-			CalibratedWaterFlowRate( CalibratedWaterFlowRate ),
-			BasinHeaterPowerFTempDiff( BasinHeaterPowerFTempDiff ),
-			BasinHeaterSetPointTemp( BasinHeaterSetPointTemp ),
-			MakeupWaterDrift( MakeupWaterDrift ),
-			FreeConvectionCapacityFraction( FreeConvectionCapacityFraction ),
-			TowerMassFlowRateMultiplier( TowerMassFlowRateMultiplier ),
-			HeatRejectCapNomCapSizingRatio( HeatRejectCapNomCapSizingRatio ),
-			TowerNominalCapacity( TowerNominalCapacity ),
-			TowerLowSpeedNomCap( TowerLowSpeedNomCap ),
-			TowerLowSpeedNomCapSizingFactor( TowerLowSpeedNomCapSizingFactor ),
-			TowerFreeConvNomCap( TowerFreeConvNomCap ),
-			TowerFreeConvNomCapSizingFactor( TowerFreeConvNomCapSizingFactor ),
-			SizFac( SizFac ),
-			WaterInletNodeNum( WaterInletNodeNum ),
-			WaterOutletNodeNum( WaterOutletNodeNum ),
-			OutdoorAirInletNodeNum( OutdoorAirInletNodeNum ),
-			TowerModelType( TowerModelType ),
-			VSTower( VSTower ),
-			FanPowerfAirFlowCurve( FanPowerfAirFlowCurve ),
-			BlowDownSchedulePtr( BlowDownSchedulePtr ),
-			BasinHeaterSchedulePtr( BasinHeaterSchedulePtr ),
-			HighMassFlowErrorCount( HighMassFlowErrorCount ),
-			HighMassFlowErrorIndex( HighMassFlowErrorIndex ),
-			OutletWaterTempErrorCount( OutletWaterTempErrorCount ),
-			OutletWaterTempErrorIndex( OutletWaterTempErrorIndex ),
-			SmallWaterMassFlowErrorCount( SmallWaterMassFlowErrorCount ),
-			SmallWaterMassFlowErrorIndex( SmallWaterMassFlowErrorIndex ),
-			WMFRLessThanMinAvailErrCount( WMFRLessThanMinAvailErrCount ),
-			WMFRLessThanMinAvailErrIndex( WMFRLessThanMinAvailErrIndex ),
-			WMFRGreaterThanMaxAvailErrCount( WMFRGreaterThanMaxAvailErrCount ),
-			WMFRGreaterThanMaxAvailErrIndex( WMFRGreaterThanMaxAvailErrIndex ),
-			CoolingTowerAFRRFailedCount( CoolingTowerAFRRFailedCount ),
-			CoolingTowerAFRRFailedIndex( CoolingTowerAFRRFailedIndex ),
-			SpeedSelected( SpeedSelected ),
-			CapacityControl( CapacityControl ),
-			BypassFraction( BypassFraction ),
-			NumCell( NumCell ),
-			CellCtrl( CellCtrl ),
-			CellCtrl_Num( CellCtrl_Num ),
-			NumCellOn( NumCellOn ),
-			MinFracFlowRate( MinFracFlowRate ),
-			MaxFracFlowRate( MaxFracFlowRate ),
-			EvapLossMode( EvapLossMode ),
-			UserEvapLossFactor( UserEvapLossFactor ),
-			DriftLossFraction( DriftLossFraction ),
-			BlowdownMode( BlowdownMode ),
-			ConcentrationRatio( ConcentrationRatio ),
-			SchedIDBlowdown( SchedIDBlowdown ),
-			SuppliedByWaterSystem( SuppliedByWaterSystem ),
-			WaterTankID( WaterTankID ),
-			WaterTankDemandARRID( WaterTankDemandARRID ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			UAModFuncAirFlowRatioCurvePtr( UAModFuncAirFlowRatioCurvePtr ),
-			UAModFuncWetBulbDiffCurvePtr( UAModFuncWetBulbDiffCurvePtr ),
-			UAModFuncWaterFlowRatioCurvePtr( UAModFuncWaterFlowRatioCurvePtr ),
-			SetpointIsOnOutlet( SetpointIsOnOutlet ),
-			VSMerkelAFRErrorIter( VSMerkelAFRErrorIter ),
-			VSMerkelAFRErrorFail( VSMerkelAFRErrorFail )
-		{}
-
 	};
 
 	struct TowerInletConds
@@ -508,21 +337,6 @@ namespace CondenserLoopTowers {
 			AirWetBulb( 0.0 ),
 			AirPress( 0.0 ),
 			AirHumRat( 0.0 )
-		{}
-
-		// Member Constructor
-		TowerInletConds(
-			Real64 const WaterTemp, // Tower water inlet temperature (C)
-			Real64 const AirTemp, // Tower air inlet dry-bulb temperature (C)
-			Real64 const AirWetBulb, // Tower air inlet wet-bulb temperature (C)
-			Real64 const AirPress, // Tower air barometric pressure
-			Real64 const AirHumRat // Tower air inlet humidity ratio (kg/kg)
-		) :
-			WaterTemp( WaterTemp ),
-			AirTemp( AirTemp ),
-			AirWetBulb( AirWetBulb ),
-			AirPress( AirPress ),
-			AirHumRat( AirHumRat )
 		{}
 
 	};
@@ -587,70 +401,13 @@ namespace CondenserLoopTowers {
 			SpeedSelected( 0 )
 		{}
 
-		// Member Constructor
-		ReportVars(
-			Real64 const InletWaterTemp, // Tower inlet water temperature (C)
-			Real64 const OutletWaterTemp, // Tower outlet water temperature (C)
-			Real64 const WaterMassFlowRate, // Tower water mass flow rate (m3/s)
-			Real64 const Qactual, // Tower heat rejection rate (W)
-			Real64 const FanPower, // Tower fan power (W)
-			Real64 const FanEnergy, // Tower fan energy consumption (J)
-			Real64 const AirFlowRatio, // Air flow ratio through variable speed cooling tower
-			Real64 const BasinHeaterPower, // Basin heater power (W)
-			Real64 const BasinHeaterConsumption, // Basin heater energy consumption (J)
-			Real64 const WaterAmountUsed, // Tower make up water usage (m3)
-			Real64 const FanCyclingRatio, // cycling ratio of tower fan when min fan speed provide too much capacity (for VFD)
-			Real64 const EvaporationVdot,
-			Real64 const EvaporationVol,
-			Real64 const DriftVdot,
-			Real64 const DriftVol,
-			Real64 const BlowdownVdot,
-			Real64 const BlowdownVol,
-			Real64 const MakeUpVdot,
-			Real64 const MakeUpVol,
-			Real64 const TankSupplyVdot,
-			Real64 const TankSupplyVol,
-			Real64 const StarvedMakeUpVdot,
-			Real64 const StarvedMakeUpVol,
-			Real64 const BypassFraction, // Added for fluid bypass
-			int const NumCellOn, // for multi-cell tower
-			int const SpeedSelected // Speed selected for the two speed tower
-		) :
-			InletWaterTemp( InletWaterTemp ),
-			OutletWaterTemp( OutletWaterTemp ),
-			WaterMassFlowRate( WaterMassFlowRate ),
-			Qactual( Qactual ),
-			FanPower( FanPower ),
-			FanEnergy( FanEnergy ),
-			AirFlowRatio( AirFlowRatio ),
-			BasinHeaterPower( BasinHeaterPower ),
-			BasinHeaterConsumption( BasinHeaterConsumption ),
-			WaterAmountUsed( WaterAmountUsed ),
-			FanCyclingRatio( FanCyclingRatio ),
-			EvaporationVdot( EvaporationVdot ),
-			EvaporationVol( EvaporationVol ),
-			DriftVdot( DriftVdot ),
-			DriftVol( DriftVol ),
-			BlowdownVdot( BlowdownVdot ),
-			BlowdownVol( BlowdownVol ),
-			MakeUpVdot( MakeUpVdot ),
-			MakeUpVol( MakeUpVol ),
-			TankSupplyVdot( TankSupplyVdot ),
-			TankSupplyVol( TankSupplyVol ),
-			StarvedMakeUpVdot( StarvedMakeUpVdot ),
-			StarvedMakeUpVol( StarvedMakeUpVol ),
-			BypassFraction( BypassFraction ),
-			NumCellOn( NumCellOn ),
-			SpeedSelected( SpeedSelected )
-		{}
-
 	};
 
 	struct VSTowerData
 	{
 		// Members
 		// variables specific to variable-speed towers
-		FArray1D< Real64 > Coeff; // - model coefficients
+		Array1D< Real64 > Coeff; // - model coefficients
 		bool FoundModelCoeff; // - TRUE if model is calibratable
 		Real64 MinInletAirWBTemp; // - model limit for min inlet air WB temp
 		Real64 MaxInletAirWBTemp; // - model limit for max inlet air WB temp
@@ -740,7 +497,7 @@ namespace CondenserLoopTowers {
 
 		// Member Constructor
 		VSTowerData(
-			FArray1< Real64 > const & Coeff, // - model coefficients
+			Array1< Real64 > const & Coeff, // - model coefficients
 			bool const FoundModelCoeff, // - TRUE if model is calibratable
 			Real64 const MinInletAirWBTemp, // - model limit for min inlet air WB temp
 			Real64 const MaxInletAirWBTemp, // - model limit for max inlet air WB temp
@@ -840,10 +597,10 @@ namespace CondenserLoopTowers {
 	};
 
 	// Object Data
-	extern FArray1D< Towerspecs > SimpleTower; // dimension to number of machines
-	extern FArray1D< TowerInletConds > SimpleTowerInlet; // inlet conditions
-	extern FArray1D< ReportVars > SimpleTowerReport; // report variables
-	extern FArray1D< VSTowerData > VSTower; // model coefficients and specific variables for VS tower
+	extern Array1D< Towerspecs > SimpleTower; // dimension to number of machines
+	extern Array1D< TowerInletConds > SimpleTowerInlet; // inlet conditions
+	extern Array1D< ReportVars > SimpleTowerReport; // report variables
+	extern Array1D< VSTowerData > VSTower; // model coefficients and specific variables for VS tower
 
 	// Functions
 
@@ -913,7 +670,7 @@ namespace CondenserLoopTowers {
 	Real64
 	VSMerkelResidual(
 		Real64 const AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = Tower number
+		Array1< Real64 > const & Par // par(1) = Tower number
 	);
 
 	void
@@ -963,19 +720,19 @@ namespace CondenserLoopTowers {
 	Real64
 	SimpleTowerUAResidual(
 		Real64 const UA, // UA of cooling tower
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = design tower load [W]
+		Array1< Real64 > const & Par // par(1) = design tower load [W]
 	);
 
 	Real64
 	SimpleTowerTrResidual(
 		Real64 const Trange, // cooling tower range temperature [C]
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = tower number
+		Array1< Real64 > const & Par // par(1) = tower number
 	);
 
 	Real64
 	SimpleTowerApproachResidual(
 		Real64 const FlowRatio, // water or air flow ratio of cooling tower
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = tower number
+		Array1< Real64 > const & Par // par(1) = tower number
 	);
 
 	// End of the CondenserLoopTowers Module Simulation Subroutines
@@ -1005,7 +762,7 @@ namespace CondenserLoopTowers {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

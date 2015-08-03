@@ -2,8 +2,8 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -225,8 +225,8 @@ namespace ZoneContaminantPredictorCorrector {
 		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string AlphaName;
-		FArray1D< Real64 > IHGNumbers;
+		Array1D_string AlphaName;
+		Array1D< Real64 > IHGNumbers;
 		Real64 SchMin;
 		Real64 SchMax;
 		int NumAlpha;
@@ -240,7 +240,7 @@ namespace ZoneContaminantPredictorCorrector {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		//  LOGICAL :: ValidScheduleType
-		FArray1D_bool RepVarSet;
+		Array1D_bool RepVarSet;
 		std::string CurrentModuleObject;
 
 		// FLOW:
@@ -397,10 +397,11 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericPDriven( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), MultizoneSurfaceData.SurfName(), AirflowNetworkNumOfSurfaces );
 			if ( ZoneContamGenericPDriven( Loop ).SurfNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
+				ShowContinueError( "which is not listed in AirflowNetwork:MultiZone:Surface." );
 				ErrorsFound = true;
 			}
 			// Ensure external surface
-			if ( Surface( ZoneContamGenericPDriven( Loop ).SurfNum ).ExtBoundCond != ExternalEnvironment ) {
+			if ( ZoneContamGenericPDriven( Loop ).SurfNum > 0 && Surface( MultizoneSurfaceData( ZoneContamGenericPDriven( Loop ).SurfNum ).SurfNum ).ExtBoundCond != ExternalEnvironment ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + ". The entered surface (" + AlphaName( 2 ) + ") is not an exterior surface" );
 				ErrorsFound = true;
 			}
@@ -452,13 +453,17 @@ namespace ZoneContaminantPredictorCorrector {
 			// Object report variables
 			SetupOutputVariable( "Generic Air Contaminant Pressure Driven Generation Volume Flow Rate [m3/s]", ZoneContamGenericPDriven( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericPDriven( Loop ).Name );
 
-			ZonePtr = Surface( ZoneContamGenericPDriven( Loop ).SurfNum ).Zone;
+			if ( ZoneContamGenericPDriven( Loop ).SurfNum > 0 ) {
+				ZonePtr = Surface( MultizoneSurfaceData( ZoneContamGenericPDriven( Loop ).SurfNum ).SurfNum ).Zone;
+			} else {
+				ZonePtr = 0;
+			}
 			// Zone total report variables
-			if ( RepVarSet( ZonePtr ) ) {
+			if ( ZonePtr > 0 && RepVarSet( ZonePtr ) ) {
 				RepVarSet( ZonePtr ) = false;
 				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate [m3/s]", ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
 			}
-			SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericPDriven( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericPDriven( Loop ).GCGenRate );
+			if ( ZonePtr > 0 ) SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericPDriven( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericPDriven( Loop ).GCGenRate );
 		}
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
@@ -894,8 +899,8 @@ namespace ZoneContaminantPredictorCorrector {
 		struct NeededControlTypes
 		{
 			// Members
-			FArray1D_bool MustHave; // 4= the four control types
-			FArray1D_bool DidHave;
+			Array1D_bool MustHave; // 4= the four control types
+			Array1D_bool DidHave;
 
 			// Default Constructor
 			NeededControlTypes() :
@@ -905,8 +910,8 @@ namespace ZoneContaminantPredictorCorrector {
 
 			// Member Constructor
 			NeededControlTypes(
-				FArray1_bool const & MustHave, // 4= the four control types
-				FArray1_bool const & DidHave
+				Array1_bool const & MustHave, // 4= the four control types
+				Array1_bool const & DidHave
 			) :
 				MustHave( 4, MustHave ),
 				DidHave( 4, DidHave )
@@ -917,8 +922,8 @@ namespace ZoneContaminantPredictorCorrector {
 		struct NeededComfortControlTypes
 		{
 			// Members
-			FArray1D_bool MustHave; // 4= the four control types
-			FArray1D_bool DidHave;
+			Array1D_bool MustHave; // 4= the four control types
+			Array1D_bool DidHave;
 
 			// Default Constructor
 			NeededComfortControlTypes() :
@@ -928,8 +933,8 @@ namespace ZoneContaminantPredictorCorrector {
 
 			// Member Constructor
 			NeededComfortControlTypes(
-				FArray1_bool const & MustHave, // 4= the four control types
-				FArray1_bool const & DidHave
+				Array1_bool const & MustHave, // 4= the four control types
+				Array1_bool const & DidHave
 			) :
 				MustHave( 12, MustHave ),
 				DidHave( 12, DidHave )
@@ -1082,7 +1087,6 @@ namespace ZoneContaminantPredictorCorrector {
 		using InternalHeatGains::SumAllInternalGenericContamGains;
 		using DataAirflowNetwork::MultizoneSurfaceData;
 		using DataAirflowNetwork::AirflowNetworkNodeSimu;
-		using DataAirflowNetwork::AirflowNetworkNumOfZones;
 		using DataAirflowNetwork::SimulateAirflowNetwork;
 		using DataAirflowNetwork::AirflowNetworkControlSimple;
 
@@ -1328,7 +1332,7 @@ namespace ZoneContaminantPredictorCorrector {
 		if ( Contaminant.CO2Simulation ) {
 			for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 				SumAllInternalCO2Gains( Loop, ZoneCO2Gain( Loop ) );
-				SumInternalCO2GainsByTypes( Loop, FArray1D_int( 1, IntGainTypeOf_People ), ZoneCO2GainFromPeople( Loop ) );
+				SumInternalCO2GainsByTypes( Loop, Array1D_int( 1, IntGainTypeOf_People ), ZoneCO2GainFromPeople( Loop ) );
 			}
 		}
 
@@ -1375,7 +1379,7 @@ namespace ZoneContaminantPredictorCorrector {
 				if ( Sch == 0.0 || BeginEnvrnFlag || WarmupFlag ) {
 					ZoneContamGenericDecay( Loop ).GCTime = 0.0;
 				} else {
-					ZoneContamGenericDecay( Loop ).GCTime += TimeStepZone * SecInHour;
+					ZoneContamGenericDecay( Loop ).GCTime += TimeStepZoneSec;
 				}
 				GCGain = ZoneContamGenericDecay( Loop ).GCInitEmiRate * Sch * std::exp( -ZoneContamGenericDecay( Loop ).GCTime / ZoneContamGenericDecay( Loop ).GCDelayTime );
 				ZoneContamGenericDecay( Loop ).GCGenRate = GCGain;
@@ -1952,7 +1956,6 @@ namespace ZoneContaminantPredictorCorrector {
 		using ZonePlenum::NumZoneReturnPlenums;
 		using ZonePlenum::NumZoneSupplyPlenums;
 		using DataDefineEquip::AirDistUnit;
-		using DataDefineEquip::NumAirDistUnits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2301,7 +2304,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

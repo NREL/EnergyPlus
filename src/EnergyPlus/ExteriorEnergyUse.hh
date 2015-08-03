@@ -2,7 +2,7 @@
 #define ExteriorEnergyUse_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -154,8 +154,8 @@ namespace ExteriorEnergyUse {
 	};
 
 	// Object Data
-	extern FArray1D< ExteriorLightUsage > ExteriorLights; // Structure for Exterior Light reporting
-	extern FArray1D< ExteriorEquipmentUsage > ExteriorEquipment; // Structure for Exterior Equipment Reporting
+	extern Array1D< ExteriorLightUsage > ExteriorLights; // Structure for Exterior Light reporting
+	extern Array1D< ExteriorEquipmentUsage > ExteriorEquipment; // Structure for Exterior Equipment Reporting
 
 	// Functions
 
@@ -180,7 +180,7 @@ namespace ExteriorEnergyUse {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

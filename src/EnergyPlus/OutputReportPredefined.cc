@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
@@ -88,6 +88,17 @@ namespace OutputReportPredefined {
 	int pdchDXCoolCoilSEERIP; // SEER value in IP unit at AHRI std. 210/240 conditions [Btu/W-hr]
 	int pdchDXCoolCoilEERIP; // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
 	int pdchDXCoolCoilIEERIP; // IEER value in IP unit at AHRI std. 340/360 conditions
+
+	// DX Cooling Coil subtable per ANSI/ASHRAE Std 127 for Tests A, B, C and D
+	int pdstDXCoolCoil2;
+	int pdchDXCoolCoilNetCapSIA; // Standard Rated (Net) Cooling Capacity [W], Test A
+	int pdchDXCoolCoilElecPowerA; // Standard Rated Electric Power [W], Test A
+	int pdchDXCoolCoilNetCapSIB; // Standard Rated (Net) Cooling Capacity [W], Test B
+	int pdchDXCoolCoilElecPowerB; // Standard Rated Electric Power [W], Test B
+	int pdchDXCoolCoilNetCapSIC; // Standard Rated (Net) Cooling Capacity [W], Test C
+	int pdchDXCoolCoilElecPowerC; // Standard Rated Electric Power [W], Test C
+	int pdchDXCoolCoilNetCapSID; // Standard Rated (Net) Cooling Capacity [W], Test D
+	int pdchDXCoolCoilElecPowerD; // Standard Rated Electric Power [W], Test D
 
 	// VAV DX Cooling Ratings Details
 	int pdstVAVDXCoolCoil; // details for Packaged VAV rating under AHRI 340/360
@@ -264,6 +275,16 @@ namespace OutputReportPredefined {
 	int pdchSysSizUserClAir;
 	int pdchSysSizCalcHtAir;
 	int pdchSysSizUserHtAir;
+	int pdstPlantSize;
+	int pdchPlantSizCalcVdot;
+	int pdchPlantSizMeasVdot;
+	int pdchPlantSizPrevVdot;
+//	int pdchPlantSizPass;
+	int pdchPlantSizCoincYesNo;
+	int pdchPlantSizDesDay;
+	int pdchPlantSizPkTimeHour;
+	int pdchPlantSizPkTimeDayOfSim;
+	int pdchPlantSizPkTimeMin;
 
 	//System summary
 	int pdrSystem;
@@ -630,12 +651,12 @@ namespace OutputReportPredefined {
 	Real64 TotalTimeNotSimpleASH55EitherForABUPS( 0.0 );
 
 	// Object Data
-	FArray1D< reportNameType > reportName;
-	FArray1D< SubTableType > subTable;
-	FArray1D< ColumnTagType > columnTag;
-	FArray1D< TableEntryType > tableEntry;
-	FArray1D< CompSizeTableEntryType > CompSizeTableEntry;
-	FArray1D< ShadowRelateType > ShadowRelate;
+	Array1D< reportNameType > reportName;
+	Array1D< SubTableType > subTable;
+	Array1D< ColumnTagType > columnTag;
+	Array1D< TableEntryType > tableEntry;
+	Array1D< CompSizeTableEntryType > CompSizeTableEntry;
+	Array1D< ShadowRelateType > ShadowRelate;
 
 	// Functions
 
@@ -877,6 +898,18 @@ namespace OutputReportPredefined {
 		pdchDXCoolCoilSEERIP = newPreDefColumn( pdstDXCoolCoil, "SEER [Btu/W-h]" );
 		pdchDXCoolCoilIEERIP = newPreDefColumn( pdstDXCoolCoil, "IEER [Btu/W-h]" );
 
+		// for DX Cooling Coil ASHRAE 127-12 Report
+		pdstDXCoolCoil2 = newPreDefSubTable( pdrEquip, "DX Cooling Coil ASHRAE 127 Standard Ratings Report" );
+		pdchDXCoolCoilType = newPreDefColumn( pdstDXCoolCoil2, "DX Cooling Coil Type" );
+		pdchDXCoolCoilNetCapSIA = newPreDefColumn( pdstDXCoolCoil2, "Rated Net Cooling Capacity Test A [W]" );
+		pdchDXCoolCoilElecPowerA = newPreDefColumn( pdstDXCoolCoil2, "Rated Electric Power Test A [W]" );
+		pdchDXCoolCoilNetCapSIB = newPreDefColumn( pdstDXCoolCoil2, "Rated Net Cooling Capacity Test B [W]" );
+		pdchDXCoolCoilElecPowerB = newPreDefColumn( pdstDXCoolCoil2, "Rated Electric Power Test B [W]" );
+		pdchDXCoolCoilNetCapSIC = newPreDefColumn( pdstDXCoolCoil2, "Rated Net Cooling Capacity Test C [W]" );
+		pdchDXCoolCoilElecPowerC = newPreDefColumn( pdstDXCoolCoil2, "Rated Electric Power Test C [W]" );
+		pdchDXCoolCoilNetCapSID = newPreDefColumn( pdstDXCoolCoil2, "Rated Net Cooling Capacity Test D [W]" );
+		pdchDXCoolCoilElecPowerD = newPreDefColumn( pdstDXCoolCoil2, "Rated Electric Power Test D [W]" );
+
 		pdstDXHeatCoil = newPreDefSubTable( pdrEquip, "DX Heating Coils" );
 		pdchDXHeatCoilType = newPreDefColumn( pdstDXHeatCoil, "DX Heating Coil Type" );
 		pdchDXHeatCoilHighCap = newPreDefColumn( pdstDXHeatCoil, "High Temperature Heating (net) Rating Capacity [W]" );
@@ -923,7 +956,7 @@ namespace OutputReportPredefined {
 
 		pdrSizing = newPreDefReport( "HVACSizingSummary", "Size", "HVAC Sizing Summary" );
 
-		pdstZoneClSize = newPreDefSubTable( pdrSizing, "Zone Cooling" );
+		pdstZoneClSize = newPreDefSubTable( pdrSizing, "Zone Sensible Cooling" );
 
 		pdchZnClCalcDesLd = newPreDefColumn( pdstZoneClSize, "Calculated Design Load [W]" );
 		pdchZnClUserDesLd = newPreDefColumn( pdstZoneClSize, "User Design Load [W]" );
@@ -937,8 +970,9 @@ namespace OutputReportPredefined {
 		pdchZnClPkIndHum = newPreDefColumn( pdstZoneClSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
 		pdchZnClPkOATemp = newPreDefColumn( pdstZoneClSize, "Outdoor Temperature at Peak Load [C]" );
 		pdchZnClPkOAHum = newPreDefColumn( pdstZoneClSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
+		addFootNoteSubTable( pdstZoneClSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads." );
 
-		pdstZoneHtSize = newPreDefSubTable( pdrSizing, "Zone Heating" );
+		pdstZoneHtSize = newPreDefSubTable( pdrSizing, "Zone Sensible Heating" );
 
 		pdchZnHtCalcDesLd = newPreDefColumn( pdstZoneHtSize, "Calculated Design Load [W]" );
 		pdchZnHtUserDesLd = newPreDefColumn( pdstZoneHtSize, "User Design Load [W]" );
@@ -952,6 +986,7 @@ namespace OutputReportPredefined {
 		pdchZnHtPkIndHum = newPreDefColumn( pdstZoneHtSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
 		pdchZnHtPkOATemp = newPreDefColumn( pdstZoneHtSize, "Outdoor Temperature at Peak Load [C]" );
 		pdchZnHtPkOAHum = newPreDefColumn( pdstZoneHtSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
+		addFootNoteSubTable( pdstZoneHtSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads." );
 
 		pdstSystemSize = newPreDefSubTable( pdrSizing, "System Design Air Flow Rates" );
 
@@ -959,6 +994,17 @@ namespace OutputReportPredefined {
 		pdchSysSizUserClAir = newPreDefColumn( pdstSystemSize, "User cooling [m3/s]" );
 		pdchSysSizCalcHtAir = newPreDefColumn( pdstSystemSize, "Calculated heating [m3/s]" );
 		pdchSysSizUserHtAir = newPreDefColumn( pdstSystemSize, "User heating [m3/s]" );
+
+		pdstPlantSize = newPreDefSubTable( pdrSizing, "Plant Loop Coincident Design Fluid Flow Rate Adjustments" );
+//		pdchPlantSizPass = newPreDefColumn( pdstPlantSize, "Sizing Pass" );
+		pdchPlantSizPrevVdot = newPreDefColumn( pdstPlantSize, "Previous Design Volume Flow Rate [m3/s]" );
+		pdchPlantSizMeasVdot = newPreDefColumn( pdstPlantSize, "Algorithm Volume Flow Rate [m3/s]" );
+		pdchPlantSizCalcVdot = newPreDefColumn( pdstPlantSize, "Coincident Design Volume Flow Rate [m3/s]" );
+		pdchPlantSizCoincYesNo = newPreDefColumn( pdstPlantSize, "Coincident Size Adjusted" );
+		pdchPlantSizDesDay = newPreDefColumn( pdstPlantSize, "Peak Sizing Period Name" );
+		pdchPlantSizPkTimeDayOfSim = newPreDefColumn( pdstPlantSize, "Peak Day into Period" );
+		pdchPlantSizPkTimeHour = newPreDefColumn( pdstPlantSize, "Peak Hour Of Day" );
+		pdchPlantSizPkTimeMin = newPreDefColumn( pdstPlantSize, "Peak Step Start Minute" );
 
 		// System Summary Report
 
@@ -1616,7 +1662,7 @@ namespace OutputReportPredefined {
 			++numTableEntry;
 			// if larger than current size grow the array
 			if ( numTableEntry > sizeTableEntry ) {
-				tableEntry.redimension( sizeTableEntry += sizeIncrement );
+				tableEntry.redimension( sizeTableEntry *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 	}
@@ -1668,7 +1714,7 @@ namespace OutputReportPredefined {
 			++numCompSizeTableEntry;
 			// if larger than current size grow the array
 			if ( numCompSizeTableEntry > sizeCompSizeTableEntry ) {
-				CompSizeTableEntry.redimension( sizeCompSizeTableEntry += sizeIncrement );
+				CompSizeTableEntry.redimension( sizeCompSizeTableEntry *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 		CompSizeTableEntry( numCompSizeTableEntry ).typeField = FieldType;
@@ -1726,7 +1772,7 @@ namespace OutputReportPredefined {
 			++numShadowRelate;
 			// if larger than current size grow the array
 			if ( numShadowRelate > sizeShadowRelate ) {
-				ShadowRelate.redimension( sizeShadowRelate += sizeIncrement );
+				ShadowRelate.redimension( sizeShadowRelate *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 		ShadowRelate( numShadowRelate ).castSurf = castingField;
@@ -1782,7 +1828,7 @@ namespace OutputReportPredefined {
 			++numReportName;
 			// if larger than current size grow the array
 			if ( numReportName > sizeReportName ) {
-				reportName.redimension( sizeReportName += sizeIncrement );
+				reportName.redimension( sizeReportName *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 		// initialize new record
@@ -1840,7 +1886,7 @@ namespace OutputReportPredefined {
 			++numSubTable;
 			// if larger than current size then grow the array
 			if ( numSubTable > sizeSubTable ) {
-				subTable.redimension( sizeSubTable += sizeIncrement );
+				subTable.redimension( sizeSubTable *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 		// initialize new record)
@@ -1937,7 +1983,7 @@ namespace OutputReportPredefined {
 			++numColumnTag;
 			// if larger than current size grow the array
 			if ( numColumnTag > sizeColumnTag ) {
-				columnTag.redimension( sizeColumnTag += sizeIncrement );
+				columnTag.redimension( sizeColumnTag *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 		// initialize new record)
@@ -1949,7 +1995,7 @@ namespace OutputReportPredefined {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

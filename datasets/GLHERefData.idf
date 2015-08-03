@@ -19,7 +19,7 @@
 ! is 0.75in. Dia. SDR11 HDPE. The fluid is water. The borehole/length ratio is 0.06
 ! (76.2m/4.572m [300ft/15ft])
 
-!  Version,8.1;
+!  Version,8.3;
 
 !************ LINE CONFIGURATION: 1 x 2, line, Standard Grout *****************
 ! The G-function is defined by the following data pairs
@@ -28,14 +28,13 @@
     Vertical GHE 1x2 Std,    !- Name
     GHE Inlet Node 1x2 Std,  !- Inlet Node Name
     GHE Outlet Node 1x2 Std, !- Outlet Node Name
-    0.000303,                !- Maximum Flow Rate {m3/s}
+    0.000303,                !- Design Flow Rate {m3/s}
     2,                       !- Number of Bore Holes
     76.2,                    !- Bore Hole Length {m}
     0.05715,                 !- Bore Hole Radius {m}
     2.493,                   !- Ground Thermal Conductivity {W/m-K}
     2.4957E+06,              !- Ground Thermal Heat Capacity {J/m3-K}
     13.0,                    !- Ground Temperature {C}
-    0.00303,                 !- Design Flow Rate {m3/s}
     0.744,                   !- Grout Thermal Conductivity {W/m-K}
     0.389,                   !- Pipe Thermal Conductivity {W/m-K}
     0.0267,                  !- Pipe Out Diameter {m}
@@ -204,14 +203,13 @@
     Vertical GHE 1x2 Enhanced,  !- Name
     GHE Inlet Node 1x2 Enhanced,  !- Inlet Node Name
     GHE Outlet Node 1x2 Enhanced,  !- Outlet Node Name
-    0.000303,                !- Maximum Flow Rate {m3/s}
+    0.000303,                !- Design Flow Rate {m3/s}
     2,                       !- Number of Bore Holes
     76.2,                    !- Bore Hole Length {m}
     0.05715,                 !- Bore Hole Radius {m}
     2.493,                   !- Ground Thermal Conductivity {W/m-K}
     2.4957E+06,              !- Ground Thermal Heat Capacity {J/m3-K}
     13.0,                    !- Ground Temperature {C}
-    0.00303,                 !- Design Flow Rate {m3/s}
     1.4714,                  !- Grout Thermal Conductivity {W/m-K}
     0.389,                   !- Pipe Thermal Conductivity {W/m-K}
     0.0267,                  !- Pipe Out Diameter {m}
@@ -380,14 +378,13 @@
     Vertical GHE 4x4 Std,    !- Name
     GHE Inlet Node 4x4 Std,  !- Inlet Node Name
     GHE Outlet Node 4x4 Std, !- Outlet Node Name
-    0.00242,                 !- Maximum Flow Rate {m3/s}
+    0.00242,                 !- Design Flow Rate {m3/s}
     16,                      !- Number of Bore Holes
     76.2,                    !- Bore Hole Length {m}
     0.05715,                 !- Bore Hole Radius {m}
     2.493,                   !- Ground Thermal Conductivity {W/m-K}
     2.4957E+06,              !- Ground Thermal Heat Capacity {J/m3-K}
     13.0,                    !- Ground Temperature {C}
-    0.00242,                 !- Design Flow Rate {m3/s}
     0.744,                   !- Grout Thermal Conductivity {W/m-K}
     0.389,                   !- Pipe Thermal Conductivity {W/m-K}
     0.0267,                  !- Pipe Out Diameter {m}
@@ -556,14 +553,13 @@
     Vertical GHE 4x4 Enhanced,  !- Name
     GHE Inlet Node 4x4 Enhanced,  !- Inlet Node Name
     GHE Outlet Node 4x4 Enhanced,  !- Outlet Node Name
-    0.00242,                 !- Maximum Flow Rate {m3/s}
+    0.00242,                 !- Design Flow Rate {m3/s}
     16,                      !- Number of Bore Holes
     76.2,                    !- Bore Hole Length {m}
     0.05715,                 !- Bore Hole Radius {m}
     2.493,                   !- Ground Thermal Conductivity {W/m-K}
     2.4957E+06,              !- Ground Thermal Heat Capacity {J/m3-K}
     13.0,                    !- Ground Temperature {C}
-    0.00242,                 !- Design Flow Rate {m3/s}
     1.4714,                  !- Grout Thermal Conductivity {W/m-K}
     0.389,                   !- Pipe Thermal Conductivity {W/m-K}
     0.0267,                  !- Pipe Out Diameter {m}
@@ -732,14 +728,13 @@
     Vertical GHE 8x8 Std,    !- Name
     GHE Inlet Node 8x8 Std,  !- Inlet Node Name
     GHE Outlet Node 8x8 Std, !- Outlet Node Name
-    0.00969,                 !- Maximum Flow Rate {m3/s}
+    0.00969,                 !- Design Flow Rate {m3/s}
     64,                      !- Number of Bore Holes
     76.2,                    !- Bore Hole Length {m}
     0.05715,                 !- Bore Hole Radius {m}
     2.493,                   !- Ground Thermal Conductivity {W/m-K}
     2.4957E+06,              !- Ground Thermal Heat Capacity {J/m3-K}
     13.0,                    !- Ground Temperature {C}
-    0.00969,                 !- Design Flow Rate {m3/s}
     0.744,                   !- Grout Thermal Conductivity {W/m-K}
     0.389,                   !- Pipe Thermal Conductivity {W/m-K}
     0.0267,                  !- Pipe Out Diameter {m}
@@ -908,14 +903,13 @@
     Vertical GHE 8x8 Enhanced,  !- Name
     GHE Inlet Node 8x8 Enhanced,  !- Inlet Node Name
     GHE Outlet Node 8x8 Enhanced,  !- Outlet Node Name
-    0.00969,                 !- Maximum Flow Rate {m3/s}
+    0.00969,                 !- Design Flow Rate {m3/s}
     64,                      !- Number of Bore Holes
     76.2,                    !- Bore Hole Length {m}
     0.05715,                 !- Bore Hole Radius {m}
     2.493,                   !- Ground Thermal Conductivity {W/m-K}
     2.4957E+06,              !- Ground Thermal Heat Capacity {J/m3-K}
     13.0,                    !- Ground Temperature {C}
-    0.00969,                 !- Design Flow Rate {m3/s}
     1.4714,                  !- Grout Thermal Conductivity {W/m-K}
     0.389,                   !- Pipe Thermal Conductivity {W/m-K}
     0.0267,                  !- Pipe Out Diameter {m}

@@ -2,8 +2,8 @@
 #define DataPlantPipingSystems_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray3D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array3D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -234,7 +234,7 @@ namespace DataPlantPipingSystems {
 	struct CartesianPipeCellInformation // Specialized cell information only used by cells which contain pipes
 	{
 		// Members
-		FArray1D< RadialCellInformation > Soil;
+		Array1D< RadialCellInformation > Soil;
 		RadialCellInformation Insulation;
 		RadialCellInformation Pipe;
 		FluidCellInformation Fluid;
@@ -247,7 +247,7 @@ namespace DataPlantPipingSystems {
 
 		// Member Constructor
 		CartesianPipeCellInformation(
-			FArray1< RadialCellInformation > const & Soil,
+			Array1< RadialCellInformation > const & Soil,
 			RadialCellInformation const & Insulation,
 			RadialCellInformation const & Pipe,
 			FluidCellInformation const & Fluid,
@@ -411,7 +411,7 @@ namespace DataPlantPipingSystems {
 		Real64 Min;
 		Real64 Max;
 		int RegionType; // From Enum: RegionType
-		FArray1D< Real64 > CellWidths;
+		Array1D< Real64 > CellWidths;
 
 		// Default Constructor
 		GridRegion()
@@ -422,7 +422,7 @@ namespace DataPlantPipingSystems {
 			Real64 const Min,
 			Real64 const Max,
 			int const RegionType, // From Enum: RegionType
-			FArray1< Real64 > const & CellWidths
+			Array1< Real64 > const & CellWidths
 		) :
 			Min( Min ),
 			Max( Max ),
@@ -571,7 +571,7 @@ namespace DataPlantPipingSystems {
 		Point3DReal Centroid;
 		int CellType; // From Enum: CellType
 		int PipeIndex;
-		FArray1D< DirectionNeighbor_Dictionary > NeighborInformation;
+		Array1D< DirectionNeighbor_Dictionary > NeighborInformation;
 		CartesianPipeCellInformation PipeCellData;
 
 		// Default Constructor
@@ -593,7 +593,7 @@ namespace DataPlantPipingSystems {
 			Point3DReal const & Centroid,
 			int const CellType, // From Enum: CellType
 			int const PipeIndex,
-			FArray1< DirectionNeighbor_Dictionary > const & NeighborInformation,
+			Array1< DirectionNeighbor_Dictionary > const & NeighborInformation,
 			CartesianPipeCellInformation const & PipeCellData
 		) :
 			MyBase( MyBase ),
@@ -766,8 +766,8 @@ namespace DataPlantPipingSystems {
 		int WallBoundaryOSCMIndex;
 		std::string FloorBoundaryOSCMName;
 		int FloorBoundaryOSCMIndex;
-		FArray1D_int WallSurfacePointers;
-		FArray1D_int FloorSurfacePointers;
+		Array1D_int WallSurfacePointers;
+		Array1D_int FloorSurfacePointers;
 		int BasementWallXIndex;
 		int BasementFloorYIndex;
 
@@ -793,8 +793,8 @@ namespace DataPlantPipingSystems {
 			int const WallBoundaryOSCMIndex,
 			std::string const & FloorBoundaryOSCMName,
 			int const FloorBoundaryOSCMIndex,
-			FArray1_int const & WallSurfacePointers,
-			FArray1_int const & FloorSurfacePointers,
+			Array1_int const & WallSurfacePointers,
+			Array1_int const & FloorSurfacePointers,
 			int const BasementWallXIndex,
 			int const BasementFloorYIndex
 		) :
@@ -840,7 +840,7 @@ namespace DataPlantPipingSystems {
 	struct ReportingInformation
 	{
 		// Members
-		FArray1D< DirectionReal_Dictionary > SurfaceHeatTransfer;
+		Array1D< DirectionReal_Dictionary > SurfaceHeatTransfer;
 		Real64 TotalBoundaryHeatTransfer;
 		Real64 EnergyStoredInCells;
 		Real64 AverageSurfaceTemperature;
@@ -866,7 +866,7 @@ namespace DataPlantPipingSystems {
 
 		// Member Constructor
 		ReportingInformation(
-			FArray1< DirectionReal_Dictionary > const & SurfaceHeatTransfer,
+			Array1< DirectionReal_Dictionary > const & SurfaceHeatTransfer,
 			Real64 const TotalBoundaryHeatTransfer,
 			Real64 const EnergyStoredInCells,
 			Real64 const AverageSurfaceTemperature,
@@ -894,9 +894,9 @@ namespace DataPlantPipingSystems {
 	struct MeshPartitions
 	{
 		// Members
-		FArray1D< MeshPartition > X;
-		FArray1D< MeshPartition > Y;
-		FArray1D< MeshPartition > Z;
+		Array1D< MeshPartition > X;
+		Array1D< MeshPartition > Y;
+		Array1D< MeshPartition > Z;
 
 		// Default Constructor
 		MeshPartitions()
@@ -904,9 +904,9 @@ namespace DataPlantPipingSystems {
 
 		// Member Constructor
 		MeshPartitions(
-			FArray1< MeshPartition > const & X,
-			FArray1< MeshPartition > const & Y,
-			FArray1< MeshPartition > const & Z
+			Array1< MeshPartition > const & X,
+			Array1< MeshPartition > const & Y,
+			Array1< MeshPartition > const & Z
 		) :
 			X( X ),
 			Y( Y ),
@@ -1058,8 +1058,8 @@ namespace DataPlantPipingSystems {
 		Point3DInteger CircuitInletCell;
 		Point3DInteger CircuitOutletCell;
 		// Names and pointers to pipe segments found in this pipe circuit
-		FArray1D_string PipeSegmentNames;
-		FArray1D_int PipeSegmentIndeces;
+		Array1D_string PipeSegmentNames;
+		Array1D_int PipeSegmentIndeces;
 		// Pointer to the domain which contains this pipe circuit
 		int ParentDomainIndex;
 		// Misc inputs
@@ -1075,7 +1075,7 @@ namespace DataPlantPipingSystems {
 		BaseThermalPropertySet PipeProperties;
 		BaseThermalPropertySet InsulationProperties;
 		// A list of 3d cell indices that span the entire length of this pipe circuit (useful for reporting)
-		FArray1D< Point3DInteger > ListOfCircuitPoints;
+		Array1D< Point3DInteger > ListOfCircuitPoints;
 		// Flags
 		bool CheckEquipName;
 		bool NeedToFindOnPlantLoop;
@@ -1142,8 +1142,8 @@ namespace DataPlantPipingSystems {
 			int const OutletNodeNum,
 			Point3DInteger const & CircuitInletCell,
 			Point3DInteger const & CircuitOutletCell,
-			FArray1_string const & PipeSegmentNames,
-			FArray1_int const & PipeSegmentIndeces,
+			Array1_string const & PipeSegmentNames,
+			Array1_int const & PipeSegmentIndeces,
 			int const ParentDomainIndex,
 			RadialSizing const & PipeSize,
 			RadialSizing const & InsulationSize,
@@ -1156,7 +1156,7 @@ namespace DataPlantPipingSystems {
 			int const NumRadialCells,
 			BaseThermalPropertySet const & PipeProperties,
 			BaseThermalPropertySet const & InsulationProperties,
-			FArray1< Point3DInteger > const & ListOfCircuitPoints,
+			Array1< Point3DInteger > const & ListOfCircuitPoints,
 			bool const CheckEquipName,
 			bool const NeedToFindOnPlantLoop,
 			bool const IsActuallyPartOfAHorizontalTrench,
@@ -1285,8 +1285,8 @@ namespace DataPlantPipingSystems {
 		// ID
 		std::string Name;
 		// Names and pointers to circuits found in this domain
-		FArray1D_string CircuitNames;
-		FArray1D_int CircuitIndeces;
+		Array1D_string CircuitNames;
+		Array1D_int CircuitIndeces;
 		int MaxIterationsPerTS;
 		// Flag variables
 		bool OneTimeInit;
@@ -1316,7 +1316,7 @@ namespace DataPlantPipingSystems {
 		ReportingInformation Reporting;
 		bool HasBasement;
 		// Zone coupled variables
-		FArray1D <ZoneCoupledSurfaceData> ZoneCoupledSurfaces;
+		Array1D <ZoneCoupledSurfaceData> ZoneCoupledSurfaces;
 		int ZoneCoupledOSCMIndex;
 		Real64 PerimeterOffset;
 		bool SlabInGradeFlag;
@@ -1361,7 +1361,7 @@ namespace DataPlantPipingSystems {
 		int NumInsulationCells;
 
 		// Main 3D cells array
-		FArray3D< CartesianCell > Cells;
+		Array3D< CartesianCell > Cells;
 
 		// Default Constructor
 		FullDomainStructureInfo() :
@@ -1374,7 +1374,7 @@ namespace DataPlantPipingSystems {
 			IsActuallyPartOfAHorizontalTrench( false ),
 			HasAPipeCircuit( true ),
 			IsZoneCoupledSlab( false ),
-			HasCoupledBasement( false ), 
+			HasCoupledBasement( false ),
 			HasBasement( false ),
 			ZoneCoupledOSCMIndex( 0 ),
 			PerimeterOffset( 0.0 ),
@@ -1424,8 +1424,8 @@ namespace DataPlantPipingSystems {
 		// Member Constructor
 		FullDomainStructureInfo(
 			std::string const & Name,
-			FArray1_string const & CircuitNames,
-			FArray1_int const & CircuitIndeces,
+			Array1_string const & CircuitNames,
+			Array1_int const & CircuitIndeces,
 			int const MaxIterationsPerTS,
 			bool const OneTimeInit,
 			bool const BeginSimInit,
@@ -1451,7 +1451,7 @@ namespace DataPlantPipingSystems {
 			CurSimConditionsInfo const & Cur,
 			ReportingInformation const & Reporting,
 			bool const HasBasement,
-			FArray1 <ZoneCoupledSurfaceData> const & ZoneCoupledSurfaces,
+			Array1 <ZoneCoupledSurfaceData> const & ZoneCoupledSurfaces,
 			int const ZoneCoupledOSCMIndex,
 			Real64 const PerimeterOffset,
 			bool const SlabInGradeFlag,
@@ -1495,7 +1495,7 @@ namespace DataPlantPipingSystems {
 			int const NumGroundSurfCells,
 			int const NumInsulationCells,
 
-			FArray3< CartesianCell > const & Cells			
+			Array3< CartesianCell > const & Cells
 		) :
 			Name( Name ),
 			CircuitNames( CircuitNames ),
@@ -1574,9 +1574,9 @@ namespace DataPlantPipingSystems {
 	};
 
 	// Object Data
-	extern FArray1D< FullDomainStructureInfo > PipingSystemDomains;
-	extern FArray1D< PipeCircuitInfo > PipingSystemCircuits;
-	extern FArray1D< PipeSegmentInfo > PipingSystemSegments;
+	extern Array1D< FullDomainStructureInfo > PipingSystemDomains;
+	extern Array1D< PipeCircuitInfo > PipingSystemCircuits;
+	extern Array1D< PipeSegmentInfo > PipingSystemSegments;
 
 } // DataPlantPipingSystems
 

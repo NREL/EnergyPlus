@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -77,7 +77,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 	// Output Variables Type definition
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	std::string GSHPRefrigerant( "R22" ); // refrigerent name and index
 	int GSHPRefrigIndex( 0 );
@@ -98,8 +98,8 @@ namespace HeatPumpWaterToWaterCOOLING {
 	// Name Public routines, optionally name Private routines within this module
 
 	// Object Data
-	FArray1D< GshpSpecs > GSHP; // dimension to number of machines
-	FArray1D< ReportVars > GSHPReport;
+	Array1D< GshpSpecs > GSHP; // dimension to number of machines
+	Array1D< ReportVars > GSHPReport;
 
 	// MODULE SUBROUTINES:
 
@@ -252,8 +252,8 @@ namespace HeatPumpWaterToWaterCOOLING {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray( 5 ); // character string data
-		FArray1D< Real64 > NumArray( 23 ); // numeric data
+		Array1D_string AlphArray( 5 ); // character string data
+		Array1D< Real64 > NumArray( 23 ); // numeric data
 
 		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
@@ -473,8 +473,8 @@ namespace HeatPumpWaterToWaterCOOLING {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyPlanScanFlag;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyPlanScanFlag;
 		static bool MyOneTimeFlag( true );
 		Real64 rho; // local fluid density
 		bool errFlag;
@@ -548,11 +548,11 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 	void
 	CalcGshpModel(
-		std::string const & GSHPType, // type ofGSHP
+		std::string const & EP_UNUSED( GSHPType ), // type ofGSHP
 		std::string const & GSHPName, // user specified name ofGSHP
 		int const GSHPNum, // GSHP Number
 		Real64 & MyLoad, // Operating Load
-		bool const FirstHVACIteration
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -569,9 +569,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using namespace FluidProperties;
 		using General::TrimSigDigits;
 		using DataPlant::PlantLoop;
@@ -754,7 +752,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 		SourceSideEffect = 1.0 - std::exp( -SourceSideUA / ( CpSourceSide * SourceSideWaterMassFlowRate ) );
 
 		// main iteration loop to solve model equations
-		LOOPSourceEnth: while ( true ) {
+		while ( true ) {
 			++IterationCount;
 
 			// To determine Load Side temperature
@@ -826,7 +824,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 			//            Shoot into the super heated region
 			T111 = CompSuctionSatTemp + 100.0;
 			// Iterate to find the Suction State
-			LOOP: while ( true ) {
+			while ( true ) {
 				CompSuctionTemp = 0.5 * ( T110 + T111 );
 
 				CompSuctionEnth = GetSupHeatEnthalpyRefrig( GSHPRefrigerant, CompSuctionTemp, SuctionPr, GSHPRefrigIndex, RoutineNameCompSuctionTemp );
@@ -840,7 +838,6 @@ namespace HeatPumpWaterToWaterCOOLING {
 				} else {
 					T111 = CompSuctionTemp;
 				}
-				LOOP_loop: ;
 			}
 			LOOP_exit: ;
 
@@ -887,7 +884,6 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 			}
 
-			LOOPSourceEnth_loop: ;
 		}
 		LOOPSourceEnth_exit: ;
 

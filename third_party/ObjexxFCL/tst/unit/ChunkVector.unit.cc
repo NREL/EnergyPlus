@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -15,7 +15,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/ChunkVector.hh>
-#include <ObjexxFCL/ChunkVector.io.hh>
 #include <ObjexxFCL/TypeTraits.hh>
 #include "ObjexxFCL.unit.hh"
 
@@ -25,34 +24,26 @@
 #include <ostream>
 #include <vector>
 
-// Stream Output
+// Stream << vector
 template< typename T >
 std::ostream &
 operator <<( std::ostream & stream, std::vector< T > const & v )
 {
-	if ( v.empty() ) return stream;
-
-	// Types
 	using std::setw;
 	typedef  ObjexxFCL::TypeTraits< T >  Traits;
 	typedef  typename std::vector< T >::size_type  size_type;
-
-	// Save current stream state and set persistent state
-	std::ios_base::fmtflags const old_flags( stream.flags() );
-	std::streamsize const old_precision( stream.precision( Traits::precision() ) );
-	stream << std::right << std::showpoint << std::uppercase;
-
-	// Output array to stream
-	size_type const e( v.size() - 1 );
-	int const w( Traits::iwidth() );
-	for ( size_type i = 0; i < e; ++i ) {
-		stream << setw( w ) << v[ i ] << ' ';
-	} stream << setw( w ) << v[ e ];
-
-	// Restore previous stream state
-	stream.precision( old_precision );
-	stream.flags( old_flags );
-
+	if ( stream && ( ! v.empty() ) ) {
+		std::ios_base::fmtflags const old_flags( stream.flags() );
+		std::streamsize const old_precision( stream.precision( Traits::precision ) );
+		stream << std::right << std::showpoint << std::uppercase;
+		size_type const e( v.size() - 1 );
+		int const w( Traits::iwidth );
+		for ( size_type i = 0; i < e; ++i ) {
+			stream << setw( w ) << v[ i ] << ' ';
+		} stream << setw( w ) << v[ e ];
+		stream.precision( old_precision );
+		stream.flags( old_flags );
+	}
 	return stream;
 }
 

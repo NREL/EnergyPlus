@@ -95,7 +95,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.3;
 
   Timestep,6;
 
@@ -1814,33 +1814,33 @@
     0.0,                     !- Minimum Hot Water Flow Rate {m3/s}
     0.001,                   !- Heating Convergence Tolerance
     ,                        !- Availability Manager List Name
-    FanCoilDesignSpec1;       !- Design Specification ZoneHVAC Sizing Object Name
+    FanCoilDesignSpec1;      !- Design Specification ZoneHVAC Sizing Object Name
 
   DesignSpecification:ZoneHVAC:Sizing,
     FanCoilDesignSpec1,      !- Name
     SupplyAirFlowRate,       !- Cooling Design Air Flow Method
-    autosize,                !- Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
+    autosize,                !- Cooling Design Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
     ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+    ,                        !- Cooling Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    0.0,                     !- Supply Air Flow Rate When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
+    0.0,                     !- Supply Air Flow Rate When No Cooling or Heating is Required {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required {m3/s-m2}
+    ,                        !- Fraction of Design Cooling Supply Air Flow Rate When No Clg or Htg Required
+    ,                        !- Fraction of Design Heating Supply Air Flow Rate When No Clg or Htg Required
     SupplyAirFlowRate,       !- Heating Design Air Flow Method
-    autosize,                !- Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
+    autosize,                !- Heating Design Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Fraction of Heating Design Supply Air Flow Rate
+    ,                        !- Heating Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
     autosize,                !- Cooling Design Capacity {W}
     ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
     CapacityPerFloorArea,    !- Heating Design Capacity Method
     ,                        !- Heating Design Capacity {W}
     156.89549,               !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ;                        !- Fraction of Autosized Heating Design Capacity
 
   OutdoorAir:Mixer,
     Zone1FanCoilOAMixer,     !- Name
@@ -1852,7 +1852,7 @@
   Fan:ConstantVolume,
     Zone1FanCoilFan,         !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1948,28 +1948,28 @@
   DesignSpecification:ZoneHVAC:Sizing,
     FanCoilDesignSpec2,      !- Name
     FlowPerFloorArea,        !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Supply Air Flow Rate
-    9.9676501E-3,                       !- Cooling Design Supply Air Flow Rate Per Floor Area
+    ,                        !- Cooling Design Supply Air Flow Rate {m3/s}
+    9.9676501E-3,            !- Cooling Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
     ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+    ,                        !- Cooling Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     FlowPerFloorArea,        !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required
-    0.0,                     !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
+    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required {m3/s}
+    0.0,                     !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required {m3/s-m2}
+    ,                        !- Fraction of Design Cooling Supply Air Flow Rate When No Clg or Htg Required
+    ,                        !- Fraction of Design Heating Supply Air Flow Rate When No Clg or Htg Required
     FlowPerFloorArea,        !- Heating Design Air Flow Method
-    ,                        !- Heating Design Supply Air Flow Rate
-    9.9676501E-3,            !- Heating Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    FractionOfAutosizedCoolingCapacity,   !- Cooling Design Capacity Method
+    ,                        !- Heating Design Supply Air Flow Rate {m3/s}
+    9.9676501E-3,            !- Heating Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Fraction of Heating Design Supply Air Flow Rate
+    ,                        !- Heating Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    FractionOfAutosizedCoolingCapacity,  !- Cooling Design Capacity Method
     ,                        !- Cooling Design Capacity {W}
     ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    1.,                      !- Fraction of Autosized Cooling Design Capacity {-}
-    FractionOfAutosizedHeatingCapacity,   !- Heating Design Capacity Method
+    1.,                      !- Fraction of Autosized Cooling Design Capacity
+    FractionOfAutosizedHeatingCapacity,  !- Heating Design Capacity Method
     ,                        !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    1.;                      !- Fraction of Autosized Cooling Design Capacity {-}
+    1.;                      !- Fraction of Autosized Heating Design Capacity
 
   OutdoorAir:Mixer,
     Zone2FanCoilOAMixer,     !- Name
@@ -1981,7 +1981,7 @@
   Fan:ConstantVolume,
     Zone2FanCoilFan,         !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2074,33 +2074,31 @@
     ,                        !- Availability Manager List Name
     FanCoilDesignSpec3;      !- Design Specification ZoneHVAC Sizing Object Name
 
-
   DesignSpecification:ZoneHVAC:Sizing,
     FanCoilDesignSpec3,      !- Name
     FractionOfAutosizedCoolingAirflow,  !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
+    ,                        !- Cooling Design Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
     1.0,                     !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+    ,                        !- Cooling Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
+    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required {m3/s-m2}
+    ,                        !- Fraction of Design Cooling Supply Air Flow Rate When No Clg or Htg Required
+    ,                        !- Fraction of Design Heating Supply Air Flow Rate When No Clg or Htg Required
     FractionOfAutosizedHeatingAirflow,  !- Heating Design Air Flow Method
-    ,                        !- Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-    1.0,                     !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
+    ,                        !- Heating Design Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    1.0,                     !- Fraction of Heating Design Supply Air Flow Rate
+    ,                        !- Heating Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     CapacityPerFloorArea,    !- Cooling Design Capacity Method
     ,                        !- Cooling Design Capacity {W}
     234.74985,               !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
     CapacityPerFloorArea,    !- Heating Design Capacity Method
     ,                        !- Heating Design Capacity {W}
     156.89549,               !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-
+    ;                        !- Fraction of Autosized Heating Design Capacity
 
   OutdoorAir:Mixer,
     Zone3FanCoilOAMixer,     !- Name
@@ -2112,7 +2110,7 @@
   Fan:ConstantVolume,
     Zone3FanCoilFan,         !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency

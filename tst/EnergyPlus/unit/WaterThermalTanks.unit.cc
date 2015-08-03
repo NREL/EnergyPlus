@@ -5,16 +5,13 @@
 
 // EnergyPlus Headers
 #include <WaterThermalTanks.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 
-bool FloatEqualTest(Real64 val1, Real64 val2, Real64 SmallNum = 0.00000001) {
-	using namespace std;
-	return ( abs(val1 - val2) < SmallNum );
-}
-
 TEST( HeatPumpWaterHeaterTests, TestQsourceCalcs )
 {
+	ShowMessage( "Begin Test: HeatPumpWaterHeaterTests, TestQsourceCalcs" );
 	Real64 DeltaT = 0.0;
 	Real64 const SourceInletTemp = 62.0;
 	Real64 const Cp = 4178.; // water, J/(kg * K)
@@ -49,14 +46,41 @@ TEST( HeatPumpWaterHeaterTests, TestQsourceCalcs )
 	SourceMassFlowRate = SourceMassFlowRateOrig;
 	Real64 const NodeTemp = 58.0;
 	
+	WaterThermalTanks::StratifiedNodeData StratNode;
+	StratNode.Temp = 58.0;
+	StratNode.HPWHWrappedCondenserHeatingFrac = 0.5;
+	
 	// Test case without HPWH
-	DeltaT = 0.0;
-	Qsource = WaterThermalTanks::CalcStratifiedTankSourceSideHeatTransferRate(DeltaT, SourceInletTemp, Cp, SourceMassFlowRate, NodeTemp);
+	Qheatpump = 0.0;
+	Qsource = WaterThermalTanks::CalcStratifiedTankSourceSideHeatTransferRate(Qheatpump, SourceInletTemp, Cp, SourceMassFlowRate, StratNode);
 	EXPECT_DOUBLE_EQ(Qsource, SourceMassFlowRate * Cp * (SourceInletTemp - NodeTemp));
 	
-	// Test case with HPWH
-	DeltaT = 5.0;
-	Qsource = WaterThermalTanks::CalcStratifiedTankSourceSideHeatTransferRate(DeltaT, SourceInletTemp, Cp, SourceMassFlowRate, NodeTemp);
-	EXPECT_DOUBLE_EQ(Qsource, SourceMassFlowRate * Cp * DeltaT);
+	// Test case with Pumped HPWH
+	Qheatpump = 100.0;
+	Qsource = WaterThermalTanks::CalcStratifiedTankSourceSideHeatTransferRate(Qheatpump, SourceInletTemp, Cp, SourceMassFlowRate, StratNode);
+	EXPECT_DOUBLE_EQ(Qsource, Qheatpump);
 	
+	// Test case with Wrapped HPWH
+	SourceMassFlowRate = 0.0;
+	Qsource = WaterThermalTanks::CalcStratifiedTankSourceSideHeatTransferRate(Qheatpump, SourceInletTemp, Cp, SourceMassFlowRate, StratNode);
+	EXPECT_DOUBLE_EQ(Qsource, Qheatpump * StratNode.HPWHWrappedCondenserHeatingFrac );
+	
+}
+
+TEST( WaterThermalTankData, GetDeadBandTemp )
+{
+
+	ShowMessage( "Begin Test: WaterThermalTankData, GetDeadBandTemp" );
+	WaterThermalTanks::WaterThermalTankData thisTank;
+	thisTank.SetPointTemp = 10;
+	thisTank.DeadBandDeltaTemp = 1;
+
+	// first the hot water tank
+	thisTank.IsChilledWaterTank = false;
+	EXPECT_DOUBLE_EQ( 9.0,  thisTank.getDeadBandTemp() );
+
+	// then the chilled water tank
+	thisTank.IsChilledWaterTank = true;
+	EXPECT_DOUBLE_EQ( 11.0, thisTank.getDeadBandTemp() );
+
 }

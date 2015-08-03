@@ -1,11 +1,12 @@
 #ifndef ZoneTempPredictorCorrector_hh_INCLUDED
 #define ZoneTempPredictorCorrector_hh_INCLUDED
 
+// C++ Headers
+#include <vector>
+
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -27,11 +28,11 @@ namespace ZoneTempPredictorCorrector {
 	//INTEGER, PUBLIC, PARAMETER :: iPushZoneTimestepHistories    = 5
 	//INTEGER, PUBLIC, PARAMETER :: iPushSystemTimestepHistories  = 6
 
-	extern FArray1D_string const ValidControlTypes;
+	extern Array1D_string const ValidControlTypes;
 
-	extern FArray1D_string const ValidComfortControlTypes;
+	extern Array1D_string const ValidComfortControlTypes;
 
-	extern FArray1D_string const cZControlTypes;
+	extern Array1D_string const cZControlTypes;
 
 	extern int const iZC_TStat;
 	extern int const iZC_TCTStat;
@@ -39,7 +40,7 @@ namespace ZoneTempPredictorCorrector {
 	extern int const iZC_HStat;
 	extern int const iZC_TandHStat;
 	extern int const iZC_StagedDual;
-	extern FArray1D_int const iZControlTypes;
+	extern Array1D_int const iZControlTypes;
 
 	extern int const SglHeatSetPoint;
 	extern int const SglCoolSetPoint;
@@ -85,14 +86,14 @@ namespace ZoneTempPredictorCorrector {
 	// Number of zone with staged controlled objects
 	extern int NumStageCtrZone;
 
-	extern FArray1D< Real64 > ZoneSetPointLast;
-	extern FArray1D< Real64 > TempIndZnLd;
-	extern FArray1D< Real64 > TempDepZnLd;
-	extern FArray1D< Real64 > ZoneAirRelHum; // Zone relative humidity in percent
+	extern Array1D< Real64 > ZoneSetPointLast;
+	extern Array1D< Real64 > TempIndZnLd;
+	extern Array1D< Real64 > TempDepZnLd;
+	extern Array1D< Real64 > ZoneAirRelHum; // Zone relative humidity in percent
 
 	// Zone temperature history - used only for oscillation test
-	extern FArray2D< Real64 > ZoneTempHist;
-	extern FArray1D< Real64 > ZoneTempOscillate;
+	extern Array2D< Real64 > ZoneTempHist;
+	extern Array1D< Real64 > ZoneTempOscillate;
 	extern Real64 AnyZoneTempOscillate;
 
 	// SUBROUTINE SPECIFICATIONS:
@@ -178,14 +179,14 @@ namespace ZoneTempPredictorCorrector {
 	};
 
 	// Object Data
-	extern FArray1D< ZoneTempControlType > SetPointSingleHeating;
-	extern FArray1D< ZoneTempControlType > SetPointSingleCooling;
-	extern FArray1D< ZoneTempControlType > SetPointSingleHeatCool;
-	extern FArray1D< ZoneTempControlType > SetPointDualHeatCool;
-	extern FArray1D< ZoneComfortFangerControlType > SetPointSingleHeatingFanger;
-	extern FArray1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
-	extern FArray1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
-	extern FArray1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
+	extern Array1D< ZoneTempControlType > SetPointSingleHeating;
+	extern Array1D< ZoneTempControlType > SetPointSingleCooling;
+	extern Array1D< ZoneTempControlType > SetPointSingleHeatCool;
+	extern Array1D< ZoneTempControlType > SetPointDualHeatCool;
+	extern Array1D< ZoneComfortFangerControlType > SetPointSingleHeatingFanger;
+	extern Array1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
+	extern Array1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
+	extern Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
 
 	// Functions
 
@@ -238,7 +239,10 @@ namespace ZoneTempPredictorCorrector {
 	RevertZoneTimestepHistories();
 
 	void
-	CorrectZoneHumRat( int const ZoneNum );
+	CorrectZoneHumRat(
+		int const ZoneNum,
+		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
+	);
 
 	void
 	DownInterpolate4HistoryValues(
@@ -266,7 +270,8 @@ namespace ZoneTempPredictorCorrector {
 		Real64 & SumMCp, // Zone sum of MassFlowRate*Cp
 		Real64 & SumMCpT, // Zone sum of MassFlowRate*Cp*T
 		Real64 & SumSysMCp, // Zone sum of air system MassFlowRate*Cp
-		Real64 & SumSysMCpT // Zone sum of air system MassFlowRate*Cp*T
+		Real64 & SumSysMCpT, // Zone sum of air system MassFlowRate*Cp*T
+		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
 	);
 
 	void
@@ -281,7 +286,8 @@ namespace ZoneTempPredictorCorrector {
 		Real64 & SumMCpDTsystem, // Zone sum of air system MassFlowRate*Cp*(Tsup - Tz)
 		Real64 & SumNonAirSystem, // Zone sum of non air system convective heat gains
 		Real64 & CzdTdt, // Zone air energy storage term.
-		Real64 & imBalance // put all terms in eq. 5 on RHS , should be zero
+		Real64 & imBalance, // put all terms in eq. 5 on RHS , should be zero
+		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
 	);
 
 	bool
@@ -314,7 +320,7 @@ namespace ZoneTempPredictorCorrector {
 	Real64
 	PMVResidual(
 		Real64 const Tset,
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = PMV set point
+		Array1< Real64 > const & Par // par(1) = PMV set point
 	);
 
 	void
@@ -325,7 +331,7 @@ namespace ZoneTempPredictorCorrector {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

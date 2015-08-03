@@ -137,9 +137,7 @@ namespace EcoRoofManager {
 		//SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Kv( 0.4 ); // Von Karmen's constant (source FASST)
 		Real64 const rch( 0.63 ); // Turbulent Schimdt Number
-		Real64 const Ks( 0.2 ); // W/m.k. Thermal Conductivity of soil
 		Real64 const rche( 0.71 ); // Turbulent Prandtl Number
-		Real64 const Rv( 461.53 ); // Gas Constant of Water Vapor J/kg K
 		Real64 const Rair( 0.286e3 ); // Gas Constant of air J/Kg K
 		Real64 const g1( 9.81 ); // Gravity. In m/sec^2.
 		Real64 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant W/m^2K^4
@@ -280,7 +278,7 @@ namespace EcoRoofManager {
 		HMovInsul = 0.0;
 
 		if ( Surface( SurfNum ).ExtWind ) {
-			InitExteriorConvectionCoeff( SurfNum, HMovInsul, RoughSurf, AbsThermSurf, TH( SurfNum, 1, 1 ), HcExtSurf( SurfNum ), HSkyExtSurf( SurfNum ), HGrdExtSurf( SurfNum ), HAirExtSurf( SurfNum ) );
+			InitExteriorConvectionCoeff( SurfNum, HMovInsul, RoughSurf, AbsThermSurf, TH( 1, 1, SurfNum ), HcExtSurf( SurfNum ), HSkyExtSurf( SurfNum ), HGrdExtSurf( SurfNum ), HAirExtSurf( SurfNum ) );
 		}
 
 		RS = BeamSolarRad + AnisoSkyMult( SurfNum ) * DifSolarRad;
@@ -595,7 +593,7 @@ namespace EcoRoofManager {
 		} // if firstecosurface (if not we do NOT need to recalculate ecoroof energybalance as all ecoroof surfaces MUST be the same
 		// this endif was moved here from the if statement regarding whether we are looking at the first ecoroof surface or not.
 
-		TH( SurfNum, 1, 1 ) = Tgold; // SoilTemperature
+		TH( 1, 1, SurfNum ) = Tgold; // SoilTemperature
 		TempExt = Tgold;
 
 	}
@@ -611,10 +609,10 @@ namespace EcoRoofManager {
 		Real64 const Vfluxg, // Water mass flux from soil surface [m/s]
 		int & ConstrNum, // Indicator for contruction index for the current surface
 		Real64 & Alphag,
-		int const unit, // unused1208
-		Real64 const Tg, // unused1208
-		Real64 const Tf, // unused1208
-		Real64 const Qsoil // unused1208
+		int const EP_UNUSED( unit ), // unused1208
+		Real64 const EP_UNUSED( Tg ), // unused1208
+		Real64 const EP_UNUSED( Tf ), // unused1208
+		Real64 const EP_UNUSED( Qsoil ) // unused1208
 	)
 	{
 		// SUBROUTINE INFORMATION
@@ -668,7 +666,7 @@ namespace EcoRoofManager {
 		static Real64 TopDepth; // Thickness of "near-surface" soil layer
 		static Real64 RootDepth( 0.0 ); // Thickness of "root zone" soil layer //Autodesk Was used uninitialized
 		// Note TopDepth+RootDepth = thickness of ecoroof soil layer
-		static Real64 SecondsPerTimeStep; // Seconds per TimeStep
+		static Real64 TimeStepZoneSec; // Seconds per TimeStep
 		Real64 SoilConductivity; // Moisture dependent conductivity to be fed back into CTF Calculator
 		Real64 SoilSpecHeat; // Moisture dependent Spec. Heat to be fed back into CTF Calculator
 		Real64 SoilAbsorpSolar; // Moisture dependent Solar absorptance (1-albedo)
@@ -745,7 +743,7 @@ namespace EcoRoofManager {
 
 			RootDepth = SoilThickness - TopDepth;
 			//Next create a timestep in seconds
-			SecondsPerTimeStep = MinutesPerTimeStep * 60.0;
+			TimeStepZoneSec = MinutesPerTimeStep * 60.0;
 
 			UpdatebeginFlag = false;
 		}
@@ -890,7 +888,7 @@ namespace EcoRoofManager {
 
 			//Next, using the soil parameters, solve for the soil moisture
 			SoilConductivityAveTop = ( SoilHydroConductivityTop + SoilHydroConductivityRoot ) * 0.5;
-			Moisture += ( SecondsPerTimeStep / TopDepth ) * ( ( SoilConductivityAveTop * ( CapillaryPotentialTop - CapillaryPotentialRoot ) / TopDepth ) - SoilConductivityAveTop );
+			Moisture += ( TimeStepZoneSec / TopDepth ) * ( ( SoilConductivityAveTop * ( CapillaryPotentialTop - CapillaryPotentialRoot ) / TopDepth ) - SoilConductivityAveTop );
 
 			//Now limit the soil from going over the moisture maximum and takes excess to create runoff
 			if ( Moisture >= MoistureMax ) { //This statement makes sure that the top layer is not over the moisture maximum for the soil.
@@ -913,7 +911,7 @@ namespace EcoRoofManager {
 
 			//Using the parameters above, distribute the Root Layer moisture
 			TestMoisture = MeanRootMoisture;
-			MeanRootMoisture += ( SecondsPerTimeStep / RootDepth ) * ( ( SoilConductivityAveTop * ( CapillaryPotentialTop - CapillaryPotentialRoot ) / RootDepth ) + SoilConductivityAveTop - SoilConductivityAveRoot );
+			MeanRootMoisture += ( TimeStepZoneSec / RootDepth ) * ( ( SoilConductivityAveTop * ( CapillaryPotentialTop - CapillaryPotentialRoot ) / RootDepth ) + SoilConductivityAveTop - SoilConductivityAveRoot );
 
 			//Limit the moisture from going over the saturation limit and create runoff:
 			if ( MeanRootMoisture >= MoistureMax ) {
@@ -927,7 +925,7 @@ namespace EcoRoofManager {
 			}
 
 			//Next, track runoff from the bottom of the soil:
-			CurrentRunoff += SoilConductivityAveRoot * SecondsPerTimeStep;
+			CurrentRunoff += SoilConductivityAveRoot * TimeStepZoneSec;
 
 			//~~~END SF EDITS
 		}
@@ -1038,7 +1036,7 @@ namespace EcoRoofManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

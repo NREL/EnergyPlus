@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -87,7 +87,6 @@ public: // Creation
 	inline
 	DimensionSlice( IndexRange const & range, IndexSlice slice, std::int64_t const multiplier = 1 )
 	{
-		assert( range.initialized() );
 		slice.lud( range.l(), range.u() );
 		assert( slice.initialized() );
 		assert( slice.empty() || range.contains( slice.l(), slice.last() ) );
@@ -101,7 +100,6 @@ public: // Creation
 	inline
 	DimensionSlice( IndexRange const & range, IndexSlice slice, size_type const multiplier )
 	{
-		assert( range.initialized() );
 		slice.lud( range.l(), range.u() );
 		assert( slice.initialized() );
 		assert( slice.empty() || range.contains( slice.l(), slice.last() ) );
@@ -116,7 +114,6 @@ public: // Creation
 	inline
 	DimensionSlice( IndexRange const & range, IndexSlice slice, M const multiplier )
 	{
-		assert( range.initialized() );
 		slice.lud( range.l(), range.u() );
 		assert( slice.initialized() );
 		assert( slice.empty() || range.contains( slice.l(), slice.last() ) );
@@ -173,7 +170,7 @@ public: // Creation
 	inline
 	DimensionSlice( IndexRange const & range, size_type const multiplier = 1 )
 	{
-		assert( range.initialized() && range.bounded() );
+		assert( range.bounded() );
 		assert( multiplier <= size_type( std::numeric_limits< std::int64_t >::max() ) );
 		m_ = multiplier;
 		k_ = ( range.l() - 1 ) * multiplier;
@@ -257,9 +254,6 @@ private: // Data
 	int u_; // Upper index
 
 }; // DimensionSlice
-
-// Types
-typedef  DimensionSlice  DSlice;
 
 } // ObjexxFCL
 

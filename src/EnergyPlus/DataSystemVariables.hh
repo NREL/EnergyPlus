@@ -34,6 +34,7 @@ namespace DataSystemVariables {
 	extern std::string const cDisplayZoneAirHeatBalanceOffBalance;
 	extern std::string const cSortIDD;
 	extern std::string const cReportDuringWarmup;
+	extern std::string const cReportDuringHVACSizingSimulation;
 	extern std::string const cIgnoreSolarRadiation;
 	extern std::string const cIgnoreBeamRadiation;
 	extern std::string const cIgnoreDiffuseRadiation;
@@ -79,6 +80,7 @@ namespace DataSystemVariables {
 	extern bool TraceHVACControllerEnvFlag; // If TRUE generates a trace file for each individual HVAC
 	// controller with all controller iterations
 	extern bool ReportDuringWarmup; // True when the report outputs even during warmup
+	extern bool ReportDuringHVACSizingSimulation; // true when reporting outputs during HVAC sizing Simulation
 	extern bool ReportDetailedWarmupConvergence; // True when the detailed warmup convergence is requested
 	extern bool UpdateDataDuringWarmupExternalInterface; // variable sets in the external interface.
 	// This update the value during the warmup added for FMI
@@ -118,7 +120,7 @@ namespace DataSystemVariables {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

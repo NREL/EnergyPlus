@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -911,6 +911,30 @@ quoted( std::string & s )
 std::string
 head( std::string const & s );
 
+// Concatenation: Non-template to Support Conversions
+inline
+std::string
+operator +( std::string const & s, std::string const & t )
+{
+	return std::string( s ) += t;
+}
+
+// Concatenation: Non-template to Support Conversions
+inline
+std::string
+operator +( c_cstring const s, std::string const & t )
+{
+	return std::string( s ) += t;
+}
+
+// Concatenation: Non-template to Support Conversions
+inline
+std::string
+operator +( std::string const & s, c_cstring const t )
+{
+	return s + std::string( t );
+}
+
 // Conversion To std::string
 
 // string of a Template Argument Type Supporting Stream Output
@@ -920,7 +944,7 @@ std::string
 string_of( T const & t )
 {
 	std::ostringstream t_stream;
-	t_stream << std::uppercase << std::setprecision( TypeTraits< T >::precision() ) << t;
+	t_stream << std::uppercase << std::setprecision( TypeTraits< T >::precision ) << t;
 	return t_stream.str();
 }
 
@@ -950,7 +974,7 @@ left_string_of(
 {
 	std::ostringstream t_stream;
 	t_stream << std::left << std::uppercase
-	 << std::setw( w ) << std::setfill( f ) << std::setprecision( TypeTraits< T >::precision() ) << t;
+	 << std::setw( w ) << std::setfill( f ) << std::setprecision( TypeTraits< T >::precision ) << t;
 	return t_stream.str();
 }
 
@@ -966,7 +990,7 @@ right_string_of(
 {
 	std::ostringstream t_stream;
 	t_stream << std::right << std::uppercase
-	 << std::setw( w ) << std::setfill( f ) << std::setprecision( TypeTraits< T >::precision() ) << t;
+	 << std::setw( w ) << std::setfill( f ) << std::setprecision( TypeTraits< T >::precision ) << t;
 	return t_stream.str();
 }
 
@@ -982,7 +1006,7 @@ lead_zero_string_of(
 {
 	std::ostringstream t_stream;
 	t_stream << std::internal << std::uppercase
-	 << std::setw( w ) << std::setfill( '0' ) << std::setprecision( TypeTraits< T >::precision() ) << t;
+	 << std::setw( w ) << std::setfill( '0' ) << std::setprecision( TypeTraits< T >::precision ) << t;
 	return t_stream.str();
 }
 
@@ -992,8 +1016,8 @@ inline
 std::string
 general_string_of(
  T const & t,
- int const w = TypeTraits< T >::iwidth(), // Minimum width
- std::streamsize const p = TypeTraits< T >::precision() // Precision
+ int const w = TypeTraits< T >::iwidth, // Minimum width
+ std::streamsize const p = TypeTraits< T >::precision // Precision
 )
 {
 	std::ostringstream t_stream;
@@ -1008,8 +1032,8 @@ inline
 std::string
 fixed_string_of(
  T const & t,
- int const w = TypeTraits< T >::iwidth(), // Minimum width
- std::streamsize const p = TypeTraits< T >::precision() // Precision
+ int const w = TypeTraits< T >::iwidth, // Minimum width
+ std::streamsize const p = TypeTraits< T >::precision // Precision
 )
 {
 	std::ostringstream t_stream;
@@ -1024,8 +1048,8 @@ inline
 std::string
 scientific_string_of(
  T const & t,
- int const w = TypeTraits< T >::iwidth(), // Minimum width
- std::streamsize const p = TypeTraits< T >::precision() // Precision
+ int const w = TypeTraits< T >::iwidth, // Minimum width
+ std::streamsize const p = TypeTraits< T >::precision // Precision
 )
 {
 	std::ostringstream t_stream;

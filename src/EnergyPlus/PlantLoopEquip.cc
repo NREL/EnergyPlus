@@ -208,14 +208,8 @@ namespace PlantLoopEquip {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int CompNum; // Plant side component list equipment number
-		int BrnNum; // Branch counter
 		int EquipNum; // Plant side component list equipment number
 		int EquipTypeNum;
-		int BranchInletNode;
-		int LastNodeOnBranch;
-		int PumpOutletNode;
-		int LoopControl;
 		bool RunFlag; // TRUE if operating this iteration
 		// std::string EquipType; // local equipment type
 		// std::string EquipName; // local equipment name
@@ -225,23 +219,21 @@ namespace PlantLoopEquip {
 		Real64 MinLoad;
 		Real64 OptLoad;
 		Real64 SizingFac; // the component sizing fraction
-		static Real64 BranchFlowRequest( 0.0 );
-		static Real64 InitialBranchFlow( 0.0 );
 		int GeneralEquipType; // Basic Equipment type from EquipType Used to help organize this routine
-		static bool PumpPowerToLoop( false );
-		static bool RunLoopPumps( false );
 		Real64 TempCondInDesign; // Design condenser inlet temp. C , or 25.d0
 		Real64 TempEvapOutDesign;
 
 		// set up a reference for this component
 		auto & sim_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ) );
 
-		// Based on the general equip type and the GetCompSizFac value, see if we can just leave early
 		GeneralEquipType = sim_component.GeneralEquipType;
-		if ( GetCompSizFac && ( GeneralEquipType != GenEquipTypes_Chiller && GeneralEquipType != GenEquipTypes_Boiler ) && GeneralEquipType != GenEquipTypes_CoolingTower ) {
-			sim_component.SizFac = 0.0;
-			return;
-		}
+		// Based on the general equip type and the GetCompSizFac value, see if we can just leave early
+// no, no, can't do this, because all the plant components need to run their init and size routines, not just chillers, boilers and cooling towers.  Other things happen besides sizing fac.
+
+//		if ( GetCompSizFac && ( GeneralEquipType != GenEquipTypes_Chiller && GeneralEquipType != GenEquipTypes_Boiler ) && GeneralEquipType != GenEquipTypes_CoolingTower ) {
+//			sim_component.SizFac = 0.0;
+//			return;
+//		}
 
 		//set local variables
 		// EquipType = sim_component.TypeOf;
@@ -254,7 +246,6 @@ namespace PlantLoopEquip {
 		CurLoad = sim_component.MyLoad;
 
 		//select equipment and call equiment simulation
-		TypeOfEquip:
 		//PIPES
 		//Pipe has no special types at the moment, so find it this way
 		if ( GeneralEquipType == GenEquipTypes_Pipe ) {
@@ -668,7 +659,7 @@ namespace PlantLoopEquip {
 				}
 
 				// HEAT PUMP WATER HEATER
-			} else if ( EquipTypeNum == TypeOf_HeatPumpWtrHeater ) {
+			} else if ( EquipTypeNum == TypeOf_HeatPumpWtrHeaterPumped || EquipTypeNum == TypeOf_HeatPumpWtrHeaterWrapped ) {
 				SimWaterThermalTank( EquipTypeNum, sim_component.Name, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration, LoopNum, LoopSideNum ); //DSU
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
@@ -742,7 +733,7 @@ namespace PlantLoopEquip {
 		} else if ( GeneralEquipType == GenEquipTypes_GroundHeatExchanger ) {
 
 			if ( EquipTypeNum == TypeOf_GrndHtExchgVertical ) { // 'GROUND HEAT EXCHANGER:VERTICAL'
-				SimGroundHeatExchangers( sim_component.TypeOf, sim_component.Name, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip ); //DSU
+				SimGroundHeatExchangers( sim_component.TypeOf_Num, sim_component.Name, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip ); //DSU
 
 				if ( InitLoopEquip ) {
 					sim_component.CompNum = EquipNum;
@@ -768,6 +759,13 @@ namespace PlantLoopEquip {
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgHorizTrench ) {
 				SimPipingSystemCircuit( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
+
+				if ( InitLoopEquip ) {
+					sim_component.CompNum = EquipNum;
+				}
+
+			} else if ( EquipTypeNum == TypeOf_GrndHtExchgSlinky ) { // 'GROUND HEAT EXCHANGER:SLINKY'
+				SimGroundHeatExchangers( sim_component.TypeOf_Num, sim_component.Name, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip );
 
 				if ( InitLoopEquip ) {
 					sim_component.CompNum = EquipNum;
@@ -1043,7 +1041,7 @@ namespace PlantLoopEquip {
 			} else if ( EquipTypeNum == TypeOf_UnitarySystemRecovery ) {
 
 			} else if ( EquipTypeNum == TypeOf_SwimmingPool_Indoor ) {
-				
+
 			} else {
 
 				ShowSevereError( "SimPlantEquip: Invalid ZoneHVAC Type=" + sim_component.TypeOf );
@@ -1135,7 +1133,7 @@ namespace PlantLoopEquip {
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

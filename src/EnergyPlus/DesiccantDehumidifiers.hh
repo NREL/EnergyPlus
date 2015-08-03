@@ -2,8 +2,7 @@
 #define DesiccantDehumidifiers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -492,7 +491,7 @@ namespace DesiccantDehumidifiers {
 	};
 
 	// Object Data
-	extern FArray1D< DesiccantDehumidifierData > DesicDehum;
+	extern Array1D< DesiccantDehumidifierData > DesicDehum;
 
 	// Functions
 
@@ -550,7 +549,7 @@ namespace DesiccantDehumidifiers {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par = _ // Par(5) is the requested coil load
+		Array1< Real64 > const & Par // Par(5) is the requested coil load
 	);
 
 	//        End of Reporting subroutines for the SimAir Module
@@ -577,7 +576,7 @@ namespace DesiccantDehumidifiers {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

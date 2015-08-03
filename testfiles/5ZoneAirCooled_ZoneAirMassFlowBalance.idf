@@ -8,9 +8,9 @@
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
 ! Highlights:              Zone Air Mass Flow Conservation calculation. The interior (core) zone is connected to each of the
-!                          the four perimeter zones using ZoneMixing Objects.  Zone Mixing air flow from the perimeter zones 
-!                          to the core zone is driven by an exhaust fan in the core zone. Additional infiltration is drawn in 
-!                          to the perimeter zones when required to balance the zone air mass flow.   
+!                          the four perimeter zones using ZoneMixing Objects.  Zone Mixing air flow from the perimeter zones
+!                          to the core zone is driven by an exhaust fan in the core zone. Additional infiltration is drawn in
+!                          to the perimeter zones when required to balance the zone air mass flow.
 !
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
@@ -105,7 +105,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.3;
 
   Building,
     Building,                !- Name
@@ -120,9 +120,9 @@
   Timestep,4;
 
   ZoneAirMassFlowConservation,
-  Yes,                       !- Adjust Zone Mixing For Zone Air Mass Flow Balance
-  AddInfiltrationFlow;       !- Source Zone Infiltration Treatment 
-  
+    Yes,                     !- Adjust Zone Mixing For Zone Air Mass Flow Balance
+    AddInfiltrationFlow;     !- Source Zone Infiltration Treatment
+
   SurfaceConvectionAlgorithm:Inside,Simple;
 
   SurfaceConvectionAlgorithm:Outside,SimpleCombined;
@@ -168,8 +168,7 @@
     10,                      !- Upper Limit Value
     CONTINUOUS;              !- Numeric Type
 
-
-   RunPeriod,
+  RunPeriod,
     WinterRunPeriod,         !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
@@ -182,8 +181,7 @@
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
 
-
-   RunPeriod,
+  RunPeriod,
     SummerRunPeriod,         !- Name
     7,                       !- Begin Month
     1,                       !- Begin Day of Month
@@ -195,7 +193,6 @@
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
-
 
   Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name
@@ -444,7 +441,6 @@
 !  Construction,
 !    SB-U,                    !- Name
 !    MAT-SB-U;                !- Outside Layer
-
 !  Construction,
 !    FLOOR-1,                 !- Name
 !   MAT-FLOOR-1;             !- Outside Layer
@@ -559,7 +555,6 @@
 !    CLEAR 6MM,               !- Outside Layer
 !    AIR 6MM,                 !- Layer 2
 !    CLEAR 6MM;               !- Layer 3
-
 !  Construction,
 !    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
 !    LoE CLEAR 6MM,           !- Outside Layer
@@ -1606,7 +1601,6 @@
     2.438400269,             !- Ceiling Height {m}
     447.682556152;           !- Volume {m3}
 
-
 ! ***TRANSFER AIR***
 
   ZoneMixing,
@@ -1628,7 +1622,6 @@
     ,                        !- Minimum Outdoor Temperature Schedule Name
     ;                        !- Maximum Outdoor Temperature Schedule Name
 
-
   ZoneMixing,
     SPACE5-1 Zone Mixing2,   !- Name
     SPACE5-1,                !- Zone Name
@@ -1647,7 +1640,6 @@
     ,                        !- Maximum Source Zone Temperature Schedule Name
     ,                        !- Minimum Outdoor Temperature Schedule Name
     ;                        !- Maximum Outdoor Temperature Schedule Name
-
 
   ZoneMixing,
     SPACE5-1 Zone Mixing3,   !- Name
@@ -1690,13 +1682,13 @@
   Fan:ZoneExhaust,
     SPACE5-1 Exhaust Fan,    !- Name
     ExhaustFan-SCH,          !- Availability Schedule Name
-    1.0,                     !- Fan Efficiency
+    1.0,                     !- Fan Total Efficiency
     1.0e-006,                !- Pressure Rise {Pa}
     0.20,                    !- Maximum Flow Rate {m3/s}
     SPACE5-1 Exhaust Fan Node,  !- Air Inlet Node Name
     SPACE5-1 Exhaust Fan Outlet Node,  !- Air Outlet Node Name
     Zone Exhaust Fans,       !- End-Use Subcategory
-    ,                        !- Flow Fraction Schedule Name  
+    ,                        !- Flow Fraction Schedule Name
     Decoupled;               !- System Availability Manager Coupling Mode
 
   People,
@@ -1997,14 +1989,14 @@
     VAV Sys 1,               !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    0.3,                     !- Minimum System Air Flow Ratio
+    0.3,                     !- Central Heating Maximum System Air Flow Ratio
     4.5,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.8,                    !- Central Cooling Design Supply Air Temperature {C}
     16.7,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     no,                      !- 100% Outdoor Air in Cooling
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2012,15 +2004,25 @@
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
     ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   Sizing:Plant,
     Hot Water Loop,          !- Plant or Condenser Loop Name
@@ -2253,7 +2255,7 @@
     SPACE5-1,                !- Zone Name
     SPACE5-1 Eq,             !- Zone Conditioning Equipment List Name
     SPACE5-1 In Node,        !- Zone Air Inlet Node or NodeList Name
-    SPACE5-1 Exhaust Fan Node, !- Zone Air Exhaust Node or NodeList Name
+    SPACE5-1 Exhaust Fan Node,  !- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Node,           !- Zone Air Node Name
     SPACE5-1 Out Node;       !- Zone Return Air Node Name
 
@@ -2367,10 +2369,10 @@
     SPACE5-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    Fan:ZoneExhaust,         !- Zone Equipment 1 Object Type  
-    SPACE5-1 Exhaust Fan,    !- Zone Equipment 1 Name
-    2,                       !- Zone Equipment 1 Cooling Sequence
-    2;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
+    SPACE5-1 Exhaust Fan,    !- Zone Equipment 2 Name
+    2,                       !- Zone Equipment 2 Cooling Sequence
+    2;                       !- Zone Equipment 2 Heating or No-Load Sequence
 
   ZoneHVAC:AirDistributionUnit,
     SPACE1-1 ATU,            !- Name
@@ -2759,7 +2761,6 @@
     SimpleAnalysis,          !- Type of Analysis
     CrossFlow;               !- Heat Exchanger Configuration
 
-   
   Coil:Heating:Water,
     Main Heating Coil 1,     !- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
@@ -2780,7 +2781,7 @@
   Fan:VariableVolume,
     Supply Fan 1,            !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600.0,                   !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
@@ -2910,7 +2911,7 @@
     HW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Heating Demand Side Branches,  !- Demand Side Branch List Name
     Heating Demand Side Connectors,  !- Demand Side Connector List Name
-    SequentialLoad;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:Scheduled,
     Hot Water Loop Setpoint Manager,  !- Name
@@ -3236,7 +3237,7 @@
     CW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Cooling Demand Side Branches,  !- Demand Side Branch List Name
     Cooling Demand Side Connectors,  !- Demand Side Connector List Name
-    SequentialLoad,              !- Load Distribution Scheme
+    SequentialLoad,          !- Load Distribution Scheme
     CW Avail List;           !- Availability Manager List Name
 
   AvailabilityManagerAssignmentList,
@@ -3499,9 +3500,6 @@
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
-
-
-
 ! The following custom meters are set up to illustrate the capabilities
 ! of custom meters.
 ! Custom Meter "MyGeneralLights" duplicates the InteriorLights:Electricity meter.
@@ -3548,64 +3546,103 @@
     ZoneComponentLoadSummary;!- Report 2 Name
 
   Output:Surfaces:List,Details;
-   
-  Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
-  Output:Variable,SPACE1-1,Zone Mean Air Temperature,hourly;
-  Output:Variable,SPACE2-1,Zone Mean Air Temperature,hourly; 
-  Output:Variable,SPACE3-1,Zone Mean Air Temperature,hourly; 
-  Output:Variable,SPACE4-1,Zone Mean Air Temperature,hourly; 
-  Output:Variable,SPACE5-1,Zone Mean Air Temperature,hourly;
-  
-  Output:Variable,SPACE1-1,Zone Supply Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE1-1,Zone Exhaust Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE1-1,Zone Return Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE1-1,Zone Mixing Receiving Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE1-1,Zone Mixing Source Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE1-1,Zone Mass Balance Infiltration Air Mass Flow Rate, hourly;
-   
-  Output:Variable,SPACE2-1,Zone Supply Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE2-1,Zone Exhaust Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE2-1,Zone Return Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE2-1,Zone Mixing Receiving Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE2-1,Zone Mixing Source Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE2-1,Zone Mass Balance Infiltration Air Mass Flow Rate, hourly;
-  
-  Output:Variable,SPACE3-1,Zone Supply Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE3-1,Zone Exhaust Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE3-1,Zone Return Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE3-1,Zone Mixing Receiving Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE3-1,Zone Mixing Source Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE3-1,Zone Mass Balance Infiltration Air Mass Flow Rate, hourly;
-  
-  Output:Variable,SPACE4-1,Zone Supply Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE4-1,Zone Exhaust Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE4-1,Zone Return Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE4-1,Zone Mixing Receiving Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE4-1,Zone Mixing Source Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE4-1,Zone Mass Balance Infiltration Air Mass Flow Rate, hourly;
-  
-  Output:Variable,SPACE5-1,Zone Supply Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE5-1,Zone Exhaust Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE5-1,Zone Return Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE5-1,Zone Mixing Receiving Air Mass Flow Rate, hourly;
-  Output:Variable,SPACE5-1,Zone Mixing Source Air Mass Flow Rate, hourly;
-  !Output:Variable,SPACE5-1,Zone Mass Balance Infiltration Air Mass Flow Rate, hourly;
-  
-  
-  Output:Variable,SPACE1-1 In Node,System Node Mass Flow Rate,hourly;
-  Output:Variable,SPACE1-1 Out Node,System Node Mass Flow Rate,hourly;
-  Output:Variable,SPACE2-1 In Node,System Node Mass Flow Rate,hourly;
-  Output:Variable,SPACE2-1 Out Node,System Node Mass Flow Rate,hourly;
-  Output:Variable,SPACE3-1 In Node,System Node Mass Flow Rate,hourly;
-  Output:Variable,SPACE3-1 Out Node,System Node Mass Flow Rate,hourly;
-  Output:Variable,SPACE4-1 In Node,System Node Mass Flow Rate,hourly;
-  Output:Variable,SPACE4-1 Out Node,System Node Mass Flow Rate,hourly;
-  Output:Variable,SPACE5-1 In Node,System Node Mass Flow Rate,hourly;
-  Output:Variable,SPACE5-1 Out Node,System Node Mass Flow Rate,hourly;  
-  Output:Variable,SPACE5-1 Exhaust Fan Node,System Node Mass Flow Rate,hourly; 
-  
-  Output:Variable,*,Zone Infiltration Standard Density Volume Flow Rate,hourly;  
-  Output:Variable,*,Zone Infiltration Air Mass Flow Balance Status,hourly;   
 
-  
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
+
+  Output:Variable,SPACE1-1,Zone Mean Air Temperature,hourly;
+
+  Output:Variable,SPACE2-1,Zone Mean Air Temperature,hourly;
+
+  Output:Variable,SPACE3-1,Zone Mean Air Temperature,hourly;
+
+  Output:Variable,SPACE4-1,Zone Mean Air Temperature,hourly;
+
+  Output:Variable,SPACE5-1,Zone Mean Air Temperature,hourly;
+
+  Output:Variable,SPACE1-1,Zone Supply Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE1-1,Zone Exhaust Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE1-1,Zone Return Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE1-1,Zone Mixing Receiving Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE1-1,Zone Mixing Source Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE1-1,Zone Mass Balance Infiltration Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE2-1,Zone Supply Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE2-1,Zone Exhaust Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE2-1,Zone Return Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE2-1,Zone Mixing Receiving Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE2-1,Zone Mixing Source Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE2-1,Zone Mass Balance Infiltration Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE3-1,Zone Supply Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE3-1,Zone Exhaust Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE3-1,Zone Return Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE3-1,Zone Mixing Receiving Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE3-1,Zone Mixing Source Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE3-1,Zone Mass Balance Infiltration Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE4-1,Zone Supply Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE4-1,Zone Exhaust Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE4-1,Zone Return Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE4-1,Zone Mixing Receiving Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE4-1,Zone Mixing Source Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE4-1,Zone Mass Balance Infiltration Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE5-1,Zone Supply Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE5-1,Zone Exhaust Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE5-1,Zone Return Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE5-1,Zone Mixing Receiving Air Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE5-1,Zone Mixing Source Air Mass Flow Rate,hourly;
+
+  !Output:Variable,SPACE5-1,Zone Mass Balance Infiltration Air Mass Flow Rate, hourly;
+
+  Output:Variable,SPACE1-1 In Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE1-1 Out Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE2-1 In Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE2-1 Out Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE3-1 In Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE3-1 Out Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE4-1 In Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE4-1 Out Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE5-1 In Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE5-1 Out Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE5-1 Exhaust Fan Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,*,Zone Infiltration Standard Density Volume Flow Rate,hourly;
+
+  Output:Variable,*,Zone Infiltration Air Mass Flow Balance Status,hourly;
+
   !Output:Diagnostics,DisplayExtraWarnings;

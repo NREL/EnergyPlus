@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -103,8 +103,8 @@ namespace ChillerIndirectAbsorption {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 
 	// Object Data
-	FArray1D< IndirectAbsorberSpecs > IndirectAbsorber; // dimension to number of machines
-	FArray1D< ReportVars > IndirectAbsorberReport;
+	Array1D< IndirectAbsorberSpecs > IndirectAbsorber; // dimension to number of machines
+	Array1D< ReportVars > IndirectAbsorberReport;
 
 	// MODULE SUBROUTINES:
 
@@ -115,7 +115,7 @@ namespace ChillerIndirectAbsorption {
 
 	void
 	SimIndirectAbsorber(
-		std::string const & AbsorberType, // type of Absorber
+		std::string const & EP_UNUSED( AbsorberType ), // type of Absorber
 		std::string const & AbsorberName, // user specified name of Absorber
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int const LoopNum, // Plant loop index for where called from
@@ -198,11 +198,10 @@ namespace ChillerIndirectAbsorption {
 
 		// Initialize Loop Equipment
 		if ( InitLoopEquip ) {
-			IndirectAbsorber( ChillNum ).IsThisSized = false;
 			InitIndirectAbsorpChiller( ChillNum, RunFlag, MyLoad );
-			IndirectAbsorber( ChillNum ).IsThisSized = true;
-			SizeIndirectAbsorpChiller( ChillNum );
+
 			if ( LoopNum == IndirectAbsorber( ChillNum ).CWLoopNum ) {
+				SizeIndirectAbsorpChiller( ChillNum ); // only size when called from chilled water loop
 				MinCap = IndirectAbsorber( ChillNum ).NomCap * IndirectAbsorber( ChillNum ).MinPartLoadRat;
 				MaxCap = IndirectAbsorber( ChillNum ).NomCap * IndirectAbsorber( ChillNum ).MaxPartLoadRat;
 				OptCap = IndirectAbsorber( ChillNum ).NomCap * IndirectAbsorber( ChillNum ).OptPartLoadRat;
@@ -280,6 +279,7 @@ namespace ChillerIndirectAbsorption {
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
+		using DataSizing::AutoSize;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -294,7 +294,7 @@ namespace ChillerIndirectAbsorption {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		bool errFlag; // GetInput error flag
-		FArray1D_bool GenInputOutputNodesUsed; // Used for SetupOutputVariable
+		Array1D_bool GenInputOutputNodesUsed; // Used for SetupOutputVariable
 
 		//FLOW
 		cCurrentModuleObject = "Chiller:Absorption:Indirect";
@@ -330,7 +330,13 @@ namespace ChillerIndirectAbsorption {
 			}
 			IndirectAbsorber( AbsorberNum ).Name = cAlphaArgs( 1 );
 			IndirectAbsorber( AbsorberNum ).NomCap = rNumericArgs( 1 );
+			if ( IndirectAbsorber( AbsorberNum ).NomCap == AutoSize ) {
+				IndirectAbsorber( AbsorberNum ).NomCapWasAutoSized = true;
+			}
 			IndirectAbsorber( AbsorberNum ).NomPumpPower = rNumericArgs( 2 );
+			if ( IndirectAbsorber( AbsorberNum ).NomPumpPower == AutoSize ) {
+				IndirectAbsorber( AbsorberNum ).NomPumpPowerWasAutoSized = true;
+			}
 			if ( rNumericArgs( 1 ) == 0.0 ) {
 				ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( rNumericArgs( 1 ), 2 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -511,10 +517,19 @@ namespace ChillerIndirectAbsorption {
 			IndirectAbsorber( AbsorberNum ).MinCondInletTemp = rNumericArgs( 7 );
 			IndirectAbsorber( AbsorberNum ).TempLowLimitEvapOut = rNumericArgs( 8 );
 			IndirectAbsorber( AbsorberNum ).EvapVolFlowRate = rNumericArgs( 9 );
+			if ( IndirectAbsorber( AbsorberNum ).EvapVolFlowRate == AutoSize ) {
+				IndirectAbsorber( AbsorberNum ).EvapVolFlowRateWasAutoSized = true;
+			}
 			IndirectAbsorber( AbsorberNum ).CondVolFlowRate = rNumericArgs( 10 );
+			if ( IndirectAbsorber( AbsorberNum ).CondVolFlowRate == AutoSize ) {
+				IndirectAbsorber( AbsorberNum ).CondVolFlowRateWasAutoSized = true;
+			}
 
 			if ( NumNums > 10 ) {
 				IndirectAbsorber( AbsorberNum ).GeneratorVolFlowRate = rNumericArgs( 11 );
+				if ( IndirectAbsorber( AbsorberNum ).GeneratorVolFlowRate == AutoSize ) {
+					IndirectAbsorber( AbsorberNum ).GeneratorVolFlowRateWasAutoSized = true;
+				}
 			}
 
 			if ( IndirectAbsorber( AbsorberNum ).GeneratorVolFlowRate == 0.0 && IndirectAbsorber( AbsorberNum ).GenHeatSourceType == NodeType_Water ) {
@@ -628,8 +643,7 @@ namespace ChillerIndirectAbsorption {
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_Chiller_Indirect_Absorption;
 		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantSizeNotComplete;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using InputProcessor::SameString;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;
@@ -654,26 +668,14 @@ namespace ChillerIndirectAbsorption {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyFlag;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyFlag;
+		static Array1D_bool MyEnvrnFlag;
 		int CondInletNode; // node number of water inlet node to the condenser
 		int CondOutletNode; // node number of water outlet node from the condenser
-		int LoopCtr; // Plant loop counter
-		int LoopSideCtr; // Loop side counter
-		int BranchCtr; // Plant branch counter
-		int CompCtr; // Component counter
 		bool errFlag;
 		bool FatalError;
 		Real64 rho; // local fluid density
-		Real64 CpWater; // local specific heat
 		Real64 SteamDensity; // density of generator steam (when connected to a steam loop)
-		Real64 EnthSteamOutDry; // dry enthalpy of steam (quality = 1)
-		Real64 EnthSteamOutWet; // wet enthalpy of steam (quality = 0)
-		Real64 HfgSteam; // latent heat of steam at constant pressure
-		Real64 SteamDeltaT; // amount of sub-cooling of steam condensate
-		int GeneratorInletNode; // generator inlet node number, steam/water side
-		Real64 SteamOutletTemp;
-		static int DummyWaterIndex( 1 );
 		Real64 mdotEvap; // local fluid mass flow rate thru evaporator
 		Real64 mdotCond; // local fluid mass flow rate thru condenser
 		Real64 mdotGen; // local fluid mass flow rate thru generator
@@ -757,8 +759,8 @@ namespace ChillerIndirectAbsorption {
 		CondOutletNode = IndirectAbsorber( ChillNum ).CondOutletNodeNum;
 
 		//Initialize Supply Side Variables
-		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantSizesOkayToFinalize ) ) {
-			if ( PlantSizeNotComplete ) SizeIndirectAbsorpChiller( ChillNum );
+		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
+
 			rho = GetDensityGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 			IndirectAbsorber( ChillNum ).EvapMassFlowRateMax = IndirectAbsorber( ChillNum ).EvapVolFlowRate * rho;
@@ -847,7 +849,9 @@ namespace ChillerIndirectAbsorption {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToReport;
+		using DataPlant::PlantFinalSizesOkayToReport;
 		using DataPlant::MyPlantSizingIndex;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using CurveManager::CurveValue;
@@ -896,7 +900,6 @@ namespace ChillerIndirectAbsorption {
 		Real64 tmpCondVolFlowRate; // local condenser design volume flow rate
 		Real64 tmpGeneratorVolFlowRate; // local generator design volume flow rate
 		static int DummWaterIndex( 1 );
-		bool IsAutoSize; // Indicator to autosize for reporting
 		Real64 NomCapUser; // Hardsized nominal capacity cooling power for reporting
 		Real64 NomPumpPowerUser; // Hardsized local nominal pump power for reporting
 		Real64 EvapVolFlowRateUser; // Hardsized local evaporator design volume flow rate for reporting
@@ -933,12 +936,14 @@ namespace ChillerIndirectAbsorption {
 
 		//IF (IndirectAbsorber(ChillNum)%CondVolFlowRate == AutoSize) THEN
 		if ( PltSizNum > 0 ) { //Autodesk:Std An integer can't be used in a boolean context (most compilers will allow this non-standard usage): Added > 0 patch
-			PltSizCondNum = MyPlantSizingIndex( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, IndirectAbsorber( ChillNum ).CondInletNodeNum, IndirectAbsorber( ChillNum ).CondOutletNodeNum, LoopErrorsFound );
+			PltSizCondNum = MyPlantSizingIndex( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+				IndirectAbsorber( ChillNum ).CondInletNodeNum, IndirectAbsorber( ChillNum ).CondOutletNodeNum, LoopErrorsFound );
 		}
 
 		if ( IndirectAbsorber( ChillNum ).GenHeatSourceType == NodeType_Steam ) {
 			if ( IndirectAbsorber( ChillNum ).GeneratorInletNodeNum > 0 && IndirectAbsorber( ChillNum ).GeneratorOutletNodeNum > 0 ) {
-				PltSizSteamNum = MyPlantSizingIndex( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, IndirectAbsorber( ChillNum ).GeneratorInletNodeNum, IndirectAbsorber( ChillNum ).GeneratorOutletNodeNum, LoopErrorsFound );
+				PltSizSteamNum = MyPlantSizingIndex( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+					IndirectAbsorber( ChillNum ).GeneratorInletNodeNum, IndirectAbsorber( ChillNum ).GeneratorOutletNodeNum, LoopErrorsFound );
 			} else {
 				for ( PltSizIndex = 1; PltSizIndex <= NumPltSizInput; ++PltSizIndex ) {
 					if ( PlantSizData( PltSizIndex ).LoopType == SteamLoop ) {
@@ -948,7 +953,8 @@ namespace ChillerIndirectAbsorption {
 			}
 		} else {
 			if ( IndirectAbsorber( ChillNum ).GeneratorInletNodeNum > 0 && IndirectAbsorber( ChillNum ).GeneratorOutletNodeNum > 0 ) {
-				PltSizHeatingNum = MyPlantSizingIndex( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, IndirectAbsorber( ChillNum ).GeneratorInletNodeNum, IndirectAbsorber( ChillNum ).GeneratorOutletNodeNum, LoopErrorsFound );
+				PltSizHeatingNum = MyPlantSizingIndex( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+					IndirectAbsorber( ChillNum ).GeneratorInletNodeNum, IndirectAbsorber( ChillNum ).GeneratorOutletNodeNum, LoopErrorsFound );
 			} else {
 				for ( PltSizIndex = 1; PltSizIndex <= NumPltSizInput; ++PltSizIndex ) {
 					if ( PlantSizData( PltSizIndex ).LoopType == HeatingLoop ) {
@@ -958,10 +964,6 @@ namespace ChillerIndirectAbsorption {
 			}
 		}
 
-		IsAutoSize = false;
-		if ( IndirectAbsorber( ChillNum ).NomCap == AutoSize ) {
-			IsAutoSize = true;
-		}
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 
@@ -969,21 +971,27 @@ namespace ChillerIndirectAbsorption {
 
 				rho = GetDensityGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate * IndirectAbsorber( ChillNum ).SizFac;
-				if ( ! IsAutoSize ) tmpNomCap = IndirectAbsorber( ChillNum ).NomCap;
+				if ( ! IndirectAbsorber( ChillNum ).NomCapWasAutoSized ) tmpNomCap = IndirectAbsorber( ChillNum ).NomCap;
 			} else {
-				if ( IsAutoSize ) tmpNomCap = 0.0;
+				if ( IndirectAbsorber( ChillNum ).NomCapWasAutoSized ) tmpNomCap = 0.0;
 			}
-			if ( PlantSizesOkayToFinalize ) {
-				if ( IsAutoSize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( IndirectAbsorber( ChillNum ).NomCapWasAutoSized ) {
 					IndirectAbsorber( ChillNum ).NomCap = tmpNomCap;
-					if ( ! IndirectAbsorber( ChillNum ).IsThisSized ) {
-						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, "Design Size Nominal Capacity [W]", tmpNomCap );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+							"Design Size Nominal Capacity [W]", tmpNomCap );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+							"Initial Design Size Nominal Capacity [W]", tmpNomCap );
 					}
 				} else {
 					if ( IndirectAbsorber( ChillNum ).NomCap > 0.0 && tmpNomCap > 0.0 ) {
 						NomCapUser = IndirectAbsorber( ChillNum ).NomCap;
-						if ( ! IndirectAbsorber( ChillNum ).IsThisSized ) {
-							ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, "Design Size Nominal Capacity [W]", tmpNomCap, "User-Specified Nominal Capacity [W]", NomCapUser );
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+								"Design Size Nominal Capacity [W]", tmpNomCap, "User-Specified Nominal Capacity [W]", NomCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + IndirectAbsorber( ChillNum ).Name );
@@ -999,36 +1007,42 @@ namespace ChillerIndirectAbsorption {
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
-				ShowSevereError( "Autosizing of Absorption Chiller nominal capacity requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Chiller:Absorption:Indirect object=" + IndirectAbsorber( ChillNum ).Name );
-				ErrorsFound = true;
+			if ( IndirectAbsorber( ChillNum ).NomCapWasAutoSized ) {
+				if ( PlantFirstSizesOkayToFinalize ) {
+					ShowSevereError( "Autosizing of Absorption Chiller nominal capacity requires a loop Sizing:Plant object" );
+					ShowContinueError( "Occurs in Chiller:Absorption:Indirect object=" + IndirectAbsorber( ChillNum ).Name );
+					ErrorsFound = true;
+				}
 			} else {
-				if ( ! IndirectAbsorber( ChillNum ).IsThisSized ) {
+				if ( PlantFinalSizesOkayToReport ) {
 					if ( IndirectAbsorber( ChillNum ).NomCap > 0.0 ) {
-						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, "User-Specified Nominal Capacity [W]", IndirectAbsorber( ChillNum ).NomCap );
+						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+							"User-Specified Nominal Capacity [W]", IndirectAbsorber( ChillNum ).NomCap );
 					}
 				}
 			}
 		}
 
-		IsAutoSize = false;
-		if ( IndirectAbsorber( ChillNum ).NomPumpPower == AutoSize ) {
-			IsAutoSize = true;
-		}
 		tmpNomPumpPower = 0.0045 * tmpNomCap;
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFirstSizesOkayToFinalize ) {
 			// the DOE-2 EIR for single stage absorption chiller
-			if ( IsAutoSize ) {
+			if ( IndirectAbsorber( ChillNum ).NomPumpPowerWasAutoSized ) {
 				IndirectAbsorber( ChillNum ).NomPumpPower = tmpNomPumpPower; //0.0045d0 * IndirectAbsorber(ChillNum)%NomCap
-				if ( ! IndirectAbsorber( ChillNum ).IsThisSized ) {
-					ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, "Design Size Nominal Pumping Power [W]", tmpNomPumpPower );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+						"Design Size Nominal Pumping Power [W]", tmpNomPumpPower );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+						"Initial Design Size Nominal Pumping Power [W]", tmpNomPumpPower );
 				}
 			} else {
 				if ( IndirectAbsorber( ChillNum ).NomPumpPower > 0.0 && tmpNomPumpPower > 0.0 ) {
 					NomPumpPowerUser = IndirectAbsorber( ChillNum ).NomPumpPower;
-					if ( ! IndirectAbsorber( ChillNum ).IsThisSized ) {
-						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, "Design Size Nominal Pumping Power [W]", tmpNomPumpPower, "User-Specified Nominal Pumping Power [W]", NomPumpPowerUser );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+							"Design Size Nominal Pumping Power [W]", tmpNomPumpPower,
+							"User-Specified Nominal Pumping Power [W]", NomPumpPowerUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( tmpNomPumpPower - NomPumpPowerUser ) / NomPumpPowerUser ) > AutoVsHardSizingThreshold ) {
 								ShowMessage( "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + IndirectAbsorber( ChillNum ).Name );
@@ -1044,28 +1058,31 @@ namespace ChillerIndirectAbsorption {
 			}
 		}
 
-		IsAutoSize = false;
-		if ( IndirectAbsorber( ChillNum ).EvapVolFlowRate == AutoSize ) {
-			IsAutoSize = true;
-		}
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpEvapVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate * IndirectAbsorber( ChillNum ).SizFac;
-				if ( ! IsAutoSize ) tmpEvapVolFlowRate = IndirectAbsorber( ChillNum ).EvapVolFlowRate;
+				if ( ! IndirectAbsorber( ChillNum ).EvapVolFlowRateWasAutoSized ) tmpEvapVolFlowRate = IndirectAbsorber( ChillNum ).EvapVolFlowRate;
 			} else {
-				if ( IsAutoSize ) tmpEvapVolFlowRate = 0.0;
+				if ( IndirectAbsorber( ChillNum ).EvapVolFlowRateWasAutoSized ) tmpEvapVolFlowRate = 0.0;
 			}
-			if ( PlantSizesOkayToFinalize ) {
-				if ( IsAutoSize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( IndirectAbsorber( ChillNum ).EvapVolFlowRateWasAutoSized ) {
 					IndirectAbsorber( ChillNum ).EvapVolFlowRate = tmpEvapVolFlowRate;
-					if ( ! IndirectAbsorber( ChillNum ).IsThisSized ) {
-						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+							"Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+							"Initial Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate );
 					}
 				} else {
 					if ( IndirectAbsorber( ChillNum ).EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0 ) {
 						EvapVolFlowRateUser = IndirectAbsorber( ChillNum ).EvapVolFlowRate;
-						if ( ! IndirectAbsorber( ChillNum ).IsThisSized ) {
-							ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate, "User-Specified Design Chilled Water Flow Rate [m3/s]", EvapVolFlowRateUser );
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+								"Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate,
+								"User-Specified Design Chilled Water Flow Rate [m3/s]", EvapVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpEvapVolFlowRate - EvapVolFlowRateUser ) / EvapVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizeChillerElectricIndirect: Potential issue with equipment sizing for " + IndirectAbsorber( ChillNum ).Name );
@@ -1081,29 +1098,28 @@ namespace ChillerIndirectAbsorption {
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
-				ShowSevereError( "Autosizing of Absorption Chiller evap flow rate requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Chiller:Absorption:Indirect object=" + IndirectAbsorber( ChillNum ).Name );
-				ErrorsFound = true;
+			if ( IndirectAbsorber( ChillNum ).EvapVolFlowRateWasAutoSized ) {
+				if ( PlantFirstSizesOkayToFinalize ) {
+					ShowSevereError( "Autosizing of Absorption Chiller evap flow rate requires a loop Sizing:Plant object" );
+					ShowContinueError( "Occurs in Chiller:Absorption:Indirect object=" + IndirectAbsorber( ChillNum ).Name );
+					ErrorsFound = true;
+				}
 			} else {
-				if ( ! IndirectAbsorber( ChillNum ).IsThisSized ) {
+				if ( PlantFinalSizesOkayToReport ) {
 					if ( IndirectAbsorber( ChillNum ).EvapVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", IndirectAbsorber( ChillNum ).EvapVolFlowRate );
+						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+							"User-Specified Design Chilled Water Flow Rate [m3/s]", IndirectAbsorber( ChillNum ).EvapVolFlowRate );
 					}
 				}
 			}
 		}
 
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFirstSizesOkayToFinalize ) {
 			RegisterPlantCompDesignFlow( IndirectAbsorber( ChillNum ).EvapInletNodeNum, IndirectAbsorber( ChillNum ).EvapVolFlowRate );
 		} else {
 			RegisterPlantCompDesignFlow( IndirectAbsorber( ChillNum ).EvapInletNodeNum, tmpEvapVolFlowRate );
 		}
 
-		IsAutoSize = false;
-		if ( IndirectAbsorber( ChillNum ).CondVolFlowRate == AutoSize ) {
-			IsAutoSize = true;
-		}
 		if ( PltSizCondNum > 0 && PltSizNum > 0 ) {
 			if ( IndirectAbsorber( ChillNum ).EvapVolFlowRate >= SmallWaterVolFlow && tmpNomCap > 0.0 ) {
 				//       QCondenser = QEvaporator + QGenerator + PumpingPower
@@ -1112,21 +1128,28 @@ namespace ChillerIndirectAbsorption {
 
 				rho = GetDensityGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CDLoopNum ).FluidName, InitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				tmpCondVolFlowRate = tmpNomCap * ( 1.0 + SteamInputRatNom + tmpNomPumpPower / tmpNomCap ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
-				if ( ! IsAutoSize ) tmpCondVolFlowRate = IndirectAbsorber( ChillNum ).CondVolFlowRate;
+				if ( ! IndirectAbsorber( ChillNum ).CondVolFlowRateWasAutoSized ) tmpCondVolFlowRate = IndirectAbsorber( ChillNum ).CondVolFlowRate;
 			} else {
-				if ( IsAutoSize ) tmpCondVolFlowRate = 0.0;
+				if ( IndirectAbsorber( ChillNum ).CondVolFlowRateWasAutoSized ) tmpCondVolFlowRate = 0.0;
 			}
-			if ( PlantSizesOkayToFinalize ) {
-				if ( IsAutoSize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( IndirectAbsorber( ChillNum ).CondVolFlowRateWasAutoSized ) {
 					IndirectAbsorber( ChillNum ).CondVolFlowRate = tmpCondVolFlowRate;
-					if ( ! IndirectAbsorber( ChillNum ).IsThisSized ) {
-						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+							"Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+							"Initial Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate );
 					}
 				} else {
 					if ( IndirectAbsorber( ChillNum ).CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0 ) {
 						CondVolFlowRateUser = IndirectAbsorber( ChillNum ).CondVolFlowRate;
-						if ( ! IndirectAbsorber( ChillNum ).IsThisSized ) {
-							ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate, "User-Specified Design Condenser Water Flow Rate [m3/s]", CondVolFlowRateUser );
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+								"Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate,
+								"User-Specified Design Condenser Water Flow Rate [m3/s]", CondVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpCondVolFlowRate - CondVolFlowRateUser ) / CondVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + IndirectAbsorber( ChillNum ).Name );
@@ -1142,13 +1165,15 @@ namespace ChillerIndirectAbsorption {
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
-				ShowSevereError( "Autosizing of Absorption Chiller condenser flow rate requires a condenser" );
-				ShowContinueError( "loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Chiller:Absorption:Indirect object=" + IndirectAbsorber( ChillNum ).Name );
-				ErrorsFound = true;
+			if ( IndirectAbsorber( ChillNum ).CondVolFlowRateWasAutoSized ) {
+				if ( PlantFirstSizesOkayToFinalize ) {
+					ShowSevereError( "Autosizing of Absorption Chiller condenser flow rate requires a condenser" );
+					ShowContinueError( "loop Sizing:Plant object" );
+					ShowContinueError( "Occurs in Chiller:Absorption:Indirect object=" + IndirectAbsorber( ChillNum ).Name );
+					ErrorsFound = true;
+				}
 			} else {
-				if ( ! IndirectAbsorber( ChillNum ).IsThisSized ) {
+				if ( PlantFinalSizesOkayToReport ) {
 					if ( IndirectAbsorber( ChillNum ).CondVolFlowRate > 0.0 ) {
 						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", IndirectAbsorber( ChillNum ).CondVolFlowRate );
 					}
@@ -1157,16 +1182,12 @@ namespace ChillerIndirectAbsorption {
 		}
 
 		// save the design condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFirstSizesOkayToFinalize ) {
 			RegisterPlantCompDesignFlow( IndirectAbsorber( ChillNum ).CondInletNodeNum, IndirectAbsorber( ChillNum ).CondVolFlowRate );
 		} else {
 			RegisterPlantCompDesignFlow( IndirectAbsorber( ChillNum ).CondInletNodeNum, tmpCondVolFlowRate );
 		}
 
-		IsAutoSize = false;
-		if ( IndirectAbsorber( ChillNum ).GeneratorVolFlowRate == AutoSize ) {
-			IsAutoSize = true;
-		}
 		if ( (PltSizSteamNum > 0 && IndirectAbsorber( ChillNum ).GenHeatSourceType == NodeType_Steam) || (PltSizHeatingNum > 0 && IndirectAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water) ) {
 			if ( IndirectAbsorber( ChillNum ).EvapVolFlowRate >= SmallWaterVolFlow && tmpNomCap > 0.0 ) {
 				if ( IndirectAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water ) {
@@ -1175,18 +1196,25 @@ namespace ChillerIndirectAbsorption {
 
 					RhoWater = GetDensityGlycol( PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidName, ( PlantSizData( PltSizHeatingNum ).ExitTemp - SteamDeltaT ), PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
 					tmpGeneratorVolFlowRate = ( tmpNomCap * SteamInputRatNom ) / ( CpWater * SteamDeltaT * RhoWater );
-					if ( ! IsAutoSize ) tmpGeneratorVolFlowRate = IndirectAbsorber( ChillNum ).GeneratorVolFlowRate;
-					if ( PlantSizesOkayToFinalize ) {
-						if ( IsAutoSize ) {
+					if ( ! IndirectAbsorber( ChillNum ).GeneratorVolFlowRateWasAutoSized ) tmpGeneratorVolFlowRate = IndirectAbsorber( ChillNum ).GeneratorVolFlowRate;
+					if ( PlantFirstSizesOkayToFinalize ) {
+						if ( IndirectAbsorber( ChillNum ).GeneratorVolFlowRateWasAutoSized ) {
 							IndirectAbsorber( ChillNum ).GeneratorVolFlowRate = tmpGeneratorVolFlowRate;
-							if ( ! IndirectAbsorber( ChillNum ).IsThisSized ) {
-								ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, "Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate );
+							if ( PlantFinalSizesOkayToReport ) {
+								ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+									"Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate );
+							}
+							if ( PlantFirstSizesOkayToReport ) {
+								ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+									"Initial Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate );
 							}
 						} else {
 							if ( IndirectAbsorber( ChillNum ).GeneratorVolFlowRate > 0.0 && tmpGeneratorVolFlowRate > 0.0 ) {
 								GeneratorVolFlowRateUser = IndirectAbsorber( ChillNum ).GeneratorVolFlowRate;
-								if ( ! IndirectAbsorber( ChillNum ).IsThisSized ) {
-									ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, "Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate, "User-Specified Design Generator Fluid Flow Rate [m3/s]", GeneratorVolFlowRateUser );
+								if ( PlantFinalSizesOkayToReport ) {
+									ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+										"Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate,
+										"User-Specified Design Generator Fluid Flow Rate [m3/s]", GeneratorVolFlowRateUser );
 									if ( DisplayExtraWarnings ) {
 										if ( ( std::abs( tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser ) / GeneratorVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 											ShowMessage( "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + IndirectAbsorber( ChillNum ).Name );
@@ -1214,18 +1242,25 @@ namespace ChillerIndirectAbsorption {
 					SteamMassFlowRate = ( tmpNomCap * SteamInputRatNom ) / ( ( HfgSteam ) + ( SteamDeltaT * CpWater ) );
 					//         calculate the steam volumetric flow rate
 					tmpGeneratorVolFlowRate = SteamMassFlowRate / SteamDensity;
-					if ( ! IsAutoSize ) tmpGeneratorVolFlowRate = IndirectAbsorber( ChillNum ).GeneratorVolFlowRate;
-					if ( PlantSizesOkayToFinalize ) {
-						if ( IsAutoSize ) {
+					if ( ! IndirectAbsorber( ChillNum ).GeneratorVolFlowRateWasAutoSized ) tmpGeneratorVolFlowRate = IndirectAbsorber( ChillNum ).GeneratorVolFlowRate;
+					if ( PlantFirstSizesOkayToFinalize ) {
+						if ( IndirectAbsorber( ChillNum ).GeneratorVolFlowRateWasAutoSized ) {
 							IndirectAbsorber( ChillNum ).GeneratorVolFlowRate = tmpGeneratorVolFlowRate;
-							if ( ! IndirectAbsorber( ChillNum ).IsThisSized ) {
-								ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, "Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate );
+							if ( PlantFinalSizesOkayToReport ) {
+								ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+									"Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate );
+							}
+							if ( PlantFirstSizesOkayToReport ) {
+								ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+									"Initial Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate );
 							}
 						} else {
 							if ( IndirectAbsorber( ChillNum ).GeneratorVolFlowRate > 0.0 && tmpGeneratorVolFlowRate > 0.0 ) {
 								GeneratorVolFlowRateUser = IndirectAbsorber( ChillNum ).GeneratorVolFlowRate;
-								if ( ! IndirectAbsorber( ChillNum ).IsThisSized ) {
-									ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, "Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate, "User-Specified Design Generator Fluid Flow Rate [m3/s]", GeneratorVolFlowRateUser );
+								if ( PlantFinalSizesOkayToReport ) {
+									ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+										"Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate,
+										"User-Specified Design Generator Fluid Flow Rate [m3/s]", GeneratorVolFlowRateUser );
 									if ( DisplayExtraWarnings ) {
 										if ( ( std::abs( tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser ) / GeneratorVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 											ShowMessage( "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + IndirectAbsorber( ChillNum ).Name );
@@ -1242,8 +1277,8 @@ namespace ChillerIndirectAbsorption {
 					}
 				}
 			} else {
-				if ( IsAutoSize ) {
-					if ( PlantSizesOkayToFinalize ) {
+				if ( IndirectAbsorber( ChillNum ).GeneratorVolFlowRateWasAutoSized ) {
+					if ( PlantFirstSizesOkayToFinalize ) {
 						IndirectAbsorber( ChillNum ).GeneratorVolFlowRate = 0.0;
 					} else {
 						tmpGeneratorVolFlowRate = 0.0;
@@ -1251,35 +1286,38 @@ namespace ChillerIndirectAbsorption {
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
-				ShowSevereError( "Autosizing of Absorption Chiller generator flow rate requires a loop Sizing:Plant object." );
-				ShowContinueError( " For steam loops, use a steam Sizing:Plant object." );
-				ShowContinueError( " For hot water loops, use a heating Sizing:Plant object." );
-				ShowContinueError( "Occurs in Chiller:Absorption:Indirect object=" + IndirectAbsorber( ChillNum ).Name );
-				ErrorsFound = true;
+			if ( IndirectAbsorber( ChillNum ).GeneratorVolFlowRateWasAutoSized ) {
+				if ( PlantFirstSizesOkayToFinalize ) {
+					ShowSevereError( "Autosizing of Absorption Chiller generator flow rate requires a loop Sizing:Plant object." );
+					ShowContinueError( " For steam loops, use a steam Sizing:Plant object." );
+					ShowContinueError( " For hot water loops, use a heating Sizing:Plant object." );
+					ShowContinueError( "Occurs in Chiller:Absorption:Indirect object=" + IndirectAbsorber( ChillNum ).Name );
+					ErrorsFound = true;
+				}
 			} else {
-				if ( ! IndirectAbsorber( ChillNum ).IsThisSized ) {
+				if ( PlantFinalSizesOkayToReport ) {
 					if ( IndirectAbsorber( ChillNum ).GeneratorVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name, "User-Specified Design Generator Fluid Flow Rate [m3/s]", IndirectAbsorber( ChillNum ).GeneratorVolFlowRate );
+						ReportSizingOutput( "Chiller:Absorption:Indirect", IndirectAbsorber( ChillNum ).Name,
+						"User-Specified Design Generator Fluid Flow Rate [m3/s]", IndirectAbsorber( ChillNum ).GeneratorVolFlowRate );
 					}
 				}
 			}
 		}
 
 		// save the design steam or hot water volumetric flow rate for use by the steam or hot water loop sizing algorithms
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFirstSizesOkayToFinalize ) {
 			RegisterPlantCompDesignFlow( IndirectAbsorber( ChillNum ).GeneratorInletNodeNum, IndirectAbsorber( ChillNum ).GeneratorVolFlowRate );
 		} else {
 			RegisterPlantCompDesignFlow( IndirectAbsorber( ChillNum ).GeneratorInletNodeNum, tmpGeneratorVolFlowRate );
 		}
 
-		if ( IndirectAbsorber( ChillNum ).GeneratorDeltaTemp == AutoSize ) {
+		if ( IndirectAbsorber( ChillNum ).GeneratorDeltaTempWasAutoSized ) {
 			if ( PltSizHeatingNum > 0 && IndirectAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water ) {
 				IndirectAbsorber( ChillNum ).GeneratorDeltaTemp = max( 0.5, PlantSizData( PltSizHeatingNum ).DeltaT );
 			} else if ( IndirectAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water ) {
 				rho = GetDensityGlycol( PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidName, InitConvTemp, PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
 				CpWater = GetSpecificHeatGlycol( PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidName, PlantSizData( PltSizHeatingNum ).ExitTemp, PlantLoop( IndirectAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
-				if ( PlantSizesOkayToFinalize ) {
+				if ( PlantFirstSizesOkayToFinalize ) {
 					IndirectAbsorber( ChillNum ).GeneratorDeltaTemp = ( SteamInputRatNom * IndirectAbsorber( ChillNum ).NomCap ) / ( CpWater * rho * IndirectAbsorber( ChillNum ).GeneratorVolFlowRate );
 				}
 			}
@@ -1289,7 +1327,7 @@ namespace ChillerIndirectAbsorption {
 			ShowFatalError( "Preceding sizing errors cause program termination" );
 		}
 
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFinalSizesOkayToReport ) {
 			//create predefined report
 			equipName = IndirectAbsorber( ChillNum ).Name;
 			PreDefTableEntry( pdchMechType, equipName, "Chiller:Absorption:Indirect" );
@@ -1307,7 +1345,7 @@ namespace ChillerIndirectAbsorption {
 		int const ChillNum, // Absorber number
 		Real64 const MyLoad, // operating load
 		bool const RunFlag, // TRUE when Absorber operating
-		bool const FirstIteration, // TRUE when first iteration of timestep !unused1208
+		bool const EP_UNUSED( FirstIteration ), // TRUE when first iteration of timestep !unused1208
 		int const EquipFlowCtrl // Flow control mode for the equipment
 	)
 	{
@@ -1342,7 +1380,6 @@ namespace ChillerIndirectAbsorption {
 		using DataGlobals::SecInHour;
 		using DataGlobals::WarmupFlag;
 		using CurveManager::CurveValue;
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataEnvironment::OutBaroPress;
 		using PlantUtilities::SetComponentFlowRate;
@@ -1387,14 +1424,13 @@ namespace ChillerIndirectAbsorption {
 		Real64 EnthSteamOutDry; // enthalpy of dry steam at generator inlet
 		Real64 EnthSteamOutWet; // enthalpy of wet steam at generator inlet
 		Real64 HfgSteam; // heat of vaporization of steam
-		static FArray1D_bool MyEnvironFlag;
-		static FArray1D_bool MyEnvironSteamFlag;
+		static Array1D_bool MyEnvironFlag;
+		static Array1D_bool MyEnvironSteamFlag;
 		static bool OneTimeFlag( true );
 		Real64 FRAC; // fraction of time step chiller cycles
 		static bool PossibleSubcooling; // flag to determine if supply water temperature is below setpoint
 		Real64 CpFluid; // specific heat of generator fluid
 		Real64 SteamDeltaT; // temperature difference of fluid through generator
-		Real64 SteamDensity; // density of steam
 		Real64 SteamOutletTemp; // generator outlet temperature
 		Real64 CapacityfAbsorberTemp; // performance curve output
 		Real64 CapacityfEvaporatorTemp; // performance curve output

@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -126,12 +126,6 @@ TEST( CArrayPTest, Proxy )
 		CArrayP_int const v( 10u, 22 ); // Real array
 		CArrayP_int w( CArrayP_int::Proxy( v ) ); // Proxy for const
 		EXPECT_EQ( 10u, w.size() );
-#ifndef OBJEXXFCL_PROXY_CONST_CHECKS
-		EXPECT_EQ( 22, w[ 2 ] );
-		w[ 0 ]; // Assertion failure if strict proxy const-correctness: Lookup uses non-const version: OK if w is declared const
-		++w[ 0 ]; // Assertion failure if strict proxy const-correctness
-		EXPECT_EQ( 23, w[ 0 ] );
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 		EXPECT_EQ( v, w );
 		CArrayP_int const x( CArrayP_int::Proxy( v ) ); // Const proxy for const
 		EXPECT_EQ( 22, x[ 5 ] ); // OK: Uses const subscript lookup

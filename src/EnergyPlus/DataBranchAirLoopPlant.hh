@@ -2,7 +2,7 @@
 #define DataBranchAirLoopPlant_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -31,7 +31,7 @@ namespace DataBranchAirLoopPlant {
 	extern int const ControlType_Passive; // 'Passive'
 	extern int const ControlType_SeriesActive; // 'SeriesActive'
 	extern int const ControlType_Bypass; // 'Bypass
-	extern FArray1D_string const cControlType;
+	extern Array1D_string const cControlType;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -108,7 +108,7 @@ namespace DataBranchAirLoopPlant {
 	};
 
 	// Object Data
-	extern FArray1D< PlantPressureCurveData > PressureCurve;
+	extern Array1D< PlantPressureCurveData > PressureCurve;
 
 } // DataBranchAirLoopPlant
 

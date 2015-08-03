@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -111,7 +111,7 @@ namespace PoweredInductionUnits {
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 	bool GetPIUInputFlag( true ); // First time, input is "gotten"
 
 	int NumPIUs( 0 );
@@ -123,7 +123,7 @@ namespace PoweredInductionUnits {
 	// PRIVATE UpdatePIU
 
 	// Object Data
-	FArray1D< PowIndUnitData > PIU;
+	Array1D< PowIndUnitData > PIU;
 
 	// Functions
 
@@ -649,9 +649,9 @@ namespace PoweredInductionUnits {
 		int OutletNode; // unit air outlet node number
 		Real64 RhoAir; // air density at outside pressure and standard temperature and humidity
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
-		static FArray1D_bool MyPlantScanFlag;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MySizeFlag;
+		static Array1D_bool MyPlantScanFlag;
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop; // Loop checking control variable
 		Real64 rho; // local plant fluid density
@@ -844,7 +844,6 @@ namespace PoweredInductionUnits {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizNum; // do loop index for plant sizing
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
 		Real64 CoilInTemp;
 		Real64 CoilOutTemp;
@@ -1282,7 +1281,6 @@ namespace PoweredInductionUnits {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIter( 25 ); // maximum number of iterations for controlling output
 
 		// INTERFACE BLOCK SPECIFICATIONS
 
@@ -1316,8 +1314,6 @@ namespace PoweredInductionUnits {
 		Real64 MixTempNeeded; // mixer outlet temperature needed to meet cooling load
 		Real64 MinSteamFlow;
 		Real64 MaxSteamFlow;
-		Real64 rho; // local plant fluid density
-		Real64 Cp; // local plant specific Heat
 		Real64 mdot; // local plant fluid flow rate kg/s
 
 		// FLOW
@@ -1529,7 +1525,6 @@ namespace PoweredInductionUnits {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIter( 25 ); // maximum number of iterations for controlling output
 
 		// INTERFACE BLOCK SPECIFICATIONS
 
@@ -1866,7 +1861,7 @@ namespace PoweredInductionUnits {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

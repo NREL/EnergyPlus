@@ -9,11 +9,12 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/noexcept.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/TraitsA.hh>
 #include <ObjexxFCL/TraitsB.hh>
@@ -27,8 +28,9 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
-#include <iostream>
+#include <istream>
 #include <limits>
+#include <ostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -38,7 +40,6 @@ namespace ObjexxFCL {
 // Forward
 class byte;
 class ubyte;
-class Fstring;
 
 // List-Directed Input Entry
 struct EntryFormatLD
@@ -143,7 +144,7 @@ protected: // Creation
 
 	// Move Constructor
 	inline
-	Format( Format && f ) :
+	Format( Format && f ) NOEXCEPT :
 	 p_( f.p_ ),
 	 r_( f.r_ ),
 	 u_( f.u_ ),
@@ -720,11 +721,6 @@ public: // Input Methods
 		io_err( stream );
 	}
 
-	// Input
-	virtual
-	void
-	in( std::istream & stream, Fstring & s );
-
 public: // Output Methods
 
 	// Output without Argument
@@ -923,15 +919,6 @@ public: // Output Methods
 		io_err( stream );
 	}
 
-	// Output
-	inline
-	virtual
-	void
-	out( std::ostream & stream, Fstring const &, std::string const & )
-	{ // Default implementation
-		io_err( stream );
-	}
-
 public: // Static Methods
 
 	// Skip Rest of Line and Line Terminator (Manipulator)
@@ -1097,7 +1084,7 @@ private: // Data
 
 protected: // Static Data
 
-	static Size const NOSIZE = static_cast< Size >( -1 );
+	static Size const NOSIZE;
 	static std::string const LF;
 
 }; // Format
@@ -1129,7 +1116,7 @@ protected: // Creation
 
 	// Move Constructor
 	inline
-	FormatCombo( FormatCombo && f ) :
+	FormatCombo( FormatCombo && f ) NOEXCEPT :
 	 Format( std::move( f ) )
 	{}
 
@@ -1179,10 +1166,12 @@ public: // Creation
 
 	// Move Constructor
 	inline
-	FormatList( FormatList && f ) :
+	FormatList( FormatList && f ) NOEXCEPT :
 	 FormatCombo( std::move( f ) ),
 	 formats_( std::move( f.formats_ ) )
-	{}
+	{
+		f.formats_.clear();
+	}
 
 	// Clone
 	inline
@@ -1324,7 +1313,7 @@ protected: // Creation
 
 	// Move Constructor
 	inline
-	FormatGroup( FormatGroup && f ) :
+	FormatGroup( FormatGroup && f ) NOEXCEPT :
 	 FormatCombo( std::move( f ) ),
 	 format_( f.format_ )
 	{
@@ -1500,7 +1489,7 @@ public: // Creation
 
 	// Move Constructor
 	inline
-	FormatGroupTop( FormatGroupTop && f ) :
+	FormatGroupTop( FormatGroupTop && f ) NOEXCEPT :
 	 FormatGroup( std::move( f ) ),
 	 P_( 0 ),
 	 blank_zero_( false ),
@@ -1804,7 +1793,7 @@ protected: // Creation
 
 	// Move Constructor
 	inline
-	FormatLeaf( FormatLeaf && f ) :
+	FormatLeaf( FormatLeaf && f ) NOEXCEPT :
 	 Format( std::move( f ) )
 	{}
 
@@ -2966,10 +2955,6 @@ public: // Input Methods
 		s = read( stream, w_ ); // Reads the whole record if w_ unspecified since std::string is variable length
 	}
 
-	// Input
-	void
-	in( std::istream & stream, Fstring & s );
-
 public: // Output Methods
 
 	// Output
@@ -3088,10 +3073,6 @@ public: // Output Methods
 		stream << spc( ter ) << std::string( ( has_w() && ( w_ > l ) ? w_ - l : 0ul ), ' ' ) << s;
 	}
 
-	// Output
-	void
-	out( std::ostream & stream, Fstring const &, std::string const & ter );
-
 private: // Methods
 
 	// Read Value from Stream and Reinterpret as Type T
@@ -3100,7 +3081,7 @@ private: // Methods
 	void
 	read_val_reinterpret( std::istream & stream, T & t ) const
 	{
-		Size const w( TraitsA< T >::w() );
+		Size const w( TraitsA< T >::w );
 		std::string s( read( stream, wid( w ) ) );
 		std::string::size_type const ls( s.length() );
 		if ( ( w > 0ul ) && ( ls < w ) ) s += std::string( w - ls, ' ' ); // Right-pad to width needed by T
@@ -3119,7 +3100,7 @@ private: // Methods
 	void
 	write_val_reinterpret( std::ostream & stream, T const & t, std::string const & ter )
 	{
-		Size const w( TraitsA< T >::w() );
+		Size const w( TraitsA< T >::w );
 		Size const ww( wid( w ) );
 		Size const wt( std::min( w, ww ) );
 		std::string s( ww, ' ' );
@@ -3133,7 +3114,7 @@ private: // Methods
 	void
 	write_val_reinterpret( std::ostream & stream, bool const b, std::string const & ter )
 	{
-		Size const w( TraitsA< bool >::w() );
+		Size const w( TraitsA< bool >::w );
 		Size const ww( wid( w ) );
 		Size const wt( std::min( w, ww ) );
 		std::string s( ww, ' ' );
@@ -3281,7 +3262,7 @@ protected: // Creation
 
 	// Move Constructor
 	inline
-	FormatInteger( FormatInteger && f ) :
+	FormatInteger( FormatInteger && f ) NOEXCEPT :
 	 FormatLeaf( std::move( f ) ),
 	 w_( f.w_ ),
 	 m_( f.m_ )
@@ -3335,7 +3316,7 @@ public: // Properties
 		return w_;
 	}
 
-	// Min Width
+	// Minimum Width
 	inline
 	Size
 	m() const
@@ -3467,7 +3448,7 @@ protected: // Methods
 	void
 	read_int( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read( stream, wid( TraitsI< T >::w() ) ) ) );
+		std::string const s( blank_process( read( stream, wid( TraitsI< T >::w ) ) ) );
 		t = static_cast< T >( read_int_base( stream, s ) );
 	}
 
@@ -3477,7 +3458,7 @@ protected: // Methods
 	void
 	read_int_reinterpret( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read( stream, wid( TraitsI< T >::w() ) ) ) );
+		std::string const s( blank_process( read( stream, wid( TraitsI< T >::w ) ) ) );
 		read_int_reinterpret( stream, s, t );
 	}
 
@@ -3854,7 +3835,7 @@ protected: // Methods
 	void
 	read_binary( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read( stream, wid( TraitsB< T >::w() ) ) ) );
+		std::string const s( blank_process( read( stream, wid( TraitsB< T >::w ) ) ) );
 		t = static_cast< T >( read_int_base( stream, s ) );
 	}
 
@@ -3864,7 +3845,7 @@ protected: // Methods
 	void
 	read_binary_reinterpret( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read( stream, wid( TraitsB< T >::w() ) ) ) );
+		std::string const s( blank_process( read( stream, wid( TraitsB< T >::w ) ) ) );
 		read_int_reinterpret( stream, s, t );
 	}
 
@@ -4203,7 +4184,7 @@ protected: // Creation
 
 	// Move Constructor
 	inline
-	FormatFloat( FormatFloat && f ) :
+	FormatFloat( FormatFloat && f ) NOEXCEPT :
 	 FormatLeaf( std::move( f ) ),
 	 w_( f.w_ ),
 	 d_( f.d_ )
@@ -4272,7 +4253,7 @@ public: // Input Methods
 	void
 	in( std::istream & stream, bool & b )
 	{
-		std::string const s( blank_process( read_float( stream, wid( TraitsF< bool >::w() ) ) ) );
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< bool >::w ) ) ) );
 		if ( s.length() > 0 ) {
 			bool ok( is_type< float >( s ) );
 			float const v( val_of< float >( s ) );
@@ -4365,7 +4346,7 @@ protected: // Methods
 	void
 	read_val( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w() ) ) ) );
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w ) ) ) );
 		if ( is_type< T >( s ) ) {
 			t = type_of< T >( s );
 			if ( ( d_ > 0ul ) && ( t != T( 0 ) ) && ( ! has( s, '.' ) ) ) t /= static_cast< T >( std::pow( T( 10 ), d_ ) ); // Apply implied decimal point
@@ -4382,7 +4363,7 @@ protected: // Methods
 	void
 	read_val_reinterpret( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w() ) ) ) );
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w ) ) ) );
 		if ( s.length() > 0 ) {
 			bool ok( true );
 			if ( sizeof( T ) < sizeof( float ) ) {
@@ -4522,7 +4503,7 @@ protected: // Creation
 
 	// Move Constructor
 	inline
-	FormatGED( FormatGED && f ) :
+	FormatGED( FormatGED && f ) NOEXCEPT :
 	 FormatFloat( std::move( f ) ),
 	 e_( f.e_ )
 	{}
@@ -4701,10 +4682,6 @@ public: // Input Methods
 		s = read( stream, w() ); // Reads the whole record if w() unspecified since std::string is variable length
 	}
 
-	// Input
-	void
-	in( std::istream & stream, Fstring & s );
-
 public: // Output Methods
 
 	// Output
@@ -4767,7 +4744,7 @@ protected: // Methods
 	void
 	read_int( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read( stream, wid( TraitsG< T >::w() ) ) ) );
+		std::string const s( blank_process( read( stream, wid( TraitsG< T >::w ) ) ) );
 		if ( is_type< T >( s ) ) {
 			t = type_of< T >( s );
 		} else { // Bad input
@@ -5236,10 +5213,6 @@ public: // Input Methods
 		read_string( stream, s );
 	}
 
-	// Input
-	void
-	in( std::istream & stream, Fstring & s );
-
 public: // Output Methods
 
 	// Output
@@ -5305,10 +5278,6 @@ public: // Output Methods
 	// Output
 	void
 	out( std::ostream & stream, std::string const & s, std::string const & ter );
-
-	// Output
-	void
-	out( std::ostream & stream, Fstring const & s, std::string const & ter );
 
 protected: // Methods
 
