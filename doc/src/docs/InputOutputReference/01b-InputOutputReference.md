@@ -7023,7 +7023,7 @@ Schedule:Compact,
 ```
 
 
-#### DesignSpecification:ZoneAirDistribution
+### DesignSpecification:ZoneAirDistribution
 
 This object is used to describe the air distribution effectiveness and fraction of secondary recirculation air (return air not directly mixed with outdoor air) of a zone. It is referenced by the Sizing:Zone and Controller:MechanicalVentilation objects.
 

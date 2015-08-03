@@ -7430,7 +7430,7 @@ This field allows the user to specify the coil operating options as one of the f
 
 #### Field: Supply Air Fan Operating Mode Schedule Name
 
-This field is a schedule name (ref: Schedule) that determines whether the operating modes of unit heater’s On:Off fan. A schedule values of 0 indicates cycling fan operation (fan cycles with cooling/heating coil). A schedule values greater than 0 (usually 1 is used) indicate constant fan operation (fan runs continually regardless of coils operation). If this input field is left blank, then the operating mode of the OnOff fan type defaults to cycling operation.
+This field is a schedule name (ref: Schedule) that determines the operating modes of the unit heater’s On:Off fan. A schedule value of 0 indicates cycling fan operation (fan cycles with cooling/heating coil). A schedule value greater than 0 (usually 1 is used) indicates constant fan operation (fan runs continually regardless of the coils operation). If this input field is left blank, then the operating mode of the On:Off fan type defaults to cycling operation.
 
 #### Field: Heating Coil Object Type
 
@@ -7695,7 +7695,7 @@ This field is the name of the heating coil that is part of the unit heater syste
 
 #### Field: Supply Air Fan Operating Mode Schedule Name
 
-This field is a schedule name (ref: Schedule) that determines whether the operating modes of unit heater’s On:Off fan. A schedule values of 0 indicates cycling fan operation (fan cycles with cooling/heating coil). A schedule values greater than 0 (usually 1 is used) indicate constant fan operation (fan runs continually regardless of coils operation). If this input field is left blank, then the operating mode of the OnOff fan type defaults to cycling operation.
+This field is a schedule name (ref: Schedule) that determines the operating modes of the unit heater’s On:Off fan. A schedule value of 0 indicates cycling fan operation (fan cycles with cooling/heating coil). A schedule value greater than 0 (usually 1 is used) indicates constant fan operation (fan runs continually regardless of the coils operation). If this input field is left blank, then the operating mode of the On:Off fan type defaults to cycling operation.
 
 #### Field: Supply Air Fan Operation During No Heating
 

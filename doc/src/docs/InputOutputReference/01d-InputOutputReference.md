@@ -17015,7 +17015,7 @@ This object is used in conjunction with an outdoor air controller (Ref. Controll
 
 Ventilation standards provide guidance on appropriate levels of outdoor ventilation air required for acceptable indoor air quality. The Ventilation Rate Procedure (VRP) of ASHRAE Standard 62.1-2007/2010 ([www.ashrae.org](http://www.ashrae.org)) requires outdoor ventilation rates to be determined based on the floor area of each occupied zone plus the number of people in each zone and considers the zone air distribution effectiveness and system ventilation efficiency. The outdoor air ventilation rate can be reset dynamically as operating conditions change (e.g., variations in occupancy). The Controller:MechanicalVentilation object implements the VRP for calculating these outdoor air ventilation requirements and resetting them based on varying occupancy levels and zone diversification. This is particularly useful for large air distribution systems that serve a number of different zone types with varying occupancy levels. This object can also be used to model the Indoor Air Quality Procedure (IAQP) as defined in Standard 62.1
 
-#### The first five inputs for this object are the name, the availability schedule, the zone outdoor air method, the system outdoor air method, and the zone maximum outdoor air fraction. The next three input fields define the zone name (or zone list name), the design specification outdoor air object name, and the design specification zone air distribution object name to be applied to this zone (or zone list). The last three fields are extensible
+The first five inputs for this object are the name, the availability schedule, the zone outdoor air method, the system outdoor air method, and the zone maximum outdoor air fraction. The next three input fields define the zone name (or zone list name), the design specification outdoor air object name, and the design specification zone air distribution object name to be applied to this zone (or zone list). The last three fields are extensible
 
 #### Field: Name
 
@@ -21687,19 +21687,19 @@ This is the maximum temperature of cooling water inlet or outlet that can occur 
 
 #### Field: Electrical Efficiency Curve Name
 
-This is the name of Curve:Triquadratic object that defines the steady-state net electrical efficiency.   The electrical efficiency, $\eta_e$, is a function of   the cooling water mass flow rate, $\dot m_{cw}$, the temperature of the cooling water at the inlet, $T_{cw}$, the steady-state net electrical power produced, $P_{net,ss}$.
+This is the name of Curve:Triquadratic object that defines the steady-state net electrical efficiency.   The electrical efficiency, <span>\({\eta_e}\)</span>, is a function of   the cooling water mass flow rate, <span>\({\dot m_{cw}}\)</span>, the temperature of the cooling water at the inlet, <span>\({T_{cw}}\)</span>, the steady-state net electrical power produced, <span>\({P_{net,ss}}\)</span>.
 
-$${\eta_e} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)$$
+<span>\({\eta_e} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)\)</span>
 
-The associated Curve:Triquadratic object should be defined with the independent variables $P_{net,ss}, \dot m_{cw}, T_{cw}$  corresponding to *x*, *y*, and *z*, respectively.
+The associated Curve:Triquadratic object should be defined with the independent variables <span>\({P_{net,ss}},{\dot m_{cw}},{T_{cw}}\)</span>  corresponding to *x*, *y*, and *z*, respectively.
 
 #### Field: Thermal Efficiency Curve Name
 
-This is the name of a Curve:Triquadratic object that defines the steady-state net thermal efficiency.   The thermal efficiency, $\eta_q$, is a function of   the cooling water mass flow rate, $\dot m_{cw}$, the temperature of the cooling water at the inlet, $T_{cw}$, the steady-state net electrical power produced, $P_{net,ss}$.
+This is the name of a Curve:Triquadratic object that defines the steady-state net thermal efficiency.   The thermal efficiency, <span>\({\eta_q}\)</span>, is a function of   the cooling water mass flow rate, <span>\({\dot m_{cw}}\)</span>, the temperature of the cooling water at the inlet, <span>\({T_{cw}}\)</span>, the steady-state net electrical power produced, <span>\({P_{net,ss}}\)</span>.
 
-$${\eta_q} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)$$
+<span>\({\eta_q} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)\)</span>
 
-The associated Curve:Triquadratic object should be defined with the independent variables $P_{net,ss},\dot m_{cw},T_{cw}$ corresponding to *x*, *y*, and *z*, respectively.
+The associated Curve:Triquadratic object should be defined with the independent variables <span>\({P_{net,ss}},{\dot m_{cw}},{T_{cw}}\)</span>  corresponding to *x*, *y*, and *z*, respectively.
 
 #### Field: Cooling Water Flow Rate Mode
 
@@ -21709,7 +21709,7 @@ For internal control, the following field is used to define a Biquadratic curve 
 
 #### Field: Cooling Water Flow Rate Curve Name
 
-This field contains the name of a Curve:Biquadratic object that defines the mass flow rate of cooling water, $\dot m_{cw}$.   This field is only used if the prior field is set to    InternalControl.      The mass flow of cooling water is a function of steady-state power, $P_{net,ss}$, and the inlet temperature of the cooling water, $T_{cw}$.   The associated Curve:Biquadratic should be defined with the independent variables $P_{net,ss}$ and $T_{cw}$ corresponding to *x* and *y*, respectively.
+This field contains the name of a Curve:Biquadratic object that defines the mass flow rate of cooling water, <span>\({\dot m_{cw}}\)</span>.   This field is only used if the prior field is set to    InternalControl.      The mass flow of cooling water is a function of steady-state power, <span>\({P_{net,ss}}\)</span>, and the inlet temperature of the cooling water, <span>\({T_{cw}}\)</span>.   The associated Curve:Biquadratic should be defined with the independent variables <span>\({P_{net,ss}}\)</span>  and <span>\({T_{cw}}\)</span>  corresponding to *x* and *y*, respectively.
 
 #### Field: Air Flow Rate Curve Name
 
@@ -21759,7 +21759,7 @@ This field describes the value for the coefficient used to determine the rate of
 
 #### Field: Nominal Engine Operating Temperature
 
-This field describes the nominal engine temperature during normal, steady-state operation, $T_{eng,nom}$  [ &deg;C].
+This field describes the nominal engine temperature during normal, steady-state operation, <span>\({T_{eng,nom}}\)</span>  [ &deg;C].
 
 #### Field: Warm Up Power Coefficient
 
