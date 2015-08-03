@@ -62,6 +62,64 @@ namespace DataZoneControls {
 	Array1D< TStatObject > StagedTStatObjects;
 	Array1D< ZoneStagedControls > StageControlledZone;
 
+	// Clears the global data in DataZoneControls.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumTempControlledZones = 0;
+		NumHumidityControlZones = 0;
+		NumComfortControlledZones = 0;
+		NumTStatStatements = 0;
+		NumComfortTStatStatements = 0;
+		NumOpTempControlledZones = 0; // number of zones with operative temp control
+		NumTempAndHumidityControlledZones = 0; // number of zones with over cool control
+		AnyOpTempControl = false; // flag set true if any zones have op temp control
+		AnyZoneTempAndHumidityControl = false; // flag set true if any zones have over cool control
+		GetZoneAirStatsInputFlag = true; // True when need to get input
+		if ( StageZoneLogic.allocated() )
+		{
+			StageZoneLogic.deallocate();
+		}
+		if ( OccRoomTSetPointHeat.allocated() )
+		{
+			OccRoomTSetPointHeat.deallocate();
+		}
+		if ( OccRoomTSetPointCool.allocated() )
+		{
+			OccRoomTSetPointCool.deallocate();
+		}
+		if ( HumidityControlZone.allocated() )
+		{
+			HumidityControlZone.deallocate();
+		}
+		if ( TempControlledZone.allocated() )
+		{
+			TempControlledZone.deallocate();
+		}
+		if ( ComfortControlledZone.allocated() )
+		{
+			ComfortControlledZone.deallocate();
+		}
+		if ( TStatObjects.allocated() )
+		{
+			TStatObjects.deallocate();
+		}
+		if ( ComfortTStatObjects.allocated() )
+		{
+			ComfortTStatObjects.deallocate();
+		}
+		if ( StagedTStatObjects.allocated() )
+		{
+			StagedTStatObjects.deallocate();
+		}
+		if ( StageControlledZone.allocated() )
+		{
+			StageControlledZone.deallocate();
+		}
+	}
+
+
 	//     NOTICE
 	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence

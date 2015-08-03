@@ -52,8 +52,12 @@ namespace DemandManager {
 
 	// SUBROUTINE SPECIFICATIONS:
 
-	// Types
+	// Clears the global data in DemandManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
+	// Types
 	struct DemandManagerListData
 	{
 		// Members

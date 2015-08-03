@@ -96,6 +96,27 @@ namespace DemandManager {
 
 	// Functions
 
+	// Clears the global data in DemandManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumDemandManagerList = 0;
+		NumDemandMgr = 0;
+		DemandManagerExtIterations = 0;
+		DemandManagerHBIterations = 0;
+		DemandManagerHVACIterations = 0;
+		GetInput = true;
+		if ( DemandManagerList.allocated() )
+		{
+			DemandManagerList.deallocate();
+		}
+		if ( DemandMgr.allocated() )
+		{
+			DemandMgr.deallocate();
+		}
+	}
+
 	void
 	ManageDemand()
 	{

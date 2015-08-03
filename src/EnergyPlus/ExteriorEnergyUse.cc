@@ -85,6 +85,23 @@ namespace ExteriorEnergyUse {
 
 	// Functions
 
+	// Clears the global data in ExteriorEnergyUse.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumExteriorLights = 0;
+		NumExteriorEqs = 0;
+		if ( ExteriorLights.allocated() )
+		{
+			ExteriorLights.deallocate();
+		}
+		if ( ExteriorEquipment.allocated() )
+		{
+			ExteriorEquipment.deallocate();
+		}
+	}
+	
 	void
 	ManageExteriorEnergyUse()
 	{
