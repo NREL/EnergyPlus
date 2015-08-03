@@ -47,8 +47,6 @@ TEST_F(HVACFixture, DemandManagerGetInput)
 	EXPECT_EQ( ManagerSelectionAll, DemandMgr( 1 ).SelectionControl );
 	EXPECT_EQ( 1, DemandMgr( 1 ).NumOfLoads );
 
-	OAController.deallocate();
-	NumOAControllers = 0;
 }
 
 }
