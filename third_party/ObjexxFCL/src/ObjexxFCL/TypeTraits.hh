@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -22,54 +22,40 @@
 #include <cstddef>
 #include <ios>
 #include <limits>
-#include <typeinfo>
+#include <type_traits>
 
 namespace ObjexxFCL {
 
 template< class A, class B >
 inline
 bool
-same_type_as( A const & a, B const & b )
+same_type_as( A const &, B const & )
 {
-	return ( typeid( a ) == typeid( b ) );
+	return std::is_same< A, B >::value;
 }
 
 template< class A, class B >
 inline
 bool
-SAME_TYPE_AS( A const & a, B const & b )
+SAME_TYPE_AS( A const &, B const & )
 {
-	return ( typeid( a ) == typeid( b ) );
+	return std::is_same< A, B >::value;
 }
 
 template< class A, class B >
 inline
 bool
-extends_type_of( A const & a, B const & b )
+extends_type_of( A const &, B const & )
 {
-#ifdef OBJEXXFCL_FULL_EXTENDS_TYPE_OF // Full support for dynamic type of b
-	if ( typeid( a ) == typeid( b ) ) { // Simpler than adding double dispatch to all classes
-		return true;
-	} else if ( a.super() ) { // Requires virtual super() returning pointer to super class
-		return extends_type_of( *a.super(), b ); // Recurse up inheritance hierarchy
-	} else {
-		return false;
-	}
-#else // Support for static type of b
-	assert( typeid( b ) == typeid( B ) ); // Check that we are safe using simple support
-#ifdef NDEBUG
-	static_cast< void >( b ); // Suppress unused warning
-#endif
-	return ( dynamic_cast< B const * >( &a ) != nullptr );
-#endif
+	return std::is_same< A, B >::value || std::is_base_of< B, A >::value;
 }
 
 template< class A, class B >
 inline
 bool
-EXTENDS_TYPE_OF( A const & a, B const & b )
+EXTENDS_TYPE_OF( A const &, B const & )
 {
-	return extends_type_of( a, b );
+	return std::is_same< A, B >::value || std::is_base_of< B, A >::value;
 }
 
 // is_a: Type Test for const Reference Argument
@@ -139,11 +125,11 @@ struct TypeTraits
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -185,11 +171,11 @@ struct TypeTraits< char >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -231,11 +217,11 @@ struct TypeTraits< signed char >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -277,11 +263,11 @@ struct TypeTraits< unsigned char >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -323,11 +309,11 @@ struct TypeTraits< bool >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -369,11 +355,11 @@ struct TypeTraits< byte >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -415,11 +401,11 @@ struct TypeTraits< ubyte >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -461,11 +447,11 @@ struct TypeTraits< short int >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -507,11 +493,11 @@ struct TypeTraits< unsigned short int >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -553,11 +539,11 @@ struct TypeTraits< int >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -599,11 +585,11 @@ struct TypeTraits< unsigned int >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -645,11 +631,11 @@ struct TypeTraits< long int >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -691,11 +677,11 @@ struct TypeTraits< unsigned long int >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -737,11 +723,11 @@ struct TypeTraits< long long int >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -783,11 +769,11 @@ struct TypeTraits< unsigned long long int >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -829,11 +815,11 @@ struct TypeTraits< float >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 8; // Precision
@@ -875,11 +861,11 @@ struct TypeTraits< double >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 16; // Precision
@@ -921,11 +907,11 @@ struct TypeTraits< long double >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 33; // Precision
@@ -968,11 +954,11 @@ struct TypeTraits< std::complex< float > >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 8; // Precision
@@ -1015,11 +1001,11 @@ struct TypeTraits< std::complex< double > >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 16; // Precision
@@ -1062,11 +1048,11 @@ struct TypeTraits< std::complex< long double > >
 	traits_type
 	initial_array_value()
 	{
-#ifdef OBJEXXFCL_FARRAY_INIT_DEBUG
+#ifdef OBJEXXFCL_ARRAY_INIT_DEBUG
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_FARRAY_INIT_DEBUG
+#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
 	}
 
 	static std::streamsize const precision = 33; // Precision

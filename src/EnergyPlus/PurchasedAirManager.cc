@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -98,7 +98,7 @@ namespace PurchasedAirManager {
 	int const LimitFlowRate( 2 );
 	int const LimitCapacity( 3 );
 	int const LimitFlowRateAndCapacity( 4 );
-	FArray1D_string const cLimitType( 4, { "NoLimit", "LimitFlowRate", "LimitCapacity", "LimitFlowRateAndCapacity" } );
+	Array1D_string const cLimitType( 4, { "NoLimit", "LimitFlowRate", "LimitCapacity", "LimitFlowRateAndCapacity" } );
 	// Dehumidification and Humidification control type parameters
 	int const None( 1 );
 	int const ConstantSensibleHeatRatio( 2 );
@@ -131,12 +131,12 @@ namespace PurchasedAirManager {
 
 	int NumPurchAir;
 	bool GetPurchAirInputFlag( true );
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 	//SUBROUTINE SPECIFICATIONS FOR MODULE PurchasedAir:
 
 	// Object Data
-	FArray1D< ZonePurchasedAir > PurchAir; // Used to specify purchased air parameters
-	FArray1D< PurchAirNumericFieldData > PurchAirNumericFields; // Used to save the indecies of scalable sizing object for zone HVAC
+	Array1D< ZonePurchasedAir > PurchAir; // Used to specify purchased air parameters
+	Array1D< PurchAirNumericFieldData > PurchAirNumericFields; // Used to save the indecies of scalable sizing object for zone HVAC
 
 	// Functions
 
@@ -169,7 +169,6 @@ namespace PurchasedAirManager {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::MaxNameLength;
 		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 
@@ -721,7 +720,7 @@ namespace PurchasedAirManager {
 	void
 	InitPurchasedAir(
 		int const PurchAirNum,
-		bool const FirstHVACIteration, // unused1208
+		bool const EP_UNUSED( FirstHVACIteration ), // unused1208
 		int const ControlledZoneNum,
 		int const ActualZoneNum
 	)
@@ -768,9 +767,9 @@ namespace PurchasedAirManager {
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
-		static FArray1D_bool OneTimeUnitInitsDone; // True if one-time inits for PurchAirNum are completed
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MySizeFlag;
+		static Array1D_bool OneTimeUnitInitsDone; // True if one-time inits for PurchAirNum are completed
 		//      LOGICAL :: ErrorsFound = .FALSE.   ! If errors detected in input
 		bool UnitOn; // simple checks for error
 		bool CoolOn; // simple checks for error
@@ -983,7 +982,6 @@ namespace PurchasedAirManager {
 		using Psychrometrics::CPCW;
 		using Psychrometrics::PsyHFnTdbW;
 		using General::RoundSigDigits;
-		using DataHVACGlobals::SystemAirflowSizing;
 		using DataHVACGlobals::CoolingAirflowSizing;
 		using DataHVACGlobals::HeatingAirflowSizing;
 		using DataHVACGlobals::CoolingCapacitySizing;
@@ -1003,11 +1001,6 @@ namespace PurchasedAirManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 MixedAirTemp;
-		Real64 OutletTemp;
-		Real64 MixedAirHumRat;
-		Real64 OutletHumRat;
-		Real64 DesignLoad;
 		bool IsAutoSize; // Indicator to autosize
 		Real64 MaxHeatVolFlowRateDes; // Autosized maximum heating air flow for reporting
 		Real64 MaxHeatVolFlowRateUser; // Hardsized maximum heating air flow for reporting
@@ -1020,7 +1013,6 @@ namespace PurchasedAirManager {
 		std::string CompName; // component name
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
-		bool bPRINT = true; // TRUE if sizing is reported to output (eio)
 		Real64 TempSize; // autosized value of coil input field
 		int FieldNum = 2; // IDD numeric field number where input field description is found
 		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
@@ -2238,15 +2230,8 @@ namespace PurchasedAirManager {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataHeatBalance::ZoneIntGain;
 		using DataHeatBalance::Zone;
 		using DataEnvironment::StdRhoAir;
-		using DataSizing::OAFlowPPer;
-		using DataSizing::OAFlow;
-		using DataSizing::OAFlowPerArea;
-		using DataSizing::OAFlowACH;
-		using DataSizing::OAFlowSum;
-		using DataSizing::OAFlowMax;
 		using DataContaminantBalance::ZoneSysContDemand;
 		using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
@@ -2429,7 +2414,7 @@ namespace PurchasedAirManager {
 	}
 
 	void
-	UpdatePurchasedAir( int const PurchAirNum )
+	UpdatePurchasedAir( int const EP_UNUSED( PurchAirNum ) )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -2846,7 +2831,7 @@ namespace PurchasedAirManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

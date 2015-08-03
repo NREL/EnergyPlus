@@ -1,14 +1,15 @@
 
 # Compiler-agnostic compiler flags first
 ADD_CXX_DEFINITIONS("-DOBJEXXFCL_ARRAY_NOALIGN") # Disable experimental ObjexxFCL array alignment
-ADD_CXX_DEBUG_DEFINITIONS("-DOBJEXXFCL_FARRAY_INIT_DEBUG") # Initialize ObjexxFCL arrays to aid debugging
+ADD_CXX_DEBUG_DEFINITIONS("-DOBJEXXFCL_ARRAY_INIT_DEBUG") # Initialize ObjexxFCL arrays to aid debugging
 
 # Make sure expat is compiled as a static library
 ADD_DEFINITIONS("-DXML_STATIC")
 
-IF ( MSVC ) # Visual C++ (VS 2013)
+IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++ (VS 2013)
 
     # Disabled Warnings: Enable some of these as more serious warnings are addressed
+    #  4068 Unknown pragma
     #  4101 Unreferenced local variable
     #  4102 Unreferenced label
     #  4244 Narrowing conversions
@@ -25,10 +26,9 @@ IF ( MSVC ) # Visual C++ (VS 2013)
     ADD_CXX_DEFINITIONS("/MP") # Enables multi-processor compilation of source within a single project
     ADD_CXX_DEFINITIONS("/W1") # Increase to /W2 then /W3 as more serious warnings are addressed
 
-    ADD_CXX_DEFINITIONS("/wd4101 /wd4102 /wd4244 /wd4258 /wd4355 /wd4996") # Disables warning messages listed above
+    ADD_CXX_DEFINITIONS("/wd4068 /wd4101 /wd4102 /wd4244 /wd4258 /wd4355 /wd4996") # Disables warning messages listed above
     ADD_CXX_DEFINITIONS("/DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
     ADD_CXX_DEFINITIONS("/DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
-    ADD_CXX_DEFINITIONS("/DMSC_EXTENSIONS") # ObjexxFCL needs this when not using /Za
 
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
     ADD_CXX_RELEASE_DEFINITIONS("/GS-") # Disable buffer overrun checks for performance in release mode
@@ -38,7 +38,6 @@ IF ( MSVC ) # Visual C++ (VS 2013)
     ADD_CXX_DEBUG_DEFINITIONS("/RTCsu") # Runtime checks
 
 ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # g++/Clang
-
     option(ENABLE_THREAD_SANITIZER "Enable thread sanitizer testing in gcc/clang" FALSE)
     set(LINKER_FLAGS "")
     if(ENABLE_THREAD_SANITIZER)
@@ -84,25 +83,29 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     ADD_CXX_DEFINITIONS("-pipe") # Faster compiler processing
     ADD_CXX_DEFINITIONS("-std=c++11") # Enable C++11 features in g++
     ADD_CXX_DEFINITIONS("-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
-    #ADD_CXX_DEFINITIONS("-Wall -Wextra") # Turn on warnings
-    ADD_CXX_DEFINITIONS("-Wno-unused-parameter -Wno-unused-variable -Wno-unused-label") # Suppress unused item warnings until more serious ones are addressed
+    ADD_CXX_DEFINITIONS("-ffor-scope")
+    ADD_CXX_DEFINITIONS("-Wall -Wextra") # Turn on warnings
+    ADD_CXX_DEFINITIONS("-Wno-unknown-pragmas")
     if( CMAKE_COMPILER_IS_GNUCXX ) # g++
       ADD_CXX_DEFINITIONS("-Wno-unused-but-set-parameter -Wno-unused-but-set-variable") # Suppress unused-but-set warnings until more serious ones are addressed
+      ADD_CXX_DEFINITIONS("-Wno-maybe-uninitialized")
+    elseif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
+      ADD_CXX_DEFINITIONS("-Wno-invalid-source-encoding")
     endif()
-    ADD_CXX_DEFINITIONS("-Wno-invalid-source-encoding")
-    ADD_CXX_DEFINITIONS("-ffor-scope")
 
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
-  IF ( CMAKE_COMPILER_IS_GNUCXX ) # g++
-    ADD_CXX_DEBUG_DEFINITIONS("-ffloat-store") # Improve debug run solution stability
-    ADD_CXX_DEBUG_DEFINITIONS("-fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
-  ENDIF ()
-    ADD_CXX_DEBUG_DEFINITIONS("-ggdb") # Produces debugging information specifically for gdb
+    if ( CMAKE_COMPILER_IS_GNUCXX ) # g++
+      ADD_CXX_DEBUG_DEFINITIONS("-ffloat-store") # Improve debug run solution stability
+      ADD_CXX_DEBUG_DEFINITIONS("-fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
+    endif ()
+  
+  ADD_CXX_DEBUG_DEFINITIONS("-ggdb") # Produces debugging information specifically for gdb
 
 ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
 
     # Disabled Warnings: Enable some of these as more serious warnings are addressed
     #   177 Variable declared but never referenced
+    #   488 Template parameter not used ...
     #   869 Parameter never referenced
     #  1786 Use of deprecated items
     #  2259 Non-pointer conversions may lose significant bits
@@ -115,7 +118,7 @@ ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     ADD_CXX_DEFINITIONS("/Qcxx-features") # Enables standard C++ features without disabling Microsoft extensions
     ADD_CXX_DEFINITIONS("/Wall") # Enable "all" warnings
     ADD_CXX_DEFINITIONS("/Wp64") # 64-bit warnings
-    ADD_CXX_DEFINITIONS("/Qdiag-disable:177,869,1786,2259,3280,11074,11075") # Disable warnings listed above
+    ADD_CXX_DEFINITIONS("/Qdiag-disable:177,488,869,1786,2259,3280,11074,11075") # Disable warnings listed above
     ADD_CXX_DEFINITIONS("/DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
     ADD_CXX_DEFINITIONS("/DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
 
@@ -146,6 +149,7 @@ ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
 
     # Disabled Warnings: Enable some of these as more serious warnings are addressed
     #   177 Variable declared but never referenced
+    #   488 Template parameter not used ...
     #   869 Parameter never referenced
     #  1786 Use of deprecated items
     #  2259 Non-pointer conversions may lose significant bits
@@ -157,7 +161,7 @@ ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     ADD_CXX_DEFINITIONS("-std=c++11") # Specify C++11 language
     ADD_CXX_DEFINITIONS("-Wall") # Enable "all" warnings
     ADD_CXX_DEFINITIONS("-Wp64") # 64-bit warnings
-    ADD_CXX_DEFINITIONS("-diag-disable:177,869,1786,2259,3280,11074,11075") # Disable warnings listed above
+    ADD_CXX_DEFINITIONS("-diag-disable:177,488,869,1786,2259,3280,11074,11075") # Disable warnings listed above
 
     # Optimization options that had no significant benefit for EnergyPlus
     #  -inline-factor=200

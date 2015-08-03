@@ -2,7 +2,7 @@
 #define DataRootFinder_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -58,7 +58,7 @@ namespace DataRootFinder {
 	extern int const iMethodSecant; // Step performed using secant method
 	extern int const iMethodBrent; // Step performed using Brent's method
 	// Names for each solution method type
-	extern FArray1D_string const SolutionMethodTypes;
+	extern Array1D_string const SolutionMethodTypes;
 
 	// DERIVED TYPE DEFINITIONS
 	// Type declaration for the numerical controls.
@@ -148,7 +148,7 @@ namespace DataRootFinder {
 		PointType UpperPoint; // Point { XUpper, F(XUpper) } so that XRoot <= YUpper
 		PointType CurrentPoint; // Last evaluated point { X, F(X) }
 		int NumHistory; // Number of points stored in History
-		FArray1D< PointType > History; // Vector containing last 3 best iterates
+		Array1D< PointType > History; // Vector containing last 3 best iterates
 
 		// Default Constructor
 		RootFinderDataType() :
@@ -174,7 +174,7 @@ namespace DataRootFinder {
 			PointType const & UpperPoint, // Point { XUpper, F(XUpper) } so that XRoot <= YUpper
 			PointType const & CurrentPoint, // Last evaluated point { X, F(X) }
 			int const NumHistory, // Number of points stored in History
-			FArray1< PointType > const & History // Vector containing last 3 best iterates
+			Array1< PointType > const & History // Vector containing last 3 best iterates
 		) :
 			Controls( Controls ),
 			StatusFlag( StatusFlag ),

@@ -59,6 +59,8 @@ endif()
 
 if(BUILD_FORTRAN)
 
+  set(ENV{CI_BASEMENT_NUMYEARS} "2")
+
   # Parametric preprocessor next
   string(FIND "${IDF_CONTENT}" "Parametric:" PAR_RESULT)
   if ( "${PAR_RESULT}" GREATER -1 )

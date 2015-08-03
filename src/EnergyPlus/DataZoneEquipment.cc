@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -84,7 +84,7 @@ namespace DataZoneEquipment {
 	// End zone equip objects
 
 	int const NumValidSysAvailZoneComponents( 13 );
-	FArray1D_string const cValidSysAvailManagerCompTypes( NumValidSysAvailZoneComponents, { "ZoneHVAC:FourPipeFanCoil", "ZoneHVAC:PackagedTerminalHeatPump", "ZoneHVAC:PackagedTerminalAirConditioner", "ZoneHVAC:WaterToAirHeatPump", "ZoneHVAC:WindowAirConditioner", "ZoneHVAC:UnitHeater", "ZoneHVAC:UnitVentilator", "ZoneHVAC:EnergyRecoveryVentilator", "ZoneHVAC:VentilatedSlab", "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", "ZoneHVAC:IdealLoadsAirSystem", "ZoneHVAC:EvaporativeCoolerUnit" } );
+	Array1D_string const cValidSysAvailManagerCompTypes( NumValidSysAvailZoneComponents, { "ZoneHVAC:FourPipeFanCoil", "ZoneHVAC:PackagedTerminalHeatPump", "ZoneHVAC:PackagedTerminalAirConditioner", "ZoneHVAC:WaterToAirHeatPump", "ZoneHVAC:WindowAirConditioner", "ZoneHVAC:UnitHeater", "ZoneHVAC:UnitVentilator", "ZoneHVAC:EnergyRecoveryVentilator", "ZoneHVAC:VentilatedSlab", "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", "ZoneHVAC:IdealLoadsAirSystem", "ZoneHVAC:EvaporativeCoolerUnit" } );
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -94,21 +94,21 @@ namespace DataZoneEquipment {
 	bool ZoneEquipInputsFilled( false );
 	bool ZoneEquipSimulatedOnce( false );
 	int NumOfZoneEquipLists( 0 ); // The Number of Zone Equipment List objects
-	FArray1D_int ZoneEquipAvail;
+	Array1D_int ZoneEquipAvail;
 
-	FArray1D_bool CrossMixingReportFlag;
-	FArray1D_bool MixingReportFlag;
-	FArray1D< Real64 > VentMCP;
+	Array1D_bool CrossMixingReportFlag;
+	Array1D_bool MixingReportFlag;
+	Array1D< Real64 > VentMCP;
 
 	// Utility routines for module
 
 	// Object Data
-	FArray1D< EquipConfiguration > ZoneEquipConfig;
-	FArray1D< EquipList > ZoneEquipList;
-	FArray1D< ControlList > HeatingControlList;
-	FArray1D< ControlList > CoolingControlList;
-	FArray1D< SupplyAir > SupplyAirPath;
-	FArray1D< ReturnAir > ReturnAirPath;
+	Array1D< EquipConfiguration > ZoneEquipConfig;
+	Array1D< EquipList > ZoneEquipList;
+	Array1D< ControlList > HeatingControlList;
+	Array1D< ControlList > CoolingControlList;
+	Array1D< SupplyAir > SupplyAirPath;
+	Array1D< ReturnAir > ReturnAirPath;
 
 	// Functions
 
@@ -221,13 +221,13 @@ namespace DataZoneEquipment {
 		int IOStat;
 		std::string InletNodeListName;
 		std::string ExhaustNodeListName;
-		FArray1D_string AlphArray;
-		FArray1D< Real64 > NumArray;
+		Array1D_string AlphArray;
+		Array1D< Real64 > NumArray;
 		int MaxAlphas;
 		int MaxNums;
 		int NumParams;
 		int NumNodes;
-		FArray1D_int NodeNums;
+		Array1D_int NodeNums;
 		int Counter;
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
@@ -236,10 +236,10 @@ namespace DataZoneEquipment {
 		bool UniqueNodeError;
 		int NumOfControlledZones; // The number of Controlled Zone Equip Configuration objects
 		std::string CurrentModuleObject; // Object type for getting and error messages
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		bool IdealLoadsOnEquipmentList;
 		static int found( 0 );
 		int maxEquipCount;
@@ -274,7 +274,7 @@ namespace DataZoneEquipment {
 		};
 
 		// Object Data
-		FArray1D< EquipListAudit > ZoneEquipListAcct;
+		Array1D< EquipListAudit > ZoneEquipListAcct;
 
 		ExhaustNodeListName = "";
 		InletNodeListName = "";
@@ -553,9 +553,12 @@ namespace DataZoneEquipment {
 					} else if ( SELECT_CASE_var == "ZONEHVAC:ENERGYRECOVERYVENTILATOR" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ERVStandAlone_Num;
 
-					} else if ( SELECT_CASE_var == "WATERHEATER:HEATPUMP" ) {
+					} else if ( SELECT_CASE_var == "WATERHEATER:HEATPUMP:PUMPEDCONDENSER" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = HPWaterHeater_Num;
-
+					
+					} else if ( SELECT_CASE_var == "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER" ) {
+						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = HPWaterHeater_Num;
+						
 					} else if ( SELECT_CASE_var == "ZONEHVAC:VENTILATEDSLAB" ) { // Ventilated Slab
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = VentilatedSlab_Num;
 
@@ -1339,7 +1342,7 @@ namespace DataZoneEquipment {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

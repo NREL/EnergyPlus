@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -88,7 +88,7 @@ namespace HVACSingleDuctInduc {
 
 	int NumIndUnits( 0 );
 	int NumFourPipes( 0 );
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 	bool GetIUInputFlag( true ); // First time, input is "gotten"
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE HVACSingleDuctInduc:
@@ -97,7 +97,7 @@ namespace HVACSingleDuctInduc {
 	// PRIVATE ReportIndUnit
 
 	// Object Data
-	FArray1D< IndUnitData > IndUnit;
+	Array1D< IndUnitData > IndUnit;
 
 	// Functions
 
@@ -242,6 +242,7 @@ namespace HVACSingleDuctInduc {
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilWaterCooling;
 		using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
+		using MixerComponent::GetZoneMixerIndex;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -262,12 +263,12 @@ namespace HVACSingleDuctInduc {
 		int IUIndex; // loop index
 		int IUNum; // current fan coil number
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int NumAlphas( 0 ); // Number of Alphas for each GetObjectItem call
 		static int NumNumbers( 0 ); // Number of Numbers for each GetObjectItem call
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -280,6 +281,7 @@ namespace HVACSingleDuctInduc {
 		int SupAirIn; // controlled zone supply air inlet index
 		bool AirNodeFound;
 		int ADUNum;
+		bool errFlag;
 
 		// find the number of each type of induction unit
 		CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction";
@@ -372,7 +374,16 @@ namespace HVACSingleDuctInduc {
 			IndUnit( IUNum ).MaxVolColdWaterFlow = Numbers( 6 );
 			IndUnit( IUNum ).MinVolColdWaterFlow = Numbers( 7 );
 			IndUnit( IUNum ).ColdControlOffset = Numbers( 8 );
+
+			// Get the Zone Mixer name and check that it is OK
+			errFlag = false;
 			IndUnit( IUNum ).MixerName = Alphas( 12 );
+			GetZoneMixerIndex( IndUnit( IUNum ).MixerName, IndUnit( IUNum ).Mixer_Num, errFlag, CurrentModuleObject );
+			if ( errFlag ) {
+				ShowContinueError( "...specified in " + CurrentModuleObject + " = " + IndUnit( IUNum ).Name );
+				ErrorsFound = true;
+			}
+
 			// Add heating coil to component sets array
 			SetUpCompSets( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, IndUnit( IUNum ).HCoilType, IndUnit( IUNum ).HCoil, Alphas( 4 ), "UNDEFINED" );
 			// Add cooling coil to component sets array
@@ -435,7 +446,6 @@ namespace HVACSingleDuctInduc {
 		Numbers.deallocate();
 		lAlphaBlanks.deallocate();
 		lNumericBlanks.deallocate();
-
 		if ( ErrorsFound ) {
 			ShowFatalError( RoutineName + "Errors found in getting input. Preceding conditions cause termination." );
 		}
@@ -500,9 +510,9 @@ namespace HVACSingleDuctInduc {
 		Real64 IndRat; // unit induction ratio
 		Real64 RhoAir; // air density at outside pressure and standard temperature and humidity
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
-		static FArray1D_bool MyPlantScanFlag;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MySizeFlag;
+		static Array1D_bool MyPlantScanFlag;
 
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop; // Loop checking control variable
@@ -989,7 +999,7 @@ namespace HVACSingleDuctInduc {
 		Real64 PriAirMassFlow; // primary air mass flow rate [kg/s]
 		Real64 SecAirMassFlow; // secondary air mass flow rate [kg/s]
 		Real64 InducRat; // Induction Ratio
-		FArray1D< Real64 > Par( 7 );
+		Array1D< Real64 > Par( 7 );
 		int SolFlag;
 		Real64 ErrTolerance;
 		int HWOutletNode;
@@ -1219,7 +1229,7 @@ namespace HVACSingleDuctInduc {
 	Real64
 	FourPipeIUHeatingResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		FArray1< Real64 > const & Par // Par(5) is the requested zone load
+		Array1< Real64 > const & Par // Par(5) is the requested zone load
 	)
 	{
 
@@ -1279,7 +1289,7 @@ namespace HVACSingleDuctInduc {
 	Real64
 	FourPipeIUCoolingResidual(
 		Real64 const CWFlow, // cold water flow rate in kg/s
-		FArray1< Real64 > const & Par // Par(5) is the requested zone load
+		Array1< Real64 > const & Par // Par(5) is the requested zone load
 	)
 	{
 
@@ -1396,7 +1406,7 @@ namespace HVACSingleDuctInduc {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

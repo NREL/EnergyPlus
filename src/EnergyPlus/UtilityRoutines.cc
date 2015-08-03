@@ -10,8 +10,8 @@ extern "C" {
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/char.functions.hh>
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -239,7 +239,6 @@ CloseMiscOpenFiles()
 	// na
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	int const MaxUnitNumber( 1000 );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -488,7 +487,7 @@ GetNewUnitNumber()
 //	//  Indicate number and value of preconnected units
 //
 //	int const NUMBER_OF_PRECONNECTED_UNITS( 2 );
-//	static FArray1D_int const PRECONNECTED_UNITS( NUMBER_OF_PRECONNECTED_UNITS, { 5, 6 } );
+//	static Array1D_int const PRECONNECTED_UNITS( NUMBER_OF_PRECONNECTED_UNITS, { 5, 6 } );
 //
 //	//  Largest allowed unit number (or a large number, if none)
 //	int const MaxUnitNumber( 1000 );
@@ -1748,7 +1747,7 @@ ShowRecurringErrors()
 }
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

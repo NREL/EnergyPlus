@@ -2,7 +2,7 @@
 #define FuelCellElectricGenerator_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -18,7 +18,7 @@ namespace FuelCellElectricGenerator {
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern bool GetFuelCellInput; // When TRUE, calls subroutine to read input file.
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE FuelCell ElectricGenerator
 
@@ -71,7 +71,7 @@ namespace FuelCellElectricGenerator {
 	Real64
 	FuelCellProductGasEnthResidual(
 		Real64 const TprodGas, // temperature, this is "x" being searched
-		FArray1< Real64 > const & Par // par(1) = Generator Number
+		Array1< Real64 > const & Par // par(1) = Generator Number
 	);
 
 	void

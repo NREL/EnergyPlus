@@ -186,9 +186,8 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 	int iHeatingSizingType( 1 );
 	bool FirstHVACIteration( true );
 	bool SaveOutputFile( false );
-	Real64 PartLoadRatio( 1.0 );
 	int write_stat;
-	FArray1D_int SizingTypes( { DataSizing::None, DataSizing::SupplyAirFlowRate, DataSizing::FlowPerFloorArea, DataSizing::FractionOfAutosizedCoolingAirflow, DataSizing::FractionOfAutosizedHeatingAirflow, DataSizing::FlowPerCoolingCapacity, DataSizing::FlowPerHeatingCapacity } );
+	Array1D_int SizingTypes( { DataSizing::None, DataSizing::SupplyAirFlowRate, DataSizing::FlowPerFloorArea, DataSizing::FractionOfAutosizedCoolingAirflow, DataSizing::FractionOfAutosizedHeatingAirflow, DataSizing::FlowPerCoolingCapacity, DataSizing::FlowPerHeatingCapacity } );
 
 	//	int const None( 1 );
 	//	int const SupplyAirFlowRate( 2 );
@@ -230,7 +229,7 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 
 	ZoneSizingRunDone = true;
 	ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = false;
-	ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 16 );
+	ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 25 );
 	ZoneEqSizing( CurZoneEqNum ).SizingMethod( DataHVACGlobals::SystemAirflowSizing ) = DataSizing::SupplyAirFlowRate;
 
 	// test cooling only sizing
@@ -244,9 +243,9 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 	FinalZoneSizing( CurZoneEqNum ).CoolDesTemp = 15.0;
 	FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat = 0.0006;
 
-	for( int iSizingType = DataSizing::None; iSizingType <= DataSizing::FlowPerCoolingCapacity; ++iSizingType ) {
+	for ( int iSizingType = DataSizing::None; iSizingType <= DataSizing::FlowPerCoolingCapacity; ++iSizingType ) {
 
-		if( iSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) continue; // not allowed for cooling air flow
+		if ( iSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) continue; // not allowed for cooling air flow
 
 		UnitarySystem( UnitarySysNum ).Name = "UnitarySystem:CoolingOnly #" + TrimSigDigits( iSizingType );
 		UnitarySystem( UnitarySysNum ).CoolingSAFMethod = SizingTypes( iSizingType );
@@ -257,10 +256,10 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 		UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = AutoSize;
 
 		// when l = 2, MaxCoolAirVolFlow is already set to 1.005 on previous call and represents floor area x flow rate ratio
-		if( iSizingType == DataSizing::FlowPerFloorArea ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.005;
-		if( iSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 1.005;
-		if( iSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.0;
-		if( iSizingType == DataSizing::FlowPerCoolingCapacity ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.005 / 18827.616766698276;
+		if ( iSizingType == DataSizing::FlowPerFloorArea ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.005;
+		if ( iSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 1.005;
+		if ( iSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.0;
+		if ( iSizingType == DataSizing::FlowPerCoolingCapacity ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.005 / 18827.616766698276;
 
 		SizeUnitarySystem( UnitarySysNum, FirstHVACIteration, AirLoopNum );
 
@@ -281,10 +280,10 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 	FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat = 0.001;
 	FinalZoneSizing( CurZoneEqNum ).HeatDesTemp = 30.0;
 
-	for( int iSizingType = DataSizing::None; iSizingType <= DataSizing::FlowPerHeatingCapacity; ++iSizingType ) {
+	for ( int iSizingType = DataSizing::None; iSizingType <= DataSizing::FlowPerHeatingCapacity; ++iSizingType ) {
 
-		if( iSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) continue; // not allowed for heating air flow
-		if( iSizingType == DataSizing::FlowPerCoolingCapacity ) continue; // not allowed for heating air flow
+		if ( iSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) continue; // not allowed for heating air flow
+		if ( iSizingType == DataSizing::FlowPerCoolingCapacity ) continue; // not allowed for heating air flow
 
 		UnitarySystem( UnitarySysNum ).Name = "UnitarySystem:HeatingOnly #" + TrimSigDigits( iSizingType );
 		UnitarySystem( UnitarySysNum ).HeatingSAFMethod = SizingTypes( iSizingType );
@@ -295,10 +294,10 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 		UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = AutoSize;
 
 		// when l = 2, MaxCoolAirVolFlow is already set to 1.005 on previous call and represents floor area x flow rate ratio
-		if( iSizingType == DataSizing::FlowPerFloorArea ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.005;
-		if( iSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 1.005;
-		if( iSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.0;
-		if( iSizingType == DataSizing::FlowPerHeatingCapacity ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.005 / 15148.243236712493;
+		if ( iSizingType == DataSizing::FlowPerFloorArea ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.005;
+		if ( iSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 1.005;
+		if ( iSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.0;
+		if ( iSizingType == DataSizing::FlowPerHeatingCapacity ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.005 / 15148.243236712493;
 
 		SizeUnitarySystem( UnitarySysNum, FirstHVACIteration, AirLoopNum );
 
@@ -324,14 +323,14 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 	FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat = 0.001;
 	FinalZoneSizing( CurZoneEqNum ).HeatDesTemp = 30.0;
 
-	for( int iSizingType = DataSizing::None; iSizingType <= DataSizing::FlowPerHeatingCapacity; ++iSizingType ) {
+	for ( int iSizingType = DataSizing::None; iSizingType <= DataSizing::FlowPerHeatingCapacity; ++iSizingType ) {
 
 		iCoolingSizingType = iSizingType;
 		iHeatingSizingType = iSizingType;
-		if( iSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) iHeatingSizingType = DataSizing::FractionOfAutosizedHeatingAirflow;
-		if( iSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) iCoolingSizingType = DataSizing::FractionOfAutosizedCoolingAirflow;
-		if( iSizingType == DataSizing::FlowPerCoolingCapacity ) iHeatingSizingType = DataSizing::FlowPerHeatingCapacity;
-		if( iSizingType == DataSizing::FlowPerHeatingCapacity ) iCoolingSizingType = DataSizing::FlowPerCoolingCapacity;
+		if ( iSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) iHeatingSizingType = DataSizing::FractionOfAutosizedHeatingAirflow;
+		if ( iSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) iCoolingSizingType = DataSizing::FractionOfAutosizedCoolingAirflow;
+		if ( iSizingType == DataSizing::FlowPerCoolingCapacity ) iHeatingSizingType = DataSizing::FlowPerHeatingCapacity;
+		if ( iSizingType == DataSizing::FlowPerHeatingCapacity ) iCoolingSizingType = DataSizing::FlowPerCoolingCapacity;
 		UnitarySystem( UnitarySysNum ).Name = "UnitarySystem:CoolingAndHeating #" + TrimSigDigits( iSizingType );
 		UnitarySystem( UnitarySysNum ).CoolingSAFMethod = SizingTypes( iCoolingSizingType );
 		UnitarySystem( UnitarySysNum ).HeatingSAFMethod = SizingTypes( iHeatingSizingType );
@@ -343,13 +342,13 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 		UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = AutoSize;
 
 		// when l = 2, MaxCoolAirVolFlow is already set to 1.005 on previous call and represents floor area x flow rate ratio
-		if( iSizingType == DataSizing::FlowPerFloorArea ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.005;
-		if( iCoolingSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 1.005;
-		if( iCoolingSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.0;
-		if( iCoolingSizingType == DataSizing::FlowPerCoolingCapacity ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.005 / 18827.616766698276;
-		if( iHeatingSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 1.005;
-		if( iHeatingSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.0;
-		if( iHeatingSizingType == DataSizing::FlowPerHeatingCapacity ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.005 / 1431.9234900374995;
+		if ( iSizingType == DataSizing::FlowPerFloorArea ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.005;
+		if ( iCoolingSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 1.005;
+		if ( iCoolingSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.0;
+		if ( iCoolingSizingType == DataSizing::FlowPerCoolingCapacity ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.005 / 18827.616766698276;
+		if ( iHeatingSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 1.005;
+		if ( iHeatingSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.0;
+		if ( iHeatingSizingType == DataSizing::FlowPerHeatingCapacity ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.005 / 1431.9234900374995;
 
 		SizeUnitarySystem( UnitarySysNum, FirstHVACIteration, AirLoopNum );
 
@@ -364,7 +363,7 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 	}
 
 	// Close and delete eio output file
-	if( SaveOutputFile ) {
+	if ( SaveOutputFile ) {
 		gio::close( OutputFileInits );
 	} else {
 		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }

@@ -1,6 +1,6 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
@@ -286,9 +286,7 @@ namespace CostEstimateManager {
 		using DataGlobals::NumOfZones;
 		using DataHeatBalance::Construct;
 		using DataHeatBalance::TotConstructs;
-		using DataHeatBalance::Lights;
 		using DataHeatBalance::Zone;
-		using DataHeatBalance::TotLights;
 		using InputProcessor::FindItem;
 		using DXCoils::DXCoil;
 		using DXCoils::NumDXCoils;
@@ -297,7 +295,6 @@ namespace CostEstimateManager {
 		using PlantChillers::NumElectricChillers;
 		using DataPhotovoltaics::PVarray;
 		using DataPhotovoltaics::NumPVs;
-		using DataPhotovoltaics::NumSimplePVModuleTypes;
 		using DataPhotovoltaics::iSimplePVModel;
 		using namespace DataDaylighting;
 		using HeatingCoils::HeatingCoil;
@@ -565,7 +562,6 @@ namespace CostEstimateManager {
 		using DataHeatBalance::TotConstructs;
 		using DataHeatBalance::Lights;
 		using DataHeatBalance::Zone;
-		using DataHeatBalance::TotLights;
 		using InputProcessor::FindItem;
 		using DXCoils::DXCoil;
 		using DXCoils::NumDXCoils;
@@ -574,7 +570,6 @@ namespace CostEstimateManager {
 		using PlantChillers::NumElectricChillers;
 		using DataPhotovoltaics::PVarray;
 		using DataPhotovoltaics::NumPVs;
-		using DataPhotovoltaics::NumSimplePVModuleTypes;
 		using DataPhotovoltaics::iSimplePVModel;
 		using namespace DataDaylighting;
 		using HeatingCoils::HeatingCoil;
@@ -601,8 +596,8 @@ namespace CostEstimateManager {
 
 		std::string ThisConstructStr;
 
-		FArray1D_bool uniqueSurfMask;
-		FArray1D< Real64 > SurfMultipleARR;
+		Array1D_bool uniqueSurfMask;
+		Array1D< Real64 > SurfMultipleARR;
 		int surf; // do-loop counter for checking for surfaces for uniqueness
 		int thisCoil; // index of named coil in its derived type
 		bool WildcardObjNames;
@@ -858,7 +853,7 @@ namespace CostEstimateManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

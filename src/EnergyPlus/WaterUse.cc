@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -71,14 +71,14 @@ namespace WaterUse {
 	//INTEGER :: MaxIterationsErrorCount =0
 	bool GetWaterUseInputFlag( true );
 
-	FArray1D_bool CheckEquipName;
-	FArray1D_bool CheckPlantLoop;
+	Array1D_bool CheckEquipName;
+	Array1D_bool CheckPlantLoop;
 
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	FArray1D< WaterEquipmentType > WaterEquipment;
-	FArray1D< WaterConnectionsType > WaterConnections;
+	Array1D< WaterEquipmentType > WaterEquipment;
+	Array1D< WaterConnectionsType > WaterConnections;
 
 	// MODULE SUBROUTINES:
 
@@ -195,7 +195,7 @@ namespace WaterUse {
 
 	void
 	SimulateWaterUseConnection(
-		int const EquipTypeNum,
+		int const EP_UNUSED( EquipTypeNum ),
 		std::string const & CompName,
 		int & CompIndex,
 		bool const InitLoopEquip,
@@ -946,7 +946,6 @@ namespace WaterUse {
 		// METHODOLOGY EMPLOYED:
 
 		// Using/Aliasing
-		using DataGlobals::SysSizingCalc;
 		using DataGlobals::DoingSizing;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataLoopNode::Node;
@@ -965,7 +964,7 @@ namespace WaterUse {
 		int InletNode;
 		int OutletNode;
 		static bool MyOneTimeFlag( true ); // one time flag                    !DSU
-		static FArray1D_bool SetLoopIndexFlag; // get loop number flag             !DSU
+		static Array1D_bool SetLoopIndexFlag; // get loop number flag             !DSU
 		bool errFlag;
 
 		if ( MyOneTimeFlag ) { //DSU
@@ -1486,7 +1485,6 @@ namespace WaterUse {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataHeatBalance::ZoneIntGain;
 		using DataHeatBalance::Zone;
 
 		// Locals
@@ -1537,7 +1535,7 @@ namespace WaterUse {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

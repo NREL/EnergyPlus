@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <ExteriorEnergyUse.hh>
@@ -80,8 +80,8 @@ namespace ExteriorEnergyUse {
 	// Name Public routines, optionally name Private routines within this module
 
 	// Object Data
-	FArray1D< ExteriorLightUsage > ExteriorLights; // Structure for Exterior Light reporting
-	FArray1D< ExteriorEquipmentUsage > ExteriorEquipment; // Structure for Exterior Equipment Reporting
+	Array1D< ExteriorLightUsage > ExteriorLights; // Structure for Exterior Light reporting
+	Array1D< ExteriorEquipmentUsage > ExteriorEquipment; // Structure for Exterior Equipment Reporting
 
 	// Functions
 
@@ -546,7 +546,6 @@ namespace ExteriorEnergyUse {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::SecInHour;
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::DoOutputReporting;
 		using DataGlobals::KindOfSim;
@@ -626,7 +625,7 @@ namespace ExteriorEnergyUse {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

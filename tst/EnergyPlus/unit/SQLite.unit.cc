@@ -4,124 +4,11 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/SQLiteProcedures.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-
-using namespace EnergyPlus;
-using namespace ObjexxFCL;
+#include "Fixtures/SQLiteFixture.hh"
 
 namespace EnergyPlus {
 
-	class SQLiteFixture : public testing::Test
-	{
-
-	protected:
-		static void SetUpTestCase() { }
-
-		static void TearDownTestCase() { }
-
-		std::unique_ptr<SQLite> sqlite_test;
-		std::shared_ptr<std::ostringstream> ss = std::make_shared<std::ostringstream>();
-
-		virtual void SetUp() {
-			ASSERT_NO_THROW(sqlite_test = std::unique_ptr<SQLite>(new SQLite( ss, ":memory:", "std::ostringstream", true, true )));
-			ASSERT_TRUE(sqlite_test->writeOutputToSQLite());
-			ASSERT_TRUE(sqlite_test->writeTabularDataToSQLite());
-			sqlite_test->sqliteExecuteCommand("PRAGMA foreign_keys = ON;");
-			EXPECT_EQ("SQLite3 message, std::ostringstream open for processing!\n", ss->str());
-			ss->str(std::string());
-		}
-
-		virtual void TearDown() {
-			// don't know if this is needed...
-			sqlite_test.reset();
-			sqlite_test = nullptr;
-		}
-
-		std::string storageType( const int storageTypeIndex ) {
-			return sqlite_test->storageType( storageTypeIndex );
-		}
-
-		std::string timestepTypeName( const int timestepType ) {
-			return sqlite_test->timestepTypeName( timestepType );
-		}
-
-		std::string reportingFreqName( const int reportingFreqIndex ) {
-			return sqlite_test->reportingFreqName( reportingFreqIndex );
-		}
-
-		std::string columnText( const unsigned char* column ) {
-			return std::string( reinterpret_cast<const char*>( column ) );
-		}
-
-		int logicalToInteger( const bool value ) {
-			return sqlite_test->logicalToInteger(value);
-		}
-
-		void adjustReportingHourAndMinutes( int & hour, int & minutes ) {
-			sqlite_test->adjustReportingHourAndMinutes( hour, minutes );
-		}
-
-		bool indexExists( const std::string& indexName ) {
-			sqlite3_stmt* sqlStmtPtr;
-			std::string sql("pragma index_info(" + indexName + ");");
-			bool success = false;
-			int rc = sqlite3_prepare_v2(sqlite_test->m_db.get(), sql.c_str(), -1, &sqlStmtPtr, nullptr);
-			if ( SQLITE_OK != rc ) {
-				sqlite3_finalize(sqlStmtPtr);
-				return success;
-			}
-			if ( SQLITE_ROW == sqlite3_step( sqlStmtPtr ) ) {
-				success = true;
-			}
-			sqlite3_finalize(sqlStmtPtr);
-			return success;
-		}
-
-		int columnCount( const std::string& tableName ) {
-			sqlite3_stmt* sqlStmtPtr;
-			std::string sql("pragma table_info(" + tableName + ");");
-			int rc = sqlite3_prepare_v2(sqlite_test->m_db.get(), sql.c_str(), -1, &sqlStmtPtr, nullptr);
-			if ( SQLITE_OK != rc ) {
-				sqlite3_finalize(sqlStmtPtr);
-				return -1;
-			}
-			int rowCount = 0;
-			while ( SQLITE_ROW == sqlite3_step( sqlStmtPtr ) ) {
-				rowCount++;
-			}
-			sqlite3_finalize(sqlStmtPtr);
-			return rowCount;
-		}
-
-		std::vector < std::vector < std::string > > queryResult( const std::string& statement, const std::string& tableName ) {
-			std::vector < std::vector < std::string > > queryVector;
-
-			int rowCount = columnCount( tableName );
-			if( rowCount < 1 ) return queryVector;
-
-			sqlite3_stmt* sqlStmtPtr;
-
-			int code = sqlite3_prepare_v2(sqlite_test->m_db.get(), statement.c_str(), -1, &sqlStmtPtr, nullptr);
-			while ( SQLITE_ROW == sqlite3_step( sqlStmtPtr ) ) {
-				std::vector < std::string > valueVector;
-				for( int i = 0; i < rowCount; ++i ) {
-					auto sqlite_value = sqlite3_column_text(sqlStmtPtr, i);
-					if (nullptr == sqlite_value) {
-						valueVector.push_back("");
-					} else {
-						valueVector.push_back(columnText(sqlite_value));
-					}
-				}
-				queryVector.push_back(valueVector);
-			}
-			sqlite3_finalize(sqlStmtPtr);
-			return queryVector;
-		}
-	};
-
-	TEST_F( SQLiteFixture, sqliteWriteMessage ) {
-		ShowMessage( "Begin Test: SQLiteFixture, sqliteWriteMessage" );
+	TEST_F( SQLiteFixture, SQLiteProcedures_sqliteWriteMessage ) {
 		sqlite_test->sqliteWriteMessage( "" );
 		EXPECT_EQ("SQLite3 message, \n", ss->str());
 		ss->str(std::string());
@@ -130,9 +17,8 @@ namespace EnergyPlus {
 		ss->str(std::string());
 	}
 
-	TEST_F( SQLiteFixture, initializeIndexes ) {
-		ShowMessage( "Begin Test: SQLiteFixture, initializeIndexes" );
-		sqlite_test->sqliteBegin( );
+	TEST_F( SQLiteFixture, SQLiteProcedures_initializeIndexes ) {
+		sqlite_test->sqliteBegin();
 		sqlite_test->initializeIndexes();
 		sqlite_test->sqliteCommit();
 
@@ -143,9 +29,8 @@ namespace EnergyPlus {
 		EXPECT_FALSE(indexExists("tdI"));
 	}
 
-	TEST_F( SQLiteFixture, simulationRecords ) {
-		ShowMessage( "Begin Test: SQLiteFixture, simulationRecords" );
-		sqlite_test->sqliteBegin( );
+	TEST_F( SQLiteFixture, SQLiteProcedures_simulationRecords ) {
+		sqlite_test->sqliteBegin();
 		// There needs to be a simulation record otherwise updateSQLiteSimulationRecord will fail
 		sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 		sqlite_test->createSQLiteSimulationsRecord( 2, "EnergyPlus Version", "Current Time" );
@@ -156,7 +41,7 @@ namespace EnergyPlus {
 		auto result = queryResult("SELECT * FROM Simulations;", "Simulations");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(3, result.size());
+		ASSERT_EQ(3ul, result.size());
 		std::vector<std::string> testResult0 {"1", "EnergyPlus Version", "Current Time", "6", "FALSE", "FALSE"};
 		std::vector<std::string> testResult1 {"2", "EnergyPlus Version", "Current Time", "", "1", "0"};
 		std::vector<std::string> testResult2 {"3", "EnergyPlus Version", "Current Time", "", "1", "1"};
@@ -169,14 +54,13 @@ namespace EnergyPlus {
 		result = queryResult("SELECT * FROM Simulations;", "Simulations");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(3, result.size());
+		ASSERT_EQ(3ul, result.size());
 		std::vector<std::string> testResult3 {"1", "EnergyPlus Version", "Current Time", "6", "1", "1"};
 		EXPECT_EQ(testResult3, result[0]);
 	}
 
-	TEST_F( SQLiteFixture, createSQLiteEnvironmentPeriodRecord ) {
-		ShowMessage( "Begin Test: SQLiteFixture, createSQLiteEnvironmentPeriodRecord" );
-		sqlite_test->sqliteBegin( );
+	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteEnvironmentPeriodRecord ) {
+		sqlite_test->sqliteBegin();
 		// There needs to be a simulation record otherwise the foreign key constraint will fail
 		sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 		sqlite_test->createSQLiteEnvironmentPeriodRecord( 1, "CHICAGO ANN HTG 99.6% CONDNS DB", 1 );
@@ -186,7 +70,7 @@ namespace EnergyPlus {
 		auto result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(4, result.size());
+		ASSERT_EQ(4ul, result.size());
 		std::vector<std::string> testResult0 {"1", "1", "CHICAGO ANN HTG 99.6% CONDNS DB", "1"};
 		std::vector<std::string> testResult1 {"2", "1", "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "1"};
 		std::vector<std::string> testResult2 {"3", "1", "CHICAGO ANN HTG 99.6% CONDNS DB", "2"};
@@ -204,19 +88,18 @@ namespace EnergyPlus {
 		result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
 		sqlite_test->sqliteCommit();
 
-		EXPECT_EQ(4, result.size());
+		EXPECT_EQ(4ul, result.size());
 	}
 
-	TEST_F( SQLiteFixture, errorRecords ) {
-		ShowMessage( "Begin Test: SQLiteFixture, errorRecords" );
-		sqlite_test->sqliteBegin( );
+	TEST_F( SQLiteFixture, SQLiteProcedures_errorRecords ) {
+		sqlite_test->sqliteBegin();
 		// There needs to be a simulation record otherwise the foreign key constraint will fail
 		sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 		sqlite_test->createSQLiteErrorRecord( 1, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1 );
 		auto result = queryResult("SELECT * FROM Errors;", "Errors");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(1, result.size());
+		ASSERT_EQ(1ul, result.size());
 		std::vector<std::string> testResult0 {"1", "1", "0", "CheckUsedConstructions: There are 2 nominally unused constructions in input.", "1"};
 		EXPECT_EQ(testResult0, result[0]);
 
@@ -226,7 +109,7 @@ namespace EnergyPlus {
 		result = queryResult("SELECT * FROM Errors;", "Errors");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(1, result.size());
+		ASSERT_EQ(1ul, result.size());
 		std::vector<std::string> testResult1 {"1", "1", "0", "CheckUsedConstructions: There are 2 nominally unused constructions in input.  New error message", "1"};
 		EXPECT_EQ(testResult1, result[0]);
 
@@ -237,7 +120,7 @@ namespace EnergyPlus {
 		result = queryResult("SELECT * FROM Errors;", "Errors");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(3, result.size());
+		ASSERT_EQ(3ul, result.size());
 		std::vector<std::string> testResult2 {"1", "1", "0", "CheckUsedConstructions: There are 2 nominally unused constructions in input.  New error message", "1"};
 		std::vector<std::string> testResult3 {"2", "1", "0", "CheckUsedConstructions: There are 2 nominally unused constructions in input.", "1"};
 		std::vector<std::string> testResult4 {"3", "1", "0", "This should be changed.  Changed error message.", "1"};
@@ -251,13 +134,12 @@ namespace EnergyPlus {
 		result = queryResult("SELECT * FROM Errors;", "Errors");
 		sqlite_test->sqliteCommit();
 
-		EXPECT_EQ(3, result.size());
+		EXPECT_EQ(3ul, result.size());
 	}
 
-	TEST_F( SQLiteFixture, createSQLiteReportDictionaryRecord )
+	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord )
 	{
-		ShowMessage( "Begin Test: SQLiteFixture, createSQLiteReportDictionaryRecord" );
-		sqlite_test->sqliteBegin( );
+		sqlite_test->sqliteBegin();
 		sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 		sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 		sqlite_test->createSQLiteReportDictionaryRecord( 3, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 3, true, _ );
@@ -266,7 +148,7 @@ namespace EnergyPlus {
 		auto result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(5, result.size());
+		ASSERT_EQ(5ul, result.size());
 		std::vector<std::string> testResult0 {"1", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Hourly", "", "C"};
 		std::vector<std::string> testResult1 {"2", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Facility:Electricity", "Hourly", "", "J"};
 		std::vector<std::string> testResult2 {"3", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Facility:Electricity", "Monthly", "", "J"};
@@ -286,7 +168,7 @@ namespace EnergyPlus {
 		result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(9, result.size());
+		ASSERT_EQ(9ul, result.size());
 		std::vector<std::string> testResult5 {"6", "0", "Unknown!!!", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Hourly", "", "C"};
 		std::vector<std::string> testResult6 {"7", "1", "Sum", "Facility:Electricity", "Unknown!!!", "", "Facility:Electricity", "Hourly", "", "J"};
 		std::vector<std::string> testResult7 {"8", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Facility:Electricity", "Unknown!!!", "", "J"};
@@ -301,12 +183,11 @@ namespace EnergyPlus {
 		sqlite_test->createSQLiteReportDictionaryRecord( 9, 3, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 		result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 		sqlite_test->sqliteCommit();
-		EXPECT_EQ(9, result.size());
+		EXPECT_EQ(9ul, result.size());
 	}
 
-	TEST_F( SQLiteFixture, createSQLiteTimeIndexRecord ) {
-		ShowMessage( "Begin Test: SQLiteFixture, createSQLiteTimeIndexRecord" );
-		sqlite_test->sqliteBegin( );
+	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteTimeIndexRecord ) {
+		sqlite_test->sqliteBegin();
 		sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 		sqlite_test->createSQLiteTimeIndexRecord( 3, 1, 1, 0, 1 );
 		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 0, 1, 1, 1, _, _, 0, "WinterDesignDay" );
@@ -317,7 +198,7 @@ namespace EnergyPlus {
 		auto result = queryResult("SELECT * FROM Time;", "Time");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(7, result.size());
+		ASSERT_EQ(7ul, result.size());
 		// some of these are odd.........
 		std::vector<std::string> testResult0 {"1", "", "", "", "", "", "1440", "4", "1", "", "0", ""};
 		std::vector<std::string> testResult1 {"2", "1", "31", "24", "0", "", "44640", "3", "1", "", "0", ""};
@@ -340,7 +221,7 @@ namespace EnergyPlus {
 		EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to CreateSQLiteTimeIndexRecord: -999\n", ss->str());
 		ss->str(std::string());
 
-		EXPECT_EQ(7, result.size());
+		EXPECT_EQ(7ul, result.size());
 
 		sqlite_test->sqliteBegin();
 		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, 3, 60, 0, 0, _, true );
@@ -364,9 +245,8 @@ namespace EnergyPlus {
 		sqlite_test->sqliteCommit();
 	}
 
-	TEST_F( SQLiteFixture, createSQLiteReportDataRecord ) {
-		ShowMessage( "Begin Test: SQLiteFixture, createSQLiteReportDataRecord" );
-		sqlite_test->sqliteBegin( );
+	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteReportDataRecord ) {
+		sqlite_test->sqliteBegin();
 		sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 		sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 		sqlite_test->createSQLiteReportDataRecord( 1, 999.9 );
@@ -377,7 +257,7 @@ namespace EnergyPlus {
 		auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(4, reportData.size());
+		ASSERT_EQ(4ul, reportData.size());
 		std::vector<std::string> reportData0 {"1", "1", "1", "999.9"};
 		std::vector<std::string> reportData1 {"2", "1", "1", "999.9"};
 		std::vector<std::string> reportData2 {"3", "1", "1", "999.9"};
@@ -387,7 +267,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(reportData2, reportData[2]);
 		EXPECT_EQ(reportData3, reportData[3]);
 
-		ASSERT_EQ(2, reportExtendedData.size());
+		ASSERT_EQ(2ul, reportExtendedData.size());
 		std::vector<std::string> reportExtendedData0 {"1","2","100.0","7","3","14","16","30","0.0","1","31","3","45","59"};
 		std::vector<std::string> reportExtendedData1 {"2","4","999.0","7","3","14","","30","100.0","1","31","3","","59"};
 		EXPECT_EQ(reportExtendedData0, reportExtendedData[0]);
@@ -405,54 +285,50 @@ namespace EnergyPlus {
 		EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to CreateSQLiteMeterRecord: -100\n", ss->str());
 		ss->str(std::string());
 
-		EXPECT_EQ(4, reportData.size());
-		EXPECT_EQ(2, reportExtendedData.size());
+		EXPECT_EQ(4ul, reportData.size());
+		EXPECT_EQ(2ul, reportExtendedData.size());
 	}
 
-	TEST_F( SQLiteFixture, addSQLiteZoneSizingRecord ) {
-		ShowMessage( "Begin Test: SQLiteFixture, addSQLiteZoneSizingRecord" );
-		sqlite_test->sqliteBegin( );
+	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteZoneSizingRecord ) {
+		sqlite_test->sqliteBegin();
 		sqlite_test->addSQLiteZoneSizingRecord( "FLOOR 1 IT HALL", "Cooling", 175, 262, 0.013, 0.019, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00", 20.7, 0.0157, 0.0033 );
 		auto result = queryResult("SELECT * FROM ZoneSizes;", "ZoneSizes");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(1, result.size());
+		ASSERT_EQ(1ul, result.size());
 		std::vector<std::string> testResult0 {"1", "FLOOR 1 IT HALL", "Cooling", "175.0", "262.0", "0.013", "0.019", "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00", "20.7", "0.0157", "0.0033"};
 		EXPECT_EQ(testResult0, result[0]);
 	}
 
-	TEST_F( SQLiteFixture, addSQLiteSystemSizingRecord ) {
-		ShowMessage( "Begin Test: SQLiteFixture, addSQLiteSystemSizingRecord" );
-		sqlite_test->sqliteBegin( );
+	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteSystemSizingRecord ) {
+		sqlite_test->sqliteBegin();
 		sqlite_test->addSQLiteSystemSizingRecord( "VAV_1", "Calculated Cooling Design Air Flow Rate [m3/s]", 6.37 );
 		sqlite_test->addSQLiteSystemSizingRecord( "VAV_2", "User Cooling Design Air Flow Rate", 5.1 );
 		auto result = queryResult("SELECT * FROM SystemSizes;", "SystemSizes");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(2, result.size());
+		ASSERT_EQ(2ul, result.size());
 		std::vector<std::string> testResult0 {"1", "VAV_1", "Calculated Cooling Design Air Flow Rate", "6.37", "m3/s"};
 		std::vector<std::string> testResult1 {"2", "VAV_2", "User Cooling Design Air Flow Rate", "5.1", ""};
 		EXPECT_EQ(testResult0, result[0]);
 		EXPECT_EQ(testResult1, result[1]);
 	}
 
-	TEST_F( SQLiteFixture, addSQLiteComponentSizingRecord ) {
-		ShowMessage( "Begin Test: SQLiteFixture, addSQLiteComponentSizingRecord" );
-		sqlite_test->sqliteBegin( );
+	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteComponentSizingRecord ) {
+		sqlite_test->sqliteBegin();
 		sqlite_test->addSQLiteComponentSizingRecord( "AirTerminal:SingleDuct:VAV:Reheat", "CORE_BOTTOM VAV BOX COMPONENT", "Design Size Maximum Air Flow Rate [m3/s]", 3.23 );
 		sqlite_test->addSQLiteComponentSizingRecord( "Coil:Heating:Electric", "CORE_BOTTOM VAV BOX REHEAT COIL", "Design Size Nominal Capacity", 38689.18 );
 		auto result = queryResult("SELECT * FROM ComponentSizes;", "ComponentSizes");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(2, result.size());
+		ASSERT_EQ(2ul, result.size());
 		std::vector<std::string> testResult0 {"1", "AirTerminal:SingleDuct:VAV:Reheat", "CORE_BOTTOM VAV BOX COMPONENT", "Design Size Maximum Air Flow Rate", "3.23", "m3/s"};
 		std::vector<std::string> testResult1 {"2", "Coil:Heating:Electric", "CORE_BOTTOM VAV BOX REHEAT COIL", "Design Size Nominal Capacity", "38689.18", ""};
 		EXPECT_EQ(testResult0, result[0]);
 		EXPECT_EQ(testResult1, result[1]);
 	}
 
-	TEST_F( SQLiteFixture, privateMethods ) {
-		ShowMessage( "Begin Test: SQLiteFixture, privateMethods" );
+	TEST_F( SQLiteFixture, SQLiteProcedures_privateMethods ) {
 		// test storageType
 		EXPECT_EQ( "Avg", storageType( 1 ) );
 		EXPECT_EQ( "Sum", storageType( 2 ) );
@@ -492,22 +368,21 @@ namespace EnergyPlus {
 		EXPECT_EQ( 65, minutes );
 	}
 
-	TEST_F( SQLiteFixture, DaylightMaping ) {
-		ShowMessage( "Begin Test: SQLiteFixture, DaylightMaping" );
-		auto const & zone = std::unique_ptr<DataHeatBalance::ZoneData>( new DataHeatBalance::ZoneData( ) );
+	TEST_F( SQLiteFixture, SQLiteProcedures_DaylightMaping ) {
+		auto const & zone = std::unique_ptr<DataHeatBalance::ZoneData>( new DataHeatBalance::ZoneData() );
 		zone->Name = "DAYLIT ZONE";
 		zone->CeilingHeight = 3;
 		zone->Volume = 302;
 
-		FArray1D< Real64 > XValue( { 50.1, 51.3 } );
-		FArray1D< Real64 > YValue( { 50.1, 52.1 } );
-		FArray2D< Real64 > IllumValue( 2, 2, { 1, 2, 3, 4 } );
+		Array1D< Real64 > XValue( { 50.1, 51.3 } );
+		Array1D< Real64 > YValue( { 50.1, 52.1 } );
+		Array2D< Real64 > IllumValue( 2, 2, { 1, 3, 2, 4 } );
 
 		sqlite_test->sqliteBegin();
 		sqlite_test->addZoneData( 1, *zone );
 		sqlite_test->createZoneExtendedOutput();
 		sqlite_test->createSQLiteDaylightMapTitle( 1, "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", 1, "RefPt1=(2.50:2.00:0.80)", "RefPt2=(2.50:18.00:0.80)", 0.8 );
-		sqlite_test->createSQLiteDaylightMap( 1, 7 , 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue );
+		sqlite_test->createSQLiteDaylightMap( 1, 7, 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue );
 
 		auto zones = queryResult("SELECT * FROM Zones;", "Zones");
 		auto daylightMaps = queryResult("SELECT * FROM DaylightMaps;", "DaylightMaps");
@@ -515,19 +390,19 @@ namespace EnergyPlus {
 		auto daylightMapHourlyReports = queryResult("SELECT * FROM DaylightMapHourlyReports;", "DaylightMapHourlyReports");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(1, zones.size());
+		ASSERT_EQ(1ul, zones.size());
 		std::vector<std::string> zone0 { "1", "DAYLIT ZONE", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "1", "1.0", "1.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "3.0", "302.0", "1", "1", "0.0", "0.0", "0.0", "0.0", "1" };
 		EXPECT_EQ(zone0, zones[0]);
 
-		ASSERT_EQ(1, daylightMaps.size());
+		ASSERT_EQ(1ul, daylightMaps.size());
 		std::vector<std::string> daylightMap0 { "1", "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", "1", "RefPt1=(2.50:2.00:0.80)", "RefPt2=(2.50:18.00:0.80)", "0.8" };
 		EXPECT_EQ(daylightMap0, daylightMaps[0]);
 
-		ASSERT_EQ(1, daylightMapHourlyReports.size());
+		ASSERT_EQ(1ul, daylightMapHourlyReports.size());
 		std::vector<std::string> daylightMapHourlyReport0 { "1", "1", "7", "21", "5" };
 		EXPECT_EQ(daylightMapHourlyReport0, daylightMapHourlyReports[0]);
 
-		ASSERT_EQ(4, daylightMapHourlyData.size());
+		ASSERT_EQ(4ul, daylightMapHourlyData.size());
 		std::vector<std::string> daylightMapHourlyData0 { "1", "1", "50.1", "50.1", "1.0" };
 		std::vector<std::string> daylightMapHourlyData1 { "2", "1", "51.3", "50.1", "2.0" };
 		std::vector<std::string> daylightMapHourlyData2 { "3", "1", "50.1", "52.1", "3.0" };
@@ -549,14 +424,13 @@ namespace EnergyPlus {
 		daylightMapHourlyReports = queryResult("SELECT * FROM DaylightMapHourlyReports;", "DaylightMapHourlyReports");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(1, daylightMaps.size());
-		ASSERT_EQ(1, daylightMapHourlyReports.size());
-		ASSERT_EQ(4, daylightMapHourlyData.size());
+		ASSERT_EQ(1ul, daylightMaps.size());
+		ASSERT_EQ(1ul, daylightMapHourlyReports.size());
+		ASSERT_EQ(4ul, daylightMapHourlyData.size());
 	}
 
-	TEST_F( SQLiteFixture, createZoneExtendedOutput ) {
-		ShowMessage( "Begin Test: SQLiteFixture, createZoneExtendedOutput" );
-		auto const & zoneData0 = std::unique_ptr<DataHeatBalance::ZoneData>( new DataHeatBalance::ZoneData( ) );
+	TEST_F( SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput ) {
+		auto const & zoneData0 = std::unique_ptr<DataHeatBalance::ZoneData>( new DataHeatBalance::ZoneData() );
 		zoneData0->Name = "test zone 1";
 		zoneData0->CeilingHeight = 1;
 		zoneData0->Volume = 1;
@@ -874,25 +748,25 @@ namespace EnergyPlus {
 		auto roomAirModels = queryResult("SELECT * FROM RoomAirModels;", "RoomAirModels");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(2, zones.size());
+		ASSERT_EQ(2ul, zones.size());
 		std::vector<std::string> zone0 { "1","test zone 1","0.0","0.0","0.0","0.0","0.0","0.0","0.0","1","1.0","1.0","0.0","0.0","0.0","0.0","0.0","0.0","1.0","1.0","1","1","0.0","0.0","0.0","0.0","1" };
 		std::vector<std::string> zone1 { "2","test zone 2","2.0","2.0","2.0","2.0","2.0","2.0","2.0","2","2.0","2.0","2.0","2.0","2.0","2.0","2.0","2.0","2.0","2.0","2","2","2.0","2.0","2.0","2.0","0" };
 		EXPECT_EQ(zone0, zones[0]);
 		EXPECT_EQ(zone1, zones[1]);
 
-		ASSERT_EQ(2, zoneLists.size());
+		ASSERT_EQ(2ul, zoneLists.size());
 		std::vector<std::string> zoneList0 { "1","test zoneList 1" };
 		std::vector<std::string> zoneList1 { "2","test zoneList 2" };
 		EXPECT_EQ(zoneList0, zoneLists[0]);
 		EXPECT_EQ(zoneList1, zoneLists[1]);
 
-		ASSERT_EQ(2, zoneGroups.size());
+		ASSERT_EQ(2ul, zoneGroups.size());
 		std::vector<std::string> zoneGroup0 { "1","test zoneGroup 1","","1" };
 		std::vector<std::string> zoneGroup1 { "2","test zoneGroup 2","2","99" };
 		EXPECT_EQ(zoneGroup0, zoneGroups[0]);
 		EXPECT_EQ(zoneGroup1, zoneGroups[1]);
 
-		ASSERT_EQ(3, zoneInfoZoneLists.size());
+		ASSERT_EQ(3ul, zoneInfoZoneLists.size());
 		std::vector<std::string> zoneInfoZoneList0 { "1","1" };
 		std::vector<std::string> zoneInfoZoneList1 { "2","1" };
 		std::vector<std::string> zoneInfoZoneList2 { "2","2" };
@@ -900,111 +774,110 @@ namespace EnergyPlus {
 		EXPECT_EQ(zoneInfoZoneList1, zoneInfoZoneLists[1]);
 		EXPECT_EQ(zoneInfoZoneList2, zoneInfoZoneLists[2]);
 
-		ASSERT_EQ(2, schedules.size());
+		ASSERT_EQ(2ul, schedules.size());
 		std::vector<std::string> schedule0 { "1","always on","ON/OFF","1.0","1.0" };
 		std::vector<std::string> schedule1 { "2","always off","ON/OFF","0.0","0.0" };
 		EXPECT_EQ(schedule0, schedules[0]);
 		EXPECT_EQ(schedule1, schedules[1]);
 
-		ASSERT_EQ(2, materials.size());
+		ASSERT_EQ(2ul, materials.size());
 		std::vector<std::string> material0 { "1","test material 1","1","0","0.0","0.0","0.0","0.0","0.0","0","0.0","0.0","0.0","0.0" };
 		std::vector<std::string> material1 { "2","test material 2","2","2","2.0","2.0","2.0","2.0","2.0","1","2.0","2.0","2.0","2.0" };
 		EXPECT_EQ(material0, materials[0]);
 		EXPECT_EQ(material1, materials[1]);
 
-		ASSERT_EQ(2, constructions.size());
+		ASSERT_EQ(2ul, constructions.size());
 		std::vector<std::string> construction0 { "1","test construction 1","0","0","0","0.0","0.0","0.0","0.0","0.0","0.0","0","0","0.0" };
 		std::vector<std::string> construction1 { "2","test construction 2","2","2","2","2.0","2.0","2.0","2.0","2.0","2.0","2","1","2.0" };
 		EXPECT_EQ(construction0, constructions[0]);
 		EXPECT_EQ(construction1, constructions[1]);
 
-		ASSERT_EQ(2, constructionLayers.size());
+		ASSERT_EQ(2ul, constructionLayers.size());
 		std::vector<std::string> constructionLayer0 { "1","2","1","2" };
 		std::vector<std::string> constructionLayer1 { "2","2","2","1" };
 		EXPECT_EQ(constructionLayer0, constructionLayers[0]);
 		EXPECT_EQ(constructionLayer1, constructionLayers[1]);
 
-		ASSERT_EQ(2, surfaces.size());
+		ASSERT_EQ(2ul, surfaces.size());
 		std::vector<std::string> surface0 { "1","test surface 1","","Window","0.0","0.0","0.0","0.0","0.0","0.0","0","0","0.0","0.0","0","","","0","0","0" };
 		std::vector<std::string> surface1 { "2","test surface 2","2","Wall","2.0","2.0","2.0","2.0","2.0","2.0","2","2","2.0","2.0","1","1","1","2","1","1" };
 		EXPECT_EQ(surface0, surfaces[0]);
 		EXPECT_EQ(surface1, surfaces[1]);
 
-		ASSERT_EQ(2, lightings.size());
+		ASSERT_EQ(2ul, lightings.size());
 		std::vector<std::string> lighting0 { "1","test lighting 1","","","0.0","0.0","0.0","0.0","0.0","0.0","" };
 		std::vector<std::string> lighting1 { "2","test lighting 2","1","1","2.0","2.0","2.0","2.0","2.0","2.0","test" };
 		EXPECT_EQ(lighting0, lightings[0]);
 		EXPECT_EQ(lighting1, lightings[1]);
 
-		ASSERT_EQ(2, peoples.size());
+		ASSERT_EQ(2ul, peoples.size());
 		std::vector<std::string> people0 { "1","test people 1","","0","","","0.0","0.0","","","","0","0","0","0","","","-1","0.0","0" };
 		std::vector<std::string> people1 { "2","test people 2","1","2","1","1","2.0","2.0","1","1","1","1","1","1","2","1","test","1","2.0","1" };
 		EXPECT_EQ(people0, peoples[0]);
 		EXPECT_EQ(people1, peoples[1]);
 
-		ASSERT_EQ(2, elecEquips.size());
+		ASSERT_EQ(2ul, elecEquips.size());
 		std::vector<std::string> elecEquip0 { "1","test elecEquip 1","","","0.0","0.0","0.0","0.0","0.0","" };
 		std::vector<std::string> elecEquip1 { "2","test elecEquip 2","1","1","2.0","2.0","2.0","2.0","2.0","test" };
 		EXPECT_EQ(elecEquip0, elecEquips[0]);
 		EXPECT_EQ(elecEquip1, elecEquips[1]);
 
-		ASSERT_EQ(2, gasEquips.size());
+		ASSERT_EQ(2ul, gasEquips.size());
 		std::vector<std::string> gasEquip0 { "1","test gasEquip 1","","","0.0","0.0","0.0","0.0","0.0","" };
 		std::vector<std::string> gasEquip1 { "2","test gasEquip 2","1","1","2.0","2.0","2.0","2.0","2.0","test" };
 		EXPECT_EQ(gasEquip0, gasEquips[0]);
 		EXPECT_EQ(gasEquip1, gasEquips[1]);
 
-		ASSERT_EQ(2, steamEquips.size());
+		ASSERT_EQ(2ul, steamEquips.size());
 		std::vector<std::string> steamEquip0 { "1","test steamEquip 1","","","0.0","0.0","0.0","0.0","0.0","" };
 		std::vector<std::string> steamEquip1 { "2","test steamEquip 2","1","1","2.0","2.0","2.0","2.0","2.0","test" };
 		EXPECT_EQ(steamEquip0, steamEquips[0]);
 		EXPECT_EQ(steamEquip1, steamEquips[1]);
 
-		ASSERT_EQ(2, hwEquips.size());
+		ASSERT_EQ(2ul, hwEquips.size());
 		std::vector<std::string> hwEquip0 { "1","test hwEquip 1","","","0.0","0.0","0.0","0.0","0.0","" };
 		std::vector<std::string> hwEquip1 { "2","test hwEquip 2","1","1","2.0","2.0","2.0","2.0","2.0","test" };
 		EXPECT_EQ(hwEquip0, hwEquips[0]);
 		EXPECT_EQ(hwEquip1, hwEquips[1]);
 
-		ASSERT_EQ(2, otherEquips.size());
+		ASSERT_EQ(2ul, otherEquips.size());
 		std::vector<std::string> otherEquip0 { "1","test otherEquip 1","","","0.0","0.0","0.0","0.0","0.0","" };
 		std::vector<std::string> otherEquip1 { "2","test otherEquip 2","1","1","2.0","2.0","2.0","2.0","2.0","test" };
 		EXPECT_EQ(otherEquip0, otherEquips[0]);
 		EXPECT_EQ(otherEquip1, otherEquips[1]);
 
-		ASSERT_EQ(2, baseboards.size());
+		ASSERT_EQ(2ul, baseboards.size());
 		std::vector<std::string> baseboard0 { "1","test baseboard 1","","","0.0","0.0","0.0","0.0","0.0","0.0","" };
 		std::vector<std::string> baseboard1 { "2","test baseboard 2","1","1","2.0","2.0","2.0","2.0","2.0","2.0","test" };
 		EXPECT_EQ(baseboard0, baseboards[0]);
 		EXPECT_EQ(baseboard1, baseboards[1]);
 
-		ASSERT_EQ(2, infiltrations.size());
+		ASSERT_EQ(2ul, infiltrations.size());
 		std::vector<std::string> infiltration0 { "1","test infiltration 1","","","0.0" };
 		std::vector<std::string> infiltration1 { "2","test infiltration 2","1","1","2.0" };
 		EXPECT_EQ(infiltration0, infiltrations[0]);
 		EXPECT_EQ(infiltration1, infiltrations[1]);
 
-		ASSERT_EQ(2, ventilations.size());
+		ASSERT_EQ(2ul, ventilations.size());
 		std::vector<std::string> ventilation0 { "1","test ventilation 1","","","0.0" };
 		std::vector<std::string> ventilation1 { "2","test ventilation 2","1","1","2.0" };
 		EXPECT_EQ(ventilation0, ventilations[0]);
 		EXPECT_EQ(ventilation1, ventilations[1]);
 
-		ASSERT_EQ(2, roomAirModels.size());
+		ASSERT_EQ(2ul, roomAirModels.size());
 		std::vector<std::string> roomAirModel0 { "1","test roomAirModel 1","2","1","0" };
 		std::vector<std::string> roomAirModel1 { "2","test roomAirModel 2","3","3","1" };
 		EXPECT_EQ(roomAirModel0, roomAirModels[0]);
 		EXPECT_EQ(roomAirModel1, roomAirModels[1]);
 	}
 
-	TEST_F( SQLiteFixture, createSQLiteTabularDataRecords ) {
-		ShowMessage( "Begin Test: SQLiteFixture, createSQLiteTabularDataRecords" );
-		FArray1D_string const rowLabels( { "Heating", "Cooling" } );
-		FArray1D_string const columnLabels( { "Electricity [GJ]", "Natural Gas [GJ]" } );
-		FArray2D_string const body( 2, 2, { "216.38", "869.08", "1822.42", "0.00" } );
-		FArray1D_string const rowLabels2( { "Heating [kWh]" } );
-		FArray1D_string const columnLabels2( { "Electricity", "Natural Gas" } );
-		FArray2D_string const body2( 1, 2, { "815.19", "256.72" } );
+	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteTabularDataRecords ) {
+		Array1D_string const rowLabels( { "Heating", "Cooling" } );
+		Array1D_string const columnLabels( { "Electricity [GJ]", "Natural Gas [GJ]" } );
+		Array2D_string const body( 2, 2, { "216.38", "869.08", "1822.42", "0.00" } );
+		Array1D_string const rowLabels2( { "Heating [kWh]" } );
+		Array1D_string const columnLabels2( { "Electricity", "Natural Gas" } );
+		Array2D_string const body2( 1, 2, { "815.19", "256.72" } );
 
 		sqlite_test->sqliteBegin();
 		// tabular data references simulation record... always checks for first simulation record only.
@@ -1016,7 +889,7 @@ namespace EnergyPlus {
 		auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(6, tabularData.size());
+		ASSERT_EQ(6ul, tabularData.size());
 		// tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId, columnId, value
 		std::vector<std::string> tabularData0 { "1","1","2","3","6","4","5","1","0","0","216.38" };
 		std::vector<std::string> tabularData1 { "2","1","2","3","7","4","5","1","1","0","869.08" };
@@ -1032,7 +905,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(tabularData5, tabularData[5]);
 
 
-		ASSERT_EQ(10, strings.size());
+		ASSERT_EQ(10ul, strings.size());
 		std::vector<std::string> string0 { "1","1","AnnualBuildingUtilityPerformanceSummary" };
 		std::vector<std::string> string1 { "2","2","Entire Facility" };
 		std::vector<std::string> string2 { "3","3","End Uses" };
@@ -1054,7 +927,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(string8, strings[8]);
 		EXPECT_EQ(string9, strings[9]);
 
-		ASSERT_EQ(6, stringTypes.size());
+		ASSERT_EQ(6ul, stringTypes.size());
 		std::vector<std::string> stringType0 { "1","ReportName" };
 		std::vector<std::string> stringType1 { "2","ReportForString" };
 		std::vector<std::string> stringType2 { "3","TableName" };

@@ -971,6 +971,11 @@ IMPLICIT NONE
      REAL(r64),DIMENSION(3)              :: NumArray  !numeric data
      CHARACTER *3 RUNID
 
+     INTEGER :: EnvVarNumYearsStringLength
+     CHARACTER * 4 :: EnvVarNumYearsString
+     INTEGER :: EnvVarNumYears
+     INTEGER :: EnvVarNumYearsStatus
+
      ! Set defaults
      SimParams%F=.1d0
      SimParams%IYRS=15
@@ -1003,6 +1008,25 @@ IMPLICIT NONE
        SimParams%F=.1d0
      ENDIF
      SimParams%IYRS =NumArray(2)
+     
+     ! Override with environment variable for quicker testing
+     CALL GET_ENVIRONMENT_VARIABLE("CI_BASEMENT_NUMYEARS", EnvVarNumYearsString, EnvVarNumYearsStringLength, EnvVarNumYearsStatus)
+     SELECT CASE (EnvVarNumYearsStatus)
+     CASE (-1)
+       ! environment variable exists, but too big to fit in the string; ignoring
+     CASE (1)
+       ! environment variable does not exist, move along
+     CASE (2)
+       ! no environment variables, what?
+     CASE (0)
+       ! good, got a nice value, try to read it into the integer
+       READ(EnvVarNumYearsString, '(I4)', IOSTAT=EnvVarNumYearsStatus) EnvVarNumYears
+       ! if it worked, assign the value, if not just ignore and move on
+       IF (EnvVarNumYearsStatus == 0) THEN
+         SimParams%IYRS = EnvVarNumYears
+       END IF
+     END SELECT
+          
      IF (SimParams%IYRS <= 0.d0) THEN
        CALL ShowSevereError('GetSimParams: Entered "IYRS: Maximum number of yearly iterations:" '//  &
           'choice is not valid.'//  &

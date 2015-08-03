@@ -30,10 +30,9 @@ class HVACSizingSimulationManagerTest : public :: testing::Test
 public:
 
 	// constructor for test fixture class
-	HVACSizingSimulationManagerTest ( )
+	HVACSizingSimulationManagerTest()
 	{
-
-			// setup weather manager state needed
+		// setup weather manager state needed
 		NumOfEnvrn = 2;
 		Environment.allocate( NumOfEnvrn );
 		Environment(1).KindOfEnvrn = ksDesignDay;
@@ -52,7 +51,7 @@ public:
 		PlantSizData( NumPltSizInput ).NumTimeStepsInAvg = 1;
 		PlantSizData( NumPltSizInput ).PlantLoopName = "Test Plant Loop 1";
 		PlantSizData( NumPltSizInput ).LoopType = HeatingLoop;
-		
+
 		//set up a plant loop
 		TotNumLoops = 1;
 		PlantLoop.allocate( TotNumLoops );
@@ -78,7 +77,7 @@ public:
 		// need a node to log mass flow rate from
 		Node.allocate( 1 );
 		TimeValue.allocate( 2 );
-		// set up time related 
+		// set up time related
 		SetupTimePointers( "Zone", TimeStepZone ); // Set up Time pointer for HB/Zone Simulation
 		SetupTimePointers( "HVAC", TimeStepSys );
 
@@ -92,13 +91,12 @@ public:
 
 		int write_stat;
 		// Open the Initialization Output File (lifted from SimulationManager.cc)
-		OutputFileInits = GetNewUnitNumber( );
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios( ); }
-
+		OutputFileInits = GetNewUnitNumber();
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 	}
-	
+
 	//destructor
-	~HVACSizingSimulationManagerTest ()
+	~HVACSizingSimulationManagerTest()
 	{
 		TotNumLoops = 0;
 		PlantLoop( 1 ).LoopSide.deallocate();
@@ -112,17 +110,13 @@ public:
 	}
 };
 
-TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3 )
+TEST_F( HVACSizingSimulationManagerTest, WeatherFileDaysTest3 )
 {
 	ShowMessage( "Begin Test: HVACSizingSimulationManagerTest, WeatherFileDaysTest3" );
-	
+
 // this test emulates two design days and two sizing weather file days periods
 // calls code related to coincident plant sizing with HVAC sizing simulation
 // this test runs 3 system timesteps for each zone timestep
-
-	int temp;
-
-
 
 	Environment.deallocate();
 			// setup weather manager state needed
@@ -137,7 +131,7 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3 )
 	Environment( 3 ).KindOfEnvrn = ksRunPeriodDesign;
 	Environment( 3 ).DesignDayNum = 0;
 	Environment( 3 ).TotalDays = 4;
-	
+
 	Environment( 4 ).KindOfEnvrn = ksRunPeriodDesign;
 	Environment( 4 ).DesignDayNum = 0;
 	Environment( 4 ).TotalDays = 4;
@@ -150,8 +144,6 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3 )
 	EXPECT_EQ( 1, testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplySideInletNodeNum );
 
 	testSizeSimManagerObj.SetupSizingAnalyses();
-
-	
 
 	EXPECT_EQ( 4, NumOfEnvrn );
 	AddDesignSetToEnvironmentStruct( 1 );
@@ -272,7 +264,7 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3 )
 	EXPECT_DOUBLE_EQ( 2.0 , PlantLoop( 1 ).MaxMassFlowRate ); // original size
 	testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments( 1 );
 	EXPECT_DOUBLE_EQ( 2.4 , PlantLoop( 1 ).MaxMassFlowRate ); //resize check
-	
+
 	// check that the data are as expected in the logs
 	// first timestep
 	EXPECT_DOUBLE_EQ( 0.1 , testSizeSimManagerObj.sizingLogger
@@ -319,27 +311,25 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3 )
 			.logObjs[ testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplyInletNodeFlow_LogIndex ]
 				.ztStepObj[ 96 ].runningAvgDataValue );
 
-	// first timestep of third sizing environment WeatherFileDays 
+	// first timestep of third sizing environment WeatherFileDays
 	EXPECT_DOUBLE_EQ( 0.1 , testSizeSimManagerObj.sizingLogger
 			.logObjs[ testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplyInletNodeFlow_LogIndex ]
 				.ztStepObj[ 192 ].runningAvgDataValue);
 
-	// first timestep of fourth sizing environment WeatherFileDays 
+	// first timestep of fourth sizing environment WeatherFileDays
 	EXPECT_DOUBLE_EQ( 0.1 , testSizeSimManagerObj.sizingLogger
 			.logObjs[ testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplyInletNodeFlow_LogIndex ]
 				.ztStepObj[ 576 ].runningAvgDataValue);
 
 }
 
-TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3 )
+TEST_F( HVACSizingSimulationManagerTest, TopDownTestSysTimestep3 )
 {
 	ShowMessage( "Begin Test: HVACSizingSimulationManagerTest, TopDownTestSysTimestep3" );
-	
+
 // this test emulates two design days and calls nearly all the OO code related
 // to coincident plant sizing with HVAC sizing simulation
 // this test runs 3 system timesteps for each zone timestep
-
-	int temp;
 
 	HVACSizingSimulationManager testSizeSimManagerObj;
 
@@ -366,7 +356,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3 )
 	Envrn = 3;
 	Environment( Envrn ).DesignDayNum = 1;
 	testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment();
-	for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+	for ( HourOfDay = 1; HourOfDay <= 24; ++HourOfDay ) { // Begin hour loop ...
 		TimeValue( 1 ).CurMinute = 0.0;
 		TimeValue( 2 ).CurMinute = 0.0;
 		for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
@@ -389,7 +379,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3 )
 	Envrn = 4;
 	Environment( Envrn ).DesignDayNum = 2;
 	testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment();
-	for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+	for ( HourOfDay = 1; HourOfDay <= 24; ++HourOfDay ) { // Begin hour loop ...
 		TimeValue( 1 ).CurMinute = 0.0;
 		TimeValue( 2 ).CurMinute = 0.0;
 		for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
@@ -414,7 +404,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3 )
 	EXPECT_DOUBLE_EQ( 2.0 , PlantLoop( 1 ).MaxMassFlowRate ); // original size
 	testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments( 1 );
 	EXPECT_DOUBLE_EQ( 2.4 , PlantLoop( 1 ).MaxMassFlowRate ); //resize check
-	
+
 	// check that the data are as expected in the logs
 	// first timestep
 	EXPECT_DOUBLE_EQ( 0.1 , testSizeSimManagerObj.sizingLogger
@@ -463,15 +453,14 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3 )
 
 }
 
-TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1 )
+TEST_F( HVACSizingSimulationManagerTest, TopDownTestSysTimestep1 )
 {
 	ShowMessage( "Begin Test: HVACSizingSimulationManagerTest, TopDownTestSysTimestep1" );
-	
+
 // this test emulates two design days and calls nearly all the OO code related
 // to coincident plant sizing with HVAC sizing simulation
 // this test runs 1 system timestep for each zone timestep
 
-	int temp;
 	GlobalCoolSizingFactor = 1.0;
 	PlantSizData( NumPltSizInput ).SizingFactorOption = GlobalCoolingSizingFactorMode;
 
@@ -498,7 +487,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1 )
 	Envrn = 3;
 	Environment( Envrn ).DesignDayNum = 1;
 	testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment();
-	for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+	for ( HourOfDay = 1; HourOfDay <= 24; ++HourOfDay ) { // Begin hour loop ...
 		TimeValue( 1 ).CurMinute = 0.0;
 		TimeValue( 2 ).CurMinute = 0.0;
 		for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
@@ -523,10 +512,10 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1 )
 	Envrn = 4;
 	Environment( Envrn ).DesignDayNum = 2;
 	testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment();
-	for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+	for ( HourOfDay = 1; HourOfDay <= 24; ++HourOfDay ) { // Begin hour loop ...
 		TimeValue( 1 ).CurMinute = 0.0;
 		TimeValue( 2 ).CurMinute = 0.0;
-		for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+		for ( TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep ) {
 
 			for ( int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop ) {
 				TimeValue( 2 ).CurMinute += TimeValue( 2 ).TimeStep * 60.0;
@@ -548,20 +537,16 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1 )
 	EXPECT_DOUBLE_EQ( 2.0 , PlantLoop( 1 ).MaxMassFlowRate ); // original size
 	testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments( 1 );
 	EXPECT_DOUBLE_EQ( 2.4 , PlantLoop( 1 ).MaxMassFlowRate ); //resize check
-
-
-
 }
 
-TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps )
+TEST_F( HVACSizingSimulationManagerTest, VarySysTimesteps )
 {
 	ShowMessage( "Begin Test: HVACSizingSimulationManagerTest, VarySysTimesteps" );
-	
+
 // this test emulates two design days and calls nearly all the OO code related
 // to coincident plant sizing with HVAC sizing simulation
-// this test run varies the system timestep some to test irregular 
+// this test run varies the system timestep some to test irregular
 
-	int temp;
 	PlantSizData( NumPltSizInput ).NumTimeStepsInAvg = 2;
 	GlobalHeatSizingFactor = 1.0;
 	PlantSizData( NumPltSizInput ).SizingFactorOption = GlobalHeatingSizingFactorMode;
@@ -638,7 +623,6 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps )
 		} // TimeStep loop
 	} // End hour loop.
 
-
 	testSizeSimManagerObj.PostProcessLogs();
 
 	EXPECT_DOUBLE_EQ( 2.0 , PlantLoop( 1 ).MaxMassFlowRate ); // original size
@@ -647,6 +631,5 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps )
 
 	testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments( 1 );
 
-	testSizeSimManagerObj.sizingLogger.IncrementSizingPeriodSet( );
-
+	testSizeSimManagerObj.sizingLogger.IncrementSizingPeriodSet();
 }

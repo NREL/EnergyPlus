@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -122,7 +122,7 @@ namespace PackagedTerminalHeatPump {
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	Real64 SupHeaterLoad( 0.0 ); // load to be met by supplemental heater [W]
 	int NumPTHP( 0 ); // total number of PTHP's
@@ -149,8 +149,8 @@ namespace PackagedTerminalHeatPump {
 	// modules for variable speed heat pump
 
 	// Object Data
-	FArray1D< PTUnitData > PTUnit;
-	FArray1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds VRF TU numeric input fields character field name
+	Array1D< PTUnitData > PTUnit;
+	Array1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds VRF TU numeric input fields character field name
 
 	// Functions
 
@@ -484,7 +484,6 @@ namespace PackagedTerminalHeatPump {
 		auto & GetHXDXCoilInletNode( HVACHXAssistedCoolingCoil::GetCoilInletNode );
 		auto & GetHXDXCoilOutletNode( HVACHXAssistedCoolingCoil::GetCoilOutletNode );
 		auto & GetHeatingCoilIndex( HeatingCoils::GetCoilIndex );
-		using HeatingCoils::HeatingCoil;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		auto & GetHeatingCoilInletNode( HeatingCoils::GetCoilInletNode );
 		auto & GetHeatingCoilOutletNode( HeatingCoils::GetCoilOutletNode );
@@ -511,9 +510,6 @@ namespace PackagedTerminalHeatPump {
 		using BranchNodeConnections::SetUpCompSets;
 		using FluidProperties::GetSatDensityRefrig;
 		auto & GetWtoAHPCoilCapacity( WaterToAirHeatPump::GetCoilCapacity );
-		auto & GetWtoAHPCoilInletNode( WaterToAirHeatPump::GetCoilInletNode );
-		auto & GetWtoAHPCoilOutletNode( WaterToAirHeatPump::GetCoilOutletNode );
-		auto & GetWtoAHPCoilIndex( WaterToAirHeatPump::GetCoilIndex );
 		auto & GetWtoAHPSimpleCoilCapacity( WaterToAirHeatPumpSimple::GetCoilCapacity );
 		auto & GetWtoAHPSimpleCoilInletNode( WaterToAirHeatPumpSimple::GetCoilInletNode );
 		auto & GetWtoAHPSimpleCoilOutletNode( WaterToAirHeatPumpSimple::GetCoilOutletNode );
@@ -554,9 +550,9 @@ namespace PackagedTerminalHeatPump {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PTUnitIndex; // loop index
 		int PTUnitNum; // current packaged terminal unit number
-		FArray1D_string Alphas; // Alpha items for object
-		FArray1D< Real64 > Numbers; // Numeric items for object
-		FArray1D_int OANodeNums( 4 ); // Node numbers of OA mixer (OA, EA, RA, MA)
+		Array1D_string Alphas; // Alpha items for object
+		Array1D< Real64 > Numbers; // Numeric items for object
+		Array1D_int OANodeNums( 4 ); // Node numbers of OA mixer (OA, EA, RA, MA)
 		int FanInletNodeNum; // Fan inlet node number
 		int FanOutletNodeNum; // Fan outlet node number
 		int SuppHeatInletNodeNum; // Supplemental heating coil inlet node number
@@ -596,10 +592,10 @@ namespace PackagedTerminalHeatPump {
 		int NodeNum; // index to loop counter
 		bool ZoneNodeNotFound; // used in error checking
 
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		MaxNumbers = 0;
 		MaxAlphas = 0;
@@ -2722,12 +2718,10 @@ namespace PackagedTerminalHeatPump {
 		using namespace DataZoneEnergyDemands;
 		using DataGlobals::InitConvTemp;
 		using DataGlobals::AnyPlantInModel;
-		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::StdRhoAir;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
-		using DataZoneEquipment::ZoneEquipSimulatedOnce;
 		auto & GetHeatingCoilCapacity( HeatingCoils::GetCoilCapacity );
 		using SteamCoils::SimulateSteamCoilComponents;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
@@ -2776,11 +2770,11 @@ namespace PackagedTerminalHeatPump {
 		static bool MyOneTimeFlag( true ); // initialization flag
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
-		static FArray1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
-		static FArray1D_bool MySizeFlag; // used for sizing PTHP inputs one time
-		static FArray1D_bool MyFanFlag; // used for sizing PTHP fan inputs one time
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+		static Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
+		static Array1D_bool MySizeFlag; // used for sizing PTHP inputs one time
+		static Array1D_bool MyFanFlag; // used for sizing PTHP fan inputs one time
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		Real64 QActual; // actual PTAC steam heating coil load met (W)
 		bool ErrorsFound; // flag returned from mining call
 		Real64 QToCoolSetPt;
@@ -4008,7 +4002,7 @@ namespace PackagedTerminalHeatPump {
 		Real64 NoCompOutput; // output when no active compressor [W]
 		Real64 ErrorToler; // error tolerance
 		int SolFla; // Flag of RegulaFalsi solver
-		static FArray1D< Real64 > Par( 8 ); // Parameters passed to RegulaFalsi
+		static Array1D< Real64 > Par( 8 ); // Parameters passed to RegulaFalsi
 		std::string IterNum; // Max number of iterations for warning message
 		Real64 CpAir; // air specific heat
 		Real64 OutsideDryBulbTemp; // Outside air temperature at external node height
@@ -4253,7 +4247,6 @@ namespace PackagedTerminalHeatPump {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIte( 500 ); // maximum number of iterations
 		Real64 const ErrTolerance( 0.001 ); // convergence limit for hotwater coil
 		int const SolveMaxIter( 50 );
 
@@ -4277,13 +4270,10 @@ namespace PackagedTerminalHeatPump {
 		bool errFlag; // subroutine error flag
 		Real64 WSHPRuntimeFrac; // RTF variable for WSHP's
 		Real64 mdot; // local temporary for mass flow rate
-		Real64 PartLoadFraction; // heating or cooling part load fraction
 		Real64 MaxHotWaterFlow; // coil maximum hot water mass flow rate, kg/s
 		Real64 HotWaterMdot; // actual hot water mass flow rate
-		static FArray1D< Real64 > Par( 3 );
+		static Array1D< Real64 > Par( 3 );
 		int SolFlag;
-		Real64 MinFlow; // minimum fluid flow rate, kg/s
-		int ControlCompTypeNum; // temporary component index number
 		static int ATMixOutNode( 0 ); // outlet node of ATM Mixer
 
 		//Tuned Named constants to avoid heap allocation when passed to Optional args
@@ -4588,17 +4578,16 @@ namespace PackagedTerminalHeatPump {
 		tau = PTUnit( PTUnitNum ).HPTimeConstant;
 		pr = PTUnit( PTUnitNum ).OnCyclePowerFraction;
 
-		//Initialize
+		// Initialize
 		errFlag = false;
 		error = 1.0;
 		NumIteration = 0;
 
-		//Initial guess for part load fraction
+		// Initial guess for part load fraction
 		PLF1 = 1.0;
 
-		//Calculate PLF using successive substitution until convergence
-		//is achieved
-		LOOPPLF: while ( true ) {
+		// Calculate PLF using successive substitution until convergence is achieved
+		while ( true ) {
 			++NumIteration;
 
 			if ( PLR == 1 ) {
@@ -4632,7 +4621,6 @@ namespace PackagedTerminalHeatPump {
 				error = std::abs( ( PLF2 - PLF1 ) / PLF1 );
 				PLF1 = PLF2;
 			}
-			LOOPPLF_loop: ;
 		}
 		LOOPPLF_exit: ;
 
@@ -4661,7 +4649,7 @@ namespace PackagedTerminalHeatPump {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		FArray1< Real64 > const & Par // Par(5) is the requested coil load
+		Array1< Real64 > const & Par // Par(5) is the requested coil load
 	)
 	{
 
@@ -4731,7 +4719,7 @@ namespace PackagedTerminalHeatPump {
 	Real64
 	SupSATResidual(
 		Real64 & TempSupHeater, // supplemental heater load at maximum SAT
-		FArray1< Real64 > const & Par // par(1) = PTUnitNum
+		Array1< Real64 > const & Par // par(1) = PTUnitNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -4787,7 +4775,7 @@ namespace PackagedTerminalHeatPump {
 	Real64
 	PLRResidual(
 		Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = PTUnitNum
+		Array1< Real64 > const & Par // par(1) = PTUnitNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -5572,7 +5560,6 @@ namespace PackagedTerminalHeatPump {
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using DataGlobals::WarmupFlag;
-		using DataGlobals::CurrentTime;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using SteamCoils::SimulateSteamCoilComponents;
@@ -5586,7 +5573,6 @@ namespace PackagedTerminalHeatPump {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // maximum number of iterations
-		Real64 const MinPLF( 0.0 ); // minimum part load factor allowed
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -5602,9 +5588,8 @@ namespace PackagedTerminalHeatPump {
 		Real64 LatOutput; // latent capacity output
 		Real64 ErrorToler; // error tolerance
 		int SolFla; // Flag of RegulaFalsi solver
-		static FArray1D< Real64 > Par( 11 ); // Parameters passed to RegulaFalsi
+		static Array1D< Real64 > Par( 11 ); // Parameters passed to RegulaFalsi
 		Real64 CpAir; // air specific heat
-		Real64 QCoilActual; // coil load actually delivered returned to calling component
 		int i; // Speed index
 		static int ErrCountCyc( 0 ); // Counter used to minimize the occurrence of output warnings
 		static int ErrCountVar( 0 ); // Counter used to minimize the occurrence of output warnings
@@ -5862,7 +5847,7 @@ namespace PackagedTerminalHeatPump {
 	Real64
 	VSHPCyclingResidual(
 		Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = FurnaceNum
+		Array1< Real64 > const & Par // par(1) = FurnaceNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -5972,7 +5957,7 @@ namespace PackagedTerminalHeatPump {
 	Real64
 	VSHPSpeedResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = MSHPNum
+		Array1< Real64 > const & Par // par(1) = MSHPNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -6096,7 +6081,7 @@ namespace PackagedTerminalHeatPump {
 		Real64 const QLatReq, // Zone latent load []
 		Real64 & OnOffAirFlowRatio, // ratio of compressor ON airflow to AVERAGE airflow over timestep
 		Real64 & SupHeaterLoad, // supplemental heater load (W)
-		bool const HXUnitOn // flag to enable heat exchanger
+		bool const EP_UNUSED( HXUnitOn ) // flag to enable heat exchanger
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -6159,11 +6144,10 @@ namespace PackagedTerminalHeatPump {
 		Real64 QCoilReq; // load passed to heating coil (W)
 		Real64 QActual; // actual heating coil output (W)
 		int OpMode; // fan operating mode, CycFanCycCoil or ContFanCycCoil
-		bool errFlag; // subroutine error flag
 		Real64 mdot; // local temporary for mass flow rate
 		Real64 MaxHotWaterFlow; // coil maximum hot water mass flow rate, kg/s
 		Real64 HotWaterMdot; // actual hot water mass flow rate
-		static FArray1D< Real64 > Par( 3 );
+		static Array1D< Real64 > Par( 3 );
 		int SolFlag;
 		static int ATMixOutNode( 0 ); // outlet node of ATM Mixer
 
@@ -6369,7 +6353,7 @@ namespace PackagedTerminalHeatPump {
 	void
 	SetVSHPAirFlow(
 		int const PTUnitNum, // Unit index
-		int const ZoneNum, // Zone index
+		int const EP_UNUSED( ZoneNum ), // Zone index
 		Real64 const PartLoadRatio, // unit part load ratio
 		Real64 & OnOffAirFlowRatio, // ratio of compressor ON airflow to average airflow over timestep
 		Optional_int_const SpeedNum, // Speed number
@@ -6542,11 +6526,11 @@ namespace PackagedTerminalHeatPump {
 		int const PTUnitNum, // index to furnace
 		int const ZoneNum, // index to zone
 		bool const FirstHVACIteration, // Flag for 1st HVAC iteration
-		int const AirLoopNum, // index to air loop !unused1208
+		int const EP_UNUSED( AirLoopNum ), // index to air loop !unused1208
 		Real64 & OnOffAirFlowRatio, // ratio of coil on to coil off air flow rate
-		int const OpMode, // fan operating mode
-		Real64 const QZnReq, // sensible load to be met (W) !unused1208
-		Real64 const MoistureLoad, // moisture load to be met (W)
+		int const EP_UNUSED( OpMode ), // fan operating mode
+		Real64 const EP_UNUSED( QZnReq ), // sensible load to be met (W) !unused1208
+		Real64 const EP_UNUSED( MoistureLoad ), // moisture load to be met (W)
 		Real64 & PartLoadRatio // coil part-load ratio
 	)
 	{
@@ -6666,7 +6650,7 @@ namespace PackagedTerminalHeatPump {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

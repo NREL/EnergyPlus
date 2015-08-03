@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -70,12 +70,12 @@ namespace DirectAirManager {
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumDirectAir( 0 );
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE AirLoopSplitter
 
 	// Object Data
-	FArray1D< DirectAirProps > DirectAir;
+	Array1D< DirectAirProps > DirectAir;
 
 	// Functions
 
@@ -332,7 +332,6 @@ namespace DirectAirManager {
 		// na
 
 		// Using/Aliasing
-		using DataEnvironment::StdBaroPress;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using DataAirflowNetwork::SimulateAirflowNetwork;
 		using DataAirflowNetwork::AirflowNetworkFanActivated;
@@ -355,8 +354,8 @@ namespace DirectAirManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MySizeFlag;
 		int ZoneNode;
 		int Loop;
 
@@ -646,7 +645,7 @@ namespace DirectAirManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

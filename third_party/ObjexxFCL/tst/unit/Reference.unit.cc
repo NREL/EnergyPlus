@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -109,4 +109,40 @@ TEST( ReferenceTest, String )
 	EXPECT_TRUE( r.associated() );
 	EXPECT_TRUE( r.attached( s ) );
 	EXPECT_EQ( s, r );
+}
+
+TEST( ReferenceTest, Allocate )
+{
+	{
+		Reference_int r;
+		r.allocate();
+		r = 123;
+		EXPECT_TRUE( r.attached() );
+		EXPECT_TRUE( r.associated() );
+		EXPECT_TRUE( r.attached() );
+		EXPECT_EQ( 123, r );
+		r.deallocate();
+		EXPECT_FALSE( r.attached() );
+		EXPECT_FALSE( r.associated() );
+		EXPECT_FALSE( r.attached() );
+	}
+	{
+		struct S
+		{
+			int i, j, k;
+		};
+		Reference< S > r;
+		r.allocate();
+		r().i = 1;
+		r().j = 2;
+		r().k = 3;
+		EXPECT_TRUE( r.attached() );
+		EXPECT_TRUE( r.associated() );
+		EXPECT_TRUE( r.attached() );
+		EXPECT_EQ( 1, r().i );
+		r.deallocate();
+		EXPECT_FALSE( r.attached() );
+		EXPECT_FALSE( r.associated() );
+		EXPECT_FALSE( r.attached() );
+	}
 }

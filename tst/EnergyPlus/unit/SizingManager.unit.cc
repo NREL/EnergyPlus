@@ -26,12 +26,12 @@ TEST( GetOARequirementsTest, DSOA1 )
 	int NumOARequirements = 6;
 	OARequirements.allocate( NumOARequirements );
 
-	FArray1D_string Alphas; // Alpha input items for object
-	FArray1D_string cAlphaFields; // Alpha field names
-	FArray1D_string cNumericFields; // Numeric field names
-	FArray1D< Real64 > Numbers; // Numeric input items for object
-	FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-	FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+	Array1D_string Alphas; // Alpha input items for object
+	Array1D_string cAlphaFields; // Alpha field names
+	Array1D_string cNumericFields; // Numeric field names
+	Array1D< Real64 > Numbers; // Numeric input items for object
+	Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+	Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 	Alphas.allocate( NumAlphas );
 	cAlphaFields.allocate( NumAlphas );
@@ -161,7 +161,7 @@ TEST( GetOARequirementsTest, DSOA1 )
 	EXPECT_EQ( 0.4, OARequirements( OAIndex ).OAFlowACH );
 
 	// Clean up
-	OARequirements.deallocate( );
+	OARequirements.deallocate();
 	Alphas.deallocate();
 	cAlphaFields.deallocate();
 	cNumericFields.deallocate();

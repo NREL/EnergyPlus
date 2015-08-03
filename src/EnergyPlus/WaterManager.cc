@@ -2,8 +2,8 @@
 #include <cassert>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -263,12 +263,12 @@ namespace WaterManager {
 		static int alphaOffset( 0 );
 		static int SurfNum( 0 );
 		static std::string objNameMsg;
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
-		FArray1D_bool lNumericFieldBlanks;
-		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_string cAlphaArgs;
-		FArray1D< Real64 > rNumericArgs;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
+		Array1D_bool lNumericFieldBlanks;
+		Array1D_bool lAlphaFieldBlanks;
+		Array1D_string cAlphaArgs;
+		Array1D< Real64 > rNumericArgs;
 		std::string cCurrentModuleObject;
 		static Real64 tmpMax( 0.0 );
 		static Real64 tmpMin( 0.0 );
@@ -1254,8 +1254,8 @@ namespace WaterManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int oldNumSupply;
-		FArray1D_string oldSupplyCompNames;
-		FArray1D_string oldSupplyCompTypes;
+		Array1D_string oldSupplyCompNames;
+		Array1D_string oldSupplyCompTypes;
 		//  LOGICAL , SAVE    :: MyOneTimeFlag = .TRUE.
 
 		TankIndex = FindItemInList( TankName, WaterStorage.Name(), NumWaterStorageTanks );
@@ -1411,8 +1411,8 @@ namespace WaterManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int oldNumDemand;
-		FArray1D_string oldDemandCompNames;
-		FArray1D_string oldDemandCompTypes;
+		Array1D_string oldDemandCompNames;
+		Array1D_string oldDemandCompTypes;
 		//  LOGICAL , SAVE    :: MyOneTimeFlag = .TRUE.
 
 		TankIndex = FindItemInList( TankName, WaterStorage.Name(), NumWaterStorageTanks );
@@ -1656,7 +1656,6 @@ namespace WaterManager {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::InitConvTemp;
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::KickOffSimulation;
 		using DataGlobals::DoingSizing;
@@ -1800,7 +1799,7 @@ namespace WaterManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

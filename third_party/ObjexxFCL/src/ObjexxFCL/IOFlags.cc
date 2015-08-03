@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -16,6 +16,9 @@
 
 // C++ Headers
 #include <cassert>
+#ifndef OBJEXXFCL_IO_ERROR_SUPPRESS
+#include <iostream>
+#endif
 
 namespace ObjexxFCL {
 
@@ -212,5 +215,15 @@ namespace ObjexxFCL {
 		}
 		return *this;
 	}
+
+	// Error Handler
+#ifndef OBJEXXFCL_IO_ERROR_SUPPRESS
+	void
+	IOFlags::error() const
+	{
+		std::cerr << '\n' << msg_ << std::endl;
+		std::exit( EXIT_FAILURE );
+	}
+#endif
 
 } // ObjexxFCL

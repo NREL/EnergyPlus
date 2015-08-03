@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 
@@ -85,13 +85,13 @@ namespace TranspiredCollector {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumUTSC( 0 ); // number of transpired collectors in model
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 	bool GetInputFlag( true ); // First time, input is gotten
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE TranspiredCollector:
 
 	// Object Data
-	FArray1D< UTSCDataStruct > UTSC;
+	Array1D< UTSCDataStruct > UTSC;
 
 	// Functions
 
@@ -262,10 +262,10 @@ namespace TranspiredCollector {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		FArray1D_string Alphas; // Alpha items for extensible
+		Array1D_string Alphas; // Alpha items for extensible
 		// Solar Collectors:Unglazed Transpired object
 		int Item; // Item to be "gotten"
-		FArray1D< Real64 > Numbers( 11 ); // Numeric items for object
+		Array1D< Real64 > Numbers( 11 ); // Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int MaxNumAlphas; // argumenet for call to GetObjectDefMaxArgs
@@ -283,10 +283,10 @@ namespace TranspiredCollector {
 		Real64 TiltRads; // average tilt of collector in radians
 		Real64 tempHdeltaNPL; // temporary variable for bouyancy length scale
 		int NumUTSCSplitter;
-		FArray1D_string AlphasSplit; // Alpha items for extensible
+		Array1D_string AlphasSplit; // Alpha items for extensible
 		// Solar Collectors:Unglazed Transpired object
 		int ItemSplit; // Item to be "gotten"
-		FArray1D< Real64 > NumbersSplit( 1 ); // Numeric items for object
+		Array1D< Real64 > NumbersSplit( 1 ); // Numeric items for object
 		int NumAlphasSplit; // Number of Alphas for each GetObjectItem call
 		int NumNumbersSplit; // Number of Numbers for each GetObjectItem call
 		int MaxNumAlphasSplit; // argumenet for call to GetObjectDefMaxArgs
@@ -294,7 +294,7 @@ namespace TranspiredCollector {
 		int IOStatusSplit; // Used in GetObjectItem
 		int NumOASys; // do loop counter
 		int ACountBase; // counter for alhpasSplit
-		FArray1D_bool SplitterNameOK; // check for correct association of
+		Array1D_bool SplitterNameOK; // check for correct association of
 		std::string CurrentModuleObject; // for ease in renaming.
 		std::string CurrentModuleMultiObject; // for ease in renaming.
 
@@ -645,7 +645,7 @@ namespace TranspiredCollector {
 		static bool MyOneTimeFlag( true );
 		int UTSCUnitNum;
 		static bool MySetPointCheckFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		int ControlNode;
 		//unused  INTEGER             :: InletNode
 		int SplitBranch;
@@ -750,7 +750,6 @@ namespace TranspiredCollector {
 		// Using/Aliasing
 		using DataEnvironment::SkyTemp;
 		using DataEnvironment::OutHumRat;
-		using DataEnvironment::SunIsUp;
 		using DataEnvironment::OutBaroPress;
 		using DataEnvironment::IsRain;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -767,12 +766,10 @@ namespace TranspiredCollector {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const g( 9.81 ); // gravity constant (m/s**2)
 		Real64 const nu( 15.66e-6 ); // kinematic viscosity (m**2/s) for air at 300 K
 		// (Mills 1999 Heat Transfer)
 		Real64 const k( 0.0267 ); // thermal conductivity (W/m K) for air at 300 K
 		// (Mills 1999 Heat Transfer)
-		Real64 const Pr( 0.71 ); // Prandtl number for air
 		Real64 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant
 		//  REAL(r64), PARAMETER  :: KelvinConv = KelvinConv         ! Conversion from Celsius to Kelvin
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -784,11 +781,11 @@ namespace TranspiredCollector {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 		// following arrays are used to temporarily hold results from multiple underlying surfaces
-		FArray1D< Real64 > HSkyARR;
-		FArray1D< Real64 > HGroundARR;
-		FArray1D< Real64 > HAirARR;
-		FArray1D< Real64 > HPlenARR;
-		FArray1D< Real64 > LocalWindArr;
+		Array1D< Real64 > HSkyARR;
+		Array1D< Real64 > HGroundARR;
+		Array1D< Real64 > HAirARR;
+		Array1D< Real64 > HPlenARR;
+		Array1D< Real64 > LocalWindArr;
 		//  REAL(r64), ALLOCATABLE, DIMENSION(:) :: IscARR
 		//  REAL(r64), ALLOCATABLE, DIMENSION(:) :: TsoARR
 
@@ -927,7 +924,7 @@ namespace TranspiredCollector {
 			InitExteriorConvectionCoeff( SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR( ThisSurf ), HGroundARR( ThisSurf ), HAirARR( ThisSurf ) );
 			ConstrNum = Surface( SurfPtr ).Construction;
 			AbsThermSurf = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermal;
-			TsoK = TH( SurfPtr, 1, 1 ) + KelvinConv;
+			TsoK = TH( 1, 1, SurfPtr ) + KelvinConv;
 			TscollK = UTSC( UTSCNum ).TcollLast + KelvinConv;
 			HPlenARR( ThisSurf ) = Sigma * AbsExt * AbsThermSurf * ( pow_4( TscollK ) - pow_4( TsoK ) ) / ( TscollK - TsoK );
 		}
@@ -954,7 +951,7 @@ namespace TranspiredCollector {
 //		Isc = sum( QRadSWOutIncident( UTSC( UTSCNum ).SurfPtrs ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced by below
 		Isc = sum_product_sub( QRadSWOutIncident, Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / AreaSum; //Autodesk:F2C++ Functions handle array subscript usage
 //		Tso = sum( TH( UTSC( UTSCNum ).SurfPtrs, 1, 1 ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced by below
-		Tso = sum_product_sub( TH( _, 1, 1 ), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / AreaSum; //Autodesk:F2C++ Functions handle array subscript usage
+		Tso = sum_product_sub( TH( 1, 1, _ ), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / AreaSum; //Autodesk:F2C++ Functions handle array subscript usage
 
 		if ( Vwind > 5.0 ) {
 			HcWind = 5.62 + 3.9 * ( Vwind - 5.0 ); //McAdams forced convection correlation
@@ -1069,7 +1066,6 @@ namespace TranspiredCollector {
 		// USE STATEMENTS:
 
 		// Using/Aliasing
-		using DataEnvironment::SunIsUp;
 		using DataEnvironment::OutBaroPress;
 		using DataEnvironment::OutEnthalpy;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -1224,9 +1220,9 @@ namespace TranspiredCollector {
 				auto & outNode( Node( OutletNode( io ) ) );
 				auto const & inNode( Node( InletNode( ii ) ) );
 				outNode.MassFlowRate = inNode.MassFlowRate;
-				outNode.Temp         = inNode.Temp;
-				outNode.HumRat       = inNode.HumRat;
-				outNode.Enthalpy     = inNode.Enthalpy;
+				outNode.Temp = inNode.Temp;
+				outNode.HumRat = inNode.HumRat;
+				outNode.Enthalpy = inNode.Enthalpy;
 			}
 		}
 
@@ -1402,7 +1398,7 @@ namespace TranspiredCollector {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

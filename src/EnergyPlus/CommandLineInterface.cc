@@ -38,43 +38,48 @@ using namespace ez;
 int
 ProcessArgs(int argc, const char * argv[])
 {
-	bool annSimulation;
-	bool ddSimulation;
+	typedef  std::string::size_type  size_type;
 
 	// Expand long-name options using "=" sign into two arguments
 	// and expand multiple short options into separate arguments
-	std::vector<std::string> arguments;
+	std::vector< std::string > arguments;
 
 	for ( int i = 0; i < argc; ++i ) {
 
 		std::string inputArg( argv[ i ] );
 
-		int doubleDashPosition = inputArg.find("--");
-		int equalsPosition = inputArg.find("=");
+		std::string const dash( "-" );
+		size_type const doubleDashPosition = inputArg.find("--");
+		size_type const equalsPosition = inputArg.find("=");
 
-		if (doubleDashPosition == 0 && equalsPosition != std::string::npos){
+		if ( doubleDashPosition == 0 && equalsPosition != std::string::npos ) { // --option=value
 			arguments.push_back(inputArg.substr(0,equalsPosition));
 			arguments.push_back(inputArg.substr(equalsPosition + 1,inputArg.size() - 1));
-		}
-		else if (inputArg.substr(0,1) == '-' && inputArg.substr(1,1) != '-' && inputArg.size() > 2){
-			for (int c = 1; c < inputArg.size(); ++c){
-				arguments.push_back("-" + inputArg.substr(c,1));
+		} else if ( ( inputArg.size() > 2 ) && ( inputArg[ 0 ] == '-' ) && ( inputArg[ 1 ] != '-' ) ) { // -abc style
+			for ( size_type c = 1; c < inputArg.size(); ++c ) {
+				arguments.push_back( dash + inputArg[ c ] );
 			}
-		}
-		else
+		} else { // ?
 			arguments.push_back(inputArg);
+		}
 	}
 
+//Fix This is problematic for a few reasons:
+//  Using ezOptionParser with a raw C-string interface is asking for trouble: Find something taking std::string if possible
+//  Passing out pointers returned by c_str() is bad form:
+//   They are pointers to internally-managed memory in std::string
+//   They are invalid as soon as the string goes out of scope or is modified
+//   In this case the strings may be in scope and unmodified until parse is done but this is red flag usage
 	// convert to vector of C strings for option parser
-	std::vector<const char *> cStrArgs;
+	std::vector< const char * > cStrArgs;
 	cStrArgs.reserve(arguments.size());
-	for (int i = 0; i < arguments.size(); ++i) {
+	for ( size_type i = 0; i < arguments.size(); ++i ) {
 		cStrArgs.push_back(arguments[i].c_str());
 	}
 
-	int argCount = cStrArgs.size();
+	size_type const argCount = cStrArgs.size();
 
-	bool legacyMode = (argCount == 1);
+	bool const legacyMode = (argCount == 1);
 
 	// Define options
 	ezOptionParser opt;
@@ -112,7 +117,7 @@ ProcessArgs(int argc, const char * argv[])
 	std::string errorFollowUp = "Type 'energyplus --help' for usage.";
 
 	// Parse arguments
-	opt.parse(argCount, &cStrArgs[0]);
+	opt.parse( argCount, &cStrArgs[0] );
 
 	// print arguments parsed (useful for debugging)
 	/*std::string pretty;
@@ -153,14 +158,13 @@ ProcessArgs(int argc, const char * argv[])
 		exit(EXIT_SUCCESS);
 	}
 
-	if(opt.lastArgs.size() == 1){
-		for(int i=0; i < opt.lastArgs.size(); ++i) {
-			std::string arg(opt.lastArgs[i]->c_str());
+	if (opt.lastArgs.size() == 1) {
+		for ( size_type i = 0; i < opt.lastArgs.size(); ++i ) {
+			std::string const & arg( *opt.lastArgs[i] );
 			inputIdfFileName = arg;
 		}
 	}
-	if(opt.lastArgs.size() == 0)
-		inputIdfFileName = "in.idf";
+	if (opt.lastArgs.size() == 0) inputIdfFileName = "in.idf";
 
 	// Convert all paths to native paths
 	makeNativePath(inputIdfFileName);
@@ -169,23 +173,22 @@ ProcessArgs(int argc, const char * argv[])
 	makeNativePath(dirPathName);
 
 	std::vector<std::string> badOptions;
-	if(opt.lastArgs.size() > 1){
+	if (opt.lastArgs.size() > 1u) {
 		bool invalidOptionFound = false;
-		for(int i=0; i < opt.lastArgs.size(); ++i) {
-			std::string arg(opt.lastArgs[i]->c_str());
-			if (arg.substr(0,1) == "-"){
+		for ( size_type i = 0; i < opt.lastArgs.size(); ++i ) {
+			std::string const & arg( *opt.lastArgs[i] );
+			if (arg.substr(0,1) == "-") {
 				invalidOptionFound = true;
 				DisplayString("ERROR: Invalid option: " + arg);
 			}
 		}
-		if (invalidOptionFound){
+		if (invalidOptionFound) {
 			DisplayString(errorFollowUp);
 			exit(EXIT_FAILURE);
-		}
-		else {
+		} else {
 			DisplayString("ERROR: Multiple input files specified:");
-			for(int i=0; i < opt.lastArgs.size(); ++i) {
-				std::string arg(opt.lastArgs[i]->c_str());
+			for ( size_type i = 0; i < opt.lastArgs.size(); ++i ) {
+				std::string const & arg( *opt.lastArgs[i] );
 				DisplayString("  Input file #" + std::to_string(i+1) +  ": " + arg);
 			}
 			DisplayString(errorFollowUp);
@@ -205,9 +208,9 @@ ProcessArgs(int argc, const char * argv[])
 
 	runEPMacro = opt.isSet("-m");
 
-	if (opt.isSet("-d") ){
+	if (opt.isSet("-d") ) {
 		// Add the trailing path character if necessary
-		if(dirPathName[dirPathName.size()-1]!=pathChar){
+		if (dirPathName[dirPathName.size()-1]!=pathChar) {
 			dirPathName+=pathChar;
 		}
 
@@ -217,14 +220,14 @@ ProcessArgs(int argc, const char * argv[])
 
 	// File naming scheme
 	std::string outputFilePrefix;
-	if(opt.isSet("-p")) {
+	if (opt.isSet("-p")) {
 		std::string prefixOutName;
 		opt.get("-p")->getString(prefixOutName);
 		makeNativePath(prefixOutName);
 		outputFilePrefix = dirPathName + prefixOutName;
-	}
-	else
+	} else {
 		outputFilePrefix = dirPathName + "eplus";
+	}
 
 	std::string suffixType;
 	opt.get("-s")->getString(suffixType);
@@ -258,8 +261,7 @@ ProcessArgs(int argc, const char * argv[])
 		adsSuffix = "ADS";
 		screenSuffix = "screen";
 
-	}
-	else if (suffixType == "D" || suffixType == "d") {
+	} else if (suffixType == "D" || suffixType == "d") {
 
 		normalSuffix = "";
 		tableSuffix = "-table";
@@ -271,8 +273,7 @@ ProcessArgs(int argc, const char * argv[])
 		adsSuffix = "-ads";
 		screenSuffix = "-screen";
 
-	}
-	else if (suffixType == "C" || suffixType == "c") {
+	} else if (suffixType == "C" || suffixType == "c") {
 
 		normalSuffix = "";
 		tableSuffix = "Table";
@@ -284,8 +285,7 @@ ProcessArgs(int argc, const char * argv[])
 		adsSuffix = "Ads";
 		screenSuffix = "Screen";
 
-	}
-	else {
+	} else {
 		DisplayString("ERROR: Unrecognized argument for output suffix style: " + suffixType);
 		DisplayString(errorFollowUp);
 		exit(EXIT_FAILURE);
@@ -327,7 +327,12 @@ ProcessArgs(int argc, const char * argv[])
 	outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
 	outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
 	outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
-	outputSqliteErrFileName = dirPathName + sqliteSuffix + ".err";
+	if (suffixType == "L" || suffixType == "l") {
+		outputSqliteErrFileName = dirPathName + sqliteSuffix + ".err";
+	}
+	else {
+		outputSqliteErrFileName = outputFilePrefix + sqliteSuffix + ".err";
+	}
 	outputScreenCsvFileName = outputFilePrefix + screenSuffix + ".csv";
 	outputDelightInFileName = "eplusout.delightin";
 	outputDelightOutFileName = "eplusout.delightout";
@@ -353,8 +358,8 @@ ProcessArgs(int argc, const char * argv[])
 
 
 	// Handle bad options
-	if(!opt.gotExpected(badOptions)) {
-		for(int i=0; i < badOptions.size(); ++i) {
+	if (!opt.gotExpected(badOptions)) {
+		for ( size_type i = 0; i < badOptions.size(); ++i ) {
 			DisplayString("ERROR: Unexpected number of arguments for option " + badOptions[i]);
 		}
 		DisplayString(errorFollowUp);
@@ -362,21 +367,21 @@ ProcessArgs(int argc, const char * argv[])
 	}
 
 	// This is a place holder in case there are required options in the future
-	if(!opt.gotRequired(badOptions)) {
-		for(int i=0; i < badOptions.size(); ++i) {
+	if ( !opt.gotRequired(badOptions) ) {
+		for ( size_type i = 0; i < badOptions.size(); ++i ) {
 			DisplayString("ERROR: Missing required option " + badOptions[i]);
 		}
 		DisplayString(errorFollowUp);
 		exit(EXIT_FAILURE);
 	}
 
-	if(opt.firstArgs.size() > 1 || opt.unknownArgs.size() > 0){
-		for(int i=1; i < opt.firstArgs.size(); ++i) {
-			std::string arg(opt.firstArgs[i]->c_str());
+	if ( opt.firstArgs.size() > 1 || opt.unknownArgs.size() > 0 ) {
+		for ( size_type i = 1; i < opt.firstArgs.size(); ++i ) {
+			std::string const & arg( *opt.firstArgs[i] );
 			DisplayString("ERROR: Invalid option: " + arg);
 		}
-		for(int i=0; i < opt.unknownArgs.size(); ++i) {
-			std::string arg(opt.unknownArgs[i]->c_str());
+		for ( size_type i = 0; i < opt.unknownArgs.size(); ++i ) {
+			std::string const & arg( *opt.unknownArgs[i] );
 			DisplayString("ERROR: Invalid option: " + arg);
 		}
 		DisplayString(errorFollowUp);
@@ -452,10 +457,10 @@ ProcessArgs(int argc, const char * argv[])
 	}
 
 	// Preprocessors (These will likely move to a new file)
-	if(runEPMacro){
+	if (runEPMacro) {
 		std::string epMacroPath = exeDirectory + "EPMacro" + exeExtension;
 		{ IOFlags flags; gio::inquire( epMacroPath, flags ); FileExists = flags.exists(); }
-		if (!FileExists){
+		if (!FileExists) {
 			DisplayString("ERROR: Could not find EPMacro executable: " + getAbsolutePath(epMacroPath) + "." );
 			exit(EXIT_FAILURE);
 		}
@@ -463,21 +468,19 @@ ProcessArgs(int argc, const char * argv[])
 		bool inputFileNamedIn =
 				(getAbsolutePath(inputIdfFileName) == getAbsolutePath("in.imf"));
 
-		if (!inputFileNamedIn)
-			linkFile(inputIdfFileName.c_str(), "in.imf");
+		if (!inputFileNamedIn) linkFile(inputIdfFileName.c_str(), "in.imf");
 		DisplayString("Running EPMacro...");
 		systemCall(epMacroCommand);
-		if (!inputFileNamedIn)
-			removeFile("in.imf");
+		if (!inputFileNamedIn) removeFile("in.imf");
 		moveFile("audit.out",outputEpmdetFileName);
 		moveFile("out.idf",outputEpmidfFileName);
-	    inputIdfFileName = outputEpmidfFileName;
+	   inputIdfFileName = outputEpmidfFileName;
 	}
 
-	if(runExpandObjects) {
+	if (runExpandObjects) {
 		std::string expandObjectsPath = exeDirectory + "ExpandObjects" + exeExtension;
 		{ IOFlags flags; gio::inquire( expandObjectsPath, flags ); FileExists = flags.exists(); }
-		if (!FileExists){
+		if (!FileExists) {
 			DisplayString("ERROR: Could not find ExpandObjects executable: " + getAbsolutePath(expandObjectsPath) + "." );
 			exit(EXIT_FAILURE);
 		}
@@ -499,7 +502,7 @@ ProcessArgs(int argc, const char * argv[])
 			removeFile("Energy+.idd");
 		moveFile("expandedidf.err", outputExperrFileName);
 		{ IOFlags flags; gio::inquire( "expanded.idf", flags ); FileExists = flags.exists(); }
-		if (FileExists){
+		if (FileExists) {
 			moveFile("expanded.idf", outputExpidfFileName);
 		    inputIdfFileName = outputExpidfFileName;
 		}
@@ -509,6 +512,12 @@ ProcessArgs(int argc, const char * argv[])
 	return 0;
 }
 
+//Fix This is Fortranic code that needs to be brought up to C++ style
+//     All the index and len and strip should be eliminated and replaced by string calls only where needed
+//     I/o with std::string should not be pulling in trailing blanks so stripping should not be needed, etc.
+//     Rewinding is a big performance hit and should be avoided if possible
+//     Case-insensitive comparison is much faster than converting strings to upper or lower case
+//     Each strip and case conversion is a heap hit and should be avoided if possible
 void
 ReadINIFile(
 	int const UnitNumber, // Unit number of the opened INI file
@@ -567,16 +576,16 @@ ReadINIFile(
 	bool NewHeading;
 
 	// Formats
-	static gio::Fmt const Format_700( "(A)" );
+	static gio::Fmt Format_700( "(A)" );
 
-	DataOut = "           ";
+	DataOut.clear();
 
 	// I tried ADJUSTL(TRIM(KindofParameter)) and got an internal compiler error
 
 	Param = KindofParameter;
 	strip( Param );
 	ILEN = len( Param );
-	gio::rewind( UnitNumber );
+	gio::rewind( UnitNumber ); //Performance Ouch!
 	EndofFile = false;
 	Found = false;
 	NewHeading = false;
@@ -657,7 +666,5 @@ ReadINIFile(
 
 }
 
-} //CommandLineInterface namespace
-} //EnergyPlus namespace
-
-
+} // CommandLineInterface namespace
+} // EnergyPlus namespace

@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <HeatPumpWaterToWaterSimple.hh>
@@ -96,8 +96,8 @@ namespace HeatPumpWaterToWaterSimple {
 	// Update routine to check convergence and update nodes
 
 	// Object Data
-	FArray1D< GshpSpecs > GSHP;
-	FArray1D< ReportVars > GSHPReport;
+	Array1D< GshpSpecs > GSHP;
+	Array1D< ReportVars > GSHPReport;
 
 	// MODULE SUBROUTINES:
 
@@ -163,25 +163,23 @@ namespace HeatPumpWaterToWaterSimple {
 		if ( InitLoopEquip ) {
 			GSHPNum = FindItemInList( GSHPName, GSHP.Name(), NumGSHPs );
 			if ( GSHPNum != 0 ) { // if 0, fall through to next
-				{ auto const SELECT_CASE_var( GSHPTypeNum );
-				if ( SELECT_CASE_var == TypeOf_HPWaterEFCooling ) {
+				if ( GSHPTypeNum == TypeOf_HPWaterEFCooling ) {
 					MinCap = 0.0;
 					MaxCap = GSHP( GSHPNum ).RatedCapCool;
 					OptCap = GSHP( GSHPNum ).RatedCapCool;
-				} else if ( SELECT_CASE_var == TypeOf_HPWaterEFHeating ) {
+				} else if ( GSHPTypeNum == TypeOf_HPWaterEFHeating ) {
 					MinCap = 0.0;
 					MaxCap = GSHP( GSHPNum ).RatedCapHeat;
 					OptCap = GSHP( GSHPNum ).RatedCapHeat;
 				} else {
 					ShowFatalError( "SimHPWatertoWaterSimple: Module called with incorrect GSHPType=" + GSHPType );
-				}}
+				}
 				return;
 			}
 		}
 
 		// Calculate Demand on heat pump
-		TypeOfEquip: { auto const SELECT_CASE_var( GSHPTypeNum );
-		if ( SELECT_CASE_var == TypeOf_HPWaterEFCooling ) {
+		if ( GSHPTypeNum == TypeOf_HPWaterEFCooling ) {
 			if ( GSHPNum != 0 ) {
 				if ( LoopNum == GSHP( GSHPNum ).LoadLoopNum ) { // chilled water loop
 
@@ -197,7 +195,7 @@ namespace HeatPumpWaterToWaterSimple {
 			} else {
 				ShowFatalError( "SimHPWatertoWaterSimple:: Invalid " + HPEqFitCooling + ", Requested Unit=" + GSHPName );
 			}
-		} else if ( SELECT_CASE_var == TypeOf_HPWaterEFHeating ) {
+		} else if ( GSHPTypeNum == TypeOf_HPWaterEFHeating ) {
 			if ( GSHPNum != 0 ) {
 				if ( LoopNum == GSHP( GSHPNum ).LoadLoopNum ) { // chilled water loop
 
@@ -214,7 +212,7 @@ namespace HeatPumpWaterToWaterSimple {
 			}
 		} else {
 			ShowFatalError( "SimHPWatertoWaterSimple: Module called with incorrect GSHPType=" + GSHPType );
-		}} // TypeOfEquip
+		} // TypeOfEquip
 
 	}
 
@@ -267,8 +265,8 @@ namespace HeatPumpWaterToWaterSimple {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray( 5 ); // character string data
-		FArray1D< Real64 > NumArray( 15 ); // numeric data
+		Array1D_string AlphArray( 5 ); // character string data
+		Array1D< Real64 > NumArray( 15 ); // numeric data
 
 		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
@@ -422,9 +420,9 @@ namespace HeatPumpWaterToWaterSimple {
 	void
 	InitWatertoWaterHP(
 		int const GSHPTypeNum, // Type of GSHP
-		std::string const & GSHPName, // User Specified Name of GSHP
+		std::string const & EP_UNUSED( GSHPName ), // User Specified Name of GSHP
 		int const GSHPNum, // GSHP Number
-		bool const FirstHVACIteration,
+		bool const EP_UNUSED( FirstHVACIteration ),
 		Real64 const MyLoad // Demand Load
 	)
 	{
@@ -451,7 +449,6 @@ namespace HeatPumpWaterToWaterSimple {
 		// Oklahoma State University. (downloadable from http://www.hvac.okstate.edu/)
 
 		// Using/Aliasing
-		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataPlant::TypeOf_HPWaterEFCooling;
 		using DataPlant::TypeOf_HPWaterEFHeating;
@@ -478,11 +475,11 @@ namespace HeatPumpWaterToWaterSimple {
 		int LoadSideOutletNode; // Load Side Outlet Node
 		int SourceSideInletNode; // Source Side Inlet Node
 		int SourceSideOutletNode; // Source Side Outlet Node
-		static FArray1D_bool MyEnvrnFlag; // Flag required to keep track of initialization
+		static Array1D_bool MyEnvrnFlag; // Flag required to keep track of initialization
 		static bool OneTimeFlag( true ); // One Time Flag
 		static Real64 CurrentSimTime( 0.0 ); // Current Simulation Time
 		static Real64 PrevSimTime( 0.0 ); // Previous Simulation Time
-		static FArray1D_bool MyPlanScanFlag;
+		static Array1D_bool MyPlanScanFlag;
 		static bool MyOneTimeFlag( true );
 		int LoopNum;
 		int LoopSideNum;

@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -86,8 +86,8 @@ namespace DemandManager {
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	FArray1D< DemandManagerListData > DemandManagerList;
-	FArray1D< DemandManagerData > DemandMgr;
+	Array1D< DemandManagerListData > DemandManagerList;
+	Array1D< DemandManagerData > DemandMgr;
 
 	// MODULE SUBROUTINES:
 
@@ -362,8 +362,8 @@ namespace DemandManager {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray; // Character string data
-		FArray1D< Real64 > NumArray; // Numeric data
+		Array1D_string AlphArray; // Character string data
+		Array1D< Real64 > NumArray; // Numeric data
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		std::string Units; // String for meter units
@@ -592,8 +592,8 @@ namespace DemandManager {
 		int MaxNums; // Max number of elements in the numeric array
 		int NumParams; // Number of arguments total in an ObjectDef
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray; // Character string data
-		FArray1D< Real64 > NumArray; // Numeric data
+		Array1D_string AlphArray; // Character string data
+		Array1D< Real64 > NumArray; // Numeric data
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false );
@@ -1616,7 +1616,7 @@ namespace DemandManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

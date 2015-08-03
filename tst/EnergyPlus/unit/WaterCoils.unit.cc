@@ -23,6 +23,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <Psychrometrics.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -38,6 +39,7 @@ using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::FluidProperties;
+using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::SizingManager;
 using namespace EnergyPlus::WaterCoils;
 using namespace EnergyPlus::Psychrometrics;
@@ -73,6 +75,7 @@ public:
 		FinalSysSizing.allocate( 1 );
 		PrimaryAirSystem.allocate( 1 );
 		AirLoopControlInfo.allocate( 1 );
+		InitializePsychRoutines();
 	}
 
 	~WaterCoilsTest() // Reset global state
@@ -91,13 +94,15 @@ public:
 		SysSizPeakDDNum.clear();
 		PrimaryAirSystem.clear();
 		AirLoopControlInfo.clear();
+		cached_Twb.clear();
+		cached_Psat.clear();
 	}
 
 };
 
 TEST_F( WaterCoilsTest, WaterCoolingCoilSizing )
 {
-	InitializePsychRoutines( );
+	InitializePsychRoutines();
 	OutBaroPress = 101325.0;
 	StdRhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
 	ShowMessage( "Begin Test: WaterCoilsTest, WaterCoolingCoilSizing" );
@@ -114,7 +119,7 @@ TEST_F( WaterCoilsTest, WaterCoolingCoilSizing )
 	PlantSizData( 1 ).PlantLoopName = "WaterLoop";
 
 	// set up plant loop
-	for( int l = 1; l <= TotNumLoops; ++l ) {
+	for ( int l = 1; l <= TotNumLoops; ++l ) {
 		auto & loop( PlantLoop( l ) );
 		loop.LoopSide.allocate( 2 );
 		auto & loopside( PlantLoop( 1 ).LoopSide( 1 ) );

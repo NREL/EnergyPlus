@@ -2,7 +2,7 @@
 #define PackagedTerminalHeatPump_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -39,7 +39,7 @@ namespace PackagedTerminalHeatPump {
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	extern Real64 SupHeaterLoad; // load to be met by supplemental heater [W]
 	extern int NumPTHP; // total number of PTHP's
@@ -202,12 +202,12 @@ namespace PackagedTerminalHeatPump {
 		Real64 IdleMassFlowRate; // idle air flow rate
 		Real64 FanVolFlow; // fan volumetric flow rate
 		bool CheckFanFlow; // Supply airflow check
-		FArray1D< Real64 > HeatVolumeFlowRate; // Supply air volume flow rate during heating operation
-		FArray1D< Real64 > HeatMassFlowRate; // Supply air mass flow rate during heating operation
-		FArray1D< Real64 > CoolVolumeFlowRate; // Supply air volume flow rate during cooling operation
-		FArray1D< Real64 > CoolMassFlowRate; // Supply air mass flow rate during cooling operation
-		FArray1D< Real64 > MSHeatingSpeedRatio; // Fan speed ratio in heating mode
-		FArray1D< Real64 > MSCoolingSpeedRatio; // Fan speed ratio in cooling mode
+		Array1D< Real64 > HeatVolumeFlowRate; // Supply air volume flow rate during heating operation
+		Array1D< Real64 > HeatMassFlowRate; // Supply air mass flow rate during heating operation
+		Array1D< Real64 > CoolVolumeFlowRate; // Supply air volume flow rate during cooling operation
+		Array1D< Real64 > CoolMassFlowRate; // Supply air mass flow rate during cooling operation
+		Array1D< Real64 > MSHeatingSpeedRatio; // Fan speed ratio in heating mode
+		Array1D< Real64 > MSCoolingSpeedRatio; // Fan speed ratio in cooling mode
 		int CompSpeedNum;
 		Real64 CompSpeedRatio;
 		int ErrIndexCyc;
@@ -465,12 +465,12 @@ namespace PackagedTerminalHeatPump {
 			Real64 const IdleMassFlowRate, // idle air flow rate
 			Real64 const FanVolFlow, // fan volumetric flow rate
 			bool const CheckFanFlow, // Supply airflow check
-			FArray1< Real64 > const & HeatVolumeFlowRate, // Supply air volume flow rate during heating operation
-			FArray1< Real64 > const & HeatMassFlowRate, // Supply air mass flow rate during heating operation
-			FArray1< Real64 > const & CoolVolumeFlowRate, // Supply air volume flow rate during cooling operation
-			FArray1< Real64 > const & CoolMassFlowRate, // Supply air mass flow rate during cooling operation
-			FArray1< Real64 > const & MSHeatingSpeedRatio, // Fan speed ratio in heating mode
-			FArray1< Real64 > const & MSCoolingSpeedRatio, // Fan speed ratio in cooling mode
+			Array1< Real64 > const & HeatVolumeFlowRate, // Supply air volume flow rate during heating operation
+			Array1< Real64 > const & HeatMassFlowRate, // Supply air mass flow rate during heating operation
+			Array1< Real64 > const & CoolVolumeFlowRate, // Supply air volume flow rate during cooling operation
+			Array1< Real64 > const & CoolMassFlowRate, // Supply air mass flow rate during cooling operation
+			Array1< Real64 > const & MSHeatingSpeedRatio, // Fan speed ratio in heating mode
+			Array1< Real64 > const & MSCoolingSpeedRatio, // Fan speed ratio in cooling mode
 			int const CompSpeedNum,
 			Real64 const CompSpeedRatio,
 			int const ErrIndexCyc,
@@ -620,7 +620,7 @@ namespace PackagedTerminalHeatPump {
 	struct PTUnitNumericFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		PTUnitNumericFieldData()
@@ -628,15 +628,15 @@ namespace PackagedTerminalHeatPump {
 
 		// Member Constructor
 		PTUnitNumericFieldData(
-			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
 			) :
 			FieldNames(FieldNames)
 		{}
 	};
 
 	// Object Data
-	extern FArray1D< PTUnitData > PTUnit;
-	extern FArray1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds PT unit numeric input fields character field name
+	extern Array1D< PTUnitData > PTUnit;
+	extern Array1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds PT unit numeric input fields character field name
 
 	// Functions
 
@@ -720,19 +720,19 @@ namespace PackagedTerminalHeatPump {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		FArray1< Real64 > const & Par // Par(5) is the requested coil load
+		Array1< Real64 > const & Par // Par(5) is the requested coil load
 	);
 
 	Real64
 	SupSATResidual(
 		Real64 & TempSupHeater, // supplemental heater load at maximum SAT
-		FArray1< Real64 > const & Par // par(1) = PTUnitNum
+		Array1< Real64 > const & Par // par(1) = PTUnitNum
 	);
 
 	Real64
 	PLRResidual(
 		Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = PTUnitNum
+		Array1< Real64 > const & Par // par(1) = PTUnitNum
 	);
 
 	void
@@ -810,7 +810,7 @@ namespace PackagedTerminalHeatPump {
 	Real64
 	VSHPCyclingResidual(
 		Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = FurnaceNum
+		Array1< Real64 > const & Par // par(1) = FurnaceNum
 	);
 
 	//******************************************************************************
@@ -818,7 +818,7 @@ namespace PackagedTerminalHeatPump {
 	Real64
 	VSHPSpeedResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = MSHPNum
+		Array1< Real64 > const & Par // par(1) = MSHPNum
 	);
 
 	//******************************************************************************
@@ -866,7 +866,7 @@ namespace PackagedTerminalHeatPump {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

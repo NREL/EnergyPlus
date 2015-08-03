@@ -6,9 +6,9 @@ set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} 
 
 set( CMAKE_VERSION_MAJOR 8 )
 set( CMAKE_VERSION_MINOR 3 )
-set( CMAKE_VERSION_PATCH 1 ) 
+set( CMAKE_VERSION_PATCH 4 )
 
-set( PREV_RELEASE_SHA "e53a815" )
+set( PREV_RELEASE_SHA "6d97d07" )
 
 set( ENERGYPLUS_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}" )
 
@@ -45,6 +45,17 @@ set(CPACK_PACKAGE_CONTACT "Kyle Benne <Kyle.Benne@nrel.gov>")
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
+option( BUILD_VALIDATION_REPORTS "Build validation reports" OFF )
+option( BUILD_DOCS "Build markdown based documentation" OFF )
+
+if (BUILD_DOCS)
+  option( BUILD_MONOLITHIC_ENGINEERINGREFERENCE  "Build all-in-one EngineeringReference (has caveats)" ON )
+
+  if (BUILD_PACKAGE)
+    option( PACKAGE_BUILT_DOCS "Add built docs to package" OFF )
+  endif()
+endif()
+
 # Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
 # Turn this option OFF for automated testing.
 option( ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON )
@@ -91,7 +102,7 @@ if( UNIX AND NOT APPLE )
   set(CMAKE_INSTALL_RPATH "$ORIGIN")
 endif()
 
-if (MSVC)
+if ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) )
   if (CMAKE_C_COMPILER_VERSION VERSION_LESS "18.00.30723")
     message(FATAL_ERROR "Visual Studio 2013 Update 3 or Greater Required")
   endif()
@@ -128,6 +139,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
 INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/CLI/ )
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/jsoncpp)
 
 if( BUILD_TESTING )
   option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
@@ -146,6 +158,7 @@ ADD_SUBDIRECTORY(third_party/DElight)
 IF(NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
 ENDIF()
+ADD_SUBDIRECTORY(third_party/jsoncpp)
 
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
@@ -154,6 +167,7 @@ if( BUILD_TESTING )
   ADD_SUBDIRECTORY(third_party/gtest)
   ADD_SUBDIRECTORY(testfiles)
   ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
+  ADD_SUBDIRECTORY(tst/jsoncpp/unit)
 endif()
 
 if( BUILD_FORTRAN )
@@ -167,15 +181,18 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/ParametricPreprocessor PROJECT ParametricPreprocessor NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/Slab PROJECT Slab NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ConvertESOMTR PROJECT ConvertESOMTR NO_EXTERNAL_INSTALL )
+  cmake_add_fortran_subdirectory(src/CalcSoilSurfTemp PROJECT CalcSoilSurfTemp NO_EXTERNAL_INSTALL )
 endif()
 
 configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" )
+configure_file( idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd" )
+configure_file( idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd" )
 
 if( BUILD_PACKAGE )
   set(CPACK_INSTALL_CMAKE_PROJECTS
     "${CMAKE_BINARY_DIR};EnergyPlus;ALL;/"
   )
-  
+
   if( BUILD_FORTRAN )
     list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ExpandObjects/;ExpandObjects;ALL;/")
     list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ReadVars/;ReadVars;ALL;/")
@@ -185,6 +202,7 @@ if( BUILD_PACKAGE )
     list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ParametricPreprocessor/;ParametricPreprocessor;ALL;/")
     list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/Slab/;Slab;ALL;/")
     list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ConvertESOMTR/;ConvertESOMTR;ALL;/")
+    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/CalcSoilSurfTemp/;CalcSoilSurfTemp;ALL;/")
   endif()
 
   include(cmake/Install.cmake)
@@ -192,7 +210,7 @@ endif()
 
 
 set(OPTIMIZABLE_TARGETS
-  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight energyplus energyplusapi energypluslib energypluslib2 
+  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight energyplus energyplusapi energypluslib energypluslib2
     )
 if(NOT APPLE AND NOT MSVC)
   list(APPEND OPTIMIZABLE_TARGETS parser)
@@ -205,7 +223,7 @@ endif()
 if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
   get_filename_component(LINKER_DIR "${CMAKE_LINKER}" PATH)
   get_filename_component(LINKER_DIR_NAME "${LINKER_DIR}" NAME)
-  
+
   if (MSVC12)
     set(PGORTVER "120")
   elseif(MSVC14)
@@ -213,7 +231,7 @@ if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
   endif()
 
   message("Examining ${LINKER_DIR_NAME} for PGO RT DLL")
-  
+
   if ("${LINKER_DIR_NAME}" MATCHES ".*amd64.*")
     get_filename_component(LINKER_PARENT_DIR "${LINKER_DIR}" PATH)
     set(PGORTDIR "${LINKER_PARENT_DIR}/amd64")
@@ -221,7 +239,7 @@ if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
   else()
     set(PGORTDIR "${LINKER_DIR}")
   endif()
-  
+
   file(COPY "${PGORTDIR}/pgort${PGORTVER}.dll" DESTINATION "${CMAKE_BINARY_DIR}/Products/Release" )
 
   foreach(target ${OPTIMIZABLE_TARGETS})
@@ -233,7 +251,7 @@ if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
     if(targ_link_flags STREQUAL "targ_link_flags-NOTFOUND")
       set(targ_link_flags "")
     endif()
-    
+
     if(targ_static_link_flags STREQUAL "targ_static_link_flags-NOTFOUND")
       set(targ_static_link_flags "")
     endif()
@@ -245,7 +263,7 @@ if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
     if (ENABLE_LTO OR PROFILE_GENERATE OR PROFILE_USE)
       set(targ_compile_flags "${targ_compile_flags} /GL")
     endif()
-    
+
     if(ENABLE_LTO AND NOT PROFILE_GENERATE AND NOT PROFILE_USE)
       set(targ_link_flags "${targ_link_flags} /LTCG")
       set(targ_static_link_flags "${targ_static_link_flags} /LTCG")
@@ -261,7 +279,7 @@ if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
       set(targ_static_link_flags "${targ_static_link_flags} /LTCG")
     endif()
 
-    set_target_properties(${target} PROPERTIES LINK_FLAGS "${targ_link_flags}" STATIC_LIBRARY_FLAGS "${targ_static_link_flags}" 
+    set_target_properties(${target} PROPERTIES LINK_FLAGS "${targ_link_flags}" STATIC_LIBRARY_FLAGS "${targ_static_link_flags}"
        COMPILE_FLAGS "${targ_compile_flags}")
 
   endforeach()
@@ -298,7 +316,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # Clang
 
   if (PROFILE_GENERATE)
     set_target_properties(${OPTIMIZABLE_TARGETS}
-      PROPERTIES LINK_FLAGS "-fprofile-instr-generate" COMPILE_FLAGS "-fprofile-instr-generate") 
+      PROPERTIES LINK_FLAGS "-fprofile-instr-generate" COMPILE_FLAGS "-fprofile-instr-generate")
   endif()
 
   if (PROFILE_USE)
@@ -311,8 +329,26 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # Clang
       PROPERTIES LINK_FLAGS "-flto -fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata" COMPILE_FLAGS "-flto -fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata")
   endif()
 
- 
+
 endif()
 
 
+
+if (BUILD_VALIDATION_REPORTS)
+  include(ExternalProject)
+  ExternalProject_Add(ValidationReports
+    DEPENDS energyplus ReadVarsESO Basement Slab
+    GIT_REPOSITORY git://github.com/NREL/EnergyPlusValidationReports
+    GIT_TAG master
+    CMAKE_CACHE_ARGS
+      -DENERGYPLUS_PATH:PATH=${CMAKE_BINARY_DIR}
+      -DENERGYPLUS_VERSION:STRING=${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}
+    INSTALL_COMMAND ""
+    )
+endif()
+
+
+if (BUILD_DOCS)
+  add_subdirectory(doc/src)
+endif()
 

@@ -136,7 +136,7 @@ namespace DataGlobals {
 	extern int KindOfSim; // See parameters. (ksDesignDay, ksRunPeriodDesign, ksRunPeriodWeather)
 	extern bool DoOutputReporting; // TRUE if variables to be written out
 	extern bool DoingSizing; // TRUE when "sizing" is being performed (some error messages won't be displayed)
-	extern bool DoingHVACSizingSimulations; // true when HVAC Sizing Simulations are being performed. 
+	extern bool DoingHVACSizingSimulations; // true when HVAC Sizing Simulations are being performed.
 	extern bool DoingInputProcessing; // TRUE when "IP" is being performed (some error messages are cached)
 	extern bool DisplayAllWarnings; // True when selection for  "DisplayAllWarnings" is entered (turns on other warning flags)
 	extern bool DisplayExtraWarnings; // True when selection for  "DisplayExtraWarnings" is entered
@@ -171,6 +171,11 @@ namespace DataGlobals {
 	extern int Progress;
 	extern void ( *fProgressPtr )( int const );
 	extern void ( *fMessagePtr )( std::string const & );
+
+	// Clears the global data in DataGlobals.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 } // DataGlobals
 

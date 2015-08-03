@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -48,7 +48,7 @@ protected: // Creation
 	// Name Constructor
 	inline
 	explicit
-	Stream( Name name = Name() ) :
+	Stream( Name const & name = Name() ) :
 	 name_( stripped_whitespace( name ) )
 	{
 		flags_.name( name_ );
@@ -56,7 +56,7 @@ protected: // Creation
 
 	// Name + Flags Constructor
 	inline
-	Stream( Name name, IOFlags flags ) :
+	Stream( Name const & name, IOFlags const & flags ) :
 	 name_( stripped_whitespace( name ) ),
 	 flags_( flags )
 	{
