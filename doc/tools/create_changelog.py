@@ -60,7 +60,7 @@ pr_tokens = [x.split(' ')[7] for x in log_merge_prs]
 pr_numbers = sorted([x[1:] for x in pr_tokens])
 
 # create and initialize the master array, with known keys plus an "Unknown" key
-ValidPRTypes = ['Defect', 'NewFeature', 'Performance', 'DoNotPublish']
+ValidPRTypes = ['Defect', 'NewFeature', 'Performance', 'Refactoring', 'DoNotPublish']
 PRS = {'Unknown': []}
 for valid_pr_type in ValidPRTypes:
     PRS[valid_pr_type] = []
@@ -111,6 +111,7 @@ with io.open(md_file, 'w') as f:
     out_pr_class('NewFeature', 'New Features')
     out_pr_class('Performance', 'Performance Enhancements')
     out_pr_class('Defect', 'Defects Repaired')
+    out_pr_class('Refactoring', 'Under the Hood Restructuring')
     if debug:
         out_pr_class('Unknown', 'Other-DevelopersFixPlease')
 
@@ -149,6 +150,7 @@ with io.open(html_file, 'w') as f2:
     out_pr_class('NewFeature', 'New Features')
     out_pr_class('Performance', 'Performance Enhancements')
     out_pr_class('Defect', 'Defects Repaired')
+    out_pr_class('Refactoring', 'Under the Hood Restructuring')
     out('</body>')
     out('</html>')
 
