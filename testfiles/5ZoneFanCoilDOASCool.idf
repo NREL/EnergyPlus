@@ -218,7 +218,7 @@ SizingPeriod:DesignDay,
 
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
-RunPeriod,
+ RunPeriod,
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
@@ -230,8 +230,7 @@ RunPeriod,
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
-
-
+    
 !-   ===========  ALL OBJECTS IN CLASS: SITE:GROUNDTEMPERATURE:BUILDINGSURFACE ===========
 
 Site:GroundTemperature:BuildingSurface,21.5,21.4,21.5,21.5,22.0,22.9,23.0,23.1,23.1,22.2,21.7,21.6;
@@ -1883,13 +1882,6 @@ DesignSpecification:ZoneAirDistribution,
     1;                       !- Zone Air Distribution Effectiveness in Heating Mode {dimensionless}
 
 
-!-   ===========  ALL OBJECTS IN CLASS: SIZING:PARAMETERS ===========
-
-Sizing:Parameters,
-    1.2,                     !- Heating Sizing Factor
-    1.2;                     !- Cooling Sizing Factor
-
-
 !-   ===========  ALL OBJECTS IN CLASS: SIZING:ZONE ===========
 
 Sizing:Zone,
@@ -1918,8 +1910,8 @@ Sizing:Zone,
     SZ DSZAD SPACE1-1,       !- Design Specification Zone Air Distribution Object Name
     Yes,                     !- Account for Dedicated Outside Air System
     ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
-    12.2,                    !- Dedicated Outside Air Low Setpoint for Design
-    14.4;                    !- Dedicated Outside Air High Setpoint for Design
+    12.8,                    !- Dedicated Outside Air Low Setpoint for Design
+    15.6;                    !- Dedicated Outside Air High Setpoint for Design
 
 Sizing:Zone,
     SPACE2-1,                !- Zone or ZoneList Name
@@ -1947,8 +1939,8 @@ Sizing:Zone,
     SZ DSZAD SPACE2-1,       !- Design Specification Zone Air Distribution Object Name
     Yes,                     !- Account for Dedicated Outside Air System
     ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
-    12.2,                    !- Dedicated Outside Air Low Setpoint for Design
-    14.4;                    !- Dedicated Outside Air High Setpoint for Design
+    12.8,                    !- Dedicated Outside Air Low Setpoint for Design
+    15.6;                    !- Dedicated Outside Air High Setpoint for Design
 
 Sizing:Zone,
     SPACE3-1,                !- Zone or ZoneList Name
@@ -1976,8 +1968,8 @@ Sizing:Zone,
     SZ DSZAD SPACE3-1,       !- Design Specification Zone Air Distribution Object Name
     Yes,                     !- Account for Dedicated Outside Air System
     ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
-    12.2,                    !- Dedicated Outside Air Low Setpoint for Design
-    14.4;                    !- Dedicated Outside Air High Setpoint for Design
+    12.8,                    !- Dedicated Outside Air Low Setpoint for Design
+    15.6;                    !- Dedicated Outside Air High Setpoint for Design
 
 Sizing:Zone,
     SPACE4-1,                !- Zone or ZoneList Name
@@ -2005,8 +1997,8 @@ Sizing:Zone,
     SZ DSZAD SPACE4-1,       !- Design Specification Zone Air Distribution Object Name
     Yes,                     !- Account for Dedicated Outside Air System
     ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
-    12.2,                    !- Dedicated Outside Air Low Setpoint for Design
-    14.4;                    !- Dedicated Outside Air High Setpoint for Design
+    12.8,                    !- Dedicated Outside Air Low Setpoint for Design
+    15.6;                    !- Dedicated Outside Air High Setpoint for Design
 
 Sizing:Zone,
     SPACE5-1,                !- Zone or ZoneList Name
@@ -2034,8 +2026,8 @@ Sizing:Zone,
     SZ DSZAD SPACE5-1,       !- Design Specification Zone Air Distribution Object Name
     Yes,                     !- Account for Dedicated Outside Air System
     ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
-    12.2,                    !- Dedicated Outside Air Low Setpoint for Design
-    14.4;                    !- Dedicated Outside Air High Setpoint for Design
+    12.8,                    !- Dedicated Outside Air Low Setpoint for Design
+    15.6;                    !- Dedicated Outside Air High Setpoint for Design
 
 
 !-   ===========  ALL OBJECTS IN CLASS: SIZING:SYSTEM ===========
@@ -2476,7 +2468,7 @@ ZoneHVAC:EquipmentConnections,
 
 Fan:VariableVolume,
     DOAS Supply Fan,         !- Name
-    OCCUPY-1,                !- Availability Schedule Name
+    FanAvailSched,                !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
     1000,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
@@ -3979,7 +3971,7 @@ CondenserEquipmentOperationSchemes,
 
 AvailabilityManager:Scheduled,
     DOAS Availability,       !- Name
-    OCCUPY-1;                !- Schedule Name
+    FanAvailSched;                !- Schedule Name
 
 
 !-   ===========  ALL OBJECTS IN CLASS: AVAILABILITYMANAGERASSIGNMENTLIST ===========
@@ -3993,27 +3985,27 @@ AvailabilityManagerAssignmentList,
 !-   ===========  ALL OBJECTS IN CLASS: SETPOINTMANAGER:SCHEDULED ===========
 
 SetpointManager:Scheduled,
-    DOAS Cooling Supply Air Temp Manager,  !- Name
-    Temperature,             !- Control Variable
-    HVACTemplate-Always 12.8,!- Schedule Name
-    DOAS Supply Fan Outlet;  !- Setpoint Node or NodeList Name
-
-! NOTE:  Heating supply air setpoint is placed on Supply Path Inlet node to allow separate heating and cooling setpoints.
-! SetpointManager:MixedAir <system name> Heating Coil Air Temp Manager adjusts this setpoint for fan heat and places it on the Heating Coil Outlet
-SetpointManager:Scheduled,
-    DOAS Heating Supply Air Temp Manager,  !- Name
-    Temperature,             !- Control Variable
-    HVACTemplate-Always 12.2,!- Schedule Name
-    DOAS Supply Path Inlet;  !- Setpoint Node or NodeList Name
-
-SetpointManager:Scheduled,
     Chilled Water Loop CndW Temp Manager,  !- Name
     Temperature,             !- Control Variable
     HVACTemplate-Always 29.4,!- Schedule Name
     Chilled Water Loop CndW Supply Setpoint Nodes;  !- Setpoint Node or NodeList Name
-
+    
+SetpointManager:Scheduled,
+    DOAS Heating Supply Air Temp Manager,
+    Temperature,
+    HVACTemplate-Always 12.2,
+    DOAS Supply Path Inlet;
 
 !-   ===========  ALL OBJECTS IN CLASS: SETPOINTMANAGER:OUTDOORAIRRESET ===========
+
+SetpointManager:OutdoorAirReset,
+    DOAS Cooling Supply Air Temp Manager, !- Name
+    Temperature,  !- Control Variable
+    18.3,                    !- Setpoint at Outdoor Low Temperature {C}
+    4.4,                    !- Outdoor Low Temperature (C)
+    12.8,                    !- Setpoint at Outdoor High Temperature (C)
+    26.7,                    !- Outdoor High Temperature (C)
+    DOAS Supply Fan Outlet;  !- Setpoint Node or NodeList Name
 
 SetpointManager:OutdoorAirReset,
     Hot Water Loop HW Temp Manager,  !- Name
@@ -4139,7 +4131,8 @@ Output:Surfaces:Drawing,dxf;
 
 
 Output:Table:SummaryReports,
-    AllSummary;              !- Report 1 Name
+    AllSummary,
+    ZoneComponentLoadSummary;
 
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUTCONTROL:TABLE:STYLE ===========
@@ -4151,17 +4144,11 @@ OutputControl:Table:Style,
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLE ===========
 
 Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
+Output:Variable,*,Site Outdoor Air Relative Humidity,hourly;
 Output:Variable,*,Zone Air Temperature,hourly;
+Output:Variable,*,Zone Air Relative Humidity,hourly;
 Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
 Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
-Output:Variable,*,Zone Mean Air Temperature,hourly;
-Output:Variable,*,Zone Mean Radiant Temperature,hourly;
-Output:Variable,*,Zone Operative Temperature,hourly;
-Output:Variable,*,Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time,hourly;
-Output:Variable,*,Zone Air Humidity Ratio,hourly;
-Output:Variable,*,Zone Air Relative Humidity,hourly;
-Output:Variable,*,Zone Heating Setpoint Not Met While Occupied Time,hourly;
-Output:Variable,*,Zone Cooling Setpoint Not Met While Occupied Time,hourly;
 Output:Variable,*,Heating Coil Heating Rate,hourly;
 Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
 Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly;
