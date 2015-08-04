@@ -17,6 +17,7 @@ set( test_src
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
+  DemandResponse.unit.cc
   DXCoils.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
@@ -57,6 +58,7 @@ set( test_src
   WaterCoils.unit.cc
   WaterThermalTanks.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
+  ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc
 )

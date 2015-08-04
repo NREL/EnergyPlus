@@ -383,7 +383,7 @@ Contains the sensible-instant, sensible-delay, sensible-return air, latent, tota
 
 - Heating Peak Conditions
 
-An intermediate calculation in the estimation of the sensible-delayed colum is the decay curves that are shown in the *Radiant to Convective Decay Curve* subtables. A decay curve is created for each surface in the zone.
+Contains the time of the peak load and the outside dry bulb and wet bulb temperatures as well as the outside humidity ratio for that time. It also shows the zone temperature and the relative humidity and humidity ratio for that time.
 
 #### Standard 62.1 Summary
 

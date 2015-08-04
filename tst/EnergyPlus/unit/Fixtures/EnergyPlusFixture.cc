@@ -14,6 +14,8 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -58,6 +60,8 @@ namespace EnergyPlus {
 		DataIPShortCuts::clear_state();
 		DataOutputs::clear_state();
 		DataSurfaces::clear_state();
+		DataZoneControls::clear_state();
+		ExteriorEnergyUse::clear_state();
 		HeatBalanceManager::clear_state();
 		InputProcessor::clear_state();
 		OutputProcessor::clear_state();
@@ -335,8 +339,14 @@ namespace EnergyPlus {
 			idd_stream = std::unique_ptr<std::istringstream>( new std::istringstream( idd ) );
 		} else {
 			static auto const exeDirectory = FileSystem::getParentDirectoryPath( FileSystem::getAbsolutePath( FileSystem::getProgramPath() ) );
-			static auto const idd_location = exeDirectory + "Energy+.idd";
-			static auto const file_exists = FileSystem::fileExists( idd_location );
+			static auto idd_location = exeDirectory + "Energy+.idd";
+			static auto file_exists = FileSystem::fileExists( idd_location );
+
+			if ( ! file_exists ) {
+				// Energy+.idd is in parent Products folder instead of Debug/Release/RelWithDebInfo/MinSizeRel folder of exe
+				idd_location = FileSystem::getParentDirectoryPath( exeDirectory ) + "Energy+.idd";
+				file_exists = FileSystem::fileExists( idd_location );
+			}
 
 			if ( ! file_exists ) {
 				EXPECT_TRUE( file_exists ) << 
