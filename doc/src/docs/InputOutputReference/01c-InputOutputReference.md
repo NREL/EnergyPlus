@@ -7430,7 +7430,7 @@ This field allows the user to specify the coil operating options as one of the f
 
 #### Field: Supply Air Fan Operating Mode Schedule Name
 
-This field is a schedule name (ref: Schedule) that determines the operating modes of the unit heater’s On:Off fan. A schedule value of 0 indicates cycling fan operation (fan cycles with cooling/heating coil). A schedule value greater than 0 (usually 1 is used) indicates constant fan operation (fan runs continually regardless of the coils operation). If this input field is left blank, then the operating mode of the On:Off fan type defaults to cycling operation.
+This field is a schedule name (ref: Schedule) that determines the operating modes of the unit ventilator’s On:Off fan. A schedule value of 0 indicates cycling fan operation (fan cycles with cooling/heating coil). A schedule value greater than 0 (usually 1 is used) indicates constant fan operation (fan runs continually regardless of the coils operation). If this input field is left blank, then the operating mode of the On:Off fan type defaults to cycling operation.
 
 #### Field: Heating Coil Object Type
 
