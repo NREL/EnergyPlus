@@ -493,6 +493,21 @@ namespace OutputProcessor {
 
 	}
 
+
+	void 
+	SetTimeValueMinutes( Real64 minuteZone, Real64 minuteHVAC )
+	{
+		// set the current minute variables for this array which is an anonymous namespace and so cannot be accessed from other files
+		TimeValue( 1 ).CurMinute = minuteZone;
+		TimeValue( 2 ).CurMinute = minuteHVAC;
+	}
+
+	void 
+	SetOutputProcessorReportNumberCounter( int curReportNumberCounter )
+	{
+		ReportNumberCounter = curReportNumberCounter;
+	}
+
 	void
 	CheckReportVariable(
 		std::string const & KeyedValue, // Associated Key for this variable

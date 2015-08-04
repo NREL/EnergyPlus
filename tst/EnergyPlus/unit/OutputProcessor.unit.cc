@@ -14,6 +14,8 @@
 #include <map>
 
 using namespace EnergyPlus::PurchasedAirManager;
+using namespace EnergyPlus::WeatherManager;
+using namespace EnergyPlus::OutputProcessor;
 
 namespace EnergyPlus {
 
@@ -3170,13 +3172,17 @@ namespace EnergyPlus {
 				"12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 			} ) );
 
+			TimeValue.deallocate(); 
 		}
 
 		TEST_F( EnergyPlusFixture, OutputProcessor_ResetAccumulationWhenWarmupComplete )
 		{
 			std::string const idf_objects = delimited_string( {
+				"Version,8.3;",
 				"Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,detailed;",
 				"Output:Meter:MeterFileOnly,DistrictHeating:HVAC,detailed;",
+				"Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,runperiod;",
+				"Output:Meter:MeterFileOnly,DistrictHeating:HVAC,r;",
 			} );
 
 			ASSERT_FALSE( process_idf( idf_objects ) );
@@ -3211,32 +3217,96 @@ namespace EnergyPlus {
 			if ( DataEnvironment::DayOfMonth == WeatherManager::EndDayOfMonth( DataEnvironment::Month ) ) {
 				DataEnvironment::EndMonthFlag = true;
 			}
-			TimeValue.allocate( 2 );
+			TimeValue.allocate( 2 );  // should this be commented out since belong to anonymous namespace in different file?
 			auto timeStep = 1.0 / 6;
 			SetupTimePointers( "Zone", timeStep );
 			SetupTimePointers( "HVAC", timeStep );
-			TimeValue( 1 ).CurMinute = 50;
-			TimeValue( 2 ).CurMinute = 50;
+
+			SetTimeValueMinutes( 10, 10 );
 
 
 			DataGlobals::WarmupFlag = true;
 
+			SetOutputProcessorReportNumberCounter( 0 );
+			ReportOutputFileHeaders();
+
 			PurchAir( 1 ).TotHeatEnergy = 1.1;
-
 			UpdateMeterReporting();
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
 
+			PurchAir( 1 ).TotHeatEnergy = 1.3;
+			UpdateMeterReporting();
 			UpdateDataandReport( DataGlobals::HVACTSReporting );
+
+			PurchAir( 1 ).TotHeatEnergy = 1.5;
+			UpdateMeterReporting();
 			UpdateDataandReport( DataGlobals::HVACTSReporting );
+
+			PurchAir( 1 ).TotHeatEnergy = 1.7;
+			UpdateMeterReporting();
 			UpdateDataandReport( DataGlobals::HVACTSReporting );
+
+			PurchAir( 1 ).TotHeatEnergy = 1.9;
+			UpdateMeterReporting();
 			UpdateDataandReport( DataGlobals::HVACTSReporting );
+
+			PurchAir( 1 ).TotHeatEnergy = 2.2;
+			UpdateMeterReporting();
 			UpdateDataandReport( DataGlobals::HVACTSReporting );
-			UpdateDataandReport( DataGlobals::HVACTSReporting );
-			UpdateDataandReport( DataGlobals::HVACTSReporting );
+
+			DataGlobals::WarmupFlag = false;
+
+			PurchAir( 1 ).TotHeatEnergy = 2.4;
+			UpdateMeterReporting();
+			UpdateDataandReport( DataGlobals::ZoneTSReporting ); //zone timestep              
+
 
 			compare_eso_stream( delimited_string( {
-				"1,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+				"1,1,,Zone Ideal Loads Supply Air Total Heating Energy [J] !Each Call",
+				"32,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+				"2,365,12,31, 0,24,10.00,20.00,Tuesday",
+				"1,1.1",
+				"2,365,12,31, 0,24,20.00,30.00,Tuesday",
+				"1,1.3",
+				"2,365,12,31, 0,24,30.00,40.00,Tuesday",
+				"1,1.5",
+				"2,365,12,31, 0,24,40.00,50.00,Tuesday",
+				"1,1.7",
+				"2,365,12,31, 0,24,50.00,60.00,Tuesday",
+				"1,1.9",
+				"2,365,12,31, 0,24,60.00,70.00,Tuesday",
+				"1,2.2",
+				"5,365",
+				"32,9.7,1.1,12,31,24,20,2.2,12,31,24,70",
 			} ) );
 
+
+			// must call the function twice to perform reset
+			DataGlobals::WarmupFlag = true;
+			ResetAccumulationWhenWarmupComplete( DataGlobals::WarmupFlag );
+			DataGlobals::WarmupFlag = false;
+			ResetAccumulationWhenWarmupComplete( DataGlobals::WarmupFlag );
+
+			PurchAir( 1 ).TotHeatEnergy = 100.0;
+			UpdateMeterReporting();
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
+
+			PurchAir( 1 ).TotHeatEnergy = 200.0;
+			UpdateMeterReporting();
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
+			
+			PurchAir( 1 ).TotHeatEnergy = 300.0;
+			UpdateMeterReporting();
+			UpdateDataandReport( DataGlobals::ZoneTSReporting ); //zone timestep              
+
+			compare_eso_stream( delimited_string( {
+				"2,365,12,31, 0,24, 0.00,10.00,Tuesday",
+				"1,100.",
+				"2,365,12,31, 0,24,10.00,20.00,Tuesday",
+				"1,200.",
+				"5,365",
+				"32,300.,100.,12,31,24,10,200.,12,31,24,20",
+			} ) );
 
 
 			PurchAir.deallocate();

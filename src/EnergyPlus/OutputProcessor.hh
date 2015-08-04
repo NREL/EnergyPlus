@@ -918,6 +918,12 @@ namespace OutputProcessor {
 	);
 
 	void
+	SetTimeValueMinutes( Real64 minuteZone, Real64 minuteHVAC );
+
+	void
+	SetOutputProcessorReportNumberCounter( int curReportNumberCounter );
+
+	void
 	CheckReportVariable(
 		std::string const & KeyedValue, // Associated Key for this variable
 		std::string const & VarName // String Name of variable (without units)
