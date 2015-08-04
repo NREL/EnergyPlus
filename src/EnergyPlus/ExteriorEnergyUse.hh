@@ -42,6 +42,11 @@ namespace ExteriorEnergyUse {
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>
 
+	// Clears the global data in ExteriorEnergyUse.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+	
 	// Name Public routines, optionally name Private routines within this module
 
 	// Types
