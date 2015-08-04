@@ -78,7 +78,6 @@ namespace TARCOGGasses90 {
 
 		// Locals
 
-		static Real64 const sqrt_2( std::sqrt( 2.0 ) );
 		static Real64 const two_sqrt_2( 2.0 * std::sqrt( 2.0 ) );
 		static Array1D< Real64 > fvis( maxgas );
 		static Array1D< Real64 > fcon( maxgas );
