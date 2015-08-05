@@ -19139,7 +19139,7 @@ Demand limiting controls shut off or reduce the power to non-essential loads in 
 
 - turn on generators to meet some or all of the building's demand.
 
-The demand limiting controls implemented in EnergyPlus are intended to allow some of the more common demand limiting strategies. Currently, only Exterior:Lights, Lights, ElectricEquipment, and ZoneControl:Thermostat objects can be demand limited. Additional components will be demand limited in future releases.
+The demand limiting controls implemented in EnergyPlus are intended to allow some of the more common demand limiting strategies. Currently, only Exterior:Lights, Lights, ElectricEquipment, ZoneControl:Thermostat, and Controller:OutdoorAir objects can be demand limited. Additional components will be demand limited in future releases.
 
 ### DemandManagerAssignmentList
 
@@ -19581,6 +19581,75 @@ An example IDF showing how this object is used is provided below:
 ### DemandManager:Thermostats Outputs
 
 There are no output variables reported for the DemandManager:Thermostats object.
+
+
+### DemandManager:Ventilation
+
+The DemandManager:Ventilation object is used for limiting the ventilation rate calculated from the Controller:OutdoorAir object.
+
+#### Field: Name
+
+The name of the DemandManager:Ventilation object.
+
+#### Field: Availability Schedule Name
+
+The reference to the schedule object specifying the availability of this demand manager. A schedule value of zero indicates that this demand response (DR) is not applicable for that time period. A schedule greater than zero indicates that the demand response applies during the time period. If this field is blank, the schedule has values of one for all time period.
+
+#### Field: Limit Control
+
+This field specifies the type of limiting control. There are three options. The **FixedRate** option reduces the ventilation to a specified air flow rate. The **ReductionRatio** specifies the multiplier of the ventilation rate. The **Off** option disables the demand manager in the simulation.
+
+#### Field: Minimum Limit Duration
+
+The minimum amount of time [minutes] that the demand manager will continue to demand limit after being activated. This prevent loads from turning on and off every time step.
+
+#### Field: Fixed Rate
+
+This field specifies the amount of fixed ventilation rate when the demand manager is active and *FixedRate* limit control is applied. The unit is m3/s.
+
+#### Field: Reduction Ratio
+
+This field specifies the multiplier of the ventilation rate when the demand manager is active and *ReductionRatio* limit control is applied.
+
+#### Field: Limit Step Change
+
+NOT YET IMPLEMENTED.
+
+#### Field: Selection Control
+
+This field specifies which loads (ventilation rates) are selected to be limited. The **All** option simultaneously limits all of the loads listed in the demand manager. The **RotateMany** option limits all loads except for one which rotates sequentially through the loads listed. The **RotateOne** limits only one load which rotates sequentially through the loads listed. The time interval between rotations is set by the *Rotation Duration* field.
+
+#### Field: Rotation Duration
+
+If the **RotateOne** of **RotateMany** option is used for *Selection Control*, this field sets the time interval [minues] between rotations.
+
+#### Field: Controller Outdoor Air 1-10 Name
+
+The names of Controller:OutdoorAir objects defined elsewhere in the input file. These are the ventilation rates to be limited by this demand manager. Then objects are accommodated in the list by default. The IDD specification, however, is extensible and additional fields may be added by directly editing the IDD.
+
+An example IDF showing how this object is used is provided below:
+
+
+
+```idf
+   DemandManager:Ventilation,
+       Ventilation Manager,         !- Name
+       ,                            !- Availability Schedule Name
+       ReductionRatio,              !- Reset Control
+       60,                          !- Minimum Limit Duration {minutes}
+       ,                            !- Fixed Rate {m3/s}
+       0.5,                         !- Reduction Ratio
+       ,                            !- Limit Step Change
+       All,                         !- Selection Control
+       ,                            !- Rotation Duration {minutes}
+       OA Controller 1;             !- Controller:OutdoorAir Name
+```
+
+
+### DemandManager:Ventilation Outputs
+
+There are no output variables reported for the DemandManager:Ventilation object.
+
 
 Group -- Electric Load Center-Generator Specifications
 ------------------------------------------------------
