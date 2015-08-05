@@ -111,16 +111,16 @@ namespace Vectors {
 		edge0 = p( 1 ) - p( 0 );
 		edge1 = p( 2 ) - p( 0 );
 
-		edgex = edge0 * edge1;
-		nor = VecNormalize( edge0 * edge1 );
+		edgex = cross( edge0, edge1 );
+		nor = VecNormalize( edgex );
 
 		//  Initialize csum
 		csum = 0.0;
 
 		for ( i = 0; i <= n - 2; ++i ) {
-			csum += p( i ) * p( i + 1 );
+			csum += cross( p( i ), p( i + 1 ) );
 		}
-		csum += p( n - 1 ) * p( 0 );
+		csum += cross( p( n - 1 ), p( 0 ) );
 
 		areap = 0.5 * std::abs( dot( nor, csum ) );
 
@@ -342,7 +342,7 @@ namespace Vectors {
 
 		lcsx = x3a;
 		lcsz = NewellSurfaceNormalVector;
-		lcsy = lcsz * x3a;
+		lcsy = cross( lcsz, x3a );
 
 		//!!
 
@@ -352,13 +352,13 @@ namespace Vectors {
 		v1 = Surf( 1 ) - Surf( 2 );
 
 		//    Vec3d    v2 = cross(v0,v1);
-		v2 = v0 * v1;
+		v2 = cross( v0, v1 );
 		//    cs3[2] = norm(v2); // z
 		cs3_2 = VecNormalize( v2 );
 		//    cs3[0] = norm(v0); // x
 		cs3_0 = VecNormalize( v0 );
 		//    cs3[1] = cross(cs3[2],cs3[0]); // y
-		cs3_1 = cs3_2 * cs3_0;
+		cs3_1 = cross( cs3_2, cs3_0 );
 		//    Vec3d    z3 = cs3[2];
 		z3 = cs3_2;
 		//    double costheta = dot(z3,Ref_CS[2]);
@@ -369,7 +369,7 @@ namespace Vectors {
 			//    // azimuth
 			//    Vec3d    x2 = cross(Ref_CS[2],z3); // order is important; x2 = x1
 			//    RotAng[0] = ATAN2(dot(x2,Ref_CS[1]),dot(x2,Ref_CS[0]));
-			x2 = ZUnit * z3;
+			x2 = cross( ZUnit, z3 );
 			rotang_0 = std::atan2( dot( x2, YUnit ), dot( x2, XUnit ) );
 
 		} else {
@@ -547,7 +547,7 @@ namespace Vectors {
 		V1 = VList( 2 ) - VList( 1 );
 		for ( int Vert = 3; Vert <= NSides; ++Vert ) {
 			V2 = VList( Vert ) - VList( 1 );
-			OutNewellAreaVector += V1 * V2;
+			OutNewellAreaVector += cross( V1, V2 );
 			V1 = V2;
 		}
 		//     do vert=1,nsides

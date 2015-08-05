@@ -564,7 +564,7 @@ namespace FluidCoolers {
 
 	bool
 	TestFluidCoolerTwoSpeedInputForDesign(
-		std::string const cCurrentModuleObject,
+		std::string const & cCurrentModuleObject,
 		Array1D<std::string> const &  AlphArray,
 		Array1D<std::string> const & cNumericFieldNames,
 		Array1D<std::string> const & cAlphaFieldNames,
@@ -2128,7 +2128,7 @@ namespace FluidCoolers {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

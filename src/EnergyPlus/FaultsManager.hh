@@ -41,7 +41,7 @@ namespace FaultsManager {
 	extern int const iFault_ThermostatOffset;
 	extern int const iFault_HumidistatOffset;
 	extern int const iFault_Fouling_AirFilter;
-	
+
 	// Types of faults under Group Operational Faults in IDD
 	//  1. Temperature sensor offset
 	//  2. Humidity sensor offset
@@ -117,9 +117,9 @@ namespace FaultsManager {
 		std::string FaultyAirFilterFanName;          // The name of the fan corresponding to the fouled air filter
 		std::string FaultyAirFilterFanType;          // The type of the fan corresponding to the fouled air filter
 		std::string FaultyAirFilterFanCurve;         // The name of the fan curve
-		int         FaultyAirFilterFanCurvePtr;      // The index to the curve 
+		int         FaultyAirFilterFanCurvePtr;      // The index to the curve
 		std::string FaultyAirFilterPressFracSche;    // Schedule describing variations of the fan pressure rise
-		int         FaultyAirFilterPressFracSchePtr; // The pointer to the schedule  
+		int         FaultyAirFilterPressFracSchePtr; // The pointer to the schedule
 		Real64      FaultyAirFilterFanPressInc;      // The increase of the fan pressure due to fouled air filter
 		Real64      FaultyAirFilterFanFlowDec;       // The decrease of the fan airflow rate due to fouled air filter
 
@@ -173,16 +173,16 @@ namespace FaultsManager {
 	void
 	CheckAndReadFaults();
 
-	bool 
+	bool
 	CheckFaultyAirFilterFanCurve(
-		std::string const CompName, // name of the fan 
+		std::string const & CompName, // name of the fan
 		int const FanCurvePtr       // pointer of the fan curve
 	);
 
 	// *****************************************************************************
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
