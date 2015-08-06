@@ -1704,6 +1704,7 @@ namespace DXCoils {
         Real64 const Temp,    // evaporating or condensing temperature
         int const CoolCoil,   // index to VRFTU cooling coil 
         int const HeatCoil,   // index to VRFTU heating coil
+		bool SHSCModify,      // indicate whether SH/SC would be modified
         Real64 & FanSpdRatio, // fan speed ratio
         Real64 & Wout,    // outlet air humidity ratio
         Real64 & Toutlet, // outlet air temperature

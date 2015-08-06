@@ -243,6 +243,7 @@ namespace HVACVariableRefrigerantFlow {
 		using DXCoils::DXCoilSH;
 		using DXCoils::DXCoilSC;
 		using DXCoils::DXCoil_InletAirDBT;
+		using DXCoils::DXCoil;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -271,6 +272,46 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 IUMaxCondTemp;
 		
 		// FLOW:
+
+		//@@ Debug
+		if (EnergyPlus::DataEnvironment::Month==8 
+			// && EnergyPlus::DataEnvironment::DayOfMonth==1 
+			&& EnergyPlus::DataGlobals::SimTimeSteps==840
+			// && EnergyPlus::DataGlobals::WarmupFlag 
+			) 
+		{
+			bool tempbool = EnergyPlus::DataGlobals::BeginTimeStepFlag;
+			int tempint = 0;
+
+			std::cout << EnergyPlus::DataGlobals::SimTimeSteps <<",   "
+				<< EnergyPlus::DataEnvironment::Month <<",   "
+				<< EnergyPlus::DataEnvironment::DayOfMonth <<",   "
+				<< EnergyPlus::DataGlobals::WarmupFlag <<",   "
+				<< EnergyPlus::DataGlobals::BeginTimeStepFlag 
+				<< ", VRF Parameters:      "
+				<< EnergyPlus::HVACVariableRefrigerantFlow::VRF(1).Path << ",   "
+				<< EnergyPlus::HVACVariableRefrigerantFlow::VRF(1).CompActSpeed <<",   "
+				<< EnergyPlus::HVACVariableRefrigerantFlow::VRF(1).NcompCooling <<",   "
+				<< EnergyPlus::HVACVariableRefrigerantFlow::VRF(1).NcompHeating <<",   "
+				<< EnergyPlus::HVACVariableRefrigerantFlow::VRF(1).EvaporatingTemp <<",   "
+				<< EnergyPlus::HVACVariableRefrigerantFlow::VRF(1).CondensingTemp <<",   "
+				<< EnergyPlus::HVACVariableRefrigerantFlow::VRF(1).TUCoolingLoad <<",   "
+				<< ", VRFTU Parameters:      "
+				<< EnergyPlus::HVACVariableRefrigerantFlow::VRFTU(3).LatentCoolingRate <<",   "
+				<< EnergyPlus::HVACVariableRefrigerantFlow::VRFTU(3).SensibleCoolingRate <<",   "
+				<< EnergyPlus::HVACVariableRefrigerantFlow::VRFTU(3).TotalCoolingRate <<",   "
+				<< ", Coil Parameters:      "
+				<< EnergyPlus::DXCoils::DXCoil(3).TotalCoolingEnergyRate <<",   "
+				<< EnergyPlus::DXCoils::DXCoil(3).EvaporatingTemp <<",   "
+				<< EnergyPlus::DXCoils::DXCoil(3).CondensingTemp <<",   "
+				<< EnergyPlus::DXCoils::DXCoil(3).SH <<",   "
+				<< EnergyPlus::DXCoils::DXCoil(3).SC <<",   "
+				<< EnergyPlus::DXCoils::DXCoil(3).InletAirTemp <<",   "
+				<< EnergyPlus::DXCoils::DXCoil(3).InletAirHumRat <<",   "
+				<< EnergyPlus::DXCoils::DXCoil(3).InletAirEnthalpy <<",   "
+				<< std::endl 
+				;
+		}
 
 		// Obtains and Allocates VRF system related parameters from input file
 		if ( GetVRFInputFlag ) { //First time subroutine has been entered
@@ -344,8 +385,9 @@ namespace HVACVariableRefrigerantFlow {
 			} else {
 				TerminalUnitList( TUListNum ).TU_SC( IndexToTUInTUList ) = 0.0;
 			}
-			if(( DXCoolingCoilIndex > 0 ) || ( DXHeatingCoilIndex > 0 ) ) {
-				TerminalUnitList( TUListNum ).TU_IADT( IndexToTUInTUList ) = DXCoil_InletAirDBT( DXHeatingCoilIndex );
+			// @@
+			if( DXCoolingCoilIndex > 0  || DXHeatingCoilIndex > 0 ) {
+				TerminalUnitList( TUListNum ).TU_IADT( IndexToTUInTUList ) = DXCoil_InletAirDBT( DXHeatingCoilIndex ); //DXCoil( DXCoilNum ).InletAirTemp;
 			} else {
 				TerminalUnitList( TUListNum ).TU_IADT( IndexToTUInTUList ) = 0.0;
 			}
@@ -3170,6 +3212,10 @@ namespace HVACVariableRefrigerantFlow {
 
 							SetDXCoolingCoilData( VRFTU( VRFTUNum ).CoolCoilIndex, ErrorsFound, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MinOATCooling );
 							SetDXCoolingCoilData( VRFTU( VRFTUNum ).CoolCoilIndex, ErrorsFound, _, _, _, _, _, VRF( VRFTU( VRFTUNum ).VRFSysNum ).MaxOATCooling );
+							
+							DXCoils::DXCoil( VRFTU( VRFTUNum ).CoolCoilIndex ).VRFIUPtr = VRFTUNum;
+							DXCoils::DXCoil( VRFTU( VRFTUNum ).CoolCoilIndex ).VRFOUPtr = VRFTU( VRFTUNum ).VRFSysNum;
+
 						} else {
 							ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
 							ShowContinueError( "... when checking " + cAllCoilTypes( VRFTU( VRFTUNum ).DXCoolCoilType_Num ) + " \"" + cAlphaArgs( 12 ) + "\"" );
@@ -3268,6 +3314,10 @@ namespace HVACVariableRefrigerantFlow {
 							// Defrost capacity is used for nothing more than setting defrost power/consumption report
 							// variables which are not reported. The coil's defrost algorythm IS used to derate the coil
 							SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, 1.0 ); // DefrostCapacity=1.0
+							
+							DXCoils::DXCoil( VRFTU( VRFTUNum ).HeatCoilIndex ).VRFIUPtr = VRFTUNum;
+							DXCoils::DXCoil( VRFTU( VRFTUNum ).HeatCoilIndex ).VRFOUPtr = VRFTU( VRFTUNum ).VRFSysNum;
+
 							// Terminal unit heating to cooling sizing ratio has precedence over VRF system sizing ratio
 							if ( VRFTU( VRFTUNum ).HeatingCapacitySizeRatio > 1.0 ) {
 								SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, VRFTU( VRFTUNum ).HeatingCapacitySizeRatio );
@@ -4732,10 +4782,10 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 temp = -1;
 		if ( CoolingLoad( VRFCond ) ) {
 			OperatingMode = 0;
-			CalcVRFIUAirFlow( ZoneNum, OperatingMode, VRF( VRFCond ).MinEvaporatingTemp, VRFTU( VRFTUNum ).CoolCoilIndex, VRFTU( VRFTUNum ).HeatCoilIndex, FanSpeedRatio, temp, temp, temp, temp, temp, temp, temp );
+			CalcVRFIUAirFlow( ZoneNum, OperatingMode, VRF( VRFCond ).MinEvaporatingTemp, VRFTU( VRFTUNum ).CoolCoilIndex, VRFTU( VRFTUNum ).HeatCoilIndex, false, FanSpeedRatio, temp, temp, temp, temp, temp, temp, temp );
 		} else if ( HeatingLoad( VRFCond ) ) {
 			OperatingMode = 1;
-			CalcVRFIUAirFlow( ZoneNum, OperatingMode, VRF( VRFCond ).MaxCondensingTemp, VRFTU( VRFTUNum ).CoolCoilIndex, VRFTU( VRFTUNum ).HeatCoilIndex, FanSpeedRatio, temp, temp, temp, temp, temp, temp, temp );
+			CalcVRFIUAirFlow( ZoneNum, OperatingMode, VRF( VRFCond ).MaxCondensingTemp, VRFTU( VRFTUNum ).CoolCoilIndex, VRFTU( VRFTUNum ).HeatCoilIndex, false, FanSpeedRatio, temp, temp, temp, temp, temp, temp, temp );
 		} else {
 			FanSpeedRatio = VRFTU( VRFTUNum ).MaxNoCoolAirMassFlow / VRFTU( VRFTUNum ).MaxCoolAirMassFlow;
 		}
@@ -7462,9 +7512,9 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 Modifi_factor     ;   // Yoshi_Compressor power modification algorithm_modification factor  
 		Real64 Modifi_SH         ;   // Yoshi_Compressor power modification algorithm_modified SH
 		Real64 Modifi_Pe         ;   // Yoshi_Compressor power modification algorithm_modified Pe
-		Real64 C_cap_density     ;   // Yoshi_Compressor capacity modification algorithm_modified flow rate
-		Real64 C_cap_enthalpy    ;   // Yoshi_Compressor capacity modification algorithm_modified enthalpy difference
-		Real64 C_cap_operation   ;   // Yoshi_Compressor capacity modification algorithm_modified Cap
+		Real64 C_cap_density  = 1;   // Yoshi_Compressor capacity modification algorithm_modified flow rate
+		Real64 C_cap_enthalpy = 1;   // Yoshi_Compressor capacity modification algorithm_modified enthalpy difference
+		Real64 C_cap_operation= 1;   // Yoshi_Compressor capacity modification algorithm_modified Cap
 		Real64 Modifi_SHin       ;   // Yoshi_Compressor power modification algorithm_modified SH for IDU
 		Real64 C_cap_operation0  ;   // Yoshi_Compressor capacity modification algorithm_modified Cap
 		Real64 Pipe_Q0           ;   // Yoshi_Compressor capacity modification algorithm_modified Pipe_Q
@@ -7609,8 +7659,8 @@ namespace HVACVariableRefrigerantFlow {
 		VRF( VRFCond ).BasinHeaterPower = 0.0;
 		// @@
 		VRF(VRFCond).CondensingTemp = OutDryBulbTemp;
-		IUMinEvapTemp = 1.0;
-		IUMaxCondTemp = 4.0;
+		IUMinEvapTemp = 10.0;
+		IUMaxCondTemp = 40.0;
 		Tolerance = 0.05;
 		RefrigerantIndex = -1;
 		Counter = 1;
@@ -7620,7 +7670,7 @@ namespace HVACVariableRefrigerantFlow {
 		NumIteHIUIn = 1;
 		NumIteCcap = 1;
 		Path = 0;
-  
+		
 		// sum loads on TU coils
 		for ( NumTU = 1; NumTU <= NumTUInList; ++NumTU ) {
 			TUCoolingLoad += TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU );
@@ -7700,6 +7750,9 @@ namespace HVACVariableRefrigerantFlow {
 		
 		IUMaxCondTemp = VRF( VRFCond ).MaxCondensingTemp;
 			
+		Modifi_SH = VRF( VRFCond ).SH; // initialization
+		Modifi_Pe = Pevap; // initialization
+		
 		// XP_iteration to solve condensing temperature. 
 		// XP_Step 13 to step 19 ****************************************************************
 		// Step 2.2_zrp
@@ -7751,7 +7804,7 @@ namespace HVACVariableRefrigerantFlow {
 				}
 			} 
 			if( NumIUActivated > 0 ) 
-				Pipe_T_room = Pipe_T_room / NumIUActivated;
+				Pipe_T_room = Pipe_T_room / NumIUActivated; //24;  @@
 			else
 				Pipe_T_room = 24;
 		
@@ -7862,24 +7915,12 @@ namespace HVACVariableRefrigerantFlow {
 				//150129 Yoshi
 				CyclingRatio = TUCoolingLoad * C_cap_operation / CompEvaporatingCAPSpdMin;
 		
-				NcompCooling = CompEvaporatingPWRSpd( 1 ) * CyclingRatio;
+				// @@ should be CompEvaporatingPWRSpdMin
+				NcompCooling = CompEvaporatingPWRSpdMin * CyclingRatio;
 				CompSpdActual = VRF( VRFCond ).CompressorSpeed( 1 );
 				
 				VRF( VRFCond ).CondensingTemp = MinOutdoorUnitTc;
 				//150129 Yosh end
-			  
-			} else {//compressor not cycling :Determine Tc( VRF( VRFCond ).CondensingTemp )
-				// Since: if( TUCoolingLoad <= CompEvaporatingCAPSpdMin )
-		
-		
-			}
-		
-			
-			if( TUCoolingLoad*C_cap_operation <= CompEvaporatingCAPSpdMin ) { //compressor cycling ?? 
-			//Yoshi 0710: This part would be updated later: CompEvaporatingCAPSpdMin is a fake value, so it should be dealt with
-				// TUCoolingLoad*C_cap_operation is Q_rps_modify, zrp, 0312
-				Path = 1;
-				// ...
 			  
 			} else {//compressor not cycling :Determine Tc( VRF( VRFCond ).CondensingTemp )
 				// Since: if( TUCoolingLoad <= CompEvaporatingCAPSpdMin )
@@ -7977,7 +8018,7 @@ namespace HVACVariableRefrigerantFlow {
 								  	if( VRF( VRFCond ).C3Te == 0 )  
 								  		Modifi_SHin = -( VRF( VRFCond ).C1Te - Tfs + Pipe_Te_assumed )/VRF( VRFCond ).C2Te; //150130 Modifi_SH>Modifi_SHin
 								  	else
-								  		Modifi_SHin = ( -VRF( VRFCond ).C2Te +( pow_2( VRF( VRFCond ).C2Te ) - 4 * ( VRF( VRFCond ).C1Te - Tfs + Pipe_Te_assumed ) * std::pow( VRF( VRFCond ).C3Te , 0.5 ) ) ) / ( 2*VRF( VRFCond ).C3Te );
+										Modifi_SHin = ( -VRF( VRFCond ).C2Te + std::pow( ( pow_2( VRF( VRFCond ).C2Te ) - 4 * ( VRF( VRFCond ).C1Te - Tfs + Pipe_Te_assumed ) * VRF( VRFCond ).C3Te) , 0.5 ) ) / ( 2*VRF( VRFCond ).C3Te );
 								  	
 		//150201 Yoshi	??		  		Modifi_SHin = max( 3.0, min( 30.0, Modifi_SHin ) ) // 15 will be obtained from idf in near future _ Yoshi  This Modifi_SH is from the last order's indoor unit 
 								  	
@@ -8104,7 +8145,7 @@ namespace HVACVariableRefrigerantFlow {
 								
 							if( CapDiff >( Tolerance*Cap_Eva0 ) )  //Not converged ??? NcompCooling is not updated
 								NumIteCcap = 999;
-							else
+							// @@ else
 								NcompCooling  = CurveValue( VRF( VRFCond ).OUCoolingPWRFT( CounterCompSpdTemp ), VRF( VRFCond ).CondensingTemp, Tsuction ); //150130 Comp Input update
 								//150130_Yoshi_end 
 							
@@ -8392,7 +8433,7 @@ namespace HVACVariableRefrigerantFlow {
 							if( VRF( VRFCond ).C3Te == 0 ) 
 								Modifi_SH = -( VRF( VRFCond ).C1Te - Tfs + VRF( VRFCond ).EvaporatingTemp ) / VRF( VRFCond ).C2Te;
 							else
-								Modifi_SH = ( -VRF( VRFCond ).C2Te +( pow_2( VRF( VRFCond ).C2Te ) - 4 * ( VRF( VRFCond ).C1Te - Tfs + VRF( VRFCond ).EvaporatingTemp ) * std::pow( VRF( VRFCond ).C3Te, 0.5 ) ) ) / ( 2*VRF( VRFCond ).C3Te ); 
+								Modifi_SH = ( -VRF( VRFCond ).C2Te + std::pow( ( pow_2( VRF( VRFCond ).C2Te ) - 4 * ( VRF( VRFCond ).C1Te - Tfs + VRF( VRFCond ).EvaporatingTemp ) * VRF( VRFCond ).C3Te ), 0.5 ) ) / ( 2*VRF( VRFCond ).C3Te ); 
 		
 							Modifi_Pe = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).EvaporatingTemp, RefrigerantIndex, RoutineName ); 
 							
@@ -8505,13 +8546,13 @@ namespace HVACVariableRefrigerantFlow {
 		}
 		
 		// 0924: For Debug purposes @@
-		// VRF( VRFCond ).Path = Path; 
-		// VRF( VRFCond ).NumIteNcomp = Counter; // Number of Ncomp itarations
-		// VRF( VRFCond ).NumIteTe = NumIteTe; // Number of Te itarations
-		// VRF( VRFCond ).NumIteHIUIn = NumIteHIUIn; // Number of Pipe_h_IU_in itarations
-		// VRF( VRFCond ).Modifi_SH = Modifi_SH;  
-		// VRF( VRFCond ).Modifi_Pe = Modifi_Pe; 
-		// VRF( VRFCond ).Modifi_factor  =  C_cap_operation; 
+		VRF( VRFCond ).Path = Path; 
+		VRF( VRFCond ).NumIteNcomp = Counter; // Number of Ncomp itarations
+		VRF( VRFCond ).NumIteTe = NumIteTe; // Number of Te itarations
+		VRF( VRFCond ).NumIteHIUIn = NumIteHIUIn; // Number of Pipe_h_IU_in itarations
+		VRF( VRFCond ).Modifi_SH = Modifi_SH;  
+		VRF( VRFCond ).Modifi_Pe = Modifi_Pe; 
+		VRF( VRFCond ).Modifi_factor  =  C_cap_operation; 
 		//150129 Yoshi end 
 		
 		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -9134,16 +9175,18 @@ namespace HVACVariableRefrigerantFlow {
 			LoopDXCoolCoilRTF = 0.0;
 		}
 
-		if ( HeatingLoad( VRFCond ) ) {
+		if ( VRFTU( VRFTUNum ).HeatingCoilPresent ) {
 			// above condition for heat pump mode, below condition for heat recovery mode
-			if ( ( ! VRF( VRFCond ).HeatRecoveryUsed && HeatingLoad( VRFCond ) ) || ( VRF( VRFCond ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList ) ) ) {
-				SimDXCoil( "", Off, FirstHVACIteration, VRFTU( VRFTUNum ).HeatCoilIndex, 1.0, PartLoadRatio, OnOffAirFlowRatio, _, MaxHeatingCapacity( VRFCond ) );
-			} else {
+			//@@
+			// if ( ( ! VRF( VRFCond ).HeatRecoveryUsed && CoolingLoad( VRFCond ) ) || ( VRF( VRFCond ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList ) ) ) {
+			if ( HeatingLoad( VRFCond ) ) {
+				SimDXCoil( "", On, FirstHVACIteration, VRFTU( VRFTUNum ).HeatCoilIndex, OpMode, 1.0, OnOffAirFlowRatio, _, MaxHeatingCapacity( VRFCond ), VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFCondCyclingRatio );
+			} else { // cooling coil is off
 				SimDXCoil( "", Off, FirstHVACIteration, VRFTU( VRFTUNum ).HeatCoilIndex, OpMode, 0.0, OnOffAirFlowRatio );
 			}
-			LoopDXHeatCoilRTF = LoopDXCoilRTF;
+			LoopDXCoolCoilRTF = LoopDXCoilRTF;
 		} else {
-			LoopDXHeatCoilRTF = 0.0;
+			LoopDXCoolCoilRTF = 0.0;
 		}
 
 		// if draw through, simulate coils then fan

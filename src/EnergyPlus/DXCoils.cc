@@ -5587,7 +5587,7 @@ namespace DXCoils {
 			SizeDXCoil( DXCoilNum );
 			MySizeFlag( DXCoilNum ) = false;
 
-			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {// @@ || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling 
+			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling) {
 
 				Mode = 1;
 				// Check for zero capacity or zero max flow rate
@@ -5613,6 +5613,25 @@ namespace DXCoils {
 				DXCoil( DXCoilNum ).RatedCBF( Mode ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( Mode ), DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ), DXCoil( DXCoilNum ).RatedSHR( Mode ) );
 
 			}
+			
+			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling ) {// @@  
+
+				Mode = 1;
+				// Check for zero capacity or zero max flow rate
+				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) <= 0.0 ) {
+					ShowSevereError( "Sizing: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + " has zero rated total capacity" );
+					ErrorsFound = true;
+				}
+				if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) <= 0.0 ) {
+					ShowSevereError( "Sizing: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + " has zero rated air flow rate" );
+					ErrorsFound = true;
+				}
+				if ( ErrorsFound ) {
+					ShowFatalError( "Preceding condition causes termination." );
+				}
+				DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ) = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
+			}
+
 
 			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 				for ( DehumidModeNum = 0; DehumidModeNum <= DXCoil( DXCoilNum ).NumDehumidModes; ++DehumidModeNum ) {
@@ -5647,7 +5666,7 @@ namespace DXCoils {
 
 			}
 
-			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) { // @@ || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating 
+			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) { 
 
 				Mode = 1;
 				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) <= 0.0 ) {
@@ -5673,6 +5692,26 @@ namespace DXCoils {
 
 			}
 
+			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating ) { // @@
+
+				Mode = 1;
+				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) <= 0.0 ) {
+					ShowSevereError( "Sizing: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + " has zero rated total capacity" );
+					ErrorsFound = true;
+				}
+				if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) <= 0.0 ) {
+					ShowSevereError( "Sizing: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + " has zero rated air flow rate" );
+					ErrorsFound = true;
+				}
+				if ( ErrorsFound ) {
+					ShowFatalError( "Preceding condition causes termination." );
+				}
+				RatedHeatPumpIndoorAirTemp = 21.11; // 21.11C or 70F
+				RatedHeatPumpIndoorHumRat = 0.00881; // Humidity ratio corresponding to 70F dry bulb/60F wet bulb
+				DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ) = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) * PsyRhoAirFnPbTdbW( StdBaroPress, RatedHeatPumpIndoorAirTemp, RatedHeatPumpIndoorHumRat, RoutineName );
+			}
+
+			
 			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
 				// Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
 				RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate2 / DXCoil( DXCoilNum ).RatedTotCap2;
@@ -14892,7 +14931,7 @@ Label50: ;
 			// There is cooling load			
 				OperatingMode = 0;				
 				// The following function calculates: (1) FanSpdRatio, (2) coil inlet/outlet conditions, and (3) SH/SC
-				CalcVRFIUAirFlow( ZoneIndex, OperatingMode, DXCoil( DXCoilNum ).EvaporatingTemp,DXCoilNum, DXCoilNum, FanSpdRatio, OutletAirHumRat, 
+				CalcVRFIUAirFlow( ZoneIndex, OperatingMode, DXCoil( DXCoilNum ).EvaporatingTemp, DXCoilNum, DXCoilNum, true, FanSpdRatio, OutletAirHumRat, 
 								OutletAirTemp, OutletAirEnthalpy, HcoilIn, TcoilIn, ActualSH, ActualSC );				
 			} else {
 			// There is no cooling load
@@ -14960,7 +14999,7 @@ Label50: ;
 		DXCoil( DXCoilNum ).CondInletTemp = CondInletTemp;
 		DXCoilTotalCooling( DXCoilNum ) = DXCoil( DXCoilNum ).TotalCoolingEnergyRate;
 		DXCoilCoolInletAirWBTemp( DXCoilNum ) = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure );
-		
+		//@@
 		DXCoilSH( DXCoilNum ) = DXCoil( DXCoilNum ).ActualSH;
 		DXCoilSC( DXCoilNum ) = DXCoil( DXCoilNum ).ActualSC;
 		DXCoil_InletAirDBT( DXCoilNum ) = DXCoil( DXCoilNum ).InletAirTemp;
@@ -15232,7 +15271,7 @@ Label50: ;
 			// There is heating load
 				OperatingMode = 1;
 				// The following function calculates: (1) FanSpdRatio, (2) coil inlet/outlet conditions, and (3) SH/SC
-				CalcVRFIUAirFlow( ZoneIndex, OperatingMode, DXCoil( DXCoilNum ).CondensingTemp, DXCoilNum, DXCoilNum, FanSpdRatio, OutletAirHumRat, 
+				CalcVRFIUAirFlow( ZoneIndex, OperatingMode, DXCoil( DXCoilNum ).CondensingTemp, DXCoilNum, DXCoilNum, true, FanSpdRatio, OutletAirHumRat, 
 								OutletAirTemp, OutletAirEnthalpy, HcoilIn, TcoilIn, ActualSH, ActualSC );
 			} else { 
 			// There is no heating load
@@ -15379,6 +15418,7 @@ Label50: ;
         QZnReqSenHeatingLoad = ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP;
         
         RHsat = 0.98; // Saturated RH  
+        EvapTemp = 6.0;
         TairInlet   = DXCoil( CoolCoilNum ).InletAirTemp;
         RatedCapCool    = DXCoil( CoolCoilNum ).RatedTotCap( 1 ); // Rated total cooling capacity
         RatedCapHeat = DXCoil( HeatCoilNum ).RatedTotCap( 1 ); // Rated heating capacity
@@ -15415,36 +15455,28 @@ Label50: ;
             hTinwADP = PsyHFnTdbW( TairInlet, wADP );
             SHRini = min( ( hTinwADP-hADP ) / ( Hin-hADP ), 1.0 );
 	    	
-            if ( QZnReqSenCoolingLoad >= RatedCapCool * SHRini ) // Rated sensible cooling capacity
-			
+            if ( QZnReqSenCoolingLoad >= RatedCapCool * SHRini ) // Rated sensible cooling capacity			
 				// correspond to the maximum cooling capacity
-                EvapTemp = EvapTempMin; 
-				
-            else {
-			
+                EvapTemp = EvapTempMin; 				
+            else {			
                 TcoilIn = TairInlet + Qfan / Garate / 1005;
                 Tout = TcoilIn - QZnReqSenCoolingLoad / Garate / 1005;   
                 Th2 = TcoilIn - ( TcoilIn - Tout ) / ( 1 - BFC );
-                EvapTemp = max( min( (Th2 - DeltaT ), EvapTempMax ), EvapTempMin );
+                //EvapTemp = max( min( (Th2 - DeltaT ), EvapTempMax ), EvapTempMin );
+                EvapTemp = max( (Th2 - DeltaT ), EvapTempMin );
             }     
         }
         
 		//2. HEATING Mode
         if ( QZnReqSenHeatingLoad <= 0 ) {
-		//2.1) There is no heating load
-		
-			CondTemp = DXCoil( HeatCoilNum ).InletAirTemp;
-			
+		//2.1) There is no heating load		
+			CondTemp = DXCoil( HeatCoilNum ).InletAirTemp;			
         } else {
-		//2.2) There is heating load
-		
-            if ( QZnReqSenHeatingLoad >= RatedCapHeat ) {
-			
+		//2.2) There is heating load		
+            if ( QZnReqSenHeatingLoad >= RatedCapHeat ) {			
 				// correspond to the maximum heating capacity
-                 CondTemp = CondTempMax;
-				 
-            } else {
-			
+                 CondTemp = CondTempMax;				 
+            } else {			
                  TcoilIn = TairInlet + Qfan/Garate/1005;
                  Tout = TcoilIn + QZnReqSenHeatingLoad/Garate/1005;        
                  Th2 = TcoilIn + ( Tout - TcoilIn )/( 1-BFH );
@@ -15461,6 +15493,7 @@ Label50: ;
         Real64 const Temp,    // evaporating or condensing temperature
         int const CoolCoil,   // index to VRFTU cooling coil 
         int const HeatCoil,   // index to VRFTU heating coil
+		bool SHSCModify,      // indicate whether SH/SC would be modified
         Real64 & FanSpdRatio, // fan speed ratio
         Real64 & Wout,    // outlet air humidity ratio
         Real64 & Toutlet, // outlet air temperature
@@ -15602,9 +15635,8 @@ Label50: ;
                 Par( 6 ) = BF;
                 
                 SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, 0.5, 1.5, Par);
-				FanSpdRatio = max( min( Ratio1, 1.0 ), 0.0);
-                
-                if( Wout > 0 ) { // Wout = -1 for blank
+                FanSpdRatio = Ratio1;
+                if( SHSCModify ) {
 				// No need to update SH (SHact = SH)
                     
                     TcIn = TairInlet + Qfan *  pow_2( FanSpdRatio ) / Garate / 1005; // FanSpdRatio is updated
@@ -15629,7 +15661,7 @@ Label50: ;
 			
 				FanSpdRatio = FanSpdRatioMin;
 				
-				if ( Wout > 0 ){
+				if( SHSCModify ){
 					TcIn = TcoilIn; // TcoilIn = f(FanSpdRatioMin)
 					Toutlet = TcoilIn - QZnReqSenCoolingLoad / 1005.0 / FanSpdRatio / Garate;
 					Th2 = TcoilIn - ( TcoilIn - Toutlet ) / ( 1 - BF );
@@ -15701,9 +15733,8 @@ Label50: ;
                 Par( 6 ) = BF;
                 
                 SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, 0.5, 1.5, Par);
-				FanSpdRatio = max( min( Ratio1, 1.0 ), 0.0);
-                
-                if( Wout > 0 ) {	
+                FanSpdRatio = Ratio1;
+                if( SHSCModify ) {	
 				// No need to update SC (SCact = SC )
 				
                     TcIn = TairInlet + Qfan *  pow_2( FanSpdRatio )/Garate/1005.0;// FanSpdRatio is updated
@@ -15722,7 +15753,7 @@ Label50: ;
 			
 				FanSpdRatio = FanSpdRatioMin;
 			
-                if( Wout > 0 ) {	
+                if( SHSCModify ) {	
 					TcIn = TcoilIn; // TcoilIn = f(FanSpdRatioMin)
 					Toutlet = TairInlet + QZnReqSenHeatingLoad / 1005.0 / FanSpdRatio / Garate;
 					Th2 = TcoilIn + ( Toutlet - TcoilIn ) / ( 1 - BF  );
@@ -15759,7 +15790,7 @@ Label50: ;
 			
             FanSpdRatio = 0.0;
 			
-			if( Wout > 0 ) { // Wout = -1 for blank
+			if( SHSCModify ) { 
 				SHact = 999.0;
 				SCact = 999.0;
 				Toutlet = TairInlet;
@@ -15769,6 +15800,8 @@ Label50: ;
 				Wout = Win;
 			}
         }
+		
+		FanSpdRatio = max( min( FanSpdRatio, 1.0 ), 0.0);
         
     }
 	

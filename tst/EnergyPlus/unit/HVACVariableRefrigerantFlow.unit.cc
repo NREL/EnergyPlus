@@ -7,6 +7,7 @@
 #include <cassert>
 #include <cmath>
 #include <string>
+#include "Fixtures/EnergyPlusFixture.hh"
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -15,15 +16,24 @@
 
 // EnergyPlus Headers
 #include <CurveManager.hh>
+#include <DataZoneEnergyDemands.hh>
+#include <DataEnvironment.hh>
+#include <DXCoils.hh>
 #include <HVACVariableRefrigerantFlow.hh>
+#include <Psychrometrics.hh>
+#include <ScheduleManager.hh>
 
 using namespace EnergyPlus;
 using namespace HVACVariableRefrigerantFlow;
 using namespace CurveManager;
+using namespace ScheduleManager;
+using namespace DXCoils;
+
+namespace EnergyPlus {
 
 TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CalcVRF )
 {
-	// PURPOSE OF THIS SUBROUTINE:
+	// @@ PURPOSE OF THIS SUBROUTINE:
 	// 		Subroutine CalcVRF_FluidTCtrl is part of the new VRF model based on physics, appliable for Fluid Temperature Control.
 	// 		This subroutine simulates the components making up the VRF indoor terminal unit.
 
@@ -80,4 +90,227 @@ TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CompResidual )
 	PerfCurve.deallocate( );
 	Par.deallocate( ); 
 	
+}
+
+TEST_F( EnergyPlusFixture, VRFFluidTCtrlGetCoilInput )
+{
+	// PURPOSE OF THE TEST:
+	//   IDF Read in for the new coil type: Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl
+	
+	std::string const idf_objects = delimited_string({
+       " Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl, ",
+       "     TU1 VRF DX Cooling Coil, !- Name                             ",
+       "     VRFAvailSched,           !- Availability Schedule Name       ",
+       "     2200,                    !- Rated Total Cooling Capacity {W} ",
+       "     0.865,                   !- Rated Sensible Heat Ratio        ",
+       "     0.1727,                  !- Rated Air Flow Rate {m3/s}       ",
+       "     0,                       !- Evaporating Temperature Calculat ",
+       "     0.80404,                 !- Evaporating Temperature Calculat ",
+       "     0,                       !- Evaporating Temperature Calculat ",
+       "     TU1 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node         ",
+       "     TU1 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node       ",
+       "     35.1,                    !- Released Heat by Indoor Unit Fan ",
+       "     ,                        !- Name of Water Storage Tank for Co",
+       "     0.0592,                  !- Indoor Unit Bypass Factor        ",
+       "     3;                       !- Superheating Set Point {C}       ",
+	});
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	
+	GetDXCoils();
+
+    ASSERT_EQ( 1, NumDXCoils);
+	EXPECT_EQ( 32, DXCoil( 1 ).DXCoilType_Num );
+	EXPECT_EQ( 2200, DXCoil( 1 ).RatedTotCap( 1 ) );
+}
+
+TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_FanSpdResidualCool )
+{
+	// PURPOSE OF THIS TEST:
+	//   Test the method FanSpdResidualCool.
+		
+	using namespace DXCoils;
+	
+	int NumPar;
+	double FanSpdRto;
+	double ZnSenLoad;
+	double Th2; 
+	double TairInlet;
+	double QfanRate;
+	double Garate; 
+	double BF; 
+	Array1D< Real64 > Par;
+
+	// Allocate
+	NumPar = 6;
+	Par.allocate( 6 );
+		
+	// Inputs: 
+	FanSpdRto = 0.5;
+	ZnSenLoad = 2716.62;
+	Th2 = 17.41212; 
+	TairInlet = 25.55534; 
+	QfanRate = 37.8;
+	Garate = 0.20664; 
+	BF = 0.0592; 
+    Par( 1 ) = ZnSenLoad;
+    Par( 2 ) = Th2; 
+    Par( 3 ) = TairInlet;  
+    Par( 4 ) = QfanRate;
+    Par( 5 ) = Garate; 
+    Par( 6 ) = BF; 
+
+	// Run and Check
+    double FanSpdResidual = FanSpdResidualCool( FanSpdRto, Par );
+	EXPECT_NEAR( -0.7055, FanSpdResidual, 0.0005 );
+	
+	// Clean up
+	Par.deallocate( ); 
+	
+}
+
+TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_FanSpdResidualHeat )
+{
+	// PURPOSE OF THIS TEST:
+	//   Test the method FanSpdResidualHeat.
+		
+	using namespace DXCoils;
+	
+	int NumPar;
+	double FanSpdRto;
+	double ZnSenLoad;
+	double Th2; 
+	double TairInlet;
+	double QfanRate;
+	double Garate; 
+	double BF; 
+	Array1D< Real64 > Par;
+
+	// Allocate
+	NumPar = 6;
+	Par.allocate( 6 );
+		
+	// Inputs: 
+	FanSpdRto = 0.5;
+	ZnSenLoad = 4241.66;
+	Th2 = 41.221; 
+	TairInlet = 20.236; 
+	QfanRate = 37.8;
+	Garate = 0.21136; 
+	BF = 0.1360; 
+    Par( 1 ) = ZnSenLoad;
+    Par( 2 ) = Th2; 
+    Par( 3 ) = TairInlet;  
+    Par( 4 ) = QfanRate;
+    Par( 5 ) = Garate; 
+    Par( 6 ) = BF; 
+
+	// Run and Check
+    double FanSpdResidual = FanSpdResidualHeat( FanSpdRto, Par );
+	EXPECT_NEAR( -0.5459, FanSpdResidual, 0.0005 );
+	
+	// Clean up
+	Par.deallocate( ); 
+	
+}
+
+TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CalcVRFIUAirFlow )
+{
+	// PURPOSE OF THIS TEST:
+	//   Test the method CalcVRFIUAirFlow, which analyzes the VRF Indoor Unit operations given zonal loads.
+	//   Calculated parameters includie: (1) Fan Speed Ratio, (2) SH/SC Degrees, and (3) Coil Inlet/Outlet conditions 
+		
+	using namespace DXCoils;
+	using namespace DataZoneEnergyDemands;
+	using namespace EnergyPlus::Psychrometrics;
+	using DataEnvironment::OutBaroPress;
+	
+	int ZoneIndex;  // index to zone where the VRF Terminal Unit resides 
+	int CoolCoilIndex;  // index to VRFTU cooling coil 
+	int HeatCoilIndex;  // index to VRFTU heating coil
+	int Mode;       // mode 0 for cooling, 1 for heating, 2 for neither cooling nor heating
+	bool SHSCModify = true; // indicate whether SH/SC is modified
+	Real64 Temp;    // evaporating or condensing temperature
+	Real64 FanSpdRatio; // fan speed ratio
+	Real64 Wout;    // outlet air humidity ratio
+	Real64 Toutlet; // outlet air temperature
+	Real64 Houtlet; // outlet air enthalpy
+	Real64 HcoilIn; // inlet air enthalpy
+	Real64 TcIn;    // coil inlet temperature, after fan
+	Real64 SHact;   // actual SH
+	Real64 SCact;   // actual SC
+
+	// Allocate
+	int NumCoils = 2;
+	DXCoil.allocate( NumCoils );
+	int NumZones = 2;
+	ZoneSysEnergyDemand.allocate( NumZones );
+
+	// Common Inputs
+	CoolCoilIndex = 1;  
+	HeatCoilIndex = 2;  
+	FanSpdRatio = 0;
+	Wout = 1;    	
+	OutBaroPress = 101570;
+	InitializePsychRoutines();
+	
+	DXCoil( CoolCoilIndex ).C1Te = 0;
+	DXCoil( CoolCoilIndex ).C2Te = 0.804;
+	DXCoil( CoolCoilIndex ).C3Te = 0;
+	DXCoil( CoolCoilIndex ).SH	 = 3.00;
+	DXCoil( HeatCoilIndex ).C1Tc = -1.905;
+	DXCoil( HeatCoilIndex ).C2Tc = 0.4333;
+	DXCoil( HeatCoilIndex ).C3Tc = 0.0207;
+	DXCoil( HeatCoilIndex ).SC	 = 5.00;
+
+	// Run and Check for Cooling Mode
+	Mode = 0;
+	Temp = 15;   	
+	ZoneIndex = 1; 
+	
+	ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP = -2716.6229;
+	ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP = -45507.8487;
+	
+	DXCoil( CoolCoilIndex ).BF = 0.0592;
+	DXCoil( CoolCoilIndex ).Qfan = 37.80;
+	DXCoil( CoolCoilIndex ).RatedAirMassFlowRate( 1 ) = 0.2066;
+	DXCoil( CoolCoilIndex ).InletAirTemp = 25.5553;
+	DXCoil( CoolCoilIndex ).InletAirHumRat = 8.4682e-3;
+	DXCoil( CoolCoilIndex ).InletAirEnthalpy = 47259.78;
+	
+	CalcVRFIUAirFlow(ZoneIndex, Mode, Temp, CoolCoilIndex, HeatCoilIndex, SHSCModify, FanSpdRatio, Wout, Toutlet, Houtlet, HcoilIn, TcIn, SHact, SCact);
+	EXPECT_NEAR( TcIn, 25.60, 0.01 );
+	EXPECT_NEAR( Toutlet, 17.90, 0.01 );
+	EXPECT_NEAR( Houtlet, 39443, 1 );
+	EXPECT_NEAR( HcoilIn, 47306, 1 );
+	EXPECT_NEAR( SHact, 3.00, 0.01 );
+
+
+	// Run and Check for Heating Mode
+	Mode = 1;
+	Temp = 42;   	
+	ZoneIndex = 2; 
+
+	ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP = 43167.2628;
+	ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP = 4241.66099;
+
+	DXCoil( HeatCoilIndex ).BF = 0.136;
+	DXCoil( HeatCoilIndex ).Qfan = 37.80;
+	DXCoil( HeatCoilIndex ).RatedAirMassFlowRate( 1 ) = 0.21136;
+	DXCoil( HeatCoilIndex ).InletAirTemp = 20.2362;
+	DXCoil( HeatCoilIndex ).InletAirHumRat = 4.1053e-3;
+	DXCoil( HeatCoilIndex ).InletAirEnthalpy = 30755.6253;
+
+	CalcVRFIUAirFlow(ZoneIndex, Mode, Temp, CoolCoilIndex, HeatCoilIndex, SHSCModify, FanSpdRatio, Wout, Toutlet, Houtlet, HcoilIn, TcIn, SHact, SCact);
+	EXPECT_NEAR( TcIn, 20.45, 0.01 );
+	EXPECT_NEAR( Toutlet, 38.40, 0.01 );
+	EXPECT_NEAR( Houtlet, 49142, 1 );
+	EXPECT_NEAR( HcoilIn, 30973, 1 );
+	EXPECT_NEAR( SCact, 5.00, 0.01 );
+
+	// Clean up
+	DXCoil.deallocate( ); 
+	ZoneSysEnergyDemand.deallocate( ); 
+}
+
 }
