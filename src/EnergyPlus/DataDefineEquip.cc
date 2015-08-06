@@ -48,6 +48,7 @@ namespace DataDefineEquip {
 	int const SingleDuctUserDefined( 14 );
 	int const SingleDuctInletATMixer( 15 );
 	int const SingleDuctSupplyATMixer( 16 );
+	int const SingleDuctConstVolFourPipeBeam( 17 );
 
 	// DERIVED TYPE DEFINITIONS
 

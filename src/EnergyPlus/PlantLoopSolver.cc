@@ -2559,7 +2559,7 @@ namespace PlantLoopSolver {
 				//sometimes these coils are children in ZoneHVAC equipment
 				// PlantLoop(LoopNum)%LoopSide(LoopSideNum)%SimZoneEquipNeeded= .TRUE.
 
-			} else if ( ( SELECT_CASE_var == TypeOf_Baseboard_Conv_Water ) || ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam ) || ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Water ) || ( SELECT_CASE_var == TypeOf_LowTempRadiant_VarFlow ) || ( SELECT_CASE_var == TypeOf_LowTempRadiant_ConstFlow ) || ( SELECT_CASE_var == TypeOf_CooledBeamAirTerminal ) || ( SELECT_CASE_var == TypeOf_ZoneHVACAirUserDefined ) || ( SELECT_CASE_var == TypeOf_AirTerminalUserDefined ) ) { //zone connected components
+			} else if ( ( SELECT_CASE_var == TypeOf_Baseboard_Conv_Water ) || ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam ) || ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Water ) || ( SELECT_CASE_var == TypeOf_LowTempRadiant_VarFlow ) || ( SELECT_CASE_var == TypeOf_LowTempRadiant_ConstFlow ) || ( SELECT_CASE_var == TypeOf_CooledBeamAirTerminal ) || ( SELECT_CASE_var == TypeOf_ZoneHVACAirUserDefined ) || ( SELECT_CASE_var == TypeOf_AirTerminalUserDefined ) || ( SELECT_CASE_var == TypeOf_FourPipeBeamAirTerminal ) ) { //zone connected components
 
 				this_loopside.SimZoneEquipNeeded = true;
 

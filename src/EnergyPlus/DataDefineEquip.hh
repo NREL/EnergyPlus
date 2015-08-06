@@ -1,12 +1,15 @@
 #ifndef DataDefineEquip_hh_INCLUDED
 #define DataDefineEquip_hh_INCLUDED
 
+// C++ Headers
+#include <memory>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <AirTerminalUnit.hh>
 
 namespace EnergyPlus {
 
@@ -38,6 +41,7 @@ namespace DataDefineEquip {
 	extern int const SingleDuctUserDefined;
 	extern int const SingleDuctInletATMixer;
 	extern int const SingleDuctSupplyATMixer;
+	extern int const SingleDuctConstVolFourPipeBeam;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -56,6 +60,7 @@ namespace DataDefineEquip {
 		int NumControls; // number of controls (not used; =0)
 		Array1D_string EquipType; // Pointer indentifying type of subcomponent
 		Array1D_int EquipType_Num;
+		std::shared_ptr< AirTerminalUnit > airTerminalPtr;
 		Array1D_string EquipName; // name of subcomponent
 		Array1D_int EquipIndex;
 		Real64 UpStreamLeakFrac; // upstream nominal leakage fraction
@@ -80,6 +85,7 @@ namespace DataDefineEquip {
 			NumControls( 0 ),
 			EquipType( MaxZoneAirComponents ),
 			EquipType_Num( MaxZoneAirComponents, 0 ),
+			airTerminalPtr( nullptr ),
 			EquipName( MaxZoneAirComponents ),
 			EquipIndex( MaxZoneAirComponents, 0 ),
 			UpStreamLeakFrac( 0.0 ),

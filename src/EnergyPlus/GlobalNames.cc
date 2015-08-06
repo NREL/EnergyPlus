@@ -50,10 +50,12 @@ namespace GlobalNames {
 	int NumBoilers( 0 );
 	int NumBaseboards( 0 );
 	int NumCoils( 0 );
+	int numAirDistUnits( 0 );
 	int CurMaxChillers( 0 );
 	int CurMaxBoilers( 0 );
 	int CurMaxBaseboards( 0 );
 	int CurMaxCoils( 0 );
+	int curMaxAirDistUnits( 0 );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE GlobalNames:
 
@@ -62,6 +64,7 @@ namespace GlobalNames {
 	Array1D< ComponentNameData > BoilerNames;
 	Array1D< ComponentNameData > BaseboardNames;
 	Array1D< ComponentNameData > CoilNames;
+	Array1D< ComponentNameData > aDUNames;
 
 	// Functions
 
@@ -334,9 +337,44 @@ namespace GlobalNames {
 
 	}
 
+	void
+	VerifyUniqueADUName(
+		std::string const & TypeToVerify,
+		std::string const & NameToVerify,
+		bool & ErrorFound,
+		std::string const & StringToDisplay
+	)
+	{
+
+
+		ErrorFound = false;
+		int Found = 0;
+
+		if ( numAirDistUnits > 0 ) Found = FindItemInList( NameToVerify, aDUNames.CompName(), numAirDistUnits );
+
+		if ( Found != 0 ) {
+			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + aDUNames( Found ).CompType + "\"" );
+			ShowContinueError( "...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\"." );
+			ErrorFound = true;
+		} else {
+			if ( numAirDistUnits == 0 ) {
+				curMaxAirDistUnits = 4;
+				aDUNames.allocate( curMaxAirDistUnits );
+			} else if ( numAirDistUnits == curMaxAirDistUnits ) {
+				curMaxAirDistUnits += 4;
+				aDUNames.redimension( curMaxAirDistUnits );
+			}
+			++numAirDistUnits;
+			aDUNames( numAirDistUnits ).CompType = MakeUPPERCase( TypeToVerify );
+			aDUNames( numAirDistUnits ).CompName = NameToVerify;
+		}
+
+	}
+
+
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
