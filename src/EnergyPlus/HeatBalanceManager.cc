@@ -185,6 +185,37 @@ namespace HeatBalanceManager {
 
 	// Functions
 
+	// Clears the global data in HeatBalanceManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		MaxCoolLoadPrevDay.deallocate();
+		MaxCoolLoadZone.deallocate();
+		MaxHeatLoadPrevDay.deallocate();
+		MaxHeatLoadZone.deallocate();
+		MaxTempPrevDay.deallocate();
+		MaxTempZone.deallocate();
+		MinTempPrevDay.deallocate();
+		MinTempZone.deallocate();
+		WarmupTempDiff.deallocate();
+		WarmupLoadDiff.deallocate();
+		TempZoneSecPrevDay.deallocate();
+		LoadZoneSecPrevDay.deallocate();
+		TempZonePrevDay.deallocate();
+		LoadZonePrevDay.deallocate();
+		TempZone.deallocate();
+		LoadZone.deallocate();
+		TempZoneRpt.deallocate();
+		TempZoneRptStdDev.deallocate();
+		LoadZoneRpt.deallocate();
+		LoadZoneRptStdDev.deallocate();
+		MaxLoadZoneRpt.deallocate();
+		CountWarmupDayPoints = int();
+		CurrentModuleObject = std::string();
+		WarmupConvergenceValues.deallocate();
+	}
+
 	void
 	ManageHeatBalance()
 	{
@@ -5954,9 +5985,9 @@ Label20: ;
 					Phi = double( IPhi - 1 ) * 10.0;
 					CosPhi = std::cos( Phi * DegToRadians );
 					if ( std::abs( CosPhi ) < 0.0001 ) CosPhi = 0.0;
-					tsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransSolBeamCoef( {1,6} ) );
-					tvisFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransVisBeamCoef( {1,6} ) );
-					rfsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).ReflSolBeamFrontCoef( {1,6} ) );
+					tsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransSolBeamCoef );
+					tvisFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransVisBeamCoef );
+					rfsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).ReflSolBeamFrontCoef );
 					for ( IGlass = 1; IGlass <= NGlass( IGlSys ); ++IGlass ) {
 						solabsFit( IGlass, IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).AbsBeamCoef( {1,6}, IGlass ) );
 					}
@@ -8015,7 +8046,7 @@ Label1000: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

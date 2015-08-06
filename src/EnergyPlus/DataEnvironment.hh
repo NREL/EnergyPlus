@@ -154,6 +154,11 @@ namespace DataEnvironment {
 
 	// Functions
 
+	// Clears the global data in DataEnvironment.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	Real64
 	OutDryBulbTempAt( Real64 const Z ); // Height above ground (m)
 
@@ -257,7 +262,7 @@ namespace DataEnvironment {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

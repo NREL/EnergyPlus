@@ -128,14 +128,15 @@ namespace DataHVACGlobals {
 	Array1D_string const cFurnaceTypes( NumUnitarySystemTypes, { "AirLoopHVAC:Unitary:Furnace:HeatOnly", "AirLoopHVAC:Unitary:Furnace:HeatCool", "AirLoopHVAC:UnitaryHeatOnly", "AirLoopHVAC:UnitaryHeatCool", "AirLoopHVAC:UnitaryHeatPump:AirToAir", "AirLoopHVAC:UnitaryHeatPump:WaterToAir", "AirLoopHVAC:UnitarySystem" } );
 
 	// parameters describing coil types
-	int const NumAllCoilTypes( 29 );
+	int const NumAllCoilTypes( 31 );
 
 	int const CoilDX_CoolingSingleSpeed( 1 );
 	int const CoilDX_HeatingEmpirical( 2 );
 	int const CoilDX_CoolingTwoSpeed( 3 );
 	int const CoilDX_CoolingHXAssisted( 4 );
 	int const CoilDX_CoolingTwoStageWHumControl( 5 );
-	int const CoilDX_HeatPumpWaterHeater( 6 );
+	int const CoilDX_HeatPumpWaterHeaterPumped( 6 );
+	int const CoilDX_HeatPumpWaterHeaterWrapped( 31 );
 	int const CoilDX_MultiSpeedCooling( 7 );
 	int const CoilDX_MultiSpeedHeating( 8 );
 
@@ -177,7 +178,7 @@ namespace DataHVACGlobals {
 	int const WaterConstant( 2 ); // water flow is constant
 	int const WaterConstantOnDemand( 3 ); // water flow is constant whenever the coil is operational - this is the only method used in EP V7.2 and earlier
 
-	Array1D_string const cAllCoilTypes( NumAllCoilTypes, { "Coil:Cooling:DX:SingleSpeed", "Coil:Heating:DX:SingleSpeed", "Coil:Cooling:DX:TwoSpeed", "CoilSystem:Cooling:DX:HeatExchangerAssisted", "Coil:Cooling:DX:TwoStageWithHumidityControlMode", "Coil:WaterHeating:AirToWaterHeatPump", "Coil:Cooling:DX:MultiSpeed", "Coil:Heating:DX:MultiSpeed", "Coil:Heating:Gas", "Coil:Heating:Gas:MultiStage", "Coil:Heating:Electric", "Coil:Heating:Electric:MultiStage", "Coil:Heating:Desuperheater", "Coil:Cooling:Water", "Coil:Cooling:Water:DetailedGeometry", "Coil:Heating:Water", "Coil:Heating:Steam", "CoilSystem:Cooling:Water:HeatExchangerAssisted", "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", "Coil:Cooling:WaterToAirHeatPump:EquationFit", "Coil:Heating:WaterToAirHeatPump:EquationFit", "Coil:Cooling:DX:VariableRefrigerantFlow", "Coil:Heating:DX:VariableRefrigerantFlow", "Coil:Cooling:DX:SingleSpeed:ThermalStorage", "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Cooling:DX:VariableSpeed", "Coil:Heating:DX:VariableSpeed" } );
+	Array1D_string const cAllCoilTypes( NumAllCoilTypes, { "Coil:Cooling:DX:SingleSpeed", "Coil:Heating:DX:SingleSpeed", "Coil:Cooling:DX:TwoSpeed", "CoilSystem:Cooling:DX:HeatExchangerAssisted", "Coil:Cooling:DX:TwoStageWithHumidityControlMode", "Coil:WaterHeating:AirToWaterHeatPump:Pumped", "Coil:Cooling:DX:MultiSpeed", "Coil:Heating:DX:MultiSpeed", "Coil:Heating:Gas", "Coil:Heating:Gas:MultiStage", "Coil:Heating:Electric", "Coil:Heating:Electric:MultiStage", "Coil:Heating:Desuperheater", "Coil:Cooling:Water", "Coil:Cooling:Water:DetailedGeometry", "Coil:Heating:Water", "Coil:Heating:Steam", "CoilSystem:Cooling:Water:HeatExchangerAssisted", "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", "Coil:Cooling:WaterToAirHeatPump:EquationFit", "Coil:Heating:WaterToAirHeatPump:EquationFit", "Coil:Cooling:DX:VariableRefrigerantFlow", "Coil:Heating:DX:VariableRefrigerantFlow", "Coil:Cooling:DX:SingleSpeed:ThermalStorage", "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Cooling:DX:VariableSpeed", "Coil:Heating:DX:VariableSpeed", "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", "Coil:WaterHeating:AirToWaterHeatPump:Wrapped" } );
 
 	// parameters describing coil performance types
 	int const CoilPerfDX_CoolBypassEmpirical( 100 );
@@ -445,8 +446,77 @@ namespace DataHVACGlobals {
 	OptStartDataType OptStartData; // For optimum start
 	Array1D< ComponentSetPtData > CompSetPtEquip;
 
+	// Clears the global data in DataHVACGlobals.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		DXCT = 1;
+		FirstTimeStepSysFlag = false;
+		SysUpdateTimeInc = 0.0;
+		TimeStepSys = 0.0;
+		SysTimeElapsed = 0.0;
+		FracTimeStepZone = 0.0;
+		ShortenTimeStepSys = false;
+		NumOfSysTimeSteps = 1;
+		NumOfSysTimeStepsLastZoneTimeStep = 1;
+		LimitNumSysSteps = 0;
+		UseZoneTimeStepHistory = true;
+		NumPlantLoops = 0;
+		NumCondLoops = 0;
+		NumElecCircuits = 0;
+		NumGasMeters = 0;
+		NumPrimaryAirSys = 0;
+		FanElecPower = 0.0;
+		OnOffFanPartLoadFraction = 1.0;
+		DXCoilTotalCapacity = 0.0;
+		DXElecCoolingPower = 0.0;
+		DXElecHeatingPower = 0.0;
+		ElecHeatingCoilPower = 0.0;
+		AirToAirHXElecPower = 0.0;
+		UnbalExhMassFlow = 0.0;
+		BalancedExhMassFlow = 0.0;
+		PlenumInducedMassFlow = 0.0;
+		TurnFansOn = false;
+		TurnFansOff = false;
+		ZoneCompTurnFansOn = false;
+		ZoneCompTurnFansOff = false;
+		SetPointErrorFlag = false;
+		DoSetPointTest = false;
+		NightVentOn = false;
+		NumTempContComps = 0;
+		HPWHInletDBTemp = 0.0;
+		HPWHInletWBTemp = 0.0;
+		HPWHCrankcaseDBTemp = 0.0;
+		AirLoopInit = false;
+		AirLoopsSimOnce = false;
+		NumHybridVentSysAvailMgrs = 0;
+		HybridVentSysAvailAirLoopNum.deallocate();
+		HybridVentSysAvailVentCtrl.deallocate();
+		HybridVentSysAvailActualZoneNum.deallocate();
+		HybridVentSysAvailANCtrlStatus.deallocate();
+		HybridVentSysAvailMaster.deallocate();
+		HybridVentSysAvailWindModifier.deallocate();
+		MSHPMassFlowRateLow = 0.0;
+		MSHPMassFlowRateHigh = 0.0;
+		MSHPWasteHeat = 0.0;
+		PreviousTimeStep = 0.0;
+		ShortenTimeStepSysRoomAir = false;
+		deviationFromSetPtThresholdHtg = -0.2;
+		deviationFromSetPtThresholdClg = 0.2;
+		SimAirLoopsFlag = true;
+		SimElecCircuitsFlag = true;
+		SimPlantLoopsFlag = true;
+		SimZoneEquipmentFlag = true;
+		SimNonZoneEquipmentFlag = true;
+		ZoneMassBalanceHVACReSim = true;
+		ZoneComp.deallocate();
+		OptStartData = OptStartDataType();
+		CompSetPtEquip.deallocate();
+	}
+
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

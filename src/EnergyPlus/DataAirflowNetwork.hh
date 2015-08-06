@@ -123,7 +123,7 @@ namespace DataAirflowNetwork {
 	extern bool VAVSystem; // This flag is used to represent a VAV system
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
@@ -320,10 +320,10 @@ namespace DataAirflowNetwork {
 			Real64 const BuildWidth, // The width of the building along the facade that contains this zone.
 			int const ASH55PeopleInd, // Index of people object with ASH55 comfort calcs for ventilation control
 			int const CEN15251PeopleInd, // Index of people object with CEN15251 comfort calcs for ventilation control
-			std::string const OccupantVentilationControlName, // Occupant ventilation control name
+			std::string const & OccupantVentilationControlName, // Occupant ventilation control name
 			int const OccupantVentilationControlNum, // Occupant ventilation control number
 			int const RAFNNodeNum // Index of RAFN node number
-			) :
+		) :
 			ZoneName( ZoneName ),
 			VentControl( VentControl ),
 			VentSchName( VentSchName ),
@@ -345,7 +345,7 @@ namespace DataAirflowNetwork {
 			OccupantVentilationControlName( OccupantVentilationControlName ),
 			OccupantVentilationControlNum( OccupantVentilationControlNum ),
 			RAFNNodeNum( RAFNNodeNum )
-		{}
+		    {}
 
 	};
 
@@ -480,7 +480,7 @@ namespace DataAirflowNetwork {
 			bool const HybridCtrlGlobal, // Hybrid ventilation global control logical
 			bool const HybridCtrlMaster, // Hybrid ventilation global control master
 			Real64 const WindModifier, // Wind modifier from hybrid ventilation control
-			std::string const OccupantVentilationControlName, // Occupant ventilation control name
+			std::string const & OccupantVentilationControlName, // Occupant ventilation control name
 			int const OccupantVentilationControlNum, // Occupant ventilation control number
 			int const OpeningStatus, // Open status at current time step
 			int const PrevOpeningstatus, // Open status at previous time step

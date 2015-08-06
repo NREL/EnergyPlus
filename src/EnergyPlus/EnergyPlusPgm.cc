@@ -51,7 +51,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	//      NOTICE
 
-	//      Copyright © 1996-2014 The Board of Trustees of the University of Illinois and The Regents of the
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//      University of California through Ernest Orlando Lawrence Berkeley National Laboratory.  All rights
 	//      reserved.
 
@@ -126,11 +126,11 @@ EnergyPlusPgm( std::string const & filepath )
 	//      (Conjunction Of Multizone Infiltration Specialists) developed by a multinational, multi-institutional
 	//      effort under the auspices of the International Energy Agency's Buildings and Community Systems Agreement
 	//      working group focusing on multizone air flow modeling (Annex 23) and now administered by the Swiss Federal
-	//      Laboratories for Materials Testing and Research (EMPA), Division 175, Überlandstrasse 129, CH-8600 Dübendorf,
+	//      Laboratories for Materials Testing and Research (EMPA), Division 175, Ãœberlandstrasse 129, CH-8600 DÃ¼bendorf,
 	//      Switzerland.
 
 	//      The EnergyPlus v1.2 model for displacement ventilation and cross-ventilation was developed
-	//      by Guilherme Carrilho da Graça and Paul Linden of the Department of Mechanical and Aerospace
+	//      by Guilherme Carrilho da GraÃ§a and Paul Linden of the Department of Mechanical and Aerospace
 	//      Engineering, University of California, San Diego.
 
 	//      The EnergyPlus models for UFAD served zones were developed by Anna Liu and Paul Linden at the Department
@@ -241,7 +241,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 #ifdef _MSC_VER
 #ifndef _DEBUG
-    // If _MSC_VER and not debug then prevent dialogs on error
+	// If _MSC_VER and not debug then prevent dialogs on error
 	SetErrorMode(SEM_NOGPFAULTERRORBOX);
 	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
@@ -372,7 +372,7 @@ EnergyPlusPgm( std::string const & filepath )
 		}
 		ProgramPath = filepath + pathChar;
 		int dummy_argc = 0;
-		const char * dummy_argv[] = { NULL };
+		const char * dummy_argv[] = { nullptr };
 		CommandLineInterface::ProcessArgs( dummy_argc, dummy_argv );
 	}
 
@@ -395,27 +395,31 @@ EnergyPlusPgm( std::string const & filepath )
 	ReportOrphanFluids();
 	ReportOrphanSchedules();
 
-    if (runReadVars) {
+	if (runReadVars) {
 		std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
 		bool FileExists;
 		{ IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
 		if (!FileExists) {
-			DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + "." );
-			exit(EXIT_FAILURE);
+			readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + exeExtension;
+			{ IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
+			if (!FileExists) {
+				DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + "." );
+				exit(EXIT_FAILURE);
+			}
 		}
 
-		std::string RVIfile = idfDirPathName + idfFileNameOnly + ".rvi";
-    	std::string MVIfile = idfDirPathName + idfFileNameOnly + ".mvi";
+		std::string const RVIfile = idfDirPathName + idfFileNameOnly + ".rvi";
+		std::string const MVIfile = idfDirPathName + idfFileNameOnly + ".mvi";
 
-    	int fileUnitNumber;
-    	int iostatus;
-    	bool rviFileExists;
-    	bool mviFileExists;
+		int fileUnitNumber;
+		int iostatus;
+		bool rviFileExists;
+		bool mviFileExists;
 
-    	gio::Fmt readvarsFmt( "(A)" );
+		gio::Fmt readvarsFmt( "(A)" );
 
-    	{ IOFlags flags; gio::inquire( RVIfile, flags ); rviFileExists = flags.exists(); }
-    	if (!rviFileExists) {
+		{ IOFlags flags; gio::inquire( RVIfile, flags ); rviFileExists = flags.exists(); }
+		if (!rviFileExists) {
 			fileUnitNumber = GetNewUnitNumber();
 			{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, RVIfile, flags ); iostatus = flags.ios(); }
 			if ( iostatus != 0 ) {
@@ -424,10 +428,10 @@ EnergyPlusPgm( std::string const & filepath )
 			gio::write( fileUnitNumber, readvarsFmt ) << outputEsoFileName;
 			gio::write( fileUnitNumber, readvarsFmt ) << outputCsvFileName;
 			gio::close( fileUnitNumber );
-    	}
+		}
 
-    	{ IOFlags flags; gio::inquire( MVIfile, flags ); mviFileExists = flags.exists(); }
-    	if (!mviFileExists) {
+		{ IOFlags flags; gio::inquire( MVIfile, flags ); mviFileExists = flags.exists(); }
+		if (!mviFileExists) {
 			fileUnitNumber = GetNewUnitNumber();
 			{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, MVIfile, flags ); iostatus = flags.ios(); }
 			if ( iostatus != 0 ) {
@@ -436,21 +440,21 @@ EnergyPlusPgm( std::string const & filepath )
 			gio::write( fileUnitNumber, readvarsFmt ) << outputMtrFileName;
 			gio::write( fileUnitNumber, readvarsFmt ) << outputMtrCsvFileName;
 			gio::close( fileUnitNumber );
-    	}
+		}
 
-    	std::string readVarsRviCommand = "\"" + readVarsPath + "\"" + " " + RVIfile + " unlimited";
-    	std::string readVarsMviCommand = "\"" + readVarsPath + "\"" + " " + MVIfile + " unlimited";
+		std::string readVarsRviCommand = "\"" + readVarsPath + "\"" + " " + RVIfile + " unlimited";
+		std::string readVarsMviCommand = "\"" + readVarsPath + "\"" + " " + MVIfile + " unlimited";
 
-    	systemCall(readVarsRviCommand);
-    	systemCall(readVarsMviCommand);
+		systemCall(readVarsRviCommand);
+		systemCall(readVarsMviCommand);
 
-	    if (!rviFileExists)
-	    	removeFile(RVIfile.c_str());
+		if (!rviFileExists)
+			removeFile(RVIfile.c_str());
 
-	    if (!mviFileExists)
-	    	removeFile(MVIfile.c_str());
+		if (!mviFileExists)
+			removeFile(MVIfile.c_str());
 
-	    moveFile("readvars.audit", outputRvauditFileName);
+		moveFile("readvars.audit", outputRvauditFileName);
 
 	}
 
@@ -523,4 +527,3 @@ CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 	}
 
 }
-

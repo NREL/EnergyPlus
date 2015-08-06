@@ -1259,9 +1259,9 @@ namespace OutdoorAirUnit {
 								if ( PltSizCoolNum > 0 ) {
 									if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow >= SmallAirVolFlow ) {
 										CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-										CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
-										CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
 										CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+										CoilOutTemp = min( CoilInTemp, FinalZoneSizing( CurZoneEqNum ).CoolDesTemp );
+										CoilOutHumRat = min( CoilInHumRat, FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat );
 										DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow * ( PsyHFnTdbW( CoilInTemp, CoilInHumRat ) - PsyHFnTdbW( CoilOutTemp, CoilOutHumRat ) );
 										DesCoilLoad = max( 0.0, DesCoilLoad );
 										rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5.0, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
@@ -1442,9 +1442,9 @@ namespace OutdoorAirUnit {
 								if ( PltSizCoolNum > 0 ) {
 									if ( SizeAirMassFlow >= SmallAirVolFlow ) {
 										CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-										CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
-										CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
 										CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+										CoilOutTemp = min( CoilInTemp, FinalZoneSizing( CurZoneEqNum ).CoolDesTemp );
+										CoilOutHumRat = min( CoilInHumRat, FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat );
 										DesCoilLoad = SizeAirMassFlow * ( PsyHFnTdbW( CoilInTemp, CoilInHumRat ) - PsyHFnTdbW( CoilOutTemp, CoilOutHumRat ) );
 										DesCoilLoad = max( 0.0, DesCoilLoad );
 										rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5.0, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
@@ -2613,7 +2613,7 @@ namespace OutdoorAirUnit {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

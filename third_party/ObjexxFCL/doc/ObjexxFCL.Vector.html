@@ -2,7 +2,7 @@
 <html lang="en-US">
 <head>
 	<meta charset="UTF-8">
-	<title>ObjexxFCL Users Guide: Array</title>
+	<title>ObjexxFCL Users Guide: Vectors</title>
 	<meta name="description" content="Objexx Fortran Compatibility Library">
 	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
 	<meta name="copyright" content="Copyright 2000-2015 Objexx Engineering, Inc. All rights reserved.">
@@ -20,7 +20,7 @@
 <tbody>
 	<tr>
 		<td></td>
-		<td height="80"><a href="ObjexxFCL.html"><img src="images/Objexx.logo.gif" alt="Home" border="0" align="left" /></a></td>
+		<td height="70"><a href="ObjexxFCL.html"><img src="images/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
 		<td></td>
 		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.0</div></td>
 		<td></td>
@@ -51,18 +51,19 @@
 		</td>
 		<td></td>
 		<td width="500" valign="top">
-			<h1>Vector2 and Vector3</h1>
-			<p class="body">Vector2 and Vector3 provide 2 and 3 element vectors with these characteristics that make them efficient 2D and 3D representations for technical applications:</p>
+			<h1>Vectors</h1>
+			<p class="body">Vector2, Vector3, and Vector4 provide small fixed-size vectors with these characteristics that make them efficient representations for technical applications:</p>
 			<ul class="body">
+				<li>Stack-based: no heap allocations.</li>
 				<li>Fast, loop-free operations.</li>
 				<li>Minimal space overhead.</li>
 				<li>Interoperation with <span class="source">std::array</span>, <span class="source">std::vector</span>, <span class="source">std::initializer_list</span>, and <span class="source">Array1</span>.</li>
 				<li>Useful functions such as distance, normalization, dot and cross products.</li>
 			</ul>
-			<p class="body">Vector2 and Vector3 are class templates. Shorthand (typedef) names are provided for the common value types in their forward declaration headers so, for example, we use <span class="source">Vector2_double</span> instead of <span class="source">Vector2&lt; double &gt;</span> on this page.</p>
+			<p class="body">The Vectors are class templates. Shorthand (typedef) names are provided for the common value types in their forward declaration headers so, for example, we use <span class="source">Vector2_double</span> instead of <span class="source">Vector2&lt; double &gt;</span> on this page.</p>
 
 			<h2 class="h3">Named Elements</h2>
-			<p class="body">Vector2 and Vector3 elements can be accessed by name with a few common variants:</p>
+			<p class="body">Vector elements can be accessed by name with a few common variants:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
 				<tr>
 					<td bgcolor="#F7F4F7">
@@ -97,7 +98,7 @@ v.x_3 = 9.0; // Element 3 is x_3</pre></td>
 			</table>
 
 			<h2 class="h3">Subscripting</h2>
-			<p class="body">Vector2 and Vector3 elements can be accessed by subscripting operations:</p>
+			<p class="body">Vector elements can be accessed by subscripting operations:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
 				<tr>
 					<td bgcolor="#F7F4F7">
@@ -109,7 +110,7 @@ v( 2 ) = 12.0; // () operations use 1-based indexing
 			</table>
 
 			<h2 class="h3">Assignment</h2>
-			<p class="body">Vector2 and Vector3 support whole-vector element-wise assignment with the operators {=, +=, -=, *=, /=}:</p>
+			<p class="body">The Vectors support whole-vector element-wise assignment with the operators {=, +=, -=, *=, /=}:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
 			<tr>
 				<td bgcolor="#F7F4F7"><pre>Vector3_double v( { 1.0, 2.0, 3.0 } );
@@ -130,7 +131,7 @@ v += 10.0; // Now elements are { 11.0, 12.0, 13.0 }</pre></td>
 			</table>
 
 			<h2 class="h3">Comparison</h2>
-			<p class="body">Vector2 and Vector3 provide two kinds of comparison operations:</p>
+			<p class="body">The Vectors provide two kinds of comparison operations:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
 			<tr>
 				<td bgcolor="#F7F4F7"><pre>Vector3_double v( { 1.0, 2.0, 3.0 } );
@@ -140,10 +141,10 @@ v < u; // Inequalities use lexical order to provide a complete ordering
 lt( v, u ); // Named comparison functions use strict (partial) ordering</pre></td>
 			</tr>
 			</table>
-			<p>Inequalities comparisons use lexical order to provide a complete ordering so that Vector2 and Vector3 can be stored in containers like <span class="source">std::set</span>. Named comparison functions like lt and ge use strict ordering of all elements and thus provide only a partial ordering.</p>
+			<p>Inequalities comparisons use lexical order to provide a complete ordering so that Vectors can be stored in containers like <span class="source">std::set</span>. Named comparison functions like lt and ge use strict ordering of all elements and thus provide only a partial ordering.</p>
 
 			<h2 class="h3">Additional Functions</h2>
-			<p class="body">Vector2 and Vector3 provide a number of additional functions:</p>
+			<p class="body">The Vectors provide a number of additional functions:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
 			<tr>
 				<td bgcolor="#F7F4F7"><pre>Vector3_double v( { 1.0, 2.0, 3.0 } );

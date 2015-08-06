@@ -56,6 +56,8 @@ namespace ZonePlenum {
 		Array1D< Real64 > InducedHumRat;
 		Array1D< Real64 > InducedEnthalpy;
 		Array1D< Real64 > InducedPressure;
+		Array1D< Real64 > InducedCO2;
+		Array1D< Real64 > InducedGenContam;
 		bool InitFlag;
 		int NumInletNodes;
 		Array1D_int InletNode;
@@ -117,6 +119,8 @@ namespace ZonePlenum {
 			Array1< Real64 > const & InducedHumRat,
 			Array1< Real64 > const & InducedEnthalpy,
 			Array1< Real64 > const & InducedPressure,
+			Array1< Real64 > const & InducedCO2,
+			Array1< Real64 > const & InducedGenContam,
 			bool const InitFlag,
 			int const NumInletNodes,
 			Array1_int const & InletNode,
@@ -156,6 +160,8 @@ namespace ZonePlenum {
 			InducedHumRat( InducedHumRat ),
 			InducedEnthalpy( InducedEnthalpy ),
 			InducedPressure( InducedPressure ),
+			InducedCO2( InducedCO2 ),
+			InducedGenContam( InducedGenContam ),
 			InitFlag( InitFlag ),
 			NumInletNodes( NumInletNodes ),
 			InletNode( InletNode ),
@@ -367,7 +373,7 @@ namespace ZonePlenum {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
