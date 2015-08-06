@@ -31,6 +31,7 @@ set( test_src
   OutputProcessor.unit.cc
   OutputReportTabular.unit.cc
   ReportSizingManager.unit.cc
+  RoomAirflowNetwork.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
   SizingAnalysisObjects.unit.cc

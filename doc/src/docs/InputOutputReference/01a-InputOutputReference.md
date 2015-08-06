@@ -15627,6 +15627,20 @@ Table 10. Summary of Room Air Models
 <td>cross ventilation</td>
 <td>‘RoomAirModelType’ , ‘RoomAirSettings:CrossVentilation’</td>
 </tr>
+<tr>
+<td>RoomAirflowNetwork</td>
+<td>Room air model using AirflowNetwork</td>
+<td>All zones</td>
+<td>‘RoomAirModelType’, 
+‘RoomAirSettings:AirflowNetwork’
+‘RoomAir:Node:AirflowNetwork’,
+‘RoomAir:Node:AirflowNetwork:AdjacentSurfaceList’,
+‘RoomAir:Node:AirflowNetwork:HVACEquipment’,
+‘RoomAir:Node:AirflowNetwork:InternalGains’,
+‘AirflowNetwork:IntraZone:Node’,
+‘AirflowNetwork:IntraZone:Linkage’
+</td>
+</tr>
 </table>
 
 
@@ -15645,7 +15659,7 @@ This alpha field indicates the unique name of a Zone object defined elsewhere in
 
 #### Field: Room-Air Modeling Type
 
-This alpha field indicates the room-air model used for the specified zone. Currently, there are three options for different air models. Entering the keyword ‘Mixing’  specifies the  conventional complete-mixing air model. Note that Mixing is the default and no RoomAirModelType  object would be needed to use the complete-mixing model. Entering the keyword ‘UserDefined ‘specifies the User Defined Room Air Temperature Patterns. Entering the keyword ‘OneNodeDisplacementVentilation ‘specifies the Mundt one node displacement ventilation air model for displacement ventilation. Entering the keyword ‘ThreeNodeDisplacementVentilation‘ specifies the three-node displacement ventilation model developed by the University of California, San Diego (UCSD DV). Entering the keyword ‘CrossVentilation’ specifies the two-zone cross ventilation model developed by the University of California, San Diego (UCSD CV). Entering the keyword ‘UnderFloorAirDistributionInterior‘ specifies the two-node interior zone under floor air distribution model developed by the University of California, San Diego (UCSD UFI). Entering the keyword ‘UnderFloorAirDistributionExterior‘ specifies the two-node exterior zone under floor air distribution model developed by the University of California, San Diego (UCSD UFE).
+This alpha field indicates the room-air model used for the specified zone. Currently, there are three options for different air models. Entering the keyword ‘Mixing’  specifies the  conventional complete-mixing air model. Note that Mixing is the default and no RoomAirModelType  object would be needed to use the complete-mixing model. Entering the keyword ‘UserDefined ‘specifies the User Defined Room Air Temperature Patterns. Entering the keyword ‘OneNodeDisplacementVentilation ‘specifies the Mundt one node displacement ventilation air model for displacement ventilation. Entering the keyword ‘ThreeNodeDisplacementVentilation‘ specifies the three-node displacement ventilation model developed by the University of California, San Diego (UCSD DV). Entering the keyword ‘CrossVentilation’ specifies the two-zone cross ventilation model developed by the University of California, San Diego (UCSD CV). Entering the keyword ‘UnderFloorAirDistributionInterior‘ specifies the two-node interior zone under floor air distribution model developed by the University of California, San Diego (UCSD UFI). Entering the keyword ‘UnderFloorAirDistributionExterior‘ specifies the two-node exterior zone under floor air distribution model developed by the University of California, San Diego (UCSD UFE). Entering the keyword ‘AirflowNetwork‘ specifies the RoomAir Model is integrated with the AirflowNetowrk model, which will introduces airflows among introzone links. This modeling type will ignore the next field. 
 
 #### Field: Air Temperature Coupling Strategy
 
@@ -16332,13 +16346,13 @@ The following fields are used to define an instance of the ‘UCSD UFAD Exterior
 
 This field provides the unique name of a zone described elsewhere in the file. A single instance of the ‘RoomAirSettings:UnderFloorAirDistributionExterior’ object is needed for each zone that is to be modeled using this method.
 
-#### Field: Number of Diffusers
+#### Field: Number of Diffusers ####
 
-#### The total number of diffusers in this zone. This field can allowed to Autocalculate (in which case it is set to the design occupancy level; i.e., number of people). If the design occupancy is low or zero but there are still heat sources that could generate buoyancy driven plumes, the user should input a value based on the design supply air flow rate of the zone and the design flow rate of an individual diffuser. In the absence of any other information, divide the zone area by 100 ft<sup>2</sup>. The default for this field is Autocalculate.
+The total number of diffusers in this zone. This field can allowed to Autocalculate (in which case it is set to the design occupancy level; i.e., number of people). If the design occupancy is low or zero but there are still heat sources that could generate buoyancy driven plumes, the user should input a value based on the design supply air flow rate of the zone and the design flow rate of an individual diffuser. In the absence of any other information, divide the zone area by 100 ft<sup>2</sup>. The default for this field is Autocalculate.
 
-#### Field: Power per Plume
+#### Field: Power per Plume 
 
-#### The power in watts incorporated in a buoyancy driven thermal plume. Normally we assume all the loads of a workstation create a single plume so that this represents the convective heat gain from a workstation – 1 person, 1 computer terminal, plus any task lighting. A typical value would be 220 watts. However, the model assumes an “equivalent” plume derived from the zone extraction rate normalized to the number of workstations/occupants. This field should be allowed to default – the program will calculate a value based upon the occupancy and the extraction rate.  The default is Autocalculate.
+The power in watts incorporated in a buoyancy driven thermal plume. Normally we assume all the loads of a workstation create a single plume so that this represents the convective heat gain from a workstation – 1 person, 1 computer terminal, plus any task lighting. A typical value would be 220 watts. However, the model assumes an “equivalent” plume derived from the zone extraction rate normalized to the number of workstations/occupants. This field should be allowed to default – the program will calculate a value based upon the occupancy and the extraction rate.  The default is Autocalculate.
 
 #### Field: Design Effective Area of Diffuser
 
@@ -16410,9 +16424,184 @@ An example input is:
     Autocalculate,           !- Coefficient B
     Autocalculate,           !- Coefficient C
     Autocalculate,           !- Coefficient D
-   Autocalculate;           !- Coefficient E
+    Autocalculate;           !- Coefficient E
 ```
 
+### RoomAirflowNetwork Model
+
+This model simulates a thermal zone using a network approach by assuming intra-zone nodes connected by user-defined patterns of airflows. The new model also allows users to specify a node to be connected to surfaces to have convective heat transfer between surfaces and the node, portion of internal gains and supply air and return air fractions from zone equipment. The model requires following objects to work together:
+
+    RoomAirSettings:AirflowNetwork
+    RoomAir:Node:AirflowNetwork
+    RoomAir:Node:AirflowNetwork:AdjacentSurfaceList
+    RoomAir:Node:AirflowNetwork:InternalGains
+    RoomAir:Node:AirflowNetwork:HVACEquipment
+    AirflowNetwork:Intrazone:Node
+    AirflowNetwork:Intrazone:Linkage
+
+The first *five* **objects** are described below. The last two objects are described in the Airflow Network Model section. 
+
+### RoomAirSettings:AirflowNetwork
+
+This object provides inputs in a thermal zone needed for the RoomAirflowNetwork model.  The inputs specify a thermal zone and a list of RoomAir nodes. The object gives a summary of the model configuration in a zone.
+
+#### Field: Name
+
+This is a unique character string associated with this instance of the RoomAirSettings:AirflowNetwork object.
+ 
+#### Field: Zone Name
+
+The name of the EnergyPlus thermal zone corresponding to the RoomAir model zone.
+
+#### Field: Control Point RoomAir:Node Name
+
+This is the name of a RoomAir:Node:AirflowNetwork object that contains the sensor for zone HVAC controls.  The conditions at this node will be used for thermostatic, humidistatic, or comfort based control decisions. The zone node defined in a Zone object is required.  
+
+#### Field: RoomAir:Node:AirflowNetwork x Name
+
+The name of a RoomAir:Node:AirflowNetwork object defined elsewhere.  This node will receive the fraction of internal gains, and HVAC equipment, and a list of surface names exposed to this node with convective heat transfer. 
+
+An IDF example input is:
+
+```idf
+  RoomAirSettings:AirflowNetwork,
+    NORTH_ZONE,     !- Name 
+    NORTH_ZONE,              !- Zone Name
+    RoomAir Schedule,        !- Availability Schedule Name
+    NORTH_ZONE,              !- Control Point RoomAir:Node Name
+    LeftUpper,               !- RoomAir:Node:AirflowNetwork 1 Name
+    CentralUpper,            !- RoomAir:Node:AirflowNetwork 2 Name
+    NORTH_ZONE,              !- RoomAir:Node:AirflowNetwork 3 Name
+    LeftMiddle,              !- RoomAir:Node:AirflowNetwork 4 Name
+    LeftLower,               !- RoomAir:Node:AirflowNetwork 5 Name
+    CentralLower;            !- RoomAir:Node:AirflowNetwork 6 Name
+```
+
+### RoomAir:Node:AirflowNetwork
+
+This object is used to define a node in a thermal zone. The input specifies the fraction of zone volume and provides a list of names to define fraction of internal gains, surface connection and HVAC equipment.
+
+#### Field: Name
+
+This is a unique character string associated with this instance of the RoomAirSettings:AirflowNetwork object. 
+
+#### Field: Zone Name
+
+The name of the EnergyPlus thermal zone and is defined in an RoomAirSettings:AirflowNetwork object.
+
+#### Field: Fraction of Zone Air Volume
+
+The field specifies a fraction of the overall zone air volume that is assigned to this RoomAir:Node:AirflowNetwork object. The fraction will be used to calculate zone air storage term. See corresponding sections in Engineering Reference for its use in the node energy and moisture balance equations.
+
+#### Field: RoomAir:Node:AirflowNetwork:AdjacentSurfaceList Name
+
+The field specifies a name to provide a list of connected adjacent surfaces with convective heat transfer between surfaces and this particular node.  When a moisture mode is assigned to surfaces, convective moisture transfer will be calculated. See corresponding sections in Engineering Reference for its use in the node energy and moisture balance equations.
+
+#### Field: RoomAir:Node:AirflowNetwork:InternalGains Name
+
+The field specifies a name to provide a list of internal gain objects and associated fractions assigned to this particular node. See corresponding sections in Engineering Reference for its use in the node energy and moisture balance equations.
+
+#### Field: RoomAir:Node:AirflowNetwork:HVACEquipment Name
+
+The field specifies a name to provide a list of HVAC equipment, including AirLoop terminals and zone equipment. See corresponding sections in Engineering Reference for its use in the node energy and moisture balance equations.
+
+```idf
+  RoomAir:Node:AirflowNetwork,
+    LeftUpper,         !- Name
+    NORTH_ZONE,        !- Zone Name
+    0.15,              !- Fraction of Zone Air Volume
+    Surface_18_T_List, !- RoomAir:Node:AirflowNetwork:AdjacentSurfaceList Name
+    LeftUpper_Gain,    !- RoomAir:Node:AirflowNetwork:InternalGains Name
+    LeftUpper_HVAC;    !- RoomAir:Node:AirflowNetwork:HVACEquipment Name
+```
+
+### RoomAir:Node:AirflowNetwork:AdjacentSurfaceList
+
+This object is used to provide a list of connected adjacent surfaces with convective heat transfer between surfaces and this particular node. When a moisture mode is assigned to surfaces, convective moisture transfer will be calculated. It should be pointed out that a fraction of a surface exposed to this particular node is not allowed.
+
+#### Field: Name
+
+This is a unique character string associated with this instance of the RoomAir:Node:AirflowNetwork:AdjacentSurfaceList object. 
+
+#### Field: Surface x Name
+
+The field specifies a surface name based on the order from 1 to 21. The maximum number of surfaces can be extensible.
+
+```idf
+  RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,
+    Surface_18_T_List, !- Name
+    Surface_18_T;      !- Surface 1 Name
+```
+### RoomAir:Node:AirflowNetwork:InternalGains
+
+This object is used to define a list of internal gains in the same zone and associated fraction assigned to this particular node. 
+
+#### Field: Name
+
+This is a unique character string associated with this instance of the RoomAir:Node:AirflowNetwork:InternalGains object. 
+
+#### Field: Internal Gain Object x Type
+
+The field specifies an internal gain object type based on the list in the Energy+. 
+
+#### Field: Internal Gain Object x Name
+
+The field specifies an internal gain object name based on the list in the Energy+.
+ 
+#### Field: Fraction of Gains to Node x
+
+The field specifies a fraction of the particular internal gain object assigned to this node. 
+
+```idf
+  RoomAir:Node:AirflowNetwork:InternalGains,
+    CentralUpper_Gain,        !- Name
+    People,                !- Internal Gain Object 1 Type
+    NORTH_ZONE People,     !- Internal Gain Object 1 Name
+    0.15,                  !- Fraction of Gains to Node 1
+    Lights,                !- Internal Gain Object 2 Type
+    NORTH_ZONE Lights,     !- Internal Gain Object 2 Name
+    0.15,                  !- Fraction of Gains to Node 2
+    ElectricEquipment,     !- Internal Gain Object 3 Type
+    NORTH_ZONE Equip,     !- Internal Gain Object 3 Name
+    0.15;                  !- Fraction of Gains to Node 3
+```
+
+{Field set: 3 fields (Internal Gain Object x Type, Internal Gain Object x Name, and Fraction of Gains to Node x). are extensible.}
+
+### RoomAir:Node:AirflowNetwork:HVACEquipment
+
+This object is used to define a list of HVAC equipment objects in the same zone and associated fractions assigned to this particular node. 
+
+#### Field: Name
+
+This is a unique character string associated with this instance of the RoomAir:Node:AirflowNetwork:HVACEquipment object. 
+
+#### Field: ZoneHVAC or Air Terminal Equipment Object Type x
+
+The field specifies an object type of ZoneHVAC equipment or terminal type based on the list in the Energy+.idd.
+
+#### Field: ZoneHVAC or Air Terminal Equipment Object Name x
+
+The field specifies the object name based on the object type defined in the previous field.  
+
+#### Field: Fraction of Output or Supply Air from HVAC Equipment x 
+
+The field specifies a fraction of supply air from the particular equipment to this node. 
+
+#### Field: Fraction of Input or Return Air from HVAC Equipment x 
+
+The field specifies a fraction of return air from the particular equipment to this node. 
+
+```idf
+  RoomAir:Node:AirflowNetwork:HVACEquipment,
+    CentralUpper_HVAC,        !- Name
+    ZoneHVAC:PackagedTerminalAirConditioner, !- ZoneHVAC or Air Terminal Equipment Object Type 1
+    NORTH_ZONE PTAC,       !- ZoneHVAC or Air Terminal Equipment Object Name 1
+    0.14,                   !- Fraction of Output or Supply Air from HVAC Equipment 1 
+    0.14;                   !- Fraction of Input or Return Air to HVAC Equipment 1
+```
+
+{Field set: 4 fields (ZoneHVAC or Air Terminal Equipment Object Type x, ZoneHVAC or Air Terminal Equipment Object Name x, Fraction of Output or Supply Air from HVAC Equipment x, and Fraction of Input or Return Air from HVAC Equipment x) are extensible.}
 
 ### Room Air Model Outputs
 
@@ -16559,7 +16748,6 @@ Ratio between airflow rate in the recirculation region and inflow rate, non-dime
 An integer flag that indicates whether the zone is mixed (single node well-mixed zone model used) or significant momentum conservation is occurring (UCSD CV model used). The value 1 means well-mixed; 0 means cross ventilation is present. Transition to mixed flow can occur due to three mechanism: reduction in inflow velocity, reduction in inflow aperture area and dominance of buoyancy effects. A value of 1 is yes, a value of 0 is no.
 
 
-
 #### Room Air Zone Is Recirculating Status []
 
 An integer flag that indicates whether recirculations are present in the flow. A cross ventilation flow does not have recirculations whenever the inflow area is similar to the room cross section area (such as airflow in a typical corridor). A value of 1 is yes, a value of 0 is no.
@@ -16634,6 +16822,54 @@ The convective heat gain from windows in an UnderFloorAirDistributionExterior zo
 This output, (Phi) is a measure of temperature stratification in the space. It is the difference between the occupied subzone temperature and the supply temperature divided by difference between the return temperature and the supply temperature. Technically it is equal to Kc. As phi approaches 1, the space is fully mixed. As phi approaches 0, the space becomes fully stratified. Expressed as an equation:
 
 *(T<sub>occ</sub>* – *T<sub>sup</sub>) / (T<sub>ret</sub>* *- T<sub>sup</sub>)*
+
+### RoomAirflowNetwork Model Outputs
+
+* HVAC,Average,RoomAirflowNetwork Node Temperature [C]
+
+* HVAC,Average,RoomAirflowNetwork Node Humidity Ratio [kgWater/kgDryAir]
+
+* HVAC,Average,RoomAirflowNetwork Node Relative Humidity [%]
+
+* HVAC,Average,RoomAirflowNetwork Node SumIntSensibleGain [W]
+
+* HVAC,Average,RoomAirflowNetwork Node SumIntLatentGain [W]
+
+* HVAC,Average,RoomAirflowNetwork Node NonAirSystemResponse [W]
+
+* HVAC,Average,RoomAirflowNetwork Node SysDepZoneLoadsLagged [W]
+
+* HVAC,Average,RoomAirflowNetwork Node HVAC Supply Fraction []
+
+* HVAC,Average,RoomAirflowNetwork Node HVAC Return Fraction []
+
+#### RoomAirflowNetwork Node Temperature [C]
+
+The temperature at a Room Air Node in a zone in degrees C.
+
+#### HVAC,Average,RoomAirflowNetwork Node Humidity Ratio [kgWater/kgDryAir]
+
+The humidity ratio at a Room Air Node in a zone in kgWater/kgDryAir.
+
+#### RoomAirflowNetwork Node Relative Humidity [%]
+
+The relative humidity ratio at a Room Air Node in a zone in percent.
+
+#### HVAC,Average,RoomAirflowNetwork Node SumIntSensibleGain [W]
+
+A sum of internal sensible gains assigned to a Room Air node in a zone.
+
+#### HVAC,Average,RoomAirflowNetwork Node SumIntLatentGain [W]
+
+A sum of internal latent gains assigned to a Room Air node in a zone.
+
+#### HVAC,Average,RoomAirflowNetwork Node NonAirSystemResponse [W]
+
+A sum of system convective gains, collected via NonAirSystemResponse, and assigned to a Room Air node in a zone. 
+
+#### HVAC,Average,RoomAirflowNetwork Node SysDepZoneLoadsLagged [W]
+
+A sum of SysDepZoneLoads saved to be added to zone heat balance at the next HVAC time step. A typical system is a zone dehumidifier.
 
 Group – Internal Gains (People, Lights, Other internal zone equipment)
 ----------------------------------------------------------------------

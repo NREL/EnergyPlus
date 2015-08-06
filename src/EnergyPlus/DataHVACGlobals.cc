@@ -318,6 +318,128 @@ namespace DataHVACGlobals {
 	bool SimNonZoneEquipmentFlag; // True when non-zone equipment components need to be (re)simulated
 	bool ZoneMassBalanceHVACReSim; // True when zone air mass flow balance and air loop needs (re)simulated
 
+	int const NumZoneHVACTerminalTypes( 37 );
+
+	Array1D_string const ZoneHVACTerminalTypes( NumZoneHVACTerminalTypes,
+	{
+		"ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",
+		"ZONEHVAC:ENERGYRECOVERYVENTILATOR",
+		"ZONEHVAC:FOURPIPEFANCOIL",
+		"ZONEHVAC:OUTDOORAIRUNIT",
+		"ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER",
+		"ZONEHVAC:PACKAGEDTERMINALHEATPUMP",
+		"ZONEHVAC:UNITHEATER",
+		"ZONEHVAC:UNITVENTILATOR",
+		"ZONEHVAC:VENTILATEDSLAB",
+		"ZONEHVAC:WATERTOAIRHEATPUMP",
+		"ZONEHVAC:WINDOWAIRCONDITIONER",
+		"ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC",
+		"ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER",
+		"ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM",
+		"ZONEHVAC:BASEBOARD:CONVECTIVE:ELECTRIC",
+		"ZONEHVAC:BASEBOARD:CONVECTIVE:WATER",
+		"ZONEHVAC:HIGHTEMPERATURERADIANT",
+		"ZONEHVAC:DEHUMIDIFIER:DX",
+		"ZONEHVAC:IDEALLOADSAIRSYSTEM",
+		"ZONEHVAC:REFRIGERATIONCHILLERSET",
+		"FAN:ZONEEXHAUST",
+		"WATERHEATER:HEATPUMP",
+		"AIRTERMINAL:SINGLEDUCT:UNCONTROLLED",
+		"AIRTERMINAL:DUALDUCT:CONSTANTVOLUME",
+		"AIRTERMINAL:DUALDUCT:VAV",
+		"AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT",
+		"AIRTERMINAL:SINGLEDUCT:VAV:REHEAT",
+		"AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT",
+		"AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT",
+		"AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT",
+		"AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEINDUCTION",
+		"AIRTERMINAL:SINGLEDUCT:VAV:REHEAT:VARIABLESPEEDFAN",
+		"AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:REHEAT",
+		"AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:NOREHEAT",
+		"AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:COOLEDBEAM",
+		"AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR",
+		"AIRLOOPHVACRETURNAIR"
+	} );
+
+	Array1D_string const ccZoneHVACTerminalTypes( NumZoneHVACTerminalTypes,
+	{
+		"ZoneHVAC:TerminalUnit:VariableRefrigerantFlow",
+		"ZoneHVAC:EnergyRecoveryVentilator",
+		"ZoneHVAC:FourPipeFanCoil",
+		"ZoneHVAC:OutdoorAirUnit",
+		"ZoneHVAC:PackagedTerminalAirConditioner",
+		"ZoneHVAC:PackagedTerminalHeatPump",
+		"ZoneHVAC:UnitHeater",
+		"ZoneHVAC:UnitVentilator",
+		"ZoneHVAC:VentilatedSlab",
+		"ZoneHVAC:WaterToAirHeatPump",
+		"ZoneHVAC:WindowAirConditioner",
+		"ZoneHVAC:Baseboard:RadiantConvective:Electric",
+		"ZoneHVAC:Baseboard:RadiantConvective:Water",
+		"ZoneHVAC:Baseboard:RadiantConvective:Steam",
+		"ZoneHVAC:Baseboard:Convective:Electric",
+		"ZoneHVAC:Baseboard:Convective:Water",
+		"ZoneHVAC:HighTemperatureRadiant",
+		"ZoneHVAC:Dehumidifier:DX",
+		"ZoneHVAC:IdealLoadsAirSystem",
+		"ZoneHVAC:RefrigerationChillerSet",
+		"Fan:ZoneExhaust",
+		"WaterHeater:HeatPump",
+		"AirTerminal:SingleDuct:Uncontrolled",
+		"AirTerminal:DualDuct:ConstantVolume",
+		"AirTerminal:DualDuct:VAV",
+		"AirTerminal:SingleDuct:ConstantVolume:Reheat",
+		"AirTerminal:SingleDuct:VAV:Reheat",
+		"AirTerminal:SingleDuct:VAV:NoReheat",
+		"AirTerminal:SingleDuct:SeriesPIU:Reheat",
+		"AirTerminal:SingleDuct:ParallelPIU:Reheat",
+		"AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction",
+		"AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan",
+		"AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat",
+		"AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat",
+		"AirTerminal:SingleDuct:ConstantVolume:CooledBeam",
+		"AirTerminal:DualDuct:VAV:OutdoorAir",
+		"AirLoopHVACReturnAir"
+	} );
+
+	int const ZoneEquipTypeOf_VariableRefrigerantFlow( 1 );
+	int const ZoneEquipTypeOf_EnergyRecoveryVentilator( 2 );
+	int const ZoneEquipTypeOf_FourPipeFanCoil( 3 );
+	int const ZoneEquipTypeOf_OutdoorAirUnit( 4 );
+	int const ZoneEquipTypeOf_PackagedTerminalAirConditioner( 5 );
+	int const ZoneEquipTypeOf_PackagedTerminalHeatPump( 6 );
+	int const ZoneEquipTypeOf_UnitHeater( 7 );
+	int const ZoneEquipTypeOf_UnitVentilator( 8 );
+	int const ZoneEquipTypeOf_VentilatedSlab( 9 );
+	int const ZoneEquipTypeOf_WaterToAirHeatPump( 10 );
+	int const ZoneEquipTypeOf_WindowAirConditioner( 11 );
+	int const ZoneEquipTypeOf_BaseboardRadiantConvectiveElectric( 12 );
+	int const ZoneEquipTypeOf_BaseboardRadiantConvectiveWater( 13 );
+	int const ZoneEquipTypeOf_BaseboardRadiantConvectiveSteam( 14 );
+	int const ZoneEquipTypeOf_BaseboardConvectiveElectric( 15 );
+	int const ZoneEquipTypeOf_BaseboardConvectiveWater( 16 );
+	int const ZoneEquipTypeOf_HighTemperatureRadiant( 17 );
+	int const ZoneEquipTypeOf_DehumidifierDX( 18 );
+	int const ZoneEquipTypeOf_IdealLoadsAirSystem( 19 );
+	int const ZoneEquipTypeOf_RefrigerationChillerSet( 20 );
+	int const ZoneEquipTypeOf_FanZoneExhaust( 21 );
+	int const ZoneEquipTypeOf_WaterHeaterHeatPump( 22 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctUncontrolled( 23 );
+	int const ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume( 24 );
+	int const ZoneEquipTypeOf_AirTerminalDualDuctVAV( 25 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat( 26 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheat( 27 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVNoReheat( 28 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctSeriesPIUReheat( 29 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctParallelPIUReheat( 30 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctCAVFourPipeInduction( 31 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheatVariableSpeedFan( 32 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolReheat( 33 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolNoReheat( 34 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeCooledBeam( 35 );
+	int const ZoneEquipTypeOf_AirTerminalDualDuctVAVOutdoorAir( 36 );
+	int const ZoneEquipTypeOf_AirLoopHVACReturnAir( 37 );
+
 	// Object Data
 	Array1D< ZoneCompTypeData > ZoneComp;
 	OptStartDataType OptStartData; // For optimum start

@@ -1138,9 +1138,10 @@ namespace ZonePlenum {
 				}
 				Node( ZoneNode ).CO2 = Node( OutletNode ).CO2;
 			} else {
-				Node( OutletNode ).CO2 = Node( InletNode ).CO2;
-				Node( ZoneNode ).CO2 = Node( InletNode ).CO2;
-			}
+				Node( OutletNode ).CO2 = Node( ZoneNode ).CO2;
+//				Node( OutletNode ).CO2 = Node( InletNode ).CO2;
+//				Node( ZoneNode ).CO2 = Node( InletNode ).CO2;
+			} 
 		}
 
 		if ( Contaminant.GenericContamSimulation ) {
@@ -1152,9 +1153,10 @@ namespace ZonePlenum {
 				}
 				Node( ZoneNode ).GenContam = Node( OutletNode ).GenContam;
 			} else {
-				Node( OutletNode ).GenContam = Node( InletNode ).GenContam;
-				Node( ZoneNode ).GenContam = Node( InletNode ).GenContam;
-			}
+				Node( OutletNode ).GenContam = Node( ZoneNode ).GenContam;
+//				Node( OutletNode ).GenContam = Node( InletNode ).GenContam;
+//				Node( ZoneNode ).GenContam = Node( InletNode ).GenContam;
+			} 
 		}
 
 	}
