@@ -20167,15 +20167,6 @@ SwimmingPool:Indoor,
        \note To be matched with a construction in this input file
        \type object-list
        \object-list FloorSurfaceNames
-       \reference SurfaceNames
-       \reference SurfAndSubSurfNames
-       \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
-       \reference OutFaceEnvNames
-       \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
-       \reference AllShadingAndHTSurfNames
   N1,  \field Average Depth
        \required-field
        \type real
