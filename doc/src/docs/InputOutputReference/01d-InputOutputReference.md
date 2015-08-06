@@ -17015,7 +17015,7 @@ This object is used in conjunction with an outdoor air controller (Ref. Controll
 
 Ventilation standards provide guidance on appropriate levels of outdoor ventilation air required for acceptable indoor air quality. The Ventilation Rate Procedure (VRP) of ASHRAE Standard 62.1-2007/2010 ([www.ashrae.org](http://www.ashrae.org)) requires outdoor ventilation rates to be determined based on the floor area of each occupied zone plus the number of people in each zone and considers the zone air distribution effectiveness and system ventilation efficiency. The outdoor air ventilation rate can be reset dynamically as operating conditions change (e.g., variations in occupancy). The Controller:MechanicalVentilation object implements the VRP for calculating these outdoor air ventilation requirements and resetting them based on varying occupancy levels and zone diversification. This is particularly useful for large air distribution systems that serve a number of different zone types with varying occupancy levels. This object can also be used to model the Indoor Air Quality Procedure (IAQP) as defined in Standard 62.1
 
-#### The first five inputs for this object are the name, the availability schedule, the zone outdoor air method, the system outdoor air method, and the zone maximum outdoor air fraction. The next three input fields define the zone name (or zone list name), the design specification outdoor air object name, and the design specification zone air distribution object name to be applied to this zone (or zone list). The last three fields are extensible
+The first five inputs for this object are the name, the availability schedule, the zone outdoor air method, the system outdoor air method, and the zone maximum outdoor air fraction. The next three input fields define the zone name (or zone list name), the design specification outdoor air object name, and the design specification zone air distribution object name to be applied to this zone (or zone list). The last three fields are extensible
 
 #### Field: Name
 
@@ -21673,7 +21673,7 @@ This is the temperature of exhaust leaving the generator.   This output is avail
 
 ### Generator:MicroCHP
 
-This object is used to model small-scale combined heat and power (micro CHP) electric generators using the model developed by IEA/ECBCS Annex 42     see www.cogen-sim.net.     The model was developed for both internal combustion and Stirling cycle engines, but might be used for other types of residential CHP devices.
+This object is used to model small-scale combined heat and power (micro CHP) electric generators using the model developed by IEA/ECBCS [Annex 42](http://www.ecbcs.org/annexes/annex42.htm). The model was developed for both internal combustion and Stirling cycle engines, but might be used for other types of residential CHP devices.
 
 Note that unlike other component models in EnergyPlus, this model is not normalized. Therefore, performance coefficients developed for one type and capacity of CHP device cannot be used for a device with a different capacity.
 
@@ -21756,19 +21756,19 @@ This is the maximum temperature of cooling water inlet or outlet that can occur 
 
 #### Field: Electrical Efficiency Curve Name
 
-This is the name of Curve:Triquadratic object that defines the steady-state net electrical efficiency.   The electrical efficiency, <span>\({\eta_e}\)</span>, is a function of   the cooling water mass flow rate, <span>\({\dot m_{cw}}\)</span>, the temperature of the cooling water at the inlet, <span>\({T_{cw}}\)</span>, the steady-state net electrical power produced, <span>\({P_{net,ss}}\)</span>.
+This is the name of Curve:Triquadratic object that defines the steady-state net electrical efficiency.   The electrical efficiency, <span>$ \eta_e $</span>, is a function of the cooling water mass flow rate <span> $ \dot m_{cw}  $</span>, the temperature of the cooling water at the inlet, <span>$ T_{cw} $</span>, the steady-state net electrical power produced, <span>$ P_{net,ss} $</span>.
 
-           <span>\({\eta_e} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)\)</span>
+<div> \[ \eta_e = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right) \] </div>
 
-The associated Curve:Triquadratic object should be defined with the independent variables <span>\({P_{net,ss}},{\dot m_{cw}},{T_{cw}}\)</span>  corresponding to *x*, *y*, and *z*, respectively.
+The associated Curve:Triquadratic object should be defined with the independent variables <span> $ {P_{net,ss}},{\dot m_{cw}},{T_{cw}} $ </span>  corresponding to *x*, *y*, and *z*, respectively.
 
 #### Field: Thermal Efficiency Curve Name
 
-This is the name of a Curve:Triquadratic object that defines the steady-state net thermal efficiency.   The thermal efficiency, <span>\({\eta_q}\)</span>, is a function of   the cooling water mass flow rate, <span>\({\dot m_{cw}}\)</span>, the temperature of the cooling water at the inlet, <span>\({T_{cw}}\)</span>, the steady-state net electrical power produced, <span>\({P_{net,ss}}\)</span>.
+This is the name of a Curve:Triquadratic object that defines the steady-state net thermal efficiency.   The thermal efficiency, <span>$ \eta_q $</span>, is a function of the cooling water mass flow rate, <span>$ \dot m_{cw} $</span>, the temperature of the cooling water at the inlet, <span>$ T_{cw} $</span>, the steady-state net electrical power produced, <span> $ P_{net,ss} $ </span>.
 
-           <span>\({\eta_q} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)\)</span>
+<div> \[ {\eta_q} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right) \] </div>
 
-The associated Curve:Triquadratic object should be defined with the independent variables <span>\({P_{net,ss}},{\dot m_{cw}},{T_{cw}}\)</span>  corresponding to *x*, *y*, and *z*, respectively.
+The associated Curve:Triquadratic object should be defined with the independent variables <span> $ {P_{net,ss}},{\dot m_{cw}},{T_{cw}} $ </span>  corresponding to *x*, *y*, and *z*, respectively.
 
 #### Field: Cooling Water Flow Rate Mode
 
@@ -21778,7 +21778,7 @@ For internal control, the following field is used to define a Biquadratic curve 
 
 #### Field: Cooling Water Flow Rate Curve Name
 
-This field contains the name of a Curve:Biquadratic object that defines the mass flow rate of cooling water, <span>\({\dot m_{cw}}\)</span>.   This field is only used if the prior field is set to    InternalControl.      The mass flow of cooling water is a function of steady-state power, <span>\({P_{net,ss}}\)</span>, and the inlet temperature of the cooling water, <span>\({T_{cw}}\)</span>.   The associated Curve:Biquadratic should be defined with the independent variables <span>\({P_{net,ss}}\)</span>  and <span>\({T_{cw}}\)</span>  corresponding to *x* and *y*, respectively.
+This field contains the name of a Curve:Biquadratic object that defines the mass flow rate of cooling water, <span> $ {\dot m_{cw}} $ </span>.   This field is only used if the prior field is set to InternalControl. The mass flow of cooling water is a function of steady-state power, <span> $ {P_{net,ss}} $ </span>, and the inlet temperature of the cooling water, <span> $ {T_{cw}} $ </span>.   The associated Curve:Biquadratic should be defined with the independent variables <span> $ {P_{net,ss}} $ </span> and <span> $ {T_{cw}} $ </span> corresponding to *x* and *y*, respectively.
 
 #### Field: Air Flow Rate Curve Name
 
@@ -21862,33 +21862,33 @@ An example IDF showing how this object is used is provided below:
 
 ```idf
    Generator:MicroCHP:NonNormalizedParameters,
-       SENERTECH5_5KW,                   !- Name
-       5500.0000,                             !- Maximum Electric Power {W}
-       0.0000,                                   !- Minimum Electric Power {W}
-       0.0000,                                   !- Minimum Cooling Water Flow Rate {kg/s}
-       80.0000,                                 !- Maximum Cooling Water Temperature {C}
-       SenerTechElEff,                   !- Electrical Efficiency Curve Name
-       SenerTechThermEff,             !- Thermal Efficiency Curve Name
-       InternalControl,                 !- Cooling Water Flow Rate Mode
-       SenerTechCoolWaterflow,   !- Cooling Water Flow Rate Curve Name
-       SenerTechAirFlow,               !- Air Flow Rate Curve Name
-       1000000000.0000,                 !- Maximum Net Electrical Power Rate of Change {W/s}
-       1000000000.0000,                 !- Maximum Fuel Flow Rate of Change {kg/s2}
-       741.0000,                               !- Heat Exchanger U-Factor Times Area Value {W/K}
-       13.7000,                                 !- Skin Loss U-Factor Times Area Value {W/K}
-       0.5000,                                   !- Skin Loss Radiative Fraction
-       63605.6000,                           !- Aggregated Thermal Mass of Energy Conversion Portion of Generator {W/K}
-       1000.7000,                             !- Aggregated Thermal Mass of Heat Recovery Portion of Generator {W/K}
-       0.0000,                                   !- Standby Power {W}
-       TimeDelay,                             !- Warm Up Mode
-       ,                                               !- Warm Up Fuel Flow Rate Coefficient
-       ,                                               !- Nominal Engine Operating Temperature {C}
-       ,                                               !- Warm Up Power Coefficient
-       ,                                               !- Warm Up Fuel Flow Rate Limit Ratio
-       60.0000,                                 !- Warm Up Delay Time {s}
-       0.0000,                                   !- Cool Down Power {W}
-       60.0000,                                 !- Cool Down Delay Time {s}
-       OptionalCoolDown;               !- Restart Mode
+       SENERTECH5_5KW,         !- Name
+       5500.0000,              !- Maximum Electric Power {W}
+       0.0000,                 !- Minimum Electric Power {W}
+       0.0000,                 !- Minimum Cooling Water Flow Rate {kg/s}
+       80.0000,                !- Maximum Cooling Water Temperature {C}
+       SenerTechElEff,         !- Electrical Efficiency Curve Name
+       SenerTechThermEff,      !- Thermal Efficiency Curve Name
+       InternalControl,        !- Cooling Water Flow Rate Mode
+       SenerTechCoolWaterflow, !- Cooling Water Flow Rate Curve Name
+       SenerTechAirFlow,       !- Air Flow Rate Curve Name
+       1000000000.0000,        !- Maximum Net Electrical Power Rate of Change {W/s}
+       1000000000.0000,        !- Maximum Fuel Flow Rate of Change {kg/s2}
+       741.0000,               !- Heat Exchanger U-Factor Times Area Value {W/K}
+       13.7000,                !- Skin Loss U-Factor Times Area Value {W/K}
+       0.5000,                 !- Skin Loss Radiative Fraction
+       63605.6000,             !- Aggregated Thermal Mass of Energy Conversion Portion of Generator {W/K}
+       1000.7000,              !- Aggregated Thermal Mass of Heat Recovery Portion of Generator {W/K}
+       0.0000,                 !- Standby Power {W}
+       TimeDelay,              !- Warm Up Mode
+       ,                       !- Warm Up Fuel Flow Rate Coefficient
+       ,                       !- Nominal Engine Operating Temperature {C}
+       ,                       !- Warm Up Power Coefficient
+       ,                       !- Warm Up Fuel Flow Rate Limit Ratio
+       60.0000,                !- Warm Up Delay Time {s}
+       0.0000,                 !- Cool Down Power {W}
+       60.0000,                !- Cool Down Delay Time {s}
+       OptionalCoolDown;       !- Restart Mode
 ```
 
 ### Generator:MicroCHP Outputs
