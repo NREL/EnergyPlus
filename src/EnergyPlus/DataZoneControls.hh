@@ -37,6 +37,11 @@ namespace DataZoneControls {
 
 	// Types
 
+	// Clears the global data in DataZoneControls.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	struct ZoneTempControls
 	{
 		// Members

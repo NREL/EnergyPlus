@@ -1561,6 +1561,10 @@ ShowErrorMessage(
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, DataStringGlobals::outputErrFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
 			DisplayString( "Trying to display error: \"" + ErrorMessage + "\"" );
+			if (write_stat == 600) {
+				DisplayString("ERROR: Could not open file "+DataStringGlobals::outputErrFileName+" for output (write). Write permission denied in output directory.");
+				std::exit( EXIT_FAILURE );
+			}
 			ShowFatalError( "ShowErrorMessage: Could not open file "+DataStringGlobals::outputErrFileName+" for output (write)." );
 		}
 		gio::write( StandardErrorOutput, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;

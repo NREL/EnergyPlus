@@ -38975,6 +38975,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39020,6 +39021,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39061,6 +39063,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39102,6 +39105,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39143,6 +39147,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39184,6 +39189,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39225,6 +39231,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39266,6 +39273,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39307,6 +39315,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39348,6 +39357,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39389,6 +39399,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39430,6 +39441,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39471,6 +39483,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39512,6 +39525,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39553,6 +39567,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39594,6 +39609,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39635,6 +39651,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39676,6 +39693,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:AirDistributionUnit
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -64282,6 +64300,7 @@ GroundHeatExchanger:Vertical,
         \minimum> 0.0
         \ip-units in
   N13,  \field Maximum Length of Simulation
+        \units years
         \minimum> 0.0
   N14,  \field G-Function Reference Ratio
         \type real
@@ -73793,6 +73812,7 @@ DemandManagerAssignmentList,
        \key DemandManager:Lights
        \key DemandManager:ElectricEquipment
        \key DemandManager:Thermostats
+       \key DemandManager:Ventilation
   A8 , \field DemandManager 1 Name
        \type object-list
        \object-list DemandManagerNames
@@ -73802,6 +73822,7 @@ DemandManagerAssignmentList,
        \key DemandManager:Lights
        \key DemandManager:ElectricEquipment
        \key DemandManager:Thermostats
+       \key DemandManager:Ventilation
   A10, \field DemandManager 2 Name
        \type object-list
        \object-list DemandManagerNames
@@ -73811,6 +73832,7 @@ DemandManagerAssignmentList,
        \key DemandManager:Lights
        \key DemandManager:ElectricEquipment
        \key DemandManager:Thermostats
+       \key DemandManager:Ventilation
   A12, \field DemandManager 3 Name
        \type object-list
        \object-list DemandManagerNames
@@ -73820,6 +73842,7 @@ DemandManagerAssignmentList,
        \key DemandManager:Lights
        \key DemandManager:ElectricEquipment
        \key DemandManager:Thermostats
+       \key DemandManager:Ventilation
   A14, \field DemandManager 4 Name
        \type object-list
        \object-list DemandManagerNames
@@ -73829,6 +73852,7 @@ DemandManagerAssignmentList,
        \key DemandManager:Lights
        \key DemandManager:ElectricEquipment
        \key DemandManager:Thermostats
+       \key DemandManager:Ventilation
   A16, \field DemandManager 5 Name
        \type object-list
        \object-list DemandManagerNames
@@ -73838,6 +73862,7 @@ DemandManagerAssignmentList,
        \key DemandManager:Lights
        \key DemandManager:ElectricEquipment
        \key DemandManager:Thermostats
+       \key DemandManager:Ventilation
   A18, \field DemandManager 6 Name
        \type object-list
        \object-list DemandManagerNames
@@ -73847,6 +73872,7 @@ DemandManagerAssignmentList,
        \key DemandManager:Lights
        \key DemandManager:ElectricEquipment
        \key DemandManager:Thermostats
+       \key DemandManager:Ventilation
   A20, \field DemandManager 7 Name
        \type object-list
        \object-list DemandManagerNames
@@ -73856,6 +73882,7 @@ DemandManagerAssignmentList,
        \key DemandManager:Lights
        \key DemandManager:ElectricEquipment
        \key DemandManager:Thermostats
+       \key DemandManager:Ventilation
   A22, \field DemandManager 8 Name
        \type object-list
        \object-list DemandManagerNames
@@ -73865,6 +73892,7 @@ DemandManagerAssignmentList,
        \key DemandManager:Lights
        \key DemandManager:ElectricEquipment
        \key DemandManager:Thermostats
+       \key DemandManager:Ventilation
   A24, \field DemandManager 9 Name
        \type object-list
        \object-list DemandManagerNames
@@ -73874,6 +73902,7 @@ DemandManagerAssignmentList,
        \key DemandManager:Lights
        \key DemandManager:ElectricEquipment
        \key DemandManager:Thermostats
+       \key DemandManager:Ventilation
   A26; \field DemandManager 10 Name
        \type object-list
        \object-list DemandManagerNames
@@ -74303,6 +74332,89 @@ DemandManager:Thermostats,
        \note can be selected by entering <Zone Name><space><Global Thermostat Object Name>.
        \type object-list
        \object-list ZoneControlThermostaticNames
+       
+  DemandManager:Ventilation,
+       \memo used for demand limiting Controller:OutdoorAir objects.
+       \extensible:1 Duplicate the last field Controller:OutdoorAir Name
+       \min-fields 10
+  A1 , \field Name
+       \required-field
+       \type alpha
+       \reference DemandManagerNames
+  A2 , \field Availability Schedule Name
+       \note Availability schedule name for this demand manager. Schedule value > 0 means the demand manager is available.
+       \note If this field is blank, the DR is always available.
+       \type object-list
+       \object-list ScheduleNames
+  A3 , \field Limit Control
+       \required-field
+       \type choice
+       \key Off
+       \key FixedRate
+       \key ReductionRatio
+  N1 , \field Minimum Limit Duration
+       \type integer
+       \minimum> 0
+       \units minutes
+       \note If blank, duration defaults to the timestep
+  N2 , \field Fixed Rate
+       \memo Used in case when Limit strategy is set to FixedRate
+       \type real
+       \minimum 0.0
+       \units m3/s
+  N3 , \field Reduction Ratio
+       \memo Used in case when Limit Control is set to ReductionRatio
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  N4 , \field Limit Step Change
+       \note Not yet implemented
+       \type real
+  A4 , \field Selection Control
+       \required-field
+       \type choice
+       \key All
+       \key RotateMany
+       \key RotateOne
+       \default All
+  N5 , \field Rotation Duration
+       \type integer
+       \minimum 0
+       \units minutes
+       \note If blank, duration defaults to the timestep
+  A5 , \field Controller Outdoor Air 1 Name
+       \note Enter the name of a Controller:OutdoorAir object.
+       \begin-extensible
+       \required-field
+       \type object-list
+       \object-list OAControllerNames
+  A6 , \field Controller Outdoor Air 2 Name
+       \type object-list
+       \object-list OAControllerNames
+  A7 , \field Controller Outdoor Air 3 Name
+       \type object-list
+       \object-list OAControllerNames
+  A8 , \field Controller Outdoor Air 4 Name
+       \type object-list
+       \object-list OAControllerNames
+  A9  ,\field Controller Outdoor Air 5 Name
+       \type object-list
+       \object-list OAControllerNames
+  A10 ,\field Controller Outdoor Air 6 Name
+       \type object-list
+       \object-list OAControllerNames
+  A11 ,\field Controller Outdoor Air 7 Name
+       \type object-list
+       \object-list OAControllerNames
+  A12 ,\field Controller Outdoor Air 8 Name
+       \type object-list
+       \object-list OAControllerNames
+  A13 ,\field Controller Outdoor Air 9 Name
+       \type object-list
+       \object-list OAControllerNames
+  A14 ;\field Controller Outdoor Air 10 Name
+       \type object-list
+       \object-list OAControllerNames
 
 \group Electric Load Center-Generator Specifications
 
