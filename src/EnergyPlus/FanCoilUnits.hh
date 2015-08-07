@@ -32,6 +32,7 @@ namespace FanCoilUnits {
 	extern int const CCoil_HXAssist;
 
 	extern int const HCoil_Water;
+	extern int const HCoil_Electric;
 
 	//capacity control method supported in this module
 	extern int const CCM_ConsFanVarFlow;
@@ -135,6 +136,7 @@ namespace FanCoilUnits {
 		Real64 MinHotWaterVolFlow; // m3/s
 		Real64 MinHotWaterFlow; // kg/s
 		Real64 HotControlOffset; // control tolerance
+		Real64 DesignHeatingCapacity; // size of electric heating coil [W]
 		int AvailStatus;
 		std::string AvailManagerListName; // Name of an availability manager list object
 		// addition for OA to Zone Units
@@ -216,6 +218,7 @@ namespace FanCoilUnits {
 			MinHotWaterVolFlow( 0.0 ),
 			MinHotWaterFlow( 0.0 ),
 			HotControlOffset( 0.0 ),
+			DesignHeatingCapacity( 0.0 ),
 			AvailStatus( 0 ),
 			ATMixerExists( false ),
 			ATMixerIndex( 0 ),
@@ -308,6 +311,7 @@ namespace FanCoilUnits {
 			Real64 const MinHotWaterVolFlow, // m3/s
 			Real64 const MinHotWaterFlow, // kg/s
 			Real64 const HotControlOffset, // control tolerance
+			Real64 const DesignHeatingCapacity, // size of electric heating coil [W]
 			int const AvailStatus,
 			std::string const & AvailManagerListName, // Name of an availability manager list object
 			bool const ATMixerExists, // True if there is an ATMixer
@@ -399,6 +403,7 @@ namespace FanCoilUnits {
 			MinHotWaterVolFlow( MinHotWaterVolFlow ),
 			MinHotWaterFlow( MinHotWaterFlow ),
 			HotControlOffset( HotControlOffset ),
+			DesignHeatingCapacity( DesignHeatingCapacity ),
 			AvailStatus( AvailStatus ),
 			AvailManagerListName( AvailManagerListName ),
 			ATMixerExists( ATMixerExists ),
@@ -496,7 +501,8 @@ namespace FanCoilUnits {
 		int const ControlledZoneNum, // ZoneEquipConfig index
 		bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
 		Real64 & LoadMet, // load met by unit (watts)
-		Optional< Real64 > PLR = _ // Part Load Ratio, fraction of time step fancoil is on
+		Optional< Real64 > PLR = _, // Part Load Ratio, fraction of time step fancoil is on
+		Optional< Real64 > ElectricHeaterControl = _ // 1 or 0, enables or disables heating coil
 	);
 
 	void
@@ -521,6 +527,12 @@ namespace FanCoilUnits {
 	GetFanCoilIndex(
 		std::string const & FanCoilName,
 		int & FanCoilIndex
+	);
+
+	Real64
+	CalcFanCoilLoadResidual(
+		Real64 const PartLoadRatio, // DX cooling coil part load ratio
+		Array1< Real64 > const & Par // Function parameters
 	);
 
 	//     NOTICE

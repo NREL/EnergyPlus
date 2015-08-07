@@ -145,6 +145,7 @@ ControlCompOutput(
 	bool WaterCoilAirFlowControl; // True if controlling air flow through water coil, water flow fixed
 	int SimCompNum; // internal number for case statement
 	static Real64 HalvingPrec( 0.0 ); // precision of halving algorithm
+	Real64 ElectricHeaterEnable; // 1 or 0, enables or disables heating coil
 
 	struct IntervalHalf
 	{
@@ -492,7 +493,9 @@ ControlCompOutput(
 
 		case 7: // 'ZONEHVAC:FOURPIPEFANCOIL'
 			// Simulate fancoil unit
-			Calc4PipeFanCoil( CompNum, ControlledZoneIndex, FirstHVACIteration, LoadMet );
+			ElectricHeaterEnable = 1.0;
+			if ( QZnReq <= 0.0 ) ElectricHeaterEnable = 0.0;
+			Calc4PipeFanCoil( CompNum, ControlledZoneIndex, FirstHVACIteration, LoadMet, _, ElectricHeaterEnable );
 			//Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;

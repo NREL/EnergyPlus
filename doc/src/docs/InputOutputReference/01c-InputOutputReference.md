@@ -6983,19 +6983,19 @@ This is the availability status of the ideal loads object as set by the hybrid v
 
 ### ZoneHVAC:FourPipeFanCoil
 
-What is a fan coil unit? Like many HVAC terms, “fan coil unit” is used rather loosely. Sometimes it is used for terminal units that would be better described as powered induction units. Carrier and others use the term for the room side of refrigerant-based split systems. Here we are modeling in-room forced-convection hydronic units. Typically these units are small (200 – 1200 cfm) and self-contained. They are mostly used in exterior zones, usually in hotels, apartments, or offices. They may be connected to ducted outside air, or have a direct outside air vent, but they do not have outside air economizers. Units with outside air economizers are marketed (in the United States) as unit ventilators. Unit ventilators are typically bigger than fan coils and are widely used in classrooms or other applications where ventilation is a priority. If a zonal unit with an outside economizer is desired, *ZoneHVAC:UnitVentilator* should be used.
+What is a fan coil unit? Like many HVAC terms, “fan coil unit” is used rather loosely. Sometimes it is used for terminal units that would be better described as powered induction units. Carrier and others use the term for the room side of refrigerant-based split systems. Here we are modeling in-room forced-convection hydronic units. The hydronic heating coil may be replaced with an electric heating coil. Typically these units are small (200 – 1200 cfm) and self-contained. They are mostly used in exterior zones, usually in hotels, apartments, or offices. They may be connected to ducted outside air, or have a direct outside air vent, but they do not have outside air economizers. Units with outside air economizers are marketed (in the United States) as unit ventilators. Unit ventilators are typically bigger than fan coils and are widely used in classrooms or other applications where ventilation is a priority. If a zonal unit with an outside economizer is desired, *ZoneHVAC:UnitVentilator* should be used.
 
-The heating or cooling output of the unit ventilator is controlled by varying the air flow rate, the water flow rate, or both. Air flow rate can be controlled by cycling the fan on/off or with a variable speed fan drive. The most common setup is a two or three speed fan with the speed selected by hand. The fan then cycles on/off to control heating / cooling output. The controls are often a wall mounted thermostat with hand selection of heating/cooling and fan speed (off/low/medium/high). These controls may also be mounted on the unit
+The heating or cooling output of the unit ventilator is controlled by varying the air flow rate, the water flow rate, or both. Air flow rate can be controlled by cycling the fan on/off or with a variable speed fan drive. The most common setup is a two or three speed fan with the speed selected by hand. The fan then cycles on/off to control heating / cooling output. The controls are often a wall mounted thermostat with hand selection of heating/cooling and fan speed (off/low/medium/high). These controls may also be mounted on the unit.
 
 Carrier offers a retrofit VSD motor for fan coil units. It claims up to 45% energy savings from such a retrofit, as well as increased comfort and less noise compared to a cycling fan (fan coil fans ar typically noisy and inefficient). Some other manufacturers are also offering units with VSD fans. Variable speed fans appear to offer an easy way to significantly increase the efficiency of what have typically been very inefficient units.
 
 EnergyPlus provides 4 capacity control methods for this unit: 1) multi-speed cycling fan with constant water flow rate; 2) constant speed continuous fan with variable water flow rate; 3) variable-speed fan with constant water flow rate; 4) variable-speed fan with variable water flow rate.
 
-In EnergyPlus the fan coil units are modeled as compound components. That is, they are assembled from other components. Fan coils contain an outdoor air mixer, a fan, a heating coil and a cooling coil. These components are described elsewhere in this document. The fan coil input simply requires the names of these four components, which have to be described elsewhere in the input. The input also requires the name of an availability schedule, maximum airflow rate, outdoor airflow rate, and maximum and minimum hot and cold water volumetric flow rates. The unit is connected to the zone inlet and exhaust nodes and the outdoor air by specifying unit inlet, and outlet air node names and the outdoor air mixer object name. The outdoor air mixer child object provides the outdoor air and relief air nodes names. Note that the unit air inlet node should be the same as a zone exhaust node and the unit outlet node should be the same as a zone inlet node. The fan coil unit is connected to a hot water loop (demand side) through its hot water coil and to a chilled water loop (demand side) through its cooling coil.
+In EnergyPlus the fan coil units are modeled as compound components. That is, they are assembled from other components. Fan coils contain an outdoor air mixer, a fan, a heating coil and a cooling coil. These components are described elsewhere in this document. The fan coil input simply requires the names of these four components, which have to be described elsewhere in the input. The input also requires the name of an availability schedule, maximum airflow rate, outdoor airflow rate, and maximum and minimum hot (for hydronic heating coil only) and cold water volumetric flow rates. The unit is connected to the zone inlet and exhaust nodes and the outdoor air by specifying unit inlet, and outlet air node names and the outdoor air mixer object name. The outdoor air mixer child object provides the outdoor air and relief air nodes names. Note that the unit air inlet node should be the same as a zone exhaust node and the unit outlet node should be the same as a zone inlet node. The fan coil unit is connected to a hot water loop through its hot water coil or with no hot water loop when using an electric coil (demand side) and to a chilled water loop (demand side) through its cooling coil.
 
 Note that the type of fan component associated with the fan coil unit depends on the type of capacity control method chosen. For *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used. And for *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume*  should be chosen.
 
-Fan coil units can be 4-pipe or 2-pipe. For 4-pipe units there are 2 supply pipes and 2 return pipes. For 2-pipe units there is a single supply pipe and a single return pipe and the supply is switched between hot and chilled water depending on the season. We model 4-pipe units, but the 4-pipe model can be used to model 2-pipe  units by using the coil availability schedules to make sure that either hot or chilled water is exclusively available.
+Fan coil units can be 4-pipe or 2-pipe. For 4-pipe units there are 2 supply pipes and 2 return pipes. For 2-pipe units there is a single supply pipe and a single return pipe and the supply is switched between hot and chilled water depending on the season. We model 4-pipe units, but the 4-pipe model can be used to model 2-pipe  units by using the coil availability schedules to make sure that either hot or chilled water is exclusively available. Alternately, an electric heating coil may be used to model a true 2-pipe system.
 
 #### Field: Name
 
@@ -7103,25 +7103,29 @@ The convergence tolerance for the control of the unit cooling output. The unit i
 
 #### Field: Heating Coil Object Type
 
-This field is the type of coil that is used for heating in the fan coil system. It is used in conjunction with the heating coil name (see next field) to specify the heating coil present within the system. The only allowable heating coil type is:
+This field is the type of coil that is used for heating in the fan coil system. It is used in conjunction with the heating coil name (see next field) to specify the heating coil present within the system. The only allowable heating coil types are:
 
 * Coil:Heating:Water
+
+* Coil:Heating:Electric
 
 #### Field: Heating Coil Name
 
 The name of the heating coil component that composes part of the fan coil unit. The heating coil air inlet node should be the same as the cooling coil outlet node. The heating coil air outlet node should be the same as the fan coil air outlet node.
 
-Only the following coil type can be used:
+Only the following coil types can be used:
 
 * Coil:Heating:Water
 
+* Coil:Heating:Electric
+
 #### Field: Maximum Hot Water Flow Rate
 
-The maximum hot water volumetric flow rate (m<sup>3</sup>/sec) through the fan coil unit’s heating coil.
+The maximum hot water volumetric flow rate (m<sup>3</sup>/sec) through the fan coil unit’s heating coil. This field is not used with an electric heating coil.
 
 #### Field: Minimum Hot Water Flow Rate
 
-The minimum hot water volumetric flow rate (m<sup>3</sup>/sec) through the fan coil unit’s heating coil.
+The minimum hot water volumetric flow rate (m<sup>3</sup>/sec) through the fan coil unit’s heating coil. This field is not used with an electric heating coil.
 
 #### Field: Heating Convergence Tolerance
 
@@ -7228,7 +7232,7 @@ Curve:Exponent,
     0.0,                     !- Coefficient1 Constant
     1.0,                     !- Coefficient2 Constant
     3.0,                     !- Coefficient3 Constant
-   0.0,                     !- Minimum Value of x
+    0.0,                     !- Minimum Value of x
     1.5,                     !- Maximum Value of x
     0.01,                    !- Minimum Curve Output
     1.5;                     !- Maximum Curve Output
@@ -7238,7 +7242,7 @@ Curve:Cubic,
    0.33856828,              !- Coefficient1 Constant
    1.72644131,              !- Coefficient2 x
    -1.49280132,             !- Coefficient3 x**2
-  0.42776208,              !- Coefficient4 x**3
+   0.42776208,              !- Coefficient4 x**3
    0.5,                     !- Minimum Value of x
    1.5,                     !- Maximum Value of x
    0.3,                     !- Minimum Curve Output
@@ -10656,7 +10660,7 @@ are compound components usually placed in the primary air loop as the sole compo
 
 The AirloopHVAC:UnitarySystem object is intended to replace all other air loop equipment, although other system types are still available. This system is unique in that it can accommodate all fan and coil types whereas other system types are specific to the type of fan and coil available for simulation. Additionally, although the AirloopHVAC:UnitarySystem is intended for use in the primary airloop, this object can be modeled as zone equipment (i.e., listed in a ZoneHVAC:EquipmentList) or as an outside air system component (i.e., listed in a AirLoopHVAC:OutdoorAirSystem:EquipmentList).
 
-The AirLoopHVAC:UnitarySystem object is a “virtual” component that consists of a fan component (OnOff, ConstantVolume, or VariableVolume), a cooling coil component, a heating coil component, and a reheat coil as shown in Figure 117. When a draw through configuration is desired, the fan is placed directly after the heating coil. If dehumidification control is selected, a reheat coil component is also required. If the reheat coil is present and the dehumidification control type input is not specified as CoolReheat, the reheat coil will not be active.  All of the fan and coil components are optional which allows the AirLoopHVAC:UnitarySystem object to be configured for heating-only, cooling-only, or both heating and cooling.  It may also be applied without a fan, controlling one or more coils, similar to the function of CoilSystem:Cooling:DX.
+The AirLoopHVAC:UnitarySystem object is a “virtual” component that consists of a fan component (OnOff, ConstantVolume, VariableVolume, or ComponentModel), a cooling coil component, a heating coil component, and a reheat coil as shown in Figure 117. When a draw through configuration is desired, the fan is placed directly after the heating coil. If dehumidification control is selected, a reheat coil component is also required. If the reheat coil is present and the dehumidification control type input is not specified as CoolReheat, the reheat coil will not be active.  All of the fan and coil components are optional which allows the AirLoopHVAC:UnitarySystem object to be configured for fan-only, heating-only, cooling-only, or both heating and cooling.  It may also be applied without a fan, controlling one or more coils, similar to the function of CoilSystem:Cooling:DX.
 
 ![](media/image294.png)
 
@@ -10702,7 +10706,7 @@ This alpha field contains the unitary system outlet node name.
 
 #### Field: Supply Fan Object Type
 
-This alpha field contains the identifying type of supply air fan specified for the unitary system. Fan type must be **Fan:OnOff,** **Fan:ConstantVolume, or Fan:VariableVolume**. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e. Supply Air Fan Operating Mode Schedule values are at times 0). Fan:VariableVolume is used for variable air volume systems or multi- or variable-speed coils.
+This alpha field contains the identifying type of supply air fan specified for the unitary system. Fan type must be **Fan:OnOff,** **Fan:ConstantVolume, Fan:VariableVolume, or Fan:ComponentModel**. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e. Supply Air Fan Operating Mode Schedule values are at times 0). Fan:VariableVolume is used for variable air volume systems or multi- or variable-speed coils. The Fan:ComponentModel may be used in place of any of these fan types to more accurately represent fan performance.
 
 #### Field: Supply Fan Name
 
@@ -10748,6 +10752,8 @@ This alpha field contains the identifying type of heating coil specified in the 
 
 * Coil:Heating:Desuperheater
 
+* Coil:UserDefined
+
 #### Field: Heating Coil Name
 
 This alpha field contains the identifying name given to the unitary system heating coil.
@@ -10761,6 +10767,8 @@ This numeric field is used to adjust heat pump heating capacity with respect to 
 This alpha field contains the identifying type of cooling coil specified in the unitary system. Allowable coil types are:
 
 * Coil:Cooling:DX:SingleSpeed
+
+* Coil:Cooling:DX:SingleSpeed:ThermalStorage
 
 * Coil:Cooling:DX:TwoSpeed
 
@@ -10784,6 +10792,8 @@ This alpha field contains the identifying type of cooling coil specified in the 
 
 * CoilSystem:Cooling:Water:HeatExchangerAssisted
 
+* Coil:UserDefined
+
 #### Field: Cooling Coil Name
 
 This alpha field contains the identifying name given to the unitary system cooling coil.
@@ -10802,7 +10812,7 @@ This alpha field defines the latent load control method. Available choices are S
 
 #### Field: Supplemental Heating Coil Object Type
 
-This alpha field contains the identifying type of supplemental heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. supplemental heating type must be one of:
+This alpha field contains the identifying type of supplemental heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The Coil:UserDefined object must be configured as a heating coil. Supplemental heating type must be one of:
 
 * Coil:Heating:Electric
 
@@ -10813,6 +10823,8 @@ This alpha field contains the identifying type of supplemental heating coil spec
 * Coil:Heating:Water
 
 * Coil:Heating:Steam
+
+* Coil:UserDefined
 
 #### Field: Supplemental Heating Coil Name
 

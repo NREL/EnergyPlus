@@ -351,6 +351,7 @@ namespace HVACUnitarySystem {
 		int SpeedNum; // speed number of active multi- or variable-speed coil
 		Real64 SpeedRatio; // current compressor speed ratio (variable speed)
 		Real64 CycRatio; // cycling part load ratio (variable speed)
+		int TESOpMode; // operating mode of TES DX cooling coil
 		// Warning message variables
 		int HXAssistedSensPLRIter; // used in HX Assisted calculations
 		int HXAssistedSensPLRIterIndex; // used in HX Assisted calculations
@@ -418,6 +419,7 @@ namespace HVACUnitarySystem {
 		int CoolIndexAvail; // Index used to minimize the occurrence of output warnings
 		int HeatCountAvail; // Counter used to minimize the occurrence of output warnings
 		int HeatIndexAvail; // Index used to minimize the occurrence of output warnings
+		bool FirstPass; // used to determine when first call is made
 
 		// Default Constructor
 		UnitarySystemData() :
@@ -600,6 +602,7 @@ namespace HVACUnitarySystem {
 			SpeedNum( 0 ),
 			SpeedRatio( 0.0 ),
 			CycRatio( 0.0 ),
+			TESOpMode( 0 ),
 			HXAssistedSensPLRIter( 0 ),
 			HXAssistedSensPLRIterIndex( 0 ),
 			HXAssistedSensPLRFail( 0 ),
@@ -663,7 +666,8 @@ namespace HVACUnitarySystem {
 			CoolCountAvail( 0 ),
 			CoolIndexAvail( 0 ),
 			HeatCountAvail( 0 ),
-			HeatIndexAvail( 0 )
+			HeatIndexAvail( 0 ),
+			FirstPass( true )
 		{}
 
 		// Member Constructor
@@ -860,6 +864,7 @@ namespace HVACUnitarySystem {
 			int const SpeedNum, // speed number of active multi- or variable-speed coil
 			Real64 const SpeedRatio, // current compressor speed ratio (variable speed)
 			Real64 const CycRatio, // cycling part load ratio (variable speed)
+			int const TESOpMode, // operting mode of TES DX Cooling coil
 			int const HXAssistedSensPLRIter, // used in HX Assisted calculations
 			int const HXAssistedSensPLRIterIndex, // used in HX Assisted calculations
 			int const HXAssistedSensPLRFail, // used in HX Assisted calculations
@@ -923,7 +928,8 @@ namespace HVACUnitarySystem {
 			int const CoolCountAvail, // Counter used to minimize the occurrence of output warnings
 			int const CoolIndexAvail, // Index used to minimize the occurrence of output warnings
 			int const HeatCountAvail, // Counter used to minimize the occurrence of output warnings
-			int const HeatIndexAvail // Index used to minimize the occurrence of output warnings
+			int const HeatIndexAvail, // Index used to minimize the occurrence of output warnings
+			bool const FirstPass // used to determine when first call is made
 		) :
 			UnitarySystemType( UnitarySystemType ),
 			UnitarySystemType_Num( UnitarySystemType_Num ),
@@ -1117,6 +1123,7 @@ namespace HVACUnitarySystem {
 			SpeedNum( SpeedNum ),
 			SpeedRatio( SpeedRatio ),
 			CycRatio( CycRatio ),
+			TESOpMode( TESOpMode ),
 			HXAssistedSensPLRIter( HXAssistedSensPLRIter ),
 			HXAssistedSensPLRIterIndex( HXAssistedSensPLRIterIndex ),
 			HXAssistedSensPLRFail( HXAssistedSensPLRFail ),
@@ -1180,7 +1187,8 @@ namespace HVACUnitarySystem {
 			CoolCountAvail( CoolCountAvail ),
 			CoolIndexAvail( CoolIndexAvail ),
 			HeatCountAvail( HeatCountAvail ),
-			HeatIndexAvail( HeatIndexAvail )
+			HeatIndexAvail( HeatIndexAvail ),
+			FirstPass( FirstPass )
 		{}
 
 	};

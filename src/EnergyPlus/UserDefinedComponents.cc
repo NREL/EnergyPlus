@@ -1829,6 +1829,10 @@ namespace UserDefinedComponents {
 				Node( UserCoil( CompNum ).Air( Loop ).OutletNodeNum ).HumRat = UserCoil( CompNum ).Air( Loop ).OutletHumRat;
 				Node( UserCoil( CompNum ).Air( Loop ).OutletNodeNum ).MassFlowRate = UserCoil( CompNum ).Air( Loop ).OutletMassFlowRate;
 				Node( UserCoil( CompNum ).Air( Loop ).OutletNodeNum ).Enthalpy = PsyHFnTdbW( UserCoil( CompNum ).Air( Loop ).OutletTemp, UserCoil( CompNum ).Air( Loop ).OutletHumRat );
+
+				Node( UserCoil( CompNum ).Air( Loop ).OutletNodeNum ).MassFlowRateMinAvail = Node( UserCoil( CompNum ).Air( Loop ).InletNodeNum ).MassFlowRateMinAvail;
+				Node( UserCoil( CompNum ).Air( Loop ).OutletNodeNum ).MassFlowRateMaxAvail = Node( UserCoil( CompNum ).Air( Loop ).InletNodeNum ).MassFlowRateMaxAvail;
+
 			}
 		}
 
@@ -1895,6 +1899,7 @@ namespace UserDefinedComponents {
 		Node( UserZoneAirHVAC( CompNum ).ZoneAir.OutletNodeNum ).HumRat = UserZoneAirHVAC( CompNum ).ZoneAir.OutletHumRat;
 		Node( UserZoneAirHVAC( CompNum ).ZoneAir.OutletNodeNum ).MassFlowRate = UserZoneAirHVAC( CompNum ).ZoneAir.OutletMassFlowRate;
 		Node( UserZoneAirHVAC( CompNum ).ZoneAir.OutletNodeNum ).Enthalpy = PsyHFnTdbW( UserZoneAirHVAC( CompNum ).ZoneAir.OutletTemp, UserZoneAirHVAC( CompNum ).ZoneAir.OutletHumRat );
+
 		if ( UserZoneAirHVAC( CompNum ).SourceAir.OutletNodeNum > 0 ) {
 			Node( UserZoneAirHVAC( CompNum ).SourceAir.OutletNodeNum ).Temp = UserZoneAirHVAC( CompNum ).SourceAir.OutletTemp;
 			Node( UserZoneAirHVAC( CompNum ).SourceAir.OutletNodeNum ).HumRat = UserZoneAirHVAC( CompNum ).SourceAir.OutletHumRat;

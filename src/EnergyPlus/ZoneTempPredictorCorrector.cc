@@ -3218,6 +3218,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		ZoneSetPointLast( ZoneNum ) = ZoneSetPoint;
+		TempZoneThermostatSetPoint( ZoneNum ) = ZoneSetPoint;
 
 		// Save the unmultiplied zone load to a report variable
 		SNLoadPredictedRate( ZoneNum ) = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired * LoadCorrectionFactor( ZoneNum );

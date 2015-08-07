@@ -1752,6 +1752,8 @@ namespace HVACUnitarySystem {
 		using HVACDXSystem::GetCoolingCoilTypeNameAndIndex;
 		using EMSManager::ManageEMS;
 		using DataGlobals::emsCallFromUnitarySystemSizing;
+		using PackagedThermalStorageCoil::SimTESCoil;
+		using PackagedThermalStorageCoil::GetTESCoilCoolingCapacity;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2014,11 +2016,14 @@ namespace HVACUnitarySystem {
 			DataFlowUsedForSizing = 0.0;
 		}
 
-		// STEP 3: use the greater of cooling and heating air flow rates for system flow
+		// STEP 3: use the greater of cooling and heating air flow rates for system flow that have both coil types
 		// previous version of E+ used maximum flow rate for unitary systems. Keep this methodology for now.
-		// Delete next 2 lines and uncomment 2 lines inside next if (HeatPump) statement to allow non-heat pump systems to operate at different flow rates (might require additional change to if block loigc).
-		EqSizing.CoolingAirVolFlow = max( EqSizing.CoolingAirVolFlow, EqSizing.HeatingAirVolFlow );
-		EqSizing.HeatingAirVolFlow = EqSizing.CoolingAirVolFlow;
+		// Delete next 2 lines and uncomment 2 lines inside next if (HeatPump) statement to allow non-heat pump systems to operate at different flow rates (might require additional change to if block logic).
+// this change might cause diff's since the if below was just added on 8/7/15
+//		if ( UnitarySystem(UnitarySysNum).CoolCoilExists && UnitarySystem(UnitarySysNum).HeatCoilExists ) {
+			EqSizing.CoolingAirVolFlow = max( EqSizing.CoolingAirVolFlow, EqSizing.HeatingAirVolFlow );
+			EqSizing.HeatingAirVolFlow = EqSizing.CoolingAirVolFlow;
+//		}
 
 		// STEP 4: set heat pump coil capacities equal to greater of cooling or heating capacity
 		if ( UnitarySystem( UnitarySysNum ).HeatPump ) { // if a heat pump, use maximum values and set main air flow and capacity variables
@@ -2054,9 +2059,12 @@ namespace HVACUnitarySystem {
 		// not sure what to do if UnitarySystem has only 1 coil type and flow needs to occur when present coil is off
 		// how does constant fan operating mode pertain here?
 		if ( UnitarySystem( UnitarySysNum ).HeatCoilExists && ! UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
+// these changes are surely going to cause diff's
 			UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = EqSizing.HeatingAirVolFlow;
+//			UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = EqSizing.CoolingAirVolFlow;
 		} else if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && ! UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
 			UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = EqSizing.CoolingAirVolFlow;
+//			UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = EqSizing.HeatingAirVolFlow;
 		}
 
 		if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
@@ -2344,6 +2352,12 @@ namespace HVACUnitarySystem {
 				DataFractionUsedForSizing = 1.0;
 				SizingMethod = AutoCalculateSizing;
 				if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHP || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple ) EqSizing.DesHeatingLoad = DataConstantUsedForSizing;
+			} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = CoilDX_PackagedThermalStorageCooling ) {
+				SimTESCoil( UnitarySystem( UnitarySysNum ).CoolingCoilName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, UnitarySystem( UnitarySysNum ).FanOpMode, UnitarySystem( UnitarySysNum ).TESOpMode, 0.0 );
+				GetTESCoilCoolingCapacity( UnitarySystem( UnitarySysNum ).CoolingCoilName, DataConstantUsedForSizing, ErrFound, CompType );
+				EqSizing.DesCoolingLoad = DataConstantUsedForSizing;
+				DataFractionUsedForSizing = 1.0;
+				SizingMethod = AutoCalculateSizing;
 			}
 
 			PrintFlag = true;
@@ -2568,6 +2582,7 @@ namespace HVACUnitarySystem {
 		using UserDefinedComponents::GetUserDefinedCoilIndex;
 		using UserDefinedComponents::GetUserDefinedCoilAirInletNode;
 		using UserDefinedComponents::GetUserDefinedCoilAirOutletNode;
+		using PackagedThermalStorageCoil::GetTESCoilCoolingCapacity;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2973,7 +2988,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).FanExists = true;
 			}
 
-			if ( UnitarySystem( UnitarySysNum ).FanType_Num == FanType_SimpleOnOff || UnitarySystem( UnitarySysNum ).FanType_Num == FanType_SimpleConstVolume || UnitarySystem( UnitarySysNum ).FanType_Num == FanType_SimpleVAV ) {
+			if ( UnitarySystem( UnitarySysNum ).FanType_Num == FanType_SimpleOnOff || UnitarySystem( UnitarySysNum ).FanType_Num == FanType_SimpleConstVolume || UnitarySystem( UnitarySysNum ).FanType_Num == FanType_SimpleVAV || UnitarySystem( UnitarySysNum ).FanType_Num == FanType_ComponentModel ) {
 				IsNotOK = false;
 				ValidateComponent( FanType, FanName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
@@ -3049,7 +3064,7 @@ namespace HVACUnitarySystem {
 				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 				ShowContinueError( "Illegal " + cAlphaFields( iFanSchedAlphaNum ) + " = " + Alphas( iFanSchedAlphaNum ) );
 				ErrorsFound = true;
-			} else if ( lAlphaBlanks( iFanSchedAlphaNum ) ) {
+			} else if ( lAlphaBlanks( iFanSchedAlphaNum ) && UnitarySystem( UnitarySysNum ).FanExists ) {
 				if ( UnitarySystem( UnitarySysNum ).ControlType == SetPointBased ) {
 					// Fan operating mode must be constant fan so that the coil outlet temp is proportional to PLR
 					// Cycling fan always outputs the full load outlet air temp so should not be used with set point based control
@@ -3122,6 +3137,8 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = Coil_HeatingGas_MultiStage;
 			} else if ( SameString( HeatingCoilType, "Coil:Heating:Gas" ) || SameString( HeatingCoilType, "Coil:Heating:Electric" ) || SameString( HeatingCoilType, "Coil:Heating:Desuperheater" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = GetHeatingCoilTypeNum( HeatingCoilType, HeatingCoilName, errFlag );
+			} else if ( SameString( HeatingCoilType, "Coil:UserDefined" ) ) {
+				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = Coil_UserDefined;
 			} else if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = GetDXCoilTypeNum( HeatingCoilType, HeatingCoilName, errFlag, PrintMessage );
 			}
@@ -3563,6 +3580,56 @@ namespace HVACUnitarySystem {
 
 				}
 
+				} else if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_UserDefined ) {
+					ValidateComponent( HeatingCoilType, HeatingCoilName, IsNotOK, CurrentModuleObject );
+					if ( IsNotOK ) {
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ErrorsFound = true;
+					} else { // mine data from Heating coil object
+
+						errFlag = false;
+						UnitarySystem( UnitarySysNum ).HeatingCoilAvailSchPtr = ScheduleAlwaysOn;
+						if ( errFlag ) {
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ErrorsFound = true;
+							errFlag = false;
+						}
+
+						GetUserDefinedCoilIndex( HeatingCoilName, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, errFlag, CurrentModuleObject );
+						if ( UnitarySystem( UnitarySysNum ).HeatingCoilIndex == 0 ) {
+							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ShowContinueError( "Illegal " + cAlphaFields( iHeatingCoilNameAlphaNum ) + " = " + HeatingCoilName );
+							ErrorsFound = true;
+							errFlag = false;
+						}
+
+// **** How to get this info ****
+//						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = GetWtoAHPCoilCapacity( CoolingCoilType, CoolingCoilName, errFlag );
+//						if ( errFlag ) {
+//							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+//							ErrorsFound = true;
+//							errFlag = false;
+//						}
+
+						// Get the Cooling Coil Inlet Node
+						errFlag = false;
+						GetUserDefinedCoilAirInletNode( HeatingCoilName, HeatingCoilInletNode, errFlag, CurrentModuleObject );
+						if ( errFlag ) {
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ErrorsFound = true;
+							errFlag = false;
+						}
+
+						// Get the Cooling Coil Outlet Node
+						GetUserDefinedCoilAirOutletNode( HeatingCoilName, HeatingCoilOutletNode, errFlag, CurrentModuleObject );
+						if ( errFlag ) {
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ErrorsFound = true;
+							errFlag = false;
+						}
+
+					}
+
 			} else if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
 				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 				ShowContinueError( "Illegal " + cAlphaFields( iHeatingCoilTypeAlphaNum ) + " = " + Alphas( iHeatingCoilTypeAlphaNum ) );
@@ -3625,10 +3692,8 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = CoilDX_CoolingTwoSpeed;
 				} else if ( SameString( CoolingCoilType, "Coil:UserDefined" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = Coil_UserDefined;
-//					SimCoilUserDefined( CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive );
 				} else if ( SameString( CoolingCoilType, "Coil:Cooling:DX:SingleSpeed:ThermalStorage" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = CoilDX_PackagedThermalStorageCooling;
-//					SimTESCoil( CompName, CompIndex, FanOpMode, TESOpMode, PartLoadFrac );
 				} else {
 					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Illegal " + cAlphaFields( iCoolingCoilTypeAlphaNum ) + " = " + Alphas( iCoolingCoilTypeAlphaNum ) );
@@ -4248,13 +4313,12 @@ namespace HVACUnitarySystem {
 							errFlag = false;
 						}
 
-// **** How to get this info ****
-//						UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = GetWtoAHPCoilCapacity( CoolingCoilType, CoolingCoilName, errFlag );
-//						if ( errFlag ) {
-//							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
-//							ErrorsFound = true;
-//							errFlag = false;
-//						}
+						GetTESCoilCoolingCapacity( CoolingCoilName, UnitarySystem( UnitarySysNum ).DesignCoolingCapacity, errFlag, CurrentModuleObject );
+						if ( errFlag ) {
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ErrorsFound = true;
+							errFlag = false;
+						}
 
 						// Get the Cooling Coil Inlet Node
 						errFlag = false;
@@ -7124,6 +7188,7 @@ namespace HVACUnitarySystem {
 		using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 		using WaterToAirHeatPump::SimWatertoAirHP;
 		using UserDefinedComponents::SimCoilUserDefined;
+		using PackagedThermalStorageCoil::SimTESCoil;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -7255,6 +7320,10 @@ namespace HVACUnitarySystem {
 
 			UnitarySystem( UnitarySysNum ).CoolCompPartLoadRatio = PartLoadRatio * double( CompOn );
 
+		} else if ( SELECT_CASE_var == CoilDX_PackagedThermalStorageCooling ) {
+
+			SimTESCoil( CompName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, UnitarySystem( UnitarySysNum ).FanOpMode, UnitarySystem( UnitarySysNum ).TESOpMode, PartLoadRatio );
+
 		}}
 
 		UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac = PartLoadRatio;
@@ -7296,6 +7365,7 @@ namespace HVACUnitarySystem {
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 		using WaterToAirHeatPump::SimWatertoAirHP;
+		using UserDefinedComponents::SimCoilUserDefined;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -7316,6 +7386,13 @@ namespace HVACUnitarySystem {
 		Real64 dummy; // used when sub argument is not needed
 		Real64 OutdoorPressure; // Outdoor barometric pressure at condenser (Pa)
 		bool errFlag; // returned flag from called routine
+		int AirLoopNum;
+		bool HeatingActive;
+		bool CoolingActive;
+
+		AirLoopNum = 1;
+		HeatingActive = false;
+		CoolingActive = true;
 
 		CompName = UnitarySystem( UnitarySysNum ).HeatingCoilName;
 		dummy = 0.0;
@@ -7345,6 +7422,9 @@ namespace HVACUnitarySystem {
 
 			SimDXCoil( CompName, CompOn, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadRatio, OnOffAirFlowRatio );
 			UnitarySystem( UnitarySysNum ).HeatCompPartLoadRatio = PartLoadRatio * double( CompOn );
+
+		} else if ( SELECT_CASE_var == Coil_UserDefined ) {
+			SimCoilUserDefined( CompName, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, AirLoopNum, HeatingActive, CoolingActive );
 
 		} else if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 			if ( present( HeatCoilLoad ) ) {
@@ -7648,6 +7728,11 @@ namespace HVACUnitarySystem {
 		using WaterToAirHeatPump::SimWatertoAirHP;
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using VariableSpeedCoils::VarSpeedCoil;
+		using UserDefinedComponents::SimCoilUserDefined;
+		using PackagedThermalStorageCoil::SimTESCoil;
+		using PackagedThermalStorageCoil::ControlTESIceStorageTankCoil;
+		using PackagedThermalStorageCoil::OffMode;
+		using PackagedThermalStorageCoil::ChargeOnlyMode;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -7703,6 +7788,14 @@ namespace HVACUnitarySystem {
 		int SpeedNum;
 		Real64 LoopDXCoilMaxRTFSave; // Used to find RTF of DX heating coils without overwriting globabl variable
 		Real64 NoLoadTempOut; // saves coil off outlet temp
+		int AirLoopNum;
+		bool HeatingActive;
+		bool CoolingActive;
+
+		AirLoopNum = 1;
+		HeatingActive = false;
+		CoolingActive = true;
+
 
 		// Set local variables
 		// Retrieve the load on the controlled zone
@@ -7796,6 +7889,15 @@ namespace HVACUnitarySystem {
 				} else if ( CoilType_Num == Coil_CoolingWaterToAirHP ) {
 
 					SimWatertoAirHP( BlankString, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, UnitarySystem( UnitarySysNum ).MaxCoolAirMassFlow, FanOpMode, FirstHVACIteration, WSHPRuntimeFrac, UnitarySystem( UnitarySysNum ).MaxONOFFCyclesperHour, UnitarySystem( UnitarySysNum ).HPTimeConstant, UnitarySystem( UnitarySysNum ).FanDelayTime, UnitarySystem( UnitarySysNum ).InitHeatPump, ReqOutput, dummy, 0, PartLoadFrac );
+
+//				No need to simulate off condition since this EMS based component acts according to the EMS program. If NoLoadTempOut does not meet condition, coil will be simulated below.
+//				} else if ( CoilType_Num == Coil_UserDefined ) {
+//					SimCoilUserDefined( CompName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, AirLoopNum, HeatingActive, CoolingActive );
+
+				} else if ( CoilType_Num == CoilDX_PackagedThermalStorageCooling ) {
+
+					SimTESCoil( CompName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, FanOpMode, UnitarySystem( UnitarySysNum ).TESOpMode, PartLoadFrac );
+
 				} else {
 
 				}
@@ -7881,6 +7983,20 @@ namespace HVACUnitarySystem {
 					} else if ( CoilType_Num == Coil_CoolingWaterToAirHP ) {
 
 						SimWatertoAirHP( BlankString, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, UnitarySystem( UnitarySysNum ).MaxCoolAirMassFlow, FanOpMode, FirstHVACIteration, WSHPRuntimeFrac, UnitarySystem( UnitarySysNum ).MaxONOFFCyclesperHour, UnitarySystem( UnitarySysNum ).HPTimeConstant, UnitarySystem( UnitarySysNum ).FanDelayTime, UnitarySystem( UnitarySysNum ).InitHeatPump, ReqOutput, dummy, 0, PartLoadFrac );
+
+					} else if ( CoilType_Num == Coil_UserDefined ) {
+						SimCoilUserDefined( CompName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, AirLoopNum, HeatingActive, CoolingActive );
+
+					} else if ( CoilType_Num == CoilDX_PackagedThermalStorageCooling ) {
+
+						// TES coil simulated above with PLR=0. Operating mode is known here, no need to simulate again to determine operating mode.
+						if ( UnitarySystem( UnitarySysNum ).TESOpMode == OffMode || UnitarySystem( UnitarySysNum ).TESOpMode == ChargeOnlyMode ) { // cannot cool
+							PartLoadFrac = 0.0;
+						} else {
+							// Get full load result
+							SimTESCoil( CompName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, FanOpMode, UnitarySystem( UnitarySysNum ).TESOpMode, PartLoadFrac );
+						}
+
 					} else {
 
 					}
@@ -7893,7 +8009,9 @@ namespace HVACUnitarySystem {
 					//        IF ((Node(OutletNode)%Temp-DesOutTemp) .GT. Acc) THEN ! new method gets caught when temps are very close
 					if ( Node( OutletNode ).Temp > DesOutTemp - Acc ) {
 						PartLoadFrac = 1.0;
-
+						if ( CoilType_Num == CoilDX_PackagedThermalStorageCooling && ( UnitarySystem( UnitarySysNum ).TESOpMode == OffMode || UnitarySystem( UnitarySysNum ).TESOpMode == ChargeOnlyMode ) ) {
+							PartLoadFrac = 0.0;
+						}
 					} else {
 
 						if ( CoilType_Num == CoilDX_CoolingSingleSpeed ) { // COIL:DX:COOLINGBYPASSFACTOREMPIRICAL
@@ -8092,6 +8210,19 @@ namespace HVACUnitarySystem {
 							Par( 4 ) = ReqOutput;
 							UnitarySystem ( UnitarySysNum ).CoolingCoilSensDemand = ReqOutput;
 							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, CoolWatertoAirHPTempResidual, 0.0, 1.0, Par );
+
+						} else if ( CoilType_Num == Coil_UserDefined ) {
+							// do nothing, user defined coil cannot be controlled
+
+					} else if ( CoilType_Num == CoilDX_PackagedThermalStorageCooling ) {
+
+						ControlTESIceStorageTankCoil( CompName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, UnitarySystem( UnitarySysNum ).UnitarySystemType, 
+							FanOpMode, DesOutTemp, DesOutHumRat, PartLoadFrac, 
+							UnitarySystem( UnitarySysNum ).TESOpMode, UnitarySystem( UnitarySysNum ).DehumidificationMode, 
+							UnitarySystem( UnitarySysNum ).SensPLRIter, UnitarySystem( UnitarySysNum ).SensPLRIterIndex, 
+							UnitarySystem( UnitarySysNum ).SensPLRFail, UnitarySystem( UnitarySysNum ).SensPLRFailIndex, 
+							UnitarySystem( UnitarySysNum ).LatPLRIter, UnitarySystem( UnitarySysNum ).LatPLRIterIndex, 
+							UnitarySystem( UnitarySysNum ).LatPLRFail, UnitarySystem( UnitarySysNum ).LatPLRFailIndex );
 
 						} else {
 							ShowMessage( " For :" + UnitarySystem( UnitarySysNum ).UnitarySystemType + "=\"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
@@ -8562,6 +8693,7 @@ namespace HVACUnitarySystem {
 		using WaterToAirHeatPump::SimWatertoAirHP;
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using VariableSpeedCoils::VarSpeedCoil;
+		using UserDefinedComponents::SimCoilUserDefined;
 
 		// Locals
 		bool const SuppHeatingCoilFlag( false );
@@ -8610,6 +8742,13 @@ namespace HVACUnitarySystem {
 		Real64 OutdoorPressure; // local variable for OutBaroPress
 		Real64 OutdoorWetBulb; // local variable for OutWetBulbTemp
 		Real64 OutletTemp;
+		int AirLoopNum;
+		bool HeatingActive;
+		bool CoolingActive;
+
+		AirLoopNum = 1;
+		HeatingActive = false;
+		CoolingActive = true;
 
 		// Set local variables
 		// Retrieve the load on the controlled zone
@@ -8684,6 +8823,9 @@ namespace HVACUnitarySystem {
 					SimDXCoil( CompName, On, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, FanOpMode, PartLoadFrac );
 					UnitarySystem( UnitarySysNum ).CompPartLoadRatio = PartLoadFrac;
 
+				} else if ( SELECT_CASE_var == Coil_UserDefined ) {
+//					SimCoilUserDefined( CompName, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, AirLoopNum, HeatingActive, CoolingActive );
+
 				} else if ( ( SELECT_CASE_var == CoilDX_MultiSpeedHeating ) || ( SELECT_CASE_var == Coil_HeatingAirToAirVariableSpeed ) || ( SELECT_CASE_var == Coil_HeatingWaterToAirHPVSEquationFit ) || ( SELECT_CASE_var == Coil_HeatingElectric_MultiStage ) || ( SELECT_CASE_var == Coil_HeatingGas_MultiStage ) ) {
 
 					SimMultiSpeedCoils( UnitarySysNum, FirstHVACIteration, SensibleLoad, LatentLoad, PartLoadFrac, HeatingCoil );
@@ -8734,6 +8876,9 @@ namespace HVACUnitarySystem {
 
 						SimDXCoil( CompName, On, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, FanOpMode, PartLoadFrac );
 						UnitarySystem( UnitarySysNum ).CompPartLoadRatio = PartLoadFrac;
+
+					} else if ( SELECT_CASE_var == Coil_UserDefined ) {
+						SimCoilUserDefined( CompName, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, AirLoopNum, HeatingActive, CoolingActive );
 
 					} else if ( SELECT_CASE_var == CoilDX_MultiSpeedHeating ) {
 
@@ -8907,6 +9052,9 @@ namespace HVACUnitarySystem {
 							UnitarySystem ( UnitarySysNum ).HeatingCoilSensDemand = ReqOutput;
 
 							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, HeatWatertoAirHPTempResidual, 0.0, 1.0, Par );
+
+						} else if ( SELECT_CASE_var == Coil_UserDefined ) {
+							// do nothing, user defined coil cannot be controlled
 
 						} else {
 							ShowMessage( " For :" + UnitarySystem( UnitarySysNum ).UnitarySystemType + "=\"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
@@ -9984,6 +10132,9 @@ namespace HVACUnitarySystem {
 			} // ELSE ! No Moisture Load
 		} // No Heating/Cooling Load
 
+		CompOnMassFlow = min( CompOnMassFlow, Node( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ).MassFlowRateMaxAvail );
+		CompOffMassFlow = min( CompOffMassFlow, Node( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ).MassFlowRateMaxAvail );
+
 		MSHPMassFlowRateLow = CompOffMassFlow; // these need to be set for multi-speed coils
 		MSHPMassFlowRateHigh = CompOnMassFlow; // doesn't hurt to set these if multi-speed coils are not used
 
@@ -10072,7 +10223,7 @@ namespace HVACUnitarySystem {
 		}
 		if ( GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).SysAvailSchedPtr ) > 0.0 && ( ( FanOn || TurnFansOn ) && ! TurnFansOff ) ) {
 			Node( InletNode ).MassFlowRate = AverageUnitMassFlow;
-			Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow;
+//			Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow;
 			if ( AverageUnitMassFlow > 0.0 ) {
 				OnOffAirFlowRatio = CompOnMassFlow / AverageUnitMassFlow;
 			} else {
@@ -10281,16 +10432,34 @@ namespace HVACUnitarySystem {
 		LoopOnOffFanPartLoadRatio = UnitarySystem( UnitarySysNum ).FanPartLoadRatio;
 		LoopCompCycRatio = UnitarySystem( UnitarySysNum ).CycRatio;
 
-		if ( CurOASysNum > 0 ) {
-			OASysEqSizing( CurOASysNum ).AirFlow = false;
-			OASysEqSizing( CurOASysNum ).Capacity = false;
-		} else if ( CurSysNum > 0 ) {
-			UnitarySysEqSizing( CurSysNum ).AirFlow = false;
-			UnitarySysEqSizing( CurSysNum ).Capacity = false;
-			AirLoopControlInfo( CurSysNum ).UnitarySysSimulating = false;
-		} else if ( CurZoneEqNum > 0 ) {
-			ZoneEqSizing( CurZoneEqNum ).AirFlow = false;
-			ZoneEqSizing( CurZoneEqNum ).Capacity = false;
+		if ( UnitarySystem(UnitarySysNum).FirstPass ) {
+
+			if ( CurOASysNum > 0 ) {
+				OASysEqSizing( CurOASysNum ).AirFlow = false;
+				OASysEqSizing( CurOASysNum ).CoolingAirFlow = false;
+				OASysEqSizing( CurOASysNum ).HeatingAirFlow = false;
+				OASysEqSizing( CurOASysNum ).Capacity = false;
+				OASysEqSizing( CurOASysNum ).CoolingCapacity = false;
+				OASysEqSizing( CurOASysNum ).HeatingCapacity = false;
+			} else if ( CurSysNum > 0 ) {
+				UnitarySysEqSizing( CurSysNum ).AirFlow = false;
+				UnitarySysEqSizing( CurSysNum ).CoolingAirFlow = false;
+				UnitarySysEqSizing( CurSysNum ).HeatingAirFlow = false;
+				UnitarySysEqSizing( CurSysNum ).Capacity = false;
+				UnitarySysEqSizing( CurSysNum ).CoolingCapacity = false;
+				UnitarySysEqSizing( CurSysNum ).HeatingCapacity = false;
+				AirLoopControlInfo( CurSysNum ).UnitarySysSimulating = false;
+			} else if ( CurZoneEqNum > 0 ) {
+				ZoneEqSizing( CurZoneEqNum ).AirFlow = false;
+				ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = false;
+				ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = false;
+				ZoneEqSizing( CurZoneEqNum ).Capacity = false;
+				ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = false;
+				ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = false;
+			}
+
+			UnitarySystem( UnitarySysNum ).FirstPass = false;
+
 		}
 
 	}
