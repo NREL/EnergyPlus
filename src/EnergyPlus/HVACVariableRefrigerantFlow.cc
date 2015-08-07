@@ -238,7 +238,6 @@ namespace HVACVariableRefrigerantFlow {
 		using General::TrimSigDigits;
 		using DXCoils::DXCoilTotalCooling;
 		using DXCoils::DXCoilTotalHeating;
-		using DXCoils::CalcVRFIUEvapCondTemp;
 		using DXCoils::DXCoil;
 
 		// Locals
@@ -337,48 +336,14 @@ namespace HVACVariableRefrigerantFlow {
 			
 			if ( VRF( VRFCondenser ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) { 
 			// Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-				CalcVRFCondenser_FluidTCtrl( VRFCondenser, FirstHVACIteration );
+				CalcVRFCondenser_FluidTCtrl( VRFCondenser, FirstHVACIteration ); // Analyze the VRF OU operations
+				CalcVRFIUTeTc_FluidTCtrl( VRFCondenser ); // Get the VRF IU Te/Tc
 			} else {
 			// Algorithm Type: VRF model based on system curve
 				CalcVRFCondenser( VRFCondenser, FirstHVACIteration );
 			}
 		
 			ReportVRFCondenser( VRFCondenser );
-			    
-			// @@ This is for FluidTCtrl only @@! Can be moved into CalcVRFCondenser. Set up a new method "CalcVRFIUTeTc" // Step 1.3_zrp
-			if ( VRF( VRFCondenser ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) {
-			
-				// Followings for FluidTCtrl Only
-				Array1D< Real64 >  EvapTemp;
-				Array1D< Real64 >  CondTemp;
-				Real64 IUMinEvapTemp;
-				Real64 IUMaxCondTemp;
-				
-				// XP_Calculate the VRF outdoor unit minimum evaporating temperature ?? For next iteration_zrp
-				EvapTemp.allocate( TerminalUnitList( TUListNum ).NumTUInList );
-				CondTemp.allocate( TerminalUnitList( TUListNum ).NumTUInList );
-				IUMinEvapTemp = 100.0;
-				IUMaxCondTemp = 0.0;
-
-				if ( VRF( VRFCondenser ).Algorithm == 1) { 
-				// 1. HighSensible 
-					int VRFTUNumi;
-					for ( int i = 1; i <= TerminalUnitList( TUListNum ).NumTUInList; i++ ) {
-						VRFTUNumi = TerminalUnitList( TUListNum ).ZoneTUPtr( i );
-						CalcVRFIUEvapCondTemp( VRFTU( VRFTUNumi ).CoolCoilIndex, VRFTU( VRFTUNumi ).HeatCoilIndex, VRFTU( VRFTUNumi ).ZoneNum, EvapTemp( i ), CondTemp( i ) );
-
-						IUMinEvapTemp = min( IUMinEvapTemp, EvapTemp( i ), 15.0);
-						IUMaxCondTemp = max( IUMaxCondTemp, CondTemp( i ), 42.0);
-					}
-					
-					VRF( VRFCondenser ).MinEvaporatingTemp = max( IUMinEvapTemp, 4.0 ); 
-					VRF( VRFCondenser ).MaxCondensingTemp = min( IUMaxCondTemp, 46.0 );
-				} else {
-				// 2. TeTcConstant
-					VRF( VRFCondenser ).MinEvaporatingTemp = VRF( VRFCondenser ).EvapTempFixed;
-					VRF( VRFCondenser ).MaxCondensingTemp  = VRF( VRFCondenser ).CondTempFixed;
-				}
-			}
 			
 			if ( VRF( VRFCondenser ).CondenserType == WaterCooled ) UpdateVRFCondenser( VRFCondenser );
 		}
@@ -3786,7 +3751,6 @@ namespace HVACVariableRefrigerantFlow {
 		using General::RoundSigDigits;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::InitComponentNodes;
-		using DXCoils::CalcVRFIUEvapCondTemp;
 		using DXCoils::CalcVRFIUAirFlow;
 
 		// Locals
@@ -7285,6 +7249,70 @@ namespace HVACVariableRefrigerantFlow {
 	}
 
 	void
+	CalcVRFIUTeTc_FluidTCtrl(
+		int const IndexVRFCondenser // index to VRF OU
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         RP Zhang (LBNL), XF Pang (LBNL), Y Yura (Daikin Inc)
+		//       DATE WRITTEN   June 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		//       This subroutine is part of the new VRF model based on physics, appliable for Fluid Temperature Control.
+		//       This subroutine determines the VRF evaporating temperature at cooling mode and the condensing temperature 
+		//       at heating mode. This is the indoor unit side analysis.
+
+		// METHODOLOGY EMPLOYED:
+		//       There are two options to calculate the IU Te/Tc: (1) HighSensible method analyzes the conditions of each IU 
+		//       and then decide and Te/Tc that can satisfy all the zones (2) TeTcConstant method uses fixed values provided 
+		//       by the user.
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using DXCoils::CalcVRFIUEvapCondTemp;
+		
+		// Followings for FluidTCtrl Only
+		Array1D< Real64 >  EvapTemp;
+		Array1D< Real64 >  CondTemp;
+		Real64 IUMinEvapTemp;
+		Real64 IUMaxCondTemp;
+		
+		int TUListNum = VRF( IndexVRFCondenser ).ZoneTUListPtr;
+		EvapTemp.allocate( TerminalUnitList( TUListNum ).NumTUInList );
+		CondTemp.allocate( TerminalUnitList( TUListNum ).NumTUInList );
+		IUMinEvapTemp = 100.0;
+		IUMaxCondTemp = 0.0;
+
+		if ( VRF( IndexVRFCondenser ).Algorithm == 1) { 
+		// 1. HighSensible: analyze the conditions of each IU 
+		
+			for ( int i = 1; i <= TerminalUnitList( TUListNum ).NumTUInList; i++ ) {
+				int VRFTUNumi = TerminalUnitList( TUListNum ).ZoneTUPtr( i );
+				// analyze the conditions of each IU 
+				CalcVRFIUEvapCondTemp( VRFTU( VRFTUNumi ).CoolCoilIndex, VRFTU( VRFTUNumi ).HeatCoilIndex, VRFTU( VRFTUNumi ).ZoneNum, EvapTemp( i ), CondTemp( i ) );
+
+				// select the Te/Tc that can satisfy all the zones
+				IUMinEvapTemp = min( IUMinEvapTemp, EvapTemp( i ), 15.0);
+				IUMaxCondTemp = max( IUMaxCondTemp, CondTemp( i ), 42.0);
+			}
+			
+			VRF( IndexVRFCondenser ).MinEvaporatingTemp = max( IUMinEvapTemp, 4.0 ); 
+			VRF( IndexVRFCondenser ).MaxCondensingTemp = min( IUMaxCondTemp, 46.0 );
+			
+		} else {
+		// 2. TeTcConstant: use fixed values provided by the user
+			VRF( IndexVRFCondenser ).MinEvaporatingTemp = VRF( IndexVRFCondenser ).EvapTempFixed;
+			VRF( IndexVRFCondenser ).MaxCondensingTemp  = VRF( IndexVRFCondenser ).CondTempFixed;
+		}
+	
+	}
+	
+			
+	void
 	CalcVRFCondenser_FluidTCtrl(
 		int const VRFCond, // index to VRF condenser
 		bool const EP_UNUSED( FirstHVACIteration ) // flag for first time through HVAC system simulation
@@ -7657,7 +7685,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		
 		
-		// @@! zrp: Main modification starts here
+		// @@ zrp: Main modification starts here
 				
 				
 		// zrp: Main modification start
@@ -8448,7 +8476,7 @@ namespace HVACVariableRefrigerantFlow {
 				}
 		
 			} //compressor cycling
-			 
+			
 			VRF( VRFCond ).CompActSpeed = max( CompSpdActual, 0.0 );
 			VRF( VRFCond ).NcompHeating = max( NcompHeating, 0.0 ) / 0.95; // 0.95 is the efficiency of the compressor inverter, coming from IDF input 
 			VRF( VRFCond ).CondFanPower = VRF( VRFCond ).RatedCondFanPower * pow_3( CondFlowRatio );
@@ -8483,7 +8511,7 @@ namespace HVACVariableRefrigerantFlow {
 		VRF( VRFCond ).Modifi_factor  =  C_cap_operation; 
 		//150129 Yoshi end 
 		
-		// @@! zrp: Main modification ends here
+		// @@ zrp: Main modification ends here
 		
 		
 		// calculate capacities and energy use

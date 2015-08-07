@@ -1546,6 +1546,11 @@ namespace HVACVariableRefrigerantFlow {
 	// Begin of Methods for New VRF Model: Fluid Temperature Control
 	//******************************************************************************
 	void
+	CalcVRFIUTeTc_FluidTCtrl(
+		int const IndexVRFCondenser // index to VRF OU
+	);
+	
+	void
 	CalcVRF_FluidTCtrl(
 		int const VRFTUNum, // Unit index in VRF terminal unit array
 		bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
