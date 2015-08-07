@@ -87,11 +87,6 @@ namespace DXCoils {
 	extern Array1D< Real64 > DXCoilCoolInletAirWBTemp; // DX cooling coil inlet air wet-bulb temp [C]
 	extern Array1D< Real64 > DXCoilHeatInletAirDBTemp; // DX heating coil inlet air dry-bulb temp [C]
 	extern Array1D< Real64 > DXCoilHeatInletAirWBTemp; // DX heating coil inlet air wet-bulb temp [C]
-	// Followings for VRF FluidTCtrl Only
-	extern Array1D< Real64 >  DXCoilSH; // Yoshi_DX superheating degrees [C]
-	extern Array1D< Real64 >  DXCoilSC; // Yoshi_DX subcooling degrees [C]
-	extern Array1D< Real64 >  DXCoil_InletAirDBT; // Yoshi_InletAirDBT [C]
-	extern int MinIDUFanSpeed; //XP_minimum indoor unit fan speed ratio
 	
 	extern int CurDXCoilNum;
 

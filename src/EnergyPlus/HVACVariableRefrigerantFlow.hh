@@ -1003,9 +1003,6 @@ namespace HVACVariableRefrigerantFlow {
 		Array1D_bool HeatingCoilAvailable; // cooling coil availability scheduled on
 		Array1D_int CoolingCoilAvailSchPtr; // cooilng coil availability schedule index
 		Array1D_int HeatingCoilAvailSchPtr; // heating coil availability schedule index
-		Array1D< Real64 > TU_SH;        // Yoshi_SH for each TU
-		Array1D< Real64 > TU_SC;        // Yoshi_SC for each TU
-		Array1D< Real64 > TU_IADT;      // Yoshi_Inlet Air Drybulb Temperature for each TU 	 
 
 		// Default Constructor
 		TerminalUnitListData() :
@@ -1029,10 +1026,7 @@ namespace HVACVariableRefrigerantFlow {
 			Array1_bool const & CoolingCoilAvailable, // cooling coil availability scheduled on
 			Array1_bool const & HeatingCoilAvailable, // cooling coil availability scheduled on
 			Array1_int const & CoolingCoilAvailSchPtr, // cooilng coil availability schedule index
-			Array1_int const & HeatingCoilAvailSchPtr, // heating coil availability schedule index
-			Array1D< Real64 > const & TU_SH,        // Yoshi_SH for each TU
-			Array1D< Real64 > const & TU_SC,        // Yoshi_SC for each TU
-			Array1D< Real64 > const & TU_IADT       // Yoshi_Inlet Air Drybulb Temperature for each TU 	 
+			Array1_int const & HeatingCoilAvailSchPtr // heating coil availability schedule index
 		) :
 			Name( Name ),
 			NumTUInList( NumTUInList ),
@@ -1049,10 +1043,7 @@ namespace HVACVariableRefrigerantFlow {
 			CoolingCoilAvailable( CoolingCoilAvailable ),
 			HeatingCoilAvailable( HeatingCoilAvailable ),
 			CoolingCoilAvailSchPtr( CoolingCoilAvailSchPtr ),
-			HeatingCoilAvailSchPtr( HeatingCoilAvailSchPtr ),
-			TU_SH( TU_SH ),
-			TU_SC( TU_SC ),
-			TU_IADT( TU_IADT )
+			HeatingCoilAvailSchPtr( HeatingCoilAvailSchPtr )
 		{}
 
 	};
