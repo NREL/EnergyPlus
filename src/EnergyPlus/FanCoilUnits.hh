@@ -38,6 +38,7 @@ namespace FanCoilUnits {
 	extern int const CCM_CycFan;
 	extern int const CCM_VarFanVarFlow;
 	extern int const CCM_VarFanConsFlow;
+	extern int const CCM_MultiStageFan;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -147,6 +148,9 @@ namespace FanCoilUnits {
 		int ATMixerOutNode; // outlet air node number for the air terminal mixer
 		int ZonePtr; // pointer to a zone served by a fancoil unit
 		int HVACSizingIndex; // index of a HVACSizing object for a fancoil unit
+		Real64 SpeedRatio; // speed ratio when the fan is cycling between stages
+		int FanOpModeSchedPtr; // pointer to supply air fan operating mode schedule
+		int FanOpMode; // 1=cycling fan cycling coil; 2=constant fan cycling coil
 
 		// Report data
 		Real64 HeatPower; // unit heating output in watts
@@ -225,6 +229,9 @@ namespace FanCoilUnits {
 			ATMixerOutNode( 0 ),
 			ZonePtr( 0 ),
 			HVACSizingIndex( 0 ),
+			SpeedRatio( 0.0 ),
+			FanOpModeSchedPtr( 0 ),
+			FanOpMode( 1 ),
 			HeatPower( 0.0 ),
 			HeatEnergy( 0.0 ),
 			TotCoolPower( 0.0 ),
@@ -319,6 +326,9 @@ namespace FanCoilUnits {
 			int const ATMixerOutNode, // outlet air node number for the air terminal mixer
 			int const ZonePtr, // pointer to a zone served by a fancoil unit
 			int const HVACSizingIndex, // index of a HVACSizing object for a fancoil unit
+			Real64 const SpeedRatio, // speed ratio when the fan is cycling between stages
+			int const FanOpModeSchedPtr, // pointer to supply air fan operating mode schedule
+			int const FanOpMode, // 1=cycling fan cycling coil; 2=constant fan cycling coil
 			Real64 const HeatPower, // unit heating output in watts
 			Real64 const HeatEnergy, // unit heating output in J
 			Real64 const TotCoolPower, // unit total cooling power output in watts
@@ -410,6 +420,9 @@ namespace FanCoilUnits {
 			ATMixerOutNode( ATMixerOutNode ),
 			ZonePtr( ZonePtr ),
 			HVACSizingIndex( HVACSizingIndex ),
+			SpeedRatio( SpeedRatio ),
+			FanOpModeSchedPtr( FanOpModeSchedPtr ),
+			FanOpMode( FanOpMode ),
 			HeatPower( HeatPower ),
 			HeatEnergy( HeatEnergy ),
 			TotCoolPower( TotCoolPower ),
@@ -498,6 +511,25 @@ namespace FanCoilUnits {
 		Real64 & LoadMet, // load met by unit (watts)
 		Optional< Real64 > PLR = _ // Part Load Ratio, fraction of time step fancoil is on
 	);
+
+	void
+	SimMultiStage4PipeFanCoil(
+		int & FanCoilNum, // number of the current fan coil unit being simulated
+		int const ControlledZoneNum, // index into ZoneEqupConfig
+		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+		Real64 & PowerMet // Sensible power supplied (W)
+		);
+
+	void
+	CalcMultiStage4PipeFanCoil(
+		int & FanCoilNum, // number of the current fan coil unit being simulated
+		int const ZoneNum, // number of zone being served
+		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+		Real64 const QZnReq, // current zone cooling or heating load
+		Real64 & SpeedRatio, // fan coil speed ratio
+		Real64 & PartLoadRatio, // fan coil part load ratio
+		Real64 & PowerMet // Sensible power supplied (W)
+		);
 
 	void
 	ReportFanCoilUnit( int const FanCoilNum ); // number of the current fan coil unit being simulated

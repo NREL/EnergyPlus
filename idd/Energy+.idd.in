@@ -31872,6 +31872,7 @@ ZoneHVAC:FourPipeFanCoil,
         \key CyclingFan
         \key VariableFanVariableFlow
         \key VariableFanConstantFlow
+        \key MultiStageFan
    N1 , \field Maximum Supply Air Flow Rate
         \required-field
         \autosizable
@@ -31970,10 +31971,18 @@ ZoneHVAC:FourPipeFanCoil,
         \note Enter the name of an AvailabilityManagerAssignmentList object.
         \type object-list
         \object-list SystemAvailabilityManagerLists
-   A16; \field Design Specification ZoneHVAC Sizing Object Name
+   A16, \field Design Specification ZoneHVAC Sizing Object Name
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
         \type object-list
         \object-list DesignSpecificationZoneHVACSizingName
+   A17; \field Supply Air Fan Operating Mode Schedule Name
+        \type object-list
+        \object-list ScheduleNames
+        \note Enter the name of a schedule that controls fan operation. Schedule Name values of 0 denote
+        \note cycling fan operation (fan cycles with cooling coil). Schedule values greater
+        \note than 0 denote constant fan operation (fan runs continually regardless of coil operation).
+        \note The fan operating mode defaults to cycling fan operation if this field is left blank.
+        \note This input field is currently used with MultiStageFan capacity control method
 
 ZoneHVAC:WindowAirConditioner,
         \memo Window air conditioner. Forced-convection cooling-only unit with supply fan, direct

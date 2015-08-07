@@ -1406,6 +1406,26 @@ namespace HVACUnitarySystem {
 		Real64 const PartLoadFrac,
 		int const CoilType
 	);
+	
+	void
+	SimMultiStageWaterCoolingCoils(
+		std::string const & CompName, // water cooling coil name
+		bool const FirstHVACIteration, // true when first HVAC iteration
+		int const UnitarySysNum, // index of AirloopHVAC:UnitarySystem object
+		Real64 const SpeedRatio, // = (Load - CoilCapMinFanSpeed) / (CoilCapMaxFanSpeed - CoilCapMinFanSpeed)
+		Real64 const PartLoadRatio, // cycling part load ratio
+		int const SpeedNum, // Speed number
+		int const FanOpMode ); // Sets fan control to CycFanCycCoil or ContFanCycCoil
+
+	void
+	SimMultiStageWaterHeatingCoils(
+		std::string const & CompName, // water cooling coil name
+		bool const FirstHVACIteration, // true when first HVAC iteration
+		int const UnitarySysNum, // index of AirloopHVAC:UnitarySystem object
+		Real64 const SpeedRatio, // = (Load - CoilCapMinFanSpeed) / (CoilCapMaxFanSpeed - CoilCapMinFanSpeed)
+		Real64 const PartLoadRatio, // cycling part load ratio
+		int const SpeedNum, // Speed number
+		int const FanOpMode ); // Sets fan control to CycFanCycCoil or ContFanCycCoil
 
 	void
 	SimSteamCoils(

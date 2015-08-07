@@ -15,6 +15,11 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/DataPlant.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::HVACUnitarySystem;
@@ -25,6 +30,18 @@ using namespace DataGlobals;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace DataSizing;
 using namespace EnergyPlus::Psychrometrics;
+using namespace EnergyPlus::DataZoneEquipment;
+using namespace EnergyPlus::DataHeatBalance;
+using namespace EnergyPlus::HeatBalanceManager;
+using namespace EnergyPlus::DataPlant;
+using namespace EnergyPlus::DataEnvironment;
+using namespace EnergyPlus::WaterCoils;
+using General::TrimSigDigits;
+using DataEnvironment::OutDryBulbTemp;
+using WaterCoils::WaterCoil;
+using WaterCoils::WaterCoil_SimpleHeating;
+using WaterCoils::WaterCoil_Cooling;
+using WaterCoils::SimpleAnalysis;
 using General::TrimSigDigits;
 
 TEST( SetOnOffMassFlowRateTest, Test1 )
@@ -375,5 +392,376 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 	UnitarySystemNumericFields.deallocate();
 	cached_Twb.deallocate();
 	cached_Psat.deallocate();
+
+}
+TEST( HVACUnitarySystem, SimMultiStageWaterHeatingCoils ) {
+
+	ShowMessage( "Begin Test: CalcUnitaryHeatingSystem, SimMultiStageWaterHeatingCoils" );
+
+	int UnitarySysNum( 1 );
+	bool FirstHVACIteration( false );
+	Real64 PartLoadRatio( 1.0 );
+	int CompOn( 1 );
+	Real64 OnOffAirFlowRatio( 1.0 );
+	Real64 HeatCoilLoad( 0.0 );
+	Real64 HotWaterMassFlowRate( 0.0 );
+
+	int NumOfZones( 1 );
+	ZoneEquipConfig.allocate( 1 );
+	ZoneEquipConfig( 1 ).ZoneName = "East Zone";
+	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
+	ZoneEquipConfig( 1 ).IsControlled = true;
+	ZoneEquipConfig( 1 ).AirLoopNum = 1;
+	ZoneEquipConfig( 1 ).NumInletNodes = 1;
+	ZoneEquipConfig( 1 ).InletNode.allocate( 1 );
+	ZoneEquipConfig( 1 ).InletNode( 1 ) = 1;
+	ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
+	ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
+	ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 2;
+	ZoneEquipConfig( 1 ).ReturnAirNode = 3;
+
+	Zone.allocate( NumOfZones );
+	Zone( 1 ).Name = ZoneEquipConfig( 1 ).ZoneName;
+
+	TotNumLoops = 1;
+	PlantLoop.allocate( TotNumLoops );
+
+	MultiOrVarSpeedHeatCoil.allocate( 1 );
+	MultiOrVarSpeedHeatCoil( UnitarySysNum ) = true;
+	MultiOrVarSpeedCoolCoil.allocate( 1 );
+	MultiOrVarSpeedCoolCoil( UnitarySysNum ) = true;
+	Node.allocate( 10 );
+	WaterCoil.allocate( 1 );
+
+	MSHPMassFlowRateLow = 0.0;
+	MSHPMassFlowRateHigh = 0.0;
+
+	UnitarySystem.allocate( 1 );
+	UnitarySystem( UnitarySysNum ).HeatMassFlowRate.allocate( 3 );
+	UnitarySystem( UnitarySysNum ).CoolMassFlowRate.allocate( 3 );
+	UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio.allocate( 3 );
+	UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio.allocate( 3 );
+
+	UnitarySystem( UnitarySysNum ).LastMode = HeatingMode;
+	UnitarySystem( UnitarySysNum ).IdleMassFlowRate = 0.2;
+	UnitarySystem( UnitarySysNum ).IdleSpeedRatio = 0.2;
+	UnitarySystem( UnitarySysNum ).FanAvailSchedPtr = ScheduleAlwaysOn;
+	UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum = 1;
+
+	UnitarySystem( UnitarySysNum ).HeatMassFlowRate( 1 ) = 0.25;
+	UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( 1 ) = 0.25;
+	UnitarySystem( UnitarySysNum ).HeatMassFlowRate( 2 ) = 0.5;
+	UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( 2 ) = 0.5;
+	UnitarySystem( UnitarySysNum ).HeatMassFlowRate( 3 ) = 1.0;
+	UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( 3 ) = 1.0;
+
+	UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 1 ) = 0.3;
+	UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 1 ) = 0.3;
+	UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 2 ) = 0.6;
+	UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 2 ) = 0.6;
+	UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 3 ) = 1.0;
+	UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 3 ) = 1.0;
+
+	// heating load at various speeds
+	UnitarySystem( UnitarySysNum ).NumOfSpeedHeating = 3;
+	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 3;
+	UnitarySystem( UnitarySysNum ).NumOfSpeedCooling = 3;
+	UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 0;
+	HeatingLoad = true;
+	CoolingLoad = false;
+
+	// cycling fan mode 
+	UnitarySystem( UnitarySysNum ).FanOpMode = CycFanCycCoil;
+
+	// heating load only
+	MoistureLoad = 0.0;
+	HeatCoilLoad = 12000.0;
+	UnitarySystem( UnitarySysNum ).Humidistat = false;
+
+	HotWaterMassFlowRate = 1.0;
+	UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow = 0.001;
+	UnitarySystem( UnitarySysNum ).MultiSpeedCoolingCoil = true;
+	UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = Coil_HeatingWater;
+	UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = 1.0;
+	UnitarySystem( UnitarySysNum ).HeatingCycRatio = 1.0;
+	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 3;
+
+	WaterCoils::CheckEquipName.allocate( 1 );
+	WaterCoils::NumWaterCoils = 1;
+	WaterCoils::GetWaterCoilsInputFlag = false;
+	WaterCoil( 1 ).SchedPtr = DataGlobals::ScheduleAlwaysOn;
+	WaterCoil( 1 ).Name = "Water Heating Coil";
+	WaterCoil( 1 ).TotWaterHeatingCoilRate = 0.0;
+	WaterCoil( 1 ).WaterCoilType = Coil_HeatingWater;
+	WaterCoil( 1 ).WaterCoilType_Num = WaterCoil_SimpleHeating;
+	WaterCoil( 1 ).DesAirVolFlowRate = 1.0;
+	WaterCoil( 1 ).MaxWaterVolFlowRate = HotWaterMassFlowRate;
+	WaterCoil( 1 ).UACoil = 400.0;
+
+	WaterCoil( 1 ).AirInletNodeNum = 4;
+	WaterCoil( 1 ).AirOutletNodeNum = 5;
+
+	WaterCoil( 1 ).InletAirTemp = 10.0;
+	WaterCoil( 1 ).InletAirHumRat = 0.003;
+	WaterCoil( 1 ).InletWaterTemp = 60.0;
+	Node( WaterCoil( 1 ).AirInletNodeNum ).Temp = 10.0;
+	Node( WaterCoil( 1 ).AirInletNodeNum ).HumRat = 0.003;
+	Node( WaterCoil( 1 ).AirInletNodeNum ).Enthalpy = 25000;
+
+	WaterCoil( 1 ).InletWaterMassFlowRate = HotWaterMassFlowRate;
+	WaterCoil( 1 ).MaxWaterMassFlowRate = HotWaterMassFlowRate;
+
+	WaterCoil( 1 ).WaterLoopNum = 1;
+	WaterCoil( 1 ).WaterLoopSide = 1;
+	WaterCoil( 1 ).WaterLoopBranchNum = 1;
+	WaterCoil( 1 ).WaterLoopCompNum = 1;
+
+	WaterCoil( 1 ).WaterInletNodeNum = 6;
+	WaterCoil( 1 ).WaterOutletNodeNum = 7;
+	Node( WaterCoil( 1 ).WaterInletNodeNum ).MassFlowRate = HotWaterMassFlowRate;
+	Node( WaterCoil( 1 ).WaterInletNodeNum ).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+	Node( WaterCoil( 1 ).WaterInletNodeNum ).Temp = 60.0;
+
+	Node( WaterCoil( 1 ).WaterOutletNodeNum ).MassFlowRate = HotWaterMassFlowRate;
+	Node( WaterCoil( 1 ).WaterOutletNodeNum ).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+
+	for ( int l = 1; l <= TotNumLoops; ++l ) {
+		auto & loop( PlantLoop( l ) );
+		loop.LoopSide.allocate( 2 );
+		auto & loopside( PlantLoop( 1 ).LoopSide( 1 ) );
+		loopside.TotalBranches = 1;
+		loopside.Branch.allocate( 1 );
+		auto & loopsidebranch( PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ) );
+		loopsidebranch.TotalComponents = 1;
+		loopsidebranch.Comp.allocate( 1 );
+	}
+	PlantLoop( 1 ).Name = "WaterLoop";
+	PlantLoop( 1 ).FluidName = "FluidWaterLoop";
+	PlantLoop( 1 ).FluidIndex = 1;
+	PlantLoop( 1 ).FluidName = "WATER";
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = WaterCoil( 1 ).Name;
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = WaterCoil_SimpleHeating;
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = WaterCoil( 1 ).WaterInletNodeNum;
+
+	UnitarySystem( UnitarySysNum ).HeatingCoilIndex = 1;
+	UnitarySystem( UnitarySysNum ).HeatingCoilName = WaterCoil( 1 ).Name;
+	UnitarySystem( UnitarySysNum ).HeatCoilFluidInletNode = WaterCoil( 1 ).WaterInletNodeNum;
+	UnitarySystem( UnitarySysNum ).HeatCoilFluidOutletNodeNum = WaterCoil( 1 ).WaterOutletNodeNum;
+
+	DataGlobals::DoingSizing = true;
+
+	SimMultiStageWaterHeatingCoils( WaterCoil( 1 ).Name, FirstHVACIteration, UnitarySysNum, UnitarySystem( UnitarySysNum ).HeatingSpeedRatio, UnitarySystem( UnitarySysNum ).HeatingCycRatio, UnitarySystem( UnitarySysNum ).HeatingSpeedNum, UnitarySystem( UnitarySysNum ).FanOpMode );
+
+	EXPECT_NEAR( 15750.0, WaterCoil( 1 ).TotWaterHeatingCoilRate, 2.0 );
+
+	DataGlobals::DoingSizing = false;
+	// Clean up
+	//CheckEquipName.deallocate();
+	MultiOrVarSpeedHeatCoil.deallocate();
+	MultiOrVarSpeedCoolCoil.deallocate();
+	PlantLoop.deallocate();
+	WaterCoil.allocate( 1 );
+	Node.deallocate();
+	UnitarySystem.deallocate();
+	ZoneEquipConfig.deallocate();
+	Zone.deallocate();
+}
+TEST( HVACUnitarySystem, SimMultiStageWaterCoolingCoils ) {
+
+	ShowMessage( "Begin Test: CalcUnitaryHeatingSystem, SimMultiStageWaterCoolingCoils" );
+
+	int UnitarySysNum( 1 );
+	bool FirstHVACIteration( false );
+	Real64 PartLoadRatio( 1.0 );
+	int CompOn( 1 );
+	Real64 OnOffAirFlowRatio( 1.0 );
+	Real64 HeatCoilLoad( 0.0 );
+	Real64 HotWaterMassFlowRate( 0.0 );
+	Real64 ColdWaterMassFlowRate( 0.0 );
+
+	int NumOfZones( 1 );
+	ZoneEquipConfig.allocate( 1 );
+	ZoneEquipConfig( 1 ).ZoneName = "East Zone";
+	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
+	ZoneEquipConfig( 1 ).IsControlled = true;
+	ZoneEquipConfig( 1 ).AirLoopNum = 1;
+	ZoneEquipConfig( 1 ).NumInletNodes = 1;
+	ZoneEquipConfig( 1 ).InletNode.allocate( 1 );
+	ZoneEquipConfig( 1 ).InletNode( 1 ) = 1;
+	ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
+	ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
+	ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 2;
+	ZoneEquipConfig( 1 ).ReturnAirNode = 3;
+
+	Zone.allocate( NumOfZones );
+	Zone( 1 ).Name = ZoneEquipConfig( 1 ).ZoneName;
+
+	TotNumLoops = 1;
+	PlantLoop.allocate( TotNumLoops );
+
+	MultiOrVarSpeedHeatCoil.allocate( 1 );
+	MultiOrVarSpeedHeatCoil( UnitarySysNum ) = true;
+	MultiOrVarSpeedCoolCoil.allocate( 1 );
+	MultiOrVarSpeedCoolCoil( UnitarySysNum ) = true;
+	Node.allocate( 10 );
+	WaterCoil.allocate( 1 );
+
+	MSHPMassFlowRateLow = 0.0;
+	MSHPMassFlowRateHigh = 0.0;
+
+	UnitarySystem.allocate( 1 );
+	UnitarySystem( UnitarySysNum ).HeatMassFlowRate.allocate( 3 );
+	UnitarySystem( UnitarySysNum ).CoolMassFlowRate.allocate( 3 );
+	UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio.allocate( 3 );
+	UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio.allocate( 3 );
+
+	UnitarySystem( UnitarySysNum ).LastMode = HeatingMode;
+	UnitarySystem( UnitarySysNum ).IdleMassFlowRate = 0.2;
+	UnitarySystem( UnitarySysNum ).IdleSpeedRatio = 0.2;
+	UnitarySystem( UnitarySysNum ).FanAvailSchedPtr = ScheduleAlwaysOn;
+	UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum = 1;
+
+	UnitarySystem( UnitarySysNum ).HeatMassFlowRate( 1 ) = 0.25;
+	UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( 1 ) = 0.25;
+	UnitarySystem( UnitarySysNum ).HeatMassFlowRate( 2 ) = 0.5;
+	UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( 2 ) = 0.5;
+	UnitarySystem( UnitarySysNum ).HeatMassFlowRate( 3 ) = 1.0;
+	UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( 3 ) = 1.0;
+
+	UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 1 ) = 0.3;
+	UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 1 ) = 0.3;
+	UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 2 ) = 0.6;
+	UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 2 ) = 0.6;
+	UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 3 ) = 1.0;
+	UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 3 ) = 1.0;
+
+	// heating load at various speeds
+	UnitarySystem( UnitarySysNum ).NumOfSpeedHeating = 3;
+	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 0;
+	UnitarySystem( UnitarySysNum ).NumOfSpeedCooling = 3;
+	UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 3;
+	HeatingLoad = true;
+	CoolingLoad = false;
+
+	// cycling fan mode 
+	UnitarySystem( UnitarySysNum ).FanOpMode = CycFanCycCoil;
+
+	// heating load only
+	MoistureLoad = 0.0;
+	HeatCoilLoad = 12000.0;
+	UnitarySystem( UnitarySysNum ).Humidistat = false;
+
+	HotWaterMassFlowRate = 1.0;
+	ColdWaterMassFlowRate = 1.0;
+	UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow = ColdWaterMassFlowRate;
+	UnitarySystem( UnitarySysNum ).MultiSpeedCoolingCoil = true;
+	UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = Coil_CoolingWater;
+	UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 1.0;
+	UnitarySystem( UnitarySysNum ).CoolingCycRatio = 1.0;
+	UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 3;
+
+	WaterCoils::CheckEquipName.allocate( 1 );
+	WaterCoils::NumWaterCoils = 1;
+	WaterCoils::GetWaterCoilsInputFlag = false;
+	WaterCoil( 1 ).SchedPtr = DataGlobals::ScheduleAlwaysOn;
+	WaterCoil( 1 ).Name = "Water Cooling Coil";
+	WaterCoil( 1 ).TotWaterCoolingCoilRate = 0.0;
+	WaterCoil( 1 ).WaterCoilType = CoilType_Cooling;
+	WaterCoil( 1 ).WaterCoilType_Num = WaterCoil_Cooling;
+	WaterCoil( 1 ).WaterCoilModel = CoilModel_Cooling;
+	WaterCoil( 1 ).DesAirVolFlowRate = 1.0;
+	WaterCoil( 1 ).MaxWaterVolFlowRate = ColdWaterMassFlowRate;
+	WaterCoil( 1 ).CoolingCoilAnalysisMode = SimpleAnalysis;
+	WaterCoil( 1 ).HeatExchType = CrossFlow;
+
+	WaterCoil( 1 ).UACoilTotal = 4689.0;
+	WaterCoil( 1 ).UACoilExternal = 6110.0;
+	WaterCoil( 1 ).UACoilInternal = 20164.0;
+
+	WaterCoil( 1 ).TotCoilOutsideSurfArea = 50.0;
+	WaterCoil( 1 ).TotWaterCoolingCoilRate = 30000.0;
+	WaterCoil( 1 ).SenWaterCoolingCoilRate = 20000.0;
+
+	WaterCoil( 1 ).InletAirMassFlowRate = 1.0;
+	WaterCoil( 1 ).MaxWaterVolFlowRate = 0.001;
+	WaterCoil( 1 ).DesInletWaterTemp = 6.67;
+	WaterCoil( 1 ).DesInletAirTemp = 30.0;
+	WaterCoil( 1 ).DesOutletAirTemp = 12.0;
+	WaterCoil( 1 ).DesInletAirHumRat = 0.013;
+	WaterCoil( 1 ).DesOutletAirHumRat = 0.008;
+
+	WaterCoil( 1 ).AirInletNodeNum = 4;
+	WaterCoil( 1 ).AirOutletNodeNum = 5;
+
+	WaterCoil( 1 ).InletAirTemp = 30.0;
+	WaterCoil( 1 ).InletAirHumRat = 0.0085;
+	WaterCoil( 1 ).InletWaterTemp = 6.0;
+	Node( WaterCoil( 1 ).AirInletNodeNum ).Temp = 30.0;
+	Node( WaterCoil( 1 ).AirInletNodeNum ).HumRat = 0.0085;
+	Node( WaterCoil( 1 ).AirInletNodeNum ).Enthalpy = 55000;
+
+	WaterCoil( 1 ).InletWaterMassFlowRate = ColdWaterMassFlowRate;
+	WaterCoil( 1 ).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
+
+	WaterCoil( 1 ).WaterLoopNum = 1;
+	WaterCoil( 1 ).WaterLoopSide = 1;
+	WaterCoil( 1 ).WaterLoopBranchNum = 1;
+	WaterCoil( 1 ).WaterLoopCompNum = 1;
+
+	WaterCoil( 1 ).WaterInletNodeNum = 6;
+	WaterCoil( 1 ).WaterOutletNodeNum = 7;
+	Node( WaterCoil( 1 ).WaterInletNodeNum ).MassFlowRate = ColdWaterMassFlowRate;
+	Node( WaterCoil( 1 ).WaterInletNodeNum ).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+	Node( WaterCoil( 1 ).WaterInletNodeNum ).Temp = 6.0;
+
+	Node( WaterCoil( 1 ).WaterOutletNodeNum ).MassFlowRate = ColdWaterMassFlowRate;
+	Node( WaterCoil( 1 ).WaterOutletNodeNum ).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+
+	for ( int l = 1; l <= TotNumLoops; ++l ) {
+		auto & loop( PlantLoop( l ) );
+		loop.LoopSide.allocate( 2 );
+		auto & loopside( PlantLoop( 1 ).LoopSide( 1 ) );
+		loopside.TotalBranches = 1;
+		loopside.Branch.allocate( 1 );
+		auto & loopsidebranch( PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ) );
+		loopsidebranch.TotalComponents = 1;
+		loopsidebranch.Comp.allocate( 1 );
+	}
+	PlantLoop( 1 ).Name = "WaterLoop";
+	PlantLoop( 1 ).FluidName = "FluidWaterLoop";
+	PlantLoop( 1 ).FluidIndex = 1;
+	PlantLoop( 1 ).FluidName = "WATER";
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = WaterCoil( 1 ).Name;
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = WaterCoil_Cooling;
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = WaterCoil( 1 ).WaterInletNodeNum;
+
+	UnitarySystem( UnitarySysNum ).CoolingCoilIndex = 1;
+	UnitarySystem( UnitarySysNum ).CoolingCoilName = WaterCoil( 1 ).Name;
+	UnitarySystem( UnitarySysNum ).CoolCoilFluidInletNode = WaterCoil( 1 ).WaterInletNodeNum;
+	UnitarySystem( UnitarySysNum ).CoolCoilFluidOutletNodeNum = WaterCoil( 1 ).WaterOutletNodeNum;
+
+	MyUAAndFlowCalcFlag.allocate( 1 );
+	MyUAAndFlowCalcFlag( 1 ) = true;
+	DataGlobals::DoingSizing = true;
+
+	DataEnvironment::OutBaroPress = 101325.0;
+	DataEnvironment::StdRhoAir = 1.20;
+
+	InitializePsychRoutines();
+
+	SimMultiStageWaterCoolingCoils( WaterCoil( 1 ).Name, FirstHVACIteration, UnitarySysNum, UnitarySystem( UnitarySysNum ).CoolingSpeedRatio, UnitarySystem( UnitarySysNum ).CoolingCycRatio, UnitarySystem( UnitarySysNum ).CoolingSpeedNum, UnitarySystem( UnitarySysNum ).FanOpMode );
+
+	EXPECT_NEAR( 26672.0, WaterCoil( 1 ).TotWaterCoolingCoilRate, 2.0 );
+
+	// Clean up
+	MultiOrVarSpeedHeatCoil.deallocate();
+	MultiOrVarSpeedCoolCoil.deallocate();
+	MyUAAndFlowCalcFlag.deallocate();
+	Node.deallocate();
+	PlantLoop.deallocate();
+	UnitarySystem.deallocate();
+	WaterCoil.allocate( 1 );
+	ZoneEquipConfig.deallocate();
+	Zone.deallocate();
 
 }
