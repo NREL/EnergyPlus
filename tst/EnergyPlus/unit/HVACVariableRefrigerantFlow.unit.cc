@@ -51,8 +51,6 @@ TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CompResidual )
 	double Te = -2.796; // Outdoor unit evaporating temperature
 	double Tdis = 40.093; 
 	double CondHeat = 1864.44;
-	double FanDesignFlowRateDec;
-	double FanFaultyDeltaPressInc = 0.10; // Increase by 10%
 	Array1D< Real64 > Par;
 	
 	// Allocate

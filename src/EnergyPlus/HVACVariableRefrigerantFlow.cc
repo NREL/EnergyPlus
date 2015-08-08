@@ -1273,7 +1273,6 @@ namespace HVACVariableRefrigerantFlow {
 		int NumOfCompSpd; // XP_ number of compressor speed inputs
 		int Count1Index; // XP
 		int Count2Index; // XP
-		int NumIteTe; // ! XP
 
 		// Flow
 		MaxAlphas = 0;
@@ -3795,7 +3794,6 @@ namespace HVACVariableRefrigerantFlow {
 		bool EnableSystem; // use to turn on secondary operating mode if OA temp limits exceeded
 		Real64 rho; // density of water (kg/m3)
 		Real64 OutsideDryBulbTemp; // Outdoor air temperature at external node height
-		int i;
   
 		// FLOW:
 
@@ -7311,7 +7309,7 @@ namespace HVACVariableRefrigerantFlow {
 	
 	}
 	
-			
+	
 	void
 	CalcVRFCondenser_FluidTCtrl(
 		int const VRFCond, // index to VRF condenser
@@ -7457,7 +7455,6 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 Psuction          ;   // suction pressure
 		Real64 Pdischarge        ;   // suction pressure
 		Real64 Tsuction          ;   // suction temperature
-		Real64 Modifi_factor     ;   // Compressor power modification algorithm_modification factor  
 		Real64 Modifi_SH         ;   // Compressor power modification algorithm_modified SH
 		Real64 Modifi_Pe         ;   // Compressor power modification algorithm_modified Pe
 		Real64 Modifi_SHin       ;   // Compressor power modification algorithm_modified SH for IDU
@@ -7474,9 +7471,6 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 Pipe_h_IU_in_up	 ;	 // Piping Loss Algorithm Parameter: enthalpy of IU at inlet (up)
 		Real64 Pipe_h_IU_out     ;   // Piping Loss Algorithm Parameter: enthalpy of IU at outlet    
 		Real64 Pipe_h_IU_out_i   ;   // Piping Loss Algorithm Parameter: enthalpy of IU at outlet (individual)  
-		Real64 Pipe_h_IU_out_new ;   // Piping Loss Algorithm Parameter: enthalpy of IU at outlet (new)
-		Real64 Pipe_h_IU_out_low ;	 // Piping Loss Algorithm Parameter: enthalpy of IU at outlet (low)
-		Real64 Pipe_h_IU_out_up	 ;	 // Piping Loss Algorithm Parameter: enthalpy of IU at outlet (up)
 		Real64 Pipe_h_comp_out   ;   // Piping Loss Algorithm Parameter: enthalpy of Compressor at outlet 
 		Real64 Pipe_h_comp_out_new;  // Piping Loss Algorithm Parameter: enthalpy of Compressor at outlet (new)
 		Real64 Pipe_h_out_ave    ;   // Average Enthalpy of the refrigerant leaving IUs
@@ -7524,13 +7518,11 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 NcompDiff         ;   // XP_ Compressor power difference
 		Real64 Tolerance         ;   // XP_ converge tolerance for condensing temperature calculation
 		Real64 CompSpdActual     ;   // XP_ Actual compressor running speed [rps]
-		Real64 CompSpd_Modify    ;   // Yoshi_ Modified compressor speed for N_comp calculation [rps]
 		Real64 TcondOut          ;   // XP
 		Real64 Tcondh2           ;   // XP
 		Real64 Houtdoor          ;   // XP
-		Real64 HcondOut          ;   // XP
-		Real64 TOutHeatMode      ;   // XP
-		Real64 Th2HeatMode       ;   // XP
+		// Real64 TOutHeatMode      ;   // XP
+		// Real64 Th2HeatMode       ;   // XP
 		Real64 deltaT            ;   // XP
 		Real64 Hfs               ;   // XP
 		Real64 TfsSat            ;   // XP
@@ -7544,19 +7536,19 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 MinOutdoorUnitPc  ;   // Yoshi_For Cooling Mode, the minimum pressure that Pc can be
 		Real64 CompEvaporatingCAPSpdMin; // XP
 		Real64 CompEvaporatingPWRSpdMin; // XP
-		Real64 Variable1         ;   
+		// Real64 Variable1         ;   
 		Real64 SmallLoadTe       ;   // XP_Outdoor unit evaporating temperature at small indoor heating load
 		Real64 MinRefriPe        ;  
-		Real64 dPP			     ;   // Yoshi_0923
+		// Real64 dPP			     ;   // Yoshi_0923
 		Real64 Tc0			     ;   // Yoshi_0923
-		Real64 Tc1			     ;   // Yoshi_0923
-		Real64 Te0			     ;   // Yoshi_0923
-		Real64 Te1			     ;   // Yoshi_0923
+		// Real64 Tc1			     ;   // Yoshi_0923
+		// Real64 Te0			     ;   // Yoshi_0923
+		// Real64 Te1			     ;   // Yoshi_0923
 		Real64 Cap_Eva0		     ;   // Yoshi_0923
 		Real64 Cap_Eva1		     ;   // Yoshi_0923
 		Real64 CapDiff		     ;   // Yoshi_0923
-		Real64 CompEvaporatingCAPSpd_new0; 
-		Real64 CompEvaporatingCAPSpd_new1; 
+		// Real64 CompEvaporatingCAPSpd_new0; 
+		// Real64 CompEvaporatingCAPSpd_new1; 
 		Array1D< Real64 > CompEvaporatingPWRSpd; // XP_cooling power function of evaporating and condensing temperatures at certain speed
 		Array1D< Real64 > CompEvaporatingCAPSpd; // XP_cooling capacity function of evaporating and condensing temperatures at certain speed 
 		Array1D< Real64 > Par( 3 );

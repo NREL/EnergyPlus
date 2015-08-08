@@ -337,7 +337,7 @@ namespace DXCoils {
 
 		} else if ( SELECT_CASE_var == CoilVRF_FluidTCtrl_Cooling ) { 
 
-			CalcVRFCoolingCoil_FluidTCtrl( DXCoilNum, 1, FirstHVACIteration, PartLoadRatio, FanOpMode, CompCycRatio, _, _, MaxCap );
+			CalcVRFCoolingCoil_FluidTCtrl( DXCoilNum, 1, FirstHVACIteration, PartLoadRatio, FanOpMode, CompCycRatio, _, _ );
 
 		} else if ( SELECT_CASE_var == CoilVRF_FluidTCtrl_Heating ) {
 
@@ -14340,8 +14340,7 @@ Label50: ;
 		int const FanOpMode, // Allows parent object to control fan operation
 		Real64 const CompCycRatio, // cycling ratio of VRF condenser
 		Optional_int_const PerfMode, // Performance mode for MultiMode DX coil; Always 1 for other coil types
-		Optional< Real64 const > OnOffAirFlowRatio, // ratio of compressor on airflow to compressor off airflow
-		Optional< Real64 const > MaxCoolCap // maximum capacity of DX coil
+		Optional< Real64 const > OnOffAirFlowRatio // ratio of compressor on airflow to compressor off airflow
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -14385,13 +14384,10 @@ Label50: ;
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 			
 		Real64 AirMassFlow; // dry air mass flow rate through coil [kg/s] (adjusted for bypass if any)
-		Real64 AirMassFlowRatio; // Ratio of actual air mass flow to rated air mass flow (adjusted for bypass if any)
 		Real64 AirVolumeFlowRate; // Air volume flow rate across the cooling coil [m3/s] (adjusted for bypass if any)
 		// (average flow if cycling fan, full flow if constant fan)
 		Real64 VolFlowperRatedTotCap; // Air volume flow rate divided by rated total cooling capacity [m3/s-W] (adjusted for bypass)
 		Real64 TotCap; // gross total cooling capacity at off-rated conditions [W]
-		Real64 TotCapTempModFac; // Total capacity modifier (function of entering wetbulb, outside drybulb)
-		Real64 TotCapFlowModFac; // Total capacity modifier (function of actual supply air flow vs rated flow)
 		Real64 InletAirWetBulbC; // wetbulb temperature of inlet air [C]
 		Real64 InletAirDryBulbTemp; // inlet air dry bulb temperature [C]
 		Real64 InletAirEnthalpy; // inlet air enthalpy [J/kg]
@@ -14403,23 +14399,15 @@ Label50: ;
 		Real64 CBF; // coil bypass factor at off rated conditions
 		Real64 A0; // NTU * air mass flow rate, used in CBF calculation
 		Real64 hDelta; // Change in air enthalpy across the cooling coil [J/kg]
-		Real64 hADP; // Apparatus dew point enthalpy [J/kg]
-		Real64 hTinwADP; // Enthalpy at inlet dry-bulb and wADP [J/kg]
 		Real64 hTinwout; // Enthalpy at inlet dry-bulb and outlet humidity ratio [J/kg]
-		Real64 tADP; // Apparatus dew point temperature [C]
-		Real64 wADP; // Apparatus dew point humidity ratio [kg/kg]
 		Real64 FullLoadOutAirEnth; // outlet full load enthalpy [J/kg]
 		Real64 FullLoadOutAirHumRat; // outlet humidity ratio at full load
 		Real64 FullLoadOutAirTemp; // outlet air temperature at full load [C]
 		Real64 PLF; // Part load factor, accounts for thermal lag at compressor startup, used in power calculation
-		Real64 QLatActual; // operating latent capacity of DX coil
-		Real64 QLatRated; // Rated latent capacity of DX coil
-		Real64 SHRUnadjusted; // SHR prior to latent degradation effective SHR calculation
 		int Counter; // Counter for dry evaporator iterations
 		int MaxIter; // Maximum number of iterations for dry evaporator calculations
 		Real64 RF; // Relaxation factor for dry evaporator iterations
 		Real64 Tolerance; // Error tolerance for dry evaporator iterations
-		Real64 werror; // Deviation of humidity ratio in dry evaporator iteration loop
 		Real64 CondInletTemp; // Condenser inlet temperature (C). Outdoor dry-bulb temp for air-cooled condenser.
 		// Outdoor Wetbulb +(1 - effectiveness)*(outdoor drybulb - outdoor wetbulb) for evap condenser.
 		Real64 CondInletHumRat; // Condenser inlet humidity ratio (kg/kg). Zero for air-cooled condenser.
@@ -14444,22 +14432,15 @@ Label50: ;
 		Real64 OutletAirEnthalpy; // Supply air enthalpy (average value if constant fan, full output if cycling fan)
 		Real64 ADiff; // Used for exponential
 		
-		// Followings for VRF FluidTCtrl Only @@ Refine
-		Real64 SHRRated;                // Rated Sensible Heat Ratio (sensible/total) of the cooling coil
+		// Followings for VRF FluidTCtrl Only @@ 
 		Real64 QZnReqSenCoolingLoad;    
 		Real64 PartCoolRatio;           
-		Real64 QfanRated;               
-		Real64 Qfan;                    
 		Real64 FanSpdRatio;             
-		Real64 Wout;                    
 		Real64 TcoilIn;                 
 		Real64 HcoilIn;                 
-		Real64 Tout;                    
-		Real64 MinSpd = 0.65;           
 		Real64 ActualSH;                
 		Real64 ActualSC;                
 		int OperatingMode;              
-		bool FanCycFlag;                
 
 		// If Performance mode not present, then set to 1.  Used only by Multimode/Multispeed DX coil (otherwise mode = 1)
 		if ( present( PerfMode ) ) {
@@ -14914,30 +14895,20 @@ Label50: ;
 		Real64 AirVolumeFlowRate; // Air volume flow rate across the cooling coil [m3/s]
 		Real64 VolFlowperRatedTotCap; // Air volume flow rate divided by rated total cooling capacity [m3/s-W]
 		Real64 TotCap; // gross total cooling capacity at off-rated conditions [W]
-		Real64 TotCapTempModFac; // Total capacity modifier (function of entering drybulb, outside drybulb) depending
 		// on the type of curve
-		Real64 TotCapFlowModFac; // Total capacity modifier (function of actual supply air flow vs rated flow)
 		Real64 TotCapModFac; // Total capacity modifier 
 		Real64 InletAirDryBulbTemp; // inlet air dry bulb temperature [C]
 		Real64 InletAirWetBulbC; // wetbulb temperature of inlet air [C]
 		Real64 InletAirEnthalpy; // inlet air enthalpy [J/kg]
 		Real64 InletAirHumRat; // inlet air humidity ratio [kg/kg]
 		//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
-		Real64 FullLoadOutAirEnth; // outlet full load enthalpy [J/kg]
-		Real64 FullLoadOutAirHumRat; // outlet humidity ratio at full load
-		Real64 FullLoadOutAirTemp; // outlet air temperature at full load [C]
-		Real64 FullLoadOutAirRH; // outlet air relative humidity at full load
 		Real64 EIRTempModFac( 0.0 ); // EIR modifier (function of entering drybulb, outside drybulb) depending on the
 		// type of curve
-		Real64 DefrostEIRTempModFac; // EIR modifier for defrost (function of entering wetbulb, outside drybulb)
 		Real64 EIRFlowModFac; // EIR modifier (function of actual supply air flow vs rated flow)
 		Real64 EIR; // EIR at part load and off rated conditions
 		Real64 PLF; // Part load factor, accounts for thermal lag at compressor startup
 		Real64 PLRHeating; // PartLoadRatio in heating
-		Real64 OutdoorCoilT; // Outdoor coil temperature (C)
-		Real64 OutdoorCoildw; // Outdoor coil delta w assuming coil temp of OutdoorCoilT (kg/kg)
-		Real64 FractionalDefrostTime; // Fraction of time step system is in defrost
-		Real64 HeatingCapacityMultiplier; // Multiplier for heating capacity when system is in defrost
+		//Real64 HeatingCapacityMultiplier; // Multiplier for heating capacity when system is in defrost
 		Real64 InputPowerMultiplier; // Multiplier for power when system is in defrost
 		Real64 LoadDueToDefrost( 0.0 ); // Additional load due to defrost
 		Real64 CrankcaseHeatingPower; // power due to crankcase heater
@@ -15228,14 +15199,12 @@ Label50: ;
         Real64 Th2min;
         Real64 Hin;
         Real64 Win;
-        Real64 Hout;
         Real64 BFC;
         Real64 BFH;
         Real64 SH;
         Real64 SC;
         Real64 Qfan;
         Real64 Garate; // Nominal air mass flow rate
-        Real64 EvapT;
         Real64 hADP;
         Real64 wADP;
         Real64 hTinwADP;
@@ -15244,8 +15213,8 @@ Label50: ;
         Real64 RHsat;
 		
 		// @@ Following may be from IDF
+        // Real64 EvapTempMax = 13.0; // Maximum VRF IU Te
         Real64 EvapTempMin = 6.0;  // Minimum VRF IU Te
-        Real64 EvapTempMax = 13.0; // Maximum VRF IU Te
         Real64 CondTempMin = 42.0; // Minimum VRF IU Tc
         Real64 CondTempMax = 46.0; // Maximum VRF IU Tc
         
@@ -15372,18 +15341,14 @@ Label50: ;
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 QZnReqSenCoolingLoad;
         Real64 QZnReqSenHeatingLoad;
-        Real64 AirMassFlow         ;
-        Real64 RatedAirMassFlow    ;
         Real64 Ratio1              ;
         int MaxIter( 500 )         ;
         int SolFla                 ;
         Array1D< Real64 > Par( 11 );
-        bool FanCycSta             ;
         Real64 TairInlet           ; // air inlet temp entering indoor unit fan
         Real64 TcoilIn             ;
         Real64 Hin                 ;
         Real64 Win                 ;
-        Real64 Hout                ;
         Real64 BF                  ;
         Real64 SH                  ;
         Real64 SC                  ;
@@ -15391,7 +15356,6 @@ Label50: ;
         Real64 Garate              ; // Nominal air mass flow rate
         Real64 RHsat               ;
         Real64 Wh2                 ;
-        Real64 Woutlet             ;
         Real64 FanSpdRatioMin      ;
         Real64 MaxSH               ;
         Real64 MaxSC               ;
@@ -15405,7 +15369,6 @@ Label50: ;
         Real64 Tout2               ;
         Real64 Th21                ;
         Real64 Th22                ;
-        Real64 Th2min              ;
         Real64 Th2                 ;
         Real64 deltaT              ;
         Real64 deltaT1             ;
@@ -15668,7 +15631,6 @@ Label50: ;
 		//FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 ZnSenLoad;  
 		Real64 TairInlet;
-		Real64 CAPRated ;
 		Real64 QfanRate ;
 		Real64 TotCap   ;
 		Real64 Garate   ;
@@ -15719,7 +15681,6 @@ Label50: ;
 
 		Real64 ZnSenLoad; 
 		Real64 TairInlet;
-		Real64 CAPRated;
 		Real64 QfanRate;
 		Real64 TotCap;
 		Real64 Garate;

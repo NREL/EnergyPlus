@@ -1547,7 +1547,7 @@ namespace HVACVariableRefrigerantFlow {
 	//******************************************************************************
 	void
 	CalcVRFIUTeTc_FluidTCtrl(
-		int const IndexVRFCondenser // index to VRF OU
+		int const IndexVRFCondenser // index to VRF Outdoor Unit
 	);
 	
 	void
