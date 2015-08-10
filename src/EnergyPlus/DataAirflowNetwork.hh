@@ -1108,14 +1108,25 @@ namespace DataAirflowNetwork {
 
  	};
 
-	struct IntraZoneLinkageProp : public AirflowNetworkLinkage // Intra zone linkage data
+	struct IntraZoneLinkageProp  // Intra zone linkage data
 	{
 		// Members
+		std::string Name; // Provide a unique linkage name 
+		Array1D_string NodeNames; // Names of nodes (limited to 2) 
+		Array1D< Real64 > NodeHeights; // Node heights 
+		std::string CompName; // Name of element 
+		int CompNum; // Element Number 
+		Array1D_int NodeNums; // Node numbers 
+		int LinkNum; // Linkage number 
 		std::string SurfaceName; // Connection Surface Name
 
 		// Default Constructor
 		IntraZoneLinkageProp( ) :
-			AirflowNetworkLinkage( )
+			NodeNames( 2 ),
+			NodeHeights( 2, 0.0 ),
+			CompNum( 0 ),
+			NodeNums( 2, 0 ),
+			LinkNum( 0 )
 		{}
 
 		// Member Constructor
@@ -1129,7 +1140,13 @@ namespace DataAirflowNetwork {
 			std::string const & SurfaceName, // Connection Surface Name
 			int const LinkNum // Linkage number
 			) :
-			AirflowNetworkLinkage( Name, NodeNames, NodeHeights, CompName, CompNum, NodeNums, LinkNum ),
+			Name( Name ),
+			NodeNames( 2, NodeNames ),
+			NodeHeights( 2, NodeHeights ),
+			CompName( CompName ),
+			CompNum( CompNum ),
+			NodeNums( 2, NodeNums ),
+			LinkNum( LinkNum ),
 			SurfaceName( SurfaceName )
 		{}
 
