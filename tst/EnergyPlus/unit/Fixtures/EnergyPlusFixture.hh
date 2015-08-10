@@ -126,7 +126,7 @@ namespace EnergyPlus {
 		static void TearDownTestCase() { }
 
 		// This is run every unit test for this fixture.
-		// It sets up the IOHelper class for all the necessary added functionality.
+		// It sets up the various stream redirections.
 		// It also calls show_message every unit test to output a begin message to the error file.
 		virtual void SetUp();
 
@@ -254,7 +254,6 @@ namespace EnergyPlus {
 			std::string const & name, 
 			int const num_alphas, 
 			int const num_numbers, 
-			int const object_def_ptr, 
 			std::vector< std::string > const & alphas, 
 			std::vector< bool > const & alphas_blank, 
 			std::vector< Real64 > const & numbers, 

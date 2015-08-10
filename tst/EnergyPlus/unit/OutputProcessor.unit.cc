@@ -1543,63 +1543,63 @@ namespace EnergyPlus {
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-0.1" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-2 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-002" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-02" } ) ) );
 		#endif
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-3 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-003" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-03" } ) ) );
 		#endif
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-4 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-004" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-04" } ) ) );
 		#endif
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-5 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-005" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-05" } ) ) );
 		#endif
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-6 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-006" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-06" } ) ) );
 		#endif
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-7 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-007" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-07" } ) ) );
 		#endif
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-8 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-008" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-08" } ) ) );
 		#endif
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-9 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-009" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-09" } ) ) );
 		#endif
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-10 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-010" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-10" } ) ) );
@@ -1607,56 +1607,56 @@ namespace EnergyPlus {
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-11 ) );
 			// this seems to always be low... not 1.0e-11
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,9.999999999999999E-012" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,9.999999999999999E-12" } ) ) );
 		#endif
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-12 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-012" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-12" } ) ) );
 		#endif
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-13 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-013" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-13" } ) ) );
 		#endif
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-14 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-014" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-14" } ) ) );
 		#endif
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-15 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-015" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-15" } ) ) );
 		#endif
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-16 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-016" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-16" } ) ) );
 		#endif
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", -1.0e-16 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1.000000000000000E-016" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1.000000000000000E-16" } ) ) );
 		#endif
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-19 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-019" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-19" } ) ) );
@@ -1717,7 +1717,7 @@ namespace EnergyPlus {
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000000000000" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e17 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E+017" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E+17" } ) ) );
@@ -1727,14 +1727,14 @@ namespace EnergyPlus {
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-10000000000000000" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", -1.0e17 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1.000000000000000E+017" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1.000000000000000E+17" } ) ) );
 		#endif
 
 			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e25 ) );
-		#ifdef _WIN32
+		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E+025" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E+25" } ) ) );

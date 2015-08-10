@@ -6,6 +6,10 @@ set( test_src
   TestHelpers/IdfParser.hh
   Fixtures/EnergyPlusFixture.cc
   Fixtures/EnergyPlusFixture.hh
+  Fixtures/HVACFixture.hh
+  Fixtures/IdfParserFixture.hh
+  Fixtures/InputProcessorFixture.hh
+  Fixtures/SQLiteFixture.hh
   AdvancedAFN.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
@@ -13,6 +17,7 @@ set( test_src
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
+  DemandResponse.unit.cc
   DXCoils.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
@@ -47,11 +52,13 @@ set( test_src
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
+  SwimmingPool.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
   WaterCoils.unit.cc
   WaterThermalTanks.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
+  ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc
 )

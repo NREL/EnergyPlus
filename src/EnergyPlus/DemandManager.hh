@@ -20,6 +20,7 @@ namespace DemandManager {
 	extern int const ManagerTypeLights;
 	extern int const ManagerTypeElecEquip;
 	extern int const ManagerTypeThermostats;
+	extern int const ManagerTypeVentilation;
 
 	extern int const ManagerPrioritySequential;
 	extern int const ManagerPriorityOptimal;
@@ -51,8 +52,12 @@ namespace DemandManager {
 
 	// SUBROUTINE SPECIFICATIONS:
 
-	// Types
+	// Clears the global data in DemandManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
+	// Types
 	struct DemandManagerListData
 	{
 		// Members
@@ -169,6 +174,10 @@ namespace DemandManager {
 		int NumOfLoads; // Number of load objects
 		Array1D_int Load; // Pointers to load objects
 
+		// Additional fields related to DemandManager:Ventilation
+		Real64 FixedRate; // m3 per person
+		Real64 ReductionRatio; // % of reduction
+
 		// Default Constructor
 		DemandManagerData() :
 			Type( 0 ),
@@ -187,7 +196,9 @@ namespace DemandManager {
 			RotatedLoadNum( 0 ),
 			LowerLimit( 0.0 ),
 			UpperLimit( 0.0 ),
-			NumOfLoads( 0 )
+			NumOfLoads( 0 ),
+			FixedRate( 0.0 ),
+			ReductionRatio( 0.0 )
 		{}
 
 		// Member Constructor
@@ -210,7 +221,9 @@ namespace DemandManager {
 			Real64 const LowerLimit, // Lowest demand limit as fraction of design level
 			Real64 const UpperLimit, // Not used for demand limit
 			int const NumOfLoads, // Number of load objects
-			Array1_int const & Load // Pointers to load objects
+			Array1_int const & Load, // Pointers to load objects
+			Real64 const FixedRate, // fixed rate for ventilation strategy
+			Real64 const ReductionRatio // reduction rate for ventilation strategy
 		) :
 			Name( Name ),
 			Type( Type ),
@@ -230,7 +243,9 @@ namespace DemandManager {
 			LowerLimit( LowerLimit ),
 			UpperLimit( UpperLimit ),
 			NumOfLoads( NumOfLoads ),
-			Load( Load )
+			Load( Load ),
+			FixedRate( FixedRate ),
+			ReductionRatio( ReductionRatio )
 		{}
 
 	};
@@ -283,7 +298,7 @@ namespace DemandManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

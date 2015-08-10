@@ -649,7 +649,7 @@ The choice made for this field has important implications for modeling accuracy 
 
 <table class="table table-striped">
 <tr>
-<th>Demanh Winhow</th>
+<th>Demand Window</th>
 <th>Applicable Number of Timesteps per Hour</th>
 </tr>
 <tr>
@@ -1268,7 +1268,7 @@ No problems for processing
 
 This object is an advanced feature that can be used to control the effective storage capacity of the zone.  Capacitance multipliers of 1.0 indicate the capacitance is that of the (moist) air in the volume of the specified zone. This multiplier can be increased if the zone air capacitance needs to be increased for stability of the simulation or to allow modeling higher or lower levels of damping of behavior over time. The multipliers are applied to the base value corresponding to the total capacitance for the zone’s volume of air at current zone (moist) conditions.
 
-#### Field: Sensible Heat Capacity Multiplier
+#### Field: Temperature Capacity Multiplier
 
 This field is used to alter the effective heat capacitance of the zone air volume. This affects the transient calculations of zone air temperature. Values greater than 1.0 have the effect of smoothing or damping the rate of change in the temperature of zone air from timestep to timestep.  Note that sensible heat capacity can also be modeled using internal mass surfaces.
 
@@ -1333,7 +1333,7 @@ An IDF example:
 
 ### ProgramControl
 
-The ProgramControl object can be used to control how the EnergyPlus program executes on the computer.  Portions of EnergyPlus have been programmed to use more than one processor, or CPU core, at the same time during a single simulation.  This multithreading may not be desireable when running more than one simulation at a time on the same computer (because it can actually run more slowly).  This input object is optional and allows controlling the number of threads (or cores, or processors) that EnergyPlus will use so that conflicts can be managed.  When this object is used, its input for the number of threads will take precedent over the value of the environment variable **“EP\_OMP\_NUM\_THREADS”** which is an alternate method of controlling the program’s threading. Since the primary method for OpenMP simulations currently (V7.1 and V7.2) is the interior radiant exchange to solve for inside surface temperatures, EnergyPlus sets the threads to 1 if the nominal number of surfaces is &lt;= 30.
+This object is currently disabled. The ProgramControl object can be used to control how the EnergyPlus program executes on the computer.  Portions of EnergyPlus have been programmed to use more than one processor, or CPU core, at the same time during a single simulation.  This multithreading may not be desireable when running more than one simulation at a time on the same computer (because it can actually run more slowly).  This input object is optional and allows controlling the number of threads (or cores, or processors) that EnergyPlus will use so that conflicts can be managed.  When this object is used, its input for the number of threads will take precedent over the value of the environment variable **“EP\_OMP\_NUM\_THREADS”** which is an alternate method of controlling the program’s threading. Since the primary method for OpenMP simulations currently (V7.1 and V7.2) is the interior radiant exchange to solve for inside surface temperatures, EnergyPlus sets the threads to 1 if the nominal number of surfaces is &lt;= 30.
 
 #### Field: Number of Threads Allowed
 
@@ -2509,15 +2509,15 @@ Note that using this object overrides the wind speed profile coefficients implie
 
 #### Field: Wind Speed Profile Exponent
 
-The wind speed profile exponent for the terrain surrounding the site. The exponent can be estimated from the table above (see **Site:WeatherStation**) or calculated beforehand using more sophisticated techniques, such as CFD modeling of the site terrain. Note that using this object overrides the wind speed profile coefficients implied by the *Terrain* field of the **Building** object even if this field is left blank.
+The wind speed profile exponent for the terrain surrounding the site. The exponent can be estimated from the table above (see **Site:WeatherStation**) or calculated beforehand using more sophisticated techniques, such as CFD modeling of the site terrain. Note that using this object overrides the wind speed profile coefficients implied by the *Terrain* field of the **Building** object even if this field is left blank. This field can be set to zero to turn off all wind dependence on height.
 
 #### Field: Wind Speed Profile Boundary Layer Thickness
 
-The wind speed profile boundary layer thickness [m] for the terrain surrounding the site. The boundary layer can be estimated from the table above (see **Site:WeatherStation**) or calculated beforehand using more sophisticated techniques, such as CFD modeling of the site terrain. Note that using this object overrides the wind speed profile coefficients implied by the *Terrain* field of the **Building** object even if this field is left blank. This field can be set to zero to turn off all wind dependence on height.
+The wind speed profile boundary layer thickness [m] for the terrain surrounding the site. The boundary layer can be estimated from the table above (see **Site:WeatherStation**) or calculated beforehand using more sophisticated techniques, such as CFD modeling of the site terrain. Note that using this object overrides the wind speed profile coefficients implied by the *Terrain* field of the **Building** object even if this field is left blank.
 
 #### Field: Air Temperature Gradient Coefficient
 
-The air temperature gradient coefficient [K/m] is a research option that allows the user to control the variation in outdoor air temperature as a function of height above ground. The real physical value is 0.0065 K/m. This field can be set to zero to turn off all temperature dependence on height. Note that the *Air Temperature Sensor Height* in the **Site:WeatherStation** object should also be set to zero in order to force the local outdoor air temperatures to match the weather file outdoor air temperature. This change is required because the **Site:WeatherStation** object assumes an air temperature gradient of 0.0065 K/m.
+The air temperature gradient coefficient [K/m] is a research option that allows the user to control the variation in outdoor air temperature as a function of height above ground. The real physical value is 0.0065 K/m. This field can be set to zero to turn off all temperature dependence on height. Note that the *Air Temperature Sensor Height* in the **Site:WeatherStation** object should also be set to zero in order to force the local outdoor air temperatures to match the weather file outdoor air temperature. This change is required because the **Site:WeatherStation** object assumes an air temperature gradient of 0.0065 K/m. This field can be set to zero to turn off all temperature dependence on height.
 
 ```idf
   Site:HeightVariation,
@@ -4136,15 +4136,15 @@ This field represents the specific heat of the material layer in units of J/(kg-
 
 #### Field: Thermal Absorptance
 
-The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing “black body” conditions).
+The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing “black body” conditions). The default value for this field is 0.9.
 
 #### Field: Solar Absorptance
 
-The solar absorptance field in the Material input syntax represents the fraction of incident  solar radiation that is absorbed by the material. Solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0.
+The solar absorptance field in the Material input syntax represents the fraction of incident  solar radiation that is absorbed by the material. Solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
 
 #### Field: Visible Absorptance
 
-The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0.
+The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
 
 An IDF example:
 
@@ -4179,15 +4179,15 @@ This field is used to enter the thermal resistance (R-value) of the material lay
 
 #### Field: Thermal Absorptance
 
-The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing “black body” conditions).
+The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing “black body” conditions). The default value for this field is 0.9.
 
 #### Field: Solar Absorptance
 
-The solar absorptance field in the Material input syntax represents the fraction of incident  solar radiation that is absorbed by the material. Solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0.
+The solar absorptance field in the Material input syntax represents the fraction of incident  solar radiation that is absorbed by the material. Solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
 
 #### Field: Visible Absorptance
 
-The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0.
+The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
 
 An IDF example:
 
@@ -7181,15 +7181,15 @@ This field represents the specific heat of the material layer in units of J/(kg-
 
 #### Field: Thermal Absorptance
 
-The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing “black body” conditions). Typical values are from .9 to .98.
+The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing “black body” conditions). Typical values are from .9 to .98. The default value for this field is 0.9.
 
 #### Field: Solar Absorptance
 
-The solar absorptance field in the Material input syntax represents the fraction of incident  solar radiation that is absorbed by the material. Solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. Typical values are from .6 to .85.
+The solar absorptance field in the Material input syntax represents the fraction of incident  solar radiation that is absorbed by the material. Solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. Typical values are from .6 to .85. The default value for this field is 0.7.
 
 #### Field: Visible Absorptance
 
-The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.5 and 1.0.
+The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.5 and 1.0. The default value for this field is 0.75.
 
 #### Field: Saturation Volumetric Moisture Content of the Soil Layer
 
@@ -11042,15 +11042,15 @@ The fraction of the outside area of an exterior surface that is illuminated by (
 
 #### Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient [W/m2-K]
 
-This is the coefficient that describes thermal radiation heat transfer between the outside face and the air mass surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T – T) when applied to the ambient air. Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Air Coeff.”
+This is the coefficient that describes thermal radiation heat transfer between the outside face and the air mass surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T_surf – T_surfodb) when applied to the ambient air. Where T_surf = Surface Outside Face Temperature, and T_surfodb = Surface Outside Face Outdoor Air Drybulb Temperature. Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Air Coeff.”
 
 #### Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient [W/m2-K]
 
-This is the coefficient that describes thermal radiation heat transfer between the outside face and the sky surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T – T) when applied to the sky. Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Sky Coeff.”
+This is the coefficient that describes thermal radiation heat transfer between the outside face and the sky surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T_surf – T_sky) when applied to the sky. Where T_surf = Surface Outside Face Temperature, and T_sky = Site Sky Temperature. Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Sky Coeff.”
 
 #### Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient [W/m2-K]
 
-This is the coefficient that describes thermal radiation heat transfer between the outside face and the ground surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T – T) when applied to the ground. Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Ground Coeff.”
+This is the coefficient that describes thermal radiation heat transfer between the outside face and the ground surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T_surf – T_odb) when applied to the ground. Where T_surf = Surface Outside Face Temperature, and T_odb = Site Outdoor Air Drybulb Temperature (used as an approximation for the ground surface temperature). Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Ground Coeff.”
 
 #### Surface Outside Face Solar Radiation Heat Gain Rate [W]
 

@@ -972,7 +972,7 @@ The “data dictionary” for EnergyPlus Weather Data is shown in the Auxiliary 
 Running EnergyPlus
 ==================
 
-EnergyPlus is written in language conforming to Fortran Standard 90/95.  It runs as a 32 bit console (non-Windows) application on Intel compatible computers (Windows NT, Windows 95/98).  More explicit details on running EnergyPlus are available in a separate document (Running EnergyPlus in Auxiliary Programs document).  The following files are used to run EnergyPlus:
+EnergyPlus is written in C++ and runs as a console application. More explicit details on running EnergyPlus are available in a separate document (Running EnergyPlus in Auxiliary Programs document). Optional command-line arguments are available (energyplus --help, or man energyplus on Linux systems). The following files are used to run EnergyPlus:
 
 * EnergyPlus.exe (the executable file)
 
@@ -1108,7 +1108,7 @@ Licensing
 
 In order to make efficient distribution of your interface, you should consider licensing EnergyPlus.  First, you must license/register to use EnergyPlus.  Since we are distributing EnergyPlus via the World Wide Web, at no charge, it will be easy to get your hands on a copy for testing out your interface.  However, you may wish to understand more of the internals and, to make a complete distribution package, will need to at least execute a distribution license.
 
-http://www.eere.energy.gov/buildings/energyplus/energyplus_licensing.html contains the details on licensing EnergyPlus for commercial or non-commercial use.
+https://energyplus.net/licensing contains the details on licensing EnergyPlus for commercial or non-commercial use.
 
 Appendix A.  Simple IDF file
 ============================

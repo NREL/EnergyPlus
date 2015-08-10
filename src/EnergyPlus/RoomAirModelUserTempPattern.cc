@@ -591,7 +591,7 @@ namespace RoomAirModelUserTempPattern {
 		if ( SELECT_CASE_var == OutdoorDryBulbMode ) {
 
 			Grad = OutdoorDryBulbGrad(Zone(ZoneNum).OutDryBulbTemp, RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale, RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient, RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale, RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
-		
+
 		} else if ( SELECT_CASE_var == ZoneAirTempMode ) {
 
 			if ( Tmean >= RoomAirPattern( PattrnID ).TwoGradPatrn.UpperBoundTempScale ) {
@@ -719,7 +719,7 @@ namespace RoomAirModelUserTempPattern {
 		}
 		return Grad;
 	}
-	
+
 	void
 	FigureConstGradPattern(
 		int const PattrnID,
@@ -1158,7 +1158,7 @@ namespace RoomAirModelUserTempPattern {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

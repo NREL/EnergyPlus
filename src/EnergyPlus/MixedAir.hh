@@ -230,6 +230,8 @@ namespace MixedAir {
 		bool EMSOverrideOARate; // if true, EMS is calling to override OA rate
 		Real64 EMSOARateValue; // Value EMS is directing to use. [kg/s]
 		int HeatRecoveryBypassControlType; // User input selects type of heat recovery optimization
+		bool ManageDemand; // Used by demand manager to manage ventilation
+		Real64 DemandLimitFlowRate; //Current demand limit if demand manager is ON
 
 		// Default Constructor
 		OAControllerProps() :
@@ -287,7 +289,9 @@ namespace MixedAir {
 			MinOAFracLimit( 0.0 ),
 			EMSOverrideOARate( false ),
 			EMSOARateValue( 0.0 ),
-			HeatRecoveryBypassControlType( BypassWhenWithinEconomizerLimits )
+			HeatRecoveryBypassControlType( BypassWhenWithinEconomizerLimits ),
+			ManageDemand( false ),
+			DemandLimitFlowRate( 0.0 )
 		{}
 
 		// Member Constructor
@@ -352,7 +356,9 @@ namespace MixedAir {
 			Real64 const MinOAFracLimit, // Minimum OA fraction limit
 			bool const EMSOverrideOARate, // if true, EMS is calling to override OA rate
 			Real64 const EMSOARateValue, // Value EMS is directing to use. [kg/s]
-			int const HeatRecoveryBypassControlType // User input selects type of heat recovery optimization
+			int const HeatRecoveryBypassControlType, // User input selects type of heat recovery optimization
+			bool const ManageDemand,
+			Real64 DemandLimitFlowRate
 		) :
 			Name( Name ),
 			ControllerType( ControllerType ),
@@ -414,7 +420,9 @@ namespace MixedAir {
 			MinOAFracLimit( MinOAFracLimit ),
 			EMSOverrideOARate( EMSOverrideOARate ),
 			EMSOARateValue( EMSOARateValue ),
-			HeatRecoveryBypassControlType( HeatRecoveryBypassControlType )
+			HeatRecoveryBypassControlType( HeatRecoveryBypassControlType ),
+			ManageDemand( ManageDemand ),
+			DemandLimitFlowRate( DemandLimitFlowRate )
 		{}
 
 	};
@@ -670,6 +678,16 @@ namespace MixedAir {
 	extern Array1D< VentilationMechanicalProps > VentilationMechanical;
 
 	// Functions
+
+	Real64 OAGetFlowRate(int OAPtr);
+
+	Real64 OAGetMinFlowRate(int OAPtr);
+
+	void OASetDemandManagerVentilationState(int OAPtr, bool aState);
+
+	void OASetDemandManagerVentilationFlow(int OAPtr, Real64 aFlow);
+
+	int GetOAController(std::string const & OAName);
 
 	// Clears the global data in MixedAir.
 	// Needed for unit tests, should not be normally called.
@@ -957,7 +975,7 @@ namespace MixedAir {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

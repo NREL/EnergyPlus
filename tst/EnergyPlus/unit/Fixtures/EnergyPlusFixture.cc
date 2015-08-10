@@ -14,6 +14,8 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -58,6 +60,8 @@ namespace EnergyPlus {
 		DataIPShortCuts::clear_state();
 		DataOutputs::clear_state();
 		DataSurfaces::clear_state();
+		DataZoneControls::clear_state();
+		ExteriorEnergyUse::clear_state();
 		HeatBalanceManager::clear_state();
 		InputProcessor::clear_state();
 		OutputProcessor::clear_state();
@@ -335,8 +339,14 @@ namespace EnergyPlus {
 			idd_stream = std::unique_ptr<std::istringstream>( new std::istringstream( idd ) );
 		} else {
 			static auto const exeDirectory = FileSystem::getParentDirectoryPath( FileSystem::getAbsolutePath( FileSystem::getProgramPath() ) );
-			static auto const idd_location = exeDirectory + "Energy+.idd";
-			static auto const file_exists = FileSystem::fileExists( idd_location );
+			static auto idd_location = exeDirectory + "Energy+.idd";
+			static auto file_exists = FileSystem::fileExists( idd_location );
+
+			if ( ! file_exists ) {
+				// Energy+.idd is in parent Products folder instead of Debug/Release/RelWithDebInfo/MinSizeRel folder of exe
+				idd_location = FileSystem::getParentDirectoryPath( exeDirectory ) + "Energy+.idd";
+				file_exists = FileSystem::fileExists( idd_location );
+			}
 
 			if ( ! file_exists ) {
 				EXPECT_TRUE( file_exists ) << 
@@ -377,7 +387,6 @@ namespace EnergyPlus {
 		std::string const & name, 
 		int const num_alphas, 
 		int const num_numbers, 
-		int const object_def_ptr, 
 		std::vector< std::string > const & alphas, 
 		std::vector< bool > const & alphas_blank, 
 		std::vector< Real64 > const & numbers, 
@@ -385,6 +394,8 @@ namespace EnergyPlus {
 	)
 	{
 		using namespace InputProcessor;
+
+		bool has_error = OverallErrorFlag;
 
 		EXPECT_FALSE( OverallErrorFlag );
 
@@ -397,15 +408,17 @@ namespace EnergyPlus {
 		index = ObjectStartRecord( index );
 
 		EXPECT_EQ( name, IDFRecords( index ).Name );
+		if ( name != IDFRecords( index ).Name ) has_error = true;
 		EXPECT_EQ( num_alphas, IDFRecords( index ).NumAlphas );
+		if ( num_alphas != IDFRecords( index ).NumAlphas ) has_error = true;
 		EXPECT_EQ( num_numbers, IDFRecords( index ).NumNumbers );
-		EXPECT_EQ( object_def_ptr, IDFRecords( index ).ObjectDefPtr );
-		EXPECT_TRUE( compare_containers( alphas, IDFRecords( index ).Alphas ) );
-		EXPECT_TRUE( compare_containers( alphas_blank, IDFRecords( index ).AlphBlank ) );
-		EXPECT_TRUE( compare_containers( numbers, IDFRecords( index ).Numbers ) );
-		EXPECT_TRUE( compare_containers( numbers_blank, IDFRecords( index ).NumBlank ) );
+		if ( num_numbers != IDFRecords( index ).NumNumbers ) has_error = true;
+		if ( ! compare_containers( alphas, IDFRecords( index ).Alphas ) ) has_error = true;
+		if ( ! compare_containers( alphas_blank, IDFRecords( index ).AlphBlank ) ) has_error = true;
+		if ( ! compare_containers( numbers, IDFRecords( index ).Numbers ) ) has_error = true;
+		if ( ! compare_containers( numbers_blank, IDFRecords( index ).NumBlank ) ) has_error = true;
 
-		return ! ::testing::Test::HasFailure();
+		return ! has_error;
 	}
 
 	InputProcessorCache::InputProcessorCache()

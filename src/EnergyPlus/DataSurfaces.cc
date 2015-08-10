@@ -512,7 +512,7 @@ namespace DataSurfaces {
 		WinSysSolTransmittance.deallocate();
 		WinSysSolReflectance.deallocate();
 		WinSysSolAbsorptance.deallocate();
-		SUNCOSHR = Array2D< Real64 >( 24, 3, 0.0 );
+		SUNCOSHR.dimension( 24, 3, 0.0 );
 		ReflFacBmToDiffSolObs.deallocate();
 		ReflFacBmToDiffSolGnd.deallocate();
 		ReflFacBmToBmSolObs.deallocate();
@@ -634,7 +634,7 @@ namespace DataSurfaces {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

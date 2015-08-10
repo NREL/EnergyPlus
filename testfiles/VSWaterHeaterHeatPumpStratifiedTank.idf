@@ -9,7 +9,7 @@
 ! System:   None.
 ! Plant:    Plant loop with one WaterHeater:Stratified object with variable-speed heat pump water heating connected to two water use equipment
 
-  Version,8.2;
+  Version,8.3;
 
   Building,
     Water Heater DHW Plant Loop Example,  !- Name
@@ -195,7 +195,7 @@
 
   PlantEquipmentList,
     DHW Plant Equipment,     !- Name
-    WaterHeater:HeatPump,    !- Equipment 1 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,    !- Equipment 1 Object Type
     PlantHeatPumpWaterHeater;!- Equipment 1 Name
 
   SetpointManager:Scheduled,
@@ -261,13 +261,13 @@
     Water Heater Use Branch, !- Name
     ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
-    WaterHeater:HeatPump,    !- Component 1 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,    !- Component 1 Object Type
     PlantHeatPumpWaterHeater,!- Component 1 Name
     Water Heater Use Inlet Node,  !- Component 1 Inlet Node Name
     Water Heater Use Outlet Node,  !- Component 1 Outlet Node Name
     PASSIVE;                 !- Component 1 Branch Control Type
 
-  WaterHeater:HeatPump,
+  WaterHeater:HeatPump:PumpedCondenser,
     PlantHeatPumpWaterHeater,!- Name
     PlantHPWHSch,            !- Availability Schedule Name
     PlantHPWHTempSch,        !- Compressor Setpoint Temperature Schedule Name
@@ -291,6 +291,7 @@
     Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,  !- DX Coil Object Type
     HPWHPlantDXCoilVS,       !- Variable-speed DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
     Fan:OnOff,               !- Fan Object Type
@@ -302,7 +303,8 @@
     ,                        !- Inlet Air Mixer Node Name
     ,                        !- Outlet Air Splitter Node Name
     ,                        !- Inlet Air Mixer Schedule Name
-    Heater1;                 !- Control Sensor Location In Stratified Tank
+    ,                        !- Control Logic
+    1.0;                     !- Control Sensor Location In Stratified Tank
 
   WaterHeater:Stratified,
     Water Heater Tank,       !- Name

@@ -4922,7 +4922,7 @@ Nimmo, B.G. et al. 1993.DEAC: Desiccant Enhancement of Cooling-Based Dehumidific
 
 #### Overview
 
-The input object Coil:WaterHeating:AirToWaterHeatPump provides a model used in a heat pump water heater (HPWH) consisting of a water heater tank (e.g., WaterHeater:Mixed), a direct expansion (DX) “coil” (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source. The heat pump water heater (Ref. WaterHeater:HeatPump), water heater tank (Ref. WaterHeater:Mixed), and fan (Ref. Fan:\*) objects are described elsewhere in this document.
+The input object `Coil:WaterHeating:AirToWaterHeatPump:\*` provides a model used in a heat pump water heater (HPWH) consisting of a water heater tank (e.g., `WaterHeater:Mixed` or `WaterHeater:Stratified`), a direct expansion (DX) “coil” (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source. The heat pump water heater (Ref. `WaterHeater:HeatPump:*`), water heater tank (Ref. `WaterHeater:Mixed` and `WaterHeater:Stratified`), and fan (Ref. `Fan:\*`) objects are described elsewhere in this document.
 
 
 
@@ -4936,7 +4936,7 @@ The heat pump water heater DX coil model described here determines the thermal p
 
 Figure 179. Schematic of the Heat Pump Water Heater DX Coil
 
-Virtually all of the inputs to this DX coil model relate to its water heating performance and energy consumption. The air-side cooling capacity of this DX system is derived from user inputs and some model assumptions. The sensible/latent cooling capacity split is defined by the user at rated conditions, and the model adjusts this split at off-rated conditions.
+Virtually all of the inputs to this DX coil model relate to its water heating performance and energy consumption. Model inputs differ between the `Coil:WaterHeating:AirToWaterHeatPump:Pumped` and `Coil:WaterHeating:AirToWaterHeatPump:Wrapped` to include only the relevant inputs for `WaterHeater:HeatPump:PumpedCondenser` and `WaterHeater:HeatPump:WrappedCondenser`, respectively. The air-side cooling capacity of this DX system is derived from user inputs and some model assumptions. The sensible/latent cooling capacity split is defined by the user at rated conditions, and the model adjusts this split at off-rated conditions.
 
 #### Model Description
 
@@ -4946,19 +4946,19 @@ The user must input the heating capacity, coefficient of performance (COP), and 
 
 2)    Heating capacity modifier curve (function of air flow fraction)
 
-3)    Heating capacity modifier curve (function of water flow fraction)
+3)    Heating capacity modifier curve (function of water flow fraction, pumped condenser only)
 
 4)    Heating COP modifier curve (function of temperature)
 
 5)    Heating COP modifier curve (function of air flow fraction)
 
-6)    Heating COP modifier curve  (function of water flow fraction)
+6)    Heating COP modifier curve  (function of water flow fraction, pumped condenser only)
 
 7)    Part load fraction correlation (function of part load ratio)
 
-Note: The air dry-bulb or wet-bulb temperature used in the following curve objects is the inlet air temperature to the HPWH evaporator coil/fan assembly. If the fan placement specified in the WaterHeater:HeatPump compound object is draw-through, then the inlet air temperature represents the temperature of the air entering the evaporator coil itself. If blow-through fan placement is specified, then the inlet air temperature represents air conditions entering the fan located immediately in front (upstream) of the evaporator coil.
+Note: The air dry-bulb or wet-bulb temperature used in the following curve objects is the inlet air temperature to the HPWH evaporator coil/fan assembly. If the fan placement specified in the `WaterHeater:HeatPump:*` compound object is draw-through, then the inlet air temperature represents the temperature of the air entering the evaporator coil itself. If blow-through fan placement is specified, then the inlet air temperature represents air conditions entering the fan located immediately in front (upstream) of the evaporator coil.
 
-·        The heating capacity as a function of temperature modifier curve defines the variation in DX coil heating capacity as a function of inlet fluid (air and water) temperatures. The curve object may use either a bi-quadratic or cubic form. The bi-quadratic curve uses inlet air temperature (dry-bulb or wet-bulb temperature based on the input field Evaporator Air Temperature Type for Curve Objects) and condenser inlet water temperature as the independent variables. The cubic curve uses inlet air (dry-bulb or wet-bulb) temperature as the independent variable. The curve should be normalized to have the value of 1.0 at the rating point temperatures specified by the user.
+The heating capacity as a function of temperature modifier curve defines the variation in DX coil heating capacity as a function of inlet fluid (air and water) temperatures. The curve object may use either a bi-quadratic or cubic form. The bi-quadratic curve uses inlet air temperature (dry-bulb or wet-bulb temperature based on the input field Evaporator Air Temperature Type for Curve Objects) and condenser inlet water temperature as the independent variables. The cubic curve uses inlet air (dry-bulb or wet-bulb) temperature as the independent variable. The curve should be normalized to have the value of 1.0 at the rating point temperatures specified by the user.
 
 <div>$$HCapFTemp = a + b\left( {{T_{evap,in}}} \right) + c{\left( {{T_{evap,in}}} \right)^2} + d\left( {{T_{cond,in}}} \right) + e{\left( {{T_{cond,in}}} \right)^2} + f\left( {{T_{evap,in}}} \right)\left( {{T_{cond,in}}} \right)$$</div>
 
@@ -4972,7 +4972,7 @@ where:
 
 <span>\({T_{cond,in}}\)</span>  = temperature of the water entering the DX coil condenser (°C)
 
-·        The heating capacity as a function of air flow fraction modifier curve is a quadratic or cubic curve that defines the variation in DX coil heating capacity as a function of the ratio of actual air flow rate across the evaporator coil to the rated evaporator air flow rate (i.e., fraction of full load air flow rate). When used, the output of this curve should be normalized to have the value of 1.0  at an air flow fraction of 1.
+The heating capacity as a function of air flow fraction modifier curve is a quadratic or cubic curve that defines the variation in DX coil heating capacity as a function of the ratio of actual air flow rate across the evaporator coil to the rated evaporator air flow rate (i.e., fraction of full load air flow rate). When used, the output of this curve should be normalized to have the value of 1.0  at an air flow fraction of 1.
 
 <div>$$HCapFAirFlow = \,a + \,b\left( {f{f_{air}}} \right)\,\, + \,\,c{\left( {f{f_{air}}} \right)^2}$$</div>
 
@@ -4986,7 +4986,7 @@ where:
 
 Note: The actual volumetric air flow rate through the evaporator coil/fan assembly for any simulation time step where the compressor is operating must be between 0.00002684 m<sup>3</sup>/s and .00008056 m<sup>3</sup>/s per watt of rated total heating capacity. The simulation will issue a warning message if this air flow range is exceeded, but the simulation will continue.
 
-·        The heating capacity as a function of water flow fraction modifier curve is a quadratic or cubic curve that defines the variation in DX coil heating capacity as a function of the ratio of actual water flow rate through the condenser to the rated condenser water flow rate (i.e., fraction of full load water flow rate). When used, the output of this curve should be normalized to have the value of 1.0 at a water flow fraction of 1.
+The heating capacity as a function of water flow fraction modifier curve is a quadratic or cubic curve that defines the variation in DX coil heating capacity as a function of the ratio of actual water flow rate through the condenser to the rated condenser water flow rate (i.e., fraction of full load water flow rate). *It is only used for the pumped condenser configuration.* When used, the output of this curve should be normalized to have the value of 1.0 at a water flow fraction of 1.
 
 <div>$$HCapFWaterFlow = \,a + \,b\left( {f{f_{water}}} \right)\,\, + \,\,c{\left( {f{f_{water}}} \right)^2}$$</div>
 
@@ -4998,7 +4998,7 @@ where:
 
 <div>$$f{f_{water}} = water\,flow\,fraction = \left( {\frac{{Actual\,water\,mass\,flow\,rate}}{{Rated\,water\,mass\,flow\,rate}}} \right)$$</div>
 
-·        The heating COP as a function of temperature modifier curve defines the variation in DX coil heating COP as a function of inlet fluid (air and water) temperatures. The curve object may use either a bi-quadratic or cubic form. The bi-quadratic curve uses inlet air temperature (dry-bulb or wet-bulb temperature based on the input field Evaporator Air Temperature Type for Curve Objects) and condenser inlet water temperature as the independent variables. The cubic curve uses inlet air (dry-bulb or wet-bulb) temperature as the independent variable. The curve should be normalized to have the value of 1.0 at the rating point temperatures specified by the user.
+The heating COP as a function of temperature modifier curve defines the variation in DX coil heating COP as a function of inlet fluid (air and water) temperatures. The curve object may use either a bi-quadratic or cubic form. The bi-quadratic curve uses inlet air temperature (dry-bulb or wet-bulb temperature based on the input field Evaporator Air Temperature Type for Curve Objects) and condenser inlet water temperature as the independent variables. The cubic curve uses inlet air (dry-bulb or wet-bulb) temperature as the independent variable. The curve should be normalized to have the value of 1.0 at the rating point temperatures specified by the user.
 
 <div>$$HCOPFTemp = a + b\left( {{T_{evap,in}}} \right) + c{\left( {{T_{evap,in}}} \right)^2} + d\left( {{T_{cond,in}}} \right) + e{\left( {{T_{cond,in}}} \right)^2} + f\left( {{T_{evap,in}}} \right)\left( {{T_{cond,in}}} \right)$$</div>
 
@@ -5006,7 +5006,7 @@ or
 
 <div>$$HCOPFTemp = a + b\left( {{T_{evap,in}}} \right) + c{\left( {{T_{evap,in}}} \right)^2} + d{\left( {{T_{evap,in}}} \right)^3}$$</div>
 
-·        The heating COP as a function of air flow fraction modifier curve is a quadratic or cubic curve that defines the variation in DX coil heating COP as a function of the ratio of actual air flow rate across the evaporator coil to the rated evaporator air flow rate (i.e., fraction of full load air flow rate). When used, the output of this curve should be normalized to have the value of 1.0 at an air flow fraction of 1.
+The heating COP as a function of air flow fraction modifier curve is a quadratic or cubic curve that defines the variation in DX coil heating COP as a function of the ratio of actual air flow rate across the evaporator coil to the rated evaporator air flow rate (i.e., fraction of full load air flow rate). When used, the output of this curve should be normalized to have the value of 1.0 at an air flow fraction of 1.
 
 <div>$$HCOPFAirFlow = \,a + \,b\left( {f{f_{air}}} \right)\,\, + \,\,c{\left( {f{f_{air}}} \right)^2}$$</div>
 
@@ -5014,7 +5014,7 @@ or
 
 <div>$$HCOPFAirFlow = \,a + \,b\left( {f{f_{air}}} \right)\,\, + \,\,c{\left( {f{f_{air}}} \right)^2}\,\, + \,\,d{\left( {f{f_{air}}} \right)^3}$$</div>
 
-·        The heating COP as a function of water flow fraction modifier curve is a quadratic or cubic curve that defines the variation in DX coil heating COP as a function of the ratio of actual water flow rate through the condenser to the rated condenser water flow rate (i.e., fraction of full load water flow rate). When used, the output of this curve should be normalized to have the value of 1.0 at a water flow fraction of 1.
+The heating COP as a function of water flow fraction modifier curve is a quadratic or cubic curve that defines the variation in DX coil heating COP as a function of the ratio of actual water flow rate through the condenser to the rated condenser water flow rate (i.e., fraction of full load water flow rate). *It is only used for the pumped condenser configuration.* When used, the output of this curve should be normalized to have the value of 1.0 at a water flow fraction of 1.
 
 <div>$$HCOPFWaterFlow = \,a + \,b\left( {f{f_{water}}} \right)\,\, + \,\,c{\left( {f{f_{water}}} \right)^2}$$</div>
 
@@ -5022,7 +5022,7 @@ or
 
 <div>$$HCOPFWaterFlow = \,a + \,b\left( {f{f_{water}}} \right)\,\, + \,\,c{\left( {f{f_{water}}} \right)^2}\,\, + \,\,d{\left( {f{f_{water}}} \right)^3}$$</div>
 
-·        The part load fraction as a function of part load ratio correlation curve parameterizes the variation of electrical power input to the heat pump DX coil as a function of the part load ratio (PLR, heating delivered/steady-state heating capacity). The part load ratio divided by the part load fraction yields the runtime fraction of the DX heating coil for a given simulation time step. The part load fraction correlation accounts for efficiency losses due to compressor cycling.
+The part load fraction as a function of part load ratio correlation curve parameterizes the variation of electrical power input to the heat pump DX coil as a function of the part load ratio (PLR, heating delivered/steady-state heating capacity). The part load ratio divided by the part load fraction yields the runtime fraction of the DX heating coil for a given simulation time step. The part load fraction correlation accounts for efficiency losses due to compressor cycling.
 
 <div>$$PartLoadFrac = PLF = a + b\left( {PLR} \right) + c{\left( {PLR} \right)^2}$$</div>
 
@@ -5116,7 +5116,7 @@ where:
 
 This evaporator cooling capacity is used to calculate the air-side performance of the heat pump water heater DX coil. The sensible heat ratio of the cooling capacity at rated conditions is specified by the user in the input for this DX coil object. The calculation of sensible heat ratio at off-rated conditions uses the ADP/BF approach described for the DX cooling coil model (Ref. Coil Model – DX Cooling Coil Model). The exiting air conditions for the HPWH DX coil are calculated the same way as they are for the DX cooling coil model (cycling fan, cycling coil). The crankcase heater power and consumption are also calculated using the same equations used for the DX cooling coil model.
 
-The runtime fraction of the DX coil compressor is calculated as the ratio of the compressor part load ratio to the part load fraction correlation entered by the user. The part load ratio of the DX coil is determined by the heat pump water heater compound object (Ref. WaterHeater:HeatPump) and is used by the DX coil to determine the run time fraction of the compressor.
+The runtime fraction of the DX coil compressor is calculated as the ratio of the compressor part load ratio to the part load fraction correlation entered by the user. The part load ratio of the DX coil is determined by the heat pump water heater compound object (Ref. `WaterHeater:HeatPump:*`) and is used by the DX coil to determine the run time fraction of the compressor.
 
 <div>$$RTF = \left( {{\raise0.7ex\hbox{${PLR}$} \!\mathord{\left/ {\vphantom {{PLR} {PartLoadFrac}}}\right.}\!\lower0.7ex\hbox{${PartLoadFrac}$}}} \right) = runtime\,fraction\,of\,the\,compressor$$</div>
 
@@ -5126,13 +5126,13 @@ Finally, the condenser water outlet temperature is calculated based on the total
 
 where:
 
-<span>\({T_{cond,out}}\)</span>      = condenser outlet water temperature when the DX coil is operating (˚C)
+<span>\({T_{cond,out}}\)</span> = condenser outlet water temperature when the DX coil is operating (˚C)
 
-<span>\({T_{cond,in}}\)</span>        = condenser inlet water temperature (˚C)
+<span>\({T_{cond,in}}\)</span> = condenser inlet water temperature (˚C)
 
-<span>\({C_p}\)</span>             = specific heat of water entering the condenser coil (J/kg-C)
+<span>\({C_p}\)</span> = specific heat of water entering the condenser coil (J/kg-C)
 
-<span>\(\mathop m\limits^ \bullet  cond\)</span>         = actual condenser water mass flow rate when the coil is operating,                                 defined in the WaterHeater:HeatPump parent object (kg/s)
+<span>\(\mathop m\limits^ \bullet  cond\)</span> = actual condenser water mass flow rate when the coil is operating,                                 defined in the WaterHeater:HeatPump:PumpedCondenser parent object (kg/s)
 
 
 

@@ -7,6 +7,8 @@
 #include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/Vector2.fwd.hh>
+#include <ObjexxFCL/Vector3.fwd.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -95,37 +97,37 @@ namespace DaylightingManager {
 		int const iRefPoint,
 		int const loopwin,
 		int const CalledFrom, // indicate  which type of routine called this routine
-		Array1A< Real64 > const RREF, // Location of a reference point in absolute coordinate system
-		Array1A< Real64 > const VIEWVC, // View vector in absolute coordinate system
+		Vector3< Real64 > const & RREF, // Location of a reference point in absolute coordinate system
+		Vector3< Real64 > const & VIEWVC, // View vector in absolute coordinate system
 		int & IWin,
 		int & IWin2,
 		int & NWX,
 		int & NWY,
-		Array1A< Real64 > W2, // Second vertex of window
-		Array1A< Real64 > W3, // Third vertex of window
-		Array1A< Real64 > W21, // Vector from window vertex 2 to window vertex 1
-		Array1A< Real64 > W23, // Vector from window vertex 2 to window vertex 3
+		Vector3< Real64 > & W2, // Second vertex of window
+		Vector3< Real64 > & W3, // Third vertex of window
+		Vector3< Real64 > & W21, // Vector from window vertex 2 to window vertex 1
+		Vector3< Real64 > & W23, // Vector from window vertex 2 to window vertex 3
 		int & LSHCAL, // Interior shade calculation flag:  0=not yet calculated, 1=already calculated
 		int & InShelfSurf, // Inside daylighting shelf surface number
 		int & ICtrl, // Window control counter
 		int & ShType, // Window shading type
 		int & BlNum, // Window blind number
-		Array1A< Real64 > WNORM2, // Unit vector normal to window
+		Vector3< Real64 > & WNORM2, // Unit vector normal to window
 		int & ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
 		int & IConst, // Construction counter
-		Array1A< Real64 > RREF2, // Location of virtual reference point in absolute coordinate system
+		Vector3< Real64 > & RREF2, // Location of virtual reference point in absolute coordinate system
 		Real64 & DWX, // Horizontal dimension of window element (m)
 		Real64 & DWY, // Vertical dimension of window element (m)
 		Real64 & DAXY, // Area of window element
-		Array1A< Real64 > U2, // Second vertex of window for TDD:DOME (if exists)
-		Array1A< Real64 > U23, // Vector from window vertex 2 to window vertex 3 for TDD:DOME (if exists)
-		Array1A< Real64 > U21, // Vector from window vertex 2 to window vertex 1 for TDD:DOME (if exists)
-		Array1A< Real64 > VIEWVC2, // Virtual view vector in absolute coordinate system
+		Vector3< Real64 > & U2, // Second vertex of window for TDD:DOME (if exists)
+		Vector3< Real64 > & U23, // Vector from window vertex 2 to window vertex 3 for TDD:DOME (if exists)
+		Vector3< Real64 > & U21, // Vector from window vertex 2 to window vertex 1 for TDD:DOME (if exists)
+		Vector3< Real64 > & VIEWVC2, // Virtual view vector in absolute coordinate system
 		bool & Rectangle, // True if window is rectangular
 		bool & Triangle, // True if window is triangular
 		Optional_int_const MapNum = _,
-		Optional< Array2S< Real64 > > MapWindowSolidAngAtRefPt = _,
-		Optional< Array2S< Real64 > > MapWindowSolidAngAtRefPtWtd = _
+//		Optional< Real64 > MapWindowSolidAngAtRefPt = _, //Inactive
+		Optional< Real64 > MapWindowSolidAngAtRefPtWtd = _
 	);
 
 	void
@@ -140,21 +142,21 @@ namespace DaylightingManager {
 		int const iXelement,
 		int const iYelement,
 		Real64 & SkyObstructionMult,
-		Array1A< Real64 > const W2, // Second vertex of window
-		Array1A< Real64 > const W21, // Vector from window vertex 2 to window vertex 1
-		Array1A< Real64 > const W23, // Vector from window vertex 2 to window vertex 3
-		Array1A< Real64 > const RREF, // Location of a reference point in absolute coordinate system
+		Vector3< Real64 > const & W2, // Second vertex of window
+		Vector3< Real64 > const & W21, // Vector from window vertex 2 to window vertex 1
+		Vector3< Real64 > const & W23, // Vector from window vertex 2 to window vertex 3
+		Vector3< Real64 > const & RREF, // Location of a reference point in absolute coordinate system
 		int const NWYlim, // For triangle, largest NWY for a given IX
-		Array1A< Real64 > const VIEWVC2, // Virtual view vector in absolute coordinate system
+		Vector3< Real64 > const & VIEWVC2, // Virtual view vector in absolute coordinate system
 		Real64 const DWX, // Horizontal dimension of window element (m)
 		Real64 const DWY, // Vertical dimension of window element (m)
 		Real64 const DAXY, // Area of window element
-		Array1A< Real64 > const U2, // Second vertex of window for TDD:DOME (if exists)
-		Array1A< Real64 > const U23, // Vector from window vertex 2 to window vertex 3 for TDD:DOME (if exists)
-		Array1A< Real64 > const U21, // Vector from window vertex 2 to window vertex 1 for TDD:DOME (if exists)
-		Array1A< Real64 > RWIN, // Center of a window element for TDD:DOME (if exists) in abs coord sys
-		Array1A< Real64 > RWIN2, // Center of a window element for TDD:DOME (if exists) in abs coord sys
-		Array1A< Real64 > Ray, // Unit vector along ray from reference point to window element
+		Vector3< Real64 > const & U2, // Second vertex of window for TDD:DOME (if exists)
+		Vector3< Real64 > const & U23, // Vector from window vertex 2 to window vertex 3 for TDD:DOME (if exists)
+		Vector3< Real64 > const & U21, // Vector from window vertex 2 to window vertex 1 for TDD:DOME (if exists)
+		Vector3< Real64 > & RWIN, // Center of a window element for TDD:DOME (if exists) in abs coord sys
+		Vector3< Real64 > & RWIN2, // Center of a window element for TDD:DOME (if exists) in abs coord sys
+		Vector3< Real64 > & Ray, // Unit vector along ray from reference point to window element
 		Real64 & PHRAY, // Altitude of ray from reference point to window element (radians)
 		int & LSHCAL, // Interior shade calculation flag:  0=not yet calculated, 1=already calculated
 		Real64 & COSB, // Cosine of angle between window outward normal and ray from reference point to window element
@@ -164,16 +166,16 @@ namespace DaylightingManager {
 		Real64 & THRAY, // Azimuth of ray from reference point to window element (radians)
 		int & IHitIntObs, // = 1 if interior obstruction hit, = 0 otherwise
 		int & IHitExtObs, // 1 if ray from ref pt to ext win hits an exterior obstruction
-		Array1A< Real64 > const WNORM2, // Unit vector normal to window
+		Vector3< Real64 > const & WNORM2, // Unit vector normal to window
 		int const ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
 		int const IConst, // Construction counter
-		Array1A< Real64 > const RREF2, // Location of virtual reference point in absolute coordinate system
+		Vector3< Real64 > const & RREF2, // Location of virtual reference point in absolute coordinate system
 		bool const Triangle,
 		Real64 & TVISIntWin, // Visible transmittance of int win at COSBIntWin for light from ext win
 		Real64 & TVISIntWinDisk, // Visible transmittance of int win at COSBIntWin for sun
 		Optional_int_const MapNum = _,
-		Optional< Array2S< Real64 > > MapWindowSolidAngAtRefPt = _,
-		Optional< Array2S< Real64 > > MapWindowSolidAngAtRefPtWtd = _
+//		Optional< Real64 > MapWindowSolidAngAtRefPt = _, //Inactive
+		Optional< Real64 > MapWindowSolidAngAtRefPtWtd = _
 	);
 
 	void
@@ -182,8 +184,7 @@ namespace DaylightingManager {
 		int const IWin, // Complex fenestration number
 		int const NWX, // Number of horizontal divisions
 		int const NWY, // Number of vertical divisions
-		Array1A< Real64 > const VIEWVC, // view vector component in absolute coord sys
-		Array1A< Real64 > const RefPoint, // reference point coordinates
+		Vector3< Real64 > const & RefPoint, // reference point coordinates
 		int const NRefPts, // Number of reference points
 		int const iRefPoint, // Reference points counter
 		int const CalledFrom,
@@ -196,19 +197,19 @@ namespace DaylightingManager {
 		BSDFRefPointsGeomDescr & DaylghtGeomDescr,
 		int const ZoneNum, // Current zone number
 		int const iWin,
-		Array1A< Real64 > const RefPoint, // reference point
+		Vector3< Real64 > const & RefPoint, // reference point
 		int const CurFenState,
 		int const NBasis,
 		int const NTrnBasis,
 		Real64 const AZVIEW,
 		int const NWX,
 		int const NWY,
-		Array1A< Real64 > const W2,
-		Array1A< Real64 > const W21,
-		Array1A< Real64 > const W23,
+		Vector3< Real64 > const & W2,
+		Vector3< Real64 > const & W21,
+		Vector3< Real64 > const & W23,
 		Real64 const DWX,
 		Real64 const DWY,
-		Array1A< Real64 > const WNorm, // unit vector from window (point towards outside)
+		Vector3< Real64 > const & WNorm, // unit vector from window (point towards outside)
 		Real64 const WinElArea,
 		int const CalledFrom,
 		Optional_int_const MapNum = _
@@ -230,9 +231,9 @@ namespace DaylightingManager {
 
 	void
 	CFSRefPointSolidAngle(
-		Array1A< Real64 > const RefPoint,
-		Array1A< Real64 > const RWin,
-		Array1A< Real64 > const WNorm,
+		Vector3< Real64 > const & RefPoint,
+		Vector3< Real64 > const & RWin,
+		Vector3< Real64 > const & WNorm,
 		BSDFRefPoints & RefPointMap,
 		BSDFRefPointsGeomDescr & RefPointGeomMap,
 		int const iWin,
@@ -244,7 +245,7 @@ namespace DaylightingManager {
 
 	void
 	CFSRefPointPosFactor(
-		Array1A< Real64 > const RefPoint,
+		Vector3< Real64 > const & RefPoint,
 		BSDFRefPoints & RefPointMap,
 		int const iWin,
 		int const CurFenState,
@@ -254,7 +255,7 @@ namespace DaylightingManager {
 
 	Real64
 	CalcObstrMultiplier(
-		Array1A< Real64 > const GroundHitPt, // Coordinates of point that ray hits ground (m)
+		Vector3< Real64 > const & GroundHitPt, // Coordinates of point that ray hits ground (m)
 		int const AltSteps, // Number of steps in altitude angle for solar reflection calc
 		int const AzimSteps // Number of steps in azimuth angle of solar reflection calc
 	);
@@ -273,32 +274,31 @@ namespace DaylightingManager {
 		int const iHour,
 		int & ISunPos,
 		Real64 const SkyObstructionMult,
-		Array1< Real64 > const & RWIN2, // Center of a window element for TDD:DOME (if exists) in abs coord sys
-		Array1< Real64 > const & Ray, // Unit vector along ray from reference point to window element
+		Vector3< Real64 > const & RWIN2, // Center of a window element for TDD:DOME (if exists) in abs coord sys
+		Vector3< Real64 > const & Ray, // Unit vector along ray from reference point to window element
 		Real64 const PHRAY, // Altitude of ray from reference point to window element (radians)
 		int const LSHCAL, // Interior shade calculation flag:  0=not yet calculated, 1=already calculated
 		int const InShelfSurf, // Inside daylighting shelf surface number
-		Real64 const COSB, // Cosine of angle between window outward normal and ray from reference point
-		Real64 const ObTrans, // Product of solar transmittances of exterior obstructions hit by ray
-		Real64 const TVISB, // Visible transmittance of window for COSB angle of incidence (times light well
+		Real64 const COSB, // Cosine of angle between window outward normal and ray from reference point to window element
+		Real64 const ObTrans, // Product of solar transmittances of exterior obstructions hit by ray from reference point through a window element
+		Real64 const TVISB, // Visible transmittance of window for COSB angle of incidence (times light well efficiency, if appropriate)
 		Real64 const DOMEGA, // Solid angle subtended by window element wrt reference point (steradians)
 		int const ICtrl, // Window control counter
 		int const ShType, // Window shading type
 		int const BlNum, // Window blind number
 		Real64 const THRAY, // Azimuth of ray from reference point to window element (radians)
-		Array1< Real64 > const & WNORM2, // Unit vector normal to window
+		Vector3< Real64 > const & WNORM2, // Unit vector normal to window
 		int const ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
 		int const IConst, // Construction counter
-		Real64 const AZVIEW, // Azimuth of view vector in absolute coord system for
-		Array1< Real64 > const & RREF2, // Location of virtual reference point in absolute coordinate system
-		int const loopwin,
+		Real64 const AZVIEW, // Azimuth of view vector in absolute coord system for glare calculation (radians)
+		Vector3< Real64 > const & RREF2, // Location of virtual reference point in absolute coordinate system
 		int const IHitIntObs, // = 1 if interior obstruction hit, = 0 otherwise
 		int const IHitExtObs, // 1 if ray from ref pt to ext win hits an exterior obstruction
 		int const CalledFrom, // indicate  which type of routine called this routine
 		Real64 & TVISIntWin, // Visible transmittance of int win at COSBIntWin for light from ext win
 		Real64 & TVISIntWinDisk, // Visible transmittance of int win at COSBIntWin for sun
 		Optional_int_const MapNum = _,
-		Optional< Array2S< Real64 > const > MapWindowSolidAngAtRefPtWtd = _
+		Optional< Real64 const > MapWindowSolidAngAtRefPtWtd = _
 	);
 
 	void
@@ -352,7 +352,7 @@ namespace DaylightingManager {
 
 	void
 	DayltgGlareWithIntWins(
-		Array1A< Real64 > GLINDX, // Glare index
+		Array1< Real64 > & GLINDX, // Glare index
 		int const ZoneNum // Zone number
 	);
 
@@ -363,35 +363,28 @@ namespace DaylightingManager {
 	);
 
 	void
-	DayltgCrossProduct(
-		Array1< Real64 > const & A, // Vector components: C = A X B
-		Array1< Real64 > const & B,
-		Array1< Real64 > & C
-	);
-
-	void
 	DayltgPierceSurface(
 		int const ISurf, // Surface index
-		Array1< Real64 > const & R1, // Point from which ray originates
-		Array1< Real64 > const & RN, // Unit vector along in direction of ray whose
+		Vector3< Real64 > const & R1, // Point from which ray originates
+		Vector3< Real64 > const & RN, // Unit vector along in direction of ray whose
 		int & IPIERC, // =1 if line through point R1 in direction of unit vector
-		Array1< Real64 > & CP // Point that ray along RN intersects plane of surface
+		Vector3< Real64 > & CP // Point that ray along RN intersects plane of surface
 	);
 
 	void
 	DayltgHitObstruction(
 		int const IHOUR, // Hour number
 		int const IWin, // Window index
-		Array1A< Real64 > const R1, // Origin of ray (m)
-		Array1A< Real64 > const RN, // Unit vector along ray
+		Vector3< Real64 > const & R1, // Origin of ray (m)
+		Vector3< Real64 > const & RN, // Unit vector along ray
 		Real64 & ObTrans // Product of solar transmittances of exterior obstructions
 	);
 
 	void
 	DayltgHitInteriorObstruction(
 		int const IWin, // Window index
-		Array1A< Real64 > const R1, // Origin of ray (m)
-		Array1A< Real64 > const R2, // Destination of ray (m)
+		Vector3< Real64 > const & R1, // Origin of ray (m)
+		Vector3< Real64 > const & R2, // Destination of ray (m)
 		int & IHit // Hit flag: 1 = ray hits an obstruction, 0 = does not
 	);
 
@@ -399,8 +392,8 @@ namespace DaylightingManager {
 	DayltgHitBetWinObstruction(
 		int const IWin1, // Surface number of origin window
 		int const IWin2, // Surface number of destination window
-		Array1A< Real64 > const R1, // Origin of ray (on IWin1) (m)
-		Array1A< Real64 > const R2, // Destination of ray (on IWin2) (m)
+		Vector3< Real64 > const & R1, // Origin of ray (on IWin1) (m)
+		Vector3< Real64 > const & R2, // Destination of ray (on IWin2) (m)
 		int & IHit // Hit flag: 1 = ray hits an obstruction, 0 = does not
 	);
 
@@ -434,9 +427,9 @@ namespace DaylightingManager {
 		int const NBasis,
 		int const IHR,
 		int const iRefPoint,
-		Array2A< Real64 > ElementLuminanceSky, // sky related luminance at window element (exterior side)
-		Array1A< Real64 > ElementLuminanceSun, // sun related luminance at window element (exterior side),
-		Array1A< Real64 > ElementLuminanceSunDisk, // sun related luminance at window element (exterior side),
+		Array2< Real64 > & ElementLuminanceSky, // sky related luminance at window element (exterior side)
+		Array1< Real64 > & ElementLuminanceSun, // sun related luminance at window element (exterior side),
+		Array1< Real64 > & ElementLuminanceSunDisk, // sun related luminance at window element (exterior side),
 		int const CalledFrom,
 		Optional_int_const MapNum = _
 	);
@@ -468,13 +461,12 @@ namespace DaylightingManager {
 		int const iWin, // Window index
 		int const ZoneNum, // Zone number
 		int const iHour, // Hour of day
-		int const LoopWin,
 		int const iRefPoint,
 		int const NumEl, // Total number of window elements
 		Real64 const AZVIEW, // Azimuth of view vector in absolute coord system for
 		int const CalledFrom, // indicate  which type of routine called this routine
 		Optional_int_const MapNum = _,
-		Optional< Array2S< Real64 > const > MapWindowSolidAngAtRefPtWtd = _
+		Optional< Real64 const > MapWindowSolidAngAtRefPtWtd = _
 	);
 
 	Real64
@@ -487,50 +479,25 @@ namespace DaylightingManager {
 	void
 	ProfileAngle(
 		int const SurfNum, // Surface number
-		Array1A< Real64 > const CosDirSun, // Solar direction cosines
+		Vector3< Real64 > const & CosDirSun, // Solar direction cosines
 		int const HorOrVert, // If HORIZONTAL, calculates ProfileAngHor
-		Real64 & ProfileAng, // Solar profile angle (radians).
-		bool const = false // Disambiguation sentinel
+		Real64 & ProfileAng // Solar profile angle (radians).
 	);
-
-	inline
-	void
-	ProfileAngle(
-		int const SurfNum, // Surface number
-		Array1S< Real64 > const & CosDirSun, // Solar direction cosines
-		int const HorOrVert, // If HORIZONTAL, calculates ProfileAngHor
-		Real64 & ProfileAng // Solar profile angle (radians).
-	)
-	{
-		ProfileAngle( SurfNum, Array1D< Real64 >( CosDirSun ), HorOrVert, ProfileAng, false );
-	}
-
-	inline
-	void
-	ProfileAngle(
-		int const SurfNum, // Surface number
-		Array1D< Real64 > const & CosDirSun, // Solar direction cosines
-		int const HorOrVert, // If HORIZONTAL, calculates ProfileAngHor
-		Real64 & ProfileAng // Solar profile angle (radians).
-	)
-	{
-		ProfileAngle( SurfNum, CosDirSun, HorOrVert, ProfileAng, false );
-	}
 
 	void
 	DayltgClosestObstruction(
-		Array1A< Real64 > const RecPt, // Point on window from which ray emanates (m)
-		Array1A< Real64 > const RayVec, // Unit vector along ray pointing away from window (m)
+		Vector3< Real64 > const & RecPt, // Point on window from which ray emanates (m)
+		Vector3< Real64 > const & RayVec, // Unit vector along ray pointing away from window (m)
 		int & NearestHitSurfNum, // Surface number of nearest obstruction that is hit by ray;
-		Array1A< Real64 > NearestHitPt // Ray's hit point on nearest obstruction (m)
+		Vector3< Real64 > & NearestHitPt // Ray's hit point on nearest obstruction (m)
 	);
 
 	void
 	DayltgSurfaceLumFromSun(
 		int const IHR, // Hour number
-		Array1A< Real64 > const Ray, // Ray from window to reflecting surface (m)
+		Vector3< Real64 > const & Ray, // Ray from window to reflecting surface (m)
 		int const ReflSurfNum, // Number of surface for which luminance is being calculated
-		Array1A< Real64 > const ReflHitPt, // Point on ReflSurfNum for luminance calculation (m)
+		Vector3< Real64 > const & ReflHitPt, // Point on ReflSurfNum for luminance calculation (m)
 		Real64 & LumAtReflHitPtFrSun // Luminance at ReflHitPt from beam solar reflection for unit
 	);
 
@@ -576,7 +543,7 @@ namespace DaylightingManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

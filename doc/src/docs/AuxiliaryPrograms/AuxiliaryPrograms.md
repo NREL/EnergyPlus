@@ -3818,7 +3818,7 @@ Weather data for Israel locations developed by Faculty of Civil and Environmenta
 
 RMY Australia Representative Meteorological Year Climate Files Developed for the Australia Greenhouse Office for use in complying with Building Code of Australia. These data are licensed through ACADS BSG Ltd for use by EnergyPlus users. For use in any other formats, users must contact ACADS BSG Ltd for licensing information.
 
-The RMY data are © 2006 Commonwealth of Australia, Department of the Environment and Water Resources, Australia Greenhouse Office, Canberra, ACT, Australia. [www.greenhouse.gov.au/buildings/code.html](http://www.greenhouse.gov.au/buildings/code.html) All intellectual property rights reserved.
+The RMY data are © 2006 Commonwealth of Australia, Department of the Environment and Water Resources, Australia Greenhouse Office, Canberra, ACT, Australia. [www.greenhouse.gov.au/buildings/code.html](https://web.archive.org/web/20070608213812/http://www.greenhouse.gov.au/buildings/code.html) (URL has since been removed, so replaced with a link on The Internet Archive from 2007.)  All intellectual property rights reserved.
 
 ### Iranian Typical Meteorological Year (ITMY)
 
@@ -10686,7 +10686,9 @@ As installed, the RunEPlus is ready to run the sample files that are included. I
 Running EnergyPlus by Hand
 --------------------------
 
-EnergyPlus is compiled as a 32 bit console application on Windows™ (Windows 98, Windows NT, Windows 2000, Windows ME) operating systems, commonly run on the Intel™ or compatible processing chips (aka WinTel machines). To run the program bring up the command prompt and "cd" to the directory containing the executable. Assume that the executable is called *EnergyPlus.exe*. In the same directory EnergyPlus expects *in.idf*, the input data file; *Energy+.idd*, the data dictionary file; *in.epw*, the weather file (needed only if there is a RunPeriod in the input); and optionally *Energy+.ini*, the initialization file. Typing "EnergyPlus" (and hitting the *Enter* key) will execute the program. EnergyPlus will write messages to the command window as it runs. A simulation with two design days and one run period looks like:
+EnergyPlus runs as a console application with optional command line arguments. The arguments may be listed by typing energyplus --help (Windows OS) or man energyplus (Linux OS). For more information about the command line interface, see https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md. The remainder of this section describes running EnergyPlus in legacy mode (i.e. no command-line arguments) on Windows OS.
+ 
+To run the program bring up the command prompt and "cd" to the directory containing the executable. Assume that the executable is called *EnergyPlus.exe*. In the same directory EnergyPlus expects *in.idf*, the input data file; *Energy+.idd*, the data dictionary file; *in.epw*, the weather file (needed only if there is a RunPeriod in the input); and optionally *Energy+.ini*, the initialization file. Typing "EnergyPlus" (and hitting the *Enter* key) will execute the program. EnergyPlus will write messages to the command window as it runs. A simulation with two design days and one run period looks like:
 
 ```
  EnergyPlus Starting
