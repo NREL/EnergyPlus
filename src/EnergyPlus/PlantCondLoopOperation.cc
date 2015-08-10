@@ -1526,7 +1526,6 @@ namespace PlantCondLoopOperation {
 		using InputProcessor::FindItemInList;
 
 		using DataRuntimeLanguage::EMSProgramCallManager;
-		using DataRuntimeLanguage::NumProgramCallManagers;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1587,7 +1586,7 @@ namespace PlantCondLoopOperation {
 						SetupEMSInternalVariable( "Component Remaining Current Demand Rate", PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + ':' + PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).Name, "[W]", PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).EMSIntVarRemainingLoadValue );
 					}
 				}
-				StackMngrNum = FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager.Name(), NumProgramCallManagers );
+				StackMngrNum = FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
 				if ( StackMngrNum > 0 ) { // found it
 					PlantLoop( LoopNum ).OpScheme( SchemeNum ).ErlSimProgramMngr = StackMngrNum;
 				} else {
@@ -1597,7 +1596,7 @@ namespace PlantCondLoopOperation {
 					ErrorsFound = true;
 				}
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					StackMngrNum = FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager.Name(), NumProgramCallManagers );
+					StackMngrNum = FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						PlantLoop( LoopNum ).OpScheme( SchemeNum ).ErlInitProgramMngr = StackMngrNum;
 					} else {

@@ -156,7 +156,7 @@ namespace PlantCentralGSHP {
 
 		// Find the correct wrapper
 		if ( CompIndex == 0 ) {
-			WrapperNum = FindItemInList( WrapperName, Wrapper.Name(), NumWrappers );
+			WrapperNum = FindItemInList( WrapperName, Wrapper );
 			if ( WrapperNum == 0 ) {
 				ShowFatalError( "SimCentralGroundSourceHeatPump: Specified Wrapper not one of Valid Wrappers=" + WrapperName );
 			}
@@ -648,7 +648,7 @@ namespace PlantCentralGSHP {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Wrapper.Name(), WrapperNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Wrapper, WrapperNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -745,7 +745,7 @@ namespace PlantCentralGSHP {
 			for ( Comp = 1; Comp <= Wrapper( WrapperNum ).NumOfComp; ++Comp ) {
 				if ( Wrapper( WrapperNum ).WrapperComp( Comp ).WrapperPerformanceObjectType == "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR" ) {
 					CompName = Wrapper( WrapperNum ).WrapperComp( Comp ).WrapperComponentName;
-					CompIndex = FindItemInList( CompName, ChillerHeater.Name(), ubound( ChillerHeater.Name(), 1 ) );
+					CompIndex = FindItemInList( CompName, ChillerHeater );
 					// User may enter invalid name rather than selecting one from the object list
 					if ( CompIndex <= 0 ) {
 						ShowSevereError( "GetWrapperInput: Invalid Chiller Heater Modules Performance Component Name =" + CompName );
@@ -949,7 +949,7 @@ namespace PlantCentralGSHP {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ChillerHeater.Name(), ChillerHeaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ChillerHeater, ChillerHeaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				CHErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";

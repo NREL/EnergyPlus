@@ -186,7 +186,7 @@ namespace NodeInputManager {
 		}
 
 		if ( not_blank( Name ) ) {
-			ThisOne = FindItemInList( Name, NodeLists.Name(), NumOfNodeLists );
+			ThisOne = FindItemInList( Name, NodeLists );
 			if ( ThisOne != 0 ) {
 				NumNodes = NodeLists( ThisOne ).NumOfNodesInList;
 				NodeNumbers( {1,NumNodes} ) = NodeLists( ThisOne ).NodeNumbers( {1,NumNodes} );
@@ -299,7 +299,7 @@ namespace NodeInputManager {
 
 		Try = 0;
 		if ( NumOfNodeLists > 0 ) {
-			Try = FindItemInList( Name, NodeLists( {1,NumOfNodeLists} ).Name(), NumOfNodeLists );
+			Try = FindItemInList( Name, NodeLists );
 		}
 
 		if ( Try != 0 ) {
@@ -529,7 +529,7 @@ namespace NodeInputManager {
 			GetObjectItem( CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphas( 1 ), NodeLists.Name(), NCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( cAlphas( 1 ), NodeLists, NCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				continue;

@@ -166,7 +166,7 @@ namespace ChillerGasAbsorption {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			ChillNum = FindItemInList( AbsorberName, GasAbsorber.Name(), NumGasAbsorbers );
+			ChillNum = FindItemInList( AbsorberName, GasAbsorber );
 			if ( ChillNum == 0 ) {
 				ShowFatalError( "SimGasAbsorber: Unit not found=" + AbsorberName );
 			}
@@ -325,7 +325,7 @@ namespace ChillerGasAbsorption {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), GasAbsorber.Name(), AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), GasAbsorber, AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";

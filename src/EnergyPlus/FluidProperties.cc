@@ -475,7 +475,7 @@ namespace FluidProperties {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), FluidNames.Name(), FluidNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), FluidNames, FluidNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...Fluid names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -1700,7 +1700,7 @@ namespace FluidProperties {
 			// Check to see if glycol name is one of the defaults or is listed in the Fluid Name list
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), GlycolData.Name(), NumOfGlyConcs, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), GlycolData, NumOfGlyConcs, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...Fluid names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -5397,7 +5397,7 @@ namespace FluidProperties {
 		}
 
 		// Check to see if this glycol shows up in the glycol data
-		Found = FindItemInList( MakeUPPERCase( Refrigerant ), RefrigData.Name(), NumOfRefrigerants );
+		Found = FindItemInList( MakeUPPERCase( Refrigerant ), RefrigData );
 
 		if ( Found > 0 ) {
 			FindRefrigerant = Found;
@@ -5465,7 +5465,7 @@ namespace FluidProperties {
 		}
 
 		// Check to see if this glycol shows up in the glycol data
-		Found = FindItemInList( MakeUPPERCase( Glycol ), GlycolData.Name(), NumOfGlycols );
+		Found = FindItemInList( MakeUPPERCase( Glycol ), GlycolData, NumOfGlycols ); // GlycolData is allocated to NumOfGlyConcs
 
 		if ( Found > 0 ) {
 			FindGlycol = Found;
@@ -5800,11 +5800,11 @@ namespace FluidProperties {
 		// Item must be either in Refrigerant or Glycol list
 		Found = 0;
 		if ( NumOfRefrigerants > 0 ) {
-			Found = FindItemInList( NameToCheck, RefrigData.Name(), NumOfRefrigerants );
+			Found = FindItemInList( NameToCheck, RefrigData );
 		}
 		if ( Found == 0 ) {
 			if ( NumOfGlycols > 0 ) {
-				Found = FindItemInList( NameToCheck, GlycolData.Name(), NumOfGlycols );
+				Found = FindItemInList( NameToCheck, GlycolData, NumOfGlycols ); // GlycolData is allocated to NumOfGlyConcs
 			}
 		}
 

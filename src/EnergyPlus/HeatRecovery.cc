@@ -202,7 +202,7 @@ namespace HeatRecovery {
 
 		// Find the correct unit index
 		if ( CompIndex == 0 ) {
-			HeatExchNum = FindItemInList( CompName, ExchCond.Name(), NumHeatExchangers );
+			HeatExchNum = FindItemInList( CompName, ExchCond );
 			if ( HeatExchNum == 0 ) {
 				ShowFatalError( "SimHeatRecovery: Unit not found=" + CompName );
 			}
@@ -352,7 +352,7 @@ namespace HeatRecovery {
 			ExchNum = ExchIndex;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExchCond.Name(), ExchNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ExchCond, ExchNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -415,7 +415,7 @@ namespace HeatRecovery {
 			ExchNum = ExchIndex + NumAirToAirPlateExchs;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExchCond.Name(), ExchNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ExchCond, ExchNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -526,7 +526,7 @@ namespace HeatRecovery {
 			ExchNum = ExchIndex + NumAirToAirPlateExchs + NumAirToAirGenericExchs;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExchCond.Name(), ExchNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ExchCond, ExchNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -590,7 +590,7 @@ namespace HeatRecovery {
 			PerfDataNum = PerfDataIndex;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), BalDesDehumPerfData.Name(), PerfDataNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), BalDesDehumPerfData, PerfDataNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -4489,7 +4489,7 @@ namespace HeatRecovery {
 			GetInputFlag = false;
 		}
 
-		WhichHX = FindItemInList( HXName, ExchCond.Name(), NumHeatExchangers );
+		WhichHX = FindItemInList( HXName, ExchCond );
 		if ( WhichHX != 0 ) {
 			GetSupplyInletNode = ExchCond( WhichHX ).SupInletNode;
 		} else {
@@ -4552,7 +4552,7 @@ namespace HeatRecovery {
 			GetInputFlag = false;
 		}
 
-		WhichHX = FindItemInList( HXName, ExchCond.Name(), NumHeatExchangers );
+		WhichHX = FindItemInList( HXName, ExchCond );
 		if ( WhichHX != 0 ) {
 			GetSupplyOutletNode = ExchCond( WhichHX ).SupOutletNode;
 		} else {
@@ -4615,7 +4615,7 @@ namespace HeatRecovery {
 			GetInputFlag = false;
 		}
 
-		WhichHX = FindItemInList( HXName, ExchCond.Name(), NumHeatExchangers );
+		WhichHX = FindItemInList( HXName, ExchCond );
 		if ( WhichHX != 0 ) {
 			GetSecondaryInletNode = ExchCond( WhichHX ).SecInletNode;
 		} else {
@@ -4678,7 +4678,7 @@ namespace HeatRecovery {
 			GetInputFlag = false;
 		}
 
-		WhichHX = FindItemInList( HXName, ExchCond.Name(), NumHeatExchangers );
+		WhichHX = FindItemInList( HXName, ExchCond );
 		if ( WhichHX != 0 ) {
 			GetSecondaryOutletNode = ExchCond( WhichHX ).SecOutletNode;
 		} else {
@@ -4741,7 +4741,7 @@ namespace HeatRecovery {
 			GetInputFlag = false;
 		}
 
-		WhichHX = FindItemInList( HXName, ExchCond.Name(), NumHeatExchangers );
+		WhichHX = FindItemInList( HXName, ExchCond );
 		if ( WhichHX != 0 ) {
 			GetSupplyAirFlowRate = ExchCond( WhichHX ).NomSupAirVolFlow;
 		} else {
@@ -4805,7 +4805,7 @@ namespace HeatRecovery {
 			GetInputFlag = false;
 		}
 
-		WhichHX = FindItemInList( HXName, ExchCond.Name(), NumHeatExchangers );
+		WhichHX = FindItemInList( HXName, ExchCond );
 		if ( WhichHX != 0 ) {
 			GetHeatExchangerObjectTypeNum = ExchCond( WhichHX ).ExchTypeNum;
 		} else {
@@ -4871,7 +4871,7 @@ namespace HeatRecovery {
 		}
 
 		if ( HXNum == 0 ) {
-			WhichHX = FindItemInList( HXName, ExchCond.Name(), NumHeatExchangers );
+			WhichHX = FindItemInList( HXName, ExchCond );
 		} else {
 			WhichHX = HXNum;
 		}

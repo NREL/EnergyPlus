@@ -174,7 +174,7 @@ namespace ChillerExhaustAbsorption {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			ChillNum = FindItemInList( AbsorberName, ExhaustAbsorber.Name(), NumExhaustAbsorbers );
+			ChillNum = FindItemInList( AbsorberName, ExhaustAbsorber );
 			if ( ChillNum == 0 ) {
 				ShowFatalError( "SimExhaustAbsorber: Unit not found=" + AbsorberName );
 			}
@@ -336,7 +336,7 @@ namespace ChillerExhaustAbsorption {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExhaustAbsorber.Name(), AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ExhaustAbsorber, AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";

@@ -132,7 +132,7 @@ namespace DirectAirManager {
 
 		// Find the correct Direct Air Equipment
 		if ( CompIndex == 0 ) {
-			DirectAirNum = FindItemInList( EquipName, DirectAir.EquipID(), NumDirectAir );
+			DirectAirNum = FindItemInList( EquipName, DirectAir, &DirectAirProps::EquipID );
 			if ( DirectAirNum == 0 ) {
 				ShowFatalError( "SimDirectAir: Unit not found=" + EquipName );
 			}
@@ -235,7 +235,7 @@ namespace DirectAirManager {
 				GetObjectItem( cCurrentModuleObject, DirectAirNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), DirectAir.EquipID(), DirectAirNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), DirectAir, &DirectAirProps::EquipID, DirectAirNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxxxxx";

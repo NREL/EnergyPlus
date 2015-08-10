@@ -139,7 +139,7 @@ namespace WindTurbine {
 		}
 
 		if ( GeneratorIndex == 0 ) {
-			WindTurbineNum = FindItemInList( GeneratorName, WindTurbineSys.Name(), NumWindTurbines );
+			WindTurbineNum = FindItemInList( GeneratorName, WindTurbineSys );
 			if ( WindTurbineNum == 0 ) {
 				ShowFatalError( "SimWindTurbine: Specified Generator not one of Valid Wind Turbine Generators " + GeneratorName );
 			}
@@ -294,7 +294,7 @@ namespace WindTurbine {
 			GetObjectItem( CurrentModuleObject, WindTurbineNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), WindTurbineSys.Name(), WindTurbineNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), WindTurbineSys, WindTurbineNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;

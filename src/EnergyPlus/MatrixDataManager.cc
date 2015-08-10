@@ -135,7 +135,7 @@ namespace MatrixDataManager {
 			++MatNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MatData.Name(), MatNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), MatData, MatNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -221,7 +221,7 @@ namespace MatrixDataManager {
 		}
 
 		if ( NumMats > 0 ) {
-			MatrixIndexPtr = FindItemInList( MatrixName, MatData( {1,NumMats} ).Name(), NumMats );
+			MatrixIndexPtr = FindItemInList( MatrixName, MatData );
 		} else {
 			MatrixIndexPtr = 0;
 		}
