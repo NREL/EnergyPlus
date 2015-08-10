@@ -3,6 +3,7 @@
 #include <fstream> 
 
 // ObjexxFCL Headers
+#include <ObjexxFCL\Optional.hh>
 
 // EnergyPlus Headers
 #include <DataGlobals.hh>
@@ -13,10 +14,38 @@
 namespace EnergyPlus {
 
 namespace GroundTemps {
+	int daysInYear = 365;
+	int secInDay = 86400;
+	int timeStepInDays = 0;
+	Real64 finalTempConvergenceCriteria = 0.01;
+	Real64 iterationTempConvergenceCriteria = 0.00001;
 
 	void
-	FiniteDiffGroundTempsModel::initModel()
+	FiniteDiffGroundTempsModel::simulate()
 	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		FiniteDiffGroundTempsModel::getWeatherData();
 
@@ -32,6 +61,29 @@ namespace GroundTemps {
 	FiniteDiffGroundTempsModel::getWeatherData()
 	{
 	
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
 		using WeatherManager::AddDesignSetToEnvironmentStruct;
 		using WeatherManager::GetNextEnvironment;
 		using WeatherManager::ManageWeather;
@@ -179,6 +231,29 @@ namespace GroundTemps {
 	FiniteDiffGroundTempsModel::developMesh()
 	{
 
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
 		std::ofstream static outFile( "MeshData.csv", std::ofstream::out );
 		
 		// Surface layer parameters
@@ -259,52 +334,105 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::performSimulation()
 	{
-	
-		int daysInYear = 365;
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		std::ofstream static outFile( "FinalTemps.csv", std::ofstream::out );
+		std::ofstream static outFile_timeStep( "TimeStepTemps.csv", std::ofstream::out );
 		bool convergedFinal = false;
 
-		initDomainTemperatures();
+		initDomain();
 		
 		do {
 		
 			// loop over all days
-			for ( int day = 1; day <= daysInYear; ++day ) {
+			for ( timeStepInDays = 1; timeStepInDays <= daysInYear; ++timeStepInDays ) {
 
-				bool iterationConverged = false;
+				timeStepInSeconds = 86400; // Seconds in day
 
-				doStartOfTimeStepInits();
+					bool iterationConverged = false;
 
-				// Loop until iteration temperature converges
-				do {
+					doStartOfTimeStepInits();
+
+					// Loop until iteration temperature converges
+					do {
 			
-					// For all cells
-					for ( int cell = 1; cell <= totalNumCells; ++cell ) {
+						// For all cells
+						for ( int cell = 1; cell <= totalNumCells; ++cell ) {
 
-						if ( cell == 1 ) {
-							updateSurfaceCellTemperature();
-						} else if ( cell > 1 && cell < totalNumCells ) {
-							updateGeneralDomainCellTemperature( cell );
-						} else if ( cell == totalNumCells ) {
-							updateBottomCellTemperature();
+							if ( cell == 1 ) {
+								updateSurfaceCellTemperature();
+							} else if ( cell > 1 && cell < totalNumCells ) {
+								updateGeneralDomainCellTemperature( cell );
+							} else if ( cell == totalNumCells ) {
+								updateBottomCellTemperature();
+							}
 						}
-					}
 
-					// Shift temperatures for next iteration
-					updateIterationTemperatures();
+						// Check iteration temperature convergence
+						iterationConverged = checkIterationTemperatureConvergence();
 
-					// Check iteration temperature convergence
-					iterationConverged = checkIterationTemperatureConvergence();
+						if ( !iterationConverged ) {
+							// Shift temperatures for next iteration
+							updateIterationTemperatures();
+						}
+					
+					} while ( !iterationConverged );
 
-				} while ( !iterationConverged );
+					// Shift temperatures for next timestep
+					updateTimeStepTemperatures();
 
-				// Shift temperatures for next timestep
-				updateTimeStepTemperatures();
+				//// Output timestep temps for testing
+				//for ( int cell = 1; cell <= totalNumCells; ++cell ) {
+				//	if ( cell == totalNumCells ) {
+				//		outFile_timeStep << groundTemps( timeStepInDays, cell ) << std::endl;
+				//	} else {
+				//		outFile_timeStep << groundTemps( timeStepInDays, cell ) << "," ;
+				//	}
+
+				//}
+
 			}
 
 			// Check final temperature convergence
 			convergedFinal = checkFinalTemperatureConvergence();
 
 		} while ( !convergedFinal );
+
+		//// Output final annual temps for testing
+		//for ( int cell = 1; cell <= totalNumCells; ++cell ) {
+
+		//	outFile << cellArray( cell ).minZValue;
+
+		//	for ( int day = 1; day <= daysInYear; ++ day ) {
+		//		if ( day < daysInYear ) {
+		//			outFile << "," << groundTemps( day, cell );
+		//		} else {
+		//			outFile << "," << groundTemps( day, cell ) << "," << std::endl;
+		//		}
+		//	}
+		//}
 	}
 
 	//******************************************************************************
@@ -312,6 +440,30 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::updateSurfaceCellTemperature()
 	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
 		cellArray( 1 ).temperature = 20.0; // Just for testing
 	}
 
@@ -319,31 +471,60 @@ namespace GroundTemps {
 
 	void
 	FiniteDiffGroundTempsModel::updateGeneralDomainCellTemperature( 
-		Real64 const cell
+		int const cell
 	)
 	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// Set up once-per-cell items
 		Real64 numerator = 0.0;
 		Real64 denominator = 0.0;
+		Real64 neighborTemp = 0.0;
+		Real64 resistance = 0.0;
 
 		auto & thisCell( cellArray( cell ) );
+		auto & cellAbove_thisCell( cellArray( cell - 1 ) );
+		auto & cellBelow_thisCell( cellArray( cell + 1 ) );
 
 		// add effect from cell history
 		numerator += thisCell.temperature_prevTimeStep;
-		++denominator;
+		++denominator;			
 
-		// loop across each direction in the simulation
-		for ( int curDirection = 1; curDirection <= 2; ++curDirection ) {
+		// Conduction resistance between this cell and above cell
+		resistance = ( ( thisCell.thickness / 2.0 ) / ( thisCell.conductionArea * thisCell.props.conductivity ) ) 
+					+ ( ( cellAbove_thisCell.thickness / 2.0 ) / ( cellAbove_thisCell.conductionArea * cellAbove_thisCell.props.conductivity ) );
 
-			Real64 neighborTemp = 0.0;
-			Real64 resistance = 0.0;
+		numerator += ( thisCell.beta / resistance ) * cellAbove_thisCell.temperature;
+		denominator += thisCell.beta / resistance;
 
-			//'evaluate the transient expression terms
-			evaluateNeighborResistance( thisCell, curDirection, neighborTemp, resistance );
-			numerator += ( thisCell.beta / resistance ) * neighborTemp;
-			denominator += thisCell.beta / resistance;
-		}
+		// Conduction resitance between this cell and below cell
+		resistance = ( ( thisCell.thickness / 2.0 ) / ( thisCell.conductionArea * thisCell.props.conductivity ) ) 
+					+ ( ( cellBelow_thisCell.thickness / 2.0 ) / ( cellBelow_thisCell.conductionArea * cellBelow_thisCell.props.conductivity ) );
+
+		numerator += ( thisCell.beta / resistance ) * cellBelow_thisCell.temperature;
+		denominator += thisCell.beta / resistance;
 
 		//'now that we have passed all directions, update the temperature
 		thisCell.temperature = numerator / denominator;
@@ -355,6 +536,30 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::updateBottomCellTemperature()
 	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
 		cellArray( totalNumCells ).temperature = 15.0; // Just for testing
 	}
 
@@ -363,7 +568,44 @@ namespace GroundTemps {
 	bool
 	FiniteDiffGroundTempsModel::checkFinalTemperatureConvergence()
 	{
-		return true;
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		bool converged = true;
+
+		for ( int cell = 1; cell <= totalNumCells; ++ cell ) {
+		
+			auto & thisCell( cellArray( cell ) );
+
+			if ( std::abs( thisCell.temperature - thisCell.temperature_finalConvergence ) >= finalTempConvergenceCriteria ) {
+				converged = false;
+			}
+
+			thisCell.temperature_finalConvergence = thisCell.temperature;
+		}
+
+		return converged;
 	}
 
 	//******************************************************************************
@@ -371,15 +613,72 @@ namespace GroundTemps {
 	bool
 	FiniteDiffGroundTempsModel::checkIterationTemperatureConvergence()
 	{
-		return true;
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		bool converged = true;
+
+		for ( int cell = 1; cell <= totalNumCells; ++ cell ) {
+		
+			if ( std::abs( cellArray( cell ).temperature - cellArray( cell ).temperature_prevIteration ) >= iterationTempConvergenceCriteria ) {
+				converged = false;
+				break;
+			}
+		}
+
+		return converged;
 	}
 
 	//******************************************************************************
 
 	void
-	FiniteDiffGroundTempsModel::initDomainTemperatures()
+	FiniteDiffGroundTempsModel::initDomain()
 	{
 		
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
 		using DataGlobals::SecsInDay;
 
 		std::string objectName = "KAModelForFDModel";
@@ -405,15 +704,31 @@ namespace GroundTemps {
 
 		tempModel->groundThermalDiffisivity = groundThemalDiffusivity;
 
+		// Intialize temperatures and volume
 		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
 			auto & thisCell( cellArray( cell ) );
-
+			
 			Real64 depth = ( thisCell.maxZValue + thisCell.minZValue ) / 2.0;
+			
+			// Initialize temperatures
+			thisCell.temperature = 15.0; //tempModel->getGroundTempAtTimeInSeconds( depth, 0.0 );  // Initialized at first day of year
+			thisCell.temperature_finalConvergence = thisCell.temperature;
+			thisCell.temperature_prevIteration = thisCell.temperature;
+			thisCell.temperature_prevTimeStep = thisCell.temperature;
 
-			thisCell.temperature = tempModel->getGroundTempAtTimeInSeconds( depth, 0.0 );  // Initialized at first day of year
+			// Set cell volume
+			thisCell.volume = thisCell.thickness * thisCell.conductionArea;
 
+			// Delete me
 			initTempsFile << thisCell.temperature << std::endl;
 		}
+
+		// Initialize freezing calculation variables
+		evaluateSoilRhoCp( _, true );
+
+		// Initialize the groundTemps array
+		groundTemps.dimension( { 0, daysInYear }, { 0, totalNumCells }, 0.0 );
+
 	}
 
 	//******************************************************************************
@@ -421,6 +736,30 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::updateIterationTemperatures()
 	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
 		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
 			cellArray( cell ).temperature_prevIteration = cellArray( cell ).temperature;
 		}
@@ -431,8 +770,38 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::updateTimeStepTemperatures()
 	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
 		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
-			cellArray( cell ).temperature_prevTimeStep = cellArray( cell ).temperature;
+
+			auto & thisCell( cellArray( cell ) );
+
+			thisCell.temperature_prevTimeStep = thisCell.temperature;
+
+			// Log temps for later use
+			groundTemps( timeStepInDays, cell ) = thisCell.temperature;
 		}
 	}
 
@@ -441,24 +810,39 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::doStartOfTimeStepInits()
 	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
 		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
 			
-			//inits here
+			auto & thisCell( cellArray( cell ) );
+
+			evaluateSoilRhoCp( cell );
+
+			thisCell.beta = ( timeStepInSeconds / ( thisCell.props.rhoCp * thisCell.volume ) );
 
 		}
-	}
-
-	//******************************************************************************
-
-	void
-	FiniteDiffGroundTempsModel::evaluateNeighborResistance(
-		cell curCell,
-		int const currDirection,
-		Real64 neighborTemp,
-		Real64 resistance
-	)
-	{
-	
 	}
 
 	//******************************************************************************
@@ -466,6 +850,30 @@ namespace GroundTemps {
 	Real64
 	FiniteDiffGroundTempsModel::getGroundTemp()
 	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
 		return 0;
 	}
 
@@ -477,6 +885,30 @@ namespace GroundTemps {
 		Real64 const simTimeInSeconds
 	)
 	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
 		return 0;
 	}
 
@@ -488,7 +920,136 @@ namespace GroundTemps {
 		int const simTimeInMonths
 	)
 	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
 		return 0;
+	}
+
+	//******************************************************************************
+	
+	void
+	FiniteDiffGroundTempsModel::evaluateSoilRhoCp(
+		Optional< int const > cell,
+		Optional_bool_const InitOnly
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		//'static variables only calculated once per simulation run
+		static Real64 Theta_ice;
+		static Real64 Theta_liq;
+		static Real64 Theta_sat;
+		static Real64 rho_ice;
+		static Real64 rho_liq;
+		static Real64 rhoCp_soil_liq_1;
+		static Real64 CP_liq;
+		static Real64 CP_ice;
+		static Real64 Lat_fus;
+		static Real64 Cp_transient;
+		static Real64 rhoCP_soil_liq;
+		static Real64 rhoCP_soil_transient;
+		static Real64 rhoCP_soil_ice;
+		// other variables
+		Real64 frzAllIce;
+		Real64 frzIceTrans;
+		Real64 frzLiqTrans;
+		Real64 frzAllLiq;
+		Real64 rhoCP_soil;
+
+		// These vary by domain now, so we must be careful to retrieve them every time
+		Theta_liq = baseMoistureContent;
+		Theta_sat = baseMoistureContentAtSaturation;
+
+		// Assumption
+		Theta_ice = Theta_liq;
+
+		if ( present( InitOnly ) ) {
+			//'Cp (freezing) calculations
+			rho_ice = 917.0; //'Kg / m3
+			rho_liq = 1000.0; //'kg / m3
+			rhoCp_soil_liq_1 = 1225000.0 / ( 1.0 - Theta_sat ); //'J/m3K
+			//'from( " An improved model for predicting soil thermal conductivity from water content at room temperature, Fig 4" )
+			CP_liq = 4180.0; //'J / KgK
+			CP_ice = 2066.0; //'J / KgK
+			Lat_fus = 334000.0; //'J / Kg
+			Cp_transient = Lat_fus / 0.4 + ( 0.5 * CP_ice - ( CP_liq + CP_ice ) / 2.0 * 0.1 ) / 0.4;
+			//'from( " Numerical and experimental investigation of melting and freezing processes in phase change material storage" )
+			rhoCP_soil_liq = rhoCp_soil_liq_1 * ( 1.0 - Theta_sat ) + rho_liq * CP_liq * Theta_liq;
+			rhoCP_soil_transient = rhoCp_soil_liq_1 * ( 1.0 - Theta_sat ) + ( ( rho_liq + rho_ice ) / 2.0 ) * Cp_transient * Theta_ice;
+			rhoCP_soil_ice = rhoCp_soil_liq_1 * ( 1.0 - Theta_sat ) + rho_ice * CP_ice * Theta_ice; //'!J / m3K
+			return;
+		}
+
+		auto & thisCell( cellArray( cell ) );
+
+		//'set some temperatures here for generalization -- these could be set in the input file
+		frzAllIce = -0.5;
+		frzIceTrans = -0.4;
+		frzLiqTrans = -0.1;
+		frzAllLiq = 0.0;
+
+		//'calculate this cell's new Cp value based on the cell temperature
+		if ( thisCell.temperature >= frzAllLiq ) {
+			rhoCP_soil = rhoCp_soil_liq_1;
+		} else if ( thisCell.temperature <= frzAllIce ) {
+			rhoCP_soil = rhoCP_soil_ice;
+		} else if ( ( thisCell.temperature < frzAllLiq ) && ( thisCell.temperature > frzLiqTrans ) ) {
+			rhoCP_soil = rhoCp_soil_liq_1 + ( rhoCP_soil_transient - rhoCP_soil_liq ) / ( frzAllLiq - frzLiqTrans ) * ( frzAllLiq - thisCell.temperature );
+		} else if ( ( thisCell.temperature <= frzLiqTrans ) && ( thisCell.temperature >= frzIceTrans ) ) {
+			rhoCP_soil = rhoCP_soil_transient;
+		} else if ( ( thisCell.temperature < frzIceTrans ) && ( thisCell.temperature > frzAllIce ) ) {
+			rhoCP_soil = rhoCP_soil_ice + ( rhoCP_soil_transient - rhoCP_soil_ice ) / ( frzIceTrans - frzAllIce ) * ( thisCell.temperature - frzAllIce );
+		} else { // Debugging -- Delete me
+			thisCell.temperature = thisCell.temperature;
+		}
+		
+		thisCell.props.rhoCp = baseDensity * baseSpecificHeat; //rhoCP_soil;
+
+		thisCell.props.specificHeat = thisCell.props.rhoCp / thisCell.props.density;
+
 	}
 
 	//******************************************************************************

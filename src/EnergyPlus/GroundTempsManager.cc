@@ -168,9 +168,9 @@ namespace GroundTemps {
 
 					thisModel->baseSpecificHeat = rNumericArgs( 3 );
 
-					thisModel->baseMoistureContent = rNumericArgs( 4 );
+					thisModel->baseMoistureContent = rNumericArgs( 4 ) / 100.0;
 
-					thisModel->baseMoistureContentAtSaturation = rNumericArgs( 5 );
+					thisModel->baseMoistureContentAtSaturation = rNumericArgs( 5 ) / 100.0;
 
 					found = true;
 					break;
@@ -180,8 +180,8 @@ namespace GroundTemps {
 		if ( found && !ErrorsFound ) {
 			groundTempModels.push_back( thisModel );
 
-			// Initialize the model
-			thisModel->initModel();
+			// Simulate
+			thisModel->simulate();
 
 			// Return the pointer
 			return thisModel;

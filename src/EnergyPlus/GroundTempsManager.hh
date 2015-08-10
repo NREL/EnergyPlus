@@ -6,6 +6,8 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -96,6 +98,7 @@ namespace GroundTemps {
 			Real64 baseMoistureContent;
 			Real64 baseMoistureContentAtSaturation;
 			int totalNumCells;
+			Real64 timeStepInSeconds;
 
 		struct cell {
 
@@ -105,6 +108,7 @@ namespace GroundTemps {
 				Real64 density;
 				Real64 specificHeat;
 				Real64 diffusivity;
+				Real64 rhoCp;
 			};
 
 			properties props;
@@ -116,7 +120,10 @@ namespace GroundTemps {
 			Real64 temperature;
 			Real64 temperature_prevIteration;
 			Real64 temperature_prevTimeStep;
+			Real64 temperature_finalConvergence;
 			Real64 beta;
+			Real64 volume;
+			Real64 conductionArea = 1.0; // Assumes 1 m2 
 	
 		};
 
@@ -126,7 +133,7 @@ namespace GroundTemps {
 		getWeatherData();
 
 		void
-		initModel();
+		simulate();
 
 		void
 		developMesh();
@@ -139,14 +146,14 @@ namespace GroundTemps {
 
 		void
 		updateGeneralDomainCellTemperature(
-			Real64 const cell
+			int const cell
 		);
 
 		void
 		updateBottomCellTemperature();
 
 		void
-		initDomainTemperatures();
+		initDomain();
 
 		bool
 		checkFinalTemperatureConvergence();
@@ -159,14 +166,6 @@ namespace GroundTemps {
 
 		void
 		updateTimeStepTemperatures();
-
-		void
-		evaluateNeighborResistance(
-			cell curCell,
-			int const currDirection,
-			Real64 neighborTemp,
-			Real64 resistance
-		);
 
 		void
 		doStartOfTimeStepInits();
@@ -185,6 +184,14 @@ namespace GroundTemps {
 			Real64 const depth,
 			int const monthOfSim
 		);
+
+		void
+		evaluateSoilRhoCp(
+		Optional< int const > cell = _,
+		Optional_bool_const InitOnly = _
+		);
+
+		Array2D< Real64 > groundTemps;
 
 		static std::shared_ptr< FiniteDiffGroundTempsModel > FiniteDiffGTMFactory( int objectType, std::string objectName);
 	};
