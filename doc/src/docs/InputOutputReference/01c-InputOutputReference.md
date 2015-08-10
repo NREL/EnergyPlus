@@ -7428,6 +7428,10 @@ This field is the name of a fan (ref: Fan:OnOff, Fan:ConstantVolume, Fan: Variab
 
 This field allows the user to specify the coil operating options as one of the following options: **None**, **Heating**, **Cooling** or **HeatingAndCooling**. If **None** is selected, the unit ventilator does not have any coils, and any other input will be ignored. If either **Heating** or **Cooling** is selected, only a heating or cooling coil, respectively, is present. Thus, only four more inputs will be expected. If **HeatingAndCooling** is selected, both heating and cooling coil input must be entered, and the unit ventilator will have both a heating and a cooling coil.
 
+#### Field: Supply Air Fan Operating Mode Schedule Name
+
+This field is a schedule name (ref: Schedule) that determines the operating modes of the unit ventilator’s On:Off fan. A schedule value of 0 indicates cycling fan operation (fan cycles with cooling/heating coil). A schedule value greater than 0 (usually 1 is used) indicates constant fan operation (fan runs continually regardless of the coils operation). If this input field is left blank, then the operating mode of the On:Off fan type defaults to cycling operation.
+
 #### Field: Heating Coil Object Type
 
 This field is the type of coil that is used for heating in the unit ventilator system. It is used in conjunction with the heating coil name (see next field) to specify the heating coil present within the system. Allowable heating coil types are:
@@ -7691,7 +7695,7 @@ This field is the name of the heating coil that is part of the unit heater syste
 
 #### Field: Supply Air Fan Operating Mode Schedule Name
 
-This field is a schedule name (ref: Schedule) that determines whether the operating modes of unit heater’s On:Off fan. A schedule values of 0 indicates cycling fan operation (fan cycles with cooling/heating coil). A schedule values greater than 0 (usually 1 is used) indicate constant fan operation (fan runs continually regardless of coils operation). If this input field is left blank, then the operating mode of the OnOff fan type defaults to cycling operation.
+This field is a schedule name (ref: Schedule) that determines the operating modes of the unit heater’s On:Off fan. A schedule value of 0 indicates cycling fan operation (fan cycles with cooling/heating coil). A schedule value greater than 0 (usually 1 is used) indicates constant fan operation (fan runs continually regardless of the coils operation). If this input field is left blank, then the operating mode of the On:Off fan type defaults to cycling operation.
 
 #### Field: Supply Air Fan Operation During No Heating
 
@@ -11827,7 +11831,7 @@ This alpha input field contains the type of dehumidification control. The follow
 
 The default is **None**. For the other dehumidification control modes, the maximum humidity setpoint is required. This must be set using a **ZoneControl:Humidistat** object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. Supplemental heating coil (supplemental heating coil type and name) is a required input in AirToAir HeatPumps. The supplemental heating coil capacity must be adequate enough to meet the heating coil load and offset the excess cooling load due to extra dehumidification required to meet the high relative humidity setpoint.
 
-Note: the air-to-air heat pump’s fan, cooling coil, heating coil and supplementary heating coil must be connected in the air loop according to the configuration shown above (Figure 118) for the blow-through fan configuration. The only other valid configuration is with a draw-through fan placement, where the fan is located between the DX heating coil and the supplementary heating coil. In addition, the volumetric air flow rate specified in the direct air unit for the controlling zone should properly reflect the fractional volumetric air flow rate specified in the heat pump object.
+Note: the air-to-air heat pump’s fan, cooling coil, heating coil and supplementary heating coil must be connected in the air loop according to the configuration shown above (Figure 118) for the blow-through fan configuration. The only other valid configuration is with a draw-through fan placement, where the fan is located between the DX heating coil and the supplementary heating coil. 
 
 #### AirLoopHVAC:UnitaryHeatPump:AirToAir Example Specification
 

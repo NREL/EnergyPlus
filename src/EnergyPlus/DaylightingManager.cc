@@ -4319,7 +4319,7 @@ namespace DaylightingManager {
 			for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
 				GetObjectItem( cCurrentModuleObject, MapNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IllumMap( MapNum ).Name = cAlphaArgs( 1 );
-				IllumMap( MapNum ).Zone = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+				IllumMap( MapNum ).Zone = FindItemInList( cAlphaArgs( 2 ), Zone );
 
 				if ( IllumMap( MapNum ).Zone == 0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -4414,7 +4414,7 @@ namespace DaylightingManager {
 			rNumericArgs = 0.0;
 			GetObjectItem( cCurrentModuleObject, Loop1, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// First is Zone Name
-			ZoneFound = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
+			ZoneFound = FindItemInList( cAlphaArgs( 1 ), Zone );
 			if ( ZoneFound == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\"." );
 				ErrorsFound = true;
@@ -5013,7 +5013,7 @@ namespace DaylightingManager {
 
 			GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlpha, rNumericArgs, NumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			SurfNum = FindItemInList( cAlphaArgs( 1 ), Surface.Name(), TotSurfaces );
+			SurfNum = FindItemInList( cAlphaArgs( 1 ), Surface );
 			if ( SurfNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\" not found." );
 			}
@@ -10048,7 +10048,7 @@ Label903: ;
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

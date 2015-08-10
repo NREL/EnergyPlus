@@ -875,6 +875,7 @@ namespace DataPlant {
 		using InputProcessor::FindItemInList;
 		using DataSizing::NumPltSizInput;
 		using DataSizing::PlantSizData;
+		using DataSizing::PlantSizingData;
 		//  USE DataPlant, ONLY: PlantLoop, ScanPlantLoopsForNodeNum
 
 		// Return value
@@ -919,7 +920,7 @@ namespace DataPlant {
 
 		if ( MyPltLoopNum > 0 ) {
 			if ( NumPltSizInput > 0 ) {
-				MyPltSizNum = FindItemInList( PlantLoop( MyPltLoopNum ).Name, PlantSizData.PlantLoopName(), NumPltSizInput );
+				MyPltSizNum = FindItemInList( PlantLoop( MyPltLoopNum ).Name, PlantSizData, &PlantSizingData::PlantLoopName );
 			}
 			if ( MyPltSizNum == 0 ) {
 				if ( PrintErrorFlag ) {
@@ -970,7 +971,7 @@ namespace DataPlant {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

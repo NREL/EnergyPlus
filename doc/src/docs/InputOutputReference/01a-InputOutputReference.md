@@ -649,7 +649,7 @@ The choice made for this field has important implications for modeling accuracy 
 
 <table class="table table-striped">
 <tr>
-<th>Demanh Winhow</th>
+<th>Demand Window</th>
 <th>Applicable Number of Timesteps per Hour</th>
 </tr>
 <tr>
@@ -11042,15 +11042,15 @@ The fraction of the outside area of an exterior surface that is illuminated by (
 
 #### Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient [W/m2-K]
 
-This is the coefficient that describes thermal radiation heat transfer between the outside face and the air mass surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T – T) when applied to the ambient air. Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Air Coeff.”
+This is the coefficient that describes thermal radiation heat transfer between the outside face and the air mass surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T_surf – T_surfodb) when applied to the ambient air. Where T_surf = Surface Outside Face Temperature, and T_surfodb = Surface Outside Face Outdoor Air Drybulb Temperature. Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Air Coeff.”
 
 #### Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient [W/m2-K]
 
-This is the coefficient that describes thermal radiation heat transfer between the outside face and the sky surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T – T) when applied to the sky. Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Sky Coeff.”
+This is the coefficient that describes thermal radiation heat transfer between the outside face and the sky surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T_surf – T_sky) when applied to the sky. Where T_surf = Surface Outside Face Temperature, and T_sky = Site Sky Temperature. Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Sky Coeff.”
 
 #### Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient [W/m2-K]
 
-This is the coefficient that describes thermal radiation heat transfer between the outside face and the ground surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T – T) when applied to the ground. Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Ground Coeff.”
+This is the coefficient that describes thermal radiation heat transfer between the outside face and the ground surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T_surf – T_odb) when applied to the ground. Where T_surf = Surface Outside Face Temperature, and T_odb = Site Outdoor Air Drybulb Temperature (used as an approximation for the ground surface temperature). Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Ground Coeff.”
 
 #### Surface Outside Face Solar Radiation Heat Gain Rate [W]
 
