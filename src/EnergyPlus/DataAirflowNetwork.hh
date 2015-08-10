@@ -1067,47 +1067,6 @@ namespace DataAirflowNetwork {
 
 	};
 
-	struct AirflowNetworkLinkage // AirflowNetwork linkage data base class 
- 	{
- 		// Members 
- 		std::string Name; // Provide a unique linkage name 
- 		Array1D_string NodeNames; // Names of nodes (limited to 2) 
- 		Array1D< Real64 > NodeHeights; // Node heights 
- 		std::string CompName; // Name of element 
- 		int CompNum; // Element Number 
- 		Array1D_int NodeNums; // Node numbers 
- 		int LinkNum; // Linkage number 
-
- 		// Default Constructor 
- 		AirflowNetworkLinkage( ) :
- 			NodeNames( 2 ),
- 			NodeHeights( 2, 0.0 ),
- 			CompNum( 0 ),
- 			NodeNums( 2, 0 ),
- 			LinkNum( 0 )
- 		{}
-
- 		// Member Constructor 
- 		AirflowNetworkLinkage(
- 			std::string const & Name, // Provide a unique linkage name 
- 			Array1_string const & NodeNames, // Names of nodes (limited to 2) 
- 			Array1< Real64 > const & NodeHeights, // Node heights 
- 			std::string const & CompName, // Name of element 
- 			int const CompNum, // Element Number 
- 			Array1_int const & NodeNums, // Node numbers 
- 			int const LinkNum // Linkage number 
-			) :
- 			Name( Name ),
- 			NodeNames( 2, NodeNames ),
- 			NodeHeights( 2, NodeHeights ),
- 			CompName( CompName ),
- 			CompNum( CompNum ),
- 			NodeNums( 2, NodeNums ),
- 			LinkNum( LinkNum )
- 		{}
-
- 	};
-
 	struct IntraZoneLinkageProp  // Intra zone linkage data
 	{
 		// Members
@@ -1604,21 +1563,32 @@ namespace DataAirflowNetwork {
 
 	};
 
-	struct DisSysLinkageProp : public AirflowNetworkLinkage // Distribution system linkage data
+	struct DisSysLinkageProp // Distribution system linkage data
 	{
 		// Members
+		std::string LinkName; // Name of distribution system linkage
+		Array1D_string NodeNames; // Names of nodes (limited to 2)
+		Array1D< Real64 > NodeHeights; // Node heights
+		std::string CompName; // Name of element
+		int CompNum; // Element Number
 		std::string ZoneName; // Name of zone
 		int ZoneNum; // Zone Number
+		Array1D_int NodeNums; // Node numbers
+		int LinkNum; // Linkage number
 
 		// Default Constructor
-		DisSysLinkageProp() :
+		DisSysLinkageProp( ) :
+			NodeNames( 2 ),
+			NodeHeights( 2, 0.0 ),
+			CompNum( 0 ),
 			ZoneNum( 0 ),
-			AirflowNetworkLinkage( )
+			NodeNums( 2, 0 ),
+			LinkNum( 0 )
 		{}
 
 		// Member Constructor
 		DisSysLinkageProp(
-			std::string const & Name, // Name of distribution system linkage
+			std::string const & LinkName, // Name of distribution system linkage
 			Array1_string const & NodeNames, // Names of nodes (limited to 2)
 			Array1< Real64 > const & NodeHeights, // Node heights
 			std::string const & CompName, // Name of element
@@ -1627,10 +1597,16 @@ namespace DataAirflowNetwork {
 			int const ZoneNum, // Zone Number
 			Array1_int const & NodeNums, // Node numbers
 			int const LinkNum // Linkage number
-		) :
-			AirflowNetworkLinkage( Name, NodeNames, NodeHeights, CompName, CompNum, NodeNums, LinkNum ),
+			) :
+			LinkName( LinkName ),
+			NodeNames( 2, NodeNames ),
+			NodeHeights( 2, NodeHeights ),
+			CompName( CompName ),
+			CompNum( CompNum ),
 			ZoneName( ZoneName ),
-			ZoneNum( ZoneNum )
+			ZoneNum( ZoneNum ),
+			NodeNums( 2, NodeNums ),
+			LinkNum( LinkNum )
 		{}
 
 	};
@@ -1742,9 +1718,16 @@ namespace DataAirflowNetwork {
 
 	};
 
-	struct AirflowNetworkLinkageProp : public AirflowNetworkLinkage // AirflowNetwork linkage data
+	struct AirflowNetworkLinkageProp  // AirflowNetwork linkage data
 	{
 		// Members
+		std::string Name; // Provide a unique linkage name 
+		Array1D_string NodeNames; // Names of nodes (limited to 2) 
+		Array1D< Real64 > NodeHeights; // Node heights 
+		std::string CompName; // Name of element 
+		int CompNum; // Element Number 
+		Array1D_int NodeNums; // Node numbers 
+		int LinkNum; // Linkage number 
 		std::string ZoneName; // Name of zone
 		int ZoneNum; // Zone Number
 		int DetOpenNum; // Large Opening number
@@ -1753,7 +1736,11 @@ namespace DataAirflowNetwork {
 
 		// Default Constructor
 		AirflowNetworkLinkageProp() :
-			AirflowNetworkLinkage( ),
+			NodeNames( 2 ),
+			NodeHeights( 2, 0.0 ),
+			CompNum( 0 ),
+			NodeNums( 2, 0 ),
+			LinkNum( 0 ),
 			ZoneNum( 0 ),
 			DetOpenNum( 0 ),
 			ConnectionFlag( 0 ),
@@ -1775,7 +1762,13 @@ namespace DataAirflowNetwork {
 			int const ConnectionFlag, // Return and supply connection flag
 			bool const VAVTermDamper // True if this component is a damper for a VAV terminal
 		) :
-			AirflowNetworkLinkage( Name, NodeNames, NodeHeights, CompName, CompNum, NodeNums, LinkNum ),
+			Name( Name ),
+			NodeNames( 2, NodeNames ),
+			NodeHeights( 2, NodeHeights ),
+			CompName( CompName ),
+			CompNum( CompNum ),
+			NodeNums( 2, NodeNums ),
+			LinkNum( LinkNum ),
 			ZoneName( ZoneName ),
 			ZoneNum( ZoneNum ),
 			DetOpenNum( DetOpenNum ),
