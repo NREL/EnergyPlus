@@ -137,7 +137,6 @@ namespace FanCoilUnits {
 	Array1D_bool MySizeFlag;
 	Array1D_bool CheckEquipName;
 	bool GetFanCoilInputFlag( true ); // First time, input is "gotten"
-	Real64 SpeedRatio( 0.0 );
 	Real64 FanFlowRatio( 0.0 );
 	bool HeatingLoad( false ); // True when zone needs heating
 	bool CoolingLoad( false ); // True when zone needs cooling
@@ -2423,7 +2422,7 @@ namespace FanCoilUnits {
 		}
 
 		if ( UnitOn && QZnReq < ( -1.0 * Small5WLoad ) && CoolingLoad ) {
-			SpeedRatio = 1.0;
+
 			mdot = 0.0;
 			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
 			mdot = FanCoil( FanCoilNum ).MaxColdWaterFlow;
@@ -2463,7 +2462,6 @@ namespace FanCoilUnits {
 
 		} else if ( UnitOn && QZnReq > Small5WLoad && HeatingLoad ) {
 
-			SpeedRatio = 1.0;
 			mdot = 0.0;
 			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
 			mdot = FanCoil( FanCoilNum ).MaxHotWaterFlow;
@@ -2503,7 +2501,7 @@ namespace FanCoilUnits {
 			CalcMultiStage4PipeFanCoil( FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut );
 
 		} else {
-			SpeedRatio = 0.0;
+			//SpeedRatio = 0.0;
 			if ( FanCoil( FanCoilNum ).FanOpMode == ContFanCycCoil ) {
 				PartLoadRatio = 1.0;
 				FanCoil( FanCoilNum ).SpeedFanSel = 1;
@@ -2631,7 +2629,7 @@ namespace FanCoilUnits {
 		// initialize local variables
 		mdot = 0.0;
 		PLR = 1.0;
-		SRatio = 1.0;
+		SRatio = 0.0;
 		QUnitOut = 0.0;
 		QUnitOutMax = 0.0;
 		FanElecPower = 0.0;

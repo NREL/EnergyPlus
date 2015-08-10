@@ -49,6 +49,10 @@ namespace FanCoilUnits {
 	extern Array1D_bool MySizeFlag;
 	extern Array1D_bool CheckEquipName;
 	extern bool GetFanCoilInputFlag; // First time, input is "gotten"
+	extern Real64 FanFlowRatio;
+	extern bool HeatingLoad; // True when zone needs heating
+	extern bool CoolingLoad; // True when zone needs cooling
+	extern Real64 const Small5WLoad; // load threshold 5.0 W
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
