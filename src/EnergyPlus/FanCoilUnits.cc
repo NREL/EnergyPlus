@@ -686,7 +686,7 @@ namespace FanCoilUnits {
 					ErrorsFound = true;
 				}
 			}
-			if ( FanCoil( FanCoilNum ).CapCtrlMeth == "MultiStageFan" ) {
+			if ( FanCoil( FanCoilNum ).CapCtrlMeth == "MULTISTAGEFAN" ) {
 				FanCoil( FanCoilNum ).FanOpModeSchedPtr = GetScheduleIndex( Alphas( 17 ) );
 				if ( !lAlphaBlanks( 17 ) ) {
 					if ( FanCoil( FanCoilNum ).FanType_Num != FanType_SimpleOnOff ) {

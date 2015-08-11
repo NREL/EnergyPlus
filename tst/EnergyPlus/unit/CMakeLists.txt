@@ -22,7 +22,7 @@ set( test_src
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
-  FanCoilUnits.unit
+  FanCoilUnits.unit.cc
   Fans.unit.cc
   FaultFoulingAirFilters.unit.cc
   FluidCoolers.unit.cc
