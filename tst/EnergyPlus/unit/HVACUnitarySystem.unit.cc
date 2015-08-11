@@ -400,7 +400,6 @@ TEST( HVACUnitarySystem, CalcUnitaryHeatingSystem ) {
 
 	int UnitarySysNum( 1 );
 	bool FirstHVACIteration( false );
-	Real64 PartLoadRatio( 1.0 );
 	int CompOn( 1 );
 	Real64 OnOffAirFlowRatio( 1.0 );
 	Real64 HeatCoilLoad( 0.0 );
@@ -546,7 +545,6 @@ TEST( HVACUnitarySystem, CalcUnitaryCoolingSystem ) {
 	int CompOn( 1 );
 	int UnitarySysNum( 1 );
 	bool FirstHVACIteration( false );
-	Real64 PartLoadRatio( 1.0 );
 	Real64 OnOffAirFlowRatio( 1.0 );
 	Real64 CoilCoolHeatRat( 1.0 );
 	Real64 AirMassFlowRate( 0.0 );

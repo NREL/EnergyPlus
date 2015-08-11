@@ -2246,7 +2246,7 @@ namespace FanCoilUnits {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SimMultiStage4PipeFanCoil" );
-		int const MaxIterCycl( 100 );
+		//int const MaxIterCycl( 100 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 
@@ -2265,11 +2265,6 @@ namespace FanCoilUnits {
 		Real64 QCoilCoolSP; // coil load to the cooling setpoint [W]
 		Real64 SpeedRatio; // ratio between lower and higher fan speed
 		Real64 PartLoadRatio; // Part Load Ratio, fraction of time step fancoil is on
-		Real64 Error; // Error between QZnReq and QUnitOut
-		Real64 AbsError; // Absolute error between QZnReq and QUnitOut [W]   !FB
-		Real64 Relax;
-		Real64 DelPLR;
-		int Iter; // iteration counter
 		int OutletNode; // unit air outlet node
 		int InletNode; // unit air inlet node
 		bool UnitOn; // TRUE if unit is on
@@ -2285,10 +2280,6 @@ namespace FanCoilUnits {
 		QTotUnitOut = 0.0;
 		QUnitOutMax = 0.0;
 		QUnitOutNoHC = 0.0;
-		AbsError = 2.0 * Small5WLoad;
-		Relax = 1.0;
-		Error = 1.0;
-		Iter = 0;
 
 		OutletNode = FanCoil( FanCoilNum ).AirOutNode;
 		InletNode = FanCoil( FanCoilNum ).AirInNode;
@@ -2609,7 +2600,6 @@ namespace FanCoilUnits {
 		Real64 QUnitOutMaxLS; // lower fan speed output
 		Real64 HighSpeedRatio; // fan flow ratio at low speed 
 		Real64 LowSpeedRatio; // fan flow ratio at low speed 
-		Real64 AirMassFlow; // air mass flow rate [kg/sec]
 		Real64 AirMassFlowAvg; // supply air flow rate weighted by speed ratio
 		Real64 AirMassFlowLow; // supply air flow rate at lower speed
 		Real64 AirMassFlowHigh; // supply air flow rate at higher speed
@@ -2622,8 +2612,6 @@ namespace FanCoilUnits {
 		int OutletNode; // unit air outlet node
 		int InletNode; // unit air inlet node
 		int Iter; // iteration counter
-
-		Real64 QUnitOutNoHC;
 
 		// initialize local variables
 		mdot = 0.0;

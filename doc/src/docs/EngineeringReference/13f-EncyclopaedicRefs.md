@@ -1,3 +1,21 @@
+<head>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX", "output/HTML-CSS"],
+  tex2jax: {
+   inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+   displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+   processEscapes: true
+  },
+  "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+  <script type="text/javascript"
+   src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+</head>
+
 <!--RemoveStart-->
 Simulation Models – Encyclopedic Reference
 ==========================================
@@ -3950,6 +3968,60 @@ where <span>\({\dot Q_{hc}}\)</span>is the heating coil load, <span>\({\dot Q_{z
 If the unit is on and <span>\({\dot Q_{cc}}\)</span>&lt; 0 and the thermostat type is not “single heating setpoint”, *ControlCompOutput* is called with the control node set to the cold water inlet node. *ControlCompOutput* is a general component control routine. In this case calls *Calc4PipeFanCoil* repeatedly while varying the cold water flow rate and minimizing <span>\(({\dot Q_{sens,out}} - {\dot Q_{z,csp}})/{\dot Q_{z,csp}}\)</span>to within the cooling convergence tolerance. Similarly if the unit is on and <span>\({\dot Q_{hc}}\)</span>&gt;0 and the thermostat type is not “single cooling setpoint”, *ControlCompOutput* is called with the control node set to the hot water inlet node. *ControlCompOutput* varies the hot water flow rate to minimize <span>\(({\dot Q_{sens,out}} - {\dot Q_{z,hsp}})/{\dot Q_{z,hsp}}\)</span> to within the heating tolerance. *ControlCompOutput* executes a slow but safe interval halving algorithm to do its minimization. Once control is achieved, the total cooling/heating output is calculated:
 
      <span>\({\dot Q_{tot,out}} = \dot m\cdot ({\mathop{\rm PsyHFnTdbW}\nolimits} ({T_{out}},{W_{out}}) - {\mathop{\rm PsyHFnTdbW}\nolimits} ({T_{in,}}{W_{in}})\)</span>
+
+
+##### Multi-Speed Fan In FanCoil
+
+When modeling multi-speed fan in FanCoil unit, capacity is modulated using speed ratio or part load ratio.  The supply air fan speed is varied while operating the coils at maximum water flow. When there is no system load to meet, the water control valve is fully closed. When the FanCoil fan is cycling between to consecutive fan speed levels, a speed ratio is calculated, else when the FanCoil unit cycles between the minimum fan speed and off-position, then part load ratio is calculated. The fan may be off or run continuously at lowest speed to provide ventilation air depending the fan operating schedule specified. When the FanCoil is operating at the lowest fan speed (Speed = 1), the water flow rate is reported as the average for the time step by multiplying the maximum water flow by part load ratio. The speed ratio and part-load ratio are calculated such that the FanCoil unit satisfies the required system zone cooling or heating load.The set of equations used for the multi-speed fan capacity control methods in FanCoil unit are summarized next.
+
+###### Cycling Between Stages
+
+When the supply fan is cycling between consecutive speeds, then the speed ratio (SR) and the average mass flow rate are calculated as follows:
+
+<div>$${SR_{n}} = Abs({SystemLoad} - {FullLoadOutput_{n-1}}) / Abs({FullLoadOutput_{n}} - {FullLoadOutput_{n-1}})$$</div>
+<div>$${\dot m} = {\dot m_{on, n}} {SR_{n}} + {\dot m_{on, n-1}} (1 - {SR_{n}})$$</div>
+<div>$${\dot m{w}} = {\dot m_{w, max}}$$</div>
+
+###### Cycling OnOff at Lowest Stage
+
+The average supply air flow rate calculation when the fan is running at the lowest fan speed level depends on the fan operating schedule and load. The fan coil unit part load ratio is given by:
+
+<div>$${PLR} = Abs({SystemLoad} - {NoLoadOutput}) / Abs({FullLoadOutput_{1}} - {NoLoadOutput})$$</div>
+
+
+####### Continuous Fan
+
+<div>$${\dot m} = {\dot m_{on, 1}} {PLR} + {\dot m_{off}} (1 - {PLR})$$</div>$$
+
+####### Cycling Fan:
+
+<div>$${\dot m} = {\dot m_{on, 1}} {PLR}$$</div>$$
+<div>$${\dot m{w}} = {\dot m_{w, max}} * {PLR}$$</div>$$
+
+where:
+
+{SR_{n}}		=	 speed ratio of the fan coil unit at speed n, (-)
+
+{PLR}			=	 part load ratio of the fan coil uni at speed 1, (-)
+
+{\dot m}		=	 average mass flow rate of supply air, (kg/s
+
+{\dot m_{on, n-1}}	=	mass flow rate of supply air at fan speed level n-1, (kg/s)
+
+{\dot m_{on, n}}}	=	mass flow rate of supply air at fan speed level n, (kg/s)
+
+{\dot m_{off}}	=	mass flow rate of supply air when the coils are off, (kg/s)
+
+{\dot m_{w}}	=	 average mass flow rate of chilled or hot water, (kg/s)
+
+{\dot m_{w, max}}	=	maximum or full mass flow rate of chilled or hot water, (kg/s)
+
+SystemLoad 	= system load to be met by the fan coil unit, (W)
+
+{FullLoadOutput_{n-1}} 	= fully load fan coil unit output at fan speed level n-1, (W)
+
+{FullLoadOutput_{n}} 	= fully load fan coil unit output at fan speed level n, (W)
+
 
 #### References
 

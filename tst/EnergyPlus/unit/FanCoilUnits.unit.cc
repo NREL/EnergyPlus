@@ -41,14 +41,13 @@ using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::WaterCoils;
+using namespace EnergyPlus::Fans;
+using namespace EnergyPlus::ScheduleManager;
 using General::TrimSigDigits;
 using DataEnvironment::OutDryBulbTemp;
 using General::TrimSigDigits;
 using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 using MixedAir::OAMixer;
-using MixedAir::GetOAMixerInputFlag;
-using namespace EnergyPlus::Fans;
-using namespace EnergyPlus::ScheduleManager;
 
 
 namespace EnergyPlus {
@@ -58,8 +57,6 @@ namespace EnergyPlus {
 
 		int FanCoilNum( 1 );
 		int ZoneNum( 1 );
-		int NumOfZones( 1 );
-		int NumOAMixers( 1 );
 		bool FirstHVACIteration( false );
 		bool ErrorsFound( false );
 		Real64 PartLoadRatio( 1.0 );
@@ -217,16 +214,16 @@ namespace EnergyPlus {
 		Node( OAMixer( 1 ).InletNode ).HumRat = 0.0030;
 		Node( OAMixer( 1 ).InletNode ).Enthalpy = 18000;
 
-		Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRate = AirMassFlow;
-		Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRateMin = AirMassFlow;
-		Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRateMinAvail = AirMassFlow;
-		Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRateMax = MaxAirMassFlow;
-		Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRateMaxAvail = MaxAirMassFlow;
+		Node( FanCoil( 1 ).AirInNode ).MassFlowRate = AirMassFlow;
+		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMin = AirMassFlow;
+		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMinAvail = AirMassFlow;
+		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMax = MaxAirMassFlow;
+		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMaxAvail = MaxAirMassFlow;
 
 		// heating load only
 		FanCoil( 1 ).OutAirMassFlow = AirMassFlow;
 		FanCoil( 1 ).MaxAirMassFlow = MaxAirMassFlow;
-		Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRateMax = MaxAirMassFlow;
+		Node( FanCoil( 1 ).OutsideAirNode ).MassFlowRateMax = MaxAirMassFlow;
 
 		Fan( 1 ).InletAirMassFlowRate = AirMassFlow;
 		Fan( 1 ).MaxAirMassFlowRate = MaxAirMassFlow;
@@ -345,8 +342,6 @@ namespace EnergyPlus {
 
 		int FanCoilNum( 1 );
 		int ZoneNum( 1 );
-		int NumOfZones( 1 );
-		int NumOAMixers( 1 );
 		bool FirstHVACIteration( false );
 		bool ErrorsFound( false );
 		Real64 PartLoadRatio( 1.0 );
@@ -505,16 +500,16 @@ namespace EnergyPlus {
 		Node( OAMixer( 1 ).InletNode ).HumRat = 0.0085;
 		Node( OAMixer( 1 ).InletNode ).Enthalpy = 53000;
 
-		Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRate = AirMassFlow;
-		Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRateMin = AirMassFlow;
-		Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRateMinAvail = AirMassFlow;
-		Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRateMax = MaxAirMassFlow;
-		Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRateMaxAvail = MaxAirMassFlow;
+		Node( FanCoil( 1 ).AirInNode ).MassFlowRate = AirMassFlow;
+		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMin = AirMassFlow;
+		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMinAvail = AirMassFlow;
+		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMax = MaxAirMassFlow;
+		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMaxAvail = MaxAirMassFlow;
 
 		// heating load only
 		FanCoil( 1 ).OutAirMassFlow = AirMassFlow;
 		FanCoil( 1 ).MaxAirMassFlow = MaxAirMassFlow;
-		Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRateMax = MaxAirMassFlow;
+		Node( FanCoil( 1 ).OutsideAirNode ).MassFlowRateMax = MaxAirMassFlow;
 
 		Fan( 1 ).InletAirMassFlowRate = AirMassFlow;
 		Fan( 1 ).MaxAirMassFlowRate = MaxAirMassFlow;
