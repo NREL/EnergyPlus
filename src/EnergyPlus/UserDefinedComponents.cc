@@ -328,7 +328,7 @@ namespace UserDefinedComponents {
 
 		if ( AirLoopNum != -1 ) { // IF the sysem is not an equipment of outdoor air unit
 			// determine if heating or cooling on primary air stream
-			if ( Node( UserCoil( CompNum ).Air( 1 ).InletNodeNum ).Temp < Node( UserCoil( CompNum ).Air( 1 ).InletNodeNum ).Temp ) {
+			if ( Node( UserCoil( CompNum ).Air( 1 ).InletNodeNum ).Temp < Node( UserCoil( CompNum ).Air( 1 ).OutletNodeNum ).Temp ) {
 				HeatingActive = true;
 			} else {
 				HeatingActive = false;

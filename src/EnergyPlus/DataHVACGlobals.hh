@@ -158,6 +158,8 @@ namespace DataHVACGlobals {
 	extern int const Coil_HeatingAirToAirVariableSpeed;
 	extern int const CoilDX_HeatPumpWaterHeaterVariableSpeed;
 
+	extern Array1D_string const cAllCoilTypes;
+
 	// Water to air HP coil types
 	extern int const WatertoAir_Simple;
 	extern int const WatertoAir_ParEst;
@@ -168,8 +170,6 @@ namespace DataHVACGlobals {
 	extern int const WaterCycling; // water flow cycles with compressor
 	extern int const WaterConstant; // water flow is constant
 	extern int const WaterConstantOnDemand; // water flow is constant whenever the coil is operational - this is the only method used in EP V7.2 and earlier
-
-	extern Array1D_string const cAllCoilTypes;
 
 	// parameters describing coil performance types
 	extern int const CoilPerfDX_CoolBypassEmpirical;
