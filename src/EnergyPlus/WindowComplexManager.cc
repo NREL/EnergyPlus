@@ -1,6 +1,7 @@
 // C++ Headers
 #include <cassert>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 
 // ObjexxFCL Headers
@@ -24,6 +25,7 @@
 #include <DataZoneEquipment.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
+#include <PierceSurface.hh>
 #include <Psychrometrics.hh>
 #include <TARCOGGassesParams.hh>
 #include <TARCOGMain.hh>
@@ -433,20 +435,20 @@ namespace WindowComplexManager {
 		NLayers = SurfaceWindow( iSurf ).ComplexFen.State( iState ).NLayers;
 		NBkSurf = ComplexWind( iSurf ).NBkSurf;
 
-		ComplexWind( iSurf ).Geom( iState ).SolBmGndWt.allocate( NumOfTimeStepInHour, 24, ComplexWind( iSurf ).Geom( iState ).NGnd );
-		ComplexWind( iSurf ).Geom( iState ).SolBmIndex.allocate( NumOfTimeStepInHour, 24 );
-		ComplexWind( iSurf ).Geom( iState ).ThetaBm.allocate( NumOfTimeStepInHour, 24 );
-		ComplexWind( iSurf ).Geom( iState ).PhiBm.allocate( NumOfTimeStepInHour, 24 );
-		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinDirHemiTrans.allocate( NumOfTimeStepInHour, 24 );
-		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinDirSpecTrans.allocate( NumOfTimeStepInHour, 24 );
-		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinBmGndTrans.allocate( NumOfTimeStepInHour, 24 );
-		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinBmFtAbs.allocate( NumOfTimeStepInHour, 24, NLayers );
-		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinBmGndAbs.allocate( NumOfTimeStepInHour, 24, NLayers );
-		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinToSurfBmTrans.allocate( NumOfTimeStepInHour, 24, NBkSurf );
+		ComplexWind( iSurf ).Geom( iState ).SolBmGndWt.allocate( 24, NumOfTimeStepInHour, ComplexWind( iSurf ).Geom( iState ).NGnd );
+		ComplexWind( iSurf ).Geom( iState ).SolBmIndex.allocate( 24, NumOfTimeStepInHour );
+		ComplexWind( iSurf ).Geom( iState ).ThetaBm.allocate( 24, NumOfTimeStepInHour );
+		ComplexWind( iSurf ).Geom( iState ).PhiBm.allocate( 24, NumOfTimeStepInHour );
+		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinDirHemiTrans.allocate( 24, NumOfTimeStepInHour );
+		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinDirSpecTrans.allocate( 24, NumOfTimeStepInHour );
+		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinBmGndTrans.allocate( 24, NumOfTimeStepInHour );
+		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinBmFtAbs.allocate( 24, NumOfTimeStepInHour, NLayers );
+		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinBmGndAbs.allocate( 24, NumOfTimeStepInHour, NLayers );
+		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinToSurfBmTrans.allocate( 24, NumOfTimeStepInHour, NBkSurf );
 		SurfaceWindow( iSurf ).ComplexFen.State( iState ).BkSurf.allocate( NBkSurf );
 		for ( KBkSurf = 1; KBkSurf <= NBkSurf; ++KBkSurf ) {
-			SurfaceWindow( iSurf ).ComplexFen.State( iState ).BkSurf( KBkSurf ).WinDHBkRefl.allocate( NumOfTimeStepInHour, 24 );
-			SurfaceWindow( iSurf ).ComplexFen.State( iState ).BkSurf( KBkSurf ).WinDirBkAbs.allocate( NumOfTimeStepInHour, 24, NLayers );
+			SurfaceWindow( iSurf ).ComplexFen.State( iState ).BkSurf( KBkSurf ).WinDHBkRefl.allocate( 24, NumOfTimeStepInHour );
+			SurfaceWindow( iSurf ).ComplexFen.State( iState ).BkSurf( KBkSurf ).WinDirBkAbs.allocate( 24, NumOfTimeStepInHour, NLayers );
 		}
 
 	}
@@ -526,7 +528,7 @@ namespace WindowComplexManager {
 		CalcWindowStaticProperties( iSurf, NumOfStates, ComplexWind( iSurf ), ComplexWind( iSurf ).Geom( NumOfStates ), SurfaceWindow( iSurf ).ComplexFen.State( NumOfStates ) );
 
 		// calculate hourly data from complex fenestration
-		CFSShadeAndBeamInitialization( iSurf, NumOfStates, ComplexWind( iSurf ), ComplexWind( iSurf ).Geom( NumOfStates ), SurfaceWindow( iSurf ).ComplexFen.State( NumOfStates ) );
+		CFSShadeAndBeamInitialization( iSurf, NumOfStates );
 
 	}
 
@@ -709,7 +711,7 @@ namespace WindowComplexManager {
 			ISurf = WindowList( IWind ).SurfNo;
 			NumStates = ComplexWind( ISurf ).NumStates;
 			for ( IState = 1; IState <= NumStates; ++IState ) {
-				CFSShadeAndBeamInitialization( ISurf, IState, ComplexWind( ISurf ), ComplexWind( ISurf ).Geom( IState ), SurfaceWindow( ISurf ).ComplexFen.State( IState ) );
+				CFSShadeAndBeamInitialization( ISurf, IState );
 			} //State loop
 		} //window loop
 
@@ -718,10 +720,7 @@ namespace WindowComplexManager {
 	void
 	CFSShadeAndBeamInitialization(
 		int const iSurf, // Window surface number
-		int const iState, // Window state number
-		BSDFWindowGeomDescr & EP_UNUSED( Window ), // Window Geometry
-		BSDFGeomDescr & EP_UNUSED( Geom ), // State Geometry
-		BSDFStateDescr & EP_UNUSED( State ) // State Description
+		int const iState // Window state number
 	)
 	{
 
@@ -762,16 +761,6 @@ namespace WindowComplexManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static Real64 DotProd( 0.0 ); // temporary variable for testing dot products
-		int I; // general purpose index
-		int IncRay; // Index of incident ray corresponding to beam direction
-		Real64 Theta; // Theta angle of incident ray correspongind to beam direction
-		Real64 Phi; // Phi angle of incident ray correspongind to beam direction
-		static int IHit( 0 ); // hit flag
-		int JSurf; // general purpose surface number
-		int Hour; // hour of day
-		int TotHits; // hit counter
-		int TS; // time step
 
 		// Object Data
 		static Vector SunDir( 0.0, 0.0, 1.0 ); // unit vector pointing toward sun (world CS)
@@ -780,105 +769,114 @@ namespace WindowComplexManager {
 
 		if ( KickOffSizing || KickOffSimulation ) return;
 
+		int IncRay; // Index of incident ray corresponding to beam direction
+		Real64 Theta; // Theta angle of incident ray correspongind to beam direction
+		Real64 Phi; // Phi angle of incident ray correspongind to beam direction
+		int IHit; // hit flag
+		int TotHits; // hit counter
+		auto & complexWindow( ComplexWind( iSurf ) );
+		auto & complexWindowGeom( complexWindow.Geom( iState ) );
+		auto & surfaceWindowState( SurfaceWindow( iSurf ).ComplexFen.State( iState ) );
+
 		if ( ! DetailedSolarTimestepIntegration ) {
-			for ( Hour = 1; Hour <= 24; ++Hour ) {
-				for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
+			std::size_t lHT( 0 ); // Linear index for ( Hour, TS )
+			std::size_t lHTI( 0 ); // Linear index for ( Hour, TS, I )
+			for ( int Hour = 1; Hour <= 24; ++Hour ) {
+				for ( int TS = 1; TS <= NumOfTimeStepInHour; ++TS, ++lHT ) { // [ lHT ] == ( Hour, TS )
 					SunDir = SUNCOSTS( TS, Hour, {1,3} );
 					Theta = 0.0;
 					Phi = 0.0;
 					if ( SUNCOSTS( TS, Hour, 3 ) > SunIsUpValue ) {
-						IncRay = FindInBasis( SunDir, Front_Incident, iSurf, iState, ComplexWind( iSurf ).Geom( iState ).Inc, Theta, Phi );
-						ComplexWind( iSurf ).Geom( iState ).ThetaBm( TS, Hour ) = Theta;
-						ComplexWind( iSurf ).Geom( iState ).PhiBm( TS, Hour ) = Phi;
+						IncRay = FindInBasis( SunDir, Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi );
+						complexWindowGeom.ThetaBm[ lHT ] = Theta;
+						complexWindowGeom.PhiBm[ lHT ] = Phi;
 					} else {
-						ComplexWind( iSurf ).Geom( iState ).ThetaBm( TS, Hour ) = 0.0;
-						ComplexWind( iSurf ).Geom( iState ).PhiBm( TS, Hour ) = 0.0;
-						IncRay = 0; //sundown can't have ray incident on window
+						complexWindowGeom.ThetaBm[ lHT ] = 0.0;
+						complexWindowGeom.PhiBm[ lHT ] = 0.0;
+						IncRay = 0; // sundown can't have ray incident on window
 					}
-					if ( IncRay > 0 ) {
-						//Sun may be incident on the window
-						ComplexWind( iSurf ).Geom( iState ).SolBmIndex( TS, Hour ) = IncRay;
-					} else {
-						//Window can't be sunlit, set front incidence ray index to zero
-						ComplexWind( iSurf ).Geom( iState ).SolBmIndex( TS, Hour ) = 0;
+					if ( IncRay > 0 ) { // Sun may be incident on the window
+						complexWindowGeom.SolBmIndex[ lHT ] = IncRay;
+					} else { // Window can't be sunlit, set front incidence ray index to zero
+						complexWindowGeom.SolBmIndex[ lHT ] = 0;
 					}
-					for ( I = 1; I <= ComplexWind( iSurf ).Geom( iState ).NGnd; ++I ) { //Gnd pt loop
+					for ( int I = 1, nGnd = complexWindowGeom.NGnd; I <= nGnd; ++I, ++lHTI ) { // Gnd pt loop
 						IHit = 0;
 						TotHits = 0;
-						for ( JSurf = 1; JSurf <= TotSurfaces; ++JSurf ) {
+						Vector const gndPt( complexWindowGeom.GndPt( I ) );
+						for ( int JSurf = 1, eSurf = TotSurfaces; JSurf <= eSurf; ++JSurf ) {
 							// the following test will cycle on anything except exterior surfaces and shading surfaces
 							if ( Surface( JSurf ).HeatTransSurf && Surface( JSurf ).ExtBoundCond != ExternalEnvironment ) continue;
-							//  skip surfaces that face away from the ground point
-							DotProd = dot( SunDir, Surface( JSurf ).NewellSurfaceNormalVector );
-							if ( DotProd >= 0.0 ) continue;
-							//Looking for surfaces between GndPt and sun
-							PierceSurfaceVector( JSurf, ComplexWind( iSurf ).Geom( iState ).GndPt( I ), SunDir, IHit, HitPt );
+							// skip surfaces that face away from the ground point
+							if ( dot( SunDir, Surface( JSurf ).NewellSurfaceNormalVector ) >= 0.0 ) continue;
+							// Looking for surfaces between GndPt and sun
+							PierceSurface( JSurf, gndPt, SunDir, IHit, HitPt );
 							if ( IHit == 0 ) continue;
-							//  Are not going into the details of whether a hit surface is transparent
-							//  Since this is ultimately simply weighting the transmittance, so great
-							//  detail is not warranted
+							// Are not going into the details of whether a hit surface is transparent
+							// Since this is ultimately simply weighting the transmittance, so great
+							// detail is not warranted
 							++TotHits;
 							break;
 						}
 						if ( TotHits > 0 ) {
-							ComplexWind( iSurf ).Geom( iState ).SolBmGndWt( TS, Hour, I ) = 0.0;
+							complexWindowGeom.SolBmGndWt[ lHTI ] = 0.0; // [ lHTI ] == ( Hour, TS, I )
 						} else {
-							ComplexWind( iSurf ).Geom( iState ).SolBmGndWt( TS, Hour, I ) = 1.0;
+							complexWindowGeom.SolBmGndWt[ lHTI ] = 1.0; // [ lHTI ] == ( Hour, TS, I )
 						}
 					} // Gnd pt loop
 
 					// update window beam properties
-					CalculateWindowBeamProperties( iSurf, iState, ComplexWind( iSurf ), ComplexWind( iSurf ).Geom( iState ), SurfaceWindow( iSurf ).ComplexFen.State( iState ), Hour, TS );
+					CalculateWindowBeamProperties( iSurf, iState, complexWindow, complexWindowGeom, surfaceWindowState, Hour, TS );
 				} // Timestep loop
 			} // Hour loop
 		} else { // detailed timestep integration
+			std::size_t const lHT( complexWindowGeom.ThetaBm.index( HourOfDay, TimeStep ) ); // [ lHT ] == ( HourOfDay, TimeStep )
 			SunDir = SUNCOSTS( TimeStep, HourOfDay, {1,3} );
 			Theta = 0.0;
 			Phi = 0.0;
 			if ( SUNCOSTS( TimeStep, HourOfDay, 3 ) > SunIsUpValue ) {
-				IncRay = FindInBasis( SunDir, Front_Incident, iSurf, iState, ComplexWind( iSurf ).Geom( iState ).Inc, Theta, Phi );
-				ComplexWind( iSurf ).Geom( iState ).ThetaBm( TimeStep, HourOfDay ) = Theta;
-				ComplexWind( iSurf ).Geom( iState ).PhiBm( TimeStep, HourOfDay ) = Phi;
+				IncRay = FindInBasis( SunDir, Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi );
+				complexWindowGeom.ThetaBm[ lHT ] = Theta;
+				complexWindowGeom.PhiBm[ lHT ] = Phi;
 			} else {
-				ComplexWind( iSurf ).Geom( iState ).ThetaBm( TimeStep, HourOfDay ) = 0.0;
-				ComplexWind( iSurf ).Geom( iState ).PhiBm( TimeStep, HourOfDay ) = 0.0;
-				IncRay = 0; //sundown can't have ray incident on window
+				complexWindowGeom.ThetaBm[ lHT ] = 0.0;
+				complexWindowGeom.PhiBm[ lHT ] = 0.0;
+				IncRay = 0; // sundown can't have ray incident on window
 			}
 
-			if ( IncRay > 0 ) {
-				//Sun may be incident on the window
-				ComplexWind( iSurf ).Geom( iState ).SolBmIndex( TimeStep, HourOfDay ) = IncRay;
-			} else {
-				//Window can't be sunlit, set front incidence ray index to zero
-				ComplexWind( iSurf ).Geom( iState ).SolBmIndex( TimeStep, HourOfDay ) = 0.0;
+			if ( IncRay > 0 ) { // Sun may be incident on the window
+				complexWindowGeom.SolBmIndex[ lHT ] = IncRay;
+			} else { // Window can't be sunlit, set front incidence ray index to zero
+				complexWindowGeom.SolBmIndex[ lHT ] = 0.0;
 			}
-			for ( I = 1; I <= ComplexWind( iSurf ).Geom( iState ).NGnd; ++I ) { //Gnd pt loop
+			std::size_t lHTI( complexWindowGeom.SolBmGndWt.index( HourOfDay, TimeStep, 1 ) ); // Linear index for ( HourOfDay, TimeStep, I )
+			for ( int I = 1, nGnd = complexWindowGeom.NGnd; I <= nGnd; ++I, ++lHTI ) { // Gnd pt loop
 				IHit = 0;
 				TotHits = 0;
-				for ( JSurf = 1; JSurf <= TotSurfaces; ++JSurf ) {
+				Vector const gndPt( complexWindowGeom.GndPt( I ) );
+				for ( int JSurf = 1; JSurf <= TotSurfaces; ++JSurf ) {
 					// the following test will cycle on anything except exterior surfaces and shading surfaces
 					if ( Surface( JSurf ).HeatTransSurf && Surface( JSurf ).ExtBoundCond != ExternalEnvironment ) continue;
-					//  skip surfaces that face away from the ground point
-					DotProd = dot( SunDir, Surface( JSurf ).NewellSurfaceNormalVector );
-					if ( DotProd >= 0.0 ) continue;
-					//Looking for surfaces between GndPt and sun
-					PierceSurfaceVector( JSurf, ComplexWind( iSurf ).Geom( iState ).GndPt( I ), SunDir, IHit, HitPt );
+					// skip surfaces that face away from the ground point
+					if ( dot( SunDir, Surface( JSurf ).NewellSurfaceNormalVector ) >= 0.0 ) continue;
+					// Looking for surfaces between GndPt and sun
+					PierceSurface( JSurf, gndPt, SunDir, IHit, HitPt );
 					if ( IHit == 0 ) continue;
-					//  Are not going into the details of whether a hit surface is transparent
-					//  Since this is ultimately simply weighting the transmittance, so great
-					//  detail is not warranted
+					// Are not going into the details of whether a hit surface is transparent
+					// Since this is ultimately simply weighting the transmittance, so great
+					// detail is not warranted
 					++TotHits;
 					break;
 				}
 				if ( TotHits > 0 ) {
-					ComplexWind( iSurf ).Geom( iState ).SolBmGndWt( TimeStep, HourOfDay, I ) = 0.0;
+					complexWindowGeom.SolBmGndWt[ lHTI ] = 0.0; // [ lHTI ] == ( HourOfDay, TimeStep, I )
 				} else {
-					ComplexWind( iSurf ).Geom( iState ).SolBmGndWt( TimeStep, HourOfDay, I ) = 1.0;
+					complexWindowGeom.SolBmGndWt[ lHTI ] = 1.0; // [ lHTI ] == ( HourOfDay, TimeStep, I )
 				}
 			} // Gnd pt loop
 
 			// Update window beam properties
-			CalculateWindowBeamProperties( iSurf, iState, ComplexWind( iSurf ), ComplexWind( iSurf ).Geom( iState ), SurfaceWindow( iSurf ).ComplexFen.State( iState ), HourOfDay, TimeStep );
+			CalculateWindowBeamProperties( iSurf, iState, complexWindow, complexWindowGeom, surfaceWindowState, HourOfDay, TimeStep );
 		} // solar calculation mode, average over days or detailed
 
 	}
@@ -887,8 +885,8 @@ namespace WindowComplexManager {
 	CalculateWindowBeamProperties(
 		int const ISurf, // Window surface number
 		int const IState, // Window state number
-		BSDFWindowGeomDescr & Window, // Window Geometry
-		BSDFGeomDescr & Geom, // State Geometry
+		BSDFWindowGeomDescr const & Window, // Window Geometry
+		BSDFGeomDescr const & Geom, // State Geometry
 		BSDFStateDescr & State, // State Description
 		int const Hour, // Hour number
 		int const TS // Timestep number
@@ -960,32 +958,32 @@ namespace WindowComplexManager {
 		//  Begin calculation
 		//  Calculate the Transmittance from a given beam direction to a given zone surface
 
-		IBm = Geom.SolBmIndex( TS, Hour );
+		IBm = Geom.SolBmIndex( Hour, TS );
 		if ( IBm <= 0.0 ) { //Beam cannot be incident on window for this Hour, TS
-			State.WinToSurfBmTrans( TS, Hour, {1,Window.NBkSurf} ) = 0.0;
-			State.WinDirHemiTrans( TS, Hour ) = 0.0;
-			State.WinDirSpecTrans( TS, Hour ) = 0.0;
-			State.WinBmFtAbs( TS, Hour, {1,State.NLayers} ) = 0.0;
+			State.WinToSurfBmTrans( Hour, TS, {1,Window.NBkSurf} ) = 0.0;
+			State.WinDirHemiTrans( Hour, TS ) = 0.0;
+			State.WinDirSpecTrans( Hour, TS ) = 0.0;
+			State.WinBmFtAbs( Hour, TS, {1,State.NLayers} ) = 0.0;
 		} else {
 			for ( I = 1; I <= Window.NBkSurf; ++I ) { //Back surface loop
 				Sum1 = 0.0;
 				for ( J = 1; J <= Geom.NSurfInt( I ); ++J ) { //Ray loop
 					Sum1 += Geom.Trn.Lamda( Geom.SurfInt( J, I ) ) * Construct( IConst ).BSDFInput.SolFrtTrans( IBm, Geom.SurfInt( J, I ) );
 				} //Ray loop
-				State.WinToSurfBmTrans( TS, Hour, I ) = Sum1;
+				State.WinToSurfBmTrans( Hour, TS, I ) = Sum1;
 			} //Back surface loop
 			//Calculate the directional-hemispherical transmittance
 			Sum1 = 0.0;
 			for ( J = 1; J <= Geom.Trn.NBasis; ++J ) {
 				Sum1 += Geom.Trn.Lamda( J ) * Construct( IConst ).BSDFInput.SolFrtTrans( IBm, J );
 			}
-			State.WinDirHemiTrans( TS, Hour ) = Sum1;
+			State.WinDirHemiTrans( Hour, TS ) = Sum1;
 			//Calculate the directional specular transmittance
 			//Note:  again using assumption that Inc and Trn basis have same structure
-			State.WinDirSpecTrans( TS, Hour ) = Geom.Trn.Lamda( IBm ) * Construct( IConst ).BSDFInput.SolFrtTrans( IBm, IBm );
+			State.WinDirSpecTrans( Hour, TS ) = Geom.Trn.Lamda( IBm ) * Construct( IConst ).BSDFInput.SolFrtTrans( IBm, IBm );
 			//Calculate the layer front absorptance for beam radiation
 			for ( L = 1; L <= State.NLayers; ++L ) {
-				State.WinBmFtAbs( TS, Hour, L ) = Construct( IConst ).BSDFInput.Layer( L ).FrtAbs( IBm, 1 );
+				State.WinBmFtAbs( Hour, TS, L ) = Construct( IConst ).BSDFInput.Layer( L ).FrtAbs( IBm, 1 );
 			}
 		}
 		//Calculate,  for a given beam direction, the transmittance into the zone
@@ -995,17 +993,17 @@ namespace WindowComplexManager {
 		Sum2 = 0.0;
 		for ( J = 1; J <= Geom.NGnd; ++J ) { //Incident ray loop
 			JRay = Geom.GndIndex( J );
-			if ( Geom.SolBmGndWt( TS, Hour, J ) > 0.0 ) {
-				Sum2 += Geom.SolBmGndWt( TS, Hour, J ) * Geom.Inc.Lamda( JRay );
+			if ( Geom.SolBmGndWt( Hour, TS, J ) > 0.0 ) {
+				Sum2 += Geom.SolBmGndWt( Hour, TS, J ) * Geom.Inc.Lamda( JRay );
 				for ( M = 1; M <= Geom.Trn.NBasis; ++M ) { //Outgoing ray loop
-					Sum1 += Geom.SolBmGndWt( TS, Hour, J ) * Geom.Inc.Lamda( JRay ) * Geom.Trn.Lamda( M ) * Construct( IConst ).BSDFInput.SolFrtTrans( JRay, M );
+					Sum1 += Geom.SolBmGndWt( Hour, TS, J ) * Geom.Inc.Lamda( JRay ) * Geom.Trn.Lamda( M ) * Construct( IConst ).BSDFInput.SolFrtTrans( JRay, M );
 				} //Outgoing ray loop
 			}
 		} //Indcident ray loop
 		if ( Sum2 > 0.0 ) {
-			State.WinBmGndTrans( TS, Hour ) = Sum1 / Sum2;
+			State.WinBmGndTrans( Hour, TS ) = Sum1 / Sum2;
 		} else {
-			State.WinBmGndTrans( TS, Hour ) = 0.0; //No unshaded ground => no transmittance
+			State.WinBmGndTrans( Hour, TS ) = 0.0; //No unshaded ground => no transmittance
 		}
 
 		//Calculate,  for a given beam direction, the layer front absorptance
@@ -1016,15 +1014,15 @@ namespace WindowComplexManager {
 			Sum2 = 0.0;
 			for ( J = 1; J <= Geom.NGnd; ++J ) { //Incident ray loop
 				JRay = Geom.GndIndex( J );
-				if ( Geom.SolBmGndWt( TS, Hour, J ) > 0.0 ) {
-					Sum2 += Geom.SolBmGndWt( TS, Hour, J ) * Geom.Inc.Lamda( JRay );
-					Sum1 += Geom.SolBmGndWt( TS, Hour, J ) * Geom.Inc.Lamda( JRay ) * Construct( IConst ).BSDFInput.Layer( L ).FrtAbs( JRay, 1 );
+				if ( Geom.SolBmGndWt( Hour, TS, J ) > 0.0 ) {
+					Sum2 += Geom.SolBmGndWt( Hour, TS, J ) * Geom.Inc.Lamda( JRay );
+					Sum1 += Geom.SolBmGndWt( Hour, TS, J ) * Geom.Inc.Lamda( JRay ) * Construct( IConst ).BSDFInput.Layer( L ).FrtAbs( JRay, 1 );
 				}
 			} //Incident ray loop
 			if ( Sum2 > 0.0 ) {
-				State.WinBmGndAbs( TS, Hour, L ) = Sum1 / Sum2;
+				State.WinBmGndAbs( Hour, TS, L ) = Sum1 / Sum2;
 			} else {
-				State.WinBmGndAbs( TS, Hour, L ) = 0.0; //No unshaded ground => no absorptance
+				State.WinBmGndAbs( Hour, TS, L ) = 0.0; //No unshaded ground => no absorptance
 			}
 		} //layer loop
 
@@ -1068,9 +1066,9 @@ namespace WindowComplexManager {
 			}
 			for ( KRegWin = 1; KRegWin <= NRegWin; ++KRegWin ) {
 				KBkSurf = RegWinIndex( KRegWin );
-				State.BkSurf( KBkSurf ).WinDHBkRefl( TS, Hour ) = Refl;
+				State.BkSurf( KBkSurf ).WinDHBkRefl( Hour, TS ) = Refl;
 				for ( L = 1; L <= State.NLayers; ++L ) {
-					State.BkSurf( KBkSurf ).WinDirBkAbs( TS, Hour, L ) = Absorb( L );
+					State.BkSurf( KBkSurf ).WinDirBkAbs( Hour, TS, L ) = Absorb( L );
 				}
 			}
 		}
@@ -1723,7 +1721,7 @@ namespace WindowComplexManager {
 				//  skip surfaces that face away from the window
 				DotProd = dot( Geom.sInc( IRay ), Surface( JSurf ).NewellSurfaceNormalVector );
 				if ( DotProd >= 0.0 ) continue;
-				PierceSurfaceVector( JSurf, Surface( ISurf ).Centroid, Geom.sInc( IRay ), IHit, HitPt );
+				PierceSurface( JSurf, Surface( ISurf ).Centroid, Geom.sInc( IRay ), IHit, HitPt );
 				if ( IHit <= 0 ) continue;
 				IHit = 0; //A hit, clear the hit flag for the next cycle
 				if ( TotHits == 0 ) {
@@ -1899,7 +1897,7 @@ namespace WindowComplexManager {
 			for ( KBkSurf = 1; KBkSurf <= NBkSurf; ++KBkSurf ) { //back surf loop
 				BaseSurf = Surface( ISurf ).BaseSurf; //ShadowComb is organized by base surface
 				JSurf = ShadowComb( BaseSurf ).BackSurf( KBkSurf ); //these are all proper back surfaces
-				PierceSurfaceVector( JSurf, Surface( ISurf ).Centroid, Geom.sTrn( IRay ), IHit, HitPt );
+				PierceSurface( JSurf, Surface( ISurf ).Centroid, Geom.sTrn( IRay ), IHit, HitPt );
 				if ( IHit <= 0 ) continue;
 				IHit = 0; //A hit, clear the hit flag for the next cycle
 				if ( TotHits == 0 ) {
@@ -2260,13 +2258,13 @@ namespace WindowComplexManager {
 				Hold = Sum1 / Sum2;
 				for ( I = 1; I <= 24; ++I ) {
 					for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
-						State.BkSurf( KBkSurf ).WinDHBkRefl( J, I ) = Hold;
+						State.BkSurf( KBkSurf ).WinDHBkRefl( I, J ) = Hold;
 					}
 				}
 			} else {
 				for ( I = 1; I <= 24; ++I ) {
 					for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
-						State.BkSurf( KBkSurf ).WinDHBkRefl( J, I ) = 0.0;
+						State.BkSurf( KBkSurf ).WinDHBkRefl( I, J ) = 0.0;
 					}
 				}
 			}
@@ -2283,13 +2281,13 @@ namespace WindowComplexManager {
 					Hold = Sum1 / Sum2;
 					for ( I = 1; I <= 24; ++I ) {
 						for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
-							State.BkSurf( KBkSurf ).WinDirBkAbs( J, I, L ) = Hold;
+							State.BkSurf( KBkSurf ).WinDirBkAbs( I, J, L ) = Hold;
 						}
 					}
 				} else {
 					for ( I = 1; I <= 24; ++I ) {
 						for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
-							State.BkSurf( KBkSurf ).WinDirBkAbs( J, I, L ) = 0.0;
+							State.BkSurf( KBkSurf ).WinDirBkAbs( I, J, L ) = 0.0;
 						}
 					}
 				}
@@ -3027,12 +3025,12 @@ namespace WindowComplexManager {
 		Real64 Pa; // Atmospheric (outside/inside) pressure (used onlu if CalcDeflection = 1)
 		Real64 Pini; // Initial presssure at time of fabrication (used only if CalcDeflection = 1)
 		Real64 Tini; // Initial temperature at time of fabrication (used only if CalcDeflection = 1)
-		Array1D< Real64 > GapDefMax( maxlay-1 ); // Vector of gap widths in deflected state.  It will be used as input
+		static Array1D< Real64 > GapDefMax( maxlay-1, 0.0 ); // Vector of gap widths in deflected state.  It will be used as input
 		// if CalcDeflection = 2. In case CalcDeflection = 1 it will return recalculated
 		// gap widths. [m]
-		Array1D< Real64 > YoungsMod( maxlay ); // Vector of Young's modulus. [m]
-		Array1D< Real64 > PoissonsRat( maxlay ); // Vector of Poisson's Ratios. [m]
-		Array1D< Real64 > LayerDef( maxlay ); // Vector of layers deflection. [m]
+		static Array1D< Real64 > YoungsMod( maxlay, 0.0 ); // Vector of Young's modulus. [m]
+		static Array1D< Real64 > PoissonsRat( maxlay, 0.0 ); // Vector of Poisson's Ratios. [m]
+		static Array1D< Real64 > LayerDef( maxlay, 0.0 ); // Vector of layers deflection. [m]
 
 		static Array2D_int iprop( maxgas, maxlay+1, 1 ); // Matrix of gas codes - see above {maxgap x maxgas}
 		static Array2D< Real64 > frct( maxgas, maxlay+1, 0.0 ); // Matrix of mass percentages in gap mixtures  {maxgap x maxgas}
@@ -4007,203 +4005,6 @@ namespace WindowComplexManager {
 		SearchAscTable = Ih;
 
 		return SearchAscTable;
-
-	}
-
-	//=================================================================================================
-
-	void
-	CrossProduct(
-		Array1A< Real64 > A, // Vector components: C = A X B
-		Array1A< Real64 > B,
-		Array1A< Real64 > C
-	)
-	{
-
-		// Cross product between vectors A and B
-
-		// Argument array dimensioning
-		A.dim( 3 );
-		B.dim( 3 );
-		C.dim( 3 );
-
-		// Locals
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		// FLOW:
-		C( 1 ) = A( 2 ) * B( 3 ) - A( 3 ) * B( 2 );
-		C( 2 ) = A( 3 ) * B( 1 ) - A( 1 ) * B( 3 );
-		C( 3 ) = A( 1 ) * B( 2 ) - A( 2 ) * B( 1 );
-
-	}
-
-	void
-	PierceSurfaceVector(
-		int const ISurf, // Surface index
-		Vector const & Orig, // Point from which ray originates
-		Vector const & Dir, // Unit vector along in direction of ray whose
-		int & IPIERC, // =1 if line through point R1 in direction of unit vector
-		Vector & HitPt // Point that ray along RN intersects plane of surface
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Fred Winkelmann
-		//       DATE WRITTEN   July 1997
-		//       MODIFIED       Sept 2003, FCW: modification of Daylighting routine DayltgPierceSurface
-		//                             June 2011, JHK: inputs made vector types; copy of routine from
-		//                                        SolarReflectionManager
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Returns point CPhit that line through point R1 in direction of unit vector RN intersects
-		// the plan of surface ISurf. IPIERC = 1 if CPhit is inside the perimeter of ISurf. If not,
-		// IPIERC = 0. This routine works for convex and concave surfaces with 3 or more vertices.
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// Based on DOE-2.1E subroutine DPIERC.
-
-		// Using/Aliasing
-		using namespace Vectors;
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:na
-		// INTERFACE BLOCK SPECIFICATIONS:na
-		// DERIVED TYPE DEFINITIONS:na
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		//  intersection with surface is to be determined
-		//  RN intersects surface ISurf; =0 otherwise.
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Array1D< Real64 > CPhit( 3 ); // Point that ray along RN intersects plane of surface
-		Array1D< Real64 > R1( 3 ); // Point from which ray originates
-		Array1D< Real64 > RN( 3 ); // Unit vector along in direction of ray whose
-		Array1D< Real64 > V1( 3 ); // First vertex
-		Array1D< Real64 > V2( 3 ); // Second vertex
-		Array1D< Real64 > V3( 3 ); // Third vertex
-		int NV; // Number of vertices (3 or 4)
-		Array1D< Real64 > A1( 3 ); // Vector from vertex 1 to 2
-		Array1D< Real64 > A2( 3 ); // Vector from vertex 2 to 3
-		Array1D< Real64 > AXC( 3 ); // Cross product of A and C
-		Array1D< Real64 > SN( 3 ); // Vector normal to surface (SN = A1 X A2)
-		Array1D< Real64 > AA( 3 ); // AA(I) = A(N,I)
-		Array1D< Real64 > CC( 3 ); // CC(I) = C(N,I)
-		Array1D< Real64 > CCC( 3 ); // Vector from vertex 2 to CP
-		Array1D< Real64 > AAA( 3 ); // Vector from vertex 2 to vertex 1
-		Array1D< Real64 > BBB( 3 ); // Vector from vertex 2 to vertex 3
-		int N; // Vertex loop index
-		int I; // Vertext-to-vertex index
-		Real64 F1; // Intermediate variables
-		Real64 F2;
-		Real64 SCALE; // Scale factor
-		Real64 DOTCB; // Dot product of vectors CCC and BBB
-		Real64 DOTCA; // Dot product of vectors CCC and AAA
-		Real64 DOTAXCSN; // Dot product of vectors AXC and SN
-
-		//  REAL(r64)      :: V(4,3)                   ! Vertices of surfaces
-		//  REAL(r64)      :: A(4,3)                   ! Vertex-to-vertex vectors; A(1,i) is from vertex 1 to 2, etc.
-		//  REAL(r64)      :: C(4,3)                   ! Vectors from vertices to intersection point
-		static Array2D< Real64 > V; // Vertices of surfaces
-		static Array2D< Real64 > A; // Vertex-to-vertex vectors; A(1,i) is from vertex 1 to 2, etc.
-		static Array2D< Real64 > C; // Vectors from vertices to intersection point
-		static bool firstTime( true );
-
-		// FLOW:
-		IPIERC = 0;
-		R1 = Orig;
-		RN = Dir;
-		// Vertex vectors
-		if ( firstTime ) {
-			V.allocate( 3, MaxVerticesPerSurface );
-			V = 0.0;
-			A.allocate( 3, MaxVerticesPerSurface );
-			A = 0.0;
-			C.allocate( 3, MaxVerticesPerSurface );
-			C = 0.0;
-			firstTime = false;
-		}
-
-		NV = Surface( ISurf ).Sides;
-		for ( N = 1; N <= NV; ++N ) {
-			V( 1, N ) = Surface( ISurf ).Vertex( N ).x;
-			V( 2, N ) = Surface( ISurf ).Vertex( N ).y;
-			V( 3, N ) = Surface( ISurf ).Vertex( N ).z;
-		}
-
-		// Vertex-to-vertex vectors. A(1,2) is from vertex 1 to 2, etc.
-		for ( I = 1; I <= 3; ++I ) {
-			for ( N = 1; N <= NV - 1; ++N ) {
-				A( I, N ) = V( I, N + 1 ) - V( I, N );
-			}
-			A( I, NV ) = V( I, 1 ) - V( I, NV );
-			A1( I ) = A( I, 1 );
-			A2( I ) = A( I, 2 );
-			V1( I ) = V( I, 1 );
-			V2( I ) = V( I, 2 );
-			V3( I ) = V( I, 3 );
-		}
-
-		// Vector normal to surface
-		CrossProduct( A1, A2, SN );
-		// Scale factor, the solution of SN.(CPhit-V2) = 0 and
-		// CPhit = R1 + SCALE*RN, where CPhit is the point that RN,
-		// when extended, intersects the plane of the surface.
-		F1 = dot( SN, V2 - R1 );
-		F2 = dot( SN, RN );
-		// Skip surfaces that are parallel to RN
-		if ( std::abs( F2 ) < 0.01 ) return;
-		SCALE = F1 / F2;
-		// Skip surfaces that RN points away from
-		if ( SCALE <= 0.0 ) return;
-		// Point that RN intersects plane of surface
-		CPhit = R1 + RN * SCALE;
-		HitPt = CPhit;
-		// Vector from vertex 2 to CPhit
-		CCC = CPhit - V2;
-
-		// Two cases: rectangle and non-rectangle; do rectangle
-		// first since most common shape and faster calculation
-		if ( Surface( ISurf ).Shape == Rectangle || Surface( ISurf ).Shape == RectangularDoorWindow || Surface( ISurf ).Shape == RectangularOverhang || Surface( ISurf ).Shape == RectangularLeftFin || Surface( ISurf ).Shape == RectangularRightFin ) {
-			// Surface is rectangular
-			// Vectors from vertex 2 to vertex 1 and vertex 2 to vertex 3
-			AAA = V1 - V2;
-			BBB = V3 - V2;
-			// Intersection point, CCC, is inside rectangle if
-			// 0 < CCC.BBB < BBB.BBB AND 0 < CCC.AAA < AAA.AAA
-			DOTCB = dot( CCC, BBB );
-			if ( DOTCB < 0.0 ) return;
-			if ( DOTCB > magnitude_squared( BBB ) ) return;
-			DOTCA = dot( CCC, AAA );
-			if ( DOTCA < 0.0 ) return;
-			if ( DOTCA > magnitude_squared( AAA ) ) return;
-			// Surface is intersected
-			IPIERC = 1;
-		} else {
-			// Surface is not rectangular
-			// Vectors from surface vertices to CPhit
-			for ( N = 1; N <= NV; ++N ) {
-				for ( I = 1; I <= 3; ++I ) {
-					C( I, N ) = CPhit( I ) - V( I, N );
-				}
-			}
-			// Cross products of vertex-to-vertex vectors and
-			// vertex-to-CPhit vectors
-			for ( N = 1; N <= NV; ++N ) {
-				for ( I = 1; I <= 3; ++I ) {
-					AA( I ) = A( I, N );
-					CC( I ) = C( I, N );
-				}
-				CrossProduct( AA, CC, AXC );
-				DOTAXCSN = dot( AXC, SN );
-				// If at least one of these dot products is negative
-				// intersection point is outside of surface
-				if ( DOTAXCSN < 0.0 ) return;
-			}
-			// Surface is intersected
-			IPIERC = 1;
-		}
 
 	}
 
