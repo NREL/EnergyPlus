@@ -223,7 +223,7 @@ namespace VentilatedSlab {
 
 		// Find the correct VentilatedSlabInput
 		if ( CompIndex == 0 ) {
-			Item = FindItemInList( CompName, VentSlab.Name(), NumOfVentSlabs );
+			Item = FindItemInList( CompName, VentSlab );
 			if ( Item == 0 ) {
 				ShowFatalError( "SimVentilatedSlab: system not found=" + CompName );
 			}
@@ -289,7 +289,6 @@ namespace VentilatedSlab {
 		auto & GetSteamCoilMaxFlowRate( SteamCoils::GetCoilMaxWaterFlowRate );
 		auto & GetHXAssistedCoilFlowRate( HVACHXAssistedCoolingCoil::GetCoilMaxWaterFlowRate );
 		using HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName;
-		using DataGlobals::NumOfZones;
 		using DataGlobals::ScheduleAlwaysOn;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::Construct;
@@ -303,7 +302,6 @@ namespace VentilatedSlab {
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
 		using DataSizing::ZoneHVACSizing;
-		using DataSizing::NumZoneHVACSizing;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -379,7 +377,7 @@ namespace VentilatedSlab {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), VentSlab.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), VentSlab, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -398,7 +396,7 @@ namespace VentilatedSlab {
 			}
 
 			VentSlab( Item ).ZoneName = cAlphaArgs( 3 );
-			VentSlab( Item ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
+			VentSlab( Item ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone );
 			if ( VentSlab( Item ).ZonePtr == 0 ) {
 				if ( lAlphaBlanks( 3 ) ) {
 					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 3 ) + " is required but input is blank." );
@@ -411,7 +409,7 @@ namespace VentilatedSlab {
 			VentSlab( Item ).SurfListName = cAlphaArgs( 4 );
 			SurfListNum = 0;
 			//    IF (NumOfSlabLists > 0) SurfListNum = FindItemInList(VentSlab(Item)%SurfListName, SlabList%Name, NumOfSlabLists)
-			if ( NumOfSurfListVentSlab > 0 ) SurfListNum = FindItemInList( VentSlab( Item ).SurfListName, SlabList.Name(), NumOfSurfListVentSlab );
+			if ( NumOfSurfListVentSlab > 0 ) SurfListNum = FindItemInList( VentSlab( Item ).SurfListName, SlabList );
 			if ( SurfListNum > 0 ) { // Found a valid surface list
 				VentSlab( Item ).NumOfSurfaces = SlabList( SurfListNum ).NumOfSurfaces;
 				VentSlab( Item ).ZName.allocate( VentSlab( Item ).NumOfSurfaces );
@@ -447,7 +445,7 @@ namespace VentilatedSlab {
 				VentSlab( Item ).SurfaceFlowFrac.allocate( VentSlab( Item ).NumOfSurfaces );
 				MaxCloNumOfSurfaces = max( MaxCloNumOfSurfaces, VentSlab( Item ).NumOfSurfaces );
 				VentSlab( Item ).SurfaceName( 1 ) = VentSlab( Item ).SurfListName;
-				VentSlab( Item ).SurfacePtr( 1 ) = FindItemInList( VentSlab( Item ).SurfaceName( 1 ), Surface.Name(), TotSurfaces );
+				VentSlab( Item ).SurfacePtr( 1 ) = FindItemInList( VentSlab( Item ).SurfaceName( 1 ), Surface );
 				VentSlab( Item ).SurfaceFlowFrac( 1 ) = 1.0;
 				// Error checking for single surfaces
 				if ( VentSlab( Item ).SurfacePtr( 1 ) == 0 ) {
@@ -967,7 +965,7 @@ namespace VentilatedSlab {
 
 			VentSlab( Item ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 34 )) {
-				VentSlab( Item ).HVACSizingIndex = FindItemInList( cAlphaArgs( 34 ), ZoneHVACSizing.Name(), NumZoneHVACSizing);
+				VentSlab( Item ).HVACSizingIndex = FindItemInList( cAlphaArgs( 34 ), ZoneHVACSizing );
 				if (VentSlab( Item ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 34 ) + " = " + cAlphaArgs( 34 ) + " not found." );
 					ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " = " + VentSlab( Item ).Name );
@@ -4063,7 +4061,7 @@ namespace VentilatedSlab {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

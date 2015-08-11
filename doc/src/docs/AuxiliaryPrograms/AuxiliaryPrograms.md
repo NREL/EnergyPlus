@@ -3818,7 +3818,7 @@ Weather data for Israel locations developed by Faculty of Civil and Environmenta
 
 RMY Australia Representative Meteorological Year Climate Files Developed for the Australia Greenhouse Office for use in complying with Building Code of Australia. These data are licensed through ACADS BSG Ltd for use by EnergyPlus users. For use in any other formats, users must contact ACADS BSG Ltd for licensing information.
 
-The RMY data are © 2006 Commonwealth of Australia, Department of the Environment and Water Resources, Australia Greenhouse Office, Canberra, ACT, Australia. [www.greenhouse.gov.au/buildings/code.html](http://www.greenhouse.gov.au/buildings/code.html) All intellectual property rights reserved.
+The RMY data are © 2006 Commonwealth of Australia, Department of the Environment and Water Resources, Australia Greenhouse Office, Canberra, ACT, Australia. [www.greenhouse.gov.au/buildings/code.html](https://web.archive.org/web/20070608213812/http://www.greenhouse.gov.au/buildings/code.html) (URL has since been removed, so replaced with a link on The Internet Archive from 2007.)  All intellectual property rights reserved.
 
 ### Iranian Typical Meteorological Year (ITMY)
 

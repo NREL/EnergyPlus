@@ -220,7 +220,7 @@ namespace PackagedTerminalHeatPump {
 
 		// Find the correct packaged terminal heat pump
 		if ( CompIndex == 0 ) {
-			PTUnitNum = FindItemInList( CompName, PTUnit.Name(), NumPTUs );
+			PTUnitNum = FindItemInList( CompName, PTUnit );
 			if ( PTUnitNum == 0 ) {
 				ShowFatalError( "SimPackagedTerminalUnit: Unit not found=" + CompName );
 			}
@@ -530,7 +530,6 @@ namespace PackagedTerminalHeatPump {
 		using DataHVACGlobals::WaterConstant;
 		using DataHVACGlobals::WaterConstantOnDemand;
 		using SingleDuct::GetATMixer;
-		using DataSizing::NumZoneHVACSizing;
 		using DataSizing::ZoneHVACSizing;
 
 		// Locals
@@ -661,7 +660,7 @@ namespace PackagedTerminalHeatPump {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PTUnit.Name(), PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PTUnit, PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -1162,7 +1161,7 @@ namespace PackagedTerminalHeatPump {
 
 			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 18 )) {
-				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 18 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
+				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 18 ), ZoneHVACSizing );
 				if (PTUnit( PTUnitNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 18 ) + " = " + Alphas( 18 ) + " not found.");
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
@@ -1276,7 +1275,7 @@ namespace PackagedTerminalHeatPump {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PTUnit.Name(), PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PTUnit, PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -1716,7 +1715,7 @@ namespace PackagedTerminalHeatPump {
 
 			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 16 ) ) {
-				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 16 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
+				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 16 ), ZoneHVACSizing );
 				if ( PTUnit( PTUnitNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 16 ) + " = " + Alphas( 16 ) + " not found." );
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
@@ -1822,7 +1821,7 @@ namespace PackagedTerminalHeatPump {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PTUnit.Name(), PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PTUnit, PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -2166,7 +2165,7 @@ namespace PackagedTerminalHeatPump {
 
 			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 20 ) ) {
-				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 20 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
+				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 20 ), ZoneHVACSizing );
 				if (PTUnit( PTUnitNum ).HVACSizingIndex == 0 ) {
 					ShowSevereError( cAlphaFields( 20 ) + " = " + Alphas( 20 ) + " not found." );
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
@@ -6650,7 +6649,7 @@ namespace PackagedTerminalHeatPump {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
