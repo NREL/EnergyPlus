@@ -1423,16 +1423,12 @@ namespace RoomAirModelManager {
 		int thisAirNodeinZone;
 		int AlphaArgNum;
 		int AirCntrlNodeNum;
-		int thisSurfinZone;
-		int thisHBsurfID;
-		int numBaseNum;
 		int TotNumOfRAFNNodeSurfLists;
 		int TotNumOfRAFNNodeGainsLists;
 		int TotNumOfRAFNNodeHVACLists;
 		bool IntGainError;
 		int RAFNNodeNum;
 		bool foundList;
-		int zoneLoop;
 		int NumSurfsThisNode;
 		int NumOfSurfs;
 		int SurfCount;
@@ -1445,7 +1441,6 @@ namespace RoomAirModelManager {
 		int numEquip;
 		int EquipLoop;
 		int TotNumEquip;
-		int EquipNum;
 		bool IntEquipError;
 		Real64 SumFraction;
 		std::string Name;

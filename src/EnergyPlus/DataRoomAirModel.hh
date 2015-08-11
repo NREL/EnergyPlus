@@ -1194,6 +1194,8 @@ namespace DataRoomAirModel {
 		Real64 NonAirSystemResponse; // sum of convective system load 
 		Real64 SysDepZoneLoadsLagged; // sum of system lagged load
 		Real64 SysDepZoneLoadsLaggedOld; // sum of system lagged load
+		Real64 AirCap; // Air storage term for energy balalce at each node
+		Real64 AirHumRat; // Air storage term for moisture balalce at each node
 		// latent moisture balance terms for node
 		Real64 SumIntLatentGain; // rate of heat gain form internal latent gains(after fraction)
 		Real64 SumHmAW; // sum of AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
@@ -1201,8 +1203,6 @@ namespace DataRoomAirModel {
 		Real64 SumHmARaW; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ratio
 		Real64 SumLinkM; // sum of mdor for incoming airflows for this node derived from the AirflowNetwork model
 		Real64 SumLinkMW; // sum of mdor*Cp*T for incoming airflows and source humidity ratio for this node derived from the AirflowNetwork model 
-		Real64 AirCap; // Air storage term for energy balalce at each node
-		Real64 AirHumRat; // Air storage term for moisture balalce at each node
 
 		// Default Constructor
 		RoomAirflowNetworkAirNodeNestedStruct( ) :
@@ -1257,7 +1257,7 @@ namespace DataRoomAirModel {
 			SysDepZoneLoadsLagged( 0.0 ),
 			SysDepZoneLoadsLaggedOld( 0.0 ),
 			AirCap( 0.0 ),
-		    AirHumRat( 0.0 ), 
+			AirHumRat( 0.0 ),
 			//latent moisture balance terms for node
 			SumIntLatentGain( 0.0 ), // rate of heat gain form internal latent gains(after fraction)
 			SumHmAW( 0.0 ), // sum of AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
@@ -1265,7 +1265,7 @@ namespace DataRoomAirModel {
 			SumHmARaW( 0.0 ), // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ratio
 			SumLinkM( 0.0 ),
 			SumLinkMW( 0.0 )
-		{}
+			{}
 
 		// Member Constructor
 		RoomAirflowNetworkAirNodeNestedStruct(
@@ -1313,7 +1313,7 @@ namespace DataRoomAirModel {
 			Real64 const HumRatDSX2, // node air humidity ratio at t minus 2 system timestep
 			Real64 const HumRatDSX3, // node air humidity ratio at t minus 3 system timestep
 			Real64 const HumRatDSX4, // node air humidity ratio at t minus 4 system timestep
-			Real64 const HumRatpW1, // node air humidity ratio at the previous time step used in Exact and Euler method
+			Real64 const HumRatW1, // node air humidity ratio at the previous time step used in Exact and Euler method
 			Real64 const HumRatWMX, // temporary node air humidity ratio to test convergence used in Exact and Euler method
 			Real64 const HumRatWM2, // node air humidity ratio at time step t-2 used in Exact and Euler method
 			Real64 const RelHumidity, // node air relative humidity
@@ -1332,8 +1332,8 @@ namespace DataRoomAirModel {
 			Real64 const SysDepZoneLoadsLagged, // sum of system lagged load
 			Real64 const SysDepZoneLoadsLaggedOld, // sum of system lagged load
 			Real64 const AirCap, // Air storage term for energy balalce at each node
-		    Real64 const AirHumRat, // Air storage term for moisture balalce at each node
-		// latent moisture balance terms for node
+			Real64 const AirHumRat, // Air storage term for moisture balalce at each node
+			// latent moisture balance terms for node
 			Real64 const SumIntLatentGain, // rate of heat gain form internal latent gains(after fraction)
 			Real64 const SumHmAW, // sum of AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
 			Real64 const SumHmARa, // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
@@ -1355,9 +1355,9 @@ namespace DataRoomAirModel {
 			NodeHVACListName( NodeHVACListName ), // name of node's HVAC list
 			HasHVACAssigned( HasHVACAssigned ), // True if HVAC systems are assigned to this node
 			NumHVACs( NumHVACs ), // Number of HVAC systems
-			HVAC( ), // HVAC struct
-			AirflowNetworkNodeID( ), // pointer to AirflowNetworkNodeData structure
-			NumOfAirflowLinks( ), // Number of intra zone links
+			HVAC( HVAC ), // HVAC struct
+			AirflowNetworkNodeID( AirflowNetworkNodeID ), // pointer to AirflowNetworkNodeData structure
+			NumOfAirflowLinks( NumOfAirflowLinks ), // Number of intra zone links
 			Link( Link ), // Linkage struct
 			AirVolume( AirVolume ), // air volume in control volume associated with this node(m3 / s)
 			RhoAir( RhoAir ), // current density of air for nodal control volume

@@ -283,14 +283,6 @@ namespace RoomAirModelAirflowNetwork {
 		static bool MyOneTimeFlag( true );  // one time setup flag
 		static bool MyOneTimeFlagConf( true ); // one time setup flag for zone configuration
 		static bool MyEnvrnFlag( true ); // one time setup flag for zone configuration
-		Real64 SumIntGain; // entire zone's sum for internal gains.
-		Real64 SumHA;
-		Real64 SumHATsurf;
-		Real64 SumHATref;
-		Real64 SumMCpDummy;
-		Real64 SumMCpTDummy;
-		Real64 SumSysMCpDummy;
-		Real64 SumSysMCpTDummy;
 		Real64 SumLinkMCp;
 		Real64 SumLinkMCpT;
 		int linkNum;
@@ -309,7 +301,6 @@ namespace RoomAirModelAirflowNetwork {
 		int IdZone;
 		int IdNode;
 		int EquipLoop;
-		int IdEquipIndex;
 		int MaxNodeNum;
 		Array1D_bool NodeFound; // True if a node is found.
 		int MaxEquipNum;
@@ -628,7 +619,6 @@ namespace RoomAirModelAirflowNetwork {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//unused    INTEGER    :: thisZoneInfo
-		Real64 AvailTest;
 		Real64 H2OHtOfVap;
 		Real64 HumRatTmp;
 		Real64 NodeTempX1;
@@ -762,7 +752,6 @@ namespace RoomAirModelAirflowNetwork {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int ZoneNodeNum; // system node array index
 		int AirNodeNum; // nested node structure index
 		int I;
 		int LoopAirNode;
@@ -1426,7 +1415,7 @@ namespace RoomAirModelAirflowNetwork {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		Real64 const TolValue( .0001 );
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
