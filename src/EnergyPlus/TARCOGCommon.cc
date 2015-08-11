@@ -133,42 +133,29 @@ namespace TARCOGCommon {
 	void
 	matrixQBalance(
 		int const nlayer,
-		Array2A< Real64 > a,
-		Array1A< Real64 > b,
-		Array1A< Real64 > const scon,
-		Array1A< Real64 > const thick,
-		Array1A< Real64 > const hcgas,
+		Array2< Real64 > & a,
+		Array1< Real64 > & b,
+		Array1< Real64 > const & scon,
+		Array1< Real64 > const & thick,
+		Array1< Real64 > const & hcgas,
 		Real64 const hcout,
 		Real64 const hcin,
-		Array1A< Real64 > const asol,
-		Array1A< Real64 > const qv,
+		Array1< Real64 > const & asol,
+		Array1< Real64 > const & qv,
 		Real64 const Tin,
 		Real64 const Tout,
 		Real64 const Gin,
 		Real64 const Gout,
-		Array1A< Real64 > const theta,
-		Array1A< Real64 > const tir,
-		Array1A< Real64 > const rir,
-		Array1A< Real64 > const emis
+		Array1< Real64 > const & theta,
+		Array1< Real64 > const & tir,
+		Array1< Real64 > const & rir,
+		Array1< Real64 > const & emis
 	)
 	{
 
 		// Using/Aliasing
 		using DataGlobals::StefanBoltzmann;
 		using namespace TARCOGParams;
-
-		// Argument array dimensioning
-		a.dim( 4*nlayer, 4*nlayer );
-		b.dim( 4*nlayer );
-		scon.dim( maxlay );
-		thick.dim( maxlay );
-		hcgas.dim( maxlay1 );
-		asol.dim( maxlay );
-		qv.dim( maxlay1 );
-		theta.dim( maxlay2 );
-		tir.dim( maxlay2 );
-		rir.dim( maxlay2 );
-		emis.dim( maxlay2 );
 
 		// Locals
 		// local variables
@@ -250,8 +237,8 @@ namespace TARCOGCommon {
 
 	void
 	EquationsSolver(
-		Array2A< Real64 > a,
-		Array1A< Real64 > b,
+		Array2< Real64 > & a,
+		Array1< Real64 > & b,
 		int const n,
 		int & nperr,
 		std::string & ErrorMessage
@@ -271,10 +258,6 @@ namespace TARCOGCommon {
 		// Using/Aliasing
 		using namespace TARCOGParams;
 
-		// Argument array dimensioning
-		a.dim( n, n );
-		b.dim( n );
-
 		// Locals
 		Array1D_int indx( n );
 		Real64 d;
@@ -290,21 +273,19 @@ namespace TARCOGCommon {
 
 	void
 	ludcmp(
-		Array2A< Real64 > a,
+		Array2< Real64 > & a,
 		int const n,
-		Array1A_int indx,
+		Array1_int & indx,
 		Real64 & d,
 		int & nperr,
 		std::string & ErrorMessage
 	)
 	{
 
-		// Argument array dimensioning
-		a.dim( n, n );
-		indx.dim( n );
-
 		// Locals
-		int const NMAX( 500 );
+		static int const NMAX( 500 );
+		static Array1D< Real64 > vv( NMAX );
+
 		Real64 const TINY( 1.0e-20 );
 
 		int i;
@@ -314,7 +295,6 @@ namespace TARCOGCommon {
 		Real64 aamax;
 		Real64 dum;
 		Real64 sum;
-		Array1D< Real64 > vv( NMAX );
 
 		d = 1.0;
 		for ( i = 1; i <= n; ++i ) {
