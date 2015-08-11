@@ -172,6 +172,8 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
+		void calculate();
+
 	};
 
 	struct DefineSchedDualSetPointManager // Derived type for Scheduled Dual Setpoint Manager
@@ -199,6 +201,8 @@ namespace SetPointManager {
 			SetPtHi( 0.0 ),
 			SetPtLo( 0.0 )
 		{}
+
+		void calculate();
 
 	};
 
@@ -238,6 +242,11 @@ namespace SetPointManager {
 			NumCtrlNodes( 0 ),
 			SetPt( 0.0 )
 		{}
+
+		void calculate(
+			Optional_int_const NodeNum = _, // When Init Calls this routine, it passes the cur node number
+			Optional_bool_const InitFlag = _ // When Init Calls this routine, it passes True
+		);
 
 	};
 
@@ -283,6 +292,8 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
+		void calculate();
+
 	};
 
 	struct DefineSZHeatingSetPointManager // Derived type for the Single Zone Heating Setpoint Manager data
@@ -312,6 +323,8 @@ namespace SetPointManager {
 			NumCtrlNodes( 0 ),
 			SetPt( 0.0 )
 		{}
+
+		void calculate();
 
 	};
 
@@ -343,6 +356,8 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
+		void calculate();
+
 	};
 
 	struct DefineSZMinHumSetPointManager // Derived Type for Single Zone Minimum Humidity Setpoint Manager data
@@ -367,6 +382,8 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
+		void calculate();
+
 	};
 
 	struct DefineSZMaxHumSetPointManager // Derived Type for Single Zone Maximum Humidity Setpoint Manager data
@@ -390,6 +407,8 @@ namespace SetPointManager {
 			NumCtrlNodes( 0 ),
 			SetPt( 0.0 )
 		{}
+
+		void calculate();
 
 	};
 
@@ -417,6 +436,8 @@ namespace SetPointManager {
 			SetPt( 0.0 ),
 			MySetPointCheckFlag( true )
 		{}
+
+		void calculate();
 
 	};
 
@@ -455,6 +476,8 @@ namespace SetPointManager {
 			MySetPointCheckFlag( true )
 		{}
 
+		void calculate();
+
 	};
 
 	struct DefineWarmestSetPointManager
@@ -484,6 +507,8 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
+		void calculate();
+
 	};
 
 	struct DefineColdestSetPointManager
@@ -512,6 +537,8 @@ namespace SetPointManager {
 			NumCtrlNodes( 0 ),
 			SetPt( 0.0 )
 		{}
+
+		void calculate();
 
 	};
 
@@ -550,6 +577,8 @@ namespace SetPointManager {
 			SimReady( false )
 		{}
 
+		void calculate();
+
 	};
 
 	struct DefRABFlowSetPointManager
@@ -587,6 +616,8 @@ namespace SetPointManager {
 			AllSetPtMgrIndex( 0 )
 		{}
 
+		void calculate();
+
 	};
 
 	struct DefMultiZoneAverageCoolingSetPointManager // derived type for SetpointManager:Multizone:Cooling:Average data
@@ -612,6 +643,8 @@ namespace SetPointManager {
 			NumCtrlNodes( 0 ),
 			SetPt( 0.0 )
 		{}
+
+		void calculate();
 
 	};
 
@@ -639,6 +672,8 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
+		void calculate();
+
 	};
 
 	struct DefMultiZoneAverageMinHumSetPointManager // derived type for SetpointManager:MultiZone:MinimumHumidity:Average data
@@ -664,6 +699,8 @@ namespace SetPointManager {
 			NumCtrlNodes( 0 ),
 			SetPt( 0.0 )
 		{}
+
+		void calculate();
 
 	};
 
@@ -691,6 +728,8 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
+		void calculate();
+
 	};
 
 	struct DefMultiZoneMinHumSetPointManager // derived type for SetpointManager:MultiZone:Humidity:Minimum data
@@ -717,6 +756,8 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
+		void calculate();
+
 	};
 
 	struct DefMultiZoneMaxHumSetPointManager // derived type for SetpointManager:MultiZone:Humidity:Maximum data
@@ -742,6 +783,8 @@ namespace SetPointManager {
 			NumCtrlNodes( 0 ),
 			SetPt( 0.0 )
 		{}
+
+		void calculate();
 
 	};
 
@@ -770,6 +813,8 @@ namespace SetPointManager {
 			NumCtrlNodes( 0 ),
 			SetPt( 0.0 )
 		{}
+
+		void calculate();
 
 	};
 
@@ -800,6 +845,8 @@ namespace SetPointManager {
 			NumCtrlNodes( 0 ),
 			SetPt( 0.0 )
 		{}
+
+		void calculate();
 
 	};
 
@@ -832,6 +879,8 @@ namespace SetPointManager {
 			NumCtrlNodes( 0 ),
 			SetPt( 0.0 )
 		{}
+
+		void calculate();
 
 	};
 
@@ -882,6 +931,8 @@ namespace SetPointManager {
 			TypeNum( 0 )
 		{}
 
+		void calculate();
+
 	};
 
 	struct DefineIdealCondEntSetPointManager // derived type for SetpointManager:CondenserEnteringReset:Ideal data
@@ -915,6 +966,7 @@ namespace SetPointManager {
 		int CondPumpBranchNum; // condenser branch number for pump
 		int ChilledPumpNum; // chilled water pump number
 		int ChilledPumpBranchNum; // chilled water branch number for pump
+		bool SetupIdealCondEntSetPtVars; // flag for initialization of meters and such
 
 		// Default Constructor
 		DefineIdealCondEntSetPointManager() :
@@ -941,8 +993,13 @@ namespace SetPointManager {
 			CondPumpNum( 0 ),
 			CondPumpBranchNum( 0 ),
 			ChilledPumpNum( 0 ),
-			ChilledPumpBranchNum( 0 )
+			ChilledPumpBranchNum( 0 ),
+			SetupIdealCondEntSetPtVars( true )
 		{}
+
+		void calculate();
+
+		void SetupMeteredVarsForSetPt();
 
 	};
 
@@ -972,6 +1029,8 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
+		void calculate();
+
 	};
 
 	struct DefineSZOneStageHeatingSetPointManager // Derived type for the Single Zone One Stage Heating Setpoint Manager data
@@ -999,6 +1058,8 @@ namespace SetPointManager {
 			NumCtrlNodes( 0 ),
 			SetPt( 0.0 )
 		{}
+
+		void calculate();
 
 	};
 
@@ -1120,93 +1181,93 @@ namespace SetPointManager {
 	void
 	SimSetPointManagers();
 
-	void
-	CalcScheduledSetPoint( int & SetPtMgrNum );
+	//void
+	//CalcScheduledSetPoint( int & SetPtMgrNum );
 
-	void
-	CalcScheduledDualSetPoint( int & SetPtMgrNum );
+	//void
+	//CalcScheduledDualSetPoint( int & SetPtMgrNum );
 
-	void
-	CalcOutsideAirSetPoint(
-		int & SetPtMgrNum,
-		Optional_int_const NodeNum = _, // When Init Calls this routine, it passes the cur node number
-		Optional_bool_const InitFlag = _ // When Init Calls this routine, it passes True
-	);
+	//void
+	//CalcOutsideAirSetPoint(
+		//int & SetPtMgrNum,
+		//Optional_int_const NodeNum = _, // When Init Calls this routine, it passes the cur node number
+		//Optional_bool_const InitFlag = _ // When Init Calls this routine, it passes True
+	//);
 
-	void
-	CalcSingZoneRhSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcSingZoneRhSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcSingZoneHtSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcSingZoneHtSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcSingZoneClSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcSingZoneClSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcSZOneStageCoolingSetPt( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcSZOneStageCoolingSetPt( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcSZOneStageHeatingSetPt( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcSZOneStageHeatingSetPt( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcSingZoneMinHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcSingZoneMinHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcSingZoneMaxHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcSingZoneMaxHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcMixedAirSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcMixedAirSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcOAPretreatSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcOAPretreatSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcWarmestSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcWarmestSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcColdestSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcColdestSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcWarmestSetPointTempFlow( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcWarmestSetPointTempFlow( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcRABFlowSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcRABFlowSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcMultiZoneAverageHeatingSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcMultiZoneAverageHeatingSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcMultiZoneAverageCoolingSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcMultiZoneAverageCoolingSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcMultiZoneAverageMinHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcMultiZoneAverageMinHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcMultiZoneAverageMaxHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcMultiZoneAverageMaxHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcMultiZoneMinHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcMultiZoneMinHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcMultiZoneMaxHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcMultiZoneMaxHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcFollowOATempSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcFollowOATempSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcFollowSysNodeTempSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcFollowSysNodeTempSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcGroundTempSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
+	//void
+	//CalcGroundTempSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
 
-	void
-	CalcCondEntSetPoint( int const SetPtMgrNum ); // number of the current set point manager being simulated
+	//void
+	//CalcCondEntSetPoint( int const SetPtMgrNum ); // number of the current set point manager being simulated
 
-	void
-	CalcIdealCondEntSetPoint( int const SetPtMgrNum ); // number of the current set point manager being simulated
+	//void
+	//CalcIdealCondEntSetPoint( int const SetPtMgrNum ); // number of the current set point manager being simulated
 
-	void
-	SetupMeteredVarsForSetPt( int const SetPtMgrNum ); // number of this setpoint manager (only Ideal Cond Reset)
+	//void
+	//SetupMeteredVarsForSetPt( int const SetPtMgrNum ); // number of this setpoint manager (only Ideal Cond Reset)
 
 	void
 	UpdateSetPointManagers();
