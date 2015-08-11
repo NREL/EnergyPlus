@@ -196,12 +196,12 @@ namespace SortAndStringUtilities {
 		while ( true ) {
 			--j;
 			while ( true ) {
-				if ( Alphas( j ) <= cpivot ) break;
+				if ( lessthani(Alphas( j ), cpivot ) || equali(Alphas(j), cpivot)) break;
 				--j;
 			}
 			++i;
 			while ( true ) {
-				if ( Alphas( i ) >= cpivot ) break;
+				if ( lessthani(cpivot, Alphas( i )) || equali(cpivot, Alphas(i))) break;
 				++i;
 			}
 			if ( i < j ) { // Swap the strings at index i and j
