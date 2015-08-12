@@ -55,6 +55,7 @@ set( test_src
   SwimmingPool.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
+  VentilatedSlab.unit.cc
   WaterCoils.unit.cc
   WaterThermalTanks.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
