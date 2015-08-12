@@ -335,6 +335,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 CompMaxDeltaP;         	    // XP_maximum compressor delta P
 		Real64 RefPipDia;         	        // XP_diameter of refrigerant pipe that links the outdoor unit to the indoor units
 		Real64 RefPipLen;         	        // XP_length of refrigerant pipe that links the outdoor unit to the indoor units
+		Real64 RefPipEquLen;         	    // XP_Equivilent length of refrigerant pipe for pressure drop calculations
 		Real64 RefPipHei;         	        // XP_height of refrigerant pipe that links the outdoor unit to the indoor units
 		Real64 RefPipInsThi;   	            // XP_thickness of refrigerant pipe insulation
 		Real64 RefPipInsCon;   	            // XP_thermal conductivity of refrigerant pipe insulation
@@ -541,7 +542,8 @@ namespace HVACVariableRefrigerantFlow {
 			CoeffCdeltaToutHeat( 0.0 ),	             		 
 			CompMaxDeltaP( 0.0 ),         	                     
 			RefPipDia( 0.0 ),         	                         
-			RefPipLen( 0.0 ),         	                         
+			RefPipLen( 0.0 ),         	           
+			RefPipEquLen( 0.0 ),
 			RefPipHei( 0.0 ),       	                         
 			RefPipInsThi( 0.0 ),
 			RefPipInsCon( 0.0 ),
@@ -757,6 +759,7 @@ namespace HVACVariableRefrigerantFlow {
 			Real64 const CompMaxDeltaP,         	   
 			Real64 const RefPipDia,         	       
 			Real64 const RefPipLen,         	       
+			Real64 const RefPipEquLen,
 			Real64 const RefPipHei,         	       
 			Real64 const RefPipInsThi,   	           
 			Real64 const RefPipInsCon,   	           
@@ -968,7 +971,8 @@ namespace HVACVariableRefrigerantFlow {
 			CoeffCdeltaToutHeat( CoeffCdeltaToutHeat ),	       
 			CompMaxDeltaP( CompMaxDeltaP ),         	   
 			RefPipDia( RefPipDia ),         	       
-			RefPipLen( RefPipLen ),         	       
+			RefPipLen( RefPipLen ),         	
+			RefPipEquLen( RefPipEquLen ),			
 			RefPipHei( RefPipHei ),         	       
 			RefPipInsThi( RefPipInsThi ),   	           
 			RefPipInsCon( RefPipInsCon ),   	           
