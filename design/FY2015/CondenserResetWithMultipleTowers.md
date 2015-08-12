@@ -1,0 +1,130 @@
+Adding Support for Multiple Cooling Towers in Condenser Entering Temp Reset Setpoint Managers
+---------------------------------------------------------------------------------------------
+
+This will add implementation for using multiple cooling towers into the following existing setpoint managers:
+
+ - SetpointManager:CondenserEnteringReset
+ - SetpointManager:CondenserEnteringReset:Ideal
+ 
+These setpoint managers are intended to minimize plant energy use by adjusting the condenser setpoint temperature.  The first uses user-defined curve fit expressions to determine a reset temperature.  The second uses a search technique to re-simulate the plant and find the minimum energy point.
+
+# Justification
+
+The current implementation requires a strict topology of a single chiller on the chilled water loop, and a single cooling tower on the condenser loop.  This is highly restrictive for users interested in using this embedded low energy control technique.  The addition of support for multiple towers has been requested by Carrier to ensure their adoption of EnergyPlus.
+
+# Expected Outcome
+
+The final outcome of this new feature is the ability to control (via resetting the setpoint temperature) multiple cooling towers.  This work is not intended to make changes to the setpoint manager operation/algorithms except where required to allow multiple towers.  Thus I won't be evaluating whether the setpoint managers are actually maintaining the lowest energy state.
+
+# Expected Approach
+
+Development of this will involve a few steps which will approximately follow this pattern (with review happening in several phases):
+
+  1. Investigate the current object implementation in terms of documentation and source code
+  2. Determine if any input changes are required
+  3. Determine if there is any code restructuring necessary/desired
+  4. Determine expected changes to be made in the code (i.e. create a design)
+  5. Create tests (unit/integration) that demonstrate the deficiency
+  6. Make code changes to implement new feature
+
+## Plan
+
+The detailed plan for completing this new feature falls into four categories: refactoring (prep) work, core code changes, supplemental code changes, and testing.
+
+### Refactoring
+
+Some refactoring will be performed in SetPointManager:
+
+ - Delete member constructors, they aren't used
+ - Pull global ```Calc*()``` functions into calculate() member functions for each SetPointManager class
+
+### Core Code Changes
+
+Code changes for this new feature:
+ 
+ - With the SetpointManager:CondenserEnteringReset implementation, it isn't clear why it doesn't support multiple towers, so long as the effect of multiple towers are included in the user-defined curves
+ - With the SetpointManager:CondenserEnteringReset:Ideal implementation, at a minimum the tower energy variables will need to be transformed into vectors, possibly additional work revealed during implementation and testing
+ - Unit tests will be added
+
+### Additional code changes
+
+ - While working on this task, I anticipate removing the dependence on the SystemReports/OutputProcessor interface, and instead rely on specific GetEnergy* functions implemented in each support object (chiller/pump/tower).
+
+### Testing
+
+ - Unit tests will be added to support the changes in the source code.
+ - At least one new example file will be added to demonstrate this feature
+ - Simulation output will be evaluated to verify operation is as expected
+
+# Researching Existing Modules
+
+## SetpointManager:CondenserEnteringReset
+### Purpose
+  - resets entering water temp setpoint to optimal setpoint temp resulting in minimum net energy consumption.
+### Overview
+  - uses one curve for optimum condenser ewt and two other curves for bcs on the optimized sp value
+### Inputs
+  - default entering temperature reset schedule
+  - minimum design wet-bulb temperature curve name: T = f(OutdoorWetBulb, WeightedPLR, TowerDesignWB, CondenserFlowPerCapacity)
+  - minimum outside wet-bulb temperature curve name: T = f(MinDesignWetBulb, WeightedPLR, TowerDesignWB, CondenserFlowPerCapacity)
+  - optimized condenser entering temp curve name: T = f(OutdoorWetBulb, WeightedPLR, TowerDesignWB, CondenserFlowPerCapacity)
+  - minimum lift
+  - max condenser entering temp
+  - cooling tower deisgn inlet air wet-bulb temp
+### Eng Ref
+  - calculate WPLR = current chiller cooling load / nominal chiller capacity
+  - calculate normalized flow per capacity = design tower flow rate / design tower capacity
+  - use curve to calculate MinDesignWB, MinActualWB, OptCondEntTemp
+  - if OptCondEntTemp out of bounds from MinDesignWB and MinActualWB, use the default value from the schedule, otherwise use OptCondEntTemp
+### Source code
+  - hardwire des condenser flow per ton -- why?
+  - recall a few parameters
+  - get chiller load from PL.LS.BR.CP.MyLoad
+  - check type of chiller and assign TempDesCondIn and TempEvapOutDesign
+  - constrain min cond setpoint and entering cond temp
+  - store design load and actual load
+  - (referencing vectors, but only operating on scalars)
+  - if chiller load is zero use design value
+  - calculate weighted load ratio
+  - get curve values
+  - calculate setpoint based on conditions
+### Simulation output
+  - (use this section for determining outputs for testing/evaluation, and also trying out multiple towers)
+ 
+## SetpointManager:CondenserEnteringReset:Ideal
+### Purpose
+  - determines near-optimal condenser water entering setpoint resulting in minimum net energy consumption
+### Overview
+  - uses a search algorithm to find ideal setpoint at a given time step
+### Inputs:
+  - minimum lift
+  - max condenser entering temp
+### Eng Ref:
+  - requires resimulating HVAC systems at each timestep until optimal condition (minimum total chiller, tower, chw pump, and cond pump power, aka TEC)
+  - minimum bound = f(MinimumLift[user], EvaporatorLeavingTemp)
+  - maximum bound = Maximum[user]
+  - assumption: single minimum exists between those boundaries
+  - procedure:
+    + Set initial setpoint value at user defined max; calculate TEC
+    + Decreate setpoint by 1C; calculate TEC
+    + Compare TEC1, TEC2
+    + If TEC1 is smaller, we can't get better given assumption above, so quit here
+    + Otherwise, simple search until minimum is hit
+### Source code:
+  - first time through, initialize meters and variable pointers
+  - only operate if RunOptCondEntTemp
+  - get chiller load from PL.LS.BR.CP.MyLoad
+  - if curload > 0 do the rest
+  - retrieve evap outlet temp to calculate CondTempLimit (upper bound)
+  - get chiller energy, chw pump energy, tower fan energy, and cond pump energy to calculate total energy usage (uses GetInternalVariableValue)
+  - check TotEnergyPre (the value from the last time through????)
+  - if it was non-zero, we are now in a correction phase, so:
+    - calculate delta energy and adjust the setpoint search
+  - if it was zero, we are starting over, so:
+    - move setpoint down by 1, store energy as TotEnergyPre
+    - set RunOptCondEntTemp to true
+### Source code outside of SetPointManager:
+  - DataGlobals::RunOptCondEntTemp
+  - in HVACManager, after SimHVAC call, if any ideal cond resets: while(RunOptCondEntTemp) {SimHVAC();}  
+### Simulation output
+  - (use this section for determining outputs for testing/evaluation, and also trying out multiple towers)

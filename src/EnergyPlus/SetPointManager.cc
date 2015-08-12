@@ -6485,8 +6485,6 @@ namespace SetPointManager {
 			Dsn_EntCondTemp = max( Dsn_EntCondTemp, TempDesCondIn );
 
 			// Load this array with the design capacity and actual load of each chiller this timestep
-			Des_Load = 0.0;
-			Act_Load = 0.0;
 			Des_Load = DesignClgCapacity_Watts;
 			Act_Load = CurrentLoad_Watts;
 
@@ -6630,13 +6628,6 @@ namespace SetPointManager {
 		static bool RunSubOptCondEntTemp( false );
 		static bool RunFinalOptCondEntTemp( false );
 		static bool firstTime( true );
-		static Array1D_bool SetupIdealCondEntSetPtVars;
-
-		//! Current timestep's condenser water entering setpoint
-		if ( firstTime ) {
-			SetupIdealCondEntSetPtVars.dimension( NumIdealCondEntSetPtMgrs, true );
-			firstTime = false;
-		}
 
 		InitCondWaterSetPoint = this->MaxCondEntTemp;
 		MinLiftTD = this->MinimumLiftTD;
