@@ -1,4 +1,4 @@
-// EnergyPlus::HVACUnitarySystem Unit Tests
+// EnergyPlus::FanCoilUnits Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -9,7 +9,6 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -23,31 +22,32 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/GlobalNames.hh>
 
 #include "Fixtures/HVACFixture.hh"
 
-using namespace EnergyPlus;
-using namespace EnergyPlus::FanCoilUnits;
 using namespace ObjexxFCL;
+using namespace EnergyPlus;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
-using namespace DataGlobals;
+using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataZoneEquipment;
-using namespace DataSizing;
-using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataHeatBalance;
-using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::WaterCoils;
+using namespace EnergyPlus::FanCoilUnits;
 using namespace EnergyPlus::Fans;
+using namespace EnergyPlus::GlobalNames;
+using namespace EnergyPlus::HeatBalanceManager;
+using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
-using General::TrimSigDigits;
+using namespace EnergyPlus::WaterCoils;
 using DataEnvironment::OutDryBulbTemp;
-using General::TrimSigDigits;
 using DataZoneEnergyDemands::ZoneSysEnergyDemand;
+using General::TrimSigDigits;
 using MixedAir::OAMixer;
+
 
 
 namespace EnergyPlus {
@@ -62,7 +62,7 @@ namespace EnergyPlus {
 		Real64 PartLoadRatio( 1.0 );
 		Real64 SpeedRatio( 0.0 );
 		Real64 QZnReq( 0.0 );
-		Real64 WaterMassFlowRate( 0.0 );
+		Real64 HotWaterMassFlowRate( 0.0 );
 		Real64 ColdWaterMassFlowRate( 0.0 );
 		Real64 QUnitOut( 0.0 );
 		Real64 AirMassFlow( 0.0 );
@@ -70,6 +70,8 @@ namespace EnergyPlus {
 
 		DataEnvironment::OutBaroPress = 101325.0;
 		DataEnvironment::StdRhoAir = 1.20;
+		WaterCoils::GetWaterCoilsInputFlag = true;
+		NumCoils = 0;
 
 		std::string const idf_objects = delimited_string( {
 			"	Version,8.3;",
@@ -200,8 +202,9 @@ namespace EnergyPlus {
 
 		AirMassFlow = 0.60;
 		MaxAirMassFlow = 0.60;
-		FanFlowRatio = 1.0;
-		WaterMassFlowRate = 1.0;
+		// heating load only
+		ColdWaterMassFlowRate = 0.0;
+		HotWaterMassFlowRate = 1.0;
 		
 		Node( OAMixer( 1 ).RetNode ).MassFlowRate = AirMassFlow;
 		Node( OAMixer( 1 ).RetNode ).MassFlowRateMax = MaxAirMassFlow;
@@ -220,7 +223,6 @@ namespace EnergyPlus {
 		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMax = MaxAirMassFlow;
 		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMaxAvail = MaxAirMassFlow;
 
-		// heating load only
 		FanCoil( 1 ).OutAirMassFlow = AirMassFlow;
 		FanCoil( 1 ).MaxAirMassFlow = MaxAirMassFlow;
 		Node( FanCoil( 1 ).OutsideAirNode ).MassFlowRateMax = MaxAirMassFlow;
@@ -255,12 +257,12 @@ namespace EnergyPlus {
 		Node( WaterCoil( 1 ).AirInletNodeNum ).MassFlowRateMaxAvail = AirMassFlow;
 
 		Node( WaterCoil( 1 ).WaterInletNodeNum ).Temp = 60.0;
-		Node( WaterCoil( 1 ).WaterInletNodeNum ).MassFlowRate = WaterMassFlowRate;
-		Node( WaterCoil( 1 ).WaterInletNodeNum ).MassFlowRateMaxAvail = WaterMassFlowRate;
-		Node( WaterCoil( 1 ).WaterOutletNodeNum ).MassFlowRate = WaterMassFlowRate;
-		Node( WaterCoil( 1 ).WaterOutletNodeNum ).MassFlowRateMaxAvail = WaterMassFlowRate;
-		WaterCoil( 1 ).InletWaterMassFlowRate = WaterMassFlowRate;
-		WaterCoil( 1 ).MaxWaterMassFlowRate = WaterMassFlowRate;
+		Node( WaterCoil( 1 ).WaterInletNodeNum ).MassFlowRate = HotWaterMassFlowRate;
+		Node( WaterCoil( 1 ).WaterInletNodeNum ).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+		Node( WaterCoil( 1 ).WaterOutletNodeNum ).MassFlowRate = HotWaterMassFlowRate;
+		Node( WaterCoil( 1 ).WaterOutletNodeNum ).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+		WaterCoil( 1 ).InletWaterMassFlowRate = HotWaterMassFlowRate;
+		WaterCoil( 1 ).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
 		for ( int l = 1; l <= TotNumLoops; ++l ) {
 			auto & loop( PlantLoop( l ) );
@@ -313,7 +315,6 @@ namespace EnergyPlus {
 		MyUAAndFlowCalcFlag( 2 ) = true;
 		DataGlobals::DoingSizing = true;
 
-
 		LocalTurnFansOff = false;
 		LocalTurnFansOn = true;
 		Fan( 1 ).AvailSchedPtrNum = DataGlobals::ScheduleAlwaysOn;
@@ -328,13 +329,14 @@ namespace EnergyPlus {
 
 		DataGlobals::DoingSizing = false;
 
-		FanCoil.deallocate();
-		ZoneSysEnergyDemand.deallocate();
 		PlantLoop.deallocate();
-		WaterCoil.allocate( 1 );
+		ZoneSysEnergyDemand.deallocate();
+		FanCoil.deallocate();
 		Node.deallocate();
+		WaterCoil.deallocate();
 		ZoneEquipConfig.deallocate();
 		Zone.deallocate();
+		CoilNames.deallocate();
 	}
 	TEST_F( HVACFixture, MultiStage4PipeFanCoilCoolingTest ) {
 
@@ -347,7 +349,7 @@ namespace EnergyPlus {
 		Real64 PartLoadRatio( 1.0 );
 		Real64 SpeedRatio( 0.0 );
 		Real64 QZnReq( 0.0 );
-		Real64 WaterMassFlowRate( 0.0 );
+		Real64 HotWaterMassFlowRate( 0.0 );
 		Real64 ColdWaterMassFlowRate( 0.0 );
 		Real64 QUnitOut( 0.0 );
 		Real64 AirMassFlow( 0.0 );
@@ -355,6 +357,8 @@ namespace EnergyPlus {
 
 		DataEnvironment::OutBaroPress = 101325.0;
 		DataEnvironment::StdRhoAir = 1.20;
+		WaterCoils::GetWaterCoilsInputFlag = true;
+		NumCoils = 0;
 
 		std::string const idf_objects = delimited_string( {
 			"	Version,8.3;",
@@ -483,10 +487,11 @@ namespace EnergyPlus {
 		TotNumLoops = 2;
 		PlantLoop.allocate( TotNumLoops );
 
-		//FanFlowRatio = 1.0;
 		AirMassFlow = 0.60;
 		MaxAirMassFlow = 0.60;
-		WaterMassFlowRate = 0.0;
+		
+		// cooling load only
+		HotWaterMassFlowRate = 0.0;
 		ColdWaterMassFlowRate = 1.0;
 
 		Node( OAMixer( 1 ).RetNode ).MassFlowRate = AirMassFlow;
@@ -506,7 +511,6 @@ namespace EnergyPlus {
 		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMax = MaxAirMassFlow;
 		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMaxAvail = MaxAirMassFlow;
 
-		// heating load only
 		FanCoil( 1 ).OutAirMassFlow = AirMassFlow;
 		FanCoil( 1 ).MaxAirMassFlow = MaxAirMassFlow;
 		Node( FanCoil( 1 ).OutsideAirNode ).MassFlowRateMax = MaxAirMassFlow;
@@ -541,12 +545,12 @@ namespace EnergyPlus {
 		Node( WaterCoil( 1 ).AirInletNodeNum ).MassFlowRateMaxAvail = AirMassFlow;
 
 		Node( WaterCoil( 1 ).WaterInletNodeNum ).Temp = 60.0;
-		Node( WaterCoil( 1 ).WaterInletNodeNum ).MassFlowRate = WaterMassFlowRate;
-		Node( WaterCoil( 1 ).WaterInletNodeNum ).MassFlowRateMaxAvail = WaterMassFlowRate;
-		Node( WaterCoil( 1 ).WaterOutletNodeNum ).MassFlowRate = WaterMassFlowRate;
-		Node( WaterCoil( 1 ).WaterOutletNodeNum ).MassFlowRateMaxAvail = WaterMassFlowRate;
-		WaterCoil( 1 ).InletWaterMassFlowRate = WaterMassFlowRate;
-		WaterCoil( 1 ).MaxWaterMassFlowRate = WaterMassFlowRate;
+		Node( WaterCoil( 1 ).WaterInletNodeNum ).MassFlowRate = HotWaterMassFlowRate;
+		Node( WaterCoil( 1 ).WaterInletNodeNum ).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+		Node( WaterCoil( 1 ).WaterOutletNodeNum ).MassFlowRate = HotWaterMassFlowRate;
+		Node( WaterCoil( 1 ).WaterOutletNodeNum ).MassFlowRateMaxAvail = HotWaterMassFlowRate;
+		WaterCoil( 1 ).InletWaterMassFlowRate = HotWaterMassFlowRate;
+		WaterCoil( 1 ).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
 		for ( int l = 1; l <= TotNumLoops; ++l ) {
 			auto & loop( PlantLoop( l ) );
@@ -612,13 +616,14 @@ namespace EnergyPlus {
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
 
 		DataGlobals::DoingSizing = false;
-		FanCoil.deallocate();
-		ZoneSysEnergyDemand.deallocate();
 		PlantLoop.deallocate();
-		WaterCoil.allocate( 1 );
+		ZoneSysEnergyDemand.deallocate();
+		FanCoil.deallocate();
 		Node.deallocate();
+		WaterCoil.deallocate();
 		ZoneEquipConfig.deallocate();
 		Zone.deallocate();
+		CoilNames.deallocate();
 
 	}
 }

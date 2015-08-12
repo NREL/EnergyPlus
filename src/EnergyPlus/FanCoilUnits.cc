@@ -687,8 +687,8 @@ namespace FanCoilUnits {
 				}
 			}
 			if ( FanCoil( FanCoilNum ).CapCtrlMeth == "MULTISTAGEFAN" ) {
-				FanCoil( FanCoilNum ).FanOpModeSchedPtr = GetScheduleIndex( Alphas( 17 ) );
 				if ( !lAlphaBlanks( 17 ) ) {
+					FanCoil( FanCoilNum ).FanOpModeSchedPtr = GetScheduleIndex( Alphas( 17 ) );
 					if ( FanCoil( FanCoilNum ).FanType_Num != FanType_SimpleOnOff ) {
 						ShowSevereError( CurrentModuleObject + " = " + FanCoil( FanCoilNum ).Name );
 						ShowContinueError( "For " + cAlphaFields( 17 ) + " = " + Alphas( 17 ) );
