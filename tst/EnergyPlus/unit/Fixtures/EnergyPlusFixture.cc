@@ -51,6 +51,8 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
 
 #include <fstream>
 #include <algorithm>
@@ -114,6 +116,8 @@ namespace EnergyPlus {
 		DataConvergParams::clear_state();
 		WeatherManager::clear_state();
 		OutputReportPredefined::clear_state();
+		DataZoneEnergyDemands::clear_state();
+		DataHeatBalFanSys::clear_state();
 
 		{ 
 			IOFlags flags; 

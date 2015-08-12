@@ -46,16 +46,10 @@
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
-
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-// following have not added clear_state yet
-
-//#include <EnergyPlus/ZoneEquipmentManager.hh>
-
-
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/PlantUtilities.hh>
