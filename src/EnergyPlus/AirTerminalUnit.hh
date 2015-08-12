@@ -70,12 +70,15 @@ public: // Creation
 protected: // Assignment
 
 	// Copy Assignment
-//	operator =( AirTerminalUnit const & ) = default;
+
+	AirTerminalUnit &
+	operator =( AirTerminalUnit const & ) = default;
 
 	// Move Assignment
-//#if !defined(_MSC_VER) || defined(__INTEL_COMPILER) || (_MSC_VER>=1900)
-//	operator =( AirTerminalUnit && ) = default;
-//#endif
+#if !defined(_MSC_VER) || defined(__INTEL_COMPILER) || (_MSC_VER>=1900)
+	AirTerminalUnit &
+	operator =( AirTerminalUnit && ) = default;
+#endif
 
 public: // Methods		REMOVE ANY OF THESE THAT AREN'T COMMON (WITH SAME ARGS) TO ALL SUB-TYPES
 
