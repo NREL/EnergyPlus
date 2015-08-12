@@ -1097,7 +1097,7 @@ namespace ExternalInterface {
 					if ( SameString( cAlphaArgs( 3 ), FMU( i ).Name ) ) {
 						Name_NEW = cAlphaArgs( 4 );
 						if ( ! SameString( Name_OLD, Name_NEW ) ) {
-							FOUND = FindItem( Name_NEW, checkInstanceName.Name(), NumFMUInputVariables );
+							FOUND = FindItem( Name_NEW, checkInstanceName );
 							if ( FOUND == 0 ) {
 								checkInstanceName( l ).Name = Name_NEW;
 								FMU( i ).NumInstances = j;
@@ -1256,7 +1256,7 @@ namespace ExternalInterface {
 							FMU( i ).Instance( j ).eplusOutputVariable( k ).VarKey = cAlphaArgs( 1 );
 							FMU( i ).Instance( j ).eplusOutputVariable( k ).Name = cAlphaArgs( 2 );
 							// verify whether we have duplicate FMU input variables in the idf
-							VerifyName( FMU( i ).Instance( j ).fmuInputVariable( k ).Name, FMU( i ).Instance( j ).checkfmuInputVariable.Name(), NumFMUInputVariables, IsNotOK, IsBlank, "The FMU input variable \"" + FMU( i ).Instance( j ).fmuInputVariable( k ).Name + "\" of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" has duplicates. Please check the input file again and delete duplicated entries." );
+							VerifyName( FMU( i ).Instance( j ).fmuInputVariable( k ).Name, FMU( i ).Instance( j ).checkfmuInputVariable, NumFMUInputVariables, IsNotOK, IsBlank, "The FMU input variable \"" + FMU( i ).Instance( j ).fmuInputVariable( k ).Name + "\" of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" has duplicates. Please check the input file again and delete duplicated entries." );
 							if ( IsNotOK ) {
 								ErrorsFound = true;
 								StopExternalInterfaceIfError();
@@ -2238,7 +2238,7 @@ namespace ExternalInterface {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
