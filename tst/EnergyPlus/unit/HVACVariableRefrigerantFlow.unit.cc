@@ -110,16 +110,27 @@ TEST_F( EnergyPlusFixture, VRFFluidTCtrlGetCoilInput )
        "     35.1,                    !- Released Heat by Indoor Unit Fan ",
        "     ,                        !- Name of Water Storage Tank for Co",
        "     0.0592,                  !- Indoor Unit Bypass Factor        ",
-       "     3;                       !- Superheating Set Point {C}       ",
+       "     3;                       !- Superheating Set Point {C}       "
 	});
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
 	
+	// Run the method
 	GetDXCoils();
 
+	// Check the results
     ASSERT_EQ( 1, NumDXCoils);
-	EXPECT_EQ( 32, DXCoil( 1 ).DXCoilType_Num );
-	EXPECT_EQ( 2200, DXCoil( 1 ).RatedTotCap( 1 ) );
+	EXPECT_EQ( DXCoil( 1 ).DXCoilType_Num, 32 );
+	EXPECT_EQ( DXCoil( 1 ).RatedTotCap( 1 ), 2200 );
+	EXPECT_EQ( DXCoil( 1 ).RatedSHR( 1 ), 0.865 );
+	EXPECT_EQ( DXCoil( 1 ).RatedAirVolFlowRate( 1 ), 0.1727 );
+	EXPECT_EQ( DXCoil( 1 ).C1Te, 0 );
+	EXPECT_EQ( DXCoil( 1 ).C2Te, 0.80404 );
+	EXPECT_EQ( DXCoil( 1 ).C3Te, 0 );
+	EXPECT_EQ( DXCoil( 1 ).Qfan, 35.1 );
+	EXPECT_EQ( DXCoil( 1 ).BF, 0.0592 );
+	EXPECT_EQ( DXCoil( 1 ).SH, 3 );
+
 }
 
 TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_FanSpdResidualCool )
@@ -309,6 +320,42 @@ TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CalcVRFIUAirFlow )
 	// Clean up
 	DXCoil.deallocate( ); 
 	ZoneSysEnergyDemand.deallocate( ); 
+}
+
+TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CalcVRFIUTeTc )
+{
+	// PURPOSE OF THIS TEST:
+	//   Test the method CalcVRFIUTeTc_FluidTCtrl, which determines the VRF evaporating temperature at 
+	//   cooling mode and the condensing temperature at heating mode.
+		
+	using namespace HVACVariableRefrigerantFlow;
+	
+	// Allocate
+	int NumVRFCondenser = 1;
+	VRF.allocate( NumVRFCondenser );
+	int NumTUList = 1;
+	TerminalUnitList.allocate( NumTUList );
+	
+	// Common Inputs
+	int IndexVRFCondenser = 1;
+	int IndexTUList = 1;
+
+	TerminalUnitList( IndexTUList ).NumTUInList = 2;
+
+	VRF( IndexVRFCondenser ).ZoneTUListPtr = 1;
+	VRF( IndexVRFCondenser ).Algorithm = 0;
+	VRF( IndexVRFCondenser ).EvapTempFixed = 3;
+	VRF( IndexVRFCondenser ).CondTempFixed = 5;
+	
+	// Run and Check 
+	CalcVRFIUTeTc_FluidTCtrl( IndexVRFCondenser );
+
+	EXPECT_EQ( VRF( IndexVRFCondenser ).MinEvaporatingTemp, 3 );
+	EXPECT_EQ( VRF( IndexVRFCondenser ).MaxCondensingTemp, 5 );
+
+	// Clean up
+	VRF.deallocate( ); 
+	TerminalUnitList.deallocate( ); 
 }
 
 }

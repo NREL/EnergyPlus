@@ -262,6 +262,10 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 QZnReq;
 		
 		// FLOW:
+		if ( EnergyPlus::DataEnvironment::DayOfMonth == 15 && EnergyPlus::DataGlobals::SimTimeSteps == 423 && !EnergyPlus::DataGlobals::WarmupFlag) {
+			int aaa = 1;
+		} //@@ 
+
 
 		// Obtains and Allocates VRF system related parameters from input file
 		if ( GetVRFInputFlag ) { //First time subroutine has been entered
@@ -1271,14 +1275,10 @@ namespace HVACVariableRefrigerantFlow {
 		// Followings for VRF FluidTCtrl Only
 		int NumCompSpd; // XP_loop counter
 		int NumOfCompSpd; // XP_ number of compressor speed inputs
-		int Count1Index; // XP
-		int Count2Index; // XP
 
 		// Flow
 		MaxAlphas = 0;
 		MaxNumbers = 0;
-		Count1Index = 52; // XP_the index of the last numeric field before compressor speed entries
-		Count2Index = 44; // XP_use for calculating the index for cooling capacity curve for different speeds
 		
 		NumVRFCTU = GetNumObjectsFound( "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow" );
 		if ( NumVRFCTU > 0 ) {
@@ -2105,7 +2105,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		}
 
-		// read all VRF condenser objects: Algorithm Type 2_physics based model (FluidTCtrl)
+		// read all VRF condenser objects: Algorithm Type 2_physics based model (FluidTCtrl)_Aug. 2015, zrp
 		cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl";
 		for ( VRFNum = NumVRFCond_SysCurve + 1; VRFNum <= NumVRFCond; ++VRFNum ) {
 			GetObjectItem( cCurrentModuleObject, VRFNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -2120,6 +2120,8 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFNum ).Name = cAlphaArgs( 1 );
 			VRF( VRFNum ).VRFSystemTypeNum = VRF_HeatPump;
 			VRF( VRFNum ).VRFAlgorithmTypeNum = AlgorithmTypeFluidTCtrl;
+			VRF( VRFNum ).FuelType = FuelTypeElectric; 
+			
 			if ( lAlphaFieldBlanks( 2 ) ) {
 				VRF( VRFNum ).SchedPtr = ScheduleAlwaysOn;
 			} else {
@@ -2130,746 +2132,943 @@ namespace HVACVariableRefrigerantFlow {
 					ErrorsFound = true;
 				}
 			}
-			//     CALL TestCompSet(TRIM(cCurrentModuleObject),VRF(VRFTUNum)%Name,cAlphaArgs(3),cAlphaArgs(4),'Air Nodes')
 
-			VRF( VRFNum ).CoolingCapacity = rNumericArgs( 1 );
-			VRF( VRFNum ).CoolingCOP = rNumericArgs( 2 );
-			VRF( VRFNum ).MinOATCooling = rNumericArgs( 3 );
-			VRF( VRFNum ).MaxOATCooling = rNumericArgs( 4 );
+			VRF( VRFNum ).ZoneTUListPtr = FindItemInList( cAlphaArgs( 3 ), TerminalUnitList.Name(), NumVRFTULists );
+			if ( VRF( VRFNum ).ZoneTUListPtr == 0 ) {
+				ShowSevereError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\"" );
+				ShowContinueError( cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) + " not found." );
+				ErrorsFound = true;
+			}
 			
-			VRF( VRFNum ).RefrigerantName = cAlphaArgs( 45 ); 
-			VRF( VRFNum ).SucPressDrop  = rNumericArgs( 38 );
-			VRF( VRFNum ).DisPressDrop  = rNumericArgs( 39 );
-			VRF( VRFNum ).MaxCondFlow   = rNumericArgs( 41 );
-			VRF( VRFNum ).MaxCondFlowTemp = rNumericArgs( 40 );
-			VRF( VRFNum ).MinCondFlow   = rNumericArgs( 43 );
-			VRF( VRFNum ).MinCondFlowTemp = rNumericArgs( 42 );
-			VRF( VRFNum ).BFC        = rNumericArgs( 48 );
-			VRF( VRFNum ).BFH        = rNumericArgs( 65 );
-			VRF( VRFNum ).SH         = rNumericArgs( 49 );
-			VRF( VRFNum ).SC         = rNumericArgs( 50 );
-			VRF( VRFNum ).C1Te       = rNumericArgs( 44 );
-			VRF( VRFNum ).C2Te       = rNumericArgs( 45 );
-			VRF( VRFNum ).C3Te       = rNumericArgs( 66 );
-			VRF( VRFNum ).C1Tc       = rNumericArgs( 46 );
-			VRF( VRFNum ).C2Tc       = rNumericArgs( 47 );
-			VRF( VRFNum ).C3Tc       = rNumericArgs( 67 );
-			VRF( VRFNum ).RatedCondFanPower= rNumericArgs( 51 );
-			VRF( VRFNum ).EvapTempFixed  = rNumericArgs( 63 );
-			VRF( VRFNum ).CondTempFixed  = rNumericArgs( 64 );
-			VRF( VRFNum ).CompMaxDeltaP  = rNumericArgs( 68 );
-			VRF( VRFNum ).RefPipDia      = rNumericArgs( 69 );
-			VRF( VRFNum ).RefPipLen      = rNumericArgs( 70 );
-			VRF( VRFNum ).RefPipHei      = rNumericArgs( 71 );
-			VRF( VRFNum ).RefPipInsThi   = rNumericArgs( 72 );
-			VRF( VRFNum ).RefPipInsCon   = rNumericArgs( 73 );
-			VRF( VRFNum ).RefPipInsH     = rNumericArgs( 74 );
+			// @@ 	
+			//int temp = EnergyPlus::FluidProperties::NumOfRefrigerants;
+			//VerifyName( cAlphaArgs( 4 ), EnergyPlus::FluidProperties::RefrigData.Name(), EnergyPlus::FluidProperties::NumOfRefrigerants - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			//if ( IsNotOK ) {
+			//	ErrorsFound = true;
+			//}
+			VRF( VRFNum ).RefrigerantName = cAlphaArgs( 4 );
 			
-			// XP_Get the simulation algorithm for indoor unit
+			VRF( VRFNum ).SH = rNumericArgs( 1 );
+			VRF( VRFNum ).SC = rNumericArgs( 2 );
 			
-			NumOfCompSpd = rNumericArgs( 52 );   
-			VRF( VRFNum ).CompressorSpeed.dimension( NumOfCompSpd );
-			VRF( VRFNum ).OUCoolingCAPFT.dimension( NumOfCompSpd );
-            VRF( VRFNum ).OUCoolingPWRFT.dimension( NumOfCompSpd );
-			
-			if( SameString( cAlphaArgs( 66 ), "HIGHSENSIBLE" ) ) {
+			if( SameString( cAlphaArgs( 5 ), "VariableTemp" ) ) {
 				VRF(VRFNum).Algorithm = 1;
-			} else if ( SameString( cAlphaArgs( 66 ), "TETCCONSTANT" ) ) {
+			} else if ( SameString( cAlphaArgs( 5 ), "ConstantTemp" ) ) {
 				VRF(VRFNum).Algorithm = 2;
 			} else {
 				VRF(VRFNum).Algorithm = 1;
 			}
 			
+			VRF( VRFNum ).EvapTempFixed  = rNumericArgs( 3 );
+			VRF( VRFNum ).CondTempFixed  = rNumericArgs( 4 );
 			
-			for ( NumCompSpd = 1; NumCompSpd <= NumOfCompSpd; NumCompSpd++ ) {
-				VRF( VRFNum ).CompressorSpeed( NumCompSpd ) = rNumericArgs( Count1Index + NumCompSpd );
-			    VRF( VRFNum ).OUCoolingCAPFT( NumCompSpd ) = GetCurveIndex( cAlphaArgs( Count2Index + 2 * NumCompSpd ) );
-                VRF( VRFNum ).OUCoolingPWRFT( NumCompSpd ) = GetCurveIndex( cAlphaArgs( Count2Index + 2 * NumCompSpd + 1 ) );
-			}
-
-			VRF( VRFNum ).CoolCapFT = GetCurveIndex( cAlphaArgs( 3 ) );
-			if ( VRF( VRFNum ).CoolCapFT > 0 ) {
-				// Verify Curve Object, only legal type is biquadratic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolCapFT ) );
-				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 3 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolCapFT ) );
-					ShowContinueError( "... curve type must be BiQuadratic." );
-					ErrorsFound = true;
-				}}
-				//  only show error if cooling coil is present, since TU's have not yet been read, do this later in GetInput
-				//      ELSE
-				//        CALL ShowSevereError(TRIM(cCurrentModuleObject)//', "'//TRIM(VRF(VRFNum)%Name)// &
-				//                     '" '//TRIM(cAlphaFieldNames(3))//' not found.')
-				//        ErrorsFound=.TRUE.
-			}
-
-			VRF( VRFNum ).CoolBoundaryCurvePtr = GetCurveIndex( cAlphaArgs( 4 ) );
-			if ( VRF( VRFNum ).CoolBoundaryCurvePtr > 0 ) {
-				// Verify Curve Object, only legal type is linear, quadratic, or cubic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolBoundaryCurvePtr ) );
-				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 4 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolBoundaryCurvePtr ) );
-					ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
-					ErrorsFound = true;
-				}}
-			}
-
-			VRF( VRFNum ).CoolCapFTHi = GetCurveIndex( cAlphaArgs( 5 ) );
-			if ( VRF( VRFNum ).CoolCapFTHi > 0 ) {
-				// Verify Curve Object, only legal type is biquadratic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolCapFTHi ) );
-				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 5 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolCapFTHi ) );
-					ShowContinueError( "... curve type must be BiQuadratic." );
-					ErrorsFound = true;
-				}}
-			}
-
-			VRF( VRFNum ).CoolEIRFT = GetCurveIndex( cAlphaArgs( 6 ) );
-			if ( VRF( VRFNum ).CoolEIRFT > 0 ) {
-				// Verify Curve Object, only legal type is biquadratic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolEIRFT ) );
-				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 6 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolEIRFT ) );
-					ShowContinueError( "... curve type must be BiQuadratic." );
-					ErrorsFound = true;
-				}}
-				//  only show error if cooling coil is present, since TU's have not yet been read, do this later in GetInput
-				//      ELSE
-				//        CALL ShowSevereError(TRIM(cCurrentModuleObject)//', "'//TRIM(VRF(VRFNum)%Name)// &
-				//                     '" '//TRIM(cAlphaFieldNames(6))//' not found.')
-				//        ErrorsFound=.TRUE.
-			}
-
-			VRF( VRFNum ).EIRCoolBoundaryCurvePtr = GetCurveIndex( cAlphaArgs( 7 ) );
-			if ( VRF( VRFNum ).EIRCoolBoundaryCurvePtr > 0 ) {
-				// Verify Curve Object, only legal type is linear, quadratic, or cubic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).EIRCoolBoundaryCurvePtr ) );
-				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 7 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).EIRCoolBoundaryCurvePtr ) );
-					ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
-					ErrorsFound = true;
-				}}
-			}
-
-			VRF( VRFNum ).CoolEIRFTHi = GetCurveIndex( cAlphaArgs( 8 ) );
-			if ( VRF( VRFNum ).CoolEIRFTHi > 0 ) {
-				// Verify Curve Object, only legal type is biquadratic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolEIRFTHi ) );
-				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 8 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolEIRFTHi ) );
-					ShowContinueError( "... curve type must be BiQuadratic." );
-					ErrorsFound = true;
-				}}
-			}
-
-			VRF( VRFNum ).CoolEIRFPLR1 = GetCurveIndex( cAlphaArgs( 9 ) );
-			if ( VRF( VRFNum ).CoolEIRFPLR1 > 0 ) {
-				// Verify Curve Object, only legal type is linear, quadratic, or cubic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolEIRFPLR1 ) );
-				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 9 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolEIRFPLR1 ) );
-					ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
-					ErrorsFound = true;
-				}}
-				//  only show error if cooling coil is present, since TU's have not yet been read, do this later in GetInput
-				//      ELSE
-				//        CALL ShowSevereError(TRIM(cCurrentModuleObject)//', "'//TRIM(VRF(VRFNum)%Name)// &
-				//                     '" '//TRIM(cAlphaFieldNames(9))//' not found.')
-				//        ErrorsFound=.TRUE.
-			}
-
-			VRF( VRFNum ).CoolEIRFPLR2 = GetCurveIndex( cAlphaArgs( 10 ) );
-			if ( VRF( VRFNum ).CoolEIRFPLR2 > 0 ) {
-				// Verify Curve Object, only legal type is linear, quadratic, or cubic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolEIRFPLR2 ) );
-				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 10 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolEIRFPLR2 ) );
-					ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
-					ErrorsFound = true;
-				}}
-			}
-
-			VRF( VRFNum ).CoolCombRatioPTR = GetCurveIndex( cAlphaArgs( 11 ) );
-			if ( VRF( VRFNum ).CoolCombRatioPTR > 0 ) {
-				// Verify Curve Object, only legal type is linear, quadratic, or cubic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolCombRatioPTR ) );
-				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 11 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolCombRatioPTR ) );
-					ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
-					ErrorsFound = true;
-				}}
-			}
-
-			VRF( VRFNum ).CoolPLFFPLR = GetCurveIndex( cAlphaArgs( 12 ) );
-			if ( VRF( VRFNum ).CoolPLFFPLR > 0 ) {
-				// Verify Curve Object, only legal type is linear, quadratic, or cubic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolPLFFPLR ) );
-				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 12 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolPLFFPLR ) );
-					ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
-					ErrorsFound = true;
-				}}
-			}
-
-			VRF( VRFNum ).HeatingCapacity = rNumericArgs( 5 );
-			VRF( VRFNum ).HeatingCapacitySizeRatio = rNumericArgs( 6 );
-			if ( ! lNumericFieldBlanks( 6 ) && VRF( VRFNum ).HeatingCapacity == AutoSize ) {
-				VRF( VRFNum ).LockHeatingCapacity = true;
-			}
-			VRF( VRFNum ).HeatingCOP = rNumericArgs( 7 );
-			VRF( VRFNum ).MinOATHeating = rNumericArgs( 8 );
-			VRF( VRFNum ).MaxOATHeating = rNumericArgs( 9 );
-			if ( VRF( VRFNum ).MinOATHeating >= VRF( VRFNum ).MaxOATHeating ) {
-				ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\"" );
-				ShowContinueError( "... " + cNumericFieldNames( 8 ) + " (" + TrimSigDigits( VRF( VRFNum ).MinOATHeating, 3 ) + ") must be less than maximum (" + TrimSigDigits( VRF( VRFNum ).MaxOATHeating, 3 ) + ")." );
-				ErrorsFound = true;
-			}
-
-			VRF( VRFNum ).HeatCapFT = GetCurveIndex( cAlphaArgs( 13 ) );
-			if ( VRF( VRFNum ).HeatCapFT > 0 ) {
-				// Verify Curve Object, only legal type is biquadratic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatCapFT ) );
-				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 13 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatCapFT ) );
-					ShowContinueError( "... curve type must be BiQuadratic." );
-					ErrorsFound = true;
-				}}
-				//  only show error if heating coil is present, since TU's have not yet been read, do this later in GetInput
-				//      ELSE
-				//        CALL ShowSevereError(TRIM(cCurrentModuleObject)//', "'//TRIM(VRF(VRFNum)%Name)// &
-				//                     '" '//TRIM(cAlphaFieldNames(13))//' not found.')
-				//        ErrorsFound=.TRUE.
-			}
-
-			VRF( VRFNum ).HeatBoundaryCurvePtr = GetCurveIndex( cAlphaArgs( 14 ) );
-			if ( VRF( VRFNum ).HeatBoundaryCurvePtr > 0 ) {
-				// Verify Curve Object, only legal type is linear, quadratic, or cubic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatBoundaryCurvePtr ) );
-				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 14 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatBoundaryCurvePtr ) );
-					ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
-					ErrorsFound = true;
-				}}
-			}
-
-			VRF( VRFNum ).HeatCapFTHi = GetCurveIndex( cAlphaArgs( 15 ) );
-			if ( VRF( VRFNum ).HeatCapFTHi > 0 ) {
-				// Verify Curve Object, only legal type is biquadratic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatCapFTHi ) );
-				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 15 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatCapFTHi ) );
-					ShowContinueError( "... curve type must be BiQuadratic." );
-					ErrorsFound = true;
-				}}
-			}
-
-			VRF( VRFNum ).HeatEIRFT = GetCurveIndex( cAlphaArgs( 16 ) );
-			if ( VRF( VRFNum ).HeatEIRFT > 0 ) {
-				// Verify Curve Object, only legal type is biquadratic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatEIRFT ) );
-				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 16 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatEIRFT ) );
-					ShowContinueError( "... curve type must be BiQuadratic." );
-					ErrorsFound = true;
-				}}
-				//  only show error if heating coil is present, since TU's have not yet been read, do this later in GetInput
-				//      ELSE
-				//        CALL ShowSevereError(TRIM(cCurrentModuleObject)//', "'//TRIM(VRF(VRFNum)%Name)// &
-				//                     '" '//TRIM(cAlphaFieldNames(16))//' not found.')
-				//        ErrorsFound=.TRUE.
-			}
-
-			VRF( VRFNum ).EIRHeatBoundaryCurvePtr = GetCurveIndex( cAlphaArgs( 17 ) );
-			if ( VRF( VRFNum ).EIRHeatBoundaryCurvePtr > 0 ) {
-				// Verify Curve Object, only legal type is linear, quadratic, or cubic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).EIRHeatBoundaryCurvePtr ) );
-				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 17 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).EIRHeatBoundaryCurvePtr ) );
-					ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
-					ErrorsFound = true;
-				}}
-			}
-
-			VRF( VRFNum ).HeatEIRFTHi = GetCurveIndex( cAlphaArgs( 18 ) );
-			if ( VRF( VRFNum ).HeatEIRFTHi > 0 ) {
-				// Verify Curve Object, only legal type is biquadratic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatEIRFTHi ) );
-				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 18 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatEIRFTHi ) );
-					ShowContinueError( "... curve type must be BiQuadratic." );
-					ErrorsFound = true;
-				}}
-			}
-
-			if ( SameString( cAlphaArgs( 19 ), "WETBULBTEMPERATURE" ) ) {
-				VRF( VRFNum ).HeatingPerformanceOATType = WetBulbIndicator;
-			} else if ( SameString( cAlphaArgs( 19 ), "DRYBULBTEMPERATURE" ) ) {
-				VRF( VRFNum ).HeatingPerformanceOATType = DryBulbIndicator;
-			} else {
-				ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 19 ) + " input for this object = " + cAlphaArgs( 19 ) );
-				ShowContinueError( "... input must be WETBULBTEMPERATURE or DRYBULBTEMPERATURE." );
-				ErrorsFound = true;
-			}
-
-			VRF( VRFNum ).HeatEIRFPLR1 = GetCurveIndex( cAlphaArgs( 20 ) );
-			if ( VRF( VRFNum ).HeatEIRFPLR1 > 0 ) {
-				// Verify Curve Object, only legal type is linear, quadratic, or cubic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatEIRFPLR1 ) );
-				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 20 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatEIRFPLR1 ) );
-					ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
-					ErrorsFound = true;
-				}}
-			}
-
-			VRF( VRFNum ).HeatEIRFPLR2 = GetCurveIndex( cAlphaArgs( 21 ) );
-			if ( VRF( VRFNum ).HeatEIRFPLR2 > 0 ) {
-				// Verify Curve Object, only legal type is linear, quadratic, or cubic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatEIRFPLR2 ) );
-				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 21 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatEIRFPLR2 ) );
-					ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
-					ErrorsFound = true;
-				}}
-			}
-
-			VRF( VRFNum ).HeatCombRatioPTR = GetCurveIndex( cAlphaArgs( 22 ) );
-			if ( VRF( VRFNum ).HeatCombRatioPTR > 0 ) {
-				// Verify Curve Object, only legal type is linear, quadratic, or cubic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatCombRatioPTR ) );
-				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 22 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatCombRatioPTR ) );
-					ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
-					ErrorsFound = true;
-				}}
-			}
-			VRF( VRFNum ).HeatPLFFPLR = GetCurveIndex( cAlphaArgs( 23 ) );
-			if ( VRF( VRFNum ).HeatPLFFPLR > 0 ) {
-				// Verify Curve Object, only legal type is linear, quadratic, or cubic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatPLFFPLR ) );
-				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 23 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatPLFFPLR ) );
-					ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
-					ErrorsFound = true;
-				}}
-			}
-
-			VRF( VRFNum ).MinPLR = rNumericArgs( 10 );
-
-			VRF( VRFNum ).MasterZonePtr = FindItemInList( cAlphaArgs( 24 ), Zone.Name(), NumOfZones );
-
-			if ( SameString( cAlphaArgs( 25 ), "LoadPriority" ) ) {
-				VRF( VRFNum ).ThermostatPriority = LoadPriority;
-			} else if ( SameString( cAlphaArgs( 25 ), "ZonePriority" ) ) {
-				VRF( VRFNum ).ThermostatPriority = ZonePriority;
-			} else if ( SameString( cAlphaArgs( 25 ), "ThermostatOffsetPriority" ) ) {
-				VRF( VRFNum ).ThermostatPriority = ThermostatOffsetPriority;
-			} else if ( SameString( cAlphaArgs( 25 ), "Scheduled" ) ) {
-				VRF( VRFNum ).ThermostatPriority = ScheduledPriority;
-			} else if ( SameString( cAlphaArgs( 25 ), "MasterThermostatPriority" ) ) {
-				VRF( VRFNum ).ThermostatPriority = MasterThermostatPriority;
-				if ( VRF( VRFNum ).MasterZonePtr == 0 ) {
-					ShowSevereError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\"" );
-					ShowContinueError( cAlphaFieldNames( 24 ) + " must be entered when " + cAlphaFieldNames( 25 ) + " = " + cAlphaArgs( 25 ) );
-					ErrorsFound = true;
-				}
-				//      ELSE IF (SameString(cAlphaArgs(25),'FirstOnPriority') )THEN ! strategy not used
-				//        VRF(VRFNum)%ThermostatPriority = FirstOnPriority
-			} else {
+			// @@
+			rNumericArgs( 5 );  // VRF( VRFNum ).EvapTempIUMin  = 
+			rNumericArgs( 6 );  // VRF( VRFNum ).CondTempIUMax  = 
+			rNumericArgs( 7 );  // VRF( VRFNum ).EvapTempIUMin  = 
+			rNumericArgs( 8 );  // VRF( VRFNum ).CondTempIUMax  = 
+			rNumericArgs( 9 );  // VRF( VRFNum ).CondTempOUMin  = 
+			rNumericArgs( 10 ); // VRF( VRFNum ).CondTempOUMax  = 
+			
+			// @@ OU Fan
+			
+			//Get OU fan data
+			FanType = cAlphaArgs( 6 ); //- Outdoor Unit Fan Object Type
+			FanName = cAlphaArgs( 7 ); //- Outdoor Unit Fan Object Name
+			errFlag = false;
+			GetFanType( FanName, FanType_Num, errFlag, cCurrentModuleObject );
+			if ( errFlag ) {
 				ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
-				ShowContinueError( "Illegal " + cAlphaFieldNames( 25 ) + " = " + cAlphaArgs( 25 ) );
+				ShowContinueError( "Illegal " + cAlphaFieldNames( 7 ) + " = " + cAlphaArgs( 7 ) );
 				ErrorsFound = true;
 			}
-
-			if ( VRF( VRFNum ).ThermostatPriority == ScheduledPriority ) {
-				VRF( VRFNum ).SchedPriorityPtr = GetScheduleIndex( cAlphaArgs( 26 ) );
-				if ( VRF( VRFNum ).SchedPriorityPtr == 0 ) {
-					ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
-					ShowContinueError( "..." + cAlphaFieldNames( 26 ) + " = " + cAlphaArgs( 26 ) + " not found." );
-					ShowContinueError( "A schedule name is required when " + cAlphaFieldNames( 25 ) + " = " + cAlphaArgs( 25 ) );
-					ErrorsFound = true;
-				}
-			}
-
-			VRF( VRFNum ).ZoneTUListPtr = FindItemInList( cAlphaArgs( 27 ), TerminalUnitList.Name(), NumVRFTULists );
-			if ( VRF( VRFNum ).ZoneTUListPtr == 0 ) {
-				ShowSevereError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\"" );
-				ShowContinueError( cAlphaFieldNames( 27 ) + " = " + cAlphaArgs( 27 ) + " not found." );
+			if ( ! SameString( cFanTypes( FanType_Num ), FanType ) ) {
+				ShowContinueError( "Fan type specified = " + cAlphaArgs( 6 ) );
+				ShowContinueError( "Based on the fan name the type of fan actually used = " + cFanTypes( FanType_Num ) );
 				ErrorsFound = true;
 			}
-
-			VRF( VRFNum ).HeatRecoveryUsed = false;
-			if ( ! lAlphaFieldBlanks( 28 ) ) {
-				if ( SameString( cAlphaArgs( 28 ), "No" ) ) {
-					VRF( VRFNum ).HeatRecoveryUsed = false;
-				} else if ( SameString( cAlphaArgs( 28 ), "Yes" ) ) {
-					VRF( VRFNum ).HeatRecoveryUsed = true;
-				} else {
-					ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
-					ShowContinueError( "Illegal " + cAlphaFieldNames( 28 ) + " = " + cAlphaArgs( 28 ) );
+			if ( FanType_Num == FanType_SimpleOnOff || FanType_Num == FanType_SimpleConstVolume ) { // Validate the fan
+				
+				ValidateComponent( cFanTypes( FanType_Num ), FanName, IsNotOK, cCurrentModuleObject );
+				
+				if ( IsNotOK ) {
+					ShowContinueError( "...occurs in " + cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
 					ErrorsFound = true;
+				} else { // mine data from fan object
+
+					// Get the fan index
+					int OUFanIndex;
+					errFlag = false;
+					GetFanIndex( FanName, OUFanIndex, errFlag );
+					if ( errFlag ) {
+						ShowContinueError( "...occurs in " + cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
+						ErrorsFound = true;
+					}
+
+					// Get the Design Fan Volume Flow Rate
+					errFlag = false;
+					double OUFanVolFlowRate = GetFanDesignVolumeFlowRate( FanType, FanName, errFlag );
+					if ( errFlag ) {
+						ShowContinueError( "...occurs in " + cCurrentModuleObject + " =" + VRFTU( VRFTUNum ).Name );
+						ErrorsFound = true;
+					}
+					 
+					// Get rated OU fan power
+					double OUFanPower;
+					double DeltaP = EnergyPlus::Fans::Fan( OUFanIndex ).DeltaPress;
+					double TotEff = EnergyPlus::Fans::Fan( OUFanIndex ).FanEff; 
+					OUFanPower = ( OUFanVolFlowRate * DeltaP ) / TotEff;					
+	
+					VRF( VRFNum ).RatedCondFanPower = OUFanPower;  // @@ From fan object rNumericArgs( 51 );
+					VRF( VRFNum ).MaxCondFlow = OUFanVolFlowRate; //3; //rNumericArgs( 41 );
+				}
+
+			} else { 
+				ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
+				ShowContinueError( "Illegal " + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) );
+				ErrorsFound = true;
+			} 
+			// cAlphaArgs( 6 ); //- Outdoor Unit Fan Object Type
+			// cAlphaArgs( 7 ); //- Outdoor Unit Fan Object Name
+			// VRF( VRFNum ).RatedCondFanPower = 170;  // @@ From fan object rNumericArgs( 51 );
+			// VRF( VRFNum ).MaxCondFlow   = FanVolFlowRate; //3; //rNumericArgs( 41 );
+			// VRF( VRFNum ).MaxCondFlowTemp = 35; //rNumericArgs( 40 );
+			// VRF( VRFNum ).MinCondFlowTemp = 15; //rNumericArgs( 42 );
+			// VRF( VRFNum ).MinCondFlow   = 0.4; //rNumericArgs( 43 );
+			
+			// @@ Bypass Factor
+			VRF( VRFNum ).BFC        = 0.219;   // rNumericArgs( 48 );
+			VRF( VRFNum ).BFH        = 0.45581; // rNumericArgs( 65 );
+			
+			// OUEvapTempCurve
+			int indexOUEvapTempCurve = GetCurveIndex( cAlphaArgs( 8 ) ); // convert curve name to index number	
+			// Verify curve name and type			
+			if ( indexOUEvapTempCurve == 0 ) {
+				if ( lAlphaFieldBlanks( 8 ) ) {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", missing" );
+					ShowContinueError( "...required " + cAlphaFieldNames( 8 ) + " is blank." );
+				} else {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFieldNames( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\"." );
+				}
+				ErrorsFound = true;
+			} else {
+				{ auto const SELECT_CASE_var( GetCurveType( indexOUEvapTempCurve ) );
+            
+					if ( SELECT_CASE_var == "QUADRATIC" ) {
+						VRF( VRFNum ).C1Te = EnergyPlus::CurveManager::PerfCurve( indexOUEvapTempCurve ).Coeff1;
+						VRF( VRFNum ).C2Te = EnergyPlus::CurveManager::PerfCurve( indexOUEvapTempCurve ).Coeff2;
+						VRF( VRFNum ).C3Te = EnergyPlus::CurveManager::PerfCurve( indexOUEvapTempCurve ).Coeff3;
+												
+					} else {
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFieldNames( 8 ) + " type for this object = " + GetCurveType( indexOUEvapTempCurve ) );
+						ShowContinueError( "... Curve type must be Quadratic." );
+						ErrorsFound = true;
+					}
 				}
 			}
-
-			VRF( VRFNum ).EquivPipeLngthCool = rNumericArgs( 11 );
-			VRF( VRFNum ).VertPipeLngth = rNumericArgs( 12 );
-			VRF( VRFNum ).PCFLengthCoolPtr = GetCurveIndex( cAlphaArgs( 29 ) );
-			if ( VRF( VRFNum ).PCFLengthCoolPtr > 0 ) {
-				// Verify Curve Object, only legal type is linear, quadratic, cubic, or biquadratic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).PCFLengthCoolPtr ) );
-				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-				} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-					VRF( VRFNum ).PCFLengthCoolPtrType = BiQuadratic;
+			
+			// OUCondTempCurve
+			int indexOUCondTempCurve = GetCurveIndex( cAlphaArgs( 9 ) ); // convert curve name to index number	
+			// Verify curve name and type			
+			if ( indexOUCondTempCurve == 0 ) {
+				if ( lAlphaFieldBlanks( 9 ) ) {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", missing" );
+					ShowContinueError( "...required " + cAlphaFieldNames( 9 ) + " is blank." );
 				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 29 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).PCFLengthCoolPtr ) );
-					ShowContinueError( "... curve type must be Linear, Quadratic, Cubic or BiQuadratic." );
-					ErrorsFound = true;
-				}}
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFieldNames( 9 ) + "=\"" + cAlphaArgs( 9 ) + "\"." );
+				}
+				ErrorsFound = true;
+			} else {
+				{ auto const SELECT_CASE_var( GetCurveType( indexOUCondTempCurve ) );
+            
+					if ( SELECT_CASE_var == "QUADRATIC" ) {
+						VRF( VRFNum ).C1Tc = EnergyPlus::CurveManager::PerfCurve( indexOUCondTempCurve ).Coeff1;
+						VRF( VRFNum ).C2Tc = EnergyPlus::CurveManager::PerfCurve( indexOUCondTempCurve ).Coeff2;
+						VRF( VRFNum ).C3Tc = EnergyPlus::CurveManager::PerfCurve( indexOUCondTempCurve ).Coeff3;
+												
+					} else {
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFieldNames( 9 ) + " type for this object = " + GetCurveType( indexOUCondTempCurve ) );
+						ShowContinueError( "... Curve type must be Quadratic." );
+						ErrorsFound = true;
+					}
+				}
 			}
-			VRF( VRFNum ).PCFHeightCool = rNumericArgs( 13 );
-
-			VRF( VRFNum ).EquivPipeLngthHeat = rNumericArgs( 14 );
-			VRF( VRFNum ).PCFLengthHeatPtr = GetCurveIndex( cAlphaArgs( 30 ) );
-			if ( VRF( VRFNum ).PCFLengthHeatPtr > 0 ) {
-				// Verify Curve Object, only legal type is linear, quadratic, cubic, or biquadratic
-				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).PCFLengthHeatPtr ) );
-				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-				} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-					VRF( VRFNum ).PCFLengthHeatPtrType = BiQuadratic;
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 30 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).PCFLengthHeatPtr ) );
-					ShowContinueError( "... curve type must be Linear, Quadratic, Cubic or BiQuadratic." );
-					ErrorsFound = true;
-				}}
-			}
-			VRF( VRFNum ).PCFHeightHeat = rNumericArgs( 15 );
-
-			VRF( VRFNum ).CCHeaterPower = rNumericArgs( 16 );
-			VRF( VRFNum ).NumCompressors = rNumericArgs( 17 );
-			VRF( VRFNum ).CompressorSizeRatio = rNumericArgs( 18 );
-			VRF( VRFNum ).MaxOATCCHeater = rNumericArgs( 19 );
-
-			if ( ! lAlphaFieldBlanks( 31 ) ) {
-				if ( SameString( cAlphaArgs( 31 ), "ReverseCycle" ) ) VRF( VRFNum ).DefrostStrategy = ReverseCycle;
-				if ( SameString( cAlphaArgs( 31 ), "Resistive" ) ) VRF( VRFNum ).DefrostStrategy = Resistive;
+			
+			// Pipe parameters
+			VRF( VRFNum ).RefPipDia      = rNumericArgs( 11 );
+			VRF( VRFNum ).RefPipLen      = rNumericArgs( 12 );
+			VRF( VRFNum ).RefPipHei      = rNumericArgs( 14 );
+			VRF( VRFNum ).RefPipInsThi   = rNumericArgs( 15 );
+			VRF( VRFNum ).RefPipInsCon   = rNumericArgs( 16 );
+			rNumericArgs( 13 ); // @@ RefPipLenEuqiv
+			VRF( VRFNum ).RefPipInsH     = 9.3; //@@
+			
+			// Crank case
+			VRF( VRFNum ).CCHeaterPower = rNumericArgs( 17 );
+			VRF( VRFNum ).NumCompressors = rNumericArgs( 18 );
+			VRF( VRFNum ).CompressorSizeRatio = rNumericArgs( 19 );
+			VRF( VRFNum ).MaxOATCCHeater = rNumericArgs( 20 );
+			
+			//Defrost
+			if ( ! lAlphaFieldBlanks( 10 ) ) {
+				if ( SameString( cAlphaArgs( 10 ), "ReverseCycle" ) ) VRF( VRFNum ).DefrostStrategy = ReverseCycle;
+				if ( SameString( cAlphaArgs( 10 ), "Resistive" ) ) VRF( VRFNum ).DefrostStrategy = Resistive;
 				if ( VRF( VRFNum ).DefrostStrategy == 0 ) {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 31 ) + " not found: " + cAlphaArgs( 31 ) );
+					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 10 ) + " not found: " + cAlphaArgs( 10 ) );
 					ErrorsFound = true;
 				}
 			} else {
 				VRF( VRFNum ).DefrostStrategy = ReverseCycle;
 			}
 
-			if ( ! lAlphaFieldBlanks( 32 ) ) {
-				if ( SameString( cAlphaArgs( 32 ), "Timed" ) ) VRF( VRFNum ).DefrostControl = Timed;
-				if ( SameString( cAlphaArgs( 32 ), "OnDemand" ) ) VRF( VRFNum ).DefrostControl = OnDemand;
+			if ( ! lAlphaFieldBlanks( 11 ) ) {
+				if ( SameString( cAlphaArgs( 11 ), "Timed" ) ) VRF( VRFNum ).DefrostControl = Timed;
+				if ( SameString( cAlphaArgs( 11 ), "OnDemand" ) ) VRF( VRFNum ).DefrostControl = OnDemand;
 				if ( VRF( VRFNum ).DefrostControl == 0 ) {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 32 ) + " not found: " + cAlphaArgs( 32 ) );
+					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 11 ) + " not found: " + cAlphaArgs( 11 ) );
 					ErrorsFound = true;
 				}
 			} else {
 				VRF( VRFNum ).DefrostControl = Timed;
 			}
 
-			if ( ! lAlphaFieldBlanks( 33 ) ) {
-				VRF( VRFNum ).DefrostEIRPtr = GetCurveIndex( cAlphaArgs( 33 ) );
+			if ( ! lAlphaFieldBlanks( 12 ) ) {
+				VRF( VRFNum ).DefrostEIRPtr = GetCurveIndex( cAlphaArgs( 12 ) );
 				if ( VRF( VRFNum ).DefrostEIRPtr > 0 ) {
 					// Verify Curve Object, only legal type is linear, quadratic, or cubic
 					{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).DefrostEIRPtr ) );
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					} else {
-						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 33 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).DefrostEIRPtr ) );
+						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 12 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).DefrostEIRPtr ) );
 						ShowContinueError( "... curve type must be BiQuadratic." );
 						ErrorsFound = true;
 					}}
 				} else {
 					if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
-						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 33 ) + " not found:" + cAlphaArgs( 33 ) );
+						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 12 ) + " not found:" + cAlphaArgs( 12 ) );
 						ErrorsFound = true;
 					}
 				}
 			} else {
 				if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 33 ) + " not found:" + cAlphaArgs( 33 ) );
+					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 12 ) + " not found:" + cAlphaArgs( 12 ) );
 					ErrorsFound = true;
 				}
 			}
-
-			VRF( VRFNum ).DefrostFraction = rNumericArgs( 20 );
-			VRF( VRFNum ).DefrostCapacity = rNumericArgs( 21 );
+			
+			VRF( VRFNum ).DefrostFraction = rNumericArgs( 21 );
+			VRF( VRFNum ).DefrostCapacity = rNumericArgs( 22 );
+			VRF( VRFNum ).MaxOATDefrost = rNumericArgs( 23 );
 			if ( VRF( VRFNum ).DefrostCapacity == 0.0 && VRF( VRFNum ).DefrostStrategy == Resistive ) {
-				ShowWarningError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cNumericFieldNames( 21 ) + " = 0.0 for defrost strategy = RESISTIVE." );
+				ShowWarningError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cNumericFieldNames( 22 ) + " = 0.0 for defrost strategy = RESISTIVE." );
+			}
+			
+			VRF( VRFNum ).CompMaxDeltaP  = rNumericArgs( 24 );
+			
+			// Evaporative Capacity & Compressor Power Curves corresponding to each Loading Index / compressor speed
+			NumOfCompSpd = rNumericArgs( 25 );   
+			VRF( VRFNum ).CompressorSpeed.dimension( NumOfCompSpd );
+			VRF( VRFNum ).OUCoolingCAPFT.dimension( NumOfCompSpd );
+            VRF( VRFNum ).OUCoolingPWRFT.dimension( NumOfCompSpd );
+			int Count1Index = 25; // the index of the last numeric field before compressor speed entries
+			int Count2Index = 11; // the index of the last alpha field before capacity/power curves
+			for ( NumCompSpd = 1; NumCompSpd <= NumOfCompSpd; NumCompSpd++ ) {
+				VRF( VRFNum ).CompressorSpeed( NumCompSpd ) = rNumericArgs( Count1Index + NumCompSpd );
+
+				// Evaporating Capacity Curve
+				if ( ! lAlphaFieldBlanks( Count2Index + 2 * NumCompSpd ) ) {
+					int indexOUEvapCapCurve = GetCurveIndex( cAlphaArgs( Count2Index + 2 * NumCompSpd ) ); // convert curve name to index number	
+					if ( indexOUEvapCapCurve == 0 ) {// Verify curve name and type			
+						if ( lAlphaFieldBlanks( Count2Index + 2 * NumCompSpd ) ) {
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", missing" );
+							ShowContinueError( "...required " + cAlphaFieldNames( Count2Index + 2 * NumCompSpd ) + " is blank." );
+						} else {
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", invalid" );
+							ShowContinueError( "...not found " + cAlphaFieldNames( Count2Index + 2 * NumCompSpd ) + "=\"" + cAlphaArgs( Count2Index + 2 * NumCompSpd ) + "\"." );
+						}
+						ErrorsFound = true;
+					} else {
+						{ auto const SELECT_CASE_var( GetCurveType( indexOUEvapCapCurve ) );
+					
+							if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+								VRF( VRFNum ).OUCoolingCAPFT( NumCompSpd ) = indexOUEvapCapCurve;
+							} else {
+								ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", invalid" );
+								ShowContinueError( "...illegal " + cAlphaFieldNames( Count2Index + 2 * NumCompSpd ) + " type for this object = " + GetCurveType( indexOUEvapCapCurve ) );
+								ShowContinueError( "... Curve type must be BiQuadratic." );
+								ErrorsFound = true;
+							}
+						}
+					}
+				}
+				
+				// Compressor Power Curve
+				if ( ! lAlphaFieldBlanks( Count2Index + 2 * NumCompSpd + 1 ) ) {
+					int indexOUCompPwrCurve = GetCurveIndex( cAlphaArgs( Count2Index + 2 * NumCompSpd + 1 ) ); // convert curve name to index number	
+					if ( indexOUCompPwrCurve == 0 ) {// Verify curve name and type			
+						if ( lAlphaFieldBlanks( Count2Index + 2 * NumCompSpd + 1 ) ) {
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", missing" );
+							ShowContinueError( "...required " + cAlphaFieldNames( Count2Index + 2 * NumCompSpd + 1 ) + " is blank." );
+						} else {
+							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", invalid" );
+							ShowContinueError( "...not found " + cAlphaFieldNames( Count2Index + 2 * NumCompSpd + 1 ) + "=\"" + cAlphaArgs( Count2Index + 2 * NumCompSpd + 1 ) + "\"." );
+						}
+						ErrorsFound = true;
+					} else {
+						{ auto const SELECT_CASE_var( GetCurveType( indexOUCompPwrCurve ) );
+					
+							if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+								VRF( VRFNum ).OUCoolingPWRFT( NumCompSpd ) = indexOUCompPwrCurve;
+							} else {
+								ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", invalid" );
+								ShowContinueError( "...illegal " + cAlphaFieldNames( Count2Index + 2 * NumCompSpd + 1 ) + " type for this object = " + GetCurveType( indexOUCompPwrCurve ) );
+								ShowContinueError( "... Curve type must be BiQuadratic." );
+								ErrorsFound = true;
+							}
+						}
+					}
+				}
+				
 			}
 
-			VRF( VRFNum ).MaxOATDefrost = rNumericArgs( 22 );
+			// @@ To Be ADDED
+			// A35,    OANode,   
+			// A36,    ,         // @@ To Be REMOVED
+			// N23,    ,         //     CALL TestCompSet(TRIM(cCurrentModuleObject),VRF(VRFTUNum)%Name,cAlphaArgs(3),cAlphaArgs(4),'Air Nodes')
 
-			if ( ! lAlphaFieldBlanks( 35 ) ) {
-				if ( SameString( cAlphaArgs( 34 ), "AirCooled" ) ) VRF( VRFNum ).CondenserType = AirCooled;
-				if ( SameString( cAlphaArgs( 34 ), "EvaporativelyCooled" ) ) VRF( VRFNum ).CondenserType = EvapCooled;
-				if ( SameString( cAlphaArgs( 34 ), "WaterCooled" ) ) {
-					VRF( VRFNum ).CondenserType = WaterCooled;
-					VRF( VRFNum ).VRFPlantTypeOfNum = TypeOf_HeatPumpVRF;
-				}
-				if ( VRF( VRFNum ).CondenserType == 0 ) {
-					ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
-					ShowContinueError( "Illegal " + cAlphaFieldNames( 34 ) + " = " + cAlphaArgs( 34 ) );
-					ErrorsFound = true;
-				}
-			} else {
-				VRF( VRFNum ).CondenserType = AirCooled;
-			}
+			VRF( VRFNum ).CondenserType = AirCooled; 
+			//if ( ! lAlphaFieldBlanks( 35 ) ) {
+			//	if ( SameString( cAlphaArgs( 34 ), "AirCooled" ) ) VRF( VRFNum ).CondenserType = AirCooled;
+			//	if ( SameString( cAlphaArgs( 34 ), "EvaporativelyCooled" ) ) VRF( VRFNum ).CondenserType = EvapCooled;
+			//	if ( SameString( cAlphaArgs( 34 ), "WaterCooled" ) ) {
+			//		VRF( VRFNum ).CondenserType = WaterCooled;
+			//		VRF( VRFNum ).VRFPlantTypeOfNum = TypeOf_HeatPumpVRF;
+			//	}
+			//	if ( VRF( VRFNum ).CondenserType == 0 ) {
+			//		ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
+			//		ShowContinueError( "Illegal " + cAlphaFieldNames( 34 ) + " = " + cAlphaArgs( 34 ) );
+			//		ErrorsFound = true;
+			//	}
+			//} else {
+			//	VRF( VRFNum ).CondenserType = AirCooled;
+			//}
 
 			// outdoor condenser node
-			if ( lAlphaFieldBlanks( 35 ) ) {
-				VRF( VRFNum ).CondenserNodeNum = 0;
-			} else {
-				{ auto const SELECT_CASE_var( VRF( VRFNum ).CondenserType );
-				if ( ( SELECT_CASE_var == AirCooled ) || ( SELECT_CASE_var == EvapCooled ) ) {
-					VRF( VRFNum ).CondenserNodeNum = GetOnlySingleNode( cAlphaArgs( 35 ), ErrorsFound, cCurrentModuleObject, VRF( VRFNum ).Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
-					if ( ! CheckOutAirNodeNumber( VRF( VRFNum ).CondenserNodeNum ) ) {
-						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 35 ) + " not a valid Outdoor Air Node = " + cAlphaArgs( 35 ) );
-						ShowContinueError( "...node name does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node." );
-						ErrorsFound = true;
-					}
-				} else if ( SELECT_CASE_var == WaterCooled ) {
-					VRF( VRFNum ).CondenserNodeNum = GetOnlySingleNode( cAlphaArgs( 35 ), ErrorsFound, cCurrentModuleObject, VRF( VRFNum ).Name, NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
-				} else {
-				}}
-			}
+			VRF( VRFNum ).CondenserNodeNum = 0; //@@ GetOnlySingleNode( "OANode", ErrorsFound, cCurrentModuleObject, VRF( VRFNum ).Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
+			// if ( lAlphaFieldBlanks( 35 ) ) {
+			// 	VRF( VRFNum ).CondenserNodeNum = 0;
+			// } else {
+			// 	{ auto const SELECT_CASE_var( VRF( VRFNum ).CondenserType );
+			// 	if ( ( SELECT_CASE_var == AirCooled ) || ( SELECT_CASE_var == EvapCooled ) ) {
+			// 		VRF( VRFNum ).CondenserNodeNum = GetOnlySingleNode( cAlphaArgs( 35 ), ErrorsFound, cCurrentModuleObject, VRF( VRFNum ).Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
+			// 		if ( ! CheckOutAirNodeNumber( VRF( VRFNum ).CondenserNodeNum ) ) {
+			// 			ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 35 ) + " not a valid Outdoor Air Node = " + cAlphaArgs( 35 ) );
+			// 			ShowContinueError( "...node name does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node." );
+			// 			ErrorsFound = true;
+			// 		}
+			// 	} else if ( SELECT_CASE_var == WaterCooled ) {
+			// 		VRF( VRFNum ).CondenserNodeNum = GetOnlySingleNode( cAlphaArgs( 35 ), ErrorsFound, cCurrentModuleObject, VRF( VRFNum ).Name, NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			// 	} else {
+			// 	}}
+			// }
 
-			if ( ! lAlphaFieldBlanks( 36 ) && VRF( VRFNum ).CondenserType == WaterCooled ) {
-				VRF( VRFNum ).CondenserOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 36 ), ErrorsFound, cCurrentModuleObject, VRF( VRFNum ).Name, NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-				TestCompSet( cCurrentModuleObject, VRF( VRFNum ).Name, cAlphaArgs( 35 ), cAlphaArgs( 36 ), "Condenser Water Nodes" );
-			} else if ( lAlphaFieldBlanks( 36 ) && VRF( VRFNum ).CondenserType == WaterCooled ) {
-				ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 36 ) + " is blank." );
-				ShowContinueError( "...node name must be entered when Condenser Type = WaterCooled." );
-				ErrorsFound = true;
-			}
+			// if ( ! lAlphaFieldBlanks( 36 ) && VRF( VRFNum ).CondenserType == WaterCooled ) {
+			// 	VRF( VRFNum ).CondenserOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 36 ), ErrorsFound, cCurrentModuleObject, VRF( VRFNum ).Name, NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			// 	TestCompSet( cCurrentModuleObject, VRF( VRFNum ).Name, cAlphaArgs( 35 ), cAlphaArgs( 36 ), "Condenser Water Nodes" );
+			// } else if ( lAlphaFieldBlanks( 36 ) && VRF( VRFNum ).CondenserType == WaterCooled ) {
+			// 	ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 36 ) + " is blank." );
+			// 	ShowContinueError( "...node name must be entered when Condenser Type = WaterCooled." );
+			// 	ErrorsFound = true;
+			// }
 
-			if ( lNumericFieldBlanks( 23 ) ) {
-				if ( VRF( VRFNum ).CondenserType == WaterCooled ) {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cNumericFieldNames( 23 ) + " is blank." );
-					ShowContinueError( "...input is required when " + cAlphaFieldNames( 34 ) + " = " + cAlphaArgs( 34 ) );
-					ErrorsFound = true;
-				}
-			} else {
-				VRF( VRFNum ).WaterCondVolFlowRate = rNumericArgs( 23 );
-			}
-			VRF( VRFNum ).EvapCondEffectiveness = rNumericArgs( 24 );
-			VRF( VRFNum ).EvapCondAirVolFlowRate = rNumericArgs( 25 );
-			VRF( VRFNum ).EvapCondPumpPower = rNumericArgs( 26 );
+			// if ( lNumericFieldBlanks( 23 ) ) {
+			// 	if ( VRF( VRFNum ).CondenserType == WaterCooled ) {
+			// 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cNumericFieldNames( 23 ) + " is blank." );
+			// 		ShowContinueError( "...input is required when " + cAlphaFieldNames( 34 ) + " = " + cAlphaArgs( 34 ) );
+			// 		ErrorsFound = true;
+			// 	}
+			// } else {
+			// 	VRF( VRFNum ).WaterCondVolFlowRate = rNumericArgs( 23 );
+			// }
+			// VRF( VRFNum ).EvapCondEffectiveness = rNumericArgs( 24 );
+			// VRF( VRFNum ).EvapCondAirVolFlowRate = rNumericArgs( 25 );
+			// VRF( VRFNum ).EvapCondPumpPower = rNumericArgs( 26 );
+			
+			VRF( VRFNum ).CoolingCapacity = 12310; //rNumericArgs( 1 );
+			VRF( VRFNum ).CoolingCOP = 3.37; //rNumericArgs( 2 );
+			VRF( VRFNum ).MinOATCooling = -10; //rNumericArgs( 3 );
+			VRF( VRFNum ).MaxOATCooling = 43; //rNumericArgs( 4 );
+			 
+			VRF( VRFNum ).SucPressDrop; // rNumericArgs( 38 );
+			VRF( VRFNum ).DisPressDrop; // rNumericArgs( 39 );
+			
+			
+			// XP_Get the simulation algorithm for indoor unit
+			
+			// VRF( VRFNum ).CoolCapFT = GetCurveIndex( cAlphaArgs( 3 ) );
+			// if ( VRF( VRFNum ).CoolCapFT > 0 ) {
+			// 	// Verify Curve Object, only legal type is biquadratic
+			// 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolCapFT ) );
+			// 	if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+			// 	} else {
+			// 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 3 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolCapFT ) );
+			// 		ShowContinueError( "... curve type must be BiQuadratic." );
+			// 		ErrorsFound = true;
+			// 	}}
+			// }
+            // 
+			// VRF( VRFNum ).CoolBoundaryCurvePtr = GetCurveIndex( cAlphaArgs( 4 ) );
+			// if ( VRF( VRFNum ).CoolBoundaryCurvePtr > 0 ) {
+			// 	// Verify Curve Object, only legal type is linear, quadratic, or cubic
+			// 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolBoundaryCurvePtr ) );
+			// 	if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			// 	} else {
+			// 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 4 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolBoundaryCurvePtr ) );
+			// 		ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
+			// 		ErrorsFound = true;
+			// 	}}
+			// }
 
-			// Get Water System tank connections
-			// A37, \field Supply Water Storage Tank Name
-			VRF( VRFNum ).EvapWaterSupplyName = cAlphaArgs( 37 );
-			if ( lAlphaFieldBlanks( 37 ) ) {
-				VRF( VRFNum ).EvapWaterSupplyMode = WaterSupplyFromMains;
-			} else {
-				VRF( VRFNum ).EvapWaterSupplyMode = WaterSupplyFromTank;
-				SetupTankDemandComponent( VRF( VRFNum ).Name, cCurrentModuleObject, VRF( VRFNum ).EvapWaterSupplyName, ErrorsFound, VRF( VRFNum ).EvapWaterSupTankID, VRF( VRFNum ).EvapWaterTankDemandARRID );
-			}
+			  // VRF( VRFNum ).CoolCapFTHi = GetCurveIndex( cAlphaArgs( 5 ) );
+			  // if ( VRF( VRFNum ).CoolCapFTHi > 0 ) {
+			  // 	// Verify Curve Object, only legal type is biquadratic
+			  // 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolCapFTHi ) );
+			  // 	if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+			  // 	} else {
+			  // 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 5 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolCapFTHi ) );
+			  // 		ShowContinueError( "... curve type must be BiQuadratic." );
+			  // 		ErrorsFound = true;
+			  // 	}}
+			  // }
+              // 
+			  // VRF( VRFNum ).CoolEIRFT = GetCurveIndex( cAlphaArgs( 6 ) );
+			  // if ( VRF( VRFNum ).CoolEIRFT > 0 ) {
+			  // 	// Verify Curve Object, only legal type is biquadratic
+			  // 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolEIRFT ) );
+			  // 	if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+			  // 	} else {
+			  // 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 6 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolEIRFT ) );
+			  // 		ShowContinueError( "... curve type must be BiQuadratic." );
+			  // 		ErrorsFound = true;
+			  // 	}}
+			  // 	//  only show error if cooling coil is present, since TU's have not yet been read, do this later in GetInput
+			  // 	//      ELSE
+			  // 	//        CALL ShowSevereError(TRIM(cCurrentModuleObject)//', "'//TRIM(VRF(VRFNum)%Name)// &
+			  // 	//                     '" '//TRIM(cAlphaFieldNames(6))//' not found.')
+			  // 	//        ErrorsFound=.TRUE.
+			  // }
+              // 
+			  // VRF( VRFNum ).EIRCoolBoundaryCurvePtr = GetCurveIndex( cAlphaArgs( 7 ) );
+			  // if ( VRF( VRFNum ).EIRCoolBoundaryCurvePtr > 0 ) {
+			  // 	// Verify Curve Object, only legal type is linear, quadratic, or cubic
+			  // 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).EIRCoolBoundaryCurvePtr ) );
+			  // 	if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			  // 	} else {
+			  // 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 7 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).EIRCoolBoundaryCurvePtr ) );
+			  // 		ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
+			  // 		ErrorsFound = true;
+			  // 	}}
+			  // }
+              // 
+			  // VRF( VRFNum ).CoolEIRFTHi = GetCurveIndex( cAlphaArgs( 8 ) );
+			  // if ( VRF( VRFNum ).CoolEIRFTHi > 0 ) {
+			  // 	// Verify Curve Object, only legal type is biquadratic
+			  // 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolEIRFTHi ) );
+			  // 	if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+			  // 	} else {
+			  // 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 8 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolEIRFTHi ) );
+			  // 		ShowContinueError( "... curve type must be BiQuadratic." );
+			  // 		ErrorsFound = true;
+			  // 	}}
+			  // }
+              // 
+			  // VRF( VRFNum ).CoolEIRFPLR1 = GetCurveIndex( cAlphaArgs( 9 ) );
+			  // if ( VRF( VRFNum ).CoolEIRFPLR1 > 0 ) {
+			  // 	// Verify Curve Object, only legal type is linear, quadratic, or cubic
+			  // 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolEIRFPLR1 ) );
+			  // 	if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			  // 	} else {
+			  // 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 9 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolEIRFPLR1 ) );
+			  // 		ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
+			  // 		ErrorsFound = true;
+			  // 	}}
+			  // 	//  only show error if cooling coil is present, since TU's have not yet been read, do this later in GetInput
+			  // 	//      ELSE
+			  // 	//        CALL ShowSevereError(TRIM(cCurrentModuleObject)//', "'//TRIM(VRF(VRFNum)%Name)// &
+			  // 	//                     '" '//TRIM(cAlphaFieldNames(9))//' not found.')
+			  // 	//        ErrorsFound=.TRUE.
+			  // }
+              // 
+			  // VRF( VRFNum ).CoolEIRFPLR2 = GetCurveIndex( cAlphaArgs( 10 ) );
+			  // if ( VRF( VRFNum ).CoolEIRFPLR2 > 0 ) {
+			  // 	// Verify Curve Object, only legal type is linear, quadratic, or cubic
+			  // 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolEIRFPLR2 ) );
+			  // 	if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			  // 	} else {
+			  // 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 10 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolEIRFPLR2 ) );
+			  // 		ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
+			  // 		ErrorsFound = true;
+			  // 	}}
+			  // }
+              // 
+			  // VRF( VRFNum ).CoolCombRatioPTR = GetCurveIndex( cAlphaArgs( 11 ) );
+			  // if ( VRF( VRFNum ).CoolCombRatioPTR > 0 ) {
+			  // 	// Verify Curve Object, only legal type is linear, quadratic, or cubic
+			  // 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolCombRatioPTR ) );
+			  // 	if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			  // 	} else {
+			  // 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 11 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolCombRatioPTR ) );
+			  // 		ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
+			  // 		ErrorsFound = true;
+			  // 	}}
+			  // }
+              // 
+			  // VRF( VRFNum ).CoolPLFFPLR = GetCurveIndex( cAlphaArgs( 12 ) );
+			  // if ( VRF( VRFNum ).CoolPLFFPLR > 0 ) {
+			  // 	// Verify Curve Object, only legal type is linear, quadratic, or cubic
+			  // 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).CoolPLFFPLR ) );
+			  // 	if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			  // 	} else {
+			  // 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 12 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).CoolPLFFPLR ) );
+			  // 		ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
+			  // 		ErrorsFound = true;
+			  // 	}}
+			  // }
 
-			//   Basin heater power as a function of temperature must be greater than or equal to 0
-			VRF( VRFNum ).BasinHeaterPowerFTempDiff = rNumericArgs( 27 );
-			if ( rNumericArgs( 27 ) < 0.0 ) {
-				ShowSevereError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\", " + cNumericFieldNames( 27 ) + " must be >= 0" );
-				ErrorsFound = true;
-			}
+			//@@
+			VRF( VRFNum ).HeatingCapacity = 10500; //rNumericArgs( 5 );
+			VRF( VRFNum ).HeatingCapacitySizeRatio = 1; //rNumericArgs( 6 );
+			// if ( ! lNumericFieldBlanks( 6 ) && VRF( VRFNum ).HeatingCapacity == AutoSize ) {
+			// 	VRF( VRFNum ).LockHeatingCapacity = true;
+			// }
+			 VRF( VRFNum ).HeatingCOP = 2.8; //rNumericArgs( 7 ); For initialize the iteration
+			 VRF( VRFNum ).MinOATHeating = -20; //rNumericArgs( 8 );
+			 VRF( VRFNum ).MaxOATHeating = 30; //rNumericArgs( 9 );
+			// if ( VRF( VRFNum ).MinOATHeating >= VRF( VRFNum ).MaxOATHeating ) {
+			// 	ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\"" );
+			// 	ShowContinueError( "... " + cNumericFieldNames( 8 ) + " (" + TrimSigDigits( VRF( VRFNum ).MinOATHeating, 3 ) + ") must be less than maximum (" + TrimSigDigits( VRF( VRFNum ).MaxOATHeating, 3 ) + ")." );
+			// 	ErrorsFound = true;
+			// }
+            // 
+			// VRF( VRFNum ).HeatCapFT = GetCurveIndex( cAlphaArgs( 13 ) );
+			// if ( VRF( VRFNum ).HeatCapFT > 0 ) {
+			// 	// Verify Curve Object, only legal type is biquadratic
+			// 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatCapFT ) );
+			// 	if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+			// 	} else {
+			// 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 13 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatCapFT ) );
+			// 		ShowContinueError( "... curve type must be BiQuadratic." );
+			// 		ErrorsFound = true;
+			// 	}}
+			// 	//  only show error if heating coil is present, since TU's have not yet been read, do this later in GetInput
+			// 	//      ELSE
+			// 	//        CALL ShowSevereError(TRIM(cCurrentModuleObject)//', "'//TRIM(VRF(VRFNum)%Name)// &
+			// 	//                     '" '//TRIM(cAlphaFieldNames(13))//' not found.')
+			// 	//        ErrorsFound=.TRUE.
+			// }
 
-			VRF( VRFNum ).BasinHeaterSetPointTemp = rNumericArgs( 28 );
-			if ( VRF( VRFNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
-				if ( NumNums < 27 ) {
-					VRF( VRFNum ).BasinHeaterSetPointTemp = 2.0;
-				}
-				if ( VRF( VRFNum ).BasinHeaterSetPointTemp < 2.0 ) {
-					ShowWarningError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\", " + cNumericFieldNames( 28 ) + " is less than 2 deg C. Freezing could occur." );
-				}
-			}
+			// VRF( VRFNum ).HeatBoundaryCurvePtr = GetCurveIndex( cAlphaArgs( 14 ) );
+			// if ( VRF( VRFNum ).HeatBoundaryCurvePtr > 0 ) {
+			// 	// Verify Curve Object, only legal type is linear, quadratic, or cubic
+			// 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatBoundaryCurvePtr ) );
+			// 	if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			// 	} else {
+			// 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 14 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatBoundaryCurvePtr ) );
+			// 		ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
+			// 		ErrorsFound = true;
+			// 	}}
+			// }
+            // 
+			// VRF( VRFNum ).HeatCapFTHi = GetCurveIndex( cAlphaArgs( 15 ) );
+			// if ( VRF( VRFNum ).HeatCapFTHi > 0 ) {
+			// 	// Verify Curve Object, only legal type is biquadratic
+			// 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatCapFTHi ) );
+			// 	if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+			// 	} else {
+			// 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 15 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatCapFTHi ) );
+			// 		ShowContinueError( "... curve type must be BiQuadratic." );
+			// 		ErrorsFound = true;
+			// 	}}
+			// }
+            // 
+			// VRF( VRFNum ).HeatEIRFT = GetCurveIndex( cAlphaArgs( 16 ) );
+			// if ( VRF( VRFNum ).HeatEIRFT > 0 ) {
+			// 	// Verify Curve Object, only legal type is biquadratic
+			// 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatEIRFT ) );
+			// 	if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+			// 	} else {
+			// 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 16 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatEIRFT ) );
+			// 		ShowContinueError( "... curve type must be BiQuadratic." );
+			// 		ErrorsFound = true;
+			// 	}}
+			// 	//  only show error if heating coil is present, since TU's have not yet been read, do this later in GetInput
+			// 	//      ELSE
+			// 	//        CALL ShowSevereError(TRIM(cCurrentModuleObject)//', "'//TRIM(VRF(VRFNum)%Name)// &
+			// 	//                     '" '//TRIM(cAlphaFieldNames(16))//' not found.')
+			// 	//        ErrorsFound=.TRUE.
+			// }
 
-			if ( ! lAlphaFieldBlanks( 38 ) ) {
-				VRF( VRFNum ).BasinHeaterSchedulePtr = GetScheduleIndex( cAlphaArgs( 38 ) );
-				if ( VRF( VRFNum ).BasinHeaterSchedulePtr == 0 ) {
-					ShowWarningError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\", " + cAlphaFieldNames( 38 ) + " = \"" + cAlphaArgs( 38 ) + "\" was not found." );
-					ShowContinueError( "Basin heater will be available to operate throughout the simulation." );
-				}
-			}
+			// VRF( VRFNum ).EIRHeatBoundaryCurvePtr = GetCurveIndex( cAlphaArgs( 17 ) );
+			// if ( VRF( VRFNum ).EIRHeatBoundaryCurvePtr > 0 ) {
+			// 	// Verify Curve Object, only legal type is linear, quadratic, or cubic
+			// 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).EIRHeatBoundaryCurvePtr ) );
+			// 	if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			// 	} else {
+			// 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 17 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).EIRHeatBoundaryCurvePtr ) );
+			// 		ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
+			// 		ErrorsFound = true;
+			// 	}}
+			// }
+            // 
+			// VRF( VRFNum ).HeatEIRFTHi = GetCurveIndex( cAlphaArgs( 18 ) );
+			// if ( VRF( VRFNum ).HeatEIRFTHi > 0 ) {
+			// 	// Verify Curve Object, only legal type is biquadratic
+			// 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatEIRFTHi ) );
+			// 	if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+			// 	} else {
+			// 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 18 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatEIRFTHi ) );
+			// 		ShowContinueError( "... curve type must be BiQuadratic." );
+			// 		ErrorsFound = true;
+			// 	}}
+			// }
+            // 
+			// if ( SameString( cAlphaArgs( 19 ), "WETBULBTEMPERATURE" ) ) {
+			// 	VRF( VRFNum ).HeatingPerformanceOATType = WetBulbIndicator;
+			// } else if ( SameString( cAlphaArgs( 19 ), "DRYBULBTEMPERATURE" ) ) {
+			// 	VRF( VRFNum ).HeatingPerformanceOATType = DryBulbIndicator;
+			// } else {
+			// 	ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 19 ) + " input for this object = " + cAlphaArgs( 19 ) );
+			// 	ShowContinueError( "... input must be WETBULBTEMPERATURE or DRYBULBTEMPERATURE." );
+			// 	ErrorsFound = true;
+			// }
 
-			VRF( VRFNum ).FuelType = FuelTypeElectric;
-			if ( ! lAlphaFieldBlanks( 39 ) ) {
-				//A39; \field Fuel type
-				if ( SameString( cAlphaArgs( 39 ), "ELECTRICITY" ) ) {
-					VRF( VRFNum ).FuelType = FuelTypeElectric;
-				} else if ( SameString( cAlphaArgs( 39 ), "ELECTRIC" ) ) {
-					VRF( VRFNum ).FuelType = FuelTypeElectric;
-				} else if ( SameString( cAlphaArgs( 39 ), "NATURALGAS" ) ) {
-					VRF( VRFNum ).FuelType = FuelTypeNaturalGas;
-				} else if ( SameString( cAlphaArgs( 39 ), "PROPANEGAS" ) ) {
-					VRF( VRFNum ).FuelType = FuelTypePropaneGas;
-				} else if ( SameString( cAlphaArgs( 39 ), "DIESEL" ) ) {
-					VRF( VRFNum ).FuelType = FuelTypeDiesel;
-				} else if ( SameString( cAlphaArgs( 39 ), "GASOLINE" ) ) {
-					VRF( VRFNum ).FuelType = FuelTypeGasoline;
-				} else if ( SameString( cAlphaArgs( 39 ), "FUELOIL#1" ) ) {
-					VRF( VRFNum ).FuelType = FuelTypeFuelOil1;
-				} else if ( SameString( cAlphaArgs( 39 ), "FUELOIL#2" ) ) {
-					VRF( VRFNum ).FuelType = FuelTypeFuelOil2;
-				} else if ( SameString( cAlphaArgs( 39 ), "OtherFuel1" ) ) {
-					VRF( VRFNum ).FuelType = FuelTypeOtherFuel1;
-				} else if ( SameString( cAlphaArgs( 39 ), "OtherFuel2" ) ) {
-					VRF( VRFNum ).FuelType = FuelTypeOtherFuel2;
-				} else {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\", " + cAlphaFieldNames( 39 ) + " not found = " + cAlphaArgs( 39 ) );
-					ShowContinueError( "Valid choices are Electric, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2, OtherFuel1 or OtherFuel2" );
-					ErrorsFound = true;
-				}
-			}
+			// VRF( VRFNum ).HeatEIRFPLR1 = GetCurveIndex( cAlphaArgs( 20 ) );
+			// if ( VRF( VRFNum ).HeatEIRFPLR1 > 0 ) {
+			// 	// Verify Curve Object, only legal type is linear, quadratic, or cubic
+			// 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatEIRFPLR1 ) );
+			// 	if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			// 	} else {
+			// 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 20 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatEIRFPLR1 ) );
+			// 		ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
+			// 		ErrorsFound = true;
+			// 	}}
+			// }
+            // 
+			// VRF( VRFNum ).HeatEIRFPLR2 = GetCurveIndex( cAlphaArgs( 21 ) );
+			// if ( VRF( VRFNum ).HeatEIRFPLR2 > 0 ) {
+			// 	// Verify Curve Object, only legal type is linear, quadratic, or cubic
+			// 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatEIRFPLR2 ) );
+			// 	if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			// 	} else {
+			// 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 21 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatEIRFPLR2 ) );
+			// 		ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
+			// 		ErrorsFound = true;
+			// 	}}
+			// }
 
-			//  REAL(r64)    :: MinOATHeatRecovery         =0.0d0 ! Minimum outdoor air temperature for heat recovery operation (C)
-			//  REAL(r64)    :: MaxOATHeatRecovery         =0.0d0 ! Maximum outdoor air temperature for heat recovery operation (C)
-			if ( VRF( VRFNum ).HeatRecoveryUsed ) {
-				if ( lNumericFieldBlanks( 29 ) ) {
-					VRF( VRFNum ).MinOATHeatRecovery = max( VRF( VRFNum ).MinOATCooling, VRF( VRFNum ).MinOATHeating );
-				} else {
-					VRF( VRFNum ).MinOATHeatRecovery = rNumericArgs( 29 );
-					if ( VRF( VRFNum ).MinOATHeatRecovery < VRF( VRFNum ).MinOATCooling || VRF( VRFNum ).MinOATHeatRecovery < VRF( VRFNum ).MinOATHeating ) {
-						ShowWarningError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\", " + cNumericFieldNames( 29 ) + " is less than the minimum temperature in heat pump mode." );
-						ShowContinueError( "..." + cNumericFieldNames( 29 ) + " = " + TrimSigDigits( VRF( VRFNum ).MinOATHeatRecovery, 2 ) + " C" );
-						ShowContinueError( "...Minimum Outdoor Temperature in Cooling Mode = " + TrimSigDigits( VRF( VRFNum ).MinOATCooling, 2 ) + " C" );
-						ShowContinueError( "...Minimum Outdoor Temperature in Heating Mode = " + TrimSigDigits( VRF( VRFNum ).MinOATHeating, 2 ) + " C" );
-						ShowContinueError( "...Minimum Outdoor Temperature in Heat Recovery Mode reset to greater of cooling or heating minimum temperature and simulation continues." );
-						VRF( VRFNum ).MinOATHeatRecovery = max( VRF( VRFNum ).MinOATCooling, VRF( VRFNum ).MinOATHeating );
-						ShowContinueError( "... adjusted " + cNumericFieldNames( 29 ) + " = " + TrimSigDigits( VRF( VRFNum ).MinOATHeatRecovery, 2 ) + " C" );
-					}
-				}
-				if ( lNumericFieldBlanks( 30 ) ) {
-					VRF( VRFNum ).MaxOATHeatRecovery = min( VRF( VRFNum ).MaxOATCooling, VRF( VRFNum ).MaxOATHeating );
-				} else {
-					VRF( VRFNum ).MaxOATHeatRecovery = rNumericArgs( 30 );
-					if ( VRF( VRFNum ).MaxOATHeatRecovery > VRF( VRFNum ).MaxOATCooling || VRF( VRFNum ).MaxOATHeatRecovery > VRF( VRFNum ).MaxOATHeating ) {
-						ShowWarningError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\", " + cNumericFieldNames( 30 ) + " is greater than the maximum temperature in heat pump mode." );
-						ShowContinueError( "..." + cNumericFieldNames( 30 ) + " = " + TrimSigDigits( VRF( VRFNum ).MaxOATHeatRecovery, 2 ) + " C" );
-						ShowContinueError( "...Maximum Outdoor Temperature in Cooling Mode = " + TrimSigDigits( VRF( VRFNum ).MaxOATCooling, 2 ) + " C" );
-						ShowContinueError( "...Maximum Outdoor Temperature in Heating Mode = " + TrimSigDigits( VRF( VRFNum ).MaxOATHeating, 2 ) + " C" );
-						ShowContinueError( "...Maximum Outdoor Temperature in Heat Recovery Mode reset to lesser of cooling or heating minimum temperature and simulation continues." );
-						VRF( VRFNum ).MaxOATHeatRecovery = min( VRF( VRFNum ).MaxOATCooling, VRF( VRFNum ).MaxOATHeating );
-						ShowContinueError( "... adjusted " + cNumericFieldNames( 30 ) + " = " + TrimSigDigits( VRF( VRFNum ).MaxOATHeatRecovery, 2 ) + " C" );
-					}
-				}
+			// VRF( VRFNum ).HeatCombRatioPTR = GetCurveIndex( cAlphaArgs( 22 ) );
+			// if ( VRF( VRFNum ).HeatCombRatioPTR > 0 ) {
+			// 	// Verify Curve Object, only legal type is linear, quadratic, or cubic
+			// 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatCombRatioPTR ) );
+			// 	if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			// 	} else {
+			// 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 22 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatCombRatioPTR ) );
+			// 		ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
+			// 		ErrorsFound = true;
+			// 	}}
+			// }
+			// VRF( VRFNum ).HeatPLFFPLR = GetCurveIndex( cAlphaArgs( 23 ) );
+			// if ( VRF( VRFNum ).HeatPLFFPLR > 0 ) {
+			// 	// Verify Curve Object, only legal type is linear, quadratic, or cubic
+			// 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatPLFFPLR ) );
+			// 	if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			// 	} else {
+			// 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 23 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HeatPLFFPLR ) );
+			// 		ShowContinueError( "... curve type must be Linear, Quadratic or Cubic." );
+			// 		ErrorsFound = true;
+			// 	}}
+			// }
 
-				//  INTEGER      :: HRCAPFTCool                =0   ! Index to cool capacity as a function of temperature curve for heat recovery
-				//  REAL(r64)    :: HRInitialCoolCapFrac       =0.0d0 ! Fractional cooling degradation at the start of heat recovery from cooling mode
-				//  REAL(r64)    :: HRCoolCapTC                =0.0d0 ! Time constant used to recover from intial degratation in cooling heat recovery
-				VRF( VRFNum ).HRCAPFTCool = GetCurveIndex( cAlphaArgs( 40 ) );
-				if ( VRF( VRFNum ).HRCAPFTCool > 0 ) {
-					// Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
-					{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HRCAPFTCool ) );
-					if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-					} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-						VRF( VRFNum ).HRCAPFTCoolType = BiQuadratic;
-					} else {
-						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 40 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HRCAPFTCool ) );
-						ShowContinueError( "... curve type must be Bi-Quadratic, Linear, Quadratic or Cubic." );
-						ErrorsFound = true;
-					}}
-				}
-				if ( ! lNumericFieldBlanks( 31 ) ) {
-					VRF( VRFNum ).HRInitialCoolCapFrac = rNumericArgs( 31 );
-				}
-				VRF( VRFNum ).HRCoolCapTC = rNumericArgs( 32 );
-
-				//  INTEGER      :: HREIRFTCool                =0   ! Index to cool EIR as a function of temperature curve for heat recovery
-				//  REAL(r64)    :: HRInitialCoolEIRFrac       =0.0d0 ! Fractional EIR degradation at the start of heat recovery from cooling mode
-				//  REAL(r64)    :: HRCoolEIRTC                =0.0d0 ! Time constant used to recover from intial degratation in cooling heat recovery
-				VRF( VRFNum ).HREIRFTCool = GetCurveIndex( cAlphaArgs( 41 ) );
-				if ( VRF( VRFNum ).HREIRFTCool > 0 ) {
-					// Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
-					{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HREIRFTCool ) );
-					if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-					} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-						VRF( VRFNum ).HREIRFTCoolType = BiQuadratic;
-					} else {
-						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 41 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HREIRFTCool ) );
-						ShowContinueError( "... curve type must be Bi-Quadratic, Linear, Quadratic or Cubic." );
-						ErrorsFound = true;
-					}}
-				}
-				VRF( VRFNum ).HRInitialCoolEIRFrac = rNumericArgs( 33 );
-				VRF( VRFNum ).HRCoolEIRTC = rNumericArgs( 34 );
-
-				//  INTEGER      :: HRCAPFTHeat                =0   ! Index to heat capacity as a function of temperature curve for heat recovery
-				//  REAL(r64)    :: HRInitialHeatCapFrac       =0.0d0 ! Fractional heating degradation at the start of heat recovery from heating mode
-				//  REAL(r64)    :: HRHeatCapTC                =0.0d0 ! Time constant used to recover from intial degratation in heating heat recovery
-				VRF( VRFNum ).HRCAPFTHeat = GetCurveIndex( cAlphaArgs( 42 ) );
-				if ( VRF( VRFNum ).HRCAPFTHeat > 0 ) {
-					// Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
-					{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HRCAPFTHeat ) );
-					if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-					} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-						VRF( VRFNum ).HRCAPFTHeatType = BiQuadratic;
-					} else {
-						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 42 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HRCAPFTHeat ) );
-						ShowContinueError( "... curve type must be Bi-Quadratic, Linear, Quadratic or Cubic." );
-						ErrorsFound = true;
-					}}
-				}
-				VRF( VRFNum ).HRInitialHeatCapFrac = rNumericArgs( 35 );
-				VRF( VRFNum ).HRHeatCapTC = rNumericArgs( 36 );
-
-				//  INTEGER      :: HREIRFTHeat                =0   ! Index to heat EIR as a function of temperature curve for heat recovery
-				//  REAL(r64)    :: HRInitialHeatEIRFrac       =0.0d0 ! Fractional EIR degradation at the start of heat recovery from heating mode
-				//  REAL(r64)    :: HRHeatEIRTC                =0.0d0 ! Time constant used to recover from intial degratation in heating heat recovery
-				VRF( VRFNum ).HREIRFTHeat = GetCurveIndex( cAlphaArgs( 43 ) );
-				if ( VRF( VRFNum ).HREIRFTHeat > 0 ) {
-					// Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
-					{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HREIRFTHeat ) );
-					if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-					} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-						VRF( VRFNum ).HREIRFTHeatType = BiQuadratic;
-					} else {
-						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 43 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HREIRFTHeat ) );
-						ShowContinueError( "... curve type must be Bi-Quadratic, Linear, Quadratic or Cubic." );
-						ErrorsFound = true;
-					}}
-				}
-				VRF( VRFNum ).HRInitialHeatEIRFrac = rNumericArgs( 37 );
-				VRF( VRFNum ).HRHeatEIRTC = rNumericArgs( 38 );
-
-			} else {
-			}
-
-			if ( VRF( VRFNum ).CondenserType == WaterCooled ) {
-
-				//scan for loop connection data
-				errFlag = false;
-				ScanPlantLoopsForObject( VRF( VRFNum ).Name, VRF( VRFNum ).VRFPlantTypeOfNum, VRF( VRFNum ).SourceLoopNum, VRF( VRFNum ).SourceLoopSideNum, VRF( VRFNum ).SourceBranchNum, VRF( VRFNum ).SourceCompNum, _, _, _, VRF( VRFNum ).CondenserNodeNum, _, errFlag );
-
-				if ( errFlag ) {
-					ShowSevereError( "GetVRFInput: Error scanning for plant loop data" );
-					ErrorsFound = true;
-				}
-
-			}
+			// VRF( VRFNum ).MinPLR = rNumericArgs( 10 );
+            // 
+			// VRF( VRFNum ).MasterZonePtr = FindItemInList( cAlphaArgs( 24 ), Zone.Name(), NumOfZones );
+            // 
+			// if ( SameString( cAlphaArgs( 25 ), "LoadPriority" ) ) {
+			// 	VRF( VRFNum ).ThermostatPriority = LoadPriority;
+			// } else if ( SameString( cAlphaArgs( 25 ), "ZonePriority" ) ) {
+			// 	VRF( VRFNum ).ThermostatPriority = ZonePriority;
+			// } else if ( SameString( cAlphaArgs( 25 ), "ThermostatOffsetPriority" ) ) {
+			// 	VRF( VRFNum ).ThermostatPriority = ThermostatOffsetPriority;
+			// } else if ( SameString( cAlphaArgs( 25 ), "Scheduled" ) ) {
+			// 	VRF( VRFNum ).ThermostatPriority = ScheduledPriority;
+			// } else if ( SameString( cAlphaArgs( 25 ), "MasterThermostatPriority" ) ) {
+			// 	VRF( VRFNum ).ThermostatPriority = MasterThermostatPriority;
+			// 	if ( VRF( VRFNum ).MasterZonePtr == 0 ) {
+			// 		ShowSevereError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\"" );
+			// 		ShowContinueError( cAlphaFieldNames( 24 ) + " must be entered when " + cAlphaFieldNames( 25 ) + " = " + cAlphaArgs( 25 ) );
+			// 		ErrorsFound = true;
+			// 	}
+			// 	//      ELSE IF (SameString(cAlphaArgs(25),'FirstOnPriority') )THEN ! strategy not used
+			// 	//        VRF(VRFNum)%ThermostatPriority = FirstOnPriority
+			// } else {
+			// 	ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
+			// 	ShowContinueError( "Illegal " + cAlphaFieldNames( 25 ) + " = " + cAlphaArgs( 25 ) );
+			// 	ErrorsFound = true;
+			// }
+            // 
+			// if ( VRF( VRFNum ).ThermostatPriority == ScheduledPriority ) {
+			// 	VRF( VRFNum ).SchedPriorityPtr = GetScheduleIndex( cAlphaArgs( 26 ) );
+			// 	if ( VRF( VRFNum ).SchedPriorityPtr == 0 ) {
+			// 		ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
+			// 		ShowContinueError( "..." + cAlphaFieldNames( 26 ) + " = " + cAlphaArgs( 26 ) + " not found." );
+			// 		ShowContinueError( "A schedule name is required when " + cAlphaFieldNames( 25 ) + " = " + cAlphaArgs( 25 ) );
+			// 		ErrorsFound = true;
+			// 	}
+			// }
+            // 
+			// VRF( VRFNum ).HeatRecoveryUsed = false;
+			// if ( ! lAlphaFieldBlanks( 28 ) ) {
+			// 	if ( SameString( cAlphaArgs( 28 ), "No" ) ) {
+			// 		VRF( VRFNum ).HeatRecoveryUsed = false;
+			// 	} else if ( SameString( cAlphaArgs( 28 ), "Yes" ) ) {
+			// 		VRF( VRFNum ).HeatRecoveryUsed = true;
+			// 	} else {
+			// 		ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
+			// 		ShowContinueError( "Illegal " + cAlphaFieldNames( 28 ) + " = " + cAlphaArgs( 28 ) );
+			// 		ErrorsFound = true;
+			// 	}
+			// }
+            // 
+			// VRF( VRFNum ).EquivPipeLngthCool = rNumericArgs( 11 );
+			// VRF( VRFNum ).VertPipeLngth = rNumericArgs( 12 );
+			// VRF( VRFNum ).PCFLengthCoolPtr = GetCurveIndex( cAlphaArgs( 29 ) );
+			// if ( VRF( VRFNum ).PCFLengthCoolPtr > 0 ) {
+			// 	// Verify Curve Object, only legal type is linear, quadratic, cubic, or biquadratic
+			// 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).PCFLengthCoolPtr ) );
+			// 	if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			// 	} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+			// 		VRF( VRFNum ).PCFLengthCoolPtrType = BiQuadratic;
+			// 	} else {
+			// 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 29 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).PCFLengthCoolPtr ) );
+			// 		ShowContinueError( "... curve type must be Linear, Quadratic, Cubic or BiQuadratic." );
+			// 		ErrorsFound = true;
+			// 	}}
+			// }
+			// VRF( VRFNum ).PCFHeightCool = rNumericArgs( 13 );
+            // 
+			// VRF( VRFNum ).EquivPipeLngthHeat = rNumericArgs( 14 );
+			// VRF( VRFNum ).PCFLengthHeatPtr = GetCurveIndex( cAlphaArgs( 30 ) );
+			// if ( VRF( VRFNum ).PCFLengthHeatPtr > 0 ) {
+			// 	// Verify Curve Object, only legal type is linear, quadratic, cubic, or biquadratic
+			// 	{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).PCFLengthHeatPtr ) );
+			// 	if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			// 	} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+			// 		VRF( VRFNum ).PCFLengthHeatPtrType = BiQuadratic;
+			// 	} else {
+			// 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 30 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).PCFLengthHeatPtr ) );
+			// 		ShowContinueError( "... curve type must be Linear, Quadratic, Cubic or BiQuadratic." );
+			// 		ErrorsFound = true;
+			// 	}}
+			// }
+			// VRF( VRFNum ).PCFHeightHeat = rNumericArgs( 15 );
+            // 
+            // 
+            // 
+            // 
+			// // Get Water System tank connections
+			// // A37, \field Supply Water Storage Tank Name
+			// VRF( VRFNum ).EvapWaterSupplyName = cAlphaArgs( 37 );
+			// if ( lAlphaFieldBlanks( 37 ) ) {
+			// 	VRF( VRFNum ).EvapWaterSupplyMode = WaterSupplyFromMains;
+			// } else {
+			// 	VRF( VRFNum ).EvapWaterSupplyMode = WaterSupplyFromTank;
+			// 	SetupTankDemandComponent( VRF( VRFNum ).Name, cCurrentModuleObject, VRF( VRFNum ).EvapWaterSupplyName, ErrorsFound, VRF( VRFNum ).EvapWaterSupTankID, VRF( VRFNum ).EvapWaterTankDemandARRID );
+			// }
+            // 
+			// //   Basin heater power as a function of temperature must be greater than or equal to 0
+			// VRF( VRFNum ).BasinHeaterPowerFTempDiff = rNumericArgs( 27 );
+			// if ( rNumericArgs( 27 ) < 0.0 ) {
+			// 	ShowSevereError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\", " + cNumericFieldNames( 27 ) + " must be >= 0" );
+			// 	ErrorsFound = true;
+			// }
+            // 
+			// VRF( VRFNum ).BasinHeaterSetPointTemp = rNumericArgs( 28 );
+			// if ( VRF( VRFNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
+			// 	if ( NumNums < 27 ) {
+			// 		VRF( VRFNum ).BasinHeaterSetPointTemp = 2.0;
+			// 	}
+			// 	if ( VRF( VRFNum ).BasinHeaterSetPointTemp < 2.0 ) {
+			// 		ShowWarningError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\", " + cNumericFieldNames( 28 ) + " is less than 2 deg C. Freezing could occur." );
+			// 	}
+			// }
+            // 
+			// if ( ! lAlphaFieldBlanks( 38 ) ) {
+			// 	VRF( VRFNum ).BasinHeaterSchedulePtr = GetScheduleIndex( cAlphaArgs( 38 ) );
+			// 	if ( VRF( VRFNum ).BasinHeaterSchedulePtr == 0 ) {
+			// 		ShowWarningError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\", " + cAlphaFieldNames( 38 ) + " = \"" + cAlphaArgs( 38 ) + "\" was not found." );
+			// 		ShowContinueError( "Basin heater will be available to operate throughout the simulation." );
+			// 	}
+			// }
+            // 
+			// VRF( VRFNum ).FuelType = FuelTypeElectric;
+			// if ( ! lAlphaFieldBlanks( 39 ) ) {
+			// 	//A39; \field Fuel type
+			// 	if ( SameString( cAlphaArgs( 39 ), "ELECTRICITY" ) ) {
+			// 		VRF( VRFNum ).FuelType = FuelTypeElectric;
+			// 	} else if ( SameString( cAlphaArgs( 39 ), "ELECTRIC" ) ) {
+			// 		VRF( VRFNum ).FuelType = FuelTypeElectric;
+			// 	} else if ( SameString( cAlphaArgs( 39 ), "NATURALGAS" ) ) {
+			// 		VRF( VRFNum ).FuelType = FuelTypeNaturalGas;
+			// 	} else if ( SameString( cAlphaArgs( 39 ), "PROPANEGAS" ) ) {
+			// 		VRF( VRFNum ).FuelType = FuelTypePropaneGas;
+			// 	} else if ( SameString( cAlphaArgs( 39 ), "DIESEL" ) ) {
+			// 		VRF( VRFNum ).FuelType = FuelTypeDiesel;
+			// 	} else if ( SameString( cAlphaArgs( 39 ), "GASOLINE" ) ) {
+			// 		VRF( VRFNum ).FuelType = FuelTypeGasoline;
+			// 	} else if ( SameString( cAlphaArgs( 39 ), "FUELOIL#1" ) ) {
+			// 		VRF( VRFNum ).FuelType = FuelTypeFuelOil1;
+			// 	} else if ( SameString( cAlphaArgs( 39 ), "FUELOIL#2" ) ) {
+			// 		VRF( VRFNum ).FuelType = FuelTypeFuelOil2;
+			// 	} else if ( SameString( cAlphaArgs( 39 ), "OtherFuel1" ) ) {
+			// 		VRF( VRFNum ).FuelType = FuelTypeOtherFuel1;
+			// 	} else if ( SameString( cAlphaArgs( 39 ), "OtherFuel2" ) ) {
+			// 		VRF( VRFNum ).FuelType = FuelTypeOtherFuel2;
+			// 	} else {
+			// 		ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\", " + cAlphaFieldNames( 39 ) + " not found = " + cAlphaArgs( 39 ) );
+			// 		ShowContinueError( "Valid choices are Electric, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2, OtherFuel1 or OtherFuel2" );
+			// 		ErrorsFound = true;
+			// 	}
+			// }
+            // 
+			// //  REAL(r64)    :: MinOATHeatRecovery         =0.0d0 ! Minimum outdoor air temperature for heat recovery operation (C)
+			// //  REAL(r64)    :: MaxOATHeatRecovery         =0.0d0 ! Maximum outdoor air temperature for heat recovery operation (C)
+			// if ( VRF( VRFNum ).HeatRecoveryUsed ) {
+			// 	if ( lNumericFieldBlanks( 29 ) ) {
+			// 		VRF( VRFNum ).MinOATHeatRecovery = max( VRF( VRFNum ).MinOATCooling, VRF( VRFNum ).MinOATHeating );
+			// 	} else {
+			// 		VRF( VRFNum ).MinOATHeatRecovery = rNumericArgs( 29 );
+			// 		if ( VRF( VRFNum ).MinOATHeatRecovery < VRF( VRFNum ).MinOATCooling || VRF( VRFNum ).MinOATHeatRecovery < VRF( VRFNum ).MinOATHeating ) {
+			// 			ShowWarningError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\", " + cNumericFieldNames( 29 ) + " is less than the minimum temperature in heat pump mode." );
+			// 			ShowContinueError( "..." + cNumericFieldNames( 29 ) + " = " + TrimSigDigits( VRF( VRFNum ).MinOATHeatRecovery, 2 ) + " C" );
+			// 			ShowContinueError( "...Minimum Outdoor Temperature in Cooling Mode = " + TrimSigDigits( VRF( VRFNum ).MinOATCooling, 2 ) + " C" );
+			// 			ShowContinueError( "...Minimum Outdoor Temperature in Heating Mode = " + TrimSigDigits( VRF( VRFNum ).MinOATHeating, 2 ) + " C" );
+			// 			ShowContinueError( "...Minimum Outdoor Temperature in Heat Recovery Mode reset to greater of cooling or heating minimum temperature and simulation continues." );
+			// 			VRF( VRFNum ).MinOATHeatRecovery = max( VRF( VRFNum ).MinOATCooling, VRF( VRFNum ).MinOATHeating );
+			// 			ShowContinueError( "... adjusted " + cNumericFieldNames( 29 ) + " = " + TrimSigDigits( VRF( VRFNum ).MinOATHeatRecovery, 2 ) + " C" );
+			// 		}
+			// 	}
+			// 	if ( lNumericFieldBlanks( 30 ) ) {
+			// 		VRF( VRFNum ).MaxOATHeatRecovery = min( VRF( VRFNum ).MaxOATCooling, VRF( VRFNum ).MaxOATHeating );
+			// 	} else {
+			// 		VRF( VRFNum ).MaxOATHeatRecovery = rNumericArgs( 30 );
+			// 		if ( VRF( VRFNum ).MaxOATHeatRecovery > VRF( VRFNum ).MaxOATCooling || VRF( VRFNum ).MaxOATHeatRecovery > VRF( VRFNum ).MaxOATHeating ) {
+			// 			ShowWarningError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\", " + cNumericFieldNames( 30 ) + " is greater than the maximum temperature in heat pump mode." );
+			// 			ShowContinueError( "..." + cNumericFieldNames( 30 ) + " = " + TrimSigDigits( VRF( VRFNum ).MaxOATHeatRecovery, 2 ) + " C" );
+			// 			ShowContinueError( "...Maximum Outdoor Temperature in Cooling Mode = " + TrimSigDigits( VRF( VRFNum ).MaxOATCooling, 2 ) + " C" );
+			// 			ShowContinueError( "...Maximum Outdoor Temperature in Heating Mode = " + TrimSigDigits( VRF( VRFNum ).MaxOATHeating, 2 ) + " C" );
+			// 			ShowContinueError( "...Maximum Outdoor Temperature in Heat Recovery Mode reset to lesser of cooling or heating minimum temperature and simulation continues." );
+			// 			VRF( VRFNum ).MaxOATHeatRecovery = min( VRF( VRFNum ).MaxOATCooling, VRF( VRFNum ).MaxOATHeating );
+			// 			ShowContinueError( "... adjusted " + cNumericFieldNames( 30 ) + " = " + TrimSigDigits( VRF( VRFNum ).MaxOATHeatRecovery, 2 ) + " C" );
+			// 		}
+			// 	}
+            // 
+			// 	//  INTEGER      :: HRCAPFTCool                =0   ! Index to cool capacity as a function of temperature curve for heat recovery
+			// 	//  REAL(r64)    :: HRInitialCoolCapFrac       =0.0d0 ! Fractional cooling degradation at the start of heat recovery from cooling mode
+			// 	//  REAL(r64)    :: HRCoolCapTC                =0.0d0 ! Time constant used to recover from intial degratation in cooling heat recovery
+			// 	VRF( VRFNum ).HRCAPFTCool = GetCurveIndex( cAlphaArgs( 40 ) );
+			// 	if ( VRF( VRFNum ).HRCAPFTCool > 0 ) {
+			// 		// Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
+			// 		{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HRCAPFTCool ) );
+			// 		if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			// 		} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+			// 			VRF( VRFNum ).HRCAPFTCoolType = BiQuadratic;
+			// 		} else {
+			// 			ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 40 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HRCAPFTCool ) );
+			// 			ShowContinueError( "... curve type must be Bi-Quadratic, Linear, Quadratic or Cubic." );
+			// 			ErrorsFound = true;
+			// 		}}
+			// 	}
+			// 	if ( ! lNumericFieldBlanks( 31 ) ) {
+			// 		VRF( VRFNum ).HRInitialCoolCapFrac = rNumericArgs( 31 );
+			// 	}
+			// 	VRF( VRFNum ).HRCoolCapTC = rNumericArgs( 32 );
+            // 
+			// 	//  INTEGER      :: HREIRFTCool                =0   ! Index to cool EIR as a function of temperature curve for heat recovery
+			// 	//  REAL(r64)    :: HRInitialCoolEIRFrac       =0.0d0 ! Fractional EIR degradation at the start of heat recovery from cooling mode
+			// 	//  REAL(r64)    :: HRCoolEIRTC                =0.0d0 ! Time constant used to recover from intial degratation in cooling heat recovery
+			// 	VRF( VRFNum ).HREIRFTCool = GetCurveIndex( cAlphaArgs( 41 ) );
+			// 	if ( VRF( VRFNum ).HREIRFTCool > 0 ) {
+			// 		// Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
+			// 		{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HREIRFTCool ) );
+			// 		if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			// 		} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+			// 			VRF( VRFNum ).HREIRFTCoolType = BiQuadratic;
+			// 		} else {
+			// 			ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 41 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HREIRFTCool ) );
+			// 			ShowContinueError( "... curve type must be Bi-Quadratic, Linear, Quadratic or Cubic." );
+			// 			ErrorsFound = true;
+			// 		}}
+			// 	}
+			// 	VRF( VRFNum ).HRInitialCoolEIRFrac = rNumericArgs( 33 );
+			// 	VRF( VRFNum ).HRCoolEIRTC = rNumericArgs( 34 );
+            // 
+			// 	//  INTEGER      :: HRCAPFTHeat                =0   ! Index to heat capacity as a function of temperature curve for heat recovery
+			// 	//  REAL(r64)    :: HRInitialHeatCapFrac       =0.0d0 ! Fractional heating degradation at the start of heat recovery from heating mode
+			// 	//  REAL(r64)    :: HRHeatCapTC                =0.0d0 ! Time constant used to recover from intial degratation in heating heat recovery
+			// 	VRF( VRFNum ).HRCAPFTHeat = GetCurveIndex( cAlphaArgs( 42 ) );
+			// 	if ( VRF( VRFNum ).HRCAPFTHeat > 0 ) {
+			// 		// Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
+			// 		{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HRCAPFTHeat ) );
+			// 		if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			// 		} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+			// 			VRF( VRFNum ).HRCAPFTHeatType = BiQuadratic;
+			// 		} else {
+			// 			ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 42 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HRCAPFTHeat ) );
+			// 			ShowContinueError( "... curve type must be Bi-Quadratic, Linear, Quadratic or Cubic." );
+			// 			ErrorsFound = true;
+			// 		}}
+			// 	}
+			// 	VRF( VRFNum ).HRInitialHeatCapFrac = rNumericArgs( 35 );
+			// 	VRF( VRFNum ).HRHeatCapTC = rNumericArgs( 36 );
+            // 
+			// 	//  INTEGER      :: HREIRFTHeat                =0   ! Index to heat EIR as a function of temperature curve for heat recovery
+			// 	//  REAL(r64)    :: HRInitialHeatEIRFrac       =0.0d0 ! Fractional EIR degradation at the start of heat recovery from heating mode
+			// 	//  REAL(r64)    :: HRHeatEIRTC                =0.0d0 ! Time constant used to recover from intial degratation in heating heat recovery
+			// 	VRF( VRFNum ).HREIRFTHeat = GetCurveIndex( cAlphaArgs( 43 ) );
+			// 	if ( VRF( VRFNum ).HREIRFTHeat > 0 ) {
+			// 		// Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
+			// 		{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HREIRFTHeat ) );
+			// 		if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
+			// 		} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+			// 			VRF( VRFNum ).HREIRFTHeatType = BiQuadratic;
+			// 		} else {
+			// 			ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 43 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).HREIRFTHeat ) );
+			// 			ShowContinueError( "... curve type must be Bi-Quadratic, Linear, Quadratic or Cubic." );
+			// 			ErrorsFound = true;
+			// 		}}
+			// 	}
+			// 	VRF( VRFNum ).HRInitialHeatEIRFrac = rNumericArgs( 37 );
+			// 	VRF( VRFNum ).HRHeatEIRTC = rNumericArgs( 38 );
+            // 
+			// } else {
+			// }
+            // 
+			// if ( VRF( VRFNum ).CondenserType == WaterCooled ) {
+            // 
+			// 	//scan for loop connection data
+			// 	errFlag = false;
+			// 	ScanPlantLoopsForObject( VRF( VRFNum ).Name, VRF( VRFNum ).VRFPlantTypeOfNum, VRF( VRFNum ).SourceLoopNum, VRF( VRFNum ).SourceLoopSideNum, VRF( VRFNum ).SourceBranchNum, VRF( VRFNum ).SourceCompNum, _, _, _, VRF( VRFNum ).CondenserNodeNum, _, errFlag );
+            // 
+			// 	if ( errFlag ) {
+			// 		ShowSevereError( "GetVRFInput: Error scanning for plant loop data" );
+			// 		ErrorsFound = true;
+			// 	}
+            // 
+			// }
 
 		}
 
@@ -3321,7 +3520,7 @@ namespace HVACVariableRefrigerantFlow {
 				//   check that curve types are present in VRF Condenser if cooling coil is present in terminal unit (can be blank)
 				//   all curves are checked for correct type if a curve name is entered in the VRF condenser object. Check that the
 				//   curve is present if the corresponding coil is entered in the terminal unit.
-				if ( VRFTU( VRFTUNum ).VRFSysNum > 0 ) {
+				if ( VRFTU( VRFTUNum ).VRFSysNum > 0 && VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFAlgorithmTypeNum != AlgorithmTypeFluidTCtrl ) {
 
 					if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).CoolingCapacity <= 0 && VRF( VRFTU( VRFTUNum ).VRFSysNum ).CoolingCapacity != AutoSize ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
@@ -3362,7 +3561,7 @@ namespace HVACVariableRefrigerantFlow {
 				//     set cooling coil present flag
 				SetDXCoolingCoilData( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, VRFTU( VRFTUNum ).CoolingCoilPresent );
 
-				if ( VRFTU( VRFTUNum ).VRFSysNum > 0 ) {
+				if ( VRFTU( VRFTUNum ).VRFSysNum > 0 && VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFAlgorithmTypeNum != AlgorithmTypeFluidTCtrl ) {
 
 					if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingCapacity <= 0 && VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingCapacity != AutoSize ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
@@ -8175,7 +8374,7 @@ namespace HVACVariableRefrigerantFlow {
 			// @@
 			VRF( VRFCond ).CompActSpeed = max( CompSpdActual,0.0 );
 			VRF( VRFCond ).NcompCooling = max( NcompCooling,0.0 ) / 0.95; // 0.95 is the efficiency of the compressor inverter, coming from IDF input 
-			VRF( VRFCond ).CondFanPower = VRF( VRFCond ).RatedCondFanPower * pow_3( CondFlowRatio );
+			VRF( VRFCond ).CondFanPower = VRF( VRFCond ).RatedCondFanPower * pow_3( CondFlowRatio ); //@@
 			VRF( VRFCond ).VRFCondCyclingRatio = CyclingRatio; // report variable for cycling rate
 			VRF( VRFCond ).MinEvaporatingTemp = Tsuction; 
 		
@@ -8471,7 +8670,7 @@ namespace HVACVariableRefrigerantFlow {
 			
 			VRF( VRFCond ).CompActSpeed = max( CompSpdActual, 0.0 );
 			VRF( VRFCond ).NcompHeating = max( NcompHeating, 0.0 ) / 0.95; // 0.95 is the efficiency of the compressor inverter, coming from IDF input 
-			VRF( VRFCond ).CondFanPower = VRF( VRFCond ).RatedCondFanPower * pow_3( CondFlowRatio );
+			VRF( VRFCond ).CondFanPower = VRF( VRFCond ).RatedCondFanPower * pow_3( CondFlowRatio ); //@@
 			VRF( VRFCond ).VRFCondCyclingRatio = CyclingRatio ;// report variable for cycling rate
 		
 		

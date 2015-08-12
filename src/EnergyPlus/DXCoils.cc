@@ -4885,6 +4885,7 @@ namespace DXCoils {
 		if ( ErrorsFound ) {
 			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
 		}
+		
 		// @@ Loop over the VRF Cooling Coils for VRF FluidTCtrl Model_zrp 2015
 		CurrentModuleObject = cAllCoilTypes( CoilVRF_FluidTCtrl_Cooling );
 		for ( DXCoilIndex = 1; DXCoilIndex <= NumVRFCoolingFluidTCtrlCoils; ++DXCoilIndex ) {
@@ -4923,73 +4924,50 @@ namespace DXCoils {
 					ErrorsFound = true;
 				}
 			}
-			DXCoil( DXCoilNum ).RatedTotCap( 1 ) = Numbers( 1 );
-			DXCoil( DXCoilNum ).RatedSHR( 1 ) = Numbers( 2 );
-			DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) = Numbers( 3 );
-
-			// @@
-			DXCoil( DXCoilNum ).C1Te = Numbers( 4 );
-			DXCoil( DXCoilNum ).C2Te = Numbers( 5 );
-			DXCoil( DXCoilNum ).C3Te = Numbers( 6 );
-			DXCoil( DXCoilNum ).Qfan = Numbers( 7 );
-			DXCoil( DXCoilNum ).BF   = Numbers( 8 );
-			DXCoil( DXCoilNum ).SH   = Numbers( 9 );
 			
-			// DXCoil( DXCoilNum ).CCapFTemp( 1 ) = GetCurveIndex( Alphas( 3 ) );
-			// // Verify Curve Object, only legal type is Linear, Quadratic, Cubic, or BiQuadratic
-			// { auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFTemp( 1 ) ) );
-            // 
-			// if ( SELECT_CASE_var == "LINEAR" ) {
-			// 	DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Linear;
-            // 
-			// } else if ( SELECT_CASE_var == "QUADRATIC" ) {
-			// 	DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Quadratic;
-            // 
-			// } else if ( SELECT_CASE_var == "CUBIC" ) {
-			// 	DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Cubic;
-            // 
-			// } else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-			// 	DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = BiQuadratic;
-            // 
-			// } else {
-			// 	ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-			// 	ShowContinueError( "...illegal " + cAlphaFields( 3 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).CCapFTemp( 1 ) ) );
-			// 	ShowContinueError( "... Curve type must be Linear, Quadratic, Cubic, or BiQuadratic." );
-			// 	ErrorsFound = true;
-			// }}
-            // 
-			// DXCoil( DXCoilNum ).CCapFFlow( 1 ) = GetCurveIndex( Alphas( 4 ) ); // convert curve name to number
-			// if ( DXCoil( DXCoilNum ).CCapFFlow( 1 ) == 0 ) {
-			// 	if ( lAlphaBlanks( 4 ) ) {
-			// 		ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
-			// 		ShowContinueError( "...required " + cAlphaFields( 4 ) + " is blank." );
-			// 	} else {
-			// 		ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-			// 		ShowContinueError( "...not found " + cAlphaFields( 4 ) + "=\"" + Alphas( 4 ) + "\"." );
-			// 	}
-			// 	ErrorsFound = true;
-			// } else {
-			// 	// Verify Curve Object, only legal type is Linear, Quadratic or Cubic
-			// 	{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
-            // 
-			// 	if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-            // 
-			// 	} else {
-			// 		ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-			// 		ShowContinueError( "...illegal " + cAlphaFields( 4 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
-			// 		ShowContinueError( "... Curve type must be Linear, Quadratic or Cubic." );
-			// 		ErrorsFound = true;
-			// 	}}
-			// }
-
 			DXCoil( DXCoilNum ).AirInNode = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-
 			DXCoil( DXCoilNum ).AirOutNode = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
 
-			DXCoil( DXCoilNum ).CondensateCollectName = Alphas( 5 );
-			if ( lAlphaBlanks( 5 ) ) {
+			DXCoil( DXCoilNum ).RatedTotCap( 1 ) = Numbers( 1 );
+			DXCoil( DXCoilNum ).RatedSHR( 1 ) = Numbers( 2 );
+			DXCoil( DXCoilNum ).SH = Numbers( 3 );
+
+			int indexSHCurve = GetCurveIndex( Alphas( 5 ) ); // convert curve name to index number	
+			// Verify curve name and type			
+			if ( indexSHCurve == 0 ) {
+				if ( lAlphaBlanks( 5 ) ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
+					ShowContinueError( "...required " + cAlphaFields( 5 ) + " is blank." );
+				} else {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFields( 5 ) + "=\"" + Alphas( 5 ) + "\"." );
+				}
+				ErrorsFound = true;
+			} else {
+				{ auto const SELECT_CASE_var( GetCurveType( indexSHCurve ) );
+            
+					if ( SELECT_CASE_var == "QUADRATIC" ) {
+						DXCoil( DXCoilNum ).C1Te = EnergyPlus::CurveManager::PerfCurve( indexSHCurve ).Coeff1;
+						DXCoil( DXCoilNum ).C2Te = EnergyPlus::CurveManager::PerfCurve( indexSHCurve ).Coeff2;
+						DXCoil( DXCoilNum ).C3Te = EnergyPlus::CurveManager::PerfCurve( indexSHCurve ).Coeff3;
+												
+					} else {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( 5 ) + " type for this object = " + GetCurveType( indexSHCurve ) );
+						ShowContinueError( "... Curve type must be Quadratic." );
+						ErrorsFound = true;
+					}
+				}
+			}
+
+			// @@ Use fan object data
+			DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) = 0.1793;
+			DXCoil( DXCoilNum ).Qfan = 35.1;
+			DXCoil( DXCoilNum ).BF = 0.0592;
+						
+			DXCoil( DXCoilNum ).CondensateCollectName = Alphas( 6 );
+			if ( lAlphaBlanks( 6 ) ) {
 				DXCoil( DXCoilNum ).CondensateCollectMode = CondensateDiscarded;
 			} else {
 				DXCoil( DXCoilNum ).CondensateCollectMode = CondensateToTank;
@@ -5040,25 +5018,17 @@ namespace DXCoils {
 					ErrorsFound = true;
 				}
 			}
-			DXCoil( DXCoilNum ).RatedTotCap( 1 ) = Numbers( 1 );
-			DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) = Numbers( 2 );
-
-			// @@
-			DXCoil( DXCoilNum ).C1Tc = Numbers( 3 );
-			DXCoil( DXCoilNum ).C2Tc = Numbers( 4 );
-			DXCoil( DXCoilNum ).C3Tc = Numbers( 5 );
-			DXCoil( DXCoilNum ).Qfan = Numbers( 6 );
-			DXCoil( DXCoilNum ).BF   = Numbers( 7 );
-			DXCoil( DXCoilNum ).SC   = Numbers( 8 );
 
 			DXCoil( DXCoilNum ).AirInNode = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-
 			DXCoil( DXCoilNum ).AirOutNode = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
-
-			DXCoil( DXCoilNum ).CCapFTemp = GetCurveIndex( Alphas( 5 ) );
-			if ( DXCoil( DXCoilNum ).CCapFTemp( 1 ) == 0 ) {
+			
+			DXCoil( DXCoilNum ).RatedTotCap( 1 ) = Numbers( 1 );
+			DXCoil( DXCoilNum ).SC = Numbers( 2 );
+			
+			int indexSCCurve = GetCurveIndex( Alphas( 5 ) ); // convert curve name to index number	
+			// Verify curve name and type			
+			if ( indexSCCurve == 0 ) {
 				if ( lAlphaBlanks( 5 ) ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
 					ShowContinueError( "...required " + cAlphaFields( 5 ) + " is blank." );
@@ -5068,48 +5038,26 @@ namespace DXCoils {
 				}
 				ErrorsFound = true;
 			} else {
-				// Verify Curve Object, only legal type is Quadratic
-				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFTemp( 1 ) ) );
-
-				if ( SELECT_CASE_var == "LINEAR" ) {
-					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Linear;
-				} else if ( SELECT_CASE_var == "QUADRATIC" ) {
-					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Quadratic;
-				} else if ( SELECT_CASE_var == "CUBIC" ) {
-					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = Cubic;
-				} else if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-					DXCoil( DXCoilNum ).TotCapTempModFacCurveType( 1 ) = BiQuadratic;
-				} else {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-					ShowContinueError( "...illegal " + cAlphaFields( 5 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).CCapFTemp( 1 ) ) );
-					ShowContinueError( "... Curve type must be Linear, Quadratic, Cubic or BiQuadratic." );
-					ErrorsFound = true;
-				}}
-			}
-
-			DXCoil( DXCoilNum ).CCapFFlow( 1 ) = GetCurveIndex( Alphas( 6 ) ); // convert curve name to number
-			if ( DXCoil( DXCoilNum ).CCapFFlow( 1 ) == 0 ) {
-				if ( lAlphaBlanks( 6 ) ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
-					ShowContinueError( "...required " + cAlphaFields( 6 ) + " is blank." );
-				} else {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-					ShowContinueError( "...not found " + cAlphaFields( 6 ) + "=\"" + Alphas( 6 ) + "\"." );
+				{ auto const SELECT_CASE_var( GetCurveType( indexSCCurve ) );
+            
+					if ( SELECT_CASE_var == "QUADRATIC" ) {
+						DXCoil( DXCoilNum ).C1Tc = EnergyPlus::CurveManager::PerfCurve( indexSCCurve ).Coeff1;
+						DXCoil( DXCoilNum ).C2Tc = EnergyPlus::CurveManager::PerfCurve( indexSCCurve ).Coeff2;
+						DXCoil( DXCoilNum ).C3Tc = EnergyPlus::CurveManager::PerfCurve( indexSCCurve ).Coeff3;
+												
+					} else {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...illegal " + cAlphaFields( 5 ) + " type for this object = " + GetCurveType( indexSCCurve ) );
+						ShowContinueError( "... Curve type must be Quadratic." );
+						ErrorsFound = true;
+					}
 				}
-				ErrorsFound = true;
-			} else {
-				// Verify Curve Object, only legal type is Quadratic
-				{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
-
-				if ( ( SELECT_CASE_var == "LINEAR" ) || ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
-
-				} else {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-					ShowContinueError( "...illegal " + cAlphaFields( 5 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).CCapFFlow( 1 ) ) );
-					ShowContinueError( "... Curve type must be linear, Quadratic or Cubic." );
-					ErrorsFound = true;
-				}}
 			}
+			
+			// @@ Use fan object data
+			DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) = 0.1793;
+			DXCoil( DXCoilNum ).Qfan = 35.1;
+			DXCoil( DXCoilNum ).BF = 0.136;
 
 		}
 
