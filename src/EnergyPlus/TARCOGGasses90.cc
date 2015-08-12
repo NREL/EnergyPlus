@@ -55,14 +55,14 @@ namespace TARCOGGasses90 {
 	void
 	GASSES90(
 		Real64 const tmean,
-		Array1A_int const iprop,
-		Array1A< Real64 > const frct,
+		Array1_int const & iprop,
+		Array1< Real64 > const & frct,
 		Real64 const pres,
 		int const nmix,
-		Array1A< Real64 > const xwght,
-		Array2A< Real64 > const xgcon,
-		Array2A< Real64 > const xgvis,
-		Array2A< Real64 > const xgcp,
+		Array1< Real64 > const & xwght,
+		Array2< Real64 > const & xgcon,
+		Array2< Real64 > const & xgvis,
+		Array2< Real64 > const & xgcp,
 		Real64 & con,
 		Real64 & visc,
 		Real64 & dens,
@@ -76,46 +76,29 @@ namespace TARCOGGasses90 {
 
 		// Variables
 
-		// Argument array dimensioning
-		iprop.dim( maxgas );
-		frct.dim( maxgas );
-		xwght.dim( maxgas );
-		xgcon.dim( 3, maxgas );
-		xgvis.dim( 3, maxgas );
-		xgcp.dim( 3, maxgas );
-
 		// Locals
 
-		static Real64 const sqrt_2( std::sqrt( 2.0 ) );
-
-		int i;
-		int j;
-
-		Array1D< Real64 > fvis( maxgas );
-		Array1D< Real64 > fcon( maxgas );
-		Array1D< Real64 > fdens( maxgas );
-		Array1D< Real64 > fcp( maxgas );
-		Array1D< Real64 > kprime( maxgas );
-		Array1D< Real64 > kdblprm( maxgas );
-		Array1D< Real64 > mukpdwn( maxgas );
-		Array1D< Real64 > kpdown( maxgas );
-		Array1D< Real64 > kdpdown( maxgas );
+		static Real64 const two_sqrt_2( 2.0 * std::sqrt( 2.0 ) );
+		static Array1D< Real64 > fvis( maxgas );
+		static Array1D< Real64 > fcon( maxgas );
+		static Array1D< Real64 > fdens( maxgas );
+		static Array1D< Real64 > fcp( maxgas );
+		static Array1D< Real64 > kprime( maxgas );
+		static Array1D< Real64 > kdblprm( maxgas );
+		static Array1D< Real64 > mukpdwn( maxgas );
+		static Array1D< Real64 > kpdown( maxgas );
+		static Array1D< Real64 > kdpdown( maxgas );
 		Real64 molmix;
 		Real64 cpmixm;
-		Real64 kpmix;
-		Real64 kdpmix;
-		Real64 kmix;
-		Real64 mumix;
 		Real64 phimup;
 		Real64 downer;
 		Real64 psiup;
 		Real64 psiterm;
 		Real64 phikup;
-		Real64 rhomix;
 
 		//Simon: TODO: this is used for EN673 calculations and it is not assigned properly. Check this
 		//REAL(r64), dimension(maxgas, 3) :: xgrho //Autodesk:Unused
-		Array2D< Real64 > grho( 3, maxgas );
+//		static Array2D< Real64 > grho( 3, maxgas ); //Unused
 
 		//REAL(r64) gaslaw
 		//DATA gaslaw /8314.51d0/   ! Molar gas constant in Joules/(kmol*K)
@@ -129,13 +112,8 @@ namespace TARCOGGasses90 {
 		//Autodesk:Uninit Initialize variables used uninitialized
 		//xgrho = 0.0d0 //Autodesk:Uninit Force default initialization
 
-		con = 0.0;
-		visc = 0.0;
-		dens = 0.0;
-		cp = 0.0;
-
 		//Simon: remove this when assigned properly
-		grho = 0.0;
+//		grho = 0.0; //Unused
 
 		Real64 const tmean_2( pow_2( tmean ) );
 		fcon( 1 ) = xgcon( 1, iprop( 1 ) ) + xgcon( 2, iprop( 1 ) ) * tmean + xgcon( 3, iprop( 1 ) ) * tmean_2;
@@ -146,8 +124,7 @@ namespace TARCOGGasses90 {
 		// Mollecular weights in kg/kmol
 		if ( ( standard == EN673 ) || ( standard == EN673Design ) ) {
 			//fdens( 1 ) = xgrho( iprop( 1 ), 1 ) + xgrho( iprop( 1 ), 2 ) * tmean + xgrho( iprop( 1 ), 3 ) * pow_2( tmean ); //Autodesk:Uninit xgrho was uninitialized
-//			fdens( i ) = ENpressure * xwght( iprop( i ) ) / ( gaslaw * tmean );
-			fdens( 1 ) = ENpressure * xwght( iprop( 1 ) ) / ( gaslaw * tmean ); //Autodesk:Init Guess patch for line above (i is uninitialized)
+			fdens( 1 ) = ENpressure * xwght( iprop( 1 ) ) / ( gaslaw * tmean );
 		}
 
 		if ( frct( 1 ) == 1.0 ) { // Single gas properties
@@ -156,18 +133,19 @@ namespace TARCOGGasses90 {
 			cp = fcp( 1 ); // SpecIFic heat in J/(kg*K)
 			dens = fdens( 1 ); // density in kg/m^3
 		} else { // Mixture properties
-			molmix = frct( 1 ) * xwght( iprop( 1 ) ); // initialize equation 56
-			cpmixm = molmix * fcp( 1 ); // initialize equation 58
-			kprime( 1 ) = 3.75 * UniversalGasConst / xwght( iprop( 1 ) ) * fvis( 1 ); // equation 67
-			kdblprm( 1 ) = fcon( 1 ) - kprime( 1 ); // equation 67
-			// initialize sumations for eqns 60-66:
-			mumix = 0.0;
-			kpmix = 0.0;
-			kdpmix = 0.0;
-			mukpdwn( 1 ) = 1.0;
-			kpdown( 1 ) = 1.0;
-			kdpdown( 1 ) = 1.0;
-			for ( i = 2; i <= nmix; ++i ) {
+			bool const stdISO15099( standard == ISO15099 );
+			bool const stdEN673( ( standard == EN673 ) || ( standard == EN673Design ) );
+			if ( stdISO15099 ) {
+				molmix = frct( 1 ) * xwght( iprop( 1 ) ); // initialize equation 56
+				cpmixm = molmix * fcp( 1 ); // initialize equation 58
+				kprime( 1 ) = 3.75 * UniversalGasConst / xwght( iprop( 1 ) ) * fvis( 1 ); // equation 67
+				kdblprm( 1 ) = fcon( 1 ) - kprime( 1 ); // equation 67
+				// initialize sumations for eqns 60-66:
+				mukpdwn( 1 ) = 1.0;
+				kpdown( 1 ) = 1.0;
+				kdpdown( 1 ) = 1.0;
+			}
+			for ( int i = 2; i <= nmix; ++i ) {
 				if ( frct( i ) == 0.0 ) {
 					nperr = 2011; // error 2011: component fraction in a mixture is 0%
 					ErrorMessage = "Component fraction in mixture is 0%";
@@ -177,25 +155,30 @@ namespace TARCOGGasses90 {
 				fcon( i ) = xgcon( 1, iprop( i ) ) + xgcon( 2, iprop( i ) ) * tmean + xgcon( 3, iprop( i ) ) * tmean_2;
 				fvis( i ) = xgvis( 1, iprop( i ) ) + xgvis( 2, iprop( i ) ) * tmean + xgvis( 3, iprop( i ) ) * tmean_2;
 				fcp( i ) = xgcp( 1, iprop( i ) ) + xgcp( 2, iprop( i ) ) * tmean + xgcp( 3, iprop( i ) ) * tmean_2;
-				fdens( i ) = pres * xwght( iprop( i ) ) / ( UniversalGasConst * tmean );
-				if ( ( standard == EN673 ) || ( standard == EN673Design ) ) {
+//				fdens( i ) = pres * xwght( iprop( i ) ) / ( UniversalGasConst * tmean ); //Unused
+				if ( stdEN673 ) {
 					//fdens( i ) = grho( iprop( i ), 1 ) + grho( iprop( i ), 2 ) * tmean + grho( iprop( i ), 3 ) * pow_2( tmean );
-					fdens( 1 ) = ENpressure * xwght( iprop( 1 ) ) / ( gaslaw * tmean ); // Density using ideal gas law: rho=(presure*mol. weight)/(gas const*Tmean)
+					fdens( i ) = ENpressure * xwght( iprop( i ) ) / ( gaslaw * tmean ); // Density using ideal gas law: rho=(presure*mol. weight)/(gas const*Tmean)
 				}
-				molmix += frct( i ) * xwght( iprop( i ) ); // equation 56
-				cpmixm += frct( i ) * fcp( i ) * xwght( iprop( i ) ); // equation 58-59
-				kprime( i ) = 3.75 * UniversalGasConst / xwght( iprop( i ) ) * fvis( i ); // equation 67
-				kdblprm( i ) = fcon( i ) - kprime( i ); // equation 68
-				mukpdwn( i ) = 1.0; // initialize denominator of equation 60
-				kpdown( i ) = 1.0; // initialize denominator of equation 63
-				kdpdown( i ) = 1.0; // initialize denominator of equation 65
+				if ( stdISO15099 ) {
+					molmix += frct( i ) * xwght( iprop( i ) ); // equation 56
+					cpmixm += frct( i ) * fcp( i ) * xwght( iprop( i ) ); // equation 58-59
+					kprime( i ) = 3.75 * UniversalGasConst / xwght( iprop( i ) ) * fvis( i ); // equation 67
+					kdblprm( i ) = fcon( i ) - kprime( i ); // equation 68
+					mukpdwn( i ) = 1.0; // initialize denominator of equation 60
+					kpdown( i ) = 1.0; // initialize denominator of equation 63
+					kdpdown( i ) = 1.0; // initialize denominator of equation 65
+				}
 			}
 
-			if ( standard == ISO15099 ) {
-				for ( i = 1; i <= nmix; ++i ) {
+			if ( stdISO15099 ) {
+				Real64 mumix( 0.0 );
+				Real64 kpmix( 0.0 );
+				Real64 kdpmix( 0.0 );
+				for ( int i = 1; i <= nmix; ++i ) {
 					Real64 const kprime_i( kprime( i ) );
 					Real64 const xwght_i( xwght( iprop( i ) ) );
-					for ( j = 1; j <= nmix; ++j ) {
+					for ( int j = 1; j <= nmix; ++j ) {
 						Real64 const xwght_j( xwght( iprop( j ) ) );
 
 						// numerator of equation 61
@@ -203,7 +186,7 @@ namespace TARCOGGasses90 {
 						phimup = pow_2( 1.0 + std::sqrt( fvis( i ) / fvis( j ) ) * x_pow );
 
 						// denominator of equation 61, 64 and 66
-						downer = 2.0 * sqrt_2 * std::sqrt( 1.0 + ( xwght_i / xwght_j ) );
+						downer = two_sqrt_2 * std::sqrt( 1.0 + ( xwght_i / xwght_j ) );
 
 						// calculate the denominator of equation 60
 						if ( i != j ) mukpdwn( i ) += phimup / downer * frct( j ) / frct( i );
@@ -228,20 +211,25 @@ namespace TARCOGGasses90 {
 				}
 
 				// calculate the density of the mixture assuming an ideal gas:
-				rhomix = pres * molmix / ( UniversalGasConst * tmean ); // equation 57
-				kmix = kpmix + kdpmix; // equation 68-a
+				Real64 const rhomix = pres * molmix / ( UniversalGasConst * tmean ); // equation 57
+				Real64 const kmix = kpmix + kdpmix; // equation 68-a
 
 				// final mixture properties:
 				visc = mumix;
 				con = kmix;
 				dens = rhomix;
 				cp = cpmixm / molmix;
-			} else if ( ( standard == EN673 ) || ( standard == EN673Design ) ) {
-				for ( i = 1; i <= nmix; ++i ) {
-					con += fcon( i ) * frct( i );
-					visc += fvis( i ) * frct( i );
-					dens += fdens( i ) * frct( i );
-					cp += fcp( i ) * frct( i );
+			} else if ( stdEN673 ) {
+				con = 0.0;
+				visc = 0.0;
+				dens = 0.0;
+				cp = 0.0;
+				for ( int i = 1; i <= nmix; ++i ) {
+					Real64 const frct_i( frct( i ) );
+					con += fcon( i ) * frct_i;
+					visc += fvis( i ) * frct_i;
+					dens += fdens( i ) * frct_i;
+					cp += fcp( i ) * frct_i;
 				}
 			} else {
 				assert( false ); // should never come here - unsupported standard
