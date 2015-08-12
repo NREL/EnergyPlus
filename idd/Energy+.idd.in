@@ -67115,7 +67115,7 @@ PlantEquipmentOperation:ThermalEnergyStorage,
        \memo energy storage systems.  It replaces a host of setpoint managers with simple,
        \memo single input values.  For more complex controls, use the ComponentSetpoint
        \memo scheme.
-    \min-fields 7
+       \min-fields 7
    A1, \field Name
        \required-field
        \reference ControlSchemeList
@@ -67178,8 +67178,8 @@ PlantEquipmentOperation:ThermalEnergyStorage,
        \autosizable
    A8, \field Component 1 Operation Type
        \note This field is the operation type for the component listed above.  For this
-       \note plant equipment operation scheme, “Cooling” should be selected for chiller
-       \note equipment while ice storage equipment should be defined as “Dual”.
+       \note plant equipment operation scheme, "Cooling" should be selected for chiller
+       \note equipment while ice storage equipment should be defined as "Dual".
        \required-field
        \type choice
        \key Heating
