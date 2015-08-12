@@ -83,6 +83,7 @@ namespace OutputReportTabular {
 	//                                      |--> BinResultsBelow
 	//                                      |
 	//                                      |--> BinObjVarID
+	//
 	//                                      |--> MonthlyFieldSetInput
 	//   MonthlyInput --------------------->|
 	//                                      |--> MonthlyTable --> MonthlyColumns

@@ -344,6 +344,8 @@ SET( SRC_2
   OutputReportPredefined.hh
   OutputReportTabular.cc
   OutputReportTabular.hh
+  OutputReportTabularAnnual.cc
+  OutputReportTabularAnnual.hh
   OutputReports.cc
   OutputReports.hh
   OutsideEnergySources.cc
