@@ -2265,7 +2265,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), IntraZoneNodeData.Name( ), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), IntraZoneNodeData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2280,7 +2280,7 @@ namespace AirflowNetworkBalanceManager {
 					ShowSevereError( RoutineName + CurrentModuleObject + "='" + Alphas( 1 ) + "' invalid name " + cAlphaFields( 2 ) + "='" + Alphas( 2 ) );
 					ErrorsFound = true;
 				}
-				IntraZoneNodeData( i ).AFNZoneNum = FindItemInList( Alphas( 3 ), MultizoneZoneData.ZoneName( ), AirflowNetworkNumOfZones );
+				IntraZoneNodeData( i ).AFNZoneNum = FindItemInList( Alphas( 3 ), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones );
 				if ( MultizoneZoneData( IntraZoneNodeData( i ).AFNZoneNum ).RAFNNodeNum == 0 ) {
 					GetRAFNNodeNum( MultizoneZoneData( IntraZoneNodeData( i ).AFNZoneNum ).ZoneName, IntraZoneNodeData( i ).ZoneNum, MultizoneZoneData( IntraZoneNodeData( i ).AFNZoneNum ).RAFNNodeNum, Errorfound1 );
 				}
@@ -2320,7 +2320,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), IntraZoneLinkageData.Name( ), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), IntraZoneLinkageData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2337,12 +2337,12 @@ namespace AirflowNetworkBalanceManager {
 				// Perform simple test first.The comprehensive input validation will occur later
 				// Check valid surface name
 				if ( !lAlphaBlanks( 5 ) ) {
-					IntraZoneLinkageData( i ).LinkNum = FindItemInList( Alphas( 5 ), MultizoneSurfaceData.SurfName( ), AirflowNetworkNumOfSurfaces );
+					IntraZoneLinkageData(i).LinkNum = FindItemInList( Alphas( 5 ), MultizoneSurfaceData, &MultizoneSurfaceProp::SurfName, AirflowNetworkNumOfSurfaces );
 					if ( IntraZoneLinkageData( i ).LinkNum == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "='" + Alphas( 1 ) + "': Invalid " + cAlphaFields( 5 ) + " given = " + Alphas( 5 ) + " in AirflowNetwork:MultiZone:Surface objects" );
 						ErrorsFound = true;
 					}
-					VerifyName( Alphas( 5 ), IntraZoneLinkageData.ma( &IntraZoneLinkageProp::SurfaceName ), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+					VerifyName( Alphas( 5 ), IntraZoneLinkageData, &IntraZoneLinkageProp::SurfaceName, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) Alphas( 5 ) = "xxxxx";
@@ -2353,9 +2353,9 @@ namespace AirflowNetworkBalanceManager {
 					ErrorsFound = true;
 				}
 				// Check valid node names
-				IntraZoneLinkageData( i ).NodeNums( 1 ) = FindItemInList( Alphas( 2 ), IntraZoneNodeData.Name( ), IntraZoneNumOfNodes );
+				IntraZoneLinkageData( i ).NodeNums( 1 ) = FindItemInList( Alphas( 2 ), IntraZoneNodeData, IntraZoneNumOfNodes );
 				if ( IntraZoneLinkageData( i ).NodeNums( 1 ) == 0 ) {
-					IntraZoneLinkageData( i ).NodeNums( 1 ) = FindItemInList( Alphas( 2 ), MultizoneZoneData.ZoneName( ), AirflowNetworkNumOfZones );
+					IntraZoneLinkageData( i ).NodeNums( 1 ) = FindItemInList( Alphas( 2 ), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones );
 					IntraZoneLinkageData( i ).NodeHeights( 1 ) = Zone( MultizoneZoneData( IntraZoneLinkageData( i ).NodeNums( 1 ) ).ZoneNum ).Centroid.z;
 					if ( IntraZoneLinkageData( i ).NodeNums( 1 ) == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "='" + Alphas( 1 ) + "': Invalid " + cAlphaFields( 2 ) + " given = " + Alphas( 2 ) +
@@ -2366,9 +2366,9 @@ namespace AirflowNetworkBalanceManager {
 					IntraZoneLinkageData( i ).NodeHeights( 1 ) = IntraZoneNodeData( IntraZoneLinkageData( i ).NodeNums( 1 ) ).Height;
 					IntraZoneLinkageData( i ).NodeNums( 1 ) = IntraZoneLinkageData( i ).NodeNums( 1 ) + AirflowNetworkNumOfZones + AirflowNetworkNumOfExtNode;
 				}
-				IntraZoneLinkageData( i ).NodeNums( 2 ) = FindItemInList( Alphas( 3 ), IntraZoneNodeData.Name( ), IntraZoneNumOfNodes );
+				IntraZoneLinkageData( i ).NodeNums( 2 ) = FindItemInList( Alphas( 3 ), IntraZoneNodeData, IntraZoneNumOfNodes );
 				if ( IntraZoneLinkageData( i ).NodeNums( 2 ) == 0 ) {
-					IntraZoneLinkageData( i ).NodeNums( 2 ) = FindItemInList( Alphas( 3 ), MultizoneZoneData.ZoneName( ), AirflowNetworkNumOfZones );
+					IntraZoneLinkageData( i ).NodeNums( 2 ) = FindItemInList( Alphas( 3 ), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones );
 					if ( IntraZoneLinkageData( i ).NodeNums( 2 ) > 0 ){
 						IntraZoneLinkageData( i ).NodeHeights( 2 ) = Zone( MultizoneZoneData( IntraZoneLinkageData( i ).NodeNums( 2 ) ).ZoneNum ).Centroid.z;
 					} else {
