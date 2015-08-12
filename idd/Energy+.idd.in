@@ -372,7 +372,7 @@ Version,
       \format singleLine
   A1 ; \field Version Identifier
       \required-field
-      \default 8.3
+      \default ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}
 
 SimulationControl,
       \unique-object
@@ -18374,19 +18374,19 @@ RoomAirModelType,
       \note Mundt roomair model for displacement ventilation with single floor air node
       \note needs RoomAirSettings:OneNodeDisplacementVentilation object referencing this Zone
       \key ThreeNodeDisplacementVentilation
-      \note (UCSD three-node displacement ventilation model)
+      \note (ThreeNodeDisplacementVentilation = RoomAir modeling using UCSD three-node displacement ventilation model)
       \note needs RoomAirSettings:ThreeNodeDisplacementVentilation object referencing this Zone
       \key CrossVentilation
-      \note (UCSD two-zone cross ventilation model)
+      \note (CrossVentilation = RoomAir modeling using UCSD two-zone cross ventilation model)
       \note needs RoomAirSettings:CrossVentilation object referencing this Zone
       \key UnderFloorAirDistributionInterior
       \note 2-Node UFAD model for interior zones
       \note needs RoomAirSettings:UnderFloorAirDistributionInterior object referencing this Zone
       \key UnderFloorAirDistributionExterior
-      \note (2-Node UFAD model for exterior zones)
+      \note (UnderFloorAirDistributionExterior = RoomAir modeling using 2-Node UFAD model for exterior zones)
       \note needs RoomAirSettings:UnderFloorAirDistributionExterior object referencing this Zone
       \key AirflowNetwork
-      \note (RoomAir modeling using AirflowNetwork)
+      \note (AirflowNetwork = RoomAir modeling using AirflowNetwork)
       \note needs RoomAirSettings:AirflowNetwork object referencing this Zone
       \default Mixing
   A4; \field Air Temperature Coupling Strategy
