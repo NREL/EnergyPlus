@@ -154,6 +154,13 @@ namespace HVACManager {
 	// MODULE SUBROUTINES:
 
 	// Functions
+	void
+	clear_state()
+	{
+		HVACManageIteration = 0;
+		RepIterAir = 0;
+	}
+
 
 	void
 	ManageHVAC()

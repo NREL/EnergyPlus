@@ -75,6 +75,14 @@ namespace OutsideEnergySources {
 	Array1D< ReportVars > EnergySourceReport;
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumDistrictUnits = 0;
+		EnergySource.deallocate();
+		EnergySourceReport.deallocate();
+	};
+
 
 	void
 	SimOutsideEnergy(

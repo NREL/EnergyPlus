@@ -156,6 +156,13 @@ namespace SimulationManager {
 	// MODULE SUBROUTINES:
 
 	// Functions
+	void
+	clear_state()
+	{
+		RunPeriodsInInput = false ;
+		RunControlInInput = false ;
+	}
+
 
 	void
 	ManageSimulation()

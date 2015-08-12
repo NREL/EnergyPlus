@@ -1170,6 +1170,8 @@ namespace WeatherManager {
 	extern Array1D< DataPeriodData > DataPeriods;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageWeather();

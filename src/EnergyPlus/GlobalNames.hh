@@ -65,6 +65,10 @@ namespace GlobalNames {
 
 	// Functions
 
+	// for unit tests
+	void
+	clear_state();
+
 	void
 	VerifyUniqueChillerName(
 		std::string const & TypeToVerify,

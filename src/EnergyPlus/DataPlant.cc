@@ -378,6 +378,44 @@ namespace DataPlant {
 
 	// Functions
 
+	// Clears the global data in DataPlant.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumPipes = 0;
+		NumPlantPipes = 0;
+		NumCondPipes = 0;
+		EconLoadMet = 0.0 ; // Load met by Economizer
+		TotNumLoops = 0;
+		TotNumHalfLoops = 0;
+		PlantFirstSizeCompleted = false;
+		PlantFirstSizesOkayToFinalize = false;
+		PlantReSizingCompleted = false;
+		PlantFirstSizesOkayToReport = false;
+		PlantFinalSizesOkayToReport = false;
+		AnyEMSPlantOpSchemesInModel = false;
+		EconBranchNum.deallocate();
+		EconCompNum.deallocate();
+		CheckLoopEcon.deallocate();
+		EconOn.deallocate();
+		SimSupplySide.deallocate();
+		SimDemandSide.deallocate();
+		LoadChangeDownStream.deallocate();
+		PlantManageSubIterations = 0;
+		PlantManageHalfLoopCalls = 0;
+		Pipe.deallocate();
+		PlantLoop.deallocate();
+		PlantAvailMgr.deallocate();
+		PlantReport.deallocate();
+		VentRepPlantSupplySide.deallocate();
+		VentRepPlantDemandSide.deallocate();
+		VentRepCondSupplySide.deallocate();
+		VentRepCondDemandSide.deallocate();
+		PlantCallingOrderInfo.deallocate();
+
+	}
+
 	void
 	ScanPlantLoopsForObject(
 		std::string const & CompName,

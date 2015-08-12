@@ -24,7 +24,33 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataBranchNodeConnections.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/PlantManager.hh>
+#include <EnergyPlus/SetPointManager.hh>
+#include <EnergyPlus/OutsideEnergySources.hh>
+#include <EnergyPlus/HVACManager.hh>
+#include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
 
+#include <EnergyPlus/DataConvergParams.hh>
+#include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 
 #include <fstream>
 #include <algorithm>
@@ -66,6 +92,28 @@ namespace EnergyPlus {
 		InputProcessor::clear_state();
 		OutputProcessor::clear_state();
 		ScheduleManager::clear_state();
+		DataAirLoop::clear_state();
+		DataBranchNodeConnections::clear_state();
+		DataHVACGlobals::clear_state();
+		DataLoopNode::clear_state();
+		DataSizing::clear_state();
+		Humidifiers::clear_state();
+		MixedAir::clear_state();
+		NodeInputManager::clear_state();
+		OutAirNodeManager::clear_state();
+		DataDefineEquip::clear_state();
+		DataZoneEquipment::clear_state();
+		DataPlant::clear_state();
+		GlobalNames::clear_state();
+		SetPointManager::clear_state();
+		OutsideEnergySources::clear_state();
+		HVACManager::clear_state();
+		BranchInputManager::clear_state();
+		SimulationManager::clear_state();
+		SizingManager::clear_state();
+		DataConvergParams::clear_state();
+		WeatherManager::clear_state();
+		OutputReportPredefined::clear_state();
 
 		{ 
 			IOFlags flags; 

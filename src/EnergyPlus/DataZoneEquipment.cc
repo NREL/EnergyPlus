@@ -111,6 +111,28 @@ namespace DataZoneEquipment {
 	Array1D< ReturnAir > ReturnAirPath;
 
 	// Functions
+	// Clears the global data in DataZoneEquipment.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumSupplyAirPaths = 0;
+		NumReturnAirPaths = 0 ;
+		ZoneEquipInputsFilled = false ;
+		ZoneEquipSimulatedOnce = false ;
+		NumOfZoneEquipLists = 0 ; // The Number of Zone Equipment List objects
+		ZoneEquipAvail.deallocate();
+		CrossMixingReportFlag.deallocate();
+		MixingReportFlag.deallocate();
+		VentMCP.deallocate();
+		ZoneEquipConfig.deallocate();
+		ZoneEquipList.deallocate();
+		HeatingControlList.deallocate();
+		CoolingControlList.deallocate();
+		SupplyAirPath.deallocate();
+		ReturnAirPath.deallocate();
+	
+	};
 
 	void
 	GetZoneEquipmentData()

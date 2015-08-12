@@ -849,6 +849,10 @@ namespace DataZoneEquipment {
 	extern Array1D< ReturnAir > ReturnAirPath;
 
 	// Functions
+		// Clears the global data in DataZoneEquipment.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 	void
 	GetZoneEquipmentData();

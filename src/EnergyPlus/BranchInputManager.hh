@@ -267,6 +267,8 @@ namespace BranchInputManager {
 	extern Array1D< MixerData > Mixers; // Mixer Data for each Mixer
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageBranchInput();

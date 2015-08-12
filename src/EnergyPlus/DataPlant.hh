@@ -2317,6 +2317,12 @@ namespace DataPlant {
 
 	// Functions
 
+	// Clears the global data in DataPlant.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
+
 	void
 	ScanPlantLoopsForObject(
 		std::string const & CompName,

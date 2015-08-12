@@ -94,6 +94,22 @@ namespace DataConvergParams {
 	Array1D< HVACAirLoopIterationConvergenceStruct > AirLoopConvergence;
 	Array1D< PlantIterationConvergenceStruct > PlantConvergence;
 
+	void
+	clear_state()
+	{
+		AirLoopConvergFail = 0 ;
+		MinTimeStepSys = ( 1.0 / 60.0 ) ; // =1 minute
+		MinTimeStepTol = 1.0e-4 ; // = min allowable for ABS(1.-TimeStepSys/(MinTimeStepSys))
+		MaxZoneTempDiff = 0.3 ; // 0.3 C = (1% OF 300 C) = max allowable difference between
+		MinSysTimeRemaining = ( 1.0 / 3600.0 ) ; // = 1 second
+		MaxIter = 20 ; // maximum number of iterations allowed
+		MaxPlantSubIterations = 8 ; // Iteration Max for Plant Simulation sub iterations
+		MinPlantSubIterations = 2 ; // Iteration Min for Plant Simulation sub iterations
+		ZoneInletConvergence.deallocate();
+		AirLoopConvergence.deallocate();
+		PlantConvergence.deallocate();
+	}
+
 	//     NOTICE
 	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence

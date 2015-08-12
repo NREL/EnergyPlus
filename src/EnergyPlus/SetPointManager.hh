@@ -1950,6 +1950,9 @@ namespace SetPointManager {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	ManageSetPoints();
 
 	void

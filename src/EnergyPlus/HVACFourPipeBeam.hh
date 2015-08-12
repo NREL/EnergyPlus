@@ -104,6 +104,10 @@ public: // Creation
 
 public: // Methods		MARK ANY THAT DON'T ALTER STATE const !!!
 
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	static std::shared_ptr< AirTerminalUnit >
 	fourPipeBeamFactory(
 		int objectType,
@@ -145,8 +149,6 @@ public: // Methods		MARK ANY THAT DON'T ALTER STATE const !!!
 	void
 	simulate(
 		bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
-		int const ZoneNum, // index of zone served by the unit
-		int const ZoneNodeNum, // zone node number of zone served by the unit
 		Real64 & NonAirSysOutput // convective cooling by the beam system [W]
 	);
 

@@ -105,6 +105,26 @@ namespace BranchInputManager {
 	Array1D< MixerData > Mixers; // Mixer Data for each Mixer
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumOfBranchLists = 0; // Number of Branch Lists found in IDF
+		NumOfBranches = 0; // Number of Branches found in IDF
+		NumOfConnectorLists = 0; // Number of Connector Lists found in IDF
+		NumSplitters = 0; // Number of Splitters found in IDF
+		NumMixers = 0; // Number of Mixers found in IDF
+		GetBranchInputFlag = true ; // Flag used to retrieve Input
+		GetBranchListInputFlag = true ; // Flag used to retrieve Input
+		GetSplitterInputFlag = true ; // Flag used to retrieve Input
+		GetMixerInputFlag = true ; // Flag used to retrieve Input
+		GetConnectorListInputFlag = true ; // Flag used to retrieve Input
+		InvalidBranchDefinitions = true ;
+		BranchList.deallocate(); // Branch List data for each Branch List
+		Branch.deallocate(); // Branch Data for each Branch
+		ConnectorLists.deallocate(); // Connector List data for each Connector List
+		Splitters.deallocate(); // Splitter Data for each Splitter
+		Mixers.deallocate(); // Mixer Data for each Mixer
+	}
 
 	void
 	ManageBranchInput()
@@ -1833,6 +1853,7 @@ namespace BranchInputManager {
 		}
 		BCount = 0;
 		for ( Count = 1; Count <= NumOfBranchLists; ++Count ) {
+			CurrentModuleObject = "BranchList";
 			GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;

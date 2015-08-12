@@ -837,6 +837,9 @@ namespace OutputReportPredefined {
 	extern Array1D< ShadowRelateType > ShadowRelate;
 
 	// Functions
+	void
+	clear_state();
+
 
 	void
 	SetPredefinedTables();

@@ -287,6 +287,237 @@ namespace WeatherManager {
 	// MODULE SUBROUTINES:
 
 	// Functions
+	void
+	clear_state()
+	{
+		Debugout = false ;
+		YearofSim = 1 ; // The Present year of Simulation.
+		EnvironmentReportNbr = 0 ; // Report number for the environment stamp
+		EnvironmentReportChr = ""; // Report number for the environment stamp (character -- for printing)
+		TimeStampReportNbr = 0; // Report number for the time stamp
+		TimeStampReportChr = ""; // Report number for the time stamp (character -- for printing)
+		WeatherDataReport = 0 ; // Report number for the weather data
+		WeatherFileExists = false ; // Set to true if a weather file exists
+		LocationTitle = ""; // Location Title from input File
+		LocationGathered = false; // flag to show if Location exists on Input File (we assume one is 
+		WeatherFileLatitude = 0.0 ;
+		WeatherFileLongitude = 0.0 ;
+		WeatherFileTimeZone = 0.0 ;
+		WeatherFileElevation = 0.0 ;
+		WeatherFileUnitNumber = 0 ; // File unit number for the weather file
+		for ( int i = 1; i <= 12; i++ )
+		{
+			GroundTemps( i ) = 18.0;
+			GroundTempsFC( i ) = 0.0;
+			SurfaceGroundTemps( i ) = 13.0;
+			DeepGroundTemps( i ) = 16.0;
+			GroundReflectances( i ) = 0.2;
+		}
+		SnowGndRefModifier = 1.0 ; // Modifier to ground reflectance during snow
+		SnowGndRefModifierForDayltg = 1.0 ; // Modifier to ground reflectance during snow for daylighting
+		WaterMainsTempsMethod = 0 ; // Water mains temperature calculation method
+		WaterMainsTempsSchedule = 0 ; // Water mains temperature schedule
+		WaterMainsTempsAnnualAvgAirTemp = 0.0 ; // Annual average outdoor air temperature (C)
+		WaterMainsTempsMaxDiffAirTemp = 0.0 ; // Maximum difference in monthly average outdoor air temperatures (deltaC)
+		wthFCGroundTemps = false;
+		RainAmount =  0.0 ;
+		SnowAmount = 0.0 ;
+		TotRunPers =  0 ; // Total number of Run Periods (Weather data) to Setup
+		TotRunDesPers = 0 ; // Total number of Run Design Periods (Weather data) to Setup
+		NumSpecialDays = 0 ;
+		for ( int i = 1; i <= 366; i++ )
+		{
+			SpecialDayTypes( i ) = 0 ;
+			WeekDayTypes( i) = 0;
+			DSTIndex( i ) = 0;
+		}
+
+		NumDataPeriods = 0;
+		NumIntervalsPerHour = 1;
+		UseDaylightSaving = true ; // True if user says to use Weather File specified DaylightSaving Period
+		UseSpecialDays = true; // True if user says to use Weather File specified Special Days for current RunPeriod
+		UseRainValues = true ; // True if rain values from weather file are to be used
+		UseSnowValues = true ; // True if snow values from weather file are to be used
+		EPWDaylightSaving = false ; // True if a DaylightSaving Time Period is input (EPW files)
+		IDFDaylightSaving = false ; // True if a DaylightSaving Time Period is input (IDF files)
+		DaylightSavingIsActive = false ; // True if a DaylightSavingPeriod should be used for Environment
+		WFAllowsLeapYears = false; // True if the Weather File (WF) header has "Yes" for Leap Years
+		WFLeapYearInd =  0 ; // Indicator for current Weather file "Leap Year", used in DayOfYear calculations and others.
+		curSimDayForEndOfRunPeriod = 0 ; // normal=number days in sim, but different when repeating runperiods or multi-year files
+		Envrn = 0 ; // Counter for environments
+		NumOfEnvrn = 0 ; // Number of environments to be simulated
+		NumEPWTypExtSets = 0 ; // Number of Typical/Extreme on weather file.
+		NumWPSkyTemperatures = 0 ; // Number of WeatherProperty:SkyTemperature items in input file
+		TodayIsRain.deallocate(); // Rain indicator, true=rain
+		TodayIsSnow.deallocate(); // Snow indicator, true=snow
+		TodayRainAmount.deallocate(); // ficitious indicator of Rain
+		TodaySnowAmount.deallocate(); // ficitious indicator of Snow
+		TodayOutDryBulbTemp.deallocate(); // Dry bulb temperature of outside air
+		TodayOutWetBulbTemp.deallocate(); // Wet bulb temperature of outside air
+		TodayOutDewPointTemp.deallocate(); // Dew Point Temperature of outside air
+		TodayOutBaroPress.deallocate(); // Barometric pressure of outside air
+		TodayOutHumRat.deallocate(); // Humidity ratio of outside air
+		TodayOutRelHum.deallocate(); // Relative Humidity of outside air
+		TodayWindSpeed.deallocate(); // Wind speed of outside air
+		TodayWindDir.deallocate(); // Wind direction of outside air
+		TodaySkyTemp.deallocate(); // Sky temperature
+		TodayHorizIRSky.deallocate(); // Horizontal IR from Sky
+		TodayBeamSolarRad.deallocate(); // Direct normal solar irradiance
+		TodayDifSolarRad.deallocate(); // Sky diffuse horizontal solar irradiance
+		TodayAlbedo.deallocate(); // Albedo
+		TodayLiquidPrecip.deallocate(); // Liquid Precipitation Depth (mm)
+		TomorrowIsRain.deallocate(); // Rain indicator, true=rain
+		TomorrowIsSnow.deallocate(); // Snow indicator, true=snow
+		TomorrowRainAmount.deallocate(); // ficitious indicator of Rain
+		TomorrowSnowAmount.deallocate(); // ficitious indicator of Snow
+		TomorrowOutDryBulbTemp.deallocate(); // Dry bulb temperature of outside air
+		TomorrowOutDewPointTemp.deallocate(); // Dew Point Temperature of outside air
+		TomorrowOutBaroPress.deallocate(); // Barometric pressure of outside air
+		TomorrowOutRelHum.deallocate(); // Relative Humidity of outside air
+		TomorrowWindSpeed.deallocate(); // Wind speed of outside air
+		TomorrowWindDir.deallocate(); // Wind direction of outside air
+		TomorrowSkyTemp.deallocate(); // Sky temperature
+		TomorrowHorizIRSky.deallocate(); // Horizontal IR from Sky
+		TomorrowBeamSolarRad.deallocate(); // Direct normal solar irradiance
+		TomorrowDifSolarRad.deallocate(); // Sky diffuse horizontal solar irradiance
+		TomorrowAlbedo.deallocate(); // Albedo
+		TomorrowLiquidPrecip.deallocate(); // Liquid Precipitation Depth
+		DDDBRngModifier.deallocate(); // Design Day Dry-bulb Temperature Range Modifier
+		DDHumIndModifier.deallocate(); // Design Day relative humidity values
+		DDBeamSolarValues.deallocate(); // Design Day Beam Solar Values
+		DDDiffuseSolarValues.deallocate(); // Design Day Relative Humidity Values
+		DDSkyTempScheduleValues.deallocate(); // Sky temperature - DesignDay input
+		RptIsRain = 0 ; // Rain Report Value
+		RptIsSnow = 0 ; // Snow Report Value
+		RptDayType = 0 ; // DayType Report Value
+
+		HrAngle =  0.0 ; // Current Hour Angle
+		SolarAltitudeAngle = 0.0 ; // Angle of Solar Altitude (degrees)
+		SolarAzimuthAngle = 0.0 ; // Angle of Solar Azimuth (degrees)
+		HorizIRSky = 0.0 ; // Horizontal Infrared Radiation Intensity (W/m2)
+		TimeStepFraction = 0.0 ; // Fraction of hour each time step represents
+		SPSiteDryBulbRangeModScheduleValue.deallocate(); // reporting Drybulb Temperature Range Modifier Schedule Value
+		SPSiteHumidityConditionScheduleValue.deallocate(); // reporting Humidity Condition Schedule Value
+		SPSiteBeamSolarScheduleValue.deallocate(); // reporting Beam Solar Schedule Value
+		SPSiteDiffuseSolarScheduleValue.deallocate(); // reporting Diffuse Solar Schedule Value
+		SPSiteSkyTemperatureScheduleValue.deallocate(); // reporting SkyTemperature Modifier Schedule Value
+		SPSiteScheduleNamePtr.deallocate(); // SP Site Schedule Name Ptrs
+		SPSiteScheduleUnits.deallocate(); // SP Site Schedule Units
+		NumSPSiteScheduleNamePtrs = 0 ; // Number of SP Site Schedules (DesignDay only)
+		NumMissing = 0 ; // Number of hours of missing data
+		Interpolation.deallocate(); // Interpolation values based on Number of Time Steps in Hour
+		SolarInterpolation.deallocate(); // Solar Interpolation values based on
+
+		ErrorInWeatherFile = false ; // Set to TRUE when there is a problem with dates
+		LeapYearAdd = 0 ; 
+		DatesShouldBeReset = false; 
+		StartDatesCycleShouldBeReset = false; // True when start dates on repeat should be reset
+		Jan1DatesShouldBeReset = false; // True if Jan 1 should signal reset of dates
+
+		TodayVariables.DayOfYear = 0 ;
+		TodayVariables.Year = 0 ;
+		TodayVariables.Month = 0 ;
+		TodayVariables.DayOfMonth = 0 ;
+		TodayVariables.DayOfWeek = 0 ;
+		TodayVariables.DaylightSavingIndex = 0 ;
+		TodayVariables.HolidayIndex = 0 ;
+		TodayVariables.SinSolarDeclinAngle = 0.0 ;
+		TodayVariables.CosSolarDeclinAngle = 0.0 ;
+		TodayVariables.EquationOfTime = 0.0 ;
+		TomorrowVariables.DayOfYear = 0 ;
+		TomorrowVariables.Year = 0 ;
+		TomorrowVariables.Month = 0 ;
+		TomorrowVariables.DayOfMonth = 0 ;
+		TomorrowVariables.DayOfWeek = 0 ;
+		TomorrowVariables.DaylightSavingIndex = 0 ;
+		TomorrowVariables.HolidayIndex = 0 ;
+		TomorrowVariables.SinSolarDeclinAngle = 0.0 ;
+		TomorrowVariables.CosSolarDeclinAngle = 0.0 ;
+		TomorrowVariables.EquationOfTime = 0.0 ;
+
+		DesignDay.deallocate(); 
+
+		Missing.DryBulb = 0.0 ;
+		Missing.DewPoint = 0.0 ;
+		Missing.RelHumid = 0 ;
+		Missing.StnPres = 0.0 ;
+		Missing.WindDir = 0 ;
+		Missing.WindSpd = 0.0 ;
+		Missing.TotSkyCvr = 0 ;
+		Missing.OpaqSkyCvr = 0 ;
+		Missing.Visibility = 0.0 ;
+		Missing.Ceiling = 0 ;
+		Missing.PrecipWater = 0 ;
+		Missing.AerOptDepth = 0.0 ;
+		Missing.SnowDepth = 0 ;
+		Missing.DaysLastSnow = 0 ;
+		Missing.Albedo = 0.0 ;
+		Missing.LiquidPrecip = 0.0 ;
+		Missed.DryBulb = 0 ;
+		Missed.DewPoint = 0 ;
+		Missed.RelHumid = 0 ;
+		Missed.StnPres = 0 ;
+		Missed.WindDir = 0 ;
+		Missed.WindSpd = 0 ;
+		Missed.DirectRad = 0 ;
+		Missed.DiffuseRad = 0 ;
+		Missed.TotSkyCvr = 0 ;
+		Missed.OpaqSkyCvr = 0 ;
+		Missed.Visibility = 0 ;
+		Missed.Ceiling = 0 ;
+		Missed.PrecipWater = 0 ;
+		Missed.AerOptDepth = 0 ;
+		Missed.SnowDepth = 0 ;
+		Missed.DaysLastSnow = 0 ;
+		Missed.WeathCodes = 0 ;
+		Missed.Albedo = 0 ;
+		Missed.LiquidPrecip = 0 ;
+		OutOfRange.DryBulb = 0 ;
+		OutOfRange.DewPoint = 0 ;
+		OutOfRange.RelHumid = 0 ;
+		OutOfRange.StnPres = 0 ;
+		OutOfRange.WindDir = 0 ;
+		OutOfRange.WindSpd = 0 ;
+		OutOfRange.DirectRad = 0 ;
+		OutOfRange.DiffuseRad = 0 ;
+
+		DesDayInput.deallocate(); // Design day Input Data
+		Environment.deallocate(); // Environment data
+		RunPeriodInput.deallocate();
+		RunPeriodDesignInput.deallocate();
+		TypicalExtremePeriods.deallocate();
+
+		EPWDST.StDateType = 0 ;
+		EPWDST.StWeekDay = 0 ;
+		EPWDST.StMon = 0 ;
+		EPWDST.StDay = 0 ;
+		EPWDST.EnDateType = 0 ;
+		EPWDST.EnMon = 0 ;
+		EPWDST.EnDay = 0 ;
+		EPWDST.EnWeekDay = 0 ;
+
+		IDFDST.StDateType = 0 ;
+		IDFDST.StWeekDay = 0 ;
+		IDFDST.StMon = 0 ;
+		IDFDST.StDay = 0 ;
+		IDFDST.EnDateType = 0 ;
+		IDFDST.EnMon = 0 ;
+		IDFDST.EnDay = 0 ;
+		IDFDST.EnWeekDay = 0 ;
+
+		DST.StDateType = 0 ;
+		DST.StWeekDay = 0 ;
+		DST.StMon = 0 ;
+		DST.StDay = 0 ;
+		DST.EnDateType = 0 ;
+		DST.EnMon = 0 ;
+		DST.EnDay = 0 ;
+		DST.EnWeekDay = 0 ;
+		WPSkyTemperature.deallocate();
+		SpecialDays.deallocate();
+		DataPeriods.deallocate();
+	
+	} //clear_state, for unit tests
 
 	void
 	ManageWeather()

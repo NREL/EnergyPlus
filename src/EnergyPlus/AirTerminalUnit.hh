@@ -73,19 +73,21 @@ protected: // Assignment
 //	operator =( AirTerminalUnit const & ) = default;
 
 	// Move Assignment
-#if !defined(_MSC_VER) || defined(__INTEL_COMPILER) || (_MSC_VER>=1900)
-	operator =( AirTerminalUnit && ) = default;
-#endif
+//#if !defined(_MSC_VER) || defined(__INTEL_COMPILER) || (_MSC_VER>=1900)
+//	operator =( AirTerminalUnit && ) = default;
+//#endif
 
 public: // Methods		REMOVE ANY OF THESE THAT AREN'T COMMON (WITH SAME ARGS) TO ALL SUB-TYPES
 
+	// for unit tests
+	virtual
+	void
+	clear_state() = 0;
 
 	virtual
 	void
 	simulate(
 		bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
-		int const ZoneNum, // index of zone served by the unit
-		int const ZoneNodeNum, // zone node number of zone served by the unit
 		Real64 & NonAirSysOutput // convective cooling by the beam system [W]
 	) = 0;
 

@@ -6,6 +6,24 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -16,6 +34,31 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/PlantManager.hh>
+#include <EnergyPlus/SetPointManager.hh>
+#include <EnergyPlus/OutsideEnergySources.hh>
+#include <EnergyPlus/HVACManager.hh>
+#include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+
+#include <EnergyPlus/DataConvergParams.hh>
+#include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+// following have not added clear_state yet
+
+//#include <EnergyPlus/ZoneEquipmentManager.hh>
+
+
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/PlantUtilities.hh>
 
 namespace EnergyPlus {
 
@@ -35,16 +78,8 @@ namespace EnergyPlus {
 			Psychrometrics::cached_Twb.deallocate();
 			Psychrometrics::cached_Psat.deallocate();
 
-			DataAirLoop::clear_state();
-			DataBranchNodeConnections::clear_state();
-			DataHVACGlobals::clear_state();
-			DataLoopNode::clear_state();
-			DataSizing::clear_state();
-			Humidifiers::clear_state();
-			MixedAir::clear_state();
-			NodeInputManager::clear_state();
-			OutAirNodeManager::clear_state();
-			
+
+
 			EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 		}
 	};
