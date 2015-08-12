@@ -161,7 +161,7 @@ namespace BranchNodeConnections {
 				}
 
 				// Check out AirTerminal inlet/outlet nodes
-				Found = FindItemInList( NodeName, AirTerminalNodeConnections.NodeName(), NumOfAirTerminalNodes - 1 );
+				Found = FindItemInList( NodeName, AirTerminalNodeConnections, &EqNodeConnectionDef::NodeName, NumOfAirTerminalNodes - 1 );
 				if ( Found != 0 ) { // Nodename already used
 					ShowSevereError( RoutineName + ObjectType + "=\"" + ObjectName + "\" node name duplicated." );
 					ShowContinueError( "NodeName=\"" + NodeName + "\", entered as type=" + ConnectionType );
@@ -1988,7 +1988,7 @@ namespace BranchNodeConnections {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

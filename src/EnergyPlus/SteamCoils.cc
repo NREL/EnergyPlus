@@ -169,7 +169,7 @@ namespace SteamCoils {
 
 		// Find the correct SteamCoilNumber with the Coil Name
 		if ( CompIndex == 0 ) {
-			CoilNum = FindItemInList( CompName, SteamCoil.Name(), NumSteamCoils );
+			CoilNum = FindItemInList( CompName, SteamCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "SimulateSteamCoilComponents: Coil not found=" + CompName );
 			}
@@ -299,7 +299,7 @@ namespace SteamCoils {
 			GetObjectItem( CurrentModuleObject, StmHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SteamCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), SteamCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1371,7 +1371,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilType == "COIL:HEATING:STEAM" ) {
-			IndexNum = FindItemInList( CoilName, SteamCoil.Name(), NumSteamCoils );
+			IndexNum = FindItemInList( CoilName, SteamCoil );
 		} else {
 			IndexNum = 0;
 		}
@@ -1436,7 +1436,7 @@ namespace SteamCoils {
 
 		// Find the correct Coil number
 		if ( CompIndex == 0 ) {
-			CoilNum = FindItemInList( CompName, SteamCoil.Name(), NumSteamCoils );
+			CoilNum = FindItemInList( CompName, SteamCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "CheckSteamCoilSchedule: Coil not found=" + CompName );
 			}
@@ -1510,7 +1510,7 @@ namespace SteamCoils {
 		}
 
 		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			WhichCoil = FindItem( CoilName, SteamCoil.Name(), NumSteamCoils );
+			WhichCoil = FindItem( CoilName, SteamCoil );
 			if ( WhichCoil != 0 ) {
 				// coil does not specify MaxWaterFlowRate
 				MaxWaterFlowRate = 0.0;
@@ -1774,7 +1774,7 @@ namespace SteamCoils {
 		}
 
 		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			IndexNum = FindItem( CoilName, SteamCoil.Name(), NumSteamCoils );
+			IndexNum = FindItem( CoilName, SteamCoil );
 		} else {
 			IndexNum = 0;
 		}
@@ -1907,7 +1907,7 @@ namespace SteamCoils {
 		}
 
 		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			IndexNum = FindItem( CoilName, SteamCoil.Name(), NumSteamCoils );
+			IndexNum = FindItem( CoilName, SteamCoil );
 		} else {
 			IndexNum = 0;
 		}
@@ -2042,7 +2042,7 @@ namespace SteamCoils {
 		}
 
 		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			IndexNum = FindItem( CoilName, SteamCoil.Name(), NumSteamCoils );
+			IndexNum = FindItem( CoilName, SteamCoil );
 		} else {
 			IndexNum = 0;
 		}
@@ -2113,7 +2113,7 @@ namespace SteamCoils {
 		}
 
 		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			WhichCoil = FindItem( CoilName, SteamCoil.Name(), NumSteamCoils );
+			WhichCoil = FindItem( CoilName, SteamCoil );
 			if ( WhichCoil != 0 ) {
 				// coil does not specify MaxWaterFlowRate
 				Capacity = SteamCoil( WhichCoil ).OperatingCapacity;
@@ -2254,7 +2254,7 @@ namespace SteamCoils {
 		WhichCoil = 0;
 		NodeNumber = 0;
 		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			WhichCoil = FindItem( CoilName, SteamCoil.Name(), NumSteamCoils );
+			WhichCoil = FindItem( CoilName, SteamCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = SteamCoil( WhichCoil ).TempSetPointNodeNum;
 			}
@@ -2329,7 +2329,7 @@ namespace SteamCoils {
 		AvailSchIndex = 0;
 
 		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			WhichCoil = FindItem( CoilName, SteamCoil.Name(), NumSteamCoils );
+			WhichCoil = FindItem( CoilName, SteamCoil );
 			if ( WhichCoil != 0 ) {
 				AvailSchIndex = SteamCoil( WhichCoil ).SchedPtr;
 			}
@@ -2352,7 +2352,7 @@ namespace SteamCoils {
 	// *****************************************************************************
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

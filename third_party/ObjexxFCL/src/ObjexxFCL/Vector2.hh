@@ -1,7 +1,7 @@
 #ifndef ObjexxFCL_Vector2_hh_INCLUDED
 #define ObjexxFCL_Vector2_hh_INCLUDED
 
-// Vector2: Fast Two-Element Vector
+// Vector2: Fast 2-Element Vector
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
@@ -31,7 +31,10 @@
 
 namespace ObjexxFCL {
 
-// Vector2: Fast Two-Element Vector
+// Vector2: Fast 2-Element Vector
+// . Heap-free and loop-free for speed
+// . Provides direct element access via .x style lookup
+// . Use std::array< T, 2 > instead in array/vectorization context
 template< typename T >
 class Vector2
 {
@@ -41,6 +44,10 @@ private: // Friends
 	template< typename > friend class Vector2;
 
 public: // Types
+
+	typedef  TypeTraits< T >  Traits;
+	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
+	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
 
 	// STL Style
 	typedef  T  value_type;
@@ -64,9 +71,12 @@ public: // Creation
 
 	// Default Constructor
 	inline
-	Vector2() :
-	 x( T() ),
-	 y( T() )
+	Vector2()
+#if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
+	 :
+	 x( Traits::initial_array_value() ),
+	 y( Traits::initial_array_value() )
+#endif
 	{}
 
 	// Copy Constructor
@@ -87,7 +97,7 @@ public: // Creation
 	// Uniform Value Constructor
 	inline
 	explicit
-	Vector2( T const & t ) :
+	Vector2( Tc t ) :
 	 x( t ),
 	 y( t )
 	{}
@@ -95,8 +105,8 @@ public: // Creation
 	// Value Constructor
 	inline
 	Vector2(
-	 T const & x_,
-	 T const & y_
+	 Tc x_,
+	 Tc y_
 	) :
 	 x( x_ ),
 	 y( y_ )
@@ -144,7 +154,7 @@ public: // Creation
 	inline
 	static
 	Vector2
-	x_vector( T const & tar_length = T( 1 ) )
+	x_vector( Tc tar_length = T( 1 ) )
 	{
 		return Vector2( tar_length, T( 0 ) );
 	}
@@ -153,7 +163,7 @@ public: // Creation
 	inline
 	static
 	Vector2
-	y_vector( T const & tar_length = T( 1 ) )
+	y_vector( Tc tar_length = T( 1 ) )
 	{
 		return Vector2( T( 0 ), tar_length );
 	}
@@ -162,9 +172,9 @@ public: // Creation
 	inline
 	static
 	Vector2
-	uniform_vector( T const & tar_length = T( 1 ) )
+	uniform_vector( Tc tar_length = T( 1 ) )
 	{
-		return Vector2( std::sqrt( ( tar_length * tar_length ) / T( 2 ) ) );
+		return Vector2( tar_length / std::sqrt( T( 2 ) ) );
 	}
 
 	// Destructor
@@ -375,7 +385,7 @@ public: // Assignment
 	// = Value
 	inline
 	Vector2 &
-	operator =( T const & t )
+	operator =( Tc t )
 	{
 		x = y = t;
 		return *this;
@@ -384,7 +394,7 @@ public: // Assignment
 	// += Value
 	inline
 	Vector2 &
-	operator +=( T const & t )
+	operator +=( Tc t )
 	{
 		x += t;
 		y += t;
@@ -394,7 +404,7 @@ public: // Assignment
 	// -= Value
 	inline
 	Vector2 &
-	operator -=( T const & t )
+	operator -=( Tc t )
 	{
 		x -= t;
 		y -= t;
@@ -404,7 +414,7 @@ public: // Assignment
 	// *= Value
 	inline
 	Vector2 &
-	operator *=( T const & t )
+	operator *=( Tc t )
 	{
 		x *= t;
 		y *= t;
@@ -440,8 +450,8 @@ public: // Assignment
 	inline
 	Vector2 &
 	assign(
-	 T const & x_,
-	 T const & y_
+	 Tc x_,
+	 Tc y_
 	)
 	{
 		x = x_;
@@ -455,7 +465,7 @@ public: // Assignment: Scaled
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Vector2 &
-	scaled_assign( T const & t, Vector2< U > const & v )
+	scaled_assign( Tc t, Vector2< U > const & v )
 	{
 		x = t * v.x;
 		y = t * v.y;
@@ -466,7 +476,7 @@ public: // Assignment: Scaled
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Vector2 &
-	scaled_add( T const & t, Vector2< U > const & v )
+	scaled_add( Tc t, Vector2< U > const & v )
 	{
 		x += t * v.x;
 		y += t * v.y;
@@ -477,7 +487,7 @@ public: // Assignment: Scaled
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Vector2 &
-	scaled_sub( T const & t, Vector2< U > const & v )
+	scaled_sub( Tc t, Vector2< U > const & v )
 	{
 		x -= t * v.x;
 		y -= t * v.y;
@@ -488,7 +498,7 @@ public: // Assignment: Scaled
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Vector2 &
-	scaled_mul( T const & t, Vector2< U > const & v )
+	scaled_mul( Tc t, Vector2< U > const & v )
 	{
 		x *= t * v.x;
 		y *= t * v.y;
@@ -499,7 +509,7 @@ public: // Assignment: Scaled
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Vector2 &
-	scaled_div( T const & t, Vector2< U > const & v )
+	scaled_div( Tc t, Vector2< U > const & v )
 	{
 		assert( t != T( 0 ) );
 		assert( v.x != T( 0 ) );
@@ -513,7 +523,7 @@ public: // Subscript
 
 	// Vector2[ i ] const: 0-Based Index
 	inline
-	T const &
+	Tr
 	operator []( size_type const i ) const
 	{
 		assert( i <= 1 );
@@ -531,7 +541,7 @@ public: // Subscript
 
 	// Vector2( i ) const: 1-Based Index
 	inline
-	T const &
+	Tr
 	operator ()( size_type const i ) const
 	{
 		assert( ( 1 <= i ) && ( i <= 2 ) );
@@ -600,10 +610,26 @@ public: // Properties: General
 		return std::sqrt( ( x * x ) + ( y * y ) );
 	}
 
+	// Magnitude
+	inline
+	T
+	mag() const
+	{
+		return std::sqrt( ( x * x ) + ( y * y ) );
+	}
+
 	// Magnitude Squared
 	inline
 	T
 	magnitude_squared() const
+	{
+		return ( x * x ) + ( y * y );
+	}
+
+	// Magnitude Squared
+	inline
+	T
+	mag_squared() const
 	{
 		return ( x * x ) + ( y * y );
 	}
@@ -666,7 +692,7 @@ public: // Properties: General
 		return ( x * a[ 0 ] ) + ( y * a[ 1 ] );
 	}
 
-	// Cross Product
+	// Cross Product with a Vector2
 	inline
 	T
 	cross( Vector2 const & v ) const
@@ -674,7 +700,7 @@ public: // Properties: General
 		return ( x * v.y ) - ( y * v.x );
 	}
 
-	// Cross Product
+	// Cross Product with an Array
 	template< typename A, class = typename std::enable_if< std::is_assignable< T&, typename A::value_type >::value >::type >
 	inline
 	T
@@ -686,7 +712,7 @@ public: // Properties: General
 
 	// Alias for Element 1
 	inline
-	T const &
+	Tr
 	x1() const
 	{
 		return x;
@@ -702,7 +728,7 @@ public: // Properties: General
 
 	// Alias for Element 2
 	inline
-	T const &
+	Tr
 	x2() const
 	{
 		return y;
@@ -740,7 +766,7 @@ public: // Modifiers
 	// Normalize to a Length
 	inline
 	Vector2 &
-	normalize( T const & tar_length = T( 1 ) )
+	normalize( Tc tar_length = T( 1 ) )
 	{
 		T const cur_length( length() );
 		assert( cur_length != T ( 0 ) );
@@ -753,7 +779,7 @@ public: // Modifiers
 	// Normalize to a Length: Zero Vector2 if Length is Zero
 	inline
 	Vector2 &
-	normalize_zero( T const & tar_length = T( 1 ) )
+	normalize_zero( Tc tar_length = T( 1 ) )
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -769,7 +795,7 @@ public: // Modifiers
 	// Normalize to a Length: Uniform Vector2 if Length is Zero
 	inline
 	Vector2 &
-	normalize_uniform( T const & tar_length = T( 1 ) )
+	normalize_uniform( Tc tar_length = T( 1 ) )
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -785,7 +811,7 @@ public: // Modifiers
 	// Normalize to a Length: x Vector2 if Length is Zero
 	inline
 	Vector2 &
-	normalize_x( T const & tar_length = T( 1 ) )
+	normalize_x( Tc tar_length = T( 1 ) )
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -802,7 +828,7 @@ public: // Modifiers
 	// Normalize to a Length: y Vector2 if Length is Zero
 	inline
 	Vector2 &
-	normalize_y( T const & tar_length = T( 1 ) )
+	normalize_y( Tc tar_length = T( 1 ) )
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -836,7 +862,17 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Sum In a Vector2
+	// Add a Vector2
+	inline
+	Vector2 &
+	add( Vector2 const & v )
+	{
+		x += v.x;
+		y += v.y;
+		return *this;
+	}
+
+	// Sum a Vector2
 	inline
 	Vector2 &
 	sum( Vector2 const & v )
@@ -846,10 +882,20 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Subtract Out a Vector2
+	// Subtract a Vector2
 	inline
 	Vector2 &
 	sub( Vector2 const & v )
+	{
+		x -= v.x;
+		y -= v.y;
+		return *this;
+	}
+
+	// Subtract a Vector2
+	inline
+	Vector2 &
+	subtract( Vector2 const & v )
 	{
 		x -= v.x;
 		y -= v.y;
@@ -901,7 +947,7 @@ public: // Generators
 	// Normalized to a Length
 	inline
 	Vector2
-	normalized( T const & tar_length = T( 1 ) ) const
+	normalized( Tc tar_length = T( 1 ) ) const
 	{
 		T const cur_length( length() );
 		assert( cur_length != T ( 0 ) );
@@ -915,7 +961,7 @@ public: // Generators
 	// Normalized to a Length: Zero Vector2 if Length is Zero
 	inline
 	Vector2
-	normalized_zero( T const & tar_length = T( 1 ) ) const
+	normalized_zero( Tc tar_length = T( 1 ) ) const
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -932,7 +978,7 @@ public: // Generators
 	// Normalized to a Length: Uniform Vector2 if Length is Zero
 	inline
 	Vector2
-	normalized_uniform( T const & tar_length = T( 1 ) ) const
+	normalized_uniform( Tc tar_length = T( 1 ) ) const
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -949,7 +995,7 @@ public: // Generators
 	// Normalized to a Length: x Vector2 if Length is Zero
 	inline
 	Vector2
-	normalized_x( T const & tar_length = T( 1 ) ) const
+	normalized_x( Tc tar_length = T( 1 ) ) const
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -966,7 +1012,7 @@ public: // Generators
 	// Normalized to a Length: y Vector2 if Length is Zero
 	inline
 	Vector2
-	normalized_y( T const & tar_length = T( 1 ) ) const
+	normalized_y( Tc tar_length = T( 1 ) ) const
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -978,289 +1024,6 @@ public: // Generators
 		} else { // Return y vector
 			return Vector2( T( 0 ), tar_length, T( 0 ) );
 		}
-	}
-
-	// Vector2 + Vector2
-	friend
-	inline
-	Vector2
-	operator +( Vector2 const & a, Vector2 const & b )
-	{
-		return Vector2( a.x + b.x, a.y + b.y );
-	}
-
-	// Vector2 + Value
-	friend
-	inline
-	Vector2
-	operator +( Vector2 const & v, T const & t )
-	{
-		return Vector2( v.x + t, v.y + t );
-	}
-
-	// Value + Vector2
-	friend
-	inline
-	Vector2
-	operator +( T const & t, Vector2 const & v )
-	{
-		return Vector2( t + v.x, t + v.y );
-	}
-
-	// Vector2 - Vector2
-	friend
-	inline
-	Vector2
-	operator -( Vector2 const & a, Vector2 const & b )
-	{
-		return Vector2( a.x - b.x, a.y - b.y );
-	}
-
-	// Vector2 - Value
-	friend
-	inline
-	Vector2
-	operator -( Vector2 const & v, T const & t )
-	{
-		return Vector2( v.x - t, v.y - t );
-	}
-
-	// Value - Vector2
-	friend
-	inline
-	Vector2
-	operator -( T const & t, Vector2 const & v )
-	{
-		return Vector2( t - v.x, t - v.y );
-	}
-
-	// Vector2 * Vector2
-	friend
-	inline
-	Vector2
-	operator *( Vector2 const & a, Vector2 const & b )
-	{
-		return Vector2( a.x * b.x, a.y * b.y );
-	}
-
-	// Vector2 * Value
-	friend
-	inline
-	Vector2
-	operator *( Vector2 const & v, T const & t )
-	{
-		return Vector2( v.x * t, v.y * t );
-	}
-
-	// Value * Vector2
-	friend
-	inline
-	Vector2
-	operator *( T const & t, Vector2 const & v )
-	{
-		return Vector2( t * v.x, t * v.y );
-	}
-
-	// Vector2 / Vector2
-	friend
-	inline
-	Vector2
-	operator /( Vector2 const & a, Vector2 const & b )
-	{
-		assert( b.x != T( 0 ) );
-		assert( b.y != T( 0 ) );
-		return Vector2( a.x / b.x, a.y / b.y );
-	}
-
-	// Vector2 / Value
-	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
-	friend
-	inline
-	Vector2
-	operator /( Vector2 const & v, U const & u )
-	{
-		assert( u != U( 0 ) );
-		U const inv_u( U ( 1 ) / u );
-		return Vector2( v.x * inv_u, v.y * inv_u );
-	}
-
-	// Vector2 / Value
-	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
-	friend
-	inline
-	Vector2
-	operator /( Vector2 const & v, U const & u )
-	{
-		assert( u != U( 0 ) );
-		return Vector2( v.x / u, v.y / u );
-	}
-
-	// Value / Vector2
-	friend
-	inline
-	Vector2
-	operator /( T const & t, Vector2 const & v )
-	{
-		assert( v.x != T( 0 ) );
-		assert( v.y != T( 0 ) );
-		return Vector2( t / v.x, t / v.y );
-	}
-
-	// Minimum of Two Vector2s
-	friend
-	inline
-	Vector2
-	min( Vector2 const & a, Vector2 const & b )
-	{
-		return Vector2(
-		 ( a.x <= b.x ? a.x : b.x ),
-		 ( a.y <= b.y ? a.y : b.y )
-		);
-	}
-
-	// Minimum of Three Vector2s
-	friend
-	inline
-	Vector2
-	min( Vector2 const & a, Vector2 const & b, Vector2 const & c )
-	{
-		return Vector2(
-		 ObjexxFCL::min( a.x, b.x, c.x ),
-		 ObjexxFCL::min( a.y, b.y, c.y )
-		);
-	}
-
-	// Minimum of Four Vector2s
-	friend
-	inline
-	Vector2
-	min( Vector2 const & a, Vector2 const & b, Vector2 const & c, Vector2 const & d )
-	{
-		return Vector2(
-		 ObjexxFCL::min( a.x, b.x, c.x, d.x ),
-		 ObjexxFCL::min( a.y, b.y, c.y, d.y )
-		);
-	}
-
-	// Maximum of Two Vector2s
-	friend
-	inline
-	Vector2
-	max( Vector2 const & a, Vector2 const & b )
-	{
-		return Vector2(
-		 ( a.x >= b.x ? a.x : b.x ),
-		 ( a.y >= b.y ? a.y : b.y )
-		);
-	}
-
-	// Maximum of Three Vector2s
-	friend
-	inline
-	Vector2
-	max( Vector2 const & a, Vector2 const & b, Vector2 const & c )
-	{
-		return Vector2(
-		 ObjexxFCL::max( a.x, b.x, c.x ),
-		 ObjexxFCL::max( a.y, b.y, c.y )
-		);
-	}
-
-	// Maximum of Four Vector2s
-	friend
-	inline
-	Vector2
-	max( Vector2 const & a, Vector2 const & b, Vector2 const & c, Vector2 const & d )
-	{
-		return Vector2(
-		 ObjexxFCL::max( a.x, b.x, c.x, d.x ),
-		 ObjexxFCL::max( a.y, b.y, c.y, d.y )
-		);
-	}
-
-	// Sum of Two Vector2s
-	friend
-	inline
-	Vector2
-	sum( Vector2 const & a, Vector2 const & b )
-	{
-		return Vector2( a.x + b.x, a.y + b.y );
-	}
-
-	// Sum of Three Vector2s
-	friend
-	inline
-	Vector2
-	sum( Vector2 const & a, Vector2 const & b, Vector2 const & c )
-	{
-		return Vector2( a.x + b.x + c.x, a.y + b.y + c.y );
-	}
-
-	// Sum of Four Vector2s
-	friend
-	inline
-	Vector2
-	sum( Vector2 const & a, Vector2 const & b, Vector2 const & c, Vector2 const & d )
-	{
-		return Vector2( a.x + b.x + c.x + d.x, a.y + b.y + c.y + d.y );
-	}
-
-	// Subtract of Two Vector2s
-	friend
-	inline
-	Vector2
-	sub( Vector2 const & a, Vector2 const & b )
-	{
-		return Vector2( a.x - b.x, a.y - b.y );
-	}
-
-	// Midpoint of Two Vector2s
-	friend
-	inline
-	Vector2
-	mid( Vector2 const & a, Vector2 const & b )
-	{
-		return Vector2(
-		 T( 0.5 * ( a.x + b.x ) ),
-		 T( 0.5 * ( a.y + b.y ) )
-		);
-	}
-
-	// Center of Two Vector2s
-	friend
-	inline
-	Vector2
-	cen( Vector2 const & a, Vector2 const & b )
-	{
-		return Vector2(
-		 T( 0.5 * ( a.x + b.x ) ),
-		 T( 0.5 * ( a.y + b.y ) )
-		);
-	}
-
-	// Center of Three Vector2s
-	friend
-	inline
-	Vector2
-	cen( Vector2 const & a, Vector2 const & b, Vector2 const & c )
-	{
-		static long double const third( 1.0 / 3.0 );
-		return Vector2(
-		 T( third * ( a.x + b.x + c.x ) ),
-		 T( third * ( a.y + b.y + c.y ) )
-		);
-	}
-
-	// Center of Four Vector2s
-	friend
-	inline
-	Vector2
-	cen( Vector2 const & a, Vector2 const & b, Vector2 const & c, Vector2 const & d )
-	{
-		return Vector2(
-		 T( 0.25 * ( a.x + b.x + c.x + d.x ) ),
-		 T( 0.25 * ( a.y + b.y + c.y + d.y ) )
-		);
 	}
 
 	// Projected Normal to a Vector2
@@ -1283,401 +1046,13 @@ public: // Generators
 		return Vector2( c * v.x, c * v.y );
 	}
 
-public: // Friends: Comparison
-
-	// Vector2 == Vector2
-	friend
-	inline
-	bool
-	operator ==( Vector2 const & a, Vector2 const & b )
-	{
-		return ( a.x == b.x ) && ( a.y == b.y );
-	}
-
-	// Vector2 != Vector2
-	friend
-	inline
-	bool
-	operator !=( Vector2 const & a, Vector2 const & b )
-	{
-		return ( a.x != b.x ) || ( a.y != b.y );
-	}
-
-	// Vector2 < Vector2: Lexicographic
-	friend
-	inline
-	bool
-	operator <( Vector2 const & a, Vector2 const & b )
-	{
-		return (
-		 ( a.x < b.x ? true :
-		 ( b.x < a.x ? false : // a.x == b.x
-		 ( a.y < b.y ) ) )
-		);
-	}
-
-	// Vector2 <= Vector2: Lexicographic
-	friend
-	inline
-	bool
-	operator <=( Vector2 const & a, Vector2 const & b )
-	{
-		return (
-		 ( a.x < b.x ? true :
-		 ( b.x < a.x ? false : // a.x == b.x
-		 ( a.y <= b.y ) ) )
-		);
-	}
-
-	// Vector2 >= Vector2: Lexicographic
-	friend
-	inline
-	bool
-	operator >=( Vector2 const & a, Vector2 const & b )
-	{
-		return (
-		 ( a.x > b.x ? true :
-		 ( b.x > a.x ? false : // a.x == b.x
-		 ( a.y >= b.y ) ) )
-		);
-	}
-
-	// Vector2 > Vector2: Lexicographic
-	friend
-	inline
-	bool
-	operator >( Vector2 const & a, Vector2 const & b )
-	{
-		return (
-		 ( a.x > b.x ? true :
-		 ( b.x > a.x ? false : // a.x == b.x
-		 ( a.y > b.y ) ) )
-		);
-	}
-
-	// Vector2 < Vector2: Element-wise
-	friend
-	inline
-	bool
-	lt( Vector2 const & a, Vector2 const & b )
-	{
-		return ( a.x < b.x ) && ( a.y < b.y );
-	}
-
-	// Vector2 <= Vector2: Element-wise
-	friend
-	inline
-	bool
-	le( Vector2 const & a, Vector2 const & b )
-	{
-		return ( a.x <= b.x ) && ( a.y <= b.y );
-	}
-
-	// Vector2 >= Vector2: Element-wise
-	friend
-	inline
-	bool
-	ge( Vector2 const & a, Vector2 const & b )
-	{
-		return ( a.x >= b.x ) && ( a.y >= b.y );
-	}
-
-	// Vector2 > Vector2: Element-wise
-	friend
-	inline
-	bool
-	gt( Vector2 const & a, Vector2 const & b )
-	{
-		return ( a.x > b.x ) && ( a.y > b.y );
-	}
-
-	// Vector2 == Value
-	friend
-	inline
-	bool
-	operator ==( Vector2 const & v, T const & t )
-	{
-		return ( v.x == t ) && ( v.y == t );
-	}
-
-	// Vector2 != Value
-	friend
-	inline
-	bool
-	operator !=( Vector2 const & v, T const & t )
-	{
-		return ( v.x != t ) || ( v.y != t );
-	}
-
-	// Vector2 < Value
-	friend
-	inline
-	bool
-	operator <( Vector2 const & v, T const & t )
-	{
-		return ( v.x < t ) && ( v.y < t );
-	}
-
-	// Vector2 <= Value
-	friend
-	inline
-	bool
-	operator <=( Vector2 const & v, T const & t )
-	{
-		return ( v.x <= t ) && ( v.y <= t );
-	}
-
-	// Vector2 >= Value
-	friend
-	inline
-	bool
-	operator >=( Vector2 const & v, T const & t )
-	{
-		return ( v.x >= t ) && ( v.y >= t );
-	}
-
-	// Vector2 > Value
-	friend
-	inline
-	bool
-	operator >( Vector2 const & v, T const & t )
-	{
-		return ( v.x > t ) && ( v.y > t );
-	}
-
-	// Value == Vector2
-	friend
-	inline
-	bool
-	operator ==( T const & t, Vector2 const & v )
-	{
-		return ( t == v.x ) && ( t == v.y );
-	}
-
-	// Value != Vector2
-	friend
-	inline
-	bool
-	operator !=( T const & t, Vector2 const & v )
-	{
-		return ( t != v.x ) || ( t != v.y );
-	}
-
-	// Value < Vector2
-	friend
-	inline
-	bool
-	operator <( T const & t, Vector2 const & v )
-	{
-		return ( t < v.x ) && ( t < v.y );
-	}
-
-	// Value <= Vector2
-	friend
-	inline
-	bool
-	operator <=( T const & t, Vector2 const & v )
-	{
-		return ( t <= v.x ) && ( t <= v.y );
-	}
-
-	// Value >= Vector2
-	friend
-	inline
-	bool
-	operator >=( T const & t, Vector2 const & v )
-	{
-		return ( t >= v.x ) && ( t >= v.y );
-	}
-
-	// Value > Vector2
-	friend
-	inline
-	bool
-	operator >( T const & t, Vector2 const & v )
-	{
-		return ( t > v.x ) && ( t > v.y );
-	}
-
-	// Equal Length?
-	friend
-	inline
-	bool
-	equal_length( Vector2 const & a, Vector2 const & b )
-	{
-		return ( a.length_squared() == b.length_squared() );
-	}
-
-	// Not Equal Length?
-	friend
-	inline
-	bool
-	not_equal_length( Vector2 const & a, Vector2 const & b )
-	{
-		return ( a.length_squared() != b.length_squared() );
-	}
-
-public: // Friends
-
-	// Distance
-	friend
-	inline
-	T
-	distance( Vector2 const & a, Vector2 const & b )
-	{
-		return std::sqrt( square( a.x - b.x ) + square( a.y - b.y ) );
-	}
-
-	// Distance Squared
-	friend
-	inline
-	T
-	distance_squared( Vector2 const & a, Vector2 const & b )
-	{
-		return square( a.x - b.x ) + square( a.y - b.y );
-	}
-
-	// Dot Product
-	friend
-	inline
-	T
-	dot( Vector2 const & a, Vector2 const & b )
-	{
-		return ( a.x * b.x ) + ( a.y * b.y );
-	}
-
-	// Cross Product
-	friend
-	inline
-	T
-	cross( Vector2 const & a, Vector2 const & b )
-	{
-		return ( a.x * b.y ) - ( a.y * b.x );
-	}
-
-	// Angle Between Two Vector2s (in Radians on [0,pi])
-	friend
-	inline
-	T
-	angle( Vector2 const & a, Vector2 const & b )
-	{
-		T const axb( std::abs( a.cross( b ) ) );
-		T const adb( a.dot( b ) );
-		return ( ( axb != T( 0 ) ) || ( adb != T( 0 ) ) ? bump_up_angle( std::atan2( axb, adb ) ) : T( 0 ) ); // More accurate than dot-based for angles near 0 and Pi
-	}
-
-	// Angle abc Formed by Three Vector2s (in Radians on [0,pi])
-	friend
-	inline
-	T
-	angle( Vector2 const & a, Vector2 const & b, Vector2 const & c )
-	{
-		return angle( a - b, c - b );
-	}
-
-	// Cosine of Angle Between Two Vector2s
-	friend
-	inline
-	T
-	cos( Vector2 const & a, Vector2 const & b )
-	{
-		T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
-		return ( mag > T( 0 ) ? sin_cos_range( a.dot( b ) / mag ) : T( 1 ) );
-	}
-
-	// Cosine of Angle abc Formed by Three Vector2s
-	friend
-	inline
-	T
-	cos( Vector2 const & a, Vector2 const & b, Vector2 const & c )
-	{
-		return cos( a - b, c - b );
-	}
-
-	// Sine of Angle Between Two Vector2s
-	friend
-	inline
-	T
-	sin( Vector2 const & a, Vector2 const & b )
-	{
-		T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
-		return ( mag > T( 0 ) ? std::abs( sin_cos_range( a.cross( b ) / mag ) ) : T( 0 ) );
-	}
-
-	// Sine of Angle abc Formed by Three Vector2s
-	friend
-	inline
-	T
-	sin( Vector2 const & a, Vector2 const & b, Vector2 const & c )
-	{
-		return sin( a - b, c - b );
-	}
-
-	// Directed Angle Between Two Vector2s (in Radians on [0,2*pi])
-	friend
-	inline
-	T
-	dir_angle( Vector2 const & a, Vector2 const & b )
-	{
-		T const axb( a.cross( b ) );
-		T const adb( a.dot( b ) );
-		return ( ( axb != T( 0 ) ) || ( adb != T( 0 ) ) ? bump_up_angle( std::atan2( axb, adb ) ) : T( 0 ) );
-	}
-
-	// Directed Angle abc Formed by Three Vector2s (in Radians on [0,2*pi])
-	friend
-	inline
-	T
-	dir_angle( Vector2 const & a, Vector2 const & b, Vector2 const & c )
-	{
-		return dir_angle( a - b, c - b );
-	}
-
-	// Cosine of Directed Angle Between Two Vector2s
-	friend
-	inline
-	T
-	dir_cos( Vector2 const & a, Vector2 const & b )
-	{
-		T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
-		return ( mag > T( 0 ) ? sin_cos_range( a.dot( b ) / mag ) : T( 1 ) );
-	}
-
-	// Cosine of Directed Angle abc Formed by Three Vector2s
-	friend
-	inline
-	T
-	dir_cos( Vector2 const & a, Vector2 const & b, Vector2 const & c )
-	{
-		return dir_cos( a - b, c - b );
-	}
-
-	// Sine of Directed Angle Between Two Vector2s
-	friend
-	inline
-	T
-	dir_sin( Vector2 const & a, Vector2 const & b )
-	{
-		T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
-		return ( mag > T( 0 ) ? sin_cos_range( a.cross( b ) / mag ) : T( 0 ) );
-	}
-
-	// Sine of Directed Angle abc Formed by Three Vector2s
-	friend
-	inline
-	T
-	dir_sin( Vector2 const & a, Vector2 const & b, Vector2 const & c )
-	{
-		return dir_sin( a - b, c - b );
-	}
-
-private: // Methods
+public: // Static Methods
 
 	// Square of a value
 	inline
 	static
 	T
-	square( T const & t )
+	square( Tc t )
 	{
 		return t * t;
 	}
@@ -1686,7 +1061,7 @@ private: // Methods
 	inline
 	static
 	T
-	sin_cos_range( T const & t )
+	sin_cos_range( Tc t )
 	{
 		return std::min( std::max( t, T( -1 ) ), T( 1 ) );
 	}
@@ -1695,7 +1070,7 @@ private: // Methods
 	inline
 	static
 	T
-	bump_up_angle( T const & t )
+	bump_up_angle( Tc t )
 	{
 		static T const Two_Pi( T( 2 ) * std::acos( -1.0 ) );
 		return ( t >= T( 0 ) ? t : Two_Pi + t );
@@ -1706,6 +1081,734 @@ public: // Data
 	T x, y; // Elements
 
 }; // Vector2
+
+// Length
+template< typename T >
+inline
+T
+length( Vector2< T > const & v )
+{
+	return v.length();
+}
+
+// Length Squared
+template< typename T >
+inline
+T
+length_squared( Vector2< T > const & v )
+{
+	return v.length_squared();
+}
+
+// Magnitude
+template< typename T >
+inline
+T
+magnitude( Vector2< T > const & v )
+{
+	return v.magnitude();
+}
+
+// Magnitude
+template< typename T >
+inline
+T
+mag( Vector2< T > const & v )
+{
+	return v.mag();
+}
+
+// Magnitude Squared
+template< typename T >
+inline
+T
+magnitude_squared( Vector2< T > const & v )
+{
+	return v.magnitude_squared();
+}
+
+// Magnitude Squared
+template< typename T >
+inline
+T
+mag_squared( Vector2< T > const & v )
+{
+	return v.mag_squared();
+}
+
+// Vector2 == Vector2
+template< typename T >
+inline
+bool
+operator ==( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return ( a.x == b.x ) && ( a.y == b.y );
+}
+
+// Vector2 != Vector2
+template< typename T >
+inline
+bool
+operator !=( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return ( a.x != b.x ) || ( a.y != b.y );
+}
+
+// Vector2 < Vector2: Lexicographic
+template< typename T >
+inline
+bool
+operator <( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return (
+	 ( a.x < b.x ? true :
+	 ( b.x < a.x ? false : // a.x == b.x
+	 ( a.y < b.y ) ) )
+	);
+}
+
+// Vector2 <= Vector2: Lexicographic
+template< typename T >
+inline
+bool
+operator <=( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return (
+	 ( a.x < b.x ? true :
+	 ( b.x < a.x ? false : // a.x == b.x
+	 ( a.y <= b.y ) ) )
+	);
+}
+
+// Vector2 >= Vector2: Lexicographic
+template< typename T >
+inline
+bool
+operator >=( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return (
+	 ( a.x > b.x ? true :
+	 ( b.x > a.x ? false : // a.x == b.x
+	 ( a.y >= b.y ) ) )
+	);
+}
+
+// Vector2 > Vector2: Lexicographic
+template< typename T >
+inline
+bool
+operator >( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return (
+	 ( a.x > b.x ? true :
+	 ( b.x > a.x ? false : // a.x == b.x
+	 ( a.y > b.y ) ) )
+	);
+}
+
+// Vector2 < Vector2: Element-wise
+template< typename T >
+inline
+bool
+lt( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return ( a.x < b.x ) && ( a.y < b.y );
+}
+
+// Vector2 <= Vector2: Element-wise
+template< typename T >
+inline
+bool
+le( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return ( a.x <= b.x ) && ( a.y <= b.y );
+}
+
+// Vector2 >= Vector2: Element-wise
+template< typename T >
+inline
+bool
+ge( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return ( a.x >= b.x ) && ( a.y >= b.y );
+}
+
+// Vector2 > Vector2: Element-wise
+template< typename T >
+inline
+bool
+gt( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return ( a.x > b.x ) && ( a.y > b.y );
+}
+
+// Vector2 == Value
+template< typename T >
+inline
+bool
+operator ==( Vector2< T > const & v, typename Vector2< T >::Tc t )
+{
+	return ( v.x == t ) && ( v.y == t );
+}
+
+// Vector2 != Value
+template< typename T >
+inline
+bool
+operator !=( Vector2< T > const & v, typename Vector2< T >::Tc t )
+{
+	return ( v.x != t ) || ( v.y != t );
+}
+
+// Vector2 < Value
+template< typename T >
+inline
+bool
+operator <( Vector2< T > const & v, typename Vector2< T >::Tc t )
+{
+	return ( v.x < t ) && ( v.y < t );
+}
+
+// Vector2 <= Value
+template< typename T >
+inline
+bool
+operator <=( Vector2< T > const & v, typename Vector2< T >::Tc t )
+{
+	return ( v.x <= t ) && ( v.y <= t );
+}
+
+// Vector2 >= Value
+template< typename T >
+inline
+bool
+operator >=( Vector2< T > const & v, typename Vector2< T >::Tc t )
+{
+	return ( v.x >= t ) && ( v.y >= t );
+}
+
+// Vector2 > Value
+template< typename T >
+inline
+bool
+operator >( Vector2< T > const & v, typename Vector2< T >::Tc t )
+{
+	return ( v.x > t ) && ( v.y > t );
+}
+
+// Value == Vector2
+template< typename T >
+inline
+bool
+operator ==( typename Vector2< T >::Tc t, Vector2< T > const & v )
+{
+	return ( t == v.x ) && ( t == v.y );
+}
+
+// Value != Vector2
+template< typename T >
+inline
+bool
+operator !=( typename Vector2< T >::Tc t, Vector2< T > const & v )
+{
+	return ( t != v.x ) || ( t != v.y );
+}
+
+// Value < Vector2
+template< typename T >
+inline
+bool
+operator <( typename Vector2< T >::Tc t, Vector2< T > const & v )
+{
+	return ( t < v.x ) && ( t < v.y );
+}
+
+// Value <= Vector2
+template< typename T >
+inline
+bool
+operator <=( typename Vector2< T >::Tc t, Vector2< T > const & v )
+{
+	return ( t <= v.x ) && ( t <= v.y );
+}
+
+// Value >= Vector2
+template< typename T >
+inline
+bool
+operator >=( typename Vector2< T >::Tc t, Vector2< T > const & v )
+{
+	return ( t >= v.x ) && ( t >= v.y );
+}
+
+// Value > Vector2
+template< typename T >
+inline
+bool
+operator >( typename Vector2< T >::Tc t, Vector2< T > const & v )
+{
+	return ( t > v.x ) && ( t > v.y );
+}
+
+// Equal Length?
+template< typename T >
+inline
+bool
+equal_length( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return ( a.length_squared() == b.length_squared() );
+}
+
+// Not Equal Length?
+template< typename T >
+inline
+bool
+not_equal_length( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return ( a.length_squared() != b.length_squared() );
+}
+
+// Vector2 + Vector2
+template< typename T >
+inline
+Vector2< T >
+operator +( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return Vector2< T >( a.x + b.x, a.y + b.y );
+}
+
+// Vector2 + Value
+template< typename T >
+inline
+Vector2< T >
+operator +( Vector2< T > const & v, typename Vector2< T >::Tc t )
+{
+	return Vector2< T >( v.x + t, v.y + t );
+}
+
+// Value + Vector2
+template< typename T >
+inline
+Vector2< T >
+operator +( typename Vector2< T >::Tc t, Vector2< T > const & v )
+{
+	return Vector2< T >( t + v.x, t + v.y );
+}
+
+// Vector2 - Vector2
+template< typename T >
+inline
+Vector2< T >
+operator -( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return Vector2< T >( a.x - b.x, a.y - b.y );
+}
+
+// Vector2 - Value
+template< typename T >
+inline
+Vector2< T >
+operator -( Vector2< T > const & v, typename Vector2< T >::Tc t )
+{
+	return Vector2< T >( v.x - t, v.y - t );
+}
+
+// Value - Vector2
+template< typename T >
+inline
+Vector2< T >
+operator -( typename Vector2< T >::Tc t, Vector2< T > const & v )
+{
+	return Vector2< T >( t - v.x, t - v.y );
+}
+
+// Vector2 * Vector2
+template< typename T >
+inline
+Vector2< T >
+operator *( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return Vector2< T >( a.x * b.x, a.y * b.y );
+}
+
+// Vector2 * Value
+template< typename T >
+inline
+Vector2< T >
+operator *( Vector2< T > const & v, typename Vector2< T >::Tc t )
+{
+	return Vector2< T >( v.x * t, v.y * t );
+}
+
+// Value * Vector2
+template< typename T >
+inline
+Vector2< T >
+operator *( typename Vector2< T >::Tc t, Vector2< T > const & v )
+{
+	return Vector2< T >( t * v.x, t * v.y );
+}
+
+// Vector2 / Vector2
+template< typename T >
+inline
+Vector2< T >
+operator /( Vector2< T > const & a, Vector2< T > const & b )
+{
+	assert( b.x != T( 0 ) );
+	assert( b.y != T( 0 ) );
+	return Vector2< T >( a.x / b.x, a.y / b.y );
+}
+
+// Vector2 / Value
+template< typename T, typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
+inline
+Vector2< T >
+operator /( Vector2< T > const & v, U const & u )
+{
+	assert( u != U( 0 ) );
+	U const inv_u( U ( 1 ) / u );
+	return Vector2< T >( v.x * inv_u, v.y * inv_u );
+}
+
+// Vector2 / Value
+template< typename T, typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
+inline
+Vector2< T >
+operator /( Vector2< T > const & v, U const & u )
+{
+	assert( u != U( 0 ) );
+	return Vector2< T >( v.x / u, v.y / u );
+}
+
+// Value / Vector2
+template< typename T >
+inline
+Vector2< T >
+operator /( typename Vector2< T >::Tc t, Vector2< T > const & v )
+{
+	assert( v.x != T( 0 ) );
+	assert( v.y != T( 0 ) );
+	return Vector2< T >( t / v.x, t / v.y );
+}
+
+// Minimum of Two Vector2s
+template< typename T >
+inline
+Vector2< T >
+min( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return Vector2< T >(
+	 ( a.x <= b.x ? a.x : b.x ),
+	 ( a.y <= b.y ? a.y : b.y )
+	);
+}
+
+// Minimum of Three Vector2s
+template< typename T >
+inline
+Vector2< T >
+min( Vector2< T > const & a, Vector2< T > const & b, Vector2< T > const & c )
+{
+	return Vector2< T >(
+	 ObjexxFCL::min( a.x, b.x, c.x ),
+	 ObjexxFCL::min( a.y, b.y, c.y )
+	);
+}
+
+// Minimum of Four Vector2s
+template< typename T >
+inline
+Vector2< T >
+min( Vector2< T > const & a, Vector2< T > const & b, Vector2< T > const & c, Vector2< T > const & d )
+{
+	return Vector2< T >(
+	 ObjexxFCL::min( a.x, b.x, c.x, d.x ),
+	 ObjexxFCL::min( a.y, b.y, c.y, d.y )
+	);
+}
+
+// Maximum of Two Vector2s
+template< typename T >
+inline
+Vector2< T >
+max( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return Vector2< T >(
+	 ( a.x >= b.x ? a.x : b.x ),
+	 ( a.y >= b.y ? a.y : b.y )
+	);
+}
+
+// Maximum of Three Vector2s
+template< typename T >
+inline
+Vector2< T >
+max( Vector2< T > const & a, Vector2< T > const & b, Vector2< T > const & c )
+{
+	return Vector2< T >(
+	 ObjexxFCL::max( a.x, b.x, c.x ),
+	 ObjexxFCL::max( a.y, b.y, c.y )
+	);
+}
+
+// Maximum of Four Vector2s
+template< typename T >
+inline
+Vector2< T >
+max( Vector2< T > const & a, Vector2< T > const & b, Vector2< T > const & c, Vector2< T > const & d )
+{
+	return Vector2< T >(
+	 ObjexxFCL::max( a.x, b.x, c.x, d.x ),
+	 ObjexxFCL::max( a.y, b.y, c.y, d.y )
+	);
+}
+
+// Sum of Two Vector2s
+template< typename T >
+inline
+Vector2< T >
+sum( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return Vector2< T >( a.x + b.x, a.y + b.y );
+}
+
+// Sum of Three Vector2s
+template< typename T >
+inline
+Vector2< T >
+sum( Vector2< T > const & a, Vector2< T > const & b, Vector2< T > const & c )
+{
+	return Vector2< T >( a.x + b.x + c.x, a.y + b.y + c.y );
+}
+
+// Sum of Four Vector2s
+template< typename T >
+inline
+Vector2< T >
+sum( Vector2< T > const & a, Vector2< T > const & b, Vector2< T > const & c, Vector2< T > const & d )
+{
+	return Vector2< T >( a.x + b.x + c.x + d.x, a.y + b.y + c.y + d.y );
+}
+
+// Subtract of Two Vector2s
+template< typename T >
+inline
+Vector2< T >
+sub( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return Vector2< T >( a.x - b.x, a.y - b.y );
+}
+
+// Subtract of Two Vector2s
+template< typename T >
+inline
+Vector2< T >
+subtract( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return Vector2< T >( a.x - b.x, a.y - b.y );
+}
+
+// Midpoint of Two Vector2s
+template< typename T >
+inline
+Vector2< T >
+mid( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return Vector2< T >(
+	 T( 0.5 * ( a.x + b.x ) ),
+	 T( 0.5 * ( a.y + b.y ) )
+	);
+}
+
+// Center of Two Vector2s
+template< typename T >
+inline
+Vector2< T >
+cen( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return Vector2< T >(
+	 T( 0.5 * ( a.x + b.x ) ),
+	 T( 0.5 * ( a.y + b.y ) )
+	);
+}
+
+// Center of Three Vector2s
+template< typename T >
+inline
+Vector2< T >
+cen( Vector2< T > const & a, Vector2< T > const & b, Vector2< T > const & c )
+{
+	static long double const third( 1.0 / 3.0 );
+	return Vector2< T >(
+	 T( third * ( a.x + b.x + c.x ) ),
+	 T( third * ( a.y + b.y + c.y ) )
+	);
+}
+
+// Center of Four Vector2s
+template< typename T >
+inline
+Vector2< T >
+cen( Vector2< T > const & a, Vector2< T > const & b, Vector2< T > const & c, Vector2< T > const & d )
+{
+	return Vector2< T >(
+	 T( 0.25 * ( a.x + b.x + c.x + d.x ) ),
+	 T( 0.25 * ( a.y + b.y + c.y + d.y ) )
+	);
+}
+
+// Distance
+template< typename T >
+inline
+T
+distance( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return std::sqrt( Vector2< T >::square( a.x - b.x ) + Vector2< T >::square( a.y - b.y ) );
+}
+
+// Distance Squared
+template< typename T >
+inline
+T
+distance_squared( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return Vector2< T >::square( a.x - b.x ) + Vector2< T >::square( a.y - b.y );
+}
+
+// Dot Product
+template< typename T >
+inline
+T
+dot( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return ( a.x * b.x ) + ( a.y * b.y );
+}
+
+// Cross Product
+template< typename T >
+inline
+T
+cross( Vector2< T > const & a, Vector2< T > const & b )
+{
+	return ( a.x * b.y ) - ( a.y * b.x );
+}
+
+// Angle Between Two Vector2s (in Radians on [0,pi])
+template< typename T >
+inline
+T
+angle( Vector2< T > const & a, Vector2< T > const & b )
+{
+	T const axb( std::abs( a.cross( b ) ) );
+	T const adb( a.dot( b ) );
+	return ( ( axb != T( 0 ) ) || ( adb != T( 0 ) ) ? Vector2< T >::bump_up_angle( std::atan2( axb, adb ) ) : T( 0 ) ); // More accurate than dot-based for angles near 0 and Pi
+}
+
+// Angle abc Formed by Three Vector2s (in Radians on [0,pi])
+template< typename T >
+inline
+T
+angle( Vector2< T > const & a, Vector2< T > const & b, Vector2< T > const & c )
+{
+	return angle( a - b, c - b );
+}
+
+// Cosine of Angle Between Two Vector2s
+template< typename T >
+inline
+T
+cos( Vector2< T > const & a, Vector2< T > const & b )
+{
+	T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
+	return ( mag > T( 0 ) ? Vector2< T >::sin_cos_range( a.dot( b ) / mag ) : T( 1 ) );
+}
+
+// Cosine of Angle abc Formed by Three Vector2s
+template< typename T >
+inline
+T
+cos( Vector2< T > const & a, Vector2< T > const & b, Vector2< T > const & c )
+{
+	return cos( a - b, c - b );
+}
+
+// Sine of Angle Between Two Vector2s
+template< typename T >
+inline
+T
+sin( Vector2< T > const & a, Vector2< T > const & b )
+{
+	T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
+	return ( mag > T( 0 ) ? std::abs( Vector2< T >::sin_cos_range( a.cross( b ) / mag ) ) : T( 0 ) );
+}
+
+// Sine of Angle abc Formed by Three Vector2s
+template< typename T >
+inline
+T
+sin( Vector2< T > const & a, Vector2< T > const & b, Vector2< T > const & c )
+{
+	return sin( a - b, c - b );
+}
+
+// Directed Angle Between Two Vector2s (in Radians on [0,2*pi])
+template< typename T >
+inline
+T
+dir_angle( Vector2< T > const & a, Vector2< T > const & b )
+{
+	T const axb( a.cross( b ) );
+	T const adb( a.dot( b ) );
+	return ( ( axb != T( 0 ) ) || ( adb != T( 0 ) ) ? Vector2< T >::bump_up_angle( std::atan2( axb, adb ) ) : T( 0 ) );
+}
+
+// Directed Angle abc Formed by Three Vector2s (in Radians on [0,2*pi])
+template< typename T >
+inline
+T
+dir_angle( Vector2< T > const & a, Vector2< T > const & b, Vector2< T > const & c )
+{
+	return dir_angle( a - b, c - b );
+}
+
+// Cosine of Directed Angle Between Two Vector2s
+template< typename T >
+inline
+T
+dir_cos( Vector2< T > const & a, Vector2< T > const & b )
+{
+	T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
+	return ( mag > T( 0 ) ? Vector2< T >::sin_cos_range( a.dot( b ) / mag ) : T( 1 ) );
+}
+
+// Cosine of Directed Angle abc Formed by Three Vector2s
+template< typename T >
+inline
+T
+dir_cos( Vector2< T > const & a, Vector2< T > const & b, Vector2< T > const & c )
+{
+	return dir_cos( a - b, c - b );
+}
+
+// Sine of Directed Angle Between Two Vector2s
+template< typename T >
+inline
+T
+dir_sin( Vector2< T > const & a, Vector2< T > const & b )
+{
+	T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
+	return ( mag > T( 0 ) ? Vector2< T >::sin_cos_range( a.cross( b ) / mag ) : T( 0 ) );
+}
+
+// Sine of Directed Angle abc Formed by Three Vector2s
+template< typename T >
+inline
+T
+dir_sin( Vector2< T > const & a, Vector2< T > const & b, Vector2< T > const & c )
+{
+	return dir_sin( a - b, c - b );
+}
 
 // Stream << Vector2 output operator
 template< typename T >

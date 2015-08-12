@@ -208,7 +208,7 @@ namespace EarthTube {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// First Alpha is Zone Name
-			EarthTubeSys( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
+			EarthTubeSys( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone );
 			if ( EarthTubeSys( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + " not found=" + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
@@ -654,7 +654,7 @@ namespace EarthTube {
 	//*****************************************************************************************
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

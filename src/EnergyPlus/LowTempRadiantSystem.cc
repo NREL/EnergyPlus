@@ -257,7 +257,7 @@ namespace LowTempRadiantSystem {
 
 		// Find the correct High Temp Radiant System
 		if ( CompIndex == 0 ) {
-			RadSysNum = FindItemInList( CompName, RadSysTypes.Name(), TotalNumOfRadSystems );
+			RadSysNum = FindItemInList( CompName, RadSysTypes );
 			if ( RadSysNum == 0 ) {
 				ShowFatalError( "SimLowTempRadiantSystem: Unit not found=" + CompName );
 			}
@@ -265,11 +265,11 @@ namespace LowTempRadiantSystem {
 			SystemType = RadSysTypes( RadSysNum ).SystemType;
 			{ auto const SELECT_CASE_var( SystemType );
 			if ( SELECT_CASE_var == HydronicSystem ) {
-				RadSysTypes( RadSysNum ).CompIndex = FindItemInList( CompName, HydrRadSys.Name(), NumOfHydrLowTempRadSys );
+				RadSysTypes( RadSysNum ).CompIndex = FindItemInList( CompName, HydrRadSys );
 			} else if ( SELECT_CASE_var == ConstantFlowSystem ) {
-				RadSysTypes( RadSysNum ).CompIndex = FindItemInList( CompName, CFloRadSys.Name(), NumOfCFloLowTempRadSys );
+				RadSysTypes( RadSysNum ).CompIndex = FindItemInList( CompName, CFloRadSys );
 			} else if ( SELECT_CASE_var == ElectricSystem ) {
-				RadSysTypes( RadSysNum ).CompIndex = FindItemInList( CompName, ElecRadSys.Name(), NumOfElecLowTempRadSys );
+				RadSysTypes( RadSysNum ).CompIndex = FindItemInList( CompName, ElecRadSys );
 			}}
 		} else {
 			RadSysNum = CompIndex;
@@ -327,7 +327,6 @@ namespace LowTempRadiantSystem {
 
 		// Using/Aliasing
 		using BranchNodeConnections::TestCompSet;
-		using DataGlobals::NumOfZones;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataGlobals::ScheduleAlwaysOn;
 		using DataHeatBalance::Zone;
@@ -486,7 +485,7 @@ namespace LowTempRadiantSystem {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), RadSysTypes.Name(), BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), RadSysTypes, BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -510,7 +509,7 @@ namespace LowTempRadiantSystem {
 			}
 
 			HydrRadSys( Item ).ZoneName = Alphas( 3 );
-			HydrRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone.Name(), NumOfZones );
+			HydrRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone );
 			if ( HydrRadSys( Item ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
@@ -525,7 +524,7 @@ namespace LowTempRadiantSystem {
 
 			HydrRadSys( Item ).SurfListName = Alphas( 4 );
 			SurfListNum = 0;
-			if ( NumOfSurfaceLists > 0 ) SurfListNum = FindItemInList( HydrRadSys( Item ).SurfListName, SurfList.Name(), NumOfSurfaceLists );
+			if ( NumOfSurfaceLists > 0 ) SurfListNum = FindItemInList( HydrRadSys( Item ).SurfListName, SurfList );
 			if ( SurfListNum > 0 ) { // Found a valid surface list
 				HydrRadSys( Item ).NumOfSurfaces = SurfList( SurfListNum ).NumOfSurfaces;
 				HydrRadSys( Item ).SurfacePtr.allocate( HydrRadSys( Item ).NumOfSurfaces );
@@ -547,7 +546,7 @@ namespace LowTempRadiantSystem {
 				HydrRadSys( Item ).SurfaceFlowFrac.allocate( HydrRadSys( Item ).NumOfSurfaces );
 				HydrRadSys( Item ).NumCircuits.allocate( HydrRadSys( Item ).NumOfSurfaces );
 				HydrRadSys( Item ).SurfaceName( 1 ) = HydrRadSys( Item ).SurfListName;
-				HydrRadSys( Item ).SurfacePtr( 1 ) = FindItemInList( HydrRadSys( Item ).SurfaceName( 1 ), Surface.Name(), TotSurfaces );
+				HydrRadSys( Item ).SurfacePtr( 1 ) = FindItemInList( HydrRadSys( Item ).SurfaceName( 1 ), Surface );
 				HydrRadSys( Item ).SurfaceFlowFrac( 1 ) = 1.0;
 				HydrRadSys( Item ).NumCircuits( 1 ) = 0.0;
 				// Error checking for single surfaces
@@ -819,7 +818,7 @@ namespace LowTempRadiantSystem {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), RadSysTypes.Name(), BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), RadSysTypes, BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -843,7 +842,7 @@ namespace LowTempRadiantSystem {
 			}
 
 			CFloRadSys( Item ).ZoneName = Alphas( 3 );
-			CFloRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone.Name(), NumOfZones );
+			CFloRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone );
 			if ( CFloRadSys( Item ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
@@ -858,7 +857,7 @@ namespace LowTempRadiantSystem {
 
 			CFloRadSys( Item ).SurfListName = Alphas( 4 );
 			SurfListNum = 0;
-			if ( NumOfSurfaceLists > 0 ) SurfListNum = FindItemInList( CFloRadSys( Item ).SurfListName, SurfList.Name(), NumOfSurfaceLists );
+			if ( NumOfSurfaceLists > 0 ) SurfListNum = FindItemInList( CFloRadSys( Item ).SurfListName, SurfList );
 			if ( SurfListNum > 0 ) { // Found a valid surface list
 				CFloRadSys( Item ).NumOfSurfaces = SurfList( SurfListNum ).NumOfSurfaces;
 				CFloRadSys( Item ).SurfacePtr.allocate( CFloRadSys( Item ).NumOfSurfaces );
@@ -883,7 +882,7 @@ namespace LowTempRadiantSystem {
 				CFloRadSys( Item ).NumCircuits.allocate( CFloRadSys( Item ).NumOfSurfaces );
 				MaxCloNumOfSurfaces = max( MaxCloNumOfSurfaces, CFloRadSys( Item ).NumOfSurfaces );
 				CFloRadSys( Item ).SurfaceName( 1 ) = CFloRadSys( Item ).SurfListName;
-				CFloRadSys( Item ).SurfacePtr( 1 ) = FindItemInList( CFloRadSys( Item ).SurfaceName( 1 ), Surface.Name(), TotSurfaces );
+				CFloRadSys( Item ).SurfacePtr( 1 ) = FindItemInList( CFloRadSys( Item ).SurfaceName( 1 ), Surface );
 				CFloRadSys( Item ).SurfaceFlowFrac( 1 ) = 1.0;
 				CFloRadSys( Item ).NumCircuits( 1 ) = 0.0;
 				// Error checking for single surfaces
@@ -1075,7 +1074,7 @@ namespace LowTempRadiantSystem {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), RadSysTypes.Name(), BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), RadSysTypes, BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1099,7 +1098,7 @@ namespace LowTempRadiantSystem {
 			}
 
 			ElecRadSys( Item ).ZoneName = Alphas( 3 );
-			ElecRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone.Name(), NumOfZones );
+			ElecRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone );
 			if ( ElecRadSys( Item ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
@@ -1114,7 +1113,7 @@ namespace LowTempRadiantSystem {
 
 			ElecRadSys( Item ).SurfListName = Alphas( 4 );
 			SurfListNum = 0;
-			if ( NumOfSurfaceLists > 0 ) SurfListNum = FindItemInList( ElecRadSys( Item ).SurfListName, SurfList.Name(), NumOfSurfaceLists );
+			if ( NumOfSurfaceLists > 0 ) SurfListNum = FindItemInList( ElecRadSys( Item ).SurfListName, SurfList );
 			if ( SurfListNum > 0 ) { // Found a valid surface list
 				ElecRadSys( Item ).NumOfSurfaces = SurfList( SurfListNum ).NumOfSurfaces;
 				ElecRadSys( Item ).SurfacePtr.allocate( ElecRadSys( Item ).NumOfSurfaces );
@@ -1131,7 +1130,7 @@ namespace LowTempRadiantSystem {
 				ElecRadSys( Item ).SurfaceName.allocate( ElecRadSys( Item ).NumOfSurfaces );
 				ElecRadSys( Item ).SurfacePowerFrac.allocate( ElecRadSys( Item ).NumOfSurfaces );
 				ElecRadSys( Item ).SurfaceName( 1 ) = ElecRadSys( Item ).SurfListName;
-				ElecRadSys( Item ).SurfacePtr( 1 ) = FindItemInList( ElecRadSys( Item ).SurfaceName( 1 ), Surface.Name(), TotSurfaces );
+				ElecRadSys( Item ).SurfacePtr( 1 ) = FindItemInList( ElecRadSys( Item ).SurfaceName( 1 ), Surface );
 				ElecRadSys( Item ).SurfacePowerFrac( 1 ) = 1.0;
 				// Error checking for single surfaces
 				if ( ElecRadSys( Item ).SurfacePtr( 1 ) == 0 ) {
@@ -5011,7 +5010,7 @@ namespace LowTempRadiantSystem {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

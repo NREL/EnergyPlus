@@ -1846,7 +1846,7 @@ namespace SetPointManager {
 		{}
 
 	};
-	
+
 	struct DefineReturnWaterChWSetPointManager // derived type for SetpointManager:SupplyResetForReturnTemperature:ChilledWater data
 	{
 		// Members
@@ -1881,7 +1881,7 @@ namespace SetPointManager {
 		void calculate( DataLoopNode::NodeData & returnNode, DataLoopNode::NodeData & supplyNode );
 
 	};
-	
+
 	struct DefineReturnWaterHWSetPointManager // derived type for SetpointManager:SupplyResetForReturnTemperature:HotWater data
 	{
 		// Members
@@ -2121,7 +2121,7 @@ namespace SetPointManager {
 	
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -1,4 +1,4 @@
-![](EngineeringReference/media/ep.gif)
+![](media/ep.gif)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
@@ -45,7 +45,7 @@ General Modeling Overview
 
 The EnergyPlus program is a collection of many program modules that work together to calculate the energy required for heating and cooling a building using a variety of systems and energy sources. It does this by simulating the building and associated energy systems when they are exposed to different environmental and operating conditions. The core of the simulation is a model of the building that is based on fundamental heat balance principles. Since it is relatively meaningless to state: “based on fundamental heat balance principles”, the model will be described in greater detail in later sections of this document in concert with the FORTRAN code which is used to describe the model. It turns out that the model itself is relatively simple compared with the data organization and control that is needed to simulate the great many combinations of system types, primary energy plant arrangements, schedules, and environments. The next section shows this overall organization in schematic form. Later sections will expand on the details within the blocks of the schematic.
 
-![](EngineeringReference/media/image1.png)
+![](media/image1.png)
 
 Figure 1. EnergyPlus Program Schematic
 
@@ -142,19 +142,19 @@ Since everything in EnergyPlus is based on the foundation of the loads simulatio
 
 EnergyPlus determines warmup convergence in the following manner as shown in the Figure 2 below. The process of the convergence checks begins by tracking four parameters such including the maximum zone air temperature, the minimum zone air temperature, the maximum heating load, and the maximum cooling load for individual zone. It is note that these convergence checks are only in effective in simulations with at least one zone since the criteria is solely based on the maximum and minimum values obtained from an individual zone. Differences in these parameters between two consecutive days are then compared with the convergence tolerance values at the end of the day during the warmup period. For example, the maximum and minimum air temperature and the percentage difference of zone load for each zone at 9:00AM during the second to last warmup is compared to the values at 9:00AM last warmup day as follows:
 
-<div>$${T_{\max ,prev}} - {T_{\max }} < {T_{tol}}$$</div>
+<div>$${T_{\max ,prev}} - {T_{\max }} &lt; {T_{tol}}$$</div>
 
-<div>$${T_{\min ,prev}} - {T_{\min }} < {T_{tol}}$$</div>
+<div>$${T_{\min ,prev}} - {T_{\min }} &lt; {T_{tol}}$$</div>
 
-<div>$$\frac{{{q_h} - {q_{h,prev}}}}{{{q_h}}} < {q_{tol}}$$</div>
+<div>$$\frac{{{q_h} - {q_{h,prev}}}}{{{q_h}}} &lt; {q_{tol}}$$</div>
 
-<div>$$\frac{{{q_c} - {q_{c,prev}}}}{{{q_c}}} < {q_{tol}}$$</div>
+<div>$$\frac{{{q_c} - {q_{c,prev}}}}{{{q_c}}} &lt; {q_{tol}}$$</div>
 
 where Tmax,prev is the maximum zone temperature of previous day, Tmax is the maximum zone temperature of current day, Ttol is the value of temperature tolerance, qh,prev is the maximum heating load of previous day, qh, is the maximum heating load of current day, qtol is the value of load tolerance, qc,prev is the maximum cooling load of previous day, and qc, is the maximum cooling load of current day.
 
 Note that a minimum load of 100W is used to establish a fraction for the maximum loads when they are less than the minimum. This is done to avoid a false negative indication for the percentage load difference that may appear when zonal loads are very small. The convergence checks are repeated until passed for all zones. EnergyPlus assumes that the warmup period has been reached steady-periodic when these four parameters are within tolerance. Finally, temperature and load differences between the last two warmup days for individual zone at each time step in the last warmup day are reported so that users can easily track whether or not the warmup period has converged. The input parameters and output related to the warmup period are discussed in the Input-Output Reference.
 
-![](EngineeringReference/media/image6.png)
+![](media/image6.png)
 
 Figure 2. Flows of Warmup Convergence Checks
 

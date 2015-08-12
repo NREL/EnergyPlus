@@ -754,13 +754,13 @@ namespace ZoneEquipmentManager {
 		static gio::Fmt Format_995( "(' Cooling Sizing Factor Information, Zone ',A,', ',G12.5)" );
 
 		for ( ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSizingInput; ++ZoneSizIndex ) {
-			ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, Zone.Name(), NumOfZones );
+			ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, Zone );
 			if ( ZoneIndex == 0 ) {
 				ShowSevereError( "SetUpZoneSizingArrays: Sizing:Zone=\"" + ZoneSizingInput( ZoneSizIndex ).ZoneName + "\" references unknown zone" );
 				ErrorsFound = true;
 			}
 			if ( any( ZoneEquipConfig.IsControlled() ) ) {
-				ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, ZoneEquipConfig.ZoneName(), NumOfZones );
+				ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 				if ( ZoneIndex == 0 ) {
 					if ( ! isPulseZoneSizing ) {
 						ShowWarningError( "SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + ZoneSizingInput( ZoneSizIndex ).ZoneName + "\", Zone is not found in the Controlled Zones List" );
@@ -826,7 +826,7 @@ namespace ZoneEquipmentManager {
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).SupplyAirNode = ZoneEquipConfig( CtrlZoneNum ).InletNode( 1 );
 				}
 				// For each Zone Sizing object, find the corresponding controlled zone
-				ZoneSizNum = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput.ZoneName(), NumZoneSizingInput );
+				ZoneSizNum = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 				if ( ZoneSizNum > 0 ) { // move data from zone sizing input
 					ZoneSizing( DesDayNum, CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnCoolDgnSAMethod;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).ZnHeatDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnHeatDgnSAMethod;
@@ -1019,7 +1019,7 @@ namespace ZoneEquipmentManager {
 			if ( ZoneEquipConfig( CtrlZoneNum ).NumInletNodes > 0 ) {
 				CalcFinalZoneSizing( CtrlZoneNum ).SupplyAirNode = ZoneEquipConfig( CtrlZoneNum ).InletNode( 1 );
 			}
-			ZoneSizNum = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput.ZoneName(), NumZoneSizingInput );
+			ZoneSizNum = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 			if ( ZoneSizNum > 0 ) { // move data from zone sizing input
 				FinalZoneSizing( CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnCoolDgnSAMethod;
 				FinalZoneSizing( CtrlZoneNum ).ZnHeatDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnHeatDgnSAMethod;
@@ -2891,7 +2891,7 @@ namespace ZoneEquipmentManager {
 				} else if ( SELECT_CASE_var == ERVStandAlone_Num ) { // 'ZoneHVAC:EnergyRecoveryVentilator'
 					SimStandAloneERV( PrioritySimOrder( EquipTypeNum ).EquipName, ActualZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( ControlledZoneNum ).EquipIndex( EquipPtr ) );
 
-				} else if ( SELECT_CASE_var == HPWaterHeater_Num ) { // 'WaterHeater:HeatPump'
+				} else if ( SELECT_CASE_var == HPWaterHeater_Num ) { // 'WaterHeater:HeatPump:PumpedCondenser'
 					SimHeatPumpWaterHeater( PrioritySimOrder( EquipTypeNum ).EquipName, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( ControlledZoneNum ).EquipIndex( EquipPtr ) );
 				} else if ( SELECT_CASE_var == VentilatedSlab_Num ) { // 'ZoneHVAC:VentilatedSlab'
 					SimVentilatedSlab( PrioritySimOrder( EquipTypeNum ).EquipName, ActualZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
@@ -3101,8 +3101,8 @@ namespace ZoneEquipmentManager {
 				if ( ( CurEqCoolingPriority > psc.CoolingPriority && ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputRequired < 0.0 ) || ( CurEqHeatingPriority > psc.HeatingPriority && ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputRequired >= 0.0 ) ) {
 
 					//Tuned C++ string swap avoids copying
-					std::swap( pso.EquipType, psc.EquipType );
-					std::swap( pso.EquipName, psc.EquipName );
+					pso.EquipType.swap( psc.EquipType );
+					pso.EquipName.swap( psc.EquipName );
 					std::swap( pso.EquipPtr, psc.EquipPtr );
 					std::swap( pso.EquipType_Num, psc.EquipType_Num );
 					std::swap( pso.CoolingPriority, psc.CoolingPriority );
@@ -3663,7 +3663,6 @@ namespace ZoneEquipmentManager {
 		Real64 WinGapFlowTtoRA; // Sum of mass flow times outlet temp for all airflow windows in zone [(kg/s)-C]
 		Real64 WinGapTtoRA; // Temp of outlet flow mixture to return air from all airflow windows in zone [C]
 		Real64 H2OHtOfVap; // Heat of vaporization of water (W/kg)
-		Real64 RhoAir; // Density of air (Kg/m3)
 		Real64 ZoneMult; // zone multiplier
 		Real64 SumRetAirLatentGainRate;
 
@@ -3681,8 +3680,6 @@ namespace ZoneEquipmentManager {
 				//RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
 				// Add sensible heat gain from refrigerated cases with under case returns
 				SumAllReturnAirConvectionGains( ActualZoneNum, QRetAir );
-
-				CpAir = PsyCpAirFnWTdb( Node( ZoneNode ).HumRat, Node( ZoneNode ).Temp );
 
 				// Need to add the energy to the return air from lights and from airflow windows. Where the heat
 				// is added depends on if there is system flow or not.  If there is system flow the heat is added
@@ -3721,6 +3718,7 @@ namespace ZoneEquipmentManager {
 				// cases the heat to return air is treated as a zone heat gain and dealt with in CalcZoneSums in
 				// MODULE ZoneTempPredictorCorrector.
 				if ( ! Zone( ActualZoneNum ).NoHeatToReturnAir ) {
+					CpAir = PsyCpAirFnWTdb( Node( ZoneNode ).HumRat, Node( ZoneNode ).Temp );
 					if ( MassFlowRA > 0.0 ) {
 						if ( WinGapFlowToRA > 0.0 ) {
 							// Add heat-to-return from window gap airflow
@@ -3763,13 +3761,11 @@ namespace ZoneEquipmentManager {
 				// Update the rest of the Return Air Node conditions, if the return air system exists!
 				Node( ReturnNode ).Press = Node( ZoneNode ).Press;
 
-				H2OHtOfVap = PsyHgAirFnWTdb( Node( ZoneNode ).HumRat, Node( ReturnNode ).Temp );
-				RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ReturnNode ).Temp, Node( ZoneNode ).HumRat );
-
 				// Include impact of under case returns for refrigerated display case when updating the return air node humidity
 				if ( ! Zone( ActualZoneNum ).NoHeatToReturnAir ) {
 					if ( MassFlowRA > 0 ) {
 						SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate );
+						H2OHtOfVap = PsyHgAirFnWTdb( Node( ZoneNode ).HumRat, Node( ReturnNode ).Temp );
 						Node( ReturnNode ).HumRat = Node( ZoneNode ).HumRat + ( SumRetAirLatentGainRate / ( H2OHtOfVap * MassFlowRA ) );
 					} else {
 						// If no mass flow rate exists, include the latent HVAC case credit with the latent Zone case credit
@@ -5025,7 +5021,7 @@ namespace ZoneEquipmentManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

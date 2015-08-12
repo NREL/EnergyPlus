@@ -107,6 +107,18 @@ namespace Humidifiers {
 
 	// Functions
 
+	// Clears the global data in Humidifiers.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumHumidifiers = 0;
+		NumElecSteamHums = 0;
+		NumGasSteamHums = 0;
+		CheckEquipName.deallocate();
+		Humidifier.deallocate();
+	}
+
 	void
 	SimHumidifier(
 		std::string const & CompName, // name of the humidifier unit
@@ -158,7 +170,7 @@ namespace Humidifiers {
 
 		// Get the humidifier unit index
 		if ( CompIndex == 0 ) {
-			HumNum = FindItemInList( CompName, Humidifier.Name(), NumHumidifiers );
+			HumNum = FindItemInList( CompName, Humidifier );
 			if ( HumNum == 0 ) {
 				ShowFatalError( "SimHumidifier: Unit not found=" + CompName );
 			}
@@ -307,7 +319,7 @@ namespace Humidifiers {
 			HumNum = HumidifierIndex;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Humidifier.Name(), HumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), Humidifier, HumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -350,7 +362,7 @@ namespace Humidifiers {
 			HumNum = NumElecSteamHums + HumidifierIndex;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Humidifier.Name(), HumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), Humidifier, HumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -376,7 +388,7 @@ namespace Humidifiers {
 			Humidifier( HumNum ).AirOutNode = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 4 ), Alphas( 5 ), "Air Nodes" );
 
-			Humidifier( HumNum ).EfficiencyCurvePtr = GetCurveIndex( cAlphaArgs( 3 ) );
+			Humidifier( HumNum ).EfficiencyCurvePtr = GetCurveIndex( Alphas( 3 ) );
 			if ( Humidifier( HumNum ).EfficiencyCurvePtr > 0 ) {
 					{ auto const SELECT_CASE_var( GetCurveType( Humidifier( HumNum ).EfficiencyCurvePtr ) );
 					if ( SELECT_CASE_var == "LINEAR" ) {
@@ -391,7 +403,7 @@ namespace Humidifiers {
 						ShowContinueError( "...Curve type for " + cAlphaFields( 3 ) + " = " + GetCurveType( Humidifier( HumNum ).EfficiencyCurvePtr ) );
 						ErrorsFound = true;
 					}}
-			} else if ( !lAlphaFieldBlanks( 3 ) ) {
+			} else if ( !lAlphaBlanks( 3 ) ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"," );
 				ShowContinueError( "Invalid " + cAlphaFields( 3 ) + '=' + Alphas( 3 ) );
 				ShowSevereError( "..." + cAlphaFields( 3 ) + " not found." );
@@ -1313,7 +1325,7 @@ namespace Humidifiers {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -262,12 +262,12 @@ namespace RoomAirModelManager {
 		using InputProcessor::GetObjectDefMaxArgs;
 		using namespace DataIPShortCuts;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::SurfaceClass_IntMass;
 		using DataHeatBalance::Zone;
 		using ScheduleManager::GetScheduleIndex;
 		using RoomAirModelUserTempPattern::FigureNDheightInZone;
 		using DataZoneEquipment::ZoneEquipConfig;
+		using DataZoneEquipment::EquipConfiguration;
 		using DataErrorTracking::TotalWarningErrors;
 		using DataErrorTracking::TotalRoomAirPatternTooLow;
 		using DataErrorTracking::TotalRoomAirPatternTooHigh;
@@ -333,7 +333,7 @@ namespace RoomAirModelManager {
 			GetObjectItem( cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//first get zone ID
 			ZoneNum = 0;
-			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneNum == 0 ) { //throw error
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
 				ShowContinueError( "Invalid-not found " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -540,7 +540,7 @@ namespace RoomAirModelManager {
 			for ( i = 1; i <= NumPairs; ++i ) {
 				RoomAirPattern( thisPattern ).MapPatrn.SurfName( i ) = cAlphaArgs( i + 1 );
 				RoomAirPattern( thisPattern ).MapPatrn.DeltaTai( i ) = rNumericArgs( i + 4 );
-				found = FindItemInList( cAlphaArgs( i + 1 ), Surface.Name(), TotSurfaces );
+				found = FindItemInList( cAlphaArgs( i + 1 ), Surface );
 				if ( found != 0 ) {
 					RoomAirPattern( thisPattern ).MapPatrn.SurfID( i ) = found;
 				} else {
@@ -571,7 +571,7 @@ namespace RoomAirModelManager {
 		for ( i = 1; i <= NumOfZones; ++i ) {
 			if ( AirPatternZoneInfo( i ).IsUsed ) {
 				// first get return and exhaust air node index
-				found = FindItemInList( AirPatternZoneInfo( i ).ZoneName, ZoneEquipConfig.ZoneName(), NumOfZones );
+				found = FindItemInList( AirPatternZoneInfo( i ).ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 				if ( found != 0 ) {
 
 					AirPatternZoneInfo( i ).ReturnAirNodeID = ZoneEquipConfig( found ).ReturnAirNode;
@@ -679,7 +679,7 @@ namespace RoomAirModelManager {
 			GetObjectItem( cCurrentModuleObject, AirNodeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), AirNode.Name(), AirNodeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), AirNode, AirNodeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -687,7 +687,7 @@ namespace RoomAirModelManager {
 			AirNode( AirNodeNum ).Name = cAlphaArgs( 1 );
 
 			AirNode( AirNodeNum ).ZoneName = cAlphaArgs( 3 ); // Zone name
-			AirNode( AirNodeNum ).ZonePtr = FindItemInList( AirNode( AirNodeNum ).ZoneName, Zone.Name(), NumOfZones );
+			AirNode( AirNodeNum ).ZonePtr = FindItemInList( AirNode( AirNodeNum ).ZoneName, Zone );
 			if ( AirNode( AirNodeNum ).ZonePtr == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -895,7 +895,7 @@ namespace RoomAirModelManager {
 		// loop through all 'RoomAirSettings:OneNodeDisplacementVentilation' objects
 		for ( ControlNum = 1; ControlNum <= NumOfMundtContrl; ++ControlNum ) {
 			GetObjectItem( cCurrentModuleObject, ControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
-			ZoneNum = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
+			ZoneNum = FindItemInList( cAlphaArgs( 1 ), Zone );
 			if ( ZoneNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -941,7 +941,6 @@ namespace RoomAirModelManager {
 		using namespace DataIPShortCuts;
 		using DataHeatBalance::Zone;
 		using namespace ScheduleManager;
-		using DataSurfaces::TotSurfaces;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -974,7 +973,7 @@ namespace RoomAirModelManager {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// First is Zone Name
 			ZoneUCSDDV( Loop ).ZoneName = cAlphaArgs( 1 );
-			ZoneUCSDDV( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
+			ZoneUCSDDV( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone );
 			if ( ZoneUCSDDV( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -1038,7 +1037,6 @@ namespace RoomAirModelManager {
 		using DataHeatBalance::Zone;
 		using namespace ScheduleManager;
 
-		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::Surface;
 		using namespace DataAirflowNetwork;
 		using DataHeatBalance::TotPeople;
@@ -1081,7 +1079,7 @@ namespace RoomAirModelManager {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// First is Zone Name
 			ZoneUCSDCV( Loop ).ZoneName = cAlphaArgs( 1 );
-			ZoneUCSDCV( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
+			ZoneUCSDCV( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone );
 			if ( ZoneUCSDCV( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -1142,7 +1140,7 @@ namespace RoomAirModelManager {
 
 			// Following depend on valid zone
 
-			Loop2 = FindItemInList( Zone( ZoneUCSDCV( Loop ).ZonePtr ).Name, MultizoneZoneData.ZoneName(), AirflowNetworkNumOfZones );
+			Loop2 = FindItemInList( Zone( ZoneUCSDCV( Loop ).ZonePtr ).Name, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
 			if ( Loop2 == 0 ) {
 				ShowSevereError( "Problem with " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "AirflowNetwork airflow model must be active in this zone" );
@@ -1197,7 +1195,6 @@ namespace RoomAirModelManager {
 		using namespace DataIPShortCuts;
 		using DataHeatBalance::Zone;
 		using namespace ScheduleManager;
-		using DataSurfaces::TotSurfaces;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1237,7 +1234,7 @@ namespace RoomAirModelManager {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// First is Zone Name
 			ZoneUCSDUI( Loop ).ZoneName = cAlphaArgs( 1 );
-			ZoneUCSDUI( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
+			ZoneUCSDUI( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone );
 			ZoneUFPtr( ZoneUCSDUI( Loop ).ZonePtr ) = Loop;
 			if ( ZoneUCSDUI( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
@@ -1296,7 +1293,7 @@ namespace RoomAirModelManager {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// First is Zone Name
 			ZoneUCSDUE( Loop ).ZoneName = cAlphaArgs( 1 );
-			ZoneUCSDUE( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
+			ZoneUCSDUE( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone );
 			ZoneUFPtr( ZoneUCSDUE( Loop ).ZonePtr ) = Loop;
 			if ( ZoneUCSDUE( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
@@ -2118,7 +2115,7 @@ namespace RoomAirModelManager {
 	//*****************************************************************************************
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

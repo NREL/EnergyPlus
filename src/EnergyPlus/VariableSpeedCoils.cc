@@ -223,7 +223,7 @@ namespace VariableSpeedCoils {
 		}
 
 		if ( CompIndex == 0 ) {
-			DXCoilNum = FindItemInList( CompName, VarSpeedCoil.Name(), NumWatertoAirHPs );
+			DXCoilNum = FindItemInList( CompName, VarSpeedCoil );
 			if ( DXCoilNum == 0 ) {
 				ShowFatalError( "WaterToAirHPVSWEquationFit not found=" + CompName );
 			}
@@ -412,7 +412,7 @@ namespace VariableSpeedCoils {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), VarSpeedCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), VarSpeedCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -790,7 +790,7 @@ namespace VariableSpeedCoils {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), VarSpeedCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), VarSpeedCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1142,7 +1142,7 @@ namespace VariableSpeedCoils {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), VarSpeedCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), VarSpeedCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1498,7 +1498,7 @@ namespace VariableSpeedCoils {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), VarSpeedCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), VarSpeedCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1826,7 +1826,7 @@ namespace VariableSpeedCoils {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName(AlphArray(1), VarSpeedCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+			VerifyName(AlphArray(1), VarSpeedCoil, &VariableSpeedCoilData::Name, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name");
 			if (IsNotOK) {
 				ErrorsFound = true;
 				if (IsBlank) AlphArray(1) = "xxxxx";
@@ -1839,6 +1839,7 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil(DXCoilNum).CondenserType = WaterHeater;
 			VarSpeedCoil(DXCoilNum).CoolHeatType = "WATERHEATING";
 			VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum = CoilDX_HeatPumpWaterHeaterVariableSpeed;
+			VarSpeedCoil(DXCoilNum).VarSpeedCoilType = cAllCoilTypes(CoilDX_HeatPumpWaterHeaterVariableSpeed);
 
 			VarSpeedCoil(DXCoilNum).Name = AlphArray(1);
 			VarSpeedCoil(DXCoilNum).NumOfSpeeds = int(NumArray(1));
@@ -5373,11 +5374,11 @@ namespace VariableSpeedCoils {
 			SameString( CoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ||
 			SameString( CoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ||
 			SameString( CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED")) {
-			WhichCoil = FindItemInList( CoilName, VarSpeedCoil.Name(), NumWatertoAirHPs );
+			WhichCoil = FindItemInList( CoilName, VarSpeedCoil );
 			if ( WhichCoil != 0 ) {
-				if ( CoilType == "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" || CoilType == "COIL:HEATING:DX:VARIABLESPEED" ) {
+				if ( SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) || SameString( CoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ) {
 					CoilCapacity = VarSpeedCoil( WhichCoil ).RatedCapHeat;
-				} else if (CoilType == "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED" ) {
+				} else if ( SameString( CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED" ) ) {
 					CoilCapacity = VarSpeedCoil(WhichCoil).RatedCapWH;
 				} else {
 					CoilCapacity = VarSpeedCoil( WhichCoil ).RatedCapCoolTotal;
@@ -5451,7 +5452,7 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		IndexNum = FindItemInList( CoilName, VarSpeedCoil.Name(), NumWatertoAirHPs );
+		IndexNum = FindItemInList( CoilName, VarSpeedCoil );
 
 		if ( IndexNum == 0 ) {
 			ShowSevereError( "GetCoilIndexVariableSpeed: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
@@ -5523,7 +5524,7 @@ namespace VariableSpeedCoils {
 			SameString( CoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ||
 			SameString( CoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ||
 			SameString( CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED")) {
-			WhichCoil = FindItemInList( CoilName, VarSpeedCoil.Name(), NumWatertoAirHPs );
+			WhichCoil = FindItemInList( CoilName, VarSpeedCoil );
 			if ( WhichCoil != 0 ) {
 				//CoilAirFlowRate=VarSpeedCoil(WhichCoil)%RatedAirVolFlowRate
 				if ( VarSpeedCoil( WhichCoil ).RatedAirVolFlowRate == AutoSize ) { //means autosize
@@ -5599,7 +5600,7 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList(CoilName, VarSpeedCoil.Name(), NumWatertoAirHPs);
+		WhichCoil = FindItemInList( CoilName, VarSpeedCoil );
 		if (WhichCoil != 0) {
 			PLRNumber = VarSpeedCoil(WhichCoil).PLFFPLR;
 		}
@@ -5667,7 +5668,7 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, VarSpeedCoil.Name(), NumWatertoAirHPs );
+		WhichCoil = FindItemInList( CoilName, VarSpeedCoil );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = VarSpeedCoil( WhichCoil ).AirInletNodeNum;
 		}
@@ -5736,7 +5737,7 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, VarSpeedCoil.Name(), NumWatertoAirHPs );
+		WhichCoil = FindItemInList( CoilName, VarSpeedCoil );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = VarSpeedCoil( WhichCoil ).AirOutletNodeNum;
 		}
@@ -5802,7 +5803,7 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, VarSpeedCoil.Name(), NumWatertoAirHPs );
+		WhichCoil = FindItemInList( CoilName, VarSpeedCoil );
 		if ( WhichCoil != 0 ) {
 			CondNode = VarSpeedCoil( WhichCoil ).CondenserInletNodeNum;
 		} else {
@@ -5866,7 +5867,7 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, VarSpeedCoil.Name(), NumWatertoAirHPs );
+		WhichCoil = FindItemInList( CoilName, VarSpeedCoil );
 		if ( WhichCoil != 0 ) {
 			MinOAT = VarSpeedCoil( WhichCoil ).MinOATCompressor;
 		} else {
@@ -5929,7 +5930,7 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, VarSpeedCoil.Name(), NumWatertoAirHPs );
+		WhichCoil = FindItemInList( CoilName, VarSpeedCoil );
 		if ( WhichCoil != 0 ) {
 			Speeds = VarSpeedCoil( WhichCoil ).NumOfSpeeds;
 		} else {
@@ -6751,7 +6752,7 @@ namespace VariableSpeedCoils {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -514,7 +514,7 @@ namespace RuntimeLanguageProcessor {
 					Pos = scan( Remainder, ' ' );
 					if ( Pos == std::string::npos ) Pos = Remainder.length();
 					Variable = MakeUPPERCase( stripped( Remainder.substr( 0, Pos ) ) ); // really the subroutine, or reference to instruction set
-					StackNum2 = FindItemInList( Variable, ErlStack.Name(), NumErlStacks );
+					StackNum2 = FindItemInList( Variable, ErlStack );
 					if ( StackNum2 == 0 ) {
 						AddError( StackNum, LineNum, "Program or Subroutine name [" + Variable + "] not found for the RUN instruction." );
 					} else {
@@ -2462,7 +2462,6 @@ namespace RuntimeLanguageProcessor {
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
 		using DataHeatBalance::Construct;
-		using DataHeatBalance::TotConstructs;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -2698,7 +2697,7 @@ namespace RuntimeLanguageProcessor {
 						continue;
 					}
 
-					ConstructNum = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+					ConstructNum = FindItemInList( cAlphaArgs( 2 ), Construct );
 
 					if ( ConstructNum == 0 ) {
 						if ( lAlphaFieldBlanks( 2 ) ) {
@@ -2728,7 +2727,7 @@ namespace RuntimeLanguageProcessor {
 					GetObjectItem( cCurrentModuleObject, StackNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), ErlStack.Name(), StackNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+					VerifyName( cAlphaArgs( 1 ), ErlStack, StackNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2755,7 +2754,7 @@ namespace RuntimeLanguageProcessor {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), ErlStack.Name(), StackNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+					VerifyName( cAlphaArgs( 1 ), ErlStack, StackNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2783,7 +2782,7 @@ namespace RuntimeLanguageProcessor {
 					GetObjectItem( cCurrentModuleObject, TrendNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), TrendVariable.Name(), TrendNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+					VerifyName( cAlphaArgs( 1 ), TrendVariable, TrendNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2871,7 +2870,7 @@ namespace RuntimeLanguageProcessor {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), RuntimeReportVar.Name(), RuntimeReportVarNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+					VerifyName( cAlphaArgs( 1 ), RuntimeReportVar, RuntimeReportVarNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -3011,7 +3010,7 @@ namespace RuntimeLanguageProcessor {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), RuntimeReportVar.Name(), RuntimeReportVarNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+					VerifyName( cAlphaArgs( 1 ), RuntimeReportVar, RuntimeReportVarNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -4022,7 +4021,7 @@ namespace RuntimeLanguageProcessor {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -185,6 +185,37 @@ namespace HeatBalanceManager {
 
 	// Functions
 
+	// Clears the global data in HeatBalanceManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		MaxCoolLoadPrevDay.deallocate();
+		MaxCoolLoadZone.deallocate();
+		MaxHeatLoadPrevDay.deallocate();
+		MaxHeatLoadZone.deallocate();
+		MaxTempPrevDay.deallocate();
+		MaxTempZone.deallocate();
+		MinTempPrevDay.deallocate();
+		MinTempZone.deallocate();
+		WarmupTempDiff.deallocate();
+		WarmupLoadDiff.deallocate();
+		TempZoneSecPrevDay.deallocate();
+		LoadZoneSecPrevDay.deallocate();
+		TempZonePrevDay.deallocate();
+		LoadZonePrevDay.deallocate();
+		TempZone.deallocate();
+		LoadZone.deallocate();
+		TempZoneRpt.deallocate();
+		TempZoneRptStdDev.deallocate();
+		LoadZoneRpt.deallocate();
+		LoadZoneRptStdDev.deallocate();
+		MaxLoadZoneRpt.deallocate();
+		CountWarmupDayPoints = int();
+		CurrentModuleObject = std::string();
+		WarmupConvergenceValues.deallocate();
+	}
+
 	void
 	ManageHeatBalance()
 	{
@@ -425,9 +456,9 @@ namespace HeatBalanceManager {
 			for ( Loop = 1; Loop <= NumObjects; ++Loop ) {
 				GetObjectItem( ConstrObjects( ONum ), Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status );
 				if ( ONum != 5 ) {
-					CNum = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+					CNum = FindItemInList( cAlphaArgs( 2 ), Construct );
 				} else {
-					CNum = FindItemInList( cAlphaArgs( 4 ), Construct.Name(), TotConstructs );
+					CNum = FindItemInList( cAlphaArgs( 4 ), Construct );
 				}
 				if ( CNum == 0 ) continue;
 				Construct( CNum ).IsUsed = true;
@@ -1310,7 +1341,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( MaterialNames( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( MaterialNames( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -1389,7 +1420,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( MaterialNames( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( MaterialNames( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -1455,7 +1486,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( MaterialNames( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( MaterialNames( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -1484,7 +1515,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( MaterialNames( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( MaterialNames( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -1539,7 +1570,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( MaterialNames( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( MaterialNames( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -1581,7 +1612,7 @@ namespace HeatBalanceManager {
 
 			Material( MaterNum ).GlassSpectralDataPtr = 0;
 			if ( TotSpectralData > 0 && ! lAlphaFieldBlanks( 3 ) ) {
-				Material( MaterNum ).GlassSpectralDataPtr = FindItemInList( MaterialNames( 3 ), SpectralData.Name(), TotSpectralData );
+				Material( MaterNum ).GlassSpectralDataPtr = FindItemInList( MaterialNames( 3 ), SpectralData );
 			}
 			if ( SameString( MaterialNames( 2 ), "SpectralAverage" ) ) Material( MaterNum ).GlassSpectralDataPtr = 0;
 			// No need for spectral data for BSDF either
@@ -1751,7 +1782,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( MaterialNames( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( MaterialNames( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -1827,7 +1858,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( MaterialNames( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( MaterialNames( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -1904,7 +1935,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( MaterialNames( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( MaterialNames( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -2009,7 +2040,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( MaterialNames( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( MaterialNames( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -2123,7 +2154,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -2190,7 +2221,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( MaterialNames( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( MaterialNames( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -2261,7 +2292,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( MaterialNames( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( MaterialNames( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -2333,7 +2364,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( MaterialNames( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( MaterialNames( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -2404,7 +2435,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( MaterialNames( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( MaterialNames( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -2564,7 +2595,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( MaterialNames( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( MaterialNames( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -2688,7 +2719,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( MaterialNames( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( MaterialNames( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -2936,7 +2967,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( MaterialNames( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( MaterialNames( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -3075,7 +3106,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( MaterialNames( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( MaterialNames( 1 ), Material, MaterNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -3148,7 +3179,7 @@ namespace HeatBalanceManager {
 				IsBlank = false;
 
 				// Verify unique names
-				VerifyName( cAlphaArgs( 1 ), TCGlazings.Name(), Loop - 1, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), TCGlazings, Loop - 1, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 				if ( ErrorInName ) {
 					ShowContinueError( "...All Thermochromic Glazing names must be unique regardless of subtype." );
 					ErrorsFound = true;
@@ -3178,7 +3209,7 @@ namespace HeatBalanceManager {
 					TCGlazings( Loop ).LayerName( iTC ) = cAlphaArgs( 1 + iTC );
 
 					// Find this glazing material in the material list
-					iMat = FindItemInList( cAlphaArgs( 1 + iTC ), Material.Name(), TotMaterials );
+					iMat = FindItemInList( cAlphaArgs( 1 + iTC ), Material );
 					if ( iMat != 0 ) {
 						//TC glazing
 						Material( iMat ).SpecTemp = rNumericArgs( iTC );
@@ -3207,7 +3238,7 @@ namespace HeatBalanceManager {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, MaterialNumAlpha, rNumericArgs, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Material.Name(), MaterNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Material, MaterNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -3337,7 +3368,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( SpecDataNames( 1 ), SpectralData.Name(), Loop, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( SpecDataNames( 1 ), SpectralData, Loop, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -3598,7 +3629,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( ConstructAlphas( 0 ), Construct.Name(), ConstrNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( ConstructAlphas( 0 ), Construct, ConstrNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -3620,7 +3651,7 @@ namespace HeatBalanceManager {
 
 				//Find the material in the list of materials
 
-				Construct( ConstrNum ).LayerPoint( Layer ) = FindItemInList( ConstructAlphas( Layer ), Material.Name(), TotMaterials );
+				Construct( ConstrNum ).LayerPoint( Layer ) = FindItemInList( ConstructAlphas( Layer ), Material );
 
 				// count number of glass layers
 				if ( Construct( ConstrNum ).LayerPoint( Layer ) > 0 ) {
@@ -3635,7 +3666,7 @@ namespace HeatBalanceManager {
 
 				if ( Construct( ConstrNum ).LayerPoint( Layer ) == 0 ) {
 					//This may be a TC GlazingGroup
-					Construct( ConstrNum ).LayerPoint( Layer ) = FindItemInList( ConstructAlphas( Layer ), TCGlazings.Name(), TotTCGlazings );
+					Construct( ConstrNum ).LayerPoint( Layer ) = FindItemInList( ConstructAlphas( Layer ), TCGlazings );
 
 					if ( Construct( ConstrNum ).LayerPoint( Layer ) > 0 ) {
 						//reset layer pointer to the first glazing in the TC GlazingGroup
@@ -3694,7 +3725,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( ConstructAlphas( 0 ), Construct.Name(), TotRegConstructs + ConstrNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( ConstructAlphas( 0 ), Construct, TotRegConstructs + ConstrNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -3743,7 +3774,7 @@ namespace HeatBalanceManager {
 
 				//Find the material in the list of materials
 
-				Construct( TotRegConstructs + ConstrNum ).LayerPoint( Layer ) = FindItemInList( ConstructAlphas( Layer ), Material.Name(), TotMaterials );
+				Construct( TotRegConstructs + ConstrNum ).LayerPoint( Layer ) = FindItemInList( ConstructAlphas( Layer ), Material );
 
 				if ( Construct( TotRegConstructs + ConstrNum ).LayerPoint( Layer ) == 0 ) {
 					ShowSevereError( "Did not find matching material for " + CurrentModuleObject + ' ' + Construct( ConstrNum ).Name + ", missing material = " + ConstructAlphas( Layer ) );
@@ -3777,7 +3808,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( ConstructAlphas( 0 ), Construct.Name(), TotRegConstructs + ConstrNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( ConstructAlphas( 0 ), Construct, TotRegConstructs + ConstrNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -3799,7 +3830,7 @@ namespace HeatBalanceManager {
 			for ( Layer = 1; Layer <= ConstructNumAlpha - 1; ++Layer ) {
 
 				//Find the material in the list of materials
-				Construct( TotRegConstructs + ConstrNum ).LayerPoint( Layer ) = FindItemInList( ConstructAlphas( Layer ), Material.Name(), TotMaterials );
+				Construct( TotRegConstructs + ConstrNum ).LayerPoint( Layer ) = FindItemInList( ConstructAlphas( Layer ), Material );
 
 				if ( Construct( TotRegConstructs + ConstrNum ).LayerPoint( Layer ) == 0 ) {
 					ShowSevereError( "Did not find matching material for " + CurrentModuleObject + ' ' + Construct( ConstrNum ).Name + ", missing material = " + ConstructAlphas( Layer ) );
@@ -4024,7 +4055,7 @@ namespace HeatBalanceManager {
 			//    Make sure Zone Name is unique
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Zone.Name(), ZoneLoop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Zone, ZoneLoop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -4059,14 +4090,14 @@ namespace HeatBalanceManager {
 				// List name
 				ErrorInName = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), ZoneList.Name(), ListNum - 1, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), ZoneList, ListNum - 1, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 
 				if ( ErrorInName ) {
 					ErrorsFound = true;
 				}
 
 				ZoneList( ListNum ).Name = cAlphaArgs( 1 );
-				if ( FindItemInList( ZoneList( ListNum ).Name, Zone.Name(), NumOfZones ) > 0 ) {
+				if ( FindItemInList( ZoneList( ListNum ).Name, Zone ) > 0 ) {
 					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\":  is a duplicate of a zone name." );
 					ShowContinueError( "This could be a problem in places where either a Zone Name or a Zone List can be used." );
 				}
@@ -4084,7 +4115,7 @@ namespace HeatBalanceManager {
 					for ( ZoneNum = 1; ZoneNum <= ZoneList( ListNum ).NumOfZones; ++ZoneNum ) {
 						ZoneName = cAlphaArgs( ZoneNum + 1 );
 						ZoneList( ListNum ).MaxZoneNameLength = max( ZoneList( ListNum ).MaxZoneNameLength, len( ZoneName ) );
-						ZoneList( ListNum ).Zone( ZoneNum ) = FindItemInList( ZoneName, Zone.Name(), NumOfZones );
+						ZoneList( ListNum ).Zone( ZoneNum ) = FindItemInList( ZoneName, Zone );
 						if ( ZoneList( ListNum ).Zone( ZoneNum ) == 0 ) {
 							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\":  " + cAlphaFieldNames( ZoneNum + 1 ) + ' ' + ZoneName + " not found." );
 							ErrorsFound = true;
@@ -4116,7 +4147,7 @@ namespace HeatBalanceManager {
 				// Group name
 				ErrorInName = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), ZoneGroup.Name(), GroupNum - 1, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), ZoneGroup, GroupNum - 1, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 
 				if ( ErrorInName ) {
 					ErrorsFound = true;
@@ -4128,7 +4159,7 @@ namespace HeatBalanceManager {
 				ZoneGroup( GroupNum ).Multiplier = rNumericArgs( 1 );
 
 				// Zone list
-				ListNum = FindItemInList( cAlphaArgs( 2 ), ZoneList.Name(), NumOfZoneLists );
+				ListNum = FindItemInList( cAlphaArgs( 2 ), ZoneList );
 				ZoneGroup( GroupNum ).ZoneList = ListNum;
 
 				if ( ListNum == 0 ) {
@@ -5142,7 +5173,7 @@ namespace HeatBalanceManager {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( FrameDividerNames( 1 ), FrameDivider.Name(), FrameDividerNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( FrameDividerNames( 1 ), FrameDivider, FrameDividerNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -5954,9 +5985,9 @@ Label20: ;
 					Phi = double( IPhi - 1 ) * 10.0;
 					CosPhi = std::cos( Phi * DegToRadians );
 					if ( std::abs( CosPhi ) < 0.0001 ) CosPhi = 0.0;
-					tsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransSolBeamCoef( {1,6} ) );
-					tvisFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransVisBeamCoef( {1,6} ) );
-					rfsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).ReflSolBeamFrontCoef( {1,6} ) );
+					tsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransSolBeamCoef );
+					tvisFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransVisBeamCoef );
+					rfsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).ReflSolBeamFrontCoef );
 					for ( IGlass = 1; IGlass <= NGlass( IGlSys ); ++IGlass ) {
 						solabsFit( IGlass, IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).AbsBeamCoef( {1,6}, IGlass ) );
 					}
@@ -6195,7 +6226,7 @@ Label1000: ;
 		int iFCConcreteLayer; // Layer pointer to the materials array
 
 		// First get the concrete layer
-		iFCConcreteLayer = FindItemInList( "~FC_Concrete", Material.Name(), TotMaterials );
+		iFCConcreteLayer = FindItemInList( "~FC_Concrete", Material );
 		Rcon = Material( iFCConcreteLayer ).Resistance;
 
 		// Count number of constructions defined with Ffactor or Cfactor method
@@ -6213,7 +6244,7 @@ Label1000: ;
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( ConstructAlphas( 1 ), Construct.Name(), ConstrNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( ConstructAlphas( 1 ), Construct, ConstrNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -6257,7 +6288,7 @@ Label1000: ;
 			Construct( ConstrNum ).LayerPoint( 2 ) = iFCConcreteLayer;
 
 			// The fictitious insulation is the outside layer
-			MaterNum = FindItemInList( "~FC_Insulation_" + RoundSigDigits( Loop ), Material.Name(), TotMaterials );
+			MaterNum = FindItemInList( "~FC_Insulation_" + RoundSigDigits( Loop ), Material );
 			Construct( ConstrNum ).LayerPoint( 1 ) = MaterNum;
 
 			// Calculate the thermal resistance of the fictitious insulation layer
@@ -6293,7 +6324,7 @@ Label1000: ;
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( ConstructAlphas( 1 ), Construct.Name(), ConstrNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( ConstructAlphas( 1 ), Construct, ConstrNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -6329,7 +6360,7 @@ Label1000: ;
 			Construct( ConstrNum ).LayerPoint( 2 ) = iFCConcreteLayer;
 
 			// The fictitious insulation is the outside layer
-			MaterNum = FindItemInList( "~FC_Insulation_" + RoundSigDigits( Loop + TotFfactorConstructs ), Material.Name(), TotMaterials );
+			MaterNum = FindItemInList( "~FC_Insulation_" + RoundSigDigits( Loop + TotFfactorConstructs ), Material );
 			Construct( ConstrNum ).LayerPoint( 1 ) = MaterNum;
 
 			// CR 8886 Rsoil should be in SI unit. From ASHRAE 90.1-2010 SI
@@ -6447,7 +6478,7 @@ Label1000: ;
 				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				ErrorInName = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), SurfIncSolSSG.Name(), Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), SurfIncSolSSG, Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 				if ( ErrorInName ) {
 					ShowContinueError( "...each SurfaceProperty:SolarIncidentInside name must not duplicate other SurfaceProperty:SolarIncidentInside name" );
 					ErrorsFound = true;
@@ -6457,7 +6488,7 @@ Label1000: ;
 				SurfIncSolSSG( Loop ).Name = cAlphaArgs( 1 );
 
 				// Assign surface number
-				SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface.Name(), TotSurfaces );
+				SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface );
 				if ( SurfNum == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 2 ) + " has been found." );
 					ShowContinueError( cAlphaFieldNames( 2 ) + " entered value = \"" + cAlphaArgs( 2 ) + "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file." );
@@ -6467,7 +6498,7 @@ Label1000: ;
 				}
 
 				// Assign construction number
-				ConstrNum = FindItemInList( cAlphaArgs( 3 ), Construct.Name(), TotConstructs );
+				ConstrNum = FindItemInList( cAlphaArgs( 3 ), Construct );
 				if ( ConstrNum == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 3 ) + " has been found." );
 					ShowContinueError( cAlphaFieldNames( 3 ) + " entered value = \"" + cAlphaArgs( 3 ) + "\" no corresponding construction (ref Construction) has been found in the input file." );
@@ -6503,7 +6534,7 @@ Label1000: ;
 				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				ErrorInName = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), FenLayAbsSSG.Name(), Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), FenLayAbsSSG, Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 				if ( ErrorInName ) {
 					ShowContinueError( "...each ComplexFenestrationProperty:SolarAbsorbedLayers name must not duplicate other ComplexFenestrationProperty:SolarAbsorbedLayers name" );
 					ErrorsFound = true;
@@ -6513,7 +6544,7 @@ Label1000: ;
 				FenLayAbsSSG( Loop ).Name = cAlphaArgs( 1 );
 
 				// Assign surface number
-				SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface.Name(), TotSurfaces );
+				SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface );
 				if ( SurfNum == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 2 ) + " has been found." );
 					ShowContinueError( cAlphaFieldNames( 2 ) + " entered value = \"" + cAlphaArgs( 2 ) + "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file." );
@@ -6523,7 +6554,7 @@ Label1000: ;
 				}
 
 				// Assign construction number
-				ConstrNum = FindItemInList( cAlphaArgs( 3 ), Construct.Name(), TotConstructs );
+				ConstrNum = FindItemInList( cAlphaArgs( 3 ), Construct );
 				if ( ConstrNum == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 3 ) + " has been found." );
 					ShowContinueError( cAlphaFieldNames( 3 ) + " entered value = \"" + cAlphaArgs( 3 ) + "\" no corresponding construction (ref Construction) has been found in the input file." );
@@ -7004,7 +7035,7 @@ Label1000: ;
 			IsBlank = false;
 
 			// Verify unique names
-			VerifyName( cAlphaArgs( 1 ), SupportPillar.Name(), Loop, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SupportPillar, Loop, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
@@ -7040,7 +7071,7 @@ Label1000: ;
 			IsBlank = false;
 
 			// Verify unique names
-			VerifyName( cAlphaArgs( 1 ), DeflectionState.Name(), Loop, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), DeflectionState, Loop, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
@@ -7069,7 +7100,7 @@ Label1000: ;
 			IsBlank = false;
 
 			// Verify unique names
-			VerifyName( cAlphaArgs( 1 ), Material.Name(), MaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Material, MaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
@@ -7099,16 +7130,16 @@ Label1000: ;
 			}
 
 			if ( ! lAlphaFieldBlanks( 2 ) ) {
-				Material( MaterNum ).GasPointer = FindItemInList( cAlphaArgs( 2 ), Material.Name(), TotMaterials );
+				Material( MaterNum ).GasPointer = FindItemInList( cAlphaArgs( 2 ), Material );
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
 				ShowContinueError( cCurrentModuleObject + " does not have assigned WindowMaterial:Gas or WindowMaterial:GasMixutre." );
 			}
 			if ( ! lAlphaFieldBlanks( 3 ) ) {
-				Material( MaterNum ).DeflectionStatePtr = FindItemInList( cAlphaArgs( 3 ), DeflectionState.Name(), W7DeflectionStates );
+				Material( MaterNum ).DeflectionStatePtr = FindItemInList( cAlphaArgs( 3 ), DeflectionState );
 			}
 			if ( ! lAlphaFieldBlanks( 4 ) ) {
-				Material( MaterNum ).SupportPillarPtr = FindItemInList( cAlphaArgs( 4 ), SupportPillar.Name(), W7SupportPillars );
+				Material( MaterNum ).SupportPillarPtr = FindItemInList( cAlphaArgs( 4 ), SupportPillar );
 			}
 		}
 
@@ -7127,7 +7158,7 @@ Label1000: ;
 			IsBlank = false;
 
 			// Verify unique names
-			VerifyName( cAlphaArgs( 1 ), ComplexShade.Name(), Loop, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ComplexShade, Loop, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
@@ -7387,7 +7418,7 @@ Label1000: ;
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), WindowThermalModel.Name(), TotThermalModels - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), WindowThermalModel, TotThermalModels - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				continue;
@@ -7486,7 +7517,7 @@ Label1000: ;
 			++ConstrNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( locAlphaArgs( 1 ), Construct.Name(), ConstrNum - 1, IsNotOK, IsBlank, locCurrentModuleObject + " Name" );
+			VerifyName( locAlphaArgs( 1 ), Construct, ConstrNum - 1, IsNotOK, IsBlank, locCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				continue;
@@ -7532,7 +7563,7 @@ Label1000: ;
 			}}
 
 			//Simon: Assign thermal model number
-			ThermalModelNum = FindItemInList( locAlphaArgs( 4 ), WindowThermalModel.Name(), TotThermalModels );
+			ThermalModelNum = FindItemInList( locAlphaArgs( 4 ), WindowThermalModel );
 			if ( ThermalModelNum == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Illegal value for " + locAlphaFieldNames( 4 ) + " has been found." );
 				ShowContinueError( locAlphaFieldNames( 4 ) + " entered value = \"" + locAlphaArgs( 4 ) + "\" no corresponding thermal model (WindowThermalModel:Params) found in the input file." );
@@ -7705,7 +7736,7 @@ Label1000: ;
 					AlphaIndex = 9 + ( Layer * 3 ) - 2;
 					currentOpticalLayer = int( Layer / 2 ) + 1;
 					//Material info is contained in the thermal construct
-					Construct( ConstrNum ).LayerPoint( Layer ) = FindItemInList( locAlphaArgs( AlphaIndex ), Material.Name(), TotMaterials );
+					Construct( ConstrNum ).LayerPoint( Layer ) = FindItemInList( locAlphaArgs( AlphaIndex ), Material );
 
 					//Simon: Load only if optical layer
 					if ( mod( Layer, 2 ) != 0 ) {
@@ -7925,7 +7956,7 @@ Label1000: ;
 					AlphaIndex = 9 + ( Layer * 3 ) - 2;
 					currentOpticalLayer = int( Layer / 2 ) + 1;
 
-					Construct( ConstrNum ).LayerPoint( Layer ) = FindItemInList( locAlphaArgs( AlphaIndex ), Material.Name(), TotMaterials );
+					Construct( ConstrNum ).LayerPoint( Layer ) = FindItemInList( locAlphaArgs( AlphaIndex ), Material );
 
 					if ( mod( Layer, 2 ) != 0 ) {
 						Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).MaterialIndex = Construct( ConstrNum ).LayerPoint( Layer );
@@ -8015,7 +8046,7 @@ Label1000: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

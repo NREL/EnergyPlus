@@ -55,7 +55,7 @@ Latent Gain is simply the total gain (metabolic rate) – sensible gain:
 
 <div>$$LatentGain = MetabolicRate - SensibleGain$$</div>
 
-![](EngineeringReference/media/image5820.png)
+![](media/image5820.png)
 
 Figure 259.  Sensible Heat Gain from People Correlation
 
@@ -176,7 +176,7 @@ SHIZone = ∑ [VAir * (TAirIn – TAirSupply)] / ∑ [VAir * (TAirOut - TAirSupp
 
 The input object ZoneBaseboard:OutdoorTemperatureControlled provides a model for an outdoor temperature controlled baseboard heater that adds energy to the zone according a control profile as shown in the following figure.  At TA = T2, the baseboard heat gain is Q2.  For TA &gt; T2, there is no heat gain.  For TA &lt; T1, a maximum amount of energy, Q1, is added to the zone.  There is proportional control between those two temperatures:
 
-![](EngineeringReference/media/image5821.png)
+![](media/image5821.png)
 
 Figure 260.  Control of Outdoor Temperature Controlled Baseboard Heat
 
@@ -208,7 +208,7 @@ The capacity at low temperature that is the maximum capacity of the unit is thus
 
 where
 
-<span>$Ca{p_{{T_L}}}$</span>is capacity at low temperature, W
+<span>\(Ca{p_{{T_L}}}\)</span>is capacity at low temperature, W
 
 *q<sub>I</sub>* is design infiltration sensible load, W
 
@@ -222,7 +222,7 @@ The capacity at high temperature is then prorated against the reference low and 
 
 where
 
-<span>$Ca{p_{{T_H}}}$</span> is capacity at high temperature, W
+<span>\(Ca{p_{{T_H}}}\)</span> is capacity at high temperature, W
 
 *T<sub>H</sub>* is high temperature, °C
 
@@ -242,7 +242,7 @@ If all surfaces in the room are opaque, the radiation is distributed in proporti
 
 <div>$${\rho_i} = 1 - {\alpha_i} - {\tau_i}$$</div>
 
-That fraction of radiation represented by <span>${\tau_i}$</span> is lost from the zone.
+That fraction of radiation represented by <span>\({\tau_i}\)</span> is lost from the zone.
 
 The transmittance and absorptance of transparent surfaces (windows or glass doors) are calculated as in section Window Calculation Module based on the optical properties of the window material layers.  The total absorptance of the window is computed for the interior shading device, the inside surface, and the outside surface for diffuse solar radiation incident from outside the zone.  Those absorptances are used for short wavelength radiation incident from inside the zone.  In most cases, this should not cause significant error.  When movable insulation covers the window, the radiation that would have been transmitted is absorbed at the outer surface of the window (thermally equal to the inside surface of the insulation).
 
@@ -546,7 +546,7 @@ In the case of a pipe in a zone, the heat loss or gain is accounted for in the p
 
 Pipe heat transfer in EnergyPlus is simulated by discretizing the pipe length into a number of nodes (20) and is an implementation of the model by Hanby et al. (2002). A control volume drawn around a node in the pipe is shown in Figure 261. Three nodes are defined at each discrete section of the pipe and represent the fluid, pipe wall and external environment. The fluid and pipe have defined thermal capacitance (mass). The insulation around the pipe is currently modeled as steady-state (no thermal mass), and so the effect of this resistance is accounted for within the h<sub>f</sub> term in the following description.  For the fluid, there is one-dimensional flow from each upstream node.
 
-![PipeDelay](EngineeringReference/media/image5831.png)
+![PipeDelay](media/image5831.png)
 
 Figure 261. Control Volume drawn around node *i*
 
@@ -558,19 +558,19 @@ The model is formulated from the heat balances on the fluid and wall nodes.
 
 Where, subscript *w*, *f* and *e* denote the values for pipe wall, fluid and environment respectively. The current node is represented by a subscript of *i*, while the previous node is represented by *i-1*.
 
-<span>$M$</span> = Mass
+<span>\(M\)</span> = Mass
 
-<span>${C_p}$</span> = Specific Heat
+<span>\({C_p}\)</span> = Specific Heat
 
-<span>$\dot m$</span> = Mass flow rate of fluid in pipe
+<span>\(\dot m\)</span> = Mass flow rate of fluid in pipe
 
-<span>$T$</span>  = Temperature
+<span>\(T\)</span>  = Temperature
 
-<span>$A$</span>  =  Heat Transfer Area
+<span>\(A\)</span>  =  Heat Transfer Area
 
-<span>$h$</span>  = Film convective resistance
+<span>\(h\)</span>  = Film convective resistance
 
-<span>$t$</span>   = time
+<span>\(t\)</span>   = time
 
 The exterior film convective resistance is calculated based on either wind speed, room air velocity, or a scheduled value based on the type of pipe heat transfer object. However, when the velocity gets too low, natural convection must be modeled. This is handled within the program by having a lower limit on the Nusselt number. For natural convection from a horizontal cylinder, a constant Nusselt number is assumed based on information from Spang (referenced below). This Nusselt number is 0.36. The Nusselt number used in calculating the exterior convection coefficient (Incropera and Dewitt 1996) is the maximum of the Nusselt number from the forced convection coefficient correlation and this natural convection Nusselt number (0.36).
 
@@ -632,7 +632,7 @@ The buried pipe model in EnergyPlus is similar to the other pipe heat transfer o
 
 The buried model develops a grid around the pipe. The grid was based originally on a model by Piechowski (1999), and still carries the model nomenclature. The grid extends from the ground surface down to a calculated distance below the pipe. The domain extends sideways from the symmetric center of the pipe to a calculated distance from the pipe. The grid stretches along the full length of the pipe. At each cross section, transient 2D Cartesian finite difference equations are used, updating each node except the node centered on the pipe. Axial heat transfer is not modeled in the soil. The large view of the outer Cartesian grid system is shown in Figure 262.
 
-![](EngineeringReference/media/image5851.png)
+![](media/image5851.png)
 
 Figure 262. Pipe:Underground Outer Finite Difference Grid
 
@@ -680,11 +680,11 @@ A dual-coordinate system finite volume heat transfer model of pipes buried in a 
 
 A new heat transfer model is implemented to handle a diverse set of buried pipe conditions.  The model uses a dual-coordinate system approach to solve a finite volume domain in a computationally efficient manner.  The main idea behind the dual coordinate system technique is to focus the computational effort to the region where it is most needed: near the pipe(s).  To this end, a coarse grid Cartesian coordinate system is used to solve the slow-moving ground heat transfer.  Then, within one of these cells, a radial coordinate system is configured around the pipe/insulation with a specialized interface cell between the systems.  Figure 263 shows an example of cells surrounding a pipe, including the radial region in the near-pipe cell, while Figure 264 shows a zoomed-in view of the near-pipe cell itself.
 
-![](EngineeringReference/media/image5852.png)
+![](media/image5852.png)
 
 Figure 263. Radial "near-pipe" cell within a Cartesian cell
 
-![](EngineeringReference/media/image5853.png)
+![](media/image5853.png)
 
 Figure 264. Close-up view of example radial cell
 
@@ -879,7 +879,7 @@ Differential pressure based control will maintain the differential pressure with
 
 The allowable mass flow rate range for the Differential pressure control is explained in the figure below:
 
-![](EngineeringReference/media/image5856.png)
+![](media/image5856.png)
 
 Figure 265. Allowable mass flow rate range for the Differential pressure control
 
@@ -943,7 +943,7 @@ Note that the shaft power relates to the increase in head through the pump. Sinc
 
 ### Pump Heat Addition to Surrounding Zone
 
-If the user input includes naming a Zone that surrounds the pump, then the pump becomes a source of internal heat gain to that zone.  The amount of heat transmitted to the surrounding zone is simply the difference between power input and the rate of heat transferred to the fluid. The user can also input a fraction,<span>${f_{rad}}$</span> , that controls the overall split between thermal radiation and sensible convection.  The pump’s sensible zone gains are determined using the following equations:
+If the user input includes naming a Zone that surrounds the pump, then the pump becomes a source of internal heat gain to that zone.  The amount of heat transmitted to the surrounding zone is simply the difference between power input and the rate of heat transferred to the fluid. The user can also input a fraction,<span>\({f_{rad}}\)</span> , that controls the overall split between thermal radiation and sensible convection.  The pump’s sensible zone gains are determined using the following equations:
 
 <div>$$TotalZoneGain = PumpPower - PumpHeatToFluid$$</div>
 
@@ -1090,7 +1090,7 @@ o   The recirculation air conditions are set equal to the zone return air nod
 
 o   The unit entering conditions are then:
 
-If <span>${\dot m_s}$</span>&gt; <span>${\dot m_{oa}}$</span> then
+If <span>\({\dot m_s}\)</span>&gt; <span>\({\dot m_{oa}}\)</span> then
 
 <div>$${h_{ma}} = ({\dot m_{oa}} \cdot {h_{oa}} + ({\dot m_s} - {\dot m_{oa}}) \cdot {h_{recirc}})/{\dot m_s}$$</div>
 
@@ -1175,79 +1175,79 @@ In heat recovery mode, both evaporator temperatures and condenser temperatures a
 
 The following nomenclature is used in the following equations:
 
-<span>${\dot m_{cw,bypass}}$</span> = chilled water bypass mass flow rate in the system [kg/s]
+<span>\({\dot m_{cw,bypass}}\)</span> = chilled water bypass mass flow rate in the system [kg/s]
 
-<span>${\dot m_{hw,bypass}}$</span>= hot water bypass mass flow rate in the system [kg/s]
+<span>\({\dot m_{hw,bypass}}\)</span>= hot water bypass mass flow rate in the system [kg/s]
 
-<span>${\dot m_{src,bypass}}$</span> =source water bypass mass flow rate in the system [kg/s]
+<span>\({\dot m_{src,bypass}}\)</span> =source water bypass mass flow rate in the system [kg/s]
 
-<span>${\dot m_{cw,CH}}$</span> =chilled water mass flow rate of i<sup>th</sup> chiller-heater’s evaporator [kg/s]
+<span>\({\dot m_{cw,CH}}\)</span> =chilled water mass flow rate of i<sup>th</sup> chiller-heater’s evaporator [kg/s]
 
-<span>${\dot m_{hw,CH}}$</span> =hot water mass flow rate of i<sup>th</sup> chiller-heater’s condenser [kg/s]
+<span>\({\dot m_{hw,CH}}\)</span> =hot water mass flow rate of i<sup>th</sup> chiller-heater’s condenser [kg/s]
 
-<span>${\dot m_{src,CH}}$</span> =source water mass flow rate of i<sup>th</sup> chiller-heater, which varies with operating modes [kg/s]
+<span>\({\dot m_{src,CH}}\)</span> =source water mass flow rate of i<sup>th</sup> chiller-heater, which varies with operating modes [kg/s]
 
-<span>${\dot m_{cw,sys}}$</span> =chilled water mass flow rate of the system [kg/s]
+<span>\({\dot m_{cw,sys}}\)</span> =chilled water mass flow rate of the system [kg/s]
 
-<span>${\dot m_{hw,sys}}$</span> =hot water mass flow rate of the system [kg/s]
+<span>\({\dot m_{hw,sys}}\)</span> =hot water mass flow rate of the system [kg/s]
 
-<span>${\dot m_{src,sys}}$</span> =source water mass flow rate of the system [kg/s]
+<span>\({\dot m_{src,sys}}\)</span> =source water mass flow rate of the system [kg/s]
 
-<span>${T_{cw,sys}}$</span> =chilled water outlet temperature of the system [C]
+<span>\({T_{cw,sys}}\)</span> =chilled water outlet temperature of the system [C]
 
-<span>${T_{hw,sys}}$</span> =hot water outlet temperature of the system [C]
+<span>\({T_{hw,sys}}\)</span> =hot water outlet temperature of the system [C]
 
-<span>${T_{src,sys}}$</span> =source water outlet temperature of the system [C]
+<span>\({T_{src,sys}}\)</span> =source water outlet temperature of the system [C]
 
-<span>${T_{cw,bypass}}$</span> =mass-weighed bypass chilled water temperature in the system [C]
+<span>\({T_{cw,bypass}}\)</span> =mass-weighed bypass chilled water temperature in the system [C]
 
-<span>${T_{hw,bypass}}$</span> =mass-weighed bypass hot water temperature in the system [C]
+<span>\({T_{hw,bypass}}\)</span> =mass-weighed bypass hot water temperature in the system [C]
 
-<span>${T_{src,bypass}}$</span> =mass-weighed bypass source water temperature in the system [C]
+<span>\({T_{src,bypass}}\)</span> =mass-weighed bypass source water temperature in the system [C]
 
-<span>${T_{cw,CH}}$</span> =mass-weighed chilled water outlet temperature from chiller-heaters [C]
+<span>\({T_{cw,CH}}\)</span> =mass-weighed chilled water outlet temperature from chiller-heaters [C]
 
-<span>${T_{hw,CH}}$</span> =mass-weighed hot water outlet temperature from chiller-heaters [C]
+<span>\({T_{hw,CH}}\)</span> =mass-weighed hot water outlet temperature from chiller-heaters [C]
 
-<span>${T_{src,CH}}$</span> =mass-weighed source water outlet temperature from chiller-heaters [C]
+<span>\({T_{src,CH}}\)</span> =mass-weighed source water outlet temperature from chiller-heaters [C]
 
-<span>${T_{cw,i}}$</span> =chilled water inlet temperature of the system [C]
+<span>\({T_{cw,i}}\)</span> =chilled water inlet temperature of the system [C]
 
-<span>${T_{hw,i}}$</span> =hot water inlet temperature of the system [C]
+<span>\({T_{hw,i}}\)</span> =hot water inlet temperature of the system [C]
 
-<span>${T_{src,i}}$</span> =source water inlet temperature of the system [C]
+<span>\({T_{src,i}}\)</span> =source water inlet temperature of the system [C]
 
-<span>${T_{cw,out}}$</span> =chilled water outlet temperature of i<sup>th</sup> chiller-heater [C]
+<span>\({T_{cw,out}}\)</span> =chilled water outlet temperature of i<sup>th</sup> chiller-heater [C]
 
-<span>${T_{hw,out}}$</span> =hot water outlet temperature of i<sup>th</sup> chiller-heater [C]
+<span>\({T_{hw,out}}\)</span> =hot water outlet temperature of i<sup>th</sup> chiller-heater [C]
 
-<span>${T_{src,out}}$</span> =source water outlet temperature of i<sup>th</sup> chiller-heater [C]
+<span>\({T_{src,out}}\)</span> =source water outlet temperature of i<sup>th</sup> chiller-heater [C]
 
 The model reads node information and local variables of individual chiller-heaters. The nodes and local variables vary with the operating modes as described above in order to calculate mass-weighed temperatures. In the cooling-only mode, it calculates a mass-weighed chilled water temperature (*T<sub>cw,CH</sub>*) and a source water temperature (*T<sub>src,CH</sub>*) as follows:
 
 <div>$${T_{cw,CH}} = \sum\limits_{CH = 1}^n {{T_{cw,out}}} \frac{{{{\dot m}_{cw,CH}}}}{{{m_{cw,sys}}}}$$</div>
 
-***<span>${T_{src,CH}} = \sum\limits_{CH = 1}^n {{T_{src,out}}} \frac{{{{\dot m}_{src,CH}}}}{{{m_{src,sys}}}}$</span> ***.
+***<span>\({T_{src,CH}} = \sum\limits_{CH = 1}^n {{T_{src,out}}} \frac{{{{\dot m}_{src,CH}}}}{{{m_{src,sys}}}}\)</span> ***.
 
 In heating-only mode, it calculates a mass-weighed hot water temperature (*T<sub>hw,CH</sub>*) and a source water temperature (*T<sub>src,CH</sub>*) as follows:
 
-***<span>${T_{hw,CH}} = \sum\limits_{CH = 1}^n {{T_{hw,out}}} \frac{{{{\dot m}_{hw,CH}}}}{{{m_{hw,sys}}}}$</span> ***
+***<span>\({T_{hw,CH}} = \sum\limits_{CH = 1}^n {{T_{hw,out}}} \frac{{{{\dot m}_{hw,CH}}}}{{{m_{hw,sys}}}}\)</span> ***
 
-***<span>${T_{src,CH}} = \sum\limits_{CH = 1}^n {{T_{src,out}}} \frac{{{{\dot m}_{src,CH}}}}{{{m_{src,sys}}}}$</span> ***.
+***<span>\({T_{src,CH}} = \sum\limits_{CH = 1}^n {{T_{src,out}}} \frac{{{{\dot m}_{src,CH}}}}{{{m_{src,sys}}}}\)</span> ***.
 
 When all chiller-heaters are in heat recovery mode, it calculates a mass-weighed chilled water temperature (*T<sub>cw,CH</sub>*) and hot water temperature (*T<sub>hw,CH</sub>*) as follows:
 
-***<span>${T_{cw,CH}} = \sum\limits_{CH = 1}^n {{T_{cw,out}}} \frac{{{{\dot m}_{cw,CH}}}}{{{m_{cw,sys}}}}$</span>***
+***<span>\({T_{cw,CH}} = \sum\limits_{CH = 1}^n {{T_{cw,out}}} \frac{{{{\dot m}_{cw,CH}}}}{{{m_{cw,sys}}}}\)</span>***
 
-***<span>${T_{hw,CH}} = \sum\limits_{CH = 1}^n {{T_{hw,out}}} \frac{{{{\dot m}_{hw,CH}}}}{{{m_{hw,sys}}}}$</span> ***.
+***<span>\({T_{hw,CH}} = \sum\limits_{CH = 1}^n {{T_{hw,out}}} \frac{{{{\dot m}_{hw,CH}}}}{{{m_{hw,sys}}}}\)</span> ***.
 
 In cooling or heating dominant simultaneous cooling-heating mode (mode 4 and 5), at least one chiller-heater should be in heat recovery mode, and the other(s) are in either mode 4 or mode 5. The system is connected to three loops such as chilled water loop, hot water loop, and source water loop. The model thus calculates a mass-weighed chilled water temperature (*T<sub>cw,CH</sub>*), hot water temperature (*T<sub>hw,CH</sub>*), and source water temperature (*T<sub>src,CH</sub>*) as follows:
 
-***<span>${T_{cw,CH}} = \sum\limits_{CH = 1}^n {{T_{cw,out}}} \frac{{{{\dot m}_{cw,CH}}}}{{{m_{cw,sys}}}}$</span>***
+***<span>\({T_{cw,CH}} = \sum\limits_{CH = 1}^n {{T_{cw,out}}} \frac{{{{\dot m}_{cw,CH}}}}{{{m_{cw,sys}}}}\)</span>***
 
-***<span>${T_{hw,CH}} = \sum\limits_{CH = 1}^n {{T_{hw,out}}} \frac{{{{\dot m}_{hw,CH}}}}{{{m_{hw,sys}}}}$</span>***
+***<span>\({T_{hw,CH}} = \sum\limits_{CH = 1}^n {{T_{hw,out}}} \frac{{{{\dot m}_{hw,CH}}}}{{{m_{hw,sys}}}}\)</span>***
 
-***<span>${T_{src,CH}} = \sum\limits_{CH = 1}^n {{T_{src,out}}} \frac{{{{\dot m}_{src,CH}}}}{{{m_{src,sys}}}}$</span>*** .
+***<span>\({T_{src,CH}} = \sum\limits_{CH = 1}^n {{T_{src,out}}} \frac{{{{\dot m}_{src,CH}}}}{{{m_{src,sys}}}}\)</span>*** .
 
 The model then calculates a mass-weighed temperature for the by-pass flows remained in the system as follows:
 
@@ -1263,7 +1263,7 @@ The outlet temperatures at each outlet node of the system are then determined as
 
 <div>$${T_{hw,sys}} = {T_{hw,CH}} + {T_{hw,bypass}}$$</div>
 
-<span>${T_{src,sys}} = {T_{src,CH}} + {T_{src,bypass}}$</span>.
+<span>\({T_{src,sys}} = {T_{src,CH}} + {T_{src,bypass}}\)</span>.
 
 The total heat transfer energy of the system is also calculated in the same manner as the temperature calculations. The model simply sums all heat transfer energy of the chiller-heaters depending on their operating modes.
 
@@ -1288,7 +1288,7 @@ The following nomenclature is used in the cooling equations:
 
 *CompPower<sub>@PLRmin</sub>*  =compressor power at the minimum part-load ratio [W]
 
-<span>${C_{p,cw}}$</span> =chilled water specific heat  [J/kgK]
+<span>\({C_{p,cw}}\)</span> =chilled water specific heat  [J/kgK]
 
 *CyclingRatio*<sub></sub> =compressor cycling ratio =*PLR<sub>actual</sub>* / *PLR<sub>min</sub>*
 
@@ -1300,9 +1300,9 @@ The following nomenclature is used in the cooling equations:
 
 *EIRFPLR<sub>clg</sub>* =electric input to cooling output factor for part-load function curve
 
-<span>${\dot m_{cw}}$</span> =chilled water mass flow rate [kg/s]
+<span>\({\dot m_{cw}}\)</span> =chilled water mass flow rate [kg/s]
 
-<span>${\dot m_{avail,cw}}$</span> =chilled water maximum available mass flow rate [kg/s]
+<span>\({\dot m_{avail,cw}}\)</span> =chilled water maximum available mass flow rate [kg/s]
 
 *PLR<sub>clg</sub>* =cooling part-load ratio = *CoolingLoad* / *EvapCapAvail<sub>clg</sub>*
 
@@ -1310,15 +1310,15 @@ The following nomenclature is used in the cooling equations:
 
 *PLR<sub>min</sub>* =minimum part-load ratio
 
-<span>$QCon{d_{c\lg }}$</span> =total condenser heat transfer energy [J]
+<span>\(QCon{d_{c\lg }}\)</span> =total condenser heat transfer energy [J]
 
-<span>$\dot QCon{d_{c\lg }}$</span> =condenser heat transfer rate [W]
+<span>\(\dot QCon{d_{c\lg }}\)</span> =condenser heat transfer rate [W]
 
-<span>$QEva{p_{c\lg }}$</span> =total evaporator heat transfer energy [J]
+<span>\(QEva{p_{c\lg }}\)</span> =total evaporator heat transfer energy [J]
 
-<span>$\dot QEva{p_{c\lg }}$</span> =evaporator heat transfer rate [W]
+<span>\(\dot QEva{p_{c\lg }}\)</span> =evaporator heat transfer rate [W]
 
-<span>${\dot Q_{falseloading,c\lg }}$</span> =false loading rate [W]
+<span>\({\dot Q_{falseloading,c\lg }}\)</span> =false loading rate [W]
 
 *RefCOP<sub>clg</sub>* =reference coefficient of performance [W/W]
 
@@ -1336,9 +1336,9 @@ The following nomenclature is used in the cooling equations:
 
 *T<sub>cw,l</sub>* =leaving chilled water  temperature [W]
 
-<span>$\Delta {T_{cw}}$</span> =chilled water inlet and outlet temperature difference [C]
+<span>\(\Delta {T_{cw}}\)</span> =chilled water inlet and outlet temperature difference [C]
 
-<span>$\Delta {T_{cw}}_{,\max }$</span> =maximum chilled water inlet and outlet temperature difference [C]
+<span>\(\Delta {T_{cw}}_{,\max }\)</span> =maximum chilled water inlet and outlet temperature difference [C]
 
 The model sequentially calls each chiller-heater module in the order defined in the Central Heat Pump System object. It then determines cooling load that each chiller-heater needs to meet and water flow rates delivered to each chiller-heater. Once each chiller-heater is assumed to operate, it determines cooling capacity and efficiency using user-supplied performance information.
 
@@ -1352,11 +1352,11 @@ Three performance curves are used in the calculation of cooling capacity and eff
 
 The Cooling Capacity Function of Temperature Curve (*EvapCapFT<sub>clg</sub>*) represents the fraction of the cooling capacity of the chiller-heater as it varies by temperature. The curve should have a value of 1.0 at the reference conditions. The output of a bi-quadratic curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser water temperature is given by:
 
-***<span>$EvapCapF{T_{c\lg }} = a + b{T_{cw,l}} + c{T_{cw,l}}^2 + d{T_{Cond}} + e{T_{Cond}}^2 + f{T_{cw,l}}{T_{Cond}}$</span>***.
+***<span>\(EvapCapF{T_{c\lg }} = a + b{T_{cw,l}} + c{T_{cw,l}}^2 + d{T_{Cond}} + e{T_{Cond}}^2 + f{T_{cw,l}}{T_{Cond}}\)</span>***.
 
 The Cooling Mode Electric Input to Cooling Output Ratio Function of Temperature (EIRFT<sub>clg</sub>) curve represents the fraction of electricity to the chiller-heater at full load as it varies by temperature. The output of a bi-quadratic curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser water temperature is given by:
 
-***<span>$EIRF{T_{c\lg }} = a + b{T_{cw,l}} + c{T_{cw,l}}^2 + d{T_{Cond}} + e{T_{Cond}}^2 + f{T_{cw,l}}{T_{Cond}}$</span>***.
+***<span>\(EIRF{T_{c\lg }} = a + b{T_{cw,l}} + c{T_{cw,l}}^2 + d{T_{Cond}} + e{T_{Cond}}^2 + f{T_{cw,l}}{T_{Cond}}\)</span>***.
 
 The Cooling Mode Electric Input to Cooling Output Ratio Function of Part Load Ratio (EIRFPLR<sub>clg</sub>) curve represents the fraction of electricity to the chiller-heater as the load on the chiller varies at a given set of operating temperatures. The curve is normalized so that at full load the value of the curve should be 1.0. Note that the bi-cubic formulation below is generally only valid when LeavingCondenser variable is chosen for the field of Cooling Mode Condenser Water Temperature Curve Input Variable whereas the quadratic curve can be used for both choices, i.e., LeavingCondenser and EnteringCondenser. Bi-cubic may also be used when the chiller-heater uses a variable-speed compressor motor drive. The output of this curve can be determined by one of the following three performance curves:
 
@@ -1368,49 +1368,49 @@ The Cooling Mode Electric Input to Cooling Output Ratio Function of Part Load Ra
 
 The full-load cooling capacity at specific temperature operating conditions (i.e., at temperatures different from the design temperatures) is then computed as follows:
 
-***<span>$EvapCapAvai{l_{c\lg }} = RefEvapCa{p_{c\lg }} \cdot EvapCapF{T_{c\lg }}$</span>***.
+***<span>\(EvapCapAvai{l_{c\lg }} = RefEvapCa{p_{c\lg }} \cdot EvapCapF{T_{c\lg }}\)</span>***.
 
 The model then determines current chiller-heater’s evaporator heat transfer rate based on the total cooling load required a central heat pump system to meet and the maximum available chiller-heater cooling capacity. The maximum evaporator temperature difference between the entering chilled water temperature (*T<sub>cw,e</sub>*) and the leaving chilled water temperature (*T<sub>cw,l</sub>*) obtained from the plant loop setpoint temperature can also be determined. It then calculates mass flow rate for variable flow control chiller-heaters and the temperature difference for constant flow control chiller-heaters, setting the cooling load each chiller-heater needs to meet equal to the evaporator heat transfer rate.
 
 As for variable flow control chiller-heaters, the chilled water mass flow rate is computed as follows:
 
-***<span>${\dot m_{cw}} = \frac{{\dot QEva{p_{c\lg }}}}{{{C_{p,cw}}\Delta {T_{cw,\max }}}}$</span>***.
+***<span>\({\dot m_{cw}} = \frac{{\dot QEva{p_{c\lg }}}}{{{C_{p,cw}}\Delta {T_{cw,\max }}}}\)</span>***.
 
 The chilled water mass flow rate calculated is then compared to the maximum available mass flow rate for individual chiller-heaters. If the calculated one is bigger than the maximum, the model sets the chilled water mass flow rate equal to the maximum. It then adjusts the temperature difference based on the evaporator heat transfer rate and the maximum mass flow rate. If the adjusted temperature difference also exceeds the maximum, the model finally adjusts the evaporator heat transfer rate at the maximum temperature difference and mass flow rate as follows:
 
-***<span>$\dot QEva{p_{c\lg }} = {\dot m_{avail,cw}}{C_{p,cw}}\Delta {T_{cw,\max }}$</span>***.
+***<span>\(\dot QEva{p_{c\lg }} = {\dot m_{avail,cw}}{C_{p,cw}}\Delta {T_{cw,\max }}\)</span>***.
 
 As for constant flow control chiller-heaters, the model calculates chilled water temperature difference as follows:
 
-***<span>$\Delta {T_{cw}} = \frac{{\dot QEva{p_{c\lg }}}}{{{{\dot m}_{avail,cw}}{C_{p,cw}}}}$</span>***.
+***<span>\(\Delta {T_{cw}} = \frac{{\dot QEva{p_{c\lg }}}}{{{{\dot m}_{avail,cw}}{C_{p,cw}}}}\)</span>***.
 
 The temperature difference calculated is then compared to the maximum temperature difference allowed. If the calculated one is bigger than the maximum, the model sets the chilled water temperature difference equal the maximum, and then adjusts the evaporator heat transfer rate at the given conditions as follows:
 
-***<span>$\dot QEva{p_{c\lg }} = {\dot m_{avail,cw}}{C_{p,cw}}\Delta {T_{cw,\max }}$</span>***.
+***<span>\(\dot QEva{p_{c\lg }} = {\dot m_{avail,cw}}{C_{p,cw}}\Delta {T_{cw,\max }}\)</span>***.
 
 The model then calculates the part-load ratio as the ratio of the evaporator heat transfer rate to the available chiller-heater capacity as follows:
 
-***<span>$PL{R_{c\lg }} = \frac{{\dot QEva{p_{c\lg }}}}{{\dot QEvapAvai{l_{c\lg }}}}$</span>***.
+***<span>\(PL{R_{c\lg }} = \frac{{\dot QEva{p_{c\lg }}}}{{\dot QEvapAvai{l_{c\lg }}}}\)</span>***.
 
 The part-load ratio calculated is set to be between the maximum of 1.0 and the minimum of 0.0 when it is out of the range. Once the part-load ratio is calculated the cycling ratio and false loading rate can be obtained as follows:
 
 <div>$$CyclingRatio = \frac{{PL{R_{{\rm{actual}}}}}}{{PL{R_{{\rm{min}}}}}}$$</div>
 
-<span>${\dot Q_{falseloading,c\lg }} = EvapCapAvai{l_{{\rm{clg}}}} \cdot PL{R_{c\lg }} \cdot CyclingRatio - \dot QEva{p_{{\rm{clg}}}}$</span>.
+<span>\({\dot Q_{falseloading,c\lg }} = EvapCapAvai{l_{{\rm{clg}}}} \cdot PL{R_{c\lg }} \cdot CyclingRatio - \dot QEva{p_{{\rm{clg}}}}\)</span>.
 
 The compressor power demand is then computed by:
 
-<span>$CompPowe{r_{c\lg }} = RefFullLoadPowe{r_{{\rm{clg}}}} \cdot {\rm{ }}EIRF{T_{c\lg }}{\rm{ }} \cdot EIRFPL{R_{c\lg }} \cdot CyclingRatio$</span>.
+<span>\(CompPowe{r_{c\lg }} = RefFullLoadPowe{r_{{\rm{clg}}}} \cdot {\rm{ }}EIRF{T_{c\lg }}{\rm{ }} \cdot EIRFPL{R_{c\lg }} \cdot CyclingRatio\)</span>.
 
 The heat transfer rate for the chiller-heater condenser can then be computed as follows:
 
-<span>$\dot QCon{d_{c\lg }} = ComPowe{r_{c\lg }} \cdot CompMotorEffic + \dot QEva{p_{c\lg }} + {\dot Q_{falseloading,c\lg }}$</span> .
+<span>\(\dot QCon{d_{c\lg }} = ComPowe{r_{c\lg }} \cdot CompMotorEffic + \dot QEva{p_{c\lg }} + {\dot Q_{falseloading,c\lg }}\)</span> .
 
 The total heat transfer energy by the evaporator and condenser can be calculated as follows:
 
 <div>$$QEva{p_{c\lg }} = \dot QEva{p_{c\lg }} \cdot TimeStepSys \cdot 3600$$</div>
 
-<span>$QCon{d_{c\lg }} = \dot QCon{d_{c\lg }} \cdot TimeStepSys \cdot 3600$</span> .
+<span>\(QCon{d_{c\lg }} = \dot QCon{d_{c\lg }} \cdot TimeStepSys \cdot 3600\)</span> .
 
 #### Heating-only mode and Simultaneous cooling-heating mode
 
@@ -1422,9 +1422,9 @@ The following nomenclature is used in the heating equations:
 
 *CompPower<sub>@PLRmin</sub>*  =compressor power at the minimum part-load ratio [W]
 
-<span>${C_{p,evap}}$</span> =evaporator water specific heat  [J/kgK]
+<span>\({C_{p,evap}}\)</span> =evaporator water specific heat  [J/kgK]
 
-<span>${C_{p,hw}}$</span> =hot water specific heat  [J/kgK]
+<span>\({C_{p,hw}}\)</span> =hot water specific heat  [J/kgK]
 
 *CyclingRatio*<sub></sub> =compressor cycling ratio =*PLR<sub>actual</sub>* / *PLR<sub>min</sub>*
 
@@ -1436,11 +1436,11 @@ The following nomenclature is used in the heating equations:
 
 *EIRFPLR<sub>htg</sub>* =electric input to cooling output factor for part-load function curve
 
-<span>${\dot m_{avail,evap}}$</span> =evaporator water maximum available mass flow rate [kg/s]
+<span>\({\dot m_{avail,evap}}\)</span> =evaporator water maximum available mass flow rate [kg/s]
 
-<span>${\dot m_{avail,hw}}$</span> =condenser water maximum available mass flow rate [kg/s]
+<span>\({\dot m_{avail,hw}}\)</span> =condenser water maximum available mass flow rate [kg/s]
 
-<span>${\dot m_{hw}}$</span> =hot water mass flow rate [kg/s]
+<span>\({\dot m_{hw}}\)</span> =hot water mass flow rate [kg/s]
 
 *PLR<sub>htg</sub>* =cooling part-load ratio = *RefCap* / *EvapCapAvail<sub>htg</sub>*
 
@@ -1448,17 +1448,17 @@ The following nomenclature is used in the heating equations:
 
 *PLR<sub>min</sub>* =minimum part-load ratio
 
-<span>$QCon{d_{htg}}$</span> =total condenser heat transfer energy [J]
+<span>\(QCon{d_{htg}}\)</span> =total condenser heat transfer energy [J]
 
-<span>$\dot QCondAvai{l_{htg}}$</span> =available full-load heating capacity at current conditions [W]
+<span>\(\dot QCondAvai{l_{htg}}\)</span> =available full-load heating capacity at current conditions [W]
 
-<span>$\dot QCon{d_{htg}}$</span> =condenser heat transfer rate [W]
+<span>\(\dot QCon{d_{htg}}\)</span> =condenser heat transfer rate [W]
 
-<span>$QEva{p_{htg}}$</span> =total evaporator heat transfer energy [J]
+<span>\(QEva{p_{htg}}\)</span> =total evaporator heat transfer energy [J]
 
-<span>$\dot QEva{p_{htg}}$</span> =evaporator heat transfer rate [W]
+<span>\(\dot QEva{p_{htg}}\)</span> =evaporator heat transfer rate [W]
 
-<span>${\dot Q_{falseloading,htg}}$</span> =false loading rate [W]
+<span>\({\dot Q_{falseloading,htg}}\)</span> =false loading rate [W]
 
 *RefCOP<sub>htg</sub>* =reference coefficient of performance [W/W]
 
@@ -1478,11 +1478,11 @@ The following nomenclature is used in the heating equations:
 
 *T<sub>hw,l</sub>* =leaving hot water temperature [C]
 
-<span>$\Delta {T_{evap}}$</span> =evaporator inlet and outlet water temperature difference [C]
+<span>\(\Delta {T_{evap}}\)</span> =evaporator inlet and outlet water temperature difference [C]
 
-<span>$\Delta {T_{hw}}$</span> =hot water inlet and outlet temperature difference [C]
+<span>\(\Delta {T_{hw}}\)</span> =hot water inlet and outlet temperature difference [C]
 
-<span>$\Delta {T_{hw}}_{,\max }$</span> =maximum hot water inlet and outlet temperature difference [C]
+<span>\(\Delta {T_{hw}}_{,\max }\)</span> =maximum hot water inlet and outlet temperature difference [C]
 
 The calculations for the evaporator side are similar to the cooling-only mode calculations. The evaporator capacity and efficiency is determined by a different set of three performance curves read in the cooling-only mode, and the performance curve set is used for both heating-only mode and simultaneous cooling-heating mode. During these modes, the evaporator side is not connected to the chilled water loop, but source water loop. The model thus assumes that each chiller-heater does not meet the plant loop chilled water setpoint temperature while the evaporator operates at the full load capacity to produce heating at a constant water flow rate.
 
@@ -1496,11 +1496,11 @@ The model sequentially calls each chiller-heater module in the order of the defi
 
 The output of a Heating Mode Cooling Capacity Function of Temperature curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser water temperature is given by:
 
-***<span>$EvapCapF{T_{htg}} = a + b{T_{cw,l}} + c{T_{cw,l}}^2 + d{T_{Cond}} + e{T_{Cond}}^2 + f{T_{cw,l}}{T_{Cond}}$</span>***
+***<span>\(EvapCapF{T_{htg}} = a + b{T_{cw,l}} + c{T_{cw,l}}^2 + d{T_{Cond}} + e{T_{Cond}}^2 + f{T_{cw,l}}{T_{Cond}}\)</span>***
 
 The output of a Heating Mode Cooling Output Ratio Function of Temperature curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser water temperature is given by:
 
-***<span>$EIRF{T_{htg}} = a + b{T_{cw,l}} + c{T_{cw,l}}^2 + d{T_{Cond}} + e{T_{Cond}}^2 + f{T_{cw,l}}{T_{Cond}}$</span>***.
+***<span>\(EIRF{T_{htg}} = a + b{T_{cw,l}} + c{T_{cw,l}}^2 + d{T_{Cond}} + e{T_{Cond}}^2 + f{T_{cw,l}}{T_{Cond}}\)</span>***.
 
 The output of Heating Mode Cooling Output Ratio Function of Part Load Ratio curve can be determined by one of the following three performance curves as follows:
 
@@ -1512,23 +1512,23 @@ The output of Heating Mode Cooling Output Ratio Function of Part Load Ratio curv
 
 The full-load evaporator capacity at specific temperature operating conditions is then given by:
 
-***<span>$EvapCapAvai{l_{htg}} = RefEvapCa{p_{htg}} \cdot EvapCapF{T_{htg}}$</span>***.
+***<span>\(EvapCapAvai{l_{htg}} = RefEvapCa{p_{htg}} \cdot EvapCapF{T_{htg}}\)</span>***.
 
 The part-load ratio is set to be between zero and the maximum, and the evaporator heat transfer rate is computed by:
 
-***<span>$\dot QEva{p_{htg}} = EvapCapAvai{l_{htg}}PL{R_{htg}}$</span>***The evaporator inlet and outlet temperature difference is then given by:
+***<span>\(\dot QEva{p_{htg}} = EvapCapAvai{l_{htg}}PL{R_{htg}}\)</span>***The evaporator inlet and outlet temperature difference is then given by:
 
-***<span>$\Delta {T_{evap}} = \frac{{\dot QEva{p_{htg}}}}{{{{\dot m}_{avail,evap}}{C_{p,evap}}}}$</span>***
+***<span>\(\Delta {T_{evap}} = \frac{{\dot QEva{p_{htg}}}}{{{{\dot m}_{avail,evap}}{C_{p,evap}}}}\)</span>***
 
 Once the part-load ratio is calculated the cycling ratio and false loading rate are computed by:
 
 <div>$$CyclingRatio = \frac{{PL{R_{{\rm{actual}}}}}}{{PL{R_{{\rm{min}}}}}}$$</div>
 
-<span>${\dot Q_{falseloading,htg}} = EvapCapAvai{l_{{\rm{htg}}}} \cdot PL{R_{htg}} \cdot CyclingRatio - \dot QEva{p_{{\rm{htg}}}}$</span>.
+<span>\({\dot Q_{falseloading,htg}} = EvapCapAvai{l_{{\rm{htg}}}} \cdot PL{R_{htg}} \cdot CyclingRatio - \dot QEva{p_{{\rm{htg}}}}\)</span>.
 
 The compressor power demand is then computed by:
 
-***<span>$CompPowe{r_{htg}} = FullLoadPowe{r_{{\rm{htg}}}} \cdot {\rm{ }}EIRF{T_{htg}}{\rm{ }} \cdot EIRFPL{R_{htg}} \cdot CyclingRatio$</span>***
+***<span>\(CompPowe{r_{htg}} = FullLoadPowe{r_{{\rm{htg}}}} \cdot {\rm{ }}EIRF{T_{htg}}{\rm{ }} \cdot EIRFPL{R_{htg}} \cdot CyclingRatio\)</span>***
 
 The heat transfer rate of the chiller-heater condenser is then computed as follows:
 
@@ -1538,25 +1538,25 @@ Once condenser available heating capacity is determined, the model calculates cu
 
 As for variable flow control chiller-heaters, the condenser water mass flow rate is computed as follows:
 
-***<span>${\dot m_{hw}} = \frac{{\dot QCon{d_{htg}}}}{{{C_{p,hw}}\Delta {T_{hw,\max }}}}$</span>***.
+***<span>\({\dot m_{hw}} = \frac{{\dot QCon{d_{htg}}}}{{{C_{p,hw}}\Delta {T_{hw,\max }}}}\)</span>***.
 
 The condenser water mass flow rate calculated is then compared to the maximum available mass flow rate for individual chiller-heaters. If the calculated one is bigger than the maximum, the model sets the condenser water mass flow rate equal the maximum. It then adjusts the hot water temperature difference at the maximum mass flow rate. If the adjusted temperature difference also exceeds the maximum, the model finally adjusts the condenser heat transfer rate at the maximum allowable conditions as follows:
 
-***<span>$\dot QCon{d_{htg}} = {\dot m_{avail,hw}}{C_{p,hw}}\Delta {T_{hw,\max }}$</span>***.
+***<span>\(\dot QCon{d_{htg}} = {\dot m_{avail,hw}}{C_{p,hw}}\Delta {T_{hw,\max }}\)</span>***.
 
 As for constant flow control chiller-heaters, the model calculates condenser temperature difference as follows:
 
-***<span>$\Delta {T_{hw}} = \frac{{\dot QCon{d_{htg}}}}{{{{\dot m}_{avail,hw}}{C_{p,hw}}}}$</span>***.
+***<span>\(\Delta {T_{hw}} = \frac{{\dot QCon{d_{htg}}}}{{{{\dot m}_{avail,hw}}{C_{p,hw}}}}\)</span>***.
 
 The temperature difference calculated is then compared to maximum hot water temperature difference. If the calculated one is bigger than the maximum, the model sets the hot water temperature difference equal the maximum, and then adjusts the condenser heat transfer rate at the given conditions as follows:
 
-***<span>$\dot QCon{d_{htg}} = {\dot m_{avail,hw}}{C_{p,hw}}\Delta {T_{hw,\max }}$</span>***.
+***<span>\(\dot QCon{d_{htg}} = {\dot m_{avail,hw}}{C_{p,hw}}\Delta {T_{hw,\max }}\)</span>***.
 
 Finally, the total heat transfer energy by the evaporator and condenser can then be calculated as follows:
 
-***<span>$QEva{p_{htg}} = \dot QEva{p_{htg}} \cdot TimeStepSys \cdot 3600$</span>***
+***<span>\(QEva{p_{htg}} = \dot QEva{p_{htg}} \cdot TimeStepSys \cdot 3600\)</span>***
 
-***<span>$QCon{d_{htg}} = \dot QCon{d_{htg}} \cdot TimeStepSys \cdot 3600$</span>***.
+***<span>\(QCon{d_{htg}} = \dot QCon{d_{htg}} \cdot TimeStepSys \cdot 3600\)</span>***.
 
 ### References
 
