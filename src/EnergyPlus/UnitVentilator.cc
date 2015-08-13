@@ -191,7 +191,7 @@ namespace UnitVentilator {
 
 		// Find the correct Unit Ventilator Equipment
 		if ( CompIndex == 0 ) {
-			UnitVentNum = FindItemInList( CompName, UnitVent.Name(), NumOfUnitVents );
+			UnitVentNum = FindItemInList( CompName, UnitVent );
 			if ( UnitVentNum == 0 ) {
 				ShowFatalError( "SimUnitVentilator: Unit not found=" + CompName );
 			}
@@ -273,7 +273,6 @@ namespace UnitVentilator {
 
 		using DataSizing::AutoSize;
 		using DataSizing::ZoneHVACSizing;
-		using DataSizing::NumZoneHVACSizing;
 		using General::TrimSigDigits;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataGlobals::NumOfZones;
@@ -355,7 +354,7 @@ namespace UnitVentilator {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), UnitVent.Name(), UnitVentNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), UnitVent, UnitVentNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -543,7 +542,7 @@ namespace UnitVentilator {
 
 			UnitVent( UnitVentNum ).HVACSizingIndex = 0;
 			if (!lAlphaBlanks( 20 )) {
-				UnitVent( UnitVentNum ).HVACSizingIndex = FindItemInList( Alphas( 20 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
+				UnitVent( UnitVentNum ).HVACSizingIndex = FindItemInList( Alphas( 20 ), ZoneHVACSizing );
 				if (UnitVent( UnitVentNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 20 ) + " = " + Alphas( 20 ) + " not found.");
 					ShowContinueError( "Occurs in " + cMO_UnitVentilator + " = " + UnitVent(UnitVentNum).Name );
@@ -3238,7 +3237,7 @@ namespace UnitVentilator {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

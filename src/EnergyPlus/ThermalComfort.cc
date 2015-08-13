@@ -1682,7 +1682,6 @@ namespace ThermalComfort {
 		using namespace DataGlobals;
 		using namespace DataHeatBalance;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::FindItemInList;
@@ -1731,7 +1730,7 @@ namespace ThermalComfort {
 
 			AngleFactorList( Item ).Name = cAlphaArgs( 1 ); // no need for verification/uniqueness.
 			AngleFactorList( Item ).ZoneName = cAlphaArgs( 2 );
-			AngleFactorList( Item ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			AngleFactorList( Item ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( AngleFactorList( Item ).ZonePtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid - not found" );
 				ShowContinueError( "...invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -1750,7 +1749,7 @@ namespace ThermalComfort {
 
 			for ( SurfNum = 1; SurfNum <= AngleFactorList( Item ).TotAngleFacSurfaces; ++SurfNum ) {
 				AngleFactorList( Item ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 2 );
-				AngleFactorList( Item ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 2 ), Surface.Name(), TotSurfaces );
+				AngleFactorList( Item ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 2 ), Surface );
 				AngleFactorList( Item ).AngleFactor( SurfNum ) = rNumericArgs( SurfNum );
 				// Error trap for surfaces that do not exist or surfaces not in the zone
 				if ( AngleFactorList( Item ).SurfacePtr( SurfNum ) == 0 ) {
@@ -1784,7 +1783,7 @@ namespace ThermalComfort {
 
 		for ( Item = 1; Item <= TotPeople; ++Item ) {
 			if ( People( Item ).MRTCalcType != AngleFactor ) continue;
-			People( Item ).AngleFactorListPtr = FindItemInList( People( Item ).AngleFactorListName, AngleFactorList.Name(), NumOfAngleFactorLists );
+			People( Item ).AngleFactorListPtr = FindItemInList( People( Item ).AngleFactorListName, AngleFactorList );
 			WhichAFList = People( Item ).AngleFactorListPtr;
 			if ( WhichAFList == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + People( Item ).AngleFactorListName + "\", invalid" );
@@ -2924,7 +2923,7 @@ namespace ThermalComfort {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

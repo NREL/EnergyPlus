@@ -560,7 +560,7 @@ namespace OutputReportTabular {
 			IsNotOK = false;
 			IsBlank = false;
 			if ( TabNum - 1 > 0 ) {
-				VerifyName( AlphArray( 1 ), MonthlyInput.name(), TabNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), MonthlyInput, &MonthlyInputType::name, TabNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "RTMBLANK";
@@ -14248,7 +14248,7 @@ Label900: ;
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -137,7 +137,7 @@ namespace CTElectricGenerator {
 
 		//SELECT and CALL MODELS
 		if ( GeneratorIndex == 0 ) {
-			GenNum = FindItemInList( GeneratorName, CTGenerator.Name(), NumCTGenerators );
+			GenNum = FindItemInList( GeneratorName, CTGenerator );
 			if ( GenNum == 0 ) ShowFatalError( "SimCTGenerator: Specified Generator not one of Valid COMBUSTION Turbine Generators " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -211,7 +211,7 @@ namespace CTElectricGenerator {
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = FindItemInList( CompName, CTGenerator.Name(), NumCTGenerators );
+			CompNum = FindItemInList( CompName, CTGenerator );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimCTPlantHeatRecovery: CT Generator Unit not found=" + CompName );
 				return;
@@ -294,7 +294,7 @@ namespace CTElectricGenerator {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), CTGenerator.Name(), GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), CTGenerator, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";

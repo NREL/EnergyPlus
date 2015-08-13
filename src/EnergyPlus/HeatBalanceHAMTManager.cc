@@ -342,7 +342,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject1, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject1 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
@@ -364,7 +364,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject2, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject2 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
@@ -443,7 +443,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject3, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject3 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
@@ -476,7 +476,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject4, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject4 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -507,7 +507,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject5, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject5 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -541,7 +541,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject6, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject6 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -575,7 +575,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject7, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			vtcsid = FindItemInList( AlphaArray( 1 ), Surface.Name(), TotSurfaces );
+			vtcsid = FindItemInList( AlphaArray( 1 ), Surface );
 			if ( vtcsid == 0 ) {
 				ShowSevereError( cHAMTObject7 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -1675,7 +1675,7 @@ namespace HeatBalanceHAMTManager {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     Illinois and The Regents of the University of California through
 	//     Ernest Orlando Lawrence Berkeley National Laboratory.  All rights
 	//     reserved.
