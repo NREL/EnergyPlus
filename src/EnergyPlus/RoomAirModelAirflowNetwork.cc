@@ -1105,15 +1105,14 @@ namespace RoomAirModelAirflowNetwork {
 			HA = HA + HConvIn( SurfNum ) * Area;
 			SumHATsurf += HConvIn( SurfNum ) * Area * TempSurfInTmp( SurfNum );
 
-			{	auto const SELECT_CASE_var( Surface( SurfNum ).TAirRef );
-			if ( SELECT_CASE_var == ZoneMeanAirTemp ) {
+			if ( Surface( SurfNum ).TAirRef == ZoneMeanAirTemp ) {
 				// The zone air is the reference temperature(which is to be solved for in CorrectZoneAirTemp).
 				RefAirTemp = MAT( ZoneNum );
 				SumHA += HA;
-			} else if ( SELECT_CASE_var == AdjacentAirTemp ) {
+			} else if ( Surface( SurfNum ).TAirRef == AdjacentAirTemp ) {
 				RefAirTemp = TempEffBulkAir( SurfNum );
 				SumHATref += HA * RefAirTemp;
-			} else if ( SELECT_CASE_var == ZoneSupplyAirTemp ) {
+			} else if ( Surface( SurfNum ).TAirRef == ZoneSupplyAirTemp ) {
 				// check whether this zone is a controlled zone or not
 				if ( !ControlledZoneAirFlag ) {
 					ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );
@@ -1122,12 +1121,10 @@ namespace RoomAirModelAirflowNetwork {
 				// determine supply air temperature as a weighted average of the inlet temperatures.
 				RefAirTemp = SumSysMCpT / SumSysMCp;
 				SumHATref += HA * RefAirTemp;
-			}
-
-			else {
+			} else {
 				RefAirTemp = MAT( ZoneNum );
 				SumHA = SumHA + HA;
-			}}
+			}
 
 		} // SurfNum
 
