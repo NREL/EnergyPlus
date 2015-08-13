@@ -8503,6 +8503,9 @@ The maximum temperature deviation within any cell between one iteration and anot
 
 The maximum number of iterations to make when performing temperature updates of the Cartesian coordinate system.  The actual number of iterations made will of course depend on transient conditions and convergence tolerance.
 
+#### Field: Evapotranspiration Ground Cover Parameter
+Numeric field specifies the ground cover effects used in the evapotranspiration model at the ground surface heat balance. The values range from 0 (solid, nonpermeable ground surface) to 1.5 (wild growth).
+
 #### Field: Number of Pipe Circuits Entered for this Domain
 
 The number of pipe circuit objects which will be defined in the following fields.

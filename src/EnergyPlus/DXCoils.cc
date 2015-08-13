@@ -270,7 +270,7 @@ namespace DXCoils {
 		}
 
 		if ( CompIndex == 0 ) {
-			DXCoilNum = FindItemInList( CompName, DXCoil.Name(), NumDXCoils );
+			DXCoilNum = FindItemInList( CompName, DXCoil );
 			if ( DXCoilNum == 0 ) {
 				ShowFatalError( "DX Coil not found=" + CompName );
 			}
@@ -418,7 +418,7 @@ namespace DXCoils {
 		//  find correct DX Coil
 
 		if ( CompIndex == 0 ) {
-			DXCoilNum = FindItemInList( CompName, DXCoil.Name(), NumDXCoils );
+			DXCoilNum = FindItemInList( CompName, DXCoil );
 			if ( DXCoilNum == 0 ) {
 				ShowFatalError( "DX Coil not found=" + CompName );
 			}
@@ -565,7 +565,7 @@ namespace DXCoils {
 
 		//  find correct DX Coil
 		if ( CompIndex == 0 ) {
-			DXCoilNum = FindItemInList( CompName, DXCoil.Name(), NumDXCoils );
+			DXCoilNum = FindItemInList( CompName, DXCoil );
 			if ( DXCoilNum == 0 ) {
 				ShowFatalError( "DX Coil not found=" + CompName );
 			}
@@ -1049,7 +1049,7 @@ namespace DXCoils {
 			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1435,7 +1435,7 @@ namespace DXCoils {
 			// A18; \field Zone Name for Condenser Placement
 			if ( !lAlphaBlanks( 18 ) && NumAlphas > 17 ) {
 				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 18 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 18 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
-				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 18 ), Zone.Name(), NumOfZones );
+				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 18 ), Zone );
 				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
 					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Cooling:DX:SingleSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecCoolingDXCoilSingleSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
 					DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone = true;
@@ -1460,7 +1460,7 @@ namespace DXCoils {
 			++DXCoilNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1936,7 +1936,7 @@ namespace DXCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2261,7 +2261,7 @@ namespace DXCoils {
 			//A14, \field Zone Name for Evaporator Placement
 			if ( !lAlphaBlanks( 14 ) && NumAlphas > 13 ) {
 				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 14 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 14 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
-				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 14 ), Zone.Name(), NumOfZones );
+				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 14 ), Zone );
 				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
 					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Heating:DX:SingleSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecHeatingDXCoilSingleSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate, _, _, DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate );
 					DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone = true;
@@ -2322,7 +2322,7 @@ namespace DXCoils {
 			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2796,7 +2796,7 @@ namespace DXCoils {
 			// A21; \field Zone Name for Condenser Placement
 			if ( !lAlphaBlanks( 21 ) && NumAlphas > 20 ) {
 				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 21 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 21 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
-				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 21 ), Zone.Name(), NumOfZones );
+				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 21 ), Zone );
 				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
 					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Cooling:DX:TwoSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecCoolingDXCoilTwoSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
 					DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone = true;
@@ -2827,7 +2827,7 @@ namespace DXCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -3301,7 +3301,7 @@ namespace DXCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -3658,7 +3658,7 @@ namespace DXCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -4144,7 +4144,7 @@ namespace DXCoils {
 			//A37; \field Zone Name for Condenser Placement
 			if ( !lAlphaBlanks( 37 ) && NumAlphas > 36 ) {
 				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 37 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 37 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
-				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 37 ), Zone.Name(), NumOfZones );
+				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 37 ), Zone );
 				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
 					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Cooling:DX:MultiSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecCoolingDXCoilMultiSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
 					DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone = true;
@@ -4175,7 +4175,7 @@ namespace DXCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -4636,7 +4636,7 @@ namespace DXCoils {
 			//A34; \field Zone Name for Condenser Placement
 			if ( !lAlphaBlanks( 34 ) && NumAlphas > 33 ) {
 				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 34 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 34 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
-				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 34 ), Zone.Name(), NumOfZones );
+				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 34 ), Zone );
 				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
 					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Heating:DX:MultiSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecHeatingDXCoilMultiSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate, _, _, DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate );
 					DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone = true;
@@ -4685,7 +4685,7 @@ namespace DXCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -4794,7 +4794,7 @@ namespace DXCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -12529,7 +12529,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		DXCoilIndex = FindItemInList( DXCoilName, DXCoil.Name(), NumDXCoils );
+		DXCoilIndex = FindItemInList( DXCoilName, DXCoil );
 		if ( DXCoilIndex == 0 ) {
 			if ( present( SuppressWarning ) ) {
 				//     No warning printed if only searching for the existence of a DX Coil
@@ -12599,22 +12599,22 @@ Label50: ;
 		}
 
 		if ( SameString( CoilType, "Coil:Heating:DX:SingleSpeed" ) || SameString( CoilType, "Coil:Cooling:DX:SingleSpeed" ) ) {
-			WhichCoil = FindItem( CoilName, DXCoil.Name(), NumDXCoils );
+			WhichCoil = FindItem( CoilName, DXCoil );
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = DXCoil( WhichCoil ).RatedTotCap( 1 );
 			}
 		} else if ( SameString( CoilType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode" ) ) {
-			WhichCoil = FindItem( CoilName, DXCoil.Name(), NumDXCoils );
+			WhichCoil = FindItem( CoilName, DXCoil );
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = DXCoil( WhichCoil ).RatedTotCap( DXCoil( WhichCoil ).NumCapacityStages );
 			}
 		} else if ( SameString( CoilType, "Coil:Cooling:DX:TwoSpeed" ) ) {
-			WhichCoil = FindItem( CoilName, DXCoil.Name(), NumDXCoils );
+			WhichCoil = FindItem( CoilName, DXCoil );
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = DXCoil( WhichCoil ).RatedTotCap( 1 );
 			}
 		} else if ( SameString( CoilType, "Coil:Cooling:DX:MultiSpeed" ) ) {
-			WhichCoil = FindItem( CoilName, DXCoil.Name(), NumDXCoils );
+			WhichCoil = FindItem( CoilName, DXCoil );
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = DXCoil( WhichCoil ).MSRatedTotCap( DXCoil( WhichCoil ).NumOfSpeeds );
 			}
@@ -12772,7 +12772,7 @@ Label50: ;
 			PrintMessage = true;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			TypeNum = DXCoil( WhichCoil ).DXCoilType_Num;
 		} else {
@@ -12841,7 +12841,7 @@ Label50: ;
 		}
 
 		if ( SameString( CoilType, "Coil:Heating:DX:SingleSpeed" ) || SameString( CoilType, "Coil:Heating:DX:MultiSpeed" ) ) {
-			WhichCoil = FindItem( CoilName, DXCoil.Name(), NumDXCoils );
+			WhichCoil = FindItem( CoilName, DXCoil );
 			if ( WhichCoil != 0 ) {
 				MinOAT = DXCoil( WhichCoil ).MinOATCompressor;
 			}
@@ -12912,7 +12912,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = DXCoil( WhichCoil ).AirInNode;
 		} else {
@@ -12977,7 +12977,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = DXCoil( WhichCoil ).AirOutNode;
 		} else {
@@ -13041,7 +13041,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			CondNode = DXCoil( WhichCoil ).CondenserInletNodeNum( 1 );
 		} else {
@@ -13106,7 +13106,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			BypassFraction = DXCoil( WhichCoil ).BypassedFlowFrac( 1 );
 		} else {
@@ -13182,12 +13182,12 @@ Label50: ;
 				//       Search for DX cooling coils
 				for ( WhichCompanionComp = 1; WhichCompanionComp <= NumCompSets; ++WhichCompanionComp ) {
 					if ( ! SameString( CompSets( WhichCompanionComp ).ParentCName, CompSetsParentName ) || ! SameString( CompSets( WhichCompanionComp ).CType, "Coil:Cooling:DX:SingleSpeed" ) ) continue;
-					DXCoolingCoilIndex = FindItemInList( CompSets( WhichCompanionComp ).CName, DXCoil.Name(), NumDXCoils );
+					DXCoolingCoilIndex = FindItemInList( CompSets( WhichCompanionComp ).CName, DXCoil );
 					break;
 				}
 				for ( WhichCompanionComp = 1; WhichCompanionComp <= NumCompSets; ++WhichCompanionComp ) {
 					if ( ! SameString( CompSets( WhichCompanionComp ).ParentCName, CompSetsParentName ) || ! SameString( CompSets( WhichCompanionComp ).CType, "Coil:Cooling:DX:MultiSpeed" ) ) continue;
-					DXCoolingCoilIndex = FindItemInList( CompSets( WhichCompanionComp ).CName, DXCoil.Name(), NumDXCoils );
+					DXCoolingCoilIndex = FindItemInList( CompSets( WhichCompanionComp ).CName, DXCoil );
 					break;
 				}
 				//       Search for Heat Exchanger Assisted DX cooling coils
@@ -13198,7 +13198,7 @@ Label50: ;
 						HXCompSetsParentName = CompSets( WhichHXAssistedComp ).CName;
 						for ( WhichCompanionComp = 1; WhichCompanionComp <= NumCompSets; ++WhichCompanionComp ) {
 							if ( ! SameString( CompSets( WhichCompanionComp ).ParentCName, HXCompSetsParentName ) || ! SameString( CompSets( WhichCompanionComp ).CType, "Coil:Cooling:DX:SingleSpeed" ) ) continue;
-							DXCoolingCoilIndex = FindItemInList( CompSets( WhichCompanionComp ).CName, DXCoil.Name(), NumDXCoils );
+							DXCoolingCoilIndex = FindItemInList( CompSets( WhichCompanionComp ).CName, DXCoil );
 							break;
 						}
 						break;
@@ -13281,7 +13281,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			NumberOfSpeeds = DXCoil( WhichCoil ).NumOfSpeeds;
 		} else {
@@ -13358,7 +13358,7 @@ Label50: ;
 				WhichCoil = CoilIndex;
 			}
 		} else {
-			WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+			WhichCoil = FindItemInList( CoilName, DXCoil );
 		}
 		if ( WhichCoil != 0 ) {
 			SchPtr = DXCoil( WhichCoil ).SchedPtr;
@@ -13426,7 +13426,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			{ auto const SELECT_CASE_var( DXCoil( WhichCoil ).DXCoilType_Num );
 			if ( ( SELECT_CASE_var == CoilDX_CoolingSingleSpeed ) || ( SELECT_CASE_var == CoilDX_CoolingTwoSpeed ) || ( SELECT_CASE_var == CoilDX_HeatingEmpirical ) || ( SELECT_CASE_var == CoilDX_CoolingTwoStageWHumControl ) ) {
@@ -13731,7 +13731,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			DXCoil( WhichCoil ).FindCompanionUpStreamCoil = false;
 		} else {
@@ -13786,7 +13786,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			DXCoil( WhichCoil ).CoilSystemName = CoilSystemName;
 		} else {
@@ -13913,7 +13913,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			DXCoil( WhichCoil ).ISHundredPercentDOASDXCoil = true;
 		} else {
@@ -15605,7 +15605,7 @@ Label50: ;
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

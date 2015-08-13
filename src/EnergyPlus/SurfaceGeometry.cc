@@ -4425,7 +4425,7 @@ namespace SurfaceGeometry {
 				}
 
 				if ( ! lAlphaFieldBlanks( FrameField ) && SurfaceTmp( SurfNum ).FrameDivider == 0 ) {
-					SurfaceTmp( SurfNum ).FrameDivider = FindItemInList( cAlphaArgs( FrameField ), FrameDivider.Name(), TotFrameDivider );
+					SurfaceTmp( SurfNum ).FrameDivider = FindItemInList( cAlphaArgs( FrameField ), FrameDivider );
 					if ( SurfaceTmp( SurfNum ).FrameDivider == 0 ) {
 						if ( ! Construct( SurfaceTmp( SurfNum ).Construction ).WindowTypeEQL ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( FrameField ) + "=\"" + cAlphaArgs( FrameField ) + "\"" );
@@ -8934,7 +8934,7 @@ namespace SurfaceGeometry {
 
 		// If this construction name already exists, set the surface's shaded construction number to it
 
-		ConstrNewSh = FindItemInList( ConstrNameSh, Construct.Name(), TotConstructs );
+		ConstrNewSh = FindItemInList( ConstrNameSh, Construct );
 
 		if ( ConstrNewSh > 0 ) {
 			SurfaceTmp( SurfNum ).ShadedConstruction = ConstrNewSh;
@@ -9416,7 +9416,7 @@ namespace SurfaceGeometry {
 		w1 = Construct( IConst ).W5FileGlazingSysWidth;
 
 		Const2Name = Construct( IConst ).Name + ":2";
-		IConst2 = FindItemInList( Const2Name, Construct.Name(), TotConstructs );
+		IConst2 = FindItemInList( Const2Name, Construct );
 
 		if ( IConst2 == 0 ) { // Only one glazing system on Window5 Data File for this window.
 
@@ -9600,7 +9600,7 @@ namespace SurfaceGeometry {
 		w1 = Construct( IConst ).W5FileGlazingSysWidth;
 
 		Const2Name = Construct( IConst ).Name + ":2";
-		IConst2 = FindItemInList( Const2Name, Construct.Name(), TotConstructs );
+		IConst2 = FindItemInList( Const2Name, Construct );
 
 		++AddedSubSurfaces;
 		SurfaceTmp.redimension( ++TotSurfaces );
@@ -10600,7 +10600,7 @@ namespace SurfaceGeometry {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
