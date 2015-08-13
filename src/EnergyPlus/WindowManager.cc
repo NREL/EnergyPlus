@@ -6070,7 +6070,7 @@ namespace WindowManager {
 			TInRadFr = TInRad * root_4( ( 1.0 + 0.5 * ProjCorrFrIn ) / ( 1.0 + ProjCorrFrIn ) );
 			FrameCon = SurfaceWindow( SurfNum ).FrameConductance;
 			HInRad = 0.5 * SurfaceWindow( SurfNum ).FrameEmis * sigma * pow_3( TInRadFr + SurfaceWindow( SurfNum ).FrameTempSurfIn + TKelvin );
-			HInConvFr = 0.0;
+			HInConvFr = HInConv;
 			HOutRad = 0.5 * SurfaceWindow( SurfNum ).FrameEmis * sigma * pow_3( TOutRadFr + SurfaceWindow( SurfNum ).FrameTempSurfOut + TKelvin );
 			HOutConvFr = HOutConv;
 			if ( FrameDivider( FrDivNum ).FrameProjectionOut > 0.0 ) {
@@ -6097,7 +6097,7 @@ namespace WindowManager {
 			//  ( SurfaceWindow(SurfNum)%FrameEmis*(sigma*(SurfaceWindow(SurfNum)%FrameTempSurfIn+TKelvin)**4 - rmir) + &
 			//    hcin*(SurfaceWindow(SurfNum)%FrameTempSurfIn+TKelvin - tin) )
 
-			FrameHeatGain = SurfaceWindow( SurfNum ).FrameArea * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrFrIn ) * ( hcin * ( SurfaceWindow( SurfNum ).FrameTempSurfIn + TKelvin - tin ) );
+			FrameHeatGain = SurfaceWindow( SurfNum ).FrameArea * FrameCon * ( SurfaceWindow( SurfNum ).FrameTempSurfOut - SurfaceWindow( SurfNum ).FrameTempSurfIn );
 
 			if ( FrameHeatGain > 0.0 ) {
 				SurfaceWindow( SurfNum ).FrameHeatGain = FrameHeatGain;
