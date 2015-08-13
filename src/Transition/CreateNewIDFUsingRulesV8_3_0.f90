@@ -369,8 +369,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               CASE('SITE:GROUNDDOMAIN')
                 ! Object rename
                 nodiff=.false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! objectname needs to be udpated before the GetNewObject call
                 ObjectName = 'Site:GroundDomain:Slab'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 
               CASE('GROUNDHEATEXCHANGER:VERTICAL')
