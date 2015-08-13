@@ -45,8 +45,7 @@ namespace FourPipeBeam {
 	HVACFourPipeBeam::clear_state()
 	{
 		FourPipeBeams.deallocate();
-	};
-
+	}
 
 //	HVACFourPipeBeam::HVACFourPipeBeam(){}
 
@@ -562,7 +561,6 @@ namespace FourPipeBeam {
 
 		bool ErrorsFound = false;
 		Real64 rho; // local fluid density
-		Real64 Cp; // local fluid specific heat
 		bool noHardSizeAnchorAvailable; // aid for complex logic surrounding mix of hard size and autosizes
 		Real64 cpAir = 0.0;
 		int SolFlag;

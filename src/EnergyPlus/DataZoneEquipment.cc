@@ -132,7 +132,7 @@ namespace DataZoneEquipment {
 		SupplyAirPath.deallocate();
 		ReturnAirPath.deallocate();
 	
-	};
+	}
 
 	void
 	GetZoneEquipmentData()

@@ -81,7 +81,7 @@ namespace OutsideEnergySources {
 		NumDistrictUnits = 0;
 		EnergySource.deallocate();
 		EnergySourceReport.deallocate();
-	};
+	}
 
 
 	void

@@ -334,38 +334,38 @@ namespace SetPointManager {
 		ManagerOn = false ;
 		GetInputFlag = true ; // First time, input is "gotten"
 		// Object Data
-	AllSetPtMgr.deallocate(); // Array for all Setpoint Manager data(warnings)
-	SchSetPtMgr.deallocate(); // Array for Scheduled Setpoint Manager data
-	DualSchSetPtMgr.deallocate(); // Dual Scheduled Setpoint Manager data
-	OutAirSetPtMgr.deallocate(); // Array for Outside Air Setpoint Manager data
-	SingZoneRhSetPtMgr.deallocate(); // Array for SZRH Set Pt Mgr
-	SingZoneHtSetPtMgr.deallocate(); // Array for SZ Heating Set Pt Mgr
-	SingZoneClSetPtMgr.deallocate(); // Array for SZ Cooling Set Pt Mgr
-	SZMinHumSetPtMgr.deallocate(); // Array for SZ Min Hum Set Pt Mgr
-	SZMaxHumSetPtMgr.deallocate(); // Array for SZ Max Hum Set Pt Mgr
-	MixedAirSetPtMgr.deallocate(); // Array for Mixed Air Set Pt Mgr
-	OAPretreatSetPtMgr.deallocate(); // Array for OA Pretreat Set Pt Mgr
-	WarmestSetPtMgr.deallocate(); // Array for Warmest Set Pt Mgr
-	ColdestSetPtMgr.deallocate(); // Array for Coldest Set Pt Mgr
-	WarmestSetPtMgrTempFlow.deallocate(); // Array for Warmest Set Pt Mgr
-	RABFlowSetPtMgr.deallocate(); // Array for return air bypass
-	MZAverageCoolingSetPtMgr.deallocate(); // Array for MultiZone
-	MZAverageHeatingSetPtMgr.deallocate(); // Array for MultiZone
-	MZAverageMinHumSetPtMgr.deallocate(); // Array for MultiZone
-	MZAverageMaxHumSetPtMgr.deallocate(); // Array for MultiZone
-	MZMinHumSetPtMgr.deallocate(); // Multizone min humidity rat Set Pt Mgr
-	MZMaxHumSetPtMgr.deallocate(); // Multizone max humidity rat Set Pt Mgr
-	FollowOATempSetPtMgr.deallocate(); // Array for Follow Outdoor Air
-	FollowSysNodeTempSetPtMgr.deallocate(); // Array for Follow System
-	GroundTempSetPtMgr.deallocate(); // Array for Ground Temp Setpoint
-	CondEntSetPtMgr.deallocate(); // Condenser Entering Water Set Pt Mgr
-	IdealCondEntSetPtMgr.deallocate(); // Ideal Condenser Entering Set Pt Mgr
-	SZOneStageCoolingSetPtMgr.deallocate(); // single zone 1 stage cool
-	SZOneStageHeatingSetPtMgr.deallocate(); // single zone 1 stage heat
-	ReturnWaterResetChWSetPtMgr.deallocate(); // return water reset
-	ReturnWaterResetHWSetPtMgr.deallocate(); // hot-water return water reset
+		AllSetPtMgr.deallocate(); // Array for all Setpoint Manager data(warnings)
+		SchSetPtMgr.deallocate(); // Array for Scheduled Setpoint Manager data
+		DualSchSetPtMgr.deallocate(); // Dual Scheduled Setpoint Manager data
+		OutAirSetPtMgr.deallocate(); // Array for Outside Air Setpoint Manager data
+		SingZoneRhSetPtMgr.deallocate(); // Array for SZRH Set Pt Mgr
+		SingZoneHtSetPtMgr.deallocate(); // Array for SZ Heating Set Pt Mgr
+		SingZoneClSetPtMgr.deallocate(); // Array for SZ Cooling Set Pt Mgr
+		SZMinHumSetPtMgr.deallocate(); // Array for SZ Min Hum Set Pt Mgr
+		SZMaxHumSetPtMgr.deallocate(); // Array for SZ Max Hum Set Pt Mgr
+		MixedAirSetPtMgr.deallocate(); // Array for Mixed Air Set Pt Mgr
+		OAPretreatSetPtMgr.deallocate(); // Array for OA Pretreat Set Pt Mgr
+		WarmestSetPtMgr.deallocate(); // Array for Warmest Set Pt Mgr
+		ColdestSetPtMgr.deallocate(); // Array for Coldest Set Pt Mgr
+		WarmestSetPtMgrTempFlow.deallocate(); // Array for Warmest Set Pt Mgr
+		RABFlowSetPtMgr.deallocate(); // Array for return air bypass
+		MZAverageCoolingSetPtMgr.deallocate(); // Array for MultiZone
+		MZAverageHeatingSetPtMgr.deallocate(); // Array for MultiZone
+		MZAverageMinHumSetPtMgr.deallocate(); // Array for MultiZone
+		MZAverageMaxHumSetPtMgr.deallocate(); // Array for MultiZone
+		MZMinHumSetPtMgr.deallocate(); // Multizone min humidity rat Set Pt Mgr
+		MZMaxHumSetPtMgr.deallocate(); // Multizone max humidity rat Set Pt Mgr
+		FollowOATempSetPtMgr.deallocate(); // Array for Follow Outdoor Air
+		FollowSysNodeTempSetPtMgr.deallocate(); // Array for Follow System
+		GroundTempSetPtMgr.deallocate(); // Array for Ground Temp Setpoint
+		CondEntSetPtMgr.deallocate(); // Condenser Entering Water Set Pt Mgr
+		IdealCondEntSetPtMgr.deallocate(); // Ideal Condenser Entering Set Pt Mgr
+		SZOneStageCoolingSetPtMgr.deallocate(); // single zone 1 stage cool
+		SZOneStageHeatingSetPtMgr.deallocate(); // single zone 1 stage heat
+		ReturnWaterResetChWSetPtMgr.deallocate(); // return water reset
+		ReturnWaterResetHWSetPtMgr.deallocate(); // hot-water return water reset
 
-	};
+	}
 
 	void
 	ManageSetPoints()

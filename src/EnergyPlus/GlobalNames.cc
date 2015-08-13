@@ -87,7 +87,7 @@ namespace GlobalNames {
 		CoilNames.deallocate();
 		aDUNames.deallocate();
 	
-	};
+	}
 
 	void
 	VerifyUniqueChillerName(

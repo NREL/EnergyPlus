@@ -132,14 +132,6 @@ namespace EnergyPlus {
 		EXPECT_EQ( DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->airOutNodeNum, DataZoneEquipment::ZoneEquipConfig( 1 ).AirDistUnitHeat( 1 ).OutNode );
 		EXPECT_EQ( DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->aDUNum, 1 );
 
-		bool const FirstHVACIteration= true;
-
-
-
-		int const zoneIndex = 1;
-		Real64 NonAirSysOutput;
-
-	//	DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate(FirstHVACIteration,zoneIndex, DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneNode, NonAirSysOutput);
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->clear_state();
 	}
 
@@ -1645,7 +1637,7 @@ namespace EnergyPlus {
 
 		//PlantManager::InitializeLoops( FirstHVACIteration );
 		PlantUtilities::SetAllFlowLocks( DataPlant::FlowUnlocked );
-		//first run with a sensible cooling load of 5000 W
+		//first run with a sensible cooling load of 5000 W and cold supply air
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = -5000.0;
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = -4000.0;
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -5000.0;
@@ -1667,7 +1659,7 @@ namespace EnergyPlus {
 
 		EXPECT_FLOAT_EQ( NonAirSysOutput, -1038.4176 );
 
-		//next run with a sensible heating load of 5000 W
+		//next run with a sensible heating load of 5000 W and cold supply air
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired =  5000.0;
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 5000.0;
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = 6000.0;
@@ -1683,7 +1675,51 @@ namespace EnergyPlus {
 
 		EXPECT_FLOAT_EQ( NonAirSysOutput, 7999.2612 );
 
+
+		// next run with cooling load and neutral supply air
+		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = -5000.0;
+		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = -4000.0;
+		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -5000.0;
+
+		DataLoopNode::Node( 14 ).Temp = 14.0; // chilled water inlet node
+		DataLoopNode::Node( 40 ).HumRat = 0.008; // zone node
+		DataLoopNode::Node( 40 ).Temp = 24.0; // zone node
+		DataLoopNode::Node( 44 ).HumRat = 0.008; // primary air inlet node
+		DataLoopNode::Node( 44 ).Temp = 22.0; // primary air inlet node
+		DataLoopNode::Node( 38 ).Temp = 45.0; // hot water inlet node
+
+		NonAirSysOutput = 0.0;
+		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
+
+		EXPECT_EQ( DataLoopNode::Node( 1 ).MassFlowRate, DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->mDotDesignPrimAir );
+		EXPECT_FLOAT_EQ( DataLoopNode::Node( 15 ).Temp, 18.084021 );
+		EXPECT_FLOAT_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.25288695 ); 
+		EXPECT_FLOAT_EQ( DataLoopNode::Node( 39 ).Temp, 45.0 );
+		EXPECT_FLOAT_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.0 );
+
+		EXPECT_FLOAT_EQ( NonAirSysOutput, -4323.4897 );
+
+		// next run with heating load and neutral supply air
+		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired =  5000.0;
+		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 5000.0;
+		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = 6000.0;
+
+		DataLoopNode::Node( 40 ).Temp = 21.0; // zone node
+
+		NonAirSysOutput = 0.0;
+		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
+
+		EXPECT_EQ( DataLoopNode::Node( 1 ).MassFlowRate, DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->mDotDesignPrimAir );
+		EXPECT_FLOAT_EQ( DataLoopNode::Node( 15 ).Temp, 14.0);
+		EXPECT_FLOAT_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0); 
+		EXPECT_FLOAT_EQ( DataLoopNode::Node( 39 ).Temp, 33.735477 );
+		EXPECT_FLOAT_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.099567369 );
+
+		EXPECT_FLOAT_EQ( NonAirSysOutput, 4688.1992 );
+
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->clear_state();
+
+
 	
 	}
 }
