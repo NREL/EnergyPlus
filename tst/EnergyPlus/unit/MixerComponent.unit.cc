@@ -4,15 +4,11 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <MixerComponent.hh>
-#include <InputProcessor.hh>
-#include <DataStringGlobals.hh>
+#include <EnergyPlus/MixerComponent.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::MixerComponent;
-using namespace EnergyPlus::InputProcessor;
-
-using namespace ObjexxFCL;
 
 TEST(MixerComponent, GetZoneMixerIndex)
 {

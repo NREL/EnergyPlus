@@ -131,9 +131,9 @@ namespace SetPointManager {
 	int const iCtrlVarType_MinMassFlow( 9 ); // control Type 'MinimumMassFlowRate'
 
 	int const NumValidCtrlTypes( 9 );
-	Array1D_string const cValidCtrlTypes( 
-		NumValidCtrlTypes, { 
-			"Temperature", 
+	Array1D_string const cValidCtrlTypes(
+		NumValidCtrlTypes, {
+			"Temperature",
 			"MaximumTemperature",
 			"MinimumTemperature",
 			"HumidityRatio",
@@ -177,34 +177,34 @@ namespace SetPointManager {
 	int const iSPMType_ReturnWaterResetHW( 29 );
 
 	int const NumValidSPMTypes( 29 );
-	Array1D_string const cValidSPMTypes( 
-		NumValidSPMTypes, { 
-			"SetpointManager:Scheduled", 
-			"SetpointManager:Scheduled:DualSetpoint", 
-			"SetpointManager:OutdoorAirReset", 
-			"SetpointManager:SingleZone:Reheat", 
-			"SetpointManager:SingleZone:Heating", 
-			"SetpointManager:SingleZone:Cooling", 
-			"SetpointManager:SingleZone:Humidity:Minimum", 
-			"SetpointManager:SingleZone:Humidity:Maximum", 
-			"SetpointManager:MixedAir", 
-			"SetpointManager:OutdoorAirPretreat", 
-			"SetpointManager:Warmest", 
-			"SetpointManager:Coldest", 
-			"SetpointManager:WarmestTemperatureFlow", 
-			"SetpointManager:ReturnAirBypassFlow", 
-			"SetpointManager:MultiZone:Cooling:Average", 
-			"SetpointManager:MultiZone:Heating:Average", 
-			"SetpointManager:MultiZone:MinimumHumidity:Average", 
-			"SetpointManager:MultiZone:MaximumHumidity:Average", 
-			"SetpointManager:MultiZone:Humidity:Minimum", 
-			"SetpointManager:MultiZone:Humidity:Maximum", 
-			"SetpointManager:FollowOutdoorAirTemperature", 
-			"SetpointManager:FollowSystemNodeTemperature", 
-			"SetpointManager:FollowGroundTemperature", 
-			"SetpointManager:CondenserEnteringReset", 
-			"SetpointManager:CondenserEnteringReset:Ideal", 
-			"SetpointManager:SingleZone:OneStageCooling", 
+	Array1D_string const cValidSPMTypes(
+		NumValidSPMTypes, {
+			"SetpointManager:Scheduled",
+			"SetpointManager:Scheduled:DualSetpoint",
+			"SetpointManager:OutdoorAirReset",
+			"SetpointManager:SingleZone:Reheat",
+			"SetpointManager:SingleZone:Heating",
+			"SetpointManager:SingleZone:Cooling",
+			"SetpointManager:SingleZone:Humidity:Minimum",
+			"SetpointManager:SingleZone:Humidity:Maximum",
+			"SetpointManager:MixedAir",
+			"SetpointManager:OutdoorAirPretreat",
+			"SetpointManager:Warmest",
+			"SetpointManager:Coldest",
+			"SetpointManager:WarmestTemperatureFlow",
+			"SetpointManager:ReturnAirBypassFlow",
+			"SetpointManager:MultiZone:Cooling:Average",
+			"SetpointManager:MultiZone:Heating:Average",
+			"SetpointManager:MultiZone:MinimumHumidity:Average",
+			"SetpointManager:MultiZone:MaximumHumidity:Average",
+			"SetpointManager:MultiZone:Humidity:Minimum",
+			"SetpointManager:MultiZone:Humidity:Maximum",
+			"SetpointManager:FollowOutdoorAirTemperature",
+			"SetpointManager:FollowSystemNodeTemperature",
+			"SetpointManager:FollowGroundTemperature",
+			"SetpointManager:CondenserEnteringReset",
+			"SetpointManager:CondenserEnteringReset:Ideal",
+			"SetpointManager:SingleZone:OneStageCooling",
 			"SetpointManager:SingleZone:OneStageHeating",
 			"SetpointManager:ReturnTemperature:ChilledWater",
 			"SetpointManager:ReturnTemperature:HotWater"
@@ -246,7 +246,7 @@ namespace SetPointManager {
 	int NumSZOneStageHeatingSetPtMgrs( 0 ); // number of singel zone one stage heating setpoint managers
 	int NumReturnWaterResetChWSetPtMgrs( 0 ); // number of return water reset setpoint managers
 	int NumReturnWaterResetHWSetPtMgrs( 0 ); // number of hot-water return water reset setpoint managers
-	
+
 	bool ManagerOn( false );
 	bool GetInputFlag( true ); // First time, input is "gotten"
 
@@ -293,7 +293,7 @@ namespace SetPointManager {
 	Array1D< DefineSZOneStageHeatingSetPointManager > SZOneStageHeatingSetPtMgr; // single zone 1 stage heat
 	Array1D< DefineReturnWaterChWSetPointManager > ReturnWaterResetChWSetPtMgr; // return water reset
 	Array1D< DefineReturnWaterHWSetPointManager > ReturnWaterResetHWSetPtMgr; // hot-water return water reset
-	
+
 	// Functions
 
 	void
@@ -633,39 +633,39 @@ namespace SetPointManager {
 		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
-		
+
 		cCurrentModuleObject = "SetpointManager:ReturnTemperature:HotWater";
 		NumReturnWaterResetHWSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject );
 		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
-		
-		NumAllSetPtMgrs = NumSchSetPtMgrs 
-						+ NumDualSchSetPtMgrs 
-						+ NumOutAirSetPtMgrs 
-						+ NumSZRhSetPtMgrs 
-						+ NumSZHtSetPtMgrs 
-						+ NumSZClSetPtMgrs 
-						+ NumSZMinHumSetPtMgrs 
-						+ NumSZMaxHumSetPtMgrs 
-						+ NumMixedAirSetPtMgrs 
-						+ NumOAPretreatSetPtMgrs 
-						+ NumWarmestSetPtMgrs 
-						+ NumColdestSetPtMgrs 
-						+ NumWarmestSetPtMgrsTempFlow 
-						+ NumRABFlowSetPtMgrs 
-						+ NumMZClgAverageSetPtMgrs 
-						+ NumMZHtgAverageSetPtMgrs 
-						+ NumMZAverageMinHumSetPtMgrs 
-						+ NumMZAverageMaxHumSetPtMgrs 
-						+ NumMZMinHumSetPtMgrs 
-						+ NumMZMaxHumSetPtMgrs 
-						+ NumFollowOATempSetPtMgrs 
-						+ NumFollowSysNodeTempSetPtMgrs 
-						+ NumGroundTempSetPtMgrs 
-						+ NumCondEntSetPtMgrs 
-						+ NumIdealCondEntSetPtMgrs 
-						+ NumSZOneStageCoolingSetPtMgrs 
+
+		NumAllSetPtMgrs = NumSchSetPtMgrs
+						+ NumDualSchSetPtMgrs
+						+ NumOutAirSetPtMgrs
+						+ NumSZRhSetPtMgrs
+						+ NumSZHtSetPtMgrs
+						+ NumSZClSetPtMgrs
+						+ NumSZMinHumSetPtMgrs
+						+ NumSZMaxHumSetPtMgrs
+						+ NumMixedAirSetPtMgrs
+						+ NumOAPretreatSetPtMgrs
+						+ NumWarmestSetPtMgrs
+						+ NumColdestSetPtMgrs
+						+ NumWarmestSetPtMgrsTempFlow
+						+ NumRABFlowSetPtMgrs
+						+ NumMZClgAverageSetPtMgrs
+						+ NumMZHtgAverageSetPtMgrs
+						+ NumMZAverageMinHumSetPtMgrs
+						+ NumMZAverageMaxHumSetPtMgrs
+						+ NumMZMinHumSetPtMgrs
+						+ NumMZMaxHumSetPtMgrs
+						+ NumFollowOATempSetPtMgrs
+						+ NumFollowSysNodeTempSetPtMgrs
+						+ NumGroundTempSetPtMgrs
+						+ NumCondEntSetPtMgrs
+						+ NumIdealCondEntSetPtMgrs
+						+ NumSZOneStageCoolingSetPtMgrs
 						+ NumSZOneStageHeatingSetPtMgrs
 						+ NumReturnWaterResetChWSetPtMgrs
 						+ NumReturnWaterResetHWSetPtMgrs;
@@ -695,7 +695,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SchSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SchSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -787,7 +787,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), DualSchSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), DualSchSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -873,7 +873,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), OutAirSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), OutAirSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -962,7 +962,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SingZoneRhSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SingZoneRhSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1006,7 +1006,7 @@ namespace SetPointManager {
 			}
 
 			// get the actual zone number of the control zone
-			SingZoneRhSetPtMgr( SetPtMgrNum ).ControlZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
+			SingZoneRhSetPtMgr( SetPtMgrNum ).ControlZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone );
 			if ( SingZoneRhSetPtMgr( SetPtMgrNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
 				ShowContinueError( "..invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
@@ -1039,7 +1039,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SingZoneHtSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SingZoneHtSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1083,7 +1083,7 @@ namespace SetPointManager {
 			}
 
 			// get the actual zone number of the control zone
-			SingZoneHtSetPtMgr( SetPtMgrNum ).ControlZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
+			SingZoneHtSetPtMgr( SetPtMgrNum ).ControlZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone );
 			if ( SingZoneHtSetPtMgr( SetPtMgrNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
 				ShowContinueError( "..invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
@@ -1115,7 +1115,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SingZoneClSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SingZoneClSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1159,7 +1159,7 @@ namespace SetPointManager {
 			}
 
 			// get the actual zone number of the control zone
-			SingZoneClSetPtMgr( SetPtMgrNum ).ControlZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
+			SingZoneClSetPtMgr( SetPtMgrNum ).ControlZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone );
 			if ( SingZoneClSetPtMgr( SetPtMgrNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
 				ShowContinueError( "..invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
@@ -1191,7 +1191,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SZMinHumSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SZMinHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1282,7 +1282,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SZMaxHumSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SZMaxHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1374,7 +1374,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MixedAirSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), MixedAirSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1448,7 +1448,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), OAPretreatSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), OAPretreatSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1559,7 +1559,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), WarmestSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), WarmestSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1636,7 +1636,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ColdestSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ColdestSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1713,7 +1713,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), WarmestSetPtMgrTempFlow.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), WarmestSetPtMgrTempFlow, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1797,7 +1797,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), RABFlowSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), RABFlowSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1856,7 +1856,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MZAverageCoolingSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), MZAverageCoolingSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1915,7 +1915,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MZAverageHeatingSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), MZAverageHeatingSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1974,7 +1974,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MZAverageMinHumSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), MZAverageMinHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2033,7 +2033,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MZAverageMaxHumSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), MZAverageMaxHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2092,7 +2092,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MZMinHumSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), MZMinHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2151,7 +2151,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MZMaxHumSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), MZMaxHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2211,7 +2211,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), FollowOATempSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), FollowOATempSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2292,7 +2292,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), FollowSysNodeTempSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), FollowSysNodeTempSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2375,7 +2375,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), GroundTempSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), GroundTempSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2500,7 +2500,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), CondEntSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), CondEntSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2571,7 +2571,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), IdealCondEntSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), IdealCondEntSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2626,7 +2626,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SZOneStageCoolingSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SZOneStageCoolingSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2646,7 +2646,7 @@ namespace SetPointManager {
 			SZOneStageCoolingSetPtMgr( SetPtMgrNum ).ControlZoneName = cAlphaArgs( 2 );
 			SZOneStageCoolingSetPtMgr( SetPtMgrNum ).ZoneNodeNum = GetSystemNodeNumberForZone( cAlphaArgs( 2 ) );
 			// get the actual zone number of the control zone
-			SZOneStageCoolingSetPtMgr( SetPtMgrNum ).ControlZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			SZOneStageCoolingSetPtMgr( SetPtMgrNum ).ControlZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( SZOneStageCoolingSetPtMgr( SetPtMgrNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
 				ShowContinueError( "..invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -2698,7 +2698,7 @@ namespace SetPointManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SZOneStageHeatingSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SZOneStageHeatingSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2718,7 +2718,7 @@ namespace SetPointManager {
 			SZOneStageHeatingSetPtMgr( SetPtMgrNum ).ControlZoneName = cAlphaArgs( 2 );
 			SZOneStageHeatingSetPtMgr( SetPtMgrNum ).ZoneNodeNum = GetSystemNodeNumberForZone( cAlphaArgs( 2 ) );
 			// get the actual zone number of the control zone
-			SZOneStageHeatingSetPtMgr( SetPtMgrNum ).ControlZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			SZOneStageHeatingSetPtMgr( SetPtMgrNum ).ControlZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( SZOneStageHeatingSetPtMgr( SetPtMgrNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
 				ShowContinueError( "..invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -2772,7 +2772,7 @@ namespace SetPointManager {
 			// set up the name
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ReturnWaterResetChWSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ReturnWaterResetChWSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2817,7 +2817,7 @@ namespace SetPointManager {
 			AllSetPtMgr( AllSetPtMgrNum ).NumCtrlNodes = 1;
 
 		}
-		
+
 		if ( NumReturnWaterResetHWSetPtMgrs > 0 ) ReturnWaterResetHWSetPtMgr.allocate( NumReturnWaterResetHWSetPtMgrs );
 
 		cCurrentModuleObject = "SetpointManager:ReturnTemperature:HotWater";
@@ -2829,7 +2829,7 @@ namespace SetPointManager {
 			// set up the name
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ReturnWaterResetHWSetPtMgr.Name(), SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ReturnWaterResetHWSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -3295,7 +3295,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_Warmest );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( WarmestSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo.AirLoopName(), NumPrimaryAirSys );
+						AirLoopNum = FindItemInList( WarmestSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + WarmestSetPtMgr( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + WarmestSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
@@ -3319,7 +3319,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_Coldest );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumColdestSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( ColdestSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo.AirLoopName(), NumPrimaryAirSys );
+						AirLoopNum = FindItemInList( ColdestSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + ColdestSetPtMgr( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + ColdestSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
@@ -3343,7 +3343,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_WarmestTempFlow );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( WarmestSetPtMgrTempFlow( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo.AirLoopName(), NumPrimaryAirSys );
+						AirLoopNum = FindItemInList( WarmestSetPtMgrTempFlow( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + WarmestSetPtMgrTempFlow( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + WarmestSetPtMgrTempFlow( SetPtMgrNum ).AirLoopName + "\"." );
@@ -3368,7 +3368,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_RAB );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumRABFlowSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( RABFlowSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo.AirLoopName(), NumPrimaryAirSys );
+						AirLoopNum = FindItemInList( RABFlowSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						AllSetPtMgr( RABFlowSetPtMgr( SetPtMgrNum ).AllSetPtMgrIndex ).AirLoopNum = AirLoopNum;
 						AllSetPtMgr( RABFlowSetPtMgr( SetPtMgrNum ).AllSetPtMgrIndex ).AirLoopName = RABFlowSetPtMgr( SetPtMgrNum ).AirLoopName;
 						if ( AirLoopNum == 0 ) {
@@ -3402,7 +3402,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_MZCoolingAverage );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZClgAverageSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( MZAverageCoolingSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo.AirLoopName(), NumPrimaryAirSys );
+						AirLoopNum = FindItemInList( MZAverageCoolingSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + MZAverageCoolingSetPtMgr( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + MZAverageCoolingSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
@@ -3426,7 +3426,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_MZHeatingAverage );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZHtgAverageSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( MZAverageHeatingSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo.AirLoopName(), NumPrimaryAirSys );
+						AirLoopNum = FindItemInList( MZAverageHeatingSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + MZAverageHeatingSetPtMgr( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + MZAverageHeatingSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
@@ -3452,7 +3452,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_MZMinHumAverage );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMinHumSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( MZAverageMinHumSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo.AirLoopName(), NumPrimaryAirSys );
+						AirLoopNum = FindItemInList( MZAverageMinHumSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + MZAverageMinHumSetPtMgr( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + MZAverageMinHumSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
@@ -3485,7 +3485,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_MZMaxHumAverage );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMaxHumSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( MZAverageMaxHumSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo.AirLoopName(), NumPrimaryAirSys );
+						AirLoopNum = FindItemInList( MZAverageMaxHumSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + MZAverageMaxHumSetPtMgr( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + MZAverageMaxHumSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
@@ -3518,7 +3518,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_MZMinHum );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZMinHumSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( MZMinHumSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo.AirLoopName(), NumPrimaryAirSys );
+						AirLoopNum = FindItemInList( MZMinHumSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + MZMinHumSetPtMgr( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + MZMinHumSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
@@ -3551,7 +3551,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_MZMaxHum );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZMaxHumSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( MZMaxHumSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo.AirLoopName(), NumPrimaryAirSys );
+						AirLoopNum = FindItemInList( MZMaxHumSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + MZMaxHumSetPtMgr( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + MZMaxHumSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
@@ -4155,7 +4155,7 @@ namespace SetPointManager {
 			for ( SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetChWSetPtMgrs; ++SetPtMgrNum ) {
 				Node( ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).supplyNodeIndex ).TempSetPoint = ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).minimumChilledWaterSetpoint;
 			}
-			
+
 			for ( SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetHWSetPtMgrs; ++SetPtMgrNum ) {
 				Node( ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).supplyNodeIndex ).TempSetPoint = ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).maximumHotWaterSetpoint;
 			}
@@ -6756,7 +6756,7 @@ namespace SetPointManager {
 	}
 
 	void
-	DefineReturnWaterChWSetPointManager::calculate( DataLoopNode::NodeData & returnNode, DataLoopNode::NodeData & supplyNode ) 
+	DefineReturnWaterChWSetPointManager::calculate( DataLoopNode::NodeData & returnNode, DataLoopNode::NodeData & supplyNode )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -6782,7 +6782,7 @@ namespace SetPointManager {
 		//    a. T_supply_setpoint = T_return_target - Q_demand / ( V_dot * rho * C_p )
 		//  3. Constrain this value to limits
 		//    a. T_supply_setpoint will be within: [ Design Chilled Water Supply Temperature, Maximum Supply Water Reset Temperature ]
-		
+
 		// NOTES:
 		// The assumptions related to lagging of setpoint are most suited for smaller timesteps and/or plants that don't vary wildly from one time step to another
 		// The assumptions also become affected by variable flow plants more-so than constant-flow plants
@@ -6817,7 +6817,7 @@ namespace SetPointManager {
 
 		// get the operating flow rate
 		Real64 mdot = supplyNode.MassFlowRate;
-		
+
 		// calculate the current demand
 		Real64 Qdemand = mdot * cp * ( returnNode.Temp - supplyNode.Temp );
 
@@ -6827,7 +6827,7 @@ namespace SetPointManager {
 			return;
 		}
 
-		// Determine a return target, default is to use the constant value, but scheduled or externally 
+		// Determine a return target, default is to use the constant value, but scheduled or externally
 		//  set on the return node TempSetPoint will overwrite it.  Note that the schedule index is only
 		//  greater than zero if the input type is scheduled, and the useReturnTempSetpoint flag is only
 		//  true if the input type is specified as such
@@ -6862,7 +6862,7 @@ namespace SetPointManager {
 
 
 	void
-	DefineReturnWaterHWSetPointManager::calculate( DataLoopNode::NodeData & returnNode, DataLoopNode::NodeData & supplyNode ) 
+	DefineReturnWaterHWSetPointManager::calculate( DataLoopNode::NodeData & returnNode, DataLoopNode::NodeData & supplyNode )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -6888,7 +6888,7 @@ namespace SetPointManager {
 		//    a. T_supply_setpoint = T_return_target + Q_demand / ( V_dot * rho * C_p )
 		//  3. Constrain this value to limits
 		//    a. T_supply_setpoint will be within: [ Minimum Chilled Water Reset Temperature, Design Hot Water Supply Temperature ]
-		
+
 		// NOTES:
 		// The assumptions related to lagging of setpoint are most suited for smaller timesteps and/or plants that don't vary wildly from one time step to another
 		// The assumptions also become affected by variable flow plants more-so than constant-flow plants
@@ -6923,7 +6923,7 @@ namespace SetPointManager {
 
 		// get the operating flow rate
 		Real64 mdot = supplyNode.MassFlowRate;
-		
+
 		// calculate the current demand
 		Real64 Qdemand = mdot * cp * ( supplyNode.Temp - returnNode.Temp );
 
@@ -7995,7 +7995,7 @@ namespace SetPointManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

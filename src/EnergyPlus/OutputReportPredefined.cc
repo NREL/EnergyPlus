@@ -966,7 +966,7 @@ namespace OutputReportPredefined {
 
 		pdrSizing = newPreDefReport( "HVACSizingSummary", "Size", "HVAC Sizing Summary" );
 
-		pdstZoneClSize = newPreDefSubTable( pdrSizing, "Zone Cooling" );
+		pdstZoneClSize = newPreDefSubTable( pdrSizing, "Zone Sensible Cooling" );
 
 		pdchZnClCalcDesLd = newPreDefColumn( pdstZoneClSize, "Calculated Design Load [W]" );
 		pdchZnClUserDesLd = newPreDefColumn( pdstZoneClSize, "User Design Load [W]" );
@@ -981,9 +981,8 @@ namespace OutputReportPredefined {
 		pdchZnClPkOATemp = newPreDefColumn( pdstZoneClSize, "Outdoor Temperature at Peak Load [C]" );
 		pdchZnClPkOAHum = newPreDefColumn( pdstZoneClSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
 		pdchZnClPkOAMinFlow = newPreDefColumn( pdstZoneClSize, "Minimum Outdoor Air Flow Rate [m3/s]" );
-		pdchZnClPkDOASHeatGain = newPreDefColumn( pdstZoneClSize, "Heat Gain Rate from DOAS [W]" );
-
-		pdstZoneHtSize = newPreDefSubTable( pdrSizing, "Zone Heating" );
+		pdchZnClPkDOASHeatGain = newPreDefColumn( pdstZoneClSize, "Heat Gain Rate from DOAS [W]" );		addFootNoteSubTable( pdstZoneClSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads." );
+		pdstZoneHtSize = newPreDefSubTable( pdrSizing, "Zone Sensible Heating" );
 
 		pdchZnHtCalcDesLd = newPreDefColumn( pdstZoneHtSize, "Calculated Design Load [W]" );
 		pdchZnHtUserDesLd = newPreDefColumn( pdstZoneHtSize, "User Design Load [W]" );
@@ -998,8 +997,7 @@ namespace OutputReportPredefined {
 		pdchZnHtPkOATemp = newPreDefColumn( pdstZoneHtSize, "Outdoor Temperature at Peak Load [C]" );
 		pdchZnHtPkOAHum = newPreDefColumn( pdstZoneHtSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
 		pdchZnHtPkOAMinFlow = newPreDefColumn( pdstZoneHtSize, "Minimum Outdoor Air Flow Rate [m3/s]" );
-		pdchZnHtPkDOASHeatGain = newPreDefColumn( pdstZoneHtSize, "Heat Gain Rate from DOAS [W]" );
-
+		pdchZnHtPkDOASHeatGain = newPreDefColumn( pdstZoneHtSize, "Heat Gain Rate from DOAS [W]" );		addFootNoteSubTable( pdstZoneHtSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads." );
 		pdstSystemSize = newPreDefSubTable( pdrSizing, "System Design Air Flow Rates" );
 
 		pdchSysSizCalcClAir = newPreDefColumn( pdstSystemSize, "Calculated cooling [m3/s]" );
@@ -2013,7 +2011,7 @@ namespace OutputReportPredefined {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -15,6 +16,7 @@
 #include <DataVectorTypes.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
+#include <PierceSurface.hh>
 #include <ScheduleManager.hh>
 #include <Vectors.hh>
 
@@ -268,7 +270,7 @@ namespace SolarReflectionManager {
 			SurfNum = SolReflRecSurf( RecSurfNum ).SurfNum;
 			// Outward norm to receiving surface
 			SolReflRecSurf( RecSurfNum ).NormVec = Surface( SurfNum ).OutNormVec;
-			Surface( SurfNum ).Vertex( 1 ).assign_to( RecVec );
+			RecVec = Surface( SurfNum ).Vertex( 1 );
 			// Loop over all surfaces and find those that can be obstructing surfaces for this receiving surf
 			SolReflRecSurf( RecSurfNum ).NumPossibleObs = 0;
 			for ( ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {
@@ -286,7 +288,7 @@ namespace SolarReflectionManager {
 				// obstructing surface are all negative.
 				ObsBehindRec = true;
 				for ( loop = 1; loop <= Surface( ObsSurfNum ).Sides; ++loop ) {
-					Surface( ObsSurfNum ).Vertex( loop ).assign_to( ObsVec );
+					ObsVec = Surface( ObsSurfNum ).Vertex( loop );
 					DotProd = dot( SolReflRecSurf( RecSurfNum ).NormVec, ObsVec - RecVec );
 					//CR8251      IF(DotProd > 0.01d0) THEN  ! This obstructing-surface vertex is not behind receiving surface
 					if ( DotProd > 1.0e-6 ) { // This obstructing-surface vertex is not behind receiving surface
@@ -304,7 +306,7 @@ namespace SolarReflectionManager {
 					ObsHasView = false;
 					for ( loopA = 1; loopA <= Surface( SurfNum ).Sides; ++loopA ) {
 						for ( loopB = 1; loopB <= Surface( ObsSurfNum ).Sides; ++loopB ) {
-							( Surface( ObsSurfNum ).Vertex( loopB ) - Surface( SurfNum ).Vertex( loopA ) ).assign_to( VecAB );
+							VecAB = ( Surface( ObsSurfNum ).Vertex( loopB ) - Surface( SurfNum ).Vertex( loopA ) );
 							if ( dot( VecAB, SolReflRecSurf( RecSurfNum ).NormVec ) > 0.0 && dot( VecAB, Surface( ObsSurfNum ).OutNormVec ) < 0.0 ) {
 								ObsHasView = true;
 								break;
@@ -475,8 +477,8 @@ namespace SolarReflectionManager {
 						SolReflRecSurf( RecSurfNum ).HitPt( RayNum, RecPtNum ) = NearestHitPt;
 						// For hit surface, calculate unit normal vector pointing into the hemisphere
 						// containing the receiving point
-						( Surface( NearestHitSurfNum ).Vertex( 1 ) - Surface( NearestHitSurfNum ).Vertex( 3 ) ).assign_to( Vec1 );
-						( Surface( NearestHitSurfNum ).Vertex( 2 ) - Surface( NearestHitSurfNum ).Vertex( 3 ) ).assign_to( Vec2 );
+						Vec1 = ( Surface( NearestHitSurfNum ).Vertex( 1 ) - Surface( NearestHitSurfNum ).Vertex( 3 ) );
+						Vec2 = ( Surface( NearestHitSurfNum ).Vertex( 2 ) - Surface( NearestHitSurfNum ).Vertex( 3 ) );
 						VNorm = cross( Vec1, Vec2 );
 						VNorm.normalize(); //Do Handle magnitude==0
 						if ( dot( VNorm, -RayVec ) < 0.0 ) VNorm = -VNorm;
@@ -1025,11 +1027,11 @@ namespace SolarReflectionManager {
 								SpecReflectance = 0.0;
 								if ( Surface( ReflSurfNum ).Class == SurfaceClass_Window ) {
 									ConstrNumRefl = Surface( ReflSurfNum ).Construction;
-									SpecReflectance = POLYF( std::abs( CosIncAngRefl ), Construct( ConstrNumRefl ).ReflSolBeamFrontCoef( {1,6} ) );
+									SpecReflectance = POLYF( std::abs( CosIncAngRefl ), Construct( ConstrNumRefl ).ReflSolBeamFrontCoef );
 								}
 								if ( Surface( ReflSurfNum ).ShadowingSurf && Surface( ReflSurfNum ).ShadowSurfGlazingConstruct > 0 ) {
 									ConstrNumRefl = Surface( ReflSurfNum ).ShadowSurfGlazingConstruct;
-									SpecReflectance = Surface( ReflSurfNum ).ShadowSurfGlazingFrac * POLYF( std::abs( CosIncAngRefl ), Construct( ConstrNumRefl ).ReflSolBeamFrontCoef( {1,6} ) );
+									SpecReflectance = Surface( ReflSurfNum ).ShadowSurfGlazingFrac * POLYF( std::abs( CosIncAngRefl ), Construct( ConstrNumRefl ).ReflSolBeamFrontCoef );
 								}
 								// Angle of incidence of reflected beam on receiving surface
 								CosIncAngRec = dot( SolReflRecSurf( RecSurfNum ).NormVec, SunVecMir );
@@ -1213,7 +1215,7 @@ namespace SolarReflectionManager {
 										// Special test for vertical surfaces with URay dot OutNormVec < 0; excludes
 										// case where ground hit point is in back of ObsSurfNum
 										if ( Surface( ObsSurfNum ).Tilt > 89.0 && Surface( ObsSurfNum ).Tilt < 91.0 ) {
-											Surface( ObsSurfNum ).Vertex( 2 ).assign_to( SurfVert );
+											SurfVert = Surface( ObsSurfNum ).Vertex( 2 );
 											SurfVertToGndPt = HitPtRefl - SurfVert;
 											if ( dot( SurfVertToGndPt, Surface( ObsSurfNum ).OutNormVec ) < 0.0 ) continue;
 										}
@@ -1250,185 +1252,9 @@ namespace SolarReflectionManager {
 
 	}
 
-	// Vector3 -- Vector interoperation support until they are unified
-
-	// Vector3 = Vector
-	inline
-	void
-	assign( Vector3< Real64 > & a, Vector const & b )
-	{
-		a.x = b.x;
-		a.y = b.y;
-		a.z = b.z;
-	}
-
-	// Vector3 = Vector - Vector3
-	inline
-	void
-	diff( Vector3< Real64 > & a, Vector const & b, Vector3< Real64 > const & c )
-	{
-		a.x = b.x - c.x;
-		a.y = b.y - c.y;
-		a.z = b.z - c.z;
-	}
-
-	//=================================================================================================
-
-	void
-	PierceSurface(
-		int const ISurf, // Surface index
-		Vector3< Real64 > const & R1, // Point from which ray originates
-		Vector3< Real64 > const & RN, // Unit vector along in direction of ray whose
-		int & IPIERC, // =1 if line through point R1 in direction of unit vector
-		Vector3< Real64 > & CPhit // Point that ray along RN intersects plane of surface
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Fred Winkelmann
-		//       DATE WRITTEN   July 1997
-		//       MODIFIED       Sept 2003, FCW: modification of Daylighting routine DayltgPierceSurface
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Returns point CPhit that line through point R1 in direction of unit vector RN intersects
-		// the plan of surface ISurf. IPIERC = 1 if CPhit is inside the perimeter of ISurf. If not,
-		// IPIERC = 0. This routine works for convex and concave surfaces with 3 or more vertices.
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// Based on DOE-2.1E subroutine DPIERC.
-
-		// USE STATEMENTS:na
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:na
-		// INTERFACE BLOCK SPECIFICATIONS:na
-		// DERIVED TYPE DEFINITIONS:na
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		//  intersection with surface is to be determined
-		//  RN intersects surface ISurf; =0 otherwise.
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int NV; // Number of vertices (3 or 4)
-		Vector3< Real64 > AXC; // Cross product of A and C
-		Vector3< Real64 > SN; // Vector normal to surface (SN = A1 X A2)
-		//unused  REAL(r64) :: AA(3)                    ! AA(I) = A(N,I)
-		//unused  REAL(r64) :: CC(3)                    ! CC(I) = C(N,I)
-		Vector3< Real64 > CCC; // Vector from vertex 2 to CP
-		Vector3< Real64 > AAA; // Vector from vertex 2 to vertex 1
-		Vector3< Real64 > BBB; // Vector from vertex 2 to vertex 3
-		int N; // Vertex loop index
-		Real64 F1; // Intermediate variables
-		Real64 F2;
-		Real64 SCALE; // Scale factor
-		Real64 DOTCB; // Dot product of vectors CCC and BBB
-		Real64 DOTCA; // Dot product of vectors CCC and AAA
-		//unused  REAL(r64) :: DOTAXCSN                 ! Dot product of vectors AXC and SN
-
-		// Vertex vectors
-		static Array1D< Vector3< Real64 > > V( MaxVerticesPerSurface ); // Vertices of surfaces
-		static Array1D< Vector3< Real64 > > A( MaxVerticesPerSurface ); // Vertex-to-vertex vectors; A(1,i) is from vertex 1 to 2, etc.
-		static Array1D< Vector3< Real64 > > C( MaxVerticesPerSurface ); // Vectors from vertices to intersection point
-
-		// FLOW:
-		IPIERC = 0;
-
-		// Aliases
-		auto const & surface( Surface( ISurf ) );
-		auto const & vertex( surface.Vertex );
-
-		// Set the first two V & A
-		assign( V( 1 ), vertex( 1 ) );
-		diff( A( 1 ), vertex( 2 ), V( 1 ) );
-		assign( V( 2 ), vertex( 2 ) );
-		diff( A( 2 ), vertex( 3 ), V( 2 ) );
-
-		// Vector normal to surface
-		SN = cross( A( 1 ), A( 2 ) );
-
-		// Scale factor, the solution of SN.(CPhit-V2) = 0 and
-		// CPhit = R1 + SCALE*RN, where CPhit is the point that RN,
-		// when extended, intersects the plane of the surface.
-		F2 = dot( SN, RN );
-		if ( std::abs( F2 ) < 0.01 ) return; // Skip surfaces that are parallel to RN
-		F1 = SN.x * ( V( 2 ).x - R1.x ) + SN.y * ( V( 2 ).y - R1.y ) + SN.z * ( V( 2 ).z - R1.z );
-		//F1 = DOT_PRODUCT(SN, V2 - R1)
-		SCALE = F1 / F2;
-		if ( SCALE <= 0.0 ) return; // Skip surfaces that RN points away from
-		CPhit = R1 + RN * SCALE; // Point that RN intersects plane of surface
-
-		// Two cases: rectangle and non-rectangle; do rectangle
-		// first since most common shape and faster calculation
-		if ( surface.Shape == Rectangle || surface.Shape == RectangularDoorWindow || surface.Shape == RectangularOverhang || surface.Shape == RectangularLeftFin || surface.Shape == RectangularRightFin ) {
-			// Surface is rectangular
-			// Vectors from vertex 2 to vertex 1 and vertex 2 to vertex 3
-
-			// Intersection point, CCC, is inside rectangle if
-			// 0 < CCC.BBB < BBB.BBB AND 0 < CCC.AAA < AAA.AAA
-
-			// CCC = CPhit - V2  ! Vector from vertex 2 to CPhit
-			CCC = CPhit - V( 2 );
-
-			// Set third V just for here
-			assign( V( 3 ), vertex( 3 ) );
-
-			// BBB = V3 - V2
-			BBB = V( 3 ) - V( 2 );
-
-			DOTCB = dot( CCC, BBB );
-			if ( DOTCB < 0.0 ) return;
-			if ( DOTCB > BBB.magnitude_squared() ) return;
-
-			// AAA = V1 - V2
-			AAA = V( 1 ) - V( 2 );
-
-			DOTCA = dot( CCC, AAA );
-			if ( DOTCA < 0.0 ) return;
-			if ( DOTCA > AAA.magnitude_squared() ) return;
-			// Surface is intersected
-			IPIERC = 1;
-
-		} else { // Surface is not rectangular
-
-			// First two of V & A already set
-			// test first vertex:
-			C( 1 ) = CPhit - V( 1 );
-			AXC = cross( A( 1 ), C( 1 ) );
-			if ( dot( AXC, SN ) < 0.0 ) return; // If at least one dot product is negative, intersection outside of surface
-
-			// test second vertex:
-			C( 2 ) = CPhit - V( 2 );
-			AXC = cross( A( 2 ), C( 2 ) );
-			if ( dot( AXC, SN ) < 0.0 ) return; // If at least one dot product is negative, intersection outside of surface
-
-			NV = surface.Sides;
-			if ( NV > 3 ) { // Since first two of V & A already set, start with 3.  (so if NV=3, this loop won't happen)
-				for ( N = 3; N <= NV - 1; ++N ) {
-					assign( V( N ), vertex( N ) );
-					diff( A( N ), vertex( N + 1 ), V( N ) );
-					C( N ) = CPhit - V( N );
-					AXC = cross( A( N ), C( N ) );
-					if ( dot( AXC, SN ) < 0.0 ) return; // If at least one dot product is negative, intersection outside of surface
-				}
-			}
-
-			// Last vertex (NV=3 or NV=4)
-			assign( V( NV ), vertex( NV ) );
-			A( NV ) = V( 1 ) - V( NV );
-			C( NV ) = CPhit - V( NV );
-			AXC = cross( A( NV ), C( NV ) );
-			if ( dot( AXC, SN ) < 0.0 ) return; // If at least one dot product is negative, intersection outside of surface
-
-			IPIERC = 1; // Surface is intersected
-		}
-
-	}
-
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

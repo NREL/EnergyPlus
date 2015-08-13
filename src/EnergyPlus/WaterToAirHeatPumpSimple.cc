@@ -208,7 +208,7 @@ namespace WaterToAirHeatPumpSimple {
 		}
 
 		if ( CompIndex == 0 ) {
-			HPNum = FindItemInList( CompName, SimpleWatertoAirHP.Name(), NumWatertoAirHPs );
+			HPNum = FindItemInList( CompName, SimpleWatertoAirHP );
 			if ( HPNum == 0 ) {
 				ShowFatalError( "WaterToAirHPSimple not found=" + CompName );
 			}
@@ -368,7 +368,7 @@ namespace WaterToAirHeatPumpSimple {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), SimpleWatertoAirHP.Name(), HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), SimpleWatertoAirHP, HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -445,7 +445,7 @@ namespace WaterToAirHeatPumpSimple {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), SimpleWatertoAirHP.Name(), HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), SimpleWatertoAirHP, HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1231,7 +1231,7 @@ namespace WaterToAirHeatPumpSimple {
 						// rated condenser water inlet temperature of 85F
 						ratioTS = ( ( ( 85.0 - 32.0 ) / 1.8 ) + 273.15 ) / 283.15;
 						SensCapTempModFac = SensCapCoeff1 + ( ratioTDB * SensCapCoeff2 ) + ( ratioTWB * SensCapCoeff3 ) + ( ratioTS * SensCapCoeff4 ) + ( 1.0 * SensCapCoeff5 ) + ( 1.0 * SensCapCoeff6 );
-						// Sensible capacity is calculated from enthalpy difference with constant humidity ratio, i.e., 
+						// Sensible capacity is calculated from enthalpy difference with constant humidity ratio, i.e.,
 						// there is only temperature difference between entering and leaving air enthalpy. Previously
 						// it was calculated using m.cp.dT
 						SensCapAtPeak = rhoair * VolFlowRate * ( MixEnth - SupEnth );
@@ -1290,7 +1290,7 @@ namespace WaterToAirHeatPumpSimple {
 						// rated condenser water inlet temperature of 85F
 						ratioTS = ( ( ( 85.0 - 32.0 ) / 1.8 ) + 273.15 ) / 283.15;
 						SensCapTempModFac = SensCapCoeff1 + ( ratioTDB * SensCapCoeff2 ) + ( ratioTWB * SensCapCoeff3 ) + ( ratioTS * SensCapCoeff4 ) + ( 1.0 * SensCapCoeff5 ) + ( 1.0 * SensCapCoeff6 );
-						// Sensible capacity is calculated from enthalpy difference with constant humidity ratio, i.e., 
+						// Sensible capacity is calculated from enthalpy difference with constant humidity ratio, i.e.,
 						// there is only temperature difference between entering and leaving air enthalpy. Previously
 						// it was calculated using m.cp.dT
 						SensCapAtPeak = rhoair * VolFlowRate * ( MixEnth - SupEnth );
@@ -2401,7 +2401,7 @@ namespace WaterToAirHeatPumpSimple {
 			GetCoilsInputFlag = false;
 		}
 
-		IndexNum = FindItemInList( CoilName, SimpleWatertoAirHP.Name(), NumWatertoAirHPs );
+		IndexNum = FindItemInList( CoilName, SimpleWatertoAirHP );
 
 		if ( IndexNum == 0 ) {
 			ShowSevereError( "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
@@ -2468,7 +2468,7 @@ namespace WaterToAirHeatPumpSimple {
 		}
 
 		if ( SameString( CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT" ) || SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" ) ) {
-			WhichCoil = FindItemInList( CoilName, SimpleWatertoAirHP.Name(), NumWatertoAirHPs );
+			WhichCoil = FindItemInList( CoilName, SimpleWatertoAirHP );
 			if ( WhichCoil != 0 ) {
 				if ( SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" ) ) {
 					CoilCapacity = SimpleWatertoAirHP( WhichCoil ).RatedCapHeat;
@@ -2546,7 +2546,7 @@ namespace WaterToAirHeatPumpSimple {
 		}
 
 		if ( CoilType == "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT" || CoilType == "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" ) {
-			WhichCoil = FindItemInList( CoilName, SimpleWatertoAirHP.Name(), NumWatertoAirHPs );
+			WhichCoil = FindItemInList( CoilName, SimpleWatertoAirHP );
 			if ( WhichCoil != 0 ) {
 				CoilAirFlowRate = SimpleWatertoAirHP( WhichCoil ).RatedAirVolFlowRate;
 			}
@@ -2617,7 +2617,7 @@ namespace WaterToAirHeatPumpSimple {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, SimpleWatertoAirHP.Name(), NumWatertoAirHPs );
+		WhichCoil = FindItemInList( CoilName, SimpleWatertoAirHP );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = SimpleWatertoAirHP( WhichCoil ).AirInletNodeNum;
 		}
@@ -2686,7 +2686,7 @@ namespace WaterToAirHeatPumpSimple {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, SimpleWatertoAirHP.Name(), NumWatertoAirHPs );
+		WhichCoil = FindItemInList( CoilName, SimpleWatertoAirHP );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = SimpleWatertoAirHP( WhichCoil ).AirOutletNodeNum;
 		}

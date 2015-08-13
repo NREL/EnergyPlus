@@ -626,6 +626,262 @@ namespace DataHeatBalance {
 
 	// Functions
 
+	// Clears the global data in DataHeatBalance.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		MaxSolidWinLayers = 0;
+		LowHConvLimit = 0.1;
+		HighHConvLimit = 1000.0;
+		MaxAllowedDelTempCondFD = 0.002;
+		BuildingName = std::string();
+		BuildingAzimuth = 0.0;
+		LoadsConvergTol = 0.0;
+		TempConvergTol = 0.0;
+		DefaultInsideConvectionAlgo = 1;
+		DefaultOutsideConvectionAlgo = 1;
+		SolarDistribution = 0;
+		InsideSurfIterations = 0;
+		OverallHeatTransferSolutionAlgo = UseCTF;
+		NumberOfHeatTransferAlgosUsed = 1;
+		HeatTransferAlgosUsed.deallocate();
+		MaxNumberOfWarmupDays = 25;
+		MinNumberOfWarmupDays = 6;
+		CondFDRelaxFactor = 1.0;
+		CondFDRelaxFactorInput = 1.0;
+		ZoneAirSolutionAlgo = Use3rdOrder;
+		BuildingRotationAppendixG = 0.0;
+		NumOfZoneLists = 0;
+		NumOfZoneGroups = 0;
+		NumPeopleStatements = 0;
+		NumLightsStatements = 0;
+		NumZoneElectricStatements = 0;
+		NumZoneGasStatements = 0;
+		NumInfiltrationStatements = 0;
+		NumVentilationStatements = 0;
+		NumHotWaterEqStatements = 0;
+		NumSteamEqStatements = 0;
+		NumOtherEqStatements = 0;
+		NumZoneITEqStatements = 0;
+		TotPeople = 0;
+		TotLights = 0;
+		TotElecEquip = 0;
+		TotGasEquip = 0;
+		TotOthEquip = 0;
+		TotHWEquip = 0;
+		TotStmEquip = 0;
+		TotInfiltration = 0;
+		TotDesignFlowInfiltration = 0;
+		TotShermGrimsInfiltration = 0;
+		TotAIM2Infiltration = 0;
+		TotVentilation = 0;
+		TotDesignFlowVentilation = 0;
+		TotWindAndStackVentilation = 0;
+		TotMixing = 0;
+		TotCrossMixing = 0;
+		TotRefDoorMixing = 0;
+		TotBBHeat = 0;
+		TotMaterials = 0;
+		TotConstructs = 0;
+		TotSpectralData = 0;
+		W5GlsMat = 0;
+		W5GlsMatAlt = 0;
+		W5GasMat = 0;
+		W5GasMatMixture = 0;
+		W7SupportPillars = 0;
+		W7DeflectionStates = 0;
+		W7MaterialGaps = 0;
+		TotBlinds = 0;
+		TotScreens = 0;
+		TotTCGlazings = 0;
+		NumSurfaceScreens = 0;
+		TotShades = 0;
+		TotComplexShades = 0;
+		TotComplexGaps = 0;
+		TotSimpleWindow = int();
+		W5GlsMatEQL = 0;
+		TotShadesEQL = 0;
+		TotDrapesEQL = 0;
+		TotBlindsEQL = 0;
+		TotScreensEQL = 0;
+		W5GapMatEQL = 0;
+		TotZoneAirBalance = 0;
+		TotFrameDivider = 0;
+		AirFlowFlag = 0;
+		TotCO2Gen = 0;
+		CalcWindowRevealReflection = false;
+		StormWinChangeThisDay = false;
+		AdaptiveComfortRequested_CEN15251 = false;
+		AdaptiveComfortRequested_ASH55 = false;
+		NumRefrigeratedRacks = 0;
+		NumRefrigSystems = 0;
+		NumRefrigCondensers = 0;
+		NumRefrigChillerSets = 0;
+		SNLoadHeatEnergy.deallocate();
+		SNLoadCoolEnergy.deallocate();
+		SNLoadHeatRate.deallocate();
+		SNLoadCoolRate.deallocate();
+		SNLoadPredictedRate.deallocate();
+		SNLoadPredictedHSPRate.deallocate();
+		SNLoadPredictedCSPRate.deallocate();
+		MoisturePredictedRate.deallocate();
+		ListSNLoadHeatEnergy.deallocate();
+		ListSNLoadCoolEnergy.deallocate();
+		ListSNLoadHeatRate.deallocate();
+		ListSNLoadCoolRate.deallocate();
+		GroupSNLoadHeatEnergy.deallocate();
+		GroupSNLoadCoolEnergy.deallocate();
+		GroupSNLoadHeatRate.deallocate();
+		GroupSNLoadCoolRate.deallocate();
+		MRT.deallocate();
+		SUMAI.deallocate();
+		ZoneTransSolar.deallocate();
+		ZoneWinHeatGain.deallocate();
+		ZoneWinHeatGainRep.deallocate();
+		ZoneWinHeatLossRep.deallocate();
+		ZoneBmSolFrExtWinsRep.deallocate();
+		ZoneBmSolFrIntWinsRep.deallocate();
+		InitialZoneDifSolReflW.deallocate();
+		ZoneDifSolFrExtWinsRep.deallocate();
+		ZoneDifSolFrIntWinsRep.deallocate();
+		ZoneOpaqSurfInsFaceCond.deallocate();
+		ZoneOpaqSurfInsFaceCondGainRep.deallocate();
+		ZoneOpaqSurfInsFaceCondLossRep.deallocate();
+		ZoneOpaqSurfExtFaceCond.deallocate();
+		ZoneOpaqSurfExtFaceCondGainRep.deallocate();
+		ZoneOpaqSurfExtFaceCondLossRep.deallocate();
+		QRadThermInAbs.deallocate();
+		QRadSWwinAbs.deallocate();
+		InitialDifSolwinAbs.deallocate();
+		QRadSWOutIncident.deallocate();
+		QRadSWOutIncidentBeam.deallocate();
+		BmIncInsSurfIntensRep.deallocate();
+		BmIncInsSurfAmountRep.deallocate();
+		IntBmIncInsSurfIntensRep.deallocate();
+		IntBmIncInsSurfAmountRep.deallocate();
+		QRadSWOutIncidentSkyDiffuse.deallocate();
+		QRadSWOutIncidentGndDiffuse.deallocate();
+		QRadSWOutIncBmToDiffReflGnd.deallocate();
+		QRadSWOutIncSkyDiffReflGnd.deallocate();
+		QRadSWOutIncBmToBmReflObs.deallocate();
+		QRadSWOutIncBmToDiffReflObs.deallocate();
+		QRadSWOutIncSkyDiffReflObs.deallocate();
+		CosIncidenceAngle.deallocate();
+		BSDFBeamDirectionRep.deallocate();
+		BSDFBeamThetaRep.deallocate();
+		BSDFBeamPhiRep.deallocate();
+		QRadSWwinAbsTot.deallocate();
+		QRadSWwinAbsLayer.deallocate();
+		FenLaySurfTempFront.deallocate();
+		FenLaySurfTempBack.deallocate();
+		ZoneTransSolarEnergy.deallocate();
+		ZoneWinHeatGainRepEnergy.deallocate();
+		ZoneWinHeatLossRepEnergy.deallocate();
+		ZoneBmSolFrExtWinsRepEnergy.deallocate();
+		ZoneBmSolFrIntWinsRepEnergy.deallocate();
+		ZoneDifSolFrExtWinsRepEnergy.deallocate();
+		ZoneDifSolFrIntWinsRepEnergy.deallocate();
+		ZnOpqSurfInsFaceCondGnRepEnrg.deallocate();
+		ZnOpqSurfInsFaceCondLsRepEnrg.deallocate();
+		ZnOpqSurfExtFaceCondGnRepEnrg.deallocate();
+		ZnOpqSurfExtFaceCondLsRepEnrg.deallocate();
+		BmIncInsSurfAmountRepEnergy.deallocate();
+		IntBmIncInsSurfAmountRepEnergy.deallocate();
+		QRadSWwinAbsTotEnergy.deallocate();
+		SWwinAbsTotalReport.deallocate();
+		InitialDifSolInAbsReport.deallocate();
+		InitialDifSolInTransReport.deallocate();
+		SWInAbsTotalReport.deallocate();
+		SWOutAbsTotalReport.deallocate();
+		SWOutAbsEnergyReport.deallocate();
+		NominalR.deallocate();
+		NominalRforNominalUCalculation.deallocate();
+		NominalU.deallocate();
+		TempEffBulkAir.deallocate();
+		HConvIn.deallocate();
+		AnisoSkyMult.deallocate();
+		DifShdgRatioIsoSky.deallocate();
+		DifShdgRatioIsoSkyHRTS.deallocate();
+		curDifShdgRatioIsoSky.deallocate();
+		DifShdgRatioHoriz.deallocate();
+		DifShdgRatioHorizHRTS.deallocate();
+		WithShdgIsoSky.deallocate();
+		WoShdgIsoSky.deallocate();
+		WithShdgHoriz.deallocate();
+		WoShdgHoriz.deallocate();
+		MultIsoSky.deallocate();
+		MultCircumSolar.deallocate();
+		MultHorizonZenith.deallocate();
+		QS.deallocate();
+		QSLights.deallocate();
+		QSDifSol.deallocate();
+		ITABSF.deallocate();
+		TMULT.deallocate();
+		QL.deallocate();
+		SunlitFracHR.deallocate();
+		CosIncAngHR.deallocate();
+		SunlitFrac.deallocate();
+		SunlitFracWithoutReveal.deallocate();
+		CosIncAng.deallocate();
+		BackSurfaces.deallocate();
+		OverlapAreas.deallocate();
+		MVFC.deallocate();
+		MTC.deallocate();
+		ZeroPointerVal = 0.0;
+		ZonePreDefRep.deallocate();
+		BuildingPreDefRep = ZonePreDefRepType();
+		ZoneIntGain.deallocate();
+		Material.deallocate();
+		SupportPillar.deallocate();
+		DeflectionState.deallocate();
+		Construct.deallocate();
+		SpectralData.deallocate();
+		Zone.deallocate();
+		ZoneList.deallocate();
+		ZoneGroup.deallocate();
+		People.deallocate();
+		Lights.deallocate();
+		ZoneElectric.deallocate();
+		ZoneGas.deallocate();
+		ZoneOtherEq.deallocate();
+		ZoneHWEq.deallocate();
+		ZoneSteamEq.deallocate();
+		ZoneITEq.deallocate();
+		ZoneBBHeat.deallocate();
+		Infiltration.deallocate();
+		Ventilation.deallocate();
+		ZoneAirBalance.deallocate();
+		Mixing.deallocate();
+		CrossMixing.deallocate();
+		RefDoorMixing.deallocate();
+		Blind.deallocate();
+		ComplexShade.deallocate();
+		WindowThermalModel.deallocate();
+		SurfaceScreens.deallocate();
+		ScreenTrans.deallocate();
+		ZoneIntEEuse.deallocate();
+		RefrigCaseCredit.deallocate();
+		HeatReclaimRefrigeratedRack.deallocate();
+		HeatReclaimRefrigCondenser.deallocate();
+		HeatReclaimDXCoil.deallocate();
+		ZnAirRpt.deallocate();
+		TCGlazings.deallocate();
+		ZoneCO2Gen.deallocate();
+		PeopleObjects.deallocate();
+		LightsObjects.deallocate();
+		ZoneElectricObjects.deallocate();
+		ZoneGasObjects.deallocate();
+		HotWaterEqObjects.deallocate();
+		SteamEqObjects.deallocate();
+		OtherEqObjects.deallocate();
+		InfiltrationObjects.deallocate();
+		VentilationObjects.deallocate();
+		ZnRpt.deallocate();
+		MassConservation.deallocate();
+		ZoneAirMassFlow = ZoneAirMassFlowConservation();
+	}
+
 	void
 	CheckAndSetConstructionProperties(
 		int const ConstrNum, // Construction number to be set/checked
@@ -1193,7 +1449,7 @@ namespace DataHeatBalance {
 
 		// maybe it's already there
 		errFlag = false;
-		Found = FindItemInList( "~" + Blind( inBlindNumber ).Name, Blind.Name(), TotBlinds );
+		Found = FindItemInList( "~" + Blind( inBlindNumber ).Name, Blind );
 		if ( Found == 0 ) {
 			// Add a new blind
 			Blind.redimension( ++TotBlinds );
@@ -1737,7 +1993,7 @@ namespace DataHeatBalance {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

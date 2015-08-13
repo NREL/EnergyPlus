@@ -262,7 +262,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		// CompIndex accounting
 		if ( CompIndex == 0 ) {
-			VRFTUNum = FindItemInList( CompName, VRFTU.Name(), NumVRFTU );
+			VRFTUNum = FindItemInList( CompName, VRFTU );
 			if ( VRFTUNum == 0 ) {
 				ShowFatalError( "SimulateVRF: VRF Terminal Unit not found=" + CompName );
 			}
@@ -387,7 +387,7 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		if ( InitLoopEquip ) {
-			VRFNum = FindItemInList( VRFName, VRF.Name(), NumVRFCond );
+			VRFNum = FindItemInList( VRFName, VRF );
 			if ( VRFNum != 0 ) { // if 0, fall through to next
 				{ auto const SELECT_CASE_var( VRFTypeNum );
 				if ( SELECT_CASE_var == TypeOf_HeatPumpVRF ) {
@@ -1188,7 +1188,6 @@ namespace HVACVariableRefrigerantFlow {
 		using WaterManager::SetupTankSupplyComponent;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataSizing::AutoSize;
-		using DataSizing::NumZoneHVACSizing;
 		using DataSizing::ZoneHVACSizing;
 
 		//    USE DataIPShortCuts
@@ -1308,7 +1307,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), TerminalUnitList.Name(), VRFNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), TerminalUnitList, VRFNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1354,7 +1353,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), VRF.Name(), VRFNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), VRF, VRFNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1668,7 +1667,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			VRF( VRFNum ).MinPLR = rNumericArgs( 10 );
 
-			VRF( VRFNum ).MasterZonePtr = FindItemInList( cAlphaArgs( 24 ), Zone.Name(), NumOfZones );
+			VRF( VRFNum ).MasterZonePtr = FindItemInList( cAlphaArgs( 24 ), Zone );
 
 			if ( SameString( cAlphaArgs( 25 ), "LoadPriority" ) ) {
 				VRF( VRFNum ).ThermostatPriority = LoadPriority;
@@ -1703,7 +1702,7 @@ namespace HVACVariableRefrigerantFlow {
 				}
 			}
 
-			VRF( VRFNum ).ZoneTUListPtr = FindItemInList( cAlphaArgs( 27 ), TerminalUnitList.Name(), NumVRFTULists );
+			VRF( VRFNum ).ZoneTUListPtr = FindItemInList( cAlphaArgs( 27 ), TerminalUnitList );
 			if ( VRF( VRFNum ).ZoneTUListPtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\"" );
 				ShowContinueError( cAlphaFieldNames( 27 ) + " = " + cAlphaArgs( 27 ) + " not found." );
@@ -2083,7 +2082,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), VRFTU.Name(), VRFTUNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), VRFTU, VRFTUNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2388,7 +2387,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			VRFTU( VRFTUNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaFieldBlanks( 16 ) ) {
-				VRFTU( VRFTUNum ).HVACSizingIndex = FindItemInList( cAlphaArgs( 16 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
+				VRFTU( VRFTUNum ).HVACSizingIndex = FindItemInList( cAlphaArgs( 16 ), ZoneHVACSizing );
 				if ( VRFTU( VRFTUNum ).HVACSizingIndex == 0 ) {
 					ShowSevereError( cAlphaFieldNames( 16 ) + " = " + cAlphaArgs( 16 ) + " not found." );
 					ShowContinueError( "Occurs in " + cCurrentModuleObject + " = " + VRFTU( VRFTUNum).Name );
@@ -6095,7 +6094,7 @@ namespace HVACVariableRefrigerantFlow {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

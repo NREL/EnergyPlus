@@ -19,6 +19,7 @@
 #include <ObjexxFCL/MArray1.hh>
 #include <ObjexxFCL/Vector2.hh>
 #include <ObjexxFCL/Vector3.hh>
+#include <ObjexxFCL/Vector4.hh>
 
 // C++ Headers
 #include <array>
@@ -278,8 +279,8 @@ public: // Assignment: Array
 	operator =( Vector2< U > const & v )
 	{
 		assert( size_ == 2u );
-		operator ()( 1 ) = v[ 0 ];
-		operator ()( 2 ) = v[ 1 ];
+		operator ()( 1 ) = v.x;
+		operator ()( 2 ) = v.y;
 		return *this;
 	}
 
@@ -290,9 +291,23 @@ public: // Assignment: Array
 	operator =( Vector3< U > const & v )
 	{
 		assert( size_ == 3u );
-		operator ()( 1 ) = v[ 0 ];
-		operator ()( 2 ) = v[ 1 ];
-		operator ()( 3 ) = v[ 2 ];
+		operator ()( 1 ) = v.x;
+		operator ()( 2 ) = v.y;
+		operator ()( 3 ) = v.z;
+		return *this;
+	}
+
+	// Vector4 Assignment Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1S &
+	operator =( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		operator ()( 1 ) = v.x;
+		operator ()( 2 ) = v.y;
+		operator ()( 3 ) = v.z;
+		operator ()( 4 ) = v.w;
 		return *this;
 	}
 
@@ -674,8 +689,8 @@ public: // Assignment: Array
 	operator +=( Vector2< U > const & v )
 	{
 		assert( size_ == 2u );
-		operator ()( 1 ) += v[ 0 ];
-		operator ()( 2 ) += v[ 1 ];
+		operator ()( 1 ) += v.x;
+		operator ()( 2 ) += v.y;
 		return *this;
 	}
 
@@ -686,8 +701,8 @@ public: // Assignment: Array
 	operator -=( Vector2< U > const & v )
 	{
 		assert( size_ == 2u );
-		operator ()( 1 ) -= v[ 0 ];
-		operator ()( 2 ) -= v[ 1 ];
+		operator ()( 1 ) -= v.x;
+		operator ()( 2 ) -= v.y;
 		return *this;
 	}
 
@@ -698,8 +713,8 @@ public: // Assignment: Array
 	operator *=( Vector2< U > const & v )
 	{
 		assert( size_ == 2u );
-		operator ()( 1 ) *= v[ 0 ];
-		operator ()( 2 ) *= v[ 1 ];
+		operator ()( 1 ) *= v.x;
+		operator ()( 2 ) *= v.y;
 		return *this;
 	}
 
@@ -710,10 +725,10 @@ public: // Assignment: Array
 	operator /=( Vector2< U > const & v )
 	{
 		assert( size_ == 2u );
-		assert( v[ 0 ] != T( 0 ) );
-		assert( v[ 1 ] != T( 0 ) );
-		operator ()( 1 ) /= v[ 0 ];
-		operator ()( 2 ) /= v[ 1 ];
+		assert( v.x != T( 0 ) );
+		assert( v.y != T( 0 ) );
+		operator ()( 1 ) /= v.x;
+		operator ()( 2 ) /= v.y;
 		return *this;
 	}
 
@@ -724,9 +739,9 @@ public: // Assignment: Array
 	operator +=( Vector3< U > const & v )
 	{
 		assert( size_ == 3u );
-		operator ()( 1 ) += v[ 0 ];
-		operator ()( 2 ) += v[ 1 ];
-		operator ()( 3 ) += v[ 2 ];
+		operator ()( 1 ) += v.x;
+		operator ()( 2 ) += v.y;
+		operator ()( 3 ) += v.z;
 		return *this;
 	}
 
@@ -737,9 +752,9 @@ public: // Assignment: Array
 	operator -=( Vector3< U > const & v )
 	{
 		assert( size_ == 3u );
-		operator ()( 1 ) -= v[ 0 ];
-		operator ()( 2 ) -= v[ 1 ];
-		operator ()( 3 ) -= v[ 2 ];
+		operator ()( 1 ) -= v.x;
+		operator ()( 2 ) -= v.y;
+		operator ()( 3 ) -= v.z;
 		return *this;
 	}
 
@@ -750,9 +765,9 @@ public: // Assignment: Array
 	operator *=( Vector3< U > const & v )
 	{
 		assert( size_ == 3u );
-		operator ()( 1 ) *= v[ 0 ];
-		operator ()( 2 ) *= v[ 1 ];
-		operator ()( 3 ) *= v[ 2 ];
+		operator ()( 1 ) *= v.x;
+		operator ()( 2 ) *= v.y;
+		operator ()( 3 ) *= v.z;
 		return *this;
 	}
 
@@ -763,12 +778,72 @@ public: // Assignment: Array
 	operator /=( Vector3< U > const & v )
 	{
 		assert( size_ == 3u );
-		assert( v[ 0 ] != T( 0 ) );
-		assert( v[ 1 ] != T( 0 ) );
-		assert( v[ 2 ] != T( 0 ) );
-		operator ()( 1 ) /= v[ 0 ];
-		operator ()( 2 ) /= v[ 1 ];
-		operator ()( 3 ) /= v[ 2 ];
+		assert( v.x != T( 0 ) );
+		assert( v.y != T( 0 ) );
+		assert( v.z != T( 0 ) );
+		operator ()( 1 ) /= v.x;
+		operator ()( 2 ) /= v.y;
+		operator ()( 3 ) /= v.z;
+		return *this;
+	}
+
+	// += Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1S &
+	operator +=( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		operator ()( 1 ) += v.x;
+		operator ()( 2 ) += v.y;
+		operator ()( 3 ) += v.z;
+		operator ()( 4 ) += v.w ;
+		return *this;
+	}
+
+	// -= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1S &
+	operator -=( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		operator ()( 1 ) -= v.x;
+		operator ()( 2 ) -= v.y;
+		operator ()( 3 ) -= v.z;
+		operator ()( 4 ) -= v.w ;
+		return *this;
+	}
+
+	// *= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1S &
+	operator *=( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		operator ()( 1 ) *= v.x;
+		operator ()( 2 ) *= v.y;
+		operator ()( 3 ) *= v.z;
+		operator ()( 4 ) *= v.w ;
+		return *this;
+	}
+
+	// /= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1S &
+	operator /=( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		assert( v.x != T( 0 ) );
+		assert( v.y != T( 0 ) );
+		assert( v.z != T( 0 ) );
+		assert( v.w != T( 0 ) );
+		operator ()( 1 ) /= v.x;
+		operator ()( 2 ) /= v.y;
+		operator ()( 3 ) /= v.z;
+		operator ()( 4 ) /= v.w ;
 		return *this;
 	}
 
@@ -935,8 +1010,8 @@ public: // Assignment: Logical
 	and_equals( Vector2< U > const & v )
 	{
 		assert( size_ == 2u );
-		operator ()( 1 ) = operator ()( 1 ) && v[ 0 ];
-		operator ()( 2 ) = operator ()( 2 ) && v[ 1 ];
+		operator ()( 1 ) = operator ()( 1 ) && v.x;
+		operator ()( 2 ) = operator ()( 2 ) && v.y;
 		return *this;
 	}
 
@@ -947,8 +1022,8 @@ public: // Assignment: Logical
 	or_equals( Vector2< U > const & v )
 	{
 		assert( size_ == 2u );
-		operator ()( 1 ) = operator ()( 1 ) || v[ 0 ];
-		operator ()( 2 ) = operator ()( 2 ) || v[ 1 ];
+		operator ()( 1 ) = operator ()( 1 ) || v.x;
+		operator ()( 2 ) = operator ()( 2 ) || v.y;
 		return *this;
 	}
 
@@ -959,9 +1034,9 @@ public: // Assignment: Logical
 	and_equals( Vector3< U > const & v )
 	{
 		assert( size_ == 3u );
-		operator ()( 1 ) = operator ()( 1 ) && v[ 0 ];
-		operator ()( 2 ) = operator ()( 2 ) && v[ 1 ];
-		operator ()( 3 ) = operator ()( 3 ) && v[ 2 ];
+		operator ()( 1 ) = operator ()( 1 ) && v.x;
+		operator ()( 2 ) = operator ()( 2 ) && v.y;
+		operator ()( 3 ) = operator ()( 3 ) && v.z;
 		return *this;
 	}
 
@@ -972,9 +1047,37 @@ public: // Assignment: Logical
 	or_equals( Vector3< U > const & v )
 	{
 		assert( size_ == 3u );
-		operator ()( 1 ) = operator ()( 1 ) || v[ 0 ];
-		operator ()( 2 ) = operator ()( 2 ) || v[ 1 ];
-		operator ()( 3 ) = operator ()( 3 ) || v[ 2 ];
+		operator ()( 1 ) = operator ()( 1 ) || v.x;
+		operator ()( 2 ) = operator ()( 2 ) || v.y;
+		operator ()( 3 ) = operator ()( 3 ) || v.z;
+		return *this;
+	}
+
+	// &&= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1S &
+	and_equals( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		operator ()( 1 ) = operator ()( 1 ) && v.x;
+		operator ()( 2 ) = operator ()( 2 ) && v.y;
+		operator ()( 3 ) = operator ()( 3 ) && v.z;
+		operator ()( 4 ) = operator ()( 4 ) && v.w;
+		return *this;
+	}
+
+	// ||= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	Array1S &
+	or_equals( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		operator ()( 1 ) = operator ()( 1 ) || v.x;
+		operator ()( 2 ) = operator ()( 2 ) || v.y;
+		operator ()( 3 ) = operator ()( 3 ) || v.z;
+		operator ()( 4 ) = operator ()( 4 ) || v.w;
 		return *this;
 	}
 
@@ -1362,8 +1465,8 @@ public: // MArray Generators
 public: // Comparison: Predicate
 
 	// Slice == Slice
-	inline
 	friend
+	inline
 	bool
 	eq( Array1S const & a, Array1S const & b )
 	{
@@ -1376,8 +1479,8 @@ public: // Comparison: Predicate
 	}
 
 	// Slice != Slice
-	inline
 	friend
+	inline
 	bool
 	ne( Array1S const & a, Array1S const & b )
 	{
@@ -1385,8 +1488,8 @@ public: // Comparison: Predicate
 	}
 
 	// Slice < Slice
-	inline
 	friend
+	inline
 	bool
 	lt( Array1S const & a, Array1S const & b )
 	{
@@ -1399,8 +1502,8 @@ public: // Comparison: Predicate
 	}
 
 	// Slice <= Slice
-	inline
 	friend
+	inline
 	bool
 	le( Array1S const & a, Array1S const & b )
 	{
@@ -1413,8 +1516,8 @@ public: // Comparison: Predicate
 	}
 
 	// Slice > Slice
-	inline
 	friend
+	inline
 	bool
 	gt( Array1S const & a, Array1S const & b )
 	{
@@ -1422,8 +1525,8 @@ public: // Comparison: Predicate
 	}
 
 	// Slice >= Slice
-	inline
 	friend
+	inline
 	bool
 	ge( Array1S const & a, Array1S const & b )
 	{
@@ -1431,8 +1534,8 @@ public: // Comparison: Predicate
 	}
 
 	// Slice == Value
-	inline
 	friend
+	inline
 	bool
 	eq( Array1S const & a, T const & t )
 	{
@@ -1444,8 +1547,8 @@ public: // Comparison: Predicate
 	}
 
 	// Slice != Value
-	inline
 	friend
+	inline
 	bool
 	ne( Array1S const & a, T const & t )
 	{
@@ -1453,8 +1556,8 @@ public: // Comparison: Predicate
 	}
 
 	// Slice < Value
-	inline
 	friend
+	inline
 	bool
 	lt( Array1S const & a, T const & t )
 	{
@@ -1466,8 +1569,8 @@ public: // Comparison: Predicate
 	}
 
 	// Slice <= Value
-	inline
 	friend
+	inline
 	bool
 	le( Array1S const & a, T const & t )
 	{
@@ -1479,8 +1582,8 @@ public: // Comparison: Predicate
 	}
 
 	// Slice > Value
-	inline
 	friend
+	inline
 	bool
 	gt( Array1S const & a, T const & t )
 	{
@@ -1488,8 +1591,8 @@ public: // Comparison: Predicate
 	}
 
 	// Slice >= Value
-	inline
 	friend
+	inline
 	bool
 	ge( Array1S const & a, T const & t )
 	{
@@ -1497,8 +1600,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value == Slice
-	inline
 	friend
+	inline
 	bool
 	eq( T const & t, Array1S const & a )
 	{
@@ -1506,8 +1609,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value != Slice
-	inline
 	friend
+	inline
 	bool
 	ne( T const & t, Array1S const & a )
 	{
@@ -1515,8 +1618,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value < Slice
-	inline
 	friend
+	inline
 	bool
 	lt( T const & t, Array1S const & a )
 	{
@@ -1528,8 +1631,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value <= Slice
-	inline
 	friend
+	inline
 	bool
 	le( T const & t, Array1S const & a )
 	{
@@ -1541,8 +1644,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value > Slice
-	inline
 	friend
+	inline
 	bool
 	gt( T const & t, Array1S const & a )
 	{
@@ -1550,8 +1653,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value >= Slice
-	inline
 	friend
+	inline
 	bool
 	ge( T const & t, Array1S const & a )
 	{
@@ -1561,8 +1664,8 @@ public: // Comparison: Predicate
 public: // Comparison: Predicate: Any
 
 	// Any Slice == Slice
-	inline
 	friend
+	inline
 	bool
 	any_eq( Array1S const & a, Array1S const & b )
 	{
@@ -1576,8 +1679,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Slice != Slice
-	inline
 	friend
+	inline
 	bool
 	any_ne( Array1S const & a, Array1S const & b )
 	{
@@ -1585,8 +1688,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Slice < Slice
-	inline
 	friend
+	inline
 	bool
 	any_lt( Array1S const & a, Array1S const & b )
 	{
@@ -1600,8 +1703,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Slice <= Slice
-	inline
 	friend
+	inline
 	bool
 	any_le( Array1S const & a, Array1S const & b )
 	{
@@ -1615,8 +1718,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Slice > Slice
-	inline
 	friend
+	inline
 	bool
 	any_gt( Array1S const & a, Array1S const & b )
 	{
@@ -1624,8 +1727,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Slice >= Slice
-	inline
 	friend
+	inline
 	bool
 	any_ge( Array1S const & a, Array1S const & b )
 	{
@@ -1633,8 +1736,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Slice == Value
-	inline
 	friend
+	inline
 	bool
 	any_eq( Array1S const & a, T const & t )
 	{
@@ -1646,8 +1749,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Slice != Value
-	inline
 	friend
+	inline
 	bool
 	any_ne( Array1S const & a, T const & t )
 	{
@@ -1655,8 +1758,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Slice < Value
-	inline
 	friend
+	inline
 	bool
 	any_lt( Array1S const & a, T const & t )
 	{
@@ -1668,8 +1771,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Slice <= Value
-	inline
 	friend
+	inline
 	bool
 	any_le( Array1S const & a, T const & t )
 	{
@@ -1681,8 +1784,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Slice > Value
-	inline
 	friend
+	inline
 	bool
 	any_gt( Array1S const & a, T const & t )
 	{
@@ -1690,8 +1793,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Slice >= Value
-	inline
 	friend
+	inline
 	bool
 	any_ge( Array1S const & a, T const & t )
 	{
@@ -1699,8 +1802,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value == Slice
-	inline
 	friend
+	inline
 	bool
 	any_eq( T const & t, Array1S const & a )
 	{
@@ -1708,8 +1811,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value != Slice
-	inline
 	friend
+	inline
 	bool
 	any_ne( T const & t, Array1S const & a )
 	{
@@ -1717,8 +1820,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value < Slice
-	inline
 	friend
+	inline
 	bool
 	any_lt( T const & t, Array1S const & a )
 	{
@@ -1730,8 +1833,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value <= Slice
-	inline
 	friend
+	inline
 	bool
 	any_le( T const & t, Array1S const & a )
 	{
@@ -1743,8 +1846,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value > Slice
-	inline
 	friend
+	inline
 	bool
 	any_gt( T const & t, Array1S const & a )
 	{
@@ -1752,8 +1855,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value >= Slice
-	inline
 	friend
+	inline
 	bool
 	any_ge( T const & t, Array1S const & a )
 	{
@@ -1763,8 +1866,8 @@ public: // Comparison: Predicate: Any
 public: // Comparison: Predicate: All
 
 	// All Slice == Slice
-	inline
 	friend
+	inline
 	bool
 	all_eq( Array1S const & a, Array1S const & b )
 	{
@@ -1772,8 +1875,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Slice != Slice
-	inline
 	friend
+	inline
 	bool
 	all_ne( Array1S const & a, Array1S const & b )
 	{
@@ -1781,8 +1884,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Slice < Slice
-	inline
 	friend
+	inline
 	bool
 	all_lt( Array1S const & a, Array1S const & b )
 	{
@@ -1790,8 +1893,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Slice <= Slice
-	inline
 	friend
+	inline
 	bool
 	all_le( Array1S const & a, Array1S const & b )
 	{
@@ -1799,8 +1902,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Slice > Slice
-	inline
 	friend
+	inline
 	bool
 	all_gt( Array1S const & a, Array1S const & b )
 	{
@@ -1808,8 +1911,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Slice >= Slice
-	inline
 	friend
+	inline
 	bool
 	all_ge( Array1S const & a, Array1S const & b )
 	{
@@ -1817,8 +1920,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Slice == Value
-	inline
 	friend
+	inline
 	bool
 	all_eq( Array1S const & a, T const & t )
 	{
@@ -1826,8 +1929,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Slice != Value
-	inline
 	friend
+	inline
 	bool
 	all_ne( Array1S const & a, T const & t )
 	{
@@ -1835,8 +1938,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Slice < Value
-	inline
 	friend
+	inline
 	bool
 	all_lt( Array1S const & a, T const & t )
 	{
@@ -1844,8 +1947,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Slice <= Value
-	inline
 	friend
+	inline
 	bool
 	all_le( Array1S const & a, T const & t )
 	{
@@ -1853,8 +1956,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Slice > Value
-	inline
 	friend
+	inline
 	bool
 	all_gt( Array1S const & a, T const & t )
 	{
@@ -1862,8 +1965,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Slice >= Value
-	inline
 	friend
+	inline
 	bool
 	all_ge( Array1S const & a, T const & t )
 	{
@@ -1871,8 +1974,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value == Slice
-	inline
 	friend
+	inline
 	bool
 	all_eq( T const & t, Array1S const & a )
 	{
@@ -1880,8 +1983,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value != Slice
-	inline
 	friend
+	inline
 	bool
 	all_ne( T const & t, Array1S const & a )
 	{
@@ -1889,8 +1992,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value < Slice
-	inline
 	friend
+	inline
 	bool
 	all_lt( T const & t, Array1S const & a )
 	{
@@ -1898,8 +2001,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value <= Slice
-	inline
 	friend
+	inline
 	bool
 	all_le( T const & t, Array1S const & a )
 	{
@@ -1907,8 +2010,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value > Slice
-	inline
 	friend
+	inline
 	bool
 	all_gt( T const & t, Array1S const & a )
 	{
@@ -1916,8 +2019,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value >= Slice
-	inline
 	friend
+	inline
 	bool
 	all_ge( T const & t, Array1S const & a )
 	{
@@ -1927,8 +2030,8 @@ public: // Comparison: Predicate: All
 public: // Comparison: Count
 
 	// Count Slice == Slice
-	inline
 	friend
+	inline
 	size_type
 	count_eq( Array1S const & a, Array1S const & b )
 	{
@@ -1943,8 +2046,8 @@ public: // Comparison: Count
 	}
 
 	// Count Slice != Slice
-	inline
 	friend
+	inline
 	size_type
 	count_ne( Array1S const & a, Array1S const & b )
 	{
@@ -1959,8 +2062,8 @@ public: // Comparison: Count
 	}
 
 	// Count Slice < Slice
-	inline
 	friend
+	inline
 	size_type
 	count_lt( Array1S const & a, Array1S const & b )
 	{
@@ -1975,8 +2078,8 @@ public: // Comparison: Count
 	}
 
 	// Count Slice <= Slice
-	inline
 	friend
+	inline
 	size_type
 	count_le( Array1S const & a, Array1S const & b )
 	{
@@ -1991,8 +2094,8 @@ public: // Comparison: Count
 	}
 
 	// Count Slice > Slice
-	inline
 	friend
+	inline
 	size_type
 	count_gt( Array1S const & a, Array1S const & b )
 	{
@@ -2007,8 +2110,8 @@ public: // Comparison: Count
 	}
 
 	// Count Slice >= Slice
-	inline
 	friend
+	inline
 	size_type
 	count_ge( Array1S const & a, Array1S const & b )
 	{
@@ -2023,8 +2126,8 @@ public: // Comparison: Count
 	}
 
 	// Count Slice == Value
-	inline
 	friend
+	inline
 	size_type
 	count_eq( Array1S const & a, T const & t )
 	{
@@ -2037,8 +2140,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value == Slice
-	inline
 	friend
+	inline
 	size_type
 	count_eq( T const & t, Array1S const & a )
 	{
@@ -2046,8 +2149,8 @@ public: // Comparison: Count
 	}
 
 	// Count Slice != Value
-	inline
 	friend
+	inline
 	size_type
 	count_ne( Array1S const & a, T const & t )
 	{
@@ -2060,8 +2163,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value != Slice
-	inline
 	friend
+	inline
 	size_type
 	count_ne( T const & t, Array1S const & a )
 	{
@@ -2069,8 +2172,8 @@ public: // Comparison: Count
 	}
 
 	// Count Slice < Value
-	inline
 	friend
+	inline
 	size_type
 	count_lt( Array1S const & a, T const & t )
 	{
@@ -2083,8 +2186,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value < Slice
-	inline
 	friend
+	inline
 	size_type
 	count_lt( T const & t, Array1S const & a )
 	{
@@ -2092,8 +2195,8 @@ public: // Comparison: Count
 	}
 
 	// Count Slice <= Value
-	inline
 	friend
+	inline
 	size_type
 	count_le( Array1S const & a, T const & t )
 	{
@@ -2106,8 +2209,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value <= Slice
-	inline
 	friend
+	inline
 	size_type
 	count_le( T const & t, Array1S const & a )
 	{
@@ -2115,8 +2218,8 @@ public: // Comparison: Count
 	}
 
 	// Count Slice > Value
-	inline
 	friend
+	inline
 	size_type
 	count_gt( Array1S const & a, T const & t )
 	{
@@ -2129,8 +2232,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value > Slice
-	inline
 	friend
+	inline
 	size_type
 	count_gt( T const & t, Array1S const & a )
 	{
@@ -2138,8 +2241,8 @@ public: // Comparison: Count
 	}
 
 	// Count Slice >= Value
-	inline
 	friend
+	inline
 	size_type
 	count_ge( Array1S const & a, T const & t )
 	{
@@ -2152,8 +2255,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value >= Slice
-	inline
 	friend
+	inline
 	size_type
 	count_ge( T const & t, Array1S const & a )
 	{
@@ -2164,8 +2267,8 @@ public: // Comparison: Predicate: MArray
 
 	// Array1S == MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	eq( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2179,8 +2282,8 @@ public: // Comparison: Predicate: MArray
 
 	// Array1S != MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	ne( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2189,8 +2292,8 @@ public: // Comparison: Predicate: MArray
 
 	// Array1S < MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	lt( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2204,8 +2307,8 @@ public: // Comparison: Predicate: MArray
 
 	// Array1S <= MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	le( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2219,8 +2322,8 @@ public: // Comparison: Predicate: MArray
 
 	// Array1S > MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	gt( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2234,8 +2337,8 @@ public: // Comparison: Predicate: MArray
 
 	// Array1S >= MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	ge( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2249,8 +2352,8 @@ public: // Comparison: Predicate: MArray
 
 	// MArray1 == Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	eq( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2259,8 +2362,8 @@ public: // Comparison: Predicate: MArray
 
 	// MArray1 != Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	ne( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2269,8 +2372,8 @@ public: // Comparison: Predicate: MArray
 
 	// MArray1 < Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	lt( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2279,8 +2382,8 @@ public: // Comparison: Predicate: MArray
 
 	// MArray1 <= Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	le( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2289,8 +2392,8 @@ public: // Comparison: Predicate: MArray
 
 	// MArray1 > Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	gt( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2299,8 +2402,8 @@ public: // Comparison: Predicate: MArray
 
 	// MArray1 >= Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	ge( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2311,8 +2414,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any Array1S == MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_eq( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2326,8 +2429,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any Array1S != MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_ne( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2336,8 +2439,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any Array1S < MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_lt( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2351,8 +2454,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any Array1S <= MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_le( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2366,8 +2469,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any Array1S > MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_gt( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2381,8 +2484,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any Array1S >= MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_ge( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2396,8 +2499,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any MArray1 == Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_eq( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2406,8 +2509,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any MArray1 != Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_ne( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2416,8 +2519,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any MArray1 < Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_lt( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2426,8 +2529,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any MArray1 <= Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_le( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2436,8 +2539,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any MArray1 > Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_gt( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2446,8 +2549,8 @@ public: // Comparison: Predicate: Any: MArray
 
 	// Any MArray1 >= Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	any_ge( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2458,8 +2561,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All Array1S == MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_eq( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2468,8 +2571,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All Array1S != MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_ne( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2478,8 +2581,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All Array1S < MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_lt( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2488,8 +2591,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All Array1S <= MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_le( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2498,8 +2601,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All Array1S > MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_gt( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2508,8 +2611,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All Array1S >= MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_ge( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2518,8 +2621,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All MArray1 == Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_eq( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2528,8 +2631,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All MArray1 != Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_ne( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2538,8 +2641,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All MArray1 < Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_lt( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2548,8 +2651,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All MArray1 <= Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_le( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2558,8 +2661,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All MArray1 > Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_gt( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2568,8 +2671,8 @@ public: // Comparison: Predicate: All: MArray
 
 	// All MArray1 >= Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	bool
 	all_ge( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2580,8 +2683,8 @@ public: // Comparison: Count: MArray
 
 	// Count Array1S == MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_eq( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2596,8 +2699,8 @@ public: // Comparison: Count: MArray
 
 	// Count Array1S != MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_ne( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2612,8 +2715,8 @@ public: // Comparison: Count: MArray
 
 	// Count Array1S < MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_lt( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2628,8 +2731,8 @@ public: // Comparison: Count: MArray
 
 	// Count Array1S <= MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_le( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2644,8 +2747,8 @@ public: // Comparison: Count: MArray
 
 	// Count Array1S > MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_gt( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2660,8 +2763,8 @@ public: // Comparison: Count: MArray
 
 	// Count Array1S >= MArray1
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_ge( Array1S const & a, MArray1< A, T > const & b )
 	{
@@ -2676,8 +2779,8 @@ public: // Comparison: Count: MArray
 
 	// Count MArray1 == Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_eq( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2686,8 +2789,8 @@ public: // Comparison: Count: MArray
 
 	// Count MArray1 != Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_ne( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2696,8 +2799,8 @@ public: // Comparison: Count: MArray
 
 	// Count MArray1 < Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_lt( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2706,8 +2809,8 @@ public: // Comparison: Count: MArray
 
 	// Count MArray1 <= Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_le( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2716,8 +2819,8 @@ public: // Comparison: Count: MArray
 
 	// Count MArray1 > Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_gt( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2726,8 +2829,8 @@ public: // Comparison: Count: MArray
 
 	// Count MArray1 >= Array1S
 	template< class A >
-	inline
 	friend
+	inline
 	size_type
 	count_ge( MArray1< A, T > const & a, Array1S const & b )
 	{
@@ -2836,6 +2939,102 @@ distance( Array1S< T > const & a, Array1S< T > const & b )
 	return std::sqrt( distance_sq );
 }
 
+// Distance
+template< class A, typename T >
+inline
+T
+distance( Array1S< T > const & a, MArray1< A, T > const & b )
+{
+	assert( a.size() == b.size() );
+	T distance_sq( T( 0 ) );
+	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
+		T const distance_i( a( i ) - b( j ) );
+		distance_sq += distance_i * distance_i;
+	}
+	return std::sqrt( distance_sq );
+}
+
+// Distance
+template< class A, typename T >
+inline
+T
+distance( MArray1< A, T > const & a, Array1S< T > const & b )
+{
+	return distance( b, a );
+}
+
+// Distance
+template< typename T >
+inline
+T
+distance( Array1S< T > const & a, Vector2< T > const & b )
+{
+	assert( a.size() == 2u );
+	T distance_sq( T( 0 ) );
+	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
+		T const distance_i( a( i ) - b( j ) );
+		distance_sq += distance_i * distance_i;
+	}
+	return std::sqrt( distance_sq );
+}
+
+// Distance
+template< typename T >
+inline
+T
+distance( Vector2< T > const & a, Array1S< T > const & b )
+{
+	return distance( b, a );
+}
+
+// Distance
+template< typename T >
+inline
+T
+distance( Array1S< T > const & a, Vector3< T > const & b )
+{
+	assert( a.size() == 3u );
+	T distance_sq( T( 0 ) );
+	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
+		T const distance_i( a( i ) - b( j ) );
+		distance_sq += distance_i * distance_i;
+	}
+	return std::sqrt( distance_sq );
+}
+
+// Distance
+template< typename T >
+inline
+T
+distance( Vector3< T > const & a, Array1S< T > const & b )
+{
+	return distance( b, a );
+}
+
+// Distance
+template< typename T >
+inline
+T
+distance( Array1S< T > const & a, Vector4< T > const & b )
+{
+	assert( a.size() == 4u );
+	T distance_sq( T( 0 ) );
+	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
+		T const distance_i( a( i ) - b( j ) );
+		distance_sq += distance_i * distance_i;
+	}
+	return std::sqrt( distance_sq );
+}
+
+// Distance
+template< typename T >
+inline
+T
+distance( Vector4< T > const & a, Array1S< T > const & b )
+{
+	return distance( b, a );
+}
+
 // Distance Squared
 template< typename T >
 inline
@@ -2849,6 +3048,102 @@ distance_squared( Array1S< T > const & a, Array1S< T > const & b )
 		distance_sq += distance_i * distance_i;
 	}
 	return distance_sq;
+}
+
+// Distance Squared
+template< class A, typename T >
+inline
+T
+distance_squared( Array1S< T > const & a, MArray1< A, T > const & b )
+{
+	assert( a.size() == b.size() );
+	T distance_sq( T( 0 ) );
+	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
+		T const distance_i( a( i ) - b( j ) );
+		distance_sq += distance_i * distance_i;
+	}
+	return distance_sq;
+}
+
+// Distance Squared
+template< class A, typename T >
+inline
+T
+distance_squared( MArray1< A, T > const & a, Array1S< T > const & b )
+{
+	return distance_squared( b, a );
+}
+
+// Distance Squared
+template< typename T >
+inline
+T
+distance_squared( Array1S< T > const & a, Vector2< T > const & b )
+{
+	assert( a.size() == 2u );
+	T distance_sq( T( 0 ) );
+	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
+		T const distance_i( a( i ) - b( j ) );
+		distance_sq += distance_i * distance_i;
+	}
+	return distance_sq;
+}
+
+// Distance Squared
+template< typename T >
+inline
+T
+distance_squared( Vector2< T > const & a, Array1S< T > const & b )
+{
+	return distance_squared( b, a );
+}
+
+// Distance Squared
+template< typename T >
+inline
+T
+distance_squared( Array1S< T > const & a, Vector3< T > const & b )
+{
+	assert( a.size() == 3u );
+	T distance_sq( T( 0 ) );
+	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
+		T const distance_i( a( i ) - b( j ) );
+		distance_sq += distance_i * distance_i;
+	}
+	return distance_sq;
+}
+
+// Distance Squared
+template< typename T >
+inline
+T
+distance_squared( Vector3< T > const & a, Array1S< T > const & b )
+{
+	return distance_squared( b, a );
+}
+
+// Distance Squared
+template< typename T >
+inline
+T
+distance_squared( Array1S< T > const & a, Vector4< T > const & b )
+{
+	assert( a.size() == 4u );
+	T distance_sq( T( 0 ) );
+	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
+		T const distance_i( a( i ) - b( j ) );
+		distance_sq += distance_i * distance_i;
+	}
+	return distance_sq;
+}
+
+// Distance Squared
+template< typename T >
+inline
+T
+distance_squared( Vector4< T > const & a, Array1S< T > const & b )
+{
+	return distance_squared( b, a );
 }
 
 // Dot Product
@@ -2930,6 +3225,75 @@ dot( MArray1< A, bool > const & a, Array1S< bool > const & b )
 	return dot( b, a );
 }
 
+// Dot Product with Vector2
+template< typename T >
+inline
+T
+dot( Array1S< T > const & a, Vector2< T > const & b )
+{
+	assert( a.size() == 2u );
+	T result( T( 0 ) );
+	for ( int i = 1, e = a.u(); i <= e; ++i ) {
+		result += a( i ) * b( i );
+	}
+	return result;
+}
+
+// Dot Product with Vector2
+template< typename T >
+inline
+T
+dot( Vector2< T > const & a, Array1S< T > const & b )
+{
+	return dot( b, a );
+}
+
+// Dot Product with Vector3
+template< typename T >
+inline
+T
+dot( Array1S< T > const & a, Vector3< T > const & b )
+{
+	assert( a.size() == 3u );
+	T result( T( 0 ) );
+	for ( int i = 1, e = a.u(); i <= e; ++i ) {
+		result += a( i ) * b( i );
+	}
+	return result;
+}
+
+// Dot Product with Vector3
+template< typename T >
+inline
+T
+dot( Vector3< T > const & a, Array1S< T > const & b )
+{
+	return dot( b, a );
+}
+
+// Dot Product with Vector4
+template< typename T >
+inline
+T
+dot( Array1S< T > const & a, Vector4< T > const & b )
+{
+	assert( a.size() == 4u );
+	T result( T( 0 ) );
+	for ( int i = 1, e = a.u(); i <= e; ++i ) {
+		result += a( i ) * b( i );
+	}
+	return result;
+}
+
+// Dot Product with Vector4
+template< typename T >
+inline
+T
+dot( Vector4< T > const & a, Array1S< T > const & b )
+{
+	return dot( b, a );
+}
+
 // Dot Product (Fortran Intrinsic Name)
 template< typename T >
 inline
@@ -2981,6 +3345,36 @@ bool
 dot_product( MArray1< A, bool > const & a, Array1S< bool > const & b )
 {
 	return dot( b, a );
+}
+
+// Cross Product of 2-Tuples
+template< typename T >
+inline
+T
+cross2( Array1S< T > const & a, Array1S< T > const & b )
+{
+	assert( conformable( a, b ) );
+	assert( a.size() == 2u );
+	return ( a[ 0 ] * b[ 1 ] ) - ( a[ 1 ] * b[ 0 ] );
+}
+
+// Cross Product of 2-Tuples
+template< typename T >
+inline
+T
+cross2( Array1S< T > const & a, Vector2< T > const & b )
+{
+	assert( a.size() == 2u );
+	return ( a[ 0 ] * b.y ) - ( a[ 1 ] * b.x );
+}
+
+// Cross Product of 2-Tuples
+template< typename T >
+inline
+T
+cross2( Vector2< T > const & a, Array1S< T > const & b )
+{
+	return cross2( b, a );
 }
 
 // Stream >> Array1S

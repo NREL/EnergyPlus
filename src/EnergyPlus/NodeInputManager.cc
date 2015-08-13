@@ -90,6 +90,25 @@ namespace NodeInputManager {
 
 	// Functions
 
+	// Clears the global data in NodeInputManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumOfNodeLists = 0;
+		NumOfUniqueNodeNames = 0;
+		GetNodeInputFlag = true;
+		TmpNodeID.deallocate();
+		NodeRef.deallocate();
+		CurCheckContextName = std::string();
+		UniqueNodeNames.deallocate();
+		NumCheckNodes = 0;
+		MaxCheckNodes = 0;
+		NodeVarsSetup = false;
+		NodeWetBulbRepReq.deallocate();
+		NodeLists.deallocate();
+	}
+
 	void
 	GetNodeNums(
 		std::string const & Name, // Name for which to obtain information
@@ -167,7 +186,7 @@ namespace NodeInputManager {
 		}
 
 		if ( not_blank( Name ) ) {
-			ThisOne = FindItemInList( Name, NodeLists.Name(), NumOfNodeLists );
+			ThisOne = FindItemInList( Name, NodeLists );
 			if ( ThisOne != 0 ) {
 				NumNodes = NodeLists( ThisOne ).NumOfNodesInList;
 				NodeNumbers( {1,NumNodes} ) = NodeLists( ThisOne ).NodeNumbers( {1,NumNodes} );
@@ -280,7 +299,7 @@ namespace NodeInputManager {
 
 		Try = 0;
 		if ( NumOfNodeLists > 0 ) {
-			Try = FindItemInList( Name, NodeLists( {1,NumOfNodeLists} ).Name(), NumOfNodeLists );
+			Try = FindItemInList( Name, NodeLists );
 		}
 
 		if ( Try != 0 ) {
@@ -510,7 +529,7 @@ namespace NodeInputManager {
 			GetObjectItem( CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphas( 1 ), NodeLists.Name(), NCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( cAlphas( 1 ), NodeLists, NCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				continue;
@@ -1332,7 +1351,7 @@ namespace NodeInputManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

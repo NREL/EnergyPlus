@@ -167,7 +167,7 @@ namespace PipeHeatTransfer {
 		}
 
 		if ( EqNum == 0 ) {
-			PipeHTNum = FindItemInList( EquipName, PipeHT.Name(), NumOfPipeHT );
+			PipeHTNum = FindItemInList( EquipName, PipeHT );
 			if ( PipeHTNum == 0 ) {
 				ShowFatalError( "SimPipeHeatTransfer: Pipe:heat transfer requested not found=" + EquipName ); // Catch any bad names before crashing
 			}
@@ -254,14 +254,11 @@ namespace PipeHeatTransfer {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataGlobals::NumOfZones;
 		using DataGlobals::SecInHour;
 		using DataGlobals::Pi;
 		using DataHeatBalance::Construct;
-		using DataHeatBalance::TotConstructs;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::Material;
-		using DataHeatBalance::TotMaterials;
 		using DataHeatBalance::IntGainTypeOf_PipeIndoor;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
@@ -336,7 +333,7 @@ namespace PipeHeatTransfer {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipeHT.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), PipeHT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -346,7 +343,7 @@ namespace PipeHeatTransfer {
 
 			// General user input data
 			PipeHT( Item ).Construction = cAlphaArgs( 2 );
-			PipeHT( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+			PipeHT( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct );
 
 			if ( PipeHT( Item ).ConstructionNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
@@ -386,7 +383,7 @@ namespace PipeHeatTransfer {
 			if ( SELECT_CASE_var == "ZONE" ) {
 				PipeHT( Item ).EnvironmentPtr = ZoneEnv;
 				PipeHT( Item ).EnvrZone = cAlphaArgs( 6 );
-				PipeHT( Item ).EnvrZonePtr = FindItemInList( cAlphaArgs( 6 ), Zone.Name(), NumOfZones );
+				PipeHT( Item ).EnvrZonePtr = FindItemInList( cAlphaArgs( 6 ), Zone );
 				if ( PipeHT( Item ).EnvrZonePtr == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -450,7 +447,7 @@ namespace PipeHeatTransfer {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipeHT.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), PipeHT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -460,7 +457,7 @@ namespace PipeHeatTransfer {
 
 			// General user input data
 			PipeHT( Item ).Construction = cAlphaArgs( 2 );
-			PipeHT( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+			PipeHT( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct );
 
 			if ( PipeHT( Item ).ConstructionNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
@@ -543,7 +540,7 @@ namespace PipeHeatTransfer {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipeHT.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), PipeHT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -553,7 +550,7 @@ namespace PipeHeatTransfer {
 
 			// General user input data
 			PipeHT( Item ).Construction = cAlphaArgs( 2 );
-			PipeHT( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+			PipeHT( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct );
 
 			if ( PipeHT( Item ).ConstructionNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
@@ -618,7 +615,7 @@ namespace PipeHeatTransfer {
 			// Also get the soil material name
 			// A7,  \field Soil Material
 			PipeHT( Item ).SoilMaterial = cAlphaArgs( 6 );
-			PipeHT( Item ).SoilMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material.Name(), TotMaterials );
+			PipeHT( Item ).SoilMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material );
 			if ( PipeHT( Item ).SoilMaterialNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + PipeHT( Item ).SoilMaterial );
 				ShowContinueError( "Found in " + cCurrentModuleObject + '=' + PipeHT( Item ).Name );
@@ -898,8 +895,6 @@ namespace PipeHeatTransfer {
 		using DataEnvironment::PubGroundTempSurface;
 		using DataEnvironment::PubGroundTempSurfFlag;
 		using DataLoopNode::Node;
-		using DataHeatBalance::TotConstructs;
-		using DataHeatBalance::TotMaterials;
 		using DataHeatBalance::Construct;
 		using DataHeatBalance::Material;
 		using DataHeatBalFanSys::MAT; // average (mean) zone air temperature [C]
@@ -1241,7 +1236,7 @@ namespace PipeHeatTransfer {
 		}
 
 		if ( PipeNum == 0 ) {
-			PipeNum = FindItemInList( PipeName, PipeHT.Name(), NumOfPipeHT );
+			PipeNum = FindItemInList( PipeName, PipeHT );
 			if ( PipeNum == 0 ) {
 				ShowFatalError( "SimPipes: Pipe requested not found =" + PipeName ); // Catch any bad names before crashing
 			}
@@ -2134,7 +2129,7 @@ namespace PipeHeatTransfer {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

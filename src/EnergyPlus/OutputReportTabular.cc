@@ -562,7 +562,7 @@ namespace OutputReportTabular {
 			IsNotOK = false;
 			IsBlank = false;
 			if ( TabNum - 1 > 0 ) {
-				VerifyName( AlphArray( 1 ), MonthlyInput.name(), TabNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), MonthlyInput, &MonthlyInputType::name, TabNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "RTMBLANK";
@@ -6747,6 +6747,8 @@ namespace OutputReportTabular {
 				}
 			}
 
+			collapsedTotal(6) = WaterConversionFunct(collapsedTotal(6), waterConversionFactor);
+
 			// convert to GJ
 			gatherPowerFuelFireGen /= largeConversionFactor;
 			gatherPowerPV /= largeConversionFactor;
@@ -7230,7 +7232,7 @@ namespace OutputReportTabular {
 					curTotal += useVal( iResource, jUse );
 				}
 				if ( abs( curTotal - collapsedTotal( iResource ) ) > ( collapsedTotal( iResource ) * 0.001 )) {
-					ShowWarningError( "In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: " + columnHead( 1 ) );
+					ShowWarningError(ResourceWarningMessage(columnHead(iResource)));
 				}
 			}
 
@@ -7945,6 +7947,18 @@ namespace OutputReportTabular {
 			//CALL WriteTextLine('Note 2: The source energy conversion factors used are: ')
 			//CALL WriteTextLine('        1.05 for all fuels, 1 for district, and 3 for electricity.')
 		}
+	}
+
+	std::string
+	ResourceWarningMessage(std::string resource)
+	{
+		return "In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: " + resource;
+	}
+
+	Real64
+	WaterConversionFunct(Real64 WaterTotal, Real64 ConversionFactor)
+	{
+		return WaterTotal / ConversionFactor;
 	}
 
 	void
@@ -14344,7 +14358,7 @@ Label900: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of
 	//     Berkeley National Laboratory.  All rights reserved.
 

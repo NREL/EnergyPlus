@@ -199,7 +199,7 @@ namespace HVACDXSystem {
 
 		// Find the correct DXSystemNumber
 		if ( CompIndex == 0 ) {
-			DXSystemNum = FindItemInList( DXCoolingSystemName, DXCoolingSystem.Name(), NumDXSystem );
+			DXSystemNum = FindItemInList( DXCoolingSystemName, DXCoolingSystem );
 			if ( DXSystemNum == 0 ) {
 				ShowFatalError( "SimDXCoolingSystem: DXUnit not found=" + DXCoolingSystemName );
 			}
@@ -377,7 +377,7 @@ namespace HVACDXSystem {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoolingSystem.Name(), DXCoolSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoolingSystem, DXCoolSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2930,7 +2930,7 @@ namespace HVACDXSystem {
 
 		DXCoolSysNum = 0;
 		if ( NumDXSystem > 0 ) {
-			DXCoolSysNum = FindItemInList( DXCoilSysName, DXCoolingSystem.Name(), NumDXSystem );
+			DXCoolSysNum = FindItemInList( DXCoilSysName, DXCoolingSystem );
 			if ( DXCoolSysNum > 0 && DXCoolingSystem( DXCoolSysNum ).ISHundredPercentDOASDXCoil ) {
 				//DXCoolingSystem(DXCoolSysNum)%ISHundredPercentDOASDXCoil = .TRUE.
 				SetDXCoilTypeData( DXCoolingSystem( DXCoolSysNum ).CoolingCoilName );
@@ -2985,7 +2985,7 @@ namespace HVACDXSystem {
 
 		DXCoolSysNum = 0;
 		if ( NumDXSystem > 0 ) {
-			DXCoolSysNum = FindItemInList( DXCoilSysName, DXCoolingSystem.Name(), NumDXSystem );
+			DXCoolSysNum = FindItemInList( DXCoilSysName, DXCoolingSystem );
 			if ( DXCoolSysNum > 0 && DXCoolSysNum <= NumDXSystem ) {
 				CoolCoilType = DXCoolingSystem( DXCoolSysNum ).CoolingCoilType_Num;
 				CoolCoilIndex = DXCoolingSystem( DXCoolSysNum ).CoolingCoilIndex;
@@ -3269,7 +3269,7 @@ namespace HVACDXSystem {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

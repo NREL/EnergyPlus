@@ -161,7 +161,7 @@ namespace HeatPumpWaterToWaterSimple {
 		}
 
 		if ( InitLoopEquip ) {
-			GSHPNum = FindItemInList( GSHPName, GSHP.Name(), NumGSHPs );
+			GSHPNum = FindItemInList( GSHPName, GSHP );
 			if ( GSHPNum != 0 ) { // if 0, fall through to next
 				if ( GSHPTypeNum == TypeOf_HPWaterEFCooling ) {
 					MinCap = 0.0;
@@ -296,7 +296,7 @@ namespace HeatPumpWaterToWaterSimple {
 			GetObjectItem( HPEqFitCoolingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			IsNotOK = false;
 			IsBlank = true;
-			VerifyName( AlphArray( 1 ), GSHP.Name(), HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
+			VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -348,7 +348,7 @@ namespace HeatPumpWaterToWaterSimple {
 			GetObjectItem( HPEqFitHeatingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			IsNotOK = false;
 			IsBlank = true;
-			VerifyName( AlphArray( 1 ), GSHP.Name(), HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
+			VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;

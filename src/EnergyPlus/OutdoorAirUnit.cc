@@ -211,7 +211,7 @@ namespace OutdoorAirUnit {
 		// Find the correct Outdoor Air Unit
 
 		if ( CompIndex == 0 ) {
-			OAUnitNum = FindItemInList( CompName, OutAirUnit.Name(), NumOfOAUnits );
+			OAUnitNum = FindItemInList( CompName, OutAirUnit );
 			if ( OAUnitNum == 0 ) {
 				ShowFatalError( "ZoneHVAC:OutdoorAirUnit not found=" + CompName );
 			}
@@ -276,7 +276,6 @@ namespace OutdoorAirUnit {
 		using SteamCoils::GetSteamCoilIndex;
 		using SteamCoils::GetCoilSteamInletNode;
 		using FluidProperties::FindRefrigerant;
-		using DataGlobals::NumOfZones;
 		using DataGlobals::ScheduleAlwaysOn;
 		using DataHeatBalance::Zone;
 		using DataSizing::AutoSize;
@@ -379,7 +378,7 @@ namespace OutdoorAirUnit {
 			GetObjectItem( CurrentModuleObject, OAUnitNum, cAlphaArgs, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), OutAirUnit.Name(), OAUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), OutAirUnit, OAUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -403,7 +402,7 @@ namespace OutdoorAirUnit {
 
 			//A3
 			OutAirUnit( OAUnitNum ).ZoneName = cAlphaArgs( 3 );
-			OutAirUnit( OAUnitNum ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
+			OutAirUnit( OAUnitNum ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone );
 
 			if ( OutAirUnit( OAUnitNum ).ZonePtr == 0 ) {
 				if ( lAlphaBlanks( 3 ) ) {
@@ -428,7 +427,7 @@ namespace OutdoorAirUnit {
 
 			//A5
 			OutAirUnit( OAUnitNum ).SFanName = cAlphaArgs( 5 );
-			VerifyName( cAlphaArgs( 5 ), OutAirUnit.SFanName(), OAUnitNum - 1, IsNotOK, IsBlank, "OA Unit Supply Fan Name" );
+			VerifyName( cAlphaArgs( 5 ), OutAirUnit, &OAUnitData::SFanName, OAUnitNum - 1, IsNotOK, IsBlank, "OA Unit Supply Fan Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 5 ) = "xxxxx";
@@ -457,7 +456,7 @@ namespace OutdoorAirUnit {
 				OutAirUnit( OAUnitNum ).ExtFan = false;
 			} else if ( ! lAlphaBlanks( 7 ) ) {
 				OutAirUnit( OAUnitNum ).ExtFanName = cAlphaArgs( 7 );
-				VerifyName( cAlphaArgs( 7 ), OutAirUnit.ExtFanName(), OAUnitNum - 1, IsNotOK, IsBlank, "OA Unit Exhaust Fan Name" );
+				VerifyName( cAlphaArgs( 7 ), OutAirUnit, &OAUnitData::ExtFanName, OAUnitNum - 1, IsNotOK, IsBlank, "OA Unit Exhaust Fan Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 7 ) = "xxxxx";
@@ -559,7 +558,7 @@ namespace OutdoorAirUnit {
 			}
 
 			//A16 : component list
-			VerifyName( cAlphaArgs( 16 ), OutAirUnit.ComponentListName(), OAUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObjects( CO_OAEqList ) + " Name" );
+			VerifyName( cAlphaArgs( 16 ), OutAirUnit, &OAUnitData::ComponentListName, OAUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObjects( CO_OAEqList ) + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 16 ) = "xxxxx";
@@ -786,7 +785,6 @@ namespace OutdoorAirUnit {
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::StdRhoAir;
-		using DataGlobals::NumOfZones;
 		using DataGlobals::AnyPlantInModel;
 		using DataLoopNode::Node;
 		using ScheduleManager::GetCurrentScheduleValue;
@@ -1259,9 +1257,9 @@ namespace OutdoorAirUnit {
 								if ( PltSizCoolNum > 0 ) {
 									if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow >= SmallAirVolFlow ) {
 										CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-										CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
-										CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
 										CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+										CoilOutTemp = min( CoilInTemp, FinalZoneSizing( CurZoneEqNum ).CoolDesTemp );
+										CoilOutHumRat = min( CoilInHumRat, FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat );
 										DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow * ( PsyHFnTdbW( CoilInTemp, CoilInHumRat ) - PsyHFnTdbW( CoilOutTemp, CoilOutHumRat ) );
 										DesCoilLoad = max( 0.0, DesCoilLoad );
 										rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5.0, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
@@ -1442,9 +1440,9 @@ namespace OutdoorAirUnit {
 								if ( PltSizCoolNum > 0 ) {
 									if ( SizeAirMassFlow >= SmallAirVolFlow ) {
 										CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-										CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
-										CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
 										CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+										CoilOutTemp = min( CoilInTemp, FinalZoneSizing( CurZoneEqNum ).CoolDesTemp );
+										CoilOutHumRat = min( CoilInHumRat, FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat );
 										DesCoilLoad = SizeAirMassFlow * ( PsyHFnTdbW( CoilInTemp, CoilInHumRat ) - PsyHFnTdbW( CoilOutTemp, CoilOutHumRat ) );
 										DesCoilLoad = max( 0.0, DesCoilLoad );
 										rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5.0, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
@@ -2613,7 +2611,7 @@ namespace OutdoorAirUnit {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

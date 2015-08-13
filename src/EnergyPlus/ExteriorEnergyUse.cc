@@ -85,6 +85,17 @@ namespace ExteriorEnergyUse {
 
 	// Functions
 
+	// Clears the global data in ExteriorEnergyUse.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumExteriorLights = 0;
+		NumExteriorEqs = 0;
+		ExteriorLights.deallocate();
+		ExteriorEquipment.deallocate();
+	}
+	
 	void
 	ManageExteriorEnergyUse()
 	{
@@ -211,7 +222,7 @@ namespace ExteriorEnergyUse {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExteriorLights.Name(), Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ExteriorLights, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -287,7 +298,7 @@ namespace ExteriorEnergyUse {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExteriorEquipment.Name(), Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ExteriorEquipment, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -357,7 +368,7 @@ namespace ExteriorEnergyUse {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExteriorEquipment.Name(), Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ExteriorEquipment, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -625,7 +636,7 @@ namespace ExteriorEnergyUse {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
