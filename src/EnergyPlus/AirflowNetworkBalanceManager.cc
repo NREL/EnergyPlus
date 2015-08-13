@@ -1297,7 +1297,7 @@ namespace AirflowNetworkBalanceManager {
 						MultizoneSurfaceData( i ).NodeNums( 2 ) = j;
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = " + MultizoneSurfaceData( i ).SurfName );
-						ShowContinueError( "..Zone = " + Zone( Surface( MultizoneSurfaceData( i ).SurfNum ).Zone ).Name + " is not described in AIRFLOWNETWORK:MULTIZONE:ZONE" );
+						ShowContinueError( "..Zone = " + Zone( Surface( n ).Zone ).Name + " is not described in AIRFLOWNETWORK:MULTIZONE:ZONE" );
 						ErrorsFound = true;
 						continue;
 					}
