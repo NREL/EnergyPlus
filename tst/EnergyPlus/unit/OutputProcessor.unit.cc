@@ -3172,7 +3172,6 @@ namespace EnergyPlus {
 				"12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 			} ) );
 
-			TimeValue.deallocate(); 
 		}
 
 		TEST_F( EnergyPlusFixture, OutputProcessor_ResetAccumulationWhenWarmupComplete )
@@ -3186,11 +3185,6 @@ namespace EnergyPlus {
 			} );
 
 			ASSERT_FALSE( process_idf( idf_objects ) );
-
-			GetReportVariableInput();
-			Array1D< ZonePurchasedAir > PurchAir; // Used to specify purchased air parameters
-			PurchAir.allocate( 1 );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Heating Energy [J]", PurchAir( 1 ).TotHeatEnergy, "System", "Sum", PurchAir( 1 ).Name, _, "DISTRICTHEATING", "Heating", _, "System" );
 
 			// Setup so that UpdateDataandReport can be called.
 			DataGlobals::DayOfSim = 365;
@@ -3217,18 +3211,22 @@ namespace EnergyPlus {
 			if ( DataEnvironment::DayOfMonth == WeatherManager::EndDayOfMonth( DataEnvironment::Month ) ) {
 				DataEnvironment::EndMonthFlag = true;
 			}
-			TimeValue.allocate( 2 );  // should this be commented out since belong to anonymous namespace in different file?
+			TimeValue.allocate( 2 );
 			auto timeStep = 1.0 / 6;
 			SetupTimePointers( "Zone", timeStep );
 			SetupTimePointers( "HVAC", timeStep );
 
-			SetTimeValueMinutes( 10, 10 );
-
+			TimeValue( 1 ).CurMinute = 10;
+			TimeValue( 2 ).CurMinute = 10;
 
 			DataGlobals::WarmupFlag = true;
 
-			SetOutputProcessorReportNumberCounter( 0 );
 			ReportOutputFileHeaders();
+
+			GetReportVariableInput();
+			Array1D< ZonePurchasedAir > PurchAir; // Used to specify purchased air parameters
+			PurchAir.allocate( 1 );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Heating Energy [J]", PurchAir( 1 ).TotHeatEnergy, "System", "Sum", PurchAir( 1 ).Name, _, "DISTRICTHEATING", "Heating", _, "System" );
 
 			PurchAir( 1 ).TotHeatEnergy = 1.1;
 			UpdateMeterReporting();
@@ -3262,22 +3260,22 @@ namespace EnergyPlus {
 
 
 			compare_eso_stream( delimited_string( {
-				"1,1,,Zone Ideal Loads Supply Air Total Heating Energy [J] !Each Call",
-				"32,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+				"6,1,,Zone Ideal Loads Supply Air Total Heating Energy [J] !Each Call",
+				"37,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 				"2,365,12,31, 0,24,10.00,20.00,Tuesday",
-				"1,1.1",
+				"6,1.1",
 				"2,365,12,31, 0,24,20.00,30.00,Tuesday",
-				"1,1.3",
+				"6,1.3",
 				"2,365,12,31, 0,24,30.00,40.00,Tuesday",
-				"1,1.5",
+				"6,1.5",
 				"2,365,12,31, 0,24,40.00,50.00,Tuesday",
-				"1,1.7",
+				"6,1.7",
 				"2,365,12,31, 0,24,50.00,60.00,Tuesday",
-				"1,1.9",
+				"6,1.9",
 				"2,365,12,31, 0,24,60.00,70.00,Tuesday",
-				"1,2.2",
+				"6,2.2",
 				"5,365",
-				"32,9.7,1.1,12,31,24,20,2.2,12,31,24,70",
+				"37,9.7,1.1,12,31,24,20,2.2,12,31,24,70",
 			} ) );
 
 
@@ -3301,16 +3299,12 @@ namespace EnergyPlus {
 
 			compare_eso_stream( delimited_string( {
 				"2,365,12,31, 0,24, 0.00,10.00,Tuesday",
-				"1,100.",
+				"6,100.",
 				"2,365,12,31, 0,24,10.00,20.00,Tuesday",
-				"1,200.",
+				"6,200.",
 				"5,365",
-				"32,300.,100.,12,31,24,10,200.,12,31,24,20",
+				"37,300.,100.,12,31,24,10,200.,12,31,24,20",
 			} ) );
-
-
-			PurchAir.deallocate();
-
 
 		}
 	
