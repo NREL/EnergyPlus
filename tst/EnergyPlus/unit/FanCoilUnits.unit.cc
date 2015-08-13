@@ -16,13 +16,15 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/GlobalNames.hh>
+
 
 #include "Fixtures/HVACFixture.hh"
 
@@ -43,11 +45,12 @@ using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::WaterCoils;
+
 using DataEnvironment::OutDryBulbTemp;
 using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 using General::TrimSigDigits;
 using MixedAir::OAMixer;
-
+using General::JulianDay;
 
 
 namespace EnergyPlus {
@@ -72,6 +75,11 @@ namespace EnergyPlus {
 		DataEnvironment::StdRhoAir = 1.20;
 		WaterCoils::GetWaterCoilsInputFlag = true;
 		NumCoils = 0;
+		DataGlobals::NumOfTimeStepInHour = 1;
+		DataGlobals::TimeStep = 1;
+		DataGlobals::MinutesPerTimeStep = 60;
+
+		InitializePsychRoutines();
 
 		std::string const idf_objects = delimited_string( {
 			"	Version,8.3;",
@@ -112,12 +120,15 @@ namespace EnergyPlus {
 			"	Zone1FanCoilOAInNode, !- Outdoor Air Stream Node Name",
 			"	Zone1FanCoilExhNode, !- Relief Air Stream Node Name",
 			"	Zone1FanCoilAirInletNode; !- Return Air Stream Node Name",
-			"	Schedule:Compact,",
+			"	Schedule:Constant,",
 			"	FanAndCoilAvailSched, !- Name",
-			"	Fraction, !- Schedule Type Limits Name",
-			"	Through: 12/31, !- Field 1",
-			"	For: AllDays, !- Field 2",
-			"	Until: 24:00, 1.0;        !- Field 3",
+			"	FRACTION, !- Schedule Type",
+			"	1;        !- TimeStep Value",
+			"	ScheduleTypeLimits,",
+			"	Fraction, !- Name",
+			"	0.0, !- Lower Limit Value",
+			"	1.0, !- Upper Limit Value",
+			"	CONTINUOUS;              !- Numeric Type",
 			"   Fan:OnOff,",
 			"	Zone1FanCoilFan, !- Name",
 			"	FanAndCoilAvailSched, !- Availability Schedule Name",
@@ -169,7 +180,7 @@ namespace EnergyPlus {
 			"	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
 			"	0.3, !- Low Speed Supply Air Flow Ratio",
 			"	0.6, !- Medium Speed Supply Air Flow Ratio",
-			"	0.5, !- Maximum Outdoor Air Flow Rate { m3 / s }",
+			"	0.0, !- Maximum Outdoor Air Flow Rate { m3 / s }",
 			"	FanAndCoilAvailSched, !- Outdoor Air Schedule Name",
 			"	Zone1FanCoilAirInletNode, !- Air Inlet Node Name",
 			"	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
@@ -193,9 +204,20 @@ namespace EnergyPlus {
 		ASSERT_FALSE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
+		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
+
 		GetZoneEquipmentData1();
+		ProcessScheduleInput();
+		ScheduleInputProcessed = true;
 		GetFanInput();
+		EXPECT_EQ( DataHVACGlobals::FanType_SimpleOnOff, Fan( 1 ).FanType_Num );
+
 		GetFanCoilUnits();
+		EXPECT_EQ( "MULTISTAGEFAN", FanCoil( 1 ).CapCtrlMeth );
+		EXPECT_EQ( "OUTDOORAIR:MIXER", FanCoil( 1 ).OAMixType );
+		EXPECT_EQ( "FAN:ONOFF", FanCoil( 1 ).FanType );
+		EXPECT_EQ( "COIL:COOLING:WATER", FanCoil( 1 ).CCoilType );
+		EXPECT_EQ( "COIL:HEATING:WATER", FanCoil( 1 ).HCoilType );
 
 		TotNumLoops = 2;
 		PlantLoop.allocate( TotNumLoops );
@@ -209,13 +231,14 @@ namespace EnergyPlus {
 		Node( OAMixer( 1 ).RetNode ).MassFlowRate = AirMassFlow;
 		Node( OAMixer( 1 ).RetNode ).MassFlowRateMax = MaxAirMassFlow;
 
-		Node( OAMixer( 1 ).RetNode ).Temp = 24.0;
-		Node( OAMixer( 1 ).RetNode ).HumRat = 0.0050;
+		Node( OAMixer( 1 ).RetNode ).Temp = 22.0;
 		Node( OAMixer( 1 ).RetNode ).Enthalpy = 36000;
+		Node( OAMixer( 1 ).RetNode ).HumRat = PsyWFnTdbH( Node( OAMixer( 1 ).RetNode ).Temp, Node( OAMixer( 1 ).RetNode ).Enthalpy );
 
 		Node( OAMixer( 1 ).InletNode ).Temp = 10.0;
-		Node( OAMixer( 1 ).InletNode ).HumRat = 0.0030;
 		Node( OAMixer( 1 ).InletNode ).Enthalpy = 18000;
+		Node( OAMixer( 1 ).InletNode ).HumRat = PsyWFnTdbH( Node( OAMixer( 1 ).InletNode ).Temp, Node( OAMixer( 1 ).InletNode ).Enthalpy );
+
 
 		Node( FanCoil( 1 ).AirInNode ).MassFlowRate = AirMassFlow;
 		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMin = AirMassFlow;
@@ -223,9 +246,9 @@ namespace EnergyPlus {
 		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMax = MaxAirMassFlow;
 		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMaxAvail = MaxAirMassFlow;
 
-		FanCoil( 1 ).OutAirMassFlow = AirMassFlow;
+		FanCoil( 1 ).OutAirMassFlow = 0.0;
 		FanCoil( 1 ).MaxAirMassFlow = MaxAirMassFlow;
-		Node( FanCoil( 1 ).OutsideAirNode ).MassFlowRateMax = MaxAirMassFlow;
+		Node( FanCoil( 1 ).OutsideAirNode ).MassFlowRateMax = 0.0;
 
 		Fan( 1 ).InletAirMassFlowRate = AirMassFlow;
 		Fan( 1 ).MaxAirMassFlowRate = MaxAirMassFlow;
@@ -306,8 +329,8 @@ namespace EnergyPlus {
 		ZoneSysEnergyDemand.allocate( 1 );
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = 0;
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 4000.0;
-		WaterCoil( 1 ).TotWaterHeatingCoilRate = 0.0;
 		FanCoil( 1 ).SpeedFanSel = 2;
+		QUnitOut = 0.0;
 		QZnReq = 4000.0;
 
 		MyUAAndFlowCalcFlag.allocate( 2 );
@@ -317,11 +340,15 @@ namespace EnergyPlus {
 
 		LocalTurnFansOff = false;
 		LocalTurnFansOn = true;
-		Fan( 1 ).AvailSchedPtrNum = DataGlobals::ScheduleAlwaysOn;
-		WaterCoil( 1 ).SchedPtr = DataGlobals::ScheduleAlwaysOn;
-		WaterCoil( 2 ).SchedPtr = DataGlobals::ScheduleAlwaysOn;
 
-		InitializePsychRoutines();
+		DataEnvironment::Month = 1;
+		DataEnvironment::DayOfMonth = 21;
+		DataGlobals::HourOfDay = 1;
+		DataEnvironment::DSTIndicator = 0;
+		DataEnvironment::DayOfWeek = 2;
+		DataEnvironment::HolidayIndex = 0;
+		DataEnvironment::DayOfYear_Schedule = JulianDay( Month, DayOfMonth, 1 );
+		UpdateScheduleValues();
 
 		CalcMultiStage4PipeFanCoil( FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut );
 
@@ -359,6 +386,11 @@ namespace EnergyPlus {
 		DataEnvironment::StdRhoAir = 1.20;
 		WaterCoils::GetWaterCoilsInputFlag = true;
 		NumCoils = 0;
+		DataGlobals::NumOfTimeStepInHour = 1;
+		DataGlobals::TimeStep = 1;
+		DataGlobals::MinutesPerTimeStep = 60;
+
+		InitializePsychRoutines();
 
 		std::string const idf_objects = delimited_string( {
 			"	Version,8.3;",
@@ -405,6 +437,11 @@ namespace EnergyPlus {
 			"	Through: 12/31, !- Field 1",
 			"	For: AllDays, !- Field 2",
 			"	Until: 24:00, 1.0;        !- Field 3",
+			"	ScheduleTypeLimits,",
+			"	Fraction, !- Name",
+			"	0.0, !- Lower Limit Value",
+			"	1.0, !- Upper Limit Value",
+			"	CONTINUOUS;              !- Numeric Type",
 			"   Fan:OnOff,",
 			"	Zone1FanCoilFan, !- Name",
 			"	FanAndCoilAvailSched, !- Availability Schedule Name",
@@ -456,7 +493,7 @@ namespace EnergyPlus {
 			"	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
 			"	0.3, !- Low Speed Supply Air Flow Ratio",
 			"	0.6, !- Medium Speed Supply Air Flow Ratio",
-			"	0.5, !- Maximum Outdoor Air Flow Rate { m3 / s }",
+			"	0.1, !- Maximum Outdoor Air Flow Rate { m3 / s }",
 			"	FanAndCoilAvailSched, !- Outdoor Air Schedule Name",
 			"	Zone1FanCoilAirInletNode, !- Air Inlet Node Name",
 			"	Zone1FanCoilAirOutletNode, !- Air Outlet Node Name",
@@ -480,9 +517,20 @@ namespace EnergyPlus {
 		ASSERT_FALSE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
+		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
+
 		GetZoneEquipmentData1();
+		ProcessScheduleInput();
+		ScheduleInputProcessed = true;
 		GetFanInput();
+		EXPECT_EQ( DataHVACGlobals::FanType_SimpleOnOff, Fan( 1 ).FanType_Num );
+
 		GetFanCoilUnits();
+		EXPECT_EQ( "MULTISTAGEFAN", FanCoil( 1 ).CapCtrlMeth );
+		EXPECT_EQ( "OUTDOORAIR:MIXER", FanCoil( 1 ).OAMixType );
+		EXPECT_EQ( "FAN:ONOFF", FanCoil( 1 ).FanType );
+		EXPECT_EQ( "COIL:COOLING:WATER", FanCoil( 1 ).CCoilType );
+		EXPECT_EQ( "COIL:HEATING:WATER", FanCoil( 1 ).HCoilType );
 
 		TotNumLoops = 2;
 		PlantLoop.allocate( TotNumLoops );
@@ -498,12 +546,12 @@ namespace EnergyPlus {
 		Node( OAMixer( 1 ).RetNode ).MassFlowRateMax = MaxAirMassFlow;
 
 		Node( OAMixer( 1 ).RetNode ).Temp = 24.0;
-		Node( OAMixer( 1 ).RetNode ).HumRat = 0.0050;
 		Node( OAMixer( 1 ).RetNode ).Enthalpy = 36000;
+		Node( OAMixer( 1 ).RetNode ).HumRat = PsyWFnTdbH( Node( OAMixer( 1 ).RetNode ).Temp, Node( OAMixer( 1 ).RetNode ).Enthalpy );
 
 		Node( OAMixer( 1 ).InletNode ).Temp = 30.0;
-		Node( OAMixer( 1 ).InletNode ).HumRat = 0.0085;
 		Node( OAMixer( 1 ).InletNode ).Enthalpy = 53000;
+		Node( OAMixer( 1 ).InletNode ).HumRat = PsyWFnTdbH( Node( OAMixer( 1 ).InletNode ).Temp, Node( OAMixer( 1 ).InletNode ).Enthalpy );
 
 		Node( FanCoil( 1 ).AirInNode ).MassFlowRate = AirMassFlow;
 		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMin = AirMassFlow;
@@ -511,9 +559,9 @@ namespace EnergyPlus {
 		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMax = MaxAirMassFlow;
 		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMaxAvail = MaxAirMassFlow;
 
-		FanCoil( 1 ).OutAirMassFlow = AirMassFlow;
+		FanCoil( 1 ).OutAirMassFlow = 0.0;
 		FanCoil( 1 ).MaxAirMassFlow = MaxAirMassFlow;
-		Node( FanCoil( 1 ).OutsideAirNode ).MassFlowRateMax = MaxAirMassFlow;
+		Node( FanCoil( 1 ).OutsideAirNode ).MassFlowRateMax = 0.0;
 
 		Fan( 1 ).InletAirMassFlowRate = AirMassFlow;
 		Fan( 1 ).MaxAirMassFlowRate = MaxAirMassFlow;
@@ -594,8 +642,8 @@ namespace EnergyPlus {
 		ZoneSysEnergyDemand.allocate( 1 );
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -4000.00;
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 0.0;
-		WaterCoil( 1 ).TotWaterCoolingCoilRate = 0.0;
 		FanCoil( 1 ).SpeedFanSel = 2;
+		QUnitOut = 0.0;
 		QZnReq = -4000.0;
 
 		MyUAAndFlowCalcFlag.allocate( 2 );
@@ -605,11 +653,15 @@ namespace EnergyPlus {
 
 		LocalTurnFansOff = false;
 		LocalTurnFansOn = true;
-		Fan( 1 ).AvailSchedPtrNum = DataGlobals::ScheduleAlwaysOn;
-		WaterCoil( 1 ).SchedPtr = DataGlobals::ScheduleAlwaysOn;
-		WaterCoil( 2 ).SchedPtr = DataGlobals::ScheduleAlwaysOn;
 
-		InitializePsychRoutines();
+		DataEnvironment::Month = 1;
+		DataEnvironment::DayOfMonth = 21;
+		DataGlobals::HourOfDay = 1;
+		DataEnvironment::DSTIndicator = 0;
+		DataEnvironment::DayOfWeek = 2;
+		DataEnvironment::HolidayIndex = 0;
+		DataEnvironment::DayOfYear_Schedule = JulianDay( Month, DayOfMonth, 1 );
+		UpdateScheduleValues();
 
 		CalcMultiStage4PipeFanCoil( FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut );
 

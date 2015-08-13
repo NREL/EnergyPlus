@@ -474,13 +474,15 @@ TEST( HVACUnitarySystem, CalcUnitaryHeatingSystem ) {
 	WaterCoil( 1 ).MaxWaterVolFlowRate = HotWaterMassFlowRate;
 	WaterCoil( 1 ).UACoil = 400.0;
 	WaterCoil( 1 ).InletAirTemp = 10.0;
-	WaterCoil( 1 ).InletAirHumRat = 0.003;
 	WaterCoil( 1 ).InletAirEnthalpy = 18000.0;
+	WaterCoil( 1 ).InletAirHumRat = PsyWFnTdbH( WaterCoil( 1 ).InletAirTemp, WaterCoil( 1 ).InletAirEnthalpy );
+
 	WaterCoil( 1 ).AirInletNodeNum = 4;
 	WaterCoil( 1 ).AirOutletNodeNum = 5;
 	Node( WaterCoil( 1 ).AirInletNodeNum ).Temp = 10.0;
-	Node( WaterCoil( 1 ).AirInletNodeNum ).HumRat = 0.003;
 	Node( WaterCoil( 1 ).AirInletNodeNum ).Enthalpy = 18000;
+	Node( WaterCoil( 1 ).AirInletNodeNum ).HumRat = PsyWFnTdbH( Node( WaterCoil( 1 ).AirInletNodeNum ).Temp, Node( WaterCoil( 1 ).AirInletNodeNum ).Enthalpy );
+
 	Node( WaterCoil( 1 ).AirInletNodeNum ).MassFlowRate = AirMassFlowRate;
 	Node( WaterCoil( 1 ).AirInletNodeNum ).MassFlowRateMax = AirMassFlowRate;
 
@@ -554,6 +556,10 @@ TEST( HVACUnitarySystem, CalcUnitaryCoolingSystem ) {
 	TotNumLoops = 1;
 	PlantLoop.allocate( TotNumLoops );
 
+	DataEnvironment::OutBaroPress = 101325.0;
+	DataEnvironment::StdRhoAir = 1.20;
+	InitializePsychRoutines();
+
 	MultiOrVarSpeedHeatCoil.allocate( 1 );
 	MultiOrVarSpeedHeatCoil( UnitarySysNum ) = true;
 	MultiOrVarSpeedCoolCoil.allocate( 1 );
@@ -593,13 +599,11 @@ TEST( HVACUnitarySystem, CalcUnitaryCoolingSystem ) {
 	UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 3;
 	HeatingLoad = false;
 	CoolingLoad = true;
-	// cooling load only
 	MoistureLoad = 0.0;
-
-
 	AirMassFlowRate = 1.0;
 	HotWaterMassFlowRate = 1.0;
 	ColdWaterMassFlowRate = 1.0;
+
 	UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow = ColdWaterMassFlowRate;
 	UnitarySystem( UnitarySysNum ).MultiSpeedCoolingCoil = true;
 	UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = Coil_CoolingWater;
@@ -633,14 +637,15 @@ TEST( HVACUnitarySystem, CalcUnitaryCoolingSystem ) {
 	WaterCoil( 1 ).AirInletNodeNum = 4;
 	WaterCoil( 1 ).AirOutletNodeNum = 5;
 	WaterCoil( 1 ).InletAirTemp = 30.0;
-	WaterCoil( 1 ).InletAirHumRat = 0.0085;
+	WaterCoil( 1 ).InletAirEnthalpy = 53000;
+	WaterCoil( 1 ).InletAirHumRat = PsyWFnTdbH( WaterCoil( 1 ).InletAirTemp, WaterCoil( 1 ).InletAirEnthalpy );
 	WaterCoil( 1 ).InletWaterTemp = 6.0;
 	WaterCoil( 1 ).InletAirMassFlowRate = AirMassFlowRate;
 	Node( WaterCoil( 1 ).AirInletNodeNum ).MassFlowRate = AirMassFlowRate;
 	Node( WaterCoil( 1 ).AirInletNodeNum ).MassFlowRateMax = AirMassFlowRate;
 	Node( WaterCoil( 1 ).AirInletNodeNum ).Temp = 30.0;
-	Node( WaterCoil( 1 ).AirInletNodeNum ).HumRat = 0.0085;
 	Node( WaterCoil( 1 ).AirInletNodeNum ).Enthalpy = 53000;
+	Node( WaterCoil( 1 ).AirInletNodeNum ).HumRat = PsyWFnTdbH( Node( WaterCoil( 1 ).AirInletNodeNum ).Temp, Node( WaterCoil( 1 ).AirInletNodeNum ).Enthalpy );
 
 	WaterCoil( 1 ).WaterLoopNum = 1;
 	WaterCoil( 1 ).WaterLoopSide = 1;
@@ -682,15 +687,12 @@ TEST( HVACUnitarySystem, CalcUnitaryCoolingSystem ) {
 	MyUAAndFlowCalcFlag.allocate( 1 );
 	MyUAAndFlowCalcFlag( 1 ) = true;
 	DataGlobals::DoingSizing = true;
-	DataEnvironment::OutBaroPress = 101325.0;
-	DataEnvironment::StdRhoAir = 1.20;
 
-	InitializePsychRoutines();
 	WaterCoil( 1 ).TotWaterCoolingCoilRate = 0.0;
 	
 	CalcUnitaryCoolingSystem( UnitarySysNum, FirstHVACIteration, UnitarySystem( UnitarySysNum ).CoolingCycRatio, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat );
 
-	EXPECT_NEAR( 26672.0, WaterCoil( 1 ).TotWaterCoolingCoilRate, 2.0 );
+	EXPECT_NEAR( 27530.0, WaterCoil( 1 ).TotWaterCoolingCoilRate, 2.0 );
 
 	// Clean up
 	MultiOrVarSpeedHeatCoil.deallocate();

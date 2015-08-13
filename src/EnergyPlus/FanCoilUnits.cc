@@ -140,7 +140,7 @@ namespace FanCoilUnits {
 	Real64 FanFlowRatio( 0.0 );
 	bool HeatingLoad( false ); // True when zone needs heating
 	bool CoolingLoad( false ); // True when zone needs cooling
-	Real64 const Small5WLoad( 5.0 ); // load threshold 5.0 W\
+	Real64 const Small5WLoad( 5.0 ); // load threshold 5.0 W
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
