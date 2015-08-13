@@ -1172,9 +1172,6 @@ namespace General {
 		}
 
 		std::string::size_type const DotPos = index( String, '.' ); // Position of decimal point in original string
-		if( DotPos == std::string::npos ) {
-			int tmepa=1; //@@
-		}
 		assert( DotPos != std::string::npos );
 		assert( DotPos > 0 ); // Or SPos will not be valid
 		char TestChar( DotPos + SigDigits + 1 < String.length() ? String[ DotPos + SigDigits + 1 ] : ' ' ); // Test character (digit) for rounding, if position in digit string >= 5 (digit is 5 or greater) then will round

@@ -262,9 +262,10 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 QZnReq;
 		
 		// FLOW:
-		if ( EnergyPlus::DataEnvironment::DayOfMonth == 15 && EnergyPlus::DataGlobals::SimTimeSteps == 423 && !EnergyPlus::DataGlobals::WarmupFlag) {
-			int aaa = 1;
-		} //@@ 
+		
+		// if ( EnergyPlus::DataEnvironment::DayOfMonth == 15 && EnergyPlus::DataGlobals::SimTimeSteps == 423 && !EnergyPlus::DataGlobals::WarmupFlag) {
+		// 	int aaa = 1;
+		// } //@@ 
 
 
 		// Obtains and Allocates VRF system related parameters from input file
@@ -2207,7 +2208,7 @@ namespace HVACVariableRefrigerantFlow {
 					errFlag = false;
 					double OUFanVolFlowRate = GetFanDesignVolumeFlowRate( FanType, FanName, errFlag );
 					if ( errFlag ) {
-						ShowContinueError( "...occurs in " + cCurrentModuleObject + " =" + VRFTU( VRFTUNum ).Name );
+						ShowContinueError( "...occurs in " + cCurrentModuleObject + " =" + VRF( VRFNum ).Name );
 						ErrorsFound = true;
 					}
 					 
@@ -3178,10 +3179,29 @@ namespace HVACVariableRefrigerantFlow {
 				ErrorsFound = true;
 			}
 
+			// Check the type of the fan is correct
 			if ( ! SameString( cFanTypes( FanType_Num ), FanType ) ) {
 				ShowSevereError( cCurrentModuleObject + " = " + VRFTU( VRFTUNum ).Name );
 				ShowContinueError( "Fan type specified = " + cAlphaArgs( 7 ) );
 				ShowContinueError( "Based on the fan name the type of fan actually used = " + cFanTypes( FanType_Num ) );
+				ErrorsFound = true;
+			}
+			
+			// VRFTU Supply Air Fan Object Type must be Fan:VariableVolume if VRF Algorithm Type is AlgorithmTypeFluidTCtrl
+			if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl && FanType_Num != FanType_SimpleVAV ){
+				ShowSevereError( cCurrentModuleObject + " = " + VRFTU( VRFTUNum ).Name );
+				ShowContinueError( "Fan type specified = " + cAlphaArgs( 7 ) );
+				ShowContinueError( "Fan Object Type must be Fan:VariableVolume if VRF AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl" );
+				ShowContinueError( "is used to model VRF outdoor unit." );
+				ErrorsFound = true;
+			}
+
+			// VRFTU Supply Air Fan Object Type must be Fan:OnOff or Fan:ConstantVolume if VRF Algorithm Type is AlgorithmTypeSysCurve
+			if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFAlgorithmTypeNum == AlgorithmTypeSysCurve && !( FanType_Num == FanType_SimpleOnOff || FanType_Num == FanType_SimpleConstVolume ) ){
+				ShowSevereError( cCurrentModuleObject + " = " + VRFTU( VRFTUNum ).Name );
+				ShowContinueError( "Fan type specified = " + cAlphaArgs( 7 ) );
+				ShowContinueError( "Fan Object Type must be Fan:OnOff or Fan:ConstantVolume if VRF AirConditioner:VariableRefrigerantFlow" );
+				ShowContinueError( "is used to model VRF outdoor unit." );
 				ErrorsFound = true;
 			}
 
@@ -3314,6 +3334,8 @@ namespace HVACVariableRefrigerantFlow {
 							
 							DXCoils::DXCoil( VRFTU( VRFTUNum ).CoolCoilIndex ).VRFIUPtr = VRFTUNum;
 							DXCoils::DXCoil( VRFTU( VRFTUNum ).CoolCoilIndex ).VRFOUPtr = VRFTU( VRFTUNum ).VRFSysNum;
+							DXCoils::DXCoil( VRFTU( VRFTUNum ).CoolCoilIndex ).SupplyFanIndex = VRFTU( VRFTUNum ).FanIndex;
+							DXCoils::DXCoil( VRFTU( VRFTUNum ).CoolCoilIndex ).RatedAirVolFlowRate( 1 ) = EnergyPlus::Fans::Fan( VRFTU( VRFTUNum ).FanIndex ).MaxAirFlowRate; 
 
 						} else {
 							ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
@@ -3416,6 +3438,8 @@ namespace HVACVariableRefrigerantFlow {
 							
 							DXCoils::DXCoil( VRFTU( VRFTUNum ).HeatCoilIndex ).VRFIUPtr = VRFTUNum;
 							DXCoils::DXCoil( VRFTU( VRFTUNum ).HeatCoilIndex ).VRFOUPtr = VRFTU( VRFTUNum ).VRFSysNum;
+							DXCoils::DXCoil( VRFTU( VRFTUNum ).HeatCoilIndex ).SupplyFanIndex = VRFTU( VRFTUNum ).FanIndex;
+							DXCoils::DXCoil( VRFTU( VRFTUNum ).HeatCoilIndex ).RatedAirVolFlowRate( 1 ) = EnergyPlus::Fans::Fan( VRFTU( VRFTUNum ).FanIndex ).MaxAirFlowRate; 
 
 							// Terminal unit heating to cooling sizing ratio has precedence over VRF system sizing ratio
 							if ( VRFTU( VRFTUNum ).HeatingCapacitySizeRatio > 1.0 ) {
@@ -8412,7 +8436,7 @@ namespace HVACVariableRefrigerantFlow {
 				Pipe_T_room = 18;
 				
 			Pipe_h_IU_in_low = GetSatEnthalpyRefrig ( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).MaxCondensingTemp, 1.0,  RefrigerantIndex, RoutineName ); // Quality=1
-			Pipe_h_IU_in_up = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, min( VRF( VRFCond ).MaxCondensingTemp + 50, RefTHigh), max( min( Pcond, RefPHigh), RefPLow ), RefrigerantIndex, RoutineName );
+			Pipe_h_IU_in_up = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, max( min( VRF( VRFCond ).MaxCondensingTemp + 50, RefTHigh ), RefTLow), max( min( Pcond, RefPHigh), RefPLow ), RefrigerantIndex, RoutineName );
 		
 			Pipe_h_IU_in = Pipe_h_IU_in_low;
 		
@@ -8451,11 +8475,11 @@ namespace HVACVariableRefrigerantFlow {
 			//0312 Yoshi end to get the merged SC & enthalpy for modification factor
 		
 			//Perform iteration to calculate Pipe_T_IU_in using assumed Pipe_h_IU_in
-			for ( Pipe_T_IU_in = VRF( VRFCond ).MaxCondensingTemp; Pipe_T_IU_in <= min( VRF( VRFCond ).MaxCondensingTemp + 50, RefTHigh); Pipe_T_IU_in++ ) {
+			for ( Pipe_T_IU_in = VRF( VRFCond ).MaxCondensingTemp; Pipe_T_IU_in <= min( VRF( VRFCond ).MaxCondensingTemp + 50, RefTHigh ) ; Pipe_T_IU_in++ ) {
 				Pipe_h_IU_in_temp = GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Pipe_T_IU_in, max( min( Pcond, RefPHigh), RefPLow ), RefrigerantIndex, RoutineName );		
 				if( Pipe_h_IU_in_temp > Pipe_h_IU_in ) break; //EXIT Do_Pipe_T_IU_in
 			} //END DO Do_Pipe_T_IU_in
-			if( Pipe_T_IU_in > min( VRF( VRFCond ).MaxCondensingTemp + 50, RefTHigh) ) {				  
+			if( Pipe_T_IU_in > min( VRF( VRFCond ).MaxCondensingTemp + 50, RefTHigh ) ) {				  
 				Pipe_T_IU_in = VRF( VRFCond ).MaxCondensingTemp;
 			}
 				

@@ -454,8 +454,6 @@ namespace DXCoils {
 		Real64 C1Tc; // XP_Indoor Unit Coefficient 1 to calculate Tc,req
 		Real64 C2Tc; // XP_Indoor Unit Coefficient 2 to calculate Tc,req 
 		Real64 C3Tc; // XP_Indoor Unit Coefficient 3 to calculate Tc,req
-		Real64 Qfan; // XP_Indoor Unit fan motor released heat at nominal condition
-		Real64 BF  ; // XP_Bypass factor
 		Real64 SH  ; // XP_Superheating
 		Real64 SC  ; // XP_Subcooling 
 		Real64 ActualSH; // XP_Superheating
@@ -691,8 +689,6 @@ namespace DXCoils {
 			C1Tc( 0.0 ),	                
 			C2Tc( 0.0 ),                 
 			C3Tc( 0.0 ),                 
-			Qfan( 0.0 ),                 
-			BF( 0.0 ),                   
 			SH( 0.0 ),                   
 			SC( 0.0 ),                   
 			ActualSH( 0.0 ),             
@@ -968,8 +964,6 @@ namespace DXCoils {
 			Real64 const C1Tc, // XP_Indoor Unit Coefficient 1 to calculate Tc,req
 			Real64 const C2Tc, // XP_Indoor Unit Coefficient 2 to calculate Tc,req 
 			Real64 const C3Tc, // XP_Indoor Unit Coefficient 3 to calculate Tc,req
-			Real64 const Qfan, // XP_Indoor Unit fan motor released heat at nominal condition
-			Real64 const BF  , // XP_Bypass factor
 			Real64 const SH  , // XP_Superheating
 			Real64 const SC  , // XP_Subcooling 
 			Real64 const ActualSH, // XP_Superheating
@@ -1241,9 +1235,7 @@ namespace DXCoils {
 			C3Te( C3Te ),
 			C1Tc( C1Tc ),
 			C2Tc( C2Tc ),
-			C3Tc( C3Tc ),
-			Qfan( Qfan ),
-			BF( BF ),             
+			C3Tc( C3Tc ),   
 			SH( SH ),
 			SC( SC ),
 			ActualSH( ActualSH ),

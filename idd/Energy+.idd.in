@@ -33461,6 +33461,7 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
   A12,  \field Cooling Coil Object Name
         \type object-list
         \object-list CoolingCoilsDXVarRefrigFlow
+        \object-list CoolingCoilsDXVarRefrigFlowFluidTemperatureControl
         \note Cooling Coil Type must be Coil:Cooling:DX:VariableRefrigerantFlow
         \note This field may be left blank if heating-only mode is used
   A13,  \field Heating Coil Object Type
@@ -33478,6 +33479,7 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
   A14,  \field Heating Coil Object Name
         \type object-list
         \object-list HeatingCoilsDXVarRefrigFlow
+        \object-list HeatingCoilsDXVarRefrigFlowFluidTemperatureControl
         \note Heating Coil Type must be Coil:Heating:DX:VariableRefrigerantFlow
         \note This field may be left blank if cooling-only mode is used
   N8 ,  \field Zone Terminal Unit On Parasitic Electric Energy Use
