@@ -1055,8 +1055,9 @@ namespace DataAirflowNetwork {
 			std::string const & RAFNNodeName, // RoomAir model node name
 			Real64 const Height, // Nodal height
 			int const RAFNNodeNum, // RoomAir model node number
-			int const ZoneNum // Zone number
-			) :
+			int const ZoneNum, // Zone number
+			int const AFNZoneNum // MultiZone number
+		) :
 			Name( Name ),
 			RAFNNodeName( RAFNNodeName ),
 			Height( Height ),

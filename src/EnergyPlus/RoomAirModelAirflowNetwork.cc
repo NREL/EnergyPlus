@@ -667,19 +667,18 @@ namespace RoomAirModelAirflowNetwork {
 		TempIndCoef = ThisRAFNNode.SumIntSensibleGain + ThisRAFNNode.SumHATsurf - ThisRAFNNode.SumHATref + ThisRAFNNode.SumLinkMCpT + ThisRAFNNode.SumSysMCpT + ThisRAFNNode.NonAirSystemResponse + ThisRAFNNode.SysDepZoneLoadsLagged;
 		AirCap = ThisRAFNNode.AirVolume * ZoneVolCapMultpSens * ThisRAFNNode.RhoAir * ThisRAFNNode.CpAir / ( TimeStepSys*SecInHour );
 
-		{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
-		if ( SELECT_CASE_var == Use3rdOrder ) {
-			TempTmp = ( TempIndCoef + AirCap*( 3.0*NodeTempX1 - ( 3.0 / 2.0 )*NodeTempX2 + ( 1.0 / 3.0 )*NodeTempX3 ) )
-				/ ( ( 11.0 / 6.0 ) * AirCap + TempDepCoef );
-		} else if ( SELECT_CASE_var == UseAnalyticalSolution ) {
+		if ( ZoneAirSolutionAlgo == UseAnalyticalSolution ) {
 			if ( TempDepCoef == 0.0 ) { // B=0
 				TempTmp = AirTempT1 + TempIndCoef / AirCap;
 			} else {
 				TempTmp = ( AirTempT1 - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, -TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
 			}
-		} else if ( SELECT_CASE_var == UseEulerMethod ) {
+		} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
 			TempTmp = ( AirCap * AirTempT1 + TempIndCoef ) / ( AirCap + TempDepCoef );
-		}}
+		} else {
+			TempTmp = ( TempIndCoef + AirCap*( 3.0*NodeTempX1 - ( 3.0 / 2.0 )*NodeTempX2 + ( 1.0 / 3.0 )*NodeTempX3 ) )
+				/ ( ( 11.0 / 6.0 ) * AirCap + TempDepCoef );
+		}
 
 		ThisRAFNNode.AirTemp = TempTmp;
 
@@ -689,19 +688,18 @@ namespace RoomAirModelAirflowNetwork {
 		B = ( ThisRAFNNode.SumIntLatentGain / H2OHtOfVap ) + ThisRAFNNode.SumSysMW + ThisRAFNNode.SumLinkMW + ThisRAFNNode.SumHmARaW;
 		C = ThisRAFNNode.RhoAir * ThisRAFNNode.AirVolume * ZoneVolCapMultpMoist / ( SecInHour * TimeStepSys );
 
-		{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
-		if ( SELECT_CASE_var == Use3rdOrder ) {
-			HumRatTmp = ( B + C*( 3.0*NodeHumRatX1 - ( 3.0 / 2.0 )*NodeHumRatX2 + ( 1.0 / 3.0 )*NodeHumRatX3 ) ) / ( ( 11.0 / 6.0 )*C + A );
-			// Exact solution
-		} else if ( SELECT_CASE_var == UseAnalyticalSolution ) {
+		// Exact solution
+		if ( ZoneAirSolutionAlgo == UseAnalyticalSolution ) {
 			if ( A == 0.0 ) { // B=0
 				HumRatTmp = HumRatW1 + B / C;
 			} else {
 				HumRatTmp = ( HumRatW1 - B / A ) * std::exp( min( 700., -A / C ) ) + B / A;
 			}
-		} else if ( SELECT_CASE_var == UseEulerMethod ) {
+		} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
 			HumRatTmp = ( C * HumRatW1 + B ) / ( C + A );
-		}}
+		} else {
+			HumRatTmp = ( B + C*( 3.0*NodeHumRatX1 - ( 3.0 / 2.0 )*NodeHumRatX2 + ( 1.0 / 3.0 )*NodeHumRatX3 ) ) / ( ( 11.0 / 6.0 )*C + A );
+		}
 
 		ThisRAFNNode.HumRat = HumRatTmp;
 
