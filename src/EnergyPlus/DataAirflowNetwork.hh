@@ -1595,8 +1595,8 @@ namespace DataAirflowNetwork {
 
 		// Default Constructor
 		DisSysLinkageProp() :
-			ZoneNum( 0 ),
-			AirflowNetworkLinkage( )
+			AirflowNetworkLinkage( ),
+			ZoneNum( 0 )
 		{}
 
 		// Member Constructor
@@ -1606,10 +1606,10 @@ namespace DataAirflowNetwork {
 			Array1< Real64 > const & NodeHeights, // Node heights
 			std::string const & CompName, // Name of element
 			int const CompNum, // Element Number
-			std::string const & ZoneName, // Name of zone
-			int const ZoneNum, // Zone Number
 			Array1_int const & NodeNums, // Node numbers
-			int const LinkNum // Linkage number
+			int const LinkNum, // Linkage number
+			std::string const & ZoneName, // Name of zone
+			int const ZoneNum // Zone Number
 		) :
 			AirflowNetworkLinkage( Name, NodeNames, NodeHeights, CompName, CompNum, NodeNums, LinkNum ),
 			ZoneName( ZoneName ),
