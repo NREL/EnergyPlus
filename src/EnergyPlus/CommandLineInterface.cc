@@ -327,7 +327,12 @@ ProcessArgs(int argc, const char * argv[])
 	outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
 	outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
 	outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
-	outputSqliteErrFileName = dirPathName + sqliteSuffix + ".err";
+	if (suffixType == "L" || suffixType == "l") {
+		outputSqliteErrFileName = dirPathName + sqliteSuffix + ".err";
+	}
+	else {
+		outputSqliteErrFileName = outputFilePrefix + sqliteSuffix + ".err";
+	}
 	outputScreenCsvFileName = outputFilePrefix + screenSuffix + ".csv";
 	outputDelightInFileName = "eplusout.delightin";
 	outputDelightOutFileName = "eplusout.delightout";

@@ -17,6 +17,7 @@ set( test_src
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
+  DemandResponse.unit.cc
   DXCoils.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
@@ -55,9 +56,11 @@ set( test_src
   SwimmingPool.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
+  VentilatedSlab.unit.cc
   WaterCoils.unit.cc
   WaterThermalTanks.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
+  ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc
 )

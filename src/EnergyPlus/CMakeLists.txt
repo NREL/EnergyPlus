@@ -361,6 +361,8 @@ SET( SRC_2
   PhotovoltaicThermalCollectors.hh
   Photovoltaics.cc
   Photovoltaics.hh
+  PierceSurface.cc
+  PierceSurface.hh
   PipeHeatTransfer.cc
   PipeHeatTransfer.hh
   Pipes.cc

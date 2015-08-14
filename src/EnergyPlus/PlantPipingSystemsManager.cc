@@ -240,7 +240,6 @@ namespace PlantPipingSystemsManager {
 		static bool GetInputFlag( true ); // First time, input is "gotten"
 		int CircuitNum;
 		int DomainNum;
-		int NumOfPipeCircuits;
 
 		//Autodesk:Uninit Initialize variables used uninitialized
 		DomainNum = 0; //Autodesk:Uninit Force default initialization
@@ -252,9 +251,8 @@ namespace PlantPipingSystemsManager {
 		}
 
 		// Look for circuit index
-		NumOfPipeCircuits = size( PipingSystemCircuits );
 		if ( EqNum == 0 ) {
-			CircuitNum = FindItemInList( EquipName, PipingSystemCircuits.Name(), NumOfPipeCircuits );
+			CircuitNum = FindItemInList( EquipName, PipingSystemCircuits );
 			if ( CircuitNum == 0 ) {
 				// Catch any bad names before crashing
 				ShowFatalError( RoutineName + ": Piping circuit requested not found=" + EquipName );
@@ -262,6 +260,7 @@ namespace PlantPipingSystemsManager {
 			EqNum = CircuitNum;
 		} else {
 			CircuitNum = EqNum;
+			int const NumOfPipeCircuits = isize( PipingSystemCircuits );
 			if ( CircuitNum > NumOfPipeCircuits || CircuitNum < 1 ) {
 				ShowFatalError( RoutineName + ":  Invalid component index passed=" + TrimSigDigits( DomainNum ) + ", Number of Units=" + TrimSigDigits( NumOfPipeCircuits ) + ", Entered Unit name=" + EquipName ); //Autodesk:Uninit DomainNum was uninitialized
 			}
@@ -535,7 +534,7 @@ namespace PlantPipingSystemsManager {
 			for ( ThisCircuitPipeSegmentCounter = PipingSystemCircuits( CircuitCtr ).PipeSegmentNames.l1(); ThisCircuitPipeSegmentCounter <= PipingSystemCircuits( CircuitCtr ).PipeSegmentNames.u1(); ++ThisCircuitPipeSegmentCounter ) {
 
 				ThisSegmentName = PipingSystemCircuits( CircuitCtr ).PipeSegmentNames( ThisCircuitPipeSegmentCounter );
-				ThisSegmentIndex = FindItemInList( ThisSegmentName, PipingSystemSegments.Name(), TotalNumSegments );
+				ThisSegmentIndex = FindItemInList( ThisSegmentName, PipingSystemSegments );
 				if ( ThisSegmentIndex > 0 ) {
 					PipingSystemCircuits( CircuitCtr ).PipeSegmentIndeces( ThisCircuitPipeSegmentCounter ) = ThisSegmentIndex;
 					PipingSystemSegments( ThisSegmentIndex ).ParentCircuitIndex = CircuitCtr;
@@ -557,7 +556,7 @@ namespace PlantPipingSystemsManager {
 
 			// validate pipe domain-circuit name-to-index references
 			for ( CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr ) {
-				CircuitIndex = FindItemInList( PipingSystemDomains( DomainNum ).CircuitNames( CircuitCtr ), PipingSystemCircuits.Name(), isize( PipingSystemCircuits ) );
+				CircuitIndex = FindItemInList( PipingSystemDomains( DomainNum ).CircuitNames( CircuitCtr ), PipingSystemCircuits );
 				PipingSystemDomains( DomainNum ).CircuitIndeces( CircuitCtr ) = CircuitIndex;
 				PipingSystemCircuits( CircuitIndex ).ParentDomainIndex = DomainNum;
 			}
@@ -704,7 +703,6 @@ namespace PlantPipingSystemsManager {
 		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts;
 		using DataSurfaces::OSCM;
-		using DataSurfaces::TotOSCM;
 		using General::TrimSigDigits;
 		using namespace GroundTemps;
 
@@ -736,7 +734,7 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).Name = cAlphaArgs( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipingSystemDomains.Name(), DomainNum - 1, IsNotOK, IsBlank, ObjName_ug_GeneralDomain + " Name" );
+			VerifyName( cAlphaArgs( 1 ), PipingSystemDomains, DomainNum - 1, IsNotOK, IsBlank, ObjName_ug_GeneralDomain + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Duplicate name encountered";
@@ -868,7 +866,7 @@ namespace PlantPipingSystemsManager {
 				// get boundary condition model names and indeces --error check
 				CurIndex = 9;
 				PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName = cAlphaArgs( CurIndex );
-				PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName, OSCM.Name(), TotOSCM );
+				PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName, OSCM );
 				if ( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex <= 0 ) {
 					IssueSevereInputFieldError( RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), cAlphaArgs( CurIndex ), "Could not match with an Other Side Conditions Model input object.", ErrorsFound );
 				} else {
@@ -883,7 +881,7 @@ namespace PlantPipingSystemsManager {
 
 				CurIndex = 10;
 				PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName = cAlphaArgs( CurIndex );
-				PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName, OSCM.Name(), TotOSCM );
+				PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName, OSCM );
 				if ( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex <= 0 ) {
 					IssueSevereInputFieldError( RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), cAlphaArgs( CurIndex ), "Could not match with an Other Side Conditions Model input object.", ErrorsFound );
 				} else {
@@ -957,7 +955,6 @@ namespace PlantPipingSystemsManager {
 			using InputProcessor::VerifyName;
 			using namespace DataIPShortCuts;
 			using DataSurfaces::OSCM;
-			using DataSurfaces::TotOSCM;
 			using General::TrimSigDigits;
 			using DataHeatBalance::Material;
 			using DataHeatBalance::TotMaterials;
@@ -1089,7 +1086,7 @@ namespace PlantPipingSystemsManager {
 				Domain( ZoneCoupledDomainCtr ).ObjName = cAlphaArgs( 1 );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Domain.ObjName(), ZoneCoupledDomainCtr - 1, IsNotOK, IsBlank, ObjName_ZoneCoupled_Slab + " Name" );
+				VerifyName( cAlphaArgs( 1 ), Domain, &GroundDomainData::ObjName, ZoneCoupledDomainCtr - 1, IsNotOK, IsBlank, ObjName_ZoneCoupled_Slab + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					cAlphaArgs( 1 ) = "Duplicate name encountered";
@@ -1238,7 +1235,7 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).Name = Domain( ZoneCoupledDomainCtr ).ObjName;
 
 				// get boundary condition model names and indices -- error check
-				PipingSystemDomains( DomainCtr ).ZoneCoupledOSCMIndex = FindItemInList( Domain( ZoneCoupledDomainCtr ).OSCMName, OSCM.Name(), TotOSCM );
+				PipingSystemDomains( DomainCtr ).ZoneCoupledOSCMIndex = FindItemInList( Domain( ZoneCoupledDomainCtr ).OSCMName, OSCM );
 				if ( PipingSystemDomains( DomainCtr ).ZoneCoupledOSCMIndex <= 0 ) {
 					IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Slab, cAlphaArgs( 1 ), cAlphaFieldNames( 2 ), cAlphaArgs( 2 ), "Could not match with an Other Side Conditions Model input object.", ErrorsFound );
 				} else {
@@ -1348,7 +1345,6 @@ namespace PlantPipingSystemsManager {
 		using InputProcessor::MakeUPPERCase;
 		using namespace DataIPShortCuts;
 		using DataSurfaces::OSCM;
-		using DataSurfaces::TotOSCM;
 		using General::TrimSigDigits;
 		using DataHeatBalance::Material;
 		using DataHeatBalance::TotMaterials;
@@ -1446,7 +1442,7 @@ namespace PlantPipingSystemsManager {
 			Domain( BasementCtr ).ObjName = cAlphaArgs( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Domain.ObjName(), BasementCtr - 1, IsNotOK, IsBlank, ObjName_ZoneCoupled_Basement + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Domain, &GroundDomainData::ObjName, BasementCtr - 1, IsNotOK, IsBlank, ObjName_ZoneCoupled_Basement + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Duplicate name encountered";
@@ -1488,7 +1484,7 @@ namespace PlantPipingSystemsManager {
 			// get boundary condition model names and indeces --error check
 			CurIndex = 4;
 			PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName = cAlphaArgs( CurIndex );
-			PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName, OSCM.Name(), TotOSCM );
+			PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName, OSCM );
 			if ( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex <= 0 ) {
 				IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Basement, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), cAlphaArgs( CurIndex ), "Could not match with an Other Side Conditions Model input object.", ErrorsFound );
 			} else {
@@ -1506,7 +1502,7 @@ namespace PlantPipingSystemsManager {
 
 			CurIndex = 8;
 			PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName = cAlphaArgs( CurIndex );
-			PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName, OSCM.Name(), TotOSCM );
+			PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName, OSCM );
 			if ( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex <= 0 ) {
 				IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Basement, cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), cAlphaArgs( CurIndex ), "Could not match with an Other Side Conditions Model input object.", ErrorsFound );
 			} else {
@@ -1736,7 +1732,7 @@ namespace PlantPipingSystemsManager {
 			PipingSystemCircuits( PipeCircuitCounter ).Name = cAlphaArgs( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipingSystemCircuits.Name(), PipeCircuitCounter - 1, IsNotOK, IsBlank, ObjName_Circuit + " Name" );
+			VerifyName( cAlphaArgs( 1 ), PipingSystemCircuits, PipeCircuitCounter - 1, IsNotOK, IsBlank, ObjName_Circuit + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Duplicate name encountered";
@@ -1860,7 +1856,7 @@ namespace PlantPipingSystemsManager {
 			PipingSystemSegments( SegmentCtr ).Name = cAlphaArgs( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipingSystemSegments.Name(), SegmentCtr - 1, IsNotOK, IsBlank, ObjName_Segment + " Name" );
+			VerifyName( cAlphaArgs( 1 ), PipingSystemSegments, SegmentCtr - 1, IsNotOK, IsBlank, ObjName_Segment + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Duplicate name encountered";
@@ -2073,7 +2069,7 @@ namespace PlantPipingSystemsManager {
 			HGHX( HorizontalGHXCtr ).ObjName = cAlphaArgs( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), HGHX.ObjName(), HorizontalGHXCtr - 1, IsNotOK, IsBlank, ObjName_HorizTrench + " Name" );
+			VerifyName( cAlphaArgs( 1 ), HGHX, &HorizontalTrenchData::ObjName, HorizontalGHXCtr - 1, IsNotOK, IsBlank, ObjName_HorizTrench + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Duplicate name encountered";
@@ -9443,7 +9439,7 @@ namespace PlantPipingSystemsManager {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

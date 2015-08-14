@@ -156,7 +156,7 @@ namespace GeneratorFuelSupply {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), FuelSupply.Name(), FuelSupNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), FuelSupply, FuelSupNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -645,7 +645,7 @@ namespace GeneratorFuelSupply {
 			for ( i = 1; i <= FuelSupply( FuelSupplyNum ).NumConstituents; ++i ) {
 
 				thisName = FuelSupply( FuelSupplyNum ).ConstitName( i );
-				thisGasID = FindItem( thisName, GasPhaseThermoChemistryData.ConstituentName(), NumHardCodedConstituents );
+				thisGasID = FindItem( thisName, GasPhaseThermoChemistryData, &GasPropertyDataStruct::ConstituentName );
 				FuelSupply( FuelSupplyNum ).GasLibID( i ) = thisGasID;
 
 				if ( thisGasID == 0 ) {

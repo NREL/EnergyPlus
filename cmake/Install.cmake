@@ -155,6 +155,8 @@ install(FILES "${CMAKE_SOURCE_DIR}/idd/V8-3-0-Energy+.idd" DESTINATION "PreProce
 install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}-Energy+.idd" )
 
 if( WIN32 )
+  # calcsoilsurftemp is now built from source, just need to install the batch run script
+  INSTALL(FILES "${CMAKE_SOURCE_DIR}/src/CalcSoilSurfTemp/RunCalcSoilSurfTemp.bat" DESTINATION "PreProcess/CalcSoilSurfTemp/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/bin/Windows/EP-Launch.exe" "./")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/bin/Windows/Epl-run.bat" "./")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/bin/Windows/RunDirMulti.bat" "./")
@@ -166,9 +168,6 @@ if( WIN32 )
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/bin/Windows/PostProcess/CSVproc.exe" "PostProcess/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/bin/Windows/PostProcess/RunReadESO.bat" "PostProcess/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/bin/Windows/PreProcess/BLASTTranslator/BLASTTranslator.txt" "PreProcess/BLASTTranslator/")
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/bin/Windows/PreProcess/CalcSoilSurfTemp/CalcSoilSurfTemp.exe" "PreProcess/CalcSoilSurfTemp/")
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/bin/Windows/PreProcess/CalcSoilSurfTemp/CalcSoilSurfTemp.out" "PreProcess/CalcSoilSurfTemp/")
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/bin/Windows/PreProcess/CalcSoilSurfTemp/RunCalcSoilSurfTemp.bat" "PreProcess/CalcSoilSurfTemp/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/bin/Windows/PreProcess/CoeffConv/CoeffCheck.exe" "PreProcess/CoeffConv/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/bin/Windows/PreProcess/CoeffConv/CoeffCheckExample.cci" "PreProcess/CoeffConv/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/bin/Windows/PreProcess/CoeffConv/CoeffConv.exe" "PreProcess/CoeffConv/")

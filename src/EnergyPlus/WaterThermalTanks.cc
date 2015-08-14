@@ -286,7 +286,7 @@ namespace WaterThermalTanks {
 		// Find the correct Equipment
 		if ( CompType != TypeOf_HeatPumpWtrHeaterPumped && CompType != TypeOf_HeatPumpWtrHeaterWrapped ) {
 			if ( CompIndex == 0 ) {
-				CompNum = FindItem( CompName, WaterThermalTank.Name(), NumWaterThermalTank );
+				CompNum = FindItem( CompName, WaterThermalTank );
 				if ( CompNum == 0 ) {
 					ShowFatalError( "SimWaterThermalTank:  Unit not found=" + CompName );
 				}
@@ -305,7 +305,7 @@ namespace WaterThermalTanks {
 			}
 		} else {
 			if ( CompIndex == 0 ) {
-				CompNum = FindItem( CompName, HPWaterHeater.Name(), NumHeatPumpWaterHeater );
+				CompNum = FindItem( CompName, HPWaterHeater );
 				if ( CompNum == 0 ) {
 					ShowFatalError( "SimWaterThermalTank:  Unit not found=" + CompName );
 				}
@@ -613,7 +613,7 @@ namespace WaterThermalTanks {
 
 		// Find the correct Heat Pump Water Heater
 		if ( CompIndex == 0 ) {
-			HeatPumpNum = FindItemInList( CompName, HPWaterHeater.Name(), NumHeatPumpWaterHeater );
+			HeatPumpNum = FindItemInList( CompName, HPWaterHeater );
 			if ( HeatPumpNum == 0 ) {
 				ShowFatalError( "SimHeatPumpWaterHeater: Unit not found=" + CompName );
 			}
@@ -979,7 +979,7 @@ namespace WaterThermalTanks {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), WaterHeaterDesuperheater.Name(), DesuperheaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+					VerifyName( cAlphaArgs( 1 ), WaterHeaterDesuperheater, DesuperheaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1291,7 +1291,7 @@ namespace WaterThermalTanks {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( hpwhAlpha[ 1 ], HPWaterHeater.Name(), HPWaterHeaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+					VerifyName( hpwhAlpha[ 1 ], HPWaterHeater, HPWaterHeaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) hpwhAlpha[ 1 ] = "xxxxx";
@@ -1432,7 +1432,7 @@ namespace WaterThermalTanks {
 
 						// Inlet Air Zone
 						if ( ! hpwhAlphaBlank[ 13 + nAlphaOffset ] ) {
-							HPWH.AmbientTempZone = FindItemInList( hpwhAlpha[ 13 + nAlphaOffset ], Zone.Name(), NumOfZones );
+							HPWH.AmbientTempZone = FindItemInList( hpwhAlpha[ 13 + nAlphaOffset ], Zone );
 							if ( HPWH.AmbientTempZone == 0 ) {
 								ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
 								ShowContinueError( hpwhAlphaFieldNames[ 13 + nAlphaOffset ] + "=\"" + hpwhAlpha[ 13 + nAlphaOffset ] + "\"." );
@@ -1452,7 +1452,7 @@ namespace WaterThermalTanks {
 
 						// Inlet Air Zone
 						if ( ! hpwhAlphaBlank[ 13 + nAlphaOffset ] ) {
-							HPWH.AmbientTempZone = FindItemInList( hpwhAlpha[ 13 + nAlphaOffset ], Zone.Name(), NumOfZones );
+							HPWH.AmbientTempZone = FindItemInList( hpwhAlpha[ 13 + nAlphaOffset ], Zone );
 							if ( HPWH.AmbientTempZone == 0 ) {
 								ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
 								ShowContinueError( hpwhAlphaFieldNames[ 13 + nAlphaOffset ] + "=\"" + hpwhAlpha[ 13 + nAlphaOffset ] + "\"." );
@@ -1991,7 +1991,7 @@ namespace WaterThermalTanks {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), WaterThermalTank.Name(), WaterThermalTankNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+					VerifyName( cAlphaArgs( 1 ), WaterThermalTank, WaterThermalTankNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2258,7 +2258,7 @@ namespace WaterThermalTanks {
 
 					} else if ( SELECT_CASE_var == "ZONE" ) {
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempIndicator = AmbientTempZone;
-						WaterThermalTank( WaterThermalTankNum ).AmbientTempZone = FindItemInList( cAlphaArgs( 10 ), Zone.Name(), NumOfZones );
+						WaterThermalTank( WaterThermalTankNum ).AmbientTempZone = FindItemInList( cAlphaArgs( 10 ), Zone );
 						if ( WaterThermalTank( WaterThermalTankNum ).AmbientTempZone == 0 ) {
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Temperature Zone not found = " + cAlphaArgs( 10 ) );
 							ErrorsFound = true;
@@ -2427,7 +2427,7 @@ namespace WaterThermalTanks {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), WaterThermalTank.Name(), WaterThermalTankNum - NumWaterHeaterMixed - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+					VerifyName( cAlphaArgs( 1 ), WaterThermalTank, WaterThermalTankNum - NumWaterHeaterMixed - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2724,7 +2724,7 @@ namespace WaterThermalTanks {
 
 					} else if ( SELECT_CASE_var == "ZONE" ) {
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempIndicator = AmbientTempZone;
-						WaterThermalTank( WaterThermalTankNum ).AmbientTempZone = FindItemInList( cAlphaArgs( 12 ), Zone.Name(), NumOfZones );
+						WaterThermalTank( WaterThermalTankNum ).AmbientTempZone = FindItemInList( cAlphaArgs( 12 ), Zone );
 						if ( WaterThermalTank( WaterThermalTankNum ).AmbientTempZone == 0 ) {
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Temperature Zone not found = " + cAlphaArgs( 12 ) );
 							ErrorsFound = true;
@@ -2975,7 +2975,7 @@ namespace WaterThermalTanks {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), WaterThermalTank.Name(), WaterThermalTankNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+					VerifyName( cAlphaArgs( 1 ), WaterThermalTank, WaterThermalTankNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -3050,7 +3050,7 @@ namespace WaterThermalTanks {
 
 					} else if ( SELECT_CASE_var == "ZONE" ) {
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempIndicator = AmbientTempZone;
-						WaterThermalTank( WaterThermalTankNum ).AmbientTempZone = FindItemInList( cAlphaArgs( 5 ), Zone.Name(), NumOfZones );
+						WaterThermalTank( WaterThermalTankNum ).AmbientTempZone = FindItemInList( cAlphaArgs( 5 ), Zone );
 						if ( WaterThermalTank( WaterThermalTankNum ).AmbientTempZone == 0 ) {
 							ShowSevereError( "Invalid, " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
 							ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -3197,7 +3197,7 @@ namespace WaterThermalTanks {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( cAlphaArgs( 1 ), WaterThermalTank.Name(), WaterThermalTankNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+					VerifyName( cAlphaArgs( 1 ), WaterThermalTank, WaterThermalTankNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -3297,7 +3297,7 @@ namespace WaterThermalTanks {
 
 					} else if ( SELECT_CASE_var == "ZONE" ) {
 						WaterThermalTank( WaterThermalTankNum ).AmbientTempIndicator = AmbientTempZone;
-						WaterThermalTank( WaterThermalTankNum ).AmbientTempZone = FindItemInList( cAlphaArgs( 6 ), Zone.Name(), NumOfZones );
+						WaterThermalTank( WaterThermalTankNum ).AmbientTempZone = FindItemInList( cAlphaArgs( 6 ), Zone );
 						if ( WaterThermalTank( WaterThermalTankNum ).AmbientTempZone == 0 ) {
 							ShowSevereError( "Invalid, " + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) );
 							ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -3855,7 +3855,7 @@ namespace WaterThermalTanks {
 					GetObjectItem( cCurrentModuleObject, WHsizingNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 					// find which water heater this object is for
-					WaterThermalTankNum = FindItemInList( cAlphaArgs( 1 ), WaterThermalTank.Name(), NumWaterThermalTank );
+					WaterThermalTankNum = FindItemInList( cAlphaArgs( 1 ), WaterThermalTank );
 					if ( WaterThermalTankNum == 0 ) {
 						// did not match name throw warning.
 						ShowSevereError( cCurrentModuleObject + " object name: " + cAlphaArgs( 1 ) + " does not match any of the water heaters defined in the file" );
@@ -4239,10 +4239,6 @@ namespace WaterThermalTanks {
 			}
 
 		} // get input flag
-
-		if ( allocated( HPWHSaveNodeNames ) ) HPWHSaveNodeNames.deallocate();
-		if ( allocated( WHSaveNodeNames ) ) WHSaveNodeNames.deallocate();
-		if ( allocated( CoilSaveNodeNames ) ) CoilSaveNodeNames.deallocate();
 
 	}
 
@@ -7454,7 +7450,7 @@ namespace WaterThermalTanks {
 			Tank.SourceInletTemp = Node( HPWaterOutletNode ).Temp;
 
 			// Check tank temperature by setting source inlet mass flow rate to zero.
-			
+
 			 // disables heat pump for stratified tanks
 
 			// Disable the tank's internal heating element to find PLR of the HPWH using floating temperatures.
@@ -10410,7 +10406,7 @@ namespace WaterThermalTanks {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

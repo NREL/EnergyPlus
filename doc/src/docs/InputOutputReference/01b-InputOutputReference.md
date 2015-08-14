@@ -8312,7 +8312,7 @@ Pipe:Underground,
     Water,                              !- Fluid Name
     SunExposed,                         !- Sun Exposure
     0.05,                               !- Pipe Inside Diameter    
-    20.0,                               !- pipe Length
+    20.0,                               !- Pipe Length
     Buried Pipe Soil,                   !- Soil Material
     Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
     KATemps;                            !- Name of Undisturbed Ground Temperature Object
@@ -8491,6 +8491,9 @@ The maximum temperature deviation within any cell between one iteration and anot
 #### Field: Maximum Iterations in the Outer Cartesian Domain Iteration Loop
 
 The maximum number of iterations to make when performing temperature updates of the Cartesian coordinate system.  The actual number of iterations made will of course depend on transient conditions and convergence tolerance.
+
+#### Field: Evapotranspiration Ground Cover Parameter
+Numeric field specifies the ground cover effects used in the evapotranspiration model at the ground surface heat balance. The values range from 0 (solid, nonpermeable ground surface) to 1.5 (wild growth).
 
 #### Field: Number of Pipe Circuits Entered for this Domain
 
@@ -11039,11 +11042,11 @@ This numeric field contains the chiller’s optimum part-load ratio. This is the
 
 This numeric field contains the chiller’s minimum unloading ratio. The expected range is between 0 and 1. The minimum unloading ratio is where the chiller capacity can no longer be reduced by unloading and must be false loaded to meet smaller cooling loads. A typical false loading strategy is hot-gas bypass. The minimum unloading ratio must be greater than or equal to the Minimum Part Load Ratio, and less than or equal to the Maximum Part Load Ratio. The default value is 0.2.
 
-#### Field: Chilled Water Side Inlet Node
+#### Field: Chilled Water Inlet Node Name
 
 This required alpha field contains the identifying name for the chiller plant side (chilled water) inlet node.
 
-#### Field: Chilled Water Side Outlet Node
+#### Field: Chilled Water Outlet Node Name
 
 This required alpha field contains the identifying name for the chiller plant side (chilled water) outlet node.
 
@@ -11079,11 +11082,11 @@ This choice field determines how the chiller operates with respect to the intend
 
 This is the design heat recovery water flow rate if the heat recovery option is being simulated. If this value is greater than 0.0 (or Autosize), a heat recovery loop must be specified and attached to the chiller using the next two node fields. The units are in cubic meters per second.  This field is autosizable.  When autosizing, the flow rate is simply the product of the design condenser flow rate and the condenser heat recovery relative capacity fraction set in the field below.
 
-#### Field: Heat Recovery Side Inlet Node
+#### Field: Heat Recovery Inlet Node Name
 
 This alpha field contains the identifying name for the chiller heat recovery side inlet node. If the user wants to model chiller heat recovery, a heat recovery loop must be specified.
 
-#### Field: Heat Recovery Side Outlet Node
+#### Field: Heat Recovery Outlet Node Name
 
 This alpha field contains the identifying name for the chiller heat recovery side outlet node. If the user wants to model chiller heat recovery, a heat recovery loop must be specified.
 
@@ -11438,11 +11441,11 @@ This choice field determines how the chiller operates with respect to the intend
 
 This is the design heat recovery water flow rate if the heat recovery option is being simulated. If this value is greater than 0.0 (or autosize), a heat recovery loop must be specified and attached to the chiller using the next two node fields. The units are in cubic meters per second.  This field is autosizable.  When autosizing, the flow rate is simply the product of the design condenser flow rate and the condenser heat recovery relative capacity fraction set in the field below.
 
-#### Field: Heat Recovery Side Inlet Node
+#### Field: Heat Recovery Inlet Node Name
 
 This alpha field contains the identifying name for the chiller heat recovery side inlet node. If the user wants to model chiller heat recovery, a heat recovery loop must be specified and it can only be used with a water-cooled condenser.
 
-#### Field: Heat Recovery Side Outlet Node
+#### Field: Heat Recovery Outlet Node Name
 
 This alpha field contains the identifying name for the chiller heat recovery side outlet node. If the user wants to model chiller heat recovery, a heat recovery loop must be specified and it can only be used with a water-cooled condenser.
 
@@ -18769,7 +18772,7 @@ This represents the fan speed operating at each time step: 2 for High Speed, 1 f
 
 ### CoolingTower:VariableSpeed:Merkel
 
-This variable speed tower model is based on Merkel's theory and is similar to the single-speed and two-speed tower models.  The closed-circuit cooling tower is modeled as a counter flow heat exchanger with a variable-speed fan drawing air through the tower (induced-draft configuration). The model also includes a “free convection” regime where cooling tower performance modeled with the fan off.
+This variable speed tower model is based on Merkel's theory and is similar to the single-speed and two-speed tower models.  The open wet cooling tower is modeled as a counter flow heat exchanger with a variable-speed fan drawing air through the tower (induced-draft configuration). The model also includes a “free convection” regime where cooling tower performance modeled with the fan off.
 
 For this model, Merkel’s theory is modified to include adjustments developed by Scheier to alter the heat transfer effectiveness based on current wetbulb, air flow rates, and water flow rates. The input requires performance curves or lookup tables to describe these three adjustment factors.
 

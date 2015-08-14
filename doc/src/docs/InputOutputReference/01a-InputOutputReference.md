@@ -649,7 +649,7 @@ The choice made for this field has important implications for modeling accuracy 
 
 <table class="table table-striped">
 <tr>
-<th>Demanh Winhow</th>
+<th>Demand Window</th>
 <th>Applicable Number of Timesteps per Hour</th>
 </tr>
 <tr>
@@ -1333,7 +1333,7 @@ An IDF example:
 
 ### ProgramControl
 
-The ProgramControl object can be used to control how the EnergyPlus program executes on the computer.  Portions of EnergyPlus have been programmed to use more than one processor, or CPU core, at the same time during a single simulation.  This multithreading may not be desireable when running more than one simulation at a time on the same computer (because it can actually run more slowly).  This input object is optional and allows controlling the number of threads (or cores, or processors) that EnergyPlus will use so that conflicts can be managed.  When this object is used, its input for the number of threads will take precedent over the value of the environment variable **“EP\_OMP\_NUM\_THREADS”** which is an alternate method of controlling the program’s threading. Since the primary method for OpenMP simulations currently (V7.1 and V7.2) is the interior radiant exchange to solve for inside surface temperatures, EnergyPlus sets the threads to 1 if the nominal number of surfaces is &lt;= 30.
+This object is currently disabled. The ProgramControl object can be used to control how the EnergyPlus program executes on the computer.  Portions of EnergyPlus have been programmed to use more than one processor, or CPU core, at the same time during a single simulation.  This multithreading may not be desireable when running more than one simulation at a time on the same computer (because it can actually run more slowly).  This input object is optional and allows controlling the number of threads (or cores, or processors) that EnergyPlus will use so that conflicts can be managed.  When this object is used, its input for the number of threads will take precedent over the value of the environment variable **“EP\_OMP\_NUM\_THREADS”** which is an alternate method of controlling the program’s threading. Since the primary method for OpenMP simulations currently (V7.1 and V7.2) is the interior radiant exchange to solve for inside surface temperatures, EnergyPlus sets the threads to 1 if the nominal number of surfaces is &lt;= 30.
 
 #### Field: Number of Threads Allowed
 
@@ -11690,15 +11690,15 @@ The fraction of the outside area of an exterior surface that is illuminated by (
 
 #### Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient [W/m2-K]
 
-This is the coefficient that describes thermal radiation heat transfer between the outside face and the air mass surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T – T) when applied to the ambient air. Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Air Coeff.”
+This is the coefficient that describes thermal radiation heat transfer between the outside face and the air mass surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T_surf – T_surfodb) when applied to the ambient air. Where T_surf = Surface Outside Face Temperature, and T_surfodb = Surface Outside Face Outdoor Air Drybulb Temperature. Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Air Coeff.”
 
 #### Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient [W/m2-K]
 
-This is the coefficient that describes thermal radiation heat transfer between the outside face and the sky surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T – T) when applied to the sky. Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Sky Coeff.”
+This is the coefficient that describes thermal radiation heat transfer between the outside face and the sky surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T_surf – T_sky) when applied to the sky. Where T_surf = Surface Outside Face Temperature, and T_sky = Site Sky Temperature. Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Sky Coeff.”
 
 #### Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient [W/m2-K]
 
-This is the coefficient that describes thermal radiation heat transfer between the outside face and the ground surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T – T) when applied to the ground. Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Ground Coeff.”
+This is the coefficient that describes thermal radiation heat transfer between the outside face and the ground surrounding the surface.  It is the value of “Hr” in the classic linearized model for thermal radiation Q = Hr \* A \* (T_surf – T_odb) when applied to the ground. Where T_surf = Surface Outside Face Temperature, and T_odb = Site Outdoor Air Drybulb Temperature (used as an approximation for the ground surface temperature). Former Name: Prior to version 7.1, this output was called “Surface Ext Rad to Ground Coeff.”
 
 #### Surface Outside Face Solar Radiation Heat Gain Rate [W]
 
