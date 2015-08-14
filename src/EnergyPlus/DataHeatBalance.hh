@@ -648,11 +648,15 @@ namespace DataHeatBalance {
 		Real64 WinShadeAirFlowPermeability; // The effective area of openings in the shade itself, expressed as a
 		//  fraction of the shade area
 		bool EMPDMaterialProps; // True if EMPD properties have been assigned
-		Real64 EMPDVALUE;
+		Real64 EMPDperm;
 		Real64 MoistACoeff;
 		Real64 MoistBCoeff;
 		Real64 MoistCCoeff;
 		Real64 MoistDCoeff;
+		Real64 EMPDPeriodShort;
+		Real64 EMPDPeriodLong;
+		Real64 CoatingPerm;
+		Real64 CoatingThickness;
 		Real64 EMPDaCoeff;
 		Real64 EMPDbCoeff;
 		Real64 EMPDcCoeff;
@@ -811,11 +815,15 @@ namespace DataHeatBalance {
 			WinShadeRightOpeningMult( 0.0 ),
 			WinShadeAirFlowPermeability( 0.0 ),
 			EMPDMaterialProps( false ),
-			EMPDVALUE( 0.0 ),
+			EMPDperm( 0.0 ),
 			MoistACoeff( 0.0 ),
 			MoistBCoeff( 0.0 ),
 			MoistCCoeff( 0.0 ),
 			MoistDCoeff( 0.0 ),
+			EMPDPeriodShort( 0.0 ),
+			EMPDPeriodLong( 0.0 ),
+			CoatingPerm( 0.0 ),
+			CoatingThickness( 0.0 ),
 			EMPDaCoeff( 0.0 ),
 			EMPDbCoeff( 0.0 ),
 			EMPDcCoeff( 0.0 ),
@@ -970,11 +978,15 @@ namespace DataHeatBalance {
 			Real64 const WinShadeRightOpeningMult, // Area of air-flow opening at right side of shade, expressed as a fraction
 			Real64 const WinShadeAirFlowPermeability, // The effective area of openings in the shade itself, expressed as a
 			bool const EMPDMaterialProps, // True if EMPD properties have been assigned
-			Real64 const EMPDVALUE,
+			Real64 const EMPDperm,
 			Real64 const MoistACoeff,
 			Real64 const MoistBCoeff,
 			Real64 const MoistCCoeff,
 			Real64 const MoistDCoeff,
+			Real64 const EMPDPeriodShort,
+			Real64 const EMPDPeriodLong,
+			Real64 const CoatingPerm,
+			Real64 const CoatingThickness,
 			Real64 const EMPDaCoeff,
 			Real64 const EMPDbCoeff,
 			Real64 const EMPDcCoeff,
@@ -1127,11 +1139,15 @@ namespace DataHeatBalance {
 			WinShadeRightOpeningMult( WinShadeRightOpeningMult ),
 			WinShadeAirFlowPermeability( WinShadeAirFlowPermeability ),
 			EMPDMaterialProps( EMPDMaterialProps ),
-			EMPDVALUE( EMPDVALUE ),
+			EMPDperm( EMPDperm ),
 			MoistACoeff( MoistACoeff ),
 			MoistBCoeff( MoistBCoeff ),
 			MoistCCoeff( MoistCCoeff ),
 			MoistDCoeff( MoistDCoeff ),
+			EMPDPeriodShort( EMPDPeriodShort ),
+			EMPDPeriodLong( EMPDPeriodLong ),
+			CoatingPerm( CoatingPerm ),
+			CoatingThickness( CoatingThickness ),
 			EMPDaCoeff( EMPDaCoeff ),
 			EMPDbCoeff( EMPDbCoeff ),
 			EMPDcCoeff( EMPDcCoeff ),

@@ -6713,9 +6713,8 @@ MaterialProperty:MoisturePenetrationDepth:Settings,
        \note Material Name that the moisture properties will be added to.
        \note Additional material properties required to perform the EMPD model.
        \note Effective Mean Penetration Depth (EMPD)
-  N1 , \field Moisture Penetration Depth
+  N1 , \field Material moisture permeability
        \required-field
-       \note This is the penetration depth
        \units m
        \minimum 0.0
        \type real
@@ -6731,9 +6730,24 @@ MaterialProperty:MoisturePenetrationDepth:Settings,
        \required-field
        \units dimensionless
        \type real
-  N5 ; \field Moisture Equation Coefficient d
+  N5 , \field Moisture Equation Coefficient d
        \required-field
        \units dimensionless
+       \type real
+  N6 , \field Short-term buffering period
+       \required-field
+       \units s
+       \type real
+  N7 , \field Long-term buffering period
+       \required-field
+       \units s
+       \type real
+  N8 , \field Coating layer permeability
+       \required-field
+       \type real
+  N9 ; \field Coating layer thickness
+       \required-field
+       \units m
        \type real
 
 MaterialProperty:PhaseChange,

@@ -15,6 +15,7 @@
 #include <DataHeatBalFanSys.hh>
 #include <DataIPShortCuts.hh>
 #include <DataMoistureBalanceEMPD.hh>
+#include <DataMoistureBalance.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataSurfaces.hh>
 #include <General.hh>
@@ -34,7 +35,7 @@ namespace MoistureBalanceEMPDManager {
 	//   Authors:        Muthusamy Swami and Lixing Gu
 	//   Date written:   August, 1999
 	//   Modified:       na
-	//   Re-engineered:  na
+	//   Re-engineered:  Jason Woods and Noel Merket, August 2015
 
 	// PURPOSE OF THIS MODULE:
 	// To calculate moisture adsorption and desorption at interior wall surfaces
@@ -72,6 +73,9 @@ namespace MoistureBalanceEMPDManager {
 	using DataSurfaces::Surface;
 	using DataSurfaces::SurfaceClass_Window;
 	using namespace DataMoistureBalanceEMPD;
+	using DataMoistureBalance::HMassConvInFD;
+	using DataMoistureBalance::HConvInFD;
+	using DataMoistureBalance::RhoVaporAirIn;
 
 	// Data
 	// MODULE VARIABLE and Function DECLARATIONs
@@ -131,7 +135,7 @@ namespace MoistureBalanceEMPDManager {
 		int MaterNum; // Counter to keep track of the material number
 		int MaterialNumAlpha; // Number of material alpha names being passed
 		int MaterialNumProp; // Number of material properties being passed
-		Array1D< Real64 > MaterialProps( 5 ); // Temporary array to transfer material properties
+		Array1D< Real64 > MaterialProps( 9 ); // Temporary array to transfer material properties
 		static bool ErrorsFound( false ); // If errors detected in input
 
 		int EMPDMat; // EMPD Moisture Material additional properties for each base material
@@ -185,11 +189,15 @@ namespace MoistureBalanceEMPDManager {
 
 			// Once the material derived type number is found then load the additional moisture material properties
 			Material( MaterNum ).EMPDMaterialProps = true;
-			Material( MaterNum ).EMPDVALUE = MaterialProps( 1 );
+			Material( MaterNum ).EMPDperm = MaterialProps( 1 );
 			Material( MaterNum ).MoistACoeff = MaterialProps( 2 );
 			Material( MaterNum ).MoistBCoeff = MaterialProps( 3 );
 			Material( MaterNum ).MoistCCoeff = MaterialProps( 4 );
 			Material( MaterNum ).MoistDCoeff = MaterialProps( 5 );
+			Material( MaterNum ).EMPDPeriodShort = MaterialProps( 6 );
+			Material( MaterNum ).EMPDPeriodLong = MaterialProps( 7 );
+			Material( MaterNum ).CoatingPerm = MaterialProps( 8 );
+			Material( MaterNum ).CoatingThickness = MaterialProps( 9 );
 
 		}
 
@@ -200,7 +208,7 @@ namespace MoistureBalanceEMPDManager {
 			if ( Surface( SurfNum ).HeatTransferAlgorithm != HeatTransferModel_EMPD ) continue;
 			ConstrNum = Surface( SurfNum ).Construction;
 			MatNum = Construct( ConstrNum ).LayerPoint( Construct( ConstrNum ).TotLayers );
-			if ( Material( MatNum ).EMPDVALUE > 0.0 && Surface( SurfNum ).Zone > 0 ) {
+			if ( Material( MatNum ).EMPDperm > 0.0 && Surface( SurfNum ).Zone > 0 ) {
 				EMPDzone( Surface( SurfNum ).Zone ) = true;
 			} else {
 				++ErrCount;
@@ -295,6 +303,15 @@ namespace MoistureBalanceEMPDManager {
 			RhoVapEMPD.allocate( TotSurfaces );
 			WSurfEMPD.allocate( TotSurfaces );
 			RHEMPD.allocate( TotSurfaces );
+			RVsurface.allocate( TotSurfaces );
+			RVsurfOld.allocate( TotSurfaces );
+			RVdeep.allocate( TotSurfaces );
+			RVdeepOld.allocate( TotSurfaces );
+			RVwall.allocate( TotSurfaces );
+			HMshort.allocate( TotSurfaces );
+			FluxSurf.allocate( TotSurfaces );
+			FluxDeep.allocate( TotSurfaces );
+			FluxZone.allocate( TotSurfaces );
 		}
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
@@ -304,10 +321,28 @@ namespace MoistureBalanceEMPDManager {
 				MoistEMPDOld( SurfNum ) = 0.0001;
 				MoistEMPDInt( SurfNum ) = 0.0001;
 				MoistEMPDNew( SurfNum ) = 0.0001;
+				RVsurface( SurfNum ) = 0.001;
+				RVsurfOld( SurfNum ) = 0.001;
+				RVdeep( SurfNum ) = 0.001;
+				RVdeepOld( SurfNum ) = 0.001;
+				RVwall( SurfNum ) = 0.001;
+				HMshort( SurfNum ) = 0.001;
+				FluxSurf( SurfNum ) = 0.001;
+				FluxDeep( SurfNum ) = 0.001;
+				FluxZone( SurfNum ) = 0.001;
 			} else {
 				MoistEMPDOld( SurfNum ) = ZoneAirHumRat( ZoneNum ); // Surface moisture level initialization
 				MoistEMPDInt( SurfNum ) = ZoneAirHumRat( ZoneNum ); // by assuming initial values be equal to ZoneAirHumRat
 				MoistEMPDNew( SurfNum ) = ZoneAirHumRat( ZoneNum );
+				RVsurface( SurfNum ) = RhoVaporAirIn( SurfNum );
+				RVsurfOld( SurfNum ) = RhoVaporAirIn( SurfNum );
+				RVdeep( SurfNum ) = RhoVaporAirIn( SurfNum );
+				RVdeepOld( SurfNum ) = RhoVaporAirIn( SurfNum );
+				RVwall( SurfNum ) = RhoVaporAirIn( SurfNum );
+				HMshort( SurfNum ) = 0.0003;
+				FluxSurf( SurfNum ) = 0.000;
+				FluxDeep( SurfNum ) = 0.000;
+				FluxZone( SurfNum ) = 0.000;
 			}
 		}
 		if ( ! InitEnvrnFlag ) return;
@@ -360,6 +395,9 @@ namespace MoistureBalanceEMPDManager {
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyRhovFnTdbWPb;
+		using Psychrometrics::PsyRhFnTdbRhov;
+		using Psychrometrics::PsyRhovFnTdbRh;
+		using Psychrometrics::PsyPsatFnTemp;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -367,7 +405,7 @@ namespace MoistureBalanceEMPDManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Error( 0.01 ); // Totlarence (%)
 		Real64 const RLXM( 0.3 ); // Relaxation factor (0-1)
-		Real64 const Lam( 2.5e6 ); // Heat of vaporization (J/kg)
+		Real64 const Lam( 0.1 ); // Heat of vaporization (J/kg)
 		static std::string const RoutineName( "CalcMoistureEMPD" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -382,7 +420,8 @@ namespace MoistureBalanceEMPDManager {
 		int MatNum; // Material number at interior layer
 		int ConstrNum; // Construction number
 		Real64 RHOBULK; // Material bulk density
-		Real64 HM; // Moisture transfer coefficient
+		Real64 HMlong; // Overall deep-layer transfer coefficient
+		Real64 RSurfaceLayer; // Mass transfer resistance between actual surface and surface layer node
 		Real64 Taver; // Average zone temperature between current time and previous time
 		//    REAL(r64)    :: Waver     ! Average zone humidity ratio between current time and previous time
 		Real64 RHaver; // Average zone relative humidity {0-1} between current time and previous time
@@ -397,11 +436,16 @@ namespace MoistureBalanceEMPDManager {
 		static bool OneTimeFlag( true );
 		Real64 Wsurf; // Surface moisture flux
 		Real64 PVsurf; // Surface vapor pressure
-
-		//    if (OneTimeFlag) then
-		//       Call InitMoistureBalanceEMPD
-		//       OneTimeFlag = .False.
-		//    end if
+		Real64 PVsat; // saturation surface vapor pressure
+		Real64 RHSurfOld;
+		Real64 RHDeepOld;
+		Real64 Wsat; // saturation humidity ratio
+		Real64 dEMPD;
+		Real64 dEMPDdeep;
+		Real64 EMPDdiffusivity;
+		Real64 Rcoating;
+		Real64 RHsurface;
+		Real64 RHdeep;
 
 		if ( BeginEnvrnFlag && OneTimeFlag ) {
 			InitMoistureBalanceEMPD();
@@ -423,61 +467,53 @@ namespace MoistureBalanceEMPDManager {
 
 		ZoneNum = Surface( SurfNum ).Zone;
 		auto const & material( Material( MatNum ) );
-		if ( material.EMPDVALUE <= 0.0 ) {
+		if ( material.EMPDperm <= 0.0 ) {
 			MoistEMPDNew( SurfNum ) = PsyRhovFnTdbWPb( TempZone, ZoneAirHumRat( ZoneNum ), OutBaroPress );
 			return;
 		}
 
-		Taver = ( TempSurfIn + TempSurfInOld ) / 2.0;
-		Real64 const Taver_237( Taver + 237.7 );
-		Real64 const RHaver_fac( 461.52 * ( Taver + KelvinConv ) * std::exp( -23.7093 + 4111.0 / Taver_237 ) );
-		Real64 const BR_fac( ( 4111.0 / pow_2( Taver_237 ) ) - ( 1.0 / ( Taver + KelvinConv ) ) );
-
-		while ( Flag > 0 ) {
-			RVaver = ( MoistEMPDNew( SurfNum ) + MoistEMPDOld( SurfNum ) ) / 2.0;
-			RHaver = RVaver * RHaver_fac;
-			if ( RHaver > 1.0 ) {
-				RHaver = 1.0;
-			} else if ( RHaver < 0.0 ) {
-				RHaver = 0.00001;
-			}
-
-			AT = ( material.MoistACoeff * material.MoistBCoeff * std::pow( RHaver, material.MoistBCoeff ) + material.MoistCCoeff * material.MoistDCoeff * std::pow( RHaver, material.MoistDCoeff ) ) / RVaver;
-			BR = BR_fac * AT * RVaver;
-			RHOBULK = material.Density;
-			HM = HConvIn( SurfNum ) / ( PsyRhoAirFnPbTdbW( OutBaroPress, TempZone, ZoneAirHumRat( ZoneNum ), RoutineName ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), TempZone ) );
-			ZoneNum = Surface( SurfNum ).Zone;
-			RALPHA = ZoneAirHumRat( ZoneNum ) * OutBaroPress / ( 461.52 * ( TempZone + KelvinConv ) * ( ZoneAirHumRat( ZoneNum ) + 0.62198 ) );
-			BB = HM / ( RHOBULK * material.EMPDVALUE * AT );
-			CC = BB * RALPHA + BR / AT * ( TempSurfIn - TempSurfInOld ) / TimeStepZoneSec;
-			SolverMoistureBalanceEMPD( MoistEMPDNew( SurfNum ), MoistEMPDOld( SurfNum ), 1.0, BB, CC );
-
-			Flag = 0;
-			ErrorM = std::abs( ( MoistEMPDNew( SurfNum ) - MoistEMPDInt( SurfNum ) ) / MoistEMPDInt( SurfNum ) ) * 100.0;
-			if ( ErrorM > Error ) ++Flag;
-
-			++NOFITR;
-			if ( NOFITR > 500 ) {
-				ShowFatalError( "Iteration limit exceeded in EMPD model, program terminated." );
-			}
-
-			if ( Flag > 0 ) {
-				MoistEMPDNew( SurfNum ) = MoistEMPDNew( SurfNum ) * RLXM + MoistEMPDInt( SurfNum ) * ( 1.0 - RLXM );
-			}
-			MoistEMPDInt( SurfNum ) = MoistEMPDNew( SurfNum );
-		}
+		Taver = 24.5;
+		RVaver = ( MoistEMPDNew( SurfNum ) + MoistEMPDOld( SurfNum ) ) * 0.5;
+		RHaver = RVaver * 461.52 * ( Taver + KelvinConv ) * std::exp( -23.7093 + 4111.0 / ( Taver + 237.7 ));
+		PVsat = PsyPsatFnTemp( Taver, RoutineName );
+		Wsat = 0.622 * PVsat / ( OutBaroPress - PVsat );
+		
+		RHOBULK = material.Density;
+		
+		EMPDdiffusivity = material.EMPDperm * 461.52 * ( Taver + KelvinConv );
+		
+		AT = material.MoistACoeff * material.MoistBCoeff * pow( RHaver, material.MoistBCoeff - 1 ) + material.MoistCCoeff * material.MoistCCoeff * material.MoistDCoeff * pow( RHaver, material.MoistDCoeff - 1 );
+		
+		dEMPD = sqrt( material.EMPDperm * material.EMPDPeriodShort * PVsat / ( RHOBULK * AT * Pi ) );
+		dEMPDdeep = sqrt( material.EMPDperm * material.EMPDPeriodLong * PVsat / ( RHOBULK * AT * Pi ) );
+		
+		Rcoating = material.CoatingThickness * material.CoatingPerm * 461.52 * ( Taver + KelvinConv );
+		HMshort( SurfNum ) = 1.0 / ( 0.5 * dEMPD / EMPDdiffusivity + 1.0 / HMassConvInFD( SurfNum ) + Rcoating );
+		HMlong = 2.0 * EMPDdiffusivity / ( dEMPDdeep + dEMPD );
+		
+		FluxSurf( SurfNum ) = HMshort( SurfNum ) * ( RVsurface( SurfNum ) - RhoVaporAirIn( SurfNum ) ) + HMlong * ( RVsurface( SurfNum ) - RVdeep( SurfNum ) );
+		FluxDeep( SurfNum ) = HMlong * ( RVsurface( SurfNum ) - RVdeep( SurfNum ) );
+		FluxZone( SurfNum ) = HMshort( SurfNum ) * ( RVsurface( SurfNum ) - RhoVaporAirIn( SurfNum ) );
+		
+		RHDeepOld = PsyRhFnTdbRhov( Taver, RVdeepOld( SurfNum ) );
+		RHSurfOld = PsyRhFnTdbRhov( Taver, RVsurfOld( SurfNum ) );
+		
+		RHsurface = RHSurfOld + TimeStepZone * 3600.0 * ( - FluxSurf( SurfNum ) / ( RHOBULK * dEMPD * AT ) );
+		RHdeep = RHDeepOld + TimeStepZone * 3600.0 * FluxDeep( SurfNum ) / ( RHOBULK * dEMPDdeep * AT );
+		
+		RVsurface( SurfNum ) = PsyRhovFnTdbRh( Taver, RHsurface );
+		RVdeep( SurfNum ) = PsyRhovFnTdbRh( Taver, RHdeep );
 
 		// Calculate latent load
-		PVsurf = RHaver * std::exp( 23.7093 - 4111.0 / Taver_237 );
-		Wsurf = 0.62198 * RHaver / ( std::exp( -23.7093 + 4111.0 / Taver_237 ) * OutBaroPress - RHaver );
-		MoistEMPDFlux( SurfNum ) = HM * ( MoistEMPDNew( SurfNum ) - PsyRhoAirFnPbTdbW( OutBaroPress, TempZone, ZoneAirHumRat( ZoneNum ), RoutineName ) * ZoneAirHumRat( ZoneNum ) ) * Lam;
+		PVsurf = RHaver * std::exp( 23.7093 - 4111.0 / ( Taver + 237.7 ) );
+
 		// Calculate surface dew point temperature based on surface vapor density
 		TempSat = 4111.0 / ( 23.7093 - std::log( PVsurf ) ) + 35.45 - KelvinConv;
 
 		// Put results in the single precision reporting variable
-		RhoVapEMPD( SurfNum ) = MoistEMPDNew( SurfNum );
-		RHEMPD( SurfNum ) = PsyRhFnTdbRhovLBnd0C( TempSurfIn, RhoVapEMPD( SurfNum ), RoutineName ) * 100.0;
-		WSurfEMPD( SurfNum ) = PsyWFnTdbRhPb( TempSurfIn, RHEMPD( SurfNum ) / 100.0, OutBaroPress, RoutineName );
+		RhoVapEMPD( SurfNum ) = RVsurface( SurfNum );
+		RHEMPD( SurfNum ) = RHsurface * 100.0;
+		WSurfEMPD( SurfNum ) = RhoVaporAirIn( SurfNum );
 
 	}
 
@@ -545,6 +581,10 @@ namespace MoistureBalanceEMPDManager {
 		MoistEMPDInt.deallocate();
 		MoistEMPDNew.deallocate();
 		MoistEMPDFlux.deallocate();
+		RVsurface.deallocate();
+		RVsurfOld.deallocate();
+		RVdeep.deallocate();
+		RVdeepOld.deallocate();
 
 	}
 
@@ -580,6 +620,8 @@ namespace MoistureBalanceEMPDManager {
 		// na
 
 		MoistEMPDOld( SurfNum ) = MoistEMPDNew( SurfNum );
+		RVdeepOld( SurfNum ) = RVdeep( SurfNum );
+		RVsurfOld( SurfNum ) = RVsurface( SurfNum );
 
 	}
 
@@ -638,7 +680,7 @@ namespace MoistureBalanceEMPDManager {
 			if ( Construct( ConstrNum ).TypeIsWindow ) continue;
 			MatNum = Construct( ConstrNum ).LayerPoint( Construct( ConstrNum ).TotLayers );
 			if ( Material( MatNum ).EMPDMaterialProps ) {
-				gio::write( OutputFileInits, Format_700 ) << Construct( ConstrNum ).Name << Material( MatNum ).Name << Material( MatNum ).EMPDVALUE << Material( MatNum ).MoistACoeff << Material( MatNum ).MoistBCoeff << Material( MatNum ).MoistCCoeff << Material( MatNum ).MoistDCoeff;
+				gio::write( OutputFileInits, Format_700 ) << Construct( ConstrNum ).Name << Material( MatNum ).Name << Material( MatNum ).EMPDperm << Material( MatNum ).MoistACoeff << Material( MatNum ).MoistBCoeff << Material( MatNum ).MoistCCoeff << Material( MatNum ).MoistDCoeff;
 			}
 		}
 

@@ -4806,6 +4806,12 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	using DataMoistureBalance::HAirFD;
 	using DataMoistureBalanceEMPD::MoistEMPDNew;
 	using DataMoistureBalanceEMPD::MoistEMPDFlux;
+	using DataMoistureBalanceEMPD::FluxSurf;
+	using DataMoistureBalanceEMPD::FluxDeep;
+	using DataMoistureBalanceEMPD::HMshort;
+	using DataMoistureBalanceEMPD::MoistEMPDOld;
+	using DataMoistureBalanceEMPD::FluxZone;
+	using DataMoistureBalanceEMPD::RVsurface;
 	using DataAirflowNetwork::SimulateAirflowNetwork;
 	using DataAirflowNetwork::AirflowNetworkControlSimple;
 
@@ -5086,6 +5092,8 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			// check for saturation conditions of air
 			Real64 const HConvIn_surf( HConvInFD( SurfNum ) = HConvIn( SurfNum ) );
 			RhoVaporAirIn( SurfNum ) = min( PsyRhovFnTdbWPb_fast( MAT_zone, ZoneAirHumRat_zone, OutBaroPress ), PsyRhovFnTdbRh( MAT_zone, 1.0, HBSurfManInsideSurf ) );
+			// TODO: Check with Jason about why RhoVaporAirIn( SurfNum ) wasn't added in his version.
+			//       The original was commented out, which makes me think it was a debugging effort.
 			HMassConvInFD( SurfNum ) = HConvIn_surf / ( ( PsyRhoAirFnPbTdbW_fast( OutBaroPress, MAT_zone, ZoneAirHumRat_zone ) + RhoVaporAirIn( SurfNum ) ) * PsyCpAirFnWTdb_fast( ZoneAirHumRat_zone, MAT_zone ) );
 
 			// Perform heat balance on the inside face of the surface ...
@@ -5646,7 +5654,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 				UpdateMoistureBalanceEMPD( SurfNum );
 				RhoVaporSurfIn( SurfNum ) = MoistEMPDNew( SurfNum );
 				//SUMC(ZoneNum) = SUMC(ZoneNum)-MoistEMPDFlux(SurfNum)*Surface(SurfNum)%Area
-
+				// TODO: Check with Jason that these equations were applied correctly. It's different than in his code.
 				Real64 const FD_Area_fac( HMassConvInFD( SurfNum ) * surface.Area );
 				SumHmAW( ZoneNum ) += FD_Area_fac * ( RhoVaporSurfIn( SurfNum ) - RhoVaporAirIn( SurfNum ) );
 				Real64 const surfInTemp( TempSurfInTmp( SurfNum ) );

@@ -40,6 +40,15 @@ namespace DataMoistureBalanceEMPD {
 	Array1D< Real64 > MoistEMPDNew; // Moisture level at interior surfaces at current interation
 	// and current time step
 	Array1D< Real64 > MoistEMPDFlux; // Moisture flux at interior surfaces [W]
+	Array1D< Real64 > RVsurfOld;
+	Array1D< Real64 > RVdeepOld;
+	Array1D< Real64 > RVsurface;
+	Array1D< Real64 > RVdeep;
+	Array1D< Real64 > RVwall;
+	Array1D< Real64 > FluxSurf;
+	Array1D< Real64 > FluxDeep;
+	Array1D< Real64 > FluxZone;
+	Array1D< Real64 > HMshort;
 
 	//     NOTICE
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois

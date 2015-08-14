@@ -32,6 +32,15 @@ namespace DataMoistureBalanceEMPD {
 	extern Array1D< Real64 > MoistEMPDNew; // Moisture level at interior surfaces at current interation
 	// and current time step
 	extern Array1D< Real64 > MoistEMPDFlux; // Moisture flux at interior surfaces [W]
+	extern Array1D< Real64 > RVsurfOld;
+	extern Array1D< Real64 > RVdeepOld;
+	extern Array1D< Real64 > RVsurface;
+	extern Array1D< Real64 > RVdeep;
+	extern Array1D< Real64 > RVwall;
+	extern Array1D< Real64 > FluxSurf;
+	extern Array1D< Real64 > FluxDeep;
+	extern Array1D< Real64 > FluxZone;
+	extern Array1D< Real64 > HMshort;
 
 } // DataMoistureBalanceEMPD
 
