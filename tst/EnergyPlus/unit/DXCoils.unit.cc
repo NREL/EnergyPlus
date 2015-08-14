@@ -14,6 +14,7 @@
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <OutputReportPredefined.hh>
+#include <ScheduleManager.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
@@ -23,16 +24,16 @@ using namespace DataHVACGlobals;
 using namespace DataSizing;
 using namespace CurveManager;
 using namespace OutputReportPredefined;
+using namespace ScheduleManager;
 
 namespace EnergyPlus {
 
-	TEST_F( HVACFixture, DXCoils_Test1 )
-	{
+	TEST_F( HVACFixture, DXCoils_Test1 ) {
 		using CurveManager::Quadratic;
 		using CurveManager::BiQuadratic;
 		using CurveManager::NumCurves;
 		//	int NumDXCoils( 0 ); // Total number of DX coils
-	//	Array1D< DXCoilData > DXCoil;
+		//	Array1D< DXCoilData > DXCoil;
 		int DXCoilNum;
 		int CurveNum;
 
@@ -161,8 +162,7 @@ namespace EnergyPlus {
 		PerfCurve.deallocate();
 
 	}
-	TEST_F( HVACFixture, DXCoils_Test2 )
-	{
+	TEST_F( HVACFixture, DXCoils_Test2 ) {
 		using CurveManager::Quadratic;
 		using CurveManager::BiQuadratic;
 		using CurveManager::NumCurves;
@@ -280,10 +280,9 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( HVACFixture, TestMultiSpeedDefrostCOP )
-	{
+	TEST_F( HVACFixture, TestMultiSpeedDefrostCOP ) {
 		// Test that the COP calculation is correct when the defrost is on. #4973
-		
+
 		using CurveManager::Quadratic;
 		using CurveManager::BiQuadratic;
 		using CurveManager::NumCurves;
@@ -294,18 +293,18 @@ namespace EnergyPlus {
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyHFnTdbW;
 		int DXCoilNum;
-		
+
 		// Set up heating coil and curves.
-		
+
 		NumDXCoils = 1;
 		DXCoilNum = 1;
 		DXCoil.allocate( NumDXCoils );
 		DXCoilData & Coil = DXCoil( DXCoilNum );
-		
+
 		Coil.DXCoilType = "Coil:Heating:DX:MultiSpeed";
 		Coil.DXCoilType_Num = CoilDX_MultiSpeedHeating;
 		Coil.SchedPtr = DataGlobals::ScheduleAlwaysOn;
-		
+
 		DXCoilNumericFields.allocate( NumDXCoils );
 		DataHeatBalance::HeatReclaimDXCoil.allocate( NumDXCoils );
 		DXCoilOutletTemp.allocate( NumDXCoils );
@@ -317,7 +316,7 @@ namespace EnergyPlus {
 		Coil.DefrostStrategy = Resistive;
 		Coil.Name = "DX Heating coil";
 		Coil.NumOfSpeeds = 2;
-		
+
 		Coil.MSRatedTotCap.allocate( Coil.NumOfSpeeds );
 		Coil.MSRatedSHR.allocate( Coil.NumOfSpeeds );
 		Coil.MSRatedCOP.allocate( Coil.NumOfSpeeds );
@@ -341,7 +340,7 @@ namespace EnergyPlus {
 		Coil.MSFanPowerPerEvapAirFlowRate.allocate( Coil.NumOfSpeeds );
 		Coil.MSTotCapTempModFacCurveType.allocate( Coil.NumOfSpeeds );
 		Coil.MSEIRTempModFacCurveType.allocate( Coil.NumOfSpeeds );
-		
+
 		Coil.MinOATCompressor = -73.27777777777779;
 		Coil.CrankcaseHeaterCapacity = 0.0;
 		Coil.MaxOATDefrost = 0.0;
@@ -363,14 +362,14 @@ namespace EnergyPlus {
 		Coil.MSFanPowerPerEvapAirFlowRate( 2 ) = 773.3;
 		Coil.MSWasteHeatFrac( 2 ) = 0.2;
 		Coil.RatedSHR( 1 ) = 1.0;
-		
-		for (int mode = 1; mode <= Coil.NumOfSpeeds; ++mode) {
-			Coil.MSRatedAirMassFlowRate( mode ) = Coil.MSRatedAirVolFlowRate( mode ) * PsyRhoAirFnPbTdbW(EnergyPlus::DataEnvironment::StdBaroPress, 21.11, 0.00881, "InitDXCoil");
+
+		for ( int mode = 1; mode <= Coil.NumOfSpeeds; ++mode ) {
+			Coil.MSRatedAirMassFlowRate( mode ) = Coil.MSRatedAirVolFlowRate( mode ) * PsyRhoAirFnPbTdbW( EnergyPlus::DataEnvironment::StdBaroPress, 21.11, 0.00881, "InitDXCoil" );
 		}
-		
+
 		NumCurves = 11;
 		PerfCurve.allocate( NumCurves );
-		
+
 		PerfomanceCurveData * pCurve;
 
 		int const nCapfT1 = 1;
@@ -387,7 +386,7 @@ namespace EnergyPlus {
 		pCurve->Var1Max = 100;
 		pCurve->Var2Min = -100;
 		pCurve->Var2Max = 100;
-		
+
 		Coil.MSCCapFTemp( 1 ) = nCapfT1;
 		Coil.MSTotCapTempModFacCurveType( 1 ) = pCurve->CurveType;
 
@@ -402,7 +401,7 @@ namespace EnergyPlus {
 		pCurve->Var1Max = 2;
 		pCurve->CurveMin = 0;
 		pCurve->CurveMax = 2;
-		
+
 		Coil.MSCCapFFlow( 1 ) = nCapfFF1;
 
 		int const nEIRfT1 = 3;
@@ -419,7 +418,7 @@ namespace EnergyPlus {
 		pCurve->Var1Max = 100;
 		pCurve->Var2Min = -100;
 		pCurve->Var2Max = 100;
-		
+
 		Coil.MSEIRFTemp( 1 ) = nEIRfT1;
 		Coil.MSEIRTempModFacCurveType( 1 ) = pCurve->CurveType;
 
@@ -434,9 +433,9 @@ namespace EnergyPlus {
 		pCurve->Var1Max = 2;
 		pCurve->CurveMin = 0;
 		pCurve->CurveMax = 2;
-		
+
 		Coil.MSEIRFFlow( 1 ) = nEIRfFF1;
-		
+
 		int const nPLFfPLR1 = 5;
 		pCurve = &PerfCurve( nPLFfPLR1 );
 		pCurve->CurveType = Quadratic;
@@ -448,9 +447,9 @@ namespace EnergyPlus {
 		pCurve->Var1Max = 1;
 		pCurve->CurveMin = 0.7;
 		pCurve->CurveMax = 1;
-		
+
 		Coil.MSPLFFPLR( 1 ) = nPLFfPLR1;
-		
+
 		int const nConstantBiquadratic = 6;
 		pCurve = &PerfCurve( nConstantBiquadratic );
 		pCurve->CurveType = BiQuadratic;
@@ -465,7 +464,7 @@ namespace EnergyPlus {
 		pCurve->Var1Max = 100;
 		pCurve->Var2Min = -100;
 		pCurve->Var2Max = 100;
-		
+
 		Coil.MSWasteHeat( 1 ) = nConstantBiquadratic;
 		Coil.MSWasteHeat( 2 ) = nConstantBiquadratic;
 
@@ -483,7 +482,7 @@ namespace EnergyPlus {
 		pCurve->Var1Max = 100;
 		pCurve->Var2Min = -100;
 		pCurve->Var2Max = 100;
-		
+
 		Coil.MSCCapFTemp( 2 ) = nCapfT2;
 		Coil.MSTotCapTempModFacCurveType( 2 ) = pCurve->CurveType;
 
@@ -498,9 +497,9 @@ namespace EnergyPlus {
 		pCurve->Var1Max = 2;
 		pCurve->CurveMin = 0;
 		pCurve->CurveMax = 2;
-		
+
 		Coil.MSCCapFFlow( 2 ) = nCapfFF2;
-		
+
 		int const nEIRfT2 = 9;
 		pCurve = &PerfCurve( nEIRfT2 );
 		pCurve->CurveType = BiQuadratic;
@@ -515,7 +514,7 @@ namespace EnergyPlus {
 		pCurve->Var1Max = 100;
 		pCurve->Var2Min = -100;
 		pCurve->Var2Max = 100;
-		
+
 		Coil.MSEIRFTemp( 2 ) = nEIRfT2;
 		Coil.MSEIRTempModFacCurveType( 2 ) = pCurve->CurveType;
 
@@ -530,7 +529,7 @@ namespace EnergyPlus {
 		pCurve->Var1Max = 2;
 		pCurve->CurveMin = 0;
 		pCurve->CurveMax = 2;
-		
+
 		Coil.MSEIRFFlow( 2 ) = nEIRfFF2;
 
 		int const nPLFfPLR2 = 11;
@@ -544,10 +543,10 @@ namespace EnergyPlus {
 		pCurve->Var1Max = 1;
 		pCurve->CurveMin = 0.7;
 		pCurve->CurveMax = 1;
-		
+
 		Coil.MSPLFFPLR( 2 ) = nPLFfPLR2;
-		
-		for ( int CurveNum = 1; CurveNum <= NumCurves; ++CurveNum) {
+
+		for ( int CurveNum = 1; CurveNum <= NumCurves; ++CurveNum ) {
 			PerfomanceCurveData & rCurve = PerfCurve( CurveNum );
 			if ( rCurve.CurveType == BiQuadratic ) {
 				rCurve.ObjectType = CurveType_BiQuadratic;
@@ -557,7 +556,7 @@ namespace EnergyPlus {
 				rCurve.InterpolationType = EvaluateCurveToLimits;
 			}
 		}
-		
+
 		// Set up inlet air conditions.
 		Coil.InletAirMassFlowRate = Coil.MSRatedAirMassFlowRate( 1 );
 		MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate( 1 );
@@ -566,51 +565,50 @@ namespace EnergyPlus {
 		OutBaroPress = 101325; // sea level
 		Coil.InletAirTemp = 20;
 		Coil.InletAirHumRat = 0.008;
-		Coil.InletAirEnthalpy = PsyHFnTdbW(Coil.InletAirTemp, Coil.InletAirHumRat);
-		
+		Coil.InletAirEnthalpy = PsyHFnTdbW( Coil.InletAirTemp, Coil.InletAirHumRat );
+
 		// Test high speed
 		Real64 SpeedRatio = 1.0;
 		Real64 CycRatio = 1.0;
 		int SpeedNum = 2;
 		int const FanOpMode = ContFanCycCoil;
-		
+
 		// Defroster on
 		OutDryBulbTemp = -5.0; // cold
 		CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode );
-		Real64 COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue(nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp) * CurveValue(nEIRfFF2, 1));
+		Real64 COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue( nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp ) * CurveValue( nEIRfFF2, 1 ) );
 		Real64 COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
 		EXPECT_LT( COPwDefrost, COPwoDefrost );
-		
+
 		// Defroster off
 		OutDryBulbTemp = 5.0; // not cold enough for defroster
 		CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode );
-		COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue(nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp) * CurveValue(nEIRfFF2, 1));
+		COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue( nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp ) * CurveValue( nEIRfFF2, 1 ) );
 		COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
 		EXPECT_DOUBLE_EQ( COPwoDefrost, COPwDefrost );
-		
+
 		// Test low speed
 		SpeedNum = 1;
 
 		// Defroster on
 		OutDryBulbTemp = -5.0; // cold
 		CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode );
-		COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue(nEIRfT1, Coil.InletAirTemp, OutDryBulbTemp) * CurveValue(nEIRfFF1, 1));
+		COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue( nEIRfT1, Coil.InletAirTemp, OutDryBulbTemp ) * CurveValue( nEIRfFF1, 1 ) );
 		COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
 		EXPECT_LT( COPwDefrost, COPwoDefrost );
-		
+
 		// Defroster off
 		OutDryBulbTemp = 5.0; // not cold enough for defroster
 		CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode );
-		COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue(nEIRfT1, Coil.InletAirTemp, OutDryBulbTemp) * CurveValue(nEIRfFF1, 1));
+		COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue( nEIRfT1, Coil.InletAirTemp, OutDryBulbTemp ) * CurveValue( nEIRfFF1, 1 ) );
 		COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
 		EXPECT_DOUBLE_EQ( COPwoDefrost, COPwDefrost );
-		
+
 	}
 
-	TEST_F( HVACFixture, TestSingleSpeedDefrostCOP )
-	{
+	TEST_F( HVACFixture, TestSingleSpeedDefrostCOP ) {
 		// Test that the COP calculation is correct when the defrost is on. #4973
-		
+
 		using CurveManager::Quadratic;
 		using CurveManager::BiQuadratic;
 		using CurveManager::NumCurves;
@@ -621,9 +619,9 @@ namespace EnergyPlus {
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyHFnTdbW;
 		int DXCoilNum;
-		
+
 		// Set up heating coil and curves.
-		
+
 		NumDXCoils = 1;
 		DXCoilNum = 1;
 		DXCoil.allocate( NumDXCoils );
@@ -636,12 +634,12 @@ namespace EnergyPlus {
 		DXCoilHeatInletAirDBTemp.allocate( NumDXCoils );
 		DXCoilHeatInletAirWBTemp.allocate( NumDXCoils );
 		DXCoilData & Coil = DXCoil( DXCoilNum );
-		
+
 		Coil.Name = "DX Single Speed Heating Coil";
 		Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
 		Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
 		Coil.SchedPtr = DataGlobals::ScheduleAlwaysOn;
-		
+
 		Coil.RatedSHR( 1 ) = 1.0;
 		Coil.RatedTotCap( 1 ) = 11012.634487601337;
 		Coil.RatedCOP( 1 ) = 4.200635910578916;
@@ -659,12 +657,12 @@ namespace EnergyPlus {
 		Coil.PLRImpact = false;
 		Coil.FuelType = FuelTypeElectricity;
 		Coil.RegionNum = 4;
-		
+
 		NumCurves = 5;
 		PerfCurve.allocate( NumCurves );
-		
+
 		PerfomanceCurveData * pCurve;
-		
+
 		int const nCapfT2 = 1;
 		pCurve = &PerfCurve( nCapfT2 );
 		pCurve->CurveType = BiQuadratic;
@@ -679,10 +677,10 @@ namespace EnergyPlus {
 		pCurve->Var1Max = 100;
 		pCurve->Var2Min = -100;
 		pCurve->Var2Max = 100;
-		
+
 		Coil.CCapFTemp( 1 ) = nCapfT2;
 		Coil.TotCapTempModFacCurveType( 1 ) = pCurve->CurveType;
-		
+
 		int const nCapfFF2 = 2;
 		pCurve = &PerfCurve( nCapfFF2 );
 		pCurve->CurveType = Quadratic;
@@ -694,7 +692,7 @@ namespace EnergyPlus {
 		pCurve->Var1Max = 2;
 		pCurve->CurveMin = 0;
 		pCurve->CurveMax = 2;
-		
+
 		Coil.CCapFFlow( 1 ) = nCapfFF2;
 
 		int const nEIRfT2 = 3;
@@ -711,7 +709,7 @@ namespace EnergyPlus {
 		pCurve->Var1Max = 100;
 		pCurve->Var2Min = -100;
 		pCurve->Var2Max = 100;
-		
+
 		Coil.EIRFTemp( 1 ) = nEIRfT2;
 		Coil.EIRTempModFacCurveType( 1 ) = pCurve->CurveType;
 
@@ -726,9 +724,9 @@ namespace EnergyPlus {
 		pCurve->Var1Max = 2;
 		pCurve->CurveMin = 0;
 		pCurve->CurveMax = 2;
-		
+
 		Coil.EIRFFlow( 1 ) = nEIRfFF2;
-		
+
 		int const nPLFfPLR2 = 5;
 		pCurve = &PerfCurve( nPLFfPLR2 );
 		pCurve->CurveType = Quadratic;
@@ -740,10 +738,10 @@ namespace EnergyPlus {
 		pCurve->Var1Max = 1;
 		pCurve->CurveMin = 0.7;
 		pCurve->CurveMax = 1;
-		
+
 		Coil.PLFFPLR( 1 ) = nPLFfPLR2;
-		
-		for ( int CurveNum = 1; CurveNum <= NumCurves; ++CurveNum) {
+
+		for ( int CurveNum = 1; CurveNum <= NumCurves; ++CurveNum ) {
 			PerfomanceCurveData & rCurve = PerfCurve( CurveNum );
 			if ( rCurve.CurveType == BiQuadratic ) {
 				rCurve.ObjectType = CurveType_BiQuadratic;
@@ -760,24 +758,136 @@ namespace EnergyPlus {
 		OutBaroPress = 101325; // sea level
 		Coil.InletAirTemp = 20;
 		Coil.InletAirHumRat = 0.008;
-		Coil.InletAirEnthalpy = PsyHFnTdbW(Coil.InletAirTemp, Coil.InletAirHumRat);
-		
+		Coil.InletAirEnthalpy = PsyHFnTdbW( Coil.InletAirTemp, Coil.InletAirHumRat );
+
 		int const FanOpMode = ContFanCycCoil;
 		Real64 const PLR = 1.0;
-		
+
 		// Defrost Off
 		OutDryBulbTemp = -5.0; // cold
-		CalcDXHeatingCoil(DXCoilNum, PLR, FanOpMode);
-		Real64 COPwoDefrost = Coil.RatedCOP( 1 ) / ( CurveValue(nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp ) * CurveValue(nEIRfFF2, 1) );
+		CalcDXHeatingCoil( DXCoilNum, PLR, FanOpMode );
+		Real64 COPwoDefrost = Coil.RatedCOP( 1 ) / ( CurveValue( nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp ) * CurveValue( nEIRfFF2, 1 ) );
 		Real64 COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
 		EXPECT_LT( COPwDefrost, COPwoDefrost );
-		
+
 		// Defrost On
 		OutDryBulbTemp = 5.0; // not as cold
-		CalcDXHeatingCoil(DXCoilNum, PLR, FanOpMode);
-		COPwoDefrost = Coil.RatedCOP( 1 ) / ( CurveValue(nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp ) * CurveValue(nEIRfFF2, 1) );
+		CalcDXHeatingCoil( DXCoilNum, PLR, FanOpMode );
+		COPwoDefrost = Coil.RatedCOP( 1 ) / ( CurveValue( nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp ) * CurveValue( nEIRfFF2, 1 ) );
 		COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
 		EXPECT_DOUBLE_EQ( COPwoDefrost, COPwDefrost );
 
-		}
+	}
+
+	TEST_F( HVACFixture, DXCoilEvapCondPumpSizingTest ) {
+		
+		// tests autosizing evaporatively cooled condenser pump #4802
+		
+		std::string const idf_objects = delimited_string( {
+			"Version,8.3;",
+			"	Schedule:Compact,",
+			"	FanAndCoilAvailSched, !- Name",
+			"	Fraction,             !- Schedule Type Limits Name",
+			"	Through: 12/31,       !- Field 1",
+			"	For: AllDays,         !- Field 2",
+			"	Until: 24:00, 1.0;    !- Field 3",
+			"Curve:Biquadratic,",
+			"	WindACCoolCapFT, !- Name",
+			"	0.942587793,     !- Coefficient1 Constant",
+			"	0.009543347,     !- Coefficient2 x",
+			"	0.000683770,     !- Coefficient3 x**2",
+			"	-0.011042676,    !- Coefficient4 y",
+			"	0.000005249,     !- Coefficient5 y**2",
+			"	-0.000009720,    !- Coefficient6 x*y",
+			"	12.77778,        !- Minimum Value of x",
+			"	23.88889,        !- Maximum Value of x",
+			"	18.0,            !- Minimum Value of y",
+			"	46.11111,        !- Maximum Value of y",
+			"	,                !- Minimum Curve Output",
+			"	,                !- Maximum Curve Output",
+			"	Temperature,     !- Input Unit Type for X",
+			"	Temperature,     !- Input Unit Type for Y",
+			"	Dimensionless;   !- Output Unit Type",
+			"Curve:Biquadratic,",
+			"	WindACEIRFT,   !- Name",
+			"	0.342414409,   !- Coefficient1 Constant",
+			"	0.034885008,   !- Coefficient2 x",
+			"	-0.000623700,  !- Coefficient3 x**2",
+			"	0.004977216,   !- Coefficient4 y",
+			"	0.000437951,   !- Coefficient5 y**2",
+			"	-0.000728028,  !- Coefficient6 x*y",
+			"	12.77778,      !- Minimum Value of x",
+			"	23.88889,      !- Maximum Value of x",
+			"	18.0,          !- Minimum Value of y",
+			"	46.11111,      !- Maximum Value of y",
+			"	,              !- Minimum Curve Output",
+			"	,              !- Maximum Curve Output",
+			"	Temperature,   !- Input Unit Type for X",
+			"	Temperature,   !- Input Unit Type for Y",
+			"	Dimensionless; !- Output Unit Type",
+			"Curve:Quadratic,",
+			"	WindACCoolCapFFF, !- Name",
+			"	0.8,              !- Coefficient1 Constant",
+			"	0.2,              !- Coefficient2 x",
+			"	0.0,              !- Coefficient3 x**2",
+			"	0.5,              !- Minimum Value of x",
+			"	1.5;              !- Maximum Value of x",
+			"Curve:Quadratic,",
+			"	WindACEIRFFF, !- Name",
+			"	1.1552,       !- Coefficient1 Constant",
+			"  -0.1808,       !- Coefficient2 x",
+			"	0.0256,       !- Coefficient3 x**2",
+			"	0.5,          !- Minimum Value of x",
+			"	1.5;          !- Maximum Value of x",
+			"Curve:Quadratic,",
+			"	WindACPLFFPLR, !- Name",
+			"	0.85,          !- Coefficient1 Constant",
+			"	0.15,          !- Coefficient2 x",
+			"	0.0,           !- Coefficient3 x**2",
+			"	0.0,           !- Minimum Value of x",
+			"	1.0;           !- Maximum Value of x",
+			"Coil:Cooling:DX:SingleSpeed,",
+			"	Furnace ACDXCoil 1,   !- Name",
+			" 	FanAndCoilAvailSched, !- Availability Schedule Name",
+			"	25000.0,              !- Gross Rated Total Cooling Capacity { W }",
+			"	0.75,                 !- Gross Rated Sensible Heat Ratio",
+			"	4.40,                 !- Gross Rated Cooling COP { W / W }",
+			"	1.30,                 !- Rated Air Flow Rate { m3 / s }",
+			"	,                     !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+			"	DX Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
+			"	Heating Coil Air Inlet Node,    !- Air Outlet Node Name",
+			"	WindACCoolCapFT,      !- Total Cooling Capacity Function of Temperature Curve Name",
+			"	WindACCoolCapFFF,     !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+			"	WindACEIRFT,          !- Energy Input Ratio Function of Temperature Curve Name",
+			"	WindACEIRFFF,         !- Energy Input Ratio Function of Flow Fraction Curve Name",
+			"	WindACPLFFPLR,        !- Part Load Fraction Correlation Curve Name",
+			"	0.0,                  !- Nominal Time for Condensate Removal to Begin",
+			"	0.0,                  !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
+			"	0.0,                  !- Maximum Cycling Rate",
+			"	0.0,                  !- Latent Capacity Time Constant",
+			"	Split TSW Cooling Coil Condenser Inlet, !- Condenser Air Inlet Node Name",
+			"	EvaporativelyCooled,  !- Condenser Type",
+			"	0.0,                  !- Evaporative Condenser Effectiveness",
+			"	,                     !- Evaporative Condenser Air Flow Rate",
+			"	autosize,             !- Evaporative Condenser Pump Rated Power Consumption",
+			"	0.0,                  !- Crankcase Heater Capacity",
+			"	10.0;                 !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		ProcessScheduleInput();
+		GetCurveInput();
+		GetDXCoils();
+
+		ASSERT_EQ( 1, NumDXCoils );
+		EXPECT_EQ( DataSizing::AutoSize, DXCoil( 1 ).EvapCondPumpElecNomPower( 1 ) );
+
+		SetPredefinedTables();
+		
+		SizeDXCoil( 1 );
+		EXPECT_EQ( 25000.0, DXCoil( 1 ).RatedTotCap( 1 ) );
+		EXPECT_EQ( DXCoil( 1 ).RatedTotCap( 1 ) * 0.004266, DXCoil( 1 ).EvapCondPumpElecNomPower( 1 ) );
+
+	}
 }
