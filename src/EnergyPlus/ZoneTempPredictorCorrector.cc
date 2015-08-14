@@ -2077,13 +2077,6 @@ namespace ZoneTempPredictorCorrector {
 
 				SetupOutputVariable( "Zone Predicted Sensible Load Room Air Correction Factor [ ]", LoadCorrectionFactor( Loop ), "System", "Average", Zone( Loop ).Name );
 
-				if ( AnyEnergyManagementSystemInModel ) {
-					SetupEMSInternalVariable( "Zone Sensible Load to Heating Setpoint", Zone( Loop ).Name, "[W]", ZoneSysEnergyDemand( Loop ).OutputRequiredToHeatingSP );
-					SetupEMSInternalVariable( "Zone Sensible Load to Cooling Setpoint", Zone( Loop ).Name, "[W]", ZoneSysEnergyDemand( Loop ).OutputRequiredToCoolingSP );
-					SetupEMSInternalVariable( "Zone Latent Load to Humidifying Setpoint", Zone( Loop ).Name, "[kg/s]", ZoneSysMoistureDemand( Loop ).OutputRequiredToHumidifyingSP );
-					SetupEMSInternalVariable( "Zone Latent Load to Dehumidifying Setpoint", Zone( Loop ).Name, "[kg/s]", ZoneSysMoistureDemand( Loop ).OutputRequiredToDehumidifyingSP );
-				}
-
 				if ( allocated( StageZoneLogic ) ) {
 					if ( StageZoneLogic( Loop ) ) {
 						SetupOutputVariable( "Zone Thermostat Staged Number []", ZoneSysEnergyDemand( Loop ).StageNum, "System", "Average", Zone( Loop ).Name );
@@ -3218,7 +3211,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		ZoneSetPointLast( ZoneNum ) = ZoneSetPoint;
-		TempZoneThermostatSetPoint( ZoneNum ) = ZoneSetPoint;
+//		TempZoneThermostatSetPoint( ZoneNum ) = ZoneSetPoint; // needed to fix Issue # 5048
 
 		// Save the unmultiplied zone load to a report variable
 		SNLoadPredictedRate( ZoneNum ) = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired * LoadCorrectionFactor( ZoneNum );

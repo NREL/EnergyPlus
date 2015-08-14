@@ -50738,6 +50738,8 @@ AirLoopHVAC:UnitarySystem,
        \note input field above is left blank.
        \note Specify a Fan:VariableVolume when modeling VAV systems which used setpoint based control
        \note if the fan is included in the unitary system object.
+       \note The ComponentModel fan type may be substituted for the ConstantVolume or VariableVolume
+       \note fan types when more detailed fan modeling is required.
        \note The variable or constant volume fan may be specified on the branch instead of contained
        \note within the unitary system object (i.e., this field may be blank for certain configurations).
   A9, \field Supply Fan Name

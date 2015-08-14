@@ -285,7 +285,6 @@ namespace FanCoilUnits {
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
 		using DataPlant::TypeOf_CoilWaterCooling;
-		using DataPlant::TypeOf_Other;
 		using MixedAir::GetOAMixerIndex;
 		using MixedAir::GetOAMixerNodeNumbers;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -534,7 +533,6 @@ namespace FanCoilUnits {
 				}
 			} else if ( SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
 				FanCoil( FanCoilNum ).HCoilType_Num = HCoil_Electric;
-				FanCoil( FanCoilNum ).HCoilPlantTypeOfNum = TypeOf_Other;
 				IsNotOK = false;
 				ValidateComponent( FanCoil( FanCoilNum ).HCoilType, FanCoil( FanCoilNum ).HCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
@@ -1966,18 +1964,10 @@ namespace FanCoilUnits {
 					Error = ( QZnReq - QUnitOut ) / QZnReq;
 					AbsError = QZnReq - QUnitOut;
 					DelPLR = ( QZnReq - QUnitOut ) / QUnitOutMax;
-					if ( PLR + DelPLR < 0.0 ) {
-						PLR *= ( 1.0 - Relax );
-					} else if ( PLR + DelPLR > 1.0 ) {
-						PLR /= ( 1.0 - Relax );
-					} else {
-						PLR += Relax * DelPLR;
-					}
+					PLR += Relax * DelPLR;
 					PLR = max( 0.0, min( 1.0, PLR ) );
 					++Iter;
 					if ( Iter == 32 ) Relax = 0.5;
-					if ( Iter == 50 ) Relax = 0.25;
-					if ( Iter == 75 ) Relax = 0.025;
 				}
 
 				// warning if not converged
@@ -2013,18 +2003,10 @@ namespace FanCoilUnits {
 					Error = ( QZnReq - QUnitOut ) / QZnReq;
 					AbsError = QZnReq - QUnitOut;
 					DelPLR = ( QZnReq - QUnitOut ) / QUnitOutMax;
-					if ( PLR + DelPLR < 0.0 ) {
-						PLR *= ( 1.0 - Relax );
-					} else if ( PLR + DelPLR > 1.0 ) {
-						PLR /= ( 1.0 - Relax );
-					} else {
-						PLR += Relax * DelPLR;
-					}
+					PLR += Relax * DelPLR;
 					PLR = max( 0.0, min( 1.0, PLR ) );
 					++Iter;
 					if ( Iter == 32 ) Relax = 0.5;
-					if ( Iter == 50 ) Relax = 0.25;
-					if ( Iter == 75 ) Relax = 0.025;
 				}
 
 				// warning if not converged

@@ -1572,8 +1572,10 @@ namespace ReportSizingManager {
 				} else if ( SizingType == HeatingCapacitySizing ) {
 					DataFracOfAutosizedHeatingCapacity = 1.0;
 					if (CurOASysNum > 0) {
-						if (OASysEqSizing(CurOASysNum).HeatingAirFlow) {
+						if (OASysEqSizing(CurOASysNum).AirFlow) {
 							DesVolFlow = OASysEqSizing(CurOASysNum).AirVolFlow;
+						} else if (OASysEqSizing(CurOASysNum).HeatingAirFlow) {
+							DesVolFlow = OASysEqSizing(CurOASysNum).HeatingAirVolFlow;
 						} else {
 							DesVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
 						}

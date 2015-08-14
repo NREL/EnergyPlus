@@ -212,6 +212,7 @@ namespace HVACUnitarySystem {
 	Real64 QToCoolSetPt( 0.0 ); // load to cooling set point {W}
 	Real64 QToHeatSetPt( 0.0 ); // load to heating set point {W}
 	Real64 TempSteamIn( 100.0 ); // steam coil steam inlet temperature
+	bool boolNotAUnitTest( true ); // used to deallocate UnitarySystemNumericFields when sizing completes, set to false for unit tests
 
 	// Allocatable types
 	Array1D_bool CheckEquipName;
@@ -2460,7 +2461,7 @@ namespace HVACUnitarySystem {
 
 		CoolingLoad = TempCoolingLoad;
 		HeatingLoad = TempHeatingLoad;
-		if ( ++NumUnitarySystemsSized == NumUnitarySystem ) UnitarySystemNumericFields.deallocate(); // remove temporary array for field names at end of sizing
+		if ( ++NumUnitarySystemsSized == NumUnitarySystem && boolNotAUnitTest) UnitarySystemNumericFields.deallocate(); // remove temporary array for field names at end of sizing
 
 	}
 
@@ -3058,14 +3059,14 @@ namespace HVACUnitarySystem {
 				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 				ShowContinueError( "Illegal " + cAlphaFields( iFanSchedAlphaNum ) + " = " + Alphas( iFanSchedAlphaNum ) );
 				ErrorsFound = true;
-			} else if ( lAlphaBlanks( iFanSchedAlphaNum ) && UnitarySystem( UnitarySysNum ).FanExists ) {
+			} else if ( lAlphaBlanks( iFanSchedAlphaNum ) ) {
 				if ( UnitarySystem( UnitarySysNum ).ControlType == SetPointBased ) {
 					// Fan operating mode must be constant fan so that the coil outlet temp is proportional to PLR
 					// Cycling fan always outputs the full load outlet air temp so should not be used with set point based control
 					UnitarySystem( UnitarySysNum ).FanOpMode = ContFanCycCoil;
 				} else {
 					UnitarySystem( UnitarySysNum ).FanOpMode = CycFanCycCoil;
-					if ( UnitarySystem( UnitarySysNum ).FanType_Num != FanType_SimpleOnOff ) {
+					if ( UnitarySystem( UnitarySysNum ).FanType_Num != FanType_SimpleOnOff && UnitarySystem( UnitarySysNum ).FanExists ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( cAlphaFields( iFanTypeAlphaNum ) + " = " + Alphas( iFanTypeAlphaNum ) );
 						ShowContinueError( "Fan type must be Fan:OnOff when " + cAlphaFields( iFanSchedAlphaNum ) + " = Blank." );
@@ -8263,15 +8264,15 @@ namespace HVACUnitarySystem {
 						} else if ( CoilType_Num == Coil_UserDefined ) {
 							// do nothing, user defined coil cannot be controlled
 
-					} else if ( CoilType_Num == CoilDX_PackagedThermalStorageCooling ) {
+						} else if ( CoilType_Num == CoilDX_PackagedThermalStorageCooling ) {
 
-						ControlTESIceStorageTankCoil( CompName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, UnitarySystem( UnitarySysNum ).UnitarySystemType, 
-							FanOpMode, DesOutTemp, DesOutHumRat, PartLoadFrac, 
-							UnitarySystem( UnitarySysNum ).TESOpMode, UnitarySystem( UnitarySysNum ).DehumidificationMode, 
-							UnitarySystem( UnitarySysNum ).SensPLRIter, UnitarySystem( UnitarySysNum ).SensPLRIterIndex, 
-							UnitarySystem( UnitarySysNum ).SensPLRFail, UnitarySystem( UnitarySysNum ).SensPLRFailIndex, 
-							UnitarySystem( UnitarySysNum ).LatPLRIter, UnitarySystem( UnitarySysNum ).LatPLRIterIndex, 
-							UnitarySystem( UnitarySysNum ).LatPLRFail, UnitarySystem( UnitarySysNum ).LatPLRFailIndex );
+							ControlTESIceStorageTankCoil( CompName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, UnitarySystem( UnitarySysNum ).UnitarySystemType, 
+								FanOpMode, DesOutTemp, DesOutHumRat, PartLoadFrac, 
+								UnitarySystem( UnitarySysNum ).TESOpMode, UnitarySystem( UnitarySysNum ).DehumidificationMode, 
+								UnitarySystem( UnitarySysNum ).SensPLRIter, UnitarySystem( UnitarySysNum ).SensPLRIterIndex, 
+								UnitarySystem( UnitarySysNum ).SensPLRFail, UnitarySystem( UnitarySysNum ).SensPLRFailIndex, 
+								UnitarySystem( UnitarySysNum ).LatPLRIter, UnitarySystem( UnitarySysNum ).LatPLRIterIndex, 
+								UnitarySystem( UnitarySysNum ).LatPLRFail, UnitarySystem( UnitarySysNum ).LatPLRFailIndex );
 
 						} else {
 							ShowMessage( " For :" + UnitarySystem( UnitarySysNum ).UnitarySystemType + "=\"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
@@ -10298,7 +10299,7 @@ namespace HVACUnitarySystem {
 		}
 		if ( GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).SysAvailSchedPtr ) > 0.0 && ( ( FanOn || TurnFansOn ) && ! TurnFansOff ) ) {
 			Node( InletNode ).MassFlowRate = AverageUnitMassFlow;
-//			Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow;
+			Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow;
 			if ( AverageUnitMassFlow > 0.0 ) {
 				OnOffAirFlowRatio = CompOnMassFlow / AverageUnitMassFlow;
 			} else {

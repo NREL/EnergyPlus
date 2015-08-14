@@ -77,6 +77,7 @@ namespace HVACUnitarySystem {
 	extern Real64 QToCoolSetPt; // load to cooling set point {W}
 	extern Real64 QToHeatSetPt; // load to heating set point {W}
 	extern Real64 TempSteamIn; // steam coil steam inlet temperature
+	extern bool boolNotAUnitTest; // used to deallocate UnitarySystemNumericFields when sizing completes, set to false for unit tests
 
 	// Allocatable types
 	extern Array1D_bool CheckEquipName;

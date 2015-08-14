@@ -6998,7 +6998,7 @@ In EnergyPlus the fan coil units are modeled as compound components. That is, th
 
 Note that the type of fan component associated with the fan coil unit depends on the type of capacity control method chosen. For *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used. And for *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume*  should be chosen.
 
-Fan coil units can be 4-pipe or 2-pipe. For 4-pipe units there are 2 supply pipes and 2 return pipes. For 2-pipe units there is a single supply pipe and a single return pipe and the supply is switched between hot and chilled water depending on the season. We model 4-pipe units, but the 4-pipe model can be used to model 2-pipe  units by using the coil availability schedules to make sure that either hot or chilled water is exclusively available. Fan coil units with hydronic heat can instead be modeled using an electric heating coil if desired (i.e., replace the hydronic heating coil with an electric heating coil).
+Fan coil units can be 4-pipe or 2-pipe. For 4-pipe units there are 2 supply pipes and 2 return pipes. For 2-pipe units there is a single supply pipe and a single return pipe and the supply is switched between hot and chilled water depending on the season. EnergyPlus models 4-pipe units, but the 4-pipe model can be used to model 2-pipe units by using the coil availability schedules to make sure that either hot or chilled water is exclusively available. Fan coil units with hydronic heat can instead be modeled using an electric heating coil if desired (i.e., replace the hydronic heating coil with an electric heating coil).
 
 #### Field: Name
 
@@ -7030,7 +7030,7 @@ If the fan coil unit uses outdoor air, this field specifies the outdoor air volu
 
 #### Field: Outdoor Air Schedule Name
 
-#### The name of a schedule whose values (0.0 to 1.0) are used as multipliers to alter the outdoor air flow rate. If this field is left blank, the values will default to 1.0.
+The name of a schedule whose values (0.0 to 1.0) are used as multipliers to alter the outdoor air flow rate. If this field is left blank, the values will default to 1.0.
 
 #### Field: Air Inlet Node Name
 
@@ -10713,7 +10713,7 @@ This alpha field contains the unitary system outlet node name.
 
 #### Field: Supply Fan Object Type
 
-This alpha field contains the identifying type of supply air fan specified for the unitary system. Fan type must be **Fan:OnOff,** **Fan:ConstantVolume, Fan:VariableVolume, or Fan:ComponentModel**. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e. Supply Air Fan Operating Mode Schedule values are at times 0). Fan:VariableVolume is used for variable air volume systems or multi- or variable-speed coils. The Fan:ComponentModel may be used in place of any of these fan types to more accurately represent fan performance.
+This alpha field contains the identifying type of supply air fan specified for the unitary system. Fan type must be **Fan:OnOff,** **Fan:ConstantVolume, Fan:VariableVolume, or Fan:ComponentModel**. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e. Supply Air Fan Operating Mode Schedule values are at times 0). Fan:VariableVolume is used for variable air volume systems or multi- or variable-speed coils. The Fan:ComponentModel may be used in place of the ConstantVolume or VariableVolume fan types to more accurately represent fan performance.
 
 #### Field: Supply Fan Name
 
