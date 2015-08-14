@@ -298,55 +298,47 @@ namespace HVACVariableRefrigerantFlow {
 		int HPOperatingModeErrorIndex;
 		
 		//The following are for the Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-		std::string RefrigerantName;        // Name of refrigerant, must match name in FluidName (see fluidpropertiesrefdata.idf)
-		Real64 CondensingTemp;           	// @@Comments should be updated XP_VRV system outdoor unit condensing temperature [C]
-		Real64 EvaporatingTemp;          	// XP_VRV system outdoor unit condensing temperature [C]
-		Real64 MinEvaporatingTemp;       	// XP_VRV system min evaporating temperature among all indoor units [C]
-		Real64 MaxCondensingTemp;        	// XP_VRV system max condensing temperature among all indoor units [C]
-		Real64 SucPressDrop;             	// XP_VRV system min evaporating temperature among all indoor units [C]
-		Real64 DisPressDrop;             	// XP_VRV system min evaporating temperature among all indoor units [C]
-		Real64 MaxCondFlow;              	// XP_Max condenser air flow rate  [m3/s]
-		Real64 MaxCondFlowTemp;          	// XP_outdoor air temp for rated condenser flow  [C]
-		Real64 MinCondFlow;              	// XP_Min condenser air flow rate  [m3/s]
-		Real64 MinCondFlowTemp;          	// XP_outdoor air temp for min condenser flow  [C]
-		Real64 BFC;           	       		// XP_Bypass factor in cooling mode
-		Real64 BFH;           	       		// XP_Bypass factor in heating mode
-		Real64 SH;                       	// XP_Superheating
-		Real64 SC;                       	// XP_Subcooling
-		Real64 C1Te;	                   	// XP_Coefficient 1 to calculate Te,req
-		Real64 C2Te;                     	// XP_Coefficient 2 to calculate Te,req
-		Real64 C3Te;                     	// XP_Coefficient 3 to calculate Te,req
-		Real64 C1Tc;	                   	// XP_Coefficient 1 to calculate Tc,req
-		Real64 C2Tc;                     	// XP_Coefficient 2 to calculate Tc,req
-		Real64 C3Tc;                     	// XP_Coefficient 3 to calculate Tc,req
-		int    Algorithm;                	// XP_1-High sensible, 2-Te/Tc constant
-		Real64 EvapTempFixed;            	// XP_Fixed indoor evaporating temperature
-		Real64 CondTempFixed;            	// XP_Fixed inddor condensing temperature
-		Real64 RatedCondFanPower;        	// XP
-		Real64 CondFanPower;             	// XP
-		Real64 CompActSpeed;             	// XP
-		Real64 NcompCooling;             	// XP-compressor electric power [W]
-		Real64 NcompHeating;             	// XP-compressor electric power [W]
-		Array1D< Real64 > CompressorSpeed;  // XP_compressor speed [rps]
-		Array1D_int OUCoolingCAPFT;         // XP_index to outdoor unit cooling capacity funtion of temperature at different compressor speed
-		Array1D_int OUCoolingPWRFT;         // XP_index to outdoor unit cooling power funtion of temperature at different compressor speed
-		Real64 CoeffCdeltaTout;	            // XP_coefficents in equation 14  
-		Real64 CoeffCdeltaToutHeat;	        // XP_coefficents in equation 14 for heating
-		Real64 CompMaxDeltaP;         	    // XP_maximum compressor delta P
-		Real64 RefPipDia;         	        // XP_diameter of refrigerant pipe that links the outdoor unit to the indoor units
-		Real64 RefPipLen;         	        // XP_length of refrigerant pipe that links the outdoor unit to the indoor units
-		Real64 RefPipEquLen;         	    // XP_Equivilent length of refrigerant pipe for pressure drop calculations
-		Real64 RefPipHei;         	        // XP_height of refrigerant pipe that links the outdoor unit to the indoor units
-		Real64 RefPipInsThi;   	            // XP_thickness of refrigerant pipe insulation
-		Real64 RefPipInsCon;   	            // XP_thermal conductivity of refrigerant pipe insulation
-		Real64 RefPipInsH;   	            // XP_heat transfer coefficient of air to insulation
-		Real64 Path;  	                    // Yoshi: For debug
-		Real64 NumIteNcomp;  	            // Yoshi: For debug (similar to CompActSpeed)
-		Real64 NumIteTe;  	                // Yoshi: For debug
-		Real64 NumIteHIUIn;  	            // Yoshi: For debug
-		Real64 Modifi_factor; 	            // Yoshi: For debug
-		Real64 Modifi_SH; 	                // Yoshi: For debug
-		Real64 Modifi_Pe; 	                // Yoshi: For debug
+		std::string RefrigerantName; // Name of refrigerant, must match name in FluidName (see fluidpropertiesrefdata.idf)
+		Real64 CondensingTemp; // VRV system outdoor unit condensing temperature [C]
+		Real64 EvaporatingTemp; // VRV system outdoor unit evaporating temperature [C]
+		Real64 IUEvaporatingTemp; // VRV system indoor unit evaporating temperature, min among all indoor units [C]
+		Real64 IUCondensingTemp; // VRV system indoor unit condensing temperature, max among all indoor units [C]
+		Real64 IUEvapTempLow; // VRV system indoor unit evaporating temperature, lower bound[C]
+		Real64 IUEvapTempHigh; // VRV system indoor unit evaporating temperature, higher bound [C]
+		Real64 IUCondTempLow; // VRV system indoor unit condensing temperature, lower bound [C]
+		Real64 IUCondTempHigh; // VRV system indoor unit condensing temperature, higher bound [C]
+		Real64 OUEvapTempLow; // VRV system outdoor unit evaporating temperature, lower bound[C]
+		Real64 OUEvapTempHigh; // VRV system outdoor unit evaporating temperature, higher bound [C]
+		Real64 OUCondTempLow; // VRV system outdoor unit condensing temperature, lower bound [C]
+		Real64 OUCondTempHigh; // VRV system outdoor unit condensing temperature, higher bound [C]
+		Real64 OUAirFlowRate; // Max condenser air flow rate  [m3/s]
+		Real64 SH; // VRF outdoor unit uperheating degrees [C]
+		Real64 SC; // VRF outdoor unit ubcooling
+		Real64 C1Te; // VRF Outdoor Unit Coefficient 1 to calculate Te,req [--]
+		Real64 C2Te; // VRF Outdoor Unit Coefficient 2 to calculate Te,req [--]
+		Real64 C3Te; // VRF Outdoor Unit Coefficient 3 to calculate Te,req [--]
+		Real64 C1Tc; // VRF Outdoor Unit Coefficient 1 to calculate Tc,req [--]
+		Real64 C2Tc; // VRF Outdoor Unit Coefficient 2 to calculate Tc,req [--]
+		Real64 C3Tc; // VRF Outdoor Unit Coefficient 3 to calculate Tc,req [--]
+		int AlgorithmIUCtrl; //VRF indoor unit contrl algorithm, 1-High sensible, 2-Te/Tc constant
+		Real64 EvapTempFixed; // Indoor unit evaporating temperature, fixed, for AlgorithmIUCtrl is 2-Te/Tc constant [C]
+		Real64 CondTempFixed; // Inddor unit condensing temperature, fixed, for AlgorithmIUCtrl is 2-Te/Tc constant [C]
+		Real64 RatedCondFanPower; // Outdoor unit fan power at rated conditions [W]
+		Real64 CondFanPower; // Outdoor unit fan power at real conditions[W]
+		Real64 CompActSpeed; // Compressor speed [rps]
+		Real64 NcompCooling; // compressor electric power at cooling mode [W]
+		Real64 NcompHeating; // compressor electric power at heating mode [W]
+		Array1D< Real64 > CompressorSpeed; // compressor speed array [rps]
+		Array1D_int OUCoolingCAPFT; // index to outdoor unit cooling capacity funtion of temperature at different compressor speed
+		Array1D_int OUCoolingPWRFT; // index to outdoor unit cooling power funtion of temperature at different compressor speed
+		Real64 CompMaxDeltaP; // maximum compressor pressure rise [Pa]
+		Real64 RefPipDia;  // diameter of refrigerant pipe that links the outdoor unit to the indoor units [m]
+		Real64 RefPipLen;  // length of refrigerant pipe that links the outdoor unit to the indoor units [m]
+		Real64 RefPipEquLen; // Equivilent length of refrigerant pipe for pressure drop calculations [m]
+		Real64 RefPipHei; // height of refrigerant pipe that links the outdoor unit to the indoor units [m]
+		Real64 RefPipInsThi; // thickness of refrigerant pipe insulation [m]
+		Real64 RefPipInsCon; // thermal conductivity of refrigerant pipe insulation [W/mk]
+		Real64 VRFOperationSimPath; // simulation path indicating the VRF operation mode [--]
 
 		// Default Constructor
 		VRFCondenserEquipment() :
@@ -512,16 +504,17 @@ namespace HVACVariableRefrigerantFlow {
 			HPOperatingModeErrorIndex( 0 ),
 			CondensingTemp( 25.0 ),
 			EvaporatingTemp( 6.0 ),
-			MinEvaporatingTemp( 6.0 ), 
-			MaxCondensingTemp( 25.0 ),
-			SucPressDrop( 0.0 ),
-			DisPressDrop( 0.0 ),
-			MaxCondFlow( 0.0 ),
-			MaxCondFlowTemp( 30.0 ),
-			MinCondFlow( 0.0 ),
-			MinCondFlowTemp( 10.0 ),
-			BFC( 0.0 ),   			             
-			BFH( 0.0 ),           	       			             
+			IUEvaporatingTemp( 6.0 ), 
+			IUCondensingTemp( 25.0 ),
+			IUEvapTempLow( 4.0 ),
+			IUEvapTempHigh( 13.0 ),
+			IUCondTempLow( 42.0 ), 
+			IUCondTempHigh( 46.0 ),
+			OUEvapTempLow( -30.0 ),
+			OUEvapTempHigh( 20.0 ),
+			OUCondTempLow( 30.0 ), 
+			OUCondTempHigh( 96.0 ),
+			OUAirFlowRate( 0.0 ),	             
 			SH( 0.0 ),                       			         
 			SC( 0.0 ),                       			         
 			C1Te( 0.0 ),	                   			         
@@ -530,16 +523,14 @@ namespace HVACVariableRefrigerantFlow {
 			C1Tc( 0.0 ),	                   			         
 			C2Tc( 0.0 ),                     			         
 			C3Tc( 0.0 ),                     			         
-			Algorithm( 1 ),            
+			AlgorithmIUCtrl( 1 ),            
 			EvapTempFixed( 0.0 ),            			         
 			CondTempFixed( 0.0 ),            			         
 			RatedCondFanPower( 0.0 ),   
 			CondFanPower( 0.0 ),  
 			CompActSpeed( 0.0 ),   
 			NcompCooling( 0.0 ),   
-			NcompHeating( 0.0 ),   		 	 
-			CoeffCdeltaTout( 0.0 ),	                 		 
-			CoeffCdeltaToutHeat( 0.0 ),	             		 
+			NcompHeating( 0.0 ),   		 	      		 
 			CompMaxDeltaP( 0.0 ),         	                     
 			RefPipDia( 0.0 ),         	                         
 			RefPipLen( 0.0 ),         	           
@@ -547,14 +538,7 @@ namespace HVACVariableRefrigerantFlow {
 			RefPipHei( 0.0 ),       	                         
 			RefPipInsThi( 0.0 ),
 			RefPipInsCon( 0.0 ),
-			RefPipInsH( 0.0 ),
-			Path( 0.0 ),
-			NumIteNcomp( 0.0 ),
-			NumIteTe( 0.0 ),	     
-			NumIteHIUIn( 0.0 ),
-			Modifi_factor( 0.0 ),
-			Modifi_SH( 0.0 ), 	                			     
-			Modifi_Pe( 0.0 )
+			VRFOperationSimPath( 0.0 )
 		{}
 
 		// Member Constructor
@@ -725,16 +709,17 @@ namespace HVACVariableRefrigerantFlow {
 			std::string const RefrigerantName, 
 			Real64 const CondensingTemp,           	
 			Real64 const EvaporatingTemp,          	
-			Real64 const MinEvaporatingTemp,       	
-			Real64 const MaxCondensingTemp,        	
-			Real64 const SucPressDrop,             	
-			Real64 const DisPressDrop,             	
-			Real64 const MaxCondFlow,              	
-			Real64 const MaxCondFlowTemp,          	
-			Real64 const MinCondFlow,              	
-			Real64 const MinCondFlowTemp,          	
-			Real64 const BFC,           	       		
-			Real64 const BFH,           	       		
+			Real64 const IUEvaporatingTemp,       	
+			Real64 const IUCondensingTemp,        	
+			Real64 const IUEvapTempLow,
+			Real64 const IUEvapTempHigh,
+			Real64 const IUCondTempLow,
+			Real64 const IUCondTempHigh,     	
+			Real64 const OUEvapTempLow,
+			Real64 const OUEvapTempHigh,
+			Real64 const OUCondTempLow,
+			Real64 const OUCondTempHigh,
+			Real64 const OUAirFlowRate,       	
 			Real64 const SH,                       	
 			Real64 const SC,                       	
 			Real64 const C1Te,	                   
@@ -743,7 +728,7 @@ namespace HVACVariableRefrigerantFlow {
 			Real64 const C1Tc,	                   
 			Real64 const C2Tc,                     	
 			Real64 const C3Tc,                     	
-			int    const Algorithm,                	
+			int    const AlgorithmIUCtrl,                	
 			Real64 const EvapTempFixed,            	
 			Real64 const CondTempFixed,            	
 			Real64 const RatedCondFanPower,        	
@@ -753,24 +738,15 @@ namespace HVACVariableRefrigerantFlow {
 			Real64 const NcompHeating,             	
 			Array1D< Real64 > & CompressorSpeed, 
 			Array1D_int & OUCoolingCAPFT,        
-			Array1D_int & OUCoolingPWRFT,        
-			Real64 const CoeffCdeltaTout,	           
-			Real64 const CoeffCdeltaToutHeat,	       
+			Array1D_int & OUCoolingPWRFT,         
 			Real64 const CompMaxDeltaP,         	   
 			Real64 const RefPipDia,         	       
 			Real64 const RefPipLen,         	       
 			Real64 const RefPipEquLen,
 			Real64 const RefPipHei,         	       
 			Real64 const RefPipInsThi,   	           
-			Real64 const RefPipInsCon,   	           
-			Real64 const RefPipInsH,   	           
-			Real64 const Path,  	                   
-			Real64 const NumIteNcomp,  	           
-			Real64 const NumIteTe,  	               
-			Real64 const NumIteHIUIn,  	           
-			Real64 const Modifi_factor, 	           
-			Real64 const Modifi_SH, 	               
-			Real64 const Modifi_Pe
+			Real64 const RefPipInsCon,             
+			Real64 const VRFOperationSimPath
 		) :
 			Name( Name ),
 			VRFSystemTypeNum( VRFSystemTypeNum ),
@@ -938,16 +914,17 @@ namespace HVACVariableRefrigerantFlow {
 			RefrigerantName( RefrigerantName ),
 			CondensingTemp( CondensingTemp ),           	
 			EvaporatingTemp( EvaporatingTemp ),          	
-			MinEvaporatingTemp( MinEvaporatingTemp ),       	
-			MaxCondensingTemp( MaxCondensingTemp ),        	
-			SucPressDrop( SucPressDrop ),             	
-			DisPressDrop( DisPressDrop ),             	
-			MaxCondFlow( MaxCondFlow ),              	
-			MaxCondFlowTemp( MaxCondFlowTemp ),          	
-			MinCondFlow( MinCondFlow ),              	
-			MinCondFlowTemp( MinCondFlowTemp ),          	
-			BFC( BFC ),           	       		
-			BFH( BFH ),           	       		
+			IUEvaporatingTemp( IUEvaporatingTemp ),       	
+			IUCondensingTemp( IUCondensingTemp ),    	
+			IUEvapTempLow( IUEvapTempLow ),
+			IUEvapTempHigh( IUEvapTempHigh ),
+			IUCondTempLow( IUCondTempLow ),
+			IUCondTempHigh( IUCondTempHigh ),   	
+			OUEvapTempLow( OUEvapTempLow ),
+			OUEvapTempHigh( OUEvapTempHigh ),
+			OUCondTempLow( OUCondTempLow ),
+			OUCondTempHigh( OUCondTempHigh ),
+			OUAirFlowRate( OUAirFlowRate ),    	
 			SH( SH ),                       	
 			SC( SC ),                       	
 			C1Te( C1Te ),	                   
@@ -956,7 +933,7 @@ namespace HVACVariableRefrigerantFlow {
 			C1Tc( C1Tc ),	                   
 			C2Tc( C2Tc ),                     	
 			C3Tc( C3Tc ),                     	
-			Algorithm( Algorithm ),                	
+			AlgorithmIUCtrl( AlgorithmIUCtrl ),                	
 			EvapTempFixed( EvapTempFixed ),            	
 			CondTempFixed( CondTempFixed ),            	
 			RatedCondFanPower( RatedCondFanPower ),        	
@@ -966,24 +943,15 @@ namespace HVACVariableRefrigerantFlow {
 			NcompHeating( NcompHeating ),             	
 			CompressorSpeed( CompressorSpeed ), 
 			OUCoolingCAPFT( OUCoolingCAPFT ),        
-			OUCoolingPWRFT( OUCoolingPWRFT ),        
-			CoeffCdeltaTout( CoeffCdeltaTout ),	           
-			CoeffCdeltaToutHeat( CoeffCdeltaToutHeat ),	       
+			OUCoolingPWRFT( OUCoolingPWRFT ),             
 			CompMaxDeltaP( CompMaxDeltaP ),         	   
 			RefPipDia( RefPipDia ),         	       
 			RefPipLen( RefPipLen ),         	
 			RefPipEquLen( RefPipEquLen ),			
 			RefPipHei( RefPipHei ),         	       
 			RefPipInsThi( RefPipInsThi ),   	           
-			RefPipInsCon( RefPipInsCon ),   	           
-			RefPipInsH( RefPipInsH ),   	           
-			Path( Path ),  	                   
-			NumIteNcomp( NumIteNcomp ),  	           
-			NumIteTe( NumIteTe ),  	               
-			NumIteHIUIn( NumIteHIUIn ),  	           
-			Modifi_factor( Modifi_factor ), 	           
-			Modifi_SH( Modifi_SH ), 	               
-			Modifi_Pe( Modifi_Pe )
+			RefPipInsCon( RefPipInsCon ),              
+			VRFOperationSimPath( VRFOperationSimPath )
 		{}
 
 	};
@@ -1573,7 +1541,7 @@ namespace HVACVariableRefrigerantFlow {
 	Real64 
 	CompResidual( 
 		Real64 const Te, // Outdoor unit evaporating temperature
-		Array1< Real64 > const & Par        // parameters
+		Array1< Real64 > const & Par // Array of parameters
 	);
 
 	// End of Methods for New VRF Model: Fluid Temperature Control

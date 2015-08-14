@@ -53063,11 +53063,25 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list FluidNames
        \default R410A
-  N1 , \field Outdoor Unit Reference Superheating 
+  N1 , \field Reference Cooling COP
+       \type real
+       \units W/W
+       \minimum> 0.0
+       \default 3.3
+       \note Enter the coefficient of performance at rated conditions or leave blank to use default.
+       \note This reference COP value is only used for the initialization of the physics based VRF model.
+  N2 , \field Reference Heating COP
+       \type real
+       \units W/W
+       \minimum> 0.0
+       \default 3.4
+       \note Enter the coefficient of performance at rated conditions or leave blank to use default.
+       \note This reference COP value is only used for the initialization of the physics based VRF model.
+  N3 , \field Reference Outdoor Unit Superheating 
        \required-field
        \type real
        \units deltaC  
-  N2 , \field Outdoor Unit Reference Subcooling 
+  N4 , \field Reference Outdoor Unit Subcooling 
        \required-field
        \type real 
        \units deltaC   
@@ -53077,50 +53091,42 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \key ConstantTemp
        \key VariableTemp
        \default VariableTemp
-  N3 , \field Reference Evaporating Temperature for Indoor Unit 
-       \note This field is required if Refrigerant Temperature Control Algorithm 
+  N5 , \field Reference Evaporating Temperature for Indoor Unit 
+       \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is ConstantTemp
        \type real
        \units C       
        \default 6.0
-  N4 , \field Reference Condensing Temperature for Indoor Unit 
-       \note This field is required if Refrigerant Temperature Control Algorithm 
+  N6 , \field Reference Condensing Temperature for Indoor Unit 
+       \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is ConstantTemp
        \type real
        \units C       
-       \default 30.0
-  N5 , \field Variable Evaporating Temperature Minimum for Indoor Unit
+       \default 44.0
+  N7 , \field Variable Evaporating Temperature Minimum for Indoor Unit
        \type real
        \units C       
        \default 4.0
-       \note This field is required if Refrigerant Temperature Control Algorithm 
+       \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp 
-  N6 , \field Variable Evaporating Temperature Maximum for Indoor Unit
+  N8 , \field Variable Evaporating Temperature Maximum for Indoor Unit
        \type real
        \units C       
        \default 13.0
-       \note This field is required if Refrigerant Temperature Control Algorithm 
+       \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp 
-  N7 , \field Variable Condensing Temperature Minimum for Indoor Unit
+  N9 , \field Variable Condensing Temperature Minimum for Indoor Unit
        \type real
        \units C       
        \default 42.0
-       \note This field is required if Refrigerant Temperature Control Algorithm 
-       \note is VariableTemp 
-  N8 , \field Variable Condensing Temperature Maximum for Indoor Unit
+       \note This field is used if Refrigerant Temperature Control Algorithm 
+       \note is VariableTemp
+  N10, \field Variable Condensing Temperature Maximum for Indoor Unit
        \type real
        \units C       
        \default 46.0
-       \note This field is required if Refrigerant Temperature Control Algorithm 
-       \note is VariableTemp 
-  N9 , \field Variable Condensing Temperature Minimum for Outdoor Unit
-       \type real
-       \units C       
-       \default 42.0 
-  N10, \field Variable Condensing Temperature Maximum for Outdoor Unit
-       \type real
-       \units C       
-       \default 46.0
+       \note This field is used if Refrigerant Temperature Control Algorithm 
+       \note is VariableTemp
   A6 , \field Outdoor Unit Fan Object Type
        \type choice 
        \key Fan:OnOff

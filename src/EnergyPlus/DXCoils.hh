@@ -98,7 +98,7 @@ namespace DXCoils {
 	extern int NumVRFCoolingCoils; // number of VRF heat pump cooling coils
 	extern int NumDXHeatingCoils; // number of DX heat pump heating coils
 	extern int NumDoe2DXCoils; // number of doe2 DX  coils
-	extern int NumDXHeatPumpWaterHeaterCoils; // number of DX  water heater coils
+	extern int NumDXHeatPumpWaterHeaterPumpedCoils; // number of DX  water heater coils, pumped
 	extern int NumDXHeatPumpWaterHeaterWrappedCoils; // number of wrapped tank HPWH coils
 	extern int NumDXMulSpeedCoils; // number of DX coils with multi-speed compressor
 	extern int NumDXMulModeCoils; // number of DX coils with multi-mode performance
@@ -422,11 +422,11 @@ namespace DXCoils {
 		int SecCoilSHRFT; // index to the secondary coil sensible heat ratio temperature modifier curve
 		int SecCoilSHRFF; // index to the secondary coil sensible heat ratio flor fraction modifier curve
 		Real64 SecCoilAirFlow; // secondary coil air flow rate
-		Real64 SecCoilAirFlowScalingFactor; // secondary coil air flow rate autosize scaling factor 
+		Real64 SecCoilAirFlowScalingFactor; // secondary coil air flow rate autosize scaling factor
 		Real64 SecCoilRatedSHR; // secondary coil nominal or rated sensible heat ratio
 		Real64 SecCoilSHR; // secondary coil current sensible heat ratio
-		int SecZoneAirNodeNum; // secondary zone air node number 
-		Real64 EvapInletWetBulb; // secondary DX coil inlet wet bulb temperature (zone air node wet bulb temp.) 
+		int SecZoneAirNodeNum; // secondary zone air node number
+		Real64 EvapInletWetBulb; // secondary DX coil inlet wet bulb temperature (zone air node wet bulb temp.)
 		Real64 SecCoilSensibleHeatGainRate; // secondary zone sensible heat gain rate [W]
 		Real64 SecCoilTotalHeatRemovalRate; // secondary zone total heat removal rate [W]
 		Real64 SecCoilSensibleHeatRemovalRate; // secondary zone sensible heat removal rate [W]
@@ -436,7 +436,7 @@ namespace DXCoils {
 		Array1D_int MSSecCoilSHRFT; // index to the multi speed secondary coil sensible heat ratio temperature modifier curve
 		Array1D_int MSSecCoilSHRFF; //  index to the multi speed secondary coil sensible heat ratio flow fraction modifier curve
 		Array1D< Real64 > MSSecCoilAirFlow; // multispeed secondary coil air flow rate
-		Array1D< Real64 > MSSecCoilAirFlowScalingFactor; //multispeed secondary coil air flow rate autosize scaling factor 
+		Array1D< Real64 > MSSecCoilAirFlowScalingFactor; //multispeed secondary coil air flow rate autosize scaling factor
 		Array1D< Real64 > MSSecCoilRatedSHR; // multispeed secondary coil nominal or rated sensible heat ratio
 		int MSSpeedNumLS; // current low speed number of multspeed HP
 		int MSSpeedNumHS; // current high speed number of multspeed HP
@@ -446,18 +446,18 @@ namespace DXCoils {
 		//The following members are for VRF Coils (FluidTCtrl Model)
 		int VRFIUPtr; // index to the VRF Indoor Unit where the coil is placed
 		int VRFOUPtr; // index to the VRF Outdoor Unit that the coil serves
-		Real64 EvaporatingTemp; // XP_indoor unit evaporating temperature [C]
-		Real64 CondensingTemp; // XP_indoor unit condensing temperature [C]
-		Real64 C1Te; // XP_Indoor Unit Coefficient 1 to calculate Te,req
-		Real64 C2Te; // XP_Indoor Unit Coefficient 2 to calculate Te,req
-		Real64 C3Te; // XP_Indoor Unit Coefficient 3 to calculate Te,req
-		Real64 C1Tc; // XP_Indoor Unit Coefficient 1 to calculate Tc,req
-		Real64 C2Tc; // XP_Indoor Unit Coefficient 2 to calculate Tc,req 
-		Real64 C3Tc; // XP_Indoor Unit Coefficient 3 to calculate Tc,req
-		Real64 SH  ; // XP_Superheating
-		Real64 SC  ; // XP_Subcooling 
-		Real64 ActualSH; // XP_Superheating
-		Real64 ActualSC; // XP_Subcooling 
+		Real64 EvaporatingTemp; // indoor unit evaporating temperature [C]
+		Real64 CondensingTemp; // indoor unit condensing temperature [C]
+		Real64 C1Te; // VRF Indoor Unit Coefficient 1 to calculate Te,req [--]
+		Real64 C2Te; // VRF Indoor Unit Coefficient 2 to calculate Te,req [--]
+		Real64 C3Te; // VRF Indoor Unit Coefficient 3 to calculate Te,req [--]
+		Real64 C1Tc; // VRF Indoor Unit Coefficient 1 to calculate Tc,req [--]
+		Real64 C2Tc; // VRF Indoor Unit Coefficient 2 to calculate Tc,req [--]
+		Real64 C3Tc; // VRF Indoor Unit Coefficient 3 to calculate Tc,req [--]
+		Real64 SH; // Superheating degrees [C]
+		Real64 SC; // Subcooling  degrees [C]
+		Real64 ActualSH; // Actual superheating degrees [C]
+		Real64 ActualSC; // Actual subcooling degrees [C]
 
 		// Default Constructor
 		DXCoilData() :
@@ -934,11 +934,11 @@ namespace DXCoils {
 			int const SecCoilSHRFT, // index to the secondary coil sensible heat ratio temperature modifier curve
 			int const SecCoilSHRFF, // index to the secondary coil sensible heat ratio flor fraction modifier curve
 			Real64 const SecCoilAirFlow, // secondary coil air flow rate
-			Real64 const SecCoilAirFlowScalingFactor, // secondary coil air flow rate autosize scaling factor 
+			Real64 const SecCoilAirFlowScalingFactor, // secondary coil air flow rate autosize scaling factor
 			Real64 const SecCoilRatedSHR, // secondary coil nominal or rated sensible heat ratio
 			Real64 const SecCoilSHR, // secondary coil current sensible heat ratio
-			int const SecZoneAirNodeNum, // secondary zone air node number 
-			Real64 const EvapInletWetBulb, // secondary DX coil inlet wet bulb temperature (zone air node wet bulb temp.) 
+			int const SecZoneAirNodeNum, // secondary zone air node number
+			Real64 const EvapInletWetBulb, // secondary DX coil inlet wet bulb temperature (zone air node wet bulb temp.)
 			Real64 const SecCoilSensibleHeatGainRate, // secondary zone sensible heat gain rate [W]
 			Real64 const SecCoilTotalHeatRemovalRate, // secondary zone total heat removal rate [W]
 			Real64 const SecCoilSensibleHeatRemovalRate, // secondary zone sensible heat removal rate [W]
@@ -948,7 +948,7 @@ namespace DXCoils {
 			Array1_int const & MSSecCoilSHRFT, // index to the multi speed secondary coil sensible heat ratio temperature modifier curve
 			Array1_int const & MSSecCoilSHRFF, //  index to the multi speed secondary coil sensible heat ratio flow fraction modifier curve
 			Array1< Real64 > const & MSSecCoilAirFlow, // multispeed secondary coil air flow rate
-			Array1< Real64 > const & MSSecCoilAirFlowScalingFactor, //multispeed secondary coil air flow rate autosize scaling factor 
+			Array1< Real64 > const & MSSecCoilAirFlowScalingFactor, //multispeed secondary coil air flow rate autosize scaling factor
 			Array1< Real64 > const & MSSecCoilRatedSHR, // multispeed secondary coil nominal or rated sensible heat ratio
 			int const MSSpeedNumLS, // current low speed number of multspeed HP
 			int const MSSpeedNumHS, // current high speed number of multspeed HP
@@ -956,18 +956,18 @@ namespace DXCoils {
 			Real64 const MSCycRatio, // current cycling ratio of multspeed HP
 			int const VRFIUPtr,  // index to the VRF Indoor Unit where the coil is placed
 			int const VRFOUPtr,  // index to the VRF Outdoor Unit that the coil serves
-			Real64 const EvaporatingTemp, // XP_indoor unit evaporating temperature [C]
-			Real64 const CondensingTemp, // XP_indoor unit condensing temperature [C]
-			Real64 const C1Te, // XP_Indoor Unit Coefficient 1 to calculate Te,req
-			Real64 const C2Te, // XP_Indoor Unit Coefficient 2 to calculate Te,req
-			Real64 const C3Te, // XP_Indoor Unit Coefficient 3 to calculate Te,req
-			Real64 const C1Tc, // XP_Indoor Unit Coefficient 1 to calculate Tc,req
-			Real64 const C2Tc, // XP_Indoor Unit Coefficient 2 to calculate Tc,req 
-			Real64 const C3Tc, // XP_Indoor Unit Coefficient 3 to calculate Tc,req
-			Real64 const SH  , // XP_Superheating
-			Real64 const SC  , // XP_Subcooling 
-			Real64 const ActualSH, // XP_Superheating
-			Real64 const ActualSC // XP_Subcooling 
+			Real64 const EvaporatingTemp, // indoor unit evaporating temperature [C]
+			Real64 const CondensingTemp, // indoor unit condensing temperature [C]
+			Real64 const C1Te, // Indoor Unit Coefficient 1 to calculate Te,req [--]
+			Real64 const C2Te, // Indoor Unit Coefficient 2 to calculate Te,req [--]
+			Real64 const C3Te, // Indoor Unit Coefficient 3 to calculate Te,req [--]
+			Real64 const C1Tc, // Indoor Unit Coefficient 1 to calculate Tc,req [--]
+			Real64 const C2Tc, // Indoor Unit Coefficient 2 to calculate Tc,req [--]
+			Real64 const C3Tc, // Indoor Unit Coefficient 3 to calculate Tc,req [--]
+			Real64 const SH  , // Superheating degrees [C]
+			Real64 const SC  , // Subcooling degrees [C]
+			Real64 const ActualSH, // Actual superheating [C]
+			Real64 const ActualSC // Actual subcooling [C]
 		) :
 			Name( Name ),
 			DXCoilType( DXCoilType ),
@@ -1676,11 +1676,9 @@ namespace DXCoils {
 	
 	void
 	CalcVRFIUEvapCondTemp(
-		int const CoolCoilNum, // the number of the VRF Cooling DX coil to be simulated
-    	int const HeatCoilNum, // the number of the VRF Heating DX coil to be simulated
-    	int const ZoneIndex,   // index to zone where the VRF Terminal Unit resides
-    	Real64 & EvapTemp, // evaporating temperature
-    	Real64 & CondTemp  // condensing temperature 
+		int const VRFTUNum, // the number of the VRF TU to be simulated
+		Real64 & EvapTemp, // evaporating temperature
+		Real64 & CondTemp  // condensing temperature 
 	);
 	
 	void
@@ -1704,13 +1702,13 @@ namespace DXCoils {
 	Real64 
 	FanSpdResidualCool( 
 		Real64 const FanSpdRto, // indoor unit fan speed ratio  
-		Array1< Real64 > const & Par        // parameters
+		Array1< Real64 > const & Par // array of parameters
 	);
 	
 	Real64 
 	FanSpdResidualHeat( 
 		Real64 FanSpdRto, // indoor unit fan speed ratio  
-		Array1< Real64 > const & Par        // parameters
+		Array1< Real64 > const & Par // array of parameters
 	);
 	// End of Methods for New VRF Model: Fluid Temperature Control
 	// *****************************************************************************

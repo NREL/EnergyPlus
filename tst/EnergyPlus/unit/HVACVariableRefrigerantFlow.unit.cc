@@ -31,14 +31,6 @@ using namespace DXCoils;
 
 namespace EnergyPlus {
 
-TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CalcVRF )
-{
-	// @@ PURPOSE OF THIS SUBROUTINE:
-	// 		Subroutine CalcVRF_FluidTCtrl is part of the new VRF model based on physics, appliable for Fluid Temperature Control.
-	// 		This subroutine simulates the components making up the VRF indoor terminal unit.
-
-}
-
 TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CompResidual )
 {
     // PURPOSE OF THIS SUBROUTINE:
@@ -270,10 +262,12 @@ TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CalcVRFIUAirFlow )
     DXCoil( CoolCoilIndex ).C2Te = 0.804;
     DXCoil( CoolCoilIndex ).C3Te = 0;
     DXCoil( CoolCoilIndex ).SH	 = 3.00;
+	DXCoil( CoolCoilIndex ).SupplyFanIndex = 0;
     DXCoil( HeatCoilIndex ).C1Tc = -1.905;
     DXCoil( HeatCoilIndex ).C2Tc = 0.4333;
     DXCoil( HeatCoilIndex ).C3Tc = 0.0207;
     DXCoil( HeatCoilIndex ).SC	 = 5.00;
+	DXCoil( HeatCoilIndex ).SupplyFanIndex = 0;
     
     // Run and Check for Cooling Mode
     Mode = 0;
@@ -282,19 +276,17 @@ TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CalcVRFIUAirFlow )
     
     ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP = -2716.6229;
     ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP = -45507.8487;
-    
-    //DXCoil( CoolCoilIndex ).BF = 0.0592;
-    //DXCoil( CoolCoilIndex ).Qfan = 37.80;
+
     DXCoil( CoolCoilIndex ).RatedAirMassFlowRate( 1 ) = 0.2066;
     DXCoil( CoolCoilIndex ).InletAirTemp = 25.5553;
     DXCoil( CoolCoilIndex ).InletAirHumRat = 8.4682e-3;
     DXCoil( CoolCoilIndex ).InletAirEnthalpy = 47259.78;
     
     CalcVRFIUAirFlow(ZoneIndex, Mode, Temp, CoolCoilIndex, HeatCoilIndex, SHSCModify, FanSpdRatio, Wout, Toutlet, Houtlet, HcoilIn, TcIn, SHact, SCact);
-    EXPECT_NEAR( TcIn, 25.60, 0.01 );
-    EXPECT_NEAR( Toutlet, 17.90, 0.01 );
-    EXPECT_NEAR( Houtlet, 39443, 1 );
-    EXPECT_NEAR( HcoilIn, 47306, 1 );
+    EXPECT_NEAR( TcIn, 25.56, 0.01 );
+    EXPECT_NEAR( Toutlet, 17.89, 0.01 );
+    EXPECT_NEAR( Houtlet, 39440, 1 );
+    EXPECT_NEAR( HcoilIn, 47259, 1 );
     EXPECT_NEAR( SHact, 3.00, 0.01 );
     
     
@@ -305,19 +297,17 @@ TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CalcVRFIUAirFlow )
     
     ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP = 43167.2628;
     ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP = 4241.66099;
-    
-    //DXCoil( HeatCoilIndex ).BF = 0.136;
-    //DXCoil( HeatCoilIndex ).Qfan = 37.80;
+
     DXCoil( HeatCoilIndex ).RatedAirMassFlowRate( 1 ) = 0.21136;
     DXCoil( HeatCoilIndex ).InletAirTemp = 20.2362;
     DXCoil( HeatCoilIndex ).InletAirHumRat = 4.1053e-3;
     DXCoil( HeatCoilIndex ).InletAirEnthalpy = 30755.6253;
     
     CalcVRFIUAirFlow(ZoneIndex, Mode, Temp, CoolCoilIndex, HeatCoilIndex, SHSCModify, FanSpdRatio, Wout, Toutlet, Houtlet, HcoilIn, TcIn, SHact, SCact);
-    EXPECT_NEAR( TcIn, 20.45, 0.01 );
-    EXPECT_NEAR( Toutlet, 38.40, 0.01 );
-    EXPECT_NEAR( Houtlet, 49142, 1 );
-    EXPECT_NEAR( HcoilIn, 30973, 1 );
+    EXPECT_NEAR( TcIn, 20.24, 0.01 );
+    EXPECT_NEAR( Toutlet, 38.37, 0.01 );
+    EXPECT_NEAR( Houtlet, 49113, 1 );
+    EXPECT_NEAR( HcoilIn, 30756, 1 );
     EXPECT_NEAR( SCact, 5.00, 0.01 );
     
     // Clean up
@@ -346,15 +336,15 @@ TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CalcVRFIUTeTc )
     TerminalUnitList( IndexTUList ).NumTUInList = 2;
     
     VRF( IndexVRFCondenser ).ZoneTUListPtr = 1;
-    VRF( IndexVRFCondenser ).Algorithm = 0;
+    VRF( IndexVRFCondenser ).AlgorithmIUCtrl = 0;
     VRF( IndexVRFCondenser ).EvapTempFixed = 3;
     VRF( IndexVRFCondenser ).CondTempFixed = 5;
     
     // Run and Check 
     CalcVRFIUTeTc_FluidTCtrl( IndexVRFCondenser );
     
-    EXPECT_EQ( VRF( IndexVRFCondenser ).MinEvaporatingTemp, 3 );
-    EXPECT_EQ( VRF( IndexVRFCondenser ).MaxCondensingTemp, 5 );
+    EXPECT_EQ( VRF( IndexVRFCondenser ).IUEvaporatingTemp, 3 );
+    EXPECT_EQ( VRF( IndexVRFCondenser ).IUCondensingTemp, 5 );
     
     // Clean up
     VRF.deallocate( ); 
