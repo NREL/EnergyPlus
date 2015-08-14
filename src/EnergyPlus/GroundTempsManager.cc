@@ -157,20 +157,13 @@ namespace GroundTemps {
 					// Read input into object here
 
 					thisModel->objectType = objectType;
-
 					thisModel->objectName = cAlphaArgs( 1 );
-
-					thisModel->surfaceCover = cAlphaArgs( 2 );
-
 					thisModel->baseConductivity = rNumericArgs( 1 );
-
 					thisModel->baseDensity = rNumericArgs( 2 );
-
 					thisModel->baseSpecificHeat = rNumericArgs( 3 );
-
-					thisModel->baseMoistureContent = rNumericArgs( 4 ) / 100.0;
-
-					thisModel->baseMoistureContentAtSaturation = rNumericArgs( 5 ) / 100.0;
+					thisModel->waterContent = rNumericArgs( 4 ) / 100.0;
+					thisModel->saturatedWaterContent = rNumericArgs( 5 ) / 100.0;
+					thisModel->evapotransCoeff = rNumericArgs( 6 );
 
 					found = true;
 					break;
@@ -181,7 +174,7 @@ namespace GroundTemps {
 			groundTempModels.push_back( thisModel );
 
 			// Simulate
-			thisModel->simulate();
+			thisModel->initAndSim();
 
 			// Return the pointer
 			return thisModel;

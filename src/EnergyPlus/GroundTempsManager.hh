@@ -91,16 +91,17 @@ namespace GroundTemps {
 	class FiniteDiffGroundTempsModel : public BaseGroundTempsModel {
 		
 		public:
-			std::string surfaceCover;
 			Real64 baseConductivity;
 			Real64 baseDensity;
 			Real64 baseSpecificHeat;
-			Real64 baseMoistureContent;
-			Real64 baseMoistureContentAtSaturation;
 			int totalNumCells;
 			Real64 timeStepInSeconds;
+			Real64 evapotransCoeff;
+			Real64 saturatedWaterContent; 
+			Real64 waterContent;
+			Real64 annualAveAirTemp;
 
-		struct cell {
+		struct instanceOfCellData {
 
 			struct properties
 			{
@@ -124,16 +125,30 @@ namespace GroundTemps {
 			Real64 beta;
 			Real64 volume;
 			Real64 conductionArea = 1.0; // Assumes 1 m2 
-	
-		};
+		
+			};
 
-		Array1D< cell > cellArray;
+		Array1D< instanceOfCellData > cellArray;
+
+		struct instanceOfWeatherData
+			{
+				Real64 dryBulbTemp;
+				Real64 dewPointTemp;
+				Real64 barometricPressure;
+				Real64 airDensity;
+				Real64 relativeHumidity;
+				Real64 windSpeed;
+				Real64 horizontalRadiation;
+				Real64 horizontalExtraterrestrialRadiation;
+			};
+
+		Array1D< instanceOfWeatherData > weatherDataArray;
 
 		void
 		getWeatherData();
 
 		void
-		simulate();
+		initAndSim();
 
 		void
 		developMesh();
@@ -187,13 +202,20 @@ namespace GroundTemps {
 
 		void
 		evaluateSoilRhoCp(
-		Optional< int const > cell = _,
-		Optional_bool_const InitOnly = _
+			Optional< int const > cell = _,
+			Optional_bool_const InitOnly = _
 		);
 
 		Array2D< Real64 > groundTemps;
 
 		static std::shared_ptr< FiniteDiffGroundTempsModel > FiniteDiffGTMFactory( int objectType, std::string objectName);
+
+		enum surfaceTypes {
+			surfaceCoverType_bareSoil = 1,
+			surfaceCoverType_shortGrass = 2,
+			surfaceCoverType_longGrass = 3
+		};
+
 	};
 
 	//******************************************************************************
@@ -202,18 +224,11 @@ namespace GroundTemps {
 	class ShallowGroundTemps : public BaseGroundTempsModel
 	{
 		public:
-			// Public Members
-			//Real64 aveGroundTemp;
-			//Real64 aveGroundTempAmplitude;
-			//Real64 phaseShiftInSecs;
 			int timeOfSimInMonths;
 			Array1D< Real64 > surfaceGroundTemps;
 
 		// Default Constructor
 		ShallowGroundTemps():
-			//aveGroundTemp( 15 ),
-			//aveGroundTempAmplitude( 12 ),
-			//phaseShiftInSecs( 0 ),
 			timeOfSimInMonths( 0 ),
 			surfaceGroundTemps( 12, 13.0 )
 

@@ -260,6 +260,7 @@ namespace WeatherManager {
 	bool DatesShouldBeReset( false ); // True when weekdays should be reset
 	bool StartDatesCycleShouldBeReset( false ); // True when start dates on repeat should be reset
 	bool Jan1DatesShouldBeReset( false ); // True if Jan 1 should signal reset of dates
+	bool RPReadAllWeatherData( false ); // True if need to read all weather data prior to simulation
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WeatherManager
 	//PUBLIC  ProcessDateString
@@ -5055,7 +5056,13 @@ Label9999: ;
 		RPD2 = GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 		RP = GetNumObjectsFound( "RunPeriod" );
 		RPAW = GetNumObjectsFound( "RunPeriod:CustomRange" );
+		RPReadAllWeatherData = GetNumObjectsFound("Site:GroundTemperature:Undisturbed:FiniteDifference") > 0;
 		TotRunPers = RP + RPAW;
+		
+		//if ( RPReadAllWeatherData ) {
+		//	TotRunPers++;
+		//}
+		
 		NumOfEnvrn = TotDesDays + TotRunPers + RPD1 + RPD2;
 		if ( TotRunPers > 0 ) {
 			WeathSimReq = true;
@@ -5074,7 +5081,7 @@ Label9999: ;
 		DesignDay.allocate( TotDesDays );
 		Environment.allocate( NumOfEnvrn );
 
-		// Set all Environments to False and then the weather environment will be set
+		// Set all Environments to DesignDay and then the weather environment will be set
 		//  in the get annual run data subroutine
 		for ( Env = 1; Env <= TotDesDays; ++Env ) {
 			Environment( Env ).KindOfEnvrn = ksDesignDay;
@@ -5089,11 +5096,15 @@ Label9999: ;
 		for ( Env = 1; Env <= TotRunPers; ++Env ) {
 			Environment( TotDesDays + RPD1 + RPD2 + Env ).KindOfEnvrn = ksRunPeriodWeather;
 		}
+		
+		//if ( RPReadAllWeatherData ) {
+		//	Environment( TotRunPers ).KindOfEnvrn = ksReadAllWeatherData;
+		//}
 
 		if ( TotDesDays >= 1 ) {
 			GetDesignDayData( TotDesDays, ErrorsFound );
 		}
-
+		
 		if ( RPD1 >= 1 || RPD2 >= 1 ) {
 			GetRunPeriodDesignData( ErrorsFound );
 		}
@@ -5565,6 +5576,21 @@ Label9999: ;
 			RunPeriodInput( 1 ).MonWeekDay = 0;
 			if ( RunPeriodInput( 1 ).DayOfWeek != 0 && ! ErrorsFound ) {
 				SetupWeekDaysByMonth( RunPeriodInput( 1 ).StartMonth, RunPeriodInput( 1 ).StartDay, RunPeriodInput( 1 ).DayOfWeek, RunPeriodInput( 1 ).MonWeekDay );
+			}
+		}
+
+		if ( RPReadAllWeatherData ) {
+			++NumOfEnvrn;
+			++TotRunPers;
+			Environment.redimension( NumOfEnvrn );
+			RunPeriodInput.redimension( TotRunPers );
+			Environment( NumOfEnvrn ).KindOfEnvrn = ksReadAllWeatherData;
+			WeathSimReq = true;
+			RunPeriodInput( TotRunPers ).StartDate = JulianDay( 1, 1, 0 );
+			RunPeriodInput( TotRunPers ).EndDate = JulianDay( 12, 31, 0 );
+			RunPeriodInput( TotRunPers ).MonWeekDay = 0;
+			if ( RunPeriodInput( TotRunPers ).DayOfWeek != 0 && ! ErrorsFound ) {
+				SetupWeekDaysByMonth( RunPeriodInput( TotRunPers ).StartMonth, RunPeriodInput( TotRunPers ).StartDay, RunPeriodInput( TotRunPers ).DayOfWeek, RunPeriodInput( TotRunPers ).MonWeekDay );
 			}
 		}
 
@@ -9041,126 +9067,137 @@ Label9998: ;
 
 		// Transfer weather file information to the Environment derived type
 		Envrn = TotDesDays + 1;
+
 		// Sizing Periods from Weather File
 		for ( Loop = 1; Loop <= TotRunDesPers; ++Loop ) {
-			Environment( Envrn ).StartMonth = RunPeriodDesignInput( Loop ).StartMonth;
-			Environment( Envrn ).StartDay = RunPeriodDesignInput( Loop ).StartDay;
-			Environment( Envrn ).StartJDay = JulianDay( RunPeriodDesignInput( Loop ).StartMonth, RunPeriodDesignInput( Loop ).StartDay, LeapYearAdd );
-			Environment( Envrn ).TotalDays = RunPeriodDesignInput( Loop ).TotalDays;
-			Environment( Envrn ).EndMonth = RunPeriodDesignInput( Loop ).EndMonth;
-			Environment( Envrn ).EndDay = RunPeriodDesignInput( Loop ).EndDay;
-			Environment( Envrn ).EndJDay = JulianDay( RunPeriodDesignInput( Loop ).EndMonth, RunPeriodDesignInput( Loop ).EndDay, LeapYearAdd );
-			Environment( Envrn ).NumSimYears = RunPeriodDesignInput( Loop ).NumSimYears;
-			if ( Environment( Envrn ).StartJDay <= Environment( Envrn ).EndJDay ) {
-				Environment( Envrn ).TotalDays = ( Environment( Envrn ).EndJDay - Environment( Envrn ).StartJDay + 1 ) * Environment( Envrn ).NumSimYears;
+			auto & env = Environment( Envrn );
+			auto & runPer = RunPeriodDesignInput( Loop );
+
+			env.StartMonth = runPer.StartMonth;
+			env.StartDay = runPer.StartDay;
+			env.StartJDay = JulianDay( runPer.StartMonth, runPer.StartDay, LeapYearAdd );
+			env.TotalDays = runPer.TotalDays;
+			env.EndMonth = runPer.EndMonth;
+			env.EndDay = runPer.EndDay;
+			env.EndJDay = JulianDay( runPer.EndMonth, runPer.EndDay, LeapYearAdd );
+			env.NumSimYears = runPer.NumSimYears;
+			if ( env.StartJDay <= env.EndJDay ) {
+				env.TotalDays = ( env.EndJDay - env.StartJDay + 1 ) * env.NumSimYears;
 			} else {
-				Environment( Envrn ).TotalDays = ( JulianDay( 12, 31, LeapYearAdd ) - Environment( Envrn ).StartJDay + 1 + Environment( Envrn ).EndJDay ) * Environment( Envrn ).NumSimYears;
+				env.TotalDays = ( JulianDay( 12, 31, LeapYearAdd ) - env.StartJDay + 1 + env.EndJDay ) * env.NumSimYears;
 			}
-			TotRunDesPersDays += Environment( Envrn ).TotalDays;
-			Environment( Envrn ).UseDST = RunPeriodDesignInput( Loop ).UseDST;
-			Environment( Envrn ).UseHolidays = RunPeriodDesignInput( Loop ).UseHolidays;
-			Environment( Envrn ).Title = RunPeriodDesignInput( Loop ).Title;
-			Environment( Envrn ).cKindOfEnvrn = RunPeriodDesignInput( Loop ).PeriodType;
-			Environment( Envrn ).KindOfEnvrn = ksRunPeriodDesign;
-			Environment( Envrn ).DesignDayNum = 0;
-			Environment( Envrn ).RunPeriodDesignNum = Loop;
-			Environment( Envrn ).DayOfWeek = RunPeriodDesignInput( Loop ).DayOfWeek;
-			Environment( Envrn ).MonWeekDay = RunPeriodDesignInput( Loop ).MonWeekDay;
-			Environment( Envrn ).SetWeekDays = false;
-			Environment( Envrn ).ApplyWeekendRule = RunPeriodDesignInput( Loop ).ApplyWeekendRule;
-			Environment( Envrn ).UseRain = RunPeriodDesignInput( Loop ).UseRain;
-			Environment( Envrn ).UseSnow = RunPeriodDesignInput( Loop ).UseSnow;
+			TotRunDesPersDays += env.TotalDays;
+			env.UseDST = runPer.UseDST;
+			env.UseHolidays = runPer.UseHolidays;
+			env.Title = runPer.Title;
+			env.cKindOfEnvrn = runPer.PeriodType;
+			env.KindOfEnvrn = ksRunPeriodDesign;
+			env.DesignDayNum = 0;
+			env.RunPeriodDesignNum = Loop;
+			env.DayOfWeek = runPer.DayOfWeek;
+			env.MonWeekDay = runPer.MonWeekDay;
+			env.SetWeekDays = false;
+			env.ApplyWeekendRule = runPer.ApplyWeekendRule;
+			env.UseRain = runPer.UseRain;
+			env.UseSnow = runPer.UseSnow;
 			++Envrn;
 		}
 
 		// RunPeriods from weather file
 		for ( Loop = 1; Loop <= TotRunPers; ++Loop ) { // Run Periods.
-			Environment( Envrn ).StartMonth = RunPeriodInput( Loop ).StartMonth;
-			Environment( Envrn ).StartDay = RunPeriodInput( Loop ).StartDay;
-			Environment( Envrn ).EndMonth = RunPeriodInput( Loop ).EndMonth;
-			Environment( Envrn ).EndDay = RunPeriodInput( Loop ).EndDay;
-			Environment( Envrn ).NumSimYears = RunPeriodInput( Loop ).NumSimYears;
-			if ( RunPeriodInput( Loop ).ActualWeather ) {
-				Environment( Envrn ).CurrentYear = RunPeriodInput( Loop ).StartYear;
-				Environment( Envrn ).IsLeapYear = IsLeapYear( RunPeriodInput( Loop ).StartYear );
-				Environment( Envrn ).TreatYearsAsConsecutive = true;
-				Environment( Envrn ).StartYear = RunPeriodInput( Loop ).StartYear;
-				Environment( Envrn ).EndYear = RunPeriodInput( Loop ).EndYear;
-				JGDate( GregorianToJulian, Environment( Envrn ).StartDate, Environment( Envrn ).StartYear, Environment( Envrn ).StartMonth, Environment( Envrn ).StartDay );
-				JGDate( GregorianToJulian, Environment( Envrn ).EndDate, Environment( Envrn ).EndYear, Environment( Envrn ).EndMonth, Environment( Envrn ).EndDay );
-				Environment( Envrn ).StartJDay = Environment( Envrn ).StartDate;
-				Environment( Envrn ).EndJDay = Environment( Envrn ).EndDate;
-				Environment( Envrn ).TotalDays = Environment( Envrn ).EndDate - Environment( Envrn ).StartDate + 1;
-				Environment( Envrn ).RawSimDays = Environment( Envrn ).EndDate - Environment( Envrn ).StartDate + 1;
-				Environment( Envrn ).MatchYear = true;
-				Environment( Envrn ).ActualWeather = true;
-			} else if ( RunPeriodInput( Loop ).BeginYear < 100 ) { // std RunPeriod
-				Environment( Envrn ).CurrentYear = 0;
+			auto & env = Environment( Envrn );
+			auto & runPer = RunPeriodInput( Loop );
+
+			env.StartMonth = runPer.StartMonth;
+			env.StartDay = runPer.StartDay;
+			env.EndMonth = runPer.EndMonth;
+			env.EndDay = runPer.EndDay;
+			env.NumSimYears = runPer.NumSimYears;
+			if ( runPer.ActualWeather ) {
+				env.CurrentYear = runPer.StartYear;
+				env.IsLeapYear = IsLeapYear( runPer.StartYear );
+				env.TreatYearsAsConsecutive = true;
+				env.StartYear = runPer.StartYear;
+				env.EndYear = runPer.EndYear;
+				JGDate( GregorianToJulian, env.StartDate, env.StartYear, env.StartMonth, env.StartDay );
+				JGDate( GregorianToJulian, env.EndDate, env.EndYear, env.EndMonth, env.EndDay );
+				env.StartJDay = env.StartDate;
+				env.EndJDay = env.EndDate;
+				env.TotalDays = env.EndDate - env.StartDate + 1;
+				env.RawSimDays = env.EndDate - env.StartDate + 1;
+				env.MatchYear = true;
+				env.ActualWeather = true;
+			} else if ( runPer.BeginYear < 100 ) { // std RunPeriod
+				env.CurrentYear = 0;
 				if ( ! WFAllowsLeapYears ) {
-					Environment( Envrn ).IsLeapYear = false; // explicit set
+					env.IsLeapYear = false; // explicit set
 					LocalLeapYearAdd = 0;
 				} else {
-					Environment( Envrn ).IsLeapYear = true; // explicit set
+					env.IsLeapYear = true; // explicit set
 					LocalLeapYearAdd = 1;
 				}
-				Environment( Envrn ).TreatYearsAsConsecutive = false;
-				Environment( Envrn ).RollDayTypeOnRepeat = RunPeriodInput( Loop ).RollDayTypeOnRepeat;
-				Environment( Envrn ).StartJDay = JulianDay( RunPeriodInput( Loop ).StartMonth, RunPeriodInput( Loop ).StartDay, LocalLeapYearAdd );
-				Environment( Envrn ).EndJDay = JulianDay( RunPeriodInput( Loop ).EndMonth, RunPeriodInput( Loop ).EndDay, LocalLeapYearAdd );
+				env.TreatYearsAsConsecutive = false;
+				env.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
+				env.StartJDay = JulianDay( runPer.StartMonth, runPer.StartDay, LocalLeapYearAdd );
+				env.EndJDay = JulianDay( runPer.EndMonth, runPer.EndDay, LocalLeapYearAdd );
 				// need message if isleapyear and wfleapyearind=0
-				if ( Environment( Envrn ).StartJDay <= Environment( Envrn ).EndJDay ) {
-					Environment( Envrn ).RawSimDays = ( Environment( Envrn ).EndJDay - Environment( Envrn ).StartJDay + 1 );
-					Environment( Envrn ).TotalDays = ( Environment( Envrn ).EndJDay - Environment( Envrn ).StartJDay + 1 ) * Environment( Envrn ).NumSimYears;
+				if ( env.StartJDay <= env.EndJDay ) {
+					env.RawSimDays = ( env.EndJDay - env.StartJDay + 1 );
+					env.TotalDays = ( env.EndJDay - env.StartJDay + 1 ) * env.NumSimYears;
 				} else {
-					Environment( Envrn ).RawSimDays = ( JulianDay( 12, 31, LeapYearAdd ) - Environment( Envrn ).StartJDay + 1 + Environment( Envrn ).EndJDay );
-					Environment( Envrn ).TotalDays = ( JulianDay( 12, 31, LeapYearAdd ) - Environment( Envrn ).StartJDay + 1 + Environment( Envrn ).EndJDay ) * Environment( Envrn ).NumSimYears;
+					env.RawSimDays = ( JulianDay( 12, 31, LeapYearAdd ) - env.StartJDay + 1 + env.EndJDay );
+					env.TotalDays = ( JulianDay( 12, 31, LeapYearAdd ) - env.StartJDay + 1 + env.EndJDay ) * env.NumSimYears;
 				}
 
 			} else { // Using Runperiod and StartYear option.
-				Environment( Envrn ).CurrentYear = RunPeriodInput( Loop ).BeginYear;
-				Environment( Envrn ).IsLeapYear = IsLeapYear( Environment( Envrn ).CurrentYear );
-				Environment( Envrn ).TreatYearsAsConsecutive = true;
-				Environment( Envrn ).RollDayTypeOnRepeat = RunPeriodInput( Loop ).RollDayTypeOnRepeat;
-				Environment( Envrn ).StartJDay = JulianDay( RunPeriodInput( Loop ).StartMonth, RunPeriodInput( Loop ).StartDay, LeapYearAdd );
-				Environment( Envrn ).EndJDay = JulianDay( RunPeriodInput( Loop ).EndMonth, RunPeriodInput( Loop ).EndDay, LeapYearAdd );
-				Environment( Envrn ).TotalDays = 0;
-				for ( Loop1 = 1; Loop1 <= Environment( Envrn ).NumSimYears; ++Loop1 ) {
-					if ( ! IsLeapYear( RunPeriodInput( Loop ).BeginYear - 1 + Loop1 ) || ! WFAllowsLeapYears ) {
-						JDay1 = JulianDay( RunPeriodInput( Loop ).StartMonth, RunPeriodInput( Loop ).StartDay, 0 );
-						JDay2 = JulianDay( RunPeriodInput( Loop ).EndMonth, RunPeriodInput( Loop ).EndDay, 0 );
+				env.CurrentYear = runPer.BeginYear;
+				env.IsLeapYear = IsLeapYear( env.CurrentYear );
+				env.TreatYearsAsConsecutive = true;
+				env.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
+				env.StartJDay = JulianDay( runPer.StartMonth, runPer.StartDay, LeapYearAdd );
+				env.EndJDay = JulianDay( runPer.EndMonth, runPer.EndDay, LeapYearAdd );
+				env.TotalDays = 0;
+				for ( Loop1 = 1; Loop1 <= env.NumSimYears; ++Loop1 ) {
+					if ( ! IsLeapYear( runPer.BeginYear - 1 + Loop1 ) || ! WFAllowsLeapYears ) {
+						JDay1 = JulianDay( runPer.StartMonth, runPer.StartDay, 0 );
+						JDay2 = JulianDay( runPer.EndMonth, runPer.EndDay, 0 );
 						if ( JDay1 <= JDay2 ) {
-							if ( Loop1 == 1 ) Environment( Envrn ).RawSimDays = ( JDay2 - JDay1 + 1 );
-							Environment( Envrn ).TotalDays += ( JDay2 - JDay1 + 1 );
+							if ( Loop1 == 1 ) env.RawSimDays = ( JDay2 - JDay1 + 1 );
+							env.TotalDays += ( JDay2 - JDay1 + 1 );
 						} else {
-							if ( Loop1 == 1 ) Environment( Envrn ).RawSimDays = JulianDay( 12, 31, 0 ) - JDay1 + 1 + JDay2;
-							Environment( Envrn ).TotalDays += JulianDay( 12, 31, 0 ) - JDay1 + 1 + JDay2;
+							if ( Loop1 == 1 ) env.RawSimDays = JulianDay( 12, 31, 0 ) - JDay1 + 1 + JDay2;
+							env.TotalDays += JulianDay( 12, 31, 0 ) - JDay1 + 1 + JDay2;
 						}
 					} else { // Leap Year
-						JDay1 = JulianDay( RunPeriodInput( Loop ).StartMonth, RunPeriodInput( Loop ).StartDay, 1 );
-						JDay2 = JulianDay( RunPeriodInput( Loop ).EndMonth, RunPeriodInput( Loop ).EndDay, 1 );
+						JDay1 = JulianDay( runPer.StartMonth, runPer.StartDay, 1 );
+						JDay2 = JulianDay( runPer.EndMonth, runPer.EndDay, 1 );
 						if ( JDay1 <= JDay2 ) {
-							Environment( Envrn ).TotalDays += ( JDay2 - JDay1 + 1 );
+							env.TotalDays += ( JDay2 - JDay1 + 1 );
 						} else {
-							Environment( Envrn ).TotalDays += JulianDay( 12, 31, 1 ) - JDay1 + 1 + JDay2;
+							env.TotalDays += JulianDay( 12, 31, 1 ) - JDay1 + 1 + JDay2;
 						}
 					}
 				}
 			}
-			Environment( Envrn ).UseDST = RunPeriodInput( Loop ).UseDST;
-			Environment( Envrn ).UseHolidays = RunPeriodInput( Loop ).UseHolidays;
-			if ( RunPeriodInput( Loop ).Title == BlankString ) {
-				Environment( Envrn ).Title = WeatherFileLocationTitle;
+			env.UseDST = runPer.UseDST;
+			env.UseHolidays = runPer.UseHolidays;
+			if ( runPer.Title == BlankString ) {
+				env.Title = WeatherFileLocationTitle;
 			} else {
-				Environment( Envrn ).Title = RunPeriodInput( Loop ).Title;
+				env.Title = runPer.Title;
 			}
-			Environment( Envrn ).cKindOfEnvrn = "WeatherFileRunPeriod";
-			Environment( Envrn ).KindOfEnvrn = ksRunPeriodWeather;
-			Environment( Envrn ).DayOfWeek = RunPeriodInput( Loop ).DayOfWeek;
-			Environment( Envrn ).MonWeekDay = RunPeriodInput( Loop ).MonWeekDay;
-			Environment( Envrn ).SetWeekDays = false;
-			Environment( Envrn ).ApplyWeekendRule = RunPeriodInput( Loop ).ApplyWeekendRule;
-			Environment( Envrn ).UseRain = RunPeriodInput( Loop ).UseRain;
-			Environment( Envrn ).UseSnow = RunPeriodInput( Loop ).UseSnow;
+			if ( RPReadAllWeatherData && env.KindOfEnvrn == ksReadAllWeatherData ) {
+				env.cKindOfEnvrn = "ReadAllWeatherDataRunPeriod";
+			} else {
+				env.cKindOfEnvrn = "WeatherFileRunPeriod";
+				env.KindOfEnvrn = ksRunPeriodWeather;
+			}
+			env.DayOfWeek = runPer.DayOfWeek;
+			env.MonWeekDay = runPer.MonWeekDay;
+			env.SetWeekDays = false;
+			env.ApplyWeekendRule = runPer.ApplyWeekendRule;
+			env.UseRain = runPer.UseRain;
+			env.UseSnow = runPer.UseSnow;
 			++Envrn;
 		}
 

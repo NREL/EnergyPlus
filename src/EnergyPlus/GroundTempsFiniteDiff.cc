@@ -3,9 +3,11 @@
 #include <fstream> 
 
 // ObjexxFCL Headers
-#include <ObjexxFCL\Optional.hh>
+#include <ObjexxFCL/Fmath.hh>
+#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataReportingFlags.hh>
 #include <GroundTempsManager.hh>
@@ -14,14 +16,16 @@
 namespace EnergyPlus {
 
 namespace GroundTemps {
+	
+	using DataGlobals::SecsInDay;	
+	
 	int daysInYear = 365;
-	int secInDay = 86400;
-	int timeStepInDays = 0;
-	Real64 finalTempConvergenceCriteria = 0.01;
+	int simDay = 0;
+	Real64 finalTempConvergenceCriteria = 0.05;
 	Real64 iterationTempConvergenceCriteria = 0.00001;
 
 	void
-	FiniteDiffGroundTempsModel::simulate()
+	FiniteDiffGroundTempsModel::initAndSim()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -84,145 +88,136 @@ namespace GroundTemps {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		using WeatherManager::AddDesignSetToEnvironmentStruct;
+		//using WeatherManager::AddDesignSetToEnvironmentStruct;
 		using WeatherManager::GetNextEnvironment;
 		using WeatherManager::ManageWeather;
 		using WeatherManager::ResetEnvironmentCounter;
 
+		using namespace DataEnvironment;
 		using namespace DataGlobals;
 		using namespace DataReportingFlags;
+		using namespace WeatherManager;
 
 		bool Available; // an environment is available to process
 		bool ErrorsFound;
 
+		Real64 outDryBulbTemp_num;
+		Real64 relHum_num;
+		Real64 windSpeed_num;
+		Real64 horizSolarRad_num;
+		Real64 horizExtraterrRad_num;
+		Real64 airDensity_num;
+		Real64 annualAveAirTemp_num;
+		int denominator;
+
 		ResetEnvironmentCounter();
 
-		AddDesignSetToEnvironmentStruct( 1 );
+		std::ofstream outFile( "WeatherFileData.csv", std::ofstream::out );
 
 		WarmupFlag = false;
 		Available = true;
-		//for ( int i = 1; i <= NumOfEnvrn; ++i ) { // loop over environments
+		ErrorsFound = false;
 
-		GetNextEnvironment( Available, ErrorsFound );
+		for ( int i = 1; i <= NumOfEnvrn; ++i ) { // loop over environments
 
-		//if (ErrorsFound) break;
-		//if (!Available) continue;
+			GetNextEnvironment( Available, ErrorsFound );
 
-		// need to handle above two cases
+			if ( KindOfSim != ksReadAllWeatherData ) continue;
 
-		//hvacSizingSimulationManager->sizingLogger.SetupSizingLogsNewEnvironment();
+			weatherDataArray.dimension( daysInYear );
 
-		//	if (!DoDesDaySim) continue; // not sure about this, may need to force users to set this on input for this method, but maybe not
-		//	if ( KindOfSim == ksRunPeriodWeather ) continue;
-		//	if ( KindOfSim == ksDesignDay ) continue;
-		//	if ( KindOfSim == ksRunPeriodDesign ) continue;
+			BeginEnvrnFlag = true;
+			EndEnvrnFlag = false;
+			EndMonthFlag = false;
+			WarmupFlag = false;
+			DayOfSim = 0;
+			DayOfSimChr = "0";
+			NumOfWarmupDays = 0;
 
-		//	if ( Environment(Envrn).HVACSizingIterationNum != HVACSizingIterCount ) continue;
+			annualAveAirTemp_num = 0.0;
 
-		//	if ( ReportDuringHVACSizingSimulation ) {
-		//		if ( sqlite ) {
-		//			sqlite->sqliteBegin();
-		//			sqlite->createSQLiteEnvironmentPeriodRecord( DataEnvironment::CurEnvirNum, DataEnvironment::EnvironmentName, DataGlobals::KindOfSim );
-		//			sqlite->sqliteCommit();
-		//		}
-		//	}
-		//	ExitDuringSimulations = true;
+			while ( ( DayOfSim < NumOfDayInEnvrn ) || ( WarmupFlag ) ) { // Begin day loop ...
 
-		//	DisplayString("Initializing New Environment Parameters, HVAC Sizing Simulation");
+				++DayOfSim;
 
-		BeginEnvrnFlag = true;
-		EndEnvrnFlag = false;
-		//EndMonthFlag = false;
-		WarmupFlag = false;
-		DayOfSim = 0;
-		DayOfSimChr = "0";
-		NumOfWarmupDays = 0;
+				// Reset daily values
+				outDryBulbTemp_num = 0.0;
+				relHum_num = 0.0;
+				windSpeed_num = 0.0;
+				horizSolarRad_num = 0.0;
+				horizExtraterrRad_num = 0.0;
+				airDensity_num = 0.0;
+				denominator = 0;
 
-		//	ManageEMS(emsCallFromBeginNewEvironment); // calling point
+				auto & tdwd = weatherDataArray( DayOfSim ); // "This day weather data"
 
-		while ( ( DayOfSim < NumOfDayInEnvrn ) || ( WarmupFlag ) ) { // Begin day loop ...
+				BeginDayFlag = true;
+				EndDayFlag = false;
 
-		//		if ( ReportDuringHVACSizingSimulation ) {
-		//			if ( sqlite ) sqlite->sqliteBegin(); // setup for one transaction per day
-		//		}
+				for ( HourOfDay = 1; HourOfDay <= 24; ++HourOfDay ) { // Begin hour loop ...
 
-			++DayOfSim;
+					BeginHourFlag = true;
+					EndHourFlag = false;
 
-		//		gio::write( DayOfSimChr, fmtLD ) << DayOfSim;
-		//		strip(DayOfSimChr);
-		//		if ( !WarmupFlag ) {
-		//			++CurrentOverallSimDay;
-		//			DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);
-		//		} else {
-		//			DayOfSimChr = "0";
-		//		}
+					for ( TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep ) {
 
-			BeginDayFlag = true;
-			EndDayFlag = false;
+						BeginTimeStepFlag = true;
 
-		//		if ( WarmupFlag ) {
-		//			++NumOfWarmupDays;
-		//			cWarmupDay = TrimSigDigits(NumOfWarmupDays);
-		//			DisplayString("Warming up {" + cWarmupDay + '}');
-		//		} else if (DayOfSim == 1) {
-		//			DisplayString("Starting HVAC Sizing Simulation at " + CurMnDy + " for " + EnvironmentName);
-		//			gio::write(OutputFileInits, Format_700) << NumOfWarmupDays;
-		//		} else if (DisplayPerfSimulationFlag) {
-		//			DisplayString("Continuing Simulation at " + CurMnDy + " for " + EnvironmentName);
-		//			DisplayPerfSimulationFlag = false;
-		//		}
+			//				 Set the End__Flag variables to true if necessary.  Note that
+			//				 each flag builds on the previous level.  EndDayFlag cannot be
+			//				 .TRUE. unless EndHourFlag is also .TRUE., etc.  Note that the
+			//				 EndEnvrnFlag and the EndSimFlag cannot be set during warmup.
+			//				 Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
+			//				 SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-			for ( HourOfDay = 1; HourOfDay <= 24; ++HourOfDay ) { // Begin hour loop ...
-
-		//			BeginHourFlag = true;
-		//			EndHourFlag = false;
-
-				for ( TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep ) {
-		//				if ( AnySlabsInModel || AnyBasementsInModel ) {
-		//					InitAndSimGroundDomains();
-		//				}
-
-					BeginTimeStepFlag = true;
-
-
-		//				 Set the End__Flag variables to true if necessary.  Note that
-		//				 each flag builds on the previous level.  EndDayFlag cannot be
-		//				 .TRUE. unless EndHourFlag is also .TRUE., etc.  Note that the
-		//				 EndEnvrnFlag and the EndSimFlag cannot be set during warmup.
-		//				 Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
-		//				 SubTimeStepFlags can/will be set/reset in the HVAC Manager.
-
-					if ( TimeStep == NumOfTimeStepInHour ) {
-						EndHourFlag = true;
-						if ( HourOfDay == 24 ) {
-							EndDayFlag = true;
-							if ( !WarmupFlag && (DayOfSim == NumOfDayInEnvrn) ) {
-								EndEnvrnFlag = true;
+						if ( TimeStep == NumOfTimeStepInHour ) {
+							EndHourFlag = true;
+							if ( HourOfDay == 24 ) {
+								EndDayFlag = true;
+								if ( !WarmupFlag && (DayOfSim == NumOfDayInEnvrn) ) {
+									EndEnvrnFlag = true;
+								}
 							}
 						}
-					}
 
-					ManageWeather();
+						ManageWeather();
 
-					BeginHourFlag = false;
-					BeginDayFlag = false;
-					BeginEnvrnFlag = false;
-					BeginSimFlag = false;
-					BeginFullSimFlag = false;
+						outDryBulbTemp_num += OutDryBulbTemp;
+						airDensity_num += OutAirDensity;
+						relHum_num += OutRelHumValue;
+						windSpeed_num += WindSpeed;
+						horizSolarRad_num += BeamSolarRad;
+						horizExtraterrRad_num += 0; // Horizontal Extraterrestrial Radiation
 
-				} // TimeStep loop
+						BeginHourFlag = false;
+						BeginDayFlag = false;
+						BeginEnvrnFlag = false;
+						BeginSimFlag = false;
+						BeginFullSimFlag = false;
 
-				PreviousHour = HourOfDay;
+						++denominator;
 
-			} // ... End hour loop.
+					} // TimeStep loop
 
-		//		if ( ReportDuringHVACSizingSimulation ) {
-		//			if ( sqlite ) sqlite->sqliteCommit(); // one transaction per day
-		//		}
+					PreviousHour = HourOfDay;
 
-		} // ... End day loop.
+				} // ... End hour loop.
 
-		//} // ... End environment loop.
+				tdwd.dryBulbTemp = outDryBulbTemp_num / denominator;
+				tdwd.relativeHumidity = relHum_num / denominator;
+				tdwd.windSpeed = windSpeed_num / denominator;
+				tdwd.horizontalRadiation = horizSolarRad_num / denominator;
+				tdwd.horizontalExtraterrestrialRadiation = horizExtraterrRad_num / denominator;
+				tdwd.airDensity = airDensity_num / denominator;
+				annualAveAirTemp_num += tdwd.dryBulbTemp;
+
+				outFile << tdwd.dryBulbTemp << "," << tdwd.relativeHumidity << "," << tdwd.windSpeed << "," << tdwd.horizontalRadiation << "," << tdwd.horizontalExtraterrestrialRadiation << "," << tdwd.airDensity << std::endl;
+
+			} // ... End day loop.
+
+		} // ... End environment loop.
+
+		annualAveAirTemp = annualAveAirTemp_num / 365;
 	}
 
 	//******************************************************************************
@@ -283,7 +278,7 @@ namespace GroundTemps {
 		for ( int i = 1; i <= totalNumCells; ++i ) {
 
 			// Reference to thisCell
-			auto & thisCell( cellArray( i ) );
+			auto & thisCell = cellArray( i );
 
 			// Set the index 
 			thisCell.index = i;
@@ -359,17 +354,33 @@ namespace GroundTemps {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		std::ofstream static outFile( "FinalTemps.csv", std::ofstream::out );
-		std::ofstream static outFile_timeStep( "TimeStepTemps.csv", std::ofstream::out );
+		std::ofstream static outFile_Jan1( "Jan1.csv", std::ofstream::out );
+		std::ofstream static outFile_June1( "June1.csv", std::ofstream::out );
+
+		timeStepInSeconds = SecsInDay; 
 		bool convergedFinal = false;
+		int yearCounter = 0;
 
 		initDomain();
+
+		for (int i = 1; i <= totalNumCells; ++i ) {
+				outFile_Jan1 << "," << cellArray(i).minZValue;
+			}
 		
+		outFile_Jan1 << std::endl;
+
+		outFile_Jan1 << "0";
+
+		for (int i = 1; i <= totalNumCells; ++i ) {
+				outFile_Jan1 << "," << cellArray(i).temperature;
+			}
+
+		outFile_Jan1 << std::endl;
+
 		do {
 		
 			// loop over all days
-			for ( timeStepInDays = 1; timeStepInDays <= daysInYear; ++timeStepInDays ) {
-
-				timeStepInSeconds = 86400; // Seconds in day
+			for ( simDay = 1; simDay <= daysInYear; ++simDay ) {
 
 					bool iterationConverged = false;
 
@@ -403,36 +414,39 @@ namespace GroundTemps {
 					// Shift temperatures for next timestep
 					updateTimeStepTemperatures();
 
-				//// Output timestep temps for testing
-				//for ( int cell = 1; cell <= totalNumCells; ++cell ) {
-				//	if ( cell == totalNumCells ) {
-				//		outFile_timeStep << groundTemps( timeStepInDays, cell ) << std::endl;
-				//	} else {
-				//		outFile_timeStep << groundTemps( timeStepInDays, cell ) << "," ;
-				//	}
-
-				//}
-
 			}
 
 			// Check final temperature convergence
 			convergedFinal = checkFinalTemperatureConvergence();
+			
+			++yearCounter;
+			
+			outFile_Jan1 << yearCounter;
+			outFile_June1 << yearCounter;
+
+			for (int i = 1; i <= totalNumCells; ++i ) {
+				outFile_Jan1 << "," << groundTemps( 1, i );
+				outFile_June1 << "," << groundTemps( 152, i );
+			}
+
+			outFile_Jan1 << std::endl;
+			outFile_June1 << std::endl;
 
 		} while ( !convergedFinal );
 
-		//// Output final annual temps for testing
-		//for ( int cell = 1; cell <= totalNumCells; ++cell ) {
+		// Output final annual temps for testing
+		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
 
-		//	outFile << cellArray( cell ).minZValue;
+			outFile << cellArray( cell ).minZValue;
 
-		//	for ( int day = 1; day <= daysInYear; ++ day ) {
-		//		if ( day < daysInYear ) {
-		//			outFile << "," << groundTemps( day, cell );
-		//		} else {
-		//			outFile << "," << groundTemps( day, cell ) << "," << std::endl;
-		//		}
-		//	}
-		//}
+			for ( int day = 1; day <= daysInYear; ++ day ) {
+				if ( day < daysInYear ) {
+					outFile << "," << groundTemps( day, cell );
+				} else {
+					outFile << "," << groundTemps( day, cell ) << "," << std::endl;
+				}
+			}
+		}
 	}
 
 	//******************************************************************************
@@ -464,7 +478,172 @@ namespace GroundTemps {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		cellArray( 1 ).temperature = 20.0; // Just for testing
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		// declare some variables
+		Real64 numerator;
+		Real64 denominator;
+		Real64 resistance;
+		Real64 incidentHeatGain;
+		Real64 incidentSolar_MJhrmin;
+		Real64 evapotransHeatLoss_Wm2;
+		Real64 absorbedIncidentSolar_MJhrmin;
+		Real64 vaporPressureSaturated_kPa;
+		Real64 vaporPressureActual_kPa;
+		Real64 currAirTempK;
+		Real64 QRAD_A;
+		Real64 QRAD_SO;
+		Real64 QRAD_NL;
+		Real64 ratio_SO;
+		Real64 netIncidentRadiation_MJhr;
+		Real64 netIncidentRadiation_Wm2;
+		Real64 slope_S;
+		Real64 CN;
+		Real64 G_hr;
+		Real64 Cd;
+		Real64 pressure;
+		Real64 psychrometricConstant;
+		Real64 evapotransFluidLoss_mmhr;
+		Real64 evapotransFluidLoss_mhr;
+		Real64 latentHeatVaporization;
+		Real64 evapotransHeatLoss_MJhrmin;
+
+		Real64 const rho_water( 998.0 ); // [kg/m3]
+		Real64 const airSpecificHeat( 1003 ); // '[J/kg-K]
+		// evapotranspiration parameters
+		Real64 const meanSolarConstant( 0.08196 ); // 1367 [W/m2], entered in [MJ/m2-minute]
+		Real64 const A_s( 0.25 );
+		Real64 const B_s( 0.5 ); 
+		Real64 const absor_Corrected( 0.77 );
+		Real64 const convert_Wm2_To_MJhrmin( 3600.0 / 1000000.0 );
+		Real64 const convert_MJhrmin_To_Wm2( 1.0 / convert_Wm2_To_MJhrmin );
+
+		bool static surfConstantsSet;
+
+		using DataEnvironment::Elevation;
+
+		// initialize values
+		numerator = 0.0;
+		denominator = 0.0;
+		resistance = 0.0;
+		surfConstantsSet = false;
+
+		auto & thisCell = cellArray( 1 );
+		auto & cellBelow_thisCell = cellArray( 2 );
+		auto & cwd = weatherDataArray( simDay ); // "Current Weather Day"
+
+		// Add effect from previous time step
+		numerator += thisCell.temperature_prevTimeStep;
+		++denominator;
+
+		// Conduction to lower cell
+		resistance = ( thisCell.thickness / 2.0 ) / ( thisCell.props.conductivity * thisCell.conductionArea ) 
+						+ ( cellBelow_thisCell.thickness / 2.0 )/( cellBelow_thisCell.props.conductivity * cellBelow_thisCell.conductionArea );
+		numerator += ( thisCell.beta / resistance ) * cellBelow_thisCell.temperature;
+		denominator += ( thisCell.beta / resistance );
+
+		// Convection to atmosphere
+		if ( cwd.windSpeed > 0.1 ) {
+			resistance = 208.0 / ( cwd.airDensity * airSpecificHeat * cwd.windSpeed * thisCell.conductionArea );
+		} else {
+			// Future development should include additional natural convection effects here
+		}
+		numerator += ( thisCell.beta / resistance ) * cwd.dryBulbTemp;
+		denominator += ( thisCell.beta / resistance );
+
+		// Initialize, this variable is used for both evapotranspiration and non-ET cases, [W]
+		incidentHeatGain = 0.0;
+
+		// For convenience convert to Kelvin once
+		currAirTempK = cwd.dryBulbTemp + 273.15;
+
+		// Convert input solar radiation [w/m2] into units for ET model, [MJ/hr-min]
+		incidentSolar_MJhrmin = cwd.horizontalRadiation * convert_Wm2_To_MJhrmin;
+
+		// Extraterrestial Radiation
+		QRAD_A = cwd.horizontalExtraterrestrialRadiation;//12.0 * 60.0 / Pi * meanSolarConstant * dr * ( ( Solar_Angle_2 - Solar_Angle_1 ) * std::sin( Latitude_Radians ) * std::sin( Declination ) + std::cos( Latitude_Radians ) * std::cos( Declination ) * ( std::sin( Solar_Angle_2 ) - std::sin( Solar_Angle_1 ) ) );
+
+		// Calculate another Q term...
+		QRAD_SO = ( A_s + B_s + 0.00002 * Elevation ) * QRAD_A;
+
+		// Correct the Qrad term ... better way??
+		if ( incidentSolar_MJhrmin < 0.01 ) {
+			ratio_SO = 0.0;
+		} else {
+			if ( QRAD_SO != 0.0 ) {
+				ratio_SO = incidentSolar_MJhrmin / QRAD_SO;
+			} else {
+				// I used logic below to choose value, divide by 0 = infinity, so value = 1, not sure if correct...
+				ratio_SO = 1.0;
+			}
+
+		}
+
+		// Constrain ratio_SO
+		ratio_SO = min( ratio_SO, 1.0 );
+		ratio_SO = max( ratio_SO, 0.3 );
+
+		// Calculate another Q term, [MJ/hr-min]
+		absorbedIncidentSolar_MJhrmin = absor_Corrected * incidentSolar_MJhrmin;
+
+		// Calculate saturated vapor pressure, [kPa]
+		vaporPressureSaturated_kPa = 0.6108 * std::exp( 17.27 * cwd.dryBulbTemp / ( cwd.dryBulbTemp + 237.3 ) );
+
+		// Calculate actual vapor pressure, [kPa]
+		vaporPressureActual_kPa = vaporPressureSaturated_kPa * cwd.relativeHumidity;
+
+		// Calculate another Q term, [MJ/m2-hr]
+		QRAD_NL = 2.042E-10 * pow_4( currAirTempK ) * ( 0.34 - 0.14 * std::sqrt( vaporPressureActual_kPa ) ) * ( 1.35 * ratio_SO - 0.35 );
+
+		// Calculate another Q term, [MJ/hr]
+		netIncidentRadiation_MJhr = absorbedIncidentSolar_MJhrmin - QRAD_NL;
+
+		// ?
+		CN = 37.0;
+
+		// Check whether there was sun
+		if ( netIncidentRadiation_MJhr < 0.0 ) {
+			G_hr = 0.5 * netIncidentRadiation_MJhr;
+			Cd = 0.96;
+		} else {
+			G_hr = 0.1 * netIncidentRadiation_MJhr;
+			Cd = 0.24;
+		}
+
+		slope_S = 2503.0 * std::exp( 17.27 * cwd.dryBulbTemp / ( cwd.dryBulbTemp + 237.3 ) ) / pow_2( cwd.dryBulbTemp + 237.3 );
+		pressure = 98.0;
+		psychrometricConstant = 0.665e-3 * pressure;
+
+		// Evapotranspiration constant, [mm/hr]
+		evapotransFluidLoss_mmhr = ( evapotransCoeff * slope_S * ( netIncidentRadiation_MJhr - G_hr ) + psychrometricConstant * ( CN / currAirTempK ) * cwd.windSpeed * ( vaporPressureSaturated_kPa - vaporPressureActual_kPa ) ) / ( slope_S + psychrometricConstant * ( 1 + Cd * cwd.windSpeed ) );
+
+		// Convert units, [m/hr]
+		evapotransFluidLoss_mhr = evapotransFluidLoss_mmhr / 1000.0;
+
+		// Calculate latent heat, [MJ/kg]
+		// Full formulation is cubic: L(T) = -0.0000614342 * T**3 + 0.00158927 * T**2 - 2.36418 * T + 2500.79[5]
+		// In: Cubic fit to Table 2.1,p.16, Textbook: R.R.Rogers & M.K. Yau, A Short Course in Cloud Physics, 3e,(1989), Pergamon press
+		// But a linear relation should suffice;
+		// note-for now using the previous time step temperature as an approximation to help ensure stability
+		latentHeatVaporization = 2.501 - 2.361e-3 * thisCell.temperature_prevTimeStep;
+
+		// Calculate evapotranspiration heat loss, [MJ/m2-hr]
+		evapotransHeatLoss_MJhrmin = rho_water * evapotransFluidLoss_mhr * latentHeatVaporization;
+
+		// Convert net incident solar units, [W/m2]
+		netIncidentRadiation_Wm2 = netIncidentRadiation_MJhr * convert_MJhrmin_To_Wm2;
+
+		// Convert evapotranspiration units, [W/m2]
+		evapotransHeatLoss_Wm2 = evapotransHeatLoss_MJhrmin * convert_MJhrmin_To_Wm2;
+
+		// Calculate overall net heat ?gain? into the cell, [W]
+		incidentHeatGain = ( netIncidentRadiation_Wm2 - evapotransHeatLoss_Wm2 ) * thisCell.conductionArea;
+
+		// Add any solar/evapotranspiration heat gain here
+		numerator += thisCell.beta * incidentHeatGain;
+
+		// Calculate the return temperature and leave
+		cellArray( 1 ).temperature = numerator / denominator;
+
 	}
 
 	//******************************************************************************
@@ -504,9 +683,9 @@ namespace GroundTemps {
 		Real64 neighborTemp = 0.0;
 		Real64 resistance = 0.0;
 
-		auto & thisCell( cellArray( cell ) );
-		auto & cellAbove_thisCell( cellArray( cell - 1 ) );
-		auto & cellBelow_thisCell( cellArray( cell + 1 ) );
+		auto & thisCell = cellArray( cell );
+		auto & cellAbove_thisCell = cellArray( cell - 1 );
+		auto & cellBelow_thisCell = cellArray( cell + 1 );
 
 		// add effect from cell history
 		numerator += thisCell.temperature_prevTimeStep;
@@ -560,7 +739,7 @@ namespace GroundTemps {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		cellArray( totalNumCells ).temperature = 15.0; // Just for testing
+		cellArray( totalNumCells ).temperature = annualAveAirTemp; // Just for testing
 	}
 
 	//******************************************************************************
@@ -596,7 +775,7 @@ namespace GroundTemps {
 
 		for ( int cell = 1; cell <= totalNumCells; ++ cell ) {
 		
-			auto & thisCell( cellArray( cell ) );
+			auto & thisCell = cellArray( cell );
 
 			if ( std::abs( thisCell.temperature - thisCell.temperature_finalConvergence ) >= finalTempConvergenceCriteria ) {
 				converged = false;
@@ -683,10 +862,10 @@ namespace GroundTemps {
 
 		std::string objectName = "KAModelForFDModel";
 		int objectType = 1;
-		Real64 avgGroundTemp = 15.5;
+		Real64 avgGroundTemp = annualAveAirTemp;
 		Real64 aveGroundTempAmplitiude = 12.0;
 		int phaseShiftDay = 21;
-		Real64 groundThemalDiffusivity = 4.0e-7;
+		Real64 groundThemalDiffusivity = baseConductivity / ( baseDensity * baseSpecificHeat );
 		
 		std::unique_ptr< KusudaGroundTempsModel > tempModel( new KusudaGroundTempsModel() );
 
@@ -706,12 +885,12 @@ namespace GroundTemps {
 
 		// Intialize temperatures and volume
 		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
-			auto & thisCell( cellArray( cell ) );
+			auto & thisCell = cellArray( cell );
 			
 			Real64 depth = ( thisCell.maxZValue + thisCell.minZValue ) / 2.0;
 			
 			// Initialize temperatures
-			thisCell.temperature = 15.0; //tempModel->getGroundTempAtTimeInSeconds( depth, 0.0 );  // Initialized at first day of year
+			thisCell.temperature = tempModel->getGroundTempAtTimeInSeconds( depth, 0.0 );  // Initialized at first day of year
 			thisCell.temperature_finalConvergence = thisCell.temperature;
 			thisCell.temperature_prevIteration = thisCell.temperature;
 			thisCell.temperature_prevTimeStep = thisCell.temperature;
@@ -796,12 +975,12 @@ namespace GroundTemps {
 
 		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
 
-			auto & thisCell( cellArray( cell ) );
+			auto & thisCell = cellArray( cell );
 
 			thisCell.temperature_prevTimeStep = thisCell.temperature;
 
 			// Log temps for later use
-			groundTemps( timeStepInDays, cell ) = thisCell.temperature;
+			groundTemps( simDay, cell ) = thisCell.temperature;
 		}
 	}
 
@@ -836,7 +1015,7 @@ namespace GroundTemps {
 
 		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
 			
-			auto & thisCell( cellArray( cell ) );
+			auto & thisCell = cellArray( cell );
 
 			evaluateSoilRhoCp( cell );
 
@@ -1000,8 +1179,8 @@ namespace GroundTemps {
 		Real64 rhoCP_soil;
 
 		// These vary by domain now, so we must be careful to retrieve them every time
-		Theta_liq = baseMoistureContent;
-		Theta_sat = baseMoistureContentAtSaturation;
+		Theta_liq = waterContent;
+		Theta_sat = saturatedWaterContent;
 
 		// Assumption
 		Theta_ice = Theta_liq;
@@ -1023,7 +1202,7 @@ namespace GroundTemps {
 			return;
 		}
 
-		auto & thisCell( cellArray( cell ) );
+		auto & thisCell = cellArray( cell );
 
 		//'set some temperatures here for generalization -- these could be set in the input file
 		frzAllIce = -0.5;
@@ -1042,8 +1221,8 @@ namespace GroundTemps {
 			rhoCP_soil = rhoCP_soil_transient;
 		} else if ( ( thisCell.temperature < frzIceTrans ) && ( thisCell.temperature > frzAllIce ) ) {
 			rhoCP_soil = rhoCP_soil_ice + ( rhoCP_soil_transient - rhoCP_soil_ice ) / ( frzIceTrans - frzAllIce ) * ( thisCell.temperature - frzAllIce );
-		} else { // Debugging -- Delete me
-			thisCell.temperature = thisCell.temperature;
+		} else {
+			assert( false ); // Shouldn't get here
 		}
 		
 		thisCell.props.rhoCp = baseDensity * baseSpecificHeat; //rhoCP_soil;
