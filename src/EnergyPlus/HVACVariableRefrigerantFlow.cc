@@ -3179,13 +3179,16 @@ namespace HVACVariableRefrigerantFlow {
 			SetupOutputVariable( "VRF Heat Pump Cooling COP []", VRF( NumCond ).OperatingCoolingCOP, "System", "Average", VRF( NumCond ).Name );
 			SetupOutputVariable( "VRF Heat Pump Heating COP []", VRF( NumCond ).OperatingHeatingCOP, "System", "Average", VRF( NumCond ).Name );
 			SetupOutputVariable( "VRF Heat Pump COP []", VRF( NumCond ).OperatingCOP, "System", "Average", VRF( NumCond ).Name );
+			
 			// Followings for VRF FluidTCtrl Only
-			SetupOutputVariable( "VRF Heat Pump Min Evaperating Temperature [C]", VRF( NumCond ).IUEvaporatingTemp, "System", "Average", VRF( NumCond ).Name );
-			SetupOutputVariable( "VRF Heat Pump Condensing Temperature [C]", VRF( NumCond ).CondensingTemp, "System", "Average", VRF( NumCond ).Name );
-			SetupOutputVariable( "VRF Heat Pump Condenser Fan Power [W]", VRF( NumCond ).CondFanPower, "System", "Average", VRF( NumCond ).Name );
-			SetupOutputVariable( "VRF Heat Pump Compressor Speed [rev/sec]", VRF( NumCond ).CompActSpeed, "System", "Average", VRF( NumCond ).Name );
-			SetupOutputVariable( "VRF Heat Pump Max Condensing Temperature [C]", VRF( NumCond ).IUCondensingTemp, "System", "Average", VRF( NumCond ).Name );
-			SetupOutputVariable( "VRF Heat Pump Evaperating Temperature [C]", VRF( NumCond ).EvaporatingTemp, "System", "Average", VRF( NumCond ).Name );
+			if( VRF( NumCond ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ){
+				SetupOutputVariable( "VRF Heat Pump Min Evaporating Temperature [C]", VRF( NumCond ).IUEvaporatingTemp, "System", "Average", VRF( NumCond ).Name );
+				SetupOutputVariable( "VRF Heat Pump Condensing Temperature [C]", VRF( NumCond ).CondensingTemp, "System", "Average", VRF( NumCond ).Name );
+				SetupOutputVariable( "VRF Heat Pump Condenser Fan Power [W]", VRF( NumCond ).CondFanPower, "System", "Average", VRF( NumCond ).Name );
+				SetupOutputVariable( "VRF Heat Pump Compressor Speed [rev/sec]", VRF( NumCond ).CompActSpeed, "System", "Average", VRF( NumCond ).Name );
+				SetupOutputVariable( "VRF Heat Pump Max Condensing Temperature [C]", VRF( NumCond ).IUCondensingTemp, "System", "Average", VRF( NumCond ).Name );
+				SetupOutputVariable( "VRF Heat Pump Evaporating Temperature [C]", VRF( NumCond ).EvaporatingTemp, "System", "Average", VRF( NumCond ).Name );
+			}
 
 			if ( VRF( NumCond ).DefrostStrategy == Resistive || ( VRF( NumCond ).DefrostStrategy == ReverseCycle && VRF( NumCond ).FuelType == FuelTypeElectric ) ) {
 				SetupOutputVariable( "VRF Heat Pump Defrost Electric Power [W]", VRF( NumCond ).DefrostPower, "System", "Average", VRF( NumCond ).Name );

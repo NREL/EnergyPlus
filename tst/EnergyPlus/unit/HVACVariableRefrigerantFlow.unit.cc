@@ -84,9 +84,9 @@ TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CompResidual )
 
 TEST_F( EnergyPlusFixture, VRFFluidTCtrlGetCoilInput )
 {
-	// PURPOSE OF THE TEST:
-	//   IDF Read in for the new coil type: Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl
-	
+    // PURPOSE OF THE TEST:
+    //   IDF Read in for the new coil type: Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl
+    
     std::string const idf_objects = delimited_string({
        " Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,  ",
        " 	 TU1 VRF DX Cooling Coil, !- Name							   ",
@@ -125,7 +125,7 @@ TEST_F( EnergyPlusFixture, VRFFluidTCtrlGetCoilInput )
     EXPECT_EQ( DXCoil( 1 ).C2Te, 0.80404 );
     EXPECT_EQ( DXCoil( 1 ).C3Te, 0 );
     EXPECT_EQ( DXCoil( 1 ).SH, 3 );
-
+    
 }
 
 TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_FanSpdResidualCool )
@@ -221,12 +221,12 @@ TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_FanSpdResidualHeat )
 TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CalcVRFIUAirFlow )
 {
     // PURPOSE OF THIS TEST:
-	//   Test the method CalcVRFIUAirFlow, which analyzes the VRF Indoor Unit operations given zonal loads.
-	//   Calculated parameters includie: (1) Fan Speed Ratio, (2) SH/SC Degrees, and (3) Coil Inlet/Outlet conditions 
+    //   Test the method CalcVRFIUAirFlow, which analyzes the VRF Indoor Unit operations given zonal loads.
+    //   Calculated parameters includie: (1) Fan Speed Ratio, (2) SH/SC Degrees, and (3) Coil Inlet/Outlet conditions 
     	
     using namespace DXCoils;
-	using namespace DataZoneEnergyDemands;
-	using namespace EnergyPlus::Psychrometrics;
+    using namespace DataZoneEnergyDemands;
+    using namespace EnergyPlus::Psychrometrics;
     using DataEnvironment::OutBaroPress;
     
     int ZoneIndex;  // index to zone where the VRF Terminal Unit resides 
@@ -262,12 +262,12 @@ TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CalcVRFIUAirFlow )
     DXCoil( CoolCoilIndex ).C2Te = 0.804;
     DXCoil( CoolCoilIndex ).C3Te = 0;
     DXCoil( CoolCoilIndex ).SH	 = 3.00;
-	DXCoil( CoolCoilIndex ).SupplyFanIndex = 0;
+    DXCoil( CoolCoilIndex ).SupplyFanIndex = 0;
     DXCoil( HeatCoilIndex ).C1Tc = -1.905;
     DXCoil( HeatCoilIndex ).C2Tc = 0.4333;
     DXCoil( HeatCoilIndex ).C3Tc = 0.0207;
     DXCoil( HeatCoilIndex ).SC	 = 5.00;
-	DXCoil( HeatCoilIndex ).SupplyFanIndex = 0;
+    DXCoil( HeatCoilIndex ).SupplyFanIndex = 0;
     
     // Run and Check for Cooling Mode
     Mode = 0;
@@ -276,7 +276,7 @@ TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CalcVRFIUAirFlow )
     
     ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP = -2716.6229;
     ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP = -45507.8487;
-
+    
     DXCoil( CoolCoilIndex ).RatedAirMassFlowRate( 1 ) = 0.2066;
     DXCoil( CoolCoilIndex ).InletAirTemp = 25.5553;
     DXCoil( CoolCoilIndex ).InletAirHumRat = 8.4682e-3;
@@ -297,7 +297,7 @@ TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CalcVRFIUAirFlow )
     
     ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP = 43167.2628;
     ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP = 4241.66099;
-
+    
     DXCoil( HeatCoilIndex ).RatedAirMassFlowRate( 1 ) = 0.21136;
     DXCoil( HeatCoilIndex ).InletAirTemp = 20.2362;
     DXCoil( HeatCoilIndex ).InletAirHumRat = 4.1053e-3;

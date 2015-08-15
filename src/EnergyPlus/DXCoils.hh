@@ -1684,19 +1684,19 @@ namespace DXCoils {
 	void
 	CalcVRFIUAirFlow (
 		int const ZoneIndex,  // index to zone where the VRF Terminal Unit resides 
-        int const Mode,       // mode 0 for cooling, 1 for heating, 2 for neither cooling nor heating
-        Real64 const Temp,    // evaporating or condensing temperature
-        int const CoolCoil,   // index to VRFTU cooling coil 
-        int const HeatCoil,   // index to VRFTU heating coil
+		int const Mode,       // mode 0 for cooling, 1 for heating, 2 for neither cooling nor heating
+		Real64 const Temp,    // evaporating or condensing temperature
+		int const CoolCoil,   // index to VRFTU cooling coil 
+		int const HeatCoil,   // index to VRFTU heating coil
 		bool SHSCModify,      // indicate whether SH/SC would be modified
-        Real64 & FanSpdRatio, // fan speed ratio
-        Real64 & Wout,    // outlet air humidity ratio
-        Real64 & Toutlet, // outlet air temperature
-        Real64 & Houtlet, // outlet air enthalpy
-        Real64 & HcoilIn, // inlet air enthalpy
-        Real64 & TcoilIn, // coil inlet temperature
-        Real64 & SHact,   // actual SH
-        Real64 & SCact    // actual SC
+		Real64 & FanSpdRatio, // fan speed ratio
+		Real64 & Wout,    // outlet air humidity ratio
+		Real64 & Toutlet, // outlet air temperature
+		Real64 & Houtlet, // outlet air enthalpy
+		Real64 & HcoilIn, // inlet air enthalpy
+		Real64 & TcoilIn, // coil inlet temperature
+		Real64 & SHact,   // actual SH
+		Real64 & SCact    // actual SC
 	);
 	
 	Real64 
