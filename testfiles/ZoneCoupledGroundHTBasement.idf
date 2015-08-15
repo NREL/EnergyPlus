@@ -111,7 +111,7 @@ Timestep,
  
  ! Denver Centennial  Golden   N_CO_USA Annual Heating Design Conditions Wind Speed=3m/s Wind Dir=340
  ! Coldest Month=DEC
- ! Denver Centennial  Golden   N_CO_USA Annual Heating 99.6%, MaxDB=-18.8degreesC
+ ! Denver Centennial  Golden   N_CO_USA Annual Heating 99.6%, MaxDB=-18.8°C
  SizingPeriod:DesignDay,
   Denver Centennial  Golden   N Ann Htg 99.6% Condns DB,     !- Name
          12,      !- Month
@@ -143,7 +143,7 @@ Timestep,
 
  ! Denver Centennial  Golden   N Annual Cooling Design Conditions Wind Speed=4.9m/s Wind Dir=0
  ! Hottest Month=JUL
- ! Denver Centennial  Golden   N_CO_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33degreesC MWB=15.7degreesC
+ ! Denver Centennial  Golden   N_CO_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33°C MWB=15.7°C
  SizingPeriod:DesignDay,
   Denver Centennial  Golden   N Ann Clg .4% Condns DB=>MWB,     !- Name
           7,      !- Month
