@@ -592,6 +592,7 @@ namespace WeatherManager {
 	{
 		// Members
 		int DayOfYear; // Day of year for weather data
+		int DayOfYear_Schedule; //Day of year in schedule
 		int Year; // Year of weather data
 		int Month; // Month of weather data
 		int DayOfMonth; // Day of month for weather data
@@ -605,6 +606,7 @@ namespace WeatherManager {
 		// Default Constructor
 		DayWeatherVariables() :
 			DayOfYear( 0 ),
+			DayOfYear_Schedule( 0 ),
 			Year( 0 ),
 			Month( 0 ),
 			DayOfMonth( 0 ),
@@ -619,6 +621,7 @@ namespace WeatherManager {
 		// Member Constructor
 		DayWeatherVariables(
 			int const DayOfYear, // Day of year for weather data
+			int const DayOfYear_Schedule, //Day of year in schedule
 			int const Year, // Year of weather data
 			int const Month, // Month of weather data
 			int const DayOfMonth, // Day of month for weather data
@@ -630,6 +633,7 @@ namespace WeatherManager {
 			Real64 const EquationOfTime // Value of the equation of time formula
 		) :
 			DayOfYear( DayOfYear ),
+			DayOfYear_Schedule( DayOfYear_Schedule ),
 			Year( Year ),
 			Month( Month ),
 			DayOfMonth( DayOfMonth ),
