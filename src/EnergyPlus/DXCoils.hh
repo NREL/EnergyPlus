@@ -9,6 +9,7 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
+#include <DataEnvironment.hh>
 
 namespace EnergyPlus {
 
@@ -17,6 +18,7 @@ namespace DXCoils {
 	// Using/Aliasing
 	using DataHVACGlobals::AirCooled;
 	using DataHVACGlobals::DryBulbIndicator;
+	using DataEnvironment::StdBaroPress;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -1344,7 +1346,8 @@ namespace DXCoils {
 		Real64 const InletAirHumRat, // inlet air humidity ratio [kg water / kg dry air]
 		Real64 const TotCap, // total cooling  capacity [Watts]
 		Real64 const AirMassFlowRate, // the air mass flow rate at the given capacity [kg/s]
-		Real64 const SHR // sensible heat ratio at the given capacity and flow rate
+		Real64 const SHR, // sensible heat ratio at the given capacity and flow rate
+		Real64 const BaroPress=StdBaroPress // Barometric pressure [Pa]
 	);
 
 	Real64
