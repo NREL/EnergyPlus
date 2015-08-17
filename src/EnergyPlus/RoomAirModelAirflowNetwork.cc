@@ -261,7 +261,6 @@ namespace RoomAirModelAirflowNetwork {
 		using DataZoneEquipment::ZoneEquipList;
 		using DataLoopNode::NumOfNodes;
 		using DataLoopNode::NodeID;
-		using DataLoopNode::Node;
 		using InputProcessor::SameString;
 		using General::RoundSigDigits;
 
