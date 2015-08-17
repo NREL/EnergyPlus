@@ -1297,7 +1297,7 @@ namespace AirflowNetworkBalanceManager {
 						MultizoneSurfaceData( i ).NodeNums( 2 ) = j;
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = " + MultizoneSurfaceData( i ).SurfName );
-						ShowContinueError( "..Zone = " + Zone( Surface( MultizoneSurfaceData( i ).SurfNum ).Zone ).Name + " is not described in AIRFLOWNETWORK:MULTIZONE:ZONE" );
+						ShowContinueError("An adjacent zone = " + Zone(Surface(n).Zone).Name + " is not described in AIRFLOWNETWORK:MULTIZONE:ZONE");
 						ErrorsFound = true;
 						continue;
 					}
@@ -7625,7 +7625,7 @@ namespace AirflowNetworkBalanceManager {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

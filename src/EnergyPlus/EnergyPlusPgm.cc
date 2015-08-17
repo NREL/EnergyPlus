@@ -51,7 +51,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	//      NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//      University of California through Ernest Orlando Lawrence Berkeley National Laboratory.  All rights
 	//      reserved.
 
@@ -310,6 +310,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	get_environment_variable( cReportDuringWarmup, cEnvValue );
 	if ( ! cEnvValue.empty() ) ReportDuringWarmup = env_var_on( cEnvValue ); // Yes or True
+	if ( ReverseDD ) ReportDuringWarmup = false; // force to false for ReverseDD runs
 
 	get_environment_variable( cReportDuringHVACSizingSimulation, cEnvValue);
 	if ( ! cEnvValue.empty() ) ReportDuringHVACSizingSimulation = env_var_on( cEnvValue ); // Yes or True

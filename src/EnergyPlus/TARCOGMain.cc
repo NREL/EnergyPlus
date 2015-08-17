@@ -587,16 +587,16 @@ namespace TARCOGMain {
 		Real64 trminTemp;
 		Real64 hinTemp;
 		Real64 houtTemp;
-		Array1D< Real64 > sconTemp( maxlay );
-		Array1D< Real64 > thickTemp( maxlay );
+		static Array1D< Real64 > sconTemp( maxlay );
+		static Array1D< Real64 > thickTemp( maxlay );
 
 		//REAL(r64), dimension(maxlay) ::  sol ! Vector of Absorbed solar energy for each layer [W/m2] = dir*asol
 
 		//Internaly used
 		static bool converged( false ); // used for convergence check in case of deflection calculations
-		Array1D< Real64 > told( maxlay2 );
-		Array1D< Real64 > CurGap( MaxGap );
-		Array1D< Real64 > GapDefMean( MaxGap );
+		static Array1D< Real64 > told( maxlay2 );
+		static Array1D< Real64 > CurGap( MaxGap );
+		static Array1D< Real64 > GapDefMean( MaxGap );
 		Real64 dtmax;
 		int i;
 		int counter;
@@ -660,13 +660,12 @@ namespace TARCOGMain {
 
 		if ( GoAhead( nperr ) ) {
 
-			{ auto const SELECT_CASE_var( standard );
-			if ( SELECT_CASE_var == ISO15099 ) {
+			if ( standard == ISO15099 ) {
 				Calc_ISO15099( nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure, VacuumMaxGapThickness, CurGap, thick, scon, tir, emis, totsol, tilt, asol, height, heightt, width, presure, iprop, frct, xgcon, xgvis, xgcp, xwght, gama, nmix, SupportPillar, PillarSpacing, PillarRadius, theta, q, qv, ufactor, sc, hflux, hcin, hcout, hrin, hrout, hin, hout, hcgas, hrgas, shgc, nperr, ErrorMessage, shgct, tamb, troom, ibc, Atop, Abot, Al, Ar, Ah, SlatThick, SlatWidth, SlatAngle, SlatCond, SlatSpacing, SlatCurve, vvent, tvent, LayerType, nslice, LaminateA, LaminateB, sumsol, Ra, Nu, ThermalMod, Debug_mode, ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, HcUnshadedOut, HcUnshadedIn, Keff, ShadeGapKeffConv, SDScalar, SHGCCalc, NumOfIterations );
-			} else if ( ( SELECT_CASE_var == EN673 ) || ( SELECT_CASE_var == EN673Design ) ) {
+			} else if ( ( standard == EN673 ) || ( standard == EN673Design ) ) {
 				Calc_EN673( standard, nlayer, tout, tind, CurGap, thick, scon, emis, totsol, tilt, dir, asol, presure, iprop, frct, nmix, xgcon, xgvis, xgcp, xwght, theta, ufactor, hcin, hin, hout, shgc, nperr, ErrorMessage, ibc, hg, hr, hs, Ra, Nu );
 			} else {
-			}}
+			}
 
 		}
 
@@ -699,13 +698,12 @@ namespace TARCOGMain {
 					thick = thickTemp;
 
 					//after performed deflection recalculate temperatures with new gap widths
-					{ auto const SELECT_CASE_var( standard );
-					if ( SELECT_CASE_var == ISO15099 ) {
+					if ( standard == ISO15099 ) {
 						Calc_ISO15099( nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure, VacuumMaxGapThickness, GapDefMean, thick, scon, tir, emis, totsol, tilt, asol, height, heightt, width, presure, iprop, frct, xgcon, xgvis, xgcp, xwght, gama, nmix, SupportPillar, PillarSpacing, PillarRadius, theta, q, qv, ufactor, sc, hflux, hcin, hcout, hrin, hrout, hin, hout, hcgas, hrgas, shgc, nperr, ErrorMessage, shgct, tamb, troom, ibc, Atop, Abot, Al, Ar, Ah, SlatThick, SlatWidth, SlatAngle, SlatCond, SlatSpacing, SlatCurve, vvent, tvent, LayerType, nslice, LaminateA, LaminateB, sumsol, Ra, Nu, ThermalMod, Debug_mode, ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, HcUnshadedOut, HcUnshadedIn, Keff, ShadeGapKeffConv, SDScalar, SHGCCalc, NumOfIterations );
-					} else if ( ( SELECT_CASE_var == EN673 ) || ( SELECT_CASE_var == EN673Design ) ) {
+					} else if ( ( standard == EN673 ) || ( standard == EN673Design ) ) {
 						Calc_EN673( standard, nlayer, tout, tind, GapDefMean, thick, scon, emis, totsol, tilt, dir, asol, presure, iprop, frct, nmix, xgcon, xgvis, xgcp, xwght, theta, ufactor, hcin, hin, hout, shgc, nperr, ErrorMessage, ibc, hg, hr, hs, Ra, Nu );
 					} else {
-					}} //select case (standard)
+					} //select case (standard)
 
 					if ( ! ( GoAhead( nperr ) ) ) {
 						return;
@@ -737,7 +735,7 @@ namespace TARCOGMain {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
