@@ -6013,6 +6013,214 @@ AirLoopHVAC:ZoneMixer,
 
 There are no specific outputs for the four pipe induction terminal units.
 
+### AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam
+
+The four-pipe beam air terminal system is a mixed air-hydronic system. A central, single-duct forced-air system that supplies conditioned air to the zones. Chilled water circulates through ceiling-mounted fin-tube convector units to provide sensible cooling. Hot water circulates through the same convectors to provide heating.  Water flow rate through the beam unit is varied to meet the zone sensible cooling or heating load. Any dehumidification is done by the central forced-air system. Thermodynamically, the cooled beam system resembles the four-pipe induction unit (**AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction**).
+ 
+To model a typical four-pipe beam system the user will need to define a conventional central constant volume forced air system in order to deliver primary air to the beam. This central system (usually) provides outside air for ventilation.  Primary air is normally delivered at a fixed temperature but could be reset by a schedule or using an outdoor air reset setpoint manager. On the supply side of this air loop there will be the usual central conditioning equipment: outside air mixer, fan, heating and cooling coil. On the zone equipment (demand) side of the loop, the four-pipe beams will be represented as air terminal units. Because the four-pipe beam can provide heating the system can avoid over-cooling zones during times of load with cool primary air temperatures similar to the action of a reheat coil in a VAV terminal.  Therefore it is not always unnecessary to have additional zone equipment (such as baseboard heaters) to handle heating (or reheating) loads.
+Although the four-pipe beam equipment in a zone is treated by the program as a single terminal unit, the actual installation will often have multiple beam units in each zone. If needed, the program (in its sizing calculation for the system) determines how many beams of a given length are needed to meet the zone design loads.
+
+The model includes two different types of inputs for flow rates, “design” and “rated … per-meter.”  The design values are the actual sizes of the flow rates as viewed from the zone and central air handler (but before zone multipliers).  The design values include all the individual beam units and their lengths.  The rated per-meter values are used to characterize product performance at nominal rating conditions in such a way that it can be scaled to match the size of a zone.  The conditions at the rating point are not fixed in the program and can be entered by the user when they differ from default values.  The rated per meter values are normalized by the linear dimensions of the beam and are generally obtained from product catalog data by dividing by the length of the beam.
+ 
+#### Field: Name
+A unique user-assigned name for a particular beam unit. Any reference to this unit by another object will use this name.
+
+#### Field: Primary Air Availability Schedule Name
+The name of the schedule that denotes whether the terminal unit is operating to provide primary air during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit is on and requesting primary air flow during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.
+
+#### Field: Cooling Availability Schedule Name
+The name of the schedule that denotes whether the terminal unit is operating to provide cooling during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit is on and requesting primary air flow during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods. The primary air availability schedule named in the previous input field must have a value that is “on” during times that cooling is available.
+ 
+#### Field: Heating Availability Schedule Name
+The name of the schedule that denotes whether the terminal unit can operate to provide heating during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit is on and requesting primary air flow during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods. The primary air availability schedule named in the input field above must have a value that is “on” during times that heating is available.
+ 
+#### Field: Primary Air Inlet Node Name
+The name of the HVAC system node from which the unit draws its primary air.
+ 
+#### Field: Primary Air Outlet Node Name
+The name of the air node that connects this terminal unit to the zone. The will be the same as one of the zone inlet nodes.
+ 
+#### Field: Chilled Water Inlet Node Name
+The name of the chilled water inlet node.  If desired, the chilled water node connections can be omitted and the model will assume the intent is to model a two-pipe heating only beam.
+ 
+#### Field: Chilled Water Outlet Node Name
+The name of the chilled water outlet node.
+
+#### Field: Hot Water Inlet Node Name
+The name of the hot water inlet node.  If desired, the hot water node connections can be omitted and the model will assume the intent is to model a two-pipe cooling only beam.
+
+#### Field: Hot Water Outlet Node Name
+The name of the hot water outlet node.
+
+#### Field: Design Primary Air Volume Flow Rate
+This is the air flow rate (m3/s) of the primary air entering the air terminal unit from the central air handling unit. This input can be autosized.
+  
+#### Field: Design Chilled Water Volume Flow Rate
+The maximum chilled water flow rate (m3/s) for the unit(s) serving the entire zone. This input can be autosized based on the zone design load.
+
+#### Field: Design Hot Water Volume Flow Rate
+The maximum hot water flow rate (m3/s) for the unit(s) serving the entire zone. This input can be autosized based on the zone design load.
+
+#### Field: Zone Total Beam Length (m)
+The total length of all the beams in the zone (m). The real spaces may actually have a number of individual beam units of a specific length and this is the length of individual beams times the total number of beams in the thermal zone. The individual beam’s length should be consistent with the rated capacities and performance curves entered in other input fields but the value here accounts for all the beams in a thermal zone.  It need not be an even multiple of actual unit’s beam length but it can be if desired. This field is autosizable.
+
+#### Field: Rated Primary Air Flow Rate per Meter (m3/s-m)
+This is the primary air volume flow rate at rating conditions divided by the length of the beam, in m3/s-m.  This volume flow rate input is converted to a mass flow rate using standard air density at sea level (and becomes the value for the term m ̇_(SA,rated) in the model description). This 
+
+#### Field: Beam Rated Cooling Capacity per Meter (W/m)
+This is the beam cooling capacity at rating conditions divided by the length of the beam, in W/m.  This is only the cooling contributed by the chilled water circulating through the convector and is separate from any cooling (or heating) that may also be provided by the primary air.  (This input is used for the term q ̇_(cool,rated) in the performance calculation).  The default is 600 W/m.
+
+#### Field: Beam Rated Cooling Room Air Chilled Water Temperature Difference (Delta C)
+This input defines the value of the temperature difference between the room air and entering chilled water at the rating point, in delta Celsius.  This input helps to define the operating conditions that correspond with Rated Beam Cooling Capacity per Meter.  (This input is used for the term 〖∆T〗_(air-water,cool,rated)   in the performance calculation.)  It is used to normalize the independent variable in the input field called Beam Cooling Capacity Temperature Difference Modification Factor Curve or Table Name. The default is 10.0 C.
+ 
+#### Field: Beam Rated Chilled Water Volume Flow Rate per Meter (m3/s-m)
+This input defines the value of the chilled water flow rate per meter length of beam at the rating point, in m3/s/m, or more strictly m3/s-m.  This input helps to define the operating conditions that correspond with Rated Beam Cooling Capacity per Meter.  (This input is used for the term v ̇_(cw,rated) in the performance calculation.)  It is used to normalize the independent variable in the input field called Beam Cooling Capacity Chilled Water Flow Modification Factor Curve or Table Name.  The default is 0.00005 m3/s-m.
+
+#### Field: Beam Cooling Capacity Temperature Difference Modification Factor Curve Name
+This field is the name of a curve or table object that describes how the beam convector’s cooling capacity varies as a function of the temperature difference between the zone air and the entering chilled water.  The single independent variable is the ratio of the current simulation results for the difference between the air and entering water and the difference at the rating point.  (This input is used to define the functional relationship f_(∆T,cool,mod) (〖∆T〗_(air-water)/〖∆T〗_(air-water,cool,rated) ) in the performance calculation.)  The result of the curve or table is multiplied by the rated capacity to adjust the cooling capacity.
+
+#### Field: Beam Cooling Capacity Air Flow Modification Factor Curve Name
+This field is the name of a curve or table object that describes how the beam convectors cooling capacity varies as a function of the primary air flow rate.  The single independent variable is the ratio of the current primary air flow rate and the primary air flow rate at the rating point.  (This input is used to define the functional relationship f_((v,c) ̇ool,mod) (v ̇_air/v ̇_(air,rated) ) in the performance calculation.)  The result of the curve or table is multiplied by the rated capacity to adjust the cooling capacity.  The factor is useful to adjust for a range of primary air flow rates that a given product can accommodate.  However since this is a constant volume air terminal, the modification does not typically vary during the simulation and the range of independent variable does not need to be all that broad in practice.
+ 
+#### Field: Beam Cooling Capacity Chilled Water Flow Modification Factor Curve Name
+This field is the name of a curve or table object that describes how the beam convector’s cooling capacity varies as a function of the water flow rate.  The single independent variable is the ratio of the current fluid flow rate to the fluid flow rate at the rating point.  (This input is used to define the functional relationship f_((m,) ̇cool,mod) (m ̇_cw/m ̇_(cw,rated) ) in the performance calculation.)  The result of the curve or table is multiplied by the rated capacity to adjust the cooling capacity.  The model will adjust the chilled water flow rate to vary cooling power to meet the zone load, so for control purposes, the range of the independent variable must include all the way down to zero flow, with zero capacity at zero flow.
+
+#### Field: Beam Rated Heating Capacity per Meter (W/m)
+This is the beam heating capacity at rating conditions divided by the length of the beam, in W/m.  This is only the heating contributed by the hot water circulating through the convector and is separate from any heating (or cooling) that may also be provided by the primary air.  (This input is used for the term  q ̇_(heat,rated) in the performance calculation).  The default is 1,200 W/m.
+
+#### Field: Beam Rated Heating Room Air Hot Water Temperature Difference (Delta C)
+This input defines the value of the temperature difference between the entering hot water and the room air at the rating point, in Kelvin.  This input helps to define the operating conditions that correspond with Rated Beam Heating Capacity per Meter.  (This input is used for the term  〖∆T〗_(water-air,heat,rated)   in the performance calculation.)  It is used to normalize the independent variable in the input field called Beam Heating Capacity Temperature Difference Modification Factor Curve or Table Name. The default is 27.8 (Delta C).
+ 
+#### Field: Beam Rated Hot Water Volume Flow Rate per Meter (m3/s-m)
+This input defines the value of the hot water flow rate per meter length of beam at the rating point, in m3/s/m, or more strictly m3/s-m.  This input helps to define the operating conditions that correspond with Rated Beam Heating Capacity per Meter.  (This input is used for the term v ̇_(hw,rated) in the performance calculation.)  It is used to normalize the independent variable in the input field called Beam Heating Capacity Hot Water Flow Modification Factor Curve or Table Name.  The default is 0.00005 m3/s-m.
+
+#### Field: Beam Heating Capacity Temperature Difference Modification Factor Curve Name
+This field is the name of a curve or table object that describes how the beam convector’s heating capacity varies as a function of the temperature difference between the entering hot water and the zone air.  The single independent variable is the ratio of the current simulation results for the difference between the water and air and the difference at the rating point.  (This input is used to define the functional relationship *f <sub>∆T,heat,mod</sub> ( ∆T <sub>(water-air)</sub> /( ∆T<sub>(water-air,heat,rated)</sub> )*  in the performance calculation.)  The result of the curve or table is multiplied by the rated capacity to adjust the heating capacity.
+
+#### Field: Beam Heating Capacity Air Flow Modification Factor Curve Name
+This field is the name of a curve or table object that describes how the beam convectors heating capacity varies as a function of the primary air flow rate.  The single independent variable is the ratio of the current primary air flow rate and the primary air flow rate at the rating point.  (This input is used to define the functional relationship f_(v ̇,heat,mod) (m ̇_SA/m ̇_(SA,rated) ) in the performance calculation.)  The result of the curve or table is multiplied by the rated capacity to adjust the heating capacity.  The factor is useful to adjust for a range of primary air rates that a given product can accommodate.  However since this is a constant volume air terminal, the modification does not typically vary during the simulation and the range of independent variable does not need to be all that broad in practice.
+
+#### Field: Beam Heating Capacity Hot Water Flow Modification Factor Curve Name
+This field is the name of a curve or table object that describes how the beam convector’s heating capacity varies as a function of the water flow rate.  The single independent variable is the ratio of the current fluid flow rate to the fluid flow rate at the rating point.  (This input is used to define the functional relationship f_((m,) ̇heat,mod) (m ̇_hw/m ̇_(hw,rated) ) in the performance calculation.)  The result of the curve or table is multiplied by the rated capacity to adjust the heating capacity.  The model will adjust the hot water flow rate to vary heating power to meet the zone load, so for control purposes, the range of the independent variable must include all the way down to zero flow, with zero capacity at zero flow.
+
+
+An example input follows:
+
+      AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
+        Zone One 4pipe Beam, !- Name
+        ALWAYS_ON , !- Primary Air Availability Schedule Name
+        ALWAYS_ON , !- Cooling Availability Schedule Name
+        ALWAYS_ON , !- Heating Availability Schedule Name
+        Zone One 4pipe Beam Inlet Node Name , !- Primary Air Inlet Node Name
+        Zone One 4pipe Beam Outlet Node Name , !- Primary Air Outlet Node Name
+        Zone One 4pipe Beam CW Inlet Node , !- Chilled Water Inlet Node Name
+        Zone One 4pipe Beam CW Outlet Node , !- Chilled Water Outlet Node Name
+        Zone One 4pipe Beam HW Inlet Node , !- Hot Water Inlet Node Name
+        Zone One 4pipe Beam HW Outlet Node, !- Hot Water Outlet Node Name
+        AUTOSIZE , !- Design Primary Air Volume Flow Rate
+        AUTOSIZE , !- Design Chilled Water Volume Flow Rate
+        AUTOSIZE , !- Design Hot Water Volume Flow Rate
+        AUTOSIZE , !- Zone Total Beam Length
+        0.036 , !- Rated Primary Air Flow Rate per Meter
+        597 , !- Rated Beam Cooling Capacity per Meter
+        10.0 , !- Rated Cooling Room Air Chilled Water Temperature Difference
+        5.2E-5 , !- Rated Chilled Water Volume Flow Rate per Meter
+        CapModFuncOfTempDiff, !- Beam Cooling Capacity Temperature Difference Modification Factor Curve or Table Name
+        CoolCapModFuncOfSAFlow, !- Beam Cooling Capacity Air Flow Modification Factor Curve or Table Name
+        CapModFuncOfWaterFlow, !- Beam Cooling Capacity Chilled Water Flow Modification Factor Curve or Table Name
+        1548 , !- Rated Beam Heating Capacity per Meter
+        27.8, !- Rated Heating Room Air Hot Water Temperature Difference
+        5.2E-5, !- Rated Hot Water Volume Flow Rate per Meter
+        CapModFuncOfTempDiff, !- Beam Heating Capacity Temperature Difference Modification Factor Curve or Table Name
+        HeatCapModFuncOfSAFlow, !- Beam Heating Capacity Air Flow Modification Factor Curve or Table Name
+        CapModFuncOfWaterFlow; !- Beam Heating Capacity Hot Water Flow Modification Factor Curve or Table Name
+    
+      Curve:Linear,  ! y = x
+        CapModFuncOfTempDiff, !-Name
+        0, !_ Coef Const
+        1, !- Coef x
+        0,  !- min x
+        1.5, !- max x
+        0.0 , !- min y
+        1.5; ! max y
+    
+      Table:OneIndependentVariable,
+        CoolCapModFuncOfSAFlow, !- Name
+        quadratic,!- Curve Type
+        EvaluateCurveToLimits,!- Interpolation Method
+        0.714,!- min x
+        1.2857,!- max x
+        0.8234,!- min y
+        1.1256,!- max y
+        dimensionless, !-
+        dimensionless, !- 
+        , !- normalization ref
+        0.714286, 0.823403,
+        1.0,      1.0,
+        1.2857,   1.1256;
+    
+      Table:OneIndependentVariable,
+        CapModFuncOfWaterFlow, !- Name
+        quadratic,!- Curve Type
+        EvaluateCurveToLimits,!- Interpolation Method
+        0.0,!- min x
+        1.333333,!- max x
+        0.0,!- min y
+        1.04,!- max y
+        dimensionless, !-
+        dimensionless, !- 
+         , !- normalization ref
+        0.0,      0.0,
+        0.05,     0.001,
+        0.33333,  0.71,
+        0.5,      0.85,
+        0.666667, 0.92,
+        0.833333, 0.97,
+        1.0,      1.0,
+        1.333333, 1.04;
+       
+      Table:OneIndependentVariable,
+        HeatCapModFuncOfSAFlow, !- Name
+        quadratic,!- Curve Type
+        EvaluateCurveToLimits,!- Interpolation Method
+        0.714,!- min x
+        1.2857,!- max x
+        0.8554,!- min y
+        1.0778,!- max y
+        dimensionless, !-
+        dimensionless, !- 
+        , !- normalization ref
+        0.714286, 0.8554,
+        1.0,      1.0,
+        1.2857,   1.0778; 
+
+
+### AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam Outputs
+
+#### Zone Air Terminal Beam Sensible Cooling Rate [W]
+#### Zone Air Terminal Beam Sensible Cooling Energy [J]
+These are the sensible cooling power and energy delivered by the beams to the zone, exclusive of any cooling or heating done by the primary air.
+
+#### Zone Air Terminal Beam Sensible Heating Rate [W]
+#### Zone Air Terminal Beam Sensible Heating Energy [J]
+These are the sensible heating power and energy delivered by the beams to the zone, exclusive of any cooling or heating done by the primary air.
+
+#### Zone Air Terminal Primary Air Sensible Cooling Rate [W]
+Sensible cooling by the primary air to the zone, exclusive of any cooling or heating done by the beams.
+
+#### Zone Air Terminal Primary Air Sensible Cooling Energy [J]
+Sensible cooling by the primary air to the zone, exclusive of any cooling or heating done by the beams.
+
+#### Zone Air Terminal Primary Air Sensible Heating Rate [W]
+Heating by the primary air to the zone, exclusive of any cooling or heating done by the beams.
+
+#### Zone Air Terminal Primary Air Sensible Heating Energy [J]
+Heating by the primary air to the zone, exclusive of any cooling or heating done by the beams.
+
+#### Zone Air Terminal Primary Air Flow Rate [m3/s]
+Air flow rate from the central air handler into the zone in m3/s.  Note that this does not include any of the secondary air flow that is induced by the convector and nozzle action (the model does not resolve secondary air flow rate and the result are not available).  
+
+
 ### AirTerminal:SingleDuct:ConstantVolume:CooledBeam
 
 The Cooled Beam system is a mixed air-hydronic system. A central, single-duct forced-air system supplies conditioned ventilation air to the zones. Sensible cooling is done by chilled water circulating through ceiling mounted cooled beam units. Chilled water flow rate through the cooled beam units is varied to meet the zone sensible cooling load. Any dehumidification is done by the central ventilation air system. Heating is usually accomplished with hot water radiators. Thermodynamically, the cooled beam system resembles the four-pipe induction unit.
