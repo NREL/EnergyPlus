@@ -889,5 +889,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( 25000.0, DXCoil( 1 ).RatedTotCap( 1 ) );
 		EXPECT_EQ( DXCoil( 1 ).RatedTotCap( 1 ) * 0.004266, DXCoil( 1 ).EvapCondPumpElecNomPower( 1 ) );
 
+		// clear
+		DXCoil.deallocate();
 	}
 }
