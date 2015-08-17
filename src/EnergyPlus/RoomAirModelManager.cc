@@ -2689,9 +2689,7 @@ namespace RoomAirModelManager {
 		using InputProcessor::GetObjectItem;
 		using DataRoomAirModel::AirNode;
 		using DataRoomAirModel::TotNumOfAirNodes;
-		using DataLoopNode::NumOfNodes;
 		using DataLoopNode::NodeID;
-		using DataLoopNode::Node;
 		using namespace DataIPShortCuts;
 		using Fans::GetFanOutletNode;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -2920,8 +2918,8 @@ namespace RoomAirModelManager {
 				ReturnNodeName = "";
 			}
 		} else if ( TypeNum == 37 ) {  // AirLoopHVACReturnAir
-			SupplyNodeName = Alphas( 4 ); // ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?
-			ReturnNodeName = ""; // ???????????????
+			SupplyNodeName = Alphas( 4 ); // 
+			ReturnNodeName = ""; // 
 		}
 
 		// Need to find a better to handle allocate and deallocate

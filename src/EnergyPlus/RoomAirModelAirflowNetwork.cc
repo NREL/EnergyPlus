@@ -250,11 +250,9 @@ namespace RoomAirModelAirflowNetwork {
 		using DataHeatBalFanSys::NonAirSystemResponse;
 		using DataHeatBalFanSys::SysDepZoneLoadsLagged;
 		using DataHeatBalance::Zone;
-		using DataHeatBalance::RefrigCaseCredit;
 		using DataEnvironment::OutBaroPress;
 		using DataGlobals::NumOfZones;
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::DisplayExtraWarnings;
 		using DataAirflowNetwork::AirflowNetworkLinkageData;
 		using DataAirflowNetwork::AirflowNetworkLinkSimu;
 		using DataAirflowNetwork::AirflowNetworkNodeSimu;
@@ -843,16 +841,8 @@ namespace RoomAirModelAirflowNetwork {
 		using ZonePlenum::NumZoneReturnPlenums;
 		using ZonePlenum::NumZoneSupplyPlenums;
 		using DataDefineEquip::AirDistUnit;
-		using DataDefineEquip::NumAirDistUnits;
 		using DataHeatBalFanSys::ZoneAirHumRat;
-		using DataAirflowNetwork::SimulateAirflowNetwork;
-		using DataAirflowNetwork::AirflowNetworkExchangeData;
 		using DataAirflowNetwork::AirflowNetworkZoneExhaustFan;
-		using DataAirflowNetwork::AirflowNetworkNumOfExhFan;
-		using DataAirflowNetwork::AirflowNetworkFanActivated;
-		using DataAirflowNetwork::AirflowNetworkControlMultizone;
-		using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
-		using DataAirflowNetwork::AirflowNetworkControlMultiADS;
 		using DataGlobals::NumOfZones;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::SecInHour;
