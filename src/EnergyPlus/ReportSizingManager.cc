@@ -1859,7 +1859,8 @@ namespace ReportSizingManager {
 			if ( DataEMSOverrideON ) {
 				SizingResult = DataEMSOverride;
 			} else {
-				SizingResult = AutosizeDes;
+				//SizingResult = AutosizeDes;
+				AutosizeUser = SizingResult;
 			}
 		} else {
 			AutosizeUser = SizingResult;
