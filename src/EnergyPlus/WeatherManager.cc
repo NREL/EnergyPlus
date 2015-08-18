@@ -4632,7 +4632,7 @@ Label9999: ;
 		}
 
 		if ( ! ErrorsFound ) {
-			StdBaroPress = StdBaroPressSeaLevel * std::pow( 1.0 - 2.25577e-05 * Elevation, 5.2559 );
+			StdBaroPress = StdPressureSeaLevel * std::pow( 1.0 - 2.25577e-05 * Elevation, 5.2559 );
 			StdRhoAir = PsyRhoAirFnPbTdbW( StdBaroPress, constant_twenty, constant_zero );
 			// Write Final Location Information to the initialization output file
 			gio::write( OutputFileInits, LocHdFormat );

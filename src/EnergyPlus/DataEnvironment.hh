@@ -22,7 +22,7 @@ namespace DataEnvironment {
 	extern Real64 const EarthRadius; // Radius of the Earth (m)
 	extern Real64 const AtmosphericTempGradient; // Standard atmospheric air temperature gradient (K/m)
 	extern Real64 const SunIsUpValue; // if Cos Zenith Angle of the sun is >= this value, the sun is "up"
-	extern Real64 const StdBaroPressSeaLevel; // Standard barometric pressure at sea level (Pa)
+	extern Real64 const StdPressureSeaLevel; // Standard barometric pressure at sea level (Pa)
 
 	// DERIVED TYPE DEFINITIONS:
 	// na

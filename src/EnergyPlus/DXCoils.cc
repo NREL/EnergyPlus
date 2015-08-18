@@ -89,7 +89,7 @@ namespace DXCoils {
 	using namespace DataGlobals;
 	using namespace DataHVACGlobals;
 	using namespace Psychrometrics;
-	using DataEnvironment::StdBaroPressSeaLevel;
+	using DataEnvironment::StdPressureSeaLevel;
 	using DataEnvironment::StdBaroPress;
 	using DataEnvironment::EnvironmentName;
 	using DataEnvironment::CurMnDy;
@@ -5212,7 +5212,7 @@ namespace DXCoils {
 				ShowSevereError( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": Rated air volume flow rate per watt of rated total water heating capacity is out of range" );
 				ShowContinueError( "Min Rated Vol Flow Per Watt=[" + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) + "], Rated Vol Flow Per Watt=[" + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) + "], Max Rated Vol Flow Per Watt=[" + TrimSigDigits( MaxHeatVolFlowPerRatedTotCap( DXCT ), 3 ) + "]. See Input-Output Reference Manual for valid range." );
 			}
-			HPInletAirHumRat = PsyWFnTdbTwbPb( DXCoil( DXCoilNum ).RatedInletDBTemp, DXCoil( DXCoilNum ).RatedInletWBTemp, StdBaroPressSeaLevel, RoutineName );
+			HPInletAirHumRat = PsyWFnTdbTwbPb( DXCoil( DXCoilNum ).RatedInletDBTemp, DXCoil( DXCoilNum ).RatedInletWBTemp, StdPressureSeaLevel, RoutineName );
 			HPWHInletDBTemp = DXCoil( DXCoilNum ).RatedInletDBTemp;
 			HPWHInletWBTemp = DXCoil( DXCoilNum ).RatedInletWBTemp;
 			DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 ) = DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) * PsyRhoAirFnPbTdbW( StdBaroPress, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, RoutineName );
@@ -5225,8 +5225,8 @@ namespace DXCoils {
 				MySizeFlag( DXCoilNum ) = false;
 			}
 
-			Real64 const RatedAirMassFlowRateSeaLevel = DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) * PsyRhoAirFnPbTdbW( StdBaroPressSeaLevel, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, RoutineName );
-			DXCoil( DXCoilNum ).RatedCBF( 1 ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( 1 ), RatedAirMassFlowRateSeaLevel, DXCoil( DXCoilNum ).RatedSHR( 1 ), StdBaroPressSeaLevel );
+			Real64 const RatedAirMassFlowRateSeaLevel = DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) * PsyRhoAirFnPbTdbW( StdPressureSeaLevel, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, RoutineName );
+			DXCoil( DXCoilNum ).RatedCBF( 1 ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( 1 ), RatedAirMassFlowRateSeaLevel, DXCoil( DXCoilNum ).RatedSHR( 1 ), StdPressureSeaLevel );
 			MyEnvrnFlag( DXCoilNum ) = false;
 		}
 
