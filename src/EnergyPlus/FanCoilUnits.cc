@@ -1162,7 +1162,7 @@ namespace FanCoilUnits {
 					FanCoil( FanCoilNum ).MaxAirVolFlow = AutoSize;
 					MaxAirVolFlowDes = max(CoolingAirVolFlowDes, HeatingAirVolFlowDes);
 				} else {
-					FanCoil( FanCoilNum ).MaxAirVolFlow = max(CoolingAirVolFlowDes, HeatingAirVolFlowDes);;
+					FanCoil( FanCoilNum ).MaxAirVolFlow = max(CoolingAirVolFlowDes, HeatingAirVolFlowDes);
 					MaxAirVolFlowDes = 0.0;
 				}
 			} else {
@@ -1312,21 +1312,36 @@ namespace FanCoilUnits {
 									}
 									TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 								} else if ( CapSizingMethod == CapacityPerFloorArea ) {
-									ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-									ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+									if ( ZoneSizingRunDone ) {
+										PrintFlag = false;
+										TempSize = AutoSize;
+										DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+										RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+										ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = TempSize;
+										ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;										
+									}
+									TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 									DataScalableCapSizingON = true;
 								} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-									DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
+									CheckZoneSizing( CompType, CompName );
+									PrintFlag = false;
 									TempSize = AutoSize;
+									DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+									ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = TempSize;
+									ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;												
+									TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad * ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 									DataScalableCapSizingON = true;
 								}
 							}
-							SizingString = "";
+							SizingString = "Heating Design Capacity [W]";
 							PrintFlag = false;
 							RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 							DesCoilLoad = TempSize;
+							DataScalableCapSizingON = false;
+							DataFlowUsedForSizing = 0.0;
 						} else {
-							SizingString = "";
+							SizingString = "Heating Design Capacity [W]";
 							PrintFlag = false;
 							TempSize = AutoSize;
 							RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
@@ -1412,22 +1427,36 @@ namespace FanCoilUnits {
 									}
 									TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
 								} else if ( CapSizingMethod == CapacityPerFloorArea ) {
-									ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
-									ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
+									if ( ZoneSizingRunDone ) {
+										CheckZoneSizing( CompType, CompName );
+										PrintFlag = false;
+										TempSize = AutoSize;
+										DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+										RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+										ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = TempSize;
+										ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;									
+									}
+									TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
 									DataScalableCapSizingON = true;
 								} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
-									DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
-									DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+									PrintFlag = false;
 									TempSize = AutoSize;
+									DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+									ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = TempSize;
+									ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+									TempSize = ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad * ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
 									DataScalableCapSizingON = true;
 								}
 							}
-							SizingString = "";
+							SizingString = "Cooling Design Capacity [W]";
 							PrintFlag = false;
 							RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 							DesCoilLoad = TempSize;
+							DataScalableCapSizingON = false;
+							DataFlowUsedForSizing = 0.0;
 						} else {
-							SizingString = "";
+							SizingString = "Cooling Design Capacity [W]";
 							PrintFlag = false;
 							TempSize = AutoSize;
 							DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;

@@ -1971,7 +1971,7 @@ namespace ReportSizingManager {
 						}
 					}
 				} else {
-					if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag ) {
+					if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag && !( DataScalableSizingON || DataScalableCapSizingON ) ) {
 						ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( AutosizeDes - AutosizeUser ) / AutosizeUser ) > AutoVsHardSizingThreshold ) {
