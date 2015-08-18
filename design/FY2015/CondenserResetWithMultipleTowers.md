@@ -128,3 +128,42 @@ Code changes for this new feature:
   - in HVACManager, after SimHVAC call, if any ideal cond resets: while(RunOptCondEntTemp) {SimHVAC();}  
 ### Simulation output
   - (use this section for determining outputs for testing/evaluation, and also trying out multiple towers)
+
+# Researching Existing Example Files
+
+I will focus on two existing example files:
+ - CoolingTower_VariableSpeed_CondEntTempReset.idf
+ - CoolingTower_VariableSpeed_IdealCondEntTempSetpoint.idf
+
+The two files differ in only three ways:
+ - Comments in the header
+ - The actual SetPointManager change
+ - Additional output variables in the "ideal" example
+ 
+The "ideal" file includes the same curves that are required in the non-"ideal" file even though they are not used.  Since the files are identical, the plant topology can be described once.
+
+## Chilled water loop
+
+- PlantLoop: "Chilled Water Loop"
+- DemandSide: Cooling Coil, Bypass
+- SupplySide: Pump, Chiller, Bypass
+- OperationScheme: CoolingLoad, Chiller Only
+- SetPointManager: Scheduled
+- Pump: Pump:VariableSpeed "CW Circ Pump"
+- Chiller: Chiller:Electric "Central Chiller"
+
+## Condenser loop
+
+- CondenserLoop: "Condenser Water Loop"
+- DemandSide: Chiller, Bypass
+- SupplySide: Pump, Tower, Bypass
+- OperationScheme: CoolingLoad, Tower only
+- SetPointManager: CondenserEnteringReset
+- Pump: Pump:VariableSpeed "Cond Circ Pump"
+- Tower: CoolingTower:VariableSpeed "Central Tower"
+
+## Trying out a run
+
+I modified the ConEntTempReset file to include a second cooling tower.  I encountered an error due to the second tower.  I made a few changes to the source to not throw this error and re-ran.  The file runs to completion and the only diffs are in the tower outputs.  I need to investigate it a little further but I think it might still be functioning perfectly.  Here is where I will start back up tomorrow:
+
+- Report out the setpoint on the outlet node of the condenser supply side.  The value should be identical, or close.  The difference is that there are two towers contributing to meeting this setpoint, but the overall loop behavior should be fine.

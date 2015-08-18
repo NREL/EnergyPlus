@@ -3597,16 +3597,8 @@ namespace SetPointManager {
 											ShowContinueError( "Found SingleSpeed Cooling Tower, Cooling Tower=" + PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).Name );
 											ShowContinueError( "SingleSpeed cooling towers cannot be used with this setpoint manager on each loop" );
 											ErrorsFound = true;
-										}
-										// Check if there are more than 1 cooling tower on the plant and generate error
-										if ( TypeOf_Num == TypeOf_CoolingTower_TwoSpd || TypeOf_Num == TypeOf_CoolingTower_VarSpdMerkel || TypeOf_Num == TypeOf_CoolingTower_VarSpd ) {
-											++NumCT;
-											if ( NumCT > 1 ) {
-												ShowSevereError( cSetPointManagerType + "=\"" + CondEntSetPtMgr( SetPtMgrNum ).Name + "\", too many towers found" );
-												ShowContinueError( "only one cooling tower can be used with this setpoint manager on each loop" );
-												ShowContinueError( "Found more than one cooling tower, Cooling Tower=" + PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).Name );
-												ErrorsFound = true;
-											}
+										} else if ( TypeOf_Num == TypeOf_CoolingTower_TwoSpd || TypeOf_Num == TypeOf_CoolingTower_VarSpd ) {
+											// TODO: add this cooling tower to the spm struct in the form of a new plant location with internal tower comp num in the to-be-added vector of locations
 										}
 									}
 								}
@@ -3616,7 +3608,6 @@ namespace SetPointManager {
 									for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
 										TypeOf_Num = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).TypeOf_Num;
 										if ( TypeOf_Num == TypeOf_Chiller_Absorption || TypeOf_Num == TypeOf_Chiller_Indirect_Absorption || TypeOf_Num == TypeOf_Chiller_CombTurbine || TypeOf_Num == TypeOf_Chiller_ConstCOP || TypeOf_Num == TypeOf_Chiller_Electric || TypeOf_Num == TypeOf_Chiller_ElectricEIR || TypeOf_Num == TypeOf_Chiller_DFAbsorption || TypeOf_Num == TypeOf_Chiller_ElectricReformEIR || TypeOf_Num == TypeOf_Chiller_EngineDriven ) {
-
 											// Scan the supply side to find the chiller index and branch index on plantloop
 											TypeNum = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).TypeOf_Num;
 											for ( LoopNum2 = 1; LoopNum2 <= NumCondLoops + NumPlantLoops; ++LoopNum2 ) {
@@ -3661,16 +3652,6 @@ namespace SetPointManager {
 											ShowContinueError( "SingleSpeed cooling towers cannot be used with this setpoint manager on each loop" );
 											ErrorsFound = true;
 										}
-										// Check if there are more than 1 cooling tower on the plant and generate error
-										if ( TypeOf_Num == TypeOf_CoolingTower_TwoSpd || TypeOf_Num == TypeOf_CoolingTower_VarSpdMerkel || TypeOf_Num == TypeOf_CoolingTower_VarSpd ) {
-											++NumCT;
-											if ( NumCT > 1 ) {
-												ShowSevereError( cSetPointManagerType + "=\"" + IdealCondEntSetPtMgr( SetPtMgrNum ).Name + "\", too many cooling towers found" );
-												ShowContinueError( "only one cooling tower can be used with this setpoint manager on each loop" );
-												ShowContinueError( "Found more than one cooling tower, Cooling Tower=" + PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).Name );
-												ErrorsFound = true;
-											}
-										}
 										// Scan the pump on the condenser water loop
 										if ( TypeOf_Num == TypeOf_PumpVariableSpeed || TypeOf_Num == TypeOf_PumpConstantSpeed ) {
 											IdealCondEntSetPtMgr( SetPtMgrNum ).CondPumpNum = CompNum;
@@ -3684,7 +3665,6 @@ namespace SetPointManager {
 									for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
 										TypeOf_Num = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).TypeOf_Num;
 										if ( TypeOf_Num == TypeOf_Chiller_Absorption || TypeOf_Num == TypeOf_Chiller_Indirect_Absorption || TypeOf_Num == TypeOf_Chiller_CombTurbine || TypeOf_Num == TypeOf_Chiller_ConstCOP || TypeOf_Num == TypeOf_Chiller_Electric || TypeOf_Num == TypeOf_Chiller_ElectricEIR || TypeOf_Num == TypeOf_Chiller_DFAbsorption || TypeOf_Num == TypeOf_Chiller_ElectricReformEIR || TypeOf_Num == TypeOf_Chiller_EngineDriven ) {
-
 											// Scan the supply side to find the chiller index and branch index on plantloop
 											TypeNum = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).TypeOf_Num;
 											for ( LoopNum2 = 1; LoopNum2 <= NumCondLoops + NumPlantLoops; ++LoopNum2 ) {
@@ -6627,7 +6607,6 @@ namespace SetPointManager {
 		static Real64 TotEnergyPre( 0.0 ); // Totoal energy consumptions at the previous time step
 		static bool RunSubOptCondEntTemp( false );
 		static bool RunFinalOptCondEntTemp( false );
-		static bool firstTime( true );
 
 		InitCondWaterSetPoint = this->MaxCondEntTemp;
 		MinLiftTD = this->MinimumLiftTD;
