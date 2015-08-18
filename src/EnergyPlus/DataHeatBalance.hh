@@ -177,8 +177,11 @@ namespace DataHeatBalance {
 	extern int const AirBalanceQuadrature;
 
 	// Parameter for source zone air flow mass balance infiltration treatment
+	extern int const NoInfiltrationFlow;
 	extern int const AddInfiltrationFlow;
 	extern int const AdjustInfiltrationFlow;
+	extern int const MixingSourceZonesOnly;
+	extern int const AllZones;
 
 	extern int const NumZoneIntGainDeviceTypes;
 
@@ -3594,13 +3597,17 @@ namespace DataHeatBalance {
 	{
 		// Members
 		bool EnforceZoneMassBalance;     // flag to enforce zone air mass conservation
+		bool BalanceMixing;              // flag to allow mixing to be adjusted for zone mass balance
 		int InfiltrationTreatment;       // determines how infiltration is treated for zone mass balance
+		int InfiltrationZoneType;        // specifies which types of zones allo infiltration to be changed
 		//Note, unique global object
 
 		// Default Constructor
 		ZoneAirMassFlowConservation() :
 			EnforceZoneMassBalance( false ),
-			InfiltrationTreatment( 0 )
+			BalanceMixing( false ),
+			InfiltrationTreatment( 0 ),
+			InfiltrationZoneType( 0 )
 		{}
 
 		// Member Constructor
@@ -3609,7 +3616,9 @@ namespace DataHeatBalance {
 			int InfiltrationTreatment
 			) :
 			EnforceZoneMassBalance( EnforceZoneMassBalance ),
-			InfiltrationTreatment( InfiltrationTreatment )
+			BalanceMixing( BalanceMixing ),
+			InfiltrationTreatment( InfiltrationTreatment ),
+			InfiltrationZoneType( InfiltrationZoneType )
 		{}
 	};
 

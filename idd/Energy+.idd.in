@@ -667,8 +667,9 @@ ZoneAirContaminantBalance,
 ZoneAirMassFlowConservation,
        \memo Enforces the zone air mass flow balance by adjusting zone mixing object flow rates.
        \memo The infiltration object mass flow rate may also be adjusted or may add infiltration
-       \memo air flow to the base infiltration air flow for source zones only.
+       \memo air flow to the base infiltration air flow.
        \unique-object
+       \min-fields 3
   A1,  \field Adjust Zone Mixing For Zone Air Mass Flow Balance
        \note If Yes, Zone mixing object flow rates are adjusted to balance the zone air mass flow
        \note and additional infiltration air flow may be added if required in order to balance the
@@ -694,13 +695,15 @@ ZoneAirMassFlowConservation,
        \type choice
        \key AddInfiltrationFlow
        \key AdjustInfiltrationFlow
+       \key None
        \default AddInfiltrationFlow
        \note AddInfiltrationFlow may add infiltration to the base flow specified in the
        \note infiltration object to balance the zone air mass flow. The additional infiltration
        \note air mass flow is not self-balanced. The base flow is assumed to be self-balanced.
        \note AdjustInfiltrationFlow may adjust the base flow calculated using
        \note the base flow specified in the infiltration object to balance the zone air mass flow. If it
-       \note If no adjustment is required, then the base infiltration is assumed to be self-balanced. 
+       \note If no adjustment is required, then the base infiltration is assumed to be self-balanced.
+       \note None will make no changes to the base infiltration flow.
   A3;  \field Infiltration Balancing Zones
        \note This input field allows user to choose which zones are included in infiltration balancing.
        \note MixingSourceZonesOnly allows infiltration balancing only in zones which as source zones for mixing

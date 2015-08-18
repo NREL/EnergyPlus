@@ -652,8 +652,8 @@ namespace HeatBalanceManager {
 		static gio::Fmt Format_730( "(' Zone Air Carbon Dioxide Balance Simulation, ',A,',',A)" );
 		static gio::Fmt Format_729( "('! <Zone Air Contaminant Balance Simulation>, Simulation {Yes/No}, Generic Contaminant Concentration')" );
 		static gio::Fmt Format_731( "(' Zone Air Generic Contaminant Balance Simulation, ',A,',',A)" );
-		static gio::Fmt Format_732( "('! <Zone Air Mass Flow Balance Simulation>, Simulation {Yes/No}')");
-		static gio::Fmt Format_733( "(' Zone Air Mass Flow Balance Simulation, ',A)");
+		static gio::Fmt Format_732( "('! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance {Yes/No}, Adjust Zone Mixing {Yes/No}, Adjust Zone Infiltration {AddInfiltration/AdjustInfiltration/NoInfiltration}, Infiltration Zones {MixingSourceZonesOnly/AllZones}')");
+		static gio::Fmt Format_733( "(' Zone Air Mass Flow Balance Simulation, ',A,',',A,',',A,',',A)");
 
 		//Assign the values to the building data
 
@@ -1081,51 +1081,80 @@ namespace HeatBalanceManager {
 		// A new object is added by B. Nigusse, 02/14
 		CurrentModuleObject = "ZoneAirMassFlowConservation";
 		NumObjects = GetNumObjectsFound(CurrentModuleObject);
+		ZoneAirMassFlow.EnforceZoneMassBalance = false;
 
 		if ( NumObjects > 0 ) {
 			GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( NumAlpha > 0 ) {
 				{ auto const SELECT_CASE_var( AlphaName( 1 ) );
 				if ( SELECT_CASE_var == "YES" ) {
+					ZoneAirMassFlow.BalanceMixing = true;
 					ZoneAirMassFlow.EnforceZoneMassBalance = true;
+					AlphaName( 1 ) = "Yes";
 				} else if ( SELECT_CASE_var == "NO" ) {
-					ZoneAirMassFlow.EnforceZoneMassBalance = false;
+					ZoneAirMassFlow.BalanceMixing = false;
+					AlphaName( 1 ) = "No";
 				} else {
-					ZoneAirMassFlow.EnforceZoneMassBalance = false;
-					AlphaName(1) = "NO";
-					ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = NO" );
+					ZoneAirMassFlow.BalanceMixing = false;
+					AlphaName(1) = "No";
+					ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = No" );
 				}}
 			}
 			if ( NumAlpha > 1 ) {
 				{ auto const SELECT_CASE_var( AlphaName( 2 ) );
 				if ( SELECT_CASE_var == "ADDINFILTRATIONFLOW" ) {
-					ZoneAirMassFlow.InfiltrationTreatment = true;
+					ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
+					ZoneAirMassFlow.EnforceZoneMassBalance = true;
+					AlphaName( 2 ) = "AddInfiltrationFlow";
 					if ( !Contaminant.CO2Simulation ) Contaminant.SimulateContaminants = true;
 				} else if ( SELECT_CASE_var == "ADJUSTINFILTRATIONFLOW" ) {
-					ZoneAirMassFlow.InfiltrationTreatment = 2;
+					ZoneAirMassFlow.InfiltrationTreatment = AdjustInfiltrationFlow;
+					ZoneAirMassFlow.EnforceZoneMassBalance = true;
+					AlphaName( 2 ) = "AddInfiltrationFlow";
+				} else if ( SELECT_CASE_var == "NONE" ) {
+					ZoneAirMassFlow.InfiltrationTreatment = NoInfiltrationFlow;
+					AlphaName( 2 ) = "None";
 				} else {
-					ZoneAirMassFlow.InfiltrationTreatment = 1;
-					AlphaName(2) = "ADDINFILTRATIONFLOW";
-					ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(2) + ". The default choice is assigned = NO" );
+					ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
+					ZoneAirMassFlow.EnforceZoneMassBalance = true;
+					AlphaName( 2 ) = "AddInfiltrationFlow";
+					ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(2) + ". The default choice is assigned = AddInfiltrationFlow" );
 				}}
 			} else {
-				ZoneAirMassFlow.InfiltrationTreatment = 1;
-				AlphaName(2) = "ADDINFILTRATIONFLOW";
+				ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
+				ZoneAirMassFlow.EnforceZoneMassBalance = true;
+				AlphaName( 2 ) = "AddInfiltrationFlow";
+			}
+			if ( ZoneAirMassFlow.InfiltrationTreatment == NoInfiltrationFlow ) {
+				AlphaName( 3 ) = "N/A";
+			} else {
+				if ( NumAlpha > 2 ) {
+						{ auto const SELECT_CASE_var( AlphaName( 3 ) );
+						if ( SELECT_CASE_var == "MIXINGSOURCEZONESONLY" ) {
+							ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
+							AlphaName( 3 ) = "MixingSourceZonesOnly";
+						} else if ( SELECT_CASE_var == "ALLZONES" ) {
+							ZoneAirMassFlow.InfiltrationZoneType = AdjustInfiltrationFlow;
+							AlphaName( 3 ) = "AllZones";
+						} else {
+							ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
+							AlphaName( 3 ) = "MixingSourceZonesOnly";
+							ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames( 3 ) + ". The default choice is assigned = MixingSourceZonesOnly" );
+						}}
+				} else {
+					ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
+					AlphaName( 3 ) = "MixingSourceZonesOnly";
+				}
 			}
 		} else {
 			ZoneAirMassFlow.EnforceZoneMassBalance = false;
-			AlphaName(1) = "NO";
 		}
-		//// allocate if the global variable ZoneAirMassFlow is ON
-		//if ( ZoneAirMassFlow.EnforceZoneMassBalance ) {
-		//	MassConservation.allocate( NumOfZones );
-		//}
 
 		gio::write( OutputFileInits, Format_732 );
 		if ( ZoneAirMassFlow.EnforceZoneMassBalance ) {
-			gio::write( OutputFileInits, Format_733 ) << "Yes";
+			gio::write( OutputFileInits, Format_733 ) << "Yes" << AlphaName( 1 ) << AlphaName( 2 ) << AlphaName( 3 );
 		} else {
-			gio::write( OutputFileInits, Format_733 ) << "No";
+			gio::write( OutputFileInits, Format_733 ) << "No" << AlphaName( 1 ) << AlphaName( 2 ) << AlphaName( 3 );
 		}
 
 	}
