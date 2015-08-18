@@ -156,6 +156,7 @@ namespace SimAirServingZones {
 		bool InitAirLoopsOneTimeFlag( true );
 		int TestUniqueNodesNum( 0 );
 		bool SizeAirLoopsOneTimeFlag( true );
+		bool InitAirLoopsBranchSizingFlag( true );
 	}
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -178,6 +179,7 @@ namespace SimAirServingZones {
 		GetAirLoopInputFlag = true;
 		InitAirLoopsOneTimeFlag = true;
 		SizeAirLoopsOneTimeFlag = true;
+		InitAirLoopsBranchSizingFlag = true;
 		NumOfTimeStepInDay = 0;
 		TestUniqueNodesNum = 0;
 	}
@@ -1390,8 +1392,9 @@ namespace SimAirServingZones {
 		static bool MyEnvrnFlag( true );
 		/////////// hoisted into namespace InitAirLoopsOneTimeFlag////////////
 		//static bool MyOneTimeFlag( true );
+		//static bool MyBranchSizingFlag( true ); //InitAirLoopsBranchSizingFlag
 		///////////////////////////
-		static bool MyBranchSizingFlag( true );
+
 		bool ErrorsFound;
 		static Real64 OAReliefDiff( 0.0 ); // local for massflow change across OA system, kg/s
 
@@ -1839,7 +1842,7 @@ namespace SimAirServingZones {
 		} // one time flag
 
 		// Size the air loop branch air flows
-		if ( ! SysSizingCalc && MyBranchSizingFlag ) {
+		if ( ! SysSizingCalc && InitAirLoopsBranchSizingFlag ) {
 
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 
@@ -1849,7 +1852,7 @@ namespace SimAirServingZones {
 
 			}
 
-			MyBranchSizingFlag = false;
+			InitAirLoopsBranchSizingFlag = false;
 
 			// calculate the ratio of air loop design flow to the sum of the zone design flows
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
