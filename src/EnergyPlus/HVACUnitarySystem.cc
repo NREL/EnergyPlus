@@ -7780,7 +7780,6 @@ namespace HVACUnitarySystem {
 		using VariableSpeedCoils::VarSpeedCoil;
 		using UserDefinedComponents::SimCoilUserDefined;
 		using PackagedThermalStorageCoil::SimTESCoil;
-		using PackagedThermalStorageCoil::ControlTESIceStorageTankCoil;
 		using PackagedThermalStorageCoil::OffMode;
 		using PackagedThermalStorageCoil::ChargeOnlyMode;
 
@@ -8062,6 +8061,8 @@ namespace HVACUnitarySystem {
 						if ( CoilType_Num == CoilDX_PackagedThermalStorageCooling && ( UnitarySystem( UnitarySysNum ).TESOpMode == OffMode || UnitarySystem( UnitarySysNum ).TESOpMode == ChargeOnlyMode ) ) {
 							PartLoadFrac = 0.0;
 						}
+					} else if ( CoilType_Num == CoilDX_PackagedThermalStorageCooling && ( UnitarySystem( UnitarySysNum ).TESOpMode == OffMode || UnitarySystem( UnitarySysNum ).TESOpMode == ChargeOnlyMode ) ) {
+							PartLoadFrac = 0.0;
 					} else {
 
 						if ( CoilType_Num == CoilDX_CoolingSingleSpeed ) { // COIL:DX:COOLINGBYPASSFACTOREMPIRICAL
@@ -8171,7 +8172,7 @@ namespace HVACUnitarySystem {
 
 							Par( 1 ) = double( UnitarySystem( UnitarySysNum ).CoolingCoilIndex );
 							Par( 2 ) = DesOutTemp;
-							Par( 3 ) = UnitarySysNum;
+							Par( 3 ) = double( UnitarySysNum );
 							// Par(4) = CycRatio or SpeedRatio
 							Par( 5 ) = UnitarySystem( UnitarySysNum ).CoolingSpeedNum;
 							Par( 6 ) = 1.0; // UnitarySystem(UnitarySysNum)%FanOpMode
@@ -8201,7 +8202,7 @@ namespace HVACUnitarySystem {
 
 							Par( 1 ) = double( UnitarySystem( UnitarySysNum ).CoolingCoilIndex );
 							Par( 2 ) = DesOutTemp;
-							Par( 3 ) = UnitarySysNum;
+							Par( 3 ) = double( UnitarySysNum );
 							// Par(4) = CycRatio or SpeedRatio
 							Par( 5 ) = UnitarySystem( UnitarySysNum ).CoolingSpeedNum;
 							Par( 6 ) = 1.0; // UnitarySystem(UnitarySysNum)%FanOpMode
@@ -8266,13 +8267,10 @@ namespace HVACUnitarySystem {
 
 						} else if ( CoilType_Num == CoilDX_PackagedThermalStorageCooling ) {
 
-							ControlTESIceStorageTankCoil( CompName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, UnitarySystem( UnitarySysNum ).UnitarySystemType, 
-								FanOpMode, DesOutTemp, DesOutHumRat, PartLoadFrac, 
-								UnitarySystem( UnitarySysNum ).TESOpMode, UnitarySystem( UnitarySysNum ).DehumidificationMode, 
-								UnitarySystem( UnitarySysNum ).SensPLRIter, UnitarySystem( UnitarySysNum ).SensPLRIterIndex, 
-								UnitarySystem( UnitarySysNum ).SensPLRFail, UnitarySystem( UnitarySysNum ).SensPLRFailIndex, 
-								UnitarySystem( UnitarySysNum ).LatPLRIter, UnitarySystem( UnitarySysNum ).LatPLRIterIndex, 
-								UnitarySystem( UnitarySysNum ).LatPLRFail, UnitarySystem( UnitarySysNum ).LatPLRFailIndex );
+							Par( 1 ) = double( UnitarySysNum );
+							Par( 2 ) = DesOutTemp;
+							Par( 3 ) = 0.0; // DesOutHumRat; set to 0 if temp controlled
+							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, TESIceStorageCoilOutletResidual, 0.0, 1.0, Par );
 
 						} else {
 							ShowMessage( " For :" + UnitarySystem( UnitarySysNum ).UnitarySystemType + "=\"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
@@ -8627,14 +8625,12 @@ namespace HVACUnitarySystem {
 
 						} else if ( CoilType_Num == CoilDX_PackagedThermalStorageCooling ) {
 
-// need to iterate on answer
-//							ControlTESIceStorageTankCoil( CompName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, UnitarySystem( UnitarySysNum ).UnitarySystemType, 
-//								FanOpMode, DesOutTemp, DesOutHumRat, PartLoadFrac, 
-//								UnitarySystem( UnitarySysNum ).TESOpMode, UnitarySystem( UnitarySysNum ).DehumidificationMode, 
-//								UnitarySystem( UnitarySysNum ).SensPLRIter, UnitarySystem( UnitarySysNum ).SensPLRIterIndex, 
-//								UnitarySystem( UnitarySysNum ).SensPLRFail, UnitarySystem( UnitarySysNum ).SensPLRFailIndex, 
-//								UnitarySystem( UnitarySysNum ).LatPLRIter, UnitarySystem( UnitarySysNum ).LatPLRIterIndex, 
-//								UnitarySystem( UnitarySysNum ).LatPLRFail, UnitarySystem( UnitarySysNum ).LatPLRFailIndex );
+							if ( CoilType_Num == CoilDX_PackagedThermalStorageCooling && ( UnitarySystem( UnitarySysNum ).TESOpMode != OffMode && UnitarySystem( UnitarySysNum ).TESOpMode != ChargeOnlyMode ) ) {
+								Par( 1 ) = double( UnitarySysNum );
+								Par( 2 ) = 0.0; // DesOutTemp; set to 0 if humrat controlled
+								Par( 3 ) = DesOutHumRat;
+								SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, TESIceStorageCoilOutletResidual, 0.0, 1.0, Par );
+							}
 
 						} else {
 
@@ -11764,6 +11760,76 @@ namespace HVACUnitarySystem {
 
 		OutletAirTemp = Node( UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum ).Temp;
 		Residuum = Par( 3 ) - OutletAirTemp;
+
+		return Residuum;
+	}
+
+	Real64
+	TESIceStorageCoilOutletResidual(
+		Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+		Array1< Real64 > const & Par // data array
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR        Richard Raustad, FSEC
+		//       DATE WRITTEN   August 2015
+		//       MODIFIED
+		//       RE-ENGINEERED
+
+		// PURPOSE OF THIS FUNCTION:
+		// Calculates residual function (desired outlet temp - actual outlet temp)
+		// Coil output depends on the part load ratio which is being varied to zero the residual.
+
+		// METHODOLOGY EMPLOYED:
+		// Calls SimWatertoAirHP or SimWatertoAirHPSimple to get outlet humidity ratio at the given cycling ratio
+		// and calculates the residual as defined above
+
+		// REFERENCES:
+
+		// Using/Aliasing
+		using PackagedThermalStorageCoil::SimTESCoil;
+
+		// Return value
+		Real64 Residuum; // residual to be minimized to zero
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// Par( 1 ) = double( UnitarySysNum );
+		// Par( 2 ) = DesOutTemp;
+		// Par( 3 ) = 0.0; // DesOutHumRat; set to 0 if temp controlled
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int UnitarySysNum; // index of this coil
+		Real64 DesiredOutletTemp; // temperature control point
+		Real64 DesiredOutletHumRat; // humidity ratio control point
+		Real64 OutletAirTemp; // outlet air temperature [C]
+		Real64 OutletAirHumRat; // outlet air humidity ratio [kg/kg]
+
+		UnitarySysNum = int( Par( 1 ) );
+		DesiredOutletTemp = Par( 2 );
+		DesiredOutletHumRat = Par( 3 );
+
+		SimTESCoil( UnitarySystem( UnitarySysNum ).CoolingCoilName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, UnitarySystem( UnitarySysNum ).FanOpMode, UnitarySystem( UnitarySysNum ).TESOpMode, PartLoadRatio );
+
+		if ( DesiredOutletHumRat > 0.0 ) {
+			OutletAirHumRat = Node( UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum ).HumRat;
+			Residuum = OutletAirHumRat - DesiredOutletHumRat;
+		} else {
+			OutletAirTemp = Node( UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum ).Temp;
+			Residuum = OutletAirTemp - DesiredOutletTemp;
+		}
 
 		return Residuum;
 	}

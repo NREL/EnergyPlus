@@ -1552,6 +1552,12 @@ namespace HVACUnitarySystem {
 	);
 
 	Real64
+	TESIceStorageCoilOutletResidual(
+		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+		Array1< Real64 > const & Par // par( 1 ) = double( UnitarySysNum );
+	);
+
+	Real64
 	HeatWatertoAirHPTempResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
 		Array1< Real64 > const & Par // par(1) = HeatWatertoAirHP coil number

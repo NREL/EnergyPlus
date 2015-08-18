@@ -2138,9 +2138,9 @@ namespace FanCoilUnits {
 		// Assume the unit is able to vary the flow. A cycling unit is treated as
 		// if it were variable flow, with the flow being the averaqe flow over the time step
 		if ( GetCurrentScheduleValue( FanCoil( FanCoilNum ).SchedPtr ) > 0.0 ) {
-			if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num != CCM_ConsFanVarFlow ) {
+//			if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num != CCM_ConsFanVarFlow ) {
 				Node( InletNode ).MassFlowRate = PartLoad * Node( InletNode ).MassFlowRateMax;
-			}
+//			}
 		}
 		// use the value of the outside air schedule if present
 		if ( FanCoil( FanCoilNum ).SchedOutAirPtr > 0 ) {
