@@ -5201,8 +5201,13 @@ namespace HVACUnitarySystem {
 				ShowContinueError( "Multimode control must be used with a Heat Exchanger Assisted or Multimode Cooling Coil." );
 				if ( lAlphaBlanks( iSuppHeatCoilNameAlphaNum ) ) {
 				} else {
-					ShowContinueError( "Dehumidification control type is assumed to be CoolReheat and the simulation continues." );
-					UnitarySystem( UnitarySysNum ).DehumidControlType_Num = DehumidControl_CoolReheat;
+					if ( UnitarySystem(UnitarySysNum).CoolingCoilType_Num == Coil_UserDefined ) {
+						ShowContinueError( "Dehumidification control type is assumed to be None and the simulation continues." );
+						UnitarySystem( UnitarySysNum ).DehumidControlType_Num = DehumidControl_None;
+					} else {
+						ShowContinueError( "Dehumidification control type is assumed to be CoolReheat and the simulation continues." );
+						UnitarySystem( UnitarySysNum ).DehumidControlType_Num = DehumidControl_CoolReheat;
+					}
 				}
 			}
 
@@ -7837,8 +7842,8 @@ namespace HVACUnitarySystem {
 		int SpeedNum;
 		Real64 LoopDXCoilMaxRTFSave; // Used to find RTF of DX heating coils without overwriting globabl variable
 		Real64 NoLoadTempOut; // saves coil off outlet temp
-		bool HeatingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since coil is wrapped by UnitarySystem.
-		bool CoolingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since coil is wrapped by UnitarySystem.
+		bool HeatingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off.
+		bool CoolingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off.
 
 		// Set local variables
 		// Retrieve the load on the controlled zone
@@ -7938,6 +7943,7 @@ namespace HVACUnitarySystem {
 					HeatingActive = false; // set to arbitrary value on entry to function
 					CoolingActive = true; // set to arbitrary value on entry to function
 					SimCoilUserDefined( CompName, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, AirLoopNum, HeatingActive, CoolingActive );
+					if ( CoolingActive ) PartLoadFrac = 1.0;
 
 				} else if ( CoilType_Num == CoilDX_PackagedThermalStorageCooling ) {
 
@@ -8917,7 +8923,7 @@ namespace HVACUnitarySystem {
 				}}
 
 				//     IF outlet temp at no load is within ACC of set point, do not run the coil
-				if ( std::abs( Node( OutletNode ).Temp - DesOutTemp ) < Acc ) {
+				if ( std::abs( Node( OutletNode ).Temp - DesOutTemp ) < Acc  || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_UserDefined) {
 					// do nothing, coil is at the set point.
 				} else if ( ( Node( OutletNode ).Temp - DesOutTemp ) > Acc ) { // IF outlet temp is above set point turn off coil
 					PartLoadFrac = 0.0;
@@ -8936,7 +8942,7 @@ namespace HVACUnitarySystem {
 
 					} else if ( SELECT_CASE_var == Coil_UserDefined ) {
 
-						//  do nothing, coil cannot be controlled and has already been simulated
+						//  should never get here, coil cannot be controlled and has already been simulated
 
 					} else if ( SELECT_CASE_var == CoilDX_MultiSpeedHeating ) {
 
@@ -8995,7 +9001,7 @@ namespace HVACUnitarySystem {
 					FullOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
 
 					//       If the outlet temp is within ACC of set point,
-					if ( std::abs( Node( OutletNode ).Temp - DesOutTemp ) < Acc ) {
+					if ( std::abs( Node( OutletNode ).Temp - DesOutTemp ) < Acc || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_UserDefined) {
 						// do nothing, coil is at set point
 					} else if ( Node( OutletNode ).Temp < ( DesOutTemp - Acc ) ) { // IF outlet temp is below set point coil must be on
 						PartLoadFrac = 1.0;
@@ -9113,7 +9119,7 @@ namespace HVACUnitarySystem {
 
 						} else if ( SELECT_CASE_var == Coil_UserDefined ) {
 
-							// do nothing, user defined coil cannot be controlled and has already been simulated
+							// should never get here, user defined coil cannot be controlled and has already been simulated
 
 						} else {
 							ShowMessage( " For :" + UnitarySystem( UnitarySysNum ).UnitarySystemType + "=\"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
@@ -9238,8 +9244,8 @@ namespace HVACUnitarySystem {
 		Real64 LoopHeatingCoilMaxRTFSave; // Used to find RTF of heating coils without overwriting globabl variable
 		Real64 LoopDXCoilMaxRTFSave; // Used to find RTF of DX heating coils without overwriting globabl variable
 		Real64 NoLoadTempOut; // save outlet temp when coil is off (C)
-		bool HeatingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since coil is wrapped by UnitarySystem.
-		bool CoolingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since coil is wrapped by UnitarySystem.
+		bool HeatingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off.
+		bool CoolingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off.
 
 		// Set local variables
 		// Retrieve the load on the controlled zone
@@ -9304,9 +9310,9 @@ namespace HVACUnitarySystem {
 				//                        - PsyHFnTdbW(Node(InletNode)%Temp,Node(OutletNode)%HumRat))
 
 				//     If OutletTemp is within ACC of set point, either coil operated or is not needed
-				if ( std::abs( Node( OutletNode ).Temp - DesOutTemp ) < Acc ) {
+				if ( std::abs( Node( OutletNode ).Temp - DesOutTemp ) < Acc || UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num == Coil_UserDefined ) {
 					// do nothing, coil is at set point (i.e., gas/elec/steam/user coil will try to hit set point
-				} else if ( PartLoadFrac > 0.0 || UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num == Coil_UserDefined ) {
+				} else if ( PartLoadFrac > 0.0 ) {
 					// do nothing, coil tried to hit set point (i.e., gas/elec/steam/user coil tried to hit set point but missed
 				} else if ( NoLoadTempOut > ( DesOutTemp - Acc ) ) {
 					PartLoadFrac = 0.0; // outlet temp > set point, coil is not needed
@@ -9403,6 +9409,10 @@ namespace HVACUnitarySystem {
 							}
 
 							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, SteamHeatingCoilResidual, 0.0, 1.0, Par );
+
+						} else if ( SELECT_CASE_var == Coil_UserDefined ) {
+
+							//  do nothing, coil has already been simulated
 
 						} else {
 

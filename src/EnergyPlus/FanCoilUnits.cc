@@ -1968,6 +1968,7 @@ namespace FanCoilUnits {
 					PLR = max( 0.0, min( 1.0, PLR ) );
 					++Iter;
 					if ( Iter == 32 ) Relax = 0.5;
+					if ( Iter == 65 ) Relax = 0.25;
 				}
 
 				// warning if not converged
@@ -2007,6 +2008,7 @@ namespace FanCoilUnits {
 					PLR = max( 0.0, min( 1.0, PLR ) );
 					++Iter;
 					if ( Iter == 32 ) Relax = 0.5;
+					if ( Iter == 65 ) Relax = 0.25;
 				}
 
 				// warning if not converged
@@ -2138,9 +2140,11 @@ namespace FanCoilUnits {
 		// Assume the unit is able to vary the flow. A cycling unit is treated as
 		// if it were variable flow, with the flow being the averaqe flow over the time step
 		if ( GetCurrentScheduleValue( FanCoil( FanCoilNum ).SchedPtr ) > 0.0 ) {
-//			if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num != CCM_ConsFanVarFlow ) {
+			if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num != CCM_ConsFanVarFlow ) {
 				Node( InletNode ).MassFlowRate = PartLoad * Node( InletNode ).MassFlowRateMax;
-//			}
+			} else {
+				Node( InletNode ).MassFlowRate = Node( InletNode ).MassFlowRateMax;
+			}
 		}
 		// use the value of the outside air schedule if present
 		if ( FanCoil( FanCoilNum ).SchedOutAirPtr > 0 ) {
@@ -2164,7 +2168,11 @@ namespace FanCoilUnits {
 			if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_CycFan ) {
 				Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRate = min( OASchedValue * Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRateMax * PartLoad * FanCoil( FanCoilNum ).SpeedFanRatSel, Node( InletNode ).MassFlowRate );
 			} else {
-				Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRate = min( OASchedValue * Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRateMax * PartLoad, Node( InletNode ).MassFlowRate );
+				if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num != CCM_ConsFanVarFlow ) {
+					Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRate = min( OASchedValue * Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRateMax * PartLoad, Node( InletNode ).MassFlowRate );
+				} else {
+					Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRate = min( OASchedValue * Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRateMax, Node( InletNode ).MassFlowRate );
+				}
 			}
 			Node( FanCoil( FanCoilNum ).AirReliefNode ).MassFlowRate = Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRate;
 			AirMassFlow = Node( InletNode ).MassFlowRate;
@@ -2188,6 +2196,7 @@ namespace FanCoilUnits {
 			if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 				SimulateWaterCoilComponents( FanCoil( FanCoilNum ).HCoilName, FirstHVACIteration, FanCoil( FanCoilNum ).HCoilName_Index, _, 1, PLR );
 			} else {
+				if ( Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate > 0.0 ) ElecHeaterControl = 0.0;
 				SimulateHeatingCoilComponents( FanCoil( FanCoilNum ).HCoilName, FirstHVACIteration, FanCoil( FanCoilNum ).DesignHeatingCapacity * PartLoad * ElecHeaterControl, FanCoil( FanCoilNum ).HCoilName_Index, _, false, ContFanCycCoil, PartLoad );
 			}
 
@@ -2202,6 +2211,7 @@ namespace FanCoilUnits {
 			if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 				SimulateWaterCoilComponents( FanCoil( FanCoilNum ).HCoilName, FirstHVACIteration, FanCoil( FanCoilNum ).HCoilName_Index );
 			} else {
+				if ( Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate > 0.0 ) ElecHeaterControl = 0.0;
 				SimulateHeatingCoilComponents( FanCoil( FanCoilNum ).HCoilName, FirstHVACIteration, FanCoil( FanCoilNum ).DesignHeatingCapacity * PartLoad * ElecHeaterControl, FanCoil( FanCoilNum ).HCoilName_Index, _, false, ContFanCycCoil, PartLoad );
 			}
 
@@ -2672,11 +2682,11 @@ namespace FanCoilUnits {
 
 		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PartLoadRatio ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 
-		// Calculate residual based on output calculation flag
-		if ( std::abs( QUnitOut ) == 0.0 ) {
+		// Calculate residual based on output magnitude
+		if ( std::abs(  QZnReq ) <= 100.0 ) {
 			Residuum = ( QUnitOut - QZnReq ) / 100.0;
 		} else {
-			Residuum = ( QUnitOut - QZnReq ) / QUnitOut;
+			Residuum = ( QUnitOut - QZnReq ) / QZnReq;
 		}
 
 		return Residuum;
