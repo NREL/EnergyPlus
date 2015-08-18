@@ -3,8 +3,34 @@
 **Michael J. Witte, GARD Analytics, Inc.**
 
  - Original August 7, 2015
+ - Add highlights from [NFP-LinkInfiltrationToHVAC.docc](https://github.com/NREL/EnergyPlusDevSupport/blob/master/DesignDocuments/Proposals/NFP-LinkInfiltrationToHVAC.docc)
 
  
+## Approach
+Extend the ZoneAirMassFlowConservation feature by adding user inputs to control the maximum and minimum return air flow rate for each zone. The return air flow rate will be set based on user inputs and current system flow status, then the ZoneAirMassFlowConservation algorithm will make any necessary adjustments to mixing and infiltration flow rates.  In the extreme, this feature should make it possible to model a fully pressurized zone with zero return airflow and zero infiltration and incoming mixing flow rates. 
+
+## Proposed Input Changes
+
+
+
+
+
+```
+  ZoneHVAC:EquipmentConnections,
+    SPACE1-1,                !- Zone Name
+    SPACE1-1 Eq,             !- Zone Conditioning Equipment List Name
+    SPACE1-1 In Node,        !- Zone Air Inlet Node or NodeList Name
+    ,                        !- Zone Air Exhaust Node or NodeList Name
+    SPACE1-1 Node,           !- Zone Air Node Name
+    SPACE1-1 Out Node,       !- Zone Return Air Node Name
+NEW FIELD --> SPACE1-1 Return Flow Schedule,  !- Zone Return Air Flow Rate Fraction Schedule Name
+NEW FIELD --> SPACE1-1 In Node;        !- Zone Return Air Flow Rate Basis Node or NodeList Name
+
+  ZoneAirMassFlowConservation,
+    Yes,                     !- Adjust Zone Mixing For Zone Air Mass Flow Balance
+NEW KEY CHOICE --> AdjustInfiltrationFlowAllZones;     !- Source Zone Infiltration Treatment
+
+```
 
 ## Data Structures ##
 ```[C++]
