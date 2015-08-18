@@ -21,7 +21,7 @@ namespace GroundTemps {
 	
 	int daysInYear = 365;
 	int simDay = 0;
-	Real64 finalTempConvergenceCriteria = 0.05;
+	Real64 finalTempConvergenceCriteria = 0.01;
 	Real64 iterationTempConvergenceCriteria = 0.00001;
 
 	void
@@ -105,7 +105,6 @@ namespace GroundTemps {
 		Real64 relHum_num;
 		Real64 windSpeed_num;
 		Real64 horizSolarRad_num;
-		Real64 horizExtraterrRad_num;
 		Real64 airDensity_num;
 		Real64 annualAveAirTemp_num;
 		int denominator;
@@ -145,7 +144,6 @@ namespace GroundTemps {
 				relHum_num = 0.0;
 				windSpeed_num = 0.0;
 				horizSolarRad_num = 0.0;
-				horizExtraterrRad_num = 0.0;
 				airDensity_num = 0.0;
 				denominator = 0;
 
@@ -186,8 +184,7 @@ namespace GroundTemps {
 						airDensity_num += OutAirDensity;
 						relHum_num += OutRelHumValue;
 						windSpeed_num += WindSpeed;
-						horizSolarRad_num += BeamSolarRad;
-						horizExtraterrRad_num += 0; // Horizontal Extraterrestrial Radiation
+						horizSolarRad_num += BeamSolarRad + DifSolarRad;
 
 						BeginHourFlag = false;
 						BeginDayFlag = false;
@@ -207,11 +204,10 @@ namespace GroundTemps {
 				tdwd.relativeHumidity = relHum_num / denominator;
 				tdwd.windSpeed = windSpeed_num / denominator;
 				tdwd.horizontalRadiation = horizSolarRad_num / denominator;
-				tdwd.horizontalExtraterrestrialRadiation = horizExtraterrRad_num / denominator;
 				tdwd.airDensity = airDensity_num / denominator;
 				annualAveAirTemp_num += tdwd.dryBulbTemp;
 
-				outFile << tdwd.dryBulbTemp << "," << tdwd.relativeHumidity << "," << tdwd.windSpeed << "," << tdwd.horizontalRadiation << "," << tdwd.horizontalExtraterrestrialRadiation << "," << tdwd.airDensity << std::endl;
+				outFile << tdwd.dryBulbTemp << "," << tdwd.relativeHumidity << "," << tdwd.windSpeed << "," << tdwd.horizontalRadiation << "," << tdwd.airDensity << std::endl;
 
 			} // ... End day loop.
 
@@ -557,32 +553,10 @@ namespace GroundTemps {
 		currAirTempK = cwd.dryBulbTemp + 273.15;
 
 		// Convert input solar radiation [w/m2] into units for ET model, [MJ/hr-min]
+		// Diffuse + Direct Beam Radation
 		incidentSolar_MJhrmin = cwd.horizontalRadiation * convert_Wm2_To_MJhrmin;
 
-		// Extraterrestial Radiation
-		QRAD_A = cwd.horizontalExtraterrestrialRadiation;//12.0 * 60.0 / Pi * meanSolarConstant * dr * ( ( Solar_Angle_2 - Solar_Angle_1 ) * std::sin( Latitude_Radians ) * std::sin( Declination ) + std::cos( Latitude_Radians ) * std::cos( Declination ) * ( std::sin( Solar_Angle_2 ) - std::sin( Solar_Angle_1 ) ) );
-
-		// Calculate another Q term...
-		QRAD_SO = ( A_s + B_s + 0.00002 * Elevation ) * QRAD_A;
-
-		// Correct the Qrad term ... better way??
-		if ( incidentSolar_MJhrmin < 0.01 ) {
-			ratio_SO = 0.0;
-		} else {
-			if ( QRAD_SO != 0.0 ) {
-				ratio_SO = incidentSolar_MJhrmin / QRAD_SO;
-			} else {
-				// I used logic below to choose value, divide by 0 = infinity, so value = 1, not sure if correct...
-				ratio_SO = 1.0;
-			}
-
-		}
-
-		// Constrain ratio_SO
-		ratio_SO = min( ratio_SO, 1.0 );
-		ratio_SO = max( ratio_SO, 0.3 );
-
-		// Calculate another Q term, [MJ/hr-min]
+		// Absorbed solar radiation, [MJ/hr-min]
 		absorbedIncidentSolar_MJhrmin = absor_Corrected * incidentSolar_MJhrmin;
 
 		// Calculate saturated vapor pressure, [kPa]
@@ -592,12 +566,12 @@ namespace GroundTemps {
 		vaporPressureActual_kPa = vaporPressureSaturated_kPa * cwd.relativeHumidity;
 
 		// Calculate another Q term, [MJ/m2-hr]
-		QRAD_NL = 2.042E-10 * pow_4( currAirTempK ) * ( 0.34 - 0.14 * std::sqrt( vaporPressureActual_kPa ) ) * ( 1.35 * ratio_SO - 0.35 );
+		QRAD_NL = 2.042E-10 * pow_4( currAirTempK ) * ( 0.34 - 0.14 * std::sqrt( vaporPressureActual_kPa ) );
 
 		// Calculate another Q term, [MJ/hr]
 		netIncidentRadiation_MJhr = absorbedIncidentSolar_MJhrmin - QRAD_NL;
 
-		// ?
+		// constant
 		CN = 37.0;
 
 		// Check whether there was sun
@@ -729,7 +703,9 @@ namespace GroundTemps {
 		// <description>
 
 		// REFERENCES:
-		// na
+		// Fridleifsson, I.B., R. Bertani, E.Huenges, J.W. Lund, A. Ragnarsson, L. Rybach. 2008
+		//	'The possible role and contribution of geothermal energy to the mitigation of climate change.'
+		//	IPCC scoping meeting on renewable energy sources: 59-80.
 
 		// USE STATEMENTS:
 		// na
@@ -739,7 +715,38 @@ namespace GroundTemps {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		cellArray( totalNumCells ).temperature = annualAveAirTemp; // Just for testing
+		Real64 numerator;
+		Real64 denominator;
+		Real64 resistance;
+		Real64 HTBottom;
+		Real64 geothermalGradient;
+
+		auto & thisCell = cellArray( totalNumCells );
+		auto & cellAbove_thisCell = cellArray( totalNumCells - 1 );
+
+		numerator = 0.0;
+		denominator = 0.0;
+		resistance = 0.0;
+		geothermalGradient = 0.025; // C/m
+
+		// Initialize
+		numerator += thisCell.temperature_prevTimeStep;
+		++denominator;
+
+		// Conduction resistance between this cell and above cell
+		resistance = ( ( thisCell.thickness / 2.0 ) / ( thisCell.conductionArea * thisCell.props.conductivity ) ) 
+					+ ( ( cellAbove_thisCell.thickness / 2.0 ) / ( cellAbove_thisCell.conductionArea * cellAbove_thisCell.props.conductivity ) );
+
+		numerator += ( thisCell.beta / resistance ) * cellAbove_thisCell.temperature;
+		denominator += thisCell.beta / resistance;
+
+		// Geothermal gradient heat transfer
+		HTBottom = geothermalGradient * thisCell.props.conductivity * thisCell.conductionArea;
+
+		numerator += thisCell.beta * HTBottom;
+
+		cellArray( totalNumCells ).temperature = numerator / denominator;
+
 	}
 
 	//******************************************************************************

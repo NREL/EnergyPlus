@@ -243,6 +243,7 @@ SET( SRC
   GroundTempsFiniteDiff.cc
   GroundTempsKusudaAchenbach.cc
   GroundTempsSite.cc
+  GroundTempsXing.cc
   HVACControllers.cc
   HVACControllers.hh
   HVACCooledBeam.cc
