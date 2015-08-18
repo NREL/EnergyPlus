@@ -206,7 +206,16 @@ namespace MixedAir {
 	bool GetOASysInputFlag( true ); // Flag set to make sure you get input once
 	bool GetOAMixerInputFlag( true ); // Flag set to make sure you get input once
 	bool GetOAControllerInputFlag( true ); // Flag set to make sure you get input once
-
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitOAControllerOneTimeFlag( true );
+		bool InitOAControllerSetPointCheckFlag( true );
+		bool InitOAControllerSetUpAirLoopHVACVariables( true );
+	}
 	//SUBROUTINE SPECIFICATIONS FOR MODULE MixedAir
 	// Driver/Manager Routines
 
@@ -289,6 +298,9 @@ namespace MixedAir {
 		GetOASysInputFlag = true;
 		GetOAMixerInputFlag = true;
 		GetOAControllerInputFlag = true;
+		InitOAControllerOneTimeFlag = true;
+		InitOAControllerSetPointCheckFlag = true;
+		InitOAControllerSetUpAirLoopHVACVariables = true;
 		ControllerLists.deallocate();
 		OAController.deallocate();
 		OAMixer.deallocate();
@@ -2678,9 +2690,11 @@ namespace MixedAir {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true ); // One-time initialization flag
-		static bool MySetPointCheckFlag( true ); // One-time initialization flag
-		static bool SetUpAirLoopHVACVariables( true ); // One-time initialization flag
+		/////////// hoisted into namespace 
+		//static bool MyOneTimeFlag( true ); // One-time initialization flag
+		//static bool MySetPointCheckFlag( true ); // One-time initialization flag
+		//static bool SetUpAirLoopHVACVariables( true ); // One-time initialization flag
+		//////////////////////////////////
 		static Array1D_bool MyEnvrnFlag; // One-time initialization flag
 		static Array1D_bool MySizeFlag; // One-time initialization flag
 		static Array1D_bool MechVentCheckFlag; // One-time initialization flag
@@ -2727,7 +2741,7 @@ namespace MixedAir {
 		ErrorsFound = false;
 		OANode = 0;
 
-		if ( MyOneTimeFlag ) {
+		if ( InitOAControllerOneTimeFlag ) {
 
 			MyEnvrnFlag.dimension( NumOAControllers, true );
 			MySizeFlag.dimension( NumOAControllers, true );
@@ -2790,11 +2804,11 @@ namespace MixedAir {
 				}}
 
 			}
-			MyOneTimeFlag = false;
+			InitOAControllerOneTimeFlag = false;
 
 		}
 
-		if ( ! SysSizingCalc && MySetPointCheckFlag && DoSetPointTest && ! FirstHVACIteration ) {
+		if ( ! SysSizingCalc && InitOAControllerSetPointCheckFlag && DoSetPointTest && ! FirstHVACIteration ) {
 			for ( OAControllerIndex = 1; OAControllerIndex <= NumOAControllers; ++OAControllerIndex ) {
 				MixedAirNode = OAController( OAControllerIndex ).MixNode;
 				if ( MixedAirNode > 0 ) {
@@ -2821,7 +2835,7 @@ namespace MixedAir {
 				}
 			}
 
-			MySetPointCheckFlag = false;
+			InitOAControllerSetPointCheckFlag = false;
 		}
 
 		if ( ! SysSizingCalc && MySizeFlag( OAControllerNum ) ) {
@@ -3060,7 +3074,7 @@ namespace MixedAir {
 		// If AirloopHVAC objects are not used, NumPrimaryAirSys is always equal to 0 and only these
 		// two IF statements are checked each time through Init (e.g., if StandAloneERV controllers are used
 		// without AirloopHVAC objects).
-		if ( SetUpAirLoopHVACVariables ) {
+		if ( InitOAControllerSetUpAirLoopHVACVariables ) {
 			if ( NumPrimaryAirSys > 0 ) {
 				// Added code to report (TH, 10/20/2008):
 				//   air economizer status (1 = on, 0 = off or does not exist), and
@@ -3137,7 +3151,7 @@ namespace MixedAir {
 
 				}
 
-				SetUpAirLoopHVACVariables = false;
+				InitOAControllerSetUpAirLoopHVACVariables = false;
 
 			}
 		}

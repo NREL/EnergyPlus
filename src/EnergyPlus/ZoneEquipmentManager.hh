@@ -72,6 +72,8 @@ namespace ZoneEquipmentManager {
 	extern Array1D< SimulationOrder > PrioritySimOrder;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageZoneEquipment(

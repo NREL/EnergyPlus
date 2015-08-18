@@ -159,6 +159,15 @@ namespace ZoneTempPredictorCorrector {
 	// Number of zone with staged controlled objects
 	int NumStageCtrZone( 0 );
 
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitZoneAirSetPointsOneTimeFlag( true );
+		bool SetupOscillationOutputFlag( true );
+	}
 	Array1D< Real64 > ZoneSetPointLast;
 	Array1D< Real64 > TempIndZnLd;
 	Array1D< Real64 > TempDepZnLd;
@@ -182,6 +191,37 @@ namespace ZoneTempPredictorCorrector {
 	Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
 
 	// Functions
+	void
+	clear_state()
+	{
+	
+		NumSingleTempHeatingControls = 0;
+		NumSingleTempCoolingControls = 0;
+		NumSingleTempHeatCoolControls = 0;
+		NumDualTempHeatCoolControls = 0;
+		NumSingleFangerHeatingControls = 0;
+		NumSingleFangerCoolingControls = 0;
+		NumSingleFangerHeatCoolControls = 0;
+		NumDualFangerHeatCoolControls = 0;
+		NumStageCtrZone = 0;
+		InitZoneAirSetPointsOneTimeFlag = true ;
+		SetupOscillationOutputFlag =  true;
+		ZoneSetPointLast.deallocate();
+		TempIndZnLd.deallocate();
+		TempDepZnLd.deallocate();
+		ZoneAirRelHum.deallocate();
+		ZoneTempHist.deallocate();
+		ZoneTempOscillate.deallocate();
+		AnyZoneTempOscillate= 0.0;
+		SetPointSingleHeating.deallocate();
+		SetPointSingleCooling.deallocate();
+		SetPointSingleHeatCool.deallocate();
+		SetPointDualHeatCool.deallocate();
+		SetPointSingleHeatingFanger.deallocate();
+		SetPointSingleCoolingFanger.deallocate();
+		SetPointSingleHeatCoolFanger.deallocate();
+		SetPointDualHeatCoolFanger.deallocate();
+	}
 
 	void
 	ManageZoneAirUpdates(
@@ -1957,7 +1997,9 @@ namespace ZoneTempPredictorCorrector {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
 		int ZoneNum;
-		static bool MyOneTimeFlag( true );
+		//////////// hoisted into namespace changed to InitZoneAirSetPointsOneTimeFlag////////////
+		//static bool MyOneTimeFlag( true );
+		//////////////////////////////////////
 		static bool MyEnvrnFlag( true );
 		static bool MyDayFlag( true );
 		static bool ErrorsFound( false );
@@ -1967,7 +2009,7 @@ namespace ZoneTempPredictorCorrector {
 		int SurfNum;
 
 		// FLOW:
-		if ( MyOneTimeFlag ) {
+		if ( InitZoneAirSetPointsOneTimeFlag ) {
 			TempZoneThermostatSetPoint.dimension( NumOfZones, 0.0 );
 			ZoneThermostatSetPointHi.dimension( NumOfZones, 0.0 );
 			ZoneThermostatSetPointLo.dimension( NumOfZones, 0.0 );
@@ -2111,7 +2153,7 @@ namespace ZoneTempPredictorCorrector {
 				SetupOutputVariable( "Zone Group Sensible Cooling Rate [W]", GroupSNLoadCoolRate( Loop ), "System", "Average", ZoneGroup( Loop ).Name );
 			} // Loop
 
-			MyOneTimeFlag = false;
+			InitZoneAirSetPointsOneTimeFlag = false;
 		}
 
 		// Do the Begin Environment initializations
@@ -5254,7 +5296,9 @@ namespace ZoneTempPredictorCorrector {
 		Real64 Diff12;
 		Real64 Diff23;
 		Real64 Diff34;
-		static bool SetupOscillationOutputFlag( true );
+		/////////// hoisted into namespace ////////////
+		//static bool SetupOscillationOutputFlag( true );
+		/////////////////////////////////////////////////
 		bool isAnyZoneOscillating;
 
 		//first time run allocate arrays and setup output variable

@@ -138,7 +138,16 @@ namespace WeatherManager {
 	std::string LocationTitle; // Location Title from input File
 	bool LocationGathered( false ); // flag to show if Location exists on Input File (we assume one is there and
 	// correct on weather file)
-
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool GetBranchInputOneTimeFlag( true );
+		bool GetEnvironmentFirstCall( true );
+		bool PrntEnvHeaders( true ); 
+	}
 	Real64 WeatherFileLatitude( 0.0 );
 	Real64 WeatherFileLongitude( 0.0 );
 	Real64 WeatherFileTimeZone( 0.0 );
@@ -300,6 +309,10 @@ namespace WeatherManager {
 		WeatherFileExists = false ; // Set to true if a weather file exists
 		LocationTitle = ""; // Location Title from input File
 		LocationGathered = false; // flag to show if Location exists on Input File (we assume one is 
+
+		GetBranchInputOneTimeFlag = true ;
+		GetEnvironmentFirstCall = true ;
+		PrntEnvHeaders = true ; 
 		WeatherFileLatitude = 0.0 ;
 		WeatherFileLongitude = 0.0 ;
 		WeatherFileTimeZone = 0.0 ;
@@ -670,9 +683,11 @@ namespace WeatherManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // Set to true before execution starts
-		static bool FirstCall( true );
-		static bool PrntEnvHeaders( true );
+		//////////// hoisted into namespace changed to GetBranchInputOneTimeFlag////////////
+		//	static bool GetInputFlag( true ); // Set to true before execution starts changed to GetEnvironmentInputOneTimeFlag
+		//	static bool FirstCall( true ); // changed to GetEnvironmentFirstCall
+		//static bool PrntEnvHeaders( true ); 
+		////////////////////////////////////////////////
 		int Loop;
 		std::string StDate;
 		std::string EnDate;
@@ -701,7 +716,7 @@ namespace WeatherManager {
 		std::string kindOfRunPeriod;
 		Real64 GrossApproxAvgDryBulb;
 
-		if ( BeginSimFlag && FirstCall ) {
+		if ( BeginSimFlag && GetEnvironmentFirstCall ) {
 
 			PrintEndDataDictionary = true;
 
@@ -755,15 +770,15 @@ namespace WeatherManager {
 				SetupEMSActuator( "Weather Data", "Environment", "Wind Direction", "[deg]", EMSWindDirOverrideOn, EMSWindDirOverrideValue );
 			}
 
-			FirstCall = false;
+			GetEnvironmentFirstCall = false;
 
 		} // ... end of BeginSimFlag IF-THEN block.
 
-		if ( GetInputFlag ) {
+		if ( GetBranchInputOneTimeFlag ) {
 
 			SetupInterpolationValues();
 			TimeStepFraction = 1.0 / double( NumOfTimeStepInHour );
-
+			rhoAirSTP = Psychrometrics::PsyRhoAirFnPbTdbW( stdAtmosphericPressure, constant_twenty, constant_zero );
 			OpenWeatherFile( ErrorsFound ); // moved here because of possibility of special days on EPW file
 			CloseWeatherFile();
 			ReadUserWeatherInput();
@@ -774,7 +789,7 @@ namespace WeatherManager {
 					ErrorsFound = true;
 				}
 			}
-			GetInputFlag = false;
+			GetBranchInputOneTimeFlag = false;
 			Envrn = 0;
 			if ( NumOfEnvrn > 0 ) {
 				ResolveLocationInformation( ErrorsFound ); // Obtain weather related info from input file

@@ -573,7 +573,7 @@ namespace FourPipeBeam {
 		Real64 originalTermUnitSizeHeatVDot = 0.0;
 
 		// convert rated primary flow rate to mass flow rate using standard pressure and dry air at 20.0
-		this->mDotNormRatedPrimAir = this->vDotNormRatedPrimAir * Psychrometrics::PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0); 
+		this->mDotNormRatedPrimAir = this->vDotNormRatedPrimAir * DataEnvironment::rhoAirSTP; 
 
 		noHardSizeAnchorAvailable = false;
 
@@ -657,7 +657,7 @@ namespace FourPipeBeam {
 							/ (cpAir * 2.0) ;
 				}
 				if ( minFlow * 3.0 >= maxFlowCool ) {
-					minFlow = maxFlowCool / 3.0 ;
+					minFlow = maxFlowCool / 3.0 ; // make sure min is significantly lower than max.
 				} 
 
 				pltSizCoolNum = MyPlantSizingIndex( "four pipe beam unit", this->name, this->cWInNodeNum, this->cWOutNodeNum, ErrorsFound );

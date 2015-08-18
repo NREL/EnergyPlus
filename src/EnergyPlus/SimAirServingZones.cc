@@ -144,8 +144,19 @@ namespace SimAirServingZones {
 
 	// MODULE VARIABLE DECLARATIONS:
 	bool GetAirLoopInputFlag( true ); // Flag set to make sure you get input once
+
 	int NumOfTimeStepInDay; // number of zone time steps in a day
 
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitAirLoopsOneTimeFlag( true );
+		int TestUniqueNodesNum( 0 );
+		bool SizeAirLoopsOneTimeFlag( true );
+	}
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
 
@@ -161,6 +172,15 @@ namespace SimAirServingZones {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state()
+	{
+		GetAirLoopInputFlag = true;
+		InitAirLoopsOneTimeFlag = true;
+		SizeAirLoopsOneTimeFlag = true;
+		NumOfTimeStepInDay = 0;
+		TestUniqueNodesNum = 0;
+	}
 
 	void
 	ManageAirLoops(
@@ -397,7 +417,9 @@ namespace SimAirServingZones {
 		static bool SplitterExists( false ); // TRUE if there is a slitter in a primary air system
 		static bool MixerExists( false ); // TRUE if there is a mixer in a primary air system
 		bool errFlag;
-		static int TestUniqueNodesNum( 0 );
+		/////////// hoisted into namespace 
+		//static int TestUniqueNodesNum( 0 );
+		///////////////////////////
 		int NumOASysSimpControllers; // number of simple controllers in the OA Sys of an air primary system
 		int NumOASysControllers; // total number of controllers in the OA Sys
 		int OASysContListNum; // index of the controller list of the OA Sys
@@ -1366,7 +1388,9 @@ namespace SimAirServingZones {
 
 		//Simulation Flags
 		static bool MyEnvrnFlag( true );
-		static bool MyOneTimeFlag( true );
+		/////////// hoisted into namespace InitAirLoopsOneTimeFlag////////////
+		//static bool MyOneTimeFlag( true );
+		///////////////////////////
 		static bool MyBranchSizingFlag( true );
 		bool ErrorsFound;
 		static Real64 OAReliefDiff( 0.0 ); // local for massflow change across OA system, kg/s
@@ -1379,7 +1403,7 @@ namespace SimAirServingZones {
 		AirLoopInit = true;
 
 		// Do the one time initializations
-		if ( MyOneTimeFlag ) {
+		if ( InitAirLoopsOneTimeFlag ) {
 
 			// Figure out what zones are served by each primary air system (air loop) and
 			// store the results in AirToZoneNodeInfo()%CoolCtrlZoneNums and AirToZoneNodeInfo()%HeatCtrlZoneNums
@@ -1760,7 +1784,7 @@ namespace SimAirServingZones {
 				}
 			}
 
-			MyOneTimeFlag = false;
+			InitAirLoopsOneTimeFlag = false;
 
 			CtrlZoneNumsCool.deallocate();
 			CtrlZoneNumsHeat.deallocate();
@@ -3255,11 +3279,13 @@ namespace SimAirServingZones {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
+		/////////// hoisted into namespace SizeAirLoopsOneTimeFlag
+		//static bool MyOneTimeFlag( true );
+		///////////////////////////
 
-		if ( MyOneTimeFlag ) {
+		if ( SizeAirLoopsOneTimeFlag ) {
 			SetUpSysSizingArrays();
-			MyOneTimeFlag = false;
+			SizeAirLoopsOneTimeFlag = false;
 		}
 
 	}

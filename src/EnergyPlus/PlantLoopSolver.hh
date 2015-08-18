@@ -85,6 +85,8 @@ namespace PlantLoopSolver {
 	};
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	PlantHalfLoopSolver(

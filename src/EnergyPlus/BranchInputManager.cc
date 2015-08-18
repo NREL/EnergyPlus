@@ -91,6 +91,15 @@ namespace BranchInputManager {
 
 	std::string CurrentModuleObject; // for ease in getting objects
 
+
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool GetBranchInputOneTimeFlag( true );
+	}
 	//SUBROUTINE SPECIFICATIONS FOR MODULE BranchInputManager
 	//PUBLIC  TestAirPathIntegrity
 	//PRIVATE TestSupplyAirPathIntegrity
@@ -119,6 +128,7 @@ namespace BranchInputManager {
 		GetMixerInputFlag = true ; // Flag used to retrieve Input
 		GetConnectorListInputFlag = true ; // Flag used to retrieve Input
 		InvalidBranchDefinitions = true ;
+		GetBranchInputOneTimeFlag = true;
 		BranchList.deallocate(); // Branch List data for each Branch List
 		Branch.deallocate(); // Branch Data for each Branch
 		ConnectorLists.deallocate(); // Connector List data for each Connector List
@@ -1591,7 +1601,9 @@ namespace BranchInputManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // Set for first time call
+		//////////// hoisted into namespace changed GetBranchInputOneTimeFlag////////////
+		// static bool GetInputFlag( true ); // Set for first time call
+		////////////////////////////////////////////////
 		int Count; // Loop Counter
 		int BCount; // Actual Num of Branches
 		int Comp; // Loop Counter
@@ -1616,7 +1628,7 @@ namespace BranchInputManager {
 		int PressureCurveType;
 		int PressureCurveIndex;
 
-		if ( GetInputFlag ) {
+		if ( GetBranchInputOneTimeFlag ) {
 			CurrentModuleObject = "Branch";
 			NumOfBranches = GetNumObjectsFound( CurrentModuleObject );
 			if ( NumOfBranches > 0 ) {
@@ -1754,7 +1766,7 @@ namespace BranchInputManager {
 					InvalidBranchDefinitions = true;
 				}
 				TestInletOutletNodes( ErrFound );
-				GetInputFlag = false;
+				GetBranchInputOneTimeFlag = false;
 			}
 		}
 

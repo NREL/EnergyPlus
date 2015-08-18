@@ -212,7 +212,7 @@ namespace OutputProcessor {
 		int LHourP( -1 ); // Helps set hours for timestamp output
 		Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
 		Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
-		int GetMeterIndexFirstCall( true ); //trigger setup in GetMeterIndex
+		bool GetMeterIndexFirstCall( true ); //trigger setup in GetMeterIndex
 	}
 
 	// All routines should be listed here whether private or not

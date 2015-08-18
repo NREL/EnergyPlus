@@ -53,6 +53,18 @@
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/HeatBalanceAirManager.hh>
+#include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/PlantLoopSolver.hh>
 
 #include <fstream>
 #include <algorithm>
@@ -118,6 +130,18 @@ namespace EnergyPlus {
 		OutputReportPredefined::clear_state();
 		DataZoneEnergyDemands::clear_state();
 		DataHeatBalFanSys::clear_state();
+		EMSManager::clear_state();
+		DataRuntimeLanguage::clear_state();
+		InternalHeatGains::clear_state();
+		ZoneTempPredictorCorrector::clear_state();
+		ZoneEquipmentManager::clear_state();
+		HeatBalanceAirManager::clear_state();
+		SolarShading::clear_state();
+		SplitterComponent::clear_state();
+		ZoneAirLoopEquipmentManager::clear_state();
+		SimAirServingZones::clear_state();
+		WaterCoils::clear_state();
+		PlantLoopSolver::clear_state();
 
 		{ 
 			IOFlags flags; 

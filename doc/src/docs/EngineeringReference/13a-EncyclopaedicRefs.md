@@ -458,7 +458,7 @@ Note that the terminal unit output is never explicitly passed to another routine
 
 No specific references.
 
-### Four Pipe Beam Unit (AirTerminal::SingleDuct:ConstantVolume:FourPipeBeam)
+### Four Pipe Beam Unit (AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam)
 
 The four pipe beam air terminal units are ceiling-mounted, beam-type units that are provided with primary air from a central system and additional heating or cooling by inducing room air to flow over a hydronic convector.  They are called *four pipe* because the units are connected with two pipes for chilled water supply and return and another two pipes for hot water supply and return.  A simple empirical model is used to enable using input data derived from manufacturer’s catalog data.  
 
@@ -828,6 +828,12 @@ The residual is calculated by evaluating the entire model to determine the total
 <div>$$ {residuum} = \left(\frac{ ({\dot Q_{Zone, Required}} - {\dot Q_{Tot}} )}{{\dot Q_{Zone, Required}}}\right) $$</div>
 
 After the solvers have run and the final sizes for the four pipe beam have been determined, there is one more step taken to make further adjustments in the central sizing data structures for sizing air system components.  The usual methods of sizing the main AirLoopHVAC branch and fans are not able account for the methods used to size the four pipe beam. When the Sizing:System object was set to use *VentilationRequirement*, the air handler will be too small.  When the Sizing:System object was set to use *Sensible*, the air handler will be too large.  The system sizing calculations have already been completed at the time the four pipe beam air terminals are sized so we need to make some adjustments.  The final primary supply air flow rate size is compared to the original final zone sizes for the air terminal unit and the air loop sizes adjusted to make up for the difference.  A sizing report item called "AirLoopHVAC Design Supply Air Flow Rate Adjustment [m3/s]" is generated for each four pipe beam that shows the magnitude of the adjustment to data structure values used to size central air systems.  Therefore when autosizing air handlers with four pipe beams, it is expected that the outcomes for air system sizes will not agree with the system sizing reporting because of the differences introduced by this adjustment.  
+
+#### Developing Model Input From Catalog Data
+
+An example is presented showing how manufacturer’s data can be converted into the input data for the proposed model.  The following example is for a Trox active DID632A product with a type “H” nozzle, where the rating point has been chosen based on a 6 foot active length and 140 CFM primary rate with other rating conditions as listed in the catalog data.  The EnergyPlus IDF input for this example is show as the example in the in the Input Output reference description of the four pipe beam. 
+ 
+
 
 ### Cooled Beam Unit (AirTerminal:SingleDuct:ConstantVolume:CooledBeam)
 

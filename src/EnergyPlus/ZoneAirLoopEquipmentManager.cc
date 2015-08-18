@@ -76,6 +76,11 @@ namespace ZoneAirLoopEquipmentManager {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ZoneAirLoopEquipmentManager
 
 	// Functions
+	void
+	clear_state()
+	{
+		GetAirDistUnitsFlag = true;
+	}
 
 	void
 	ManageZoneAirLoopEquipment(
