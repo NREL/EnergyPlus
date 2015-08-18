@@ -1960,8 +1960,6 @@ namespace LowTempRadiantSystem {
 		Real64 WaterVolFlowMaxDes;		// Design water volume flow rate for reproting
 		Real64 WaterVolFlowMaxUser;		// User hard-sized water volume flow rate for reproting
 
-		//Real64 CapacityPerFloorArea1; 
-
 		ErrorsFound = false;
 		IsAutoSize = false;
 		DesCoilLoad = 0.0;
@@ -1976,7 +1974,6 @@ namespace LowTempRadiantSystem {
 		DataScalableCapSizingON = false;
 		DataFracOfAutosizedHeatingCapacity = 1.0;
 		OpMode = 1;
-		//CapacityPerFloorArea1 = 0.0;
 
 		if ( SystemType == ElectricSystem ) {
 
@@ -2029,8 +2026,6 @@ namespace LowTempRadiantSystem {
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
 							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad * ElecRadSys( RadSysNum ).ScaledHeatingCapacity;
-							//DataFracOfAutosizedHeatingCapacity = ElecRadSys( RadSysNum ).ScaledHeatingCapacity;
-							//TempSize = AutoSize;
 							DataScalableCapSizingON = true;
 						} else {
 							TempSize = ElecRadSys( RadSysNum ).ScaledHeatingCapacity;
@@ -2040,9 +2035,6 @@ namespace LowTempRadiantSystem {
 						DataConstantUsedForSizing = 0.0;
 						DataFractionUsedForSizing = 0.0;
 						DataScalableCapSizingON = false;
-
-						//CapacityPerFloorArea1 = TempSize / Zone( ElecRadSys( RadSysNum ).ZonePtr ).FloorArea;
-						//CapacityPerFloorArea1 = 15000.0 / TempSize;
 					}
 					
 				}
@@ -2103,8 +2095,6 @@ namespace LowTempRadiantSystem {
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
 							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad * HydrRadSys( RadSysNum ).ScaledHeatingCapacity;
-							//DataFracOfAutosizedHeatingCapacity = HydrRadSys( RadSysNum ).ScaledHeatingCapacity;
-							//TempSize = AutoSize;
 							DataScalableCapSizingON = true;
 						} else {
 							TempSize = HydrRadSys( RadSysNum ).ScaledHeatingCapacity;
@@ -2114,9 +2104,6 @@ namespace LowTempRadiantSystem {
 						DataConstantUsedForSizing = 0.0;
 						DataFractionUsedForSizing = 0.0;
 						DataScalableCapSizingON = false;
-
-						//CapacityPerFloorArea1 = DesCoilLoad / Zone( HydrRadSys( RadSysNum ).ZonePtr ).FloorArea;
-
 					} else {
 						DesCoilLoad = 0.0;
 					}
@@ -2220,8 +2207,6 @@ namespace LowTempRadiantSystem {
 							ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
 							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
 							TempSize = ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad * HydrRadSys( RadSysNum ).ScaledCoolingCapacity;
-							//DataFracOfAutosizedCoolingCapacity = HydrRadSys( RadSysNum ).ScaledCoolingCapacity;
-							//TempSize = AutoSize;
 							DataScalableCapSizingON = true;
 
 						} else {
@@ -2229,8 +2214,6 @@ namespace LowTempRadiantSystem {
 						}
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 						DesCoilLoad = TempSize;
-						// CapacityPerFloorArea1 = DesCoilLoad / Zone( HydrRadSys( RadSysNum ).ZonePtr ).FloorArea;
-
 						DataConstantUsedForSizing = 0.0;
 						DataFractionUsedForSizing = 0.0;
 						DataScalableCapSizingON = false;
