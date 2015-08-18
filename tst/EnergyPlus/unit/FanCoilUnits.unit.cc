@@ -25,7 +25,6 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
-
 #include "Fixtures/HVACFixture.hh"
 
 using namespace ObjexxFCL;
@@ -51,7 +50,6 @@ using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 using General::TrimSigDigits;
 using MixedAir::OAMixer;
 using General::JulianDay;
-
 
 namespace EnergyPlus {
 	TEST_F( HVACFixture, MultiStage4PipeFanCoilHeatingTest ) {
@@ -238,7 +236,6 @@ namespace EnergyPlus {
 		Node( OAMixer( 1 ).InletNode ).Temp = 10.0;
 		Node( OAMixer( 1 ).InletNode ).Enthalpy = 18000;
 		Node( OAMixer( 1 ).InletNode ).HumRat = PsyWFnTdbH( Node( OAMixer( 1 ).InletNode ).Temp, Node( OAMixer( 1 ).InletNode ).Enthalpy );
-
 
 		Node( FanCoil( 1 ).AirInNode ).MassFlowRate = AirMassFlow;
 		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMin = AirMassFlow;

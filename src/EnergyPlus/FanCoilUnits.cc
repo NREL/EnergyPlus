@@ -2200,12 +2200,13 @@ namespace FanCoilUnits {
 	}
 
 	void
-		SimMultiStage4PipeFanCoil(
+	SimMultiStage4PipeFanCoil(
 		int & FanCoilNum, // number of the current fan coil unit being simulated
 		int const ZoneNum, // number of zone being served
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & PowerMet // Sensible power supplied (W)
-		) {
+	) 
+	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Bereket Nigusse
@@ -2226,20 +2227,8 @@ namespace FanCoilUnits {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using Psychrometrics::PsyHFnTdbW;
 		using DataHeatBalFanSys::TempControlType;
-		using General::TrimSigDigits;
 		using PlantUtilities::SetComponentFlowRate;
-		using WaterCoils::WaterCoil;
-		using WaterCoils::UpdateWaterCoil;
-		using Psychrometrics::PsyHFnTdbW;
-		using Psychrometrics::PsyTdbFnHW;
-		using Psychrometrics::PsyTsatFnHPb;
-		using Psychrometrics::PsyWFnTdbH;
-		using DataEnvironment::OutBaroPress;
-		using General::SolveRegulaFalsi;
-		using DataGlobals::WarmupFlag;
-		using SingleDuct::SimATMixer;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2528,7 +2517,7 @@ namespace FanCoilUnits {
 	}
 
 	void
-		CalcMultiStage4PipeFanCoil(
+	CalcMultiStage4PipeFanCoil(
 		int & FanCoilNum, // number of the current fan coil unit being simulated
 		int const ZoneNum, // number of zone being served
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -2536,7 +2525,8 @@ namespace FanCoilUnits {
 		Real64 & SpeedRatio, // fan coil speed ratio
 		Real64 & PartLoadRatio, // fan coil part load ratio
 		Real64 & PowerMet // Sensible power supplied (W)
-		) {
+	)
+	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Bereket Nigusse
@@ -2559,23 +2549,10 @@ namespace FanCoilUnits {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using Psychrometrics::PsyHFnTdbW;
 		using DataHeatBalFanSys::TempControlType;
-		using General::TrimSigDigits;
 		using PlantUtilities::SetComponentFlowRate;
-		using WaterCoils::WaterCoil;
-		using WaterCoils::UpdateWaterCoil;
-		using Psychrometrics::PsyHFnTdbW;
-		using Psychrometrics::PsyTdbFnHW;
-		using Psychrometrics::PsyTsatFnHPb;
-		using Psychrometrics::PsyWFnTdbH;
-		using Psychrometrics::PsyCpAirFnWTdb;
-		using DataEnvironment::OutBaroPress;
-		using General::SolveRegulaFalsi;
-		using DataGlobals::WarmupFlag;
-		using MixedAir::SimOAMixer;
-		using SingleDuct::SimATMixer;
-		using DataZoneEquipment::ZoneEquipConfig;
+		using General::TrimSigDigits;
+
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
