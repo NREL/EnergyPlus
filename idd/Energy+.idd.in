@@ -688,24 +688,27 @@ ZoneAirMassFlowConservation,
        \note and source zones if there is at least one mixing object defined. The default input
        \note is “No”. (Note that “No” input may also results in balanced flow depending on the
        \note system specified).
-  A2;  \field Source Zone Infiltration Treatment
+  A2,  \field Infiltration Balancing Method
        \note This input field allows user to choose how zone infiltration flow is treated during
        \note the zone air mass flow balance calculation.
        \type choice
        \key AddInfiltrationFlow
        \key AdjustInfiltrationFlow
        \default AddInfiltrationFlow
-       \note It has two choice KEYs: “AddInfiltrationFlow” and “AdjustInfiltrationFlow”.  If this
-       \note input is specified as “AddInfiltrationFlow”, then energy plus adds infiltration air
-       \note mass flow on top of the base flow, which is calculated using the infiltration object
-       \note user inputs, in order to balance the zone air mass flow.  The additional infiltration
-       \note air mass flow is not self-balanced.  If this input is specified as
-       \note “AdjustInfiltrationFlow”, then energy plus may adjust the base flow calculated using
-       \note the infiltration object user inputs in order to balance the zone air mass flow. If it
-       \note is not required to adjust the base infiltration air flow calculated from the user
-       \note specified infiltration object inputs, then the base infiltration air mass flow
-       \note is assumed self-balanced. If the above input field specified as "No", then this input
-       \note field has no impact on the simulation.
+       \note AddInfiltrationFlow may add infiltration to the base flow specified in the
+       \note infiltration object to balance the zone air mass flow. The additional infiltration
+       \note air mass flow is not self-balanced. The base flow is assumed to be self-balanced.
+       \note AdjustInfiltrationFlow may adjust the base flow calculated using
+       \note the base flow specified in the infiltration object to balance the zone air mass flow. If it
+       \note If no adjustment is required, then the base infiltration is assumed to be self-balanced. 
+  A3;  \field Infiltration Balancing Zones
+       \note This input field allows user to choose which zones are included in infiltration balancing.
+       \note MixingSourceZonesOnly allows infiltration balancing only in zones which as source zones for mixing
+       \note AllZones allows infiltration balancing in any zone.
+       \type choice
+       \key MixingSourceZonesOnly
+       \key AllZones
+       \default MixingSourceZonesOnly
 
 ZoneCapacitanceMultiplier:ResearchSpecial,
        \unique-object

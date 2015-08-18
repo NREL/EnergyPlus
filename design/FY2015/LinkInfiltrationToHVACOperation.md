@@ -28,7 +28,8 @@ NEW FIELD --> SPACE1-1 In Node;        !- Zone Return Air Flow Rate Basis Node o
 
   ZoneAirMassFlowConservation,
     Yes,                     !- Adjust Zone Mixing For Zone Air Mass Flow Balance
-NEW KEY CHOICE --> AdjustInfiltrationFlowAllZones;     !- Source Zone Infiltration Treatment
+NEW FIELD NAMDE -->    AdjustInfiltrationFlowAllZones,     !- Infiltration Balancing Method
+NEW FIELD --> AllZones;      !- Infiltration Balancing Zones [AllZones or MixingS?ourceZonesOnly]
 
 ```
 
