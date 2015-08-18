@@ -5215,7 +5215,7 @@ namespace DXCoils {
 			HPInletAirHumRat = PsyWFnTdbTwbPb( DXCoil( DXCoilNum ).RatedInletDBTemp, DXCoil( DXCoilNum ).RatedInletWBTemp, StdBaroPressSeaLevel, RoutineName );
 			HPWHInletDBTemp = DXCoil( DXCoilNum ).RatedInletDBTemp;
 			HPWHInletWBTemp = DXCoil( DXCoilNum ).RatedInletWBTemp;
-			DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 ) = DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) * PsyRhoAirFnPbTdbW( StdBaroPressSeaLevel, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, RoutineName );
+			DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 ) = DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) * PsyRhoAirFnPbTdbW( StdBaroPress, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, RoutineName );
 			//   get rated coil bypass factor excluding fan heat
 			FanElecPower = 0.0;
 			//   call CalcHPWHDXCoil to determine DXCoil%RatedTotCap(1) for rated CBF calculation below
@@ -5225,7 +5225,8 @@ namespace DXCoils {
 				MySizeFlag( DXCoilNum ) = false;
 			}
 
-			DXCoil( DXCoilNum ).RatedCBF( 1 ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( 1 ), DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 ), DXCoil( DXCoilNum ).RatedSHR( 1 ), StdBaroPressSeaLevel );
+			Real64 const RatedAirMassFlowRateSeaLevel = DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) * PsyRhoAirFnPbTdbW( StdBaroPressSeaLevel, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, RoutineName );
+			DXCoil( DXCoilNum ).RatedCBF( 1 ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( 1 ), RatedAirMassFlowRateSeaLevel, DXCoil( DXCoilNum ).RatedSHR( 1 ), StdBaroPressSeaLevel );
 			MyEnvrnFlag( DXCoilNum ) = false;
 		}
 
