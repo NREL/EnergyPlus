@@ -1,0 +1,163 @@
+# Link Infiltration to HVAC System Operation - Design
+
+**Michael J. Witte, GARD Analytics, Inc.**
+
+ - Original August 7, 2015
+
+ 
+
+## Data Structures ##
+```[C++]
+DataHeatBalance.hh
+	struct ZoneAirMassFlowConservation 
+	{
+		// Members
+		bool EnforceZoneMassBalance;     // flag to enforce zone air mass conservation
+		int InfiltrationTreatment;       // determines how infiltration is treated for zone mass balance
+		//Note, unique global object
+
+DataHeatBalance.cc
+	// Parameter for source zone air flow mass balance infiltration treatment
+	int const AddInfiltrationFlow( 1 );
+	int const AdjustInfiltrationFlow( 2 );
+```
+*Add new parameter*
+```[C++]
+	int const AdjustInfiltrationFlowAllZones( 3 );
+```
+```[C++]
+
+DataZoneEquipment.hh
+	struct EquipConfiguration
+	{
+		// Members
+		std::string ZoneName;
+		int ActualZoneNum; // index into the Zone data
+		std::string EquipListName;
+		int EquipListIndex;
+		std::string ControlListName;
+		int ZoneNode;
+		int ReturnAirNode;
+		int NumInletNodes;
+		int NumExhaustNodes;
+		bool FlowError; // flow error flag
+		Array1D_int InletNode; // zone supply air inlet nodes
+		Array1D_int ExhaustNode; // zone air exhaust nodes
+		int ReturnZonePlenumCondNum; // number of the zone's return air plenum
+		int AirLoopNum; // the air loop index for this controlled zone
+		int FanOpMode; // =0 if no central sys;
+		// -1 if central sys is in cycling fan mode;
+		// =2 if central sysis in constant fan mode.
+		bool ZonalSystemOnly; // TRUE if served by a zonal system (only)
+		bool IsControlled; // True when this is a controlled zone.
+		Real64 ZoneExh; // zone exhaust (unbalanced+balanced) mass flow rate [kg/s]
+		Real64 ZoneExhBalanced; // balanced zone exhaust mass flow rate [kg/s]
+		Real64 PlenumMassFlow; // zone air mass flow rate induced from plenum [kg/s]
+		// AirDistUnitCool and AirDistUnitHeat
+		// do not correspond with the AIR DISTRIBUTION UNIT object in the zone equipment list.
+		// AirDistUnitCool/AirDistUnitHeat, may represent a DIRECT AIR object,
+		// or the cold/hot side of AIR DISTRIBUTION
+		// UNIT object.  That is both AirDistUnitHeat and AirDistUnitCool are required to describe a dual
+		// duct AIR DISTRIBUTION object in the ZoneEquipList.  Although only one AIR DISTRIBUTION UNIT is
+		// allowed in ZoneEquipList, two instances of that object may exist in this data structure
+		Array1D< AirIn > AirDistUnitHeat; // dimensioned to number of zone inlet nodes
+		Array1D< AirIn > AirDistUnitCool; // dimensioned to number of zone inlet nodes.
+		bool SupLeakToRetPlen; // True if there is supply duct leak to the
+		// plenum (simple duct leakage model)
+		bool InFloorActiveElement; // Convection adapation, true if zone has in-floor HVAC
+		bool InWallActiveElement; // Convection adapation, true if zone has in-wall HVAC
+		bool InCeilingActiveElement; // Convection adapation,
+		// true when zone has in-ceiling HVAC
+```
+*Add new data to EquipConfiguration*
+```[C++]
+		// return node flow controls
+		Array1D_int ReturnFlowBasisNode; // return air flow rate basis nodes
+        int ReturnFlowSchedPtr; // return air flow schedule
+```
+
+## Code Structure ##
+
+*Existing (not expected to change)*
+
+#### SimulationManager.cc
+* Resimulate
+   - Note: calls CalcAirFlowSimple
+
+####HeatBalanceManager.cc
+* GetProjectControlData
+   - Note: Gets input for ZoneAirMassConservation and many other objects (should be separated out)
+
+####HeatBalanceAirManager.cc
+* GetAirHeatBalanceInput
+   * SetZoneMassConservationFlag
+      - Note: sets the zone mass conservation flag to true  
+* GetSimpleAirModelInputs
+   - Note: After processing simple airflow inputs (ZoneVentilation, ZoneInfiltration, etc.) there are several related loops (most of these should probably be separated out from this function?)
+      - a loop gets pointers to the mixing objects serving source zones
+      - a loop determines which zones are source zones for mixing objects
+      - a loop determines which zones are receiving zones for mixing objets
+      - a loop gets pointers to the mixing objects serving receiving zones
+      - a pair of loops sets up the ZoneReOrder list with receiving zones first then source zones (*not sure what happens if a given zone is both*)
+      - a loop sets up output variables related to zone mass conservation
+      - a loop sets up Zone Mass Balance Infiltration Air Mass Flow Rate output variable
+      - a loop at the end of this routine checks if every source zone has an infiltration object to use for balancing, throws a severe/fatal error if not.
+* InitSimpleMixingConvectiveHeatGains
+   - Note: After current mixing flows are set, if zone air mass flow balance enforced calculate the fraction of contribution of each mixing object to a zone mixed flow rate (should be separated out?)
+
+####HVACStandAloneERV.cc
+* CalcStandAloneERV
+   - When ZoneAirMassFlow.EnforceZoneMassBalance is true, unbalanced airflow warning is supressed
+
+####ZoneEquipmentManager.cc
+* SimZoneEquipment
+   - Calls CalcAirFlowSimple with AdjustZoneMixingFlowFlag
+      - adjusts mixing and infiltration flow rates depending on settings
+      - uses Infiltration(j).MassFlowRate for adjusted infiltration which as been set in CalcZoneMassBalance same as MassConservation(ZoneNum).InfiltrationMassFlowRate - so why not use that?  That *is* used for *add* infiltration.  Confused here.  Mixing(j).MixingMassFlowRate is used the same way.
+   - Unbalanced exhaust flow warnings are supressed if ZoneAirMassFlow.EnforceZoneMassBalance is true
+   - Calls CalcZoneMassBalance
+      - This is the heart of the air mass flow balance calcs
+      - Calls CalcZoneMixingFlowRateOfReceivingZone
+         - updates receiving zone mixing flow rates
+         - Calls CalcZoneMixingFlowRateOfSourceZone
+            - updates source zone mixing flow rates
+      - calculates infiltration adjustments
+      - calculates BuildingZoneMixingFlow
+      - **calculates return air node mass flow rate Node(RetNode).MassFlowRate**
+      - iterates to achieve balance up to IterMax (25)
+
+*CalcAirFlowSimple is called from several places*
+   - HVACManager.cc(328):		CalcAirFlowSimple();
+   - HVACManager.cc(386):				CalcAirFlowSimple( SysTimestepLoop );
+   - SimulationManager.cc(2796):		CalcAirFlowSimple( 0, ZoneAirMassFlow.EnforceZoneMassBalance );
+     - second argument seems wrong here - this is insides if ( ResimHVAC ) - may be incorrect arguments
+     - Checking the history, this used to pass AdjustZoneMixingFlowFlag = true when ZoneAirMassFlow.EnforceZoneMassBalance was true, so this was collapsed (along with other changes to the arguments) to simply pass ZoneAirMassFlow.EnforceZoneMassBalance. The name of this argument is misleading, because it controls adjustments of both mixing and infiltration within CalcAirFlowSimple.  The usage appears to be OK, however.
+   - ZoneEquipmentManager.cc(2690):			CalcAirFlowSimple( 0, AdjustZoneMixingFlowFlag );
+      - here, AdjustZoneMixingFlowFlag is simply a constant that is always true, the call is within an if ( ZoneAirMassFlow.EnforceZoneMassBalance ) with no else.
+
+## Output ##
+*No new outputs are proposed*
+
+Zone Infiltration Mass Flow Rate [kg/s]", ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilMdot
+MCpI_temp = Infiltration(j).VolumeFlowRate \* AirDensity \* CpAir;
+ADJUSTInfiltration: Infiltration(j).VolumeFlowRate = Infiltration(j).MassFlowRate / AirDensity;
+OR
+ADDInfiltration:  Infiltration(j).VolumeFlowRate = Infiltration(j).VolumeFlowRate + MassConservation(NZ).InfiltrationMassFlowRate / AirDensity;
+
+"Zone Mass Balance Infiltration Air Mass Flow Rate [kg/s]", MassConservation(Infiltration(Loop).ZonePtr).InfiltrationMassFlowRate
+
+
+So, if adjustinfiltration is active,
+In CalcZoneMassBalance
+MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
+Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate = ZoneInfiltrationMassFlowRate
+
+In CalcAirFlowSimple
+Infiltration(j).VolumeFlowRate = Infiltration(j).MassFlowRate / AirDensity;
+
+
+## Proposed Changes ##
+1. Currently, only zones with mixing objects (as source or receiving) are included in the zone mass balance.  Adjustment of infiltration will be extended to all zones when the AdjustInfiltrationFlowAllZones option is specified. **CalcZoneMassBalance and probably other functions.**
+2. *Possible bug?* Currently, there does not appear to be any impact on the reported zone infiltration flow rate. It's not clear if infiltration and mixing adjustments are having an impact on the zone heat balance.  If not, this will be fixed. **Change calls to CalcAirFlowSimple**
+3. Add input fields for user control of return air flow rate.  This adusted return flow rate should automatically flow into the zone air mass balance calculations. **DataZoneEquipment::GetZoneEquipmentData1 and CalcZoneMassBalance.**
+
