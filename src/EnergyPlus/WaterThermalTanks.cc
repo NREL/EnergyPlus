@@ -3703,8 +3703,8 @@ namespace WaterThermalTanks {
 												} // EquipmentTypeNum
 												if ( TankNotLowestPriority && FoundTankInList ) {
 													ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
-													ShowContinueError( "Heat pump water heaters must have lower priorities than all other equipment types in a ZoneHVAC:EquipmentList." );
-													ErrorsFound = true;
+													ShowContinueError( "Heat pump water heaters should be simulated first, before other space conditioning equipment." );
+													ShowContinueError( "Poor temperature control may result if the Heating/Cooling sequence number is not 1 in the ZoneHVAC:EquipmentList." );
 												}
 												break;
 											} // ZoneEquipConfigNum .LE. NumOfZoneEquipLists
