@@ -1665,10 +1665,8 @@ namespace FanCoilUnits {
 				mdot = 0.0;
 				SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
 				// obtain unit output with no active heating/cooling
-				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC );
-			} else {
-				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, 0.0 ); // needs PLR=0 for electric heating coil, otherwise will run at full capacity
 			}
+			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, 0.0 );
 
 			// get the loads at the coils
 			QCoilHeatSP = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP - QUnitOutNoHC;
@@ -1677,7 +1675,7 @@ namespace FanCoilUnits {
 				// get full load result
 				mdot = FanCoil( FanCoilNum ).MaxColdWaterFlow;
 				SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
-				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMaxHC, _, ElectricHeaterControl );
+				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMaxHC );
 				if ( QUnitOutMaxHC < QCoilCoolSP ) {
 					// more cooling than required, find reduced water flow rate to meet the load
 					ControlNode = FanCoil( FanCoilNum ).ColdControlNode;
@@ -1780,10 +1778,8 @@ namespace FanCoilUnits {
 			if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 				mdot = 0.0;
 				SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
-				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC );
-			} else {
-				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, 0.0 ); // needs PLR=0 for electric heating coil, otherwise will run at full capacity
 			}
+			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, 0.0 ); // needs PLR=0 for electric heating coil, otherwise will run at full capacity
 
 			if ( UnitOn && ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToCoolSP < ( -1.0 * SmallLoad ) && TempControlType( ZoneNum ) != SingleHeatingSetPoint ) {
 				// cooling coil action, maximum cold water flow
@@ -1794,7 +1790,7 @@ namespace FanCoilUnits {
 				ControlOffset = FanCoil( FanCoilNum ).ColdControlOffset;
 
 				// get the maximum output of the fcu
-				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMax, _, ElectricHeaterControl );
+				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMax );
 
 				if ( QUnitOutMax < 0.0 ) { // protect against QUnitOutMax = 0 (no water flow, plant off, etc.)
 					// calculate the PLR, if load greater than output, PLR = 1 (output = max)
@@ -1807,7 +1803,7 @@ namespace FanCoilUnits {
 						//    Node(FanCoil(FanCoilNum)%ColdControlNode)%MassFlowRate = PLR * FanCoil(FanCoilNum)%MaxColdWaterFlow
 						mdot = PLR * FanCoil( FanCoilNum ).MaxColdWaterFlow;
 						SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
-						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR, ElectricHeaterControl );
+						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR );
 						Error = ( QZnReq - QUnitOut ) / QZnReq;
 						AbsError = QZnReq - QUnitOut;
 						DelPLR = ( QZnReq - QUnitOut ) / QUnitOutMax;
@@ -1834,7 +1830,7 @@ namespace FanCoilUnits {
 				}
 
 				// at the end calculate output with adjusted PLR
-				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR, ElectricHeaterControl );
+				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR );
 
 			} else if ( UnitOn && ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP > SmallLoad && TempControlType( ZoneNum ) != SingleCoolingSetPoint ) {
 				// heating coil action, maximun hot water flow
@@ -1940,10 +1936,8 @@ namespace FanCoilUnits {
 			if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 				mdot = 0.0;
 				SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
-				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC );
-			} else {
-				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, 0.0 ); // needs PLR=0 for electric heating coil, otherwise will run at full capacity
 			}
+			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, 0.0 ); // needs PLR=0 for electric heating coil, otherwise will run at full capacity
 
 			if ( UnitOn && ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToCoolSP < ( -1.0 * SmallLoad ) && TempControlType( ZoneNum ) != SingleHeatingSetPoint ) {
 				// cooling coil action, maximum cold water flow
@@ -1953,14 +1947,14 @@ namespace FanCoilUnits {
 				ControlOffset = FanCoil( FanCoilNum ).ColdControlOffset;
 
 				// get the maximum output of the fcu
-				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMax, _, ElectricHeaterControl );
+				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMax );
 				// calculate the PLR, if load greater than output, PLR = 1 (output = max)
 				if ( QUnitOutMax != 0.0 ) PLR = std::abs( QZnReq / QUnitOutMax );
 				if ( PLR > 1.0 ) PLR = 1.0;
 
 				// adjust the PLR to meet the cooling load calling Calc4PipeFanCoil repeatedly with the PLR adjusted
 				while ( std::abs( Error ) > ControlOffset && std::abs( AbsError ) > SmallLoad && Iter < MaxIterCycl && PLR != 1.0 ) {
-					Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR, ElectricHeaterControl );
+					Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR );
 					Error = ( QZnReq - QUnitOut ) / QZnReq;
 					AbsError = QZnReq - QUnitOut;
 					DelPLR = ( QZnReq - QUnitOut ) / QUnitOutMax;
@@ -1981,7 +1975,7 @@ namespace FanCoilUnits {
 				}
 
 				// at the end calculate output with adjusted PLR
-				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR, ElectricHeaterControl );
+				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR );
 
 			} else if ( UnitOn && ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP > SmallLoad && TempControlType( ZoneNum ) != SingleCoolingSetPoint ) {
 				// heating coil action, maximun hot water flow
@@ -2066,8 +2060,7 @@ namespace FanCoilUnits {
 		int const ControlledZoneNum, // ZoneEquipConfig index
 		bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
 		Real64 & LoadMet, // load met by unit (watts)
-		Optional< Real64 > PLR, // Part Load Ratio, fraction of time step fancoil is on
-		Optional< Real64 > ElectricHeaterControl // 1 or 0, enables or disables heating coil
+		Optional< Real64 > PLR // Part Load Ratio, fraction of time step fancoil is on
 	)
 	{
 
@@ -2118,7 +2111,7 @@ namespace FanCoilUnits {
 		Real64 AirMassFlow; // total mass flow through the unit
 		Real64 PartLoad; // if PLR present PartLoad = PLR
 		Real64 OASchedValue; // value of OASchedValue, =1 if not schedule
-		Real64 ElecHeaterControl; // 1 or 0, enables or disables heating coil
+		Real64 ElecHeaterControl( 1.0 ); // 1 or 0, enables or disables heating coil
 		// FLOW
 
 		// if PLR present in arguments, get its value, else default PLR = 1
@@ -2126,11 +2119,6 @@ namespace FanCoilUnits {
 			PartLoad = PLR;
 		} else {
 			PartLoad = 1.0;
-		}
-		if ( present( ElectricHeaterControl ) ) {
-			ElecHeaterControl = ElectricHeaterControl;
-		} else {
-			ElecHeaterControl = 1.0;
 		}
 
 		OutletNode = FanCoil( FanCoilNum ).AirOutNode;

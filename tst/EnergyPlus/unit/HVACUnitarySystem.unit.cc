@@ -233,6 +233,7 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 	//	int const FractionOfAutosizedCoolingCapacity( 11 );
 	//	int const FractionOfAutosizedHeatingCapacity( 12 );
 
+	HVACUnitarySystem::NumUnitarySystem = 50; // trick code so that UnitarySystemNumericFields.deallocate(); does not occur within code called from unit test
 	InitializePsychRoutines();
 	FinalZoneSizing.allocate( 1 );
 	ZoneEqSizing.allocate( 1 );
@@ -245,8 +246,7 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 	CurOASysNum = 0;
 	CurZoneEqNum = 1;
 
-	UnitarySystem.allocate( 1 );
-	HVACUnitarySystem::boolNotAUnitTest = false; // will deallocate UnitarySystemNumericFields when true and cause this unit test to crash
+	UnitarySystem.allocate( HVACUnitarySystem::NumUnitarySystem );
 	UnitarySystem( UnitarySysNum ).UnitarySystemType = "AirLoopHVAC:UnitarySystem";
 	UnitarySystem( UnitarySysNum ).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
 	UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
@@ -287,10 +287,10 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 		UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = AutoSize;
 		UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = AutoSize;
 
-		// when l = 2, MaxCoolAirVolFlow is already set to 1.005 on previous call and represents floor area x flow rate ratio
-		if ( iSizingType == DataSizing::FlowPerFloorArea ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.005;
+		// for FractionOfAutosizedCoolingAirflow, set sizing data to 1.005 and UnitarySystem MaxCoolAirVolFlow to 1, they will multiply and yield 1.005
 		if ( iSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 1.005;
 		if ( iSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.0;
+		// for FlowPerCoolingCapacity, do the division so sizing will yield 1.005
 		if ( iSizingType == DataSizing::FlowPerCoolingCapacity ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.005 / 18827.616766698276;
 
 		SizeUnitarySystem( UnitarySysNum, FirstHVACIteration, AirLoopNum );
@@ -325,10 +325,10 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 		UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = AutoSize;
 		UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = AutoSize;
 
-		// when l = 2, MaxCoolAirVolFlow is already set to 1.005 on previous call and represents floor area x flow rate ratio
-		if ( iSizingType == DataSizing::FlowPerFloorArea ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.005;
+		// for FractionOfAutosizedHeatingAirflow, set sizing data to 1.005 and UnitarySystem MaxHeatAirVolFlow to 1, they will multiply and yield 1.005
 		if ( iSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 1.005;
 		if ( iSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.0;
+		// for FlowPerHeatingCapacity, do the division so sizing will yield 1.005
 		if ( iSizingType == DataSizing::FlowPerHeatingCapacity ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.005 / 15148.243236712493;
 
 		SizeUnitarySystem( UnitarySysNum, FirstHVACIteration, AirLoopNum );
@@ -373,13 +373,15 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 		UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = AutoSize;
 		UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = AutoSize;
 
-		// when l = 2, MaxCoolAirVolFlow is already set to 1.005 on previous call and represents floor area x flow rate ratio
-		if ( iSizingType == DataSizing::FlowPerFloorArea ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.005;
+		// for FractionOfAutosizedCoolingAirflow, set sizing data to 1.005 and UnitarySystem MaxCoolAirVolFlow to 1, they will multiply and yield 1.005
 		if ( iCoolingSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 1.005;
 		if ( iCoolingSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.0;
+		// for FlowPerCoolingCapacity, do the division so sizing will yield 1.005
 		if ( iCoolingSizingType == DataSizing::FlowPerCoolingCapacity ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.005 / 18827.616766698276;
+		// for FractionOfAutosizedHeatingAirflow, set sizing data to 1.005 and UnitarySystem MaxHeatAirVolFlow to 1, they will multiply and yield 1.005
 		if ( iHeatingSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 1.005;
 		if ( iHeatingSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.0;
+		// for FlowPerHeatingCapacity, do the division so sizing will yield 1.005
 		if ( iHeatingSizingType == DataSizing::FlowPerHeatingCapacity ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.005 / 1431.9234900374995;
 
 		SizeUnitarySystem( UnitarySysNum, FirstHVACIteration, AirLoopNum );
@@ -389,7 +391,6 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 		EXPECT_EQ( 1.005, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
 		EXPECT_EQ( 1.005, UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow );
 		EXPECT_EQ( 18827.616766698276, ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad );
-		// why is the heating capacity so much lower ???
 		EXPECT_EQ( 1431.9234900374995, ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad );
 
 	}
@@ -401,6 +402,7 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
+	HVACUnitarySystem::NumUnitarySystem = 0;
 	FinalZoneSizing.deallocate();
 	ZoneEqSizing.deallocate();
 	UnitarySystem.deallocate();

@@ -212,7 +212,6 @@ namespace HVACUnitarySystem {
 	Real64 QToCoolSetPt( 0.0 ); // load to cooling set point {W}
 	Real64 QToHeatSetPt( 0.0 ); // load to heating set point {W}
 	Real64 TempSteamIn( 100.0 ); // steam coil steam inlet temperature
-	bool boolNotAUnitTest( true ); // used to deallocate UnitarySystemNumericFields when sizing completes, set to false for unit tests
 
 	// Allocatable types
 	Array1D_bool CheckEquipName;
@@ -2017,7 +2016,7 @@ namespace HVACUnitarySystem {
 			DataFlowUsedForSizing = 0.0;
 		}
 
-		// STEP 3: use the greater of cooling and heating air flow rates for system flow that have both coil types
+		// STEP 3: use the greater of cooling and heating air flow rates for system flow
 		// previous version of E+ used maximum flow rate for unitary systems. Keep this methodology for now.
 		// Delete next 2 lines and uncomment 2 lines inside next if (HeatPump) statement to allow non-heat pump systems to operate at different flow rates (might require additional change to if block logic).
 		EqSizing.CoolingAirVolFlow = max( EqSizing.CoolingAirVolFlow, EqSizing.HeatingAirVolFlow );
@@ -2461,7 +2460,7 @@ namespace HVACUnitarySystem {
 
 		CoolingLoad = TempCoolingLoad;
 		HeatingLoad = TempHeatingLoad;
-		if ( ++NumUnitarySystemsSized == NumUnitarySystem && boolNotAUnitTest) UnitarySystemNumericFields.deallocate(); // remove temporary array for field names at end of sizing
+		if ( ++NumUnitarySystemsSized == NumUnitarySystem ) UnitarySystemNumericFields.deallocate(); // remove temporary array for field names at end of sizing
 
 	}
 
@@ -10514,33 +10513,37 @@ namespace HVACUnitarySystem {
 		LoopOnOffFanPartLoadRatio = UnitarySystem( UnitarySysNum ).FanPartLoadRatio;
 		LoopCompCycRatio = UnitarySystem( UnitarySysNum ).CycRatio;
 
-		if (  ! SysSizingCalc && UnitarySystem(UnitarySysNum).FirstPass ) {
+		if (  UnitarySystem(UnitarySysNum).FirstPass ) {
 
-			if ( CurOASysNum > 0 ) {
-				OASysEqSizing( CurOASysNum ).AirFlow = false;
-				OASysEqSizing( CurOASysNum ).CoolingAirFlow = false;
-				OASysEqSizing( CurOASysNum ).HeatingAirFlow = false;
-				OASysEqSizing( CurOASysNum ).Capacity = false;
-				OASysEqSizing( CurOASysNum ).CoolingCapacity = false;
-				OASysEqSizing( CurOASysNum ).HeatingCapacity = false;
-			} else if ( CurSysNum > 0 ) {
-				UnitarySysEqSizing( CurSysNum ).AirFlow = false;
-				UnitarySysEqSizing( CurSysNum ).CoolingAirFlow = false;
-				UnitarySysEqSizing( CurSysNum ).HeatingAirFlow = false;
-				UnitarySysEqSizing( CurSysNum ).Capacity = false;
-				UnitarySysEqSizing( CurSysNum ).CoolingCapacity = false;
-				UnitarySysEqSizing( CurSysNum ).HeatingCapacity = false;
-				AirLoopControlInfo( CurSysNum ).UnitarySysSimulating = false;
-			} else if ( CurZoneEqNum > 0 ) {
-				ZoneEqSizing( CurZoneEqNum ).AirFlow = false;
-				ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = false;
-				ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = false;
-				ZoneEqSizing( CurZoneEqNum ).Capacity = false;
-				ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = false;
-				ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = false;
+			if (  ! SysSizingCalc ) {
+
+				if ( CurOASysNum > 0 ) {
+					OASysEqSizing( CurOASysNum ).AirFlow = false;
+					OASysEqSizing( CurOASysNum ).CoolingAirFlow = false;
+					OASysEqSizing( CurOASysNum ).HeatingAirFlow = false;
+					OASysEqSizing( CurOASysNum ).Capacity = false;
+					OASysEqSizing( CurOASysNum ).CoolingCapacity = false;
+					OASysEqSizing( CurOASysNum ).HeatingCapacity = false;
+				} else if ( CurSysNum > 0 ) {
+					UnitarySysEqSizing( CurSysNum ).AirFlow = false;
+					UnitarySysEqSizing( CurSysNum ).CoolingAirFlow = false;
+					UnitarySysEqSizing( CurSysNum ).HeatingAirFlow = false;
+					UnitarySysEqSizing( CurSysNum ).Capacity = false;
+					UnitarySysEqSizing( CurSysNum ).CoolingCapacity = false;
+					UnitarySysEqSizing( CurSysNum ).HeatingCapacity = false;
+					AirLoopControlInfo( CurSysNum ).UnitarySysSimulating = false;
+				} else if ( CurZoneEqNum > 0 ) {
+					ZoneEqSizing( CurZoneEqNum ).AirFlow = false;
+					ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = false;
+					ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = false;
+					ZoneEqSizing( CurZoneEqNum ).Capacity = false;
+					ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = false;
+					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = false;
+				}
+
+				UnitarySystem( UnitarySysNum ).FirstPass = false;
+
 			}
-
-			UnitarySystem( UnitarySysNum ).FirstPass = false;
 
 		}
 
