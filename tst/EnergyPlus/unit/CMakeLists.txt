@@ -6,6 +6,7 @@ set( test_src
   TestHelpers/IdfParser.hh
   Fixtures/EnergyPlusFixture.cc
   Fixtures/EnergyPlusFixture.hh
+  Fixtures/GroundTempsFixture.hh
   Fixtures/HVACFixture.hh
   Fixtures/IdfParserFixture.hh
   Fixtures/InputProcessorFixture.hh
