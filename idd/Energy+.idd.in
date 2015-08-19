@@ -1734,6 +1734,37 @@ Site:GroundTemperature:Deep,
        \type real
        \default 16
        
+Site:GroundTemperature:Undisturbed:Xing,
+       \memo Undisturbed ground temperature object using the 
+       \memo Xing 2014 2 harmonic parameter model.
+  A1,  \field Name of ground temperature object
+       \required-field
+  N1,  \field Average Soil Temperature
+       \required-field
+       \type real
+       \units C
+       \note Annual average soil temperature
+  N2,  \field Surface Temperature Amplitude 1
+       \required-field
+       \type real
+       \units deltaC
+       \note First surface amplitude parameter
+  N3,  \field Phase Shift 1
+       \required-field
+       \type real
+       \units days
+       \note Phase shift of first surface amplitude parameter
+  N4,  \field Surface Temperature Amplitude 2
+       \required-field
+       \type real
+       \units deltaC
+       \note Second surface amplitude parameter
+  N5;  \field Phase Shift 2
+       \required-field
+       \type real
+       \units days
+       \note Phase shift of second surface amplitude parameter
+       
 Site:GroundTemperature:Undisturbed:KusudaAchenbach,
        \memo Undisturbed ground temperature object using the 
        \memo Kusuda-Achenbach 1965 correlation.
@@ -1761,13 +1792,6 @@ Site:GroundTemperature:Undisturbed:FiniteDifference,
        \memo detailed finite difference 1-D model
   A1,  \field Name of ground temperature object
        \required-field
-  A2,  \field Ground cover type
-       \required-field
-       \type Choice
-       \key Short Grass
-       \key Long Grass
-       \key Bare Soil
-       \default ShortGrass
   N1,  \field Soil Thermal Conductivity
        \required-field
        \type real
@@ -1789,13 +1813,24 @@ Site:GroundTemperature:Undisturbed:FiniteDifference,
        \minimum 0
        \maximum 100
        \default 30
-  N5;  \field Soil Moisture Content Volume Fraction at Saturation
+  N5,  \field Soil Moisture Content Volume Fraction at Saturation
        \type real
        \type percent
        \minimum 0
        \maximum 100
        \default 50
-
+   N6; \field Evapotranspiration Ground Cover Parameter
+       \type real
+       \minimum 0
+       \maximum 1.5
+       \default 0.4
+       \note This specifies the ground cover effects during evapotranspiration
+       \note  calculations.  The value roughly represents the following cases:
+       \note  = 0   : concrete or other solid, non-permeable ground surface material
+       \note  = 0.5 : short grass, much like a manicured lawn
+       \note  = 1   : standard reference state (12 cm grass)
+       \note  = 1.5 : wild growth       
+       
 Site:GroundDomain:Slab,
         \memo Ground-coupled slab model for on-grade and
         \memo in-grade cases with or without insulation.

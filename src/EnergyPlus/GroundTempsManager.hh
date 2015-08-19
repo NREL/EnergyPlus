@@ -17,6 +17,8 @@ namespace EnergyPlus {
 
 namespace GroundTemps {
 
+	//******************************************************************************
+
 	// Base class
 	class BaseGroundTempsModel
 	{
@@ -100,6 +102,8 @@ namespace GroundTemps {
 			Real64 saturatedWaterContent; 
 			Real64 waterContent;
 			Real64 annualAveAirTemp;
+			Real64 depth;
+			Real64 simTimeInDays;
 
 		struct instanceOfCellData {
 
@@ -205,7 +209,18 @@ namespace GroundTemps {
 			Optional_bool_const InitOnly = _
 		);
 
+		Real64
+		interpolate(
+			Real64 const x,
+			Real64 const x_hi,
+			Real64 const x_low,
+			Real64 const y_hi,
+			Real64 const y_low
+		);
+
 		Array2D< Real64 > groundTemps;
+
+		Array1D< Real64 > cellDepths;
 
 		static std::shared_ptr< FiniteDiffGroundTempsModel > FiniteDiffGTMFactory( int objectType, std::string objectName);
 

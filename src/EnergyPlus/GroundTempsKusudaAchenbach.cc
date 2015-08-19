@@ -25,13 +25,9 @@ namespace GroundTemps {
 		// METHODOLOGY EMPLOYED:
 		// Kusuda and Achenbach correlation is used
 
-		//Kusuda and Achenbach
 		// Using/Aliasing
 		using DataGlobals::SecsInDay;
 		using DataGlobals::Pi;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 term1;
@@ -54,6 +50,15 @@ namespace GroundTemps {
 		Real64 const seconds
 	)
 	{	
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Returns the ground temperature when input time is in seconds
+
 		// Set depth of temperature
 		depth = depthOfTemp;
 
@@ -72,7 +77,16 @@ namespace GroundTemps {
 		int const month
 	)
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       RE-ENGINEERED  na
 
+		// PURPOSE OF THIS SUBROUTINE:
+		// Returns the ground temperature when input time is in months
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 const aveSecondsInMonth = ( 365 / 12 ) * ( 3600 * 24 );
 
 		// Convert months to seconds. Puts 'seconds' time in middle of specified month
@@ -85,7 +99,6 @@ namespace GroundTemps {
 		// Get and return ground temperature
 		return getGroundTemp();
 	}
-
 
 	//******************************************************************************
 

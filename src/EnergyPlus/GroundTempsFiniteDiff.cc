@@ -1,4 +1,5 @@
 // C++ Headers
+#include <algorithm>
 #include <memory>
 #include <fstream> 
 
@@ -11,6 +12,7 @@
 #include <DataGlobals.hh>
 #include <DataReportingFlags.hh>
 #include <GroundTempsManager.hh>
+#include <InputProcessor.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -21,13 +23,14 @@ namespace GroundTemps {
 	
 	int daysInYear = 365;
 	int simDay = 0;
-	Real64 finalTempConvergenceCriteria = 0.01;
+	Real64 finalTempConvergenceCriteria = 0.5; // 0.01; FOR TESTING ONLY
 	Real64 iterationTempConvergenceCriteria = 0.00001;
+
+	//******************************************************************************
 
 	void
 	FiniteDiffGroundTempsModel::initAndSim()
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   Summer 2015
@@ -35,28 +38,13 @@ namespace GroundTemps {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		// Initalizes and simulated finite difference ground temps model
 
 		FiniteDiffGroundTempsModel::getWeatherData();
 
 		FiniteDiffGroundTempsModel::developMesh();
 
 		FiniteDiffGroundTempsModel::performSimulation();
-	
 	}
 
 	//******************************************************************************
@@ -64,7 +52,6 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::getWeatherData()
 	{
-	
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   Summer 2015
@@ -72,35 +59,22 @@ namespace GroundTemps {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
+		// Finds correct envrionment for reading all weather data. Loops over all weather data in weather file
+		//	and data structure containing daily average of required weather data.
 
 		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		//using WeatherManager::AddDesignSetToEnvironmentStruct;
 		using WeatherManager::GetNextEnvironment;
 		using WeatherManager::ManageWeather;
 		using WeatherManager::ResetEnvironmentCounter;
-
 		using namespace DataEnvironment;
 		using namespace DataGlobals;
 		using namespace DataReportingFlags;
 		using namespace WeatherManager;
 
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
 		bool Available; // an environment is available to process
 		bool ErrorsFound;
-
 		Real64 outDryBulbTemp_num;
 		Real64 relHum_num;
 		Real64 windSpeed_num;
@@ -213,7 +187,7 @@ namespace GroundTemps {
 
 		} // ... End environment loop.
 
-		annualAveAirTemp = annualAveAirTemp_num / 365;
+		annualAveAirTemp = annualAveAirTemp_num / 365; // Used for initalizing domain
 	}
 
 	//******************************************************************************
@@ -221,7 +195,6 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::developMesh()
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   Summer 2015
@@ -229,19 +202,7 @@ namespace GroundTemps {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// Creates static mesh used for model
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -268,7 +229,9 @@ namespace GroundTemps {
 
 		totalNumCells = surfaceLayerNumCells + centerLayerNumCells + deepLayerNumCells;
 
+		// Allocate arrays
 		cellArray.allocate( totalNumCells );
+		cellDepths.allocate( totalNumCells );
 
 		// Setup cells surface layer cells
 		for ( int i = 1; i <= totalNumCells; ++i ) {
@@ -279,14 +242,13 @@ namespace GroundTemps {
 			// Set the index 
 			thisCell.index = i;
 
-			// Give thickness to the cell
+			// Give thickness to the cells
 			if ( i <= surfaceLayerNumCells ) {				
-
 				// Constant thickness mesh here
 				thisCell.thickness = surfaceLayerCellThickness;
 
 			} else if ( i > surfaceLayerNumCells && i <= ( centerLayerNumCells + surfaceLayerNumCells ) ) {
-
+				// Geometric expansion/contraction here
 				int numCenterCell = i - surfaceLayerNumCells;
 
 				if ( numCenterCell <= ( centerLayerNumCells / 2 ) ) {
@@ -294,15 +256,16 @@ namespace GroundTemps {
 				} else {
 					thisCell.thickness = cellArray( ( surfaceLayerNumCells + ( centerLayerNumCells / 2 ) ) - ( numCenterCell - ( centerLayerNumCells / 2 ) ) ).thickness;
 				}
-
-			} else if ( i > ( centerLayerNumCells + surfaceLayerNumCells ) ) {
-				
+			} else if ( i > ( centerLayerNumCells + surfaceLayerNumCells ) ) {			
 				// Constant thickness mesh here
 				thisCell.thickness = deepLayerCellThickness;
 			}
 
 			// Set minimum z value
 			thisCell.minZValue = currentCellDepth;
+
+			// Populate depth array for use later when looking up temperatures
+			cellDepths( i ) = currentCellDepth + thisCell.thickness / 2.0 ;
 
 			// Update local counter
 			currentCellDepth += thisCell.thickness;
@@ -325,7 +288,6 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::performSimulation()
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   Summer 2015
@@ -333,19 +295,7 @@ namespace GroundTemps {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// Simulates model, repeating years, until steady-periodic temperatures are determined.
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -373,6 +323,7 @@ namespace GroundTemps {
 
 		outFile_Jan1 << std::endl;
 
+		// Loop until converged
 		do {
 		
 			// loop over all days
@@ -450,7 +401,6 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::updateSurfaceCellTemperature()
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   Summer 2015
@@ -458,24 +408,9 @@ namespace GroundTemps {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		// Determines heat transfer to surface. Updates surface cell temperature.
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// declare some variables
 		Real64 numerator;
 		Real64 denominator;
 		Real64 resistance;
@@ -627,7 +562,6 @@ namespace GroundTemps {
 		int const cell
 	)
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   Summer 2015
@@ -635,23 +569,9 @@ namespace GroundTemps {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// Update cell temperature based on HT from cells above and below
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		// Set up once-per-cell items
 		Real64 numerator = 0.0;
 		Real64 denominator = 0.0;
 		Real64 neighborTemp = 0.0;
@@ -689,7 +609,6 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::updateBottomCellTemperature()
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   Summer 2015
@@ -697,24 +616,14 @@ namespace GroundTemps {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
+		// Updates bottom cell temperature based on earth heat flux HT from cell above
 
 		// REFERENCES:
 		// Fridleifsson, I.B., R. Bertani, E.Huenges, J.W. Lund, A. Ragnarsson, L. Rybach. 2008
 		//	'The possible role and contribution of geothermal energy to the mitigation of climate change.'
 		//	IPCC scoping meeting on renewable energy sources: 59-80.
 
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		Real64 numerator;
 		Real64 denominator;
 		Real64 resistance;
@@ -745,7 +654,7 @@ namespace GroundTemps {
 
 		numerator += thisCell.beta * HTBottom;
 
-		cellArray( totalNumCells ).temperature = numerator / denominator;
+		cellArray( totalNumCells ).temperature = annualAveAirTemp; // numerator / denominator; FOR TESTING ONLY
 
 	}
 
@@ -754,7 +663,6 @@ namespace GroundTemps {
 	bool
 	FiniteDiffGroundTempsModel::checkFinalTemperatureConvergence()
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   Summer 2015
@@ -762,22 +670,9 @@ namespace GroundTemps {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// Checks final temperature convergence
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		bool converged = true;
 
 		for ( int cell = 1; cell <= totalNumCells; ++ cell ) {
@@ -799,7 +694,6 @@ namespace GroundTemps {
 	bool
 	FiniteDiffGroundTempsModel::checkIterationTemperatureConvergence()
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   Summer 2015
@@ -807,22 +701,9 @@ namespace GroundTemps {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// Checks iteration temperature convergence
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		bool converged = true;
 
 		for ( int cell = 1; cell <= totalNumCells; ++ cell ) {
@@ -840,8 +721,7 @@ namespace GroundTemps {
 
 	void
 	FiniteDiffGroundTempsModel::initDomain()
-	{
-		
+	{		
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   Summer 2015
@@ -849,24 +729,13 @@ namespace GroundTemps {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
+		// Initalizes model using Kusuda-Achenbach model.
+		// Average ground temp initialized to average annual air temperature
 
 		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		using DataGlobals::SecsInDay;
 
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string objectName = "KAModelForFDModel";
 		int objectType = 1;
 		Real64 avgGroundTemp = annualAveAirTemp;
@@ -874,20 +743,15 @@ namespace GroundTemps {
 		int phaseShiftDay = 21;
 		Real64 groundThemalDiffusivity = baseConductivity / ( baseDensity * baseSpecificHeat );
 		
+		// Temporary KA model for initialization
 		std::unique_ptr< KusudaGroundTempsModel > tempModel( new KusudaGroundTempsModel() );
 
 		std::ofstream initTempsFile( "InitTemps.csv", std::ofstream::out );
-
 		tempModel->objectName = objectName;
-
 		tempModel->objectType = objectType;
-
 		tempModel->aveGroundTemp = avgGroundTemp;
-
 		tempModel->aveGroundTempAmplitude = aveGroundTempAmplitiude;
-
 		tempModel->phaseShiftInSecs = phaseShiftDay * SecsInDay;
-
 		tempModel->groundThermalDiffisivity = groundThemalDiffusivity;
 
 		// Intialize temperatures and volume
@@ -913,7 +777,7 @@ namespace GroundTemps {
 		evaluateSoilRhoCp( _, true );
 
 		// Initialize the groundTemps array
-		groundTemps.dimension( { 0, daysInYear }, { 0, totalNumCells }, 0.0 );
+		groundTemps.dimension( { 1, daysInYear }, { 1, totalNumCells }, 0.0 );
 
 	}
 
@@ -922,7 +786,6 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::updateIterationTemperatures()
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   Summer 2015
@@ -930,21 +793,7 @@ namespace GroundTemps {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		// Updates iteration temperatures for convergence checks
 
 		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
 			cellArray( cell ).temperature_prevIteration = cellArray( cell ).temperature;
@@ -956,7 +805,6 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::updateTimeStepTemperatures()
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   Summer 2015
@@ -964,21 +812,7 @@ namespace GroundTemps {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		// Updates timestep temperatures for convergence checks.
 
 		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
 
@@ -996,7 +830,6 @@ namespace GroundTemps {
 	void
 	FiniteDiffGroundTempsModel::doStartOfTimeStepInits()
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   Summer 2015
@@ -1004,21 +837,7 @@ namespace GroundTemps {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		// Updates cell properties for each timestep
 
 		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
 			
@@ -1034,6 +853,20 @@ namespace GroundTemps {
 	//******************************************************************************
 
 	Real64
+	FiniteDiffGroundTempsModel::interpolate(
+		Real64 const x,
+		Real64 const x_hi,
+		Real64 const x_low,
+		Real64 const y_hi,
+		Real64 const y_low
+	)
+	{
+		return ( x - x_low ) / ( x_hi - x_low ) * ( y_hi - y_low ) + y_low;
+	}
+
+	//******************************************************************************
+
+	Real64
 	FiniteDiffGroundTempsModel::getGroundTemp()
 	{
 
@@ -1044,34 +877,118 @@ namespace GroundTemps {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// Interpolates between days and depths to find correct ground temperature
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		// Interpolation variables
+		int i0;				// First day
+		int i1;				// Next day
+		int j0;				// Cell index with depth less than y-depth
+		int j1;				// Next cell index (with depth greater than y-depth
+		Real64 T_i0_j0;		// Temp at int( x-day ); cell lower_bound( y-depth )
+		Real64 T_i1_j0;		// Temp at int( x-day ) + 1; cell lower_bound( y-depth )
+		Real64 T_i0_j1;		// Temp at int( x-day ); cell lower_bound( y-depth ) + 1
+		Real64 T_i1_j1;		// Temp at int( x-day ) + 1; cell lower_bound( y-depth ) + 1
+		Real64 T_ix_j0;		// Temp at x-day; cell lower_bound( y-depth )
+		Real64 T_ix_j1;		// Temp at x-day; cell lower_bound( y-depth ) + 1
+		Real64 T_ix_jy;		// Final Temperature--Temp at x-day; y-depth
 
-		return 0;
+		if ( depth < 0.0 ) {
+			ShowFatalError("FiniteDiffGroundTemps: Invalid depth passed.");
+		}
+
+		if ( simTimeInDays < 0 || simTimeInDays > 366 ) {
+			ShowFatalError("FiniteDiffGroundTemps: Invalid day passed.");
+		}
+		
+		// Get index of nearest cell with depth less than depth
+		auto it = std::lower_bound( cellDepths.begin(), cellDepths.end(), depth );
+		j0 = std::distance( cellDepths.begin(), it );
+
+		if ( j0 < totalNumCells ) {
+			// All depths within domain
+			j1 = j0 + 1;
+
+			if ( simTimeInDays <= 1 || simTimeInDays >= daysInYear) {
+				// First day of year, last day of year, and leap day
+				// Interpolate between first and last day
+				i0 = daysInYear;
+				i1 = 1;
+
+				// Lookup ground temps
+				T_i0_j0 = groundTemps( i0, j0 );
+				T_i0_j1 = groundTemps( i0, j1 );
+				T_i1_j0 = groundTemps( i1, j0 );
+				T_i1_j1 = groundTemps( i1, j1 );
+
+				// Interpolate between days holding depth constant
+				T_ix_j0 = interpolate( simTimeInDays, 1, 0, T_i1_j0, T_i0_j0 );
+				T_ix_j1 = interpolate( simTimeInDays, 1, 0, T_i1_j1, T_i0_j1 );
+
+				// Interpolate to correct depth now that we're at the right time
+				T_ix_jy = interpolate( depth, cellDepths( j1 ), cellDepths( j0 ), T_ix_j1, T_ix_j0 );
+
+			} else {
+				// All other days
+				i0 = int( simTimeInDays );
+				i1 = i0 + 1;
+
+				// Lookup ground temps
+				T_i0_j0 = groundTemps( i0, j0 );
+				T_i0_j1 = groundTemps( i0, j1 );
+				T_i1_j0 = groundTemps( i1, j0 );
+				T_i1_j1 = groundTemps( i1, j1 );
+
+				// Interpolate between days holding depth constant
+				T_ix_j0 = interpolate( simTimeInDays, 1, 0, T_i1_j0, T_i0_j0 );
+				T_ix_j1 = interpolate( simTimeInDays, 1, 0, T_i1_j1, T_i0_j1 );
+
+				// Interpolate to correct depth now that we're at the right time
+				T_ix_jy = interpolate( depth, cellDepths( j1 ), cellDepths( j0 ), T_ix_j1, T_ix_j0 );
+			}
+
+		} else {
+			// Requesting a temperature deeper than domain. Pass deepest point in domain.
+			j1 = j0;
+
+			if ( simTimeInDays <= 1 || simTimeInDays >= daysInYear) {
+				// First day of year, last day of year, and leap day
+				// Interpolate between first and last day
+				i0 = totalNumCells;
+				i1 = 1;
+
+				// Lookup ground temps
+				T_i0_j1 = groundTemps( i0, j1 );
+				T_i1_j1 = groundTemps( i1, j1 );
+
+				// Interpolate between days holding depth constant
+				T_ix_jy = interpolate( simTimeInDays, 1, 0, T_i1_j1, T_i0_j1 );
+
+			} else {
+				// All other days
+				i0 = int( simTimeInDays );
+				i1 = i0 + 1;
+
+				// Lookup ground temps
+				T_i0_j1 = groundTemps( i0, j1 );
+				T_i1_j1 = groundTemps( i1, j1 );
+
+				// Interpolate between days holding depth constant
+				T_ix_jy = interpolate( simTimeInDays, 1, 0, T_i1_j1, T_i0_j1 );
+			}
+		}
+
+		return T_ix_jy;
 	}
 
 	//******************************************************************************
 
 	Real64
 	FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(
-		Real64 const depth,
-		Real64 const simTimeInSeconds
+		Real64 const _depth,
+		Real64 const seconds
 	)
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   Summer 2015
@@ -1079,34 +996,26 @@ namespace GroundTemps {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// Retrieves ground tempeature when input time is in seconds
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 const secPerDay = 24 * 3600;
 
-		return 0;
+		depth = _depth;
+
+		simTimeInDays = seconds / secPerDay;
+
+		return getGroundTemp();
 	}
 
 	//******************************************************************************
 
 	Real64
 	FiniteDiffGroundTempsModel::getGroundTempAtTimeInMonths(
-		Real64 const depth,
-		int const simTimeInMonths
+		Real64 const _depth,
+		int const month
 	)
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   Summer 2015
@@ -1114,21 +1023,22 @@ namespace GroundTemps {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// Returns ground temperature when input time is in months
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 const aveDaysInMonth = 365 / 12;
+
+		depth = _depth;
+
+		// Convert months to seconds. Puts 'seconds' time in middle of specified month
+		if ( month >= 1 && month <= 12 ) {
+			simTimeInDays = aveDaysInMonth * ( ( month - 1 ) + 0.5 );
+		} else {
+			ShowFatalError("FiniteDiffGroundTempsModel: Invalid month passed to ground temperature model");
+		}
+		
+		// Get and return ground temperature
+		return getGroundTemp();
 
 		return 0;
 	}
@@ -1141,7 +1051,6 @@ namespace GroundTemps {
 		Optional_bool_const InitOnly
 	)
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Edwin Lee
 		//       DATE WRITTEN   Summer 2011
@@ -1149,22 +1058,9 @@ namespace GroundTemps {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// Evaluates the soil properties
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//'static variables only calculated once per simulation run
 		static Real64 Theta_ice;
 		static Real64 Theta_liq;
 		static Real64 Theta_sat;

@@ -30,15 +30,26 @@ namespace GroundTemps {
 	// Kusuda model factory
 	std::shared_ptr< KusudaGroundTempsModel > 
 	KusudaGTMFactory( 
-	int objectType, 
-	std::string objectName,
-	Real64 groundThermalDiffusivity
+		int objectType, 
+		std::string objectName,
+		Real64 groundThermalDiffusivity
 	)
 	{
-		
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Reads input and creates instance of Kusuda ground temps model
+
+		// USE STATEMENTS:
 		using DataGlobals::SecsInDay;
 		using namespace DataIPShortCuts;
-		
+
+		// Locals
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:	
 		bool found = false;
 		int NumNums;
 		int NumAlphas;
@@ -50,75 +61,71 @@ namespace GroundTemps {
 
 		std::string const cCurrentModuleObject = "Site:GroundTemperature:Undisturbed:KusudaAchenbach";
 		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
-			for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
 
-				InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+		for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
 
-				if ( objectName == cAlphaArgs( 1 ) ) {
-					// Read input into object here
+			InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
-					thisModel->objectName = cAlphaArgs( 1 );
+			if ( objectName == cAlphaArgs( 1 ) ) {
 
-					thisModel->objectType = objectType;
+				// Read input into object here
+				thisModel->objectName = cAlphaArgs( 1 );
+				thisModel->objectType = objectType;
+				thisModel->aveGroundTemp = rNumericArgs( 1 );
+				thisModel->aveGroundTempAmplitude = rNumericArgs( 2 );
+				thisModel->phaseShiftInSecs = rNumericArgs( 3 ) * SecsInDay;
+				thisModel->groundThermalDiffisivity = groundThermalDiffusivity;
 
-					thisModel->aveGroundTemp = rNumericArgs( 1 );
+				// Putting this here for now. Need to implement functionality allowing parameters to be generated from Site:GroundTemperature:Shallow if KA object not present
 
-					thisModel->aveGroundTempAmplitude = rNumericArgs( 2 );
+				//int monthsInYear( 12 );
+				//int avgDaysInMonth( 30 );
+				//int monthOfMinSurfTemp( 0 );
+				//Real64 averageGroundTemp( 0 );
+				//Real64 averageGroundTempAmplitude( 0 );
+				//Real64 phaseShiftOfMinGroundTempDays( 0 );
+				//Real64 minSurfTemp( 100 ); // Set high month 1 temp will be lower and actually get updated
 
-					thisModel->phaseShiftInSecs = rNumericArgs( 3 ) * SecsInDay;
+				//InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
-					thisModel->groundThermalDiffisivity = groundThermalDiffusivity;
+				//thisModel->objectName = "Site:GroundTemperature:Shallow";
 
-					// Putting this here for now. Need to implement functionality allowing parameters to be generated from Site:GroundTemperature:Shallow if KA object not present
+				//thisModel->objectType = objectType;
 
-					//int monthsInYear( 12 );
-					//int avgDaysInMonth( 30 );
-					//int monthOfMinSurfTemp( 0 );
-					//Real64 averageGroundTemp( 0 );
-					//Real64 averageGroundTempAmplitude( 0 );
-					//Real64 phaseShiftOfMinGroundTempDays( 0 );
-					//Real64 minSurfTemp( 100 ); // Set high month 1 temp will be lower and actually get updated
+				//// Calculate Average Ground Temperature for all 12 months of the year:
+				//for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
+				//	averageGroundTemp += PubGroundTempSurface( monthIndex );
+				//}
+				//averageGroundTemp /= monthsInYear;
+				//
+				//thisModel->aveGroundTemp = averageGroundTemp;
 
-					//InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+				//// Calculate Average Amplitude from Average:;
+				//for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
+				//	averageGroundTempAmplitude += std::abs( PubGroundTempSurface( monthIndex ) - averageGroundTemp );
+				//}
+				//averageGroundTempAmplitude /= monthsInYear;
+				//
+				//thisModel->aveGroundTempAmplitude = averageGroundTempAmplitude;
 
-					//thisModel->objectName = "Site:GroundTemperature:Shallow";
+				//// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
+				//for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
+				//	if ( PubGroundTempSurface( monthIndex ) <= minSurfTemp ) {
+				//		monthOfMinSurfTemp = monthIndex;
+				//		minSurfTemp = PubGroundTempSurface( monthIndex );
+				//	}
+				//}
+				//
+				//phaseShiftOfMinGroundTempDays = monthOfMinSurfTemp * avgDaysInMonth;
 
-					//thisModel->objectType = objectType;
-
-					//// Calculate Average Ground Temperature for all 12 months of the year:
-					//for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-					//	averageGroundTemp += PubGroundTempSurface( monthIndex );
-					//}
-					//averageGroundTemp /= monthsInYear;
-					//
-					//thisModel->aveGroundTemp = averageGroundTemp;
-
-					//// Calculate Average Amplitude from Average:;
-					//for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-					//	averageGroundTempAmplitude += std::abs( PubGroundTempSurface( monthIndex ) - averageGroundTemp );
-					//}
-					//averageGroundTempAmplitude /= monthsInYear;
-					//
-					//thisModel->aveGroundTempAmplitude = averageGroundTempAmplitude;
-
-					//// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
-					//for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-					//	if ( PubGroundTempSurface( monthIndex ) <= minSurfTemp ) {
-					//		monthOfMinSurfTemp = monthIndex;
-					//		minSurfTemp = PubGroundTempSurface( monthIndex );
-					//	}
-					//}
-					//
-					//phaseShiftOfMinGroundTempDays = monthOfMinSurfTemp * avgDaysInMonth;
-
-					//// Unit conversion
-					//thisModel->phaseShiftInSecs = phaseShiftOfMinGroundTempDays * SecsInDay;
+				//// Unit conversion
+				//thisModel->phaseShiftInSecs = phaseShiftOfMinGroundTempDays * SecsInDay;
 
 
-					found = true;
-					break;
-				}
+				found = true;
+				break;
 			}
+		}
 
 		if ( found && !ErrorsFound ) {
 			groundTempModels.push_back( thisModel );
@@ -131,12 +138,93 @@ namespace GroundTemps {
 
 	//******************************************************************************
 
-	// Finite difference model factory
-	std::shared_ptr< FiniteDiffGroundTempsModel > 
-	FiniteDiffGTMFactory( int objectType, std::string objectName ){
+	// Xing model factory
+	std::shared_ptr< XingGroundTemps > 
+	XingGTMFactory( 
+		int objectType, 
+		std::string objectName,
+		Real64 groundThermalDiffusivity
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
 
+		// PURPOSE OF THIS SUBROUTINE:
+		// Reads input and creates instance of Xing ground temps model
+
+		// USE STATEMENTS:
 		using namespace DataIPShortCuts;
 
+		// Locals
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		bool found = false;
+		int NumNums;
+		int NumAlphas;
+		int IOStat;
+		bool ErrorsFound = false;
+
+		// New shared pointer for this model object
+		std::shared_ptr< XingGroundTemps > thisModel( new XingGroundTemps() );
+
+		std::string const cCurrentModuleObject = "Site:GroundTemperature:Undisturbed:Xing";
+		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+
+		for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
+
+			InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+
+			if ( objectName == cAlphaArgs( 1 ) ) {
+				// Read input into object here
+
+				thisModel->objectName = cAlphaArgs( 1 );
+				thisModel->objectType = objectType;
+				thisModel->aveGroundTemp = rNumericArgs( 1 );
+				thisModel->surfTempAmplitude_1 = rNumericArgs( 2 );
+				thisModel->phaseShift_1 = rNumericArgs( 3 );
+				thisModel->surfTempAmplitude_2 = rNumericArgs( 4 );
+				thisModel->phaseShift_2 = rNumericArgs( 5 );
+				thisModel->groundThermalDiffisivity = groundThermalDiffusivity;
+
+				found = true;
+				break;
+			}
+		}
+
+		if ( found && !ErrorsFound ) {
+			groundTempModels.push_back( thisModel );
+			return thisModel;
+		} else {
+			ShowFatalError( "Site:GroundTemperature:Undisturbed:Xing--Errors getting input for ground temperature model");
+			return nullptr;
+		}
+	}
+
+	//******************************************************************************
+
+	// Finite difference model factory
+	std::shared_ptr< FiniteDiffGroundTempsModel > 
+	FiniteDiffGTMFactory(
+		int objectType,
+		std::string objectName
+		)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Read input and creates instance of finite difference ground temp model
+
+		// USE STATEMENTS:
+		using namespace DataIPShortCuts;
+
+		// Locals
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool found = false;
 		int NumNums;
 		int NumAlphas;
@@ -149,26 +237,27 @@ namespace GroundTemps {
 		// Search through finite diff models here
 		std::string const cCurrentModuleObject = "Site:GroundTemperature:Undisturbed:FiniteDifference";
 		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
-			for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
 
-				InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+		for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
 
-				if ( objectName == cAlphaArgs( 1 ) ) {
-					// Read input into object here
+			InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
-					thisModel->objectType = objectType;
-					thisModel->objectName = cAlphaArgs( 1 );
-					thisModel->baseConductivity = rNumericArgs( 1 );
-					thisModel->baseDensity = rNumericArgs( 2 );
-					thisModel->baseSpecificHeat = rNumericArgs( 3 );
-					thisModel->waterContent = rNumericArgs( 4 ) / 100.0;
-					thisModel->saturatedWaterContent = rNumericArgs( 5 ) / 100.0;
-					thisModel->evapotransCoeff = rNumericArgs( 6 );
+			if ( objectName == cAlphaArgs( 1 ) ) {
+				// Read input into object here
 
-					found = true;
-					break;
-				}
+				thisModel->objectType = objectType;
+				thisModel->objectName = cAlphaArgs( 1 );
+				thisModel->baseConductivity = rNumericArgs( 1 );
+				thisModel->baseDensity = rNumericArgs( 2 );
+				thisModel->baseSpecificHeat = rNumericArgs( 3 );
+				thisModel->waterContent = rNumericArgs( 4 ) / 100.0;
+				thisModel->saturatedWaterContent = rNumericArgs( 5 ) / 100.0;
+				thisModel->evapotransCoeff = rNumericArgs( 6 );
+
+				found = true;
+				break;
 			}
+		}
 
 		if ( found && !ErrorsFound ) {
 			groundTempModels.push_back( thisModel );
@@ -189,14 +278,26 @@ namespace GroundTemps {
 
 	// Site:GroundTemperature:Shallow factory
 	std::shared_ptr< ShallowGroundTemps > 
-	ShallowGTMFactory(){
+	ShallowGTMFactory()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
 
+		// PURPOSE OF THIS SUBROUTINE:
+		// Reads input and creates instance of Site:GroundDomain:Shallow object
+
+		// USE STATEMENTS:
 		using DataEnvironment::GroundTemp_SurfaceObjInput;
 		using DataGlobals::OutputFileInits;
 		using DataGlobals::SecsInDay;
 		using namespace DataIPShortCuts;
 		using namespace ObjexxFCL::gio;
-		
+
+		// Locals
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool found = false;
 		int NumNums;
 		int NumAlphas;
@@ -252,14 +353,26 @@ namespace GroundTemps {
 
 	// Site:GroundTemperature:BuildingSurface factory
 	std::shared_ptr< BuildingSurfaceGroundTemps > 
-	BuildingSurfaceGTMFactory(){
+	BuildingSurfaceGTMFactory()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
 
+		// PURPOSE OF THIS SUBROUTINE:
+		// Reads input and creates instance of Site:GroundTemperature:BuildingSurface object
+
+		// USE STATEMENTS:
 		using DataEnvironment::GroundTempObjInput;
 		using DataGlobals::OutputFileInits;		
 		using DataGlobals::SecsInDay;
 		using namespace DataIPShortCuts;
 		using namespace ObjexxFCL::gio;
-		
+
+		// Locals
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool found = false;
 		bool genErrorMessage = false;
 		int NumNums;
@@ -322,8 +435,18 @@ namespace GroundTemps {
 
 	// Site:GroundTemperature:FCFactorMethod factory
 	std::shared_ptr< FCFactorGroundTemps > 
-	FCFactorGTMFactory(){
+	FCFactorGTMFactory()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
 
+		// PURPOSE OF THIS SUBROUTINE:
+		// Reads input and creates instance of Site:GroundTemperature:FCfactorMethod object
+
+		// USE STATEMENTS:
 		using DataEnvironment::FCGroundTemps;
 		using DataGlobals::OutputFileInits;
 		using DataGlobals::SecsInDay;
@@ -331,6 +454,8 @@ namespace GroundTemps {
 		using namespace DataIPShortCuts;
 		using namespace ObjexxFCL::gio;
 
+		// Locals
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool found = false;
 		int NumNums;
 		int NumAlphas;
@@ -387,14 +512,26 @@ namespace GroundTemps {
 
 	// Site:GroundTemperature:Deep factory
 	std::shared_ptr< DeepGroundTemps > 
-	DeepGTMFactory(){
+	DeepGTMFactory()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
 
+		// PURPOSE OF THIS SUBROUTINE:
+		// Reads input and creates instance of Site:GroundTemperature:Deep object
+
+		// USE STATEMENTS:
 		using DataEnvironment::GroundTemp_DeepObjInput;
 		using DataGlobals::OutputFileInits;
 		using DataGlobals::SecsInDay;
 		using namespace DataIPShortCuts;
 		using namespace ObjexxFCL::gio;
 
+		// Locals
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool found = false;
 		int NumNums;
 		int NumAlphas;
@@ -456,6 +593,17 @@ namespace GroundTemps {
 		Real64 const groundThermalDiffusivity
 	)
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Called by objects requireing ground temperature models. Determines type and calls appropriate factory method.
+
+		// Locals
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int objectType( 0 );
 		int objectType_KusudaGroundTemp( 1 );
 		int objectType_FiniteDiffGroundTemp( 2 );
@@ -463,6 +611,7 @@ namespace GroundTemps {
 		int objectType_SiteShallowGroundTemp( 4 );
 		int objectType_SiteDeepGroundTemp( 5 );
 		int objectType_SiteFCFactorMethodGroundTemp( 6 );
+		int objectType_XingGroundTemp( 7 );
 
 		std::string objectType_KusudaGroundTemp_str = "SITE:GROUNDTEMPERATURE:UNDISTURBED:KUSUDAACHENBACH";
 		std::string objectType_FiniteDiffGroundTemp_str = "SITE:GROUNDTEMPERATURE:UNDISTURBED:FINITEDIFFERENCE";
@@ -470,6 +619,7 @@ namespace GroundTemps {
 		std::string objectType_SiteShallowGroundTemp_str = "SITE:GROUNDTEMPERATURE:SHALLOW";
 		std::string objectType_SiteDeepGroundTemp_str = "SITE:GROUNDTEMPERATURE:DEEP";
 		std::string objectType_SiteFCFactorMethodGroundTemp_str = "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD";
+		std::string objectType_XingGroundTemp_str = "SITE:GROUNDTEMPERATURE:UNDISTURBED:XING";
 	
 		// Set object type
 		if ( objectType_str == objectType_KusudaGroundTemp_str ) {
@@ -484,6 +634,8 @@ namespace GroundTemps {
 			objectType = objectType_SiteDeepGroundTemp;
 		} else if ( objectType_str == objectType_SiteFCFactorMethodGroundTemp_str ) {
 			objectType = objectType_SiteFCFactorMethodGroundTemp;
+		} else if (objectType_str == objectType_XingGroundTemp_str ) {
+			objectType = objectType_XingGroundTemp;
 		} else {
 			// Error out if no ground temperature object types recognized
 			ShowFatalError( "GetGroundTempsModelAndInit: Ground temperature object " + objectType_str + " not recognized." );
@@ -513,6 +665,8 @@ namespace GroundTemps {
 			return DeepGTMFactory();
 		} else if ( objectType == objectType_SiteFCFactorMethodGroundTemp ) {
 			return FCFactorGTMFactory();
+		} else if ( objectType == objectType_XingGroundTemp ) {
+			return XingGTMFactory( objectType, objectName, groundThermalDiffusivity );
 		} else {
 			// Error
 			return nullptr; 

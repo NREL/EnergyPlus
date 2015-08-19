@@ -10,9 +10,19 @@ namespace GroundTemps {
 
 	Real64 XingGroundTemps::getGroundTemp()
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
 
+		// PURPOSE OF THIS SUBROUTINE:
+		// Returns the ground temperature for the Site:GroundTemperature:Undisturbed:Xing
+
+		// USE STATEMENTS:
 		using DataGlobals::Pi;
 
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 retVal;
 		Real64 summation;
 
@@ -40,7 +50,6 @@ namespace GroundTemps {
 			term2 = ( 2 * Pi * n ) / tp * ( simTimeInDays - PL_n ) - depth * std::sqrt( ( n * Pi ) / ( groundThermalDiffisivity * tp ) );
 
 			summation += std::exp( term1 ) * Ts_n * std::cos( term2 );
-
 		}
 
 		retVal = aveGroundTemp - summation;
@@ -55,6 +64,16 @@ namespace GroundTemps {
 		int month
 	)
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Returns ground temperature when input time is in months
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 const aveDaysInMonth = 365 / 12;
 
 		depth = _depth;
@@ -77,6 +96,16 @@ namespace GroundTemps {
 		Real64 seconds
 	)
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Returns ground temperature when time is in seconds
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 const secPerDay = 24 * 3600;
 
 		depth = _depth;

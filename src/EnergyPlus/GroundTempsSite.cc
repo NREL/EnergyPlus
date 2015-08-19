@@ -15,6 +15,15 @@ namespace GroundTemps {
 	Real64
 	ShallowGroundTemps::getGroundTemp()
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Return the ground temperature from Site:GroundTemperature:Shallow
+
 		return surfaceGroundTemps( timeOfSimInMonths );
 	}
 
@@ -26,7 +35,16 @@ namespace GroundTemps {
 		Real64 const seconds
 	)
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       RE-ENGINEERED  na
 
+		// PURPOSE OF THIS SUBROUTINE:
+		// Returns the ground temperature when input time is in seconds
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 secPerMonth = 365 * 3600 * 24 / 12;
 		int month;
 
@@ -42,9 +60,9 @@ namespace GroundTemps {
 
 		timeOfSimInMonths = month;
 
-			// Get and return ground temp
-			return getGroundTemp();
-		}
+		// Get and return ground temp
+		return getGroundTemp();
+	}
 
 	//******************************************************************************
 
@@ -54,7 +72,15 @@ namespace GroundTemps {
 		int const month
 	)
 	{
-		// Set month
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Returns the ground temperature when input time is in months
+
 		timeOfSimInMonths = month;
 
 		// Get and return ground temp
@@ -67,6 +93,15 @@ namespace GroundTemps {
 	Real64
 	BuildingSurfaceGroundTemps::getGroundTemp()
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Returns the ground temperature for Site:GroundTemperature:BuildingSurface
+
 		return buildingSurfaceGroundTemps( timeOfSimInMonths );
 	}
 
@@ -78,7 +113,16 @@ namespace GroundTemps {
 		Real64 const seconds
 	)
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       RE-ENGINEERED  na
 
+		// PURPOSE OF THIS SUBROUTINE:
+		// Returns the ground temperature when input time is in seconds
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 secPerMonth = 365 * 3600 * 24 / 12;
 		int month;
 
@@ -94,9 +138,9 @@ namespace GroundTemps {
 
 		timeOfSimInMonths = month;
 
-			// Get and return ground temp
-			return getGroundTemp();
-		}
+		// Get and return ground temp
+		return getGroundTemp();
+	}
 
 	//******************************************************************************
 
@@ -106,12 +150,20 @@ namespace GroundTemps {
 		int const month
 	)
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Returns the ground temperature when input time is in months
+
 		// Set month
 		timeOfSimInMonths = month;
 
 		// Get and return ground temp
 		return getGroundTemp();
-
 	}
 
 	//******************************************************************************
@@ -119,6 +171,15 @@ namespace GroundTemps {
 	Real64
 	FCFactorGroundTemps::getGroundTemp()
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Returns the ground temperature for Site:GroundTemperature:FCFactorMethod
+
 		return fcFactorGroundTemps( timeOfSimInMonths );
 	}
 
@@ -130,7 +191,16 @@ namespace GroundTemps {
 		Real64 const seconds
 	)
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       RE-ENGINEERED  na
 
+		// PURPOSE OF THIS SUBROUTINE:
+		// Returns the ground temperature when input time is in seconds
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 secPerMonth = 365 * 3600 * 24 / 12;
 		int month;
 
@@ -146,9 +216,9 @@ namespace GroundTemps {
 
 		timeOfSimInMonths = month;
 
-			// Get and return ground temp
-			return getGroundTemp();
-		}
+		// Get and return ground temp
+		return getGroundTemp();
+	}
 
 	//******************************************************************************
 
@@ -158,12 +228,20 @@ namespace GroundTemps {
 		int const month
 	)
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Returns the ground temperature when input time is in months
+
 		// Set month
 		timeOfSimInMonths = month;
 
 		// Get and return ground temp
 		return getGroundTemp();
-
 	}
 
 	//******************************************************************************
@@ -171,6 +249,15 @@ namespace GroundTemps {
 	Real64
 	DeepGroundTemps::getGroundTemp()
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Returns the ground temperature for Site:GroundTemperature:Deep
+
 		return deepGroundTemps( timeOfSimInMonths );
 	}
 
@@ -182,7 +269,16 @@ namespace GroundTemps {
 		Real64 const seconds
 	)
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       RE-ENGINEERED  na
 
+		// PURPOSE OF THIS SUBROUTINE:
+		// Returns the ground temperature when input time is in seconds
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 secPerMonth = 365 * 3600 * 24 / 12;
 		int month;
 
@@ -198,9 +294,9 @@ namespace GroundTemps {
 
 		timeOfSimInMonths = month;
 
-			// Get and return ground temp
-			return getGroundTemp();
-		}
+		// Get and return ground temp
+		return getGroundTemp();
+	}
 
 	//******************************************************************************
 
@@ -210,12 +306,20 @@ namespace GroundTemps {
 		int const month
 	)
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   Summer 2011
+		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Returns the ground temperature when input time is in months
+
 		// Set month
 		timeOfSimInMonths = month;
 
 		// Get and return ground temp
 		return getGroundTemp();
-
 	}
 
 	//******************************************************************************
