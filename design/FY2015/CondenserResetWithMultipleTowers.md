@@ -167,3 +167,9 @@ The "ideal" file includes the same curves that are required in the non-"ideal" f
 I modified the ConEntTempReset file to include a second cooling tower.  I encountered an error due to the second tower.  I made a few changes to the source to not throw this error and re-ran.  The file runs to completion and the only diffs are in the tower outputs.  I need to investigate it a little further but I think it might still be functioning perfectly.  Here is where I will start back up tomorrow:
 
 - Report out the setpoint on the outlet node of the condenser supply side.  The value should be identical, or close.  The difference is that there are two towers contributing to meeting this setpoint, but the overall loop behavior should be fine.
+
+  - Results, DD-only: The setpoint is identical between the single and multiple tower versions.  On the winter design day, the setpoint stays at 30 degrees.  On the summer design day, the setpoint is pegged at 32 degrees.  I checked the inputs, and this is the value of the ```Maximum Condenser Entering Water Temperature {C}``` field.  It appears that the input file doesn't demonstrate the setpoint reset very well on the design day itself, so I'll re-run annual next.  As for functionality, adding the second tower doesn't cause much difference in results, here is the tower heat transfer rate for the single tower in the base case, and the summation of two towers in the two tower case:
+  
+![](CondenserResetWithMultipleTowers-FigureTowerHeatTransferTest.png)
+
+  Although the total heat transfer varies slightly through the day, the overall behavior is nearly equivalent.
