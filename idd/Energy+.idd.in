@@ -42772,10 +42772,11 @@ Coil:Heating:DX:VariableRefrigerantFlow,
        \note ff = fraction of the full load flow
 
 Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl, 
-       \memo This object models the indoor unit coil of the Variable Refrigerant Flow system (cooling mode)
+       \memo This is a key object in the new physics based VRF model applicable for Fluid
+       \memo Temperature Control. It describes the the indoor unit coil of the system at cooling mode.
        \memo Used with ZoneHVAC:TerminalUnit:VariableRefrigerantFlow. 
        \memo Outdoor unit is modeled separately, see AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl.
-       \min-fields 7
+       \min-fields 6
   A1,  \field Name
        \required-field
        \type alpha
@@ -42796,19 +42797,22 @@ Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \note the outlet node to the coil
   N1,  \field Rated Total Cooling Capacity
        \required-field
+       \autosizable
        \type real
        \units W
        \minimum> 0.0
        \note Supply air fan heat is not included
   N2,  \field Rated Sensible Heat Ratio
        \required-field
+       \autosizable
        \type real
        \minimum> 0.0
        \note Supply air fan heat is not included
   N3,  \field Indoor Unit Reference Superheating 
-       \required-field
        \type real
        \units deltaC 
+       \minimum 0.0
+       \default 5.0
   A5,  \field Indoor Unit Evaporating Temperature Function of Superheating Curve Name    
        \required-field   
        \type object-list
@@ -42818,11 +42822,12 @@ Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list WaterStorageTankNames
  
-Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl, 
-       \memo This object models the indoor unit coil of the Variable Refrigerant Flow system (heating mode)
+Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,
+       \memo This is a key object in the new physics based VRF model applicable for Fluid
+       \memo Temperature Control. It describes the the indoor unit coil of the system at heating mode.
        \memo Used with ZoneHVAC:TerminalUnit:VariableRefrigerantFlow. 
        \memo Outdoor unit is modeled separately, see AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl.
-       \min-fields 6
+       \min-fields 5
   A1,  \field Name
        \required-field
        \type alpha
@@ -42843,15 +42848,17 @@ Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \note the outlet node to the coil
   N1,  \field Rated Total Heating Capacity
        \required-field
+       \autosizable
        \type real
        \units W
        \minimum> 0.0
        \autosizable
        \note Supply air fan heat is not included
   N2,  \field Indoor Unit Reference Subcooling 
-       \required-field
        \type real 
        \units deltaC
+       \minimum 0.0
+       \default 5.0
   A5;  \field Indoor Unit Condensing Temperature Function of Subcooling Curve Name    
        \required-field   
        \type object-list
@@ -53039,9 +53046,11 @@ AirConditioner:VariableRefrigerantFlow,
        \note from cooling only mode to heat recovery mode
 
 AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
-       \memo This object models the performance of the Variable Refrigerant Flow system 
-       \memo excluding the indoor units. 
-       \min-fields 21
+       \memo This is a key object in the new physics based VRF model applicable for Fluid 
+       \memo Temperature Control 
+       \memo It describes the Variable Refrigerant Flow system excluding the performance of indoor units
+       \memo Indoor units are modeled separately, see ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+       \min-fields 10
   A1 , \field Heat Pump Name
        \required-field
        \type alpha
@@ -53049,17 +53058,16 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   A2 , \field Availability Schedule Name
        \type object-list
        \object-list ScheduleNames
-       \note Enter the name of a schedule that defines the availability of the unit.
-       \note Schedule values of 0 denote the unit is off. All other values denote the unit is available.
-       \note If this field is left blank, the unit is available the entire simulation.
+       \note Enter the name of a schedule that defines the availability of the unit
+       \note Schedule values of 0 denote the unit is off. All other values denote the unit is available
+       \note If this field is left blank, the unit is available the entire simulation
   A3 , \field Zone Terminal Unit List Name
        \required-field
        \type object-list
        \object-list ZoneTerminalUnitListNames
        \note Enter the name of a ZoneTerminalUnitList. This list connects zone terminal units to this
-       \note heat pump.	   
+       \note heat pump	   
   A4 , \field Refrigerant Type
-       \required-field
        \type object-list
        \object-list FluidNames
        \default R410A
@@ -53068,25 +53076,24 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \units W/W
        \minimum> 0.0
        \default 3.3
-       \note Enter the coefficient of performance at rated conditions or leave blank to use default.
-       \note This reference COP value is only used for the initialization of the physics based VRF model.
+       \note Enter the coefficient of performance at rated conditions or leave blank to use default
+       \note This reference COP value is only used for the initialization of the physics based VRF model
   N2 , \field Reference Heating COP
        \type real
        \units W/W
        \minimum> 0.0
        \default 3.4
-       \note Enter the coefficient of performance at rated conditions or leave blank to use default.
-       \note This reference COP value is only used for the initialization of the physics based VRF model.
+       \note Enter the coefficient of performance at rated conditions or leave blank to use default
+       \note This reference COP value is only used for the initialization of the physics based VRF model
   N3 , \field Reference Outdoor Unit Superheating 
-       \required-field
        \type real
        \units deltaC  
+       \default 3
   N4 , \field Reference Outdoor Unit Subcooling 
-       \required-field
        \type real 
-       \units deltaC   
+       \units deltaC    
+       \default 5
   A5 , \field Refrigerant Temperature Control Algorithm for Indoor Unit
-       \required-field
        \type choice
        \key ConstantTemp
        \key VariableTemp
@@ -53124,7 +53131,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   N10, \field Variable Condensing Temperature Maximum for Indoor Unit
        \type real
        \units C       
-       \default 46.0
+       \default 46.0 
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp
   A6 , \field Outdoor Unit Fan Object Type
@@ -53147,47 +53154,47 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \object-list QuadraticCurves	 
        \object-list UniVariateTables  
   N11, \field Diameter of main pipe connecting outdoor unit to indoor units
-       \required-field
        \note used to calculate the piping loss
        \type real 
        \units m
        \minimum 0.0
+       \default 0.0254 
   N12, \field Length of main pipe connecting outdoor unit to indoor units
-       \required-field
        \note used to calculate the heat loss of the main pipe
        \type real 
        \units m
        \minimum 0.0
+       \default 30.0
   N13, \field Equivalent length of main pipe connecting outdoor unit to indoor units
-       \required-field
        \note used to calculate the refrigerant pressure drop of the main pipe
        \type real 
        \units m
        \minimum 0.0
+       \default 36.0
   N14, \field Height difference between the outdoor unit node and 
        \field indoor unit node of the main pipe
-       \required-field
        \note Difference between outdoor unit height and indoor unit height
        \note Positive means outdoor unit is higher than indoor unit 
        \note Negative means outdoor unit is lower than indoor unit 
        \type real 
        \units m
+       \default 5.0
   N15, \field Insulation thickness of the main pipe
-       \required-field
        \type real 
        \units m
        \minimum 0.0	
+	   \default 0.02
   N16, \field Thermal conductivity of the main pipe insulation material
-       \required-field
        \type real 
        \units W/m-K
        \minimum 0.0	
+	   \default 0.032
   N17, \field Crankcase Heater Power per Compressor
        \type real
        \units W
        \default 33.0
        \note Enter the value of the resistive heater located in the compressor(s). This heater
-       \note is used to warm the refrigerant and oil when the compressor is off.
+       \note is used to warm the refrigerant and oil when the compressor is off
   N18, \field Number of Compressors
        \type integer
        \units dimensionless
@@ -53198,14 +53205,14 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type real
        \units W/W
        \default 0.5
-       \note Enter the ratio of the first stage compressor to total compressor capacity.
+       \note Enter the ratio of the first stage compressor to total compressor capacity
        \note All other compressors are assumed to be equally sized. This inputs is used
-       \note only for crankcase heater calculations.
+       \note only for crankcase heater calculations
   N20, \field Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater
        \type real
        \units C
        \default 5.0
-       \note Enter the maximum outdoor temperature above which the crankcase heaters are disabled.
+       \note Enter the maximum outdoor temperature above which the crankcase heaters are disabled
   A10, \field Defrost Strategy
        \type choice
        \key ReverseCycle
@@ -53213,7 +53220,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \default Resistive
        \note Select a defrost strategy. 
        \note Reverse cycle reverses the operating mode from heating to 
-       \note cooling to melt frost formation on the condenser coil. 
+       \note cooling to melt frost formation on the condenser coil
        \note The resistive strategy uses a resistive heater
        \note to melt the frost.
   A11, \field Defrost Control
@@ -53221,42 +53228,41 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \key Timed
        \key OnDemand
        \default Timed
-       \note Choose a defrost control type. 
+       \note Choose a defrost control type
        \note Either use a fixed Timed defrost period or select
-       \note OnDemand to defrost only when necessary.
+       \note OnDemand to defrost only when necessary
   A12, \field Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
        \type object-list
        \object-list LinearCurves
        \object-list QuadraticCubicCurves
        \object-list UniVariateTables
-       \note A valid performance curve must be used if ReverseCycle defrost strategy is selected.
+       \note A valid performance curve must be used if ReverseCycle defrost strategy is selected
   N21, \field Defrost Time Period Fraction
        \type real
        \minimum 0.0
        \default 0.058333
-       \note Fraction of time in defrost mode.
-       \note Only applicable if timed defrost control is specified.
+       \note Fraction of time in defrost mode
+       \note Only applicable if timed defrost control is specified
   N22, \field Resistive Defrost Heater Capacity
        \type real
        \minimum 0.0
        \default 0.0
        \autosizable
        \units W
-       \note Enter the size of the resistive defrost heating element.
+       \note Enter the size of the resistive defrost heating element
        \note Only applicable if resistive defrost strategy is specified
        \ip-units W
   N23, \field Maximum Outdoor Dry-bulb Temperature for Defrost Operation
        \type real
        \units C
        \default 5.0
-       \note Enter the maximum outdoor temperature above which the crankcase heaters are disabled.	
+       \note Enter the maximum outdoor temperature above which the crankcase heaters are disabled
   N24, \field Compressor maximum delta Pressure
-       \required-field
        \type real 
-       \units kPa
-       \default 4500
+       \units Pa
+       \default 4500000.0
        \minimum 0.0
-       \maximum 50000
+       \maximum 50000000.0
   N25, \field Number of Compressor Loading Index Entries
        \required-field
        \type integer

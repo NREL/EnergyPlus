@@ -339,7 +339,7 @@ namespace HVACVariableRefrigerantFlow {
 				CalcVRFCondenser_FluidTCtrl( VRFCondenser, FirstHVACIteration ); // Analyze the VRF OU operations
 				CalcVRFIUTeTc_FluidTCtrl( VRFCondenser ); // Get the VRF IU Te/Tc
 			} else {
-			// Algorithm Type: VRF model based on system curve
+			// Algorithm Type: VRF model based on system curve 
 				CalcVRFCondenser( VRFCondenser, FirstHVACIteration );
 			}
 		
@@ -2100,7 +2100,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		}
 
-		// read all VRF condenser objects: Algorithm Type 2_physics based model (FluidTCtrl)_Aug. 2015, zrp
+		// Read all VRF condenser objects: Algorithm Type 2_physics based model (FluidTCtrl)_Aug. 2015, zrp
 		cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl";
 		for ( VRFNum = NumVRFCond_SysCurve + 1; VRFNum <= NumVRFCond; ++VRFNum ) {
 			GetObjectItem( cCurrentModuleObject, VRFNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -2135,7 +2135,17 @@ namespace HVACVariableRefrigerantFlow {
 				ErrorsFound = true;
 			}
 			
+			//Refrigerant type
 			VRF( VRFNum ).RefrigerantName = cAlphaArgs( 4 );
+			if ( EnergyPlus::FluidProperties::GetInput ) {
+				EnergyPlus::FluidProperties::GetFluidPropertiesData();
+				EnergyPlus::FluidProperties::GetInput = false;
+			}
+			if ( FindItemInList( VRF( VRFNum ).RefrigerantName, EnergyPlus::FluidProperties::RefrigData.Name(), EnergyPlus::FluidProperties::NumOfRefrigerants ) == 0 ) {
+				ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
+				ShowContinueError( "Illegal " + cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) );
+				ErrorsFound = true;
+			}
 			
 			//Refrence system COP
 			VRF( VRFNum ).CoolingCOP = rNumericArgs( 1 );
@@ -2285,6 +2295,19 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFNum ).RefPipHei      = rNumericArgs( 14 );
 			VRF( VRFNum ).RefPipInsThi   = rNumericArgs( 15 );
 			VRF( VRFNum ).RefPipInsCon   = rNumericArgs( 16 );
+			
+			// Check the RefPipEquLen 
+			if ( lAlphaFieldBlanks( 13 ) && !lAlphaFieldBlanks( 12 ) ) {
+				VRF( VRFNum ).RefPipEquLen = 1.2 * VRF( VRFNum ).RefPipLen;
+				ShowWarningError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\", \" " + cNumericFieldNames( 13 ) + "\" is calculated based on" );
+				ShowContinueError( "...the provided \"" + cNumericFieldNames( 12 ) + "\" value." );
+			} 
+			if ( VRF( VRFNum ).RefPipEquLen < VRF( VRFNum ).RefPipLen ) {
+				VRF( VRFNum ).RefPipEquLen = 1.2 * VRF( VRFNum ).RefPipLen;
+				ShowWarningError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\", invalid \" " + cNumericFieldNames( 13 ) + "\" value." );
+				ShowContinueError( "...Equivalent length of main pipe should be greater than or equal to the actural length." );
+				ShowContinueError( "...The value is recalculated based on the provided \"" + cNumericFieldNames( 12 ) + "\" value." );
+			}
 			
 			// Crank case
 			VRF( VRFNum ).CCHeaterPower = rNumericArgs( 17 );
@@ -3182,12 +3205,14 @@ namespace HVACVariableRefrigerantFlow {
 			
 			// Followings for VRF FluidTCtrl Only
 			if( VRF( NumCond ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ){
-				SetupOutputVariable( "VRF Heat Pump Min Evaporating Temperature [C]", VRF( NumCond ).IUEvaporatingTemp, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Condensing Temperature [C]", VRF( NumCond ).CondensingTemp, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Condenser Fan Power [W]", VRF( NumCond ).CondFanPower, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Compressor Speed [rev/sec]", VRF( NumCond ).CompActSpeed, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Max Condensing Temperature [C]", VRF( NumCond ).IUCondensingTemp, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Evaporating Temperature [C]", VRF( NumCond ).EvaporatingTemp, "System", "Average", VRF( NumCond ).Name );
+				SetupOutputVariable( "VRF Heat Pump Indoor Unit Evaporating Temperature at Cooling Mode [C]", VRF( NumCond ).IUEvaporatingTemp, "System", "Average", VRF( NumCond ).Name );
+				SetupOutputVariable( "VRF Heat Pump Outdoor Unit Condensing Temperature at Cooling Mode [C]", VRF( NumCond ).CondensingTemp, "System", "Average", VRF( NumCond ).Name );
+				SetupOutputVariable( "VRF Heat Pump Indoor Unit Condensing Temperature at Heating Mode [C]", VRF( NumCond ).IUCondensingTemp, "System", "Average", VRF( NumCond ).Name );
+				SetupOutputVariable( "VRF Heat Pump Outdoor Unit Evaporating Temperature at Heating Mode [C]", VRF( NumCond ).EvaporatingTemp, "System", "Average", VRF( NumCond ).Name );
+				SetupOutputVariable( "VRF Heat Pump Compressor Electric Power at Cooling Mode [W]", VRF( NumCond ).NcompCooling, "System", "Average", VRF( NumCond ).Name );
+				SetupOutputVariable( "VRF Heat Pump Compressor Electric Power at Heating Mode [W]", VRF( NumCond ).NcompHeating, "System", "Average", VRF( NumCond ).Name );
+				SetupOutputVariable( "VRF Heat Pump Compressor Rotating Speed [rev/sec]", VRF( NumCond ).CompActSpeed, "System", "Average", VRF( NumCond ).Name );
+				SetupOutputVariable( "VRF Heat Pump Outdoor Unit Fan Power [W]", VRF( NumCond ).CondFanPower, "System", "Average", VRF( NumCond ).Name );
 			}
 
 			if ( VRF( NumCond ).DefrostStrategy == Resistive || ( VRF( NumCond ).DefrostStrategy == ReverseCycle && VRF( NumCond ).FuelType == FuelTypeElectric ) ) {
@@ -7232,13 +7257,13 @@ namespace HVACVariableRefrigerantFlow {
 		
 			TUCoolingLoad_temp = TUCoolingLoad; 
 			CondFlowRatio = 1.0;
-			MaxOutdoorUnitPc = min( Psuction + VRF( VRFCond ).CompMaxDeltaP * 1000, 4000000.0 );  
+			MaxOutdoorUnitPc = min( Psuction + VRF( VRFCond ).CompMaxDeltaP, 4000000.0 );  
 			MaxOutdoorUnitTc = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, max( min( MaxOutdoorUnitPc, RefPHigh), RefPLow ), RefrigerantIndex, RoutineName );
 			MinOutdoorUnitTc = OutdoorDryBulb + VRF( VRFCond ).SC;
 			MinOutdoorUnitPc = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, MinOutdoorUnitTc, RefrigerantIndex, RoutineName );
 		
 			MinRefriPe = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, -15, RefrigerantIndex, RoutineName );
-			MinOutdoorUnitPe = max( MinOutdoorUnitPc - VRF( VRFCond ).CompMaxDeltaP * 1000, MinRefriPe );
+			MinOutdoorUnitPe = max( MinOutdoorUnitPc - VRF( VRFCond ).CompMaxDeltaP, MinRefriPe );
 			MinOutdoorUnitTe = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, max( min( MinOutdoorUnitPe, RefPHigh), RefPLow ), RefrigerantIndex, RoutineName );
 		
 			CompEvaporatingCAPSpdMin = CurveValue( VRF( VRFCond ).OUCoolingCAPFT( 1 ), MinOutdoorUnitTc, MinOutdoorUnitTe ); 
@@ -7400,7 +7425,7 @@ namespace HVACVariableRefrigerantFlow {
 							Pipe_h_IU_in  = GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Tc0 - VRF( VRFCond ).SC,  0.0, RefrigerantIndex, RoutineName );
 							CompSpdActual = VRF( VRFCond ).CompressorSpeed( 1 );
 							Par( 1 ) = Tc0;
-							Par( 2 ) = TUCoolingLoad*C_cap_operation0;  // 150130 To be confirmed
+							Par( 2 ) = TUCoolingLoad * C_cap_operation0;  // 150130 To be confirmed
 							Par( 3 ) = VRF( VRFCond ).OUCoolingCAPFT( CounterCompSpdTemp );
 							
 							// Update Te'( MinOutdoorUnitTe ) to meet the required evaporator capacity
@@ -7408,7 +7433,7 @@ namespace HVACVariableRefrigerantFlow {
 							Pdischarge = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).CondensingTemp, RefrigerantIndex, RoutineName );
 							
 							MinRefriPe = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, -15, RefrigerantIndex, RoutineName );
-							MinOutdoorUnitPe = max( Pdischarge - VRF( VRFCond ).CompMaxDeltaP * 1000, MinRefriPe );
+							MinOutdoorUnitPe = max( Pdischarge - VRF( VRFCond ).CompMaxDeltaP, MinRefriPe );
 							MinOutdoorUnitTe = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, max( min( MinOutdoorUnitPe, RefPHigh), RefPLow ), RefrigerantIndex, RoutineName );
 							
 							SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual, MinOutdoorUnitTe, Tsuction, Par ); // SmallLoadTe is the updated Te'
@@ -7567,8 +7592,9 @@ namespace HVACVariableRefrigerantFlow {
 				} // END DO DoName1
 				
 				CompEvaporatingCAPSpd( NumOfCompSpdInput ) = CurveValue( VRF( VRFCond ).OUCoolingCAPFT( NumOfCompSpdInput ), VRF( VRFCond ).CondensingTemp, Tsuction );
-				
-				if( TUCoolingLoad > CompEvaporatingCAPSpd( NumOfCompSpdInput ) ) {
+				if( CounterCompSpdTemp > NumOfCompSpdInput ) { 
+				// CounterCompSpdTemp > NumOfCompSpdInput 
+				// TUCoolingLoad * C_cap_operation > CompEvaporatingCAPSpd( NumOfCompSpdInput )
 				// Required cooling load is beyond the maximum system capacity
 					NcompCooling = CompEvaporatingPWRSpd( NumOfCompSpdInput );
 					CompSpdActual = VRF( VRFCond ).CompressorSpeed( NumOfCompSpdInput );
@@ -7703,7 +7729,7 @@ namespace HVACVariableRefrigerantFlow {
 		
 			CondFlowRatio = 1.0;
 			MinRefriPe = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, -15, RefrigerantIndex, RoutineName );   
-			MinOutdoorUnitPe = min( Pdischarge - VRF( VRFCond ).CompMaxDeltaP * 1000, MinRefriPe ); 
+			MinOutdoorUnitPe = min( Pdischarge - VRF( VRFCond ).CompMaxDeltaP, MinRefriPe ); 
 			MinOutdoorUnitTe = GetSatTemperatureRefrig( VRF( VRFCond ).RefrigerantName, max( min( MinOutdoorUnitPe, RefPHigh), RefPLow), RefrigerantIndex, RoutineName );
 			CompEvaporatingCAPSpdMin = CurveValue( VRF( VRFCond ).OUCoolingCAPFT( 1 ), Tdischarge, MinOutdoorUnitTe );
 			CompEvaporatingPWRSpdMin = CurveValue( VRF( VRFCond ).OUCoolingPWRFT( 1 ), Tdischarge, MinOutdoorUnitTe );
@@ -7831,10 +7857,13 @@ namespace HVACVariableRefrigerantFlow {
 						
 					} //Since: if( CondHeatExtract <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) )
 				 
-				} //END DO DoName2
+				} // END DO DoName2
 		
 				CompEvaporatingCAPSpd( NumOfCompSpdInput ) = CurveValue( VRF( VRFCond ).OUCoolingCAPFT( NumOfCompSpdInput ), Tdischarge, VRF( VRFCond ).EvaporatingTemp );
-				if( CondHeatExtract > CompEvaporatingCAPSpd( NumOfCompSpdInput ) ) {
+				if( CounterCompSpdTemp > NumOfCompSpdInput ) { 
+				// CounterCompSpdTemp > NumOfCompSpdInput 
+				// CondHeatExtract * C_cap_operation > CompEvaporatingCAPSpd( NumOfCompSpdInput )
+				// Required heating load is beyond the maximum system capacity
 					NcompHeating = CompEvaporatingPWRSpd( NumOfCompSpdInput );
 					CompSpdActual = VRF( VRFCond ).CompressorSpeed( NumOfCompSpdInput );
 				}
@@ -8066,6 +8095,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		VRF( VRFCond ).VRFCondPLR = max( CoolingPLR, HeatingPLR );
 
+		// For HR Operations
 		HRHeatRequestFlag = any( TerminalUnitList( TUListNum ).HRHeatRequest );
 		HRCoolRequestFlag = any( TerminalUnitList( TUListNum ).HRCoolRequest );
 
@@ -8305,45 +8335,6 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFCond ).QCondenser = -CondCapacity + CondPower + VRF( VRFCond ).TUCoolingLoad / VRF( VRFCond ).PipingCorrectionCooling;
 		} else {
 			VRF( VRFCond ).QCondenser = 0.0;
-		}
-
-		if ( VRF( VRFCond ).CondenserType == EvapCooled ) {
-			// Calculate basin heater power
-			CalcBasinHeaterPower( VRF( VRFCond ).BasinHeaterPowerFTempDiff, VRF( VRFCond ).BasinHeaterSchedulePtr, VRF( VRFCond ).BasinHeaterSetPointTemp, VRF( VRFCond ).BasinHeaterPower );
-			VRF( VRFCond ).BasinHeaterPower *= ( 1.0 - VRFRTF );
-
-			// calcualte evaporative condenser pump power and water consumption
-			if ( CoolingLoad( VRFCond ) && CoolingPLR > 0.0 ) {
-				//******************
-				// WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
-				// H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
-				//                    /RhoWater [kg H2O/m3 H2O]
-				//******************
-				RhoWater = RhoH2O( OutdoorDryBulb );
-				VRF( VRFCond ).EvapWaterConsumpRate = ( CondInletHumRat - OutdoorHumRat ) * CondAirMassFlow / RhoWater * VRF( VRFCond ).VRFCondPLR;
-				VRF( VRFCond ).EvapCondPumpElecPower = VRF( VRFCond ).EvapCondPumpPower * VRFRTF;
-			}
-		} else if ( VRF( VRFCond ).CondenserType == WaterCooled ) {
-
-			if ( CondCapacity > 0.0 ) {
-				CondenserWaterMassFlowRate = CondWaterMassFlow;
-			} else {
-				CondenserWaterMassFlowRate = 0.0;
-			}
-			SetComponentFlowRate( CondenserWaterMassFlowRate, VRF( VRFCond ).CondenserNodeNum, VRF( VRFCond ).CondenserOutletNodeNum, VRF( VRFCond ).SourceLoopNum, VRF( VRFCond ).SourceLoopSideNum, VRF( VRFCond ).SourceBranchNum, VRF( VRFCond ).SourceCompNum );
-
-			VRF( VRFCond ).CondenserInletTemp = Node( VRF( VRFCond ).CondenserNodeNum ).Temp;
-			VRF( VRFCond ).WaterCondenserMassFlow = Node( VRF( VRFCond ).CondenserNodeNum ).MassFlowRate;
-
-			CpCond = GetSpecificHeatGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, VRF( VRFCond ).CondenserInletTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
-			if ( CondWaterMassFlow > 0.0 ) {
-				CondOutletTemp = VRF( VRFCond ).QCondenser / ( CondWaterMassFlow * CpCond ) + CondInletTemp;
-			} else {
-				CondOutletTemp = CondInletTemp;
-			}
-			QCondTmp = CondWaterMassFlow * CpCond * ( CondOutletTemp - CondInletTemp );
-			VRF( VRFCond ).CondenserSideOutletTemp = CondOutletTemp;
-
 		}
 
 		// calculate operating COP

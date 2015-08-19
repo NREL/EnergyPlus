@@ -5737,12 +5737,12 @@ namespace FluidProperties {
 			++TempRangeErrCount;
 			// send warning
 			if ( TempRangeErrCount <= RefrigerantErrorLimitTest ) {
-				ShowSevereError( "GetInterpolatedSatProp: Saturation temperature for interpolation is out of range of data supplied: **" );
+				ShowWarningError( "GetInterpolatedSatProp: Saturation temperature for interpolation is out of range of data supplied: **" );
 				ShowContinueErrorTimeStamp( " Called from:" + CalledFrom );
 				ShowContinueError( "Refrigerant temperature = " + RoundSigDigits( Temperature, 2 ) );
 				ShowContinueError( "Returned saturated property value = " + RoundSigDigits( ReturnValue, 3 ) );
 			} else {
-				ShowRecurringSevereErrorAtEnd( "GetInterpolatedSatProp: Refrigerant temperature for interpolation out of range error", TempRangeErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
+				ShowRecurringWarningErrorAtEnd( "GetInterpolatedSatProp: Refrigerant temperature for interpolation out of range error", TempRangeErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
 			}
 		}
 

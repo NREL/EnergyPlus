@@ -297,7 +297,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 EMSValueForHPOperatingMode;
 		int HPOperatingModeErrorIndex;
 		
-		//The following are for the Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
+		//The following are for the Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
 		std::string RefrigerantName; // Name of refrigerant, must match name in FluidName (see fluidpropertiesrefdata.idf)
 		Real64 CondensingTemp; // VRV system outdoor unit condensing temperature [C]
 		Real64 EvaporatingTemp; // VRV system outdoor unit evaporating temperature [C]
@@ -312,8 +312,8 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 OUCondTempLow; // VRV system outdoor unit condensing temperature, lower bound [C]
 		Real64 OUCondTempHigh; // VRV system outdoor unit condensing temperature, higher bound [C]
 		Real64 OUAirFlowRate; // Max condenser air flow rate  [m3/s]
-		Real64 SH; // VRF outdoor unit uperheating degrees [C]
-		Real64 SC; // VRF outdoor unit ubcooling
+		Real64 SH; // VRF outdoor unit superheating degrees [C]
+		Real64 SC; // VRF outdoor unit subcooling degrees [C]
 		Real64 C1Te; // VRF Outdoor Unit Coefficient 1 to calculate Te,req [--]
 		Real64 C2Te; // VRF Outdoor Unit Coefficient 2 to calculate Te,req [--]
 		Real64 C3Te; // VRF Outdoor Unit Coefficient 3 to calculate Te,req [--]
@@ -329,8 +329,8 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 NcompCooling; // compressor electric power at cooling mode [W]
 		Real64 NcompHeating; // compressor electric power at heating mode [W]
 		Array1D< Real64 > CompressorSpeed; // compressor speed array [rps]
-		Array1D_int OUCoolingCAPFT; // index to outdoor unit cooling capacity funtion of temperature at different compressor speed
-		Array1D_int OUCoolingPWRFT; // index to outdoor unit cooling power funtion of temperature at different compressor speed
+		Array1D_int OUCoolingCAPFT; // index to outdoor unit cooling capacity function of temperature at different compressor speed
+		Array1D_int OUCoolingPWRFT; // index to outdoor unit cooling power function of temperature at different compressor speed
 		Real64 CompMaxDeltaP; // maximum compressor pressure rise [Pa]
 		Real64 RefPipDia;  // diameter of refrigerant pipe that links the outdoor unit to the indoor units [m]
 		Real64 RefPipLen;  // length of refrigerant pipe that links the outdoor unit to the indoor units [m]
@@ -502,10 +502,10 @@ namespace HVACVariableRefrigerantFlow {
 			EMSOverrideHPOperatingMode( false ),
 			EMSValueForHPOperatingMode( 0.0 ),
 			HPOperatingModeErrorIndex( 0 ),
-			CondensingTemp( 25.0 ),
+			CondensingTemp( 44.0 ),
 			EvaporatingTemp( 6.0 ),
 			IUEvaporatingTemp( 6.0 ), 
-			IUCondensingTemp( 25.0 ),
+			IUCondensingTemp( 44.0 ),
 			IUEvapTempLow( 4.0 ),
 			IUEvapTempHigh( 13.0 ),
 			IUCondTempLow( 42.0 ), 

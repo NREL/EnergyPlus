@@ -4895,9 +4895,9 @@ namespace DXCoils {
 			++DXCoilNum;
 
 			// allocate single performance mode for numeric field strings used for sizing routine
-			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
+			DXCoilNumericFields( DXCoilNum ).PerfMode.allocate ( 1 );
 			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
-			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
+			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames = cNumericFields;
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -4984,9 +4984,9 @@ namespace DXCoils {
 			++DXCoilNum;
 
 			// allocate single performance mode for numeric field strings used for sizing routine
-			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
-			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
-			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
+			DXCoilNumericFields( DXCoilNum ).PerfMode.allocate ( 1 );
+			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate( MaxNumbers );
+			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames = cNumericFields;
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -5283,8 +5283,8 @@ namespace DXCoils {
 			}
 			
 			
-			// VRF heating coil for FluidTCtrl
-			else if ( Coil.DXCoilType_Num == CoilVRF_FluidTCtrl_Heating ) {
+			// VRF cooling coil for FluidTCtrl, report variables
+			else if ( Coil.DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling ) {
 				// Setup Report Variables for Cooling Equipment:
 				// CurrentModuleObject='Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl
 				SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", Coil.TotalCoolingEnergyRate, "System", "Average", Coil.Name );
@@ -5294,7 +5294,7 @@ namespace DXCoils {
 				SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", Coil.LatCoolingEnergyRate, "System", "Average", Coil.Name );
 				SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", Coil.LatCoolingEnergy, "System", "Sum", Coil.Name );
 				SetupOutputVariable( "Cooling Coil Runtime Fraction []", Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name );
-				// Followings for VRF FluidTCtrl Only
+				// Followings for VRF_FluidTCtrl Only
 				SetupOutputVariable( "Cooling Coil VRF Evaporating Temperature [C]", Coil.EvaporatingTemp, "System", "Average", Coil.Name );
 				SetupOutputVariable( "Cooling Coil VRF Super Heating Degrees [C]", Coil.ActualSH, "System", "Average", Coil.Name );
 				
@@ -5304,17 +5304,16 @@ namespace DXCoils {
 				}
 			}
 
-			// VRF cooling coil for FluidTCtrl
-			else if ( Coil.DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling )  {
+			// VRF heating coil for FluidTCtrl, report variables
+			else if ( Coil.DXCoilType_Num == CoilVRF_FluidTCtrl_Heating )  {
 				// Setup Report Variables for Heating Equipment:
 				// CurrentModuleObject='Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl
 				SetupOutputVariable( "Heating Coil Total Heating Rate [W]", Coil.TotalHeatingEnergyRate, "System", "Average", Coil.Name );
 				SetupOutputVariable( "Heating Coil Total Heating Energy [J]", Coil.TotalHeatingEnergy, "System", "Sum", Coil.Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 				SetupOutputVariable( "Heating Coil Runtime Fraction []", Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name );
-				// Followings for VRF FluidTCtrl Only
+				// Followings for VRF_FluidTCtrl Only
 				SetupOutputVariable( "Heating Coil VRF Condensing Temperature [C]", Coil.CondensingTemp, "System", "Average", Coil.Name );
 				SetupOutputVariable( "Heating Coil VRF Subcooling Degrees [C]", Coil.ActualSC, "System", "Average", Coil.Name );
-				
 			}
 			
 		}
@@ -5529,7 +5528,7 @@ namespace DXCoils {
 
 			}
 			
-			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling ) {// @@  
+			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling ) {  
 
 				Mode = 1;
 				// Check for zero capacity or zero max flow rate
@@ -5607,7 +5606,7 @@ namespace DXCoils {
 
 			}
 
-			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating ) { // @@
+			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating ) { 
 
 				Mode = 1;
 				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) <= 0.0 ) {
@@ -5989,14 +5988,20 @@ namespace DXCoils {
 						if ( ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) && ( DXCoil( DXCoilNum ).CondenserType( 1 ) == AirCooled ) ) { // seconday DX coil in secondary zone is specified
 							SizeSecDXCoil = true;
 						}
-					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) { //  @@ || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating
+					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) { 
 						SizingMethod = HeatingAirflowSizing;
 						CompName = DXCoil( DXCoilNum ).Name;
 						FieldNum = 2;
-					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) { // @@ || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling
+					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) { 
 						SizingMethod = CoolingAirflowSizing;
 						CompName = DXCoil( DXCoilNum ).Name;
 						FieldNum = 3;
+					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating ) { 
+						SizingMethod = HeatingAirflowSizing;
+						CompName = DXCoil( DXCoilNum ).Name;
+					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling ) { 
+						SizingMethod = CoolingAirflowSizing;
+						CompName = DXCoil( DXCoilNum ).Name;
 					} else {
 						SizingMethod = CoolingAirflowSizing;
 						CompName = DXCoil( DXCoilNum ).Name;
@@ -6004,7 +6009,11 @@ namespace DXCoils {
 					}
 					PrintFlag = true;
 					TempSize = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
-					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [m3/s]";
+					if( FieldNum > 0 ){
+						SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [m3/s]";
+					} else {
+						SizingString = "Rated Air Flow Rate [m3/s]"; 
+					}
 					CompType = DXCoil( DXCoilNum ).DXCoilType;
 					DataIsDXCoil = true;
 					DataEMSOverrideON = DXCoil ( DXCoilNum ).RatedAirVolFlowRateEMSOverrideON ( Mode );
@@ -15005,16 +15014,15 @@ Label50: ;
     ) {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Xiufeng Pang, LBNL
-        //       DATE WRITTEN   Feb 2013
-        //       MODIFIED       Feb 2014, Xiufeng Pang, LBNL, Apply the new algorithms from Daikin to simulate the indoor unit
-        //                      Jul 2015, RP Zhang, LBNL, Modify the bounds of the Te/Tc
+        //       DATE WRITTEN   Feb 2014
+        //       MODIFIED       Jul 2015, RP Zhang, LBNL, Modify the bounds of the Te/Tc
         //       RE-ENGINEERED  na
         
         // PURPOSE OF THIS SUBROUTINE:
         // 		 Calculate the VRF IU Te (cooling mode) and Tc (heating mode), given zonal loads.
         
         // METHODOLOGY EMPLOYED:
-        // 		 Daikin New VRF Energy Simulation Model.
+		//		 A new physics based VRF model appliable for Fluid Temperature Control.
         
         // REFERENCES:
         // na
@@ -15196,7 +15204,7 @@ Label50: ;
 	    //        Calculated parameters includie: (1) Fan Speed Ratio, (2) SH/SC Degrees, and (3) Coil Inlet/Outlet conditions 
         //
         // METHODOLOGY EMPLOYED:
-        //        Daikin New Energy Simulation Model of VRV PowerPoint.
+		//		  A new physics based VRF model appliable for Fluid Temperature Control.
         //
         // REFERENCES:
         //        na
