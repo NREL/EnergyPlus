@@ -4777,7 +4777,6 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 	// METHODOLOGY EMPLOYED:
 	// Various boundary conditions are set and additional parameters are set-
-	// up.  Then, the proper heat balance equation is selected based on whether
 	// the surface is a partition or not and on whether or not movable
 	// insulation is present on the inside face.
 
@@ -5094,7 +5093,10 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			RhoVaporAirIn( SurfNum ) = min( PsyRhovFnTdbWPb_fast( MAT_zone, ZoneAirHumRat_zone, OutBaroPress ), PsyRhovFnTdbRh( MAT_zone, 1.0, HBSurfManInsideSurf ) );
 			// TODO: Check with Jason about why RhoVaporAirIn( SurfNum ) wasn't added in his version.
 			//       The original was commented out, which makes me think it was a debugging effort.
-			HMassConvInFD( SurfNum ) = HConvIn_surf / ( ( PsyRhoAirFnPbTdbW_fast( OutBaroPress, MAT_zone, ZoneAirHumRat_zone ) + RhoVaporAirIn( SurfNum ) ) * PsyCpAirFnWTdb_fast( ZoneAirHumRat_zone, MAT_zone ) );
+			//		 
+			//		 The rhoVaporAirIn should be removed. CpAir units are on a mass of dry-air basis, so should only multiply by dry-air density (PsyRhoAirFn...)
+			//        Units are [m/s] = [J/s-m^2-K] / ([kg_da/m^3] * [J/kg_da-K]) = [J-m^3-kg_da-K / s-m^2-K-kg_da-J] = [m/s]
+			HMassConvInFD( SurfNum ) = HConvIn_surf / ( PsyRhoAirFnPbTdbW_fast( OutBaroPress, MAT_zone, ZoneAirHumRat_zone ) * PsyCpAirFnWTdb_fast( ZoneAirHumRat_zone, MAT_zone ) );
 
 			// Perform heat balance on the inside face of the surface ...
 			// The following are possibilities here:
@@ -5184,6 +5186,8 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 							}
 							if ( surface.HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
 								TempSurfInTmp( SurfNum ) -= MoistEMPDFlux( SurfNum ) * TempDiv; // Coefficient for conduction (current time) | Convection and damping term
+								Real64 MoistEMPDflux_dummy;
+								MoistEMPDflux_dummy = MoistEMPDFlux(SurfNum);
 								if ( TempSurfInSat > TempSurfInTmp( SurfNum ) ) {
 									TempSurfInTmp( SurfNum ) = TempSurfInSat; // Surface temp cannot be below dew point
 								}
@@ -5655,6 +5659,10 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 				RhoVaporSurfIn( SurfNum ) = MoistEMPDNew( SurfNum );
 				//SUMC(ZoneNum) = SUMC(ZoneNum)-MoistEMPDFlux(SurfNum)*Surface(SurfNum)%Area
 				// TODO: Check with Jason that these equations were applied correctly. It's different than in his code.
+				//       This equation calculates mass transfer from the surface to the zone. There may be something wrong with these equations, hence the debugging. But not sure. 
+				//	     First equation is mass-transfer coefficient x area ([m/s] x [m^2] = [m^3/s])
+				//	     Second equation calculates mass transfer ([m^3/s] * [kg_v/m^3] = [kg_v/s]
+				//	     Third and fourth equations calculate some non-intuitive terms: mass-transfer coefficient x area x dry-air density [kg_da/s], and mass-transfer coefficient x area x inside surface vapor density [kg_v/s]
 				Real64 const FD_Area_fac( HMassConvInFD( SurfNum ) * surface.Area );
 				SumHmAW( ZoneNum ) += FD_Area_fac * ( RhoVaporSurfIn( SurfNum ) - RhoVaporAirIn( SurfNum ) );
 				Real64 const surfInTemp( TempSurfInTmp( SurfNum ) );

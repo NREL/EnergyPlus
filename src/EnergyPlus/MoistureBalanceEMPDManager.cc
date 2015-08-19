@@ -472,7 +472,7 @@ namespace MoistureBalanceEMPDManager {
 			return;
 		}
 
-		Taver = 24.5;
+		Taver = 20;
 		RVaver = ( MoistEMPDNew( SurfNum ) + MoistEMPDOld( SurfNum ) ) * 0.5;
 		RHaver = RVaver * 461.52 * ( Taver + KelvinConv ) * std::exp( -23.7093 + 4111.0 / ( Taver + 237.7 ));
 		PVsat = PsyPsatFnTemp( Taver, RoutineName );
@@ -480,7 +480,7 @@ namespace MoistureBalanceEMPDManager {
 		
 		RHOBULK = material.Density;
 		
-		EMPDdiffusivity = material.EMPDperm * 461.52 * ( Taver + KelvinConv );
+		EMPDdiffusivity = material.EMPDperm * 461.52 * (Taver + KelvinConv);
 		
 		AT = material.MoistACoeff * material.MoistBCoeff * pow( RHaver, material.MoistBCoeff - 1 ) + material.MoistCCoeff * material.MoistCCoeff * material.MoistDCoeff * pow( RHaver, material.MoistDCoeff - 1 );
 		
@@ -490,11 +490,14 @@ namespace MoistureBalanceEMPDManager {
 		Rcoating = material.CoatingThickness * material.CoatingPerm * 461.52 * ( Taver + KelvinConv );
 		HMshort( SurfNum ) = 1.0 / ( 0.5 * dEMPD / EMPDdiffusivity + 1.0 / HMassConvInFD( SurfNum ) + Rcoating );
 		HMlong = 2.0 * EMPDdiffusivity / ( dEMPDdeep + dEMPD );
-		
+		RSurfaceLayer = 1.0 / HMshort(SurfNum) - 1.0 / HMassConvInFD(SurfNum) - Rcoating;
+
 		FluxSurf( SurfNum ) = HMshort( SurfNum ) * ( RVsurface( SurfNum ) - RhoVaporAirIn( SurfNum ) ) + HMlong * ( RVsurface( SurfNum ) - RVdeep( SurfNum ) );
 		FluxDeep( SurfNum ) = HMlong * ( RVsurface( SurfNum ) - RVdeep( SurfNum ) );
 		FluxZone( SurfNum ) = HMshort( SurfNum ) * ( RVsurface( SurfNum ) - RhoVaporAirIn( SurfNum ) );
 		
+		MoistEMPDNew(SurfNum) = RVsurface(SurfNum) - FluxZone(SurfNum)*RSurfaceLayer;
+
 		RHDeepOld = PsyRhFnTdbRhov( Taver, RVdeepOld( SurfNum ) );
 		RHSurfOld = PsyRhFnTdbRhov( Taver, RVsurfOld( SurfNum ) );
 		
@@ -504,9 +507,12 @@ namespace MoistureBalanceEMPDManager {
 		RVsurface( SurfNum ) = PsyRhovFnTdbRh( Taver, RHsurface );
 		RVdeep( SurfNum ) = PsyRhovFnTdbRh( Taver, RHdeep );
 
+		
+		MoistEMPDFlux(SurfNum) = FluxZone(SurfNum)*Lam;
+
 		// Calculate latent load
 		PVsurf = RHaver * std::exp( 23.7093 - 4111.0 / ( Taver + 237.7 ) );
-
+		
 		// Calculate surface dew point temperature based on surface vapor density
 		TempSat = 4111.0 / ( 23.7093 - std::log( PVsurf ) ) + 35.45 - KelvinConv;
 
