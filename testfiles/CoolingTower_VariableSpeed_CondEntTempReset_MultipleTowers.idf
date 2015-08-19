@@ -3996,3 +3996,4 @@
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
 
+Output:Variable, Condenser Supply Outlet Node,System Node Setpoint Temperature,hourly;

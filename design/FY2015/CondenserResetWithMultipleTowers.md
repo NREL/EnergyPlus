@@ -173,3 +173,11 @@ I modified the ConEntTempReset file to include a second cooling tower.  I encoun
 ![](CondenserResetWithMultipleTowers-FigureTowerHeatTransferTest.png)
 
   Although the total heat transfer varies slightly through the day, the overall behavior is nearly equivalent.
+
+  - Results, Annual: To check the annual operation of the setpoint manager, I re-ran the input file and plotted the setpoint temperature:
+  
+![](CondenserResetWithMultipleTowers-FigureAnnualCondenserSetpoint.png)
+  
+  The loop behaves pretty much identically throughout the entire year.  The small deviation could be that the loop was out of capacity with only a single tower, I might investigate further, but not right now.  
+  
+I am moving forward assuming the non-ideal condenser setpoint is working fine for multiple towers.  The optimality of the setpoint when using two towers is similar for a single tower configuration in that it is determined solely on how well the curves are defined for optimality.
