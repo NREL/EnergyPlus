@@ -5,14 +5,19 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::CurveManager;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::Psychrometrics;
+using namespace EnergyPlus::DataSizing;
+using namespace EnergyPlus::DataAirSystems;
 
 // This could almost definitely benefit from some improvements such as a fixture to only do init once,
 // but I've never used those and am just interested in stubbing this out for now
@@ -213,4 +218,62 @@ TEST( EvaporativeCoolers, IndEvapCoolerPower )
 
 	EvaporativeCoolers::EvapCond.deallocate();
 	PerfCurve.deallocate();
+}
+TEST( EvaporativeCoolers, SizeEvapCoolerTest ) {
+
+	ShowMessage( "Begin Test: EvaporativeCoolers, SizeEvapCoolerTest" );
+
+	int const EvapCoolNum( 1 );
+	Real64 PrimaryAirDesignFlow( 0.0 );
+	Real64 SecondaryAirDesignFlow( 0.0 );
+
+	// allocate
+	DataSizing::CurSysNum = 1;
+	EvaporativeCoolers::EvapCond.allocate( 1 );
+	FinalSysSizing.allocate( CurSysNum );
+	PrimaryAirSystem.allocate( CurSysNum );
+	PrimaryAirSystem( CurSysNum ).Branch.allocate( 1 );
+	PrimaryAirSystem( CurSysNum ).Branch( 1 ).Comp.allocate( 1 );
+
+	// Set Primary Air Data
+	PrimaryAirSystem( CurSysNum ).NumBranches = 1;
+	PrimaryAirSystem( CurSysNum ).Branch( 1 ).TotalComponents = 1;
+	// Evaporative Cooler Type "EvaporativeCooler:Indirect:ResearchSpecial"
+	EvaporativeCoolers::EvapCond( EvapCoolNum ).EvapCoolerType = 1004;
+
+	// Set Parameters for Evap Cooler on Main Air Loop System
+	EvaporativeCoolers::EvapCond( EvapCoolNum ).EvapCoolerName = "EvapCool On Main AirLoop",
+	PrimaryAirSystem( CurSysNum ).Branch( 1 ).Comp( 1 ).Name = EvaporativeCoolers::EvapCond( EvapCoolNum ).EvapCoolerName;
+	EvaporativeCoolers::EvapCond( EvapCoolNum ).VolFlowRate = DataSizing::AutoSize;
+	EvaporativeCoolers::EvapCond( EvapCoolNum ).IndirectVolFlowRate = DataSizing::AutoSize;
+	FinalSysSizing( CurSysNum ).DesMainVolFlow = 1.0;
+	FinalSysSizing( CurSysNum ).DesOutAirVolFlow = 0.2;
+	EvaporativeCoolers::EvapCond( EvapCoolNum ).IndirectVolFlowScalingFactor = 1.2;
+	PrimaryAirDesignFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+	SecondaryAirDesignFlow = PrimaryAirDesignFlow * EvaporativeCoolers::EvapCond( EvapCoolNum ).IndirectVolFlowScalingFactor;
+
+	// Test Indirect Evaporative Cooler Primary/Secondary Air Design Flow Rate on Main Air Loop 
+	EvaporativeCoolers::SizeEvapCooler( EvapCoolNum );
+	EXPECT_EQ( PrimaryAirDesignFlow, EvaporativeCoolers::EvapCond( EvapCoolNum ).VolFlowRate );
+	EXPECT_EQ( SecondaryAirDesignFlow, EvaporativeCoolers::EvapCond( EvapCoolNum ).IndirectVolFlowRate );
+	
+	// Set Parameters for Evap Cooler on OA System
+	EvaporativeCoolers::EvapCond( EvapCoolNum ).EvapCoolerName = "EvapCool On OA System",
+	EvaporativeCoolers::EvapCond( EvapCoolNum ).VolFlowRate = DataSizing::AutoSize;
+	EvaporativeCoolers::EvapCond( EvapCoolNum ).IndirectVolFlowRate = DataSizing::AutoSize;
+	FinalSysSizing( CurSysNum ).DesMainVolFlow = 1.0;
+	FinalSysSizing( CurSysNum ).DesOutAirVolFlow = 0.2;
+	EvaporativeCoolers::EvapCond( EvapCoolNum ).IndirectVolFlowScalingFactor = 1.0;
+	PrimaryAirDesignFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+	SecondaryAirDesignFlow = max( PrimaryAirDesignFlow, 0.5 * FinalSysSizing( CurSysNum ).DesMainVolFlow );
+	SecondaryAirDesignFlow = SecondaryAirDesignFlow * EvaporativeCoolers::EvapCond( EvapCoolNum ).IndirectVolFlowScalingFactor;
+
+	// Test Indirect Evaporative Cooler Primary/Secondary Air Design Flow Rate on AO System
+	EvaporativeCoolers::SizeEvapCooler( EvapCoolNum );
+	EXPECT_EQ( PrimaryAirDesignFlow, EvaporativeCoolers::EvapCond( EvapCoolNum ).VolFlowRate );
+	EXPECT_EQ( SecondaryAirDesignFlow, EvaporativeCoolers::EvapCond( EvapCoolNum ).IndirectVolFlowRate );
+
+	EvaporativeCoolers::EvapCond.deallocate();
+	PrimaryAirSystem.deallocate();
+	FinalSysSizing.deallocate();
 }
