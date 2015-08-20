@@ -238,12 +238,18 @@ SET( SRC
   GlobalNames.hh
   GroundHeatExchangers.cc
   GroundHeatExchangers.hh
-  GroundTempsManager.cc
-  GroundTempsManager.hh
-  GroundTempsFiniteDiff.cc
-  GroundTempsKusudaAchenbach.cc
-  GroundTempsSite.cc
-  GroundTempsXing.cc
+  GroundTemperatureModeling/
+  GroundTemperatureModeling/BaseGroundTemperatureModel.hh
+  GroundTemperatureModeling/GroundTempsFiniteDiff.cc
+  GroundTemperatureModeling/GroundTempsFiniteDiff.hh
+  GroundTemperatureModeling/GroundTempsKusudaAchenbach.cc
+  GroundTemperatureModeling/GroundTempsKusudaAchenbach.hh
+  GroundTemperatureModeling/GroundTempsManager.cc
+  GroundTemperatureModeling/GroundTempsManager.hh  
+  GroundTemperatureModeling/GroundTempsSite.cc
+  GroundTemperatureModeling/GroundTempsSite.hh
+  GroundTemperatureModeling/GroundTempsXing.cc
+  GroundTemperatureModeling/GroundTempsXing.hh
   HVACControllers.cc
   HVACControllers.hh
   HVACCooledBeam.cc
