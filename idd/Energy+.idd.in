@@ -1739,27 +1739,42 @@ Site:GroundTemperature:Undisturbed:Xing,
        \memo Xing 2014 2 harmonic parameter model.
   A1,  \field Name of ground temperature object
        \required-field
-  N1,  \field Average Soil Temperature
+  N1,  \field Soil Thermal Conductivity
+       \required-field
+       \type real
+       \units W/m-K
+       \minimum> 0.0
+  N2,  \field Soil Density
+       \required-field
+       \type real
+       \units kg/m3
+       \minimum> 0.0
+  N3,  \field Soil Specific Heat
+       \required-field
+       \type real
+       \units J/kg-K
+       \minimum> 0.0
+  N4,  \field Average Soil Temperature
        \required-field
        \type real
        \units C
        \note Annual average soil temperature
-  N2,  \field Surface Temperature Amplitude 1
+  N5,  \field Surface Temperature Amplitude 1
        \required-field
        \type real
        \units deltaC
        \note First surface amplitude parameter
-  N3,  \field Phase Shift 1
+  N6,  \field Phase Shift 1
        \required-field
        \type real
        \units days
        \note Phase shift of first surface amplitude parameter
-  N4,  \field Surface Temperature Amplitude 2
+  N7,  \field Surface Temperature Amplitude 2
        \required-field
        \type real
        \units deltaC
        \note Second surface amplitude parameter
-  N5;  \field Phase Shift 2
+  N8;  \field Phase Shift 2
        \required-field
        \type real
        \units days
@@ -1770,17 +1785,32 @@ Site:GroundTemperature:Undisturbed:KusudaAchenbach,
        \memo Kusuda-Achenbach 1965 correlation.
   A1,  \field Name of ground temperature object
        \required-field
-  N1,  \field Average Surface Temperature
+  N1,  \field Soil Thermal Conductivity
+       \required-field
+       \type real
+       \units W/m-K
+       \minimum> 0.0
+  N2,  \field Soil Density
+       \required-field
+       \type real
+       \units kg/m3
+       \minimum> 0.0
+  N3,  \field Soil Specific Heat
+       \required-field
+       \type real
+       \units J/kg-K
+       \minimum> 0.0
+  N4,  \field Average Surface Temperature
        \required-field
        \type real
        \units C
        \note Annual average surface temperature
-  N2,  \field Average Amplitude of Surface Temperature
+  N5,  \field Average Amplitude of Surface Temperature
        \required-field
        \type real
        \units deltaC
        \note Annual average surface temperature variation from average.
-  N3;  \field Phase Shift of Minimum Surface Temperature
+  N6;  \field Phase Shift of Minimum Surface Temperature
        \required-field
        \type real
        \units days

@@ -18,8 +18,7 @@ namespace GroundTemperatureManager {
 	std::shared_ptr< BaseGroundTempsModel >
 	GetGroundTempModelAndInit(
 		std::string const type,
-		std::string const name,
-		Real64 const groundThermalDiffusivity
+		std::string const name
 	);
 
 	void

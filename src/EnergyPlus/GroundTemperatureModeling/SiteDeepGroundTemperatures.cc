@@ -21,7 +21,10 @@ namespace EnergyPlus {
 
 	// Site:GroundTemperature:Deep factory
 	std::shared_ptr< SiteDeepGroundTemps > 
-	SiteDeepGroundTemps::DeepGTMFactory()
+	SiteDeepGroundTemps::DeepGTMFactory( 
+		int objectType, 
+		std::string objectName
+	)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell

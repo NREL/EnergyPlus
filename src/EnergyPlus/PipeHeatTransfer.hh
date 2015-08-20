@@ -12,14 +12,14 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
-#include <GroundTempsManager.hh>
+#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 
 namespace EnergyPlus {
 
 namespace PipeHeatTransfer {
 
 	// Using/Aliasing
-	using namespace GroundTemps;
+	using namespace GroundTemperatureManager;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS

@@ -17,7 +17,7 @@
 #include <DisplayRoutines.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <GroundTempsManager.hh>
+#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -77,7 +77,7 @@ namespace GroundHeatExchangers {
 	using DataHVACGlobals::SysTimeElapsed;
 	using namespace DataLoopNode;
 	using General::TrimSigDigits;
-	using namespace GroundTemps;
+	using namespace GroundTemperatureManager;
 
 	// Data
 	// DERIVED TYPE DEFINITIONS
@@ -1605,7 +1605,7 @@ namespace GroundHeatExchangers {
 				}
 
 				// Initialize ground temperature model and get pointer reference
-				slinkyGLHE( GLHENum ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ) , cAlphaArgs( 6 ), slinkyGLHE( GLHENum ).diffusivityGround );
+				slinkyGLHE( GLHENum ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ) , cAlphaArgs( 6 ) );
 
 				//Check for Errors
 				if ( errorsFound ) {
@@ -2117,7 +2117,7 @@ namespace GroundHeatExchangers {
 		using DataPlant::TypeOf_GrndHtExchgSlinky;
 		using DataPlant::ScanPlantLoopsForObject;
 		using FluidProperties::GetDensityGlycol;
-		using namespace GroundTemps;
+		using namespace GroundTemperatureManager;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

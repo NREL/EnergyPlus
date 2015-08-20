@@ -21,7 +21,10 @@ namespace EnergyPlus {
 
 	// Site:GroundTemperature:FCFactorMethod factory
 	std::shared_ptr< SiteFCFactorMethodGroundTemps > 
-	SiteFCFactorMethodGroundTemps::FCFactorGTMFactory()
+	SiteFCFactorMethodGroundTemps::FCFactorGTMFactory( 
+		int objectType, 
+		std::string objectName
+	)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell

@@ -27,7 +27,10 @@ namespace EnergyPlus {
 
 			{}
 
-		static std::shared_ptr< SiteBuildingSurfaceGroundTemps > BuildingSurfaceGTMFactory();
+		static std::shared_ptr< SiteBuildingSurfaceGroundTemps > BuildingSurfaceGTMFactory( 
+			int objectType, 
+			std::string objectName
+		);
 
 		Real64
 		getGroundTemp();

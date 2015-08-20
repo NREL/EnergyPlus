@@ -17,8 +17,7 @@ namespace EnergyPlus {
 	std::shared_ptr< KusudaGroundTempsModel > 
 	KusudaGroundTempsModel::KusudaGTMFactory( 
 		int objectType, 
-		std::string objectName,
-		Real64 groundThermalDiffusivity
+		std::string objectName
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -58,10 +57,10 @@ namespace EnergyPlus {
 				// Read input into object here
 				thisModel->objectName = cAlphaArgs( 1 );
 				thisModel->objectType = objectType;
-				thisModel->aveGroundTemp = rNumericArgs( 1 );
-				thisModel->aveGroundTempAmplitude = rNumericArgs( 2 );
-				thisModel->phaseShiftInSecs = rNumericArgs( 3 ) * SecsInDay;
-				thisModel->groundThermalDiffisivity = groundThermalDiffusivity;
+				thisModel->groundThermalDiffisivity = rNumericArgs( 1 ) / ( rNumericArgs( 2 ) * rNumericArgs( 3 ) );
+				thisModel->aveGroundTemp = rNumericArgs( 4 );
+				thisModel->aveGroundTempAmplitude = rNumericArgs( 5 );
+				thisModel->phaseShiftInSecs = rNumericArgs( 6 ) * SecsInDay;
 
 				// Putting this here for now. Need to implement functionality allowing parameters to be generated from Site:GroundTemperature:Shallow if KA object not present
 

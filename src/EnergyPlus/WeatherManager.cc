@@ -24,7 +24,7 @@
 #include <DisplayRoutines.hh>
 #include <EMSManager.hh>
 #include <General.hh>
-#include <GroundTempsManager.hh>
+#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -64,7 +64,7 @@ namespace WeatherManager {
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
 	using namespace DataEnvironment;
-	using namespace GroundTemps;
+	using namespace GroundTemperatureManager;
 	using namespace DataReportingFlags;
 	using DataSystemVariables::iASCII_CR;
 	using DataSystemVariables::iUnicode_end;
@@ -2004,7 +2004,7 @@ namespace WeatherManager {
 		using General::JulianDay;
 		using ScheduleManager::UpdateScheduleValues;
 		using InputProcessor::SameString;
-		using namespace GroundTemps;
+		using namespace GroundTemperatureManager;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -7155,7 +7155,7 @@ Label9999: ;
 		using namespace DataIPShortCuts;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
-		using namespace GroundTemps;
+		using namespace GroundTemperatureManager;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -7176,19 +7176,19 @@ Label9999: ;
 
 		// FLOW:
 		// Initialize Site:GroundTemperature:BuildingSurface object
-		siteBuildingSurfaceGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "", 0.0);
+		siteBuildingSurfaceGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "" );
 		ErrorsFound = siteBuildingSurfaceGroundTempsPtr->errorsFound;
 
 		// Initialize Site:GroundTemperature:FCFactorMethod object
-		siteFCFactorMethodGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "", 0.0);
+		siteFCFactorMethodGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "" );
 		ErrorsFound = siteFCFactorMethodGroundTempsPtr->errorsFound;	
 
 		// Initialize Site:GroundTemperature:Shallow object
-		siteShallowGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:SHALLOW", "", 0.0);
+		siteShallowGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:SHALLOW", "" );
 		ErrorsFound = siteShallowGroundTempsPtr->errorsFound;
 		
 		// Initialize Site:GroundTemperature:Deep object
-		siteDeepGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:DEEP", "", 0.0);
+		siteDeepGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:DEEP", "" );
 		ErrorsFound = siteDeepGroundTempsPtr->errorsFound;
 
 	}

@@ -13,11 +13,10 @@ namespace EnergyPlus {
 	//******************************************************************************
 
 	// Xing model factory
-	std::shared_ptr< XingGroundTemps > 
-	XingGroundTemps::XingGTMFactory( 
+	std::shared_ptr< XingGroundTempsModel > 
+	XingGroundTempsModel::XingGTMFactory( 
 		int objectType, 
-		std::string objectName,
-		Real64 groundThermalDiffusivity
+		std::string objectName
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -42,7 +41,7 @@ namespace EnergyPlus {
 		bool ErrorsFound = false;
 
 		// New shared pointer for this model object
-		std::shared_ptr< XingGroundTemps > thisModel( new XingGroundTemps() );
+		std::shared_ptr< XingGroundTempsModel > thisModel( new XingGroundTempsModel() );
 
 		std::string const cCurrentModuleObject = "Site:GroundTemperature:Undisturbed:Xing";
 		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
@@ -56,13 +55,13 @@ namespace EnergyPlus {
 
 				thisModel->objectName = cAlphaArgs( 1 );
 				thisModel->objectType = objectType;
-				thisModel->aveGroundTemp = rNumericArgs( 1 );
-				thisModel->surfTempAmplitude_1 = rNumericArgs( 2 );
-				thisModel->phaseShift_1 = rNumericArgs( 3 );
-				thisModel->surfTempAmplitude_2 = rNumericArgs( 4 );
-				thisModel->phaseShift_2 = rNumericArgs( 5 );
-				thisModel->groundThermalDiffisivity = groundThermalDiffusivity;
-
+				thisModel->groundThermalDiffisivity = rNumericArgs( 1 ) / ( rNumericArgs( 2 ) * rNumericArgs( 3 ) );
+				thisModel->aveGroundTemp = rNumericArgs( 4 );
+				thisModel->surfTempAmplitude_1 = rNumericArgs( 5 );
+				thisModel->phaseShift_1 = rNumericArgs( 6 );
+				thisModel->surfTempAmplitude_2 = rNumericArgs( 7 );
+				thisModel->phaseShift_2 = rNumericArgs( 8 );
+				
 				found = true;
 				break;
 			}
@@ -79,7 +78,7 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-	Real64 XingGroundTemps::getGroundTemp()
+	Real64 XingGroundTempsModel::getGroundTemp()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
@@ -130,7 +129,7 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-	Real64 XingGroundTemps::getGroundTempAtTimeInMonths(
+	Real64 XingGroundTempsModel::getGroundTempAtTimeInMonths(
 		Real64 _depth,
 		int month
 	)
@@ -162,7 +161,7 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-	Real64 XingGroundTemps::getGroundTempAtTimeInSeconds(
+	Real64 XingGroundTempsModel::getGroundTempAtTimeInSeconds(
 		Real64 _depth,
 		Real64 seconds
 	)

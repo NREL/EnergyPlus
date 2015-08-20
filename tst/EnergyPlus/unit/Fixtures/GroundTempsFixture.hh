@@ -6,7 +6,7 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
-#include <EnergyPlus/GroundTempsManager.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 
 namespace EnergyPlus {
 
@@ -21,7 +21,7 @@ namespace EnergyPlus {
 		}
 
 		virtual void TearDown() {
-			GroundTemps::clear_state();		
+			GroundTemperatureManager::clear_state();		
 
 			EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 		}

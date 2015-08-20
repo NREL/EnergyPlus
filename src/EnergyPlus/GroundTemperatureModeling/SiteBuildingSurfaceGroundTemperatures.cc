@@ -21,7 +21,10 @@ namespace EnergyPlus {
 
 	// Site:GroundTemperature:BuildingSurface factory
 	std::shared_ptr< SiteBuildingSurfaceGroundTemps > 
-	SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory()
+	SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory( 
+		int objectType, 
+		std::string objectName
+	)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell

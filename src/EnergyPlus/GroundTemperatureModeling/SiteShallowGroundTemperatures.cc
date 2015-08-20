@@ -21,7 +21,10 @@ namespace EnergyPlus {
 
 	// Site:GroundTemperature:Shallow factory
 	std::shared_ptr< SiteShallowGroundTemps > 
-	SiteShallowGroundTemps::ShallowGTMFactory()
+	SiteShallowGroundTemps::ShallowGTMFactory( 
+		int objectType, 
+		std::string objectName
+	)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell

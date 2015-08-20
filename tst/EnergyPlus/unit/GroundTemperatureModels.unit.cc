@@ -4,14 +4,14 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/GroundTempsManager.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/GroundTempsFixture.hh"
 
 using namespace EnergyPlus;
 
-using namespace EnergyPlus::GroundTemps;
+using namespace EnergyPlus::GroundTemperatureManager;
  
 TEST_F( GroundTempsFixture, FiniteDiffGroundTempsTest )
 {

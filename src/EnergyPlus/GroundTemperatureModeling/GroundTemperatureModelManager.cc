@@ -27,8 +27,7 @@ namespace GroundTemperatureManager {
 	std::shared_ptr< BaseGroundTempsModel >
 	GetGroundTempModelAndInit(
 		std::string const objectType_str,
-		std::string const objectName,
-		Real64 const groundThermalDiffusivity
+		std::string const objectName
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -92,19 +91,19 @@ namespace GroundTemperatureManager {
 
 		// If not found, create new instance of the model
 		if ( objectType == objectType_KusudaGroundTemp ) {
-			return KusudaGroundTempsModel::KusudaGTMFactory( objectType, objectName, groundThermalDiffusivity );
+			return KusudaGroundTempsModel::KusudaGTMFactory( objectType, objectName );
 		} else if ( objectType == objectType_FiniteDiffGroundTemp ) {
 			return FiniteDiffGroundTempsModel::FiniteDiffGTMFactory( objectType, objectName );
 		} else if ( objectType == objectType_SiteBuildingSurfaceGroundTemp ) {
-			return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory();
+			return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory( objectType, objectName );
 		} else if ( objectType == objectType_SiteShallowGroundTemp ) {
-			return SiteShallowGroundTemps::ShallowGTMFactory();
+			return SiteShallowGroundTemps::ShallowGTMFactory( objectType, objectName );
 		} else if ( objectType == objectType_SiteDeepGroundTemp ) {
-			return SiteDeepGroundTemps::DeepGTMFactory();
+			return SiteDeepGroundTemps::DeepGTMFactory( objectType, objectName );
 		} else if ( objectType == objectType_SiteFCFactorMethodGroundTemp ) {
-			return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory();
+			return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory( objectType, objectName );
 		} else if ( objectType == objectType_XingGroundTemp ) {
-			return XingGroundTemps::XingGTMFactory( objectType, objectName, groundThermalDiffusivity );
+			return XingGroundTempsModel::XingGTMFactory( objectType, objectName );
 		} else {
 			// Error
 			return nullptr; 

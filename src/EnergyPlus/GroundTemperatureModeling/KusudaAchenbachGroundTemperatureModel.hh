@@ -26,8 +26,7 @@ namespace EnergyPlus{
 		static std::shared_ptr< KusudaGroundTempsModel > 
 		KusudaGTMFactory( 
 			int objectType, 
-			std::string objectName,
-			Real64 groundThermalDiffusivity
+			std::string objectName
 		);
 
 		Real64

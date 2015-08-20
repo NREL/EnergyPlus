@@ -10,14 +10,14 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
-#include <GroundTempsManager.hh>
+#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 
 namespace EnergyPlus {
 
 namespace GroundHeatExchangers {
 
 	// Using/Aliasing
-	using namespace GroundTemps;
+	using namespace GroundTemperatureManager;
 
 	// Data
 	// DERIVED TYPE DEFINITIONS

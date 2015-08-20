@@ -29,7 +29,10 @@ namespace EnergyPlus {
 
 			{}
 
-		static std::shared_ptr< SiteShallowGroundTemps > ShallowGTMFactory();
+		static std::shared_ptr< SiteShallowGroundTemps > ShallowGTMFactory( 
+			int objectType, 
+			std::string objectName
+		);
 
 		Real64
 		getGroundTemp();

@@ -10,7 +10,7 @@
 
 namespace EnergyPlus {
 
-	class XingGroundTemps : public BaseGroundTempsModel
+	class XingGroundTempsModel : public BaseGroundTempsModel
 	{
 		public:
 			Real64 depth;
@@ -22,11 +22,10 @@ namespace EnergyPlus {
 			Real64 surfTempAmplitude_2;
 			Real64 phaseShift_2;
 
-		static std::shared_ptr< XingGroundTemps > 
+		static std::shared_ptr< XingGroundTempsModel > 
 		XingGTMFactory( 
 			int objectType, 
-			std::string objectName,
-			Real64 groundThermalDiffusivity
+			std::string objectName
 		);
 
 		Real64
