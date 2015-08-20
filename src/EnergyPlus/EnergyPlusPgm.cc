@@ -310,6 +310,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	get_environment_variable( cReportDuringWarmup, cEnvValue );
 	if ( ! cEnvValue.empty() ) ReportDuringWarmup = env_var_on( cEnvValue ); // Yes or True
+	if ( ReverseDD ) ReportDuringWarmup = false; // force to false for ReverseDD runs
 
 	get_environment_variable( cReportDuringHVACSizingSimulation, cEnvValue);
 	if ( ! cEnvValue.empty() ) ReportDuringHVACSizingSimulation = env_var_on( cEnvValue ); // Yes or True
