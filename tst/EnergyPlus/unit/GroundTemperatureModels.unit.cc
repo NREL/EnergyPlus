@@ -12,11 +12,10 @@
 using namespace EnergyPlus;
 
 using namespace EnergyPlus::GroundTemps;
-
  
-TEST_F( GroundTempsFixture, getGroundTemp )
+TEST_F( GroundTempsFixture, FiniteDiffGroundTempsTest )
 {
-	
+
 }
 
 

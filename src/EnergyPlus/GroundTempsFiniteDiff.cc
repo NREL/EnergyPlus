@@ -889,6 +889,7 @@ namespace GroundTemps {
 		Real64 T_ix_j0;		// Temp at x-day; cell lower_bound( y-depth )
 		Real64 T_ix_j1;		// Temp at x-day; cell lower_bound( y-depth ) + 1
 		Real64 T_ix_jy;		// Final Temperature--Temp at x-day; y-depth
+		Real64 dayFrac;		// Fraction of day
 
 		if ( depth < 0.0 ) {
 			ShowFatalError("FiniteDiffGroundTemps: Invalid depth passed.");
@@ -901,6 +902,9 @@ namespace GroundTemps {
 		// Get index of nearest cell with depth less than depth
 		auto it = std::lower_bound( cellDepths.begin(), cellDepths.end(), depth );
 		j0 = std::distance( cellDepths.begin(), it );
+
+		// Fraction of day
+		dayFrac = simTimeInDays - int( simTimeInDays );
 
 		if ( j0 < totalNumCells ) {
 			// All depths within domain
@@ -919,8 +923,8 @@ namespace GroundTemps {
 				T_i1_j1 = groundTemps( i1, j1 );
 
 				// Interpolate between days holding depth constant
-				T_ix_j0 = interpolate( simTimeInDays, 1, 0, T_i1_j0, T_i0_j0 );
-				T_ix_j1 = interpolate( simTimeInDays, 1, 0, T_i1_j1, T_i0_j1 );
+				T_ix_j0 = interpolate( dayFrac, 1, 0, T_i1_j0, T_i0_j0 );
+				T_ix_j1 = interpolate( dayFrac, 1, 0, T_i1_j1, T_i0_j1 );
 
 				// Interpolate to correct depth now that we're at the right time
 				T_ix_jy = interpolate( depth, cellDepths( j1 ), cellDepths( j0 ), T_ix_j1, T_ix_j0 );
@@ -937,8 +941,8 @@ namespace GroundTemps {
 				T_i1_j1 = groundTemps( i1, j1 );
 
 				// Interpolate between days holding depth constant
-				T_ix_j0 = interpolate( simTimeInDays, 1, 0, T_i1_j0, T_i0_j0 );
-				T_ix_j1 = interpolate( simTimeInDays, 1, 0, T_i1_j1, T_i0_j1 );
+				T_ix_j0 = interpolate( dayFrac, 1, 0, T_i1_j0, T_i0_j0 );
+				T_ix_j1 = interpolate( dayFrac, 1, 0, T_i1_j1, T_i0_j1 );
 
 				// Interpolate to correct depth now that we're at the right time
 				T_ix_jy = interpolate( depth, cellDepths( j1 ), cellDepths( j0 ), T_ix_j1, T_ix_j0 );
@@ -951,7 +955,7 @@ namespace GroundTemps {
 			if ( simTimeInDays <= 1 || simTimeInDays >= daysInYear) {
 				// First day of year, last day of year, and leap day
 				// Interpolate between first and last day
-				i0 = totalNumCells;
+				i0 = daysInYear;
 				i1 = 1;
 
 				// Lookup ground temps
@@ -959,7 +963,7 @@ namespace GroundTemps {
 				T_i1_j1 = groundTemps( i1, j1 );
 
 				// Interpolate between days holding depth constant
-				T_ix_jy = interpolate( simTimeInDays, 1, 0, T_i1_j1, T_i0_j1 );
+				T_ix_jy = interpolate( dayFrac, 1, 0, T_i1_j1, T_i0_j1 );
 
 			} else {
 				// All other days
@@ -971,7 +975,7 @@ namespace GroundTemps {
 				T_i1_j1 = groundTemps( i1, j1 );
 
 				// Interpolate between days holding depth constant
-				T_ix_jy = interpolate( simTimeInDays, 1, 0, T_i1_j1, T_i0_j1 );
+				T_ix_jy = interpolate( dayFrac, 1, 0, T_i1_j1, T_i0_j1 );
 			}
 		}
 

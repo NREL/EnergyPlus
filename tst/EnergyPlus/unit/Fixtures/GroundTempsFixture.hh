@@ -17,18 +17,15 @@ namespace EnergyPlus {
 		static void TearDownTestCase() { }
 		
 		virtual void SetUp() {
-			EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
-            
+			EnergyPlusFixture::SetUp();  // Sets up the base fixture first.       
 		}
 
 		virtual void TearDown() {
+			GroundTemps::clear_state();		
 
-			GroundTemps::clear_state();
-			
 			EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 		}
 	};
-
 }
 
 #endif

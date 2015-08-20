@@ -400,7 +400,12 @@ namespace GroundTemps {
 			Real64 const depth,
 			int const monthOfSim
 		);
+
+
 	};
+
+	void
+	clear_state();
 
 	//******************************************************************************
 
