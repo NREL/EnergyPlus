@@ -318,18 +318,18 @@ namespace MoistureBalanceEMPDManager {
 			ZoneNum = Surface( SurfNum ).Zone;
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 			if ( ZoneAirHumRat( ZoneNum ) == 0.0 ) {
-				MoistEMPDOld( SurfNum ) = 0.0001;
-				MoistEMPDInt( SurfNum ) = 0.0001;
-				MoistEMPDNew( SurfNum ) = 0.0001;
-				RVsurface( SurfNum ) = 0.001;
-				RVsurfOld( SurfNum ) = 0.001;
-				RVdeep( SurfNum ) = 0.001;
-				RVdeepOld( SurfNum ) = 0.001;
-				RVwall( SurfNum ) = 0.001;
-				HMshort( SurfNum ) = 0.001;
-				FluxSurf( SurfNum ) = 0.001;
-				FluxDeep( SurfNum ) = 0.001;
-				FluxZone( SurfNum ) = 0.001;
+				MoistEMPDOld(SurfNum) = ZoneAirHumRat(ZoneNum);
+				MoistEMPDInt(SurfNum) = ZoneAirHumRat(ZoneNum);
+				MoistEMPDNew(SurfNum) = ZoneAirHumRat(ZoneNum);
+				RVsurface(SurfNum) = RhoVaporAirIn(SurfNum);
+				RVsurfOld(SurfNum) = RhoVaporAirIn(SurfNum);
+				RVdeep(SurfNum) = RhoVaporAirIn(SurfNum);
+				RVdeepOld(SurfNum) = RhoVaporAirIn(SurfNum);
+				RVwall(SurfNum) = RhoVaporAirIn(SurfNum);
+				HMshort( SurfNum ) = 0.003;
+				FluxSurf( SurfNum ) = 0.000;
+				FluxDeep( SurfNum ) = 0.000;
+				FluxZone( SurfNum ) = 0.000;
 			} else {
 				MoistEMPDOld( SurfNum ) = ZoneAirHumRat( ZoneNum ); // Surface moisture level initialization
 				MoistEMPDInt( SurfNum ) = ZoneAirHumRat( ZoneNum ); // by assuming initial values be equal to ZoneAirHumRat
@@ -489,7 +489,12 @@ namespace MoistureBalanceEMPDManager {
 		dEMPD = sqrt( material.EMPDperm * material.EMPDPeriodShort * PVsat / ( material.Density * AT * Pi ) );
 		dEMPDdeep = sqrt( material.EMPDperm * material.EMPDPeriodLong * PVsat / ( material.Density * AT * Pi ) );
 		
-		Rcoating = material.CoatingThickness * material.CoatingPerm * 461.52 * ( Taver + KelvinConv );
+		if (material.CoatingPerm <= 0.0) {
+			Rcoating = 0;
+		} else {
+			Rcoating = material.CoatingThickness / (material.CoatingPerm * 461.52 * (Taver + KelvinConv));
+		}
+		
 		hm_short = 1.0 / ( 0.5 * dEMPD / EMPDdiffusivity + 1.0 / h_mass_conv_in_fd + Rcoating );
 		hm_long = 2.0 * EMPDdiffusivity / ( dEMPDdeep + dEMPD );
 		RSurfaceLayer = 1.0 / hm_short - 1.0 / h_mass_conv_in_fd - Rcoating;

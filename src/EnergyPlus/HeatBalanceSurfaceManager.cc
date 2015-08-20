@@ -5091,11 +5091,6 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			// check for saturation conditions of air
 			Real64 const HConvIn_surf( HConvInFD( SurfNum ) = HConvIn( SurfNum ) );
 			RhoVaporAirIn( SurfNum ) = min( PsyRhovFnTdbWPb_fast( MAT_zone, ZoneAirHumRat_zone, OutBaroPress ), PsyRhovFnTdbRh( MAT_zone, 1.0, HBSurfManInsideSurf ) );
-			// TODO: Check with Jason about why RhoVaporAirIn( SurfNum ) wasn't added in his version.
-			//       The original was commented out, which makes me think it was a debugging effort.
-			//		 
-			//		 The rhoVaporAirIn should be removed. CpAir units are on a mass of dry-air basis, so should only multiply by dry-air density (PsyRhoAirFn...)
-			//        Units are [m/s] = [J/s-m^2-K] / ([kg_da/m^3] * [J/kg_da-K]) = [J-m^3-kg_da-K / s-m^2-K-kg_da-J] = [m/s]
 			HMassConvInFD( SurfNum ) = HConvIn_surf / ( PsyRhoAirFnPbTdbW_fast( OutBaroPress, MAT_zone, ZoneAirHumRat_zone ) * PsyCpAirFnWTdb_fast( ZoneAirHumRat_zone, MAT_zone ) );
 
 			// Perform heat balance on the inside face of the surface ...
@@ -5645,7 +5640,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 				SumHmARa( ZoneNum ) += FD_Area_fac * RhoAirZone;
 
-				SumHmARaW( ZoneNum ) += FD_Area_fac * RhoAirZone * Wsurf;
+				SumHmARaW( ZoneNum ) += FD_Area_fac * RhoVaporSurfIn(SurfNum);  //RhoAirZone * Wsurf;
 			} else if ( surface.HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
 				// need to calculate the amount of moisture that is entering or
 				// leaving the zone  Qm [kg/sec] = hmi * Area * (Del Rhov)
@@ -5658,15 +5653,11 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 				UpdateMoistureBalanceEMPD( SurfNum );
 				RhoVaporSurfIn( SurfNum ) = MoistEMPDNew( SurfNum );
 				//SUMC(ZoneNum) = SUMC(ZoneNum)-MoistEMPDFlux(SurfNum)*Surface(SurfNum)%Area
-				// TODO: Check with Jason that these equations were applied correctly. It's different than in his code.
-				//       This equation calculates mass transfer from the surface to the zone. There may be something wrong with these equations, hence the debugging. But not sure. 
-				//	     First equation is mass-transfer coefficient x area ([m/s] x [m^2] = [m^3/s])
-				//	     Second equation calculates mass transfer ([m^3/s] * [kg_v/m^3] = [kg_v/s]
-				//	     Third and fourth equations calculate some non-intuitive terms: mass-transfer coefficient x area x dry-air density [kg_da/s], and mass-transfer coefficient x area x inside surface vapor density [kg_v/s]
 				Real64 const FD_Area_fac( HMassConvInFD( SurfNum ) * surface.Area );
 				SumHmAW( ZoneNum ) += FD_Area_fac * ( RhoVaporSurfIn( SurfNum ) - RhoVaporAirIn( SurfNum ) );
-				Real64 const surfInTemp( TempSurfInTmp( SurfNum ) );
-				SumHmARa( ZoneNum ) += FD_Area_fac * PsyRhoAirFnPbTdbW( OutBaroPress, surfInTemp, PsyWFnTdbRhPb( surfInTemp, PsyRhFnTdbRhovLBnd0C( surfInTemp, RhoVaporAirIn( SurfNum ) ), OutBaroPress ) );
+				// Real64 const surfInTemp( TempSurfInTmp( SurfNum ) );
+				Real64 const MAT_zone(MAT(ZoneNum));
+				SumHmARa(ZoneNum) += FD_Area_fac * PsyRhoAirFnPbTdbW(OutBaroPress, MAT_zone, PsyWFnTdbRhPb(MAT_zone, PsyRhFnTdbRhovLBnd0C(MAT_zone, RhoVaporAirIn(SurfNum)), OutBaroPress));  //surfInTemp, PsyWFnTdbRhPb( surfInTemp, PsyRhFnTdbRhovLBnd0C( surfInTemp, RhoVaporAirIn( SurfNum ) ), OutBaroPress ) );
 				SumHmARaW( ZoneNum ) += FD_Area_fac * RhoVaporSurfIn( SurfNum );
 			}
 		}
