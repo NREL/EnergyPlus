@@ -617,34 +617,6 @@ namespace WeatherManager {
 			CosSolarDeclinAngle( 0.0 ),
 			EquationOfTime( 0.0 )
 		{}
-
-		// Member Constructor
-		DayWeatherVariables(
-			int const DayOfYear, // Day of year for weather data
-			int const DayOfYear_Schedule, //Day of year in schedule
-			int const Year, // Year of weather data
-			int const Month, // Month of weather data
-			int const DayOfMonth, // Day of month for weather data
-			int const DayOfWeek, // Day of week for weather data
-			int const DaylightSavingIndex, // Daylight Saving Time Period indicator (0=no,1=yes)
-			int const HolidayIndex, // Holiday indicator (0=no holiday, non-zero=holiday type)
-			Real64 const SinSolarDeclinAngle, // Sine of the solar declination angle
-			Real64 const CosSolarDeclinAngle, // Cosine of the solar declination angle
-			Real64 const EquationOfTime // Value of the equation of time formula
-		) :
-			DayOfYear( DayOfYear ),
-			DayOfYear_Schedule( DayOfYear_Schedule ),
-			Year( Year ),
-			Month( Month ),
-			DayOfMonth( DayOfMonth ),
-			DayOfWeek( DayOfWeek ),
-			DaylightSavingIndex( DaylightSavingIndex ),
-			HolidayIndex( HolidayIndex ),
-			SinSolarDeclinAngle( SinSolarDeclinAngle ),
-			CosSolarDeclinAngle( CosSolarDeclinAngle ),
-			EquationOfTime( EquationOfTime )
-		{}
-
 	};
 
 	struct SpecialDayData
