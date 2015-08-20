@@ -188,17 +188,23 @@ namespace MoistureBalanceEMPDManager {
 			}
 
 			// Once the material derived type number is found then load the additional moisture material properties
-			Material( MaterNum ).EMPDMaterialProps = true;
-			Material( MaterNum ).EMPDperm = MaterialProps( 1 );
-			Material( MaterNum ).MoistACoeff = MaterialProps( 2 );
-			Material( MaterNum ).MoistBCoeff = MaterialProps( 3 );
-			Material( MaterNum ).MoistCCoeff = MaterialProps( 4 );
-			Material( MaterNum ).MoistDCoeff = MaterialProps( 5 );
-			Material( MaterNum ).EMPDPeriodShort = MaterialProps( 6 );
-			Material( MaterNum ).EMPDPeriodLong = MaterialProps( 7 );
-			Material( MaterNum ).CoatingPerm = MaterialProps( 8 );
-			Material( MaterNum ).CoatingThickness = MaterialProps( 9 );
+			auto & material( Material( MaterNum ) );
+			material.EMPDmu = MaterialProps( 1 );
+			material.MoistACoeff = MaterialProps( 2 );
+			material.MoistBCoeff = MaterialProps( 3 );
+			material.MoistCCoeff = MaterialProps( 4 );
+			material.MoistDCoeff = MaterialProps( 5 );
+			material.EMPDSurfaceDepth = MaterialProps( 6 );
+			material.EMPDDeepDepth = MaterialProps( 7 );
+			material.EMPDCoatingThickness = MaterialProps( 8 );
+			material.EMPDmuCoating = MaterialProps( 9 );
 
+			if ( material.EMPDDeepDepth <= material.EMPDSurfaceDepth && material.EMPDDeepDepth != 0.0 ) {
+				ShowSevereError( cCurrentModuleObject + ": material=\"" + material.Name + "\"");
+				ShowContinueError( "Deep-layer penetration depth must zero or greater than the surface-layer penetration depth." );
+				ShowContinueError( "Setting deep-layer depth to zero and continuing." );
+				material.EMPDDeepDepth = 0.0;
+			}
 		}
 
 		// Ensure at least one interior EMPD surface for each zone
@@ -208,7 +214,7 @@ namespace MoistureBalanceEMPDManager {
 			if ( Surface( SurfNum ).HeatTransferAlgorithm != HeatTransferModel_EMPD ) continue;
 			ConstrNum = Surface( SurfNum ).Construction;
 			MatNum = Construct( ConstrNum ).LayerPoint( Construct( ConstrNum ).TotLayers );
-			if ( Material( MatNum ).EMPDperm > 0.0 && Surface( SurfNum ).Zone > 0 ) {
+			if ( Material( MatNum ).EMPDmu > 0.0 && Surface( SurfNum ).Zone > 0 ) {
 				EMPDzone( Surface( SurfNum ).Zone ) = true;
 			} else {
 				++ErrCount;

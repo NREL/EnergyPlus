@@ -6713,9 +6713,9 @@ MaterialProperty:MoisturePenetrationDepth:Settings,
        \note Material Name that the moisture properties will be added to.
        \note Additional material properties required to perform the EMPD model.
        \note Effective Mean Penetration Depth (EMPD)
-  N1 , \field Material moisture permeability
+  N1 , \field Water Vapor Diffusion Resistance Factor
        \required-field
-       \units m
+       \units dimensionless
        \minimum 0.0
        \type real
   N2 , \field Moisture Equation Coefficient a
@@ -6734,21 +6734,27 @@ MaterialProperty:MoisturePenetrationDepth:Settings,
        \required-field
        \units dimensionless
        \type real
-  N6 , \field Short-term buffering period
-       \required-field
-       \units s
-       \type real
-  N7 , \field Long-term buffering period
-       \required-field
-       \units s
-       \type real
-  N8 , \field Coating layer permeability
-       \required-field
-       \type real
-  N9 ; \field Coating layer thickness
+  N6 , \field Surface-layer penetration depth
        \required-field
        \units m
        \type real
+       \minimum> 0
+  N7 , \field Deep-layer penetration depth
+       \required-field
+       \units m
+       \type real
+       \minimum 0
+       \default 0
+  N8 , \field Coating layer thickness
+       \required-field
+       \type real
+       \units m
+       \minimum 0
+  N9 ; \field Coating layer water vapor diffusion resistance factor
+       \required-field
+       \type real
+       \units dimensionless
+       \minimum 0
 
 MaterialProperty:PhaseChange,
     \memo Additional properties for temperature dependent thermal conductivity

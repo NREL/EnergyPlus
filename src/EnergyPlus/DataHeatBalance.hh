@@ -648,19 +648,15 @@ namespace DataHeatBalance {
 		Real64 WinShadeAirFlowPermeability; // The effective area of openings in the shade itself, expressed as a
 		//  fraction of the shade area
 		bool EMPDMaterialProps; // True if EMPD properties have been assigned
-		Real64 EMPDperm;
-		Real64 MoistACoeff;
-		Real64 MoistBCoeff;
-		Real64 MoistCCoeff;
-		Real64 MoistDCoeff;
-		Real64 EMPDPeriodShort;
-		Real64 EMPDPeriodLong;
-		Real64 CoatingPerm;
-		Real64 CoatingThickness;
-		Real64 EMPDaCoeff;
-		Real64 EMPDbCoeff;
-		Real64 EMPDcCoeff;
-		Real64 EMPDdCoeff;
+		Real64 EMPDmu; // Water Vapor Diffusion Resistance Factor (dimensionless)
+		Real64 MoistACoeff; // Moisture Equation Coefficient a
+		Real64 MoistBCoeff; // Moisture Equation Coefficient b
+		Real64 MoistCCoeff; // Moisture Equation Coefficient c
+		Real64 MoistDCoeff; // Moisture Equation Coefficient d
+		Real64 EMPDSurfaceDepth; // Surface-layer penetrtion depth (m)
+		Real64 EMPDDeepDepth; // Deep-layer penetration depth (m)
+		Real64 EMPDCoatingThickness; // Coating Layer Thickness (m)
+		Real64 EMPDmuCoating; // Coating Layer water vapor diffusion resistance factor (dimensionless)
 		// EcoRoof-Related properties, essentially for the plant layer,
 		//    the soil layer uses the same resource as a regular material
 		int EcoRoofCalculationMethod; // 1-Simple, 2-SchaapGenuchten
@@ -815,19 +811,15 @@ namespace DataHeatBalance {
 			WinShadeRightOpeningMult( 0.0 ),
 			WinShadeAirFlowPermeability( 0.0 ),
 			EMPDMaterialProps( false ),
-			EMPDperm( 0.0 ),
+			EMPDmu( 0.0 ),
 			MoistACoeff( 0.0 ),
 			MoistBCoeff( 0.0 ),
 			MoistCCoeff( 0.0 ),
 			MoistDCoeff( 0.0 ),
-			EMPDPeriodShort( 0.0 ),
-			EMPDPeriodLong( 0.0 ),
-			CoatingPerm( 0.0 ),
-			CoatingThickness( 0.0 ),
-			EMPDaCoeff( 0.0 ),
-			EMPDbCoeff( 0.0 ),
-			EMPDcCoeff( 0.0 ),
-			EMPDdCoeff( 0.0 ),
+			EMPDSurfaceDepth( 0.0 ),
+			EMPDDeepDepth( 0.0 ),
+			EMPDCoatingThickness( 0.0 ),
+			EMPDmuCoating( 0.0 ),
 			EcoRoofCalculationMethod( 0 ),
 			HeightOfPlants( 0.0 ),
 			LAI( 0.0 ),
@@ -978,19 +970,15 @@ namespace DataHeatBalance {
 			Real64 const WinShadeRightOpeningMult, // Area of air-flow opening at right side of shade, expressed as a fraction
 			Real64 const WinShadeAirFlowPermeability, // The effective area of openings in the shade itself, expressed as a
 			bool const EMPDMaterialProps, // True if EMPD properties have been assigned
-			Real64 const EMPDperm,
-			Real64 const MoistACoeff,
-			Real64 const MoistBCoeff,
-			Real64 const MoistCCoeff,
-			Real64 const MoistDCoeff,
-			Real64 const EMPDPeriodShort,
-			Real64 const EMPDPeriodLong,
-			Real64 const CoatingPerm,
-			Real64 const CoatingThickness,
-			Real64 const EMPDaCoeff,
-			Real64 const EMPDbCoeff,
-			Real64 const EMPDcCoeff,
-			Real64 const EMPDdCoeff,
+			Real64 const EMPDmu, // Water Vapor Diffusion Resistance Factor (dimensionless)
+			Real64 const MoistACoeff, // Moisture Equation Coefficient a
+			Real64 const MoistBCoeff, // Moisture Equation Coefficient b
+			Real64 const MoistCCoeff, // Moisture Equation Coefficient c
+			Real64 const MoistDCoeff, // Moisture Equation Coefficient d
+			Real64 const EMPDSurfaceDepth, // Surface-layer penetrtion depth (m)
+			Real64 const EMPDDeepDepth, // Deep-layer penetration depth (m)
+			Real64 const EMPDCoatingThickness, // Coating Layer Thickness (m)
+			Real64 const EMPDmuCoating, // Coating Layer water vapor diffusion resistance factor (dimensionless)
 			int const EcoRoofCalculationMethod, // 1-Simple, 2-SchaapGenuchten
 			Real64 const HeightOfPlants, // plants' height
 			Real64 const LAI, // LeafAreaIndex (Dimensionless???)
@@ -1139,19 +1127,15 @@ namespace DataHeatBalance {
 			WinShadeRightOpeningMult( WinShadeRightOpeningMult ),
 			WinShadeAirFlowPermeability( WinShadeAirFlowPermeability ),
 			EMPDMaterialProps( EMPDMaterialProps ),
-			EMPDperm( EMPDperm ),
+			EMPDmu( EMPDmu ),
 			MoistACoeff( MoistACoeff ),
 			MoistBCoeff( MoistBCoeff ),
 			MoistCCoeff( MoistCCoeff ),
 			MoistDCoeff( MoistDCoeff ),
-			EMPDPeriodShort( EMPDPeriodShort ),
-			EMPDPeriodLong( EMPDPeriodLong ),
-			CoatingPerm( CoatingPerm ),
-			CoatingThickness( CoatingThickness ),
-			EMPDaCoeff( EMPDaCoeff ),
-			EMPDbCoeff( EMPDbCoeff ),
-			EMPDcCoeff( EMPDcCoeff ),
-			EMPDdCoeff( EMPDdCoeff ),
+			EMPDSurfaceDepth( EMPDSurfaceDepth ),
+			EMPDDeepDepth( EMPDDeepDepth ),
+			EMPDCoatingThickness( EMPDCoatingThickness ),
+			EMPDmuCoating( EMPDmuCoating ),
 			EcoRoofCalculationMethod( EcoRoofCalculationMethod ),
 			HeightOfPlants( HeightOfPlants ),
 			LAI( LAI ),
