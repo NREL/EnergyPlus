@@ -38790,6 +38790,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
        \type object-list
        \object-list UniVariateCurves
        \object-list UniVariateTables
+
 AirTerminal:SingleDuct:ConstantVolume:CooledBeam,
        \memo Central air system terminal unit, single duct, constant volume, with cooled beam
        \memo (active or passive).
