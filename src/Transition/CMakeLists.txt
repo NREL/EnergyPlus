@@ -99,10 +99,10 @@ LIST(GET VERSIONS ${ii} OLD_VERSION)
 LIST(GET VERSIONS ${i} NEW_VERSION)
 
 # for newer files, we actually configure the file, for older versions we just copy the file over
-IF( EXISTS "${CMAKE_SOURCE_DIR}/src/Transition/CreateNewIDFUsingRulesV${NEW_VERSION}.f90.in" ) 
-  CONFIGURE_FILE( "${CMAKE_SOURCE_DIR}/src/Transition/CreateNewIDFUsingRulesV${NEW_VERSION}.f90.in" "${CMAKE_CURRENT_BINARY_DIR}/CreateNewIDFUsingRulesV${NEW_VERSION}.f90" )
+IF( EXISTS "${CMAKE_SOURCE_DIR}/CreateNewIDFUsingRulesV${NEW_VERSION}.f90.in" ) 
+  CONFIGURE_FILE( "${CMAKE_SOURCE_DIR}/CreateNewIDFUsingRulesV${NEW_VERSION}.f90.in" "${CMAKE_CURRENT_BINARY_DIR}/CreateNewIDFUsingRulesV${NEW_VERSION}.f90" )
 ELSE()
-  CONFIGURE_FILE( "${CMAKE_SOURCE_DIR}/src/Transition/CreateNewIDFUsingRulesV${NEW_VERSION}.f90" "${CMAKE_CURRENT_BINARY_DIR}/CreateNewIDFUsingRulesV${NEW_VERSION}.f90" COPYONLY)
+  CONFIGURE_FILE( "${CMAKE_SOURCE_DIR}/CreateNewIDFUsingRulesV${NEW_VERSION}.f90" "${CMAKE_CURRENT_BINARY_DIR}/CreateNewIDFUsingRulesV${NEW_VERSION}.f90" COPYONLY)
 ENDIF()
 
 # then create all the binaries using just the Transition source and the appropriate version of the main sub
