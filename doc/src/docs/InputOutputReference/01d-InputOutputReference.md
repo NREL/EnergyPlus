@@ -16294,7 +16294,7 @@ SetpointManager:FollowGroundTemperature,
 
 ### SetpointManager:CondenserEnteringReset
 
-The object resets the condenser entering water temperature setpoint to the optimal setpoint temperature that will result in minimum net energy consumption for the chiller and cooling tower plant. This chiller-tower optimization scheme uses one curve to determine the optimum condenser entering water temperature for a given time step and two other curves to place boundary conditions on the    optimized    setpoint value. Note that this object will work with only one cooling tower object in a plant loop.
+The object resets the condenser entering water temperature setpoint to the optimal setpoint temperature that will result in minimum net energy consumption for the chiller and cooling tower plant. This chiller-tower optimization scheme uses one curve to determine the optimum condenser entering water temperature for a given time step and two other curves to place limit conditions on the optimized setpoint value. Note that this object will work with only one cooling tower object in a plant loop.
 
 #### Field: Name
 
@@ -16306,7 +16306,7 @@ The type of variable that will be controlled. The only valid choice for this set
 
 #### Field: Default Condenser Entering Water Temperature Schedule Name
 
-This schedule should define the default condenser entering water temperature setpoint. This scheduled setpoint value is only used in a given time step if the    optimized    setpoint value (see the Optimized Condenser Entering Water Temperature Curve Name field) does not fall within its prescribed boundary conditions.
+This schedule should define the default condenser entering water temperature setpoint. This scheduled setpoint value is only used in a given time step if the optimized setpoint value (see the Optimized Condenser Entering Water Temperature Curve Name field) does not fall within its prescribed boundary conditions.
 
 #### Field: Minimum Design Wetbulb Temperature Curve Name
 
@@ -16342,7 +16342,7 @@ NF = Normalized condenser water flow per unit of tower capacity, m3/s-W
 
 #### Field: Optimized Condenser Entering Temperature Curve Name
 
-The curve name associated with the coefficients in the optimized condenser entering water temperature equation. The value from this curve is used to calculate the optimized condenser entering water temperature for each timestep. If this    optimized    setpoint does not fall within the bounds established by the two boundary conditions, then the value from the Default Condenser Entering Water Temperature Schedule is used for the Condenser Entering Water Setpoint for that timestep.   This curve must be quad-linear (Curve:QuadLinear) and is defined as:
+The curve name associated with the coefficients in the optimized condenser entering water temperature equation. The value from this curve is used to calculate the optimized condenser entering water temperature for each timestep. If this optimized setpoint does not fall within the bounds established by the two boundary conditions, then the value from the Default Condenser Entering Water Temperature Schedule is used for the Condenser Entering Water Setpoint for that timestep.  This curve must be quad-linear (Curve:QuadLinear) and is defined as:
 
 <div>\[T = {C_1} + {C_2}OaWb + {C_3}WPLR + {C_4}TwrWb + {C_5}NF\]</div>
 
@@ -16358,7 +16358,7 @@ NF = Normalized condenser water flow per unit of tower capacity, m3/s-W
 
 #### Field: Minimum Lift
 
-This field establishes the minimum Lift allowed.   Lift is generally thought of as the difference between condenser refrigerant pressure and the evaporator refrigerant pressure. Using defined pressure and temperature relationships, lift also can be related to the difference between the leaving chilled water and the leaving condenser water temperature. Further, when the leaving condenser water temperature and condenser water flow are constant, the entering condenser temperature can be used as a proxy for lift. Because most condenser water systems are designed for constant flow, entering condenser temperature is the most common metric for lift, and that is what meant here. If the calculated Condenser Entering Water Setpoint falls below (TEvapLvgWater+ MinimumLift), then the Condenser Entering Water Setpoint is reset to equal TEvapLvgWater+ MinimumLift. The units for this field are deg C TD. Default is 11.1 ˚C (20 F).
+This field establishes the minimum Lift allowed.  Lift is generally thought of as the difference between condenser refrigerant pressure and the evaporator refrigerant pressure. Using defined pressure and temperature relationships, lift also can be related to the difference between the leaving chilled water and the leaving condenser water temperature. Further, when the leaving condenser water temperature and condenser water flow are constant, the entering condenser temperature can be used as a proxy for lift. Because most condenser water systems are designed for constant flow, entering condenser temperature is the most common metric for lift, and that is what meant here. If the calculated Condenser Entering Water Setpoint falls below (TEvapLvgWater+ MinimumLift), then the Condenser Entering Water Setpoint is reset to equal TEvapLvgWater+ MinimumLift. The units for this field are deg C TD. Default is 11.1 ˚C (20 F).
 
 #### Field: Maximum Condenser Entering Temperature
 
