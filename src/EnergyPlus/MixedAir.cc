@@ -176,6 +176,8 @@ namespace MixedAir {
 	//                                        ! based on the generic contaminant setpoint
 	//INTEGER, PARAMETER :: SOAM_IAQPCOM = 6  ! Take the maximum outdoor air rate from both CO2 and generic contaminant controls
 	//                                        ! based on the generic contaminant setpoint
+	//INTEGER, PARAMETER :: SOAM_ProportionalControlDesOcc = 7     ! Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+	//                                                       ! to calculate the system level outdoor air flow rates based on design occupancy
 
 	Array1D_string const CurrentModuleObjects( 8, { "AirLoopHVAC:OutdoorAirSystem", "AirLoopHVAC:OutdoorAirSystem:EquipmentList", "AirLoopHVAC:ControllerList", "AvailabilityManagerAssignmentList", "Controller:OutdoorAir", "ZoneHVAC:EnergyRecoveryVentilator:Controller", "Controller:MechanicalVentilation", "OutdoorAir:Mixer" } );
 
@@ -1578,9 +1580,16 @@ namespace MixedAir {
 						ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
 						ErrorsFound = true;
 					}
-				} else if ( SELECT_CASE_var == "PROPORTIONALCONTROL" ) { // Proportional Control based on ASHRAE Standard 62.1-2004
-					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_ProportionalControl;
+				} else if ( SELECT_CASE_var == "PROPORTIONALCONTROLBASEDONOCCUPANCYSCHEDULE" ) { // Proportional Control based on ASHRAE Standard 62.1-2004
+					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_ProportionalControlSchOcc;
 					if ( ! Contaminant.CO2Simulation ) {
+						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" valid " + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\" requires CO2 simulation." );
+						ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
+						ErrorsFound = true;
+					}
+				} else if ( SELECT_CASE_var == "PROPORTIONALCONTROLBASEDONDESIGNOCCUPANCY" ) { // Proportional Control based on ASHRAE Standard 62.1-2004
+					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_ProportionalControlDesOcc;
+					if ( !Contaminant.CO2Simulation ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" valid " + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\" requires CO2 simulation." );
 						ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
 						ErrorsFound = true;
@@ -2020,12 +2029,20 @@ namespace MixedAir {
 
 			for ( VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum ) {
 				for ( jZone = 1; jZone <= VentilationMechanical( VentMechNum ).NumofVentMechZones; ++jZone ) {
-					if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_ProportionalControl ) {
+					if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_ProportionalControlSchOcc ) {
 						if ( VentilationMechanical( VentMechNum ).ZoneOAACH( jZone ) > 0.0 || VentilationMechanical( VentMechNum ).ZoneOAFlow( jZone ) > 0.0 ) {
 							ShowWarningError( CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", inappropriate outdoor air method" );
 							ShowContinueError( "Inappropriate method for Design Specification Outdoor Air Object Name=\"" + VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ) + "\"." );
 							ShowContinueError( "For Zone=\"" + Zone( VentilationMechanical( VentMechNum ).Zone( jZone ) ).Name + "\"." );
-							ShowContinueError( "Since System Outdoor Air Method=\"ProportionalControl\", AirChanges/Hour or Flow/Zone outdoor air methods are not valid. Simulation continues.... " );
+							ShowContinueError( "Since System Outdoor Air Method= ProportionalControlBasedonOccupancySchedule\", AirChanges/Hour or Flow/Zone outdoor air methods are not valid. Simulation continues.... " );
+						}
+					}
+					if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+						if ( VentilationMechanical( VentMechNum ).ZoneOAACH( jZone ) > 0.0 || VentilationMechanical( VentMechNum ).ZoneOAFlow( jZone ) > 0.0 ) {
+							ShowWarningError( CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", inappropriate outdoor air method" );
+							ShowContinueError( "Inappropriate method for Design Specification Outdoor Air Object Name=\"" + VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ) + "\"." );
+							ShowContinueError( "For Zone=\"" + Zone( VentilationMechanical( VentMechNum ).Zone( jZone ) ).Name + "\"." );
+							ShowContinueError( "Since System Outdoor Air Method= ProportionalControlBasedonDesignOccupancy\", AirChanges/Hour or Flow/Zone outdoor air methods are not valid. Simulation continues.... " );
 						}
 					}
 
@@ -2121,8 +2138,10 @@ namespace MixedAir {
 					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "VentilationRateProcedure,"; }
 				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_IAQP ) {
 					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "IndoorAirQualityProcedure,"; }
-				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_ProportionalControl ) {
-					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "ProportionalControl,"; }
+				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_ProportionalControlSchOcc ) {
+					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "ProportionalControlBasedonOccupancySchedule,"; }
+				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "ProportionalControlBasedOnDesignOccupancy,"; }
 				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_IAQPGC ) {
 					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "IndoorAirQualityGenericContaminant,"; }
 				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_IAQPCOM ) {
@@ -3719,7 +3738,7 @@ namespace MixedAir {
 						// Calc the zone OA flow rate based on the people component
 						// ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
 						//  Checking DCV flag before calculating zone OA per person
-						if ( VentilationMechanical( VentMechObjectNum ).DCVFlag ) {
+						if ( VentilationMechanical( VentMechObjectNum ).DCVFlag && VentilationMechanical( VentMechObjectNum ).SystemOAMethod != SOAM_ProportionalControlDesOcc ) {
 							ZoneOAPeople = ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAPeopleRate( ZoneIndex );
 						} else {
 							ZoneOAPeople = 0.0;
@@ -3767,7 +3786,7 @@ namespace MixedAir {
 					}
 
 					// get system supply air flow rate
-					if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_VRP || VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControl ) {
+					if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_VRP || VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlSchOcc || VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
 						// Get system supply air flow rate
 						if ( AirLoopControlInfo( AirLoopNum ).LoopFlowRateSet ) {
 							// if flow rate has been specified by a manager, set it to the specified value
@@ -3798,7 +3817,7 @@ namespace MixedAir {
 							// Calc the zone OA flow rate based on the people component
 							// ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
 							//  Checking DCV flag before calculating zone OA per person
-							if ( VentilationMechanical( VentMechObjectNum ).DCVFlag ) {
+							if ( VentilationMechanical( VentMechObjectNum ).DCVFlag && VentilationMechanical( VentMechObjectNum ).SystemOAMethod != SOAM_ProportionalControlDesOcc ) {
 								ZoneOAPeople = ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAPeopleRate( ZoneIndex );
 							} else {
 								ZoneOAPeople = 0.0;
@@ -3861,7 +3880,7 @@ namespace MixedAir {
 								// the VRP case
 								ZoneOA = ZoneOABZ / ZoneEz;
 
-							} else if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControl ) {
+							} else if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlSchOcc || VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
 								// Check whether "Carbon Dioxide Control Availability Schedule" for ZoneControl:ContaminantController is specified
 								if ( Zone( ZoneNum ).ZoneContamControllerSchedIndex > 0.0 ) {
 									// Check the availability schedule value for ZoneControl:ContaminantController
@@ -3885,13 +3904,25 @@ namespace MixedAir {
 
 												if ( ZoneMaxCO2 <= ZoneMinCO2 ) {
 													++VentilationMechanical( VentMechObjectNum ).CO2MaxMinLimitErrorCount;
-													if ( VentilationMechanical( VentMechObjectNum ).CO2MaxMinLimitErrorCount < 2 ) {
-														ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\"." );
-														ShowContinueError( "For System Outdoor Air Method = ProportionalControl, maximum target CO2 concentration (" + RoundSigDigits( ZoneMaxCO2, 2 ) + "), is not greater than minimum target CO2 concentration (" + RoundSigDigits( ZoneMinCO2, 2 ) + ")." );
-														ShowContinueError( "\"ProportionalControl\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
-														ShowContinueErrorTimeStamp( "" );
-													} else {
-														ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\", For System Outdoor Air Method = ProportionalControl, maximum target CO2 concentration is not greater than minimum target CO2 concentration. Error continues...", VentilationMechanical( VentMechObjectNum ).CO2MaxMinLimitErrorIndex );
+													if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlSchOcc ) {
+														if ( VentilationMechanical( VentMechObjectNum ).CO2MaxMinLimitErrorCount < 2 ) {
+															ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\"." );
+															ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, maximum target CO2 concentration (" + RoundSigDigits( ZoneMaxCO2, 2 ) + "), is not greater than minimum target CO2 concentration (" + RoundSigDigits( ZoneMinCO2, 2 ) + ")." );
+															ShowContinueError( "\"ProportionalControlBasedonOccupancySchedule\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
+															ShowContinueErrorTimeStamp( "" );
+														} else {
+															ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\", For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, maximum target CO2 concentration is not greater than minimum target CO2 concentration. Error continues...", VentilationMechanical( VentMechObjectNum ).CO2MaxMinLimitErrorIndex );
+														}
+													}
+													if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+														if ( VentilationMechanical( VentMechObjectNum ).CO2MaxMinLimitErrorCount < 2 ) {
+															ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\"." );
+															ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, maximum target CO2 concentration (" + RoundSigDigits( ZoneMaxCO2, 2 ) + "), is not greater than minimum target CO2 concentration (" + RoundSigDigits( ZoneMinCO2, 2 ) + ")." );
+															ShowContinueError( "\"ProportionalControlBasedonDesignOccupancy\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
+															ShowContinueErrorTimeStamp( "" );
+														} else {
+															ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\", For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, maximum target CO2 concentration is not greater than minimum target CO2 concentration. Error continues...", VentilationMechanical( VentMechObjectNum ).CO2MaxMinLimitErrorIndex );
+														}
 													}
 
 													ZoneOA = ZoneOABZ / ZoneEz;
@@ -3914,13 +3945,25 @@ namespace MixedAir {
 											} else {
 												if ( DisplayExtraWarnings ) {
 													++VentilationMechanical( VentMechObjectNum ).CO2GainErrorCount;
-													if ( VentilationMechanical( VentMechObjectNum ).CO2GainErrorCount < 2 ) {
-														ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\"." );
-														ShowContinueError( "For System Outdoor Air Method = ProportionalControl, CO2 generation from people is not greater than zero. Occurs in Zone =\"" + Zone( ZoneNum ).Name + "\". " );
-														ShowContinueError( "\"ProportionalControl\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
-														ShowContinueErrorTimeStamp( "" );
-													} else {
-														ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\", For System Outdoor Air Method = ProportionalControl, CO2 generation from people is not greater than zero. Error continues...", VentilationMechanical( VentMechObjectNum ).CO2GainErrorIndex );
+													if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlSchOcc ) {
+														if ( VentilationMechanical( VentMechObjectNum ).CO2GainErrorCount < 2 ) {
+															ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\"." );
+															ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, CO2 generation from people is not greater than zero. Occurs in Zone =\"" + Zone( ZoneNum ).Name + "\". " );
+															ShowContinueError( "\"ProportionalControlBasedonOccupancySchedule\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
+															ShowContinueErrorTimeStamp( "" );
+														} else {
+															ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\", For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, CO2 generation from people is not greater than zero. Error continues...", VentilationMechanical( VentMechObjectNum ).CO2GainErrorIndex );
+														}
+													}
+													if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+														if ( VentilationMechanical( VentMechObjectNum ).CO2GainErrorCount < 2 ) {
+															ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\"." );
+															ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, CO2 generation from people is not greater than zero. Occurs in Zone =\"" + Zone( ZoneNum ).Name + "\". " );
+															ShowContinueError( "\"ProportionalControlBasedonDesignOccupancy\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
+															ShowContinueErrorTimeStamp( "" );
+														} else {
+															ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\", For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, CO2 generation from people is not greater than zero. Error continues...", VentilationMechanical( VentMechObjectNum ).CO2GainErrorIndex );
+														}
 													}
 												}
 												ZoneOA = ZoneOABZ / ZoneEz;
@@ -4031,7 +4074,7 @@ namespace MixedAir {
 						if ( SysEv <= 0.0 ) SysEv = 1.0;
 
 						// Calc system outdoor air requirement
-						if ( VentilationMechanical(VentMechObjectNum).SystemOAMethod == SOAM_ProportionalControl ) {
+						if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlSchOcc || VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
 							SysOA = SysOA / SysEv;
 						} else {
 							SysOA = SysOAuc / SysEv;
