@@ -7045,8 +7045,8 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 CompSpdActual; // Actual compressor running speed [rps]
 		Real64 CompEvaporatingCAPSpdMin; // Evaporating capacity at the lowest compressor speed [W]
 		Real64 CompEvaporatingPWRSpdMin; // Compressor power at the lowest compressor speed [W]
-		Real64 CondHeatRel; // Condenser heat release (cooling mode) [W]
-		Real64 CondHeatExtract; // Condenser heat extract (heating mode) [W]
+		Real64 OUCondHeatRelease; // Condenser heat release (cooling mode) [W]
+		Real64 OUEvapHeatExtract; // Condenser heat extract (heating mode) [W]
 		Real64 CondFlowRatio; // Outdoor unit fan air flow ratio [-]
 		Real64 deltaT; // Difference between evaporating/condensing temperature and coil surface temperature [C]
 		Real64 Pipe_Q0; // Compressor capacity modification algorithm_modified Pipe_Q, for temporary use [W]
@@ -7365,6 +7365,7 @@ namespace HVACVariableRefrigerantFlow {
 			Modifi_Pe = Pevap - Pipe_DeltP; //This Modifi_Pe is used for rps > min; will be updated for rps = min  
 			
 			TUCoolingLoad = TUCoolingLoad_temp + Pipe_Q;
+			OUCondHeatRelease = TUCoolingLoad + CompEvaporatingPWRSpdMin;
 		
 			// Calculate capacity modification factor
 			C_cap_density = GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + 8,         max( min( Modifi_Pe, RefPHigh), RefPLow ), RefrigerantIndex, RoutineName )   
@@ -7372,7 +7373,7 @@ namespace HVACVariableRefrigerantFlow {
 			C_cap_enthalpy =( GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName, Tsuction + 8,      max( min( Modifi_Pe, RefPHigh), RefPLow ), RefrigerantIndex, RoutineName ) 
 							- GetSatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName,  MinOutdoorUnitTc - 5, 0.0, RefrigerantIndex, RoutineName ) ) /( Pipe_h_comp_in - Pipe_h_IU_in );
 			C_cap_operation = C_cap_density * C_cap_enthalpy;
-		
+			
 			if( TUCoolingLoad * C_cap_operation <= CompEvaporatingCAPSpdMin ) { 
 			// Required cooling load is less than the min cooling capacity
 				VRFOperationSimPath = 1;
@@ -7386,10 +7387,10 @@ namespace HVACVariableRefrigerantFlow {
 			// Required cooling load is greater than or equal to the min cooling capacity
 		
 				Label10: ;
-				CondHeatRel = TUCoolingLoad + NcompPriCooling; 
+				OUCondHeatRelease = TUCoolingLoad + NcompPriCooling; 
 				
 				// VRF OU air side calculations
-				TcondOut = OutdoorDryBulb + CondHeatRel / 1005.0 / VRF( VRFCond ).OUAirFlowRate / RhoAir;
+				TcondOut = OutdoorDryBulb + OUCondHeatRelease / 1005.0 / VRF( VRFCond ).OUAirFlowRate / RhoAir;
 				Tcondh2  = OutdoorDryBulb + ( TcondOut - OutdoorDryBulb ) / ( 1 - BFC );
 				deltaT = VRF( VRFCond ).C3Tc * pow_2( VRF( VRFCond ).SC ) + VRF( VRFCond ).C2Tc * VRF( VRFCond ).SC + VRF( VRFCond ).C1Tc;
 				VRF( VRFCond ).CondensingTemp = Tcondh2 + deltaT; 
@@ -7539,8 +7540,8 @@ namespace HVACVariableRefrigerantFlow {
 							
 							Modifi_SH = Pipe_T_comp_in - Tsuction;  
 							Modifi_Pe = Pipe_Pe_assumed - Pipe_DeltP;  
-							CondHeatRel = TUCoolingLoad_temp + Pipe_Q + NcompPriCooling; //Pipe_Q is changed when Tsuction is changed ->Tc is also changed
-							TcondOut = OutdoorDryBulb + CondHeatRel / 1005.0 / VRF( VRFCond ).OUAirFlowRate / RhoAir;
+							OUCondHeatRelease = TUCoolingLoad_temp + Pipe_Q + NcompPriCooling; //Pipe_Q is changed when Tsuction is changed ->Tc is also changed
+							TcondOut = OutdoorDryBulb + OUCondHeatRelease / 1005.0 / VRF( VRFCond ).OUAirFlowRate / RhoAir;
 							Tcondh2  = OutdoorDryBulb + ( TcondOut-OutdoorDryBulb ) / ( 1 - BFC );
 							deltaT = VRF( VRFCond ).C3Tc * pow_2( VRF( VRFCond ).SC ) + VRF( VRFCond ).C2Tc * VRF( VRFCond ).SC + VRF( VRFCond ).C1Tc;
 							VRF( VRFCond ).CondensingTemp = min( Tcondh2 + deltaT, MaxOutdoorUnitTc );  
@@ -7598,6 +7599,7 @@ namespace HVACVariableRefrigerantFlow {
 				// Required cooling load is beyond the maximum system capacity
 					NcompCooling = CompEvaporatingPWRSpd( NumOfCompSpdInput );
 					CompSpdActual = VRF( VRFCond ).CompressorSpeed( NumOfCompSpdInput );
+					OUCondHeatRelease = NcompCooling + CompEvaporatingCAPSpd( NumOfCompSpdInput );
 				}
 				
 				NcompDiff =( NcompCooling - NcompPriCooling ) / NcompPriCooling;
@@ -7638,6 +7640,7 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFCond ).CondFanPower = VRF( VRFCond ).RatedCondFanPower * pow_3( CondFlowRatio ); //@@
 			VRF( VRFCond ).VRFCondCyclingRatio = CyclingRatio; // report variable for cycling rate
 			VRF( VRFCond ).IUEvaporatingTemp = Tsuction; 
+			VRF( VRFCond ).CoolingCapacity = OUCondHeatRelease - VRF( VRFCond ).NcompCooling;
 		
 		// @@@@@ 2. HEATING MODE
 		} else if ( HeatingLoad( VRFCond ) && ( TUHeatingLoad > 0.0 ) ) {
@@ -7735,7 +7738,7 @@ namespace HVACVariableRefrigerantFlow {
 			CompEvaporatingPWRSpdMin = CurveValue( VRF( VRFCond ).OUCoolingPWRFT( 1 ), Tdischarge, MinOutdoorUnitTe );
 		
 			TUHeatingLoad = TUHeatingLoad_temp + Pipe_Q; 
-			CondHeatExtract = TUHeatingLoad - CompEvaporatingPWRSpdMin;
+			OUEvapHeatExtract = TUHeatingLoad - CompEvaporatingPWRSpdMin;
 		
 			C_cap_density = GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, MinOutdoorUnitTe + 8,   max( min( MinOutdoorUnitPe, RefPHigh), RefPLow ), RefrigerantIndex, RoutineName ) 
 							/ GetSupHeatDensityRefrig( VRF( VRFCond ).RefrigerantName, MinOutdoorUnitTe + VRF( VRFCond ).SH, max( min( MinOutdoorUnitPe, RefPHigh), RefPLow ), RefrigerantIndex, RoutineName );   
@@ -7744,10 +7747,10 @@ namespace HVACVariableRefrigerantFlow {
 							/ ( GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName,  MinOutdoorUnitTe  + VRF( VRFCond ).SH, max( min( MinOutdoorUnitPe, RefPHigh), RefPLow ), RefrigerantIndex, RoutineName ) - Pipe_h_out_ave );
 			C_cap_operation = C_cap_density * C_cap_enthalpy;
 			
-			if( ( CondHeatExtract * C_cap_operation ) <= CompEvaporatingCAPSpdMin ) { 
+			if( ( OUEvapHeatExtract * C_cap_operation ) <= CompEvaporatingCAPSpdMin ) { 
 			//Reuired heating load is smaller than the min heating capacity
 			
-				CyclingRatio = CondHeatExtract*C_cap_operation / CompEvaporatingCAPSpdMin;
+				CyclingRatio = OUEvapHeatExtract*C_cap_operation / CompEvaporatingCAPSpdMin;
 				NcompHeating = CompEvaporatingPWRSpdMin * CyclingRatio;
 				CompSpdActual = VRF( VRFCond ).CompressorSpeed( 1 );
 				VRF( VRFCond ).EvaporatingTemp = MinOutdoorUnitTe;
@@ -7758,9 +7761,9 @@ namespace HVACVariableRefrigerantFlow {
 				// Perform iterations to calculate NcompHeating (Label20)
 				Label20: ;
 				// VRF OU coil analysis
-				CondHeatExtract = TUHeatingLoad - NcompPriHeating;
+				OUEvapHeatExtract = TUHeatingLoad - NcompPriHeating;
 				Houtdoor = PsyHFnTdbW( OutdoorDryBulb, OutdoorHumRat );
-				Hfs = Houtdoor - CondHeatExtract / ( VRF( VRFCond ).OUAirFlowRate * RhoAir ) / ( 1 - BFH );
+				Hfs = Houtdoor - OUEvapHeatExtract / ( VRF( VRFCond ).OUAirFlowRate * RhoAir ) / ( 1 - BFH );
 				if( Hfs < 0.01 ) Hfs = 0.01;
 				TfsSat = PsyTsatFnHPb( Hfs, OutdoorPressure, "CalcVRFCondenser_FluidTCtrl" );
 				WfsSat = PsyWFnTdbH( TfsSat, Hfs, "CalcVRFCondenser_FluidTCtrl" );
@@ -7787,7 +7790,7 @@ namespace HVACVariableRefrigerantFlow {
 									/( GetSupHeatEnthalpyRefrig( VRF( VRFCond ).RefrigerantName,  VRF( VRFCond ).EvaporatingTemp  + VRF( VRFCond ).SH, max( min( MinOutdoorUnitPe, RefPHigh), RefPLow ), RefrigerantIndex, RoutineName ) - Pipe_h_out_ave );
 					C_cap_operation = C_cap_density * C_cap_enthalpy; 
 			 
-					if( ( CondHeatExtract * C_cap_operation ) <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) ) {
+					if( ( OUEvapHeatExtract * C_cap_operation ) <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) ) {
 					//Compressor Capacity is greater than the required          
 		
 						if( CounterCompSpdTemp <= 1 ) {
@@ -7796,11 +7799,11 @@ namespace HVACVariableRefrigerantFlow {
 							NumIteCcap = 1;
 							
 							Label19: ;
-							CondHeatExtract = TUHeatingLoad - NcompPriHeating; 
+							OUEvapHeatExtract = TUHeatingLoad - NcompPriHeating; 
 							
 							CompSpdActual = VRF( VRFCond ).CompressorSpeed( 1 );
 							Par( 1 ) = Tdischarge;
-							Par( 2 ) = CondHeatExtract * C_cap_operation;
+							Par( 2 ) = OUEvapHeatExtract * C_cap_operation;
 							Par( 3 ) = VRF( VRFCond ).OUCoolingCAPFT( CounterCompSpdTemp );
 		
 							SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual, MinOutdoorUnitTe, VRF( VRFCond ).EvaporatingTemp, Par );
@@ -7845,7 +7848,7 @@ namespace HVACVariableRefrigerantFlow {
 							CompSpdUB = CounterCompSpdTemp;
 		
 							CompSpdActual = VRF( VRFCond ).CompressorSpeed( CompSpdLB ) +( VRF( VRFCond ).CompressorSpeed( CompSpdUB ) - VRF( VRFCond ).CompressorSpeed( CompSpdLB ) )  
-											/ ( CompEvaporatingCAPSpd( CompSpdUB ) - CompEvaporatingCAPSpd( CompSpdLB ) ) *( CondHeatExtract*C_cap_operation - CompEvaporatingCAPSpd( CompSpdLB ) );
+											/ ( CompEvaporatingCAPSpd( CompSpdUB ) - CompEvaporatingCAPSpd( CompSpdLB ) ) *( OUEvapHeatExtract*C_cap_operation - CompEvaporatingCAPSpd( CompSpdLB ) );
 							Modifi_SH = VRF( VRFCond ).SH;
 							NcompHeating = CompEvaporatingPWRSpd( CompSpdLB ) +( CompEvaporatingPWRSpd( CompSpdUB ) - CompEvaporatingPWRSpd( CompSpdLB ) ) /  
 										  ( VRF( VRFCond ).CompressorSpeed( CompSpdUB ) - VRF( VRFCond ).CompressorSpeed( CompSpdLB ) ) *   
@@ -7855,17 +7858,18 @@ namespace HVACVariableRefrigerantFlow {
 							
 						} //Since: if( CounterCompSpdTemp <= 1 )
 						
-					} //Since: if( CondHeatExtract <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) )
+					} //Since: if( OUEvapHeatExtract <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) )
 				 
 				} // END DO DoName2
 		
 				CompEvaporatingCAPSpd( NumOfCompSpdInput ) = CurveValue( VRF( VRFCond ).OUCoolingCAPFT( NumOfCompSpdInput ), Tdischarge, VRF( VRFCond ).EvaporatingTemp );
 				if( CounterCompSpdTemp > NumOfCompSpdInput ) { 
 				// CounterCompSpdTemp > NumOfCompSpdInput 
-				// CondHeatExtract * C_cap_operation > CompEvaporatingCAPSpd( NumOfCompSpdInput )
+				// OUEvapHeatExtract * C_cap_operation > CompEvaporatingCAPSpd( NumOfCompSpdInput )
 				// Required heating load is beyond the maximum system capacity
 					NcompHeating = CompEvaporatingPWRSpd( NumOfCompSpdInput );
 					CompSpdActual = VRF( VRFCond ).CompressorSpeed( NumOfCompSpdInput );
+					OUEvapHeatExtract = CompEvaporatingCAPSpd( NumOfCompSpdInput );
 				}
 				
 				NcompDiff =( NcompHeating - NcompPriHeating ) / NcompPriHeating;
@@ -7894,7 +7898,7 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFCond ).NcompHeating = max( NcompHeating, 0.0 ) / 0.95; 
 			VRF( VRFCond ).CondFanPower = VRF( VRFCond ).RatedCondFanPower * pow_3( CondFlowRatio ); 
 			VRF( VRFCond ).VRFCondCyclingRatio = CyclingRatio ;// report variable for cycling rate
-			VRF( VRFCond ).HeatingCapacity = CondHeatExtract;
+			VRF( VRFCond ).HeatingCapacity = OUEvapHeatExtract +  VRF( VRFCond ).NcompHeating;
 		
 		// @@@@@ 3. Stop running
 		} else { // Since: if( CoolingLoad( VRFCond ) &&( TUCoolingLoad > 0.0 ) ) 
@@ -7917,88 +7921,20 @@ namespace HVACVariableRefrigerantFlow {
 		// calculate capacities and energy use
 		if ( CoolingLoad( VRFCond ) && TerminalUnitList( TUListNum ).CoolingCoilPresent( NumTUInList ) ) {
 			InletAirWetBulbC = SumCoolInletWB;
-			TotCoolCapTempModFac = 1; 
-			TotCoolEIRTempModFac = 1; 
-
-			// recalculate cooling Cap and EIR curve output if using boundary curve along with dual Cap and EIR curves.
-			if ( VRF( VRFCond ).CoolBoundaryCurvePtr > 0 ) {
-				CoolOABoundary = 1; 
-				if ( OutdoorDryBulb > CoolOABoundary ) {
-					if ( VRF( VRFCond ).CoolCapFTHi > 0 ) TotCoolCapTempModFac = 1; 
-					if ( VRF( VRFCond ).CoolEIRFTHi > 0 ) TotCoolEIRTempModFac = 1;
-				}
-			}
 			
-			if ( TUCoolingLoad > CompEvaporatingCAPSpd( NumOfCompSpdInput ) ) 
-				TotalCondCoolingCapacity = CompEvaporatingCAPSpd( NumOfCompSpdInput );
-			else
-				TotalCondCoolingCapacity = TUCoolingLoad;
-
-			if ( TotalCondCoolingCapacity > 0.0 ) {
-				CoolingPLR = ( TUCoolingLoad / VRF( VRFCond ).PipingCorrectionCooling ) / TotalCondCoolingCapacity;
+			// From the VRF_FluidTCtrl model
+			if ( TUCoolingLoad > 0.0 ) {
+				if ( TUCoolingLoad <= VRF( VRFCond ).CoolingCapacity ) 
+					CoolingPLR = TUCoolingLoad / VRF( VRFCond ).CoolingCapacity;
+				else
+					CoolingPLR = 1.0;
 			} else {
 				CoolingPLR = 0.0;
-			}
-
-			//   Warn user if curve output goes negative
-			if ( TotCoolEIRTempModFac < 0.0 ) {
-				if ( ! WarmupFlag && NumTUInCoolingMode > 0 ) {
-					if ( VRF( VRFCond ).EIRFTempCoolErrorIndex == 0 ) {
-						ShowSevereMessage( cVRFTypes( VRF_HeatPump ) + " \"" + VRF( VRFCond ).Name + "\":" );
-						ShowContinueError( " Cooling Energy Input Ratio Modifier curve (function of temperature) output is negative (" + TrimSigDigits( TotCoolEIRTempModFac, 3 ) + ")." );
-						ShowContinueError( " Negative value occurs using an outdoor air temperature of " + TrimSigDigits( CondInletTemp, 1 ) + " C and an average indoor air wet-bulb temperature of " + TrimSigDigits( InletAirWetBulbC, 1 ) + " C." );
-						ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
-					}
-					ShowRecurringWarningErrorAtEnd( ccSimPlantEquipTypes( TypeOf_HeatPumpVRF ) + " \"" + VRF( VRFCond ).Name + "\": Cooling Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...", VRF( VRFCond ).EIRFTempCoolErrorIndex, TotCoolEIRTempModFac, TotCoolEIRTempModFac );
-					TotCoolEIRTempModFac = 0.0;
-				}
 			}
 
 		} else if ( HeatingLoad( VRFCond ) && TerminalUnitList( TUListNum ).HeatingCoilPresent( NumTUInList ) ) {
 			InletAirDryBulbC = SumHeatInletDB;
 			InletAirWetBulbC = SumHeatInletWB;
-			{ auto const SELECT_CASE_var( VRF( VRFCond ).HeatingPerformanceOATType );
-			if ( SELECT_CASE_var == DryBulbIndicator ) {
-				TotHeatCapTempModFac = CurveValue( VRF( VRFCond ).HeatCapFT, InletAirDryBulbC, CondInletTemp );
-				TotHeatEIRTempModFac = CurveValue( VRF( VRFCond ).HeatEIRFT, InletAirDryBulbC, CondInletTemp );
-			} else if ( SELECT_CASE_var == WetBulbIndicator ) {
-				TotHeatCapTempModFac = CurveValue( VRF( VRFCond ).HeatCapFT, InletAirDryBulbC, OutdoorWetBulb );
-				TotHeatEIRTempModFac = CurveValue( VRF( VRFCond ).HeatEIRFT, InletAirDryBulbC, OutdoorWetBulb );
-			} else {
-				TotHeatCapTempModFac = 1.0;
-				TotHeatEIRTempModFac = 1.0;
-			}}
-			// recalculate heating Cap and EIR curve output if using boundary curve along with dual Cap and EIR curves.
-			if ( VRF( VRFCond ).HeatBoundaryCurvePtr > 0 ) {
-				HeatOABoundary = CurveValue( VRF( VRFCond ).HeatBoundaryCurvePtr, InletAirDryBulbC );
-				{ auto const SELECT_CASE_var( VRF( VRFCond ).HeatingPerformanceOATType );
-				if ( SELECT_CASE_var == DryBulbIndicator ) {
-					if ( OutdoorDryBulb > HeatOABoundary ) {
-						if ( VRF( VRFCond ).HeatCapFTHi > 0 ) TotHeatCapTempModFac = CurveValue( VRF( VRFCond ).HeatCapFTHi, InletAirDryBulbC, CondInletTemp );
-					}
-				} else if ( SELECT_CASE_var == WetBulbIndicator ) {
-					if ( OutdoorWetBulb > HeatOABoundary ) {
-						if ( VRF( VRFCond ).HeatCapFTHi > 0 ) TotHeatCapTempModFac = CurveValue( VRF( VRFCond ).HeatCapFTHi, InletAirDryBulbC, OutdoorWetBulb );
-					}
-				} else {
-					TotHeatCapTempModFac = 1.0;
-				}}
-			}
-			if ( VRF( VRFCond ).EIRHeatBoundaryCurvePtr > 0 ) {
-				HeatOABoundary = CurveValue( VRF( VRFCond ).EIRHeatBoundaryCurvePtr, InletAirDryBulbC );
-				{ auto const SELECT_CASE_var( VRF( VRFCond ).HeatingPerformanceOATType );
-				if ( SELECT_CASE_var == DryBulbIndicator ) {
-					if ( OutdoorDryBulb > HeatOABoundary ) {
-						if ( VRF( VRFCond ).HeatEIRFTHi > 0 ) TotHeatEIRTempModFac = CurveValue( VRF( VRFCond ).HeatEIRFTHi, InletAirDryBulbC, CondInletTemp );
-					}
-				} else if ( SELECT_CASE_var == WetBulbIndicator ) {
-					if ( OutdoorWetBulb > HeatOABoundary ) {
-						if ( VRF( VRFCond ).HeatEIRFTHi > 0 ) TotHeatEIRTempModFac = CurveValue( VRF( VRFCond ).HeatEIRFTHi, InletAirDryBulbC, OutdoorWetBulb );
-					}
-				} else {
-					TotHeatEIRTempModFac = 1.0;
-				}}
-			}
 
 			// Initializing defrost adjustment factors
 			LoadDueToDefrost = 0.0;
@@ -8057,40 +7993,17 @@ namespace HVACVariableRefrigerantFlow {
 				}
 			}
 
-			// TotalCondHeatingCapacity = VRF( VRFCond ).HeatingCapacity * HeatCombinationRatio( VRFCond ) * TotHeatCapTempModFac * HeatingCapacityMultiplier;
-			// TotalTUHeatingCapacity = TotalCondHeatingCapacity * VRF( VRFCond ).PipingCorrectionHeating;
-			if( TUHeatingLoad > CompEvaporatingCAPSpd( NumOfCompSpdInput ) )
-				TotalCondHeatingCapacity = CompEvaporatingCAPSpd( NumOfCompSpdInput );
-			else
-				TotalCondHeatingCapacity = TUHeatingLoad;
-  
-			if ( TotalCondHeatingCapacity > 0.0 ) {
-				HeatingPLR = ( TUHeatingLoad / VRF( VRFCond ).PipingCorrectionHeating ) / TotalCondHeatingCapacity;
-				HeatingPLR += LoadDueToDefrost / TotalCondHeatingCapacity;
+			// From the VRF_FluidTCtrl model
+			if ( TUHeatingLoad > 0.0 ) {
+				if ( TUHeatingLoad <= VRF( VRFCond ).HeatingCapacity ) 
+					HeatingPLR = TUHeatingLoad / VRF( VRFCond ).HeatingCapacity;
+				else
+					HeatingPLR = 1.0;
+				HeatingPLR += LoadDueToDefrost / VRF( VRFCond ).HeatingCapacity;
 			} else {
 				HeatingPLR = 0.0;
-			}
-
-			//   Warn user if curve output goes negative
-			if ( TotHeatEIRTempModFac < 0.0 ) {
-				if ( ! WarmupFlag && NumTUInHeatingMode > 0 ) {
-					if ( VRF( VRFCond ).EIRFTempHeatErrorIndex == 0 ) {
-						ShowSevereMessage( cVRFTypes( VRF_HeatPump ) + " \"" + VRF( VRFCond ).Name + "\":" );
-						ShowContinueError( " Heating Energy Input Ratio Modifier curve (function of temperature) output is negative (" + TrimSigDigits( TotHeatEIRTempModFac, 3 ) + ")." );
-						{ auto const SELECT_CASE_var( VRF( VRFCond ).HeatingPerformanceOATType );
-						if ( SELECT_CASE_var == DryBulbIndicator ) {
-							ShowContinueError( " Negative value occurs using an outdoor air dry-bulb temperature of " + TrimSigDigits( CondInletTemp, 1 ) + " C and an average indoor air dry-bulb temperature of " + TrimSigDigits( InletAirDryBulbC, 1 ) + " C." );
-						} else if ( SELECT_CASE_var == WetBulbIndicator ) {
-							ShowContinueError( " Negative value occurs using an outdoor air wet-bulb temperature of " + TrimSigDigits( OutdoorWetBulb, 1 ) + " C and an average indoor air wet-bulb temperature of " + TrimSigDigits( InletAirWetBulbC, 1 ) + " C." );
-						} else {
-						}}
-						ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
-					}
-					ShowRecurringWarningErrorAtEnd( ccSimPlantEquipTypes( TypeOf_HeatPumpVRF ) + " \"" + VRF( VRFCond ).Name + "\": Heating Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...", VRF( VRFCond ).EIRFTempHeatErrorIndex, TotHeatEIRTempModFac, TotHeatEIRTempModFac );
-					TotHeatEIRTempModFac = 0.0;
-				}
-			}
-
+			} 
+			
 		}
 
 		VRF( VRFCond ).VRFCondPLR = max( CoolingPLR, HeatingPLR );
