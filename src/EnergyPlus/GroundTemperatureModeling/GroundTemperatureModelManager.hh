@@ -1,45 +1,29 @@
-#ifndef BaseGroundTemperatureModel_hh_INCLUDED
-#define BaseGroundTemperatureModel_hh_INCLUDED
+#ifndef GroundTemperatureModelManager_hh_INCLUDED
+#define GroundTemperatureModelManager_hh_INCLUDED
+
+// C++ Headers
+#include <memory>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include <GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 #include <DataGlobals.hh>
 
-namespace EnergyPlus{
+namespace EnergyPlus {
 
-	// Base class
-	class BaseGroundTempsModel
-	{
-		public:
-			// Public Members
-			int objectType;
-			std::string objectName;
-			bool errorsFound;
+namespace GroundTemperatureManager {
 
-			// Default Constructor
-		BaseGroundTempsModel() :
-			objectType( 0 ),
-			errorsFound( false )
+	static std::vector < std::shared_ptr < BaseGroundTempsModel > > groundTempModels;
 
-			{}
-		
-		// Virtual method for retrieving the ground temp
-		virtual Real64
-		getGroundTemp()=0;
+	std::shared_ptr< BaseGroundTempsModel >
+	GetGroundTempModelAndInit(
+		std::string const type,
+		std::string const name,
+		Real64 const groundThermalDiffusivity
+	);
 
-		virtual Real64
-		getGroundTempAtTimeInSeconds(
-			Real64 const,
-			Real64 const
-		)=0;
-
-		virtual Real64
-		getGroundTempAtTimeInMonths(
-			Real64 const,
-			int const
-		)=0;
-
-	};
+	void
+	clear_state();
 
 	//     NOTICE
 
@@ -64,6 +48,8 @@ namespace EnergyPlus{
 
 	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
-}
+}	// GroundTemperatureManager
+
+}	// EnergyPlus
 
 #endif

@@ -1,43 +1,48 @@
-#ifndef BaseGroundTemperatureModel_hh_INCLUDED
-#define BaseGroundTemperatureModel_hh_INCLUDED
+#ifndef SiteDeepGroundTemperatures_hh_INCLUDED
+#define SiteDeepGroundTemperatures_hh_INCLUDED
+
+// C++ Headers
+#include <memory>
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
-#include <DataGlobals.hh>
+#include <GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
-namespace EnergyPlus{
+namespace EnergyPlus {
 
-	// Base class
-	class BaseGroundTempsModel
+	// Derived class for Site:GroundTemperature:Deep
+	class SiteDeepGroundTemps : public BaseGroundTempsModel
 	{
 		public:
-			// Public Members
-			int objectType;
-			std::string objectName;
-			bool errorsFound;
+			int timeOfSimInMonths;
+			Array1D< Real64 > deepGroundTemps;
 
-			// Default Constructor
-		BaseGroundTempsModel() :
-			objectType( 0 ),
-			errorsFound( false )
+		// Default Constructor
+		SiteDeepGroundTemps():
+			timeOfSimInMonths( 0 ),
+			deepGroundTemps( 12, 13.0 )
 
 			{}
-		
-		// Virtual method for retrieving the ground temp
-		virtual Real64
-		getGroundTemp()=0;
 
-		virtual Real64
+		static std::shared_ptr< SiteDeepGroundTemps > DeepGTMFactory();
+
+		Real64
+		getGroundTemp();
+
+		Real64
 		getGroundTempAtTimeInSeconds(
-			Real64 const,
-			Real64 const
-		)=0;
+			Real64 const depth,
+			Real64 const timeInSecondsOfSim
+		);
 
-		virtual Real64
+		Real64
 		getGroundTempAtTimeInMonths(
-			Real64 const,
-			int const
-		)=0;
+			Real64 const depth,
+			int const monthOfSim
+		);
 
 	};
 

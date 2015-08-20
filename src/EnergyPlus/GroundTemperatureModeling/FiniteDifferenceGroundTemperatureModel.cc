@@ -1,7 +1,7 @@
 // C++ Headers
 #include <algorithm>
+#include <fstream>
 #include <memory>
-#include <fstream> 
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
@@ -10,21 +10,95 @@
 // EnergyPlus Headers
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
+#include <DataIPShortCuts.hh>
 #include <DataReportingFlags.hh>
-#include <GroundTempsManager.hh>
+#include <GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
+#include <GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
+#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <InputProcessor.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
 
-namespace GroundTemps {
-	
-	using DataGlobals::SecsInDay;	
+	using DataGlobals::SecsInDay;
 	
 	int daysInYear = 365;
 	int simDay = 0;
 	Real64 finalTempConvergenceCriteria = 0.25; // FOR TESTING ONLY
 	Real64 iterationTempConvergenceCriteria = 0.00001;
+
+	//******************************************************************************
+
+	// Finite difference model factory
+	std::shared_ptr< FiniteDiffGroundTempsModel > 
+	FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(
+		int objectType,
+		std::string objectName
+		)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Read input and creates instance of finite difference ground temp model
+
+		// USE STATEMENTS:
+		using namespace DataIPShortCuts;
+		using namespace GroundTemperatureManager;
+
+		// Locals
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		bool found = false;
+		int NumNums;
+		int NumAlphas;
+		int IOStat;
+		bool ErrorsFound = false;
+
+		// New shared pointer for this model object
+		std::shared_ptr< FiniteDiffGroundTempsModel > thisModel( new FiniteDiffGroundTempsModel() );
+
+		// Search through finite diff models here
+		std::string const cCurrentModuleObject = "Site:GroundTemperature:Undisturbed:FiniteDifference";
+		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+
+		for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
+
+			InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+
+			if ( objectName == cAlphaArgs( 1 ) ) {
+				// Read input into object here
+
+				thisModel->objectType = objectType;
+				thisModel->objectName = cAlphaArgs( 1 );
+				thisModel->baseConductivity = rNumericArgs( 1 );
+				thisModel->baseDensity = rNumericArgs( 2 );
+				thisModel->baseSpecificHeat = rNumericArgs( 3 );
+				thisModel->waterContent = rNumericArgs( 4 ) / 100.0;
+				thisModel->saturatedWaterContent = rNumericArgs( 5 ) / 100.0;
+				thisModel->evapotransCoeff = rNumericArgs( 6 );
+
+				found = true;
+				break;
+			}
+		}
+
+		if ( found && !ErrorsFound ) {
+			groundTempModels.push_back( thisModel );
+
+			// Simulate
+			thisModel->initAndSim();
+
+			// Return the pointer
+			return thisModel;
+		} else {
+			ShowFatalError( "Site:GroundTemperature:Undisturbed:FiniteDifference--Errors getting input for ground temperature model" );
+			return nullptr;
+		}
+
+	}
 
 	//******************************************************************************
 
@@ -776,6 +850,8 @@ namespace GroundTemps {
 		// Initialize the groundTemps array
 		groundTemps.dimension( { 1, daysInYear }, { 1, totalNumCells }, 0.0 );
 
+		// Need to delete tempModel?
+
 	}
 
 	//******************************************************************************
@@ -1159,7 +1235,5 @@ namespace GroundTemps {
 	//     permit others to do so.
 
 	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
-
-}	// GroundTemps
 
 }	// EnergyPlus

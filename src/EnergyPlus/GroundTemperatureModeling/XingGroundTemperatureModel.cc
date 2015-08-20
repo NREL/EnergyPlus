@@ -1,12 +1,83 @@
+// C++ Headers
+#include <memory>
 
 // EnergyPlus headers
 #include <DataGlobals.hh>
-#include <GroundTempsManager.hh>
+#include <DataIPShortCuts.hh>
+#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <GroundTemperatureModeling/XingGroundTemperatureModel.hh>
 #include <InputProcessor.hh>
 
 namespace EnergyPlus {
 
-namespace GroundTemps {
+	//******************************************************************************
+
+	// Xing model factory
+	std::shared_ptr< XingGroundTemps > 
+	XingGroundTemps::XingGTMFactory( 
+		int objectType, 
+		std::string objectName,
+		Real64 groundThermalDiffusivity
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Reads input and creates instance of Xing ground temps model
+
+		// USE STATEMENTS:
+		using namespace DataIPShortCuts;
+		using namespace GroundTemperatureManager;
+
+		// Locals
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		bool found = false;
+		int NumNums;
+		int NumAlphas;
+		int IOStat;
+		bool ErrorsFound = false;
+
+		// New shared pointer for this model object
+		std::shared_ptr< XingGroundTemps > thisModel( new XingGroundTemps() );
+
+		std::string const cCurrentModuleObject = "Site:GroundTemperature:Undisturbed:Xing";
+		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+
+		for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
+
+			InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+
+			if ( objectName == cAlphaArgs( 1 ) ) {
+				// Read input into object here
+
+				thisModel->objectName = cAlphaArgs( 1 );
+				thisModel->objectType = objectType;
+				thisModel->aveGroundTemp = rNumericArgs( 1 );
+				thisModel->surfTempAmplitude_1 = rNumericArgs( 2 );
+				thisModel->phaseShift_1 = rNumericArgs( 3 );
+				thisModel->surfTempAmplitude_2 = rNumericArgs( 4 );
+				thisModel->phaseShift_2 = rNumericArgs( 5 );
+				thisModel->groundThermalDiffisivity = groundThermalDiffusivity;
+
+				found = true;
+				break;
+			}
+		}
+
+		if ( found && !ErrorsFound ) {
+			groundTempModels.push_back( thisModel );
+			return thisModel;
+		} else {
+			ShowFatalError( "Site:GroundTemperature:Undisturbed:Xing--Errors getting input for ground temperature model");
+			return nullptr;
+		}
+	}
+
+	//******************************************************************************
 
 	Real64 XingGroundTemps::getGroundTemp()
 	{
@@ -139,8 +210,5 @@ namespace GroundTemps {
 	//     permit others to do so.
 
 	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
-
-
-}	// GroundTemps namespace
 
 }	// EnergyPlus namespace

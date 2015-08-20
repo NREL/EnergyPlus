@@ -1,43 +1,48 @@
-#ifndef BaseGroundTemperatureModel_hh_INCLUDED
-#define BaseGroundTemperatureModel_hh_INCLUDED
+#ifndef XingGroundTemperatureManager_hh_INCLUDED
+#define XingGroundTemperatureManager_hh_INCLUDED
+
+// C++ Headers
+#include <memory>
 
 // EnergyPlus Headers
+#include <GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 #include <EnergyPlus.hh>
-#include <DataGlobals.hh>
 
-namespace EnergyPlus{
+namespace EnergyPlus {
 
-	// Base class
-	class BaseGroundTempsModel
+	class XingGroundTemps : public BaseGroundTempsModel
 	{
 		public:
-			// Public Members
-			int objectType;
-			std::string objectName;
-			bool errorsFound;
+			Real64 depth;
+			Real64 groundThermalDiffisivity;
+			Real64 simTimeInDays;
+			Real64 aveGroundTemp;
+			Real64 surfTempAmplitude_1;
+			Real64 phaseShift_1;
+			Real64 surfTempAmplitude_2;
+			Real64 phaseShift_2;
 
-			// Default Constructor
-		BaseGroundTempsModel() :
-			objectType( 0 ),
-			errorsFound( false )
+		static std::shared_ptr< XingGroundTemps > 
+		XingGTMFactory( 
+			int objectType, 
+			std::string objectName,
+			Real64 groundThermalDiffusivity
+		);
 
-			{}
-		
-		// Virtual method for retrieving the ground temp
-		virtual Real64
-		getGroundTemp()=0;
+		Real64
+		getGroundTemp();
 
-		virtual Real64
+		Real64
 		getGroundTempAtTimeInSeconds(
-			Real64 const,
-			Real64 const
-		)=0;
+			Real64 const depth,
+			Real64 const timeInSecondsOfSim
+		);
 
-		virtual Real64
+		Real64
 		getGroundTempAtTimeInMonths(
-			Real64 const,
-			int const
-		)=0;
+			Real64 const depth,
+			int const monthOfSim
+		);
 
 	};
 

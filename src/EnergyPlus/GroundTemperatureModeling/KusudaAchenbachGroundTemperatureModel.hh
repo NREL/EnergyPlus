@@ -1,43 +1,49 @@
-#ifndef BaseGroundTemperatureModel_hh_INCLUDED
-#define BaseGroundTemperatureModel_hh_INCLUDED
+#ifndef KusudaAchenbachGroundTemperatureModel_hh_INCLUDED
+#define KusudaAchenbachGroundTemperatureModel_hh_INCLUDED
+
+// C++ Headers
+#include <memory>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
+#include <GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus{
 
-	// Base class
-	class BaseGroundTempsModel
+	// Derived class for Kusuda-Achenbach model
+	class KusudaGroundTempsModel : public BaseGroundTempsModel
 	{
 		public:
 			// Public Members
-			int objectType;
-			std::string objectName;
-			bool errorsFound;
+			Real64 depth;
+			Real64 groundThermalDiffisivity;
+			Real64 simTimeInSeconds;
+			Real64 aveGroundTemp;
+			Real64 aveGroundTempAmplitude;
+			Real64 phaseShiftInSecs;
 
-			// Default Constructor
-		BaseGroundTempsModel() :
-			objectType( 0 ),
-			errorsFound( false )
+		static std::shared_ptr< KusudaGroundTempsModel > 
+		KusudaGTMFactory( 
+			int objectType, 
+			std::string objectName,
+			Real64 groundThermalDiffusivity
+		);
 
-			{}
-		
-		// Virtual method for retrieving the ground temp
-		virtual Real64
-		getGroundTemp()=0;
+		Real64
+		getGroundTemp();
 
-		virtual Real64
+		Real64
 		getGroundTempAtTimeInSeconds(
-			Real64 const,
-			Real64 const
-		)=0;
+			Real64 const depth,
+			Real64 const timeInSecondsOfSim
+		);
 
-		virtual Real64
+		Real64
 		getGroundTempAtTimeInMonths(
-			Real64 const,
-			int const
-		)=0;
+			Real64 const depth,
+			int const monthOfSim
+		);
 
 	};
 
