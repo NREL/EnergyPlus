@@ -954,14 +954,15 @@ namespace SetPointManager {
 		int ChllrVarIndex; // report variable index
 		int ChlPumpVarType; // report variable type
 		int ChlPumpVarIndex; // report variable index
-		int ClTowerVarType; // report variable type
-		int ClTowerVarIndex; // report variable index
+		Array1D_int ClTowerVarType; // report variable type
+		Array1D_int ClTowerVarIndex; // report variable index
 		int CndPumpVarType; // report variable type
 		int CndPumpVarIndex; // report variable index
 		int TypeNum; // chiller type number
-		int TowerNum; // cooling tower number
+		Array1D_int TowerNum; // cooling tower number
 		int CondLoopNum; // condenser loop number
-		int CondBranchNum; // condenser branch number
+		Array1D_int CondTowerBranchNum; // condenser branch number
+		int numTowers; // number of towers to query
 		int CondPumpNum; // condenser pump number
 		int CondPumpBranchNum; // condenser branch number for pump
 		int ChilledPumpNum; // chilled water pump number
@@ -982,14 +983,11 @@ namespace SetPointManager {
 			ChllrVarIndex( 0 ),
 			ChlPumpVarType( 0 ),
 			ChlPumpVarIndex( 0 ),
-			ClTowerVarType( 0 ),
-			ClTowerVarIndex( 0 ),
 			CndPumpVarType( 0 ),
 			CndPumpVarIndex( 0 ),
 			TypeNum( 0 ),
-			TowerNum( 0 ),
 			CondLoopNum( 0 ),
-			CondBranchNum( 0 ),
+			numTowers( 0 ),
 			CondPumpNum( 0 ),
 			CondPumpBranchNum( 0 ),
 			ChilledPumpNum( 0 ),

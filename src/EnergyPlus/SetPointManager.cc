@@ -3137,7 +3137,6 @@ namespace SetPointManager {
 		int CompNumPlantSide;
 		static int TypeNum( 0 );
 		static int NumChiller( 0 );
-		static int NumCT( 0 );
 		static int TypeOf_Num( 0 );
 
 		ManagerOn = true;
@@ -3581,7 +3580,6 @@ namespace SetPointManager {
 				}
 
 				// condenser entering water temperature reset setpoint manager
-				NumCT = 0;
 				cSetPointManagerType = cValidSPMTypes( iSPMType_CondEntReset );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumCondEntSetPtMgrs; ++SetPtMgrNum ) {
 					// Scan loops and find the loop index that includes the condenser cooling tower node used as setpoint
@@ -3595,14 +3593,11 @@ namespace SetPointManager {
 										if ( TypeOf_Num == TypeOf_CoolingTower_SingleSpd ) {
 											ShowSevereError( cSetPointManagerType + "=\"" + CondEntSetPtMgr( SetPtMgrNum ).Name + "\", invalid tower found" );
 											ShowContinueError( "Found SingleSpeed Cooling Tower, Cooling Tower=" + PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).Name );
-											ShowContinueError( "SingleSpeed cooling towers cannot be used with this setpoint manager on each loop" );
+											ShowContinueError( "SingleSpeed cooling towers cannot be used with this setpoint manager." );
 											ErrorsFound = true;
-										} else if ( TypeOf_Num == TypeOf_CoolingTower_TwoSpd || TypeOf_Num == TypeOf_CoolingTower_VarSpd ) {
-											// TODO: add this cooling tower to the spm struct in the form of a new plant location with internal tower comp num in the to-be-added vector of locations
 										}
 									}
 								}
-								NumCT = 0;
 								// Scan all attached chillers in the condenser loop index found to find the chiller index
 								for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( DemandSide ).TotalBranches; ++BranchNum ) {
 									for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
@@ -3635,7 +3630,6 @@ namespace SetPointManager {
 
 				// Ideal condenser entering water temperature reset setpoint manager
 				cSetPointManagerType = cValidSPMTypes( iSPMType_IdealCondEntReset );
-				NumCT = 0;
 				NumChiller = 0;
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumIdealCondEntSetPtMgrs; ++SetPtMgrNum ) {
 					// Scan loops and find the loop index that includes the condenser cooling tower node used as setpoint
@@ -3651,6 +3645,10 @@ namespace SetPointManager {
 											ShowContinueError( "Found Single Speed Cooling Tower, Cooling Tower=" + PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ).Name );
 											ShowContinueError( "SingleSpeed cooling towers cannot be used with this setpoint manager on each loop" );
 											ErrorsFound = true;
+										} else if ( TypeOf_Num == TypeOf_CoolingTower_TwoSpd || TypeOf_Num == TypeOf_CoolingTower_VarSpd ) {
+											IdealCondEntSetPtMgr( SetPtMgrNum ).CondTowerBranchNum.push_back( BranchNum );
+											IdealCondEntSetPtMgr( SetPtMgrNum ).TowerNum.push_back( CompNum );
+											IdealCondEntSetPtMgr( SetPtMgrNum ).numTowers++;
 										}
 										// Scan the pump on the condenser water loop
 										if ( TypeOf_Num == TypeOf_PumpVariableSpeed || TypeOf_Num == TypeOf_PumpConstantSpeed ) {
@@ -3659,7 +3657,6 @@ namespace SetPointManager {
 										}
 									}
 								}
-								NumCT = 0;
 								// Scan all attached chillers in the condenser loop index found to find the chiller index
 								for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( DemandSide ).TotalBranches; ++BranchNum ) {
 									for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
@@ -3698,8 +3695,6 @@ namespace SetPointManager {
 											}
 											IdealCondEntSetPtMgr( SetPtMgrNum ).TypeNum = TypeNum;
 											IdealCondEntSetPtMgr( SetPtMgrNum ).CondLoopNum = LoopNum;
-											IdealCondEntSetPtMgr( SetPtMgrNum ).TowerNum = CompNum;
-											IdealCondEntSetPtMgr( SetPtMgrNum ).CondBranchNum = BranchNum;
 										}
 									}
 								}
@@ -6591,8 +6586,6 @@ namespace SetPointManager {
 		static int ChillerNum( 0 ); // Chiller number
 		static int TowerLoopNum( 0 ); // Tower loop number
 		static int CondLoopNum( 0 ); // Condenser loop number
-		static int TowerBranchNum( 0 ); // Tower branch number
-		static int TowerNum( 0 ); // Tower number
 		static int ChilledPumpBranchNum( 0 ); // Chilled water pump branch number
 		static int ChilledPumpNum( 0 ); // Chilled water pump number
 		static int CondPumpBranchNum( 0 ); // Condenser water pump branch number
@@ -6601,7 +6594,7 @@ namespace SetPointManager {
 		// and at the previous time step
 		static Real64 ChillerEnergy( 0.0 ); // Chiller energy consumption
 		static Real64 ChilledPumpEnergy( 0.0 ); // Chilled water pump energy consumption
-		static Real64 TowerFanEnergy( 0.0 ); // Colling tower fan energy consumption
+		static Real64 TowerFanEnergy( 0.0 ); // Cooling tower fan energy consumption
 		static Real64 CondPumpEnergy( 0.0 ); // Condenser water pump energy consumption
 		static Real64 TotEnergy( 0.0 ); // Totoal energy consumptions at this time step
 		static Real64 TotEnergyPre( 0.0 ); // Totoal energy consumptions at the previous time step
@@ -6616,8 +6609,6 @@ namespace SetPointManager {
 		ChillerNum = this->ChillerIndexPlantSide;
 		TowerLoopNum = this->CondLoopNum;
 		CondLoopNum = this->CondLoopNum;
-		TowerBranchNum = this->CondBranchNum;
-		TowerNum = this->TowerNum;
 		ChilledPumpBranchNum = this->ChilledPumpBranchNum;
 		ChilledPumpNum = this->ChilledPumpNum;
 		CondPumpBranchNum = this->CondPumpBranchNum;
@@ -6654,7 +6645,10 @@ namespace SetPointManager {
 				ChilledPumpEnergy = GetInternalVariableValue( this->ChlPumpVarType, this->ChlPumpVarIndex );
 
 				// Get the cooling tower fan energy consumption
-				TowerFanEnergy = GetInternalVariableValue( this->ClTowerVarType, this->ClTowerVarIndex );
+				TowerFanEnergy = 0;
+				for ( int i = 1; i <= this->numTowers; i++ ) {
+					TowerFanEnergy += GetInternalVariableValue( this->ClTowerVarType( i ), this->ClTowerVarIndex( i ) );
+				}
 
 				// Get the condenser pump energy consumption
 				CondPumpEnergy = GetInternalVariableValue( this->CndPumpVarType, this->CndPumpVarIndex );
@@ -6939,25 +6933,8 @@ namespace SetPointManager {
 		// For the Ideal Cond reset setpoint manager, this sets up the
 		// report variables used during the calculation.
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataPlant;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string TypeOfComp;
@@ -6974,31 +6951,17 @@ namespace SetPointManager {
 		int NumVariables;
 		int NumFound;
 
-		static int ChillerTypeNum( 0 ); // Chiller type number
-		static int ChillerLoopNum( 0 ); // Chiller loop number
-		static int ChillerBranchNum( 0 ); // Chiller branch number
-		static int ChillerNum( 0 ); // Chiller number
-		static int TowerLoopNum( 0 ); // Tower loop number
-		static int TowerBranchNum( 0 ); // Tower branch number
-		static int CondLoopNum( 0 ); // Condenser loop number
-		static int TowerNum( 0 ); // Tower number
-		static int ChilledPumpBranchNum( 0 ); // Chilled water pump branch number
-		static int ChilledPumpNum( 0 ); // Chilled water pump number
-		static int CondPumpBranchNum( 0 ); // Condenser water pump branch number
-		static int CondPumpNum( 0 ); // Condenser pump number
-
-		ChillerTypeNum = this->TypeNum;
-		ChillerLoopNum = this->LoopIndexPlantSide;
-		ChillerBranchNum = this->BranchIndexPlantSide;
-		ChillerNum = this->ChillerIndexPlantSide;
-		TowerLoopNum = this->CondLoopNum;
-		CondLoopNum = this->CondLoopNum;
-		TowerBranchNum = this->CondBranchNum;
-		TowerNum = this->TowerNum;
-		ChilledPumpBranchNum = this->ChilledPumpBranchNum;
-		ChilledPumpNum = this->ChilledPumpNum;
-		CondPumpBranchNum = this->CondPumpBranchNum;
-		CondPumpNum = this->CondPumpNum;
+		// Chiller and ChW pump location, assumes supply side
+		int ChillerLoopNum( this->LoopIndexPlantSide ); // Chiller loop number
+		int ChillerBranchNum( this->BranchIndexPlantSide ); // Chiller branch number
+		int ChillerNum( this->ChillerIndexPlantSide ); // Chiller number
+		int ChilledPumpBranchNum( this->ChilledPumpBranchNum ); // Chilled water pump branch number
+		int ChilledPumpNum( this->ChilledPumpNum ); // Chilled water pump number
+		
+		// Tower and CW pump location, assumes supply side, and tower branch/comp nums are used directly instead of local variable copies
+		int TowerLoopNum( this->CondLoopNum ); // Tower loop number
+		int CondPumpBranchNum( this->CondPumpBranchNum ); // Condenser water pump branch number
+		int CondPumpNum( this->CondPumpNum ); // Condenser pump number
 
 		TypeOfComp = PlantLoop( ChillerLoopNum ).LoopSide( SupplySide ).Branch( ChillerBranchNum ).Comp( ChillerNum ).TypeOf;
 		NameOfComp = PlantLoop( ChillerLoopNum ).LoopSide( SupplySide ).Branch( ChillerBranchNum ).Comp( ChillerNum ).Name;
@@ -7016,15 +6979,6 @@ namespace SetPointManager {
 		this->ChllrVarType = VarTypes( 1 );
 		this->ChllrVarIndex = VarIndexes( 1 );
 
-		VarIndexes.deallocate();
-		VarTypes.deallocate();
-		IndexTypes.deallocate();
-		UnitsStrings.deallocate();
-		ResourceTypes.deallocate();
-		EndUses.deallocate();
-		Groups.deallocate();
-		Names.deallocate();
-
 		TypeOfComp = PlantLoop( ChillerLoopNum ).LoopSide( SupplySide ).Branch( ChilledPumpBranchNum ).Comp( ChilledPumpNum ).TypeOf;
 		NameOfComp = PlantLoop( ChillerLoopNum ).LoopSide( SupplySide ).Branch( ChilledPumpBranchNum ).Comp( ChilledPumpNum ).Name;
 		NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
@@ -7041,42 +6995,27 @@ namespace SetPointManager {
 		this->ChlPumpVarType = VarTypes( 1 );
 		this->ChlPumpVarIndex = VarIndexes( 1 );
 
-		VarIndexes.deallocate();
-		VarTypes.deallocate();
-		IndexTypes.deallocate();
-		UnitsStrings.deallocate();
-		ResourceTypes.deallocate();
-		EndUses.deallocate();
-		Groups.deallocate();
-		Names.deallocate();
+		for ( int i = 1; i <= this->numTowers; i++ ) {
+			TypeOfComp = PlantLoop( TowerLoopNum ).LoopSide( SupplySide ).Branch( this->CondTowerBranchNum( i ) ).Comp( this->TowerNum( i ) ).TypeOf;
+			NameOfComp = PlantLoop( TowerLoopNum ).LoopSide( SupplySide ).Branch( this->CondTowerBranchNum( i ) ).Comp( this->TowerNum( i ) ).Name;
+			NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
+			VarIndexes.allocate( NumVariables );
+			VarTypes.allocate( NumVariables );
+			IndexTypes.allocate( NumVariables );
+			UnitsStrings.allocate( NumVariables );
+			ResourceTypes.allocate( NumVariables );
+			EndUses.allocate( NumVariables );
+			Groups.allocate( NumVariables );
+			Names.allocate( NumVariables );
 
-		TypeOfComp = PlantLoop( TowerLoopNum ).LoopSide( SupplySide ).Branch( TowerBranchNum ).Comp( TowerNum ).TypeOf;
-		NameOfComp = PlantLoop( TowerLoopNum ).LoopSide( SupplySide ).Branch( TowerBranchNum ).Comp( TowerNum ).Name;
-		NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
-		VarIndexes.allocate( NumVariables );
-		VarTypes.allocate( NumVariables );
-		IndexTypes.allocate( NumVariables );
-		UnitsStrings.allocate( NumVariables );
-		ResourceTypes.allocate( NumVariables );
-		EndUses.allocate( NumVariables );
-		Groups.allocate( NumVariables );
-		Names.allocate( NumVariables );
+			GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+			this->ClTowerVarType.push_back( VarTypes( 1 ) );
+			this->ClTowerVarIndex.push_back( VarIndexes( 1 ) );
 
-		GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
-		this->ClTowerVarType = VarTypes( 1 );
-		this->ClTowerVarIndex = VarIndexes( 1 );
+		}
 
-		VarIndexes.deallocate();
-		VarTypes.deallocate();
-		IndexTypes.deallocate();
-		UnitsStrings.deallocate();
-		ResourceTypes.deallocate();
-		EndUses.deallocate();
-		Groups.deallocate();
-		Names.deallocate();
-
-		TypeOfComp = PlantLoop( CondLoopNum ).LoopSide( SupplySide ).Branch( CondPumpBranchNum ).Comp( CondPumpNum ).TypeOf;
-		NameOfComp = PlantLoop( CondLoopNum ).LoopSide( SupplySide ).Branch( CondPumpBranchNum ).Comp( CondPumpNum ).Name;
+		TypeOfComp = PlantLoop( TowerLoopNum ).LoopSide( SupplySide ).Branch( CondPumpBranchNum ).Comp( CondPumpNum ).TypeOf;
+		NameOfComp = PlantLoop( TowerLoopNum ).LoopSide( SupplySide ).Branch( CondPumpBranchNum ).Comp( CondPumpNum ).Name;
 		NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
 		VarIndexes.allocate( NumVariables );
 		VarTypes.allocate( NumVariables );
@@ -7090,15 +7029,6 @@ namespace SetPointManager {
 		GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
 		this->CndPumpVarType = VarTypes( 1 );
 		this->CndPumpVarIndex = VarIndexes( 1 );
-
-		VarIndexes.deallocate();
-		VarTypes.deallocate();
-		IndexTypes.deallocate();
-		UnitsStrings.deallocate();
-		ResourceTypes.deallocate();
-		EndUses.deallocate();
-		Groups.deallocate();
-		Names.deallocate();
 
 	}
 
