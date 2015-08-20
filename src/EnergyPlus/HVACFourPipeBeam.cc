@@ -841,16 +841,17 @@ namespace FourPipeBeam {
 									DataPlant::PlantLoop( this->cWLocation.loopNum ).FluidIndex, routineName );
 			this->mDotNormRatedCW = this->vDotNormRatedCW * rho;
 			this->mDotCW = this->vDotDesignCW * rho;
-			PlantUtilities::InitComponentNodes(0.0, 
-									this->mDotCW, 
-									this->cWInNodeNum, 
-									this->cWOutNodeNum, 
-									this->cWLocation.loopNum, 
-									this->cWLocation.loopSideNum, 
-									this->cWLocation.branchNum, 
-									this->cWLocation.compNum 
-									);
-
+			if ( this-> beamCoolingPresent ) {
+				PlantUtilities::InitComponentNodes(0.0, 
+										this->mDotCW, 
+										this->cWInNodeNum, 
+										this->cWOutNodeNum, 
+										this->cWLocation.loopNum, 
+										this->cWLocation.loopSideNum, 
+										this->cWLocation.branchNum, 
+										this->cWLocation.compNum 
+										);
+			}
 		}
 		if ( vDotDesignHWWasAutosized ) {
 			this->vDotDesignHW = this->vDotNormRatedHW * this->totBeamLength;
@@ -858,15 +859,17 @@ namespace FourPipeBeam {
 									DataPlant::PlantLoop( this->hWLocation.loopNum ).FluidIndex, routineName );
 			this->mDotNormRatedHW = this->vDotNormRatedHW * rho;
 			this->mDotHW = this->vDotDesignHW * rho;
-			PlantUtilities::InitComponentNodes( 0.0, 
-									this->mDotHW, 
-									this->hWInNodeNum, 
-									this->hWOutNodeNum, 
-									this->hWLocation.loopNum, 
-									this->hWLocation.loopSideNum, 
-									this->hWLocation.branchNum, 
-									this->hWLocation.compNum 
-									);
+			if ( this-> beamHeatingPresent ) {
+				PlantUtilities::InitComponentNodes( 0.0, 
+										this->mDotHW, 
+										this->hWInNodeNum, 
+										this->hWOutNodeNum, 
+										this->hWLocation.loopNum, 
+										this->hWLocation.loopSideNum, 
+										this->hWLocation.branchNum, 
+										this->hWLocation.compNum 
+										);
+			}
 		}
 		this->calc();
 		Residuum = (  ( this->qDotZoneReq - this->qDotTotalDelivered ) 
@@ -899,14 +902,20 @@ namespace FourPipeBeam {
 
 		if ( this->mDotSystemAir == 0.0 || ( ! this->airAvailable  && ! this->coolingAvailable && ! this->heatingAvailable ) ) { //unit is off
 			this->mDotHW = 0.0;
-			SetComponentFlowRate(this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWLocation.loopNum, 
+			if ( this-> beamHeatingPresent )
+			{
+				SetComponentFlowRate(this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWLocation.loopNum, 
 								this->hWLocation.loopSideNum, this->hWLocation.branchNum, this->hWLocation.compNum );
+			}
 			this->hWTempOut = this->hWTempIn;
 			// assume if there is still flow that unit has an internal bypass and convector does not still heat
 			this->mDotCW = 0.0;
 			this->cWTempOut = this->cWTempIn;
-			SetComponentFlowRate(this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum, this->cWLocation.loopNum, 
+			if ( this-> beamCoolingPresent )
+			{
+				SetComponentFlowRate(this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum, this->cWLocation.loopNum, 
 								this->cWLocation.loopSideNum, this->cWLocation.branchNum, this->cWLocation.compNum );
+			}
 			// assume if there is still flow that unit has an internal bypass and convector does not still cool
 			// don't even need to run calc
 			return;
@@ -916,13 +925,19 @@ namespace FourPipeBeam {
 		if ( this->airAvailable && this->mDotSystemAir > 0.0 && ! this->coolingAvailable && ! this->heatingAvailable) {
 			dOASMode = true;
 			this->mDotHW = 0.0;
-			SetComponentFlowRate(this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWLocation.loopNum, 
+			if ( this -> beamHeatingPresent )
+			{
+				SetComponentFlowRate(this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWLocation.loopNum, 
 								this->hWLocation.loopSideNum, this->hWLocation.branchNum, this->hWLocation.compNum );
+			}
 			// assume if there is still flow that unit has an internal bypass and convector does not still heat
 			this->hWTempOut = this->hWTempIn;
 			this->mDotCW = 0.0;
-			SetComponentFlowRate(this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum, this->cWLocation.loopNum, 
+			if ( this-> beamCoolingPresent )
+			{
+				SetComponentFlowRate(this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum, this->cWLocation.loopNum, 
 								this->cWLocation.loopSideNum, this->cWLocation.branchNum, this->cWLocation.compNum );
+			}
 			// assume if there is still flow that unit has an internal bypass and convector does not still cool
 			this->cWTempOut = this->cWTempIn;
 			this->calc();
@@ -944,8 +959,11 @@ namespace FourPipeBeam {
 		if ( this->qDotBeamReq < - DataHVACGlobals::SmallLoad && this->coolingAvailable ){ // beam cooling needed
 			// first calc with max chilled water flow
 			this->mDotHW = 0.0;
-			SetComponentFlowRate(this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWLocation.loopNum, 
+			if ( this->beamHeatingPresent )
+			{
+				SetComponentFlowRate(this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWLocation.loopNum, 
 								this->hWLocation.loopSideNum, this->hWLocation.branchNum, this->hWLocation.compNum );
+			}
 			this->hWTempOut = this->hWTempIn;
 			this->mDotCW = this->mDotDesignCW;
 			this->calc();
@@ -974,8 +992,11 @@ namespace FourPipeBeam {
 		} else if ( qDotBeamReq > DataHVACGlobals::SmallLoad && this->heatingAvailable ){ // beam heating needed
 			// first calc with max hot water flow
 			this->mDotCW = 0.0;
-			SetComponentFlowRate(this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum, this->cWLocation.loopNum, 
+			if ( this->beamCoolingPresent )
+			{
+				SetComponentFlowRate(this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum, this->cWLocation.loopNum, 
 								this->cWLocation.loopSideNum, this->cWLocation.branchNum, this->cWLocation.compNum );
+			}
 			this->cWTempOut = this->cWTempIn;
 			this->mDotHW = this->mDotDesignHW;
 			this->calc();
@@ -1003,14 +1024,20 @@ namespace FourPipeBeam {
 
 		} else {
 			this->mDotHW = 0.0;
-			SetComponentFlowRate(this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWLocation.loopNum, 
+			if ( this-> beamHeatingPresent )
+			{
+				SetComponentFlowRate(this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWLocation.loopNum, 
 								this->hWLocation.loopSideNum, this->hWLocation.branchNum, this->hWLocation.compNum );
+			}
 			this->hWTempOut = this->hWTempIn;
 			// assume if there is still flow that unit has an internal bypass and convector does not still heat
 			this->mDotCW = 0.0;
 			this->cWTempOut = this->cWTempIn;
-			SetComponentFlowRate(this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum, this->cWLocation.loopNum, 
+			if ( this -> beamCoolingPresent)
+			{
+				SetComponentFlowRate(this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum, this->cWLocation.loopNum, 
 								this->cWLocation.loopSideNum, this->cWLocation.branchNum, this->cWLocation.compNum );
+			}
 			// assume if there is still flow that unit has an internal bypass and convector does not still cool
 			// don't even need to run calc
 			return;
@@ -1086,13 +1113,16 @@ namespace FourPipeBeam {
 			}
 		} else {
 			this->mDotCW = 0.0;
-			SetComponentFlowRate( this->mDotCW,
-								this->cWInNodeNum,
-								this->cWOutNodeNum,
-								this->cWLocation.loopNum,
-								this->cWLocation.loopSideNum,
-								this->cWLocation.branchNum,
-								this->cWLocation.compNum );
+			if ( this-> beamCoolingPresent )
+			{
+				SetComponentFlowRate( this->mDotCW,
+									this->cWInNodeNum,
+									this->cWOutNodeNum,
+									this->cWLocation.loopNum,
+									this->cWLocation.loopSideNum,
+									this->cWLocation.branchNum,
+									this->cWLocation.compNum );
+			}
 			this->cWTempOut = this->cWTempIn;
 			this->qDotBeamCooling = 0.0;
 		}
@@ -1129,13 +1159,16 @@ namespace FourPipeBeam {
 			}
 		} else {
 			this->mDotHW = 0.0;
-			SetComponentFlowRate(	this->mDotHW,
-								this->hWInNodeNum,
-								this->hWOutNodeNum,
-								this->hWLocation.loopNum,
-								this->hWLocation.loopSideNum,
-								this->hWLocation.branchNum,
-								this->hWLocation.compNum );
+			if ( this-> beamHeatingPresent )
+			{
+				SetComponentFlowRate(	this->mDotHW,
+										this->hWInNodeNum,
+										this->hWOutNodeNum,
+										this->hWLocation.loopNum,
+										this->hWLocation.loopSideNum,
+										this->hWLocation.branchNum,
+										this->hWLocation.compNum );
+			}
 			this->hWTempOut = this->hWTempIn;
 			this->qDotBeamHeating = 0.0;
 		}
