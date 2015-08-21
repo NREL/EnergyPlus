@@ -97,6 +97,7 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     if ( CMAKE_COMPILER_IS_GNUCXX ) # g++
       ADD_CXX_DEBUG_DEFINITIONS("-ffloat-store") # Improve debug run solution stability
       ADD_CXX_DEBUG_DEFINITIONS("-fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
+      ADD_CXX_DEBUG_DEFINITIONS("-D_GLIBCXX_DEBUG") # Standard container debug mode (bounds checking, ...)
     endif ()
   
   ADD_CXX_DEBUG_DEFINITIONS("-ggdb") # Produces debugging information specifically for gdb
