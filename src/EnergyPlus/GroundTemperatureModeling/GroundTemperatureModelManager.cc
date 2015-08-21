@@ -21,6 +21,16 @@
 namespace EnergyPlus {
 
 namespace GroundTemperatureManager {
+
+	int const objectType_KusudaGroundTemp( 1 );
+	int const objectType_FiniteDiffGroundTemp( 2 );
+	int const objectType_SiteBuildingSurfaceGroundTemp( 3 );
+	int const objectType_SiteShallowGroundTemp( 4 );
+	int const objectType_SiteDeepGroundTemp( 5 );
+	int const objectType_SiteFCFactorMethodGroundTemp( 6 );
+	int const objectType_XingGroundTemp( 7 );
+
+	Array1D_string const CurrentModuleObjects( 7, { "SITE:GROUNDTEMPERATURE:UNDISTURBED:KUSUDAACHENBACH", "SITE:GROUNDTEMPERATURE:UNDISTURBED:FINITEDIFFERENCE", "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "SITE:GROUNDTEMPERATURE:SHALLOW", "SITE:GROUNDTEMPERATURE:DEEP", "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "SITE:GROUNDTEMPERATURE:UNDISTURBED:XING"} );
 			
 	//******************************************************************************
 
@@ -42,36 +52,21 @@ namespace GroundTemperatureManager {
 		// Locals
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int objectType( 0 );
-		int objectType_KusudaGroundTemp( 1 );
-		int objectType_FiniteDiffGroundTemp( 2 );
-		int objectType_SiteBuildingSurfaceGroundTemp( 3 );
-		int objectType_SiteShallowGroundTemp( 4 );
-		int objectType_SiteDeepGroundTemp( 5 );
-		int objectType_SiteFCFactorMethodGroundTemp( 6 );
-		int objectType_XingGroundTemp( 7 );
-
-		std::string objectType_KusudaGroundTemp_str = "SITE:GROUNDTEMPERATURE:UNDISTURBED:KUSUDAACHENBACH";
-		std::string objectType_FiniteDiffGroundTemp_str = "SITE:GROUNDTEMPERATURE:UNDISTURBED:FINITEDIFFERENCE";
-		std::string objectType_SiteBuildingSurfaceGroundTemp_str = "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE";
-		std::string objectType_SiteShallowGroundTemp_str = "SITE:GROUNDTEMPERATURE:SHALLOW";
-		std::string objectType_SiteDeepGroundTemp_str = "SITE:GROUNDTEMPERATURE:DEEP";
-		std::string objectType_SiteFCFactorMethodGroundTemp_str = "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD";
-		std::string objectType_XingGroundTemp_str = "SITE:GROUNDTEMPERATURE:UNDISTURBED:XING";
 	
 		// Set object type
-		if ( objectType_str == objectType_KusudaGroundTemp_str ) {
+		if ( objectType_str == CurrentModuleObjects( objectType_KusudaGroundTemp ) ) {
 			objectType = objectType_KusudaGroundTemp;
-		} else if ( objectType_str == objectType_FiniteDiffGroundTemp_str ) {
+		} else if ( objectType_str == CurrentModuleObjects( objectType_FiniteDiffGroundTemp ) ) {
 			objectType = objectType_FiniteDiffGroundTemp;
-		} else if ( objectType_str == objectType_SiteBuildingSurfaceGroundTemp_str ) {
+		} else if ( objectType_str == CurrentModuleObjects( objectType_SiteBuildingSurfaceGroundTemp ) ) {
 			objectType = objectType_SiteBuildingSurfaceGroundTemp;
-		} else if ( objectType_str == objectType_SiteShallowGroundTemp_str ){
+		} else if ( objectType_str == CurrentModuleObjects( objectType_SiteShallowGroundTemp ) ){
 			objectType = objectType_SiteShallowGroundTemp;
-		} else if ( objectType_str == objectType_SiteDeepGroundTemp_str ) {
+		} else if ( objectType_str == CurrentModuleObjects( objectType_SiteDeepGroundTemp ) ) {
 			objectType = objectType_SiteDeepGroundTemp;
-		} else if ( objectType_str == objectType_SiteFCFactorMethodGroundTemp_str ) {
+		} else if ( objectType_str == CurrentModuleObjects( objectType_SiteFCFactorMethodGroundTemp ) ) {
 			objectType = objectType_SiteFCFactorMethodGroundTemp;
-		} else if (objectType_str == objectType_XingGroundTemp_str ) {
+		} else if (objectType_str == CurrentModuleObjects( objectType_XingGroundTemp ) ) {
 			objectType = objectType_XingGroundTemp;
 		} else {
 			// Error out if no ground temperature object types recognized
