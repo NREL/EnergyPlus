@@ -58,55 +58,59 @@ namespace EnergyPlus {
 				thisModel->objectName = cAlphaArgs( 1 );
 				thisModel->objectType = objectType;
 				thisModel->groundThermalDiffisivity = rNumericArgs( 1 ) / ( rNumericArgs( 2 ) * rNumericArgs( 3 ) );
-				thisModel->aveGroundTemp = rNumericArgs( 4 );
-				thisModel->aveGroundTempAmplitude = rNumericArgs( 5 );
-				thisModel->phaseShiftInSecs = rNumericArgs( 6 ) * SecsInDay;
 
-				// Putting this here for now. Need to implement functionality allowing parameters to be generated from Site:GroundTemperature:Shallow if KA object not present
+				bool useGroundTempDataForKusuda = lNumericFieldBlanks( 4 ) || lNumericFieldBlanks( 5 ) || lNumericFieldBlanks( 6 );
 
-				//int monthsInYear( 12 );
-				//int avgDaysInMonth( 30 );
-				//int monthOfMinSurfTemp( 0 );
-				//Real64 averageGroundTemp( 0 );
-				//Real64 averageGroundTempAmplitude( 0 );
-				//Real64 phaseShiftOfMinGroundTempDays( 0 );
-				//Real64 minSurfTemp( 100 ); // Set high month 1 temp will be lower and actually get updated
+				if ( !useGroundTempDataForKusuda ) {
+					// Use Kusuda Parameters
+					thisModel->aveGroundTemp = rNumericArgs( 4 );
+					thisModel->aveGroundTempAmplitude = rNumericArgs( 5 );
+					thisModel->phaseShiftInSecs = rNumericArgs( 6 ) * SecsInDay;
+				} else {
+					// Use data from Site:GroundTemperature:Shallow to generate parameters
 
-				//InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+					int monthsInYear( 12 );
+					int avgDaysInMonth( 30 );
+					int monthOfMinSurfTemp( 0 );
+					Real64 averageGroundTemp( 0 );
+					Real64 averageGroundTempAmplitude( 0 );
+					Real64 phaseShiftOfMinGroundTempDays( 0 );
+					Real64 minSurfTemp( 100 ); // Set high month 1 temp will be lower and actually get updated
 
-				//thisModel->objectName = "Site:GroundTemperature:Shallow";
+					std::shared_ptr< BaseGroundTempsModel > shallowObj = GetGroundTempModelAndInit( CurrentModuleObjects( objectType_SiteShallowGroundTemp ), "" );
 
-				//thisModel->objectType = objectType;
+					// Calculate Average Ground Temperature for all 12 months of the year:
+					for ( int monthIndex = 1; monthIndex <= 12; ++monthIndex ) {
+						averageGroundTemp += shallowObj->getGroundTempAtTimeInMonths( 0.0, monthIndex );
+					}
+					
+					averageGroundTemp /= monthsInYear;
 
-				//// Calculate Average Ground Temperature for all 12 months of the year:
-				//for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-				//	averageGroundTemp += PubGroundTempSurface( monthIndex );
-				//}
-				//averageGroundTemp /= monthsInYear;
-				//
-				//thisModel->aveGroundTemp = averageGroundTemp;
+					// Calculate Average Amplitude from Average:;
+					for ( int monthIndex = 1; monthIndex <= 12; ++monthIndex ) {
+						Real64 currMonthTemp;
+						currMonthTemp = shallowObj->getGroundTempAtTimeInMonths( 0.0, monthIndex );
+						averageGroundTempAmplitude += abs( currMonthTemp - averageGroundTemp );
+					}
 
-				//// Calculate Average Amplitude from Average:;
-				//for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-				//	averageGroundTempAmplitude += std::abs( PubGroundTempSurface( monthIndex ) - averageGroundTemp );
-				//}
-				//averageGroundTempAmplitude /= monthsInYear;
-				//
-				//thisModel->aveGroundTempAmplitude = averageGroundTempAmplitude;
+					averageGroundTempAmplitude /= monthsInYear;
 
-				//// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
-				//for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
-				//	if ( PubGroundTempSurface( monthIndex ) <= minSurfTemp ) {
-				//		monthOfMinSurfTemp = monthIndex;
-				//		minSurfTemp = PubGroundTempSurface( monthIndex );
-				//	}
-				//}
-				//
-				//phaseShiftOfMinGroundTempDays = monthOfMinSurfTemp * avgDaysInMonth;
+					// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
+					for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
+						Real64 currMonthTemp = shallowObj->getGroundTempAtTimeInMonths( 0.0, monthIndex );
+						if ( currMonthTemp <= minSurfTemp ) {
+							monthOfMinSurfTemp = monthIndex;
+							minSurfTemp = currMonthTemp;
+						}
+					}
 
-				//// Unit conversion
-				//thisModel->phaseShiftInSecs = phaseShiftOfMinGroundTempDays * SecsInDay;
+					phaseShiftOfMinGroundTempDays = monthOfMinSurfTemp * avgDaysInMonth;
 
+					// Asign to KA Model
+					thisModel->aveGroundTemp = averageGroundTemp;
+					thisModel->aveGroundTempAmplitude = averageGroundTempAmplitude;
+					thisModel->phaseShiftInSecs = phaseShiftOfMinGroundTempDays * SecsInDay;
+				}
 
 				found = true;
 				break;
@@ -146,21 +150,24 @@ namespace EnergyPlus {
 		Real64 term1;
 		Real64 term2;
 		Real64 secsInYear;
+		Real64 retVal;
 
 		secsInYear = SecsInDay * 365.0;
 
 		term1 = -depth * std::sqrt( Pi / ( secsInYear * groundThermalDiffisivity ) );
 		term2 = ( 2 * Pi / secsInYear ) * ( simTimeInSeconds - phaseShiftInSecs - ( depth / 2 ) * std::sqrt( secsInYear / ( Pi * groundThermalDiffisivity ) ) );
 
-		return aveGroundTemp - aveGroundTempAmplitude * std::exp( term1 ) * std::cos( term2 );
+		retVal = aveGroundTemp - aveGroundTempAmplitude * std::exp( term1 ) * std::cos( term2 );
+
+		return retVal;
 	}
 
 	//******************************************************************************
 
 	Real64
 	KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(
-		Real64 const depthOfTemp,
-		Real64 const seconds
+		Real64 const _depth,
+		Real64 const _seconds
 	)
 	{	
 		// SUBROUTINE INFORMATION:
@@ -173,10 +180,10 @@ namespace EnergyPlus {
 		// Returns the ground temperature when input time is in seconds
 
 		// Set depth of temperature
-		depth = depthOfTemp;
+		depth = _depth;
 
 		// Set sim time in seconds
-		simTimeInSeconds = seconds;
+		simTimeInSeconds = _seconds;
 
 		// Get and return ground temperature
 		return getGroundTemp();
@@ -186,8 +193,8 @@ namespace EnergyPlus {
 
 	Real64
 	KusudaGroundTempsModel::getGroundTempAtTimeInMonths(
-		Real64 const depth,
-		int const month
+		Real64 const _depth,
+		int const _month
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -202,9 +209,12 @@ namespace EnergyPlus {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 const aveSecondsInMonth = ( 365 / 12 ) * ( 3600 * 24 );
 
+		// Set depth
+		depth = _depth;
+
 		// Convert months to seconds. Puts 'seconds' time in middle of specified month
-		if ( month >= 1 && month <= 12 ) {
-			simTimeInSeconds = aveSecondsInMonth * ( ( month - 1 ) + 0.5 );
+		if ( _month >= 1 && _month <= 12 ) {
+			simTimeInSeconds = aveSecondsInMonth * ( ( _month - 1 ) + 0.5 );
 		} else {
 			ShowFatalError("KusudaGroundTempsModel: Invalid month passed to ground temperature model");
 		}

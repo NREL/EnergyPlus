@@ -119,8 +119,8 @@ namespace EnergyPlus {
 
 	Real64
 	SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInSeconds(
-		Real64 const depth,
-		Real64 const seconds
+		Real64 const _depth,
+		Real64 const _seconds
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -134,19 +134,15 @@ namespace EnergyPlus {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 secPerMonth = 365 * 3600 * 24 / 12;
-		int month;
 
 		// Convert secs to months
-		if ( seconds > 0.0 && seconds <= ( secPerMonth * 12 ) ) {
-			month = ceil( seconds / ( secPerMonth * 12 ) );
-		} else if ( seconds > ( secPerMonth * 12 ) ) {
-			month = ceil( seconds / (secPerMonth * 12.0 ) );
-			month = remainder( month, 12 );
-		} else {
-			ShowFatalError("Site:GroundTemperature:FCFactorMethod--Invalid time passed to ground temperature model");
-		}
+		int month = ceil( _seconds / secPerMonth );
 
-		timeOfSimInMonths = month;
+		if ( month >= 1 && month <= 12 ) {
+			timeOfSimInMonths = month;
+		} else {
+			timeOfSimInMonths = remainder( month, 12 );
+		}
 
 		// Get and return ground temp
 		return getGroundTemp();
@@ -157,7 +153,7 @@ namespace EnergyPlus {
 	Real64
 	SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInMonths(
 		Real64 const depth,
-		int const month
+		int const _month
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -170,7 +166,11 @@ namespace EnergyPlus {
 		// Returns the ground temperature when input time is in months
 
 		// Set month
-		timeOfSimInMonths = month;
+		if ( _month >= 1 && _month <= 12 ) {
+			timeOfSimInMonths = _month;
+		} else {
+			timeOfSimInMonths = remainder( _month, 12 );
+		}
 
 		// Get and return ground temp
 		return getGroundTemp();
