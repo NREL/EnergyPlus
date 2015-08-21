@@ -3337,6 +3337,7 @@ namespace ZoneEquipmentManager {
 		using DataHeatBalFanSys::ZoneReOrder;
 		using DataHVACGlobals::ZoneMassBalanceHVACReSim;
 		using DataHVACGlobals::SmallMassFlow;
+		using ScheduleManager::GetCurrentScheduleValue;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3508,13 +3509,26 @@ namespace ZoneEquipmentManager {
 				// Update Return Air Node Conditions; If one Exists
 				RetNode = ZoneEquipConfig(ZoneNum).ReturnAirNode;
 				if ( RetNode > 0 ) {
-					Node(RetNode).MassFlowRate = max(Node(ZoneNode).MassFlowRate + ZoneMixingNetAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExhBalanced), 0.0);
-					if ( AirLoopNum > 0 ) {
-						if (!PrimaryAirSystem(AirLoopNum).OASysExists) {
-							Node(RetNode).MassFlowRate = max(Node(ZoneNode).MassFlowRate + ZoneMixingNetAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExh), 0.0);
+					if ( ZoneEquipConfig( ZoneNum ).NumReturnFlowBasisNodes > 0 ) {
+						// Set base return air flow rate using basis node flow rates
+						Node( RetNode ).MassFlowRate = 0.0;
+						for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneNum ).NumReturnFlowBasisNodes; ++NodeNum ) {
+							Node( RetNode ).MassFlowRate += ZoneEquipConfig( ZoneNum ).ReturnFlowBasisNode( NodeNum );
+						}
+					} else {
+						// Set base return air flow rate using default method of inlets minus exhausts adjusted for "balanced" exhuast flow
+						Node(RetNode).MassFlowRate = Node(ZoneNode).MassFlowRate + ZoneMixingNetAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExhBalanced);
+						if ( AirLoopNum > 0 ) {
+// MJW?? -Not sure why this is different
+							if (!PrimaryAirSystem(AirLoopNum).OASysExists) {
+								Node(RetNode).MassFlowRate = Node(ZoneNode).MassFlowRate + ZoneMixingNetAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExh);
+							}
 						}
 					}
-					MassConservation(ZoneNum).RetMassFlowRate = Node(RetNode).MassFlowRate;
+					// Apply return air flow rate fraction schedule and reset negative values to zero
+					Node( RetNode ).MassFlowRate *= GetCurrentScheduleValue( ZoneEquipConfig(ZoneNum).ReturnFlowSchedPtrNum );
+					Node( RetNode ).MassFlowRate = max( Node( RetNode ).MassFlowRate , 0.0 );
+					MassConservation( ZoneNum ).RetMassFlowRate = Node( RetNode ).MassFlowRate;
 					Node(RetNode).MassFlowRateMax = Node(ZoneNode).MassFlowRateMax;
 					Node(RetNode).MassFlowRateMin = Node(ZoneNode).MassFlowRateMin;
 					Node(RetNode).MassFlowRateMaxAvail = Node(ZoneNode).MassFlowRateMaxAvail;
@@ -3555,6 +3569,7 @@ namespace ZoneEquipmentManager {
 				}
 			}
 
+// MJW?? This is messing with the user-specified return air flow rate - how to handle? This adjustment was there before ZoneAirMassFlowConservation was added
 			// adjust the zone return air flow rates to match the air loop return air flow rate
 			for ( ZoneNum1 = 1; ZoneNum1 <= NumOfZones; ++ZoneNum1 ) {
 				ZoneNum = ZoneNum1;

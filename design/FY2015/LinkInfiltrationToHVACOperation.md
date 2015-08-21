@@ -6,6 +6,35 @@
  - Add highlights from [NFP-LinkInfiltrationToHVAC.docc](https://github.com/NREL/EnergyPlusDevSupport/blob/master/DesignDocuments/Proposals/NFP-LinkInfiltrationToHVAC.docc)
 
  
+## Background
+ZoneAirMassFlowConservation was added in v8.2.0 via pull request [#4245](https://github.com/NREL/EnergyPlus/pull/4245). This PR touched 21 source files. Highlights:
+
+   - Added ZoneMixingFlow to DataAirLoop structure
+   - Added ZoneMassBalanceHVACReSim to DataHVACGlobales to signal re-simulation when needed
+   - Added several arrays to DataHeatBalFanSys:
+       ZoneMassBalanceFlag, ZoneInfiltrationFlag, ZoneMassBalanceRepVarFlag, and ZoneReOrder
+   - Added ZoneAirMassBalanceSimulation flag to DataHeatBalance
+   - Added new fields to DataInfiltration structure:  VolumeFlowRate and MassFlowRate
+   - Added new fields to DataMixing structure: DesiredAirFlowRateSaved and MixingMassFlowRate
+   - Added a new struct for ZoneAirMassFlowConservation, ZoneAirMassFlow (just holds the fields in the new object)
+   - Added a new struct for < ZoneMassConservationData >, MassConservation
+   - Moved arrays from HVACManager to DataZoneEquipment: CrossMixingReportFlag, MixingReportFlag, and VentMCP
+   - Moved CalcAirFlowSimple() and GetStandAloneERVNodes() from HVACManager to ZoneEquipmentManager
+   - Added argument AdjustZoneMixingFlowFlag to CalcAirFlowSimple()
+   - Added an additional call to CalcAirFlowSimple() in ZoneEquipmentManager
+   - Added flag to HVACStandAloneERV to suppress unbalanced flow warnings
+   - Added SetZoneMassConservationFlag() to HeatBalanceAirManager - sets ZoneMassBalanceFlag flags to true
+   - Added blocks of code to HeatBalanceAirManager::GetSimpleAirModelInputs to fill new ZoneMixingNum, ZoneReOrder and MassConservation data, and set up new output variables.
+   - Added code to HeatBalanceManager::GetProjectControlData to process inputs for new ZoneAirMassFlowConservation object and do some related initializations
+   - Added a check to force system re-simulation in SimAirServingZones
+if ( ZoneMassBalanceHVACReSim ) SysReSim = true; 
+   - Added initilization of AirLoopFlow.ZoneMixingFlow in ZoneEquipmentManager
+   - Added checks in ZoneEquipmentManager::SimZoneEquipment to supress unbalanced flow warnings
+   - Added code to ZoneEquipmentManager::CalcZoneMassBalance to calculate mixing and infiltration flow rates for mass conservation
+   - Since CalcAirflowSimple was moved, hard to tell what was changed in it, if anything
+   - Added new CalcZoneMixingFlowRateOfReceivingZone() and CalcZoneMixingFlowRateOfSourceZone() in ZoneEquipmentManager
+
+
 ## Approach
 Extend the ZoneAirMassFlowConservation feature by adding user inputs to control the maximum and minimum return air flow rate for each zone. The return air flow rate will be set based on user inputs and current system flow status, then the ZoneAirMassFlowConservation algorithm will make any necessary adjustments to mixing and infiltration flow rates.  In the extreme, this feature should make it possible to model a fully pressurized zone with zero return airflow and zero infiltration and incoming mixing flow rates. 
 

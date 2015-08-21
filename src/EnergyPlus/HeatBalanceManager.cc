@@ -648,11 +648,11 @@ namespace HeatBalanceManager {
 		static gio::Fmt Format_724( "('! <Sky Radiance Distribution>, Value {Anisotropic}',/,'Sky Radiance Distribution,Anisotropic')" );
 		static gio::Fmt Format_726( "('! <Zone Air Solution Algorithm>, Value {ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}')" );
 		static gio::Fmt Format_727( "(' Zone Air Solution Algorithm, ',A)" );
-		static gio::Fmt Format_728( "('! <Zone Air Contaminant Balance Simulation>, Simulation {Yes/No}, Carbon Dioxide Concentration')" );
+		static gio::Fmt Format_728( "('! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {Yes/No}, Carbon Dioxide Concentration')" );
 		static gio::Fmt Format_730( "(' Zone Air Carbon Dioxide Balance Simulation, ',A,',',A)" );
-		static gio::Fmt Format_729( "('! <Zone Air Contaminant Balance Simulation>, Simulation {Yes/No}, Generic Contaminant Concentration')" );
+		static gio::Fmt Format_729( "('! <Zone Air Generic Contaminant Balance Simulation>, Simulation {Yes/No}, Generic Contaminant Concentration')" );
 		static gio::Fmt Format_731( "(' Zone Air Generic Contaminant Balance Simulation, ',A,',',A)" );
-		static gio::Fmt Format_732( "('! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance {Yes/No}, Adjust Zone Mixing {Yes/No}, Adjust Zone Infiltration {AddInfiltration/AdjustInfiltration/NoInfiltration}, Infiltration Zones {MixingSourceZonesOnly/AllZones}')");
+		static gio::Fmt Format_732( "('! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing, Adjust Zone Infiltration {AddInfiltration | AdjustInfiltration | None}, Infiltration Zones {MixingSourceZonesOnly | AllZones}')");
 		static gio::Fmt Format_733( "(' Zone Air Mass Flow Balance Simulation, ',A,',',A,',',A,',',A)");
 
 		//Assign the values to the building data
@@ -1154,7 +1154,7 @@ namespace HeatBalanceManager {
 		if ( ZoneAirMassFlow.EnforceZoneMassBalance ) {
 			gio::write( OutputFileInits, Format_733 ) << "Yes" << AlphaName( 1 ) << AlphaName( 2 ) << AlphaName( 3 );
 		} else {
-			gio::write( OutputFileInits, Format_733 ) << "No" << AlphaName( 1 ) << AlphaName( 2 ) << AlphaName( 3 );
+			gio::write( OutputFileInits, Format_733 ) << "No" << "N/A" << "N/A" << "N/A";
 		}
 
 	}
