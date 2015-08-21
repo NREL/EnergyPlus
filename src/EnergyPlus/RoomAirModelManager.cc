@@ -1561,10 +1561,8 @@ namespace RoomAirModelManager {
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 				// find surface list
 				if ( RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes > 0 ) {
-					RAFNNodeNum = FindItemInList( cAlphaArgs( 1 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node.ma( &RoomAirflowNetworkAirNodeNestedStruct::NodeSurfListName ), RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
-
-				}
-				else {
+					RAFNNodeNum = FindItemInList( cAlphaArgs( 1 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node, &RoomAirflowNetworkAirNodeNestedStruct::NodeSurfListName, RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
+				} else {
 					RAFNNodeNum = 0;
 				}
 				if ( RAFNNodeNum > 0 ) { // found it
@@ -1626,9 +1624,8 @@ namespace RoomAirModelManager {
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 				// find surface list
 				if ( RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes > 0 ) {
-					RAFNNodeNum = FindItemInList( cAlphaArgs( 1 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node.ma( &RoomAirflowNetworkAirNodeNestedStruct::NodeIntGainsListName ), RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
-				}
-				else {
+					RAFNNodeNum = FindItemInList( cAlphaArgs( 1 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node, &RoomAirflowNetworkAirNodeNestedStruct::NodeIntGainsListName, RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
+				} else {
 					RAFNNodeNum = 0;
 				}
 				if ( RAFNNodeNum > 0 ) { // found it
@@ -1693,9 +1690,8 @@ namespace RoomAirModelManager {
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 				// find surface list
 				if ( RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes > 0 ) {
-					RAFNNodeNum = FindItemInList( cAlphaArgs( 1 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node.ma( &RoomAirflowNetworkAirNodeNestedStruct::NodeHVACListName ), RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
-				}
-				else {
+					RAFNNodeNum = FindItemInList( cAlphaArgs( 1 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node, &RoomAirflowNetworkAirNodeNestedStruct::NodeHVACListName, RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
+				} else {
 					RAFNNodeNum = 0;
 				}
 				if ( RAFNNodeNum > 0 ) { // found it

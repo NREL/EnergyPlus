@@ -7,7 +7,6 @@
 
 // EnergyPlus Headers
 #include <RoomAirModelAirflowNetwork.hh>
-// #include <DataInterfaces.hh>
 #include <BaseboardElectric.hh>
 #include <BaseboardRadiator.hh>
 #include <DataAirflowNetwork.hh>
@@ -57,15 +56,15 @@ namespace RoomAirModelAirflowNetwork {
 	// MODULE INFORMATION:
 	//       AUTHOR         Brent Griffith
 	//       DATE WRITTEN   November 2009
-	//       MODIFIED       na
+	//       MODIFIED       Lixing Gu, Aug. 2015 for v8.4 replease
 	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS MODULE:
 	// contains the RoomAir model portions of RoomAirflowNetwork modeling
 
 	// METHODOLOGY EMPLOYED:
-	// Interact with Surface HB and Airflow Network Domains to get
-	// inputs.Do heat balance calculations on roomair nodes.
+	// Interact with Surface HB, internal gain, HVAC system and Airflow Network Domains 
+	// Do heat and moisture balance calculations on roomair nodes.
 
 	// REFERENCES:
 	// none
@@ -107,11 +106,11 @@ namespace RoomAirModelAirflowNetwork {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Brent Griffith
 		//       DATE WRITTEN   January 2004/Aug 2005
-		//       MODIFIED       na
+		//       MODIFIED       Lixing Gu, Aug. 2015 for v8.4 replease
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		//  manage the user-defined air temp. distribution model
+		// This subroutine manages RoomAirflowNetwork model simulation
 
 		// METHODOLOGY EMPLOYED:
 		// calls subroutines
@@ -120,18 +119,6 @@ namespace RoomAirModelAirflowNetwork {
 		// na
 
 		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -176,27 +163,15 @@ namespace RoomAirModelAirflowNetwork {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Predict zone load at a controlled node
+		// Predict zone loads at a controlled node
 
 		// METHODOLOGY EMPLOYED:
-		// calls subroutines
+		// na
 
 		// REFERENCES:
 		// na
 
 		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -230,14 +205,14 @@ namespace RoomAirModelAirflowNetwork {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B. Griffith
 		//       DATE WRITTEN   November 2009
-		//       MODIFIED       na
+		//       MODIFIED       Lixing Gu, Aug. 2015 for v8.4 replease
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
+		// Perform one-time checking and term calculations
 
 		// METHODOLOGY EMPLOYED:
-		// <description>
+		// na
 
 		// REFERENCES:
 		// na
@@ -263,18 +238,6 @@ namespace RoomAirModelAirflowNetwork {
 		using DataLoopNode::NodeID;
 		using InputProcessor::SameString;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );  // one time setup flag
@@ -577,7 +540,7 @@ namespace RoomAirModelAirflowNetwork {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Brent Griffith
 		//       DATE WRITTEN   November 2009
-		//       MODIFIED
+		//       MODIFIED       Lixing Gu, Aug. 2015 for v8.4 replease
 		//       RE-ENGINEERED
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -585,7 +548,7 @@ namespace RoomAirModelAirflowNetwork {
 
 		// METHODOLOGY EMPLOYED:
 		// take terms(updated in init routine) and use classic air balance equations
-		// solved for state variables.Store results in structure.
+		// solved for state variables. Store results in structure.
 
 		// REFERENCES:
 		// na
@@ -602,20 +565,7 @@ namespace RoomAirModelAirflowNetwork {
 		using DataEnvironment::OutBaroPress;
 		using Psychrometrics::PsyRhFnTdbWPb;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//unused    INTEGER    :: thisZoneInfo
 		Real64 H2OHtOfVap;
 		Real64 HumRatTmp;
 		Real64 NodeTempX1;
@@ -714,14 +664,14 @@ namespace RoomAirModelAirflowNetwork {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   November 2009
-		//       MODIFIED       na
+		//       MODIFIED       Lixing Gu, Aug. 2015 for v8.4 replease
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// update variables
 
 		// METHODOLOGY EMPLOYED:
-		// <description>
+		// na
 
 		// REFERENCES:
 		// na
@@ -733,18 +683,6 @@ namespace RoomAirModelAirflowNetwork {
 		using DataZoneEquipment::ZoneEquipList;
 		using DataLoopNode::Node;
 		using DataGlobals::ZoneSizingCalc;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int AirNodeNum; // nested node structure index
@@ -800,8 +738,7 @@ namespace RoomAirModelAirflowNetwork {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   August 2009
-		//       MODIFIED       Aug 2003, FCW: add SumHA contributions from window frame and divider
-		//       Aug 2003, CC : change how the reference temperatures are used
+		//       MODIFIED       Lixing Gu, Aug. 2015 for v8.4 replease
 		//       RE - ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE :
@@ -817,8 +754,6 @@ namespace RoomAirModelAirflowNetwork {
 		// If Tref is applied to all surfaces, SumHA = 0, and SumHATref /= 0.
 		// If Tref is not used at all, SumHATref = 0, and SumHA /= 0.
 		// 
-		// For future implementations, Tref can be easily converted into an array to
-		// allow a different reference temperature to be specified for each surface.
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -827,8 +762,6 @@ namespace RoomAirModelAirflowNetwork {
 		// na
 
 		// USE STATEMENTS:
-		// na
-		// Using/Aliasing
 		using DataSurfaces::Surface;
 		using DataSurfaces::SurfaceClass_Window;
 		using DataSurfaces::SurfaceWindow;
@@ -853,18 +786,6 @@ namespace RoomAirModelAirflowNetwork {
 		using InternalHeatGains::SumInternalLatentGainsByIndices;
 		using InternalHeatGains::SumReturnAirConvectionGainsByIndices;
 		using DataHeatBalFanSys::MAT;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NodeNum; // System node number
@@ -903,7 +824,7 @@ namespace RoomAirModelAirflowNetwork {
 		Real64 SumLinkM; //               !Zone sum of MassFlowRate from the AirflowNetwork model
 		Real64 SumLinkMW; //             !Zone sum of MassFlowRate*W from the AirflowNetwork model
 
-	// FLOW
+	    // FLOW
 		SumIntGain = 0.0;
 		SumHA = 0.0;
 		SumHATsurf = 0.0;
@@ -1142,14 +1063,14 @@ namespace RoomAirModelAirflowNetwork {
 		//       AUTHOR         B Griffith
 		//                      derived from P. Biddulph-- HAMT, L. Gu -- EPMD, 
 		//       DATE WRITTEN   November 2009
-		//       MODIFIED       na
+		//       MODIFIED       Lixing Gu, Aug. 2015 for v8.4 replease
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Breakout summation of surface moisture interaction terms
 
 		// METHODOLOGY EMPLOYED:
-		// <description>
+		// na
 
 		// REFERENCES:
 		// na
@@ -1165,18 +1086,6 @@ namespace RoomAirModelAirflowNetwork {
 		using DataEnvironment::OutBaroPress;
 		using DataHeatBalSurface::TempSurfInTmp;
 		using DataHeatBalFanSys::MAT;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SurfNum;
@@ -1246,14 +1155,14 @@ namespace RoomAirModelAirflowNetwork {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B. Griffith
 		//       DATE WRITTEN   June 2012
-		//       MODIFIED       na
+		//       MODIFIED       Lixing Gu, Aug. 2015 for v8.4 replease
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
+		// Sum system response from none air systems
 
 		// METHODOLOGY EMPLOYED:
-		// <description>
+		// na
 
 		// REFERENCES:
 		// na
@@ -1275,25 +1184,12 @@ namespace RoomAirModelAirflowNetwork {
 		using DataHVACGlobals::ZoneEquipTypeOf_BaseboardRadiantConvectiveElectric;
 		using DataHVACGlobals::ZoneEquipTypeOf_HighTemperatureRadiant;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		int I;
 		Real64 SysOutputProvided;
 		Real64 LatOutputProvided;
 
-		// TODO, FINISH THIS
+		// TODO
 		auto & ThisRAFNNode( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ) );
 
 		ThisRAFNNode.NonAirSystemResponse = 0.0;
@@ -1369,45 +1265,29 @@ namespace RoomAirModelAirflowNetwork {
 	RAFNData::SumSystemDepResponseForNode(
 	)
 	{
-		// FUNCTION INFORMATION:
+		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B.Griffith
 		//       DATE WRITTEN   aug 2005, Jan2004
-		//       MODIFIED       na
+		//       MODIFIED       Lixing Gu, Aug. 2015 for v8.4 replease
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// return a non-dimensional height zeta
+		// PURPOSE OF THIS SUBROUTINE:
+		// Sum system sensible loads used at the next time step
 
 		// METHODOLOGY EMPLOYED:
-		// figure average floor height (follows code in surfacegeometry.f90
-		// use ceiling height from Zone structure
-		// non dimensionalize surface's centroid's Z value
+		// na
 
 		// REFERENCES:
 		// na
 
 		// USE STATEMENTS:
-		// na
-		// Using/Aliasing
 		using ZoneDehumidifier::SimZoneDehumidifier;
 		using DataHVACGlobals::ZoneEquipTypeOf_DehumidifierDX;
 
 		// Return value
 		// na
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int I;
 		Real64 SysOutputProvided;
 		Real64 LatOutputProvided;
@@ -1466,6 +1346,6 @@ namespace RoomAirModelAirflowNetwork {
 
 	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
-} // RoomAirModelUserTempPattern
+} // RoomAirModelAirflowNetwork
 
 } // EnergyPlus
