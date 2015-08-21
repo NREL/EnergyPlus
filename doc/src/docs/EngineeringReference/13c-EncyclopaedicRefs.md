@@ -1,4 +1,20 @@
-<!--RemoveStart-->
+<head>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX", "output/HTML-CSS"],
+  tex2jax: {
+   inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+   displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+   processEscapes: true
+  },
+  "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+  <script type="text/javascript"
+   src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+</head><!--RemoveStart-->
 Simulation Models – Encyclopedic Reference
 ==========================================
 
@@ -4682,9 +4698,9 @@ Variable Refrigerant Flow Heat Pumps <a name="VRF"></a>
 
 There are two common types of variable refrigerant flow heat pump systems:
 
-n cooling only or heating only air-conditioning systems (a.k.a. heat pump), or
+- cooling only or heating only air-conditioning systems (a.k.a. heat pump), or
 
-n heat recovery systems that allow simultaneous cooling and heating
+- heat recovery systems that allow simultaneous cooling and heating
 
 Energyplus models heat pump and heat recovery operating modes as described in the section entitled Variable Refrigerant Flow Heat Pump Model. The variable refrigerant flow model currently supports air-, evaporatively-, or water-cooled condenser equipment. Throughout this section, the term “condenser” refers to the outdoor unit where the compressor is located.
 

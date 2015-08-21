@@ -26639,7 +26639,7 @@ HVACTemplate:System:VRF,
       \type real
       \units C
       \default 5.0
-      \note Enter the maximum outdoor temperature above which the crankcase heaters are disabled.
+      \note Enter the maximum outdoor temperature above which defrost operation is disabled.
   A9, \field Condenser Type
       \type choice
       \key AirCooled
@@ -52742,7 +52742,7 @@ AirConditioner:VariableRefrigerantFlow,
        \type real
        \units C
        \default 5.0
-       \note Enter the maximum outdoor temperature above which the crankcase heaters are disabled.
+       \note Enter the maximum outdoor temperature above which defrost operation is disabled.
   A34, \field Condenser Type
        \type choice
        \key AirCooled
