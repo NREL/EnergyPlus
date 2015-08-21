@@ -4,9 +4,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <SetPointManager.hh>
+#include <CurveManager.hh>
 #include <DataPlant.hh>
 #include <DataLoopNode.hh>
+#include <ScheduleManager.hh>
+#include <SetPointManager.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
+
 
 using namespace EnergyPlus;
  
@@ -185,4 +189,134 @@ TEST( SetPointManager, DefineReturnWaterHWSetPointManager )
 	DataPlant::PlantLoop(1).LoopSide.deallocate();
 	DataPlant::PlantLoop.deallocate();
 
+}
+
+TEST_F( EnergyPlusFixture, SetPointManagerDefineCondEntSetPointManager )
+{
+	// Set up the curves using the idf parser
+	std::string const idf_objects = delimited_string({
+  "Curve:QuadLinear,",
+    "MinDsnWBCurveName,       !- Name",
+    "-3.333,                  !- Coefficient1 Constant",
+    "0,                       !- Coefficient2 w",
+    "38.9,                    !- Coefficient3 x",
+    "0,                       !- Coefficient4 y",
+    "0,                       !- Coefficient5 z",
+    "-30,                     !- Minimum Value of w",
+    "40,                      !- Maximum Value of w",
+    "0,                       !- Minimum Value of x",
+    "1,                       !- Maximum Value of x",
+    "10,                      !- Minimum Value of y",
+    "38,                      !- Maximum Value of y",
+    "0.00000001,              !- Minimum Value of z",
+    "0.00000008,              !- Maximum Value of z",
+    "0,                       !- Minimum Curve Output",
+    "38,                      !- Maximum Curve Output",
+    "Temperature,             !- Input Unit Type for w",
+    "Dimensionless,           !- Input Unit Type for x",
+    "Dimensionless,           !- Input Unit Type for y",
+    "Dimensionless;           !- Input Unit Type for z",
+  "Curve:QuadLinear,",
+    "MinActWBCurveName,       !- Name",
+    "-8.333,                  !- Coefficient1 Constant",
+    "2,                       !- Coefficient2 w",
+    "5.5556,                  !- Coefficient3 x",
+    "-1,                      !- Coefficient4 y",
+    "0,                       !- Coefficient5 z",
+    "0,                       !- Minimum Value of w",
+    "38,                      !- Maximum Value of w",
+    "0,                       !- Minimum Value of x",
+    "1,                       !- Maximum Value of x",
+    "10,                      !- Minimum Value of y",
+    "38,                      !- Maximum Value of y",
+    "0.00000001,              !- Minimum Value of z",
+    "0.00000008,              !- Maximum Value of z",
+    "0,                       !- Minimum Curve Output",
+    "43,                      !- Maximum Curve Output",
+    "Temperature,             !- Input Unit Type for w",
+    "Dimensionless,           !- Input Unit Type for x",
+    "Dimensionless,           !- Input Unit Type for y",
+    "Dimensionless;           !- Input Unit Type for z",
+  "Curve:QuadLinear,",
+    "OptCondEntCurveName,     !- Name",
+    "12.2711,                 !- Coefficient1 Constant",
+    "0.8,                     !- Coefficient2 w",
+    "6.6667,                  !- Coefficient3 x",
+    "0.266,                   !- Coefficient4 y",
+    "-6193484,                !- Coefficient5 z",
+    "0,                       !- Minimum Value of w",
+    "38,                      !- Maximum Value of w",
+    "0,                       !- Minimum Value of x",
+    "1,                       !- Maximum Value of x",
+    "10,                      !- Minimum Value of y",
+    "38,                      !- Maximum Value of y",
+    "0.00000001,              !- Minimum Value of z",
+    "0.00000008,              !- Maximum Value of z",
+    "0,                       !- Minimum Curve Output",
+    "32,                      !- Maximum Curve Output",
+    "Temperature,             !- Input Unit Type for w",
+    "Dimensionless,           !- Input Unit Type for x",
+    "Dimensionless,           !- Input Unit Type for y",
+    "Dimensionless;           !- Input Unit Type for z",
+  "Schedule:Compact,",
+    "Condenser Loop Temp Schedule,  !- Name",
+    "Temperature,             !- Schedule Type Limits Name",
+    "Through: 12/31,          !- Field 1",
+    "For: AllDays,            !- Field 2",
+    "Until: 24:00,30.0;       !- Field 3"
+    });
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	// a few constants for convenience
+	int const evapOutletNodeNum = 1;
+	int const condInletNodeNum  = 2;
+	int const chwLoopIndex      = 1;
+	int const condLoopIndex     = 2;
+	int const demandSide        = 1;
+	int const supplySide        = 2;
+	int const chillerBranchChW  = 1;
+	int const chillerBranchCW   = 1;
+	int const chillerCompIndex  = 1;
+
+	// Set up ChW loop manually, way too much input to do that here in idf, all I care about is the 
+	DataPlant::TotNumLoops = 2;
+	DataPlant::PlantLoop.allocate(2);
+	DataPlant::PlantReport.allocate(1);
+	DataPlant::PlantReport(1).CoolingDemand = 1200;
+
+	DataPlant::PlantLoop(chwLoopIndex).LoopSide.allocate(2);
+	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch.allocate(1);
+	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp.allocate(1);
+	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).NodeNumOut = evapOutletNodeNum;
+	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TempDesCondIn = 20;
+	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TempDesEvapOut = 5;
+	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).MaxLoad = 5000;
+
+	DataPlant::PlantLoop(condLoopIndex).LoopSide.allocate(2);
+	DataPlant::PlantLoop(condLoopIndex).LoopSide(demandSide).Branch.allocate(1);
+	DataPlant::PlantLoop(condLoopIndex).LoopSide(demandSide).Branch(chillerBranchCW).Comp.allocate(1);
+	DataPlant::PlantLoop(condLoopIndex).LoopSide(demandSide).Branch(chillerBranchCW).Comp(chillerCompIndex).NodeNumIn  = condInletNodeNum;
+
+	DataLoopNode::Node.allocate(2);
+	DataLoopNode::Node(evapOutletNodeNum).Temp = 22;
+	DataLoopNode::Node(condInletNodeNum).Temp = 10;
+
+	SetPointManager::DefineCondEntSetPointManager thisSPM;
+	thisSPM.MinTwrWbCurve = CurveManager::GetCurveIndex("MinDsnWBCurveName");
+	thisSPM.MinOaWbCurve = CurveManager::GetCurveIndex("MinActWBCurveName");
+	thisSPM.OptCondEntCurve = CurveManager::GetCurveIndex("OptCondEntCurveName");
+	thisSPM.CondEntTempSchedPtr = ScheduleManager::GetScheduleIndex("Condenser Loop Temp Schedule");
+	thisSPM.LoopIndexPlantSide = chwLoopIndex;
+	thisSPM.ChillerIndexPlantSide = chillerBranchChW;
+	thisSPM.BranchIndexPlantSide = chillerCompIndex;
+	thisSPM.LoopIndexDemandSide = condLoopIndex;
+	thisSPM.ChillerIndexDemandSide = chillerBranchCW;
+	thisSPM.BranchIndexDemandSide = chillerCompIndex;
+		
+	// now start hitting all the code paths
+	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
+	DataPlant::PlantLoop(condLoopIndex).LoopSide(demandSide).Branch(chillerBranchCW).Comp(chillerCompIndex).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
+	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).MyLoad = 1000;
+	thisSPM.calculate();
+	EXPECT_TRUE(true);  //23, thisSPM.SetPt
 }
