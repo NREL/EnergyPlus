@@ -1405,7 +1405,7 @@ namespace WaterThermalTanks {
 	void
 	CalcWaterThermalTankZoneGains();
 
-	void
+	bool
 	GetWaterThermalTankInput();
 
 	void

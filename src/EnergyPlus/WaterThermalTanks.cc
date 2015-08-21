@@ -745,7 +745,7 @@ namespace WaterThermalTanks {
 
 	}
 
-	void
+	bool
 	GetWaterThermalTankInput()
 	{
 
@@ -4240,6 +4240,7 @@ namespace WaterThermalTanks {
 
 		} // get input flag
 
+		return ErrorsFound;
 	}
 
 	void
