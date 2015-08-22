@@ -3612,7 +3612,7 @@ namespace WaterThermalTanks {
 								ShowContinueError( "Please leave the source side inlet and outlet fields blank." );
 								ErrorsFound = true;
 							} else {
-								WaterHeaterSaveNodes &HPWHNodeNames = HPWHSaveNodeNames( NumHeatPumpWaterHeater );
+								WaterHeaterSaveNodes &HPWHNodeNames = HPWHSaveNodeNames( HPWaterHeaterNum );
 								WaterHeaterSaveNodes &TankNodenames = WHSaveNodeNames( CheckWaterHeaterNum );
 								Tank.SourceInletNode = GetOnlySingleNode(HPWHNodeNames.OutletNodeName1, ErrorsFound, Tank.Type, Tank.Name, NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
 								TankNodenames.InletNodeName2 = HPWHNodeNames.OutletNodeName1;
