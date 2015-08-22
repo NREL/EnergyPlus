@@ -3,7 +3,7 @@
 ! Basic file description:  1 story building divided into 3 interior conditioned zones. Roof with no plenum.
 !                          No ground contact with floor.
 !
-! Highlights:              HVAC: electric low temperature radiant system heats and terminal reheat cools.
+! Highlights:              HVAC: electric low temperature radiant system heats and terminal reheat cools with scalable and autosizing.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA_WMO_725300, 2 design days, 1 run period,
 !                          Run Control executes the design days only.
