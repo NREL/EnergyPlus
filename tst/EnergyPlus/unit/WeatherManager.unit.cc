@@ -12,13 +12,13 @@
 #include <DataGlobals.hh>
 
 
-#include "Fixtures/InputProcessorFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::WeatherManager;
 using namespace EnergyPlus::ScheduleManager;
 
-TEST_F (InputProcessorFixture, SkyTempTest )
+TEST_F(EnergyPlusFixture, SkyTempTest )
 {
 	std::string const idf_objects = delimited_string({
 		"Version,",
