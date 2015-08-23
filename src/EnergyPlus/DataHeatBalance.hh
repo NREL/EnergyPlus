@@ -3612,8 +3612,10 @@ namespace DataHeatBalance {
 
 		// Member Constructor
 		ZoneAirMassFlowConservation(
-			bool EnforceZoneMassBalance,
-			int InfiltrationTreatment
+			bool const EnforceZoneMassBalance,
+			bool const BalanceMixing,
+			int const InfiltrationTreatment,
+			int const InfiltrationZoneType
 			) :
 			EnforceZoneMassBalance( EnforceZoneMassBalance ),
 			BalanceMixing( BalanceMixing ),
