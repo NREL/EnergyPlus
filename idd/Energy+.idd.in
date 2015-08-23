@@ -6648,7 +6648,6 @@ WindowMaterial:Gap:EquivalentLayer,
        \key Sealed
        \key VentedIndoor
        \key VentedOutdoor
-       \reference GapVentTypeName
        \note Sealed means the gap is enclosed and gas tight, i.e., no venting to indoor or
        \note outdoor environment.  VentedIndoor means the gap is vented to indoor environment, and
        \note VentedOutdoor means the gap is vented to the outdoor environment. The gap types
@@ -19943,7 +19942,6 @@ ElectricEquipment:ITE:AirCooled,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference ITEEquipmentNames
   A2 , \field Zone Name
        \required-field
        \type object-list
@@ -23562,7 +23560,6 @@ AirflowNetwork:Distribution:Linkage,
       \required-field
       \type alpha
       \note Enter a unique name for this object.
-      \reference AirflowNetwork LinkageNames
  A2 , \field Node 1 Name
       \required-field
       \type object-list
@@ -74673,12 +74670,12 @@ Generator:MicroCHP:NonNormalizedParameters,
       \note TriQuadratic
       \type object-list
       \object-list TriQuadraticCurves
-      \object-list MultivariateTables
+      \object-list MultiVariateTables
   A3, \field Thermal Efficiency Curve Name
       \note TriQuadratic
       \type object-list
       \object-list TriQuadraticCurves
-      \object-list MultivariateTables
+      \object-list MultiVariateTables
   A4, \field Cooling Water Flow Rate Mode
       \type choice
       \key PlantControl
