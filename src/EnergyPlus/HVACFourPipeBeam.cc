@@ -894,7 +894,7 @@ namespace FourPipeBeam {
 
 		NonAirSysOutput = 0.0; // initialize
 
-		if ( this->mDotSystemAir == 0.0 || ( ! this->airAvailable  && ! this->coolingAvailable && ! this->heatingAvailable ) ) { //unit is off
+		if ( this->mDotSystemAir < DataHVACGlobals::VerySmallMassFlow || ( ! this->airAvailable  && ! this->coolingAvailable && ! this->heatingAvailable ) ) { //unit is off
 			this->mDotHW = 0.0;
 			if ( this-> beamHeatingPresent )
 			{
@@ -916,7 +916,7 @@ namespace FourPipeBeam {
 		}
 
 
-		if ( this->airAvailable && this->mDotSystemAir > 0.0 && ! this->coolingAvailable && ! this->heatingAvailable) {
+		if ( this->airAvailable && this->mDotSystemAir > DataHVACGlobals::VerySmallMassFlow && ! this->coolingAvailable && ! this->heatingAvailable) {
 			dOASMode = true;
 			this->mDotHW = 0.0;
 			if ( this -> beamHeatingPresent )
@@ -1074,7 +1074,7 @@ namespace FourPipeBeam {
 		this->qDotBeamCooling = 0.0;
 		this->qDotSystemAir = this->mDotSystemAir*( (this->cpSystemAir * this->tDBSystemAir) - (this->cpZoneAir * this->tDBZoneAirTemp) );
 
-		if ( this->coolingAvailable &&  this->mDotCW > 0.0 ) {
+		if ( this->coolingAvailable &&  this->mDotCW > DataHVACGlobals::VerySmallMassFlow ) {
 			//test chilled water flow against plant, it might not all be available
 			SetComponentFlowRate(	this->mDotCW,
 									this->cWInNodeNum,
@@ -1120,7 +1120,7 @@ namespace FourPipeBeam {
 			this->cWTempOut = this->cWTempIn;
 			this->qDotBeamCooling = 0.0;
 		}
-		if ( this->heatingAvailable && this->mDotHW > 0.0 ){
+		if ( this->heatingAvailable && this->mDotHW > DataHVACGlobals::VerySmallMassFlow ){
 			//test hot water flow against plant, it might not all be available
 			SetComponentFlowRate(	this->mDotHW,
 									this->hWInNodeNum,
