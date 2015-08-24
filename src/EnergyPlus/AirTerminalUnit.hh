@@ -82,11 +82,6 @@ protected: // Assignment
 
 public: // Methods		REMOVE ANY OF THESE THAT AREN'T COMMON (WITH SAME ARGS) TO ALL SUB-TYPES
 
-	// for unit tests
-	virtual
-	void
-	clear_state() = 0;
-
 	virtual
 	void
 	simulate(

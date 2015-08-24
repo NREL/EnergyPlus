@@ -132,7 +132,6 @@ namespace EnergyPlus {
 		EXPECT_EQ( DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->airOutNodeNum, DataZoneEquipment::ZoneEquipConfig( 1 ).AirDistUnitHeat( 1 ).OutNode );
 		EXPECT_EQ( DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->aDUNum, 1 );
 
-		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->clear_state();
 	}
 
 
@@ -1697,7 +1696,6 @@ namespace EnergyPlus {
 
 		EXPECT_FLOAT_EQ( NonAirSysOutput, 4685.3999 );
 
-		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->clear_state();
 	
 	}
 	

@@ -40,12 +40,6 @@ namespace FourPipeBeam {
 
 	Array1D< std::shared_ptr< HVACFourPipeBeam > > FourPipeBeams; // dimension to number of machines
 
-	// Needed for unit tests, should not be normally called.
-	void
-	HVACFourPipeBeam::clear_state()
-	{
-		FourPipeBeams.deallocate();
-	}
 
 //	HVACFourPipeBeam::HVACFourPipeBeam(){}
 

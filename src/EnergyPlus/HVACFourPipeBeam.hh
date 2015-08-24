@@ -104,9 +104,6 @@ public: // Creation
 
 public: // Methods		MARK ANY THAT DON'T ALTER STATE const !!!
 
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state();
 
 	static std::shared_ptr< AirTerminalUnit >
 	fourPipeBeamFactory(
