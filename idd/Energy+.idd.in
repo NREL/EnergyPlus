@@ -678,15 +678,15 @@ ZoneAirMassFlowConservation,
        \key No
        \default No
        \note This optional choice input field allows users triggering the zone air mass flow
-       \note balance calculation when desired. This global object has two choice KEYs: “Yes” and
-       \note “No”. If this input field is specified as “Yes”, then EnergyPlus attempts to enforce
-       \note the zone air mass flow conservation, or else if it is specified as “No”, then EnergyPlus
+       \note balance calculation when desired. This global object has two choice KEYs: "Yes" and
+       \note "No". If this input field is specified as "Yes", then EnergyPlus attempts to enforce
+       \note the zone air mass flow conservation, or else if it is specified as "No", then EnergyPlus
        \note calculation defaults to zone air mass flow balance that does not include zone mixing
        \note objects and that assumes self-balanced simple flow objects per the default procedure,
        \note which may not necessarily enforce zone mass conservation unless the user specified
        \note a balanced flow to begin with. Mass conservation is enforced both for the receiving
        \note and source zones if there is at least one mixing object defined. The default input
-       \note is “No”. (Note that “No” input may also results in balanced flow depending on the
+       \note is "No". (Note that "No" input may also results in balanced flow depending on the
        \note system specified).
   A2;  \field Source Zone Infiltration Treatment
        \note This input field allows user to choose how zone infiltration flow is treated during
@@ -695,12 +695,12 @@ ZoneAirMassFlowConservation,
        \key AddInfiltrationFlow
        \key AdjustInfiltrationFlow
        \default AddInfiltrationFlow
-       \note It has two choice KEYs: “AddInfiltrationFlow” and “AdjustInfiltrationFlow”.  If this
-       \note input is specified as “AddInfiltrationFlow”, then energy plus adds infiltration air
+       \note It has two choice KEYs: "AddInfiltrationFlow" and "AdjustInfiltrationFlow".  If this
+       \note input is specified as "AddInfiltrationFlow", then energy plus adds infiltration air
        \note mass flow on top of the base flow, which is calculated using the infiltration object
        \note user inputs, in order to balance the zone air mass flow.  The additional infiltration
        \note air mass flow is not self-balanced.  If this input is specified as
-       \note “AdjustInfiltrationFlow”, then energy plus may adjust the base flow calculated using
+       \note "AdjustInfiltrationFlow", then energy plus may adjust the base flow calculated using
        \note the infiltration object user inputs in order to balance the zone air mass flow. If it
        \note is not required to adjust the base infiltration air flow calculated from the user
        \note specified infiltration object inputs, then the base infiltration air mass flow
@@ -4777,14 +4777,14 @@ WindowMaterial:Glazing,
        \key No
        \key Yes
        \default No
-  N13, \field Young’s modulus
+  N13, \field Young's modulus
        \note coefficient used for deflection calculations. Used only with complex
        \note fenestration when deflection model is set to TemperatureAndPressureInput
        \units Pa
        \type real
        \minimum> 0.0
        \default 7.2e10
-  N14; \field Poisson’s ratio
+  N14; \field Poisson's ratio
        \note coefficient used for deflection calculations. Used only with complex
        \note fenestration when deflection model is set to TemperatureAndPressureInput
        \type real
@@ -6149,7 +6149,7 @@ WindowMaterial:Blind:EquivalentLayer,
   N3 , \field Slat Crown
        \note Perpendicular length between the cord and the curve.
        \note Slat is assumed to be rectangular in cross section
-       \note and flat. Crown=0.0625x“Slat width”
+       \note and flat. Crown=0.0625x"Slat width"
        \type real
        \units m
        \minimum 0
@@ -6651,7 +6651,7 @@ WindowMaterial:Gap:EquivalentLayer,
        \note Sealed means the gap is enclosed and gas tight, i.e., no venting to indoor or
        \note outdoor environment.  VentedIndoor means the gap is vented to indoor environment, and
        \note VentedOutdoor means the gap is vented to the outdoor environment. The gap types
-       \note VentedIndoor and VentedOutdoor are used with gas type “Air” only.
+       \note VentedIndoor and VentedOutdoor are used with gas type "Air" only.
   N2 , \field Conductivity Coefficient A
        \units W/m-K
        \type real
@@ -31910,7 +31910,7 @@ ZoneHVAC:FourPipeFanCoil,
         \note For ConstantFanVariableFlow a Fan:OnOff or Fan:ConstantVolume is valid.
         \note For CyclingFan, a Fan:OnOff is valid.
         \note For VariableFanVariableFlow or VariableFanConstantFlow a Fan:VariableVolume is valid.
-        \note The fan’s inlet node should be the same as the outdoor air mixer’s mixed air node.
+        \note The fan's inlet node should be the same as the outdoor air mixer's mixed air node.
    A10, \field Supply Air Fan Name
         \required-field
         \type object-list
@@ -33002,11 +33002,11 @@ ZoneHVAC:UnitHeater,
         \key Yes
         \key No
         \note This choice field allows the user to define how the unit heater will operate
-        \note under “no heating load” or cooling conditions. If the “No” is selected, then
+        \note under "no heating load" or cooling conditions. If the "No" is selected, then
         \note the fan will not run unless there is a heating load. If the fan does not run,
         \note this effectively shuts the unit heater system off when there is no heating load.
-        \note If the “Yes” is selected, the unit heater is available and has a ConstantVolume
-        \note fan, or has an OnOff fan with “Supply Air Fan Operating Mode Schedule” value
+        \note If the "Yes" is selected, the unit heater is available and has a ConstantVolume
+        \note fan, or has an OnOff fan with "Supply Air Fan Operating Mode Schedule" value
         \note greater than zero, then the fan will always run regardless of the zone load.
    N2 , \field Maximum Hot Water or Steam Flow Rate
         \note Not used when heating coil is gas or electric
@@ -48243,8 +48243,8 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Table:OneIndependentVariable object can also be used
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
-       \note ffw = Fraction of the full load Water Flow	   
-	   
+       \note ffw = Fraction of the full load Water Flow
+
 Coil:WaterHeating:Desuperheater,
        \memo Desuperheater air heating coil. The heating energy provided by this coil is reclaimed
        \memo from the superheated refrigerant gas leaving a compressor and does not impact the
@@ -49725,7 +49725,7 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \minimum -99.0
        \note This numeric field defines the evaporative cooler air inlet node drybulb temperature minimum  
        \note limit in degrees Celsius. The evaporative cooler will be turned off when the evaporator cooler 
-       \note air inlet node dry-bulb temperature falls below this limit. The typical minimum value is 16°C. Users 
+       \note air inlet node dry-bulb temperature falls below this limit. The typical minimum value is 16degC. Users 
        \note are allowed to specify their own limits. If this field is left blank, then there is no drybulb lower
        \note temperature limit for evaporative cooler operation.
   N7 , \field Evaporative Operation Maximum Limit Wetbulb Temperature
@@ -49733,14 +49733,14 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \note when outdoor wetbulb temperature rises above this limit the cooler shuts down.
        \note This numeric field defines the evaporative cooler air inlet node wet-bulb temperature maximum 
        \note limit in degrees Celsius. The evaporative cooler will be turned off when the evaporative cooler 
-       \note air inlet node wet-bulb temperature exceeds this limit. The typical maximum value is 24°C. Users 
+       \note air inlet node wet-bulb temperature exceeds this limit. The typical maximum value is 24degC. Users 
        \note are allowed to specify their own limits. If this field is left blank, then there is no upper 
        \note wetbulb temperature limit for evaporative cooler operation.
   N8 ; \field Evaporative Operation Maximum Limit Drybulb Temperature
        \type real
        \note This numeric field defines the evaporative cooler air inlet node dry-bulb temperature maximum 
        \note limit in degrees Celsius. The evaporative cooler will be turned off when its air inlet node 
-       \note drybulb temperature exceeds this limit. The typical maximum value is 26°C. Users 
+       \note drybulb temperature exceeds this limit. The typical maximum value is 26degC. Users 
        \note are allowed to specify their own limits. If this field is left blank, then there is no upper
        \note temperature limit for evaporative cooler operation.
 
@@ -51640,7 +51640,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         \units m3/s
         \minimum 0.0
         \autosizable
-        \note Must be less than or equal to the fan’s maximum flow rate.
+        \note Must be less than or equal to the fan's maximum flow rate.
         \note Only used when fan operating mode is continuous (disregarded for cycling fan mode).
         \note This air flow rate is used when no heating or cooling is required (i.e., the DX coil
         \note compressor and supplemental heating coil are off). If this field is left blank or zero,
@@ -62779,7 +62779,7 @@ EvaporativeFluidCooler:SingleSpeed,
        \default 0.008
        \units percent
        \note Rate of drift loss as a percentage of circulating spray water flow rate
-       \note Default value for this field in under investigation. For now Cooling tower’s drift loss
+       \note Default value for this field in under investigation. For now Cooling tower's drift loss
        \note percent default value is taken here.
   A8 , \field Blowdown Calculation Mode
        \type choice
@@ -62794,7 +62794,7 @@ EvaporativeFluidCooler:SingleSpeed,
        \note Blowdown is water intentionally drained from the basin in order to offset the build
        \note up of solids in the water that would otherwise occur because of evaporation.
        \note Ratio of solids in the blowdown water to solids in the make up water.
-       \note Default value for this field in under investigation. For now Cooling tower’s
+       \note Default value for this field in under investigation. For now Cooling tower's
        \note Blowdown Concentration Ratio percent default value is taken here.
   A9 , \field Blowdown Makeup Water Usage Schedule Name
        \type object-list
@@ -63020,7 +63020,7 @@ EvaporativeFluidCooler:TwoSpeed,
        \type real
        \units percent
        \default 0.008
-       \note Default value is under investigation. For now cooling tower’s default value is taken.
+       \note Default value is under investigation. For now cooling tower's default value is taken.
   A7 , \field Blowdown Calculation Mode
        \type choice
        \key ConcentrationRatio
@@ -63034,7 +63034,7 @@ EvaporativeFluidCooler:TwoSpeed,
        \note Blowdown is water intentionally drained from the Evaporative Fluid Cooler in order to offset the
        \note build up of solids in the water that would otherwise occur because of evaporation.
        \note Ratio of solids in the blowdown water to solids in the make up water.
-       \note Default value is under investigation. For now cooling tower’s default value is taken.
+       \note Default value is under investigation. For now cooling tower's default value is taken.
   A8 , \field Blowdown Makeup Water Usage Schedule Name
        \type object-list
        \object-list ScheduleNames
@@ -65043,7 +65043,7 @@ WaterHeater:HeatPump:PumpedCondenser,
        \required-field
        \type choice
        \key Coil:WaterHeating:AirToWaterHeatPump:Pumped
-	   \key Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed
+       \key Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed
        \default Coil:WaterHeating:AirToWaterHeatPump:Pumped
        \note Specify the type of DX coil used by this heat pump water heater. The only
        \note valid choice is Coil:WaterHeating:AirToWaterHeatPump:Pumped and Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed.
@@ -72538,14 +72538,14 @@ Refrigeration:AirChiller,
         \minimum 0.0
         \maximum 20.
         \note The rated difference between the air entering the refrigeration chiller and the
-        \note cooling source temperature in °C.
+        \note cooling source temperature in degC.
   N6 ,  \field Maximum Temperature Difference Between Inlet Air and Evaporating Temperature
         \type real
         \units deltaC
         \minimum 0.0
         \maximum 25.
         \note The maximum difference between the air entering the refrigeration chiller and the
-        \note cooling source temperature in °C used to limit capacity during pull-down.
+        \note cooling source temperature in degC used to limit capacity during pull-down.
         \note defaults to 1.3 times the Rated Temperature Difference DT1
   N7 ,  \field Coil Material Correction Factor
         \type real
@@ -74623,7 +74623,7 @@ Generator:FuelCell:Inverter,
 
 Generator:MicroCHP,
       \memo Small-scale combined heat and power (micro CHP) electric generator using the model
-      \memo developed by IEA/ECBCS Annex 42 Ð see www.cogen-sim.net. The model was developed
+      \memo developed by IEA/ECBCS Annex 42 see www.cogen-sim.net. The model was developed
       \memo for both internal combustion and Stirling cycle
       \memo engines, but might be used for other types of residential CHP devices.
   A1, \field Name
@@ -76725,7 +76725,7 @@ FaultModel:TemperatureSensorOffset:ReturnAir,
        \maximum< 10
        \default 0.0
        \units deltaC
-	   
+  
 FaultModel:EnthalpySensorOffset:ReturnAir,
    \memo This object describes return air enthalpy sensor offset
    \min-fields 3
@@ -76821,7 +76821,7 @@ FaultModel:HumidistatOffset,
        \note Required field for Type ThermostatOffsetDependent
        \type object-list
        \object-list ThermostatOffsetFaults   
-	   
+
 FaultModel:Fouling:AirFilter,
    \memo This object describes fault of dirty air filters
    \min-fields 4
