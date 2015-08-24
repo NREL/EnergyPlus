@@ -2573,9 +2573,9 @@ The chiller model uses user-supplied performance information at reference condit
 
 *ChillerCapFTemp* = cooling capacity factor, equal to 1 at reference conditions
 
-*T<sub>cw,l</sub>*            = leaving chilled water temperature, ?C
+*T<sub>cw,l</sub>*            = leaving chilled water temperature, ˚C
 
-*T<sub>cond,e</sub>*         = entering condenser fluid temperature, ?C. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower). For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively.
+*T<sub>cond,e</sub>*         = entering condenser fluid temperature, ˚C. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower). For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively.
 
 ·        The energy input to cooling output ratio function of temperature curve is a biquadratic performance curve that parameterizes the variation of the energy input to cooling output ratio (EIR) as a function of the leaving chilled water temperature and the entering condenser fluid temperature. The EIR is the inverse of the COP. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) to give the full-load EIR at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation.
 
@@ -2585,9 +2585,9 @@ where
 
 *ChillerEIRFTemp* = energy input to cooling output factor, equal to 1 at reference conditions
 
-*T<sub>cw,l</sub>*      = leaving chilled water temperature, ?C
+*T<sub>cw,l</sub>*      = leaving chilled water temperature, ˚C
 
-*T<sub>cond,e</sub>*<sub>     </sub>= entering condenser fluid temperature, ?C. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower). For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively. If the chiller is a heat recovery chiller,then the condenser inlet temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
+*T<sub>cond,e</sub>*<sub>     </sub>= entering condenser fluid temperature, ˚C. For a water-cooled condenser this will be the water temperature returning from the condenser loop (e.g., leaving the cooling tower). For air- or evap-cooled condensers this will be the entering outdoor air dry-bulb or wet-bulb temperature, respectively. If the chiller is a heat recovery chiller,then the condenser inlet temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
 
 ·        The energy input to cooling output ratio function of part-load ratio curve is a quadratic performance curve that parameterizes the variation of the chiller input power ratio as a function of the part-load ratio. The part-load ratio is the actual cooling load divided by the chiller’s available cooling capacity. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) and the Energy Input to Cooling Output Ratio Function of Temperature Curve to give the EIR at the specific temperatures and part-load ratio at which the chiller is operating. This curve should have a value of 1.0 when the part-load ratio equals 1.0. The quadratic curve should be valid for the range of part-load ratios anticipated for the simulation.
 
@@ -2625,13 +2625,13 @@ The evaporator heat transfer rate is then compared to the available capacity. If
 
 where
 
-*T<sub>cw,l</sub>*            = water temperature leaving the evaporator, ?C
+*T<sub>cw,l</sub>*            = water temperature leaving the evaporator, ˚C
 
-*T<sub>cw,e</sub>*           = water temperature entering the evaporator, ?C
+*T<sub>cw,e</sub>*           = water temperature entering the evaporator, ˚C
 
 <span>\({\mathop m\limits^ \bullet_{evap}}\)</span>         = evaporator mass flow rate, kg/s
 
-*C<sub>p,evap</sub>*         = specific heat of water entering evaporator at *T<sub>cw,e</sub>*, J/kg-?C
+*C<sub>p,evap</sub>*         = specific heat of water entering evaporator at *T<sub>cw,e</sub>*, J/kg-˚C
 
 The part-load ratio is then calculated as the ratio of the evaporator heat transfer rate to the available chiller capacity. The part-load ratio is not allowed to be greater than the maximum part-load ratio specified by the user or less than zero as follows:
 
@@ -2685,13 +2685,13 @@ For water-cooled chillers, the water temperature leaving the condenser is then c
 
 where:
 
-*T<sub>cond,l</sub>*          = water temperature leaving the condenser, ?C
+*T<sub>cond,l</sub>*          = water temperature leaving the condenser, ˚C
 
-*T<sub>cond,e</sub>*         = water temperature entering the condenser, ?C
+*T<sub>cond,e</sub>*         = water temperature entering the condenser, ˚C
 
 <span>\({\mathop m\limits^ \bullet_{cond}}\)</span>         = mass flow rate through the condenser, kg/s
 
-<span>\({C_{p,cond}}\)</span>       = specific heat of water entering the condenser at *T<sub>cond,e</sub>*, J/kg-?C
+<span>\({C_{p,cond}}\)</span>       = specific heat of water entering the condenser at *T<sub>cond,e</sub>*, J/kg-˚C
 
 For air- and evaporatively-cooled condensers, the exiting air temperature is not calculated and is set equal to the entering air or wet-bulb temperature, respectively.
 
@@ -2902,9 +2902,9 @@ where
 
 *ChillerCapFTemp* = Cooling capacity factor, equal to 1 at reference conditions
 
-*T<sub>cw,l</sub>*            = leaving chilled water temperature, ?C
+*T<sub>cw,l</sub>*            = leaving chilled water temperature, ˚C
 
-*T<sub>cond,l</sub>*<sub>            </sub>= leaving condenser water temperature, ?C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
+*T<sub>cond,l</sub>*<sub>            </sub>= leaving condenser water temperature, ˚C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
 
 ·        The energy input to cooling output ratio function of temperature curve is a biquadratic performance curve that parameterizes the variation of the energy input to cooling output ratio (EIR) as a function of the leaving chilled water temperature and the leaving condenser water temperature. The EIR is the inverse of the COP. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) to give the full-load EIR at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified in the input data file by the user. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation (otherwise the program issues warning messages).
 
@@ -2912,9 +2912,9 @@ where
 
 *ChillerEIRFTemp* = Energy input to cooling output factor, equal to 1 at reference conditions
 
-*T<sub>cw,l</sub>*      = leaving chilled water temperature, ?C
+*T<sub>cw,l</sub>*      = leaving chilled water temperature, ˚C
 
-*T<sub>cond,l</sub>*<sub>     </sub>= leaving condenser water temperature, ?C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
+*T<sub>cond,l</sub>*<sub>     </sub>= leaving condenser water temperature, ˚C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
 
 ·        The energy input to cooling output ratio function of part-load ratio curve parameterizes the variation of the energy input ratio (EIR). The output of this curve is multiplied by the reference EIR (inverse of the reference COP) and the Energy Input to Cooling Output Ratio Function of Temperature Curve to give the EIR at the specific temperatures and part-load ratio at which the chiller is operating. This curve should have a value of 1.0 at the reference leaving condenser water temperature with part-load ratio equal to 1.0. It is recommended that this performance curve be developed using both full- and part-load performance data. The bicubic curve should be valid for the range of condenser water temperatures and part-load ratios anticipated for the simulation (otherwise the program issues warning messages). Either of the following two types of curves can be used.
 
@@ -2928,7 +2928,7 @@ where
 
 *ChillerEIRFPLR* = Energy input to cooling output factor, equal to 1 at the reference leaving condenser water temperature and PLR = 1.0
 
-*T<sub>cond,l</sub>*<sub>     </sub>= leaving condenser water temperature, ?C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
+*T<sub>cond,l</sub>*<sub>     </sub>= leaving condenser water temperature, ˚C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.
 
 *PLR*      =Part load ratio = (cooling load) / (chiller’s available cooling capacity)
 
@@ -2984,13 +2984,13 @@ The evaporator heat transfer rate is then compared to the available capacity. If
 
 where
 
-*T<sub>cw,l</sub>*            = water temperature leaving the evaporator, ?C
+*T<sub>cw,l</sub>*            = water temperature leaving the evaporator, ˚C
 
-*T<sub>cw,e</sub>*           = water temperature entering the evaporator, ?C
+*T<sub>cw,e</sub>*           = water temperature entering the evaporator, ˚C
 
 <span>\({\mathop m\limits^ \bullet_{evap}}\)</span>         = evaporator mass flow rate, kg/s
 
-*C<sub>p,evap</sub>*         = specific heat of water entering evaporator at *T<sub>cw,e</sub>*, J/kg-?C
+*C<sub>p,evap</sub>*         = specific heat of water entering evaporator at *T<sub>cw,e</sub>*, J/kg-˚C
 
 The part-load ratio is then calculated as the ratio of the evaporator heat transfer rate to the available chiller capacity. The part-load ratio is not allowed to be greater than the maximum part-load ratio specified by the user or less than zero as follows:
 
@@ -3042,13 +3042,13 @@ The above curve values are calculated based on the leaving condenser water tempe
 
 where:
 
-*T<sub>cond,l</sub>*          = water temperature leaving the condenser, ?C
+*T<sub>cond,l</sub>*          = water temperature leaving the condenser, ˚C
 
-*T<sub>cond,e</sub>*         = water temperature entering the condenser, ?C
+*T<sub>cond,e</sub>*         = water temperature entering the condenser, ˚C
 
 <span>\({\mathop m\limits^ \bullet_{cond}}\)</span>         = mass flow rate through the condenser, kg/s
 
-<span>\({C_{p,cond}}\)</span>       = specific heat of water entering the condenser at *T<sub>cond,e</sub>*, J/kg-?C
+<span>\({C_{p,cond}}\)</span>       = specific heat of water entering the condenser at *T<sub>cond,e</sub>*, J/kg-˚C
 
 The final calculations determine the total heat transfer energy for the condenser and evaporator, as well as the total electric energy consumed by the chiller compressor motor(s) and condenser fan(s). The results are available as output variables.
 

@@ -9940,74 +9940,45 @@
 
 ! ***REPORT METERS/VARIABLES***
 
-  Output:Meter,Electricity:Facility,HOURLY;
-
-  Output:Meter,Fans:Electricity,HOURLY;
-
-  Output:Meter,Cooling:Electricity,HOURLY;
-
-  Output:Meter,Heating:Electricity,HOURLY;
-
-  Output:Meter,InteriorLights:Electricity,HOURLY;
-
-  Output:Meter,InteriorEquipment:Electricity,HOURLY;
-
-  Output:Meter,Gas:Facility,HOURLY;
-
-  Output:Meter,Heating:Gas,HOURLY;
-
-  Output:Meter,InteriorEquipment:Gas,HOURLY;
-
-  Output:Meter,Water Heater:WaterSystems:Gas,HOURLY;
-
-  Output:Variable,*,Site Outdoor Air Drybulb Temperature,HOURLY;
-
-  Output:Variable,*,Site Outdoor Air Humidity Ratio,HOURLY;
-
-  Output:Variable,*,Site Outdoor Air Relative Humidity,timestep;
-Output:Variable,*,Zone Air Terminal Beam Sensible Cooling Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Zone Air Terminal Beam Sensible Cooling Rate,detailed; !- HVAC Average [W]
-Output:Variable,*,Zone Air Terminal Beam Sensible Heating Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Zone Air Terminal Beam Sensible Heating Rate,detailed; !- HVAC Average [W]
-Output:Variable,*,Zone Air Terminal Primary Air Sensible Cooling Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Zone Air Terminal Primary Air Sensible Cooling Rate,detailed; !- HVAC Average [W]
-Output:Variable,*,Zone Air Terminal Primary Air Sensible Heating Energy,detailed; !- HVAC Sum [J]
-Output:Variable,*,Zone Air Terminal Primary Air Sensible Heating Rate,detailed; !- HVAC Average [W]
-Output:Variable,*,Zone Air Terminal Primary Air Flow Rate,detailed; !- HVAC Average [m3/s]
-Output:Variable,*,Air System Outdoor Air Mass Flow Rate,detailed; !- HVAC Average [kg/s]
-  Output:Variable,*,Zone Mean Air Temperature,timestep;
-  Output:Variable,*,Chiller Electric Power,detailed; !- HVAC Average [W]
-  Output:Variable,*,Boiler Mass Flow Rate,detailed; !- HVAC Average [kg/s]
-  Output:Variable,*,Boiler Gas Rate,detailed; !- HVAC Average [W]
-Output:Variable,*,Chiller Evaporator Mass Flow Rate,timestep; !- HVAC Average [kg/s]
-
-Output:Variable,CV_1 Supply Equipment Outlet Node,System Node Mass Flow Rate,detailed; !- HVAC Average [kg/s]
-Output:Variable,CV_1 Supply Equipment Inlet Node,System Node Mass Flow Rate,detailed; !- HVAC Average [kg/s]
-
-Output:Variable,Core_bottom 4pipe Beam CW Inlet Node,System Node Mass Flow Rate Request,detailed; !- HVAC Average [kg/s]
-
-Output:Variable,Core_bottom 4pipe Beam HW Inlet Node,System Node Mass Flow Rate Request,detailed; !- HVAC Average [kg/s]
-
-Output:Variable,Core_bottom 4pipe Beam CW Inlet Node,System Node Mass Flow Rate,detailed; !- HVAC Average [kg/s]
-Output:Variable,Core_bottom 4pipe Beam CW Outlet Node,System Node Mass Flow Rate,detailed; !- HVAC Average [kg/s]
-Output:Variable,Core_bottom 4pipe Beam HW Inlet Node,System Node Mass Flow Rate,detailed; !- HVAC Average [kg/s]
-Output:Variable,Core_bottom 4pipe Beam HW Outlet Node,System Node Mass Flow Rate,detailed; !- HVAC Average [kg/s]
-Output:Variable,Core_bottom 4pipe Beam CW Inlet Node,System Node Temperature,detailed; !- HVAC Average [kg/s]
-Output:Variable,Core_bottom 4pipe Beam CW Outlet Node,System Node Temperature,detailed; !- HVAC Average [kg/s]
-Output:Variable,Core_bottom 4pipe Beam HW Inlet Node,System Node Temperature,detailed; !- HVAC Average [kg/s]
-Output:Variable,Core_bottom 4pipe Beam HW Outlet Node,System Node Temperature,detailed; !- HVAC Average [kg/s]
 
 
-Output:Variable,Core_bottom 4pipe Beam Inlet Node Name,System Node Mass Flow Rate,detailed; !- HVAC Average [kg/s]
-Output:Variable,Core_bottom 4pipe Beam Outlet Node Name,System Node Mass Flow Rate,detailed; !- HVAC Average [kg/s]
+  Output:Variable,*,Site Outdoor Air Relative Humidity,hourly;
+  Output:Variable,*,Zone Air Terminal Beam Sensible Cooling Energy,hourly; !- HVAC Sum [J]
+  Output:Variable,*,Zone Air Terminal Beam Sensible Cooling Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,Zone Air Terminal Beam Sensible Heating Energy,hourly; !- HVAC Sum [J]
+  Output:Variable,*,Zone Air Terminal Beam Sensible Heating Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,Zone Air Terminal Primary Air Sensible Cooling Energy,hourly; !- HVAC Sum [J]
+  Output:Variable,*,Zone Air Terminal Primary Air Sensible Cooling Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,Zone Air Terminal Primary Air Sensible Heating Energy,hourly; !- HVAC Sum [J]
+  Output:Variable,*,Zone Air Terminal Primary Air Sensible Heating Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,Zone Air Terminal Primary Air Flow Rate,hourly; !- HVAC Average [m3/s]
+  Output:Variable,*,Air System Outdoor Air Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,*,Zone Mean Air Temperature,hourly;
+  Output:Variable,*,Chiller Electric Power,hourly; !- HVAC Average [W]
+  Output:Variable,*,Boiler Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,*,Boiler Gas Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,Chiller Evaporator Mass Flow Rate,hourly; !- HVAC Average [kg/s]
 
+  Output:Variable,CV_1 Supply Equipment Outlet Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,CV_1 Supply Equipment Inlet Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
 
-Output:Variable,CV_1 Zone Equipment Inlet Node,System Node Mass Flow Rate,detailed; !- HVAC Average [kg/s]
+  Output:Variable,Core_bottom 4pipe Beam CW Inlet Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Core_bottom 4pipe Beam CW Outlet Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Core_bottom 4pipe Beam HW Inlet Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Core_bottom 4pipe Beam HW Outlet Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Core_bottom 4pipe Beam CW Inlet Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Core_bottom 4pipe Beam CW Outlet Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Core_bottom 4pipe Beam HW Inlet Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Core_bottom 4pipe Beam HW Outlet Node,System Node Temperature,hourly; !- HVAC Average [kg/s]
 
+  Output:Variable,Core_bottom 4pipe Beam Inlet Node Name,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,Core_bottom 4pipe Beam Outlet Node Name,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
 
-Output:Variable,CV_2 Supply Equipment Outlet Node,System Node Mass Flow Rate,detailed; !- HVAC Average [kg/s]
-Output:Variable,CV_3 Supply Equipment Outlet Node,System Node Mass Flow Rate,detailed; !- HVAC Average [kg/s]
-Output:Variable,VAV_5 Supply Equipment Outlet Node,System Node Mass Flow Rate,detailed; !- HVAC Average [kg/s]
+  Output:Variable,CV_1 Zone Equipment Inlet Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+
+  Output:Variable,CV_2 Supply Equipment Outlet Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,CV_3 Supply Equipment Outlet Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,VAV_5 Supply Equipment Outlet Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
 
 
 ! ***REPORT TABLES***

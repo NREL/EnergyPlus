@@ -110,6 +110,13 @@ public: // Methods		MARK ANY THAT DON'T ALTER STATE const !!!
 		int objectType,
 		std::string objectName
 	);
+	void
+	simulate(
+		bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
+		Real64 & NonAirSysOutput // convective cooling by the beam system [W]
+	);
+
+ private: // Methods
 
 	void
 	init(
@@ -144,18 +151,12 @@ public: // Methods		MARK ANY THAT DON'T ALTER STATE const !!!
 	);
 
 	void
-	simulate(
-		bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
-		Real64 & NonAirSysOutput // convective cooling by the beam system [W]
-	);
-
-	void
 	update() const;
 
 	void
 	report() ;
 
-public: // Data
+private: // data
 
 	int coolingAvailSchedNum; // index to schedule for cooling availability
 	bool coolingAvailable; // true if beam cooling is available
@@ -216,7 +217,7 @@ public: // Data
 	Real64 supAirHeatingRate; // Total cooling rate from supply air [W]
 	Real64 primAirFlow; // supply air flow per zone at standard elevation-adjusted density [m3/s]
 
-private: // data
+
 
 	bool myEnvrnFlag; // control when to re initialize for new environment period
 	bool mySizeFlag; // control when to run sizing method
