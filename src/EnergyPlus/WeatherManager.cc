@@ -318,14 +318,12 @@ namespace WeatherManager {
 		WeatherFileTimeZone = 0.0 ;
 		WeatherFileElevation = 0.0 ;
 		WeatherFileUnitNumber = 0 ; // File unit number for the weather file
-		for ( int i = 1; i <= 12; i++ )
-		{
-			GroundTemps( i ) = 18.0;
-			GroundTempsFC( i ) = 0.0;
-			SurfaceGroundTemps( i ) = 13.0;
-			DeepGroundTemps( i ) = 16.0;
-			GroundReflectances( i ) = 0.2;
-		}
+		GroundTemps			= Array1D< Real64 >( 12, 18.0 );
+		GroundTempsFC		= Array1D< Real64 >( 12, 0.0 );
+		SurfaceGroundTemps	= Array1D< Real64 >( 12, 13.0 );
+		DeepGroundTemps		= Array1D< Real64 >( 12, 16.0 );
+		GroundReflectances	= Array1D< Real64 >( 12, 0.2 );
+
 		SnowGndRefModifier = 1.0 ; // Modifier to ground reflectance during snow
 		SnowGndRefModifierForDayltg = 1.0 ; // Modifier to ground reflectance during snow for daylighting
 		WaterMainsTempsMethod = 0 ; // Water mains temperature calculation method
@@ -338,12 +336,10 @@ namespace WeatherManager {
 		TotRunPers =  0 ; // Total number of Run Periods (Weather data) to Setup
 		TotRunDesPers = 0 ; // Total number of Run Design Periods (Weather data) to Setup
 		NumSpecialDays = 0 ;
-		for ( int i = 1; i <= 366; i++ )
-		{
-			SpecialDayTypes( i ) = 0 ;
-			WeekDayTypes( i) = 0;
-			DSTIndex( i ) = 0;
-		}
+
+		SpecialDayTypes	= Array1D< int >(366, 0 );
+		WeekDayTypes	= Array1D< int >(366, 0 );
+		DSTIndex		= Array1D< int >(366, 0 );
 
 		NumDataPeriods = 0;
 		NumIntervalsPerHour = 1;
