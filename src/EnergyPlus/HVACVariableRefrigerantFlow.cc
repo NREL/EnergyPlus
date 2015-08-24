@@ -1797,14 +1797,12 @@ namespace HVACVariableRefrigerantFlow {
 						ErrorsFound = true;
 					}}
 				} else {
-//					if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
 					if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle ) {
 						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 33 ) + " not found:" + cAlphaArgs( 33 ) );
 						ErrorsFound = true;
 					}
 				}
 			} else {
-//				if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
 				if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle ) {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 33 ) + " not found:" + cAlphaArgs( 33 ) );
 					ErrorsFound = true;

@@ -626,6 +626,7 @@ namespace EnergyPlus {
 		DataGlobals::BeginEnvrnFlag = true;
 		DataSizing::CurZoneEqNum = 1;
 		DataEnvironment::OutBaroPress = 101325; // sea level
+		DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
 		StdRhoAir = PsyRhoAirFnPbTdbW( DataEnvironment::OutBaroPress, 20.0, 0.0 );
 		ZoneEqSizing.allocate( 1 );
 		ZoneSizingRunDone = true;
