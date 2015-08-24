@@ -3,11 +3,16 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+#include "Fixtures/HVACFixture.hh"
+
 // EnergyPlus Headers
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
@@ -17,14 +22,18 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataAirflowNetwork.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace DataGlobals;
+using namespace EnergyPlus::DataZoneControls;
 using namespace EnergyPlus::DataZoneEquipment;
+using namespace EnergyPlus::DataZoneEnergyDemands;
 using namespace EnergyPlus::DataSizing;
+using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::ZonePlenum;
 using namespace EnergyPlus::ZoneTempPredictorCorrector;
 using namespace EnergyPlus::DataLoopNode;
@@ -33,6 +42,7 @@ using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataAirflowNetwork;
 using namespace EnergyPlus::Psychrometrics;
+using namespace EnergyPlus::ScheduleManager;
 
 
 TEST( ZoneTempPredictorCorrector, CorrectZoneHumRatTest )
@@ -229,3 +239,335 @@ TEST( ZoneTempPredictorCorrector, CorrectZoneHumRatTest )
 	ZoneW1.deallocate();
 
 }
+
+	TEST_F( HVACFixture, ZoneTempPredictorCorrector_ReportingTest )
+	{
+		// AUTHOR: R. Raustad, FSEC
+		// DATE WRITTEN: Aug 2015
+
+		std::string const idf_objects = delimited_string({
+			"Version,8.3;",
+			" ",
+			"Zone,",
+			"  Core_top,             !- Name",
+			"  0.0000,                  !- Direction of Relative North {deg}",
+			"  0.0000,                  !- X Origin {m}",
+			"  0.0000,                  !- Y Origin {m}",
+			"  0.0000,                  !- Z Origin {m}",
+			"  1,                       !- Type",
+			"  1,                       !- Multiplier",
+			"  ,                        !- Ceiling Height {m}",
+			"  ,                        !- Volume {m3}",
+			"  autocalculate,           !- Floor Area {m2}",
+			"  ,                        !- Zone Inside Convection Algorithm",
+			"  ,                        !- Zone Outside Convection Algorithm",
+			"  Yes;                     !- Part of Total Floor Area",
+			" ",
+			"ZoneControl:Thermostat,",
+			"  Core_top Thermostat,     !- Name",
+			"  Core_top,                !- Zone or ZoneList Name",
+			"  Single Heating Control Type Sched,  !- Control Type Schedule Name",
+			"  ThermostatSetpoint:SingleHeating,  !- Control 1 Object Type",
+			"  Core_top HeatSPSched;    !- Control 1 Name",
+			" ",
+			"Schedule:Compact,",
+			"  Single Heating Control Type Sched,  !- Name",
+			"  Control Type,            !- Schedule Type Limits Name",
+			"  Through: 12/31,          !- Field 1",
+			"  For: AllDays,            !- Field 2",
+			"  Until: 24:00,1;          !- Field 3",
+			" ",
+			"ThermostatSetpoint:SingleHeating,",
+			"  Core_top HeatSPSched,    !- Name",
+			"  SNGL_HTGSETP_SCH;        !- Heating Setpoint Temperature Schedule Name",
+			" ",
+			"Schedule:Compact,",
+			"  SNGL_HTGSETP_SCH,        !- Name",
+			"  Temperature,             !- Schedule Type Limits Name",
+ 			"  Through: 12/31,          !- Field 1",
+			"  For: AllDays,            !- Field 2",
+			"  Until: 24:00,15.0;       !- Field 3",
+			" ",
+			"Zone,",
+			"  Core_middle,             !- Name",
+			"  0.0000,                  !- Direction of Relative North {deg}",
+			"  0.0000,                  !- X Origin {m}",
+			"  0.0000,                  !- Y Origin {m}",
+			"  0.0000,                  !- Z Origin {m}",
+			"  1,                       !- Type",
+			"  1,                       !- Multiplier",
+			"  ,                        !- Ceiling Height {m}",
+			"  ,                        !- Volume {m3}",
+			"  autocalculate,           !- Floor Area {m2}",
+			"  ,                        !- Zone Inside Convection Algorithm",
+			"  ,                        !- Zone Outside Convection Algorithm",
+			"  Yes;                     !- Part of Total Floor Area",
+			" ",
+			"ZoneControl:Thermostat,",
+			"  Core_middle Thermostat,  !- Name",
+			"  Core_middle,             !- Zone or ZoneList Name",
+			"  Single Cooling Control Type Sched,  !- Control Type Schedule Name",
+			"  ThermostatSetpoint:SingleCooling,  !- Control 1 Object Type",
+			"  Core_middle CoolSPSched; !- Control 1 Name",
+			" ",
+			"Schedule:Compact,",
+			"  Single Cooling Control Type Sched,  !- Name",
+			"  Control Type,            !- Schedule Type Limits Name",
+			"  Through: 12/31,          !- Field 1",
+			"  For: AllDays,            !- Field 2",
+			"  Until: 24:00,2;          !- Field 3",
+			" ",
+			"ThermostatSetpoint:SingleCooling,",
+			"  Core_middle CoolSPSched, !- Name",
+			"  SNGL_CLGSETP_SCH;        !- Cooling Setpoint Temperature Schedule Name",
+			" ",
+			"Schedule:Compact,",
+			"  SNGL_CLGSETP_SCH,        !- Name",
+			"  Temperature,             !- Schedule Type Limits Name",
+			"  Through: 12/31,          !- Field 1",
+			"  For: AllDays,            !- Field 2",
+			"  Until: 24:00,24.0;       !- Field 3",
+			" ",
+			"Zone,",
+			"  Core_basement,             !- Name",
+			"  0.0000,                  !- Direction of Relative North {deg}",
+			"  0.0000,                  !- X Origin {m}",
+			"  0.0000,                  !- Y Origin {m}",
+			"  0.0000,                  !- Z Origin {m}",
+			"  1,                       !- Type",
+			"  1,                       !- Multiplier",
+			"  ,                        !- Ceiling Height {m}",
+			"  ,                        !- Volume {m3}",
+			"  autocalculate,           !- Floor Area {m2}",
+			"  ,                        !- Zone Inside Convection Algorithm",
+			"  ,                        !- Zone Outside Convection Algorithm",
+			"  Yes;                     !- Part of Total Floor Area",
+			" ",
+			"ZoneControl:Thermostat,",
+			"  Core_basement Thermostat,  !- Name",
+			"  Core_basement,             !- Zone or ZoneList Name",
+			"  Single Cooling Heating Control Type Sched,  !- Control Type Schedule Name",
+			"  ThermostatSetpoint:SingleHeatingOrCooling,  !- Control 1 Object Type",
+			"  Core_basement CoolHeatSPSched; !- Control 1 Name",
+			" ",
+			"Schedule:Compact,",
+			"  Single Cooling Heating Control Type Sched,  !- Name",
+			"  Control Type,            !- Schedule Type Limits Name",
+			"  Through: 12/31,          !- Field 1",
+			"  For: AllDays,            !- Field 2",
+			"  Until: 24:00,3;          !- Field 3",
+			" ",
+			"ThermostatSetpoint:SingleHeatingOrCooling,",
+			"  Core_basement CoolHeatSPSched, !- Name",
+			"  CLGHTGSETP_SCH;             !- Heating Setpoint Temperature Schedule Name",
+			" ",
+			"Zone,",
+			"  Core_bottom,             !- Name",
+			"  0.0000,                  !- Direction of Relative North {deg}",
+			"  0.0000,                  !- X Origin {m}",
+			"  0.0000,                  !- Y Origin {m}",
+			"  0.0000,                  !- Z Origin {m}",
+			"  1,                       !- Type",
+			"  1,                       !- Multiplier",
+			"  ,                        !- Ceiling Height {m}",
+			"  ,                        !- Volume {m3}",
+			"  autocalculate,           !- Floor Area {m2}",
+			"  ,                        !- Zone Inside Convection Algorithm",
+			"  ,                        !- Zone Outside Convection Algorithm",
+			"  Yes;                     !- Part of Total Floor Area",
+			" ",
+			"ZoneControl:Thermostat,",
+			"  Core_bottom Thermostat,  !- Name",
+			"  Core_bottom,             !- Zone or ZoneList Name",
+			"  Dual Zone Control Type Sched,  !- Control Type Schedule Name",
+			"  ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type",
+			"  Core_bottom DualSPSched; !- Control 1 Name",
+			" ",
+			"Schedule:Compact,",
+			"  Dual Zone Control Type Sched,  !- Name",
+			"  Control Type,            !- Schedule Type Limits Name",
+			"  Through: 12/31,          !- Field 1",
+			"  For: AllDays,            !- Field 2",
+			"  Until: 24:00,4;          !- Field 3",
+			" ",
+			"ThermostatSetpoint:DualSetpoint,",
+			"  Core_bottom DualSPSched, !- Name",
+			"  HTGSETP_SCH,             !- Heating Setpoint Temperature Schedule Name",
+			"  CLGSETP_SCH;             !- Cooling Setpoint Temperature Schedule Name",
+			" ",
+			"Schedule:Compact,",
+			"  CLGSETP_SCH,             !- Name",
+			"  Temperature,             !- Schedule Type Limits Name",
+			"  Through: 12/31,          !- Field 1",
+			"  For: AllDays,            !- Field 2",
+			"  Until: 24:00,24.0;       !- Field 3",
+			" ",
+			"Schedule:Compact,",
+			"  HTGSETP_SCH,             !- Name",
+			"  Temperature,             !- Schedule Type Limits Name",
+ 			"  Through: 12/31,          !- Field 1",
+			"  For: AllDays,            !- Field 2",
+			"  Until: 24:00,15.0;       !- Field 3",
+			" ",
+			"Schedule:Compact,",
+			"  CLGHTGSETP_SCH,          !- Name",
+			"  Temperature,             !- Schedule Type Limits Name",
+ 			"  Through: 12/31,          !- Field 1",
+			"  For: AllDays,            !- Field 2",
+			"  Until: 24:00,24.0;       !- Field 3",
+		});
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false ); // If errors detected in input
+		GetZoneData( ErrorsFound );
+		ASSERT_FALSE( ErrorsFound );
+
+		GetZoneAirSetPoints();
+
+		int HeatZoneNum( 1 );
+		int CoolZoneNum( 2 );
+		int CoolHeatZoneNum( 3 );
+		int DualZoneNum( 4 );
+		DeadBandOrSetback.allocate( NumTempControlledZones );
+		CurDeadBandOrSetback.allocate( NumTempControlledZones );
+		TempControlType.allocate( NumTempControlledZones );
+		ZoneSysEnergyDemand.allocate( NumTempControlledZones );
+		TempZoneThermostatSetPoint.allocate( NumTempControlledZones );
+		ZoneSetPointLast.allocate( NumTempControlledZones );
+		Setback.allocate( NumTempControlledZones );
+		ZoneThermostatSetPointLo.allocate( NumTempControlledZones );
+		ZoneThermostatSetPointHi.allocate( NumTempControlledZones );
+		TempDepZnLd.allocate( NumTempControlledZones );
+		TempIndZnLd.allocate( NumTempControlledZones );
+		TempDepZnLd = 0.0;
+		TempIndZnLd = 0.0;
+
+		SNLoadPredictedRate.allocate( NumTempControlledZones );
+		LoadCorrectionFactor.allocate( NumTempControlledZones );
+		SNLoadPredictedHSPRate.allocate( NumTempControlledZones );
+		SNLoadPredictedCSPRate.allocate( NumTempControlledZones );
+
+		LoadCorrectionFactor( HeatZoneNum ) = 1.0;
+		LoadCorrectionFactor( CoolZoneNum ) = 1.0;
+		LoadCorrectionFactor( CoolHeatZoneNum ) = 1.0;
+		LoadCorrectionFactor( DualZoneNum ) = 1.0;
+		
+		// The following parameters describe the setpoint types in TempControlType(ActualZoneNum)
+		//	extern int const SingleHeatingSetPoint; = 1
+		//	extern int const SingleCoolingSetPoint; = 2
+		//	extern int const SingleHeatCoolSetPoint; = 3
+		//	extern int const DualSetPointWithDeadBand; = 4
+		Schedule( TempControlledZone( HeatZoneNum ).CTSchedIndex ).CurrentValue = DataHVACGlobals::SingleHeatingSetPoint;
+		Schedule( TempControlledZone( CoolZoneNum ).CTSchedIndex ).CurrentValue = DataHVACGlobals::SingleCoolingSetPoint;
+		Schedule( TempControlledZone( CoolHeatZoneNum ).CTSchedIndex ).CurrentValue = DataHVACGlobals::SingleHeatCoolSetPoint;
+
+		Schedule( TempControlledZone( DualZoneNum ).CTSchedIndex ).CurrentValue = 0; // simulate no thermostat or non-controlled zone
+
+		ZoneSysEnergyDemand( DualZoneNum ).TotalOutputRequired = 0.0; // no load and no thermostat since control type is set to 0 above
+		CalcZoneAirTempSetPoints();
+		CalcPredictedSystemLoad( DualZoneNum );
+
+		EXPECT_EQ( 0.0, TempZoneThermostatSetPoint( DualZoneNum ) ); // Set point initialized to 0 and never set since thermostat control type = 0
+
+		Schedule( TempControlledZone( DualZoneNum ).CTSchedIndex ).CurrentValue = DataHVACGlobals::DualSetPointWithDeadBand; // reset Tstat control schedule to dual thermostat control
+
+		// set up a back calculated load
+		// for the first few, TempIndZnLd() = 0.0
+		// LoadToHeatingSetPoint = ( TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) ) - TempIndZnLd( ZoneNum ) );
+		// LoadToCoolingSetPoint = ( TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) ) - TempIndZnLd( ZoneNum ) );
+		int SetPointTempSchedIndex = SetPointSingleHeating( TempControlledZone( HeatZoneNum ).ControlTypeSchIndx( TempControlledZone( HeatZoneNum ).SchIndx_SingleHeatSetPoint ) ).TempSchedIndex;
+		Schedule( SetPointTempSchedIndex ).CurrentValue = 20.0;
+		ZoneSysEnergyDemand( HeatZoneNum ).TotalOutputRequired = -1000.0; // cooling load
+		TempDepZnLd( HeatZoneNum ) = ZoneSysEnergyDemand( HeatZoneNum ).TotalOutputRequired / Schedule( SetPointTempSchedIndex ).CurrentValue;
+
+		CalcZoneAirTempSetPoints();
+		CalcPredictedSystemLoad( HeatZoneNum );
+
+		EXPECT_EQ( 20.0, TempZoneThermostatSetPoint( HeatZoneNum ) );
+		EXPECT_EQ( -1000.0, ZoneSysEnergyDemand( HeatZoneNum ).TotalOutputRequired ); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
+		EXPECT_TRUE( CurDeadBandOrSetback( HeatZoneNum ) ); // Tstat should show there is no load on a single heating SP
+
+		SetPointTempSchedIndex = SetPointSingleHeating( TempControlledZone( HeatZoneNum ).ControlTypeSchIndx( TempControlledZone( HeatZoneNum ).SchIndx_SingleHeatSetPoint ) ).TempSchedIndex;
+		Schedule( SetPointTempSchedIndex ).CurrentValue = 21.0;
+		ZoneSysEnergyDemand( HeatZoneNum ).TotalOutputRequired = 1000.0; // heating load
+		TempDepZnLd( HeatZoneNum ) = ZoneSysEnergyDemand( HeatZoneNum ).TotalOutputRequired / Schedule( SetPointTempSchedIndex ).CurrentValue;
+
+		SetPointTempSchedIndex = SetPointSingleCooling( TempControlledZone( CoolZoneNum ).ControlTypeSchIndx( TempControlledZone( CoolZoneNum ).SchIndx_SingleCoolSetPoint ) ).TempSchedIndex;
+		Schedule( SetPointTempSchedIndex ).CurrentValue = 23.0;
+		ZoneSysEnergyDemand( CoolZoneNum ).TotalOutputRequired = -3000.0; // cooling load
+		TempDepZnLd( CoolZoneNum ) = ZoneSysEnergyDemand( CoolZoneNum ).TotalOutputRequired / Schedule( SetPointTempSchedIndex ).CurrentValue;
+
+		SetPointTempSchedIndex = SetPointSingleHeatCool( TempControlledZone( CoolHeatZoneNum ).ControlTypeSchIndx( TempControlledZone( CoolHeatZoneNum ).SchIndx_SingleHeatCoolSetPoint ) ).TempSchedIndex;
+		Schedule( SetPointTempSchedIndex ).CurrentValue = 22.0;
+		ZoneSysEnergyDemand( CoolHeatZoneNum ).TotalOutputRequired = -4000.0; // cooling load
+		TempDepZnLd( CoolHeatZoneNum ) = ZoneSysEnergyDemand( CoolHeatZoneNum ).TotalOutputRequired / Schedule( SetPointTempSchedIndex ).CurrentValue;
+
+		SetPointTempSchedIndex = SetPointDualHeatCool( TempControlledZone( DualZoneNum ).ControlTypeSchIndx( TempControlledZone( DualZoneNum ).SchIndx_DualSetPointWDeadBand ) ).CoolTempSchedIndex;
+		Schedule( SetPointTempSchedIndex ).CurrentValue = 24.0;
+		SetPointTempSchedIndex = SetPointDualHeatCool( TempControlledZone( DualZoneNum ).ControlTypeSchIndx( TempControlledZone( DualZoneNum ).SchIndx_DualSetPointWDeadBand ) ).HeatTempSchedIndex;
+		Schedule( SetPointTempSchedIndex ).CurrentValue = 20.0;
+		ZoneSysEnergyDemand( DualZoneNum ).TotalOutputRequired = 2500.0; // heating load
+		TempDepZnLd( DualZoneNum ) = ZoneSysEnergyDemand( DualZoneNum ).TotalOutputRequired / Schedule( SetPointTempSchedIndex ).CurrentValue;
+
+		CalcZoneAirTempSetPoints();
+		CalcPredictedSystemLoad( HeatZoneNum );
+
+		EXPECT_EQ( 21.0, TempZoneThermostatSetPoint( HeatZoneNum ) );
+		EXPECT_FALSE( CurDeadBandOrSetback( HeatZoneNum ) ); // Tstat should show there is load on a single heating SP
+		EXPECT_EQ( 1000.0, ZoneSysEnergyDemand( HeatZoneNum ).TotalOutputRequired ); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
+
+		CalcPredictedSystemLoad( CoolZoneNum );
+
+		EXPECT_EQ( 23.0, TempZoneThermostatSetPoint( CoolZoneNum ) );
+		EXPECT_FALSE( CurDeadBandOrSetback( CoolZoneNum ) ); // Tstat should show there is load on a single cooling SP
+		EXPECT_EQ( -3000.0, ZoneSysEnergyDemand( CoolZoneNum ).TotalOutputRequired ); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
+
+		CalcPredictedSystemLoad( CoolHeatZoneNum );
+
+		ASSERT_EQ( 22.0, TempZoneThermostatSetPoint( CoolHeatZoneNum ) );
+		EXPECT_FALSE( CurDeadBandOrSetback( CoolHeatZoneNum ) ); // Tstat should show there is load on a single heating or cooling SP
+		EXPECT_EQ( -4000.0, ZoneSysEnergyDemand( CoolHeatZoneNum ).TotalOutputRequired ); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
+
+		CalcPredictedSystemLoad( DualZoneNum );
+
+		EXPECT_EQ( 20.0, TempZoneThermostatSetPoint( DualZoneNum ) );
+		EXPECT_FALSE( CurDeadBandOrSetback( DualZoneNum ) ); // Tstat should show there is load on a dual SP
+		EXPECT_EQ( 2500.0, ZoneSysEnergyDemand( DualZoneNum ).TotalOutputRequired ); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
+
+		SetPointTempSchedIndex = SetPointDualHeatCool( TempControlledZone( DualZoneNum ).ControlTypeSchIndx( TempControlledZone( DualZoneNum ).SchIndx_DualSetPointWDeadBand ) ).CoolTempSchedIndex;
+		Schedule( SetPointTempSchedIndex ).CurrentValue = 25.0;
+		ZoneSysEnergyDemand( DualZoneNum ).TotalOutputRequired = 1000.0;
+		// LoadToCoolingSetPoint = ( TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) ) - TempIndZnLd( ZoneNum ) );
+		TempDepZnLd( DualZoneNum ) = ZoneSysEnergyDemand( DualZoneNum ).TotalOutputRequired / Schedule( SetPointTempSchedIndex ).CurrentValue;
+		TempIndZnLd( DualZoneNum ) = 3500.0; // results in a cooling load
+
+		CalcZoneAirTempSetPoints();
+		CalcPredictedSystemLoad( DualZoneNum );
+
+		EXPECT_EQ( 25.0, TempZoneThermostatSetPoint( DualZoneNum ) );
+		EXPECT_FALSE( CurDeadBandOrSetback( DualZoneNum ) ); // Tstat should show there is load on a dual SP
+		EXPECT_EQ( -2500.0, ZoneSysEnergyDemand( DualZoneNum ).TotalOutputRequired ); // should show a cooling load
+
+		NumTempControlledZones = 0;
+		Zone.deallocate();
+		DeadBandOrSetback.deallocate();
+		CurDeadBandOrSetback.deallocate();
+		TempControlType.deallocate();
+		TempControlledZone.deallocate();
+		ZoneSysEnergyDemand.deallocate();
+		TempZoneThermostatSetPoint.deallocate();
+		ZoneSetPointLast.deallocate();
+		Setback.deallocate();
+		ZoneThermostatSetPointLo.deallocate();
+		ZoneThermostatSetPointHi.deallocate();
+		SNLoadPredictedRate.deallocate();
+		LoadCorrectionFactor.deallocate();
+		SNLoadPredictedHSPRate.deallocate();
+		SNLoadPredictedCSPRate.deallocate();
+		TempDepZnLd.deallocate();
+		TempIndZnLd.deallocate();
+		OccRoomTSetPointHeat.deallocate();
+		OccRoomTSetPointCool.deallocate();
+
+	}
