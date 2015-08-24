@@ -201,7 +201,7 @@ namespace MoistureBalanceEMPDManager {
 
 			if ( material.EMPDDeepDepth <= material.EMPDSurfaceDepth && material.EMPDDeepDepth != 0.0 ) {
 				ShowSevereError( cCurrentModuleObject + ": material=\"" + material.Name + "\"");
-				ShowContinueError( "Deep-layer penetration depth must zero or greater than the surface-layer penetration depth." );
+				ShowContinueError( "Deep-layer penetration depth must be zero or greater than the surface-layer penetration depth." );
 				ShowContinueError( "Setting deep-layer depth to zero and continuing." );
 				material.EMPDDeepDepth = 0.0;
 			}
@@ -442,7 +442,8 @@ namespace MoistureBalanceEMPDManager {
 		Real64 Rcoating;
 		Real64 RHsurface;
 		Real64 RHdeep;
-
+		Real64 EMPDdiffusivity2;
+				
 		if ( BeginEnvrnFlag && OneTimeFlag ) {
 			InitMoistureBalanceEMPD();
 			OneTimeFlag = false;
@@ -477,7 +478,7 @@ namespace MoistureBalanceEMPDManager {
 		MatNum = Construct( ConstrNum ).LayerPoint( Construct( ConstrNum ).TotLayers ); // Then find the material pointer
 
 		auto const & material( Material( MatNum ) );
-		if ( material.EMPDperm <= 0.0 ) {
+		if ( material.EMPDmu <= 0.0 ) {
 			moist_empd_new = PsyRhovFnTdbWPb( TempZone, ZoneAirHumRat( surface.Zone ), OutBaroPress );
 			return;
 		}
@@ -487,22 +488,23 @@ namespace MoistureBalanceEMPDManager {
 		RHaver = RVaver * 461.52 * ( Taver + KelvinConv ) * std::exp( -23.7093 + 4111.0 / ( Taver + 237.7 ));
 		PVsat = PsyPsatFnTemp( Taver, RoutineName );
 		Wsat = 0.622 * PVsat / ( OutBaroPress - PVsat );
-		
-		EMPDdiffusivity = material.EMPDperm * 461.52 * (Taver + KelvinConv);
+
+		EMPDdiffusivity = (2.0e-7 * pow(Taver + KelvinConv, 0.81) / OutBaroPress) / material.EMPDmu * 461.52 * (Taver+KelvinConv);
 		
 		AT = material.MoistACoeff * material.MoistBCoeff * pow( RHaver, material.MoistBCoeff - 1 ) + material.MoistCCoeff * material.MoistCCoeff * material.MoistDCoeff * pow( RHaver, material.MoistDCoeff - 1 );
 		
-		dEMPD = sqrt( material.EMPDperm * material.EMPDPeriodShort * PVsat / ( material.Density * AT * Pi ) );
-		dEMPDdeep = sqrt( material.EMPDperm * material.EMPDPeriodLong * PVsat / ( material.Density * AT * Pi ) );
-		
-		if (material.CoatingPerm <= 0.0) {
+		if (material.EMPDmuCoating <= 0.0) {
 			Rcoating = 0;
 		} else {
-			Rcoating = material.CoatingThickness / (material.CoatingPerm * 461.52 * (Taver + KelvinConv));
+			Rcoating = material.EMPDCoatingThickness * material.EMPDmuCoating * OutBaroPress / (2.0e-7 * pow(Taver + KelvinConv, 0.81) * 461.52 * (Taver + KelvinConv));
 		}
 		
-		hm_short = 1.0 / ( 0.5 * dEMPD / EMPDdiffusivity + 1.0 / h_mass_conv_in_fd + Rcoating );
-		hm_long = 2.0 * EMPDdiffusivity / ( dEMPDdeep + dEMPD );
+		hm_short = 1.0 / ( 0.5 * material.EMPDSurfaceDepth / EMPDdiffusivity + 1.0 / h_mass_conv_in_fd + Rcoating );
+		if (material.EMPDDeepDepth <= 0.0) {
+			hm_long = 0;
+		} else {
+		hm_long = 2.0 * EMPDdiffusivity / ( material.EMPDDeepDepth + material.EMPDSurfaceDepth );
+		}
 		RSurfaceLayer = 1.0 / hm_short - 1.0 / h_mass_conv_in_fd - Rcoating;
 
 		flux_surf = hm_short * ( rv_surface - rho_vapor_air_in ) + hm_long * ( rv_surface - rv_deep );
@@ -514,9 +516,12 @@ namespace MoistureBalanceEMPDManager {
 		RHDeepOld = PsyRhFnTdbRhov( Taver, rv_deep_old );
 		RHSurfOld = PsyRhFnTdbRhov( Taver, rv_surf_old );
 		
-		RHsurface = RHSurfOld + TimeStepZone * 3600.0 * ( - flux_surf / ( material.Density * dEMPD * AT ) );
-		RHdeep = RHDeepOld + TimeStepZone * 3600.0 * flux_deep / ( material.Density * dEMPDdeep * AT );
-		
+		RHsurface = RHSurfOld + TimeStepZone * 3600.0 * ( - flux_surf / ( material.Density * material.EMPDSurfaceDepth * AT ) );
+		if (material.EMPDDeepDepth <= 0.0) {
+			RHdeep = RHDeepOld;
+		} else {
+			RHdeep = RHDeepOld + TimeStepZone * 3600.0 * flux_deep / (material.Density * material.EMPDDeepDepth * AT);
+		}
 		rv_surface = PsyRhovFnTdbRh( Taver, RHsurface );
 		rv_deep = PsyRhovFnTdbRh( Taver, RHdeep );
 
@@ -686,19 +691,19 @@ namespace MoistureBalanceEMPDManager {
 		int MatNum;
 
 		// Formats
-		static gio::Fmt Format_700( "(' Construction EMPD, ',A,', ',A,', ',4(F8.4,', '),F8.4)" );
+		static gio::Fmt Format_700( "(' Construction EMPD, ',A,', ',F8.4,', ',4(F8.4,', '),F8.4,', ',F8.4,', ',F8.4,', ',F8.4)" );
 
 		ScanForReports( "Constructions", DoReport, "Constructions" );
 
 		if ( ! DoReport ) return;
 		//   Write Descriptions
-		gio::write( OutputFileInits, fmtA ) << "! <Construction EMPD>, Construction Name, Inside Layer Material Name, Penetration Depth {m}, a, b, c, d";
+		gio::write( OutputFileInits, fmtA ) << "! <Construction EMPD>, Construction Name, Inside Layer Material Name, Vapor Resistance Factor, a, b, c, d, Surface Penetration Depth {m}, Deep Penetration Depth {m}, Coating Vapor Resistance Factor, Coating Thickness {m}";
 
 		for ( ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
 			if ( Construct( ConstrNum ).TypeIsWindow ) continue;
 			MatNum = Construct( ConstrNum ).LayerPoint( Construct( ConstrNum ).TotLayers );
 			if ( Material( MatNum ).EMPDMaterialProps ) {
-				gio::write( OutputFileInits, Format_700 ) << Construct( ConstrNum ).Name << Material( MatNum ).Name << Material( MatNum ).EMPDperm << Material( MatNum ).MoistACoeff << Material( MatNum ).MoistBCoeff << Material( MatNum ).MoistCCoeff << Material( MatNum ).MoistDCoeff;
+				gio::write( OutputFileInits, Format_700 ) << Construct( ConstrNum ).Name << Material( MatNum ).Name << Material( MatNum ).EMPDmu << Material( MatNum ).MoistACoeff << Material( MatNum ).MoistBCoeff << Material( MatNum ).MoistCCoeff << Material( MatNum ).MoistDCoeff << Material( MatNum ).EMPDSurfaceDepth << Material( MatNum ).EMPDDeepDepth << Material ( MatNum ).EMPDmuCoating << Material ( MatNum ).EMPDCoatingThickness;
 			}
 		}
 
