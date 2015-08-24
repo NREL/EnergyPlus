@@ -6648,7 +6648,6 @@ WindowMaterial:Gap:EquivalentLayer,
        \key Sealed
        \key VentedIndoor
        \key VentedOutdoor
-       \reference GapVentTypeName
        \note Sealed means the gap is enclosed and gas tight, i.e., no venting to indoor or
        \note outdoor environment.  VentedIndoor means the gap is vented to indoor environment, and
        \note VentedOutdoor means the gap is vented to the outdoor environment. The gap types
@@ -19943,7 +19942,6 @@ ElectricEquipment:ITE:AirCooled,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference ITEEquipmentNames
   A2 , \field Zone Name
        \required-field
        \type object-list
@@ -23562,7 +23560,6 @@ AirflowNetwork:Distribution:Linkage,
       \required-field
       \type alpha
       \note Enter a unique name for this object.
-      \reference AirflowNetwork LinkageNames
  A2 , \field Node 1 Name
       \required-field
       \type object-list
@@ -32625,7 +32622,7 @@ ZoneHVAC:Dehumidifier:DX,
    A5,  \field Water Removal Curve Name
         \required-field
         \type object-list
-        \object-list BiQuadraticCurves
+        \object-list BiquadraticCurves
         \object-list BiVariateTables
         \note Name of a curve that describes the water removal rate (normalized to rated conditions)
         \note as a function of the dry-bulb temperature and relative humidity of the air
@@ -32637,7 +32634,7 @@ ZoneHVAC:Dehumidifier:DX,
    A6,  \field Energy Factor Curve Name
         \required-field
         \type object-list
-        \object-list BiQuadraticCurves
+        \object-list BiquadraticCurves
         \object-list BiVariateTables
         \note Name of a curve that describes the energy factor (normalized to rated conditions)
         \note as a function of the dry-bulb temperature and relative humidity of the air
@@ -41179,7 +41176,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Recoverable waste heat at full load and rated conditions
   A18, \field Speed 1 Waste Heat Function of Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
@@ -41335,7 +41332,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Recoverable waste heat at full load and rated conditions
   A24, \field Speed 2 Waste Heat Function of Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
@@ -41482,7 +41479,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Recoverable waste heat at full load and rated conditions
   A30, \field Speed 3 Waste Heat Function of Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
@@ -41629,7 +41626,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Recoverable waste heat at full load and rated conditions
   A36, \field Speed 4 Waste Heat Function of Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
@@ -43640,7 +43637,7 @@ Coil:Heating:DX:MultiSpeed,
   A15, \field Speed 1 Waste Heat Function of Temperature Curve Name
        \required-field
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
@@ -43740,7 +43737,7 @@ Coil:Heating:DX:MultiSpeed,
   A21, \field Speed 2 Waste Heat Function of Temperature Curve Name
        \required-field
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
@@ -43830,7 +43827,7 @@ Coil:Heating:DX:MultiSpeed,
        \note recoverable waste heat at full load and rated conditions
   A27, \field Speed 3 Waste Heat Function of Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
@@ -43920,7 +43917,7 @@ Coil:Heating:DX:MultiSpeed,
        \note recoverable waste heat at full load and rated conditions
   A33, \field Speed 4 Waste Heat Function of Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
@@ -52383,7 +52380,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note Cooling is disabled above this temperature.
   A3 , \field Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note Enter a curve name that represents full load cooling capacity ratio as a
        \note function of outdoor dry-bulb temperature and indoor wet-bulb temperature.
@@ -52401,7 +52398,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note leave this field blank.
   A5 , \field Cooling Capacity Ratio Modifier Function of High Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note This curve object is used to describe the high outdoor temperature
        \note performance curve used to describe cooling capacity ratio.
@@ -52410,7 +52407,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note If a single performance curve is used, leave this field blank.
   A6 , \field Cooling Energy Input Ratio Modifier Function of Low Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note Enter a curve name that represents cooling energy ratio as a function of
        \note outdoor dry-bulb temperature and indoor wet-bulb temperature
@@ -52426,7 +52423,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note leave this field blank.
   A8 , \field Cooling Energy Input Ratio Modifier Function of High Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note This curve object is used to describe the high outdoor temperature
        \note performance curve used to describe cooling energy ratio.
@@ -52500,7 +52497,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note Enter the maximum outdoor temperature allowed for heating operation.
   A13, \field Heating Capacity Ratio Modifier Function of Low Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note Enter a curve name that represents full load heating capacity ratio as a
        \note function of outdoor wet-bulb temperature and indoor dry-bulb temperature.
@@ -52522,7 +52519,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note If a single performance curve is used, leave this field blank.
   A15, \field Heating Capacity Ratio Modifier Function of High Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note This curve object is used to describe the high outdoor temperature
        \note performance curve used to describe heating capacity ratio.
@@ -52531,7 +52528,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note If a single performance curve is used, leave this field blank.
   A16, \field Heating Energy Input Ratio Modifier Function of Low Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note Enter a curve name that represents heating energy ratio as a function of
        \note outdoor wet-bulb temperature and indoor dry-bulb temperature
@@ -52551,7 +52548,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note If a single performance curve is used, leave this field blank.
   A18, \field Heating Energy Input Ratio Modifier Function of High Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note This curve object is used to allow separate performance curves for heating energy.
        \note If a single performance curve is used, leave this field blank.
@@ -52640,7 +52637,7 @@ AirConditioner:VariableRefrigerantFlow,
        \type object-list
        \object-list LinearCurves
        \object-list QuadraticCubicCurves
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list UniVariateTables
        \object-list BiVariateTables
        \note PCF = a0 + a1*L + a2*L^2 + a3*L^3 + a4*H
@@ -52663,7 +52660,7 @@ AirConditioner:VariableRefrigerantFlow,
        \type object-list
        \object-list LinearCurves
        \object-list QuadraticCubicCurves
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list UniVariateTables
        \object-list BiVariateTables
        \note PCF = a0 + a1*L + a2*L^2 + a3*L^3 + a4*H
@@ -52719,7 +52716,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note OnDemand to defrost only when necessary.
   A33, \field Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note A valid performance curve must be used if reversecycle defrost strategy is selected.
   N20, \field Defrost Time Period Fraction
@@ -52840,7 +52837,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note recovery mode will not operate.
   A40, \field Heat Recovery Cooling Capacity Modifier Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note Enter the name of a performance curve which represents
        \note the change in cooling capacity when heat recovery is active
@@ -52862,7 +52859,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note from cooling only mode to heat recovery mode
   A41, \field Heat Recovery Cooling Energy Modifier Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note Enter the name of a performance curve which represents
        \note the change in cooling energy when heat recovery is active
@@ -52884,7 +52881,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note from cooling only mode to heat recovery mode
   A42, \field Heat Recovery Heating Capacity Modifier Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note Enter the name of a performance curve which represents
        \note the change in heating capacity when heat recovery is active
@@ -52906,7 +52903,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note from cooling only mode to heat recovery mode
   A43, \field Heat Recovery Heating Energy Modifier Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note Enter the name of a performance curve which represents
        \note the change in heating electric consumption rate when heat recovery is active
@@ -68389,7 +68386,7 @@ ExternalInterface:FunctionalMockupUnitImport,
        \required-field
        \type alpha
        \retaincase
-       \reference FMUFilename
+       \reference FMUFileName
   N1 , \field FMU Timeout
        \note in milli-seconds
        \type real
@@ -73686,7 +73683,7 @@ Generator:MicroTurbine,
   A2, \field Electrical Power Function of Temperature and Elevation Curve Name
       \required-field
       \type object-list
-      \object-list BiQuadraticCurves
+      \object-list BiquadraticCurves
       \object-list BiVariateTables
       \note curve = a + b*T + c*T**2 + d*Elev + e*Elev**2 + f*T*Elev
       \note T = combustion air inlet temperature (C)
@@ -73774,7 +73771,7 @@ Generator:MicroTurbine,
       \minimum> 0.0
  A10, \field Heat Recovery Water Flow Rate Function of Temperature and Power Curve Name
       \type object-list
-      \object-list BiQuadraticCurves
+      \object-list BiquadraticCurves
       \object-list BiVariateTables
       \note curve = a + b*T + c*T**2 + d*Pnet + e*Pnet + f*T*Pnet
       \note T = heat recovery inlet water temperature
@@ -74673,12 +74670,12 @@ Generator:MicroCHP:NonNormalizedParameters,
       \note TriQuadratic
       \type object-list
       \object-list TriQuadraticCurves
-      \object-list MultivariateTables
+      \object-list MultiVariateTables
   A3, \field Thermal Efficiency Curve Name
       \note TriQuadratic
       \type object-list
       \object-list TriQuadraticCurves
-      \object-list MultivariateTables
+      \object-list MultiVariateTables
   A4, \field Cooling Water Flow Rate Mode
       \type choice
       \key PlantControl
