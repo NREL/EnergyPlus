@@ -1,4 +1,3 @@
-<head>
 <!--RemoveStart-->
 Simulation Models – Encyclopedic Reference
 ==========================================
