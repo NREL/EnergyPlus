@@ -55,7 +55,6 @@ namespace GlobalNames {
 	int CurMaxBoilers( 0 );
 	int CurMaxBaseboards( 0 );
 	int CurMaxCoils( 0 );
-	int curMaxAirDistUnits( 0 );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE GlobalNames:
 
@@ -80,7 +79,6 @@ namespace GlobalNames {
 		CurMaxBoilers = 0;
 		CurMaxBaseboards = 0;
 		CurMaxCoils = 0;
-		curMaxAirDistUnits = 0;
 		ChillerNames.deallocate();
 		BoilerNames.deallocate();
 		BaseboardNames.deallocate();
@@ -367,7 +365,7 @@ namespace GlobalNames {
 	)
 	{
 
-
+		ComponentNameData aDUData;
 		ErrorFound = false;
 		int Found = 0;
 
@@ -378,16 +376,10 @@ namespace GlobalNames {
 			ShowContinueError( "...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\"." );
 			ErrorFound = true;
 		} else {
-			if ( numAirDistUnits == 0 ) {
-				curMaxAirDistUnits = 4;
-				aDUNames.allocate( curMaxAirDistUnits );
-			} else if ( numAirDistUnits == curMaxAirDistUnits ) {
-				curMaxAirDistUnits += 4;
-				aDUNames.redimension( curMaxAirDistUnits );
-			}
 			++numAirDistUnits;
-			aDUNames( numAirDistUnits ).CompType = MakeUPPERCase( TypeToVerify );
-			aDUNames( numAirDistUnits ).CompName = NameToVerify;
+			aDUData.CompType = MakeUPPERCase( TypeToVerify );
+			aDUData.CompName = NameToVerify;
+			aDUNames.push_back( aDUData );
 		}
 
 	}
