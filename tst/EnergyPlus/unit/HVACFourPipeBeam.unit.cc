@@ -6,9 +6,22 @@
 #include "Fixtures/HVACFixture.hh"
 #include <AirTerminalUnit.hh>
 #include <HVACFourPipeBeam.hh>
-
-
-
+#include <DataHeatBalance.hh>
+#include <DataZoneEquipment.hh>
+#include <DataLoopNode.hh>
+#include <NodeInputManager.hh>
+#include <DataDefineEquip.hh>
+#include <SimulationManager.hh>
+#include <OutputReportPredefined.hh>
+#include <HeatBalanceManager.hh>
+#include <OutputProcessor.hh>
+#include <DataHVACGlobals.hh>
+#include <PlantManager.hh>
+#include <BranchInputManager.hh>
+#include <SizingManager.hh>
+#include <WeatherManager.hh>
+#include <PlantUtilities.hh>
+#include <DataZoneEnergyDemands.hh>
 
 namespace EnergyPlus {
 
