@@ -8613,7 +8613,7 @@ Label50: ;
 				PLF = 0.7;
 			}
 
-			DXCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;
+			DXCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio; 
 			DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction = CompCycRatio / PLF;
 			if ( DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction > 1.0 && std::abs( DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction - 1.0 ) > 0.001 ) {
 				if ( DXCoil( DXCoilNum ).ErrIndex3 == 0 ) {
@@ -14510,8 +14510,7 @@ Label50: ;
 		DXCoil( DXCoilNum ).PrintLowAmbMessage = false;
 		DXCoil( DXCoilNum ).PrintLowOutTempMessage = false;
 
-		if ( ( AirMassFlow > 0.0 ) && ( GetCurrentScheduleValue( DXCoil( DXCoilNum ).SchedPtr ) > 0.0 ) && ( CompOp == On ) ) { // for cycling fan, reset mass flow to full on rate
-
+		if ( ( AirMassFlow > 0.0 ) && ( GetCurrentScheduleValue( DXCoil( DXCoilNum ).SchedPtr ) > 0.0 ) && ( PartLoadRatio > 0.0 ) && ( CompOp == On ) ) { // for cycling fan, reset mass flow to full on rate
 			InletAirWetBulbC = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure );
 			AirVolumeFlowRate = AirMassFlow / PsyRhoAirFnPbTdbW( OutdoorPressure, InletAirDryBulbTemp, InletAirHumRat );
 			VolFlowperRatedTotCap = AirVolumeFlowRate / DXCoil( DXCoilNum ).RatedTotCap( Mode );
@@ -14867,9 +14866,9 @@ Label50: ;
             
             // Modify total heating capacity based on defrost heating capacity multiplier
             // MaxHeatCap passed from parent object VRF Condenser and is used to limit capacity of TU's to that available from condenser
-            if( present( MaxHeatCap ) ) {
-            	TotCap = min( MaxHeatCap, TotCap );
-            }
+            // if( present( MaxHeatCap ) ) {
+            // 	TotCap = min( MaxHeatCap, TotCap );
+            // }
             
             PartHeatRatio = QZnHeating / TotCap;
             
