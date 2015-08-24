@@ -2,7 +2,7 @@
 #define ChillerGasAbsorption_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -23,7 +23,7 @@ namespace ChillerGasAbsorption {
 
 	// This type holds the output from the algorithm i.e., the Report Variables
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 
@@ -251,8 +251,8 @@ namespace ChillerGasAbsorption {
 	};
 
 	// Object Data
-	extern FArray1D< GasAbsorberSpecs > GasAbsorber; // dimension to number of machines
-	extern FArray1D< ReportVars > GasAbsorberReport;
+	extern Array1D< GasAbsorberSpecs > GasAbsorber; // dimension to number of machines
+	extern Array1D< ReportVars > GasAbsorberReport;
 
 	// Functions
 
@@ -358,7 +358,7 @@ namespace ChillerGasAbsorption {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -2,7 +2,7 @@
 #define TARCOGDeflection_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
+#include <ObjexxFCL/Array1A.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -22,14 +22,14 @@ namespace TARCOGDeflection {
 		Real64 const Pa,
 		Real64 const Pini,
 		Real64 const Tini,
-		FArray1A< Real64 > const PaneThickness,
-		FArray1A< Real64 > const NonDeflectedGapWidth,
-		FArray1A< Real64 > DeflectedGapWidthMax,
-		FArray1A< Real64 > DeflectedGapWidthMean,
-		FArray1A< Real64 > const PanelTemps,
-		FArray1A< Real64 > const YoungsMod,
-		FArray1A< Real64 > const PoissonsRat,
-		FArray1A< Real64 > LayerDeflection,
+		Array1A< Real64 > const PaneThickness,
+		Array1A< Real64 > const NonDeflectedGapWidth,
+		Array1A< Real64 > DeflectedGapWidthMax,
+		Array1A< Real64 > DeflectedGapWidthMean,
+		Array1A< Real64 > const PanelTemps,
+		Array1A< Real64 > const YoungsMod,
+		Array1A< Real64 > const PoissonsRat,
+		Array1A< Real64 > LayerDeflection,
 		int & nperr,
 		std::string & ErrorMessage
 	);
@@ -42,12 +42,12 @@ namespace TARCOGDeflection {
 		Real64 const Pa,
 		Real64 const Pini,
 		Real64 const Tini,
-		FArray1A< Real64 > const NonDeflectedGapWidth,
-		FArray1A< Real64 > DeflectedGapWidthMax,
-		FArray1A< Real64 > DeflectedGapWidthMean,
-		FArray1A< Real64 > const PanelTemps,
-		FArray1A< Real64 > DCoeff,
-		FArray1A< Real64 > LayerDeflection,
+		Array1A< Real64 > const NonDeflectedGapWidth,
+		Array1A< Real64 > DeflectedGapWidthMax,
+		Array1A< Real64 > DeflectedGapWidthMean,
+		Array1A< Real64 > const PanelTemps,
+		Array1A< Real64 > DCoeff,
+		Array1A< Real64 > LayerDeflection,
 		int & nperr,
 		std::string & ErrorMessage
 	);
@@ -57,16 +57,16 @@ namespace TARCOGDeflection {
 		int const nlayer,
 		Real64 const W,
 		Real64 const H,
-		FArray1A< Real64 > DCoeff,
-		FArray1A< Real64 > const NonDeflectedGapWidth,
-		FArray1A< Real64 > const DeflectedGapWidthMax,
-		FArray1A< Real64 > DeflectedGapWidthMean,
-		FArray1A< Real64 > LayerDeflection
+		Array1A< Real64 > DCoeff,
+		Array1A< Real64 > const NonDeflectedGapWidth,
+		Array1A< Real64 > const DeflectedGapWidthMax,
+		Array1A< Real64 > DeflectedGapWidthMean,
+		Array1A< Real64 > LayerDeflection
 	);
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

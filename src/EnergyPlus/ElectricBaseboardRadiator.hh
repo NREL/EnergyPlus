@@ -2,7 +2,7 @@
 #define ElectricBaseboardRadiator_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -23,15 +23,15 @@ namespace ElectricBaseboardRadiator {
 
 	//MODULE VARIABLE DECLARATIONS:
 	extern int NumElecBaseboards;
-	extern FArray1D< Real64 > QBBElecRadSource; // Need to keep the last value in case we are still iterating
-	extern FArray1D< Real64 > QBBElecRadSrcAvg; // Need to keep the last value in case we are still iterating
-	extern FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+	extern Array1D< Real64 > QBBElecRadSource; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > QBBElecRadSrcAvg; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
 	// Record keeping variables used to calculate QBBRadSrcAvg locally
-	extern FArray1D< Real64 > LastQBBElecRadSrc; // Need to keep the last value in case we are still iterating
-	extern FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	extern FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
-	extern FArray1D_bool MySizeFlag;
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D< Real64 > LastQBBElecRadSrc; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	extern Array1D_bool MySizeFlag;
+	extern Array1D_bool CheckEquipName;
 	//SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
 	// Types
@@ -42,8 +42,8 @@ namespace ElectricBaseboardRadiator {
 		std::string EquipName;
 		int EquipType;
 		std::string Schedule;
-		FArray1D_string SurfaceName;
-		FArray1D_int SurfacePtr;
+		Array1D_string SurfaceName;
+		Array1D_int SurfacePtr;
 		int ZonePtr;
 		int SchedPtr;
 		int TotSurfToDistrib;
@@ -65,7 +65,7 @@ namespace ElectricBaseboardRadiator {
 		Real64 Energy;
 		Real64 ConvEnergy;
 		Real64 RadEnergy;
-		FArray1D< Real64 > FracDistribToSurf;
+		Array1D< Real64 > FracDistribToSurf;
 		int HeatingCapMethod; // - Method for electric baseboard heating capacity scalable sizing calculation
 		Real64 ScaledHeatingCapacity; // - electric baseboard scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
 
@@ -102,8 +102,8 @@ namespace ElectricBaseboardRadiator {
 			std::string const & EquipName,
 			int const EquipType,
 			std::string const & Schedule,
-			FArray1_string const & SurfaceName,
-			FArray1_int const & SurfacePtr,
+			Array1_string const & SurfaceName,
+			Array1_int const & SurfacePtr,
 			int const ZonePtr,
 			int const SchedPtr,
 			int const TotSurfToDistrib,
@@ -125,7 +125,7 @@ namespace ElectricBaseboardRadiator {
 			Real64 const Energy,
 			Real64 const ConvEnergy,
 			Real64 const RadEnergy,
-			FArray1< Real64 > const & FracDistribToSurf,
+			Array1< Real64 > const & FracDistribToSurf,
 			int const HeatingCapMethod,
 			Real64 const ScaledHeatingCapacity
 		) :
@@ -165,7 +165,7 @@ namespace ElectricBaseboardRadiator {
 	struct ElecBaseboardNumericFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		ElecBaseboardNumericFieldData()
@@ -173,15 +173,15 @@ namespace ElectricBaseboardRadiator {
 
 		// Member Constructor
 		ElecBaseboardNumericFieldData(
-			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
 			) :
 			FieldNames(FieldNames)
 		{}
 	};
 
 	// Object Data
-	extern FArray1D< ElecBaseboardParams > ElecBaseboard;
-	extern FArray1D< ElecBaseboardNumericFieldData > ElecBaseboardNumericFields;
+	extern Array1D< ElecBaseboardParams > ElecBaseboard;
+	extern Array1D< ElecBaseboardNumericFieldData > ElecBaseboardNumericFields;
 
 	// Functions
 
@@ -231,7 +231,7 @@ namespace ElectricBaseboardRadiator {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

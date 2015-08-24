@@ -2,7 +2,7 @@
 #define DataHVACControllers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -18,13 +18,13 @@ namespace DataHVACControllers {
 	// MODULE PARAMETER DEFINITIONS:
 
 	extern int const ControllerSimple_Type;
-	extern FArray1D_string const ControllerTypes;
+	extern Array1D_string const ControllerTypes;
 
 	// Controller action used in modules HVACControllers and ZoneControllers
 	extern int const iNoAction;
 	extern int const iReverseAction;
 	extern int const iNormalAction;
-	extern FArray1D_string const ActionTypes;
+	extern Array1D_string const ActionTypes;
 
 	// Controller mode used in modules HVACControllers and ZoneControllers
 	extern int const iModeWrongAction; // Controller error. E.g., bad action
@@ -37,7 +37,7 @@ namespace DataHVACControllers {
 
 	extern int const iFirstMode; // First operating mode in range
 	extern int const iLastMode; // Last operating mode in range
-	extern FArray1D_string const ControllerModeTypes;
+	extern Array1D_string const ControllerModeTypes;
 
 	// Controller operation used in module HVACControllers
 	extern int const iControllerOpColdStart; // Reset for cold start

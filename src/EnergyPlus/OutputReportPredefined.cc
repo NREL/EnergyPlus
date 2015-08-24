@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
@@ -651,12 +651,12 @@ namespace OutputReportPredefined {
 	Real64 TotalTimeNotSimpleASH55EitherForABUPS( 0.0 );
 
 	// Object Data
-	FArray1D< reportNameType > reportName;
-	FArray1D< SubTableType > subTable;
-	FArray1D< ColumnTagType > columnTag;
-	FArray1D< TableEntryType > tableEntry;
-	FArray1D< CompSizeTableEntryType > CompSizeTableEntry;
-	FArray1D< ShadowRelateType > ShadowRelate;
+	Array1D< reportNameType > reportName;
+	Array1D< SubTableType > subTable;
+	Array1D< ColumnTagType > columnTag;
+	Array1D< TableEntryType > tableEntry;
+	Array1D< CompSizeTableEntryType > CompSizeTableEntry;
+	Array1D< ShadowRelateType > ShadowRelate;
 
 	// Functions
 
@@ -956,7 +956,7 @@ namespace OutputReportPredefined {
 
 		pdrSizing = newPreDefReport( "HVACSizingSummary", "Size", "HVAC Sizing Summary" );
 
-		pdstZoneClSize = newPreDefSubTable( pdrSizing, "Zone Cooling" );
+		pdstZoneClSize = newPreDefSubTable( pdrSizing, "Zone Sensible Cooling" );
 
 		pdchZnClCalcDesLd = newPreDefColumn( pdstZoneClSize, "Calculated Design Load [W]" );
 		pdchZnClUserDesLd = newPreDefColumn( pdstZoneClSize, "User Design Load [W]" );
@@ -970,8 +970,9 @@ namespace OutputReportPredefined {
 		pdchZnClPkIndHum = newPreDefColumn( pdstZoneClSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
 		pdchZnClPkOATemp = newPreDefColumn( pdstZoneClSize, "Outdoor Temperature at Peak Load [C]" );
 		pdchZnClPkOAHum = newPreDefColumn( pdstZoneClSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
+		addFootNoteSubTable( pdstZoneClSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads." );
 
-		pdstZoneHtSize = newPreDefSubTable( pdrSizing, "Zone Heating" );
+		pdstZoneHtSize = newPreDefSubTable( pdrSizing, "Zone Sensible Heating" );
 
 		pdchZnHtCalcDesLd = newPreDefColumn( pdstZoneHtSize, "Calculated Design Load [W]" );
 		pdchZnHtUserDesLd = newPreDefColumn( pdstZoneHtSize, "User Design Load [W]" );
@@ -985,6 +986,7 @@ namespace OutputReportPredefined {
 		pdchZnHtPkIndHum = newPreDefColumn( pdstZoneHtSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
 		pdchZnHtPkOATemp = newPreDefColumn( pdstZoneHtSize, "Outdoor Temperature at Peak Load [C]" );
 		pdchZnHtPkOAHum = newPreDefColumn( pdstZoneHtSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
+		addFootNoteSubTable( pdstZoneHtSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads." );
 
 		pdstSystemSize = newPreDefSubTable( pdrSizing, "System Design Air Flow Rates" );
 
@@ -993,7 +995,7 @@ namespace OutputReportPredefined {
 		pdchSysSizCalcHtAir = newPreDefColumn( pdstSystemSize, "Calculated heating [m3/s]" );
 		pdchSysSizUserHtAir = newPreDefColumn( pdstSystemSize, "User heating [m3/s]" );
 
-		pdstPlantSize = newPreDefSubTable( pdrSizing, "Plant Loop Coincident Design Fluid Flow Rate Adjustments");
+		pdstPlantSize = newPreDefSubTable( pdrSizing, "Plant Loop Coincident Design Fluid Flow Rate Adjustments" );
 //		pdchPlantSizPass = newPreDefColumn( pdstPlantSize, "Sizing Pass" );
 		pdchPlantSizPrevVdot = newPreDefColumn( pdstPlantSize, "Previous Design Volume Flow Rate [m3/s]" );
 		pdchPlantSizMeasVdot = newPreDefColumn( pdstPlantSize, "Algorithm Volume Flow Rate [m3/s]" );
@@ -1993,7 +1995,7 @@ namespace OutputReportPredefined {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -4,7 +4,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -121,7 +121,7 @@ namespace HeatBalFiniteDiffManager {
 
 	int const CrankNicholsonSecondOrder( 1 ); // original CondFD scheme.  semi implicit, second order in time
 	int const FullyImplicitFirstOrder( 2 ); // fully implicit scheme, first order in time.
-	FArray1D_string const cCondFDSchemeType( 2, { "CrankNicholsonSecondOrder", "FullyImplicitFirstOrder" } );
+	Array1D_string const cCondFDSchemeType( 2, { "CrankNicholsonSecondOrder", "FullyImplicitFirstOrder" } );
 
 	Real64 const TempInitValue( 23.0 ); // Initialization value for Temperature
 	Real64 const RhovInitValue( 0.0115 ); // Initialization value for Rhov
@@ -139,14 +139,14 @@ namespace HeatBalFiniteDiffManager {
 	//REAL(r64) :: Tdryin   =0.0d0
 	//REAL(r64) :: RHOut    =0.0d0
 	//REAL(r64) :: RHIn     =0.0d0
-	FArray1D< Real64 > SigmaR; // Total Resistance of construction layers
-	FArray1D< Real64 > SigmaC; // Total Capacitance of construction layers
+	Array1D< Real64 > SigmaR; // Total Resistance of construction layers
+	Array1D< Real64 > SigmaC; // Total Capacitance of construction layers
 
 	//REAL(r64), ALLOCATABLE, DIMENSION(:)   :: WSurfIn         !Humidity Ratio of the inside surface for reporting
 	//REAL(r64), ALLOCATABLE, DIMENSION(:)   :: QMassInFlux     !MassFlux on Surface for reporting
 	//REAL(r64), ALLOCATABLE, DIMENSION(:)   :: QMassOutFlux    !MassFlux on Surface for reporting
-	FArray1D< Real64 > QHeatInFlux; // HeatFlux on Surface for reporting
-	FArray1D< Real64 > QHeatOutFlux; // HeatFlux on Surface for reporting
+	Array1D< Real64 > QHeatInFlux; // HeatFlux on Surface for reporting
+	Array1D< Real64 > QHeatOutFlux; // HeatFlux on Surface for reporting
 	//REAL(r64), ALLOCATABLE, DIMENSION(:)   :: QFluxZoneToInSurf !sum of Heat flows at the surface to air interface,
 	//                                 ! zone-side boundary conditions W/m2 before CR 8280 was not reported, but was calculated.
 	//REAL(r64), ALLOCATABLE, DIMENSION(:)   :: QFluxOutsideToOutSurf !sum of Heat flows at the surface to air interface, Out-side boundary conditions W/m2
@@ -177,9 +177,9 @@ namespace HeatBalFiniteDiffManager {
 	// Update Data Routine
 
 	// Object Data
-	FArray1D< ConstructionDataFD > ConstructFD;
-	FArray1D< SurfaceDataFD > SurfaceFD;
-	FArray1D< MaterialDataFD > MaterialFD;
+	Array1D< ConstructionDataFD > ConstructFD;
+	Array1D< SurfaceDataFD > SurfaceFD;
+	Array1D< MaterialDataFD > MaterialFD;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -287,17 +287,14 @@ namespace HeatBalFiniteDiffManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string MaterialNames( 3 ); // Number of Material Alpha names defined
-		FArray1D_string ConstructionName( 3 ); // Name of Construction with CondFDsimplified
+		Array1D_string MaterialNames( 3 ); // Number of Material Alpha names defined
+		Array1D_string ConstructionName( 3 ); // Name of Construction with CondFDsimplified
 		int MaterNum; // Counter to keep track of the material number
 		int MaterialNumAlpha; // Number of material alpha names being passed
 		int MaterialNumProp; // Number of material properties being passed
-		FArray1D< Real64 > MaterialProps( 40 ); // Temporary array to transfer material properties
+		Array1D< Real64 > MaterialProps( 40 ); // Temporary array to transfer material properties
 		static bool ErrorsFound( false ); // If errors detected in input
 		//  INTEGER :: CondFDMat                ! Number of variable property CondFD materials in input
-		int ConstructNumber; // Cconstruction with CondHBsimple to be overridden with CondHBdetailed
-
-		int NumConstructionAlpha;
 		int Loop;
 		int NumAlphas;
 		int NumNumbers;
@@ -357,7 +354,7 @@ namespace HeatBalFiniteDiffManager {
 				GetObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				//Load the material derived type from the input data.
-				MaterNum = FindItemInList( MaterialNames( 1 ), Material.Name(), TotMaterials );
+				MaterNum = FindItemInList( MaterialNames( 1 ), Material );
 				if ( MaterNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + " entered=" + MaterialNames( 1 ) + ", must match to a valid Material name." );
 					ErrorsFound = true;
@@ -378,43 +375,43 @@ namespace HeatBalFiniteDiffManager {
 					ShowContinueError( "...expected " + RoundSigDigits( MaterialFD( MaterNum ).numTempEnth ) + " pairs, but only entered " + RoundSigDigits( MaterialNumProp - 1 ) + " numbers." );
 					ErrorsFound = true;
 				}
-				MaterialFD( MaterNum ).TempEnth.dimension( MaterialFD( MaterNum ).numTempEnth, 2, 0.0 );
+				MaterialFD( MaterNum ).TempEnth.dimension( 2, MaterialFD( MaterNum ).numTempEnth, 0.0 );
 				propNum = 2;
 				// Temperature first
 				for ( int pcount = 1, pcount_end = MaterialFD( MaterNum ).numTempEnth; pcount <= pcount_end; ++pcount ) {
-					MaterialFD( MaterNum ).TempEnth( pcount, 1 ) = MaterialProps( propNum );
+					MaterialFD( MaterNum ).TempEnth( 1, pcount ) = MaterialProps( propNum );
 					propNum += 2;
 				}
 				propNum = 3;
 				// Then Enthalpy
 				for ( int pcount = 1, pcount_end = MaterialFD( MaterNum ).numTempEnth; pcount <= pcount_end; ++pcount ) {
-					MaterialFD( MaterNum ).TempEnth( pcount, 2 ) = MaterialProps( propNum );
+					MaterialFD( MaterNum ).TempEnth( 2, pcount ) = MaterialProps( propNum );
 					propNum += 2;
 				}
 				nonInc = false;
 				inegptr = 0;
 				for ( int pcount = 1, pcount_end = MaterialFD( MaterNum ).numTempEnth - 1; pcount <= pcount_end; ++pcount ) {
-					if ( MaterialFD( MaterNum ).TempEnth( pcount, 1 ) < MaterialFD( MaterNum ).TempEnth( pcount + 1, 1 ) ) continue;
+					if ( MaterialFD( MaterNum ).TempEnth( 1, pcount ) < MaterialFD( MaterNum ).TempEnth( 1, pcount + 1 ) ) continue;
 					nonInc = true;
 					inegptr = pcount + 1;
 					break;
 				}
 				if ( nonInc ) {
 					ShowSevereError( "GetCondFDInput: " + cCurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", non increasing Temperatures. Temperatures must be strictly increasing." );
-					ShowContinueError( "...occurs first at item=[" + RoundSigDigits( inegptr ) + "], value=[" + RoundSigDigits( MaterialFD( MaterNum ).TempEnth( inegptr, 1 ), 2 ) + "]." );
+					ShowContinueError( "...occurs first at item=[" + RoundSigDigits( inegptr ) + "], value=[" + RoundSigDigits( MaterialFD( MaterNum ).TempEnth( 1, inegptr ), 2 ) + "]." );
 					ErrorsFound = true;
 				}
 				nonInc = false;
 				inegptr = 0;
 				for ( int pcount = 1, pcount_end = MaterialFD( MaterNum ).numTempEnth - 1; pcount <= pcount_end; ++pcount ) {
-					if ( MaterialFD( MaterNum ).TempEnth( pcount, 2 ) <= MaterialFD( MaterNum ).TempEnth( pcount + 1, 2 ) ) continue;
+					if ( MaterialFD( MaterNum ).TempEnth( 2, pcount ) <= MaterialFD( MaterNum ).TempEnth( 2, pcount + 1 ) ) continue;
 					nonInc = true;
 					inegptr = pcount + 1;
 					break;
 				}
 				if ( nonInc ) {
 					ShowSevereError( "GetCondFDInput: " + cCurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", non increasing Enthalpy." );
-					ShowContinueError( "...occurs first at item=[" + RoundSigDigits( inegptr ) + "], value=[" + RoundSigDigits( MaterialFD( MaterNum ).TempEnth( inegptr, 2 ), 2 ) + "]." );
+					ShowContinueError( "...occurs first at item=[" + RoundSigDigits( inegptr ) + "], value=[" + RoundSigDigits( MaterialFD( MaterNum ).TempEnth( 2, inegptr ), 2 ) + "]." );
 					ShowContinueError( "...These values may be Cp (Specific Heat) rather than Enthalpy.  Please correct." );
 					ErrorsFound = true;
 				}
@@ -431,7 +428,7 @@ namespace HeatBalFiniteDiffManager {
 				GetObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				//Load the material derived type from the input data.
-				MaterNum = FindItemInList( MaterialNames( 1 ), Material.Name(), TotMaterials );
+				MaterNum = FindItemInList( MaterialNames( 1 ), Material );
 				if ( MaterNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + " entered=" + MaterialNames( 1 ) + ", must match to a valid Material name." );
 					ErrorsFound = true;
@@ -451,30 +448,30 @@ namespace HeatBalFiniteDiffManager {
 					ShowContinueError( "...expected " + RoundSigDigits( MaterialFD( MaterNum ).numTempCond ) + " pairs, but only entered " + RoundSigDigits( MaterialNumProp ) + " numbers." );
 					ErrorsFound = true;
 				}
-				MaterialFD( MaterNum ).TempCond.dimension( MaterialFD( MaterNum ).numTempCond, 2, 0.0 );
+				MaterialFD( MaterNum ).TempCond.dimension( 2, MaterialFD( MaterNum ).numTempCond, 0.0 );
 				propNum = 1;
 				// Temperature first
 				for ( int pcount = 1, pcount_end = MaterialFD( MaterNum ).numTempCond; pcount <= pcount_end; ++pcount ) {
-					MaterialFD( MaterNum ).TempCond( pcount, 1 ) = MaterialProps( propNum );
+					MaterialFD( MaterNum ).TempCond( 1, pcount ) = MaterialProps( propNum );
 					propNum += 2;
 				}
 				propNum = 2;
 				// Then Conductivity
 				for ( int pcount = 1, pcount_end = MaterialFD( MaterNum ).numTempCond; pcount <= pcount_end; ++pcount ) {
-					MaterialFD( MaterNum ).TempCond( pcount, 2 ) = MaterialProps( propNum );
+					MaterialFD( MaterNum ).TempCond( 2, pcount ) = MaterialProps( propNum );
 					propNum += 2;
 				}
 				nonInc = false;
 				inegptr = 0;
 				for ( int pcount = 1, pcount_end = MaterialFD( MaterNum ).numTempCond - 1; pcount <= pcount_end; ++pcount ) {
-					if ( MaterialFD( MaterNum ).TempCond( pcount, 1 ) < MaterialFD( MaterNum ).TempCond( pcount + 1, 1 ) ) continue;
+					if ( MaterialFD( MaterNum ).TempCond( 1, pcount ) < MaterialFD( MaterNum ).TempCond( 1, pcount + 1 ) ) continue;
 					nonInc = true;
 					inegptr = pcount + 1;
 					break;
 				}
 				if ( nonInc ) {
 					ShowSevereError( "GetCondFDInput: " + cCurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", non increasing Temperatures. Temperatures must be strictly increasing." );
-					ShowContinueError( "...occurs first at item=[" + RoundSigDigits( inegptr ) + "], value=[" + RoundSigDigits( MaterialFD( MaterNum ).TempCond( inegptr, 1 ), 2 ) + "]." );
+					ShowContinueError( "...occurs first at item=[" + RoundSigDigits( inegptr ) + "], value=[" + RoundSigDigits( MaterialFD( MaterNum ).TempCond( 1, inegptr ), 2 ) + "]." );
 					ErrorsFound = true;
 				}
 			}
@@ -483,11 +480,11 @@ namespace HeatBalFiniteDiffManager {
 		for ( MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum ) {
 			if ( MaterialFD( MaterNum ).numTempEnth == 0 ) {
 				MaterialFD( MaterNum ).numTempEnth = 3;
-				MaterialFD( MaterNum ).TempEnth.dimension( 3, 2, -100.0 );
+				MaterialFD( MaterNum ).TempEnth.dimension( 2, 3, -100.0 );
 			}
 			if ( MaterialFD( MaterNum ).numTempCond == 0 ) {
 				MaterialFD( MaterNum ).numTempCond = 3;
-				MaterialFD( MaterNum ).TempCond.dimension( 3, 2, -100.0 );
+				MaterialFD( MaterNum ).TempCond.dimension( 2, 3, -100.0 );
 			}
 		}
 
@@ -992,8 +989,8 @@ namespace HeatBalFiniteDiffManager {
 
 	void
 	relax_array(
-		FArray1< Real64 > & a, // Array to relax
-		FArray1< Real64 > const & b, // Array to relax towards
+		Array1< Real64 > & a, // Array to relax
+		Array1< Real64 > const & b, // Array to relax towards
 		Real64 const r // Relaxation factor [0-1]
 	)
 	{
@@ -1007,8 +1004,8 @@ namespace HeatBalFiniteDiffManager {
 
 	Real64
 	sum_array_diff(
-		FArray1< Real64 > const & a,
-		FArray1< Real64 > const & b
+		Array1< Real64 > const & a,
+		Array1< Real64 > const & b
 	)
 	{
 		assert( equal_dimensions( a, b ) );
@@ -1085,18 +1082,14 @@ namespace HeatBalFiniteDiffManager {
 		// Aliases
 		auto & surfaceFD( SurfaceFD( Surf ) );
 		auto const & T( surfaceFD.T );
-		auto & TOld( surfaceFD.TOld );
 		auto & TT( surfaceFD.TT );
 		auto const & Rhov( surfaceFD.Rhov );
-		auto & RhovOld( surfaceFD.RhovOld );
 		auto & RhoT( surfaceFD.RhoT );
 		auto const & TD( surfaceFD.TD );
 		auto & TDT( surfaceFD.TDT );
 		auto & TDTLast( surfaceFD.TDTLast );
-		auto & TDOld( surfaceFD.TDOld );
 		auto & TDreport( surfaceFD.TDreport );
 		auto & RH( surfaceFD.RH );
-		auto & RHreport( surfaceFD.RHreport );
 		auto & EnthOld( surfaceFD.EnthOld );
 		auto & EnthNew( surfaceFD.EnthNew );
 		auto & EnthLast( surfaceFD.EnthLast );
@@ -1329,7 +1322,7 @@ namespace HeatBalFiniteDiffManager {
 
 	Real64
 	terpld(
-		FArray2< Real64 > const & a,
+		Array2< Real64 > const & a,
 		Real64 const x1,
 		int const nind,
 		int const ndep
@@ -1343,8 +1336,8 @@ namespace HeatBalFiniteDiffManager {
 
 		//inputs:
 		//  a = two dimensional array
-		//  nind=column containing independent variable
-		//  ndep=column containing the dependent variable
+		//  nind=row containing independent variable
+		//  ndep=row containing the dependent variable
 		//   x1 = specific independent variable value for which
 		//      interpolated output is wanted
 		//outputs:
@@ -1353,32 +1346,32 @@ namespace HeatBalFiniteDiffManager {
 		//    routine returns first or last dependent variable
 		//      for out of range x1.
 
-		int const first( a.l1() );
+		int const first( a.l2() );
 
 		assert( a.size() > 0u );
-		FArray2< Real64 >::size_type l( 1 );
+		Array2< Real64 >::size_type l( 1 );
 		Real64 r( a[ 0 ] );
 		int last( first );
-		for ( int i1 = first + 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
+		for ( int i1 = first + 1, e1 = a.u2(); i1 <= e1; ++i1, ++l ) {
 			if ( a[ l ] > r ) {
 				r = a[ l ];
 				last = i1;
 			}
 		}
 
-		FArray2< Real64 >::size_type lind( a.index( 0, nind ) );
-		FArray2< Real64 >::size_type ldep( a.index( 0, ndep ) );
-		if ( ( a.size1() == 1u ) || ( x1 <= a[ lind + first ] ) ) { // [ lind + first ] == ( first, nind )
-			return a[ ldep + first ]; // [ ldep + first ] == ( first, ndep )
-		} else if ( x1 >= a[ lind + last ] ) { // [ lind + last ] == ( last, nind )
-			return a[ ldep + last ]; // [ ldep + last ] == ( last, ndep )
+		Array2< Real64 >::size_type lind( a.index( nind, 0 ) );
+		Array2< Real64 >::size_type ldep( a.index( ndep, 0 ) );
+		if ( ( a.size2() == 1u ) || ( x1 <= a[ lind + first ] ) ) { // [ lind + first ] == ( nind, first )
+			return a[ ldep + first ]; // [ ldep + first ] == ( ndep, first )
+		} else if ( x1 >= a[ lind + last ] ) { // [ lind + last ] == ( nind, last )
+			return a[ ldep + last ]; // [ ldep + last ] == ( ndep, last )
 		} else {
 			int i;
 			int i1( first );
 			int i2( last );
 			while ( ( i2 - i1 ) > 1 ) {
 				i = i1 + ( ( i2 - i1 ) >> 1 ); //Tuned bit shift replaces / 2
-				if ( x1 < a[ lind + i ] ) { // [ lind + i ] == ( i, nind )
+				if ( x1 < a[ lind + i ] ) { // [ lind + i ] == ( nind, i )
 					i2 = i;
 				} else {
 					i1 = i;
@@ -1387,8 +1380,8 @@ namespace HeatBalFiniteDiffManager {
 			i = i2;
 			lind += i;
 			ldep += i;
-			Real64 const fract( ( x1 - a[ lind - 1 ] ) / ( a[ lind ] - a[ lind - 1 ] ) ); // [ lind ] == ( i, nind ), [ lind - 1 ] == ( i - 1, nind )
-			return a[ ldep - 1 ] + fract * ( a[ ldep ] - a[ ldep - 1 ] ); // [ ldep ] == ( i, ndep ), [ ldep - 1 ] == ( i - 1, ndep )
+			Real64 const fract( ( x1 - a[ lind - 1 ] ) / ( a[ lind ] - a[ lind - 1 ] ) ); // [ lind ] == ( nind, i ), [ lind - 1 ] == ( nind, i - 1 )
+			return a[ ldep - 1 ] + fract * ( a[ ldep ] - a[ ldep - 1 ] ); // [ ldep ] == ( ndep, i ), [ ldep - 1 ] == ( ndep, i - 1 )
 		}
 	}
 
@@ -1401,15 +1394,15 @@ namespace HeatBalFiniteDiffManager {
 		int const i, // Node Index
 		int const Lay, // Layer Number for Construction
 		int const Surf, // Surface number
-		FArray1< Real64 > const & T, // Old node Temperature in MFD finite difference solution
-		FArray1< Real64 > & TT, // New node Temperature in MFD finite difference solution.
-		FArray1< Real64 > const & Rhov, // MFD Nodal Vapor Density[kg/m3] and is the old or last time step result.
-		FArray1< Real64 > & RhoT, // MFD vapor density for the new time step.
-		FArray1< Real64 > & RH, // Nodal relative humidity
-		FArray1< Real64 > const & TD, // The old dry Temperature at each node for the CondFD algorithm..
-		FArray1< Real64 > & TDT, // The current or new Temperature at each node location for the CondFD solution..
-		FArray1< Real64 > & EnthOld, // Old Nodal enthalpy
-		FArray1< Real64 > & EnthNew, // New Nodal enthalpy
+		Array1< Real64 > const & EP_UNUSED( T ), // Old node Temperature in MFD finite difference solution
+		Array1< Real64 > & TT, // New node Temperature in MFD finite difference solution.
+		Array1< Real64 > const & EP_UNUSED( Rhov ), // MFD Nodal Vapor Density[kg/m3] and is the old or last time step result.
+		Array1< Real64 > & RhoT, // MFD vapor density for the new time step.
+		Array1< Real64 > & EP_UNUSED( RH ), // Nodal relative humidity
+		Array1< Real64 > const & TD, // The old dry Temperature at each node for the CondFD algorithm..
+		Array1< Real64 > & TDT, // The current or new Temperature at each node location for the CondFD solution..
+		Array1< Real64 > & EnthOld, // Old Nodal enthalpy
+		Array1< Real64 > & EnthNew, // New Nodal enthalpy
 		int const TotNodes, // Total nodes in layer
 		Real64 const HMovInsul // Conductance of movable(transparent) insulation.
 	)
@@ -1563,8 +1556,8 @@ namespace HeatBalFiniteDiffManager {
 
 					// Set Thermal Conductivity. Can be constant, simple linear temp dep or multiple linear segment temp function dep.
 					auto const & matFD_TempCond( matFD.TempCond );
-					assert( matFD_TempCond.u1() >= 3 );
-					auto const lTC( matFD_TempCond.index( 1, 2 ) );
+					assert( matFD_TempCond.u2() >= 3 );
+					auto const lTC( matFD_TempCond.index( 2, 1 ) );
 					Real64 kt;
 					if ( matFD_TempCond[ lTC ] + matFD_TempCond[ lTC+1 ] + matFD_TempCond[ lTC+2 ] >= 0.0 ) { // Multiple Linear Segment Function
 						// Use average temp of surface and first node for k
@@ -1580,8 +1573,8 @@ namespace HeatBalFiniteDiffManager {
 					Real64 const Cpo( mat.SpecHeat ); // Specific heat from idf
 					Real64 Cp( Cpo ); // Specific heat modified if PCM, otherwise equal to Cpo // Will be changed if PCM
 					auto const & matFD_TempEnth( matFD.TempEnth );
-					assert( matFD_TempEnth.u1() >= 3 );
-					auto const lTE( matFD_TempEnth.index( 1, 2 ) );
+					assert( matFD_TempEnth.u2() >= 3 );
+					auto const lTE( matFD_TempEnth.index( 2, 1 ) );
 					if ( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] >= 0.0 ) { // Phase change material: Use TempEnth data to generate Cp
 						//               CheckhT = Material(MatLay)%TempEnth       ! debug
 						// Enthalpy function used to get average specific heat. Updated by GS so enthalpy function is followed.
@@ -1681,15 +1674,15 @@ namespace HeatBalFiniteDiffManager {
 		int const i, // Node Index
 		int const Lay, // Layer Number for Construction
 		int const Surf, // Surface number
-		FArray1< Real64 > const & T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > const & Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & RH, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > const & TD, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & TDT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & EnthOld, // Old Nodal enthalpy
-		FArray1< Real64 > & EnthNew // New Nodal enthalpy
+		Array1< Real64 > const & EP_UNUSED( T ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EP_UNUSED( TT ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > const & EP_UNUSED( Rhov ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EP_UNUSED( RhoT ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EP_UNUSED( RH ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > const & TD, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & TDT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EnthOld, // Old Nodal enthalpy
+		Array1< Real64 > & EnthNew // New Nodal enthalpy
 	)
 	{
 
@@ -1742,8 +1735,8 @@ namespace HeatBalFiniteDiffManager {
 
 		//  Set Thermal Conductivity.  Can be constant, simple linear temp dep or multiple linear segment temp function dep.
 		auto const & matFD_TempCond( matFD.TempCond );
-		assert( matFD_TempCond.u1() >= 3 );
-		auto const lTC( matFD_TempCond.index( 1, 2 ) );
+		assert( matFD_TempCond.u2() >= 3 );
+		auto const lTC( matFD_TempCond.index( 2, 1 ) );
 		Real64 ktA1; // Variable Outer Thermal conductivity in temperature equation
 		Real64 ktA2; // Thermal Inner conductivity in temperature equation
 		if ( matFD_TempCond[ lTC ] + matFD_TempCond[ lTC+1 ] + matFD_TempCond[ lTC+2 ] >= 0.0 ) { // Multiple Linear Segment Function
@@ -1761,8 +1754,8 @@ namespace HeatBalFiniteDiffManager {
 		Real64 const Cpo( mat.SpecHeat ); // Const Cp from input
 		Real64 Cp( Cpo ); // Cp used // Will be changed if PCM
 		auto const & matFD_TempEnth( matFD.TempEnth );
-		assert( matFD_TempEnth.u1() >= 3 );
-		auto const lTE( matFD_TempEnth.index( 1, 2 ) );
+		assert( matFD_TempEnth.u2() >= 3 );
+		auto const lTE( matFD_TempEnth.index( 2, 1 ) );
 		if ( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] >= 0.0 ) { // Phase change material: Use TempEnth data
 			EnthOld( i ) = terpld( matFD_TempEnth, TD_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
 			EnthNew( i ) = terpld( matFD_TempEnth, TDT_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
@@ -1800,16 +1793,16 @@ namespace HeatBalFiniteDiffManager {
 		int const i, // Node Index
 		int const Lay, // Layer Number for Construction
 		int const Surf, // Surface number
-		FArray1< Real64 > const & T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > const & Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & RH, // RELATIVE HUMIDITY.
-		FArray1< Real64 > const & TD, // OLD NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
-		FArray1< Real64 > & TDT, // NEW NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
-		FArray1< Real64 > const & EnthOld, // Old Nodal enthalpy
-		FArray1< Real64 > & EnthNew, // New Nodal enthalpy
-		int const GSiter // Iteration number of Gauss Seidell iteration
+		Array1< Real64 > const & EP_UNUSED( T ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EP_UNUSED( TT ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > const & EP_UNUSED( Rhov ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EP_UNUSED( RhoT ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EP_UNUSED( RH ), // RELATIVE HUMIDITY.
+		Array1< Real64 > const & TD, // OLD NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
+		Array1< Real64 > & TDT, // NEW NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
+		Array1< Real64 > const & EP_UNUSED( EnthOld ), // Old Nodal enthalpy
+		Array1< Real64 > & EnthNew, // New Nodal enthalpy
+		int const EP_UNUSED( GSiter ) // Iteration number of Gauss Seidell iteration
 	)
 	{
 
@@ -1882,8 +1875,8 @@ namespace HeatBalFiniteDiffManager {
 				Real64 kt1( 0.0 );
 				if ( ! RLayerPresent ) {
 					auto const & matFD_TempCond( matFD.TempCond );
-					assert( matFD_TempCond.u1() >= 3 );
-					auto const lTC( matFD_TempCond.index( 1, 2 ) );
+					assert( matFD_TempCond.u2() >= 3 );
+					auto const lTC( matFD_TempCond.index( 2, 1 ) );
 					if ( matFD_TempCond[ lTC ] + matFD_TempCond[ lTC+1 ] + matFD_TempCond[ lTC+2 ] >= 0.0 ) { // Multiple Linear Segment Function
 						kt1 = terpld( matFD.TempCond, ( TDT_i + TDT_m ) / 2.0, 1, 2 ); // 1: Temperature, 2: Thermal conductivity
 					} else {
@@ -1896,8 +1889,8 @@ namespace HeatBalFiniteDiffManager {
 				Real64 kt2( 0.0 );
 				if ( ! RLayer2Present ) {
 					auto const & matFD2_TempCond( matFD2.TempCond );
-					assert( matFD2_TempCond.u1() >= 3 );
-					auto const lTC2( matFD2_TempCond.index( 1, 2 ) );
+					assert( matFD2_TempCond.u2() >= 3 );
+					auto const lTC2( matFD2_TempCond.index( 2, 1 ) );
 					if ( matFD2_TempCond[ lTC2 ] + matFD2_TempCond[ lTC2+1 ] + matFD2_TempCond[ lTC2+2 ] >= 0.0 ) { // Multiple Linear Segment Function
 						kt2 = terpld( matFD2_TempCond, ( TDT_i + TDT_p ) / 2.0, 1, 2 ); // 1: Temperature, 2: Thermal conductivity
 					} else {
@@ -1928,13 +1921,13 @@ namespace HeatBalFiniteDiffManager {
 				auto const TD_i( TD( i ) );
 
 				auto const & matFD_TempEnth( matFD.TempEnth );
-				assert( matFD_TempEnth.u1() >= 3 );
-				auto const lTE( matFD_TempEnth.index( 1, 2 ) );
+				assert( matFD_TempEnth.u2() >= 3 );
+				auto const lTE( matFD_TempEnth.index( 2, 1 ) );
 				Real64 const matFD_sum( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] );
 
 				auto const & matFD2_TempEnth( matFD2.TempEnth );
-				assert( matFD2_TempEnth.u1() >= 3 );
-				auto const lTE2( matFD2_TempEnth.index( 1, 2 ) );
+				assert( matFD2_TempEnth.u2() >= 3 );
+				auto const lTE2( matFD2_TempEnth.index( 2, 1 ) );
 				Real64 const matFD2_sum( matFD2_TempEnth[ lTE2 ] + matFD2_TempEnth[ lTE2+1 ] + matFD2_TempEnth[ lTE2+2 ] );
 
 				if ( RLayerPresent && ! RLayer2Present ) { // R-layer first
@@ -2082,16 +2075,16 @@ namespace HeatBalFiniteDiffManager {
 		int const i, // Node Index
 		int const Lay, // Layer Number for Construction
 		int const Surf, // Surface number
-		FArray1< Real64 > const & T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (Old).
-		FArray1< Real64 > & TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (New).
-		FArray1< Real64 > const & Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & RH, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > const & TD, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & TDT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & EnthOld, // Old Nodal enthalpy
-		FArray1< Real64 > & EnthNew, // New Nodal enthalpy
-		FArray1< Real64 > & TDreport // Temperature value from previous HeatSurfaceHeatManager titeration's value
+		Array1< Real64 > const & EP_UNUSED( T ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (Old).
+		Array1< Real64 > & EP_UNUSED( TT ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (New).
+		Array1< Real64 > const & EP_UNUSED( Rhov ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EP_UNUSED( RhoT ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EP_UNUSED( RH ), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > const & TD, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & TDT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EnthOld, // Old Nodal enthalpy
+		Array1< Real64 > & EnthNew, // New Nodal enthalpy
+		Array1< Real64 > & TDreport // Temperature value from previous HeatSurfaceHeatManager titeration's value
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -2182,8 +2175,8 @@ namespace HeatBalFiniteDiffManager {
 
 				// Set Thermal Conductivity. Can be constant, simple linear temp dep or multiple linear segment temp function dep.
 				auto const & matFD_TempCond( matFD.TempCond );
-				assert( matFD_TempCond.u1() >= 3 );
-				auto const lTC( matFD_TempCond.index( 1, 2 ) );
+				assert( matFD_TempCond.u2() >= 3 );
+				auto const lTC( matFD_TempCond.index( 2, 1 ) );
 				Real64 kt;
 				if ( matFD_TempCond[ lTC ] + matFD_TempCond[ lTC+1 ] + matFD_TempCond[ lTC+2 ] >= 0.0 ) { // Multiple Linear Segment Function
 					// Use average of surface and first node temp for determining k
@@ -2198,8 +2191,8 @@ namespace HeatBalFiniteDiffManager {
 				Real64 const Cpo( mat.SpecHeat );
 				Real64 Cp( Cpo ); // Will be changed if PCM
 				auto const & matFD_TempEnth( matFD.TempEnth );
-				assert( matFD_TempEnth.u1() >= 3 );
-				auto const lTE( matFD_TempEnth.index( 1, 2 ) );
+				assert( matFD_TempEnth.u2() >= 3 );
+				auto const lTE( matFD_TempEnth.index( 2, 1 ) );
 				if ( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] >= 0.0 ) { // Phase change material: Use TempEnth data
 					EnthOld( i ) = terpld( matFD_TempEnth, TD_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
 					EnthNew( i ) = terpld( matFD_TempEnth, TDT_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
@@ -2371,7 +2364,7 @@ namespace HeatBalFiniteDiffManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

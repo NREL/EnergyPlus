@@ -2,7 +2,7 @@
 #define InternalHeatGains_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -64,7 +64,7 @@ namespace InternalHeatGains {
 	void
 	SumInternalConvectionGainsByTypes(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		FArray1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
 		Real64 & SumConvGainRate
 	);
 
@@ -77,7 +77,7 @@ namespace InternalHeatGains {
 	void
 	SumReturnAirConvectionGainsByTypes(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		FArray1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
 		Real64 & SumReturnAirGainRate
 	);
 
@@ -90,7 +90,7 @@ namespace InternalHeatGains {
 	void
 	SumInternalRadiationGainsByTypes(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		FArray1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
 		Real64 & SumRadiationGainRate
 	);
 
@@ -103,7 +103,7 @@ namespace InternalHeatGains {
 	void
 	SumInternalLatentGainsByTypes(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		FArray1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
 		Real64 & SumLatentGainRate
 	);
 
@@ -122,7 +122,7 @@ namespace InternalHeatGains {
 	void
 	SumInternalCO2GainsByTypes(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		FArray1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
 		Real64 & SumCO2GainRate
 	);
 
@@ -137,7 +137,7 @@ namespace InternalHeatGains {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

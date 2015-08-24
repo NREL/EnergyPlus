@@ -2,9 +2,9 @@
 #define WindowComplexManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array1S.hh>
+#include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -49,9 +49,9 @@ namespace WindowComplexManager {
 
 	extern int NumComplexWind; // Total number of complex windows
 	//Debug
-	extern FArray2D_int DbgIBm;
-	extern FArray2D< Real64 > DbgTheta;
-	extern FArray2D< Real64 > DbgPhi;
+	extern Array2D_int DbgIBm;
+	extern Array2D< Real64 > DbgTheta;
+	extern Array2D< Real64 > DbgPhi;
 	extern Real64 DdbgTheta;
 	extern Real64 DdbgPhi;
 	//EndDebug
@@ -122,9 +122,9 @@ namespace WindowComplexManager {
 	};
 
 	// Object Data
-	extern FArray1D< BasisStruct > BasisList;
-	extern FArray1D< WindowIndex > WindowList;
-	extern FArray2D< WindowStateIndex > WindowStateList;
+	extern Array1D< BasisStruct > BasisList;
+	extern Array1D< WindowIndex > WindowList;
+	extern Array2D< WindowStateIndex > WindowStateList;
 
 	// Functions
 
@@ -155,18 +155,15 @@ namespace WindowComplexManager {
 	void
 	CFSShadeAndBeamInitialization(
 		int const iSurf, // Window surface number
-		int const iState, // Window state number
-		BSDFWindowGeomDescr & Window, // Window Geometry
-		BSDFGeomDescr & Geom, // State Geometry
-		BSDFStateDescr & State // State Description
+		int const iState // Window state number
 	);
 
 	void
 	CalculateWindowBeamProperties(
 		int const ISurf, // Window surface number
 		int const IState, // Window state number
-		BSDFWindowGeomDescr & Window, // Window Geometry
-		BSDFGeomDescr & Geom, // State Geometry
+		BSDFWindowGeomDescr const & Window, // Window Geometry
+		BSDFGeomDescr const & Geom, // State Geometry
 		BSDFStateDescr & State, // State Description
 		int const Hour, // Hour number
 		int const TS // Timestep number
@@ -279,7 +276,7 @@ namespace WindowComplexManager {
 	CheckGasCoefs(
 		Real64 const currentWeight,
 		int & indexNumber,
-		FArray1A< Real64 > wght,
+		Array1A< Real64 > wght,
 		bool & feedData
 	);
 
@@ -287,30 +284,21 @@ namespace WindowComplexManager {
 	SearchAscTable(
 		Real64 const y, // Value to be found in the table
 		int const n, // Number of values in the table
-		FArray1S< Real64 > const ytab // Table of values, monotonic, ascending order
+		Array1S< Real64 > const ytab // Table of values, monotonic, ascending order
 	);
 
 	//=================================================================================================
 
 	void
 	CrossProduct(
-		FArray1A< Real64 > A, // Vector components: C = A X B
-		FArray1A< Real64 > B,
-		FArray1A< Real64 > C
-	);
-
-	void
-	PierceSurfaceVector(
-		int const ISurf, // Surface index
-		Vector const & Orig, // Point from which ray originates
-		Vector const & Dir, // Unit vector along in direction of ray whose
-		int & IPIERC, // =1 if line through point R1 in direction of unit vector
-		Vector & HitPt // Point that ray along RN intersects plane of surface
+		Array1A< Real64 > A, // Vector components: C = A X B
+		Array1A< Real64 > B,
+		Array1A< Real64 > C
 	);
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

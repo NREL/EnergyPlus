@@ -50,7 +50,7 @@ namespace DataBranchAirLoopPlant {
 	int const ControlType_Passive( 2 ); // 'Passive'
 	int const ControlType_SeriesActive( 3 ); // 'SeriesActive'
 	int const ControlType_Bypass( 4 ); // 'Bypass
-	FArray1D_string const cControlType( {0,4}, { "Unknown", "Active", "Passive", "SeriesActive", "Bypass" } );
+	Array1D_string const cControlType( {0,4}, { "Unknown", "Active", "Passive", "SeriesActive", "Bypass" } );
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -58,14 +58,14 @@ namespace DataBranchAirLoopPlant {
 	int NumPressureCurves( 0 );
 
 	// Object Data
-	FArray1D< PlantPressureCurveData > PressureCurve;
+	Array1D< PlantPressureCurveData > PressureCurve;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	//=================================================================================================!
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

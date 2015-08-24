@@ -9,9 +9,12 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/noexcept.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -38,6 +41,9 @@ private: // Friend
 	template< typename > friend class Chunk;
 
 public: // Types
+
+	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
+	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
 
 	// STL style
 	typedef  T  value_type;
@@ -77,6 +83,18 @@ public: // Creation
 		}
 	}
 
+	// Move Constructor
+	inline
+	Chunk( Chunk && c ) NOEXCEPT :
+	 size_( c.size_ ),
+	 capacity_( c.capacity_ ),
+	 data_( c.data_ )
+	{
+		c.size_ = 0u;
+		c.capacity_ = 0u;
+		c.data_ = nullptr;
+	}
+
 	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
@@ -104,7 +122,7 @@ public: // Creation
 	inline
 	Chunk(
 	 size_type const size,
-	 T const & value
+	 Tc value
 	) :
 	 size_( size ),
 	 capacity_( size_ ),
@@ -142,6 +160,21 @@ public: // Assignment
 		return *this;
 	}
 
+	// Move Assignment
+	inline
+	Chunk &
+	operator =( Chunk && c ) NOEXCEPT
+	{
+		assert( this != &c );
+		size_ = c.size_;
+		capacity_ = c.capacity_;
+		delete[] data_; data_ = c.data_;
+		c.size_ = 0u;
+		c.capacity_ = 0u;
+		c.data_ = nullptr;
+		return *this;
+	}
+
 	// Copy Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
@@ -164,7 +197,7 @@ public: // Assignment
 	Chunk &
 	assign(
 	 size_type const size,
-	 T const & value
+	 Tc value
 	)
 	{
 		if ( size_ != size ) {
@@ -231,7 +264,7 @@ public: // Assignment
 	// = Value
 	inline
 	Chunk &
-	operator =( T const & value )
+	operator =( Tc value )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = value;
@@ -242,7 +275,7 @@ public: // Assignment
 	// += Value
 	inline
 	Chunk &
-	operator +=( T const & value )
+	operator +=( Tc value )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] += value;
@@ -253,7 +286,7 @@ public: // Assignment
 	// -= Value
 	inline
 	Chunk &
-	operator -=( T const & value )
+	operator -=( Tc value )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] -= value;
@@ -264,7 +297,7 @@ public: // Assignment
 	// *= Value
 	inline
 	Chunk &
-	operator *=( T const & value )
+	operator *=( Tc value )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] *= value;
@@ -275,7 +308,7 @@ public: // Assignment
 	// /= Value
 	inline
 	Chunk &
-	operator /=( T const & value )
+	operator /=( Tc value )
 	{
 		assert( value != T( 0 ) );
 		for ( size_type i = 0; i < size_; ++i ) {
@@ -288,7 +321,7 @@ public: // Subscript
 
 	// Chunk[ i ] const: 0-Based Indexing
 	inline
-	T const &
+	Tr
 	operator []( size_type const i ) const
 	{
 		assert( i < size_ );
@@ -340,7 +373,7 @@ public: // Inspector
 
 	// First Element
 	inline
-	T const &
+	Tr
 	front() const
 	{
 		assert( size_ > 0u );
@@ -349,7 +382,7 @@ public: // Inspector
 
 	// Last Element
 	inline
-	T const &
+	Tr
 	back() const
 	{
 		assert( size_ > 0u );
@@ -379,7 +412,7 @@ public: // Modifier
 	// Append an Element
 	inline
 	Chunk &
-	push_back( T const & value )
+	push_back( Tc value )
 	{
 		assert( size_ < max_size() );
 		if ( size_ == capacity_ ) reserve( 2 * capacity_ );
@@ -423,7 +456,7 @@ public: // Modifier
 	Chunk &
 	resize(
 	 size_type const size,
-	 T const & value
+	 Tc value
 	)
 	{
 		if ( size_ != size ) {
@@ -464,7 +497,7 @@ public: // Modifier
 	Chunk &
 	non_preserving_resize(
 	 size_type const size,
-	 T const & value
+	 Tc value
 	)
 	{
 		if ( size_ != size ) {
@@ -536,9 +569,7 @@ public: // Modifier
 private: // Data
 
 	size_type size_; // Number of elements in use
-
 	size_type capacity_; // Number of elements it can hold without resizing
-
 	T * data_; // Data array
 
 }; // Chunk

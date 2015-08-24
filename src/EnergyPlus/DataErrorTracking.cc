@@ -34,8 +34,8 @@ namespace DataErrorTracking {
 
 	// MODULE PARAMETER DEFINITIONS:
 	int const SearchCounts( 20 );
-	FArray1D_string const MessageSearch( SearchCounts, { "InterZone Surface Areas", "CAUTION -- Interzone", "Node Connection Error", "InterZone Surface Azimu", "InterZone Surface Tilts", "Suspected non-planar", "Deprecated", "Floor Tilt=", "Roof/Ceiling Tilt=", "View factors not", "Unbalanced exhaust air", "Loads Initialization", "CalcDaylightMapPoints:", "Zone Air Heat Balance", "occupant density is ext", "Temperature (low) out o", "Temperature (high) out", "nominally unused", "InfraredTransparent", "No reporting elements" } );
-	FArray1D_string const Summaries( SearchCounts, { "InterZone Surface Areas -- mismatch", "Interzone surfaces - different zones", "Node Connection Errors", "InterZone Surface Azimuths -- mismatch", "InterZone Surface Tilts -- mismatch", "Likely non-planar surfaces", "Deprecated Features or Key Values", "Incorrect Floor Tilt", "Incorrect Roof/Ceiling Tilt", "Incomplete View factors", "Unbalanced exhaust air flow", "Loads Initialization did not Converge", "CalcDaylightMapPoints: Window", "Zone Air Heat Balance Warnings", "Occupant density is extremely high", "Temperature (low) out of bounds", "Temperature (high) out of bounds", "Nominally Unused Constructions", "Material:InfraredTransparent usage", "No Reporting Elements requested" } );
+	Array1D_string const MessageSearch( SearchCounts, { "InterZone Surface Areas", "CAUTION -- Interzone", "Node Connection Error", "InterZone Surface Azimu", "InterZone Surface Tilts", "Suspected non-planar", "Deprecated", "Floor Tilt=", "Roof/Ceiling Tilt=", "View factors not", "Unbalanced exhaust air", "Loads Initialization", "CalcDaylightMapPoints:", "Zone Air Heat Balance", "occupant density is ext", "Temperature (low) out o", "Temperature (high) out", "nominally unused", "InfraredTransparent", "No reporting elements" } );
+	Array1D_string const Summaries( SearchCounts, { "InterZone Surface Areas -- mismatch", "Interzone surfaces - different zones", "Node Connection Errors", "InterZone Surface Azimuths -- mismatch", "InterZone Surface Tilts -- mismatch", "Likely non-planar surfaces", "Deprecated Features or Key Values", "Incorrect Floor Tilt", "Incorrect Roof/Ceiling Tilt", "Incomplete View factors", "Unbalanced exhaust air flow", "Loads Initialization did not Converge", "CalcDaylightMapPoints: Window", "Zone Air Heat Balance Warnings", "Occupant density is extremely high", "Temperature (low) out of bounds", "Temperature (high) out of bounds", "Nominally Unused Constructions", "Material:InfraredTransparent usage", "No Reporting Elements requested" } );
 	// in below -- simple line end <CR>.  End of Whole message <CRE>
 	std::string const MoreDetails_1( "Area mismatch errors happen when the interzone surface in zone A is<CR>not the same size as it's companion in zone B.<CRE>" ); // InterZone Surface Areas -- mismatch
 	std::string const MoreDetails_2; // Interzone surfaces - different zones
@@ -56,7 +56,7 @@ namespace DataErrorTracking {
 	std::string const MoreDetails_18( "The nominally unused constructions warning is provided to alert you to potential conditions that can cause<CR>extra time during simulation. Each construction is calculated by the algorithm indicated in the HeatBalanceAlgorithm<CR>object. You may remove the constructions indicated (when you use the DisplayExtraWarnings option).<CRE>" ); // Nominally unused constructions
 	std::string const MoreDetails_19( "Using Material:InfraredTransparent materials in constructions are correctly used in interzone surface<CR>constructions. Warnings are given if they are used in other kinds of surfaces.<CR>They CANNOT currently be used with ConductionFiniteDifference algorithms.<CRE>" ); // InfraredTransparent constructions in non-interzone surfaces
 	std::string const MoreDetails_20( "No Reporting elements have been requested. You will see no output values from your run.<CR>Add Output:Variable, Output:Meter, Output:Table:SummaryReports, Output:Table:Monthly, Output:Table:TimeBins<CR>objects to your input file to receive output values from the simulation.<CRE>" ); // No reporting elements requested
-	FArray1D_string const MoreDetails( SearchCounts, { MoreDetails_1, MoreDetails_2, MoreDetails_3, MoreDetails_4, MoreDetails_5, MoreDetails_6, MoreDetails_7, MoreDetails_8, MoreDetails_9, MoreDetails_10, MoreDetails_11, MoreDetails_12, MoreDetails_13, MoreDetails_14, MoreDetails_15, MoreDetails_16, MoreDetails_16, MoreDetails_18, MoreDetails_19, MoreDetails_20 } ); // Details 16 applies to both temperature out of bounds | errors.
+	Array1D_string const MoreDetails( SearchCounts, { MoreDetails_1, MoreDetails_2, MoreDetails_3, MoreDetails_4, MoreDetails_5, MoreDetails_6, MoreDetails_7, MoreDetails_8, MoreDetails_9, MoreDetails_10, MoreDetails_11, MoreDetails_12, MoreDetails_13, MoreDetails_14, MoreDetails_15, MoreDetails_16, MoreDetails_16, MoreDetails_18, MoreDetails_19, MoreDetails_20 } ); // Details 16 applies to both temperature out of bounds | errors.
 
 	int const MaxRecurringErrorMsgLength( 250 ); // Maximum error message length for recurring error messages
 
@@ -66,7 +66,7 @@ namespace DataErrorTracking {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D_int MatchCounts( SearchCounts, 0 );
+	Array1D_int MatchCounts( SearchCounts, 0 );
 	bool AbortProcessing( false ); // Flag used to if currently in "abort processing"
 	int NumRecurringErrors( 0 ); // Number of stored recurring error messages
 	int TotalSevereErrors( 0 ); // Counter
@@ -89,10 +89,10 @@ namespace DataErrorTracking {
 	std::string LastSevereError;
 
 	// Object Data
-	FArray1D< RecurringErrorData > RecurringErrors;
+	Array1D< RecurringErrorData > RecurringErrors;
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

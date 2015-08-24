@@ -72,7 +72,7 @@ namespace DataPhotovoltaics {
 	Real64 ShuntResistance( 0.0 ); // old "RSH" in common block of trnsys code
 
 	// Object Data
-	FArray1D< PVArrayStruct > PVarray;
+	Array1D< PVArrayStruct > PVarray;
 
 	// ___________________________________________________________________________
 
@@ -86,7 +86,7 @@ namespace DataPhotovoltaics {
 	//     Tel: (608) 274-2577
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

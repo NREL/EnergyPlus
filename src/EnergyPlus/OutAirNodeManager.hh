@@ -2,7 +2,7 @@
 #define OutAirNodeManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -18,13 +18,18 @@ namespace OutAirNodeManager {
 
 	//MODULE VARIABLE DECLARATIONS:
 
-	extern FArray1D_int OutsideAirNodeList; // List of all outside air inlet nodes
+	extern Array1D_int OutsideAirNodeList; // List of all outside air inlet nodes
 	extern int NumOutsideAirNodes; // Number of single outside air nodes
 	extern bool GetOutAirNodesInputFlag; // Flag set to make sure you get input once
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE OutAirNodeManager
 
 	// Functions
+
+	// Clears the global data in OutAirNodeManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 	void
 	SetOutAirNodes();
@@ -46,7 +51,7 @@ namespace OutAirNodeManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

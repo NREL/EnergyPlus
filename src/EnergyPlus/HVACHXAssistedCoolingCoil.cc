@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -70,11 +70,11 @@ namespace HVACHXAssistedCoolingCoil {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int TotalNumHXAssistedCoils( 0 ); // The total number of HXAssistedCoolingCoil compound objects
-	FArray1D< Real64 > HXAssistedCoilOutletTemp; // Outlet temperature from this compound object
-	FArray1D< Real64 > HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
+	Array1D< Real64 > HXAssistedCoilOutletTemp; // Outlet temperature from this compound object
+	Array1D< Real64 > HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
 	// PUBLIC so others can access this information
 	bool GetCoilsInputFlag( true ); // Flag to allow input data to be retrieved from idf on first call to this subroutine
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -96,7 +96,7 @@ namespace HVACHXAssistedCoolingCoil {
 	// Utility routines for module
 
 	// Object Data
-	FArray1D< HXAssistedCoilParameters > HXAssistedCoil;
+	Array1D< HXAssistedCoilParameters > HXAssistedCoil;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -168,7 +168,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 		// Find the correct HXAssistedCoolingCoil number
 		if ( CompIndex == 0 ) {
-			HXAssistedCoilNum = FindItemInList( HXAssistedCoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			HXAssistedCoilNum = FindItemInList( HXAssistedCoilName, HXAssistedCoil );
 			if ( HXAssistedCoilNum == 0 ) {
 				ShowFatalError( "HX Assisted Coil not found=" + HXAssistedCoilName );
 			}
@@ -250,7 +250,6 @@ namespace HVACHXAssistedCoolingCoil {
 		using InputProcessor::SameString;
 		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
-		using DataHeatBalance::Zone;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
 		auto & GetDXCoilInletNode( DXCoils::GetCoilInletNode );
@@ -296,12 +295,12 @@ namespace HVACHXAssistedCoolingCoil {
 		int CoolingCoilInletNodeNum; // outlet node number of cooling coil, used for warning messages
 		int CoolingCoilOutletNodeNum; // outlet node number of cooling coil, used for warning messages
 		std::string CurrentModuleObject; // Object type for getting and error messages
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > NumArray; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > NumArray; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -337,7 +336,7 @@ namespace HVACHXAssistedCoolingCoil {
 			GetObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), HXAssistedCoil.Name(), HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), HXAssistedCoil, HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -458,7 +457,7 @@ namespace HVACHXAssistedCoolingCoil {
 			GetObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), HXAssistedCoil.Name(), HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), HXAssistedCoil, HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -804,7 +803,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			HXDXCoilIndex = FindItem( HXDXCoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			HXDXCoilIndex = FindItem( HXDXCoilName, HXAssistedCoil );
 		} else {
 			HXDXCoilIndex = 0;
 		}
@@ -822,7 +821,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 	void
 	CheckHXAssistedCoolingCoilSchedule(
-		std::string const & CompType, // unused1208
+		std::string const & EP_UNUSED( CompType ), // unused1208
 		std::string const & CompName,
 		Real64 & Value,
 		int & CompIndex
@@ -874,7 +873,7 @@ namespace HVACHXAssistedCoolingCoil {
 		// Find the correct Coil number
 		if ( CompIndex == 0 ) {
 			if ( TotalNumHXAssistedCoils > 0 ) {
-				HXAssistedCoilNum = FindItem( CompName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+				HXAssistedCoilNum = FindItem( CompName, HXAssistedCoil );
 			} else {
 				HXAssistedCoilNum = 0;
 			}
@@ -959,7 +958,7 @@ namespace HVACHXAssistedCoolingCoil {
 		errFlag = false;
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1058,7 +1057,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1140,7 +1139,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1213,7 +1212,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1285,7 +1284,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1364,7 +1363,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1436,7 +1435,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 		//  HXAssistedCoil(HXAssistedCoilNum)%CoolingCoilName            = AlphArray(7)
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1507,7 +1506,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1579,7 +1578,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1647,7 +1646,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1722,7 +1721,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
 
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 
 			if ( SameString( CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 				if ( WhichCoil != 0 ) {
@@ -1800,7 +1799,6 @@ namespace HVACHXAssistedCoolingCoil {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
-		static int ErrCount( 0 );
 
 		// Obtains and allocates HXAssistedCoolingCoil related parameters from input file
 		if ( GetCoilsInputFlag ) { // First time subroutine has been called, get input data
@@ -1811,7 +1809,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
 
-			WhichCoil = FindItem( CoilName, HXAssistedCoil.Name(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
 
 			if ( SameString( CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) || SameString( CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
 				if ( WhichCoil != 0 ) {
@@ -1890,7 +1888,7 @@ namespace HVACHXAssistedCoolingCoil {
 		Found = false;
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( HXName, HXAssistedCoil.HeatExchangerName(), TotalNumHXAssistedCoils );
+			WhichCoil = FindItem( HXName, HXAssistedCoil, &HXAssistedCoilParameters::HeatExchangerName );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1912,7 +1910,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

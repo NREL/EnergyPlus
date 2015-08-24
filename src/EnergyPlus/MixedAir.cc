@@ -3,7 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -177,7 +177,7 @@ namespace MixedAir {
 	//INTEGER, PARAMETER :: SOAM_IAQPCOM = 6  ! Take the maximum outdoor air rate from both CO2 and generic contaminant controls
 	//                                        ! based on the generic contaminant setpoint
 
-	FArray1D_string const CurrentModuleObjects( 8, { "AirLoopHVAC:OutdoorAirSystem", "AirLoopHVAC:OutdoorAirSystem:EquipmentList", "AirLoopHVAC:ControllerList", "AvailabilityManagerAssignmentList", "Controller:OutdoorAir", "ZoneHVAC:EnergyRecoveryVentilator:Controller", "Controller:MechanicalVentilation", "OutdoorAir:Mixer" } );
+	Array1D_string const CurrentModuleObjects( 8, { "AirLoopHVAC:OutdoorAirSystem", "AirLoopHVAC:OutdoorAirSystem:EquipmentList", "AirLoopHVAC:ControllerList", "AvailabilityManagerAssignmentList", "Controller:OutdoorAir", "ZoneHVAC:EnergyRecoveryVentilator:Controller", "Controller:MechanicalVentilation", "OutdoorAir:Mixer" } );
 
 	// Parameters below (CMO - Current Module Object.  used primarily in Get Inputs)
 	// Multiple Get Input routines in this module or these would be in individual routines.
@@ -201,8 +201,8 @@ namespace MixedAir {
 	int NumOAMixers( 0 ); // Number of Outdoor Air Mixers
 	int NumVentMechControllers( 0 ); // Number of Controller:MechanicalVentilation objects in input deck
 
-	FArray1D_bool MyOneTimeErrorFlag;
-	FArray1D_bool MyOneTimeCheckUnitarySysFlag;
+	Array1D_bool MyOneTimeErrorFlag;
+	Array1D_bool MyOneTimeCheckUnitarySysFlag;
 	bool GetOASysInputFlag( true ); // Flag set to make sure you get input once
 	bool GetOAMixerInputFlag( true ); // Flag set to make sure you get input once
 	bool GetOAControllerInputFlag( true ); // Flag set to make sure you get input once
@@ -223,12 +223,154 @@ namespace MixedAir {
 	// Utility routines for the module
 
 	// Object Data
-	FArray1D< ControllerListProps > ControllerLists;
-	FArray1D< OAControllerProps > OAController;
-	FArray1D< OAMixerProps > OAMixer;
-	FArray1D< VentilationMechanicalProps > VentilationMechanical;
+	Array1D< ControllerListProps > ControllerLists;
+	Array1D< OAControllerProps > OAController;
+	Array1D< OAMixerProps > OAMixer;
+	Array1D< VentilationMechanicalProps > VentilationMechanical;
 
 	// Functions
+
+	Real64 OAGetFlowRate( int OAPtr )
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Simon Vidanovic
+		//       DATE WRITTEN   March 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE
+		// Return flow rate [m3/s] for current controller
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+
+		Real64 FlowRate( 0 );
+
+		if ( ( OAPtr > 0 ) && ( OAPtr <= NumOAControllers ) && ( StdRhoAir != 0 ) )
+		{
+			FlowRate = OAController( OAPtr ).OAMassFlow / StdRhoAir;
+		}
+
+		return FlowRate;
+	}
+
+	Real64 OAGetMinFlowRate( int OAPtr )
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Simon Vidanovic
+		//       DATE WRITTEN   March 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE
+		// Return min flow rate [m3/s] for current controller
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+
+		Real64 MinFlowRate( 0 );
+
+		if ( ( OAPtr > 0 ) && ( OAPtr <= NumOAControllers ) )
+		{
+			MinFlowRate = OAController( OAPtr ).MinOA;
+		}
+
+		return MinFlowRate;
+	}
+
+	void OASetDemandManagerVentilationState( int OAPtr, bool aState )
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Simon Vidanovic
+		//       DATE WRITTEN   March 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE
+		// Setting if controller is in demand manager state
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+
+		if ( ( OAPtr > 0 ) && ( OAPtr <= NumOAControllers ) )
+		{
+			OAController( OAPtr ).ManageDemand = aState;
+		}
+	}
+
+	void OASetDemandManagerVentilationFlow( int OAPtr, Real64 aFlow )
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Simon Vidanovic
+		//       DATE WRITTEN   March 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE
+		// Set demand manager flow rate for use in managing demand use
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+
+		if ( ( OAPtr > 0 ) && ( OAPtr <= NumOAControllers ) )
+		{
+			OAController( OAPtr ).DemandLimitFlowRate = aFlow * StdRhoAir;
+		}
+
+	}
+
+	int GetOAController( std::string const & OAName )
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Simon Vidanovic
+		//       DATE WRITTEN   March 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE
+		// To get correct OA controller pointer for purpose of setting properties
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+
+		int CurrentOAController( 0 );
+
+		for ( int i = 1; i <= NumOAControllers; i++ )
+		{
+			if ( OAName == OAController( i ).Name ) {
+				CurrentOAController = i;
+				break;
+			}
+		}
+
+		return CurrentOAController;
+	}
+
+	// Clears the global data in MixedAir.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumControllerLists = 0;
+		NumOAControllers = 0;
+		NumERVControllers = 0;
+		NumOAMixers = 0;
+		NumVentMechControllers = 0;
+		MyOneTimeErrorFlag.deallocate();
+		MyOneTimeCheckUnitarySysFlag.deallocate();
+		GetOASysInputFlag = true;
+		GetOAMixerInputFlag = true;
+		GetOAControllerInputFlag = true;
+		ControllerLists.deallocate();
+		OAController.deallocate();
+		OAMixer.deallocate();
+		VentilationMechanical.deallocate();
+	}
 
 	void
 	ManageOutsideAirSystem(
@@ -274,7 +416,7 @@ namespace MixedAir {
 		}
 
 		if ( OASysNum == 0 ) {
-			OASysNum = FindItemInList( OASysName, OutsideAirSys.Name(), NumOASystems );
+			OASysNum = FindItemInList( OASysName, OutsideAirSys );
 			if ( OASysNum == 0 ) {
 				ShowFatalError( "ManageOutsideAirSystem: AirLoopHVAC:OutdoorAirSystem not found=" + OASysName );
 			}
@@ -376,8 +518,8 @@ namespace MixedAir {
 				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
 				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
 				if ( SameString( CompType, "OutdoorAir:Mixer" ) ) {
-					OAMixerNum = FindItemInList( CompName, OAMixer.Name(), NumOAMixers );
-					OAControllerNum = FindItemInList( CtrlName, OAController.Name(), NumOAControllers );
+					OAMixerNum = FindItemInList( CompName, OAMixer );
+					OAControllerNum = FindItemInList( CtrlName, OAController );
 					if ( OAController( OAControllerNum ).MixNode != OAMixer( OAMixerNum ).MixNode ) {
 						ShowSevereError( "The mixed air node of Controller:OutdoorAir=\"" + OAController( OAControllerNum ).Name + "\"" );
 						ShowContinueError( "should be the same node as the mixed air node of OutdoorAir:Mixer=\"" + OAMixer( OAMixerNum ).Name + "\"." );
@@ -649,7 +791,7 @@ namespace MixedAir {
 		}
 
 		if ( CompIndex == 0 ) {
-			OAMixerNum = FindItemInList( CompName, OAMixer.Name(), NumOAMixers );
+			OAMixerNum = FindItemInList( CompName, OAMixer );
 			CompIndex = OAMixerNum;
 			if ( OAMixerNum == 0 ) {
 				ShowFatalError( "SimOAMixer: OutdoorAir:Mixer not found=" + CompName );
@@ -714,7 +856,7 @@ namespace MixedAir {
 
 		if ( CtrlIndex == 0 ) {
 			if ( NumOAControllers > 0 ) {
-				OAControllerNum = FindItemInList( CtrlName, OAController.Name(), NumOAControllers );
+				OAControllerNum = FindItemInList( CtrlName, OAController );
 			} else {
 				OAControllerNum = 0;
 			}
@@ -779,8 +921,8 @@ namespace MixedAir {
 		int NumNums; // Number of real numbers returned by GetObjectItem
 		int NumAlphas; // Number of alphanumerics returned by GetObjectItem
 		int IOStat;
-		FArray1D< Real64 > NumArray;
-		FArray1D_string AlphArray;
+		Array1D< Real64 > NumArray;
+		Array1D_string AlphArray;
 		int OASysNum;
 		int CompNum;
 		int Item;
@@ -797,10 +939,10 @@ namespace MixedAir {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // Object type for getting and messages
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -837,7 +979,7 @@ namespace MixedAir {
 			GetObjectItem( CurrentModuleObject, Item, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), ControllerLists.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), ControllerLists, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -890,7 +1032,7 @@ namespace MixedAir {
 			GetObjectItem( CurrentModuleObject, OASysNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), OutsideAirSys.Name(), OASysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), OutsideAirSys, OASysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -898,7 +1040,7 @@ namespace MixedAir {
 			OutsideAirSys( OASysNum ).Name = AlphArray( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 2 ), OutsideAirSys.ControllerListName(), OASysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + ' ' + cAlphaFields( 2 ) + " Name" );
+			VerifyName( AlphArray( 2 ), OutsideAirSys, &OutsideAirSysProps::ControllerListName, OASysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + ' ' + cAlphaFields( 2 ) + " Name" );
 			if ( IsNotOK && AlphArray( 1 ) != "xxxxx" ) {
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = \"" + AlphArray( 1 ) + "\"." );
 				ErrorsFound = true;
@@ -1109,14 +1251,11 @@ namespace MixedAir {
 		using DataZoneEquipment::NumOfZoneEquipLists;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::ZoneList;
-		using DataHeatBalance::NumOfZoneLists;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
 		using namespace OutputReportPredefined;
 
 		using DataAirSystems::PrimaryAirSystem;
-		using DataZoneControls::HumidityControlZone;
-		using DataZoneControls::NumHumidityControlZones;
 		using DataContaminantBalance::Contaminant;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 
@@ -1152,13 +1291,13 @@ namespace MixedAir {
 		int VentMechNum; // Number of VENTILATION:MECHANICAL objects
 		int groupNum; // Index to group in extensible VENTILATION:MECHANICAL object
 		int IOStat; // Status of GetObjectItem call
-		FArray1D< Real64 > NumArray;
-		FArray1D_string AlphArray;
+		Array1D< Real64 > NumArray;
+		Array1D_string AlphArray;
 		std::string CurrentModuleObject; // Object type for getting and messages
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static bool ErrorsFound( false ); // Flag identifying errors found during get input
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -1177,36 +1316,33 @@ namespace MixedAir {
 		int CompNum; // Used to determine if control zone is served by furnace air loop
 
 		int NumGroups; // Number of extensible input groups of the VentilationMechanical object
-		int numBaseNum; // base number for numeric arguments (for readability)
-		//INTEGER :: OAIndex               ! Loop index for design specification outdoor air object list
-		//INTEGER :: NumControllerList = 0  ! Index to controller lists
 		static int ControllerListNum( 0 ); // Index used to loop through controller list
 		static int ControllerNum( 0 ); // Index to controllers in each controller list
 		static int Num( 0 ); // Index used to loop through controllers in list
 		static int SysNum( 0 ); // Index used to loop through OA systems
 		static Real64 DesSupplyVolFlowRate( 0.0 ); // Temporary variable for design supply volumetric flow rate for air loop (m3/s)
-		FArray1D_string DesignSpecOAObjName; // name of the design specification outdoor air object
-		FArray1D_int DesignSpecOAObjIndex; // index of the design specification outdoor air object
-		FArray1D_string VentMechZoneName; // Zone or Zone List to apply mechanical ventilation rate
-		FArray1D< Real64 > VentMechZoneOAAreaRate; // Mechanical ventilation rate (m3/s/m2) for zone or zone list
-		FArray1D< Real64 > VentMechZoneOAPeopleRate; // Mechanical ventilation rate (m3/s/person) for zone or zone list
-		FArray1D< Real64 > VentMechZoneOAFlow; // Mechanical ventilation rate (m3/s/person) for zone or zone list
-		FArray1D< Real64 > VentMechZoneOAACH; // Mechanical ventilation rate (m3/s/person) for zone or zone list
+		Array1D_string DesignSpecOAObjName; // name of the design specification outdoor air object
+		Array1D_int DesignSpecOAObjIndex; // index of the design specification outdoor air object
+		Array1D_string VentMechZoneName; // Zone or Zone List to apply mechanical ventilation rate
+		Array1D< Real64 > VentMechZoneOAAreaRate; // Mechanical ventilation rate (m3/s/m2) for zone or zone list
+		Array1D< Real64 > VentMechZoneOAPeopleRate; // Mechanical ventilation rate (m3/s/person) for zone or zone list
+		Array1D< Real64 > VentMechZoneOAFlow; // Mechanical ventilation rate (m3/s/person) for zone or zone list
+		Array1D< Real64 > VentMechZoneOAACH; // Mechanical ventilation rate (m3/s/person) for zone or zone list
 
-		FArray1D< Real64 > VentMechZoneADEffCooling; // Zone air distribution effectiveness in cooling mode
+		Array1D< Real64 > VentMechZoneADEffCooling; // Zone air distribution effectiveness in cooling mode
 		// for each zone or zone list
-		FArray1D< Real64 > VentMechZoneADEffHeating; // Zone air distribution effectiveness in heating mode
+		Array1D< Real64 > VentMechZoneADEffHeating; // Zone air distribution effectiveness in heating mode
 		// for each zone or zone list
-		FArray1D_int VentMechZoneADEffSchPtr; // Pointer to the zone air distribution effectiveness schedule
+		Array1D_int VentMechZoneADEffSchPtr; // Pointer to the zone air distribution effectiveness schedule
 		// for each zone or zone list
-		FArray1D_string VentMechZoneADEffSchName; // Zone air distribution effectiveness
+		Array1D_string VentMechZoneADEffSchName; // Zone air distribution effectiveness
 		//  schedule name for each zone or zone list
 
-		FArray1D< Real64 > VentMechZoneSecondaryRecirculation; // Zone air secondary recirculation ratio
+		Array1D< Real64 > VentMechZoneSecondaryRecirculation; // Zone air secondary recirculation ratio
 		//  for each zone or zone list
-		FArray1D_string DesignSpecZoneADObjName; // name of the design specification zone air
+		Array1D_string DesignSpecZoneADObjName; // name of the design specification zone air
 		//  distribution object for each zone or zone list
-		FArray1D_int DesignSpecZoneADObjIndex; // index of the design specification zone air distribution object
+		Array1D_int DesignSpecZoneADObjIndex; // index of the design specification zone air distribution object
 
 		static int ObjIndex( 0 );
 		static int EquipListIndex( 0 );
@@ -1265,7 +1401,7 @@ namespace MixedAir {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), OAController.Name(), OutAirNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), OAController, OutAirNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1275,7 +1411,7 @@ namespace MixedAir {
 
 				//     Mangesh code to fix CR 8225 - 09/14/2010
 				if ( ( NumControllerLists > 0 ) && ( NumOASystems > 0 ) ) {
-					OALp: for ( AirLoopNumber = 1; AirLoopNumber <= NumPrimaryAirSys; ++AirLoopNumber ) {
+					for ( AirLoopNumber = 1; AirLoopNumber <= NumPrimaryAirSys; ++AirLoopNumber ) {
 						DesSupplyVolFlowRate = AirLoopFlow( AirLoopNumber ).DesSupply / StdRhoAir;
 						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
 							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
@@ -1305,7 +1441,6 @@ namespace MixedAir {
 								}
 							}
 						}
-						OALp_loop: ;
 					}
 					OALp_exit: ;
 				}
@@ -1394,7 +1529,7 @@ namespace MixedAir {
 				// Check Controller:MechanicalVentilation object name
 				ErrorInName = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), VentilationMechanical.Name(), VentMechNum - 1, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), VentilationMechanical, VentMechNum - 1, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 				if ( ErrorInName ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1511,7 +1646,7 @@ namespace MixedAir {
 					//     Getting OA details from design specification OA object
 					if ( ! lAlphaBlanks( ( groupNum - 1 ) * 3 + 6 ) ) {
 						DesignSpecOAObjName( groupNum ) = AlphArray( ( groupNum - 1 ) * 3 + 6 );
-						ObjIndex = FindItemInList( DesignSpecOAObjName( groupNum ), OARequirements.Name(), NumOARequirements );
+						ObjIndex = FindItemInList( DesignSpecOAObjName( groupNum ), OARequirements );
 						DesignSpecOAObjIndex( groupNum ) = ObjIndex;
 
 						if ( ObjIndex > 0 ) {
@@ -1578,7 +1713,7 @@ namespace MixedAir {
 					// Get zone air distribution details from design specification Zone Air Distribution object
 					if ( ! lAlphaBlanks( ( groupNum - 1 ) * 3 + 7 ) ) {
 						DesignSpecZoneADObjName( groupNum ) = AlphArray( ( groupNum - 1 ) * 3 + 7 );
-						ObjIndex = FindItemInList( DesignSpecZoneADObjName( groupNum ), ZoneAirDistribution.Name(), NumZoneAirDistribution );
+						ObjIndex = FindItemInList( DesignSpecZoneADObjName( groupNum ), ZoneAirDistribution );
 						DesignSpecZoneADObjIndex( groupNum ) = ObjIndex;
 
 						if ( ObjIndex > 0 ) {
@@ -1648,11 +1783,11 @@ namespace MixedAir {
 						//        ENDIF
 					}
 
-					ZoneNum = FindItemInList( VentMechZoneName( groupNum ), Zone.Name(), NumOfZones );
+					ZoneNum = FindItemInList( VentMechZoneName( groupNum ), Zone );
 					if ( ZoneNum > 0 ) {
 						++MechVentZoneCount;
 					} else {
-						ZoneListNum = FindItemInList( VentMechZoneName( groupNum ), ZoneList.Name(), NumOfZoneLists );
+						ZoneListNum = FindItemInList( VentMechZoneName( groupNum ), ZoneList );
 						if ( ZoneListNum > 0 ) {
 							MechVentZoneCount += ZoneList( ZoneListNum ).NumOfZones;
 						} else {
@@ -1691,7 +1826,7 @@ namespace MixedAir {
 
 				//   Loop through zone names and list of zone names and store data
 				for ( groupNum = 1; groupNum <= NumGroups; ++groupNum ) {
-					ZoneNum = FindItemInList( VentMechZoneName( groupNum ), Zone.Name(), NumOfZones );
+					ZoneNum = FindItemInList( VentMechZoneName( groupNum ), Zone );
 					if ( ZoneNum > 0 ) {
 						if ( any_eq( VentilationMechanical( VentMechNum ).Zone, ZoneNum ) ) {
 							//          Disregard duplicate zone names, show warning and do not store data for this zone
@@ -1712,7 +1847,7 @@ namespace MixedAir {
 								VentilationMechanical( VentMechNum ).ZoneOAACH = VentMechZoneOAACH( groupNum );
 							} else {
 								if ( DoZoneSizing ) {
-									ObjIndex = FindItemInList( VentMechZoneName( groupNum ), ZoneSizingInput.ZoneName(), NumZoneSizingInput );
+									ObjIndex = FindItemInList( VentMechZoneName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 									if ( ObjIndex > 0 ) {
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).DesignSpecOAObjName;
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneDesignSpecOAIndex;
@@ -1725,7 +1860,7 @@ namespace MixedAir {
 										} else { // use defaults
 											VentilationMechanical( VentMechNum ).ZoneOAAreaRate( MechVentZoneCount ) = 0.0;
 											// since this is case with no DesSpcOA object, cannot determine the method and default would be Flow/Person which should default to this flow rate
-											VentilationMechanical( VentMechNum ).ZoneOAPeopleRate( MechVentZoneCount ) = 0.00944; 
+											VentilationMechanical( VentMechNum ).ZoneOAPeopleRate( MechVentZoneCount ) = 0.00944;
 											VentilationMechanical( VentMechNum ).ZoneOAFlow( MechVentZoneCount ) = 0.0;
 											VentilationMechanical( VentMechNum ).ZoneOAACH = 0.0;
 										}
@@ -1748,7 +1883,7 @@ namespace MixedAir {
 								VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount ) = DesignSpecZoneADObjIndex( groupNum );
 							} else {
 								if ( DoZoneSizing ) {
-									ObjIndex = FindItemInList( VentMechZoneName( groupNum ), ZoneSizingInput.ZoneName(), NumZoneSizingInput );
+									ObjIndex = FindItemInList( VentMechZoneName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 									if ( ObjIndex > 0 ) {
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistEffObjName;
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistributionIndex;
@@ -1763,7 +1898,7 @@ namespace MixedAir {
 						}
 					} else {
 						//       Not a zone name, must be a zone list
-						ZoneListNum = FindItemInList( VentMechZoneName( groupNum ), ZoneList.Name(), NumOfZoneLists );
+						ZoneListNum = FindItemInList( VentMechZoneName( groupNum ), ZoneList );
 						if ( ZoneListNum > 0 ) {
 							for ( ScanZoneListNum = 1; ScanZoneListNum <= ZoneList( ZoneListNum ).NumOfZones; ++ScanZoneListNum ) {
 								// check to make sure zone name is unique (not listed more than once)...
@@ -1784,7 +1919,7 @@ namespace MixedAir {
 										ObjIndex = VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount );
 									} else {
 										if ( DoZoneSizing ) {
-											ObjIndex = FindItemInList( Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name, ZoneSizingInput.ZoneName(), NumZoneSizingInput );
+											ObjIndex = FindItemInList( Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 											if ( ObjIndex > 0 ) {
 												VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).DesignSpecOAObjName;
 												VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneDesignSpecOAIndex;
@@ -1823,7 +1958,7 @@ namespace MixedAir {
 										ObjIndex = VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount );
 									} else {
 										if ( DoZoneSizing ) {
-											ObjIndex = FindItemInList( Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name, ZoneSizingInput.ZoneName(), NumZoneSizingInput );
+											ObjIndex = FindItemInList( Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 											if ( ObjIndex > 0 ) {
 												VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistEffObjName;
 												VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistributionIndex;
@@ -1900,7 +2035,7 @@ namespace MixedAir {
 						if ( ZoneNum > 0 ) {
 							EquipListIndex = ZoneEquipConfig( ZoneNum ).EquipListIndex;
 							if ( EquipListIndex > 0 ) {
-								EquipLoop: for ( EquipListNum = 1; EquipListNum <= NumOfZoneEquipLists; ++EquipListNum ) {
+								for ( EquipListNum = 1; EquipListNum <= NumOfZoneEquipLists; ++EquipListNum ) {
 									if ( EquipListNum == EquipListIndex ) {
 										for ( EquipNum = 1; EquipNum <= ZoneEquipList( EquipListNum ).NumOfEquipTypes; ++EquipNum ) {
 											if ( SameString( ZoneEquipList( EquipListNum ).EquipType( EquipNum ), "ZONEHVAC:AIRDISTRIBUTIONUNIT" ) ) {
@@ -1920,7 +2055,6 @@ namespace MixedAir {
 											}
 										}
 									}
-									EquipLoop_loop: ;
 								}
 								EquipLoop_exit: ;
 							}
@@ -1963,7 +2097,7 @@ namespace MixedAir {
 
 			// Link OA controller object with mechanical ventilation object
 			for ( OAControllerNum = 1; OAControllerNum <= NumOAControllers; ++OAControllerNum ) {
-				OAController( OAControllerNum ).VentMechObjectNum = FindItemInList( OAController( OAControllerNum ).VentilationMechanicalName, VentilationMechanical.Name(), NumVentMechControllers );
+				OAController( OAControllerNum ).VentMechObjectNum = FindItemInList( OAController( OAControllerNum ).VentilationMechanicalName, VentilationMechanical );
 				if ( OAController( OAControllerNum ).VentMechObjectNum == 0 && ! OAController( OAControllerNum ).VentilationMechanicalName.empty() ) {
 					ShowSevereError( CurrentModuleObject + "=\"" + OAController( OAControllerNum ).VentilationMechanicalName + "\", non-match to Controller:OutdoorAir" );
 					ShowContinueError( "Invalid specified in Controller:OutdoorAir object = " + OAController( OAControllerNum ).Name );
@@ -2063,13 +2197,13 @@ namespace MixedAir {
 		int NumArg; // Number of arguments from GetObjectDefMaxArgs call
 		int OutAirNum;
 		int IOStat;
-		FArray1D< Real64 > NumArray; // array that holds numeric input values
-		FArray1D_string AlphArray; // array that holds alpha input values
+		Array1D< Real64 > NumArray; // array that holds numeric input values
+		Array1D_string AlphArray; // array that holds alpha input values
 		std::string CurrentModuleObject; // Object type for getting and messages
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -2097,7 +2231,7 @@ namespace MixedAir {
 				GetObjectItem( CurrentModuleObject, OutAirNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), OAMixer.Name(), OutAirNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), OAMixer, OutAirNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -2152,14 +2286,14 @@ namespace MixedAir {
 	ProcessOAControllerInputs(
 		std::string const & CurrentModuleObject,
 		int const OutAirNum,
-		FArray1_string const & AlphArray,
+		Array1_string const & AlphArray,
 		int & NumAlphas,
-		FArray1< Real64 > const & NumArray,
+		Array1< Real64 > const & NumArray,
 		int & NumNums,
-		FArray1_bool const & lNumericBlanks, //Unused
-		FArray1_bool const & lAlphaBlanks,
-		FArray1_string const & cAlphaFields,
-		FArray1_string const & cNumericFields, //Unused
+		Array1_bool const & lNumericBlanks, //Unused
+		Array1_bool const & lAlphaBlanks,
+		Array1_string const & cAlphaFields,
+		Array1_string const & cNumericFields, //Unused
 		bool & ErrorsFound // If errors found in input
 	)
 	{
@@ -2192,7 +2326,6 @@ namespace MixedAir {
 		using DataZoneEquipment::NumOfZoneEquipLists;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::ZoneList;
-		using DataHeatBalance::NumOfZoneLists;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
 		using namespace OutputReportPredefined;
@@ -2368,7 +2501,7 @@ namespace MixedAir {
 		//   High humidity control option can be used with any economizer flag
 		if ( SameString( AlphArray( 16 ), "Yes" ) ) {
 
-			OAController( OutAirNum ).HumidistatZoneNum = FindItemInList( AlphArray( 17 ), Zone.Name(), NumOfZones );
+			OAController( OutAirNum ).HumidistatZoneNum = FindItemInList( AlphArray( 17 ), Zone );
 
 			// Get the node number for the zone with the humidistat
 			if ( OAController( OutAirNum ).HumidistatZoneNum > 0 ) {
@@ -2522,7 +2655,7 @@ namespace MixedAir {
 
 	void
 	InitOutsideAirSys(
-		int const OASysNum, // unused1208
+		int const EP_UNUSED( OASysNum ), // unused1208
 		bool const FirstHVACIteration
 	)
 	{
@@ -2625,9 +2758,9 @@ namespace MixedAir {
 		static bool MyOneTimeFlag( true ); // One-time initialization flag
 		static bool MySetPointCheckFlag( true ); // One-time initialization flag
 		static bool SetUpAirLoopHVACVariables( true ); // One-time initialization flag
-		static FArray1D_bool MyEnvrnFlag; // One-time initialization flag
-		static FArray1D_bool MySizeFlag; // One-time initialization flag
-		static FArray1D_bool MechVentCheckFlag; // One-time initialization flag
+		static Array1D_bool MyEnvrnFlag; // One-time initialization flag
+		static Array1D_bool MySizeFlag; // One-time initialization flag
+		static Array1D_bool MechVentCheckFlag; // One-time initialization flag
 		bool FoundZone; // Logical determines if ZONE object is accounted for in VENTILATION:MECHANICAL object
 		bool FoundAreaZone; // Logical determines if ZONE object is accounted for in VENTILATION:MECHANICAL object
 		bool FoundPeopleZone; // Logical determines if ZONE object is accounted for in VENTILATION:MECHANICAL object
@@ -2702,7 +2835,7 @@ namespace MixedAir {
 					thisNumForMixer = FindItem( CurrentModuleObjects( CMO_OAMixer ), OutsideAirSys( thisOASys ).ComponentType, isize( OutsideAirSys( thisOASys ).ComponentType ) );
 					if ( thisNumForMixer != 0 ) {
 						equipName = OutsideAirSys( thisOASys ).ComponentName( thisNumForMixer );
-						thisMixerIndex = FindItemInList( equipName, OAMixer.Name(), NumOAMixers );
+						thisMixerIndex = FindItemInList( equipName, OAMixer );
 						if ( thisMixerIndex != 0 ) {
 							OAController( thisOAController ).InletNode = OAMixer( thisMixerIndex ).InletNode;
 						} else {
@@ -3104,7 +3237,7 @@ namespace MixedAir {
 
 						// ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
 						int OAFlowMethod = OARequirements( vent_mech.ZoneDesignSpecOAObjIndex( ZoneIndex ) ).OAFlowMethod;
-						if ( OAFlowMethod == OAFlowPPer || OAFlowMethod == OAFlowSum || OAFlowMethod == OAFlowMax ){
+						if ( OAFlowMethod == OAFlowPPer || OAFlowMethod == OAFlowSum || OAFlowMethod == OAFlowMax ) {
 							TotalPeopleOAFlow += ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * vent_mech.ZoneOAPeopleRate( ZoneIndex );
 						}
 					}
@@ -3370,6 +3503,8 @@ namespace MixedAir {
 		using DataHeatBalFanSys::ZoneAirHumRat;
 		using DataContaminantBalance::ZoneSysContDemand;
 		using DataGlobals::DisplayExtraWarnings;
+		using DataGlobals::WarmupFlag;
+		using DataGlobals::DoingSizing;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -3395,7 +3530,7 @@ namespace MixedAir {
 		Real64 EconomizerAirFlowScheduleValue; // value of economizer operation schedule (push-button type control schedule)
 		Real64 OASignal; // Outside air flow rate fraction (0.0 to 1.0)
 		//unused1208 REAL(r64) :: OADPTemp                   ! Outside air dew point temperature
-		static FArray1D< Real64 > Par( 4 ); // Par(1) = mixed air node number //Tuned Made static
+		static Array1D< Real64 > Par( 4 ); // Par(1) = mixed air node number //Tuned Made static
 		// Par(2) = return air node number
 		// Par(3) = outside air node number
 		// Par(4) = mixed air mass flow rate
@@ -3449,7 +3584,6 @@ namespace MixedAir {
 		Real64 ZoneMinCO2; // Minimum CO2 concentration in zone
 		Real64 ZoneContamControllerSched; // Schedule value for ZoneControl:ContaminantController
 
-		static bool MultiPath( false ); // TRUE if multi-path ventilation system such as dual fan dual duct, VAV with fan-powered box
 		static Real64 Ep( 1.0 ); // zone primary air fraction
 		static Real64 Er( 0.0 ); // zone secondary recirculation fraction
 		static Real64 Fa( 1.0 ); // temporary variable used in multi-path VRP calc
@@ -4154,6 +4288,11 @@ namespace MixedAir {
 			OAController( OAControllerNum ).OAMassFlow = min( OAController( OAControllerNum ).OAMassFlow, OAController( OAControllerNum ).MaxOAMassFlowRate );
 		}
 
+		// Update OAMassFlow if there is Demand Manager on ventilation
+		// Implement demand managers before EMS override because we want EMS to have higher priority than demand manager
+		if ( !WarmupFlag && !DoingSizing && ( OAController( OAControllerNum ).ManageDemand ) && ( OAController( OAControllerNum ).OAMassFlow > OAController( OAControllerNum ).DemandLimitFlowRate ) )
+			OAController( OAControllerNum ).OAMassFlow = OAController( OAControllerNum ).DemandLimitFlowRate;
+
 		if ( OAController( OAControllerNum ).EMSOverrideOARate ) {
 			OAController( OAControllerNum ).OAMassFlow = OAController( OAControllerNum ).EMSOARateValue;
 		}
@@ -4576,6 +4715,8 @@ namespace MixedAir {
 
 		// Using/Aliasing
 		using namespace DataLoopNode;
+		using DataGlobals::WarmupFlag;
+		using DataGlobals::DoingSizing;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -4601,17 +4742,34 @@ namespace MixedAir {
 
 		if ( OAController( OAControllerNum ).ControllerType_Num == ControllerOutsideAir ) {
 			// The outside air controller sets the outside air flow rate and the relief air flow rate
-			Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
-			Node( InletAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
+			if ( !WarmupFlag && !DoingSizing && ( OAController( OAControllerNum ).ManageDemand ) && ( OAController( OAControllerNum ).OAMassFlow > OAController( OAControllerNum ).DemandLimitFlowRate ) )
+			{
+				Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).DemandLimitFlowRate;
+				Node( InletAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).DemandLimitFlowRate;
+				Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).DemandLimitFlowRate;
+			}
+			else
+			{
+				Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
+				Node( InletAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
+				Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).OAMassFlow;
+			}
 			Node( RelAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).RelMassFlow;
-			Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).OAMassFlow;
 		} else {
 			// The ERV controller sets the supply and secondary inlet node information for the Stand Alone ERV
 			// Currently, the Stand Alone ERV only has constant air flows (supply and exhaust), and these are
 			// already set in HVACStandAloneERV.cc (subroutine init). Therefore, these flow assignments below are
 			// currently redundant but may be useful in the future as mass flow rates can vary based on the controller signal.
-			Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
-			Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).OAMassFlow;
+			if ( !WarmupFlag && !DoingSizing && ( OAController( OAControllerNum ).ManageDemand ) && ( OAController( OAControllerNum ).OAMassFlow > OAController( OAControllerNum ).DemandLimitFlowRate ) )
+			{
+				Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).DemandLimitFlowRate;
+				Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).DemandLimitFlowRate;
+			}
+			else
+			{
+				Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
+				Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).OAMassFlow;
+			}
 			Node( RetAirNodeNum ).MassFlowRate = Node( OAController( OAControllerNum ).RetNode ).MassFlowRate;
 			Node( RetAirNodeNum ).MassFlowRateMaxAvail = Node( OAController( OAControllerNum ).RetNode ).MassFlowRate;
 		}
@@ -4711,7 +4869,7 @@ namespace MixedAir {
 	}
 
 	void
-	ReportOAMixer( int const OAMixerNum ) // unused1208
+	ReportOAMixer( int const EP_UNUSED( OAMixerNum ) ) // unused1208
 	{
 
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -4719,7 +4877,7 @@ namespace MixedAir {
 	}
 
 	void
-	ReportOAController( int const OAControllerNum ) // unused1208
+	ReportOAController( int const EP_UNUSED( OAControllerNum ) ) // unused1208
 	{
 
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -4735,7 +4893,7 @@ namespace MixedAir {
 	Real64
 	MixedAirControlTempResidual(
 		Real64 const OASignal, // Relative outside air flow rate (0 to 1)
-		FArray1< Real64 > const & Par // par(1) = mixed node number
+		Array1< Real64 > const & Par // par(1) = mixed node number
 	)
 	{
 
@@ -4807,7 +4965,7 @@ namespace MixedAir {
 		return Residuum;
 	}
 
-	FArray1D_int
+	Array1D_int
 	GetOAMixerNodeNumbers(
 		std::string const & OAMixerName, // must match OA mixer names for the OA mixer type
 		bool & ErrorsFound // set to true if problem
@@ -4835,7 +4993,7 @@ namespace MixedAir {
 		using InputProcessor::FindItemInList;
 
 		// Return value
-		FArray1D_int OANodeNumbers( 4 ); // return OA mixer nodes
+		Array1D_int OANodeNumbers( 4 ); // return OA mixer nodes
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -4858,7 +5016,7 @@ namespace MixedAir {
 			GetOAMixerInputFlag = false;
 		}
 
-		WhichOAMixer = FindItemInList( OAMixerName, OAMixer.Name(), NumOAMixers );
+		WhichOAMixer = FindItemInList( OAMixerName, OAMixer );
 		if ( WhichOAMixer != 0 ) {
 			OANodeNumbers( 1 ) = OAMixer( WhichOAMixer ).InletNode;
 			OANodeNumbers( 2 ) = OAMixer( WhichOAMixer ).RelNode;
@@ -5323,7 +5481,7 @@ namespace MixedAir {
 			GetOASysInputFlag = false;
 		}
 
-		OASysNumber = FindItemInList( OASysName, OutsideAirSys.Name(), NumOASystems );
+		OASysNumber = FindItemInList( OASysName, OutsideAirSys );
 
 		return OASysNumber;
 
@@ -5380,7 +5538,7 @@ namespace MixedAir {
 		if ( OASysNumber > 0 && OASysNumber <= NumOASystems ) {
 			for ( OACompNum = 1; OACompNum <= OutsideAirSys( OASysNumber ).NumComponents; ++OACompNum ) {
 				if ( SameString( OutsideAirSys( OASysNumber ).ComponentType( OACompNum ), "OUTDOORAIR:MIXER" ) ) {
-					OAMixerNumber = FindItemInList( OutsideAirSys( OASysNumber ).ComponentName( OACompNum ), OAMixer.Name(), NumOAMixers );
+					OAMixerNumber = FindItemInList( OutsideAirSys( OASysNumber ).ComponentName( OACompNum ), OAMixer );
 					break;
 				}
 			}
@@ -5436,7 +5594,7 @@ namespace MixedAir {
 			GetOAMixerInputFlag = false;
 		}
 
-		OAMixerIndex = FindItem( OAMixerName, OAMixer.Name(), NumOAMixers );
+		OAMixerIndex = FindItem( OAMixerName, OAMixer );
 
 		if ( OAMixerIndex == 0 ) {
 			ShowSevereError( "GetOAMixerIndex: Could not find OutdoorAir:Mixer, Name=\"" + OAMixerName + "\"" );
@@ -5757,7 +5915,7 @@ namespace MixedAir {
 			//  Now check AirLoopHVAC and AirLoopHVAC:OutdoorAirSystem
 			Found = 0;
 			if ( NumOASystems > 0 ) {
-				Found = FindItemInList( ControllerListName, OutsideAirSys.ControllerListName(), NumOASystems );
+				Found = FindItemInList( ControllerListName, OutsideAirSys, &OutsideAirSysProps::ControllerListName );
 				if ( Found > 0 ) ++Count;
 			}
 
@@ -6035,7 +6193,7 @@ namespace MixedAir {
 			GetOAControllerInputFlag = false;
 		}
 
-		VerifyName( OAControllerName, OAController.Name(), NumCurrentOAControllers, IsNotOK, IsBlank, SourceID );
+		VerifyName( OAControllerName, OAController, NumCurrentOAControllers, IsNotOK, IsBlank, SourceID );
 
 	}
 
@@ -6369,7 +6527,7 @@ namespace MixedAir {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

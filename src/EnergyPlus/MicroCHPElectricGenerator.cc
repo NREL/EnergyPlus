@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -84,8 +84,8 @@ namespace MicroCHPElectricGenerator {
 
 	// DERIVED TYPE DEFINITIONS
 	bool GetMicroCHPInput( true ); // When TRUE, calls subroutine to read input file.
-	FArray1D_bool CheckEquipName;
-	FArray1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
+	Array1D_bool MySizeFlag;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Combustion ElectricGenerator
 
@@ -98,7 +98,7 @@ namespace MicroCHPElectricGenerator {
 
 	void
 	SimMicroCHPGenerator(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlagElectCenter, // simulate Generator when TRUE
@@ -152,7 +152,7 @@ namespace MicroCHPElectricGenerator {
 		//  Call InitMicroCHPNoNormalizeGenerators
 
 		if ( GeneratorIndex == 0 ) {
-			GenNum = FindItemInList( GeneratorName, MicroCHP.Name(), NumMicroCHPs );
+			GenNum = FindItemInList( GeneratorName, MicroCHP );
 			if ( GenNum == 0 ) ShowFatalError( "SimMicroCHPGenerator: Specified Generator not one of Valid Micro CHP Generators " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -228,8 +228,8 @@ namespace MicroCHPElectricGenerator {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray( 25 ); // character string data
-		FArray1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
+		Array1D_string AlphArray( 25 ); // character string data
+		Array1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
 		static bool ErrorsFound( false ); // error flag
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -368,7 +368,7 @@ namespace MicroCHPElectricGenerator {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), MicroCHP.Name(), GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), MicroCHP, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -378,7 +378,7 @@ namespace MicroCHPElectricGenerator {
 				ObjMSGName = cCurrentModuleObject + " Named " + AlphArray( 1 );
 				MicroCHP( GeneratorNum ).ParamObjName = AlphArray( 2 ); //  A2 Micro CHP Parameter Object Name
 				//find input structure
-				thisParamID = FindItemInList( AlphArray( 2 ), MicroCHPParamInput.Name(), NumMicroCHPParams );
+				thisParamID = FindItemInList( AlphArray( 2 ), MicroCHPParamInput );
 				if ( thisParamID != 0 ) {
 					MicroCHP( GeneratorNum ).A42Model = MicroCHPParamInput( thisParamID ); // entire structure of input data assigned here!
 				} else {
@@ -389,7 +389,7 @@ namespace MicroCHPElectricGenerator {
 
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
 					MicroCHP( GeneratorNum ).ZoneName = AlphArray( 3 ); //  A3 Zone Name
-					MicroCHP( GeneratorNum ).ZoneID = FindItemInList( MicroCHP( GeneratorNum ).ZoneName, Zone.Name(), NumOfZones );
+					MicroCHP( GeneratorNum ).ZoneID = FindItemInList( MicroCHP( GeneratorNum ).ZoneName, Zone );
 					if ( MicroCHP( GeneratorNum ).ZoneID == 0 ) {
 						ShowSevereError( "Invalid, " + cAlphaFieldNames( 3 ) + " = " + AlphArray( 3 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
@@ -412,7 +412,7 @@ namespace MicroCHPElectricGenerator {
 				MicroCHP( GeneratorNum ).AirOutletNodeName = AlphArray( 7 ); //  A7 Air Outlet Node Name
 				MicroCHP( GeneratorNum ).AirOutletNodeID = GetOnlySingleNode( AlphArray( 7 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 
-				MicroCHP( GeneratorNum ).FuelSupplyID = FindItemInList( AlphArray( 8 ), FuelSupply.Name(), NumGeneratorFuelSups ); // Fuel Supply ID
+				MicroCHP( GeneratorNum ).FuelSupplyID = FindItemInList( AlphArray( 8 ), FuelSupply ); // Fuel Supply ID
 				if ( MicroCHP( GeneratorNum ).FuelSupplyID == 0 ) {
 					ShowSevereError( "Invalid, " + cAlphaFieldNames( 8 ) + " = " + AlphArray( 8 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
@@ -500,7 +500,7 @@ namespace MicroCHPElectricGenerator {
 	void
 	InitMicroCHPNoNormalizeGenerators(
 		int const GeneratorNum, // Generator number
-		bool const FirstHVACIteration
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 
@@ -520,14 +520,11 @@ namespace MicroCHPElectricGenerator {
 
 		// Using/Aliasing
 		using DataHVACGlobals::SysTimeElapsed;
-		using DataHVACGlobals::TimeStepSys;
 		using DataGlobals::TimeStep;
 		using DataGlobals::TimeStepZone;
-		using DataGlobals::SecInHour;
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::HourOfDay;
 		using DataGlobals::SysSizingCalc;
-		using DataGlobals::HoursInDay;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_Generator_MicroCHP;
 		using DataPlant::PlantLoop;
@@ -560,8 +557,8 @@ namespace MicroCHPElectricGenerator {
 		static int DynaCntrlNum( 0 );
 		Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 		static bool MyOneTimeFlag( true ); // Initialization flag
-		static FArray1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-		static FArray1D_bool MyPlantScanFlag;
+		static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
+		static Array1D_bool MyPlantScanFlag;
 
 		bool errFlag;
 		Real64 mdot; // local temporary for mass flow rate
@@ -731,7 +728,6 @@ namespace MicroCHPElectricGenerator {
 		using DataGlobals::TimeStep;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::SecInHour;
-		using DataGlobals::HoursInDay;
 		using CurveManager::CurveValue;
 		using namespace DataGlobalConstants;
 		using FluidProperties::GetSpecificHeatGlycol;
@@ -1339,7 +1335,6 @@ namespace MicroCHPElectricGenerator {
 		// na
 
 		// Using/Aliasing
-		using DataHeatBalance::ZoneIntGain;
 		using DataGlobals::BeginEnvrnFlag;
 
 		// Locals
@@ -1392,7 +1387,7 @@ namespace MicroCHPElectricGenerator {
 	void
 	CalcUpdateHeatRecovery(
 		int const Num, // Generator number
-		bool const FirstHVACIteration
+		bool const EP_UNUSED( FirstHVACIteration )
 	)
 	{
 
@@ -1449,12 +1444,12 @@ namespace MicroCHPElectricGenerator {
 
 	void
 	SimMicroCHPPlantHeatRecovery(
-		std::string const & CompType,
+		std::string const & EP_UNUSED( CompType ),
 		std::string const & CompName,
 		int & CompNum,
-		bool const RunFlag,
+		bool const EP_UNUSED( RunFlag ),
 		bool & InitLoopEquip,
-		Real64 & MyThermalLoad,
+		Real64 & EP_UNUSED( MyThermalLoad ),
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
@@ -1510,7 +1505,7 @@ namespace MicroCHPElectricGenerator {
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = FindItemInList( CompName, MicroCHP.Name(), NumMicroCHPs );
+			CompNum = FindItemInList( CompName, MicroCHP );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimMicroCHPPlantHeatRecovery: MicroCHP Generator Unit not found=" + CompName );
 				return;
@@ -1631,7 +1626,7 @@ namespace MicroCHPElectricGenerator {
 
 	void
 	GetMicroCHPGeneratorResults(
-		int const GeneratorType, // type of Generator
+		int const EP_UNUSED( GeneratorType ), // type of Generator
 		int const GeneratorIndex,
 		Real64 & GeneratorPower, // electrical power
 		Real64 & GeneratorEnergy, // electrical energy

@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -11,6 +11,7 @@
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataZoneControls.hh>
+#include <MixedAir.hh>
 #include <ExteriorEnergyUse.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
@@ -26,7 +27,7 @@ namespace DemandManager {
 	// MODULE INFORMATION:
 	//       AUTHOR         Peter Graham Ellis
 	//       DATE WRITTEN   July 2005
-	//       MODIFIED       na
+	//       MODIFIED       Simon Vidanovic (March 2015) - Introduced DemandManager:Ventilation
 	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS MODULE:
@@ -52,6 +53,7 @@ namespace DemandManager {
 	int const ManagerTypeLights( 2 );
 	int const ManagerTypeElecEquip( 3 );
 	int const ManagerTypeThermostats( 4 );
+	int const ManagerTypeVentilation( 5 );
 
 	int const ManagerPrioritySequential( 1 );
 	int const ManagerPriorityOptimal( 2 );
@@ -60,6 +62,7 @@ namespace DemandManager {
 	int const ManagerLimitOff( 1 );
 	int const ManagerLimitFixed( 2 );
 	int const ManagerLimitVariable( 3 );
+	int const ManagerLimitReductionRatio( 4 );
 
 	int const ManagerSelectionAll( 1 );
 	int const ManagerSelectionMany( 2 );
@@ -86,12 +89,27 @@ namespace DemandManager {
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	FArray1D< DemandManagerListData > DemandManagerList;
-	FArray1D< DemandManagerData > DemandMgr;
+	Array1D< DemandManagerListData > DemandManagerList;
+	Array1D< DemandManagerData > DemandMgr;
 
 	// MODULE SUBROUTINES:
 
 	// Functions
+
+	// Clears the global data in DemandManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumDemandManagerList = 0;
+		NumDemandMgr = 0;
+		DemandManagerExtIterations = 0;
+		DemandManagerHBIterations = 0;
+		DemandManagerHVACIterations = 0;
+		GetInput = true;
+		DemandManagerList.deallocate();
+		DemandMgr.deallocate();
+	}
 
 	void
 	ManageDemand()
@@ -217,7 +235,7 @@ namespace DemandManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Peter Graham Ellis
 		//       DATE WRITTEN   July 2005
-		//       MODIFIED       na
+		//       MODIFIED       Simon Vidanovic (March 2015) - Introduced DemandManager:Ventilation
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -282,7 +300,7 @@ namespace DemandManager {
 								ResimHB = true;
 								ResimHVAC = true;
 
-							} else if ( SELECT_CASE_var1 == ManagerTypeThermostats ) {
+							} else if ( ( SELECT_CASE_var1 == ManagerTypeThermostats ) || ( SELECT_CASE_var1 == ManagerTypeVentilation ) ) {
 								ResimHVAC = true;
 
 							}}
@@ -310,7 +328,8 @@ namespace DemandManager {
 								ResimHB = true;
 								ResimHVAC = true;
 
-							} else if ( SELECT_CASE_var1 == ManagerTypeThermostats ) {
+							}
+							else if ( ( SELECT_CASE_var1 == ManagerTypeThermostats ) || ( SELECT_CASE_var1 == ManagerTypeVentilation ) ) {
 								ResimHVAC = true;
 
 							}}
@@ -332,7 +351,7 @@ namespace DemandManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Peter Graham Ellis
 		//       DATE WRITTEN   July 2005
-		//       MODIFIED       na
+		//       MODIFIED       Simon Vidanovic (March 2015) - Introduced DemandManager:Ventilation
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -362,8 +381,8 @@ namespace DemandManager {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray; // Character string data
-		FArray1D< Real64 > NumArray; // Numeric data
+		Array1D_string AlphArray; // Character string data
+		Array1D< Real64 > NumArray; // Numeric data
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		std::string Units; // String for meter units
@@ -388,7 +407,7 @@ namespace DemandManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), DemandManagerList.Name(), ListNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), DemandManagerList, ListNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -477,9 +496,9 @@ namespace DemandManager {
 
 						// Validate DEMAND MANAGER Type
 						{ auto const SELECT_CASE_var( AlphArray( MgrNum * 2 + 5 ) );
-						if ( ( SELECT_CASE_var == "DEMANDMANAGER:LIGHTS" ) || ( SELECT_CASE_var == "DEMANDMANAGER:EXTERIORLIGHTS" ) || ( SELECT_CASE_var == "DEMANDMANAGER:ELECTRICEQUIPMENT" ) || ( SELECT_CASE_var == "DEMANDMANAGER:THERMOSTATS" ) ) {
+						if ((SELECT_CASE_var == "DEMANDMANAGER:LIGHTS") || (SELECT_CASE_var == "DEMANDMANAGER:EXTERIORLIGHTS") || (SELECT_CASE_var == "DEMANDMANAGER:ELECTRICEQUIPMENT") || (SELECT_CASE_var == "DEMANDMANAGER:THERMOSTATS") || (SELECT_CASE_var == "DEMANDMANAGER:VENTILATION")) {
 
-							DemandManagerList( ListNum ).Manager( MgrNum ) = FindItemInList( AlphArray( MgrNum * 2 + 6 ), DemandMgr.Name(), NumDemandMgr );
+							DemandManagerList( ListNum ).Manager( MgrNum ) = FindItemInList( AlphArray( MgrNum * 2 + 6 ), DemandMgr );
 
 							if ( DemandManagerList( ListNum ).Manager( MgrNum ) == 0 ) {
 								ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( MgrNum * 2 + 6 ) + "=\"" + AlphArray( MgrNum * 2 + 6 ) + "\" not found." );
@@ -538,7 +557,7 @@ namespace DemandManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Peter Graham Ellis
 		//       DATE WRITTEN   July 2005
-		//       MODIFIED       na
+		//       MODIFIED       MODIFIED       Simon Vidanovic (March 2015) - Introduced DemandManager:Ventilation
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -557,20 +576,14 @@ namespace DemandManager {
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using ScheduleManager::GetScheduleIndex;
 		using DataHeatBalance::Lights;
-		using DataHeatBalance::TotLights;
 		using DataHeatBalance::ZoneElectric;
-		using DataHeatBalance::TotElecEquip;
 		using DataHeatBalance::LightsObjects;
-		using DataHeatBalance::NumLightsStatements;
 		using DataHeatBalance::ZoneElectricObjects;
-		using DataHeatBalance::NumZoneElectricStatements;
 		using ExteriorEnergyUse::ExteriorLights;
-		using ExteriorEnergyUse::NumExteriorLights;
 		using DataZoneControls::TempControlledZone;
-		using DataZoneControls::NumTempControlledZones;
 		using DataZoneControls::TStatObjects;
-		using DataZoneControls::NumTStatStatements;
 		using General::RoundSigDigits;
+		using MixedAir::GetOAController;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -581,6 +594,7 @@ namespace DemandManager {
 		int NumDemandMgrLights;
 		int NumDemandMgrElecEquip;
 		int NumDemandMgrThermostats;
+		int NumDemandMgrVentilation;
 		int MgrNum;
 		int StartIndex;
 		int EndIndex;
@@ -592,8 +606,8 @@ namespace DemandManager {
 		int MaxNums; // Max number of elements in the numeric array
 		int NumParams; // Number of arguments total in an ObjectDef
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray; // Character string data
-		FArray1D< Real64 > NumArray; // Numeric data
+		Array1D_string AlphArray; // Character string data
+		Array1D< Real64 > NumArray; // Numeric data
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false );
@@ -632,8 +646,15 @@ namespace DemandManager {
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNums = max( MaxNums, NumNums );
 		}
+		CurrentModuleObject = "DemandManager:Ventilation";
+		NumDemandMgrVentilation = GetNumObjectsFound( CurrentModuleObject );
+		if ( NumDemandMgrVentilation > 0 ) {
+			GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+			MaxAlphas = max( MaxAlphas, NumAlphas );
+			MaxNums = max( MaxNums, NumNums );
+		}
 
-		NumDemandMgr = NumDemandMgrExtLights + NumDemandMgrLights + NumDemandMgrElecEquip + NumDemandMgrThermostats;
+		NumDemandMgr = NumDemandMgrExtLights + NumDemandMgrLights + NumDemandMgrElecEquip + NumDemandMgrThermostats + NumDemandMgrVentilation;
 
 		if ( NumDemandMgr > 0 ) {
 			AlphArray.dimension( MaxAlphas, BlankString );
@@ -653,7 +674,7 @@ namespace DemandManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), DemandMgr.Name(), MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), DemandMgr, MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -690,7 +711,10 @@ namespace DemandManager {
 					ErrorsFound = true;
 				}}
 
-				DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
+				if ( NumArray( 1 ) == 0.0 )
+					DemandMgr( MgrNum ).LimitDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
 
 				DemandMgr( MgrNum ).LowerLimit = NumArray( 2 );
 
@@ -711,7 +735,10 @@ namespace DemandManager {
 					ErrorsFound = true;
 				}}
 
-				DemandMgr( MgrNum ).RotationDuration = NumArray( 4 );
+				if ( NumArray( 4 ) == 0.0 )
+					DemandMgr( MgrNum ).RotationDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).RotationDuration = NumArray( 4 );
 
 				DemandMgr( MgrNum ).NumOfLoads = NumAlphas - 4;
 
@@ -719,7 +746,7 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).Load.allocate( DemandMgr( MgrNum ).NumOfLoads );
 
 					for ( LoadNum = 1; LoadNum <= DemandMgr( MgrNum ).NumOfLoads; ++LoadNum ) {
-						LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), ExteriorLights.Name(), NumExteriorLights );
+						LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), ExteriorLights );
 
 						if ( LoadPtr > 0 ) {
 							DemandMgr( MgrNum ).Load( LoadNum ) = LoadPtr;
@@ -730,6 +757,12 @@ namespace DemandManager {
 
 						}
 					} // LoadNum
+				}
+				else
+				{
+					ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
+					ShowContinueError("Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+					ErrorsFound = true;
 				}
 
 			} // MgrNum
@@ -746,7 +779,7 @@ namespace DemandManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), DemandMgr.Name(), MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), DemandMgr, MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -783,7 +816,10 @@ namespace DemandManager {
 					ErrorsFound = true;
 				}}
 
-				DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
+				if ( NumArray( 1 ) == 0.0 )
+					DemandMgr( MgrNum ).LimitDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
 
 				DemandMgr( MgrNum ).LowerLimit = NumArray( 2 );
 
@@ -804,16 +840,19 @@ namespace DemandManager {
 					ErrorsFound = true;
 				}}
 
-				DemandMgr( MgrNum ).RotationDuration = NumArray( 4 );
+				if ( NumArray( 4 ) == 0.0 )
+					DemandMgr( MgrNum ).RotationDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).RotationDuration = NumArray( 4 );
 
 				// Count actual pointers to controlled zones
 				DemandMgr( MgrNum ).NumOfLoads = 0;
 				for ( LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum ) {
-					LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), LightsObjects.Name(), NumLightsStatements );
+					LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), LightsObjects );
 					if ( LoadPtr > 0 ) {
 						DemandMgr( MgrNum ).NumOfLoads += LightsObjects( LoadPtr ).NumOfZones;
 					} else {
-						LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), Lights.Name(), TotLights );
+						LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), Lights );
 						if ( LoadPtr > 0 ) {
 							++DemandMgr( MgrNum ).NumOfLoads;
 						} else {
@@ -829,20 +868,26 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).Load.allocate( DemandMgr( MgrNum ).NumOfLoads );
 					LoadNum = 0;
 					for ( Item = 1; Item <= NumAlphas - 4; ++Item ) {
-						LoadPtr = FindItemInList( AlphArray( Item + 4 ), LightsObjects.Name(), NumLightsStatements );
+						LoadPtr = FindItemInList( AlphArray( Item + 4 ), LightsObjects );
 						if ( LoadPtr > 0 ) {
 							for ( Item1 = 1; Item1 <= LightsObjects( LoadPtr ).NumOfZones; ++Item1 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = LightsObjects( LoadPtr ).StartPtr + Item1 - 1;
 							}
 						} else {
-							LoadPtr = FindItemInList( AlphArray( Item + 4 ), Lights.Name(), TotLights );
+							LoadPtr = FindItemInList( AlphArray( Item + 4 ), Lights );
 							if ( LoadPtr > 0 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = LoadPtr;
 							}
 						}
 					} // LoadNum
+				}
+				else
+				{
+					ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
+					ShowContinueError("Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+					ErrorsFound = true;
 				}
 
 			} // MgrNum
@@ -859,7 +904,7 @@ namespace DemandManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), DemandMgr.Name(), MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), DemandMgr, MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -896,7 +941,10 @@ namespace DemandManager {
 					ErrorsFound = true;
 				}}
 
-				DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
+				if ( NumArray( 1 ) == 0.0 )
+					DemandMgr( MgrNum ).LimitDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
 
 				DemandMgr( MgrNum ).LowerLimit = NumArray( 2 );
 
@@ -917,16 +965,19 @@ namespace DemandManager {
 					ErrorsFound = true;
 				}}
 
-				DemandMgr( MgrNum ).RotationDuration = NumArray( 4 );
+				if ( NumArray( 4 ) == 0.0 )
+					DemandMgr( MgrNum ).RotationDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).RotationDuration = NumArray( 4 );
 
 				// Count actual pointers to controlled zones
 				DemandMgr( MgrNum ).NumOfLoads = 0;
 				for ( LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum ) {
-					LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), ZoneElectricObjects.Name(), NumZoneElectricStatements );
+					LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), ZoneElectricObjects );
 					if ( LoadPtr > 0 ) {
 						DemandMgr( MgrNum ).NumOfLoads += ZoneElectricObjects( LoadPtr ).NumOfZones;
 					} else {
-						LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), ZoneElectric.Name(), TotElecEquip );
+						LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), ZoneElectric );
 						if ( LoadPtr > 0 ) {
 							++DemandMgr( MgrNum ).NumOfLoads;
 						} else {
@@ -942,20 +993,26 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).Load.allocate( DemandMgr( MgrNum ).NumOfLoads );
 					LoadNum = 0;
 					for ( Item = 1; Item <= NumAlphas - 4; ++Item ) {
-						LoadPtr = FindItemInList( AlphArray( Item + 4 ), ZoneElectricObjects.Name(), NumZoneElectricStatements );
+						LoadPtr = FindItemInList( AlphArray( Item + 4 ), ZoneElectricObjects );
 						if ( LoadPtr > 0 ) {
 							for ( Item1 = 1; Item1 <= ZoneElectricObjects( LoadPtr ).NumOfZones; ++Item1 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = ZoneElectricObjects( LoadPtr ).StartPtr + Item1 - 1;
 							}
 						} else {
-							LoadPtr = FindItemInList( AlphArray( Item + 4 ), ZoneElectric.Name(), TotElecEquip );
+							LoadPtr = FindItemInList( AlphArray( Item + 4 ), ZoneElectric );
 							if ( LoadPtr > 0 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = LoadPtr;
 							}
 						}
 					} // LoadNum
+				}
+				else
+				{
+					ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
+					ShowContinueError("Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+					ErrorsFound = true;
 				}
 
 			} // MgrNum
@@ -972,7 +1029,7 @@ namespace DemandManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), DemandMgr.Name(), MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), DemandMgr, MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1009,7 +1066,10 @@ namespace DemandManager {
 					ErrorsFound = true;
 				}}
 
-				DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
+				if ( NumArray( 1 ) == 0.0 )
+					DemandMgr( MgrNum ).LimitDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
 
 				DemandMgr( MgrNum ).LowerLimit = NumArray( 2 );
 				DemandMgr( MgrNum ).UpperLimit = NumArray( 3 );
@@ -1038,16 +1098,19 @@ namespace DemandManager {
 					ErrorsFound = true;
 				}}
 
-				DemandMgr( MgrNum ).RotationDuration = NumArray( 5 );
+				if ( NumArray( 5 ) == 0.0 )
+					DemandMgr( MgrNum ).RotationDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).RotationDuration = NumArray( 5 );
 
 				// Count actual pointers to controlled zones
 				DemandMgr( MgrNum ).NumOfLoads = 0;
 				for ( LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum ) {
-					LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), TStatObjects.Name(), NumTStatStatements );
+					LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), TStatObjects );
 					if ( LoadPtr > 0 ) {
 						DemandMgr( MgrNum ).NumOfLoads += TStatObjects( LoadPtr ).NumOfZones;
 					} else {
-						LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), TempControlledZone.Name(), NumTempControlledZones );
+						LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), TempControlledZone );
 						if ( LoadPtr > 0 ) {
 							++DemandMgr( MgrNum ).NumOfLoads;
 						} else {
@@ -1061,14 +1124,14 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).Load.allocate( DemandMgr( MgrNum ).NumOfLoads );
 					LoadNum = 0;
 					for ( Item = 1; Item <= NumAlphas - 4; ++Item ) {
-						LoadPtr = FindItemInList( AlphArray( Item + 4 ), TStatObjects.Name(), NumTStatStatements );
+						LoadPtr = FindItemInList( AlphArray( Item + 4 ), TStatObjects );
 						if ( LoadPtr > 0 ) {
 							for ( Item1 = 1; Item1 <= TStatObjects( LoadPtr ).NumOfZones; ++Item1 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = TStatObjects( LoadPtr ).TempControlledZoneStartPtr + Item1 - 1;
 							}
 						} else {
-							LoadPtr = FindItemInList( AlphArray( Item + 4 ), TempControlledZone.Name(), NumTempControlledZones );
+							LoadPtr = FindItemInList( AlphArray( Item + 4 ), TempControlledZone );
 							if ( LoadPtr > 0 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = LoadPtr;
@@ -1076,7 +1139,137 @@ namespace DemandManager {
 						}
 					} // LoadNum
 				}
+				else
+				{
+					ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
+					ShowContinueError("Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+					ErrorsFound = true;
+				}
 
+			} // MgrNum
+
+			// Get input for DemandManager:Ventilation
+			StartIndex = EndIndex + 1;
+			EndIndex += NumDemandMgrVentilation;
+
+			CurrentModuleObject = "DemandManager:Ventilation";
+
+			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
+
+				GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
+				IsNotOK = false;
+				IsBlank = false;
+				VerifyName( AlphArray( 1 ), DemandMgr.Name(), MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				if ( IsNotOK ) {
+					ErrorsFound = true;
+					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
+				}
+				DemandMgr( MgrNum ).Name = AlphArray( 1 );
+
+				DemandMgr( MgrNum ).Type = ManagerTypeVentilation;
+
+				if ( !lAlphaFieldBlanks( 2 ) ) {
+					DemandMgr( MgrNum ).AvailSchedule = GetScheduleIndex( AlphArray( 2 ) );
+
+					if ( DemandMgr( MgrNum ).AvailSchedule == 0 ) {
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + AlphArray( 2 ) + "\" not found." );
+						ErrorsFound = true;
+					}
+				}
+				else {
+					DemandMgr( MgrNum ).AvailSchedule = ScheduleAlwaysOn;
+				}
+
+				// Validate Limiting Control
+				{ auto const SELECT_CASE_var( AlphArray( 3 ) );
+				if ( SELECT_CASE_var == "OFF" ) {
+					DemandMgr( MgrNum ).LimitControl = ManagerLimitOff;
+
+				}
+				else if ( SELECT_CASE_var == "FIXEDRATE" ) {
+					DemandMgr( MgrNum ).LimitControl = ManagerLimitFixed;
+
+				}
+				else if ( SELECT_CASE_var == "REDUCTIONRATIO" ) {
+					DemandMgr( MgrNum ).LimitControl = ManagerLimitReductionRatio;
+
+				}
+				else {
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid value" + cAlphaFieldNames( 3 ) + "=\"" + AlphArray( 3 ) + "\"." );
+					ShowContinueError( "...value must be one of Off, FixedRate, or ReductionRatio." );
+					ErrorsFound = true;
+				}}
+
+				if ( NumArray( 1 ) == 0.0 )
+					DemandMgr( MgrNum ).LimitDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).LimitDuration = NumArray( 1 );
+
+				if ( DemandMgr( MgrNum ).LimitControl == ManagerLimitFixed )
+					DemandMgr( MgrNum ).FixedRate = NumArray( 2 );
+				if ( DemandMgr( MgrNum ).LimitControl == ManagerLimitReductionRatio )
+					DemandMgr( MgrNum ).ReductionRatio = NumArray( 3 );
+
+				DemandMgr( MgrNum ).LowerLimit = NumArray( 4 );
+
+				// Validate Selection Control
+				{ auto const SELECT_CASE_var( AlphArray( 4 ) );
+				if ( SELECT_CASE_var == "ALL" ) {
+					DemandMgr( MgrNum ).SelectionControl = ManagerSelectionAll;
+
+				}
+				else if ( SELECT_CASE_var == "ROTATEONE" ) {
+					DemandMgr( MgrNum ).SelectionControl = ManagerSelectionOne;
+
+				}
+				else if ( SELECT_CASE_var == "ROTATEMANY" ) {
+					DemandMgr( MgrNum ).SelectionControl = ManagerSelectionMany;
+
+				}
+				else {
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid value" + cAlphaFieldNames( 4 ) + "=\"" + AlphArray( 4 ) + "\"." );
+					ShowContinueError( "...value must be one of All, RotateOne, or RotateMany." );
+					ErrorsFound = true;
+				}}
+
+				if ( NumArray( 5 ) == 0.0 )
+					DemandMgr( MgrNum ).RotationDuration = MinutesPerTimeStep;
+				else
+					DemandMgr( MgrNum ).RotationDuration = NumArray( 5 );
+
+				// Count number of string fields for loading Controller:OutdoorAir names. This number must be increased in case if
+				// new string field is added or decreased if string fields are removed.
+				int AlphaShift = 4;
+
+				// Count actual pointers to air controllers
+				DemandMgr(MgrNum).NumOfLoads = 0;
+				for ( LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum ) {
+					LoadPtr = GetOAController( AlphArray( LoadNum + AlphaShift ) );
+					if ( LoadPtr > 0 ) {
+						++DemandMgr( MgrNum ).NumOfLoads;
+					}
+					else {
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( LoadNum + AlphaShift ) + "=\"" + AlphArray( LoadNum + AlphaShift ) + "\" not found." );
+						ErrorsFound = true;
+					}
+				}
+
+				if ( DemandMgr( MgrNum ).NumOfLoads > 0 ) {
+					DemandMgr( MgrNum ).Load.allocate( DemandMgr( MgrNum ).NumOfLoads );
+					for ( LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum ) {
+						LoadPtr = GetOAController( AlphArray( LoadNum + AlphaShift ) );
+						if ( LoadPtr > 0 ) {
+							DemandMgr( MgrNum ).Load( LoadNum ) = LoadPtr;
+						}
+					}
+				}
+				else
+				{
+					ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid value for number of loads.");
+					ShowContinueError("Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+					ErrorsFound = true;
+				}
 			} // MgrNum
 
 			AlphArray.deallocate();
@@ -1495,6 +1688,10 @@ namespace DemandManager {
 		using DataHeatBalFanSys::ZoneThermostatSetPointHi;
 		using DataHeatBalFanSys::ZoneThermostatSetPointLo;
 		using DataHeatBalFanSys::ComfortControlType;
+		using MixedAir::OAGetFlowRate;
+		using MixedAir::OAGetMinFlowRate;
+		using MixedAir::OASetDemandManagerVentilationState;
+		using MixedAir::OASetDemandManagerVentilationFlow;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1564,7 +1761,33 @@ namespace DemandManager {
 				}
 			}
 
-		}}
+		} else if ( SELECT_CASE_var == ManagerTypeVentilation ) {
+			Real64 FlowRate( 0 );
+			FlowRate = OAGetFlowRate( LoadPtr );
+			if ( Action == CheckCanReduce ) {
+				CanReduceDemand = true;
+			}
+			else if ( Action == SetLimit ) {
+				OASetDemandManagerVentilationState( LoadPtr, true );
+				if ( DemandMgr(MgrNum).LimitControl == ManagerLimitFixed )
+				{
+					OASetDemandManagerVentilationFlow( LoadPtr, DemandMgr( MgrNum ).FixedRate );
+				}
+				else if ( DemandMgr( MgrNum ).LimitControl == ManagerLimitReductionRatio )
+				{
+					Real64 DemandRate( 0 );
+					DemandRate = FlowRate * DemandMgr( MgrNum ).ReductionRatio;
+					OASetDemandManagerVentilationFlow( LoadPtr, DemandRate );
+				}
+			}
+			else if ( Action == ClearLimit )
+			{
+				OASetDemandManagerVentilationState( LoadPtr, false );
+			}
+		}
+
+
+		}
 
 	}
 
@@ -1616,7 +1839,7 @@ namespace DemandManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

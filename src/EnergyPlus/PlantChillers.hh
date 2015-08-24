@@ -2,7 +2,7 @@
 #define PlantChillers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -192,9 +192,9 @@ namespace PlantChillers {
 		Real64 TempRiseCoef; // (Electric ADJTC(2)) correction factor for off ChillDesign oper.
 		Real64 TempDesEvapOut; // C - (Electric ADJTC(3)The design primary loop fluid
 		// temperature at the chiller evaporator side outlet
-		FArray1D< Real64 > CapRatCoef; // (Electric RCAVC() ) coeff of cap ratio poly fit
-		FArray1D< Real64 > PowerRatCoef; // (Electric ADJEC() ) coeff of power rat poly fit
-		FArray1D< Real64 > FullLoadCoef; // (Electric RPWRC() ) coeff of full load poly. fit
+		Array1D< Real64 > CapRatCoef; // (Electric RCAVC() ) coeff of cap ratio poly fit
+		Array1D< Real64 > PowerRatCoef; // (Electric ADJEC() ) coeff of power rat poly fit
+		Array1D< Real64 > FullLoadCoef; // (Electric RPWRC() ) coeff of full load poly. fit
 		Real64 TempLowLimitEvapOut; // C - low temperature shut off
 		Real64 DesignHeatRecVolFlowRate; // m3/s, Design Water mass flow rate through heat recovery loop
 		bool DesignHeatRecVolFlowRateWasAutoSized; // true if previous was input autosize.
@@ -253,9 +253,9 @@ namespace PlantChillers {
 		Real64 TempRiseCoef; // (EngineDriven ADJTC(2)) correction factor for off ChillDesign oper.
 		Real64 TempDesEvapOut; // C - (EngineDriven ADJTC(3)The design primary loop fluid
 		// temperature at the chiller evaporator side outlet
-		FArray1D< Real64 > CapRatCoef; // (EngineDriven RCAVC() ) coeff of cap ratio poly fit
-		FArray1D< Real64 > PowerRatCoef; // (EngineDriven ADJEC() ) coeff of power rat poly fit
-		FArray1D< Real64 > FullLoadCoef; // (EngineDriven RPWRC() ) coeff of full load poly. fit
+		Array1D< Real64 > CapRatCoef; // (EngineDriven RCAVC() ) coeff of cap ratio poly fit
+		Array1D< Real64 > PowerRatCoef; // (EngineDriven ADJEC() ) coeff of power rat poly fit
+		Array1D< Real64 > FullLoadCoef; // (EngineDriven RPWRC() ) coeff of full load poly. fit
 		Real64 TempLowLimitEvapOut; // C - low temperature shut off
 		int ClngLoadtoFuelCurve; // Coeff of Shaft Power to Fuel Energy Input Coeff Poly Fit
 		int RecJacHeattoFuelCurve; // Curve Index for Ratio of Recoverable Jacket Heat to
@@ -264,7 +264,7 @@ namespace PlantChillers {
 		Real64 ExhaustTemp; // (TEXDC) Exhaust Gas Temp to Fuel Energy Input
 		int ExhaustTempCurve; // Curve Index for Exhaust Gas Temp to Fuel Energy Input Coeffs Poly Fit
 		Real64 UA; // (UACDC) exhaust gas Heat Exchanger UA to Capacity
-		FArray1D< Real64 > UACoef; // Heat Exchanger UA Coeffs Poly Fit
+		Array1D< Real64 > UACoef; // Heat Exchanger UA Coeffs Poly Fit
 		Real64 MaxExhaustperPowerOutput; // MAX EXHAUST FLOW PER W DSL POWER OUTPUT COEFF
 		Real64 DesignMinExitGasTemp; // Steam Saturation Temperature
 		Real64 FuelHeatingValue; // Heating Value of Fuel in kJ/kg
@@ -329,25 +329,25 @@ namespace PlantChillers {
 		Real64 TempRiseCoef; // (GT ADJTC(2)) correction factor for off ChillDesign oper.
 		Real64 TempDesEvapOut; // C - (GT ADJTC(3)The design primary loop fluid
 		// temperature at the chiller evaporator side outlet
-		FArray1D< Real64 > CapRatCoef; // (GT RCAVC() ) coeff of cap ratio poly fit
-		FArray1D< Real64 > PowerRatCoef; // (GT ADJEC() ) coeff of power rat poly fit
-		FArray1D< Real64 > FullLoadCoef; // (GT RPWRC() ) coeff of full load poly. fit
+		Array1D< Real64 > CapRatCoef; // (GT RCAVC() ) coeff of cap ratio poly fit
+		Array1D< Real64 > PowerRatCoef; // (GT ADJEC() ) coeff of power rat poly fit
+		Array1D< Real64 > FullLoadCoef; // (GT RPWRC() ) coeff of full load poly. fit
 		Real64 TempLowLimitEvapOut; // C - low temperature shut off
 		// "special" GT chiller input parameters
 		Real64 FuelEnergyIn; // (EFUEL) Amount of Fuel Energy Required to run gas turbine
-		FArray1D< Real64 > PLBasedFuelInputCoef; // (FUL1GC) Part Load Ratio Based Fuel Input Coefficients Poly Fit
-		FArray1D< Real64 > TempBasedFuelInputCoef; // (FUL2GC) Ambient Temperature Based Fuel Input Coeff Poly Fit
+		Array1D< Real64 > PLBasedFuelInputCoef; // (FUL1GC) Part Load Ratio Based Fuel Input Coefficients Poly Fit
+		Array1D< Real64 > TempBasedFuelInputCoef; // (FUL2GC) Ambient Temperature Based Fuel Input Coeff Poly Fit
 		Real64 ExhaustFlow; // (FEX) Exhaust Gas Flow Rate cubic meters per second
-		FArray1D< Real64 > ExhaustFlowCoef; // (FEXGC) Exhaust Gas Flow Rate Input Coef Poly Fit
+		Array1D< Real64 > ExhaustFlowCoef; // (FEXGC) Exhaust Gas Flow Rate Input Coef Poly Fit
 		Real64 ExhaustTemp; // (TEX) Exhaust Gas Temperature in C
-		FArray1D< Real64 > PLBasedExhaustTempCoef; // (TEX1GC) Part Load Ratio Based Exhaust Temperature Input Coeffs Poly Fit
-		FArray1D< Real64 > TempBasedExhaustTempCoef; // (TEX2GC) Ambient Temperature Based Exhaust Gas Temp to
+		Array1D< Real64 > PLBasedExhaustTempCoef; // (TEX1GC) Part Load Ratio Based Exhaust Temperature Input Coeffs Poly Fit
+		Array1D< Real64 > TempBasedExhaustTempCoef; // (TEX2GC) Ambient Temperature Based Exhaust Gas Temp to
 		// Fuel Energy Input Coeffs Poly Fit
 		Real64 HeatRecLubeEnergy; // (ELUBE) Recoverable Lube Oil Energy
 		Real64 HeatRecLubeRate; // (ELUBE) Recoverable Lube Oil Rate of Rwecovery (W)
-		FArray1D< Real64 > HeatRecLubeEnergyCoef; // (ELUBEGC)  Recoverable Lube Oil Energy Input Coef Poly Fit
+		Array1D< Real64 > HeatRecLubeEnergyCoef; // (ELUBEGC)  Recoverable Lube Oil Energy Input Coef Poly Fit
 		Real64 UAtoCapRat; // (UACGC) Heat Exchanger UA to Capacity
-		FArray1D< Real64 > UAtoCapCoef; // Heat Exchanger UA to Capacity Coeffs Poly Fit
+		Array1D< Real64 > UAtoCapCoef; // Heat Exchanger UA to Capacity Coeffs Poly Fit
 		Real64 GTEngineCapacity; // Capacity of GT Unit attached to Chiller
 		bool GTEngineCapacityWasAutoSized; // true if previous field was autosize on inpt
 		Real64 MaxExhaustperGTPower; // Max Exhaust Flow per KW Power Out
@@ -575,14 +575,14 @@ namespace PlantChillers {
 	};
 
 	// Object Data
-	extern FArray1D< ElectricChillerSpecs > ElectricChiller; // dimension to number of machines
-	extern FArray1D< ElectricReportVars > ElectricChillerReport;
-	extern FArray1D< EngineDrivenChillerSpecs > EngineDrivenChiller; // dimension to number of machines
-	extern FArray1D< EngineDrivenReportVars > EngineDrivenChillerReport;
-	extern FArray1D< GTChillerSpecs > GTChiller; // dimension to number of machines
-	extern FArray1D< GasTurbineReportVars > GTChillerReport;
-	extern FArray1D< ConstCOPChillerSpecs > ConstCOPChiller; // dimension to number of machines
-	extern FArray1D< ConstCOPReportVars > ConstCOPChillerReport;
+	extern Array1D< ElectricChillerSpecs > ElectricChiller; // dimension to number of machines
+	extern Array1D< ElectricReportVars > ElectricChillerReport;
+	extern Array1D< EngineDrivenChillerSpecs > EngineDrivenChiller; // dimension to number of machines
+	extern Array1D< EngineDrivenReportVars > EngineDrivenChillerReport;
+	extern Array1D< GTChillerSpecs > GTChiller; // dimension to number of machines
+	extern Array1D< GasTurbineReportVars > GTChillerReport;
+	extern Array1D< ConstCOPChillerSpecs > ConstCOPChiller; // dimension to number of machines
+	extern Array1D< ConstCOPReportVars > ConstCOPChillerReport;
 
 	// Functions
 
@@ -746,24 +746,27 @@ namespace PlantChillers {
 
 } // PlantChillers
 
-//     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-//     and The Regents of the University of California through Ernest Orlando Lawrence
-//     Berkeley National Laboratory.  All rights reserved.
-//     Portions of the EnergyPlus software package have been developed and copyrighted
-//     by other individuals, companies and institutions.  These portions have been
-//     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in main.cc.
-//     NOTICE: The U.S. Government is granted for itself and others acting on its
-//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-//     reproduce, prepare derivative works, and perform publicly and display publicly.
-//     Beginning five (5) years after permission to assert copyright is granted,
-//     subject to two possible five year renewals, the U.S. Government is granted for
-//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-//     worldwide license in this data to reproduce, prepare derivative works,
-//     distribute copies to the public, perform publicly and display publicly, and to
-//     permit others to do so.
-//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	//     NOTICE
+
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
+	//     and The Regents of the University of California through Ernest Orlando Lawrence
+	//     Berkeley National Laboratory.  All rights reserved.
+
+	//     Portions of the EnergyPlus software package have been developed and copyrighted
+	//     by other individuals, companies and institutions.  These portions have been
+	//     incorporated into the EnergyPlus software package under license.   For a complete
+	//     list of contributors, see "Notice" located in main.cc.
+
+	//     NOTICE: The U.S. Government is granted for itself and others acting on its
+	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
+	//     reproduce, prepare derivative works, and perform publicly and display publicly.
+	//     Beginning five (5) years after permission to assert copyright is granted,
+	//     subject to two possible five year renewals, the U.S. Government is granted for
+	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
+	//     worldwide license in this data to reproduce, prepare derivative works,
+	//     distribute copies to the public, perform publicly and display publicly, and to
+	//     permit others to do so.
+	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

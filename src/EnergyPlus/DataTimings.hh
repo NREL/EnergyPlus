@@ -2,7 +2,7 @@
 #define DataTimings_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -97,7 +97,7 @@ namespace DataTimings {
 	};
 
 	// Object Data
-	extern FArray1D< timings > Timing;
+	extern Array1D< timings > Timing;
 
 	// Functions
 
@@ -128,7 +128,7 @@ namespace DataTimings {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -101,7 +101,7 @@ namespace WindowAC {
 	// MODULE PARAMETER DEFINITIONS
 	int const WindowAC_UnitType( 1 );
 	std::string const cWindowAC_UnitType( "ZoneHVAC:WindowAirConditioner" );
-	FArray1D_string const cWindowAC_UnitTypes( 1, cWindowAC_UnitType );
+	Array1D_string const cWindowAC_UnitTypes( 1, cWindowAC_UnitType );
 
 	// Compressor operation
 	int const On( 1 ); // normal compressor operation
@@ -113,16 +113,16 @@ namespace WindowAC {
 
 	int NumWindAC( 0 );
 	int NumWindACCyc( 0 );
-	FArray1D_bool MySizeFlag;
+	Array1D_bool MySizeFlag;
 	bool GetWindowACInputFlag( true ); // First time, input is "gotten"
 	bool CoolingLoad( false ); // defines a cooling load
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Object Data
-	FArray1D< WindACData > WindAC;
-	FArray1D< WindACNumericFieldData > WindACNumericFields; // holds window AC numeric input fields character field name
+	Array1D< WindACData > WindAC;
+	Array1D< WindACNumericFieldData > WindACNumericFields; // holds window AC numeric input fields character field name
 
 	// Functions
 
@@ -185,7 +185,7 @@ namespace WindowAC {
 
 		// Find the correct Window AC Equipment
 		if ( CompIndex == 0 ) {
-			WindACNum = FindItemInList( CompName, WindAC.Name(), NumWindAC );
+			WindACNum = FindItemInList( CompName, WindAC );
 			if ( WindACNum == 0 ) {
 				ShowFatalError( "SimWindowAC: Unit not found=" + CompName );
 			}
@@ -271,13 +271,9 @@ namespace WindowAC {
 		using MixedAir::GetOAMixerIndex;
 		using MixedAir::GetOAMixerNodeNumbers;
 		using DataHVACGlobals::FanType_SimpleConstVolume;
-		using DataHVACGlobals::FanType_SimpleVAV;
 		using DataHVACGlobals::FanType_SimpleOnOff;
 		using DataHVACGlobals::cFanTypes;
-		using DataHVACGlobals::ZoneComp;
-		using DataZoneEquipment::WindowAC_Num;
 		using DataZoneEquipment::ZoneEquipConfig;
-		using DataSizing::NumZoneHVACSizing;
 		using DataSizing::ZoneHVACSizing;
 
 		// Locals
@@ -302,7 +298,7 @@ namespace WindowAC {
 		std::string CompSetCoolOutlet;
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
-		FArray1D_int OANodeNums( 4 ); // Node numbers of Outdoor air mixer (OA, EA, RA, MA)
+		Array1D_int OANodeNums( 4 ); // Node numbers of Outdoor air mixer (OA, EA, RA, MA)
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		static bool errFlag( false ); // Local error flag for GetOAMixerNodeNums
@@ -312,12 +308,12 @@ namespace WindowAC {
 		Real64 FanVolFlow; // Fan volumetric flow rate
 		bool CoilNodeErrFlag; // Used in error messages for mining coil outlet node number
 		std::string CurrentModuleObject; // Object type for getting and error messages
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		//  INTEGER                              :: FanType           ! Integer index for Fan type
 		int CtrlZone; // index to loop counter
@@ -356,7 +352,7 @@ namespace WindowAC {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), WindAC.Name(), WindACNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), WindAC, WindACNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -491,7 +487,7 @@ namespace WindowAC {
 
 			WindAC( WindACNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 14 ) ) {
-				WindAC( WindACNum ).HVACSizingIndex = FindItemInList( Alphas( 14 ), ZoneHVACSizing.Name(), NumZoneHVACSizing);
+				WindAC( WindACNum ).HVACSizingIndex = FindItemInList( Alphas( 14 ), ZoneHVACSizing );
 				if ( WindAC( WindACNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 14 ) + " = " + Alphas( 14 ) + " not found.");
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + WindAC( WindACNum ).Name );
@@ -682,8 +678,8 @@ namespace WindowAC {
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop; // loop counter
-		static FArray1D_bool MyEnvrnFlag; // one time initialization flag
-		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+		static Array1D_bool MyEnvrnFlag; // one time initialization flag
+		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		Real64 QToCoolSetPt; // sensible load to cooling setpoint (W)
 		Real64 NoCompOutput; // sensible load delivered with compressor off (W)
 
@@ -996,7 +992,7 @@ namespace WindowAC {
 	void
 	SimCyclingWindowAC(
 		int const WindACNum, // number of the current window AC unit being simulated
-		int const ZoneNum, // number of zone being served !unused1208
+		int const EP_UNUSED( ZoneNum ), // number of zone being served !unused1208
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & PowerMet, // Sensible power supplied (W)
 		Real64 const QZnReq, // Sensible load to be met (W)
@@ -1668,7 +1664,7 @@ namespace WindowAC {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

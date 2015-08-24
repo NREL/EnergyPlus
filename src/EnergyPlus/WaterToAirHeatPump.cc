@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -79,7 +79,7 @@ namespace WaterToAirHeatPump {
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumWatertoAirHPs( 0 ); // The Number of Water to Air Heat Pumps found in the Input
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	int RefrigIndex( 0 ); // Refrigerant index
 	int WaterIndex( 0 ); // Water index
@@ -98,7 +98,7 @@ namespace WaterToAirHeatPump {
 	// Utility routines
 
 	// Object Data
-	FArray1D< WatertoAirHPEquipConditions > WatertoAirHP;
+	Array1D< WatertoAirHPEquipConditions > WatertoAirHP;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -172,7 +172,7 @@ namespace WaterToAirHeatPump {
 		}
 
 		if ( CompIndex == 0 ) {
-			HPNum = FindItemInList( CompName, WatertoAirHP.Name(), NumWatertoAirHPs );
+			HPNum = FindItemInList( CompName, WatertoAirHP );
 			if ( HPNum == 0 ) {
 				ShowFatalError( "WaterToAir HP not found=" + CompName );
 			}
@@ -259,7 +259,6 @@ namespace WaterToAirHeatPump {
 		int NumCool;
 		int NumHeat;
 		int WatertoAirHPNum;
-		int NumFluids;
 		int NumAlphas;
 		int NumParams;
 		int NumNums;
@@ -271,12 +270,12 @@ namespace WaterToAirHeatPump {
 		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > NumArray; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > NumArray; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		// FLOW
 
@@ -321,7 +320,7 @@ namespace WaterToAirHeatPump {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), WatertoAirHP.Name(), HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), WatertoAirHP, HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -430,7 +429,7 @@ namespace WaterToAirHeatPump {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), WatertoAirHP.Name(), HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), WatertoAirHP, HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -634,9 +633,6 @@ namespace WaterToAirHeatPump {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// REAL(r64), PARAMETER        :: CpWater=4210.d0          ! Specific heat of water J/kg_C
-		Real64 const TempTOL( 0.2 ); // air temperature tolerance to trigger resimulation
-		Real64 const EnthTOL( 0.2 ); // air enthalpy tolerance to trigger resimulation
-		Real64 const HumRatTOL( 0.2 ); // air humidity ratio tolerance
 		static std::string const RoutineName( "InitWatertoAirHP" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -651,11 +647,10 @@ namespace WaterToAirHeatPump {
 		int WaterInletNode; // water inlet node number
 		int PlantOutletNode;
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MyEnvrnFlag;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
-		Real64 Temptemp;
 		bool errFlag;
 
 		if ( MyOneTimeFlag ) {
@@ -844,7 +839,7 @@ namespace WaterToAirHeatPump {
 		int const CyclingScheme, // fan/compressor cycling scheme indicator
 		bool const FirstHVACIteration, // first iteration flag
 		Real64 const RuntimeFrac,
-		bool const InitFlag, // suppress property errors if true
+		bool const EP_UNUSED( InitFlag ), // suppress property errors if true
 		Real64 const SensDemand,
 		int const CompOp,
 		Real64 const PartLoadRatio
@@ -888,7 +883,6 @@ namespace WaterToAirHeatPump {
 		Real64 const gamma( 1.114 ); // Expansion Coefficient
 		Real64 const RelaxParam( 0.5 ); // Relaxation Parameter
 		Real64 const ERR( 0.01 ); // Error Value
-		Real64 const ERR1( 0.001 ); // Error Value
 		Real64 const PB( 1.013e5 ); // Barometric Pressure (Pa)
 
 		int const STOP1( 100000 ); // Iteration stopper1
@@ -1007,9 +1001,8 @@ namespace WaterToAirHeatPump {
 		Real64 QLatActual; // Qlatent at actual operating conditions
 		Real64 SHRss; // Sensible heat ratio at steady state
 		Real64 SHReff; // Effective sensible heat ratio at part-load condition
-		FArray1D< Real64 > Par( 4 ); // Parameter array passed to RegulaFalsi function
+		Array1D< Real64 > Par( 4 ); // Parameter array passed to RegulaFalsi function
 		int SolFlag; // Solution flag returned from RegulaFalsi function
-		static bool ErrorsFound( false );
 		static bool firstTime( true );
 		static Real64 LoadSideInletDBTemp_Init; // rated conditions
 		static Real64 LoadSideInletHumRat_Init; // rated conditions
@@ -1112,7 +1105,7 @@ namespace WaterToAirHeatPump {
 		ANTUWET = LoadSideTotalUA * LoadSideMassFlowRate_CpAir_inv;
 		EffectWET = 1.0 - std::exp( -ANTUWET );
 
-		LOOPLatentDegradationModel: while ( true ) {
+		while ( true ) {
 			++NumIteration4;
 			if ( NumIteration4 == 1 ) {
 				//Set indoor air conditions to the rated condition
@@ -1130,7 +1123,7 @@ namespace WaterToAirHeatPump {
 			NumIteration2 = 0;
 			Converged = false;
 			FinalSimFlag = false;
-			LOOPSourceEnth: while ( true ) {
+			while ( true ) {
 				if ( Converged ) FinalSimFlag = true;
 
 				++NumIteration2;
@@ -1142,7 +1135,7 @@ namespace WaterToAirHeatPump {
 
 				//Innerloop: Calculate load side heat transfer
 				NumIteration3 = 0;
-				LOOPLoadEnth: while ( true ) {
+				while ( true ) {
 
 					++NumIteration3;
 
@@ -1337,7 +1330,6 @@ namespace WaterToAirHeatPump {
 						initialQLoadTotal += RelaxParam * ( QLoadTotal - initialQLoadTotal );
 					}
 
-					LOOPLoadEnth_loop: ;
 				}
 				LOOPLoadEnth_exit: ;
 
@@ -1361,8 +1353,6 @@ namespace WaterToAirHeatPump {
 				}
 
 				if ( FinalSimFlag ) goto LOOPSourceEnth_exit;
-
-				LOOPSourceEnth_loop: ;
 			}
 			LOOPSourceEnth_exit: ;
 
@@ -1398,7 +1388,6 @@ namespace WaterToAirHeatPump {
 				SHReff = QSensible / QLoadTotal;
 				goto LOOPLatentDegradationModel_exit;
 			}
-			LOOPLatentDegradationModel_loop: ;
 		}
 		LOOPLatentDegradationModel_exit: ;
 
@@ -1451,7 +1440,7 @@ namespace WaterToAirHeatPump {
 	Real64
 	CalcCompSuctionTempResidual(
 		Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
-		FArray1< Real64 > const & Par // Function parameters
+		Array1< Real64 > const & Par // Function parameters
 	)
 	{
 
@@ -1518,7 +1507,7 @@ namespace WaterToAirHeatPump {
 		int const CyclingScheme, // fan/compressor cycling scheme indicator
 		bool const FirstHVACIteration, // first iteration flag
 		Real64 const RuntimeFrac,
-		bool const InitFlag, // first iteration flag
+		bool const EP_UNUSED( InitFlag ), // first iteration flag
 		Real64 const SensDemand,
 		int const CompOp,
 		Real64 const PartLoadRatio
@@ -1557,8 +1546,6 @@ namespace WaterToAirHeatPump {
 		Real64 const gamma( 1.114 ); // Expnasion Coefficient
 		Real64 const RelaxParam( 0.5 ); // Relaxation Parameter
 		Real64 const ERR( 0.01 ); // Error Value
-		Real64 const ERR1( 0.01 ); // Error Value
-		Real64 const PB( 1.013e5 ); // Barometric Pressure (Pa)
 		int const STOP1( 10000 ); // Iteration stopper1
 		int const STOP2( 100000 ); // Iteration stopper2
 		int const STOP3( 100000 ); // Iteration stopper3
@@ -1648,7 +1635,7 @@ namespace WaterToAirHeatPump {
 		Real64 CompSuctionSatTemp; // Temperature of Saturated Refrigerant at Compressor Suction Pressure [C]
 		bool FinalSimFlag; // Final Simulation Flag
 		bool Converged; // Overall convergence Flag
-		FArray1D< Real64 > Par( 4 ); // Parameter array passed to RegulaFalsi function
+		Array1D< Real64 > Par( 4 ); // Parameter array passed to RegulaFalsi function
 		int SolFlag; // Solution flag returned from RegulaFalsi function
 
 		//  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
@@ -1718,7 +1705,7 @@ namespace WaterToAirHeatPump {
 		NumIteration3 = 0;
 		Converged = false;
 		FinalSimFlag = false;
-		LOOPLoadEnth: while ( true ) {
+		while ( true ) {
 			if ( Converged ) FinalSimFlag = true;
 
 			++NumIteration3;
@@ -1730,7 +1717,7 @@ namespace WaterToAirHeatPump {
 
 			//Innerloop: calculate load side heat transfer
 			NumIteration2 = 0;
-			LOOPSourceEnth: while ( true ) {
+			while ( true ) {
 
 				++NumIteration2;
 
@@ -1874,8 +1861,6 @@ namespace WaterToAirHeatPump {
 				} else {
 					initialQSource += RelaxParam * ( QSource - initialQSource );
 				}
-
-				LOOPSourceEnth_loop: ;
 			}
 			LOOPSourceEnth_exit: ;
 
@@ -1899,7 +1884,6 @@ namespace WaterToAirHeatPump {
 			}
 
 			if ( FinalSimFlag ) goto LOOPLoadEnth_exit;
-			LOOPLoadEnth_loop: ;
 		}
 		LOOPLoadEnth_exit: ;
 
@@ -2346,7 +2330,7 @@ namespace WaterToAirHeatPump {
 			GetCoilsInputFlag = false;
 		}
 
-		IndexNum = FindItemInList( CoilName, WatertoAirHP.Name(), NumWatertoAirHPs );
+		IndexNum = FindItemInList( CoilName, WatertoAirHP );
 
 		if ( IndexNum == 0 ) {
 			ShowSevereError( "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
@@ -2413,7 +2397,7 @@ namespace WaterToAirHeatPump {
 		}
 
 		if ( SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) || SameString( CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) ) {
-			WhichCoil = FindItemInList( CoilName, WatertoAirHP.Name(), NumWatertoAirHPs );
+			WhichCoil = FindItemInList( CoilName, WatertoAirHP );
 			if ( WhichCoil != 0 ) {
 				if ( SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) ) {
 					CoilCapacity = WatertoAirHP( WhichCoil ).HeatingCapacity;
@@ -2489,7 +2473,7 @@ namespace WaterToAirHeatPump {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, WatertoAirHP.Name(), NumWatertoAirHPs );
+		WhichCoil = FindItemInList( CoilName, WatertoAirHP );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = WatertoAirHP( WhichCoil ).AirInletNodeNum;
 		}
@@ -2558,7 +2542,7 @@ namespace WaterToAirHeatPump {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, WatertoAirHP.Name(), NumWatertoAirHPs );
+		WhichCoil = FindItemInList( CoilName, WatertoAirHP );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = WatertoAirHP( WhichCoil ).AirOutletNodeNum;
 		}

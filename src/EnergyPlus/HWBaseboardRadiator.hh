@@ -2,7 +2,7 @@
 #define HWBaseboardRadiator_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -23,17 +23,17 @@ namespace HWBaseboardRadiator {
 
 	//MODULE VARIABLE DECLARATIONS:
 	extern int NumHWBaseboards;
-	extern FArray1D< Real64 > QBBRadSource; // Need to keep the last value in case we are still iterating
-	extern FArray1D< Real64 > QBBRadSrcAvg; // Need to keep the last value in case we are still iterating
-	extern FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+	extern Array1D< Real64 > QBBRadSource; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > QBBRadSrcAvg; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
 
 	// Record keeping variables used to calculate QBBRadSrcAvg locally
-	extern FArray1D< Real64 > LastQBBRadSrc; // Need to keep the last value in case we are still iterating
-	extern FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	extern FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
-	extern FArray1D_bool MySizeFlag;
-	extern FArray1D_bool CheckEquipName;
-	extern FArray1D_bool SetLoopIndexFlag; // get loop number flag
+	extern Array1D< Real64 > LastQBBRadSrc; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	extern Array1D_bool MySizeFlag;
+	extern Array1D_bool CheckEquipName;
+	extern Array1D_bool SetLoopIndexFlag; // get loop number flag
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
@@ -45,8 +45,8 @@ namespace HWBaseboardRadiator {
 		std::string EquipID;
 		int EquipType;
 		std::string Schedule;
-		FArray1D_string SurfaceName;
-		FArray1D_int SurfacePtr;
+		Array1D_string SurfaceName;
+		Array1D_int SurfacePtr;
 		int ZonePtr;
 		int SchedPtr;
 		int WaterInletNode;
@@ -78,7 +78,7 @@ namespace HWBaseboardRadiator {
 		Real64 FracRadiant;
 		Real64 FracConvect;
 		Real64 FracDistribPerson;
-		FArray1D< Real64 > FracDistribToSurf;
+		Array1D< Real64 > FracDistribToSurf;
 		Real64 TotPower;
 		Real64 Power;
 		Real64 ConvPower;
@@ -155,8 +155,8 @@ namespace HWBaseboardRadiator {
 			std::string const & EquipID,
 			int const EquipType,
 			std::string const & Schedule,
-			FArray1_string const & SurfaceName,
-			FArray1_int const & SurfacePtr,
+			Array1_string const & SurfaceName,
+			Array1_int const & SurfacePtr,
 			int const ZonePtr,
 			int const SchedPtr,
 			int const WaterInletNode,
@@ -188,7 +188,7 @@ namespace HWBaseboardRadiator {
 			Real64 const FracRadiant,
 			Real64 const FracConvect,
 			Real64 const FracDistribPerson,
-			FArray1< Real64 > const & FracDistribToSurf,
+			Array1< Real64 > const & FracDistribToSurf,
 			Real64 const TotPower,
 			Real64 const Power,
 			Real64 const ConvPower,
@@ -267,7 +267,7 @@ namespace HWBaseboardRadiator {
 	struct HWBaseboardNumericFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		HWBaseboardNumericFieldData()
@@ -275,15 +275,15 @@ namespace HWBaseboardRadiator {
 
 		// Member Constructor
 		HWBaseboardNumericFieldData(
-			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
 			) :
 			FieldNames(FieldNames)
 		{}
 	};
 
 	// Object Data
-	extern FArray1D< HWBaseboardParams > HWBaseboard;
-	extern FArray1D< HWBaseboardNumericFieldData > HWBaseboardNumericFields;
+	extern Array1D< HWBaseboardParams > HWBaseboard;
+	extern Array1D< HWBaseboardNumericFieldData > HWBaseboardNumericFields;
 
 	// Functions
 
@@ -346,7 +346,7 @@ namespace HWBaseboardRadiator {
 	//*****************************************************************************************
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

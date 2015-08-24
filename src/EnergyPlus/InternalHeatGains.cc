@@ -3,8 +3,8 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -218,10 +218,10 @@ namespace InternalHeatGains {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string AlphaName;
+		Array1D_string AlphaName;
 		static bool ErrorsFound( false ); // If errors found in input
 		bool IsNotOK; // Flag to verify name
-		FArray1D< Real64 > IHGNumbers;
+		Array1D< Real64 > IHGNumbers;
 		int IOStat;
 		bool IsBlank;
 		int Loop;
@@ -232,7 +232,7 @@ namespace InternalHeatGains {
 		int MaxNumber;
 		int OptionNum( 0 ); //Autodesk:Init Initialization added to elim poss use uninitialized
 		int lastOption;
-		FArray1D_bool RepVarSet;
+		Array1D_bool RepVarSet;
 		//   Variables for reporting nominal internal gains
 		Real64 LightTot; // Total Lights for calculating lights per square meter
 		Real64 ElecTot; // Total Electric Load for calculating electric per square meter
@@ -258,7 +258,6 @@ namespace InternalHeatGains {
 		int Item;
 		int ZLItem;
 		int Item1;
-		int MaxZoneNameLengthInZoneList;
 
 		// Formats
 		static gio::Fmt Format_720( "(' Zone Internal Gains, ',A,',',A,',',A,',')" );
@@ -351,7 +350,7 @@ namespace InternalHeatGains {
 			GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), PeopleObjects.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), PeopleObjects, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				errFlag = true;
@@ -359,9 +358,9 @@ namespace InternalHeatGains {
 			}
 			PeopleObjects( Item ).Name = AlphaName( 1 );
 
-			Item1 = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
+			Item1 = FindItemInList( AlphaName( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( AlphaName( 2 ), ZoneList.Name(), NumOfZoneLists );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( AlphaName( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				PeopleObjects( Item ).StartPtr = TotPeople + 1;
 				++TotPeople;
@@ -633,7 +632,7 @@ namespace InternalHeatGains {
 
 							} else if ( mrtType == "SURFACEWEIGHTED" ) {
 								People( Loop ).MRTCalcType = SurfaceWeighted;
-								People( Loop ).SurfacePtr = FindItemInList( AlphaName( 8 ), Surface.Name(), TotSurfaces );
+								People( Loop ).SurfacePtr = FindItemInList( AlphaName( 8 ), Surface );
 								if ( People( Loop ).SurfacePtr == 0 ) {
 									if ( Item1 == 1 ) {
 										ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 7 ) + '=' + AlphaName( 7 ) + " invalid Surface Name=" + AlphaName( 8 ) );
@@ -899,7 +898,7 @@ namespace InternalHeatGains {
 			GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), LightsObjects.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), LightsObjects, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				errFlag = true;
@@ -907,9 +906,9 @@ namespace InternalHeatGains {
 			}
 			LightsObjects( Item ).Name = AlphaName( 1 );
 
-			Item1 = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
+			Item1 = FindItemInList( AlphaName( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( AlphaName( 2 ), ZoneList.Name(), NumOfZoneLists );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( AlphaName( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				LightsObjects( Item ).StartPtr = TotLights + 1;
 				++TotLights;
@@ -1166,7 +1165,7 @@ namespace InternalHeatGains {
 			GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneElectricObjects.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneElectricObjects, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				errFlag = true;
@@ -1174,9 +1173,9 @@ namespace InternalHeatGains {
 			}
 			ZoneElectricObjects( Item ).Name = AlphaName( 1 );
 
-			Item1 = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
+			Item1 = FindItemInList( AlphaName( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( AlphaName( 2 ), ZoneList.Name(), NumOfZoneLists );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( AlphaName( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				ZoneElectricObjects( Item ).StartPtr = TotElecEquip + 1;
 				++TotElecEquip;
@@ -1376,7 +1375,7 @@ namespace InternalHeatGains {
 			GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneGasObjects.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneGasObjects, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				errFlag = true;
@@ -1384,9 +1383,9 @@ namespace InternalHeatGains {
 			}
 			ZoneGasObjects( Item ).Name = AlphaName( 1 );
 
-			Item1 = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
+			Item1 = FindItemInList( AlphaName( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( AlphaName( 2 ), ZoneList.Name(), NumOfZoneLists );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( AlphaName( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				ZoneGasObjects( Item ).StartPtr = TotGasEquip + 1;
 				++TotGasEquip;
@@ -1607,7 +1606,7 @@ namespace InternalHeatGains {
 			GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), HotWaterEqObjects.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), HotWaterEqObjects, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				errFlag = true;
@@ -1615,9 +1614,9 @@ namespace InternalHeatGains {
 			}
 			HotWaterEqObjects( Item ).Name = AlphaName( 1 );
 
-			Item1 = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
+			Item1 = FindItemInList( AlphaName( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( AlphaName( 2 ), ZoneList.Name(), NumOfZoneLists );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( AlphaName( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				HotWaterEqObjects( Item ).StartPtr = TotHWEquip + 1;
 				++TotHWEquip;
@@ -1817,7 +1816,7 @@ namespace InternalHeatGains {
 			GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), SteamEqObjects.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), SteamEqObjects, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				errFlag = true;
@@ -1825,9 +1824,9 @@ namespace InternalHeatGains {
 			}
 			SteamEqObjects( Item ).Name = AlphaName( 1 );
 
-			Item1 = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
+			Item1 = FindItemInList( AlphaName( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( AlphaName( 2 ), ZoneList.Name(), NumOfZoneLists );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( AlphaName( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				SteamEqObjects( Item ).StartPtr = TotStmEquip + 1;
 				++TotStmEquip;
@@ -2027,7 +2026,7 @@ namespace InternalHeatGains {
 			GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), OtherEqObjects.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), OtherEqObjects, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				errFlag = true;
@@ -2035,9 +2034,9 @@ namespace InternalHeatGains {
 			}
 			OtherEqObjects( Item ).Name = AlphaName( 1 );
 
-			Item1 = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
+			Item1 = FindItemInList( AlphaName( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( AlphaName( 2 ), ZoneList.Name(), NumOfZoneLists );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( AlphaName( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				OtherEqObjects( Item ).StartPtr = TotOthEquip + 1;
 				++TotOthEquip;
@@ -2214,7 +2213,7 @@ namespace InternalHeatGains {
 				GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				ZoneITEq( Loop ).Name = AlphaName( 1 );
-				ZoneITEq( Loop ).ZonePtr = FindItemInList( AlphaName( 2 ), Zone.Name( ), NumOfZones );
+				ZoneITEq( Loop ).ZonePtr = FindItemInList( AlphaName( 2 ), Zone );
 
 				// IT equipment design level calculation method.
 				{ auto const equipmentLevel( AlphaName( 3 ) );
@@ -2514,14 +2513,14 @@ namespace InternalHeatGains {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneBBHeat.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneBBHeat, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
 			}
 			ZoneBBHeat( Loop ).Name = AlphaName( 1 );
 
-			ZoneBBHeat( Loop ).ZonePtr = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
+			ZoneBBHeat( Loop ).ZonePtr = FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneBBHeat( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -2618,14 +2617,14 @@ namespace InternalHeatGains {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneCO2Gen.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneCO2Gen, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
 			}
 			ZoneCO2Gen( Loop ).Name = AlphaName( 1 );
 
-			ZoneCO2Gen( Loop ).ZonePtr = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
+			ZoneCO2Gen( Loop ).ZonePtr = FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneCO2Gen( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -3224,8 +3223,6 @@ namespace InternalHeatGains {
 		using OutputReportTabular::radiantPulseTimestep;
 		using OutputReportTabular::radiantPulseReceived;
 		using DataGlobals::CompLoadReportIsReq;
-		using DataGlobalConstants::endUseHeating;
-		using DataGlobalConstants::endUseCooling;
 		using OutputReportTabular::AllocateLoadComponentArrays;
 		using DataSizing::CurOverallSimDay;
 
@@ -3234,7 +3231,7 @@ namespace InternalHeatGains {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D< Real64 > const C( 9, { 6.4611027, 0.946892, 0.0000255737, 7.139322, -0.0627909, 0.0000589271, -0.198550, 0.000940018, -0.00000149532 } );
+		static Array1D< Real64 > const C( 9, { 6.4611027, 0.946892, 0.0000255737, 7.139322, -0.0627909, 0.0000589271, -0.198550, 0.000940018, -0.00000149532 } );
 		static ZoneCatEUseData const zeroZoneCatEUse; // For initialization
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -3567,7 +3564,7 @@ namespace InternalHeatGains {
 			ZnRpt( NZ ).CO2Rate += ZoneCO2Gen( Loop ).CO2GainRate;
 		}
 
-		if( NumZoneITEqStatements > 0 ) CalcZoneITEq();
+		if ( NumZoneITEqStatements > 0 ) CalcZoneITEq();
 
 		CalcWaterThermalTankZoneGains();
 		CalcZonePipesHeatGain();
@@ -3611,9 +3608,9 @@ namespace InternalHeatGains {
 				// QRadThermInAbs is the thermal radiation absorbed on inside surfaces
 				QRadThermInAbs( SurfNum ) = adjQL * TMULT( NZ ) * ITABSF( SurfNum );
 				// store the magnitude and time of the pulse
-				radiantPulseUsed( NZ, CurOverallSimDay ) = adjQL - curQL;
-				radiantPulseTimestep( NZ, CurOverallSimDay ) = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
-				radiantPulseReceived( SurfNum, CurOverallSimDay ) = ( adjQL - curQL ) * TMULT( NZ ) * ITABSF( SurfNum ) * Surface( SurfNum ).Area;
+				radiantPulseUsed( CurOverallSimDay, NZ ) = adjQL - curQL;
+				radiantPulseTimestep( CurOverallSimDay, NZ ) = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
+				radiantPulseReceived( CurOverallSimDay, SurfNum ) = ( adjQL - curQL ) * TMULT( NZ ) * ITABSF( SurfNum ) * Surface( SurfNum ).Area;
 			}
 		}
 
@@ -3661,12 +3658,12 @@ namespace InternalHeatGains {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// Operating Limits for environmental class: None, A1, A2, A3, A4, B, C
 		// From ASHRAE 2011 Thermal Guidelines environmental classes for Air-Cooled ITE
-		static FArray1D< Real64 > const DBMin( 7, { -99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0 } ); // Minimum dry-bulb temperature [C]
-		static FArray1D< Real64 > const DBMax( 7, { 99.0, 32.0, 35.0, 40.0, 45.0, 35.0, 40.0 } ); // Maximum dry-bulb temperature [C]
-		static FArray1D< Real64 > const DPMax( 7, { 99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0 } ); // Maximum dewpoint temperature [C]
-		static FArray1D< Real64 > const DPMin( 7, { -99.0, -99.0, -99.0, -12.0, -12.0, -99.0, -99.0 } ); // Minimum dewpoint temperature [C]
-		static FArray1D< Real64 > const RHMin( 7, { 0.0, 20.0, 20.0, 8.0, 8.0, 8.0, 8.0 } ); // Minimum relative humidity [%]
-		static FArray1D< Real64 > const RHMax( 7, { 99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0 } );  // Minimum relative humidity [%]
+		static Array1D< Real64 > const DBMin( 7, { -99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0 } ); // Minimum dry-bulb temperature [C]
+		static Array1D< Real64 > const DBMax( 7, { 99.0, 32.0, 35.0, 40.0, 45.0, 35.0, 40.0 } ); // Maximum dry-bulb temperature [C]
+		static Array1D< Real64 > const DPMax( 7, { 99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0 } ); // Maximum dewpoint temperature [C]
+		static Array1D< Real64 > const DPMin( 7, { -99.0, -99.0, -99.0, -12.0, -12.0, -99.0, -99.0 } ); // Minimum dewpoint temperature [C]
+		static Array1D< Real64 > const RHMin( 7, { 0.0, 20.0, 20.0, 8.0, 8.0, 8.0, 8.0 } ); // Minimum relative humidity [%]
+		static Array1D< Real64 > const RHMax( 7, { 99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0 } );  // Minimum relative humidity [%]
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3697,7 +3694,6 @@ namespace InternalHeatGains {
 		Real64 AirVolFlowFrac;		// Air volume flow fraction
 		Real64 AirVolFlowFracDesignT; // Air volume flow fraction at design entering air temperature
 		Real64 AirVolFlowRate;		// Air volume flow rate at current density [m3/s]
-		Real64 AirDensity;			// Air density at inlet [kg/m3]
 		Real64 AirMassFlowRate;		// Air mass flow rate [kg/s]
 		Real64 CPUPower;			// CPU power input [W]
 		Real64 FanPower;			// Fan power input [W]
@@ -3705,8 +3701,8 @@ namespace InternalHeatGains {
 		Real64 UPSPartLoadRatio;	// UPS part load ratio (current total power input / design total power input)
 		Real64 UPSHeatGain;			// UPS convective heat gain to zone [W]
 		int EnvClass;				// Index for environmental class (None=0, A1=1, A2=2, A3=3, A4=4, B=5, C=6)
-		FArray1D< Real64 > ZoneSumTinMinusTSup( NumOfZones ); // Numerator for zone-level sensible heat index (SHI)
-		FArray1D< Real64 > ZoneSumToutMinusTSup( NumOfZones ); // Denominator for zone-level sensible heat index (SHI)
+		Array1D< Real64 > ZoneSumTinMinusTSup( NumOfZones ); // Numerator for zone-level sensible heat index (SHI)
+		Array1D< Real64 > ZoneSumToutMinusTSup( NumOfZones ); // Denominator for zone-level sensible heat index (SHI)
 
 
 		//  Zero out time step variables
@@ -4002,7 +3998,6 @@ namespace InternalHeatGains {
 		// OutputDataStructure.doc (EnergyPlus documentation)
 
 		// Using/Aliasing
-		using DataGlobals::SecInHour;
 		using OutputReportTabular::WriteTabularFiles;
 
 		// Locals
@@ -4021,7 +4016,7 @@ namespace InternalHeatGains {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
 		int ZoneLoop; // Counter for the # of zones (nz)
-		static FArray1D_int TradIntGainTypes( 7, { IntGainTypeOf_People, IntGainTypeOf_Lights, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment } );
+		static Array1D_int TradIntGainTypes( 7, { IntGainTypeOf_People, IntGainTypeOf_Lights, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment } );
 
 		// FLOW:
 		for ( Loop = 1; Loop <= TotPeople; ++Loop ) {
@@ -4516,7 +4511,7 @@ namespace InternalHeatGains {
 	void
 	SumInternalConvectionGainsByTypes(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		FArray1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
 		Real64 & SumConvGainRate
 	)
 	{
@@ -4640,7 +4635,7 @@ namespace InternalHeatGains {
 	void
 	SumReturnAirConvectionGainsByTypes(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		FArray1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
 		Real64 & SumReturnAirGainRate
 	)
 	{
@@ -4764,7 +4759,7 @@ namespace InternalHeatGains {
 	void
 	SumInternalRadiationGainsByTypes(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		FArray1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
 		Real64 & SumRadiationGainRate
 	)
 	{
@@ -4888,7 +4883,7 @@ namespace InternalHeatGains {
 	void
 	SumInternalLatentGainsByTypes(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		FArray1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
 		Real64 & SumLatentGainRate
 	)
 	{
@@ -5068,7 +5063,7 @@ namespace InternalHeatGains {
 	void
 	SumInternalCO2GainsByTypes(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		FArray1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
 		Real64 & SumCO2GainRate
 	)
 	{
@@ -5250,48 +5245,48 @@ namespace InternalHeatGains {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static int iZone( 0 );
 		static int TimeStepInDay( 0 );
-		static FArray1D_int IntGainTypesPeople( 1, { IntGainTypeOf_People } );
-		static FArray1D_int IntGainTypesLight( 1, { IntGainTypeOf_Lights } );
-		static FArray1D_int IntGainTypesEquip( 5, { IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment } );
-		static FArray1D_int IntGainTypesRefrig( 7, { IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
-		static FArray1D_int IntGainTypesWaterUse( 3, { IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified } );
-		static FArray1D_int IntGainTypesHvacLoss( 13, { IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_PipeIndoor, IntGainTypeOf_Pump_VarSpeed, IntGainTypeOf_Pump_ConSpeed, IntGainTypeOf_Pump_Cond, IntGainTypeOf_PumpBank_VarSpeed, IntGainTypeOf_PumpBank_ConSpeed, IntGainTypeOf_PlantComponentUserDefined, IntGainTypeOf_CoilUserDefined, IntGainTypeOf_ZoneHVACForcedAirUserDefined, IntGainTypeOf_AirTerminalUserDefined } );
-		static FArray1D_int IntGainTypesPowerGen( 8, { IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple } );
+		static Array1D_int IntGainTypesPeople( 1, { IntGainTypeOf_People } );
+		static Array1D_int IntGainTypesLight( 1, { IntGainTypeOf_Lights } );
+		static Array1D_int IntGainTypesEquip( 5, { IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment } );
+		static Array1D_int IntGainTypesRefrig( 7, { IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
+		static Array1D_int IntGainTypesWaterUse( 3, { IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified } );
+		static Array1D_int IntGainTypesHvacLoss( 13, { IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_PipeIndoor, IntGainTypeOf_Pump_VarSpeed, IntGainTypeOf_Pump_ConSpeed, IntGainTypeOf_Pump_Cond, IntGainTypeOf_PumpBank_VarSpeed, IntGainTypeOf_PumpBank_ConSpeed, IntGainTypeOf_PlantComponentUserDefined, IntGainTypeOf_CoilUserDefined, IntGainTypeOf_ZoneHVACForcedAirUserDefined, IntGainTypeOf_AirTerminalUserDefined } );
+		static Array1D_int IntGainTypesPowerGen( 8, { IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple } );
 
 		if ( CompLoadReportIsReq && ! isPulseZoneSizing ) {
 			TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
 			for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesPeople, peopleInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalLatentGainsByTypes( iZone, IntGainTypesPeople, peopleLatentSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalRadiationGainsByTypes( iZone, IntGainTypesPeople, peopleRadSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesPeople, peopleInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalLatentGainsByTypes( iZone, IntGainTypesPeople, peopleLatentSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalRadiationGainsByTypes( iZone, IntGainTypesPeople, peopleRadSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesLight, lightInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumReturnAirConvectionGainsByTypes( iZone, IntGainTypesLight, lightRetAirSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalRadiationGainsByTypes( iZone, IntGainTypesLight, lightLWRadSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesLight, lightInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumReturnAirConvectionGainsByTypes( iZone, IntGainTypesLight, lightRetAirSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalRadiationGainsByTypes( iZone, IntGainTypesLight, lightLWRadSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesEquip, equipInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalLatentGainsByTypes( iZone, IntGainTypesEquip, equipLatentSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalRadiationGainsByTypes( iZone, IntGainTypesEquip, equipRadSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesEquip, equipInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalLatentGainsByTypes( iZone, IntGainTypesEquip, equipLatentSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalRadiationGainsByTypes( iZone, IntGainTypesEquip, equipRadSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesRefrig, refrigInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumReturnAirConvectionGainsByTypes( iZone, IntGainTypesRefrig, refrigRetAirSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalLatentGainsByTypes( iZone, IntGainTypesRefrig, refrigLatentSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesRefrig, refrigInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumReturnAirConvectionGainsByTypes( iZone, IntGainTypesRefrig, refrigRetAirSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalLatentGainsByTypes( iZone, IntGainTypesRefrig, refrigLatentSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesWaterUse, waterUseInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalLatentGainsByTypes( iZone, IntGainTypesWaterUse, waterUseLatentSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesWaterUse, waterUseInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalLatentGainsByTypes( iZone, IntGainTypesWaterUse, waterUseLatentSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesHvacLoss, hvacLossInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalRadiationGainsByTypes( iZone, IntGainTypesHvacLoss, hvacLossRadSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesHvacLoss, hvacLossInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalRadiationGainsByTypes( iZone, IntGainTypesHvacLoss, hvacLossRadSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesPowerGen, powerGenInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalRadiationGainsByTypes( iZone, IntGainTypesPowerGen, powerGenRadSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesPowerGen, powerGenInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalRadiationGainsByTypes( iZone, IntGainTypesPowerGen, powerGenRadSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 			}
 		}
 	}
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

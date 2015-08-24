@@ -2,7 +2,7 @@
 #define Fans_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -33,7 +33,7 @@ namespace Fans {
 	extern int NumFans; // The Number of Fans found in the Input
 	extern int NumNightVentPerf; // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
 	extern bool GetFanInputFlag; // Flag set to make sure you get input once
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 	extern bool LocalTurnFansOn; // If True, overrides fan schedule and cycles ZoneHVAC component fans on
 	extern bool LocalTurnFansOff; // If True, overrides fan schedule and LocalTurnFansOn and
 	// forces ZoneHVAC comp fans off
@@ -95,9 +95,11 @@ namespace Fans {
 		Real64 FanEff; // Fan total system efficiency (fan*belt*motor*VFD)
 		bool EMSFanEffOverrideOn; // if true, then EMS is calling to override
 		Real64 EMSFanEffValue; // EMS value for total efficiency of the Fan, fraction on 0..1
+		bool FaultyFilterFlag; // Indicate whether there is a fouling air filter corresponding to the fan
+		int FaultyFilterIndex;  // Index of the fouling air filter corresponding to the fan
 		Real64 MotEff; // Fan motor efficiency
 		Real64 MotInAirFrac; // Fraction of motor heat entering air stream
-		FArray1D< Real64 > FanCoeff; // Fan Part Load Coefficients to match fan type
+		Array1D< Real64 > FanCoeff; // Fan Part Load Coefficients to match fan type
 		// Mass Flow Rate Control Variables
 		Real64 MassFlowRateMaxAvail;
 		Real64 MassFlowRateMinAvail;
@@ -198,6 +200,8 @@ namespace Fans {
 			FanEff( 0.0 ),
 			EMSFanEffOverrideOn( false ),
 			EMSFanEffValue( 0.0 ),
+			FaultyFilterFlag( false ),
+			FaultyFilterIndex( 0 ),
 			MotEff( 0.0 ),
 			MotInAirFrac( 0.0 ),
 			FanCoeff( 5, 0.0 ),
@@ -299,9 +303,11 @@ namespace Fans {
 			Real64 const FanEff, // Fan total system efficiency (fan*belt*motor*VFD)
 			bool const EMSFanEffOverrideOn, // if true, then EMS is calling to override
 			Real64 const EMSFanEffValue, // EMS value for total efficiency of the Fan, fraction on 0..1
+			bool FaultyFilterFlag, // Indicate whether there is a fouling air filter corresponding to the fan
+			int FaultyFilterIndex,  // Index of the fouling air filter corresponding to the fan
 			Real64 const MotEff, // Fan motor efficiency
 			Real64 const MotInAirFrac, // Fraction of motor heat entering air stream
-			FArray1< Real64 > const & FanCoeff, // Fan Part Load Coefficients to match fan type
+			Array1< Real64 > const & FanCoeff, // Fan Part Load Coefficients to match fan type
 			Real64 const MassFlowRateMaxAvail,
 			Real64 const MassFlowRateMinAvail,
 			Real64 const RhoAirStdInit,
@@ -399,6 +405,8 @@ namespace Fans {
 			FanEff( FanEff ),
 			EMSFanEffOverrideOn( EMSFanEffOverrideOn ),
 			EMSFanEffValue( EMSFanEffValue ),
+			FaultyFilterFlag( FaultyFilterFlag ),
+			FaultyFilterIndex( FaultyFilterIndex ),
 			MotEff( MotEff ),
 			MotInAirFrac( MotInAirFrac ),
 			FanCoeff( 5, FanCoeff ),
@@ -512,7 +520,7 @@ namespace Fans {
 	struct FanNumericFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		FanNumericFieldData()
@@ -520,16 +528,16 @@ namespace Fans {
 
 		// Member Constructor
 		FanNumericFieldData(
-			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
 		) :
 			FieldNames( FieldNames )
 		{}
 	};
 
 	// Object Data
-	extern FArray1D< FanEquipConditions > Fan;
-	extern FArray1D< NightVentPerfData > NightVentPerf;
-	extern FArray1D< FanNumericFieldData > FanNumericFields;
+	extern Array1D< FanEquipConditions > Fan;
+	extern Array1D< NightVentPerfData > NightVentPerf;
+	extern Array1D< FanNumericFieldData > FanNumericFields;
 
 	// Functions
 
@@ -699,6 +707,15 @@ namespace Fans {
 	);
 
 	Real64
+	CalFaultyFanAirFlowReduction(
+		std::string const & FanName,          // Name of the Fan
+		Real64 const FanDesignAirFlowRate,    // Fan Design Volume Flow Rate [m3/s]
+		Real64 const FanDesignDeltaPress,     // Fan Design Delta Pressure [Pa]
+		Real64 const FanFaultyDeltaPressInc,  // Increase of Fan Delta Pressure in the Faulty Case [Pa]
+		int const FanCurvePtr                 // Fan Curve Pointer
+	);
+
+	Real64
 	FanDesHeatGain(
 		int const FanNum, // index of fan in Fan array
 		Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
@@ -709,7 +726,7 @@ namespace Fans {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

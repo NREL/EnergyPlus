@@ -5,9 +5,9 @@
 #include <fstream>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/FArray3D.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Array3D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -41,7 +41,7 @@ namespace SolarShading {
 	extern int const PartialOverlap;
 	extern int const TooManyVertices;
 	extern int const TooManyFigures;
-	extern FArray1D_string const cOverLapStatus;
+	extern Array1D_string const cOverLapStatus;
 
 	// DERIVED TYPE DEFINITIONS:
 	// INTERFACE BLOCK SPECIFICATIONS:
@@ -63,7 +63,7 @@ namespace SolarShading {
 	// 1=No overlap; 2=NS1 completely within NS2
 	// 3=NS2 completely within NS1; 4=Partial overlap
 
-	extern FArray1D< Real64 > CTHETA; // Cosine of angle of incidence of sun's rays on surface NS
+	extern Array1D< Real64 > CTHETA; // Cosine of angle of incidence of sun's rays on surface NS
 	extern int FBKSHC; // HC location of first back surface
 	extern int FGSSHC; // HC location of first general shadowing surface
 	extern int FINSHC; // HC location of first back surface overlap
@@ -80,43 +80,43 @@ namespace SolarShading {
 	extern int ShadowingDaysLeft; // Days left in current shadowing period
 	extern bool debugging;
 	extern std::ofstream shd_stream; // Shading file stream
-	extern FArray1D_int HCNS; // Surface number of back surface HC figures
-	extern FArray1D_int HCNV; // Number of vertices of each HC figure
-	extern FArray2D< Int64 > HCA; // 'A' homogeneous coordinates of sides
-	extern FArray2D< Int64 > HCB; // 'B' homogeneous coordinates of sides
-	extern FArray2D< Int64 > HCC; // 'C' homogeneous coordinates of sides
-	extern FArray2D< Int64 > HCX; // 'X' homogeneous coordinates of vertices of figure.
-	extern FArray2D< Int64 > HCY; // 'Y' homogeneous coordinates of vertices of figure.
-	extern FArray3D_int WindowRevealStatus;
-	extern FArray1D< Real64 > HCAREA; // Area of each HC figure.  Sign Convention:  Base Surface
+	extern Array1D_int HCNS; // Surface number of back surface HC figures
+	extern Array1D_int HCNV; // Number of vertices of each HC figure
+	extern Array2D< Int64 > HCA; // 'A' homogeneous coordinates of sides
+	extern Array2D< Int64 > HCB; // 'B' homogeneous coordinates of sides
+	extern Array2D< Int64 > HCC; // 'C' homogeneous coordinates of sides
+	extern Array2D< Int64 > HCX; // 'X' homogeneous coordinates of vertices of figure.
+	extern Array2D< Int64 > HCY; // 'Y' homogeneous coordinates of vertices of figure.
+	extern Array3D_int WindowRevealStatus;
+	extern Array1D< Real64 > HCAREA; // Area of each HC figure.  Sign Convention:  Base Surface
 	// - Positive, Shadow - Negative, Overlap between two shadows
 	// - positive, etc., so that sum of HC areas=base sunlit area
-	extern FArray1D< Real64 > HCT; // Transmittance of each HC figure
-	extern FArray1D< Real64 > ISABSF; // For simple interior solar distribution (in which all beam
+	extern Array1D< Real64 > HCT; // Transmittance of each HC figure
+	extern Array1D< Real64 > ISABSF; // For simple interior solar distribution (in which all beam
 	// radiation entering zone is assumed to strike the floor),
 	// fraction of beam radiation absorbed by each floor surface
-	extern FArray1D< Real64 > SAREA; // Sunlit area of heat transfer surface HTS
+	extern Array1D< Real64 > SAREA; // Sunlit area of heat transfer surface HTS
 	// Excludes multiplier for windows
 	// Shadowing combinations data structure...See ShadowingCombinations type
 	extern int NumTooManyFigures;
 	extern int NumTooManyVertices;
 	extern int NumBaseSubSurround;
-	extern FArray1D< Real64 > SUNCOS; // Direction cosines of solar position
+	extern Array1D< Real64 > SUNCOS; // Direction cosines of solar position
 	extern Real64 XShadowProjection; // X projection of a shadow (formerly called C)
 	extern Real64 YShadowProjection; // Y projection of a shadow (formerly called S)
-	extern FArray1D< Real64 > XTEMP; // Temporary 'X' values for HC vertices of the overlap
-	extern FArray1D< Real64 > XVC; // X-vertices of the clipped figure
-	extern FArray1D< Real64 > XVS; // X-vertices of the shadow
-	extern FArray1D< Real64 > YTEMP; // Temporary 'Y' values for HC vertices of the overlap
-	extern FArray1D< Real64 > YVC; // Y-vertices of the clipped figure
-	extern FArray1D< Real64 > YVS; // Y-vertices of the shadow
-	extern FArray1D< Real64 > ZVC; // Z-vertices of the clipped figure
+	extern Array1D< Real64 > XTEMP; // Temporary 'X' values for HC vertices of the overlap
+	extern Array1D< Real64 > XVC; // X-vertices of the clipped figure
+	extern Array1D< Real64 > XVS; // X-vertices of the shadow
+	extern Array1D< Real64 > YTEMP; // Temporary 'Y' values for HC vertices of the overlap
+	extern Array1D< Real64 > YVC; // Y-vertices of the clipped figure
+	extern Array1D< Real64 > YVS; // Y-vertices of the shadow
+	extern Array1D< Real64 > ZVC; // Z-vertices of the clipped figure
 	// Used in Sutherland Hodman poly clipping
-	extern FArray1D< Real64 > ATEMP; // Temporary 'A' values for HC vertices of the overlap
-	extern FArray1D< Real64 > BTEMP; // Temporary 'B' values for HC vertices of the overlap
-	extern FArray1D< Real64 > CTEMP; // Temporary 'C' values for HC vertices of the overlap
-	extern FArray1D< Real64 > XTEMP1; // Temporary 'X' values for HC vertices of the overlap
-	extern FArray1D< Real64 > YTEMP1; // Temporary 'Y' values for HC vertices of the overlap
+	extern Array1D< Real64 > ATEMP; // Temporary 'A' values for HC vertices of the overlap
+	extern Array1D< Real64 > BTEMP; // Temporary 'B' values for HC vertices of the overlap
+	extern Array1D< Real64 > CTEMP; // Temporary 'C' values for HC vertices of the overlap
+	extern Array1D< Real64 > XTEMP1; // Temporary 'X' values for HC vertices of the overlap
+	extern Array1D< Real64 > YTEMP1; // Temporary 'Y' values for HC vertices of the overlap
 	extern int maxNumberOfFigures;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE SolarShading
@@ -151,9 +151,9 @@ namespace SolarShading {
 	};
 
 	// Object Data
-	extern FArray1D< SurfaceErrorTracking > TrackTooManyFigures;
-	extern FArray1D< SurfaceErrorTracking > TrackTooManyVertices;
-	extern FArray1D< SurfaceErrorTracking > TrackBaseSubSurround;
+	extern Array1D< SurfaceErrorTracking > TrackTooManyFigures;
+	extern Array1D< SurfaceErrorTracking > TrackTooManyVertices;
+	extern Array1D< SurfaceErrorTracking > TrackBaseSubSurround;
 
 	// Functions
 
@@ -193,7 +193,7 @@ namespace SolarShading {
 	bool
 	polygon_contains_point(
 		int const nsides, // number of sides (vertices)
-		FArray1A< Vector > polygon_3d, // points of polygon
+		Array1A< Vector > polygon_3d, // points of polygon
 		Vector const & point_3d, // point to be tested
 		bool const ignorex,
 		bool const ignorey,
@@ -206,9 +206,9 @@ namespace SolarShading {
 	void
 	CLIP(
 		int const NVT,
-		FArray1< Real64 > & XVT,
-		FArray1< Real64 > & YVT,
-		FArray1< Real64 > & ZVT
+		Array1< Real64 > & XVT,
+		Array1< Real64 > & YVT,
+		Array1< Real64 > & ZVT
 	);
 
 	void
@@ -216,9 +216,9 @@ namespace SolarShading {
 		int const NS, // Surface number whose vertex coordinates are being transformed
 		int const NGRS, // Base surface number for surface NS
 		int & NVT, // Number of vertices for surface NS
-		FArray1< Real64 > & XVT, // XYZ coordinates of vertices of NS in plane of NGRS
-		FArray1< Real64 > & YVT,
-		FArray1< Real64 > & ZVT
+		Array1< Real64 > & XVT, // XYZ coordinates of vertices of NS in plane of NGRS
+		Array1< Real64 > & YVT,
+		Array1< Real64 > & ZVT
 	);
 
 	void
@@ -450,7 +450,7 @@ namespace SolarShading {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

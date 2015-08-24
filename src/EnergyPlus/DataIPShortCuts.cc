@@ -45,16 +45,29 @@ namespace DataIPShortCuts {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D_string cAlphaFieldNames;
-	FArray1D_string cNumericFieldNames;
-	FArray1D_bool lNumericFieldBlanks;
-	FArray1D_bool lAlphaFieldBlanks;
-	FArray1D_string cAlphaArgs;
-	FArray1D< Real64 > rNumericArgs;
+	Array1D_string cAlphaFieldNames;
+	Array1D_string cNumericFieldNames;
+	Array1D_bool lNumericFieldBlanks;
+	Array1D_bool lAlphaFieldBlanks;
+	Array1D_string cAlphaArgs;
+	Array1D< Real64 > rNumericArgs;
 	std::string cCurrentModuleObject;
 
+	// Clears the global data in DataIPShortCuts.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		cAlphaFieldNames.deallocate();
+		cAlphaArgs.deallocate();
+		lAlphaFieldBlanks.deallocate();
+		cNumericFieldNames.deallocate();
+		rNumericArgs.deallocate();
+		lNumericFieldBlanks.deallocate();
+	}
+
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

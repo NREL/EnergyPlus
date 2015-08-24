@@ -2,9 +2,9 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 
@@ -109,7 +109,6 @@ namespace PlantLoopSolver {
 		using PlantPressureSystem::SimPressureDropSystem;
 		using DataPlant::DemandSide;
 		using DataPlant::SupplySide;
-		using DataPlant::TotNumLoops;
 		using DataPlant::FlowPumpQuery;
 		using DataPlant::FlowUnlocked;
 		using DataPlant::FlowLocked;
@@ -570,8 +569,6 @@ namespace PlantLoopSolver {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const ThisSideFlowIndex( 1 );
-		int const OtherSideFlowIndex( 2 );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS
 		int LoopCounter;
@@ -586,8 +583,8 @@ namespace PlantLoopSolver {
 		Real64 ThisBranchFlowRequestNeedIfOn;
 		Real64 InletBranchRequestNeedAndTurnOn;
 		Real64 InletBranchRequestNeedIfOn;
-//		static FArray2D< Real64 > LoadedConstantSpeedBranchFlowRateSteps; // Values never used
-		static FArray2D< Real64 > NoLoadConstantSpeedBranchFlowRateSteps;
+//		static Array2D< Real64 > LoadedConstantSpeedBranchFlowRateSteps; // Values never used
+		static Array2D< Real64 > NoLoadConstantSpeedBranchFlowRateSteps;
 		int ParallelBranchIndex;
 		Real64 OutletBranchRequestNeedAndTurnOn;
 		Real64 OutletBranchRequestNeedIfOn;
@@ -596,10 +593,10 @@ namespace PlantLoopSolver {
 		bool ThisLoopHasCommonPipe;
 
 		//Tuned Made static: Set before use
-		static FArray1D_bool ThisLoopHasConstantSpeedBranchPumps( 2 );
-		static FArray1D< Real64 > EachSideFlowRequestNeedAndTurnOn( 2 ); // 2 for SupplySide/DemandSide
-		static FArray1D< Real64 > EachSideFlowRequestNeedIfOn( 2 ); // 2 for SupplySide/DemandSide
-		static FArray1D< Real64 > EachSideFlowRequestFinal( 2 ); // 2 for SupplySide/DemandSide
+		static Array1D_bool ThisLoopHasConstantSpeedBranchPumps( 2 );
+		static Array1D< Real64 > EachSideFlowRequestNeedAndTurnOn( 2 ); // 2 for SupplySide/DemandSide
+		static Array1D< Real64 > EachSideFlowRequestNeedIfOn( 2 ); // 2 for SupplySide/DemandSide
+		static Array1D< Real64 > EachSideFlowRequestFinal( 2 ); // 2 for SupplySide/DemandSide
 
 		static bool AllocatedParallelArray( false );
 		int MaxParallelBranchCount;
@@ -616,8 +613,8 @@ namespace PlantLoopSolver {
 					MaxParallelBranchCount = max( MaxParallelBranchCount, PlantLoop( LoopCounter ).LoopSide( LoopSideCounter ).TotalBranches - 2 );
 				}
 			}
-//			LoadedConstantSpeedBranchFlowRateSteps.allocate( 2, MaxParallelBranchCount );
-			NoLoadConstantSpeedBranchFlowRateSteps.allocate( 2, MaxParallelBranchCount );
+//			LoadedConstantSpeedBranchFlowRateSteps.allocate( MaxParallelBranchCount, 2 );
+			NoLoadConstantSpeedBranchFlowRateSteps.allocate( MaxParallelBranchCount, 2 );
 			AllocatedParallelArray = true;
 		}
 
@@ -841,7 +838,7 @@ namespace PlantLoopSolver {
 //								LoadedConstantSpeedBranchFlowRateSteps( LoopSideCounter, ParallelBranchIndex ) = branch_mass_flow;
 								LoadedConstantSpeedBranchFlowRateSteps_sum += branch_mass_flow;
 							} else {
-								NoLoadConstantSpeedBranchFlowRateSteps( LoopSideCounter, ParallelBranchIndex ) = branch_mass_flow;
+								NoLoadConstantSpeedBranchFlowRateSteps( ParallelBranchIndex, LoopSideCounter ) = branch_mass_flow;
 								NoLoadConstantSpeedBranchFlowRateSteps_sum += branch_mass_flow;
 							}
 						}
@@ -864,7 +861,7 @@ namespace PlantLoopSolver {
 							} else {
 								continue;
 							}
-							auto const steps( NoLoadConstantSpeedBranchFlowRateSteps( LoopSideCounter, ParallelBranchIndex ) );
+							auto const steps( NoLoadConstantSpeedBranchFlowRateSteps( ParallelBranchIndex, LoopSideCounter ) );
 							if ( steps > 0.0 ) { // add in branches with zero MyLoad  in branch input order until satisfied
 								if ( tmpLoopFlow > AccumFlowSteps ) {
 									if ( tmpLoopFlow <= AccumFlowSteps + steps ) { // found it set requests and exit
@@ -1114,17 +1111,17 @@ namespace PlantLoopSolver {
 		bool LoadDistributionWasPerformed;
 		bool DummyInit;
 		bool const DoNotGetCompSizFac( false );
-		static FArray1D_string const LoopSideNames( 2, { "Demand", "Supply" } );
+		static Array1D_string const LoopSideNames( 2, { "Demand", "Supply" } );
 
 		//~ General variables
-		static FArray1D_int LastComponentSimulated;
+		static Array1D_int LastComponentSimulated;
 		Real64 LoadToLoopSetPoint;
 
 		int curCompOpSchemePtr;
 		int OpSchemePtr;
 
 		// Object Data
-//		static FArray1D< Location > AccessibleBranches; // Set but never used
+//		static Array1D< Location > AccessibleBranches; // Set but never used
 		Location PumpLocation;
 
 		LoadToLoopSetPoint = 0.0; //Autodesk:Init Fix possible use uninitialized
@@ -1521,7 +1518,7 @@ namespace PlantLoopSolver {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static FArray1D_int const InitCompArray( 1, 0 );
+		static Array1D_int const InitCompArray( 1, 0 );
 
 		Demand = EvaluateLoopSetPointLoad( LoopNum, ThisSide, 1, 1, InitCompArray );
 
@@ -1543,7 +1540,7 @@ namespace PlantLoopSolver {
 		int const LoopSideNum,
 		int const FirstBranchNum,
 		int const LastBranchNum,
-		FArray1S_int LastComponentSimulated
+		Array1S_int LastComponentSimulated
 	)
 	{
 
@@ -1761,12 +1758,12 @@ namespace PlantLoopSolver {
 		// METHODOLOGY EMPLOYED:
 		// Components will always supply a useful delta T, even if it happens to be zero
 		// For flow rate, make decisions based on the component's current operating scheme type:
-		//  • Demand based: these components will have a flow request on their inlet node
-		//  • Pump: these components will not be included, as they no longer include heat at the pump
-		//  • component setpoint: these components will have a flow request
+		//    Demand based: these components will have a flow request on their inlet node
+		//    Pump: these components will not be included, as they no longer include heat at the pump
+		//    component setpoint: these components will have a flow request
 
 		//    on their outlet node corresponding to their calculated delta T
-		//  • load range based: these components do not 'alter' the load, they reject the load
+		//    load range based: these components do not 'alter' the load, they reject the load
 		//    Therefore they are not included
 
 		// Using/Aliasing
@@ -1891,7 +1888,6 @@ namespace PlantLoopSolver {
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_PumpVariableSpeed;
 		using DataPlant::TypeOf_PumpBankVariableSpeed;
-		using DataBranchAirLoopPlant::ControlType_Unknown;
 		using DataBranchAirLoopPlant::ControlType_Active;
 		using DataBranchAirLoopPlant::ControlType_Passive;
 		using DataBranchAirLoopPlant::ControlType_SeriesActive;
@@ -1904,7 +1900,7 @@ namespace PlantLoopSolver {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_string const LoopSideName( 2, { "Demand", "Supply" } );
+		static Array1D_string const LoopSideName( 2, { "Demand", "Supply" } );
 		int const SplitNum( 1 ); // Only one splitter/mixer combination is allowed
 		int const LoopSideSingleBranch( 1 ); // For readability
 
@@ -2831,7 +2827,6 @@ namespace PlantLoopSolver {
 
 		// Using/Aliasing
 		using DataGlobals::WarmupFlag;
-		using DataGlobals::BeginEnvrnFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::SupplySide;
 		using DataPlant::DemandSide;
@@ -2946,7 +2941,7 @@ namespace PlantLoopSolver {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

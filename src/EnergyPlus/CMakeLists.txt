@@ -356,6 +356,8 @@ SET( SRC_2
   PhotovoltaicThermalCollectors.hh
   Photovoltaics.cc
   Photovoltaics.hh
+  PierceSurface.cc
+  PierceSurface.hh
   PipeHeatTransfer.cc
   PipeHeatTransfer.hh
   Pipes.cc
@@ -544,7 +546,7 @@ endif()
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport DElight )
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport DElight jsoncpp )
 if(UNIX AND NOT APPLE)
   target_link_libraries( energypluslib dl )
 endif()
@@ -569,9 +571,9 @@ set_target_properties(
   PROPERTIES
   INSTALL_NAME_DIR "@executable_path"
 )
-install( TARGETS energyplusapi 
-  RUNTIME DESTINATION ./ 
-  LIBRARY DESTINATION ./ 
+install( TARGETS energyplusapi
+  RUNTIME DESTINATION ./
+  LIBRARY DESTINATION ./
 )
 
 if (MINGW)
@@ -598,18 +600,18 @@ if( BUILD_TESTING )
   # Build the test executable
   add_executable( TestEnergyPlusCallbacks test_ep_as_library.cc )
   target_link_libraries( TestEnergyPlusCallbacks energyplusapi )
-  add_test(NAME "integration.TestEnergyPlusCallbacks" 
-           COMMAND ${CMAKE_COMMAND} 
-           -DSOURCE_DIR=${CMAKE_SOURCE_DIR} 
-           -DBINARY_DIR=${CMAKE_BINARY_DIR} 
+  add_test(NAME "integration.TestEnergyPlusCallbacks"
+           COMMAND ${CMAKE_COMMAND}
+           -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
+           -DBINARY_DIR=${CMAKE_BINARY_DIR}
            -DIDF_FILE=1ZoneUncontrolled.idf
            -DEPW_FILE=USA_CO_Golden-NREL.724666_TMY3.epw
-           -P ${CMAKE_SOURCE_DIR}/cmake/RunCallbackTest.cmake)  
+           -P ${CMAKE_SOURCE_DIR}/cmake/RunCallbackTest.cmake)
 endif()
 
 if(UNIX AND NOT APPLE)
   ADD_CUSTOM_COMMAND(TARGET energyplus POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E create_symlink energyplus EnergyPlus
-  COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${CMAKE_BINARY_DIR}/Products/EnergyPlus") 
+  COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${CMAKE_BINARY_DIR}/Products/EnergyPlus")
 endif()
 

@@ -2,7 +2,7 @@
 #define UnitHeater_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -31,8 +31,8 @@ namespace UnitHeater {
 	extern bool HCoilOn; // TRUE if the heating coil (gas or electric especially) should be running
 	extern int NumOfUnitHeats; // Number of unit heaters in the input file
 	extern Real64 QZnReq; // heating or cooling needed by zone [watts]
-	extern FArray1D_bool MySizeFlag;
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool MySizeFlag;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE UnitHeater
 
@@ -250,7 +250,7 @@ namespace UnitHeater {
 	struct UnitHeatNumericFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		UnitHeatNumericFieldData()
@@ -258,15 +258,15 @@ namespace UnitHeater {
 
 		// Member Constructor
 		UnitHeatNumericFieldData(
-			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
 			) :
 			FieldNames(FieldNames)
 		{}
 	};
 
 	// Object Data
-	extern FArray1D< UnitHeaterData > UnitHeat;
-	extern FArray1D< UnitHeatNumericFieldData > UnitHeatNumericFields;
+	extern Array1D< UnitHeaterData > UnitHeat;
+	extern Array1D< UnitHeatNumericFieldData > UnitHeatNumericFields;
 
 	// Functions
 
@@ -324,12 +324,12 @@ namespace UnitHeater {
 	Real64
 	CalcUnitHeaterResidual(
 		Real64 const PartLoadRatio, // heating coil part load ratio
-		FArray1< Real64 > const & Par // Function parameters
+		Array1< Real64 > const & Par // Function parameters
 	);
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

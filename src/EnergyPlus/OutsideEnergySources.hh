@@ -2,7 +2,7 @@
 #define OutsideEnergySources_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -94,8 +94,8 @@ namespace OutsideEnergySources {
 	};
 
 	// Object Data
-	extern FArray1D< OutsideEnergySourceSpecs > EnergySource;
-	extern FArray1D< ReportVars > EnergySourceReport;
+	extern Array1D< OutsideEnergySourceSpecs > EnergySource;
+	extern Array1D< ReportVars > EnergySourceReport;
 
 	// Functions
 
@@ -145,8 +145,8 @@ namespace OutsideEnergySources {
 	// *****************************************************************************
 
 	void
-	SizeDistrictEnergy( 
-		int const EnergySourceNum 
+	SizeDistrictEnergy(
+		int const EnergySourceNum
 	);
 
 	void
@@ -178,7 +178,7 @@ namespace OutsideEnergySources {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

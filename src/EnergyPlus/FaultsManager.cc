@@ -1,11 +1,13 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <FaultsManager.hh>
 #include <DataPrecisionGlobals.hh>
 #include <InputProcessor.hh>
 #include <ScheduleManager.hh>
+#include <CurveManager.hh>
+#include <Fans.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -15,8 +17,9 @@ namespace FaultsManager {
 	// MODULE INFORMATION:
 	//       AUTHOR         Tianzhen Hong, LBNL
 	//       DATE WRITTEN   August 2013
-	//       MODIFIED       Sep. 2013 Xiufeng Pang (XP) added fouling coil fault
-	//       MODIFIED       Feb. 2015 Rongpeng Zhang, added thermostat/humidistat offset faults 
+	//       MODIFIED       Sep. 2013 Xiufeng Pang (XP), added fouling coil fault
+	//       MODIFIED       Feb. 2015 Rongpeng Zhang, added thermostat/humidistat offset faults
+	//       MODIFIED       Apr. 2015 Rongpeng Zhang, added fouling air filter fault
 	//       RE-ENGINEERED
 
 	// PURPOSE OF THIS MODULE:
@@ -47,7 +50,7 @@ namespace FaultsManager {
 	int const iFouledCoil_FoulingFactor( 9002 );
 
 	// MODULE VARIABLE DECLARATIONS:
-	int const NumFaultTypes( 8 );
+	int const NumFaultTypes( 9 );
 
 	// FaultTypeEnum
 	int const iFault_TemperatureSensorOffset_OutdoorAir( 101 );
@@ -58,6 +61,8 @@ namespace FaultsManager {
 	int const iFault_Fouling_Coil( 106 );
 	int const iFault_ThermostatOffset( 107 );
 	int const iFault_HumidistatOffset( 108 );
+	int const iFault_Fouling_AirFilter( 109 );
+
 	// Types of faults under Group Operational Faults in IDD
 	//  1. Temperature sensor offset
 	//  2. Humidity sensor offset
@@ -65,43 +70,44 @@ namespace FaultsManager {
 	//  4. Fouling coils
 	//  5. Thermostat offset
 	//  6. Humidistat offset
+	//  7. Fouling air filter
 	// coming ...
-	//  7. Fouling: chillers, boilers, cooling towers
-	//  8. Damper leakage: return air, outdoor air
-	//  9. Blockage: pipe
-	//  10. Dirty: air filter
+	//  8. Fouling: chillers, boilers, cooling towers
+	//  9. Damper leakage: return air, outdoor air
+	//  10. Blockage: pipe
 	//  11. Meter: air flow, water flow
 	//  12. CO2 sensor
 	//  13. Pressure sensor offset
 	//  14. more
-	
-	FArray1D_string const cFaults( NumFaultTypes, { "FaultModel:TemperatureSensorOffset:OutdoorAir", "FaultModel:HumiditySensorOffset:OutdoorAir", "FaultModel:EnthalpySensorOffset:OutdoorAir", "FaultModel:TemperatureSensorOffset:ReturnAir", "FaultModel:EnthalpySensorOffset:ReturnAir", "FaultModel:Fouling:Coil", "FaultModel:ThermostatOffset", "FaultModel:HumidistatOffset" } );
+
+	Array1D_string const cFaults( NumFaultTypes, { "FaultModel:TemperatureSensorOffset:OutdoorAir", "FaultModel:HumiditySensorOffset:OutdoorAir", "FaultModel:EnthalpySensorOffset:OutdoorAir", "FaultModel:TemperatureSensorOffset:ReturnAir", "FaultModel:EnthalpySensorOffset:ReturnAir", "FaultModel:Fouling:Coil", "FaultModel:ThermostatOffset", "FaultModel:HumidistatOffset", "FaultModel:Fouling:AirFilter" } );
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
 	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
 	//      'FaultModel:TemperatureSensorOffset:ZoneAir   ', &
 	//      'FaultModel:Blockage:Branch                   ', &
-	//      'FaultModel:Dirty:AirFilter                   ', &
 	//      'FaultModel:Fouling:Chiller                   ', &
 	//      'FaultModel:Fouling:Boiler                    ', &
 	//      'FaultModel:Fouling:CoolingTower              ', &
 	//      'FaultModel:DamperLeakage:ReturnAir           ', &
 	//      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
-	FArray1D_int const iFaultTypeEnums( NumFaultTypes, { iFault_TemperatureSensorOffset_OutdoorAir, iFault_HumiditySensorOffset_OutdoorAir, iFault_EnthalpySensorOffset_OutdoorAir, iFault_TemperatureSensorOffset_ReturnAir, iFault_EnthalpySensorOffset_ReturnAir, iFault_Fouling_Coil, iFault_ThermostatOffset, iFault_HumidistatOffset } );
+	Array1D_int const iFaultTypeEnums(NumFaultTypes, { iFault_TemperatureSensorOffset_OutdoorAir, iFault_HumiditySensorOffset_OutdoorAir, iFault_EnthalpySensorOffset_OutdoorAir, iFault_TemperatureSensorOffset_ReturnAir, iFault_EnthalpySensorOffset_ReturnAir, iFault_Fouling_Coil, iFault_ThermostatOffset, iFault_HumidistatOffset, iFault_Fouling_AirFilter });
 
 	bool AnyFaultsInModel( false ); // True if there are operationla faults in the model
 	int NumFaults( 0 ); // Number of faults (include multiple faults of same type) in the model
 	int NumFouledCoil( 0 ); // Total number of fouled coils
 	int NumFaultyThermostat( 0 ); // Total number of faulty thermostat with offset
 	int NumFaultyHumidistat( 0 ); // Total number of faulty humidistat with offset
+	int NumFaultyAirFilter( 0 ); // Total number of fouled air filters
 
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	FArray1D< FaultProperties > Faults;
-	FArray1D< FaultProperties > FouledCoils;
-	FArray1D< FaultProperties > FaultsThermostatOffset;
-	FArray1D< FaultProperties > FaultsHumidistatOffset;
+	Array1D< FaultProperties > Faults;
+	Array1D< FaultProperties > FouledCoils;
+	Array1D< FaultProperties > FaultsThermostatOffset;
+	Array1D< FaultProperties > FaultsHumidistatOffset;
+	Array1D< FaultProperties > FaultsFouledAirFilters;
 
 	// Functions
 
@@ -129,6 +135,7 @@ namespace FaultsManager {
 
 		// Using/Aliasing
 		using ScheduleManager::GetScheduleIndex;
+		using CurveManager::GetCurveIndex;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -150,21 +157,21 @@ namespace FaultsManager {
 		int NumAlphas; // Number of Alphas for each GetobjectItem call
 		int NumNumbers; // Number of Numbers for each GetobjectItem call
 		int IOStatus;
-		FArray1D_string cAlphaArgs( 10 ); // Alpha input items for object
-		static FArray1D_bool lAlphaFieldBlanks( 10, false );
-		static FArray1D_bool lNumericFieldBlanks( 10, false );
-		FArray1D_string cAlphaFieldNames( 10 );
-		FArray1D_string cNumericFieldNames( 10 );
-		FArray1D< Real64 > rNumericArgs( 10 ); // Numeric input items for object
+		Array1D_string cAlphaArgs( 10 ); // Alpha input items for object
+		static Array1D_bool lAlphaFieldBlanks( 10, false );
+		static Array1D_bool lNumericFieldBlanks( 10, false );
+		Array1D_string cAlphaFieldNames( 10 );
+		Array1D_string cNumericFieldNames( 10 );
+		Array1D< Real64 > rNumericArgs( 10 ); // Numeric input items for object
 
 		int i;
 		int j; 	//Number of fault objects of type 101-105
 		int jFoulingCoil; //Number of fault objects of type 106: fouling coil
 		int jFaultyThermostat; //Number of fault objects of type 107: faulty thermostat
 		int jFaultyHumidistat; //Number of fault objects of type 108: faulty humidistat
+		int jFaultyAirFilter; //Number of fault objects of type 109: fouled air filter
 		int jj;
 		int iFaults;
-		int iTotalFaults;
 		std::string cFault1;
 
 		if ( RunMeOnceFlag ) return;
@@ -183,6 +190,8 @@ namespace FaultsManager {
 		NumFaultyThermostat = GetNumObjectsFound( cFaults( 7 ) );
 		// Faulty humidistat is the 8th fault
 		NumFaultyHumidistat = GetNumObjectsFound( cFaults( 8 ) );
+		// Fouled air filter is the 9th fault
+		NumFaultyAirFilter = GetNumObjectsFound( cFaults( 9 ) );
 
 		if ( NumFaults > 0 ) {
 			AnyFaultsInModel = true;
@@ -200,20 +209,91 @@ namespace FaultsManager {
 		FouledCoils.allocate( NumFouledCoil );
 		FaultsThermostatOffset.allocate( NumFaultyThermostat );
 		FaultsHumidistatOffset.allocate( NumFaultyHumidistat );
-		
+		FaultsFouledAirFilters.allocate( NumFaultyAirFilter );
+
 		j = 0;
 		jFoulingCoil = 0;
 		jFaultyThermostat = 0;
 		jFaultyHumidistat = 0;
-		
+		jFaultyAirFilter = 0;
+
 		for ( i = 1; i <= NumFaultTypes; ++i ) {
 			cFault1 = cFaults( i ); // fault object string
 			iFaults = GetNumObjectsFound( cFault1 );
-			
+
 			for ( jj = 1; jj <= iFaults; ++jj ) {
 				GetObjectItem( cFault1, jj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( SameString( cFault1, "FaultModel:HumidistatOffset" ) ) { // For Fault_type 108: HumidistatOffset
+				if ( SameString( cFault1, "FaultModel:Fouling:AirFilter" ) ) { // For Fault_type 109: Fouled Air Filters
+					++jFaultyAirFilter;
+
+					FaultsFouledAirFilters( jFaultyAirFilter ).FaultType = cFault1;
+					FaultsFouledAirFilters( jFaultyAirFilter ).FaultTypeEnum = iFaultTypeEnums( i );
+					FaultsFouledAirFilters( jFaultyAirFilter ).Name = cAlphaArgs( 1 );
+
+					// Informatin of the fan associated with the fouling air filter
+					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanType = cAlphaArgs( 2 );
+					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanName = cAlphaArgs( 3 );
+
+					// Check whether the specified fan exsits in the fan list
+					if ( FindItemInList( cAlphaArgs( 3 ), Fans::Fan, &Fans::FanEquipConditions::FanName ) != 1 ) {
+						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+						ErrorsFound = true;
+					}
+
+					// Assign fault index to the fan object
+					for ( int FanNum = 1; FanNum <= Fans::NumFans; ++FanNum ) {
+						if ( SameString( Fans::Fan( FanNum ).FanName, cAlphaArgs( 3 ) ) ) {
+							Fans::Fan( FanNum ).FaultyFilterFlag = true;
+							Fans::Fan( FanNum ).FaultyFilterIndex = jFaultyAirFilter;
+							break;
+						}
+					}
+
+					// Fault availability schedule
+					FaultsFouledAirFilters( jFaultyAirFilter ).AvaiSchedule = cAlphaArgs( 4 );
+					if ( lAlphaFieldBlanks( 4 ) ) {
+						FaultsFouledAirFilters( jFaultyAirFilter ).AvaiSchedPtr = -1; // returns schedule value of 1
+					} else {
+						FaultsFouledAirFilters( jFaultyAirFilter ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
+						if ( FaultsFouledAirFilters( jFaultyAirFilter ).AvaiSchedPtr == 0 ) {
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not found." );
+							ErrorsFound = true;
+						}
+					}
+
+					// Fan pressure increase fraction schedule
+					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterPressFracSche = cAlphaArgs( 5 );
+					if ( lAlphaFieldBlanks( 5 ) ) {
+						FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterPressFracSchePtr = -1; // returns schedule value of 1
+					} else {
+						FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterPressFracSchePtr = GetScheduleIndex( cAlphaArgs( 5 ) );
+						if ( FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterPressFracSchePtr == 0 ) {
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+							ErrorsFound = true;
+						}
+					}
+
+					// Fan curve describing the relationship between fan pressure rise and air flow rate
+					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanCurve = cAlphaArgs( 6 );
+					FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanCurvePtr = GetCurveIndex( cAlphaArgs( 6 ) );
+					if ( FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanCurvePtr == 0 ) {
+						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 )  + "\"" );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + " = \"" + cAlphaArgs( 6 ) + "\" not found."  );
+						ErrorsFound = true;
+					}
+
+					// Check whether the specified fan curve covers the design operational point of the fan
+					if ( !CheckFaultyAirFilterFanCurve( FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanName, FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanCurvePtr ) ) {
+						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 )  + "\"" );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + " = \"" + cAlphaArgs( 6 ) + "\" does not cover "  );
+						ShowContinueError( "the operational point of Fan " + FaultsFouledAirFilters( jFaultyAirFilter ).FaultyAirFilterFanName  );
+						ErrorsFound = true;
+					}
+
+					//In the fan object, calculate by each time-step: 1) pressure inc value; 2) air flow rate decrease value ......
+
+				} else if ( SameString( cFault1, "FaultModel:HumidistatOffset" ) ) { // For Fault_type 108: HumidistatOffset
 					++jFaultyHumidistat;
 
 					FaultsHumidistatOffset( jFaultyHumidistat ).FaultType = cFault1;
@@ -222,9 +302,9 @@ namespace FaultsManager {
 					FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatName = cAlphaArgs( 2 );
 					FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatType = cAlphaArgs( 3 );
 
-					if ( SameString( FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatType, "ThermostatOffsetDependent" ) ) { 
+					if ( SameString( FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatType, "ThermostatOffsetDependent" ) ) {
 					// For Humidistat Offset Type: ThermostatOffsetDependent
-					
+
 						// Related Thermostat Offset Fault Name is required for Humidistat Offset Type: ThermostatOffsetDependent
 						if ( lAlphaFieldBlanks( 6 ) ) {
 							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\": " + cAlphaFieldNames( 6 ) + " cannot be blank for Humidistat Offset Type = \"ThermostatOffsetDependent\"." );
@@ -232,10 +312,10 @@ namespace FaultsManager {
 						} else {
 							FaultsHumidistatOffset( jFaultyHumidistat ).FaultyThermostatName = cAlphaArgs( 6 );
 						}
-						
-					} else { 
+
+					} else {
 					// For Humidistat Offset Type: ThermostatOffsetIndependent
-					
+
 						// Availability schedule
 						FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedule = cAlphaArgs( 4 );
 						if ( lAlphaFieldBlanks( 4 ) ) {
@@ -267,7 +347,7 @@ namespace FaultsManager {
 						} else {
 							FaultsHumidistatOffset( jFaultyHumidistat ).Offset = rNumericArgs( 1 );
 						}
-					
+
 					}
 
 
@@ -427,10 +507,79 @@ namespace FaultsManager {
 
 	}
 
+	bool
+	CheckFaultyAirFilterFanCurve(
+		std::string const & FanName, // name of the fan
+		int const FanCurvePtr      // pointer of the fan curve
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rongpeng Zhang
+		//       DATE WRITTEN   Apr. 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// To check whether the fan curve specified in the FaultModel:Fouling:AirFilter object
+		// covers the rated operational point of the corresponding fan
+		// Return true if the curve covers the fan rated operational point
+
+		// METHODOLOGY EMPLOYED:
+		// NA
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using CurveManager::CurveValue;
+		using namespace Fans;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 FanMaxAirFlowRate; // Design Max Specified Volume Flow Rate of Fan [m3/sec]
+		Real64 FanDeltaPress;     // Design Delta Pressure Across the Fan [Pa]
+		Real64 FanDeltaPressCal;  // Calculated Delta Pressure Across the Fan [Pa]
+		bool   FanFound;          // Whether the fan is found or not
+
+		// FLOW
+
+		FanFound = false;
+
+		for ( int FanNum = 1; FanNum <= NumFans; ++FanNum ) {
+			if ( SameString( Fan( FanNum ).FanName, FanName ) ) {
+				FanMaxAirFlowRate = Fan( FanNum ).MaxAirFlowRate;
+				FanDeltaPress = Fan( FanNum ).DeltaPress;
+				FanFound = true;
+				break;
+			}
+		}
+
+		if ( !FanFound ) {
+			return false;
+		}
+
+		FanDeltaPressCal = CurveValue( FanCurvePtr, FanMaxAirFlowRate );
+
+		return ( ( FanDeltaPressCal > 0.95*FanDeltaPress ) && ( FanDeltaPressCal < 1.05*FanDeltaPress ) );
+	}
+
+
 	// *****************************************************************************
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

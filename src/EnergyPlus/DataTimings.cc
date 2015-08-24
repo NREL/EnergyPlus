@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/Time_Date.hh>
 
@@ -93,12 +93,19 @@ namespace DataTimings {
 #endif
 
 	// Object Data
-	FArray1D< timings > Timing;
+	Array1D< timings > Timing;
 
 	// Functions
 
 	void
-	epStartTime( std::string const & ctimingElementstring )
+	epStartTime(
+#ifdef EP_NO_Timings
+		std::string const & EP_UNUSED( ctimingElementstring )
+#endif
+#ifdef EP_Timings
+		std::string const & ctimingElementstring
+#endif
+		)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -136,16 +143,16 @@ namespace DataTimings {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int loop; // testing if already in structure
-		int found; // indicator for element
 
 		// Object Data
-		FArray1D< timings > tempTiming; // used for reallocate.
+		Array1D< timings > tempTiming; // used for reallocate.
 
 #ifdef EP_NO_Timings
 		return;
 #endif
 #ifdef EP_Timings
+		int loop; // testing if already in structure
+		int found; // indicator for element
 		if ( NumTimingElements == 0 ) {
 			MaxTimingElements = 250;
 			Timing.allocate( MaxTimingElements );
@@ -179,9 +186,16 @@ namespace DataTimings {
 
 	void
 	epStopTime(
+#ifdef EP_NO_Timings
+		std::string const & EP_UNUSED( ctimingElementstring ),
+		Optional_bool_const EP_UNUSED( printit ), // true if it should be printed here.
+		Optional_string_const EP_UNUSED( wprint ) // only needed (and assumed, if printit is true)
+#endif
+#ifdef EP_Timings
 		std::string const & ctimingElementstring,
 		Optional_bool_const printit, // true if it should be printed here.
 		Optional_string_const wprint // only needed (and assumed, if printit is true)
+#endif
 	)
 	{
 
@@ -221,14 +235,14 @@ namespace DataTimings {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int loop; // testing if already in structure
-		int found; // indicator for element
-		Real64 stoptime;
 
 #ifdef EP_NO_Timings
 		return;
 #endif
 #ifdef EP_Timings
+		int loop; // testing if already in structure
+		int found; // indicator for element
+		Real64 stoptime;
 		found = 0;
 		for ( loop = 1; loop <= NumTimingElements; ++loop ) {
 			if ( Timing( loop ).Element != ctimingElementstring ) continue;
@@ -280,7 +294,14 @@ namespace DataTimings {
 	}
 
 	void
-	epSummaryTimes( Real64 & TimeUsed_CPUTime )
+	epSummaryTimes(
+#ifdef EP_NO_Timings
+		Real64 & EP_UNUSED( TimeUsed_CPUTime )
+#endif
+#ifdef EP_Timings
+		Real64 & TimeUsed_CPUTime
+#endif
+		)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -315,13 +336,13 @@ namespace DataTimings {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int loop;
-		int EchoInputFile;
 
 #ifdef EP_NO_Timings
 		return;
 #endif
 #ifdef EP_Timings
+		int loop;
+		int EchoInputFile;
 		EchoInputFile = FindUnitNumber( outputAuditFile );
 		gio::write( EchoInputFile, fmtA ) << "Timing Element" + tabchar + "# calls" + tabchar + "Time {s}" + tabchar + "Time {s} (per call)";
 
@@ -550,7 +571,7 @@ namespace DataTimings {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Int32 > clockvalues( 8 );
+		Array1D< Int32 > clockvalues( 8 );
 		//value(1)   Current year
 		//value(2)   Current month
 		//value(3)   Current day
@@ -560,7 +581,7 @@ namespace DataTimings {
 		//value(7)   Seconds (0-59)
 		//value(8)   Milliseconds (0-999)
 
-		date_and_time_string( _, _, _, clockvalues );
+		date_and_time( _, _, _, clockvalues );
 		calctime = clockvalues( 5 ) * 3600.0 + clockvalues( 6 ) * 60.0 + clockvalues( 7 ) + clockvalues( 8 ) / 1000.0;
 
 		return calctime;
@@ -569,7 +590,7 @@ namespace DataTimings {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

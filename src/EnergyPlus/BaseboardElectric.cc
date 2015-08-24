@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <BaseboardElectric.hh>
@@ -60,14 +60,14 @@ namespace BaseboardElectric {
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumBaseboards( 0 );
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
 	// Object Data
-	FArray1D< BaseboardParams > Baseboard;
-	FArray1D< BaseboardNumericFieldData > BaseboardNumericFields;
+	Array1D< BaseboardParams > Baseboard;
+	Array1D< BaseboardNumericFieldData > BaseboardNumericFields;
 
 	// Functions
 
@@ -97,7 +97,6 @@ namespace BaseboardElectric {
 		// na
 
 		// Using/Aliasing
-		using DataLoopNode::Node;
 		using InputProcessor::FindItemInList;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using General::TrimSigDigits;
@@ -127,7 +126,7 @@ namespace BaseboardElectric {
 
 		// Find the correct Baseboard Equipment
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( EquipName, Baseboard.EquipName(), NumBaseboards );
+			BaseboardNum = FindItemInList( EquipName, Baseboard, &BaseboardParams::EquipName );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "SimElectricBaseboard: Unit not found=" + EquipName );
 			}
@@ -250,7 +249,7 @@ namespace BaseboardElectric {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Baseboard.EquipName(), BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), Baseboard, &BaseboardParams::EquipName, BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					continue;
@@ -408,7 +407,7 @@ namespace BaseboardElectric {
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {

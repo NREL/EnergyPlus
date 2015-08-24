@@ -137,9 +137,7 @@ namespace EcoRoofManager {
 		//SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Kv( 0.4 ); // Von Karmen's constant (source FASST)
 		Real64 const rch( 0.63 ); // Turbulent Schimdt Number
-		Real64 const Ks( 0.2 ); // W/m.k. Thermal Conductivity of soil
 		Real64 const rche( 0.71 ); // Turbulent Prandtl Number
-		Real64 const Rv( 461.53 ); // Gas Constant of Water Vapor J/kg K
 		Real64 const Rair( 0.286e3 ); // Gas Constant of air J/Kg K
 		Real64 const g1( 9.81 ); // Gravity. In m/sec^2.
 		Real64 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant W/m^2K^4
@@ -280,7 +278,7 @@ namespace EcoRoofManager {
 		HMovInsul = 0.0;
 
 		if ( Surface( SurfNum ).ExtWind ) {
-			InitExteriorConvectionCoeff( SurfNum, HMovInsul, RoughSurf, AbsThermSurf, TH( SurfNum, 1, 1 ), HcExtSurf( SurfNum ), HSkyExtSurf( SurfNum ), HGrdExtSurf( SurfNum ), HAirExtSurf( SurfNum ) );
+			InitExteriorConvectionCoeff( SurfNum, HMovInsul, RoughSurf, AbsThermSurf, TH( 1, 1, SurfNum ), HcExtSurf( SurfNum ), HSkyExtSurf( SurfNum ), HGrdExtSurf( SurfNum ), HAirExtSurf( SurfNum ) );
 		}
 
 		RS = BeamSolarRad + AnisoSkyMult( SurfNum ) * DifSolarRad;
@@ -388,7 +386,7 @@ namespace EcoRoofManager {
 			if ( Construct( ConstrNum ).CTFCross( 0 ) > 0.01 ) {
 				QuickConductionSurf = true;
 				F1temp = Construct( ConstrNum ).CTFCross( 0 ) / ( Construct( ConstrNum ).CTFInside( 0 ) + HConvIn( SurfNum ) );
-				Qsoilpart1 = -CTFConstOutPart( SurfNum ) + F1temp * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * QsrcHist( 1, SurfNum ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) );
+				Qsoilpart1 = -CTFConstOutPart( SurfNum ) + F1temp * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * QsrcHist( SurfNum, 1 ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) );
 			} else {
 				Qsoilpart1 = -CTFConstOutPart( SurfNum ) + Construct( ConstrNum ).CTFCross( 0 ) * TempSurfIn( SurfNum );
 				F1temp = 0.0;
@@ -595,7 +593,7 @@ namespace EcoRoofManager {
 		} // if firstecosurface (if not we do NOT need to recalculate ecoroof energybalance as all ecoroof surfaces MUST be the same
 		// this endif was moved here from the if statement regarding whether we are looking at the first ecoroof surface or not.
 
-		TH( SurfNum, 1, 1 ) = Tgold; // SoilTemperature
+		TH( 1, 1, SurfNum ) = Tgold; // SoilTemperature
 		TempExt = Tgold;
 
 	}
@@ -611,10 +609,10 @@ namespace EcoRoofManager {
 		Real64 const Vfluxg, // Water mass flux from soil surface [m/s]
 		int & ConstrNum, // Indicator for contruction index for the current surface
 		Real64 & Alphag,
-		int const unit, // unused1208
-		Real64 const Tg, // unused1208
-		Real64 const Tf, // unused1208
-		Real64 const Qsoil // unused1208
+		int const EP_UNUSED( unit ), // unused1208
+		Real64 const EP_UNUSED( Tg ), // unused1208
+		Real64 const EP_UNUSED( Tf ), // unused1208
+		Real64 const EP_UNUSED( Qsoil ) // unused1208
 	)
 	{
 		// SUBROUTINE INFORMATION
@@ -1038,7 +1036,7 @@ namespace EcoRoofManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -2,7 +2,7 @@
 #define HighTempRadiantSystem_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -40,15 +40,15 @@ namespace HighTempRadiantSystem {
 	// MODULE VARIABLE DECLARATIONS:
 	// Standard, run-of-the-mill variables...
 	extern int NumOfHighTempRadSys; // Number of hydronic low tempererature radiant systems
-	extern FArray1D< Real64 > QHTRadSource; // Need to keep the last value in case we are still iterating
-	extern FArray1D< Real64 > QHTRadSrcAvg; // Need to keep the last value in case we are still iterating
-	extern FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+	extern Array1D< Real64 > QHTRadSource; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > QHTRadSrcAvg; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
 	// Record keeping variables used to calculate QHTRadSrcAvg locally
-	extern FArray1D< Real64 > LastQHTRadSrc; // Need to keep the last value in case we are still iterating
-	extern FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	extern FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
-	extern FArray1D_bool MySizeFlag;
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D< Real64 > LastQHTRadSrc; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	extern Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	extern Array1D_bool MySizeFlag;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE HighTempRadiantSystem
 
@@ -77,9 +77,9 @@ namespace HighTempRadiantSystem {
 		int SetptSchedPtr; // Schedule index for the zone setpoint temperature
 		Real64 FracDistribPerson; // Fraction of fraction radiant incident on a "person" in the space
 		int TotSurfToDistrib; // Total number of surfaces the heater sends radiation to
-		FArray1D_string SurfaceName; // Surface name in the list of surfaces heater sends radiation to
-		FArray1D_int SurfacePtr; // Surface number in the list of surfaces heater sends radiation to
-		FArray1D< Real64 > FracDistribToSurf; // Fraction of fraction radiant incident on the surface
+		Array1D_string SurfaceName; // Surface name in the list of surfaces heater sends radiation to
+		Array1D_int SurfacePtr; // Surface number in the list of surfaces heater sends radiation to
+		Array1D< Real64 > FracDistribToSurf; // Fraction of fraction radiant incident on the surface
 		// Other parameters
 		// Report data
 		Real64 ElecPower; // system electric consumption in Watts
@@ -137,9 +137,9 @@ namespace HighTempRadiantSystem {
 			int const SetptSchedPtr, // Schedule index for the zone setpoint temperature
 			Real64 const FracDistribPerson, // Fraction of fraction radiant incident on a "person" in the space
 			int const TotSurfToDistrib, // Total number of surfaces the heater sends radiation to
-			FArray1_string const & SurfaceName, // Surface name in the list of surfaces heater sends radiation to
-			FArray1_int const & SurfacePtr, // Surface number in the list of surfaces heater sends radiation to
-			FArray1< Real64 > const & FracDistribToSurf, // Fraction of fraction radiant incident on the surface
+			Array1_string const & SurfaceName, // Surface name in the list of surfaces heater sends radiation to
+			Array1_int const & SurfacePtr, // Surface number in the list of surfaces heater sends radiation to
+			Array1< Real64 > const & FracDistribToSurf, // Fraction of fraction radiant incident on the surface
 			Real64 const ElecPower, // system electric consumption in Watts
 			Real64 const ElecEnergy, // system electric consumption in Joules
 			Real64 const GasPower, // system gas consumption in Watts
@@ -184,7 +184,7 @@ namespace HighTempRadiantSystem {
 	struct HighTempRadSysNumericFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		HighTempRadSysNumericFieldData()
@@ -192,15 +192,15 @@ namespace HighTempRadiantSystem {
 
 		// Member Constructor
 		HighTempRadSysNumericFieldData(
-			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
 			) :
 			FieldNames(FieldNames)
 		{}
 	};
 
 	// Object Data
-	extern FArray1D< HighTempRadiantSystemData > HighTempRadSys;
-	extern FArray1D< HighTempRadSysNumericFieldData > HighTempRadSysNumericFields;
+	extern Array1D< HighTempRadiantSystemData > HighTempRadSys;
+	extern Array1D< HighTempRadSysNumericFieldData > HighTempRadSysNumericFields;
 
 	// Functions
 
@@ -253,7 +253,7 @@ namespace HighTempRadiantSystem {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

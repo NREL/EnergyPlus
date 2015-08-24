@@ -2,7 +2,7 @@
 #define AirflowNetworkBalanceManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -30,12 +30,12 @@ namespace AirflowNetworkBalanceManager {
 
 	// MODULE VARIABLE DECLARATIONS:
 	// Report variables
-	extern FArray1D< Real64 > PZ;
+	extern Array1D< Real64 > PZ;
 	// Inverse matrix
-	extern FArray1D< Real64 > MA;
-	extern FArray1D< Real64 > MV;
-	extern FArray1D_int IVEC;
-	extern FArray1D_int SplitterNodeNumbers;
+	extern Array1D< Real64 > MA;
+	extern Array1D< Real64 > MV;
+	extern Array1D_int IVEC;
+	extern Array1D_int SplitterNodeNumbers;
 
 	extern bool AirflowNetworkGetInputFlag;
 	extern int VentilationCtrl; // Hybrid ventilation control type
@@ -68,7 +68,7 @@ namespace AirflowNetworkBalanceManager {
 	extern int NumOfExtNodes;
 	extern int AirflowNetworkNumOfExtSurfaces;
 	extern Real64 IncAng; // Wind incidence angle relative to facade normal (deg)
-	extern FArray1D< Real64 > FacadeAng; // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
+	extern Array1D< Real64 > FacadeAng; // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
 	extern int WindDirNum; // Wind direction number
 	extern Real64 WindAng; // Wind direction angle (degrees clockwise from North)
 	extern int SupplyFanInletNode; // Supply air fan inlet node number
@@ -158,7 +158,7 @@ namespace AirflowNetworkBalanceManager {
 	};
 
 	// Object Data
-	extern FArray1D< AirflowNetworkReportVars > AirflowNetworkZnRpt;
+	extern Array1D< AirflowNetworkReportVars > AirflowNetworkZnRpt;
 
 	// Functions
 
@@ -246,7 +246,7 @@ namespace AirflowNetworkBalanceManager {
 		int OpeningProbSchNum; // Opening probability schedule pointer
 		int ClosingProbSchNum; // Closing probability schedule pointer
 		Real64 ComfortBouPoint; // Thermal Comfort Temperature Boundary Point
-		bool OccupancyCheck; // Occupancy check 
+		bool OccupancyCheck; // Occupancy check
 		std::string OpeningProbSchName; // Opening probability schedule name
 		std::string ClosingProbSchName; // Closing probability schedule name
 		Real64 MaxPPD; // Maximum PPD used to calculate comfort band (%)
@@ -254,7 +254,6 @@ namespace AirflowNetworkBalanceManager {
 
 		// Default Constructor
 		OccupantVentilationControlProp():
-			Name( "" ),
 			MinOpeningTime( 0.0 ),
 			MinClosingTime( 0.0 ),
 			ComfortLowTempCurveNum( 0 ),
@@ -262,8 +261,8 @@ namespace AirflowNetworkBalanceManager {
 			OpeningProbSchNum( 0 ),
 			ClosingProbSchNum( 0 ),
 			ComfortBouPoint( 10.0 ),
-			MaxPPD( 10.0 ),
 			OccupancyCheck( false ),
+			MaxPPD( 10.0 ),
 			MinTimeControlOnly( false )
 		{}
 
@@ -283,16 +282,16 @@ namespace AirflowNetworkBalanceManager {
 			Real64 const TimeCloseDuration
 			); // function to perform calculations of opening probability
 
-		bool closingProbability( 
+		bool closingProbability(
 			Real64 const TimeCloseDuration
 			); // function to perform calculations of closing probability
 	};
 
-	extern FArray1D< OccupantVentilationControlProp > OccupantVentilationControl;
+	extern Array1D< OccupantVentilationControlProp > OccupantVentilationControl;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

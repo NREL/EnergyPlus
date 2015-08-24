@@ -47,13 +47,33 @@ namespace DataBranchNodeConnections {
 	int EqNodeConnectionAlloc( 100 );
 
 	// Object Data
-	FArray1D< ComponentListData > CompSets;
-	FArray1D< ParentListData > ParentNodeList;
-	FArray1D< NodeConnectionDef > NodeConnections;
-	FArray1D< EqNodeConnectionDef > AirTerminalNodeConnections;
+	Array1D< ComponentListData > CompSets;
+	Array1D< ParentListData > ParentNodeList;
+	Array1D< NodeConnectionDef > NodeConnections;
+	Array1D< EqNodeConnectionDef > AirTerminalNodeConnections;
+
+	// Clears the global data in DataBranchNodeConnections.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumCompSets = 0;
+		NumNodeConnectionErrors = 0;
+		NumOfNodeConnections = 0;
+		MaxNumOfNodeConnections = 0;
+		NodeConnectionAlloc = 1000;
+		NumOfActualParents = 0;
+		NumOfAirTerminalNodes = 0;
+		MaxNumOfAirTerminalNodes = 0;
+		EqNodeConnectionAlloc = 100;
+		CompSets.deallocate();
+		ParentNodeList.deallocate();
+		NodeConnections.deallocate();
+		AirTerminalNodeConnections.deallocate();
+	}
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

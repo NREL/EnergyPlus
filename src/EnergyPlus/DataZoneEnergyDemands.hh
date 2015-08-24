@@ -2,7 +2,7 @@
 #define DataZoneEnergyDemands_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -17,11 +17,11 @@ namespace DataZoneEnergyDemands {
 
 	// MODULE VARIABLE DECLARATIONS:
 
-	extern FArray1D_bool DeadBandOrSetback; // true if zone temperature is in the thermostat deadband
+	extern Array1D_bool DeadBandOrSetback; // true if zone temperature is in the thermostat deadband
 	// before any heating / cooling done
-	extern FArray1D_bool Setback; // true if zone temperature has increased
+	extern Array1D_bool Setback; // true if zone temperature has increased
 	// from previous setting
-	extern FArray1D_bool CurDeadBandOrSetback; // same as above except updated after each piece of zone equipment
+	extern Array1D_bool CurDeadBandOrSetback; // same as above except updated after each piece of zone equipment
 	// in a zone is simulated
 
 	// Types
@@ -36,9 +36,9 @@ namespace DataZoneEnergyDemands {
 		Real64 RemainingOutputReqToHeatSP; // Remaining load required to meet heating setpoint (>0 is a heating load)
 		Real64 RemainingOutputReqToCoolSP; // Remaining load required to meet cooling setpoint (<0 is a cooling load)
 		int NumZoneEquipment; // count of zone equipment for this zone, from ZoneHVAC:EquipmentList
-		FArray1D< Real64 > SequencedOutputRequired;
-		FArray1D< Real64 > SequencedOutputRequiredToHeatingSP; // load required to meet heating setpoint by sequence
-		FArray1D< Real64 > SequencedOutputRequiredToCoolingSP; // load required to meet cooling setpoint by sequence
+		Array1D< Real64 > SequencedOutputRequired;
+		Array1D< Real64 > SequencedOutputRequiredToHeatingSP; // load required to meet heating setpoint by sequence
+		Array1D< Real64 > SequencedOutputRequiredToCoolingSP; // load required to meet cooling setpoint by sequence
 		Real64 SupplyAirAdjustFactor; // supply air adjustment factor due to the cap of
 		// zone maximum outdoor air fraction
 		int StageNum; // The stage number when staged thermostate is used:
@@ -66,9 +66,9 @@ namespace DataZoneEnergyDemands {
 			Real64 const RemainingOutputReqToHeatSP, // Remaining load required to meet heating setpoint (>0 is a heating load)
 			Real64 const RemainingOutputReqToCoolSP, // Remaining load required to meet cooling setpoint (<0 is a cooling load)
 			int const NumZoneEquipment, // count of zone equipment for this zone, from ZoneHVAC:EquipmentList
-			FArray1< Real64 > const & SequencedOutputRequired,
-			FArray1< Real64 > const & SequencedOutputRequiredToHeatingSP, // load required to meet heating setpoint by sequence
-			FArray1< Real64 > const & SequencedOutputRequiredToCoolingSP, // load required to meet cooling setpoint by sequence
+			Array1< Real64 > const & SequencedOutputRequired,
+			Array1< Real64 > const & SequencedOutputRequiredToHeatingSP, // load required to meet heating setpoint by sequence
+			Array1< Real64 > const & SequencedOutputRequiredToCoolingSP, // load required to meet cooling setpoint by sequence
 			Real64 const SupplyAirAdjustFactor, // supply air adjustment factor due to the cap of
 			int const StageNum // The stage number when staged thermostate is used:
 		) :
@@ -100,9 +100,9 @@ namespace DataZoneEnergyDemands {
 		Real64 RemainingOutputReqToDehumidSP; // Remaining load required to meet dehumidifying setpoint
 		// (<0 is a dehumidify load)
 		int NumZoneEquipment; // count of zone equipment for this zone, from ZoneHVAC:EquipmentList
-		FArray1D< Real64 > SequencedOutputRequired;
-		FArray1D< Real64 > SequencedOutputRequiredToHumidSP; // load required to meet humidify setpoint by sequence
-		FArray1D< Real64 > SequencedOutputRequiredToDehumidSP; // load required to meet dehumidify setpoint by sequenc
+		Array1D< Real64 > SequencedOutputRequired;
+		Array1D< Real64 > SequencedOutputRequiredToHumidSP; // load required to meet humidify setpoint by sequence
+		Array1D< Real64 > SequencedOutputRequiredToDehumidSP; // load required to meet dehumidify setpoint by sequenc
 
 		// Default Constructor
 		ZoneSystemMoistureDemand() :
@@ -124,9 +124,9 @@ namespace DataZoneEnergyDemands {
 			Real64 const RemainingOutputReqToHumidSP, // Remaining load required to meet humidifying setpoint
 			Real64 const RemainingOutputReqToDehumidSP, // Remaining load required to meet dehumidifying setpoint
 			int const NumZoneEquipment, // count of zone equipment for this zone, from ZoneHVAC:EquipmentList
-			FArray1< Real64 > const & SequencedOutputRequired,
-			FArray1< Real64 > const & SequencedOutputRequiredToHumidSP, // load required to meet humidify setpoint by sequence
-			FArray1< Real64 > const & SequencedOutputRequiredToDehumidSP // load required to meet dehumidify setpoint by sequenc
+			Array1< Real64 > const & SequencedOutputRequired,
+			Array1< Real64 > const & SequencedOutputRequiredToHumidSP, // load required to meet humidify setpoint by sequence
+			Array1< Real64 > const & SequencedOutputRequiredToDehumidSP // load required to meet dehumidify setpoint by sequenc
 		) :
 			RemainingOutputRequired( RemainingOutputRequired ),
 			TotalOutputRequired( TotalOutputRequired ),
@@ -143,8 +143,8 @@ namespace DataZoneEnergyDemands {
 	};
 
 	// Object Data
-	extern FArray1D< ZoneSystemDemandData > ZoneSysEnergyDemand;
-	extern FArray1D< ZoneSystemMoistureDemand > ZoneSysMoistureDemand;
+	extern Array1D< ZoneSystemDemandData > ZoneSysEnergyDemand;
+	extern Array1D< ZoneSystemMoistureDemand > ZoneSysMoistureDemand;
 
 } // DataZoneEnergyDemands
 

@@ -109,15 +109,15 @@ namespace DataGenerators {
 	int NumGensWDynamics( 0 ); // number of dynamics controls for generators
 
 	// Object Data
-	FArray1D< FCDataStruct > FuelCell; // dimension to number of machines
-	FArray1D< GasPropertyDataStruct > GasPhaseThermoChemistryData;
-	FArray1D< GeneratorFuelSupplyDataStruct > FuelSupply; // fuel supply (reused across various)
-	FArray1D< MicroCHPDataStruct > MicroCHP;
-	FArray1D< MicroCHPParamsNonNormalized > MicroCHPParamInput; // Used during get input then put into nested
-	FArray1D< GeneratorDynamicsManagerStruct > GeneratorDynamics;
+	Array1D< FCDataStruct > FuelCell; // dimension to number of machines
+	Array1D< GasPropertyDataStruct > GasPhaseThermoChemistryData;
+	Array1D< GeneratorFuelSupplyDataStruct > FuelSupply; // fuel supply (reused across various)
+	Array1D< MicroCHPDataStruct > MicroCHP;
+	Array1D< MicroCHPParamsNonNormalized > MicroCHPParamInput; // Used during get input then put into nested
+	Array1D< GeneratorDynamicsManagerStruct > GeneratorDynamics;
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <ElectricBaseboardRadiator.hh>
@@ -74,27 +74,27 @@ namespace ElectricBaseboardRadiator {
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumElecBaseboards( 0 );
-	FArray1D< Real64 > QBBElecRadSource; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > QBBElecRadSrcAvg; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+	Array1D< Real64 > QBBElecRadSource; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > QBBElecRadSrcAvg; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
 	// Record keeping variables used to calculate QBBRadSrcAvg locally
-	FArray1D< Real64 > LastQBBElecRadSrc; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
+	Array1D< Real64 > LastQBBElecRadSrc; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
 	//SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
 	// Object Data
-	FArray1D< ElecBaseboardParams > ElecBaseboard;
-	FArray1D< ElecBaseboardNumericFieldData > ElecBaseboardNumericFields;
+	Array1D< ElecBaseboardParams > ElecBaseboard;
+	Array1D< ElecBaseboardNumericFieldData > ElecBaseboardNumericFields;
 
 	// Functions
 
 	void
 	SimElecBaseboard(
 		std::string const & EquipName,
-		int const ActualZoneNum,
+		int const EP_UNUSED( ActualZoneNum ),
 		int const ControlledZoneNum,
 		bool const FirstHVACIteration,
 		Real64 & PowerMet,
@@ -144,7 +144,7 @@ namespace ElectricBaseboardRadiator {
 
 		// Find the correct Baseboard Equipment
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( EquipName, ElecBaseboard.EquipName(), NumElecBaseboards );
+			BaseboardNum = FindItemInList( EquipName, ElecBaseboard, &ElecBaseboardParams::EquipName );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "SimElectricBaseboard: Unit not found=" + EquipName );
 			}
@@ -210,14 +210,12 @@ namespace ElectricBaseboardRadiator {
 		using InputProcessor::SameString;
 		using InputProcessor::FindItemInList;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using GlobalNames::VerifyUniqueBaseboardName;
 		using General::RoundSigDigits;
 		using ScheduleManager::GetScheduleIndex;
 		using namespace DataIPShortCuts;
 		using General::TrimSigDigits;
 		using DataSizing::AutoSize;
-		using DataSizing::FinalZoneSizing;
 		using DataSizing::HeatingDesignCapacity;
 		using DataSizing::CapacityPerFloorArea;
 		using DataSizing::FractionOfAutosizedHeatingCapacity;
@@ -246,7 +244,6 @@ namespace ElectricBaseboardRadiator {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AllFracsSummed; // Sum of the fractions radiant
 		int BaseboardNum;
-		int ElecBBNum;
 		int NumAlphas;
 		int NumNumbers;
 		int SurfNum; // surface number that radiant heat delivered
@@ -277,7 +274,7 @@ namespace ElectricBaseboardRadiator {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ElecBaseboard.EquipName(), BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ElecBaseboard, &ElecBaseboardParams::EquipName, BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				continue;
@@ -419,7 +416,7 @@ namespace ElectricBaseboardRadiator {
 			AllFracsSummed = ElecBaseboard( BaseboardNum ).FracDistribPerson;
 			for ( SurfNum = 1; SurfNum <= ElecBaseboard( BaseboardNum ).TotSurfToDistrib; ++SurfNum ) {
 				ElecBaseboard( BaseboardNum ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 3 );
-				ElecBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 3 ), Surface.Name(), TotSurfaces );
+				ElecBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 3 ), Surface );
 				ElecBaseboard( BaseboardNum ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 6 );
 				if ( ElecBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFieldNames( SurfNum + 3 ) + "=\"" + cAlphaArgs( SurfNum + 3 ) + "\" invalid - not found." );
@@ -522,7 +519,7 @@ namespace ElectricBaseboardRadiator {
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int ZoneNum;
 		int Loop;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
@@ -719,7 +716,7 @@ namespace ElectricBaseboardRadiator {
 	void
 	CalcElectricBaseboard(
 		int const BaseboardNum,
-		int const ControlledZoneNum
+		int const EP_UNUSED( ControlledZoneNum )
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -956,7 +953,6 @@ namespace ElectricBaseboardRadiator {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int BaseboardNum; // DO loop counter for surface index
-		int ZoneNum; // DO loop counter for surface index
 
 		// FLOW:
 		ElecBaseboardSysOn = false;
@@ -1011,7 +1007,6 @@ namespace ElectricBaseboardRadiator {
 		using DataHeatBalFanSys::MaxRadHeatFlux;
 		using General::RoundSigDigits;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using DataZoneEquipment::ZoneEquipConfig;
 
 		// Locals
@@ -1185,7 +1180,7 @@ namespace ElectricBaseboardRadiator {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

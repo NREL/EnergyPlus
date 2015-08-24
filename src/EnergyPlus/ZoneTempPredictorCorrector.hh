@@ -5,8 +5,8 @@
 #include <vector>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -28,11 +28,11 @@ namespace ZoneTempPredictorCorrector {
 	//INTEGER, PUBLIC, PARAMETER :: iPushZoneTimestepHistories    = 5
 	//INTEGER, PUBLIC, PARAMETER :: iPushSystemTimestepHistories  = 6
 
-	extern FArray1D_string const ValidControlTypes;
+	extern Array1D_string const ValidControlTypes;
 
-	extern FArray1D_string const ValidComfortControlTypes;
+	extern Array1D_string const ValidComfortControlTypes;
 
-	extern FArray1D_string const cZControlTypes;
+	extern Array1D_string const cZControlTypes;
 
 	extern int const iZC_TStat;
 	extern int const iZC_TCTStat;
@@ -40,7 +40,7 @@ namespace ZoneTempPredictorCorrector {
 	extern int const iZC_HStat;
 	extern int const iZC_TandHStat;
 	extern int const iZC_StagedDual;
-	extern FArray1D_int const iZControlTypes;
+	extern Array1D_int const iZControlTypes;
 
 	extern int const SglHeatSetPoint;
 	extern int const SglCoolSetPoint;
@@ -86,14 +86,14 @@ namespace ZoneTempPredictorCorrector {
 	// Number of zone with staged controlled objects
 	extern int NumStageCtrZone;
 
-	extern FArray1D< Real64 > ZoneSetPointLast;
-	extern FArray1D< Real64 > TempIndZnLd;
-	extern FArray1D< Real64 > TempDepZnLd;
-	extern FArray1D< Real64 > ZoneAirRelHum; // Zone relative humidity in percent
+	extern Array1D< Real64 > ZoneSetPointLast;
+	extern Array1D< Real64 > TempIndZnLd;
+	extern Array1D< Real64 > TempDepZnLd;
+	extern Array1D< Real64 > ZoneAirRelHum; // Zone relative humidity in percent
 
 	// Zone temperature history - used only for oscillation test
-	extern FArray2D< Real64 > ZoneTempHist;
-	extern FArray1D< Real64 > ZoneTempOscillate;
+	extern Array2D< Real64 > ZoneTempHist;
+	extern Array1D< Real64 > ZoneTempOscillate;
 	extern Real64 AnyZoneTempOscillate;
 
 	// SUBROUTINE SPECIFICATIONS:
@@ -179,14 +179,14 @@ namespace ZoneTempPredictorCorrector {
 	};
 
 	// Object Data
-	extern FArray1D< ZoneTempControlType > SetPointSingleHeating;
-	extern FArray1D< ZoneTempControlType > SetPointSingleCooling;
-	extern FArray1D< ZoneTempControlType > SetPointSingleHeatCool;
-	extern FArray1D< ZoneTempControlType > SetPointDualHeatCool;
-	extern FArray1D< ZoneComfortFangerControlType > SetPointSingleHeatingFanger;
-	extern FArray1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
-	extern FArray1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
-	extern FArray1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
+	extern Array1D< ZoneTempControlType > SetPointSingleHeating;
+	extern Array1D< ZoneTempControlType > SetPointSingleCooling;
+	extern Array1D< ZoneTempControlType > SetPointSingleHeatCool;
+	extern Array1D< ZoneTempControlType > SetPointDualHeatCool;
+	extern Array1D< ZoneComfortFangerControlType > SetPointSingleHeatingFanger;
+	extern Array1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
+	extern Array1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
+	extern Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
 
 	// Functions
 
@@ -320,7 +320,7 @@ namespace ZoneTempPredictorCorrector {
 	Real64
 	PMVResidual(
 		Real64 const Tset,
-		FArray1< Real64 > const & Par // par(1) = PMV set point
+		Array1< Real64 > const & Par // par(1) = PMV set point
 	);
 
 	void
@@ -331,7 +331,7 @@ namespace ZoneTempPredictorCorrector {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

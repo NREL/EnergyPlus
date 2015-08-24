@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -156,26 +156,26 @@ namespace EconomicLifeCycleCost {
 	int numResourcesUsed;
 
 	//present value factors
-	FArray1D< Real64 > SPV;
-	FArray2D< Real64 > energySPV; // yearly equivalent to FEMP UPV* values
+	Array1D< Real64 > SPV;
+	Array2D< Real64 > energySPV; // yearly equivalent to FEMP UPV* values
 
 	//arrays related to computing after tax cashflow and present value
-	FArray1D< Real64 > DepreciatedCapital;
-	FArray1D< Real64 > TaxableIncome;
-	FArray1D< Real64 > Taxes;
-	FArray1D< Real64 > AfterTaxCashFlow;
-	FArray1D< Real64 > AfterTaxPresentValue;
+	Array1D< Real64 > DepreciatedCapital;
+	Array1D< Real64 > TaxableIncome;
+	Array1D< Real64 > Taxes;
+	Array1D< Real64 > AfterTaxCashFlow;
+	Array1D< Real64 > AfterTaxPresentValue;
 
-	FArray1D_string const MonthNames( 12, { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" } );
+	Array1D_string const MonthNames( 12, { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" } );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
 	// Object Data
-	FArray1D< RecurringCostsType > RecurringCosts;
-	FArray1D< NonrecurringCostType > NonrecurringCost;
-	FArray1D< UsePriceEscalationType > UsePriceEscalation;
-	FArray1D< UseAdjustmentType > UseAdjustment;
-	FArray1D< CashFlowType > CashFlow;
+	Array1D< RecurringCostsType > RecurringCosts;
+	Array1D< NonrecurringCostType > NonrecurringCost;
+	Array1D< UsePriceEscalationType > UsePriceEscalation;
+	Array1D< UseAdjustmentType > UseAdjustment;
+	Array1D< CashFlowType > CashFlow;
 
 	// Functions
 
@@ -317,8 +317,8 @@ namespace EconomicLifeCycleCost {
 		int jFld;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_string AlphaArray( 100 ); // character string data
-		FArray1D< Real64 > NumArray( 100 ); // numeric data
+		Array1D_string AlphaArray( 100 ); // character string data
+		Array1D< Real64 > NumArray( 100 ); // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 		std::string CurrentModuleObject; // for ease in renaming.
 		int NumObj; // count of objects
@@ -563,8 +563,8 @@ namespace EconomicLifeCycleCost {
 		int jFld;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_string AlphaArray( 100 ); // character string data
-		FArray1D< Real64 > NumArray( 100 ); // numeric data
+		Array1D_string AlphaArray( 100 ); // character string data
+		Array1D< Real64 > NumArray( 100 ); // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 		std::string CurrentModuleObject; // for ease in renaming.
 
@@ -730,8 +730,8 @@ namespace EconomicLifeCycleCost {
 		int jFld;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_string AlphaArray( 100 ); // character string data
-		FArray1D< Real64 > NumArray( 100 ); // numeric data
+		Array1D_string AlphaArray( 100 ); // character string data
+		Array1D< Real64 > NumArray( 100 ); // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 		std::string CurrentModuleObject; // for ease in renaming.
 		int numComponentCostLineItems; // number of ComponentCost:LineItem objects
@@ -857,8 +857,8 @@ namespace EconomicLifeCycleCost {
 		int jFld;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_string AlphaArray( 100 ); // character string data
-		FArray1D< Real64 > NumArray( 100 ); // numeric data
+		Array1D_string AlphaArray( 100 ); // character string data
+		Array1D< Real64 > NumArray( 100 ); // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 		std::string CurrentModuleObject; // for ease in renaming.
 		static int escStartYear( 0 );
@@ -1005,8 +1005,8 @@ namespace EconomicLifeCycleCost {
 		int jYear;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_string AlphaArray( 100 ); // character string data
-		FArray1D< Real64 > NumArray( 100 ); // numeric data
+		Array1D_string AlphaArray( 100 ); // character string data
+		Array1D< Real64 > NumArray( 100 ); // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 		std::string CurrentModuleObject; // for ease in renaming.
 		int numFldsToUse;
@@ -1192,19 +1192,18 @@ namespace EconomicLifeCycleCost {
 		int offset;
 		int month; // number of months since base date
 		int firstMonth;
-		int repeatMonths;
 		static int baseMonths1900( 0 ); // number of months since 1900 for base period
 		static int serviceMonths1900( 0 ); // number of months since 1900 for service period
 		int monthsBaseToService;
-		FArray2D< Real64 > resourceCosts;
-		FArray1D< Real64 > curResourceCosts( 12 );
-		FArray1D_bool resourceCostNotZero;
-		FArray1D< Real64 > resourceCostAnnual;
+		Array2D< Real64 > resourceCosts;
+		Array1D< Real64 > curResourceCosts( 12 );
+		Array1D_bool resourceCostNotZero;
+		Array1D< Real64 > resourceCostAnnual;
 		Real64 annualCost;
 		int cashFlowCounter;
 		int found;
 		int curCategory;
-		FArray1D< Real64 > monthlyInflationFactor;
+		Array1D< Real64 > monthlyInflationFactor;
 		Real64 inflationPerMonth;
 		int iLoop;
 
@@ -1225,7 +1224,7 @@ namespace EconomicLifeCycleCost {
 			NonrecurringCost( numNonrecurringCost ).totalMonthsFromStart = 0;
 		}
 		// gather costs from EconomicTariff for each end use
-		resourceCosts.allocate( NumOfResourceTypes, 12 );
+		resourceCosts.allocate( 12, NumOfResourceTypes );
 		resourceCostNotZero.allocate( NumOfResourceTypes );
 		resourceCostAnnual.allocate( NumOfResourceTypes );
 		numResourcesUsed = 0;
@@ -1233,8 +1232,8 @@ namespace EconomicLifeCycleCost {
 			GetMonthlyCostForResource( iResource + ResourceTypeInitialOffset, curResourceCosts );
 			annualCost = 0.0;
 			for ( jMonth = 1; jMonth <= 12; ++jMonth ) {
-				resourceCosts( iResource, jMonth ) = curResourceCosts( jMonth );
-				annualCost += resourceCosts( iResource, jMonth );
+				resourceCosts( jMonth, iResource ) = curResourceCosts( jMonth );
+				annualCost += resourceCosts( jMonth, iResource );
 			}
 			if ( annualCost != 0.0 ) {
 				++numResourcesUsed;
@@ -1332,7 +1331,7 @@ namespace EconomicLifeCycleCost {
 					//energy costs (a.k.a. resource costs) start at the start of service and repeat
 					//until the end of the study total
 					for ( jMonth = 1; jMonth <= 12; ++jMonth ) {
-						CashFlow( cashFlowCounter ).mnAmount( monthsBaseToService + jMonth ) = resourceCosts( iResource, jMonth );
+						CashFlow( cashFlowCounter ).mnAmount( monthsBaseToService + jMonth ) = resourceCosts( jMonth, iResource );
 					}
 					CashFlow( cashFlowCounter ).orginalCost = resourceCostAnnual( iResource );
 					for ( jMonth = monthsBaseToService + 13; jMonth <= lengthStudyTotalMonths; ++jMonth ) {
@@ -1468,7 +1467,7 @@ namespace EconomicLifeCycleCost {
 		}
 		// compute the Single Present Value factors based on the discount rate
 		SPV.allocate( lengthStudyYears );
-		energySPV.allocate( NumOfResourceTypes, lengthStudyYears );
+		energySPV.allocate( lengthStudyYears, NumOfResourceTypes );
 		// Depending if using Constant or Current Dollar analysis
 		// use the appropriate discount rate
 		if ( inflationApproach == inflAppConstantDollar ) {
@@ -1493,7 +1492,7 @@ namespace EconomicLifeCycleCost {
 		//use SPV as default values for all energy types
 		for ( jYear = 1; jYear <= lengthStudyYears; ++jYear ) {
 			for ( kResource = 1; kResource <= NumOfResourceTypes; ++kResource ) {
-				energySPV( kResource, jYear ) = SPV( jYear );
+				energySPV( jYear, kResource ) = SPV( jYear );
 			}
 		}
 		//loop through the resources and if they match a UseEscalation use those values instead
@@ -1511,7 +1510,7 @@ namespace EconomicLifeCycleCost {
 						effectiveYear = double( jYear );
 					} else {
 					}}
-					energySPV( curResource, jYear ) = UsePriceEscalation( nUsePriceEsc ).Escalation( jYear ) / std::pow( 1.0 + curDiscountRate, effectiveYear );
+					energySPV( jYear, curResource ) = UsePriceEscalation( nUsePriceEsc ).Escalation( jYear ) / std::pow( 1.0 + curDiscountRate, effectiveYear );
 				}
 			}
 		}
@@ -1529,7 +1528,7 @@ namespace EconomicLifeCycleCost {
 				if ( ( curResource >= 1 ) && ( curResource < NumOfResourceTypes ) ) {
 					totalPV = 0.0;
 					for ( jYear = 1; jYear <= lengthStudyYears; ++jYear ) {
-						CashFlow( iCashFlow ).yrPresVal( jYear ) = CashFlow( iCashFlow ).yrAmount( jYear ) * energySPV( curResource, jYear );
+						CashFlow( iCashFlow ).yrPresVal( jYear ) = CashFlow( iCashFlow ).yrAmount( jYear ) * energySPV( jYear, curResource );
 						totalPV += CashFlow( iCashFlow ).yrPresVal( jYear );
 					}
 					CashFlow( iCashFlow ).presentValue = totalPV;
@@ -1599,7 +1598,7 @@ namespace EconomicLifeCycleCost {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > DepreciationPercent( SizeDepr ); // values expressed as percent 5% is 5.0 (based on tables)
+		Array1D< Real64 > DepreciationPercent( SizeDepr ); // values expressed as percent 5% is 5.0 (based on tables)
 		Real64 curCapital;
 		int curDepYear;
 		int iYear;
@@ -1914,12 +1913,11 @@ namespace EconomicLifeCycleCost {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_string rowHead;
+		Array2D_string tableBody;
 
-		int month;
 		int numColumns;
 		int iYear;
 		int jObj;
@@ -1939,7 +1937,7 @@ namespace EconomicLifeCycleCost {
 			rowHead.allocate( 11 );
 			columnHead.allocate( 1 );
 			columnWidth.allocate( 1 );
-			tableBody.allocate( 11, 1 );
+			tableBody.allocate( 1, 11 );
 			tableBody = "";
 			rowHead( 1 ) = "Name";
 			rowHead( 2 ) = "Discounting Convention";
@@ -1956,64 +1954,64 @@ namespace EconomicLifeCycleCost {
 
 			tableBody( 1, 1 ) = LCCname;
 			if ( discountConvension == disConvEndOfYear ) {
-				tableBody( 2, 1 ) = "EndOfYear";
+				tableBody( 1, 2 ) = "EndOfYear";
 			} else if ( discountConvension == disConvMidYear ) {
-				tableBody( 2, 1 ) = "MidYear";
+				tableBody( 1, 2 ) = "MidYear";
 			} else if ( discountConvension == disConvBeginOfYear ) {
-				tableBody( 2, 1 ) = "BeginningOfYear";
+				tableBody( 1, 2 ) = "BeginningOfYear";
 			}
 			if ( inflationApproach == inflAppConstantDollar ) {
-				tableBody( 3, 1 ) = "ConstantDollar";
+				tableBody( 1, 3 ) = "ConstantDollar";
 			} else if ( inflationApproach == inflAppCurrentDollar ) {
-				tableBody( 3, 1 ) = "CurrentDollar";
+				tableBody( 1, 3 ) = "CurrentDollar";
 			}
 			if ( inflationApproach == inflAppConstantDollar ) {
-				tableBody( 4, 1 ) = RealToStr( realDiscountRate, 4 );
+				tableBody( 1, 4 ) = RealToStr( realDiscountRate, 4 );
 			} else {
-				tableBody( 4, 1 ) = "-- N/A --";
+				tableBody( 1, 4 ) = "-- N/A --";
 			}
 			if ( inflationApproach == inflAppCurrentDollar ) {
-				tableBody( 5, 1 ) = RealToStr( nominalDiscountRate, 4 );
+				tableBody( 1, 5 ) = RealToStr( nominalDiscountRate, 4 );
 			} else {
-				tableBody( 5, 1 ) = "-- N/A --";
+				tableBody( 1, 5 ) = "-- N/A --";
 			}
 			if ( inflationApproach == inflAppCurrentDollar ) {
-				tableBody( 6, 1 ) = RealToStr( inflation, 4 );
+				tableBody( 1, 6 ) = RealToStr( inflation, 4 );
 			} else {
-				tableBody( 6, 1 ) = "-- N/A --";
+				tableBody( 1, 6 ) = "-- N/A --";
 			}
-			tableBody( 7, 1 ) = MonthNames( baseDateMonth ) + ' ' + IntToStr( baseDateYear );
-			tableBody( 8, 1 ) = MonthNames( serviceDateMonth ) + ' ' + IntToStr( serviceDateYear );
-			tableBody( 9, 1 ) = IntToStr( lengthStudyYears );
-			tableBody( 10, 1 ) = RealToStr( taxRate, 4 );
+			tableBody( 1, 7 ) = MonthNames( baseDateMonth ) + ' ' + IntToStr( baseDateYear );
+			tableBody( 1, 8 ) = MonthNames( serviceDateMonth ) + ' ' + IntToStr( serviceDateYear );
+			tableBody( 1, 9 ) = IntToStr( lengthStudyYears );
+			tableBody( 1, 10 ) = RealToStr( taxRate, 4 );
 			{ auto const SELECT_CASE_var( depreciationMethod );
 			if ( SELECT_CASE_var == depMethMACRS3 ) {
-				tableBody( 11, 1 ) = "ModifiedAcceleratedCostRecoverySystem-3year";
+				tableBody( 1, 11 ) = "ModifiedAcceleratedCostRecoverySystem-3year";
 			} else if ( SELECT_CASE_var == depMethMACRS5 ) {
-				tableBody( 11, 1 ) = "ModifiedAcceleratedCostRecoverySystem-5year";
+				tableBody( 1, 11 ) = "ModifiedAcceleratedCostRecoverySystem-5year";
 			} else if ( SELECT_CASE_var == depMethMACRS7 ) {
-				tableBody( 11, 1 ) = "ModifiedAcceleratedCostRecoverySystem-7year";
+				tableBody( 1, 11 ) = "ModifiedAcceleratedCostRecoverySystem-7year";
 			} else if ( SELECT_CASE_var == depMethMACRS10 ) {
-				tableBody( 11, 1 ) = "ModifiedAcceleratedCostRecoverySystem-10year";
+				tableBody( 1, 11 ) = "ModifiedAcceleratedCostRecoverySystem-10year";
 			} else if ( SELECT_CASE_var == depMethMACRS15 ) {
-				tableBody( 11, 1 ) = "ModifiedAcceleratedCostRecoverySystem-15year";
+				tableBody( 1, 11 ) = "ModifiedAcceleratedCostRecoverySystem-15year";
 			} else if ( SELECT_CASE_var == depMethMACRS20 ) {
-				tableBody( 11, 1 ) = "ModifiedAcceleratedCostRecoverySystem-20year";
+				tableBody( 1, 11 ) = "ModifiedAcceleratedCostRecoverySystem-20year";
 			} else if ( SELECT_CASE_var == depMethStraight27 ) {
-				tableBody( 11, 1 ) = "StraightLine-27year";
+				tableBody( 1, 11 ) = "StraightLine-27year";
 			} else if ( SELECT_CASE_var == depMethStraight31 ) {
-				tableBody( 11, 1 ) = "StraightLine-31year";
+				tableBody( 1, 11 ) = "StraightLine-31year";
 			} else if ( SELECT_CASE_var == depMethStraight39 ) {
-				tableBody( 11, 1 ) = "StraightLine-39year";
+				tableBody( 1, 11 ) = "StraightLine-39year";
 			} else if ( SELECT_CASE_var == depMethStraight40 ) {
-				tableBody( 11, 1 ) = "StraightLine-40year";
+				tableBody( 1, 11 ) = "StraightLine-40year";
 			} else if ( SELECT_CASE_var == depMethNone ) {
-				tableBody( 11, 1 ) = "None";
+				tableBody( 1, 11 ) = "None";
 			}}
 			columnWidth = 14; //array assignment - same for all columns
 			WriteSubtitle( "Life-Cycle Cost Parameters" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			if( sqlite ) {
+			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters" );
 			}
 			columnHead.deallocate();
@@ -2025,7 +2023,7 @@ namespace EconomicLifeCycleCost {
 			rowHead.allocate( lengthStudyYears + 2 );
 			columnHead.allocate( numColumns );
 			columnWidth.dimension( numColumns, 14 ); //array assignment - same for all columns
-			tableBody.allocate( lengthStudyYears + 2, numColumns );
+			tableBody.allocate( numColumns, lengthStudyYears + 2 );
 			tableBody = "";
 			columnHead = "none";
 			rowHead( 1 ) = "Resource";
@@ -2035,17 +2033,17 @@ namespace EconomicLifeCycleCost {
 			}
 			for ( jObj = 1; jObj <= numUsePriceEscalation; ++jObj ) { //loop through objects not columns to add names
 				columnHead( jObj ) = UsePriceEscalation( jObj ).name;
-				tableBody( 1, jObj ) = GetResourceTypeChar( UsePriceEscalation( jObj ).resource );
-				tableBody( 2, jObj ) = MonthNames( UsePriceEscalation( jObj ).escalationStartMonth ) + ' ' + IntToStr( UsePriceEscalation( jObj ).escalationStartYear );
+				tableBody( jObj, 1 ) = GetResourceTypeChar( UsePriceEscalation( jObj ).resource );
+				tableBody( jObj, 2 ) = MonthNames( UsePriceEscalation( jObj ).escalationStartMonth ) + ' ' + IntToStr( UsePriceEscalation( jObj ).escalationStartYear );
 			}
 			for ( jObj = 1; jObj <= numUsePriceEscalation; ++jObj ) {
 				for ( iYear = 1; iYear <= lengthStudyYears; ++iYear ) {
-					tableBody( iYear + 2, jObj ) = RealToStr( UsePriceEscalation( jObj ).Escalation( iYear ), 6 );
+					tableBody( jObj, iYear + 2 ) = RealToStr( UsePriceEscalation( jObj ).Escalation( iYear ), 6 );
 				}
 			}
 			WriteSubtitle( "Use Price Escalation" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			if( sqlite ) {
+			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation" );
 			}
 			columnHead.deallocate();
@@ -2059,7 +2057,7 @@ namespace EconomicLifeCycleCost {
 				rowHead.allocate( numYears + 1 );
 				columnHead.allocate( numColumns );
 				columnWidth.dimension( numColumns, 14 ); //array assignment - same for all columns
-				tableBody.allocate( numYears + 1, numColumns );
+				tableBody.allocate( numColumns, numYears + 1 );
 				tableBody = "";
 				columnHead = "none";
 				rowHead( 1 ) = "";
@@ -2068,16 +2066,16 @@ namespace EconomicLifeCycleCost {
 				}
 				for ( jObj = 1; jObj <= numUseAdjustment; ++jObj ) { //loop through objects not columns to add names
 					columnHead( jObj ) = UseAdjustment( jObj ).name;
-					tableBody( 1, jObj ) = GetResourceTypeChar( UseAdjustment( jObj ).resource );
+					tableBody( jObj, 1 ) = GetResourceTypeChar( UseAdjustment( jObj ).resource );
 				}
 				for ( jObj = 1; jObj <= numUseAdjustment; ++jObj ) {
 					for ( iYear = 1; iYear <= numYears; ++iYear ) {
-						tableBody( iYear + 1, jObj ) = RealToStr( UseAdjustment( jObj ).Adjustment( iYear ), 6 );
+						tableBody( jObj, iYear + 1 ) = RealToStr( UseAdjustment( jObj ).Adjustment( iYear ), 6 );
 					}
 				}
 				WriteSubtitle( "Use Adjustment" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				if( sqlite ) {
+				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment" );
 				}
 				columnHead.deallocate();
@@ -2090,7 +2088,7 @@ namespace EconomicLifeCycleCost {
 			rowHead.allocate( lengthStudyYears + 1 );
 			columnHead.allocate( numColumns );
 			columnWidth.dimension( numColumns, 14 ); //array assignment - same for all columns
-			tableBody.allocate( lengthStudyYears + 1, numColumns );
+			tableBody.allocate( numColumns, lengthStudyYears + 1 );
 			tableBody = "";
 			rowHead( 1 ) = "";
 			for ( iYear = 1; iYear <= lengthStudyYears; ++iYear ) {
@@ -2101,19 +2099,19 @@ namespace EconomicLifeCycleCost {
 				columnHead( jObj ) = CashFlow( curCashFlow ).name;
 				{ auto const SELECT_CASE_var( CashFlow( curCashFlow ).SourceKind );
 				if ( SELECT_CASE_var == skNonrecurring ) {
-					tableBody( 1, jObj ) = "Nonrecurring";
+					tableBody( jObj, 1 ) = "Nonrecurring";
 				} else if ( SELECT_CASE_var == skRecurring ) {
-					tableBody( 1, jObj ) = "Recurring";
+					tableBody( jObj, 1 ) = "Recurring";
 				}}
 				for ( iYear = 1; iYear <= lengthStudyYears; ++iYear ) {
-					tableBody( iYear + 1, jObj ) = RealToStr( CashFlow( curCashFlow ).yrAmount( iYear ), 2 );
+					tableBody( jObj, iYear + 1 ) = RealToStr( CashFlow( curCashFlow ).yrAmount( iYear ), 2 );
 				}
 			}
 			WriteSubtitle( "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			if( sqlite ) {
+			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)" );
-			}	
+			}
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2123,7 +2121,7 @@ namespace EconomicLifeCycleCost {
 			rowHead.allocate( lengthStudyYears );
 			columnHead.allocate( numColumns );
 			columnWidth.dimension( numColumns, 14 ); //array assignment - same for all columns
-			tableBody.allocate( lengthStudyYears, numColumns );
+			tableBody.allocate( numColumns, lengthStudyYears );
 			tableBody = "";
 			for ( iYear = 1; iYear <= lengthStudyYears; ++iYear ) {
 				rowHead( iYear ) = MonthNames( baseDateMonth ) + ' ' + IntToStr( baseDateYear + iYear - 1 );
@@ -2132,12 +2130,12 @@ namespace EconomicLifeCycleCost {
 				curCashFlow = countOfCostCat + numRecurringCosts + numNonrecurringCost + jObj;
 				columnHead( jObj ) = CashFlow( curCashFlow ).name;
 				for ( iYear = 1; iYear <= lengthStudyYears; ++iYear ) {
-					tableBody( iYear, jObj ) = RealToStr( CashFlow( curCashFlow ).yrAmount( iYear ), 2 );
+					tableBody( jObj, iYear ) = RealToStr( CashFlow( curCashFlow ).yrAmount( iYear ), 2 );
 				}
 			}
 			WriteSubtitle( "Energy Cost Cash Flows (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			if( sqlite ) {
+			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Energy Cost Cash Flows (Without Escalation)" );
 			}
 			columnHead.deallocate();
@@ -2149,7 +2147,7 @@ namespace EconomicLifeCycleCost {
 			columnHead.allocate( 4 );
 			columnWidth.allocate( 4 );
 			columnWidth = 14; //array assignment - same for all columns
-			tableBody.allocate( lengthStudyYears, 4 );
+			tableBody.allocate( 4, lengthStudyYears );
 			tableBody = "";
 			columnHead( 1 ) = "Construction";
 			columnHead( 2 ) = "Salvage";
@@ -2157,14 +2155,14 @@ namespace EconomicLifeCycleCost {
 			columnHead( 4 ) = "Total";
 			for ( iYear = 1; iYear <= lengthStudyYears; ++iYear ) {
 				rowHead( iYear ) = MonthNames( baseDateMonth ) + ' ' + IntToStr( baseDateYear + iYear - 1 );
-				tableBody( iYear, 1 ) = RealToStr( CashFlow( costCatConstruction ).yrAmount( iYear ), 2 );
-				tableBody( iYear, 2 ) = RealToStr( CashFlow( costCatSalvage ).yrAmount( iYear ), 2 );
-				tableBody( iYear, 3 ) = RealToStr( CashFlow( costCatOtherCapital ).yrAmount( iYear ), 2 );
-				tableBody( iYear, 4 ) = RealToStr( CashFlow( costCatTotCaptl ).yrAmount( iYear ), 2 );
+				tableBody( 1, iYear ) = RealToStr( CashFlow( costCatConstruction ).yrAmount( iYear ), 2 );
+				tableBody( 2, iYear ) = RealToStr( CashFlow( costCatSalvage ).yrAmount( iYear ), 2 );
+				tableBody( 3, iYear ) = RealToStr( CashFlow( costCatOtherCapital ).yrAmount( iYear ), 2 );
+				tableBody( 4, iYear ) = RealToStr( CashFlow( costCatTotCaptl ).yrAmount( iYear ), 2 );
 			}
 			WriteSubtitle( "Capital Cash Flow by Category (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			if( sqlite ) {
+			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Capital Cash Flow by Category (Without Escalation)" );
 			}
 			columnHead.deallocate();
@@ -2176,7 +2174,7 @@ namespace EconomicLifeCycleCost {
 			columnHead.allocate( 10 );
 			columnWidth.allocate( 10 );
 			columnWidth = 14; //array assignment - same for all columns
-			tableBody.allocate( lengthStudyYears, 10 );
+			tableBody.allocate( 10, lengthStudyYears );
 			tableBody = "";
 			columnHead( 1 ) = "Energy";
 			columnHead( 2 ) = "Water";
@@ -2191,20 +2189,20 @@ namespace EconomicLifeCycleCost {
 
 			for ( iYear = 1; iYear <= lengthStudyYears; ++iYear ) {
 				rowHead( iYear ) = MonthNames( baseDateMonth ) + ' ' + IntToStr( baseDateYear + iYear - 1 );
-				tableBody( iYear, 1 ) = RealToStr( CashFlow( costCatEnergy ).yrAmount( iYear ), 2 );
-				tableBody( iYear, 2 ) = RealToStr( CashFlow( costCatWater ).yrAmount( iYear ), 2 );
-				tableBody( iYear, 3 ) = RealToStr( CashFlow( costCatMaintenance ).yrAmount( iYear ), 2 );
-				tableBody( iYear, 4 ) = RealToStr( CashFlow( costCatRepair ).yrAmount( iYear ), 2 );
-				tableBody( iYear, 5 ) = RealToStr( CashFlow( costCatOperation ).yrAmount( iYear ), 2 );
-				tableBody( iYear, 6 ) = RealToStr( CashFlow( costCatReplacement ).yrAmount( iYear ), 2 );
-				tableBody( iYear, 7 ) = RealToStr( CashFlow( costCatMinorOverhaul ).yrAmount( iYear ), 2 );
-				tableBody( iYear, 8 ) = RealToStr( CashFlow( costCatMajorOverhaul ).yrAmount( iYear ), 2 );
-				tableBody( iYear, 9 ) = RealToStr( CashFlow( costCatOtherOperational ).yrAmount( iYear ), 2 );
-				tableBody( iYear, 10 ) = RealToStr( CashFlow( costCatTotOper ).yrAmount( iYear ), 2 );
+				tableBody( 1, iYear ) = RealToStr( CashFlow( costCatEnergy ).yrAmount( iYear ), 2 );
+				tableBody( 2, iYear ) = RealToStr( CashFlow( costCatWater ).yrAmount( iYear ), 2 );
+				tableBody( 3, iYear ) = RealToStr( CashFlow( costCatMaintenance ).yrAmount( iYear ), 2 );
+				tableBody( 4, iYear ) = RealToStr( CashFlow( costCatRepair ).yrAmount( iYear ), 2 );
+				tableBody( 5, iYear ) = RealToStr( CashFlow( costCatOperation ).yrAmount( iYear ), 2 );
+				tableBody( 6, iYear ) = RealToStr( CashFlow( costCatReplacement ).yrAmount( iYear ), 2 );
+				tableBody( 7, iYear ) = RealToStr( CashFlow( costCatMinorOverhaul ).yrAmount( iYear ), 2 );
+				tableBody( 8, iYear ) = RealToStr( CashFlow( costCatMajorOverhaul ).yrAmount( iYear ), 2 );
+				tableBody( 9, iYear ) = RealToStr( CashFlow( costCatOtherOperational ).yrAmount( iYear ), 2 );
+				tableBody( 10, iYear ) = RealToStr( CashFlow( costCatTotOper ).yrAmount( iYear ), 2 );
 			}
 			WriteSubtitle( "Operating Cash Flow by Category (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			if( sqlite ) {
+			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Operating Cash Flow by Category (Without Escalation)" );
 			}
 			columnHead.deallocate();
@@ -2263,7 +2261,7 @@ namespace EconomicLifeCycleCost {
 			columnHead.allocate( 12 );
 			columnWidth.allocate( 12 );
 			columnWidth = 14; //array assignment - same for all columns
-			tableBody.allocate( lengthStudyYears, 12 );
+			tableBody.allocate( 12, lengthStudyYears );
 			tableBody = "";
 			for ( kMonth = 1; kMonth <= 12; ++kMonth ) {
 				columnHead( kMonth ) = MonthNames( kMonth );
@@ -2273,12 +2271,12 @@ namespace EconomicLifeCycleCost {
 			}
 			for ( iYear = 1; iYear <= lengthStudyYears; ++iYear ) {
 				for ( kMonth = 1; kMonth <= 12; ++kMonth ) {
-					tableBody( iYear, kMonth ) = RealToStr( CashFlow( costCatTotGrand ).mnAmount( ( iYear - 1 ) * 12 + kMonth ), 2 );
+					tableBody( kMonth, iYear ) = RealToStr( CashFlow( costCatTotGrand ).mnAmount( ( iYear - 1 ) * 12 + kMonth ), 2 );
 				}
 			}
 			WriteSubtitle( "Monthly Total Cash Flow (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			if( sqlite ) {
+			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)" );
 			}
 			columnHead.deallocate();
@@ -2291,7 +2289,7 @@ namespace EconomicLifeCycleCost {
 			columnHead.allocate( 5 );
 			columnWidth.allocate( 5 );
 			columnWidth = 14; //array assignment - same for all columns
-			tableBody.allocate( numRows + 1, 5 );
+			tableBody.allocate( 5, numRows + 1 );
 			tableBody = "";
 			columnHead( 1 ) = "Category";
 			columnHead( 2 ) = "Kind";
@@ -2305,55 +2303,55 @@ namespace EconomicLifeCycleCost {
 				rowHead( jObj ) = CashFlow( offset + jObj ).name;
 				{ auto const SELECT_CASE_var( CashFlow( offset + jObj ).Category );
 				if ( SELECT_CASE_var == costCatMaintenance ) {
-					tableBody( jObj, 1 ) = "Maintenance";
+					tableBody( 1, jObj ) = "Maintenance";
 				} else if ( SELECT_CASE_var == costCatRepair ) {
-					tableBody( jObj, 1 ) = "Repair";
+					tableBody( 1, jObj ) = "Repair";
 				} else if ( SELECT_CASE_var == costCatOperation ) {
-					tableBody( jObj, 1 ) = "Operation";
+					tableBody( 1, jObj ) = "Operation";
 				} else if ( SELECT_CASE_var == costCatReplacement ) {
-					tableBody( jObj, 1 ) = "Replacement";
+					tableBody( 1, jObj ) = "Replacement";
 				} else if ( SELECT_CASE_var == costCatMinorOverhaul ) {
-					tableBody( jObj, 1 ) = "Minor Overhaul";
+					tableBody( 1, jObj ) = "Minor Overhaul";
 				} else if ( SELECT_CASE_var == costCatMajorOverhaul ) {
-					tableBody( jObj, 1 ) = "Major Overhaul";
+					tableBody( 1, jObj ) = "Major Overhaul";
 				} else if ( SELECT_CASE_var == costCatOtherOperational ) {
-					tableBody( jObj, 1 ) = "Other Operational";
+					tableBody( 1, jObj ) = "Other Operational";
 				} else if ( SELECT_CASE_var == costCatConstruction ) {
-					tableBody( jObj, 1 ) = "Construction";
+					tableBody( 1, jObj ) = "Construction";
 				} else if ( SELECT_CASE_var == costCatSalvage ) {
-					tableBody( jObj, 1 ) = "Salvage";
+					tableBody( 1, jObj ) = "Salvage";
 				} else if ( SELECT_CASE_var == costCatOtherCapital ) {
-					tableBody( jObj, 1 ) = "Other Capital";
+					tableBody( 1, jObj ) = "Other Capital";
 				} else if ( SELECT_CASE_var == costCatWater ) {
-					tableBody( jObj, 1 ) = "Water";
+					tableBody( 1, jObj ) = "Water";
 				} else if ( SELECT_CASE_var == costCatEnergy ) {
-					tableBody( jObj, 1 ) = "Energy";
+					tableBody( 1, jObj ) = "Energy";
 				} else {
-					tableBody( jObj, 1 ) = "-";
+					tableBody( 1, jObj ) = "-";
 				}}
 				{ auto const SELECT_CASE_var( CashFlow( offset + jObj ).SourceKind );
 				if ( SELECT_CASE_var == skNonrecurring ) {
-					tableBody( jObj, 2 ) = "Nonrecurring";
+					tableBody( 2, jObj ) = "Nonrecurring";
 				} else if ( SELECT_CASE_var == skRecurring ) {
-					tableBody( jObj, 2 ) = "Recurring";
+					tableBody( 2, jObj ) = "Recurring";
 				} else if ( SELECT_CASE_var == skResource ) {
-					tableBody( jObj, 2 ) = "Energy Cost";
+					tableBody( 2, jObj ) = "Energy Cost";
 				} else {
-					tableBody( jObj, 2 ) = "-";
+					tableBody( 2, jObj ) = "-";
 				}}
-				tableBody( jObj, 3 ) = RealToStr( CashFlow( offset + jObj ).orginalCost, 2 );
-				tableBody( jObj, 4 ) = RealToStr( CashFlow( offset + jObj ).presentValue, 2 );
+				tableBody( 3, jObj ) = RealToStr( CashFlow( offset + jObj ).orginalCost, 2 );
+				tableBody( 4, jObj ) = RealToStr( CashFlow( offset + jObj ).presentValue, 2 );
 				totalPV += CashFlow( offset + jObj ).presentValue;
 				if ( CashFlow( offset + jObj ).orginalCost != 0.0 ) {
-					tableBody( jObj, 5 ) = RealToStr( CashFlow( offset + jObj ).presentValue / CashFlow( offset + jObj ).orginalCost, 4 );
+					tableBody( 5, jObj ) = RealToStr( CashFlow( offset + jObj ).presentValue / CashFlow( offset + jObj ).orginalCost, 4 );
 				} else {
-					tableBody( jObj, 5 ) = "-";
+					tableBody( 5, jObj ) = "-";
 				}
 			}
-			tableBody( numRows + 1, 4 ) = RealToStr( totalPV, 2 );
+			tableBody( 4, numRows + 1 ) = RealToStr( totalPV, 2 );
 			WriteSubtitle( "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			if( sqlite ) {
+			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)" );
 			}
 			columnHead.deallocate();
@@ -2365,7 +2363,7 @@ namespace EconomicLifeCycleCost {
 			columnHead.allocate( 1 );
 			columnWidth.allocate( 1 );
 			columnWidth = 14; //array assignment - same for all columns
-			tableBody.allocate( 16, 1 );
+			tableBody.allocate( 1, 16 );
 			tableBody = "";
 			rowHead( 1 ) = "Construction";
 			rowHead( 2 ) = "Salvage";
@@ -2386,25 +2384,25 @@ namespace EconomicLifeCycleCost {
 			columnHead( 1 ) = "Present Value";
 
 			tableBody( 1, 1 ) = RealToStr( CashFlow( costCatConstruction ).presentValue, 2 );
-			tableBody( 2, 1 ) = RealToStr( CashFlow( costCatSalvage ).presentValue, 2 );
-			tableBody( 3, 1 ) = RealToStr( CashFlow( costCatOtherCapital ).presentValue, 2 );
-			tableBody( 4, 1 ) = RealToStr( CashFlow( costCatEnergy ).presentValue, 2 );
-			tableBody( 5, 1 ) = RealToStr( CashFlow( costCatWater ).presentValue, 2 );
-			tableBody( 6, 1 ) = RealToStr( CashFlow( costCatMaintenance ).presentValue, 2 );
-			tableBody( 7, 1 ) = RealToStr( CashFlow( costCatRepair ).presentValue, 2 );
-			tableBody( 8, 1 ) = RealToStr( CashFlow( costCatOperation ).presentValue, 2 );
-			tableBody( 9, 1 ) = RealToStr( CashFlow( costCatReplacement ).presentValue, 2 );
-			tableBody( 10, 1 ) = RealToStr( CashFlow( costCatMinorOverhaul ).presentValue, 2 );
-			tableBody( 11, 1 ) = RealToStr( CashFlow( costCatMajorOverhaul ).presentValue, 2 );
-			tableBody( 12, 1 ) = RealToStr( CashFlow( costCatOtherOperational ).presentValue, 2 );
-			tableBody( 13, 1 ) = RealToStr( CashFlow( costCatTotEnergy ).presentValue, 2 );
-			tableBody( 14, 1 ) = RealToStr( CashFlow( costCatTotOper ).presentValue, 2 );
-			tableBody( 15, 1 ) = RealToStr( CashFlow( costCatTotCaptl ).presentValue, 2 );
-			tableBody( 16, 1 ) = RealToStr( CashFlow( costCatTotGrand ).presentValue, 2 );
+			tableBody( 1, 2 ) = RealToStr( CashFlow( costCatSalvage ).presentValue, 2 );
+			tableBody( 1, 3 ) = RealToStr( CashFlow( costCatOtherCapital ).presentValue, 2 );
+			tableBody( 1, 4 ) = RealToStr( CashFlow( costCatEnergy ).presentValue, 2 );
+			tableBody( 1, 5 ) = RealToStr( CashFlow( costCatWater ).presentValue, 2 );
+			tableBody( 1, 6 ) = RealToStr( CashFlow( costCatMaintenance ).presentValue, 2 );
+			tableBody( 1, 7 ) = RealToStr( CashFlow( costCatRepair ).presentValue, 2 );
+			tableBody( 1, 8 ) = RealToStr( CashFlow( costCatOperation ).presentValue, 2 );
+			tableBody( 1, 9 ) = RealToStr( CashFlow( costCatReplacement ).presentValue, 2 );
+			tableBody( 1, 10 ) = RealToStr( CashFlow( costCatMinorOverhaul ).presentValue, 2 );
+			tableBody( 1, 11 ) = RealToStr( CashFlow( costCatMajorOverhaul ).presentValue, 2 );
+			tableBody( 1, 12 ) = RealToStr( CashFlow( costCatOtherOperational ).presentValue, 2 );
+			tableBody( 1, 13 ) = RealToStr( CashFlow( costCatTotEnergy ).presentValue, 2 );
+			tableBody( 1, 14 ) = RealToStr( CashFlow( costCatTotOper ).presentValue, 2 );
+			tableBody( 1, 15 ) = RealToStr( CashFlow( costCatTotCaptl ).presentValue, 2 );
+			tableBody( 1, 16 ) = RealToStr( CashFlow( costCatTotGrand ).presentValue, 2 );
 
 			WriteSubtitle( "Present Value by Category" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			if( sqlite ) {
+			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category" );
 			}
 			columnHead.deallocate();
@@ -2416,7 +2414,7 @@ namespace EconomicLifeCycleCost {
 			columnHead.allocate( 2 );
 			columnWidth.allocate( 2 );
 			columnWidth = 14; //array assignment - same for all columns
-			tableBody.allocate( lengthStudyYears + 1, 2 );
+			tableBody.allocate( 2, lengthStudyYears + 1 );
 			tableBody = "";
 			columnHead( 1 ) = "Total Cost";
 			columnHead( 2 ) = "Present Value of Costs";
@@ -2424,17 +2422,17 @@ namespace EconomicLifeCycleCost {
 			totalPV = 0.0;
 			for ( iYear = 1; iYear <= lengthStudyYears; ++iYear ) {
 				rowHead( iYear ) = MonthNames( baseDateMonth ) + ' ' + IntToStr( baseDateYear + iYear - 1 );
-				tableBody( iYear, 1 ) = RealToStr( CashFlow( costCatTotGrand ).yrAmount( iYear ), 2 );
-				tableBody( iYear, 2 ) = RealToStr( CashFlow( costCatTotGrand ).yrPresVal( iYear ), 2 );
+				tableBody( 1, iYear ) = RealToStr( CashFlow( costCatTotGrand ).yrAmount( iYear ), 2 );
+				tableBody( 2, iYear ) = RealToStr( CashFlow( costCatTotGrand ).yrPresVal( iYear ), 2 );
 				totalPV += CashFlow( costCatTotGrand ).yrPresVal( iYear );
 			}
 
 			rowHead( lengthStudyYears + 1 ) = "TOTAL";
-			tableBody( lengthStudyYears + 1, 2 ) = RealToStr( totalPV, 2 );
+			tableBody( 2, lengthStudyYears + 1 ) = RealToStr( totalPV, 2 );
 
 			WriteSubtitle( "Present Value by Year" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			if( sqlite ) {
+			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year" );
 			}
 			columnHead.deallocate();
@@ -2447,7 +2445,7 @@ namespace EconomicLifeCycleCost {
 				columnHead.allocate( 5 );
 				columnWidth.allocate( 5 );
 				columnWidth = 14; //array assignment - same for all columns
-				tableBody.allocate( lengthStudyYears + 1, 5 );
+				tableBody.allocate( 5, lengthStudyYears + 1 );
 				tableBody = "";
 				columnHead( 1 ) = "Depreciated Capital";
 				columnHead( 2 ) = "Taxable Income";
@@ -2458,20 +2456,20 @@ namespace EconomicLifeCycleCost {
 				totalPV = 0.0;
 				for ( iYear = 1; iYear <= lengthStudyYears; ++iYear ) {
 					rowHead( iYear ) = MonthNames( baseDateMonth ) + ' ' + IntToStr( baseDateYear + iYear - 1 );
-					tableBody( iYear, 1 ) = RealToStr( DepreciatedCapital( iYear ), 2 );
-					tableBody( iYear, 2 ) = RealToStr( TaxableIncome( iYear ), 2 );
-					tableBody( iYear, 3 ) = RealToStr( Taxes( iYear ), 2 );
-					tableBody( iYear, 4 ) = RealToStr( AfterTaxCashFlow( iYear ), 2 );
-					tableBody( iYear, 5 ) = RealToStr( AfterTaxPresentValue( iYear ), 2 );
+					tableBody( 1, iYear ) = RealToStr( DepreciatedCapital( iYear ), 2 );
+					tableBody( 2, iYear ) = RealToStr( TaxableIncome( iYear ), 2 );
+					tableBody( 3, iYear ) = RealToStr( Taxes( iYear ), 2 );
+					tableBody( 4, iYear ) = RealToStr( AfterTaxCashFlow( iYear ), 2 );
+					tableBody( 5, iYear ) = RealToStr( AfterTaxPresentValue( iYear ), 2 );
 					totalPV += AfterTaxPresentValue( iYear );
 				}
 
 				rowHead( lengthStudyYears + 1 ) = "TOTAL";
-				tableBody( lengthStudyYears + 1, 5 ) = RealToStr( totalPV, 2 );
+				tableBody( 5, lengthStudyYears + 1 ) = RealToStr( totalPV, 2 );
 
 				WriteSubtitle( "After Tax Estimate" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				if( sqlite ) {
+				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate" );
 				}
 				columnHead.deallocate();
@@ -2485,7 +2483,7 @@ namespace EconomicLifeCycleCost {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

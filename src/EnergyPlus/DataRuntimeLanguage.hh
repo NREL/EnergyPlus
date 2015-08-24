@@ -7,8 +7,8 @@
 #include <utility>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
@@ -137,7 +137,7 @@ namespace DataRuntimeLanguage {
 	// INTERFACE BLOCK SPECIFICATIONS: na
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern FArray1D_int EMSProgram;
+	extern Array1D_int EMSProgram;
 
 	extern int NumProgramCallManagers; // count of Erl program managers with calling points
 	extern int NumSensors; // count of EMS sensors used in model (data from output variables)
@@ -183,8 +183,8 @@ namespace DataRuntimeLanguage {
 	extern bool OutputEMSInternalVarsFull; // how much to write out to EDD file, if true dump full combinatorial internal list
 	extern bool OutputEMSInternalVarsSmall; // how much to write out to EDD file, if true dump internal list without key names
 
-	extern FArray2D_bool EMSConstructActuatorChecked;
-	extern FArray2D_bool EMSConstructActuatorIsOkay;
+	extern Array2D_bool EMSConstructActuatorChecked;
+	extern Array2D_bool EMSConstructActuatorIsOkay;
 
 	// Types
 
@@ -397,7 +397,7 @@ namespace DataRuntimeLanguage {
 		std::string Name; // user defined name for calling manager
 		int CallingPoint; // EMS Calling point for this manager, see parameters emsCallFrom*
 		int NumErlPrograms; // count of total number of Erl programs called by this manager
-		FArray1D_int ErlProgramARR; // list of integer pointers to Erl programs used by this manager
+		Array1D_int ErlProgramARR; // list of integer pointers to Erl programs used by this manager
 
 		// Default Constructor
 		EMSProgramCallManagementType() :
@@ -410,7 +410,7 @@ namespace DataRuntimeLanguage {
 			std::string const & Name, // user defined name for calling manager
 			int const CallingPoint, // EMS Calling point for this manager, see parameters emsCallFrom*
 			int const NumErlPrograms, // count of total number of Erl programs called by this manager
-			FArray1_int const & ErlProgramARR // list of integer pointers to Erl programs used by this manager
+			Array1_int const & ErlProgramARR // list of integer pointers to Erl programs used by this manager
 		) :
 			Name( Name ),
 			CallingPoint( CallingPoint ),
@@ -538,11 +538,11 @@ namespace DataRuntimeLanguage {
 		// Members
 		std::string Name; // Erl program or subroutine name, user defined
 		int NumLines; // count of lines in Erl program or subroutine
-		FArray1D_string Line; // string array holding lines of Erl code (for processing)
+		Array1D_string Line; // string array holding lines of Erl code (for processing)
 		int NumInstructions; // count of program instructions in stack
-		FArray1D< InstructionType > Instruction; // structure array of program instructions
+		Array1D< InstructionType > Instruction; // structure array of program instructions
 		int NumErrors; // count of errors during stack parsing
-		FArray1D_string Error; // array of error messages from stack parsing
+		Array1D_string Error; // array of error messages from stack parsing
 
 		// Default Constructor
 		ErlStackType() :
@@ -555,11 +555,11 @@ namespace DataRuntimeLanguage {
 		ErlStackType(
 			std::string const & Name, // Erl program or subroutine name, user defined
 			int const NumLines, // count of lines in Erl program or subroutine
-			FArray1_string const & Line, // string array holding lines of Erl code (for processing)
+			Array1_string const & Line, // string array holding lines of Erl code (for processing)
 			int const NumInstructions, // count of program instructions in stack
-			FArray1< InstructionType > const & Instruction, // structure array of program instructions
+			Array1< InstructionType > const & Instruction, // structure array of program instructions
 			int const NumErrors, // count of errors during stack parsing
-			FArray1_string const & Error // array of error messages from stack parsing
+			Array1_string const & Error // array of error messages from stack parsing
 		) :
 			Name( Name ),
 			NumLines( NumLines ),
@@ -577,7 +577,7 @@ namespace DataRuntimeLanguage {
 		// Members
 		int Operator; // indicates the type of operator or function 1..64
 		int NumOperands; // count of operands in expression
-		FArray1D< ErlValueType > Operand; // holds Erl values for operands in expression
+		Array1D< ErlValueType > Operand; // holds Erl values for operands in expression
 
 		// Default Constructor
 		ErlExpressionType() :
@@ -589,7 +589,7 @@ namespace DataRuntimeLanguage {
 		ErlExpressionType(
 			int const Operator, // indicates the type of operator or function 1..64
 			int const NumOperands, // count of operands in expression
-			FArray1< ErlValueType > const & Operand // holds Erl values for operands in expression
+			Array1< ErlValueType > const & Operand // holds Erl values for operands in expression
 		) :
 			Operator( Operator ),
 			NumOperands( NumOperands ),
@@ -631,9 +631,9 @@ namespace DataRuntimeLanguage {
 		std::string Name;
 		int ErlVariablePointer; // the Erl variable being logged in trend
 		int LogDepth; // number of timesteps back
-		FArray1D< Real64 > TrendValARR; // the main storage of trend data
-		FArray1D< Real64 > tempTrendARR; // temporary holder during push
-		FArray1D< Real64 > TimeARR; // hours back in time for trend points
+		Array1D< Real64 > TrendValARR; // the main storage of trend data
+		Array1D< Real64 > tempTrendARR; // temporary holder during push
+		Array1D< Real64 > TimeARR; // hours back in time for trend points
 
 		// Default Constructor
 		TrendVariableType() :
@@ -646,9 +646,9 @@ namespace DataRuntimeLanguage {
 			std::string const & Name,
 			int const ErlVariablePointer, // the Erl variable being logged in trend
 			int const LogDepth, // number of timesteps back
-			FArray1< Real64 > const & TrendValARR, // the main storage of trend data
-			FArray1< Real64 > const & tempTrendARR, // temporary holder during push
-			FArray1< Real64 > const & TimeARR // hours back in time for trend points
+			Array1< Real64 > const & TrendValARR, // the main storage of trend data
+			Array1< Real64 > const & tempTrendARR, // temporary holder during push
+			Array1< Real64 > const & TimeARR // hours back in time for trend points
 		) :
 			Name( Name ),
 			ErlVariablePointer( ErlVariablePointer ),
@@ -661,17 +661,17 @@ namespace DataRuntimeLanguage {
 	};
 
 	// Object Data
-	extern FArray1D< ErlVariableType > ErlVariable; // holds Erl variables in a structure array
-	extern FArray1D< ErlStackType > ErlStack; // holds Erl programs in separate "stacks"
-	extern FArray1D< ErlExpressionType > ErlExpression; // holds Erl expressions in structure array
-	extern FArray1D< OperatorType > PossibleOperators; // hard library of available operators and functions
-	extern FArray1D< TrendVariableType > TrendVariable; // holds Erl trend varialbes in a structure array
-	extern FArray1D< OutputVarSensorType > Sensor; // EMS:SENSOR objects used (from output variables)
-	extern FArray1D< EMSActuatorAvailableType > EMSActuatorAvailable; // actuators that could be used
-	extern FArray1D< ActuatorUsedType > EMSActuatorUsed; // actuators that are used
-	extern FArray1D< InternalVarsAvailableType > EMSInternalVarsAvailable; // internal data that could be used
-	extern FArray1D< InternalVarsUsedType > EMSInternalVarsUsed; // internal data that are used
-	extern FArray1D< EMSProgramCallManagementType > EMSProgramCallManager; // program calling managers
+	extern Array1D< ErlVariableType > ErlVariable; // holds Erl variables in a structure array
+	extern Array1D< ErlStackType > ErlStack; // holds Erl programs in separate "stacks"
+	extern Array1D< ErlExpressionType > ErlExpression; // holds Erl expressions in structure array
+	extern Array1D< OperatorType > PossibleOperators; // hard library of available operators and functions
+	extern Array1D< TrendVariableType > TrendVariable; // holds Erl trend varialbes in a structure array
+	extern Array1D< OutputVarSensorType > Sensor; // EMS:SENSOR objects used (from output variables)
+	extern Array1D< EMSActuatorAvailableType > EMSActuatorAvailable; // actuators that could be used
+	extern Array1D< ActuatorUsedType > EMSActuatorUsed; // actuators that are used
+	extern Array1D< InternalVarsAvailableType > EMSInternalVarsAvailable; // internal data that could be used
+	extern Array1D< InternalVarsUsedType > EMSInternalVarsUsed; // internal data that are used
+	extern Array1D< EMSProgramCallManagementType > EMSProgramCallManager; // program calling managers
 	extern ErlValueType Null; // special "null" Erl variable value instance
 	extern ErlValueType False; // special "false" Erl variable value instance
 	extern ErlValueType True; // special "True" Erl variable value instance, gets reset
@@ -725,7 +725,7 @@ namespace DataRuntimeLanguage {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -2,7 +2,7 @@
 #define DemandManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -20,6 +20,7 @@ namespace DemandManager {
 	extern int const ManagerTypeLights;
 	extern int const ManagerTypeElecEquip;
 	extern int const ManagerTypeThermostats;
+	extern int const ManagerTypeVentilation;
 
 	extern int const ManagerPrioritySequential;
 	extern int const ManagerPriorityOptimal;
@@ -51,8 +52,12 @@ namespace DemandManager {
 
 	// SUBROUTINE SPECIFICATIONS:
 
-	// Types
+	// Clears the global data in DemandManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
+	// Types
 	struct DemandManagerListData
 	{
 		// Members
@@ -64,10 +69,10 @@ namespace DemandManager {
 		Real64 BillingPeriod; // Current billing period value
 		int PeakSchedule; // Schedule index for billing month periods
 		int AveragingWindow; // Number of timesteps for averaging demand window
-		FArray1D< Real64 > History; // Demand window history
+		Array1D< Real64 > History; // Demand window history
 		int ManagerPriority; // Indicator for priority (SEQUENTIAL, OPTIMAL, ALL)
 		int NumOfManager; // Number of DEMAND MANAGERs
-		FArray1D_int Manager; // Indexes for DEMAND MANAGERs
+		Array1D_int Manager; // Indexes for DEMAND MANAGERs
 		Real64 MeterDemand; // Meter demand at this timestep
 		Real64 AverageDemand; // Current demand over the demand window
 		Real64 PeakDemand; // Peak demand in the billing month so far
@@ -107,10 +112,10 @@ namespace DemandManager {
 			Real64 const BillingPeriod, // Current billing period value
 			int const PeakSchedule, // Schedule index for billing month periods
 			int const AveragingWindow, // Number of timesteps for averaging demand window
-			FArray1< Real64 > const & History, // Demand window history
+			Array1< Real64 > const & History, // Demand window history
 			int const ManagerPriority, // Indicator for priority (SEQUENTIAL, OPTIMAL, ALL)
 			int const NumOfManager, // Number of DEMAND MANAGERs
-			FArray1_int const & Manager, // Indexes for DEMAND MANAGERs
+			Array1_int const & Manager, // Indexes for DEMAND MANAGERs
 			Real64 const MeterDemand, // Meter demand at this timestep
 			Real64 const AverageDemand, // Current demand over the demand window
 			Real64 const PeakDemand, // Peak demand in the billing month so far
@@ -167,7 +172,11 @@ namespace DemandManager {
 		Real64 UpperLimit; // Not used for demand limit
 		// Highest cooling setpoint for thermostats
 		int NumOfLoads; // Number of load objects
-		FArray1D_int Load; // Pointers to load objects
+		Array1D_int Load; // Pointers to load objects
+
+		// Additional fields related to DemandManager:Ventilation
+		Real64 FixedRate; // m3 per person
+		Real64 ReductionRatio; // % of reduction
 
 		// Default Constructor
 		DemandManagerData() :
@@ -187,7 +196,9 @@ namespace DemandManager {
 			RotatedLoadNum( 0 ),
 			LowerLimit( 0.0 ),
 			UpperLimit( 0.0 ),
-			NumOfLoads( 0 )
+			NumOfLoads( 0 ),
+			FixedRate( 0.0 ),
+			ReductionRatio( 0.0 )
 		{}
 
 		// Member Constructor
@@ -210,7 +221,9 @@ namespace DemandManager {
 			Real64 const LowerLimit, // Lowest demand limit as fraction of design level
 			Real64 const UpperLimit, // Not used for demand limit
 			int const NumOfLoads, // Number of load objects
-			FArray1_int const & Load // Pointers to load objects
+			Array1_int const & Load, // Pointers to load objects
+			Real64 const FixedRate, // fixed rate for ventilation strategy
+			Real64 const ReductionRatio // reduction rate for ventilation strategy
 		) :
 			Name( Name ),
 			Type( Type ),
@@ -230,14 +243,16 @@ namespace DemandManager {
 			LowerLimit( LowerLimit ),
 			UpperLimit( UpperLimit ),
 			NumOfLoads( NumOfLoads ),
-			Load( Load )
+			Load( Load ),
+			FixedRate( FixedRate ),
+			ReductionRatio( ReductionRatio )
 		{}
 
 	};
 
 	// Object Data
-	extern FArray1D< DemandManagerListData > DemandManagerList;
-	extern FArray1D< DemandManagerData > DemandMgr;
+	extern Array1D< DemandManagerListData > DemandManagerList;
+	extern Array1D< DemandManagerData > DemandMgr;
 
 	// Functions
 
@@ -283,7 +298,7 @@ namespace DemandManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

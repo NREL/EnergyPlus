@@ -2,7 +2,7 @@
 #define FluidCoolers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -46,7 +46,7 @@ namespace FluidCoolers {
 	extern Real64 Qactual; // Fluid cooler heat transfer
 	extern Real64 FanPower; // Fluid cooler fan power used
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE CondenserLoopFluidCoolers
 
@@ -211,20 +211,20 @@ namespace FluidCoolers {
 	};
 
 	// Object Data
-	extern FArray1D< FluidCoolerspecs > SimpleFluidCooler; // dimension to number of machines
-	extern FArray1D< FluidCoolerInletConds > SimpleFluidCoolerInlet; // inlet conditions
-	extern FArray1D< ReportVars > SimpleFluidCoolerReport; // report variables
+	extern Array1D< FluidCoolerspecs > SimpleFluidCooler; // dimension to number of machines
+	extern Array1D< FluidCoolerInletConds > SimpleFluidCoolerInlet; // inlet conditions
+	extern Array1D< ReportVars > SimpleFluidCoolerReport; // report variables
 
 	// Functions
 
 	bool
 	TestFluidCoolerTwoSpeedInputForDesign(
-		std::string const cCurrentModuleObject,
-		FArray1D<std::string> const &  AlphArray,
-		FArray1D<std::string> const & cNumericFieldNames,
-		FArray1D<std::string> const & cAlphaFieldNames,
+		std::string const & cCurrentModuleObject,
+		Array1D<std::string> const &  AlphArray,
+		Array1D<std::string> const & cNumericFieldNames,
+		Array1D<std::string> const & cAlphaFieldNames,
 		int const &	FluidCoolerNum
-		);
+	);
 
 	void
 	SimFluidCoolers(
@@ -289,7 +289,7 @@ namespace FluidCoolers {
 	Real64
 	SimpleFluidCoolerUAResidual(
 		Real64 const UA, // UA of fluid cooler
-		FArray1< Real64 > const & Par // par(1) = design fluid cooler load [W]
+		Array1< Real64 > const & Par // par(1) = design fluid cooler load [W]
 	);
 
 	// End of the CondenserLoopFluidCoolers Module Simulation Subroutines
@@ -315,7 +315,7 @@ namespace FluidCoolers {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

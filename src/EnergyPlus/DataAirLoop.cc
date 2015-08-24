@@ -50,17 +50,42 @@ namespace DataAirLoop {
 	bool AirLoopInputsFilled( false ); // Set to TRUE after first pass through air loop
 
 	// Object Data
-	FArray1D< AirLoopZoneEquipConnectData > AirToZoneNodeInfo;
-	FArray1D< AirLoopOutsideAirConnectData > AirToOANodeInfo;
-	FArray1D< DefinePriAirSysAvailMgrs > PriAirSysAvailMgr;
-	FArray1D< AirLooptoZoneData > AirLoopZoneInfo;
-	FArray1D< AirLoopControlData > AirLoopControlInfo;
-	FArray1D< AirLoopFlowData > AirLoopFlow;
-	FArray1D< OAControllerData > OAControllerInfo;
-	FArray1D< OutsideAirSysProps > OutsideAirSys;
+	Array1D< AirLoopZoneEquipConnectData > AirToZoneNodeInfo;
+	Array1D< AirLoopOutsideAirConnectData > AirToOANodeInfo;
+	Array1D< DefinePriAirSysAvailMgrs > PriAirSysAvailMgr;
+	Array1D< AirLooptoZoneData > AirLoopZoneInfo;
+	Array1D< AirLoopControlData > AirLoopControlInfo;
+	Array1D< AirLoopFlowData > AirLoopFlow;
+	Array1D< OAControllerData > OAControllerInfo;
+	Array1D< OutsideAirSysProps > OutsideAirSys;
+
+	// Clears the global data in DataAirLoop.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumOASystems = 0;
+		LoopFanOperationMode = 0;
+		LoopSystemOnMassFlowrate = 0.0;
+		LoopSystemOffMassFlowrate = 0.0;
+		LoopOnOffFanPartLoadRatio = 0.0;
+		LoopHeatingCoilMaxRTF = 0.0;
+		LoopOnOffFanRTF = 0.0;
+		LoopDXCoilRTF = 0.0;
+		LoopCompCycRatio = 0.0;
+		AirLoopInputsFilled = false;
+		AirToZoneNodeInfo.deallocate();
+		AirToOANodeInfo.deallocate();
+		PriAirSysAvailMgr.deallocate();
+		AirLoopZoneInfo.deallocate();
+		AirLoopControlInfo.deallocate();
+		AirLoopFlow.deallocate();
+		OAControllerInfo.deallocate();
+		OutsideAirSys.deallocate();
+	}
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

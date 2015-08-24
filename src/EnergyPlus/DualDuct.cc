@@ -3,7 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -97,7 +97,7 @@ namespace DualDuct {
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	int NumDampers( 0 ); // The Number of Dampers found in the Input //Autodesk Poss used uninitialized in ReportDualDuctConnections
 	int NumDualDuctConstVolDampers;
@@ -120,13 +120,13 @@ namespace DualDuct {
 	// Reporting routines for module
 
 	// Object Data
-	FArray1D< DamperDesignParams > Damper;
-	FArray1D< DamperFlowConditions > DamperInlet;
-	FArray1D< DamperFlowConditions > DamperHotAirInlet;
-	FArray1D< DamperFlowConditions > DamperColdAirInlet;
-	FArray1D< DamperFlowConditions > DamperOutlet;
-	FArray1D< DamperFlowConditions > DamperOAInlet; // VAV:OutdoorAir Outdoor Air Inlet
-	FArray1D< DamperFlowConditions > DamperRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
+	Array1D< DamperDesignParams > Damper;
+	Array1D< DamperFlowConditions > DamperInlet;
+	Array1D< DamperFlowConditions > DamperHotAirInlet;
+	Array1D< DamperFlowConditions > DamperColdAirInlet;
+	Array1D< DamperFlowConditions > DamperOutlet;
+	Array1D< DamperFlowConditions > DamperOAInlet; // VAV:OutdoorAir Outdoor Air Inlet
+	Array1D< DamperFlowConditions > DamperRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -189,7 +189,7 @@ namespace DualDuct {
 
 		// Find the correct DamperNumber with the AirLoop & CompNum from AirLoop Derived Type
 		if ( CompIndex == 0 ) {
-			DamperNum = FindItemInList( CompName, Damper.DamperName(), NumDampers );
+			DamperNum = FindItemInList( CompName, Damper, &DamperDesignParams::DamperName );
 			if ( DamperNum == 0 ) {
 				ShowFatalError( "SimulateDualDuct: Damper not found=" + CompName );
 			}
@@ -297,13 +297,12 @@ namespace DualDuct {
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
-		int ZoneNum; // Index to actual zone number
-		static FArray1D< Real64 > NumArray( 2, 0.0 );
-		static FArray1D_string AlphArray( 7 );
-		static FArray1D_string cAlphaFields( 7 ); // Alpha field names
-		static FArray1D_string cNumericFields( 2 ); // Numeric field names
-		static FArray1D_bool lAlphaBlanks( 7, true ); // Logical array, alpha field input BLANK = .TRUE.
-		static FArray1D_bool lNumericBlanks( 2, true ); // Logical array, numeric field input BLANK = .TRUE.
+		static Array1D< Real64 > NumArray( 2, 0.0 );
+		static Array1D_string AlphArray( 7 );
+		static Array1D_string cAlphaFields( 7 ); // Alpha field names
+		static Array1D_string cNumericFields( 2 ); // Numeric field names
+		static Array1D_bool lAlphaBlanks( 7, true ); // Logical array, alpha field input BLANK = .TRUE.
+		static Array1D_bool lNumericBlanks( 2, true ); // Logical array, numeric field input BLANK = .TRUE.
 		std::string CurrentModuleObject; // for ease in getting objects
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
@@ -339,7 +338,7 @@ namespace DualDuct {
 				DamperNum = DamperIndex;
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), Damper.DamperName(), DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), Damper, &DamperDesignParams::DamperName, DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -406,7 +405,7 @@ namespace DualDuct {
 				DamperNum = DamperIndex + NumDualDuctConstVolDampers;
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), Damper.DamperName(), DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), Damper, &DamperDesignParams::DamperName, DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -452,7 +451,7 @@ namespace DualDuct {
 				}
 
 				if ( ! lAlphaBlanks( 6 ) ) {
-					Damper( DamperNum ).OARequirementsPtr = FindItemInList( AlphArray( 6 ), OARequirements.Name(), NumOARequirements );
+					Damper( DamperNum ).OARequirementsPtr = FindItemInList( AlphArray( 6 ), OARequirements );
 					if ( Damper( DamperNum ).OARequirementsPtr == 0 ) {
 						ShowSevereError( cAlphaFields( 6 ) + " = " + AlphArray( 6 ) + " not found." );
 						ShowContinueError( "Occurs in " + cCMO_DDVariableVolume + " = " + Damper( DamperNum ).DamperName );
@@ -480,7 +479,7 @@ namespace DualDuct {
 				DamperNum = DamperIndex + NumDualDuctConstVolDampers + NumDualDuctVarVolDampers;
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), Damper.DamperName(), DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), Damper, &DamperDesignParams::DamperName, DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -544,7 +543,7 @@ namespace DualDuct {
 						}
 					}
 				}
-				Damper( DamperNum ).OARequirementsPtr = FindItemInList( AlphArray( 6 ), OARequirements.Name(), NumOARequirements );
+				Damper( DamperNum ).OARequirementsPtr = FindItemInList( AlphArray( 6 ), OARequirements );
 				if ( Damper( DamperNum ).OARequirementsPtr == 0 ) {
 					ShowSevereError( cAlphaFields( 6 ) + " = " + AlphArray( 6 ) + " not found." );
 					ShowContinueError( "Occurs in " + cCMO_DDVarVolOA + " = " + Damper( DamperNum ).DamperName );
@@ -687,9 +686,9 @@ namespace DualDuct {
 		int RAInNode; // Reciruclated Air Inlet Node for VAV:OutdoorAir units
 		int OutNode;
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
-		static FArray1D_bool MyAirLoopFlag;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MySizeFlag;
+		static Array1D_bool MyAirLoopFlag;
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop; // Loop checking control variable
 		Real64 PeopleFlow; // local sum variable, m3/s
@@ -779,7 +778,7 @@ namespace DualDuct {
 				for ( Loop = 1; Loop <= TotPeople; ++Loop ) {
 					if ( People( Loop ).ZonePtr != Damper( DamperNum ).ActualZoneNum ) continue;
 					int damperOAFlowMethod = OARequirements( Damper( DamperNum ).OARequirementsPtr ).OAFlowMethod;
-					if ( damperOAFlowMethod == OAFlowPPer || damperOAFlowMethod == OAFlowSum || damperOAFlowMethod == OAFlowMax ){
+					if ( damperOAFlowMethod == OAFlowPPer || damperOAFlowMethod == OAFlowSum || damperOAFlowMethod == OAFlowMax ) {
 						PeopleFlow += People( Loop ).NumberOfPeople * OARequirements( Damper( DamperNum ).OARequirementsPtr ).OAFlowPerPerson;
 					}
 				}
@@ -1934,7 +1933,7 @@ namespace DualDuct {
 	// *****************************************************************************
 
 	void
-	ReportDualDuct( int const DamperNum ) // unused1208
+	ReportDualDuct( int const EP_UNUSED( DamperNum ) ) // unused1208
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -2098,7 +2097,7 @@ namespace DualDuct {
 
 	void
 	GetDualDuctOutdoorAirRecircUse(
-		std::string const & CompTypeName,
+		std::string const & EP_UNUSED( CompTypeName ),
 		std::string const & CompName,
 		bool & RecircIsUsed
 	)
@@ -2139,16 +2138,16 @@ namespace DualDuct {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  INTEGER :: DamperNum
 		static bool FirstTimeOnly( true );
-		static FArray1D_bool RecircIsUsedARR;
-		static FArray1D_string DamperNamesARR;
+		static Array1D_bool RecircIsUsedARR;
+		static Array1D_string DamperNamesARR;
 		int DamperIndex; // Loop index to Damper that you are currently loading input into
 		std::string CurrentModuleObject; // for ease in getting objects
-		static FArray1D< Real64 > NumArray( 2, 0.0 );
-		static FArray1D_string AlphArray( 7 );
-		static FArray1D_string cAlphaFields( 7 ); // Alpha field names
-		static FArray1D_string cNumericFields( 2 ); // Numeric field names
-		static FArray1D_bool lAlphaBlanks( 7, true ); // Logical array, alpha field input BLANK = .TRUE.
-		static FArray1D_bool lNumericBlanks( 2, true ); // Logical array, numeric field input BLANK = .TRUE.
+		static Array1D< Real64 > NumArray( 2, 0.0 );
+		static Array1D_string AlphArray( 7 );
+		static Array1D_string cAlphaFields( 7 ); // Alpha field names
+		static Array1D_string cNumericFields( 2 ); // Numeric field names
+		static Array1D_bool lAlphaBlanks( 7, true ); // Logical array, alpha field input BLANK = .TRUE.
+		static Array1D_bool lNumericBlanks( 2, true ); // Logical array, numeric field input BLANK = .TRUE.
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
@@ -2194,7 +2193,7 @@ namespace DualDuct {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

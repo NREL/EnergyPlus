@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <HVACDuct.hh>
@@ -61,21 +61,21 @@ namespace HVACDuct {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumDucts( 0 );
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE HVACDuct:
 
 	// <name Public routines, optionally name Private routines within this module>
 
 	// Object Data
-	FArray1D< DuctData > Duct;
+	Array1D< DuctData > Duct;
 
 	// Functions
 
 	void
 	SimDuct(
 		std::string const & CompName, // name of the duct component
-		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
+		bool const EP_UNUSED( FirstHVACIteration ), // TRUE if 1st HVAC simulation of system timestep !unused1208
 		int & CompIndex // index of duct component
 	)
 	{
@@ -122,7 +122,7 @@ namespace HVACDuct {
 
 		// Get the duct component index
 		if ( CompIndex == 0 ) {
-			DuctNum = FindItemInList( CompName, Duct.Name(), NumDucts );
+			DuctNum = FindItemInList( CompName, Duct );
 			if ( DuctNum == 0 ) {
 				ShowFatalError( "SimDuct: Component not found=" + CompName );
 			}
@@ -209,7 +209,7 @@ namespace HVACDuct {
 			GetObjectItem( cCurrentModuleObject, DuctNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Duct.Name(), DuctNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Duct, DuctNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -264,7 +264,7 @@ namespace HVACDuct {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 
 		// do one time initializations
 		if ( MyOneTimeFlag ) {
@@ -289,7 +289,7 @@ namespace HVACDuct {
 	}
 
 	void
-	CalcDuct( int const DuctNum ) // number of the current duct being simulated !unused1208
+	CalcDuct( int const EP_UNUSED( DuctNum ) ) // number of the current duct being simulated !unused1208
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -390,7 +390,7 @@ namespace HVACDuct {
 	}
 
 	void
-	ReportDuct( int const DuctNum ) // number of the current duct being simulated !unused1208
+	ReportDuct( int const EP_UNUSED( DuctNum ) ) // number of the current duct being simulated !unused1208
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -430,7 +430,7 @@ namespace HVACDuct {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

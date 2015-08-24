@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -77,13 +77,13 @@ namespace BoilerSteam {
 	Real64 BoilerMassFlowMinAvail( 0.0 ); // kg/s - Boiler mass flow rate
 	static std::string const FluidNameSteam( "STEAM" );
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
 
 	// Object Data
-	FArray1D< BoilerSpecs > Boiler; // dimension to number of machines
-	FArray1D< ReportVars > BoilerReport;
+	Array1D< BoilerSpecs > Boiler; // dimension to number of machines
+	Array1D< ReportVars > BoilerReport;
 
 	// MODULE SUBROUTINES:
 
@@ -93,7 +93,7 @@ namespace BoilerSteam {
 
 	void
 	SimSteamBoiler(
-		std::string const & BoilerType, // boiler type (used in CASE statement)
+		std::string const & EP_UNUSED( BoilerType ), // boiler type (used in CASE statement)
 		std::string const & BoilerName, // boiler identifier
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // boiler counter/identifier
@@ -146,7 +146,7 @@ namespace BoilerSteam {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			BoilerNum = FindItemInList( BoilerName, Boiler.Name(), NumBoilers );
+			BoilerNum = FindItemInList( BoilerName, Boiler );
 			if ( BoilerNum == 0 ) {
 				ShowFatalError( "SimBoiler: Unit not found=" + BoilerName );
 			}
@@ -230,7 +230,7 @@ namespace BoilerSteam {
 		int SteamFluidIndex; // Fluid Index for Steam
 		static bool ErrorsFound( false );
 		bool errFlag;
-		FArray1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
+		Array1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
 
 		SteamFluidIndex = 0;
 		cCurrentModuleObject = "Boiler:Steam";
@@ -257,7 +257,7 @@ namespace BoilerSteam {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Boiler.Name(), BoilerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Boiler, BoilerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -421,7 +421,6 @@ namespace BoilerSteam {
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
-		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
 		using PlantUtilities::InitComponentNodes;
@@ -443,8 +442,8 @@ namespace BoilerSteam {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyFlag;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyFlag;
+		static Array1D_bool MyEnvrnFlag;
 		bool FatalError;
 		Real64 TempUpLimitBoilerOut; // C - Boiler outlet maximum temperature limit
 		Real64 EnthSteamOutWet;
@@ -636,19 +635,19 @@ namespace BoilerSteam {
 				if ( Boiler( BoilerNum ).NomCapWasAutoSized ) {
 					Boiler( BoilerNum ).NomCap = tmpNomCap;
 					if ( PlantFinalSizesOkayToReport ) {
-						ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name, 
+						ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name,
 							"Design Size Nominal Capacity [W]", tmpNomCap );
 					}
 					if ( PlantFirstSizesOkayToReport ) {
-						ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name, 
+						ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name,
 							"Initial Design Size Nominal Capacity [W]", tmpNomCap );
 					}
 				} else { // Hard-sized with sizing data
 					if ( Boiler( BoilerNum ).NomCap > 0.0 && tmpNomCap > 0.0 ) {
 						NomCapUser = Boiler( BoilerNum ).NomCap;
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name, 
-								"Design Size Nominal Capacity [W]", tmpNomCap, 
+							ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name,
+								"Design Size Nominal Capacity [W]", tmpNomCap,
 								"User-Specified Nominal Capacity [W]", NomCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
@@ -669,10 +668,10 @@ namespace BoilerSteam {
 				ShowSevereError( "Autosizing of Boiler nominal capacity requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Boiler:Steam object=" + Boiler( BoilerNum ).Name );
 				ErrorsFound = true;
-			} 
-			if ( ! Boiler( BoilerNum ).NomCapWasAutoSized && Boiler( BoilerNum ).NomCap > 0.0 
+			}
+			if ( ! Boiler( BoilerNum ).NomCapWasAutoSized && Boiler( BoilerNum ).NomCap > 0.0
 					&& PlantFinalSizesOkayToReport ) {
-						ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name, 
+						ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name,
 						"User-Specified Nominal Capacity [W]", Boiler( BoilerNum ).NomCap );
 			}
 		}
@@ -754,7 +753,7 @@ namespace BoilerSteam {
 		Real64 EnthSteamOutWet;
 		Real64 LatentEnthSteam;
 		Real64 QualitySteam;
-		FArray1D< Real64 > LoadCoef( 3 ); // coefficients of the fuel use/part load curve
+		Array1D< Real64 > LoadCoef( 3 ); // coefficients of the fuel use/part load curve
 		Real64 CpWater; // Heat capacity of condensed steam
 		int BoilerInletNode; // Boiler inlet node number
 		int BoilerOutletNode; // Boiler outlet node number
@@ -955,7 +954,7 @@ namespace BoilerSteam {
 		Real64 const MyLoad, // boiler operating load
 		bool const RunFlag, // boiler on when TRUE
 		int const Num, // boiler number
-		bool const FirstHVACIteration // TRUE if First iteration of simulation
+		bool const EP_UNUSED( FirstHVACIteration ) // TRUE if First iteration of simulation
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1041,7 +1040,7 @@ namespace BoilerSteam {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

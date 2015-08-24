@@ -6,11 +6,11 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/FArray2S.hh>
-#include <ObjexxFCL/FArray3D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1S.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Array2S.hh>
+#include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -87,7 +87,7 @@ namespace OutputReportTabular {
 	extern int sizeMonthlyFieldSetInput;
 	extern int MonthlyTablesCount;
 	extern int MonthlyColumnsCount;
-	extern FArray1D_bool IsMonthGathered; // shown as true for any month used
+	extern Array1D_bool IsMonthGathered; // shown as true for any month used
 
 	extern int TOCEntriesCount;
 	extern int TOCEntriesSize;
@@ -107,9 +107,9 @@ namespace OutputReportTabular {
 	extern std::ofstream fix_stream; // Fixed table stream
 	extern std::ofstream htm_stream; // HTML table stream
 	extern std::ofstream xml_stream; // XML table stream
-	extern FArray1D< std::ofstream * > TabularOutputFile; // Table stream array
-	extern FArray1D_string del; // the delimiter to use
-	extern FArray1D_int TableStyle; // see list of parameters
+	extern Array1D< std::ofstream * > TabularOutputFile; // Table stream array
+	extern Array1D_string del; // the delimiter to use
+	extern Array1D_int TableStyle; // see list of parameters
 
 	extern Real64 timeInYear;
 
@@ -128,32 +128,32 @@ namespace OutputReportTabular {
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
 	// arrays that hold the meter numbers that are initialized at get input
-	extern FArray1D_int meterNumTotalsBEPS;
-	extern FArray1D_int meterNumTotalsSource;
-	extern FArray1D_bool fuelfactorsused;
-	extern FArray1D_bool ffUsed;
-	extern FArray1D< Real64 > SourceFactors;
-	extern FArray1D_bool ffSchedUsed;
-	extern FArray1D_int ffSchedIndex;
-	extern FArray2D_int meterNumEndUseBEPS;
-	extern FArray3D_int meterNumEndUseSubBEPS;
+	extern Array1D_int meterNumTotalsBEPS;
+	extern Array1D_int meterNumTotalsSource;
+	extern Array1D_bool fuelfactorsused;
+	extern Array1D_bool ffUsed;
+	extern Array1D< Real64 > SourceFactors;
+	extern Array1D_bool ffSchedUsed;
+	extern Array1D_int ffSchedIndex;
+	extern Array2D_int meterNumEndUseBEPS;
+	extern Array3D_int meterNumEndUseSubBEPS;
 	// arrays that hold the names of the resource and end uses
-	extern FArray1D_string resourceTypeNames;
-	extern FArray1D_string sourceTypeNames;
-	extern FArray1D_string endUseNames;
+	extern Array1D_string resourceTypeNames;
+	extern Array1D_string sourceTypeNames;
+	extern Array1D_string endUseNames;
 	// arrays that hold the actual values for the year
-	extern FArray1D< Real64 > gatherTotalsBEPS;
-	extern FArray1D< Real64 > gatherTotalsBySourceBEPS;
-	extern FArray1D< Real64 > gatherTotalsSource;
-	extern FArray1D< Real64 > gatherTotalsBySource;
-	extern FArray2D< Real64 > gatherEndUseBEPS;
-	extern FArray2D< Real64 > gatherEndUseBySourceBEPS;
-	extern FArray3D< Real64 > gatherEndUseSubBEPS;
+	extern Array1D< Real64 > gatherTotalsBEPS;
+	extern Array1D< Real64 > gatherTotalsBySourceBEPS;
+	extern Array1D< Real64 > gatherTotalsSource;
+	extern Array1D< Real64 > gatherTotalsBySource;
+	extern Array2D< Real64 > gatherEndUseBEPS;
+	extern Array2D< Real64 > gatherEndUseBySourceBEPS;
+	extern Array3D< Real64 > gatherEndUseSubBEPS;
 	// arrays the hold the demand values
-	extern FArray1D< Real64 > gatherDemandTotal;
-	extern FArray2D< Real64 > gatherDemandEndUse;
-	extern FArray3D< Real64 > gatherDemandEndUseSub;
-	extern FArray1D_int gatherDemandTimeStamp;
+	extern Array1D< Real64 > gatherDemandTotal;
+	extern Array2D< Real64 > gatherDemandEndUse;
+	extern Array3D< Real64 > gatherDemandEndUseSub;
+	extern Array1D_int gatherDemandTimeStamp;
 	// to keep track of hours for the BEPS report gathering
 	extern Real64 gatherElapsedTimeBEPS;
 	// for normalization of results
@@ -216,7 +216,7 @@ namespace OutputReportTabular {
 	extern Real64 sourceFactorOtherFuel1;
 	extern Real64 sourceFactorOtherFuel2;
 
-	extern FArray1D_int td;
+	extern Array1D_int td;
 	//(1)   Current year
 	//(2)   Current month
 	//(3)   Current day
@@ -227,67 +227,67 @@ namespace OutputReportTabular {
 	//(8)   Milliseconds (0-999)
 
 	// Design day name storage
-	extern FArray1D_string DesignDayName;
+	extern Array1D_string DesignDayName;
 	extern int DesignDayCount;
 
 	//arrays related to pulse and load component reporting
-	extern FArray2D< Real64 > radiantPulseUsed;
-	extern FArray2D_int radiantPulseTimestep;
-	extern FArray2D< Real64 > radiantPulseReceived;
-	extern FArray3D< Real64 > loadConvectedNormal;
-	extern FArray3D< Real64 > loadConvectedWithPulse;
-	extern FArray3D< Real64 > netSurfRadSeq;
-	extern FArray2D< Real64 > decayCurveCool;
-	extern FArray2D< Real64 > decayCurveHeat;
-	extern FArray3D< Real64 > ITABSFseq; // used for determining the radiant fraction on each surface
-	extern FArray3D< Real64 > TMULTseq; // used for determining the radiant fraction on each surface
+	extern Array2D< Real64 > radiantPulseUsed;
+	extern Array2D_int radiantPulseTimestep;
+	extern Array2D< Real64 > radiantPulseReceived;
+	extern Array3D< Real64 > loadConvectedNormal;
+	extern Array3D< Real64 > loadConvectedWithPulse;
+	extern Array3D< Real64 > netSurfRadSeq;
+	extern Array2D< Real64 > decayCurveCool;
+	extern Array2D< Real64 > decayCurveHeat;
+	extern Array3D< Real64 > ITABSFseq; // used for determining the radiant fraction on each surface
+	extern Array3D< Real64 > TMULTseq; // used for determining the radiant fraction on each surface
 
-	extern FArray3D< Real64 > peopleInstantSeq;
-	extern FArray3D< Real64 > peopleLatentSeq;
-	extern FArray3D< Real64 > peopleRadSeq;
-	extern FArray3D< Real64 > peopleDelaySeq;
+	extern Array3D< Real64 > peopleInstantSeq;
+	extern Array3D< Real64 > peopleLatentSeq;
+	extern Array3D< Real64 > peopleRadSeq;
+	extern Array3D< Real64 > peopleDelaySeq;
 
-	extern FArray3D< Real64 > lightInstantSeq;
-	extern FArray3D< Real64 > lightRetAirSeq;
-	extern FArray3D< Real64 > lightLWRadSeq; // long wave thermal radiation
-	extern FArray3D< Real64 > lightSWRadSeq; // short wave visible radiation
-	extern FArray3D< Real64 > lightDelaySeq;
+	extern Array3D< Real64 > lightInstantSeq;
+	extern Array3D< Real64 > lightRetAirSeq;
+	extern Array3D< Real64 > lightLWRadSeq; // long wave thermal radiation
+	extern Array3D< Real64 > lightSWRadSeq; // short wave visible radiation
+	extern Array3D< Real64 > lightDelaySeq;
 
-	extern FArray3D< Real64 > equipInstantSeq;
-	extern FArray3D< Real64 > equipLatentSeq;
-	extern FArray3D< Real64 > equipRadSeq;
-	extern FArray3D< Real64 > equipDelaySeq;
+	extern Array3D< Real64 > equipInstantSeq;
+	extern Array3D< Real64 > equipLatentSeq;
+	extern Array3D< Real64 > equipRadSeq;
+	extern Array3D< Real64 > equipDelaySeq;
 
-	extern FArray3D< Real64 > refrigInstantSeq;
-	extern FArray3D< Real64 > refrigRetAirSeq;
-	extern FArray3D< Real64 > refrigLatentSeq;
+	extern Array3D< Real64 > refrigInstantSeq;
+	extern Array3D< Real64 > refrigRetAirSeq;
+	extern Array3D< Real64 > refrigLatentSeq;
 
-	extern FArray3D< Real64 > waterUseInstantSeq;
-	extern FArray3D< Real64 > waterUseLatentSeq;
+	extern Array3D< Real64 > waterUseInstantSeq;
+	extern Array3D< Real64 > waterUseLatentSeq;
 
-	extern FArray3D< Real64 > hvacLossInstantSeq;
-	extern FArray3D< Real64 > hvacLossRadSeq;
-	extern FArray3D< Real64 > hvacLossDelaySeq;
+	extern Array3D< Real64 > hvacLossInstantSeq;
+	extern Array3D< Real64 > hvacLossRadSeq;
+	extern Array3D< Real64 > hvacLossDelaySeq;
 
-	extern FArray3D< Real64 > powerGenInstantSeq;
-	extern FArray3D< Real64 > powerGenRadSeq;
-	extern FArray3D< Real64 > powerGenDelaySeq;
+	extern Array3D< Real64 > powerGenInstantSeq;
+	extern Array3D< Real64 > powerGenRadSeq;
+	extern Array3D< Real64 > powerGenDelaySeq;
 
-	extern FArray3D< Real64 > infilInstantSeq;
-	extern FArray3D< Real64 > infilLatentSeq;
+	extern Array3D< Real64 > infilInstantSeq;
+	extern Array3D< Real64 > infilLatentSeq;
 
-	extern FArray3D< Real64 > zoneVentInstantSeq;
-	extern FArray3D< Real64 > zoneVentLatentSeq;
+	extern Array3D< Real64 > zoneVentInstantSeq;
+	extern Array3D< Real64 > zoneVentLatentSeq;
 
-	extern FArray3D< Real64 > interZoneMixInstantSeq;
-	extern FArray3D< Real64 > interZoneMixLatentSeq;
+	extern Array3D< Real64 > interZoneMixInstantSeq;
+	extern Array3D< Real64 > interZoneMixLatentSeq;
 
-	extern FArray3D< Real64 > feneCondInstantSeq;
+	extern Array3D< Real64 > feneCondInstantSeq;
 	//REAL(r64), DIMENSION(:,:,:),ALLOCATABLE,PUBLIC  :: feneSolarInstantSeq
-	extern FArray3D< Real64 > feneSolarRadSeq;
-	extern FArray3D< Real64 > feneSolarDelaySeq;
+	extern Array3D< Real64 > feneSolarRadSeq;
+	extern Array3D< Real64 > feneSolarDelaySeq;
 
-	extern FArray3D< Real64 > surfDelaySeq;
+	extern Array3D< Real64 > surfDelaySeq;
 
 	extern int maxUniqueKeyCount;
 
@@ -370,8 +370,8 @@ namespace OutputReportTabular {
 	struct BinResultsType
 	{
 		// Members
-		FArray1D< Real64 > mnth; // monthly bins
-		FArray1D< Real64 > hrly; // hourly bins
+		Array1D< Real64 > mnth; // monthly bins
+		Array1D< Real64 > hrly; // hourly bins
 
 		// Default Constructor
 		BinResultsType() :
@@ -381,8 +381,8 @@ namespace OutputReportTabular {
 
 		// Member Constructor
 		BinResultsType(
-			FArray1< Real64 > const & mnth, // monthly bins
-			FArray1< Real64 > const & hrly // hourly bins
+			Array1< Real64 > const & mnth, // monthly bins
+			Array1< Real64 > const & hrly // hourly bins
 		) :
 			mnth( 12, mnth ),
 			hrly( 24, hrly )
@@ -519,8 +519,8 @@ namespace OutputReportTabular {
 		int keyCount; // noel
 		int varAvgSum; // Variable  is Averaged=1 or Summed=2
 		int varStepType; // Variable time step is Zone=1 or HVAC=2
-		FArray1D_string NamesOfKeys; // keyNames !noel
-		FArray1D_int IndexesForKeyVar; // keyVarIndexes !noel
+		Array1D_string NamesOfKeys; // keyNames !noel
+		Array1D_int IndexesForKeyVar; // keyVarIndexes !noel
 
 		// Default Constructor
 		MonthlyFieldSetInputType() :
@@ -542,8 +542,8 @@ namespace OutputReportTabular {
 			int const keyCount, // noel
 			int const varAvgSum, // Variable  is Averaged=1 or Summed=2
 			int const varStepType, // Variable time step is Zone=1 or HVAC=2
-			FArray1_string const & NamesOfKeys, // keyNames !noel
-			FArray1_int const & IndexesForKeyVar // keyVarIndexes !noel
+			Array1_string const & NamesOfKeys, // keyNames !noel
+			Array1_int const & IndexesForKeyVar // keyVarIndexes !noel
 		) :
 			variMeter( variMeter ),
 			colHead( colHead ),
@@ -597,9 +597,9 @@ namespace OutputReportTabular {
 		int stepType; // Variable time step is Zone=1 or HVAC=2
 		std::string units; // the units string, may be blank
 		int aggType; // index to the type of aggregation (see list of parameters)
-		FArray1D< Real64 > reslt; // monthly results
-		FArray1D< Real64 > duration; // the time during which results are summed for use in averages
-		FArray1D_int timeStamp; // encoded timestamp of max or min
+		Array1D< Real64 > reslt; // monthly results
+		Array1D< Real64 > duration; // the time during which results are summed for use in averages
+		Array1D_int timeStamp; // encoded timestamp of max or min
 		Real64 aggForStep; // holds the aggregation for the HVAC time steps when smaller than
 		// the zone timestep
 
@@ -626,9 +626,9 @@ namespace OutputReportTabular {
 			int const stepType, // Variable time step is Zone=1 or HVAC=2
 			std::string const & units, // the units string, may be blank
 			int const aggType, // index to the type of aggregation (see list of parameters)
-			FArray1< Real64 > const & reslt, // monthly results
-			FArray1< Real64 > const & duration, // the time during which results are summed for use in averages
-			FArray1_int const & timeStamp, // encoded timestamp of max or min
+			Array1< Real64 > const & reslt, // monthly results
+			Array1< Real64 > const & duration, // the time during which results are summed for use in averages
+			Array1_int const & timeStamp, // encoded timestamp of max or min
 			Real64 const aggForStep // holds the aggregation for the HVAC time steps when smaller than
 		) :
 			varName( varName ),
@@ -713,19 +713,19 @@ namespace OutputReportTabular {
 	};
 
 	// Object Data
-	extern FArray1D< OutputTableBinnedType > OutputTableBinned;
-	extern FArray2D< BinResultsType > BinResults; // table number, number of intervals
-	extern FArray1D< BinResultsType > BinResultsBelow; // time below the lowest defined bin
-	extern FArray1D< BinResultsType > BinResultsAbove; // time above the highest defined bin
-	extern FArray1D< BinObjVarIDType > BinObjVarID;
-	extern FArray1D< BinStatisticsType > BinStatistics;
-	extern FArray1D< NamedMonthlyType > namedMonthly; // for predefined monthly report titles
-	extern FArray1D< MonthlyFieldSetInputType > MonthlyFieldSetInput;
-	extern FArray1D< MonthlyInputType > MonthlyInput;
-	extern FArray1D< MonthlyTablesType > MonthlyTables;
-	extern FArray1D< MonthlyColumnsType > MonthlyColumns;
-	extern FArray1D< TOCEntriesType > TOCEntries;
-	extern FArray1D< UnitConvType > UnitConv;
+	extern Array1D< OutputTableBinnedType > OutputTableBinned;
+	extern Array2D< BinResultsType > BinResults; // table number, number of intervals
+	extern Array1D< BinResultsType > BinResultsBelow; // time below the lowest defined bin
+	extern Array1D< BinResultsType > BinResultsAbove; // time above the highest defined bin
+	extern Array1D< BinObjVarIDType > BinObjVarID;
+	extern Array1D< BinStatisticsType > BinStatistics;
+	extern Array1D< NamedMonthlyType > namedMonthly; // for predefined monthly report titles
+	extern Array1D< MonthlyFieldSetInputType > MonthlyFieldSetInput;
+	extern Array1D< MonthlyInputType > MonthlyInput;
+	extern Array1D< MonthlyTablesType > MonthlyTables;
+	extern Array1D< MonthlyColumnsType > MonthlyColumns;
+	extern Array1D< TOCEntriesType > TOCEntries;
+	extern Array1D< UnitConvType > UnitConv;
 
 	// Functions
 
@@ -764,16 +764,13 @@ namespace OutputReportTabular {
 	GetInputTabularTimeBins();
 
 	bool
-	warningAboutKeyNotFound( int foundIndex, int inObjIndex, const std::string & moduleName );
+	warningAboutKeyNotFound( int foundIndex, int inObjIndex, std::string const & moduleName );
 
 	void
 	GetInputTabularStyle();
 
-
 	int
-	SetUnitsStyleFromString(
-		std::string unitStringIn
-		);
+	SetUnitsStyleFromString( std::string const & unitStringIn );
 
 
 	void
@@ -866,6 +863,12 @@ namespace OutputReportTabular {
 	void
 	WriteBEPSTable();
 
+	std::string
+	ResourceWarningMessage(std::string resource);
+
+	Real64
+	WaterConversionFunct(Real64 WaterTotal, Real64 ConversionFactor);
+
 	void
 	WriteSourceEnergyEndUseSummary();
 
@@ -932,10 +935,10 @@ namespace OutputReportTabular {
 
 	void
 	WriteTable(
-		FArray2S_string const body, // row,column
-		FArray1S_string const rowLabels,
-		FArray1S_string const columnLabels,
-		FArray1S_int widthColumn,
+		Array2S_string const body, // row,column
+		Array1S_string const rowLabels,
+		Array1S_string const columnLabels,
+		Array1S_int widthColumn,
 		Optional_bool_const transposeXML = _,
 		Optional_string_const footnoteText = _
 	);
@@ -1077,7 +1080,7 @@ namespace OutputReportTabular {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -2,7 +2,7 @@
 #define Furnaces_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -40,8 +40,8 @@ namespace Furnaces {
 
 	//MODULE VARIABLE DECLARATIONS:
 	extern int NumFurnaces; // The number of furnaces found in the input data file
-	extern FArray1D_bool MySizeFlag;
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool MySizeFlag;
+	extern Array1D_bool CheckEquipName;
 	extern Real64 ModifiedHeatCoilLoad; // used to adjust heating coil capacity if outlet temp > DesignMaxOutletTemp,
 	// used for Coil:Gas:Heating and Coil:Electric:Heating coils only.
 	extern Real64 OnOffAirFlowRatioSave; // Saves the OnOffAirFlowRatio calculated in RegulaFalsi CALLs.
@@ -219,12 +219,12 @@ namespace Furnaces {
 		Real64 IdleMassFlowRate; // idle air flow rate
 		Real64 FanVolFlow; // fan volumetric flow rate
 		bool CheckFanFlow; // Supply airflow check
-		FArray1D< Real64 > HeatVolumeFlowRate; // Supply air volume flow rate during heating operation
-		FArray1D< Real64 > HeatMassFlowRate; // Supply air mass flow rate during heating operation
-		FArray1D< Real64 > CoolVolumeFlowRate; // Supply air volume flow rate during cooling operation
-		FArray1D< Real64 > CoolMassFlowRate; // Supply air mass flow rate during cooling operation
-		FArray1D< Real64 > MSHeatingSpeedRatio; // Fan speed ratio in heating mode
-		FArray1D< Real64 > MSCoolingSpeedRatio; // Fan speed ratio in cooling mode
+		Array1D< Real64 > HeatVolumeFlowRate; // Supply air volume flow rate during heating operation
+		Array1D< Real64 > HeatMassFlowRate; // Supply air mass flow rate during heating operation
+		Array1D< Real64 > CoolVolumeFlowRate; // Supply air volume flow rate during cooling operation
+		Array1D< Real64 > CoolMassFlowRate; // Supply air mass flow rate during cooling operation
+		Array1D< Real64 > MSHeatingSpeedRatio; // Fan speed ratio in heating mode
+		Array1D< Real64 > MSCoolingSpeedRatio; // Fan speed ratio in cooling mode
 		int CompSpeedNum;
 		Real64 CompSpeedRatio;
 		int ErrIndexCyc;
@@ -503,12 +503,12 @@ namespace Furnaces {
 			Real64 const IdleMassFlowRate, // idle air flow rate
 			Real64 const FanVolFlow, // fan volumetric flow rate
 			bool const CheckFanFlow, // Supply airflow check
-			FArray1< Real64 > const & HeatVolumeFlowRate, // Supply air volume flow rate during heating operation
-			FArray1< Real64 > const & HeatMassFlowRate, // Supply air mass flow rate during heating operation
-			FArray1< Real64 > const & CoolVolumeFlowRate, // Supply air volume flow rate during cooling operation
-			FArray1< Real64 > const & CoolMassFlowRate, // Supply air mass flow rate during cooling operation
-			FArray1< Real64 > const & MSHeatingSpeedRatio, // Fan speed ratio in heating mode
-			FArray1< Real64 > const & MSCoolingSpeedRatio, // Fan speed ratio in cooling mode
+			Array1< Real64 > const & HeatVolumeFlowRate, // Supply air volume flow rate during heating operation
+			Array1< Real64 > const & HeatMassFlowRate, // Supply air mass flow rate during heating operation
+			Array1< Real64 > const & CoolVolumeFlowRate, // Supply air volume flow rate during cooling operation
+			Array1< Real64 > const & CoolMassFlowRate, // Supply air mass flow rate during cooling operation
+			Array1< Real64 > const & MSHeatingSpeedRatio, // Fan speed ratio in heating mode
+			Array1< Real64 > const & MSCoolingSpeedRatio, // Fan speed ratio in cooling mode
 			int const CompSpeedNum,
 			Real64 const CompSpeedRatio,
 			int const ErrIndexCyc,
@@ -660,7 +660,7 @@ namespace Furnaces {
 	};
 
 	// Object Data
-	extern FArray1D< FurnaceEquipConditions > Furnace;
+	extern Array1D< FurnaceEquipConditions > Furnace;
 
 	// Functions
 
@@ -773,13 +773,13 @@ namespace Furnaces {
 	Real64
 	CalcFurnaceResidual(
 		Real64 const PartLoadRatio, // DX cooling coil part load ratio
-		FArray1< Real64 > const & Par // Function parameters
+		Array1< Real64 > const & Par // Function parameters
 	);
 
 	Real64
 	CalcWaterToAirResidual(
 		Real64 const PartLoadRatio, // DX cooling coil part load ratio
-		FArray1< Real64 > const & Par // Function parameters
+		Array1< Real64 > const & Par // Function parameters
 	);
 
 	void
@@ -816,7 +816,7 @@ namespace Furnaces {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		FArray1< Real64 > const & Par // Par(5) is the requested coil load
+		Array1< Real64 > const & Par // Par(5) is the requested coil load
 	);
 
 	//        End of Reporting subroutines for the Furnace Module
@@ -873,7 +873,7 @@ namespace Furnaces {
 	Real64
 	VSHPCyclingResidual(
 		Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = FurnaceNum
+		Array1< Real64 > const & Par // par(1) = FurnaceNum
 	);
 
 	//******************************************************************************
@@ -881,7 +881,7 @@ namespace Furnaces {
 	Real64
 	VSHPSpeedResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = MSHPNum
+		Array1< Real64 > const & Par // par(1) = MSHPNum
 	);
 
 	void
@@ -910,7 +910,7 @@ namespace Furnaces {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

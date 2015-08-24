@@ -10,7 +10,7 @@ extern "C" {
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -91,18 +91,18 @@ namespace ExternalInterface {
 	// which phase an error occured.
 	// (1=initialization, 2=time stepping)
 
-	FArray1D_int keyVarIndexes; // Array index for specific key name
-	FArray1D_int varTypes; // Types of variables in keyVarIndexes
-	FArray1D_int varInd; // Index of ErlVariables for ExternalInterface
+	Array1D_int keyVarIndexes; // Array index for specific key name
+	Array1D_int varTypes; // Types of variables in keyVarIndexes
+	Array1D_int varInd; // Index of ErlVariables for ExternalInterface
 	int socketFD( -1 ); // socket file descriptor
 	bool ErrorsFound( false ); // Set to true if errors are found
 	bool noMoreValues( false ); // Flag, true if no more values
 	// will be sent by the server
 
-	FArray1D_string varKeys; // Keys of report variables used for data exchange
-	FArray1D_string varNames; // Names of report variables used for data exchange
-	FArray1D_int inpVarTypes; // Names of report variables used for data exchange
-	FArray1D_string inpVarNames; // Names of report variables used for data exchange
+	Array1D_string varKeys; // Keys of report variables used for data exchange
+	Array1D_string varNames; // Names of report variables used for data exchange
+	Array1D_int inpVarTypes; // Names of report variables used for data exchange
+	Array1D_string inpVarNames; // Names of report variables used for data exchange
 
 	bool configuredControlPoints( false ); // True if control points have been configured
 	bool useEMS( false ); // Will be set to true if ExternalInterface writes to EMS variables or actuators
@@ -110,9 +110,9 @@ namespace ExternalInterface {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ExternalInterface:
 
 	// Object Data
-	FArray1D< FMUType > FMU; // Variable Types structure
-	FArray1D< FMUType > FMUTemp; // Variable Types structure
-	FArray1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
+	Array1D< FMUType > FMU; // Variable Types structure
+	Array1D< FMUType > FMUTemp; // Variable Types structure
+	Array1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
 
 	// Functions
 
@@ -133,7 +133,6 @@ namespace ExternalInterface {
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::KindOfSim;
 		using DataGlobals::ksRunPeriodWeather;
-		using DataGlobals::ZoneTSReporting;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
@@ -204,8 +203,6 @@ namespace ExternalInterface {
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		int Loop; // Loop counter
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		cCurrentModuleObject = "ExternalInterface";
 		NumExternalInterfaces = GetNumObjectsFound( cCurrentModuleObject );
@@ -384,7 +381,7 @@ namespace ExternalInterface {
 	void
 	ParseString(
 		std::string const & str, // The string, with all elements separated by ';'
-		FArray1S_string ele, // The elements
+		Array1S_string ele, // The elements
 		int const nEle // The number of elements
 	)
 	{
@@ -439,7 +436,6 @@ namespace ExternalInterface {
 		using ScheduleManager::GetDayScheduleIndex;
 		using RuntimeLanguageProcessor::isExternalInterfaceErlVariable;
 		using RuntimeLanguageProcessor::FindEMSVariable;
-		using DataGlobals::WeathSimReq;
 		using General::TrimSigDigits;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -449,7 +445,7 @@ namespace ExternalInterface {
 		std::string const xmlStrInKey("schedule,variable,actuator\0"); // xml values in string, separated by ','
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i, j; // loop counters
+		int i; // loop counters
 		std::string xmlStrOut; // xml values in string, separated by ';'
 		std::string xmlStrOutTyp; // xml values in string, separated by ';'
 		std::string xmlStrIn; // xml values in string, separated by ';'
@@ -457,11 +453,8 @@ namespace ExternalInterface {
 		static int nOutVal; // Number of output values (E+ -> ExternalInterface)
 		static int nInpVar; // Number of input values (ExternalInterface -> E+)
 		int retVal; // Return value of function call, used for error handling
-		int counter( 0 ); // Counter for ErlVariables
 		int mainVersion; // The version number
-		int curNumInpVal; // current number of input values for the InputValType
 		std::string validateErrMsg; // error returned when xml Schema validate failed
-		int errMsgLen; // the length of the error message
 		bool socFileExist; // Set to true if socket configuration
 		// file exists
 		bool simFileExist; // Set to true if simulation configuration
@@ -659,8 +652,6 @@ namespace ExternalInterface {
 		using General::TrimSigDigits;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const IntegerVar( 1 ); // Integer variable
-		int const RealVar( 2 ); // Real variable
 		static bool FirstCallGetSetDoStep( true ); // Flag to check when External Interface is called first time
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -939,7 +930,7 @@ namespace ExternalInterface {
 		// This routine terminates the FMUs instances
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i, j, k; // Loop counter
+		int i, j; // Loop counter
 
 		//----Needs to have function that allows to terminates FMU. Was not defined in version 1.0 -- fixme
 		for ( i = 1; i <= NumFMUObjects; ++i ) {
@@ -999,28 +990,23 @@ namespace ExternalInterface {
 		int NumNumbers( 0 ); // Number of Numbers for each GetObjectItem call
 		int IOStatus( 0 ); // Used in GetObjectItem
 		int NumFMUInputVariables( 0 ); // Number of FMU input variables
-		int varType( 0 ); // 0=not found, 1=integer, 2=real, 3=meter
-		int numKey( 0 ); // Number of keys found
-		int varAvgSum( 0 ); // Variable  is Averaged=1 or Summed=2
-		int varStepType( 0 ); // Variable time step is Zone=1 or HVAC=2
 		std::string varUnit; // Units sting, may be blank
 		std::string Name_NEW; // Units sting, may be blank
 		std::string Name_OLD; // Units sting, may be blank
 
-		FArray1D_int keyIndexes( 1 ); // Array index for
-		FArray1D_int varTypes( 1 ); // Array index for
-		FArray1D_string NamesOfKeys( 1 ); // Specific key name
-		int retValue;
+		Array1D_int keyIndexes( 1 ); // Array index for
+		Array1D_int varTypes( 1 ); // Array index for
+		Array1D_string NamesOfKeys( 1 ); // Specific key name
 		int retValfmiVersion;
 		int retValfmiPathLib;
-		FArray1D_string NameListInstances( 5 );
+		Array1D_string NameListInstances( 5 );
 		bool IsNotOK;
 		bool IsBlank;
 		static bool FirstCallIni( true ); // First time, input has been read
 		bool fileExist;
 		std::string tempFullFileName;
-		FArray1D_string strippedFileName; // remove path from entered file name
-		FArray1D_string fullFileName; // entered file name/found
+		Array1D_string strippedFileName; // remove path from entered file name
+		Array1D_string fullFileName; // entered file name/found
 		std::string::size_type pos;
 		int FOUND;
 
@@ -1111,7 +1097,7 @@ namespace ExternalInterface {
 					if ( SameString( cAlphaArgs( 3 ), FMU( i ).Name ) ) {
 						Name_NEW = cAlphaArgs( 4 );
 						if ( ! SameString( Name_OLD, Name_NEW ) ) {
-							FOUND = FindItem( Name_NEW, checkInstanceName.Name(), NumFMUInputVariables );
+							FOUND = FindItem( Name_NEW, checkInstanceName );
 							if ( FOUND == 0 ) {
 								checkInstanceName( l ).Name = Name_NEW;
 								FMU( i ).NumInstances = j;
@@ -1270,7 +1256,7 @@ namespace ExternalInterface {
 							FMU( i ).Instance( j ).eplusOutputVariable( k ).VarKey = cAlphaArgs( 1 );
 							FMU( i ).Instance( j ).eplusOutputVariable( k ).Name = cAlphaArgs( 2 );
 							// verify whether we have duplicate FMU input variables in the idf
-							VerifyName( FMU( i ).Instance( j ).fmuInputVariable( k ).Name, FMU( i ).Instance( j ).checkfmuInputVariable.Name(), NumFMUInputVariables, IsNotOK, IsBlank, "The FMU input variable \"" + FMU( i ).Instance( j ).fmuInputVariable( k ).Name + "\" of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" has duplicates. Please check the input file again and delete duplicated entries." );
+							VerifyName( FMU( i ).Instance( j ).fmuInputVariable( k ).Name, FMU( i ).Instance( j ).checkfmuInputVariable, NumFMUInputVariables, IsNotOK, IsBlank, "The FMU input variable \"" + FMU( i ).Instance( j ).fmuInputVariable( k ).Name + "\" of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" has duplicates. Please check the input file again and delete duplicated entries." );
 							if ( IsNotOK ) {
 								ErrorsFound = true;
 								StopExternalInterfaceIfError();
@@ -1310,8 +1296,8 @@ namespace ExternalInterface {
 
 							// The next call expects an array, but a single item is passed
 							// Therefore create a single item array here first
-							FArray1D_string tempSingleStringA( 1, FMU( i ).Instance( j ).eplusOutputVariable( k ).VarKey );
-							FArray1D_string tempSingleStringB( 1, FMU( i ).Instance( j ).eplusOutputVariable( k ).Name );
+							Array1D_string tempSingleStringA( 1, FMU( i ).Instance( j ).eplusOutputVariable( k ).VarKey );
+							Array1D_string tempSingleStringB( 1, FMU( i ).Instance( j ).eplusOutputVariable( k ).Name );
 
 							// Make the call with arrays
 							GetReportVariableKey( tempSingleStringA, 1, tempSingleStringB, keyIndexes, varTypes );
@@ -1640,8 +1626,8 @@ namespace ExternalInterface {
 			}
 		} else {
 			switch ( Month ) {
-				case  1: simtime =   0  ; break;
-				case  2: simtime =  31  ; break;
+				case  1: simtime =   0; break;
+				case  2: simtime =  31; break;
 				case  3: simtime =  59+1; break;
 				case  4: simtime =  90+1; break;
 				case  5: simtime = 120+1; break;
@@ -1698,47 +1684,22 @@ namespace ExternalInterface {
 		using General::TrimSigDigits;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const IntegerVar( 1 ); // Integer variable
-		int const RealVar( 2 ); // Real variable
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i, j, k, l; // Loop counter
-		int retVal; // Return value of function call, used for error handling
-		int NumAlphas( 0 ); // Number of Alphas for each GetObjectItem call
-		int NumNumbers( 0 ); // Number of Numbers for each GetObjectItem call
-		int IOStatus( 0 ); // Used in GetObjectItem
-		int NumFMUInputVariables( 0 ); // Number of FMU input variables
+		int i, j, k; // Loop counter
 
-		int NumNumeric; // Number of numbers being input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
-		static bool FirstCallFlag( true ); // Flag for first call
 		static bool FirstCallDesignDays( true ); // Flag fo first call during warmup
 		static bool FirstCallWUp( true ); // Flag fo first call during warmup
 		static bool FirstCallTStep( true ); // Flag for first call during time stepping
-		int Count;
 
-		FArray1D_string Alphas( 5 );
+		Array1D_string Alphas( 5 );
 
-		int NumAlpha, NumNumber, IOStat;
-		int Num;
-
-		int curNumInpVal; // current number of input values for the InputValType
 		std::string validateErrMsg; // error returned when xml Schema validate failed
-		int errMsgLen; // the length of the error message
-
-		int varType( 0 ); // 0=not found, 1=integer, 2=real, 3=meter
-		int numKey( 0 ); // Number of keys found
-		int varAvgSum( 0 ); // Variable  is Averaged=1 or Summed=2
-		int varStepType( 0 ); // Variable time step is Zone=1 or HVAC=2
 		std::string varUnits; // Units sting, may be blank
 		std::string tempChar; // Units sting, may be blank
 
-		int Loop; // Loop counter
-		int NumTSObjects;
-
-		FArray1D_int keyIndexes( 1 ); // Array index for
-		FArray1D_string NamesOfKeys( 1 ); // Specific key name
+		Array1D_int keyIndexes( 1 ); // Array index for
+		Array1D_string NamesOfKeys( 1 ); // Specific key name
 
 		if ( WarmupFlag && ( KindOfSim != ksRunPeriodWeather ) ) { // No data exchange during design days
 			if ( FirstCallDesignDays ) {
@@ -2021,11 +1982,9 @@ namespace ExternalInterface {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const nDblMax( 1024 ); // Maximum number of doubles
-		int const nIntMax( 0 ); // Maximum number of integers
-		int const nBooMax( 0 ); // Maximum number of booleans
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i, j; // Loop counter
+		int i; // Loop counter
 		int retVal; // Return value from socket
 
 		int flaWri; // flag to write to the socket
@@ -2035,8 +1994,8 @@ namespace ExternalInterface {
 		Real64 curSimTim; // current simulation time
 		Real64 preSimTim; // previous time step's simulation time
 
-		FArray1D< Real64 > dblValWri( nDblMax );
-		FArray1D< Real64 > dblValRea( nDblMax );
+		Array1D< Real64 > dblValWri( nDblMax );
+		Array1D< Real64 > dblValRea( nDblMax );
 		std::string retValCha;
 		bool continueSimulation; // Flag, true if simulation should continue
 		static bool firstCall( true );
@@ -2148,11 +2107,11 @@ namespace ExternalInterface {
 
 	void
 	GetReportVariableKey(
-		FArray1S_string const varKeys, // Standard variable name
+		Array1S_string const varKeys, // Standard variable name
 		int const numberOfKeys, // Number of keys=size(varKeys)
-		FArray1S_string const varNames, // Standard variable name
-		FArray1S_int keyVarIndexes, // Array index
-		FArray1S_int varTypes // Types of variables in keyVarIndexes
+		Array1S_string const varNames, // Standard variable name
+		Array1S_int keyVarIndexes, // Array index
+		Array1S_int varTypes // Types of variables in keyVarIndexes
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -2173,8 +2132,8 @@ namespace ExternalInterface {
 		int varAvgSum( 0 ); // Variable  is Averaged=1 or Summed=2
 		int varStepType( 0 ); // Variable time step is Zone=1 or HVAC=2
 		std::string varUnits; // Units sting, may be blank
-		FArray1D_int keyIndexes; // Array index for
-		FArray1D_string NamesOfKeys; // Specific key name
+		Array1D_int keyIndexes; // Array index for
+		Array1D_string NamesOfKeys; // Specific key name
 		int Loop, iKey; // Loop counters
 
 		// Get pointers for variables to be sent to Ptolemy
@@ -2279,7 +2238,7 @@ namespace ExternalInterface {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

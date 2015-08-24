@@ -38,10 +38,10 @@ namespace DataShadowingCombinations {
 	// MODULE VARIABLE DECLARATIONS:
 
 	// Object Data
-	FArray1D< ShadowingCombinations > ShadowComb;
+	Array1D< ShadowingCombinations > ShadowComb;
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

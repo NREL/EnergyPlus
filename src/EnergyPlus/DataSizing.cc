@@ -44,7 +44,7 @@ namespace DataSizing {
 	int const OAFlowSum( 5 );
 	int const OAFlowMax( 6 );
 
-	FArray1D_string const cOAFlowMethodTypes( NumOAFlowMethods, { "Flow/Person", "Flow/Zone", "Flow/Area", "AirChanges/Hour", "Sum", "Maximum" } );
+	Array1D_string const cOAFlowMethodTypes( NumOAFlowMethods, { "Flow/Person", "Flow/Zone", "Flow/Area", "AirChanges/Hour", "Sum", "Maximum" } );
 
 	// parameters for outside air
 	int const AllOA( 1 );
@@ -224,37 +224,148 @@ namespace DataSizing {
 	Real64 GlobalCoolSizingFactor( 0.0 ); // the global cooling sizing ratio
 	Real64 SuppHeatCap( 0.0 ); // the heating capacity of the supplemental heater in a unitary system
 	Real64 UnitaryHeatCap( 0.0 ); // the heating capacity of a unitary system
-	FArray1D< Real64 > ZoneSizThermSetPtHi; // highest zone thermostat setpoint during zone sizing calcs
-	FArray1D< Real64 > ZoneSizThermSetPtLo; // lowest zone thermostat setpoint during zone sizing calcs
-	FArray1D_string CoolPeakDateHrMin; // date:hr:min of cooling peak
-	FArray1D_string HeatPeakDateHrMin; // date:hr:min of heating peak
+	Array1D< Real64 > ZoneSizThermSetPtHi; // highest zone thermostat setpoint during zone sizing calcs
+	Array1D< Real64 > ZoneSizThermSetPtLo; // lowest zone thermostat setpoint during zone sizing calcs
+	Array1D_string CoolPeakDateHrMin; // date:hr:min of cooling peak
+	Array1D_string HeatPeakDateHrMin; // date:hr:min of heating peak
 	char SizingFileColSep; // Character to separate columns in sizing outputs
 
 	// Object Data
-	FArray1D< OARequirementsData > OARequirements;
-	FArray1D< ZoneAirDistributionData > ZoneAirDistribution;
-	FArray1D< ZoneSizingInputData > ZoneSizingInput; // Input data for zone sizing
-	FArray2D< ZoneSizingData > ZoneSizing; // Data for zone sizing (all data, all design
-	FArray1D< ZoneSizingData > FinalZoneSizing; // Final data for zone sizing including effects
-	FArray2D< ZoneSizingData > CalcZoneSizing; // Data for zone sizing (all data,
-	FArray1D< ZoneSizingData > CalcFinalZoneSizing; // Final data for zone sizing (calculated only)
-	FArray1D< ZoneSizingData > TermUnitFinalZoneSizing; // Final data for sizing terminal units
-	FArray1D< SystemSizingInputData > SysSizInput; // Input data array for system sizing object
-	FArray2D< SystemSizingData > SysSizing; // Data array for system sizing (all data)
-	FArray1D< SystemSizingData > FinalSysSizing; // Data array for system sizing (max heat/cool)
-	FArray1D< SystemSizingData > CalcSysSizing; // Data array for system sizing (max heat/cool)
-	FArray1D< SysSizPeakDDNumData > SysSizPeakDDNum; // data array for peak des day indices 
-	FArray1D< TermUnitSizingData > TermUnitSizing; // Data added in sizing routines
-	FArray1D< ZoneEqSizingData > ZoneEqSizing; // Data added in zone eq component sizing routines
-	FArray1D< ZoneEqSizingData > UnitarySysEqSizing; // Data added in unitary system sizing routines
-	FArray1D< ZoneEqSizingData > OASysEqSizing; // Data added in unitary system sizing routines
-	FArray1D< PlantSizingData > PlantSizData; // Input data array for plant sizing
-	FArray1D< DesDayWeathData > DesDayWeath; // design day weather saved at major time step
-	FArray1D< CompDesWaterFlowData > CompDesWaterFlow; // array to store components' design water flow
-	FArray1D< ZoneHVACSizingData > ZoneHVACSizing; // Input data for zone HVAC sizing
+	Array1D< OARequirementsData > OARequirements;
+	Array1D< ZoneAirDistributionData > ZoneAirDistribution;
+	Array1D< ZoneSizingInputData > ZoneSizingInput; // Input data for zone sizing
+	Array2D< ZoneSizingData > ZoneSizing; // Data for zone sizing (all data, all design
+	Array1D< ZoneSizingData > FinalZoneSizing; // Final data for zone sizing including effects
+	Array2D< ZoneSizingData > CalcZoneSizing; // Data for zone sizing (all data,
+	Array1D< ZoneSizingData > CalcFinalZoneSizing; // Final data for zone sizing (calculated only)
+	Array1D< ZoneSizingData > TermUnitFinalZoneSizing; // Final data for sizing terminal units
+	Array1D< SystemSizingInputData > SysSizInput; // Input data array for system sizing object
+	Array2D< SystemSizingData > SysSizing; // Data array for system sizing (all data)
+	Array1D< SystemSizingData > FinalSysSizing; // Data array for system sizing (max heat/cool)
+	Array1D< SystemSizingData > CalcSysSizing; // Data array for system sizing (max heat/cool)
+	Array1D< SysSizPeakDDNumData > SysSizPeakDDNum; // data array for peak des day indices
+	Array1D< TermUnitSizingData > TermUnitSizing; // Data added in sizing routines
+	Array1D< ZoneEqSizingData > ZoneEqSizing; // Data added in zone eq component sizing routines
+	Array1D< ZoneEqSizingData > UnitarySysEqSizing; // Data added in unitary system sizing routines
+	Array1D< ZoneEqSizingData > OASysEqSizing; // Data added in unitary system sizing routines
+	Array1D< PlantSizingData > PlantSizData; // Input data array for plant sizing
+	Array1D< DesDayWeathData > DesDayWeath; // design day weather saved at major time step
+	Array1D< CompDesWaterFlowData > CompDesWaterFlow; // array to store components' design water flow
+	Array1D< ZoneHVACSizingData > ZoneHVACSizing; // Input data for zone HVAC sizing
+
+	// Clears the global data in DataSizing.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumOARequirements = 0;
+		NumZoneAirDistribution = 0;
+		NumZoneSizingInput = 0;
+		NumSysSizInput = 0;
+		NumPltSizInput = 0;
+		CurSysNum = 0;
+		CurOASysNum = 0;
+		CurZoneEqNum = 0;
+		CurBranchNum = 0;
+		CurDuctType = 0;
+		CurLoopNum = 0;
+		CurCondLoopNum = 0;
+		CurEnvirNumSimDay = 0;
+		CurOverallSimDay = 0;
+		NumTimeStepsInAvg = 0;
+		SaveNumPlantComps = 0;
+		DataTotCapCurveIndex = 0;
+		DataPltSizCoolNum = 0;
+		DataPltSizHeatNum = 0;
+		DataWaterLoopNum = 0;
+		DataCoilNum = 0;
+		DataFanOpMode = 0;
+		DataCoilIsSuppHeater = false;
+		DataIsDXCoil = false;
+		DataAutosizable = true;
+		DataEMSOverrideON = false;
+		DataScalableSizingON = false;
+		DataScalableCapSizingON = false;
+		DataSysScalableFlowSizingON = false;
+		DataSysScalableCapSizingON = false;
+		SysSizingRunDone = false;
+		TermUnitSingDuct = false;
+		TermUnitPIU = false;
+		TermUnitIU = false;
+		ZoneEqFanCoil = false;
+		ZoneEqUnitHeater = false;
+		ZoneEqUnitVent = false;
+		ZoneEqVentedSlab = false;
+		ZoneEqDXCoil = false;
+		ZoneCoolingOnlyFan = false;
+		ZoneHeatingOnlyFan = false;
+		ZoneSizingRunDone = false;
+		DataErrorsFound = false;
+		AutoVsHardSizingThreshold = 0.1;
+		AutoVsHardSizingDeltaTempThreshold = 1.5;
+		DataDesInletWaterTemp = 0.0;
+		DataDesInletAirHumRat = 0.0;
+		DataDesInletAirTemp = 0.0;
+		DataDesOutletAirTemp = 0.0;
+		DataDesOutletAirHumRat = 0.0;
+		DataCoolCoilCap = 0.0;
+		DataFlowUsedForSizing = 0.0;
+		DataAirFlowUsedForSizing = 0.0;
+		DataWaterFlowUsedForSizing = 0.0;
+		DataCapacityUsedForSizing = 0.0;
+		DataDesignCoilCapacity = 0.0;
+		DataHeatSizeRatio = 1.0;
+		DataEMSOverride = 0.0;
+		DataBypassFrac = 0.0;
+		DataFracOfAutosizedCoolingAirflow = 1.0;
+		DataFracOfAutosizedHeatingAirflow = 1.0;
+		DataFlowPerCoolingCapacity = 0.0;
+		DataFlowPerHeatingCapacity = 0.0;
+		DataFracOfAutosizedCoolingCapacity = 1.0;
+		DataFracOfAutosizedHeatingCapacity = 1.0;
+		DataAutosizedCoolingCapacity = 0.0;
+		DataAutosizedHeatingCapacity = 0.0;
+		DataConstantUsedForSizing = 0.0;
+		DataFractionUsedForSizing = 0.0;
+		DataNonZoneNonAirloopValue = 0.0;
+		DataZoneNumber = 0;
+		NumZoneHVACSizing = 0;
+		DXCoolCap = 0.0;
+		GlobalHeatSizingFactor = 0.0;
+		GlobalCoolSizingFactor = 0.0;
+		SuppHeatCap = 0.0;
+		UnitaryHeatCap = 0.0;
+		ZoneSizThermSetPtHi.deallocate();
+		ZoneSizThermSetPtLo.deallocate();
+		CoolPeakDateHrMin.deallocate();
+		HeatPeakDateHrMin.deallocate();
+		SizingFileColSep = char();
+
+		OARequirements.deallocate();
+		ZoneAirDistribution.deallocate();
+		ZoneSizingInput.deallocate();
+		ZoneSizing.deallocate();
+		FinalZoneSizing.deallocate();
+		CalcZoneSizing.deallocate();
+		CalcFinalZoneSizing.deallocate();
+		TermUnitFinalZoneSizing.deallocate();
+		SysSizInput.deallocate();
+		SysSizing.deallocate();
+		FinalSysSizing.deallocate();
+		CalcSysSizing.deallocate();
+		SysSizPeakDDNum.deallocate();
+		TermUnitSizing.deallocate();
+		ZoneEqSizing.deallocate();
+		UnitarySysEqSizing.deallocate();
+		OASysEqSizing.deallocate();
+		PlantSizData.deallocate();
+		DesDayWeath.deallocate();
+		CompDesWaterFlow.deallocate();
+		ZoneHVACSizing.deallocate();
+	}
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

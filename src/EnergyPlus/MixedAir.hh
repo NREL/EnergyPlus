@@ -2,7 +2,7 @@
 #define MixedAir_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -83,7 +83,7 @@ namespace MixedAir {
 	//INTEGER, PARAMETER :: SOAM_IAQPCOM = 6  ! Take the maximum outdoor air rate from both CO2 and generic contaminant controls
 	//                                        ! based on the generic contaminant setpoint
 
-	extern FArray1D_string const CurrentModuleObjects;
+	extern Array1D_string const CurrentModuleObjects;
 
 	// Parameters below (CMO - Current Module Object.  used primarily in Get Inputs)
 	// Multiple Get Input routines in this module or these would be in individual routines.
@@ -105,8 +105,8 @@ namespace MixedAir {
 	extern int NumOAMixers; // Number of Outdoor Air Mixers
 	extern int NumVentMechControllers; // Number of Controller:MechanicalVentilation objects in input deck
 
-	extern FArray1D_bool MyOneTimeErrorFlag;
-	extern FArray1D_bool MyOneTimeCheckUnitarySysFlag;
+	extern Array1D_bool MyOneTimeErrorFlag;
+	extern Array1D_bool MyOneTimeCheckUnitarySysFlag;
 	extern bool GetOASysInputFlag; // Flag set to make sure you get input once
 	extern bool GetOAMixerInputFlag; // Flag set to make sure you get input once
 	extern bool GetOAControllerInputFlag; // Flag set to make sure you get input once
@@ -133,8 +133,8 @@ namespace MixedAir {
 		// Members
 		std::string Name;
 		int NumControllers; // number of controllers on list
-		FArray1D_string ControllerType;
-		FArray1D_string ControllerName;
+		Array1D_string ControllerType;
+		Array1D_string ControllerName;
 
 		// Default Constructor
 		ControllerListProps() :
@@ -145,8 +145,8 @@ namespace MixedAir {
 		ControllerListProps(
 			std::string const & Name,
 			int const NumControllers, // number of controllers on list
-			FArray1_string const & ControllerType,
-			FArray1_string const & ControllerName
+			Array1_string const & ControllerType,
+			Array1_string const & ControllerName
 		) :
 			Name( Name ),
 			NumControllers( NumControllers ),
@@ -230,6 +230,8 @@ namespace MixedAir {
 		bool EMSOverrideOARate; // if true, EMS is calling to override OA rate
 		Real64 EMSOARateValue; // Value EMS is directing to use. [kg/s]
 		int HeatRecoveryBypassControlType; // User input selects type of heat recovery optimization
+		bool ManageDemand; // Used by demand manager to manage ventilation
+		Real64 DemandLimitFlowRate; //Current demand limit if demand manager is ON
 
 		// Default Constructor
 		OAControllerProps() :
@@ -287,7 +289,9 @@ namespace MixedAir {
 			MinOAFracLimit( 0.0 ),
 			EMSOverrideOARate( false ),
 			EMSOARateValue( 0.0 ),
-			HeatRecoveryBypassControlType( BypassWhenWithinEconomizerLimits )
+			HeatRecoveryBypassControlType( BypassWhenWithinEconomizerLimits ),
+			ManageDemand( false ),
+			DemandLimitFlowRate( 0.0 )
 		{}
 
 		// Member Constructor
@@ -352,7 +356,9 @@ namespace MixedAir {
 			Real64 const MinOAFracLimit, // Minimum OA fraction limit
 			bool const EMSOverrideOARate, // if true, EMS is calling to override OA rate
 			Real64 const EMSOARateValue, // Value EMS is directing to use. [kg/s]
-			int const HeatRecoveryBypassControlType // User input selects type of heat recovery optimization
+			int const HeatRecoveryBypassControlType, // User input selects type of heat recovery optimization
+			bool const ManageDemand,
+			Real64 DemandLimitFlowRate
 		) :
 			Name( Name ),
 			ControllerType( ControllerType ),
@@ -414,7 +420,9 @@ namespace MixedAir {
 			MinOAFracLimit( MinOAFracLimit ),
 			EMSOverrideOARate( EMSOverrideOARate ),
 			EMSOARateValue( EMSOARateValue ),
-			HeatRecoveryBypassControlType( HeatRecoveryBypassControlType )
+			HeatRecoveryBypassControlType( HeatRecoveryBypassControlType ),
+			ManageDemand( ManageDemand ),
+			DemandLimitFlowRate( DemandLimitFlowRate )
 		{}
 
 	};
@@ -433,14 +441,14 @@ namespace MixedAir {
 		Real64 TotZoneOAACH; // Total outdoor air flow rate for all zones Air Changes per hour (m3/s/m3)
 		int SystemOAMethod; // System Outdoor Air Method - SOAM_ZoneSum, SOAM_VRP
 		Real64 ZoneMaxOAFraction; // Zone maximum outdoor air fraction
-		FArray1D< Real64 > ZoneOAAreaRate; // Mechanical ventilation rate (m3/s/m2) for each zone
-		FArray1D< Real64 > ZoneOAPeopleRate; // Mechanical ventilation rate (m3/s/person) for each zone
-		FArray1D< Real64 > ZoneOAFlow; // OA Flow Rate (m3/s/zone) for each zone
-		FArray1D< Real64 > ZoneOAACH; // OA ACH (m3/s/volume) for each zone
-		FArray1D_int Zone; // Zones requiring mechanical ventilation
-		FArray1D_int ZoneDesignSpecOAObjIndex; // index of the design specification outdoor air object
+		Array1D< Real64 > ZoneOAAreaRate; // Mechanical ventilation rate (m3/s/m2) for each zone
+		Array1D< Real64 > ZoneOAPeopleRate; // Mechanical ventilation rate (m3/s/person) for each zone
+		Array1D< Real64 > ZoneOAFlow; // OA Flow Rate (m3/s/zone) for each zone
+		Array1D< Real64 > ZoneOAACH; // OA ACH (m3/s/volume) for each zone
+		Array1D_int Zone; // Zones requiring mechanical ventilation
+		Array1D_int ZoneDesignSpecOAObjIndex; // index of the design specification outdoor air object
 		// for each zone in zone list
-		FArray1D_string ZoneDesignSpecOAObjName; // name of the design specification outdoor air object
+		Array1D_string ZoneDesignSpecOAObjName; // name of the design specification outdoor air object
 		// for each zone in zone list
 		int CO2MaxMinLimitErrorCount; // Counter when max CO2 concentration < min CO2 concentration
 		// For SOAM_ProportionalControl
@@ -449,19 +457,19 @@ namespace MixedAir {
 		int CO2GainErrorCount; // Counter when CO2 generation from people is zero for SOAM_ProportionalControl
 		int CO2GainErrorIndex; // Index for recurring error message when CO2 generation from people is zero
 		// For SOAM_ProportionalControl
-		FArray1D< Real64 > ZoneADEffCooling; // Zone air distribution effectiveness in cooling mode
+		Array1D< Real64 > ZoneADEffCooling; // Zone air distribution effectiveness in cooling mode
 		// for each zone
-		FArray1D< Real64 > ZoneADEffHeating; // Zone air distribution effectiveness in heating mode
+		Array1D< Real64 > ZoneADEffHeating; // Zone air distribution effectiveness in heating mode
 		// for each zone
-		FArray1D_int ZoneADEffSchPtr; // Pointer to the zone air distribution effectiveness schedule
+		Array1D_int ZoneADEffSchPtr; // Pointer to the zone air distribution effectiveness schedule
 		// for each zone
-		FArray1D_string ZoneADEffSchName; // Zone air distribution effectiveness schedule name
+		Array1D_string ZoneADEffSchName; // Zone air distribution effectiveness schedule name
 		// for each zone
-		FArray1D_int ZoneDesignSpecADObjIndex; // index of the design specification zone air
+		Array1D_int ZoneDesignSpecADObjIndex; // index of the design specification zone air
 		//  distribution object for each zone in the zone list
-		FArray1D_string ZoneDesignSpecADObjName; // name of the design specification zone air
+		Array1D_string ZoneDesignSpecADObjName; // name of the design specification zone air
 		// distribution object for each zone in the zone list
-		FArray1D< Real64 > ZoneSecondaryRecirculation; // zone air secondary recirculation ratio
+		Array1D< Real64 > ZoneSecondaryRecirculation; // zone air secondary recirculation ratio
 
 		// Default Constructor
 		VentilationMechanicalProps() :
@@ -493,24 +501,24 @@ namespace MixedAir {
 			Real64 const TotZoneOAACH, // Total outdoor air flow rate for all zones Air Changes per hour (m3/s/m3)
 			int const SystemOAMethod, // System Outdoor Air Method - SOAM_ZoneSum, SOAM_VRP
 			Real64 const ZoneMaxOAFraction, // Zone maximum outdoor air fraction
-			FArray1< Real64 > const & ZoneOAAreaRate, // Mechanical ventilation rate (m3/s/m2) for each zone
-			FArray1< Real64 > const & ZoneOAPeopleRate, // Mechanical ventilation rate (m3/s/person) for each zone
-			FArray1< Real64 > const & ZoneOAFlow, // OA Flow Rate (m3/s/zone) for each zone
-			FArray1< Real64 > const & ZoneOAACH, // OA ACH (m3/s/volume) for each zone
-			FArray1_int const & Zone, // Zones requiring mechanical ventilation
-			FArray1_int const & ZoneDesignSpecOAObjIndex, // index of the design specification outdoor air object
-			FArray1_string const & ZoneDesignSpecOAObjName, // name of the design specification outdoor air object
+			Array1< Real64 > const & ZoneOAAreaRate, // Mechanical ventilation rate (m3/s/m2) for each zone
+			Array1< Real64 > const & ZoneOAPeopleRate, // Mechanical ventilation rate (m3/s/person) for each zone
+			Array1< Real64 > const & ZoneOAFlow, // OA Flow Rate (m3/s/zone) for each zone
+			Array1< Real64 > const & ZoneOAACH, // OA ACH (m3/s/volume) for each zone
+			Array1_int const & Zone, // Zones requiring mechanical ventilation
+			Array1_int const & ZoneDesignSpecOAObjIndex, // index of the design specification outdoor air object
+			Array1_string const & ZoneDesignSpecOAObjName, // name of the design specification outdoor air object
 			int const CO2MaxMinLimitErrorCount, // Counter when max CO2 concentration < min CO2 concentration
 			int const CO2MaxMinLimitErrorIndex, // Index for max CO2 concentration < min CO2 concentration recurring error message
 			int const CO2GainErrorCount, // Counter when CO2 generation from people is zero for SOAM_ProportionalControl
 			int const CO2GainErrorIndex, // Index for recurring error message when CO2 generation from people is zero
-			FArray1< Real64 > const & ZoneADEffCooling, // Zone air distribution effectiveness in cooling mode
-			FArray1< Real64 > const & ZoneADEffHeating, // Zone air distribution effectiveness in heating mode
-			FArray1_int const & ZoneADEffSchPtr, // Pointer to the zone air distribution effectiveness schedule
-			FArray1_string const & ZoneADEffSchName, // Zone air distribution effectiveness schedule name
-			FArray1_int const & ZoneDesignSpecADObjIndex, // index of the design specification zone air
-			FArray1_string const & ZoneDesignSpecADObjName, // name of the design specification zone air
-			FArray1< Real64 > const & ZoneSecondaryRecirculation // zone air secondary recirculation ratio
+			Array1< Real64 > const & ZoneADEffCooling, // Zone air distribution effectiveness in cooling mode
+			Array1< Real64 > const & ZoneADEffHeating, // Zone air distribution effectiveness in heating mode
+			Array1_int const & ZoneADEffSchPtr, // Pointer to the zone air distribution effectiveness schedule
+			Array1_string const & ZoneADEffSchName, // Zone air distribution effectiveness schedule name
+			Array1_int const & ZoneDesignSpecADObjIndex, // index of the design specification zone air
+			Array1_string const & ZoneDesignSpecADObjName, // name of the design specification zone air
+			Array1< Real64 > const & ZoneSecondaryRecirculation // zone air secondary recirculation ratio
 		) :
 			Name( Name ),
 			SchName( SchName ),
@@ -664,12 +672,27 @@ namespace MixedAir {
 	};
 
 	// Object Data
-	extern FArray1D< ControllerListProps > ControllerLists;
-	extern FArray1D< OAControllerProps > OAController;
-	extern FArray1D< OAMixerProps > OAMixer;
-	extern FArray1D< VentilationMechanicalProps > VentilationMechanical;
+	extern Array1D< ControllerListProps > ControllerLists;
+	extern Array1D< OAControllerProps > OAController;
+	extern Array1D< OAMixerProps > OAMixer;
+	extern Array1D< VentilationMechanicalProps > VentilationMechanical;
 
 	// Functions
+
+	Real64 OAGetFlowRate(int OAPtr);
+
+	Real64 OAGetMinFlowRate(int OAPtr);
+
+	void OASetDemandManagerVentilationState(int OAPtr, bool aState);
+
+	void OASetDemandManagerVentilationFlow(int OAPtr, Real64 aFlow);
+
+	int GetOAController(std::string const & OAName);
+
+	// Clears the global data in MixedAir.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 	void
 	ManageOutsideAirSystem(
@@ -732,18 +755,18 @@ namespace MixedAir {
 	ProcessOAControllerInputs(
 		std::string const & CurrentModuleObject,
 		int const OutAirNum,
-		FArray1_string const & AlphArray,
+		Array1_string const & AlphArray,
 		int & NumAlphas,
-		FArray1< Real64 > const & NumArray,
+		Array1< Real64 > const & NumArray,
 		int & NumNums,
-		FArray1_bool const & lNumericBlanks, //Unused
-		FArray1_bool const & lAlphaBlanks,
-		FArray1_string const & cAlphaFields,
-		FArray1_string const & cNumericFields, //Unused
+		Array1_bool const & lNumericBlanks, //Unused
+		Array1_bool const & lAlphaBlanks,
+		Array1_string const & cAlphaFields,
+		Array1_string const & cNumericFields, //Unused
 		bool & ErrorsFound // If errors found in input
 	);
 
-		// End of Get Input subroutines for the Module
+	// End of Get Input subroutines for the Module
 	//******************************************************************************
 
 	// Beginning Initialization Section of the Module
@@ -819,10 +842,10 @@ namespace MixedAir {
 	Real64
 	MixedAirControlTempResidual(
 		Real64 const OASignal, // Relative outside air flow rate (0 to 1)
-		FArray1< Real64 > const & Par // par(1) = mixed node number
+		Array1< Real64 > const & Par // par(1) = mixed node number
 	);
 
-	FArray1D_int
+	Array1D_int
 	GetOAMixerNodeNumbers(
 		std::string const & OAMixerName, // must match OA mixer names for the OA mixer type
 		bool & ErrorsFound // set to true if problem
@@ -952,7 +975,7 @@ namespace MixedAir {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

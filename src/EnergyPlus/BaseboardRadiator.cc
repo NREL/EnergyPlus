@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -83,15 +83,15 @@ namespace BaseboardRadiator {
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumBaseboards( 0 );
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
-	FArray1D_bool SetLoopIndexFlag; // get loop number flag
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
+	Array1D_bool SetLoopIndexFlag; // get loop number flag
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
 	// Object Data
-	FArray1D< BaseboardParams > Baseboard;
-	FArray1D< BaseboardParamsNumericFieldData > BaseboardParamsNumericFields;
+	Array1D< BaseboardParams > Baseboard;
+	Array1D< BaseboardParamsNumericFieldData > BaseboardParamsNumericFields;
 
 	// Functions
 
@@ -128,17 +128,6 @@ namespace BaseboardRadiator {
 		using General::TrimSigDigits;
 		using PlantUtilities::SetActuatedBranchFlowRate;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIter( 30 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int BaseboardNum; // index of unit in baseboard array
@@ -155,7 +144,7 @@ namespace BaseboardRadiator {
 
 		// Find the correct Baseboard Equipment
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( EquipName, Baseboard.EquipID(), NumBaseboards );
+			BaseboardNum = FindItemInList( EquipName, Baseboard, &BaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "SimBaseboard: Unit not found=" + EquipName );
 			}
@@ -300,7 +289,7 @@ namespace BaseboardRadiator {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Baseboard.EquipID(), BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), Baseboard, &BaseboardParams::EquipID, BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					continue;
@@ -474,7 +463,7 @@ namespace BaseboardRadiator {
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		Real64 RhoAirStdInit;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
@@ -608,11 +597,10 @@ namespace BaseboardRadiator {
 		Real64 UA0; // lower bound for UA
 		Real64 UA1; // upper bound for UA
 		Real64 UA;
-		FArray1D< Real64 > Par( 2 );
+		Array1D< Real64 > Par( 2 );
 		bool ErrorsFound; // If errors detected in input
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
-		Real64 tmpWaterVolFlowRateMax; // local design plant fluid flow rate
 		bool FlowAutoSize; // Indicator to autosizing water volume flow
 		bool UAAutoSize; // Indicator to autosizing UA
 		Real64 WaterVolFlowRateMaxDes; // Design water volume flow for reproting
@@ -1107,7 +1095,7 @@ namespace BaseboardRadiator {
 	Real64
 	HWBaseboardUAResidual(
 		Real64 const UA, // UA of coil
-		FArray1< Real64 > const & Par // par(1) = design coil load [W]
+		Array1< Real64 > const & Par // par(1) = design coil load [W]
 	)
 	{
 
@@ -1163,11 +1151,11 @@ namespace BaseboardRadiator {
 	UpdateBaseboardPlantConnection(
 		int const BaseboardTypeNum, // type index
 		std::string const & BaseboardName, // component name
-		int const EquipFlowCtrl, // Flow control mode for the equipment
-		int const LoopNum, // Plant loop index for where called from
-		int const LoopSide, // Plant loop side index for where called from
+		int const EP_UNUSED( EquipFlowCtrl ), // Flow control mode for the equipment
+		int const EP_UNUSED( LoopNum ), // Plant loop index for where called from
+		int const EP_UNUSED( LoopSide ), // Plant loop side index for where called from
 		int & CompIndex, // Chiller number pointer
-		bool const FirstHVACIteration,
+		bool const EP_UNUSED( FirstHVACIteration ),
 		bool & InitLoopEquip // If not zero, calculate the max load for operating conditions
 	)
 	{
@@ -1214,12 +1202,10 @@ namespace BaseboardRadiator {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int BaseboardNum;
-		int InletNodeNum;
-		int OutletNodeNum;
 
 		// Find the correct baseboard
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( BaseboardName, Baseboard.EquipID(), NumBaseboards );
+			BaseboardNum = FindItemInList( BaseboardName, Baseboard, &BaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "UpdateBaseboardPlantConnection: Invalid Unit Specified " + cCMO_BBRadiator_Water + "=\"" + BaseboardName + "\"" );
 			}
@@ -1259,24 +1245,26 @@ namespace BaseboardRadiator {
 //******************************************************************************************************
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-//     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-//     and The Regents of the University of California through Ernest Orlando Lawrence
-//     Berkeley National Laboratory.  All rights reserved.
-//     Portions of the EnergyPlus software package have been developed and copyrighted
-//     by other individuals, companies and institutions.  These portions have been
-//     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in main.cc.
-//     NOTICE: The U.S. Government is granted for itself and others acting on its
-//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-//     reproduce, prepare derivative works, and perform publicly and display publicly.
-//     Beginning five (5) years after permission to assert copyright is granted,
-//     subject to two possible five year renewals, the U.S. Government is granted for
-//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-//     worldwide license in this data to reproduce, prepare derivative works,
-//     distribute copies to the public, perform publicly and display publicly, and to
-//     permit others to do so.
-//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	//     NOTICE
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
+	//     and The Regents of the University of California through Ernest Orlando Lawrence
+	//     Berkeley National Laboratory.  All rights reserved.
+
+	//     Portions of the EnergyPlus software package have been developed and copyrighted
+	//     by other individuals, companies and institutions.  These portions have been
+	//     incorporated into the EnergyPlus software package under license.   For a complete
+	//     list of contributors, see "Notice" located in main.cc.
+
+	//     NOTICE: The U.S. Government is granted for itself and others acting on its
+	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
+	//     reproduce, prepare derivative works, and perform publicly and display publicly.
+	//     Beginning five (5) years after permission to assert copyright is granted,
+	//     subject to two possible five year renewals, the U.S. Government is granted for
+	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
+	//     worldwide license in this data to reproduce, prepare derivative works,
+	//     distribute copies to the public, perform publicly and display publicly, and to
+	//     permit others to do so.
+	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

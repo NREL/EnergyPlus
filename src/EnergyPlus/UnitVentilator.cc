@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -124,16 +124,16 @@ namespace UnitVentilator {
 	int NumOfUnitVents( 0 ); // Number of unit ventilators in the input file
 	Real64 OAMassFlowRate( 0.0 ); // Outside air mass flow rate for the unit ventilator
 	Real64 QZnReq( 0.0 ); // heating or cooling needed by zone [watts]
-	FArray1D_bool MySizeFlag;
+	Array1D_bool MySizeFlag;
 	bool GetUnitVentilatorInputFlag( true ); // First time, input is "gotten"
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE UnitVentilator
 	//PRIVATE UpdateUnitVentilator
 
 	// Object Data
-	FArray1D< UnitVentilatorData > UnitVent;
-	FArray1D< UnitVentNumericFieldData > UnitVentNumericFields;
+	Array1D< UnitVentilatorData > UnitVent;
+	Array1D< UnitVentNumericFieldData > UnitVentNumericFields;
 
 	// Functions
 
@@ -191,7 +191,7 @@ namespace UnitVentilator {
 
 		// Find the correct Unit Ventilator Equipment
 		if ( CompIndex == 0 ) {
-			UnitVentNum = FindItemInList( CompName, UnitVent.Name(), NumOfUnitVents );
+			UnitVentNum = FindItemInList( CompName, UnitVent );
 			if ( UnitVentNum == 0 ) {
 				ShowFatalError( "SimUnitVentilator: Unit not found=" + CompName );
 			}
@@ -270,13 +270,10 @@ namespace UnitVentilator {
 		using DataHVACGlobals::FanType_SimpleConstVolume;
 		using DataHVACGlobals::FanType_SimpleVAV;
 		using DataHVACGlobals::FanType_SimpleOnOff;
-		using DataHVACGlobals::ZoneComp;
 
 		using DataSizing::AutoSize;
 		using DataSizing::ZoneHVACSizing;
-		using DataSizing::NumZoneHVACSizing;
 		using General::TrimSigDigits;
-		using DataZoneEquipment::UnitVentilator_Num;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataGlobals::NumOfZones;
 		using DataGlobals::ScheduleAlwaysOn;
@@ -314,12 +311,12 @@ namespace UnitVentilator {
 		int FanIndex; // index to fan used for flow checks
 		Real64 FanVolFlow; // volumetric flow rate of fan
 		std::string CurrentModuleObject;
-		FArray1D_string Alphas; // Alpha items for object
-		FArray1D< Real64 > Numbers; // Numeric items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha items for object
+		Array1D< Real64 > Numbers; // Numeric items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		int CtrlZone; // index to loop counter
 		int NodeNum; // index to loop counter
 		bool ZoneNodeNotFound; // used in error checking
@@ -357,7 +354,7 @@ namespace UnitVentilator {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), UnitVent.Name(), UnitVentNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), UnitVent, UnitVentNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -545,7 +542,7 @@ namespace UnitVentilator {
 
 			UnitVent( UnitVentNum ).HVACSizingIndex = 0;
 			if (!lAlphaBlanks( 20 )) {
-				UnitVent( UnitVentNum ).HVACSizingIndex = FindItemInList( Alphas( 20 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
+				UnitVent( UnitVentNum ).HVACSizingIndex = FindItemInList( Alphas( 20 ), ZoneHVACSizing );
 				if (UnitVent( UnitVentNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 20 ) + " = " + Alphas( 20 ) + " not found.");
 					ShowContinueError( "Occurs in " + cMO_UnitVentilator + " = " + UnitVent(UnitVentNum).Name );
@@ -895,7 +892,6 @@ namespace UnitVentilator {
 		// na
 
 		// Using/Aliasing
-		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::StdRhoAir;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
@@ -933,9 +929,9 @@ namespace UnitVentilator {
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		int HotConNode; // hot water control node number in unit ventilator loop
 		int InNode; // inlet node number in unit ventilator loop
 		int OutNode; // outlet node number in unit ventilator loop
@@ -1224,12 +1220,6 @@ namespace UnitVentilator {
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
 		int PltSizCoolNum; // index of plant sizing object for 1st cooling loop
 		bool ErrorsFound;
-		Real64 CoilInTemp;
-		Real64 CoilOutTemp;
-		Real64 CoilOutHumRat;
-		Real64 CoilInHumRat;
-		Real64 CoilInEnthalpy;
-		Real64 CoilOutEnthalpy;
 		Real64 DesCoolingLoad;
 		Real64 DesHeatingLoad;
 		Real64 TempSteamIn;
@@ -1264,7 +1254,6 @@ namespace UnitVentilator {
 		std::string CompName; // component name
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
-		bool bPRINT = true; // TRUE if sizing is reported to output (eio)
 		Real64 TempSize; // autosized value of coil input field
 		int FieldNum = 2; // IDD numeric field number where input field description is found
 		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
@@ -2030,7 +2019,7 @@ namespace UnitVentilator {
 		Real64 SpecHumOut; // Specific humidity ratio of outlet air (kg moisture / kg moist air)
 		Real64 SpecHumIn; // Specific humidity ratio of inlet air (kg moisture / kg moist air)
 		Real64 mdot;
-		FArray1D< Real64 > Par( 3 ); // parameters passed to RegulaFalsi function
+		Array1D< Real64 > Par( 3 ); // parameters passed to RegulaFalsi function
 		int OpMode; // operatin gmode of the fan
 		Real64 PartLoadFrac; // part load ratio of the unit ventilator
 		Real64 NoOutput; // no load output of the unit ventilator
@@ -2709,7 +2698,7 @@ namespace UnitVentilator {
 
 					if ( QCoilReq < 0.0 ) QCoilReq = 0.0; // a heating coil can only heat, not cool
 
-					SimulateSteamCoilComponents(  UnitVent( UnitVentNum ).HCoilName, FirstHVACIteration, UnitVent( UnitVentNum ).HCoil_Index, QCoilReq );
+					SimulateSteamCoilComponents( UnitVent( UnitVentNum ).HCoilName, FirstHVACIteration, UnitVent( UnitVentNum ).HCoil_Index, QCoilReq );
 
 				} else if ( ( SELECT_CASE_var == Heating_ElectricCoilType ) || ( SELECT_CASE_var == Heating_GasCoilType ) ) {
 
@@ -3192,7 +3181,7 @@ namespace UnitVentilator {
 	Real64
 	CalcUnitVentilatorResidual(
 		Real64 const PartLoadRatio, // Coil Part Load Ratio
-		FArray1< Real64 > const & Par // Function parameters
+		Array1< Real64 > const & Par // Function parameters
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -3248,7 +3237,7 @@ namespace UnitVentilator {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

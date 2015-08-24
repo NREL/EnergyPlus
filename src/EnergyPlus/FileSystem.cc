@@ -33,7 +33,7 @@ using namespace DataStringGlobals;
 #ifdef _WIN32
 std::string const exeExtension(".exe");
 #else
-std::string const exeExtension("");
+std::string const exeExtension;
 #endif
 
 void
@@ -49,7 +49,7 @@ getFileName( std::string const& filePath )
 	return filePath.substr(pathCharPosition + 1, filePath.size() - 1);
 }
 
-std::string 
+std::string
 getParentDirectoryPath( std::string const& path )
 {
 	std::string tempPath = path;
@@ -95,8 +95,7 @@ getAbsolutePath( std::string const& path )
 	    else
 	    	return absoluteParentPath + pathChar + pathTail;
 
-	}
-	else {
+	} else {
 		DisplayString("ERROR: Could not resolve path for " + path + ".");
 		exit(EXIT_FAILURE);
 	}
@@ -115,13 +114,10 @@ getProgramPath()
 	_NSGetExecutablePath(executableRelativePath, &pathSize);
 #elif __linux__
   ssize_t len = readlink("/proc/self/exe", executableRelativePath, sizeof(executableRelativePath)-1);
-  if (len == -1)
-  {
+  if ( len == -1 ) {
     DisplayString("ERROR: Unable to locate executable.");
     exit(EXIT_FAILURE);
-  }
-  else
-  {
+  } else {
     executableRelativePath[len] = '\0';
   }
 #elif _WIN32
@@ -132,13 +128,15 @@ getProgramPath()
 }
 
 std::string
-getFileExtension(std::string const &fileName){
+getFileExtension(std::string const &fileName)
+{
 	int extensionPosition = fileName.find_last_of(".");
 	return fileName.substr(extensionPosition + 1, fileName.size() - 1);
 }
 
 std::string
-removeFileExtension(std::string const &fileName){
+removeFileExtension(std::string const &fileName)
+{
 	int extensionPosition = fileName.find_last_of(".");
 	return fileName.substr(0, extensionPosition);
 }
@@ -147,17 +145,14 @@ void
 makeDirectory(std::string const &directoryPath)
 {
 	// Create a directory if doesn't already exist
-	if ( pathExists(directoryPath) ){ // path already exists
-		if ( !(directoryExists(directoryPath)) )
-		{
+	if ( pathExists(directoryPath) ) { // path already exists
+		if ( !directoryExists(directoryPath) ) {
 			DisplayString("ERROR: " + getAbsolutePath(directoryPath) + " is not a directory.");
 			exit(EXIT_FAILURE);
 		}
-	}
-	else { // directory does not already exist
+	} else { // directory does not already exist
 		std::string parentDirectoryPath = getParentDirectoryPath(directoryPath);
-		if (!pathExists(parentDirectoryPath))
-		{
+		if ( !pathExists(parentDirectoryPath) ) {
 			DisplayString("ERROR: " + getAbsolutePath(parentDirectoryPath) + " is not a directory.");
 			exit(EXIT_FAILURE);
 		}
@@ -190,10 +185,9 @@ directoryExists(std::string const &directoryPath)
 		return false;
 #else
 	struct stat info;
-	if ( stat(directoryPath.c_str(), &info) == 0){
+	if ( stat(directoryPath.c_str(), &info) == 0) {
 		return (info.st_mode & S_IFDIR);
-	}
-	else
+	} else
 		return false;
 #endif
 }
@@ -208,16 +202,16 @@ fileExists(std::string const &filePath)
 		return false;
 #else
 	struct stat info;
-	if ( stat(filePath.c_str(), &info) == 0){
+	if ( stat(filePath.c_str(), &info) == 0) {
 		return !(info.st_mode & S_IFDIR);
-	}
-	else
+	} else
 		return false;
 #endif
 }
 
 void
-moveFile(std::string const &filePath, std::string const &destination){
+moveFile(std::string const &filePath, std::string const &destination)
+{
 	rename(filePath.c_str(), destination.c_str());
 }
 
@@ -239,7 +233,9 @@ linkFile(std::string const &fileName, std::string const &link)
 #ifdef _WIN32
 	CopyFile(fileName.c_str(), link.c_str(), false);
 #else
-	int status = symlink(fileName.c_str(), link.c_str());
+	int returnValue = symlink(fileName.c_str(), link.c_str()); // ignore the return value
+	// we want to ignore the return value without muting all warnings, so...
+	(void)( returnValue + 1 ); // outsmart the compiler :-/
 #endif
 }
 

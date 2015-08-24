@@ -2,8 +2,8 @@
 #include <cassert>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -225,9 +225,7 @@ namespace WaterManager {
 		using InputProcessor::GetObjectDefMaxArgs;
 		using InputProcessor::VerifyName;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using DataHeatBalance::Zone;
-		using DataGlobals::NumOfZones;
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::CheckScheduleValueMinMax;
 		using ScheduleManager::GetScheduleMinValue;
@@ -263,12 +261,12 @@ namespace WaterManager {
 		static int alphaOffset( 0 );
 		static int SurfNum( 0 );
 		static std::string objNameMsg;
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
-		FArray1D_bool lNumericFieldBlanks;
-		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_string cAlphaArgs;
-		FArray1D< Real64 > rNumericArgs;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
+		Array1D_bool lNumericFieldBlanks;
+		Array1D_bool lAlphaFieldBlanks;
+		Array1D_string cAlphaArgs;
+		Array1D< Real64 > rNumericArgs;
 		std::string cCurrentModuleObject;
 		static Real64 tmpMax( 0.0 );
 		static Real64 tmpMin( 0.0 );
@@ -320,7 +318,7 @@ namespace WaterManager {
 					GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					AnyWaterSystemsInModel = true;
 					WaterStorage( Item ).Name = cAlphaArgs( 1 );
-					VerifyName( cAlphaArgs( 1 ), WaterStorage.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+					VerifyName( cAlphaArgs( 1 ), WaterStorage, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -452,7 +450,7 @@ namespace WaterManager {
 							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 							ErrorsFound = true;
 						}
-						WaterStorage( Item ).ZoneID = FindItemInList( cAlphaArgs( 10 ), Zone.Name(), NumOfZones );
+						WaterStorage( Item ).ZoneID = FindItemInList( cAlphaArgs( 10 ), Zone );
 						if ( ( WaterStorage( Item ).ZoneID == 0 ) && ( WaterStorage( Item ).AmbientTempIndicator == AmbientTempZone ) ) {
 							ShowSevereError( "Invalid " + cAlphaFieldNames( 10 ) + '=' + cAlphaArgs( 10 ) );
 							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -476,7 +474,7 @@ namespace WaterManager {
 				for ( Item = 1; Item <= NumRainCollectors; ++Item ) {
 					GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					RainCollector( Item ).Name = cAlphaArgs( 1 );
-					VerifyName( cAlphaArgs( 1 ), RainCollector.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Named " );
+					VerifyName( cAlphaArgs( 1 ), RainCollector, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Named " );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -484,7 +482,7 @@ namespace WaterManager {
 					objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs( 1 );
 
 					RainCollector( Item ).StorageTankName = cAlphaArgs( 2 );
-					RainCollector( Item ).StorageTankID = FindItemInList( cAlphaArgs( 2 ), WaterStorage.Name(), NumWaterStorageTanks );
+					RainCollector( Item ).StorageTankID = FindItemInList( cAlphaArgs( 2 ), WaterStorage );
 					if ( RainCollector( Item ).StorageTankID == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -543,7 +541,7 @@ namespace WaterManager {
 					RainCollector( Item ).SurfID.allocate( RainCollector( Item ).NumCollectSurfs );
 					for ( SurfNum = 1; SurfNum <= RainCollector( Item ).NumCollectSurfs; ++SurfNum ) {
 						RainCollector( Item ).SurfName( SurfNum ) = cAlphaArgs( SurfNum + alphaOffset );
-						RainCollector( Item ).SurfID( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + alphaOffset ), Surface.Name(), TotSurfaces );
+						RainCollector( Item ).SurfID( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + alphaOffset ), Surface );
 						if ( RainCollector( Item ).SurfID( SurfNum ) == 0 ) {
 							ShowSevereError( "Invalid " + cAlphaFieldNames( SurfNum + alphaOffset ) + '=' + cAlphaArgs( SurfNum + alphaOffset ) );
 							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -578,7 +576,7 @@ namespace WaterManager {
 				for ( Item = 1; Item <= NumGroundWaterWells; ++Item ) {
 					GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GroundwaterWell( Item ).Name = cAlphaArgs( 1 );
-					VerifyName( cAlphaArgs( 1 ), GroundwaterWell.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+					VerifyName( cAlphaArgs( 1 ), GroundwaterWell, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -636,7 +634,7 @@ namespace WaterManager {
 
 					// setup tanks whose level is controlled by supply from another tank
 					if ( ( WaterStorage( Item ).ControlSupplyType == OtherTankFloatValve ) || ( WaterStorage( Item ).ControlSupplyType == TankMainsBackup ) ) {
-						WaterStorage( Item ).SupplyTankID = FindItemInList( WaterStorage( Item ).SupplyTankName, WaterStorage.Name(), NumWaterStorageTanks );
+						WaterStorage( Item ).SupplyTankID = FindItemInList( WaterStorage( Item ).SupplyTankName, WaterStorage );
 						if ( WaterStorage( Item ).SupplyTankID == 0 ) {
 							ShowSevereError( "Other tank called " + WaterStorage( Item ).SupplyTankName + " not found for " + cCurrentModuleObject + " Named " + WaterStorage( Item ).Name ); // TODO rename point
 							ErrorsFound = true;
@@ -646,7 +644,7 @@ namespace WaterManager {
 						InternalSetupTankSupplyComponent( WaterStorage( Item ).SupplyTankName, cCurrentModuleObject, WaterStorage( Item ).Name, ErrorsFound, Dummy, Dummy );
 					}
 					// setup overflow inputs
-					WaterStorage( Item ).OverflowTankID = FindItemInList( WaterStorage( Item ).OverflowTankName, WaterStorage.Name(), NumWaterStorageTanks );
+					WaterStorage( Item ).OverflowTankID = FindItemInList( WaterStorage( Item ).OverflowTankName, WaterStorage );
 					if ( WaterStorage( Item ).OverflowTankID == 0 ) {
 						// if blank, then okay it is discarded.  but if not blank then error
 						if ( is_blank( WaterStorage( Item ).OverflowTankName ) ) {
@@ -1254,11 +1252,11 @@ namespace WaterManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int oldNumSupply;
-		FArray1D_string oldSupplyCompNames;
-		FArray1D_string oldSupplyCompTypes;
+		Array1D_string oldSupplyCompNames;
+		Array1D_string oldSupplyCompTypes;
 		//  LOGICAL , SAVE    :: MyOneTimeFlag = .TRUE.
 
-		TankIndex = FindItemInList( TankName, WaterStorage.Name(), NumWaterStorageTanks );
+		TankIndex = FindItemInList( TankName, WaterStorage );
 		if ( TankIndex == 0 ) {
 			ShowSevereError( "WaterUse:Storage (Water Storage Tank) =\"" + TankName + "\" not found in " + CompType + " called " + CompName );
 			ErrorsFound = true;
@@ -1411,11 +1409,11 @@ namespace WaterManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int oldNumDemand;
-		FArray1D_string oldDemandCompNames;
-		FArray1D_string oldDemandCompTypes;
+		Array1D_string oldDemandCompNames;
+		Array1D_string oldDemandCompTypes;
 		//  LOGICAL , SAVE    :: MyOneTimeFlag = .TRUE.
 
-		TankIndex = FindItemInList( TankName, WaterStorage.Name(), NumWaterStorageTanks );
+		TankIndex = FindItemInList( TankName, WaterStorage );
 		if ( TankIndex == 0 ) {
 			ShowSevereError( "WaterUse:Storage (Water Storage Tank) =\"" + TankName + "\" not found in " + CompType + " called " + CompName );
 			ErrorsFound = true;
@@ -1656,7 +1654,6 @@ namespace WaterManager {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::InitConvTemp;
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::KickOffSimulation;
 		using DataGlobals::DoingSizing;
@@ -1800,7 +1797,7 @@ namespace WaterManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -2,7 +2,7 @@
 #define DataGlobalConstants_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -187,7 +187,7 @@ namespace DataGlobalConstants {
 	extern int const iRT_OtherFuel2;
 	extern int const NumOfResourceTypes;
 	extern int const ResourceTypeInitialOffset; // to reach "ValidTypes"
-	extern FArray1D_string const cRT_ValidTypes;
+	extern Array1D_string const cRT_ValidTypes;
 
 	extern int const iGeneratorICEngine;
 	extern int const iGeneratorCombTurbine;
@@ -221,7 +221,7 @@ namespace DataGlobalConstants {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

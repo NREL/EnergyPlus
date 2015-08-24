@@ -78,12 +78,12 @@ namespace DataWater {
 	// Object Data
 	SiteRainFallDataStruct RainFall; // type of rainfall modeling | design annual rain | rain sched id | nominal annual rain | current rate | current amount
 	IrrigationDataStruct Irrigation; // type of irrigation modeling | Irrigation schedule id | scheduled amount | actual amount | irrigation threshold
-	FArray1D< StorageTankDataStruct > WaterStorage;
-	FArray1D< RainfallCollectorDataStruct > RainCollector;
-	FArray1D< GroundwaterWellDataStruct > GroundwaterWell;
+	Array1D< StorageTankDataStruct > WaterStorage;
+	Array1D< RainfallCollectorDataStruct > RainCollector;
+	Array1D< GroundwaterWellDataStruct > GroundwaterWell;
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

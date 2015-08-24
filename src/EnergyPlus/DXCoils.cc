@@ -4,7 +4,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -18,15 +18,18 @@
 #include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
+#include <DataHeatBalFanSys.hh>
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <DataWater.hh>
+#include <DataZoneEquipment.hh>
 #include <EMSManager.hh>
 #include <Fans.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
+#include <HeatBalanceInternalHeatGains.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -140,7 +143,7 @@ namespace DXCoils {
 	int const WaterSupplyFromTank( 102 );
 
 	int const NumValidOutputFuelTypes( 9 );
-	FArray1D_string const cValidOutputFuelTypes( NumValidOutputFuelTypes, { "Electricity", "Gas", "Propane", "Diesel", "Gasoline", "FuelOil#1", "FuelOil#2", "OtherFuel1", "OtherFuel2" } );
+	Array1D_string const cValidOutputFuelTypes( NumValidOutputFuelTypes, { "Electricity", "Gas", "Propane", "Diesel", "Gasoline", "FuelOil#1", "FuelOil#2", "OtherFuel1", "OtherFuel2" } );
 
 	static std::string const BlankString;
 
@@ -158,17 +161,17 @@ namespace DXCoils {
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D< Real64 > DXCoilOutletTemp; // DX coil outlet dry bulb temperature [C]
-	FArray1D< Real64 > DXCoilOutletHumRat; // DX coil outlet humidity ratio [kgWater/kgDryAir]
-	FArray1D< Real64 > DXCoilPartLoadRatio; // DX coil part-load ratio
-	FArray1D_int DXCoilFanOpMode; // supply air fan operating mode
-	FArray1D< Real64 > DXCoilFullLoadOutAirTemp; // DX coil full load outlet dry bulb temperature [C]
-	FArray1D< Real64 > DXCoilFullLoadOutAirHumRat; // DX coil full load outlet humidity ratio [kgWater/kgDryAir]
-	FArray1D< Real64 > DXCoilTotalCooling; // DX cooling coil total cooling output [W]
-	FArray1D< Real64 > DXCoilTotalHeating; // DX heating coil total heating output [W]
-	FArray1D< Real64 > DXCoilCoolInletAirWBTemp; // DX cooling coil inlet air wet-bulb temp [C]
-	FArray1D< Real64 > DXCoilHeatInletAirDBTemp; // DX heating coil inlet air dry-bulb temp [C]
-	FArray1D< Real64 > DXCoilHeatInletAirWBTemp; // DX heating coil inlet air wet-bulb temp [C]
+	Array1D< Real64 > DXCoilOutletTemp; // DX coil outlet dry bulb temperature [C]
+	Array1D< Real64 > DXCoilOutletHumRat; // DX coil outlet humidity ratio [kgWater/kgDryAir]
+	Array1D< Real64 > DXCoilPartLoadRatio; // DX coil part-load ratio
+	Array1D_int DXCoilFanOpMode; // supply air fan operating mode
+	Array1D< Real64 > DXCoilFullLoadOutAirTemp; // DX coil full load outlet dry bulb temperature [C]
+	Array1D< Real64 > DXCoilFullLoadOutAirHumRat; // DX coil full load outlet humidity ratio [kgWater/kgDryAir]
+	Array1D< Real64 > DXCoilTotalCooling; // DX cooling coil total cooling output [W]
+	Array1D< Real64 > DXCoilTotalHeating; // DX heating coil total heating output [W]
+	Array1D< Real64 > DXCoilCoolInletAirWBTemp; // DX cooling coil inlet air wet-bulb temp [C]
+	Array1D< Real64 > DXCoilHeatInletAirDBTemp; // DX heating coil inlet air dry-bulb temp [C]
+	Array1D< Real64 > DXCoilHeatInletAirWBTemp; // DX heating coil inlet air wet-bulb temp [C]
 	int CurDXCoilNum( 0 );
 
 	int NumDXCoils( 0 ); // Total number of DX coils
@@ -179,13 +182,14 @@ namespace DXCoils {
 	int NumVRFCoolingCoils( 0 ); // number of VRF heat pump cooling coils
 	int NumDXHeatingCoils( 0 ); // number of DX heat pump heating coils
 	int NumDoe2DXCoils( 0 ); // number of doe2 DX  coils
-	int NumDXHeatPumpWaterHeaterCoils( 0 ); // number of DX  water heater coils
+	int NumDXHeatPumpWaterHeaterPumpedCoils( 0 ); // number of DX  water heater coils, pumped
+	int NumDXHeatPumpWaterHeaterWrappedCoils( 0 ); // number of DX  water heater coils, pumped
 	int NumDXMulSpeedCoils( 0 ); // number of DX coils with multi-speed compressor
 	int NumDXMulModeCoils( 0 ); // number of DX coils with multi-mode performance
 
 	int NumDXMulSpeedCoolCoils( 0 ); // number of multispeed DX cooling coils
 	int NumDXMulSpeedHeatCoils( 0 ); // number of multispeed DX heating coils
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -202,8 +206,8 @@ namespace DXCoils {
 	// External function calls
 
 	// Object Data
-	FArray1D< DXCoilData > DXCoil;
-	FArray1D< DXCoilNumericFieldData > DXCoilNumericFields;
+	Array1D< DXCoilData > DXCoil;
+	Array1D< DXCoilNumericFieldData > DXCoilNumericFields;
 
 	// Functions
 
@@ -267,7 +271,7 @@ namespace DXCoils {
 		}
 
 		if ( CompIndex == 0 ) {
-			DXCoilNum = FindItemInList( CompName, DXCoil.Name(), NumDXCoils );
+			DXCoilNum = FindItemInList( CompName, DXCoil );
 			if ( DXCoilNum == 0 ) {
 				ShowFatalError( "DX Coil not found=" + CompName );
 			}
@@ -317,7 +321,7 @@ namespace DXCoils {
 
 			CalcDXHeatingCoil( DXCoilNum, PartLoadRatio, FanOpMode, AirFlowRatio );
 
-		} else if ( SELECT_CASE_var == CoilDX_HeatPumpWaterHeater ) {
+		} else if ( SELECT_CASE_var == CoilDX_HeatPumpWaterHeaterPumped || SELECT_CASE_var == CoilDX_HeatPumpWaterHeaterWrapped ) {
 
 			//   call the HPWHDXCoil routine to calculate water side performance set up the DX coil info for air-side calcs
 			CalcHPWHDXCoil( DXCoilNum, PartLoadRatio );
@@ -407,7 +411,7 @@ namespace DXCoils {
 		//  find correct DX Coil
 
 		if ( CompIndex == 0 ) {
-			DXCoilNum = FindItemInList( CompName, DXCoil.Name(), NumDXCoils );
+			DXCoilNum = FindItemInList( CompName, DXCoil );
 			if ( DXCoilNum == 0 ) {
 				ShowFatalError( "DX Coil not found=" + CompName );
 			}
@@ -461,7 +465,7 @@ namespace DXCoils {
 	void
 	SimDXCoilMultiMode(
 		std::string const & CompName, // name of the fan coil unit
-		int const CompOp, // compressor operation; 1=on, 0=off !unused1208
+		int const EP_UNUSED( CompOp ), // compressor operation; 1=on, 0=off !unused1208
 		bool const FirstHVACIteration, // true if first hvac iteration
 		Real64 const PartLoadRatio, // part load ratio
 		int const DehumidMode, // dehumidification mode (0=normal, 1=enhanced)
@@ -554,7 +558,7 @@ namespace DXCoils {
 
 		//  find correct DX Coil
 		if ( CompIndex == 0 ) {
-			DXCoilNum = FindItemInList( CompName, DXCoil.Name(), NumDXCoils );
+			DXCoilNum = FindItemInList( CompName, DXCoil );
 			if ( DXCoilNum == 0 ) {
 				ShowFatalError( "DX Coil not found=" + CompName );
 			}
@@ -846,6 +850,15 @@ namespace DXCoils {
 		using DataGlobals::emsCallFromComponentGetInput;
 		using EMSManager::ManageEMS;
 		using GlobalNames::VerifyUniqueCoilName;
+		using DataHeatBalance::IntGainTypeOf_SecCoolingDXCoilSingleSpeed;
+		using DataHeatBalance::IntGainTypeOf_SecHeatingDXCoilSingleSpeed;
+		using DataHeatBalance::IntGainTypeOf_SecCoolingDXCoilTwoSpeed;
+		using DataHeatBalance::IntGainTypeOf_SecCoolingDXCoilMultiSpeed;
+		using DataHeatBalance::IntGainTypeOf_SecHeatingDXCoilMultiSpeed;
+		using InputProcessor::FindItemInList;
+		using DataHeatBalance::Zone;
+		using DataLoopNode::NodeConnectionType_ZoneNode;
+
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -865,12 +878,12 @@ namespace DXCoils {
 		int DXCoilNum; // current DX coil number
 		int NumAlphas; // Number of alphas in input
 		int NumNumbers; // Number of numeric items in input
-		FArray1D_string Alphas2; // Alpha input items for object
-		FArray1D< Real64 > Numbers2; // Numeric input items for object
-		FArray1D_string cAlphaFields2; // Alpha field names
-		FArray1D_string cNumericFields2; // Numeric field names
-		FArray1D_bool lAlphaBlanks2; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks2; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas2; // Alpha input items for object
+		Array1D< Real64 > Numbers2; // Numeric input items for object
+		Array1D_string cAlphaFields2; // Alpha field names
+		Array1D_string cNumericFields2; // Numeric field names
+		Array1D_bool lAlphaBlanks2; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks2; // Logical array, numeric field input BLANK = .TRUE.
 		int NumAlphas2; // Number of alphas in input for performance object
 		int NumNumbers2; // Number of numeric items in input for performance object
 		int IOStatus; // Input status returned from GetObjectItem
@@ -896,12 +909,12 @@ namespace DXCoils {
 		Real64 HeatCOPFWaterFlow; // Used to verify HPWH DX coil heating COP (function of water flow) performance curve
 		int I; // Index of speeds
 		Real64 CurveVal; // Used to verify modifier curves equal 1 at rated conditions
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int MaxNumbers( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -919,13 +932,14 @@ namespace DXCoils {
 		NumDXHeatingCoils = GetNumObjectsFound( "Coil:Heating:DX:SingleSpeed" );
 		NumDXMulSpeedCoils = GetNumObjectsFound( "Coil:Cooling:DX:TwoSpeed" );
 		NumDXMulModeCoils = GetNumObjectsFound( "Coil:Cooling:DX:TwoStageWithHumidityControlMode" );
-		NumDXHeatPumpWaterHeaterCoils = GetNumObjectsFound( "Coil:WaterHeating:AirToWaterHeatPump" );
+		NumDXHeatPumpWaterHeaterPumpedCoils = GetNumObjectsFound( cAllCoilTypes( CoilDX_HeatPumpWaterHeaterPumped ) );
+		NumDXHeatPumpWaterHeaterWrappedCoils = GetNumObjectsFound( cAllCoilTypes( CoilDX_HeatPumpWaterHeaterWrapped ) );
 		NumDXMulSpeedCoolCoils = GetNumObjectsFound( "Coil:Cooling:DX:MultiSpeed" );
 		NumDXMulSpeedHeatCoils = GetNumObjectsFound( "Coil:Heating:DX:MultiSpeed" );
 		NumVRFCoolingCoils = GetNumObjectsFound( cAllCoilTypes( CoilVRF_Cooling ) );
 		NumVRFHeatingCoils = GetNumObjectsFound( cAllCoilTypes( CoilVRF_Heating ) );
 
-		NumDXCoils = NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils + NumVRFCoolingCoils + NumVRFHeatingCoils;
+		NumDXCoils = NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterPumpedCoils + NumDXHeatPumpWaterHeaterWrappedCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils + NumVRFCoolingCoils + NumVRFHeatingCoils;
 
 		// Determine max number of alpha and numeric arguments for all objects being read, in order to allocate local arrays
 		GetObjectDefMaxArgs( "Coil:Cooling:DX:SingleSpeed", TotalArgs, NumAlphas, NumNumbers );
@@ -940,7 +954,10 @@ namespace DXCoils {
 		GetObjectDefMaxArgs( "Coil:Cooling:DX:TwoStageWithHumidityControlMode", TotalArgs, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		GetObjectDefMaxArgs( "Coil:WaterHeating:AirToWaterHeatPump", TotalArgs, NumAlphas, NumNumbers );
+		GetObjectDefMaxArgs( cAllCoilTypes( CoilDX_HeatPumpWaterHeaterPumped ), TotalArgs, NumAlphas, NumNumbers );
+		MaxNumbers = max( MaxNumbers, NumNumbers );
+		MaxAlphas = max( MaxAlphas, NumAlphas );
+		GetObjectDefMaxArgs( cAllCoilTypes( CoilDX_HeatPumpWaterHeaterWrapped ), TotalArgs, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		GetObjectDefMaxArgs( "Coil:Cooling:DX:MultiSpeed", TotalArgs, NumAlphas, NumNumbers );
@@ -1017,7 +1034,7 @@ namespace DXCoils {
 			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1277,7 +1294,7 @@ namespace DXCoils {
 			}
 
 			DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( 1 ) = Numbers( 12 );
-			if ( DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( 1 ) < 0.0 && DXCoil( DXCoilNum ).EvapCondAirFlow( 1 ) != AutoSize ) {
+			if ( DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( 1 ) < 0.0 && DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( 1 ) != AutoSize ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 				ShowContinueError( "..." + cNumericFields( 12 ) + " cannot be < 0.0." );
 				ShowContinueError( "...entered value=[" + TrimSigDigits( Numbers( 12 ), 2 ) + "]." );
@@ -1400,6 +1417,18 @@ namespace DXCoils {
 					DXCoil( DXCoilNum ).ASHRAE127StdRprt = false;
 				}
 			}
+			// A18; \field Zone Name for Condenser Placement
+			if ( !lAlphaBlanks( 18 ) && NumAlphas > 17 ) {
+				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 18 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 18 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
+				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 18 ), Zone );
+				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
+					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Cooling:DX:SingleSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecCoolingDXCoilSingleSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
+					DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone = true;
+				} else {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFields( 18 ) + "=\"" + Alphas( 18 ) + "\"." );
+				}
+			}
 
 		} // end of the Doe2 DX coil loop
 
@@ -1416,7 +1445,7 @@ namespace DXCoils {
 			++DXCoilNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1892,7 +1921,7 @@ namespace DXCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2214,6 +2243,51 @@ namespace DXCoils {
 				}
 			}
 
+			//A14, \field Zone Name for Evaporator Placement
+			if ( !lAlphaBlanks( 14 ) && NumAlphas > 13 ) {
+				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 14 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 14 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
+				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 14 ), Zone );
+				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
+					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Heating:DX:SingleSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecHeatingDXCoilSingleSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate, _, _, DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate );
+					DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone = true;
+				} else {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFields( 14 ) + "=\"" + Alphas( 14 ) + "\"." );
+				}
+			}
+			if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
+				//N13, \field Secondary Coil Air Flow Rate
+				if ( !lNumericBlanks( 13 ) ) {
+					DXCoil( DXCoilNum ).SecCoilAirFlow = Numbers( 13 );
+				}
+				//N14, \field Secondary Coil Fan Flow Scaling Factor
+				if ( !lNumericBlanks( 14 ) ) {
+					DXCoil( DXCoilNum ).SecCoilAirFlowScalingFactor = Numbers( 14 );
+				}
+				//N15, \field Nominal Sensible Heat Ratio of Secondary Coil
+				if ( !lNumericBlanks( 15 ) ) {
+					DXCoil( DXCoilNum ).SecCoilRatedSHR = Numbers( 15 );
+				} else {
+					DXCoil( DXCoilNum ).SecCoilRatedSHR = 1.0;
+				}
+				//A15, \field Sensible Heat Ratio Modifier Function of Temperature Curve Name
+				if ( !lAlphaBlanks( 15 ) ) {
+					DXCoil( DXCoilNum ).SecCoilSHRFT = GetCurveIndex( Alphas( 15 ) );
+					if ( DXCoil( DXCoilNum ).SecCoilSHRFT == 0 ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( 15 ) + "=\"" + Alphas( 15 ) + "\"." );
+					}
+				}
+				//A16; \field Sensible Heat Ratio Function of Flow Fraction Curve Name
+				if ( !lAlphaBlanks( 16 ) ) {
+					DXCoil( DXCoilNum ).SecCoilSHRFF = GetCurveIndex( Alphas( 16 ) );
+					if ( DXCoil( DXCoilNum ).SecCoilSHRFF == 0 ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+						ShowContinueError( "...not found " + cAlphaFields( 16 ) + "=\"" + Alphas( 16 ) + "\"." );
+					}
+				}
+			}
+
 		} // end of the DX heating coil loop
 
 		if ( ErrorsFound ) {
@@ -2233,7 +2307,7 @@ namespace DXCoils {
 			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2704,15 +2778,28 @@ namespace DXCoils {
 			} else {
 				DXCoil( DXCoilNum ).UserSHRCurveExists = false;
 			}
+			// A21; \field Zone Name for Condenser Placement
+			if ( !lAlphaBlanks( 21 ) && NumAlphas > 20 ) {
+				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 21 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 21 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
+				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 21 ), Zone );
+				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
+					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Cooling:DX:TwoSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecCoolingDXCoilTwoSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
+					DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone = true;
+				} else {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFields( 21 ) + "=\"" + Alphas( 21 ) + "\"." );
+				}
+			}
+
 		}
 
 		if ( ErrorsFound ) {
 			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition(s) causes termination." );
 		}
 
-		// Loop over the DX Water Heater Coils and get & load the data
-		CurrentModuleObject = "Coil:WaterHeating:AirToWaterHeatPump";
-		for ( DXHPWaterHeaterCoilNum = 1; DXHPWaterHeaterCoilNum <= NumDXHeatPumpWaterHeaterCoils; ++DXHPWaterHeaterCoilNum ) {
+		// Loop over the Pumped DX Water Heater Coils and get & load the data
+		CurrentModuleObject = cAllCoilTypes( CoilDX_HeatPumpWaterHeaterPumped );
+		for ( DXHPWaterHeaterCoilNum = 1; DXHPWaterHeaterCoilNum <= NumDXHeatPumpWaterHeaterPumpedCoils; ++DXHPWaterHeaterCoilNum ) {
 
 			GetObjectItem( CurrentModuleObject, DXHPWaterHeaterCoilNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
@@ -2725,7 +2812,7 @@ namespace DXCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2736,7 +2823,7 @@ namespace DXCoils {
 			}
 			DXCoil( DXCoilNum ).Name = Alphas( 1 );
 			DXCoil( DXCoilNum ).DXCoilType = CurrentModuleObject;
-			DXCoil( DXCoilNum ).DXCoilType_Num = CoilDX_HeatPumpWaterHeater;
+			DXCoil( DXCoilNum ).DXCoilType_Num = CoilDX_HeatPumpWaterHeaterPumped;
 			DXCoil( DXCoilNum ).SchedPtr = 0; // heat pump water heater DX coil has no schedule
 
 			// Store the HPWH DX coil heating capacity in RatedTotCap2. After backing off pump and fan heat,
@@ -3184,6 +3271,362 @@ namespace DXCoils {
 		if ( ErrorsFound ) {
 			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
 		}
+		// Loop over the Wrapped DX Water Heater Coils and get & load the data
+		CurrentModuleObject = cAllCoilTypes( CoilDX_HeatPumpWaterHeaterWrapped );
+		for ( DXHPWaterHeaterCoilNum = 1; DXHPWaterHeaterCoilNum <= NumDXHeatPumpWaterHeaterWrappedCoils; ++DXHPWaterHeaterCoilNum ) {
+
+			GetObjectItem( CurrentModuleObject, DXHPWaterHeaterCoilNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+			++DXCoilNum;
+
+			// allocate single performance mode for numeric field strings used for sizing routine
+			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
+			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
+			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
+
+			IsNotOK = false;
+			IsBlank = false;
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			if ( IsNotOK ) {
+				ErrorsFound = true;
+				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+			}
+			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
+			if ( errFlag ) {
+				ErrorsFound = true;
+			}
+			DXCoil( DXCoilNum ).Name = Alphas( 1 );
+			DXCoil( DXCoilNum ).DXCoilType = CurrentModuleObject;
+			DXCoil( DXCoilNum ).DXCoilType_Num = CoilDX_HeatPumpWaterHeaterWrapped;
+			DXCoil( DXCoilNum ).SchedPtr = 0; // heat pump water heater DX coil has no schedule
+
+			// Store the HPWH DX coil heating capacity in RatedTotCap2. After backing off pump and fan heat,
+			// move to RatedTotCap() for use by DX coil
+			DXCoil( DXCoilNum ).RatedTotCap2 = Numbers( 1 );
+			if ( DXCoil( DXCoilNum ).RatedTotCap2 <= 0.0 ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 1 ) + " must be > 0.0, entered value=[" + TrimSigDigits( Numbers( 1 ), 2 ) + "]." );
+				ErrorsFound = true;
+			}
+
+			DXCoil( DXCoilNum ).RatedCOP( 1 ) = Numbers( 2 );
+			if ( DXCoil( DXCoilNum ).RatedCOP( 1 ) <= 0.0 ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 2 ) + " must be > 0.0, entered value=[" + TrimSigDigits( Numbers( 2 ), 2 ) + "]." );
+				ErrorsFound = true;
+			}
+
+			DXCoil( DXCoilNum ).RatedSHR( 1 ) = Numbers( 3 );
+			if ( DXCoil( DXCoilNum ).RatedSHR( 1 ) <= 0.0 || DXCoil( DXCoilNum ).RatedSHR( 1 ) > 1.0 ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 3 ) + " must be > 0 and <= 1.  entered value=[" + TrimSigDigits( Numbers( 3 ), 3 ) + "]." );
+
+				ErrorsFound = true;
+			}
+
+			DXCoil( DXCoilNum ).RatedInletDBTemp = Numbers( 4 );
+			if ( DXCoil( DXCoilNum ).RatedInletDBTemp <= 5.0 ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 4 ) + " must be > 5 {C}.  entered value=[" + TrimSigDigits( Numbers( 4 ), 1 ) + "]." );
+				ErrorsFound = true;
+			}
+
+			DXCoil( DXCoilNum ).RatedInletWBTemp = Numbers( 5 );
+			if ( DXCoil( DXCoilNum ).RatedInletWBTemp <= 5.0 ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 5 ) + " must be > 5 {C}.  entered value=[" + TrimSigDigits( Numbers( 5 ), 1 ) + "]." );
+				ErrorsFound = true;
+			}
+
+			DXCoil( DXCoilNum ).RatedInletWaterTemp = Numbers( 6 );
+			if ( DXCoil( DXCoilNum ).RatedInletWaterTemp <= 25.0 ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 6 ) + " must be > 25 {C}.  entered value=[" + TrimSigDigits( Numbers( 6 ), 1 ) + "]." );
+				ErrorsFound = true;
+			}
+
+			DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) = Numbers( 7 );
+			if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) != AutoCalculate ) {
+				if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) <= 0.0 ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "..." + cNumericFields( 7 ) + " must be > 0.0.  entered value=[" + TrimSigDigits( Numbers( 7 ), 3 ) + "]." );
+					ErrorsFound = true;
+				}
+			}
+
+			if ( SameString( Alphas( 2 ), "Yes" ) || SameString( Alphas( 2 ), "No" ) ) {
+				//  initialized to TRUE on allocate
+				if ( SameString( Alphas( 2 ), "No" ) ) DXCoil( DXCoilNum ).FanPowerIncludedInCOP = false;
+			} else {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( ",,,invalid choice for " + cAlphaFields( 2 ) + ".  Entered choice = " + Alphas( 2 ) );
+				ShowContinueError( "Valid choices are Yes or No." );
+				ErrorsFound = true;
+			}
+
+			DXCoil( DXCoilNum ).AirInNode = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+
+			DXCoil( DXCoilNum ).AirOutNode = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+
+			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
+
+			std::string const DummyCondenserInletName( "DUMMY CONDENSER INLET " + DXCoil( DXCoilNum ).Name );
+			std::string const DummyCondenserOutletName( "DUMMY CONDENSER OUTLET " + DXCoil( DXCoilNum ).Name );
+			DXCoil( DXCoilNum ).WaterInNode = GetOnlySingleNode( DummyCondenserInletName, ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+
+			DXCoil( DXCoilNum ).WaterOutNode = GetOnlySingleNode( DummyCondenserOutletName, ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+
+			TestCompSet( CurrentModuleObject, Alphas( 1 ), DummyCondenserInletName, DummyCondenserOutletName, "Water Nodes" );
+
+			DXCoil( DXCoilNum ).CrankcaseHeaterCapacity = Numbers( 8 );
+			if ( DXCoil( DXCoilNum ).CrankcaseHeaterCapacity < 0.0 ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 8 ) + " must be >= 0.0  entered value=[" + TrimSigDigits( Numbers( 8 ), 1 ) + "]." );
+				ErrorsFound = true;
+			}
+
+			DXCoil( DXCoilNum ).MaxOATCrankcaseHeater = Numbers( 9 );
+			if ( DXCoil( DXCoilNum ).MaxOATCrankcaseHeater < 0.0 ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 9 ) + " must be >= 0 {C}.  entered value=[" + TrimSigDigits( Numbers( 9 ), 1 ) + "]." );
+				ErrorsFound = true;
+			}
+
+			if ( SameString( Alphas( 5 ), "DryBulbTemperature" ) ) {
+				DXCoil( DXCoilNum ).InletAirTemperatureType = DryBulbIndicator;
+			} else if ( SameString( Alphas( 5 ), "WetBulbTemperature" ) ) {
+				DXCoil( DXCoilNum ).InletAirTemperatureType = WetBulbIndicator;
+			} else {
+				//   wrong temperature type selection
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cAlphaFields( 5 ) + " must be DryBulbTemperature or WetBulbTemperature." );
+				ShowContinueError( "...entered value=\"" + Alphas( 5 ) + "\"." );
+				ErrorsFound = true;
+			}
+
+			// set rated inlet air temperature for curve object verification
+			if ( DXCoil( DXCoilNum ).InletAirTemperatureType == WetBulbIndicator ) {
+				InletAirTemp = DXCoil( DXCoilNum ).RatedInletWBTemp;
+			} else {
+				InletAirTemp = DXCoil( DXCoilNum ).RatedInletDBTemp;
+			}
+			// set rated water temperature for curve object verification
+			InletWaterTemp = DXCoil( DXCoilNum ).RatedInletWaterTemp;
+
+			if ( ! lAlphaBlanks( 6 ) ) {
+				DXCoil( DXCoilNum ).HCapFTemp = GetCurveIndex( Alphas( 6 ) );
+				if ( DXCoil( DXCoilNum ).HCapFTemp == 0 ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFields( 6 ) + "=\"" + Alphas( 6 ) + "\"." );
+					ErrorsFound = true;
+				} else {
+					// Verify Curve Object, only legal types are BiQuadratic or Cubic
+					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCapFTemp ) );
+
+						if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+							DXCoil( DXCoilNum ).HCapFTempCurveType = BiQuadratic;
+							HeatCapFTemp = CurveValue( DXCoil( DXCoilNum ).HCapFTemp, InletAirTemp, InletWaterTemp );
+
+						} else if ( SELECT_CASE_var == "CUBIC" ) {
+							DXCoil( DXCoilNum ).HCapFTempCurveType = Cubic;
+							HeatCapFTemp = CurveValue( DXCoil( DXCoilNum ).HCapFTemp, InletAirTemp );
+
+						} else {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+							ShowContinueError( "...illegal " + cAlphaFields( 6 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).HCapFTemp ) );
+							ShowContinueError( "Curve type must be BiQuadratic or Cubic." );
+							ErrorsFound = true;
+							HeatCapFTemp = 1.0;
+						}}
+
+					if ( std::abs( HeatCapFTemp - 1.0 ) > 0.05 ) {
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\":" );
+						// could remove name from the field for output
+						ShowContinueError( "...The " + cAlphaFields( 6 ) + " should be normalized to 1.0 at the rating point." );
+						ShowContinueError( "...Curve output at the rating point = " + TrimSigDigits( HeatCapFTemp, 3 ) );
+						ShowContinueError( "...The simulation continues using the user-specified curve." );
+					}
+
+				}
+			}
+
+			if ( ! lAlphaBlanks( 7 ) ) {
+				DXCoil( DXCoilNum ).HCapFAirFlow = GetCurveIndex( Alphas( 7 ) );
+				if ( DXCoil( DXCoilNum ).HCapFAirFlow == 0 ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFields( 7 ) + "=\"" + Alphas( 7 ) + "\"." );
+					ErrorsFound = true;
+				} else {
+					// Verify Curve Object, only legal types are Cubic or Quadratic
+					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCapFAirFlow ) );
+
+						if ( SELECT_CASE_var == "CUBIC" ) {
+							HeatCapFAirFlow = CurveValue( DXCoil( DXCoilNum ).HCapFAirFlow, 1.0 );
+
+						} else if ( SELECT_CASE_var == "QUADRATIC" ) {
+							HeatCapFAirFlow = CurveValue( DXCoil( DXCoilNum ).HCapFAirFlow, 1.0 );
+
+						} else {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+							ShowContinueError( "...illegal " + cAlphaFields( 7 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).HCapFAirFlow ) );
+							ShowContinueError( "Curve type must be Quadratic or Cubic." );
+							ErrorsFound = true;
+							HeatCapFAirFlow = 1.0;
+						}}
+
+					if ( std::abs( HeatCapFAirFlow - 1.0 ) > 0.05 ) {
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\":" );
+						// could remove name from the field for output
+						ShowContinueError( "...The " + cAlphaFields( 7 ) + " should be normalized to 1.0 at the rating point." );
+						ShowContinueError( "...Curve output at an air flow fraction of 1 = " + TrimSigDigits( HeatCapFAirFlow, 3 ) );
+						ShowContinueError( "...The simulation continues using the user-specified curve." );
+					}
+
+				}
+			}
+
+			if ( ! lAlphaBlanks( 8 ) ) {
+				DXCoil( DXCoilNum ).HCOPFTemp = GetCurveIndex( Alphas( 8 ) );
+				if ( DXCoil( DXCoilNum ).HCOPFTemp == 0 ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFields( 8 ) + "=\"" + Alphas( 8 ) + "\"." );
+					ErrorsFound = true;
+				} else {
+					// Verify Curve Object, only legal types are BiQuadratic or Cubic
+					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCOPFTemp ) );
+
+						if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+							DXCoil( DXCoilNum ).HCOPFTempCurveType = BiQuadratic;
+							HeatCOPFTemp = CurveValue( DXCoil( DXCoilNum ).HCOPFTemp, InletAirTemp, InletWaterTemp );
+
+						} else if ( SELECT_CASE_var == "CUBIC" ) {
+							DXCoil( DXCoilNum ).HCOPFTempCurveType = Cubic;
+							HeatCOPFTemp = CurveValue( DXCoil( DXCoilNum ).HCOPFTemp, InletAirTemp );
+
+						} else {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+							ShowContinueError( "...illegal " + cAlphaFields( 8 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).HCOPFTemp ) );
+							ShowContinueError( "Curve type must be BiQuadratic or Cubic." );
+							ErrorsFound = true;
+							HeatCOPFTemp = 1.0;
+						}}
+
+					if ( std::abs( HeatCOPFTemp - 1.0 ) > 0.05 ) {
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\":" );
+						// could remove name from the field for output
+						ShowContinueError( "...The " + cAlphaFields( 8 ) + " should be normalized to 1.0 at the rating point." );
+						ShowContinueError( "...Curve output at an air flow fraction of 1 = " + TrimSigDigits( HeatCOPFTemp, 3 ) );
+						ShowContinueError( "...The simulation continues using the user-specified curve." );
+					}
+
+				}
+			}
+
+			if ( ! lAlphaBlanks( 9 ) ) {
+				DXCoil( DXCoilNum ).HCOPFAirFlow = GetCurveIndex( Alphas( 9 ) );
+				if ( DXCoil( DXCoilNum ).HCOPFAirFlow == 0 ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFields( 9 ) + "=\"" + Alphas( 9 ) + "\"." );
+					ErrorsFound = true;
+				} else {
+					// Verify Curve Object, only legal types are Cubic or Quadratic
+					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).HCOPFAirFlow ) );
+
+						if ( SELECT_CASE_var == "CUBIC" ) {
+							HeatCOPFAirFlow = CurveValue( DXCoil( DXCoilNum ).HCOPFAirFlow, 1.0 );
+
+						} else if ( SELECT_CASE_var == "QUADRATIC" ) {
+							HeatCOPFAirFlow = CurveValue( DXCoil( DXCoilNum ).HCOPFAirFlow, 1.0 );
+
+						} else {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+							ShowContinueError( "...illegal " + cAlphaFields( 9 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).HCOPFAirFlow ) );
+							ShowContinueError( "Curve type must be Quadratic or Cubic." );
+							ErrorsFound = true;
+							HeatCOPFAirFlow = 1.0;
+						}}
+
+					if ( std::abs( HeatCOPFAirFlow - 1.0 ) > 0.05 ) {
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\":" );
+						// could remove name from the field for output
+						ShowContinueError( "...The " + cAlphaFields( 9 ) + " should be normalized to 1.0 at the rating point." );
+						ShowContinueError( "...Curve output at an air flow fraction of 1 = " + TrimSigDigits( HeatCOPFAirFlow, 3 ) );
+						ShowContinueError( "...The simulation continues using the user-specified curve." );
+					}
+
+				}
+			}
+
+			if ( ! lAlphaBlanks( 10 ) ) {
+				DXCoil( DXCoilNum ).PLFFPLR( 1 ) = GetCurveIndex( Alphas( 10 ) );
+				if ( DXCoil( DXCoilNum ).PLFFPLR( 1 ) == 0 ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFields( 10 ) + "=\"" + Alphas( 10 ) + "\"." );
+					ErrorsFound = true;
+				} else {
+					// Verify Curve Object, only legal types are Cubic or Quadratic
+					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( 1 ) ) );
+
+						if ( SELECT_CASE_var == "CUBIC" ) {
+
+						} else if ( SELECT_CASE_var == "QUADRATIC" ) {
+
+						} else {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+							ShowContinueError( "...illegal " + cAlphaFields( 10 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).PLFFPLR( 1 ) ) );
+							ShowContinueError( "Curve type must be Quadratic or Cubic." );
+							ErrorsFound = true;
+						}}
+
+					if ( ! ErrorsFound ) {
+						//       Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
+						MinCurveVal = 999.0;
+						MaxCurveVal = -999.0;
+						CurveInput = 0.0;
+						while ( CurveInput <= 1.0 ) {
+							CurveVal = CurveValue( DXCoil( DXCoilNum ).PLFFPLR( 1 ), CurveInput );
+							if ( CurveVal < MinCurveVal ) {
+								MinCurveVal = CurveVal;
+								MinCurvePLR = CurveInput;
+							}
+							if ( CurveVal > MaxCurveVal ) {
+								MaxCurveVal = CurveVal;
+								MaxCurvePLR = CurveInput;
+							}
+							CurveInput += 0.01;
+						}
+						if ( MinCurveVal < 0.7 ) {
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+							ShowContinueError( "..." + cAlphaFields( 10 ) + " = " + Alphas( 10 ) + " has out of range value." );
+							ShowContinueError( "...Curve minimum must be >= 0.7, curve min at PLR = " + TrimSigDigits( MinCurvePLR, 2 ) + " is " + TrimSigDigits( MinCurveVal, 3 ) );
+							ShowContinueError( "...Setting curve minimum to 0.7 and simulation continues." );
+							SetCurveOutputMinMaxValues( DXCoil( DXCoilNum ).PLFFPLR( 1 ), ErrorsFound, 0.7, _ );
+						}
+
+						if ( MaxCurveVal > 1.0 ) {
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+							ShowContinueError( "..." + cAlphaFields( 10 ) + " = " + Alphas( 10 ) + " has out of range value." );
+							ShowContinueError( "...Curve maximum must be <= 1.0, curve max at PLR = " + TrimSigDigits( MaxCurvePLR, 2 ) + " is " + TrimSigDigits( MaxCurveVal, 3 ) );
+							ShowContinueError( "...Setting curve maximum to 1.0 and simulation continues." );
+							SetCurveOutputMinMaxValues( DXCoil( DXCoilNum ).PLFFPLR( 1 ), ErrorsFound, _, 1.0 );
+						}
+
+					}
+
+				}
+			}
+
+			// assume compressor resides at the inlet to the DX Coil
+			DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) = DXCoil( DXCoilNum ).AirInNode;
+
+			// set condenser type as HPWH
+			DXCoil( DXCoilNum ).CondenserType( 1 ) = WaterHeater;
+
+		} // end of the DX water heater wrapped coil loop
+
+		if ( ErrorsFound ) {
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
+		}
 
 		// DX Multispeed cooling coil
 		CurrentModuleObject = "Coil:Cooling:DX:MultiSpeed";
@@ -3200,7 +3643,7 @@ namespace DXCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -3683,7 +4126,18 @@ namespace DXCoils {
 				}
 
 			}
-
+			//A37; \field Zone Name for Condenser Placement
+			if ( !lAlphaBlanks( 37 ) && NumAlphas > 36 ) {
+				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 37 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 37 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
+				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 37 ), Zone );
+				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
+					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Cooling:DX:MultiSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecCoolingDXCoilMultiSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
+					DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone = true;
+				} else {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFields( 37 ) + "=\"" + Alphas( 37 ) + "\"." );
+				}
+			}
 		}
 
 		if ( ErrorsFound ) {
@@ -3706,7 +4160,7 @@ namespace DXCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -3885,6 +4339,11 @@ namespace DXCoils {
 			DXCoil( DXCoilNum ).MSTotCapTempModFacCurveType.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
 			DXCoil( DXCoilNum ).MSEIRTempModFacCurveType.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
 			DXCoil( DXCoilNum ).MSFanPowerPerEvapAirFlowRate.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
+			DXCoil( DXCoilNum ).MSSecCoilSHRFT.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
+			DXCoil( DXCoilNum ).MSSecCoilSHRFF.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
+			DXCoil( DXCoilNum ).MSSecCoilAirFlow.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
+			DXCoil( DXCoilNum ).MSSecCoilAirFlowScalingFactor.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
+			DXCoil( DXCoilNum ).MSSecCoilRatedSHR.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
 
 			DXCoil( DXCoilNum ).RatedSHR( 1 ) = 1.0;
 
@@ -4159,6 +4618,41 @@ namespace DXCoils {
 				}
 
 			}
+			//A34; \field Zone Name for Condenser Placement
+			if ( !lAlphaBlanks( 34 ) && NumAlphas > 33 ) {
+				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 34 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 34 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
+				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 34 ), Zone );
+				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
+					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Heating:DX:MultiSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecHeatingDXCoilMultiSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate, _, _, DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate );
+					DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone = true;
+				} else {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+					ShowContinueError( "...not found " + cAlphaFields( 34 ) + "=\"" + Alphas( 34 ) + "\"." );
+				}
+			}
+			if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
+				for ( I = 1; I <= DXCoil( DXCoilNum ).NumOfSpeeds; ++I ) {
+					DXCoil( DXCoilNum ).MSSecCoilAirFlow( I ) = Numbers( 30 + ( I - 1 ) * 3 );
+					DXCoil( DXCoilNum ).MSSecCoilAirFlowScalingFactor( I ) = Numbers( 31 + ( I - 1 ) * 3 );
+					DXCoil( DXCoilNum ).MSSecCoilRatedSHR( I ) = Numbers( 32 + ( I - 1 ) * 3 );
+					// Read SHR modifier curve function of temperature
+					if ( !lAlphaBlanks( 35 + ( I - 1 ) * 2 ) ) {
+						DXCoil( DXCoilNum ).MSSecCoilSHRFT( I ) = GetCurveIndex( Alphas( 35 + ( I - 1 ) * 2 ) ); // convert curve name to number
+						if ( DXCoil( DXCoilNum ).MSSecCoilSHRFT( I ) == 0 ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+							ShowContinueError( "...not found " + cAlphaFields( 35 + ( I - 1 ) * 2 ) + "=\"" + Alphas( 35 + ( I - 1 ) * 2 ) + "\"." );
+						}
+					}
+					// Read SHR modifier curve function of flow fraction
+					if ( !lAlphaBlanks( 36 + ( I - 1 ) * 2 ) ) {
+						DXCoil( DXCoilNum ).MSSecCoilSHRFF( I ) = GetCurveIndex( Alphas( 36 + ( I - 1 ) * 2 ) ); // convert curve name to number
+						if ( DXCoil( DXCoilNum ).MSSecCoilSHRFF( I ) == 0 ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+							ShowContinueError( "...not found " + cAlphaFields( 36 + ( I - 1 ) * 2 ) + "=\"" + Alphas( 36 + ( I - 1 ) * 2 ) + "\"." );
+						}
+					}
+				}
+			}
 		}
 
 		// Loop over the VRF Cooling Coils and get & load the data
@@ -4176,7 +4670,7 @@ namespace DXCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -4281,7 +4775,7 @@ namespace DXCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoil.Name(), DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -4373,207 +4867,235 @@ namespace DXCoils {
 			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
 		}
 
-		for ( DXCoilNum = 1; DXCoilNum <= NumDoe2DXCoils + NumDXMulModeCoils; ++DXCoilNum ) {
-			// Setup Report Variables for Cooling Equipment
-			// CurrentModuleObject='Coil:Cooling:DX:SingleSpeed/Coil:Cooling:DX:TwoStageWithHumidityControlMode'
-			SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", DXCoil( DXCoilNum ).TotalCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", DXCoil( DXCoilNum ).TotalCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", DXCoil( DXCoilNum ).SensCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", DXCoil( DXCoilNum ).SensCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", DXCoil( DXCoilNum ).LatCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", DXCoil( DXCoilNum ).LatCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Electric Power [W]", DXCoil( DXCoilNum ).ElecCoolingPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Electric Energy [J]", DXCoil( DXCoilNum ).ElecCoolingConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
-			SetupOutputVariable( "Cooling Coil Runtime Fraction []", DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction, "System", "Average", DXCoil( DXCoilNum ).Name );
+		for ( DXCoilNum = 1; DXCoilNum <= NumDXCoils; ++DXCoilNum ) {
 
-			// do we report these even if no storage tank?
-			if ( DXCoil( DXCoilNum ).CondensateCollectMode == CondensateToTank ) {
-				SetupOutputVariable( "Cooling Coil Condensate Volume Flow Rate [m3/s]", DXCoil( DXCoilNum ).CondensateVdot, "System", "Average", DXCoil( DXCoilNum ).Name );
-				SetupOutputVariable( "Cooling Coil Condensate Volume [m3]", DXCoil( DXCoilNum ).CondensateVol, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "OnSiteWater", "Condensate", _, "System" );
-			}
+			DXCoilData & Coil = DXCoil( DXCoilNum );
 
-			// Moved to Init
-			//  IF (DXCoil(DXCoilNum)%ReportCoolingCoilCrankcasePower) THEN
-			//    CALL SetupOutputVariable('DX Cooling Coil Crankcase Heater Power [W]',DXCoil(DXCoilNum)%CrankcaseHeaterPower,'System',&
-			//                             'Average',DXCoil(DXCoilNum)%Name)
-			//    CALL SetupOutputVariable('Cooling Coil Crankcase Heater Electric Energy [J]',DXCoil(DXCoilNum)%CrankcaseHeaterConsumption,&
-			//                             'System','Sum',DXCoil(DXCoilNum)%Name, &
-			//                              ResourceTypeKey='Electric',EndUseKey='COOLING',GroupKey='System')
-			//  END IF
+			if ( Coil.DXCoilType_Num == CoilDX_CoolingSingleSpeed || Coil.DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+				// Setup Report Variables for Cooling Equipment
+				// CurrentModuleObject='Coil:Cooling:DX:SingleSpeed/Coil:Cooling:DX:TwoStageWithHumidityControlMode'
+				SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", Coil.TotalCoolingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", Coil.TotalCoolingEnergy, "System", "Sum", Coil.Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+				SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", Coil.SensCoolingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", Coil.SensCoolingEnergy, "System", "Sum", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", Coil.LatCoolingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", Coil.LatCoolingEnergy, "System", "Sum", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Electric Power [W]", Coil.ElecCoolingPower, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Electric Energy [J]", Coil.ElecCoolingConsumption, "System", "Sum", Coil.Name, _, "Electric", "COOLING", _, "System" );
+				SetupOutputVariable( "Cooling Coil Runtime Fraction []", Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name );
+                if ( Coil.IsSecondaryDXCoilInZone ) {
+                    SetupOutputVariable( "Secondary Coil Heat Rejection Rate [W]", Coil.SecCoilSensibleHeatGainRate, "System", "Average", Coil.Name );
+                }
 
-			if ( DXCoil( DXCoilNum ).ReportEvapCondVars ) {
-				SetupOutputVariable( "Cooling Coil Condenser Inlet Temperature [C]", DXCoil( DXCoilNum ).CondInletTemp, "System", "Average", DXCoil( DXCoilNum ).Name );
-				SetupOutputVariable( "Cooling Coil Evaporative Condenser Water Volume [m3]", DXCoil( DXCoilNum ).EvapWaterConsump, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Water", "Cooling", _, "System" );
-				SetupOutputVariable( "Cooling Coil Evaporative Condenser Mains Supply Water Volume [m3]", DXCoil( DXCoilNum ).EvapWaterConsump, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "MainsWater", "Cooling", _, "System" );
-				SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Power [W]", DXCoil( DXCoilNum ).EvapCondPumpElecPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-				SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Energy [J]", DXCoil( DXCoilNum ).EvapCondPumpElecConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
-				if ( DXCoil( DXCoilNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
-					SetupOutputVariable( "Cooling Coil Basin Heater Electric Power [W]", DXCoil( DXCoilNum ).BasinHeaterPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy [J]", DXCoil( DXCoilNum ).BasinHeaterConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
+				// do we report these even if no storage tank?
+				if ( Coil.CondensateCollectMode == CondensateToTank ) {
+					SetupOutputVariable( "Cooling Coil Condensate Volume Flow Rate [m3/s]", Coil.CondensateVdot, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Cooling Coil Condensate Volume [m3]", Coil.CondensateVol, "System", "Sum", Coil.Name, _, "OnSiteWater", "Condensate", _, "System" );
 				}
-			}
 
-		}
+				// Moved to Init
+				//  IF (Coil%ReportCoolingCoilCrankcasePower) THEN
+				//    CALL SetupOutputVariable('DX Cooling Coil Crankcase Heater Power [W]',Coil%CrankcaseHeaterPower,'System',&
+				//                             'Average',Coil%Name)
+				//    CALL SetupOutputVariable('Cooling Coil Crankcase Heater Electric Energy [J]',Coil%CrankcaseHeaterConsumption,&
+				//                             'System','Sum',Coil%Name, &
+				//                              ResourceTypeKey='Electric',EndUseKey='COOLING',GroupKey='System')
+				//  END IF
 
-		for ( DXCoilNum = NumDoe2DXCoils + 1; DXCoilNum <= NumDoe2DXCoils + NumDXMulModeCoils; ++DXCoilNum ) {
-			// Setup Report Variables for Cooling Equipment
-			// CurrentModuleObject='Cooling:DX:TwoStageWithHumidityControlMode'
-			SetupOutputVariable( "Cooling Coil Stage 2 Runtime Fraction []", DXCoil( DXCoilNum ).CoolingCoilStg2RuntimeFrac, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Dehumidification Mode []", DXCoil( DXCoilNum ).DehumidificationMode, "System", "Average", DXCoil( DXCoilNum ).Name );
-		}
+				if ( Coil.ReportEvapCondVars ) {
+					SetupOutputVariable( "Cooling Coil Condenser Inlet Temperature [C]", Coil.CondInletTemp, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Water Volume [m3]", Coil.EvapWaterConsump, "System", "Sum", Coil.Name, _, "Water", "Cooling", _, "System" );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Mains Supply Water Volume [m3]", Coil.EvapWaterConsump, "System", "Sum", Coil.Name, _, "MainsWater", "Cooling", _, "System" );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Power [W]", Coil.EvapCondPumpElecPower, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Energy [J]", Coil.EvapCondPumpElecConsumption, "System", "Sum", Coil.Name, _, "Electric", "COOLING", _, "System" );
+					if ( Coil.BasinHeaterPowerFTempDiff > 0.0 ) {
+						SetupOutputVariable( "Cooling Coil Basin Heater Electric Power [W]", Coil.BasinHeaterPower, "System", "Average", Coil.Name );
+						SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy [J]", Coil.BasinHeaterConsumption, "System", "Sum", Coil.Name, _, "Electric", "COOLING", _, "System" );
+					}
+				}
 
-		for ( DXCoilNum = NumDoe2DXCoils + NumDXMulModeCoils + 1; DXCoilNum <= NumDXHeatingCoils + NumDoe2DXCoils + NumDXMulModeCoils; ++DXCoilNum ) {
-			// Setup Report Variables for Heating Equipment
-			// CurrentModuleObject='Coil:Heating:DX:SingleSpeed'
-			SetupOutputVariable( "Heating Coil Total Heating Rate [W]", DXCoil( DXCoilNum ).TotalHeatingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Total Heating Energy [J]", DXCoil( DXCoilNum ).TotalHeatingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Electric Power [W]", DXCoil( DXCoilNum ).ElecHeatingPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Electric Energy [J]", DXCoil( DXCoilNum ).ElecHeatingConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
-			SetupOutputVariable( "Heating Coil Defrost Electric Power [W]", DXCoil( DXCoilNum ).DefrostPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Defrost Electric Energy [J]", DXCoil( DXCoilNum ).DefrostConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
-			SetupOutputVariable( "Heating Coil Crankcase Heater Electric Power [W]", DXCoil( DXCoilNum ).CrankcaseHeaterPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Crankcase Heater Electric Energy [J]", DXCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
-			SetupOutputVariable( "Heating Coil Runtime Fraction []", DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction, "System", "Average", DXCoil( DXCoilNum ).Name );
-		}
-
-		for ( DXCoilNum = NumDoe2DXCoils + NumDXMulModeCoils + NumDXHeatingCoils + 1; DXCoilNum <= NumDoe2DXCoils + NumDXMulModeCoils + NumDXHeatingCoils + NumDXMulSpeedCoils; ++DXCoilNum ) {
-			// Setup Report Variables for Cooling Equipment
-			// CurrentModuleObject='Coil:Cooling:DX:TwoSpeed'
-			SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", DXCoil( DXCoilNum ).TotalCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", DXCoil( DXCoilNum ).TotalCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", DXCoil( DXCoilNum ).SensCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", DXCoil( DXCoilNum ).SensCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", DXCoil( DXCoilNum ).LatCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", DXCoil( DXCoilNum ).LatCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Electric Power [W]", DXCoil( DXCoilNum ).ElecCoolingPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Electric Energy [J]", DXCoil( DXCoilNum ).ElecCoolingConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
-			SetupOutputVariable( "Cooling Coil Runtime Fraction []", DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction, "System", "Average", DXCoil( DXCoilNum ).Name );
-
-			if ( DXCoil( DXCoilNum ).ReportEvapCondVars ) {
-				SetupOutputVariable( "Cooling Coil Condenser Inlet Temperature [C]", DXCoil( DXCoilNum ).CondInletTemp, "System", "Average", DXCoil( DXCoilNum ).Name );
-				SetupOutputVariable( "Cooling Coil Evaporative Condenser Water Volume [m3]", DXCoil( DXCoilNum ).EvapWaterConsump, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Water", "Cooling", _, "System" );
-				SetupOutputVariable( "Cooling Coil Evaporative Condenser Mains Supply Water Volume [m3]", DXCoil( DXCoilNum ).EvapWaterConsump, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "MainsWater", "Cooling", _, "System" );
-				SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Power [W]", DXCoil( DXCoilNum ).EvapCondPumpElecPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-				SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Energy [J]", DXCoil( DXCoilNum ).EvapCondPumpElecConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
-				if ( DXCoil( DXCoilNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
-					SetupOutputVariable( "Cooling Coil Basin Heater Electric Power [W]", DXCoil( DXCoilNum ).BasinHeaterPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy [J]", DXCoil( DXCoilNum ).BasinHeaterConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
+				if ( Coil.DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+					// Setup Report Variables for Cooling Equipment
+					// CurrentModuleObject='Cooling:DX:TwoStageWithHumidityControlMode'
+					SetupOutputVariable( "Cooling Coil Stage 2 Runtime Fraction []", Coil.CoolingCoilStg2RuntimeFrac, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Cooling Coil Dehumidification Mode []", Coil.DehumidificationMode, "System", "Average", Coil.Name );
 				}
 
 			}
 
-		}
-
-		for ( DXCoilNum = NumDoe2DXCoils + NumDXMulModeCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + 1; DXCoilNum <= NumDoe2DXCoils + NumDXMulModeCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXHeatPumpWaterHeaterCoils; ++DXCoilNum ) {
-			// Setup Report Variables for Cooling Equipment
-			// CurrentModuleObject='Coil:WaterHeating:AirToWaterHeatPump'
-			SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", DXCoil( DXCoilNum ).TotalCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", DXCoil( DXCoilNum ).TotalCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name ); //, &
-			//                           ResourceTypeKey='ENERGYTRANSFER',EndUseKey='COOLING',GroupKey='Plant')
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", DXCoil( DXCoilNum ).SensCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", DXCoil( DXCoilNum ).SensCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", DXCoil( DXCoilNum ).LatCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", DXCoil( DXCoilNum ).LatCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Runtime Fraction []", DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction, "System", "Average", DXCoil( DXCoilNum ).Name );
-
-			if ( DXCoil( DXCoilNum ).ReportCoolingCoilCrankcasePower ) {
-				SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Power [W]", DXCoil( DXCoilNum ).CrankcaseHeaterPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-				SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Energy [J]", DXCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Electric", "DHW", _, "Plant" );
+			else if ( Coil.DXCoilType_Num == CoilDX_HeatingEmpirical ) {
+				// Setup Report Variables for Heating Equipment
+				// CurrentModuleObject='Coil:Heating:DX:SingleSpeed'
+				SetupOutputVariable( "Heating Coil Total Heating Rate [W]", Coil.TotalHeatingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Heating Coil Total Heating Energy [J]", Coil.TotalHeatingEnergy, "System", "Sum", Coil.Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+				SetupOutputVariable( "Heating Coil Electric Power [W]", Coil.ElecHeatingPower, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Heating Coil Electric Energy [J]", Coil.ElecHeatingConsumption, "System", "Sum", Coil.Name, _, "Electric", "HEATING", _, "System" );
+				SetupOutputVariable( "Heating Coil Defrost Electric Power [W]", Coil.DefrostPower, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Heating Coil Defrost Electric Energy [J]", Coil.DefrostConsumption, "System", "Sum", Coil.Name, _, "Electric", "HEATING", _, "System" );
+				SetupOutputVariable( "Heating Coil Crankcase Heater Electric Power [W]", Coil.CrankcaseHeaterPower, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Heating Coil Crankcase Heater Electric Energy [J]", Coil.CrankcaseHeaterConsumption, "System", "Sum", Coil.Name, _, "Electric", "HEATING", _, "System" );
+				SetupOutputVariable( "Heating Coil Runtime Fraction []", Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name );
+                if ( Coil.IsSecondaryDXCoilInZone ) {
+                    SetupOutputVariable( "Secondary Coil Total Heat Removal Rate [W]", Coil.SecCoilTotalHeatRemovalRate, "System", "Average", Coil.Name );
+                    SetupOutputVariable( "Secondary Coil Sensible Heat Removal Rate [W]", Coil.SecCoilSensibleHeatRemovalRate, "System", "Average", Coil.Name );
+                    SetupOutputVariable( "Secondary Coil Latent Heat Removal Rate [W]", Coil.SecCoilLatentHeatRemovalRate, "System", "Average", Coil.Name );
+                    SetupOutputVariable( "Secondary Coil Sensible Heat Ratio []", Coil.SecCoilSHR, "System", "Average", Coil.Name );
+                    SetupOutputVariable( "Secondary Coil Compressor Part Load Ratio []", Coil.CompressorPartLoadRatio, "System", "Average", Coil.Name );
+                }
 			}
 
-			// new report variables for a HP water heater DX coil
-			SetupOutputVariable( "Cooling Coil Total Water Heating Rate [W]", DXCoil( DXCoilNum ).TotalHeatingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Total Water Heating Energy [J]", DXCoil( DXCoilNum ).TotalHeatingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name ); //, &
-			//                           ResourceTypeKey='ENERGYTRANSFER',EndUseKey='HEATING',GroupKey='Plant')
-			SetupOutputVariable( "Cooling Coil Water Heating Electric Power [W]", DXCoil( DXCoilNum ).ElecWaterHeatingPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Water Heating Electric Energy [J]", DXCoil( DXCoilNum ).ElecWaterHeatingConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Electric", "DHW", _, "Plant" );
-		}
+			else if ( Coil.DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+				// Setup Report Variables for Cooling Equipment
+				// CurrentModuleObject='Coil:Cooling:DX:TwoSpeed'
+				SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", Coil.TotalCoolingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", Coil.TotalCoolingEnergy, "System", "Sum", Coil.Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+				SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", Coil.SensCoolingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", Coil.SensCoolingEnergy, "System", "Sum", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", Coil.LatCoolingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", Coil.LatCoolingEnergy, "System", "Sum", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Electric Power [W]", Coil.ElecCoolingPower, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Electric Energy [J]", Coil.ElecCoolingConsumption, "System", "Sum", Coil.Name, _, "Electric", "COOLING", _, "System" );
+				SetupOutputVariable( "Cooling Coil Runtime Fraction []", Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name );
+                if ( Coil.IsSecondaryDXCoilInZone ) {
+                    SetupOutputVariable( "Secondary Coil Heat Rejection Rate [W]", Coil.SecCoilSensibleHeatGainRate, "System", "Average", Coil.Name );
+                }
 
-		for ( DXCoilNum = NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterCoils + 1; DXCoilNum <= NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterCoils + NumDXMulSpeedCoolCoils; ++DXCoilNum ) {
-			// Setup Report Variables for Cooling Equipment:
-			// CurrentModuleObject='Coil:Cooling:DX:MultiSpeed'
-			SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", DXCoil( DXCoilNum ).TotalCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", DXCoil( DXCoilNum ).TotalCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", DXCoil( DXCoilNum ).SensCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", DXCoil( DXCoilNum ).SensCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", DXCoil( DXCoilNum ).LatCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", DXCoil( DXCoilNum ).LatCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Electric Power [W]", DXCoil( DXCoilNum ).ElecCoolingPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Electric Energy [J]", DXCoil( DXCoilNum ).ElecCoolingConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
+				if ( Coil.ReportEvapCondVars ) {
+					SetupOutputVariable( "Cooling Coil Condenser Inlet Temperature [C]", Coil.CondInletTemp, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Water Volume [m3]", Coil.EvapWaterConsump, "System", "Sum", Coil.Name, _, "Water", "Cooling", _, "System" );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Mains Supply Water Volume [m3]", Coil.EvapWaterConsump, "System", "Sum", Coil.Name, _, "MainsWater", "Cooling", _, "System" );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Power [W]", Coil.EvapCondPumpElecPower, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Energy [J]", Coil.EvapCondPumpElecConsumption, "System", "Sum", Coil.Name, _, "Electric", "COOLING", _, "System" );
+					if ( Coil.BasinHeaterPowerFTempDiff > 0.0 ) {
+						SetupOutputVariable( "Cooling Coil Basin Heater Electric Power [W]", Coil.BasinHeaterPower, "System", "Average", Coil.Name );
+						SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy [J]", Coil.BasinHeaterConsumption, "System", "Sum", Coil.Name, _, "Electric", "COOLING", _, "System" );
+					}
 
-			if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
-				SetupOutputVariable( "Cooling Coil " + cValidOutputFuelTypes( DXCoil( DXCoilNum ).FuelType ) + " Rate [W]", DXCoil( DXCoilNum ).FuelUsed, "System", "Average", DXCoil( DXCoilNum ).Name );
-				SetupOutputVariable( "Cooling Coil " + cValidOutputFuelTypes( DXCoil( DXCoilNum ).FuelType ) + " Energy [J]", DXCoil( DXCoilNum ).FuelConsumed, "System", "Sum", DXCoil( DXCoilNum ).Name, _, cValidOutputFuelTypes( DXCoil( DXCoilNum ).FuelType ), "COOLING", _, "System" );
+				}
+
 			}
 
-			SetupOutputVariable( "Cooling Coil Runtime Fraction []", DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction, "System", "Average", DXCoil( DXCoilNum ).Name );
+			else if ( Coil.DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || Coil.DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) {
+				// Setup Report Variables for Cooling Equipment
+				// CurrentModuleObject='Coil:WaterHeating:AirToWaterHeatPump:Pumped or Wrapped'
+				SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", Coil.TotalCoolingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", Coil.TotalCoolingEnergy, "System", "Sum", Coil.Name ); //, &
+				//                           ResourceTypeKey='ENERGYTRANSFER',EndUseKey='COOLING',GroupKey='Plant')
+				SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", Coil.SensCoolingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", Coil.SensCoolingEnergy, "System", "Sum", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", Coil.LatCoolingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", Coil.LatCoolingEnergy, "System", "Sum", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Runtime Fraction []", Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name );
 
-			if ( DXCoil( DXCoilNum ).ReportEvapCondVars ) {
-				SetupOutputVariable( "Cooling Coil Condenser Inlet Temperature [C]", DXCoil( DXCoilNum ).CondInletTemp, "System", "Average", DXCoil( DXCoilNum ).Name );
-				SetupOutputVariable( "Cooling Coil Evaporative Condenser Water Volume [m3]", DXCoil( DXCoilNum ).EvapWaterConsump, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Water", "Cooling", _, "System" );
-				SetupOutputVariable( "Cooling Coil Evaporative Condenser Mains Supply Water Volume [m3]", DXCoil( DXCoilNum ).EvapWaterConsump, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "MainsWater", "Cooling", _, "System" );
-				SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Power [W]", DXCoil( DXCoilNum ).EvapCondPumpElecPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-				SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Energy [J]", DXCoil( DXCoilNum ).EvapCondPumpElecConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
-				if ( DXCoil( DXCoilNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
-					SetupOutputVariable( "Cooling Coil Basin Heater Electric Power [W]", DXCoil( DXCoilNum ).BasinHeaterPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy [J]", DXCoil( DXCoilNum ).BasinHeaterConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
+				if ( Coil.ReportCoolingCoilCrankcasePower ) {
+					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Power [W]", Coil.CrankcaseHeaterPower, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Energy [J]", Coil.CrankcaseHeaterConsumption, "System", "Sum", Coil.Name, _, "Electric", "DHW", _, "Plant" );
+				}
+
+				// new report variables for a HP water heater DX coil
+				SetupOutputVariable( "Cooling Coil Total Water Heating Rate [W]", Coil.TotalHeatingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Total Water Heating Energy [J]", Coil.TotalHeatingEnergy, "System", "Sum", Coil.Name ); //, &
+				//                           ResourceTypeKey='ENERGYTRANSFER',EndUseKey='HEATING',GroupKey='Plant')
+				SetupOutputVariable( "Cooling Coil Water Heating Electric Power [W]", Coil.ElecWaterHeatingPower, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Water Heating Electric Energy [J]", Coil.ElecWaterHeatingConsumption, "System", "Sum", Coil.Name, _, "Electric", "DHW", _, "Plant" );
+			}
+
+			else if ( Coil.DXCoilType_Num == CoilDX_MultiSpeedCooling ) {
+				// Setup Report Variables for Cooling Equipment:
+				// CurrentModuleObject='Coil:Cooling:DX:MultiSpeed'
+				SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", Coil.TotalCoolingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", Coil.TotalCoolingEnergy, "System", "Sum", Coil.Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+				SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", Coil.SensCoolingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", Coil.SensCoolingEnergy, "System", "Sum", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", Coil.LatCoolingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", Coil.LatCoolingEnergy, "System", "Sum", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Electric Power [W]", Coil.ElecCoolingPower, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Electric Energy [J]", Coil.ElecCoolingConsumption, "System", "Sum", Coil.Name, _, "Electric", "COOLING", _, "System" );
+
+				if ( Coil.FuelType != FuelTypeElectricity ) {
+					SetupOutputVariable( "Cooling Coil " + cValidOutputFuelTypes( Coil.FuelType ) + " Rate [W]", Coil.FuelUsed, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Cooling Coil " + cValidOutputFuelTypes( Coil.FuelType ) + " Energy [J]", Coil.FuelConsumed, "System", "Sum", Coil.Name, _, cValidOutputFuelTypes( Coil.FuelType ), "COOLING", _, "System" );
+				}
+
+				SetupOutputVariable( "Cooling Coil Runtime Fraction []", Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name );
+
+				if ( Coil.ReportEvapCondVars ) {
+					SetupOutputVariable( "Cooling Coil Condenser Inlet Temperature [C]", Coil.CondInletTemp, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Water Volume [m3]", Coil.EvapWaterConsump, "System", "Sum", Coil.Name, _, "Water", "Cooling", _, "System" );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Mains Supply Water Volume [m3]", Coil.EvapWaterConsump, "System", "Sum", Coil.Name, _, "MainsWater", "Cooling", _, "System" );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Power [W]", Coil.EvapCondPumpElecPower, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Energy [J]", Coil.EvapCondPumpElecConsumption, "System", "Sum", Coil.Name, _, "Electric", "COOLING", _, "System" );
+					if ( Coil.BasinHeaterPowerFTempDiff > 0.0 ) {
+						SetupOutputVariable( "Cooling Coil Basin Heater Electric Power [W]", Coil.BasinHeaterPower, "System", "Average", Coil.Name );
+						SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy [J]", Coil.BasinHeaterConsumption, "System", "Sum", Coil.Name, _, "Electric", "COOLING", _, "System" );
+					}
+				}
+                if (Coil.IsSecondaryDXCoilInZone) {
+                    SetupOutputVariable("Secondary Coil Heat Rejection Rate [W]", Coil.SecCoilSensibleHeatGainRate, "System", "Average", Coil.Name);
+                }
+
+			}
+
+			else if ( Coil.DXCoilType_Num == CoilDX_MultiSpeedHeating ) {
+				// Setup Report Variables for Heating Equipment:
+				// CurrentModuleObject='Coil:Heating:DX:MultiSpeed'
+				SetupOutputVariable( "Heating Coil Total Heating Rate [W]", Coil.TotalHeatingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Heating Coil Total Heating Energy [J]", Coil.TotalHeatingEnergy, "System", "Sum", Coil.Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+				SetupOutputVariable( "Heating Coil Electric Power [W]", Coil.ElecHeatingPower, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Heating Coil Electric Energy [J]", Coil.ElecHeatingConsumption, "System", "Sum", Coil.Name, _, "Electric", "HEATING", _, "System" );
+
+				if ( Coil.FuelType != FuelTypeElectricity ) {
+					SetupOutputVariable( "Heating Coil " + cValidOutputFuelTypes( Coil.FuelType ) + " Rate [W]", Coil.FuelUsed, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Heating Coil " + cValidOutputFuelTypes( Coil.FuelType ) + " Energy [J]", Coil.FuelConsumed, "System", "Sum", Coil.Name, _, cValidOutputFuelTypes( Coil.FuelType ), "HEATING", _, "System" );
+				}
+
+				if ( Coil.FuelType != FuelTypeElectricity && Coil.DefrostStrategy == ReverseCycle ) {
+					SetupOutputVariable( "Heating Coil Defrost " + cValidOutputFuelTypes( Coil.FuelType ) + " Rate [W]", Coil.DefrostPower, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Heating Coil Defrost " + cValidOutputFuelTypes( Coil.FuelType ) + " Energy [J]", Coil.DefrostConsumption, "System", "Sum", Coil.Name, _, cValidOutputFuelTypes( Coil.FuelType ), "HEATING", _, "System" );
+				} else {
+					SetupOutputVariable( "Heating Coil Defrost Electric Power [W]", Coil.DefrostPower, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Heating Coil Defrost Electric Energy [J]", Coil.DefrostConsumption, "System", "Sum", Coil.Name, _, "Electric", "HEATING", _, "System" );
+				}
+
+				SetupOutputVariable( "Heating Coil Crankcase Heater Electric Power [W]", Coil.CrankcaseHeaterPower, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Heating Coil Crankcase Heater Electric Energy [J]", Coil.CrankcaseHeaterConsumption, "System", "Sum", Coil.Name, _, "Electric", "HEATING", _, "System" );
+				SetupOutputVariable( "Heating Coil Runtime Fraction []", Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name );
+
+                if (Coil.IsSecondaryDXCoilInZone) {
+                    SetupOutputVariable("Secondary Coil Total Heat Removal Rate [W]", Coil.SecCoilTotalHeatRemovalRate, "System", "Average", Coil.Name);
+                    SetupOutputVariable("Secondary Coil Sensible Heat Removal Rate [W]", Coil.SecCoilSensibleHeatRemovalRate, "System", "Average", Coil.Name);
+                    SetupOutputVariable("Secondary Coil Latent Heat Removal Rate [W]", Coil.SecCoilLatentHeatRemovalRate, "System", "Average", Coil.Name);
+                    SetupOutputVariable("Secondary Coil Sensible Heat Ratio []", Coil.SecCoilSHR, "System", "Average", Coil.Name);
+                }
+			}
+
+			// VRF cooling coil report variables
+			else if ( Coil.DXCoilType_Num == CoilVRF_Cooling ) {
+				// Setup Report Variables for Cooling Equipment:
+				// CurrentModuleObject='Coil:Cooling:DX:VariableRefrigerantFlow
+				SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", Coil.TotalCoolingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", Coil.TotalCoolingEnergy, "System", "Sum", Coil.Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+				SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", Coil.SensCoolingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", Coil.SensCoolingEnergy, "System", "Sum", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", Coil.LatCoolingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", Coil.LatCoolingEnergy, "System", "Sum", Coil.Name );
+				SetupOutputVariable( "Cooling Coil Runtime Fraction []", Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name );
+				if ( Coil.CondensateCollectMode == CondensateToTank ) {
+					SetupOutputVariable( "Cooling Coil Condensate Volume Flow Rate [m3/s]", Coil.CondensateVdot, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Cooling Coil Condensate Volume [m3]", Coil.CondensateVol, "System", "Sum", Coil.Name, _, "OnSiteWater", "Condensate", _, "System" );
 				}
 			}
 
-		}
-
-		for ( DXCoilNum = NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterCoils + NumDXMulSpeedCoolCoils + 1; DXCoilNum <= NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils; ++DXCoilNum ) {
-			// Setup Report Variables for Heating Equipment:
-			// CurrentModuleObject='Coil:Heating:DX:MultiSpeed'
-			SetupOutputVariable( "Heating Coil Total Heating Rate [W]", DXCoil( DXCoilNum ).TotalHeatingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Total Heating Energy [J]", DXCoil( DXCoilNum ).TotalHeatingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Electric Power [W]", DXCoil( DXCoilNum ).ElecHeatingPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Electric Energy [J]", DXCoil( DXCoilNum ).ElecHeatingConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
-
-			if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
-				SetupOutputVariable( "Heating Coil " + cValidOutputFuelTypes( DXCoil( DXCoilNum ).FuelType ) + " Rate [W]", DXCoil( DXCoilNum ).FuelUsed, "System", "Average", DXCoil( DXCoilNum ).Name );
-				SetupOutputVariable( "Heating Coil " + cValidOutputFuelTypes( DXCoil( DXCoilNum ).FuelType ) + " Energy [J]", DXCoil( DXCoilNum ).FuelConsumed, "System", "Sum", DXCoil( DXCoilNum ).Name, _, cValidOutputFuelTypes( DXCoil( DXCoilNum ).FuelType ), "HEATING", _, "System" );
-			}
-
-			if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity && DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle ) {
-				SetupOutputVariable( "Heating Coil Defrost " + cValidOutputFuelTypes( DXCoil( DXCoilNum ).FuelType ) + " Rate [W]", DXCoil( DXCoilNum ).DefrostPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-				SetupOutputVariable( "Heating Coil Defrost " + cValidOutputFuelTypes( DXCoil( DXCoilNum ).FuelType ) + " Energy [J]", DXCoil( DXCoilNum ).DefrostConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, cValidOutputFuelTypes( DXCoil( DXCoilNum ).FuelType ), "HEATING", _, "System" );
-			} else {
-				SetupOutputVariable( "Heating Coil Defrost Electric Power [W]", DXCoil( DXCoilNum ).DefrostPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-				SetupOutputVariable( "Heating Coil Defrost Electric Energy [J]", DXCoil( DXCoilNum ).DefrostConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
-			}
-
-			SetupOutputVariable( "Heating Coil Crankcase Heater Electric Power [W]", DXCoil( DXCoilNum ).CrankcaseHeaterPower, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Crankcase Heater Electric Energy [J]", DXCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
-			SetupOutputVariable( "Heating Coil Runtime Fraction []", DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction, "System", "Average", DXCoil( DXCoilNum ).Name );
-
-		}
-
-		// VRF cooling coil report variables
-		for ( DXCoilNum = NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils + 1; DXCoilNum <= NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils + NumVRFCoolingCoils; ++DXCoilNum ) {
-			// Setup Report Variables for Cooling Equipment:
-			// CurrentModuleObject='Coil:Cooling:DX:VariableRefrigerantFlow
-			SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", DXCoil( DXCoilNum ).TotalCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", DXCoil( DXCoilNum ).TotalCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", DXCoil( DXCoilNum ).SensCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", DXCoil( DXCoilNum ).SensCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", DXCoil( DXCoilNum ).LatCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", DXCoil( DXCoilNum ).LatCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Runtime Fraction []", DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction, "System", "Average", DXCoil( DXCoilNum ).Name );
-			if ( DXCoil( DXCoilNum ).CondensateCollectMode == CondensateToTank ) {
-				SetupOutputVariable( "Cooling Coil Condensate Volume Flow Rate [m3/s]", DXCoil( DXCoilNum ).CondensateVdot, "System", "Average", DXCoil( DXCoilNum ).Name );
-				SetupOutputVariable( "Cooling Coil Condensate Volume [m3]", DXCoil( DXCoilNum ).CondensateVol, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "OnSiteWater", "Condensate", _, "System" );
+			// VRF heating coil report variables
+			else if ( Coil.DXCoilType_Num == CoilVRF_Heating ) {
+				// Setup Report Variables for Heating Equipment:
+				// CurrentModuleObject='Coil:Heating:DX:VariableRefrigerantFlow
+				SetupOutputVariable( "Heating Coil Total Heating Rate [W]", Coil.TotalHeatingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Heating Coil Total Heating Energy [J]", Coil.TotalHeatingEnergy, "System", "Sum", Coil.Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+				SetupOutputVariable( "Heating Coil Runtime Fraction []", Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name );
 			}
 		}
 
-		// VRF heating coil report variables
-		for ( DXCoilNum = NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils + NumVRFCoolingCoils + 1; DXCoilNum <= NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils + NumVRFCoolingCoils + NumVRFHeatingCoils; ++DXCoilNum ) {
-			// Setup Report Variables for Heating Equipment:
-			// CurrentModuleObject='Coil:Heating:DX:VariableRefrigerantFlow
-			SetupOutputVariable( "Heating Coil Total Heating Rate [W]", DXCoil( DXCoilNum ).TotalHeatingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Total Heating Energy [J]", DXCoil( DXCoilNum ).TotalHeatingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Runtime Fraction []", DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction, "System", "Average", DXCoil( DXCoilNum ).Name );
-		}
 		if ( AnyEnergyManagementSystemInModel ) {
 			// setup EMS sizing actuators for single speed DX
 			for ( DXCoilNum = 1; DXCoilNum <= NumDoe2DXCoils; ++DXCoilNum ) {
@@ -4631,6 +5153,8 @@ namespace DXCoils {
 		using DataAirLoop::AirLoopInputsFilled;
 		using General::TrimSigDigits;
 		using ReportSizingManager::ReportSizingOutput;
+		using DataHeatBalFanSys::ZoneAirHumRat;
+		using DataHeatBalFanSys::ZT;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4646,8 +5170,8 @@ namespace DXCoils {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_bool MyEnvrnFlag; // One time environment flag
-		static FArray1D_bool MySizeFlag; // One time sizing flag
+		static Array1D_bool MyEnvrnFlag; // One time environment flag
+		static Array1D_bool MySizeFlag; // One time sizing flag
 		static bool MyOneTimeFlag( true ); // One time flag used to allocate MyEnvrnFlag and MySizeFlag
 		static bool CrankcaseHeaterReportVarFlag( true ); // One time flag used to report crankcase heater power for non-HP coils
 		Real64 RatedHeatPumpIndoorAirTemp; // Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
@@ -4660,6 +5184,7 @@ namespace DXCoils {
 		int Mode; // Performance mode for MultiMode DX coil; Always 1 for other coil types
 		int DXCoilNumTemp; // Counter for crankcase heater report variable DO loop
 		int AirInletNode; // Air inlet node number
+		int SecZoneAirNodeNum; // secondary DX coil inlet node number ( secondary zone air node)
 
 		if ( MyOneTimeFlag ) {
 			// initialize the environment and sizing flags
@@ -4677,7 +5202,7 @@ namespace DXCoils {
 			DXCT = 1;
 		}
 
-		if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeater && MyEnvrnFlag( DXCoilNum ) ) {
+		if ( ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) && MyEnvrnFlag( DXCoilNum ) ) {
 
 			SizeDXCoil( DXCoilNum );
 
@@ -4914,7 +5439,16 @@ namespace DXCoils {
 		//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 		//  DXCoil(DXCoilNum)%InletAirPressure        = Node(AirInletNode)%Press
 
-		if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeater ) {
+		if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedHeating ) {
+			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+				SecZoneAirNodeNum = DXCoil( DXCoilNum ).SecZoneAirNodeNum;
+				Node( SecZoneAirNodeNum ).Temp = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+				Node( SecZoneAirNodeNum ).HumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
+				DXCoil( DXCoilNum ).EvapInletWetBulb = PsyTwbFnTdbWPb( Node( SecZoneAirNodeNum ).Temp, Node( SecZoneAirNodeNum ).HumRat, OutBaroPress, RoutineName );
+			}
+		}
+
+		if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) {
 			DXCoil( DXCoilNum ).TotalHeatingEnergyRate = 0.0;
 			DXCoil( DXCoilNum ).ElecWaterHeatingPower = 0.0;
 			//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
@@ -4930,6 +5464,14 @@ namespace DXCoils {
 
 		}
 		DXCoil( DXCoilNum ).BasinHeaterPower = 0.0;
+
+		if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+			DXCoil( DXCoilNum ).CompressorPartLoadRatio = 0.0;
+			DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate = 0.0;
+			DXCoil( DXCoilNum ).SecCoilTotalHeatRemovalRate = 0.0;
+			DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate = 0.0;
+			DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate = 0.0;
+		}
 
 	}
 
@@ -4986,7 +5528,6 @@ namespace DXCoils {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 rhoair;
-		Real64 CpAir;
 		Real64 MixTemp;
 		Real64 MixHumRat;
 		Real64 MixEnth;
@@ -5007,8 +5548,6 @@ namespace DXCoils {
 		int Mode; // Operating mode for MultiMode DX coil; Always 1 for other coil types
 		int NumOfSpeedCompanion; // Number of speed for a companion cooling coil (Multispeed HO heating coil only
 		std::string equipName;
-		bool OASysFlag; // Logical flag determines if parent object set OA Sys coil property
-		bool AirLoopSysFlag; // Logical flag determines if parent object set air loop coil property
 		Real64 RatedAirVolFlowRateDes; // Design rated air volume flow for reporting
 		Real64 RatedAirVolFlowRateUser; // Hard-sized rated air volume flow for reporting
 		Real64 RatedAirVolFlowRate2Des; // Design rated low speed air volume flow for reporting
@@ -5060,6 +5599,9 @@ namespace DXCoils {
 		int FieldNum = 2; // IDD numeric field number where input field description is found
 		int SizingMethod; // Integer representation of sizing method (e.g., CoolingAirflowSizing, HeatingCapacitySizing, etc.)
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
+		bool SizeSecDXCoil; // if true do sizing calculation for secondary coil
+		Real64 SecCoilAirFlowDes; // Design secondary DX coil air flow for reporting
+		Real64 SecCoilAirFlowUser; // Hard-sized secondary DX coil air flow for reporting
 
 		// Initiate all reporting variables
 		if ( SysSizingRunDone || ZoneSizingRunDone ) {
@@ -5081,6 +5623,7 @@ namespace DXCoils {
 
 		IsAutoSize = false;
 		IsCoolCoilCapAutoSize = false;
+		SizeSecDXCoil = false;
 		RatedAirVolFlowRateDes = 0.0;
 		RatedAirVolFlowRateUser = 0.0;
 		RatedAirVolFlowRate2Des = 0.0;
@@ -5119,6 +5662,8 @@ namespace DXCoils {
 		MSEvapCondPumpElecNomPower2User = 0.0;
 		MSDefrostCapacityDes = 0.0;
 		MSDefrostCapacityUser = 0.0;
+		SecCoilAirFlowDes = 0.0;
+		SecCoilAirFlowUser = 0.0;
 
 		//  EXTERNAL ReportSizingOutput
 
@@ -5128,7 +5673,7 @@ namespace DXCoils {
 		for ( DehumidModeNum = 0; DehumidModeNum <= DXCoil( DXCoilNum ).NumDehumidModes; ++DehumidModeNum ) {
 			for ( CapacityStageNum = 1; CapacityStageNum <= DXCoil( DXCoilNum ).NumCapacityStages; ++CapacityStageNum ) {
 				Mode = DehumidModeNum * 2 + CapacityStageNum;
-				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeater ) {
+				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) {
 					if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) == AutoCalculate ) {
 						// report autocalculated sizing
 						PrintFlag = true;
@@ -5178,6 +5723,9 @@ namespace DXCoils {
 						FieldNum = 3;
 						// doesn't look like this is needed for air flow sizing, only for heating capacity sizing
 						DataCoolCoilCap = DXCoolCap; // pass global variable used only for heat pumps (i.e., DX cooling and heating coils)
+						if ( ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) && ( DXCoil( DXCoilNum ).CondenserType( 1 ) == AirCooled ) ) { // seconday DX coil in secondary zone is specified
+							SizeSecDXCoil = true;
+						}
 					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
 						SizingMethod = HeatingAirflowSizing;
 						CompName = DXCoil( DXCoilNum ).Name;
@@ -5253,7 +5801,7 @@ namespace DXCoils {
 					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 					DataCoolCoilCap = DXCoolCap;
-				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeater ) {
+				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) {
 					SizingMethod = CoolingCapacitySizing;
 					CompName = DXCoil( DXCoilNum ).Name;
 					FieldNum = 1;
@@ -5336,6 +5884,33 @@ namespace DXCoils {
 					DXCoil( DXCoilNum ).EvapCondAirFlow( Mode ) = TempSize;
 					DataConstantUsedForSizing = 0.0;
 					DataFractionUsedForSizing = 0.0;
+				}
+
+				if ( SizeSecDXCoil ) { // autosize secondary coil air flow rate for AirCooled condenser type
+					IsAutoSize = false;
+					if ( DXCoil( DXCoilNum ).SecCoilAirFlow == AutoSize ) {
+						IsAutoSize = true;
+					}
+					// Auto size Primary Coil Air Flow * Secondary Coil Scaling Factor
+					SecCoilAirFlowDes = DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) * DXCoil( DXCoilNum ).SecCoilAirFlowScalingFactor;
+					if ( IsAutoSize ) {
+						DXCoil( DXCoilNum ).SecCoilAirFlow = SecCoilAirFlowDes;
+						ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Secondary Coil Air Flow Rate [m3/s]", SecCoilAirFlowDes );
+					} else {
+						if ( DXCoil( DXCoilNum ).SecCoilAirFlow > 0.0 && SecCoilAirFlowDes > 0.0 && !HardSizeNoDesRun ) {
+							SecCoilAirFlowUser = DXCoil( DXCoilNum ).SecCoilAirFlow;
+							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Design Size Secondary Coil Air Flow Rate [m3/s]", SecCoilAirFlowDes, "User-Specified Secondary Coil Air Flow Rate [m3/s]", SecCoilAirFlowUser );
+							if ( DisplayExtraWarnings ) {
+								if ( ( std::abs( SecCoilAirFlowDes - SecCoilAirFlowUser ) / SecCoilAirFlowUser ) > AutoVsHardSizingThreshold ) {
+									ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name );
+									ShowContinueError( "User-Specified Secondary Coil Air Flow Rate of " + RoundSigDigits( SecCoilAirFlowUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Secondary Coil Air Flow Rate of " + RoundSigDigits( SecCoilAirFlowDes, 5 ) + " [m3/s]" );
+									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+								}
+							}
+						}
+					}
 				}
 
 				// Sizing evaporative condenser air flow 2
@@ -5972,6 +6547,35 @@ namespace DXCoils {
 					ShowFatalError( "Preceding conditions cause termination." );
 				}
 			}
+			// Rated Secondary Coil Airflow Rates for AirCooled condenser type
+			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+				for ( Mode = DXCoil( DXCoilNum ).NumOfSpeeds; Mode >= 1; --Mode ) {
+					IsAutoSize = false;
+					if ( DXCoil( DXCoilNum ).MSSecCoilAirFlow( Mode ) == AutoSize ) {
+						IsAutoSize = true;
+					}
+					// Auto size Primary Coil air flow * Secondary Coil Scaling Factor
+					SecCoilAirFlowDes = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) * DXCoil( DXCoilNum ).MSSecCoilAirFlowScalingFactor( Mode );
+					if ( IsAutoSize ) {
+						DXCoil( DXCoilNum ).MSSecCoilAirFlow( Mode ) = SecCoilAirFlowDes;
+						ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Speed " + TrimSigDigits( Mode ) + " Design Size Secondary Coil Air Flow Rate [m3/s]", SecCoilAirFlowDes );
+					} else {
+						if ( DXCoil( DXCoilNum ).MSSecCoilAirFlow( Mode ) > 0.0 && SecCoilAirFlowDes > 0.0 && !HardSizeNoDesRun ) {
+							SecCoilAirFlowUser = DXCoil( DXCoilNum ).MSSecCoilAirFlow( Mode );
+							ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Speed " + TrimSigDigits( Mode ) + " Design Size Secondary Coil Air Flow Rate [m3/s]", SecCoilAirFlowDes, "Speed " + TrimSigDigits( Mode ) + " User-Specified Secondary Coil Air Flow Rate [m3/s]", SecCoilAirFlowUser );
+							if ( DisplayExtraWarnings ) {
+								if ( ( std::abs( SecCoilAirFlowDes - SecCoilAirFlowUser ) / SecCoilAirFlowUser ) > AutoVsHardSizingThreshold ) {
+									ShowMessage( "SizeDxCoil: Potential issue with equipment sizing for " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name );
+									ShowContinueError( "User-Specified Secondary Coil Air Flow Rate of " + RoundSigDigits( SecCoilAirFlowUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Secondary Coil Air Flow Rate of " + RoundSigDigits( SecCoilAirFlowDes, 5 ) + " [m3/s]" );
+									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+								}
+							}
+						}
+					}
+				}
+			}
 
 			// Sizing rated total heating capacity
 			for ( Mode = DXCoil( DXCoilNum ).NumOfSpeeds; Mode >= 1; --Mode ) {
@@ -6086,7 +6690,7 @@ namespace DXCoils {
 			}
 			addFootNoteSubTable( pdstCoolCoil, "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for." );
 
-		} else if ( ( SELECT_CASE_var == CoilDX_HeatingEmpirical ) || ( SELECT_CASE_var == CoilDX_MultiSpeedHeating ) || ( SELECT_CASE_var == CoilDX_HeatPumpWaterHeater ) ) {
+		} else if ( ( SELECT_CASE_var == CoilDX_HeatingEmpirical ) || ( SELECT_CASE_var == CoilDX_MultiSpeedHeating ) || ( SELECT_CASE_var == CoilDX_HeatPumpWaterHeaterPumped ) || ( SELECT_CASE_var == CoilDX_HeatPumpWaterHeaterWrapped ) ) {
 			PreDefTableEntry( pdchHeatCoilType, equipName, DXCoil( DXCoilNum ).DXCoilType );
 			if ( DXCoil( DXCoilNum ).NumOfSpeeds == 0 ) {
 				if ( DXCoil( DXCoilNum ).NumCapacityStages == 1 ) {
@@ -6181,26 +6785,23 @@ namespace DXCoils {
 		Real64 PartLoadFraction; // Output of Part Load Fraction as a Function of Part Load Ratio curve
 		Real64 PumpHeatToWater; // Amount of pump heat attributed to heating water
 		Real64 HPRTF; // Heat pump run time fraction
-		int EvapInletNode; // Evaporator air inlet node number
-		int EvapOutletNode; // Evaporator air outlet node number
-		int CondInletNode; // Condenser water inlet node number
-		int CondOutletNode; // Condenser water outlet node number
 
-		CondInletNode = DXCoil( DXCoilNum ).WaterInNode;
-		CondOutletNode = DXCoil( DXCoilNum ).WaterOutNode;
+		// References to Coil and Node struct
+		DXCoilData & Coil = DXCoil( DXCoilNum );
+		NodeData & AirInletNode = Node( Coil.AirInNode );
+		NodeData & WaterInletNode = Node( Coil.WaterInNode );
+		NodeData & WaterOutletNode = Node( Coil.WaterOutNode );
 
 		// If heat pump water heater is OFF, set outlet to inlet and RETURN
 		if ( PartLoadRatio == 0.0 ) {
-			Node( CondOutletNode ) = Node( CondInletNode );
+			WaterOutletNode = WaterInletNode;
 			return;
 		} else {
-			RatedHeatingCapacity = DXCoil( DXCoilNum ).RatedTotCap2;
-			RatedHeatingCOP = DXCoil( DXCoilNum ).RatedCOP( 1 );
-			EvapInletNode = DXCoil( DXCoilNum ).AirInNode;
-			EvapOutletNode = DXCoil( DXCoilNum ).AirOutNode;
-			InletWaterTemp = Node( CondInletNode ).Temp;
-			CondInletMassFlowRate = Node( CondInletNode ).MassFlowRate / PartLoadRatio;
-			EvapInletMassFlowRate = Node( EvapInletNode ).MassFlowRate / PartLoadRatio;
+			RatedHeatingCapacity = Coil.RatedTotCap2;
+			RatedHeatingCOP = Coil.RatedCOP( 1 );
+			InletWaterTemp = WaterInletNode.Temp;
+			CondInletMassFlowRate = WaterInletNode.MassFlowRate / PartLoadRatio;
+			EvapInletMassFlowRate = AirInletNode.MassFlowRate / PartLoadRatio;
 			CpWater = CPHW( InletWaterTemp );
 			CompressorPower = 0.0;
 			OperatingHeatingPower = 0.0;
@@ -6208,129 +6809,129 @@ namespace DXCoils {
 		}
 
 		// determine inlet air temperature type for curve objects
-		if ( DXCoil( DXCoilNum ).InletAirTemperatureType == WetBulbIndicator ) {
+		if ( Coil.InletAirTemperatureType == WetBulbIndicator ) {
 			InletAirTemp = HPWHInletWBTemp;
 		} else {
 			InletAirTemp = HPWHInletDBTemp;
 		}
 
 		// get output of Heating Capacity and Heating COP curves (curves default to 1 if user has not specified curve name)
-		if ( DXCoil( DXCoilNum ).HCapFTemp > 0 ) {
-			if ( DXCoil( DXCoilNum ).HCapFTempCurveType == Cubic ) {
-				HeatCapFTemp = CurveValue( DXCoil( DXCoilNum ).HCapFTemp, InletAirTemp );
+		if ( Coil.HCapFTemp > 0 ) {
+			if ( Coil.HCapFTempCurveType == Cubic ) {
+				HeatCapFTemp = CurveValue( Coil.HCapFTemp, InletAirTemp );
 			} else {
-				HeatCapFTemp = CurveValue( DXCoil( DXCoilNum ).HCapFTemp, InletAirTemp, InletWaterTemp );
+				HeatCapFTemp = CurveValue( Coil.HCapFTemp, InletAirTemp, InletWaterTemp );
 			}
 			//   Warn user if curve output goes negative
 			if ( HeatCapFTemp < 0.0 ) {
-				if ( DXCoil( DXCoilNum ).HCapFTempErrorIndex == 0 ) {
-					ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\":" );
+				if ( Coil.HCapFTempErrorIndex == 0 ) {
+					ShowWarningMessage( Coil.DXCoilType + " \"" + Coil.Name + "\":" );
 					ShowContinueError( " HPWH Heating Capacity Modifier curve (function of temperature) output is negative (" + TrimSigDigits( HeatCapFTemp, 3 ) + ")." );
-					if ( DXCoil( DXCoilNum ).HCapFTempCurveType == BiQuadratic ) {
+					if ( Coil.HCapFTempCurveType == BiQuadratic ) {
 						ShowContinueError( " Negative value occurs using an inlet air temperature of " + TrimSigDigits( InletAirTemp, 1 ) + " and an inlet water temperature of " + TrimSigDigits( InletWaterTemp, 1 ) + '.' );
 					} else {
 						ShowContinueError( " Negative value occurs using an inlet air temperature of " + TrimSigDigits( InletAirTemp, 1 ) + '.' );
 					}
 					ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": HPWH Heating Capacity Modifier curve (function of temperature) output is negative warning continues...", DXCoil( DXCoilNum ).HCapFTempErrorIndex, HeatCapFTemp, HeatCapFTemp, _, "[C]", "[C]" );
+				ShowRecurringWarningErrorAtEnd( Coil.DXCoilType + " \"" + Coil.Name + "\": HPWH Heating Capacity Modifier curve (function of temperature) output is negative warning continues...", Coil.HCapFTempErrorIndex, HeatCapFTemp, HeatCapFTemp, _, "[C]", "[C]" );
 				HeatCapFTemp = 0.0;
 			}
 		} else {
 			HeatCapFTemp = 1.0;
 		}
 
-		if ( DXCoil( DXCoilNum ).HCOPFTemp > 0 ) {
-			if ( DXCoil( DXCoilNum ).HCOPFTempCurveType == Cubic ) {
-				HeatCOPFTemp = CurveValue( DXCoil( DXCoilNum ).HCOPFTemp, InletAirTemp );
+		if ( Coil.HCOPFTemp > 0 ) {
+			if ( Coil.HCOPFTempCurveType == Cubic ) {
+				HeatCOPFTemp = CurveValue( Coil.HCOPFTemp, InletAirTemp );
 			} else {
-				HeatCOPFTemp = CurveValue( DXCoil( DXCoilNum ).HCOPFTemp, InletAirTemp, InletWaterTemp );
+				HeatCOPFTemp = CurveValue( Coil.HCOPFTemp, InletAirTemp, InletWaterTemp );
 			}
 			//   Warn user if curve output goes negative
 			if ( HeatCOPFTemp < 0.0 ) {
-				if ( DXCoil( DXCoilNum ).HCOPFTempErrorIndex == 0 ) {
-					ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\":" );
+				if ( Coil.HCOPFTempErrorIndex == 0 ) {
+					ShowWarningMessage( Coil.DXCoilType + " \"" + Coil.Name + "\":" );
 					ShowContinueError( " HPWH Heating COP Modifier curve (function of temperature) output is negative (" + TrimSigDigits( HeatCOPFTemp, 3 ) + ")." );
-					if ( DXCoil( DXCoilNum ).HCOPFTempCurveType == BiQuadratic ) {
+					if ( Coil.HCOPFTempCurveType == BiQuadratic ) {
 						ShowContinueError( " Negative value occurs using an inlet air temperature of " + TrimSigDigits( InletAirTemp, 1 ) + " and an inlet water temperature of " + TrimSigDigits( InletWaterTemp, 1 ) + '.' );
 					} else {
 						ShowContinueError( " Negative value occurs using an inlet air temperature of " + TrimSigDigits( InletAirTemp, 1 ) + '.' );
 					}
 					ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": HPWH Heating COP Modifier curve (function of temperature) output is negative warning continues...", DXCoil( DXCoilNum ).HCOPFTempErrorIndex, HeatCOPFTemp, HeatCOPFTemp, _, "[C]", "[C]" );
+				ShowRecurringWarningErrorAtEnd( Coil.DXCoilType + " \"" + Coil.Name + "\": HPWH Heating COP Modifier curve (function of temperature) output is negative warning continues...", Coil.HCOPFTempErrorIndex, HeatCOPFTemp, HeatCOPFTemp, _, "[C]", "[C]" );
 				HeatCOPFTemp = 0.0;
 			}
 		} else {
 			HeatCOPFTemp = 1.0;
 		}
 
-		if ( DXCoil( DXCoilNum ).HCapFAirFlow > 0 ) {
-			AirFlowRateRatio = EvapInletMassFlowRate / ( DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 ) );
-			HeatCapFAirFlow = CurveValue( DXCoil( DXCoilNum ).HCapFAirFlow, AirFlowRateRatio );
+		if ( Coil.HCapFAirFlow > 0 ) {
+			AirFlowRateRatio = EvapInletMassFlowRate / ( Coil.RatedAirMassFlowRate( 1 ) );
+			HeatCapFAirFlow = CurveValue( Coil.HCapFAirFlow, AirFlowRateRatio );
 			//   Warn user if curve output goes negative
 			if ( HeatCapFAirFlow < 0.0 ) {
-				if ( DXCoil( DXCoilNum ).HCapFAirFlowErrorIndex == 0 ) {
-					ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\":" );
+				if ( Coil.HCapFAirFlowErrorIndex == 0 ) {
+					ShowWarningMessage( Coil.DXCoilType + " \"" + Coil.Name + "\":" );
 					ShowContinueError( " HPWH Heating Capacity Modifier curve (function of air flow fraction) output is negative (" + TrimSigDigits( HeatCapFAirFlow, 3 ) + ")." );
 					ShowContinueError( " Negative value occurs using an air flow fraction of " + TrimSigDigits( AirFlowRateRatio, 3 ) + '.' );
 					ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": HPWH Heating Capacity Modifier curve (function of air flow fraction) output is negative warning continues...", DXCoil( DXCoilNum ).HCapFAirFlowErrorIndex, HeatCapFAirFlow, HeatCapFAirFlow );
+				ShowRecurringWarningErrorAtEnd( Coil.DXCoilType + " \"" + Coil.Name + "\": HPWH Heating Capacity Modifier curve (function of air flow fraction) output is negative warning continues...", Coil.HCapFAirFlowErrorIndex, HeatCapFAirFlow, HeatCapFAirFlow );
 				HeatCapFAirFlow = 0.0;
 			}
 		} else {
 			HeatCapFAirFlow = 1.0;
 		}
 
-		if ( DXCoil( DXCoilNum ).HCOPFAirFlow > 0 ) {
-			AirFlowRateRatio = EvapInletMassFlowRate / ( DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 ) );
-			HeatCOPFAirFlow = CurveValue( DXCoil( DXCoilNum ).HCOPFAirFlow, AirFlowRateRatio );
+		if ( Coil.HCOPFAirFlow > 0 ) {
+			AirFlowRateRatio = EvapInletMassFlowRate / ( Coil.RatedAirMassFlowRate( 1 ) );
+			HeatCOPFAirFlow = CurveValue( Coil.HCOPFAirFlow, AirFlowRateRatio );
 			//   Warn user if curve output goes negative
 			if ( HeatCOPFAirFlow < 0.0 ) {
-				if ( DXCoil( DXCoilNum ).HCOPFAirFlowErrorIndex == 0 ) {
-					ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\":" );
+				if ( Coil.HCOPFAirFlowErrorIndex == 0 ) {
+					ShowWarningMessage( Coil.DXCoilType + " \"" + Coil.Name + "\":" );
 					ShowContinueError( " HPWH Heating COP Modifier curve (function of air flow fraction) output is negative (" + TrimSigDigits( HeatCOPFAirFlow, 3 ) + ")." );
 					ShowContinueError( " Negative value occurs using an air flow fraction of " + TrimSigDigits( AirFlowRateRatio, 3 ) + '.' );
 					ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": HPWH Heating COP Modifier curve (function of air flow fraction) output is negative warning continues...", DXCoil( DXCoilNum ).HCOPFAirFlowErrorIndex, HeatCOPFAirFlow, HeatCOPFAirFlow );
+				ShowRecurringWarningErrorAtEnd( Coil.DXCoilType + " \"" + Coil.Name + "\": HPWH Heating COP Modifier curve (function of air flow fraction) output is negative warning continues...", Coil.HCOPFAirFlowErrorIndex, HeatCOPFAirFlow, HeatCOPFAirFlow );
 				HeatCOPFAirFlow = 0.0;
 			}
 		} else {
 			HeatCOPFAirFlow = 1.0;
 		}
 
-		if ( DXCoil( DXCoilNum ).HCapFWaterFlow > 0 ) {
-			WaterFlowRateRatio = CondInletMassFlowRate / ( DXCoil( DXCoilNum ).RatedHPWHCondWaterFlow * RhoH2O( InletWaterTemp ) );
-			HeatCapFWaterFlow = CurveValue( DXCoil( DXCoilNum ).HCapFWaterFlow, WaterFlowRateRatio );
+		if ( Coil.HCapFWaterFlow > 0 ) {
+			WaterFlowRateRatio = CondInletMassFlowRate / ( Coil.RatedHPWHCondWaterFlow * RhoH2O( InletWaterTemp ) );
+			HeatCapFWaterFlow = CurveValue( Coil.HCapFWaterFlow, WaterFlowRateRatio );
 			//   Warn user if curve output goes negative
 			if ( HeatCapFWaterFlow < 0.0 ) {
-				if ( DXCoil( DXCoilNum ).HCapFWaterFlowErrorIndex == 0 ) {
-					ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\":" );
+				if ( Coil.HCapFWaterFlowErrorIndex == 0 ) {
+					ShowWarningMessage( Coil.DXCoilType + " \"" + Coil.Name + "\":" );
 					ShowContinueError( " HPWH Heating Capacity Modifier curve (function of water flow fraction) output is negative (" + TrimSigDigits( HeatCapFWaterFlow, 3 ) + ")." );
 					ShowContinueError( " Negative value occurs using a water flow fraction of " + TrimSigDigits( WaterFlowRateRatio, 3 ) + '.' );
 					ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": HPWH Heating Capacity Modifier curve (function of water flow fraction) output is negative warning continues...", DXCoil( DXCoilNum ).HCapFWaterFlowErrorIndex, HeatCapFWaterFlow, HeatCapFWaterFlow );
+				ShowRecurringWarningErrorAtEnd( Coil.DXCoilType + " \"" + Coil.Name + "\": HPWH Heating Capacity Modifier curve (function of water flow fraction) output is negative warning continues...", Coil.HCapFWaterFlowErrorIndex, HeatCapFWaterFlow, HeatCapFWaterFlow );
 				HeatCapFWaterFlow = 0.0;
 			}
 		} else {
 			HeatCapFWaterFlow = 1.0;
 		}
 
-		if ( DXCoil( DXCoilNum ).HCOPFWaterFlow > 0 ) {
-			WaterFlowRateRatio = CondInletMassFlowRate / ( DXCoil( DXCoilNum ).RatedHPWHCondWaterFlow * RhoH2O( InletWaterTemp ) );
-			HeatCOPFWaterFlow = CurveValue( DXCoil( DXCoilNum ).HCOPFWaterFlow, WaterFlowRateRatio );
+		if ( Coil.HCOPFWaterFlow > 0 ) {
+			WaterFlowRateRatio = CondInletMassFlowRate / ( Coil.RatedHPWHCondWaterFlow * RhoH2O( InletWaterTemp ) );
+			HeatCOPFWaterFlow = CurveValue( Coil.HCOPFWaterFlow, WaterFlowRateRatio );
 			//   Warn user if curve output goes negative
 			if ( HeatCOPFWaterFlow < 0.0 ) {
-				if ( DXCoil( DXCoilNum ).HCOPFWaterFlowErrorIndex == 0 ) {
-					ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\":" );
+				if ( Coil.HCOPFWaterFlowErrorIndex == 0 ) {
+					ShowWarningMessage( Coil.DXCoilType + " \"" + Coil.Name + "\":" );
 					ShowContinueError( " HPWH Heating COP Modifier curve (function of water flow fraction) output is negative (" + TrimSigDigits( HeatCOPFWaterFlow, 3 ) + ")." );
 					ShowContinueError( " Negative value occurs using a water flow fraction of " + TrimSigDigits( WaterFlowRateRatio, 3 ) + '.' );
 					ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": HPWH Heating COP Modifier curve (function of water flow fraction) output is negative warning continues...", DXCoil( DXCoilNum ).HCOPFWaterFlowErrorIndex, HeatCOPFWaterFlow, HeatCOPFWaterFlow );
+				ShowRecurringWarningErrorAtEnd( Coil.DXCoilType + " \"" + Coil.Name + "\": HPWH Heating COP Modifier curve (function of water flow fraction) output is negative warning continues...", Coil.HCOPFWaterFlowErrorIndex, HeatCOPFWaterFlow, HeatCOPFWaterFlow );
 				HeatCOPFWaterFlow = 0.0;
 			}
 		} else {
@@ -6343,19 +6944,19 @@ namespace DXCoils {
 
 		if ( OperatingHeatingCOP > 0.0 ) OperatingHeatingPower = OperatingHeatingCapacity / OperatingHeatingCOP;
 
-		PumpHeatToWater = DXCoil( DXCoilNum ).HPWHCondPumpElecNomPower * DXCoil( DXCoilNum ).HPWHCondPumpFracToWater;
+		PumpHeatToWater = Coil.HPWHCondPumpElecNomPower * Coil.HPWHCondPumpFracToWater;
 		TankHeatingCOP = OperatingHeatingCOP;
 
 		// account for pump heat if not included in total water heating capacity
-		if ( DXCoil( DXCoilNum ).CondPumpHeatInCapacity ) {
+		if ( Coil.CondPumpHeatInCapacity ) {
 			TotalTankHeatingCapacity = OperatingHeatingCapacity;
 		} else {
 			TotalTankHeatingCapacity = OperatingHeatingCapacity + PumpHeatToWater;
 		}
 
 		// find part load fraction to calculate RTF
-		if ( DXCoil( DXCoilNum ).PLFFPLR( 1 ) > 0 ) {
-			PartLoadFraction = max( 0.7, CurveValue( DXCoil( DXCoilNum ).PLFFPLR( 1 ), PartLoadRatio ) );
+		if ( Coil.PLFFPLR( 1 ) > 0 ) {
+			PartLoadFraction = max( 0.7, CurveValue( Coil.PLFFPLR( 1 ), PartLoadRatio ) );
 		} else {
 			PartLoadFraction = 1.0;
 		}
@@ -6364,35 +6965,35 @@ namespace DXCoils {
 
 		// calculate evaporator total cooling capacity
 		if ( HPRTF > 0.0 ) {
-			if ( DXCoil( DXCoilNum ).FanPowerIncludedInCOP ) {
-				if ( DXCoil( DXCoilNum ).CondPumpPowerInCOP ) {
+			if ( Coil.FanPowerIncludedInCOP ) {
+				if ( Coil.CondPumpPowerInCOP ) {
 					//       make sure fan power is full load fan power
-					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF - DXCoil( DXCoilNum ).HPWHCondPumpElecNomPower;
+					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF - Coil.HPWHCondPumpElecNomPower;
 					if ( OperatingHeatingPower > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / OperatingHeatingPower;
 				} else {
 					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF;
-					if ( ( OperatingHeatingPower + DXCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + DXCoil( DXCoilNum ).HPWHCondPumpElecNomPower );
+					if ( ( OperatingHeatingPower + Coil.HPWHCondPumpElecNomPower ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + Coil.HPWHCondPumpElecNomPower );
 				}
 			} else {
-				if ( DXCoil( DXCoilNum ).CondPumpPowerInCOP ) {
+				if ( Coil.CondPumpPowerInCOP ) {
 					//       make sure fan power is full load fan power
-					CompressorPower = OperatingHeatingPower - DXCoil( DXCoilNum ).HPWHCondPumpElecNomPower;
+					CompressorPower = OperatingHeatingPower - Coil.HPWHCondPumpElecNomPower;
 					if ( ( OperatingHeatingPower + FanElecPower / HPRTF ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + FanElecPower / HPRTF );
 				} else {
 					CompressorPower = OperatingHeatingPower;
-					if ( ( OperatingHeatingPower + FanElecPower / HPRTF + DXCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + FanElecPower / HPRTF + DXCoil( DXCoilNum ).HPWHCondPumpElecNomPower );
+					if ( ( OperatingHeatingPower + FanElecPower / HPRTF + Coil.HPWHCondPumpElecNomPower ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + FanElecPower / HPRTF + Coil.HPWHCondPumpElecNomPower );
 				}
 			}
 		}
 
-		if ( DXCoil( DXCoilNum ).CondPumpHeatInCapacity ) {
+		if ( Coil.CondPumpHeatInCapacity ) {
 			EvapCoolingCapacity = TotalTankHeatingCapacity - PumpHeatToWater - CompressorPower;
 		} else {
 			EvapCoolingCapacity = TotalTankHeatingCapacity - CompressorPower;
 		}
 
 		// set evaporator total cooling capacity prior to CalcDOE2DXCoil subroutine
-		DXCoil( DXCoilNum ).RatedTotCap( 1 ) = EvapCoolingCapacity;
+		Coil.RatedTotCap( 1 ) = EvapCoolingCapacity;
 
 		// determine condenser water inlet/outlet condition at full capacity
 		if ( CondInletMassFlowRate == 0.0 ) {
@@ -6401,9 +7002,9 @@ namespace DXCoils {
 			OutletWaterTemp = InletWaterTemp + TotalTankHeatingCapacity / ( CpWater * CondInletMassFlowRate );
 		}
 
-		Node( CondOutletNode ).Temp = OutletWaterTemp;
+		WaterOutletNode.Temp = OutletWaterTemp;
 
-		Node( CondOutletNode ).MassFlowRate = Node( CondInletNode ).MassFlowRate;
+		WaterOutletNode.MassFlowRate = WaterInletNode.MassFlowRate;
 
 		// send heating capacity and COP to water heater module for standards rating calculation
 		// total heating capacity including condenser pump
@@ -6414,10 +7015,10 @@ namespace DXCoils {
 		// send DX coil total cooling capacity to HPWH for reporting
 		DXCoilTotalCapacity = EvapCoolingCapacity;
 
-		DXCoil( DXCoilNum ).TotalHeatingEnergyRate = TotalTankHeatingCapacity * PartLoadRatio;
+		Coil.TotalHeatingEnergyRate = TotalTankHeatingCapacity * PartLoadRatio;
 
 		// calculate total compressor plus condenser pump power, fan power reported in fan module
-		DXCoil( DXCoilNum ).ElecWaterHeatingPower = ( CompressorPower + DXCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) * HPRTF;
+		Coil.ElecWaterHeatingPower = ( CompressorPower + Coil.HPWHCondPumpElecNomPower ) * HPRTF;
 
 	}
 
@@ -6486,6 +7087,7 @@ namespace DXCoils {
 		using General::RoundSigDigits;
 		using General::CreateSysTimeIntervalString;
 		using DataWater::WaterStorage;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6640,6 +7242,12 @@ namespace DXCoils {
 				OutdoorPressure = OutBaroPress;
 				OutdoorWetBulb = OutWetBulbTemp;
 			}
+			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
+				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
+				OutdoorPressure = OutBaroPress;
+			}
 		} else {
 			if ( DXCoil( DXCoilNum ).CondenserInletNodeNum( Mode ) != 0 ) {
 				OutdoorPressure = Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( Mode ) ).Press;
@@ -6653,6 +7261,14 @@ namespace DXCoils {
 		if ( DXCoil( DXCoilNum ).CondenserType( Mode ) == AirCooled ) {
 			CondInletTemp = OutdoorDryBulb; // Outdoor dry-bulb temp
 			CompAmbTemp = OutdoorDryBulb;
+			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+				CondInletTemp = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
+				CompAmbTemp = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
+				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
+				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
+				OutdoorPressure = OutBaroPress;
+			}
 		} else if ( DXCoil( DXCoilNum ).CondenserType( Mode ) == EvapCooled ) {
 			RhoAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat );
 			CondAirMassFlow = RhoAir * DXCoil( DXCoilNum ).EvapCondAirFlow( Mode );
@@ -6714,7 +7330,7 @@ namespace DXCoils {
 		DXCoil( DXCoilNum ).PrintLowAmbMessage = false;
 		DXCoil( DXCoilNum ).PrintLowOutTempMessage = false;
 
-		if ( ( AirMassFlow > 0.0 ) && ( GetCurrentScheduleValue( DXCoil( DXCoilNum ).SchedPtr ) > 0.0 || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeater ) && ( PartLoadRatio > 0.0 ) && ( CompOp == On ) ) { // for cycling fan, reset mass flow to full on rate
+		if ( ( AirMassFlow > 0.0 ) && ( GetCurrentScheduleValue( DXCoil( DXCoilNum ).SchedPtr ) > 0.0 || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) && ( PartLoadRatio > 0.0 ) && ( CompOp == On ) ) { // for cycling fan, reset mass flow to full on rate
 			if ( FanOpMode == CycFanCycCoil ) {
 				AirMassFlow /= ( PartLoadRatio / DXcoolToHeatPLRRatio );
 			} else if ( FanOpMode == ContFanCycCoil && DXCoil( DXCoilNum ).DXCoilType_Num != CoilDX_CoolingTwoSpeed ) {
@@ -6736,12 +7352,12 @@ namespace DXCoils {
 			if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) <= 0.0 ) {
 				ShowFatalError( RoutineName + DXCoil( DXCoilNum ).DXCoilType + "=\"" + DXCoil( DXCoilNum ).Name + "\" - Rated total cooling capacity is zero or less." );
 			}
-			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeater ) {
+			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) {
 				VolFlowperRatedTotCap = AirVolumeFlowRate / DXCoil( DXCoilNum ).RatedTotCap2;
 			} else {
 				VolFlowperRatedTotCap = AirVolumeFlowRate / DXCoil( DXCoilNum ).RatedTotCap( Mode );
 			}
-			if ( ! FirstHVACIteration && ! WarmupFlag && DXCoil( DXCoilNum ).DXCoilType_Num != CoilDX_HeatPumpWaterHeater && ( ( VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap( DXCT ) ) || ( VolFlowperRatedTotCap > MaxCoolVolFlowPerRatedTotCap( DXCT ) ) ) ) {
+			if ( ! FirstHVACIteration && ! WarmupFlag && DXCoil( DXCoilNum ).DXCoilType_Num != CoilDX_HeatPumpWaterHeaterPumped && DXCoil( DXCoilNum ).DXCoilType_Num != CoilDX_HeatPumpWaterHeaterWrapped && ( ( VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap( DXCT ) ) || ( VolFlowperRatedTotCap > MaxCoolVolFlowPerRatedTotCap( DXCT ) ) ) ) {
 				if ( DXCoil( DXCoilNum ).ErrIndex1 == 0 ) {
 					ShowWarningMessage( RoutineName + DXCoil( DXCoilNum ).DXCoilType + "=\"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at " + RoundSigDigits( VolFlowperRatedTotCap, 3 ) + " m3/s/W." );
 					ShowContinueErrorTimeStamp( "" );
@@ -6750,7 +7366,7 @@ namespace DXCoils {
 					ShowContinueError( "or variable air volume [VAV] system using incorrect coil type." );
 				}
 				ShowRecurringWarningErrorAtEnd( RoutineName + DXCoil( DXCoilNum ).DXCoilType + "=\"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range error continues...", DXCoil( DXCoilNum ).ErrIndex1, VolFlowperRatedTotCap, VolFlowperRatedTotCap );
-			} else if ( ! WarmupFlag && DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeater && ( ( VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap( DXCT ) ) || ( VolFlowperRatedTotCap > MaxHeatVolFlowPerRatedTotCap( DXCT ) ) ) ) {
+			} else if ( ! WarmupFlag && DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped && DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped && ( ( VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap( DXCT ) ) || ( VolFlowperRatedTotCap > MaxHeatVolFlowPerRatedTotCap( DXCT ) ) ) ) {
 				if ( DXCoil( DXCoilNum ).ErrIndex1 == 0 ) {
 					ShowWarningMessage( RoutineName + DXCoil( DXCoilNum ).DXCoilType + "=\"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total water heating capacity is out of range at " + RoundSigDigits( VolFlowperRatedTotCap, 2 ) + " m3/s/W." );
 					ShowContinueErrorTimeStamp( "" );
@@ -6801,7 +7417,7 @@ namespace DXCoils {
 			InletAirHumRatTemp = InletAirHumRat;
 			AirMassFlowRatio = AirMassFlow / DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
 			while ( true ) {
-				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeater ) {
+				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) {
 					// Coil:DX:HeatPumpWaterHeater does not have total cooling capacity as a function of temp or flow curve
 					TotCapTempModFac = 1.0;
 					TotCapFlowModFac = 1.0;
@@ -6896,7 +7512,7 @@ namespace DXCoils {
 
 			if ( PLF < 0.7 ) {
 				if ( DXCoil( DXCoilNum ).ErrIndex2 == 0 ) {
-					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeater ) {
+					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) {
 						ShowWarningMessage( RoutineName + DXCoil( DXCoilNum ).DXCoilType + "=\"" + DXCoil( DXCoilNum ).Name + "\", PLF curve value" );
 						ShowContinueError( "The PLF curve value = " + TrimSigDigits( PLF, 3 ) + " for part-load ratio = " + TrimSigDigits( PartLoadRatio, 3 ) );
 						ShowContinueErrorTimeStamp( "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and simulation is continuing." );
@@ -6908,7 +7524,7 @@ namespace DXCoils {
 						ShowContinueError( "Check the IO reference manual for PLF curve guidance [" + DXCoil( DXCoilNum ).DXCoilType + "]." );
 					}
 				}
-				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeater ) {
+				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) {
 					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).Name + ", " + DXCoil( DXCoilNum ).DXCoilType + " PLF curve < 0.7 warning continues...", DXCoil( DXCoilNum ).ErrIndex2, PLF, PLF );
 				} else {
 					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).Name + ", " + DXCoil( DXCoilNum ).DXCoilType + " PLF curve < 0.7 warning continues...", DXCoil( DXCoilNum ).ErrIndex2, PLF, PLF );
@@ -6920,7 +7536,7 @@ namespace DXCoils {
 			DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction = PartLoadRatio / PLF;
 			if ( DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction > 1.0 && std::abs( DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction - 1.0 ) > 0.001 ) {
 				if ( DXCoil( DXCoilNum ).ErrIndex3 == 0 ) {
-					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeater ) {
+					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) {
 						ShowWarningMessage( RoutineName + DXCoil( DXCoilNum ).DXCoilType + "=\"" + DXCoil( DXCoilNum ).Name + "\", runtime fraction" );
 						ShowWarningMessage( "The runtime fraction exceeded 1.0. [" + RoundSigDigits( DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction, 4 ) + "]." );
 						ShowContinueError( "Runtime fraction reset to 1 and the simulation will continue." );
@@ -6934,7 +7550,7 @@ namespace DXCoils {
 						ShowContinueErrorTimeStamp( "" );
 					}
 				}
-				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeater ) {
+				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) {
 					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).Name + ", " + DXCoil( DXCoilNum ).DXCoilType + " runtime fraction > 1.0 warning continues...", DXCoil( DXCoilNum ).ErrIndex3, DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction, DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction );
 				} else {
 					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).Name + ", " + DXCoil( DXCoilNum ).DXCoilType + " runtime fraction > 1.0 warning continues...", DXCoil( DXCoilNum ).ErrIndex3, DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction, DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction );
@@ -7120,7 +7736,7 @@ namespace DXCoils {
 			}
 
 			// Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
-			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeater ) {
+			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) {
 				//   Coil:DX:HeatPumpWaterHeater does not have EIR temp or flow curves
 				EIRTempModFac = 1.0;
 				EIRFlowModFac = 1.0;
@@ -7269,6 +7885,11 @@ namespace DXCoils {
 		DXCoilPartLoadRatio( DXCoilNum ) = DXCoil( DXCoilNum ).PartLoadRatio;
 		DXCoilFanOpMode( DXCoilNum ) = FanOpMode;
 		DXCoil( DXCoilNum ).CondInletTemp = CondInletTemp;
+
+		// calc secondary coil if specified
+		if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+			CalcSecondaryDXCoils( DXCoilNum );
+		}
 
 	}
 
@@ -7947,6 +8568,7 @@ Label50: ;
 		Real64 AirVolumeFlowRate; // Air volume flow rate across the cooling coil [m3/s]
 		Real64 VolFlowperRatedTotCap; // Air volume flow rate divided by rated total cooling capacity [m3/s-W]
 		Real64 TotCap; // gross total cooling capacity at off-rated conditions [W]
+		Real64 TotCapAdj; // adjusted total cooling capacity at off-rated conditions [W]
 		Real64 TotCapTempModFac; // Total capacity modifier (function of entering drybulb, outside drybulb) depending
 		// on the type of curve
 		Real64 TotCapFlowModFac; // Total capacity modifier (function of actual supply air flow vs rated flow)
@@ -8010,7 +8632,18 @@ Label50: ;
 					// this should use Node%WetBulbTemp or a PSYC function, not OAWB
 					OutdoorWetBulb = Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) ).OutAirWetBulb;
 				}
+				if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+					OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
+					OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+					OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
+					OutdoorPressure = OutBaroPress;
+				}
 			}
+		} else if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+			OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
+			OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+			OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
+			OutdoorPressure = OutBaroPress;
 		} else {
 			OutdoorDryBulb = OutDryBulbTemp;
 			OutdoorHumRat = OutHumRat;
@@ -8138,13 +8771,14 @@ Label50: ;
 			// Modify total heating capacity based on defrost heating capacity multiplier
 			// MaxHeatCap passed from parent object VRF Condenser and is used to limit capacity of TU's to that available from condenser
 			if ( present( MaxHeatCap ) ) {
-				TotCap = min( MaxHeatCap, TotCap * HeatingCapacityMultiplier );
+				TotCapAdj = min( MaxHeatCap, TotCap * HeatingCapacityMultiplier );
+				TotCap = min( MaxHeatCap, TotCap );
 			} else {
-				TotCap *= HeatingCapacityMultiplier;
+				TotCapAdj = TotCap * HeatingCapacityMultiplier;
 			}
 
 			// Calculate full load outlet conditions
-			FullLoadOutAirEnth = InletAirEnthalpy + TotCap / AirMassFlow;
+			FullLoadOutAirEnth = InletAirEnthalpy + TotCapAdj / AirMassFlow;
 			FullLoadOutAirHumRat = InletAirHumRat;
 			FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
 			FullLoadOutAirRH = PsyRhFnTdbWPb( FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineNameFullLoad );
@@ -8189,7 +8823,7 @@ Label50: ;
 			}
 			EIR = DXCoil( DXCoilNum ).RatedEIR( Mode ) * EIRTempModFac * EIRFlowModFac;
 			// Calculate modified PartLoadRatio due to defrost (reverse-cycle defrost only)
-			PLRHeating = min( 1.0, ( PartLoadRatio + LoadDueToDefrost / TotCap ) );
+			PLRHeating = min( 1.0, ( PartLoadRatio + LoadDueToDefrost / TotCapAdj ) );
 			if ( DXCoil( DXCoilNum ).DXCoilType_Num != CoilVRF_Heating ) {
 				PLF = CurveValue( DXCoil( DXCoilNum ).PLFFPLR( Mode ), PLRHeating ); // Calculate part-load factor
 			} else {
@@ -8242,6 +8876,7 @@ Label50: ;
 			DXCoil( DXCoilNum ).OutletAirTemp = OutletAirTemp;
 			DXCoil( DXCoilNum ).OutletAirHumRat = OutletAirHumRat;
 			DXCoil( DXCoilNum ).OutletAirEnthalpy = OutletAirEnthalpy;
+			DXCoil( DXCoilNum ).CompressorPartLoadRatio = PartLoadRatio;
 
 		} else {
 
@@ -8261,6 +8896,7 @@ Label50: ;
 			} else {
 				DXCoil( DXCoilNum ).CrankcaseHeaterPower = CrankcaseHeatingPower * ( 1.0 - DXCoil( DXCoil( DXCoilNum ).CompanionUpstreamDXCoil ).CoolingCoilRuntimeFraction );
 			}
+			DXCoil( DXCoilNum ).CompressorPartLoadRatio = 0.0;
 
 		} // end of on/off if - else
 
@@ -8271,6 +8907,11 @@ Label50: ;
 		DXCoilTotalHeating( DXCoilNum ) = DXCoil( DXCoilNum ).TotalHeatingEnergyRate;
 		DXCoilHeatInletAirDBTemp( DXCoilNum ) = InletAirDryBulbTemp;
 		DXCoilHeatInletAirWBTemp( DXCoilNum ) = InletAirWetBulbC;
+
+		// calc secondary coil if specified
+		if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+			CalcSecondaryDXCoils( DXCoilNum );
+		}
 
 	}
 
@@ -8402,6 +9043,17 @@ Label50: ;
 				OutdoorHumRat = Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( Mode ) ).HumRat;
 				OutdoorWetBulb = PsyTwbFnTdbWPb( OutdoorDryBulb, OutdoorHumRat, OutdoorPressure );
 			}
+			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
+				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
+				OutdoorPressure = OutBaroPress;
+			}
+		} else if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
+				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
+				OutdoorPressure = OutBaroPress;
 		} else {
 			OutdoorDryBulb = OutDryBulbTemp;
 			OutdoorHumRat = OutHumRat;
@@ -8715,6 +9367,11 @@ Label50: ;
 		DXCoilOutletHumRat( DXCoilNum ) = DXCoil( DXCoilNum ).OutletAirHumRat;
 		DXCoil( DXCoilNum ).CondInletTemp = CondInletTemp; // Save condenser inlet temp in the data structure
 
+		// calc secondary coil if specified
+		if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+			CalcSecondaryDXCoils( DXCoilNum );
+		}
+
 	}
 
 	void
@@ -8875,7 +9532,6 @@ Label50: ;
 
 		// Using/Aliasing
 		using General::RoundSigDigits;
-		using DataEnvironment::StdRhoAir;
 
 		// Return value
 		Real64 CBF( 0.0 ); // the result - the coil bypass factor
@@ -9521,6 +10177,17 @@ Label50: ;
 				OutdoorHumRat = Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( DXMode ) ).HumRat;
 				OutdoorWetBulb = PsyTwbFnTdbWPb( OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, RoutineName );
 			}
+			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
+				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
+				OutdoorPressure = OutBaroPress;
+			}
+		} else if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+			OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
+			OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+			OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
+			OutdoorPressure = OutBaroPress;
 		} else {
 			OutdoorDryBulb = OutDryBulbTemp;
 			OutdoorHumRat = OutHumRat;
@@ -10040,6 +10707,11 @@ Label50: ;
 		DXCoilFanOpMode( DXCoilNum ) = FanOpMode;
 		DXCoil( DXCoilNum ).CondInletTemp = CondInletTemp; // Save condenser inlet temp in the data structure
 
+		// calc secondary coil if specified
+		if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+			CalcSecondaryDXCoils( DXCoilNum );
+		}
+
 	}
 
 	void
@@ -10102,9 +10774,12 @@ Label50: ;
 		Real64 OutletAirHumRat; // outlet air humidity ratio [kg/kg]
 		Real64 TotCapHS; // total capacity at high speed [W]
 		Real64 TotCapLS; // total capacity at low speed [W]
+		Real64 TotCapHSAdj; // total adjusted capacity at high speed [W]
+		Real64 TotCapLSAdj; // total adjusted capacity at low speed [W]
 		Real64 EIRHS; // EIR at off rated conditions (high speed)
 		Real64 EIRLS; // EIR at off rated conditions (low speed)
 		Real64 TotCap; // total capacity at current speed [W]
+		Real64 TotCapAdj; // total adjusted capacity at current speed [W]
 		Real64 EIR; // EIR at current speed
 		Real64 PLF; // Part load factor, accounts for thermal lag at compressor startup, used in
 		// power calculation
@@ -10195,6 +10870,17 @@ Label50: ;
 				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) ).Temp;
 				OutdoorHumRat = Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) ).HumRat;
 			}
+			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
+				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				//OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
+				OutdoorPressure = OutBaroPress;
+			}
+		} else if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+			OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
+			OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+			//OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
+			OutdoorPressure = OutBaroPress;
 		} else {
 			OutdoorDryBulb = OutDryBulbTemp;
 			OutdoorHumRat = OutHumRat;
@@ -10351,11 +11037,11 @@ Label50: ;
 					}
 				}
 
-				TotCapLS *= HeatingCapacityMultiplier;
-				TotCapHS *= HeatingCapacityMultiplier;
+				TotCapLSAdj = TotCapLS * HeatingCapacityMultiplier;
+				TotCapHSAdj = TotCapHS * HeatingCapacityMultiplier;
 
 				// Calculate modified PartLoadRatio due to defrost (reverse-cycle defrost only)
-				PLRHeating = min( 1.0, ( SpeedRatio + LoadDueToDefrostHS / TotCapHS ) );
+				PLRHeating = min( 1.0, ( SpeedRatio + LoadDueToDefrostHS / TotCapHSAdj ) );
 				PLF = CurveValue( DXCoil( DXCoilNum ).MSPLFFPLR( SpeedNumHS ), PLRHeating ); // Calculate part-load factor
 
 				if ( PLF < 0.7 ) {
@@ -10384,8 +11070,8 @@ Label50: ;
 				}
 
 				// Get full load output and power
-				LSFullLoadOutAirEnth = InletAirEnthalpy + TotCapLS / MSHPMassFlowRateLow;
-				HSFullLoadOutAirEnth = InletAirEnthalpy + TotCapHS / MSHPMassFlowRateHigh;
+				LSFullLoadOutAirEnth = InletAirEnthalpy + TotCapLSAdj / MSHPMassFlowRateLow;
+				HSFullLoadOutAirEnth = InletAirEnthalpy + TotCapHSAdj / MSHPMassFlowRateHigh;
 				LSElecHeatingPower = TotCapLS * EIRLS * InputPowerMultiplier;
 				HSElecHeatingPower = TotCapHS * EIRHS * InputPowerMultiplier;
 				OutletAirHumRat = InletAirHumRat;
@@ -10513,10 +11199,10 @@ Label50: ;
 				}
 
 				// Modify total heating capacity based on defrost heating capacity multiplier
-				TotCap *= HeatingCapacityMultiplier;
+				TotCapAdj = TotCap * HeatingCapacityMultiplier;
 
 				// Calculate full load outlet conditions
-				FullLoadOutAirEnth = InletAirEnthalpy + TotCap / AirMassFlow;
+				FullLoadOutAirEnth = InletAirEnthalpy + TotCapAdj / AirMassFlow;
 				FullLoadOutAirHumRat = InletAirHumRat;
 				FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
 				FullLoadOutAirRH = PsyRhFnTdbWPb( FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineNameFullLoad );
@@ -10545,7 +11231,7 @@ Label50: ;
 				EIRFlowModFac = CurveValue( DXCoil( DXCoilNum ).MSEIRFFlow( 1 ), AirMassFlowRatioLS );
 				EIR = 1.0 / DXCoil( DXCoilNum ).MSRatedCOP( 1 ) * EIRTempModFac * EIRFlowModFac;
 				// Calculate modified PartLoadRatio due to defrost (reverse-cycle defrost only)
-				PLRHeating = min( 1.0, ( CycRatio + LoadDueToDefrost / TotCap ) );
+				PLRHeating = min( 1.0, ( CycRatio + LoadDueToDefrost / TotCapAdj ) );
 				PLF = CurveValue( DXCoil( DXCoilNum ).MSPLFFPLR( 1 ), PLRHeating ); // Calculate part-load factor
 				if ( FanOpMode == CycFanCycCoil && CycRatio == 1.0 && PLF != 1.0 ) {
 					if ( DXCoil( DXCoilNum ).PLFErrIndex == 0 ) {
@@ -10641,6 +11327,15 @@ Label50: ;
 		DXCoil( DXCoilNum ).PartLoadRatio = PLRHeating;
 		DXCoilFanOpMode( DXCoilNum ) = FanOpMode;
 		DXCoilPartLoadRatio( DXCoilNum ) = PLRHeating;
+		DXCoil( DXCoilNum ).MSSpeedNumLS = SpeedNumLS;
+		DXCoil( DXCoilNum ).MSSpeedNumHS = SpeedNumHS;
+		DXCoil( DXCoilNum ).MSSpeedRatio = SpeedRatio;
+		DXCoil( DXCoilNum ).MSCycRatio = CycRatio;
+
+		// calc secondary coil if specified
+		if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+			CalcSecondaryDXCoils( DXCoilNum );
+		}
 
 	}
 
@@ -10791,7 +11486,7 @@ Label50: ;
 			if ( any_eq( DXCoil( DXCoilNum ).CondenserType, EvapCooled ) ) {
 				DXCoil( DXCoilNum ).BasinHeaterConsumption = DXCoil( DXCoilNum ).BasinHeaterPower * ReportingConstant;
 			}
-		} else if ( SELECT_CASE_var == CoilDX_HeatPumpWaterHeater ) {
+		} else if ( SELECT_CASE_var == CoilDX_HeatPumpWaterHeaterPumped || SELECT_CASE_var == CoilDX_HeatPumpWaterHeaterWrapped ) {
 			// water heating energy for HP water heater DX Coil condenser
 			DXCoil( DXCoilNum ).TotalHeatingEnergy = DXCoil( DXCoilNum ).TotalHeatingEnergyRate * ReportingConstant;
 			// water heating power for HP water heater
@@ -10882,8 +11577,8 @@ Label50: ;
 		Real64 const CoolingCoilInletAirWetBulbTempRated( 19.4 ); // 19.44C (67F)
 		Real64 const CoolingCoilInletAirDryBulbTempRated( 26.7 );
 		Real64 const OutdoorUnitInletAirDryBulbTempRated( 35.0 ); // 35.00C (95F)
-		static FArray1D< Real64 > const OutdoorUnitInletAirDryBulbTempPLTestPoint( 3, { 27.5, 20.0, 18.3 } );
-		static FArray1D< Real64 > const NetCapacityFactorPLTestPoint( 3, { 0.75, 0.50, 0.25 } );
+		static Array1D< Real64 > const OutdoorUnitInletAirDryBulbTempPLTestPoint( 3, { 27.5, 20.0, 18.3 } );
+		static Array1D< Real64 > const NetCapacityFactorPLTestPoint( 3, { 0.75, 0.50, 0.25 } );
 		Real64 const ConvFromSIToIP( 3.412141633 ); // Conversion from SI to IP [3.412 Btu/hr-W]
 
 		Real64 const AirMassFlowRatioRated( 1.0 ); // AHRI test is at the design flow rate
@@ -10912,11 +11607,11 @@ Label50: ;
 		static Real64 EIRFlowModFac( 0.0 ); // EIR modifier (function of actual supply air flow vs rated flow) [-]
 		Real64 EIR;
 		Real64 TotalElecPowerRated;
-		FArray1D< Real64 > EER_TestPoint_SI( 4 ); // 1 = A, 2 = B, 3= C, 4= D
-		FArray1D< Real64 > EER_TestPoint_IP( 4 ); // 1 = A, 2 = B, 3= C, 4= D
-		FArray1D< Real64 > NetCapacity_TestPoint( 4 ); // 1 = A, 2 = B, 3= C, 4= D
-		FArray1D< Real64 > NetPower_TestPoint( 4 ); // 1 = A, 2 = B, 3= C, 4= D
-		FArray1D< Real64 > SupAirMdot_TestPoint( 4 ); // 1 = A, 2 = B, 3= C, 4= D
+		Array1D< Real64 > EER_TestPoint_SI( 4 ); // 1 = A, 2 = B, 3= C, 4= D
+		Array1D< Real64 > EER_TestPoint_IP( 4 ); // 1 = A, 2 = B, 3= C, 4= D
+		Array1D< Real64 > NetCapacity_TestPoint( 4 ); // 1 = A, 2 = B, 3= C, 4= D
+		Array1D< Real64 > NetPower_TestPoint( 4 ); // 1 = A, 2 = B, 3= C, 4= D
+		Array1D< Real64 > SupAirMdot_TestPoint( 4 ); // 1 = A, 2 = B, 3= C, 4= D
 
 		static Real64 TempDryBulb_Leaving_Apoint( 0.0 );
 
@@ -10928,7 +11623,7 @@ Label50: ;
 		static Real64 AccuracyTolerance( 0.2 ); // tolerance in AHRI 340/360 Table 6 note 1
 		static int MaximumIterations( 500 );
 		int SolverFlag;
-		FArray1D< Real64 > Par( 12 ); // Parameter array passed to solver
+		Array1D< Real64 > Par( 12 ); // Parameter array passed to solver
 		Real64 EIR_HighSpeed;
 		Real64 EIR_LowSpeed;
 		int FanInletNode;
@@ -11383,7 +12078,7 @@ Label50: ;
 	Real64
 	CalcTwoSpeedDXCoilIEERResidual(
 		Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -11571,7 +12266,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		DXCoilIndex = FindItemInList( DXCoilName, DXCoil.Name(), NumDXCoils );
+		DXCoilIndex = FindItemInList( DXCoilName, DXCoil );
 		if ( DXCoilIndex == 0 ) {
 			if ( present( SuppressWarning ) ) {
 				//     No warning printed if only searching for the existence of a DX Coil
@@ -11641,22 +12336,22 @@ Label50: ;
 		}
 
 		if ( SameString( CoilType, "Coil:Heating:DX:SingleSpeed" ) || SameString( CoilType, "Coil:Cooling:DX:SingleSpeed" ) ) {
-			WhichCoil = FindItem( CoilName, DXCoil.Name(), NumDXCoils );
+			WhichCoil = FindItem( CoilName, DXCoil );
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = DXCoil( WhichCoil ).RatedTotCap( 1 );
 			}
 		} else if ( SameString( CoilType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode" ) ) {
-			WhichCoil = FindItem( CoilName, DXCoil.Name(), NumDXCoils );
+			WhichCoil = FindItem( CoilName, DXCoil );
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = DXCoil( WhichCoil ).RatedTotCap( DXCoil( WhichCoil ).NumCapacityStages );
 			}
 		} else if ( SameString( CoilType, "Coil:Cooling:DX:TwoSpeed" ) ) {
-			WhichCoil = FindItem( CoilName, DXCoil.Name(), NumDXCoils );
+			WhichCoil = FindItem( CoilName, DXCoil );
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = DXCoil( WhichCoil ).RatedTotCap( 1 );
 			}
 		} else if ( SameString( CoilType, "Coil:Cooling:DX:MultiSpeed" ) ) {
-			WhichCoil = FindItem( CoilName, DXCoil.Name(), NumDXCoils );
+			WhichCoil = FindItem( CoilName, DXCoil );
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = DXCoil( WhichCoil ).MSRatedTotCap( DXCoil( WhichCoil ).NumOfSpeeds );
 			}
@@ -11814,7 +12509,7 @@ Label50: ;
 			PrintMessage = true;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			TypeNum = DXCoil( WhichCoil ).DXCoilType_Num;
 		} else {
@@ -11883,7 +12578,7 @@ Label50: ;
 		}
 
 		if ( SameString( CoilType, "Coil:Heating:DX:SingleSpeed" ) || SameString( CoilType, "Coil:Heating:DX:MultiSpeed" ) ) {
-			WhichCoil = FindItem( CoilName, DXCoil.Name(), NumDXCoils );
+			WhichCoil = FindItem( CoilName, DXCoil );
 			if ( WhichCoil != 0 ) {
 				MinOAT = DXCoil( WhichCoil ).MinOATCompressor;
 			}
@@ -11954,7 +12649,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = DXCoil( WhichCoil ).AirInNode;
 		} else {
@@ -12019,7 +12714,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = DXCoil( WhichCoil ).AirOutNode;
 		} else {
@@ -12083,7 +12778,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			CondNode = DXCoil( WhichCoil ).CondenserInletNodeNum( 1 );
 		} else {
@@ -12148,7 +12843,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			BypassFraction = DXCoil( WhichCoil ).BypassedFlowFrac( 1 );
 		} else {
@@ -12224,12 +12919,12 @@ Label50: ;
 				//       Search for DX cooling coils
 				for ( WhichCompanionComp = 1; WhichCompanionComp <= NumCompSets; ++WhichCompanionComp ) {
 					if ( ! SameString( CompSets( WhichCompanionComp ).ParentCName, CompSetsParentName ) || ! SameString( CompSets( WhichCompanionComp ).CType, "Coil:Cooling:DX:SingleSpeed" ) ) continue;
-					DXCoolingCoilIndex = FindItemInList( CompSets( WhichCompanionComp ).CName, DXCoil.Name(), NumDXCoils );
+					DXCoolingCoilIndex = FindItemInList( CompSets( WhichCompanionComp ).CName, DXCoil );
 					break;
 				}
 				for ( WhichCompanionComp = 1; WhichCompanionComp <= NumCompSets; ++WhichCompanionComp ) {
 					if ( ! SameString( CompSets( WhichCompanionComp ).ParentCName, CompSetsParentName ) || ! SameString( CompSets( WhichCompanionComp ).CType, "Coil:Cooling:DX:MultiSpeed" ) ) continue;
-					DXCoolingCoilIndex = FindItemInList( CompSets( WhichCompanionComp ).CName, DXCoil.Name(), NumDXCoils );
+					DXCoolingCoilIndex = FindItemInList( CompSets( WhichCompanionComp ).CName, DXCoil );
 					break;
 				}
 				//       Search for Heat Exchanger Assisted DX cooling coils
@@ -12240,7 +12935,7 @@ Label50: ;
 						HXCompSetsParentName = CompSets( WhichHXAssistedComp ).CName;
 						for ( WhichCompanionComp = 1; WhichCompanionComp <= NumCompSets; ++WhichCompanionComp ) {
 							if ( ! SameString( CompSets( WhichCompanionComp ).ParentCName, HXCompSetsParentName ) || ! SameString( CompSets( WhichCompanionComp ).CType, "Coil:Cooling:DX:SingleSpeed" ) ) continue;
-							DXCoolingCoilIndex = FindItemInList( CompSets( WhichCompanionComp ).CName, DXCoil.Name(), NumDXCoils );
+							DXCoolingCoilIndex = FindItemInList( CompSets( WhichCompanionComp ).CName, DXCoil );
 							break;
 						}
 						break;
@@ -12323,7 +13018,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			NumberOfSpeeds = DXCoil( WhichCoil ).NumOfSpeeds;
 		} else {
@@ -12400,7 +13095,7 @@ Label50: ;
 				WhichCoil = CoilIndex;
 			}
 		} else {
-			WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+			WhichCoil = FindItemInList( CoilName, DXCoil );
 		}
 		if ( WhichCoil != 0 ) {
 			SchPtr = DXCoil( WhichCoil ).SchedPtr;
@@ -12468,7 +13163,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			{ auto const SELECT_CASE_var( DXCoil( WhichCoil ).DXCoilType_Num );
 			if ( ( SELECT_CASE_var == CoilDX_CoolingSingleSpeed ) || ( SELECT_CASE_var == CoilDX_CoolingTwoSpeed ) || ( SELECT_CASE_var == CoilDX_HeatingEmpirical ) || ( SELECT_CASE_var == CoilDX_CoolingTwoStageWHumControl ) ) {
@@ -12773,7 +13468,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			DXCoil( WhichCoil ).FindCompanionUpStreamCoil = false;
 		} else {
@@ -12828,7 +13523,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			DXCoil( WhichCoil ).CoilSystemName = CoilSystemName;
 		} else {
@@ -12887,14 +13582,22 @@ Label50: ;
 		Real64 SHRFlowModFac; // Sensible Heat Ratio modifier (function of actual vs rated flow)
 
 		//   Get SHR modifying factor (function of inlet wetbulb & drybulb) for off-rated conditions
-		SHRTempModFac = CurveValue( SHRFTempCurveIndex, InletWetBulb, InletDryBulb );
-		if ( SHRTempModFac < 0.0 ) {
-			SHRTempModFac = 0.0;
+		if ( SHRFTempCurveIndex == 0 ) {
+			SHRTempModFac = 1.0;
+		} else {
+			SHRTempModFac = CurveValue( SHRFTempCurveIndex, InletWetBulb, InletDryBulb );
+			if ( SHRTempModFac < 0.0 ) {
+				SHRTempModFac = 0.0;
+			}
 		}
 		//   Get SHR modifying factor (function of mass flow ratio) for off-rated conditions
-		SHRFlowModFac = CurveValue( SHRFFlowCurveIndex, AirMassFlowRatio );
-		if ( SHRFlowModFac < 0.0 ) {
-			SHRFlowModFac = 0.0;
+		if ( SHRFFlowCurveIndex == 0 ) {
+			SHRFlowModFac = 1.0;
+		} else {
+			SHRFlowModFac = CurveValue( SHRFFlowCurveIndex, AirMassFlowRatio );
+			if ( SHRFlowModFac < 0.0 ) {
+				SHRFlowModFac = 0.0;
+			}
 		}
 		//  Calculate "operating" sensible heat ratio
 		SHRopr = SHRRated * SHRTempModFac * SHRFlowModFac;
@@ -12947,7 +13650,7 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, DXCoil.Name(), NumDXCoils );
+		WhichCoil = FindItemInList( CoilName, DXCoil );
 		if ( WhichCoil != 0 ) {
 			DXCoil( WhichCoil ).ISHundredPercentDOASDXCoil = true;
 		} else {
@@ -12957,9 +13660,356 @@ Label50: ;
 
 	}
 
+	void
+	CalcSecondaryDXCoils(
+		int const DXCoilNum
+		) {
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         B. Nigusse
+		//       DATE WRITTEN   February 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calculates secondary zone heat gain from secondary DX coils placed in a zone.
+
+		// METHODOLOGY EMPLOYED:
+		// Energy balance:
+		//  (1) Condenser placed in a zone, the zone total (sensible) heat
+		//      gain rate is given Qcond = QEvap + WcompPluscondFanPower
+		//  (2) Evaporator placed in a zone, the zone total heat removal
+		//      rate is given Qevap = Qcond - WcompPluscondFanPower
+		//      Furthermore, the evaporator total heat removal is split into
+		//      latent and sensible components using user specified SHR
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using CurveManager::CurveValue;
+		using DataHVACGlobals::TimeStepSys;
+		using DataLoopNode::Node;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "CalcSecondaryDXCoils" );
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 CondInletDryBulb; // condenser entering air dry-bulb temperature (C)
+		Real64 EvapAirMassFlow; // Condenser air mass flow rate [kg/s]
+		Real64 EvapInletDryBulb; // evaporator inlet air drybulb [C]
+		Real64 EvapInletHumRat; // evaporator inlet air humidity ratio [kg/kg]
+		Real64 EvapInletWetBulb; // evaporator inlet air wetbulb [C]
+		Real64 EvapInletEnthalpy; // evaporator inlet air enthalpy [J/kg]
+		Real64 FullLoadOutAirEnth; // evaporator outlet full load enthalpy [J/kg]
+		Real64 FullLoadOutAirHumRat; // evaporator outlet humidity ratio at full load
+		Real64 FullLoadOutAirTemp; // evaporator outlet air temperature at full load [C]
+		Real64 hTinwout; // Enthalpy at inlet dry-bulb and outlet humidity ratio [J/kg]
+		Real64 SHR( 0 ); // sensible heat ratio
+		Real64 RhoAir; // secondary coil entering air density [kg/m3]
+		Real64 PartLoadRatio( 0 ); // primary coil part-load ratio [-]
+		Real64 SecCoilRatedSHR; // secondary DX coil nominal or rated sensible heat ratio
+		Real64 SecCoilFlowFraction; // secondary coil flow fraction, is 1.0 for single speed machine
+		Real64 TotalHeatRemovalRate; // secondary coil total heat removal rate
+		Real64 TotalHeatRejectionRate; // secondary coil total heat rejection rate
+		int SecCoilSHRFT; // index of the SHR modifier curve for temperature of a secondary DX coil
+		int SecCoilSHRFF; // index of the sHR modifier curve for flow fraction of a secondary DX coil
+		int MSSpeedNumLS; // current low speed number of multspeed HP
+		int MSSpeedNumHS; // current high speed number of multspeed HP
+		Real64 MSSpeedRatio; // current speed ratio of multspeed HP
+		Real64 MSCycRatio; // current cycling ratio of multspeed HP
+		Real64 SHRHighSpeed; // sensible heat ratio at high speed
+		Real64 SHRLowSpeed; // sensible heat ratio at low speed
+
+		EvapAirMassFlow = 0.0;
+
+		if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
+			// Select the correct unit type
+			{ auto const SELECT_CASE_var( DXCoil( DXCoilNum ).DXCoilType_Num );
+			if ( ( SELECT_CASE_var == CoilDX_CoolingSingleSpeed ) || ( SELECT_CASE_var == CoilDX_CoolingTwoSpeed ) || ( SELECT_CASE_var == CoilDX_MultiSpeedCooling ) ) {
+				// total sensible heat gain of the secondary zone from the secondary coil (condenser)
+				if ( DXCoil( DXCoilNum ).ElecCoolingPower > 0.0 ) {
+					TotalHeatRejectionRate = DXCoil( DXCoilNum ).TotalCoolingEnergyRate + DXCoil( DXCoilNum ).ElecCoolingPower;
+				} else {
+					TotalHeatRejectionRate = 0.0;
+					return;
+				}
+				DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate = TotalHeatRejectionRate;
+			} else if ( SELECT_CASE_var == CoilDX_HeatingEmpirical ) {
+				// evaporator coil in the secondary zone
+				if ( DXCoil( DXCoilNum ).ElecHeatingPower > 0.0 ) {
+					TotalHeatRemovalRate = max( 0.0, DXCoil( DXCoilNum ).TotalHeatingEnergyRate - DXCoil( DXCoilNum ).ElecHeatingPower );
+				} else {
+					TotalHeatRemovalRate = 0.0;
+					DXCoil( DXCoilNum ).SecCoilSHR = 0.0;
+					return;
+				}
+				DXCoil( DXCoilNum ).SecCoilTotalHeatRemovalRate = -TotalHeatRemovalRate; // +DXCoil( DXCoilNum ).DefrostPower;
+				EvapInletDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
+				EvapInletHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, EvapInletDryBulb, EvapInletHumRat );
+				EvapAirMassFlow = RhoAir * DXCoil( DXCoilNum ).SecCoilAirFlow;;
+				PartLoadRatio = DXCoil( DXCoilNum ).CompressorPartLoadRatio;
+				SecCoilRatedSHR = DXCoil( DXCoilNum ).SecCoilRatedSHR;
+				if ( ( EvapAirMassFlow > SmallMassFlow ) && ( PartLoadRatio > 0.0 ) && ( EvapInletDryBulb > DXCoil( DXCoilNum ).MinOATCompressor ) ) { // coil is running
+					SecCoilFlowFraction = 1.0;  // for single speed DX coil the secondary coil (condenser) flow fraction is 1.0
+					CondInletDryBulb = Node( DXCoil( DXCoilNum ).AirInNode ).Temp;
+					EvapInletWetBulb = PsyTwbFnTdbWPb( EvapInletDryBulb, EvapInletHumRat, OutBaroPress, RoutineName );
+					EvapInletEnthalpy = PsyHFnTdbW( EvapInletDryBulb, EvapInletHumRat );
+					SecCoilSHRFT = DXCoil( DXCoilNum ).SecCoilSHRFT;
+					SecCoilSHRFF = DXCoil( DXCoilNum ).SecCoilSHRFF;
+					// determine the current SHR
+					SHR = CalcSecondaryDXCoilsSHR( DXCoilNum, EvapAirMassFlow, TotalHeatRemovalRate, PartLoadRatio, SecCoilRatedSHR, EvapInletDryBulb, EvapInletHumRat, EvapInletWetBulb, EvapInletEnthalpy, CondInletDryBulb, SecCoilFlowFraction, SecCoilSHRFT, SecCoilSHRFF );
+					// Calculate full load output conditions
+					FullLoadOutAirEnth = EvapInletEnthalpy - ( TotalHeatRemovalRate / PartLoadRatio ) / EvapAirMassFlow;
+					hTinwout = EvapInletEnthalpy - ( 1.0 - SHR ) * ( ( TotalHeatRemovalRate / PartLoadRatio ) / EvapAirMassFlow );
+					FullLoadOutAirHumRat = PsyWFnTdbH( EvapInletDryBulb, hTinwout, RoutineName, true );
+					FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
+					// when the air outlet temperature falls below the saturation temperature, it is reset to saturation temperature
+					if ( FullLoadOutAirTemp < PsyTsatFnHPb( FullLoadOutAirEnth, OutBaroPress, RoutineName ) ) {
+						FullLoadOutAirTemp = PsyTsatFnHPb( FullLoadOutAirEnth, OutBaroPress, RoutineName );
+						FullLoadOutAirHumRat = PsyWFnTdbH( FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName );
+						// Adjust SHR for the new outlet condition that balances energy
+						hTinwout = PsyHFnTdbW( EvapInletDryBulb, FullLoadOutAirHumRat );
+						SHR = 1.0 - ( EvapInletEnthalpy - hTinwout ) / ( ( TotalHeatRemovalRate / PartLoadRatio ) / EvapAirMassFlow );
+						SHR = min( SHR, 1.0 );
+					}
+					// calculate the sensible and latent zone heat removal (extraction) rate by the secondary coil
+					DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate = DXCoil( DXCoilNum ).SecCoilTotalHeatRemovalRate * SHR;
+					DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate = DXCoil( DXCoilNum ).SecCoilTotalHeatRemovalRate - DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate;
+				} else {
+					//DX coil is off;
+					DXCoil( DXCoilNum ).SecCoilTotalHeatRemovalRate = 0.0;
+					DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate = 0.0;
+					DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate = 0.0;
+					SHR = 0.0; // SHR is set to zero if the coil is off
+				}
+				DXCoil( DXCoilNum ).SecCoilSHR = SHR;
+
+			} else if ( SELECT_CASE_var == CoilDX_MultiSpeedHeating ) {
+				EvapInletDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
+				EvapInletHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, EvapInletDryBulb, EvapInletHumRat );
+				MSSpeedRatio = DXCoil( DXCoilNum ).MSSpeedRatio;
+				MSCycRatio = DXCoil( DXCoilNum ).MSCycRatio;
+				MSSpeedNumHS = DXCoil( DXCoilNum ).MSSpeedNumHS;
+				MSSpeedNumLS = DXCoil( DXCoilNum ).MSSpeedNumLS;
+				if ( MSSpeedRatio > 0.0 ) {
+					EvapAirMassFlow = RhoAir * ( DXCoil( DXCoilNum ).MSSecCoilAirFlow( MSSpeedNumHS ) * MSSpeedRatio + DXCoil( DXCoilNum ).MSSecCoilAirFlow( MSSpeedNumLS ) * ( 1.0 - MSSpeedRatio) );
+				} else if ( MSCycRatio > 0.0 ) {
+					EvapAirMassFlow = RhoAir * DXCoil( DXCoilNum ).MSSecCoilAirFlow( MSSpeedNumLS );
+				}
+				if ( DXCoil( DXCoilNum ).ElecHeatingPower > 0.0 ) {
+					TotalHeatRemovalRate = max( 0.0, DXCoil( DXCoilNum ).TotalHeatingEnergyRate - DXCoil( DXCoilNum ).ElecHeatingPower );
+				} else {
+					TotalHeatRemovalRate = 0.0;
+					return;
+				}
+				DXCoil( DXCoilNum ).SecCoilTotalHeatRemovalRate = -TotalHeatRemovalRate; // +DXCoil( DXCoilNum ).DefrostPower;
+				if ( ( EvapAirMassFlow > SmallMassFlow ) && ( MSSpeedRatio > 0.0 || MSCycRatio > 0.0 ) && ( EvapInletDryBulb > DXCoil( DXCoilNum ).MinOATCompressor ) ) { // coil is running
+					SecCoilFlowFraction = 1.0;  // for single speed DX coil the secondary coil (condenser) flow fraction is 1.0
+					CondInletDryBulb = Node( DXCoil( DXCoilNum ).AirInNode ).Temp;
+					EvapInletWetBulb = PsyTwbFnTdbWPb( EvapInletDryBulb, EvapInletHumRat, OutBaroPress, RoutineName );
+					EvapInletEnthalpy = PsyHFnTdbW( EvapInletDryBulb, EvapInletHumRat );
+					// determine the current SHR
+					if ( MSSpeedRatio > 0.0 ) {
+						// calculate SHR for the higher speed
+						PartLoadRatio = 1.0;
+						SecCoilFlowFraction = 1.0;
+						SecCoilSHRFT = DXCoil( DXCoilNum ).MSSecCoilSHRFT( MSSpeedNumHS );
+						SecCoilSHRFF = DXCoil( DXCoilNum ).MSSecCoilSHRFF( MSSpeedNumHS );
+						SecCoilRatedSHR = DXCoil( DXCoilNum ).MSSecCoilRatedSHR( MSSpeedNumHS );
+						SHRHighSpeed = CalcSecondaryDXCoilsSHR(DXCoilNum, EvapAirMassFlow, TotalHeatRemovalRate, PartLoadRatio, SecCoilRatedSHR, EvapInletDryBulb, EvapInletHumRat, EvapInletWetBulb, EvapInletEnthalpy, CondInletDryBulb, SecCoilFlowFraction, SecCoilSHRFT, SecCoilSHRFF);
+						// calculate SHR for the lower speed
+						SecCoilSHRFT = DXCoil( DXCoilNum ).MSSecCoilSHRFT( MSSpeedNumLS );
+						SecCoilSHRFF = DXCoil( DXCoilNum ).MSSecCoilSHRFF( MSSpeedNumLS );
+						SecCoilRatedSHR = DXCoil( DXCoilNum ).MSSecCoilRatedSHR( MSSpeedNumLS );
+						SHRLowSpeed = CalcSecondaryDXCoilsSHR(DXCoilNum, EvapAirMassFlow, TotalHeatRemovalRate, PartLoadRatio, SecCoilRatedSHR, EvapInletDryBulb, EvapInletHumRat, EvapInletWetBulb, EvapInletEnthalpy, CondInletDryBulb, SecCoilFlowFraction, SecCoilSHRFT, SecCoilSHRFF);
+						SHR = SHRHighSpeed * MSSpeedRatio + SHRLowSpeed * ( 1.0 - MSSpeedRatio );
+
+					} else if ( MSCycRatio > 0.0 ) {
+						// calculate SHR for the lower speed
+						PartLoadRatio = MSCycRatio;
+						SecCoilSHRFT = DXCoil( DXCoilNum ).MSSecCoilSHRFT( MSSpeedNumLS );
+						SecCoilSHRFF = DXCoil( DXCoilNum ).MSSecCoilSHRFF( MSSpeedNumLS );
+						SecCoilRatedSHR = DXCoil( DXCoilNum ).MSSecCoilRatedSHR( MSSpeedNumLS );
+						SecCoilFlowFraction = 1.0;
+						SHRLowSpeed = CalcSecondaryDXCoilsSHR( DXCoilNum, EvapAirMassFlow, TotalHeatRemovalRate, MSCycRatio, SecCoilRatedSHR, EvapInletDryBulb, EvapInletHumRat, EvapInletWetBulb, EvapInletEnthalpy, CondInletDryBulb, SecCoilFlowFraction, SecCoilSHRFT, SecCoilSHRFF );
+						SHR = SHRLowSpeed;
+					}
+					// Calculate full load output conditions
+					FullLoadOutAirEnth = EvapInletEnthalpy - ( TotalHeatRemovalRate / PartLoadRatio ) / EvapAirMassFlow;
+					hTinwout = EvapInletEnthalpy - ( 1.0 - SHR ) * ( ( TotalHeatRemovalRate / PartLoadRatio ) / EvapAirMassFlow );
+					FullLoadOutAirHumRat = PsyWFnTdbH( EvapInletDryBulb, hTinwout, RoutineName, true );
+					FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
+					// when the air outlet temperature falls below the saturation temperature, it is reset to saturation temperature
+					if ( FullLoadOutAirTemp < PsyTsatFnHPb( FullLoadOutAirEnth, OutBaroPress, RoutineName ) ) {
+						FullLoadOutAirTemp = PsyTsatFnHPb( FullLoadOutAirEnth, OutBaroPress, RoutineName );
+						FullLoadOutAirHumRat = PsyWFnTdbH( FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName );
+						// Adjust SHR for the new outlet condition that balances energy
+						hTinwout = PsyHFnTdbW( EvapInletDryBulb, FullLoadOutAirHumRat );
+						SHR = 1.0 - ( EvapInletEnthalpy - hTinwout ) / ( TotalHeatRemovalRate / PartLoadRatio ) / EvapAirMassFlow;
+						SHR = min( SHR, 1.0 );
+					}
+					// calculate the sensible and latent zone heat removal (extraction) rate by the secondary coil
+					DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate = DXCoil( DXCoilNum ).SecCoilTotalHeatRemovalRate * SHR;
+					DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate = DXCoil( DXCoilNum ).SecCoilTotalHeatRemovalRate - DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate;
+				} else {
+					//DX coil is off;
+					DXCoil( DXCoilNum ).SecCoilTotalHeatRemovalRate = 0.0;
+					DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate = 0.0;
+					DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate = 0.0;
+					SHR = 0.0; // SHR is set to rated value if the coil is off
+				}
+				DXCoil( DXCoilNum ).SecCoilSHR = SHR;
+
+			}} // end of { auto const SELECT_CASE_var( DXCoil( DXCoilNum ).DXCoilType_Num );
+
+		} else {
+			DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate = 0.0;
+			DXCoil( DXCoilNum ).SecCoilTotalHeatRemovalRate = 0.0;
+			DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate = 0.0;
+			DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate = 0.0;
+		}
+	}
+
+	Real64
+	CalcSecondaryDXCoilsSHR(
+		int const EP_UNUSED( DXCoilNum ),
+		Real64 const EvapAirMassFlow,
+		Real64 const TotalHeatRemovalRate,
+		Real64 const PartLoadRatio,
+		Real64 const SecCoilRatedSHR,
+		Real64 const EvapInletDryBulb,
+		Real64 const EvapInletHumRat,
+		Real64 const EvapInletWetBulb,
+		Real64 const EvapInletEnthalpy,
+		Real64 const CondInletDryBulb,
+		Real64 const SecCoilFlowFraction,
+		int const SecCoilSHRFT,
+		int const SecCoilSHRFF
+		) {
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         B. Nigusse
+		//       DATE WRITTEN   February 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calculates secondary coil (evaporator) sensible heat ratio.
+
+		// METHODOLOGY EMPLOYED:
+		// Energy balance:
+		//  (1) checks if the seconday coil operation is dry and calculates appliavle SHR.
+		//  (2) determines SHR from user specified rated SHR values and SHR modifier curves for
+		//      temperature and flor fraction.
+		//  (3) if secondary coil operates dry then the larger of the user SHR value and dry
+		//      coil operation SHR is selected.
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using CurveManager::CurveValue;
+		using DataHVACGlobals::TimeStepSys;
+		using DataLoopNode::Node;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		int const MaxIter( 30 );
+		Real64 const RelaxationFactor( 0.4 );
+		Real64 const Tolerance( 0.1 );
+		Real64 const DryCoilTestEvapInletHumRatReset( 0.00001 );
+		static std::string const RoutineName( "CalcSecondaryDXCoilsSHR" );
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 DryCoilTestEvapInletHumRat; // evaporator coil inlet humidity ratio test for dry coil
+		Real64 DryCoilTestEvapInletWetBulb; // evaporator coil inlet dry bulb temperature test for dry coil
+		Real64 FullLoadOutAirEnth; // evaporator outlet full load enthalpy [J/kg]
+		Real64 FullLoadOutAirTemp; // evaporator outlet air temperature at full load [C]
+		Real64 hTinwADP; // enthaly of air at secondary coil entering temperature and Humidity ratio at ADP
+		Real64 SHRadp; // Sensible heat ratio
+		Real64 hADP; // enthaly of air at secondary coil at ADP
+		Real64 tADP; // dry bulb temperature of air at secondary coil at ADP
+		Real64 wADP; // humidity ratio of air at secondary coil at ADP
+		Real64 HumRatError; // humidity ratio error
+		bool CoilMightBeDry; // TRUE means the secondary DX coi runs dry
+		int Counter; // iteration counter
+		bool Converged; // convergence flag
+		Real64 SHR; // current time step sensible heat ratio of secondary coil
+
+		CoilMightBeDry = false;
+		FullLoadOutAirEnth = EvapInletEnthalpy - ( TotalHeatRemovalRate / PartLoadRatio ) / EvapAirMassFlow;
+		FullLoadOutAirTemp = PsyTdbFnHW( FullLoadOutAirEnth, EvapInletHumRat );
+		if ( FullLoadOutAirTemp > PsyTsatFnHPb( FullLoadOutAirEnth, OutBaroPress, RoutineName ) ) {
+			CoilMightBeDry = true;
+			// find wADP, humidity ratio at apparatus dewpoint and inlet hum rat that would have dry coil
+			DryCoilTestEvapInletHumRat = EvapInletHumRat;
+			DryCoilTestEvapInletWetBulb = EvapInletWetBulb;
+			Counter = 0;
+			Converged = false;
+			while ( !Converged ) {
+				// assumes coil bypass factor (CBF) = 0.0
+				hADP = EvapInletEnthalpy - ( TotalHeatRemovalRate / PartLoadRatio ) / EvapAirMassFlow;
+				tADP = PsyTsatFnHPb( hADP, OutBaroPress, RoutineName );
+				wADP = min( EvapInletHumRat, PsyWFnTdbH( tADP, hADP, RoutineName ) );
+				hTinwADP = PsyHFnTdbW( EvapInletDryBulb, wADP );
+				if ( ( EvapInletEnthalpy - hADP ) > 1.e-10 ) {
+					SHRadp = min( ( hTinwADP - hADP ) / ( EvapInletEnthalpy - hADP ), 1.0 );
+				} else {
+					SHRadp = 1.0;
+				}
+				if ( ( wADP > DryCoilTestEvapInletHumRat ) || ( Counter >= 1 && Counter < MaxIter ) ) {
+					if ( DryCoilTestEvapInletHumRat <= 0.0 ) DryCoilTestEvapInletHumRat = DryCoilTestEvapInletHumRatReset;
+					HumRatError = ( DryCoilTestEvapInletHumRat - wADP ) / DryCoilTestEvapInletHumRat;
+					DryCoilTestEvapInletHumRat = RelaxationFactor * wADP + ( 1.0 - RelaxationFactor ) * DryCoilTestEvapInletHumRat;
+					DryCoilTestEvapInletWetBulb = PsyTwbFnTdbWPb( EvapInletDryBulb, DryCoilTestEvapInletHumRat, OutBaroPress, RoutineName );
+					++Counter;
+					if ( std::abs( HumRatError ) <= Tolerance ) {
+						Converged = true;
+					} else {
+						Converged = false;
+					}
+				} else {
+					Converged = true;
+				}
+			}
+		}
+		// determine SHR from user specified nominal value and SHR modifier curves
+		SHR = CalcSHRUserDefinedCurves( CondInletDryBulb, EvapInletWetBulb, SecCoilFlowFraction, SecCoilSHRFT, SecCoilSHRFF, SecCoilRatedSHR );
+		if ( CoilMightBeDry ) {
+			if ( ( EvapInletHumRat < DryCoilTestEvapInletHumRat ) && ( SHRadp > SHR ) ) { // coil is dry for sure
+				SHR = 1.0;
+			} else if ( SHRadp > SHR ) {
+				SHR = SHRadp;
+			}
+		}
+		return SHR;
+	}
+
+
+
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -1,7 +1,7 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArrayS.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/ArrayS.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 
@@ -177,7 +177,7 @@ namespace RoomAirModelUserTempPattern {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_bool MyEnvrnFlag; // flag for init once at start of environment
+		static Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
 		static bool MyOneTimeFlag( true ); // one time setup flag
 		int SurfNum; // do loop counter
 
@@ -232,7 +232,6 @@ namespace RoomAirModelUserTempPattern {
 		using DataHeatBalFanSys::MAT;
 		using DataHeatBalFanSys::ZT;
 		using DataHeatBalFanSys::ZTAV;
-		using DataHeatBalance::Zone;
 		using InputProcessor::FindItem;
 
 		// Locals
@@ -283,11 +282,8 @@ namespace RoomAirModelUserTempPattern {
 		// na
 
 		// Using/Aliasing
-		using DataSurfaces::Surface;
-		using DataSurfaces::AdjacentAirTemp;
 		using DataSurfaces::ZoneMeanAirTemp;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using DataHeatBalance::Zone;
 		using InputProcessor::FindItem;
 		using OutputReportTabular::IntToStr;
 		using General::FindNumberInList;
@@ -573,7 +569,7 @@ namespace RoomAirModelUserTempPattern {
 		Real64 thisZeta; // non-dimensional height
 		Real64 DeltaHeight; // height difference in m
 		Real64 tempDeltaTai; // temporary temperature difference
-		static FArray1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
+		static Array1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
 		static bool MyOneTimeFlag( true );
 
 		if ( MyOneTimeFlag ) {
@@ -593,23 +589,8 @@ namespace RoomAirModelUserTempPattern {
 		{ auto const SELECT_CASE_var( RoomAirPattern( PattrnID ).TwoGradPatrn.InterpolationMode );
 
 		if ( SELECT_CASE_var == OutdoorDryBulbMode ) {
-			if ( Zone( ZoneNum ).OutDryBulbTemp >= RoomAirPattern( PattrnID ).TwoGradPatrn.UpperBoundTempScale ) {
-				Grad = RoomAirPattern( PattrnID ).TwoGradPatrn.HiGradient;
 
-			} else if ( Zone( ZoneNum ).OutDryBulbTemp <= RoomAirPattern( PattrnID ).TwoGradPatrn.LowerBoundTempScale ) {
-
-				Grad = RoomAirPattern( PattrnID ).TwoGradPatrn.LowGradient;
-			} else { // interpolate
-
-				if ( ( RoomAirPattern( PattrnID ).TwoGradPatrn.UpperBoundTempScale - RoomAirPattern( PattrnID ).TwoGradPatrn.LowerBoundTempScale ) != 0.0 ) {
-					// bad user input. should be trapped during get input in RoomAirManager.cc
-					Grad = RoomAirPattern( PattrnID ).TwoGradPatrn.LowGradient;
-				} else {
-
-					Grad = RoomAirPattern( PattrnID ).TwoGradPatrn.LowGradient + ( ( Zone( ZoneNum ).OutDryBulbTemp - RoomAirPattern( PattrnID ).TwoGradPatrn.LowerBoundTempScale ) / ( RoomAirPattern( PattrnID ).TwoGradPatrn.UpperBoundTempScale - RoomAirPattern( PattrnID ).TwoGradPatrn.LowerBoundTempScale ) ) * ( RoomAirPattern( PattrnID ).TwoGradPatrn.HiGradient - RoomAirPattern( PattrnID ).TwoGradPatrn.LowGradient );
-
-				}
-			}
+			Grad = OutdoorDryBulbGrad(Zone(ZoneNum).OutDryBulbTemp, RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale, RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient, RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale, RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
 
 		} else if ( SELECT_CASE_var == ZoneAirTempMode ) {
 
@@ -705,6 +686,38 @@ namespace RoomAirModelUserTempPattern {
 
 		AirPatternZoneInfo( ZoneNum ).Gradient = Grad;
 
+	}
+	Real64
+	OutdoorDryBulbGrad(
+		Real64 DryBulbTemp, // Zone(ZoneNum).OutDryBulbTemp
+		Real64 UpperBound, // RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale
+		Real64 HiGradient, // RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient
+		Real64 LowerBound, // RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale
+		Real64 LowGradient // RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient
+	)
+	{
+		Real64 Grad;
+		if (DryBulbTemp >= UpperBound) {
+			Grad = HiGradient;
+
+		}
+		else if (DryBulbTemp <= LowerBound) {
+
+			Grad = LowGradient;
+		}
+		else { // interpolate
+
+			if ((UpperBound - LowerBound) == 0.0) {
+				// bad user input. should be trapped during get input in RoomAirManager.cc
+				Grad = LowGradient;
+			}
+			else {
+
+				Grad = LowGradient + ((DryBulbTemp - LowerBound) / (UpperBound -LowerBound)) * (HiGradient - LowGradient);
+
+			}
+		}
+		return Grad;
 	}
 
 	void
@@ -949,9 +962,7 @@ namespace RoomAirModelUserTempPattern {
 		using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::TempEffBulkAir;
-		using DataHeatBalance::ZoneIntGain;
 		using DataHeatBalance::RefrigCaseCredit;
-		using DataZoneEquipment::ZoneEquipConfig;
 		using DataHeatBalFanSys::MAT;
 		using DataHeatBalFanSys::ZT;
 		using DataHeatBalFanSys::TempZoneThermostatSetPoint;
@@ -1147,7 +1158,7 @@ namespace RoomAirModelUserTempPattern {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

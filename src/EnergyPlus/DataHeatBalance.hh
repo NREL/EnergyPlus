@@ -2,10 +2,10 @@
 #define DataHeatBalance_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/FArray3D.hh>
-#include <ObjexxFCL/FArray4D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Array3D.hh>
+#include <ObjexxFCL/Array4D.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/Reference.hh>
 
@@ -70,7 +70,7 @@ namespace DataHeatBalance {
 	extern int const ScreenEquivalentLayer;
 	extern int const GapEquivalentLayer;
 
-	extern FArray1D_string const cMaterialGroupType;
+	extern Array1D_string const cMaterialGroupType;
 
 	// Parameters to indicate surface roughness for use with the Material
 	// derived type (see below):
@@ -181,10 +181,10 @@ namespace DataHeatBalance {
 	extern int const AdjustInfiltrationFlow;
 
 	extern int const NumZoneIntGainDeviceTypes;
-	extern FArray1D_string const ZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46
 
-	extern FArray1D_string const ccZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46
+	extern Array1D_string const ZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 | 50 | 51
 
+	extern Array1D_string const ccZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 | 50 | 51
 	extern int const IntGainTypeOf_People;
 	extern int const IntGainTypeOf_Lights;
 	extern int const IntGainTypeOf_ElectricEquipment;
@@ -231,6 +231,11 @@ namespace DataHeatBalance {
 	extern int const IntGainTypeOf_AirTerminalUserDefined;
 	extern int const IntGainTypeOf_PackagedTESCoilTank;
 	extern int const IntGainTypeOf_ElectricEquipmentITEAirCooled;
+	extern int const IntGainTypeOf_SecCoolingDXCoilSingleSpeed;
+	extern int const IntGainTypeOf_SecHeatingDXCoilSingleSpeed;
+	extern int const IntGainTypeOf_SecCoolingDXCoilTwoSpeed;
+	extern int const IntGainTypeOf_SecCoolingDXCoilMultiSpeed;
+	extern int const IntGainTypeOf_SecHeatingDXCoilMultiSpeed;
 
 	//Parameters for checking surface heat transfer models
 	extern Real64 const HighDiffusivityThreshold; // used to check if Material properties are out of line.
@@ -287,7 +292,7 @@ namespace DataHeatBalance {
 	extern int InsideSurfIterations; // Counts inside surface iterations
 	extern int OverallHeatTransferSolutionAlgo; // UseCTF Solution, UseEMPD moisture solution, UseCondFD solution
 	extern int NumberOfHeatTransferAlgosUsed;
-	extern FArray1D_int HeatTransferAlgosUsed;
+	extern Array1D_int HeatTransferAlgosUsed;
 	extern int MaxNumberOfWarmupDays; // Maximum number of warmup days allowed
 	extern int MinNumberOfWarmupDays; // Minimum number of warmup days allowed
 	extern Real64 CondFDRelaxFactor; // Relaxation factor, for looping across all the surfaces.
@@ -371,108 +376,108 @@ namespace DataHeatBalance {
 	extern int NumRefrigSystems; // Total number of detailed refrigeration systems in input
 	extern int NumRefrigCondensers; // Total number of detailed refrigeration condensers in input
 	extern int NumRefrigChillerSets; // Total number of refrigerated warehouse coils in input
-	extern FArray1D< Real64 > SNLoadHeatEnergy;
-	extern FArray1D< Real64 > SNLoadCoolEnergy;
-	extern FArray1D< Real64 > SNLoadHeatRate;
-	extern FArray1D< Real64 > SNLoadCoolRate;
-	extern FArray1D< Real64 > SNLoadPredictedRate;
-	extern FArray1D< Real64 > SNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
-	extern FArray1D< Real64 > SNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)
-	extern FArray1D< Real64 > MoisturePredictedRate;
+	extern Array1D< Real64 > SNLoadHeatEnergy;
+	extern Array1D< Real64 > SNLoadCoolEnergy;
+	extern Array1D< Real64 > SNLoadHeatRate;
+	extern Array1D< Real64 > SNLoadCoolRate;
+	extern Array1D< Real64 > SNLoadPredictedRate;
+	extern Array1D< Real64 > SNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
+	extern Array1D< Real64 > SNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)
+	extern Array1D< Real64 > MoisturePredictedRate;
 
-	extern FArray1D< Real64 > ListSNLoadHeatEnergy;
-	extern FArray1D< Real64 > ListSNLoadCoolEnergy;
-	extern FArray1D< Real64 > ListSNLoadHeatRate;
-	extern FArray1D< Real64 > ListSNLoadCoolRate;
+	extern Array1D< Real64 > ListSNLoadHeatEnergy;
+	extern Array1D< Real64 > ListSNLoadCoolEnergy;
+	extern Array1D< Real64 > ListSNLoadHeatRate;
+	extern Array1D< Real64 > ListSNLoadCoolRate;
 
-	extern FArray1D< Real64 > GroupSNLoadHeatEnergy;
-	extern FArray1D< Real64 > GroupSNLoadCoolEnergy;
-	extern FArray1D< Real64 > GroupSNLoadHeatRate;
-	extern FArray1D< Real64 > GroupSNLoadCoolRate;
+	extern Array1D< Real64 > GroupSNLoadHeatEnergy;
+	extern Array1D< Real64 > GroupSNLoadCoolEnergy;
+	extern Array1D< Real64 > GroupSNLoadHeatRate;
+	extern Array1D< Real64 > GroupSNLoadCoolRate;
 
-	extern FArray1D< Real64 > MRT; // MEAN RADIANT TEMPERATURE (C)
-	extern FArray1D< Real64 > SUMAI; // 1 over the Sum of zone areas or 1/SumA
-	extern FArray1D< Real64 > ZoneTransSolar; // Exterior beam plus diffuse solar entering zone;
+	extern Array1D< Real64 > MRT; // MEAN RADIANT TEMPERATURE (C)
+	extern Array1D< Real64 > SUMAI; // 1 over the Sum of zone areas or 1/SumA
+	extern Array1D< Real64 > ZoneTransSolar; // Exterior beam plus diffuse solar entering zone;
 	//   sum of WinTransSolar for exterior windows in zone (W)
-	extern FArray1D< Real64 > ZoneWinHeatGain; // Heat gain to zone from all exterior windows (includes
+	extern Array1D< Real64 > ZoneWinHeatGain; // Heat gain to zone from all exterior windows (includes
 	//   ZoneTransSolar); sum of WinHeatGain for exterior
 	//   windows in zone (W)
-	extern FArray1D< Real64 > ZoneWinHeatGainRep; // = ZoneWinHeatGain when ZoneWinHeatGain >= 0
-	extern FArray1D< Real64 > ZoneWinHeatLossRep; // = -ZoneWinHeatGain when ZoneWinHeatGain < 0
-	extern FArray1D< Real64 > ZoneBmSolFrExtWinsRep; // Beam solar into zone from exterior windows [W]
-	extern FArray1D< Real64 > ZoneBmSolFrIntWinsRep; // Beam solar into zone from interior windows [W]
-	extern FArray1D< Real64 > InitialZoneDifSolReflW; // Initial diffuse solar in zone from ext and int windows
+	extern Array1D< Real64 > ZoneWinHeatGainRep; // = ZoneWinHeatGain when ZoneWinHeatGain >= 0
+	extern Array1D< Real64 > ZoneWinHeatLossRep; // = -ZoneWinHeatGain when ZoneWinHeatGain < 0
+	extern Array1D< Real64 > ZoneBmSolFrExtWinsRep; // Beam solar into zone from exterior windows [W]
+	extern Array1D< Real64 > ZoneBmSolFrIntWinsRep; // Beam solar into zone from interior windows [W]
+	extern Array1D< Real64 > InitialZoneDifSolReflW; // Initial diffuse solar in zone from ext and int windows
 	// reflected from interior surfaces [W]
-	extern FArray1D< Real64 > ZoneDifSolFrExtWinsRep; // Diffuse solar into zone from exterior windows [W]
-	extern FArray1D< Real64 > ZoneDifSolFrIntWinsRep; // Diffuse solar into zone from interior windows [W]
-	extern FArray1D< Real64 > ZoneOpaqSurfInsFaceCond; // Zone inside face opaque surface conduction (W)
-	extern FArray1D< Real64 > ZoneOpaqSurfInsFaceCondGainRep; // = Zone inside face opaque surface conduction when >= 0
-	extern FArray1D< Real64 > ZoneOpaqSurfInsFaceCondLossRep; // = -Zone inside face opaque surface conduction when < 0
-	extern FArray1D< Real64 > ZoneOpaqSurfExtFaceCond; // Zone outside face opaque surface conduction (W)
-	extern FArray1D< Real64 > ZoneOpaqSurfExtFaceCondGainRep; // = Zone outside face opaque surface conduction when >= 0
-	extern FArray1D< Real64 > ZoneOpaqSurfExtFaceCondLossRep; // = -Zone outside face opaque surface conduction when < 0
-	extern FArray1D< Real64 > QRadThermInAbs; // Thermal radiation absorbed on inside surfaces
-	extern FArray2D< Real64 > QRadSWwinAbs; // Short wave radiation absorbed in window glass layers
-	extern FArray2D< Real64 > InitialDifSolwinAbs; // Initial diffuse solar absorbed in window glass layers
+	extern Array1D< Real64 > ZoneDifSolFrExtWinsRep; // Diffuse solar into zone from exterior windows [W]
+	extern Array1D< Real64 > ZoneDifSolFrIntWinsRep; // Diffuse solar into zone from interior windows [W]
+	extern Array1D< Real64 > ZoneOpaqSurfInsFaceCond; // Zone inside face opaque surface conduction (W)
+	extern Array1D< Real64 > ZoneOpaqSurfInsFaceCondGainRep; // = Zone inside face opaque surface conduction when >= 0
+	extern Array1D< Real64 > ZoneOpaqSurfInsFaceCondLossRep; // = -Zone inside face opaque surface conduction when < 0
+	extern Array1D< Real64 > ZoneOpaqSurfExtFaceCond; // Zone outside face opaque surface conduction (W)
+	extern Array1D< Real64 > ZoneOpaqSurfExtFaceCondGainRep; // = Zone outside face opaque surface conduction when >= 0
+	extern Array1D< Real64 > ZoneOpaqSurfExtFaceCondLossRep; // = -Zone outside face opaque surface conduction when < 0
+	extern Array1D< Real64 > QRadThermInAbs; // Thermal radiation absorbed on inside surfaces
+	extern Array2D< Real64 > QRadSWwinAbs; // Short wave radiation absorbed in window glass layers
+	extern Array2D< Real64 > InitialDifSolwinAbs; // Initial diffuse solar absorbed in window glass layers
 	// from inside(W/m2)
-	extern FArray1D< Real64 > QRadSWOutIncident; // Exterior beam plus diffuse solar incident on surface (W/m2)
-	extern FArray1D< Real64 > QRadSWOutIncidentBeam; // Exterior beam solar incident on surface (W/m2)
-	extern FArray1D< Real64 > BmIncInsSurfIntensRep; // Beam sol irrad from ext wins on inside of surface (W/m2)
-	extern FArray1D< Real64 > BmIncInsSurfAmountRep; // Beam sol amount from ext wins incident on inside of surface (W)
-	extern FArray1D< Real64 > IntBmIncInsSurfIntensRep; // Beam sol irrad from int wins on inside of surface (W/m2)
-	extern FArray1D< Real64 > IntBmIncInsSurfAmountRep; // Beam sol amount from int wins incident on inside of surface (W)
-	extern FArray1D< Real64 > QRadSWOutIncidentSkyDiffuse; // Exterior sky diffuse solar incident on surface (W/m2)
-	extern FArray1D< Real64 > QRadSWOutIncidentGndDiffuse; // Exterior ground diffuse solar incident on surface (W/m2)
-	extern FArray1D< Real64 > QRadSWOutIncBmToDiffReflGnd; // Exterior diffuse solar incident from beam to diffuse
+	extern Array1D< Real64 > QRadSWOutIncident; // Exterior beam plus diffuse solar incident on surface (W/m2)
+	extern Array1D< Real64 > QRadSWOutIncidentBeam; // Exterior beam solar incident on surface (W/m2)
+	extern Array1D< Real64 > BmIncInsSurfIntensRep; // Beam sol irrad from ext wins on inside of surface (W/m2)
+	extern Array1D< Real64 > BmIncInsSurfAmountRep; // Beam sol amount from ext wins incident on inside of surface (W)
+	extern Array1D< Real64 > IntBmIncInsSurfIntensRep; // Beam sol irrad from int wins on inside of surface (W/m2)
+	extern Array1D< Real64 > IntBmIncInsSurfAmountRep; // Beam sol amount from int wins incident on inside of surface (W)
+	extern Array1D< Real64 > QRadSWOutIncidentSkyDiffuse; // Exterior sky diffuse solar incident on surface (W/m2)
+	extern Array1D< Real64 > QRadSWOutIncidentGndDiffuse; // Exterior ground diffuse solar incident on surface (W/m2)
+	extern Array1D< Real64 > QRadSWOutIncBmToDiffReflGnd; // Exterior diffuse solar incident from beam to diffuse
 	// reflection from ground (W/m2)
-	extern FArray1D< Real64 > QRadSWOutIncSkyDiffReflGnd; // Exterior diffuse solar incident from sky diffuse
+	extern Array1D< Real64 > QRadSWOutIncSkyDiffReflGnd; // Exterior diffuse solar incident from sky diffuse
 	// reflection from ground (W/m2)
-	extern FArray1D< Real64 > QRadSWOutIncBmToBmReflObs; // Exterior beam solar incident from beam-to-beam
+	extern Array1D< Real64 > QRadSWOutIncBmToBmReflObs; // Exterior beam solar incident from beam-to-beam
 	// reflection from obstructions (W/m2)
-	extern FArray1D< Real64 > QRadSWOutIncBmToDiffReflObs; // Exterior diffuse solar incident from beam-to-diffuse
+	extern Array1D< Real64 > QRadSWOutIncBmToDiffReflObs; // Exterior diffuse solar incident from beam-to-diffuse
 	// reflection from obstructions (W/m2)
-	extern FArray1D< Real64 > QRadSWOutIncSkyDiffReflObs; // Exterior diffuse solar incident from sky diffuse
+	extern Array1D< Real64 > QRadSWOutIncSkyDiffReflObs; // Exterior diffuse solar incident from sky diffuse
 	// reflection from obstructions (W/m2)
-	extern FArray1D< Real64 > CosIncidenceAngle; // Cosine of beam solar incidence angle (for reporting)
-	extern FArray1D_int BSDFBeamDirectionRep; // BSDF beam direction number for given complex fenestration state (for reporting) []
-	extern FArray1D< Real64 > BSDFBeamThetaRep; // BSDF beam Theta angle (for reporting) [rad]
-	extern FArray1D< Real64 > BSDFBeamPhiRep; // BSDF beam Phi angle (for reporting) [rad]
+	extern Array1D< Real64 > CosIncidenceAngle; // Cosine of beam solar incidence angle (for reporting)
+	extern Array1D_int BSDFBeamDirectionRep; // BSDF beam direction number for given complex fenestration state (for reporting) []
+	extern Array1D< Real64 > BSDFBeamThetaRep; // BSDF beam Theta angle (for reporting) [rad]
+	extern Array1D< Real64 > BSDFBeamPhiRep; // BSDF beam Phi angle (for reporting) [rad]
 
-	extern FArray1D< Real64 > QRadSWwinAbsTot; // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
-	extern FArray2D< Real64 > QRadSWwinAbsLayer; // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
+	extern Array1D< Real64 > QRadSWwinAbsTot; // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
+	extern Array2D< Real64 > QRadSWwinAbsLayer; // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
 
-	extern FArray2D< Real64 > FenLaySurfTempFront; // Front surface temperatures of fenestration layers
-	extern FArray2D< Real64 > FenLaySurfTempBack; // Back surface temperatures of fenestration layers
-	extern FArray1D< Real64 > ZoneTransSolarEnergy; // Energy of ZoneTransSolar [J]
-	extern FArray1D< Real64 > ZoneWinHeatGainRepEnergy; // Energy of ZoneWinHeatGainRep [J]
-	extern FArray1D< Real64 > ZoneWinHeatLossRepEnergy; // Energy of ZoneWinHeatLossRep [J]
-	extern FArray1D< Real64 > ZoneBmSolFrExtWinsRepEnergy; // Energy of ZoneBmSolFrExtWinsRep [J]
-	extern FArray1D< Real64 > ZoneBmSolFrIntWinsRepEnergy; // Energy of ZoneBmSolFrIntWinsRep [J]
-	extern FArray1D< Real64 > ZoneDifSolFrExtWinsRepEnergy; // Energy of ZoneDifSolFrExtWinsRep [J]
-	extern FArray1D< Real64 > ZoneDifSolFrIntWinsRepEnergy; // Energy of ZoneDifSolFrIntWinsRep [J]
-	extern FArray1D< Real64 > ZnOpqSurfInsFaceCondGnRepEnrg; // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
-	extern FArray1D< Real64 > ZnOpqSurfInsFaceCondLsRepEnrg; // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
-	extern FArray1D< Real64 > ZnOpqSurfExtFaceCondGnRepEnrg; // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
-	extern FArray1D< Real64 > ZnOpqSurfExtFaceCondLsRepEnrg; // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
-	extern FArray1D< Real64 > BmIncInsSurfAmountRepEnergy; // energy of BmIncInsSurfAmountRep [J]
-	extern FArray1D< Real64 > IntBmIncInsSurfAmountRepEnergy; // energy of IntBmIncInsSurfAmountRep [J]
-	extern FArray1D< Real64 > QRadSWwinAbsTotEnergy; // Energy of QRadSWwinAbsTot [J]
-	extern FArray1D< Real64 > SWwinAbsTotalReport; // Report - Total interior/exterior shortwave
+	extern Array2D< Real64 > FenLaySurfTempFront; // Front surface temperatures of fenestration layers
+	extern Array2D< Real64 > FenLaySurfTempBack; // Back surface temperatures of fenestration layers
+	extern Array1D< Real64 > ZoneTransSolarEnergy; // Energy of ZoneTransSolar [J]
+	extern Array1D< Real64 > ZoneWinHeatGainRepEnergy; // Energy of ZoneWinHeatGainRep [J]
+	extern Array1D< Real64 > ZoneWinHeatLossRepEnergy; // Energy of ZoneWinHeatLossRep [J]
+	extern Array1D< Real64 > ZoneBmSolFrExtWinsRepEnergy; // Energy of ZoneBmSolFrExtWinsRep [J]
+	extern Array1D< Real64 > ZoneBmSolFrIntWinsRepEnergy; // Energy of ZoneBmSolFrIntWinsRep [J]
+	extern Array1D< Real64 > ZoneDifSolFrExtWinsRepEnergy; // Energy of ZoneDifSolFrExtWinsRep [J]
+	extern Array1D< Real64 > ZoneDifSolFrIntWinsRepEnergy; // Energy of ZoneDifSolFrIntWinsRep [J]
+	extern Array1D< Real64 > ZnOpqSurfInsFaceCondGnRepEnrg; // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
+	extern Array1D< Real64 > ZnOpqSurfInsFaceCondLsRepEnrg; // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
+	extern Array1D< Real64 > ZnOpqSurfExtFaceCondGnRepEnrg; // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
+	extern Array1D< Real64 > ZnOpqSurfExtFaceCondLsRepEnrg; // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
+	extern Array1D< Real64 > BmIncInsSurfAmountRepEnergy; // energy of BmIncInsSurfAmountRep [J]
+	extern Array1D< Real64 > IntBmIncInsSurfAmountRepEnergy; // energy of IntBmIncInsSurfAmountRep [J]
+	extern Array1D< Real64 > QRadSWwinAbsTotEnergy; // Energy of QRadSWwinAbsTot [J]
+	extern Array1D< Real64 > SWwinAbsTotalReport; // Report - Total interior/exterior shortwave
 	//absorbed in all glass layers of window (W)
-	extern FArray1D< Real64 > InitialDifSolInAbsReport; // Report - Initial transmitted diffuse solar
+	extern Array1D< Real64 > InitialDifSolInAbsReport; // Report - Initial transmitted diffuse solar
 	//absorbed on inside of surface (W)
-	extern FArray1D< Real64 > InitialDifSolInTransReport; // Report - Initial transmitted diffuse solar
+	extern Array1D< Real64 > InitialDifSolInTransReport; // Report - Initial transmitted diffuse solar
 	//transmitted out through inside of window surface (W)
-	extern FArray1D< Real64 > SWInAbsTotalReport; // Report - Total interior/exterior shortwave
+	extern Array1D< Real64 > SWInAbsTotalReport; // Report - Total interior/exterior shortwave
 	//absorbed on inside of surface (W)
-	extern FArray1D< Real64 > SWOutAbsTotalReport; // Report - Total exterior shortwave/solar
+	extern Array1D< Real64 > SWOutAbsTotalReport; // Report - Total exterior shortwave/solar
 	//absorbed on outside of surface (W)
-	extern FArray1D< Real64 > SWOutAbsEnergyReport; // Report - Total exterior shortwave/solar
+	extern Array1D< Real64 > SWOutAbsEnergyReport; // Report - Total exterior shortwave/solar
 	//absorbed on outside of surface (j)
 
-	extern FArray1D< Real64 > NominalR; // Nominal R value of each material -- used in matching interzone surfaces
-	extern FArray1D< Real64 > NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
-	extern FArray1D< Real64 > NominalU; // Nominal U value for each construction -- used in matching interzone surfaces
+	extern Array1D< Real64 > NominalR; // Nominal R value of each material -- used in matching interzone surfaces
+	extern Array1D< Real64 > NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
+	extern Array1D< Real64 > NominalU; // Nominal U value for each construction -- used in matching interzone surfaces
 
 	// removed variables (these were all arrays):
 	//REAL(r64), ALLOCATABLE, :: DifIncInsSurfIntensRep    !Diffuse sol irradiance from ext wins on inside of surface (W/m2)
@@ -485,64 +490,64 @@ namespace DataHeatBalance {
 	// Variables moved from HeatBalanceSurfaceManager and SolarShading
 	// to avoid conflict with their use in WindowManager
 
-	extern FArray1D< Real64 > TempEffBulkAir; // air temperature adjacent to the surface used for
+	extern Array1D< Real64 > TempEffBulkAir; // air temperature adjacent to the surface used for
 	// inside surface heat balances
-	extern FArray1D< Real64 > HConvIn; // INSIDE CONVECTION COEFFICIENT
-	extern FArray1D< Real64 > AnisoSkyMult; // Multiplier on exterior-surface sky view factor to
+	extern Array1D< Real64 > HConvIn; // INSIDE CONVECTION COEFFICIENT
+	extern Array1D< Real64 > AnisoSkyMult; // Multiplier on exterior-surface sky view factor to
 	// account for anisotropy of sky radiance; = 1.0 for
 	// for isotropic sky
 
 	// Moved from SolarShading to avoid conflicts in DaylightingDevices
-	extern FArray1D< Real64 > DifShdgRatioIsoSky; // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
-	extern FArray3D< Real64 > DifShdgRatioIsoSkyHRTS; // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
-	extern FArray1D< Real64 > curDifShdgRatioIsoSky; // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
-	extern FArray1D< Real64 > DifShdgRatioHoriz; // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
-	extern FArray3D< Real64 > DifShdgRatioHorizHRTS; // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
-	extern FArray1D< Real64 > WithShdgIsoSky; // Diffuse solar irradiance from sky on surface, with shading
-	extern FArray1D< Real64 > WoShdgIsoSky; // Diffuse solar from sky on surface, without shading
-	extern FArray1D< Real64 > WithShdgHoriz; // Diffuse solar irradiance from horizon portion of sky on surface,
+	extern Array1D< Real64 > DifShdgRatioIsoSky; // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
+	extern Array3D< Real64 > DifShdgRatioIsoSkyHRTS; // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
+	extern Array1D< Real64 > curDifShdgRatioIsoSky; // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
+	extern Array1D< Real64 > DifShdgRatioHoriz; // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
+	extern Array3D< Real64 > DifShdgRatioHorizHRTS; // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
+	extern Array1D< Real64 > WithShdgIsoSky; // Diffuse solar irradiance from sky on surface, with shading
+	extern Array1D< Real64 > WoShdgIsoSky; // Diffuse solar from sky on surface, without shading
+	extern Array1D< Real64 > WithShdgHoriz; // Diffuse solar irradiance from horizon portion of sky on surface,
 	// with shading
-	extern FArray1D< Real64 > WoShdgHoriz; // Diffuse solar irradiance from horizon portion of sky on surface,
+	extern Array1D< Real64 > WoShdgHoriz; // Diffuse solar irradiance from horizon portion of sky on surface,
 	// without shading
-	extern FArray1D< Real64 > MultIsoSky; // Contribution to eff sky view factor from isotropic sky
-	extern FArray1D< Real64 > MultCircumSolar; // Contribution to eff sky view factor from circumsolar brightening
-	extern FArray1D< Real64 > MultHorizonZenith; // Contribution to eff sky view factor from horizon or zenith brightening
+	extern Array1D< Real64 > MultIsoSky; // Contribution to eff sky view factor from isotropic sky
+	extern Array1D< Real64 > MultCircumSolar; // Contribution to eff sky view factor from circumsolar brightening
+	extern Array1D< Real64 > MultHorizonZenith; // Contribution to eff sky view factor from horizon or zenith brightening
 
-	extern FArray1D< Real64 > QS; // Zone short-wave flux density; used to calculate short-wave
+	extern Array1D< Real64 > QS; // Zone short-wave flux density; used to calculate short-wave
 	//     radiation absorbed on inside surfaces of zone
-	extern FArray1D< Real64 > QSLights; // Like QS, but Lights short-wave only.
+	extern Array1D< Real64 > QSLights; // Like QS, but Lights short-wave only.
 
-	extern FArray1D< Real64 > QSDifSol; // Like QS, but diffuse solar short-wave only.
-	extern FArray1D< Real64 > ITABSF; // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
-	extern FArray1D< Real64 > TMULT; // TMULT  - MULTIPLIER TO COMPUTE 'ITABSF'
-	extern FArray1D< Real64 > QL; // TOTAL THERMAL RADIATION ADDED TO ZONE
-	extern FArray2D< Real64 > SunlitFracHR; // Hourly fraction of heat transfer surface that is sunlit
-	extern FArray2D< Real64 > CosIncAngHR; // Hourly cosine of beam radiation incidence angle on surface
-	extern FArray3D< Real64 > SunlitFrac; // TimeStep fraction of heat transfer surface that is sunlit
-	extern FArray3D< Real64 > SunlitFracWithoutReveal; // For a window with reveal, the sunlit fraction
+	extern Array1D< Real64 > QSDifSol; // Like QS, but diffuse solar short-wave only.
+	extern Array1D< Real64 > ITABSF; // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
+	extern Array1D< Real64 > TMULT; // TMULT  - MULTIPLIER TO COMPUTE 'ITABSF'
+	extern Array1D< Real64 > QL; // TOTAL THERMAL RADIATION ADDED TO ZONE
+	extern Array2D< Real64 > SunlitFracHR; // Hourly fraction of heat transfer surface that is sunlit
+	extern Array2D< Real64 > CosIncAngHR; // Hourly cosine of beam radiation incidence angle on surface
+	extern Array3D< Real64 > SunlitFrac; // TimeStep fraction of heat transfer surface that is sunlit
+	extern Array3D< Real64 > SunlitFracWithoutReveal; // For a window with reveal, the sunlit fraction
 	// without shadowing by the reveal
-	extern FArray3D< Real64 > CosIncAng; // TimeStep cosine of beam radiation incidence angle on surface
-	extern FArray4D_int BackSurfaces; // For a given hour and timestep, a list of up to 20 surfaces receiving
+	extern Array3D< Real64 > CosIncAng; // TimeStep cosine of beam radiation incidence angle on surface
+	extern Array4D_int BackSurfaces; // For a given hour and timestep, a list of up to 20 surfaces receiving
 	// beam solar radiation from a given exterior window
-	extern FArray4D< Real64 > OverlapAreas; // For a given hour and timestep, the areas of the exterior window sending
+	extern Array4D< Real64 > OverlapAreas; // For a given hour and timestep, the areas of the exterior window sending
 	// beam solar radiation to the surfaces listed in BackSurfaces
 	//                       Air       Argon     Krypton   Xenon
-	extern FArray2D< Real64 > const GasCoeffsCon; // Gas conductivity coefficients for gases in a mixture
+	extern Array2D< Real64 > const GasCoeffsCon; // Gas conductivity coefficients for gases in a mixture
 
 	//                       Air       Argon     Krypton   Xenon
-	extern FArray2D< Real64 > const GasCoeffsVis; // Gas viscosity coefficients for gases in a mixture
+	extern Array2D< Real64 > const GasCoeffsVis; // Gas viscosity coefficients for gases in a mixture
 
 	//                     Air       Argon     Krypton   Xenon
-	extern FArray2D< Real64 > const GasCoeffsCp; // Gas specific heat coefficients for gases in a mixture
+	extern Array2D< Real64 > const GasCoeffsCp; // Gas specific heat coefficients for gases in a mixture
 
 	//                       Air       Argon     Krypton   Xenon
-	extern FArray1D< Real64 > const GasWght; // Gas molecular weights for gases in a mixture
+	extern Array1D< Real64 > const GasWght; // Gas molecular weights for gases in a mixture
 
-	extern FArray1D< Real64 > const GasSpecificHeatRatio; // Gas specific heat ratios.  Used for gasses in low pressure
+	extern Array1D< Real64 > const GasSpecificHeatRatio; // Gas specific heat ratios.  Used for gasses in low pressure
 
 	//Variables Dimensioned to Number of Zones
-	extern FArray1D< Real64 > MVFC; // Design Mixing Flow Rate [m3/s] (Cross Zone Mixing)
-	extern FArray1D< Real64 > MTC; // Control Temperature For Mixing [C] (Cross Zone Mixing)
+	extern Array1D< Real64 > MVFC; // Design Mixing Flow Rate [m3/s] (Cross Zone Mixing)
+	extern Array1D< Real64 > MTC; // Control Temperature For Mixing [C] (Cross Zone Mixing)
 
 	extern Real64 ZeroPointerVal;
 
@@ -574,16 +579,16 @@ namespace DataHeatBalance {
 		// based on the water vapor density (kg/kgK)
 		Real64 Thickness; // Layer thickness (m)
 		Real64 VaporDiffus; // Layer vapor diffusivity
-		FArray1D_int GasType; // Gas type (air=1, argon=2, krypton=3, xenon=4, custom=0) for
+		Array1D_int GasType; // Gas type (air=1, argon=2, krypton=3, xenon=4, custom=0) for
 		//  up to 5 gases in a mixture [Window gas only].  It is defined as parameter (GasCoefs)
 		int GlassSpectralDataPtr; // Number of a spectral data set associated with a window glass material
 		int NumberOfGasesInMixture; // Number of gases in a window gas mixture
-		FArray2D< Real64 > GasCon; // Gas conductance coefficients for up to 5 gases in a mixture
-		FArray2D< Real64 > GasVis; // Gas viscosity coefficients for up to 5 gases in a mixture
-		FArray2D< Real64 > GasCp; // Gas specific-heat coefficients for up to 5 gases in a mixture
-		FArray1D< Real64 > GasWght; // Gas molecular weight for up to 5 gases in a mixture
-		FArray1D< Real64 > GasSpecHeatRatio; // Gas specific heat ratio (used for low pressure calculations)
-		FArray1D< Real64 > GasFract; // Gas fractions for up to 5 gases in a mixture
+		Array2D< Real64 > GasCon; // Gas conductance coefficients for up to 5 gases in a mixture
+		Array2D< Real64 > GasVis; // Gas viscosity coefficients for up to 5 gases in a mixture
+		Array2D< Real64 > GasCp; // Gas specific-heat coefficients for up to 5 gases in a mixture
+		Array1D< Real64 > GasWght; // Gas molecular weight for up to 5 gases in a mixture
+		Array1D< Real64 > GasSpecHeatRatio; // Gas specific heat ratio (used for low pressure calculations)
+		Array1D< Real64 > GasFract; // Gas fractions for up to 5 gases in a mixture
 		// Radiation parameters
 		Real64 AbsorpSolar; // Layer solar absorptance
 		Real64 AbsorpSolarInput; // Layer solar absorptance input by user
@@ -664,20 +669,20 @@ namespace DataHeatBalance {
 		Real64 RStomata; // Minimum stomatal resistance DJS
 		// HAMT
 		int niso; // Number of data points
-		FArray1D< Real64 > isodata; // isotherm values
-		FArray1D< Real64 > isorh; // isotherm RH values
+		Array1D< Real64 > isodata; // isotherm values
+		Array1D< Real64 > isorh; // isotherm RH values
 		int nsuc; // Number of data points
-		FArray1D< Real64 > sucdata; // suction values
-		FArray1D< Real64 > sucwater; // suction water values
+		Array1D< Real64 > sucdata; // suction values
+		Array1D< Real64 > sucwater; // suction water values
 		int nred; // Number of data points
-		FArray1D< Real64 > reddata; // redistribution values
-		FArray1D< Real64 > redwater; // redistribution water values
+		Array1D< Real64 > reddata; // redistribution values
+		Array1D< Real64 > redwater; // redistribution water values
 		int nmu; // Number of data points
-		FArray1D< Real64 > mudata; // mu values
-		FArray1D< Real64 > murh; // mu rh values
+		Array1D< Real64 > mudata; // mu values
+		Array1D< Real64 > murh; // mu rh values
 		int ntc; // Number of data points
-		FArray1D< Real64 > tcdata; // thermal conductivity values
-		FArray1D< Real64 > tcwater; // thermal conductivity water values
+		Array1D< Real64 > tcdata; // thermal conductivity values
+		Array1D< Real64 > tcwater; // thermal conductivity water values
 		Real64 itemp; // initial Temperature
 		Real64 irh; // Initial RH
 		Real64 iwater; // Initial water content kg/kg
@@ -751,9 +756,9 @@ namespace DataHeatBalance {
 			GasType( 5, 0 ),
 			GlassSpectralDataPtr( 0 ),
 			NumberOfGasesInMixture( 0 ),
-			GasCon( 5, 3, 0.0 ),
-			GasVis( 5, 3, 0.0 ),
-			GasCp( 5, 3, 0.0 ),
+			GasCon( 3, 5, 0.0 ),
+			GasVis( 3, 5, 0.0 ),
+			GasCp( 3, 5, 0.0 ),
 			GasWght( 5, 0.0 ),
 			GasSpecHeatRatio( 5, 0.0 ),
 			GasFract( 5, 0.0 ),
@@ -906,15 +911,15 @@ namespace DataHeatBalance {
 			Real64 const ThermGradCoef, // Thermal-gradient coefficient for moisture capacity
 			Real64 const Thickness, // Layer thickness (m)
 			Real64 const VaporDiffus, // Layer vapor diffusivity
-			FArray1_int const & GasType, // Gas type (air=1, argon=2, krypton=3, xenon=4, custom=0) for
+			Array1_int const & GasType, // Gas type (air=1, argon=2, krypton=3, xenon=4, custom=0) for
 			int const GlassSpectralDataPtr, // Number of a spectral data set associated with a window glass material
 			int const NumberOfGasesInMixture, // Number of gases in a window gas mixture
-			FArray2< Real64 > const & GasCon, // Gas conductance coefficients for up to 5 gases in a mixture
-			FArray2< Real64 > const & GasVis, // Gas viscosity coefficients for up to 5 gases in a mixture
-			FArray2< Real64 > const & GasCp, // Gas specific-heat coefficients for up to 5 gases in a mixture
-			FArray1< Real64 > const & GasWght, // Gas molecular weight for up to 5 gases in a mixture
-			FArray1< Real64 > const & GasSpecHeatRatio, // Gas specific heat ratio (used for low pressure calculations)
-			FArray1< Real64 > const & GasFract, // Gas fractions for up to 5 gases in a mixture
+			Array2< Real64 > const & GasCon, // Gas conductance coefficients for up to 5 gases in a mixture
+			Array2< Real64 > const & GasVis, // Gas viscosity coefficients for up to 5 gases in a mixture
+			Array2< Real64 > const & GasCp, // Gas specific-heat coefficients for up to 5 gases in a mixture
+			Array1< Real64 > const & GasWght, // Gas molecular weight for up to 5 gases in a mixture
+			Array1< Real64 > const & GasSpecHeatRatio, // Gas specific heat ratio (used for low pressure calculations)
+			Array1< Real64 > const & GasFract, // Gas fractions for up to 5 gases in a mixture
 			Real64 const AbsorpSolar, // Layer solar absorptance
 			Real64 const AbsorpSolarInput, // Layer solar absorptance input by user
 			bool const AbsorpSolarEMSOverrideOn, // if true, then EMS calling to override value for solar absorptance
@@ -983,20 +988,20 @@ namespace DataHeatBalance {
 			Real64 const MinMoisture, // Minimum moisture allowed DJS
 			Real64 const RStomata, // Minimum stomatal resistance DJS
 			int const niso, // Number of data points
-			FArray1< Real64 > const & isodata, // isotherm values
-			FArray1< Real64 > const & isorh, // isotherm RH values
+			Array1< Real64 > const & isodata, // isotherm values
+			Array1< Real64 > const & isorh, // isotherm RH values
 			int const nsuc, // Number of data points
-			FArray1< Real64 > const & sucdata, // suction values
-			FArray1< Real64 > const & sucwater, // suction water values
+			Array1< Real64 > const & sucdata, // suction values
+			Array1< Real64 > const & sucwater, // suction water values
 			int const nred, // Number of data points
-			FArray1< Real64 > const & reddata, // redistribution values
-			FArray1< Real64 > const & redwater, // redistribution water values
+			Array1< Real64 > const & reddata, // redistribution values
+			Array1< Real64 > const & redwater, // redistribution water values
 			int const nmu, // Number of data points
-			FArray1< Real64 > const & mudata, // mu values
-			FArray1< Real64 > const & murh, // mu rh values
+			Array1< Real64 > const & mudata, // mu values
+			Array1< Real64 > const & murh, // mu rh values
 			int const ntc, // Number of data points
-			FArray1< Real64 > const & tcdata, // thermal conductivity values
-			FArray1< Real64 > const & tcwater, // thermal conductivity water values
+			Array1< Real64 > const & tcdata, // thermal conductivity values
+			Array1< Real64 > const & tcwater, // thermal conductivity water values
 			Real64 const itemp, // initial Temperature
 			Real64 const irh, // Initial RH
 			Real64 const iwater, // Initial water content kg/kg
@@ -1066,9 +1071,9 @@ namespace DataHeatBalance {
 			GasType( 5, GasType ),
 			GlassSpectralDataPtr( GlassSpectralDataPtr ),
 			NumberOfGasesInMixture( NumberOfGasesInMixture ),
-			GasCon( 5, 3, GasCon ),
-			GasVis( 5, 3, GasVis ),
-			GasCp( 5, 3, GasCp ),
+			GasCon( 3, 5, GasCon ),
+			GasVis( 3, 5, GasVis ),
+			GasCp( 3, 5, GasCp ),
 			GasWght( 5, GasWght ),
 			GasSpecHeatRatio( 5, GasSpecHeatRatio ),
 			GasFract( 5, GasFract ),
@@ -1215,9 +1220,9 @@ namespace DataHeatBalance {
 		// Members
 		std::string Name; // Name
 		int NumGlzMat; // Number of TC glazing materials
-		FArray1D_int LayerPoint; // Layer pointer
-		FArray1D< Real64 > SpecTemp; // Temperature corresponding to the specified TC glaing optical data
-		FArray1D_string LayerName; // Name of the referenced WindowMaterial:Glazing object
+		Array1D_int LayerPoint; // Layer pointer
+		Array1D< Real64 > SpecTemp; // Temperature corresponding to the specified TC glaing optical data
+		Array1D_string LayerName; // Name of the referenced WindowMaterial:Glazing object
 
 		// Default Constructor
 		TCGlazingsType() :
@@ -1228,9 +1233,9 @@ namespace DataHeatBalance {
 		TCGlazingsType(
 			std::string const & Name, // Name
 			int const NumGlzMat, // Number of TC glazing materials
-			FArray1_int const & LayerPoint, // Layer pointer
-			FArray1< Real64 > const & SpecTemp, // Temperature corresponding to the specified TC glaing optical data
-			FArray1_string const & LayerName // Name of the referenced WindowMaterial:Glazing object
+			Array1_int const & LayerPoint, // Layer pointer
+			Array1< Real64 > const & SpecTemp, // Temperature corresponding to the specified TC glaing optical data
+			Array1_string const & LayerName // Name of the referenced WindowMaterial:Glazing object
 		) :
 			Name( Name ),
 			NumGlzMat( NumGlzMat ),
@@ -1249,7 +1254,7 @@ namespace DataHeatBalance {
 		//  this is the total of the glass, gas and shade layers
 		int TotSolidLayers; // Total number of solid (glass or shade) layers (windows only)
 		int TotGlassLayers; // Total number of glass layers (windows only)
-		FArray1D_int LayerPoint; // Pointer array which refers back to
+		Array1D_int LayerPoint; // Pointer array which refers back to
 		// the Material structure; LayerPoint(i)=j->Material(j)%Name,etc
 		bool IsUsed; // Marked true when the construction is used
 		Real64 InsideAbsorpVis; // Inside Layer visible absorptance of an opaque surface; not used for windows.
@@ -1265,30 +1270,30 @@ namespace DataHeatBalance {
 		int W5FrameDivider; // FrameDivider number for window construction from Window5 data file;
 		//  zero is construction not from Window5 file or Window5 construction has no frame.
 		// Conductive properties for the construction
-		FArray1D< Real64 > CTFCross; // Cross or Y terms of the CTF equation
-		FArray1D< Real64 > CTFFlux; // Flux history terms of the CTF equation
-		FArray1D< Real64 > CTFInside; // Inside or Z terms of the CTF equation
-		FArray1D< Real64 > CTFOutside; // Outside or X terms of the CTF equation
-		FArray1D< Real64 > CTFSourceIn; // Heat source/sink inside terms of CTF equation
-		FArray1D< Real64 > CTFSourceOut; // Heat source/sink outside terms of CTF equation
+		Array1D< Real64 > CTFCross; // Cross or Y terms of the CTF equation
+		Array1D< Real64 > CTFFlux; // Flux history terms of the CTF equation
+		Array1D< Real64 > CTFInside; // Inside or Z terms of the CTF equation
+		Array1D< Real64 > CTFOutside; // Outside or X terms of the CTF equation
+		Array1D< Real64 > CTFSourceIn; // Heat source/sink inside terms of CTF equation
+		Array1D< Real64 > CTFSourceOut; // Heat source/sink outside terms of CTF equation
 		Real64 CTFTimeStep; // Time increment for stable simulation of construct (could be greater than TimeStep)
 		// The next three series of terms are used to calculate the temperature at the location of a source/sink
 		// in the QTF formulation.  This calculation is necessary to allow the proper simulation of a
 		// radiant system.
-		FArray1D< Real64 > CTFTSourceOut; // Outside terms of the CTF equation for interior temp
+		Array1D< Real64 > CTFTSourceOut; // Outside terms of the CTF equation for interior temp
 		// calc@source location
-		FArray1D< Real64 > CTFTSourceIn; // Inside terms of the CTF equation for interior temp
+		Array1D< Real64 > CTFTSourceIn; // Inside terms of the CTF equation for interior temp
 		// calc@source location
-		FArray1D< Real64 > CTFTSourceQ; // Source/sink terms of the CTF equation for interior temp
+		Array1D< Real64 > CTFTSourceQ; // Source/sink terms of the CTF equation for interior temp
 		// calc@source location
 		// The next three series of terms are used to calculate the temperature at a location specified by the user.
 		// This location must be between two layers and is intended to allow the user to evaluate whether or not
 		// condensation is a possibility between material layers.
-		FArray1D< Real64 > CTFTUserOut; // Outside terms of the CTF equation for interior temp
+		Array1D< Real64 > CTFTUserOut; // Outside terms of the CTF equation for interior temp
 		// calc@user location
-		FArray1D< Real64 > CTFTUserIn; // Inside terms of the CTF equation for interior temp
+		Array1D< Real64 > CTFTUserIn; // Inside terms of the CTF equation for interior temp
 		// calc@user location
-		FArray1D< Real64 > CTFTUserSource; // Source/sink terms of the CTF equation for interior temp
+		Array1D< Real64 > CTFTUserSource; // Source/sink terms of the CTF equation for interior temp
 		// calc@user location
 		int NumHistories; // CTFTimeStep/TimeStepZone or the number of temp/flux history series
 		// for the construction
@@ -1306,66 +1311,66 @@ namespace DataHeatBalance {
 		Real64 AbsDiffIn; // Inner absorptance coefficient for diffuse radiation
 		Real64 AbsDiffOut; // Outer absorptance coefficient for diffuse radiation
 		// Variables for window constructions
-		FArray1D< Real64 > AbsDiff; // Diffuse solar absorptance for each glass layer,
+		Array1D< Real64 > AbsDiff; // Diffuse solar absorptance for each glass layer,
 		// bare glass or shade on
-		FArray2D< Real64 > BlAbsDiff; // Diffuse solar absorptance for each glass layer vs.
+		Array2D< Real64 > BlAbsDiff; // Diffuse solar absorptance for each glass layer vs.
 		// slat angle, blind on
-		FArray2D< Real64 > BlAbsDiffGnd; // Diffuse ground solar absorptance for each glass layer
+		Array2D< Real64 > BlAbsDiffGnd; // Diffuse ground solar absorptance for each glass layer
 		// vs. slat angle, blind on
-		FArray2D< Real64 > BlAbsDiffSky; // Diffuse sky solar absorptance for each glass layer
+		Array2D< Real64 > BlAbsDiffSky; // Diffuse sky solar absorptance for each glass layer
 		// vs. slat angle, blind on
-		FArray1D< Real64 > AbsDiffBack; // Diffuse back solar absorptance for each glass layer
-		FArray2D< Real64 > BlAbsDiffBack; // Diffuse back solar absorptance for each glass layer,
+		Array1D< Real64 > AbsDiffBack; // Diffuse back solar absorptance for each glass layer
+		Array2D< Real64 > BlAbsDiffBack; // Diffuse back solar absorptance for each glass layer,
 		//  vs. slat angle, blind on
 		Real64 AbsDiffShade; // Diffuse solar absorptance for shade
-		FArray1D< Real64 > AbsDiffBlind; // Diffuse solar absorptance for blind, vs. slat angle
-		FArray1D< Real64 > AbsDiffBlindGnd; // Diffuse ground solar absorptance for blind, vs. slat angle
-		FArray1D< Real64 > AbsDiffBlindSky; // Diffuse sky solar absorptance for blind, vs. slat angle
+		Array1D< Real64 > AbsDiffBlind; // Diffuse solar absorptance for blind, vs. slat angle
+		Array1D< Real64 > AbsDiffBlindGnd; // Diffuse ground solar absorptance for blind, vs. slat angle
+		Array1D< Real64 > AbsDiffBlindSky; // Diffuse sky solar absorptance for blind, vs. slat angle
 		Real64 AbsDiffBackShade; // Diffuse back solar absorptance for shade
-		FArray1D< Real64 > AbsDiffBackBlind; // Diffuse back solar absorptance for blind, vs. slat angle
+		Array1D< Real64 > AbsDiffBackBlind; // Diffuse back solar absorptance for blind, vs. slat angle
 		Real64 ShadeAbsorpThermal; // Diffuse back thermal absorptance of shade
-		FArray2D< Real64 > AbsBeamCoef; // Coefficients of incidence-angle polynomial for solar
+		Array2D< Real64 > AbsBeamCoef; // Coefficients of incidence-angle polynomial for solar
 		// absorptance for each solid glazing layer
-		FArray2D< Real64 > AbsBeamBackCoef; // As for AbsBeamCoef but for back-incident solar
-		FArray1D< Real64 > AbsBeamShadeCoef; // Coefficients of incidence-angle polynomial for solar
+		Array2D< Real64 > AbsBeamBackCoef; // As for AbsBeamCoef but for back-incident solar
+		Array1D< Real64 > AbsBeamShadeCoef; // Coefficients of incidence-angle polynomial for solar
 		// absorptance of shade
 		Real64 TransDiff; // Diffuse solar transmittance, bare glass or shade on
-		FArray1D< Real64 > BlTransDiff; // Diffuse solar transmittance, blind present, vs. slat angle
-		FArray1D< Real64 > BlTransDiffGnd; // Ground diffuse solar transmittance, blind present, vs. slat angle
-		FArray1D< Real64 > BlTransDiffSky; // Sky diffuse solar transmittance, blind present, vs. slat angle
+		Array1D< Real64 > BlTransDiff; // Diffuse solar transmittance, blind present, vs. slat angle
+		Array1D< Real64 > BlTransDiffGnd; // Ground diffuse solar transmittance, blind present, vs. slat angle
+		Array1D< Real64 > BlTransDiffSky; // Sky diffuse solar transmittance, blind present, vs. slat angle
 		Real64 TransDiffVis; // Diffuse visible transmittance, bare glass or shade on
-		FArray1D< Real64 > BlTransDiffVis; // Diffuse visible transmittance, blind present, vs. slat angle
+		Array1D< Real64 > BlTransDiffVis; // Diffuse visible transmittance, blind present, vs. slat angle
 		Real64 ReflectSolDiffBack; // Diffuse back solar reflectance, bare glass or shade on
-		FArray1D< Real64 > BlReflectSolDiffBack; // Diffuse back solar reflectance, blind present, vs. slat angle
+		Array1D< Real64 > BlReflectSolDiffBack; // Diffuse back solar reflectance, blind present, vs. slat angle
 		Real64 ReflectSolDiffFront; // Diffuse front solar reflectance, bare glass or shade on
-		FArray1D< Real64 > BlReflectSolDiffFront; // Diffuse front solar reflectance, blind present, vs. slat angle
+		Array1D< Real64 > BlReflectSolDiffFront; // Diffuse front solar reflectance, blind present, vs. slat angle
 		Real64 ReflectVisDiffBack; // Diffuse back visible reflectance, bare glass or shade on
-		FArray1D< Real64 > BlReflectVisDiffBack; // Diffuse back visible reflectance, blind present, vs. slat angle
+		Array1D< Real64 > BlReflectVisDiffBack; // Diffuse back visible reflectance, blind present, vs. slat angle
 		Real64 ReflectVisDiffFront; // Diffuse front visible reflectance, bare glass or shade on
-		FArray1D< Real64 > BlReflectVisDiffFront; // Diffuse front visible reflectance, blind present, vs. slat angle
-		FArray1D< Real64 > TransSolBeamCoef; // Coeffs of incidence-angle polynomial for beam sol trans,
+		Array1D< Real64 > BlReflectVisDiffFront; // Diffuse front visible reflectance, blind present, vs. slat angle
+		Array1D< Real64 > TransSolBeamCoef; // Coeffs of incidence-angle polynomial for beam sol trans,
 		// bare glass or shade on
-		FArray1D< Real64 > TransVisBeamCoef; // Coeffs of incidence-angle polynomial for beam vis trans,
+		Array1D< Real64 > TransVisBeamCoef; // Coeffs of incidence-angle polynomial for beam vis trans,
 		// bare glass or shade on
-		FArray1D< Real64 > ReflSolBeamFrontCoef; // Coeffs of incidence-angle polynomial for beam sol front refl,
+		Array1D< Real64 > ReflSolBeamFrontCoef; // Coeffs of incidence-angle polynomial for beam sol front refl,
 		// bare glass or shade on
-		FArray1D< Real64 > ReflSolBeamBackCoef; // Like ReflSolBeamFrontCoef, but for back-incident beam solar
-		FArray2D< Real64 > tBareSolCoef; // Isolated glass solar transmittance coeffs of inc. angle polynomial
-		FArray2D< Real64 > tBareVisCoef; // Isolated glass visible transmittance coeffs of inc. angle polynomial
-		FArray2D< Real64 > rfBareSolCoef; // Isolated glass front solar reflectance coeffs of inc. angle polynomial
-		FArray2D< Real64 > rfBareVisCoef; // Isolated glass front visible reflectance coeffs of inc. angle polynomial
-		FArray2D< Real64 > rbBareSolCoef; // Isolated glass back solar reflectance coeffs of inc. angle polynomial
-		FArray2D< Real64 > rbBareVisCoef; // Isolated glass back visible reflectance coeffs of inc. angle polynomial
-		FArray2D< Real64 > afBareSolCoef; // Isolated glass front solar absorptance coeffs of inc. angle polynomial
-		FArray2D< Real64 > abBareSolCoef; // Isolated glass back solar absorptance coeffs of inc. angle polynomial
-		FArray1D< Real64 > tBareSolDiff; // Isolated glass diffuse solar transmittance
-		FArray1D< Real64 > tBareVisDiff; // Isolated glass diffuse visible transmittance
-		FArray1D< Real64 > rfBareSolDiff; // Isolated glass diffuse solar front reflectance
-		FArray1D< Real64 > rfBareVisDiff; // Isolated glass diffuse visible front reflectance
-		FArray1D< Real64 > rbBareSolDiff; // Isolated glass diffuse solar back reflectance
-		FArray1D< Real64 > rbBareVisDiff; // Isolated glass diffuse visible back reflectance
-		FArray1D< Real64 > afBareSolDiff; // Isolated glass diffuse solar front absorptance
-		FArray1D< Real64 > abBareSolDiff; // Isolated glass diffuse solar back absorptance
+		Array1D< Real64 > ReflSolBeamBackCoef; // Like ReflSolBeamFrontCoef, but for back-incident beam solar
+		Array2D< Real64 > tBareSolCoef; // Isolated glass solar transmittance coeffs of inc. angle polynomial
+		Array2D< Real64 > tBareVisCoef; // Isolated glass visible transmittance coeffs of inc. angle polynomial
+		Array2D< Real64 > rfBareSolCoef; // Isolated glass front solar reflectance coeffs of inc. angle polynomial
+		Array2D< Real64 > rfBareVisCoef; // Isolated glass front visible reflectance coeffs of inc. angle polynomial
+		Array2D< Real64 > rbBareSolCoef; // Isolated glass back solar reflectance coeffs of inc. angle polynomial
+		Array2D< Real64 > rbBareVisCoef; // Isolated glass back visible reflectance coeffs of inc. angle polynomial
+		Array2D< Real64 > afBareSolCoef; // Isolated glass front solar absorptance coeffs of inc. angle polynomial
+		Array2D< Real64 > abBareSolCoef; // Isolated glass back solar absorptance coeffs of inc. angle polynomial
+		Array1D< Real64 > tBareSolDiff; // Isolated glass diffuse solar transmittance
+		Array1D< Real64 > tBareVisDiff; // Isolated glass diffuse visible transmittance
+		Array1D< Real64 > rfBareSolDiff; // Isolated glass diffuse solar front reflectance
+		Array1D< Real64 > rfBareVisDiff; // Isolated glass diffuse visible front reflectance
+		Array1D< Real64 > rbBareSolDiff; // Isolated glass diffuse solar back reflectance
+		Array1D< Real64 > rbBareVisDiff; // Isolated glass diffuse visible back reflectance
+		Array1D< Real64 > afBareSolDiff; // Isolated glass diffuse solar front absorptance
+		Array1D< Real64 > abBareSolDiff; // Isolated glass diffuse solar back absorptance
 		bool FromWindow5DataFile; // True if this is a window construction extracted from the Window5 data file
 		Real64 W5FileMullionWidth; // Width of mullion for construction from Window5 data file (m)
 		int W5FileMullionOrientation; // Orientation of mullion, if present, for Window5 data file construction,
@@ -1403,8 +1408,8 @@ namespace DataHeatBalance {
 		// EquivalentLayer Window
 		bool WindowTypeEQL; // True for equivalent layer window, false otherwise
 		int EQLConsPtr; // Pointer to equivalent Layer window construction
-		FArray1D< Real64 > AbsDiffFrontEQL; // Diffuse layer system front absorptance for EQL window
-		FArray1D< Real64 > AbsDiffBackEQL; // Diffuse layer system back absorptance for EQL window
+		Array1D< Real64 > AbsDiffFrontEQL; // Diffuse layer system front absorptance for EQL window
+		Array1D< Real64 > AbsDiffBackEQL; // Diffuse layer system back absorptance for EQL window
 		Real64 TransDiffFrontEQL; // Diffuse system front transmittance for EQL window
 		Real64 TransDiffBackEQL; // Diffuse system back transmittance for EQL window
 
@@ -1446,11 +1451,11 @@ namespace DataHeatBalance {
 			AbsDiffIn( 0.0 ),
 			AbsDiffOut( 0.0 ),
 			AbsDiff( MaxSolidWinLayers, 0.0 ),
-			BlAbsDiff( MaxSolidWinLayers, MaxSlatAngs, 0.0 ),
-			BlAbsDiffGnd( MaxSolidWinLayers, MaxSlatAngs, 0.0 ),
-			BlAbsDiffSky( MaxSolidWinLayers, MaxSlatAngs, 0.0 ),
+			BlAbsDiff( MaxSlatAngs, MaxSolidWinLayers, 0.0 ),
+			BlAbsDiffGnd( MaxSlatAngs, MaxSolidWinLayers, 0.0 ),
+			BlAbsDiffSky( MaxSlatAngs, MaxSolidWinLayers, 0.0 ),
 			AbsDiffBack( MaxSolidWinLayers, 0.0 ),
-			BlAbsDiffBack( MaxSolidWinLayers, MaxSlatAngs, 0.0 ),
+			BlAbsDiffBack( MaxSlatAngs, MaxSolidWinLayers, 0.0 ),
 			AbsDiffShade( 0.0 ),
 			AbsDiffBlind( MaxSlatAngs, 0.0 ),
 			AbsDiffBlindGnd( MaxSlatAngs, 0.0 ),
@@ -1458,8 +1463,8 @@ namespace DataHeatBalance {
 			AbsDiffBackShade( 0.0 ),
 			AbsDiffBackBlind( MaxSlatAngs, 0.0 ),
 			ShadeAbsorpThermal( 0.0 ),
-			AbsBeamCoef( MaxSolidWinLayers, 6, 0.0 ),
-			AbsBeamBackCoef( MaxSolidWinLayers, 6, 0.0 ),
+			AbsBeamCoef( 6, MaxSolidWinLayers, 0.0 ),
+			AbsBeamBackCoef( 6, MaxSolidWinLayers, 0.0 ),
 			AbsBeamShadeCoef( 6, 0.0 ),
 			TransDiff( 0.0 ),
 			BlTransDiff( MaxSlatAngs, 0.0 ),
@@ -1479,14 +1484,14 @@ namespace DataHeatBalance {
 			TransVisBeamCoef( 6, 0.0 ),
 			ReflSolBeamFrontCoef( 6, 0.0 ),
 			ReflSolBeamBackCoef( 6, 0.0 ),
-			tBareSolCoef( 5, 6, 0.0 ),
-			tBareVisCoef( 5, 6, 0.0 ),
-			rfBareSolCoef( 5, 6, 0.0 ),
-			rfBareVisCoef( 5, 6, 0.0 ),
-			rbBareSolCoef( 5, 6, 0.0 ),
-			rbBareVisCoef( 5, 6, 0.0 ),
-			afBareSolCoef( 5, 6, 0.0 ),
-			abBareSolCoef( 5, 6, 0.0 ),
+			tBareSolCoef( 6, 5, 0.0 ),
+			tBareVisCoef( 6, 5, 0.0 ),
+			rfBareSolCoef( 6, 5, 0.0 ),
+			rfBareVisCoef( 6, 5, 0.0 ),
+			rbBareSolCoef( 6, 5, 0.0 ),
+			rbBareVisCoef( 6, 5, 0.0 ),
+			afBareSolCoef( 6, 5, 0.0 ),
+			abBareSolCoef( 6, 5, 0.0 ),
 			tBareSolDiff( 5, 0.0 ),
 			tBareVisDiff( 5, 0.0 ),
 			rfBareSolDiff( 5, 0.0 ),
@@ -1536,7 +1541,7 @@ namespace DataHeatBalance {
 			int const TotLayers, // Total number of layers for the construction; for windows
 			int const TotSolidLayers, // Total number of solid (glass or shade) layers (windows only)
 			int const TotGlassLayers, // Total number of glass layers (windows only)
-			FArray1_int const & LayerPoint, // Pointer array which refers back to
+			Array1_int const & LayerPoint, // Pointer array which refers back to
 			bool const IsUsed, // Marked true when the construction is used
 			Real64 const InsideAbsorpVis, // Inside Layer visible absorptance of an opaque surface; not used for windows.
 			Real64 const OutsideAbsorpVis, // Outside Layer visible absorptance of an opaque surface; not used for windows.
@@ -1547,19 +1552,19 @@ namespace DataHeatBalance {
 			int const OutsideRoughness, // Outside Surface roughness index (6=very smooth, 5=smooth,
 			int const DayltPropPtr, // Pointer to Daylight Construction Properties
 			int const W5FrameDivider, // FrameDivider number for window construction from Window5 data file;
-			FArray1< Real64 > const & CTFCross, // Cross or Y terms of the CTF equation
-			FArray1< Real64 > const & CTFFlux, // Flux history terms of the CTF equation
-			FArray1< Real64 > const & CTFInside, // Inside or Z terms of the CTF equation
-			FArray1< Real64 > const & CTFOutside, // Outside or X terms of the CTF equation
-			FArray1< Real64 > const & CTFSourceIn, // Heat source/sink inside terms of CTF equation
-			FArray1< Real64 > const & CTFSourceOut, // Heat source/sink outside terms of CTF equation
+			Array1< Real64 > const & CTFCross, // Cross or Y terms of the CTF equation
+			Array1< Real64 > const & CTFFlux, // Flux history terms of the CTF equation
+			Array1< Real64 > const & CTFInside, // Inside or Z terms of the CTF equation
+			Array1< Real64 > const & CTFOutside, // Outside or X terms of the CTF equation
+			Array1< Real64 > const & CTFSourceIn, // Heat source/sink inside terms of CTF equation
+			Array1< Real64 > const & CTFSourceOut, // Heat source/sink outside terms of CTF equation
 			Real64 const CTFTimeStep, // Time increment for stable simulation of construct (could be greater than TimeStep)
-			FArray1< Real64 > const & CTFTSourceOut, // Outside terms of the CTF equation for interior temp
-			FArray1< Real64 > const & CTFTSourceIn, // Inside terms of the CTF equation for interior temp
-			FArray1< Real64 > const & CTFTSourceQ, // Source/sink terms of the CTF equation for interior temp
-			FArray1< Real64 > const & CTFTUserOut, // Outside terms of the CTF equation for interior temp
-			FArray1< Real64 > const & CTFTUserIn, // Inside terms of the CTF equation for interior temp
-			FArray1< Real64 > const & CTFTUserSource, // Source/sink terms of the CTF equation for interior temp
+			Array1< Real64 > const & CTFTSourceOut, // Outside terms of the CTF equation for interior temp
+			Array1< Real64 > const & CTFTSourceIn, // Inside terms of the CTF equation for interior temp
+			Array1< Real64 > const & CTFTSourceQ, // Source/sink terms of the CTF equation for interior temp
+			Array1< Real64 > const & CTFTUserOut, // Outside terms of the CTF equation for interior temp
+			Array1< Real64 > const & CTFTUserIn, // Inside terms of the CTF equation for interior temp
+			Array1< Real64 > const & CTFTUserSource, // Source/sink terms of the CTF equation for interior temp
 			int const NumHistories, // CTFTimeStep/TimeStepZone or the number of temp/flux history series
 			int const NumCTFTerms, // Number of CTF terms for this construction (not including terms at current time)
 			Real64 const UValue, // Overall heat transfer coefficient for the construction
@@ -1569,56 +1574,56 @@ namespace DataHeatBalance {
 			Real64 const ThicknessPerpend, // Thickness between planes of symmetry in the direction
 			Real64 const AbsDiffIn, // Inner absorptance coefficient for diffuse radiation
 			Real64 const AbsDiffOut, // Outer absorptance coefficient for diffuse radiation
-			FArray1< Real64 > const & AbsDiff, // Diffuse solar absorptance for each glass layer,
-			FArray2< Real64 > const & BlAbsDiff, // Diffuse solar absorptance for each glass layer vs.
-			FArray2< Real64 > const & BlAbsDiffGnd, // Diffuse ground solar absorptance for each glass layer
-			FArray2< Real64 > const & BlAbsDiffSky, // Diffuse sky solar absorptance for each glass layer
-			FArray1< Real64 > const & AbsDiffBack, // Diffuse back solar absorptance for each glass layer
-			FArray2< Real64 > const & BlAbsDiffBack, // Diffuse back solar absorptance for each glass layer,
+			Array1< Real64 > const & AbsDiff, // Diffuse solar absorptance for each glass layer,
+			Array2< Real64 > const & BlAbsDiff, // Diffuse solar absorptance for each glass layer vs.
+			Array2< Real64 > const & BlAbsDiffGnd, // Diffuse ground solar absorptance for each glass layer
+			Array2< Real64 > const & BlAbsDiffSky, // Diffuse sky solar absorptance for each glass layer
+			Array1< Real64 > const & AbsDiffBack, // Diffuse back solar absorptance for each glass layer
+			Array2< Real64 > const & BlAbsDiffBack, // Diffuse back solar absorptance for each glass layer,
 			Real64 const AbsDiffShade, // Diffuse solar absorptance for shade
-			FArray1< Real64 > const & AbsDiffBlind, // Diffuse solar absorptance for blind, vs. slat angle
-			FArray1< Real64 > const & AbsDiffBlindGnd, // Diffuse ground solar absorptance for blind, vs. slat angle
-			FArray1< Real64 > const & AbsDiffBlindSky, // Diffuse sky solar absorptance for blind, vs. slat angle
+			Array1< Real64 > const & AbsDiffBlind, // Diffuse solar absorptance for blind, vs. slat angle
+			Array1< Real64 > const & AbsDiffBlindGnd, // Diffuse ground solar absorptance for blind, vs. slat angle
+			Array1< Real64 > const & AbsDiffBlindSky, // Diffuse sky solar absorptance for blind, vs. slat angle
 			Real64 const AbsDiffBackShade, // Diffuse back solar absorptance for shade
-			FArray1< Real64 > const & AbsDiffBackBlind, // Diffuse back solar absorptance for blind, vs. slat angle
+			Array1< Real64 > const & AbsDiffBackBlind, // Diffuse back solar absorptance for blind, vs. slat angle
 			Real64 const ShadeAbsorpThermal, // Diffuse back thermal absorptance of shade
-			FArray2< Real64 > const & AbsBeamCoef, // Coefficients of incidence-angle polynomial for solar
-			FArray2< Real64 > const & AbsBeamBackCoef, // As for AbsBeamCoef but for back-incident solar
-			FArray1< Real64 > const & AbsBeamShadeCoef, // Coefficients of incidence-angle polynomial for solar
+			Array2< Real64 > const & AbsBeamCoef, // Coefficients of incidence-angle polynomial for solar
+			Array2< Real64 > const & AbsBeamBackCoef, // As for AbsBeamCoef but for back-incident solar
+			Array1< Real64 > const & AbsBeamShadeCoef, // Coefficients of incidence-angle polynomial for solar
 			Real64 const TransDiff, // Diffuse solar transmittance, bare glass or shade on
-			FArray1< Real64 > const & BlTransDiff, // Diffuse solar transmittance, blind present, vs. slat angle
-			FArray1< Real64 > const & BlTransDiffGnd, // Ground diffuse solar transmittance, blind present, vs. slat angle
-			FArray1< Real64 > const & BlTransDiffSky, // Sky diffuse solar transmittance, blind present, vs. slat angle
+			Array1< Real64 > const & BlTransDiff, // Diffuse solar transmittance, blind present, vs. slat angle
+			Array1< Real64 > const & BlTransDiffGnd, // Ground diffuse solar transmittance, blind present, vs. slat angle
+			Array1< Real64 > const & BlTransDiffSky, // Sky diffuse solar transmittance, blind present, vs. slat angle
 			Real64 const TransDiffVis, // Diffuse visible transmittance, bare glass or shade on
-			FArray1< Real64 > const & BlTransDiffVis, // Diffuse visible transmittance, blind present, vs. slat angle
+			Array1< Real64 > const & BlTransDiffVis, // Diffuse visible transmittance, blind present, vs. slat angle
 			Real64 const ReflectSolDiffBack, // Diffuse back solar reflectance, bare glass or shade on
-			FArray1< Real64 > const & BlReflectSolDiffBack, // Diffuse back solar reflectance, blind present, vs. slat angle
+			Array1< Real64 > const & BlReflectSolDiffBack, // Diffuse back solar reflectance, blind present, vs. slat angle
 			Real64 const ReflectSolDiffFront, // Diffuse front solar reflectance, bare glass or shade on
-			FArray1< Real64 > const & BlReflectSolDiffFront, // Diffuse front solar reflectance, blind present, vs. slat angle
+			Array1< Real64 > const & BlReflectSolDiffFront, // Diffuse front solar reflectance, blind present, vs. slat angle
 			Real64 const ReflectVisDiffBack, // Diffuse back visible reflectance, bare glass or shade on
-			FArray1< Real64 > const & BlReflectVisDiffBack, // Diffuse back visible reflectance, blind present, vs. slat angle
+			Array1< Real64 > const & BlReflectVisDiffBack, // Diffuse back visible reflectance, blind present, vs. slat angle
 			Real64 const ReflectVisDiffFront, // Diffuse front visible reflectance, bare glass or shade on
-			FArray1< Real64 > const & BlReflectVisDiffFront, // Diffuse front visible reflectance, blind present, vs. slat angle
-			FArray1< Real64 > const & TransSolBeamCoef, // Coeffs of incidence-angle polynomial for beam sol trans,
-			FArray1< Real64 > const & TransVisBeamCoef, // Coeffs of incidence-angle polynomial for beam vis trans,
-			FArray1< Real64 > const & ReflSolBeamFrontCoef, // Coeffs of incidence-angle polynomial for beam sol front refl,
-			FArray1< Real64 > const & ReflSolBeamBackCoef, // Like ReflSolBeamFrontCoef, but for back-incident beam solar
-			FArray2< Real64 > const & tBareSolCoef, // Isolated glass solar transmittance coeffs of inc. angle polynomial
-			FArray2< Real64 > const & tBareVisCoef, // Isolated glass visible transmittance coeffs of inc. angle polynomial
-			FArray2< Real64 > const & rfBareSolCoef, // Isolated glass front solar reflectance coeffs of inc. angle polynomial
-			FArray2< Real64 > const & rfBareVisCoef, // Isolated glass front visible reflectance coeffs of inc. angle polynomial
-			FArray2< Real64 > const & rbBareSolCoef, // Isolated glass back solar reflectance coeffs of inc. angle polynomial
-			FArray2< Real64 > const & rbBareVisCoef, // Isolated glass back visible reflectance coeffs of inc. angle polynomial
-			FArray2< Real64 > const & afBareSolCoef, // Isolated glass front solar absorptance coeffs of inc. angle polynomial
-			FArray2< Real64 > const & abBareSolCoef, // Isolated glass back solar absorptance coeffs of inc. angle polynomial
-			FArray1< Real64 > const & tBareSolDiff, // Isolated glass diffuse solar transmittance
-			FArray1< Real64 > const & tBareVisDiff, // Isolated glass diffuse visible transmittance
-			FArray1< Real64 > const & rfBareSolDiff, // Isolated glass diffuse solar front reflectance
-			FArray1< Real64 > const & rfBareVisDiff, // Isolated glass diffuse visible front reflectance
-			FArray1< Real64 > const & rbBareSolDiff, // Isolated glass diffuse solar back reflectance
-			FArray1< Real64 > const & rbBareVisDiff, // Isolated glass diffuse visible back reflectance
-			FArray1< Real64 > const & afBareSolDiff, // Isolated glass diffuse solar front absorptance
-			FArray1< Real64 > const & abBareSolDiff, // Isolated glass diffuse solar back absorptance
+			Array1< Real64 > const & BlReflectVisDiffFront, // Diffuse front visible reflectance, blind present, vs. slat angle
+			Array1< Real64 > const & TransSolBeamCoef, // Coeffs of incidence-angle polynomial for beam sol trans,
+			Array1< Real64 > const & TransVisBeamCoef, // Coeffs of incidence-angle polynomial for beam vis trans,
+			Array1< Real64 > const & ReflSolBeamFrontCoef, // Coeffs of incidence-angle polynomial for beam sol front refl,
+			Array1< Real64 > const & ReflSolBeamBackCoef, // Like ReflSolBeamFrontCoef, but for back-incident beam solar
+			Array2< Real64 > const & tBareSolCoef, // Isolated glass solar transmittance coeffs of inc. angle polynomial
+			Array2< Real64 > const & tBareVisCoef, // Isolated glass visible transmittance coeffs of inc. angle polynomial
+			Array2< Real64 > const & rfBareSolCoef, // Isolated glass front solar reflectance coeffs of inc. angle polynomial
+			Array2< Real64 > const & rfBareVisCoef, // Isolated glass front visible reflectance coeffs of inc. angle polynomial
+			Array2< Real64 > const & rbBareSolCoef, // Isolated glass back solar reflectance coeffs of inc. angle polynomial
+			Array2< Real64 > const & rbBareVisCoef, // Isolated glass back visible reflectance coeffs of inc. angle polynomial
+			Array2< Real64 > const & afBareSolCoef, // Isolated glass front solar absorptance coeffs of inc. angle polynomial
+			Array2< Real64 > const & abBareSolCoef, // Isolated glass back solar absorptance coeffs of inc. angle polynomial
+			Array1< Real64 > const & tBareSolDiff, // Isolated glass diffuse solar transmittance
+			Array1< Real64 > const & tBareVisDiff, // Isolated glass diffuse visible transmittance
+			Array1< Real64 > const & rfBareSolDiff, // Isolated glass diffuse solar front reflectance
+			Array1< Real64 > const & rfBareVisDiff, // Isolated glass diffuse visible front reflectance
+			Array1< Real64 > const & rbBareSolDiff, // Isolated glass diffuse solar back reflectance
+			Array1< Real64 > const & rbBareVisDiff, // Isolated glass diffuse visible back reflectance
+			Array1< Real64 > const & afBareSolDiff, // Isolated glass diffuse solar front absorptance
+			Array1< Real64 > const & abBareSolDiff, // Isolated glass diffuse solar back absorptance
 			bool const FromWindow5DataFile, // True if this is a window construction extracted from the Window5 data file
 			Real64 const W5FileMullionWidth, // Width of mullion for construction from Window5 data file (m)
 			int const W5FileMullionOrientation, // Orientation of mullion, if present, for Window5 data file construction,
@@ -1649,8 +1654,8 @@ namespace DataHeatBalance {
 			BSDFWindowInputStruct const & BSDFInput, // nest structure with user input for complex fenestration
 			bool const WindowTypeEQL, // True for equivalent layer window, false otherwise
 			int const EQLConsPtr, // Pointer to equivalent Layer window construction
-			FArray1< Real64 > const & AbsDiffFrontEQL, // Diffuse layer system front absorptance for EQL window
-			FArray1< Real64 > const & AbsDiffBackEQL, // Diffuse layer system back absorptance for EQL window
+			Array1< Real64 > const & AbsDiffFrontEQL, // Diffuse layer system front absorptance for EQL window
+			Array1< Real64 > const & AbsDiffBackEQL, // Diffuse layer system back absorptance for EQL window
 			Real64 const TransDiffFrontEQL, // Diffuse system front transmittance for EQL window
 			Real64 const TransDiffBackEQL // Diffuse system back transmittance for EQL window
 		) :
@@ -1692,11 +1697,11 @@ namespace DataHeatBalance {
 			AbsDiffIn( AbsDiffIn ),
 			AbsDiffOut( AbsDiffOut ),
 			AbsDiff( MaxSolidWinLayers, AbsDiff ),
-			BlAbsDiff( MaxSolidWinLayers, MaxSlatAngs, BlAbsDiff ),
-			BlAbsDiffGnd( MaxSolidWinLayers, MaxSlatAngs, BlAbsDiffGnd ),
-			BlAbsDiffSky( MaxSolidWinLayers, MaxSlatAngs, BlAbsDiffSky ),
+			BlAbsDiff( MaxSlatAngs, MaxSolidWinLayers, BlAbsDiff ),
+			BlAbsDiffGnd( MaxSlatAngs, MaxSolidWinLayers, BlAbsDiffGnd ),
+			BlAbsDiffSky( MaxSlatAngs, MaxSolidWinLayers, BlAbsDiffSky ),
 			AbsDiffBack( MaxSolidWinLayers, AbsDiffBack ),
-			BlAbsDiffBack( MaxSolidWinLayers, MaxSlatAngs, BlAbsDiffBack ),
+			BlAbsDiffBack( MaxSlatAngs, MaxSolidWinLayers, BlAbsDiffBack ),
 			AbsDiffShade( AbsDiffShade ),
 			AbsDiffBlind( MaxSlatAngs, AbsDiffBlind ),
 			AbsDiffBlindGnd( MaxSlatAngs, AbsDiffBlindGnd ),
@@ -1704,8 +1709,8 @@ namespace DataHeatBalance {
 			AbsDiffBackShade( AbsDiffBackShade ),
 			AbsDiffBackBlind( MaxSlatAngs, AbsDiffBackBlind ),
 			ShadeAbsorpThermal( ShadeAbsorpThermal ),
-			AbsBeamCoef( MaxSolidWinLayers, 6, AbsBeamCoef ),
-			AbsBeamBackCoef( MaxSolidWinLayers, 6, AbsBeamBackCoef ),
+			AbsBeamCoef( 6, MaxSolidWinLayers, AbsBeamCoef ),
+			AbsBeamBackCoef( 6, MaxSolidWinLayers, AbsBeamBackCoef ),
 			AbsBeamShadeCoef( 6, AbsBeamShadeCoef ),
 			TransDiff( TransDiff ),
 			BlTransDiff( MaxSlatAngs, BlTransDiff ),
@@ -1725,14 +1730,14 @@ namespace DataHeatBalance {
 			TransVisBeamCoef( 6, TransVisBeamCoef ),
 			ReflSolBeamFrontCoef( 6, ReflSolBeamFrontCoef ),
 			ReflSolBeamBackCoef( 6, ReflSolBeamBackCoef ),
-			tBareSolCoef( 5, 6, tBareSolCoef ),
-			tBareVisCoef( 5, 6, tBareVisCoef ),
-			rfBareSolCoef( 5, 6, rfBareSolCoef ),
-			rfBareVisCoef( 5, 6, rfBareVisCoef ),
-			rbBareSolCoef( 5, 6, rbBareSolCoef ),
-			rbBareVisCoef( 5, 6, rbBareVisCoef ),
-			afBareSolCoef( 5, 6, afBareSolCoef ),
-			abBareSolCoef( 5, 6, abBareSolCoef ),
+			tBareSolCoef( 6, 5, tBareSolCoef ),
+			tBareVisCoef( 6, 5, tBareVisCoef ),
+			rfBareSolCoef( 6, 5, rfBareSolCoef ),
+			rfBareVisCoef( 6, 5, rfBareVisCoef ),
+			rbBareSolCoef( 6, 5, rbBareSolCoef ),
+			rbBareVisCoef( 6, 5, rbBareVisCoef ),
+			afBareSolCoef( 6, 5, afBareSolCoef ),
+			abBareSolCoef( 6, 5, abBareSolCoef ),
 			tBareSolDiff( 5, tBareSolDiff ),
 			tBareVisDiff( 5, tBareVisDiff ),
 			rfBareSolDiff( 5, rfBareSolDiff ),
@@ -1784,10 +1789,10 @@ namespace DataHeatBalance {
 		// Members
 		std::string Name; // Name of spectral data set
 		int NumOfWavelengths; // Number of wavelengths in the data set
-		FArray1D< Real64 > WaveLength; // Wavelength (microns)
-		FArray1D< Real64 > Trans; // Transmittance at normal incidence
-		FArray1D< Real64 > ReflFront; // Front reflectance at normal incidence
-		FArray1D< Real64 > ReflBack; // Back reflectance at normal incidence
+		Array1D< Real64 > WaveLength; // Wavelength (microns)
+		Array1D< Real64 > Trans; // Transmittance at normal incidence
+		Array1D< Real64 > ReflFront; // Front reflectance at normal incidence
+		Array1D< Real64 > ReflBack; // Back reflectance at normal incidence
 
 		// Default Constructor
 		SpectralDataProperties() :
@@ -1798,10 +1803,10 @@ namespace DataHeatBalance {
 		SpectralDataProperties(
 			std::string const & Name, // Name of spectral data set
 			int const NumOfWavelengths, // Number of wavelengths in the data set
-			FArray1< Real64 > const & WaveLength, // Wavelength (microns)
-			FArray1< Real64 > const & Trans, // Transmittance at normal incidence
-			FArray1< Real64 > const & ReflFront, // Front reflectance at normal incidence
-			FArray1< Real64 > const & ReflBack // Back reflectance at normal incidence
+			Array1< Real64 > const & WaveLength, // Wavelength (microns)
+			Array1< Real64 > const & Trans, // Transmittance at normal incidence
+			Array1< Real64 > const & ReflFront, // Front reflectance at normal incidence
+			Array1< Real64 > const & ReflBack // Back reflectance at normal incidence
 		) :
 			Name( Name ),
 			NumOfWavelengths( NumOfWavelengths ),
@@ -2092,7 +2097,7 @@ namespace DataHeatBalance {
 		std::string Name; // Zone List name
 		int NumOfZones; // Number of zones in the list
 		std::string::size_type MaxZoneNameLength; // Max Name length of zones in the list
-		FArray1D_int Zone; // Pointers to zones in the list
+		Array1D_int Zone; // Pointers to zones in the list
 
 		// Default Constructor
 		ZoneListData() :
@@ -2105,7 +2110,7 @@ namespace DataHeatBalance {
 			std::string const & Name, // Zone List name
 			int const NumOfZones, // Number of zones in the list
 			std::string::size_type const MaxZoneNameLength, // Max Name length of zones in the list
-			FArray1_int const & Zone // Pointers to zones in the list
+			Array1_int const & Zone // Pointers to zones in the list
 		) :
 			Name( Name ),
 			NumOfZones( NumOfZones ),
@@ -2744,7 +2749,7 @@ namespace DataHeatBalance {
 		Real64 RHBelowDeltaRH; // ITE Air Inlet Relative Humidity Difference Below Operating Range [%]
 
 		// Default Constructor
-		ITEquipData( ) :
+		ITEquipData() :
 			ZonePtr( 0 ),
 			DesignTotalPower( 0.0 ),
 			NomMinDesignLevel( 0.0 ),
@@ -3369,8 +3374,8 @@ namespace DataHeatBalance {
 		Real64 ERVMassFlowRate; // unbalanced mass flow rate from stand-alond ERV
 		bool OneTimeFlag; // One time flag to get nodes of stand alond ERV
 		int NumOfERVs; // Number of zone stand alone ERVs
-		FArray1D_int ERVInletNode; // Stand alone ERV supply air inlet nodes
-		FArray1D_int ERVExhaustNode; // Stand alone ERV air exhaust nodes
+		Array1D_int ERVInletNode; // Stand alone ERV supply air inlet nodes
+		Array1D_int ERVExhaustNode; // Stand alone ERV air exhaust nodes
 
 		// Default Constructor
 		ZoneAirBalanceData() :
@@ -3404,8 +3409,8 @@ namespace DataHeatBalance {
 			Real64 const ERVMassFlowRate, // unbalanced mass flow rate from stand-alond ERV
 			bool const OneTimeFlag, // One time flag to get nodes of stand alond ERV
 			int const NumOfERVs, // Number of zone stand alone ERVs
-			FArray1_int const & ERVInletNode, // Stand alone ERV supply air inlet nodes
-			FArray1_int const & ERVExhaustNode // Stand alone ERV air exhaust nodes
+			Array1_int const & ERVInletNode, // Stand alone ERV supply air inlet nodes
+			Array1_int const & ERVExhaustNode // Stand alone ERV air exhaust nodes
 		) :
 			Name( Name ),
 			ZoneName( ZoneName ),
@@ -3458,16 +3463,16 @@ namespace DataHeatBalance {
 		bool EMSSimpleMixingOn; // EMS actuating ventilation flow rate if .TRUE.
 		bool RefDoorMixFlag; // Refrigeration door mixing within zone
 		Real64 EMSimpleMixingFlowRate; // Value EMS is directing to use for override
-		FArray1D_bool EMSRefDoorMixingOn;
-		FArray1D< Real64 > EMSRefDoorFlowRate;
-		FArray1D< Real64 > VolRefDoorFlowRate;
-		FArray1D_int OpenSchedPtr; // Schedule for Refrigeration door open fraction
-		FArray1D< Real64 > DoorHeight; // Door height for refrigeration door, m
-		FArray1D< Real64 > DoorArea; // Door area for refrigeration door, m2
-		FArray1D< Real64 > Protection; // Refrigeration door protection factor, dimensionless
-		FArray1D_int MateZonePtr; // Zone connected by refrigeration door (MateZone > ZonePtr)
-		FArray1D_string DoorMixingObjectName; // Used in one error statement and eio
-		FArray1D_string DoorProtTypeName; // Used in eio
+		Array1D_bool EMSRefDoorMixingOn;
+		Array1D< Real64 > EMSRefDoorFlowRate;
+		Array1D< Real64 > VolRefDoorFlowRate;
+		Array1D_int OpenSchedPtr; // Schedule for Refrigeration door open fraction
+		Array1D< Real64 > DoorHeight; // Door height for refrigeration door, m
+		Array1D< Real64 > DoorArea; // Door area for refrigeration door, m2
+		Array1D< Real64 > Protection; // Refrigeration door protection factor, dimensionless
+		Array1D_int MateZonePtr; // Zone connected by refrigeration door (MateZone > ZonePtr)
+		Array1D_string DoorMixingObjectName; // Used in one error statement and eio
+		Array1D_string DoorProtTypeName; // Used in eio
 		//Note, for mixing and crossmixing, this type dimensioned by number of mixing objects.
 		//For ref door mixing, dimensioned by number of zones.
 
@@ -3532,16 +3537,16 @@ namespace DataHeatBalance {
 			bool const EMSSimpleMixingOn, // EMS actuating ventilation flow rate if .TRUE.
 			bool const RefDoorMixFlag, // Refrigeration door mixing within zone
 			Real64 const EMSimpleMixingFlowRate, // Value EMS is directing to use for override
-			FArray1_bool const & EMSRefDoorMixingOn,
-			FArray1< Real64 > const & EMSRefDoorFlowRate,
-			FArray1< Real64 > const & VolRefDoorFlowRate,
-			FArray1_int const & OpenSchedPtr, // Schedule for Refrigeration door open fraction
-			FArray1< Real64 > const & DoorHeight, // Door height for refrigeration door, m
-			FArray1< Real64 > const & DoorArea, // Door area for refrigeration door, m2
-			FArray1< Real64 > const & Protection, // Refrigeration door protection factor, dimensionless
-			FArray1_int const & MateZonePtr, // Zone connected by refrigeration door (MateZone > ZonePtr)
-			FArray1_string const & DoorMixingObjectName, // Used in one error statement and eio
-			FArray1_string const & DoorProtTypeName // Used in eio
+			Array1_bool const & EMSRefDoorMixingOn,
+			Array1< Real64 > const & EMSRefDoorFlowRate,
+			Array1< Real64 > const & VolRefDoorFlowRate,
+			Array1_int const & OpenSchedPtr, // Schedule for Refrigeration door open fraction
+			Array1< Real64 > const & DoorHeight, // Door height for refrigeration door, m
+			Array1< Real64 > const & DoorArea, // Door area for refrigeration door, m2
+			Array1< Real64 > const & Protection, // Refrigeration door protection factor, dimensionless
+			Array1_int const & MateZonePtr, // Zone connected by refrigeration door (MateZone > ZonePtr)
+			Array1_string const & DoorMixingObjectName, // Used in one error statement and eio
+			Array1_string const & DoorProtTypeName // Used in eio
 		) :
 			Name( Name ),
 			ZonePtr( ZonePtr ),
@@ -3625,9 +3630,9 @@ namespace DataHeatBalance {
 		int InfiltrationPtr;             // pointer to infiltration object
 		Real64 InfiltrationMassFlowRate;   // infiltration added to enforced source zone mass balance, kg/s
 		int IncludeInfilToZoneMassBal;     // not self-balanced, include infiltration in zone air mass balance
-		FArray1D_int ZoneMixingSourcesPtr;     // source zones pointer
-		FArray1D_int ZoneMixingReceivingPtr;   // receiving zones pointer
-		FArray1D< Real64 > ZoneMixingReceivingFr; // receiving zones fraction
+		Array1D_int ZoneMixingSourcesPtr;     // source zones pointer
+		Array1D_int ZoneMixingReceivingPtr;   // receiving zones pointer
+		Array1D< Real64 > ZoneMixingReceivingFr; // receiving zones fraction
 		//Note, this type dimensioned by number of zones
 
 		// Default Constructor
@@ -3661,9 +3666,9 @@ namespace DataHeatBalance {
 			int const InfiltrationPtr,
 			Real64 const InfiltrationMassFlowRate,
 			int const IncludeInfilToZoneMassBal,
-			FArray1_int const & ZoneMixingSourcesPtr,
-			FArray1_int const & ZoneMixingReceivingPtr,
-			FArray1< Real64 > const & ZoneMixingReceivingFr
+			Array1_int const & ZoneMixingSourcesPtr,
+			Array1_int const & ZoneMixingReceivingPtr,
+			Array1< Real64 > const & ZoneMixingReceivingFr
 			) :
 			Name(Name),
 			ZonePtr(ZonePtr),
@@ -3796,7 +3801,7 @@ namespace DataHeatBalance {
 		Real64 QBBRAD; // ENERGY RADIATED FROM BASEBOARD HEATING
 		int NumberOfDevices;
 		int MaxNumberOfDevices;
-		FArray1D< GenericComponentZoneIntGainStruct > Device;
+		Array1D< GenericComponentZoneIntGainStruct > Device;
 
 		// Default Constructor
 		ZoneSimData() :
@@ -3874,7 +3879,7 @@ namespace DataHeatBalance {
 			Real64 const QBBRAD, // ENERGY RADIATED FROM BASEBOARD HEATING
 			int const NumberOfDevices,
 			int const MaxNumberOfDevices,
-			FArray1< GenericComponentZoneIntGainStruct > const & Device
+			Array1< GenericComponentZoneIntGainStruct > const & Device
 		) :
 			NOFOCC( NOFOCC ),
 			QOCTOT( QOCTOT ),
@@ -3962,74 +3967,74 @@ namespace DataHeatBalance {
 		//  of the blind-to-glass opening area at the right side of the blind
 		// Calculated blind properties
 		// Blind solar properties
-		FArray2D< Real64 > SolFrontBeamBeamTrans; // Blind solar front beam-beam transmittance vs.
+		Array2D< Real64 > SolFrontBeamBeamTrans; // Blind solar front beam-beam transmittance vs.
 		// profile angle, slat angle
-		FArray2D< Real64 > SolFrontBeamBeamRefl; // Blind solar front beam-beam reflectance vs. profile angle,
+		Array2D< Real64 > SolFrontBeamBeamRefl; // Blind solar front beam-beam reflectance vs. profile angle,
 		// slat angle (zero)
-		FArray2D< Real64 > SolBackBeamBeamTrans; // Blind solar back beam-beam transmittance vs. profile angle,
+		Array2D< Real64 > SolBackBeamBeamTrans; // Blind solar back beam-beam transmittance vs. profile angle,
 		// slat angle
-		FArray2D< Real64 > SolBackBeamBeamRefl; // Blind solar back beam-beam reflectance vs. profile angle,
+		Array2D< Real64 > SolBackBeamBeamRefl; // Blind solar back beam-beam reflectance vs. profile angle,
 		// slat angle (zero)
-		FArray2D< Real64 > SolFrontBeamDiffTrans; // Blind solar front beam-diffuse transmittance
+		Array2D< Real64 > SolFrontBeamDiffTrans; // Blind solar front beam-diffuse transmittance
 		// vs. profile angle, slat angle
-		FArray2D< Real64 > SolFrontBeamDiffRefl; // Blind solar front beam-diffuse reflectance
+		Array2D< Real64 > SolFrontBeamDiffRefl; // Blind solar front beam-diffuse reflectance
 		// vs. profile angle, slat angle
-		FArray2D< Real64 > SolBackBeamDiffTrans; // Blind solar back beam-diffuse transmittance
+		Array2D< Real64 > SolBackBeamDiffTrans; // Blind solar back beam-diffuse transmittance
 		// vs. profile angle, slat angle
-		FArray2D< Real64 > SolBackBeamDiffRefl; // Blind solar back beam-diffuse reflectance
+		Array2D< Real64 > SolBackBeamDiffRefl; // Blind solar back beam-diffuse reflectance
 		// vs. profile angle, slat angle
-		FArray1D< Real64 > SolFrontDiffDiffTrans; // Blind solar front diffuse-diffuse transmittance
+		Array1D< Real64 > SolFrontDiffDiffTrans; // Blind solar front diffuse-diffuse transmittance
 		// vs. slat angle
-		FArray1D< Real64 > SolFrontDiffDiffTransGnd; // Blind ground solar front diffuse-diffuse transmittance
+		Array1D< Real64 > SolFrontDiffDiffTransGnd; // Blind ground solar front diffuse-diffuse transmittance
 		// vs. slat angle
-		FArray1D< Real64 > SolFrontDiffDiffTransSky; // Blind sky solar front diffuse-diffuse transmittance
+		Array1D< Real64 > SolFrontDiffDiffTransSky; // Blind sky solar front diffuse-diffuse transmittance
 		// vs. slat angle
-		FArray1D< Real64 > SolFrontDiffDiffRefl; // Blind solar front diffuse-diffuse reflectance
+		Array1D< Real64 > SolFrontDiffDiffRefl; // Blind solar front diffuse-diffuse reflectance
 		// vs. slat angle
-		FArray1D< Real64 > SolFrontDiffDiffReflGnd; // Blind ground solar front diffuse-diffuse reflectance
+		Array1D< Real64 > SolFrontDiffDiffReflGnd; // Blind ground solar front diffuse-diffuse reflectance
 		// vs. slat angle
-		FArray1D< Real64 > SolFrontDiffDiffReflSky; // Blind sky solar front diffuse-diffuse reflectance
+		Array1D< Real64 > SolFrontDiffDiffReflSky; // Blind sky solar front diffuse-diffuse reflectance
 		// vs. slat angle
-		FArray1D< Real64 > SolBackDiffDiffTrans; // Blind solar back diffuse-diffuse transmittance
+		Array1D< Real64 > SolBackDiffDiffTrans; // Blind solar back diffuse-diffuse transmittance
 		// vs. slat angle
-		FArray1D< Real64 > SolBackDiffDiffRefl; // Blind solar back diffuse-diffuse reflectance
+		Array1D< Real64 > SolBackDiffDiffRefl; // Blind solar back diffuse-diffuse reflectance
 		// vs. slat angle
-		FArray2D< Real64 > SolFrontBeamAbs; // Blind solar front beam absorptance vs. slat angle
-		FArray2D< Real64 > SolBackBeamAbs; // Blind solar back beam absorptance vs. slat angle
-		FArray1D< Real64 > SolFrontDiffAbs; // Blind solar front diffuse absorptance vs. slat angle
-		FArray1D< Real64 > SolFrontDiffAbsGnd; // Blind ground solar front diffuse absorptance vs. slat angle
-		FArray1D< Real64 > SolFrontDiffAbsSky; // Blind sky solar front diffuse absorptance vs. slat angle
-		FArray1D< Real64 > SolBackDiffAbs; // Blind solar back diffuse absorptance vs. slat angle
+		Array2D< Real64 > SolFrontBeamAbs; // Blind solar front beam absorptance vs. slat angle
+		Array2D< Real64 > SolBackBeamAbs; // Blind solar back beam absorptance vs. slat angle
+		Array1D< Real64 > SolFrontDiffAbs; // Blind solar front diffuse absorptance vs. slat angle
+		Array1D< Real64 > SolFrontDiffAbsGnd; // Blind ground solar front diffuse absorptance vs. slat angle
+		Array1D< Real64 > SolFrontDiffAbsSky; // Blind sky solar front diffuse absorptance vs. slat angle
+		Array1D< Real64 > SolBackDiffAbs; // Blind solar back diffuse absorptance vs. slat angle
 		// Blind visible properties
-		FArray2D< Real64 > VisFrontBeamBeamTrans; // Blind visible front beam-beam transmittance
+		Array2D< Real64 > VisFrontBeamBeamTrans; // Blind visible front beam-beam transmittance
 		// vs. profile angle, slat angle
-		FArray2D< Real64 > VisFrontBeamBeamRefl; // Blind visible front beam-beam reflectance
+		Array2D< Real64 > VisFrontBeamBeamRefl; // Blind visible front beam-beam reflectance
 		// vs. profile angle, slat angle (zero)
-		FArray2D< Real64 > VisBackBeamBeamTrans; // Blind visible back beam-beam transmittance
+		Array2D< Real64 > VisBackBeamBeamTrans; // Blind visible back beam-beam transmittance
 		// vs. profile angle, slat angle
-		FArray2D< Real64 > VisBackBeamBeamRefl; // Blind visible back beam-beam reflectance
+		Array2D< Real64 > VisBackBeamBeamRefl; // Blind visible back beam-beam reflectance
 		// vs. profile angle, slat angle (zero)
-		FArray2D< Real64 > VisFrontBeamDiffTrans; // Blind visible front beam-diffuse transmittance
+		Array2D< Real64 > VisFrontBeamDiffTrans; // Blind visible front beam-diffuse transmittance
 		// vs. profile angle, slat angle
-		FArray2D< Real64 > VisFrontBeamDiffRefl; // Blind visible front beam-diffuse reflectance
+		Array2D< Real64 > VisFrontBeamDiffRefl; // Blind visible front beam-diffuse reflectance
 		// vs. profile angle, slat angle
-		FArray2D< Real64 > VisBackBeamDiffTrans; // Blind visible back beam-diffuse transmittance
+		Array2D< Real64 > VisBackBeamDiffTrans; // Blind visible back beam-diffuse transmittance
 		// vs. profile angle, slat angle
-		FArray2D< Real64 > VisBackBeamDiffRefl; // Blind visible back beam-diffuse reflectance
+		Array2D< Real64 > VisBackBeamDiffRefl; // Blind visible back beam-diffuse reflectance
 		// vs. profile angle, slat angle
-		FArray1D< Real64 > VisFrontDiffDiffTrans; // Blind visible front diffuse-diffuse transmittance
+		Array1D< Real64 > VisFrontDiffDiffTrans; // Blind visible front diffuse-diffuse transmittance
 		// vs. slat angle
-		FArray1D< Real64 > VisFrontDiffDiffRefl; // Blind visible front diffuse-diffuse reflectance
+		Array1D< Real64 > VisFrontDiffDiffRefl; // Blind visible front diffuse-diffuse reflectance
 		// vs. slat angle
-		FArray1D< Real64 > VisBackDiffDiffTrans; // Blind visible back diffuse-diffuse transmittance
+		Array1D< Real64 > VisBackDiffDiffTrans; // Blind visible back diffuse-diffuse transmittance
 		// vs. slat angle
-		FArray1D< Real64 > VisBackDiffDiffRefl; // Blind visible back diffuse-diffuse reflectance
+		Array1D< Real64 > VisBackDiffDiffRefl; // Blind visible back diffuse-diffuse reflectance
 		// vs. slat angle
 		// Long-wave (IR) blind properties
-		FArray1D< Real64 > IRFrontTrans; // Blind IR front transmittance vs. slat angle
-		FArray1D< Real64 > IRFrontEmiss; // Blind IR front emissivity vs. slat angle
-		FArray1D< Real64 > IRBackTrans; // Blind IR back transmittance vs. slat angle
-		FArray1D< Real64 > IRBackEmiss; // Blind IR back emissivity vs. slat angle
+		Array1D< Real64 > IRFrontTrans; // Blind IR front transmittance vs. slat angle
+		Array1D< Real64 > IRFrontEmiss; // Blind IR front emissivity vs. slat angle
+		Array1D< Real64 > IRBackTrans; // Blind IR back transmittance vs. slat angle
+		Array1D< Real64 > IRBackEmiss; // Blind IR back emissivity vs. slat angle
 
 		// Default Constructor
 		WindowBlindProperties() :
@@ -4064,14 +4069,14 @@ namespace DataHeatBalance {
 			BlindBottomOpeningMult( 0.0 ),
 			BlindLeftOpeningMult( 0.0 ),
 			BlindRightOpeningMult( 0.0 ),
-			SolFrontBeamBeamTrans( 37, MaxSlatAngs, 0.0 ),
-			SolFrontBeamBeamRefl( 37, MaxSlatAngs, 0.0 ),
-			SolBackBeamBeamTrans( 37, MaxSlatAngs, 0.0 ),
-			SolBackBeamBeamRefl( 37, MaxSlatAngs, 0.0 ),
-			SolFrontBeamDiffTrans( 37, MaxSlatAngs, 0.0 ),
-			SolFrontBeamDiffRefl( 37, MaxSlatAngs, 0.0 ),
-			SolBackBeamDiffTrans( 37, MaxSlatAngs, 0.0 ),
-			SolBackBeamDiffRefl( 37, MaxSlatAngs, 0.0 ),
+			SolFrontBeamBeamTrans( MaxSlatAngs, 37, 0.0 ),
+			SolFrontBeamBeamRefl( MaxSlatAngs, 37, 0.0 ),
+			SolBackBeamBeamTrans( MaxSlatAngs, 37, 0.0 ),
+			SolBackBeamBeamRefl( MaxSlatAngs, 37, 0.0 ),
+			SolFrontBeamDiffTrans( MaxSlatAngs, 37, 0.0 ),
+			SolFrontBeamDiffRefl( MaxSlatAngs, 37, 0.0 ),
+			SolBackBeamDiffTrans( MaxSlatAngs, 37, 0.0 ),
+			SolBackBeamDiffRefl( MaxSlatAngs, 37, 0.0 ),
 			SolFrontDiffDiffTrans( MaxSlatAngs, 0.0 ),
 			SolFrontDiffDiffTransGnd( MaxSlatAngs, 0.0 ),
 			SolFrontDiffDiffTransSky( MaxSlatAngs, 0.0 ),
@@ -4080,20 +4085,20 @@ namespace DataHeatBalance {
 			SolFrontDiffDiffReflSky( MaxSlatAngs, 0.0 ),
 			SolBackDiffDiffTrans( MaxSlatAngs, 0.0 ),
 			SolBackDiffDiffRefl( MaxSlatAngs, 0.0 ),
-			SolFrontBeamAbs( 37, MaxSlatAngs, 0.0 ),
-			SolBackBeamAbs( 37, MaxSlatAngs, 0.0 ),
+			SolFrontBeamAbs( MaxSlatAngs, 37, 0.0 ),
+			SolBackBeamAbs( MaxSlatAngs, 37, 0.0 ),
 			SolFrontDiffAbs( MaxSlatAngs, 0.0 ),
 			SolFrontDiffAbsGnd( MaxSlatAngs, 0.0 ),
 			SolFrontDiffAbsSky( MaxSlatAngs, 0.0 ),
 			SolBackDiffAbs( MaxSlatAngs, 0.0 ),
-			VisFrontBeamBeamTrans( 37, MaxSlatAngs, 0.0 ),
-			VisFrontBeamBeamRefl( 37, MaxSlatAngs, 0.0 ),
-			VisBackBeamBeamTrans( 37, MaxSlatAngs, 0.0 ),
-			VisBackBeamBeamRefl( 37, MaxSlatAngs, 0.0 ),
-			VisFrontBeamDiffTrans( 37, MaxSlatAngs, 0.0 ),
-			VisFrontBeamDiffRefl( 37, MaxSlatAngs, 0.0 ),
-			VisBackBeamDiffTrans( 37, MaxSlatAngs, 0.0 ),
-			VisBackBeamDiffRefl( 37, MaxSlatAngs, 0.0 ),
+			VisFrontBeamBeamTrans( MaxSlatAngs, 37, 0.0 ),
+			VisFrontBeamBeamRefl( MaxSlatAngs, 37, 0.0 ),
+			VisBackBeamBeamTrans( MaxSlatAngs, 37, 0.0 ),
+			VisBackBeamBeamRefl( MaxSlatAngs, 37, 0.0 ),
+			VisFrontBeamDiffTrans( MaxSlatAngs, 37, 0.0 ),
+			VisFrontBeamDiffRefl( MaxSlatAngs, 37, 0.0 ),
+			VisBackBeamDiffTrans( MaxSlatAngs, 37, 0.0 ),
+			VisBackBeamDiffRefl( MaxSlatAngs, 37, 0.0 ),
 			VisFrontDiffDiffTrans( MaxSlatAngs, 0.0 ),
 			VisFrontDiffDiffRefl( MaxSlatAngs, 0.0 ),
 			VisBackDiffDiffTrans( MaxSlatAngs, 0.0 ),
@@ -4138,44 +4143,44 @@ namespace DataHeatBalance {
 			Real64 const BlindBottomOpeningMult, // Area of air-flow opening at bottom of blind, expressed as a fraction
 			Real64 const BlindLeftOpeningMult, // Area of air-flow opening at left side of blind, expressed as a fraction
 			Real64 const BlindRightOpeningMult, // Area of air-flow opening at right side of blind, expressed as a fraction
-			FArray2< Real64 > const & SolFrontBeamBeamTrans, // Blind solar front beam-beam transmittance vs.
-			FArray2< Real64 > const & SolFrontBeamBeamRefl, // Blind solar front beam-beam reflectance vs. profile angle,
-			FArray2< Real64 > const & SolBackBeamBeamTrans, // Blind solar back beam-beam transmittance vs. profile angle,
-			FArray2< Real64 > const & SolBackBeamBeamRefl, // Blind solar back beam-beam reflectance vs. profile angle,
-			FArray2< Real64 > const & SolFrontBeamDiffTrans, // Blind solar front beam-diffuse transmittance
-			FArray2< Real64 > const & SolFrontBeamDiffRefl, // Blind solar front beam-diffuse reflectance
-			FArray2< Real64 > const & SolBackBeamDiffTrans, // Blind solar back beam-diffuse transmittance
-			FArray2< Real64 > const & SolBackBeamDiffRefl, // Blind solar back beam-diffuse reflectance
-			FArray1< Real64 > const & SolFrontDiffDiffTrans, // Blind solar front diffuse-diffuse transmittance
-			FArray1< Real64 > const & SolFrontDiffDiffTransGnd, // Blind ground solar front diffuse-diffuse transmittance
-			FArray1< Real64 > const & SolFrontDiffDiffTransSky, // Blind sky solar front diffuse-diffuse transmittance
-			FArray1< Real64 > const & SolFrontDiffDiffRefl, // Blind solar front diffuse-diffuse reflectance
-			FArray1< Real64 > const & SolFrontDiffDiffReflGnd, // Blind ground solar front diffuse-diffuse reflectance
-			FArray1< Real64 > const & SolFrontDiffDiffReflSky, // Blind sky solar front diffuse-diffuse reflectance
-			FArray1< Real64 > const & SolBackDiffDiffTrans, // Blind solar back diffuse-diffuse transmittance
-			FArray1< Real64 > const & SolBackDiffDiffRefl, // Blind solar back diffuse-diffuse reflectance
-			FArray2< Real64 > const & SolFrontBeamAbs, // Blind solar front beam absorptance vs. slat angle
-			FArray2< Real64 > const & SolBackBeamAbs, // Blind solar back beam absorptance vs. slat angle
-			FArray1< Real64 > const & SolFrontDiffAbs, // Blind solar front diffuse absorptance vs. slat angle
-			FArray1< Real64 > const & SolFrontDiffAbsGnd, // Blind ground solar front diffuse absorptance vs. slat angle
-			FArray1< Real64 > const & SolFrontDiffAbsSky, // Blind sky solar front diffuse absorptance vs. slat angle
-			FArray1< Real64 > const & SolBackDiffAbs, // Blind solar back diffuse absorptance vs. slat angle
-			FArray2< Real64 > const & VisFrontBeamBeamTrans, // Blind visible front beam-beam transmittance
-			FArray2< Real64 > const & VisFrontBeamBeamRefl, // Blind visible front beam-beam reflectance
-			FArray2< Real64 > const & VisBackBeamBeamTrans, // Blind visible back beam-beam transmittance
-			FArray2< Real64 > const & VisBackBeamBeamRefl, // Blind visible back beam-beam reflectance
-			FArray2< Real64 > const & VisFrontBeamDiffTrans, // Blind visible front beam-diffuse transmittance
-			FArray2< Real64 > const & VisFrontBeamDiffRefl, // Blind visible front beam-diffuse reflectance
-			FArray2< Real64 > const & VisBackBeamDiffTrans, // Blind visible back beam-diffuse transmittance
-			FArray2< Real64 > const & VisBackBeamDiffRefl, // Blind visible back beam-diffuse reflectance
-			FArray1< Real64 > const & VisFrontDiffDiffTrans, // Blind visible front diffuse-diffuse transmittance
-			FArray1< Real64 > const & VisFrontDiffDiffRefl, // Blind visible front diffuse-diffuse reflectance
-			FArray1< Real64 > const & VisBackDiffDiffTrans, // Blind visible back diffuse-diffuse transmittance
-			FArray1< Real64 > const & VisBackDiffDiffRefl, // Blind visible back diffuse-diffuse reflectance
-			FArray1< Real64 > const & IRFrontTrans, // Blind IR front transmittance vs. slat angle
-			FArray1< Real64 > const & IRFrontEmiss, // Blind IR front emissivity vs. slat angle
-			FArray1< Real64 > const & IRBackTrans, // Blind IR back transmittance vs. slat angle
-			FArray1< Real64 > const & IRBackEmiss // Blind IR back emissivity vs. slat angle
+			Array2< Real64 > const & SolFrontBeamBeamTrans, // Blind solar front beam-beam transmittance vs.
+			Array2< Real64 > const & SolFrontBeamBeamRefl, // Blind solar front beam-beam reflectance vs. profile angle,
+			Array2< Real64 > const & SolBackBeamBeamTrans, // Blind solar back beam-beam transmittance vs. profile angle,
+			Array2< Real64 > const & SolBackBeamBeamRefl, // Blind solar back beam-beam reflectance vs. profile angle,
+			Array2< Real64 > const & SolFrontBeamDiffTrans, // Blind solar front beam-diffuse transmittance
+			Array2< Real64 > const & SolFrontBeamDiffRefl, // Blind solar front beam-diffuse reflectance
+			Array2< Real64 > const & SolBackBeamDiffTrans, // Blind solar back beam-diffuse transmittance
+			Array2< Real64 > const & SolBackBeamDiffRefl, // Blind solar back beam-diffuse reflectance
+			Array1< Real64 > const & SolFrontDiffDiffTrans, // Blind solar front diffuse-diffuse transmittance
+			Array1< Real64 > const & SolFrontDiffDiffTransGnd, // Blind ground solar front diffuse-diffuse transmittance
+			Array1< Real64 > const & SolFrontDiffDiffTransSky, // Blind sky solar front diffuse-diffuse transmittance
+			Array1< Real64 > const & SolFrontDiffDiffRefl, // Blind solar front diffuse-diffuse reflectance
+			Array1< Real64 > const & SolFrontDiffDiffReflGnd, // Blind ground solar front diffuse-diffuse reflectance
+			Array1< Real64 > const & SolFrontDiffDiffReflSky, // Blind sky solar front diffuse-diffuse reflectance
+			Array1< Real64 > const & SolBackDiffDiffTrans, // Blind solar back diffuse-diffuse transmittance
+			Array1< Real64 > const & SolBackDiffDiffRefl, // Blind solar back diffuse-diffuse reflectance
+			Array2< Real64 > const & SolFrontBeamAbs, // Blind solar front beam absorptance vs. slat angle
+			Array2< Real64 > const & SolBackBeamAbs, // Blind solar back beam absorptance vs. slat angle
+			Array1< Real64 > const & SolFrontDiffAbs, // Blind solar front diffuse absorptance vs. slat angle
+			Array1< Real64 > const & SolFrontDiffAbsGnd, // Blind ground solar front diffuse absorptance vs. slat angle
+			Array1< Real64 > const & SolFrontDiffAbsSky, // Blind sky solar front diffuse absorptance vs. slat angle
+			Array1< Real64 > const & SolBackDiffAbs, // Blind solar back diffuse absorptance vs. slat angle
+			Array2< Real64 > const & VisFrontBeamBeamTrans, // Blind visible front beam-beam transmittance
+			Array2< Real64 > const & VisFrontBeamBeamRefl, // Blind visible front beam-beam reflectance
+			Array2< Real64 > const & VisBackBeamBeamTrans, // Blind visible back beam-beam transmittance
+			Array2< Real64 > const & VisBackBeamBeamRefl, // Blind visible back beam-beam reflectance
+			Array2< Real64 > const & VisFrontBeamDiffTrans, // Blind visible front beam-diffuse transmittance
+			Array2< Real64 > const & VisFrontBeamDiffRefl, // Blind visible front beam-diffuse reflectance
+			Array2< Real64 > const & VisBackBeamDiffTrans, // Blind visible back beam-diffuse transmittance
+			Array2< Real64 > const & VisBackBeamDiffRefl, // Blind visible back beam-diffuse reflectance
+			Array1< Real64 > const & VisFrontDiffDiffTrans, // Blind visible front diffuse-diffuse transmittance
+			Array1< Real64 > const & VisFrontDiffDiffRefl, // Blind visible front diffuse-diffuse reflectance
+			Array1< Real64 > const & VisBackDiffDiffTrans, // Blind visible back diffuse-diffuse transmittance
+			Array1< Real64 > const & VisBackDiffDiffRefl, // Blind visible back diffuse-diffuse reflectance
+			Array1< Real64 > const & IRFrontTrans, // Blind IR front transmittance vs. slat angle
+			Array1< Real64 > const & IRFrontEmiss, // Blind IR front emissivity vs. slat angle
+			Array1< Real64 > const & IRBackTrans, // Blind IR back transmittance vs. slat angle
+			Array1< Real64 > const & IRBackEmiss // Blind IR back emissivity vs. slat angle
 		) :
 			Name( Name ),
 			MaterialNumber( MaterialNumber ),
@@ -4209,14 +4214,14 @@ namespace DataHeatBalance {
 			BlindBottomOpeningMult( BlindBottomOpeningMult ),
 			BlindLeftOpeningMult( BlindLeftOpeningMult ),
 			BlindRightOpeningMult( BlindRightOpeningMult ),
-			SolFrontBeamBeamTrans( 37, MaxSlatAngs, SolFrontBeamBeamTrans ),
-			SolFrontBeamBeamRefl( 37, MaxSlatAngs, SolFrontBeamBeamRefl ),
-			SolBackBeamBeamTrans( 37, MaxSlatAngs, SolBackBeamBeamTrans ),
-			SolBackBeamBeamRefl( 37, MaxSlatAngs, SolBackBeamBeamRefl ),
-			SolFrontBeamDiffTrans( 37, MaxSlatAngs, SolFrontBeamDiffTrans ),
-			SolFrontBeamDiffRefl( 37, MaxSlatAngs, SolFrontBeamDiffRefl ),
-			SolBackBeamDiffTrans( 37, MaxSlatAngs, SolBackBeamDiffTrans ),
-			SolBackBeamDiffRefl( 37, MaxSlatAngs, SolBackBeamDiffRefl ),
+			SolFrontBeamBeamTrans( MaxSlatAngs, 37, SolFrontBeamBeamTrans ),
+			SolFrontBeamBeamRefl( MaxSlatAngs, 37, SolFrontBeamBeamRefl ),
+			SolBackBeamBeamTrans( MaxSlatAngs, 37, SolBackBeamBeamTrans ),
+			SolBackBeamBeamRefl( MaxSlatAngs, 37, SolBackBeamBeamRefl ),
+			SolFrontBeamDiffTrans( MaxSlatAngs, 37, SolFrontBeamDiffTrans ),
+			SolFrontBeamDiffRefl( MaxSlatAngs, 37, SolFrontBeamDiffRefl ),
+			SolBackBeamDiffTrans( MaxSlatAngs, 37, SolBackBeamDiffTrans ),
+			SolBackBeamDiffRefl( MaxSlatAngs, 37, SolBackBeamDiffRefl ),
 			SolFrontDiffDiffTrans( MaxSlatAngs, SolFrontDiffDiffTrans ),
 			SolFrontDiffDiffTransGnd( MaxSlatAngs, SolFrontDiffDiffTransGnd ),
 			SolFrontDiffDiffTransSky( MaxSlatAngs, SolFrontDiffDiffTransSky ),
@@ -4225,20 +4230,20 @@ namespace DataHeatBalance {
 			SolFrontDiffDiffReflSky( MaxSlatAngs, SolFrontDiffDiffReflSky ),
 			SolBackDiffDiffTrans( MaxSlatAngs, SolBackDiffDiffTrans ),
 			SolBackDiffDiffRefl( MaxSlatAngs, SolBackDiffDiffRefl ),
-			SolFrontBeamAbs( 37, MaxSlatAngs, SolFrontBeamAbs ),
-			SolBackBeamAbs( 37, MaxSlatAngs, SolBackBeamAbs ),
+			SolFrontBeamAbs( MaxSlatAngs, 37, SolFrontBeamAbs ),
+			SolBackBeamAbs( MaxSlatAngs, 37, SolBackBeamAbs ),
 			SolFrontDiffAbs( MaxSlatAngs, SolFrontDiffAbs ),
 			SolFrontDiffAbsGnd( MaxSlatAngs, SolFrontDiffAbsGnd ),
 			SolFrontDiffAbsSky( MaxSlatAngs, SolFrontDiffAbsSky ),
 			SolBackDiffAbs( MaxSlatAngs, SolBackDiffAbs ),
-			VisFrontBeamBeamTrans( 37, MaxSlatAngs, VisFrontBeamBeamTrans ),
-			VisFrontBeamBeamRefl( 37, MaxSlatAngs, VisFrontBeamBeamRefl ),
-			VisBackBeamBeamTrans( 37, MaxSlatAngs, VisBackBeamBeamTrans ),
-			VisBackBeamBeamRefl( 37, MaxSlatAngs, VisBackBeamBeamRefl ),
-			VisFrontBeamDiffTrans( 37, MaxSlatAngs, VisFrontBeamDiffTrans ),
-			VisFrontBeamDiffRefl( 37, MaxSlatAngs, VisFrontBeamDiffRefl ),
-			VisBackBeamDiffTrans( 37, MaxSlatAngs, VisBackBeamDiffTrans ),
-			VisBackBeamDiffRefl( 37, MaxSlatAngs, VisBackBeamDiffRefl ),
+			VisFrontBeamBeamTrans( MaxSlatAngs, 37, VisFrontBeamBeamTrans ),
+			VisFrontBeamBeamRefl( MaxSlatAngs, 37, VisFrontBeamBeamRefl ),
+			VisBackBeamBeamTrans( MaxSlatAngs, 37, VisBackBeamBeamTrans ),
+			VisBackBeamBeamRefl( MaxSlatAngs, 37, VisBackBeamBeamRefl ),
+			VisFrontBeamDiffTrans( MaxSlatAngs, 37, VisFrontBeamDiffTrans ),
+			VisFrontBeamDiffRefl( MaxSlatAngs, 37, VisFrontBeamDiffRefl ),
+			VisBackBeamDiffTrans( MaxSlatAngs, 37, VisBackBeamDiffTrans ),
+			VisBackBeamDiffRefl( MaxSlatAngs, 37, VisBackBeamDiffRefl ),
 			VisFrontDiffDiffTrans( MaxSlatAngs, VisFrontDiffDiffTrans ),
 			VisFrontDiffDiffRefl( MaxSlatAngs, VisFrontDiffDiffRefl ),
 			VisBackDiffDiffTrans( MaxSlatAngs, VisBackDiffDiffTrans ),
@@ -4368,8 +4373,8 @@ namespace DataHeatBalance {
 	struct ScreenTransData
 	{
 		// Members
-		FArray2D< Real64 > Trans;
-		FArray2D< Real64 > Scatt;
+		Array2D< Real64 > Trans;
+		Array2D< Real64 > Scatt;
 
 		// Default Constructor
 		ScreenTransData()
@@ -4377,8 +4382,8 @@ namespace DataHeatBalance {
 
 		// Member Constructor
 		ScreenTransData(
-			FArray2< Real64 > const & Trans,
-			FArray2< Real64 > const & Scatt
+			Array2< Real64 > const & Trans,
+			Array2< Real64 > const & Scatt
 		) :
 			Trans( Trans ),
 			Scatt( Scatt )
@@ -4389,10 +4394,10 @@ namespace DataHeatBalance {
 	struct ZoneCatEUseData
 	{
 		// Members
-		FArray1D< Real64 > EEConvected; // Category (0 to 25) Energy Convected from Electric Equipment
-		FArray1D< Real64 > EERadiated; // Category (0 to 25) Energy Radiated from Electric Equipment
-		FArray1D< Real64 > EELost; // Category (0 to 25) Energy from Electric Equipment (lost)
-		FArray1D< Real64 > EELatent; // Category (0 to 25) Latent Energy from Electric Equipment
+		Array1D< Real64 > EEConvected; // Category (0 to 25) Energy Convected from Electric Equipment
+		Array1D< Real64 > EERadiated; // Category (0 to 25) Energy Radiated from Electric Equipment
+		Array1D< Real64 > EELost; // Category (0 to 25) Energy from Electric Equipment (lost)
+		Array1D< Real64 > EELatent; // Category (0 to 25) Latent Energy from Electric Equipment
 
 		// Default Constructor
 		ZoneCatEUseData() :
@@ -4404,10 +4409,10 @@ namespace DataHeatBalance {
 
 		// Member Constructor
 		ZoneCatEUseData(
-			FArray1< Real64 > const & EEConvected, // Category (0 to 25) Energy Convected from Electric Equipment
-			FArray1< Real64 > const & EERadiated, // Category (0 to 25) Energy Radiated from Electric Equipment
-			FArray1< Real64 > const & EELost, // Category (0 to 25) Energy from Electric Equipment (lost)
-			FArray1< Real64 > const & EELatent // Category (0 to 25) Latent Energy from Electric Equipment
+			Array1< Real64 > const & EEConvected, // Category (0 to 25) Energy Convected from Electric Equipment
+			Array1< Real64 > const & EERadiated, // Category (0 to 25) Energy Radiated from Electric Equipment
+			Array1< Real64 > const & EELost, // Category (0 to 25) Energy from Electric Equipment (lost)
+			Array1< Real64 > const & EELatent // Category (0 to 25) Latent Energy from Electric Equipment
 		) :
 			EEConvected( {0,25}, EEConvected ),
 			EERadiated( {0,25}, EERadiated ),
@@ -5644,59 +5649,64 @@ namespace DataHeatBalance {
 	};
 
 	// Object Data
-	extern FArray1D< ZonePreDefRepType > ZonePreDefRep;
+	extern Array1D< ZonePreDefRepType > ZonePreDefRep;
 	extern ZonePreDefRepType BuildingPreDefRep; //Autodesk:Note Removed explicit constructor that was missing some entries
-	extern FArray1D< ZoneSimData > ZoneIntGain;
-	extern FArray1D< MaterialProperties > Material;
-	extern FArray1D< GapSupportPillar > SupportPillar;
-	extern FArray1D< GapDeflectionState > DeflectionState;
-	extern FArray1D< ConstructionData > Construct;
-	extern FArray1D< SpectralDataProperties > SpectralData;
-	extern FArray1D< ZoneData > Zone;
-	extern FArray1D< ZoneListData > ZoneList;
-	extern FArray1D< ZoneGroupData > ZoneGroup;
-	extern FArray1D< PeopleData > People;
-	extern FArray1D< LightsData > Lights;
-	extern FArray1D< ZoneEquipData > ZoneElectric;
-	extern FArray1D< ZoneEquipData > ZoneGas;
-	extern FArray1D< ZoneEquipData > ZoneOtherEq;
-	extern FArray1D< ZoneEquipData > ZoneHWEq;
-	extern FArray1D< ZoneEquipData > ZoneSteamEq;
-	extern FArray1D< ITEquipData > ZoneITEq;
-	extern FArray1D< BBHeatData > ZoneBBHeat;
-	extern FArray1D< InfiltrationData > Infiltration;
-	extern FArray1D< VentilationData > Ventilation;
-	extern FArray1D< ZoneAirBalanceData > ZoneAirBalance;
-	extern FArray1D< MixingData > Mixing;
-	extern FArray1D< MixingData > CrossMixing;
-	extern FArray1D< MixingData > RefDoorMixing;
-	extern FArray1D< WindowBlindProperties > Blind;
-	extern FArray1D< WindowComplexShade > ComplexShade;
-	extern FArray1D< WindowThermalModelParams > WindowThermalModel;
-	extern FArray1D< SurfaceScreenProperties > SurfaceScreens;
-	extern FArray1D< ScreenTransData > ScreenTrans;
-	extern FArray1D< ZoneCatEUseData > ZoneIntEEuse;
-	extern FArray1D< RefrigCaseCreditData > RefrigCaseCredit;
-	extern FArray1D< HeatReclaimRefrigeratedRackData > HeatReclaimRefrigeratedRack;
-	extern FArray1D< HeatReclaimRefrigCondenserData > HeatReclaimRefrigCondenser;
-	extern FArray1D< HeatReclaimDXCoilData > HeatReclaimDXCoil;
-	extern FArray1D< AirReportVars > ZnAirRpt;
-	extern FArray1D< TCGlazingsType > TCGlazings;
-	extern FArray1D< ZoneEquipData > ZoneCO2Gen;
-	extern FArray1D< GlobalInternalGainMiscObject > PeopleObjects;
-	extern FArray1D< GlobalInternalGainMiscObject > LightsObjects;
-	extern FArray1D< GlobalInternalGainMiscObject > ZoneElectricObjects;
-	extern FArray1D< GlobalInternalGainMiscObject > ZoneGasObjects;
-	extern FArray1D< GlobalInternalGainMiscObject > HotWaterEqObjects;
-	extern FArray1D< GlobalInternalGainMiscObject > SteamEqObjects;
-	extern FArray1D< GlobalInternalGainMiscObject > OtherEqObjects;
-	extern FArray1D< GlobalInternalGainMiscObject > InfiltrationObjects;
-	extern FArray1D< GlobalInternalGainMiscObject > VentilationObjects;
-	extern FArray1D< ZoneReportVars > ZnRpt;
-	extern FArray1D< ZoneMassConservationData > MassConservation;
+	extern Array1D< ZoneSimData > ZoneIntGain;
+	extern Array1D< MaterialProperties > Material;
+	extern Array1D< GapSupportPillar > SupportPillar;
+	extern Array1D< GapDeflectionState > DeflectionState;
+	extern Array1D< ConstructionData > Construct;
+	extern Array1D< SpectralDataProperties > SpectralData;
+	extern Array1D< ZoneData > Zone;
+	extern Array1D< ZoneListData > ZoneList;
+	extern Array1D< ZoneGroupData > ZoneGroup;
+	extern Array1D< PeopleData > People;
+	extern Array1D< LightsData > Lights;
+	extern Array1D< ZoneEquipData > ZoneElectric;
+	extern Array1D< ZoneEquipData > ZoneGas;
+	extern Array1D< ZoneEquipData > ZoneOtherEq;
+	extern Array1D< ZoneEquipData > ZoneHWEq;
+	extern Array1D< ZoneEquipData > ZoneSteamEq;
+	extern Array1D< ITEquipData > ZoneITEq;
+	extern Array1D< BBHeatData > ZoneBBHeat;
+	extern Array1D< InfiltrationData > Infiltration;
+	extern Array1D< VentilationData > Ventilation;
+	extern Array1D< ZoneAirBalanceData > ZoneAirBalance;
+	extern Array1D< MixingData > Mixing;
+	extern Array1D< MixingData > CrossMixing;
+	extern Array1D< MixingData > RefDoorMixing;
+	extern Array1D< WindowBlindProperties > Blind;
+	extern Array1D< WindowComplexShade > ComplexShade;
+	extern Array1D< WindowThermalModelParams > WindowThermalModel;
+	extern Array1D< SurfaceScreenProperties > SurfaceScreens;
+	extern Array1D< ScreenTransData > ScreenTrans;
+	extern Array1D< ZoneCatEUseData > ZoneIntEEuse;
+	extern Array1D< RefrigCaseCreditData > RefrigCaseCredit;
+	extern Array1D< HeatReclaimRefrigeratedRackData > HeatReclaimRefrigeratedRack;
+	extern Array1D< HeatReclaimRefrigCondenserData > HeatReclaimRefrigCondenser;
+	extern Array1D< HeatReclaimDXCoilData > HeatReclaimDXCoil;
+	extern Array1D< AirReportVars > ZnAirRpt;
+	extern Array1D< TCGlazingsType > TCGlazings;
+	extern Array1D< ZoneEquipData > ZoneCO2Gen;
+	extern Array1D< GlobalInternalGainMiscObject > PeopleObjects;
+	extern Array1D< GlobalInternalGainMiscObject > LightsObjects;
+	extern Array1D< GlobalInternalGainMiscObject > ZoneElectricObjects;
+	extern Array1D< GlobalInternalGainMiscObject > ZoneGasObjects;
+	extern Array1D< GlobalInternalGainMiscObject > HotWaterEqObjects;
+	extern Array1D< GlobalInternalGainMiscObject > SteamEqObjects;
+	extern Array1D< GlobalInternalGainMiscObject > OtherEqObjects;
+	extern Array1D< GlobalInternalGainMiscObject > InfiltrationObjects;
+	extern Array1D< GlobalInternalGainMiscObject > VentilationObjects;
+	extern Array1D< ZoneReportVars > ZnRpt;
+	extern Array1D< ZoneMassConservationData > MassConservation;
 	extern ZoneAirMassFlowConservation ZoneAirMassFlow;
 
 	// Functions
+
+	// Clears the global data in DataHeatBalance.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 	void
 	CheckAndSetConstructionProperties(
@@ -5736,7 +5746,7 @@ namespace DataHeatBalance {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

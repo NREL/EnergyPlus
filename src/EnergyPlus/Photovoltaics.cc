@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -83,7 +83,7 @@ namespace Photovoltaics {
 	// DERIVED TYPE DEFINITIONS:
 	//   see DataPhotovoltaics.cc
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE Photovoltaics
 
@@ -101,11 +101,11 @@ namespace Photovoltaics {
 
 	void
 	SimPVGenerator(
-		int const GeneratorType, // type of Generator !unused1208
+		int const EP_UNUSED( GeneratorType ), // type of Generator !unused1208
 		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlag, // is PV ON or OFF as determined by schedules in ElecLoadCenter
-		Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on" !unused1208
+		Real64 const EP_UNUSED( PVLoad ) // electrical load on the PV (not really used... PV models assume "full on" !unused1208
 	)
 	{
 
@@ -129,7 +129,6 @@ namespace Photovoltaics {
 		using InputProcessor::FindItemInList;
 		//unused0909  USE DataEnvironment, ONLY : EnvironmentName, DayOfYear
 		//unused0909  USE DataGlobals, ONLY: BeginEnvrnFlag, EndEnvrnFlag
-		using DataGlobalConstants::iGeneratorPV;
 		using General::TrimSigDigits;
 
 		// Locals
@@ -155,7 +154,7 @@ namespace Photovoltaics {
 		}
 
 		if ( GeneratorIndex == 0 ) {
-			PVnum = FindItemInList( GeneratorName, PVarray.Name(), NumPVs );
+			PVnum = FindItemInList( GeneratorName, PVarray );
 			if ( PVnum == 0 ) {
 				ShowFatalError( "SimPhotovoltaicGenerator: Specified PV not one of valid Photovoltaic Generators " + GeneratorName );
 			}
@@ -203,7 +202,7 @@ namespace Photovoltaics {
 
 	void
 	GetPVGeneratorResults(
-		int const GeneratorType, // type of Generator !unused1208
+		int const EP_UNUSED( GeneratorType ), // type of Generator !unused1208
 		int const GeneratorIndex,
 		Real64 & GeneratorPower, // electrical power
 		Real64 & GeneratorEnergy, // electrical energy
@@ -288,15 +287,9 @@ namespace Photovoltaics {
 		using InputProcessor::FindItemInList;
 		using InputProcessor::SameString;
 		using namespace DataIPShortCuts;
-		using DataGlobals::DegToRadians;
 		using DataGlobals::KelvinConv;
 		//unused0909  USE DataEnvironment, ONLY: Longitude, TimeZoneMeridian
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
-		using DataSurfaces::ExternalEnvironment;
-		using DataSurfaces::SurfaceClass_Shading;
-		using DataSurfaces::SurfaceClass_Detached_F;
-		using DataSurfaces::SurfaceClass_Detached_B;
 		using namespace DataHeatBalance;
 		using ScheduleManager::GetScheduleIndex;
 		using TranspiredCollector::GetTranspiredCollectorIndex;
@@ -329,9 +322,9 @@ namespace Photovoltaics {
 		int dupPtr;
 
 		// Object Data
-		FArray1D< SimplePVParamsStruct > tmpSimpleModuleParams; // temporary, for processing input data
-		FArray1D< TRNSYSPVModuleParamsStruct > tmpTNRSYSModuleParams; // temporary, for processing input data
-		FArray1D< SNLModuleParamsStuct > tmpSNLModuleParams; // temporary, for processing input data
+		Array1D< SimplePVParamsStruct > tmpSimpleModuleParams; // temporary, for processing input data
+		Array1D< TRNSYSPVModuleParamsStruct > tmpTNRSYSModuleParams; // temporary, for processing input data
+		Array1D< SNLModuleParamsStuct > tmpSNLModuleParams; // temporary, for processing input data
 
 		// count how many photovoltaic arrays of different types are in the .idf
 		NumPVs = GetNumObjectsFound( cPVGeneratorObjectName );
@@ -352,7 +345,7 @@ namespace Photovoltaics {
 			GetObjectItem( cCurrentModuleObject, PVnum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PVarray.Name(), PVnum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), PVarray, PVnum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -360,7 +353,7 @@ namespace Photovoltaics {
 			PVarray( PVnum ).Name = cAlphaArgs( 1 );
 
 			PVarray( PVnum ).SurfaceName = cAlphaArgs( 2 );
-			PVarray( PVnum ).SurfacePtr = FindItemInList( cAlphaArgs( 2 ), Surface.Name(), TotSurfaces );
+			PVarray( PVnum ).SurfacePtr = FindItemInList( cAlphaArgs( 2 ), Surface );
 			// required-surface
 			if ( lAlphaFieldBlanks( 2 ) ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
@@ -452,7 +445,7 @@ namespace Photovoltaics {
 			{ auto const SELECT_CASE_var( PVarray( PVnum ).CellIntegrationMode );
 
 			if ( ( SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration ) || ( SELECT_CASE_var == iTranspiredCollectorCellIntegration ) || ( SELECT_CASE_var == iExteriorVentedCavityCellIntegration ) ) {
-				dupPtr = FindItemInList( PVarray( PVnum ).SurfaceName, PVarray( {PVnum + 1,NumPVs} ).SurfaceName(), ( NumPVs - PVnum ) );
+				dupPtr = FindItemInList( PVarray( PVnum ).SurfaceName, PVarray( {PVnum + 1,NumPVs} ), &PVArrayStruct::SurfaceName );
 				if ( dupPtr != 0 ) dupPtr += PVnum; // to correct for shortened array in find item
 				if ( dupPtr != 0 ) {
 					if ( PVarray( dupPtr ).CellIntegrationMode == iSurfaceOutsideFaceCellIntegration ) {
@@ -482,7 +475,7 @@ namespace Photovoltaics {
 				GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), tmpSimpleModuleParams.Name(), ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), tmpSimpleModuleParams, ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) { //repeat or blank name so don't add
 					ErrorsFound = true;
 					continue;
@@ -527,7 +520,7 @@ namespace Photovoltaics {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), tmpTNRSYSModuleParams.Name(), ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), tmpTNRSYSModuleParams, ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) { //repeat or blank name so don't add
 					ErrorsFound = true;
 					continue;
@@ -582,7 +575,7 @@ namespace Photovoltaics {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), tmpSNLModuleParams.name(), ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), tmpSNLModuleParams, &SNLModuleParamsStuct::name, ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) { //repeat or blank name so don't add
 					ErrorsFound = true;
 					continue;
@@ -639,7 +632,7 @@ namespace Photovoltaics {
 
 			if ( SELECT_CASE_var == iSimplePVModel ) {
 
-				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpSimpleModuleParams.Name(), NumSimplePVModuleTypes );
+				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpSimpleModuleParams );
 				if ( ThisParamObj > 0 ) {
 					PVarray( PVnum ).SimplePVModule = tmpSimpleModuleParams( ThisParamObj ); //entire structure assignment
 
@@ -653,7 +646,7 @@ namespace Photovoltaics {
 
 			} else if ( SELECT_CASE_var == iTRNSYSPVModel ) {
 
-				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpTNRSYSModuleParams.Name(), Num1DiodePVModuleTypes );
+				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpTNRSYSModuleParams );
 				if ( ThisParamObj > 0 ) {
 					PVarray( PVnum ).TRNSYSPVModule = tmpTNRSYSModuleParams( ThisParamObj ); //entire structure assignment
 				} else {
@@ -664,7 +657,7 @@ namespace Photovoltaics {
 
 			} else if ( SELECT_CASE_var == iSandiaPVModel ) {
 
-				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpSNLModuleParams.name(), NumSNLPVModuleTypes );
+				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpSNLModuleParams, &SNLModuleParamsStuct::name );
 				if ( ThisParamObj > 0 ) {
 					PVarray( PVnum ).SNLPVModule = tmpSNLModuleParams( ThisParamObj ); //entire structure assignment
 				} else {
@@ -723,7 +716,7 @@ namespace Photovoltaics {
 	void
 	CalcSimplePV(
 		int const thisPV,
-		bool const RunFlag // unused1208
+		bool const EP_UNUSED( RunFlag ) // unused1208
 	)
 	{
 
@@ -1097,7 +1090,6 @@ namespace Photovoltaics {
 		// Using/Aliasing
 		using DataHeatBalance::QRadSWOutIncident;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataHVACGlobals::TimeStepSys;
 		using DataGlobals::TimeStep;
@@ -1120,7 +1112,7 @@ namespace Photovoltaics {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 
 		// perform the one time initializations
@@ -1203,7 +1195,6 @@ namespace Photovoltaics {
 		Real64 const EPS( 0.001 );
 		Real64 const ERR( 0.001 );
 		Real64 const MinInsolation( 30.0 );
-		int const CCMAX( 10 );
 		int const KMAX( 100 );
 		Real64 const EtaIni( 0.10 ); // initial value of eta
 
@@ -1485,7 +1476,6 @@ namespace Photovoltaics {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const CCMAX( 10 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2653,7 +2643,6 @@ namespace Photovoltaics {
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::ExtVentedCavity;
 		using DataSurfaces::TotExtVentCav;
 
@@ -2756,7 +2745,7 @@ namespace Photovoltaics {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

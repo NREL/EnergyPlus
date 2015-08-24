@@ -4,8 +4,8 @@
 #include <vector>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -162,10 +162,6 @@ namespace PlantCondLoopOperation {
 		int NumEquipLists; // number of equipment lists
 		//Error control flags
 		bool foundlist; // equipment list found
-		bool UpperLimitTooLow; // error processing
-		Real64 HighestRange; // error processing
-		static int TooLowIndex( 0 ); // error processing
-		static int NotTooLowIndex( 0 ); // error processing
 		int NumCompsOnList;
 		int CompIndex;
 		int EquipBranchNum;
@@ -358,7 +354,7 @@ namespace PlantCondLoopOperation {
 		std::string PlantOpSchemeName; // Name of the plant or condenser operating scheme
 		std::string CurrentModuleObject; // for ease in renaming
 		std::string PlantLoopObject; // for ease in renaming
-		FArray1D_string OpSchemeNames; // Used to verify unique op scheme names
+		Array1D_string OpSchemeNames; // Used to verify unique op scheme names
 		bool IsNotOK;
 		bool IsBlank;
 		bool ErrorsFound; // Passed in from OpSchemeInput
@@ -573,7 +569,7 @@ namespace PlantCondLoopOperation {
 		int NumSchemeLists;
 		int LoopNum;
 		std::string CurrentModuleObject; // for ease in renaming.
-		FArray1D_string TempVerifyNames;
+		Array1D_string TempVerifyNames;
 
 		ErrorsFound = false; //DSU CS
 
@@ -803,12 +799,12 @@ namespace PlantCondLoopOperation {
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > NumArray; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > NumArray; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		//   certain object in the input file
 		int Num;
@@ -988,12 +984,12 @@ namespace PlantCondLoopOperation {
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > NumArray; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > NumArray; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		//   certain object in the input file
 		int Num;
@@ -1119,9 +1115,9 @@ namespace PlantCondLoopOperation {
 		bool IsNotOK;
 		std::string CurrentModuleObject;
 		static int TotNumLists( 0 );
-		static FArray1D_string EquipListsNameList;
-		static FArray1D_int EquipListsTypeList;
-		static FArray1D_int EquipListsIndexList;
+		static Array1D_string EquipListsNameList;
+		static Array1D_int EquipListsTypeList;
+		static Array1D_int EquipListsIndexList;
 		int iIndex;
 		bool firstblank;
 
@@ -1531,7 +1527,6 @@ namespace PlantCondLoopOperation {
 		using InputProcessor::FindItemInList;
 
 		using DataRuntimeLanguage::EMSProgramCallManager;
-		using DataRuntimeLanguage::NumProgramCallManagers;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1592,7 +1587,7 @@ namespace PlantCondLoopOperation {
 						SetupEMSInternalVariable( "Component Remaining Current Demand Rate", PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + ':' + PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).Name, "[W]", PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).EMSIntVarRemainingLoadValue );
 					}
 				}
-				StackMngrNum = FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager.Name(), NumProgramCallManagers );
+				StackMngrNum = FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
 				if ( StackMngrNum > 0 ) { // found it
 					PlantLoop( LoopNum ).OpScheme( SchemeNum ).ErlSimProgramMngr = StackMngrNum;
 				} else {
@@ -1602,7 +1597,7 @@ namespace PlantCondLoopOperation {
 					ErrorsFound = true;
 				}
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					StackMngrNum = FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager.Name(), NumProgramCallManagers );
+					StackMngrNum = FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						PlantLoop( LoopNum ).OpScheme( SchemeNum ).ErlInitProgramMngr = StackMngrNum;
 					} else {
@@ -1677,7 +1672,6 @@ namespace PlantCondLoopOperation {
 		int CompNum;
 		int Index;
 		int OpSchemePtr;
-		int SchemeNum;
 		int thisSchemeNum;
 		int SchemeType;
 		static bool MyOneTimeFlag( true );
@@ -1688,7 +1682,6 @@ namespace PlantCondLoopOperation {
 		int ThisTypeOfNum;
 		int CompOpNum;
 		int OldNumOpSchemes;
-		int OldNumEquipLists;
 		int NewNumEquipLists;
 		int NewNumOpSchemes;
 		int NumSearchResults;
@@ -2835,7 +2828,7 @@ namespace PlantCondLoopOperation {
 		int const CurCompLevelOpNum, // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
 		int const CurSchemePtr,
 		Real64 const LoopDemand,
-		Real64 & RemLoopDemand
+		Real64 & EP_UNUSED( RemLoopDemand )
 	)
 	{
 
@@ -2872,7 +2865,6 @@ namespace PlantCondLoopOperation {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CompPtr;
-		int ListPtr;
 
 		auto & this_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ) );
 
@@ -2944,23 +2936,21 @@ namespace PlantCondLoopOperation {
 		int ReferenceNodeNum;
 		Real64 NodeTemperature;
 
-		OperationScheme: { auto const SELECT_CASE_var( CurSchemeType );
-
-		if ( SELECT_CASE_var == DryBulbTDBOpSchemeType ) { // drybulb temp based controls
+		if ( CurSchemeType == DryBulbTDBOpSchemeType ) { // drybulb temp based controls
 			ReferenceNodeNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).ReferenceNodeNumber;
 			NodeTemperature = Node( ReferenceNodeNum ).Temp;
 			FindRangeVariable = NodeTemperature - OutDryBulbTemp;
-		} else if ( SELECT_CASE_var == WetBulbTDBOpSchemeType ) { // wetbulb temp based controls
+		} else if ( CurSchemeType == WetBulbTDBOpSchemeType ) { // wetbulb temp based controls
 			ReferenceNodeNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).ReferenceNodeNumber;
 			NodeTemperature = Node( ReferenceNodeNum ).Temp;
 			FindRangeVariable = NodeTemperature - OutWetBulbTemp;
-		} else if ( SELECT_CASE_var == DewPointTDBOpSchemeType ) { // dewpoint temp based controls
+		} else if ( CurSchemeType == DewPointTDBOpSchemeType ) { // dewpoint temp based controls
 			ReferenceNodeNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).ReferenceNodeNumber;
 			NodeTemperature = Node( ReferenceNodeNum ).Temp;
 			FindRangeVariable = NodeTemperature - OutDewPointTemp;
 		} else {
 			assert( false );
-		}} // OperationScheme
+		} // OperationScheme
 
 		return FindRangeVariable;
 
@@ -3178,7 +3168,8 @@ namespace PlantCondLoopOperation {
 						UniqueIDName = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Name;
 						ActuatorType = "On/Off Supervisory";
 						SetupEMSActuator( ActuatorName, UniqueIDName, ActuatorType, Units, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).EMSCtrlOverrideOn, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).EMSCtrlOverrideValue );
-					} else if ( LoopSideNum == DemandSide ) {
+					}
+					else if ( LoopSideNum == DemandSide ) {
 						ActuatorName = "Demand Side Branch";
 						UniqueIDName = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Name;
 						ActuatorType = "On/Off Supervisory";
@@ -3393,7 +3384,7 @@ namespace PlantCondLoopOperation {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

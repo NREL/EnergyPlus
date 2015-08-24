@@ -5,9 +5,10 @@
 #include <functional>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2A.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1S.hh>
+#include <ObjexxFCL/Array2A.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -45,10 +46,10 @@ namespace General {
 		int const MaxIte, // maximum number of allowed iterations
 		int & Flag, // integer storing exit status
 		Real64 & XRes, // value of x that solves f(x [,Par]) = 0
-		std::function< Real64( Real64 const, FArray1< Real64 > const & ) > f,
+		std::function< Real64( Real64 const, Array1< Real64 > const & ) > f,
 		Real64 const X_0, // 1st bound of interval that contains the solution
 		Real64 const X_1, // 2nd bound of interval that contains the solution
-		FArray1< Real64 > const & Par // array with additional parameters used for function evaluation
+		Array1< Real64 > const & Par // array with additional parameters used for function evaluation
 	);
 
 	void
@@ -72,27 +73,27 @@ namespace General {
 	Real64
 	InterpBlind(
 		Real64 const ProfAng, // Profile angle (rad)
-		FArray1A< Real64 > const PropArray // Array of blind properties
+		Array1A< Real64 > const PropArray // Array of blind properties
 	);
 
 	Real64
 	InterpProfAng(
 		Real64 const ProfAng, // Profile angle (rad)
-		FArray1S< Real64 > const PropArray // Array of blind properties
+		Array1S< Real64 > const PropArray // Array of blind properties
 	);
 
 //	Real64
 //	InterpSlatAng(
 //		Real64 const SlatAng, // Slat angle (rad)
 //		bool const VarSlats, // True if slat angle is variable
-//		FArray1A< Real64 > const PropArray // Array of blind properties as function of slat angle
+//		Array1A< Real64 > const PropArray // Array of blind properties as function of slat angle
 //	);
 
 	Real64
 	InterpSlatAng(
 		Real64 const SlatAng, // Slat angle (rad)
 		bool const VarSlats, // True if slat angle is variable
-		FArray1S< Real64 > const PropArray // Array of blind properties as function of slat angle
+		Array1S< Real64 > const PropArray // Array of blind properties as function of slat angle
 	);
 
 	Real64
@@ -100,7 +101,7 @@ namespace General {
 		Real64 const ProfAng, // Profile angle (rad)
 		Real64 const SlatAng, // Slat angle (rad)
 		bool const VarSlats, // True if variable-angle slats
-		FArray2A< Real64 > const PropArray // Array of blind properties
+		Array2A< Real64 > const PropArray // Array of blind properties
 	);
 
 	Real64
@@ -115,32 +116,32 @@ namespace General {
 	Real64
 	POLYF(
 		Real64 const X, // Cosine of angle of incidence
-		FArray1A< Real64 > const A // Polynomial coefficients
+		Array1A< Real64 > const A // Polynomial coefficients
 	);
 
 	Real64
 	POLYF(
 		Real64 const X, // Cosine of angle of incidence
-		FArray1< Real64 > const & A // Polynomial coefficients
+		Array1< Real64 > const & A // Polynomial coefficients
 	);
 
 	Real64
 	POLYF(
 		Real64 const X, // Cosine of angle of incidence
-		FArray1S< Real64 > const & A // Polynomial coefficients
+		Array1S< Real64 > const & A // Polynomial coefficients
 	);
 
 	Real64
 	POLY1F(
 		Real64 & X, // independent variable
-		FArray1A< Real64 > A, // array of polynomial coefficients
+		Array1A< Real64 > A, // array of polynomial coefficients
 		int & N // number of terms in polynomial
 	);
 
 	Real64
 	POLY2F(
 		Real64 & X, // independent variable
-		FArray1A< Real64 > A, // array of polynomial coefficients
+		Array1A< Real64 > A, // array of polynomial coefficients
 		int & N // number of terms in polynomial
 	);
 
@@ -176,10 +177,10 @@ namespace General {
 
 	void
 	MovingAvg(
-		FArray1A< Real64 > const DataIn, // input data that needs smoothing
+		Array1A< Real64 > const DataIn, // input data that needs smoothing
 		int const NumDataItems, // number of values in DataIn
 		int const NumItemsInAvg, // number of items in the averaging window
-		FArray1A< Real64 > SmoothedData // output data after smoothing
+		Array1A< Real64 > SmoothedData // output data after smoothing
 	);
 
 	void
@@ -246,8 +247,8 @@ namespace General {
 
 	void
 	Invert3By3Matrix(
-		FArray2A< Real64 > const A, // Input 3X3 Matrix
-		FArray2A< Real64 > InverseA // Output 3X3 Matrix - Inverse Of A
+		Array2A< Real64 > const A, // Input 3X3 Matrix
+		Array2A< Real64 > InverseA // Output 3X3 Matrix - Inverse Of A
 	);
 
 	void
@@ -265,7 +266,7 @@ namespace General {
 	int
 	FindNumberInList(
 		int const WhichNumber,
-		FArray1A_int const ListOfItems,
+		Array1A_int const ListOfItems,
 		int const NumItems
 	);
 
@@ -278,7 +279,7 @@ namespace General {
 		int const NumItems
 	)
 	{
-		return FindNumberInList( WhichNumber, FArray1D_int( ListOfItems ), NumItems );
+		return FindNumberInList( WhichNumber, Array1D_int( ListOfItems ), NumItems );
 	}
 
 	void
@@ -343,7 +344,7 @@ namespace General {
 	inline
 	void
 	ReallocateRealArray(
-		FArray1D< Real64 > & Array,
+		Array1D< Real64 > & Array,
 		int & ArrayMax, // Current and resultant dimension for Array
 		int const ArrayInc // increment for redimension
 	)
@@ -358,7 +359,7 @@ namespace General {
 		std::string const & ZoneName, // Zone Name associated
 		std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
 		std::string const & ItemName, // Item name (People, Lights, etc object)
-		FArray1S_string const ItemNames, // Item Names to check for duplication
+		Array1S_string const ItemNames, // Item Names to check for duplication
 		int const NumItems, // Number of items in ItemNames array
 		std::string & ResultName, // Resultant name
 		bool & errFlag // Error flag set to true if error found here.
@@ -379,12 +380,12 @@ namespace General {
 		bool & errFlag // Error flag set to true if error found here.
 	)
 	{
-		CheckCreatedZoneItemName( calledFrom, CurrentObject, ZoneName, MaxZoneNameLength, ItemName, FArray1D_string( ItemNames ), NumItems, ResultName, errFlag );
+		CheckCreatedZoneItemName( calledFrom, CurrentObject, ZoneName, MaxZoneNameLength, ItemName, Array1D_string( ItemNames ), NumItems, ResultName, errFlag );
 	}
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

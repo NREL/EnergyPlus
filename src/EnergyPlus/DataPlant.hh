@@ -2,7 +2,7 @@
 #define DataPlant_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/Optional.hh>
 
@@ -126,7 +126,7 @@ namespace DataPlant {
 	extern int const SupplySide;
 	extern int const DemandSupply_Yes; // DSU
 
-	extern FArray1D_string const cLoopSideLocations;
+	extern Array1D_string const cLoopSideLocations;
 	// Parameters for economizer
 	extern int const Integrated;
 	extern int const NonIntegrated;
@@ -153,7 +153,7 @@ namespace DataPlant {
 	extern int const FlowUnlocked; // components request flow
 	extern int const FlowLocked; // components take their inlet flow
 
-	extern FArray1D_string const cLoopTypes;
+	extern Array1D_string const cLoopTypes;
 
 	// Pressure Routine Call Enumeration
 	extern int const PressureCall_Init;
@@ -165,14 +165,14 @@ namespace DataPlant {
 	extern int const Press_PumpPowerCorrection; // Only updating the pump power
 	extern int const Press_FlowCorrection; // Update pump flow rate based on pump curve
 	extern int const Press_FlowSimulation; // Full pressure network simulation
-	extern FArray1D_string const PressureSimType;
+	extern Array1D_string const PressureSimType;
 	// Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
 	extern int const NumSimPlantEquipTypes;
-	extern FArray1D_string const SimPlantEquipTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 ! demand side component | 39 ! demand side component | 40 ! demand side component | 41 ! demand side component | 42 ! demand side component | 43 ! demand side component | 44 ! demand side component' | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 | 70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 | 80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89
+	extern Array1D_string const SimPlantEquipTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 ! demand side component | 39 ! demand side component | 40 ! demand side component | 41 ! demand side component | 42 ! demand side component | 43 ! demand side component | 44 ! demand side component' | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 | 70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 | 80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89
 
-	extern FArray1D_string const ccSimPlantEquipTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 ! demand side component | 39 Demand Side Component | 40 Demand Side Component | 41 Demand Side Component | 42 Demand Side Component | 43 Demand Side Component | 44 Demand Side Component' | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 | 70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 | 80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89
+	extern Array1D_string const ccSimPlantEquipTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 ! demand side component | 39 Demand Side Component | 40 Demand Side Component | 41 Demand Side Component | 42 Demand Side Component | 43 Demand Side Component | 44 Demand Side Component' | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 | 70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 | 80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89
 
-	extern FArray1D_int const ValidLoopEquipTypes; // 01  BOILER:HOTWATER | 02  BOILER:STEAM | 03  CHILLER:ABSORPTION | 04  CHILLER:ABSORPTION:INDIRECT | 05  CHILLER:COMBUSTIONTURBINE | 06  CHILLER:CONSTANTCOP | 07  CHILLERHEATER:ABSORPTION:DIRECTFIRED | 08  CHILLER:ELECTRIC | 09  CHILLER:ELECTRIC:EIR | 10  CHILLER:ELECTRIC:REFORMULATEDEIR | 11  CHILLER:ENGINEDRIVEN | 12  COOLINGTOWER:SINGLESPEED | 13  COOLINGTOWER:TWOSPEED | 14  COOLINGTOWER:VARIABLESPEED | 15  GENERATOR:FUELCELL:EXHAUSTGASTOWATERHEATEXCHANGER | 16  WATERHEATER:HEATPUMP | 17  HEATPUMP:WATERTOWATER:EQUATIONFIT:COOLING | 18  HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING | 19  HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:COOLING | 20  HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:HEATING | 21  PIPE:ADIABATIC | 22  PIPE:ADIABATIC:STEAM | 23  PIPE:OUTDOOR | 24  PIPE:INDOOR | 25  PIPE:UNDERGROUND | 26  DISTRICTCOOLING | 27  DISTRICTHEATING | 28  THERMALSTORAGE:ICE:DETAILED | 29  THERMALSTORAGE:ICE:SIMPLE | 30  TEMPERINGVALVE | 31  WATERHEATER:MIXED | 32  WATERHEATER:STRATIFIED | 33  PUMP:VARIABLESPEED | 34  PUMP:CONSTANTSPEED | 35  PUMP:VARIABLESPEED:CONDENSATE | 36  HEADEREDPUMPS:VARIABLESPEED | 37  HEADEREDPUMPS:CONSTANTSPEED | 38  WATERUSE:CONNECTIONS | 39  COIL:COOLING:WATER | 40  COIL:COOLING:WATER:DETAILEDGEOMETRY | 41  COIL:HEATING:WATER | 42  COIL:HEATING:STEAM | 43  SOLARCOLLECTOR:FLATPLATE:WATER | 44  LOADPROFILE:PLANT | 45  GROUNDHEATEXCHANGER:VERTICAL | 46  GROUNDHEATEXCHANGER:SURFACE | 47  GROUNDHEATEXCHANGER:POND | 48  GENERATOR:MICROTURBINE | 49  GENERATOR:INTERNALCOMBUSTIONENGINE | 50  GENERATOR:COMBUSTIONTURBINE | 51  GENERATOR:MICROCHP | 52  GENERATOR:FUELCELL:STACKCOOLER | 53  FLUIDCOOLER:SINGLESPEED | 54  FLUIDCOOLER:TWOSPEED | 55  EVAPORATIVEFLUIDCOOLER:SINGLESPEED | 56  EVAPORATIVEFLUIDCOOLER:TWOSPEED | 57  THERMALSTORAGE:CHILLEDWATER:MIXED | 58  THERMALSTORAGE:CHILLEDWATER:STRATIFIED | 59  SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL | 60  ZONEHVAC:BASEBOARD:CONVECTIVE:WATER | 61  ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM | 62  ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER | 63  ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW | 64  ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW | 65 AirTerminal:SingleDuct:ConstantVolume:CooledBeam | 66  Coil:Heating:WaterToAirHeatPump:EquationFit | 67  Coil:Cooling:WaterTOAIRHeatPump:EquationFit | 68  Coil:Heating:WaterTOAIRHeatPump:ParameterEstimation | 69  Coil:Cooling:WaterTOAIRHeatPump:ParameterEstimation | 70  Refrigeration:Condenser:WaterCooled | 71  Refrigeration:CompressorRack | 72  AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed | 73  CHILLERHEATER:ABSORPTION:DOUBLEEFFECT | 74  PipingSystem:Underground:PipeCircuit | 75  SolarCollector:IntegralCollectorStorage | 76  Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit | 77  Coil:Cooling:WaterTOAIRHeatPump:VariableSpeedEquationFit | 78  PlantComponent:UserDefined | 79  Coil:UserDefined | 80  ZoneHVAC:ForcedAir:UserDefined | 81  AirTerminal:SingleDuct:UserDefined | 82  AirConditioner:VariableRefrigerantFlow | 83  GroundHeatExchanger:HorizontalTrench | 84  HeatExchanger:FluidToFluid | 85  PlantComponent:TemperatureSource | 86  PlantCentralGroundSourceWrapper | 87  AirloopHVAC:UnitarySystem | 88  Coil:Cooling:DX:SingleSpeed:ThermalStorage | 89  CoolingTower:VariableSpeed:Merkel
+	extern Array1D_int const ValidLoopEquipTypes; // 01  BOILER:HOTWATER | 02  BOILER:STEAM | 03  CHILLER:ABSORPTION | 04  CHILLER:ABSORPTION:INDIRECT | 05  CHILLER:COMBUSTIONTURBINE | 06  CHILLER:CONSTANTCOP | 07  CHILLERHEATER:ABSORPTION:DIRECTFIRED | 08  CHILLER:ELECTRIC | 09  CHILLER:ELECTRIC:EIR | 10  CHILLER:ELECTRIC:REFORMULATEDEIR | 11  CHILLER:ENGINEDRIVEN | 12  COOLINGTOWER:SINGLESPEED | 13  COOLINGTOWER:TWOSPEED | 14  COOLINGTOWER:VARIABLESPEED | 15  GENERATOR:FUELCELL:EXHAUSTGASTOWATERHEATEXCHANGER | 16  WATERHEATER:HEATPUMP:PUMPEDCONDENSER | 17  HEATPUMP:WATERTOWATER:EQUATIONFIT:COOLING | 18  HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING | 19  HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:COOLING | 20  HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:HEATING | 21  PIPE:ADIABATIC | 22  PIPE:ADIABATIC:STEAM | 23  PIPE:OUTDOOR | 24  PIPE:INDOOR | 25  PIPE:UNDERGROUND | 26  DISTRICTCOOLING | 27  DISTRICTHEATING | 28  THERMALSTORAGE:ICE:DETAILED | 29  THERMALSTORAGE:ICE:SIMPLE | 30  TEMPERINGVALVE | 31  WATERHEATER:MIXED | 32  WATERHEATER:STRATIFIED | 33  PUMP:VARIABLESPEED | 34  PUMP:CONSTANTSPEED | 35  PUMP:VARIABLESPEED:CONDENSATE | 36  HEADEREDPUMPS:VARIABLESPEED | 37  HEADEREDPUMPS:CONSTANTSPEED | 38  WATERUSE:CONNECTIONS | 39  COIL:COOLING:WATER | 40  COIL:COOLING:WATER:DETAILEDGEOMETRY | 41  COIL:HEATING:WATER | 42  COIL:HEATING:STEAM | 43  SOLARCOLLECTOR:FLATPLATE:WATER | 44  LOADPROFILE:PLANT | 45  GROUNDHEATEXCHANGER:VERTICAL | 46  GROUNDHEATEXCHANGER:SURFACE | 47  GROUNDHEATEXCHANGER:POND | 48  GENERATOR:MICROTURBINE | 49  GENERATOR:INTERNALCOMBUSTIONENGINE | 50  GENERATOR:COMBUSTIONTURBINE | 51  GENERATOR:MICROCHP | 52  GENERATOR:FUELCELL:STACKCOOLER | 53  FLUIDCOOLER:SINGLESPEED | 54  FLUIDCOOLER:TWOSPEED | 55  EVAPORATIVEFLUIDCOOLER:SINGLESPEED | 56  EVAPORATIVEFLUIDCOOLER:TWOSPEED | 57  THERMALSTORAGE:CHILLEDWATER:MIXED | 58  THERMALSTORAGE:CHILLEDWATER:STRATIFIED | 59  SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL | 60  ZONEHVAC:BASEBOARD:CONVECTIVE:WATER | 61  ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM | 62  ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER | 63  ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW | 64  ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW | 65 AirTerminal:SingleDuct:ConstantVolume:CooledBeam | 66  Coil:Heating:WaterToAirHeatPump:EquationFit | 67  Coil:Cooling:WaterTOAIRHeatPump:EquationFit | 68  Coil:Heating:WaterTOAIRHeatPump:ParameterEstimation | 69  Coil:Cooling:WaterTOAIRHeatPump:ParameterEstimation | 70  Refrigeration:Condenser:WaterCooled | 71  Refrigeration:CompressorRack | 72  AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed | 73  CHILLERHEATER:ABSORPTION:DOUBLEEFFECT | 74  PipingSystem:Underground:PipeCircuit | 75  SolarCollector:IntegralCollectorStorage | 76  Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit | 77  Coil:Cooling:WaterTOAIRHeatPump:VariableSpeedEquationFit | 78  PlantComponent:UserDefined | 79  Coil:UserDefined | 80  ZoneHVAC:ForcedAir:UserDefined | 81  AirTerminal:SingleDuct:UserDefined | 82  AirConditioner:VariableRefrigerantFlow | 83  GroundHeatExchanger:HorizontalTrench | 84  HeatExchanger:FluidToFluid | 85  PlantComponent:TemperatureSource | 86  PlantCentralGroundSourceWrapper | 87  AirloopHVAC:UnitarySystem | 88  Coil:Cooling:DX:SingleSpeed:ThermalStorage | 89  CoolingTower:VariableSpeed:Merkel
 
 	extern int const TypeOf_Other;
 	extern int const TypeOf_Boiler_Simple;
@@ -190,7 +190,8 @@ namespace DataPlant {
 	extern int const TypeOf_CoolingTower_TwoSpd;
 	extern int const TypeOf_CoolingTower_VarSpd;
 	extern int const TypeOf_Generator_FCExhaust;
-	extern int const TypeOf_HeatPumpWtrHeater;
+	extern int const TypeOf_HeatPumpWtrHeaterPumped;
+	extern int const TypeOf_HeatPumpWtrHeaterWrapped;
 	extern int const TypeOf_HPWaterEFCooling;
 	extern int const TypeOf_HPWaterEFHeating;
 	extern int const TypeOf_HPWaterPECooling;
@@ -269,7 +270,7 @@ namespace DataPlant {
 
 	// Parameters for General Equipment Types
 	extern int const NumGeneralEquipTypes;
-	extern FArray1D_string const GeneralEquipTypes;
+	extern Array1D_string const GeneralEquipTypes;
 
 	extern int const GenEquipTypes_Boiler;
 	extern int const GenEquipTypes_Chiller;
@@ -295,7 +296,7 @@ namespace DataPlant {
 	extern int const GenEquipTypes_PlantComponent;
 	extern int const GenEquipTypes_CentralHeatPumpSystem;
 
-	extern FArray1D_string const OpSchemeTypes; // long since Deprecated, remove?
+	extern Array1D_string const OpSchemeTypes; // long since Deprecated, remove?
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -315,7 +316,7 @@ namespace DataPlant {
 	//END TYPE TwoWayCommonPipeData
 
 	extern int const NumConvergenceHistoryTerms;
-	extern FArray1D< Real64 > const ConvergenceHistoryARR;
+	extern Array1D< Real64 > const ConvergenceHistoryARR;
 	extern Real64 const sum_ConvergenceHistoryARR;
 	extern Real64 const square_sum_ConvergenceHistoryARR;
 	extern Real64 const sum_square_ConvergenceHistoryARR;
@@ -345,16 +346,16 @@ namespace DataPlant {
 
 	extern bool AnyEMSPlantOpSchemesInModel;
 
-	extern FArray1D_int EconBranchNum; // Branch num on which economizer is placed
-	extern FArray1D_int EconCompNum; // Component num of economizer in the economizer branch
+	extern Array1D_int EconBranchNum; // Branch num on which economizer is placed
+	extern Array1D_int EconCompNum; // Component num of economizer in the economizer branch
 
-	extern FArray1D_bool CheckLoopEcon; // Flag for initializations
-	extern FArray1D_bool EconOn; // Flag specifying if economizer is ON
+	extern Array1D_bool CheckLoopEcon; // Flag for initializations
+	extern Array1D_bool EconOn; // Flag specifying if economizer is ON
 
-	extern FArray1D_bool SimSupplySide; // DSU, sim ctrl flag for plant supply sides
-	extern FArray1D_bool SimDemandSide; // DSU, sim ctrl flag for plant supply sides
+	extern Array1D_bool SimSupplySide; // DSU, sim ctrl flag for plant supply sides
+	extern Array1D_bool SimDemandSide; // DSU, sim ctrl flag for plant supply sides
 
-	extern FArray1D_bool LoadChangeDownStream; // sim control flag.
+	extern Array1D_bool LoadChangeDownStream; // sim control flag.
 
 	extern int PlantManageSubIterations; // tracks plant iterations to characterize solver
 	extern int PlantManageHalfLoopCalls; // tracks number of half loop calls
@@ -391,9 +392,9 @@ namespace DataPlant {
 		int CorrMixIndex; // Index of Mixer corresponding to this Splitter
 		std::string NodeNameIn; // Node name for the inlet to the splitter
 		int TotalOutletNodes; // Number of outlet nodes for the splitter
-		FArray1D_int NodeNumOut; // Node number for the outlet to the splitter
-		FArray1D_int BranchNumOut; // Reference number for branch connected to splitter outlet
-		FArray1D_string NodeNameOut; // Node name for the outlet to the splitter
+		Array1D_int NodeNumOut; // Node number for the outlet to the splitter
+		Array1D_int BranchNumOut; // Reference number for branch connected to splitter outlet
+		Array1D_string NodeNameOut; // Node name for the outlet to the splitter
 
 		// Default Constructor
 		SplitterData() :
@@ -417,9 +418,9 @@ namespace DataPlant {
 			int const CorrMixIndex, // Index of Mixer corresponding to this Splitter
 			std::string const & NodeNameIn, // Node name for the inlet to the splitter
 			int const TotalOutletNodes, // Number of outlet nodes for the splitter
-			FArray1_int const & NodeNumOut, // Node number for the outlet to the splitter
-			FArray1_int const & BranchNumOut, // Reference number for branch connected to splitter outlet
-			FArray1_string const & NodeNameOut // Node name for the outlet to the splitter
+			Array1_int const & NodeNumOut, // Node number for the outlet to the splitter
+			Array1_int const & BranchNumOut, // Reference number for branch connected to splitter outlet
+			Array1_string const & NodeNameOut // Node name for the outlet to the splitter
 		) :
 			Exists( Exists ),
 			Name( Name ),
@@ -449,9 +450,9 @@ namespace DataPlant {
 		int CorrSplitIndex; // Index of Splitter corresponding to this mixer
 		std::string NodeNameOut; // Node name for the outlet to the mixer
 		int TotalInletNodes; // Number of inlet nodes for the mixer
-		FArray1D_int NodeNumIn; // Node number for the inlet to the mixer
-		FArray1D_int BranchNumIn; // Reference number for branch connected to splitter outlet
-		FArray1D_string NodeNameIn; // Node name for the inlet to the mixer
+		Array1D_int NodeNumIn; // Node number for the inlet to the mixer
+		Array1D_int BranchNumIn; // Reference number for branch connected to splitter outlet
+		Array1D_string NodeNameIn; // Node name for the inlet to the mixer
 
 		// Default Constructor
 		MixerData() :
@@ -475,9 +476,9 @@ namespace DataPlant {
 			int const CorrSplitIndex, // Index of Splitter corresponding to this mixer
 			std::string const & NodeNameOut, // Node name for the outlet to the mixer
 			int const TotalInletNodes, // Number of inlet nodes for the mixer
-			FArray1_int const & NodeNumIn, // Node number for the inlet to the mixer
-			FArray1_int const & BranchNumIn, // Reference number for branch connected to splitter outlet
-			FArray1_string const & NodeNameIn // Node name for the inlet to the mixer
+			Array1_int const & NodeNumIn, // Node number for the inlet to the mixer
+			Array1_int const & BranchNumIn, // Reference number for branch connected to splitter outlet
+			Array1_string const & NodeNameIn // Node name for the inlet to the mixer
 		) :
 			Exists( Exists ),
 			Name( Name ),
@@ -576,7 +577,7 @@ namespace DataPlant {
 		int OpSchemePtr; // DSU points to OpScheme on plant loop:
 		// PlantLoop(LoopNum)%OpScheme(Optschemeptr)...
 		int NumEquipLists; // DSU ALLOCATABLE to the schedule (for valid schedules)
-		FArray1D< EquipListPtrData > EquipList; // DSU Component  list
+		Array1D< EquipListPtrData > EquipList; // DSU Component  list
 
 		// Default Constructor
 		OpSchemePtrData() :
@@ -588,7 +589,7 @@ namespace DataPlant {
 		OpSchemePtrData(
 			int const OpSchemePtr, // DSU points to OpScheme on plant loop:
 			int const NumEquipLists, // DSU ALLOCATABLE to the schedule (for valid schedules)
-			FArray1< EquipListPtrData > const & EquipList // DSU Component  list
+			Array1< EquipListPtrData > const & EquipList // DSU Component  list
 		) :
 			OpSchemePtr( OpSchemePtr ),
 			NumEquipLists( NumEquipLists ),
@@ -623,7 +624,7 @@ namespace DataPlant {
 		int NumOpSchemes; // number of schemes held in the pointer array
 		int CurCompLevelOpNum; // pointer to the OpScheme array defined next
 		// PlantLoop()%LoopSide()%Branch()%Comp()%OpScheme(curOpSchemePtr)
-		FArray1D< OpSchemePtrData > OpScheme; // Pointers to component on lists
+		Array1D< OpSchemePtrData > OpScheme; // Pointers to component on lists
 		Real64 EquipDemand; // Component load request based on inlet temp and outlet SP
 		bool EMSLoadOverrideOn; // EMS is calling to override load dispatched to component
 		Real64 EMSLoadOverrideValue; // EMS value to use for load when overridden [W] always positive.
@@ -695,7 +696,7 @@ namespace DataPlant {
 			int const CurOpSchemeType, // updated pointer to
 			int const NumOpSchemes, // number of schemes held in the pointer array
 			int const CurCompLevelOpNum, // pointer to the OpScheme array defined next
-			FArray1< OpSchemePtrData > const & OpScheme, // Pointers to component on lists
+			Array1< OpSchemePtrData > const & OpScheme, // Pointers to component on lists
 			Real64 const EquipDemand, // Component load request based on inlet temp and outlet SP
 			bool const EMSLoadOverrideOn, // EMS is calling to override load dispatched to component
 			Real64 const EMSLoadOverrideValue, // EMS value to use for load when overridden [W] always positive.
@@ -770,7 +771,7 @@ namespace DataPlant {
 		Real64 PumpSizFac;
 		bool EMSCtrlOverrideOn; // if true, EMS is calling to override branch operation avail
 		Real64 EMSCtrlOverrideValue; // value set by EMS system for branch override controls
-		FArray1D< CompData > Comp; // Component type list
+		Array1D< CompData > Comp; // Component type list
 		bool HasPressureComponents;
 		Real64 PressureDrop;
 		int PressureCurveType; // Either none, pressure curve, or generic curve
@@ -823,7 +824,7 @@ namespace DataPlant {
 			Real64 const PumpSizFac,
 			bool const EMSCtrlOverrideOn, // if true, EMS is calling to override branch operation avail
 			Real64 const EMSCtrlOverrideValue, // value set by EMS system for branch override controls
-			FArray1< CompData > const & Comp, // Component type list
+			Array1< CompData > const & Comp, // Component type list
 			bool const HasPressureComponents,
 			Real64 const PressureDrop,
 			int const PressureCurveType, // Either none, pressure curve, or generic curve
@@ -943,7 +944,7 @@ namespace DataPlant {
 		Real64 RangeUpperLimit; // for range based controls
 		Real64 RangeLowerLimit; // for range based controls
 		int NumComps; // ALLOCATABLE to the schedule (for valid schedules)
-		FArray1D< EquipListCompData > Comp; // Component type list
+		Array1D< EquipListCompData > Comp; // Component type list
 
 		// Default Constructor
 		EquipOpList() :
@@ -958,7 +959,7 @@ namespace DataPlant {
 			Real64 const RangeUpperLimit, // for range based controls
 			Real64 const RangeLowerLimit, // for range based controls
 			int const NumComps, // ALLOCATABLE to the schedule (for valid schedules)
-			FArray1< EquipListCompData > const & Comp // Component type list
+			Array1< EquipListCompData > const & Comp // Component type list
 		) :
 			Name( Name ),
 			RangeUpperLimit( RangeUpperLimit ),
@@ -980,7 +981,7 @@ namespace DataPlant {
 		bool Available; // TRUE = designated component or operation scheme available
 		int NumEquipLists; // number of equipment lists
 		int CurListPtr; // points to the current equipment list
-		FArray1D< EquipOpList > EquipList; // Component type list
+		Array1D< EquipOpList > EquipList; // Component type list
 		int EquipListNumForLastStage; // points to the equipment list with the highest upper limit
 		std::string ReferenceNodeName; // DELTA CTRL ONLY--for calculation of delta Temp
 		int ReferenceNodeNumber; // DELTA CTRL ONLY--for calculation of delta Temp
@@ -1013,7 +1014,7 @@ namespace DataPlant {
 			bool const Available, // TRUE = designated component or operation scheme available
 			int const NumEquipLists, // number of equipment lists
 			int const CurListPtr, // points to the current equipment list
-			FArray1< EquipOpList > const & EquipList, // Component type list
+			Array1< EquipOpList > const & EquipList, // Component type list
 			int const EquipListNumForLastStage, // points to the equipment list with the highest upper limit
 			std::string const & ReferenceNodeName, // DELTA CTRL ONLY--for calculation of delta Temp
 			int const ReferenceNodeNumber, // DELTA CTRL ONLY--for calculation of delta Temp
@@ -1103,8 +1104,8 @@ namespace DataPlant {
 	struct PlantConvergencePoint
 	{
 		// Members
-		FArray1D< Real64 > MassFlowRateHistory;
-		FArray1D< Real64 > TemperatureHistory;
+		Array1D< Real64 > MassFlowRateHistory;
+		Array1D< Real64 > TemperatureHistory;
 
 		// Default Constructor
 		PlantConvergencePoint() :
@@ -1114,8 +1115,8 @@ namespace DataPlant {
 
 		// Member Constructor
 		PlantConvergencePoint(
-			FArray1< Real64 > const & MassFlowRateHistory,
-			FArray1< Real64 > const & TemperatureHistory
+			Array1< Real64 > const & MassFlowRateHistory,
+			Array1< Real64 > const & TemperatureHistory
 		) :
 			MassFlowRateHistory( NumConvergenceHistoryTerms, MassFlowRateHistory ),
 			TemperatureHistory( NumConvergenceHistoryTerms, TemperatureHistory )
@@ -1165,7 +1166,7 @@ namespace DataPlant {
 		bool MixerExists; // Logical Flag indication mixer exists in the half loop
 		int TotalPumps; // total number of pumps on the half loop
 		bool BranchPumpsExist; // logical flag indication branch pumps exist on half loop
-		FArray1D< LoopSidePumpInformation > Pumps;
+		Array1D< LoopSidePumpInformation > Pumps;
 		Real64 TotalPumpHeat; // [W] total heat addition by the pumps to place in "tank"
 		bool BypassExists;
 		bool InletNodeSetPt;
@@ -1176,10 +1177,10 @@ namespace DataPlant {
 		// is less than max available flow at inlet
 		int FlowLock; // DSU
 		int TotalConnected; // total number of other loops connected to this loop side
-		FArray1D< ConnectedLoopData > Connected; // DSU Other loops connected to this Loop side
-		FArray1D< BranchData > Branch; // Branch data
-		FArray1D< SplitterData > Splitter; // Data for splitter on branch (if any)
-		FArray1D< MixerData > Mixer; // Data for splitter on branch (if any)
+		Array1D< ConnectedLoopData > Connected; // DSU Other loops connected to this Loop side
+		Array1D< BranchData > Branch; // Branch data
+		Array1D< SplitterData > Splitter; // Data for splitter on branch (if any)
+		Array1D< MixerData > Mixer; // Data for splitter on branch (if any)
 		bool HasPressureComponents;
 		bool HasParallelPressComps;
 		Real64 PressureDrop;
@@ -1267,7 +1268,7 @@ namespace DataPlant {
 			bool const MixerExists, // Logical Flag indication mixer exists in the half loop
 			int const TotalPumps, // total number of pumps on the half loop
 			bool const BranchPumpsExist, // logical flag indication branch pumps exist on half loop
-			FArray1< LoopSidePumpInformation > const & Pumps,
+			Array1< LoopSidePumpInformation > const & Pumps,
 			Real64 const TotalPumpHeat, // [W] total heat addition by the pumps to place in "tank"
 			bool const BypassExists,
 			bool const InletNodeSetPt,
@@ -1277,10 +1278,10 @@ namespace DataPlant {
 			bool const FlowRestrictionFlag, // Max available flow at the outlet of the half loop
 			int const FlowLock, // DSU
 			int const TotalConnected, // total number of other loops connected to this loop side
-			FArray1< ConnectedLoopData > const & Connected, // DSU Other loops connected to this Loop side
-			FArray1< BranchData > const & Branch, // Branch data
-			FArray1< SplitterData > const & Splitter, // Data for splitter on branch (if any)
-			FArray1< MixerData > const & Mixer, // Data for splitter on branch (if any)
+			Array1< ConnectedLoopData > const & Connected, // DSU Other loops connected to this Loop side
+			Array1< BranchData > const & Branch, // Branch data
+			Array1< SplitterData > const & Splitter, // Data for splitter on branch (if any)
+			Array1< MixerData > const & Mixer, // Data for splitter on branch (if any)
 			bool const HasPressureComponents,
 			bool const HasParallelPressComps,
 			Real64 const PressureDrop,
@@ -1369,7 +1370,7 @@ namespace DataPlant {
 		int MaxTempErrIndex; // for recurring too hot errors
 		Real64 MinVolFlowRate; // Minimum flow rate allowed in the loop
 		Real64 MaxVolFlowRate; // Maximum flow rate allowed in the loop
-		bool MaxVolFlowRateWasAutoSized; // true if previous was set to autosized in the input 
+		bool MaxVolFlowRateWasAutoSized; // true if previous was set to autosized in the input
 		Real64 MinMassFlowRate; // Minimum flow rate allowed in the loop
 		Real64 MaxMassFlowRate; // Maximum flow rate allowed in the loop
 		Real64 Volume; // Volume of the fluid in the loop
@@ -1378,10 +1379,10 @@ namespace DataPlant {
 		bool EMSCtrl;
 		Real64 EMSValue;
 		// Loop Inlet and Outlet Nodes
-		FArray1D< HalfLoopData > LoopSide; // Half loop data (Demand side or Supply Side)
+		Array1D< HalfLoopData > LoopSide; // Half loop data (Demand side or Supply Side)
 		std::string OperationScheme; // Operation scheme name for the loop
 		int NumOpSchemes; // Number of items in list identified by "OpScheme"
-		FArray1D< OperationData > OpScheme; // Operation scheme data
+		Array1D< OperationData > OpScheme; // Operation scheme data
 		int LoadDistribution; // Load distribution scheme 1 for optimal, 2 for overloading
 		int PlantSizNum; // index to corresponding plant sizing data array
 		int LoopDemandCalcScheme; // Load distribution scheme 1 SingleSetPoint,
@@ -1466,7 +1467,7 @@ namespace DataPlant {
 			int const MaxTempErrIndex, // for recurring too hot errors
 			Real64 const MinVolFlowRate, // Minimum flow rate allowed in the loop
 			Real64 const MaxVolFlowRate, // Maximum flow rate allowed in the loop
-			bool const MaxVolFlowRateWasAutoSized, // true if previous was set to autosized in the input 
+			bool const MaxVolFlowRateWasAutoSized, // true if previous was set to autosized in the input
 			Real64 const MinMassFlowRate, // Minimum flow rate allowed in the loop
 			Real64 const MaxMassFlowRate, // Maximum flow rate allowed in the loop
 			Real64 const Volume, // Volume of the fluid in the loop
@@ -1474,10 +1475,10 @@ namespace DataPlant {
 			Real64 const Mass, // Mass of the fluid in the loop
 			bool const EMSCtrl,
 			Real64 const EMSValue,
-			FArray1< HalfLoopData > const & LoopSide, // Half loop data (Demand side or Supply Side)
+			Array1< HalfLoopData > const & LoopSide, // Half loop data (Demand side or Supply Side)
 			std::string const & OperationScheme, // Operation scheme name for the loop
 			int const NumOpSchemes, // Number of items in list identified by "OpScheme"
-			FArray1< OperationData > const & OpScheme, // Operation scheme data
+			Array1< OperationData > const & OpScheme, // Operation scheme data
 			int const LoadDistribution, // Load distribution scheme 1 for optimal, 2 for overloading
 			int const PlantSizNum, // index to corresponding plant sizing data array
 			int const LoopDemandCalcScheme, // Load distribution scheme 1 SingleSetPoint,
@@ -1637,9 +1638,9 @@ namespace DataPlant {
 		int AvailStatus; // system availability status
 		int StartTime; // cycle on time (in SimTimeSteps)
 		int StopTime; // cycle off time (in SimTimeSteps)
-		FArray1D_string AvailManagerName; // name of each availability manager
-		FArray1D_int AvailManagerType; // type of availability manager
-		FArray1D_int AvailManagerNum; // index of availability manager
+		Array1D_string AvailManagerName; // name of each availability manager
+		Array1D_int AvailManagerType; // type of availability manager
+		Array1D_int AvailManagerNum; // index of availability manager
 
 		// Default Constructor
 		PlantAvailMgrData() :
@@ -1655,9 +1656,9 @@ namespace DataPlant {
 			int const AvailStatus, // system availability status
 			int const StartTime, // cycle on time (in SimTimeSteps)
 			int const StopTime, // cycle off time (in SimTimeSteps)
-			FArray1_string const & AvailManagerName, // name of each availability manager
-			FArray1_int const & AvailManagerType, // type of availability manager
-			FArray1_int const & AvailManagerNum // index of availability manager
+			Array1_string const & AvailManagerName, // name of each availability manager
+			Array1_int const & AvailManagerType, // type of availability manager
+			Array1_int const & AvailManagerNum // index of availability manager
 		) :
 			NumAvailManagers( NumAvailManagers ),
 			AvailStatus( AvailStatus ),
@@ -1702,7 +1703,7 @@ namespace DataPlant {
 		Real64 DemandNotDispatched; // Plant Loop Demand that was not distributed [W]
 		Real64 UnmetDemand; // Plant Loop Unmet Demand [W]
 		// Loop side data
-		FArray1D< LoopSideReportVars > LoopSide;
+		Array1D< LoopSideReportVars > LoopSide;
 		Real64 BypassFrac; // Debug Variable
 		Real64 InletNodeFlowrate; // Debug Variable
 		Real64 InletNodeTemperature; // Debug Variable
@@ -1731,7 +1732,7 @@ namespace DataPlant {
 			Real64 const HeatingDemand, // Plant Loop Heating Demand[W]
 			Real64 const DemandNotDispatched, // Plant Loop Demand that was not distributed [W]
 			Real64 const UnmetDemand, // Plant Loop Unmet Demand [W]
-			FArray1< LoopSideReportVars > const & LoopSide,
+			Array1< LoopSideReportVars > const & LoopSide,
 			Real64 const BypassFrac, // Debug Variable
 			Real64 const InletNodeFlowrate, // Debug Variable
 			Real64 const InletNodeTemperature, // Debug Variable
@@ -1865,7 +1866,7 @@ namespace DataPlant {
 		Real64 Capacity;
 		Real64 Efficiency;
 		int OpMode;
-		FArray1D< MeterData > MeteredVar; // Index of energy output report data
+		Array1D< MeterData > MeteredVar; // Index of energy output report data
 		int AirSysToPlantPtr; // 0=No plant connection, >0 = index to AirSysToPlant array
 
 		// Default Constructor
@@ -1923,7 +1924,7 @@ namespace DataPlant {
 			Real64 const Capacity,
 			Real64 const Efficiency,
 			int const OpMode,
-			FArray1< MeterData > const & MeteredVar, // Index of energy output report data
+			Array1< MeterData > const & MeteredVar, // Index of energy output report data
 			int const AirSysToPlantPtr // 0=No plant connection, >0 = index to AirSysToPlant array
 		) :
 			TypeOf( TypeOf ),
@@ -1991,8 +1992,8 @@ namespace DataPlant {
 		Real64 PeakPlantSupplyOtherEff;
 		int AirSysToPlantPtr; // 0=No plant connection, >0 = index to AirSysToPlant array
 		Real64 LoopLoadFrac;
-		FArray1D< MeterData > MeteredVar; // Index of energy output report data
-		FArray1D< SubSubcomponentData > SubSubComp; // Component list
+		Array1D< MeterData > MeteredVar; // Index of energy output report data
+		Array1D< SubSubcomponentData > SubSubComp; // Component list
 
 		// Default Constructor
 		SubcomponentData() :
@@ -2056,8 +2057,8 @@ namespace DataPlant {
 			Real64 const PeakPlantSupplyOtherEff,
 			int const AirSysToPlantPtr, // 0=No plant connection, >0 = index to AirSysToPlant array
 			Real64 const LoopLoadFrac,
-			FArray1< MeterData > const & MeteredVar, // Index of energy output report data
-			FArray1< SubSubcomponentData > const & SubSubComp // Component list
+			Array1< MeterData > const & MeteredVar, // Index of energy output report data
+			Array1< SubSubcomponentData > const & SubSubComp // Component list
 		) :
 			TypeOf( TypeOf ),
 			Name( Name ),
@@ -2114,8 +2115,8 @@ namespace DataPlant {
 		Real64 TotPlantSupplyPurch;
 		Real64 TotPlantSupplyOther;
 		PlantConnection ConnectPlant; // Index of energy output report data
-		FArray1D< MeterData > MeteredVar; // Index of energy output report data
-		FArray1D< SubcomponentData > SubComp;
+		Array1D< MeterData > MeteredVar; // Index of energy output report data
+		Array1D< SubcomponentData > SubComp;
 
 		// Default Constructor
 		ReportCompData() :
@@ -2150,8 +2151,8 @@ namespace DataPlant {
 			Real64 const TotPlantSupplyPurch,
 			Real64 const TotPlantSupplyOther,
 			PlantConnection const & ConnectPlant, // Index of energy output report data
-			FArray1< MeterData > const & MeteredVar, // Index of energy output report data
-			FArray1< SubcomponentData > const & SubComp
+			Array1< MeterData > const & MeteredVar, // Index of energy output report data
+			Array1< SubcomponentData > const & SubComp
 		) :
 			Parent( Parent ),
 			TypeOf( TypeOf ),
@@ -2182,7 +2183,7 @@ namespace DataPlant {
 		int TotalComponents; // Total number of components on the branch
 		int NodeNumIn; // Branch inlet node number
 		int NodeNumOut; // Branch outlet node number
-		FArray1D< ReportCompData > Comp; // Component type list
+		Array1D< ReportCompData > Comp; // Component type list
 
 		// Default Constructor
 		ReportBranchData() :
@@ -2197,7 +2198,7 @@ namespace DataPlant {
 			int const TotalComponents, // Total number of components on the branch
 			int const NodeNumIn, // Branch inlet node number
 			int const NodeNumOut, // Branch outlet node number
-			FArray1< ReportCompData > const & Comp // Component type list
+			Array1< ReportCompData > const & Comp // Component type list
 		) :
 			Name( Name ),
 			TotalComponents( TotalComponents ),
@@ -2223,7 +2224,7 @@ namespace DataPlant {
 		int TotalBranches; // Total number of branches on the loop
 		Real64 LoopVentLoad;
 		Real64 VentLoadFrac;
-		FArray1D< ReportBranchData > Branch; // Branch data
+		Array1D< ReportBranchData > Branch; // Branch data
 
 		// Default Constructor
 		ReportLoopData() :
@@ -2252,7 +2253,7 @@ namespace DataPlant {
 			int const TotalBranches, // Total number of branches on the loop
 			Real64 const LoopVentLoad,
 			Real64 const VentLoadFrac,
-			FArray1< ReportBranchData > const & Branch // Branch data
+			Array1< ReportBranchData > const & Branch // Branch data
 		) :
 			Name( Name ),
 			NodeNumIn( NodeNumIn ),
@@ -2303,15 +2304,15 @@ namespace DataPlant {
 	};
 
 	// Object Data
-	extern FArray1D< PipeData > Pipe;
-	extern FArray1D< PlantLoopData > PlantLoop;
-	extern FArray1D< PlantAvailMgrData > PlantAvailMgr;
-	extern FArray1D< ReportVars > PlantReport;
-	extern FArray1D< ReportLoopData > VentRepPlantSupplySide;
-	extern FArray1D< ReportLoopData > VentRepPlantDemandSide;
-	extern FArray1D< ReportLoopData > VentRepCondSupplySide;
-	extern FArray1D< ReportLoopData > VentRepCondDemandSide;
-	extern FArray1D< PlantCallingOrderInfoStruct > PlantCallingOrderInfo;
+	extern Array1D< PipeData > Pipe;
+	extern Array1D< PlantLoopData > PlantLoop;
+	extern Array1D< PlantAvailMgrData > PlantAvailMgr;
+	extern Array1D< ReportVars > PlantReport;
+	extern Array1D< ReportLoopData > VentRepPlantSupplySide;
+	extern Array1D< ReportLoopData > VentRepPlantDemandSide;
+	extern Array1D< ReportLoopData > VentRepCondSupplySide;
+	extern Array1D< ReportLoopData > VentRepCondDemandSide;
+	extern Array1D< PlantCallingOrderInfoStruct > PlantCallingOrderInfo;
 
 	// Functions
 
@@ -2368,9 +2369,15 @@ namespace DataPlant {
 		Optional_bool_const SupressErrors = _ // used for WSHP's where condenser loop may not be on a plant loop
 	);
 
+	bool
+	verifyTwoNodeNumsOnSamePlantLoop(
+		int const nodeIndexA,
+		int const nodeIndexB
+	);
+
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

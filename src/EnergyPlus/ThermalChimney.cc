@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -73,9 +73,9 @@ namespace ThermalChimney {
 	// Utility routines for module
 
 	// Object Data
-	FArray1D< ThermalChimneyData > ThermalChimneySys;
-	FArray1D< ThermChimZnReportVars > ZnRptThermChim;
-	FArray1D< ThermChimReportVars > ThermalChimneyReport;
+	Array1D< ThermalChimneyData > ThermalChimneySys;
+	Array1D< ThermChimZnReportVars > ZnRptThermChim;
+	Array1D< ThermChimReportVars > ThermalChimneyReport;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -215,7 +215,7 @@ namespace ThermalChimney {
 			// First Alpha is Thermal Chimney Name
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ThermalChimneySys.Name(), Loop, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ThermalChimneySys, Loop, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) {
@@ -227,7 +227,7 @@ namespace ThermalChimney {
 			ThermalChimneySys( Loop ).Name = cAlphaArgs( 1 );
 
 			// Second Alpha is Zone Name
-			ThermalChimneySys( Loop ).RealZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			ThermalChimneySys( Loop ).RealZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ThermalChimneySys( Loop ).RealZonePtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid Zone" );
 				ShowContinueError( "invalid - not found " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -280,7 +280,7 @@ namespace ThermalChimney {
 			AllRatiosSummed = 0.0;
 			for ( TCZoneNum = 1; TCZoneNum <= ThermalChimneySys( Loop ).TotZoneToDistrib; ++TCZoneNum ) {
 				ThermalChimneySys( Loop ).ZoneName( TCZoneNum ) = cAlphaArgs( TCZoneNum + 3 );
-				ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) = FindItemInList( cAlphaArgs( TCZoneNum + 3 ), Zone.Name(), NumOfZones );
+				ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) = FindItemInList( cAlphaArgs( TCZoneNum + 3 ), Zone );
 				ThermalChimneySys( Loop ).DistanceThermChimInlet( TCZoneNum ) = rNumericArgs( 3 * TCZoneNum + 1 );
 				ThermalChimneySys( Loop ).RatioThermChimAirFlow( TCZoneNum ) = rNumericArgs( 3 * TCZoneNum + 2 );
 				if ( lNumericFieldBlanks( 3 * TCZoneNum + 2 ) ) ThermalChimneySys( Loop ).RatioThermChimAirFlow( TCZoneNum ) = 1.0;
@@ -485,8 +485,8 @@ namespace ThermalChimney {
 		// REAL(r64)                    :: OutletAirTempThermalChim
 		Real64 OverallThermalChimLength;
 		Real64 ThermChimTolerance;
-		FArray1D< Real64 > TempTCMassAirFlowRate( 10 ); // Temporary Value of Thermal Chimney Mass Flow Rate ()
-		FArray1D< Real64 > TempTCVolumeAirFlowRate( 10 ); // Temporary Value of Thermal Chimney Volume Flow Rate ()
+		Array1D< Real64 > TempTCMassAirFlowRate( 10 ); // Temporary Value of Thermal Chimney Mass Flow Rate ()
+		Array1D< Real64 > TempTCVolumeAirFlowRate( 10 ); // Temporary Value of Thermal Chimney Volume Flow Rate ()
 		int IterationLoop;
 		Real64 Process1; // Temporary Variable Used in the Middle of the Calculation
 		Real64 Process2; // Temporary Variable Used in the Middle of the Calculation
@@ -500,9 +500,9 @@ namespace ThermalChimney {
 		Real64 DeltaL; // OverallThermalChimLength / NTC
 		int ThermChimLoop1;
 		int ThermChimLoop2;
-		FArray2D< Real64 > EquaCoef( NTC, NTC ); // Coefficients in Linear Algebraic Euqation for FINITE DIFFERENCE
-		FArray1D< Real64 > EquaConst( NTC ); // Constants in Linear Algebraic Equation for FINITE DIFFERENCE
-		FArray1D< Real64 > ThermChimSubTemp( NTC ); // Air temperature of each thermal chimney air channel subregion
+		Array2D< Real64 > EquaCoef( NTC, NTC ); // Coefficients in Linear Algebraic Euqation for FINITE DIFFERENCE
+		Array1D< Real64 > EquaConst( NTC ); // Constants in Linear Algebraic Equation for FINITE DIFFERENCE
+		Array1D< Real64 > ThermChimSubTemp( NTC ); // Air temperature of each thermal chimney air channel subregion
 
 		for ( Loop = 1; Loop <= TotThermalChimney; ++Loop ) {
 
@@ -610,14 +610,14 @@ namespace ThermalChimney {
 
 				for ( ThermChimLoop1 = 1; ThermChimLoop1 <= NTC; ++ThermChimLoop1 ) {
 					for ( ThermChimLoop2 = 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2 ) {
-						EquaCoef( ThermChimLoop1, ThermChimLoop2 ) = 0.0;
+						EquaCoef( ThermChimLoop2, ThermChimLoop1 ) = 0.0;
 					}
 				}
 
 				EquaCoef( 1, 1 ) = Process2;
 				EquaConst( 1 ) = Process3 - Process1 * RoomAirTemp;
 				for ( ThermChimLoop1 = 2; ThermChimLoop1 <= NTC; ++ThermChimLoop1 ) {
-					EquaCoef( ThermChimLoop1, ( ThermChimLoop1 - 1 ) ) = Process1;
+					EquaCoef( ( ThermChimLoop1 - 1 ), ThermChimLoop1 ) = Process1;
 					EquaCoef( ThermChimLoop1, ThermChimLoop1 ) = Process2;
 					EquaConst( ThermChimLoop1 ) = Process3;
 				}
@@ -640,14 +640,14 @@ namespace ThermalChimney {
 
 			for ( ThermChimLoop1 = 1; ThermChimLoop1 <= NTC; ++ThermChimLoop1 ) {
 				for ( ThermChimLoop2 = 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2 ) {
-					EquaCoef( ThermChimLoop1, ThermChimLoop2 ) = 0.0;
+					EquaCoef( ThermChimLoop2, ThermChimLoop1 ) = 0.0;
 				}
 			}
 
 			EquaCoef( 1, 1 ) = Process2;
 			EquaConst( 1 ) = Process3 - Process1 * RoomAirTemp;
 			for ( ThermChimLoop1 = 2; ThermChimLoop1 <= NTC; ++ThermChimLoop1 ) {
-				EquaCoef( ThermChimLoop1, ( ThermChimLoop1 - 1 ) ) = Process1;
+				EquaCoef( ( ThermChimLoop1 - 1 ), ThermChimLoop1 ) = Process1;
 				EquaCoef( ThermChimLoop1, ThermChimLoop1 ) = Process2;
 				EquaConst( ThermChimLoop1 ) = Process3;
 			}
@@ -781,9 +781,9 @@ namespace ThermalChimney {
 
 	void
 	GaussElimination(
-		FArray2A< Real64 > EquaCoef,
-		FArray1A< Real64 > EquaConst,
-		FArray1A< Real64 > ThermChimSubTemp,
+		Array2A< Real64 > EquaCoef,
+		Array1A< Real64 > EquaConst,
+		Array1A< Real64 > ThermChimSubTemp,
 		int const NTC
 	)
 	{
@@ -820,7 +820,7 @@ namespace ThermalChimney {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		FArray1D< Real64 > tempor( NTC );
+		Array1D< Real64 > tempor( NTC );
 		Real64 tempb;
 		Real64 TCvalue;
 		Real64 TCcoefficient;
@@ -835,24 +835,24 @@ namespace ThermalChimney {
 			TCvalue = std::abs( EquaCoef( ThermChimLoop1, ThermChimLoop1 ) );
 			pivot = ThermChimLoop1;
 			for ( ThermChimLoop2 = ThermChimLoop1 + 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2 ) {
-				if ( std::abs( EquaCoef( ThermChimLoop2, ThermChimLoop1 ) ) > TCvalue ) {
-					TCvalue = std::abs( EquaCoef( ThermChimLoop2, ThermChimLoop1 ) );
+				if ( std::abs( EquaCoef( ThermChimLoop1, ThermChimLoop2 ) ) > TCvalue ) {
+					TCvalue = std::abs( EquaCoef( ThermChimLoop1, ThermChimLoop2 ) );
 					pivot = ThermChimLoop2;
 				}
 			}
 
 			if ( pivot != ThermChimLoop1 ) {
-				tempor( {ThermChimLoop1,NTC} ) = EquaCoef( ThermChimLoop1, {ThermChimLoop1,NTC} );
+				tempor( {ThermChimLoop1,NTC} ) = EquaCoef( {ThermChimLoop1,NTC}, ThermChimLoop1 );
 				tempb = EquaConst( ThermChimLoop1 );
-				EquaCoef( ThermChimLoop1, {ThermChimLoop1,NTC} ) = EquaCoef( pivot, {ThermChimLoop1,NTC} );
+				EquaCoef( {ThermChimLoop1,NTC}, ThermChimLoop1 ) = EquaCoef( {ThermChimLoop1,NTC}, pivot );
 				EquaConst( ThermChimLoop1 ) = EquaConst( pivot );
-				EquaCoef( pivot, {ThermChimLoop1,NTC} ) = tempor( {ThermChimLoop1,NTC} );
+				EquaCoef( {ThermChimLoop1,NTC}, pivot ) = tempor( {ThermChimLoop1,NTC} );
 				EquaConst( pivot ) = tempb;
 			}
 
 			for ( ThermChimLoop2 = ThermChimLoop1 + 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2 ) {
-				TCcoefficient = -EquaCoef( ThermChimLoop2, ThermChimLoop1 ) / EquaCoef( ThermChimLoop1, ThermChimLoop1 );
-				EquaCoef( ThermChimLoop2, {ThermChimLoop1,NTC} ) += TCcoefficient * EquaCoef( ThermChimLoop1, {ThermChimLoop1,NTC} );
+				TCcoefficient = -EquaCoef( ThermChimLoop1, ThermChimLoop2 ) / EquaCoef( ThermChimLoop1, ThermChimLoop1 );
+				EquaCoef( {ThermChimLoop1,NTC}, ThermChimLoop2 ) += TCcoefficient * EquaCoef( {ThermChimLoop1,NTC}, ThermChimLoop1 );
 				EquaConst( ThermChimLoop2 ) += TCcoefficient * EquaConst( ThermChimLoop1 );
 			}
 
@@ -862,7 +862,7 @@ namespace ThermalChimney {
 		for ( ThermChimLoop2 = NTC - 1; ThermChimLoop2 >= 1; --ThermChimLoop2 ) {
 			ThermalChimSum = 0.0;
 			for ( ThermChimLoop3 = ThermChimLoop2 + 1; ThermChimLoop3 <= NTC; ++ThermChimLoop3 ) {
-				ThermalChimSum += EquaCoef( ThermChimLoop2, ThermChimLoop3 ) * ThermChimSubTemp( ThermChimLoop3 );
+				ThermalChimSum += EquaCoef( ThermChimLoop3, ThermChimLoop2 ) * ThermChimSubTemp( ThermChimLoop3 );
 			}
 			ThermChimSubTemp( ThermChimLoop2 ) = ( EquaConst( ThermChimLoop2 ) - ThermalChimSum ) / EquaCoef( ThermChimLoop2, ThermChimLoop2 );
 		}
@@ -874,7 +874,7 @@ namespace ThermalChimney {
 	//*****************************************************************************************
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

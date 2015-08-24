@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <PlantLoadProfile.hh>
@@ -62,7 +62,7 @@ namespace PlantLoadProfile {
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	FArray1D< PlantProfileData > PlantProfile;
+	Array1D< PlantProfileData > PlantProfile;
 
 	// MODULE SUBROUTINES:
 
@@ -70,11 +70,11 @@ namespace PlantLoadProfile {
 
 	void
 	SimulatePlantProfile(
-		std::string const & EquipTypeName, // description of model (not used until different types of profiles)
+		std::string const & EP_UNUSED( EquipTypeName ), // description of model (not used until different types of profiles)
 		std::string const & EquipName, // the user-defined name
-		int const EquipTypeNum, // the plant parameter ID for equipment model
+		int const EP_UNUSED( EquipTypeNum ), // the plant parameter ID for equipment model
 		int & ProfileNum, // the index for specific load profile
-		bool const FirstHVACIteration,
+		bool const EP_UNUSED( FirstHVACIteration ),
 		bool const InitLoopEquip // flag indicating if called in special initialization mode.
 	)
 	{
@@ -114,7 +114,7 @@ namespace PlantLoadProfile {
 		}
 
 		if ( InitLoopEquip ) {
-			ProfileNum = FindItemInList( EquipName, PlantProfile.Name(), NumOfPlantProfile );
+			ProfileNum = FindItemInList( EquipName, PlantProfile );
 			if ( ProfileNum != 0 ) {
 				InitPlantProfile( ProfileNum );
 				return;
@@ -201,7 +201,7 @@ namespace PlantLoadProfile {
 				// PlantProfile name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), PlantProfile.Name(), ProfileNum - 1, IsNotOK, IsBlank, cCurrentModuleObject );
+				VerifyName( cAlphaArgs( 1 ), PlantProfile, ProfileNum - 1, IsNotOK, IsBlank, cCurrentModuleObject );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -432,7 +432,7 @@ namespace PlantLoadProfile {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

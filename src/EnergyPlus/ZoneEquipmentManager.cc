@@ -3,7 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -127,15 +127,15 @@ namespace ZoneEquipmentManager {
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
-	FArray1D< Real64 > AvgData; // scratch array for storing averaged data
-	FArray1D_int DefaultSimOrder;
+	Array1D< Real64 > AvgData; // scratch array for storing averaged data
+	Array1D_int DefaultSimOrder;
 	int NumOfTimeStepInDay; // number of zone time steps in a day
 	bool GetZoneEquipmentInputFlag( true );
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE ZoneEquipmentManager
 
 	// Object Data
-	FArray1D< SimulationOrder > PrioritySimOrder;
+	Array1D< SimulationOrder > PrioritySimOrder;
 
 	// Functions
 
@@ -555,13 +555,13 @@ namespace ZoneEquipmentManager {
 
 		for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 			if ( ! ZoneEquipConfig( ControlledZoneNum ).IsControlled ) continue;
-			ActualZoneNum = CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).ActualZoneNum;
+			ActualZoneNum = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).ActualZoneNum;
 			NonAirSystemResponse( ActualZoneNum ) = 0.0;
 			SysDepZoneLoads( ActualZoneNum ) = 0.0;
 
 			InitSystemOutputRequired( ActualZoneNum, SysOutputProvided, LatOutputProvided );
 
-			SupplyAirNode = CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).SupplyAirNode;
+			SupplyAirNode = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).SupplyAirNode;
 			ZoneNode = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
 
 			// Sign convention: SysOutputProvided <0 Supply air is heated on entering zone (zone is cooled)
@@ -570,27 +570,27 @@ namespace ZoneEquipmentManager {
 				// Determine design supply air temperture and design supply air temperature difference
 				if ( ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputRequired < 0.0 ) { // Cooling case
 					// If the user specify the design cooling supply air temperature, then
-					if ( CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).ZnCoolDgnSAMethod == SupplyAirTemperature ) {
-						Temp = CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolDesTemp;
-						HumRat = CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolDesHumRat;
+					if ( CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).ZnCoolDgnSAMethod == SupplyAirTemperature ) {
+						Temp = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolDesTemp;
+						HumRat = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolDesHumRat;
 						DeltaTemp = Temp - Node( ZoneNode ).Temp;
 						// If the user specify the design cooling supply air temperature difference, then
 					} else {
-						DeltaTemp = -std::abs( CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolDesTempDiff );
+						DeltaTemp = -std::abs( CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolDesTempDiff );
 						Temp = DeltaTemp + Node( ZoneNode ).Temp;
-						HumRat = CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolDesHumRat;
+						HumRat = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolDesHumRat;
 					}
 				} else { // Heating Case
 					// If the user specify the design heating supply air temperature, then
-					if ( CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).ZnHeatDgnSAMethod == SupplyAirTemperature ) {
-						Temp = CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatDesTemp;
-						HumRat = CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatDesHumRat;
+					if ( CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).ZnHeatDgnSAMethod == SupplyAirTemperature ) {
+						Temp = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatDesTemp;
+						HumRat = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatDesHumRat;
 						DeltaTemp = Temp - Node( ZoneNode ).Temp;
 						// If the user specify the design heating supply air temperature difference, then
 					} else {
-						DeltaTemp = std::abs( CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatDesTempDiff );
+						DeltaTemp = std::abs( CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatDesTempDiff );
 						Temp = DeltaTemp + Node( ZoneNode ).Temp;
-						HumRat = CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatDesHumRat;
+						HumRat = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatDesHumRat;
 					}
 				}
 
@@ -604,8 +604,8 @@ namespace ZoneEquipmentManager {
 					MassFlowRate = 0.0;
 				}
 
-				if ( CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).SupplyAirAdjustFactor > 1.0 ) {
-					MassFlowRate *= CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).SupplyAirAdjustFactor;
+				if ( CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).SupplyAirAdjustFactor > 1.0 ) {
+					MassFlowRate *= CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).SupplyAirAdjustFactor;
 				}
 			} else {
 
@@ -619,27 +619,27 @@ namespace ZoneEquipmentManager {
 			UpdateSystemOutputRequired( ActualZoneNum, SysOutputProvided, LatOutputProvided );
 
 			if ( SysOutputProvided > 0.0 ) {
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatLoad = SysOutputProvided;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatMassFlow = MassFlowRate;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatZoneTemp = Node( ZoneNode ).Temp;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatZoneHumRat = Node( ZoneNode ).HumRat;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatOutTemp = OutDryBulbTemp;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatOutHumRat = OutHumRat;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolLoad = 0.0;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolMassFlow = 0.0;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolZoneTemp = 0.0;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolZoneHumRat = 0.0;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatLoad = SysOutputProvided;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatMassFlow = MassFlowRate;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatZoneTemp = Node( ZoneNode ).Temp;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatZoneHumRat = Node( ZoneNode ).HumRat;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatOutTemp = OutDryBulbTemp;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatOutHumRat = OutHumRat;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolLoad = 0.0;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolMassFlow = 0.0;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolZoneTemp = 0.0;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolZoneHumRat = 0.0;
 			} else {
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolLoad = -SysOutputProvided;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolMassFlow = MassFlowRate;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolZoneTemp = Node( ZoneNode ).Temp;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolZoneHumRat = Node( ZoneNode ).HumRat;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolOutTemp = OutDryBulbTemp;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolOutHumRat = OutHumRat;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatLoad = 0.0;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatMassFlow = 0.0;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatZoneTemp = 0.0;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatZoneHumRat = 0.0;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolLoad = -SysOutputProvided;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolMassFlow = MassFlowRate;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolZoneTemp = Node( ZoneNode ).Temp;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolZoneHumRat = Node( ZoneNode ).HumRat;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolOutTemp = OutDryBulbTemp;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolOutHumRat = OutHumRat;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatLoad = 0.0;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatMassFlow = 0.0;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatZoneTemp = 0.0;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatZoneHumRat = 0.0;
 			}
 
 			if ( SupplyAirNode > 0 ) {
@@ -666,12 +666,12 @@ namespace ZoneEquipmentManager {
 			} else {
 				RetTemp = Node( ZoneNode ).Temp;
 			}
-			if ( CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatLoad > 0.0 ) {
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatZoneRetTemp = RetTemp;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatTstatTemp = TempZoneThermostatSetPoint( ActualZoneNum );
+			if ( CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatLoad > 0.0 ) {
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatZoneRetTemp = RetTemp;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatTstatTemp = TempZoneThermostatSetPoint( ActualZoneNum );
 			} else {
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolZoneRetTemp = RetTemp;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolTstatTemp = TempZoneThermostatSetPoint( ActualZoneNum );
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolZoneRetTemp = RetTemp;
+				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolTstatTemp = TempZoneThermostatSetPoint( ActualZoneNum );
 			}
 		}
 
@@ -754,13 +754,13 @@ namespace ZoneEquipmentManager {
 		static gio::Fmt Format_995( "(' Cooling Sizing Factor Information, Zone ',A,', ',G12.5)" );
 
 		for ( ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSizingInput; ++ZoneSizIndex ) {
-			ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, Zone.Name(), NumOfZones );
+			ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, Zone );
 			if ( ZoneIndex == 0 ) {
 				ShowSevereError( "SetUpZoneSizingArrays: Sizing:Zone=\"" + ZoneSizingInput( ZoneSizIndex ).ZoneName + "\" references unknown zone" );
 				ErrorsFound = true;
 			}
 			if ( any( ZoneEquipConfig.IsControlled() ) ) {
-				ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, ZoneEquipConfig.ZoneName(), NumOfZones );
+				ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 				if ( ZoneIndex == 0 ) {
 					if ( ! isPulseZoneSizing ) {
 						ShowWarningError( "SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + ZoneSizingInput( ZoneSizIndex ).ZoneName + "\", Zone is not found in the Controlled Zones List" );
@@ -784,9 +784,9 @@ namespace ZoneEquipmentManager {
 			ShowFatalError( "SetUpZoneSizingArrays: Errors found in Sizing:Zone input" );
 		}
 
-		ZoneSizing.allocate( NumOfZones, TotDesDays + TotRunDesPersDays );
+		ZoneSizing.allocate( TotDesDays + TotRunDesPersDays, NumOfZones );
 		FinalZoneSizing.allocate( NumOfZones );
-		CalcZoneSizing.allocate( NumOfZones, TotDesDays + TotRunDesPersDays );
+		CalcZoneSizing.allocate( TotDesDays + TotRunDesPersDays, NumOfZones );
 		CalcFinalZoneSizing.allocate( NumOfZones );
 		TermUnitFinalZoneSizing.allocate( NumOfZones );
 		DesDayWeath.allocate( TotDesDays + TotRunDesPersDays );
@@ -815,67 +815,67 @@ namespace ZoneEquipmentManager {
 		for ( DesDayNum = 1; DesDayNum <= TotDesDays + TotRunDesPersDays; ++DesDayNum ) {
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-				ZoneSizing( CtrlZoneNum, DesDayNum ).ZoneName = ZoneEquipConfig( CtrlZoneNum ).ZoneName;
-				ZoneSizing( CtrlZoneNum, DesDayNum ).ActualZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
+				ZoneSizing( DesDayNum, CtrlZoneNum ).ZoneName = ZoneEquipConfig( CtrlZoneNum ).ZoneName;
+				ZoneSizing( DesDayNum, CtrlZoneNum ).ActualZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
 				if ( ZoneEquipConfig( CtrlZoneNum ).NumInletNodes > 0 ) {
-					ZoneSizing( CtrlZoneNum, DesDayNum ).SupplyAirNode = ZoneEquipConfig( CtrlZoneNum ).InletNode( 1 );
+					ZoneSizing( DesDayNum, CtrlZoneNum ).SupplyAirNode = ZoneEquipConfig( CtrlZoneNum ).InletNode( 1 );
 				}
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).ZoneName = ZoneEquipConfig( CtrlZoneNum ).ZoneName;
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).ActualZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).ZoneName = ZoneEquipConfig( CtrlZoneNum ).ZoneName;
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).ActualZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
 				if ( ZoneEquipConfig( CtrlZoneNum ).NumInletNodes > 0 ) {
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).SupplyAirNode = ZoneEquipConfig( CtrlZoneNum ).InletNode( 1 );
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).SupplyAirNode = ZoneEquipConfig( CtrlZoneNum ).InletNode( 1 );
 				}
 				// For each Zone Sizing object, find the corresponding controlled zone
-				ZoneSizNum = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput.ZoneName(), NumZoneSizingInput );
+				ZoneSizNum = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 				if ( ZoneSizNum > 0 ) { // move data from zone sizing input
-					ZoneSizing( CtrlZoneNum, DesDayNum ).ZnCoolDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnCoolDgnSAMethod;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).ZnHeatDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnHeatDgnSAMethod;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesTemp = ZoneSizingInput( ZoneSizNum ).CoolDesTemp;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesTemp = ZoneSizingInput( ZoneSizNum ).HeatDesTemp;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesTempDiff = ZoneSizingInput( ZoneSizNum ).CoolDesTempDiff;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesTempDiff = ZoneSizingInput( ZoneSizNum ).HeatDesTempDiff;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesHumRat = ZoneSizingInput( ZoneSizNum ).CoolDesHumRat;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesHumRat = ZoneSizingInput( ZoneSizNum ).HeatDesHumRat;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).OADesMethod = ZoneSizingInput( ZoneSizNum ).OADesMethod;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesOAFlowPPer = ZoneSizingInput( ZoneSizNum ).DesOAFlowPPer;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesOAFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesOAFlowPerArea;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesOAFlow = ZoneSizingInput( ZoneSizNum ).DesOAFlow;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolAirDesMethod = ZoneSizingInput( ZoneSizNum ).CoolAirDesMethod;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatAirDesMethod = ZoneSizingInput( ZoneSizNum ).HeatAirDesMethod;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).InpDesCoolAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolAirFlow;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowPerArea;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMinAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlow;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFrac;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).InpDesHeatAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatAirFlow;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlowPerArea;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMaxAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlow;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlowFrac;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatSizingFactor = ZoneSizingInput( ZoneSizNum ).HeatSizingFactor;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolSizingFactor = ZoneSizingInput( ZoneSizNum ).CoolSizingFactor;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).ZnCoolDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnCoolDgnSAMethod;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).ZnHeatDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnHeatDgnSAMethod;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesTemp = ZoneSizingInput( ZoneSizNum ).CoolDesTemp;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesTemp = ZoneSizingInput( ZoneSizNum ).HeatDesTemp;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesTempDiff = ZoneSizingInput( ZoneSizNum ).CoolDesTempDiff;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesTempDiff = ZoneSizingInput( ZoneSizNum ).HeatDesTempDiff;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesHumRat = ZoneSizingInput( ZoneSizNum ).CoolDesHumRat;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesHumRat = ZoneSizingInput( ZoneSizNum ).HeatDesHumRat;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).OADesMethod = ZoneSizingInput( ZoneSizNum ).OADesMethod;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesOAFlowPPer = ZoneSizingInput( ZoneSizNum ).DesOAFlowPPer;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesOAFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesOAFlowPerArea;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesOAFlow = ZoneSizingInput( ZoneSizNum ).DesOAFlow;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolAirDesMethod = ZoneSizingInput( ZoneSizNum ).CoolAirDesMethod;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatAirDesMethod = ZoneSizingInput( ZoneSizNum ).HeatAirDesMethod;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).InpDesCoolAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolAirFlow;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowPerArea;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMinAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlow;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFrac;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).InpDesHeatAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatAirFlow;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlowPerArea;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMaxAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlow;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlowFrac;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatSizingFactor = ZoneSizingInput( ZoneSizNum ).HeatSizingFactor;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolSizingFactor = ZoneSizingInput( ZoneSizNum ).CoolSizingFactor;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnCoolDgnSAMethod;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).ZnHeatDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnHeatDgnSAMethod;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolDesTemp = ZoneSizingInput( ZoneSizNum ).CoolDesTemp;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatDesTemp = ZoneSizingInput( ZoneSizNum ).HeatDesTemp;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolDesTempDiff = ZoneSizingInput( ZoneSizNum ).CoolDesTempDiff;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatDesTempDiff = ZoneSizingInput( ZoneSizNum ).HeatDesTempDiff;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolDesHumRat = ZoneSizingInput( ZoneSizNum ).CoolDesHumRat;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatDesHumRat = ZoneSizingInput( ZoneSizNum ).HeatDesHumRat;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).OADesMethod = ZoneSizingInput( ZoneSizNum ).OADesMethod;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesOAFlowPPer = ZoneSizingInput( ZoneSizNum ).DesOAFlowPPer;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesOAFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesOAFlowPerArea;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesOAFlow = ZoneSizingInput( ZoneSizNum ).DesOAFlow;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolAirDesMethod = ZoneSizingInput( ZoneSizNum ).CoolAirDesMethod;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatAirDesMethod = ZoneSizingInput( ZoneSizNum ).HeatAirDesMethod;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).InpDesCoolAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolAirFlow;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowPerArea;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlow;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFrac;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatAirFlow;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlowPerArea;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlow;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlowFrac;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatSizingFactor = ZoneSizingInput( ZoneSizNum ).HeatSizingFactor;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolSizingFactor = ZoneSizingInput( ZoneSizNum ).CoolSizingFactor;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnCoolDgnSAMethod;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).ZnHeatDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnHeatDgnSAMethod;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolDesTemp = ZoneSizingInput( ZoneSizNum ).CoolDesTemp;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatDesTemp = ZoneSizingInput( ZoneSizNum ).HeatDesTemp;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolDesTempDiff = ZoneSizingInput( ZoneSizNum ).CoolDesTempDiff;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatDesTempDiff = ZoneSizingInput( ZoneSizNum ).HeatDesTempDiff;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolDesHumRat = ZoneSizingInput( ZoneSizNum ).CoolDesHumRat;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatDesHumRat = ZoneSizingInput( ZoneSizNum ).HeatDesHumRat;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).OADesMethod = ZoneSizingInput( ZoneSizNum ).OADesMethod;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesOAFlowPPer = ZoneSizingInput( ZoneSizNum ).DesOAFlowPPer;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesOAFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesOAFlowPerArea;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesOAFlow = ZoneSizingInput( ZoneSizNum ).DesOAFlow;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolAirDesMethod = ZoneSizingInput( ZoneSizNum ).CoolAirDesMethod;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatAirDesMethod = ZoneSizingInput( ZoneSizNum ).HeatAirDesMethod;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).InpDesCoolAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolAirFlow;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowPerArea;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlow;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFrac;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatAirFlow;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlowPerArea;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlow;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesHeatMaxAirFlowFrac;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatSizingFactor = ZoneSizingInput( ZoneSizNum ).HeatSizingFactor;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolSizingFactor = ZoneSizingInput( ZoneSizNum ).CoolSizingFactor;
 				} else { // Every controlled zone must be simulated, so set missing inputs to the first
 					//LKL I think this is sufficient for warning -- no need for array
 					if ( DesDayNum == 1 ) {
@@ -885,124 +885,124 @@ namespace ZoneEquipmentManager {
 						// Following needs to be implemented first:
 						//          CALL ShowContinueError('  A better option would be to set up global ZoneList objects for Sizing:Zone objects.')
 					}
-					ZoneSizing( CtrlZoneNum, DesDayNum ).ZnCoolDgnSAMethod = ZoneSizingInput( 1 ).ZnCoolDgnSAMethod;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).ZnHeatDgnSAMethod = ZoneSizingInput( 1 ).ZnHeatDgnSAMethod;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesTemp = ZoneSizingInput( 1 ).CoolDesTemp;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesTemp = ZoneSizingInput( 1 ).HeatDesTemp;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesTempDiff = ZoneSizingInput( 1 ).CoolDesTempDiff;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesTempDiff = ZoneSizingInput( 1 ).HeatDesTempDiff;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesHumRat = ZoneSizingInput( 1 ).CoolDesHumRat;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesHumRat = ZoneSizingInput( 1 ).HeatDesHumRat;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).OADesMethod = ZoneSizingInput( 1 ).OADesMethod;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesOAFlowPPer = ZoneSizingInput( 1 ).DesOAFlowPPer;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesOAFlowPerArea = ZoneSizingInput( 1 ).DesOAFlowPerArea;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesOAFlow = ZoneSizingInput( 1 ).DesOAFlow;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolAirDesMethod = ZoneSizingInput( 1 ).CoolAirDesMethod;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatAirDesMethod = ZoneSizingInput( 1 ).HeatAirDesMethod;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).InpDesCoolAirFlow = ZoneSizingInput( 1 ).DesCoolAirFlow;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( 1 ).DesCoolMinAirFlowPerArea;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMinAirFlow = ZoneSizingInput( 1 ).DesCoolMinAirFlow;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( 1 ).DesCoolMinAirFlowFrac;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).InpDesHeatAirFlow = ZoneSizingInput( 1 ).DesHeatAirFlow;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( 1 ).DesHeatMaxAirFlowPerArea;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMaxAirFlow = ZoneSizingInput( 1 ).DesHeatMaxAirFlow;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( 1 ).DesHeatMaxAirFlowFrac;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatSizingFactor = ZoneSizingInput( 1 ).HeatSizingFactor;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolSizingFactor = ZoneSizingInput( 1 ).CoolSizingFactor;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).ZnCoolDgnSAMethod = ZoneSizingInput( 1 ).ZnCoolDgnSAMethod;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).ZnHeatDgnSAMethod = ZoneSizingInput( 1 ).ZnHeatDgnSAMethod;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesTemp = ZoneSizingInput( 1 ).CoolDesTemp;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesTemp = ZoneSizingInput( 1 ).HeatDesTemp;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesTempDiff = ZoneSizingInput( 1 ).CoolDesTempDiff;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesTempDiff = ZoneSizingInput( 1 ).HeatDesTempDiff;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesHumRat = ZoneSizingInput( 1 ).CoolDesHumRat;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesHumRat = ZoneSizingInput( 1 ).HeatDesHumRat;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).OADesMethod = ZoneSizingInput( 1 ).OADesMethod;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesOAFlowPPer = ZoneSizingInput( 1 ).DesOAFlowPPer;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesOAFlowPerArea = ZoneSizingInput( 1 ).DesOAFlowPerArea;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesOAFlow = ZoneSizingInput( 1 ).DesOAFlow;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolAirDesMethod = ZoneSizingInput( 1 ).CoolAirDesMethod;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatAirDesMethod = ZoneSizingInput( 1 ).HeatAirDesMethod;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).InpDesCoolAirFlow = ZoneSizingInput( 1 ).DesCoolAirFlow;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( 1 ).DesCoolMinAirFlowPerArea;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMinAirFlow = ZoneSizingInput( 1 ).DesCoolMinAirFlow;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( 1 ).DesCoolMinAirFlowFrac;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).InpDesHeatAirFlow = ZoneSizingInput( 1 ).DesHeatAirFlow;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( 1 ).DesHeatMaxAirFlowPerArea;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMaxAirFlow = ZoneSizingInput( 1 ).DesHeatMaxAirFlow;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( 1 ).DesHeatMaxAirFlowFrac;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatSizingFactor = ZoneSizingInput( 1 ).HeatSizingFactor;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolSizingFactor = ZoneSizingInput( 1 ).CoolSizingFactor;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( 1 ).ZnCoolDgnSAMethod;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).ZnHeatDgnSAMethod = ZoneSizingInput( 1 ).ZnHeatDgnSAMethod;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolDesTemp = ZoneSizingInput( 1 ).CoolDesTemp;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatDesTemp = ZoneSizingInput( 1 ).HeatDesTemp;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolDesTempDiff = ZoneSizingInput( 1 ).CoolDesTempDiff;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatDesTempDiff = ZoneSizingInput( 1 ).HeatDesTempDiff;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolDesHumRat = ZoneSizingInput( 1 ).CoolDesHumRat;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatDesHumRat = ZoneSizingInput( 1 ).HeatDesHumRat;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).OADesMethod = ZoneSizingInput( 1 ).OADesMethod;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesOAFlowPPer = ZoneSizingInput( 1 ).DesOAFlowPPer;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesOAFlowPerArea = ZoneSizingInput( 1 ).DesOAFlowPerArea;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesOAFlow = ZoneSizingInput( 1 ).DesOAFlow;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolAirDesMethod = ZoneSizingInput( 1 ).CoolAirDesMethod;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatAirDesMethod = ZoneSizingInput( 1 ).HeatAirDesMethod;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).InpDesCoolAirFlow = ZoneSizingInput( 1 ).DesCoolAirFlow;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( 1 ).DesCoolMinAirFlowPerArea;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( 1 ).DesCoolMinAirFlow;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( 1 ).DesCoolMinAirFlowFrac;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( 1 ).DesHeatAirFlow;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( 1 ).DesHeatMaxAirFlowPerArea;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlow = ZoneSizingInput( 1 ).DesHeatMaxAirFlow;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( 1 ).DesHeatMaxAirFlowFrac;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatSizingFactor = ZoneSizingInput( 1 ).HeatSizingFactor;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolSizingFactor = ZoneSizingInput( 1 ).CoolSizingFactor;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( 1 ).ZnCoolDgnSAMethod;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).ZnHeatDgnSAMethod = ZoneSizingInput( 1 ).ZnHeatDgnSAMethod;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolDesTemp = ZoneSizingInput( 1 ).CoolDesTemp;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatDesTemp = ZoneSizingInput( 1 ).HeatDesTemp;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolDesTempDiff = ZoneSizingInput( 1 ).CoolDesTempDiff;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatDesTempDiff = ZoneSizingInput( 1 ).HeatDesTempDiff;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolDesHumRat = ZoneSizingInput( 1 ).CoolDesHumRat;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatDesHumRat = ZoneSizingInput( 1 ).HeatDesHumRat;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).OADesMethod = ZoneSizingInput( 1 ).OADesMethod;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesOAFlowPPer = ZoneSizingInput( 1 ).DesOAFlowPPer;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesOAFlowPerArea = ZoneSizingInput( 1 ).DesOAFlowPerArea;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesOAFlow = ZoneSizingInput( 1 ).DesOAFlow;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolAirDesMethod = ZoneSizingInput( 1 ).CoolAirDesMethod;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatAirDesMethod = ZoneSizingInput( 1 ).HeatAirDesMethod;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).InpDesCoolAirFlow = ZoneSizingInput( 1 ).DesCoolAirFlow;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( 1 ).DesCoolMinAirFlowPerArea;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( 1 ).DesCoolMinAirFlow;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( 1 ).DesCoolMinAirFlowFrac;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( 1 ).DesHeatAirFlow;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( 1 ).DesHeatMaxAirFlowPerArea;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlow = ZoneSizingInput( 1 ).DesHeatMaxAirFlow;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( 1 ).DesHeatMaxAirFlowFrac;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatSizingFactor = ZoneSizingInput( 1 ).HeatSizingFactor;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolSizingFactor = ZoneSizingInput( 1 ).CoolSizingFactor;
 				}
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatFlowSeq.allocate( NumOfTimeStepInDay );
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolFlowSeq.allocate( NumOfTimeStepInDay );
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatLoadSeq.allocate( NumOfTimeStepInDay );
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolLoadSeq.allocate( NumOfTimeStepInDay );
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneTempSeq.allocate( NumOfTimeStepInDay );
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatSetPtSeq.allocate( NumOfTimeStepInDay );
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneTempSeq.allocate( NumOfTimeStepInDay );
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolSetPtSeq.allocate( NumOfTimeStepInDay );
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutTempSeq.allocate( NumOfTimeStepInDay );
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutTempSeq.allocate( NumOfTimeStepInDay );
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneRetTempSeq.allocate( NumOfTimeStepInDay );
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatTstatTempSeq.allocate( NumOfTimeStepInDay );
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneRetTempSeq.allocate( NumOfTimeStepInDay );
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolTstatTempSeq.allocate( NumOfTimeStepInDay );
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneHumRatSeq.allocate( NumOfTimeStepInDay );
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneHumRatSeq.allocate( NumOfTimeStepInDay );
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutHumRatSeq.allocate( NumOfTimeStepInDay );
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutHumRatSeq.allocate( NumOfTimeStepInDay );
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatFlowSeq.allocate( NumOfTimeStepInDay );
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolFlowSeq.allocate( NumOfTimeStepInDay );
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatLoadSeq.allocate( NumOfTimeStepInDay );
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolLoadSeq.allocate( NumOfTimeStepInDay );
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneTempSeq.allocate( NumOfTimeStepInDay );
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneTempSeq.allocate( NumOfTimeStepInDay );
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutTempSeq.allocate( NumOfTimeStepInDay );
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutTempSeq.allocate( NumOfTimeStepInDay );
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneRetTempSeq.allocate( NumOfTimeStepInDay );
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatTstatTempSeq.allocate( NumOfTimeStepInDay );
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneRetTempSeq.allocate( NumOfTimeStepInDay );
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolTstatTempSeq.allocate( NumOfTimeStepInDay );
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneHumRatSeq.allocate( NumOfTimeStepInDay );
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneHumRatSeq.allocate( NumOfTimeStepInDay );
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutHumRatSeq.allocate( NumOfTimeStepInDay );
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutHumRatSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatFlowSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolFlowSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatLoadSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolLoadSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneTempSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatSetPtSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneTempSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolSetPtSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutTempSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutTempSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneRetTempSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatTstatTempSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneRetTempSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolTstatTempSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneHumRatSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneHumRatSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutHumRatSeq.allocate( NumOfTimeStepInDay );
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutHumRatSeq.allocate( NumOfTimeStepInDay );
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatFlowSeq.allocate( NumOfTimeStepInDay );
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolFlowSeq.allocate( NumOfTimeStepInDay );
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatLoadSeq.allocate( NumOfTimeStepInDay );
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolLoadSeq.allocate( NumOfTimeStepInDay );
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneTempSeq.allocate( NumOfTimeStepInDay );
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneTempSeq.allocate( NumOfTimeStepInDay );
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutTempSeq.allocate( NumOfTimeStepInDay );
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutTempSeq.allocate( NumOfTimeStepInDay );
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneRetTempSeq.allocate( NumOfTimeStepInDay );
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatTstatTempSeq.allocate( NumOfTimeStepInDay );
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneRetTempSeq.allocate( NumOfTimeStepInDay );
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolTstatTempSeq.allocate( NumOfTimeStepInDay );
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneHumRatSeq.allocate( NumOfTimeStepInDay );
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneHumRatSeq.allocate( NumOfTimeStepInDay );
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutHumRatSeq.allocate( NumOfTimeStepInDay );
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutHumRatSeq.allocate( NumOfTimeStepInDay );
 				for ( TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatFlowSeq( TimeStepIndex ) = 0.0;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolFlowSeq( TimeStepIndex ) = 0.0;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatLoadSeq( TimeStepIndex ) = 0.0;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolLoadSeq( TimeStepIndex ) = 0.0;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneTempSeq( TimeStepIndex ) = 0.0;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatSetPtSeq( TimeStepIndex ) = 0.0;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneTempSeq( TimeStepIndex ) = 0.0;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolSetPtSeq( TimeStepIndex ) = 0.0;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutTempSeq( TimeStepIndex ) = 0.0;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutTempSeq( TimeStepIndex ) = 0.0;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneRetTempSeq( TimeStepIndex ) = 0.0;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatTstatTempSeq( TimeStepIndex ) = 0.0;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneRetTempSeq( TimeStepIndex ) = 0.0;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolTstatTempSeq( TimeStepIndex ) = 0.0;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneHumRatSeq( TimeStepIndex ) = 0.0;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneHumRatSeq( TimeStepIndex ) = 0.0;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutHumRatSeq( TimeStepIndex ) = 0.0;
-					ZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutHumRatSeq( TimeStepIndex ) = 0.0;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatFlowSeq( TimeStepIndex ) = 0.0;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolFlowSeq( TimeStepIndex ) = 0.0;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatLoadSeq( TimeStepIndex ) = 0.0;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolLoadSeq( TimeStepIndex ) = 0.0;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneTempSeq( TimeStepIndex ) = 0.0;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneTempSeq( TimeStepIndex ) = 0.0;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutTempSeq( TimeStepIndex ) = 0.0;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutTempSeq( TimeStepIndex ) = 0.0;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneRetTempSeq( TimeStepIndex ) = 0.0;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatTstatTempSeq( TimeStepIndex ) = 0.0;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneRetTempSeq( TimeStepIndex ) = 0.0;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolTstatTempSeq( TimeStepIndex ) = 0.0;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneHumRatSeq( TimeStepIndex ) = 0.0;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneHumRatSeq( TimeStepIndex ) = 0.0;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutHumRatSeq( TimeStepIndex ) = 0.0;
-					CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutHumRatSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatFlowSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolFlowSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatLoadSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolLoadSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneTempSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatSetPtSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneTempSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolSetPtSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutTempSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutTempSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneRetTempSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatTstatTempSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneRetTempSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolTstatTempSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneHumRatSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutHumRatSeq( TimeStepIndex ) = 0.0;
+					ZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutHumRatSeq( TimeStepIndex ) = 0.0;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatFlowSeq( TimeStepIndex ) = 0.0;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolFlowSeq( TimeStepIndex ) = 0.0;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatLoadSeq( TimeStepIndex ) = 0.0;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolLoadSeq( TimeStepIndex ) = 0.0;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneTempSeq( TimeStepIndex ) = 0.0;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneTempSeq( TimeStepIndex ) = 0.0;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutTempSeq( TimeStepIndex ) = 0.0;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutTempSeq( TimeStepIndex ) = 0.0;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneRetTempSeq( TimeStepIndex ) = 0.0;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatTstatTempSeq( TimeStepIndex ) = 0.0;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneRetTempSeq( TimeStepIndex ) = 0.0;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolTstatTempSeq( TimeStepIndex ) = 0.0;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneHumRatSeq( TimeStepIndex ) = 0.0;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepIndex ) = 0.0;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutHumRatSeq( TimeStepIndex ) = 0.0;
+					CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutHumRatSeq( TimeStepIndex ) = 0.0;
 				}
 			}
 		}
@@ -1019,7 +1019,7 @@ namespace ZoneEquipmentManager {
 			if ( ZoneEquipConfig( CtrlZoneNum ).NumInletNodes > 0 ) {
 				CalcFinalZoneSizing( CtrlZoneNum ).SupplyAirNode = ZoneEquipConfig( CtrlZoneNum ).InletNode( 1 );
 			}
-			ZoneSizNum = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput.ZoneName(), NumZoneSizingInput );
+			ZoneSizNum = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 			if ( ZoneSizNum > 0 ) { // move data from zone sizing input
 				FinalZoneSizing( CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnCoolDgnSAMethod;
 				FinalZoneSizing( CtrlZoneNum ).ZnHeatDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnHeatDgnSAMethod;
@@ -1269,9 +1269,9 @@ namespace ZoneEquipmentManager {
 				}
 			}
 			FinalZoneSizing( CtrlZoneNum ).TotalZoneFloorArea = ( Zone( ZoneIndex ).FloorArea * Zone( FinalZoneSizing( CtrlZoneNum ).ActualZoneNum ).Multiplier * Zone( FinalZoneSizing( CtrlZoneNum ).ActualZoneNum ).ListMultiplier );
-			if ( FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowPPer || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowSum || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowMax ){
+			if ( FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowPPer || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowSum || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowMax ) {
 				OAFromPeople = FinalZoneSizing( CtrlZoneNum ).DesOAFlowPPer * TotPeopleInZone;
-			} else { 
+			} else {
 				OAFromPeople = 0.0;
 			}
 			OAFromArea = FinalZoneSizing( CtrlZoneNum ).DesOAFlowPerArea * FinalZoneSizing( CtrlZoneNum ).TotalZoneFloorArea;
@@ -1308,16 +1308,16 @@ namespace ZoneEquipmentManager {
 			CalcFinalZoneSizing( CtrlZoneNum ).InpDesHeatAirFlow *= Zone( ZoneIndex ).Multiplier * Zone( ZoneIndex ).ListMultiplier;
 
 			for ( DesDayNum = 1; DesDayNum <= TotDesDays + TotRunDesPersDays; ++DesDayNum ) {
-				ZoneSizing( CtrlZoneNum, DesDayNum ).MinOA = FinalZoneSizing( CtrlZoneNum ).MinOA;
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).MinOA = CalcFinalZoneSizing( CtrlZoneNum ).MinOA;
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMinAirFlow2 = FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2;
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMinAirFlow2 = CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2;
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMinAirFlow = FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow;
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMinAirFlow = CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow;
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMaxAirFlow2 = FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow2;
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMaxAirFlow2 = CalcFinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow2;
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMaxAirFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow;
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMaxAirFlow = CalcFinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow;
+				ZoneSizing( DesDayNum, CtrlZoneNum ).MinOA = FinalZoneSizing( CtrlZoneNum ).MinOA;
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).MinOA = CalcFinalZoneSizing( CtrlZoneNum ).MinOA;
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlow2 = FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2;
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlow2 = CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2;
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlow = FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow;
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlow = CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow;
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlow2 = FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow2;
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlow2 = CalcFinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow2;
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow;
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMaxAirFlow = CalcFinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow;
 			}
 		}
 
@@ -1386,158 +1386,158 @@ namespace ZoneEquipmentManager {
 		for ( DesDayNum = 1; DesDayNum <= TotDesDays + TotRunDesPersDays; ++DesDayNum ) {
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				for ( TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
-					if ( allocated( ZoneSizing( CtrlZoneNum, DesDayNum ).HeatFlowSeq ) ) {
-						ZoneSizing( CtrlZoneNum, DesDayNum ).HeatFlowSeq( TimeStepIndex ) = 0.0;
-						ZoneSizing( CtrlZoneNum, DesDayNum ).HeatLoadSeq( TimeStepIndex ) = 0.0;
+					if ( allocated( ZoneSizing( DesDayNum, CtrlZoneNum ).HeatFlowSeq ) ) {
+						ZoneSizing( DesDayNum, CtrlZoneNum ).HeatFlowSeq( TimeStepIndex ) = 0.0;
+						ZoneSizing( DesDayNum, CtrlZoneNum ).HeatLoadSeq( TimeStepIndex ) = 0.0;
 						//not used directly in output report
-						ZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneTempSeq( TimeStepIndex ) = 0.0;
-						ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatSetPtSeq( TimeStepIndex ) = 0.0;
-						ZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutTempSeq( TimeStepIndex ) = 0.0;
-						ZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneRetTempSeq( TimeStepIndex ) = 0.0;
-						ZoneSizing( CtrlZoneNum, DesDayNum ).HeatTstatTempSeq( TimeStepIndex ) = 0.0;
-						ZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneHumRatSeq( TimeStepIndex ) = 0.0;
-						ZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutHumRatSeq( TimeStepIndex ) = 0.0;
+						ZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneTempSeq( TimeStepIndex ) = 0.0;
+						ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatSetPtSeq( TimeStepIndex ) = 0.0;
+						ZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutTempSeq( TimeStepIndex ) = 0.0;
+						ZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneRetTempSeq( TimeStepIndex ) = 0.0;
+						ZoneSizing( DesDayNum, CtrlZoneNum ).HeatTstatTempSeq( TimeStepIndex ) = 0.0;
+						ZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneHumRatSeq( TimeStepIndex ) = 0.0;
+						ZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutHumRatSeq( TimeStepIndex ) = 0.0;
 					}
-					if ( allocated( CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatFlowSeq ) ) {
-						CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatFlowSeq( TimeStepIndex ) = 0.0;
-						CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatLoadSeq( TimeStepIndex ) = 0.0;
-						CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneTempSeq( TimeStepIndex ) = 0.0;
-						CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutTempSeq( TimeStepIndex ) = 0.0;
-						CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneRetTempSeq( TimeStepIndex ) = 0.0;
-						CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatTstatTempSeq( TimeStepIndex ) = 0.0;
-						CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneHumRatSeq( TimeStepIndex ) = 0.0;
-						CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutHumRatSeq( TimeStepIndex ) = 0.0;
+					if ( allocated( CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatFlowSeq ) ) {
+						CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatFlowSeq( TimeStepIndex ) = 0.0;
+						CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatLoadSeq( TimeStepIndex ) = 0.0;
+						CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneTempSeq( TimeStepIndex ) = 0.0;
+						CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutTempSeq( TimeStepIndex ) = 0.0;
+						CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneRetTempSeq( TimeStepIndex ) = 0.0;
+						CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatTstatTempSeq( TimeStepIndex ) = 0.0;
+						CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneHumRatSeq( TimeStepIndex ) = 0.0;
+						CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutHumRatSeq( TimeStepIndex ) = 0.0;
 					}
-					if ( allocated( ZoneSizing( CtrlZoneNum, DesDayNum ).CoolFlowSeq ) ) {
-						ZoneSizing( CtrlZoneNum, DesDayNum ).CoolFlowSeq( TimeStepIndex ) = 0.0;
-						ZoneSizing( CtrlZoneNum, DesDayNum ).CoolLoadSeq( TimeStepIndex ) = 0.0;
+					if ( allocated( ZoneSizing( DesDayNum, CtrlZoneNum ).CoolFlowSeq ) ) {
+						ZoneSizing( DesDayNum, CtrlZoneNum ).CoolFlowSeq( TimeStepIndex ) = 0.0;
+						ZoneSizing( DesDayNum, CtrlZoneNum ).CoolLoadSeq( TimeStepIndex ) = 0.0;
 						//not used directly in output report
-						ZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneTempSeq( TimeStepIndex ) = 0.0;
-						ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolSetPtSeq( TimeStepIndex ) = 0.0;
-						ZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutTempSeq( TimeStepIndex ) = 0.0;
-						ZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneRetTempSeq( TimeStepIndex ) = 0.0;
-						ZoneSizing( CtrlZoneNum, DesDayNum ).CoolTstatTempSeq( TimeStepIndex ) = 0.0;
-						ZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneHumRatSeq( TimeStepIndex ) = 0.0;
-						ZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutHumRatSeq( TimeStepIndex ) = 0.0;
+						ZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneTempSeq( TimeStepIndex ) = 0.0;
+						ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolSetPtSeq( TimeStepIndex ) = 0.0;
+						ZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutTempSeq( TimeStepIndex ) = 0.0;
+						ZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneRetTempSeq( TimeStepIndex ) = 0.0;
+						ZoneSizing( DesDayNum, CtrlZoneNum ).CoolTstatTempSeq( TimeStepIndex ) = 0.0;
+						ZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepIndex ) = 0.0;
+						ZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutHumRatSeq( TimeStepIndex ) = 0.0;
 					}
-					if ( allocated( CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolFlowSeq ) ) {
-						CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolFlowSeq( TimeStepIndex ) = 0.0;
-						CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolLoadSeq( TimeStepIndex ) = 0.0;
-						CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneTempSeq( TimeStepIndex ) = 0.0;
-						CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutTempSeq( TimeStepIndex ) = 0.0;
-						CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneRetTempSeq( TimeStepIndex ) = 0.0;
-						CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolTstatTempSeq( TimeStepIndex ) = 0.0;
-						CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneHumRatSeq( TimeStepIndex ) = 0.0;
-						CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutHumRatSeq( TimeStepIndex ) = 0.0;
+					if ( allocated( CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolFlowSeq ) ) {
+						CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolFlowSeq( TimeStepIndex ) = 0.0;
+						CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolLoadSeq( TimeStepIndex ) = 0.0;
+						CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneTempSeq( TimeStepIndex ) = 0.0;
+						CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutTempSeq( TimeStepIndex ) = 0.0;
+						CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneRetTempSeq( TimeStepIndex ) = 0.0;
+						CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolTstatTempSeq( TimeStepIndex ) = 0.0;
+						CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepIndex ) = 0.0;
+						CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutHumRatSeq( TimeStepIndex ) = 0.0;
 					}
 				}
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesDay = ""; // name of a cooling design day
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesDay = ""; // name of a heating design day
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolDesDay = ""; // name of a cooling design day
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatDesDay = ""; // name of a heating design day
 
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMassFlow = 0.0; // zone design heating air mass flow rate [kg/s]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMassFlow = 0.0; // zone design cooling air mass flow rate [kg/s]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatLoad = 0.0; // zone design heating load [W]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolLoad = 0.0; // zone design cooling load [W]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatDens = 0.0; // zone design heating air density [kg/m3]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolDens = 0.0; // zone design cooling air density [kg/m3]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatVolFlow = 0.0; // zone design heating air volume flow rate [m3/s]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolVolFlow = 0.0; // zone design cooling air volume flow rate [m3/s]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatVolFlowMax = 0.0; // zone design heating maximum air volume flow rate [m3/s]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolVolFlowMin = 0.0; // zone design cooling minimum air volume flow rate [m3/s]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatCoilInTemp = 0.0; // zone heating coil design air inlet temperature [C]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolCoilInTemp = 0.0; // zone cooling coil design air inlet temperature [C]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatCoilInHumRat = 0.0; // zone heating coil design air inlet humidity ratio [kg/kg]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolCoilInHumRat = 0.0; // zone cooling coil design air inlet humidity ratio [kg/kg]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatCoilInTempTU = 0.0; // zone heating coil design air inlet temperature (supply air)([C]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolCoilInTempTU = 0.0; // zone cooling coil design air inlet temperature (supply air)[C]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatCoilInHumRatTU = 0.0; // zone heating coil design air inlet humidity ratio
-				ZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolCoilInHumRatTU = 0.0; // zone cooling coil design air inlet humidity ratio
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatMassFlow = 0.0; // current zone heating air mass flow rate (HVAC time step)
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolMassFlow = 0.0; // current zone cooling air mass flow rate (HVAC time step)
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatLoad = 0.0; // current zone heating load (HVAC time step)
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolLoad = 0.0; // current zone heating load (HVAC time step)
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneTemp = 0.0; // current zone temperature (heating, time step)
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutTemp = 0.0; // current outdoor temperature (heating, time step)
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneRetTemp = 0.0; // current zone return temperature (heating, time step)
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatTstatTemp = 0.0; // current zone thermostat temperature (heating, time step)
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneTemp = 0.0; // current zone temperature (cooling, time step)
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutTemp = 0.0; // current Outdoor temperature (cooling, time step)
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneRetTemp = 0.0; // current zone return temperature (cooling, time step)
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolTstatTemp = 0.0; // current zone thermostat temperature (cooling, time step)
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneHumRat = 0.0; // current zone humidity ratio (heating, time step)
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneHumRat = 0.0; // current zone humidity ratio (cooling, time step)
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutHumRat = 0.0; // current outdoor humidity ratio (heating, time step)
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutHumRat = 0.0; // current outdoor humidity ratio (cooling, time step)
-				ZoneSizing( CtrlZoneNum, DesDayNum ).ZoneTempAtHeatPeak = 0.0; // zone temp at max heating [C]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).ZoneRetTempAtHeatPeak = 0.0; // zone return temp at max heating [C]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).OutTempAtHeatPeak = 0.0; // outdoor temperature at max heating [C]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).ZoneTempAtCoolPeak = 0.0; // zone temp at max cooling [C]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).ZoneRetTempAtCoolPeak = 0.0; // zone return temp at max cooling [C]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).OutTempAtCoolPeak = 0.0; // outdoor temperature at max cooling [C]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).ZoneHumRatAtHeatPeak = 0.0; // zone humidity ratio at max heating [kg/kg]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).ZoneHumRatAtCoolPeak = 0.0; // zone humidity ratio at max cooling [kg/kg]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).OutHumRatAtHeatPeak = 0.0; // outdoor humidity at max heating [kg/kg]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).OutHumRatAtCoolPeak = 0.0; // outdoor humidity at max cooling [kg/kg]
-				ZoneSizing( CtrlZoneNum, DesDayNum ).TimeStepNumAtHeatMax = 0; // time step number (in day) at Heating peak
-				ZoneSizing( CtrlZoneNum, DesDayNum ).TimeStepNumAtCoolMax = 0; // time step number (in day) at cooling peak
-				ZoneSizing( CtrlZoneNum, DesDayNum ).HeatDDNum = 0; // design day index of design day causing heating peak
-				ZoneSizing( CtrlZoneNum, DesDayNum ).CoolDDNum = 0; // design day index of design day causing heating peak
-				ZoneSizing( CtrlZoneNum, DesDayNum ).cHeatDDDate = ""; // date of design day causing heating peak
-				ZoneSizing( CtrlZoneNum, DesDayNum ).cCoolDDDate = ""; // date of design day causing cooling peak
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMassFlow = 0.0; // zone design heating air mass flow rate [kg/s]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMassFlow = 0.0; // zone design cooling air mass flow rate [kg/s]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatLoad = 0.0; // zone design heating load [W]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolLoad = 0.0; // zone design cooling load [W]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatDens = 0.0; // zone design heating air density [kg/m3]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolDens = 0.0; // zone design cooling air density [kg/m3]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatVolFlow = 0.0; // zone design heating air volume flow rate [m3/s]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolVolFlow = 0.0; // zone design cooling air volume flow rate [m3/s]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatVolFlowMax = 0.0; // zone design heating maximum air volume flow rate [m3/s]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolVolFlowMin = 0.0; // zone design cooling minimum air volume flow rate [m3/s]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatCoilInTemp = 0.0; // zone heating coil design air inlet temperature [C]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolCoilInTemp = 0.0; // zone cooling coil design air inlet temperature [C]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatCoilInHumRat = 0.0; // zone heating coil design air inlet humidity ratio [kg/kg]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolCoilInHumRat = 0.0; // zone cooling coil design air inlet humidity ratio [kg/kg]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatCoilInTempTU = 0.0; // zone heating coil design air inlet temperature (supply air)([C]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolCoilInTempTU = 0.0; // zone cooling coil design air inlet temperature (supply air)[C]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatCoilInHumRatTU = 0.0; // zone heating coil design air inlet humidity ratio
+				ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolCoilInHumRatTU = 0.0; // zone cooling coil design air inlet humidity ratio
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatMassFlow = 0.0; // current zone heating air mass flow rate (HVAC time step)
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolMassFlow = 0.0; // current zone cooling air mass flow rate (HVAC time step)
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatLoad = 0.0; // current zone heating load (HVAC time step)
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolLoad = 0.0; // current zone heating load (HVAC time step)
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneTemp = 0.0; // current zone temperature (heating, time step)
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutTemp = 0.0; // current outdoor temperature (heating, time step)
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneRetTemp = 0.0; // current zone return temperature (heating, time step)
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatTstatTemp = 0.0; // current zone thermostat temperature (heating, time step)
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneTemp = 0.0; // current zone temperature (cooling, time step)
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutTemp = 0.0; // current Outdoor temperature (cooling, time step)
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneRetTemp = 0.0; // current zone return temperature (cooling, time step)
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolTstatTemp = 0.0; // current zone thermostat temperature (cooling, time step)
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneHumRat = 0.0; // current zone humidity ratio (heating, time step)
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneHumRat = 0.0; // current zone humidity ratio (cooling, time step)
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutHumRat = 0.0; // current outdoor humidity ratio (heating, time step)
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutHumRat = 0.0; // current outdoor humidity ratio (cooling, time step)
+				ZoneSizing( DesDayNum, CtrlZoneNum ).ZoneTempAtHeatPeak = 0.0; // zone temp at max heating [C]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).ZoneRetTempAtHeatPeak = 0.0; // zone return temp at max heating [C]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).OutTempAtHeatPeak = 0.0; // outdoor temperature at max heating [C]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).ZoneTempAtCoolPeak = 0.0; // zone temp at max cooling [C]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).ZoneRetTempAtCoolPeak = 0.0; // zone return temp at max cooling [C]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).OutTempAtCoolPeak = 0.0; // outdoor temperature at max cooling [C]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).ZoneHumRatAtHeatPeak = 0.0; // zone humidity ratio at max heating [kg/kg]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).ZoneHumRatAtCoolPeak = 0.0; // zone humidity ratio at max cooling [kg/kg]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).OutHumRatAtHeatPeak = 0.0; // outdoor humidity at max heating [kg/kg]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).OutHumRatAtCoolPeak = 0.0; // outdoor humidity at max cooling [kg/kg]
+				ZoneSizing( DesDayNum, CtrlZoneNum ).TimeStepNumAtHeatMax = 0; // time step number (in day) at Heating peak
+				ZoneSizing( DesDayNum, CtrlZoneNum ).TimeStepNumAtCoolMax = 0; // time step number (in day) at cooling peak
+				ZoneSizing( DesDayNum, CtrlZoneNum ).HeatDDNum = 0; // design day index of design day causing heating peak
+				ZoneSizing( DesDayNum, CtrlZoneNum ).CoolDDNum = 0; // design day index of design day causing heating peak
+				ZoneSizing( DesDayNum, CtrlZoneNum ).cHeatDDDate = ""; // date of design day causing heating peak
+				ZoneSizing( DesDayNum, CtrlZoneNum ).cCoolDDDate = ""; // date of design day causing cooling peak
 
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolDesDay = ""; // name of a cooling design day
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatDesDay = ""; // name of a heating design day
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolDesDay = ""; // name of a cooling design day
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatDesDay = ""; // name of a heating design day
 
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatMassFlow = 0.0; // zone design heating air mass flow rate [kg/s]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolMassFlow = 0.0; // zone design cooling air mass flow rate [kg/s]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatLoad = 0.0; // zone design heating load [W]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolLoad = 0.0; // zone design cooling load [W]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatDens = 0.0; // zone design heating air density [kg/m3]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolDens = 0.0; // zone design cooling air density [kg/m3]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatVolFlow = 0.0; // zone design heating air volume flow rate [m3/s]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolVolFlow = 0.0; // zone design cooling air volume flow rate [m3/s]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatVolFlowMax = 0.0; // zone design heating maximum air volume flow rate [m3/s]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolVolFlowMin = 0.0; // zone design cooling minimum air volume flow rate [m3/s]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatCoilInTemp = 0.0; // zone heating coil design air inlet temperature [C]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolCoilInTemp = 0.0; // zone cooling coil design air inlet temperature [C]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatCoilInHumRat = 0.0; // zone heating coil design air inlet humidity ratio [kg/kg]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolCoilInHumRat = 0.0; // zone cooling coil design air inlet humidity ratio [kg/kg]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatCoilInTempTU = 0.0; // zone heating coil design air inlet temperature (supply air)([C]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolCoilInTempTU = 0.0; // zone cooling coil design air inlet temperature (supply air)[C]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesHeatCoilInHumRatTU = 0.0; // zone heating coil design air inlet humidity ratio
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).DesCoolCoilInHumRatTU = 0.0; // zone cooling coil design air inlet humidity ratio
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatMassFlow = 0.0; // current zone heating air mass flow rate (HVAC time step)
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolMassFlow = 0.0; // current zone cooling air mass flow rate (HVAC time step)
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatLoad = 0.0; // current zone heating load (HVAC time step)
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolLoad = 0.0; // current zone heating load (HVAC time step)
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneTemp = 0.0; // current zone temperature (heating, time step)
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutTemp = 0.0; // current outdoor temperature (heating, time step)
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneRetTemp = 0.0; // current zone return temperature (heating, time step)
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatTstatTemp = 0.0; // current zone thermostat temperature (heating, time step)
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneTemp = 0.0; // current zone temperature (cooling, time step)
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutTemp = 0.0; // current Outdoor temperature (cooling, time step)
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneRetTemp = 0.0; // current zone return temperature (cooling, time step)
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolTstatTemp = 0.0; // current zone Tstat temperature (cooling, time step)
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneHumRat = 0.0; // current zone humidity ratio (heating, time step)
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneHumRat = 0.0; // current zone humidity ratio (cooling, time step)
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutHumRat = 0.0; // current outdoor humidity ratio (heating, time step)
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutHumRat = 0.0; // current outdoor humidity ratio (cooling, time step)
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).ZoneTempAtHeatPeak = 0.0; // zone temp at max heating [C]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).ZoneRetTempAtHeatPeak = 0.0; // zone return temp at max heating [C]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).OutTempAtHeatPeak = 0.0; // outdoor temperature at max heating [C]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).ZoneTempAtCoolPeak = 0.0; // zone temp at max cooling [C]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).ZoneRetTempAtCoolPeak = 0.0; // zone return temp at max cooling [C]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).OutTempAtCoolPeak = 0.0; // outdoor temperature at max cooling [C]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).ZoneHumRatAtHeatPeak = 0.0; // zone humidity ratio at max heating [kg/kg]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).ZoneHumRatAtCoolPeak = 0.0; // zone humidity ratio at max cooling [kg/kg]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).OutHumRatAtHeatPeak = 0.0; // outdoor humidity at max heating [kg/kg]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).OutHumRatAtCoolPeak = 0.0; // outdoor humidity at max cooling [kg/kg]
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).TimeStepNumAtHeatMax = 0; // time step number (in day) at Heating peak
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).TimeStepNumAtCoolMax = 0; // time step number (in day) at cooling peak
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatDDNum = 0; // design day index of design day causing heating peak
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolDDNum = 0; // design day index of design day causing heating peak
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).cHeatDDDate = ""; // date of design day causing heating peak
-				CalcZoneSizing( CtrlZoneNum, DesDayNum ).cCoolDDDate = ""; // date of design day causing cooling peak
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatMassFlow = 0.0; // zone design heating air mass flow rate [kg/s]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMassFlow = 0.0; // zone design cooling air mass flow rate [kg/s]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatLoad = 0.0; // zone design heating load [W]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolLoad = 0.0; // zone design cooling load [W]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatDens = 0.0; // zone design heating air density [kg/m3]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolDens = 0.0; // zone design cooling air density [kg/m3]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatVolFlow = 0.0; // zone design heating air volume flow rate [m3/s]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolVolFlow = 0.0; // zone design cooling air volume flow rate [m3/s]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatVolFlowMax = 0.0; // zone design heating maximum air volume flow rate [m3/s]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolVolFlowMin = 0.0; // zone design cooling minimum air volume flow rate [m3/s]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatCoilInTemp = 0.0; // zone heating coil design air inlet temperature [C]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolCoilInTemp = 0.0; // zone cooling coil design air inlet temperature [C]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatCoilInHumRat = 0.0; // zone heating coil design air inlet humidity ratio [kg/kg]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolCoilInHumRat = 0.0; // zone cooling coil design air inlet humidity ratio [kg/kg]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatCoilInTempTU = 0.0; // zone heating coil design air inlet temperature (supply air)([C]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolCoilInTempTU = 0.0; // zone cooling coil design air inlet temperature (supply air)[C]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesHeatCoilInHumRatTU = 0.0; // zone heating coil design air inlet humidity ratio
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolCoilInHumRatTU = 0.0; // zone cooling coil design air inlet humidity ratio
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatMassFlow = 0.0; // current zone heating air mass flow rate (HVAC time step)
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolMassFlow = 0.0; // current zone cooling air mass flow rate (HVAC time step)
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatLoad = 0.0; // current zone heating load (HVAC time step)
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolLoad = 0.0; // current zone heating load (HVAC time step)
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneTemp = 0.0; // current zone temperature (heating, time step)
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutTemp = 0.0; // current outdoor temperature (heating, time step)
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneRetTemp = 0.0; // current zone return temperature (heating, time step)
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatTstatTemp = 0.0; // current zone thermostat temperature (heating, time step)
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneTemp = 0.0; // current zone temperature (cooling, time step)
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutTemp = 0.0; // current Outdoor temperature (cooling, time step)
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneRetTemp = 0.0; // current zone return temperature (cooling, time step)
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolTstatTemp = 0.0; // current zone Tstat temperature (cooling, time step)
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneHumRat = 0.0; // current zone humidity ratio (heating, time step)
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneHumRat = 0.0; // current zone humidity ratio (cooling, time step)
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutHumRat = 0.0; // current outdoor humidity ratio (heating, time step)
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutHumRat = 0.0; // current outdoor humidity ratio (cooling, time step)
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).ZoneTempAtHeatPeak = 0.0; // zone temp at max heating [C]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).ZoneRetTempAtHeatPeak = 0.0; // zone return temp at max heating [C]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).OutTempAtHeatPeak = 0.0; // outdoor temperature at max heating [C]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).ZoneTempAtCoolPeak = 0.0; // zone temp at max cooling [C]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).ZoneRetTempAtCoolPeak = 0.0; // zone return temp at max cooling [C]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).OutTempAtCoolPeak = 0.0; // outdoor temperature at max cooling [C]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).ZoneHumRatAtHeatPeak = 0.0; // zone humidity ratio at max heating [kg/kg]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).ZoneHumRatAtCoolPeak = 0.0; // zone humidity ratio at max cooling [kg/kg]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).OutHumRatAtHeatPeak = 0.0; // outdoor humidity at max heating [kg/kg]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).OutHumRatAtCoolPeak = 0.0; // outdoor humidity at max cooling [kg/kg]
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).TimeStepNumAtHeatMax = 0; // time step number (in day) at Heating peak
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).TimeStepNumAtCoolMax = 0; // time step number (in day) at cooling peak
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatDDNum = 0; // design day index of design day causing heating peak
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolDDNum = 0; // design day index of design day causing heating peak
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).cHeatDDDate = ""; // date of design day causing heating peak
+				CalcZoneSizing( DesDayNum, CtrlZoneNum ).cCoolDDDate = ""; // date of design day causing cooling peak
 			}
 		}
 		for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
@@ -1718,7 +1718,6 @@ namespace ZoneEquipmentManager {
 		// Using/Aliasing
 		using DataGlobals::HourOfDay;
 		using DataGlobals::TimeStep;
-		using DataGlobals::TimeStepZone;
 		using DataGlobals::NumOfTimeStepInHour;
 		using DataGlobals::BeginDay;
 		using DataGlobals::DuringDay;
@@ -1726,11 +1725,9 @@ namespace ZoneEquipmentManager {
 		using DataGlobals::EndZoneSizingCalc;
 		using DataGlobals::MinutesPerTimeStep;
 		using DataGlobals::OutputFileZoneSizing;
-		using DataGlobals::OutputFileDebug;
 		using DataGlobals::emsCallFromZoneSizing;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataGlobals::isPulseZoneSizing;
-		using DataGlobals::OutputFileZonePulse;
 		using DataHVACGlobals::FracTimeStepZone;
 		using DataHVACGlobals::SmallMassFlow;
 		using DataHVACGlobals::SmallTempDiff;
@@ -1798,12 +1795,12 @@ namespace ZoneEquipmentManager {
 
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolDesDay = EnvironmentName;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatDesDay = EnvironmentName;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatDens = StdRhoAir;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolDens = StdRhoAir;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatDDNum = CurOverallSimDay;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolDDNum = CurOverallSimDay;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolDesDay = EnvironmentName;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatDesDay = EnvironmentName;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatDens = StdRhoAir;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolDens = StdRhoAir;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatDDNum = CurOverallSimDay;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolDDNum = CurOverallSimDay;
 
 			}
 
@@ -1819,26 +1816,26 @@ namespace ZoneEquipmentManager {
 				if ( ZoneThermostatSetPointLo( CtrlZoneNum ) > 0.0 && ZoneThermostatSetPointLo( CtrlZoneNum ) < ZoneSizThermSetPtLo( CtrlZoneNum ) ) {
 					ZoneSizThermSetPtLo( CtrlZoneNum ) = ZoneThermostatSetPointLo( CtrlZoneNum );
 				}
-				ZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatSetPtSeq( TimeStepInDay ) = ZoneThermostatSetPointLo( CtrlZoneNum );
-				ZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatTstatTempSeq( TimeStepInDay ) = TempZoneThermostatSetPoint( CtrlZoneNum );
-				ZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolSetPtSeq( TimeStepInDay ) = ZoneThermostatSetPointHi( CtrlZoneNum );
-				ZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolTstatTempSeq( TimeStepInDay ) = TempZoneThermostatSetPoint( CtrlZoneNum );
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatFlowSeq( TimeStepInDay ) += CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatMassFlow * FracTimeStepZone;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatLoadSeq( TimeStepInDay ) += CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatLoad * FracTimeStepZone;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneTempSeq( TimeStepInDay ) += CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneTemp * FracTimeStepZone;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatOutTempSeq( TimeStepInDay ) += CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatOutTemp * FracTimeStepZone;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneRetTempSeq( TimeStepInDay ) += CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneRetTemp * FracTimeStepZone;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatTstatTempSeq( TimeStepInDay ) = TempZoneThermostatSetPoint( CtrlZoneNum );
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneHumRatSeq( TimeStepInDay ) += CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneHumRat * FracTimeStepZone;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatOutHumRatSeq( TimeStepInDay ) += CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatOutHumRat * FracTimeStepZone;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolFlowSeq( TimeStepInDay ) += CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolMassFlow * FracTimeStepZone;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolLoadSeq( TimeStepInDay ) += CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolLoad * FracTimeStepZone;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolZoneTempSeq( TimeStepInDay ) += CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolZoneTemp * FracTimeStepZone;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolOutTempSeq( TimeStepInDay ) += CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolOutTemp * FracTimeStepZone;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolZoneRetTempSeq( TimeStepInDay ) += CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolZoneRetTemp * FracTimeStepZone;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolTstatTempSeq( TimeStepInDay ) = TempZoneThermostatSetPoint( CtrlZoneNum );
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolZoneHumRatSeq( TimeStepInDay ) += CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolZoneHumRat * FracTimeStepZone;
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolOutHumRatSeq( TimeStepInDay ) += CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolOutHumRat * FracTimeStepZone;
+				ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatSetPtSeq( TimeStepInDay ) = ZoneThermostatSetPointLo( CtrlZoneNum );
+				ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatTstatTempSeq( TimeStepInDay ) = TempZoneThermostatSetPoint( CtrlZoneNum );
+				ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolSetPtSeq( TimeStepInDay ) = ZoneThermostatSetPointHi( CtrlZoneNum );
+				ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolTstatTempSeq( TimeStepInDay ) = TempZoneThermostatSetPoint( CtrlZoneNum );
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatMassFlow * FracTimeStepZone;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatLoadSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatLoad * FracTimeStepZone;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneTempSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneTemp * FracTimeStepZone;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatOutTempSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatOutTemp * FracTimeStepZone;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneRetTempSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneRetTemp * FracTimeStepZone;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatTstatTempSeq( TimeStepInDay ) = TempZoneThermostatSetPoint( CtrlZoneNum );
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneHumRatSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneHumRat * FracTimeStepZone;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatOutHumRatSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatOutHumRat * FracTimeStepZone;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolMassFlow * FracTimeStepZone;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolLoadSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolLoad * FracTimeStepZone;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneTempSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneTemp * FracTimeStepZone;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolOutTempSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolOutTemp * FracTimeStepZone;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneRetTempSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneRetTemp * FracTimeStepZone;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolTstatTempSeq( TimeStepInDay ) = TempZoneThermostatSetPoint( CtrlZoneNum );
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneHumRat * FracTimeStepZone;
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolOutHumRatSeq( TimeStepInDay ) += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolOutHumRat * FracTimeStepZone;
 			}
 
 		} else if ( SELECT_CASE_var == EndDay ) {
@@ -1846,38 +1843,38 @@ namespace ZoneEquipmentManager {
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 				AvgData = 0.0;
-				MovingAvg( CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolFlowSeq, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolFlowSeq = AvgData;
+				MovingAvg( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq = AvgData;
 			}
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 				AvgData = 0.0;
-				MovingAvg( CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolLoadSeq, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolLoadSeq = AvgData;
+				MovingAvg( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolLoadSeq, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolLoadSeq = AvgData;
 			}
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 				AvgData = 0.0;
-				MovingAvg( CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatFlowSeq, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatFlowSeq = AvgData;
+				MovingAvg( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq = AvgData;
 			}
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 				AvgData = 0.0;
-				MovingAvg( CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatLoadSeq, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatLoadSeq = AvgData;
+				MovingAvg( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatLoadSeq, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatLoadSeq = AvgData;
 			}
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 				AvgData = 0.0;
-				MovingAvg( CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolZoneRetTempSeq, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolZoneRetTempSeq = AvgData;
+				MovingAvg( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneRetTempSeq, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneRetTempSeq = AvgData;
 			}
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 				AvgData = 0.0;
-				MovingAvg( CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneRetTempSeq, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-				CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneRetTempSeq = AvgData;
+				MovingAvg( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneRetTempSeq, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneRetTempSeq = AvgData;
 			}
 
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
@@ -1885,100 +1882,100 @@ namespace ZoneEquipmentManager {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 
 				for ( TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
-					if ( CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatLoadSeq( TimeStepIndex ) > CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatLoad ) {
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatLoad = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatLoadSeq( TimeStepIndex );
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatMassFlow = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatFlowSeq( TimeStepIndex );
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ZoneTempAtHeatPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneTempSeq( TimeStepIndex );
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).OutTempAtHeatPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatOutTempSeq( TimeStepIndex );
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ZoneRetTempAtHeatPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneRetTempSeq( TimeStepIndex );
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatTstatTemp = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatTstatTempSeq( TimeStepIndex );
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ZoneHumRatAtHeatPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneHumRatSeq( TimeStepIndex );
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).OutHumRatAtHeatPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatOutHumRatSeq( TimeStepIndex );
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).TimeStepNumAtHeatMax = TimeStepIndex;
+					if ( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatLoadSeq( TimeStepIndex ) > CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatLoad ) {
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatLoad = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatLoadSeq( TimeStepIndex );
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatMassFlow = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq( TimeStepIndex );
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneTempAtHeatPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneTempSeq( TimeStepIndex );
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).OutTempAtHeatPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatOutTempSeq( TimeStepIndex );
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneRetTempAtHeatPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneRetTempSeq( TimeStepIndex );
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatTstatTemp = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatTstatTempSeq( TimeStepIndex );
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneHumRatAtHeatPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneHumRatSeq( TimeStepIndex );
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).OutHumRatAtHeatPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatOutHumRatSeq( TimeStepIndex );
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).TimeStepNumAtHeatMax = TimeStepIndex;
 					}
 				}
-				if ( CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatMassFlow > 0.0 ) {
-					CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatVolFlow = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatMassFlow / CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatDens;
-					OAFrac = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).MinOA / max( CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatVolFlow, SmallMassFlow );
+				if ( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatMassFlow > 0.0 ) {
+					CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatVolFlow = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatMassFlow / CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatDens;
+					OAFrac = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).MinOA / max( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatVolFlow, SmallMassFlow );
 					OAFrac = min( 1.0, max( 0.0, OAFrac ) );
-					TimeStepAtPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).TimeStepNumAtHeatMax;
-					CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatCoilInTemp = OAFrac * DesDayWeath( CurOverallSimDay ).Temp( TimeStepAtPeak ) + ( 1.0 - OAFrac ) * CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ZoneTempAtHeatPeak;
-					CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatCoilInHumRat = OAFrac * DesDayWeath( CurOverallSimDay ).HumRat( TimeStepAtPeak ) + ( 1.0 - OAFrac ) * CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ZoneHumRatAtHeatPeak;
+					TimeStepAtPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).TimeStepNumAtHeatMax;
+					CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatCoilInTemp = OAFrac * DesDayWeath( CurOverallSimDay ).Temp( TimeStepAtPeak ) + ( 1.0 - OAFrac ) * CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneTempAtHeatPeak;
+					CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatCoilInHumRat = OAFrac * DesDayWeath( CurOverallSimDay ).HumRat( TimeStepAtPeak ) + ( 1.0 - OAFrac ) * CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneHumRatAtHeatPeak;
 				}
 				for ( TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
-					if ( CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolLoadSeq( TimeStepIndex ) > CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolLoad ) {
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolLoad = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolLoadSeq( TimeStepIndex );
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolMassFlow = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolFlowSeq( TimeStepIndex );
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ZoneTempAtCoolPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolZoneTempSeq( TimeStepIndex );
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).OutTempAtCoolPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolOutTempSeq( TimeStepIndex );
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ZoneRetTempAtCoolPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolZoneRetTempSeq( TimeStepIndex );
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolTstatTemp = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolTstatTempSeq( TimeStepIndex );
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ZoneHumRatAtCoolPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolZoneHumRatSeq( TimeStepIndex );
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).OutHumRatAtCoolPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolOutHumRatSeq( TimeStepIndex );
-						CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).TimeStepNumAtCoolMax = TimeStepIndex;
+					if ( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolLoadSeq( TimeStepIndex ) > CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolLoad ) {
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolLoad = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolLoadSeq( TimeStepIndex );
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolMassFlow = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq( TimeStepIndex );
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneTempAtCoolPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneTempSeq( TimeStepIndex );
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).OutTempAtCoolPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolOutTempSeq( TimeStepIndex );
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneRetTempAtCoolPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneRetTempSeq( TimeStepIndex );
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolTstatTemp = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolTstatTempSeq( TimeStepIndex );
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneHumRatAtCoolPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepIndex );
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).OutHumRatAtCoolPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolOutHumRatSeq( TimeStepIndex );
+						CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).TimeStepNumAtCoolMax = TimeStepIndex;
 					}
 				}
-				if ( CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolMassFlow > 0.0 ) {
-					CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolVolFlow = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolMassFlow / CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolDens;
-					OAFrac = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).MinOA / max( CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolVolFlow, SmallMassFlow );
+				if ( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolMassFlow > 0.0 ) {
+					CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolVolFlow = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolMassFlow / CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolDens;
+					OAFrac = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).MinOA / max( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolVolFlow, SmallMassFlow );
 					OAFrac = min( 1.0, max( 0.0, OAFrac ) );
-					TimeStepAtPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).TimeStepNumAtCoolMax;
-					CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolCoilInTemp = OAFrac * DesDayWeath( CurOverallSimDay ).Temp( TimeStepAtPeak ) + ( 1.0 - OAFrac ) * CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ZoneTempAtCoolPeak;
-					CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolCoilInHumRat = OAFrac * DesDayWeath( CurOverallSimDay ).HumRat( TimeStepAtPeak ) + ( 1.0 - OAFrac ) * CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ZoneHumRatAtCoolPeak;
+					TimeStepAtPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).TimeStepNumAtCoolMax;
+					CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolCoilInTemp = OAFrac * DesDayWeath( CurOverallSimDay ).Temp( TimeStepAtPeak ) + ( 1.0 - OAFrac ) * CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneTempAtCoolPeak;
+					CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolCoilInHumRat = OAFrac * DesDayWeath( CurOverallSimDay ).HumRat( TimeStepAtPeak ) + ( 1.0 - OAFrac ) * CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneHumRatAtCoolPeak;
 				}
-				if ( CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatVolFlow > CalcFinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow ) {
-					CalcFinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatVolFlow;
-					CalcFinalZoneSizing( CtrlZoneNum ).DesHeatLoad = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatLoad;
-					CalcFinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatMassFlow;
-					CalcFinalZoneSizing( CtrlZoneNum ).HeatDesDay = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatDesDay;
-					CalcFinalZoneSizing( CtrlZoneNum ).DesHeatDens = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatDens;
-					CalcFinalZoneSizing( CtrlZoneNum ).HeatFlowSeq = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatFlowSeq;
-					CalcFinalZoneSizing( CtrlZoneNum ).HeatLoadSeq = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatLoadSeq;
-					CalcFinalZoneSizing( CtrlZoneNum ).HeatZoneTempSeq = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneTempSeq;
-					CalcFinalZoneSizing( CtrlZoneNum ).HeatOutTempSeq = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatOutTempSeq;
-					CalcFinalZoneSizing( CtrlZoneNum ).HeatZoneRetTempSeq = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneRetTempSeq;
-					CalcFinalZoneSizing( CtrlZoneNum ).HeatTstatTempSeq = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatTstatTempSeq;
-					CalcFinalZoneSizing( CtrlZoneNum ).HeatTstatTemp = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatTstatTemp;
-					CalcFinalZoneSizing( CtrlZoneNum ).HeatZoneHumRatSeq = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneHumRatSeq;
-					CalcFinalZoneSizing( CtrlZoneNum ).HeatOutHumRatSeq = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatOutHumRatSeq;
-					CalcFinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ZoneTempAtHeatPeak;
-					CalcFinalZoneSizing( CtrlZoneNum ).OutTempAtHeatPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).OutTempAtHeatPeak;
-					CalcFinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtHeatPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ZoneRetTempAtHeatPeak;
-					CalcFinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ZoneHumRatAtHeatPeak;
-					CalcFinalZoneSizing( CtrlZoneNum ).OutHumRatAtHeatPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).OutHumRatAtHeatPeak;
-					CalcFinalZoneSizing( CtrlZoneNum ).HeatDDNum = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatDDNum;
+				if ( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatVolFlow > CalcFinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow ) {
+					CalcFinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatVolFlow;
+					CalcFinalZoneSizing( CtrlZoneNum ).DesHeatLoad = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatLoad;
+					CalcFinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatMassFlow;
+					CalcFinalZoneSizing( CtrlZoneNum ).HeatDesDay = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatDesDay;
+					CalcFinalZoneSizing( CtrlZoneNum ).DesHeatDens = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatDens;
+					CalcFinalZoneSizing( CtrlZoneNum ).HeatFlowSeq = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq;
+					CalcFinalZoneSizing( CtrlZoneNum ).HeatLoadSeq = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatLoadSeq;
+					CalcFinalZoneSizing( CtrlZoneNum ).HeatZoneTempSeq = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneTempSeq;
+					CalcFinalZoneSizing( CtrlZoneNum ).HeatOutTempSeq = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatOutTempSeq;
+					CalcFinalZoneSizing( CtrlZoneNum ).HeatZoneRetTempSeq = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneRetTempSeq;
+					CalcFinalZoneSizing( CtrlZoneNum ).HeatTstatTempSeq = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatTstatTempSeq;
+					CalcFinalZoneSizing( CtrlZoneNum ).HeatTstatTemp = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatTstatTemp;
+					CalcFinalZoneSizing( CtrlZoneNum ).HeatZoneHumRatSeq = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneHumRatSeq;
+					CalcFinalZoneSizing( CtrlZoneNum ).HeatOutHumRatSeq = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatOutHumRatSeq;
+					CalcFinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneTempAtHeatPeak;
+					CalcFinalZoneSizing( CtrlZoneNum ).OutTempAtHeatPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).OutTempAtHeatPeak;
+					CalcFinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtHeatPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneRetTempAtHeatPeak;
+					CalcFinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneHumRatAtHeatPeak;
+					CalcFinalZoneSizing( CtrlZoneNum ).OutHumRatAtHeatPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).OutHumRatAtHeatPeak;
+					CalcFinalZoneSizing( CtrlZoneNum ).HeatDDNum = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatDDNum;
 					CalcFinalZoneSizing( CtrlZoneNum ).cHeatDDDate = DesDayWeath( CurOverallSimDay ).DateString;
-					CalcFinalZoneSizing( CtrlZoneNum ).TimeStepNumAtHeatMax = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).TimeStepNumAtHeatMax;
-					CalcFinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTemp = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatCoilInTemp;
-					CalcFinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRat = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesHeatCoilInHumRat;
+					CalcFinalZoneSizing( CtrlZoneNum ).TimeStepNumAtHeatMax = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).TimeStepNumAtHeatMax;
+					CalcFinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTemp = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatCoilInTemp;
+					CalcFinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRat = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatCoilInHumRat;
 				} else {
 					CalcFinalZoneSizing( CtrlZoneNum ).DesHeatDens = StdRhoAir;
 				}
-				if ( CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolVolFlow > CalcFinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow ) {
-					CalcFinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolVolFlow;
-					CalcFinalZoneSizing( CtrlZoneNum ).DesCoolLoad = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolLoad;
-					CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMassFlow = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolMassFlow;
-					CalcFinalZoneSizing( CtrlZoneNum ).CoolDesDay = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolDesDay;
-					CalcFinalZoneSizing( CtrlZoneNum ).DesCoolDens = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolDens;
-					CalcFinalZoneSizing( CtrlZoneNum ).CoolFlowSeq = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolFlowSeq;
-					CalcFinalZoneSizing( CtrlZoneNum ).CoolLoadSeq = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolLoadSeq;
-					CalcFinalZoneSizing( CtrlZoneNum ).CoolZoneTempSeq = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolZoneTempSeq;
-					CalcFinalZoneSizing( CtrlZoneNum ).CoolOutTempSeq = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolOutTempSeq;
-					CalcFinalZoneSizing( CtrlZoneNum ).CoolZoneRetTempSeq = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolZoneRetTempSeq;
-					CalcFinalZoneSizing( CtrlZoneNum ).CoolTstatTempSeq = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolTstatTempSeq;
-					CalcFinalZoneSizing( CtrlZoneNum ).CoolTstatTemp = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolTstatTemp;
-					CalcFinalZoneSizing( CtrlZoneNum ).CoolZoneHumRatSeq = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolZoneHumRatSeq;
-					CalcFinalZoneSizing( CtrlZoneNum ).CoolOutHumRatSeq = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolOutHumRatSeq;
-					CalcFinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ZoneTempAtCoolPeak;
-					CalcFinalZoneSizing( CtrlZoneNum ).OutTempAtCoolPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).OutTempAtCoolPeak;
-					CalcFinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtCoolPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ZoneRetTempAtCoolPeak;
-					CalcFinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).ZoneHumRatAtCoolPeak;
-					CalcFinalZoneSizing( CtrlZoneNum ).OutHumRatAtCoolPeak = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).OutHumRatAtCoolPeak;
-					CalcFinalZoneSizing( CtrlZoneNum ).CoolDDNum = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolDDNum;
+				if ( CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolVolFlow > CalcFinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow ) {
+					CalcFinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolVolFlow;
+					CalcFinalZoneSizing( CtrlZoneNum ).DesCoolLoad = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolLoad;
+					CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMassFlow = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolMassFlow;
+					CalcFinalZoneSizing( CtrlZoneNum ).CoolDesDay = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolDesDay;
+					CalcFinalZoneSizing( CtrlZoneNum ).DesCoolDens = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolDens;
+					CalcFinalZoneSizing( CtrlZoneNum ).CoolFlowSeq = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq;
+					CalcFinalZoneSizing( CtrlZoneNum ).CoolLoadSeq = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolLoadSeq;
+					CalcFinalZoneSizing( CtrlZoneNum ).CoolZoneTempSeq = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneTempSeq;
+					CalcFinalZoneSizing( CtrlZoneNum ).CoolOutTempSeq = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolOutTempSeq;
+					CalcFinalZoneSizing( CtrlZoneNum ).CoolZoneRetTempSeq = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneRetTempSeq;
+					CalcFinalZoneSizing( CtrlZoneNum ).CoolTstatTempSeq = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolTstatTempSeq;
+					CalcFinalZoneSizing( CtrlZoneNum ).CoolTstatTemp = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolTstatTemp;
+					CalcFinalZoneSizing( CtrlZoneNum ).CoolZoneHumRatSeq = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneHumRatSeq;
+					CalcFinalZoneSizing( CtrlZoneNum ).CoolOutHumRatSeq = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolOutHumRatSeq;
+					CalcFinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneTempAtCoolPeak;
+					CalcFinalZoneSizing( CtrlZoneNum ).OutTempAtCoolPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).OutTempAtCoolPeak;
+					CalcFinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtCoolPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneRetTempAtCoolPeak;
+					CalcFinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).ZoneHumRatAtCoolPeak;
+					CalcFinalZoneSizing( CtrlZoneNum ).OutHumRatAtCoolPeak = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).OutHumRatAtCoolPeak;
+					CalcFinalZoneSizing( CtrlZoneNum ).CoolDDNum = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolDDNum;
 					CalcFinalZoneSizing( CtrlZoneNum ).cCoolDDDate = DesDayWeath( CurOverallSimDay ).DateString;
-					CalcFinalZoneSizing( CtrlZoneNum ).TimeStepNumAtCoolMax = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).TimeStepNumAtCoolMax;
-					CalcFinalZoneSizing( CtrlZoneNum ).DesCoolCoilInTemp = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolCoilInTemp;
-					CalcFinalZoneSizing( CtrlZoneNum ).DesCoolCoilInHumRat = CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).DesCoolCoilInHumRat;
+					CalcFinalZoneSizing( CtrlZoneNum ).TimeStepNumAtCoolMax = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).TimeStepNumAtCoolMax;
+					CalcFinalZoneSizing( CtrlZoneNum ).DesCoolCoilInTemp = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolCoilInTemp;
+					CalcFinalZoneSizing( CtrlZoneNum ).DesCoolCoilInHumRat = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolCoilInHumRat;
 				} else {
 					CalcFinalZoneSizing( CtrlZoneNum ).DesCoolDens = StdRhoAir;
 				}
@@ -2222,22 +2219,22 @@ namespace ZoneEquipmentManager {
 				for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 					if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 					for ( TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
-						ZoneSizing( CtrlZoneNum, DesDayNum ).HeatFlowSeq( TimeStepIndex ) = CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatFlowSeq( TimeStepIndex );
-						ZoneSizing( CtrlZoneNum, DesDayNum ).HeatLoadSeq( TimeStepIndex ) = CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatLoadSeq( TimeStepIndex );
-						ZoneSizing( CtrlZoneNum, DesDayNum ).CoolFlowSeq( TimeStepIndex ) = CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolFlowSeq( TimeStepIndex );
-						ZoneSizing( CtrlZoneNum, DesDayNum ).CoolLoadSeq( TimeStepIndex ) = CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolLoadSeq( TimeStepIndex );
-						ZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneTempSeq( TimeStepIndex ) = CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneTempSeq( TimeStepIndex );
-						ZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutTempSeq( TimeStepIndex ) = CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutTempSeq( TimeStepIndex );
-						ZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneRetTempSeq( TimeStepIndex ) = CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneRetTempSeq( TimeStepIndex );
-						ZoneSizing( CtrlZoneNum, DesDayNum ).HeatTstatTempSeq( TimeStepIndex ) = CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatTstatTempSeq( TimeStepIndex );
-						ZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneHumRatSeq( TimeStepIndex ) = CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatZoneHumRatSeq( TimeStepIndex );
-						ZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutHumRatSeq( TimeStepIndex ) = CalcZoneSizing( CtrlZoneNum, DesDayNum ).HeatOutHumRatSeq( TimeStepIndex );
-						ZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneTempSeq( TimeStepIndex ) = CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneTempSeq( TimeStepIndex );
-						ZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutTempSeq( TimeStepIndex ) = CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutTempSeq( TimeStepIndex );
-						ZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneRetTempSeq( TimeStepIndex ) = CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneRetTempSeq( TimeStepIndex );
-						ZoneSizing( CtrlZoneNum, DesDayNum ).CoolTstatTempSeq( TimeStepIndex ) = CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolTstatTempSeq( TimeStepIndex );
-						ZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneHumRatSeq( TimeStepIndex ) = CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolZoneHumRatSeq( TimeStepIndex );
-						ZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutHumRatSeq( TimeStepIndex ) = CalcZoneSizing( CtrlZoneNum, DesDayNum ).CoolOutHumRatSeq( TimeStepIndex );
+						ZoneSizing( DesDayNum, CtrlZoneNum ).HeatFlowSeq( TimeStepIndex ) = CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatFlowSeq( TimeStepIndex );
+						ZoneSizing( DesDayNum, CtrlZoneNum ).HeatLoadSeq( TimeStepIndex ) = CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatLoadSeq( TimeStepIndex );
+						ZoneSizing( DesDayNum, CtrlZoneNum ).CoolFlowSeq( TimeStepIndex ) = CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolFlowSeq( TimeStepIndex );
+						ZoneSizing( DesDayNum, CtrlZoneNum ).CoolLoadSeq( TimeStepIndex ) = CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolLoadSeq( TimeStepIndex );
+						ZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneTempSeq( TimeStepIndex ) = CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneTempSeq( TimeStepIndex );
+						ZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutTempSeq( TimeStepIndex ) = CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutTempSeq( TimeStepIndex );
+						ZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneRetTempSeq( TimeStepIndex ) = CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneRetTempSeq( TimeStepIndex );
+						ZoneSizing( DesDayNum, CtrlZoneNum ).HeatTstatTempSeq( TimeStepIndex ) = CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatTstatTempSeq( TimeStepIndex );
+						ZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneHumRatSeq( TimeStepIndex ) = CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatZoneHumRatSeq( TimeStepIndex );
+						ZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutHumRatSeq( TimeStepIndex ) = CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatOutHumRatSeq( TimeStepIndex );
+						ZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneTempSeq( TimeStepIndex ) = CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneTempSeq( TimeStepIndex );
+						ZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutTempSeq( TimeStepIndex ) = CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutTempSeq( TimeStepIndex );
+						ZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneRetTempSeq( TimeStepIndex ) = CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneRetTempSeq( TimeStepIndex );
+						ZoneSizing( DesDayNum, CtrlZoneNum ).CoolTstatTempSeq( TimeStepIndex ) = CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolTstatTempSeq( TimeStepIndex );
+						ZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepIndex ) = CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepIndex );
+						ZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutHumRatSeq( TimeStepIndex ) = CalcZoneSizing( DesDayNum, CtrlZoneNum ).CoolOutHumRatSeq( TimeStepIndex );
 					}
 				}
 			}
@@ -2294,20 +2291,20 @@ namespace ZoneEquipmentManager {
 						FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlow = FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * FinalZoneSizing( CtrlZoneNum ).DesCoolDens;
 					}
 					for ( DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum ) {
-						if ( ZoneSizing( CtrlZoneNum, DDNum ).DesCoolVolFlow > 0.0 ) {
-							TimeStepAtPeak = ZoneSizing( CtrlZoneNum, DDNum ).TimeStepNumAtCoolMax;
-							ZoneSizing( CtrlZoneNum, DDNum ).DesCoolVolFlow = CalcZoneSizing( CtrlZoneNum, DDNum ).DesCoolVolFlow * TotCoolSizMult;
-							ZoneSizing( CtrlZoneNum, DDNum ).DesCoolMassFlow = CalcZoneSizing( CtrlZoneNum, DDNum ).DesCoolMassFlow * TotCoolSizMult;
-							ZoneSizing( CtrlZoneNum, DDNum ).DesCoolLoad = CalcZoneSizing( CtrlZoneNum, DDNum ).DesCoolLoad * TotCoolSizMult;
-							ZoneSizing( CtrlZoneNum, DDNum ).CoolFlowSeq = CalcZoneSizing( CtrlZoneNum, DDNum ).CoolFlowSeq * TotCoolSizMult;
-							ZoneSizing( CtrlZoneNum, DDNum ).CoolLoadSeq = CalcZoneSizing( CtrlZoneNum, DDNum ).CoolLoadSeq * TotCoolSizMult;
-							OAFrac = ZoneSizing( CtrlZoneNum, DDNum ).MinOA / ZoneSizing( CtrlZoneNum, DDNum ).DesCoolVolFlow;
+						if ( ZoneSizing( DDNum, CtrlZoneNum ).DesCoolVolFlow > 0.0 ) {
+							TimeStepAtPeak = ZoneSizing( DDNum, CtrlZoneNum ).TimeStepNumAtCoolMax;
+							ZoneSizing( DDNum, CtrlZoneNum ).DesCoolVolFlow = CalcZoneSizing( DDNum, CtrlZoneNum ).DesCoolVolFlow * TotCoolSizMult;
+							ZoneSizing( DDNum, CtrlZoneNum ).DesCoolMassFlow = CalcZoneSizing( DDNum, CtrlZoneNum ).DesCoolMassFlow * TotCoolSizMult;
+							ZoneSizing( DDNum, CtrlZoneNum ).DesCoolLoad = CalcZoneSizing( DDNum, CtrlZoneNum ).DesCoolLoad * TotCoolSizMult;
+							ZoneSizing( DDNum, CtrlZoneNum ).CoolFlowSeq = CalcZoneSizing( DDNum, CtrlZoneNum ).CoolFlowSeq * TotCoolSizMult;
+							ZoneSizing( DDNum, CtrlZoneNum ).CoolLoadSeq = CalcZoneSizing( DDNum, CtrlZoneNum ).CoolLoadSeq * TotCoolSizMult;
+							OAFrac = ZoneSizing( DDNum, CtrlZoneNum ).MinOA / ZoneSizing( DDNum, CtrlZoneNum ).DesCoolVolFlow;
 							OAFrac = min( 1.0, max( 0.0, OAFrac ) );
-							ZoneSizing( CtrlZoneNum, DDNum ).DesCoolCoilInTemp = OAFrac * DesDayWeath( DDNum ).Temp( TimeStepAtPeak ) + ( 1.0 - OAFrac ) * ZoneSizing( CtrlZoneNum, DDNum ).ZoneTempAtCoolPeak;
-							ZoneSizing( CtrlZoneNum, DDNum ).DesCoolCoilInHumRat = OAFrac * DesDayWeath( DDNum ).HumRat( TimeStepAtPeak ) + ( 1.0 - OAFrac ) * ZoneSizing( CtrlZoneNum, DDNum ).ZoneHumRatAtCoolPeak;
+							ZoneSizing( DDNum, CtrlZoneNum ).DesCoolCoilInTemp = OAFrac * DesDayWeath( DDNum ).Temp( TimeStepAtPeak ) + ( 1.0 - OAFrac ) * ZoneSizing( DDNum, CtrlZoneNum ).ZoneTempAtCoolPeak;
+							ZoneSizing( DDNum, CtrlZoneNum ).DesCoolCoilInHumRat = OAFrac * DesDayWeath( DDNum ).HumRat( TimeStepAtPeak ) + ( 1.0 - OAFrac ) * ZoneSizing( DDNum, CtrlZoneNum ).ZoneHumRatAtCoolPeak;
 						} else {
-							ZoneSizing( CtrlZoneNum, DDNum ).DesCoolVolFlow = ZoneSizing( CtrlZoneNum, DDNum ).InpDesCoolAirFlow;
-							ZoneSizing( CtrlZoneNum, DDNum ).DesCoolMassFlow = ZoneSizing( CtrlZoneNum, DDNum ).DesCoolVolFlow * ZoneSizing( CtrlZoneNum, DDNum ).DesCoolDens;
+							ZoneSizing( DDNum, CtrlZoneNum ).DesCoolVolFlow = ZoneSizing( DDNum, CtrlZoneNum ).InpDesCoolAirFlow;
+							ZoneSizing( DDNum, CtrlZoneNum ).DesCoolMassFlow = ZoneSizing( DDNum, CtrlZoneNum ).DesCoolVolFlow * ZoneSizing( DDNum, CtrlZoneNum ).DesCoolDens;
 						}
 					}
 				}
@@ -2328,15 +2325,15 @@ namespace ZoneEquipmentManager {
 					}
 				}
 				for ( DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum ) {
-					MaxOfMinCoolVolFlow = max( ZoneSizing( CtrlZoneNum, DDNum ).DesCoolMinAirFlow, ZoneSizing( CtrlZoneNum, DDNum ).DesCoolMinAirFlow, ZoneSizing( CtrlZoneNum, DDNum ).MinOA );
-					MaxOfMinCoolMassFlow = MaxOfMinCoolVolFlow * ZoneSizing( CtrlZoneNum, DDNum ).DesCoolDens;
-					if ( MaxOfMinCoolVolFlow > ZoneSizing( CtrlZoneNum, DDNum ).DesCoolVolFlow ) {
-						ZoneSizing( CtrlZoneNum, DDNum ).DesCoolVolFlow = MaxOfMinCoolVolFlow;
-						ZoneSizing( CtrlZoneNum, DDNum ).DesCoolMassFlow = MaxOfMinCoolMassFlow;
+					MaxOfMinCoolVolFlow = max( ZoneSizing( DDNum, CtrlZoneNum ).DesCoolMinAirFlow, ZoneSizing( DDNum, CtrlZoneNum ).DesCoolMinAirFlow, ZoneSizing( DDNum, CtrlZoneNum ).MinOA );
+					MaxOfMinCoolMassFlow = MaxOfMinCoolVolFlow * ZoneSizing( DDNum, CtrlZoneNum ).DesCoolDens;
+					if ( MaxOfMinCoolVolFlow > ZoneSizing( DDNum, CtrlZoneNum ).DesCoolVolFlow ) {
+						ZoneSizing( DDNum, CtrlZoneNum ).DesCoolVolFlow = MaxOfMinCoolVolFlow;
+						ZoneSizing( DDNum, CtrlZoneNum ).DesCoolMassFlow = MaxOfMinCoolMassFlow;
 					}
 					for ( TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
-						if ( MaxOfMinCoolMassFlow > ZoneSizing( CtrlZoneNum, DDNum ).CoolFlowSeq( TimeStepIndex ) ) {
-							ZoneSizing( CtrlZoneNum, DDNum ).CoolFlowSeq( TimeStepIndex ) = MaxOfMinCoolMassFlow;
+						if ( MaxOfMinCoolMassFlow > ZoneSizing( DDNum, CtrlZoneNum ).CoolFlowSeq( TimeStepIndex ) ) {
+							ZoneSizing( DDNum, CtrlZoneNum ).CoolFlowSeq( TimeStepIndex ) = MaxOfMinCoolMassFlow;
 						}
 					}
 				}
@@ -2345,21 +2342,21 @@ namespace ZoneEquipmentManager {
 				//        IF (FinalZoneSizing(CtrlZoneNum)%DesCoolMassFlow > 0.0d0 .AND. &
 				if ( ( FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtCoolMax == 0 || FinalZoneSizing( CtrlZoneNum ).CoolDDNum == 0 ) ) {
 					for ( DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum ) {
-						ZoneSizing( CtrlZoneNum, DDNum ).TimeStepNumAtCoolMax = 1;
-						TimeStepAtPeak = ZoneSizing( CtrlZoneNum, DDNum ).TimeStepNumAtCoolMax;
+						ZoneSizing( DDNum, CtrlZoneNum ).TimeStepNumAtCoolMax = 1;
+						TimeStepAtPeak = ZoneSizing( DDNum, CtrlZoneNum ).TimeStepNumAtCoolMax;
 						for ( TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
 							if ( DesDayWeath( DDNum ).Temp( TimeStepIndex ) > DesDayWeath( DDNum ).Temp( TimeStepAtPeak ) ) {
 								TimeStepAtPeak = TimeStepIndex;
 							}
 						}
-						ZoneSizing( CtrlZoneNum, DDNum ).TimeStepNumAtCoolMax = TimeStepAtPeak;
+						ZoneSizing( DDNum, CtrlZoneNum ).TimeStepNumAtCoolMax = TimeStepAtPeak;
 					}
 					FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtCoolMax = 1;
 					FinalZoneSizing( CtrlZoneNum ).CoolDDNum = 1;
 					TimeStepAtPeakF = FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtCoolMax;
 					DDNumF = FinalZoneSizing( CtrlZoneNum ).CoolDDNum;
 					for ( DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum ) {
-						TimeStepAtPeak = ZoneSizing( CtrlZoneNum, DDNum ).TimeStepNumAtCoolMax;
+						TimeStepAtPeak = ZoneSizing( DDNum, CtrlZoneNum ).TimeStepNumAtCoolMax;
 						if ( DesDayWeath( DDNum ).Temp( TimeStepAtPeak ) > DesDayWeath( DDNumF ).Temp( TimeStepAtPeakF ) ) {
 							DDNumF = DDNum;
 							TimeStepAtPeakF = TimeStepAtPeak;
@@ -2367,17 +2364,17 @@ namespace ZoneEquipmentManager {
 					}
 					FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtCoolMax = TimeStepAtPeakF;
 					FinalZoneSizing( CtrlZoneNum ).CoolDDNum = DDNumF;
-					FinalZoneSizing( CtrlZoneNum ).CoolDesDay = ZoneSizing( CtrlZoneNum, DDNumF ).CoolDesDay;
+					FinalZoneSizing( CtrlZoneNum ).CoolDesDay = ZoneSizing( DDNumF, CtrlZoneNum ).CoolDesDay;
 
 					// initialize sizing conditions if they have not been set (i.e., no corresponding load) to zone condition
 					if ( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak == 0.0 ) {
-						FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = ZoneSizing( CtrlZoneNum, DDNumF ).DesCoolSetPtSeq( TimeStepAtPeakF );
-						FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = ZoneSizing( CtrlZoneNum, DDNumF ).CoolZoneHumRatSeq( TimeStepAtPeakF );
+						FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq( TimeStepAtPeakF );
+						FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = ZoneSizing( DDNumF, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepAtPeakF );
 						if ( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak > 0.0 ) {
 							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = min( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak, PsyWFnTdpPb( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak, StdBaroPress, RoutineName ) );
 
 						} else {
-							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = ZoneSizing( CtrlZoneNum, DDNumF ).CoolDesHumRat;
+							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = ZoneSizing( DDNumF, CtrlZoneNum ).CoolDesHumRat;
 						}
 						FinalZoneSizing( CtrlZoneNum ).DesCoolCoilInTemp = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak;
 						FinalZoneSizing( CtrlZoneNum ).DesCoolCoilInHumRat = FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak;
@@ -2421,20 +2418,20 @@ namespace ZoneEquipmentManager {
 						FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow * FinalZoneSizing( CtrlZoneNum ).DesHeatDens;
 					}
 					for ( DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum ) {
-						if ( ZoneSizing( CtrlZoneNum, DDNum ).DesHeatVolFlow > 0.0 ) {
-							TimeStepAtPeak = ZoneSizing( CtrlZoneNum, DDNum ).TimeStepNumAtHeatMax;
-							ZoneSizing( CtrlZoneNum, DDNum ).DesHeatVolFlow = CalcZoneSizing( CtrlZoneNum, DDNum ).DesHeatVolFlow * TotHeatSizMult;
-							ZoneSizing( CtrlZoneNum, DDNum ).DesHeatMassFlow = CalcZoneSizing( CtrlZoneNum, DDNum ).DesHeatMassFlow * TotHeatSizMult;
-							ZoneSizing( CtrlZoneNum, DDNum ).DesHeatLoad = CalcZoneSizing( CtrlZoneNum, DDNum ).DesHeatLoad * TotHeatSizMult;
-							ZoneSizing( CtrlZoneNum, DDNum ).HeatFlowSeq = CalcZoneSizing( CtrlZoneNum, DDNum ).HeatFlowSeq * TotHeatSizMult;
-							ZoneSizing( CtrlZoneNum, DDNum ).HeatLoadSeq = CalcZoneSizing( CtrlZoneNum, DDNum ).HeatLoadSeq * TotHeatSizMult;
-							OAFrac = ZoneSizing( CtrlZoneNum, DDNum ).MinOA / ZoneSizing( CtrlZoneNum, DDNum ).DesHeatVolFlow;
+						if ( ZoneSizing( DDNum, CtrlZoneNum ).DesHeatVolFlow > 0.0 ) {
+							TimeStepAtPeak = ZoneSizing( DDNum, CtrlZoneNum ).TimeStepNumAtHeatMax;
+							ZoneSizing( DDNum, CtrlZoneNum ).DesHeatVolFlow = CalcZoneSizing( DDNum, CtrlZoneNum ).DesHeatVolFlow * TotHeatSizMult;
+							ZoneSizing( DDNum, CtrlZoneNum ).DesHeatMassFlow = CalcZoneSizing( DDNum, CtrlZoneNum ).DesHeatMassFlow * TotHeatSizMult;
+							ZoneSizing( DDNum, CtrlZoneNum ).DesHeatLoad = CalcZoneSizing( DDNum, CtrlZoneNum ).DesHeatLoad * TotHeatSizMult;
+							ZoneSizing( DDNum, CtrlZoneNum ).HeatFlowSeq = CalcZoneSizing( DDNum, CtrlZoneNum ).HeatFlowSeq * TotHeatSizMult;
+							ZoneSizing( DDNum, CtrlZoneNum ).HeatLoadSeq = CalcZoneSizing( DDNum, CtrlZoneNum ).HeatLoadSeq * TotHeatSizMult;
+							OAFrac = ZoneSizing( DDNum, CtrlZoneNum ).MinOA / ZoneSizing( DDNum, CtrlZoneNum ).DesHeatVolFlow;
 							OAFrac = min( 1.0, max( 0.0, OAFrac ) );
-							ZoneSizing( CtrlZoneNum, DDNum ).DesHeatCoilInTemp = OAFrac * DesDayWeath( DDNum ).Temp( TimeStepAtPeak ) + ( 1.0 - OAFrac ) * ZoneSizing( CtrlZoneNum, DDNum ).ZoneTempAtHeatPeak;
-							ZoneSizing( CtrlZoneNum, DDNum ).DesHeatCoilInHumRat = OAFrac * DesDayWeath( DDNum ).HumRat( TimeStepAtPeak ) + ( 1.0 - OAFrac ) * ZoneSizing( CtrlZoneNum, DDNum ).ZoneHumRatAtHeatPeak;
+							ZoneSizing( DDNum, CtrlZoneNum ).DesHeatCoilInTemp = OAFrac * DesDayWeath( DDNum ).Temp( TimeStepAtPeak ) + ( 1.0 - OAFrac ) * ZoneSizing( DDNum, CtrlZoneNum ).ZoneTempAtHeatPeak;
+							ZoneSizing( DDNum, CtrlZoneNum ).DesHeatCoilInHumRat = OAFrac * DesDayWeath( DDNum ).HumRat( TimeStepAtPeak ) + ( 1.0 - OAFrac ) * ZoneSizing( DDNum, CtrlZoneNum ).ZoneHumRatAtHeatPeak;
 						} else {
-							ZoneSizing( CtrlZoneNum, DDNum ).DesHeatVolFlow = ZoneSizing( CtrlZoneNum, DDNum ).InpDesHeatAirFlow;
-							ZoneSizing( CtrlZoneNum, DDNum ).DesHeatMassFlow = ZoneSizing( CtrlZoneNum, DDNum ).DesHeatVolFlow * ZoneSizing( CtrlZoneNum, DDNum ).DesHeatDens;
+							ZoneSizing( DDNum, CtrlZoneNum ).DesHeatVolFlow = ZoneSizing( DDNum, CtrlZoneNum ).InpDesHeatAirFlow;
+							ZoneSizing( DDNum, CtrlZoneNum ).DesHeatMassFlow = ZoneSizing( DDNum, CtrlZoneNum ).DesHeatVolFlow * ZoneSizing( DDNum, CtrlZoneNum ).DesHeatDens;
 						}
 					}
 				}
@@ -2449,14 +2446,14 @@ namespace ZoneEquipmentManager {
 					}
 				}
 				for ( DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum ) {
-					MinOAMass = ZoneSizing( CtrlZoneNum, DDNum ).MinOA * ZoneSizing( CtrlZoneNum, DDNum ).DesHeatDens;
-					if ( ZoneSizing( CtrlZoneNum, DDNum ).MinOA > ZoneSizing( CtrlZoneNum, DDNum ).DesHeatVolFlow ) {
-						ZoneSizing( CtrlZoneNum, DDNum ).DesHeatVolFlow = ZoneSizing( CtrlZoneNum, DDNum ).MinOA;
-						ZoneSizing( CtrlZoneNum, DDNum ).DesHeatMassFlow = MinOAMass;
+					MinOAMass = ZoneSizing( DDNum, CtrlZoneNum ).MinOA * ZoneSizing( DDNum, CtrlZoneNum ).DesHeatDens;
+					if ( ZoneSizing( DDNum, CtrlZoneNum ).MinOA > ZoneSizing( DDNum, CtrlZoneNum ).DesHeatVolFlow ) {
+						ZoneSizing( DDNum, CtrlZoneNum ).DesHeatVolFlow = ZoneSizing( DDNum, CtrlZoneNum ).MinOA;
+						ZoneSizing( DDNum, CtrlZoneNum ).DesHeatMassFlow = MinOAMass;
 					}
 					for ( TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
-						if ( MinOAMass > ZoneSizing( CtrlZoneNum, DDNum ).HeatFlowSeq( TimeStepIndex ) ) {
-							ZoneSizing( CtrlZoneNum, DDNum ).HeatFlowSeq( TimeStepIndex ) = MinOAMass;
+						if ( MinOAMass > ZoneSizing( DDNum, CtrlZoneNum ).HeatFlowSeq( TimeStepIndex ) ) {
+							ZoneSizing( DDNum, CtrlZoneNum ).HeatFlowSeq( TimeStepIndex ) = MinOAMass;
 						}
 					}
 				}
@@ -2465,21 +2462,21 @@ namespace ZoneEquipmentManager {
 				//        IF (FinalZoneSizing(CtrlZoneNum)%DesHeatMassFlow > 0.0d0 .AND. &
 				if ( ( FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtHeatMax == 0 || FinalZoneSizing( CtrlZoneNum ).HeatDDNum == 0 ) ) {
 					for ( DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum ) {
-						ZoneSizing( CtrlZoneNum, DDNum ).TimeStepNumAtHeatMax = 1;
-						TimeStepAtPeak = ZoneSizing( CtrlZoneNum, DDNum ).TimeStepNumAtHeatMax;
+						ZoneSizing( DDNum, CtrlZoneNum ).TimeStepNumAtHeatMax = 1;
+						TimeStepAtPeak = ZoneSizing( DDNum, CtrlZoneNum ).TimeStepNumAtHeatMax;
 						for ( TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
 							if ( DesDayWeath( DDNum ).Temp( TimeStepIndex ) < DesDayWeath( DDNum ).Temp( TimeStepAtPeak ) ) {
 								TimeStepAtPeak = TimeStepIndex;
 							}
 						}
-						ZoneSizing( CtrlZoneNum, DDNum ).TimeStepNumAtHeatMax = TimeStepAtPeak;
+						ZoneSizing( DDNum, CtrlZoneNum ).TimeStepNumAtHeatMax = TimeStepAtPeak;
 					}
 					FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtHeatMax = 1;
 					FinalZoneSizing( CtrlZoneNum ).HeatDDNum = 1;
 					TimeStepAtPeakF = FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtHeatMax;
 					DDNumF = FinalZoneSizing( CtrlZoneNum ).HeatDDNum;
 					for ( DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum ) {
-						TimeStepAtPeak = ZoneSizing( CtrlZoneNum, DDNum ).TimeStepNumAtHeatMax;
+						TimeStepAtPeak = ZoneSizing( DDNum, CtrlZoneNum ).TimeStepNumAtHeatMax;
 						if ( DesDayWeath( DDNum ).Temp( TimeStepAtPeak ) < DesDayWeath( DDNumF ).Temp( TimeStepAtPeakF ) ) {
 							DDNumF = DDNum;
 							TimeStepAtPeakF = TimeStepAtPeak;
@@ -2487,16 +2484,16 @@ namespace ZoneEquipmentManager {
 					}
 					FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtHeatMax = TimeStepAtPeakF;
 					FinalZoneSizing( CtrlZoneNum ).HeatDDNum = DDNumF;
-					FinalZoneSizing( CtrlZoneNum ).HeatDesDay = ZoneSizing( CtrlZoneNum, DDNumF ).HeatDesDay;
+					FinalZoneSizing( CtrlZoneNum ).HeatDesDay = ZoneSizing( DDNumF, CtrlZoneNum ).HeatDesDay;
 
 					// initialize sizing conditions if they have not been set (i.e., no corresponding load) to zone condition
 					if ( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak == 0.0 ) {
-						FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = ZoneSizing( CtrlZoneNum, DDNumF ).DesHeatSetPtSeq( TimeStepAtPeakF );
-						FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = ZoneSizing( CtrlZoneNum, DDNumF ).HeatZoneHumRatSeq( TimeStepAtPeakF );
+						FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq( TimeStepAtPeakF );
+						FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = ZoneSizing( DDNumF, CtrlZoneNum ).HeatZoneHumRatSeq( TimeStepAtPeakF );
 						if ( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak > 0.0 ) {
 							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = min( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak, PsyWFnTdpPb( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak, StdBaroPress, RoutineName ) );
 						} else {
-							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = ZoneSizing( CtrlZoneNum, DDNumF ).HeatDesHumRat;
+							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = ZoneSizing( DDNumF, CtrlZoneNum ).HeatDesHumRat;
 						}
 						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTemp = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak;
 						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRat = FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak;
@@ -2596,7 +2593,6 @@ namespace ZoneEquipmentManager {
 		using DataAirflowNetwork::AirflowNetworkControlMultizone;
 		using WaterThermalTanks::SimHeatPumpWaterHeater;
 		using DataAirSystems::PrimaryAirSystem;
-		using DataAirLoop::AirLoopControlInfo;
 		using ElectricBaseboardRadiator::SimElecBaseboard;
 		using HVACVariableRefrigerantFlow::SimulateVRF;
 		using RefrigeratedCase::SimAirChillerSet;
@@ -2605,7 +2601,6 @@ namespace ZoneEquipmentManager {
 		using DataGlobals::isPulseZoneSizing;
 		using EvaporativeCoolers::SimZoneEvaporativeCoolerUnit;
 		using HVACUnitarySystem::SimUnitarySystem;
-		using DataHeatBalance::Mixing;
 		using DataHeatBalance::ZoneAirMassFlow;
 		using SwimmingPool::SimSwimmingPool;
 
@@ -2634,7 +2629,7 @@ namespace ZoneEquipmentManager {
 
 		static bool SupPathInletChanged( false );
 		static bool FirstCall; // indicates first call to supply air path components
-		static bool FirstPassZoneEquip ( true ); // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
+		static bool FirstPassZoneEquip( true ); // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
 		static bool MyOneTimeFlag( true );
 		bool ErrorFlag;
 		static bool ValidSAMComp( false );
@@ -2645,7 +2640,7 @@ namespace ZoneEquipmentManager {
 		Real64 NonAirSysOutput;
 		static bool ZoneHasAirLoopHVACTerminal( false ); // true if zone has an air loop terminal
 		static bool ZoneHasAirLoopHVACDirectAir( false ); // true if zone has an uncontrolled air loop terminal
-		static FArray1D_bool DirectAirAndAirTerminalWarningIssued; // only warn once for each zone with problems
+		static Array1D_bool DirectAirAndAirTerminalWarningIssued; // only warn once for each zone with problems
 
 		// Determine flow rate and temperature of supply air based on type of damper
 
@@ -2683,7 +2678,7 @@ namespace ZoneEquipmentManager {
 		}
 
 		FirstCall = false;
-		
+
 		// Simulate all of the pools. These have a potential impact on surface heat balances, zone air heat balances, and moisture balances.
 		// These should be simulated first so that any systems or zone equipment devices deal with the effects of the pool properly.
 		SimSwimmingPool( FirstHVACIteration );
@@ -2896,7 +2891,7 @@ namespace ZoneEquipmentManager {
 				} else if ( SELECT_CASE_var == ERVStandAlone_Num ) { // 'ZoneHVAC:EnergyRecoveryVentilator'
 					SimStandAloneERV( PrioritySimOrder( EquipTypeNum ).EquipName, ActualZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( ControlledZoneNum ).EquipIndex( EquipPtr ) );
 
-				} else if ( SELECT_CASE_var == HPWaterHeater_Num ) { // 'WaterHeater:HeatPump'
+				} else if ( SELECT_CASE_var == HPWaterHeater_Num ) { // 'WaterHeater:HeatPump:PumpedCondenser'
 					SimHeatPumpWaterHeater( PrioritySimOrder( EquipTypeNum ).EquipName, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( ControlledZoneNum ).EquipIndex( EquipPtr ) );
 				} else if ( SELECT_CASE_var == VentilatedSlab_Num ) { // 'ZoneHVAC:VentilatedSlab'
 					SimVentilatedSlab( PrioritySimOrder( EquipTypeNum ).EquipName, ActualZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
@@ -2924,7 +2919,7 @@ namespace ZoneEquipmentManager {
 
 				}}
 
-				ZoneEquipConfig( ControlledZoneNum ).ZoneExh += ( UnbalExhMassFlow + BalancedExhMassFlow); // This is the total "exhaust" flow from equipment such as a zone exhaust fan
+				ZoneEquipConfig( ControlledZoneNum ).ZoneExh += ( UnbalExhMassFlow + BalancedExhMassFlow ); // This is the total "exhaust" flow from equipment such as a zone exhaust fan
 				ZoneEquipConfig( ControlledZoneNum ).ZoneExhBalanced += BalancedExhMassFlow;
 				ZoneEquipConfig( ControlledZoneNum ).PlenumMassFlow += PlenumInducedMassFlow;
 
@@ -3106,8 +3101,8 @@ namespace ZoneEquipmentManager {
 				if ( ( CurEqCoolingPriority > psc.CoolingPriority && ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputRequired < 0.0 ) || ( CurEqHeatingPriority > psc.HeatingPriority && ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputRequired >= 0.0 ) ) {
 
 					//Tuned C++ string swap avoids copying
-					std::swap( pso.EquipType, psc.EquipType );
-					std::swap( pso.EquipName, psc.EquipName );
+					pso.EquipType.swap( psc.EquipType );
+					pso.EquipName.swap( psc.EquipName );
 					std::swap( pso.EquipPtr, psc.EquipPtr );
 					std::swap( pso.EquipType_Num, psc.EquipType_Num );
 					std::swap( pso.CoolingPriority, psc.CoolingPriority );
@@ -3332,7 +3327,6 @@ namespace ZoneEquipmentManager {
 
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::MassConservation;
-		using DataHeatBalance::Mixing;
 		using DataHeatBalance::Infiltration;
 		using DataHeatBalance::ZoneAirMassFlow;
 		using DataHeatBalance::AddInfiltrationFlow;
@@ -3621,7 +3615,6 @@ namespace ZoneEquipmentManager {
 
 		// Using/Aliasing
 		using DataLoopNode::Node;
-		using DataHeatBalance::ZoneIntGain;
 		using DataHeatBalance::RefrigCaseCredit;
 		using DataHeatBalance::Zone;
 		using DataHeatBalFanSys::SysDepZoneLoads;
@@ -3670,7 +3663,6 @@ namespace ZoneEquipmentManager {
 		Real64 WinGapFlowTtoRA; // Sum of mass flow times outlet temp for all airflow windows in zone [(kg/s)-C]
 		Real64 WinGapTtoRA; // Temp of outlet flow mixture to return air from all airflow windows in zone [C]
 		Real64 H2OHtOfVap; // Heat of vaporization of water (W/kg)
-		Real64 RhoAir; // Density of air (Kg/m3)
 		Real64 ZoneMult; // zone multiplier
 		Real64 SumRetAirLatentGainRate;
 
@@ -3688,8 +3680,6 @@ namespace ZoneEquipmentManager {
 				//RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
 				// Add sensible heat gain from refrigerated cases with under case returns
 				SumAllReturnAirConvectionGains( ActualZoneNum, QRetAir );
-
-				CpAir = PsyCpAirFnWTdb( Node( ZoneNode ).HumRat, Node( ZoneNode ).Temp );
 
 				// Need to add the energy to the return air from lights and from airflow windows. Where the heat
 				// is added depends on if there is system flow or not.  If there is system flow the heat is added
@@ -3728,6 +3718,7 @@ namespace ZoneEquipmentManager {
 				// cases the heat to return air is treated as a zone heat gain and dealt with in CalcZoneSums in
 				// MODULE ZoneTempPredictorCorrector.
 				if ( ! Zone( ActualZoneNum ).NoHeatToReturnAir ) {
+					CpAir = PsyCpAirFnWTdb( Node( ZoneNode ).HumRat, Node( ZoneNode ).Temp );
 					if ( MassFlowRA > 0.0 ) {
 						if ( WinGapFlowToRA > 0.0 ) {
 							// Add heat-to-return from window gap airflow
@@ -3770,13 +3761,11 @@ namespace ZoneEquipmentManager {
 				// Update the rest of the Return Air Node conditions, if the return air system exists!
 				Node( ReturnNode ).Press = Node( ZoneNode ).Press;
 
-				H2OHtOfVap = PsyHgAirFnWTdb( Node( ZoneNode ).HumRat, Node( ReturnNode ).Temp );
-				RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ReturnNode ).Temp, Node( ZoneNode ).HumRat );
-
 				// Include impact of under case returns for refrigerated display case when updating the return air node humidity
 				if ( ! Zone( ActualZoneNum ).NoHeatToReturnAir ) {
 					if ( MassFlowRA > 0 ) {
 						SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate );
+						H2OHtOfVap = PsyHgAirFnWTdb( Node( ZoneNode ).HumRat, Node( ReturnNode ).Temp );
 						Node( ReturnNode ).HumRat = Node( ZoneNode ).HumRat + ( SumRetAirLatentGainRate / ( H2OHtOfVap * MassFlowRA ) );
 					} else {
 						// If no mass flow rate exists, include the latent HVAC case credit with the latent Zone case credit
@@ -3948,9 +3937,6 @@ namespace ZoneEquipmentManager {
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyTdbFnHW;
 		using DataRoomAirModel::ZTJET;
-		using DataRoomAirModel::AirModel;
-		using DataRoomAirModel::RoomAirModel_UCSDDV;
-		using DataRoomAirModel::RoomAirModel_UCSDCV;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataAirflowNetwork::SimulateAirflowNetwork;
 		using DataAirflowNetwork::AirflowNetworkControlSimple;
@@ -3969,9 +3955,6 @@ namespace ZoneEquipmentManager {
 		using DataContaminantBalance::MixingMassFlowGC;
 
 		using DataHeatBalance::Ventilation;
-		using DataGlobals::TimeStepZone;
-		using DataGlobals::WarmupFlag;
-		using DataGlobals::EndHourFlag;
 		using DataGlobals::SecInHour;
 		using DataGlobals::KickOffSimulation;
 		using DataGlobals::HourOfDay;
@@ -4023,8 +4006,8 @@ namespace ZoneEquipmentManager {
 		Real64 VVF; // DESIGN VENTILATION FLOW RATE (M**3/SEC)
 		Real64 MCpI_temp;
 		Real64 VAMFL_temp;
-		static FArray1D< Real64 > ZMAT; // Zone air temperature
-		static FArray1D< Real64 > ZHumRat; // Zone air humidity ratio
+		static Array1D< Real64 > ZMAT; // Zone air temperature
+		static Array1D< Real64 > ZHumRat; // Zone air humidity ratio
 		Real64 Cw; // Opening effectivenss
 		Real64 Cd; // Discharge coefficent
 		Real64 angle; // Angle between wind direction and effective angle
@@ -5038,7 +5021,7 @@ namespace ZoneEquipmentManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

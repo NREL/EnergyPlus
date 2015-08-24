@@ -2,12 +2,11 @@
 #define HeatBalanceManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
-#include <HVACSizingSimulationManager.hh>
 
 namespace EnergyPlus {
 
@@ -16,7 +15,7 @@ namespace HeatBalanceManager {
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 
-	extern FArray1D_string const PassFail;
+	extern Array1D_string const PassFail;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -24,30 +23,30 @@ namespace HeatBalanceManager {
 
 	//Real Variables for the Heat Balance Simulation
 	//Variables used to determine warmup convergence
-	extern FArray1D< Real64 > MaxCoolLoadPrevDay; // Max cooling load from the previous day
-	extern FArray1D< Real64 > MaxCoolLoadZone; // Maximum zone cooling load from the current day
-	extern FArray1D< Real64 > MaxHeatLoadPrevDay; // Max heating load from the previous day
-	extern FArray1D< Real64 > MaxHeatLoadZone; // Maximum zone heating load from the current day
-	extern FArray1D< Real64 > MaxTempPrevDay; // Max temperature from the previous day
-	extern FArray1D< Real64 > MaxTempZone; // Maximum zone temperature from the current day
-	extern FArray1D< Real64 > MinTempPrevDay; // Min temperature from the previous day
-	extern FArray1D< Real64 > MinTempZone; // Minimum zone temperature from the current day
+	extern Array1D< Real64 > MaxCoolLoadPrevDay; // Max cooling load from the previous day
+	extern Array1D< Real64 > MaxCoolLoadZone; // Maximum zone cooling load from the current day
+	extern Array1D< Real64 > MaxHeatLoadPrevDay; // Max heating load from the previous day
+	extern Array1D< Real64 > MaxHeatLoadZone; // Maximum zone heating load from the current day
+	extern Array1D< Real64 > MaxTempPrevDay; // Max temperature from the previous day
+	extern Array1D< Real64 > MaxTempZone; // Maximum zone temperature from the current day
+	extern Array1D< Real64 > MinTempPrevDay; // Min temperature from the previous day
+	extern Array1D< Real64 > MinTempZone; // Minimum zone temperature from the current day
 
 	//Variables used to report difference in temperature and load from the last two warmup days
-	extern FArray1D< Real64 > WarmupTempDiff; // Temperature difference between the last two warmup days
-	extern FArray1D< Real64 > WarmupLoadDiff; // Zone load differences between the last two warmup days
-	extern FArray1D< Real64 > TempZoneSecPrevDay; // Zone air temperature from the second last warmup day
-	extern FArray1D< Real64 > LoadZoneSecPrevDay; // Zone load from the second last warmup day
-	extern FArray1D< Real64 > TempZonePrevDay; // Zone air temperature from the previous day
-	extern FArray1D< Real64 > LoadZonePrevDay; // Zone load from the previuos day
-	extern FArray1D< Real64 > TempZone; // Zone air temperature from the current warmup day
-	extern FArray1D< Real64 > LoadZone; // Zone load from the current warmup day
+	extern Array1D< Real64 > WarmupTempDiff; // Temperature difference between the last two warmup days
+	extern Array1D< Real64 > WarmupLoadDiff; // Zone load differences between the last two warmup days
+	extern Array1D< Real64 > TempZoneSecPrevDay; // Zone air temperature from the second last warmup day
+	extern Array1D< Real64 > LoadZoneSecPrevDay; // Zone load from the second last warmup day
+	extern Array1D< Real64 > TempZonePrevDay; // Zone air temperature from the previous day
+	extern Array1D< Real64 > LoadZonePrevDay; // Zone load from the previuos day
+	extern Array1D< Real64 > TempZone; // Zone air temperature from the current warmup day
+	extern Array1D< Real64 > LoadZone; // Zone load from the current warmup day
 
-	extern FArray2D< Real64 > TempZoneRpt; // Zone air temperature to report (average over all warmup days)
-	extern FArray1D< Real64 > TempZoneRptStdDev; // Zone air temperature to report (std dev over all warmup days)
-	extern FArray2D< Real64 > LoadZoneRpt; // Zone load to report (average over all warmup days)
-	extern FArray1D< Real64 > LoadZoneRptStdDev; // Zone load to report (std dev over all warmup days)
-	extern FArray2D< Real64 > MaxLoadZoneRpt; // Maximum zone load for reporting calcs
+	extern Array2D< Real64 > TempZoneRpt; // Zone air temperature to report (average over all warmup days)
+	extern Array1D< Real64 > TempZoneRptStdDev; // Zone air temperature to report (std dev over all warmup days)
+	extern Array2D< Real64 > LoadZoneRpt; // Zone load to report (average over all warmup days)
+	extern Array1D< Real64 > LoadZoneRptStdDev; // Zone load to report (std dev over all warmup days)
+	extern Array2D< Real64 > MaxLoadZoneRpt; // Maximum zone load for reporting calcs
 	extern int CountWarmupDayPoints; // Count of warmup timesteps (to achieve warmup)
 
 	extern std::string CurrentModuleObject; // to assist in getting input
@@ -68,7 +67,7 @@ namespace HeatBalanceManager {
 	struct WarmupConvergence
 	{
 		// Members
-		FArray1D_int PassFlag; // one flag (1=Fail), (2=Pass) for each of the 4 conditions of convergence from
+		Array1D_int PassFlag; // one flag (1=Fail), (2=Pass) for each of the 4 conditions of convergence from
 		// warmup (PassFlag(1)=Max Temp, PassFlag(2)=Min Temp, PassFlag(3)=Max Heat Load
 		// PassFlag(4)=Max Cool Load)
 		// Following are stored test values for temperature and loads convergence
@@ -90,7 +89,7 @@ namespace HeatBalanceManager {
 
 		// Member Constructor
 		WarmupConvergence(
-			FArray1_int const & PassFlag, // one flag (1=Fail), (2=Pass) for each of the 4 conditions of convergence from
+			Array1_int const & PassFlag, // one flag (1=Fail), (2=Pass) for each of the 4 conditions of convergence from
 			Real64 const TestMaxTempValue, // Max Temperature convergence value=ABS(MaxTempPrevDay(ZoneNum)-MaxTempZone(ZoneNum))
 			Real64 const TestMinTempValue, // Min Temperature convergence value=ABS(MinTempPrevDay(ZoneNum)-MinTempZone(ZoneNum))
 			Real64 const TestMaxHeatLoadValue, // Max Heat Load convergence value=
@@ -106,9 +105,14 @@ namespace HeatBalanceManager {
 	};
 
 	// Object Data
-	extern FArray1D< WarmupConvergence > WarmupConvergenceValues;
+	extern Array1D< WarmupConvergence > WarmupConvergenceValues;
 
 	// Functions
+
+	// Clears the global data in HeatBalanceManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 	void
 	ManageHeatBalance();
@@ -160,14 +164,14 @@ namespace HeatBalanceManager {
 	ProcessZoneData(
 		std::string const & cCurrentModuleObject,
 		int const ZoneLoop,
-		FArray1_string const & cAlphaArgs,
+		Array1_string const & cAlphaArgs,
 		int & NumAlphas,
-		FArray1< Real64 > const & rNumericArgs,
+		Array1< Real64 > const & rNumericArgs,
 		int & NumNumbers,
-		FArray1_bool const & lNumericFieldBlanks, //Unused
-		FArray1_bool const & lAlphaFieldBlanks,
-		FArray1_string const & cAlphaFieldNames,
-		FArray1_string const & cNumericFieldNames, //Unused
+		Array1_bool const & lNumericFieldBlanks, //Unused
+		Array1_bool const & lAlphaFieldBlanks,
+		Array1_string const & cAlphaFieldNames,
+		Array1_string const & cNumericFieldNames, //Unused
 		bool & ErrorsFound // If errors found in input
 	);
 
@@ -258,7 +262,7 @@ namespace HeatBalanceManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

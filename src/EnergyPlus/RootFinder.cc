@@ -1042,7 +1042,7 @@ namespace RootFinder {
 		// Check that the slope requirement is respected at the min and max points
 		// Note that the singularity check takes care of RootFinderData%MinPoint%Y == RootFinderData%MaxPoint%Y
 		// therefore we use strict comparison operators < and >.
-		SelectSlope: { auto const SELECT_CASE_var( RootFinderData.Controls.SlopeType );
+		{ auto const SELECT_CASE_var( RootFinderData.Controls.SlopeType );
 		if ( SELECT_CASE_var == iSlopeIncreasing ) {
 			if ( RootFinderData.MinPoint.Y < RootFinderData.MaxPoint.Y ) {
 				CheckSlope = true;
@@ -1062,7 +1062,7 @@ namespace RootFinder {
 			ShowContinueError( "CheckSlope: iSlopeDecreasing=" + TrimSigDigits( iSlopeDecreasing ) );
 			ShowFatalError( "CheckSlope: Preceding error causes program termination." );
 
-		}} // SelectSlope
+		}}
 
 		CheckSlope = false;
 
@@ -1187,7 +1187,7 @@ namespace RootFinder {
 
 		// FLOW:
 
-		SelectSlope: { auto const SELECT_CASE_var( RootFinderData.Controls.SlopeType );
+		{ auto const SELECT_CASE_var( RootFinderData.Controls.SlopeType );
 		if ( SELECT_CASE_var == iSlopeIncreasing ) {
 			if ( RootFinderData.MinPoint.Y >= 0.0 ) {
 				CheckMinConstraint = true;
@@ -1206,7 +1206,7 @@ namespace RootFinder {
 			ShowContinueError( "CheckMinConstraint: iSlopeIncreasing=" + TrimSigDigits( iSlopeIncreasing ) );
 			ShowContinueError( "CheckMinConstraint: iSlopeDecreasing=" + TrimSigDigits( iSlopeDecreasing ) );
 			ShowFatalError( "CheckMinConstraint: Preceding error causes program termination." );
-		}} // SelectSlope
+		}}
 
 		CheckMinConstraint = false;
 
@@ -1260,7 +1260,7 @@ namespace RootFinder {
 		// FLOW:
 
 		// Check for max constrained convergence with respect to the new iterate (X,Y)
-		SelectSlope: { auto const SELECT_CASE_var( RootFinderData.Controls.SlopeType );
+		{ auto const SELECT_CASE_var( RootFinderData.Controls.SlopeType );
 		if ( SELECT_CASE_var == iSlopeIncreasing ) {
 			if ( RootFinderData.MaxPoint.Y <= 0.0 ) {
 				CheckMaxConstraint = true;
@@ -1279,7 +1279,7 @@ namespace RootFinder {
 			ShowContinueError( "CheckMaxConstraint: iSlopeIncreasing=" + TrimSigDigits( iSlopeIncreasing ) );
 			ShowContinueError( "CheckMaxConstraint: iSlopeDecreasing=" + TrimSigDigits( iSlopeDecreasing ) );
 			ShowFatalError( "CheckMaxConstraint: Preceding error causes program termination." );
-		}} // SelectSlope
+		}}
 
 		CheckMaxConstraint = false;
 
@@ -1576,7 +1576,7 @@ namespace RootFinder {
 
 		// FLOW:
 
-		SelectSlope: { auto const SELECT_CASE_var( RootFinderData.Controls.SlopeType );
+		{ auto const SELECT_CASE_var( RootFinderData.Controls.SlopeType );
 
 		if ( SELECT_CASE_var == iSlopeIncreasing ) {
 			// Update lower point
@@ -1690,7 +1690,7 @@ namespace RootFinder {
 			ShowContinueError( "UpdateBracket: iSlopeDecreasing=" + TrimSigDigits( iSlopeDecreasing ) );
 			ShowFatalError( "UpdateBracket: Preceding error causes program termination." );
 
-		}} // SelectSlope
+		}}
 
 	}
 
@@ -1864,7 +1864,7 @@ namespace RootFinder {
 	void
 	SortHistory(
 		int const N, // Number of points to sort in history array
-		FArray1S< PointType > History // Array of PointType variables. At least N of them
+		Array1S< PointType > History // Array of PointType variables. At least N of them
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -2017,7 +2017,7 @@ namespace RootFinder {
 			// - the increments are defined (at least 2 history points are available)
 			//----------------------------------------------------------------------------
 		} else {
-			SelectRecoveryMethod: { auto const SELECT_CASE_var( RootFinderData.StatusFlag );
+			{ auto const SELECT_CASE_var( RootFinderData.StatusFlag );
 			if ( SELECT_CASE_var == iStatusOKRoundOff ) {
 				// Should never happen if we exit the root finder upon detecting round-off condition
 				RootFinderData.XCandidate = BisectionMethod( RootFinderData );
@@ -2033,7 +2033,7 @@ namespace RootFinder {
 				// Assuming that the root is bracketed between the lower and upper points,
 				// we execute the requested solution method to produce the next candidate value
 				// for the root.
-				SelectMethod: { auto const SELECT_CASE_var1( RootFinderData.Controls.MethodType );
+				{ auto const SELECT_CASE_var1( RootFinderData.Controls.MethodType );
 				if ( SELECT_CASE_var1 == iMethodBisection ) {
 					// Bisection method (aka interval halving)
 					RootFinderData.XCandidate = BisectionMethod( RootFinderData );
@@ -2053,8 +2053,8 @@ namespace RootFinder {
 					ShowContinueError( "AdvanceRootFinder: iMethodSecant=" + TrimSigDigits( iMethodSecant ) );
 					ShowContinueError( "AdvanceRootFinder: iMethodBrent=" + TrimSigDigits( iMethodBrent ) );
 					ShowFatalError( "AdvanceRootFinder: Preceding error causes program termination." );
-				}} // SelectMethod
-			}} // SelectRecoveryMethod
+				}}
+			}}
 		}
 
 	}
@@ -2833,7 +2833,7 @@ namespace RootFinder {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

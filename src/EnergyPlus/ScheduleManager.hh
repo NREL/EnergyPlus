@@ -2,10 +2,12 @@
 #define ScheduleManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2A.hh>
-#include <ObjexxFCL/FArray2S.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1S.hh>
+#include <ObjexxFCL/Array2A.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -21,10 +23,10 @@ namespace ScheduleManager {
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	extern int const MaxDayTypes;
-	extern FArray1D_string const ValidDayTypes;
+	extern Array1D_string const ValidDayTypes;
 
 	extern int const NumScheduleTypeLimitUnitTypes;
-	extern FArray1D_string const ScheduleTypeLimitUnitTypes;
+	extern Array1D_string const ScheduleTypeLimitUnitTypes;
 
 	extern int const ScheduleInput_year;
 	extern int const ScheduleInput_compact;
@@ -97,7 +99,7 @@ namespace ScheduleManager {
 		int ScheduleTypePtr; // Index of Schedule Type
 		bool IntervalInterpolated; // Indicator for interval interpolation. If not "interpolated", False.  Else True
 		bool Used; // Indicator for this schedule being "used".
-		FArray2D< Real64 > TSValue; // Value array by simulation timestep
+		Array2D< Real64 > TSValue; // Value array by simulation timestep
 		Real64 TSValMax; // maximum of all TSValue's
 		Real64 TSValMin; // minimum of all TSValue's
 
@@ -116,7 +118,7 @@ namespace ScheduleManager {
 			int const ScheduleTypePtr, // Index of Schedule Type
 			bool const IntervalInterpolated, // Indicator for interval interpolation. If not "interpolated", False.  Else True
 			bool const Used, // Indicator for this schedule being "used".
-			FArray2< Real64 > const & TSValue, // Value array by simulation timestep
+			Array2< Real64 > const & TSValue, // Value array by simulation timestep
 			Real64 const TSValMax, // maximum of all TSValue's
 			Real64 const TSValMin // minimum of all TSValue's
 		) :
@@ -136,7 +138,7 @@ namespace ScheduleManager {
 		// Members
 		std::string Name; // Week Schedule Name
 		bool Used; // Indicator for this schedule being "used".
-		FArray1D_int DaySchedulePointer; // Index of Day Schedule
+		Array1D_int DaySchedulePointer; // Index of Day Schedule
 
 		// Default Constructor
 		WeekScheduleData() :
@@ -148,7 +150,7 @@ namespace ScheduleManager {
 		WeekScheduleData(
 			std::string const & Name, // Week Schedule Name
 			bool const Used, // Indicator for this schedule being "used".
-			FArray1_int const & DaySchedulePointer // Index of Day Schedule
+			Array1_int const & DaySchedulePointer // Index of Day Schedule
 		) :
 			Name( Name ),
 			Used( Used ),
@@ -162,7 +164,7 @@ namespace ScheduleManager {
 		// Members
 		std::string Name; // Schedule Name
 		int ScheduleTypePtr; // Index of Schedule Type
-		FArray1D_int WeekSchedulePointer; // one created for each day of possible simulation
+		Array1D_int WeekSchedulePointer; // one created for each day of possible simulation
 		int SchType; // what kind of object has been input.
 		bool Used; // Indicator for this schedule being "used".
 		bool MaxMinSet; // Max/min values have been stored for this schedule
@@ -190,7 +192,7 @@ namespace ScheduleManager {
 		ScheduleData(
 			std::string const & Name, // Schedule Name
 			int const ScheduleTypePtr, // Index of Schedule Type
-			FArray1_int const & WeekSchedulePointer, // one created for each day of possible simulation
+			Array1_int const & WeekSchedulePointer, // one created for each day of possible simulation
 			int const SchType, // what kind of object has been input.
 			bool const Used, // Indicator for this schedule being "used".
 			bool const MaxMinSet, // Max/min values have been stored for this schedule
@@ -216,12 +218,17 @@ namespace ScheduleManager {
 	};
 
 	// Object Data
-	extern FArray1D< ScheduleTypeData > ScheduleType; // Allowed Schedule Types
-	extern FArray1D< DayScheduleData > DaySchedule; // Day Schedule Storage
-	extern FArray1D< WeekScheduleData > WeekSchedule; // Week Schedule Storage
-	extern FArray1D< ScheduleData > Schedule; // Schedule Storage
+	extern Array1D< ScheduleTypeData > ScheduleType; // Allowed Schedule Types
+	extern Array1D< DayScheduleData > DaySchedule; // Day Schedule Storage
+	extern Array1D< WeekScheduleData > WeekSchedule; // Week Schedule Storage
+	extern Array1D< ScheduleData > Schedule; // Schedule Storage
 
 	// Functions
+
+	// Clears the global data in ScheduleManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 	void
 	ProcessScheduleInput();
@@ -254,7 +261,7 @@ namespace ScheduleManager {
 	void
 	GetScheduleValuesForDay(
 		int const ScheduleIndex,
-		FArray2S< Real64 > DayValues,
+		Array2S< Real64 > DayValues,
 		Optional_int_const JDay = _,
 		Optional_int_const CurDayofWeek = _
 	);
@@ -262,7 +269,7 @@ namespace ScheduleManager {
 	void
 	GetSingleDayScheduleValues(
 		int const DayScheduleIndex, // Index of the DaySchedule for values
-		FArray2S< Real64 > DayValues // Returned set of values
+		Array2S< Real64 > DayValues // Returned set of values
 	);
 
 	void
@@ -273,12 +280,12 @@ namespace ScheduleManager {
 
 	void
 	ProcessIntervalFields(
-		FArray1S_string const Untils,
-		FArray1S< Real64 > const Numbers,
+		Array1S_string const Untils,
+		Array1S< Real64 > const Numbers,
 		int const NumUntils,
 		int const NumNumbers,
-		FArray2A< Real64 > MinuteValue,
-		FArray2A_bool SetMinuteValue,
+		Array2A< Real64 > MinuteValue,
+		Array2A_bool SetMinuteValue,
 		bool & ErrorsFound,
 		std::string const & DayScheduleName, // Name (used for errors)
 		std::string const & ErrContext // Context (used for errors)
@@ -297,8 +304,8 @@ namespace ScheduleManager {
 	void
 	ProcessForDayTypes(
 		std::string const & ForDayField, // Field containing the "FOR:..."
-		FArray1A_bool TheseDays, // Array to contain returned "true" days
-		FArray1A_bool AlReady, // Array of days already done
+		Array1A_bool TheseDays, // Array to contain returned "true" days
+		Array1A_bool AlReady, // Array of days already done
 		bool & ErrorsFound // Will be true if error found.
 	);
 
@@ -394,7 +401,7 @@ namespace ScheduleManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

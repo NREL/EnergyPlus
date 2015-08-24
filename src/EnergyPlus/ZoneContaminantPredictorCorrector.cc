@@ -2,8 +2,8 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -206,10 +206,9 @@ namespace ZoneContaminantPredictorCorrector {
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using General::FindNumberInList;
-		using DataAirflowNetwork::AirflowNetworkNumOfSurfaces;
 		using DataAirflowNetwork::MultizoneSurfaceData;
+		using DataAirflowNetwork::MultizoneSurfaceProp;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::ExternalEnvironment;
 
 		// Locals
@@ -225,8 +224,8 @@ namespace ZoneContaminantPredictorCorrector {
 		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string AlphaName;
-		FArray1D< Real64 > IHGNumbers;
+		Array1D_string AlphaName;
+		Array1D< Real64 > IHGNumbers;
 		Real64 SchMin;
 		Real64 SchMax;
 		int NumAlpha;
@@ -240,7 +239,7 @@ namespace ZoneContaminantPredictorCorrector {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		//  LOGICAL :: ValidScheduleType
-		FArray1D_bool RepVarSet;
+		Array1D_bool RepVarSet;
 		std::string CurrentModuleObject;
 
 		// FLOW:
@@ -293,7 +292,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericConstant.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericConstant, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -301,7 +300,7 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericConstant( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericConstant( Loop ).ZoneName = AlphaName( 2 );
-			ZoneContamGenericConstant( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
+			ZoneContamGenericConstant( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneContamGenericConstant( Loop ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -386,7 +385,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericPDriven.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericPDriven, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -394,7 +393,7 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericPDriven( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericPDriven( Loop ).SurfName = AlphaName( 2 );
-			ZoneContamGenericPDriven( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), MultizoneSurfaceData.SurfName(), AirflowNetworkNumOfSurfaces );
+			ZoneContamGenericPDriven( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), MultizoneSurfaceData, &MultizoneSurfaceProp::SurfName );
 			if ( ZoneContamGenericPDriven( Loop ).SurfNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ShowContinueError( "which is not listed in AirflowNetwork:MultiZone:Surface." );
@@ -455,8 +454,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 			if ( ZoneContamGenericPDriven( Loop ).SurfNum > 0 ) {
 				ZonePtr = Surface( MultizoneSurfaceData( ZoneContamGenericPDriven( Loop ).SurfNum ).SurfNum ).Zone;
-			}
-			else {
+			} else {
 				ZonePtr = 0;
 			}
 			// Zone total report variables
@@ -478,7 +476,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericCutoff.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericCutoff, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -486,7 +484,7 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericCutoff( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericCutoff( Loop ).ZoneName = AlphaName( 2 );
-			ZoneContamGenericCutoff( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
+			ZoneContamGenericCutoff( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneContamGenericCutoff( Loop ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -554,7 +552,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericDecay.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericDecay, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -562,7 +560,7 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericDecay( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericDecay( Loop ).ZoneName = AlphaName( 2 );
-			ZoneContamGenericDecay( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
+			ZoneContamGenericDecay( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneContamGenericDecay( Loop ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -631,7 +629,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericBLDiff.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericBLDiff, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -639,7 +637,7 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericBLDiff( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericBLDiff( Loop ).SurfName = AlphaName( 2 );
-			ZoneContamGenericBLDiff( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), Surface.Name(), TotSurfaces );
+			ZoneContamGenericBLDiff( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), Surface );
 			if ( ZoneContamGenericBLDiff( Loop ).SurfNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -707,7 +705,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericDVS.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericDVS, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -715,7 +713,7 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericDVS( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericDVS( Loop ).SurfName = AlphaName( 2 );
-			ZoneContamGenericDVS( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), Surface.Name(), TotSurfaces );
+			ZoneContamGenericDVS( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), Surface );
 			if ( ZoneContamGenericDVS( Loop ).SurfNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -776,7 +774,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericDRS.Name(), Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphaName( 1 ), ZoneContamGenericDRS, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
@@ -784,7 +782,7 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericDRS( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericDRS( Loop ).ZoneName = AlphaName( 2 );
-			ZoneContamGenericDRS( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone.Name(), NumOfZones );
+			ZoneContamGenericDRS( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneContamGenericDRS( Loop ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -900,8 +898,8 @@ namespace ZoneContaminantPredictorCorrector {
 		struct NeededControlTypes
 		{
 			// Members
-			FArray1D_bool MustHave; // 4= the four control types
-			FArray1D_bool DidHave;
+			Array1D_bool MustHave; // 4= the four control types
+			Array1D_bool DidHave;
 
 			// Default Constructor
 			NeededControlTypes() :
@@ -911,8 +909,8 @@ namespace ZoneContaminantPredictorCorrector {
 
 			// Member Constructor
 			NeededControlTypes(
-				FArray1_bool const & MustHave, // 4= the four control types
-				FArray1_bool const & DidHave
+				Array1_bool const & MustHave, // 4= the four control types
+				Array1_bool const & DidHave
 			) :
 				MustHave( 4, MustHave ),
 				DidHave( 4, DidHave )
@@ -923,8 +921,8 @@ namespace ZoneContaminantPredictorCorrector {
 		struct NeededComfortControlTypes
 		{
 			// Members
-			FArray1D_bool MustHave; // 4= the four control types
-			FArray1D_bool DidHave;
+			Array1D_bool MustHave; // 4= the four control types
+			Array1D_bool DidHave;
 
 			// Default Constructor
 			NeededComfortControlTypes() :
@@ -934,8 +932,8 @@ namespace ZoneContaminantPredictorCorrector {
 
 			// Member Constructor
 			NeededComfortControlTypes(
-				FArray1_bool const & MustHave, // 4= the four control types
-				FArray1_bool const & DidHave
+				Array1_bool const & MustHave, // 4= the four control types
+				Array1_bool const & DidHave
 			) :
 				MustHave( 12, MustHave ),
 				DidHave( 12, DidHave )
@@ -955,14 +953,14 @@ namespace ZoneContaminantPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, ContControlledZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ContaminantControlledZone.Name(), ContControlledZoneNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ContaminantControlledZone, ContControlledZoneNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			ContaminantControlledZone( ContControlledZoneNum ).Name = cAlphaArgs( 1 );
 			ContaminantControlledZone( ContControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
-			ContaminantControlledZone( ContControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			ContaminantControlledZone( ContControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ContaminantControlledZone( ContControlledZoneNum ).ActualZoneNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
@@ -1088,7 +1086,6 @@ namespace ZoneContaminantPredictorCorrector {
 		using InternalHeatGains::SumAllInternalGenericContamGains;
 		using DataAirflowNetwork::MultizoneSurfaceData;
 		using DataAirflowNetwork::AirflowNetworkNodeSimu;
-		using DataAirflowNetwork::AirflowNetworkNumOfZones;
 		using DataAirflowNetwork::SimulateAirflowNetwork;
 		using DataAirflowNetwork::AirflowNetworkControlSimple;
 
@@ -1334,7 +1331,7 @@ namespace ZoneContaminantPredictorCorrector {
 		if ( Contaminant.CO2Simulation ) {
 			for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 				SumAllInternalCO2Gains( Loop, ZoneCO2Gain( Loop ) );
-				SumInternalCO2GainsByTypes( Loop, FArray1D_int( 1, IntGainTypeOf_People ), ZoneCO2GainFromPeople( Loop ) );
+				SumInternalCO2GainsByTypes( Loop, Array1D_int( 1, IntGainTypeOf_People ), ZoneCO2GainFromPeople( Loop ) );
 			}
 		}
 
@@ -1958,7 +1955,6 @@ namespace ZoneContaminantPredictorCorrector {
 		using ZonePlenum::NumZoneReturnPlenums;
 		using ZonePlenum::NumZoneSupplyPlenums;
 		using DataDefineEquip::AirDistUnit;
-		using DataDefineEquip::NumAirDistUnits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2307,7 +2303,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

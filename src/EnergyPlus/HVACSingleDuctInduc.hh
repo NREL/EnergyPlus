@@ -2,7 +2,7 @@
 #define HVACSingleDuctInduc_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -24,7 +24,7 @@ namespace HVACSingleDuctInduc {
 
 	extern int NumIndUnits;
 	extern int NumFourPipes;
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 	extern bool GetIUInputFlag; // First time, input is "gotten"
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE HVACSingleDuctInduc:
@@ -243,7 +243,7 @@ namespace HVACSingleDuctInduc {
 	};
 
 	// Object Data
-	extern FArray1D< IndUnitData > IndUnit;
+	extern Array1D< IndUnitData > IndUnit;
 
 	// Functions
 
@@ -289,13 +289,13 @@ namespace HVACSingleDuctInduc {
 	Real64
 	FourPipeIUHeatingResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		FArray1< Real64 > const & Par // Par(5) is the requested zone load
+		Array1< Real64 > const & Par // Par(5) is the requested zone load
 	);
 
 	Real64
 	FourPipeIUCoolingResidual(
 		Real64 const CWFlow, // cold water flow rate in kg/s
-		FArray1< Real64 > const & Par // Par(5) is the requested zone load
+		Array1< Real64 > const & Par // Par(5) is the requested zone load
 	);
 
 	// ========================= Utilities =======================
@@ -305,7 +305,7 @@ namespace HVACSingleDuctInduc {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

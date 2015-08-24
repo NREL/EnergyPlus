@@ -2,7 +2,7 @@
 #define GroundHeatExchangers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -50,18 +50,18 @@ namespace GroundHeatExchangers {
 		Real64 designFlow; // Design volumetric flow rate			[m3/s]
 		Real64 designMassFlow; // Design mass flow rate				[kg/s]
 		Real64 tempGround; // The far feild temperature of the ground   [°C]
-		FArray1D< Real64 > QnMonthlyAgg; // Monthly aggregated normalized heat extraction/rejection rate [W/m]
-		FArray1D< Real64 > QnHr; // Hourly aggregated normalized heat extraction/rejection rate [W/m]
-		FArray1D< Real64 > QnSubHr; // Contains the subhourly heat extraction/rejection rate normalized
+		Array1D< Real64 > QnMonthlyAgg; // Monthly aggregated normalized heat extraction/rejection rate [W/m]
+		Array1D< Real64 > QnHr; // Hourly aggregated normalized heat extraction/rejection rate [W/m]
+		Array1D< Real64 > QnSubHr; // Contains the subhourly heat extraction/rejection rate normalized
 		// by the total active length of bore holes  [W/m]
 		int prevHour;
 		Real64 gReferenceRatio; // Reference ratio for developing g-functions [-]
 		int NPairs; // Number of pairs of Lntts and Gfunc
-		FArray1D< Real64 > LNTTS; // natural log of Non Dimensional Time Ln(t/ts)
-		FArray1D< Real64 > GFNC; // G-function ( Non Dimensional temperature response factors)
+		Array1D< Real64 > LNTTS; // natural log of Non Dimensional Time Ln(t/ts)
+		Array1D< Real64 > GFNC; // G-function ( Non Dimensional temperature response factors)
 		int AGG; // Minimum Hourly History required
 		int SubAGG; // Minimum subhourly History
-		FArray1D_int LastHourN; // Stores the Previous hour's N for past hours
+		Array1D_int LastHourN; // Stores the Previous hour's N for past hours
 		// until the minimum subhourly history
 		//loop topology variables
 		Real64 boreholeTemp; // [°C]
@@ -115,7 +115,6 @@ namespace GroundHeatExchangers {
 			HXResistance( 0.0 ),
 			timeSS( 0.0 ),
 			timeSSFactor( 0.0 )
-
 		{}
 
 		virtual void
@@ -147,12 +146,12 @@ namespace GroundHeatExchangers {
 
 		Real64
 		getKAGrndTemp(
-		Real64 const z,
-		Real64 const dayOfYear,
-		Real64 const aveGroundTemp,
-		Real64 const aveGroundTempAmplitude,
-		Real64 const phaseShift
-	);
+			Real64 const z,
+			Real64 const dayOfYear,
+			Real64 const aveGroundTemp,
+			Real64 const aveGroundTempAmplitude,
+			Real64 const phaseShift
+		);
 
 	};
 
@@ -178,7 +177,6 @@ namespace GroundHeatExchangers {
 			kGrout( 0.0 ),
 			UtubeDist( 0.0 ),
 			runFlag( false )
-
 		{}
 
 		void
@@ -195,7 +193,7 @@ namespace GroundHeatExchangers {
 
 		Real64
 		getGFunc(
-		Real64 const time
+			Real64 const time
 		);
 
 	};
@@ -219,8 +217,8 @@ namespace GroundHeatExchangers {
 		int monthOfMinSurfTemp;
 		Real64 maxSimYears;
 		Real64 minSurfTemp;
-		FArray1D< Real64 > X0;
-		FArray1D< Real64 > Y0;
+		Array1D< Real64 > X0;
+		Array1D< Real64 > Y0;
 		Real64 Z0;
 
 		// Default Constructor
@@ -262,77 +260,77 @@ namespace GroundHeatExchangers {
 
 		Real64
 		doubleIntegral(
-		int const m,
-		int const n,
-		int const m1,
-		int const n1,
-		Real64 const t,
-		int const I0,
-		int const J0
+			int const m,
+			int const n,
+			int const m1,
+			int const n1,
+			Real64 const t,
+			int const I0,
+			int const J0
 		);
 
 		Real64
 		integral(
-		int const m,
-		int const n,
-		int const m1,
-		int const n1,
-		Real64 const t,
-		Real64 const eta,
-		Real64 const J0
+			int const m,
+			int const n,
+			int const m1,
+			int const n1,
+			Real64 const t,
+			Real64 const eta,
+			Real64 const J0
 		);
 
 		bool
 		isEven(
-		int const val
+			int const val
 		);
 
 		Real64
 		distance(
-		int const m,
-		int const n,
-		int const m1,
-		int const n1,
-		Real64 const eta,
-		Real64 const theta
+			int const m,
+			int const n,
+			int const m1,
+			int const n1,
+			Real64 const eta,
+			Real64 const theta
 		);
 
 		Real64
 		distanceToFictRing(
-		int const m,
-		int const n,
-		int const m1,
-		int const n1,
-		Real64 const eta,
-		Real64 const theta
+			int const m,
+			int const n,
+			int const m1,
+			int const n1,
+			Real64 const eta,
+			Real64 const theta
 		);
 
 		Real64
 		distToCenter(
-		int const m,
-		int const n,
-		int const m1,
-		int const n1
+			int const m,
+			int const n,
+			int const m1,
+			int const n1
 		);
 
 		Real64
 		nearFieldResponseFunction(
-		int const m, 
-		int const n,
-		int const m1,
-		int const n1,
-		Real64 const eta,
-		Real64 const theta,
-		Real64 const t
+			int const m,
+			int const n,
+			int const m1,
+			int const n1,
+			Real64 const eta,
+			Real64 const theta,
+			Real64 const t
 		);
 
 		Real64
 		midFieldResponseFunction(
-		int const m,
-		int const n,
-		int const m1,
-		int const n1,
-		Real64 const t
+			int const m,
+			int const n,
+			int const m1,
+			int const n1,
+			Real64 const t
 		);
 
 		Real64
@@ -343,8 +341,8 @@ namespace GroundHeatExchangers {
 	};
 
 	// Object Data
-	extern FArray1D< GLHEVert > verticalGLHE; // Vertical GLHEs
-	extern FArray1D< GLHESlinky > slinkyGLHE; // Slinky GLHEs
+	extern Array1D< GLHEVert > verticalGLHE; // Vertical GLHEs
+	extern Array1D< GLHESlinky > slinkyGLHE; // Slinky GLHEs
 
 	void
 	SimGroundHeatExchangers(
@@ -361,7 +359,7 @@ namespace GroundHeatExchangers {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

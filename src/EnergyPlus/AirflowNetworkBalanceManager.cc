@@ -3,8 +3,8 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -164,8 +164,8 @@ namespace AirflowNetworkBalanceManager {
 	int const VentCtrNum_AdjTemp( 8 ); // Temperature venting control based on adjacent zone conditions
 	int const VentCtrNum_AdjEnth( 9 ); // Enthalpy venting control based on adjacent zone conditions
 	int const FeeeOperation( 0 ); // Free operatio
-	int const MinCheckForceOpen( 1 ); // Force open when opening elapsed time is less than minimum opening time 
-	int const MinCheckForceClose( 2 ); // Force open when closing elapsed time is less than minimum closing time 
+	int const MinCheckForceOpen( 1 ); // Force open when opening elapsed time is less than minimum opening time
+	int const MinCheckForceClose( 2 ); // Force open when closing elapsed time is less than minimum closing time
 	int const ProbNoAction( 0 ); // No action from probability check
 	int const ProbForceChange( 1 ); // Force open or close from probability check
 	int const ProbKeepStatus( 2 ); // Keep status at the previous time step from probability check
@@ -176,12 +176,12 @@ namespace AirflowNetworkBalanceManager {
 
 	// MODULE VARIABLE DECLARATIONS:
 	// Report variables
-	FArray1D< Real64 > PZ;
+	Array1D< Real64 > PZ;
 	// Inverse matrix
-	FArray1D< Real64 > MA;
-	FArray1D< Real64 > MV;
-	FArray1D_int IVEC;
-	FArray1D_int SplitterNodeNumbers;
+	Array1D< Real64 > MA;
+	Array1D< Real64 > MV;
+	Array1D_int IVEC;
+	Array1D_int SplitterNodeNumbers;
 
 	bool AirflowNetworkGetInputFlag( true );
 	int VentilationCtrl( 0 ); // Hybrid ventilation control type
@@ -214,7 +214,7 @@ namespace AirflowNetworkBalanceManager {
 	int NumOfExtNodes( 0 );
 	int AirflowNetworkNumOfExtSurfaces( 0 );
 	Real64 IncAng( 0.0 ); // Wind incidence angle relative to facade normal (deg)
-	FArray1D< Real64 > FacadeAng( 5 ); // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
+	Array1D< Real64 > FacadeAng( 5 ); // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
 	int WindDirNum; // Wind direction number
 	Real64 WindAng; // Wind direction angle (degrees clockwise from North)
 	int SupplyFanInletNode( 0 ); // Supply air fan inlet node number
@@ -230,9 +230,9 @@ namespace AirflowNetworkBalanceManager {
 	// Name Public routines, optionally name Private routines within this module
 
 	// Object Data
-	FArray1D< AirflowNetworkReportVars > AirflowNetworkZnRpt;
+	Array1D< AirflowNetworkReportVars > AirflowNetworkZnRpt;
 
-	FArray1D< OccupantVentilationControlProp > OccupantVentilationControl;
+	Array1D< OccupantVentilationControlProp > OccupantVentilationControl;
 	// Functions
 
 	void
@@ -260,7 +260,6 @@ namespace AirflowNetworkBalanceManager {
 
 		// Using/Aliasing
 		using DataHVACGlobals::TurnFansOn;
-		using DataHVACGlobals::TurnFansOff;
 		using DataHVACGlobals::VerySmallMassFlow;
 		using DataAirLoop::LoopHeatingCoilMaxRTF;
 		using DataAirLoop::LoopOnOffFanRTF;
@@ -399,7 +398,6 @@ namespace AirflowNetworkBalanceManager {
 		using HVACHXAssistedCoolingCoil::VerifyHeatExchangerParent;
 		using DataHeatBalance::People;
 		using DataHeatBalance::TotPeople;
-		using ThermalComfort::ThermalComfortData;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -430,7 +428,7 @@ namespace AirflowNetworkBalanceManager {
 		int NumAPL;
 		bool IsNotOK;
 		bool IsBlank;
-		FArray1D_string CompName( 2 );
+		Array1D_string CompName( 2 );
 		std::string SimAirNetworkKey;
 		bool SimObjectError;
 		std::string StringOut;
@@ -440,20 +438,20 @@ namespace AirflowNetworkBalanceManager {
 
 		// Declare variables used in this subroutine for debug purpose
 		bool AirflowNetworkInitFlag;
-		FArray1D_int ZoneCheck;
-		FArray1D_int ZoneBCCheck;
+		Array1D_int ZoneCheck;
+		Array1D_int ZoneBCCheck;
 		bool SurfaceFound;
 
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		std::string CurrentModuleObject;
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -549,7 +547,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), OccupantVentilationControl.Name( ), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), OccupantVentilationControl, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -621,7 +619,7 @@ namespace AirflowNetworkBalanceManager {
 						OccupantVentilationControl( i ).ComfortBouPoint = 10.0;
 					}
 				}
-				// Check continuity of both curves at boundary point 
+				// Check continuity of both curves at boundary point
 				if ( OccupantVentilationControl( i ).ComfortLowTempCurveNum > 0 && OccupantVentilationControl( i ).ComfortHighTempCurveNum ) {
 					if ( abs( CurveValue( OccupantVentilationControl( i ).ComfortLowTempCurveNum, Numbers( 3 ) ) - CurveValue( OccupantVentilationControl( i ).ComfortHighTempCurveNum, Numbers( 3 ) ) ) > 0.1) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " object: The difference of both curve values at boundary point > 0.1" );
@@ -642,11 +640,9 @@ namespace AirflowNetworkBalanceManager {
 				if ( !lAlphaBlanks( 4 ) ) {
 					if ( SameString( Alphas( 4 ), "Yes" ) ) {
 						OccupantVentilationControl( i ).OccupancyCheck = true;
-					}
-					else if ( SameString( Alphas( 4 ), "No" ) ) {
+					} else if ( SameString( Alphas( 4 ), "No" ) ) {
 						OccupantVentilationControl( i ).OccupancyCheck = false;
-					}
-					else {
+					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" invalid " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" illegal key." );
 						ShowContinueError( "Valid keys are: Yes or No" );
 						ErrorsFound = true;
@@ -880,7 +876,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), MultizoneZoneData.ZoneName(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), MultizoneZoneData, &MultizoneZoneProp::ZoneName, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -906,7 +902,7 @@ namespace AirflowNetworkBalanceManager {
 
 				if ( !lAlphaBlanks( 6 ) ) {
 					MultizoneZoneData( i ).OccupantVentilationControlName = Alphas( 6 );
-					MultizoneZoneData( i ).OccupantVentilationControlNum = FindItemInList( MultizoneZoneData( i ).OccupantVentilationControlName, OccupantVentilationControl.Name( ), AirflowNetworkNumOfOccuVentCtrls );
+					MultizoneZoneData( i ).OccupantVentilationControlNum = FindItemInList( MultizoneZoneData( i ).OccupantVentilationControlName, OccupantVentilationControl );
 					if ( MultizoneZoneData( i ).OccupantVentilationControlNum == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 6 ) + " not found = " + MultizoneZoneData( i ).OccupantVentilationControlName );
 						ShowContinueError( "..for specified " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
@@ -943,7 +939,7 @@ namespace AirflowNetworkBalanceManager {
 		// ==> Zone data validation
 		for ( i = 1; i <= AirflowNetworkNumOfZones; ++i ) {
 			// Zone name validation
-			MultizoneZoneData( i ).ZoneNum = FindItemInList( MultizoneZoneData( i ).ZoneName, Zone.Name(), NumOfZones );
+			MultizoneZoneData( i ).ZoneNum = FindItemInList( MultizoneZoneData( i ).ZoneName, Zone );
 			if ( MultizoneZoneData( i ).ZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + " object, invalid " + cAlphaFields( 1 ) + " given." );
 				ShowContinueError( "..invalid " + cAlphaFields( 1 ) + " = \"" + MultizoneZoneData( i ).ZoneName + "\"" );
@@ -1068,7 +1064,7 @@ namespace AirflowNetworkBalanceManager {
 					GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( Alphas( 1 ), MultizoneExternalNodeData.Name(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+					VerifyName( Alphas( 1 ), MultizoneExternalNodeData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1097,7 +1093,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), MultizoneSurfaceData.SurfName(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), MultizoneSurfaceData, &MultizoneSurfaceProp::SurfName, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ShowContinueError( "..only 1 crack per surface is allowed, opening/crack component = " + Alphas( 2 ) );
 					ErrorsFound = true;
@@ -1168,7 +1164,7 @@ namespace AirflowNetworkBalanceManager {
 				}
 				if ( !lAlphaBlanks( 7 ) ) {
 					MultizoneSurfaceData( i ).OccupantVentilationControlName = Alphas( 7 );
-					MultizoneSurfaceData( i ).OccupantVentilationControlNum = FindItemInList( MultizoneSurfaceData( i ).OccupantVentilationControlName, OccupantVentilationControl.Name( ), AirflowNetworkNumOfOccuVentCtrls );
+					MultizoneSurfaceData( i ).OccupantVentilationControlNum = FindItemInList( MultizoneSurfaceData( i ).OccupantVentilationControlName, OccupantVentilationControl );
 					if ( MultizoneSurfaceData( i ).OccupantVentilationControlNum == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 7 ) + " not found = " + MultizoneSurfaceData( i ).OccupantVentilationControlName );
 						ShowContinueError( "..for specified " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
@@ -1185,7 +1181,7 @@ namespace AirflowNetworkBalanceManager {
 		NumOfExtNodes = 0;
 		for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) {
 			// Check a valid surface defined earlier
-			MultizoneSurfaceData( i ).SurfNum = FindItemInList( MultizoneSurfaceData( i ).SurfName, Surface.Name(), TotSurfaces );
+			MultizoneSurfaceData( i ).SurfNum = FindItemInList( MultizoneSurfaceData( i ).SurfName, Surface );
 			if ( MultizoneSurfaceData( i ).SurfNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + " object, Invalid " + cAlphaFields( 1 ) + " given = " + MultizoneSurfaceData( i ).SurfName );
 				ErrorsFound = true;
@@ -1301,7 +1297,7 @@ namespace AirflowNetworkBalanceManager {
 						MultizoneSurfaceData( i ).NodeNums( 2 ) = j;
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = " + MultizoneSurfaceData( i ).SurfName );
-						ShowContinueError( "..Zone = " + Zone( Surface( MultizoneSurfaceData( i ).SurfNum ).Zone ).Name + " is not described in AIRFLOWNETWORK:MULTIZONE:ZONE" );
+						ShowContinueError("An adjacent zone = " + Zone(Surface(n).Zone).Name + " is not described in AIRFLOWNETWORK:MULTIZONE:ZONE");
 						ErrorsFound = true;
 						continue;
 					}
@@ -1315,7 +1311,7 @@ namespace AirflowNetworkBalanceManager {
 					ErrorsFound = true;
 					continue;
 				}
-			}	
+			}
 		}
 
 		// Validate adjacent temperature and Enthalpy control for an interior surface only
@@ -1355,7 +1351,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), MultizoneCompDetOpeningData.Name(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), MultizoneCompDetOpeningData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1594,7 +1590,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), MultizoneCompSimpleOpeningData.Name(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), MultizoneCompSimpleOpeningData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1616,7 +1612,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), MultizoneCompHorOpeningData.Name(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), MultizoneCompHorOpeningData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1654,8 +1650,8 @@ namespace AirflowNetworkBalanceManager {
 		CurrentModuleObject = "AirflowNetwork:MultiZone:Surface";
 		for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) {
 			if ( MultizoneSurfaceData( i ).SurfNum == 0 ) continue;
-			if ( AirflowNetworkNumOfDetOpenings > 0 ) j = FindItemInList( MultizoneSurfaceData( i ).OpeningName, MultizoneCompDetOpeningData.Name(), AirflowNetworkNumOfDetOpenings );
-			if ( j == 0 && AirflowNetworkNumOfSimOpenings > 0 ) j = FindItemInList( MultizoneSurfaceData( i ).OpeningName, MultizoneCompSimpleOpeningData.Name(), AirflowNetworkNumOfSimOpenings );
+			if ( AirflowNetworkNumOfDetOpenings > 0 ) j = FindItemInList( MultizoneSurfaceData( i ).OpeningName, MultizoneCompDetOpeningData );
+			if ( j == 0 && AirflowNetworkNumOfSimOpenings > 0 ) j = FindItemInList( MultizoneSurfaceData( i ).OpeningName, MultizoneCompSimpleOpeningData );
 			// Obtain schedule number and check surface shape
 			if ( j > 0 ) {
 				if ( Surface( MultizoneSurfaceData( i ).SurfNum ).Sides == 3 ) {
@@ -1785,7 +1781,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), MultizoneSurfaceStdConditionsCrackData.Name(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), MultizoneSurfaceStdConditionsCrackData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					continue;
@@ -1821,7 +1817,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), MultizoneSurfaceCrackData.Name(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), MultizoneSurfaceCrackData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1840,7 +1836,7 @@ namespace AirflowNetworkBalanceManager {
 						MultizoneSurfaceCrackData( i ).StandardW = MultizoneSurfaceStdConditionsCrackData( 0 ).StandardW;
 					}
 				} else {
-					j = FindItemInList( Alphas( 2 ), MultizoneSurfaceStdConditionsCrackData( {1,AirflowNetworkNumOfStdCndns} ).Name(), AirflowNetworkNumOfStdCndns );
+					j = FindItemInList( Alphas( 2 ), MultizoneSurfaceStdConditionsCrackData( {1,AirflowNetworkNumOfStdCndns} ), AirflowNetworkNumOfStdCndns );
 					if ( j == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = " + Alphas( 1 ) + ". Specified " + cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " not found." );
 						ErrorsFound = true;
@@ -1862,7 +1858,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), MultizoneSurfaceELAData.Name(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), MultizoneSurfaceELAData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1887,7 +1883,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), MultizoneCompExhaustFanData.Name(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), MultizoneCompExhaustFanData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1921,7 +1917,7 @@ namespace AirflowNetworkBalanceManager {
 						MultizoneCompExhaustFanData( i ).StandardW = MultizoneSurfaceStdConditionsCrackData( 0 ).StandardW;
 					}
 				} else {
-					j = FindItemInList( Alphas( 2 ), MultizoneSurfaceStdConditionsCrackData( {1,AirflowNetworkNumOfStdCndns} ).Name(), AirflowNetworkNumOfStdCndns );
+					j = FindItemInList( Alphas( 2 ), MultizoneSurfaceStdConditionsCrackData( {1,AirflowNetworkNumOfStdCndns} ), AirflowNetworkNumOfStdCndns );
 					if ( j == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = " + Alphas( 1 ) + ". Specified " + cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " not found." );
 						ErrorsFound = true;
@@ -1994,7 +1990,7 @@ namespace AirflowNetworkBalanceManager {
 					GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( Alphas( 1 ), MultizoneCPValueData.Name(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+					VerifyName( Alphas( 1 ), MultizoneCPValueData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) Alphas( 2 ) = "xxxxx";
@@ -2247,7 +2243,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), DisSysNodeData.Name(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), DisSysNodeData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2282,7 +2278,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), DisSysCompLeakData.Name(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), DisSysCompLeakData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2305,7 +2301,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), DisSysCompELRData.Name(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), DisSysCompELRData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2331,7 +2327,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), DisSysCompDuctData.Name(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), DisSysCompDuctData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2453,7 +2449,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), DisSysCompCoilData.Name(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), DisSysCompCoilData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2478,7 +2474,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), DisSysCompHXData.Name(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), DisSysCompHXData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2500,7 +2496,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), DisSysCompTermUnitData.Name(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), DisSysCompTermUnitData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2523,7 +2519,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), DisSysCompCPDData.Name(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), DisSysCompCPDData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2956,7 +2952,7 @@ namespace AirflowNetworkBalanceManager {
 				GetObjectItem( CurrentModuleObject, count - AirflowNetworkNumOfSurfaces, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), AirflowNetworkLinkageData.Name(), count - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), AirflowNetworkLinkageData, count - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2970,7 +2966,7 @@ namespace AirflowNetworkBalanceManager {
 				AirflowNetworkLinkageData( count ).ZoneName = Alphas( 5 );
 				AirflowNetworkLinkageData( count ).LinkNum = count;
 				if ( ! lAlphaBlanks( 5 ) ) {
-					AirflowNetworkLinkageData( count ).ZoneNum = FindItemInList( AirflowNetworkLinkageData( count ).ZoneName, Zone.Name(), NumOfZones );
+					AirflowNetworkLinkageData( count ).ZoneNum = FindItemInList( AirflowNetworkLinkageData( count ).ZoneName, Zone );
 					if ( AirflowNetworkLinkageData( count ).ZoneNum == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields( 5 ) + " given = " + AirflowNetworkLinkageData( count ).ZoneName );
 						ErrorsFound = true;
@@ -3641,9 +3637,7 @@ namespace AirflowNetworkBalanceManager {
 		// na
 
 		// Using/Aliasing
-		using DataAirLoop::AirToZoneNodeInfo;
 		using DataHVACGlobals::TurnFansOn;
-		using DataHVACGlobals::TurnFansOff;
 		using InputProcessor::SameString; // NEEDS TO BE CHANGED after V1.3 release!!!
 
 		// Locals
@@ -3711,13 +3705,13 @@ namespace AirflowNetworkBalanceManager {
 						} else {
 							AirflowNetworkVentingControl( i, MultizoneSurfaceData( i ).OpenFactor );
 						}
-					}					
+					}
 				} else {
 					AirflowNetworkVentingControl( i, MultizoneSurfaceData( i ).OpenFactor );
 				}
 				MultizoneSurfaceData( i ).OpenFactor *= MultizoneSurfaceData( i ).WindModifier;
 				if ( MultizoneSurfaceData( i ).HybridVentClose ) MultizoneSurfaceData( i ).OpenFactor = 0.0;
-				if ( AirflowNetworkFanActivated && ( SimulateAirflowNetwork > AirflowNetworkControlMultizone ) && MultizoneSurfaceData( i ).OpenFactor > 0.0 && 
+				if ( AirflowNetworkFanActivated && ( SimulateAirflowNetwork > AirflowNetworkControlMultizone ) && MultizoneSurfaceData( i ).OpenFactor > 0.0 &&
 					( Surface( j ).ExtBoundCond == ExternalEnvironment || ( Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt && Surface( MultizoneSurfaceData( i ).SurfNum ).ExtWind ) ) && ! WarmupFlag ) {
 					// Exterior Large opening only
 					++MultizoneSurfaceData( i ).ExtLargeOpeningErrCount;
@@ -3803,10 +3797,10 @@ namespace AirflowNetworkBalanceManager {
 		// SUBROUTINE PARAMETER DEFINITIONS
 		//  index 1 is wind incidence angle (0,30,60,...,300,330 deg)
 		//  index 2 is side ratio (0.25,1.0,4.0),
-		static FArray2D< Real64 > const CPHighRiseWall( 12, 3, reshape2< Real64, int >( { 0.60, 0.54, 0.23, -0.25, -0.61, -0.55, -0.51, -0.55, -0.61, -0.25, 0.23, 0.54, 0.60, 0.48, 0.04, -0.56, -0.56, -0.42, -0.37, -0.42, -0.56, -0.56, 0.04, 0.48, 0.60, 0.44, -0.26, -0.70, -0.53, -0.32, -0.22, -0.32, -0.53, -0.70, -0.26, 0.44 }, { 12, 3 } ) ); // Surface-averaged wind-pressure coefficient array for walls // Explicit reshape2 template args are work-around for VC++2013 bug
+		static Array2D< Real64 > const CPHighRiseWall( 3, 12, reshape2< Real64, int >( { 0.60, 0.54, 0.23, -0.25, -0.61, -0.55, -0.51, -0.55, -0.61, -0.25, 0.23, 0.54, 0.60, 0.48, 0.04, -0.56, -0.56, -0.42, -0.37, -0.42, -0.56, -0.56, 0.04, 0.48, 0.60, 0.44, -0.26, -0.70, -0.53, -0.32, -0.22, -0.32, -0.53, -0.70, -0.26, 0.44 }, { 3, 12 } ) ); // Surface-averaged wind-pressure coefficient array for walls // Explicit reshape2 template args are work-around for VC++2013 bug
 		//  index 1 is wind incidence angle (0,30,60,...,300,330 deg)
 		//  index 2 is side ratio (0.25,0.5,1.0),
-		static FArray2D< Real64 > const CPHighRiseRoof( 12, 3, reshape2< Real64, int >( { -0.28, -0.69, -0.72, -0.76, -0.72, -0.69, -0.28, -0.69, -0.72, -0.76, -0.72, -0.69, -0.47, -0.52, -0.70, -0.76, -0.70, -0.52, -0.47, -0.52, -0.70, -0.76, -0.70, -0.52, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55 }, { 12, 3 } ) ); // Surface-averaged wind-pressure coefficient array for roof // Explicit reshape2 template args are work-around for VC++2013 bug
+		static Array2D< Real64 > const CPHighRiseRoof( 3, 12, reshape2< Real64, int >( { -0.28, -0.69, -0.72, -0.76, -0.72, -0.69, -0.28, -0.69, -0.72, -0.76, -0.72, -0.69, -0.47, -0.52, -0.70, -0.76, -0.70, -0.52, -0.47, -0.52, -0.70, -0.76, -0.70, -0.52, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55 }, { 3, 12 } ) ); // Surface-averaged wind-pressure coefficient array for roof // Explicit reshape2 template args are work-around for VC++2013 bug
 
 		// INTERFACE BLOCK SPECIFICATIONS:na
 		// DERIVED TYPE DEFINITIONS:na
@@ -3953,7 +3947,7 @@ namespace AirflowNetworkBalanceManager {
 							ISR = 2;
 							WtSR = ( 4.0 - SR ) / 3.0;
 						}
-						MultizoneCPValueData( FacadeNum ).CPValue( WindDirNum ) = WtSR * ( WtAng * CPHighRiseWall( IAng, ISR ) + ( 1.0 - WtAng ) * CPHighRiseWall( IAng + 1, ISR ) ) + ( 1.0 - WtSR ) * ( WtAng * CPHighRiseWall( IAng, ISR + 1 ) + ( 1.0 - WtAng ) * CPHighRiseWall( IAng + 1, ISR + 1 ) );
+						MultizoneCPValueData( FacadeNum ).CPValue( WindDirNum ) = WtSR * ( WtAng * CPHighRiseWall( ISR, IAng ) + ( 1.0 - WtAng ) * CPHighRiseWall( ISR, IAng + 1 ) ) + ( 1.0 - WtSR ) * ( WtAng * CPHighRiseWall( ISR + 1, IAng ) + ( 1.0 - WtAng ) * CPHighRiseWall( ISR + 1, IAng + 1 ) );
 					}
 
 					// Wind-pressure coefficients for roof (assumed same for low-rise and high-rise buildings)
@@ -3967,7 +3961,7 @@ namespace AirflowNetworkBalanceManager {
 							ISR = 2;
 							WtSR = ( 1.0 - SR ) / 0.5;
 						}
-						MultizoneCPValueData( FacadeNum ).CPValue( WindDirNum ) = WtSR * ( WtAng * CPHighRiseRoof( IAng, ISR ) + ( 1.0 - WtAng ) * CPHighRiseRoof( IAng + 1, ISR ) ) + ( 1.0 - WtSR ) * ( WtAng * CPHighRiseRoof( IAng, ISR + 1 ) + ( 1.0 - WtAng ) * CPHighRiseRoof( IAng + 1, ISR + 1 ) );
+						MultizoneCPValueData( FacadeNum ).CPValue( WindDirNum ) = WtSR * ( WtAng * CPHighRiseRoof( ISR, IAng ) + ( 1.0 - WtAng ) * CPHighRiseRoof( ISR, IAng + 1 ) ) + ( 1.0 - WtSR ) * ( WtAng * CPHighRiseRoof( ISR + 1, IAng ) + ( 1.0 - WtAng ) * CPHighRiseRoof( ISR + 1, IAng + 1 ) );
 					}
 
 				} // End of wind direction loop
@@ -4662,8 +4656,6 @@ namespace AirflowNetworkBalanceManager {
 		int LF;
 		int LT;
 		int CompNum;
-		int NF;
-		int NT;
 		int CompTypeNum;
 		int TypeNum;
 		std::string CompName;
@@ -4877,8 +4869,6 @@ namespace AirflowNetworkBalanceManager {
 		int LF;
 		int LT;
 		int CompNum;
-		int NF;
-		int NT;
 		int CompTypeNum;
 		int TypeNum;
 		std::string CompName;
@@ -5130,18 +5120,15 @@ namespace AirflowNetworkBalanceManager {
 				for ( K = 1; K <= NORDER; ++K ) {
 					MA( ( j - 1 ) * NORDER + K ) -= R1 * MA( ( i - 1 ) * NORDER + K );
 				}
-Label60: ;
 			}
 		}
 		for ( i = 1; i <= NORDER; ++i ) {
 			if ( IVEC( i + 20 ) == i ) continue;
 			M = i;
 			while ( NORDER > M ) {
-Label70: ;
 				++M;
 				if ( IVEC( M + 20 ) == i ) break;
 			}
-Label80: ;
 			IVEC( M + 20 ) = IVEC( i + 20 );
 			for ( j = 1; j <= NORDER; ++j ) {
 				R1 = MA( ( i - 1 ) * NORDER + j );
@@ -5149,7 +5136,6 @@ Label80: ;
 				MA( ( M - 1 ) * NORDER + j ) = R1;
 			}
 			IVEC( i + 20 ) = i;
-Label90: ;
 		}
 		return;
 		//   ########################################################### END
@@ -5179,7 +5165,6 @@ Label90: ;
 		using DataHeatBalance::ZonePreDefRep;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::TurnFansOn;
-		using DataHVACGlobals::TurnFansOff;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5577,7 +5562,6 @@ Label90: ;
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::TurnFansOn;
-		using DataHVACGlobals::TurnFansOff;
 		using DataHVACGlobals::VerySmallMassFlow;
 		using DataAirLoop::LoopSystemOnMassFlowrate;
 		using DataAirLoop::LoopSystemOffMassFlowrate;
@@ -6300,13 +6284,10 @@ Label90: ;
 
 		// Using/Aliasing
 		using DataAirLoop::AirToZoneNodeInfo;
-		using DataAirLoop::AirToOANodeInfo;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using MixedAir::GetNumOAMixers;
 		using MixedAir::GetOAMixerReliefNodeNumber;
 		using MixedAir::GetOAMixerInletNodeNumber;
-		using HeatingCoils::HeatingCoil;
-		using HeatingCoils::NumHeatingCoils;
 		using SingleDuct::GetHVACSingleDuctSysIndex;
 		using InputProcessor::SameString; // NEEDS TO BE CHANGED AFTER V1.3 RELEASE
 		using InputProcessor::MakeUPPERCase;
@@ -6343,11 +6324,11 @@ Label90: ;
 		static bool OneTimeFlag( true );
 		static bool ErrorsFound( false );
 		bool LocalError;
-		FArray1D_bool NodeFound;
+		Array1D_bool NodeFound;
 		Real64 FanFlow;
 		static bool IsNotOK( false );
 		static bool errFlag( false );
-		FArray1D_int NodeConnectionType; // Specifies the type of node connection
+		Array1D_int NodeConnectionType; // Specifies the type of node connection
 		std::string CurrentModuleObject;
 
 		// Validate supply and return connections
@@ -7090,18 +7071,16 @@ Label90: ;
 		Real64 ZoneAng1;
 		Real64 ZoneAng2;
 		Real64 ZoneAngDiff;
-		Real64 SSZoneNum;
-		Real64 SmallArea;
-		FArray1D< Real64 > ZoneAng; // Azimuth angle of the exterior wall of the zone
-		FArray1D< Real64 > PiFormula; // Formula for the mean pressure difference
-		FArray1D< Real64 > SigmaFormula; // Formula for the flucuating pressure difference
-		FArray1D< Real64 > Sprime; // The dimensionless ratio of the window separation to the building width
-		FArray1D< Real64 > CPV1; // Wind pressure coefficient for the first opening in the zone
-		FArray1D< Real64 > CPV2; // Wind pressure coefficient for the second opening in the zone
+		Array1D< Real64 > ZoneAng; // Azimuth angle of the exterior wall of the zone
+		Array1D< Real64 > PiFormula; // Formula for the mean pressure difference
+		Array1D< Real64 > SigmaFormula; // Formula for the flucuating pressure difference
+		Array1D< Real64 > Sprime; // The dimensionless ratio of the window separation to the building width
+		Array1D< Real64 > CPV1; // Wind pressure coefficient for the first opening in the zone
+		Array1D< Real64 > CPV2; // Wind pressure coefficient for the second opening in the zone
 		static int AFNNumOfExtOpenings( 0 ); // Total number of external openings in the model
 		static int OpenNuminZone( 0 ); // Counts which opening this is in the zone, 1 or 2
 		std::string Name; // External node name
-		FArray1D_int NumofExtSurfInZone; // List of the number of exterior openings in each zone
+		Array1D_int NumofExtSurfInZone; // List of the number of exterior openings in each zone
 
 		struct AFNExtSurfacesProp // External opening information
 		{
@@ -7173,7 +7152,7 @@ Label90: ;
 		};
 
 		// Object Data
-		FArray1D< AFNExtSurfacesProp > AFNExtSurfaces; // Surface numbers of all exterior openings
+		Array1D< AFNExtSurfacesProp > AFNExtSurfaces; // Surface numbers of all exterior openings
 
 		//count the total number of exterior simple and detailed openings and the number in each zone
 		//verify that each zone with "ADVANCED" single sided wind pressure coefficients has exactly two openings.
@@ -7183,14 +7162,14 @@ Label90: ;
 			if ( MultizoneZoneData( AFNZnNum ).SingleSidedCpType == "ADVANCED" ) {
 				for ( SrfNum = 1; SrfNum <= AirflowNetworkNumOfSurfaces; ++SrfNum ) {
 					if ( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ExtBoundCond == ExternalEnvironment ) { //check if outdoor boundary condition
-						MZDZoneNum = FindItemInList( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName, MultizoneZoneData.ZoneName(), AirflowNetworkNumOfZones );
+						MZDZoneNum = FindItemInList( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
 						if ( MZDZoneNum == AFNZnNum ) {
-							DetOpenNum = FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompDetOpeningData.Name(), AirflowNetworkNumOfDetOpenings );
+							DetOpenNum = FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompDetOpeningData );
 							if ( DetOpenNum > 0 ) {
 								++AFNNumOfExtOpenings;
 								++NumofExtSurfInZone( AFNZnNum );
 							} else {
-								SimOpenNum = FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompSimpleOpeningData.Name(), AirflowNetworkNumOfSimOpenings );
+								SimOpenNum = FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompSimpleOpeningData );
 								if ( SimOpenNum > 0 ) {
 									++AFNNumOfExtOpenings;
 									++NumofExtSurfInZone( AFNZnNum );
@@ -7230,14 +7209,14 @@ Label90: ;
 		//count again the number of detailed and simple exterior openings in zones with "ADVANCED" single sided wind pressure coefficients
 		AFNNumOfExtOpenings = 0;
 		for ( SrfNum = 1; SrfNum <= AirflowNetworkNumOfSurfaces; ++SrfNum ) {
-			MZDZoneNum = FindItemInList( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName, MultizoneZoneData.ZoneName(), AirflowNetworkNumOfZones );
+			MZDZoneNum = FindItemInList( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
 			if ( MultizoneZoneData( MZDZoneNum ).SingleSidedCpType == "ADVANCED" ) {
 				if ( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ExtBoundCond == ExternalEnvironment ) { //check if outdoor boundary condition
-					DetOpenNum = FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompDetOpeningData.Name(), AirflowNetworkNumOfDetOpenings );
+					DetOpenNum = FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompDetOpeningData );
 					if ( DetOpenNum > 0 ) {
 						++AFNNumOfExtOpenings;
 					} else {
-						SimOpenNum = FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompSimpleOpeningData.Name(), AirflowNetworkNumOfSimOpenings );
+						SimOpenNum = FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompSimpleOpeningData );
 						if ( SimOpenNum > 0 ) {
 							++AFNNumOfExtOpenings;
 						}
@@ -7251,8 +7230,8 @@ Label90: ;
 		for ( SrfNum = 1; SrfNum <= AirflowNetworkNumOfSurfaces; ++SrfNum ) {
 			if ( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ExtBoundCond == ExternalEnvironment ) {
 				if ( AirflowNetworkNumOfDetOpenings > 0 ) {
-					DetOpenNum = FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompDetOpeningData.Name(), AirflowNetworkNumOfDetOpenings );
-					MZDZoneNum = FindItemInList( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName, MultizoneZoneData.ZoneName(), AirflowNetworkNumOfZones );
+					DetOpenNum = FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompDetOpeningData );
+					MZDZoneNum = FindItemInList( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
 					if ( MultizoneZoneData( MZDZoneNum ).SingleSidedCpType == "ADVANCED" ) {
 						if ( DetOpenNum > 0 ) {
 							AFNExtSurfaces( ExtOpenNum ).MSDNum = SrfNum;
@@ -7261,7 +7240,7 @@ Label90: ;
 							AFNExtSurfaces( ExtOpenNum ).SurfName = Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).Name;
 							AFNExtSurfaces( ExtOpenNum ).ZoneNum = Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).Zone;
 							AFNExtSurfaces( ExtOpenNum ).ZoneName = Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName;
-							AFNExtSurfaces( ExtOpenNum ).MZDZoneNum = FindItemInList( AFNExtSurfaces( ExtOpenNum ).ZoneName, MultizoneZoneData.ZoneName(), AirflowNetworkNumOfZones );
+							AFNExtSurfaces( ExtOpenNum ).MZDZoneNum = FindItemInList( AFNExtSurfaces( ExtOpenNum ).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
 							AFNExtSurfaces( ExtOpenNum ).CompTypeNum = CompTypeNum_DOP;
 							AFNExtSurfaces( ExtOpenNum ).Height = MultizoneSurfaceData( SrfNum ).Height;
 							AFNExtSurfaces( ExtOpenNum ).Width = MultizoneSurfaceData( SrfNum ).Width;
@@ -7273,14 +7252,14 @@ Label90: ;
 						}
 					}
 				} else if ( AirflowNetworkNumOfSimOpenings > 0 ) {
-					SimOpenNum = FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompSimpleOpeningData.Name(), AirflowNetworkNumOfSimOpenings );
+					SimOpenNum = FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompSimpleOpeningData );
 					if ( SimOpenNum > 0 ) {
 						AFNExtSurfaces( ExtOpenNum ).MSDNum = SrfNum;
 						AFNExtSurfaces( ExtOpenNum ).SurfNum = MultizoneSurfaceData( SrfNum ).SurfNum;
 						AFNExtSurfaces( ExtOpenNum ).SurfName = Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).Name;
 						AFNExtSurfaces( ExtOpenNum ).ZoneNum = Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).Zone;
 						AFNExtSurfaces( ExtOpenNum ).ZoneName = Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName;
-						AFNExtSurfaces( ExtOpenNum ).MZDZoneNum = FindItemInList( AFNExtSurfaces( ExtOpenNum ).ZoneName, MultizoneZoneData.ZoneName(), AirflowNetworkNumOfZones );
+						AFNExtSurfaces( ExtOpenNum ).MZDZoneNum = FindItemInList( AFNExtSurfaces( ExtOpenNum ).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
 						AFNExtSurfaces( ExtOpenNum ).CompTypeNum = CompTypeNum_SOP;
 						AFNExtSurfaces( ExtOpenNum ).Height = MultizoneSurfaceData( SrfNum ).Height;
 						AFNExtSurfaces( ExtOpenNum ).Width = MultizoneSurfaceData( SrfNum ).Width;
@@ -7495,8 +7474,8 @@ Label90: ;
 
 	void OccupantVentilationControlProp::calc(
 		int const ZoneNum,
-		int const SurfNum,
-		int const PrevOpeningstatus,
+		int const EP_UNUSED( SurfNum ),
+		int const EP_UNUSED( PrevOpeningstatus ),
 		Real64 const TimeOpenDuration,
 		Real64 const TimeCloseDuration,
 		int & OpeningStatus,
@@ -7553,7 +7532,7 @@ Label90: ;
 			if ( closingProbability( TimeOpenDuration ) ) {
 				ClosingProbStatus = ProbForceChange; // forced to close
 			} else {
-				ClosingProbStatus = ProbKeepStatus; // Keep previous status 
+				ClosingProbStatus = ProbKeepStatus; // Keep previous status
 			}
 		} else {
 			ClosingProbStatus = ProbNoAction; // free operation
@@ -7566,7 +7545,6 @@ Label90: ;
 		Real64 const TimeCloseDuration
 		)// function to perform calculations of opening probability
 	{
-		using DataHeatBalance::ZnRpt;
 		using DataHeatBalance::ZoneIntGain;
 		using DataHeatBalFanSys::ZoneThermostatSetPointLo;
 		using DataHeatBalFanSys::ZoneThermostatSetPointHi;
@@ -7586,7 +7564,7 @@ Label90: ;
 			if ( ZoneIntGain( ZoneNum ).NOFOCC <= 0.0 ) {
 				return false;
 			}
-		} 
+		}
 
 		{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) ); // Check zone setpoints
 			if ( SELECT_CASE_var == 0 ) { // Uncontrolled
@@ -7607,12 +7585,12 @@ Label90: ;
 				}
 			}
 		}
-			
+
 		if ( OpeningProbSchNum == 0 ) {
 			return true;
 		} else {
 			SchValue = GetCurrentScheduleValue( OpeningProbSchNum );
-			RandomValue = Real64( rand( ) ) / RAND_MAX;
+			RandomValue = Real64( rand() ) / RAND_MAX;
 			if ( SchValue > RandomValue ) {
 				return true;
 			} else {
@@ -7636,7 +7614,7 @@ Label90: ;
 			return true;
 		} else {
 			SchValue = GetCurrentScheduleValue( ClosingProbSchNum );
-			RandomValue = Real64( rand( ) ) / RAND_MAX;
+			RandomValue = Real64( rand() ) / RAND_MAX;
 			if ( SchValue > RandomValue ) {
 				return true;
 			} else {
@@ -7647,7 +7625,7 @@ Label90: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

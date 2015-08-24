@@ -2,7 +2,7 @@
 #define BoilerSteam_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -30,7 +30,7 @@ namespace BoilerSteam {
 	extern Real64 BoilerMassFlowMaxAvail; // kg/s - Boiler mass flow rate
 	extern Real64 BoilerMassFlowMinAvail; // kg/s - Boiler mass flow rate
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
 
@@ -61,7 +61,7 @@ namespace BoilerSteam {
 		Real64 SizFac; // sizing factor
 		int BoilerInletNodeNum; // Node number at the boiler inlet
 		int BoilerOutletNodeNum; // Node number at the boiler outlet
-		FArray1D< Real64 > FullLoadCoef; // Coefficients of the fuel consumption/part load ratio curve
+		Array1D< Real64 > FullLoadCoef; // Coefficients of the fuel consumption/part load ratio curve
 		int TypeNum; // Plant loop type identifier
 		int LoopNum; // Plant loop index number
 		int LoopSideNum; // Loop side index number
@@ -130,8 +130,8 @@ namespace BoilerSteam {
 	};
 
 	// Object Data
-	extern FArray1D< BoilerSpecs > Boiler; // dimension to number of machines
-	extern FArray1D< ReportVars > BoilerReport;
+	extern Array1D< BoilerSpecs > Boiler; // dimension to number of machines
+	extern Array1D< ReportVars > BoilerReport;
 
 	// Functions
 
@@ -183,7 +183,7 @@ namespace BoilerSteam {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -3,7 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -103,28 +103,28 @@ namespace HeatBalanceHAMTManager {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D_int firstcell;
-	FArray1D_int lastcell;
-	FArray1D_int Extcell;
-	FArray1D_int ExtRadcell;
-	FArray1D_int ExtConcell;
-	FArray1D_int ExtSkycell;
-	FArray1D_int ExtGrncell;
-	FArray1D_int Intcell;
-	FArray1D_int IntConcell;
+	Array1D_int firstcell;
+	Array1D_int lastcell;
+	Array1D_int Extcell;
+	Array1D_int ExtRadcell;
+	Array1D_int ExtConcell;
+	Array1D_int ExtSkycell;
+	Array1D_int ExtGrncell;
+	Array1D_int Intcell;
+	Array1D_int IntConcell;
 
-	FArray1D< Real64 > watertot;
-	FArray1D< Real64 > surfrh;
-	FArray1D< Real64 > surfextrh;
-	FArray1D< Real64 > surftemp;
-	FArray1D< Real64 > surfexttemp;
-	FArray1D< Real64 > surfvp;
+	Array1D< Real64 > watertot;
+	Array1D< Real64 > surfrh;
+	Array1D< Real64 > surfextrh;
+	Array1D< Real64 > surftemp;
+	Array1D< Real64 > surfexttemp;
+	Array1D< Real64 > surfvp;
 
-	FArray1D< Real64 > extvtc; // External Surface vapor transfer coefficient
-	FArray1D< Real64 > intvtc; // Internal Surface Vapor Transfer Coefficient
-	FArray1D_bool extvtcflag; // External Surface vapor transfer coefficient flag
-	FArray1D_bool intvtcflag; // Internal Surface Vapor Transfer Coefficient flag
-	FArray1D_bool MyEnvrnFlag; // Flag to reset surface properties.
+	Array1D< Real64 > extvtc; // External Surface vapor transfer coefficient
+	Array1D< Real64 > intvtc; // Internal Surface Vapor Transfer Coefficient
+	Array1D_bool extvtcflag; // External Surface vapor transfer coefficient flag
+	Array1D_bool intvtcflag; // Internal Surface Vapor Transfer Coefficient flag
+	Array1D_bool MyEnvrnFlag; // Flag to reset surface properties.
 
 	Real64 deltat( 0.0 ); // time step in seconds
 
@@ -136,7 +136,7 @@ namespace HeatBalanceHAMTManager {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceHAMTManager:
 
 	// Object Data
-	FArray1D< subcell > cells;
+	Array1D< subcell > cells;
 
 	// Functions
 
@@ -236,14 +236,14 @@ namespace HeatBalanceHAMTManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		FArray1D_string AlphaArray;
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
+		Array1D_string AlphaArray;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
 
-		FArray1D_bool lAlphaBlanks;
-		FArray1D_bool lNumericBlanks;
+		Array1D_bool lAlphaBlanks;
+		Array1D_bool lNumericBlanks;
 
-		FArray1D< Real64 > NumArray;
+		Array1D< Real64 > NumArray;
 
 		Real64 dumrh;
 		Real64 dumdata;
@@ -342,7 +342,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject1, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject1 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
@@ -364,7 +364,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject2, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject2 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
@@ -443,7 +443,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject3, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject3 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
@@ -476,7 +476,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject4, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject4 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -507,7 +507,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject5, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject5 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -541,7 +541,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject6, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
+			matid = FindItemInList( AlphaArray( 1 ), Material );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject6 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -575,7 +575,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			GetObjectItem( cHAMTObject7, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			vtcsid = FindItemInList( AlphaArray( 1 ), Surface.Name(), TotSurfaces );
+			vtcsid = FindItemInList( AlphaArray( 1 ), Surface );
 			if ( vtcsid == 0 ) {
 				ShowSevereError( cHAMTObject7 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -1474,8 +1474,8 @@ namespace HeatBalanceHAMTManager {
 	void
 	interp(
 		int const ndata,
-		FArray1A< Real64 > const xx,
-		FArray1A< Real64 > const yy,
+		Array1A< Real64 > const xx,
+		Array1A< Real64 > const yy,
 		Real64 const invalue,
 		Real64 & outvalue,
 		Optional< Real64 > outgrad
@@ -1675,7 +1675,7 @@ namespace HeatBalanceHAMTManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     Illinois and The Regents of the University of California through
 	//     Ernest Orlando Lawrence Berkeley National Laboratory.  All rights
 	//     reserved.

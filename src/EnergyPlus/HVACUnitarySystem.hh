@@ -2,7 +2,7 @@
 #define HVACUnitarySystem_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -79,9 +79,9 @@ namespace HVACUnitarySystem {
 	extern Real64 TempSteamIn; // steam coil steam inlet temperature
 
 	// Allocatable types
-	extern FArray1D_bool CheckEquipName;
-	extern FArray1D_bool MultiOrVarSpeedHeatCoil;
-	extern FArray1D_bool MultiOrVarSpeedCoolCoil;
+	extern Array1D_bool CheckEquipName;
+	extern Array1D_bool MultiOrVarSpeedHeatCoil;
+	extern Array1D_bool MultiOrVarSpeedCoolCoil;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -114,8 +114,8 @@ namespace HVACUnitarySystem {
 		std::string Name; // Name of the design specification MSHP
 		int NumOfSpeedCooling; // The number of speeds for cooling
 		int NumOfSpeedHeating; // The number of speeds for heating
-		FArray1D< Real64 > CoolingVolFlowRatio; // The ratio of flow to max for this speed
-		FArray1D< Real64 > HeatingVolFlowRatio; // The ratio of flow to max for this speed
+		Array1D< Real64 > CoolingVolFlowRatio; // The ratio of flow to max for this speed
+		Array1D< Real64 > HeatingVolFlowRatio; // The ratio of flow to max for this speed
 
 		// Default Constructor
 		DesignSpecMSHPData() :
@@ -128,8 +128,8 @@ namespace HVACUnitarySystem {
 			std::string const & Name, // Name of the design specification MSHP
 			int const NumOfSpeedCooling, // The number of speeds for cooling
 			int const NumOfSpeedHeating, // The number of speeds for heating
-			FArray1< Real64 > const & CoolingVolFlowRatio, // The ratio of flow to max for this speed
-			FArray1< Real64 > const & HeatingVolFlowRatio // The ratio of flow to max for this speed
+			Array1< Real64 > const & CoolingVolFlowRatio, // The ratio of flow to max for this speed
+			Array1< Real64 > const & HeatingVolFlowRatio // The ratio of flow to max for this speed
 		) :
 			Name( Name ),
 			NumOfSpeedCooling( NumOfSpeedCooling ),
@@ -304,12 +304,12 @@ namespace HVACUnitarySystem {
 		Real64 IdleVolumeAirRate; // idle air flow rate [m3/s]
 		Real64 IdleMassFlowRate; // idle air flow rate [kg/s]
 		bool CheckFanFlow; // Supply airflow check
-		FArray1D< Real64 > HeatVolumeFlowRate; // Supply air volume flow rate during heating operation
-		FArray1D< Real64 > HeatMassFlowRate; // Supply air mass flow rate during heating operation
-		FArray1D< Real64 > CoolVolumeFlowRate; // Supply air volume flow rate during cooling operation
-		FArray1D< Real64 > CoolMassFlowRate; // Supply air mass flow rate during cooling operation
-		FArray1D< Real64 > MSHeatingSpeedRatio; // Fan speed ratio in heating mode
-		FArray1D< Real64 > MSCoolingSpeedRatio; // Fan speed ratio in cooling mode
+		Array1D< Real64 > HeatVolumeFlowRate; // Supply air volume flow rate during heating operation
+		Array1D< Real64 > HeatMassFlowRate; // Supply air mass flow rate during heating operation
+		Array1D< Real64 > CoolVolumeFlowRate; // Supply air volume flow rate during cooling operation
+		Array1D< Real64 > CoolMassFlowRate; // Supply air mass flow rate during cooling operation
+		Array1D< Real64 > MSHeatingSpeedRatio; // Fan speed ratio in heating mode
+		Array1D< Real64 > MSCoolingSpeedRatio; // Fan speed ratio in cooling mode
 		Real64 NoHeatCoolSpeedRatio; // Fan speed ratio when no cooling or heating
 		int DesignSpecMSHPIndex; // Index to design specification multispeed heat pump object
 		bool MultiSpeedCoolingCoil; // TRUE when cooling coil multispeed
@@ -815,12 +815,12 @@ namespace HVACUnitarySystem {
 			Real64 const IdleVolumeAirRate, // idle air flow rate [m3/s]
 			Real64 const IdleMassFlowRate, // idle air flow rate [kg/s]
 			bool const CheckFanFlow, // Supply airflow check
-			FArray1< Real64 > const & HeatVolumeFlowRate, // Supply air volume flow rate during heating operation
-			FArray1< Real64 > const & HeatMassFlowRate, // Supply air mass flow rate during heating operation
-			FArray1< Real64 > const & CoolVolumeFlowRate, // Supply air volume flow rate during cooling operation
-			FArray1< Real64 > const & CoolMassFlowRate, // Supply air mass flow rate during cooling operation
-			FArray1< Real64 > const & MSHeatingSpeedRatio, // Fan speed ratio in heating mode
-			FArray1< Real64 > const & MSCoolingSpeedRatio, // Fan speed ratio in cooling mode
+			Array1< Real64 > const & HeatVolumeFlowRate, // Supply air volume flow rate during heating operation
+			Array1< Real64 > const & HeatMassFlowRate, // Supply air mass flow rate during heating operation
+			Array1< Real64 > const & CoolVolumeFlowRate, // Supply air volume flow rate during cooling operation
+			Array1< Real64 > const & CoolMassFlowRate, // Supply air mass flow rate during cooling operation
+			Array1< Real64 > const & MSHeatingSpeedRatio, // Fan speed ratio in heating mode
+			Array1< Real64 > const & MSCoolingSpeedRatio, // Fan speed ratio in cooling mode
 			Real64 const NoHeatCoolSpeedRatio, // Fan speed ratio when no cooling or heating
 			int const DesignSpecMSHPIndex, // Index to design specification multispeed heat pump object
 			bool const MultiSpeedCoolingCoil, // TRUE when cooling coil multispeed
@@ -1188,7 +1188,7 @@ namespace HVACUnitarySystem {
 	struct UnitarySystemNumericFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		UnitarySystemNumericFieldData()
@@ -1196,16 +1196,16 @@ namespace HVACUnitarySystem {
 
 		// Member Constructor
 		UnitarySystemNumericFieldData(
-			FArray1_string const & FieldNames // Name of the UnitarySystem numeric field descriptions
+			Array1_string const & FieldNames // Name of the UnitarySystem numeric field descriptions
 		) :
-		FieldNames( FieldNames )
+			FieldNames( FieldNames )
 		{}
 	};
 
 	// Object Data
-	extern FArray1D< DesignSpecMSHPData > DesignSpecMSHP;
-	extern FArray1D< UnitarySystemData > UnitarySystem;
-	extern FArray1D< UnitarySystemNumericFieldData > UnitarySystemNumericFields;
+	extern Array1D< DesignSpecMSHPData > DesignSpecMSHP;
+	extern Array1D< UnitarySystemData > UnitarySystem;
+	extern Array1D< UnitarySystemNumericFieldData > UnitarySystemNumericFields;
 
 	// Functions
 
@@ -1327,7 +1327,7 @@ namespace HVACUnitarySystem {
 	Real64
 	CalcUnitarySystemLoadResidual(
 		Real64 const PartLoadRatio, // DX cooling coil part load ratio
-		FArray1< Real64 > const & Par // Function parameters
+		Array1< Real64 > const & Par // Function parameters
 	);
 
 	void
@@ -1458,85 +1458,85 @@ namespace HVACUnitarySystem {
 	Real64
 	DXHeatingCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	DXCoilVarSpeedResidual(
 		Real64 const SpeedRatio, // compressor speed ratio (1.0 is max, 0.0 is min)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	HeatingCoilVarSpeedResidual(
 		Real64 const SpeedRatio, // compressor speed ratio (1.0 is max, 0.0 is min)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	DXCoilVarSpeedHumRatResidual(
 		Real64 const SpeedRatio, // compressor speed ratio (1.0 is max, 0.0 is min)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	DXCoilCyclingResidual(
 		Real64 const CycRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	HeatingCoilVarSpeedCycResidual(
 		Real64 const CycRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	DXCoilCyclingHumRatResidual(
 		Real64 const CycRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	DOE2DXCoilResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	DOE2DXCoilHumRatResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	CoolWaterHumRatResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = CoolWater coil number
+		Array1< Real64 > const & Par // par(1) = CoolWater coil number
 	);
 
 	Real64
 	CoolWaterTempResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = CoolWater coil number
+		Array1< Real64 > const & Par // par(1) = CoolWater coil number
 	);
 
 	Real64
 	CoolWatertoAirHPHumRatResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = CoolWatertoAirHP coil number
+		Array1< Real64 > const & Par // par(1) = CoolWatertoAirHP coil number
 	);
 
 	Real64
 	CoolWatertoAirHPTempResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = CoolWatertoAirHP coil number
+		Array1< Real64 > const & Par // par(1) = CoolWatertoAirHP coil number
 	);
 
 	Real64
 	HeatWatertoAirHPTempResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = HeatWatertoAirHP coil number
+		Array1< Real64 > const & Par // par(1) = HeatWatertoAirHP coil number
 	);
 
 	void
@@ -1550,43 +1550,43 @@ namespace HVACUnitarySystem {
 	Real64
 	MultiModeDXCoilResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	MultiModeDXCoilHumRatResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	HXAssistedCoolCoilTempResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	HXAssistedCoolCoilHRResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	GasElecHeatingCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	HotWaterHeatingCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	SteamHeatingCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	void
@@ -1614,25 +1614,28 @@ namespace HVACUnitarySystem {
 
 } // HVACUnitarySystem
 
-// *****************************************************************************
-//     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-//     and The Regents of the University of CalIFornia through Ernest OrlanDO Lawrence
-//     Berkeley National Laboratory.  All rights reserved.
-//     Portions of the EnergyPlus software package have been developed and copyrighted
-//     by other individuals, companies and institutions.  These portions have been
-//     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in main.cc.
-//     NOTICE: The U.S. Government is granted for itself and others acting on its
-//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-//     reproduce, prepare derivative works, and perform publicly and display publicly.
-//     Beginning five (5) years after permission to assert copyright is granted,
-//     subject to two possible five year renewals, the U.S. Government is granted for
-//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-//     worldwide license in this data to reproduce, prepare derivative works,
-//     distribute copies to the public, perform publicly and display publicly, and to
-//     permit others to DO so.
-//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	// *****************************************************************************
+	//     NOTICE
+
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
+	//     and The Regents of the University of CalIFornia through Ernest OrlanDO Lawrence
+	//     Berkeley National Laboratory.  All rights reserved.
+
+	//     Portions of the EnergyPlus software package have been developed and copyrighted
+	//     by other individuals, companies and institutions.  These portions have been
+	//     incorporated into the EnergyPlus software package under license.   For a complete
+	//     list of contributors, see "Notice" located in main.cc.
+
+	//     NOTICE: The U.S. Government is granted for itself and others acting on its
+	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
+	//     reproduce, prepare derivative works, and perform publicly and display publicly.
+	//     Beginning five (5) years after permission to assert copyright is granted,
+	//     subject to two possible five year renewals, the U.S. Government is granted for
+	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
+	//     worldwide license in this data to reproduce, prepare derivative works,
+	//     distribute copies to the public, perform publicly and display publicly, and to
+	//     permit others to DO so.
+	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

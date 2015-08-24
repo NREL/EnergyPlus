@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -33,6 +33,8 @@ public: // Types
 
 	typedef  T  Value; // Type: Includes const attribute for const argument
 	typedef  IndexRange  IR;
+	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
+	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
 
 public: // Creation
 
@@ -106,7 +108,7 @@ public: // Conversion
 
 	// Value Conversion
 	inline
-	operator T const &() const
+	operator Tr() const
 	{
 		assert( ptr_ != nullptr );
 		return *ptr_;
@@ -124,7 +126,7 @@ public: // Operators
 
 	// Value
 	inline
-	T const &
+	Tr
 	operator ()() const
 	{
 		assert( ptr_ != nullptr );
@@ -307,7 +309,7 @@ public: // Modifiers
 	void
 	deallocate()
 	{
-		if ( ptr_ and own_ ) delete ptr_;
+		if ( ptr_ && own_ ) delete ptr_;
 		ptr_ = nullptr;
 		own_ = false;
 	}
@@ -315,8 +317,8 @@ public: // Modifiers
 public: // Comparison
 
 	// Reference == Reference
-	inline
 	friend
+	inline
 	bool
 	operator ==( Reference const & a, Reference const & b )
 	{
@@ -325,8 +327,8 @@ public: // Comparison
 	}
 
 	// Reference != Reference
-	inline
 	friend
+	inline
 	bool
 	operator !=( Reference const & a, Reference const & b )
 	{
@@ -335,40 +337,40 @@ public: // Comparison
 	}
 
 	// Reference == Value
-	inline
 	friend
+	inline
 	bool
-	operator ==( Reference const & a, T const & b )
+	operator ==( Reference const & a, Tc b )
 	{
 		assert( a.ptr_ != nullptr ); // Fortran disallows use if not associated
 		return ( ( a.ptr_ != nullptr ) && ( *a.ptr_ == b ) );
 	}
 
 	// Reference != Value
-	inline
 	friend
+	inline
 	bool
-	operator !=( Reference const & a, T const & b )
+	operator !=( Reference const & a, Tc b )
 	{
 		assert( a.ptr_ != nullptr ); // Fortran disallows use if not associated
 		return ( ( a.ptr_ == nullptr ) || ( *a.ptr_ != b ) );
 	}
 
 	// Value == Reference
-	inline
 	friend
+	inline
 	bool
-	operator ==( T const & a, Reference const & b )
+	operator ==( Tc a, Reference const & b )
 	{
 		assert( b.ptr_ != nullptr ); // Fortran disallows use if not associated
 		return ( ( b.ptr_ != nullptr ) && ( a == *b.ptr_ ) );
 	}
 
 	// Value != Reference
-	inline
 	friend
+	inline
 	bool
-	operator !=( T const & a, Reference const & b )
+	operator !=( Tc a, Reference const & b )
 	{
 		assert( b.ptr_ != nullptr ); // Fortran disallows use if not associated
 		return ( ( b.ptr_ == nullptr ) || ( a != *b.ptr_ ) );

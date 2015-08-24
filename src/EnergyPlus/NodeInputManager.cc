@@ -2,7 +2,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -73,28 +73,47 @@ namespace NodeInputManager {
 	// The following is a module level flag because there are several possible "entries" into
 	// this module that may need to get the Node Inputs.
 	bool GetNodeInputFlag( true ); // Flag to Get Node Input(s)
-	FArray1D_string TmpNodeID; // Used to "reallocate" name arrays
-	FArray1D_int NodeRef; // Number of times a Node is "referenced"
+	Array1D_string TmpNodeID; // Used to "reallocate" name arrays
+	Array1D_int NodeRef; // Number of times a Node is "referenced"
 	std::string CurCheckContextName; // Used in Uniqueness checks
-	FArray1D_string UniqueNodeNames; // used in uniqueness checks
+	Array1D_string UniqueNodeNames; // used in uniqueness checks
 	int NumCheckNodes( 0 ); // Num of Unique nodes in check
 	int MaxCheckNodes( 0 ); // Current "max" unique nodes in check
 	bool NodeVarsSetup( false ); // Setup indicator of node vars for reporting (also that all nodes have been entered)
-	FArray1D_bool NodeWetBulbRepReq;
+	Array1D_bool NodeWetBulbRepReq;
 
 	// Object Data
-	FArray1D< NodeListDef > NodeLists; // Node Lists
+	Array1D< NodeListDef > NodeLists; // Node Lists
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
 
 	// Functions
 
+	// Clears the global data in NodeInputManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumOfNodeLists = 0;
+		NumOfUniqueNodeNames = 0;
+		GetNodeInputFlag = true;
+		TmpNodeID.deallocate();
+		NodeRef.deallocate();
+		CurCheckContextName = std::string();
+		UniqueNodeNames.deallocate();
+		NumCheckNodes = 0;
+		MaxCheckNodes = 0;
+		NodeVarsSetup = false;
+		NodeWetBulbRepReq.deallocate();
+		NodeLists.deallocate();
+	}
+
 	void
 	GetNodeNums(
 		std::string const & Name, // Name for which to obtain information
 		int & NumNodes, // Number of nodes accompanying this Name
-		FArray1S_int NodeNumbers, // Node Numbers accompanying this Name
+		Array1S_int NodeNumbers, // Node Numbers accompanying this Name
 		bool & ErrorsFound, // True when errors are found...
 		int const NodeFluidType, // Fluidtype for checking/setting node FluidType
 		std::string const & NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
@@ -167,7 +186,7 @@ namespace NodeInputManager {
 		}
 
 		if ( not_blank( Name ) ) {
-			ThisOne = FindItemInList( Name, NodeLists.Name(), NumOfNodeLists );
+			ThisOne = FindItemInList( Name, NodeLists );
 			if ( ThisOne != 0 ) {
 				NumNodes = NodeLists( ThisOne ).NumOfNodesInList;
 				NodeNumbers( {1,NumNodes} ) = NodeLists( ThisOne ).NodeNumbers( {1,NumNodes} );
@@ -218,7 +237,7 @@ namespace NodeInputManager {
 	GetNodeList(
 		std::string const & Name, // Node List Name for which information is obtained
 		int & NumNodes, // Number of nodes accompanying this Name
-		FArray1S_int NodeNumbers, // NodeNumbers accompanying this Name
+		Array1S_int NodeNumbers, // NodeNumbers accompanying this Name
 		bool & errFlag, // Set to true when requested Node List not found
 		int const NodeFluidType, // Fluidtype for checking/setting node FluidType
 		std::string const & NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
@@ -280,7 +299,7 @@ namespace NodeInputManager {
 
 		Try = 0;
 		if ( NumOfNodeLists > 0 ) {
-			Try = FindItemInList( Name, NodeLists( {1,NumOfNodeLists} ).Name(), NumOfNodeLists );
+			Try = FindItemInList( Name, NodeLists );
 		}
 
 		if ( Try != 0 ) {
@@ -491,8 +510,8 @@ namespace NodeInputManager {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		bool flagError; // true when error node list name should be output
-		FArray1D_string cAlphas;
-		FArray1D< Real64 > rNumbers;
+		Array1D_string cAlphas;
+		Array1D< Real64 > rNumbers;
 
 		ErrorsFound = false;
 		GetObjectDefMaxArgs( CurrentModuleObject, NCount, NumAlphas, NumNumbers );
@@ -510,7 +529,7 @@ namespace NodeInputManager {
 			GetObjectItem( CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphas( 1 ), NodeLists.Name(), NCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( cAlphas( 1 ), NodeLists, NCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				continue;
@@ -744,7 +763,7 @@ namespace NodeInputManager {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int NumNodes;
-		static FArray1D_int NodeNums;
+		static Array1D_int NodeNums;
 		int FluidType;
 		std::string ConnectionType;
 		static bool firstTime( true );
@@ -1068,11 +1087,11 @@ namespace NodeInputManager {
 		static bool MyOneTimeFlag( true ); // one time flag
 		static Real64 RhoAirStdInit;
 		static Real64 RhoWaterStdInit;
-		static FArray1D_int NodeWetBulbSchedPtr;
-		static FArray1D_bool NodeRelHumidityRepReq;
-		static FArray1D_int NodeRelHumiditySchedPtr;
-		static FArray1D_bool NodeDewPointRepReq;
-		static FArray1D_int NodeDewPointSchedPtr;
+		static Array1D_int NodeWetBulbSchedPtr;
+		static Array1D_bool NodeRelHumidityRepReq;
+		static Array1D_int NodeRelHumiditySchedPtr;
+		static Array1D_bool NodeDewPointRepReq;
+		static Array1D_int NodeDewPointSchedPtr;
 		static std::vector<std::string> nodeReportingStrings;
 		static std::vector<std::string> nodeFluidNames;
 		bool ReportWetBulb;
@@ -1332,7 +1351,7 @@ namespace NodeInputManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

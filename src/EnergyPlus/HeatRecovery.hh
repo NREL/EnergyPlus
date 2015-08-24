@@ -2,7 +2,7 @@
 #define HeatRecovery_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -51,7 +51,7 @@ namespace HeatRecovery {
 	// DX coils use DXCoilFullLoadOutAirHumRat when coil is ON otherwise inlet node
 	extern bool GetInputFlag; // First time, input is "gotten"
 	extern bool CalledFromParentObject; // Indicates that HX is called from parent object (this object is not on a branch)
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 
@@ -1155,8 +1155,8 @@ namespace HeatRecovery {
 	};
 
 	// Object Data
-	extern FArray1D< HeatExchCond > ExchCond;
-	extern FArray1D< BalancedDesDehumPerfData > BalDesDehumPerfData;
+	extern Array1D< HeatExchCond > ExchCond;
+	extern Array1D< BalancedDesDehumPerfData > BalDesDehumPerfData;
 
 	// Functions
 
@@ -1257,7 +1257,7 @@ namespace HeatRecovery {
 	Real64
 	GetResidCrossFlowBothUnmixed(
 		Real64 const NTU, // number of transfer units
-		FArray1< Real64 > const & Par // par(1) = Eps, par(2) = Z
+		Array1< Real64 > const & Par // par(1) = Eps, par(2) = Z
 	);
 
 	void
@@ -1373,7 +1373,7 @@ namespace HeatRecovery {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

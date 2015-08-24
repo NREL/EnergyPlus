@@ -2,7 +2,7 @@
 #define HVACMultiSpeedHeatPump_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -61,7 +61,7 @@ namespace HVACMultiSpeedHeatPump {
 	extern Real64 SupHeaterLoad; // load to be met by supplemental heater [W]
 	extern Real64 SaveLoadResidual; // Saved load residual used to check convergence
 	extern Real64 SaveCompressorPLR; // holds compressor PLR from active DX coil
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -130,12 +130,12 @@ namespace HVACMultiSpeedHeatPump {
 		Real64 IdleSpeedRatio; // Fan speed ratio in idle mode
 		int NumOfSpeedCooling; // The number of speeds for cooling
 		int NumOfSpeedHeating; // The number of speeds for heating
-		FArray1D< Real64 > HeatVolumeFlowRate; // Supply air volume flow rate during heating operation
-		FArray1D< Real64 > HeatMassFlowRate; // Supply air mass flow rate during heating operation
-		FArray1D< Real64 > CoolVolumeFlowRate; // Supply air volume flow rate during cooling operation
-		FArray1D< Real64 > CoolMassFlowRate; // Supply air mass flow rate during cooling operation
-		FArray1D< Real64 > HeatingSpeedRatio; // Fan speed ratio in heating mode
-		FArray1D< Real64 > CoolingSpeedRatio; // Fan speed ratio in cooling mode
+		Array1D< Real64 > HeatVolumeFlowRate; // Supply air volume flow rate during heating operation
+		Array1D< Real64 > HeatMassFlowRate; // Supply air mass flow rate during heating operation
+		Array1D< Real64 > CoolVolumeFlowRate; // Supply air volume flow rate during cooling operation
+		Array1D< Real64 > CoolMassFlowRate; // Supply air mass flow rate during cooling operation
+		Array1D< Real64 > HeatingSpeedRatio; // Fan speed ratio in heating mode
+		Array1D< Real64 > CoolingSpeedRatio; // Fan speed ratio in cooling mode
 		bool CheckFanFlow; // Supply airflow check
 		int LastMode; // MSHP operation mode
 		int HeatCoolMode; // System operating mode (0 = floating, 1 = cooling, 2 = heating)
@@ -366,12 +366,12 @@ namespace HVACMultiSpeedHeatPump {
 			Real64 const IdleSpeedRatio, // Fan speed ratio in idle mode
 			int const NumOfSpeedCooling, // The number of speeds for cooling
 			int const NumOfSpeedHeating, // The number of speeds for heating
-			FArray1< Real64 > const & HeatVolumeFlowRate, // Supply air volume flow rate during heating operation
-			FArray1< Real64 > const & HeatMassFlowRate, // Supply air mass flow rate during heating operation
-			FArray1< Real64 > const & CoolVolumeFlowRate, // Supply air volume flow rate during cooling operation
-			FArray1< Real64 > const & CoolMassFlowRate, // Supply air mass flow rate during cooling operation
-			FArray1< Real64 > const & HeatingSpeedRatio, // Fan speed ratio in heating mode
-			FArray1< Real64 > const & CoolingSpeedRatio, // Fan speed ratio in cooling mode
+			Array1< Real64 > const & HeatVolumeFlowRate, // Supply air volume flow rate during heating operation
+			Array1< Real64 > const & HeatMassFlowRate, // Supply air mass flow rate during heating operation
+			Array1< Real64 > const & CoolVolumeFlowRate, // Supply air volume flow rate during cooling operation
+			Array1< Real64 > const & CoolMassFlowRate, // Supply air mass flow rate during cooling operation
+			Array1< Real64 > const & HeatingSpeedRatio, // Fan speed ratio in heating mode
+			Array1< Real64 > const & CoolingSpeedRatio, // Fan speed ratio in cooling mode
 			bool const CheckFanFlow, // Supply airflow check
 			int const LastMode, // MSHP operation mode
 			int const HeatCoolMode, // System operating mode (0 = floating, 1 = cooling, 2 = heating)
@@ -604,8 +604,8 @@ namespace HVACMultiSpeedHeatPump {
 	};
 
 	// Object Data
-	extern FArray1D< MSHeatPumpData > MSHeatPump;
-	extern FArray1D< MSHeatPumpReportData > MSHeatPumpReport;
+	extern Array1D< MSHeatPumpData > MSHeatPump;
+	extern Array1D< MSHeatPumpReportData > MSHeatPumpReport;
 
 	// Functions
 
@@ -687,7 +687,7 @@ namespace HVACMultiSpeedHeatPump {
 	Real64
 	MSHPCyclingResidual(
 		Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = MSHPNum
+		Array1< Real64 > const & Par // par(1) = MSHPNum
 	);
 
 	//******************************************************************************
@@ -695,7 +695,7 @@ namespace HVACMultiSpeedHeatPump {
 	Real64
 	MSHPVarSpeedResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = MSHPNum
+		Array1< Real64 > const & Par // par(1) = MSHPNum
 	);
 
 	//******************************************************************************
@@ -733,12 +733,12 @@ namespace HVACMultiSpeedHeatPump {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		FArray1< Real64 > const & Par // Par(5) is the requested coil load
+		Array1< Real64 > const & Par // Par(5) is the requested coil load
 	);
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

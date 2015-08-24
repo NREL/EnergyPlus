@@ -2,7 +2,7 @@
 #define HVACCooledBeam_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -24,7 +24,7 @@ namespace HVACCooledBeam {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// INTEGER :: NumPassiveCB = 0
 	// INTEGER :: NumActiveCB = 0
@@ -240,7 +240,7 @@ namespace HVACCooledBeam {
 	};
 
 	// Object Data
-	extern FArray1D< CoolBeamData > CoolBeam;
+	extern Array1D< CoolBeamData > CoolBeam;
 
 	// Functions
 
@@ -287,7 +287,7 @@ namespace HVACCooledBeam {
 	Real64
 	CoolBeamResidual(
 		Real64 const CWFlow, // cold water flow rate in kg/s
-		FArray1< Real64 > const & Par
+		Array1< Real64 > const & Par
 	);
 
 	void
@@ -298,7 +298,7 @@ namespace HVACCooledBeam {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

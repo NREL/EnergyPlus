@@ -2,7 +2,7 @@
 #define DataAirflowNetwork_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -89,7 +89,7 @@ namespace DataAirflowNetwork {
 	extern int const AirflowNetworkControlMultiADS; // Perform distribution system durin system on time
 	// and multizone calculations during off time
 
-	extern FArray1D_bool AirflowNetworkZoneFlag;
+	extern Array1D_bool AirflowNetworkZoneFlag;
 
 	extern int NumOfNodesMultiZone; // Number of nodes for multizone calculation
 	extern int NumOfNodesDistribution; // Number of nodes for distribution system calculation
@@ -106,12 +106,12 @@ namespace DataAirflowNetwork {
 	extern int AirflowNetworkNumOfZones; // The number of zones for multizone calculation
 
 	extern bool RollBackFlag; // Roll back flag when system time steo down shifting
-	extern FArray1D< Real64 > ANZT; // Local zone air temperature for roll back use
-	extern FArray1D< Real64 > ANZW; // Local zone air humidity ratio for roll back use
-	extern FArray1D< Real64 > ANCO; // Local zone air CO2 for roll back use
-	extern FArray1D< Real64 > ANGC; // Local zone air generic contaminant for roll back use
+	extern Array1D< Real64 > ANZT; // Local zone air temperature for roll back use
+	extern Array1D< Real64 > ANZW; // Local zone air humidity ratio for roll back use
+	extern Array1D< Real64 > ANCO; // Local zone air CO2 for roll back use
+	extern Array1D< Real64 > ANGC; // Local zone air generic contaminant for roll back use
 	extern int AirflowNetworkNumOfExhFan; // Number of zone exhaust fans
-	extern FArray1D_bool AirflowNetworkZoneExhaustFan; // Logical to use zone exhaust fans
+	extern Array1D_bool AirflowNetworkZoneExhaustFan; // Logical to use zone exhaust fans
 	extern bool AirflowNetworkFanActivated; // Supply fan activation flag
 	extern bool AirflowNetworkUnitarySystem; // set to TRUE for unitary systems (to make answers equal, will remove eventually)
 	// Multispeed HP only
@@ -121,7 +121,7 @@ namespace DataAirflowNetwork {
 	extern bool VAVSystem; // This flag is used to represent a VAV system
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
@@ -293,7 +293,6 @@ namespace DataAirflowNetwork {
 			BuildWidth( 10.0 ),
 			ASH55PeopleInd( 0 ),
 			CEN15251PeopleInd( 0 ),
-			OccupantVentilationControlName( "" ),
 			OccupantVentilationControlNum( 0 )
 		{}
 
@@ -317,7 +316,7 @@ namespace DataAirflowNetwork {
 			Real64 const BuildWidth, // The width of the building along the facade that contains this zone.
 			int const ASH55PeopleInd, // Index of people object with ASH55 comfort calcs for ventilation control
 			int const CEN15251PeopleInd, // Index of people object with CEN15251 comfort calcs for ventilation control
-			std::string const OccupantVentilationControlName, // Occupant ventilation control name
+			std::string const & OccupantVentilationControlName, // Occupant ventilation control name
 			int const OccupantVentilationControlNum // Occupant ventilation control number
 		) :
 			ZoneName( ZoneName ),
@@ -352,7 +351,7 @@ namespace DataAirflowNetwork {
 		std::string ExternalNodeName; // Name of external node, but not used at WPC="INPUT"
 		Real64 Factor; // Crack Actual Value or Window Open Factor for Ventilation
 		int SurfNum; // Surface number
-		FArray1D_int NodeNums; // Positive: Zone numbers; 0: External
+		Array1D_int NodeNums; // Positive: Zone numbers; 0: External
 		Real64 OpenFactor; // Surface factor
 		Real64 OpenFactorLast; // Surface factor at previous time step
 		bool EMSOpenFactorActuated; // True if EMS actuation is on
@@ -427,7 +426,6 @@ namespace DataAirflowNetwork {
 			HybridCtrlGlobal( false ),
 			HybridCtrlMaster( false ),
 			WindModifier( 1.0 ),
-			OccupantVentilationControlName( "" ),
 			OccupantVentilationControlNum( 0 ),
 			OpeningStatus( 0 ),
 			PrevOpeningstatus( 0 ),
@@ -444,7 +442,7 @@ namespace DataAirflowNetwork {
 			std::string const & ExternalNodeName, // Name of external node, but not used at WPC="INPUT"
 			Real64 const Factor, // Crack Actual Value or Window Open Factor for Ventilation
 			int const SurfNum, // Surface number
-			FArray1_int const & NodeNums, // Positive: Zone numbers; 0: External
+			Array1_int const & NodeNums, // Positive: Zone numbers; 0: External
 			Real64 const OpenFactor, // Surface factor
 			Real64 const OpenFactorLast, // Surface factor at previous time step
 			bool const EMSOpenFactorActuated, // True if EMS actuation is on
@@ -474,7 +472,7 @@ namespace DataAirflowNetwork {
 			bool const HybridCtrlGlobal, // Hybrid ventilation global control logical
 			bool const HybridCtrlMaster, // Hybrid ventilation global control master
 			Real64 const WindModifier, // Wind modifier from hybrid ventilation control
-			std::string const OccupantVentilationControlName, // Occupant ventilation control name
+			std::string const & OccupantVentilationControlName, // Occupant ventilation control name
 			int const OccupantVentilationControlNum, // Occupant ventilation control number
 			int const OpeningStatus, // Open status at current time step
 			int const PrevOpeningstatus, // Open status at previous time step
@@ -526,7 +524,7 @@ namespace DataAirflowNetwork {
 			OpenElapsedTime( OpenElapsedTime ),
 			ClosingProbStatus( ClosingProbStatus ),
 			OpeningProbStatus( OpeningProbStatus )
-			{}
+		{}
 
 	};
 
@@ -962,7 +960,7 @@ namespace DataAirflowNetwork {
 		// Members
 		std::string Name; // Name of CP array
 		int NumWindDir; // Number of wind directions
-		FArray1D< Real64 > WindDir; // Wind direction
+		Array1D< Real64 > WindDir; // Wind direction
 
 		// Default Constructor
 		MultizoneCPArrayProp() :
@@ -973,7 +971,7 @@ namespace DataAirflowNetwork {
 		MultizoneCPArrayProp(
 			std::string const & Name, // Name of CP array
 			int const NumWindDir, // Number of wind directions
-			FArray1< Real64 > const & WindDir // Wind direction
+			Array1< Real64 > const & WindDir // Wind direction
 		) :
 			Name( Name ),
 			NumWindDir( NumWindDir ),
@@ -987,7 +985,7 @@ namespace DataAirflowNetwork {
 		// Members
 		std::string Name; // Name of CP Value
 		std::string CPArrayName; // CP array Name
-		FArray1D< Real64 > CPValue; // CP Value
+		Array1D< Real64 > CPValue; // CP Value
 
 		// Default Constructor
 		MultizoneCPValueProp()
@@ -997,7 +995,7 @@ namespace DataAirflowNetwork {
 		MultizoneCPValueProp(
 			std::string const & Name, // Name of CP Value
 			std::string const & CPArrayName, // CP array Name
-			FArray1< Real64 > const & CPValue // CP Value
+			Array1< Real64 > const & CPValue // CP Value
 		) :
 			Name( Name ),
 			CPArrayName( CPArrayName ),
@@ -1009,7 +1007,7 @@ namespace DataAirflowNetwork {
 	struct DeltaCpProp
 	{
 		// Members
-		FArray1D< Real64 > WindDir; // Wind direction
+		Array1D< Real64 > WindDir; // Wind direction
 
 		// Default Constructor
 		DeltaCpProp()
@@ -1017,7 +1015,7 @@ namespace DataAirflowNetwork {
 
 		// Member Constructor
 		explicit
-		DeltaCpProp( FArray1< Real64 > const & WindDir /* Wind direction */ ) :
+		DeltaCpProp( Array1< Real64 > const & WindDir ) :
 			WindDir( WindDir )
 		{}
 
@@ -1312,7 +1310,7 @@ namespace DataAirflowNetwork {
 		Real64 Pshut; // Shutoff pressure at Q=0
 		Real64 TranRat; // Flow coefficient at laminar/turbulent transition
 		int n; // Number of ranges for fan performance curve
-		FArray1D< Real64 > Coeff; // Coefficients of fan performance curve.
+		Array1D< Real64 > Coeff; // Coefficients of fan performance curve.
 		//Each range has a min flow rate and 4 coeffieincts
 
 		// Default Constructor
@@ -1335,7 +1333,7 @@ namespace DataAirflowNetwork {
 			Real64 const Pshut, // Shutoff pressure at Q=0
 			Real64 const TranRat, // Flow coefficient at laminar/turbulent transition
 			int const n, // Number of ranges for fan performance curve
-			FArray1< Real64 > const & Coeff // Coefficients of fan performance curve.
+			Array1< Real64 > const & Coeff // Coefficients of fan performance curve.
 		) :
 			Name( Name ),
 			FlowCoef( FlowCoef ),
@@ -1479,13 +1477,13 @@ namespace DataAirflowNetwork {
 	{
 		// Members
 		std::string LinkName; // Name of distribution system linkage
-		FArray1D_string NodeNames; // Names of nodes (limited to 2)
-		FArray1D< Real64 > NodeHeights; // Node heights
+		Array1D_string NodeNames; // Names of nodes (limited to 2)
+		Array1D< Real64 > NodeHeights; // Node heights
 		std::string CompName; // Name of element
 		int CompNum; // Element Number
 		std::string ZoneName; // Name of zone
 		int ZoneNum; // Zone Number
-		FArray1D_int NodeNums; // Node numbers
+		Array1D_int NodeNums; // Node numbers
 		int LinkNum; // Linkage number
 
 		// Default Constructor
@@ -1501,13 +1499,13 @@ namespace DataAirflowNetwork {
 		// Member Constructor
 		DisSysLinkageProp(
 			std::string const & LinkName, // Name of distribution system linkage
-			FArray1_string const & NodeNames, // Names of nodes (limited to 2)
-			FArray1< Real64 > const & NodeHeights, // Node heights
+			Array1_string const & NodeNames, // Names of nodes (limited to 2)
+			Array1< Real64 > const & NodeHeights, // Node heights
 			std::string const & CompName, // Name of element
 			int const CompNum, // Element Number
 			std::string const & ZoneName, // Name of zone
 			int const ZoneNum, // Zone Number
-			FArray1_int const & NodeNums, // Node numbers
+			Array1_int const & NodeNums, // Node numbers
 			int const LinkNum // Linkage number
 		) :
 			LinkName( LinkName ),
@@ -1626,13 +1624,13 @@ namespace DataAirflowNetwork {
 	{
 		// Members
 		std::string Name; // Provide a unique linkage name
-		FArray1D_string NodeNames; // Names of nodes (limited to 2)
-		FArray1D< Real64 > NodeHeights; // Node heights
+		Array1D_string NodeNames; // Names of nodes (limited to 2)
+		Array1D< Real64 > NodeHeights; // Node heights
 		std::string CompName; // Name of element
 		int CompNum; // Element Number
 		std::string ZoneName; // Name of zone
 		int ZoneNum; // Zone Number
-		FArray1D_int NodeNums; // Node numbers
+		Array1D_int NodeNums; // Node numbers
 		int LinkNum; // Linkage number
 		int DetOpenNum; // Large Opening number
 		int ConnectionFlag; // Return and supply connection flag
@@ -1654,13 +1652,13 @@ namespace DataAirflowNetwork {
 		// Member Constructor
 		AirflowNetworkLinkageProp(
 			std::string const & Name, // Provide a unique linkage name
-			FArray1_string const & NodeNames, // Names of nodes (limited to 2)
-			FArray1< Real64 > const & NodeHeights, // Node heights
+			Array1_string const & NodeNames, // Names of nodes (limited to 2)
+			Array1< Real64 > const & NodeHeights, // Node heights
 			std::string const & CompName, // Name of element
 			int const CompNum, // Element Number
 			std::string const & ZoneName, // Name of zone
 			int const ZoneNum, // Zone Number
-			FArray1_int const & NodeNums, // Node numbers
+			Array1_int const & NodeNums, // Node numbers
 			int const LinkNum, // Linkage number
 			int const DetOpenNum, // Large Opening number
 			int const ConnectionFlag, // Return and supply connection flag
@@ -2121,46 +2119,46 @@ namespace DataAirflowNetwork {
 	};
 
 	// Object Data
-	extern FArray1D< AirflowNetworkNodeSimuData > AirflowNetworkNodeSimu;
-	extern FArray1D< AirflowNetworkLinkSimuData > AirflowNetworkLinkSimu;
-	extern FArray1D< AirflowNetworkExchangeProp > AirflowNetworkExchangeData;
-	extern FArray1D< AirflowNetworkExchangeProp > AirflowNetworkMultiExchangeData;
-	extern FArray1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport;
-	extern FArray1D< AirflowNetworkNodeReportData > AirflowNetworkNodeReport;
-	extern FArray1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport1;
+	extern Array1D< AirflowNetworkNodeSimuData > AirflowNetworkNodeSimu;
+	extern Array1D< AirflowNetworkLinkSimuData > AirflowNetworkLinkSimu;
+	extern Array1D< AirflowNetworkExchangeProp > AirflowNetworkExchangeData;
+	extern Array1D< AirflowNetworkExchangeProp > AirflowNetworkMultiExchangeData;
+	extern Array1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport;
+	extern Array1D< AirflowNetworkNodeReportData > AirflowNetworkNodeReport;
+	extern Array1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport1;
 	extern AirflowNetworkSimuProp AirflowNetworkSimu; // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr field | CP Array name at WPCCntr = "INPUT" | Building type | Height Selection | Maximum number of iteration | Initialization flag | Relative airflow convergence | Absolute airflow convergence | Convergence acceleration limit | Maximum pressure change in an element [Pa] | Azimuth Angle of Long Axis of Building | Ratio of Building Width Along Short Axis to Width Along Long Axis | Number of wind directions | Minimum pressure difference | Exterior large opening error count during HVAC system operation | Exterior large opening error index during HVAC system operation | Large opening error count at Open factor > 1.0 | Large opening error error index at Open factor > 1.0 | Initialization flag type
-	extern FArray1D< AirflowNetworkNodeProp > AirflowNetworkNodeData;
-	extern FArray1D< AirflowNetworkCompProp > AirflowNetworkCompData;
-	extern FArray1D< AirflowNetworkLinkageProp > AirflowNetworkLinkageData;
-	extern FArray1D< MultizoneZoneProp > MultizoneZoneData;
-	extern FArray1D< MultizoneSurfaceProp > MultizoneSurfaceData;
-	extern FArray1D< MultizoneCompDetOpeningProp > MultizoneCompDetOpeningData;
-	extern FArray1D< MultizoneCompSimpleOpeningProp > MultizoneCompSimpleOpeningData;
-	extern FArray1D< MultizoneCompHorOpeningProp > MultizoneCompHorOpeningData;
-	extern FArray1D< MultizoneSurfaceCrackStdCndns > MultizoneSurfaceStdConditionsCrackData;
-	extern FArray1D< MultizoneSurfaceCrackProp > MultizoneSurfaceCrackData;
-	extern FArray1D< MultizoneSurfaceELAProp > MultizoneSurfaceELAData;
-	extern FArray1D< MultizoneExternalNodeProp > MultizoneExternalNodeData;
-	extern FArray1D< MultizoneCPArrayProp > MultizoneCPArrayData;
-	extern FArray1D< MultizoneCPArrayProp > MultizoneCPArrayDataSingleSided;
-	extern FArray1D< MultizoneCPValueProp > MultizoneCPValueData;
-	extern FArray1D< MultizoneCPValueProp > MultizoneCPValueDataTemp; // temporary CP values
-	extern FArray1D< MultizoneCPValueProp > MultizoneCPValueDataTempUnMod; // temporary CPValues, without modifcation factor
-	extern FArray1D< DeltaCpProp > DeltaCp;
-	extern FArray1D< DeltaCpProp > EPDeltaCP;
-	extern FArray1D< MultizoneCompExhaustFanProp > MultizoneCompExhaustFanData;
-	extern FArray1D< DisSysNodeProp > DisSysNodeData;
-	extern FArray1D< DisSysCompLeakProp > DisSysCompLeakData;
-	extern FArray1D< DisSysCompELRProp > DisSysCompELRData;
-	extern FArray1D< DisSysCompDuctProp > DisSysCompDuctData;
-	extern FArray1D< DisSysCompDamperProp > DisSysCompDamperData;
-	extern FArray1D< DisSysCompCVFProp > DisSysCompCVFData;
-	extern FArray1D< DisSysCompDetFanProp > DisSysCompDetFanData;
-	extern FArray1D< DisSysCompCoilProp > DisSysCompCoilData;
-	extern FArray1D< DisSysCompHXProp > DisSysCompHXData;
-	extern FArray1D< DisSysCompTermUnitProp > DisSysCompTermUnitData;
-	extern FArray1D< DisSysCompCPDProp > DisSysCompCPDData;
-	extern FArray1D< AiflowNetworkReportProp > AirflowNetworkReportData;
+	extern Array1D< AirflowNetworkNodeProp > AirflowNetworkNodeData;
+	extern Array1D< AirflowNetworkCompProp > AirflowNetworkCompData;
+	extern Array1D< AirflowNetworkLinkageProp > AirflowNetworkLinkageData;
+	extern Array1D< MultizoneZoneProp > MultizoneZoneData;
+	extern Array1D< MultizoneSurfaceProp > MultizoneSurfaceData;
+	extern Array1D< MultizoneCompDetOpeningProp > MultizoneCompDetOpeningData;
+	extern Array1D< MultizoneCompSimpleOpeningProp > MultizoneCompSimpleOpeningData;
+	extern Array1D< MultizoneCompHorOpeningProp > MultizoneCompHorOpeningData;
+	extern Array1D< MultizoneSurfaceCrackStdCndns > MultizoneSurfaceStdConditionsCrackData;
+	extern Array1D< MultizoneSurfaceCrackProp > MultizoneSurfaceCrackData;
+	extern Array1D< MultizoneSurfaceELAProp > MultizoneSurfaceELAData;
+	extern Array1D< MultizoneExternalNodeProp > MultizoneExternalNodeData;
+	extern Array1D< MultizoneCPArrayProp > MultizoneCPArrayData;
+	extern Array1D< MultizoneCPArrayProp > MultizoneCPArrayDataSingleSided;
+	extern Array1D< MultizoneCPValueProp > MultizoneCPValueData;
+	extern Array1D< MultizoneCPValueProp > MultizoneCPValueDataTemp; // temporary CP values
+	extern Array1D< MultizoneCPValueProp > MultizoneCPValueDataTempUnMod; // temporary CPValues, without modifcation factor
+	extern Array1D< DeltaCpProp > DeltaCp;
+	extern Array1D< DeltaCpProp > EPDeltaCP;
+	extern Array1D< MultizoneCompExhaustFanProp > MultizoneCompExhaustFanData;
+	extern Array1D< DisSysNodeProp > DisSysNodeData;
+	extern Array1D< DisSysCompLeakProp > DisSysCompLeakData;
+	extern Array1D< DisSysCompELRProp > DisSysCompELRData;
+	extern Array1D< DisSysCompDuctProp > DisSysCompDuctData;
+	extern Array1D< DisSysCompDamperProp > DisSysCompDamperData;
+	extern Array1D< DisSysCompCVFProp > DisSysCompCVFData;
+	extern Array1D< DisSysCompDetFanProp > DisSysCompDetFanData;
+	extern Array1D< DisSysCompCoilProp > DisSysCompCoilData;
+	extern Array1D< DisSysCompHXProp > DisSysCompHXData;
+	extern Array1D< DisSysCompTermUnitProp > DisSysCompTermUnitData;
+	extern Array1D< DisSysCompCPDProp > DisSysCompCPDData;
+	extern Array1D< AiflowNetworkReportProp > AirflowNetworkReportData;
 
 } // DataAirflowNetwork
 

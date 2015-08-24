@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/numeric.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -71,8 +71,8 @@ namespace EconomicTariff {
 	int const conversionMCF( 6 ); // thousand cubic feet
 	int const conversionCCF( 7 ); // hundred cubic feet
 
-	FArray1D_string const convEneStrings( {0,7}, { "", "kWh", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
-	FArray1D_string const convDemStrings( {0,7}, { "", "kW", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
+	Array1D_string const convEneStrings( {0,7}, { "", "kWh", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
+	Array1D_string const convDemStrings( {0,7}, { "", "kW", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
 
 	int const demandWindowQuarter( 1 );
 	int const demandWindowHalf( 2 );
@@ -80,7 +80,7 @@ namespace EconomicTariff {
 	int const demandWindowDay( 4 );
 	int const demandWindowWeek( 5 );
 
-	FArray1D_string const demWindowStrings( {0,5}, { "", "/Hr", "/Hr", "/Hr", "/Day", "/Wk" } );
+	Array1D_string const demWindowStrings( {0,5}, { "", "/Hr", "/Hr", "/Hr", "/Day", "/Wk" } );
 
 	int const buyFromUtility( 1 );
 	int const sellToUtility( 2 );
@@ -217,7 +217,7 @@ namespace EconomicTariff {
 	int sizeEconVar( 0 );
 
 	// holds the outbound connections for each variable
-	FArray1D_int operand; // sized to sizeOperand
+	Array1D_int operand; // sized to sizeOperand
 	int numOperand( 0 );
 	int sizeOperand( 0 );
 
@@ -234,8 +234,8 @@ namespace EconomicTariff {
 	int numComputation( 0 );
 
 	//list of pointers to variable, 0 end of line, negative indicate operations
-	FArray1D_int steps;
-	FArray1D_int stepsCopy;
+	Array1D_int steps;
+	Array1D_int stepsCopy;
 	int numSteps( 0 );
 	int sizeSteps( 0 );
 
@@ -247,14 +247,14 @@ namespace EconomicTariff {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Object Data
-	FArray1D< EconVarType > econVar;
-	FArray1D< TariffType > tariff;
-	FArray1D< QualifyType > qualify;
-	FArray1D< ChargeSimpleType > chargeSimple;
-	FArray1D< ChargeBlockType > chargeBlock;
-	FArray1D< RatchetType > ratchet;
-	FArray1D< ComputationType > computation;
-	FArray1D< StackType > stack;
+	Array1D< EconVarType > econVar;
+	Array1D< TariffType > tariff;
+	Array1D< QualifyType > qualify;
+	Array1D< ChargeSimpleType > chargeSimple;
+	Array1D< ChargeBlockType > chargeBlock;
+	Array1D< RatchetType > ratchet;
+	Array1D< ComputationType > computation;
+	Array1D< StackType > stack;
 
 	//======================================================================================================================
 	//======================================================================================================================
@@ -361,7 +361,6 @@ namespace EconomicTariff {
 		using DataGlobals::NumOfTimeStepInHour;
 		using OutputReportTabular::AddTOCEntry;
 		using OutputProcessor::EnergyMeters;
-		using OutputProcessor::NumEnergyMeters;
 		using DataGlobalConstants::AssignResourceTypeNum;
 		using namespace DataIPShortCuts;
 		using General::RoundSigDigits;
@@ -395,8 +394,8 @@ namespace EconomicTariff {
 		int AvgSumVar;
 		int StepTypeVar;
 		std::string UnitsVar; // Units sting, may be blank
-		FArray1D_string NamesOfKeys; // Specific key name
-		FArray1D_int IndexesForKeyVar; // Array index
+		Array1D_string NamesOfKeys; // Specific key name
+		Array1D_int IndexesForKeyVar; // Array index
 		int jFld;
 		std::string CurrentModuleObject; // for ease in renaming.
 
@@ -2592,7 +2591,6 @@ namespace EconomicTariff {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::OutputFileInits;
 		using OutputReportTabular::IntToStr;
 
 		// Locals
@@ -3001,8 +2999,6 @@ namespace EconomicTariff {
 		// USE STATEMENTS:
 
 		// Using/Aliasing
-		using DataGlobals::HourOfDay;
-		using DataGlobals::TimeStep;
 		using DataGlobals::SecInHour;
 		using DataGlobals::TimeStepZoneSec;
 		using ScheduleManager::GetCurrentScheduleValue;
@@ -3081,9 +3077,9 @@ namespace EconomicTariff {
 					}
 					if ( isGood ) {
 						tariff( iTariff ).seasonForMonth( curMonth ) = curSeason;
-						tariff( iTariff ).gatherEnergy( curPeriod, curMonth ) += curEnergy;
-						if ( tariff( iTariff ).gatherDemand( curPeriod, curMonth ) < curDemand ) {
-							tariff( iTariff ).gatherDemand( curPeriod, curMonth ) = curDemand;
+						tariff( iTariff ).gatherEnergy( curMonth, curPeriod ) += curEnergy;
+						if ( tariff( iTariff ).gatherDemand( curMonth, curPeriod ) < curDemand ) {
+							tariff( iTariff ).gatherDemand( curMonth, curPeriod ) = curDemand;
 						}
 					} else {
 						ShowWarningError( "UtilityCost:Tariff: While gathering for: " + tariff( iTariff ).tariffName );
@@ -3222,13 +3218,13 @@ namespace EconomicTariff {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS
 
 		// values used in specific operations
-		FArray1D< Real64 > a( MaxNumMonths );
+		Array1D< Real64 > a( MaxNumMonths );
 		int aPt;
-		FArray1D< Real64 > b( MaxNumMonths );
+		Array1D< Real64 > b( MaxNumMonths );
 		int bPt;
-		FArray1D< Real64 > c( MaxNumMonths );
+		Array1D< Real64 > c( MaxNumMonths );
 		int cPt;
-		FArray1D< Real64 > d( MaxNumMonths );
+		Array1D< Real64 > d( MaxNumMonths );
 
 		int iTariff;
 		int jStep;
@@ -3298,7 +3294,7 @@ namespace EconomicTariff {
 						pushStack( abs( a ), noVar );
 					} else if ( SELECT_CASE_var == opINTEGER ) {
 						popStack( a, aPt );
-						pushStack( FArray1D_double( FArray1D_int( a ) ), noVar );
+						pushStack( Array1D_double( Array1D_int( a ) ), noVar );
 					} else if ( SELECT_CASE_var == opSIGN ) {
 						popStack( a, aPt );
 						pushStack( sign( 1.0, a ), noVar );
@@ -3589,7 +3585,7 @@ namespace EconomicTariff {
 
 	void
 	pushStack(
-		FArray1A< Real64 > const monthlyArray,
+		Array1A< Real64 > const monthlyArray,
 		int const variablePointer
 	)
 	{
@@ -3631,7 +3627,7 @@ namespace EconomicTariff {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > curMonthlyArray( MaxNumMonths );
+		Array1D< Real64 > curMonthlyArray( MaxNumMonths );
 		static int sizeIncrement( 50 );
 
 		curMonthlyArray = monthlyArray;
@@ -3684,7 +3680,7 @@ namespace EconomicTariff {
 
 	void
 	popStack(
-		FArray1A< Real64 > monthlyArray,
+		Array1A< Real64 > monthlyArray,
 		int & variablePointer
 	)
 	{
@@ -3772,10 +3768,10 @@ namespace EconomicTariff {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int curTariff;
 		int indexInChg;
-		FArray1D< Real64 > sourceVals( MaxNumMonths );
-		FArray1D< Real64 > costPer( MaxNumMonths );
-		FArray1D< Real64 > resultChg( MaxNumMonths );
-		FArray1D< Real64 > seasonMask( MaxNumMonths );
+		Array1D< Real64 > sourceVals( MaxNumMonths );
+		Array1D< Real64 > costPer( MaxNumMonths );
+		Array1D< Real64 > resultChg( MaxNumMonths );
+		Array1D< Real64 > seasonMask( MaxNumMonths );
 
 		curTariff = econVar( usingVariable ).tariffIndx;
 		indexInChg = econVar( usingVariable ).index;
@@ -3855,14 +3851,14 @@ namespace EconomicTariff {
 		int indexInChg;
 		int iBlk;
 		int jMonth;
-		FArray1D< Real64 > sourceVals( MaxNumMonths );
-		FArray1D< Real64 > blkSzMult( MaxNumMonths );
-		FArray1D< Real64 > remainVals( MaxNumMonths );
-		FArray1D< Real64 > resultChg( MaxNumMonths );
-		FArray1D< Real64 > amountForBlk( MaxNumMonths );
-		FArray1D< Real64 > curBlkSz( MaxNumMonths );
-		FArray1D< Real64 > curBlkCost( MaxNumMonths );
-		FArray1D< Real64 > seasonMask( MaxNumMonths );
+		Array1D< Real64 > sourceVals( MaxNumMonths );
+		Array1D< Real64 > blkSzMult( MaxNumMonths );
+		Array1D< Real64 > remainVals( MaxNumMonths );
+		Array1D< Real64 > resultChg( MaxNumMonths );
+		Array1D< Real64 > amountForBlk( MaxNumMonths );
+		Array1D< Real64 > curBlkSz( MaxNumMonths );
+		Array1D< Real64 > curBlkCost( MaxNumMonths );
+		Array1D< Real64 > seasonMask( MaxNumMonths );
 		bool flagAllZero;
 
 		curTariff = econVar( usingVariable ).tariffIndx;
@@ -3990,19 +3986,19 @@ namespace EconomicTariff {
 
 		int curTariff;
 		int indexInChg;
-		FArray1D< Real64 > baselineVals( MaxNumMonths );
-		FArray1D< Real64 > adjustmentVals( MaxNumMonths );
-		FArray1D< Real64 > multiplierVals( MaxNumMonths );
-		FArray1D< Real64 > offsetVals( MaxNumMonths );
-		FArray1D< Real64 > seasonFromMask( MaxNumMonths );
-		FArray1D< Real64 > seasonToMask( MaxNumMonths );
+		Array1D< Real64 > baselineVals( MaxNumMonths );
+		Array1D< Real64 > adjustmentVals( MaxNumMonths );
+		Array1D< Real64 > multiplierVals( MaxNumMonths );
+		Array1D< Real64 > offsetVals( MaxNumMonths );
+		Array1D< Real64 > seasonFromMask( MaxNumMonths );
+		Array1D< Real64 > seasonToMask( MaxNumMonths );
 		bool isMonthly( false );
-		FArray1D< Real64 > adjSeasonal( MaxNumMonths );
-		FArray1D< Real64 > adjPeak( MaxNumMonths );
-		FArray1D< Real64 > maxAdjBase( MaxNumMonths );
+		Array1D< Real64 > adjSeasonal( MaxNumMonths );
+		Array1D< Real64 > adjPeak( MaxNumMonths );
+		Array1D< Real64 > maxAdjBase( MaxNumMonths );
 		Real64 maximumVal;
 		int iMonth;
-		FArray1D< Real64 > finalResult( MaxNumMonths );
+		Array1D< Real64 > finalResult( MaxNumMonths );
 
 		curTariff = econVar( usingVariable ).tariffIndx;
 		indexInChg = econVar( usingVariable ).index;
@@ -4140,10 +4136,10 @@ namespace EconomicTariff {
 
 		int curTariff;
 		int indexInQual;
-		FArray1D< Real64 > sourceVals( MaxNumMonths );
-		FArray1D< Real64 > thresholdVals( MaxNumMonths );
-		FArray1D_int monthsQualify( MaxNumMonths );
-		FArray1D< Real64 > seasonMask( MaxNumMonths );
+		Array1D< Real64 > sourceVals( MaxNumMonths );
+		Array1D< Real64 > thresholdVals( MaxNumMonths );
+		Array1D_int monthsQualify( MaxNumMonths );
+		Array1D< Real64 > seasonMask( MaxNumMonths );
 		bool curIsMaximum;
 		bool curIsConsecutive;
 		int curNumberOfMonths;
@@ -4421,7 +4417,7 @@ namespace EconomicTariff {
 		int iTariff;
 		int jPeriod;
 		int kMonth;
-		FArray1D< Real64 > monthVal( MaxNumMonths );
+		Array1D< Real64 > monthVal( MaxNumMonths );
 		Real64 bigNumber( 0.0 ); //Autodesk Value not used but suppresses warning about huge() call
 
 		bigNumber = huge( bigNumber );
@@ -4430,7 +4426,7 @@ namespace EconomicTariff {
 			monthVal = 0.0;
 			for ( jPeriod = 1; jPeriod <= countPeriod; ++jPeriod ) {
 				for ( kMonth = 1; kMonth <= MaxNumMonths; ++kMonth ) {
-					monthVal( kMonth ) += tariff( iTariff ).gatherEnergy( jPeriod, kMonth );
+					monthVal( kMonth ) += tariff( iTariff ).gatherEnergy( kMonth, jPeriod );
 				}
 			}
 			econVar( tariff( iTariff ).nativeTotalEnergy ).values = monthVal;
@@ -4438,8 +4434,8 @@ namespace EconomicTariff {
 			monthVal = -bigNumber;
 			for ( jPeriod = 1; jPeriod <= countPeriod; ++jPeriod ) {
 				for ( kMonth = 1; kMonth <= MaxNumMonths; ++kMonth ) {
-					if ( tariff( iTariff ).gatherDemand( jPeriod, kMonth ) > monthVal( kMonth ) ) {
-						monthVal( kMonth ) = tariff( iTariff ).gatherDemand( jPeriod, kMonth );
+					if ( tariff( iTariff ).gatherDemand( kMonth, jPeriod ) > monthVal( kMonth ) ) {
+						monthVal( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, jPeriod );
 					}
 				}
 			}
@@ -4452,58 +4448,58 @@ namespace EconomicTariff {
 			econVar( tariff( iTariff ).nativeTotalDemand ).values = monthVal;
 			for ( kMonth = 1; kMonth <= MaxNumMonths; ++kMonth ) {
 				//nativePeakEnergy
-				econVar( tariff( iTariff ).nativePeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( periodPeak, kMonth );
+				econVar( tariff( iTariff ).nativePeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodPeak );
 				//nativePeakDemand
-				econVar( tariff( iTariff ).nativePeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodPeak, kMonth );
+				econVar( tariff( iTariff ).nativePeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodPeak );
 				//nativeShoulderEnergy
-				econVar( tariff( iTariff ).nativeShoulderEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( periodShoulder, kMonth );
+				econVar( tariff( iTariff ).nativeShoulderEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodShoulder );
 				//nativeShoulderDemand
-				econVar( tariff( iTariff ).nativeShoulderDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodShoulder, kMonth );
+				econVar( tariff( iTariff ).nativeShoulderDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodShoulder );
 				//nativeOffPeakEnergy
-				econVar( tariff( iTariff ).nativeOffPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( periodOffPeak, kMonth );
+				econVar( tariff( iTariff ).nativeOffPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodOffPeak );
 				//nativeOffPeakDemand
-				econVar( tariff( iTariff ).nativeOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodOffPeak, kMonth );
+				econVar( tariff( iTariff ).nativeOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodOffPeak );
 				//nativeMidPeakEnergy
-				econVar( tariff( iTariff ).nativeMidPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( periodMidPeak, kMonth );
+				econVar( tariff( iTariff ).nativeMidPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodMidPeak );
 				//nativeMidPeakDemand
-				econVar( tariff( iTariff ).nativeMidPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodMidPeak, kMonth );
+				econVar( tariff( iTariff ).nativeMidPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodMidPeak );
 				//nativePeakExceedsOffPeak
-				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( periodPeak, kMonth ) - tariff( iTariff ).gatherDemand( periodOffPeak, kMonth );
+				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodPeak ) - tariff( iTariff ).gatherDemand( kMonth, periodOffPeak );
 				if ( monthVal( kMonth ) > 0 ) {
 					econVar( tariff( iTariff ).nativePeakExceedsOffPeak ).values( kMonth ) = monthVal( kMonth );
 				} else {
 					econVar( tariff( iTariff ).nativePeakExceedsOffPeak ).values( kMonth ) = 0.0;
 				}
 				//nativeOffPeakExceedsPeak
-				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( periodOffPeak, kMonth ) - tariff( iTariff ).gatherDemand( periodPeak, kMonth );
+				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodOffPeak ) - tariff( iTariff ).gatherDemand( kMonth, periodPeak );
 				if ( monthVal( kMonth ) > 0 ) {
 					econVar( tariff( iTariff ).nativeOffPeakExceedsPeak ).values( kMonth ) = monthVal( kMonth );
 				} else {
 					econVar( tariff( iTariff ).nativeOffPeakExceedsPeak ).values( kMonth ) = 0.0;
 				}
 				//nativePeakExceedsMidPeak
-				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( periodPeak, kMonth ) - tariff( iTariff ).gatherDemand( periodMidPeak, kMonth );
+				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodPeak ) - tariff( iTariff ).gatherDemand( kMonth, periodMidPeak );
 				if ( monthVal( kMonth ) > 0 ) {
 					econVar( tariff( iTariff ).nativePeakExceedsMidPeak ).values( kMonth ) = monthVal( kMonth );
 				} else {
 					econVar( tariff( iTariff ).nativePeakExceedsOffPeak ).values( kMonth ) = 0.0;
 				}
 				//nativeMidPeakExceedsPeak
-				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( periodMidPeak, kMonth ) - tariff( iTariff ).gatherDemand( periodPeak, kMonth );
+				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodMidPeak ) - tariff( iTariff ).gatherDemand( kMonth, periodPeak );
 				if ( monthVal( kMonth ) > 0 ) {
 					econVar( tariff( iTariff ).nativeMidPeakExceedsPeak ).values( kMonth ) = monthVal( kMonth );
 				} else {
 					econVar( tariff( iTariff ).nativeMidPeakExceedsPeak ).values( kMonth ) = 0.0;
 				}
 				//nativePeakExceedsShoulder
-				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( periodPeak, kMonth ) - tariff( iTariff ).gatherDemand( periodShoulder, kMonth );
+				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodPeak ) - tariff( iTariff ).gatherDemand( kMonth, periodShoulder );
 				if ( monthVal( kMonth ) > 0 ) {
 					econVar( tariff( iTariff ).nativePeakExceedsShoulder ).values( kMonth ) = monthVal( kMonth );
 				} else {
 					econVar( tariff( iTariff ).nativePeakExceedsShoulder ).values( kMonth ) = 0.0;
 				}
 				//nativeShoulderExceedsPeak
-				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( periodShoulder, kMonth ) - tariff( iTariff ).gatherDemand( periodPeak, kMonth );
+				monthVal( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodShoulder ) - tariff( iTariff ).gatherDemand( kMonth, periodPeak );
 				if ( monthVal( kMonth ) > 0 ) {
 					econVar( tariff( iTariff ).nativeShoulderExceedsPeak ).values( kMonth ) = monthVal( kMonth );
 				} else {
@@ -4546,36 +4542,36 @@ namespace EconomicTariff {
 					econVar( tariff( iTariff ).nativeIsNotAutumn ).values( kMonth ) = 1.0;
 				}
 				//nativePeakAndShoulderEnergy
-				econVar( tariff( iTariff ).nativePeakAndShoulderEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( periodPeak, kMonth ) + tariff( iTariff ).gatherEnergy( periodShoulder, kMonth );
+				econVar( tariff( iTariff ).nativePeakAndShoulderEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodPeak ) + tariff( iTariff ).gatherEnergy( kMonth, periodShoulder );
 				//nativePeakAndShoulderDemand
-				if ( tariff( iTariff ).gatherDemand( periodPeak, kMonth ) > tariff( iTariff ).gatherDemand( periodShoulder, kMonth ) ) {
-					econVar( tariff( iTariff ).nativePeakAndShoulderDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodPeak, kMonth );
+				if ( tariff( iTariff ).gatherDemand( kMonth, periodPeak ) > tariff( iTariff ).gatherDemand( kMonth, periodShoulder ) ) {
+					econVar( tariff( iTariff ).nativePeakAndShoulderDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodPeak );
 				} else {
-					econVar( tariff( iTariff ).nativePeakAndShoulderDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodShoulder, kMonth );
+					econVar( tariff( iTariff ).nativePeakAndShoulderDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodShoulder );
 				}
 				//nativePeakAndMidPeakEnergy
-				econVar( tariff( iTariff ).nativePeakAndMidPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( periodPeak, kMonth ) + tariff( iTariff ).gatherEnergy( periodMidPeak, kMonth );
+				econVar( tariff( iTariff ).nativePeakAndMidPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodPeak ) + tariff( iTariff ).gatherEnergy( kMonth, periodMidPeak );
 				//nativePeakAndMidPeakDemand
-				if ( tariff( iTariff ).gatherDemand( periodPeak, kMonth ) > tariff( iTariff ).gatherDemand( periodMidPeak, kMonth ) ) {
-					econVar( tariff( iTariff ).nativePeakAndMidPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodPeak, kMonth );
+				if ( tariff( iTariff ).gatherDemand( kMonth, periodPeak ) > tariff( iTariff ).gatherDemand( kMonth, periodMidPeak ) ) {
+					econVar( tariff( iTariff ).nativePeakAndMidPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodPeak );
 				} else {
-					econVar( tariff( iTariff ).nativePeakAndMidPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodMidPeak, kMonth );
+					econVar( tariff( iTariff ).nativePeakAndMidPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodMidPeak );
 				}
 				//nativeShoulderAndOffPeakEnergy
-				econVar( tariff( iTariff ).nativeShoulderAndOffPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( periodShoulder, kMonth ) + tariff( iTariff ).gatherEnergy( periodOffPeak, kMonth );
+				econVar( tariff( iTariff ).nativeShoulderAndOffPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodShoulder ) + tariff( iTariff ).gatherEnergy( kMonth, periodOffPeak );
 				//nativeShoulderAndOffPeakDemand
-				if ( tariff( iTariff ).gatherDemand( periodShoulder, kMonth ) > tariff( iTariff ).gatherDemand( periodOffPeak, kMonth ) ) {
-					econVar( tariff( iTariff ).nativeShoulderAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodShoulder, kMonth );
+				if ( tariff( iTariff ).gatherDemand( kMonth, periodShoulder ) > tariff( iTariff ).gatherDemand( kMonth, periodOffPeak ) ) {
+					econVar( tariff( iTariff ).nativeShoulderAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodShoulder );
 				} else {
-					econVar( tariff( iTariff ).nativeShoulderAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodOffPeak, kMonth );
+					econVar( tariff( iTariff ).nativeShoulderAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodOffPeak );
 				}
 				//nativePeakAndOffPeakEnergy
-				econVar( tariff( iTariff ).nativePeakAndOffPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( periodPeak, kMonth ) + tariff( iTariff ).gatherEnergy( periodOffPeak, kMonth );
+				econVar( tariff( iTariff ).nativePeakAndOffPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodPeak ) + tariff( iTariff ).gatherEnergy( kMonth, periodOffPeak );
 				//nativePeakAndOffPeakDemand
-				if ( tariff( iTariff ).gatherDemand( periodPeak, kMonth ) > tariff( iTariff ).gatherDemand( periodOffPeak, kMonth ) ) {
-					econVar( tariff( iTariff ).nativePeakAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodPeak, kMonth );
+				if ( tariff( iTariff ).gatherDemand( kMonth, periodPeak ) > tariff( iTariff ).gatherDemand( kMonth, periodOffPeak ) ) {
+					econVar( tariff( iTariff ).nativePeakAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodPeak );
 				} else {
-					econVar( tariff( iTariff ).nativePeakAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( periodOffPeak, kMonth );
+					econVar( tariff( iTariff ).nativePeakAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodOffPeak );
 				}
 				//nativeRealTimePriceCosts
 				econVar( tariff( iTariff ).nativeRealTimePriceCosts ).values( kMonth ) = tariff( iTariff ).RTPcost( kMonth );
@@ -4761,10 +4757,10 @@ namespace EconomicTariff {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_string rowHead;
+		Array2D_string tableBody;
 		//other local variables
 		int elecFacilMeter;
 		int gasFacilMeter;
@@ -4813,7 +4809,7 @@ namespace EconomicTariff {
 			rowHead.allocate( 3 );
 			columnHead.allocate( 4 );
 			columnWidth.allocate( 4 );
-			tableBody.allocate( 3, 4 );
+			tableBody.allocate( 4, 3 );
 			tableBody = "";
 			columnHead( 1 ) = "Electric";
 			columnHead( 2 ) = "Gas";
@@ -4840,25 +4836,25 @@ namespace EconomicTariff {
 				}
 			}
 			tableBody( 1, 1 ) = RealToStr( elecTotalCost, 2 );
-			tableBody( 1, 2 ) = RealToStr( gasTotalCost, 2 );
-			tableBody( 1, 3 ) = RealToStr( otherTotalCost, 2 );
-			tableBody( 1, 4 ) = RealToStr( allTotalCost, 2 );
+			tableBody( 2, 1 ) = RealToStr( gasTotalCost, 2 );
+			tableBody( 3, 1 ) = RealToStr( otherTotalCost, 2 );
+			tableBody( 4, 1 ) = RealToStr( allTotalCost, 2 );
 			if ( buildingGrossFloorArea > 0.0 ) {
-				tableBody( 2, 1 ) = RealToStr( ( elecTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
+				tableBody( 1, 2 ) = RealToStr( ( elecTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
 				tableBody( 2, 2 ) = RealToStr( ( gasTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
-				tableBody( 2, 3 ) = RealToStr( ( otherTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
-				tableBody( 2, 4 ) = RealToStr( ( allTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
+				tableBody( 3, 2 ) = RealToStr( ( otherTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
+				tableBody( 4, 2 ) = RealToStr( ( allTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
 			}
 			if ( buildingConditionedFloorArea > 0.0 ) {
-				tableBody( 3, 1 ) = RealToStr( ( elecTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
-				tableBody( 3, 2 ) = RealToStr( ( gasTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
+				tableBody( 1, 3 ) = RealToStr( ( elecTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
+				tableBody( 2, 3 ) = RealToStr( ( gasTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
 				tableBody( 3, 3 ) = RealToStr( ( otherTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
-				tableBody( 3, 4 ) = RealToStr( ( allTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
+				tableBody( 4, 3 ) = RealToStr( ( allTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
 			}
 			columnWidth = 14; //array assignment - same for all columns
 			WriteSubtitle( "Annual Cost" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			if( sqlite ) {
+			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost" );
 			}
 			columnHead.deallocate();
@@ -4869,7 +4865,7 @@ namespace EconomicTariff {
 			rowHead.allocate( numTariff );
 			columnHead.allocate( 6 );
 			columnWidth.allocate( 6 );
-			tableBody.allocate( numTariff, 6 );
+			tableBody.allocate( 6, numTariff );
 			tableBody = "";
 			columnHead( 1 ) = "Selected";
 			columnHead( 2 ) = "Qualified";
@@ -4880,35 +4876,35 @@ namespace EconomicTariff {
 			for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
 				rowHead( iTariff ) = tariff( iTariff ).tariffName;
 				if ( tariff( iTariff ).isSelected ) {
-					tableBody( iTariff, 1 ) = "Yes";
+					tableBody( 1, iTariff ) = "Yes";
 				} else {
-					tableBody( iTariff, 1 ) = "No";
+					tableBody( 1, iTariff ) = "No";
 				}
 				if ( tariff( iTariff ).isQualified ) {
-					tableBody( iTariff, 2 ) = "Yes";
+					tableBody( 2, iTariff ) = "Yes";
 				} else {
-					tableBody( iTariff, 2 ) = "No";
+					tableBody( 2, iTariff ) = "No";
 				}
-				tableBody( iTariff, 3 ) = tariff( iTariff ).reportMeter;
+				tableBody( 3, iTariff ) = tariff( iTariff ).reportMeter;
 				{ auto const SELECT_CASE_var( tariff( iTariff ).buyOrSell );
 				if ( SELECT_CASE_var == buyFromUtility ) {
-					tableBody( iTariff, 4 ) = "Buy";
+					tableBody( 4, iTariff ) = "Buy";
 				} else if ( SELECT_CASE_var == sellToUtility ) {
-					tableBody( iTariff, 4 ) = "Sell";
+					tableBody( 4, iTariff ) = "Sell";
 				} else if ( SELECT_CASE_var == netMetering ) {
-					tableBody( iTariff, 4 ) = "Net";
+					tableBody( 4, iTariff ) = "Net";
 				}}
 				if ( tariff( iTariff ).groupName == "" ) {
-					tableBody( iTariff, 5 ) = "(none)";
+					tableBody( 5, iTariff ) = "(none)";
 				} else {
-					tableBody( iTariff, 5 ) = tariff( iTariff ).groupName;
+					tableBody( 5, iTariff ) = tariff( iTariff ).groupName;
 				}
-				tableBody( iTariff, 6 ) = RealToStr( tariff( iTariff ).totalAnnualCost, 2 );
+				tableBody( 6, iTariff ) = RealToStr( tariff( iTariff ).totalAnnualCost, 2 );
 			}
 			columnWidth = 14; //array assignment - same for all columns
 			WriteSubtitle( "Tariff Summary" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			if( sqlite ) {
+			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary" );
 			}
 			columnHead.deallocate();
@@ -4923,7 +4919,7 @@ namespace EconomicTariff {
 				rowHead.allocate( 7 );
 				columnHead.allocate( 1 );
 				columnWidth.allocate( 1 );
-				tableBody.allocate( 7, 1 );
+				tableBody.allocate( 1, 7 );
 				tableBody = "";
 				columnHead( 1 ) = "Parameter";
 				rowHead( 1 ) = "Meter";
@@ -4935,52 +4931,52 @@ namespace EconomicTariff {
 				rowHead( 7 ) = "Units";
 				tableBody( 1, 1 ) = tariff( iTariff ).reportMeter;
 				if ( tariff( iTariff ).isSelected ) {
-					tableBody( 2, 1 ) = "Yes";
+					tableBody( 1, 2 ) = "Yes";
 				} else {
-					tableBody( 2, 1 ) = "No";
+					tableBody( 1, 2 ) = "No";
 				}
 				if ( tariff( iTariff ).groupName == "" ) {
-					tableBody( 3, 1 ) = "(none)";
+					tableBody( 1, 3 ) = "(none)";
 				} else {
-					tableBody( 3, 1 ) = tariff( iTariff ).groupName;
+					tableBody( 1, 3 ) = tariff( iTariff ).groupName;
 				}
 				if ( tariff( iTariff ).isQualified ) {
-					tableBody( 4, 1 ) = "Yes";
+					tableBody( 1, 4 ) = "Yes";
 				} else {
-					tableBody( 4, 1 ) = "No";
+					tableBody( 1, 4 ) = "No";
 				}
 				if ( tariff( iTariff ).isQualified ) {
-					tableBody( 5, 1 ) = "n/a";
+					tableBody( 1, 5 ) = "n/a";
 				} else {
-					tableBody( 5, 1 ) = econVar( tariff( iTariff ).ptDisqualifier ).name;
+					tableBody( 1, 5 ) = econVar( tariff( iTariff ).ptDisqualifier ).name;
 				}
 				if ( computation( iTariff ).isUserDef ) {
-					tableBody( 6, 1 ) = computation( iTariff ).computeName;
+					tableBody( 1, 6 ) = computation( iTariff ).computeName;
 				} else {
-					tableBody( 6, 1 ) = "automatic";
+					tableBody( 1, 6 ) = "automatic";
 				}
 				{ auto const SELECT_CASE_var( tariff( iTariff ).convChoice );
 				if ( SELECT_CASE_var == conversionUSERDEF ) {
-					tableBody( 7, 1 ) = "User Defined";
+					tableBody( 1, 7 ) = "User Defined";
 				} else if ( SELECT_CASE_var == conversionKWH ) {
-					tableBody( 7, 1 ) = "kWh";
+					tableBody( 1, 7 ) = "kWh";
 				} else if ( SELECT_CASE_var == conversionTHERM ) {
-					tableBody( 7, 1 ) = "Therm";
+					tableBody( 1, 7 ) = "Therm";
 				} else if ( SELECT_CASE_var == conversionMMBTU ) {
-					tableBody( 7, 1 ) = "MMBtu";
+					tableBody( 1, 7 ) = "MMBtu";
 				} else if ( SELECT_CASE_var == conversionMJ ) {
-					tableBody( 7, 1 ) = "MJ";
+					tableBody( 1, 7 ) = "MJ";
 				} else if ( SELECT_CASE_var == conversionKBTU ) {
-					tableBody( 7, 1 ) = "kBtu";
+					tableBody( 1, 7 ) = "kBtu";
 				} else if ( SELECT_CASE_var == conversionMCF ) {
-					tableBody( 7, 1 ) = "MCF";
+					tableBody( 1, 7 ) = "MCF";
 				} else if ( SELECT_CASE_var == conversionCCF ) {
-					tableBody( 7, 1 ) = "CCF";
+					tableBody( 1, 7 ) = "CCF";
 				}}
 				columnWidth = 14; //array assignment - same for all columns
 				WriteSubtitle( "General" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				if( sqlite ) {
+				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", tariff( iTariff ).tariffName, "General" );
 				}
 				columnHead.deallocate();
@@ -5297,10 +5293,10 @@ namespace EconomicTariff {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_string rowHead;
+		Array2D_string tableBody;
 		Real64 sumVal;
 		Real64 maximumVal;
 		Real64 curVal;
@@ -5323,12 +5319,12 @@ namespace EconomicTariff {
 			rowHead.allocate( cntOfVar );
 			columnHead.allocate( 15 );
 			columnWidth.allocate( 15 );
-			tableBody.allocate( cntOfVar, 15 );
+			tableBody.allocate( 15, cntOfVar );
 		} else {
 			rowHead.allocate( cntOfVar );
 			columnHead.allocate( 14 );
 			columnWidth.allocate( 14 );
-			tableBody.allocate( cntOfVar, 14 );
+			tableBody.allocate( 14, cntOfVar );
 		}
 		// column names
 		columnHead( 1 ) = "Jan";
@@ -5368,14 +5364,14 @@ namespace EconomicTariff {
 				for ( jMonth = 1; jMonth <= 12; ++jMonth ) { //note not all months get printed out if more than 12 are used.- need to fix this later
 					curVal = econVar( iVar ).values( jMonth );
 					if ( ( curVal > 0 ) && ( curVal < 1 ) ) {
-						tableBody( nCntOfVar, jMonth ) = RealToStr( curVal, 4 );
+						tableBody( jMonth, nCntOfVar ) = RealToStr( curVal, 4 );
 					} else {
-						tableBody( nCntOfVar, jMonth ) = RealToStr( curVal, 2 );
+						tableBody( jMonth, nCntOfVar ) = RealToStr( curVal, 2 );
 					}
 				}
 				getMaxAndSum( iVar, sumVal, maximumVal );
-				tableBody( nCntOfVar, 13 ) = RealToStr( sumVal, 2 );
-				tableBody( nCntOfVar, 14 ) = RealToStr( maximumVal, 2 );
+				tableBody( 13, nCntOfVar ) = RealToStr( sumVal, 2 );
+				tableBody( 14, nCntOfVar ) = RealToStr( maximumVal, 2 );
 				if ( includeCategory ) {
 					//first find category
 					curCategory = 0;
@@ -5395,25 +5391,25 @@ namespace EconomicTariff {
 					}
 					{ auto const SELECT_CASE_var( curCategory );
 					if ( SELECT_CASE_var == catEnergyCharges ) {
-						tableBody( nCntOfVar, 15 ) = "EnergyCharges";
+						tableBody( 15, nCntOfVar ) = "EnergyCharges";
 					} else if ( SELECT_CASE_var == catDemandCharges ) {
-						tableBody( nCntOfVar, 15 ) = "DemandCharges";
+						tableBody( 15, nCntOfVar ) = "DemandCharges";
 					} else if ( SELECT_CASE_var == catServiceCharges ) {
-						tableBody( nCntOfVar, 15 ) = "ServiceCharges";
+						tableBody( 15, nCntOfVar ) = "ServiceCharges";
 					} else if ( SELECT_CASE_var == catBasis ) {
-						tableBody( nCntOfVar, 15 ) = "Basis";
+						tableBody( 15, nCntOfVar ) = "Basis";
 					} else if ( SELECT_CASE_var == catAdjustment ) {
-						tableBody( nCntOfVar, 15 ) = "Adjustment";
+						tableBody( 15, nCntOfVar ) = "Adjustment";
 					} else if ( SELECT_CASE_var == catSurcharge ) {
-						tableBody( nCntOfVar, 15 ) = "Surcharge";
+						tableBody( 15, nCntOfVar ) = "Surcharge";
 					} else if ( SELECT_CASE_var == catSubtotal ) {
-						tableBody( nCntOfVar, 15 ) = "Subtotal";
+						tableBody( 15, nCntOfVar ) = "Subtotal";
 					} else if ( SELECT_CASE_var == catTaxes ) {
-						tableBody( nCntOfVar, 15 ) = "Taxes";
+						tableBody( 15, nCntOfVar ) = "Taxes";
 					} else if ( SELECT_CASE_var == catTotal ) {
-						tableBody( nCntOfVar, 15 ) = "Total";
+						tableBody( 15, nCntOfVar ) = "Total";
 					} else {
-						tableBody( nCntOfVar, 15 ) = "none";
+						tableBody( 15, nCntOfVar ) = "none";
 					}}
 				}
 				econVar( iVar ).isReported = true;
@@ -5422,7 +5418,7 @@ namespace EconomicTariff {
 		columnWidth = 14; //array assignment - same for all columns
 		WriteSubtitle( titleString );
 		WriteTable( tableBody, rowHead, columnHead, columnWidth );
-		if( sqlite ) {
+		if ( sqlite ) {
 			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", forString, titleString );
 		}
 		columnHead.deallocate();
@@ -5457,7 +5453,6 @@ namespace EconomicTariff {
 
 		// Using/Aliasing
 		using OutputProcessor::EnergyMeters;
-		using OutputProcessor::NumEnergyMeters;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5482,8 +5477,8 @@ namespace EconomicTariff {
 		int kTariff;
 		int lMin;
 		int mGroup;
-		FArray1D_int groupIndex; // index number (in tariff) for the group name
-		FArray1D_int MinTariffIndex; // tariff index for the Minimum value
+		Array1D_int groupIndex; // index number (in tariff) for the group name
+		Array1D_int MinTariffIndex; // tariff index for the Minimum value
 		int numMins;
 		int curMinTariffIndex;
 		bool isFound;
@@ -5671,7 +5666,7 @@ namespace EconomicTariff {
 	void
 	GetMonthlyCostForResource(
 		int const inResourceNumber,
-		FArray1A< Real64 > outMonthlyCosts
+		Array1A< Real64 > outMonthlyCosts
 	)
 	{
 
@@ -5728,7 +5723,7 @@ namespace EconomicTariff {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

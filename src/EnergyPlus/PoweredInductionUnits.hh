@@ -2,7 +2,7 @@
 #define PoweredInductionUnits_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -27,7 +27,7 @@ namespace PoweredInductionUnits {
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 	extern bool GetPIUInputFlag; // First time, input is "gotten"
 
 	extern int NumPIUs;
@@ -263,7 +263,7 @@ namespace PoweredInductionUnits {
 	};
 
 	// Object Data
-	extern FArray1D< PowIndUnitData > PIU;
+	extern Array1D< PowIndUnitData > PIU;
 
 	// Functions
 
@@ -317,7 +317,7 @@ namespace PoweredInductionUnits {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

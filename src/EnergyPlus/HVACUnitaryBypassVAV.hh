@@ -2,7 +2,7 @@
 #define HVACUnitaryBypassVAV_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -63,7 +63,7 @@ namespace HVACUnitaryBypassVAV {
 	extern Real64 PartLoadFrac; // Compressor part-load fraction
 	extern Real64 SaveCompressorPLR; // Holds DX compressor PLR from active DX coil
 	extern Real64 TempSteamIn; // steam coil steam inlet temperature
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -163,12 +163,12 @@ namespace HVACUnitaryBypassVAV {
 		Real64 CompPartLoadFrac; // Compressor part load ratio
 		int AirLoopNumber; // Air loop served by the CBVAV system
 		int NumControlledZones;
-		FArray1D_int ControlledZoneNum; // Index to controlled zones
-		FArray1D_int ActualZoneNum; // Actual zone number of controlled zone
-		FArray1D_int ActualZoneNodeNum; // Actual zone node num of controlled zone
-		FArray1D_int CBVAVBoxOutletNode; // Outlet node of CBVAV Box in controlled zone
-		FArray1D_int ZoneSequenceCoolingNum; // Index to cooling sequence/priority for this zone
-		FArray1D_int ZoneSequenceHeatingNum; // Index to heating sequence/priority for this zone
+		Array1D_int ControlledZoneNum; // Index to controlled zones
+		Array1D_int ActualZoneNum; // Actual zone number of controlled zone
+		Array1D_int ActualZoneNodeNum; // Actual zone node num of controlled zone
+		Array1D_int CBVAVBoxOutletNode; // Outlet node of CBVAV Box in controlled zone
+		Array1D_int ZoneSequenceCoolingNum; // Index to cooling sequence/priority for this zone
+		Array1D_int ZoneSequenceHeatingNum; // Index to heating sequence/priority for this zone
 		int PriorityControl; // Control mode - CoolingPriority, HeatingPriority, or ZonePriority
 		int NumZonesCooled; // Number of zones requesting cooling
 		int NumZonesHeated; // Number of zones requesting heating
@@ -409,12 +409,12 @@ namespace HVACUnitaryBypassVAV {
 			Real64 const CompPartLoadFrac, // Compressor part load ratio
 			int const AirLoopNumber, // Air loop served by the CBVAV system
 			int const NumControlledZones,
-			FArray1_int const & ControlledZoneNum, // Index to controlled zones
-			FArray1_int const & ActualZoneNum, // Actual zone number of controlled zone
-			FArray1_int const & ActualZoneNodeNum, // Actual zone node num of controlled zone
-			FArray1_int const & CBVAVBoxOutletNode, // Outlet node of CBVAV Box in controlled zone
-			FArray1_int const & ZoneSequenceCoolingNum, // Index to cooling sequence/priority for this zone
-			FArray1_int const & ZoneSequenceHeatingNum, // Index to heating sequence/priority for this zone
+			Array1_int const & ControlledZoneNum, // Index to controlled zones
+			Array1_int const & ActualZoneNum, // Actual zone number of controlled zone
+			Array1_int const & ActualZoneNodeNum, // Actual zone node num of controlled zone
+			Array1_int const & CBVAVBoxOutletNode, // Outlet node of CBVAV Box in controlled zone
+			Array1_int const & ZoneSequenceCoolingNum, // Index to cooling sequence/priority for this zone
+			Array1_int const & ZoneSequenceHeatingNum, // Index to heating sequence/priority for this zone
 			int const PriorityControl, // Control mode - CoolingPriority, HeatingPriority, or ZonePriority
 			int const NumZonesCooled, // Number of zones requesting cooling
 			int const NumZonesHeated, // Number of zones requesting heating
@@ -586,7 +586,7 @@ namespace HVACUnitaryBypassVAV {
 	};
 
 	// Object Data
-	extern FArray1D< CBVAVData > CBVAV;
+	extern Array1D< CBVAVData > CBVAV;
 
 	// Functions
 
@@ -657,25 +657,25 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	DOE2DXCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	);
 
 	Real64
 	HXAssistDXCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	);
 
 	Real64
 	DXHeatingCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	);
 
 	Real64
 	MultiModeDXCoilResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	);
 
 	void
@@ -700,12 +700,12 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		FArray1< Real64 > const & Par // Par(5) is the requested coil load
+		Array1< Real64 > const & Par // Par(5) is the requested coil load
 	);
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

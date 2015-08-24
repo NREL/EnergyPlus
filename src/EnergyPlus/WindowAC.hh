@@ -2,7 +2,7 @@
 #define WindowAC_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -18,7 +18,7 @@ namespace WindowAC {
 	// MODULE PARAMETER DEFINITIONS
 	extern int const WindowAC_UnitType;
 	extern std::string const cWindowAC_UnitType;
-	extern FArray1D_string const cWindowAC_UnitTypes;
+	extern Array1D_string const cWindowAC_UnitTypes;
 
 	// Compressor operation
 	extern int const On; // normal compressor operation
@@ -30,10 +30,10 @@ namespace WindowAC {
 
 	extern int NumWindAC;
 	extern int NumWindACCyc;
-	extern FArray1D_bool MySizeFlag;
+	extern Array1D_bool MySizeFlag;
 	extern bool GetWindowACInputFlag; // First time, input is "gotten"
 	extern bool CoolingLoad; // defines a cooling load
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -251,7 +251,7 @@ namespace WindowAC {
 	struct WindACNumericFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		WindACNumericFieldData()
@@ -259,15 +259,15 @@ namespace WindowAC {
 
 		// Member Constructor
 		WindACNumericFieldData(
-			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
 			) :
 			FieldNames(FieldNames)
 		{}
 	};
 
 	// Object Data
-	extern FArray1D< WindACData > WindAC;
-	extern FArray1D< WindACNumericFieldData > WindACNumericFields; // holds window AC numeric input fields character field name
+	extern Array1D< WindACData > WindAC;
+	extern Array1D< WindACNumericFieldData > WindACNumericFields; // holds window AC numeric input fields character field name
 
 	// Functions
 
@@ -342,7 +342,7 @@ namespace WindowAC {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

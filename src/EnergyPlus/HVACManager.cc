@@ -3,7 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -144,9 +144,9 @@ namespace HVACManager {
 	int HVACManageIteration( 0 ); // counts iterations to enforce maximum iteration limit
 	int RepIterAir( 0 );
 
-	//FArray1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
-	//FArray1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
-	//FArray1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
+	//Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
+	//Array1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
+	//Array1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 	// and zone equipment simulations
@@ -452,7 +452,7 @@ namespace HVACManager {
 				if ( DoOutputReporting ) {
 					ReportMaxVentilationLoads();
 					UpdateDataandReport( HVACTSReporting );
-					if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ){
+					if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ) {
 						if ( hvacSizingSimulationManager ) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
 					}
 					UpdateTabularReports( HVACTSReporting );
@@ -481,7 +481,7 @@ namespace HVACManager {
 				}
 				CalcMoreNodeInfo();
 				UpdateDataandReport( HVACTSReporting );
-				if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ){
+				if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ) {
 					if ( hvacSizingSimulationManager ) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
 				}
 			} else if ( UpdateDataDuringWarmupExternalInterface ) { // added for FMI
@@ -617,8 +617,6 @@ namespace HVACManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		bool const IsPlantLoop( true );
-		bool const NotPlantLoop( false );
 		bool const SimWithPlantFlowUnlocked( false );
 		bool const SimWithPlantFlowLocked( true );
 
@@ -635,7 +633,6 @@ namespace HVACManager {
 		static int ErrCount( 0 ); // Number of times that the maximum iterations was exceeded
 		static bool MySetPointInit( true );
 		std::string CharErrOut; // a character string equivalent of ErrCount
-		int que;
 		static int MaxErrCount( 0 );
 		static std::string ErrEnvironmentName;
 		int LoopNum;
@@ -646,7 +643,6 @@ namespace HVACManager {
 		int StackDepth;
 		std::string HistoryStack;
 		std::string HistoryTrace;
-		int ZoneInSysIndex;
 		Real64 SlopeHumRat;
 		Real64 SlopeMdot;
 		Real64 SlopeTemps;
@@ -877,7 +873,7 @@ namespace HVACManager {
 							}
 						} // mass flow rate not converged
 
-						if( any( AirLoopConvergence( AirSysNum ).HVACHumRatNotConverged ) ) {
+						if ( any( AirLoopConvergence( AirSysNum ).HVACHumRatNotConverged ) ) {
 
 							ShowContinueError( "Air System Named = " + AirToZoneNodeInfo( AirSysNum ).AirLoopName + " did not converge for humidity ratio" );
 							ShowContinueError( "Check values should be zero. Most Recent values listed first." );
@@ -901,7 +897,7 @@ namespace HVACManager {
 							}
 						} // humidity ratio not converged
 
-						if( any( AirLoopConvergence( AirSysNum ).HVACTempNotConverged ) ) {
+						if ( any( AirLoopConvergence( AirSysNum ).HVACTempNotConverged ) ) {
 
 							ShowContinueError( "Air System Named = " + AirToZoneNodeInfo( AirSysNum ).AirLoopName + " did not converge for temperature" );
 							ShowContinueError( "Check values should be zero. Most Recent values listed first." );
@@ -924,7 +920,7 @@ namespace HVACManager {
 								ShowContinueError( "Supply-to-demand interface deck 2 temperature check value iteration history trace: " + HistoryTrace );
 							}
 						} // Temps not converged
-						if( any( AirLoopConvergence( AirSysNum ).HVACEnergyNotConverged ) ) {
+						if ( any( AirLoopConvergence( AirSysNum ).HVACEnergyNotConverged ) ) {
 
 							ShowContinueError( "Air System Named = " + AirToZoneNodeInfo( AirSysNum ).AirLoopName + " did not converge for energy" );
 							ShowContinueError( "Check values should be zero. Most Recent values listed first." );
@@ -1471,8 +1467,6 @@ namespace HVACManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxAir( 5 ); // Iteration Max for Air Simulation Iterations
-		int const MaxPlant( 3 ); // Iteration Max for Plant Simulation Iteration
-		int const MaxCond( 3 ); // Iteration Max for Plant Simulation Iteration
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1637,7 +1631,6 @@ namespace HVACManager {
 		// na
 
 		// Using/Aliasing
-		using DataZoneEquipment::ZoneEquipConfig;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1697,7 +1690,6 @@ namespace HVACManager {
 		// na
 
 		// Using/Aliasing
-		using DataZoneEquipment::ZoneEquipConfig;
 		using DataConvergParams::HVACFlowRateToler;
 
 		// Locals
@@ -2043,7 +2035,6 @@ namespace HVACManager {
 
 		// Using/Aliasing
 		using DataGlobals::SecInHour;
-		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::OutBaroPress;
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::StdRhoAir;
@@ -2107,8 +2098,8 @@ namespace HVACManager {
 		Real64 H2OHtOfVap; // Heat of vaporization of air
 		Real64 TotalLoad; // Total loss or gain
 		int MixNum; // Counter for MIXING and Cross Mixing statements
-		static FArray1D< Real64 > MixSenLoad; // Mixing sensible loss or gain
-		static FArray1D< Real64 > MixLatLoad; // Mixing latent loss or gain
+		static Array1D< Real64 > MixSenLoad; // Mixing sensible loss or gain
+		static Array1D< Real64 > MixLatLoad; // Mixing latent loss or gain
 		int j; // Index in a do-loop
 		int VentZoneNum; // Number of ventilation object per zone
 		Real64 VentZoneMassflow; // Total mass flow rate per zone
@@ -2623,10 +2614,9 @@ namespace HVACManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
-		int ZoneIndex;
 		int NodeIndex;
 		int NodeNum;
-		FArray1D< Real64 > tmpRealARR( ConvergLogStackDepth );
+		Array1D< Real64 > tmpRealARR( ConvergLogStackDepth );
 
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
@@ -2651,7 +2641,7 @@ namespace HVACManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

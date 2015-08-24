@@ -2,8 +2,8 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArrayS.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/ArrayS.functions.hh>
 
 // EnergyPlus Headers
 #include <DataEnvironment.hh>
@@ -80,7 +80,7 @@ namespace DataEnvironment {
 	Real64 GroundTempFC; // Current ground temperature defined for F or C factor method {C}
 	Real64 GroundTemp_Surface; // Current surface ground temperature {C}
 	Real64 GroundTemp_Deep; // Current deep ground temperature
-	FArray1D< Real64 > PubGroundTempSurface( 12 ); // All 12 Surf Gnd Temps (assigned in Weather Mgr, used in PlantPipeHeatTransfer)
+	Array1D< Real64 > PubGroundTempSurface( 12 ); // All 12 Surf Gnd Temps (assigned in Weather Mgr, used in PlantPipeHeatTransfer)
 	bool PubGroundTempSurfFlag; // Flag for if Surf Ground Temps Exist in idf  (assigned, used same as PubGroundTempSurface)
 	int HolidayIndex; // Indicates whether current day is a holiday and if so what type
 	// HolidayIndex=(0-no holiday, 1-holiday type 1, ...)
@@ -119,7 +119,7 @@ namespace DataEnvironment {
 	Real64 WaterMainsTemp; // Current water mains temperature
 	int Year; // Current calendar year of the simulation
 	int YearTomorrow; // Tomorrow's calendar year of the simulation
-	FArray1D< Real64 > SOLCOS( 3 ); // Solar direction cosines at current time step
+	Array1D< Real64 > SOLCOS( 3 ); // Solar direction cosines at current time step
 	Real64 CloudFraction; // Fraction of sky covered by clouds
 	Real64 HISKF; // Exterior horizontal illuminance from sky (lux).
 	Real64 HISUNF; // Exterior horizontal beam illuminance (lux)
@@ -180,6 +180,122 @@ namespace DataEnvironment {
 	//PUBLIC OutAirDensityAt
 
 	// Functions
+
+	// Clears the global data in DataEnvironment.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		BeamSolarRad = Real64();
+		EMSBeamSolarRadOverrideOn = false;
+		EMSBeamSolarRadOverrideValue = Real64();
+		DayOfMonth = int();
+		DayOfMonthTomorrow = int();
+		DayOfWeek = int();
+		DayOfWeekTomorrow = int();
+		DayOfYear = int();
+		DayOfYear_Schedule = int();
+		DifSolarRad = Real64();
+		EMSDifSolarRadOverrideOn = false;
+		EMSDifSolarRadOverrideValue = Real64();
+		DSTIndicator = int();
+		Elevation = Real64();
+		EndMonthFlag = bool();
+		GndReflectanceForDayltg = Real64();
+		GndReflectance = Real64();
+		GndSolarRad = Real64();
+		GroundTemp = Real64();
+		GroundTempKelvin = Real64();
+		GroundTempFC = Real64();
+		GroundTemp_Surface = Real64();
+		GroundTemp_Deep = Real64();
+		PubGroundTempSurface.dimension( 12 );
+		PubGroundTempSurfFlag = bool();
+		HolidayIndex = int();
+		HolidayIndexTomorrow = int();
+		IsRain = bool();
+		IsSnow = bool();
+		Latitude = Real64();
+		Longitude = Real64();
+		Month = int();
+		MonthTomorrow = int();
+		OutBaroPress = Real64();
+		OutDryBulbTemp = Real64();
+		EMSOutDryBulbOverrideOn = false;
+		EMSOutDryBulbOverrideValue = Real64();
+		OutHumRat = Real64();
+		OutRelHum = Real64();
+		OutRelHumValue = Real64();
+		EMSOutRelHumOverrideOn = false;
+		EMSOutRelHumOverrideValue = Real64();
+		OutEnthalpy = Real64();
+		OutAirDensity = Real64();
+		OutWetBulbTemp = Real64();
+		OutDewPointTemp = Real64();
+		EMSOutDewPointTempOverrideOn = false;
+		EMSOutDewPointTempOverrideValue = Real64();
+		SkyTemp = Real64();
+		SkyTempKelvin = Real64();
+		LiquidPrecipitation = Real64();
+		SunIsUp = bool();
+		WindDir = Real64();
+		EMSWindDirOverrideOn = false;
+		EMSWindDirOverrideValue = Real64();
+		WindSpeed = Real64();
+		EMSWindSpeedOverrideOn = false;
+		EMSWindSpeedOverrideValue = Real64();
+		WaterMainsTemp = Real64();
+		Year = int();
+		YearTomorrow = int();
+		SOLCOS.dimension( 3 );
+		CloudFraction = Real64();
+		HISKF = Real64();
+		HISUNF = Real64();
+		HISUNFnorm = Real64();
+		PDIRLW = Real64();
+		PDIFLW = Real64();
+		SkyClearness = Real64();
+		SkyBrightness = Real64();
+		StdBaroPress = 101325.0;
+		StdRhoAir = Real64();
+		TimeZoneNumber = Real64();
+		TimeZoneMeridian = Real64();
+		EnvironmentName = std::string();
+		WeatherFileLocationTitle = std::string();
+		CurMnDyHr = std::string();
+		CurMnDy = std::string();
+		CurEnvirNum = int();
+		TotDesDays = 0;
+		TotRunDesPersDays = 0;
+		CurrentOverallSimDay = int();
+		TotalOverallSimDays = int();
+		MaxNumberSimYears = int();
+		RunPeriodStartDayOfWeek = int();
+		CosSolarDeclinAngle = Real64();
+		EquationOfTime = Real64();
+		SinLatitude = Real64();
+		CosLatitude = Real64();
+		SinSolarDeclinAngle = Real64();
+		TS1TimeOffset = -0.5;
+		WeatherFileWindModCoeff = 1.5863;
+		WeatherFileTempModCoeff = 0.0;
+		SiteWindExp = 0.22;
+		SiteWindBLHeight = 370.0;
+		SiteTempGradient = 0.0065;
+		GroundTempObjInput = false;
+		GroundTemp_SurfaceObjInput = false;
+		GroundTemp_DeepObjInput = false;
+		FCGroundTemps = false;
+		DisplayWeatherMissingDataWarnings = false;
+		IgnoreSolarRadiation = false;
+		IgnoreBeamRadiation = false;
+		IgnoreDiffuseRadiation = false;
+		PrintEnvrnStampWarmup = false;
+		PrintEnvrnStampWarmupPrinted = false;
+		RunPeriodEnvironment = false;
+		EnvironmentStartEnd = std::string();
+		CurrentYearIsLeapYear = false;
+	}
 
 	Real64
 	OutDryBulbTempAt( Real64 const Z ) // Height above ground (m)
@@ -428,9 +544,9 @@ namespace DataEnvironment {
 	void
 	SetOutBulbTempAt(
 		int const NumItems,
-		FArray1S< Real64 > const Heights,
-		FArray1S< Real64 > DryBulb,
-		FArray1S< Real64 > WetBulb,
+		Array1S< Real64 > const Heights,
+		Array1S< Real64 > DryBulb,
+		Array1S< Real64 > WetBulb,
 		std::string const & Settings
 	)
 	{
@@ -517,9 +633,9 @@ namespace DataEnvironment {
 	void
 	SetWindSpeedAt(
 		int const NumItems,
-		FArray1S< Real64 > const Heights,
-		FArray1S< Real64 > LocalWindSpeed,
-		std::string const & Settings
+		Array1S< Real64 > const Heights,
+		Array1S< Real64 > LocalWindSpeed,
+		std::string const & EP_UNUSED( Settings )
 	)
 	{
 
@@ -578,7 +694,7 @@ namespace DataEnvironment {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

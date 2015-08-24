@@ -3,12 +3,18 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+// ObjexxFCL Headers
+#include <ObjexxFCL/gio.hh>
+
 // EnergyPlus Headers
 #include <EnergyPlus/SizingAnalysisObjects.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
 using namespace WeatherManager;
@@ -18,23 +24,22 @@ using namespace DataPlant;
 using namespace DataSizing;
 using namespace OutputReportPredefined;
 
-
 class SizingAnalysisObjectsTest : public :: testing::Test
 {
 
 public:
 
-	Real64 lowLogVal; 
+	Real64 lowLogVal;
 	Real64 midLogVal;
 	Real64 hiLogVal;
-	Real64 LogVal;  // actual variable pointed to 
+	Real64 LogVal;  // actual variable pointed to
 	int averagingWindow;
 	int logIndex;
 
 	SizingLoggerFramework sizingLoggerFrameObj;
 
 	// constructor for test fixture class
-	SizingAnalysisObjectsTest ( )
+	SizingAnalysisObjectsTest()
 	{
 		// fill in test log data values
 		lowLogVal = 50.0;
@@ -90,10 +95,14 @@ public:
 
 		SetPredefinedTables();
 
+		int write_stat;
+		// Open the Initialization Output File (lifted from SimulationManager.cc)
+		OutputFileInits = GetNewUnitNumber();
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 	}
 
 	//destructor
-	~SizingAnalysisObjectsTest( )
+	~SizingAnalysisObjectsTest()
 	{
 		TotNumLoops = 0;
 		PlantLoop( 1 ).LoopSide.deallocate();
@@ -101,16 +110,16 @@ public:
 		Environment.deallocate();
 		PlantSizData.deallocate();
 		TimeValue.deallocate();
-	}
 
+		// Close and delete eio output file
+		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
+	}
 
 };
 
-
-
-
-TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
+TEST_F( SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 {
+	ShowMessage( "Begin Test: SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework" );
 
 	int const ZoneIndex ( 1 );
 
@@ -146,11 +155,12 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 	sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep();
 
 	EXPECT_DOUBLE_EQ( midLogVal, sizingLoggerFrameObj.logObjs[ logIndex ].ztStepObj[ 96 ].logDataValue );
-
 }
 
-TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
+TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour )
 {
+	ShowMessage( "Begin Test: SizingAnalysisObjectsTest, BasicLogging4stepsPerHour" );
+
 // basic test of method FillZoneStep and zone time stamp constructor
 // setup a log for 4 timesteps per hour and fill the first 4 steps, then check that values are there
 	SizingLog TestLogObj( LogVal );
@@ -176,7 +186,6 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 // fill first step in log with zone step data
 	int KindOfSim( 4 );
 	int Envrn( 3 );
-	int DDnum( 1 );
 	int DayOfSim( 1 );
 	int HourofDay( 1 );
 	int CurMin( 15 );
@@ -191,7 +200,7 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 		CurMin,
 		timeStepDuration,
 		numTimeStepsInHour
-	); 
+	);
 	TestLogObj.FillZoneStep( tmpztStepStamp1 );
 
 // fill second step log with zone step data
@@ -206,7 +215,7 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 		CurMin,
 		timeStepDuration,
 		numTimeStepsInHour
-	); 
+	);
 	TestLogObj.FillZoneStep( tmpztStepStamp2 );
 
 // fill third step log with zone step data
@@ -220,7 +229,7 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 		CurMin,
 		timeStepDuration,
 		numTimeStepsInHour
-	); 
+	);
 	TestLogObj.FillZoneStep( tmpztStepStamp3 );
 
 // fill fourth step log with zone step data
@@ -234,7 +243,7 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 		CurMin,
 		timeStepDuration,
 		numTimeStepsInHour
-	); 
+	);
 	TestLogObj.FillZoneStep( tmpztStepStamp4 );
 
 	// now check that the correct values were stored in the right spot
@@ -244,12 +253,12 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 
 	//store this in the logger framework
 	sizingLoggerFrameObj.logObjs.push_back( TestLogObj );
-
 }
-
 
 TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 {
+	ShowMessage( "Begin Test: SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour" );
+
 // this test uses one timestep per hour and checks as for two design days
 
 	SizingLog TestLogObj( LogVal );
@@ -281,24 +290,24 @@ TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 	int numTimeStepsInHour ( 1 );
 
 	LogVal = lowLogVal;
-	for (int hr = 1; hr <= 24; hr++ ) {
+	for ( int hr = 1; hr <= 24; ++hr ) {
 		HourofDay = hr;
 		ZoneTimestepObject tmpztStepStamp1( // call constructor
 			KindOfSim,Envrn,DayOfSim,HourofDay,CurMin,timeStepDuration,
 			numTimeStepsInHour
-		); 
+		);
 		TestLogObj.FillZoneStep( tmpztStepStamp1 );
 	}
 
 	Envrn = 4;
 	DDnum = 2;
 	LogVal = hiLogVal;
-	for (int hr = 1; hr <= 24; hr++ ) {
+	for ( int hr = 1; hr <= 24; ++hr ) {
 		HourofDay = hr;
 		ZoneTimestepObject tmpztStepStamp1( // call constructor
 			KindOfSim,Envrn,DayOfSim,HourofDay,CurMin,timeStepDuration,
 			numTimeStepsInHour
-		); 
+		);
 		TestLogObj.FillZoneStep( tmpztStepStamp1 );
 	}
 
@@ -310,8 +319,9 @@ TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 	sizingLoggerFrameObj.logObjs.push_back(TestLogObj );
 }
 
-TEST_F( SizingAnalysisObjectsTest , PlantCoincidentAnalyObjTest)
+TEST_F( SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest )
 {
+	ShowMessage( "Begin Test: SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest" );
 
 	std::string loopName;
 	int loopNum;
@@ -329,7 +339,7 @@ TEST_F( SizingAnalysisObjectsTest , PlantCoincidentAnalyObjTest)
 	timestepsInAvg = 1;
 	plantSizingIndex = 1;
 
-	PlantCoinicidentAnalysis TestAnalysisObj( 
+	PlantCoinicidentAnalysis TestAnalysisObj(
 		loopName,
 		loopNum,
 		nodeNum,
@@ -342,7 +352,6 @@ TEST_F( SizingAnalysisObjectsTest , PlantCoincidentAnalyObjTest)
 	// fill first step in log with zone step data
 	int KindOfSim( 4 );
 	int Envrn( 4 );
-	int DDnum( 1 );
 	int DayOfSim( 1 );
 	int HourofDay( 1 );
 	int CurMin( 15 );
@@ -357,7 +366,7 @@ TEST_F( SizingAnalysisObjectsTest , PlantCoincidentAnalyObjTest)
 		CurMin,
 		timeStepDuration,
 		numTimeStepsInHour
-	); 
+	);
 	LogVal = 1.5; // kg/s
 	tmpztStepStamp1.runningAvgDataValue = 1.5;
 	sizingLoggerFrameObj.logObjs[logIndex].FillZoneStep( tmpztStepStamp1 );
@@ -368,7 +377,7 @@ TEST_F( SizingAnalysisObjectsTest , PlantCoincidentAnalyObjTest)
 	TestAnalysisObj.NewFoundMaxDemandTimeStamp = tmpztStepStamp1;
 	TestAnalysisObj.peakDemandMassFlow = 1.5;
 	TestAnalysisObj.peakDemandReturnTemp = 10.0;
-	
+
 	EXPECT_DOUBLE_EQ( 0.002, PlantLoop( 1 ).MaxVolFlowRate ); //  m3/s
 
 	TestAnalysisObj.ResolveDesignFlowRate( 1 );
@@ -376,8 +385,4 @@ TEST_F( SizingAnalysisObjectsTest , PlantCoincidentAnalyObjTest)
 	EXPECT_DOUBLE_EQ( 0.0015, PlantLoop( 1 ).MaxVolFlowRate ); //  m3/s
 	EXPECT_DOUBLE_EQ( 1.5, PlantLoop( 1 ).MaxMassFlowRate ); //  m3/s
 	EXPECT_TRUE( TestAnalysisObj.anotherIterationDesired );
-
-
-
 }
-

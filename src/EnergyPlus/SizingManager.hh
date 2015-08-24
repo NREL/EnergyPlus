@@ -2,7 +2,7 @@
 #define SizingManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -33,7 +33,7 @@ namespace SizingManager {
 		// Members
 		std::string Name;
 		int NumOfZones;
-		FArray1D_int Zones;
+		Array1D_int Zones;
 
 		// Default Constructor
 		ZoneListData() :
@@ -44,7 +44,7 @@ namespace SizingManager {
 		ZoneListData(
 			std::string const & Name,
 			int const NumOfZones,
-			FArray1_int const & Zones
+			Array1_int const & Zones
 		) :
 			Name( Name ),
 			NumOfZones( NumOfZones ),
@@ -65,16 +65,16 @@ namespace SizingManager {
 	ProcessInputOARequirements(
 		std::string const & cCurrentModuleObject,
 		int const OAIndex,
-		FArray1_string const & cAlphaArgs,
+		Array1_string const & cAlphaArgs,
 		int & NumAlphas,
-		FArray1< Real64 > const & rNumericArgs,
+		Array1< Real64 > const & rNumericArgs,
 		int & NumNumbers,
-		FArray1_bool const & lNumericFieldBlanks, //Unused
-		FArray1_bool const & lAlphaFieldBlanks,
-		FArray1_string const & cAlphaFieldNames,
-		FArray1_string const & cNumericFieldNames, //Unused
+		Array1_bool const & lNumericFieldBlanks, //Unused
+		Array1_bool const & lAlphaFieldBlanks,
+		Array1_string const & cAlphaFieldNames,
+		Array1_string const & cNumericFieldNames, //Unused
 		bool & ErrorsFound // If errors found in input
-		);
+	);
 
 	void
 	GetZoneAirDistribution();
@@ -92,9 +92,9 @@ namespace SizingManager {
 	GetZoneAndZoneListNames(
 		bool & ErrorsFound,
 		int & NumZones,
-		FArray1D_string & ZoneNames,
+		Array1D_string & ZoneNames,
 		int & NumZoneLists,
-		FArray1D< ZoneListData > & ZoneListNames
+		Array1D< ZoneListData > & ZoneListNames
 	);
 
 	void
@@ -132,7 +132,7 @@ namespace SizingManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

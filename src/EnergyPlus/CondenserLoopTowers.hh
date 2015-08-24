@@ -2,7 +2,7 @@
 #define CondenserLoopTowers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -75,7 +75,7 @@ namespace CondenserLoopTowers {
 	extern Real64 WaterUsage; // Tower water usage (m3/s)
 	extern Real64 FanCyclingRatio; // cycling ratio of tower fan when min fan speed provide to much capacity
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE CondenserLoopTowers
 
@@ -407,7 +407,7 @@ namespace CondenserLoopTowers {
 	{
 		// Members
 		// variables specific to variable-speed towers
-		FArray1D< Real64 > Coeff; // - model coefficients
+		Array1D< Real64 > Coeff; // - model coefficients
 		bool FoundModelCoeff; // - TRUE if model is calibratable
 		Real64 MinInletAirWBTemp; // - model limit for min inlet air WB temp
 		Real64 MaxInletAirWBTemp; // - model limit for max inlet air WB temp
@@ -497,7 +497,7 @@ namespace CondenserLoopTowers {
 
 		// Member Constructor
 		VSTowerData(
-			FArray1< Real64 > const & Coeff, // - model coefficients
+			Array1< Real64 > const & Coeff, // - model coefficients
 			bool const FoundModelCoeff, // - TRUE if model is calibratable
 			Real64 const MinInletAirWBTemp, // - model limit for min inlet air WB temp
 			Real64 const MaxInletAirWBTemp, // - model limit for max inlet air WB temp
@@ -597,10 +597,10 @@ namespace CondenserLoopTowers {
 	};
 
 	// Object Data
-	extern FArray1D< Towerspecs > SimpleTower; // dimension to number of machines
-	extern FArray1D< TowerInletConds > SimpleTowerInlet; // inlet conditions
-	extern FArray1D< ReportVars > SimpleTowerReport; // report variables
-	extern FArray1D< VSTowerData > VSTower; // model coefficients and specific variables for VS tower
+	extern Array1D< Towerspecs > SimpleTower; // dimension to number of machines
+	extern Array1D< TowerInletConds > SimpleTowerInlet; // inlet conditions
+	extern Array1D< ReportVars > SimpleTowerReport; // report variables
+	extern Array1D< VSTowerData > VSTower; // model coefficients and specific variables for VS tower
 
 	// Functions
 
@@ -670,7 +670,7 @@ namespace CondenserLoopTowers {
 	Real64
 	VSMerkelResidual(
 		Real64 const AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = Tower number
+		Array1< Real64 > const & Par // par(1) = Tower number
 	);
 
 	void
@@ -720,19 +720,19 @@ namespace CondenserLoopTowers {
 	Real64
 	SimpleTowerUAResidual(
 		Real64 const UA, // UA of cooling tower
-		FArray1< Real64 > const & Par // par(1) = design tower load [W]
+		Array1< Real64 > const & Par // par(1) = design tower load [W]
 	);
 
 	Real64
 	SimpleTowerTrResidual(
 		Real64 const Trange, // cooling tower range temperature [C]
-		FArray1< Real64 > const & Par // par(1) = tower number
+		Array1< Real64 > const & Par // par(1) = tower number
 	);
 
 	Real64
 	SimpleTowerApproachResidual(
 		Real64 const FlowRatio, // water or air flow ratio of cooling tower
-		FArray1< Real64 > const & Par // par(1) = tower number
+		Array1< Real64 > const & Par // par(1) = tower number
 	);
 
 	// End of the CondenserLoopTowers Module Simulation Subroutines
@@ -762,7 +762,7 @@ namespace CondenserLoopTowers {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

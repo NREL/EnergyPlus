@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -159,7 +159,7 @@ namespace GeneratorDynamicsManager {
 	void
 	ManageGeneratorControlState(
 		int const GeneratorType, // type of Generator
-		std::string const & GeneratorName, // user specified name of Generator
+		std::string const & EP_UNUSED( GeneratorName ), // user specified name of Generator
 		int const GeneratorNum, // Generator number
 		bool const RunFlagElectCenter, // TRUE when Generator operating per electric load center request
 		bool const RunFlagPlant, // TRUE when generator operating per Plant request (always false)
@@ -169,7 +169,7 @@ namespace GeneratorDynamicsManager {
 		int & OperatingMode, // operating mode
 		Real64 & PLRforSubtimestepStartUp, // part load ratio for switch to normal from start up
 		Real64 & PLRforSubtimestepShutDown, // part load ratio for switch from cool down to other
-		bool const FirstHVACIteration // True is this is first HVAC iteration
+		bool const EP_UNUSED( FirstHVACIteration ) // True is this is first HVAC iteration
 	)
 	{
 
@@ -247,7 +247,7 @@ namespace GeneratorDynamicsManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool RunFlag; // true if generator supposed to run
-		int DynaCntrlNum; // index in GeneratorDynamics structure for this generator          ! na
+		int DynaCntrlNum( 0 ); // index in GeneratorDynamics structure for this generator          ! na
 		Real64 CurrentFractionalDay; // working var, time in decimal days
 		Real64 EndingFractionalDay; // working var, time is decimal days
 		Real64 LastSystemTimeStepFractionalDay; // working var, time is decimal days
@@ -255,7 +255,7 @@ namespace GeneratorDynamicsManager {
 		Real64 MinPel; // working variabel for min allowed by transient constraint
 		Real64 PelInput; // holds initial value of IN var
 		Real64 Pel;
-		int newOpMode;
+		int newOpMode( 0 );
 		Real64 SchedVal;
 		//  REAL(r64)    :: PelDiff
 		Real64 ElectLoadForThermalRequest;
@@ -726,9 +726,9 @@ namespace GeneratorDynamicsManager {
 	void
 	ManageGeneratorFuelFlow(
 		int const GeneratorType, // type of Generator
-		std::string const & GeneratorName, // user specified name of Generator
+		std::string const & EP_UNUSED( GeneratorName ), // user specified name of Generator
 		int const GeneratorNum, // Generator number
-		bool const RunFlag, // TRUE when Generator operating
+		bool const EP_UNUSED( RunFlag ), // TRUE when Generator operating
 		Real64 const FuelFlowRequest, // Generator demand mdot kg/ s
 		Real64 & FuelFlowProvided, // allowed after constraints kg/s
 		bool & ConstrainedIncreasingMdot, // true if request was altered because of fuel rate of change up
@@ -773,7 +773,7 @@ namespace GeneratorDynamicsManager {
 		Real64 MdotFuel;
 		Real64 MaxMdot;
 		Real64 MinMdot;
-		int DynaCntrlNum;
+		int DynaCntrlNum( 0 );
 
 		ConstrainedIncreasingMdot = false;
 		ConstrainedDecreasingMdot = false;
@@ -832,7 +832,6 @@ namespace GeneratorDynamicsManager {
 
 		// Using/Aliasing
 		using CurveManager::CurveValue;
-		using DataPlant::PlantLoop;
 		using DataLoopNode::Node;
 		using PlantUtilities::SetComponentFlowRate;
 

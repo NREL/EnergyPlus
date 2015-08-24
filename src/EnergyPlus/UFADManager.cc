@@ -2,9 +2,9 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArrayS.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/ArrayS.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 
@@ -131,7 +131,6 @@ namespace UFADManager {
 		using namespace DataSurfaces;
 		using namespace DataRoomAirModel;
 		using ConvectionCoefficients::CalcDetailedHcInForDVModel;
-		using DataHVACGlobals::SysTimeElapsed;
 		using namespace DataUCSDSharedData;
 
 		// Locals
@@ -207,7 +206,7 @@ namespace UFADManager {
 		// na
 
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MySizeFlag;
+		static Array1D_bool MySizeFlag;
 		static Real64 NumShadesDown( 0.0 );
 		int UINum; // index to underfloor interior zone model data
 		static int Ctd( 0 ); // DO loop index
@@ -630,13 +629,11 @@ namespace UFADManager {
 		// -
 
 		// Using/Aliasing
-		using DataRoomAirModel::AirModel;
 		using namespace DataHeatBalFanSys;
 		using namespace DataEnvironment;
 		using namespace DataHeatBalance;
 		using namespace InputProcessor;
 		using ScheduleManager::GetScheduleIndex;
-		using DataGlobals::BeginEnvrnFlag;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1012,9 +1009,9 @@ namespace UFADManager {
 		int ZoneNodeNum; // node number of the HVAC zone node
 		static Real64 TempDepCoef( 0.0 ); // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
 		static Real64 TempIndCoef( 0.0 ); // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-		static FArray1D_int IntGainTypesOccupied( 28, { IntGainTypeOf_People, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment, IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple, IntGainTypeOf_PipeIndoor, IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
+		static Array1D_int IntGainTypesOccupied( 28, { IntGainTypeOf_People, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment, IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple, IntGainTypeOf_PipeIndoor, IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
 
-		static FArray1D_int IntGainTypesUpSubzone( 2, { IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights } );
+		static Array1D_int IntGainTypesUpSubzone( 2, { IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights } );
 		Real64 RetAirGains;
 
 		// Exact solution or Euler method
@@ -1061,7 +1058,7 @@ namespace UFADManager {
 			SumReturnAirConvectionGainsByTypes( ZoneNum, IntGainTypesOccupied, RetAirGains );
 			ConvGainsOccSubzone += RetAirGains;
 		}
-		
+
 		// Add convection from pool cover to occupied region
 		ConvGainsOccSubzone += SumConvPool( ZoneNum );
 
@@ -1432,9 +1429,9 @@ namespace UFADManager {
 		int ZoneNodeNum; // node number of the HVAC zone node
 		static Real64 TempDepCoef( 0.0 ); // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
 		static Real64 TempIndCoef( 0.0 ); // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-		static FArray1D_int IntGainTypesOccupied( 28, { IntGainTypeOf_People, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment, IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple, IntGainTypeOf_PipeIndoor, IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
+		static Array1D_int IntGainTypesOccupied( 28, { IntGainTypeOf_People, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment, IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple, IntGainTypeOf_PipeIndoor, IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
 
-		static FArray1D_int IntGainTypesUpSubzone( 2, { IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights } );
+		static Array1D_int IntGainTypesUpSubzone( 2, { IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights } );
 		Real64 RetAirGains;
 
 		// Exact solution or Euler method
@@ -1488,7 +1485,7 @@ namespace UFADManager {
 
 		// Add convection from pool cover to occupied region
 		ConvGainsOccSubzone += SumConvPool( ZoneNum );
-		
+
 		// gains from lights (ceiling), tubular daylighting devices, high temp radiant heaters
 		SumInternalConvectionGainsByTypes( ZoneNum, IntGainTypesUpSubzone, ConvGainsUpSubzone );
 		ConvGainsUpSubzone += SumConvHTRadSys( ZoneNum );
@@ -1799,7 +1796,7 @@ namespace UFADManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

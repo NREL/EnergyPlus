@@ -2,12 +2,13 @@
 #define SetPointManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <DataLoopNode.hh>
 
 namespace EnergyPlus {
 
@@ -40,7 +41,7 @@ namespace SetPointManager {
 	extern int const iCtrlVarType_MinMassFlow; // control Type 'MinimumMassFlowRate'
 
 	extern int const NumValidCtrlTypes;
-	extern FArray1D_string const cValidCtrlTypes;
+	extern Array1D_string const cValidCtrlTypes;
 
 	// following are used to reduce string comparisons related to CtrlVarType
 	extern int const iSPMType_Scheduled;
@@ -70,9 +71,11 @@ namespace SetPointManager {
 	extern int const iSPMType_IdealCondEntReset;
 	extern int const iSPMType_SZOneStageCooling;
 	extern int const iSPMType_SZOneStageHeating;
+	extern int const iSPMType_ReturnWaterResetChW;
+	extern int const iSPMType_ReturnWaterResetHW;
 
 	extern int const NumValidSPMTypes;
-	extern FArray1D_string const cValidSPMTypes;
+	extern Array1D_string const cValidSPMTypes;
 
 	//Type declarations in SetPointManager module
 
@@ -107,6 +110,8 @@ namespace SetPointManager {
 	extern int NumIdealCondEntSetPtMgrs; // number of Ideal Condenser Entering Temperature setpoint managers
 	extern int NumSZOneStageCoolingSetPtMgrs; // number of single zone one stage cooling setpoint managers
 	extern int NumSZOneStageHeatingSetPtMgrs; // number of singel zone one stage heating setpoint managers
+	extern int NumReturnWaterResetChWSetPtMgrs; // number of chilled-water return water reset setpoint managers
+	extern int NumReturnWaterResetHWSetPtMgrs; // number of hot-water return water reset setpoint managers
 
 	extern bool ManagerOn;
 	extern bool GetInputFlag; // First time, input is "gotten"
@@ -132,7 +137,7 @@ namespace SetPointManager {
 		int SPMType; // integer representing type of setpoint manager
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
 		int NumCtrlNodes; // number of control nodes
-		FArray1D_int CtrlNodes; // index to control node
+		Array1D_int CtrlNodes; // index to control node
 		int AirLoopNum; // index to air loop
 		std::string AirLoopName; // name of air loop
 
@@ -150,7 +155,7 @@ namespace SetPointManager {
 			int const SPMType, // integer representing type of setpoint manager
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
 			int const NumCtrlNodes, // number of control nodes
-			FArray1_int const & CtrlNodes, // index to control node
+			Array1_int const & CtrlNodes, // index to control node
 			int const AirLoopNum, // index to air loop
 			std::string const & AirLoopName // name of air loop
 		) :
@@ -175,7 +180,7 @@ namespace SetPointManager {
 		int SchedPtr;
 		int NumCtrlNodes;
 		std::string CtrlNodeListName;
-		FArray1D_int CtrlNodes;
+		Array1D_int CtrlNodes;
 		Real64 SetPt;
 
 		// Default Constructor
@@ -195,7 +200,7 @@ namespace SetPointManager {
 			int const SchedPtr,
 			int const NumCtrlNodes,
 			std::string const & CtrlNodeListName,
-			FArray1_int const & CtrlNodes,
+			Array1_int const & CtrlNodes,
 			Real64 const SetPt
 		) :
 			Name( Name ),
@@ -223,7 +228,7 @@ namespace SetPointManager {
 		int SchedPtrLo;
 		int NumCtrlNodes;
 		std::string CtrlNodeListName;
-		FArray1D_int CtrlNodes;
+		Array1D_int CtrlNodes;
 		Real64 SetPtHi;
 		Real64 SetPtLo;
 
@@ -248,7 +253,7 @@ namespace SetPointManager {
 			int const SchedPtrLo,
 			int const NumCtrlNodes,
 			std::string const & CtrlNodeListName,
-			FArray1_int const & CtrlNodes,
+			Array1_int const & CtrlNodes,
 			Real64 const SetPtHi,
 			Real64 const SetPtLo
 		) :
@@ -286,7 +291,7 @@ namespace SetPointManager {
 		Real64 OutHigh2; // 2nd Outside high (optional)
 		int NumCtrlNodes;
 		std::string CtrlNodeListName;
-		FArray1D_int CtrlNodes;
+		Array1D_int CtrlNodes;
 		Real64 SetPt;
 
 		// Default Constructor
@@ -322,7 +327,7 @@ namespace SetPointManager {
 			Real64 const OutHigh2, // 2nd Outside high (optional)
 			int const NumCtrlNodes,
 			std::string const & CtrlNodeListName,
-			FArray1_int const & CtrlNodes,
+			Array1_int const & CtrlNodes,
 			Real64 const SetPt
 		) :
 			Name( Name ),
@@ -366,7 +371,7 @@ namespace SetPointManager {
 		int RetNode; // return node inlet to OA mixer
 		int LoopInNode; // Primary Air System inlet node
 		int NumCtrlNodes;
-		FArray1D_int CtrlNodes; // node numbers of nodes where setpoint is to be set
+		Array1D_int CtrlNodes; // node numbers of nodes where setpoint is to be set
 		Real64 SetPt; // the setpoint
 
 		// Default Constructor
@@ -407,7 +412,7 @@ namespace SetPointManager {
 			int const RetNode, // return node inlet to OA mixer
 			int const LoopInNode, // Primary Air System inlet node
 			int const NumCtrlNodes,
-			FArray1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
+			Array1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
 			Real64 const SetPt // the setpoint
 		) :
 			Name( Name ),
@@ -446,7 +451,7 @@ namespace SetPointManager {
 		Real64 MinSetTemp; // minimum supply air setpoint temperature
 		Real64 MaxSetTemp; // maximum supply air setpoint temperature
 		int NumCtrlNodes;
-		FArray1D_int CtrlNodes; // node numbers of nodes where setpoint is to be set
+		Array1D_int CtrlNodes; // node numbers of nodes where setpoint is to be set
 		Real64 SetPt; // the setpoint
 
 		// Default Constructor
@@ -473,7 +478,7 @@ namespace SetPointManager {
 			Real64 const MinSetTemp, // minimum supply air setpoint temperature
 			Real64 const MaxSetTemp, // maximum supply air setpoint temperature
 			int const NumCtrlNodes,
-			FArray1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
+			Array1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
 			Real64 const SetPt // the setpoint
 		) :
 			Name( Name ),
@@ -505,7 +510,7 @@ namespace SetPointManager {
 		Real64 MinSetTemp; // minimum supply air setpoint temperature
 		Real64 MaxSetTemp; // maximum supply air setpoint temperature
 		int NumCtrlNodes;
-		FArray1D_int CtrlNodes; // node numbers of nodes where setpoint is to be set
+		Array1D_int CtrlNodes; // node numbers of nodes where setpoint is to be set
 		Real64 SetPt; // the setpoint
 
 		// Default Constructor
@@ -532,7 +537,7 @@ namespace SetPointManager {
 			Real64 const MinSetTemp, // minimum supply air setpoint temperature
 			Real64 const MaxSetTemp, // maximum supply air setpoint temperature
 			int const NumCtrlNodes,
-			FArray1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
+			Array1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
 			Real64 const SetPt // the setpoint
 		) :
 			Name( Name ),
@@ -559,10 +564,10 @@ namespace SetPointManager {
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
 		int NumZones; // number of zones whose humidity is being controlled
 		int NumCtrlNodes; // number of nodes whose humidity ratio is being set
-		FArray1D_int ZoneNodes; // zone node numbers of zones being controlled
-		FArray1D_int ZoneNum; // actual zone number ( index into Zone array)
-		FArray1D_int CtrlZoneNum; // index into ZoneEquipConfig
-		FArray1D_int CtrlNodes; // nodes where humidity ratio is being set
+		Array1D_int ZoneNodes; // zone node numbers of zones being controlled
+		Array1D_int ZoneNum; // actual zone number ( index into Zone array)
+		Array1D_int CtrlZoneNum; // index into ZoneEquipConfig
+		Array1D_int CtrlNodes; // nodes where humidity ratio is being set
 		Real64 SetPt; // the setpoint
 
 		// Default Constructor
@@ -580,10 +585,10 @@ namespace SetPointManager {
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
 			int const NumZones, // number of zones whose humidity is being controlled
 			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
-			FArray1_int const & ZoneNodes, // zone node numbers of zones being controlled
-			FArray1_int const & ZoneNum, // actual zone number ( index into Zone array)
-			FArray1_int const & CtrlZoneNum, // index into ZoneEquipConfig
-			FArray1_int const & CtrlNodes, // nodes where humidity ratio is being set
+			Array1_int const & ZoneNodes, // zone node numbers of zones being controlled
+			Array1_int const & ZoneNum, // actual zone number ( index into Zone array)
+			Array1_int const & CtrlZoneNum, // index into ZoneEquipConfig
+			Array1_int const & CtrlNodes, // nodes where humidity ratio is being set
 			Real64 const SetPt // the setpoint
 		) :
 			Name( Name ),
@@ -608,10 +613,10 @@ namespace SetPointManager {
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
 		int NumZones; // number of zones whose humidity is being controlled
 		int NumCtrlNodes; // number of nodes whose humidity ratio is being set
-		FArray1D_int ZoneNodes; // zone node numbers of zones being controlled
-		FArray1D_int ZoneNum; // actual zone number (index into Zone array)
-		FArray1D_int CtrlZoneNum; // index into ZoneEquipConfig
-		FArray1D_int CtrlNodes; // nodes where humidity ratio is being set
+		Array1D_int ZoneNodes; // zone node numbers of zones being controlled
+		Array1D_int ZoneNum; // actual zone number (index into Zone array)
+		Array1D_int CtrlZoneNum; // index into ZoneEquipConfig
+		Array1D_int CtrlNodes; // nodes where humidity ratio is being set
 		Real64 SetPt; // the setpoint
 
 		// Default Constructor
@@ -629,10 +634,10 @@ namespace SetPointManager {
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
 			int const NumZones, // number of zones whose humidity is being controlled
 			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
-			FArray1_int const & ZoneNodes, // zone node numbers of zones being controlled
-			FArray1_int const & ZoneNum, // actual zone number (index into Zone array)
-			FArray1_int const & CtrlZoneNum, // index into ZoneEquipConfig
-			FArray1_int const & CtrlNodes, // nodes where humidity ratio is being set
+			Array1_int const & ZoneNodes, // zone node numbers of zones being controlled
+			Array1_int const & ZoneNum, // actual zone number (index into Zone array)
+			Array1_int const & CtrlZoneNum, // index into ZoneEquipConfig
+			Array1_int const & CtrlNodes, // nodes where humidity ratio is being set
 			Real64 const SetPt // the setpoint
 		) :
 			Name( Name ),
@@ -659,7 +664,7 @@ namespace SetPointManager {
 		int FanInNode; // supply fan inlet node number
 		int FanOutNode; // Supplt fan outlet node number
 		int NumCtrlNodes; // number of nodes whose humidity ratio is being set
-		FArray1D_int CtrlNodes; // node numbers of nodes where setpoint is to be set
+		Array1D_int CtrlNodes; // node numbers of nodes where setpoint is to be set
 		Real64 SetPt; // the setpoint
 		bool MySetPointCheckFlag; // used for mixed air SPM test for missing SP
 
@@ -683,7 +688,7 @@ namespace SetPointManager {
 			int const FanInNode, // supply fan inlet node number
 			int const FanOutNode, // Supplt fan outlet node number
 			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
-			FArray1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
+			Array1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
 			Real64 const SetPt, // the setpoint
 			bool const MySetPointCheckFlag // used for mixed air SPM test for missing SP
 		) :
@@ -716,7 +721,7 @@ namespace SetPointManager {
 		Real64 MinSetHumRat; // minimum supply air setpoint humidity ratio [kg/kg]
 		Real64 MaxSetHumRat; // maximum supply air setpoint humidity ratio [kg/kg]
 		int NumCtrlNodes; // number of nodes whose humidity ratio is being set
-		FArray1D_int CtrlNodes; // node numbers of nodes where setpoint is to be set
+		Array1D_int CtrlNodes; // node numbers of nodes where setpoint is to be set
 		Real64 SetPt; // the setpoint
 		bool MySetPointCheckFlag; // used for DOAS SPM test for missing SP
 
@@ -750,7 +755,7 @@ namespace SetPointManager {
 			Real64 const MinSetHumRat, // minimum supply air setpoint humidity ratio [kg/kg]
 			Real64 const MaxSetHumRat, // maximum supply air setpoint humidity ratio [kg/kg]
 			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
-			FArray1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
+			Array1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
 			Real64 const SetPt, // the setpoint
 			bool const MySetPointCheckFlag // used for DOAS SPM test for missing SP
 		) :
@@ -786,7 +791,7 @@ namespace SetPointManager {
 		int Strategy; // supply flow and temperature set strategy
 		// 1 = MaxTemp
 		int NumCtrlNodes; // number of nodes whose temperature is being set
-		FArray1D_int CtrlNodes; // nodes where temperature is being set
+		Array1D_int CtrlNodes; // nodes where temperature is being set
 		Real64 SetPt; // the setpoint
 
 		// Default Constructor
@@ -811,7 +816,7 @@ namespace SetPointManager {
 			Real64 const MaxSetTemp, // maximum supply air setpoint temperature
 			int const Strategy, // supply flow and temperature set strategy
 			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			FArray1_int const & CtrlNodes, // nodes where temperature is being set
+			Array1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt // the setpoint
 		) :
 			Name( Name ),
@@ -842,7 +847,7 @@ namespace SetPointManager {
 		int Strategy; // supply flow and temperature set strategy
 		// 2 = MinTemp
 		int NumCtrlNodes; // number of nodes whose temperature is being set
-		FArray1D_int CtrlNodes; // nodes where temperature is being set
+		Array1D_int CtrlNodes; // nodes where temperature is being set
 		Real64 SetPt; // the setpoint
 
 		// Default Constructor
@@ -867,7 +872,7 @@ namespace SetPointManager {
 			Real64 const MaxSetTemp, // maximum supply air setpoint temperature
 			int const Strategy, // supply flow and temperature set strategy
 			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			FArray1_int const & CtrlNodes, // nodes where temperature is being set
+			Array1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt // the setpoint
 		) :
 			Name( Name ),
@@ -898,7 +903,7 @@ namespace SetPointManager {
 		int Strategy; // supply flow and temperature set strategy
 		// 1 = TempFirst, 2 = FlowFirst
 		int NumCtrlNodes; // number of nodes whose temperature is being set
-		FArray1D_int CtrlNodes; // nodes where temperature is being set
+		Array1D_int CtrlNodes; // nodes where temperature is being set
 		Real64 SetPt; // the setpoint
 		Real64 MinTurndown; // minimum fractional flow rate
 		Real64 Turndown; // fractional flow rate
@@ -931,7 +936,7 @@ namespace SetPointManager {
 			Real64 const MaxSetTemp, // maximum supply air setpoint temperature
 			int const Strategy, // supply flow and temperature set strategy
 			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			FArray1_int const & CtrlNodes, // nodes where temperature is being set
+			Array1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt, // the setpoint
 			Real64 const MinTurndown, // minimum fractional flow rate
 			Real64 const Turndown, // fractional flow rate
@@ -964,7 +969,7 @@ namespace SetPointManager {
 		std::string CtrlVarType; // type of variable to be set
 		int CtrlTypeMode; // set to iCtrlVarType_xxxx
 		int NumCtrlNodes; // number of nodes whose temperature is being set
-		FArray1D_int CtrlNodes; // nodes where temperature is being set
+		Array1D_int CtrlNodes; // nodes where temperature is being set
 		std::string AirLoopName; // name of air loop that will use "warmest zone" strategy
 		int AirLoopNum; // index of named air loop
 		std::string Sched; // name of a schedule of supply air setpoint temperatures
@@ -998,7 +1003,7 @@ namespace SetPointManager {
 			std::string const & CtrlVarType, // type of variable to be set
 			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
 			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			FArray1_int const & CtrlNodes, // nodes where temperature is being set
+			Array1_int const & CtrlNodes, // nodes where temperature is being set
 			std::string const & AirLoopName, // name of air loop that will use "warmest zone" strategy
 			int const AirLoopNum, // index of named air loop
 			std::string const & Sched, // name of a schedule of supply air setpoint temperatures
@@ -1042,7 +1047,7 @@ namespace SetPointManager {
 		Real64 MinSetTemp; // minimum supply air setpoint temperature [C]
 		Real64 MaxSetTemp; // maximum supply air setpoint temperature [C]
 		int NumCtrlNodes; // number of nodes whose temperature is being set
-		FArray1D_int CtrlNodes; // nodes where temperature is being set
+		Array1D_int CtrlNodes; // nodes where temperature is being set
 		Real64 SetPt; // the temperature setpoint [C]
 
 		// Default Constructor
@@ -1065,7 +1070,7 @@ namespace SetPointManager {
 			Real64 const MinSetTemp, // minimum supply air setpoint temperature [C]
 			Real64 const MaxSetTemp, // maximum supply air setpoint temperature [C]
 			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			FArray1_int const & CtrlNodes, // nodes where temperature is being set
+			Array1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt // the temperature setpoint [C]
 		) :
 			Name( Name ),
@@ -1093,7 +1098,7 @@ namespace SetPointManager {
 		Real64 MinSetTemp; // minimum supply air setpoint temperature [C]
 		Real64 MaxSetTemp; // maximum supply air setpoint temperature [C]
 		int NumCtrlNodes; // number of nodes whose temperature is being set
-		FArray1D_int CtrlNodes; // nodes where temperature is being set
+		Array1D_int CtrlNodes; // nodes where temperature is being set
 		Real64 SetPt; // the temperature setpoint [C]
 
 		// Default Constructor
@@ -1116,7 +1121,7 @@ namespace SetPointManager {
 			Real64 const MinSetTemp, // minimum supply air setpoint temperature [C]
 			Real64 const MaxSetTemp, // maximum supply air setpoint temperature [C]
 			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			FArray1_int const & CtrlNodes, // nodes where temperature is being set
+			Array1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt // the temperature setpoint [C]
 		) :
 			Name( Name ),
@@ -1144,7 +1149,7 @@ namespace SetPointManager {
 		Real64 MinSetHum; // minimum supply air humidity ratio [kg/kg]
 		Real64 MaxSetHum; // maximum supply air humidity ratio [kg/kg]
 		int NumCtrlNodes; // number of nodes whose humidity ratio is being set
-		FArray1D_int CtrlNodes; // nodes where humidity ratio is being set
+		Array1D_int CtrlNodes; // nodes where humidity ratio is being set
 		Real64 SetPt; // the humidity ratio setpoint [kg/kg]
 
 		// Default Constructor
@@ -1167,7 +1172,7 @@ namespace SetPointManager {
 			Real64 const MinSetHum, // minimum supply air humidity ratio [kg/kg]
 			Real64 const MaxSetHum, // maximum supply air humidity ratio [kg/kg]
 			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
-			FArray1_int const & CtrlNodes, // nodes where humidity ratio is being set
+			Array1_int const & CtrlNodes, // nodes where humidity ratio is being set
 			Real64 const SetPt // the humidity ratio setpoint [kg/kg]
 		) :
 			Name( Name ),
@@ -1195,7 +1200,7 @@ namespace SetPointManager {
 		Real64 MinSetHum; // minimum supply air humidity ratio [kg/kg]
 		Real64 MaxSetHum; // maximum supply air humidity ratio [kg/kg]
 		int NumCtrlNodes; // number of nodes whose humidity ratio is being set
-		FArray1D_int CtrlNodes; // nodes where humidity ratio is being set
+		Array1D_int CtrlNodes; // nodes where humidity ratio is being set
 		Real64 SetPt; // the humidity ratio setpoint [kg/kg]
 
 		// Default Constructor
@@ -1218,7 +1223,7 @@ namespace SetPointManager {
 			Real64 const MinSetHum, // minimum supply air humidity ratio [kg/kg]
 			Real64 const MaxSetHum, // maximum supply air humidity ratio [kg/kg]
 			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
-			FArray1_int const & CtrlNodes, // nodes where humidity ratio is being set
+			Array1_int const & CtrlNodes, // nodes where humidity ratio is being set
 			Real64 const SetPt // the humidity ratio setpoint [kg/kg]
 		) :
 			Name( Name ),
@@ -1246,7 +1251,7 @@ namespace SetPointManager {
 		Real64 MinSetHum; // minimum supply air humidity ratio [kg/kg]
 		Real64 MaxSetHum; // maximum supply air humidity ratio [kg/kg]
 		int NumCtrlNodes; // number of nodes whose humidity ratio is being set
-		FArray1D_int CtrlNodes; // nodes where humidity ratio is being set
+		Array1D_int CtrlNodes; // nodes where humidity ratio is being set
 		Real64 SetPt; // the humidity ratio setpoint [kg/kg]
 
 		// Default Constructor
@@ -1269,7 +1274,7 @@ namespace SetPointManager {
 			Real64 const MinSetHum, // minimum supply air humidity ratio [kg/kg]
 			Real64 const MaxSetHum, // maximum supply air humidity ratio [kg/kg]
 			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
-			FArray1_int const & CtrlNodes, // nodes where humidity ratio is being set
+			Array1_int const & CtrlNodes, // nodes where humidity ratio is being set
 			Real64 const SetPt // the humidity ratio setpoint [kg/kg]
 		) :
 			Name( Name ),
@@ -1297,7 +1302,7 @@ namespace SetPointManager {
 		Real64 MinSetHum; // minimum supply air humidity ratio [kg/kg]
 		Real64 MaxSetHum; // maximum supply air humidity ratio [kg/kg]
 		int NumCtrlNodes; // number of nodes whose humidity ratio is being set
-		FArray1D_int CtrlNodes; // nodes where humidity ratio is being set
+		Array1D_int CtrlNodes; // nodes where humidity ratio is being set
 		Real64 SetPt; // the humidity ratio setpoint [kg/kg]
 
 		// Default Constructor
@@ -1320,7 +1325,7 @@ namespace SetPointManager {
 			Real64 const MinSetHum, // minimum supply air humidity ratio [kg/kg]
 			Real64 const MaxSetHum, // maximum supply air humidity ratio [kg/kg]
 			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
-			FArray1_int const & CtrlNodes, // nodes where humidity ratio is being set
+			Array1_int const & CtrlNodes, // nodes where humidity ratio is being set
 			Real64 const SetPt // the humidity ratio setpoint [kg/kg]
 		) :
 			Name( Name ),
@@ -1349,7 +1354,7 @@ namespace SetPointManager {
 		Real64 MinSetTemp; // Minimum supply air setpoint temperature
 		Real64 MaxSetTemp; // Maximum supply air setpoint temperature
 		int NumCtrlNodes; // number of nodes whose temperature is being set
-		FArray1D_int CtrlNodes; // nodes where temperature is being set
+		Array1D_int CtrlNodes; // nodes where temperature is being set
 		Real64 SetPt; // the setpoint
 
 		// Default Constructor
@@ -1374,7 +1379,7 @@ namespace SetPointManager {
 			Real64 const MinSetTemp, // Minimum supply air setpoint temperature
 			Real64 const MaxSetTemp, // Maximum supply air setpoint temperature
 			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			FArray1_int const & CtrlNodes, // nodes where temperature is being set
+			Array1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt // the setpoint
 		) :
 			Name( Name ),
@@ -1405,7 +1410,7 @@ namespace SetPointManager {
 		Real64 MinSetTemp; // Minimum supply air setpoint temperature
 		Real64 MaxSetTemp; // Maximum supply air setpoint temperature
 		int NumCtrlNodes; // number of nodes whose temperature is being set
-		FArray1D_int CtrlNodes; // nodes where temperature is being set
+		Array1D_int CtrlNodes; // nodes where temperature is being set
 		Real64 SetPt; // the setpoint
 
 		// Default Constructor
@@ -1432,7 +1437,7 @@ namespace SetPointManager {
 			Real64 const MinSetTemp, // Minimum supply air setpoint temperature
 			Real64 const MaxSetTemp, // Maximum supply air setpoint temperature
 			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			FArray1_int const & CtrlNodes, // nodes where temperature is being set
+			Array1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt // the setpoint
 		) :
 			Name( Name ),
@@ -1467,7 +1472,7 @@ namespace SetPointManager {
 		Real64 MinSetTemp; // Minimum supply air setpoint temperature
 		Real64 MaxSetTemp; // Maximum supply air setpoint temperature
 		int NumCtrlNodes; // number of nodes whose temperature is being set
-		FArray1D_int CtrlNodes; // nodes where temperature is being set
+		Array1D_int CtrlNodes; // nodes where temperature is being set
 		Real64 SetPt; // the setpoint
 
 		// Default Constructor
@@ -1492,7 +1497,7 @@ namespace SetPointManager {
 			Real64 const MinSetTemp, // Minimum supply air setpoint temperature
 			Real64 const MaxSetTemp, // Maximum supply air setpoint temperature
 			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			FArray1_int const & CtrlNodes, // nodes where temperature is being set
+			Array1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt // the setpoint
 		) :
 			Name( Name ),
@@ -1526,7 +1531,7 @@ namespace SetPointManager {
 		Real64 MaxCondEntTemp; // maximum condenser entering water temp
 		int NumCtrlNodes; // number of nodes whose temperature is being set
 		std::string CtrlNodeListName;
-		FArray1D_int CtrlNodes; // nodes where temperature is being set
+		Array1D_int CtrlNodes; // nodes where temperature is being set
 		Real64 SetPt; // the temperature set point [C]
 		int ChillerIndexPlantSide; // plant side chiller index
 		int ChillerIndexDemandSide; // demand side chiller index
@@ -1572,7 +1577,7 @@ namespace SetPointManager {
 			Real64 const MaxCondEntTemp, // maximum condenser entering water temp
 			int const NumCtrlNodes, // number of nodes whose temperature is being set
 			std::string const & CtrlNodeListName,
-			FArray1_int const & CtrlNodes, // nodes where temperature is being set
+			Array1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt, // the temperature set point [C]
 			int const ChillerIndexPlantSide, // plant side chiller index
 			int const ChillerIndexDemandSide, // demand side chiller index
@@ -1618,7 +1623,7 @@ namespace SetPointManager {
 		Real64 MaxCondEntTemp; // maximum condenser entering water temp
 		int NumCtrlNodes; // number of nodes whose temperature is being set
 		std::string CtrlNodeListName;
-		FArray1D_int CtrlNodes; // nodes where temperature is being set
+		Array1D_int CtrlNodes; // nodes where temperature is being set
 		Real64 SetPt; // the temperature set point [C]
 		int ChillerIndexPlantSide; // plant side chiller index
 		int BranchIndexPlantSide; // plant side branch index
@@ -1677,7 +1682,7 @@ namespace SetPointManager {
 			Real64 const MaxCondEntTemp, // maximum condenser entering water temp
 			int const NumCtrlNodes, // number of nodes whose temperature is being set
 			std::string const & CtrlNodeListName,
-			FArray1_int const & CtrlNodes, // nodes where temperature is being set
+			Array1_int const & CtrlNodes, // nodes where temperature is being set
 			Real64 const SetPt, // the temperature set point [C]
 			int const ChillerIndexPlantSide, // plant side chiller index
 			int const BranchIndexPlantSide, // plant side branch index
@@ -1743,7 +1748,7 @@ namespace SetPointManager {
 		Real64 CoolingOnTemp; // minimum supply air setpoint temperature
 		Real64 CoolingOffTemp; // maximum supply air setpoint temperature
 		int NumCtrlNodes;
-		FArray1D_int CtrlNodes; // node numbers of nodes where setpoint is to be set
+		Array1D_int CtrlNodes; // node numbers of nodes where setpoint is to be set
 		Real64 SetPt; // the setpoint
 
 		// Default Constructor
@@ -1768,7 +1773,7 @@ namespace SetPointManager {
 			Real64 const CoolingOnTemp, // minimum supply air setpoint temperature
 			Real64 const CoolingOffTemp, // maximum supply air setpoint temperature
 			int const NumCtrlNodes,
-			FArray1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
+			Array1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
 			Real64 const SetPt // the setpoint
 		) :
 			Name( Name ),
@@ -1798,7 +1803,7 @@ namespace SetPointManager {
 		Real64 HeatingOnTemp; // minimum supply air setpoint temperature
 		Real64 HeatingOffTemp; // maximum supply air setpoint temperature
 		int NumCtrlNodes;
-		FArray1D_int CtrlNodes; // node numbers of nodes where setpoint is to be set
+		Array1D_int CtrlNodes; // node numbers of nodes where setpoint is to be set
 		Real64 SetPt; // the setpoint
 
 		// Default Constructor
@@ -1823,7 +1828,7 @@ namespace SetPointManager {
 			Real64 const HeatingOnTemp, // minimum supply air setpoint temperature
 			Real64 const HeatingOffTemp, // maximum supply air setpoint temperature
 			int const NumCtrlNodes,
-			FArray1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
+			Array1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
 			Real64 const SetPt // the setpoint
 		) :
 			Name( Name ),
@@ -1841,36 +1846,107 @@ namespace SetPointManager {
 
 	};
 
-	// Object Data
-	extern FArray1D< DataSetPointManager > AllSetPtMgr; // Array for all Setpoint Manager data(warnings)
-	extern FArray1D< DefineScheduledSetPointManager > SchSetPtMgr; // Array for Scheduled Setpoint Manager data
-	extern FArray1D< DefineSchedDualSetPointManager > DualSchSetPtMgr; // Dual Scheduled Setpoint Manager data
-	extern FArray1D< DefineOutsideAirSetPointManager > OutAirSetPtMgr; // Array for Outside Air Setpoint Manager data
-	extern FArray1D< DefineSZReheatSetPointManager > SingZoneRhSetPtMgr; // Array for SZRH Set Pt Mgr
-	extern FArray1D< DefineSZHeatingSetPointManager > SingZoneHtSetPtMgr; // Array for SZ Heating Set Pt Mgr
-	extern FArray1D< DefineSZCoolingSetPointManager > SingZoneClSetPtMgr; // Array for SZ Cooling Set Pt Mgr
-	extern FArray1D< DefineSZMinHumSetPointManager > SZMinHumSetPtMgr; // Array for SZ Min Hum Set Pt Mgr
-	extern FArray1D< DefineSZMaxHumSetPointManager > SZMaxHumSetPtMgr; // Array for SZ Max Hum Set Pt Mgr
-	extern FArray1D< DefineMixedAirSetPointManager > MixedAirSetPtMgr; // Array for Mixed Air Set Pt Mgr
-	extern FArray1D< DefineOAPretreatSetPointManager > OAPretreatSetPtMgr; // Array for OA Pretreat Set Pt Mgr
-	extern FArray1D< DefineWarmestSetPointManager > WarmestSetPtMgr; // Array for Warmest Set Pt Mgr
-	extern FArray1D< DefineColdestSetPointManager > ColdestSetPtMgr; // Array for Coldest Set Pt Mgr
-	extern FArray1D< DefWarmestSetPtManagerTempFlow > WarmestSetPtMgrTempFlow; // Array for Warmest Set Pt Mgr
-	extern FArray1D< DefRABFlowSetPointManager > RABFlowSetPtMgr; // Array for return air bypass
-	extern FArray1D< DefMultiZoneAverageCoolingSetPointManager > MZAverageCoolingSetPtMgr; // Array for MultiZone
-	extern FArray1D< DefMultiZoneAverageHeatingSetPointManager > MZAverageHeatingSetPtMgr; // Array for MultiZone
-	extern FArray1D< DefMultiZoneAverageMinHumSetPointManager > MZAverageMinHumSetPtMgr; // Array for MultiZone
-	extern FArray1D< DefMultiZoneAverageMaxHumSetPointManager > MZAverageMaxHumSetPtMgr; // Array for MultiZone
-	extern FArray1D< DefMultiZoneMinHumSetPointManager > MZMinHumSetPtMgr; // Multizone min humidity rat Set Pt Mgr
-	extern FArray1D< DefMultiZoneMaxHumSetPointManager > MZMaxHumSetPtMgr; // Multizone max humidity rat Set Pt Mgr
-	extern FArray1D< DefineFollowOATempSetPointManager > FollowOATempSetPtMgr; // Array for Follow Outdoor Air
-	extern FArray1D< DefineFollowSysNodeTempSetPointManager > FollowSysNodeTempSetPtMgr; // Array for Follow System
-	extern FArray1D< DefineGroundTempSetPointManager > GroundTempSetPtMgr; // Array for Ground Temp Setpoint
-	extern FArray1D< DefineCondEntSetPointManager > CondEntSetPtMgr; // Condenser Entering Water Set Pt Mgr
-	extern FArray1D< DefineIdealCondEntSetPointManager > IdealCondEntSetPtMgr; // Ideal Condenser Entering Set Pt Mgr
-	extern FArray1D< DefineSZOneStageCoolinggSetPointManager > SZOneStageCoolingSetPtMgr; // single zone 1 stage cool
-	extern FArray1D< DefineSZOneStageHeatingSetPointManager > SZOneStageHeatingSetPtMgr; // single zone 1 stage heat
+	struct DefineReturnWaterChWSetPointManager // derived type for SetpointManager:SupplyResetForReturnTemperature:ChilledWater data
+	{
+		// Members
+		std::string Name;
+		int returnNodeIndex; // node ID for the plant supply-side return node
+		int supplyNodeIndex; // node ID for the plant supply-side supply node
+		Real64 minimumChilledWaterSetpoint; // the minimum reset temperature for the chilled water setpoint
+		Real64 maximumChilledWaterSetpoint; // the maximum reset temperature for the chilled water setpoint
+		int returnTemperatureScheduleIndex; // the index in Schedules array for the scheduled return temperature; zero if not used
+		Real64 returnTemperatureConstantTarget; // the constant value used as the return temperature target; used if schedule index is zero
+		Real64 currentSupplySetPt; // the current supply setpoint temperature
+		int plantLoopIndex; // the index for the plant loop for this manager, zero if not initialized
+		int plantSetpointNodeIndex; // the index for the node where the plant setpoint is set, need to look up after Plant is established
+		bool useReturnTempSetpoint; // only true if the target return temperature should be looked up as the Node(returnNode).TempSetPoint
 
+		// Default Constructor
+		DefineReturnWaterChWSetPointManager() :
+			Name( "" ),
+			returnNodeIndex( 0 ),
+			supplyNodeIndex( 0 ),
+			minimumChilledWaterSetpoint( 0.0 ),
+			maximumChilledWaterSetpoint( 0.0 ),
+			returnTemperatureScheduleIndex( 0 ),
+			returnTemperatureConstantTarget( 0.0 ),
+			currentSupplySetPt( 0.0 ),
+			plantLoopIndex( 0 ),
+			plantSetpointNodeIndex( 0 ),
+			useReturnTempSetpoint( false )
+		{}
+
+		// Calculation method
+		void calculate( DataLoopNode::NodeData & returnNode, DataLoopNode::NodeData & supplyNode );
+
+	};
+
+	struct DefineReturnWaterHWSetPointManager // derived type for SetpointManager:SupplyResetForReturnTemperature:HotWater data
+	{
+		// Members
+		std::string Name;
+		int returnNodeIndex; // node ID for the plant supply-side return node
+		int supplyNodeIndex; // node ID for the plant supply-side supply node
+		Real64 maximumHotWaterSetpoint; // the maximum reset temperature for the hot water setpoint
+		Real64 minimumHotWaterSetpoint; // the minimum reset temperature for the hot water setpoint
+		int returnTemperatureScheduleIndex; // the index in Schedules array for the scheduled return temperature; zero if not used
+		Real64 returnTemperatureConstantTarget; // the constant value used as the return temperature target; used if schedule index is zero
+		Real64 currentSupplySetPt; // the current supply setpoint temperature
+		int plantLoopIndex; // the index for the plant loop for this manager, zero if not initialized
+		int plantSetpointNodeIndex; // the index for the node where the plant setpoint is set, need to look up after Plant is established
+		bool useReturnTempSetpoint; // only true if the target return temperature should be looked up as the Node(returnNode).TempSetPoint
+
+		// Default Constructor
+		DefineReturnWaterHWSetPointManager() :
+			Name( "" ),
+			returnNodeIndex( 0 ),
+			supplyNodeIndex( 0 ),
+			maximumHotWaterSetpoint( 0.0 ),
+			minimumHotWaterSetpoint( 0.0 ),
+			returnTemperatureScheduleIndex( 0 ),
+			returnTemperatureConstantTarget( 0.0 ),
+			currentSupplySetPt( 0.0 ),
+			plantLoopIndex( 0 ),
+			plantSetpointNodeIndex( 0 ),
+			useReturnTempSetpoint( false )
+		{}
+
+		// Calculation method
+		void calculate( DataLoopNode::NodeData & returnNode, DataLoopNode::NodeData & supplyNode );
+
+	};
+
+	// Object Data
+	extern Array1D< DataSetPointManager > AllSetPtMgr; // Array for all Setpoint Manager data(warnings)
+	extern Array1D< DefineScheduledSetPointManager > SchSetPtMgr; // Array for Scheduled Setpoint Manager data
+	extern Array1D< DefineSchedDualSetPointManager > DualSchSetPtMgr; // Dual Scheduled Setpoint Manager data
+	extern Array1D< DefineOutsideAirSetPointManager > OutAirSetPtMgr; // Array for Outside Air Setpoint Manager data
+	extern Array1D< DefineSZReheatSetPointManager > SingZoneRhSetPtMgr; // Array for SZRH Set Pt Mgr
+	extern Array1D< DefineSZHeatingSetPointManager > SingZoneHtSetPtMgr; // Array for SZ Heating Set Pt Mgr
+	extern Array1D< DefineSZCoolingSetPointManager > SingZoneClSetPtMgr; // Array for SZ Cooling Set Pt Mgr
+	extern Array1D< DefineSZMinHumSetPointManager > SZMinHumSetPtMgr; // Array for SZ Min Hum Set Pt Mgr
+	extern Array1D< DefineSZMaxHumSetPointManager > SZMaxHumSetPtMgr; // Array for SZ Max Hum Set Pt Mgr
+	extern Array1D< DefineMixedAirSetPointManager > MixedAirSetPtMgr; // Array for Mixed Air Set Pt Mgr
+	extern Array1D< DefineOAPretreatSetPointManager > OAPretreatSetPtMgr; // Array for OA Pretreat Set Pt Mgr
+	extern Array1D< DefineWarmestSetPointManager > WarmestSetPtMgr; // Array for Warmest Set Pt Mgr
+	extern Array1D< DefineColdestSetPointManager > ColdestSetPtMgr; // Array for Coldest Set Pt Mgr
+	extern Array1D< DefWarmestSetPtManagerTempFlow > WarmestSetPtMgrTempFlow; // Array for Warmest Set Pt Mgr
+	extern Array1D< DefRABFlowSetPointManager > RABFlowSetPtMgr; // Array for return air bypass
+	extern Array1D< DefMultiZoneAverageCoolingSetPointManager > MZAverageCoolingSetPtMgr; // Array for MultiZone
+	extern Array1D< DefMultiZoneAverageHeatingSetPointManager > MZAverageHeatingSetPtMgr; // Array for MultiZone
+	extern Array1D< DefMultiZoneAverageMinHumSetPointManager > MZAverageMinHumSetPtMgr; // Array for MultiZone
+	extern Array1D< DefMultiZoneAverageMaxHumSetPointManager > MZAverageMaxHumSetPtMgr; // Array for MultiZone
+	extern Array1D< DefMultiZoneMinHumSetPointManager > MZMinHumSetPtMgr; // Multizone min humidity rat Set Pt Mgr
+	extern Array1D< DefMultiZoneMaxHumSetPointManager > MZMaxHumSetPtMgr; // Multizone max humidity rat Set Pt Mgr
+	extern Array1D< DefineFollowOATempSetPointManager > FollowOATempSetPtMgr; // Array for Follow Outdoor Air
+	extern Array1D< DefineFollowSysNodeTempSetPointManager > FollowSysNodeTempSetPtMgr; // Array for Follow System
+	extern Array1D< DefineGroundTempSetPointManager > GroundTempSetPtMgr; // Array for Ground Temp Setpoint
+	extern Array1D< DefineCondEntSetPointManager > CondEntSetPtMgr; // Condenser Entering Water Set Pt Mgr
+	extern Array1D< DefineIdealCondEntSetPointManager > IdealCondEntSetPtMgr; // Ideal Condenser Entering Set Pt Mgr
+	extern Array1D< DefineSZOneStageCoolinggSetPointManager > SZOneStageCoolingSetPtMgr; // single zone 1 stage cool
+	extern Array1D< DefineSZOneStageHeatingSetPointManager > SZOneStageHeatingSetPtMgr; // single zone 1 stage heat
+	extern Array1D< DefineReturnWaterChWSetPointManager > ReturnWaterResetChWSetPtMgr; // return water reset
+	extern Array1D< DefineReturnWaterHWSetPointManager > ReturnWaterResetHWSetPtMgr; // hot-water return reset
 	// Functions
 
 	void
@@ -2005,7 +2081,7 @@ namespace SetPointManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

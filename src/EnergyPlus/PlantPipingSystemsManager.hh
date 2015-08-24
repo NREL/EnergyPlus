@@ -2,7 +2,7 @@
 #define PlantPipingSystemsManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -47,8 +47,8 @@ namespace PlantPipingSystemsManager {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern FArray1D_int NeighborFieldCells;
-	extern FArray1D_int NeighborBoundaryCells;
+	extern Array1D_int NeighborFieldCells;
+	extern Array1D_int NeighborBoundaryCells;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 	// ************************************* !
@@ -269,7 +269,7 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	FArray1D_int
+	Array1D_int
 	GetSurfaceIndecesForOSCM(
 		int const OSCMIndex,
 		int const SurfCount
@@ -279,7 +279,7 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	FArray1D< ZoneCoupledSurfaceData >
+	Array1D< ZoneCoupledSurfaceData >
 	GetSurfaceDataForOSCM(
 		int const OSCMIndex,
 		int const SurfCount
@@ -341,7 +341,7 @@ namespace PlantPipingSystemsManager {
 
 	bool
 	MeshPartitionArray_Contains(
-		FArray1D< MeshPartition > const & meshes,
+		Array1D< MeshPartition > const & meshes,
 		Real64 const value
 	);
 
@@ -367,7 +367,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	void
-	MeshPartition_SelectionSort( FArray1< MeshPartition > & X );
+	MeshPartition_SelectionSort( Array1< MeshPartition > & X );
 
 	//*********************************************************************************************!
 
@@ -565,7 +565,7 @@ namespace PlantPipingSystemsManager {
 
 	NeighborInformation
 	NeighborInformationArray_Value(
-		FArray1D< DirectionNeighbor_Dictionary > const & dict,
+		Array1D< DirectionNeighbor_Dictionary > const & dict,
 		int const Direction // From Enum: Direction
 	);
 
@@ -634,10 +634,10 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	FArray1D< GridRegion >
+	Array1D< GridRegion >
 	CreatePartitionRegionList(
 		int const DomainNum,
-		FArray1D< MeshPartition > const & ThesePartitionCenters,
+		Array1D< MeshPartition > const & ThesePartitionCenters,
 		bool const PartitionsExist,
 		Real64 const DirExtentMax,
 		int const PartitionsUBound
@@ -649,7 +649,7 @@ namespace PlantPipingSystemsManager {
 
 	int
 	CreateRegionListCount(
-		FArray1D< GridRegion > const & ThesePartitionRegions,
+		Array1D< GridRegion > const & ThesePartitionRegions,
 		Real64 const DirExtentMax,
 		bool const PartitionsExist
 	);
@@ -658,10 +658,10 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	FArray1D< GridRegion >
+	Array1D< GridRegion >
 	CreateRegionList(
 		int const DomainNum,
-		FArray1D< GridRegion > const & ThesePartitionRegions,
+		Array1D< GridRegion > const & ThesePartitionRegions,
 		Real64 const DirExtentMax,
 		int const DirDirection,
 		int const RetValUBound,
@@ -685,7 +685,7 @@ namespace PlantPipingSystemsManager {
 
 	int
 	CreateBoundaryListCount(
-		FArray1D< GridRegion > const & RegionList,
+		Array1D< GridRegion > const & RegionList,
 		int const DirDirection
 	);
 
@@ -693,9 +693,9 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	FArray1D< Real64 >
+	Array1D< Real64 >
 	CreateBoundaryList(
-		FArray1D< GridRegion > const & RegionList,
+		Array1D< GridRegion > const & RegionList,
 		Real64 const DirExtentMax,
 		int const DirDirection,
 		int const RetValLbound,
@@ -709,9 +709,9 @@ namespace PlantPipingSystemsManager {
 	void
 	CreateCellArray(
 		int const DomainNum,
-		FArray1D< Real64 > const & XBoundaryPoints,
-		FArray1D< Real64 > const & YBoundaryPoints,
-		FArray1D< Real64 > const & ZBoundaryPoints
+		Array1D< Real64 > const & XBoundaryPoints,
+		Array1D< Real64 > const & YBoundaryPoints,
+		Array1D< Real64 > const & ZBoundaryPoints
 	);
 
 	//*********************************************************************************************!
@@ -1104,7 +1104,7 @@ namespace PlantPipingSystemsManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

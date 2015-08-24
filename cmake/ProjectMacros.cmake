@@ -93,6 +93,13 @@ endmacro()
 # Create test targets
 macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
   if( BUILD_TESTING )
+
+    IF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
+      # Disabled Warnings:
+      # 1684 conversion from pointer to same-sized integral type (potential portability problem) - Due to gtest...
+      ADD_CXX_DEFINITIONS("-diag-disable:1684")
+    endif ()
+
     add_executable( ${BASE_NAME}_tests ${SRC} )
 
     if( ENABLE_GTEST_DEBUG_MODE )
@@ -145,9 +152,9 @@ function( ADD_SIMULATION_TEST )
   endif()
 
   if(ANNUAL_SIMULATION)
-   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -a" )
+   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -a -r" )
   else()
-   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -D" )
+   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -D -r" )
   endif()
   
   get_filename_component(IDF_NAME "${ADD_SIM_TEST_IDF_FILE}" NAME_WE)

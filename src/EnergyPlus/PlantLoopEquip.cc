@@ -208,14 +208,8 @@ namespace PlantLoopEquip {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int CompNum; // Plant side component list equipment number
-		int BrnNum; // Branch counter
 		int EquipNum; // Plant side component list equipment number
 		int EquipTypeNum;
-		int BranchInletNode;
-		int LastNodeOnBranch;
-		int PumpOutletNode;
-		int LoopControl;
 		bool RunFlag; // TRUE if operating this iteration
 		// std::string EquipType; // local equipment type
 		// std::string EquipName; // local equipment name
@@ -225,11 +219,7 @@ namespace PlantLoopEquip {
 		Real64 MinLoad;
 		Real64 OptLoad;
 		Real64 SizingFac; // the component sizing fraction
-		static Real64 BranchFlowRequest( 0.0 );
-		static Real64 InitialBranchFlow( 0.0 );
 		int GeneralEquipType; // Basic Equipment type from EquipType Used to help organize this routine
-		static bool PumpPowerToLoop( false );
-		static bool RunLoopPumps( false );
 		Real64 TempCondInDesign; // Design condenser inlet temp. C , or 25.d0
 		Real64 TempEvapOutDesign;
 
@@ -256,7 +246,6 @@ namespace PlantLoopEquip {
 		CurLoad = sim_component.MyLoad;
 
 		//select equipment and call equiment simulation
-		TypeOfEquip:
 		//PIPES
 		//Pipe has no special types at the moment, so find it this way
 		if ( GeneralEquipType == GenEquipTypes_Pipe ) {
@@ -670,7 +659,7 @@ namespace PlantLoopEquip {
 				}
 
 				// HEAT PUMP WATER HEATER
-			} else if ( EquipTypeNum == TypeOf_HeatPumpWtrHeater ) {
+			} else if ( EquipTypeNum == TypeOf_HeatPumpWtrHeaterPumped || EquipTypeNum == TypeOf_HeatPumpWtrHeaterWrapped ) {
 				SimWaterThermalTank( EquipTypeNum, sim_component.Name, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration, LoopNum, LoopSideNum ); //DSU
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
@@ -1052,7 +1041,7 @@ namespace PlantLoopEquip {
 			} else if ( EquipTypeNum == TypeOf_UnitarySystemRecovery ) {
 
 			} else if ( EquipTypeNum == TypeOf_SwimmingPool_Indoor ) {
-				
+
 			} else {
 
 				ShowSevereError( "SimPlantEquip: Invalid ZoneHVAC Type=" + sim_component.TypeOf );
@@ -1144,7 +1133,7 @@ namespace PlantLoopEquip {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

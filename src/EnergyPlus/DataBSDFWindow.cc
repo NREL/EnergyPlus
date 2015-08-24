@@ -70,14 +70,14 @@ namespace DataBSDFWindow {
 	int MaxBkSurf( 20 ); // was 20    Maximum number of back surfaces in solar overlap & interior solar distribution
 	int TotThermalModels( 0 ); // Number of thermal models
 	//calculation
-	FArray3D< Real64 > SUNCOSTS( 3, 24, 60 ); // Timestep values of solar direction cosines
-	FArray2D< Real64 > BSDFTempMtrx; // Temporary matrix for holding axisymmetric input
+	Array3D< Real64 > SUNCOSTS( 60, 24, 3 ); // Timestep values of solar direction cosines
+	Array2D< Real64 > BSDFTempMtrx; // Temporary matrix for holding axisymmetric input
 
 	// Object Data
-	FArray1D< BSDFWindowGeomDescr > ComplexWind; // Window geometry structure: set in CalcPerSolarBeam/SolarShading
+	Array1D< BSDFWindowGeomDescr > ComplexWind; // Window geometry structure: set in CalcPerSolarBeam/SolarShading
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

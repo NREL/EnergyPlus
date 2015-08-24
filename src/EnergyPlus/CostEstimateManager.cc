@@ -1,6 +1,6 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
@@ -282,26 +282,16 @@ namespace CostEstimateManager {
 
 		// Using/Aliasing
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
-		using DataGlobals::NumOfZones;
 		using DataHeatBalance::Construct;
-		using DataHeatBalance::TotConstructs;
-		using DataHeatBalance::Lights;
 		using DataHeatBalance::Zone;
-		using DataHeatBalance::TotLights;
 		using InputProcessor::FindItem;
 		using DXCoils::DXCoil;
-		using DXCoils::NumDXCoils;
 		using PlantChillers::ElectricChiller;
 		using PlantChillers::ElectricChillerSpecs;
-		using PlantChillers::NumElectricChillers;
 		using DataPhotovoltaics::PVarray;
-		using DataPhotovoltaics::NumPVs;
-		using DataPhotovoltaics::NumSimplePVModuleTypes;
 		using DataPhotovoltaics::iSimplePVModel;
 		using namespace DataDaylighting;
 		using HeatingCoils::HeatingCoil;
-		using HeatingCoils::NumHeatingCoils;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -352,7 +342,7 @@ namespace CostEstimateManager {
 				}
 
 				ThisConstructStr = CostLineItem( Item ).ParentObjName;
-				ThisConstructID = FindItem( ThisConstructStr, Construct.Name(), TotConstructs );
+				ThisConstructID = FindItem( ThisConstructStr, Construct );
 				if ( ThisConstructID == 0 ) { // do any surfaces have the specified construction? If not issue warning.
 					ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\" Construction=\"" + CostLineItem( Item ).ParentObjName + "\", no surfaces have the Construction specified" );
 					ShowContinueError( "No costs will be calculated for this Construction." );
@@ -385,7 +375,7 @@ namespace CostEstimateManager {
 					ErrorsFound = true;
 
 				} else { // assume name is probably useful
-					thisCoil = FindItem( CostLineItem( Item ).ParentObjName, DXCoil.Name(), NumDXCoils );
+					thisCoil = FindItem( CostLineItem( Item ).ParentObjName, DXCoil );
 					if ( thisCoil == 0 ) {
 						ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:DX, invalid coil specified" );
 						ShowContinueError( "Coil Specified=\"" + CostLineItem( Item ).ParentObjName + "\", calculations will not be completed for this item." );
@@ -418,7 +408,7 @@ namespace CostEstimateManager {
 					ErrorsFound = true;
 
 				} else { // assume name is probably useful
-					thisCoil = FindItem( CostLineItem( Item ).ParentObjName, HeatingCoil.Name(), NumHeatingCoils );
+					thisCoil = FindItem( CostLineItem( Item ).ParentObjName, HeatingCoil );
 					if ( thisCoil == 0 ) {
 						ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Gas, invalid coil specified" );
 						ShowContinueError( "Coil Specified=\"" + CostLineItem( Item ).ParentObjName + "\", calculations will not be completed for this item." );
@@ -431,7 +421,7 @@ namespace CostEstimateManager {
 					ErrorsFound = true;
 				}
 
-				thisChil = FindItem( CostLineItem( Item ).ParentObjName, ElectricChiller.ma( &ElectricChillerSpecs::Base ).Name(), NumElectricChillers );
+				thisChil = FindItem( CostLineItem( Item ).ParentObjName, ElectricChiller.ma( &ElectricChillerSpecs::Base ) );
 				if ( thisChil == 0 ) {
 					ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Chiller:Electric, invalid chiller specified." );
 					ShowContinueError( "Chiller Specified=\"" + CostLineItem( Item ).ParentObjName + "\", calculations will not be completed for this item." );
@@ -446,7 +436,7 @@ namespace CostEstimateManager {
 					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Daylighting:Controls, need to specify a Reference Object Name" );
 					ErrorsFound = true;
 				} else {
-					ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone.Name(), NumOfZones );
+					ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone );
 					if ( ThisZoneID > 0 ) {
 						CostLineItem( Item ).Qty = ZoneDaylight( ThisZoneID ).TotalDaylRefPoints;
 					} else {
@@ -458,9 +448,9 @@ namespace CostEstimateManager {
 
 			} else if ( SELECT_CASE_var == "SHADING:ZONE:DETAILED" ) {
 				if ( CostLineItem( Item ).ParentObjName != "" ) {
-					ThisSurfID = FindItem( CostLineItem( Item ).ParentObjName, Surface.Name(), TotSurfaces );
+					ThisSurfID = FindItem( CostLineItem( Item ).ParentObjName, Surface );
 					if ( ThisSurfID > 0 ) {
-						ThisZoneID = FindItem( Surface( ThisSurfID ).ZoneName, Zone.Name(), NumOfZones );
+						ThisZoneID = FindItem( Surface( ThisSurfID ).ZoneName, Zone );
 						if ( ThisZoneID == 0 ) {
 							ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Shading:Zone:Detailed, need to specify a valid zone name" );
 							ShowContinueError( "Zone specified=\"" + Surface( ThisSurfID ).ZoneName + "\"." );
@@ -485,7 +475,7 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKiloWattCap != 0.0 ) {
 					if ( CostLineItem( Item ).ParentObjName != "" ) {
-						ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone.Name(), NumOfZones );
+						ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone );
 						if ( ThisZoneID == 0 ) {
 							ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Lights, need to specify a valid zone name" );
 							ShowContinueError( "Zone specified=\"" + CostLineItem( Item ).ParentObjName + "\"." );
@@ -501,9 +491,9 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKiloWattCap != 0.0 ) {
 					if ( CostLineItem( Item ).ParentObjName != "" ) {
-						thisPV = FindItem( CostLineItem( Item ).ParentObjName, PVarray.Name(), NumPVs );
+						thisPV = FindItem( CostLineItem( Item ).ParentObjName, PVarray );
 						if ( thisPV > 0 ) {
-							ThisZoneID = FindItem( Surface( PVarray( thisPV ).SurfacePtr ).ZoneName, Zone.Name(), NumOfZones );
+							ThisZoneID = FindItem( Surface( PVarray( thisPV ).SurfacePtr ).ZoneName, Zone );
 							if ( ThisZoneID == 0 ) {
 								Multipliers = 1.0;
 							} else {
@@ -560,21 +550,15 @@ namespace CostEstimateManager {
 		// Using/Aliasing
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfaces;
-		using DataGlobals::NumOfZones;
 		using DataHeatBalance::Construct;
-		using DataHeatBalance::TotConstructs;
 		using DataHeatBalance::Lights;
 		using DataHeatBalance::Zone;
-		using DataHeatBalance::TotLights;
 		using InputProcessor::FindItem;
 		using DXCoils::DXCoil;
 		using DXCoils::NumDXCoils;
 		using PlantChillers::ElectricChiller;
 		using PlantChillers::ElectricChillerSpecs;
-		using PlantChillers::NumElectricChillers;
 		using DataPhotovoltaics::PVarray;
-		using DataPhotovoltaics::NumPVs;
-		using DataPhotovoltaics::NumSimplePVModuleTypes;
 		using DataPhotovoltaics::iSimplePVModel;
 		using namespace DataDaylighting;
 		using HeatingCoils::HeatingCoil;
@@ -601,8 +585,8 @@ namespace CostEstimateManager {
 
 		std::string ThisConstructStr;
 
-		FArray1D_bool uniqueSurfMask;
-		FArray1D< Real64 > SurfMultipleARR;
+		Array1D_bool uniqueSurfMask;
+		Array1D< Real64 > SurfMultipleARR;
 		int surf; // do-loop counter for checking for surfaces for uniqueness
 		int thisCoil; // index of named coil in its derived type
 		bool WildcardObjNames;
@@ -626,7 +610,7 @@ namespace CostEstimateManager {
 			} else if ( SELECT_CASE_var == "CONSTRUCTION" ) {
 
 				ThisConstructStr = CostLineItem( Item ).ParentObjName;
-				ThisConstructID = FindItem( ThisConstructStr, Construct.Name(), TotConstructs );
+				ThisConstructID = FindItem( ThisConstructStr, Construct );
 				// need to determine unique surfacs... some surfaces are shared by zones and hence doubled
 				uniqueSurfMask.dimension( TotSurfaces, true ); //init to true and change duplicates to false
 				SurfMultipleARR.dimension( TotSurfaces, 1.0 );
@@ -660,7 +644,7 @@ namespace CostEstimateManager {
 				if ( CostLineItem( Item ).ParentObjName == "*" ) { // wildcard, apply to all such components
 					WildcardObjNames = true;
 				} else if ( CostLineItem( Item ).ParentObjName != "" ) {
-					thisCoil = FindItem( CostLineItem( Item ).ParentObjName, DXCoil.Name(), NumDXCoils );
+					thisCoil = FindItem( CostLineItem( Item ).ParentObjName, DXCoil );
 				}
 
 				if ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) {
@@ -708,7 +692,7 @@ namespace CostEstimateManager {
 				if ( CostLineItem( Item ).ParentObjName == "*" ) { // wildcard, apply to all such components
 					WildcardObjNames = true;
 				} else if ( CostLineItem( Item ).ParentObjName != "" ) {
-					thisCoil = FindItem( CostLineItem( Item ).ParentObjName, HeatingCoil.Name(), NumHeatingCoils );
+					thisCoil = FindItem( CostLineItem( Item ).ParentObjName, HeatingCoil );
 				}
 
 				if ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) {
@@ -751,7 +735,7 @@ namespace CostEstimateManager {
 				}
 
 			} else if ( SELECT_CASE_var == "CHILLER:ELECTRIC" ) {
-				thisChil = FindItem( CostLineItem( Item ).ParentObjName, ElectricChiller.ma( &ElectricChillerSpecs::Base ).Name(), NumElectricChillers );
+				thisChil = FindItem( CostLineItem( Item ).ParentObjName, ElectricChiller.ma( &ElectricChillerSpecs::Base ) );
 				if ( ( thisChil > 0 ) && ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) ) {
 					CostLineItem( Item ).Qty = ElectricChiller( thisChil ).Base.NomCap / 1000.0;
 					CostLineItem( Item ).Units = "kW (tot cool cap.)";
@@ -778,7 +762,7 @@ namespace CostEstimateManager {
 					WildcardObjNames = true;
 					CostLineItem( Item ).Qty = sum( ZoneDaylight.TotalDaylRefPoints() );
 				} else if ( CostLineItem( Item ).ParentObjName != "" ) {
-					ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone.Name(), NumOfZones );
+					ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone );
 					if ( ThisZoneID > 0 ) {
 						CostLineItem( Item ).Qty = ZoneDaylight( ThisZoneID ).TotalDaylRefPoints;
 					}
@@ -790,9 +774,9 @@ namespace CostEstimateManager {
 
 			} else if ( SELECT_CASE_var == "SHADING:ZONE:DETAILED" ) {
 				if ( CostLineItem( Item ).ParentObjName != "" ) {
-					ThisSurfID = FindItem( CostLineItem( Item ).ParentObjName, Surface.Name(), TotSurfaces );
+					ThisSurfID = FindItem( CostLineItem( Item ).ParentObjName, Surface );
 					if ( ThisSurfID > 0 ) {
-						ThisZoneID = FindItem( Surface( ThisSurfID ).ZoneName, Zone.Name(), NumOfZones );
+						ThisZoneID = FindItem( Surface( ThisSurfID ).ZoneName, Zone );
 						if ( ThisZoneID > 0 ) {
 							CostLineItem( Item ).Qty = Surface( ThisSurfID ).Area * Zone( ThisZoneID ).Multiplier * Zone( ThisZoneID ).ListMultiplier;
 							CostLineItem( Item ).Units = "m2";
@@ -813,7 +797,7 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKiloWattCap != 0.0 ) {
 					if ( CostLineItem( Item ).ParentObjName != "" ) {
-						ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone.Name(), NumOfZones );
+						ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone );
 						if ( ThisZoneID > 0 ) {
 							CostLineItem( Item ).Qty = ( Zone( ThisZoneID ).Multiplier * Zone( ThisZoneID ).ListMultiplier / 1000.0 ) * sum( Lights.DesignLevel(), Lights.ZonePtr() == ThisZoneID ); //this handles more than one light object per zone.
 							CostLineItem( Item ).Units = "kW";
@@ -827,9 +811,9 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKiloWattCap != 0.0 ) {
 					if ( CostLineItem( Item ).ParentObjName != "" ) {
-						thisPV = FindItem( CostLineItem( Item ).ParentObjName, PVarray.Name(), NumPVs );
+						thisPV = FindItem( CostLineItem( Item ).ParentObjName, PVarray );
 						if ( thisPV > 0 ) {
-							ThisZoneID = FindItem( Surface( PVarray( thisPV ).SurfacePtr ).ZoneName, Zone.Name(), NumOfZones );
+							ThisZoneID = FindItem( Surface( PVarray( thisPV ).SurfacePtr ).ZoneName, Zone );
 							if ( ThisZoneID == 0 ) {
 								Multipliers = 1.0;
 							} else {
@@ -858,7 +842,7 @@ namespace CostEstimateManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

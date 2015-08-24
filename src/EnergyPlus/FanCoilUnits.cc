@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -129,8 +129,8 @@ namespace FanCoilUnits {
 
 	int NumFanCoils( 0 );
 	int Num4PipeFanCoils( 0 );
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
 	bool GetFanCoilInputFlag( true ); // First time, input is "gotten"
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
@@ -138,8 +138,8 @@ namespace FanCoilUnits {
 	// look up functions for node numbers
 
 	// Object Data
-	FArray1D< FanCoilData > FanCoil;
-	FArray1D< FanCoilNumericFieldData > FanCoilNumericFields;
+	Array1D< FanCoilData > FanCoil;
+	Array1D< FanCoilNumericFieldData > FanCoilNumericFields;
 
 	// Functions
 
@@ -199,7 +199,7 @@ namespace FanCoilUnits {
 
 		// Find the correct Fan Coil Equipment
 		if ( CompIndex == 0 ) {
-			FanCoilNum = FindItemInList( CompName, FanCoil.Name(), NumFanCoils );
+			FanCoilNum = FindItemInList( CompName, FanCoil );
 			if ( FanCoilNum == 0 ) {
 				ShowFatalError( "SimFanCoil: Unit not found=" + CompName );
 			}
@@ -279,19 +279,16 @@ namespace FanCoilUnits {
 		using DataHVACGlobals::FanType_SimpleConstVolume;
 		using DataHVACGlobals::FanType_SimpleVAV;
 		using DataHVACGlobals::FanType_SimpleOnOff;
-		using DataHVACGlobals::ZoneComp;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
 		using DataPlant::TypeOf_CoilWaterCooling;
 		using MixedAir::GetOAMixerIndex;
 		using MixedAir::GetOAMixerNodeNumbers;
 		using DataZoneEquipment::ZoneEquipConfig;
-		using DataZoneEquipment::FanCoil4Pipe_Num;
 		using DataGlobals::NumOfZones;
 		using DataGlobals::ScheduleAlwaysOn;
 		using SingleDuct::GetATMixer;
 		using InputProcessor::FindItemInList;
-		using DataSizing::NumZoneHVACSizing;
 		using DataSizing::ZoneHVACSizing;
 
 		// Locals
@@ -312,19 +309,19 @@ namespace FanCoilUnits {
 		int FanCoilNum; // current fan coil number
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
-		FArray1D_int OANodeNums( 4 ); // Node numbers of Outdoor air mixer (OA, EA, RA, MA)
+		Array1D_int OANodeNums( 4 ); // Node numbers of Outdoor air mixer (OA, EA, RA, MA)
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		static bool errFlag( false ); // Local error flag for GetOAMixerNodeNums
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // Object type for getting and error messages
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		int CtrlZone; // index to loop counter
 		int NodeNum; // index to loop counter
@@ -370,7 +367,7 @@ namespace FanCoilUnits {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), FanCoil.Name(), FanCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), FanCoil, FanCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -545,7 +542,7 @@ namespace FanCoilUnits {
 
 			FanCoil( FanCoilNum ).HVACSizingIndex = 0;
 			if ( !lAlphaBlanks( 16 ) ) {
-				FanCoil( FanCoilNum ).HVACSizingIndex = FindItemInList( Alphas( 16 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
+				FanCoil( FanCoilNum ).HVACSizingIndex = FindItemInList( Alphas( 16 ), ZoneHVACSizing );
 				if ( FanCoil( FanCoilNum ).HVACSizingIndex == 0 ) {
 					ShowSevereError( cAlphaFields( 16 ) + " = " + Alphas( 16 ) + " not found." );
 					ShowContinueError( "Occurs in " + cMO_FanCoil + " = " + FanCoil( FanCoilNum ).Name );
@@ -791,9 +788,9 @@ namespace FanCoilUnits {
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		Real64 rho;
 		bool errFlag;
 
@@ -1006,13 +1003,8 @@ namespace FanCoilUnits {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
 		int PltSizCoolNum; // index of plant sizing object for 1st cooling loop
-		Real64 CoilInTemp; // design inlet air temperature for coil [C]
-		Real64 CoilOutTemp; // design outlet air temperature for coil [C]
-		Real64 CoilOutHumRat; // design inlet air humidity ratio for coil [kg/kg]
-		Real64 CoilInHumRat; // design outlet air humidity ratio for coil [kg/kg]
 		bool ErrorsFound; // TRUE if errors foind during sizing
 		Real64 DesCoilLoad; // coil load used for sizing [W]
-		Real64 FCOAFrac; // design outside air fraction for the fan coil unit
 		static int CoilWaterInletNode( 0 );
 		static int CoilWaterOutletNode( 0 );
 		std::string CoolingCoilName;
@@ -1366,7 +1358,7 @@ namespace FanCoilUnits {
 					MaxHotWaterVolFlowDes = FanCoil( FanCoilNum ).MaxHotWaterVolFlow;
 					ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxHotWaterVolFlowDes, "User-Specified Maximum Hot Water Flow [m3/s]", MaxHotWaterVolFlowUser );
 					if ( DisplayExtraWarnings ) {
-						if (  (std::abs (MaxHotWaterVolFlowDes - MaxHotWaterVolFlowUser ) / MaxHotWaterVolFlowUser ) > AutoVsHardSizingThreshold ) {
+						if ( (std::abs (MaxHotWaterVolFlowDes - MaxHotWaterVolFlowUser ) / MaxHotWaterVolFlowUser ) > AutoVsHardSizingThreshold ) {
 							ShowMessage( "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil( FanCoilNum ).UnitType + ' ' + FanCoil( FanCoilNum ).Name );
 							ShowContinueError( "User-Specified Maximum Hot Water Flow of " + RoundSigDigits( MaxHotWaterVolFlowUser, 5 ) + " [m3/s]" );
 							ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + RoundSigDigits( MaxHotWaterVolFlowDes, 5 ) + " [m3/s]" );
@@ -1545,7 +1537,6 @@ namespace FanCoilUnits {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIter( 25 ); // maximum number of iterations for controlling output
 		int const iReverseAction( 1 );
 		int const iNormalAction( 2 );
 		int const MaxIterCycl( 100 );
@@ -2506,7 +2497,7 @@ namespace FanCoilUnits {
 			GetFanCoilInputFlag = false;
 		}
 
-		FanCoilIndex = FindItemInList( FanCoilName, FanCoil.Name(), NumFanCoils );
+		FanCoilIndex = FindItemInList( FanCoilName, FanCoil );
 		if ( FanCoilIndex == 0 ) {
 			ShowSevereError( "GetFanCoilIndex: Fan Coil Unit not found=" + FanCoilName );
 		}
@@ -2516,7 +2507,7 @@ namespace FanCoilUnits {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

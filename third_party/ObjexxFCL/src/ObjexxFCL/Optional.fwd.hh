@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -24,7 +24,6 @@ namespace ObjexxFCL {
 template< typename, typename = void > class Optional;
 class byte;
 class ubyte;
-class Fstring;
 
 // Types
 typedef  byte  sbyte;
@@ -54,7 +53,6 @@ typedef  Optional< char >                Optional_char;
 typedef  Optional< unsigned char >       Optional_uchar;
 typedef  Optional< signed char >         Optional_schar;
 typedef  Optional< std::string >         Optional_string;
-typedef  Optional< Fstring >             Optional_Fstring;
 
 // Const Types
 typedef  Optional< bool const >                Optional_bool_const;
@@ -83,7 +81,6 @@ typedef  Optional< char const >                Optional_char_const;
 typedef  Optional< unsigned char const >       Optional_uchar_const;
 typedef  Optional< signed char const >         Optional_schar_const;
 typedef  Optional< std::string const >         Optional_string_const;
-typedef  Optional< Fstring const >             Optional_Fstring_const;
 
 } // ObjexxFCL
 

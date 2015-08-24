@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -101,11 +101,11 @@ namespace HeatingCoils {
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumHeatingCoils( 0 ); // The Number of HeatingCoils found in the Input
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
+	Array1D_bool MySizeFlag;
+	Array1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
 	bool GetCoilsInputFlag( true ); // Flag set to make sure you get input once
 	bool CoilIsSuppHeater( false ); // Flag set to indicate the heating coil is a supplemental heater
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -123,8 +123,8 @@ namespace HeatingCoils {
 	// Utility routines for module
 
 	// Object Data
-	FArray1D< HeatingCoilEquipConditions > HeatingCoil;
-	FArray1D< HeatingCoilNumericFieldData > HeatingCoilNumericFields;
+	Array1D< HeatingCoilEquipConditions > HeatingCoil;
+	Array1D< HeatingCoilNumericFieldData > HeatingCoilNumericFields;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -195,7 +195,7 @@ namespace HeatingCoils {
 		// Find the correct HeatingCoilNumber with the Coil Name
 		if ( present( CompIndex ) ) {
 			if ( CompIndex == 0 ) {
-				CoilNum = FindItemInList( CompName, HeatingCoil.Name(), NumHeatingCoils );
+				CoilNum = FindItemInList( CompName, HeatingCoil );
 				if ( CoilNum == 0 ) {
 					ShowFatalError( "SimulateHeatingCoilComponents: Coil not found=" + CompName );
 				}
@@ -329,12 +329,12 @@ namespace HeatingCoils {
 		std::string SourceTypeString; // character string used in error message for desuperheating coil
 		std::string SourceNameString; // character string used in error message for desuperheating coil
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -401,7 +401,7 @@ namespace HeatingCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), HeatingCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), HeatingCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -458,7 +458,7 @@ namespace HeatingCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), HeatingCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), HeatingCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -525,7 +525,7 @@ namespace HeatingCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), HeatingCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), HeatingCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -595,7 +595,7 @@ namespace HeatingCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), HeatingCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), HeatingCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -678,7 +678,7 @@ namespace HeatingCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), HeatingCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), HeatingCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -900,9 +900,9 @@ namespace HeatingCoils {
 		static int ValidSourceTypeCounter( 0 ); // Counter used to determine if desuperheater source name is valid
 		static bool HeatingCoilFatalError( false ); // used for error checking
 		static bool MyOneTimeFlag( true ); // one time flag
-		static FArray1D_bool MySPTestFlag; // used for error checking
-		static FArray1D_bool ShowSingleWarning; // Used for single warning message for desuperheater coil
-		static FArray1D_bool MyEnvrnFlag; // one time environment flag
+		static Array1D_bool MySPTestFlag; // used for error checking
+		static Array1D_bool ShowSingleWarning; // Used for single warning message for desuperheater coil
+		static Array1D_bool MyEnvrnFlag; // one time environment flag
 
 		if ( MyOneTimeFlag ) {
 			// initialize the environment and sizing flags
@@ -1074,8 +1074,6 @@ namespace HeatingCoils {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using DataAirSystems::PrimaryAirSystem;
-		using DataAirLoop::AirLoopControlInfo;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using namespace OutputReportPredefined;
@@ -1589,7 +1587,7 @@ namespace HeatingCoils {
 		Real64 const QCoilReq,
 		Real64 & QCoilActual, // coil load actually delivered (W)
 		int const FanOpMode, // fan operating mode
-		Real64 const PartLoadRatio // part-load ratio of heating coil
+		Real64 const EP_UNUSED( PartLoadRatio ) // part-load ratio of heating coil
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -2395,7 +2393,7 @@ namespace HeatingCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		HeatingCoilIndex = FindItem( HeatingCoilName, HeatingCoil.Name(), NumHeatingCoils );
+		HeatingCoilIndex = FindItem( HeatingCoilName, HeatingCoil );
 		if ( HeatingCoilIndex == 0 ) {
 			ShowSevereError( "GetCoilIndex: Heating coil not found=" + HeatingCoilName );
 			ErrorsFound = true;
@@ -2456,7 +2454,7 @@ namespace HeatingCoils {
 
 		// Find the correct Coil number
 		if ( CompIndex == 0 ) {
-			CoilNum = FindItem( CompName, HeatingCoil.Name(), NumHeatingCoils );
+			CoilNum = FindItem( CompName, HeatingCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "CheckHeatingCoilSchedule: Coil not found=\"" + CompName + "\"." );
 			}
@@ -2537,12 +2535,12 @@ namespace HeatingCoils {
 
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = HeatingCoil( WhichCoil ).NominalCapacity;
 			}
 		} else if ( FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas_MultiStage ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = HeatingCoil( WhichCoil ).MSNominalCapacity( HeatingCoil( WhichCoil ).NumOfStages );
 			}
@@ -2623,7 +2621,7 @@ namespace HeatingCoils {
 		AvailSchIndex = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				AvailSchIndex = HeatingCoil( WhichCoil ).SchedPtr;
 			}
@@ -2697,7 +2695,7 @@ namespace HeatingCoils {
 		NodeNumber = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = HeatingCoil( WhichCoil ).AirInletNodeNum;
 			}
@@ -2772,7 +2770,7 @@ namespace HeatingCoils {
 		NodeNumber = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = HeatingCoil( WhichCoil ).AirOutletNodeNum;
 			}
@@ -2942,7 +2940,7 @@ namespace HeatingCoils {
 		NodeNumber = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = HeatingCoil( WhichCoil ).TempSetPointNodeNum;
 			}
@@ -3017,7 +3015,7 @@ namespace HeatingCoils {
 		TypeNum = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				TypeNum = HeatingCoil( WhichCoil ).HCoilType_Num;
 			}
@@ -3090,7 +3088,7 @@ namespace HeatingCoils {
 		WhichCoil = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -3160,7 +3158,7 @@ namespace HeatingCoils {
 
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				IndexNum = HeatingCoil( WhichCoil ).PLFCurveIndex;
 			} else {
@@ -3227,7 +3225,7 @@ namespace HeatingCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, HeatingCoil.Name(), NumHeatingCoils );
+		WhichCoil = FindItemInList( CoilName, HeatingCoil );
 		if ( WhichCoil != 0 ) {
 			NumberOfStages = HeatingCoil( WhichCoil ).NumOfStages;
 		} else {
@@ -3246,7 +3244,7 @@ namespace HeatingCoils {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -158,12 +158,12 @@ namespace HVACUnitaryBypassVAV {
 	Real64 PartLoadFrac( 0.0 ); // Compressor part-load fraction
 	Real64 SaveCompressorPLR( 0.0 ); // Holds DX compressor PLR from active DX coil
 	Real64 TempSteamIn( 100.0 ); // steam coil steam inlet temperature
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Object Data
-	FArray1D< CBVAVData > CBVAV;
+	Array1D< CBVAVData > CBVAV;
 
 	// Functions
 
@@ -225,7 +225,7 @@ namespace HVACUnitaryBypassVAV {
 
 		// Find the correct changeover-bypass VAV unit
 		if ( CompIndex == 0 ) {
-			CBVAVNum = FindItemInList( CompName, CBVAV.Name(), NumCBVAV );
+			CBVAVNum = FindItemInList( CompName, CBVAV );
 			if ( CBVAVNum == 0 ) {
 				ShowFatalError( "SimUnitaryBypassVAV: Unit not found=" + CompName );
 			}
@@ -425,9 +425,7 @@ namespace HVACUnitaryBypassVAV {
 		using ScheduleManager::CheckScheduleValueMinMax;
 		using ScheduleManager::GetScheduleIndex;
 		using DataHVACGlobals::FanType_SimpleConstVolume;
-		using DataHVACGlobals::FanType_SimpleVAV;
 		using DataHVACGlobals::FanType_SimpleOnOff;
-		using DataHVACGlobals::FanType_ZoneExhaust;
 		using DataHVACGlobals::NumPrimaryAirSys;
 		using NodeInputManager::GetOnlySingleNode;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -448,7 +446,6 @@ namespace HVACUnitaryBypassVAV {
 		using SteamCoils::GetCoilSteamInletNode;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
 		using SteamCoils::GetTypeOfCoil;
-		using SteamCoils::ZoneLoadControl;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilMaxWaterFlowRate;
 		auto & GetWaterCoilInletNode( WaterCoils::GetCoilInletNode );
@@ -471,8 +468,8 @@ namespace HVACUnitaryBypassVAV {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CBVAVIndex; // Loop index
 		int CBVAVNum; // Current CBVAV number
-		FArray1D_string Alphas( 19 ); // Alpha items for object
-		FArray1D< Real64 > Numbers( 11 ); // Numeric items for object
+		Array1D_string Alphas( 19 ); // Alpha items for object
+		Array1D< Real64 > Numbers( 11 ); // Numeric items for object
 		std::string CompSetFanInlet; // Used in SetUpCompSets call
 		std::string CompSetCoolInlet; // Used in SetUpCompSets call
 		std::string CompSetFanOutlet; // Used in SetUpCompSets call
@@ -494,7 +491,7 @@ namespace HVACUnitaryBypassVAV {
 		int AirLoopZoneNum; // Index to controlled zone
 		int BranchNum; // Index to branch containing this system
 		int CompNum; // Index to this system
-		FArray1D_int OANodeNums( 4 ); // Node numbers of OA mixer (OA, EA, RA, MA)
+		Array1D_int OANodeNums( 4 ); // Node numbers of OA mixer (OA, EA, RA, MA)
 		std::string HXDXCoolCoilName; // Name of DX cooling coil used with Heat Exchanger Assisted Cooling Coil
 		std::string MixerInletNodeName; // Name of mixer inlet node
 		std::string SplitterOutletNodeName; // Name of splitter outlet node
@@ -503,14 +500,13 @@ namespace HVACUnitaryBypassVAV {
 		bool FoundTstatZone; // TRUE if thermostat found in controlled zone
 		bool OANodeErrFlag; // TRUE if DX Coil condenser node is not found
 		bool DXCoilErrFlag; // used in warning messages
-		FArray1D_string cAlphaFields( 19 ); // Alpha field names
-		FArray1D_string cNumericFields( 11 ); // Numeric field names
-		FArray1D_bool lAlphaBlanks( 19 ); // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks( 11 ); // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string cAlphaFields( 19 ); // Alpha field names
+		Array1D_string cNumericFields( 11 ); // Numeric field names
+		Array1D_bool lAlphaBlanks( 19 ); // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks( 11 ); // Logical array, numeric field input BLANK = .TRUE.
 		static int EquipNum( 0 ); // local do loop index for equipment listed for a zone
 		int HeatCoilInletNodeNum; // Heating coil air inlet node number
 		int HeatCoilOutletNodeNum; // Heating coil air outlet node number
-		int TempNodeNum; // HW coil water inlet node
 		int SteamIndex; // steam coil index
 		Real64 SteamDensity; // steam coil steam density
 
@@ -538,7 +534,7 @@ namespace HVACUnitaryBypassVAV {
 			CBVAVNum = CBVAVIndex;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), CBVAV.Name(), CBVAVNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), CBVAV, CBVAVNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1197,7 +1193,6 @@ namespace HVACUnitaryBypassVAV {
 		using EMSManager::iHumidityRatioMaxSetPoint;
 		using SteamCoils::SimulateSteamCoilComponents;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
-		auto & GetSteamCoilCapacity( SteamCoils::GetCoilCapacity );
 		using WaterCoils::GetCoilMaxWaterFlowRate;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
@@ -1229,9 +1224,9 @@ namespace HVACUnitaryBypassVAV {
 		int MixerOutsideAirNode; // Outside air node number in CBVAV loop
 		Real64 RhoAir; // Air density at InNode
 		static bool MyOneTimeFlag( true ); // Initialization flag
-		static FArray1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-		static FArray1D_bool MySizeFlag; // Used for sizing CBVAV inputs one time
-		static FArray1D_bool MyPlantScanFlag; // Used for initializations plant component for heating coils
+		static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
+		static Array1D_bool MySizeFlag; // Used for sizing CBVAV inputs one time
+		static Array1D_bool MyPlantScanFlag; // Used for initializations plant component for heating coils
 		Real64 QSensUnitOut; // Output of CBVAV system with coils off
 		Real64 OutsideAirMultiplier; // Outside air multiplier schedule (= 1.0 if no schedule)
 		static bool FanErrFlag( false ); // Error flag returned during CALL to GetFanType
@@ -1864,7 +1859,6 @@ namespace HVACUnitaryBypassVAV {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIter( 50 ); // Maximum number of iterations
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1895,7 +1889,7 @@ namespace HVACUnitaryBypassVAV {
 		bool const FirstHVACIteration, // Flag for 1st HVAC iteration
 		Real64 & PartLoadFrac, // Compressor part load fraction
 		Real64 & LoadMet, // Load met by unit (W)
-		Real64 & QZnReq, // Zone load (W)
+		Real64 & EP_UNUSED( QZnReq ), // Zone load (W)
 		Real64 & OnOffAirFlowRatio, // Ratio of compressor ON airflow to AVERAGE airflow over timestep
 		bool const HXUnitOn // flag to enable heat exchanger
 	)
@@ -1945,7 +1939,7 @@ namespace HVACUnitaryBypassVAV {
 		int OutletNode; // CBVAV air outlet node
 		int InletNode; // CBVAV air inlet node
 		Real64 MinHumRat; // Minimum humidity ratio for sensible capacity calculation (kg/kg)
-		FArray1D< Real64 > Par( 6 ); // RegulaFalsi parameters
+		Array1D< Real64 > Par( 6 ); // RegulaFalsi parameters
 		int SolFla; // Flag of RegulaFalsi solver
 		Real64 QHeater; // Load to be met by heater [W]
 		Real64 QHeaterActual; // actual heating load met [W]
@@ -2609,7 +2603,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	DOE2DXCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2669,7 +2663,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	HXAssistDXCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2734,7 +2728,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	DXHeatingCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2794,7 +2788,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	MultiModeDXCoilResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -3091,7 +3085,7 @@ namespace HVACUnitaryBypassVAV {
 		Real64 MinWaterFlow; // minimum water mass flow rate
 		Real64 MaxHotWaterFlow; // maximum hot water mass flow rate, kg/s
 		Real64 HotWaterMdot; // actual hot water mass flow rate
-		FArray1D< Real64 > Par( 3 );
+		Array1D< Real64 > Par( 3 );
 		int SolFlag; // error flag
 
 		QCoilActual = 0.0;
@@ -3169,7 +3163,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 
@@ -3235,7 +3229,7 @@ namespace HVACUnitaryBypassVAV {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

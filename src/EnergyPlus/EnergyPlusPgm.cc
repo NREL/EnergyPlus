@@ -12,7 +12,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/Time_Date.hh>
@@ -51,7 +51,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	//      NOTICE
 
-	//      Copyright © 1996-2014 The Board of Trustees of the University of Illinois and The Regents of the
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//      University of California through Ernest Orlando Lawrence Berkeley National Laboratory.  All rights
 	//      reserved.
 
@@ -126,11 +126,11 @@ EnergyPlusPgm( std::string const & filepath )
 	//      (Conjunction Of Multizone Infiltration Specialists) developed by a multinational, multi-institutional
 	//      effort under the auspices of the International Energy Agency's Buildings and Community Systems Agreement
 	//      working group focusing on multizone air flow modeling (Annex 23) and now administered by the Swiss Federal
-	//      Laboratories for Materials Testing and Research (EMPA), Division 175, Überlandstrasse 129, CH-8600 Dübendorf,
+	//      Laboratories for Materials Testing and Research (EMPA), Division 175, Uberlandstrasse 129, CH-8600 Dubendorf,
 	//      Switzerland.
 
 	//      The EnergyPlus v1.2 model for displacement ventilation and cross-ventilation was developed
-	//      by Guilherme Carrilho da Graça and Paul Linden of the Department of Mechanical and Aerospace
+	//      by Guilherme Carrilho da Graca and Paul Linden of the Department of Mechanical and Aerospace
 	//      Engineering, University of California, San Diego.
 
 	//      The EnergyPlus models for UFAD served zones were developed by Anna Liu and Paul Linden at the Department
@@ -241,7 +241,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 #ifdef _MSC_VER
 #ifndef _DEBUG
-    // If _MSC_VER and not debug then prevent dialogs on error
+	// If _MSC_VER and not debug then prevent dialogs on error
 	SetErrorMode(SEM_NOGPFAULTERRORBOX);
 	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
@@ -273,7 +273,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	get_environment_variable( DDOnlyEnvVar, cEnvValue );
 	DDOnly = env_var_on( cEnvValue ); // Yes or True
-	if(DDOnlySimulation)
+	if (DDOnlySimulation)
 		DDOnly = true;
 
 	get_environment_variable( ReverseDDEnvVar, cEnvValue );
@@ -281,7 +281,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	get_environment_variable( FullAnnualSimulation, cEnvValue );
 	FullAnnualRun = env_var_on( cEnvValue ); // Yes or True
-	if(AnnualSimulation)
+	if (AnnualSimulation)
 		FullAnnualRun = true;
 
 	get_environment_variable( cDisplayAllWarnings, cEnvValue );
@@ -310,6 +310,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	get_environment_variable( cReportDuringWarmup, cEnvValue );
 	if ( ! cEnvValue.empty() ) ReportDuringWarmup = env_var_on( cEnvValue ); // Yes or True
+	if ( ReverseDD ) ReportDuringWarmup = false; // force to false for ReverseDD runs
 
 	get_environment_variable( cReportDuringHVACSizingSimulation, cEnvValue);
 	if ( ! cEnvValue.empty() ) ReportDuringHVACSizingSimulation = env_var_on( cEnvValue ); // Yes or True
@@ -354,7 +355,7 @@ EnergyPlusPgm( std::string const & filepath )
 	get_environment_variable( TraceHVACControllerEnvVar, cEnvValue );
 	if ( ! cEnvValue.empty() ) TraceHVACControllerEnvFlag = env_var_on( cEnvValue ); // Yes or True
 
-	if( ! filepath.empty() ) {
+	if ( ! filepath.empty() ) {
 		// if filepath is not empty, then we are using E+ as a library API call
 		// change the directory to the specified folder, and pass in dummy args to command line parser
 		// this will initialize the paths throughout E+ to the defaults
@@ -372,7 +373,7 @@ EnergyPlusPgm( std::string const & filepath )
 		}
 		ProgramPath = filepath + pathChar;
 		int dummy_argc = 0;
-		const char * dummy_argv[] = { NULL };
+		const char * dummy_argv[] = { nullptr };
 		CommandLineInterface::ProcessArgs( dummy_argc, dummy_argv );
 	}
 
@@ -395,27 +396,31 @@ EnergyPlusPgm( std::string const & filepath )
 	ReportOrphanFluids();
 	ReportOrphanSchedules();
 
-    if(runReadVars) {
+	if (runReadVars) {
 		std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
 		bool FileExists;
 		{ IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
-		if (!FileExists){
-			DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + "." );
-			exit(EXIT_FAILURE);
+		if (!FileExists) {
+			readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + exeExtension;
+			{ IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
+			if (!FileExists) {
+				DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + "." );
+				exit(EXIT_FAILURE);
+			}
 		}
 
-		std::string RVIfile = idfDirPathName + idfFileNameOnly + ".rvi";
-    	std::string MVIfile = idfDirPathName + idfFileNameOnly + ".mvi";
+		std::string const RVIfile = idfDirPathName + idfFileNameOnly + ".rvi";
+		std::string const MVIfile = idfDirPathName + idfFileNameOnly + ".mvi";
 
-    	int fileUnitNumber;
-    	int iostatus;
-    	bool rviFileExists;
-    	bool mviFileExists;
+		int fileUnitNumber;
+		int iostatus;
+		bool rviFileExists;
+		bool mviFileExists;
 
-    	gio::Fmt const readvarsFmt( "(A)" );
+		gio::Fmt readvarsFmt( "(A)" );
 
-    	{ IOFlags flags; gio::inquire( RVIfile, flags ); rviFileExists = flags.exists(); }
-    	if (!rviFileExists) {
+		{ IOFlags flags; gio::inquire( RVIfile, flags ); rviFileExists = flags.exists(); }
+		if (!rviFileExists) {
 			fileUnitNumber = GetNewUnitNumber();
 			{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, RVIfile, flags ); iostatus = flags.ios(); }
 			if ( iostatus != 0 ) {
@@ -424,10 +429,10 @@ EnergyPlusPgm( std::string const & filepath )
 			gio::write( fileUnitNumber, readvarsFmt ) << outputEsoFileName;
 			gio::write( fileUnitNumber, readvarsFmt ) << outputCsvFileName;
 			gio::close( fileUnitNumber );
-    	}
+		}
 
-    	{ IOFlags flags; gio::inquire( MVIfile, flags ); mviFileExists = flags.exists(); }
-    	if (!mviFileExists) {
+		{ IOFlags flags; gio::inquire( MVIfile, flags ); mviFileExists = flags.exists(); }
+		if (!mviFileExists) {
 			fileUnitNumber = GetNewUnitNumber();
 			{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, MVIfile, flags ); iostatus = flags.ios(); }
 			if ( iostatus != 0 ) {
@@ -436,21 +441,21 @@ EnergyPlusPgm( std::string const & filepath )
 			gio::write( fileUnitNumber, readvarsFmt ) << outputMtrFileName;
 			gio::write( fileUnitNumber, readvarsFmt ) << outputMtrCsvFileName;
 			gio::close( fileUnitNumber );
-    	}
+		}
 
-    	std::string readVarsRviCommand = "\"" + readVarsPath + "\"" + " " + RVIfile + " unlimited";
-    	std::string readVarsMviCommand = "\"" + readVarsPath + "\"" + " " + MVIfile + " unlimited";
+		std::string readVarsRviCommand = "\"" + readVarsPath + "\"" + " " + RVIfile + " unlimited";
+		std::string readVarsMviCommand = "\"" + readVarsPath + "\"" + " " + MVIfile + " unlimited";
 
-    	systemCall(readVarsRviCommand);
-    	systemCall(readVarsMviCommand);
+		systemCall(readVarsRviCommand);
+		systemCall(readVarsMviCommand);
 
-	    if (!rviFileExists)
-	    	removeFile(RVIfile.c_str());
+		if (!rviFileExists)
+			removeFile(RVIfile.c_str());
 
-	    if (!mviFileExists)
-	    	removeFile(MVIfile.c_str());
+		if (!mviFileExists)
+			removeFile(MVIfile.c_str());
 
-	    moveFile("readvars.audit", outputRvauditFileName);
+		moveFile("readvars.audit", outputRvauditFileName);
 
 	}
 
@@ -504,7 +509,7 @@ CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	FArray1D_int value( 8 );
+	Array1D_int value( 8 );
 	//value(1)   Current year
 	//value(2)   Current month
 	//value(3)   Current day
@@ -515,7 +520,7 @@ CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 	//value(8)   Milliseconds (0-999)
 	std::string datestring; // supposedly returns blank when no date available.
 
-	date_and_time_string( datestring, _, _, value );
+	date_and_time( datestring, _, _, value );
 	if ( ! datestring.empty() ) {
 		gio::write( CurrentDateTimeString, fmtDate ) << value( 1 ) << value( 2 ) << value( 3 ) << value( 5 ) << value( 6 );
 	} else {
@@ -523,4 +528,3 @@ CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 	}
 
 }
-

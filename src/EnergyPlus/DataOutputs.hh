@@ -2,7 +2,7 @@
 #define DataOutputs_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -17,7 +17,7 @@ namespace DataOutputs {
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	extern int const NumMonthlyReports;
-	extern FArray1D_string const MonthlyNamedReports;
+	extern Array1D_string const MonthlyNamedReports;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -64,9 +64,14 @@ namespace DataOutputs {
 	};
 
 	// Object Data
-	extern FArray1D< OutputReportingVariables > OutputVariablesForSimulation;
+	extern Array1D< OutputReportingVariables > OutputVariablesForSimulation;
 
 	// Functions
+
+	// Clears the global data in DataOutputs.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 	bool
 	FindItemInVariableList(
@@ -76,7 +81,7 @@ namespace DataOutputs {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

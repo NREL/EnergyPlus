@@ -48,22 +48,50 @@ namespace DataZoneControls {
 	int NumTempAndHumidityControlledZones( 0 ); // number of zones with over cool control
 	bool AnyOpTempControl( false ); // flag set true if any zones have op temp control
 	bool AnyZoneTempAndHumidityControl( false ); // flag set true if any zones have over cool control
-	FArray1D_bool StageZoneLogic; // Logical array, A zone with staged thermostat = .TRUE.
-	FArray1D< Real64 > OccRoomTSetPointHeat; // occupied heating set point for optimum start period
-	FArray1D< Real64 > OccRoomTSetPointCool; // occupied cooling set point for optimum start period
+	Array1D_bool StageZoneLogic; // Logical array, A zone with staged thermostat = .TRUE.
+	Array1D< Real64 > OccRoomTSetPointHeat; // occupied heating set point for optimum start period
+	Array1D< Real64 > OccRoomTSetPointCool; // occupied cooling set point for optimum start period
 	bool GetZoneAirStatsInputFlag( true ); // True when need to get input
 
 	// Object Data
-	FArray1D< ZoneHumidityControls > HumidityControlZone;
-	FArray1D< ZoneTempControls > TempControlledZone;
-	FArray1D< ZoneComfortControls > ComfortControlledZone;
-	FArray1D< TStatObject > TStatObjects;
-	FArray1D< TStatObject > ComfortTStatObjects;
-	FArray1D< TStatObject > StagedTStatObjects;
-	FArray1D< ZoneStagedControls > StageControlledZone;
+	Array1D< ZoneHumidityControls > HumidityControlZone;
+	Array1D< ZoneTempControls > TempControlledZone;
+	Array1D< ZoneComfortControls > ComfortControlledZone;
+	Array1D< TStatObject > TStatObjects;
+	Array1D< TStatObject > ComfortTStatObjects;
+	Array1D< TStatObject > StagedTStatObjects;
+	Array1D< ZoneStagedControls > StageControlledZone;
+
+	// Clears the global data in DataZoneControls.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumTempControlledZones = 0;
+		NumHumidityControlZones = 0;
+		NumComfortControlledZones = 0;
+		NumTStatStatements = 0;
+		NumComfortTStatStatements = 0;
+		NumOpTempControlledZones = 0; // number of zones with operative temp control
+		NumTempAndHumidityControlledZones = 0; // number of zones with over cool control
+		AnyOpTempControl = false; // flag set true if any zones have op temp control
+		AnyZoneTempAndHumidityControl = false; // flag set true if any zones have over cool control
+		GetZoneAirStatsInputFlag = true; // True when need to get input
+		StageZoneLogic.deallocate();
+		OccRoomTSetPointHeat.deallocate();
+		OccRoomTSetPointCool.deallocate();
+		HumidityControlZone.deallocate();
+		TempControlledZone.deallocate();
+		ComfortControlledZone.deallocate();
+		TStatObjects.deallocate();
+		ComfortTStatObjects.deallocate();
+		StagedTStatObjects.deallocate();
+		StageControlledZone.deallocate();
+	}
+
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -2,7 +2,7 @@
 #define PlantCentralGSHP_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -41,9 +41,9 @@ namespace PlantCentralGSHP {
 
 	// Type defining the component specifications
 
-	extern FArray1D_bool CheckEquipName;
-	extern FArray1D_bool CHCheckEquipName;
-	extern FArray1D_bool HPCheckEquipName;
+	extern Array1D_bool CheckEquipName;
+	extern Array1D_bool CHCheckEquipName;
+	extern Array1D_bool HPCheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ChillerElectricEIR
 
@@ -385,9 +385,9 @@ namespace PlantCentralGSHP {
 		Real64 WrapperCoolingLoad; // Cooling demand for the central heat pump system
 		Real64 WrapperHeatingLoad; // Heating demand for the central heat pump system
 		Real64 AncilliaryPower; // Wrapper Ancilliary Power
-		FArray1D< WrapperComponentSpecs > WrapperComp;
-		FArray1D< ChillerHeaterSpecs > ChillerHeater; // Dimension to number of machines
-		FArray1D< CHReportVars > ChillerHeaterReport; // Dimension to number of machines
+		Array1D< WrapperComponentSpecs > WrapperComp;
+		Array1D< ChillerHeaterSpecs > ChillerHeater; // Dimension to number of machines
+		Array1D< CHReportVars > ChillerHeaterReport; // Dimension to number of machines
 		bool CoolSetPointErrDone; // true if setpoint warning issued
 		bool HeatSetPointErrDone; // true if setpoint warning issued
 		bool CoolSetPointSetToLoop; // True if the setpoint is missing at the outlet node
@@ -537,10 +537,10 @@ namespace PlantCentralGSHP {
 	};
 
 	// Object Data
-	extern FArray1D< WrapperSpecs > Wrapper;
-	extern FArray1D< ChillerHeaterSpecs > ChillerHeater;
-	extern FArray1D< CHReportVars > ChillerHeaterReport;
-	extern FArray1D< WrapperReportVars > WrapperReport;
+	extern Array1D< WrapperSpecs > Wrapper;
+	extern Array1D< ChillerHeaterSpecs > ChillerHeater;
+	extern Array1D< CHReportVars > ChillerHeaterReport;
+	extern Array1D< WrapperReportVars > WrapperReport;
 
 	// Functions
 
@@ -619,7 +619,7 @@ namespace PlantCentralGSHP {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

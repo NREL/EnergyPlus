@@ -7,6 +7,7 @@
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::GroundHeatExchangers;
@@ -17,6 +18,8 @@ using namespace EnergyPlus::DataLoopNode;
 
 TEST( GroundHeatExchangerTest, KAGroundTemps)
 {
+	ShowMessage( "Begin Test: GroundHeatExchangerTest, KAGroundTemps" );
+
 	// Initialization
 	GLHESlinky thisGLHE;
 
@@ -37,6 +40,8 @@ TEST( GroundHeatExchangerTest, KAGroundTemps)
 
 TEST( GroundHeatExchangerTest, Interpolate )
 {
+	ShowMessage( "Begin Test: GroundHeatExchangerTest, Interpolate" );
+
 	// Initialization
 	GLHESlinky thisGLHE;
 	Real64 thisLNTTS;
@@ -71,9 +76,10 @@ TEST( GroundHeatExchangerTest, Interpolate )
 TEST( SlinkyGroundHeatExchangerTest, GetGFunc )
 {
 
+	ShowMessage( "Begin Test: SlinkyGroundHeatExchangerTest, GetGFunc" );
+
 	// Initialization
 	GLHESlinky thisGLHE;
-	Real64 thisLNTTS;
 	Real64 thisGFunc;
 	Real64 time;
 	
@@ -99,7 +105,6 @@ TEST( VerticalGroundHeatExchangerTest, GetGFunc )
 
 	// Initialization
 	GLHEVert thisGLHE;
-	Real64 thisLNTTS;
 	Real64 thisGFunc;
 	Real64 time;
 	
@@ -132,11 +137,11 @@ TEST( VerticalGroundHeatExchangerTest, GetGFunc )
 
 TEST( SlinkyGroundHeatExchangerTest, CalcHXResistance )
 {
+	ShowMessage( "Begin Test: SlinkyGroundHeatExchangerTest, CalcHXResistance" );
+
 	// Initializations
 	GLHESlinky thisGLHE;
 
-	Real64 inletTemp( 5.0 );
-	
 	PlantLoop.allocate( 1 );
 	thisGLHE.loopNum = 1;
 
@@ -172,11 +177,11 @@ TEST( SlinkyGroundHeatExchangerTest, CalcHXResistance )
 
 TEST( VerticalGroundHeatExchangerTest, CalcHXResistance )
 {
+	ShowMessage( "Begin Test: VerticalGroundHeatExchangerTest, CalcHXResistance" );
+
 	// Initializations
 	GLHEVert thisGLHE;
 
-	Real64 inletTemp( 5.0 );
-	
 	PlantLoop.allocate( 1 );
 	thisGLHE.loopNum = 1;
 
@@ -225,6 +230,8 @@ TEST( VerticalGroundHeatExchangerTest, CalcHXResistance )
 
 TEST( SlinkyGroundHeatExchangerTest, CalcGroundHeatExchanger )
 {
+	ShowMessage( "Begin Test: SlinkyGroundHeatExchangerTest, CalcGroundHeatExchanger" );
+
 	// Initializations
 	GLHESlinky thisGLHE;
 

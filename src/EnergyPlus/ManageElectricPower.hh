@@ -2,7 +2,7 @@
 #define ManageElectricPower_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
+#include <ObjexxFCL/Array1A.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -184,7 +184,7 @@ namespace ManageElectricPower {
 		int DemandMeterPtr; // "pointer" to Meter for electrical Demand to meet
 		std::string GenerationMeterName; // Name of Generated Energy Meter for "on demand" operation
 		int NumGenerators; // Number of Generators
-		FArray1D< GenData > ElecGen; // pointer to generator
+		Array1D< GenData > ElecGen; // pointer to generator
 		Real64 DemandLimit; // Demand Limit in Watts(W) which the generator will operate above
 		int TrackSchedPtr; // "pointer" to schedule for electrical demand to meet.
 		int BussType; // is this load center powered by AC or DC generators
@@ -243,7 +243,7 @@ namespace ManageElectricPower {
 			int const DemandMeterPtr, // "pointer" to Meter for electrical Demand to meet
 			std::string const & GenerationMeterName, // Name of Generated Energy Meter for "on demand" operation
 			int const NumGenerators, // Number of Generators
-			FArray1< GenData > const & ElecGen, // pointer to generator
+			Array1< GenData > const & ElecGen, // pointer to generator
 			Real64 const DemandLimit, // Demand Limit in Watts(W) which the generator will operate above
 			int const TrackSchedPtr, // "pointer" to schedule for electrical demand to meet.
 			int const BussType, // is this load center powered by AC or DC generators
@@ -306,7 +306,7 @@ namespace ManageElectricPower {
 		// Members
 		Real64 NightTareLossPower;
 		Real64 NominalVoltage;
-		FArray1D< Real64 > NomVoltEfficiencyARR; // eff at 10, 20, 30, 50, 75, & 100% power and Nominal voltage
+		Array1D< Real64 > NomVoltEfficiencyARR; // eff at 10, 20, 30, 50, 75, & 100% power and Nominal voltage
 
 		// Default Constructor
 		CECInverterLookUpTableData() :
@@ -319,7 +319,7 @@ namespace ManageElectricPower {
 		CECInverterLookUpTableData(
 			Real64 const NightTareLossPower,
 			Real64 const NominalVoltage,
-			FArray1< Real64 > const & NomVoltEfficiencyARR // eff at 10, 20, 30, 50, 75, & 100% power and Nominal voltage
+			Array1< Real64 > const & NomVoltEfficiencyARR // eff at 10, 20, 30, 50, 75, & 100% power and Nominal voltage
 		) :
 			NightTareLossPower( NightTareLossPower ),
 			NominalVoltage( NominalVoltage ),
@@ -496,10 +496,10 @@ namespace ManageElectricPower {
 		Real64 LastTwoTimeStepBound; // [Ah] bound charge at the previous two timesteps
 		//battery life calculation variables
 		int count0;
-		FArray1D< Real64 > B10;
-		FArray1D< Real64 > X0;
-		FArray1D< Real64 > Nmb0;
-		FArray1D< Real64 > OneNmb0;
+		Array1D< Real64 > B10;
+		Array1D< Real64 > X0;
+		Array1D< Real64 > Nmb0;
+		Array1D< Real64 > OneNmb0;
 		//report
 		Real64 ElectEnergyinStorage; // [J] state of charge
 		Real64 StoredPower; // [W]
@@ -631,10 +631,10 @@ namespace ManageElectricPower {
 			Real64 const LastTwoTimeStepAvailable, // [Ah] available charge at the previous two timesteps
 			Real64 const LastTwoTimeStepBound, // [Ah] bound charge at the previous two timesteps
 			int const count0,
-			FArray1< Real64 > const & B10,
-			FArray1< Real64 > const & X0,
-			FArray1< Real64 > const & Nmb0,
-			FArray1< Real64 > const & OneNmb0,
+			Array1< Real64 > const & B10,
+			Array1< Real64 > const & X0,
+			Array1< Real64 > const & Nmb0,
+			Array1< Real64 > const & OneNmb0,
 			Real64 const ElectEnergyinStorage, // [J] state of charge
 			Real64 const StoredPower, // [W]
 			Real64 const StoredEnergy, // [J]
@@ -741,16 +741,16 @@ namespace ManageElectricPower {
 		Real64 RatedTemp; // reference temperature for nameplate efficiency [C]
 		Real64 MaxPUL; // per unit load for maximum efficiency []
 		bool ConsiderLosses; // if true, consider transformer lossses in metering
-		FArray1D_string WiredMeterNames; // names of the meters wired to transformer
-		FArray1D_int WiredMeterPtrs; // array of "pointers" to meters wired to transformer
-		FArray1D_bool SpecialMeter; // indicates whether a meter needs special consideration
+		Array1D_string WiredMeterNames; // names of the meters wired to transformer
+		Array1D_int WiredMeterPtrs; // array of "pointers" to meters wired to transformer
+		Array1D_bool SpecialMeter; // indicates whether a meter needs special consideration
 		// Electricity:Facility and Electricity:HVAC are two special
 		// meters because tranformer loss is part of them
 		//calculated and from elsewhere vars
 		Real64 RatedNL; // rated no load losses, user input or calculated [W]
 		Real64 RatedLL; // rated load losses, user input or calculated [W]
 		int LoadCenterNum; // number of load centers served by the transformer
-		FArray1D_int LoadCenterIndexes; // index array of load centers served by the transformer
+		Array1D_int LoadCenterIndexes; // index array of load centers served by the transformer
 		int OverloadErrorIndex; // used for warning message when transformer is overloaded
 		//results and reporting
 		Real64 Efficiency; // transformer efficiency
@@ -829,13 +829,13 @@ namespace ManageElectricPower {
 			Real64 const RatedTemp, // reference temperature for nameplate efficiency [C]
 			Real64 const MaxPUL, // per unit load for maximum efficiency []
 			bool const ConsiderLosses, // if true, consider transformer lossses in metering
-			FArray1_string const & WiredMeterNames, // names of the meters wired to transformer
-			FArray1_int const & WiredMeterPtrs, // array of "pointers" to meters wired to transformer
-			FArray1_bool const & SpecialMeter, // indicates whether a meter needs special consideration
+			Array1_string const & WiredMeterNames, // names of the meters wired to transformer
+			Array1_int const & WiredMeterPtrs, // array of "pointers" to meters wired to transformer
+			Array1_bool const & SpecialMeter, // indicates whether a meter needs special consideration
 			Real64 const RatedNL, // rated no load losses, user input or calculated [W]
 			Real64 const RatedLL, // rated load losses, user input or calculated [W]
 			int const LoadCenterNum, // number of load centers served by the transformer
-			FArray1_int const & LoadCenterIndexes, // index array of load centers served by the transformer
+			Array1_int const & LoadCenterIndexes, // index array of load centers served by the transformer
 			int const OverloadErrorIndex, // used for warning message when transformer is overloaded
 			Real64 const Efficiency, // transformer efficiency
 			Real64 const PowerIn, // [W]
@@ -969,10 +969,10 @@ namespace ManageElectricPower {
 	};
 
 	// Object Data
-	extern FArray1D< ElecStorageDataStruct > ElecStorage;
-	extern FArray1D< DCtoACInverterStruct > Inverter;
-	extern FArray1D< ElectricPowerLoadCenter > ElecLoadCenter; // dimension to number of machines
-	extern FArray1D< ElectricTransformer > Transformer;
+	extern Array1D< ElecStorageDataStruct > ElecStorage;
+	extern Array1D< DCtoACInverterStruct > Inverter;
+	extern Array1D< ElectricPowerLoadCenter > ElecLoadCenter; // dimension to number of machines
+	extern Array1D< ElectricTransformer > Transformer;
 	extern WholeBuildingElectricPowerSummary WholeBldgElectSummary;
 
 	// Functions
@@ -1030,7 +1030,7 @@ namespace ManageElectricPower {
 	//*****************************************************************************************************************
 
 	bool
-		determineCurrentForBatteryDischarge(
+	determineCurrentForBatteryDischarge(
 		Real64& curI0,
 		Real64& curT0,
 		Real64& curVolt,
@@ -1057,20 +1057,20 @@ namespace ManageElectricPower {
 	Rainflow(
 		int const numbin, // numbin = constant value
 		Real64 const input, // input = input value from other object (battery model)
-		FArray1A< Real64 > B1, // stores values of points, calculated here - stored for next timestep
-		FArray1A< Real64 > X, // stores values of two data point difference, calculated here - stored for next timestep
+		Array1A< Real64 > B1, // stores values of points, calculated here - stored for next timestep
+		Array1A< Real64 > X, // stores values of two data point difference, calculated here - stored for next timestep
 		int & count, // calculated here - stored for next timestep in main loop
-		FArray1A< Real64 > Nmb, // calculated here - stored for next timestep in main loop
-		FArray1A< Real64 > OneNmb, // calculated here - stored for next timestep in main loop
+		Array1A< Real64 > Nmb, // calculated here - stored for next timestep in main loop
+		Array1A< Real64 > OneNmb, // calculated here - stored for next timestep in main loop
 		int const dim // end dimension of array
 	);
 
 	void
 	shift(
-		FArray1A< Real64 > A,
+		Array1A< Real64 > A,
 		int const m,
 		int const n,
-		FArray1A< Real64 > B,
+		Array1A< Real64 > B,
 		int const dim // end dimension of arrays
 	);
 
@@ -1079,7 +1079,7 @@ namespace ManageElectricPower {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

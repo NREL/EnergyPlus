@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -92,7 +92,7 @@ namespace ZoneDehumidifier {
 	int NumDehumidifiers( 0 ); // Number of zone dehumidifier objects in the input file
 
 	bool GetInputFlag( true ); // Set to FALSE after first time input is "gotten"
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 	// Driver/Manager Routines
@@ -110,7 +110,7 @@ namespace ZoneDehumidifier {
 	// Get either inlet or outlet node number
 
 	// Object Data
-	FArray1D< ZoneDehumidifierData > ZoneDehumid;
+	Array1D< ZoneDehumidifierData > ZoneDehumid;
 
 	// Functions
 
@@ -118,7 +118,7 @@ namespace ZoneDehumidifier {
 	SimZoneDehumidifier(
 		std::string const & CompName, // Name of the zone dehumidifier
 		int const ZoneNum, // Number of zone being served
-		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+		bool const EP_UNUSED( FirstHVACIteration ), // TRUE if 1st HVAC simulation of system timestep
 		Real64 & QSensOut, // Sensible capacity delivered to zone (W)
 		Real64 & QLatOut, // Latent capacity delivered to zone (kg/s), dehumidify = negative
 		int & CompIndex // Index to the zone dehumidifier
@@ -168,7 +168,7 @@ namespace ZoneDehumidifier {
 
 		// Find the correct zone dehumidifier
 		if ( CompIndex == 0 ) {
-			ZoneDehumidNum = FindItemInList( CompName, ZoneDehumid.Name(), NumDehumidifiers );
+			ZoneDehumidNum = FindItemInList( CompName, ZoneDehumid );
 			if ( ZoneDehumidNum == 0 ) {
 				ShowFatalError( "SimZoneDehumidifier: Unit not found= " + CompName );
 			}
@@ -256,12 +256,12 @@ namespace ZoneDehumidifier {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max)
 		Real64 CurveVal; // Output from curve object (water removal or energy factor curves)
 
@@ -285,7 +285,7 @@ namespace ZoneDehumidifier {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), ZoneDehumid.Name(), ZoneDehumidIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), ZoneDehumid, ZoneDehumidIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -531,7 +531,7 @@ namespace ZoneDehumidifier {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
+		static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
 		//  LOGICAL, ALLOCATABLE, SAVE, DIMENSION(:) :: MySizeFlag  ! Used for sizing zone dehumidifier inputs one time
 		static bool MyOneTimeFlag( true ); // initialization flag
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
@@ -1102,7 +1102,7 @@ namespace ZoneDehumidifier {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

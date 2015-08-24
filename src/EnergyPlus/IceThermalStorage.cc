@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -154,16 +154,16 @@ namespace IceThermalStorage {
 	Real64 ITSCoolingRate( 0.0 ); // ITS Discharge(-)/Charge(+) rate [W]
 	Real64 ITSCoolingEnergy( 0.0 );
 	Real64 ChillerOutletTemp( 0.0 ); // Chiller outlet brine temperature [C]
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 	// General routine
 
 	// Object Data
-	FArray1D< IceStorageSpecs > IceStorage; // dimension to number of machines
-	FArray1D< ReportVars > IceStorageReport; // dimension to number of machines
-	FArray1D< DetailedIceStorageData > DetIceStor; // Derived type for detailed ice storage model
-	FArray1D< IceStorageMapping > IceStorageTypeMap;
+	Array1D< IceStorageSpecs > IceStorage; // dimension to number of machines
+	Array1D< ReportVars > IceStorageReport; // dimension to number of machines
+	Array1D< DetailedIceStorageData > DetIceStor; // Derived type for detailed ice storage model
+	Array1D< IceStorageMapping > IceStorageTypeMap;
 
 	//*************************************************************************
 
@@ -194,11 +194,9 @@ namespace IceThermalStorage {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataHVACGlobals::TimeStepSys; // [hr]
 		using InputProcessor::FindItemInList;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::WarmupFlag;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
@@ -249,7 +247,7 @@ namespace IceThermalStorage {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			IceStorageNum = FindItemInList( IceStorageName, IceStorageTypeMap.Name(), TotalIceStorages );
+			IceStorageNum = FindItemInList( IceStorageName, IceStorageTypeMap, TotalIceStorages );
 			if ( IceStorageNum == 0 ) {
 				ShowFatalError( "SimIceStorage: Unit not found=" + IceStorageName );
 			}
@@ -859,7 +857,7 @@ namespace IceThermalStorage {
 			GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, _, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), IceStorage.Name(), IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), IceStorage, IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -955,7 +953,7 @@ namespace IceThermalStorage {
 			GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), DetIceStor.Name(), IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), DetIceStor, IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1205,8 +1203,8 @@ namespace IceThermalStorage {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MyEnvrnFlag;
 		int CompNum; // local do loop index
 		// FLOW:
 
@@ -1311,9 +1309,9 @@ namespace IceThermalStorage {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_bool MyPlantScanFlag;
+		static Array1D_bool MyPlantScanFlag;
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		bool errFlag;
 		int CompNum; // local do loop counter
 
@@ -1388,10 +1386,6 @@ namespace IceThermalStorage {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataGlobals::WarmupFlag;
-		using DataGlobals::NumOfTimeStepInHour;
-		using DataGlobals::HourOfDay;
-		using DataGlobals::TimeStep;
 		using ScheduleManager::GetCurrentScheduleValue;
 
 		// Locals
@@ -1404,7 +1398,6 @@ namespace IceThermalStorage {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Umax; // Max Urate  [fraction]
 		Real64 Umin; // Min Urate  [fraction]
 		Real64 Uact; // Acting between Umax and Umin [fraction]
 		Real64 ITSCoolingRateMax;
@@ -1428,7 +1421,6 @@ namespace IceThermalStorage {
 			OptCap = 0.0;
 
 			// Initialize processed Usys values
-			Umax = 0.0;
 			Umin = 0.0;
 			Uact = 0.0;
 
@@ -1449,8 +1441,6 @@ namespace IceThermalStorage {
 			// QiceMin is REAL(r64) ITS capacity.
 			CalcQiceDischageMax( QiceMin );
 
-			// Check Umax and Umin to verify the input U value.
-			Umax = 0.0;
 			// At the first call of ITS model, MyLoad is 0. After that proper MyLoad will be provided by E+.
 			// Therefore, Umin is decided between input U and ITS REAL(r64) capacity.
 			Umin = min( max( ( -( 1.0 - EpsLimitForDisCharge ) * QiceMin * TimeInterval / ITSNomCap ), ( -XCurIceFrac + EpsLimitForX ) ), 0.0 );
@@ -1505,19 +1495,11 @@ namespace IceThermalStorage {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Umax; // Max Urate  [fraction]
-		Real64 Umin; // Min Urate  [fraction]
-		Real64 Uact; // Acting between Umax and Umin [fraction]
 
 		// FLOW
 		{ auto const SELECT_CASE_var( IceStorageType ); //by ZG
 
 		if ( SELECT_CASE_var == IceStorageType_Simple ) { //by ZG
-
-			// Initialize processed Usys values
-			Umax = 0.0;
-			Umin = 0.0;
-			Uact = 0.0;
 
 			// Provide output results for ITS.
 			ITSMassFlowRate = 0.0; //[kg/s]
@@ -1751,7 +1733,7 @@ namespace IceThermalStorage {
 
 	void
 	CalcQiceChargeMaxByITS(
-		int & IceNum,
+		int & EP_UNUSED( IceNum ),
 		Real64 const ChillerOutletTemp, // [degC]
 		Real64 & QiceMaxByITS // [W]
 	)
@@ -1820,7 +1802,7 @@ namespace IceThermalStorage {
 		int const IceNum, // ice storage number
 		Real64 const MyLoad, // operating load
 		bool const RunFlag, // TRUE when ice storage operating
-		bool const FirstIteration, // TRUE when first iteration of timestep
+		bool const EP_UNUSED( FirstIteration ), // TRUE when first iteration of timestep
 		Real64 const MaxCap // Max possible discharge rate (positive value)
 	)
 	{
@@ -1835,9 +1817,6 @@ namespace IceThermalStorage {
 
 		// Using/Aliasing
 		using DataBranchAirLoopPlant::MassFlowTolerance;
-		using DataGlobals::HourOfDay;
-		using DataGlobals::TimeStep;
-		using DataGlobals::NumOfTimeStepInHour;
 		using DataHVACGlobals::TimeStepSys;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
@@ -1849,7 +1828,6 @@ namespace IceThermalStorage {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const TempTol( 0.0001 ); // C - minimum significant mass flow rate
 		static std::string const RoutineName( "CalcIceStorageDischarge" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -2189,7 +2167,7 @@ namespace IceThermalStorage {
 	UpdateNode(
 		Real64 const MyLoad,
 		bool const RunFlag,
-		int const Num
+		int const EP_UNUSED( Num )
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -2525,7 +2503,7 @@ namespace IceThermalStorage {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
@@ -58,12 +58,12 @@ namespace PlantValves {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumTemperingValves;
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
 	// Object Data
-	FArray1D< TemperValveData > TemperValve; // dimension to No. of TemperingValve objects
+	Array1D< TemperValveData > TemperValve; // dimension to No. of TemperingValve objects
 
 	// Functions
 
@@ -72,13 +72,13 @@ namespace PlantValves {
 		int const CompTypeNum,
 		std::string const & CompName,
 		int & CompNum,
-		bool const RunFlag, // unused1208
+		bool const EP_UNUSED( RunFlag ), // unused1208
 		bool & InitLoopEquip,
-		Real64 & MyLoad, // unused1208
+		Real64 & EP_UNUSED( MyLoad ), // unused1208
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
-		bool const FirstHVACIteration // TRUE if First iteration of simulation
+		bool const EP_UNUSED( FirstHVACIteration ) // TRUE if First iteration of simulation
 	)
 	{
 
@@ -98,7 +98,6 @@ namespace PlantValves {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::BeginEnvrnFlag;
 		using InputProcessor::FindItemInList;
 
 		// Locals
@@ -124,7 +123,7 @@ namespace PlantValves {
 
 		// Find the correct Equipment
 		if ( CompNum == 0 ) {
-			EqNum = FindItemInList( CompName, TemperValve.Name(), NumTemperingValves );
+			EqNum = FindItemInList( CompName, TemperValve );
 			if ( EqNum == 0 ) {
 				ShowFatalError( "SimPlantValves: Unit not found=" + CompName );
 			}
@@ -200,8 +199,8 @@ namespace PlantValves {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // Item to be "gotten"
-		FArray1D_string Alphas( 6 ); // Alpha items for object
-		FArray1D< Real64 > Numbers( 1 ); // Numeric items for object
+		Array1D_string Alphas( 6 ); // Alpha items for object
+		Array1D< Real64 > Numbers( 1 ); // Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
@@ -319,7 +318,7 @@ namespace PlantValves {
 		int numLoopSides; // set to SIZE(PlantLoop(i)%LoopSide)
 
 		static bool MyOneTimeFlag( true ); // first pass log
-		static FArray1D_bool MyTwoTimeFlag; // second pass do input check
+		static Array1D_bool MyTwoTimeFlag; // second pass do input check
 		bool errFlag;
 
 		{ auto const SELECT_CASE_var( CompTypeNum );
@@ -706,7 +705,7 @@ namespace PlantValves {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

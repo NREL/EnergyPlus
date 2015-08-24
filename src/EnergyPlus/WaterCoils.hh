@@ -2,8 +2,8 @@
 #define WaterCoils_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray2A.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array2A.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -62,14 +62,14 @@ namespace WaterCoils {
 
 	//MODULE VARIABLE DECLARATIONS:
 	extern int NumWaterCoils; // The Number of WaterCoils found in the Input
-	extern FArray1D_bool MySizeFlag;
-	extern FArray1D_bool MyUAAndFlowCalcFlag;
-	extern FArray1D_bool MyCoilDesignFlag;
-	extern FArray1D_bool CoilWarningOnceFlag;
-	extern FArray1D_int WaterTempCoolCoilErrs; // error counting for detailed coils
-	extern FArray1D_int PartWetCoolCoilErrs; // error counting for detailed coils
+	extern Array1D_bool MySizeFlag;
+	extern Array1D_bool MyUAAndFlowCalcFlag;
+	extern Array1D_bool MyCoilDesignFlag;
+	extern Array1D_bool CoilWarningOnceFlag;
+	extern Array1D_int WaterTempCoolCoilErrs; // error counting for detailed coils
+	extern Array1D_int PartWetCoolCoilErrs; // error counting for detailed coils
 	extern bool GetWaterCoilsInputFlag; // Flag set to make sure you get input once
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -152,7 +152,7 @@ namespace WaterCoils {
 		Real64 CoilEffectiveInsideDiam;
 		Real64 GeometryCoef1;
 		Real64 GeometryCoef2;
-		FArray1D< Real64 > DryFinEfficncyCoef;
+		Array1D< Real64 > DryFinEfficncyCoef;
 		Real64 SatEnthlCurveConstCoef;
 		Real64 SatEnthlCurveSlope;
 		Real64 EnthVsTempCurveAppxSlope;
@@ -385,7 +385,7 @@ namespace WaterCoils {
 			Real64 const CoilEffectiveInsideDiam,
 			Real64 const GeometryCoef1,
 			Real64 const GeometryCoef2,
-			FArray1< Real64 > const & DryFinEfficncyCoef,
+			Array1< Real64 > const & DryFinEfficncyCoef,
 			Real64 const SatEnthlCurveConstCoef,
 			Real64 const SatEnthlCurveSlope,
 			Real64 const EnthVsTempCurveAppxSlope,
@@ -555,7 +555,7 @@ namespace WaterCoils {
 	struct WaterCoilNumericFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		WaterCoilNumericFieldData()
@@ -563,15 +563,15 @@ namespace WaterCoils {
 
 		// Member Constructor
 		WaterCoilNumericFieldData(
-			FArray1_string const & FieldNames // Name of the WaterCoil numeric field descriptions
+			Array1_string const & FieldNames // Name of the WaterCoil numeric field descriptions
 		) :
 			FieldNames( FieldNames )
 		{}
 	};
 
 	// Object Data
-	extern FArray1D< WaterCoilEquipConditions > WaterCoil;
-	extern FArray1D< WaterCoilNumericFieldData > WaterCoilNumericFields;
+	extern Array1D< WaterCoilEquipConditions > WaterCoil;
+	extern Array1D< WaterCoilNumericFieldData > WaterCoilNumericFields;
 
 	// Functions
 
@@ -759,7 +759,7 @@ namespace WaterCoils {
 	void
 	CalcDryFinEffCoef(
 		Real64 const OutTubeEffFinDiamRatio,
-		FArray1< Real64 > & PolynomCoef
+		Array1< Real64 > & PolynomCoef
 	);
 
 	void
@@ -780,20 +780,20 @@ namespace WaterCoils {
 
 	void
 	CalcPolynomCoef(
-		FArray2< Real64 > const & OrderedPair,
-		FArray1< Real64 > & PolynomCoef
+		Array2< Real64 > const & OrderedPair,
+		Array1< Real64 > & PolynomCoef
 	);
 
 	Real64
 	SimpleHeatingCoilUAResidual(
 		Real64 const UA, // UA of coil
-		FArray1< Real64 > const & Par // par(1) = design coil load [W]
+		Array1< Real64 > const & Par // par(1) = design coil load [W]
 	);
 
 	Real64
 	SimpleCoolingCoilUAResidual(
 		Real64 const UA, // UA of coil
-		FArray1< Real64 > const & Par // par(1) = design coil load [W]
+		Array1< Real64 > const & Par // par(1) = design coil load [W]
 	);
 
 	// Iterate Routine for Cooling Coil
@@ -886,7 +886,7 @@ namespace WaterCoils {
 	Real64
 	EnthalpyResidual(
 		Real64 const Tprov, // test value of Tdb [C]
-		FArray1< Real64 > const & Par // Par(1) = desired enthaply H [J/kg]
+		Array1< Real64 > const & Par // Par(1) = desired enthaply H [J/kg]
 	);
 
 	Real64
@@ -930,7 +930,7 @@ namespace WaterCoils {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

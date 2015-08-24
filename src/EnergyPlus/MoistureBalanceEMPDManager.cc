@@ -3,7 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -75,9 +75,9 @@ namespace MoistureBalanceEMPDManager {
 
 	// Data
 	// MODULE VARIABLE and Function DECLARATIONs
-	FArray1D< Real64 > RhoVapEMPD; // Inside Surface Vapor Density Reporting variable
-	FArray1D< Real64 > WSurfEMPD; // Inside Surface Humidity Ratio Reporting variable
-	FArray1D< Real64 > RHEMPD; // Inside Surface Relative Humidity Reporting variable
+	Array1D< Real64 > RhoVapEMPD; // Inside Surface Vapor Density Reporting variable
+	Array1D< Real64 > WSurfEMPD; // Inside Surface Humidity Ratio Reporting variable
+	Array1D< Real64 > RHEMPD; // Inside Surface Relative Humidity Reporting variable
 
 	// SUBROUTINE SPECIFICATION FOR MODULE MoistureBalanceEMPDManager
 
@@ -127,11 +127,11 @@ namespace MoistureBalanceEMPDManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string MaterialNames( 3 ); // Number of Material Alpha names defined
+		Array1D_string MaterialNames( 3 ); // Number of Material Alpha names defined
 		int MaterNum; // Counter to keep track of the material number
 		int MaterialNumAlpha; // Number of material alpha names being passed
 		int MaterialNumProp; // Number of material properties being passed
-		FArray1D< Real64 > MaterialProps( 5 ); // Temporary array to transfer material properties
+		Array1D< Real64 > MaterialProps( 5 ); // Temporary array to transfer material properties
 		static bool ErrorsFound( false ); // If errors detected in input
 
 		int EMPDMat; // EMPD Moisture Material additional properties for each base material
@@ -140,7 +140,7 @@ namespace MoistureBalanceEMPDManager {
 		int SurfNum; // Surface number
 		int MatNum; // Material number at interior layer
 		int ConstrNum; // Construction number
-		FArray1D_bool EMPDzone; // EMPD property check for each zone
+		Array1D_bool EMPDzone; // EMPD property check for each zone
 		static int ErrCount( 0 );
 
 		// Load the additional EMPD Material properties
@@ -158,7 +158,7 @@ namespace MoistureBalanceEMPDManager {
 			GetObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			//Load the material derived type from the input data.
-			MaterNum = FindItemInList( MaterialNames( 1 ), Material.Name(), TotMaterials );
+			MaterNum = FindItemInList( MaterialNames( 1 ), Material );
 			if ( MaterNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + " entered=" + MaterialNames( 1 ) + ", must match to a valid Material name." );
 				ErrorsFound = true;
@@ -504,7 +504,6 @@ namespace MoistureBalanceEMPDManager {
 		// Finite difference method
 
 		// Using/Aliasing
-		using DataGlobals::TimeStepZone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -647,7 +646,7 @@ namespace MoistureBalanceEMPDManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

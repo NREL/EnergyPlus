@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -110,12 +110,12 @@ namespace PackagedThermalStorageCoil {
 	// MODULE VARIABLE DECLARATIONS:
 
 	int NumTESCoils;
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 	bool GetTESInputFlag( true );
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
 	// Object Data
-	FArray1D< PackagedTESCoolingCoilStruct > TESCoil;
+	Array1D< PackagedTESCoolingCoilStruct > TESCoil;
 
 	// Functions
 
@@ -169,7 +169,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( CompIndex == 0 ) {
-			TESCoilNum = FindItemInList( CompName, TESCoil.Name(), NumTESCoils );
+			TESCoilNum = FindItemInList( CompName, TESCoil );
 			if ( TESCoilNum == 0 ) {
 				ShowFatalError( "Thermal Energy Storage Cooling Coil not found=" + CompName );
 			}
@@ -289,7 +289,7 @@ namespace PackagedThermalStorageCoil {
 			GetObjectItem( cCurrentModuleObject, item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), TESCoil.Name(), item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), TESCoil, item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1683,10 +1683,10 @@ namespace PackagedThermalStorageCoil {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_bool MyFlag; // One time environment flag
-		static FArray1D_bool MySizeFlag; // One time sizing flag
-		static FArray1D_bool MyEnvrnFlag; // flag for init once at start of environment
-		static FArray1D_bool MyWarmupFlag; // flag for init after warmup complete
+		static Array1D_bool MyFlag; // One time environment flag
+		static Array1D_bool MySizeFlag; // One time sizing flag
+		static Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
+		static Array1D_bool MyWarmupFlag; // flag for init after warmup complete
 		static bool MyOneTimeFlag( true ); // One time flag used to allocate MyEnvrnFlag and MySizeFlag
 		bool errFlag;
 		int plloopnum;
@@ -2237,7 +2237,7 @@ namespace PackagedThermalStorageCoil {
 	void
 	CalcTESCoilCoolingOnlyMode(
 		int const TESCoilNum,
-		int const FanOpMode,
+		int const EP_UNUSED( FanOpMode ),
 		Real64 const PartLoadRatio
 	)
 	{
@@ -2545,7 +2545,7 @@ namespace PackagedThermalStorageCoil {
 	void
 	CalcTESCoilCoolingAndChargeMode(
 		int const TESCoilNum,
-		int const FanOpMode,
+		int const EP_UNUSED( FanOpMode ),
 		Real64 const PartLoadRatio
 	)
 	{
@@ -2979,7 +2979,7 @@ namespace PackagedThermalStorageCoil {
 	void
 	CalcTESCoilCoolingAndDischargeMode(
 		int const TESCoilNum,
-		int const FanOpMode,
+		int const EP_UNUSED( FanOpMode ),
 		Real64 const PartLoadRatio
 	)
 	{
@@ -4309,7 +4309,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, TESCoil.Name(), NumTESCoils );
+			CoilIndex = FindItem( CoilName, TESCoil );
 		} else {
 			CoilIndex = 0;
 		}
@@ -4327,7 +4327,7 @@ namespace PackagedThermalStorageCoil {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

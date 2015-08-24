@@ -9,9 +9,12 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/noexcept.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -63,6 +66,14 @@ public: // Creation
 	 str_( new char[ std::strlen( s.str_ ) + 1 ] )
 	{
 		std::memcpy( str_, s.str_, std::strlen( s.str_ ) + 1 );
+	}
+
+	// Move Constructor
+	inline
+	Cstring( Cstring && s ) NOEXCEPT :
+	 str_( s.str_ )
+	{
+		s.str_ = nullptr;
 	}
 
 	// C string Constructor: Implicit Conversion
@@ -192,6 +203,18 @@ public: // Assignment
 		return *this;
 	}
 
+	// Move Assignment
+	inline
+	Cstring &
+	operator =( Cstring && s ) NOEXCEPT
+	{
+		assert( this != &s );
+		delete[] str_;
+		str_ = s.str_;
+		s.str_ = nullptr;
+		return *this;
+	}
+
 	// cstring Assignment
 	inline
 	Cstring &
@@ -298,7 +321,7 @@ public: // Predicate
 
 	// Has any Character of a std::string?
 	bool
-	has_any_of( std::string const s ) const;
+	has_any_of( std::string const & s ) const;
 
 	// Has a Character?
 	bool
@@ -403,8 +426,8 @@ public: // Modifier
 	}
 
 	// swap( Cstring, Cstring )
-	inline
 	friend
+	inline
 	void
 	swap( Cstring & s, Cstring & t )
 	{
@@ -456,8 +479,8 @@ public: // Subscript
 public: // Concatenation
 
 	// Cstring + Cstring
-	inline
 	friend
+	inline
 	Cstring
 	operator +( Cstring const & s, Cstring const & t )
 	{
@@ -470,8 +493,8 @@ public: // Concatenation
 	}
 
 	// Cstring + cstring
-	inline
 	friend
+	inline
 	Cstring
 	operator +( Cstring const & s, c_cstring const t )
 	{
@@ -484,8 +507,8 @@ public: // Concatenation
 	}
 
 	// cstring + Cstring
-	inline
 	friend
+	inline
 	Cstring
 	operator +( c_cstring const s, Cstring const & t )
 	{
@@ -498,8 +521,8 @@ public: // Concatenation
 	}
 
 	// Cstring + std::string
-	inline
 	friend
+	inline
 	Cstring
 	operator +( Cstring const & s, std::string const & t )
 	{
@@ -512,8 +535,8 @@ public: // Concatenation
 	}
 
 	// Cstring + char
-	inline
 	friend
+	inline
 	Cstring
 	operator +( Cstring const & s, char const c )
 	{
@@ -525,8 +548,8 @@ public: // Concatenation
 	}
 
 	// char + Cstring
-	inline
 	friend
+	inline
 	Cstring
 	operator +( char const c, Cstring const & t )
 	{
@@ -606,8 +629,8 @@ public: // Generator
 public: // Comparison
 
 	// Cstring == Cstring
-	inline
 	friend
+	inline
 	bool
 	operator ==( Cstring const & s, Cstring const & t )
 	{
@@ -615,8 +638,8 @@ public: // Comparison
 	}
 
 	// Cstring != Cstring
-	inline
 	friend
+	inline
 	bool
 	operator !=( Cstring const & s, Cstring const & t )
 	{
@@ -624,8 +647,8 @@ public: // Comparison
 	}
 
 	// Cstring == cstring
-	inline
 	friend
+	inline
 	bool
 	operator ==( Cstring const & s, c_cstring const t )
 	{
@@ -633,8 +656,8 @@ public: // Comparison
 	}
 
 	// cstring == Cstring
-	inline
 	friend
+	inline
 	bool
 	operator ==( c_cstring const t, Cstring const & s )
 	{
@@ -642,8 +665,8 @@ public: // Comparison
 	}
 
 	// Cstring != cstring
-	inline
 	friend
+	inline
 	bool
 	operator !=( Cstring const & s, c_cstring const t )
 	{
@@ -651,8 +674,8 @@ public: // Comparison
 	}
 
 	// cstring != Cstring
-	inline
 	friend
+	inline
 	bool
 	operator !=( c_cstring const t, Cstring const & s )
 	{
@@ -660,8 +683,8 @@ public: // Comparison
 	}
 
 	// Cstring == std::string
-	inline
 	friend
+	inline
 	bool
 	operator ==( Cstring const & s, std::string const & t )
 	{
@@ -669,8 +692,8 @@ public: // Comparison
 	}
 
 	// std::string == Cstring
-	inline
 	friend
+	inline
 	bool
 	operator ==( std::string const & t, Cstring const & s )
 	{
@@ -678,8 +701,8 @@ public: // Comparison
 	}
 
 	// Cstring != std::string
-	inline
 	friend
+	inline
 	bool
 	operator !=( Cstring const & s, std::string const & t )
 	{
@@ -687,8 +710,8 @@ public: // Comparison
 	}
 
 	// std::string != Cstring
-	inline
 	friend
+	inline
 	bool
 	operator !=( std::string const & t, Cstring const & s )
 	{
@@ -696,8 +719,8 @@ public: // Comparison
 	}
 
 	// Cstring == char
-	inline
 	friend
+	inline
 	bool
 	operator ==( Cstring const & s, char const c )
 	{
@@ -705,8 +728,8 @@ public: // Comparison
 	}
 
 	// char == Cstring
-	inline
 	friend
+	inline
 	bool
 	operator ==( char const c, Cstring const & s )
 	{
@@ -714,8 +737,8 @@ public: // Comparison
 	}
 
 	// Cstring != char
-	inline
 	friend
+	inline
 	bool
 	operator !=( Cstring const & s, char const c )
 	{
@@ -723,8 +746,8 @@ public: // Comparison
 	}
 
 	// char != Cstring
-	inline
 	friend
+	inline
 	bool
 	operator !=( char const c, Cstring const & s )
 	{
@@ -768,19 +791,19 @@ public: // Comparison
 
 public: // I/O
 
-	// Output to Stream
-	friend
-	std::ostream &
-	operator <<( std::ostream & stream, Cstring const & s );
-
-	// Input from Stream
+	// Stream >> Cstring
 	friend
 	std::istream &
 	operator >>( std::istream & stream, Cstring & s );
 
+	// Stream << Cstring
+	friend
+	std::ostream &
+	operator <<( std::ostream & stream, Cstring const & s );
+
 public: // Data
 
-	static size_type const npos = static_cast< size_type >( -1 ); // Unbounded "size"
+	static size_type const npos; // Unbounded "size"
 
 private: // Data
 
@@ -900,13 +923,13 @@ equali( Cstring const & s, char const c );
 bool
 equali( char const c, Cstring const & s );
 
-// Output to Stream
-std::ostream &
-operator <<( std::ostream & stream, Cstring const & s );
-
-// Input from Stream
+// Stream >> Cstring
 std::istream &
 operator >>( std::istream & stream, Cstring & s );
+
+// Stream << Cstring
+std::ostream &
+operator <<( std::ostream & stream, Cstring const & s );
 
 } // ObjexxFCL
 

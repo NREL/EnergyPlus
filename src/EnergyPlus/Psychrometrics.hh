@@ -7,7 +7,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/bit.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -57,9 +57,9 @@ namespace Psychrometrics {
 	extern int const NumPsychMonitors; // Parameterization of Number of psychrometric routines that
 	extern std::string const blank_string;
 #ifdef EP_psych_stats
-	extern FArray1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 - max iter | 18 - PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw (raw calc)
+	extern Array1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 - max iter | 18 - PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw (raw calc)
 
-	extern FArray1D_bool const PsyReportIt; // PsyTdpFnTdbTwbPb     1 | PsyRhFnTdbWPb        2 | PsyTwbFnTdbWPb       3 | PsyVFnTdbWPb         4 | PsyWFnTdpPb          5 | PsyWFnTdbH           6 | PsyWFnTdbTwbPb       7 | PsyWFnTdbRhPb        8 | PsyPsatFnTemp        9 | PsyTsatFnHPb         10 | PsyTsatFnPb          11 | PsyRhFnTdbRhov       12 | PsyRhFnTdbRhovLBnd0C 13 | PsyTwbFnTdbWPb       14 - HR | PsyTwbFnTdbWPb       15 - max iter | PsyWFnTdbTwbPb       16 - HR | PsyTsatFnPb          17 - max iter | PsyTwbFnTdbWPb_cache 18 - PsyTwbFnTdbWPb_raw (raw calc) | PsyPsatFnTemp_cache  19 - PsyPsatFnTemp_raw (raw calc)
+	extern Array1D_bool const PsyReportIt; // PsyTdpFnTdbTwbPb     1 | PsyRhFnTdbWPb        2 | PsyTwbFnTdbWPb       3 | PsyVFnTdbWPb         4 | PsyWFnTdpPb          5 | PsyWFnTdbH           6 | PsyWFnTdbTwbPb       7 | PsyWFnTdbRhPb        8 | PsyPsatFnTemp        9 | PsyTsatFnHPb         10 | PsyTsatFnPb          11 | PsyRhFnTdbRhov       12 | PsyRhFnTdbRhovLBnd0C 13 | PsyTwbFnTdbWPb       14 - HR | PsyTwbFnTdbWPb       15 - max iter | PsyWFnTdbTwbPb       16 - HR | PsyTsatFnPb          17 - max iter | PsyTwbFnTdbWPb_cache 18 - PsyTwbFnTdbWPb_raw (raw calc) | PsyPsatFnTemp_cache  19 - PsyPsatFnTemp_raw (raw calc)
 #endif
 
 #ifndef EP_psych_errors
@@ -82,10 +82,10 @@ namespace Psychrometrics {
 	// MODULE VARIABLE DEFINITIONS:
 	extern std::string String;
 	extern bool ReportErrors;
-	extern FArray1D_int iPsyErrIndex; // Number of times error occurred
+	extern Array1D_int iPsyErrIndex; // Number of times error occurred
 #ifdef EP_psych_stats
-	extern FArray1D< Int64 > NumTimesCalled;
-	extern FArray1D_int NumIterations;
+	extern Array1D< Int64 > NumTimesCalled;
+	extern Array1D_int NumIterations;
 #endif
 
 	// DERIVED TYPE DEFINITIONS
@@ -152,10 +152,10 @@ namespace Psychrometrics {
 
 	// Object Data
 #ifdef EP_cache_PsyTwbFnTdbWPb
-	extern FArray1D< cached_twb_t > cached_Twb; // DIMENSION(0:twbcache_size)
+	extern Array1D< cached_twb_t > cached_Twb; // DIMENSION(0:twbcache_size)
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
-	extern FArray1D< cached_psat_t > cached_Psat; // DIMENSION(0:psatcache_size)
+	extern Array1D< cached_psat_t > cached_Psat; // DIMENSION(0:psatcache_size)
 #endif
 
 	// Subroutine Specifications for the Module
@@ -234,7 +234,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	PsyHfgAirFnWTdb(
-		Real64 const w, // humidity ratio {kgWater/kgDryAir} !unused1208
+		Real64 const EP_UNUSED( w ), // humidity ratio {kgWater/kgDryAir} !unused1208
 		Real64 const T // input temperature {Celsius}
 	)
 	{
@@ -267,7 +267,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	PsyHgAirFnWTdb(
-		Real64 const w, // humidity ratio {kgWater/kgDryAir} !unused1208
+		Real64 const EP_UNUSED( w ), // humidity ratio {kgWater/kgDryAir} !unused1208
 		Real64 const T // input temperature {Celsius}
 	)
 	{
@@ -1232,7 +1232,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	CPCW(
-		Real64 const Temperature // unused1208
+		Real64 const EP_UNUSED( Temperature ) // unused1208
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -1248,7 +1248,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	CPHW(
-		Real64 const Temperature // unused1208
+		Real64 const EP_UNUSED( Temperature ) // unused1208
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -1283,7 +1283,7 @@ namespace Psychrometrics {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

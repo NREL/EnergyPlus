@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -59,13 +59,23 @@ namespace OutAirNodeManager {
 
 	//MODULE VARIABLE DECLARATIONS:
 
-	FArray1D_int OutsideAirNodeList; // List of all outside air inlet nodes
+	Array1D_int OutsideAirNodeList; // List of all outside air inlet nodes
 	int NumOutsideAirNodes( 0 ); // Number of single outside air nodes
 	bool GetOutAirNodesInputFlag( true ); // Flag set to make sure you get input once
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE OutAirNodeManager
 
 	// Functions
+
+	// Clears the global data in OutAirNodeManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		OutsideAirNodeList.deallocate();
+		NumOutsideAirNodes = 0;
+		GetOutAirNodesInputFlag = true;
+	}
 
 	void
 	SetOutAirNodes()
@@ -146,7 +156,7 @@ namespace OutAirNodeManager {
 		int NumNums; // Number of REAL(r64) numbers returned by GetObjectItem
 		int NumAlphas; // Number of alphanumerics returned by GetObjectItem
 		int NumParams;
-		FArray1D_int NodeNums;
+		Array1D_int NodeNums;
 		int NumNodes;
 		int IOStat; // Status flag from GetObjectItem
 		int NodeNum; // index into NodeNums
@@ -160,14 +170,14 @@ namespace OutAirNodeManager {
 		bool ErrInList;
 		int CurSize;
 		int NextFluidStreamNum; // Fluid stream index (all outside air inlet nodes need a unique fluid stream number)
-		FArray1D_int TmpNums;
+		Array1D_int TmpNums;
 		std::string CurrentModuleObject; // Object type for getting and error messages
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -454,7 +464,7 @@ namespace OutAirNodeManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_int TmpNums;
+		Array1D_int TmpNums;
 		int DummyNumber;
 		static bool errFlag( false );
 
@@ -505,7 +515,7 @@ namespace OutAirNodeManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

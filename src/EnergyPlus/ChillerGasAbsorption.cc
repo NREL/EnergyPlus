@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -84,13 +84,13 @@ namespace ChillerGasAbsorption {
 
 	// This type holds the output from the algorithm i.e., the Report Variables
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 
 	// Object Data
-	FArray1D< GasAbsorberSpecs > GasAbsorber; // dimension to number of machines
-	FArray1D< ReportVars > GasAbsorberReport;
+	Array1D< GasAbsorberSpecs > GasAbsorber; // dimension to number of machines
+	Array1D< ReportVars > GasAbsorberReport;
 
 	// MODULE SUBROUTINES:
 
@@ -101,9 +101,9 @@ namespace ChillerGasAbsorption {
 
 	void
 	SimGasAbsorber(
-		std::string const & AbsorberType, // type of Absorber
+		std::string const & EP_UNUSED( AbsorberType ), // type of Absorber
 		std::string const & AbsorberName, // user specified name of Absorber
-		int const EquipFlowCtrl, // Flow control mode for the equipment
+		int const EP_UNUSED( EquipFlowCtrl ), // Flow control mode for the equipment
 		int & CompIndex, // Absorber number counter
 		bool const RunFlag, // simulate Absorber when TRUE
 		bool const FirstIteration, // initialize variables when TRUE
@@ -166,7 +166,7 @@ namespace ChillerGasAbsorption {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			ChillNum = FindItemInList( AbsorberName, GasAbsorber.Name(), NumGasAbsorbers );
+			ChillNum = FindItemInList( AbsorberName, GasAbsorber );
 			if ( ChillNum == 0 ) {
 				ShowFatalError( "SimGasAbsorber: Unit not found=" + AbsorberName );
 			}
@@ -192,7 +192,7 @@ namespace ChillerGasAbsorption {
 
 			// Match inlet node name of calling branch to determine if this call is for heating or cooling
 			if ( BranchInletNodeNum == GasAbsorber( ChillNum ).ChillReturnNodeNum ) { // Operate as chiller
-				SizeGasAbsorber( ChillNum ); // only call from chilled water loop 
+				SizeGasAbsorber( ChillNum ); // only call from chilled water loop
 				MinCap = GasAbsorber( ChillNum ).NomCoolingCap * GasAbsorber( ChillNum ).MinPartLoadRat;
 				MaxCap = GasAbsorber( ChillNum ).NomCoolingCap * GasAbsorber( ChillNum ).MaxPartLoadRat;
 				OptCap = GasAbsorber( ChillNum ).NomCoolingCap * GasAbsorber( ChillNum ).OptPartLoadRat;
@@ -325,7 +325,7 @@ namespace ChillerGasAbsorption {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), GasAbsorber.Name(), AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), GasAbsorber, AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -339,7 +339,7 @@ namespace ChillerGasAbsorption {
 
 			// Assign capacities
 			GasAbsorber( AbsorberNum ).NomCoolingCap = rNumericArgs( 1 );
-			if ( GasAbsorber( AbsorberNum ).NomCoolingCap == AutoSize ){
+			if ( GasAbsorber( AbsorberNum ).NomCoolingCap == AutoSize ) {
 				GasAbsorber( AbsorberNum ).NomCoolingCapWasAutoSized = true;
 			}
 			GasAbsorber( AbsorberNum ).NomHeatCoolRatio = rNumericArgs( 2 );
@@ -382,7 +382,7 @@ namespace ChillerGasAbsorption {
 				}
 			}
 			GasAbsorber( AbsorberNum ).HeatVolFlowRate = rNumericArgs( 14 );
-			if ( GasAbsorber( AbsorberNum ).HeatVolFlowRate == AutoSize ){
+			if ( GasAbsorber( AbsorberNum ).HeatVolFlowRate == AutoSize ) {
 				GasAbsorber( AbsorberNum ).HeatVolFlowRateWasAutoSized = true;
 			}
 			// Assign Curve Numbers
@@ -540,7 +540,7 @@ namespace ChillerGasAbsorption {
 	void
 	InitGasAbsorber(
 		int const ChillNum, // number of the current engine driven chiller being simulated
-		bool const RunFlag // TRUE when chiller operating
+		bool const EP_UNUSED( RunFlag ) // TRUE when chiller operating
 	)
 	{
 
@@ -566,7 +566,6 @@ namespace ChillerGasAbsorption {
 		using DataPlant::TypeOf_Chiller_DFAbsorption;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;
 		using PlantUtilities::InitComponentNodes;
@@ -594,8 +593,8 @@ namespace ChillerGasAbsorption {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyPlantScanFlag;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyPlantScanFlag;
 		int CondInletNode; // node number of water inlet node to the condenser
 		int CondOutletNode; // node number of water outlet node from the condenser
 		int HeatInletNode; // node number of hot water inlet node
@@ -866,19 +865,19 @@ namespace ChillerGasAbsorption {
 				if ( GasAbsorber( ChillNum ).NomCoolingCapWasAutoSized ) {
 					GasAbsorber( ChillNum ).NomCoolingCap = tmpNomCap;
 					if ( PlantFinalSizesOkayToReport ) {
-						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, 
+						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name,
 							"Design Size Nominal Cooling Capacity [W]", tmpNomCap );
 					}
 					if ( PlantFirstSizesOkayToReport ) {
-						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, 
+						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name,
 							"Initial Design Size Nominal Cooling Capacity [W]", tmpNomCap );
 					}
 				} else {
 					if ( GasAbsorber( ChillNum ).NomCoolingCap > 0.0 && tmpNomCap > 0.0 ) {
 						NomCapUser = GasAbsorber( ChillNum ).NomCoolingCap;
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, 
-								"Design Size Nominal Cooling Capacity [W]", tmpNomCap, 
+							ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name,
+								"Design Size Nominal Cooling Capacity [W]", tmpNomCap,
 								"User-Specified Nominal Cooling Capacity [W]", NomCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
@@ -905,7 +904,7 @@ namespace ChillerGasAbsorption {
 			} else {
 				if ( PlantFinalSizesOkayToReport ) {
 					if ( GasAbsorber( ChillNum ).NomCoolingCap > 0.0 ) {
-						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, 
+						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name,
 							"User-Specified Nominal Capacity [W]", GasAbsorber( ChillNum ).NomCoolingCap );
 					}
 				}
@@ -923,19 +922,19 @@ namespace ChillerGasAbsorption {
 				if ( GasAbsorber( ChillNum ).EvapVolFlowRateWasAutoSized ) {
 					GasAbsorber( ChillNum ).EvapVolFlowRate = tmpEvapVolFlowRate;
 					if ( PlantFinalSizesOkayToReport ) {
-						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, 
+						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name,
 							"Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate );
 					}
 					if ( PlantFirstSizesOkayToReport ) {
-						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, 
+						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name,
 							"Initial Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate );
 					}
 				} else {
 					if ( GasAbsorber( ChillNum ).EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0 ) {
 						EvapVolFlowRateUser = GasAbsorber( ChillNum ).EvapVolFlowRate;
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, 
-								"Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate, 
+							ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name,
+								"Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate,
 								"User-Specified Design Chilled Water Flow Rate [m3/s]", EvapVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpEvapVolFlowRate - EvapVolFlowRateUser ) / EvapVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
@@ -962,7 +961,7 @@ namespace ChillerGasAbsorption {
 			} else {
 				if ( PlantFinalSizesOkayToReport ) {
 					if ( GasAbsorber( ChillNum ).EvapVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, 
+						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name,
 							"User-Specified Design Chilled Water Flow Rate [m3/s]", GasAbsorber( ChillNum ).EvapVolFlowRate );
 					}
 				}
@@ -984,19 +983,19 @@ namespace ChillerGasAbsorption {
 				if ( GasAbsorber( ChillNum ).HeatVolFlowRateWasAutoSized ) {
 					GasAbsorber( ChillNum ).HeatVolFlowRate = tmpHeatRecVolFlowRate;
 					if ( PlantFinalSizesOkayToReport ) {
-						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, 
+						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name,
 							"Design Size Design Hot Water Flow Rate [m3/s]", tmpHeatRecVolFlowRate );
 					}
 					if ( PlantFirstSizesOkayToReport ) {
-						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, 
+						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name,
 							"Initial Design Size Design Hot Water Flow Rate [m3/s]", tmpHeatRecVolFlowRate );
 					}
 				} else {
 					if ( GasAbsorber( ChillNum ).HeatVolFlowRate > 0.0 && tmpHeatRecVolFlowRate > 0.0 ) {
 						HeatRecVolFlowRateUser = GasAbsorber( ChillNum ).HeatVolFlowRate;
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, 
-								"Design Size Design Hot Water Flow Rate [m3/s]", tmpHeatRecVolFlowRate, 
+							ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name,
+								"Design Size Design Hot Water Flow Rate [m3/s]", tmpHeatRecVolFlowRate,
 								"User-Specified Design Hot Water Flow Rate [m3/s]", HeatRecVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpHeatRecVolFlowRate - HeatRecVolFlowRateUser ) / HeatRecVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
@@ -1023,7 +1022,7 @@ namespace ChillerGasAbsorption {
 			} else {
 				if ( PlantFinalSizesOkayToReport ) {
 					if ( GasAbsorber( ChillNum ).HeatVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, 
+						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name,
 							"User-Specified Design Hot Water Flow Rate [m3/s]", GasAbsorber( ChillNum ).HeatVolFlowRate );
 					}
 				}
@@ -1048,19 +1047,19 @@ namespace ChillerGasAbsorption {
 				if ( GasAbsorber( ChillNum ).CondVolFlowRateWasAutoSized ) {
 					GasAbsorber( ChillNum ).CondVolFlowRate = tmpCondVolFlowRate;
 					if ( PlantFinalSizesOkayToReport ) {
-						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, 
+						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name,
 							"Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate );
 					}
 					if ( PlantFirstSizesOkayToReport ) {
-						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, 
+						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name,
 							"Initial Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate );
 					}
 				} else {
 					if ( GasAbsorber( ChillNum ).CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0 ) {
 						CondVolFlowRateUser = GasAbsorber( ChillNum ).CondVolFlowRate;
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, 
-								"Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate, 
+							ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name,
+								"Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate,
 								"User-Specified Design Condenser Water Flow Rate [m3/s]", CondVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpCondVolFlowRate - CondVolFlowRateUser ) / CondVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
@@ -1087,7 +1086,7 @@ namespace ChillerGasAbsorption {
 			} else {
 				if ( PlantFinalSizesOkayToReport ) {
 					if ( GasAbsorber( ChillNum ).CondVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name, 
+						ReportSizingOutput( "ChillerHeater:Absorption:DirectFired", GasAbsorber( ChillNum ).Name,
 							"User-Specified Design Condenser Water Flow Rate [m3/s]", GasAbsorber( ChillNum ).CondVolFlowRate );
 					}
 				}
@@ -1118,7 +1117,7 @@ namespace ChillerGasAbsorption {
 	CalcGasAbsorberChillerModel(
 		int & ChillNum, // Absorber number
 		Real64 & MyLoad, // operating load
-		bool const RunFlag // TRUE when Absorber operating
+		bool const EP_UNUSED( RunFlag ) // TRUE when Absorber operating
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1139,9 +1138,6 @@ namespace ChillerGasAbsorption {
 		// 2.  CoolTools GasMod work
 
 		// Using/Aliasing
-		using DataGlobals::BeginFullSimFlag;
-		using DataHVACGlobals::FirstTimeStepSysFlag;
-		using DataHVACGlobals::TimeStepSys;
 		using CurveManager::CurveValue;
 		using DataPlant::DeltaTempTol;
 		using DataPlant::PlantLoop;
@@ -1554,10 +1550,7 @@ namespace ChillerGasAbsorption {
 		// 2.  CoolTools GasMod work
 
 		// Using/Aliasing
-		using DataGlobals::BeginFullSimFlag;
 		using DataEnvironment::OutDryBulbTemp;
-		using DataHVACGlobals::FirstTimeStepSysFlag;
-		using DataHVACGlobals::TimeStepSys;
 		using CurveManager::CurveValue;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
@@ -1998,7 +1991,7 @@ namespace ChillerGasAbsorption {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

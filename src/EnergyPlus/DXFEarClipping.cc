@@ -2,8 +2,8 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -66,7 +66,7 @@ namespace DXFEarClipping {
 	bool
 	InPolygon(
 		Vector const & point,
-		FArray1A< Vector > poly,
+		Array1A< Vector > poly,
 		int const nsides
 	)
 	{
@@ -147,8 +147,8 @@ namespace DXFEarClipping {
 	int
 	Triangulate(
 		int const nsides, // number of sides to polygon
-		FArray1A< Vector > polygon,
-		FArray1D< dTriangle > & outtriangles,
+		Array1A< Vector > polygon,
+		Array1D< dTriangle > & outtriangles,
 		Real64 const surfazimuth, // surface azimuth angle (outward facing normal)
 		Real64 const surftilt, // surface tilt angle
 		std::string const & surfname, // surface name (for error messages)
@@ -203,18 +203,18 @@ namespace DXFEarClipping {
 
 		// Subroutine local variable declarations:
 		bool errFlag;
-		FArray1D_int ears( nsides );
-		FArray1D_int r_angles( nsides );
-		FArray1D< Real64 > rangles( nsides );
-		FArray1D_int c_vertices( nsides );
-		FArray2D_int earvert( 3, nsides );
-		FArray1D_bool removed( nsides );
+		Array1D_int ears( nsides );
+		Array1D_int r_angles( nsides );
+		Array1D< Real64 > rangles( nsides );
+		Array1D_int c_vertices( nsides );
+		Array2D_int earvert( nsides, 3 );
+		Array1D_bool removed( nsides );
 		//unused  type(Vector_2d), dimension(3) :: testtri
 		//unused  type(Vector_2d) :: point
-		FArray1D_int earverts( 3 );
-		FArray1D< Real64 > xvt( nsides );
-		FArray1D< Real64 > yvt( nsides );
-		FArray1D< Real64 > zvt( nsides );
+		Array1D_int earverts( 3 );
+		Array1D< Real64 > xvt( nsides );
+		Array1D< Real64 > yvt( nsides );
+		Array1D< Real64 > zvt( nsides );
 
 		//'General Variables
 		int i;
@@ -237,8 +237,8 @@ namespace DXFEarClipping {
 		static int errcount( 0 );
 
 		// Object Data
-		FArray1D< Vector_2d > vertex( nsides );
-		FArray1D< dTriangle > Triangle( nsides );
+		Array1D< Vector_2d > vertex( nsides );
+		Array1D< dTriangle > Triangle( nsides );
 
 		errFlag = false;
 		//  vertex=polygon
@@ -314,9 +314,9 @@ namespace DXFEarClipping {
 				// remove ear
 				++ncount;
 				removed( mvert ) = true;
-				earvert( 1, ncount ) = svert;
-				earvert( 2, ncount ) = mvert;
-				earvert( 3, ncount ) = evert;
+				earvert( ncount, 1 ) = svert;
+				earvert( ncount, 2 ) = mvert;
+				earvert( ncount, 3 ) = evert;
 				--nvertcur;
 			}
 			if ( nvertcur == 3 ) {
@@ -324,7 +324,7 @@ namespace DXFEarClipping {
 				++ncount;
 				for ( i = 1; i <= nsides; ++i ) {
 					if ( removed( i ) ) continue;
-					earvert( j, ncount ) = i;
+					earvert( ncount, j ) = i;
 					++j;
 				}
 			}
@@ -333,9 +333,9 @@ namespace DXFEarClipping {
 		ntri = ncount;
 
 		for ( i = 1; i <= ntri; ++i ) {
-			Triangle( i ).vv0 = earvert( 1, i );
-			Triangle( i ).vv1 = earvert( 2, i );
-			Triangle( i ).vv2 = earvert( 3, i );
+			Triangle( i ).vv0 = earvert( i, 1 );
+			Triangle( i ).vv1 = earvert( i, 2 );
+			Triangle( i ).vv2 = earvert( i, 3 );
 		}
 
 		outtriangles.allocate( ntri );
@@ -430,7 +430,7 @@ namespace DXFEarClipping {
 	bool
 	polygon_contains_point_2d(
 		int const nsides, // number of sides (vertices)
-		FArray1A< Vector_2d > polygon, // points of polygon
+		Array1A< Vector_2d > polygon, // points of polygon
 		Vector_2d const & point // point to be tested
 	)
 	{
@@ -465,7 +465,6 @@ namespace DXFEarClipping {
 		// Function argument definitions:
 
 		// Function parameter definitions:
-		Real64 const point_tolerance( 0.00001 );
 
 		// Interface block specifications:
 		// na
@@ -502,16 +501,16 @@ namespace DXFEarClipping {
 	void
 	generate_ears(
 		int const nvert, // number of vertices in polygon
-		FArray1A< Vector_2d > vertex,
-		FArray1A_int ears, // number of ears possible (dimensioned to nvert)
+		Array1A< Vector_2d > vertex,
+		Array1A_int ears, // number of ears possible (dimensioned to nvert)
 		int & nears, // number of ears found
-		FArray1A_int r_vertices, // number of reflex vertices (>180) possible
+		Array1A_int r_vertices, // number of reflex vertices (>180) possible
 		int & nrverts, // number of reflex vertices found (>=180)
-		FArray1A_int c_vertices, // number of convex vertices
+		Array1A_int c_vertices, // number of convex vertices
 		int & ncverts, // number of convex vertices found (< 180)
-		FArray1A_bool removed, // array that shows if a vertex has been removed (calling routine)
-		FArray1A_int earvert, // vertex indicators for first ear
-		FArray1A< Real64 > rangles
+		Array1A_bool removed, // array that shows if a vertex has been removed (calling routine)
+		Array1A_int earvert, // vertex indicators for first ear
+		Array1A< Real64 > rangles
 	)
 	{
 
@@ -568,7 +567,7 @@ namespace DXFEarClipping {
 
 		// Object Data
 		Vector_2d point; // structure for point
-		FArray1D< Vector_2d > testtri( 3 ); // structure for triangle
+		Array1D< Vector_2d > testtri( 3 ); // structure for triangle
 
 		// initialize, always recalculate
 		ears = 0;
@@ -658,12 +657,12 @@ namespace DXFEarClipping {
 	void
 	CalcWallCoordinateTransformation(
 		int const nsides,
-		FArray1A< Vector > polygon,
+		Array1A< Vector > polygon,
 		Real64 const surfazimuth,
-		Real64 const surftilt, // unused1208
-		FArray1A< Real64 > xvt,
-		FArray1A< Real64 > yvt,
-		FArray1A< Real64 > zvt
+		Real64 const EP_UNUSED( surftilt ), // unused1208
+		Array1A< Real64 > xvt,
+		Array1A< Real64 > yvt,
+		Array1A< Real64 > zvt
 	)
 	{
 
@@ -728,12 +727,12 @@ namespace DXFEarClipping {
 	void
 	CalcRfFlrCoordinateTransformation(
 		int const nsides,
-		FArray1A< Vector > polygon,
-		Real64 const surfazimuth, // unused1208
+		Array1A< Vector > polygon,
+		Real64 const EP_UNUSED( surfazimuth ), // unused1208
 		Real64 const surftilt,
-		FArray1A< Real64 > xvt,
-		FArray1A< Real64 > yvt,
-		FArray1A< Real64 > zvt
+		Array1A< Real64 > xvt,
+		Array1A< Real64 > yvt,
+		Array1A< Real64 > zvt
 	)
 	{
 
@@ -792,7 +791,7 @@ namespace DXFEarClipping {
 	}
 
 	void
-	reorder( int & nvert ) // unused1208
+	reorder( int & EP_UNUSED( nvert ) ) // unused1208
 	{
 
 		// Locals

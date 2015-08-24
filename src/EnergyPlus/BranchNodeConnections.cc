@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -161,7 +161,7 @@ namespace BranchNodeConnections {
 				}
 
 				// Check out AirTerminal inlet/outlet nodes
-				Found = FindItemInList( NodeName, AirTerminalNodeConnections.NodeName(), NumOfAirTerminalNodes - 1 );
+				Found = FindItemInList( NodeName, AirTerminalNodeConnections, &EqNodeConnectionDef::NodeName, NumOfAirTerminalNodes - 1 );
 				if ( Found != 0 ) { // Nodename already used
 					ShowSevereError( RoutineName + ObjectType + "=\"" + ObjectName + "\" node name duplicated." );
 					ShowContinueError( "NodeName=\"" + NodeName + "\", entered as type=" + ConnectionType );
@@ -303,10 +303,10 @@ namespace BranchNodeConnections {
 		int Object;
 		int StartConnect;
 		int EndConnect;
-		FArray1D_int FluidStreamInletCount;
-		FArray1D_int FluidStreamOutletCount;
-		FArray1D_int NodeObjects;
-		FArray1D_bool FluidStreamCounts;
+		Array1D_int FluidStreamInletCount;
+		Array1D_int FluidStreamOutletCount;
+		Array1D_int NodeObjects;
+		Array1D_bool FluidStreamCounts;
 		int NumObjects;
 		int MaxFluidStream;
 
@@ -1071,13 +1071,13 @@ namespace BranchNodeConnections {
 		std::string const & ComponentName,
 		bool & IsParent,
 		int & NumInlets,
-		FArray1D_string & InletNodeNames,
-		FArray1D_int & InletNodeNums,
-		FArray1D_int & InletFluidStreams,
+		Array1D_string & InletNodeNames,
+		Array1D_int & InletNodeNums,
+		Array1D_int & InletFluidStreams,
 		int & NumOutlets,
-		FArray1D_string & OutletNodeNames,
-		FArray1D_int & OutletNodeNums,
-		FArray1D_int & OutletFluidStreams,
+		Array1D_string & OutletNodeNames,
+		Array1D_int & OutletNodeNums,
+		Array1D_int & OutletFluidStreams,
 		bool & ErrorsFound
 	)
 	{
@@ -1190,12 +1190,12 @@ namespace BranchNodeConnections {
 		std::string const & ComponentType,
 		std::string const & ComponentName,
 		int & NumChildren,
-		FArray1S_string ChildrenCType,
-		FArray1S_string ChildrenCName,
-		FArray1S_string InletNodeName,
-		FArray1S_int InletNodeNum,
-		FArray1S_string OutletNodeName,
-		FArray1S_int OutletNodeNum,
+		Array1S_string ChildrenCType,
+		Array1S_string ChildrenCName,
+		Array1S_string InletNodeName,
+		Array1S_int InletNodeNum,
+		Array1S_string OutletNodeName,
+		Array1S_int OutletNodeNum,
 		bool & ErrorsFound
 	)
 	{
@@ -1233,12 +1233,12 @@ namespace BranchNodeConnections {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string ChildCType;
-		FArray1D_string ChildCName;
-		FArray1D_string ChildInNodeName;
-		FArray1D_string ChildOutNodeName;
-		FArray1D_int ChildInNodeNum;
-		FArray1D_int ChildOutNodeNum;
+		Array1D_string ChildCType;
+		Array1D_string ChildCName;
+		Array1D_string ChildInNodeName;
+		Array1D_string ChildOutNodeName;
+		Array1D_int ChildInNodeNum;
+		Array1D_int ChildOutNodeNum;
 		int Loop;
 		int CountNum;
 		bool ErrInObject;
@@ -1563,7 +1563,7 @@ namespace BranchNodeConnections {
 	}
 
 	void
-	TestInletOutletNodes( bool & ErrorsFound )
+	TestInletOutletNodes( bool & EP_UNUSED( ErrorsFound ) )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1600,7 +1600,7 @@ namespace BranchNodeConnections {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Count;
 		int Other;
-		FArray1D_bool AlreadyNoted;
+		Array1D_bool AlreadyNoted;
 
 		// Test component sets created by branches
 		AlreadyNoted.dimension( NumCompSets, false );
@@ -1770,7 +1770,7 @@ namespace BranchNodeConnections {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Count;
 		int Other;
-		FArray1D_bool AlreadyNoted;
+		Array1D_bool AlreadyNoted;
 
 		// Test component sets created by branches
 		AlreadyNoted.dimension( NumCompSets, false );
@@ -1849,7 +1849,7 @@ namespace BranchNodeConnections {
 	void
 	GetNodeConnectionType(
 		int const NodeNumber,
-		FArray1D_int & NodeConnectType,
+		Array1D_int & NodeConnectType,
 		bool & errFlag
 	)
 	{
@@ -1889,7 +1889,7 @@ namespace BranchNodeConnections {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int NodeConnectIndex;
 		int NumInList;
-		FArray1D_int ListArray;
+		Array1D_int ListArray;
 
 		if ( allocated( NodeConnectType ) ) NodeConnectType.deallocate();
 
@@ -1915,10 +1915,10 @@ namespace BranchNodeConnections {
 	void
 	FindAllNumbersInList(
 		int const WhichNumber,
-		FArray1A_int const ListOfItems,
+		Array1A_int const ListOfItems,
 		int const NumItems,
 		int & CountOfItems, // Number of items found
-		FArray1D_int & AllNumbersInList // Index array to all numbers found
+		Array1D_int & AllNumbersInList // Index array to all numbers found
 	)
 	{
 
@@ -1943,7 +1943,7 @@ namespace BranchNodeConnections {
 		// na
 
 		// Argument array dimensioning
-		ListOfItems.dim( star );
+		ListOfItems.dim( _ );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1988,7 +1988,7 @@ namespace BranchNodeConnections {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

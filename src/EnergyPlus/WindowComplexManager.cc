@@ -1,11 +1,12 @@
 // C++ Headers
 #include <cassert>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArrayS.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -24,6 +25,7 @@
 #include <DataZoneEquipment.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
+#include <PierceSurface.hh>
 #include <Psychrometrics.hh>
 #include <TARCOGGassesParams.hh>
 #include <TARCOGMain.hh>
@@ -104,9 +106,9 @@ namespace WindowComplexManager {
 
 	int NumComplexWind( 0 ); // Total number of complex windows
 	//Debug
-	FArray2D_int DbgIBm( 24, 60 );
-	FArray2D< Real64 > DbgTheta( 24, 60 );
-	FArray2D< Real64 > DbgPhi( 24, 60 );
+	Array2D_int DbgIBm( 60, 24 );
+	Array2D< Real64 > DbgTheta( 60, 24 );
+	Array2D< Real64 > DbgPhi( 60, 24 );
 	Real64 DdbgTheta;
 	Real64 DdbgPhi;
 	//EndDebug
@@ -114,9 +116,9 @@ namespace WindowComplexManager {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WindowComplexManager:
 
 	// Object Data
-	FArray1D< BasisStruct > BasisList;
-	FArray1D< WindowIndex > WindowList;
-	FArray2D< WindowStateIndex > WindowStateList;
+	Array1D< BasisStruct > BasisList;
+	Array1D< WindowIndex > WindowList;
+	Array2D< WindowStateIndex > WindowStateList;
 
 	// Functions
 
@@ -155,7 +157,6 @@ namespace WindowComplexManager {
 		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool BasisFound( false ); // Flag for sorting Basis List
 		static bool Once( true ); // Flag for insuring things happen once
 		static int IBasis( 0 ); // Index for identifying basis in BasisList
 		static int ISurf( 0 ); // Index for sorting thru Surface array
@@ -169,27 +170,13 @@ namespace WindowComplexManager {
 		static int K( 0 ); // general purpose index
 		static int KBkSurf( 0 ); // back surface index
 		static int KBasis( 0 ); // secondary reference to a basis index
-		static int NThetas( 0 ); // Current number of theta values
 		static int NumBasis( 0 ); // Number of unique bases (No. in BasisList)
-		static int NumElem( 0 ); // Number of elements in current basis
 		static int NBkSurf( 0 ); // Local variable for the number of back surfaces
 		int NumStates; // Local variable for the number of states
-		static int ElemNo( 0 ); // Current basis element number
-		static int ThConst( 0 ); // Construct array index of thermal construction of state
-		static Real64 Theta( 0.0 ); // Current theta value
-		static Real64 Phi( 0.0 ); // Current phi value
-		static Real64 DPhi( 0.0 ); // Increment for phi value (Window6 type input)
-		static Real64 Lamda( 0.0 ); // Current 'Lamda' value (element weight)
 		static int MatrixNo( 0 ); // Index of Basis matrix
-		static Real64 NextTheta( 0.0 ); // Next theta in the W6 basis after current
-		static Real64 LastTheta( 0.0 ); // Previous theta in the W6 basis before current
-		static Real64 LowerTheta( 0.0 ); // Lower theta boundary of the element
-		static Real64 UpperTheta( 0.0 ); // Upper theta boundary of the element
-		Real64 Azimuth; // Azimuth of window surface (radians)
-		Real64 Tilt; // Tilt of window surface (radians)
-		FArray1D< Real64 > Thetas; // temp array holding theta values
-		FArray1D_int NPhis; // temp array holding number of phis for a given theta
-		FArray1D< Real64 > V( 3 ); // vector array
+		Array1D< Real64 > Thetas; // temp array holding theta values
+		Array1D_int NPhis; // temp array holding number of phis for a given theta
+		Array1D< Real64 > V( 3 ); // vector array
 		Real64 VLen; // Length of vector array
 		int NHold; // No. values in the Temporary array
 
@@ -215,7 +202,7 @@ namespace WindowComplexManager {
 		};
 
 		// Object Data
-		FArray1D< TempBasisIdx > IHold; // Temporary array
+		Array1D< TempBasisIdx > IHold; // Temporary array
 
 		if ( TotComplexFenStates <= 0 ) return; //Nothing to do if no complex fenestration states
 		//Construct Basis List
@@ -227,23 +214,20 @@ namespace WindowComplexManager {
 		//            definition or additional definition of a state type with non-square matrices, then the loop
 		//            below should be modified to enter both of the bases into the basis list.
 
-		BsLoop: for ( IConst = FirstBSDF; IConst <= FirstBSDF + TotComplexFenStates - 1; ++IConst ) {
+		for ( IConst = FirstBSDF; IConst <= FirstBSDF + TotComplexFenStates - 1; ++IConst ) {
 			MatrixNo = Construct( IConst ).BSDFInput.BasisMatIndex;
 			if ( NumBasis == 0 ) {
 				NumBasis = 1;
 				ConstructBasis( IConst, BasisList( 1 ) );
 			} else {
-				BLsLp: for ( IBasis = 1; IBasis <= NumBasis; ++IBasis ) {
+				for ( IBasis = 1; IBasis <= NumBasis; ++IBasis ) {
 					if ( MatrixNo == BasisList( IBasis ).BasisMatIndex ) goto BsLoop_loop;
-					BLsLp_loop: ;
 				}
-				BLsLp_exit: ;
 				++NumBasis;
 				ConstructBasis( IConst, BasisList( NumBasis ) );
 			}
 			BsLoop_loop: ;
 		}
-		BsLoop_exit: ;
 		BasisList.redimension( NumBasis );
 		//  Proceed to set up geometry for complex fenestration states
 		ComplexWind.allocate( TotSurfaces ); //Set up companion array to SurfaceWindow to hold window
@@ -254,8 +238,8 @@ namespace WindowComplexManager {
 		//  This will define the first complex fenestration state for that window, others will follow if there are
 		//     control specifications
 		WindowList.allocate( TotSurfaces ); //Temporary allocation
-		WindowStateList.allocate( TotSurfaces, TotComplexFenStates ); //Temporary allocation
-		SfLoop: for ( ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
+		WindowStateList.allocate( TotComplexFenStates, TotSurfaces ); //Temporary allocation
+		for ( ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
 			IConst = Surface( ISurf ).Construction;
 			if ( IConst == 0 ) continue; // This is true for overhangs (Shading:Zone:Detailed)
 			if ( ! ( Construct( IConst ).TypeIsWindow && ( Construct( IConst ).WindowTypeBSDF ) ) ) continue; //Only BSDF windows
@@ -269,25 +253,23 @@ namespace WindowComplexManager {
 			WindowList( NumComplexWind ).SurfNo = ISurf;
 			//WindowList( NumComplexWind ).Azimuth = DegToRadians * Surface( ISurf ).Azimuth;
 			//WindowList( NumComplexWind ).Tilt = DegToRadians * Surface( ISurf ).Tilt;
-			WindowStateList( NumComplexWind, NumStates ).InitInc = Calculate_Geometry;
-			WindowStateList( NumComplexWind, NumStates ).InitTrn = Calculate_Geometry;
-			WindowStateList( NumComplexWind, NumStates ).CopyIncState = 0;
-			WindowStateList( NumComplexWind, NumStates ).CopyTrnState = 0;
-			WindowStateList( NumComplexWind, NumStates ).Konst = IConst;
+			WindowStateList( NumStates, NumComplexWind ).InitInc = Calculate_Geometry;
+			WindowStateList( NumStates, NumComplexWind ).InitTrn = Calculate_Geometry;
+			WindowStateList( NumStates, NumComplexWind ).CopyIncState = 0;
+			WindowStateList( NumStates, NumComplexWind ).CopyTrnState = 0;
+			WindowStateList( NumStates, NumComplexWind ).Konst = IConst;
 			//Simon Check: ThermalConstruction assigned to current construction
 			//WindowStateList(NumComplexWind, NumStates)%ThermConst = ThConst
 			for ( I = 1; I <= NumBasis; ++I ) { //Find basis in Basis List
 				if ( Construct( IConst ).BSDFInput.BasisMatIndex == BasisList( I ).BasisMatIndex ) {
-					WindowStateList( NumComplexWind, NumStates ).IncBasisIndx = I; //Note: square property matrices
-					WindowStateList( NumComplexWind, NumStates ).TrnBasisIndx = I; //   assumption
+					WindowStateList( NumStates, NumComplexWind ).IncBasisIndx = I; //Note: square property matrices
+					WindowStateList( NumStates, NumComplexWind ).TrnBasisIndx = I; //   assumption
 				}
 			}
-			if ( WindowStateList( NumComplexWind, NumStates ).IncBasisIndx <= 0 ) {
+			if ( WindowStateList( NumStates, NumComplexWind ).IncBasisIndx <= 0 ) {
 				ShowFatalError( "Complex Window Init: Window Basis not in BasisList." );
 			}
-			SfLoop_loop: ;
 		}
-		SfLoop_exit: ;
 		//  Should now have a WindowList with NumComplexWind entries containing all the complex fenestrations
 		//    with a first state defined for each.
 		//  *  *  *
@@ -309,7 +291,7 @@ namespace WindowComplexManager {
 				IHold.allocate( WindowList( IWind ).NumStates );
 				NHold = 1;
 				IHold( 1 ).State = 1;
-				IHold( 1 ).Basis = WindowStateList( IWind, 1 ).IncBasisIndx;
+				IHold( 1 ).Basis = WindowStateList( 1, IWind ).IncBasisIndx;
 				// If the Mth new basis found is basis B in the basis list, and it
 				// first occurs in the WindowStateList  in state N, then IHold(M)%Basis=B
 				// and IHold(M)%State=N
@@ -319,22 +301,22 @@ namespace WindowComplexManager {
 					J = IHold( K ).State;
 					Once = true;
 					for ( I = J + 1; I <= WindowList( IWind ).NumStates; ++I ) { //See if subsequent states have the same basis
-						if ( ( WindowStateList( NumComplexWind, I ).InitInc == Calculate_Geometry ) && ( WindowStateList( NumComplexWind, I ).IncBasisIndx == KBasis ) ) {
+						if ( ( WindowStateList( I, NumComplexWind ).InitInc == Calculate_Geometry ) && ( WindowStateList( I, NumComplexWind ).IncBasisIndx == KBasis ) ) {
 							//Note:  square property matrices (same inc & trn bases) assumption
 							//If same incident and outgoing basis assumption removed, following code will need to
 							//  be extended to treat the two bases separately
-							WindowStateList( NumComplexWind, I ).InitInc = Copy_Geometry;
-							WindowStateList( NumComplexWind, I ).InitTrn = Copy_Geometry;
-							WindowStateList( NumComplexWind, I ).CopyIncState = J;
-							WindowStateList( NumComplexWind, I ).CopyTrnState = J;
+							WindowStateList( I, NumComplexWind ).InitInc = Copy_Geometry;
+							WindowStateList( I, NumComplexWind ).InitTrn = Copy_Geometry;
+							WindowStateList( I, NumComplexWind ).CopyIncState = J;
+							WindowStateList( I, NumComplexWind ).CopyTrnState = J;
 						} else if ( Once ) {
 							Once = false; //First occurrence of a different basis
 							++NHold;
 							IHold( NHold ).State = I;
-							IHold( NHold ).Basis = WindowStateList( IWind, I ).IncBasisIndx;
-							WindowStateList( NumComplexWind, I ).InitTrn = Calculate_Geometry;
-							WindowStateList( NumComplexWind, I ).CopyIncState = 0;
-							WindowStateList( NumComplexWind, I ).CopyTrnState = 0;
+							IHold( NHold ).Basis = WindowStateList( I, IWind ).IncBasisIndx;
+							WindowStateList( I, NumComplexWind ).InitTrn = Calculate_Geometry;
+							WindowStateList( I, NumComplexWind ).CopyIncState = 0;
+							WindowStateList( I, NumComplexWind ).CopyTrnState = 0;
 						}
 					}
 				}
@@ -377,22 +359,22 @@ namespace WindowComplexManager {
 			for ( IState = 1; IState <= NumStates; ++IState ) {
 				//The following assumes identical incoming and outgoing bases.  The logic will need to be
 				//  redesigned if this assumption is relaxed
-				IConst = WindowStateList( IWind, IState ).Konst;
+				IConst = WindowStateList( IState, IWind ).Konst;
 				//ThConst = WindowStateList ( IWind , IState )%ThermConst
 				SurfaceWindow( ISurf ).ComplexFen.State( IState ).Konst = IConst;
 				//SurfaceWindow(ISurf)%ComplexFen%State(IState)%ThermConst = ThConst
-				if ( WindowStateList( IWind, IState ).InitInc == Calculate_Geometry ) {
-					ComplexWind( ISurf ).Geom( IState ).Inc = BasisList( WindowStateList( IWind, IState ).IncBasisIndx ); //Put in the basis structure from the BasisList
-					ComplexWind( ISurf ).Geom( IState ).Trn = BasisList( WindowStateList( IWind, IState ).TrnBasisIndx );
+				if ( WindowStateList( IState, IWind ).InitInc == Calculate_Geometry ) {
+					ComplexWind( ISurf ).Geom( IState ).Inc = BasisList( WindowStateList( IState, IWind ).IncBasisIndx ); //Put in the basis structure from the BasisList
+					ComplexWind( ISurf ).Geom( IState ).Trn = BasisList( WindowStateList( IState, IWind ).TrnBasisIndx );
 
 					SetupComplexWindowStateGeometry( ISurf, IState, IConst, ComplexWind( ISurf ), ComplexWind( ISurf ).Geom( IState ), SurfaceWindow( ISurf ).ComplexFen.State( IState ) );
 					//Note--setting up the state geometry will include constructing outgoing basis/surface
 					//  maps and those incoming maps that will not depend on shading.
 				} else {
-					SurfaceWindow( ISurf ).ComplexFen.State( IState ) = SurfaceWindow( ISurf ).ComplexFen.State( WindowStateList( IWind, IState ).CopyIncState ); //Note this overwrites Konst
+					SurfaceWindow( ISurf ).ComplexFen.State( IState ) = SurfaceWindow( ISurf ).ComplexFen.State( WindowStateList( IState, IWind ).CopyIncState ); //Note this overwrites Konst
 					SurfaceWindow( ISurf ).ComplexFen.State( IState ).Konst = IConst; //  so it has to be put back
 					//SurfaceWindow (ISurf )%ComplexFen%State(IState)%ThermConst = ThConst  !same for ThermConst
-					ComplexWind( ISurf ).Geom( IState ) = ComplexWind( ISurf ).Geom( WindowStateList( IWind, IState ).CopyIncState );
+					ComplexWind( ISurf ).Geom( IState ) = ComplexWind( ISurf ).Geom( WindowStateList( IState, IWind ).CopyIncState );
 				}
 
 			} //State loop
@@ -453,20 +435,20 @@ namespace WindowComplexManager {
 		NLayers = SurfaceWindow( iSurf ).ComplexFen.State( iState ).NLayers;
 		NBkSurf = ComplexWind( iSurf ).NBkSurf;
 
-		ComplexWind( iSurf ).Geom( iState ).SolBmGndWt.allocate( ComplexWind( iSurf ).Geom( iState ).NGnd, 24, NumOfTimeStepInHour );
+		ComplexWind( iSurf ).Geom( iState ).SolBmGndWt.allocate( 24, NumOfTimeStepInHour, ComplexWind( iSurf ).Geom( iState ).NGnd );
 		ComplexWind( iSurf ).Geom( iState ).SolBmIndex.allocate( 24, NumOfTimeStepInHour );
 		ComplexWind( iSurf ).Geom( iState ).ThetaBm.allocate( 24, NumOfTimeStepInHour );
 		ComplexWind( iSurf ).Geom( iState ).PhiBm.allocate( 24, NumOfTimeStepInHour );
 		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinDirHemiTrans.allocate( 24, NumOfTimeStepInHour );
 		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinDirSpecTrans.allocate( 24, NumOfTimeStepInHour );
 		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinBmGndTrans.allocate( 24, NumOfTimeStepInHour );
-		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinBmFtAbs.allocate( NLayers, 24, NumOfTimeStepInHour );
-		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinBmGndAbs.allocate( NLayers, 24, NumOfTimeStepInHour );
-		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinToSurfBmTrans.allocate( NBkSurf, 24, NumOfTimeStepInHour );
+		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinBmFtAbs.allocate( 24, NumOfTimeStepInHour, NLayers );
+		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinBmGndAbs.allocate( 24, NumOfTimeStepInHour, NLayers );
+		SurfaceWindow( iSurf ).ComplexFen.State( iState ).WinToSurfBmTrans.allocate( 24, NumOfTimeStepInHour, NBkSurf );
 		SurfaceWindow( iSurf ).ComplexFen.State( iState ).BkSurf.allocate( NBkSurf );
 		for ( KBkSurf = 1; KBkSurf <= NBkSurf; ++KBkSurf ) {
 			SurfaceWindow( iSurf ).ComplexFen.State( iState ).BkSurf( KBkSurf ).WinDHBkRefl.allocate( 24, NumOfTimeStepInHour );
-			SurfaceWindow( iSurf ).ComplexFen.State( iState ).BkSurf( KBkSurf ).WinDirBkAbs.allocate( NLayers, 24, NumOfTimeStepInHour );
+			SurfaceWindow( iSurf ).ComplexFen.State( iState ).BkSurf( KBkSurf ).WinDirBkAbs.allocate( 24, NumOfTimeStepInHour, NLayers );
 		}
 
 	}
@@ -546,7 +528,7 @@ namespace WindowComplexManager {
 		CalcWindowStaticProperties( iSurf, NumOfStates, ComplexWind( iSurf ), ComplexWind( iSurf ).Geom( NumOfStates ), SurfaceWindow( iSurf ).ComplexFen.State( NumOfStates ) );
 
 		// calculate hourly data from complex fenestration
-		CFSShadeAndBeamInitialization( iSurf, NumOfStates, ComplexWind( iSurf ), ComplexWind( iSurf ).Geom( NumOfStates ), SurfaceWindow( iSurf ).ComplexFen.State( NumOfStates ) );
+		CFSShadeAndBeamInitialization( iSurf, NumOfStates );
 
 	}
 
@@ -707,7 +689,6 @@ namespace WindowComplexManager {
 		// LOGICAL,SAVE    ::  Once  =.TRUE.  !Flag for insuring things happen once
 		int NumStates; // Number of states for a given complex fen
 		int ISurf; // Index for sorting thru Surface array
-		int IConst; // Index for accessing Construct array
 		int IState; // Index identifying the window state for a particular window
 		int IWind; // Index identifying a window in the WindowList
 
@@ -730,7 +711,7 @@ namespace WindowComplexManager {
 			ISurf = WindowList( IWind ).SurfNo;
 			NumStates = ComplexWind( ISurf ).NumStates;
 			for ( IState = 1; IState <= NumStates; ++IState ) {
-				CFSShadeAndBeamInitialization( ISurf, IState, ComplexWind( ISurf ), ComplexWind( ISurf ).Geom( IState ), SurfaceWindow( ISurf ).ComplexFen.State( IState ) );
+				CFSShadeAndBeamInitialization( ISurf, IState );
 			} //State loop
 		} //window loop
 
@@ -739,10 +720,7 @@ namespace WindowComplexManager {
 	void
 	CFSShadeAndBeamInitialization(
 		int const iSurf, // Window surface number
-		int const iState, // Window state number
-		BSDFWindowGeomDescr & Window, // Window Geometry
-		BSDFGeomDescr & Geom, // State Geometry
-		BSDFStateDescr & State // State Description
+		int const iState // Window state number
 	)
 	{
 
@@ -783,18 +761,6 @@ namespace WindowComplexManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static Real64 DotProd( 0.0 ); // temporary variable for testing dot products
-		int I; // general purpose index
-		int IncRay; // Index of incident ray corresponding to beam direction
-		Real64 Theta; // Theta angle of incident ray correspongind to beam direction
-		Real64 Phi; // Phi angle of incident ray correspongind to beam direction
-		static int IHit( 0 ); // hit flag
-		int J; // general purpose index
-		int JSurf; // general purpose surface number
-		int K; // general purpose index
-		int Hour; // hour of day
-		int TotHits; // hit counter
-		int TS; // time step
 
 		// Object Data
 		static Vector SunDir( 0.0, 0.0, 1.0 ); // unit vector pointing toward sun (world CS)
@@ -803,105 +769,114 @@ namespace WindowComplexManager {
 
 		if ( KickOffSizing || KickOffSimulation ) return;
 
+		int IncRay; // Index of incident ray corresponding to beam direction
+		Real64 Theta; // Theta angle of incident ray correspongind to beam direction
+		Real64 Phi; // Phi angle of incident ray correspongind to beam direction
+		int IHit; // hit flag
+		int TotHits; // hit counter
+		auto & complexWindow( ComplexWind( iSurf ) );
+		auto & complexWindowGeom( complexWindow.Geom( iState ) );
+		auto & surfaceWindowState( SurfaceWindow( iSurf ).ComplexFen.State( iState ) );
+
 		if ( ! DetailedSolarTimestepIntegration ) {
-			for ( Hour = 1; Hour <= 24; ++Hour ) {
-				for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-					SunDir = SUNCOSTS( {1,3}, Hour, TS );
+			std::size_t lHT( 0 ); // Linear index for ( Hour, TS )
+			std::size_t lHTI( 0 ); // Linear index for ( Hour, TS, I )
+			for ( int Hour = 1; Hour <= 24; ++Hour ) {
+				for ( int TS = 1; TS <= NumOfTimeStepInHour; ++TS, ++lHT ) { // [ lHT ] == ( Hour, TS )
+					SunDir = SUNCOSTS( TS, Hour, {1,3} );
 					Theta = 0.0;
 					Phi = 0.0;
-					if ( SUNCOSTS( 3, Hour, TS ) > SunIsUpValue ) {
-						IncRay = FindInBasis( SunDir, Front_Incident, iSurf, iState, ComplexWind( iSurf ).Geom( iState ).Inc, Theta, Phi );
-						ComplexWind( iSurf ).Geom( iState ).ThetaBm( Hour, TS ) = Theta;
-						ComplexWind( iSurf ).Geom( iState ).PhiBm( Hour, TS ) = Phi;
+					if ( SUNCOSTS( TS, Hour, 3 ) > SunIsUpValue ) {
+						IncRay = FindInBasis( SunDir, Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi );
+						complexWindowGeom.ThetaBm[ lHT ] = Theta;
+						complexWindowGeom.PhiBm[ lHT ] = Phi;
 					} else {
-						ComplexWind( iSurf ).Geom( iState ).ThetaBm( Hour, TS ) = 0.0;
-						ComplexWind( iSurf ).Geom( iState ).PhiBm( Hour, TS ) = 0.0;
-						IncRay = 0; //sundown can't have ray incident on window
+						complexWindowGeom.ThetaBm[ lHT ] = 0.0;
+						complexWindowGeom.PhiBm[ lHT ] = 0.0;
+						IncRay = 0; // sundown can't have ray incident on window
 					}
-					if ( IncRay > 0 ) {
-						//Sun may be incident on the window
-						ComplexWind( iSurf ).Geom( iState ).SolBmIndex( Hour, TS ) = IncRay;
-					} else {
-						//Window can't be sunlit, set front incidence ray index to zero
-						ComplexWind( iSurf ).Geom( iState ).SolBmIndex( Hour, TS ) = 0;
+					if ( IncRay > 0 ) { // Sun may be incident on the window
+						complexWindowGeom.SolBmIndex[ lHT ] = IncRay;
+					} else { // Window can't be sunlit, set front incidence ray index to zero
+						complexWindowGeom.SolBmIndex[ lHT ] = 0;
 					}
-					for ( I = 1; I <= ComplexWind( iSurf ).Geom( iState ).NGnd; ++I ) { //Gnd pt loop
+					for ( int I = 1, nGnd = complexWindowGeom.NGnd; I <= nGnd; ++I, ++lHTI ) { // Gnd pt loop
 						IHit = 0;
 						TotHits = 0;
-						for ( JSurf = 1; JSurf <= TotSurfaces; ++JSurf ) {
+						Vector const gndPt( complexWindowGeom.GndPt( I ) );
+						for ( int JSurf = 1, eSurf = TotSurfaces; JSurf <= eSurf; ++JSurf ) {
 							// the following test will cycle on anything except exterior surfaces and shading surfaces
 							if ( Surface( JSurf ).HeatTransSurf && Surface( JSurf ).ExtBoundCond != ExternalEnvironment ) continue;
-							//  skip surfaces that face away from the ground point
-							DotProd = dot( SunDir, Surface( JSurf ).NewellSurfaceNormalVector );
-							if ( DotProd >= 0.0 ) continue;
-							//Looking for surfaces between GndPt and sun
-							PierceSurfaceVector( JSurf, ComplexWind( iSurf ).Geom( iState ).GndPt( I ), SunDir, IHit, HitPt );
+							// skip surfaces that face away from the ground point
+							if ( dot( SunDir, Surface( JSurf ).NewellSurfaceNormalVector ) >= 0.0 ) continue;
+							// Looking for surfaces between GndPt and sun
+							PierceSurface( JSurf, gndPt, SunDir, IHit, HitPt );
 							if ( IHit == 0 ) continue;
-							//  Are not going into the details of whether a hit surface is transparent
-							//  Since this is ultimately simply weighting the transmittance, so great
-							//  detail is not warranted
+							// Are not going into the details of whether a hit surface is transparent
+							// Since this is ultimately simply weighting the transmittance, so great
+							// detail is not warranted
 							++TotHits;
 							break;
 						}
 						if ( TotHits > 0 ) {
-							ComplexWind( iSurf ).Geom( iState ).SolBmGndWt( I, Hour, TS ) = 0.0;
+							complexWindowGeom.SolBmGndWt[ lHTI ] = 0.0; // [ lHTI ] == ( Hour, TS, I )
 						} else {
-							ComplexWind( iSurf ).Geom( iState ).SolBmGndWt( I, Hour, TS ) = 1.0;
+							complexWindowGeom.SolBmGndWt[ lHTI ] = 1.0; // [ lHTI ] == ( Hour, TS, I )
 						}
 					} // Gnd pt loop
 
 					// update window beam properties
-					CalculateWindowBeamProperties( iSurf, iState, ComplexWind( iSurf ), ComplexWind( iSurf ).Geom( iState ), SurfaceWindow( iSurf ).ComplexFen.State( iState ), Hour, TS );
+					CalculateWindowBeamProperties( iSurf, iState, complexWindow, complexWindowGeom, surfaceWindowState, Hour, TS );
 				} // Timestep loop
 			} // Hour loop
 		} else { // detailed timestep integration
-			SunDir = SUNCOSTS( {1,3}, HourOfDay, TimeStep );
+			std::size_t const lHT( complexWindowGeom.ThetaBm.index( HourOfDay, TimeStep ) ); // [ lHT ] == ( HourOfDay, TimeStep )
+			SunDir = SUNCOSTS( TimeStep, HourOfDay, {1,3} );
 			Theta = 0.0;
 			Phi = 0.0;
-			if ( SUNCOSTS( 3, HourOfDay, TimeStep ) > SunIsUpValue ) {
-				IncRay = FindInBasis( SunDir, Front_Incident, iSurf, iState, ComplexWind( iSurf ).Geom( iState ).Inc, Theta, Phi );
-				ComplexWind( iSurf ).Geom( iState ).ThetaBm( HourOfDay, TimeStep ) = Theta;
-				ComplexWind( iSurf ).Geom( iState ).PhiBm( HourOfDay, TimeStep ) = Phi;
+			if ( SUNCOSTS( TimeStep, HourOfDay, 3 ) > SunIsUpValue ) {
+				IncRay = FindInBasis( SunDir, Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi );
+				complexWindowGeom.ThetaBm[ lHT ] = Theta;
+				complexWindowGeom.PhiBm[ lHT ] = Phi;
 			} else {
-				ComplexWind( iSurf ).Geom( iState ).ThetaBm( HourOfDay, TimeStep ) = 0.0;
-				ComplexWind( iSurf ).Geom( iState ).PhiBm( HourOfDay, TimeStep ) = 0.0;
-				IncRay = 0; //sundown can't have ray incident on window
+				complexWindowGeom.ThetaBm[ lHT ] = 0.0;
+				complexWindowGeom.PhiBm[ lHT ] = 0.0;
+				IncRay = 0; // sundown can't have ray incident on window
 			}
 
-			if ( IncRay > 0 ) {
-				//Sun may be incident on the window
-				ComplexWind( iSurf ).Geom( iState ).SolBmIndex( HourOfDay, TimeStep ) = IncRay;
-			} else {
-				//Window can't be sunlit, set front incidence ray index to zero
-				ComplexWind( iSurf ).Geom( iState ).SolBmIndex( HourOfDay, TimeStep ) = 0.0;
+			if ( IncRay > 0 ) { // Sun may be incident on the window
+				complexWindowGeom.SolBmIndex[ lHT ] = IncRay;
+			} else { // Window can't be sunlit, set front incidence ray index to zero
+				complexWindowGeom.SolBmIndex[ lHT ] = 0.0;
 			}
-			for ( I = 1; I <= ComplexWind( iSurf ).Geom( iState ).NGnd; ++I ) { //Gnd pt loop
+			std::size_t lHTI( complexWindowGeom.SolBmGndWt.index( HourOfDay, TimeStep, 1 ) ); // Linear index for ( HourOfDay, TimeStep, I )
+			for ( int I = 1, nGnd = complexWindowGeom.NGnd; I <= nGnd; ++I, ++lHTI ) { // Gnd pt loop
 				IHit = 0;
 				TotHits = 0;
-				for ( JSurf = 1; JSurf <= TotSurfaces; ++JSurf ) {
+				Vector const gndPt( complexWindowGeom.GndPt( I ) );
+				for ( int JSurf = 1; JSurf <= TotSurfaces; ++JSurf ) {
 					// the following test will cycle on anything except exterior surfaces and shading surfaces
 					if ( Surface( JSurf ).HeatTransSurf && Surface( JSurf ).ExtBoundCond != ExternalEnvironment ) continue;
-					//  skip surfaces that face away from the ground point
-					DotProd = dot( SunDir, Surface( JSurf ).NewellSurfaceNormalVector );
-					if ( DotProd >= 0.0 ) continue;
-					//Looking for surfaces between GndPt and sun
-					PierceSurfaceVector( JSurf, ComplexWind( iSurf ).Geom( iState ).GndPt( I ), SunDir, IHit, HitPt );
+					// skip surfaces that face away from the ground point
+					if ( dot( SunDir, Surface( JSurf ).NewellSurfaceNormalVector ) >= 0.0 ) continue;
+					// Looking for surfaces between GndPt and sun
+					PierceSurface( JSurf, gndPt, SunDir, IHit, HitPt );
 					if ( IHit == 0 ) continue;
-					//  Are not going into the details of whether a hit surface is transparent
-					//  Since this is ultimately simply weighting the transmittance, so great
-					//  detail is not warranted
+					// Are not going into the details of whether a hit surface is transparent
+					// Since this is ultimately simply weighting the transmittance, so great
+					// detail is not warranted
 					++TotHits;
 					break;
 				}
 				if ( TotHits > 0 ) {
-					ComplexWind( iSurf ).Geom( iState ).SolBmGndWt( I, HourOfDay, TimeStep ) = 0.0;
+					complexWindowGeom.SolBmGndWt[ lHTI ] = 0.0; // [ lHTI ] == ( HourOfDay, TimeStep, I )
 				} else {
-					ComplexWind( iSurf ).Geom( iState ).SolBmGndWt( I, HourOfDay, TimeStep ) = 1.0;
+					complexWindowGeom.SolBmGndWt[ lHTI ] = 1.0; // [ lHTI ] == ( HourOfDay, TimeStep, I )
 				}
 			} // Gnd pt loop
 
 			// Update window beam properties
-			CalculateWindowBeamProperties( iSurf, iState, ComplexWind( iSurf ), ComplexWind( iSurf ).Geom( iState ), SurfaceWindow( iSurf ).ComplexFen.State( iState ), HourOfDay, TimeStep );
+			CalculateWindowBeamProperties( iSurf, iState, complexWindow, complexWindowGeom, surfaceWindowState, HourOfDay, TimeStep );
 		} // solar calculation mode, average over days or detailed
 
 	}
@@ -910,8 +885,8 @@ namespace WindowComplexManager {
 	CalculateWindowBeamProperties(
 		int const ISurf, // Window surface number
 		int const IState, // Window state number
-		BSDFWindowGeomDescr & Window, // Window Geometry
-		BSDFGeomDescr & Geom, // State Geometry
+		BSDFWindowGeomDescr const & Window, // Window Geometry
+		BSDFGeomDescr const & Geom, // State Geometry
 		BSDFStateDescr & State, // State Description
 		int const Hour, // Hour number
 		int const TS // Timestep number
@@ -961,21 +936,19 @@ namespace WindowComplexManager {
 		Real64 Phi;
 		int JSurf; // gen purpose surface no
 		int BaseSurf; // base surface no
-		int K; // general purpose index
 		int M; // general purpose index--ray
 		int L; // general purpose index--layer
 		int KBkSurf; // general purpose index--back surface
 		Real64 Sum1; // general purpose sum
 		Real64 Sum2; // general purpose sum
-		Real64 Sum3; // general purpose sum
 		int IBm; // index of beam ray in incoming basis
 		int BkIncRay; // index of sun dir in back incidence basis
 		bool RegWindFnd; // flag for regular exterior back surf window
-		FArray1D_int RegWinIndex; // bk surf nos of reg windows
+		Array1D_int RegWinIndex; // bk surf nos of reg windows
 		static int NRegWin( 0 ); // no reg windows found as back surfaces
 		static int KRegWin( 0 ); // index of reg window as back surface
 		Real64 Refl; // temporary reflectance
-		FArray1D< Real64 > Absorb; // temporary layer absorptance
+		Array1D< Real64 > Absorb; // temporary layer absorptance
 
 		// Object Data
 		Vector SunDir; // current sun direction
@@ -987,22 +960,22 @@ namespace WindowComplexManager {
 
 		IBm = Geom.SolBmIndex( Hour, TS );
 		if ( IBm <= 0.0 ) { //Beam cannot be incident on window for this Hour, TS
-			State.WinToSurfBmTrans( {1,Window.NBkSurf}, Hour, TS ) = 0.0;
+			State.WinToSurfBmTrans( Hour, TS, {1,Window.NBkSurf} ) = 0.0;
 			State.WinDirHemiTrans( Hour, TS ) = 0.0;
 			State.WinDirSpecTrans( Hour, TS ) = 0.0;
-			State.WinBmFtAbs( {1,State.NLayers}, Hour, TS ) = 0.0;
+			State.WinBmFtAbs( Hour, TS, {1,State.NLayers} ) = 0.0;
 		} else {
 			for ( I = 1; I <= Window.NBkSurf; ++I ) { //Back surface loop
 				Sum1 = 0.0;
 				for ( J = 1; J <= Geom.NSurfInt( I ); ++J ) { //Ray loop
-					Sum1 += Geom.Trn.Lamda( Geom.SurfInt( I, J ) ) * Construct( IConst ).BSDFInput.SolFrtTrans( Geom.SurfInt( I, J ), IBm );
+					Sum1 += Geom.Trn.Lamda( Geom.SurfInt( J, I ) ) * Construct( IConst ).BSDFInput.SolFrtTrans( IBm, Geom.SurfInt( J, I ) );
 				} //Ray loop
-				State.WinToSurfBmTrans( I, Hour, TS ) = Sum1;
+				State.WinToSurfBmTrans( Hour, TS, I ) = Sum1;
 			} //Back surface loop
 			//Calculate the directional-hemispherical transmittance
 			Sum1 = 0.0;
 			for ( J = 1; J <= Geom.Trn.NBasis; ++J ) {
-				Sum1 += Geom.Trn.Lamda( J ) * Construct( IConst ).BSDFInput.SolFrtTrans( J, IBm );
+				Sum1 += Geom.Trn.Lamda( J ) * Construct( IConst ).BSDFInput.SolFrtTrans( IBm, J );
 			}
 			State.WinDirHemiTrans( Hour, TS ) = Sum1;
 			//Calculate the directional specular transmittance
@@ -1010,7 +983,7 @@ namespace WindowComplexManager {
 			State.WinDirSpecTrans( Hour, TS ) = Geom.Trn.Lamda( IBm ) * Construct( IConst ).BSDFInput.SolFrtTrans( IBm, IBm );
 			//Calculate the layer front absorptance for beam radiation
 			for ( L = 1; L <= State.NLayers; ++L ) {
-				State.WinBmFtAbs( L, Hour, TS ) = Construct( IConst ).BSDFInput.Layer( L ).FrtAbs( 1, IBm );
+				State.WinBmFtAbs( Hour, TS, L ) = Construct( IConst ).BSDFInput.Layer( L ).FrtAbs( IBm, 1 );
 			}
 		}
 		//Calculate,  for a given beam direction, the transmittance into the zone
@@ -1020,10 +993,10 @@ namespace WindowComplexManager {
 		Sum2 = 0.0;
 		for ( J = 1; J <= Geom.NGnd; ++J ) { //Incident ray loop
 			JRay = Geom.GndIndex( J );
-			if ( Geom.SolBmGndWt( J, Hour, TS ) > 0.0 ) {
-				Sum2 += Geom.SolBmGndWt( J, Hour, TS ) * Geom.Inc.Lamda( JRay );
+			if ( Geom.SolBmGndWt( Hour, TS, J ) > 0.0 ) {
+				Sum2 += Geom.SolBmGndWt( Hour, TS, J ) * Geom.Inc.Lamda( JRay );
 				for ( M = 1; M <= Geom.Trn.NBasis; ++M ) { //Outgoing ray loop
-					Sum1 += Geom.SolBmGndWt( J, Hour, TS ) * Geom.Inc.Lamda( JRay ) * Geom.Trn.Lamda( M ) * Construct( IConst ).BSDFInput.SolFrtTrans( M, JRay );
+					Sum1 += Geom.SolBmGndWt( Hour, TS, J ) * Geom.Inc.Lamda( JRay ) * Geom.Trn.Lamda( M ) * Construct( IConst ).BSDFInput.SolFrtTrans( JRay, M );
 				} //Outgoing ray loop
 			}
 		} //Indcident ray loop
@@ -1041,15 +1014,15 @@ namespace WindowComplexManager {
 			Sum2 = 0.0;
 			for ( J = 1; J <= Geom.NGnd; ++J ) { //Incident ray loop
 				JRay = Geom.GndIndex( J );
-				if ( Geom.SolBmGndWt( J, Hour, TS ) > 0.0 ) {
-					Sum2 += Geom.SolBmGndWt( J, Hour, TS ) * Geom.Inc.Lamda( JRay );
-					Sum1 += Geom.SolBmGndWt( J, Hour, TS ) * Geom.Inc.Lamda( JRay ) * Construct( IConst ).BSDFInput.Layer( L ).FrtAbs( 1, JRay );
+				if ( Geom.SolBmGndWt( Hour, TS, J ) > 0.0 ) {
+					Sum2 += Geom.SolBmGndWt( Hour, TS, J ) * Geom.Inc.Lamda( JRay );
+					Sum1 += Geom.SolBmGndWt( Hour, TS, J ) * Geom.Inc.Lamda( JRay ) * Construct( IConst ).BSDFInput.Layer( L ).FrtAbs( JRay, 1 );
 				}
 			} //Incident ray loop
 			if ( Sum2 > 0.0 ) {
-				State.WinBmGndAbs( L, Hour, TS ) = Sum1 / Sum2;
+				State.WinBmGndAbs( Hour, TS, L ) = Sum1 / Sum2;
 			} else {
-				State.WinBmGndAbs( L, Hour, TS ) = 0.0; //No unshaded ground => no absorptance
+				State.WinBmGndAbs( Hour, TS, L ) = 0.0; //No unshaded ground => no absorptance
 			}
 		} //layer loop
 
@@ -1070,7 +1043,7 @@ namespace WindowComplexManager {
 		}
 		if ( RegWindFnd ) {
 			Absorb.allocate( State.NLayers );
-			SunDir = SUNCOSTS( {1,3}, Hour, TS );
+			SunDir = SUNCOSTS( TS, Hour, {1,3} );
 			BkIncRay = FindInBasis( SunDir, Back_Incident, ISurf, IState, ComplexWind( ISurf ).Geom( IState ).Trn, Theta, Phi );
 			if ( BkIncRay > 0 ) {
 				//Here calculate the back incidence properties for the solar ray
@@ -1078,11 +1051,11 @@ namespace WindowComplexManager {
 				//back surface window and hit this one!
 				Sum1 = 0.0;
 				for ( J = 1; J <= Geom.Trn.NBasis; ++J ) {
-					Sum1 += Geom.Trn.Lamda( J ) * Construct( IConst ).BSDFInput.SolBkRefl( J, BkIncRay );
+					Sum1 += Geom.Trn.Lamda( J ) * Construct( IConst ).BSDFInput.SolBkRefl( BkIncRay, J );
 				}
 				Refl = Sum1;
 				for ( L = 1; L <= State.NLayers; ++L ) {
-					Absorb( L ) = Construct( IConst ).BSDFInput.Layer( L ).BkAbs( 1, BkIncRay );
+					Absorb( L ) = Construct( IConst ).BSDFInput.Layer( L ).BkAbs( BkIncRay, 1 );
 				}
 			} else {
 				//solar ray can't be incident on back, so set properties equal to zero
@@ -1095,7 +1068,7 @@ namespace WindowComplexManager {
 				KBkSurf = RegWinIndex( KRegWin );
 				State.BkSurf( KBkSurf ).WinDHBkRefl( Hour, TS ) = Refl;
 				for ( L = 1; L <= State.NLayers; ++L ) {
-					State.BkSurf( KBkSurf ).WinDirBkAbs( L, Hour, TS ) = Absorb( L );
+					State.BkSurf( KBkSurf ).WinDirBkAbs( Hour, TS, L ) = Absorb( L );
 				}
 			}
 		}
@@ -1142,12 +1115,9 @@ namespace WindowComplexManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static int ISurf( 0 ); // Index for sorting thru Surface array
-		static int IConst( 0 ); // Index for accessing Construct array
+//		static int IConst( 0 ); // Index for accessing Construct array
 		static int IState( 0 ); // Index identifying the window state for a particular window
 		static int IWind( 0 ); // Index identifying a window in the WindowList
-		static int I( 0 ); // general purpose index
-		static int J( 0 ); // general purpose index
-		static int K( 0 ); // general purpose index
 		static int NumStates( 0 ); // local copy of no of states
 
 		for ( IWind = 1; IWind <= NumComplexWind; ++IWind ) {
@@ -1155,7 +1125,7 @@ namespace WindowComplexManager {
 			NumStates = WindowList( IWind ).NumStates;
 			for ( IState = 1; IState <= NumStates; ++IState ) {
 				// IConst = WindowStateList ( IWind , IState )%Konst
-				SurfaceWindow( ISurf ).ComplexFen.State( IState ).Konst = WindowStateList( IWind, IState ).Konst;
+				SurfaceWindow( ISurf ).ComplexFen.State( IState ).Konst = WindowStateList( IState, IWind ).Konst;
 				CalcWindowStaticProperties( ISurf, IState, ComplexWind( ISurf ), ComplexWind( ISurf ).Geom( IState ), SurfaceWindow( ISurf ).ComplexFen.State( IState ) );
 			}
 		}
@@ -1202,7 +1172,6 @@ namespace WindowComplexManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int I; // gen purpose index
 
 		if ( Input.BasisMatNcols == 1 ) {
 			//Axisymmetric basis, No. rows is no. of thetas = basis length
@@ -1210,8 +1179,8 @@ namespace WindowComplexManager {
 			return;
 		}
 		NBasis = 1;
-		for ( I = 2; I <= Input.BasisMatNrows; ++I ) {
-			NBasis += std::floor( Construct( IConst ).BSDFInput.BasisMat( I, 2 ) + 0.001 );
+		for ( int I = 2; I <= Input.BasisMatNrows; ++I ) {
+			NBasis += std::floor( Construct( IConst ).BSDFInput.BasisMat( 2, I ) + 0.001 );
 		}
 
 	}
@@ -1253,7 +1222,6 @@ namespace WindowComplexManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int I; // gen purpose index
 		int ZoneNum; // Zone Number
 		int SurfNum; // Surface Number
 		static int NumSurfInZone( 0 ); // Number of zone surfaces
@@ -1327,10 +1295,8 @@ namespace WindowComplexManager {
 		static Real64 LastTheta( 0.0 ); // Previous theta in the W6 basis before current
 		static Real64 LowerTheta( 0.0 ); // Lower theta boundary of the element
 		static Real64 UpperTheta( 0.0 ); // Upper theta boundary of the element
-		Real64 Azimuth; // Azimuth of window surface (radians)
-		Real64 Tilt; // Tilt of window surface (radians)
-		FArray1D< Real64 > Thetas; // temp array holding theta values
-		FArray1D_int NPhis; // temp array holding number of phis for a given theta
+		Array1D< Real64 > Thetas; // temp array holding theta values
+		Array1D_int NPhis; // temp array holding number of phis for a given theta
 
 		NThetas = Construct( IConst ).BSDFInput.BasisMatNrows; //Note here assuming row by row input
 		Basis.NThetas = NThetas;
@@ -1345,10 +1311,10 @@ namespace WindowComplexManager {
 
 		Basis.Lamda.allocate( Construct( IConst ).BSDFInput.NBasis );
 		Basis.SolAng.allocate( Construct( IConst ).BSDFInput.NBasis );
-		BTW: if ( Construct( IConst ).BSDFInput.BasisType == BasisType_WINDOW ) {
+		if ( Construct( IConst ).BSDFInput.BasisType == BasisType_WINDOW ) {
 			//   WINDOW6 Basis
 			Basis.BasisType = BasisType_WINDOW;
-			BST: if ( Construct( IConst ).BSDFInput.BasisSymmetryType == BasisSymmetry_None ) {
+			if ( Construct( IConst ).BSDFInput.BasisSymmetryType == BasisSymmetry_None ) {
 				// No basis symmetry
 				Basis.BasisSymmetryType = BasisSymmetry_None;
 				Thetas( 1 ) = 0.0; //By convention, the first basis point is at the center (theta=0,phi=0)
@@ -1356,14 +1322,14 @@ namespace WindowComplexManager {
 				NPhis( 1 ) = 1;
 				NumElem = 1;
 				for ( I = 2; I <= NThetas; ++I ) {
-					Thetas( I ) = Construct( IConst ).BSDFInput.BasisMat( I, 1 ) * DegToRadians;
-					NPhis( I ) = std::floor( Construct( IConst ).BSDFInput.BasisMat( I, 2 ) + 0.001 );
+					Thetas( I ) = Construct( IConst ).BSDFInput.BasisMat( 1, I ) * DegToRadians;
+					NPhis( I ) = std::floor( Construct( IConst ).BSDFInput.BasisMat( 2, I ) + 0.001 );
 					if ( NPhis( I ) <= 0 ) ShowFatalError( "WindowComplexManager: incorrect input, no. phis must be positive." );
 					NumElem += NPhis( I );
 				}
 				MaxNPhis = maxval( NPhis( {1,NThetas} ) );
-				Basis.Phis.allocate( MaxNPhis + 1, NThetas + 1 ); //N+1st Phi point (not basis element) at 2Pi
-				Basis.BasisIndex.allocate( NThetas + 1, MaxNPhis );
+				Basis.Phis.allocate( NThetas + 1, MaxNPhis + 1 ); //N+1st Phi point (not basis element) at 2Pi
+				Basis.BasisIndex.allocate( MaxNPhis, NThetas + 1 );
 				Basis.Phis = 0.0; // Initialize so undefined elements will contain zero
 				Basis.BasisIndex = 0; //Initialize so undefined elements will contain zero
 				if ( NumElem != Construct( IConst ).BSDFInput.NBasis ) { //Constructed Basis must match property matrices
@@ -1372,7 +1338,7 @@ namespace WindowComplexManager {
 				Basis.Thetas = Thetas;
 				Basis.NPhis = NPhis;
 				ElemNo = 0;
-				ThLoop: for ( I = 1; I <= NThetas; ++I ) {
+				for ( I = 1; I <= NThetas; ++I ) {
 					Theta = Thetas( I );
 					if ( I == 1 ) { //First theta value must always be zero
 						HalfDTheta = 0.5 * Thetas( I + 1 );
@@ -1403,20 +1369,18 @@ namespace WindowComplexManager {
 						SolAng = DPhi * ( std::cos( LowerTheta ) - std::cos( UpperTheta ) );
 					}
 					DTheta = UpperTheta - LowerTheta;
-					Basis.Phis( NPhis( I ) + 1, I ) = 2.0 * Pi; //Non-basis-element Phi point for table searching in Phi
+					Basis.Phis( I, NPhis( I ) + 1 ) = 2.0 * Pi; //Non-basis-element Phi point for table searching in Phi
 					for ( J = 1; J <= NPhis( I ); ++J ) {
 						++ElemNo;
-						Basis.BasisIndex( I, J ) = ElemNo;
+						Basis.BasisIndex( J, I ) = ElemNo;
 						Phi = ( J - 1 ) * DPhi;
-						Basis.Phis( J, I ) = Phi; //Note: this ordering of I & J are necessary to allow Phis(Theta) to
+						Basis.Phis( I, J ) = Phi; //Note: this ordering of I & J are necessary to allow Phis(Theta) to
 						//  be searched as a one-dimensional table
 						FillBasisElement( Theta, Phi, ElemNo, Basis.Grid( ElemNo ), LowerTheta, UpperTheta, DPhi, BasisType_WINDOW ); //This gets all the simple grid characteristics
 						Basis.Lamda( ElemNo ) = Lamda;
 						Basis.SolAng( ElemNo ) = SolAng;
 					}
-					ThLoop_loop: ;
 				}
-				ThLoop_exit: ;
 			} else { // BST
 				//  Axisymmetric basis symmetry (Note this only useful specular systems, where it allows shorter data input)
 				Basis.BasisSymmetryType = BasisSymmetry_Axisymmetric;
@@ -1425,11 +1389,11 @@ namespace WindowComplexManager {
 				NPhis = 1; //As insurance, define one phi for each theta
 				NumElem = 1;
 				for ( I = 2; I <= NThetas; ++I ) {
-					Thetas( I ) = Construct( IConst ).BSDFInput.BasisMat( I, 1 ) * DegToRadians;
+					Thetas( I ) = Construct( IConst ).BSDFInput.BasisMat( 1, I ) * DegToRadians;
 					++NumElem;
 				}
-				Basis.Phis.allocate( NThetas, 1 );
-				Basis.BasisIndex.allocate( NThetas, 1 );
+				Basis.Phis.allocate( 1, NThetas );
+				Basis.BasisIndex.allocate( 1, NThetas );
 				Basis.Phis = 0.0; // Initialize so undefined elements will contain zero
 				Basis.BasisIndex = 0; //Initialize so undefined elements will contain zero
 				if ( NumElem != Construct( IConst ).BSDFInput.NBasis ) { //Constructed Basis must match property matrices
@@ -1439,7 +1403,7 @@ namespace WindowComplexManager {
 				Basis.NPhis = NPhis;
 				ElemNo = 0;
 				DPhi = 2.0 * Pi;
-				ThLoop2: for ( I = 1; I <= NThetas; ++I ) {
+				for ( I = 1; I <= NThetas; ++I ) {
 					Theta = Thetas( I );
 					if ( I == 1 ) { //First theta value must always be zero
 						HalfDTheta = 0.5 * Thetas( I + 1 );
@@ -1470,17 +1434,14 @@ namespace WindowComplexManager {
 					}
 					DTheta = UpperTheta - LowerTheta;
 					++ElemNo;
-					Basis.BasisIndex( I, 1 ) = ElemNo;
+					Basis.BasisIndex( 1, I ) = ElemNo;
 					Phi = 0.0;
-					Basis.Phis( 1, I ) = Phi; //Note: this ordering of I & J are necessary to allow Phis(Theta) to
+					Basis.Phis( I, 1 ) = Phi; //Note: this ordering of I & J are necessary to allow Phis(Theta) to
 					//  be searched as a one-dimensional table
 					FillBasisElement( Theta, Phi, ElemNo, Basis.Grid( ElemNo ), LowerTheta, UpperTheta, DPhi, BasisType_WINDOW ); //This gets all the simple grid characteristics
 					Basis.Lamda( ElemNo ) = Lamda;
 					Basis.SolAng( ElemNo ) = SolAng;
-
-					ThLoop2_loop: ;
 				}
-				ThLoop2_exit: ;
 			} // BST
 		} else { // BTW
 			ShowFatalError( "WindowComplexManager: Non-Window6 basis type not yet implemented." );
@@ -1572,7 +1533,7 @@ namespace WindowComplexManager {
 		int const IConst, // Pointer to construction for this state
 		BSDFWindowGeomDescr & Window, // Window Geometry
 		BSDFGeomDescr & Geom, // State Geometry
-		BSDFStateDescr & State // State Description
+		BSDFStateDescr & EP_UNUSED( State ) // State Description
 	)
 	{
 
@@ -1629,18 +1590,17 @@ namespace WindowComplexManager {
 		Real64 Phi; // Basis phi angle
 		Real64 HitDsq; // Squared distance to current hit pt
 		Real64 LeastHitDsq; // Squared distance to closest hit pt
-		FArray1D< Real64 > V( 3 ); // vector array
-		Real64 VLen; // Length of vector array
-		FArray1D_int TmpRfSfInd; // Temporary RefSurfIndex
-		FArray1D_int TmpRfRyNH; // Temporary RefRayNHits
-		FArray2D_int TmpHSurfNo; // Temporary HitSurfNo
-		FArray2D< Real64 > TmpHSurfDSq; // Temporary HitSurfDSq
-		FArray1D_int TmpSkyInd; // Temporary sky index list
-		FArray1D_int TmpGndInd; // Temporary gnd index list
-		FArray2D_int TmpSurfInt; // Temporary index of ray intersecing back surf
-		FArray2D< Real64 > TmpSjdotN; // Temporary dot prod of ray angle w bk surf norm
-		FArray1D_int ITemp1D; // Temporary INT 1D array
-		FArray2D< Real64 > Temp2D; // Temporary real 2D array
+		Array1D< Real64 > V( 3 ); // vector array
+		Array1D_int TmpRfSfInd; // Temporary RefSurfIndex
+		Array1D_int TmpRfRyNH; // Temporary RefRayNHits
+		Array2D_int TmpHSurfNo; // Temporary HitSurfNo
+		Array2D< Real64 > TmpHSurfDSq; // Temporary HitSurfDSq
+		Array1D_int TmpSkyInd; // Temporary sky index list
+		Array1D_int TmpGndInd; // Temporary gnd index list
+		Array2D_int TmpSurfInt; // Temporary index of ray intersecing back surf
+		Array2D< Real64 > TmpSjdotN; // Temporary dot prod of ray angle w bk surf norm
+		Array1D_int ITemp1D; // Temporary INT 1D array
+		Array2D< Real64 > Temp2D; // Temporary real 2D array
 		Real64 TransRSurf; // Norminal transmittance of shading surface
 		Real64 WtSum; // Sum for normalizing various weights
 		Real64 DotProd; // Temporary variable for manipulating dot product .dot.
@@ -1676,9 +1636,9 @@ namespace WindowComplexManager {
 		Vector HitPt; // coords of hit pt (world syst)
 		Vector X; // position vector
 		Vector VecNorm; // outer normal vector
-		FArray1D< Vector > TmpGndPt; // Temporary ground intersection list
-		FArray2D< Vector > TempV2D; // Temporary vector 2D array
-		FArray2D< Vector > TmpHitPt; // Temporary HitPt
+		Array1D< Vector > TmpGndPt; // Temporary ground intersection list
+		Array2D< Vector > TempV2D; // Temporary vector 2D array
+		Array2D< Vector > TmpHitPt; // Temporary HitPt
 		BackHitList BSHit; // Temp list of back surface hit quantities for a ray
 
 		//This routine primarily fills in the BSDFGeomDescr type for a given window and state
@@ -1728,9 +1688,9 @@ namespace WindowComplexManager {
 		//Sky, and ground ray index maps, and rays that are potentially beam radiation reflected from exterior surfaces
 		TmpRfSfInd.allocate( Geom.Inc.NBasis );
 		TmpRfRyNH.allocate( Geom.Inc.NBasis );
-		TmpHSurfNo.allocate( Geom.Inc.NBasis, TotSurfaces );
-		TmpHSurfDSq.allocate( Geom.Inc.NBasis, TotSurfaces );
-		TmpHitPt.allocate( Geom.Inc.NBasis, TotSurfaces );
+		TmpHSurfNo.allocate( TotSurfaces, Geom.Inc.NBasis );
+		TmpHSurfDSq.allocate( TotSurfaces, Geom.Inc.NBasis );
+		TmpHitPt.allocate( TotSurfaces, Geom.Inc.NBasis );
 		TmpSkyInd.allocate( Geom.Inc.NBasis );
 		TmpGndInd.allocate( Geom.Inc.NBasis );
 		TmpGndPt.allocate( Geom.Inc.NBasis );
@@ -1761,7 +1721,7 @@ namespace WindowComplexManager {
 				//  skip surfaces that face away from the window
 				DotProd = dot( Geom.sInc( IRay ), Surface( JSurf ).NewellSurfaceNormalVector );
 				if ( DotProd >= 0.0 ) continue;
-				PierceSurfaceVector( JSurf, Surface( ISurf ).Centroid, Geom.sInc( IRay ), IHit, HitPt );
+				PierceSurface( JSurf, Surface( ISurf ).Centroid, Geom.sInc( IRay ), IHit, HitPt );
 				if ( IHit <= 0 ) continue;
 				IHit = 0; //A hit, clear the hit flag for the next cycle
 				if ( TotHits == 0 ) {
@@ -1770,11 +1730,11 @@ namespace WindowComplexManager {
 					++NReflSurf;
 					TmpRfSfInd( NReflSurf ) = IRay;
 					TmpRfRyNH( NReflSurf ) = 1;
-					TmpHSurfNo( NReflSurf, 1 ) = JSurf;
-					TmpHitPt( NReflSurf, 1 ) = HitPt;
+					TmpHSurfNo( 1, NReflSurf ) = JSurf;
+					TmpHitPt( 1, NReflSurf ) = HitPt;
 					V = HitPt - Surface( ISurf ).Centroid; //vector array from window ctr to hit pt
 					LeastHitDsq = magnitude_squared( V ); //dist^2 window ctr to hit pt
-					TmpHSurfDSq( NReflSurf, 1 ) = LeastHitDsq;
+					TmpHSurfDSq( 1, NReflSurf ) = LeastHitDsq;
 					if ( ! Surface( JSurf ).HeatTransSurf && Surface( JSurf ).SchedShadowSurfIndex != 0 ) {
 						TransRSurf = 1.0; //If a shadowing surface may have a scheduled transmittance,
 						//   treat it here as completely transparent
@@ -1789,16 +1749,16 @@ namespace WindowComplexManager {
 							J = TotHits + 1;
 							if ( TotHits > 1 ) {
 								for ( I = 2; I <= TotHits; ++I ) {
-									if ( HitDsq < TmpHSurfDSq( NReflSurf, I ) ) {
+									if ( HitDsq < TmpHSurfDSq( I, NReflSurf ) ) {
 										J = I;
 										break;
 									}
 								}
 								if ( ! Surface( JSurf ).HeatTransSurf && Surface( JSurf ).SchedShadowSurfIndex == 0 ) {
 									//  The new hit is opaque, so we can drop all the hits further away
-									TmpHSurfNo( NReflSurf, J ) = JSurf;
-									TmpHitPt( NReflSurf, J ) = HitPt;
-									TmpHSurfDSq( NReflSurf, J ) = HitDsq;
+									TmpHSurfNo( J, NReflSurf ) = JSurf;
+									TmpHitPt( J, NReflSurf ) = HitPt;
+									TmpHSurfDSq( J, NReflSurf ) = HitDsq;
 									TotHits = J;
 								} else {
 									//  The new hit is scheduled (presumed transparent), so keep the more distant hits
@@ -1806,13 +1766,13 @@ namespace WindowComplexManager {
 									//       which may be either transparent or opaque
 									if ( TotHits >= J ) {
 										for ( I = TotHits; I >= J; --I ) {
-											TmpHSurfNo( NReflSurf, I + 1 ) = TmpHSurfNo( NReflSurf, I );
-											TmpHitPt( NReflSurf, I + 1 ) = TmpHitPt( NReflSurf, I );
-											TmpHSurfDSq( NReflSurf, I + 1 ) = TmpHSurfDSq( NReflSurf, I );
+											TmpHSurfNo( I + 1, NReflSurf ) = TmpHSurfNo( I, NReflSurf );
+											TmpHitPt( I + 1, NReflSurf ) = TmpHitPt( I, NReflSurf );
+											TmpHSurfDSq( I + 1, NReflSurf ) = TmpHSurfDSq( I, NReflSurf );
 										}
-										TmpHSurfNo( NReflSurf, J ) = JSurf;
-										TmpHitPt( NReflSurf, J ) = HitPt;
-										TmpHSurfDSq( NReflSurf, J ) = HitDsq;
+										TmpHSurfNo( J, NReflSurf ) = JSurf;
+										TmpHitPt( J, NReflSurf ) = HitPt;
+										TmpHSurfDSq( J, NReflSurf ) = HitDsq;
 										++TotHits;
 									}
 								}
@@ -1825,18 +1785,18 @@ namespace WindowComplexManager {
 						if ( ! Surface( JSurf ).HeatTransSurf && Surface( JSurf ).SchedShadowSurfIndex != 0 ) {
 							TransRSurf = 1.0; // New closest hit is transparent, keep the existing hit list
 							for ( I = TotHits; I >= 1; --I ) {
-								TmpHSurfNo( NReflSurf, I + 1 ) = TmpHSurfNo( NReflSurf, I );
-								TmpHitPt( NReflSurf, I + 1 ) = TmpHitPt( NReflSurf, I );
-								TmpHSurfDSq( NReflSurf, I + 1 ) = TmpHSurfDSq( NReflSurf, I );
+								TmpHSurfNo( I + 1, NReflSurf ) = TmpHSurfNo( I, NReflSurf );
+								TmpHitPt( I + 1, NReflSurf ) = TmpHitPt( I, NReflSurf );
+								TmpHSurfDSq( I + 1, NReflSurf ) = TmpHSurfDSq( I, NReflSurf );
 								++TotHits;
 							}
 						} else {
 							TransRSurf = 0.0; //New closest hit is opaque, drop the existing hit list
 							TotHits = 1;
 						}
-						TmpHSurfNo( NReflSurf, 1 ) = JSurf; // In either case the new hit is put in position 1
-						TmpHitPt( NReflSurf, 1 ) = HitPt;
-						TmpHSurfDSq( NReflSurf, 1 ) = LeastHitDsq;
+						TmpHSurfNo( 1, NReflSurf ) = JSurf; // In either case the new hit is put in position 1
+						TmpHitPt( 1, NReflSurf ) = HitPt;
+						TmpHSurfDSq( 1, NReflSurf ) = LeastHitDsq;
 					}
 				}
 			} //End of loop over surfaces
@@ -1875,9 +1835,9 @@ namespace WindowComplexManager {
 		MaxHits = maxval( TmpRfRyNH );
 		Geom.RefSurfIndex.allocate( NReflSurf );
 		Geom.RefRayNHits.allocate( NReflSurf );
-		Geom.HitSurfNo.allocate( NReflSurf, MaxHits );
-		Geom.HitSurfDSq.allocate( NReflSurf, MaxHits );
-		Geom.HitPt.allocate( NReflSurf, MaxHits );
+		Geom.HitSurfNo.allocate( MaxHits, NReflSurf );
+		Geom.HitSurfDSq.allocate( MaxHits, NReflSurf );
+		Geom.HitPt.allocate( MaxHits, NReflSurf );
 		Geom.RefSurfIndex = TmpRfSfInd( {1,NReflSurf} );
 		Geom.RefRayNHits = TmpRfRyNH( {1,NReflSurf} );
 		Geom.HitSurfNo = 0;
@@ -1885,9 +1845,9 @@ namespace WindowComplexManager {
 		Geom.HitPt = Vector( 0.0, 0.0, 0.0 );
 		for ( I = 1; I <= NReflSurf; ++I ) {
 			TotHits = TmpRfRyNH( I );
-			Geom.HitSurfNo( I, {1,TotHits} ) = TmpHSurfNo( I, {1,TotHits} );
-			Geom.HitSurfDSq( I, {1,TotHits} ) = TmpHSurfDSq( I, {1,TotHits} );
-			Geom.HitPt( I, {1,TotHits} ) = TmpHitPt( I, {1,TotHits} );
+			Geom.HitSurfNo( {1,TotHits}, I ) = TmpHSurfNo( {1,TotHits}, I );
+			Geom.HitSurfDSq( {1,TotHits}, I ) = TmpHSurfDSq( {1,TotHits}, I );
+			Geom.HitPt( {1,TotHits}, I ) = TmpHitPt( {1,TotHits}, I );
 		}
 		TmpRfRyNH.deallocate();
 		TmpRfSfInd.deallocate();
@@ -1927,8 +1887,8 @@ namespace WindowComplexManager {
 		NBkSurf = Window.NBkSurf;
 		Geom.NSurfInt.allocate( NBkSurf );
 		Geom.NSurfInt = 0; //Initialize the number of intersections to zero
-		TmpSurfInt.allocate( NBkSurf, Geom.Trn.NBasis );
-		TmpSjdotN.allocate( NBkSurf, Geom.Trn.NBasis );
+		TmpSurfInt.allocate( Geom.Trn.NBasis, NBkSurf );
+		TmpSjdotN.allocate( Geom.Trn.NBasis, NBkSurf );
 		//Find the intersections of the basis rays with the back surfaces
 		for ( IRay = 1; IRay <= Geom.Trn.NBasis; ++IRay ) { //ray loop
 			IHit = 0;
@@ -1937,7 +1897,7 @@ namespace WindowComplexManager {
 			for ( KBkSurf = 1; KBkSurf <= NBkSurf; ++KBkSurf ) { //back surf loop
 				BaseSurf = Surface( ISurf ).BaseSurf; //ShadowComb is organized by base surface
 				JSurf = ShadowComb( BaseSurf ).BackSurf( KBkSurf ); //these are all proper back surfaces
-				PierceSurfaceVector( JSurf, Surface( ISurf ).Centroid, Geom.sTrn( IRay ), IHit, HitPt );
+				PierceSurface( JSurf, Surface( ISurf ).Centroid, Geom.sTrn( IRay ), IHit, HitPt );
 				if ( IHit <= 0 ) continue;
 				IHit = 0; //A hit, clear the hit flag for the next cycle
 				if ( TotHits == 0 ) {
@@ -1978,19 +1938,19 @@ namespace WindowComplexManager {
 				KBkSurf = BSHit.KBkSurf;
 				JSurf = BSHit.HitSurf;
 				++Geom.NSurfInt( KBkSurf );
-				TmpSurfInt( KBkSurf, Geom.NSurfInt( KBkSurf ) ) = IRay;
+				TmpSurfInt( Geom.NSurfInt( KBkSurf ), KBkSurf ) = IRay;
 				VecNorm = Surface( JSurf ).OutNormVec;
-				TmpSjdotN( KBkSurf, Geom.NSurfInt( KBkSurf ) ) = dot( Geom.sTrn( IRay ), VecNorm );
+				TmpSjdotN( Geom.NSurfInt( KBkSurf ), KBkSurf ) = dot( Geom.sTrn( IRay ), VecNorm );
 			}
 		} //ray loop
 		//  All rays traced, now put away the results in the temporary arrays
 		MaxInt = maxval( Geom.NSurfInt );
-		Geom.SurfInt.allocate( Window.NBkSurf, MaxInt );
-		Geom.SjdotN.allocate( Window.NBkSurf, MaxInt );
+		Geom.SurfInt.allocate( MaxInt, Window.NBkSurf );
+		Geom.SjdotN.allocate( MaxInt, Window.NBkSurf );
 		Geom.SurfInt = 0;
 		for ( I = 1; I <= Window.NBkSurf; ++I ) {
-			Geom.SurfInt( I, {1,Geom.NSurfInt( I )} ) = TmpSurfInt( I, {1,Geom.NSurfInt( I )} );
-			Geom.SjdotN( I, {1,Geom.NSurfInt( I )} ) = TmpSjdotN( I, {1,Geom.NSurfInt( I )} );
+			Geom.SurfInt( {1,Geom.NSurfInt( I )}, I ) = TmpSurfInt( {1,Geom.NSurfInt( I )}, I );
+			Geom.SjdotN( {1,Geom.NSurfInt( I )}, I ) = TmpSjdotN( {1,Geom.NSurfInt( I )}, I );
 		}
 
 		TmpSurfInt.deallocate();
@@ -2063,7 +2023,7 @@ namespace WindowComplexManager {
 		for ( J = 1; J <= Geom.Inc.NBasis; ++J ) { //Incident ray loop
 			Sum2 += Geom.Inc.Lamda( J );
 			for ( M = 1; M <= Geom.Trn.NBasis; ++M ) { //Outgoing ray loop
-				Sum1 += Geom.Inc.Lamda( J ) * Geom.Trn.Lamda( M ) * Construct( IConst ).BSDFInput.SolFrtTrans( J, M );
+				Sum1 += Geom.Inc.Lamda( J ) * Geom.Trn.Lamda( M ) * Construct( IConst ).BSDFInput.SolFrtTrans( M, J );
 			} //Outgoing ray loop
 		} //Incident ray loop
 		if ( Sum2 > 0 ) {
@@ -2080,7 +2040,7 @@ namespace WindowComplexManager {
 		for ( J = 1; J <= Geom.Inc.NBasis; ++J ) { //Incident ray loop
 			Sum2 += Geom.Inc.Lamda( J );
 			for ( M = 1; M <= Geom.Trn.NBasis; ++M ) { //Outgoing ray loop
-				Sum1 += Geom.Inc.Lamda( J ) * Geom.Trn.Lamda( M ) * Construct( IConst ).BSDFInput.VisFrtTrans( J, M );
+				Sum1 += Geom.Inc.Lamda( J ) * Geom.Trn.Lamda( M ) * Construct( IConst ).BSDFInput.VisFrtTrans( M, J );
 			} //Outgoing ray loop
 		} //Incident ray loop
 		if ( Sum2 > 0.0 ) {
@@ -2100,7 +2060,7 @@ namespace WindowComplexManager {
 		for ( JJ = 1; JJ <= Geom.NSky; ++JJ ) {
 			for ( M = 1; M <= Geom.Trn.NBasis; ++M ) {
 				J = Geom.SkyIndex( JJ );
-				Sum1 += Geom.SolSkyWt( JJ ) * Construct( IConst ).BSDFInput.SolFrtTrans( J, M ) * Geom.Inc.Lamda( J ) * Geom.Trn.Lamda( M );
+				Sum1 += Geom.SolSkyWt( JJ ) * Construct( IConst ).BSDFInput.SolFrtTrans( M, J ) * Geom.Inc.Lamda( J ) * Geom.Trn.Lamda( M );
 			}
 		}
 		for ( JJ = 1; JJ <= Geom.NSky; ++JJ ) {
@@ -2120,7 +2080,7 @@ namespace WindowComplexManager {
 			Sum3 = 0.0;
 			for ( JJ = 1; JJ <= Geom.NSky; ++JJ ) {
 				J = Geom.SkyIndex( JJ );
-				Sum3 += Geom.SolSkyWt( JJ ) * Geom.Inc.Lamda( J ) * Construct( IConst ).BSDFInput.Layer( L ).FrtAbs( 1, J );
+				Sum3 += Geom.SolSkyWt( JJ ) * Geom.Inc.Lamda( J ) * Construct( IConst ).BSDFInput.Layer( L ).FrtAbs( J, 1 );
 			}
 
 			if ( Sum2 != 0.0 ) {
@@ -2143,7 +2103,7 @@ namespace WindowComplexManager {
 		for ( JJ = 1; JJ <= Geom.NGnd; ++JJ ) {
 			for ( M = 1; M <= Geom.Trn.NBasis; ++M ) {
 				J = Geom.GndIndex( JJ );
-				Sum1 += Geom.SolSkyGndWt( JJ ) * Construct( IConst ).BSDFInput.SolFrtTrans( J, M ) * Geom.Inc.Lamda( J ) * Geom.Trn.Lamda( M );
+				Sum1 += Geom.SolSkyGndWt( JJ ) * Construct( IConst ).BSDFInput.SolFrtTrans( M, J ) * Geom.Inc.Lamda( J ) * Geom.Trn.Lamda( M );
 			}
 		}
 
@@ -2163,7 +2123,7 @@ namespace WindowComplexManager {
 			Sum3 = 0.0;
 			for ( JJ = 1; JJ <= Geom.NGnd; ++JJ ) {
 				J = Geom.GndIndex( JJ );
-				Sum3 += Geom.SolSkyGndWt( JJ ) * Geom.Inc.Lamda( J ) * Construct( IConst ).BSDFInput.Layer( L ).FrtAbs( 1, J );
+				Sum3 += Geom.SolSkyGndWt( JJ ) * Geom.Inc.Lamda( J ) * Construct( IConst ).BSDFInput.Layer( L ).FrtAbs( J, 1 );
 			}
 
 			if ( Sum2 != 0.0 ) {
@@ -2181,7 +2141,7 @@ namespace WindowComplexManager {
 		// Trn basis = incident basis for back incidence
 		for ( J = 1; J <= Geom.Trn.NBasis; ++J ) {
 			for ( M = 1; M <= Geom.Inc.NBasis; ++M ) {
-				Sum1 += Construct( IConst ).BSDFInput.SolBkRefl( J, M ) * Geom.Trn.Lamda( J ) * Geom.Inc.Lamda( M );
+				Sum1 += Construct( IConst ).BSDFInput.SolBkRefl( M, J ) * Geom.Trn.Lamda( J ) * Geom.Inc.Lamda( M );
 			}
 		}
 		for ( J = 1; J <= Geom.Trn.NBasis; ++J ) {
@@ -2199,7 +2159,7 @@ namespace WindowComplexManager {
 		State.WinBkHemAbs.allocate( State.NLayers );
 		for ( L = 1; L <= State.NLayers; ++L ) {
 			for ( J = 1; J <= Geom.Trn.NBasis; ++J ) {
-				Sum3 += Geom.Trn.Lamda( J ) * Construct( IConst ).BSDFInput.Layer( L ).BkAbs( 1, J );
+				Sum3 += Geom.Trn.Lamda( J ) * Construct( IConst ).BSDFInput.Layer( L ).BkAbs( J, 1 );
 			}
 
 			if ( Sum2 != 0.0 ) {
@@ -2222,7 +2182,7 @@ namespace WindowComplexManager {
 		for ( L = 1; L <= State.NLayers; ++L ) {
 			Sum1 = 0.0;
 			for ( J = 1; J <= Geom.Inc.NBasis; ++J ) {
-				Sum1 += Geom.Inc.Lamda( J ) * Construct( IConst ).BSDFInput.Layer( L ).FrtAbs( 1, J );
+				Sum1 += Geom.Inc.Lamda( J ) * Construct( IConst ).BSDFInput.Layer( L ).FrtAbs( J, 1 );
 			}
 
 			if ( Sum2 != 0.0 ) {
@@ -2242,7 +2202,7 @@ namespace WindowComplexManager {
 		// Trn basis = incident basis for back incidence
 		for ( J = 1; J <= Geom.Trn.NBasis; ++J ) {
 			for ( M = 1; M <= Geom.Inc.NBasis; ++M ) {
-				Sum1 += Construct( IConst ).BSDFInput.VisBkRefl( J, M ) * Geom.Trn.Lamda( J ) * Geom.Inc.Lamda( M );
+				Sum1 += Construct( IConst ).BSDFInput.VisBkRefl( M, J ) * Geom.Trn.Lamda( J ) * Geom.Inc.Lamda( M );
 			}
 		}
 		for ( J = 1; J <= Geom.Trn.NBasis; ++J ) {
@@ -2289,9 +2249,9 @@ namespace WindowComplexManager {
 			Sum1 = 0.0;
 			Sum2 = 0.0;
 			for ( J = 1; J <= Geom.NSurfInt( KBkSurf ); ++J ) { //Inc Ray loop
-				Sum2 += Geom.Trn.Lamda( Geom.SurfInt( KBkSurf, J ) );
+				Sum2 += Geom.Trn.Lamda( Geom.SurfInt( J, KBkSurf ) );
 				for ( M = 1; M <= Geom.Inc.NBasis; ++M ) { //Outgoing Ray loop
-					Sum1 += Geom.Trn.Lamda( Geom.SurfInt( KBkSurf, J ) ) * Geom.Inc.Lamda( M ) * Construct( IConst ).BSDFInput.SolBkRefl( M, Geom.SurfInt( KBkSurf, J ) );
+					Sum1 += Geom.Trn.Lamda( Geom.SurfInt( J, KBkSurf ) ) * Geom.Inc.Lamda( M ) * Construct( IConst ).BSDFInput.SolBkRefl( Geom.SurfInt( J, KBkSurf ), M );
 				} //Outgoing Ray loop
 			} //Inc Ray loop
 			if ( Sum2 > 0.0 ) {
@@ -2314,20 +2274,20 @@ namespace WindowComplexManager {
 				Sum1 = 0.0;
 				Sum2 = 0.0;
 				for ( J = 1; J <= Geom.NSurfInt( KBkSurf ); ++J ) { //Inc Ray loop
-					Sum2 += Geom.Trn.Lamda( Geom.SurfInt( KBkSurf, J ) );
-					Sum1 += Geom.Trn.Lamda( Geom.SurfInt( KBkSurf, J ) ) * Construct( IConst ).BSDFInput.Layer( L ).BkAbs( 1, Geom.SurfInt( KBkSurf, J ) );
+					Sum2 += Geom.Trn.Lamda( Geom.SurfInt( J, KBkSurf ) );
+					Sum1 += Geom.Trn.Lamda( Geom.SurfInt( J, KBkSurf ) ) * Construct( IConst ).BSDFInput.Layer( L ).BkAbs( Geom.SurfInt( J, KBkSurf ), 1 );
 				} //Inc Ray loop
 				if ( Sum2 > 0.0 ) {
 					Hold = Sum1 / Sum2;
 					for ( I = 1; I <= 24; ++I ) {
 						for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
-							State.BkSurf( KBkSurf ).WinDirBkAbs( L, I, J ) = Hold;
+							State.BkSurf( KBkSurf ).WinDirBkAbs( I, J, L ) = Hold;
 						}
 					}
 				} else {
 					for ( I = 1; I <= 24; ++I ) {
 						for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
-							State.BkSurf( KBkSurf ).WinDirBkAbs( L, I, J ) = 0.0;
+							State.BkSurf( KBkSurf ).WinDirBkAbs( I, J, L ) = 0.0;
 						}
 					}
 				}
@@ -2344,7 +2304,7 @@ namespace WindowComplexManager {
 		for ( J = 1; J <= Geom.Inc.NBasis; ++J ) {
 			Sum1 = 0.0;
 			for ( L = 1; L <= State.NLayers; ++L ) { //layer loop
-				Sum1 += Construct( IConst ).BSDFInput.Layer( L ).FrtAbs( 1, J );
+				Sum1 += Construct( IConst ).BSDFInput.Layer( L ).FrtAbs( J, 1 );
 			}
 			State.IntegratedFtAbs( J ) = Sum1;
 		}
@@ -2354,7 +2314,7 @@ namespace WindowComplexManager {
 		for ( J = 1; J <= Geom.Inc.NBasis; ++J ) { // Incident ray loop
 			Sum1 = 0.0;
 			for ( M = 1; M <= Geom.Trn.NBasis; ++M ) { // Outgoing ray loop
-				Sum1 += Geom.Trn.Lamda( J ) * Construct( IConst ).BSDFInput.SolFrtTrans( M, J );
+				Sum1 += Geom.Trn.Lamda( J ) * Construct( IConst ).BSDFInput.SolFrtTrans( J, M );
 			} // Outgoing ray loop
 			State.IntegratedFtTrans( J ) = Sum1;
 		} // Incident ray loop
@@ -2374,7 +2334,7 @@ namespace WindowComplexManager {
 		for ( J = 1; J <= Geom.Trn.NBasis; ++J ) {
 			Sum1 = 0.0;
 			for ( L = 1; L <= State.NLayers; ++L ) { //layer loop
-				Sum1 += Construct( IConst ).BSDFInput.Layer( L ).BkAbs( 1, J );
+				Sum1 += Construct( IConst ).BSDFInput.Layer( L ).BkAbs( J, 1 );
 			}
 			State.IntegratedBkAbs( J ) = Sum1;
 		}
@@ -2384,7 +2344,7 @@ namespace WindowComplexManager {
 		for ( J = 1; J <= Geom.Trn.NBasis; ++J ) { // Outgoing ray loop
 			Sum1 = 0.0;
 			for ( M = 1; M <= Geom.Inc.NBasis; ++M ) { // Incident ray loop
-				Sum1 += Geom.Inc.Lamda( J ) * Construct( IConst ).BSDFInput.SolBkRefl( M, J );
+				Sum1 += Geom.Inc.Lamda( J ) * Construct( IConst ).BSDFInput.SolBkRefl( J, M );
 			} //Incident ray loop
 			State.IntegratedBkRefl( J ) = Sum1;
 		} //Outgoing ray loop
@@ -2398,7 +2358,7 @@ namespace WindowComplexManager {
 	}
 
 	Real64
-	SkyWeight( Vector const & DirVec ) // Direction of the element to be weighted
+	SkyWeight( Vector const & EP_UNUSED( DirVec ) ) // Direction of the element to be weighted
 	{
 
 		// FUNCTION INFORMATION:
@@ -2453,7 +2413,7 @@ namespace WindowComplexManager {
 	}
 
 	Real64
-	SkyGndWeight( Vector const & PosVec ) // x,y,z(=0) of ground intersection pt
+	SkyGndWeight( Vector const & EP_UNUSED( PosVec ) ) // x,y,z(=0) of ground intersection pt
 	{
 
 		// FUNCTION INFORMATION:
@@ -2659,7 +2619,7 @@ namespace WindowComplexManager {
 		Vector const & RayToFind, // Ray vector direction in world CS
 		int const RadType, // Type of radiation: Front_Incident, etc.
 		int const ISurf, // Window Surface number
-		int const IState, // Complex Fenestration state number
+		int const EP_UNUSED( IState ), // Complex Fenestration state number
 		BasisStruct const & Basis, // Complex Fenestration basis root
 		Real64 & Theta, // Theta value for ray
 		Real64 & Phi // Phi value for ray
@@ -2743,7 +2703,7 @@ namespace WindowComplexManager {
 			IThUp = SearchAscTable( Theta, Basis.NThetas + 1, Basis.Thetas );
 			IThDn = IThUp - 1;
 			//Determine which of the theta basis points is closer to the Theta value
-			if ( Theta <= Basis.Grid( Basis.BasisIndex( IThDn, 1 ) ).UpprTheta ) {
+			if ( Theta <= Basis.Grid( Basis.BasisIndex( 1, IThDn ) ).UpprTheta ) {
 				//Note this will take care of both the special cases IThUp=2 and IThUp=NThetas +1
 				ITheta = IThDn;
 			} else {
@@ -2753,12 +2713,12 @@ namespace WindowComplexManager {
 			if ( Basis.NPhis( ITheta ) == 1 ) {
 				//Note that for W6 basis this can only happen for the first basis element
 				//If later bases are introduced this logic may have to be redesigned
-				RayIndex = Basis.BasisIndex( ITheta, 1 );
+				RayIndex = Basis.BasisIndex( 1, ITheta );
 				return RayIndex;
 			}
-			IPhUp = SearchAscTable( Phi, Basis.NPhis( ITheta ) + 1, Basis.Phis( _, ITheta ) );
+			IPhUp = SearchAscTable( Phi, Basis.NPhis( ITheta ) + 1, Basis.Phis( ITheta, _ ) );
 			IPhDn = IPhUp - 1;
-			if ( Phi <= Basis.Grid( Basis.BasisIndex( ITheta, IPhDn ) ).UpprPhi ) {
+			if ( Phi <= Basis.Grid( Basis.BasisIndex( IPhDn, ITheta ) ).UpprPhi ) {
 				IPhi = IPhDn;
 			} else {
 				if ( IPhUp == Basis.NPhis( ITheta ) + 1 ) {
@@ -2769,7 +2729,7 @@ namespace WindowComplexManager {
 					IPhi = IPhUp;
 				}
 			}
-			RayIndex = Basis.BasisIndex( ITheta, IPhi );
+			RayIndex = Basis.BasisIndex( IPhi, ITheta );
 			return RayIndex;
 		} else if ( Basis.BasisSymmetryType == BasisSymmetry_Axisymmetric ) {
 			//Search the basis thetas
@@ -2783,13 +2743,13 @@ namespace WindowComplexManager {
 			IThUp = SearchAscTable( Theta, Basis.NThetas + 1, Basis.Thetas );
 			IThDn = IThUp - 1;
 			//Determine which of the theta basis points is closer to the Theta value
-			if ( Theta <= Basis.Grid( Basis.BasisIndex( IThDn, 1 ) ).UpprTheta ) {
+			if ( Theta <= Basis.Grid( Basis.BasisIndex( 1, IThDn ) ).UpprTheta ) {
 				//Note this will take care of both the special cases IThUp=2 and IThUp=NThetas +1
 				ITheta = IThDn;
 			} else {
 				ITheta = IThUp;
 			}
-			RayIndex = Basis.BasisIndex( ITheta, 1 );
+			RayIndex = Basis.BasisIndex( 1, ITheta );
 			return RayIndex;
 		}
 		//No other type is implemented
@@ -3037,24 +2997,24 @@ namespace WindowComplexManager {
 		Real64 VacuumPressure; // maximal pressure for gas to be considered as vacuum [Pa]
 		Real64 VacuumMaxGapThickness; // maximal gap thickness for which vacuum calculation will work without issuing
 		// warning message
-		static FArray1D< Real64 > gap( maxlay, 0.0 ); // Vector of gap widths [m] {maxlay}
-		static FArray1D< Real64 > thick( maxlay, 0.0 ); // Vector of glass thicknesses [m] {maxlay}
-		static FArray1D< Real64 > scon( maxlay, 0.0 ); // Vector of conductivities of each glazing layer  [W/m.K] {maxlay}
-		static FArray1D< Real64 > tir( maxlay*2, 0.0 ); // Vector of IR transmittances of each layer {2*maxlay - 2 surfaces per layer}
-		static FArray1D< Real64 > emis( maxlay*2, 0.0 ); // Vector of IR emittances of each surface {2*maxlay - 2 surfaces per layer}
-		static FArray1D_int SupportPlr( maxlay, 0 ); // Shows whether or not gap have support pillar
+		static Array1D< Real64 > gap( maxlay, 0.0 ); // Vector of gap widths [m] {maxlay}
+		static Array1D< Real64 > thick( maxlay, 0.0 ); // Vector of glass thicknesses [m] {maxlay}
+		static Array1D< Real64 > scon( maxlay, 0.0 ); // Vector of conductivities of each glazing layer  [W/m.K] {maxlay}
+		static Array1D< Real64 > tir( maxlay*2, 0.0 ); // Vector of IR transmittances of each layer {2*maxlay - 2 surfaces per layer}
+		static Array1D< Real64 > emis( maxlay*2, 0.0 ); // Vector of IR emittances of each surface {2*maxlay - 2 surfaces per layer}
+		static Array1D_int SupportPlr( maxlay, 0 ); // Shows whether or not gap have support pillar
 		// 0 - does not have support pillar
 		// 1 - have support pillar
-		static FArray1D< Real64 > PillarSpacing( maxlay, 0.0 ); // Pillar spacing for each gap (used in case there is support pillar)
-		static FArray1D< Real64 > PillarRadius( maxlay, 0.0 ); // Pillar radius for each gap (used in case there is support pillar)
+		static Array1D< Real64 > PillarSpacing( maxlay, 0.0 ); // Pillar spacing for each gap (used in case there is support pillar)
+		static Array1D< Real64 > PillarRadius( maxlay, 0.0 ); // Pillar radius for each gap (used in case there is support pillar)
 
 		static Real64 totsol( 0.0 ); // Total solar transmittance of the IGU
 		static Real64 tilt( 0.0 ); // Window tilt [degrees]
-		static FArray1D< Real64 > asol( maxlay, 0.0 ); // Vector of Absorbed solar energy fractions for each layer {maxlay}
+		static Array1D< Real64 > asol( maxlay, 0.0 ); // Vector of Absorbed solar energy fractions for each layer {maxlay}
 		static Real64 height( 0.0 ); // IGU cavity height [m]
 		static Real64 heightt( 0.0 ); // Total window height [m]
 		static Real64 width( 0.0 ); // Window width [m]
-		static FArray1D< Real64 > presure( maxlay+1, 0.0 ); // Vector of gas pressures in gaps [N/m^2] {maxlay+1}
+		static Array1D< Real64 > presure( maxlay+1, 0.0 ); // Vector of gas pressures in gaps [N/m^2] {maxlay+1}
 
 		//Deflection
 		//Tarcog requires deflection as input parameters.  Deflection is NOT used in EnergyPlus simulations
@@ -3065,28 +3025,28 @@ namespace WindowComplexManager {
 		Real64 Pa; // Atmospheric (outside/inside) pressure (used onlu if CalcDeflection = 1)
 		Real64 Pini; // Initial presssure at time of fabrication (used only if CalcDeflection = 1)
 		Real64 Tini; // Initial temperature at time of fabrication (used only if CalcDeflection = 1)
-		FArray1D< Real64 > GapDefMax( maxlay-1 ); // Vector of gap widths in deflected state.  It will be used as input
+		static Array1D< Real64 > GapDefMax( maxlay-1, 0.0 ); // Vector of gap widths in deflected state.  It will be used as input
 		// if CalcDeflection = 2. In case CalcDeflection = 1 it will return recalculated
 		// gap widths. [m]
-		FArray1D< Real64 > YoungsMod( maxlay ); // Vector of Young's modulus. [m]
-		FArray1D< Real64 > PoissonsRat( maxlay ); // Vector of Poisson's Ratios. [m]
-		FArray1D< Real64 > LayerDef( maxlay ); // Vector of layers deflection. [m]
+		static Array1D< Real64 > YoungsMod( maxlay, 0.0 ); // Vector of Young's modulus. [m]
+		static Array1D< Real64 > PoissonsRat( maxlay, 0.0 ); // Vector of Poisson's Ratios. [m]
+		static Array1D< Real64 > LayerDef( maxlay, 0.0 ); // Vector of layers deflection. [m]
 
-		static FArray2D_int iprop( maxlay+1, maxgas, 1 ); // Matrix of gas codes - see above {maxgap x maxgas}
-		static FArray2D< Real64 > frct( maxlay+1, maxgas, 0.0 ); // Matrix of mass percentages in gap mixtures  {maxgap x maxgas}
-		static FArray2D< Real64 > gcon( maxgas, 3, 0.0 ); // Matrix of constants for gas conductivity calc
+		static Array2D_int iprop( maxgas, maxlay+1, 1 ); // Matrix of gas codes - see above {maxgap x maxgas}
+		static Array2D< Real64 > frct( maxgas, maxlay+1, 0.0 ); // Matrix of mass percentages in gap mixtures  {maxgap x maxgas}
+		static Array2D< Real64 > gcon( 3, maxgas, 0.0 ); // Matrix of constants for gas conductivity calc
 		//     (A, B, C for max of 10 gasses) {maxgas x 3}
-		static FArray2D< Real64 > gvis( maxgas, 3, 0.0 ); // Matrix of constants for gas dynamic viscosity calc
+		static Array2D< Real64 > gvis( 3, maxgas, 0.0 ); // Matrix of constants for gas dynamic viscosity calc
 		//     (A, B, C for max of 10 gasses) {maxgas x 3}
-		static FArray2D< Real64 > gcp( maxgas, 3, 0.0 ); // Matrix of constants for gas specific heat calc at constant pressure
+		static Array2D< Real64 > gcp( 3, maxgas, 0.0 ); // Matrix of constants for gas specific heat calc at constant pressure
 		//     (A, B, C for max of 10 gasses) {maxgas x 3}
-		static FArray1D< Real64 > wght( maxgas, 0.0 ); // Vector of Molecular weights for gasses {maxgas}
-		static FArray1D< Real64 > gama( maxgas, 0.0 ); // Vector of spefic heat ration for low pressure calc {maxgas}
+		static Array1D< Real64 > wght( maxgas, 0.0 ); // Vector of Molecular weights for gasses {maxgas}
+		static Array1D< Real64 > gama( maxgas, 0.0 ); // Vector of spefic heat ration for low pressure calc {maxgas}
 		static bool feedData( false ); // flag to notify if data needs to be feed into gas arrays
-		static FArray1D_int nmix( maxlay+1, 0 ); // Vector of number of gasses in gas mixture of each gap {maxlay+1}
+		static Array1D_int nmix( maxlay+1, 0 ); // Vector of number of gasses in gas mixture of each gap {maxlay+1}
 		static Real64 hin( 0.0 ); // Indoor combined film coefficient (if non-zero) [W/m^2.K]
 		static Real64 hout( 0.0 ); // Outdoor combined film coefficient (if non-zero) [W/m^2.K]
-		static FArray1D_int ibc( 2, 0 ); // Vector of boundary condition flags (ibc(1) - outdoor, ibc(2) - indoor)
+		static Array1D_int ibc( 2, 0 ); // Vector of boundary condition flags (ibc(1) - outdoor, ibc(2) - indoor)
 		//             0 - h to be calculated;
 		//             1 - combined film coefficient (h) prescribed;
 		//             2 - convective film coefficient (hc) prescribed.
@@ -3095,35 +3055,35 @@ namespace WindowComplexManager {
 		//             -1  - old SPC142 correlation
 		//             -2  - Klems-Yazdanian correlation (applicable to outdoor only)
 		//             -3  - Kimura correlation (applicable to outdoor only)
-		static FArray1D< Real64 > Atop( maxlay, 0.0 ); // Vector with areas of top openings - between SD layers and top of
+		static Array1D< Real64 > Atop( maxlay, 0.0 ); // Vector with areas of top openings - between SD layers and top of
 		//               glazing cavity, for each layer [m^2] {maxlay} *
-		static FArray1D< Real64 > Abot( maxlay, 0.0 ); // Vector with areas of bottom openings - between SD layers
+		static Array1D< Real64 > Abot( maxlay, 0.0 ); // Vector with areas of bottom openings - between SD layers
 		//               and bottom of glazing cavity [m^2] {maxlay}
-		static FArray1D< Real64 > Al( maxlay, 0.0 ); // Vector with areas of left-hand side openings - between SD layers
+		static Array1D< Real64 > Al( maxlay, 0.0 ); // Vector with areas of left-hand side openings - between SD layers
 		//               and left end of glazing cavity [m^2] {maxlay}
-		static FArray1D< Real64 > Ar( maxlay, 0.0 ); // Vector of areas of right-hand side openings - between SD layers
+		static Array1D< Real64 > Ar( maxlay, 0.0 ); // Vector of areas of right-hand side openings - between SD layers
 		//               and right end of glazing cavity [m^2] {maxlay}
-		static FArray1D< Real64 > Ah( maxlay, 0.0 ); // Vector of total areas of holes for each SD [m^2] {maxlay}
-		static FArray1D< Real64 > SlatThick( maxlay, 0.0 ); // Thickness of the slat material [m] {maxlay} **
-		static FArray1D< Real64 > SlatWidth( maxlay, 0.0 ); // Slat width [m] {maxlay}
-		static FArray1D< Real64 > SlatAngle( maxlay, 0.0 ); // Slat tilt angle [deg] {maxlay}
-		static FArray1D< Real64 > SlatCond( maxlay, 0.0 ); // Conductivity of the slat material [W/m.K] {maxlay}
-		static FArray1D< Real64 > SlatSpacing( maxlay, 0.0 ); // Distance between slats [m] {maxlay}
-		static FArray1D< Real64 > SlatCurve( maxlay, 0.0 ); // Curvature radius of the slat [m] {maxlay}
-		static FArray1D< Real64 > vvent( maxlay+1, 0.0 ); // Vector of velocities for forced ventilation, for each gap, and for
+		static Array1D< Real64 > Ah( maxlay, 0.0 ); // Vector of total areas of holes for each SD [m^2] {maxlay}
+		static Array1D< Real64 > SlatThick( maxlay, 0.0 ); // Thickness of the slat material [m] {maxlay} **
+		static Array1D< Real64 > SlatWidth( maxlay, 0.0 ); // Slat width [m] {maxlay}
+		static Array1D< Real64 > SlatAngle( maxlay, 0.0 ); // Slat tilt angle [deg] {maxlay}
+		static Array1D< Real64 > SlatCond( maxlay, 0.0 ); // Conductivity of the slat material [W/m.K] {maxlay}
+		static Array1D< Real64 > SlatSpacing( maxlay, 0.0 ); // Distance between slats [m] {maxlay}
+		static Array1D< Real64 > SlatCurve( maxlay, 0.0 ); // Curvature radius of the slat [m] {maxlay}
+		static Array1D< Real64 > vvent( maxlay+1, 0.0 ); // Vector of velocities for forced ventilation, for each gap, and for
 		//               outdoor and indoor environment [m/s] {maxlay+1} ***
-		static FArray1D< Real64 > tvent( maxlay+1, 0.0 ); // Vector of temperatures of ventilation gas for forced ventilation, for each
+		static Array1D< Real64 > tvent( maxlay+1, 0.0 ); // Vector of temperatures of ventilation gas for forced ventilation, for each
 		//  gap, and for outdoor and indoor environment [K] {maxlay+1}
-		static FArray1D_int LayerType( maxlay, 0 ); // Glazing layer type flag {maxlay}:
+		static Array1D_int LayerType( maxlay, 0 ); // Glazing layer type flag {maxlay}:
 		//                 0 - Specular layer,
 		//                 1 - Venetian blind (SD)
 		//                 2 - Woven shade (SD) (not implemented)
 		//                 3 - Diffuse shade (not implemented)
-		static FArray1D_int nslice( maxlay, 0 ); // Vector of numbers of slices in a laminated glazing layers
+		static Array1D_int nslice( maxlay, 0 ); // Vector of numbers of slices in a laminated glazing layers
 		//   (0 - monolithic layer) {maxlay}
-		static FArray1D< Real64 > LaminateA( maxlay, 0.0 ); // Left-hand side array for creating slice equations {maxlay}
-		static FArray1D< Real64 > LaminateB( maxlay, 0.0 ); // Right-hand side array for creating slice equations {maxlay}
-		static FArray1D< Real64 > sumsol( maxlay, 0.0 ); // Array of absorbed solar energy fractions for each laminated
+		static Array1D< Real64 > LaminateA( maxlay, 0.0 ); // Left-hand side array for creating slice equations {maxlay}
+		static Array1D< Real64 > LaminateB( maxlay, 0.0 ); // Right-hand side array for creating slice equations {maxlay}
+		static Array1D< Real64 > sumsol( maxlay, 0.0 ); // Array of absorbed solar energy fractions for each laminated
 		//               glazing layer [W/m^2] {maxlay}
 		static int standard( 1 ); // Calculation standard switch:
 		//                 1 - ISO 15099,
@@ -3151,8 +3111,8 @@ namespace WindowComplexManager {
 		//                     **** Forced ventilation calculation is not active at this time.
 		// TARCOG Output:
 
-		static FArray1D< Real64 > theta( maxlay*2, 0.0 ); // Vector of average temperatures of glazing surfaces [K] {2*maxlay}
-		static FArray1D< Real64 > q( maxlay*2+1, 0.0 ); // Vector of various heat fluxes [W/m^2] {2*maxlay+1},
+		static Array1D< Real64 > theta( maxlay*2, 0.0 ); // Vector of average temperatures of glazing surfaces [K] {2*maxlay}
+		static Array1D< Real64 > q( maxlay*2+1, 0.0 ); // Vector of various heat fluxes [W/m^2] {2*maxlay+1},
 		//    depending on element index:
 		//    1  = qout (heat flux from outer-most glazing surface to outdoor space)
 		//   2*i = qpane(i) (heat flux through i-th glazing layer)
@@ -3160,34 +3120,32 @@ namespace WindowComplexManager {
 		//          surface of the adjacent glazing layer)
 		// 2*nlayer+1 = qin (heat flux from indoor space to inner-most glazing
 		//              surface)
-		static FArray1D< Real64 > qprim( maxlay1, 0.0 ); // Vector of heat fluxes from the outdoor-faced surfaces of glazing layers
+		static Array1D< Real64 > qprim( maxlay1, 0.0 ); // Vector of heat fluxes from the outdoor-faced surfaces of glazing layers
 		//    towards the adjacent glazing cavity [W/m2]
-		static FArray1D< Real64 > qv( maxlay1, 0.0 ); // Vector of heat fluxes to each gap by ventillation [W/m^2]
+		static Array1D< Real64 > qv( maxlay1, 0.0 ); // Vector of heat fluxes to each gap by ventillation [W/m^2]
 		static Real64 ufactor( 0.0 ); // Center of glass U-value [W/m^2.K]
 		static Real64 sc( 0.0 ); // Shading Coefficient
 		static Real64 hflux( 0.0 ); // Net heat flux between room and window [W/m^2]
-		static Real64 rhum( 0.0 ); // Relative humidity at inner-most surface for condensation
-		static Real64 rhout( 0.0 ); // Relative humidity at outer-most surface for condensation
 		static Real64 hcin( 0.0 ); // Indoor convective surface heat transfer coefficient  [W/m^2.K]
 		static Real64 hcout( 0.0 ); // Outdoor convective surface heat transfer coefficient [W/m^2.K]
 		static Real64 hrin( 0.0 ); // Indoor radiative surface heat transfer coefficient [W/m^2.K]
 		static Real64 hrout( 0.0 ); // Outdoor radiative surface heat transfer coefficient [W/m^2.K]
-		static FArray1D< Real64 > hcgap( maxlay1, 0.0 ); // Convective part of gap effective conductivity {maxlay}
-		static FArray1D< Real64 > hrgap( maxlay1, 0.0 ); // Radiative part of gap effective conductivity (including in and out)
+		static Array1D< Real64 > hcgap( maxlay1, 0.0 ); // Convective part of gap effective conductivity {maxlay}
+		static Array1D< Real64 > hrgap( maxlay1, 0.0 ); // Radiative part of gap effective conductivity (including in and out)
 		static Real64 shgc( 0.0 ); // Solar heat gain coefficient - per ISO 15099
 		static Real64 shgct( 0.0 ); // Solar heat gain coefficient - per old procedure
 		static Real64 tamb( 0.0 ); // Outdoor environmental temperature [K]
 		static Real64 troom( 0.0 ); // Indoor environmental temperature [K]
-		static FArray1D< Real64 > hg( maxlay, 0.0 ); // Gas conductance of the glazing cavity
+		static Array1D< Real64 > hg( maxlay, 0.0 ); // Gas conductance of the glazing cavity
 		//         [W/m^2.K] - EN673 and ISO 10292 procedure
-		static FArray1D< Real64 > hr( maxlay, 0.0 ); // Radiation conductance of the glazing cavity
+		static Array1D< Real64 > hr( maxlay, 0.0 ); // Radiation conductance of the glazing cavity
 		//         [W/m^2.K] - EN673 and ISO 10292 procedure
-		static FArray1D< Real64 > hs( maxlay, 0.0 ); // Thermal conductance of the glazing cavity
+		static Array1D< Real64 > hs( maxlay, 0.0 ); // Thermal conductance of the glazing cavity
 		//         [W/m^2.K] - EN673 and ISO 10292 procedure
 		static Real64 he( 0.0 ); // External heat transfer coefficient [W/m^2.K] - EN673 and ISO 10292 procedure
 		static Real64 hi( 0.0 ); // Internal heat transfer coefficient [W/m^2.K] - EN673 and ISO 10292 procedure
-		static FArray1D< Real64 > Ra( maxlay+1, 0.0 ); // Vector of Rayleigh numbers, for each gap {maxlay}
-		static FArray1D< Real64 > Nu( maxlay+1, 0.0 ); // Vector of Nusselt numbers, for each gap {maxlay}
+		static Array1D< Real64 > Ra( maxlay+1, 0.0 ); // Vector of Rayleigh numbers, for each gap {maxlay}
+		static Array1D< Real64 > Nu( maxlay+1, 0.0 ); // Vector of Nusselt numbers, for each gap {maxlay}
 		static int nperr( 0 ); // Error code
 		static Real64 ShadeEmisRatioOut( 0.0 ); // Ratio of modified to glass emissivity at the outermost glazing surface
 		static Real64 ShadeEmisRatioIn( 0.0 ); // Ratio of modified to glass emissivity at the innermost glazing surface
@@ -3195,23 +3153,17 @@ namespace WindowComplexManager {
 		static Real64 ShadeHcRatioIn( 0.0 ); // Ratio of modified to unshaded Hc at the innermost glazing surface
 		static Real64 HcUnshadedOut( 0.0 ); // Hc value at outdoor surface of an unshaded subsystem [W/m^2.K]
 		static Real64 HcUnshadedIn( 0.0 ); // Hc value at indoor surface of an unshaded subsystem [W/m^2.K]
-		static FArray1D< Real64 > Keff( maxlay, 0.0 ); // Vector of keff values for gaps [W/m.K] {maxlay}
-		static FArray1D< Real64 > ShadeGapKeffConv( maxlay-1, 0.0 ); // Vector of convective keff values for areas above/below
+		static Array1D< Real64 > Keff( maxlay, 0.0 ); // Vector of keff values for gaps [W/m.K] {maxlay}
+		static Array1D< Real64 > ShadeGapKeffConv( maxlay-1, 0.0 ); // Vector of convective keff values for areas above/below
 		// SD layers [W/m.K] {maxlay-1}
 
 		int ZoneNum; // Zone number corresponding to SurfNum
 
-		Real64 locTCSpecTemp; // The temperature corresponding to the specified optical properties of the TC layer
-		Real64 locTCLayerTemp; // TC layer temperature at each time step. C
-		static bool locTCFlag( false ); // True if this surface is a TC window
-		static FArray1D< Real64 > deltaTemp( 100, 0.0 );
+		static Array1D< Real64 > deltaTemp( 100, 0.0 );
 		int i;
-		static FArray1D_int iMinDT( 1, 0 );
-		static FArray1D_int IDConst( 100, 0 );
-		static Real64 dT0( 0.0 );
-		static Real64 dT1( 0.0 );
+		static Array1D_int iMinDT( 1, 0 );
+		static Array1D_int IDConst( 100, 0 );
 
-		int IConst; // Construction number
 		int TotLay; // Total number of layers in a construction
 		//   (sum of solid layers and gap layers)
 		int Lay; // Layer number
@@ -3225,9 +3177,7 @@ namespace WindowComplexManager {
 		Real64 RhoShadeIR;
 		int IGlass; // glass layer number (1,2,3,...)
 		int IGap; // Gap layer number (1,2,...)
-		int ShadeLayPtr; // Material number corresponding to a shade layer
 		int TotGlassLay; // Total number of glass layers in a construction
-		int BlNum; // Blind number
 		int ZoneEquipConfigNum;
 		int NodeNum;
 		Real64 SumSysMCp; // Zone sum of air system MassFlowRate*Cp
@@ -3236,7 +3186,6 @@ namespace WindowComplexManager {
 		Real64 NodeTemp;
 		Real64 CpAir;
 		Real64 RefAirTemp; // reference air temperatures
-		int tmpGasType;
 		int k; // Layer counter
 		int SurfNumAdj; // An interzone surface's number in the adjacent zone
 		int ZoneNumAdj; // An interzone surface's adjacent zone number
@@ -3252,7 +3201,7 @@ namespace WindowComplexManager {
 		Real64 CondHeatGainShade; // Conduction through shade/blind, outside to inside (W)
 
 		Real64 ShGlReflFacIR; // Factor for long-wave inter-reflection between shade/blind and adjacent glass
-		Real64 RhoGlIR1; // Long-wave reflectance of glass surface facing shade/blind; 1=exterior shade/blind,
+//		Real64 RhoGlIR1; // Long-wave reflectance of glass surface facing shade/blind; 1=exterior shade/blind,
 		Real64 RhoGlIR2;
 		//  2=interior shade/blind
 		Real64 RhoShIR1; // Long-wave reflectance of shade/blind surface facing glass; 1=interior shade/blind,
@@ -3278,7 +3227,7 @@ namespace WindowComplexManager {
 		Real64 CpAirOutlet; // Heat capacity of air from window gap (J/kg-K)
 		Real64 CpAirZone; // Heat capacity of zone air (J/kg-K)
 		Real64 ConvHeatGainToZoneAir; // Convective heat gain to zone air from window gap airflow (W)
-		int ConstrNumSh; // Construction number with shading device
+//		int ConstrNumSh; // Construction number with shading device
 		Real64 TransDiff; // Diffuse shortwave transmittance
 		static int CalcSHGC( 0 ); // SHGC calculations are not necessary for E+ run
 		static int NumOfIterations( 0 );
@@ -3495,8 +3444,8 @@ namespace WindowComplexManager {
 		frct( 1, 1 ) = 1.0; // pure air on outdoor side
 		nmix( 1 ) = 1; // pure air on outdoor side
 
-		iprop( nlayer + 1, 1 ) = 1; // air on indoor side
-		frct( nlayer + 1, 1 ) = 1.0; // pure air on indoor side
+		iprop( 1, nlayer + 1 ) = 1; // air on indoor side
+		frct( 1, nlayer + 1 ) = 1.0; // pure air on indoor side
 		nmix( nlayer + 1 ) = 1; // pure air on indoor side
 
 		//Simon: feed gas coefficients with air.  This is necessary for tarcog because it is used on indoor and outdoor sides
@@ -3504,9 +3453,9 @@ namespace WindowComplexManager {
 		wght( iprop( 1, 1 ) ) = GasWght( GasType );
 		gama( iprop( 1, 1 ) ) = GasSpecificHeatRatio( GasType );
 		for ( ICoeff = 1; ICoeff <= 3; ++ICoeff ) {
-			gcon( iprop( 1, 1 ), ICoeff ) = GasCoeffsCon( GasType, ICoeff );
-			gvis( iprop( 1, 1 ), ICoeff ) = GasCoeffsVis( GasType, ICoeff );
-			gcp( iprop( 1, 1 ), ICoeff ) = GasCoeffsCp( GasType, ICoeff );
+			gcon( ICoeff, iprop( 1, 1 ) ) = GasCoeffsCon( ICoeff, GasType );
+			gvis( ICoeff, iprop( 1, 1 ) ) = GasCoeffsVis( ICoeff, GasType );
+			gcp( ICoeff, iprop( 1, 1 ) ) = GasCoeffsCp( ICoeff, GasType );
 		}
 
 		// Fill window layer properties needed for window layer heat balance calculation
@@ -3581,20 +3530,20 @@ namespace WindowComplexManager {
 				for ( IMix = 1; IMix <= nmix( IGap + 1 ); ++IMix ) {
 					//iprop(IGap+1, IMix) = Material(LayPtr)%GasType(IMix)
 					//iprop(IGap+1, IMix) = GetGasIndex(Material(LayPtr)%GasWght(IMix))
-					frct( IGap + 1, IMix ) = Material( GasPointer ).GasFract( IMix );
+					frct( IMix, IGap + 1 ) = Material( GasPointer ).GasFract( IMix );
 
 					//Now has to build-up gas coefficients arrays. All used gasses should be stored into these arrays and
 					//to be correctly referenced by gap arrays
 
 					//First check if gas coefficients are already part of array.  Duplicates are not necessary
-					CheckGasCoefs( Material( GasPointer ).GasWght( IMix ), iprop( IGap + 1, IMix ), wght, feedData );
+					CheckGasCoefs( Material( GasPointer ).GasWght( IMix ), iprop( IMix, IGap + 1 ), wght, feedData );
 					if ( feedData ) {
-						wght( iprop( IGap + 1, IMix ) ) = Material( GasPointer ).GasWght( IMix );
-						gama( iprop( IGap + 1, IMix ) ) = Material( GasPointer ).GasSpecHeatRatio( IMix );
+						wght( iprop( IMix, IGap + 1 ) ) = Material( GasPointer ).GasWght( IMix );
+						gama( iprop( IMix, IGap + 1 ) ) = Material( GasPointer ).GasSpecHeatRatio( IMix );
 						for ( i = 1; i <= 3; ++i ) {
-							gcon( iprop( IGap + 1, IMix ), i ) = Material( GasPointer ).GasCon( IMix, i );
-							gvis( iprop( IGap + 1, IMix ), i ) = Material( GasPointer ).GasVis( IMix, i );
-							gcp( iprop( IGap + 1, IMix ), i ) = Material( GasPointer ).GasCp( IMix, i );
+							gcon( i, iprop( IMix, IGap + 1 ) ) = Material( GasPointer ).GasCon( i, IMix );
+							gvis( i, iprop( IMix, IGap + 1 ) ) = Material( GasPointer ).GasVis( i, IMix );
+							gcp( i, iprop( IMix, IGap + 1 ) ) = Material( GasPointer ).GasCp( i, IMix );
 						}
 					} //IF feedData THEN
 				}
@@ -3647,7 +3596,7 @@ namespace WindowComplexManager {
 			//if (dir.ne.0.0d0) then
 			for ( IGlass = 1; IGlass <= nlayer; ++IGlass ) {
 				//IF (dir > 0.0D0 ) THEN
-				asol( IGlass ) = QRadSWwinAbs( SurfNum, IGlass );
+				asol( IGlass ) = QRadSWwinAbs( IGlass, SurfNum );
 				//ELSE
 				//  asol(IGLASS) = 0.0D0
 				//ENDIF
@@ -3923,8 +3872,8 @@ namespace WindowComplexManager {
 				SurfaceWindow( SurfNum ).ThetaFace( 2 * k ) = theta( 2 * k );
 
 				// temperatures for reporting
-				FenLaySurfTempFront( SurfNum, k ) = theta( 2 * k - 1 ) - KelvinConv;
-				FenLaySurfTempBack( SurfNum, k ) = theta( 2 * k ) - KelvinConv;
+				FenLaySurfTempFront( k, SurfNum ) = theta( 2 * k - 1 ) - KelvinConv;
+				FenLaySurfTempBack( k, SurfNum ) = theta( 2 * k ) - KelvinConv;
 				//thetas(k) = theta(k)
 			}
 
@@ -3939,7 +3888,7 @@ namespace WindowComplexManager {
 	CheckGasCoefs(
 		Real64 const currentWeight,
 		int & indexNumber,
-		FArray1A< Real64 > wght,
+		Array1A< Real64 > wght,
 		bool & feedData
 	)
 	{
@@ -3954,9 +3903,6 @@ namespace WindowComplexManager {
 		// Locals
 		//Local variables
 		static int counter( 1 );
-		int IMix;
-		int I;
-		int numOfMixtures;
 		static bool coeffFound( false );
 
 		feedData = false;
@@ -3983,7 +3929,7 @@ namespace WindowComplexManager {
 	SearchAscTable(
 		Real64 const y, // Value to be found in the table
 		int const n, // Number of values in the table
-		FArray1S< Real64 > const ytab // Table of values, monotonic, ascending order
+		Array1S< Real64 > const ytab // Table of values, monotonic, ascending order
 	)
 	{
 
@@ -4062,206 +4008,9 @@ namespace WindowComplexManager {
 
 	}
 
-	//=================================================================================================
-
-	void
-	CrossProduct(
-		FArray1A< Real64 > A, // Vector components: C = A X B
-		FArray1A< Real64 > B,
-		FArray1A< Real64 > C
-	)
-	{
-
-		// Cross product between vectors A and B
-
-		// Argument array dimensioning
-		A.dim( 3 );
-		B.dim( 3 );
-		C.dim( 3 );
-
-		// Locals
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		// FLOW:
-		C( 1 ) = A( 2 ) * B( 3 ) - A( 3 ) * B( 2 );
-		C( 2 ) = A( 3 ) * B( 1 ) - A( 1 ) * B( 3 );
-		C( 3 ) = A( 1 ) * B( 2 ) - A( 2 ) * B( 1 );
-
-	}
-
-	void
-	PierceSurfaceVector(
-		int const ISurf, // Surface index
-		Vector const & Orig, // Point from which ray originates
-		Vector const & Dir, // Unit vector along in direction of ray whose
-		int & IPIERC, // =1 if line through point R1 in direction of unit vector
-		Vector & HitPt // Point that ray along RN intersects plane of surface
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Fred Winkelmann
-		//       DATE WRITTEN   July 1997
-		//       MODIFIED       Sept 2003, FCW: modification of Daylighting routine DayltgPierceSurface
-		//                             June 2011, JHK: inputs made vector types; copy of routine from
-		//                                        SolarReflectionManager
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Returns point CPhit that line through point R1 in direction of unit vector RN intersects
-		// the plan of surface ISurf. IPIERC = 1 if CPhit is inside the perimeter of ISurf. If not,
-		// IPIERC = 0. This routine works for convex and concave surfaces with 3 or more vertices.
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// Based on DOE-2.1E subroutine DPIERC.
-
-		// Using/Aliasing
-		using namespace Vectors;
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:na
-		// INTERFACE BLOCK SPECIFICATIONS:na
-		// DERIVED TYPE DEFINITIONS:na
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		//  intersection with surface is to be determined
-		//  RN intersects surface ISurf; =0 otherwise.
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > CPhit( 3 ); // Point that ray along RN intersects plane of surface
-		FArray1D< Real64 > R1( 3 ); // Point from which ray originates
-		FArray1D< Real64 > RN( 3 ); // Unit vector along in direction of ray whose
-		FArray1D< Real64 > V1( 3 ); // First vertex
-		FArray1D< Real64 > V2( 3 ); // Second vertex
-		FArray1D< Real64 > V3( 3 ); // Third vertex
-		int NV; // Number of vertices (3 or 4)
-		FArray1D< Real64 > A1( 3 ); // Vector from vertex 1 to 2
-		FArray1D< Real64 > A2( 3 ); // Vector from vertex 2 to 3
-		FArray1D< Real64 > AXC( 3 ); // Cross product of A and C
-		FArray1D< Real64 > SN( 3 ); // Vector normal to surface (SN = A1 X A2)
-		FArray1D< Real64 > AA( 3 ); // AA(I) = A(N,I)
-		FArray1D< Real64 > CC( 3 ); // CC(I) = C(N,I)
-		FArray1D< Real64 > CCC( 3 ); // Vector from vertex 2 to CP
-		FArray1D< Real64 > AAA( 3 ); // Vector from vertex 2 to vertex 1
-		FArray1D< Real64 > BBB( 3 ); // Vector from vertex 2 to vertex 3
-		int N; // Vertex loop index
-		int I; // Vertext-to-vertex index
-		Real64 F1; // Intermediate variables
-		Real64 F2;
-		Real64 SCALE; // Scale factor
-		Real64 DOTCB; // Dot product of vectors CCC and BBB
-		Real64 DOTCA; // Dot product of vectors CCC and AAA
-		Real64 DOTAXCSN; // Dot product of vectors AXC and SN
-
-		//  REAL(r64)      :: V(4,3)                   ! Vertices of surfaces
-		//  REAL(r64)      :: A(4,3)                   ! Vertex-to-vertex vectors; A(1,i) is from vertex 1 to 2, etc.
-		//  REAL(r64)      :: C(4,3)                   ! Vectors from vertices to intersection point
-		static FArray2D< Real64 > V; // Vertices of surfaces
-		static FArray2D< Real64 > A; // Vertex-to-vertex vectors; A(1,i) is from vertex 1 to 2, etc.
-		static FArray2D< Real64 > C; // Vectors from vertices to intersection point
-		static bool firstTime( true );
-
-		// FLOW:
-		IPIERC = 0;
-		R1 = Orig;
-		RN = Dir;
-		// Vertex vectors
-		if ( firstTime ) {
-			V.allocate( MaxVerticesPerSurface, 3 );
-			V = 0.0;
-			A.allocate( MaxVerticesPerSurface, 3 );
-			A = 0.0;
-			C.allocate( MaxVerticesPerSurface, 3 );
-			C = 0.0;
-			firstTime = false;
-		}
-
-		NV = Surface( ISurf ).Sides;
-		for ( N = 1; N <= NV; ++N ) {
-			V( N, 1 ) = Surface( ISurf ).Vertex( N ).x;
-			V( N, 2 ) = Surface( ISurf ).Vertex( N ).y;
-			V( N, 3 ) = Surface( ISurf ).Vertex( N ).z;
-		}
-
-		// Vertex-to-vertex vectors. A(1,2) is from vertex 1 to 2, etc.
-		for ( I = 1; I <= 3; ++I ) {
-			for ( N = 1; N <= NV - 1; ++N ) {
-				A( N, I ) = V( N + 1, I ) - V( N, I );
-			}
-			A( NV, I ) = V( 1, I ) - V( NV, I );
-			A1( I ) = A( 1, I );
-			A2( I ) = A( 2, I );
-			V1( I ) = V( 1, I );
-			V2( I ) = V( 2, I );
-			V3( I ) = V( 3, I );
-		}
-
-		// Vector normal to surface
-		CrossProduct( A1, A2, SN );
-		// Scale factor, the solution of SN.(CPhit-V2) = 0 and
-		// CPhit = R1 + SCALE*RN, where CPhit is the point that RN,
-		// when extended, intersects the plane of the surface.
-		F1 = dot( SN, V2 - R1 );
-		F2 = dot( SN, RN );
-		// Skip surfaces that are parallel to RN
-		if ( std::abs( F2 ) < 0.01 ) return;
-		SCALE = F1 / F2;
-		// Skip surfaces that RN points away from
-		if ( SCALE <= 0.0 ) return;
-		// Point that RN intersects plane of surface
-		CPhit = R1 + RN * SCALE;
-		HitPt = CPhit;
-		// Vector from vertex 2 to CPhit
-		CCC = CPhit - V2;
-
-		// Two cases: rectangle and non-rectangle; do rectangle
-		// first since most common shape and faster calculation
-		if ( Surface( ISurf ).Shape == Rectangle || Surface( ISurf ).Shape == RectangularDoorWindow || Surface( ISurf ).Shape == RectangularOverhang || Surface( ISurf ).Shape == RectangularLeftFin || Surface( ISurf ).Shape == RectangularRightFin ) {
-			// Surface is rectangular
-			// Vectors from vertex 2 to vertex 1 and vertex 2 to vertex 3
-			AAA = V1 - V2;
-			BBB = V3 - V2;
-			// Intersection point, CCC, is inside rectangle if
-			// 0 < CCC.BBB < BBB.BBB AND 0 < CCC.AAA < AAA.AAA
-			DOTCB = dot( CCC, BBB );
-			if ( DOTCB < 0.0 ) return;
-			if ( DOTCB > magnitude_squared( BBB ) ) return;
-			DOTCA = dot( CCC, AAA );
-			if ( DOTCA < 0.0 ) return;
-			if ( DOTCA > magnitude_squared( AAA ) ) return;
-			// Surface is intersected
-			IPIERC = 1;
-		} else {
-			// Surface is not rectangular
-			// Vectors from surface vertices to CPhit
-			for ( N = 1; N <= NV; ++N ) {
-				for ( I = 1; I <= 3; ++I ) {
-					C( N, I ) = CPhit( I ) - V( N, I );
-				}
-			}
-			// Cross products of vertex-to-vertex vectors and
-			// vertex-to-CPhit vectors
-			for ( N = 1; N <= NV; ++N ) {
-				for ( I = 1; I <= 3; ++I ) {
-					AA( I ) = A( N, I );
-					CC( I ) = C( N, I );
-				}
-				CrossProduct( AA, CC, AXC );
-				DOTAXCSN = dot( AXC, SN );
-				// If at least one of these dot products is negative
-				// intersection point is outside of surface
-				if ( DOTAXCSN < 0.0 ) return;
-			}
-			// Surface is intersected
-			IPIERC = 1;
-		}
-
-	}
-
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <DataSurfaceLists.hh>
@@ -57,8 +57,8 @@ namespace DataSurfaceLists {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaceLists
 
 	// Object Data
-	FArray1D< SurfaceListData > SurfList;
-	FArray1D< SlabListData > SlabList;
+	Array1D< SurfaceListData > SurfList;
+	Array1D< SlabListData > SlabList;
 
 	// Functions
 
@@ -89,8 +89,6 @@ namespace DataSurfaceLists {
 		using InputProcessor::GetObjectDefMaxArgs;
 		using InputProcessor::VerifyName;
 		using DataHeatBalance::Zone;
-		using DataHeatBalance::Construct;
-		using DataGlobals::NumOfZones;
 		using General::RoundSigDigits;
 
 		// Locals
@@ -110,21 +108,21 @@ namespace DataSurfaceLists {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string Alphas; // Alpha items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
+		Array1D_string Alphas; // Alpha items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
 		int MaxAlphas; // Maximum number of alphas for these input keywords
 		int MaxNumbers; // Maximum number of numbers for these input keywords
 		int NameConflict; // Used to see if a surface name matches the name of a surface list (not allowed)
-		FArray1D< Real64 > Numbers; // Numeric items for object
+		Array1D< Real64 > Numbers; // Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumArgs; // Unused variable that is part of a subroutine call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		Real64 SumOfAllFractions; // Summation of all of the fractions for splitting flow (must sum to 1)
 		int SurfNum; // DO loop counter for surfaces
 		int ZoneForSurface; // Zone number that a particular surface is attached to
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		int Item;
 		bool ErrorsFound;
 		int IOStatus;
@@ -160,7 +158,7 @@ namespace DataSurfaceLists {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), SurfList.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject1 + " Name" );
+				VerifyName( Alphas( 1 ), SurfList, Item - 1, IsNotOK, IsBlank, CurrentModuleObject1 + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -169,7 +167,7 @@ namespace DataSurfaceLists {
 				SurfList( Item ).Name = Alphas( 1 );
 				SurfList( Item ).NumOfSurfaces = NumAlphas - 1;
 
-				NameConflict = FindItemInList( SurfList( Item ).Name, Surface.Name(), TotSurfaces );
+				NameConflict = FindItemInList( SurfList( Item ).Name, Surface );
 				if ( NameConflict > 0 ) { // A surface list has the same name as a surface--not allowed
 					ShowSevereError( CurrentModuleObject1 + " = " + SurfList( Item ).Name + " has the same name as a surface; this is not allowed." );
 					ErrorsFound = true;
@@ -187,7 +185,7 @@ namespace DataSurfaceLists {
 				SumOfAllFractions = 0.0;
 				for ( SurfNum = 1; SurfNum <= SurfList( Item ).NumOfSurfaces; ++SurfNum ) {
 					SurfList( Item ).SurfName( SurfNum ) = Alphas( SurfNum + 1 );
-					SurfList( Item ).SurfPtr( SurfNum ) = FindItemInList( Alphas( SurfNum + 1 ), Surface.Name(), TotSurfaces );
+					SurfList( Item ).SurfPtr( SurfNum ) = FindItemInList( Alphas( SurfNum + 1 ), Surface );
 					if ( SurfList( Item ).SurfPtr( SurfNum ) == 0 ) {
 						ShowSevereError( cAlphaFields( SurfNum + 1 ) + " in " + CurrentModuleObject1 + " statement not found = " + SurfList( Item ).SurfName( SurfNum ) );
 						ErrorsFound = true;
@@ -245,7 +243,7 @@ namespace DataSurfaceLists {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), SlabList.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject2 + " Name" );
+				VerifyName( Alphas( 1 ), SlabList, Item - 1, IsNotOK, IsBlank, CurrentModuleObject2 + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -254,7 +252,7 @@ namespace DataSurfaceLists {
 				SlabList( Item ).Name = Alphas( 1 );
 				SlabList( Item ).NumOfSurfaces = ( ( NumAlphas - 1 ) / 4 );
 
-				NameConflict = FindItemInList( SlabList( Item ).Name, Surface.Name(), TotSurfaces );
+				NameConflict = FindItemInList( SlabList( Item ).Name, Surface );
 				if ( NameConflict > 0 ) { // A surface list has the same name as a surface--not allowed
 					ShowSevereError( CurrentModuleObject2 + " = " + SlabList( Item ).Name + " has the same name as a slab; this is not allowed." );
 					ErrorsFound = true;
@@ -280,14 +278,14 @@ namespace DataSurfaceLists {
 				NumArray = 1;
 				for ( SurfNum = 1; SurfNum <= SlabList( Item ).NumOfSurfaces; ++SurfNum ) {
 					SlabList( Item ).ZoneName( SurfNum ) = Alphas( AlphaArray );
-					SlabList( Item ).ZonePtr = FindItemInList( Alphas( AlphaArray ), Zone.Name(), NumOfZones );
+					SlabList( Item ).ZonePtr = FindItemInList( Alphas( AlphaArray ), Zone );
 					if ( SlabList( Item ).ZonePtr( SurfNum ) == 0 ) {
 						ShowSevereError( cAlphaFields( AlphaArray + 1 ) + " in " + CurrentModuleObject2 + " Zone not found = " + SlabList( Item ).SurfName( SurfNum ) );
 						ErrorsFound = true;
 					}
 
 					SlabList( Item ).SurfName( SurfNum ) = Alphas( AlphaArray + 1 );
-					SlabList( Item ).SurfPtr( SurfNum ) = FindItemInList( Alphas( AlphaArray + 1 ), Surface.Name(), TotSurfaces );
+					SlabList( Item ).SurfPtr( SurfNum ) = FindItemInList( Alphas( AlphaArray + 1 ), Surface );
 					if ( SlabList( Item ).SurfPtr( SurfNum ) == 0 ) {
 						ShowSevereError( cAlphaFields( AlphaArray + 1 ) + " in " + CurrentModuleObject2 + " statement not found = " + SlabList( Item ).SurfName( SurfNum ) );
 						ErrorsFound = true;
@@ -433,7 +431,7 @@ namespace DataSurfaceLists {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

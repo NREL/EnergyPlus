@@ -2,7 +2,7 @@
 #define ZoneDehumidifier_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -31,7 +31,7 @@ namespace ZoneDehumidifier {
 	extern int NumDehumidifiers; // Number of zone dehumidifier objects in the input file
 
 	extern bool GetInputFlag; // Set to FALSE after first time input is "gotten"
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 	// Driver/Manager Routines
@@ -269,7 +269,7 @@ namespace ZoneDehumidifier {
 	};
 
 	// Object Data
-	extern FArray1D< ZoneDehumidifierData > ZoneDehumid;
+	extern Array1D< ZoneDehumidifierData > ZoneDehumid;
 
 	// Functions
 
@@ -311,7 +311,7 @@ namespace ZoneDehumidifier {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

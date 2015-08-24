@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -24,7 +24,6 @@ namespace ObjexxFCL {
 template< typename, typename = void > class Required;
 class byte;
 class ubyte;
-class Fstring;
 
 // Types
 typedef  byte  sbyte;
@@ -54,7 +53,6 @@ typedef  Required< char >                Required_char;
 typedef  Required< unsigned char >       Required_uchar;
 typedef  Required< signed char >         Required_schar;
 typedef  Required< std::string >         Required_string;
-typedef  Required< Fstring >             Required_Fstring;
 
 // Const Types
 typedef  Required< bool const >                Required_bool_const;
@@ -83,7 +81,6 @@ typedef  Required< char const >                Required_char_const;
 typedef  Required< unsigned char const >       Required_uchar_const;
 typedef  Required< signed char const >         Required_schar_const;
 typedef  Required< std::string const >         Required_string_const;
-typedef  Required< Fstring const >             Required_Fstring_const;
 
 } // ObjexxFCL
 

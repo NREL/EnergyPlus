@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <GlobalNames.hh>
@@ -58,10 +58,10 @@ namespace GlobalNames {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE GlobalNames:
 
 	// Object Data
-	FArray1D< ComponentNameData > ChillerNames;
-	FArray1D< ComponentNameData > BoilerNames;
-	FArray1D< ComponentNameData > BaseboardNames;
-	FArray1D< ComponentNameData > CoilNames;
+	Array1D< ComponentNameData > ChillerNames;
+	Array1D< ComponentNameData > BoilerNames;
+	Array1D< ComponentNameData > BaseboardNames;
+	Array1D< ComponentNameData > CoilNames;
 
 	// Functions
 
@@ -111,7 +111,7 @@ namespace GlobalNames {
 
 		ErrorFound = false;
 		int Found = 0;
-		if ( NumChillers > 0 ) Found = FindItemInList( NameToVerify, ChillerNames.CompName(), NumChillers );
+		if ( NumChillers > 0 ) Found = FindItemInList( NameToVerify, ChillerNames, &ComponentNameData::CompName, NumChillers );
 		if ( Found != 0 ) {
 			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Chiller Type=\"" + ChillerNames( Found ).CompType + "\"." );
 			ShowContinueError( "...Current entry is Chiller Type=\"" + TypeToVerify + "\"." );
@@ -177,7 +177,7 @@ namespace GlobalNames {
 		ErrorFound = false;
 		int Found = 0;
 
-		if ( NumBaseboards > 0 ) Found = FindItemInList( NameToVerify, BaseboardNames.CompName(), NumBaseboards );
+		if ( NumBaseboards > 0 ) Found = FindItemInList( NameToVerify, BaseboardNames, &ComponentNameData::CompName, NumBaseboards );
 
 		if ( Found != 0 ) {
 			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + BaseboardNames( Found ).CompType + "\"." );
@@ -245,7 +245,7 @@ namespace GlobalNames {
 		ErrorFound = false;
 		int Found = 0;
 
-		if ( NumBoilers > 0 ) Found = FindItemInList( NameToVerify, BoilerNames.CompName(), NumBoilers );
+		if ( NumBoilers > 0 ) Found = FindItemInList( NameToVerify, BoilerNames, &ComponentNameData::CompName, NumBoilers );
 
 		if ( Found != 0 ) {
 			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + BoilerNames( Found ).CompType + "\"." );
@@ -313,7 +313,7 @@ namespace GlobalNames {
 		ErrorFound = false;
 		int Found = 0;
 
-		if ( NumCoils > 0 ) Found = FindItemInList( NameToVerify, CoilNames.CompName(), NumCoils );
+		if ( NumCoils > 0 ) Found = FindItemInList( NameToVerify, CoilNames, &ComponentNameData::CompName, NumCoils );
 
 		if ( Found != 0 ) {
 			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + CoilNames( Found ).CompType + "\"" );
@@ -336,7 +336,7 @@ namespace GlobalNames {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

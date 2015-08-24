@@ -3,7 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -99,11 +99,11 @@ namespace ZoneTempPredictorCorrector {
 	//INTEGER, PUBLIC, PARAMETER :: iPushZoneTimestepHistories    = 5
 	//INTEGER, PUBLIC, PARAMETER :: iPushSystemTimestepHistories  = 6
 
-	FArray1D_string const ValidControlTypes( 4, { "ThermostatSetpoint:SingleHeating", "ThermostatSetpoint:SingleCooling", "ThermostatSetpoint:SingleHeatingOrCooling", "ThermostatSetpoint:DualSetpoint" } );
+	Array1D_string const ValidControlTypes( 4, { "ThermostatSetpoint:SingleHeating", "ThermostatSetpoint:SingleCooling", "ThermostatSetpoint:SingleHeatingOrCooling", "ThermostatSetpoint:DualSetpoint" } );
 
-	FArray1D_string const ValidComfortControlTypes( 12, { "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating", "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling", "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint", "ThermostatSetpoint:ThermalComfort:Pierce:SingleHeating", "ThermostatSetpoint:ThermalComfort:Pierce:SingleCooling", "ThermostatSetpoint:ThermalComfort:Pierce:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:Pierce:DualSetpoint", "ThermostatSetpoint:ThermalComfort:KSU:SingleHeating", "ThermostatSetpoint:ThermalComfort:KSU:SingleCooling", "ThermostatSetpoint:ThermalComfort:KSU:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:KSU:DualSetpoint" } );
+	Array1D_string const ValidComfortControlTypes( 12, { "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating", "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling", "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint", "ThermostatSetpoint:ThermalComfort:Pierce:SingleHeating", "ThermostatSetpoint:ThermalComfort:Pierce:SingleCooling", "ThermostatSetpoint:ThermalComfort:Pierce:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:Pierce:DualSetpoint", "ThermostatSetpoint:ThermalComfort:KSU:SingleHeating", "ThermostatSetpoint:ThermalComfort:KSU:SingleCooling", "ThermostatSetpoint:ThermalComfort:KSU:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:KSU:DualSetpoint" } );
 
-	FArray1D_string const cZControlTypes( 6, { "ZoneControl:Thermostat", "ZoneControl:Thermostat:ThermalComfort", "ZoneControl:Thermostat:OperativeTemperature", "ZoneControl:Humidistat", "ZoneControl:Thermostat:TemperatureAndHumidity", "ZoneControl:Thermostat:StagedDualSetpoint" } );
+	Array1D_string const cZControlTypes( 6, { "ZoneControl:Thermostat", "ZoneControl:Thermostat:ThermalComfort", "ZoneControl:Thermostat:OperativeTemperature", "ZoneControl:Humidistat", "ZoneControl:Thermostat:TemperatureAndHumidity", "ZoneControl:Thermostat:StagedDualSetpoint" } );
 
 	int const iZC_TStat( 1 );
 	int const iZC_TCTStat( 2 );
@@ -111,7 +111,7 @@ namespace ZoneTempPredictorCorrector {
 	int const iZC_HStat( 4 );
 	int const iZC_TandHStat( 5 );
 	int const iZC_StagedDual( 6 );
-	FArray1D_int const iZControlTypes( 6, { iZC_TStat, iZC_TCTStat, iZC_OTTStat, iZC_HStat, iZC_TandHStat, iZC_StagedDual } );
+	Array1D_int const iZControlTypes( 6, { iZC_TStat, iZC_TCTStat, iZC_OTTStat, iZC_HStat, iZC_TandHStat, iZC_StagedDual } );
 
 	int const SglHeatSetPoint( 1 );
 	int const SglCoolSetPoint( 2 );
@@ -159,27 +159,27 @@ namespace ZoneTempPredictorCorrector {
 	// Number of zone with staged controlled objects
 	int NumStageCtrZone( 0 );
 
-	FArray1D< Real64 > ZoneSetPointLast;
-	FArray1D< Real64 > TempIndZnLd;
-	FArray1D< Real64 > TempDepZnLd;
-	FArray1D< Real64 > ZoneAirRelHum; // Zone relative humidity in percent
+	Array1D< Real64 > ZoneSetPointLast;
+	Array1D< Real64 > TempIndZnLd;
+	Array1D< Real64 > TempDepZnLd;
+	Array1D< Real64 > ZoneAirRelHum; // Zone relative humidity in percent
 
 	// Zone temperature history - used only for oscillation test
-	FArray2D< Real64 > ZoneTempHist;
-	FArray1D< Real64 > ZoneTempOscillate;
+	Array2D< Real64 > ZoneTempHist;
+	Array1D< Real64 > ZoneTempOscillate;
 	Real64 AnyZoneTempOscillate;
 
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	FArray1D< ZoneTempControlType > SetPointSingleHeating;
-	FArray1D< ZoneTempControlType > SetPointSingleCooling;
-	FArray1D< ZoneTempControlType > SetPointSingleHeatCool;
-	FArray1D< ZoneTempControlType > SetPointDualHeatCool;
-	FArray1D< ZoneComfortFangerControlType > SetPointSingleHeatingFanger;
-	FArray1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
-	FArray1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
-	FArray1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
+	Array1D< ZoneTempControlType > SetPointSingleHeating;
+	Array1D< ZoneTempControlType > SetPointSingleCooling;
+	Array1D< ZoneTempControlType > SetPointSingleHeatCool;
+	Array1D< ZoneTempControlType > SetPointDualHeatCool;
+	Array1D< ZoneComfortFangerControlType > SetPointSingleHeatingFanger;
+	Array1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
+	Array1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
+	Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
 
 	// Functions
 
@@ -349,8 +349,8 @@ namespace ZoneTempPredictorCorrector {
 		int NumStageControlledZones; // Number of staged controlled objects
 		int StageControlledZoneNum; // Index for staged controlled zones
 
-		FArray1D_int CTSchedMapToControlledZone;
-		FArray1D_int CCmSchedMapToControlledZone;
+		Array1D_int CTSchedMapToControlledZone;
+		Array1D_int CCmSchedMapToControlledZone;
 		int Item;
 		int Item1;
 		int ZLItem;
@@ -358,8 +358,8 @@ namespace ZoneTempPredictorCorrector {
 		struct NeededControlTypes
 		{
 			// Members
-			FArray1D_bool MustHave; // 4= the four control types
-			FArray1D_bool DidHave;
+			Array1D_bool MustHave; // 4= the four control types
+			Array1D_bool DidHave;
 
 			// Default Constructor
 			NeededControlTypes() :
@@ -369,8 +369,8 @@ namespace ZoneTempPredictorCorrector {
 
 			// Member Constructor
 			NeededControlTypes(
-				FArray1_bool const & MustHave, // 4= the four control types
-				FArray1_bool const & DidHave
+				Array1_bool const & MustHave, // 4= the four control types
+				Array1_bool const & DidHave
 			) :
 				MustHave( 4, MustHave ),
 				DidHave( 4, DidHave )
@@ -381,8 +381,8 @@ namespace ZoneTempPredictorCorrector {
 		struct NeededComfortControlTypes
 		{
 			// Members
-			FArray1D_bool MustHave; // 4= the four control types
-			FArray1D_bool DidHave;
+			Array1D_bool MustHave; // 4= the four control types
+			Array1D_bool DidHave;
 
 			// Default Constructor
 			NeededComfortControlTypes() :
@@ -392,8 +392,8 @@ namespace ZoneTempPredictorCorrector {
 
 			// Member Constructor
 			NeededComfortControlTypes(
-				FArray1_bool const & MustHave, // 4= the four control types
-				FArray1_bool const & DidHave
+				Array1_bool const & MustHave, // 4= the four control types
+				Array1_bool const & DidHave
 			) :
 				MustHave( 12, MustHave ),
 				DidHave( 12, DidHave )
@@ -402,8 +402,8 @@ namespace ZoneTempPredictorCorrector {
 		};
 
 		// Object Data
-		FArray1D< NeededControlTypes > TStatControlTypes;
-		FArray1D< NeededComfortControlTypes > TComfortControlTypes;
+		Array1D< NeededControlTypes > TStatControlTypes;
+		Array1D< NeededComfortControlTypes > TComfortControlTypes;
 
 		// Formats
 		static gio::Fmt Format_700( "('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, ','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')" );
@@ -420,15 +420,15 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), TStatObjects.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), TStatObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			TStatObjects( Item ).Name = cAlphaArgs( 1 );
-			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList.Name(), NumOfZoneLists );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				TStatObjects( Item ).TempControlledZoneStartPtr = NumTempControlledZones + 1;
 				++NumTempControlledZones;
@@ -466,10 +466,10 @@ namespace ZoneTempPredictorCorrector {
 					if ( TStatObjects( Item ).ZoneListActive ) {
 						cAlphaArgs( 2 ) = Zone( ZoneList( TStatObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name;
 					}
-					ZoneAssigned = FindItemInList( cAlphaArgs( 2 ), TempControlledZone.ZoneName(), TempControlledZoneNum - 1 );
+					ZoneAssigned = FindItemInList( cAlphaArgs( 2 ), TempControlledZone, &ZoneTempControls::ZoneName, TempControlledZoneNum - 1 );
 					if ( ZoneAssigned == 0 ) {
 						TempControlledZone( TempControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
-						TempControlledZone( TempControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+						TempControlledZone( TempControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
 						if ( TempControlledZone( TempControlledZoneNum ).ActualZoneNum == 0 ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 							ErrorsFound = true;
@@ -543,7 +543,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, SingleTempHeatingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointSingleHeating.Name(), SingleTempHeatingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SetPointSingleHeating, SingleTempHeatingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -567,7 +567,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, SingleTempCoolingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointSingleCooling.Name(), SingleTempCoolingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SetPointSingleCooling, SingleTempCoolingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -608,7 +608,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, DualTempHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointDualHeatCool.Name(), DualTempHeatCoolControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SetPointDualHeatCool, DualTempHeatCoolControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -634,28 +634,28 @@ namespace ZoneTempPredictorCorrector {
 			TempIndex = FindItem( ValidControlTypes( SglHeatSetPoint ), TempControlledZone( TempControlledZoneNum ).ControlType, TempControlledZone( TempControlledZoneNum ).NumControlTypes );
 			TempControlledZone( TempControlledZoneNum ).SchIndx_SingleHeatSetPoint = TempIndex;
 			if ( TempIndex > 0 ) {
-				TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex ) = FindItem( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ), SetPointSingleHeating.Name(), NumSingleTempHeatingControls );
+				TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex ) = FindItem( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ), SetPointSingleHeating );
 				TStatControlTypes( TempControlledZoneNum ).MustHave( SingleHeatingSetPoint ) = true;
 			}
 
 			TempIndex = FindItem( ValidControlTypes( SglCoolSetPoint ), TempControlledZone( TempControlledZoneNum ).ControlType, TempControlledZone( TempControlledZoneNum ).NumControlTypes );
 			TempControlledZone( TempControlledZoneNum ).SchIndx_SingleCoolSetPoint = TempIndex;
 			if ( TempIndex > 0 ) {
-				TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex ) = FindItem( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ), SetPointSingleCooling.Name(), NumSingleTempCoolingControls );
+				TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex ) = FindItem( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ), SetPointSingleCooling );
 				TStatControlTypes( TempControlledZoneNum ).MustHave( SingleCoolingSetPoint ) = true;
 			}
 
 			TempIndex = FindItem( ValidControlTypes( SglHCSetPoint ), TempControlledZone( TempControlledZoneNum ).ControlType, TempControlledZone( TempControlledZoneNum ).NumControlTypes );
 			TempControlledZone( TempControlledZoneNum ).SchIndx_SingleHeatCoolSetPoint = TempIndex;
 			if ( TempIndex > 0 ) {
-				TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex ) = FindItem( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ), SetPointSingleHeatCool.Name(), NumSingleTempHeatCoolControls );
+				TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex ) = FindItem( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ), SetPointSingleHeatCool );
 				TStatControlTypes( TempControlledZoneNum ).MustHave( SingleHeatCoolSetPoint ) = true;
 			}
 
 			TempIndex = FindItem( ValidControlTypes( DualSetPoint ), TempControlledZone( TempControlledZoneNum ).ControlType, TempControlledZone( TempControlledZoneNum ).NumControlTypes );
 			TempControlledZone( TempControlledZoneNum ).SchIndx_DualSetPointWDeadBand = TempIndex;
 			if ( TempIndex > 0 ) {
-				TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex ) = FindItem( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ), SetPointDualHeatCool.Name(), NumDualTempHeatCoolControls );
+				TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( TempIndex ) = FindItem( TempControlledZone( TempControlledZoneNum ).ControlTypeName( TempIndex ), SetPointDualHeatCool );
 				TStatControlTypes( TempControlledZoneNum ).MustHave( DualSetPointWithDeadBand ) = true;
 			}
 		}
@@ -830,7 +830,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, HumidControlledZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), HumidityControlZone.ControlName(), HumidControlledZoneNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), HumidityControlZone, &ZoneHumidityControls::ControlName, HumidControlledZoneNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -839,14 +839,14 @@ namespace ZoneTempPredictorCorrector {
 			// Ensure unique zone name
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 2 ), HumidityControlZone.ZoneName(), HumidControlledZoneNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Zone Name" );
+			VerifyName( cAlphaArgs( 2 ), HumidityControlZone, &ZoneHumidityControls::ZoneName, HumidControlledZoneNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Zone Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 2 ) = "xxxxx";
 			}
 
 			HumidityControlZone( HumidControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
-			HumidityControlZone( HumidControlledZoneNum ).ActualZoneNum = FindItem( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			HumidityControlZone( HumidControlledZoneNum ).ActualZoneNum = FindItem( cAlphaArgs( 2 ), Zone );
 			if ( HumidityControlZone( HumidControlledZoneNum ).ActualZoneNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
@@ -884,15 +884,15 @@ namespace ZoneTempPredictorCorrector {
 			// will not do much verifying -- that will come later.
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ComfortTStatObjects.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ComfortTStatObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				errFlag = true;
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList.Name(), NumOfZoneLists );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
 			ComfortTStatObjects( Item ).Name = cAlphaArgs( 1 );
 			if ( Item1 > 0 ) {
 				ComfortTStatObjects( Item ).ComfortControlledZoneStartPtr = NumComfortControlledZones + 1;
@@ -932,10 +932,10 @@ namespace ZoneTempPredictorCorrector {
 					if ( ComfortTStatObjects( Item ).ZoneListActive ) {
 						cAlphaArgs( 2 ) = Zone( ZoneList( ComfortTStatObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name;
 					}
-					ZoneAssigned = FindItemInList( cAlphaArgs( 2 ), ComfortControlledZone.ZoneName(), ComfortControlledZoneNum - 1 );
+					ZoneAssigned = FindItemInList( cAlphaArgs( 2 ), ComfortControlledZone, &ZoneComfortControls::ZoneName, ComfortControlledZoneNum - 1 );
 					if ( ZoneAssigned == 0 ) {
 						ComfortControlledZone( ComfortControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
-						ComfortControlledZone( ComfortControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+						ComfortControlledZone( ComfortControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
 						if ( ComfortControlledZone( ComfortControlledZoneNum ).ActualZoneNum == 0 ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 							ErrorsFound = true;
@@ -985,11 +985,11 @@ namespace ZoneTempPredictorCorrector {
 						}
 						if ( ComfortControlledZone( ComfortControlledZoneNum ).AverageMethodNum == AverageMethodNum_SPE ) {
 							ComfortControlledZone( ComfortControlledZoneNum ).AverageObjectName = cAlphaArgs( 4 );
-							if ( FindItem( cAlphaArgs( 4 ), People.Name(), TotPeople ) == 0 ) {
+							if ( FindItem( cAlphaArgs( 4 ), People ) == 0 ) {
 								ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
 								ErrorsFound = true;
 							} else {
-								ComfortControlledZone( ComfortControlledZoneNum ).SpecificObjectNum = FindItem( cAlphaArgs( 4 ), People.Name(), TotPeople );
+								ComfortControlledZone( ComfortControlledZoneNum ).SpecificObjectNum = FindItem( cAlphaArgs( 4 ), People );
 							}
 						}
 					} else {
@@ -1133,7 +1133,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, SingleFangerHeatingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointSingleHeatingFanger.Name(), SingleFangerHeatingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SetPointSingleHeatingFanger, SingleFangerHeatingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1163,7 +1163,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, SingleFangerCoolingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointSingleCoolingFanger.Name(), SingleFangerCoolingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SetPointSingleCoolingFanger, SingleFangerCoolingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1194,7 +1194,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, SingleFangerHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointSingleCoolingFanger.Name(), SingleFangerCoolingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SetPointSingleCoolingFanger, SingleFangerCoolingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1226,7 +1226,7 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, DualFangerHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SetPointDualHeatCoolFanger.Name(), DualFangerHeatCoolControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SetPointDualHeatCoolFanger, DualFangerHeatCoolControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1265,28 +1265,28 @@ namespace ZoneTempPredictorCorrector {
 			ComfortIndex = FindItem( ValidComfortControlTypes( SglHeatSetPointFanger ), ComfortControlledZone( ComfortControlledZoneNum ).ControlType, ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
 			ComfortControlledZone( ComfortControlledZoneNum ).SchIndx_SglHeatSetPointFanger = ComfortIndex;
 			if ( ComfortIndex > 0 ) {
-				ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex ) = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ), SetPointSingleHeatingFanger.Name(), NumSingleFangerHeatingControls );
+				ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex ) = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ), SetPointSingleHeatingFanger );
 				TComfortControlTypes( ComfortControlledZoneNum ).MustHave( SglHeatSetPointFanger ) = true;
 			}
 
 			ComfortIndex = FindItem( ValidComfortControlTypes( SglCoolSetPointFanger ), ComfortControlledZone( ComfortControlledZoneNum ).ControlType, ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
 			ComfortControlledZone( ComfortControlledZoneNum ).SchIndx_SglCoolSetPointFanger = ComfortIndex;
 			if ( ComfortIndex > 0 ) {
-				ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex ) = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ), SetPointSingleCoolingFanger.Name(), NumSingleFangerCoolingControls );
+				ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex ) = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ), SetPointSingleCoolingFanger );
 				TComfortControlTypes( ComfortControlledZoneNum ).MustHave( SglCoolSetPointFanger ) = true;
 			}
 
 			ComfortIndex = FindItem( ValidComfortControlTypes( SglHCSetPointFanger ), ComfortControlledZone( ComfortControlledZoneNum ).ControlType, ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
 			ComfortControlledZone( ComfortControlledZoneNum ).SchIndx_SglHCSetPointFanger = ComfortIndex;
 			if ( ComfortIndex > 0 ) {
-				ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex ) = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ), SetPointSingleHeatCoolFanger.Name(), NumSingleFangerHeatCoolControls );
+				ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex ) = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ), SetPointSingleHeatCoolFanger );
 				TComfortControlTypes( ComfortControlledZoneNum ).MustHave( SglHCSetPointFanger ) = true;
 			}
 
 			ComfortIndex = FindItem( ValidComfortControlTypes( DualSetPointFanger ), ComfortControlledZone( ComfortControlledZoneNum ).ControlType, ComfortControlledZone( ComfortControlledZoneNum ).NumControlTypes );
 			ComfortControlledZone( ComfortControlledZoneNum ).SchIndx_DualSetPointFanger = ComfortIndex;
 			if ( ComfortIndex > 0 ) {
-				ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex ) = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ), SetPointDualHeatCoolFanger.Name(), NumDualFangerHeatCoolControls );
+				ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeSchIndx( ComfortIndex ) = FindItem( ComfortControlledZone( ComfortControlledZoneNum ).ControlTypeName( ComfortIndex ), SetPointDualHeatCoolFanger );
 				TComfortControlTypes( ComfortControlledZoneNum ).MustHave( DualSetPointFanger ) = true;
 			}
 		}
@@ -1485,10 +1485,10 @@ namespace ZoneTempPredictorCorrector {
 			for ( OpTempContrlNum = 1; OpTempContrlNum <= NumOpTempControlledZones; ++OpTempContrlNum ) {
 				GetObjectItem( cCurrentModuleObject, OpTempContrlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				// find matching name of  ZONECONTROL:THERMOSTAT object
-				found = FindItem( cAlphaArgs( 1 ), TStatObjects.Name(), NumTStatStatements );
+				found = FindItem( cAlphaArgs( 1 ), TStatObjects );
 				if ( found == 0 ) {
 					// It might be in the TempControlledZones
-					found = FindItem( cAlphaArgs( 1 ), TempControlledZone.Name(), NumTempControlledZones );
+					found = FindItem( cAlphaArgs( 1 ), TempControlledZone );
 					if ( found == 0 ) { // throw error
 						ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cZControlTypes( iZC_TStat ) + " reference not found." );
 						ErrorsFound = true;
@@ -1600,10 +1600,10 @@ namespace ZoneTempPredictorCorrector {
 			for ( TempHumidityCntrlNum = 1; TempHumidityCntrlNum <= NumTempAndHumidityControlledZones; ++TempHumidityCntrlNum ) {
 				GetObjectItem( cCurrentModuleObject, TempHumidityCntrlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				// find matching name of  ZONECONTROL:THERMOSTAT object
-				found = FindItem( cAlphaArgs( 1 ), TStatObjects.Name(), NumTStatStatements );
+				found = FindItem( cAlphaArgs( 1 ), TStatObjects );
 				if ( found == 0 ) {
 					// It might be in the TempControlledZones
-					found = FindItem( cAlphaArgs( 1 ), TempControlledZone.Name(), NumTempControlledZones );
+					found = FindItem( cAlphaArgs( 1 ), TempControlledZone );
 					if ( found == 0 ) { // throw error
 						ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cZControlTypes( iZC_TStat ) + " reference not found." );
 						ErrorsFound = true;
@@ -1739,15 +1739,15 @@ namespace ZoneTempPredictorCorrector {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), StagedTStatObjects.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), StagedTStatObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			StagedTStatObjects( Item ).Name = cAlphaArgs( 1 );
-			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList.Name(), NumOfZoneLists );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				StagedTStatObjects( Item ).StageControlledZoneStartPtr = NumStageCtrZone + 1;
 				++NumStageCtrZone;
@@ -1784,10 +1784,10 @@ namespace ZoneTempPredictorCorrector {
 					if ( StagedTStatObjects( Item ).ZoneListActive ) {
 						cAlphaArgs( 2 ) = Zone( ZoneList( StagedTStatObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name;
 					}
-					ZoneAssigned = FindItemInList( cAlphaArgs( 2 ), StageControlledZone.ZoneName(), StageControlledZoneNum - 1 );
+					ZoneAssigned = FindItemInList( cAlphaArgs( 2 ), StageControlledZone, &ZoneStagedControls::ZoneName, StageControlledZoneNum - 1 );
 					if ( ZoneAssigned == 0 ) {
 						StageControlledZone( StageControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
-						StageControlledZone( StageControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+						StageControlledZone( StageControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
 						if ( StageControlledZone( StageControlledZoneNum ).ActualZoneNum == 0 ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 							ErrorsFound = true;
@@ -2440,7 +2440,6 @@ namespace ZoneTempPredictorCorrector {
 		// Using/Aliasing
 		using DataRoomAirModel::AirModel;
 		using DataRoomAirModel::RoomAirModel_Mixing;
-		using DataRoomAirModel::RoomAirModel_UCSDDV;
 		using DataRoomAirModel::IsZoneDV;
 		using DataRoomAirModel::ZoneDVMixedFlag;
 		using DataRoomAirModel::IsZoneUI;
@@ -2464,16 +2463,10 @@ namespace ZoneTempPredictorCorrector {
 		using DataRoomAirModel::XM2TMX;
 		using DataRoomAirModel::XM3TMX;
 		using DataRoomAirModel::XM4TMX;
-		using DataRoomAirModel::RoomAirModel_Mundt;
-		using DataRoomAirModel::RoomAirModel_UserDefined;
 
 		using General::TrimSigDigits;
-		using DataEnvironment::Month;
-		using DataEnvironment::DayOfMonth;
 		using DataLoopNode::Node;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using DataGlobals::CurrentTime;
-		using DataEnvironment::DayOfYear;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2747,8 +2740,7 @@ namespace ZoneTempPredictorCorrector {
 		int SetPointTempSchedIndexCold;
 		int SchedNameIndex;
 		int SchedTypeIndex;
-		FArray2D< Real64 > DaySPValues; // Day room temp setpoint values - for optimum start
-		Real64 OccRoomSP; // Occupied room temp set point - for optimum start
+		Array2D< Real64 > DaySPValues; // Day room temp setpoint values - for optimum start
 		int OccStartTime; // Occupancy start time - for optimum start
 
 		// FLOW:
@@ -2821,12 +2813,12 @@ namespace ZoneTempPredictorCorrector {
 
 				if ( allocated( OptStartData.OptStartFlag ) ) {
 					if ( ! allocated( DaySPValues ) ) {
-						DaySPValues.allocate( 24, NumOfTimeStepInHour );
+						DaySPValues.allocate( NumOfTimeStepInHour, 24 );
 					}
 					if ( OptStartData.ActualZoneNum( ActualZoneNum ) == ActualZoneNum ) {
 						GetScheduleValuesForDay( SetPointTempSchedIndexCold, DaySPValues );
 						OccStartTime = CEILING( OptStartData.OccStartTime( ActualZoneNum ) ) + 1;
-						TempZoneThermostatSetPoint( ActualZoneNum ) = DaySPValues( OccStartTime, 1 );
+						TempZoneThermostatSetPoint( ActualZoneNum ) = DaySPValues( 1, OccStartTime );
 					}
 
 					if ( OptStartData.OptStartFlag( ActualZoneNum ) ) {
@@ -2854,14 +2846,14 @@ namespace ZoneTempPredictorCorrector {
 
 				if ( allocated( OptStartData.OptStartFlag ) ) {
 					if ( ! allocated( DaySPValues ) ) {
-						DaySPValues.allocate( 24, NumOfTimeStepInHour );
+						DaySPValues.allocate( NumOfTimeStepInHour, 24 );
 					}
 					if ( OptStartData.ActualZoneNum( ActualZoneNum ) == ActualZoneNum ) {
 						GetScheduleValuesForDay( SetPointTempSchedIndexCold, DaySPValues );
 						OccStartTime = CEILING( OptStartData.OccStartTime( ActualZoneNum ) ) + 1;
-						OccRoomTSetPointCool( ActualZoneNum ) = DaySPValues( OccStartTime, 1 );
+						OccRoomTSetPointCool( ActualZoneNum ) = DaySPValues( 1, OccStartTime );
 						GetScheduleValuesForDay( SetPointTempSchedIndexHot, DaySPValues );
-						OccRoomTSetPointHeat( ActualZoneNum ) = DaySPValues( OccStartTime, 1 );
+						OccRoomTSetPointHeat( ActualZoneNum ) = DaySPValues( 1, OccStartTime );
 					}
 
 					if ( OptStartData.OptStartFlag( ActualZoneNum ) ) {
@@ -2877,42 +2869,41 @@ namespace ZoneTempPredictorCorrector {
 				ShowSevereError( "CalcZoneAirTempSetpoints: Illegal control type for Zone=" + Zone( ActualZoneNum ).Name + ", Found value=" + TrimSigDigits( TempControlType( ActualZoneNum ) ) + ", in Schedule=" + TempControlledZone( RelativeZoneNum ).ControlTypeSchedName );
 
 			}}
-			
+
 			//Apply offset for faulty therostats_Feb. 2015, zrp
 			if ( ( NumFaultyThermostat > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ) {
-			
+
 				//  loop through the FaultsThermostatOffset objects to find the one for the zone
 				for ( int iFault = 1; iFault <= NumFaultyThermostat; ++iFault ) {
-				
+
 					if ( SameString( TempControlledZone( RelativeZoneNum ).Name, FaultsThermostatOffset( iFault ).FaultyThermostatName ) ) {
-					
+
 						// Check fault availability schedules
 						if ( GetCurrentScheduleValue( FaultsThermostatOffset( iFault ).AvaiSchedPtr ) > 0.0 ) {
-							
+
 							// Check fault severity schedules to update the reference thermostat offset
 							double rSchVal = 1.0;
-							double offsetUpdated;							
+							double offsetUpdated;
 							if ( FaultsThermostatOffset( iFault ).SeveritySchedPtr >= 0 ) {
 								rSchVal = GetCurrentScheduleValue( FaultsThermostatOffset( iFault ).SeveritySchedPtr );
-							}						
+							}
 							offsetUpdated = rSchVal * FaultsThermostatOffset( iFault ).Offset;
-							
+
 							// Positive offset means the sensor reading is higher than the actual value
-							TempZoneThermostatSetPoint( ActualZoneNum ) -= offsetUpdated; 
+							TempZoneThermostatSetPoint( ActualZoneNum ) -= offsetUpdated;
 							ZoneThermostatSetPointLo( ActualZoneNum ) -= offsetUpdated;
 							ZoneThermostatSetPointHi( ActualZoneNum ) -= offsetUpdated;
 						}
-						
+
 						// Stop searching the FaultsThermostatOffset object for the zone
 						break;
 					}
 				}
 			}
-		
+
 		}
 
 		if ( NumComfortControlledZones > 0 ) CalcZoneAirComfortSetPoints();
-		
 
 	}
 
@@ -3314,7 +3305,7 @@ namespace ZoneTempPredictorCorrector {
 			ZoneAirRH = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress ) * 100.0;
 			ZoneRHHumidifyingSetPoint = GetCurrentScheduleValue( HumidityControlZone( HumidControlledZoneNum ).HumidifyingSchedIndex );
 			ZoneRHDehumidifyingSetPoint = GetCurrentScheduleValue( HumidityControlZone( HumidControlledZoneNum ).DehumidifyingSchedIndex );
-			
+
 			// Apply EMS values to overwrite the humidistat values
 			if ( HumidityControlZone( HumidControlledZoneNum ).EMSOverrideHumidifySetPointOn ) {
 				ZoneRHHumidifyingSetPoint = HumidityControlZone( HumidControlledZoneNum ).EMSOverrideHumidifySetPointValue;
@@ -3325,102 +3316,102 @@ namespace ZoneTempPredictorCorrector {
 
 			// Apply offsets for faulty humidistats_Feb. 2015, zrp
 			if ( ( NumFaultyHumidistat > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ) {
-			
+
 				//  loop through the FaultsHumidistatOffset objects to find the one for the zone
 				for ( int iFault = 1; iFault <= NumFaultyHumidistat; ++iFault ) {
-				
+
 					if ( SameString( HumidityControlZone( HumidControlledZoneNum ).ControlName, FaultsHumidistatOffset( iFault ).FaultyHumidistatName ) ) {
-						
+
 						if ( SameString( FaultsHumidistatOffset( iFault ).FaultyHumidistatType, "ThermostatOffsetDependent" ) ) {
-						// For Humidistat Offset Type I: ThermostatOffsetDependent				
-						
+						// For Humidistat Offset Type I: ThermostatOffsetDependent
+
 							bool IsThermostatFound = false;
 							double offsetThermostat = 0.0;
 							double offsetZoneRHHumidifyingSetPoint = 0.0;
 							double offsetZoneRHDehumidifyingSetPoint = 0.0;
 							double faultZoneWHumidifyingSetPoint;
 							double faultZoneWDehumidifyingSetPoint;
-							
+
 							// Get the offset value of the corresponding thermostat fault object
 							if ( NumFaultyThermostat > 0 ) {
-							
+
 								//  loop through the FaultsThermostatOffset objects to find the one causes the Humidistat Offset
 								for ( int iFaultThermo = 1; iFaultThermo <= NumFaultyThermostat; ++iFaultThermo ) {
-								
+
 									if ( SameString( FaultsHumidistatOffset( iFault ).FaultyThermostatName, FaultsThermostatOffset( iFaultThermo ).Name ) ) {
 										IsThermostatFound = true;
-										
+
 										// Check fault availability schedules
 										if ( GetCurrentScheduleValue( FaultsThermostatOffset( iFaultThermo ).AvaiSchedPtr ) > 0.0 ) {
-											
+
 											// Check fault severity schedules to update the reference thermostat offset
-											double rSchVal = 1.0;							
+											double rSchVal = 1.0;
 											if ( FaultsThermostatOffset( iFaultThermo ).SeveritySchedPtr >= 0 ) {
 												rSchVal = GetCurrentScheduleValue( FaultsThermostatOffset( iFaultThermo ).SeveritySchedPtr );
-											}						
+											}
 											offsetThermostat = rSchVal * FaultsThermostatOffset( iFaultThermo ).Offset;
 										}
-										
+
 										// Stop searching the FaultsThermostatOffset object for the Humidistat Offset
 										break;
 									}
 								}
 							}
-							
+
 							// The FaultsThermostatOffset specified in the FaultHumidistatOffset is not found
 							if ( ! IsThermostatFound ) {
 								ShowSevereError( "FaultModel:HumidistatOffset = \"" + FaultsHumidistatOffset( iFault ).Name + "\" invalid Reference Humidistat Offset Name = \"" + FaultsHumidistatOffset( iFault ).FaultyThermostatName + "\" not found." );
 								ShowFatalError( "Errors getting FaultModel input data.  Preceding condition(s) cause termination." );
 							}
-							
+
 							if ( offsetThermostat != 0.0 ) {
 								// Calculate the humidistat offset value from the thermostat offset value
 								faultZoneWHumidifyingSetPoint = PsyWFnTdbRhPb( ( MAT( ZoneNum ) + offsetThermostat ), ( ZoneRHHumidifyingSetPoint / 100.0 ), OutBaroPress );
 								faultZoneWDehumidifyingSetPoint = PsyWFnTdbRhPb( ( MAT( ZoneNum ) + offsetThermostat ), ( ZoneRHDehumidifyingSetPoint / 100.0 ), OutBaroPress );
 								offsetZoneRHHumidifyingSetPoint = ZoneRHHumidifyingSetPoint - PsyRhFnTdbWPb( MAT( ZoneNum ), faultZoneWHumidifyingSetPoint, OutBaroPress ) * 100.0;
 								offsetZoneRHDehumidifyingSetPoint = ZoneRHDehumidifyingSetPoint - PsyRhFnTdbWPb( MAT( ZoneNum ), faultZoneWDehumidifyingSetPoint, OutBaroPress ) * 100.0;
-								
+
 								// Apply the calculated humidistat offset value
 								// Positive offset means the sensor reading is higher than the actual value
-								ZoneRHHumidifyingSetPoint -= offsetZoneRHHumidifyingSetPoint; 
+								ZoneRHHumidifyingSetPoint -= offsetZoneRHHumidifyingSetPoint;
 								ZoneRHDehumidifyingSetPoint -= offsetZoneRHDehumidifyingSetPoint;
 
 								// constrain value to something reasonable
 								ZoneRHHumidifyingSetPoint = min( 100.0, max( 0.0, ZoneRHHumidifyingSetPoint ) );
 								ZoneRHDehumidifyingSetPoint = min( 100.0, max( 0.0, ZoneRHDehumidifyingSetPoint ) );
 							}
-								
+
 						} else {
 						// For Humidistat Offset Type II: ThermostatOffsetIndependent
-						
+
 							// Check fault availability schedules
 							if ( GetCurrentScheduleValue( FaultsHumidistatOffset( iFault ).AvaiSchedPtr ) > 0.0 ) {
-								
+
 								// Check fault severity schedules to update the reference humidistat offset
 								double rSchVal = 1.0;
-								double offsetUpdated;							
+								double offsetUpdated;
 								if ( FaultsHumidistatOffset( iFault ).SeveritySchedPtr >= 0 ) {
 									rSchVal = GetCurrentScheduleValue( FaultsHumidistatOffset( iFault ).SeveritySchedPtr );
-								}						
+								}
 								offsetUpdated = rSchVal * FaultsHumidistatOffset( iFault ).Offset;
-								
+
 								// Positive offset means the sensor reading is higher than the actual value
-								ZoneRHHumidifyingSetPoint -= offsetUpdated; 
+								ZoneRHHumidifyingSetPoint -= offsetUpdated;
 								ZoneRHDehumidifyingSetPoint -= offsetUpdated;
 
 								// constrain value to something reasonable
 								ZoneRHHumidifyingSetPoint = min( 100.0, max( 0.0, ZoneRHHumidifyingSetPoint ) );
 								ZoneRHDehumidifyingSetPoint = min( 100.0, max( 0.0, ZoneRHDehumidifyingSetPoint ) );
 							}
-						
+
 						}
-						
+
 						// Stop searching the FaultsHumidistatOffset object for the zone
 						break;
 					}
 				}
 			}
-			
+
 			// Run-time error check
 			if ( ZoneRHHumidifyingSetPoint > ZoneRHDehumidifyingSetPoint ) {
 				//      HumidityControlZone(HumidControlledZoneNum)%ErrorCount = HumidityControlZone(HumidControlledZoneNum)%ErrorCount + 1
@@ -3578,7 +3569,6 @@ namespace ZoneTempPredictorCorrector {
 		using DataLoopNode::Node;
 		using DataRoomAirModel::AirModel;
 		using DataRoomAirModel::RoomAirModel_Mixing;
-		using DataRoomAirModel::RoomAirModel_UCSDDV;
 		using DataRoomAirModel::IsZoneDV;
 		using DataRoomAirModel::ZoneDVMixedFlag;
 		using DataRoomAirModel::IsZoneUI;
@@ -3605,8 +3595,6 @@ namespace ZoneTempPredictorCorrector {
 		using DataRoomAirModel::RoomAirModel_Mundt;
 		using DataRoomAirModel::RoomAirModel_UserDefined;
 		using RoomAirModelManager::ManageAirModel;
-		using DataEnvironment::Month;
-		using DataEnvironment::DayOfMonth;
 		using General::TrimSigDigits;
 
 		// Locals
@@ -4165,7 +4153,6 @@ namespace ZoneTempPredictorCorrector {
 		using ZonePlenum::NumZoneReturnPlenums;
 		using ZonePlenum::NumZoneSupplyPlenums;
 		using DataDefineEquip::AirDistUnit;
-		using DataDefineEquip::NumAirDistUnits;
 		using DataSurfaces::Surface;
 		using DataSurfaces::HeatTransferModel_HAMT;
 		using DataSurfaces::HeatTransferModel_EMPD;
@@ -4378,8 +4365,8 @@ namespace ZoneTempPredictorCorrector {
 		Real64 & oldVal0,
 		Real64 & oldVal1,
 		Real64 & oldVal2,
-		Real64 & oldVal3,
-		Real64 & oldVal4,
+		Real64 & EP_UNUSED( oldVal3 ),
+		Real64 & EP_UNUSED( oldVal4 ),
 		Real64 & newVal0,
 		Real64 & newVal1,
 		Real64 & newVal2,
@@ -4530,7 +4517,6 @@ namespace ZoneTempPredictorCorrector {
 		using ZonePlenum::NumZoneReturnPlenums;
 		using ZonePlenum::NumZoneSupplyPlenums;
 		using DataDefineEquip::AirDistUnit;
-		using DataDefineEquip::NumAirDistUnits;
 		using InternalHeatGains::SumAllInternalConvectionGains;
 		using InternalHeatGains::SumAllReturnAirConvectionGains;
 
@@ -4838,7 +4824,6 @@ namespace ZoneTempPredictorCorrector {
 		using ZonePlenum::NumZoneReturnPlenums;
 		using ZonePlenum::NumZoneSupplyPlenums;
 		using DataDefineEquip::AirDistUnit;
-		using DataDefineEquip::NumAirDistUnits;
 		using General::RoundSigDigits;
 		using InternalHeatGains::SumAllInternalConvectionGains;
 		using InternalHeatGains::SumAllReturnAirConvectionGains;
@@ -5164,7 +5149,7 @@ namespace ZoneTempPredictorCorrector {
 			GetZoneAirStatsInputFlag = false;
 		}
 		if ( NumTempControlledZones > 0 ) {
-			if ( FindItemInList( ZoneName, TempControlledZone.ZoneName(), NumTempControlledZones ) > 0 ) {
+			if ( FindItemInList( ZoneName, TempControlledZone, &ZoneTempControls::ZoneName ) > 0 ) {
 				HasThermostat = true;
 			} else {
 				HasThermostat = false;
@@ -5199,6 +5184,7 @@ namespace ZoneTempPredictorCorrector {
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using DataZoneEquipment::ZoneEquipConfig;
+		using DataZoneEquipment::EquipConfiguration;
 
 		// Return value
 
@@ -5217,7 +5203,7 @@ namespace ZoneTempPredictorCorrector {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		return ( FindItemInList( ZoneName, ZoneEquipConfig.ZoneName(), NumOfZones ) > 0 );
+		return ( FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName ) > 0 );
 	}
 
 	void
@@ -5273,7 +5259,7 @@ namespace ZoneTempPredictorCorrector {
 
 		//first time run allocate arrays and setup output variable
 		if ( SetupOscillationOutputFlag ) {
-			ZoneTempHist.allocate( NumOfZones, 4 );
+			ZoneTempHist.allocate( 4, NumOfZones );
 			ZoneTempHist = 0.0;
 			ZoneTempOscillate.dimension( NumOfZones, 0.0 );
 			//set up zone by zone variables
@@ -5291,13 +5277,13 @@ namespace ZoneTempPredictorCorrector {
 		isAnyZoneOscillating = false;
 		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
 			isOscillate = false;
-			ZoneTempHist( iZone, 4 ) = ZoneTempHist( iZone, 3 );
-			ZoneTempHist( iZone, 3 ) = ZoneTempHist( iZone, 2 );
-			ZoneTempHist( iZone, 2 ) = ZoneTempHist( iZone, 1 );
-			ZoneTempHist( iZone, 1 ) = ZT( iZone );
-			Diff34 = ZoneTempHist( iZone, 3 ) - ZoneTempHist( iZone, 4 );
-			Diff23 = ZoneTempHist( iZone, 2 ) - ZoneTempHist( iZone, 3 );
-			Diff12 = ZoneTempHist( iZone, 1 ) - ZoneTempHist( iZone, 2 );
+			ZoneTempHist( 4, iZone ) = ZoneTempHist( 3, iZone );
+			ZoneTempHist( 3, iZone ) = ZoneTempHist( 2, iZone );
+			ZoneTempHist( 2, iZone ) = ZoneTempHist( 1, iZone );
+			ZoneTempHist( 1, iZone ) = ZT( iZone );
+			Diff34 = ZoneTempHist( 3, iZone ) - ZoneTempHist( 4, iZone );
+			Diff23 = ZoneTempHist( 2, iZone ) - ZoneTempHist( 3, iZone );
+			Diff12 = ZoneTempHist( 1, iZone ) - ZoneTempHist( 2, iZone );
 			// roll out the conditionals for increased performance
 			if ( Diff12 > OscillateMagnitude ) {
 				if ( Diff23 < NegOscillateMagnitude ) {
@@ -5757,7 +5743,7 @@ namespace ZoneTempPredictorCorrector {
 		Real64 PMVResult; // Calculated PMV value
 		Real64 PMVMin; // Minimum allowed PMV value
 		Real64 PMVMax; // Calculated PMV value
-		FArray1D< Real64 > Par( 2 ); // Passed parameter for RegularFalsi function
+		Array1D< Real64 > Par( 2 ); // Passed parameter for RegularFalsi function
 		int SolFla; // feed back flag from SolveRegulaFalsi
 		static int IterLimitExceededNum1( 0 );
 		static int IterLimitErrIndex1( 0 );
@@ -5805,7 +5791,7 @@ namespace ZoneTempPredictorCorrector {
 	Real64
 	PMVResidual(
 		Real64 const Tset,
-		FArray1< Real64 > const & Par // par(1) = PMV set point
+		Array1< Real64 > const & Par // par(1) = PMV set point
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -5925,7 +5911,7 @@ namespace ZoneTempPredictorCorrector {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

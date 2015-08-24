@@ -73,7 +73,7 @@ namespace DataRootFinder {
 	int const iMethodSecant( 3 ); // Step performed using secant method
 	int const iMethodBrent( 4 ); // Step performed using Brent's method
 	// Names for each solution method type
-	FArray1D_string const SolutionMethodTypes( {-1,4}, { "No solution method", "Bracketting method", "Bisection method", "False position method", "Secant method", "Brent method" } );
+	Array1D_string const SolutionMethodTypes( {-1,4}, { "No solution method", "Bracketting method", "Bisection method", "False position method", "Secant method", "Brent method" } );
 
 	// DERIVED TYPE DEFINITIONS
 	// Type declaration for the numerical controls.
@@ -89,7 +89,7 @@ namespace DataRootFinder {
 	// na
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

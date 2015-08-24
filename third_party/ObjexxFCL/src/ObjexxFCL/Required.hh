@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -35,6 +35,8 @@ private: // Friend
 public: // Types
 
 	typedef  T  Value;
+	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
+	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
 
 public: // Creation
 
@@ -155,7 +157,7 @@ public: // Conversion
 
 	// Value Conversion
 	inline
-	operator T const &() const
+	operator Tr() const
 	{
 		assert( ptr_ != nullptr );
 		return *ptr_;
@@ -173,7 +175,7 @@ public: // Operators
 
 	// Value
 	inline
-	T const &
+	Tr
 	operator ()() const
 	{
 		assert( ptr_ != nullptr );
@@ -210,8 +212,8 @@ public: // Properties
 public: // Comparison
 
 	// Required == Required
-	inline
 	friend
+	inline
 	bool
 	operator ==( Required const & a, Required const & b )
 	{
@@ -219,8 +221,8 @@ public: // Comparison
 	}
 
 	// Required != Required
-	inline
 	friend
+	inline
 	bool
 	operator !=( Required const & a, Required const & b )
 	{
@@ -228,37 +230,37 @@ public: // Comparison
 	}
 
 	// Required == Value
-	inline
 	friend
+	inline
 	bool
-	operator ==( Required const & a, T const & b )
+	operator ==( Required const & a, Tc b )
 	{
 		return ( ( a.ptr_ != nullptr ) && ( *a.ptr_ == b ) );
 	}
 
 	// Required != Value
-	inline
 	friend
+	inline
 	bool
-	operator !=( Required const & a, T const & b )
+	operator !=( Required const & a, Tc b )
 	{
 		return !( a == b );
 	}
 
 	// Value == Required
-	inline
 	friend
+	inline
 	bool
-	operator ==( T const & a, Required const & b )
+	operator ==( Tc a, Required const & b )
 	{
 		return ( ( b.ptr_ != nullptr ) && ( a == *b.ptr_ ) );
 	}
 
 	// Value != Required
-	inline
 	friend
+	inline
 	bool
-	operator !=( T const & a, Required const & b )
+	operator !=( Tc a, Required const & b )
 	{
 		return !( a == b );
 	}
@@ -283,6 +285,8 @@ public: // Types
 
 	typedef  T  Value;
 	typedef  typename std::enable_if< std::is_abstract< T >::value >::type  EnableType;
+	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
+	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
 
 public: // Creation
 
@@ -377,7 +381,7 @@ public: // Conversion
 
 	// Value Conversion
 	inline
-	operator T const &() const
+	operator Tr() const
 	{
 		assert( ptr_ != nullptr );
 		return *ptr_;
@@ -395,7 +399,7 @@ public: // Operators
 
 	// Value
 	inline
-	T const &
+	Tr
 	operator ()() const
 	{
 		assert( ptr_ != nullptr );
@@ -424,8 +428,8 @@ public: // Properties
 public: // Comparison
 
 	// Required == Required
-	inline
 	friend
+	inline
 	bool
 	operator ==( Required const & a, Required const & b )
 	{
@@ -433,8 +437,8 @@ public: // Comparison
 	}
 
 	// Required != Required
-	inline
 	friend
+	inline
 	bool
 	operator !=( Required const & a, Required const & b )
 	{
@@ -442,37 +446,37 @@ public: // Comparison
 	}
 
 	// Required == Value
-	inline
 	friend
+	inline
 	bool
-	operator ==( Required const & a, T const & b )
+	operator ==( Required const & a, Tc b )
 	{
 		return ( ( a.ptr_ != nullptr ) && ( *a.ptr_ == b ) );
 	}
 
 	// Required != Value
-	inline
 	friend
+	inline
 	bool
-	operator !=( Required const & a, T const & b )
+	operator !=( Required const & a, Tc b )
 	{
 		return !( a == b );
 	}
 
 	// Value == Required
-	inline
 	friend
+	inline
 	bool
-	operator ==( T const & a, Required const & b )
+	operator ==( Tc a, Required const & b )
 	{
 		return ( ( b.ptr_ != nullptr ) && ( a == *b.ptr_ ) );
 	}
 
 	// Value != Required
-	inline
 	friend
+	inline
 	bool
-	operator !=( T const & a, Required const & b )
+	operator !=( Tc a, Required const & b )
 	{
 		return !( a == b );
 	}

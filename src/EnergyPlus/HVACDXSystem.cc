@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -100,7 +100,7 @@ namespace HVACDXSystem {
 	bool EconomizerFlag( false ); // holds air loop economizer status
 
 	// Make this type allocatable
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -110,7 +110,7 @@ namespace HVACDXSystem {
 	// Update routine to check convergence and update nodes
 
 	// Object Data
-	FArray1D< DXCoolingConditions > DXCoolingSystem;
+	Array1D< DXCoolingConditions > DXCoolingSystem;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -199,7 +199,7 @@ namespace HVACDXSystem {
 
 		// Find the correct DXSystemNumber
 		if ( CompIndex == 0 ) {
-			DXSystemNum = FindItemInList( DXCoolingSystemName, DXCoolingSystem.Name(), NumDXSystem );
+			DXSystemNum = FindItemInList( DXCoolingSystemName, DXCoolingSystem );
 			if ( DXSystemNum == 0 ) {
 				ShowFatalError( "SimDXCoolingSystem: DXUnit not found=" + DXCoolingSystemName );
 			}
@@ -305,7 +305,6 @@ namespace HVACDXSystem {
 		// Using/Aliasing
 		using namespace InputProcessor;
 		using NodeInputManager::GetOnlySingleNode;
-		using DataHeatBalance::Zone;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
@@ -345,12 +344,12 @@ namespace HVACDXSystem {
 		bool DXErrorsFound; // flag returned on DX coil name check
 		std::string HXDXCoolCoilName; // Name of DX cooling coil used with Heat Exchanger Assisted Cooling Coil
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		//  certain object in the input file
 
@@ -378,7 +377,7 @@ namespace HVACDXSystem {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoolingSystem.Name(), DXCoolSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoolingSystem, DXCoolSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -858,7 +857,7 @@ namespace HVACDXSystem {
 		Real64 OutletHumRatHS; // Actual outlet humrat of the variable speed DX cooling coil at high speed
 		Real64 OutletHumRatDXCoil; // Actual outlet humidity ratio of the DX cooling coil
 		int SolFla; // Flag of solver
-		FArray1D< Real64 > Par( 5 ); // Parameter array passed to solver
+		Array1D< Real64 > Par( 5 ); // Parameter array passed to solver
 		bool SensibleLoad; // True if there is a sensible cooling load on this system
 		bool LatentLoad; // True if there is a latent   cooling load on this system
 		int DehumidMode; // Dehumidification mode (0=normal, 1=enhanced)
@@ -2079,7 +2078,7 @@ namespace HVACDXSystem {
 	Real64
 	DXCoilVarSpeedResidual(
 		Real64 const SpeedRatio, // compressor speed ratio (1.0 is max, 0.0 is min)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2135,7 +2134,7 @@ namespace HVACDXSystem {
 	Real64
 	DXCoilVarSpeedHumRatResidual(
 		Real64 const SpeedRatio, // compressor speed ratio (1.0 is max, 0.0 is min)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2191,7 +2190,7 @@ namespace HVACDXSystem {
 	Real64
 	DXCoilCyclingResidual(
 		Real64 const CycRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2247,7 +2246,7 @@ namespace HVACDXSystem {
 	Real64
 	DXCoilCyclingHumRatResidual(
 		Real64 const CycRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2303,7 +2302,7 @@ namespace HVACDXSystem {
 	Real64
 	DOE2DXCoilResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2362,7 +2361,7 @@ namespace HVACDXSystem {
 	Real64
 	DOE2DXCoilHumRatResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2421,7 +2420,7 @@ namespace HVACDXSystem {
 	Real64
 	MultiModeDXCoilResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2484,7 +2483,7 @@ namespace HVACDXSystem {
 	Real64
 	MultiModeDXCoilHumRatResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2546,7 +2545,7 @@ namespace HVACDXSystem {
 	Real64
 	HXAssistedCoolCoilTempResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2612,7 +2611,7 @@ namespace HVACDXSystem {
 	Real64
 	HXAssistedCoolCoilHRResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2678,7 +2677,7 @@ namespace HVACDXSystem {
 	Real64
 	TESCoilResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2757,7 +2756,7 @@ namespace HVACDXSystem {
 	Real64
 	TESCoilHumRatResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2931,7 +2930,7 @@ namespace HVACDXSystem {
 
 		DXCoolSysNum = 0;
 		if ( NumDXSystem > 0 ) {
-			DXCoolSysNum = FindItemInList( DXCoilSysName, DXCoolingSystem.Name(), NumDXSystem );
+			DXCoolSysNum = FindItemInList( DXCoilSysName, DXCoolingSystem );
 			if ( DXCoolSysNum > 0 && DXCoolingSystem( DXCoolSysNum ).ISHundredPercentDOASDXCoil ) {
 				//DXCoolingSystem(DXCoolSysNum)%ISHundredPercentDOASDXCoil = .TRUE.
 				SetDXCoilTypeData( DXCoolingSystem( DXCoolSysNum ).CoolingCoilName );
@@ -2946,7 +2945,7 @@ namespace HVACDXSystem {
 		int & CoolCoilType,
 		int & CoolCoilIndex,
 		std::string & CoolCoilName,
-		bool & ErrFound
+		bool & EP_UNUSED( ErrFound )
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -2986,7 +2985,7 @@ namespace HVACDXSystem {
 
 		DXCoolSysNum = 0;
 		if ( NumDXSystem > 0 ) {
-			DXCoolSysNum = FindItemInList( DXCoilSysName, DXCoolingSystem.Name(), NumDXSystem );
+			DXCoolSysNum = FindItemInList( DXCoilSysName, DXCoolingSystem );
 			if ( DXCoolSysNum > 0 && DXCoolSysNum <= NumDXSystem ) {
 				CoolCoilType = DXCoolingSystem( DXCoolSysNum ).CoolingCoilType_Num;
 				CoolCoilIndex = DXCoolingSystem( DXCoolSysNum ).CoolingCoilIndex;
@@ -3001,7 +3000,7 @@ namespace HVACDXSystem {
 	Real64
 	VSCoilCyclingResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -3062,7 +3061,7 @@ namespace HVACDXSystem {
 	Real64
 	VSCoilSpeedResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -3130,7 +3129,7 @@ namespace HVACDXSystem {
 	Real64
 	VSCoilCyclingHumResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -3199,7 +3198,7 @@ namespace HVACDXSystem {
 	Real64
 	VSCoilSpeedHumResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -3270,7 +3269,7 @@ namespace HVACDXSystem {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

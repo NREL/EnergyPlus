@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -76,13 +76,13 @@ namespace MicroturbineElectricGenerator {
 	int NumMTGenerators( 0 ); // number of MT Generators specified in input
 	bool GetMTInput( true ); // then TRUE, calls subroutine to read input file.
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE MicroturbineElectricGenerator
 
 	// Object Data
-	FArray1D< MTGeneratorSpecs > MTGenerator; // dimension to number of generators
-	FArray1D< ReportVars > MTGeneratorReport;
+	Array1D< MTGeneratorSpecs > MTGenerator; // dimension to number of generators
+	Array1D< ReportVars > MTGeneratorReport;
 
 	// MODULE SUBROUTINES:
 	// Beginning of MT Generator Module Driver Subroutine
@@ -92,7 +92,7 @@ namespace MicroturbineElectricGenerator {
 
 	void
 	SimMTGenerator(
-		int const GeneratorType, // Type of generator !unused1208
+		int const EP_UNUSED( GeneratorType ), // Type of generator !unused1208
 		std::string const & GeneratorName, // User-specified name of generator
 		int & GeneratorIndex, // Index to microturbine generator
 		bool const RunFlag, // Simulate generator when TRUE
@@ -144,7 +144,7 @@ namespace MicroturbineElectricGenerator {
 
 		// SELECT and CALL GENERATOR MODEL
 		if ( GeneratorIndex == 0 ) {
-			GenNum = FindItemInList( GeneratorName, MTGenerator.Name(), NumMTGenerators );
+			GenNum = FindItemInList( GeneratorName, MTGenerator );
 			if ( GenNum == 0 ) ShowFatalError( "SimMTGenerator: Specified Generator not a valid COMBUSTION Turbine Generator " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -169,17 +169,17 @@ namespace MicroturbineElectricGenerator {
 
 	void
 	SimMTPlantHeatRecovery(
-		std::string const & CompType, // unused1208
+		std::string const & EP_UNUSED( CompType ), // unused1208
 		std::string const & CompName,
-		int const CompTypeNum, // unused1208
+		int const EP_UNUSED( CompTypeNum ), // unused1208
 		int & CompNum,
-		bool const RunFlag, // unused1208
+		bool const EP_UNUSED( RunFlag ), // unused1208
 		bool & InitLoopEquip,
-		Real64 & MyLoad, // unused1208
+		Real64 & EP_UNUSED( MyLoad ), // unused1208
 		Real64 & MaxCap,
 		Real64 & MinCap,
 		Real64 & OptCap,
-		bool const FirstHVACIteration // TRUE if First iteration of simulation !unused1208
+		bool const EP_UNUSED( FirstHVACIteration ) // TRUE if First iteration of simulation !unused1208
 	)
 	{
 
@@ -223,7 +223,7 @@ namespace MicroturbineElectricGenerator {
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = FindItemInList( CompName, MTGenerator.Name(), NumMTGenerators );
+			CompNum = FindItemInList( CompName, MTGenerator );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimMTPlantHeatRecovery: Microturbine Generator Unit not found=" + CompName );
 				return;
@@ -308,9 +308,9 @@ namespace MicroturbineElectricGenerator {
 		static Real64 Var1Min( 0.0 ); // Minimum value for variable 1, value obtained from a curve object
 		static Real64 Var1Max( 0.0 ); // Maximum value for variable 1, value obtained from a curve object
 
-		FArray1D< Real64 > NumArray( 19 ); // Numeric data array
+		Array1D< Real64 > NumArray( 19 ); // Numeric data array
 
-		FArray1D_string AlphArray( 20 ); // Character string data array
+		Array1D_string AlphArray( 20 ); // Character string data array
 		std::string FuelType; // Type of fuel used for generator
 
 		// FLOW:
@@ -332,7 +332,7 @@ namespace MicroturbineElectricGenerator {
 			GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), MTGenerator.Name(), GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), MTGenerator, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -1122,13 +1122,11 @@ namespace MicroturbineElectricGenerator {
 		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Num; // Loop index over all generators
 		int HeatRecInletNode; // Inlet node number in heat recovery loop
 		int HeatRecOutletNode; // Outlet node number in heat recovery loop
-		static bool InitGeneratorOnce( true ); // Flag for 1 time initialization
-		static FArray1D_bool MyEnvrnFlag; // Flag for init once at start of environment
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MySizeAndNodeInitFlag;
+		static Array1D_bool MyEnvrnFlag; // Flag for init once at start of environment
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MySizeAndNodeInitFlag;
 		static bool MyOneTimeFlag( true ); // Initialization flag
 		Real64 rho; // local temporary fluid density
 		Real64 DesiredMassFlowRate;
@@ -1244,7 +1242,7 @@ namespace MicroturbineElectricGenerator {
 		int const GeneratorNum, // Generator number
 		bool const RunFlag, // TRUE when generator is being asked to operate
 		Real64 const MyLoad, // Generator demand (W)
-		bool const FirstHVACIteration // unused1208
+		bool const EP_UNUSED( FirstHVACIteration ) // unused1208
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1262,7 +1260,6 @@ namespace MicroturbineElectricGenerator {
 		// REFERENCES: na
 
 		// Using/Aliasing
-		using DataHVACGlobals::FirstTimeStepSysFlag;
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::OutBaroPress;
@@ -1929,7 +1926,7 @@ namespace MicroturbineElectricGenerator {
 
 	void
 	GetMTGeneratorResults(
-		int const GeneratorType, // type of Generator !unused1208
+		int const EP_UNUSED( GeneratorType ), // type of Generator !unused1208
 		int const GeneratorIndex,
 		Real64 & GeneratorPower, // electrical power
 		Real64 & GeneratorEnergy, // electrical energy
@@ -1978,7 +1975,7 @@ namespace MicroturbineElectricGenerator {
 
 	void
 	GetMTGeneratorExhaustNode(
-		int const CompType,
+		int const EP_UNUSED( CompType ),
 		std::string const & CompName,
 		int & ExhaustOutletNodeNum
 	)
@@ -2024,7 +2021,7 @@ namespace MicroturbineElectricGenerator {
 
 		ExhaustOutletNodeNum = 0;
 
-		CompNum = FindItemInList( CompName, MTGenerator.Name(), NumMTGenerators );
+		CompNum = FindItemInList( CompName, MTGenerator );
 
 		if ( CompNum == 0 ) {
 			ShowFatalError( "GetMTGeneratorExhaustNode: Unit not found=" + CompName );

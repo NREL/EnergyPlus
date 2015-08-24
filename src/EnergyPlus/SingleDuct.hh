@@ -2,7 +2,7 @@
 #define SingleDuct_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -44,14 +44,14 @@ namespace SingleDuct {
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
-	extern FArray1D< Real64 > MassFlow1; // previous value of the terminal unit mass flow rate
-	extern FArray1D< Real64 > MassFlow2; // previous value of the previous value of the mass flow rate
-	extern FArray1D< Real64 > MassFlow3;
-	extern FArray1D< Real64 > MassFlowDiff;
+	extern Array1D< Real64 > MassFlow1; // previous value of the terminal unit mass flow rate
+	extern Array1D< Real64 > MassFlow2; // previous value of the previous value of the mass flow rate
+	extern Array1D< Real64 > MassFlow3;
+	extern Array1D< Real64 > MassFlowDiff;
 	extern bool GetInputFlag; // Flag set to make sure you get input once
 	extern bool GetATMixerFlag; // Flag set to make sure you get input once
 	extern int NumConstVolSys;
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// INTERFACE BLOCK SPECIFICATIONS
 
@@ -518,10 +518,10 @@ namespace SingleDuct {
 	};
 
 	// Object Data
-	extern FArray1D< SysDesignParams > Sys;
-	extern FArray1D< SysFlowConditions > SysInlet;
-	extern FArray1D< SysFlowConditions > SysOutlet;
-	extern FArray1D< AirTerminalMixerData > SysATMixer;
+	extern Array1D< SysDesignParams > Sys;
+	extern Array1D< SysFlowConditions > SysInlet;
+	extern Array1D< SysFlowConditions > SysOutlet;
+	extern Array1D< AirTerminalMixerData > SysATMixer;
 
 	// Functions
 
@@ -617,25 +617,25 @@ namespace SingleDuct {
 	Real64
 	VAVVSCoolingResidual(
 		Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-		FArray1< Real64 > const & Par // Par(1) = REAL(SysNum)
+		Array1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	);
 
 	Real64
 	VAVVSHWNoFanResidual(
 		Real64 const HWMassFlow, // hot water mass flow rate [kg/s]
-		FArray1< Real64 > const & Par // Par(1) = REAL(SysNum)
+		Array1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	);
 
 	Real64
 	VAVVSHWFanOnResidual(
 		Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-		FArray1< Real64 > const & Par // Par(1) = REAL(SysNum)
+		Array1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	);
 
 	Real64
 	VAVVSHCFanOnResidual(
 		Real64 const HeatingFrac, // fraction of maximum heating output
-		FArray1< Real64 > const & Par // Par(1) = REAL(SysNum)
+		Array1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	);
 
 	// End Algorithm Section of the Module
@@ -728,7 +728,7 @@ namespace SingleDuct {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

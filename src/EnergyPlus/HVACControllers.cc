@@ -1,6 +1,6 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/numeric.hh>
@@ -157,7 +157,7 @@ namespace HVACControllers {
 	int const CoilType_Cooling( 1 );
 	int const CoilType_Heating( 2 );
 
-	FArray1D_string const ControlVariableTypes( {0,4}, { "No control variable", "Temperature", "Humidity ratio", "Temperature and humidity ratio", "Flow rate" } );
+	Array1D_string const ControlVariableTypes( {0,4}, { "No control variable", "Temperature", "Humidity ratio", "Temperature and humidity ratio", "Flow rate" } );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -172,7 +172,7 @@ namespace HVACControllers {
 	int NumAirLoopStats( 0 ); // Same size as NumPrimaryAirSys if controllers
 	// are defined, 0 otherwise.
 	// all controllers per air loop
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// Flag set to make sure you get input once
 	bool GetControllerInputFlag( true );
@@ -201,9 +201,9 @@ namespace HVACControllers {
 	// Misc routines
 
 	// Object Data
-	FArray1D< ControllerPropsType > ControllerProps;
-	FArray1D< RootFinderDataType > RootFinders;
-	FArray1D< AirLoopStatsType > AirLoopStats; // Statistics array to analyze computational profile for
+	Array1D< ControllerPropsType > ControllerProps;
+	Array1D< RootFinderDataType > RootFinders;
+	Array1D< AirLoopStatsType > AirLoopStats; // Statistics array to analyze computational profile for
 
 	static gio::Fmt fmtLD( "*" );
 	static gio::Fmt fmtA( "(A)" );
@@ -219,7 +219,7 @@ namespace HVACControllers {
 		std::string const & ControllerName,
 		int & ControllerIndex,
 		bool const FirstHVACIteration,
-		int const AirLoopNum, // unused1208
+		int const EP_UNUSED( AirLoopNum ), // unused1208
 		int const AirLoopPass,
 		int const Operation,
 		bool & IsConvergedFlag,
@@ -288,7 +288,7 @@ namespace HVACControllers {
 		}
 
 		if ( ControllerIndex == 0 ) {
-			ControlNum = FindItemInList( ControllerName, ControllerProps.ControllerName(), NumControllers );
+			ControlNum = FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
 			if ( ControlNum == 0 ) {
 				ShowFatalError( "ManageControllers: Invalid controller=" + ControllerName + ". The only valid controller type for an AirLoopHVAC is Controller:WaterCoil." );
 			}
@@ -346,7 +346,7 @@ namespace HVACControllers {
 		// side-effects on the calculation of Node(ActuatedNode)%MassFlowRateMaxAvail used to
 		// determine ControllerProps(ControlNum)%MaxAvailActuated.
 		// Plant upgrades for V7 added init to these cases because MassFlowRateMaxAvail is better controlled
-		ControllerOp: { auto const SELECT_CASE_var( Operation );
+		{ auto const SELECT_CASE_var( Operation );
 		if ( SELECT_CASE_var == iControllerOpColdStart ) {
 			// If a iControllerOpColdStart call, reset the actuator inlet flows
 			ResetController( ControlNum, FirstHVACIteration, false, IsConvergedFlag );
@@ -375,12 +375,12 @@ namespace HVACControllers {
 			// Simulate the correct Controller with the current ControlNum
 			ControllerType = ControllerProps( ControlNum ).ControllerType_Num;
 
-			ControllerCalc: { auto const SELECT_CASE_var1( ControllerType );
+			{ auto const SELECT_CASE_var1( ControllerType );
 			if ( SELECT_CASE_var1 == ControllerSimple_Type ) { // 'Controller:WaterCoil'
 				CalcSimpleController( ControlNum, FirstHVACIteration, IsConvergedFlag, IsUpToDateFlag, ControllerName );
 			} else {
 				ShowFatalError( "Invalid controller type in ManageControllers=" + ControllerProps( ControlNum ).ControllerType );
-			}} // ControllerCalc
+			}}
 
 			// Update the current Controller to the outlet nodes
 			UpdateController( ControlNum );
@@ -396,21 +396,20 @@ namespace HVACControllers {
 			// Check convergence for the correct Controller with the current ControlNum
 			ControllerType = ControllerProps( ControlNum ).ControllerType_Num;
 
-			ControllerCheck: { auto const SELECT_CASE_var1( ControllerType );
+			{ auto const SELECT_CASE_var1( ControllerType );
 			if ( SELECT_CASE_var1 == ControllerSimple_Type ) { // 'Controller:WaterCoil'
 				CheckSimpleController( ControlNum, IsConvergedFlag );
 				SaveSimpleController( ControlNum, FirstHVACIteration, IsConvergedFlag );
-
 			} else {
 				ShowFatalError( "Invalid controller type in ManageControllers=" + ControllerProps( ControlNum ).ControllerType );
-			}} // ControllerCheck
+			}}
 
 			// Report the current Controller
 			ReportController( ControlNum );
 
 		} else {
 			ShowFatalError( "ManageControllers: Invalid Operation passed=" + TrimSigDigits( Operation ) + ", Controller name=" + ControllerName );
-		}} // ControllerOp
+		}}
 
 		// Write detailed diagnostic for individual controller
 		// To enable generating an individual, detailed trace file for each controller on each air loop,
@@ -525,20 +524,18 @@ namespace HVACControllers {
 		int IOStat;
 		int AirLoopNum; // DO index for each air loop
 		bool ActuatorNodeNotFound; // true if no water coil inlet node match for actuator node
-		FArray1D< Real64 > NumArray;
-		FArray1D_string AlphArray;
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D< Real64 > NumArray;
+		Array1D_string AlphArray;
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		std::string CurrentModuleObject; // for ease in getting objects
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false );
 		int iNodeType; // for checking actuator node type
-		int WaterCoilNum; // water coil index
 		bool NodeNotFound; // flag true if the sensor node is on the coil air outlet node
-		bool NotHeatingCoil; // flag true if the water coil is a cooling coil
 		bool EMSSetPointErrorFlag; // flag true is EMS is used to set node setpoints
 
 		// All the controllers are loaded into the same derived type, both the PI and Limit
@@ -584,7 +581,7 @@ namespace HVACControllers {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), ControllerProps.ControllerName(), Num - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), ControllerProps, &ControllerPropsType::ControllerName, Num - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -743,7 +740,7 @@ namespace HVACControllers {
 	void
 	ResetController(
 		int const ControlNum,
-		bool const FirstHVACIteration,
+		bool const EP_UNUSED( FirstHVACIteration ),
 		bool const DoWarmRestartFlag,
 		bool & IsConvergedFlag
 	)
@@ -856,7 +853,7 @@ namespace HVACControllers {
 	void
 	InitController(
 		int const ControlNum,
-		bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
+		bool const EP_UNUSED( FirstHVACIteration ), // TRUE if first full HVAC iteration in an HVAC timestep
 		bool & IsConvergedFlag
 	)
 	{
@@ -914,9 +911,9 @@ namespace HVACControllers {
 		int SensedNode;
 		int ControllerIndex;
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
-		static FArray1D_bool MyPlantIndexsFlag;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MySizeFlag;
+		static Array1D_bool MyPlantIndexsFlag;
 		static bool MySetPointCheckFlag( true );
 		// Supply Air Temp Setpoint when 'TemperatureAndHumidityRatio' control is used
 		static Real64 HumidityControlTempSetPoint;
@@ -1070,7 +1067,7 @@ namespace HVACControllers {
 			}
 
 			// Setup root finder after sizing calculation
-			SelectAction: { auto const SELECT_CASE_var( ControllerProps( ControlNum ).Action );
+			{ auto const SELECT_CASE_var( ControllerProps( ControlNum ).Action );
 			if ( SELECT_CASE_var == iNormalAction ) {
 				SetupRootFinder( RootFinders( ControlNum ), iSlopeIncreasing, iMethodBrent, constant_zero, 1.0e-6, ControllerProps( ControlNum ).Offset ); // Slope type | Method type | TolX: no relative tolerance for X variables | ATolX: absolute tolerance for X variables | ATolY: absolute tolerance for Y variables
 
@@ -1078,7 +1075,7 @@ namespace HVACControllers {
 				SetupRootFinder( RootFinders( ControlNum ), iSlopeDecreasing, iMethodBrent, constant_zero, 1.0e-6, ControllerProps( ControlNum ).Offset ); // Slope type | Method type | TolX: no relative tolerance for X variables | ATolX: absolute tolerance for X variables | ATolY: absolute tolerance for Y variables
 			} else {
 				ShowFatalError( "InitController: Invalid controller action. Valid choices are \"Normal\" or \"Reverse\"" );
-			}} // SelectAction
+			}}
 
 			MySizeFlag( ControlNum ) = false;
 		}
@@ -1418,7 +1415,7 @@ namespace HVACControllers {
 
 				// We need to evaluate the sensed node temperature with the max actuated value before
 				// we can compute the actual setpoint for the dual humidity ratio / temperature strategy.
-				SelectController: { auto const SELECT_CASE_var( ControllerProps( ControlNum ).ControlVar );
+				{ auto const SELECT_CASE_var( ControllerProps( ControlNum ).ControlVar );
 				if ( ( SELECT_CASE_var == iTemperature ) || ( SELECT_CASE_var == iHumidityRatio ) || ( SELECT_CASE_var == iFlow ) ) {
 					// Always start with min point by default for the other control strategies
 					ControllerProps( ControlNum ).NextActuatedValue = RootFinders( ControlNum ).MinPoint.X;
@@ -1439,7 +1436,7 @@ namespace HVACControllers {
 					ShowContinueError( " Controller name=" + ControllerProps( ControlNum ).ControllerName );
 					ShowContinueError( " Unrecognized control variable type=" + TrimSigDigits( ControllerProps( ControlNum ).ControlVar ) );
 					ShowFatalError( "Preceding error causes program termination." );
-				}} // SelectController
+				}}
 
 			}
 
@@ -1549,7 +1546,7 @@ namespace HVACControllers {
 
 		// Process root finder if converged or error
 		// Map root finder status onto controller mode
-		SelectStatus: { auto const SELECT_CASE_var( RootFinders( ControlNum ).StatusFlag );
+		{ auto const SELECT_CASE_var( RootFinders( ControlNum ).StatusFlag );
 		if ( ( SELECT_CASE_var == iStatusNone ) || ( SELECT_CASE_var == iStatusWarningNonMonotonic ) || ( SELECT_CASE_var == iStatusWarningSingular ) ) {
 			// We need to keep iterating...
 			IsConvergedFlag = false;
@@ -1722,7 +1719,7 @@ namespace HVACControllers {
 			ShowContinueError( " Unrecognized root finder status flag=" + TrimSigDigits( RootFinders( ControlNum ).StatusFlag ) );
 			ShowFatalError( "Preceding error causes program termination." );
 
-		}} // SelectStatus
+		}}
 
 	}
 
@@ -1779,7 +1776,7 @@ namespace HVACControllers {
 		// Default initialization: assuming no convergence unless detected in the following code!
 		IsConvergedFlag = false;
 
-		SelectMode: { auto const SELECT_CASE_var( ControllerProps( ControlNum ).Mode );
+		{ auto const SELECT_CASE_var( ControllerProps( ControlNum ).Mode );
 		if ( SELECT_CASE_var == iModeOff ) {
 			// Check whether the component is running
 			// This check is perfomed by looking at the component mass flow rate at the sensed node.
@@ -1868,7 +1865,7 @@ namespace HVACControllers {
 			// which will produce ControllerProps(ControlNum)%Mode = iModeNone
 			IsConvergedFlag = false;
 
-		}} // SelectMode
+		}}
 
 	}
 
@@ -1919,7 +1916,7 @@ namespace HVACControllers {
 			return CheckMinActiveController;
 		}
 
-		SelectAction: { auto const SELECT_CASE_var( ControllerProps( ControlNum ).Action );
+		{ auto const SELECT_CASE_var( ControllerProps( ControlNum ).Action );
 		if ( SELECT_CASE_var == iNormalAction ) { // "NORMAL"
 			// Check for min constrained convergence
 			if ( ControllerProps( ControlNum ).SetPointValue <= ControllerProps( ControlNum ).SensedValue ) {
@@ -1941,7 +1938,7 @@ namespace HVACControllers {
 			ShowContinueError( "CheckMinActiveController: Valid choices are \"NORMAL\" or \"REVERSE\"" );
 			ShowFatalError( "CheckMinActiveController: Preceding error causes program termination." );
 
-		}} // SelectAction
+		}}
 
 		return CheckMinActiveController;
 	}
@@ -1993,7 +1990,7 @@ namespace HVACControllers {
 			return CheckMaxActiveController;
 		}
 
-		SelectAction: { auto const SELECT_CASE_var( ControllerProps( ControlNum ).Action );
+		{ auto const SELECT_CASE_var( ControllerProps( ControlNum ).Action );
 		if ( SELECT_CASE_var == iNormalAction ) { // "NORMAL"
 			// Check for max constrained convergence
 			if ( ControllerProps( ControlNum ).SetPointValue >= ControllerProps( ControlNum ).SensedValue ) {
@@ -2015,7 +2012,7 @@ namespace HVACControllers {
 			ShowContinueError( "CheckMaxActiveController: Valid choices are \"NORMAL\" or \"REVERSE\"" );
 			ShowFatalError( "CheckMaxActiveController: Preceding error causes program termination." );
 
-		}} // SelectAction
+		}}
 
 		return CheckMaxActiveController;
 	}
@@ -2084,8 +2081,8 @@ namespace HVACControllers {
 
 	void
 	LimitController(
-		int & ControlNum, // unused1208
-		bool & IsConvergedFlag // unused1208
+		int & EP_UNUSED( ControlNum ), // unused1208
+		bool & EP_UNUSED( IsConvergedFlag ) // unused1208
 	)
 	{
 
@@ -2188,7 +2185,7 @@ namespace HVACControllers {
 	// *****************************************************************************
 
 	void
-	ReportController( int const ControlNum ) // unused1208
+	ReportController( int const EP_UNUSED( ControlNum ) ) // unused1208
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3112,7 +3109,7 @@ Label100: ;
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(A,A),2(A,A),4(A,A))", flags ) << TrimSigDigits( CurEnvirNum ) << TrimSigDigits( LogicalToInteger( WarmupFlag ) ) << CreateHVACTimeString() << MakeHVACTimeIntervalString() << TrimSigDigits( AirLoopPass ) << TrimSigDigits( LogicalToInteger( FirstHVACIteration ) ) << TrimSigDigits( Operation ) << TrimSigDigits( ControllerProps( ControlNum ).NumCalcCalls ); }
 
 		// Write detailed diagnostic
-		SelectOperation: { auto const SELECT_CASE_var( Operation );
+		{ auto const SELECT_CASE_var( Operation );
 		if ( ( SELECT_CASE_var == iControllerOpColdStart ) || ( SELECT_CASE_var == iControllerOpWarmRestart ) ) {
 
 			// Masss flow rate
@@ -3154,7 +3151,7 @@ Label100: ;
 			// Should never happen
 			ShowFatalError( "TraceIndividualController: Invalid Operation passed=" + TrimSigDigits( Operation ) + ", Controller name=" + ControllerProps( ControlNum ).ControllerName );
 
-		}} // SelectOperation
+		}}
 
 	}
 
@@ -3343,7 +3340,7 @@ Label100: ;
 		int AirSysNum;
 		int ContrlNum;
 		int WaterCoilContrlCount;
-		FArray2D_int ContrlSensedNodeNums; // array for storing sense node info
+		Array2D_int ContrlSensedNodeNums; // array for storing sense node info
 		int SensedNodeIndex;
 		int BranchNodeIndex;
 		int BranchNum;
@@ -3361,15 +3358,15 @@ Label100: ;
 				}
 
 				if ( WaterCoilContrlCount > 1 ) {
-					ContrlSensedNodeNums.allocate( WaterCoilContrlCount, 3 );
+					ContrlSensedNodeNums.allocate( 3, WaterCoilContrlCount );
 					ContrlSensedNodeNums = 0;
 					SensedNodeIndex = 0;
 					for ( ContrlNum = 1; ContrlNum <= PrimaryAirSystem( AirSysNum ).NumControllers; ++ContrlNum ) {
 						if ( SameString( PrimaryAirSystem( AirSysNum ).ControllerType( ContrlNum ), "CONTROLLER:WATERCOIL" ) ) {
 							++SensedNodeIndex;
-							foundControl = FindItemInList( PrimaryAirSystem( AirSysNum ).ControllerName( ContrlNum ), ControllerProps.ControllerName(), NumControllers );
+							foundControl = FindItemInList( PrimaryAirSystem( AirSysNum ).ControllerName( ContrlNum ), ControllerProps, &ControllerPropsType::ControllerName );
 							if ( foundControl > 0 ) {
-								ContrlSensedNodeNums( SensedNodeIndex, 1 ) = ControllerProps( foundControl ).SensedNode;
+								ContrlSensedNodeNums( 1, SensedNodeIndex ) = ControllerProps( foundControl ).SensedNode;
 							}
 						}
 					}
@@ -3380,9 +3377,9 @@ Label100: ;
 					for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirSysNum ).NumBranches; ++BranchNum ) {
 						for ( SensedNodeIndex = 1; SensedNodeIndex <= WaterCoilContrlCount; ++SensedNodeIndex ) {
 							for ( BranchNodeIndex = 1; BranchNodeIndex <= PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).TotalNodes; ++BranchNodeIndex ) {
-								if ( ContrlSensedNodeNums( SensedNodeIndex, 1 ) == PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).NodeNum( BranchNodeIndex ) ) {
-									ContrlSensedNodeNums( SensedNodeIndex, 2 ) = BranchNodeIndex;
-									ContrlSensedNodeNums( SensedNodeIndex, 3 ) = BranchNum;
+								if ( ContrlSensedNodeNums( 1, SensedNodeIndex ) == PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).NodeNum( BranchNodeIndex ) ) {
+									ContrlSensedNodeNums( 2, SensedNodeIndex ) = BranchNodeIndex;
+									ContrlSensedNodeNums( 3, SensedNodeIndex ) = BranchNum;
 								}
 							}
 						}
@@ -3392,9 +3389,9 @@ Label100: ;
 				if ( allocated( ContrlSensedNodeNums ) ) {
 					for ( SensedNodeIndex = 1; SensedNodeIndex <= WaterCoilContrlCount; ++SensedNodeIndex ) {
 						if ( SensedNodeIndex == 1 ) continue;
-						if ( ContrlSensedNodeNums( SensedNodeIndex, 2 ) < ContrlSensedNodeNums( SensedNodeIndex - 1, 2 ) ) {
+						if ( ContrlSensedNodeNums( 2, SensedNodeIndex ) < ContrlSensedNodeNums( 2, SensedNodeIndex - 1 ) ) {
 							//now see if on the same branch
-							if ( ContrlSensedNodeNums( SensedNodeIndex, 3 ) == ContrlSensedNodeNums( SensedNodeIndex - 1, 3 ) ) {
+							if ( ContrlSensedNodeNums( 3, SensedNodeIndex ) == ContrlSensedNodeNums( 3, SensedNodeIndex - 1 ) ) {
 								// we have a flow order problem with water coil controllers
 								ShowSevereError( "CheckControllerListOrder: A water coil controller list has the wrong order" );
 								ShowContinueError( "Check the AirLoopHVAC:ControllerList for the air loop called \"" + PrimaryAirSystem( AirSysNum ).Name + "\"" );
@@ -3516,7 +3513,7 @@ Label100: ;
 		}
 
 		NodeNotFound = true;
-		ControlNum = FindItemInList( ControllerName, ControllerProps.ControllerName(), NumControllers );
+		ControlNum = FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
 		if ( ControlNum > 0 && ControlNum <= NumControllers ) {
 			WaterInletNodeNum = ControllerProps( ControlNum ).ActuatedNode;
 			NodeNotFound = false;
@@ -3528,7 +3525,7 @@ Label100: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

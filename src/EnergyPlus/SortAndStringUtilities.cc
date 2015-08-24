@@ -49,8 +49,8 @@ namespace SortAndStringUtilities {
 
 	void
 	SetupAndSort(
-		FArray1S_string Alphas, // Alphas to be sorted
-		FArray1S_int iAlphas // Indexes of sorted array
+		Array1S_string Alphas, // Alphas to be sorted
+		Array1S_int iAlphas // Indexes of sorted array
 	)
 	{
 
@@ -98,8 +98,8 @@ namespace SortAndStringUtilities {
 
 	void
 	QsortC(
-		FArray1S_string Alphas, // Alphas to be sorted
-		FArray1S_int iAlphas // Indexes of sorted array
+		Array1S_string Alphas, // Alphas to be sorted
+		Array1S_int iAlphas // Indexes of sorted array
 	)
 	{
 
@@ -150,8 +150,8 @@ namespace SortAndStringUtilities {
 
 	void
 	QsortPartition(
-		FArray1S_string Alphas, // Alphas to be sorted
-		FArray1S_int iAlphas, // Indexes of sorted array
+		Array1S_string Alphas, // Alphas to be sorted
+		Array1S_int iAlphas, // Indexes of sorted array
 		int & marker
 	)
 	{
@@ -196,12 +196,12 @@ namespace SortAndStringUtilities {
 		while ( true ) {
 			--j;
 			while ( true ) {
-				if ( Alphas( j ) <= cpivot ) break;
+				if ( lessthani(Alphas( j ), cpivot ) || equali(Alphas(j), cpivot)) break;
 				--j;
 			}
 			++i;
 			while ( true ) {
-				if ( Alphas( i ) >= cpivot ) break;
+				if ( lessthani(cpivot, Alphas( i )) || equali(cpivot, Alphas(i))) break;
 				++i;
 			}
 			if ( i < j ) { // Swap the strings at index i and j
@@ -220,7 +220,7 @@ namespace SortAndStringUtilities {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

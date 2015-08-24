@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -71,7 +71,7 @@ namespace PlantComponentTemperatureSources {
 	//MODULE ROUTINES
 
 	// Object Data
-	FArray1D< WaterSourceSpecs > WaterSource; // dimension to number of machines
+	Array1D< WaterSourceSpecs > WaterSource; // dimension to number of machines
 
 	// Functions
 
@@ -132,7 +132,7 @@ namespace PlantComponentTemperatureSources {
 
 		// Find the correct Chiller
 		if ( CompIndex == 0 ) {
-			SourceNum = FindItemInList( SourceName, WaterSource.Name(), NumSources );
+			SourceNum = FindItemInList( SourceName, WaterSource );
 			if ( SourceNum == 0 ) {
 				ShowFatalError( "SimWaterSource: Specified heat exchanger not one of Valid heat exchangers=" + SourceName );
 			}
@@ -151,7 +151,6 @@ namespace PlantComponentTemperatureSources {
 		}
 
 		if ( InitLoopEquip ) {
-
 			InitWaterSource( SourceNum, RunFlag, MyLoad, FirstHVACIteration );
 			SizeWaterSource( SourceNum );
 			if ( GetSizingFactor ) {
@@ -242,7 +241,7 @@ namespace PlantComponentTemperatureSources {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), WaterSource.Name(), SourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), WaterSource, SourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -299,9 +298,9 @@ namespace PlantComponentTemperatureSources {
 	void
 	InitWaterSource(
 		int const SourceNum, // number of the current component being simulated
-		bool const RunFlag, // TRUE when component operating
+		bool const EP_UNUSED( RunFlag ), // TRUE when component operating
 		Real64 const MyLoad,
-		bool const FirstHVACIteration // initialize variables when TRUE
+		bool const EP_UNUSED( FirstHVACIteration ) // initialize variables when TRUE
 	)
 	{
 
@@ -322,10 +321,8 @@ namespace PlantComponentTemperatureSources {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::WarmupFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
@@ -477,13 +474,11 @@ namespace PlantComponentTemperatureSources {
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		bool ErrorsFound; // If errors detected in input
 		Real64 tmpVolFlowRate; // local design volume flow rate
-
 		Real64 DesVolFlowRateUser; // Hardsized design volume flow rate for reporting
 
 		PltSizNum = 0;
 		ErrorsFound = false;
 		tmpVolFlowRate = WaterSource( SourceNum ).DesVolFlowRate;
-
 		DesVolFlowRateUser = 0.0;
 
 		PltSizNum = PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).PlantSizNum;
@@ -499,19 +494,19 @@ namespace PlantComponentTemperatureSources {
 				if ( WaterSource( SourceNum ).DesVolFlowRateWasAutoSized ) {
 					WaterSource( SourceNum ).DesVolFlowRate = tmpVolFlowRate;
 					if ( PlantFinalSizesOkayToReport ) {
-						ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name, 
+						ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name,
 							"Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate );
 					}
 					if ( PlantFirstSizesOkayToReport ) {
-						ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name, 
+						ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name,
 							"Initial Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate );
 					}
 				} else {
 					if ( WaterSource( SourceNum ).DesVolFlowRate > 0.0 && tmpVolFlowRate > 0.0 ) {
 						DesVolFlowRateUser = WaterSource( SourceNum ).DesVolFlowRate;
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name, 
-							"Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate, 
+							ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name,
+							"Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate,
 							"User-Specified Design Fluid Flow Rate [m3/s]", DesVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpVolFlowRate - DesVolFlowRateUser ) / DesVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
@@ -528,14 +523,14 @@ namespace PlantComponentTemperatureSources {
 				}
 			}
 		} else {
-			if (  WaterSource( SourceNum ).DesVolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize ) {
+			if ( WaterSource( SourceNum ).DesVolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				ShowSevereError( "Autosizing of plant component temperature source flow rate requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in PlantComponent:TemperatureSource object=" + WaterSource( SourceNum ).Name );
 				ErrorsFound = true;
-			} 
+			}
 			if ( ! WaterSource( SourceNum ).DesVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport ) {
 				if ( WaterSource( SourceNum ).DesVolFlowRate > 0.0 ) {
-					ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name, 
+					ReportSizingOutput( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name,
 						"User-Specified Design Fluid Flow Rate [m3/s]", WaterSource( SourceNum ).DesVolFlowRate );
 				}
 			}
@@ -586,10 +581,6 @@ namespace PlantComponentTemperatureSources {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int InletNode;
-		int OutletNode;
-		int LoopNum;
-		int LoopSideNum;
 		Real64 Cp;
 		Real64 rDummy;
 		int iDummy;

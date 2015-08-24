@@ -1,6 +1,6 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -130,7 +130,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 		// Find the correct Zone Air Distribution Unit Equipment
 		if ( CompIndex == 0 ) {
-			AirDistUnitNum = FindItemInList( ZoneAirLoopEquipName, AirDistUnit.Name(), NumAirDistUnits );
+			AirDistUnitNum = FindItemInList( ZoneAirLoopEquipName, AirDistUnit );
 			if ( AirDistUnitNum == 0 ) {
 				ShowFatalError( "ManageZoneAirLoopEquipment: Unit not found=" + ZoneAirLoopEquipName );
 			}
@@ -187,7 +187,6 @@ namespace ZoneAirLoopEquipmentManager {
 		using namespace DataLoopNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using DataZoneEquipment::ZoneEquipConfig;
-		using DataZoneEquipment::ZoneEquipList;
 		using DualDuct::GetDualDuctOutdoorAirRecircUse;
 		using SingleDuct::GetATMixerPriNode;
 
@@ -213,15 +212,15 @@ namespace ZoneAirLoopEquipmentManager {
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
-		static FArray1D_string AlphArray( 4 ); //Tuned Made static
-		static FArray1D< Real64 > NumArray( 2 ); //Tuned Made static
+		static Array1D_string AlphArray( 4 ); //Tuned Made static
+		static Array1D< Real64 > NumArray( 2 ); //Tuned Made static
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		static FArray1D_string cAlphaFields( 4 ); // Alpha field names //Tuned Made static
-		static FArray1D_string cNumericFields( 2 ); // Numeric field names //Tuned Made static
-		static FArray1D_bool lAlphaBlanks( 4 ); // Logical array, alpha field input BLANK = .TRUE. //Tuned Made static
-		static FArray1D_bool lNumericBlanks( 2 ); // Logical array, numeric field input BLANK = .TRUE. //Tuned Made static
+		static Array1D_string cAlphaFields( 4 ); // Alpha field names //Tuned Made static
+		static Array1D_string cNumericFields( 2 ); // Numeric field names //Tuned Made static
+		static Array1D_bool lAlphaBlanks( 4 ); // Logical array, alpha field input BLANK = .TRUE. //Tuned Made static
+		static Array1D_bool lNumericBlanks( 2 ); // Logical array, numeric field input BLANK = .TRUE. //Tuned Made static
 		bool DualDuctRecircIsUsed; // local temporary for deciding if recirc side used by dual duct terminal
 		static int ATMixerPriNode( 0 ); // primary air inlet node for air terminal mixers
 
@@ -243,7 +242,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), AirDistUnit.Name(), AirDistUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), AirDistUnit, AirDistUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -419,7 +418,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 	void
 	InitZoneAirLoopEquipment(
-		bool const FirstHVACIteration, // unused1208
+		bool const EP_UNUSED( FirstHVACIteration ), // unused1208
 		int const AirDistUnitNum
 	)
 	{
@@ -493,7 +492,6 @@ namespace ZoneAirLoopEquipmentManager {
 
 		// Using/Aliasing
 		using DataZoneEquipment::ZoneEquipConfig;
-		using DataZoneEquipment::ZoneEquipList;
 		using DataLoopNode::Node;
 		using DataAirLoop::AirLoopFlow;
 		using DualDuct::SimulateDualDuct;
@@ -735,7 +733,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

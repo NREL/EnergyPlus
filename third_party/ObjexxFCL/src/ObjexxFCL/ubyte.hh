@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -17,6 +17,7 @@
 #include <cassert>
 #include <cstddef>
 #include <istream>
+#include <ostream>
 
 namespace ObjexxFCL {
 
@@ -223,8 +224,8 @@ public: // Math
 	}
 
 	// ubyte + ubyte
-	inline
 	friend
+	inline
 	ubyte
 	operator +( ubyte const & i, ubyte const & j )
 	{
@@ -232,8 +233,8 @@ public: // Math
 	}
 
 	// ubyte - ubyte
-	inline
 	friend
+	inline
 	ubyte
 	operator -( ubyte const & i, ubyte const & j )
 	{
@@ -241,8 +242,8 @@ public: // Math
 	}
 
 	// ubyte * ubyte
-	inline
 	friend
+	inline
 	ubyte
 	operator *( ubyte const & i, ubyte const & j )
 	{
@@ -250,8 +251,8 @@ public: // Math
 	}
 
 	// ubyte / ubyte
-	inline
 	friend
+	inline
 	ubyte
 	operator /( ubyte const & i, ubyte const & j )
 	{
@@ -329,8 +330,8 @@ public: // Bitwise Logical
 	}
 
 	// ubyte & ubyte
-	inline
 	friend
+	inline
 	ubyte
 	operator &( ubyte const & i, ubyte const & j )
 	{
@@ -338,8 +339,8 @@ public: // Bitwise Logical
 	}
 
 	// ubyte | ubyte
-	inline
 	friend
+	inline
 	ubyte
 	operator |( ubyte const & i, ubyte const & j )
 	{
@@ -347,8 +348,8 @@ public: // Bitwise Logical
 	}
 
 	// ubyte ^ ubyte
-	inline
 	friend
+	inline
 	ubyte
 	operator ^( ubyte const & i, ubyte const & j )
 	{
@@ -358,8 +359,8 @@ public: // Bitwise Logical
 public: // Comparison
 
 	// ubyte == ubyte
-	inline
 	friend
+	inline
 	bool
 	operator ==( ubyte const & i, ubyte const & j )
 	{
@@ -367,8 +368,8 @@ public: // Comparison
 	}
 
 	// ubyte != ubyte
-	inline
 	friend
+	inline
 	bool
 	operator !=( ubyte const & i, ubyte const & j )
 	{
@@ -376,8 +377,8 @@ public: // Comparison
 	}
 
 	// ubyte < ubyte
-	inline
 	friend
+	inline
 	bool
 	operator <( ubyte const & i, ubyte const & j )
 	{
@@ -385,8 +386,8 @@ public: // Comparison
 	}
 
 	// ubyte <= ubyte
-	inline
 	friend
+	inline
 	bool
 	operator <=( ubyte const & i, ubyte const & j )
 	{
@@ -394,8 +395,8 @@ public: // Comparison
 	}
 
 	// ubyte > ubyte
-	inline
 	friend
+	inline
 	bool
 	operator >( ubyte const & i, ubyte const & j )
 	{
@@ -403,8 +404,8 @@ public: // Comparison
 	}
 
 	// ubyte >= ubyte
-	inline
 	friend
+	inline
 	bool
 	operator >=( ubyte const & i, ubyte const & j )
 	{
@@ -413,9 +414,9 @@ public: // Comparison
 
 public: // I/O
 
-	// Stream Input
-	inline
+	// Stream >> ubyte
 	friend
+	inline
 	std::istream &
 	operator >>( std::istream & stream, ubyte & b )
 	{
@@ -423,6 +424,18 @@ public: // I/O
 			unsigned short int i;
 			stream >> i;
 			b.b_ = static_cast< unsigned char >( i );
+		}
+		return stream;
+	}
+
+	// Stream << ubyte
+	friend
+	inline
+	std::ostream &
+	operator <<( std::ostream & stream, ubyte const & b )
+	{
+		if ( stream ) {
+			stream << static_cast< unsigned short int >( b.b_ );
 		}
 		return stream;
 	}
@@ -485,9 +498,13 @@ operator >( ubyte const & i, ubyte const & j );
 bool
 operator >=( ubyte const & i, ubyte const & j );
 
-// Stream Input
+// Stream >> ubyte
 std::istream &
 operator >>( std::istream & stream, ubyte & b );
+
+// Stream << ubyte
+std::ostream &
+operator <<( std::ostream & stream, ubyte const & b );
 
 } // ObjexxFCL
 

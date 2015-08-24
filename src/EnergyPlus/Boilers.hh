@@ -2,7 +2,7 @@
 #define Boilers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -49,7 +49,7 @@ namespace Boilers {
 	extern Real64 BoilerOutletTemp; // W - Boiler outlet temperature
 	extern Real64 BoilerPLR; // Boiler operating part-load ratio
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
 
@@ -194,8 +194,8 @@ namespace Boilers {
 	};
 
 	// Object Data
-	extern FArray1D< BoilerSpecs > Boiler; // boiler data - dimension to number of machines
-	extern FArray1D< ReportVars > BoilerReport; // report vars - dimension to number of machines
+	extern Array1D< BoilerSpecs > Boiler; // boiler data - dimension to number of machines
+	extern Array1D< ReportVars > BoilerReport; // report vars - dimension to number of machines
 
 	// Functions
 
@@ -247,7 +247,7 @@ namespace Boilers {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -2,7 +2,7 @@
 #define PlantComponentTemperatureSources_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -86,7 +86,7 @@ namespace PlantComponentTemperatureSources {
 	};
 
 	// Object Data
-	extern FArray1D< WaterSourceSpecs > WaterSource; // dimension to number of machines
+	extern Array1D< WaterSourceSpecs > WaterSource; // dimension to number of machines
 
 	// Functions
 

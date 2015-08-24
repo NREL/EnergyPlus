@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <SplitterComponent.hh>
@@ -56,7 +56,7 @@ namespace SplitterComponent {
 	bool GetSplitterInputFlag( true );
 	// Public because Used by SimAirServingZones and the Direct Air Unit
 	int NumSplitters( 0 ); // The Number of Splitters found in the Input
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -72,7 +72,7 @@ namespace SplitterComponent {
 	// Reporting routines for module
 
 	// Object Data
-	FArray1D< SplitterConditions > SplitterCond;
+	Array1D< SplitterConditions > SplitterCond;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -134,7 +134,7 @@ namespace SplitterComponent {
 
 		// Find the correct SplitterNumber
 		if ( CompIndex == 0 ) {
-			SplitterNum = FindItemInList( CompName, SplitterCond.SplitterName(), NumSplitters );
+			SplitterNum = FindItemInList( CompName, SplitterCond, &SplitterConditions::SplitterName );
 			if ( SplitterNum == 0 ) {
 				ShowFatalError( "SimAirLoopSplitter: Splitter not found=" + CompName );
 			}
@@ -224,12 +224,12 @@ namespace SplitterComponent {
 		int OutNodeNum1;
 		int OutNodeNum2;
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > NumArray; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > NumArray; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		// RESET THE GETINPUT FLAG
 		GetSplitterInputFlag = false;
@@ -254,7 +254,7 @@ namespace SplitterComponent {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SplitterCond.SplitterName(), SplitterNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), SplitterCond, &SplitterConditions::SplitterName, SplitterNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -665,7 +665,7 @@ namespace SplitterComponent {
 	// *****************************************************************************
 
 	void
-	ReportSplitter( int const SplitterNum )
+	ReportSplitter( int const EP_UNUSED( SplitterNum ) )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -758,7 +758,7 @@ namespace SplitterComponent {
 		}
 
 		if ( SplitterNum == 0 ) {
-			WhichSplitter = FindItemInList( SplitterName, SplitterCond.SplitterName(), NumSplitters );
+			WhichSplitter = FindItemInList( SplitterName, SplitterCond, &SplitterConditions::SplitterName );
 		} else {
 			WhichSplitter = SplitterNum;
 		}
@@ -777,7 +777,7 @@ namespace SplitterComponent {
 
 	}
 
-	FArray1D_int
+	Array1D_int
 	GetSplitterNodeNumbers(
 		std::string const & SplitterName, // must match Splitter names for the Splitter type
 		int const SplitterNum, // Index of Splitters
@@ -806,7 +806,7 @@ namespace SplitterComponent {
 		using InputProcessor::FindItemInList;
 
 		// Return value
-		FArray1D_int SplitterNodeNumbers;
+		Array1D_int SplitterNodeNumbers;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -831,7 +831,7 @@ namespace SplitterComponent {
 		}
 
 		if ( SplitterNum == 0 ) {
-			WhichSplitter = FindItemInList( SplitterName, SplitterCond.SplitterName(), NumSplitters );
+			WhichSplitter = FindItemInList( SplitterName, SplitterCond, &SplitterConditions::SplitterName );
 		} else {
 			WhichSplitter = SplitterNum;
 		}
@@ -859,7 +859,7 @@ namespace SplitterComponent {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

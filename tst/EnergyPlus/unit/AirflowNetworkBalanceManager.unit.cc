@@ -7,6 +7,7 @@
 #include <DataAirflowNetwork.hh>
 #include <AirflowNetworkBalanceManager.hh>
 #include <DataSurfaces.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace AirflowNetworkBalanceManager;
@@ -15,6 +16,8 @@ using namespace DataSurfaces;
 
 TEST( AirflowNetworkBalanceManagerTest, TestOtherSideCoefficients )
 {
+
+	ShowMessage( "Begin Test: AirflowNetworkBalanceManagerTest, TestOtherSideCoefficients" );
 
 	int i = 2;
 
@@ -35,15 +38,15 @@ TEST( AirflowNetworkBalanceManagerTest, TestOtherSideCoefficients )
 	MultizoneSurfaceData( 1 ).SurfNum = 1;
 	MultizoneSurfaceData( 2 ).SurfNum = 2;
 
-	CalcWindPressureCoeffs( );
+	CalcWindPressureCoeffs();
 	EXPECT_EQ( 1, MultizoneSurfaceData( 1 ).NodeNums( 2 ) );
 	EXPECT_EQ( 2, MultizoneSurfaceData( 2 ).NodeNums( 2 ) );
 	EXPECT_EQ( 1, MultizoneExternalNodeData( 1 ).CPVNum );
 	EXPECT_EQ( 3, MultizoneExternalNodeData( 2 ).CPVNum );
 
-	MultizoneSurfaceData.deallocate( );
-	MultizoneExternalNodeData.deallocate( );
-	Surface.deallocate( );
+	MultizoneSurfaceData.deallocate();
+	MultizoneExternalNodeData.deallocate();
+	Surface.deallocate();
 }
 
 

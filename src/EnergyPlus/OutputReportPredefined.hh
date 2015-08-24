@@ -2,7 +2,7 @@
 #define OutputReportPredefined_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -829,12 +829,12 @@ namespace OutputReportPredefined {
 	};
 
 	// Object Data
-	extern FArray1D< reportNameType > reportName;
-	extern FArray1D< SubTableType > subTable;
-	extern FArray1D< ColumnTagType > columnTag;
-	extern FArray1D< TableEntryType > tableEntry;
-	extern FArray1D< CompSizeTableEntryType > CompSizeTableEntry;
-	extern FArray1D< ShadowRelateType > ShadowRelate;
+	extern Array1D< reportNameType > reportName;
+	extern Array1D< SubTableType > subTable;
+	extern Array1D< ColumnTagType > columnTag;
+	extern Array1D< TableEntryType > tableEntry;
+	extern Array1D< CompSizeTableEntryType > CompSizeTableEntry;
+	extern Array1D< ShadowRelateType > ShadowRelate;
 
 	// Functions
 
@@ -908,7 +908,7 @@ namespace OutputReportPredefined {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

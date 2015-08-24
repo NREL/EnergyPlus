@@ -9,14 +9,16 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Format.hh>
+#include <ObjexxFCL/noexcept.hh>
 
 // C++ Headers
+#include <cassert>
 #include <string>
 
 namespace ObjexxFCL {
@@ -42,8 +44,8 @@ public: // Creation
 
 	// Move Constructor
 	inline
-	Fmt( Fmt && fmt ) :
-	 format_( fmt.format_ )
+	Fmt( Fmt && fmt ) NOEXCEPT :
+	 format_( fmt.format_ ? &fmt.format_->reset() : nullptr )
 	{
 		fmt.format_ = nullptr;
 	}
@@ -72,6 +74,18 @@ public: // Assignment
 			if ( format_ ) delete format_;
 			format_ = ( fmt.format_ ? fmt.format_->clone() : nullptr );
 		}
+		return *this;
+	}
+
+	// Move Assignment
+	inline
+	Fmt &
+	operator =( Fmt && fmt )
+	{
+		assert ( this != &fmt );
+		if ( format_ ) delete format_;
+		format_ = ( fmt.format_ ? &fmt.format_->reset() : nullptr );
+		fmt.format_ = nullptr;
 		return *this;
 	}
 

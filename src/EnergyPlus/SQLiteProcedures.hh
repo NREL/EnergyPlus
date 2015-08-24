@@ -2,8 +2,8 @@
 #define SQLiteProcedures_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -16,6 +16,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <map>
 
 namespace EnergyPlus {
 
@@ -49,16 +50,17 @@ protected:
 	std::shared_ptr<sqlite3> m_db;
 };
 
-class SQLite : SQLiteProcedures {
+class SQLite : SQLiteProcedures
+{
 public:
 	// Friend SQLiteFixture which is the gtest fixture class for testing SQLite
 	// This allows for testing of private methods in SQLite
 	friend class SQLiteFixture;
 
-	void addScheduleData( int const number, std::string const name, std::string const type, double const minValue, double const maxValue );
+	void addScheduleData( int const number, std::string const & name, std::string const & type, double const minValue, double const maxValue );
 	void addZoneData( int const number, DataHeatBalance::ZoneData const & zoneData );
 	void addZoneListData( int const number, DataHeatBalance::ZoneListData const & zoneListData );
-	void addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const surfaceClass );
+	void addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const & surfaceClass );
 	void addZoneGroupData( int const number, DataHeatBalance::ZoneGroupData const & zoneGroupData );
 	void addMaterialData( int const number, DataHeatBalance::MaterialProperties const & materialData );
 	void addConstructionData( int const number, DataHeatBalance::ConstructionData const & constructionData, double const & constructionUValue );
@@ -172,16 +174,16 @@ public:
 		int const dayOfMonth,
 		int const hourOfDay,
 		int const nX,
-		FArray1< Real64 > const & x,
+		Array1< Real64 > const & x,
 		int const nY,
-		FArray1< Real64 > const & y,
-		FArray2< Real64 > const & illuminance
+		Array1< Real64 > const & y,
+		Array2< Real64 > const & illuminance
 	);
 
 	void createSQLiteTabularDataRecords(
-		FArray2D_string const & body, // row,column
-		FArray1D_string const & rowLabels,
-		FArray1D_string const & columnLabels,
+		Array2D_string const & body, // row,column
+		Array1D_string const & rowLabels,
+		Array1D_string const & columnLabels,
 		std::string const & ReportName,
 		std::string const & ReportForString,
 		std::string const & TableName
@@ -260,6 +262,19 @@ private:
 
 	bool m_writeTabularDataToSQLite;
 	int m_sqlDBTimeIndex;
+
+	int m_hourlyReportIndex = 0;
+	int m_hourlyDataIndex = 0;
+	int m_tabularDataIndex = 0;
+	int m_stringIndex = 1;
+	std::map < std::pair < std::string, int > , int > m_tabularStrings;
+	int m_errorIndex = 0;
+	int m_dataIndex = 0;
+	int m_extendedDataIndex = 0;
+	int m_zoneSizingIndex = 0;
+	int m_systemSizingIndex = 0;
+	int m_componentSizingIndex = 0;
+
 	sqlite3_stmt * m_reportDataInsertStmt;
 	sqlite3_stmt * m_reportExtendedDataInsertStmt;
 	sqlite3_stmt * m_reportDictionaryInsertStmt;
@@ -325,8 +340,8 @@ private:
 	class Schedule : SQLiteData
 	{
 		public:
-			Schedule( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const scheduleNumber, std::string const scheduleName, 
-					std::string const scheduleType, double const scheduleMinValue, double const scheduleMaxValue ) :
+			Schedule( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const scheduleNumber, std::string const & scheduleName,
+					std::string const & scheduleType, double const scheduleMinValue, double const scheduleMaxValue ) :
 				SQLiteData( errorStream, db ),
 				number( scheduleNumber ),
 				name( scheduleName ),
@@ -348,7 +363,7 @@ private:
 	class Surface : SQLiteData
 	{
 		public:
-			Surface( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const surfaceNumber, DataSurfaces::SurfaceData const & surfaceData, std::string const surfaceClass ) :
+			Surface( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const surfaceNumber, DataSurfaces::SurfaceData const & surfaceData, std::string const & surfaceClass ) :
 				SQLiteData( errorStream, db ),
 				number( surfaceNumber ),
 				name( surfaceData.Name ),
@@ -479,7 +494,7 @@ private:
 		private:
 			int const number;
 			std::string const & name;
-			FArray1D_int const & zones;
+			Array1D_int const & zones;
 	};
 
 	class ZoneGroup : SQLiteData
@@ -509,7 +524,7 @@ private:
 				SQLiteData( errorStream, db ),
 				number( materialNumber ),
 				name( materialData.Name ),
-				group( materialData.Group  ),
+				group( materialData.Group ),
 				roughness( materialData.Roughness ),
 				conductivity( materialData.Conductivity ),
 				density( materialData.Density ),
@@ -562,7 +577,7 @@ private:
 				typeIsWindow( constructionData.TypeIsWindow ),
 				uValue( constructionUValue )
 			{
-				for(int layerNum = 1; layerNum <= constructionData.TotLayers; ++layerNum) {
+				for (int layerNum = 1; layerNum <= constructionData.TotLayers; ++layerNum) {
 					constructionLayers.push_back(
 						std::unique_ptr<Construction::ConstructionLayer>(new ConstructionLayer(m_errorStream, m_db, number, layerNum, constructionData.LayerPoint(layerNum)))
 					);

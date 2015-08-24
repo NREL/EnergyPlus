@@ -2,8 +2,8 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 
@@ -180,7 +180,7 @@ namespace DisplacementVentMgr {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
@@ -243,7 +243,6 @@ namespace DisplacementVentMgr {
 		// -
 
 		// Using/Aliasing
-		using DataRoomAirModel::AirModel;
 		using namespace DataHeatBalFanSys;
 		using namespace DataEnvironment;
 		using namespace DataHeatBalance;
@@ -614,9 +613,9 @@ namespace DisplacementVentMgr {
 		int FlagApertures;
 		static Real64 TempDepCoef( 0.0 ); // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
 		static Real64 TempIndCoef( 0.0 ); // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-		static FArray1D_int IntGainTypesOccupied( 28, { IntGainTypeOf_People, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment, IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple, IntGainTypeOf_PipeIndoor, IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
+		static Array1D_int IntGainTypesOccupied( 28, { IntGainTypeOf_People, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment, IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple, IntGainTypeOf_PipeIndoor, IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
 
-		static FArray1D_int IntGainTypesMixedSubzone( 2, { IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights } );
+		static Array1D_int IntGainTypesMixedSubzone( 2, { IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights } );
 		Real64 RetAirGain;
 
 		// Exact solution or Euler method
@@ -725,36 +724,36 @@ namespace DisplacementVentMgr {
 		// have to be located above 1.8m.
 
 		if ( NumOfLinksMultiZone > 0 ) {
-			for ( Loop = 1; Loop <= AirflowNetworkSurfaceUCSDCV( ZoneNum, 0 ); ++Loop ) {
+			for ( Loop = 1; Loop <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++Loop ) {
 				// direct AirflowNetwork surface
 
-				if ( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone == ZoneNum ) {
+				if ( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone == ZoneNum ) {
 
-					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax < 0.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).VolFLOW > 0 ) ) {
+					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax < 0.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).VolFLOW > 0 ) ) {
 						FlagApertures = 0;
 						break;
 					}
-					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin > 1.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).VolFLOW2 > 0 ) {
+					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin > 1.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).VolFLOW2 > 0 ) {
 						FlagApertures = 0;
 						break;
 					}
 
-					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin < 1.8 ) || ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax < 1.8 ) ) {
+					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin < 1.8 ) || ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax < 1.8 ) ) {
 						FlagApertures = 0;
 						break;
 					}
 					// indirect AirflowNetwork surface; this is an interzone surface
 				} else {
 
-					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 0.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).VolFLOW2 > 0 ) {
+					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 0.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).VolFLOW2 > 0 ) {
 						FlagApertures = 0;
 						break;
 					}
-					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 1.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).VolFLOW > 0 ) {
+					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 1.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).VolFLOW > 0 ) {
 						FlagApertures = 0;
 						break;
 					}
-					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 1.8 ) || ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 1.8 ) ) {
+					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 1.8 ) || ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 1.8 ) ) {
 						FlagApertures = 0;
 						break;
 					}
@@ -1028,7 +1027,7 @@ namespace DisplacementVentMgr {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

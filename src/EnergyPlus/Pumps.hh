@@ -2,7 +2,7 @@
 #define Pumps_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -36,7 +36,7 @@ namespace Pumps {
 	extern int const PumpBank_VarSpeed;
 	extern std::string const cPumpBank_ConSpeed;
 	extern int const PumpBank_ConSpeed;
-	extern FArray1D_string const cPumpTypes;
+	extern Array1D_string const cPumpTypes;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -152,7 +152,7 @@ namespace Pumps {
 		int PowerErrIndex2; // for recurring errors
 		Real64 MinVolFlowRateFrac; // minimum schedule value fraction modifier
 		Real64 NomVolFlowRate; // design nominal capacity of Pump
-		bool NomVolFlowRateWasAutoSized; //true if previous was autosize on input
+		bool NomVolFlowRateWasAutoSized; // true if previous was autosize on input
 		Real64 MassFlowRateMax; // design nominal capacity of Pump
 		bool EMSMassFlowOverrideOn; // if true, then EMS is calling to override flow requests.
 		Real64 EMSMassFlowValue; // EMS value to use for mass flow rate [kg/s]
@@ -164,13 +164,13 @@ namespace Pumps {
 		bool EMSPressureOverrideOn; // if true, EMS is calling to override pump pressure
 		Real64 EMSPressureOverrideValue; // EMS value to use for pressure [Pa]
 		Real64 NomPowerUse; // design nominal capacity of Pump
-		bool NomPowerUseWasAutoSized; //true if power was autosize on input
+		bool NomPowerUseWasAutoSized; // true if power was autosize on input
 		Real64 MotorEffic; // efficiency of the motor
 		Real64 PumpEffic; // efficiency of the pump
 		Real64 FracMotorLossToFluid; // ?????
 		Real64 Energy; // Energy consumed
 		Real64 Power; // Power used
-		FArray1D< Real64 > PartLoadCoef; // Pump Curve Coefficients
+		Array1D< Real64 > PartLoadCoef; // Pump Curve Coefficients
 		int PressureCurve_Index; // Pointer to a pump coefficient curve
 		Real64 PumpMassFlowRateMaxRPM; // Mass flow rate calculated from maximum rpm
 		Real64 PumpMassFlowRateMinRPM; // Mass flow rate calculated from minimum rpm
@@ -269,7 +269,7 @@ namespace Pumps {
 			int const PowerErrIndex2, // for recurring errors
 			Real64 const MinVolFlowRateFrac, // minimum schedule value fraction modifier
 			Real64 const NomVolFlowRate, // design nominal capacity of Pump
-			bool const NomVolFlowRateWasAutoSized, //true if nom vol flow rate was autosize
+			bool const NomVolFlowRateWasAutoSized, // true if nom vol flow rate was autosize
 			Real64 const MassFlowRateMax, // design nominal capacity of Pump
 			bool const EMSMassFlowOverrideOn, // if true, then EMS is calling to override flow requests.
 			Real64 const EMSMassFlowValue, // EMS value to use for mass flow rate [kg/s]
@@ -286,7 +286,7 @@ namespace Pumps {
 			Real64 const FracMotorLossToFluid, // ?????
 			Real64 const Energy, // Energy consumed
 			Real64 const Power, // Power used
-			FArray1< Real64 > const & PartLoadCoef, // Pump Curve Coefficients
+			Array1< Real64 > const & PartLoadCoef, // Pump Curve Coefficients
 			int const PressureCurve_Index, // Pointer to a pump coefficient curve
 			Real64 const PumpMassFlowRateMaxRPM, // Mass flow rate calculated from maximum rpm
 			Real64 const PumpMassFlowRateMinRPM, // Mass flow rate calculated from minimum rpm
@@ -422,8 +422,8 @@ namespace Pumps {
 	};
 
 	// Object Data
-	extern FArray1D< PumpSpecs > PumpEquip;
-	extern FArray1D< ReportVars > PumpEquipReport;
+	extern Array1D< PumpSpecs > PumpEquip;
+	extern Array1D< ReportVars > PumpEquipReport;
 
 	// Functions
 
@@ -509,7 +509,7 @@ namespace Pumps {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -2,9 +2,9 @@
 #define MatrixDataManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/FArray2S.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Array2S.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -46,9 +46,8 @@ namespace MatrixDataManager {
 		// Members
 		std::string Name; // Matrix Name
 		int MatrixType;
-		FArray1D_int Dim; // matrix dimensions
 		//REAL(r64), DIMENSION(:), ALLOCATABLE     :: Mat1D ! hold data if one dimensional
-		FArray2D< Real64 > Mat2D; // hold data if two dimensional
+		Array2D< Real64 > Mat2D; // hold data if two dimensional
 		//REAL(r64), DIMENSION(:,:,:), Allocatable :: Mat3D ! hold data if three dimensional
 
 		// Default Constructor
@@ -60,19 +59,17 @@ namespace MatrixDataManager {
 		MatrixDataStruct(
 			std::string const & Name, // Matrix Name
 			int const MatrixType,
-			FArray1_int const & Dim, // matrix dimensions
-			FArray2< Real64 > const & Mat2D // hold data if two dimensional
+			Array2< Real64 > const & Mat2D // hold data if two dimensional
 		) :
 			Name( Name ),
 			MatrixType( MatrixType ),
-			Dim( Dim ),
 			Mat2D( Mat2D )
 		{}
 
 	};
 
 	// Object Data
-	extern FArray1D< MatrixDataStruct > MatData;
+	extern Array1D< MatrixDataStruct > MatData;
 
 	// Functions
 
@@ -85,7 +82,7 @@ namespace MatrixDataManager {
 	void
 	Get2DMatrix(
 		int const Idx, // pointer index to location in MatData
-		FArray2S< Real64 > Mat2D
+		Array2S< Real64 > Mat2D
 	);
 
 	void
@@ -95,7 +92,7 @@ namespace MatrixDataManager {
 		int & NumCols
 	);
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

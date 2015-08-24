@@ -2,7 +2,7 @@
 #define EvaporativeCoolers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -32,18 +32,18 @@ namespace EvaporativeCoolers {
 	// MODULE VARIABLE DECLARATIONS:
 	extern bool GetInputEvapComponentsFlag; // Flag set to make sure you get input once
 	extern int NumEvapCool; // The Number of Evap Coolers found in the Input
-	extern FArray1D_bool MySizeFlag;
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool MySizeFlag;
+	extern Array1D_bool CheckEquipName;
 
 	extern int NumZoneEvapUnits;
-	extern FArray1D_bool CheckZoneEvapUnitName;
+	extern Array1D_bool CheckZoneEvapUnitName;
 	extern bool GetInputZoneEvapUnit;
 
 	// Indirect Evaporative Coolers Research Special Operating Modes
 	extern int const None; // the indirect evaporative cooler Research Special is scheduled off or turned off
 	extern int const DryModulated; // the evaporative cooler Research Special is modulated in Dry Mode
 	extern int const DryFull; // the evaporative cooler Research Special is run in full capacity in Dry Mode
-	extern int const DryWetModulated; // the evaporative cooler Research Special is modulated in Dry Mode or wet Mode 
+	extern int const DryWetModulated; // the evaporative cooler Research Special is modulated in Dry Mode or wet Mode
 	extern int const WetModulated; // the evaporative cooler Research Special is modulated in wet Mode
 	extern int const WetFull; // the evaporative cooler Research Special is run in full capacity in Wet Mode
 
@@ -73,7 +73,7 @@ namespace EvaporativeCoolers {
 		int InletNode;
 		int OutletNode;
 		int SecondaryInletNode; // This is usually OA node feeding into the purge/secondary side
-		int SecondaryOutletNode; // This outlet node of the secondary side and ilet to the secondary fan 
+		int SecondaryOutletNode; // This outlet node of the secondary side and ilet to the secondary fan
 		int TertiaryInletNode; // This node is used to run building exhaust into purge side.
 		Real64 InletMassFlowRate; // Inlet is primary process air node at inlet to cooler
 		Real64 InletMassFlowRateMaxAvail;
@@ -130,7 +130,7 @@ namespace EvaporativeCoolers {
 		int DewPointBoundFlag; // report when indirect research special cooler is bound by dewpoint
 		Real64 MinOATDBEvapCooler; // Minimum outdoor air operating dry-bulb temperature for evaporative cooler
 		Real64 MaxOATDBEvapCooler; // Maximum outdoor air operating dry-bulb temperature for evaporative cooler
-		bool EvapCoolerOperationControlFlag; // turns the evap cooler on/off depending on the outdoor air temperature min and max limits 
+		bool EvapCoolerOperationControlFlag; // turns the evap cooler on/off depending on the outdoor air temperature min and max limits
 		Real64 MaxOATWBEvapCooler; // Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature
 		Real64 DryCoilMaxEfficiency; // Cooler Drybulb Design Effectiveness
 		Real64 IndirectFanPower; // Secondary Fan Design Power
@@ -369,7 +369,7 @@ namespace EvaporativeCoolers {
 	struct ZoneEvapCoolerUnitFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		ZoneEvapCoolerUnitFieldData()
@@ -377,16 +377,16 @@ namespace EvaporativeCoolers {
 
 		// Member Constructor
 		ZoneEvapCoolerUnitFieldData(
-			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
 			) :
 			FieldNames(FieldNames)
 		{}
 	};
 
 	// Object Data
-	extern FArray1D< EvapConditions > EvapCond;
-	extern FArray1D< ZoneEvapCoolerUnitStruct > ZoneEvapUnit;
-	extern FArray1D< ZoneEvapCoolerUnitFieldData > ZoneEvapCoolerUnitFields;
+	extern Array1D< EvapConditions > EvapCond;
+	extern Array1D< ZoneEvapCoolerUnitStruct > ZoneEvapUnit;
+	extern Array1D< ZoneEvapCoolerUnitFieldData > ZoneEvapCoolerUnitFields;
 
 
 	// Functions
@@ -450,13 +450,13 @@ namespace EvaporativeCoolers {
 		Real64 const EDBTSec,
 		Real64 const EWBTSec,
 		Real64 const EHumRatSec,
-		Real64 const QHXTotal, 
+		Real64 const QHXTotal,
 		Real64 & QHXLatent
 	);
 
 	void
 	CalcIndirectRDDEvapCoolerOutletTemp(
-		int const EvapCoolNum, 
+		int const EvapCoolNum,
 		int const DryOrWetOperatingMode,
 		Real64 const AirMassFlowSec,
 		Real64 const EDBTSec,
@@ -467,7 +467,7 @@ namespace EvaporativeCoolers {
 	Real64
 	CalcEvapCoolRDDSecFlowResidual(
 		Real64 const AirMassFlowSec,
-		FArray1< Real64 > const & Par //Par( 6 ) is desired temperature C
+		Array1< Real64 > const & Par //Par( 6 ) is desired temperature C
 	);
 
 	Real64
@@ -545,7 +545,7 @@ namespace EvaporativeCoolers {
 	Real64
 	VSEvapUnitLoadResidual(
 		Real64 const FanSpeedRatio,
-		FArray1< Real64 > const & Par // parameters
+		Array1< Real64 > const & Par // parameters
 	);
 
 	void
@@ -556,7 +556,7 @@ namespace EvaporativeCoolers {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

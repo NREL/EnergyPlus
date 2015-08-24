@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/numeric.hh>
@@ -150,7 +150,7 @@ namespace DaylightingDevices {
 	// MODULE VARIABLE TYPE DECLARATIONS: na
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D< Real64 > COSAngle( NumOfAngles ); // List of cosines of incident angle
+	Array1D< Real64 > COSAngle( NumOfAngles ); // List of cosines of incident angle
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -211,7 +211,7 @@ namespace DaylightingDevices {
 			// Members
 			Real64 AspectRatio; // Aspect ratio, length / diameter
 			Real64 Reflectance; // Reflectance of surface
-			FArray1D< Real64 > TransBeam; // Table of beam transmittance vs. cosine angle
+			Array1D< Real64 > TransBeam; // Table of beam transmittance vs. cosine angle
 
 			// Default Constructor
 			TDDPipeStoredData() :
@@ -224,7 +224,7 @@ namespace DaylightingDevices {
 			TDDPipeStoredData(
 				Real64 const AspectRatio, // Aspect ratio, length / diameter
 				Real64 const Reflectance, // Reflectance of surface
-				FArray1< Real64 > const & TransBeam // Table of beam transmittance vs. cosine angle
+				Array1< Real64 > const & TransBeam // Table of beam transmittance vs. cosine angle
 			) :
 				AspectRatio( AspectRatio ),
 				Reflectance( Reflectance ),
@@ -234,7 +234,7 @@ namespace DaylightingDevices {
 		};
 
 		// Object Data
-		FArray1D< TDDPipeStoredData > TDDPipeStored;
+		Array1D< TDDPipeStoredData > TDDPipeStored;
 
 		// FLOW:
 		// Initialize tubular daylighting devices (TDDs)
@@ -411,7 +411,6 @@ namespace DaylightingDevices {
 		using InputProcessor::FindItemInList;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::VerifyName;
-		using DataDaylighting::ZoneDaylight;
 		using General::RoundSigDigits;
 		using General::SafeDivide;
 
@@ -446,7 +445,7 @@ namespace DaylightingDevices {
 				// Pipe name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), TDDPipe.Name(), PipeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), TDDPipe, PipeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -454,7 +453,7 @@ namespace DaylightingDevices {
 				TDDPipe( PipeNum ).Name = cAlphaArgs( 1 );
 
 				// Get TDD:DOME object
-				SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface.Name(), TotSurfaces );
+				SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome " + cAlphaArgs( 2 ) + " not found." );
@@ -499,7 +498,7 @@ namespace DaylightingDevices {
 				}
 
 				// Get TDD:DIFFUSER object
-				SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface.Name(), TotSurfaces );
+				SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Diffuser " + cAlphaArgs( 3 ) + " not found." );
@@ -558,7 +557,7 @@ namespace DaylightingDevices {
 				}
 
 				// Construction
-				TDDPipe( PipeNum ).Construction = FindItemInList( cAlphaArgs( 4 ), Construct.Name(), TotConstructs );
+				TDDPipe( PipeNum ).Construction = FindItemInList( cAlphaArgs( 4 ), Construct );
 
 				if ( TDDPipe( PipeNum ).Construction == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Pipe construction " + cAlphaArgs( 4 ) + " not found." );
@@ -619,7 +618,7 @@ namespace DaylightingDevices {
 
 					for ( TZoneNum = 1; TZoneNum <= TDDPipe( PipeNum ).NumOfTZones; ++TZoneNum ) {
 						TZoneName = cAlphaArgs( TZoneNum + 4 );
-						TDDPipe( PipeNum ).TZone( TZoneNum ) = FindItemInList( TZoneName, Zone.Name(), NumOfZones );
+						TDDPipe( PipeNum ).TZone( TZoneNum ) = FindItemInList( TZoneName, Zone );
 						if ( TDDPipe( PipeNum ).TZone( TZoneNum ) == 0 ) {
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Transition zone " + TZoneName + " not found." );
 							ErrorsFound = true;
@@ -691,7 +690,7 @@ namespace DaylightingDevices {
 				// Shelf name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Shelf.Name(), ShelfNum - 1, IsNotOK, IsBlank, "DaylightingDevice:Shelf" );
+				VerifyName( cAlphaArgs( 1 ), Shelf, ShelfNum - 1, IsNotOK, IsBlank, "DaylightingDevice:Shelf" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -699,7 +698,7 @@ namespace DaylightingDevices {
 				Shelf( ShelfNum ).Name = cAlphaArgs( 1 );
 
 				// Get window object
-				SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface.Name(), TotSurfaces );
+				SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Window " + cAlphaArgs( 2 ) + " not found." );
@@ -740,7 +739,7 @@ namespace DaylightingDevices {
 
 				// Get inside shelf heat transfer surface (optional)
 				if ( cAlphaArgs( 3 ) != "" ) {
-					SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface.Name(), TotSurfaces );
+					SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface );
 
 					if ( SurfNum == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Inside shelf " + cAlphaArgs( 3 ) + " not found." );
@@ -764,7 +763,7 @@ namespace DaylightingDevices {
 
 				// Get outside shelf attached shading surface (optional)
 				if ( cAlphaArgs( 4 ) != "" ) {
-					SurfNum = FindItemInList( cAlphaArgs( 4 ), Surface.Name(), TotSurfaces );
+					SurfNum = FindItemInList( cAlphaArgs( 4 ), Surface );
 
 					if ( SurfNum == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Outside shelf " + cAlphaArgs( 4 ) + " not found." );
@@ -789,7 +788,7 @@ namespace DaylightingDevices {
 
 						// Get outside shelf construction (required if outside shelf is specified)
 						if ( cAlphaArgs( 5 ) != "" ) {
-							ConstrNum = FindItemInList( cAlphaArgs( 5 ), Construct.Name(), TotConstructs );
+							ConstrNum = FindItemInList( cAlphaArgs( 5 ), Construct );
 
 							if ( ConstrNum == 0 ) {
 								ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Outside shelf construction " + cAlphaArgs( 5 ) + " not found." );
@@ -1148,9 +1147,9 @@ namespace DaylightingDevices {
 			HorizonRad = MultHorizonZenith( DomeSurf ) * DifShdgRatioHoriz( DomeSurf );
 		} else {
 			IsoSkyRad = MultIsoSky( DomeSurf ) * curDifShdgRatioIsoSky( DomeSurf );
-			HorizonRad = MultHorizonZenith( DomeSurf ) * DifShdgRatioHorizHRTS( DomeSurf, HourOfDay, TimeStep );
+			HorizonRad = MultHorizonZenith( DomeSurf ) * DifShdgRatioHorizHRTS( TimeStep, HourOfDay, DomeSurf );
 		}
-		CircumSolarRad = MultCircumSolar( DomeSurf ) * SunlitFrac( DomeSurf, HourOfDay, TimeStep );
+		CircumSolarRad = MultCircumSolar( DomeSurf ) * SunlitFrac( TimeStep, HourOfDay, DomeSurf );
 
 		AnisoSkyTDDMult = TDDPipe( PipeNum ).TransSolIso * IsoSkyRad + TransTDD( PipeNum, COSI, SolarBeam ) * CircumSolarRad + TDDPipe( PipeNum ).TransSolHorizon * HorizonRad;
 
@@ -1252,7 +1251,7 @@ namespace DaylightingDevices {
 	Real64
 	InterpolatePipeTransBeam(
 		Real64 const COSI, // Cosine of the incident angle
-		FArray1A< Real64 > const transBeam // Table of beam transmittance vs. cosine angle
+		Array1A< Real64 > const transBeam // Table of beam transmittance vs. cosine angle
 	)
 	{
 
@@ -1382,7 +1381,6 @@ namespace DaylightingDevices {
 		using DataHeatBalance::QRadSWwinAbs;
 		using DataHeatBalance::QRadSWwinAbsTot;
 		using DataHeatBalance::QS;
-		using DataHeatBalance::ZoneIntGain;
 		using DataSurfaces::WinTransSolar;
 
 		// Locals
@@ -1409,7 +1407,7 @@ namespace DaylightingDevices {
 			// Add diffuse interior shortwave reflected from zone surfaces and from zone sources, lights, etc.
 			QRefl += QS( Surface( DiffSurf ).Zone ) * Surface( DiffSurf ).Area * transDiff;
 
-			TotTDDPipeGain = WinTransSolar( TDDPipe( PipeNum ).Dome ) - QRadSWOutIncident( DiffSurf ) * Surface( DiffSurf ).Area + QRefl * ( 1.0 - TDDPipe( PipeNum ).TransSolIso / transDiff ) + QRadSWwinAbs( TDDPipe( PipeNum ).Dome, 1 ) * Surface( DiffSurf ).Area / 2.0 + QRadSWwinAbs( DiffSurf, 1 ) * Surface( DiffSurf ).Area / 2.0; // Solar entering pipe | Solar exiting pipe | Absorbed due to reflections on the way out | Inward absorbed solar from dome glass | Inward absorbed solar from diffuser glass
+			TotTDDPipeGain = WinTransSolar( TDDPipe( PipeNum ).Dome ) - QRadSWOutIncident( DiffSurf ) * Surface( DiffSurf ).Area + QRefl * ( 1.0 - TDDPipe( PipeNum ).TransSolIso / transDiff ) + QRadSWwinAbs( 1, TDDPipe( PipeNum ).Dome ) * Surface( DiffSurf ).Area / 2.0 + QRadSWwinAbs( 1, DiffSurf ) * Surface( DiffSurf ).Area / 2.0; // Solar entering pipe | Solar exiting pipe | Absorbed due to reflections on the way out | Inward absorbed solar from dome glass | Inward absorbed solar from diffuser glass
 
 			TDDPipe( PipeNum ).PipeAbsorbedSolar = max( 0.0, TotTDDPipeGain ); // Report variable [W]
 
@@ -1555,7 +1553,7 @@ namespace DaylightingDevices {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

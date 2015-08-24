@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -96,7 +96,7 @@ namespace PhotovoltaicThermalCollectors {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 	int NumPVT( 0 ); // count of all types of PVT in input file
 	int NumSimplePVTPerform( 0 ); // count of simple PVT performance objects in input file
 
@@ -109,7 +109,7 @@ namespace PhotovoltaicThermalCollectors {
 	//PUBLIC  GetPVTCellTemp
 
 	// Object Data
-	FArray1D< PVTCollectorStruct > PVT;
+	Array1D< PVTCollectorStruct > PVT;
 
 	// Functions
 
@@ -164,7 +164,7 @@ namespace PhotovoltaicThermalCollectors {
 
 		if ( present( PVTName ) ) {
 			if ( PVTnum == 0 ) {
-				PVTnum = FindItemInList( PVTName, PVT.Name(), NumPVT );
+				PVTnum = FindItemInList( PVTName, PVT );
 				if ( PVTnum == 0 ) {
 					ShowFatalError( "SimPVTcollectors: Unit not found=" + PVTName() );
 				}
@@ -270,7 +270,7 @@ namespace PhotovoltaicThermalCollectors {
 		bool IsBlank; // Flag for blank name
 
 		// Object Data
-		FArray1D< SimplePVTModelStruct > tmpSimplePVTperf;
+		Array1D< SimplePVTModelStruct > tmpSimplePVTperf;
 
 		// first load the performance object info into temporary structure
 		cCurrentModuleObject = "SolarCollectorPerformance:PhotovoltaicThermal:Simple";
@@ -281,7 +281,7 @@ namespace PhotovoltaicThermalCollectors {
 				GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), tmpSimplePVTperf.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Names" );
+				VerifyName( cAlphaArgs( 1 ), tmpSimplePVTperf, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Names" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) {
@@ -324,7 +324,7 @@ namespace PhotovoltaicThermalCollectors {
 			//check name
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PVT.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject );
+			VerifyName( cAlphaArgs( 1 ), PVT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) {
@@ -335,7 +335,7 @@ namespace PhotovoltaicThermalCollectors {
 			PVT( Item ).Name = cAlphaArgs( 1 );
 			PVT( Item ).TypeNum = TypeOf_PVTSolarCollectorFlatPlate; //DSU, assigned in DataPlant
 
-			PVT( Item ).SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface.Name(), TotSurfaces );
+			PVT( Item ).SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface );
 			// check surface
 			if ( PVT( Item ).SurfNum == 0 ) {
 				if ( lAlphaFieldBlanks( 2 ) ) {
@@ -375,7 +375,7 @@ namespace PhotovoltaicThermalCollectors {
 				ErrorsFound = true;
 			} else {
 				PVT( Item ).PVTModelName = cAlphaArgs( 3 );
-				ThisParamObj = FindItemInList( PVT( Item ).PVTModelName, tmpSimplePVTperf.Name(), NumSimplePVTPerform );
+				ThisParamObj = FindItemInList( PVT( Item ).PVTModelName, tmpSimplePVTperf );
 				if ( ThisParamObj > 0 ) {
 					PVT( Item ).Simple = tmpSimplePVTperf( ThisParamObj ); // entire structure assigned
 					// do one-time setups on input data
@@ -390,7 +390,7 @@ namespace PhotovoltaicThermalCollectors {
 
 			}
 			if ( allocated( PVarray ) ) { // then PV input gotten... but don't expect this to be true.
-				PVT( Item ).PVnum = FindItemInList( cAlphaArgs( 4 ), PVarray.Name(), NumPVs );
+				PVT( Item ).PVnum = FindItemInList( cAlphaArgs( 4 ), PVarray );
 				// check PV
 				if ( PVT( Item ).PVnum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) );
@@ -505,7 +505,6 @@ namespace PhotovoltaicThermalCollectors {
 
 		// Using/Aliasing
 		using DataGlobals::SysSizingCalc;
-		using DataGlobals::InitConvTemp;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using DataLoopNode::Node;
@@ -543,7 +542,7 @@ namespace PhotovoltaicThermalCollectors {
 		static bool ErrorsFound( false );
 		static bool MySetPointCheckFlag( true );
 		static bool MyOneTimeFlag( true ); // one time flag
-		static FArray1D_bool SetLoopIndexFlag; // get loop number flag
+		static Array1D_bool SetLoopIndexFlag; // get loop number flag
 		bool errFlag;
 		Real64 rho; // local fluid density kg/s
 		// FLOW:
@@ -568,7 +567,7 @@ namespace PhotovoltaicThermalCollectors {
 		// finish set up of PV, becaues PV get-input follows PVT's get input.
 		if ( ! PVT( PVTnum ).PVfound ) {
 			if ( allocated( PVarray ) ) {
-				PVT( PVTnum ).PVnum = FindItemInList( PVT( PVTnum ).PVname, PVarray.Name(), NumPVs );
+				PVT( PVTnum ).PVnum = FindItemInList( PVT( PVTnum ).PVname, PVarray );
 				if ( PVT( PVTnum ).PVnum == 0 ) {
 					ShowSevereError( "Invalid name for photovoltaic generator = " + PVT( PVTnum ).PVname );
 					ShowContinueError( "Entered in flat plate photovoltaic-thermal collector = " + PVT( PVTnum ).Name );
@@ -608,7 +607,7 @@ namespace PhotovoltaicThermalCollectors {
 			MySetPointCheckFlag = false;
 		}
 
-		if ( ! SysSizingCalc && PVT( PVTnum ).SizingInit 
+		if ( ! SysSizingCalc && PVT( PVTnum ).SizingInit
 				&& ( PVT( PVTnum ).WorkingFluidType == AirWorkingFluid ) ) {
 			SizePVT( PVTnum );
 		}
@@ -710,7 +709,6 @@ namespace PhotovoltaicThermalCollectors {
 		using DataPlant::SupplySide;
 		using DataPlant::DemandSide;
 		using DataHVACGlobals::SmallWaterVolFlow;
-		using DataHVACGlobals::SmallAirVolFlow;
 		using DataHVACGlobals::Main;
 		using DataHVACGlobals::Cooling;
 		using DataHVACGlobals::Heating;
@@ -718,8 +716,6 @@ namespace PhotovoltaicThermalCollectors {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
-		using DataAirSystems::PrimaryAirSystem;
-		using DataAirLoop::AirLoopControlInfo;
 		using DataEnvironment::StdRhoAir;
 		using DataLoopNode::Node;
 		using General::RoundSigDigits;
@@ -801,11 +797,11 @@ namespace PhotovoltaicThermalCollectors {
 			if ( PVT( PVTnum ).DesignVolFlowRateWasAutoSized ) {
 				PVT( PVTnum ).DesignVolFlowRate = DesignVolFlowRateDes;
 				if ( PlantFinalSizesOkayToReport ) {
-					ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, 
+					ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name,
 						"Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes );
 				}
 				if ( PlantFirstSizesOkayToReport ) {
-					ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, 
+					ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name,
 						"Initial Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes );
 				}
 				RegisterPlantCompDesignFlow( PVT( PVTnum ).PlantInletNodeNum, PVT( PVTnum ).DesignVolFlowRate );
@@ -813,8 +809,8 @@ namespace PhotovoltaicThermalCollectors {
 			} else { //Hardsized with sizing data
 				if ( PVT( PVTnum ).DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0 && PlantFinalSizesOkayToReport ) {
 					DesignVolFlowRateUser = PVT( PVTnum ).DesignVolFlowRate;
-					ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, 
-						"Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes, 
+					ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name,
+						"Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes,
 						"User-Specified Design Flow Rate [m3/s]", DesignVolFlowRateUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( DesignVolFlowRateDes - DesignVolFlowRateUser ) / DesignVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
@@ -835,7 +831,7 @@ namespace PhotovoltaicThermalCollectors {
 				if ( ! PVT( PVTnum ).DesignVolFlowRateWasAutoSized && ! SizingDesRunThisAirSys ) { // Simulation continue
 					HardSizeNoDesRun = true;
 					if ( PVT( PVTnum ).DesignVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, 
+						ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name,
 							"User-Specified Design Flow Rate [m3/s]", PVT( PVTnum ).DesignVolFlowRate );
 					}
 				} else {
@@ -864,10 +860,9 @@ namespace PhotovoltaicThermalCollectors {
 				if ( ! HardSizeNoDesRun ) {
 					if ( PVT( PVTnum ).DesignVolFlowRateWasAutoSized ) {
 						PVT( PVTnum ).DesignVolFlowRate = DesignVolFlowRateDes;
-						ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, 
+						ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name,
 								"Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes );
 						PVT( PVTnum ).SizingInit = false;
-
 					} else {
 						if ( PVT( PVTnum ).DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0 ) {
 							DesignVolFlowRateUser = PVT( PVTnum ).DesignVolFlowRate;
@@ -918,7 +913,6 @@ namespace PhotovoltaicThermalCollectors {
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataHeatBalance::QRadSWOutIncident;
-		using DataPlant::PlantReport;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1354,7 +1348,7 @@ namespace PhotovoltaicThermalCollectors {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

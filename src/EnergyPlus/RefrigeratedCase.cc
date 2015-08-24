@@ -4,8 +4,8 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -310,10 +310,10 @@ namespace RefrigeratedCase {
 	Real64 const FanHalfSpeedRatio( 0.1768 ); // = 1/(2**2.5) for power step for two speed fan
 	Real64 const CapFac60Percent( 0.60 ); // = 60%, load served by half power 2-speed fan
 
-	FArray1D< Real64 > const EuropeanWetCoilFactor( 5, { 1.35, 1.15, 1.05, 1.01, 1.0 } );
-	FArray1D< Real64 > const EuropeanAirInletTemp( 5, { 10.0, 0.0, -18.0, -25.0, -34.0 } );
-	FArray1D< Real64 > const EuropeanEvapTemp( 5, { 0.0, -8.0, -25.0, -31.0, -40.0 } );
-	FArray1D< Real64 > const EuropeanDT1( 5, { 10.0, 8.0, 7.0, 7.0, 6.0 } );
+	Array1D< Real64 > const EuropeanWetCoilFactor( 5, { 1.35, 1.15, 1.05, 1.01, 1.0 } );
+	Array1D< Real64 > const EuropeanAirInletTemp( 5, { 10.0, 0.0, -18.0, -25.0, -34.0 } );
+	Array1D< Real64 > const EuropeanEvapTemp( 5, { 0.0, -8.0, -25.0, -31.0, -40.0 } );
+	Array1D< Real64 > const EuropeanDT1( 5, { 10.0, 8.0, 7.0, 7.0, 6.0 } );
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -347,15 +347,15 @@ namespace RefrigeratedCase {
 
 	// Refrigerated case variables
 	Real64 CaseRAFactor( 0.0 ); // Factor determining case credit allocation (e.g. % to zone or HVAC)
-	FArray1D_bool ShowStockingWarning; // Used for one-time warning message for possible case
+	Array1D_bool ShowStockingWarning; // Used for one-time warning message for possible case
 	// input error regarding stocking
-	FArray1D_bool ShowFrostWarning; // Used for one-time warning message for possible case
+	Array1D_bool ShowFrostWarning; // Used for one-time warning message for possible case
 	// input error regarding frost
-	FArray1D_bool ShowStoreEnergyWarning; // Used for one-time warning message for possible case
+	Array1D_bool ShowStoreEnergyWarning; // Used for one-time warning message for possible case
 	// input error regarding defrost or stocking
 	//  Walk In variables
-	FArray1D_bool ShowUnmetWIEnergyWarning; // Used for one-time warning message
-	FArray1D_bool ShowWIFrostWarning; // Used for one-time warning message
+	Array1D_bool ShowUnmetWIEnergyWarning; // Used for one-time warning message
+	Array1D_bool ShowWIFrostWarning; // Used for one-time warning message
 
 	// Refrigeration compressor rack variables
 	Real64 TotalRackDeliveredCapacity( 0.0 ); // Total capacity of all refrigerated cases attached to rack (W)
@@ -365,7 +365,7 @@ namespace RefrigeratedCase {
 	Real64 RackSenCreditToHVAC( 0.0 ); // Amount of condenser heat applied to HVAC RA duct (W)
 	int InletNode( 0 ); // Water-cooled condenser inlet node number
 	int OutletNode( 0 ); // Water-cooled condenser outlet node number
-	FArray1D_bool ShowCOPWarning; // Used for one-time warning message for possible rack
+	Array1D_bool ShowCOPWarning; // Used for one-time warning message for possible rack
 	// input error regarding COP
 	// Refrigeration condenser variables (used for both racks and detailed systems)
 	Real64 TotalCondenserFanPower( 0.0 ); // Total condenser fan electric power (W)
@@ -375,32 +375,32 @@ namespace RefrigeratedCase {
 	Real64 TotalEvapWaterUseRate( 0.0 ); // Total condenser water use rate (m3/s)
 
 	// Refrigeration system variables
-	FArray1D_bool ShowUnmetEnergyWarning; // Used for one-time warning message for possible
+	Array1D_bool ShowUnmetEnergyWarning; // Used for one-time warning message for possible
 	//compressor input error regarding total system compressor capacity
-	FArray1D_bool ShowHiStageUnmetEnergyWarning; // Used for one-time warning message for possible
+	Array1D_bool ShowHiStageUnmetEnergyWarning; // Used for one-time warning message for possible
 	//high-stage compressor input error regarding high-stage compressor capacity
 
 	// Transcritical refrigeration system variables
 	bool TransCritSysFlag( false ); // Used to indicate whether or not a transcritical refrigeration system has been defined.
-	FArray1D_bool ShowUnmetEnergyWarningTrans; // Used for one-time warning message for possible
+	Array1D_bool ShowUnmetEnergyWarningTrans; // Used for one-time warning message for possible
 	//compressor input error regarding total system compressor capacity
 
 	// Refrigeration Secondary Loop variables
-	FArray1D_bool ShowUnmetSecondEnergyWarning; // Used for one-time warning message for possible
+	Array1D_bool ShowUnmetSecondEnergyWarning; // Used for one-time warning message for possible
 	//compressor input error regarding secondary loop heat exchanger capacity
 	//Refrigerated warehouse coil variables
-	FArray1D_bool CheckChillerName; // used when simrefrigcoil called for a zone
+	Array1D_bool CheckChillerName; // used when simrefrigcoil called for a zone
 	//LOGICAL, ALLOCATABLE,DIMENSION(:) :: CheckZoneNum  !used when simrefrigcoil called for a zone
-	FArray1D_bool ShowCoilFrostWarning; // Used for one-time warning message if defrost cycles insufficient to melt ice
+	Array1D_bool ShowCoilFrostWarning; // Used for one-time warning message if defrost cycles insufficient to melt ice
 
 	// Refrigeration Plant connections checks
-	FArray1D_bool CheckEquipNameRackWaterCondenser;
-	FArray1D_bool CheckEquipNameWaterCondenser;
+	Array1D_bool CheckEquipNameRackWaterCondenser;
+	Array1D_bool CheckEquipNameWaterCondenser;
 
 	//Control variables
-	FArray1D_bool RefrigPresentInZone; // Used when translating rate to energy for reporting
+	Array1D_bool RefrigPresentInZone; // Used when translating rate to energy for reporting
 	//  total refrigeration impact on a zone
-	FArray1D_bool CheckChillerSetName; // used when sim chiller set called form zone equip manager
+	Array1D_bool CheckChillerSetName; // used when sim chiller set called form zone equip manager
 
 	bool GetRefrigerationInputFlag( true ); // Flag to show case input should be read
 	bool HaveRefrigRacks( true ); // Is initialized as TRUE and remains true when
@@ -420,24 +420,24 @@ namespace RefrigeratedCase {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE RefrigeratedCase:
 
 	// Object Data
-	FArray1D< RefrigCaseData > RefrigCase;
-	FArray1D< RefrigRackData > RefrigRack;
-	FArray1D< CaseRAFractionData > CaseRAFraction;
-	FArray1D< RefrigSystemData > System;
-	FArray1D< TransRefrigSystemData > TransSystem;
-	FArray1D< RefrigCondenserData > Condenser;
-	FArray1D< RefrigCompressorData > Compressor;
-	FArray1D< RefrigGasCoolerData > GasCooler;
-	FArray1D< SubcoolerData > Subcooler;
-	FArray1D< CaseAndWalkInListDef > CaseAndWalkInList;
-	FArray1D< CompressorListDef > CompressorLists;
-	FArray1D< SecondaryLoopData > Secondary;
-	FArray1D< TransferLoadListDef > TransferLoadList;
-	FArray1D< WalkInData > WalkIn;
-	FArray1D< WarehouseCoilData > WarehouseCoil;
-	FArray1D< AirChillerSetData > AirChillerSet;
-	FArray1D< CoilCreditData > CoilSysCredit;
-	FArray1D< CaseWIZoneReportData > CaseWIZoneReport;
+	Array1D< RefrigCaseData > RefrigCase;
+	Array1D< RefrigRackData > RefrigRack;
+	Array1D< CaseRAFractionData > CaseRAFraction;
+	Array1D< RefrigSystemData > System;
+	Array1D< TransRefrigSystemData > TransSystem;
+	Array1D< RefrigCondenserData > Condenser;
+	Array1D< RefrigCompressorData > Compressor;
+	Array1D< RefrigGasCoolerData > GasCooler;
+	Array1D< SubcoolerData > Subcooler;
+	Array1D< CaseAndWalkInListDef > CaseAndWalkInList;
+	Array1D< CompressorListDef > CompressorLists;
+	Array1D< SecondaryLoopData > Secondary;
+	Array1D< TransferLoadListDef > TransferLoadList;
+	Array1D< WalkInData > WalkIn;
+	Array1D< WarehouseCoilData > WarehouseCoil;
+	Array1D< AirChillerSetData > AirChillerSet;
+	Array1D< CoilCreditData > CoilSysCredit;
+	Array1D< CaseWIZoneReportData > CaseWIZoneReport;
 
 	// Functions
 
@@ -631,13 +631,13 @@ namespace RefrigeratedCase {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string Alphas; // Alpha items for object
-		FArray1D_string cAlphaFieldNames; // Alpha field names (from input processor)
-		FArray1D_string cNumericFieldNames; // Numeric field names (from input processor)
+		Array1D_string Alphas; // Alpha items for object
+		Array1D_string cAlphaFieldNames; // Alpha field names (from input processor)
+		Array1D_string cNumericFieldNames; // Numeric field names (from input processor)
 		static std::string CurrentModuleObject; // Object type for getting and error messages
 
-		FArray1D_bool lAlphaBlanks; // Logic array, alpha input blank = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logic array, numeric input blank = .TRUE.
+		Array1D_bool lAlphaBlanks; // Logic array, alpha input blank = .TRUE.
+		Array1D_bool lNumericBlanks; // Logic array, numeric input blank = .TRUE.
 		static bool CaseLoads( false ); // Flag to help verify load type with loads served by systems cooled by cascade condensers
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		static bool IsNotOK( false ); // Flag to verify name
@@ -814,8 +814,8 @@ namespace RefrigeratedCase {
 		static Real64 TBrineAverage( 0.0 ); // Rated average of inlet and outlet temps, used for property look up, C
 		static Real64 TempRAFraction( 0.0 ); // Temporary sum of Return Air fraction per zone for reporting
 		static Real64 TestDelta( 0.0 ); // Used to compare secondary loop rated capacity to calculated capacity, fraction
-		FArray1D< Real64 > Numbers; // Numeric items for object
-		FArray2D< Real64 > DayValues; // Array of schedule values
+		Array1D< Real64 > Numbers; // Numeric items for object
+		Array2D< Real64 > DayValues; // Array of schedule values
 
 		NumSimulationCascadeCondensers = GetNumObjectsFound( "Refrigeration:Condenser:Cascade" );
 		NumSimulationCases = GetNumObjectsFound( "Refrigeration:Case" );
@@ -902,7 +902,7 @@ namespace RefrigeratedCase {
 		if ( NumCompressorLists > 0 ) CompressorLists.allocate( NumCompressorLists );
 		if ( NumSimulationTransferLoadLists > 0 ) TransferLoadList.allocate( NumSimulationTransferLoadLists );
 
-		DayValues.allocate( 24, NumOfTimeStepInHour );
+		DayValues.allocate( NumOfTimeStepInHour, 24 );
 		RefrigPresentInZone.dimension( NumOfZones, false );
 
 		GetObjectDefMaxArgs( "Refrigeration:Case", MaxNumArgs, MaxNumAlphasCase, MaxNumNumbersCase );
@@ -940,7 +940,7 @@ namespace RefrigeratedCase {
 				IsNotOK = false;
 				IsBlank = false;
 				AlphaNum = 1;
-				VerifyName( Alphas( AlphaNum ), RefrigCase.Name(), CaseNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( AlphaNum ), RefrigCase, CaseNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( AlphaNum ) + "\", invalid " + cAlphaFieldNames( AlphaNum ) + "+\"" + Alphas( AlphaNum ) );
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -971,7 +971,7 @@ namespace RefrigeratedCase {
 
 				//Get the Zone node number from the zone name entered by the user
 				RefrigCase( CaseNum ).ZoneName = Alphas( 3 );
-				RefrigCase( CaseNum ).ActualZoneNum = FindItemInList( Alphas( 3 ), Zone.Name(), NumOfZones );
+				RefrigCase( CaseNum ).ActualZoneNum = FindItemInList( Alphas( 3 ), Zone );
 
 				if ( RefrigCase( CaseNum ).ActualZoneNum == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigCase( CaseNum ).Name + "\", invalid  " + cAlphaFieldNames( 3 ) + " not valid: " + Alphas( 3 ) );
@@ -1284,7 +1284,7 @@ namespace RefrigeratedCase {
 				GetScheduleValuesForDay( RefrigCase( CaseNum ).DefrostSchedPtr, DayValues, 1 );
 				for ( HRNum = 1; HRNum <= 24; ++HRNum ) {
 					for ( TSNum = 1; TSNum <= NumOfTimeStepInHour; ++TSNum ) {
-						if ( DayValues( HRNum, TSNum ) > 0.0 ) {
+						if ( DayValues( TSNum, HRNum ) > 0.0 ) {
 							if ( ! StartCycle ) {
 								++NumDefCycles;
 								StartCycle = true;
@@ -1469,7 +1469,7 @@ namespace RefrigeratedCase {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), WalkIn.Name(), WalkInID - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), WalkIn, WalkInID - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 
 				if ( IsNotOK ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined name=\"" + Alphas( 1 ) + "\"." );
@@ -1757,7 +1757,7 @@ namespace RefrigeratedCase {
 					//Get the Zone node number from the zone name
 					//The Zone Node is needed to get the zone's ambient conditions, NumOfZones from dataglobals
 					WalkIn( WalkInID ).ZoneName( ZoneID ) = Alphas( AStart );
-					WalkIn( WalkInID ).ZoneNum( ZoneID ) = FindItemInList( Alphas( AStart ), Zone.Name(), NumOfZones );
+					WalkIn( WalkInID ).ZoneNum( ZoneID ) = FindItemInList( Alphas( AStart ), Zone );
 
 					if ( WalkIn( WalkInID ).ZoneNum( ZoneID ) == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + WalkIn( WalkInID ).Name + "\", invalid  " + cAlphaFieldNames( AStart ) + " not valid: " + Alphas( AStart ) );
@@ -1888,7 +1888,7 @@ namespace RefrigeratedCase {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( AlphaNum ), WarehouseCoil.Name(), CoilID - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( AlphaNum ), WarehouseCoil, CoilID - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 
 				if ( IsNotOK ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined name=\"" + Alphas( AlphaNum ) + "\"." );
@@ -2411,7 +2411,7 @@ namespace RefrigeratedCase {
 				IsNotOK = false;
 				IsBlank = false;
 				AlphaNum = 1;
-				VerifyName( Alphas( AlphaNum ), AirChillerSet.Name(), SetID - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( AlphaNum ), AirChillerSet, SetID - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 
 				if ( IsNotOK ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined name=\"" + Alphas( AlphaNum ) + "\"." );
@@ -2443,7 +2443,7 @@ namespace RefrigeratedCase {
 
 				++AlphaNum;
 				AirChillerSet( SetID ).ZoneName = Alphas( AlphaNum );
-				AirChillerSet( SetID ).ZoneNum = FindItemInList( Alphas( AlphaNum ), Zone.Name(), NumOfZones );
+				AirChillerSet( SetID ).ZoneNum = FindItemInList( Alphas( AlphaNum ), Zone );
 
 				if ( AirChillerSet( SetID ).ZoneNum == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AirChillerSet( SetID ).Name + "\", invalid  " + cAlphaFieldNames( AlphaNum ) + " not valid: " + Alphas( AlphaNum ) );
@@ -2484,7 +2484,7 @@ namespace RefrigeratedCase {
 				for ( ChillerIndex = 1; ChillerIndex <= NumChillersInSet; ++ChillerIndex ) {
 					AlphaListNum = AlphaStartList + ChillerIndex;
 					if ( ! lAlphaBlanks( AlphaListNum ) ) {
-						CoilNum = FindItemInList( Alphas( AlphaListNum ), WarehouseCoil.Name(), NumSimulationRefrigAirChillers );
+						CoilNum = FindItemInList( Alphas( AlphaListNum ), WarehouseCoil );
 						if ( CoilNum == 0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AirChillerSet( SetID ).Name + "\", has an invalid " + cAlphaFieldNames( AlphaListNum ) + " defined as " + Alphas( AlphaListNum ) );
 							ErrorsFound = true;
@@ -2506,7 +2506,7 @@ namespace RefrigeratedCase {
 				GetObjectItem( CurrentModuleObject, ListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), CaseAndWalkInList.Name(), ListNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), CaseAndWalkInList, ListNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 					ErrorsFound = true;
@@ -2532,9 +2532,9 @@ namespace RefrigeratedCase {
 						LoadWalkInNum = 0;
 						LoadCaseNum = 0;
 						LoadCoilNum = 0;
-						if ( NumSimulationWalkIns > 0 ) LoadWalkInNum = FindItemInList( Alphas( AlphaListNum ), WalkIn.Name(), NumSimulationWalkIns );
-						if ( NumSimulationCases > 0 ) LoadCaseNum = FindItemInList( Alphas( AlphaListNum ), RefrigCase.Name(), NumSimulationCases );
-						if ( NumSimulationRefrigAirChillers > 0 ) LoadCoilNum = FindItemInList( Alphas( AlphaListNum ), WarehouseCoil.Name(), NumSimulationRefrigAirChillers );
+						if ( NumSimulationWalkIns > 0 ) LoadWalkInNum = FindItemInList( Alphas( AlphaListNum ), WalkIn );
+						if ( NumSimulationCases > 0 ) LoadCaseNum = FindItemInList( Alphas( AlphaListNum ), RefrigCase );
+						if ( NumSimulationRefrigAirChillers > 0 ) LoadCoilNum = FindItemInList( Alphas( AlphaListNum ), WarehouseCoil );
 						if ( ( LoadWalkInNum == 0 ) && ( LoadCaseNum == 0 ) && ( LoadCoilNum == 0 ) ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaFieldNames( AlphaListNum ) + "\", has an invalid value of " + Alphas( AlphaListNum ) );
 							ErrorsFound = true;
@@ -2576,7 +2576,7 @@ namespace RefrigeratedCase {
 				GetObjectItem( CurrentModuleObject, RackNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), RefrigRack.Name(), RackNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), RefrigRack, RackNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2801,10 +2801,10 @@ namespace RefrigeratedCase {
 					CaseNum = 0;
 					WalkInNum = 0;
 					CoilNum = 0;
-					if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList.Name(), NumSimulationCaseAndWalkInLists );
-					if ( NumSimulationCases > 0 ) CaseNum = FindItemInList( Alphas( AlphaNum ), RefrigCase.Name(), NumSimulationCases );
-					if ( NumSimulationWalkIns > 0 ) WalkInNum = FindItemInList( Alphas( AlphaNum ), WalkIn.Name(), NumSimulationWalkIns );
-					if ( NumSimulationRefrigAirChillers > 0 ) CoilNum = FindItemInList( Alphas( AlphaNum ), WarehouseCoil.Name(), NumSimulationRefrigAirChillers );
+					if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList );
+					if ( NumSimulationCases > 0 ) CaseNum = FindItemInList( Alphas( AlphaNum ), RefrigCase );
+					if ( NumSimulationWalkIns > 0 ) WalkInNum = FindItemInList( Alphas( AlphaNum ), WalkIn );
+					if ( NumSimulationRefrigAirChillers > 0 ) CoilNum = FindItemInList( Alphas( AlphaNum ), WarehouseCoil );
 					NumNameMatches = 0;
 					if ( CaseAndWalkInListNum != 0 ) ++NumNameMatches;
 					if ( CaseNum != 0 ) ++NumNameMatches;
@@ -2898,7 +2898,7 @@ namespace RefrigeratedCase {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigRack( RackNum ).Name + cAlphaFieldNames( 15 ) + " must be input if walkins or AirChillers connected to rack and heat rejection location = zone." );
 							ErrorsFound = true;
 						} else { // alpha (15) not blank
-							RefrigRack( RackNum ).HeatRejectionZoneNum = FindItemInList( Alphas( 15 ), Zone.Name(), NumOfZones );
+							RefrigRack( RackNum ).HeatRejectionZoneNum = FindItemInList( Alphas( 15 ), Zone );
 							RefrigRack( RackNum ).HeatRejectionZoneNodeNum = GetSystemNodeNumberForZone( Alphas( 15 ) );
 							if ( RefrigRack( RackNum ).HeatRejectionZoneNum == 0 ) {
 								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigRack( RackNum ).Name + "\", invalid  " + cAlphaFieldNames( 15 ) + " not valid: " + Alphas( 15 ) );
@@ -2949,7 +2949,7 @@ namespace RefrigeratedCase {
 					GetObjectItem( CurrentModuleObject, CondNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( Alphas( 1 ), Condenser.Name(), CondNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+					VerifyName( Alphas( 1 ), Condenser, CondNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + " = " + Alphas( 1 ) );
 						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -3020,7 +3020,7 @@ namespace RefrigeratedCase {
 						Condenser( CondNum ).InletAirNodeNum = 0;
 					} else { //see if it's an outside air node name or an indoor zone name,
 						//have to check inside first because outside check automatically generates an error message
-						Condenser( CondNum ).InletAirZoneNum = FindItemInList( Alphas( 4 ), Zone.Name(), NumOfZones );
+						Condenser( CondNum ).InletAirZoneNum = FindItemInList( Alphas( 4 ), Zone );
 						//need to clearly id node number for air inlet conditions and zone number for casecredit assignment
 						if ( Condenser( CondNum ).InletAirZoneNum != 0 ) {
 							//set condenser flag (later used to set system flag) and zone flag
@@ -3059,7 +3059,7 @@ namespace RefrigeratedCase {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( Alphas( 1 ), Condenser.Name(), CondNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+					VerifyName( Alphas( 1 ), Condenser, CondNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
 						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -3259,7 +3259,7 @@ namespace RefrigeratedCase {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( Alphas( 1 ), Condenser.Name(), CondNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+					VerifyName( Alphas( 1 ), Condenser, CondNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
 						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -3391,7 +3391,7 @@ namespace RefrigeratedCase {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( Alphas( 1 ), Condenser.Name(), CondNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+					VerifyName( Alphas( 1 ), Condenser, CondNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
 						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -3470,7 +3470,7 @@ namespace RefrigeratedCase {
 					GetObjectItem( CurrentModuleObject, GCNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( Alphas( 1 ), GasCooler.Name(), GCNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+					VerifyName( Alphas( 1 ), GasCooler, GCNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + " = " + Alphas( 1 ) );
 						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -3575,7 +3575,7 @@ namespace RefrigeratedCase {
 						GasCooler( GCNum ).InletAirNodeNum = 0;
 					} else { //see if it's an outside air node name or an indoor zone name,
 						//have to check inside first because outside check automatically generates an error message
-						GasCooler( GCNum ).InletAirZoneNum = FindItemInList( Alphas( 4 ), Zone.Name(), NumOfZones );
+						GasCooler( GCNum ).InletAirZoneNum = FindItemInList( Alphas( 4 ), Zone );
 						//need to clearly id node number for air inlet conditions and zone number for casecredit assignment
 						if ( GasCooler( GCNum ).InletAirZoneNum != 0 ) {
 							//set condenser flag (later used to set system flag) and zone flag
@@ -3615,7 +3615,7 @@ namespace RefrigeratedCase {
 					GetObjectItem( CurrentModuleObject, SecondaryNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( Alphas( 1 ), Secondary.Name(), SecondaryNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+					VerifyName( Alphas( 1 ), Secondary, SecondaryNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
 						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -3645,10 +3645,10 @@ namespace RefrigeratedCase {
 						CaseNum = 0;
 						WalkInNum = 0;
 						CoilNum = 0;
-						if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList.Name(), NumSimulationCaseAndWalkInLists );
-						if ( NumSimulationCases > 0 ) CaseNum = FindItemInList( Alphas( AlphaNum ), RefrigCase.Name(), NumSimulationCases );
-						if ( NumSimulationWalkIns > 0 ) WalkInNum = FindItemInList( Alphas( AlphaNum ), WalkIn.Name(), NumSimulationWalkIns );
-						if ( NumSimulationRefrigAirChillers > 0 ) CoilNum = FindItemInList( Alphas( AlphaNum ), WarehouseCoil.Name(), NumSimulationRefrigAirChillers );
+						if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList );
+						if ( NumSimulationCases > 0 ) CaseNum = FindItemInList( Alphas( AlphaNum ), RefrigCase );
+						if ( NumSimulationWalkIns > 0 ) WalkInNum = FindItemInList( Alphas( AlphaNum ), WalkIn );
+						if ( NumSimulationRefrigAirChillers > 0 ) CoilNum = FindItemInList( Alphas( AlphaNum ), WarehouseCoil );
 						NumNameMatches = 0;
 						if ( CaseAndWalkInListNum != 0 ) ++NumNameMatches;
 						if ( CaseNum != 0 ) ++NumNameMatches;
@@ -3964,7 +3964,7 @@ namespace RefrigeratedCase {
 					NumNum = 12;
 					if ( ! lNumericBlanks( NumNum ) && ! lAlphaBlanks( AlphaNum ) ) {
 						Secondary( SecondaryNum ).SumUADistPiping = Numbers( NumNum );
-						Secondary( SecondaryNum ).DistPipeZoneNum = FindItemInList( Alphas( AlphaNum ), Zone.Name(), NumOfZones );
+						Secondary( SecondaryNum ).DistPipeZoneNum = FindItemInList( Alphas( AlphaNum ), Zone );
 						Secondary( SecondaryNum ).DistPipeZoneNodeNum = GetSystemNodeNumberForZone( Alphas( AlphaNum ) );
 
 						if ( Secondary( SecondaryNum ).DistPipeZoneNum == 0 ) {
@@ -3994,7 +3994,7 @@ namespace RefrigeratedCase {
 					NumNum = 13;
 					if ( ! lNumericBlanks( NumNum ) && ! lAlphaBlanks( AlphaNum ) ) {
 						Secondary( SecondaryNum ).SumUAReceiver = Numbers( NumNum );
-						Secondary( SecondaryNum ).ReceiverZoneNum = FindItemInList( Alphas( AlphaNum ), Zone.Name(), NumOfZones );
+						Secondary( SecondaryNum ).ReceiverZoneNum = FindItemInList( Alphas( AlphaNum ), Zone );
 						Secondary( SecondaryNum ).ReceiverZoneNodeNum = GetSystemNodeNumberForZone( Alphas( AlphaNum ) );
 
 						if ( Secondary( SecondaryNum ).ReceiverZoneNum == 0 ) {
@@ -4086,7 +4086,7 @@ namespace RefrigeratedCase {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), Compressor.Name(), CompNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), Compressor, CompNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -4172,7 +4172,7 @@ namespace RefrigeratedCase {
 
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( Alphas( 1 ), Subcooler.Name(), SubcoolerNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+					VerifyName( Alphas( 1 ), Subcooler, SubcoolerNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
 						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -4246,7 +4246,7 @@ namespace RefrigeratedCase {
 					GetObjectItem( CurrentModuleObject, ListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( Alphas( 1 ), TransferLoadList.Name(), ListNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+					VerifyName( Alphas( 1 ), TransferLoadList, ListNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
 						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -4267,8 +4267,8 @@ namespace RefrigeratedCase {
 						AlphaListNum = 1 + NumLoad;
 						LoadCascadeNum = 0;
 						LoadSecondaryNum = 0;
-						if ( NumRefrigCondensers > 0 ) LoadCascadeNum = FindItemInList( Alphas( AlphaListNum ), Condenser.Name(), NumRefrigCondensers );
-						if ( NumSimulationSecondarySystems > 0 ) LoadSecondaryNum = FindItemInList( Alphas( AlphaListNum ), Secondary.Name(), NumSimulationSecondarySystems );
+						if ( NumRefrigCondensers > 0 ) LoadCascadeNum = FindItemInList( Alphas( AlphaListNum ), Condenser );
+						if ( NumSimulationSecondarySystems > 0 ) LoadSecondaryNum = FindItemInList( Alphas( AlphaListNum ), Secondary );
 						if ( ( LoadCascadeNum == 0 ) && ( LoadSecondaryNum == 0 ) ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaFieldNames( AlphaListNum ) + "\" : has an invalid value of " + Alphas( AlphaListNum ) );
 							ErrorsFound = true;
@@ -4303,7 +4303,7 @@ namespace RefrigeratedCase {
 				IsNotOK = false;
 				IsBlank = false;
 				CompressorLists( ListNum ).NumCompressors = NumAlphas - 1;
-				VerifyName( Alphas( 1 ), CompressorLists.Name(), ListNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), CompressorLists, ListNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -4315,7 +4315,7 @@ namespace RefrigeratedCase {
 				for ( CompIndex = 1; CompIndex <= CompressorLists( ListNum ).NumCompressors; ++CompIndex ) {
 					AlphaListNum = CompIndex + 1; //same as do loop from 2 to end of list
 					if ( ! lAlphaBlanks( AlphaListNum ) ) {
-						CompressorLists( ListNum ).CompItemNum( CompIndex ) = FindItemInList( Alphas( AlphaListNum ), Compressor.Name(), NumSimulationCompressors );
+						CompressorLists( ListNum ).CompItemNum( CompIndex ) = FindItemInList( Alphas( AlphaListNum ), Compressor );
 						if ( CompressorLists( ListNum ).CompItemNum( CompIndex ) == 0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CompressorLists( ListNum ).Name + "\", has an invalid " + cAlphaFieldNames( AlphaListNum ) + " defined as " + Alphas( AlphaListNum ) );
 							ErrorsFound = true;
@@ -4335,7 +4335,7 @@ namespace RefrigeratedCase {
 				IsNotOK = false;
 				IsBlank = false;
 
-				VerifyName( Alphas( 1 ), System.Name(), RefrigSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), System, RefrigSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -4377,10 +4377,10 @@ namespace RefrigeratedCase {
 					CaseNum = 0;
 					WalkInNum = 0;
 					CoilNum = 0;
-					if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList.Name(), NumSimulationCaseAndWalkInLists );
-					if ( NumSimulationCases > 0 ) CaseNum = FindItemInList( Alphas( AlphaNum ), RefrigCase.Name(), NumSimulationCases );
-					if ( NumSimulationWalkIns > 0 ) WalkInNum = FindItemInList( Alphas( AlphaNum ), WalkIn.Name(), NumSimulationWalkIns );
-					if ( NumSimulationRefrigAirChillers > 0 ) CoilNum = FindItemInList( Alphas( AlphaNum ), WarehouseCoil.Name(), NumSimulationRefrigAirChillers );
+					if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList );
+					if ( NumSimulationCases > 0 ) CaseNum = FindItemInList( Alphas( AlphaNum ), RefrigCase );
+					if ( NumSimulationWalkIns > 0 ) WalkInNum = FindItemInList( Alphas( AlphaNum ), WalkIn );
+					if ( NumSimulationRefrigAirChillers > 0 ) CoilNum = FindItemInList( Alphas( AlphaNum ), WarehouseCoil );
 					NumNameMatches = 0;
 					if ( CaseAndWalkInListNum != 0 ) ++NumNameMatches;
 					if ( CaseNum != 0 ) ++NumNameMatches;
@@ -4504,9 +4504,9 @@ namespace RefrigeratedCase {
 					TransferLoadListNum = 0;
 					SecondaryNum = 0;
 					CascadeLoadNum = 0;
-					if ( NumSimulationTransferLoadLists > 0 ) TransferLoadListNum = FindItemInList( Alphas( AlphaNum ), TransferLoadList.Name(), NumSimulationTransferLoadLists );
-					if ( NumSimulationSecondarySystems > 0 ) SecondaryNum = FindItemInList( Alphas( AlphaNum ), Secondary.Name(), NumSimulationSecondarySystems );
-					if ( NumRefrigCondensers > 0 ) CascadeLoadNum = FindItemInList( Alphas( AlphaNum ), Condenser.Name(), NumRefrigCondensers );
+					if ( NumSimulationTransferLoadLists > 0 ) TransferLoadListNum = FindItemInList( Alphas( AlphaNum ), TransferLoadList );
+					if ( NumSimulationSecondarySystems > 0 ) SecondaryNum = FindItemInList( Alphas( AlphaNum ), Secondary );
+					if ( NumRefrigCondensers > 0 ) CascadeLoadNum = FindItemInList( Alphas( AlphaNum ), Condenser );
 					NumNameMatches = 0;
 					if ( TransferLoadListNum != 0 ) ++NumNameMatches;
 					if ( SecondaryNum != 0 ) ++NumNameMatches;
@@ -4621,7 +4621,7 @@ namespace RefrigeratedCase {
 				if ( ! allocated( System( RefrigSysNum ).CondenserNum ) ) System( RefrigSysNum ).CondenserNum.allocate( NumCondensers );
 				System( RefrigSysNum ).NumCondensers = 1;
 				//Find condenser number, note condensers were read in one of four objects, but all read into same list
-				CondNum = FindItemInList( Alphas( AlphaNum ), Condenser.Name(), NumRefrigCondensers );
+				CondNum = FindItemInList( Alphas( AlphaNum ), Condenser );
 				if ( CondNum == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + System( RefrigSysNum ).Name + "\", has an invalid " + cAlphaFieldNames( AlphaNum ) + " defined as " + Alphas( AlphaNum ) );
 					ErrorsFound = true;
@@ -4664,12 +4664,12 @@ namespace RefrigeratedCase {
 					ErrorsFound = true;
 				} else { //     Entry for Alphas(AlphaNum) can be either a compressor name or a compressorlist name
 					if ( NumCompressorLists > 0 ) {
-						ListNum = FindItemInList( Alphas( AlphaNum ), CompressorLists.Name(), NumCompressorLists );
+						ListNum = FindItemInList( Alphas( AlphaNum ), CompressorLists );
 					} else {
 						ListNum = 0;
 					}
 					if ( NumSimulationCompressors > 0 ) {
-						CompNum = FindItemInList( Alphas( AlphaNum ), Compressor.Name(), NumSimulationCompressors );
+						CompNum = FindItemInList( Alphas( AlphaNum ), Compressor );
 					} else {
 						CompNum = 0;
 					}
@@ -4769,7 +4769,7 @@ namespace RefrigeratedCase {
 				System( RefrigSysNum ).SumUASuctionPiping = 0.0;
 				if ( ! lNumericBlanks( 2 ) && ! lAlphaBlanks( AlphaNum ) ) {
 					System( RefrigSysNum ).SumUASuctionPiping = Numbers( 2 );
-					System( RefrigSysNum ).SuctionPipeActualZoneNum = FindItemInList( Alphas( AlphaNum ), Zone.Name(), NumOfZones );
+					System( RefrigSysNum ).SuctionPipeActualZoneNum = FindItemInList( Alphas( AlphaNum ), Zone );
 					System( RefrigSysNum ).SuctionPipeZoneNodeNum = GetSystemNodeNumberForZone( Alphas( AlphaNum ) );
 					if ( System( RefrigSysNum ).SuctionPipeZoneNodeNum == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + System( RefrigSysNum ).Name + "\", System Node Number not found for " + cAlphaFieldNames( AlphaNum ) + " = " + Alphas( AlphaNum ) + " even though " + cNumericFieldNames( 2 ) + " is greater than zero. Suction piping heat gain cannot be calculated unless a Zone is defined to deterimine the environmental temperature surrounding the piping." );
@@ -4851,8 +4851,8 @@ namespace RefrigeratedCase {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + System( RefrigSysNum ).Name + "\", " + cAlphaFieldNames( AlphaNum ) + " must be input for two-stage compression systems." );
 						ErrorsFound = true;
 					} else { //     Entry for Alphas(AlphaNum) can be either a compressor name or a compressorlist name
-						ListNum = FindItemInList( Alphas( AlphaNum ), CompressorLists.Name(), NumCompressorLists );
-						CompNum = FindItemInList( Alphas( AlphaNum ), Compressor.Name(), NumSimulationCompressors );
+						ListNum = FindItemInList( Alphas( AlphaNum ), CompressorLists );
+						CompNum = FindItemInList( Alphas( AlphaNum ), Compressor );
 						if ( ( ListNum == 0 ) && ( CompNum == 0 ) ) { // name doesn't match either a compressor or a compressor list
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + System( RefrigSysNum ).Name + "\", " + cAlphaFieldNames( AlphaNum ) + " has an invalid or undefined value=\"" + Alphas( AlphaNum ) + "\"." );
 							ErrorsFound = true;
@@ -5031,7 +5031,7 @@ namespace RefrigeratedCase {
 				GetObjectItem( CurrentModuleObject, TransRefrigSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), TransSystem.Name(), RefrigSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), TransSystem, RefrigSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -5103,9 +5103,9 @@ namespace RefrigeratedCase {
 					CaseAndWalkInListNum = 0;
 					CaseNum = 0;
 					WalkInNum = 0;
-					if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList.Name(), NumSimulationCaseAndWalkInLists );
-					if ( NumSimulationCases > 0 ) CaseNum = FindItemInList( Alphas( AlphaNum ), RefrigCase.Name(), NumSimulationCases );
-					if ( NumSimulationWalkIns > 0 ) WalkInNum = FindItemInList( Alphas( AlphaNum ), WalkIn.Name(), NumSimulationWalkIns );
+					if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList );
+					if ( NumSimulationCases > 0 ) CaseNum = FindItemInList( Alphas( AlphaNum ), RefrigCase );
+					if ( NumSimulationWalkIns > 0 ) WalkInNum = FindItemInList( Alphas( AlphaNum ), WalkIn );
 					NumNameMatches = 0;
 					if ( CaseAndWalkInListNum != 0 ) ++NumNameMatches;
 					if ( CaseNum != 0 ) ++NumNameMatches;
@@ -5196,9 +5196,9 @@ namespace RefrigeratedCase {
 					CaseAndWalkInListNum = 0;
 					CaseNum = 0;
 					WalkInNum = 0;
-					if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList.Name(), NumSimulationCaseAndWalkInLists );
-					if ( NumSimulationCases > 0 ) CaseNum = FindItemInList( Alphas( AlphaNum ), RefrigCase.Name(), NumSimulationCases );
-					if ( NumSimulationWalkIns > 0 ) WalkInNum = FindItemInList( Alphas( AlphaNum ), WalkIn.Name(), NumSimulationWalkIns );
+					if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList );
+					if ( NumSimulationCases > 0 ) CaseNum = FindItemInList( Alphas( AlphaNum ), RefrigCase );
+					if ( NumSimulationWalkIns > 0 ) WalkInNum = FindItemInList( Alphas( AlphaNum ), WalkIn );
 					NumNameMatches = 0;
 					if ( CaseAndWalkInListNum != 0 ) ++NumNameMatches;
 					if ( CaseNum != 0 ) ++NumNameMatches;
@@ -5290,7 +5290,7 @@ namespace RefrigeratedCase {
 				if ( ! allocated( TransSystem( TransRefrigSysNum ).GasCoolerNum ) ) TransSystem( TransRefrigSysNum ).GasCoolerNum.allocate( NumGasCoolers );
 				TransSystem( TransRefrigSysNum ).NumGasCoolers = 1;
 				//Find gascooler number
-				GCNum = FindItemInList( Alphas( AlphaNum ), GasCooler.Name(), NumSimulationGasCooler );
+				GCNum = FindItemInList( Alphas( AlphaNum ), GasCooler );
 
 				if ( GCNum == 0 ) { //  Invalid Gas Cooler attached to Transcritical Refrigeration System
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + TransSystem( TransRefrigSysNum ).Name + "\", has an invalid " + cAlphaFieldNames( AlphaNum ) + " defined as \"" + Alphas( AlphaNum ) + "\"." );
@@ -5313,8 +5313,8 @@ namespace RefrigeratedCase {
 					ShowSevereError( RoutineName + CurrentModuleObject + ' ' + cAlphaFieldNames( AlphaNum ) + "\" : must be input." );
 					ErrorsFound = true;
 				} else { //     Entry for Alphas(AlphaNum) can be either a compressor name or a compressorlist name
-					ListNum = FindItemInList( Alphas( AlphaNum ), CompressorLists.Name(), NumCompressorLists );
-					CompNum = FindItemInList( Alphas( AlphaNum ), Compressor.Name(), NumSimulationCompressors );
+					ListNum = FindItemInList( Alphas( AlphaNum ), CompressorLists );
+					CompNum = FindItemInList( Alphas( AlphaNum ), Compressor );
 					if ( ( ListNum == 0 ) && ( CompNum == 0 ) ) { // name doesn't match either a compressor or a compressor list
 						ShowSevereError( RoutineName + CurrentModuleObject + ", \"" + cAlphaFieldNames( AlphaNum ) + "\", has an invalid or undefined value=\"" + Alphas( AlphaNum ) + "\"." );
 						ErrorsFound = true;
@@ -5361,8 +5361,8 @@ namespace RefrigeratedCase {
 					ShowWarningError( RoutineName + CurrentModuleObject + ", The transcritical refrigeration system, \"" + TransSystem( TransRefrigSysNum ).Name + "\", is specified to be \"SingleStage\", however, a\"" + cAlphaFieldNames( AlphaNum ) + "\" was found.  The low pressure compressors will be ignored and will not simulated." );
 				} else if ( ( ! ( lAlphaBlanks( AlphaNum ) ) ) && ( TransSystem( TransRefrigSysNum ).TransSysType == 2 ) ) {
 					// TwoStage system with low pressure compressors specified
-					ListNum = FindItemInList( Alphas( AlphaNum ), CompressorLists.Name(), NumCompressorLists );
-					CompNum = FindItemInList( Alphas( AlphaNum ), Compressor.Name(), NumSimulationCompressors );
+					ListNum = FindItemInList( Alphas( AlphaNum ), CompressorLists );
+					CompNum = FindItemInList( Alphas( AlphaNum ), Compressor );
 					if ( ( ListNum == 0 ) && ( CompNum == 0 ) ) { // name doesn't match either a compressor or a compressor list
 						ShowSevereError( RoutineName + CurrentModuleObject + ", \"" + cAlphaFieldNames( AlphaNum ) + "\", has an invalid or undefined value=\"" + Alphas( AlphaNum ) + "\"." );
 						ErrorsFound = true;
@@ -5445,7 +5445,7 @@ namespace RefrigeratedCase {
 				TransSystem( TransRefrigSysNum ).SumUASuctionPipingMT = 0.0;
 				if ( ! lNumericBlanks( 3 ) && ! lAlphaBlanks( AlphaNum ) ) {
 					TransSystem( TransRefrigSysNum ).SumUASuctionPipingMT = Numbers( 3 );
-					TransSystem( TransRefrigSysNum ).SuctionPipeActualZoneNumMT = FindItemInList( Alphas( AlphaNum ), Zone.Name(), NumOfZones );
+					TransSystem( TransRefrigSysNum ).SuctionPipeActualZoneNumMT = FindItemInList( Alphas( AlphaNum ), Zone );
 					TransSystem( TransRefrigSysNum ).SuctionPipeZoneNodeNumMT = GetSystemNodeNumberForZone( Alphas( AlphaNum ) );
 					if ( TransSystem( TransRefrigSysNum ).SuctionPipeZoneNodeNumMT == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + TransSystem( TransRefrigSysNum ).Name + "\", System Node Number not found for " + cAlphaFieldNames( AlphaNum ) + " = \"" + Alphas( AlphaNum ) + "\" even though " + cNumericFieldNames( 3 ) + " is greater than zero." );
@@ -5465,7 +5465,7 @@ namespace RefrigeratedCase {
 				TransSystem( TransRefrigSysNum ).SumUASuctionPipingLT = 0.0;
 				if ( ! lNumericBlanks( 4 ) && ! lAlphaBlanks( AlphaNum ) ) {
 					TransSystem( TransRefrigSysNum ).SumUASuctionPipingLT = Numbers( 4 );
-					TransSystem( TransRefrigSysNum ).SuctionPipeActualZoneNumLT = FindItemInList( Alphas( AlphaNum ), Zone.Name(), NumOfZones );
+					TransSystem( TransRefrigSysNum ).SuctionPipeActualZoneNumLT = FindItemInList( Alphas( AlphaNum ), Zone );
 					TransSystem( TransRefrigSysNum ).SuctionPipeZoneNodeNumLT = GetSystemNodeNumberForZone( Alphas( AlphaNum ) );
 					if ( TransSystem( TransRefrigSysNum ).SuctionPipeZoneNodeNumLT == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + TransSystem( TransRefrigSysNum ).Name + "\", System Node Number not found for " + cAlphaFieldNames( AlphaNum ) + " = \"" + Alphas( AlphaNum ) + "\" even though " + cNumericFieldNames( 4 ) + " is greater than zero." );
@@ -7878,10 +7878,10 @@ namespace RefrigeratedCase {
 		if ( CompIndex == 0 ) {
 			{ auto const SELECT_CASE_var( SysType );
 			if ( SELECT_CASE_var == TypeOf_RefrigerationWaterCoolRack ) {
-				Num = FindItemInList( CompName, RefrigRack.Name(), NumRefrigeratedRacks );
+				Num = FindItemInList( CompName, RefrigRack );
 
 			} else if ( SELECT_CASE_var == TypeOf_RefrigSystemWaterCondenser ) {
-				Num = FindItemInList( CompName, Condenser.Name(), NumRefrigCondensers );
+				Num = FindItemInList( CompName, Condenser );
 			} else {
 				ShowFatalError( "SimRefrigCondenser: invalid system type passed" );
 			}}
@@ -9128,7 +9128,6 @@ namespace RefrigeratedCase {
 		Real64 TotalLoadFromSysID; // total heat rejection load from a single detailed system [W]
 		Real64 TotalLoadFromThisSystem( 0.0 ); // total heat rejection load from the detailed system id'd in subroutine call [W]
 		Real64 TotalLoadFromSystems; // total heat rejection load from all systems served by this condenser [W]
-		Real64 NomCap; // ne "design" capacity when operating evap condenser at reduced air flow [W]
 		Real64 CurMaxCapacity; // current maximum condenser capacity at delta T present for minimum condensing temperature [W]
 
 		LocalTimeStep = TimeStepZone;
@@ -10552,7 +10551,7 @@ namespace RefrigeratedCase {
 
 		{ auto const SELECT_CASE_var( SysType );
 		if ( SELECT_CASE_var == RefrigSystemTypeRack ) {
-			IndexPtr = FindItemInList( Name, RefrigRack.Name(), NumRefrigeratedRacks );
+			IndexPtr = FindItemInList( Name, RefrigRack );
 			if ( IndexPtr == 0 ) {
 				if ( present( SuppressWarning ) ) {
 					//     No warning printed if only searching for the existence of a refrigerated rack
@@ -10566,7 +10565,7 @@ namespace RefrigeratedCase {
 				ErrorsFound = true;
 			}
 		} else if ( SELECT_CASE_var == RefrigSystemTypeDetailed ) {
-			IndexPtr = FindItemInList( Name, Condenser.Name(), NumRefrigCondensers );
+			IndexPtr = FindItemInList( Name, Condenser );
 			if ( IndexPtr == 0 ) {
 				if ( present( SuppressWarning ) ) {
 					//     No warning printed if only searching for the existence of a refrigeration Condenser
@@ -10644,7 +10643,6 @@ namespace RefrigeratedCase {
 		int TransSystemNum;
 		int WalkInID;
 		int WalkInNum;
-		int ZoneNum;
 		int ZoneID;
 		std::string ChrOut;
 		std::string ChrOut2;
@@ -10792,7 +10790,7 @@ namespace RefrigeratedCase {
 				gio::write( OutputFileInits, Format_101 ) << " Refrigeration Compressor Rack," + RefrigRack( RackNum ).Name + ',' + RoundSigDigits( RefrigRack( RackNum ).NumCases ) + ',' + RoundSigDigits( RefrigRack( RackNum ).NumWalkIns ) + ',' + ChrOut + ',' + ChrOut2 + ',' + RoundSigDigits( RefrigRack( RackNum ).RatedCOP, 3 );
 				for ( CaseNum = 1; CaseNum <= RefrigRack( RackNum ).NumCases; ++CaseNum ) {
 					CaseID = RefrigRack( RackNum ).CaseNum( CaseNum );
-					if ( RefrigCase( CaseID ).ZoneNodeNum > 0 ){
+					if ( RefrigCase( CaseID ).ZoneNodeNum > 0 ) {
 						gio::write( OutputFileInits, Format_103 ) << " Refrigeration Case," + RoundSigDigits( CaseID ) + ',' + RefrigCase( CaseID ).Name + ',' + RefrigCase( CaseID ).ZoneName + ',' + RoundSigDigits( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + NodeID( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RateTotCapPerLength, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RatedLHR, 2 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Temperature, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Length, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).OperatingFanPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).LightingPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).AntiSweatPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).DefrostPower, 1 ); //Installed lighting power, may not be rated power
 					}
 				} //numcases
@@ -10819,7 +10817,7 @@ namespace RefrigeratedCase {
 
 				for ( CaseNum = 1; CaseNum <= System( SystemNum ).NumCases; ++CaseNum ) {
 					CaseID = System( SystemNum ).CaseNum( CaseNum );
-					if ( RefrigCase( CaseID ).ZoneNodeNum > 0 ){
+					if ( RefrigCase( CaseID ).ZoneNodeNum > 0 ) {
 						gio::write( OutputFileInits, Format_103 ) << " Refrigeration Case," + RoundSigDigits( CaseID ) + ',' + RefrigCase( CaseID ).Name + ',' + RefrigCase( CaseID ).ZoneName + ',' + RoundSigDigits( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + NodeID( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RateTotCapPerLength, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RatedLHR, 2 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Temperature, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Length, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).OperatingFanPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).LightingPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).AntiSweatPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).DefrostPower, 1 );
 					}
 				} //NumCases on system
@@ -10908,13 +10906,13 @@ namespace RefrigeratedCase {
 
 				for ( CaseNum = 1; CaseNum <= TransSystem( TransSystemNum ).NumCasesMT; ++CaseNum ) {
 					CaseID = TransSystem( TransSystemNum ).CaseNumMT( CaseNum );
-					if ( RefrigCase( CaseID ).ZoneNodeNum > 0 ){
+					if ( RefrigCase( CaseID ).ZoneNodeNum > 0 ) {
 						gio::write( OutputFileInits, Format_103 ) << " Medium Temperature Refrigeration Case," + RoundSigDigits( CaseID ) + ',' + RefrigCase( CaseID ).Name + ',' + RefrigCase( CaseID ).ZoneName + ',' + RoundSigDigits( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + NodeID( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RateTotCapPerLength, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RatedLHR, 2 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Temperature, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Length, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).OperatingFanPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).LightingPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).AntiSweatPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).DefrostPower, 1 );
 					}
 				} //NumCasesMT on system
 				for ( CaseNum = 1; CaseNum <= TransSystem( TransSystemNum ).NumCasesLT; ++CaseNum ) {
 					CaseID = TransSystem( TransSystemNum ).CaseNumLT( CaseNum );
-					if ( RefrigCase( CaseID ).ZoneNodeNum > 0 ){
+					if ( RefrigCase( CaseID ).ZoneNodeNum > 0 ) {
 						gio::write( OutputFileInits, Format_103 ) << " Low Temperature Refrigeration Case," + RoundSigDigits( CaseID ) + ',' + RefrigCase( CaseID ).Name + ',' + RefrigCase( CaseID ).ZoneName + ',' + RoundSigDigits( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + NodeID( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RateTotCapPerLength, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RatedLHR, 2 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Temperature, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Length, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).OperatingFanPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).LightingPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).AntiSweatPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).DefrostPower, 1 );
 					}
 				} //NumCasesLT on system
@@ -10961,7 +10959,7 @@ namespace RefrigeratedCase {
 				}}
 				for ( CaseNum = 1; CaseNum <= Secondary( SecondaryID ).NumCases; ++CaseNum ) {
 					CaseID = Secondary( SecondaryID ).CaseNum( CaseNum );
-					if ( RefrigCase( CaseID ).ZoneNodeNum > 0 ){
+					if ( RefrigCase( CaseID ).ZoneNodeNum > 0 ) {
 						gio::write( OutputFileInits, Format_103 ) << "Refrigeration Case," + RoundSigDigits( CaseID ) + ',' + RefrigCase( CaseID ).Name + ',' + RefrigCase( CaseID ).ZoneName + ',' + RoundSigDigits( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + NodeID( RefrigCase( CaseID ).ZoneNodeNum ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RateTotCapPerLength, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).RatedLHR, 2 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Temperature, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).Length, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).OperatingFanPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).LightingPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).AntiSweatPower, 1 ) + ',' + RoundSigDigits( RefrigCase( CaseID ).DefrostPower, 1 );
 					}
 				} //NumCases on secondary on secondary system
@@ -11560,7 +11558,7 @@ namespace RefrigeratedCase {
 		Real64 TBrineIn; // Brine temperature going to heat exchanger, C
 		Real64 TCondense; // Condensing temperature for a phase change secondary loop, C
 		Real64 TEvap; // Evaporating temperature in secondary loop heat exchanger (C)
-		Real64 TotalCoolingLoad; // Cooling load reported back to compressor rack or detailed system (W)
+		Real64 TotalCoolingLoad( 0 ); // Cooling load reported back to compressor rack or detailed system (W)
 		Real64 TotalHotDefrostCondCredit; // Used to credit condenser when heat reclaim used for hot gas/brine defrost (W)
 		Real64 TotalPumpPower; // Total Pumping power for loop, W
 		Real64 TotalLoad; // Total Cooling Load on secondary loop, W
@@ -11981,7 +11979,7 @@ namespace RefrigeratedCase {
 
 		// Find the correct Chiller set
 		if ( AirChillerSetPtr == 0 ) {
-			ChillerSetID = FindItemInList( AirChillerSetName, AirChillerSet.Name(), NumRefrigChillerSets );
+			ChillerSetID = FindItemInList( AirChillerSetName, AirChillerSet );
 			if ( ChillerSetID == 0 ) {
 				ShowFatalError( "SimAirChillerSet: Unit not found=" + AirChillerSetName );
 			} // chillersetid ==0 because not in list
@@ -12913,7 +12911,7 @@ namespace RefrigeratedCase {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
