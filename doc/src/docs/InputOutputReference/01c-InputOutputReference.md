@@ -13793,7 +13793,7 @@ This choice field determines the logic used to simulate the “master” thermos
 
 #### Field: Thermostat Priority Schedule Name
 
-This alpha field identifies the schedule used when the previous field is set to Scheduled. Schedule values of 0 denote cooling mode while values of 1 denote heating mode. Any other values will force the system off.
+This alpha field identifies the schedule used when the previous field is set to Scheduled. Schedule values of 0 denote heating mode while values of 1 denote cooling mode. Any other values will force the system off.
 
 #### Field: Zone Terminal Unit List Name
 
