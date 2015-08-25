@@ -331,7 +331,7 @@ namespace VariableSpeedCoils {
 		int NumHeat; // Counter for heating coil, water source
 		int NumHeatAS; // Counter for heating coil, air source
 		int NumHPWHAirToWater; //counter for air source HPWH
-		int WatertoAirHPNum; // Counter
+		int CoilCounter; // Counter
 		int I; // Loop index increment
 		int NumAlphas; // Number of variables in String format
 		int NumNums; // Number of variables in Numeric format
@@ -402,12 +402,12 @@ namespace VariableSpeedCoils {
 		// Get the data for cooling coil, WATER SOURCE
 		CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit"; //for reporting
 
-		for ( WatertoAirHPNum = 1; WatertoAirHPNum <= NumCool; ++WatertoAirHPNum ) {
+		for ( CoilCounter = 1; CoilCounter <= NumCool; ++CoilCounter ) {
 
 			++DXCoilNum;
 			AlfaFieldIncre = 1;
 
-			GetObjectItem( CurrentModuleObject, DXCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			GetObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -780,12 +780,12 @@ namespace VariableSpeedCoils {
 		// Get the data for cooling coil, AIR SOURCE
 		CurrentModuleObject = "Coil:Cooling:DX:VariableSpeed"; //for reporting
 
-		for ( WatertoAirHPNum = 1; WatertoAirHPNum <= NumCoolAS; ++WatertoAirHPNum ) {
+		for ( CoilCounter = 1; CoilCounter <= NumCoolAS; ++CoilCounter ) {
 
 			++DXCoilNum;
 			AlfaFieldIncre = 1;
 
-			GetObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			GetObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -1133,11 +1133,11 @@ namespace VariableSpeedCoils {
 		// Get the data for heating coil, WATER SOURCE
 		CurrentModuleObject = "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit";
 
-		for ( WatertoAirHPNum = 1; WatertoAirHPNum <= NumHeat; ++WatertoAirHPNum ) {
+		for ( CoilCounter = 1; CoilCounter <= NumHeat; ++CoilCounter ) {
 
 			++DXCoilNum;
 
-			GetObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			GetObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -1489,11 +1489,11 @@ namespace VariableSpeedCoils {
 		// Get the data for heating coil, AIR SOURCE
 		CurrentModuleObject = "COIL:HEATING:DX:VARIABLESPEED";
 
-		for ( WatertoAirHPNum = 1; WatertoAirHPNum <= NumHeatAS; ++WatertoAirHPNum ) {
+		for ( CoilCounter = 1; CoilCounter <= NumHeatAS; ++CoilCounter ) {
 
 			++DXCoilNum;
 
-			GetObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			GetObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -1816,12 +1816,12 @@ namespace VariableSpeedCoils {
 		//------------------------VARIABLE-SPEED AIR SOURCE HPWH---BEGIN
 		CurrentModuleObject = "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED"; //for reporting
 
-		for (WatertoAirHPNum = 1; WatertoAirHPNum <= NumHPWHAirToWater; ++WatertoAirHPNum) {
+		for (CoilCounter = 1; CoilCounter <= NumHPWHAirToWater; ++CoilCounter) {
 
 			++DXCoilNum;
 			AlfaFieldIncre = 1;
 
-			GetObjectItem(CurrentModuleObject, DXCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+			GetObjectItem(CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
 			IsNotOK = false;
 			IsBlank = false;

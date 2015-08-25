@@ -53,6 +53,7 @@ set( test_src
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
   SwimmingPool.unit.cc
+  VariableSpeedCoils.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
   VentilatedSlab.unit.cc
