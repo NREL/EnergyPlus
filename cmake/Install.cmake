@@ -152,7 +152,7 @@ install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" "PreProcess/HVACCurveFitTool/")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/release/Report%20Variables%208-3-0%20to%208-4-0.csv" "PreProcess/IDFVersionUpdater/" "Report Variables 8-3-0 to 8-4-0.csv")
 install(FILES "${CMAKE_SOURCE_DIR}/idd/V8-3-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
-install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}-Energy+.idd" )
+install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V8-4-0-Energy+.idd" )
 
 if( WIN32 )
   # calcsoilsurftemp is now built from source, just need to install the batch run script
