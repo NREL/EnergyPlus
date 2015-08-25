@@ -52610,7 +52610,7 @@ AirConditioner:VariableRefrigerantFlow,
        \type real
        \units C
        \default -20.0
-       \note Enter the minimum outdoor temperature allowed for cooling operation.
+       \note Enter the minimum outdoor temperature allowed for heating operation.
   N9 , \field Maximum Outdoor Temperature in Heating Mode
        \type real
        \units C
@@ -53085,11 +53085,35 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \default 3.4
        \note Enter the coefficient of performance at rated conditions or leave blank to use default
        \note This reference COP value is only used for the initialization of the physics based VRF model
-  N3 , \field Reference Outdoor Unit Superheating 
+  N3 , \field Minimum Outdoor Air Temperature in Cooling Mode
+       \type real
+       \units C
+       \default -6.0
+       \note Enter the minimum outdoor temperature allowed for cooling operation
+       \note Cooling is disabled below this temperature
+  N4 , \field Maximum Outdoor Air Temperature in Cooling Mode
+       \type real
+       \units C
+       \default 43.0
+       \note Enter the maximum outdoor temperature allowed for cooling operation
+       \note Cooling is disabled above this temperature
+  N5 , \field Minimum Outdoor Air Temperature in Heating Mode
+       \type real
+       \units C
+       \default -20.0
+       \note Enter the minimum outdoor temperature allowed for heating operation
+       \note Heating is disabled below this temperature
+  N6 , \field Maximum Outdoor Air Temperature in Heating Mode
+       \type real
+       \units C
+       \default 16.0
+       \note Enter the maximum outdoor temperature allowed for heating operation
+       \note Heating is disabled below this temperature
+  N7 , \field Reference Outdoor Unit Superheating 
        \type real
        \units deltaC  
        \default 3
-  N4 , \field Reference Outdoor Unit Subcooling 
+  N8 , \field Reference Outdoor Unit Subcooling 
        \type real 
        \units deltaC    
        \default 5
@@ -53098,37 +53122,37 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \key ConstantTemp
        \key VariableTemp
        \default VariableTemp
-  N5 , \field Reference Evaporating Temperature for Indoor Unit 
+  N9 , \field Reference Evaporating Temperature for Indoor Unit 
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is ConstantTemp
        \type real
        \units C       
        \default 6.0
-  N6 , \field Reference Condensing Temperature for Indoor Unit 
+  N10, \field Reference Condensing Temperature for Indoor Unit 
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is ConstantTemp
        \type real
        \units C       
        \default 44.0
-  N7 , \field Variable Evaporating Temperature Minimum for Indoor Unit
+  N11, \field Variable Evaporating Temperature Minimum for Indoor Unit
        \type real
        \units C       
        \default 4.0
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp 
-  N8 , \field Variable Evaporating Temperature Maximum for Indoor Unit
+  N12, \field Variable Evaporating Temperature Maximum for Indoor Unit
        \type real
        \units C       
        \default 13.0
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp 
-  N9 , \field Variable Condensing Temperature Minimum for Indoor Unit
+  N13, \field Variable Condensing Temperature Minimum for Indoor Unit
        \type real
        \units C       
        \default 42.0
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp
-  N10, \field Variable Condensing Temperature Maximum for Indoor Unit
+  N14, \field Variable Condensing Temperature Maximum for Indoor Unit
        \type real
        \units C       
        \default 46.0 
@@ -53153,25 +53177,25 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list QuadraticCurves	 
        \object-list UniVariateTables  
-  N11, \field Diameter of main pipe connecting outdoor unit to indoor units
+  N15, \field Diameter of main pipe connecting outdoor unit to indoor units
        \note used to calculate the piping loss
        \type real 
        \units m
        \minimum 0.0
        \default 0.0254 
-  N12, \field Length of main pipe connecting outdoor unit to indoor units
+  N16, \field Length of main pipe connecting outdoor unit to indoor units
        \note used to calculate the heat loss of the main pipe
        \type real 
        \units m
        \minimum 0.0
        \default 30.0
-  N13, \field Equivalent length of main pipe connecting outdoor unit to indoor units
+  N17, \field Equivalent length of main pipe connecting outdoor unit to indoor units
        \note used to calculate the refrigerant pressure drop of the main pipe
        \type real 
        \units m
        \minimum 0.0
        \default 36.0
-  N14, \field Height difference between the outdoor unit node and 
+  N18, \field Height difference between the outdoor unit node and 
        \field indoor unit node of the main pipe
        \note Difference between outdoor unit height and indoor unit height
        \note Positive means outdoor unit is higher than indoor unit 
@@ -53179,36 +53203,36 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type real 
        \units m
        \default 5.0
-  N15, \field Insulation thickness of the main pipe
+  N19, \field Insulation thickness of the main pipe
        \type real 
        \units m
        \minimum 0.0	
 	   \default 0.02
-  N16, \field Thermal conductivity of the main pipe insulation material
+  N20, \field Thermal conductivity of the main pipe insulation material
        \type real 
        \units W/m-K
        \minimum 0.0	
 	   \default 0.032
-  N17, \field Crankcase Heater Power per Compressor
+  N21, \field Crankcase Heater Power per Compressor
        \type real
        \units W
        \default 33.0
        \note Enter the value of the resistive heater located in the compressor(s). This heater
        \note is used to warm the refrigerant and oil when the compressor is off
-  N18, \field Number of Compressors
+  N22, \field Number of Compressors
        \type integer
        \units dimensionless
        \default 2
        \note Enter the total number of compressor. This input is used only for crankcase
        \note heater calculations.
-  N19, \field Ratio of Compressor Size to Total Compressor Capacity
+  N23, \field Ratio of Compressor Size to Total Compressor Capacity
        \type real
        \units W/W
        \default 0.5
        \note Enter the ratio of the first stage compressor to total compressor capacity
        \note All other compressors are assumed to be equally sized. This inputs is used
        \note only for crankcase heater calculations
-  N20, \field Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater
+  N24, \field Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater
        \type real
        \units C
        \default 5.0
@@ -53237,13 +53261,13 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \object-list QuadraticCubicCurves
        \object-list UniVariateTables
        \note A valid performance curve must be used if ReverseCycle defrost strategy is selected
-  N21, \field Defrost Time Period Fraction
+  N25, \field Defrost Time Period Fraction
        \type real
        \minimum 0.0
        \default 0.058333
        \note Fraction of time in defrost mode
        \note Only applicable if timed defrost control is specified
-  N22, \field Resistive Defrost Heater Capacity
+  N26, \field Resistive Defrost Heater Capacity
        \type real
        \minimum 0.0
        \default 0.0
@@ -53252,18 +53276,18 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \note Enter the size of the resistive defrost heating element
        \note Only applicable if resistive defrost strategy is specified
        \ip-units W
-  N23, \field Maximum Outdoor Dry-bulb Temperature for Defrost Operation
+  N27, \field Maximum Outdoor Dry-bulb Temperature for Defrost Operation
        \type real
        \units C
        \default 5.0
        \note Enter the maximum outdoor temperature above which the crankcase heaters are disabled
-  N24, \field Compressor maximum delta Pressure
+  N28, \field Compressor maximum delta Pressure
        \type real 
        \units Pa
        \default 4500000.0
        \minimum 0.0
        \maximum 50000000.0
-  N25, \field Number of Compressor Loading Index Entries
+  N29, \field Number of Compressor Loading Index Entries
        \required-field
        \type integer
        \default 2
@@ -53271,7 +53295,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \maximum 9
        \note First index represents minimal capacity operation 
        \note Last index represents full capacity operation 
-  N26, \field Compressor Speed at Loading Index 1 
+  N30, \field Compressor Speed at Loading Index 1 
        \type real
        \note Minimum compressor speed 
        \note unit in Rev/Sec	   
@@ -53285,7 +53309,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N27, \field Compressor Speed at Loading Index 2
+  N31, \field Compressor Speed at Loading Index 2
        \type real
        \note unit in Rev/Sec
   A15, \field Loading Index 2 Evaporative Capacity Function of Temperature Curve Name
@@ -53298,7 +53322,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N28, \field Compressor Speed at Loading Index 3       
+  N32, \field Compressor Speed at Loading Index 3       
        \type real
        \note unit in Rev/Sec
   A17, \field Loading Index 3 Evaporative Capacity Function of Temperature Curve Name       
@@ -53309,7 +53333,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N29, \field Compressor Speed at Loading Index 4       
+  N33, \field Compressor Speed at Loading Index 4       
        \type real
        \note unit in Rev/Sec
   A19, \field Loading Index 4 Evaporative Capacity Function of Temperature Curve Name       
@@ -53320,7 +53344,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N30, \field Compressor Speed at Loading Index 5       
+  N34, \field Compressor Speed at Loading Index 5       
        \type real
        \note unit in Rev/Sec
   A21, \field Loading Index 5 Evaporative Capacity Function of Temperature Curve Name       
@@ -53331,7 +53355,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N31, \field Compressor Speed at Loading Index 6       
+  N35, \field Compressor Speed at Loading Index 6       
        \type real
        \note unit in Rev/Sec
   A23, \field Loading Index 6 Evaporative Capacity Function of Temperature Curve Name       
@@ -53342,7 +53366,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N32, \field Compressor Speed at Loading Index 7       
+  N36, \field Compressor Speed at Loading Index 7       
        \type real
        \note unit in Rev/Sec
   A25, \field Loading Index 7 Evaporative Capacity Function of Temperature Curve Name       
@@ -53352,7 +53376,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   A26, \field Loading Index 7 list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N33, \field Compressor Speed at Loading Index 8       
+  N37, \field Compressor Speed at Loading Index 8       
        \type real
        \note unit in Rev/Sec
   A27, \field Loading Index 8 Evaporative Capacity Function of Temperature Curve Name       
@@ -53363,7 +53387,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N34, \field Compressor Speed at Loading Index 9       
+  N38, \field Compressor Speed at Loading Index 9       
        \type real 
        \note unit in Rev/Sec
   A29, \field Loading Index 9 Evaporative Capacity Function of Temperature Curve Name       

@@ -1381,7 +1381,6 @@ namespace HVACVariableRefrigerantFlow {
 			}
 		}
 
-		// read all VRF condenser objects
 		// read all VRF condenser objects: Algorithm Type 1_system curve based model
 		cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow";
 		for ( VRFNum = 1; VRFNum <= NumVRFCond_SysCurve; ++VRFNum ) {
@@ -2151,9 +2150,25 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFNum ).CoolingCOP = rNumericArgs( 1 );
 			VRF( VRFNum ).HeatingCOP = rNumericArgs( 2 );
 			
+			//OA temperature range for VRF-HP operations
+			VRF( VRFNum ).MinOATCooling = rNumericArgs( 3 );
+			VRF( VRFNum ).MaxOATCooling = rNumericArgs( 4 );
+			VRF( VRFNum ).MinOATHeating = rNumericArgs( 5 );
+			VRF( VRFNum ).MaxOATHeating = rNumericArgs( 6 );
+			if ( VRF( VRFNum ).MinOATCooling >= VRF( VRFNum ).MaxOATCooling ) {
+				ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\"" );
+				ShowContinueError( "... " + cNumericFieldNames( 3 ) + " (" + TrimSigDigits( VRF( VRFNum ).MinOATCooling, 3 ) + ") must be less than maximum (" + TrimSigDigits( VRF( VRFNum ).MaxOATCooling, 3 ) + ")." );
+				ErrorsFound = true;
+			}
+			if ( VRF( VRFNum ).MinOATHeating >= VRF( VRFNum ).MaxOATHeating ) {
+				ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\"" );
+				ShowContinueError( "... " + cNumericFieldNames( 5 ) + " (" + TrimSigDigits( VRF( VRFNum ).MinOATHeating, 3 ) + ") must be less than maximum (" + TrimSigDigits( VRF( VRFNum ).MaxOATHeating, 3 ) + ")." );
+				ErrorsFound = true;
+			}
+			
 			//Refrence OU SH/SC
-			VRF( VRFNum ).SH = rNumericArgs( 3 );
-			VRF( VRFNum ).SC = rNumericArgs( 4 );
+			VRF( VRFNum ).SH = rNumericArgs( 7 );
+			VRF( VRFNum ).SC = rNumericArgs( 8 );
 			
 			if( SameString( cAlphaArgs( 5 ), "VariableTemp" ) ) {
 				VRF(VRFNum).AlgorithmIUCtrl = 1;
@@ -2164,14 +2179,14 @@ namespace HVACVariableRefrigerantFlow {
 			}
 			
 			//Refrence IU Te/Tc for IU Control Algorithm: ConstantTemp
-			VRF( VRFNum ).EvapTempFixed  = rNumericArgs( 5 );
-			VRF( VRFNum ).CondTempFixed  = rNumericArgs( 6 );
+			VRF( VRFNum ).EvapTempFixed  = rNumericArgs( 9 );
+			VRF( VRFNum ).CondTempFixed  = rNumericArgs( 10 );
 			
 			//Bounds of Te/Tc for IU Control Algorithm: VariableTemp
-			VRF( VRFNum ).IUEvapTempLow = rNumericArgs( 7 ); 
-			VRF( VRFNum ).IUEvapTempHigh = rNumericArgs( 8 );  
-			VRF( VRFNum ).IUCondTempLow = rNumericArgs( 9 ); 
-			VRF( VRFNum ).IUCondTempHigh = rNumericArgs( 10 ); 
+			VRF( VRFNum ).IUEvapTempLow = rNumericArgs( 11 ); 
+			VRF( VRFNum ).IUEvapTempHigh = rNumericArgs( 12 );  
+			VRF( VRFNum ).IUCondTempLow = rNumericArgs( 13 ); 
+			VRF( VRFNum ).IUCondTempHigh = rNumericArgs( 14 ); 
 			
 			//Get OU fan data
 			FanType = cAlphaArgs( 6 ); //- Outdoor Unit Fan Object Type
@@ -2289,31 +2304,31 @@ namespace HVACVariableRefrigerantFlow {
 			}
 			
 			// Pipe parameters
-			VRF( VRFNum ).RefPipDia      = rNumericArgs( 11 );
-			VRF( VRFNum ).RefPipLen      = rNumericArgs( 12 );
-			VRF( VRFNum ).RefPipEquLen   = rNumericArgs( 13 );
-			VRF( VRFNum ).RefPipHei      = rNumericArgs( 14 );
-			VRF( VRFNum ).RefPipInsThi   = rNumericArgs( 15 );
-			VRF( VRFNum ).RefPipInsCon   = rNumericArgs( 16 );
+			VRF( VRFNum ).RefPipDia      = rNumericArgs( 15 );
+			VRF( VRFNum ).RefPipLen      = rNumericArgs( 16 );
+			VRF( VRFNum ).RefPipEquLen   = rNumericArgs( 17 );
+			VRF( VRFNum ).RefPipHei      = rNumericArgs( 18 );
+			VRF( VRFNum ).RefPipInsThi   = rNumericArgs( 19 );
+			VRF( VRFNum ).RefPipInsCon   = rNumericArgs( 20 );
 			
 			// Check the RefPipEquLen 
-			if ( lAlphaFieldBlanks( 13 ) && !lAlphaFieldBlanks( 12 ) ) {
+			if ( lNumericFieldBlanks( 17 ) && !lNumericFieldBlanks( 16 ) ) {
 				VRF( VRFNum ).RefPipEquLen = 1.2 * VRF( VRFNum ).RefPipLen;
-				ShowWarningError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\", \" " + cNumericFieldNames( 13 ) + "\" is calculated based on" );
-				ShowContinueError( "...the provided \"" + cNumericFieldNames( 12 ) + "\" value." );
+				ShowWarningError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\", \" " + cNumericFieldNames( 17 ) + "\" is calculated based on" );
+				ShowContinueError( "...the provided \"" + cNumericFieldNames( 16 ) + "\" value." );
 			} 
 			if ( VRF( VRFNum ).RefPipEquLen < VRF( VRFNum ).RefPipLen ) {
 				VRF( VRFNum ).RefPipEquLen = 1.2 * VRF( VRFNum ).RefPipLen;
-				ShowWarningError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\", invalid \" " + cNumericFieldNames( 13 ) + "\" value." );
+				ShowWarningError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\", invalid \" " + cNumericFieldNames( 17 ) + "\" value." );
 				ShowContinueError( "...Equivalent length of main pipe should be greater than or equal to the actural length." );
-				ShowContinueError( "...The value is recalculated based on the provided \"" + cNumericFieldNames( 12 ) + "\" value." );
+				ShowContinueError( "...The value is recalculated based on the provided \"" + cNumericFieldNames( 16 ) + "\" value." );
 			}
 			
 			// Crank case
-			VRF( VRFNum ).CCHeaterPower = rNumericArgs( 17 );
-			VRF( VRFNum ).NumCompressors = rNumericArgs( 18 );
-			VRF( VRFNum ).CompressorSizeRatio = rNumericArgs( 19 );
-			VRF( VRFNum ).MaxOATCCHeater = rNumericArgs( 20 );
+			VRF( VRFNum ).CCHeaterPower = rNumericArgs( 21 );
+			VRF( VRFNum ).NumCompressors = rNumericArgs( 22 );
+			VRF( VRFNum ).CompressorSizeRatio = rNumericArgs( 23 );
+			VRF( VRFNum ).MaxOATCCHeater = rNumericArgs( 24 );
 			
 			//Defrost
 			if ( ! lAlphaFieldBlanks( 10 ) ) {
@@ -2362,25 +2377,25 @@ namespace HVACVariableRefrigerantFlow {
 				}
 			}
 			
-			VRF( VRFNum ).DefrostFraction = rNumericArgs( 21 );
-			VRF( VRFNum ).DefrostCapacity = rNumericArgs( 22 );
-			VRF( VRFNum ).MaxOATDefrost = rNumericArgs( 23 );
+			VRF( VRFNum ).DefrostFraction = rNumericArgs( 25 );
+			VRF( VRFNum ).DefrostCapacity = rNumericArgs( 26 );
+			VRF( VRFNum ).MaxOATDefrost = rNumericArgs( 27 );
 			if ( VRF( VRFNum ).DefrostCapacity == 0.0 && VRF( VRFNum ).DefrostStrategy == Resistive ) {
 				ShowWarningError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cNumericFieldNames( 22 ) + " = 0.0 for defrost strategy = RESISTIVE." );
 			}
 			
-			VRF( VRFNum ).CompMaxDeltaP  = rNumericArgs( 24 );
+			VRF( VRFNum ).CompMaxDeltaP  = rNumericArgs( 28 );
 			
 			// The new VRF model is Air cooled
 			VRF( VRFNum ).CondenserType = AirCooled; 
 			VRF( VRFNum ).CondenserNodeNum = 0; 
 			
 			// Evaporative Capacity & Compressor Power Curves corresponding to each Loading Index / compressor speed
-			NumOfCompSpd = rNumericArgs( 25 );   
+			NumOfCompSpd = rNumericArgs( 29 );   
 			VRF( VRFNum ).CompressorSpeed.dimension( NumOfCompSpd );
 			VRF( VRFNum ).OUCoolingCAPFT.dimension( NumOfCompSpd );
 			VRF( VRFNum ).OUCoolingPWRFT.dimension( NumOfCompSpd );
-			int Count1Index = 25; // the index of the last numeric field before compressor speed entries
+			int Count1Index = 29; // the index of the last numeric field before compressor speed entries
 			int Count2Index = 11; // the index of the last alpha field before capacity/power curves
 			for ( NumCompSpd = 1; NumCompSpd <= NumOfCompSpd; NumCompSpd++ ) {
 				VRF( VRFNum ).CompressorSpeed( NumCompSpd ) = rNumericArgs( Count1Index + NumCompSpd );

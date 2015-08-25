@@ -14833,7 +14833,7 @@ Label50: ;
         } else {
         	CrankcaseHeatingPower = 0.0;
         }
-        
+		
         if( ( AirMassFlow > 0.0 ) && ( CompOp == On ) && 
             ( GetCurrentScheduleValue( DXCoil( DXCoilNum ).SchedPtr ) > 0.0 ) && 
             ( PartLoadRatio > 0.0 ) && ( OutdoorDryBulb > DXCoil( DXCoilNum ).MinOATCompressor ) ) {
