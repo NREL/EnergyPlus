@@ -8321,15 +8321,15 @@ This references a Material object that contains the soil properties and thicknes
 
 #### Field: Average Soil Surface Temperature
 
-If a GroundTemperatures:Surface object is not given in the input, this is \#1 of 3 inputs that must be given directly.  This represents the annual average soil temperature above the pipe.  This field can be calculated in advance using the separate CalcSoilSurfTemp program.
+If a Site:GroundTemperature:Shallow object is not given in the input, this is \#1 of 3 inputs that must be given directly.  This represents the annual average soil temperature above the pipe.  This field can be calculated in advance using the separate CalcSoilSurfTemp program.
 
 #### Field: Amplitude of Soil Surface Temperature
 
-If a GroundTemperatures:Surface object is not given in the input, this is \#2 of 3 inputs that must be given directly.  This represents the annual average soil temperature variation from the average temperature itself.  For example, if this were represented as a sine wave, this would simply be the amplitude of the curve.  This field can be calculated in advance using the separate CalcSoilSurfTemp program.
+If a Site:GroundTemperature:Shallow object is not given in the input, this is \#2 of 3 inputs that must be given directly.  This represents the annual average soil temperature variation from the average temperature itself.  For example, if this were represented as a sine wave, this would simply be the amplitude of the curve.  This field can be calculated in advance using the separate CalcSoilSurfTemp program.
 
 #### Field: Phase Constant of Soil Surface Temperature
 
-If a GroundTemperatures:Surface object is not given in the input, this is \#3 of 3 inputs that must be given directly.  This represents the time elapsed from the beginning of the year to the date of minimum surface temperature.  For example, if this were represented as a sine wave, this would simply be the phase shift of the curve.  This field can be calculated in advance using the separate CalcSoilSurfTemp program
+If a Site:GroundTemperature:Shallow object is not given in the input, this is \#3 of 3 inputs that must be given directly.  This represents the time elapsed from the beginning of the year to the date of minimum surface temperature.  For example, if this were represented as a sine wave, this would simply be the phase shift of the curve.  This field can be calculated in advance using the separate CalcSoilSurfTemp program
 
 In order to avoid having to run the preprocessor program to generate soil temperature, the user may choose to simply input a GroundTemperatures:Surface object.  This object inputs average monthly surface temperatures.  These temperatures are then used within the model to develop average ground surface data.  This ground surface data can then be used as part of the model boundary condition set.  Without a set of surface ground temperatures, the model will require user input of the three last input fields.
 
@@ -8344,7 +8344,7 @@ Pipe:Underground,
     Water,                              !- Fluid Name
     SunExposed,                         !- Sun Exposure
     0.05,                               !- Pipe Inside Diameter    
-    20.0,                               !- pipe Length
+    20.0,                               !- Pipe Length
     Buried Pipe Soil,                   !- Soil Material
     13,                                 !- Average Soil Surface Temperature
     1.5,                                !- Amplitude of Soil Surface Temperature
