@@ -206,7 +206,16 @@ namespace MixedAir {
 	bool GetOASysInputFlag( true ); // Flag set to make sure you get input once
 	bool GetOAMixerInputFlag( true ); // Flag set to make sure you get input once
 	bool GetOAControllerInputFlag( true ); // Flag set to make sure you get input once
-
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitOAControllerOneTimeFlag( true );
+		bool InitOAControllerSetPointCheckFlag( true );
+		bool InitOAControllerSetUpAirLoopHVACVariables( true );
+	}
 	//SUBROUTINE SPECIFICATIONS FOR MODULE MixedAir
 	// Driver/Manager Routines
 
@@ -232,114 +241,39 @@ namespace MixedAir {
 
 	Real64 OAGetFlowRate( int OAPtr )
 	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Simon Vidanovic
-		//       DATE WRITTEN   March 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE
-		// Return flow rate [m3/s] for current controller
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
 		Real64 FlowRate( 0 );
-
 		if ( ( OAPtr > 0 ) && ( OAPtr <= NumOAControllers ) && ( StdRhoAir != 0 ) )
 		{
 			FlowRate = OAController( OAPtr ).OAMassFlow / StdRhoAir;
 		}
-
 		return FlowRate;
 	}
-
 	Real64 OAGetMinFlowRate( int OAPtr )
 	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Simon Vidanovic
-		//       DATE WRITTEN   March 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE
-		// Return min flow rate [m3/s] for current controller
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
 		Real64 MinFlowRate( 0 );
-
 		if ( ( OAPtr > 0 ) && ( OAPtr <= NumOAControllers ) )
 		{
 			MinFlowRate = OAController( OAPtr ).MinOA;
 		}
-
 		return MinFlowRate;
 	}
-
 	void OASetDemandManagerVentilationState( int OAPtr, bool aState )
 	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Simon Vidanovic
-		//       DATE WRITTEN   March 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE
-		// Setting if controller is in demand manager state
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
 		if ( ( OAPtr > 0 ) && ( OAPtr <= NumOAControllers ) )
 		{
 			OAController( OAPtr ).ManageDemand = aState;
 		}
 	}
-
 	void OASetDemandManagerVentilationFlow( int OAPtr, Real64 aFlow )
 	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Simon Vidanovic
-		//       DATE WRITTEN   March 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE
-		// Set demand manager flow rate for use in managing demand use
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
 		if ( ( OAPtr > 0 ) && ( OAPtr <= NumOAControllers ) )
 		{
 			OAController( OAPtr ).DemandLimitFlowRate = aFlow * StdRhoAir;
 		}
-
 	}
-
 	int GetOAController( std::string const & OAName )
 	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Simon Vidanovic
-		//       DATE WRITTEN   March 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE
-		// To get correct OA controller pointer for purpose of setting properties
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
 		int CurrentOAController( 0 );
-
 		for ( int i = 1; i <= NumOAControllers; i++ )
 		{
 			if ( OAName == OAController( i ).Name ) {
@@ -347,10 +281,8 @@ namespace MixedAir {
 				break;
 			}
 		}
-
 		return CurrentOAController;
 	}
-
 	// Clears the global data in MixedAir.
 	// Needed for unit tests, should not be normally called.
 	void
@@ -366,6 +298,9 @@ namespace MixedAir {
 		GetOASysInputFlag = true;
 		GetOAMixerInputFlag = true;
 		GetOAControllerInputFlag = true;
+		InitOAControllerOneTimeFlag = true;
+		InitOAControllerSetPointCheckFlag = true;
+		InitOAControllerSetUpAirLoopHVACVariables = true;
 		ControllerLists.deallocate();
 		OAController.deallocate();
 		OAMixer.deallocate();
@@ -2041,7 +1976,7 @@ namespace MixedAir {
 											if ( SameString( ZoneEquipList( EquipListNum ).EquipType( EquipNum ), "ZONEHVAC:AIRDISTRIBUTIONUNIT" ) ) {
 												for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 													if ( SameString( ZoneEquipList( EquipListNum ).EquipName( EquipNum ), AirDistUnit( ADUNum ).Name ) ) {
-														if ( ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctVAVReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctConstVolReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctVAVNoReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctVAVReheatVSFan ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctCBVAVReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctCBVAVNoReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctConstVolCooledBeam ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == DualDuctVAVOutdoorAir ) ) {
+														if ( ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctVAVReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctConstVolReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctVAVNoReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctVAVReheatVSFan ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctCBVAVReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctCBVAVNoReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctConstVolCooledBeam ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctConstVolFourPipeBeam )  || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == DualDuctVAVOutdoorAir ) ) {
 															ShowWarningError( CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", inappropriate use of Zone secondary recirculation" );
 															ShowContinueError( "A zone secondary recirculation fraction is specified for zone served by " );
 															ShowContinueError( "...terminal unit \"" + AirDistUnit( ADUNum ).Name + "\" , that indicates a single path system" );
@@ -2755,9 +2690,11 @@ namespace MixedAir {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true ); // One-time initialization flag
-		static bool MySetPointCheckFlag( true ); // One-time initialization flag
-		static bool SetUpAirLoopHVACVariables( true ); // One-time initialization flag
+		/////////// hoisted into namespace 
+		//static bool MyOneTimeFlag( true ); // One-time initialization flag
+		//static bool MySetPointCheckFlag( true ); // One-time initialization flag
+		//static bool SetUpAirLoopHVACVariables( true ); // One-time initialization flag
+		//////////////////////////////////
 		static Array1D_bool MyEnvrnFlag; // One-time initialization flag
 		static Array1D_bool MySizeFlag; // One-time initialization flag
 		static Array1D_bool MechVentCheckFlag; // One-time initialization flag
@@ -2804,7 +2741,7 @@ namespace MixedAir {
 		ErrorsFound = false;
 		OANode = 0;
 
-		if ( MyOneTimeFlag ) {
+		if ( InitOAControllerOneTimeFlag ) {
 
 			MyEnvrnFlag.dimension( NumOAControllers, true );
 			MySizeFlag.dimension( NumOAControllers, true );
@@ -2867,11 +2804,11 @@ namespace MixedAir {
 				}}
 
 			}
-			MyOneTimeFlag = false;
+			InitOAControllerOneTimeFlag = false;
 
 		}
 
-		if ( ! SysSizingCalc && MySetPointCheckFlag && DoSetPointTest && ! FirstHVACIteration ) {
+		if ( ! SysSizingCalc && InitOAControllerSetPointCheckFlag && DoSetPointTest && ! FirstHVACIteration ) {
 			for ( OAControllerIndex = 1; OAControllerIndex <= NumOAControllers; ++OAControllerIndex ) {
 				MixedAirNode = OAController( OAControllerIndex ).MixNode;
 				if ( MixedAirNode > 0 ) {
@@ -2898,7 +2835,7 @@ namespace MixedAir {
 				}
 			}
 
-			MySetPointCheckFlag = false;
+			InitOAControllerSetPointCheckFlag = false;
 		}
 
 		if ( ! SysSizingCalc && MySizeFlag( OAControllerNum ) ) {
@@ -3137,7 +3074,7 @@ namespace MixedAir {
 		// If AirloopHVAC objects are not used, NumPrimaryAirSys is always equal to 0 and only these
 		// two IF statements are checked each time through Init (e.g., if StandAloneERV controllers are used
 		// without AirloopHVAC objects).
-		if ( SetUpAirLoopHVACVariables ) {
+		if ( InitOAControllerSetUpAirLoopHVACVariables ) {
 			if ( NumPrimaryAirSys > 0 ) {
 				// Added code to report (TH, 10/20/2008):
 				//   air economizer status (1 = on, 0 = off or does not exist), and
@@ -3214,7 +3151,7 @@ namespace MixedAir {
 
 				}
 
-				SetUpAirLoopHVACVariables = false;
+				InitOAControllerSetUpAirLoopHVACVariables = false;
 
 			}
 		}
@@ -4288,11 +4225,8 @@ namespace MixedAir {
 			OAController( OAControllerNum ).OAMassFlow = min( OAController( OAControllerNum ).OAMassFlow, OAController( OAControllerNum ).MaxOAMassFlowRate );
 		}
 
-		// Update OAMassFlow if there is Demand Manager on ventilation
-		// Implement demand managers before EMS override because we want EMS to have higher priority than demand manager
 		if ( !WarmupFlag && !DoingSizing && ( OAController( OAControllerNum ).ManageDemand ) && ( OAController( OAControllerNum ).OAMassFlow > OAController( OAControllerNum ).DemandLimitFlowRate ) )
 			OAController( OAControllerNum ).OAMassFlow = OAController( OAControllerNum ).DemandLimitFlowRate;
-
 		if ( OAController( OAControllerNum ).EMSOverrideOARate ) {
 			OAController( OAControllerNum ).OAMassFlow = OAController( OAControllerNum ).EMSOARateValue;
 		}
@@ -4750,8 +4684,8 @@ namespace MixedAir {
 			}
 			else
 			{
-				Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
-				Node( InletAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
+			Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
+			Node( InletAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
 				Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).OAMassFlow;
 			}
 			Node( RelAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).RelMassFlow;
@@ -4767,8 +4701,8 @@ namespace MixedAir {
 			}
 			else
 			{
-				Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
-				Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).OAMassFlow;
+			Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
+			Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).OAMassFlow;
 			}
 			Node( RetAirNodeNum ).MassFlowRate = Node( OAController( OAControllerNum ).RetNode ).MassFlowRate;
 			Node( RetAirNodeNum ).MassFlowRateMaxAvail = Node( OAController( OAControllerNum ).RetNode ).MassFlowRate;

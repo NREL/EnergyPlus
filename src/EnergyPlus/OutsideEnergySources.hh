@@ -98,6 +98,8 @@ namespace OutsideEnergySources {
 	extern Array1D< ReportVars > EnergySourceReport;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimOutsideEnergy(

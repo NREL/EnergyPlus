@@ -75,6 +75,15 @@ namespace HeatBalanceAirManager {
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
 
+
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool ManageAirHeatBalanceGetInputFlag( true );
+	}
 	//         Subroutine Specifications for the Heat Balance Module
 	// Driver Routines
 
@@ -89,6 +98,12 @@ namespace HeatBalanceAirManager {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state()
+	{
+		ManageAirHeatBalanceGetInputFlag =  true;
+	}
+
 
 	void
 	ManageAirHeatBalance()
@@ -129,14 +144,15 @@ namespace HeatBalanceAirManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true );
-
+		/////////// hoisted into namespace changed to ManageAirHeatBalanceGetInputFlag////////////
+		//static bool ManageAirHeatBalanceGetInputFlag( true );
+		/////////////////////////////////////////////
 		// FLOW:
 
 		// Obtains and Allocates heat balance related parameters from input file
-		if ( GetInputFlag ) {
+		if ( ManageAirHeatBalanceGetInputFlag ) {
 			GetAirHeatBalanceInput();
-			GetInputFlag = false;
+			ManageAirHeatBalanceGetInputFlag = false;
 		}
 
 		InitAirHeatBalance(); // Initialize all heat balance related parameters

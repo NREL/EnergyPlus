@@ -7,6 +7,7 @@
 #include <EnergyPlus/MixedAir.hh>
 
 #include "Fixtures/HVACFixture.hh"
+#include <EnergyPlus/OutAirNodeManager.hh>
 
 using namespace EnergyPlus::MixedAir;
 

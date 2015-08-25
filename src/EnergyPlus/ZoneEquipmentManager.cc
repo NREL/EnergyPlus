@@ -127,6 +127,16 @@ namespace ZoneEquipmentManager {
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
+		namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool SizeZoneEquipmentOneTimeFlag( true );
+		bool InitZoneEquipmentOneTimeFlag( true );
+	}
+
 	Array1D< Real64 > AvgData; // scratch array for storing averaged data
 	Array1D_int DefaultSimOrder;
 	int NumOfTimeStepInDay; // number of zone time steps in a day
@@ -138,6 +148,17 @@ namespace ZoneEquipmentManager {
 	Array1D< SimulationOrder > PrioritySimOrder;
 
 	// Functions
+	void
+	clear_state()
+	{
+		SizeZoneEquipmentOneTimeFlag = true;
+		InitZoneEquipmentOneTimeFlag =  true;
+		AvgData.deallocate(); // scratch array for storing averaged data
+		DefaultSimOrder.deallocate();
+		NumOfTimeStepInDay = 0; // number of zone time steps in a day
+		GetZoneEquipmentInputFlag = true ;
+		PrioritySimOrder.deallocate();
+	}
 
 	void
 	ManageZoneEquipment(
@@ -318,7 +339,9 @@ namespace ZoneEquipmentManager {
 		int ZoneExhNode;
 		int ControlledZoneNum;
 		int ZoneReturnAirNode;
-		static bool MyOneTimeFlag( true );
+		/////////// hoisted into namespace InitZoneEquipmentOneTimeFlag////////////
+		//static bool MyOneTimeFlag( true );
+		///////////////////////////
 		static bool MyEnvrnFlag( true );
 		int ZoneEquipType; // Type of zone equipment
 		int TotalNumComp; // Total number of zone components of ZoneEquipType
@@ -326,8 +349,8 @@ namespace ZoneEquipmentManager {
 		int ZoneEquipCount;
 		// Flow
 
-		if ( MyOneTimeFlag ) {
-			MyOneTimeFlag = false;
+		if ( InitZoneEquipmentOneTimeFlag ) {
+			InitZoneEquipmentOneTimeFlag = false;
 			TermUnitSizing.allocate( NumOfZones );
 			ZoneEqSizing.allocate( NumOfZones );
 			// setup zone equipment sequenced demand storage
@@ -532,7 +555,9 @@ namespace ZoneEquipmentManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
+		/////////// hoisted into namespace changed to SizeZoneEquipmentOneTimeFlag////////////
+		//static bool MyOneTimeFlag( true );
+		///////////////////////////////////////////////
 		int ControlledZoneNum; // controlled zone index
 		int ActualZoneNum; // index into Zone array (all zones)
 		int SupplyAirNode; // node number of zone supply air node
@@ -548,9 +573,9 @@ namespace ZoneEquipmentManager {
 		Real64 MassFlowRate; // inlet mass flow rate [kg/s]
 		Real64 RetTemp; // zone return temperature [C]
 
-		if ( MyOneTimeFlag ) {
+		if ( SizeZoneEquipmentOneTimeFlag ) {
 			SetUpZoneSizingArrays();
-			MyOneTimeFlag = false;
+			SizeZoneEquipmentOneTimeFlag = false;
 		}
 
 		for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
