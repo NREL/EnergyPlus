@@ -786,7 +786,7 @@ namespace HVACVariableRefrigerantFlow {
 			TotalTUHeatingCapacity = TotalCondHeatingCapacity * VRF( VRFCond ).PipingCorrectionHeating;
 			if ( TotalCondHeatingCapacity > 0.0 ) {
 				HeatingPLR = ( TUHeatingLoad / VRF( VRFCond ).PipingCorrectionHeating ) / TotalCondHeatingCapacity;
-				HeatingPLR += LoadDueToDefrost / TotalCondHeatingCapacity;
+				HeatingPLR += ( LoadDueToDefrost * HeatingPLR ) / TotalCondHeatingCapacity;
 			} else {
 				HeatingPLR = 0.0;
 			}
