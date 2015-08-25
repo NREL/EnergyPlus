@@ -4075,33 +4075,35 @@ namespace DXCoils {
 
 				// Read waste heat modifier curve name
 				DXCoil( DXCoilNum ).MSWasteHeat( I ) = GetCurveIndex( Alphas( 18 + ( I - 1 ) * 6 ) ); // convert curve name to number
-				if ( DXCoil( DXCoilNum ).MSWasteHeat( I ) == 0 ) {
-					if ( lAlphaBlanks( 18 + ( I - 1 ) * 6 ) ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
-						ShowContinueError( "...required " + cAlphaFields( 18 + ( I - 1 ) * 6 ) + " is blank." );
-					} else {
-						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-						ShowContinueError( "...not found " + cAlphaFields( 18 + ( I - 1 ) * 6 ) + "=\"" + Alphas( 18 + ( I - 1 ) * 6 ) + "\"." );
-					}
-					ErrorsFound = true;
-				} else {
-					// Verify Curve Object, only legal types are BiQuadratic
-					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSWasteHeat( I ) ) );
-
-					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( I ), RatedOutdoorAirTemp, RatedInletAirTemp );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( "..." + cAlphaFields( 18 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
+				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
+					if ( DXCoil( DXCoilNum ).MSWasteHeat( I ) == 0 ) {
+						if ( lAlphaBlanks( 18 + ( I - 1 ) * 6 ) ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
+							ShowContinueError( "...required " + cAlphaFields( 18 + ( I - 1 ) * 6 ) + " is blank." );
+						} else {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+							ShowContinueError( "...not found " + cAlphaFields( 18 + ( I - 1 ) * 6 ) + "=\"" + Alphas( 18 + ( I - 1 ) * 6 ) + "\"." );
 						}
-
-					} else {
-						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-						ShowContinueError( "...illegal " + cAlphaFields( 18 + ( I - 1 ) * 6 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).MSWasteHeat( I ) ) );
-						ShowContinueError( "Curve type must be BiQuadratic." );
 						ErrorsFound = true;
-					}}
+					} else {
+						// Verify Curve Object, only legal types are BiQuadratic
+						{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSWasteHeat( I ) ) );
+
+						if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+							CurveVal = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( I ), RatedOutdoorAirTemp, RatedInletAirTemp );
+							if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
+								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
+								ShowContinueError( "..." + cAlphaFields( 18 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
+								ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
+							}
+
+						} else {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+							ShowContinueError( "...illegal " + cAlphaFields( 18 + ( I - 1 ) * 6 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).MSWasteHeat( I ) ) );
+							ShowContinueError( "Curve type must be BiQuadratic." );
+							ErrorsFound = true;
+						}}
+					}
 				}
 
 				DXCoil( DXCoilNum ).MSEvapCondEffect( I ) = Numbers( 16 + ( I - 1 ) * 13 );
@@ -4548,7 +4550,7 @@ namespace DXCoils {
 						ErrorsFound = true;
 					}}
 
-					if ( ! ErrorsFound ) {
+					if ( !ErrorsFound ) {
 						//       Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
 						MinCurveVal = 999.0;
 						MaxCurveVal = -999.0;
@@ -4588,35 +4590,37 @@ namespace DXCoils {
 
 				// Read waste heat modifier curve name
 				DXCoil( DXCoilNum ).MSWasteHeat( I ) = GetCurveIndex( Alphas( 15 + ( I - 1 ) * 6 ) ); // convert curve name to number
-				if ( DXCoil( DXCoilNum ).MSWasteHeat( I ) == 0 ) {
-					if ( lAlphaBlanks( 11 ) ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
-						ShowContinueError( "...required " + cAlphaFields( 15 + ( I - 1 ) * 6 ) + " is blank." );
-					} else {
-						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-						ShowContinueError( "...not found " + cAlphaFields( 15 + ( I - 1 ) * 6 ) + "=\"" + Alphas( 15 + ( I - 1 ) * 6 ) + "\"." );
-					}
-					ErrorsFound = true;
-				} else {
-					// Verify Curve Object, only legal types are BiQuadratic
-					{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSWasteHeat( I ) ) );
-
-					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-						CurveVal = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( I ), RatedOutdoorAirTempHeat, RatedInletAirTempHeat );
-						if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
-							ShowContinueError( "..." + cAlphaFields( 15 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
-							ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
+				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
+					if ( DXCoil( DXCoilNum ).MSWasteHeat( I ) == 0 ) {
+						if ( lAlphaBlanks( 11 ) ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
+							ShowContinueError( "...required " + cAlphaFields( 15 + ( I - 1 ) * 6 ) + " is blank." );
+						} else {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+							ShowContinueError( "...not found " + cAlphaFields( 15 + ( I - 1 ) * 6 ) + "=\"" + Alphas( 15 + ( I - 1 ) * 6 ) + "\"." );
 						}
-
-					} else {
-						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-						ShowContinueError( "...illegal " + cAlphaFields( 15 + ( I - 1 ) * 6 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).MSWasteHeat( I ) ) );
-						ShowContinueError( "Curve type must be BiQuadratic." );
 						ErrorsFound = true;
-					}}
-				}
+					} else {
+						// Verify Curve Object, only legal types are BiQuadratic
+						{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSWasteHeat( I ) ) );
 
+						if ( SELECT_CASE_var == "BIQUADRATIC" ) {
+							CurveVal = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( I ), RatedOutdoorAirTempHeat, RatedInletAirTempHeat );
+							if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
+								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", curve values" );
+								ShowContinueError( "..." + cAlphaFields( 15 + ( I - 1 ) * 6 ) + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
+								ShowContinueError( "...Curve output at rated conditions = " + TrimSigDigits( CurveVal, 3 ) );
+							}
+
+						} else {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+							ShowContinueError( "...illegal " + cAlphaFields( 15 + ( I - 1 ) * 6 ) + " type for this object = " + GetCurveType( DXCoil( DXCoilNum ).MSWasteHeat( I ) ) );
+							ShowContinueError( "Curve type must be BiQuadratic." );
+							ErrorsFound = true;
+						}}
+					}
+
+				}
 			}
 			//A34; \field Zone Name for Condenser Placement
 			if ( !lAlphaBlanks( 34 ) && NumAlphas > 33 ) {
@@ -10459,10 +10463,11 @@ Label50: ;
 				HeatReclaimDXCoil( DXCoilNum ).AvailCapacity = DXCoil( DXCoilNum ).TotalCoolingEnergyRate + DXCoil( DXCoilNum ).ElecCoolingPower;
 
 				// Waste heat calculation
-				WasteHeatLS = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS );
-				WasteHeatHS = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumHS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumHS );
-				MSHPWasteHeat = ( SpeedRatio * WasteHeatHS + ( 1.0 - SpeedRatio ) * WasteHeatLS ) * DXCoil( DXCoilNum ).ElecCoolingPower;
-
+				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
+					WasteHeatLS = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS );
+					WasteHeatHS = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumHS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumHS );
+					MSHPWasteHeat = ( SpeedRatio * WasteHeatHS + ( 1.0 - SpeedRatio ) * WasteHeatLS ) * DXCoil( DXCoilNum ).ElecCoolingPower;
+				}
 				// Energy use for other fuel types
 				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
 					DXCoil( DXCoilNum ).FuelUsed = DXCoil( DXCoilNum ).ElecCoolingPower;
@@ -10639,8 +10644,9 @@ Label50: ;
 				EvapCondPumpElecPower = DXCoil( DXCoilNum ).MSEvapCondPumpElecNomPower( SpeedNumLS ) * DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction;
 
 				// Waste heat
-				MSHPWasteHeat = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS ) * DXCoil( DXCoilNum ).ElecCoolingPower;
-
+				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
+					MSHPWasteHeat = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS ) * DXCoil( DXCoilNum ).ElecCoolingPower;
+				}
 				// Energy use for other fuel types
 				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
 					DXCoil( DXCoilNum ).FuelUsed = DXCoil( DXCoilNum ).ElecCoolingPower;
@@ -11096,9 +11102,11 @@ Label50: ;
 				}
 
 				// Waste heat calculation
-				WasteHeatLS = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS );
-				WasteHeatHS = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumHS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumHS );
-				MSHPWasteHeat = ( SpeedRatio * WasteHeatHS + ( 1.0 - SpeedRatio ) * WasteHeatLS ) * DXCoil( DXCoilNum ).ElecHeatingPower;
+				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
+					WasteHeatLS = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS );
+					WasteHeatHS = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumHS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumHS );
+					MSHPWasteHeat = ( SpeedRatio * WasteHeatHS + ( 1.0 - SpeedRatio ) * WasteHeatLS ) * DXCoil( DXCoilNum ).ElecHeatingPower;
+				}
 				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
 					DXCoil( DXCoilNum ).FuelUsed = DXCoil( DXCoilNum ).ElecHeatingPower;
 					DXCoil( DXCoilNum ).ElecHeatingPower = 0.0;
@@ -11285,8 +11293,9 @@ Label50: ;
 					OutletAirEnthalpy = InletAirEnthalpy + DXCoil( DXCoilNum ).TotalHeatingEnergyRate / DXCoil( DXCoilNum ).InletAirMassFlowRate;
 					OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
 				}
-				MSHPWasteHeat = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS ) * DXCoil( DXCoilNum ).ElecHeatingPower;
-
+				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
+					MSHPWasteHeat = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS ) * DXCoil( DXCoilNum ).ElecHeatingPower;
+				}
 				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
 					DXCoil( DXCoilNum ).FuelUsed = DXCoil( DXCoilNum ).ElecHeatingPower;
 					DXCoil( DXCoilNum ).ElecHeatingPower = 0.0;
