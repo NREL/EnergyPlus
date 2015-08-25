@@ -481,6 +481,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   END IF
                 END DO
 
+              CASE('EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                ! we'll be adding a new flow rate field F5 to autosize
+                OutArgs(1:4) = InArgs(1:4)
+                OutArgs(5) = 'Autosize'
+                OutArgs(6:17) = InArgs(5:16)
+                CurArgs = CurArgs + 1
+                
               ! This was actually missed in the 8.1 to 8.2 transition, so it is included here as a redundancy
               CASE('HVACTEMPLATE:PLANT:CHILLEDWATERLOOP')
                 nodiff=.false.
