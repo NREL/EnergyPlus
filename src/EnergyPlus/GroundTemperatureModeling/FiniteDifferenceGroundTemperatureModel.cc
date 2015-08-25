@@ -21,10 +21,11 @@
 namespace EnergyPlus {
 
 	using DataGlobals::SecsInDay;
-	
-	int daysInYear = 365;
+	using WeatherManager::NumDaysInYear;
 	int simDay = 0;
-	Real64 finalTempConvergenceCriteria = 0.25; // FOR TESTING ONLY
+	int numIterYears = 0;
+	int const maxYearsToIterate = 10;
+	Real64 finalTempConvergenceCriteria = 0.5;//0.05; FOR TESTING ONLY
 	Real64 iterationTempConvergenceCriteria = 0.00001;
 
 	//******************************************************************************
@@ -157,11 +158,18 @@ namespace EnergyPlus {
 		Real64 annualAveAirTemp_num;
 		int denominator;
 
+		// Save current environment to we can revert back when done
+		int Envrn_reset = Envrn;
+		bool BeginEnvrnFlag_reset = BeginEnvrnFlag;
+		bool EndEnvrnFlag_reset = EndEnvrnFlag;
+		bool EndMonthFlag_reset = EndMonthFlag;
+		bool WarmupFlag_reset = WarmupFlag;
+		int DayOfSim_reset = DayOfSim;
+		std::string DayOfSimChr_reset = DayOfSimChr;
+		int NumOfWarmupDays_reset = NumOfWarmupDays;
+
 		ResetEnvironmentCounter();
 
-		//std::ofstream outFile( "WeatherFileData.csv", std::ofstream::out );
-
-		WarmupFlag = false;
 		Available = true;
 		ErrorsFound = false;
 
@@ -171,7 +179,7 @@ namespace EnergyPlus {
 
 			if ( KindOfSim != ksReadAllWeatherData ) continue;
 
-			weatherDataArray.dimension( daysInYear );
+			weatherDataArray.dimension( NumDaysInYear );
 
 			BeginEnvrnFlag = true;
 			EndEnvrnFlag = false;
@@ -255,13 +263,22 @@ namespace EnergyPlus {
 				tdwd.airDensity = airDensity_num / denominator;
 				annualAveAirTemp_num += tdwd.dryBulbTemp;
 
-				//outFile << tdwd.dryBulbTemp << "," << tdwd.relativeHumidity << "," << tdwd.windSpeed << "," << tdwd.horizontalRadiation << "," << tdwd.airDensity << std::endl;
-
 			} // ... End day loop.
 
 		} // ... End environment loop.
 
-		annualAveAirTemp = annualAveAirTemp_num / daysInYear; // Used for initalizing domain
+		annualAveAirTemp = annualAveAirTemp_num / NumDaysInYear; // Used for initalizing domain
+
+		// Reset Envrionment when done reading data
+		--NumOfEnvrn;
+		Envrn = Envrn_reset;
+		BeginEnvrnFlag = BeginEnvrnFlag_reset;
+		EndEnvrnFlag = EndEnvrnFlag_reset;
+		EndMonthFlag = EndMonthFlag_reset;
+		WarmupFlag = WarmupFlag_reset;
+		DayOfSim = DayOfSim_reset;
+		DayOfSimChr = DayOfSimChr_reset;
+		NumOfWarmupDays = NumOfWarmupDays_reset;
 	}
 
 	//******************************************************************************
@@ -279,8 +296,6 @@ namespace EnergyPlus {
 		// Creates static mesh used for model
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		//std::ofstream static outFile( "MeshData.csv", std::ofstream::out );
 		
 		// Surface layer parameters
 		Real64 surfaceLayerThickness = 2.0;
@@ -353,7 +368,6 @@ namespace EnergyPlus {
 			thisCell.props.specificHeat = baseSpecificHeat;
 			thisCell.props.diffusivity = baseConductivity / ( baseDensity * baseSpecificHeat );
 
-			//outFile << thisCell.index << "," << thisCell.thickness << "," << thisCell.minZValue << "," << thisCell.maxZValue << std::endl;
 		}
 	}
 
@@ -373,35 +387,17 @@ namespace EnergyPlus {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		//std::ofstream static outFile( "FinalTemps.csv", std::ofstream::out );
-		//std::ofstream static outFile_Jan1( "Jan1.csv", std::ofstream::out );
-		//std::ofstream static outFile_June1( "June1.csv", std::ofstream::out );
-
 		timeStepInSeconds = SecsInDay; 
 		bool convergedFinal = false;
 		//int yearCounter = 0;
 
 		initDomain();
 
-		//for (int i = 1; i <= totalNumCells; ++i ) {
-		//		outFile_Jan1 << "," << cellArray(i).minZValue;
-		//	}
-		//
-		//outFile_Jan1 << std::endl;
-
-		//outFile_Jan1 << "0";
-
-		//for (int i = 1; i <= totalNumCells; ++i ) {
-		//		outFile_Jan1 << "," << cellArray(i).temperature;
-		//	}
-
-		//outFile_Jan1 << std::endl;
-
 		// Loop until converged
 		do {
 		
 			// loop over all days
-			for ( simDay = 1; simDay <= daysInYear; ++simDay ) {
+			for ( simDay = 1; simDay <= NumDaysInYear; ++simDay ) {
 
 					bool iterationConverged = false;
 
@@ -439,35 +435,9 @@ namespace EnergyPlus {
 
 			// Check final temperature convergence
 			convergedFinal = checkFinalTemperatureConvergence();
-			
-			//++yearCounter;
-			//
-			//outFile_Jan1 << yearCounter;
-			//outFile_June1 << yearCounter;
 
-			//for (int i = 1; i <= totalNumCells; ++i ) {
-			//	outFile_Jan1 << "," << groundTemps( 1, i );
-			//	outFile_June1 << "," << groundTemps( 152, i );
-			//}
-
-			//outFile_Jan1 << std::endl;
-			//outFile_June1 << std::endl;
 
 		} while ( !convergedFinal );
-
-		// Output final annual temps for testing
-		//for ( int cell = 1; cell <= totalNumCells; ++cell ) {
-
-		//	outFile << cellArray( cell ).minZValue;
-
-		//	for ( int day = 1; day <= daysInYear; ++ day ) {
-		//		if ( day < daysInYear ) {
-		//			outFile << "," << groundTemps( day, cell );
-		//		} else {
-		//			outFile << "," << groundTemps( day, cell ) << "," << std::endl;
-		//		}
-		//	}
-		//}
 	}
 
 	//******************************************************************************
@@ -746,6 +716,8 @@ namespace EnergyPlus {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool converged = true;
 
+		if ( numIterYears == maxYearsToIterate ) return converged;
+
 		for ( int cell = 1; cell <= totalNumCells; ++ cell ) {
 		
 			auto & thisCell = cellArray( cell );
@@ -756,6 +728,8 @@ namespace EnergyPlus {
 
 			thisCell.temperature_finalConvergence = thisCell.temperature;
 		}
+
+		++ numIterYears;
 
 		return converged;
 	}
@@ -848,7 +822,7 @@ namespace EnergyPlus {
 		evaluateSoilRhoCp( _, true );
 
 		// Initialize the groundTemps array
-		groundTemps.dimension( { 1, daysInYear }, { 1, totalNumCells }, 0.0 );
+		groundTemps.dimension( { 1, NumDaysInYear }, { 1, totalNumCells }, 0.0 );
 
 		// Need to delete tempModel?
 
@@ -986,10 +960,10 @@ namespace EnergyPlus {
 			// All depths within domain
 			j1 = j0 + 1;
 
-			if ( simTimeInDays <= 1 || simTimeInDays >= daysInYear) {
+			if ( simTimeInDays <= 1 || simTimeInDays >= NumDaysInYear) {
 				// First day of year, last day of year, and leap day
 				// Interpolate between first and last day
-				i0 = daysInYear;
+				i0 = NumDaysInYear;
 				i1 = 1;
 
 				// Lookup ground temps
@@ -1028,10 +1002,10 @@ namespace EnergyPlus {
 			// Requesting a temperature deeper than domain. Pass deepest point in domain.
 			j1 = j0;
 
-			if ( simTimeInDays <= 1 || simTimeInDays >= daysInYear) {
+			if ( simTimeInDays <= 1 || simTimeInDays >= NumDaysInYear) {
 				// First day of year, last day of year, and leap day
 				// Interpolate between first and last day
-				i0 = daysInYear;
+				i0 = NumDaysInYear;
 				i1 = 1;
 
 				// Lookup ground temps
@@ -1075,12 +1049,14 @@ namespace EnergyPlus {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Retrieves ground tempeature when input time is in seconds
 
+		//Using
+		using DataGlobals::SecsInDay;
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 const secPerDay = 24 * 3600;
 
 		depth = _depth;
 
-		simTimeInDays = seconds / secPerDay;
+		simTimeInDays = seconds / SecsInDay;
 
 		return getGroundTemp();
 	}
@@ -1103,7 +1079,7 @@ namespace EnergyPlus {
 		// Returns ground temperature when input time is in months
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 const aveDaysInMonth = daysInYear / 12;
+		Real64 const aveDaysInMonth = NumDaysInYear / 12;
 
 		depth = _depth;
 

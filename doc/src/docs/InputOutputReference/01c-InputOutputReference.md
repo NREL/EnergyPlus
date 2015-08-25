@@ -744,7 +744,6 @@ GroundHeatExchanger:HorizontalTrench,
    0.408;       !- Evapotranspiration Ground Cover Parameter
 ```
 
-
 ### Horizontal Trench Ground Heat Exchanger Outputs
 
 * HVAC,Average,Ground Heat Exchanger Mass Flow Rate [kg/s]

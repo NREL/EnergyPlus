@@ -8,6 +8,7 @@
 #include <GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <InputProcessor.hh>
+#include <WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -59,9 +60,9 @@ namespace EnergyPlus {
 				thisModel->objectType = objectType;
 				thisModel->groundThermalDiffisivity = rNumericArgs( 1 ) / ( rNumericArgs( 2 ) * rNumericArgs( 3 ) );
 
-				bool useGroundTempDataForKusuda = lNumericFieldBlanks( 4 ) || lNumericFieldBlanks( 5 ) || lNumericFieldBlanks( 6 );
+				bool useGroundTempDataForKusuda = rNumericArgs( 4 ) || rNumericArgs( 5 ) || rNumericArgs( 6 );
 
-				if ( !useGroundTempDataForKusuda ) {
+				if ( useGroundTempDataForKusuda ) {
 					// Use Kusuda Parameters
 					thisModel->aveGroundTemp = rNumericArgs( 4 );
 					thisModel->aveGroundTempAmplitude = rNumericArgs( 5 );
@@ -73,42 +74,40 @@ namespace EnergyPlus {
 					int avgDaysInMonth( 30 );
 					int monthOfMinSurfTemp( 0 );
 					Real64 averageGroundTemp( 0 );
-					Real64 averageGroundTempAmplitude( 0 );
+					Real64 amplitudeOfGroundTemp( 0 );
 					Real64 phaseShiftOfMinGroundTempDays( 0 );
 					Real64 minSurfTemp( 100 ); // Set high month 1 temp will be lower and actually get updated
+					Real64 maxSurfTemp( -100 ); // Set low initially but will get updated
 
 					std::shared_ptr< BaseGroundTempsModel > shallowObj = GetGroundTempModelAndInit( CurrentModuleObjects( objectType_SiteShallowGroundTemp ), "" );
 
-					// Calculate Average Ground Temperature for all 12 months of the year:
-					for ( int monthIndex = 1; monthIndex <= 12; ++monthIndex ) {
-						averageGroundTemp += shallowObj->getGroundTempAtTimeInMonths( 0.0, monthIndex );
-					}
 					
-					averageGroundTemp /= monthsInYear;
-
-					// Calculate Average Amplitude from Average:;
 					for ( int monthIndex = 1; monthIndex <= 12; ++monthIndex ) {
-						Real64 currMonthTemp;
-						currMonthTemp = shallowObj->getGroundTempAtTimeInMonths( 0.0, monthIndex );
-						averageGroundTempAmplitude += abs( currMonthTemp - averageGroundTemp );
-					}
-
-					averageGroundTempAmplitude /= monthsInYear;
-
-					// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
-					for ( int monthIndex = 1; monthIndex <= monthsInYear; ++monthIndex ) {
 						Real64 currMonthTemp = shallowObj->getGroundTempAtTimeInMonths( 0.0, monthIndex );
+						
+						// Calculate Average Ground Temperature for all 12 months of the year:
+						averageGroundTemp += currMonthTemp;
+						
+						// Need max temp, min temp, and month of min surf temp to set amplitude and month of min surf temp
 						if ( currMonthTemp <= minSurfTemp ) {
 							monthOfMinSurfTemp = monthIndex;
 							minSurfTemp = currMonthTemp;
 						}
+
+						if (currMonthTemp >= maxSurfTemp ) {
+							maxSurfTemp = currMonthTemp;
+						}
 					}
+
+					averageGroundTemp /= monthsInYear;
+
+					amplitudeOfGroundTemp = ( maxSurfTemp - minSurfTemp ) / 2.0;
 
 					phaseShiftOfMinGroundTempDays = monthOfMinSurfTemp * avgDaysInMonth;
 
-					// Asign to KA Model
+					// Assign to KA Model
 					thisModel->aveGroundTemp = averageGroundTemp;
-					thisModel->aveGroundTempAmplitude = averageGroundTempAmplitude;
+					thisModel->aveGroundTempAmplitude = amplitudeOfGroundTemp;
 					thisModel->phaseShiftInSecs = phaseShiftOfMinGroundTempDays * SecsInDay;
 				}
 
@@ -145,6 +144,7 @@ namespace EnergyPlus {
 		// Using/Aliasing
 		using DataGlobals::SecsInDay;
 		using DataGlobals::Pi;
+		using WeatherManager::NumDaysInYear;
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 term1;
@@ -152,7 +152,7 @@ namespace EnergyPlus {
 		Real64 secsInYear;
 		Real64 retVal;
 
-		secsInYear = SecsInDay * 365.0;
+		secsInYear = SecsInDay * NumDaysInYear;
 
 		term1 = -depth * std::sqrt( Pi / ( secsInYear * groundThermalDiffisivity ) );
 		term2 = ( 2 * Pi / secsInYear ) * ( simTimeInSeconds - phaseShiftInSecs - ( depth / 2 ) * std::sqrt( secsInYear / ( Pi * groundThermalDiffisivity ) ) );
@@ -171,19 +171,28 @@ namespace EnergyPlus {
 	)
 	{	
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Edwin Lee
-		//       DATE WRITTEN   Summer 2011
-		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Returns the ground temperature when input time is in seconds
 
-		// Set depth of temperature
+		// Using/Aliasing
+		using DataGlobals::SecsInDay;
+		using WeatherManager::NumDaysInYear;
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 secondsInYear = NumDaysInYear * SecsInDay;
+
 		depth = _depth;
 
-		// Set sim time in seconds
 		simTimeInSeconds = _seconds;
+
+		if ( simTimeInSeconds > secondsInYear ) {
+			simTimeInSeconds = remainder( simTimeInSeconds, secondsInYear );
+		}
 
 		// Get and return ground temperature
 		return getGroundTemp();
@@ -198,25 +207,28 @@ namespace EnergyPlus {
 	)
 	{
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Edwin Lee
-		//       DATE WRITTEN   Summer 2011
-		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
 		//       RE-ENGINEERED  na
+
+		// Using/Aliasing
+		using DataGlobals::SecsInDay;
+		using WeatherManager::NumDaysInYear;
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Returns the ground temperature when input time is in months
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 const aveSecondsInMonth = ( 365 / 12 ) * ( 3600 * 24 );
+		Real64 const aveSecondsInMonth = ( NumDaysInYear / 12 ) * SecsInDay;
+		Real64 const secondsPerYear = NumDaysInYear * SecsInDay;
 
-		// Set depth
 		depth = _depth;
 
-		// Convert months to seconds. Puts 'seconds' time in middle of specified month
-		if ( _month >= 1 && _month <= 12 ) {
-			simTimeInSeconds = aveSecondsInMonth * ( ( _month - 1 ) + 0.5 );
-		} else {
-			ShowFatalError("KusudaGroundTempsModel: Invalid month passed to ground temperature model");
+		simTimeInSeconds = aveSecondsInMonth * ( ( _month - 1 ) + 0.5 );
+
+		if ( simTimeInSeconds > secondsPerYear ) {
+			simTimeInSeconds = remainder( simTimeInSeconds, secondsPerYear );
 		}
 		
 		// Get and return ground temperature

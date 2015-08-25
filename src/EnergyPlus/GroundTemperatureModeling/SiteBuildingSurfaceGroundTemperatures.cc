@@ -6,6 +6,7 @@
 
 // EnergyPlus Headers
 #include <DataEnvironment.hh>
+#include <DataGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh>
@@ -109,9 +110,9 @@ namespace EnergyPlus {
 	SiteBuildingSurfaceGroundTemps::getGroundTemp()
 	{
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Edwin Lee
-		//       DATE WRITTEN   Summer 2011
-		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -129,16 +130,20 @@ namespace EnergyPlus {
 	)
 	{
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Edwin Lee
-		//       DATE WRITTEN   Summer 2011
-		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Returns the ground temperature when input time is in seconds
 
+		// USE STATEMENTS:
+		using DataGlobals::SecsInDay;
+		using WeatherManager::NumDaysInYear;
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 secPerMonth = 365 * 3600 * 24 / 12;
+		Real64 secPerMonth = NumDaysInYear * SecsInDay / 12;
 
 		// Convert secs to months
 		int month = ceil( _seconds / secPerMonth );
@@ -162,9 +167,9 @@ namespace EnergyPlus {
 	)
 	{
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Edwin Lee
-		//       DATE WRITTEN   Summer 2011
-		//       MODIFIED       Matt Mitchell, Summer 2015
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Summer 2015
+		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:

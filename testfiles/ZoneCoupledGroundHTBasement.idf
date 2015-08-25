@@ -579,9 +579,12 @@ Material,
     
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     KATemps,                 !- Name of object
-    15.5,                    !- Annual average surface temperature
-    12.8,                    !- Annual amplitude of surface temperature
-    17.3;                    !- Phase shift of minimum surface temperature    
+    1.8,                     !- Soil Thermal Conductivity {W/m-K}
+    3200,                    !- Soil Density {kg/m3}
+    836,                     !- Soil Specific Heat {J/kg-K}
+    15.5,                    !- Annual average surface temperature {C}
+    12.8,                    !- Annual amplitude of surface temperature {delta C}
+    17.3;                    !- Phase shift of minimum surface temperature {days}
 
 !- =========== ALL OBJECTS IN CLASS: OUTPUT:VARIABLEDICTIONARY ===========
 

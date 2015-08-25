@@ -1737,7 +1737,7 @@ Site:GroundTemperature:Deep,
 Site:GroundTemperature:Undisturbed:Xing,
        \memo Undisturbed ground temperature object using the 
        \memo Xing 2014 2 harmonic parameter model.
-  A1,  \field Name of ground temperature object
+  A1,  \field Name
        \required-field
   N1,  \field Soil Thermal Conductivity
        \required-field
@@ -1754,36 +1754,31 @@ Site:GroundTemperature:Undisturbed:Xing,
        \type real
        \units J/kg-K
        \minimum> 0.0
-  N4,  \field Average Soil Temperature
+  N4,  \field Average Soil Surface Tempeature
        \required-field
        \type real
        \units C
-       \note Annual average soil temperature
-  N5,  \field Surface Temperature Amplitude 1
+  N5,  \field Soil Surface Temperature Amplitude 1
        \required-field
        \type real
        \units deltaC
-       \note First surface amplitude parameter
-  N6,  \field Phase Shift 1
-       \required-field
-       \type real
-       \units days
-       \note Phase shift of first surface amplitude parameter
-  N7,  \field Surface Temperature Amplitude 2
+  N6,  \field Soil Surface Temperature Amplitude 2
        \required-field
        \type real
        \units deltaC
-       \note Second surface amplitude parameter
-  N8;  \field Phase Shift 2
+  N7,  \field Phase Shift of Temperature Amplitude 1
        \required-field
        \type real
        \units days
-       \note Phase shift of second surface amplitude parameter
+  N8;  \field Phase Shift of Temperature Amplitude 2
+       \required-field
+       \type real
+       \units days
        
 Site:GroundTemperature:Undisturbed:KusudaAchenbach,
        \memo Undisturbed ground temperature object using the 
        \memo Kusuda-Achenbach 1965 correlation.
-  A1,  \field Name of ground temperature object
+  A1,  \field Name
        \required-field
   N1,  \field Soil Thermal Conductivity
        \required-field
@@ -1800,7 +1795,7 @@ Site:GroundTemperature:Undisturbed:KusudaAchenbach,
        \type real
        \units J/kg-K
        \minimum> 0.0
-  N4,  \field Average Surface Temperature
+  N4,  \field Average Soil Surface Temperature
        \type real
        \units C
        \note Annual average surface temperature
@@ -1817,7 +1812,7 @@ Site:GroundTemperature:Undisturbed:KusudaAchenbach,
 Site:GroundTemperature:Undisturbed:FiniteDifference,
        \memo Undisturbed ground temperature object using a 
        \memo detailed finite difference 1-D model
-  A1,  \field Name of ground temperature object
+  A1,  \field Name
        \required-field
   N1,  \field Soil Thermal Conductivity
        \required-field

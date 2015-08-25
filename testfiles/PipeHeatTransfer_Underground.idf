@@ -3232,9 +3232,12 @@
 
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     KATemps,                 !- Name of object
-    13.0,                    !- Annual average surface temperature
-    1.5,                     !- Annual amplitude of surface temperature
-    30;                     !- Phase shift of minimum surface temperature    
+    0.36,                    !- Conductivity {W/m-K}
+    2000.0,                  !- Density {kg/m3}
+    1200.0,                  !- Specific Heat {J/kg-K}
+    13.0,                    !- Annual average surface temperature {C}
+    1.5,                     !- Annual amplitude of surface temperature {delta C}
+    30;                      !- Phase shift of minimum surface temperature {days} 
     
   Branch,
     Condenser Supply Bypass Branch,  !- Name

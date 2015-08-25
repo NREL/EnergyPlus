@@ -6,7 +6,6 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
-#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>

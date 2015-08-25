@@ -7,6 +7,7 @@
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <GroundTemperatureModeling/XingGroundTemperatureModel.hh>
 #include <InputProcessor.hh>
+#include <WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -58,8 +59,8 @@ namespace EnergyPlus {
 				thisModel->groundThermalDiffisivity = rNumericArgs( 1 ) / ( rNumericArgs( 2 ) * rNumericArgs( 3 ) );
 				thisModel->aveGroundTemp = rNumericArgs( 4 );
 				thisModel->surfTempAmplitude_1 = rNumericArgs( 5 );
-				thisModel->phaseShift_1 = rNumericArgs( 6 );
-				thisModel->surfTempAmplitude_2 = rNumericArgs( 7 );
+				thisModel->surfTempAmplitude_2 = rNumericArgs( 6 );
+				thisModel->phaseShift_1 = rNumericArgs( 7 );
 				thisModel->phaseShift_2 = rNumericArgs( 8 );
 				
 				found = true;
@@ -91,6 +92,7 @@ namespace EnergyPlus {
 
 		// USE STATEMENTS:
 		using DataGlobals::Pi;
+		using WeatherManager::NumDaysInYear;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 retVal;
@@ -101,7 +103,7 @@ namespace EnergyPlus {
 
 		for ( int n = 1; n <= 2; ++n ) {
 			
-			Real64 static tp( 365 ); // Period of soil temperature cycle
+			Real64 static tp( NumDaysInYear ); // Period of soil temperature cycle
 			Real64 Ts_n; // Amplitude of surface temperature
 			Real64 PL_n; // Phase shift of surface temperature
 			
@@ -131,7 +133,7 @@ namespace EnergyPlus {
 
 	Real64 XingGroundTempsModel::getGroundTempAtTimeInMonths(
 		Real64 _depth,
-		int month
+		int _month
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -143,19 +145,23 @@ namespace EnergyPlus {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Returns ground temperature when input time is in months
 
+		// USE STATEMENTS:
+		using WeatherManager::NumDaysInYear;
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 const aveDaysInMonth = 365 / 12;
+		Real64 const aveDaysInMonth = NumDaysInYear / 12;
 
 		depth = _depth;
-
-		// Convert months to seconds. Puts 'seconds' time in middle of specified month
-		if ( month >= 1 && month <= 12 ) {
-			simTimeInDays = aveDaysInMonth * ( ( month - 1 ) + 0.5 );
+	
+		// Set month
+		if ( _month >= 1 && _month <= 12 ) {
+			simTimeInDays = aveDaysInMonth * ( ( _month - 1 ) + 0.5 );
 		} else {
-			ShowFatalError("XingGroundTempsModel: Invalid month passed to ground temperature model");
+			int monthIndex = remainder( _month, 12 );
+			simTimeInDays = aveDaysInMonth * ( ( monthIndex - 1 ) + 0.5 );
 		}
-		
-		// Get and return ground temperature
+
+		// Get and return ground temp
 		return getGroundTemp();
 	}
 
@@ -175,12 +181,19 @@ namespace EnergyPlus {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Returns ground temperature when time is in seconds
 
+		// USE STATEMENTS:
+		using DataGlobals::SecsInDay;
+		using WeatherManager::NumDaysInYear;
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 const secPerDay = 24 * 3600;
 
 		depth = _depth;
 
-		simTimeInDays = seconds / secPerDay;
+		simTimeInDays = seconds / SecsInDay;
+
+		if ( simTimeInDays >  NumDaysInYear ) {
+			simTimeInDays = remainder( simTimeInDays, NumDaysInYear );
+		}
 
 		return getGroundTemp();
 	}

@@ -209,8 +209,6 @@ namespace DataEnvironment {
 		GroundTempFC = Real64();
 		GroundTemp_Surface = Real64();
 		GroundTemp_Deep = Real64();
-		//PubGroundTempSurface.dimension( 12 );
-		//PubGroundTempSurfFlag = bool();
 		HolidayIndex = int();
 		HolidayIndexTomorrow = int();
 		IsRain = bool();

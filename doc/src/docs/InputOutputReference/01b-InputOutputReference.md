@@ -8299,7 +8299,7 @@ This is the type of undisturbed ground temperature object that is used to determ
 
 #### Field: Name of Undisturbed Ground Temperature Object
 
-This is the name of the undisturbed ground temperature object that is used to determine the ground temperature. Name is only required for undisturbed ground temperature objects with a "name" field.
+This is the name of the undisturbed ground temperature object that is used to determine the ground temperature.
 
 An example of this object in an IDF is:
 
