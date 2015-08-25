@@ -4825,7 +4825,6 @@ namespace ZoneTempPredictorCorrector {
 		using ZonePlenum::ZoneSupPlenCond;
 		using ZonePlenum::NumZoneReturnPlenums;
 		using ZonePlenum::NumZoneSupplyPlenums;
-		using DataDefineEquip::AirDistUnit;
 		using General::RoundSigDigits;
 		using InternalHeatGains::SumAllInternalConvectionGains;
 		using InternalHeatGains::SumAllReturnAirConvectionGains;
