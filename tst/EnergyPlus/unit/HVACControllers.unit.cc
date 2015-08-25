@@ -87,7 +87,7 @@ namespace EnergyPlus {
 		// check control variable type in AllSetPtMgr is reset to "MaximumHumidityRatio"
 		ASSERT_EQ( iCtrlVarType_MaxHumRat, AllSetPtMgr( 1 ).CtrlTypeMode );
 
-		// ControllerProps the control variabletype is always "HumididtyRatio"
+		// ControllerProps always expects the control variable type to be "HumididtyRatio"
 		ControllerProps( 1 ).HumRatCntrlType = GetHumidityRatioVariableType( ControllerProps( 1 ).SensedNode );
 		ASSERT_EQ( iCtrlVarType_HumRat, ControllerProps( 1 ).HumRatCntrlType );
 	
@@ -96,7 +96,7 @@ namespace EnergyPlus {
 		ControllerLists.deallocate();
 		AllSetPtMgr.deallocate();
 		SchSetPtMgr.deallocate();
-		WaterCoil.deallocate;
+		WaterCoil.deallocate();
 	}
 
 

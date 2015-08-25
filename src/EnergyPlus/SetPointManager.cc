@@ -7851,7 +7851,8 @@ namespace SetPointManager {
 
 		// METHODOLOGY EMPLOYED:
 		// Cycle through all setpoint managers and find if the node has a "Humidity Ratio" control 
-		// variable type. This routine is called from "GetControllerInput" routine
+		// variable type. This routine is called from "GetControllerInput" routine.  This reset is
+		// just to stop false warning message due to control variable type mismatch.
 
 		// REFERENCES:
 		// na
@@ -7906,7 +7907,7 @@ namespace SetPointManager {
 			ShowContinueError( " ..Humidity ratio control variable type specified is = " + cValidCtrlTypes( iCtrlVarType_HumRat ) );
 			ShowContinueError( " ..Humidity ratio control variable type allowed with water coils is = " + cValidCtrlTypes( iCtrlVarType_MaxHumRat ) );
 			ShowContinueError( " ..Setpointmanager control variable type is reset to = " + cValidCtrlTypes( iCtrlVarType_MaxHumRat ) );
-			ShowContinueError( " ..Simulation continuous. ");
+			ShowContinueError( " ..Simulation continues. ");
 		}
 
 	}
@@ -8067,7 +8068,6 @@ namespace SetPointManager {
 				}
 			}
 		}
-
 		// Loop over the schedule setpoint managers
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSchSetPtMgrs; ++SetPtMgrNum ) {
 			for ( CtrlNodeIndex = 1; CtrlNodeIndex <= SchSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) {
