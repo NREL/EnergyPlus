@@ -1,21 +1,3 @@
-<head>
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-  extensions: ["tex2jax.js"],
-  jax: ["input/TeX", "output/HTML-CSS"],
-  tex2jax: {
-   inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-   displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-   processEscapes: true
-  },
-  "HTML-CSS": { availableFonts: ["TeX"] }
-  });
-</script>
-  <script type="text/javascript"
-   src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-  </script>
-</head>
-
 <!--RemoveStart-->
 Simulation Models – Encyclopedic Reference
 ==========================================
@@ -3972,7 +3954,7 @@ If the unit is on and <span>\({\dot Q_{cc}}\)</span>&lt; 0 and the thermostat ty
 
 ##### Multi-Speed Fan In FanCoil
 
-When modeling multi-speed fan in FanCoil unit, capacity is modulated using speed ratio or part load ratio.  The supply air fan speed is varied while operating the coils at maximum water flow. When there is no system load to meet, the water control valve is fully closed. When the FanCoil fan is cycling between to consecutive fan speed levels, a speed ratio is calculated, else when the FanCoil unit cycles between the minimum fan speed and off-position, then part load ratio is calculated. The fan may be off or run continuously at lowest speed to provide ventilation air depending the fan operating schedule specified. When the FanCoil is operating at the lowest fan speed (Speed = 1), the water flow rate is reported as the average for the time step by multiplying the maximum water flow by part load ratio. The speed ratio and part-load ratio are calculated such that the FanCoil unit satisfies the required system zone cooling or heating load.The set of equations used for the multi-speed fan capacity control methods in FanCoil unit are summarized next.
+When modeling multi-speed fan in FanCoil unit, capacity is modulated using speed ratio or part load ratio.  The supply air fan speed is varied while operating the coils at maximum water flow. When there is no system load to meet, the water control valve is fully closed. When the FanCoil fan is cycling between two consecutive fan speed levels a speed ratio is calculated, but when the FanCoil unit cycles between the minimum fan speed and off-position, then part load ratio is calculated. The fan may be off or run continuously at lowest speed to provide ventilation air depending the fan operating schedule specified. When the FanCoil is operating at the lowest fan speed (Speed = 1), the water flow rate is reported as the average for the time step by multiplying the maximum water flow by part load ratio. The speed ratio and part-load ratio are calculated such that the FanCoil unit satisfies the required system zone cooling or heating load.The set of equations used for the multi-speed fan capacity control methods in FanCoil unit are summarized next.
 
 ###### Cycling Between Stages
 

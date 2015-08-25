@@ -6992,7 +6992,17 @@ The heating or cooling output of the unit ventilator is controlled by varying th
 
 Carrier offers a retrofit VSD motor for fan coil units. It claims up to 45% energy savings from such a retrofit, as well as increased comfort and less noise compared to a cycling fan (fan coil fans ar typically noisy and inefficient). Some other manufacturers are also offering units with VSD fans. Variable speed fans appear to offer an easy way to significantly increase the efficiency of what have typically been very inefficient units.
 
-EnergyPlus provides 5 capacity control methods for this unit: 1) multi-speed cycling fan with constant water flow rate; 2) constant speed continuous fan with variable water flow rate; 3) variable-speed fan with constant water flow rate; 4) variable-speed fan with variable water flow rate; 5) multi-speed fan with cycling between speeds and  constant water flow.
+EnergyPlus provides 5 capacity control methods for this unit:
+
+  1. multi-speed cycling fan with constant water flow rate
+
+  2. constant speed continuous fan with variable water flow rate
+
+  3. variable-speed fan with constant water flow rate
+
+  4. variable-speed fan with variable water flow rate
+
+  5. multi-speed fan with cycling between speeds and  constant water flow.
 
 In EnergyPlus the fan coil units are modeled as compound components. That is, they are assembled from other components. Fan coils contain an outdoor air mixer, a fan, a heating coil and a cooling coil. These components are described elsewhere in this document. The fan coil input simply requires the names of these four components, which have to be described elsewhere in the input. The input also requires the name of an availability schedule, maximum airflow rate, outdoor airflow rate, and maximum and minimum hot and cold water volumetric flow rates. The unit is connected to the zone inlet and exhaust nodes and the outdoor air by specifying unit inlet, and outlet air node names and the outdoor air mixer object name. The outdoor air mixer child object provides the outdoor air and relief air nodes names. Note that the unit air inlet node should be the same as a zone exhaust node and the unit outlet node should be the same as a zone inlet node. The fan coil unit is connected to a hot water loop (demand side) through its hot water coil and to a chilled water loop (demand side) through its cooling coil.
 
