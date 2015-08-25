@@ -10,6 +10,7 @@
 // A to Z order
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
@@ -97,6 +98,7 @@ namespace EnergyPlus {
 
 		// A to Z order
 		BranchInputManager::clear_state();
+		CondenserLoopTowers::clear_state();
 		CurveManager::clear_state();
 		DataAirLoop::clear_state();
 		DataBranchNodeConnections::clear_state();

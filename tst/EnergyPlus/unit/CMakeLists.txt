@@ -14,6 +14,7 @@ set( test_src
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
   ChillerElectricEIR.unit.cc;
+  CondenserLoopTowers.unit.cc;
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
