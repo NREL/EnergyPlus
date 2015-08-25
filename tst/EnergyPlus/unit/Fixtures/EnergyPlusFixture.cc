@@ -24,6 +24,7 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
 
 
 #include <fstream>
@@ -66,6 +67,7 @@ namespace EnergyPlus {
 		InputProcessor::clear_state();
 		OutputProcessor::clear_state();
 		ScheduleManager::clear_state();
+		VariableSpeedCoils::clear_state();
 
 		{ 
 			IOFlags flags; 
