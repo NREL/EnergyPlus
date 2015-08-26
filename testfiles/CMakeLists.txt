@@ -45,6 +45,7 @@ ADD_SIMULATION_TEST(IDF_FILE 5ZoneDesignInputCoolingCoil.idf EPW_FILE USA_IL_Chi
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneDetailedIceStorage.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneDetailedIceStorage2.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneDetailedIceStorageCubicLinear.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE 5ZoneDetailedIceStorageSimpleCtrl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneEconomicsTariffAndLifeCycleCosts.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneElectricBaseboard.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneEndUses.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
