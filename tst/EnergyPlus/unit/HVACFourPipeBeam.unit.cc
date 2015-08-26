@@ -1643,13 +1643,13 @@ namespace EnergyPlus {
 		Real64 NonAirSysOutput = 0.0;
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
 
-		EXPECT_EQ( DataLoopNode::Node( 1 ).MassFlowRate, DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->mDotDesignPrimAir );
-		EXPECT_FLOAT_EQ( DataLoopNode::Node( 15 ).Temp, 19.191523 );
-		EXPECT_FLOAT_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.04619956 ); 
-		EXPECT_FLOAT_EQ( DataLoopNode::Node( 39 ).Temp, 45.0 );
-		EXPECT_FLOAT_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.0 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 1 ).MassFlowRate, 0.3521952339035046 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).Temp, 19.191523455437512 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.046199561631265804 ); 
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).Temp, 45.0 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.0 );
 
-		EXPECT_FLOAT_EQ( NonAirSysOutput, -1004.0438 );
+		EXPECT_DOUBLE_EQ( NonAirSysOutput, -1004.0437766383318 );
 
 		//next run with a sensible heating load of 5000 W and cold supply air
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired =  5000.0;
@@ -1659,13 +1659,12 @@ namespace EnergyPlus {
 		DataLoopNode::Node( 40 ).Temp = 21.0; // zone node
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
 
-		EXPECT_EQ( DataLoopNode::Node( 1 ).MassFlowRate, DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->mDotDesignPrimAir );
-		EXPECT_FLOAT_EQ( DataLoopNode::Node( 15 ).Temp, 14.0 );
-		EXPECT_FLOAT_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0 ); 
-		EXPECT_FLOAT_EQ( DataLoopNode::Node( 39 ).Temp, 35.064465 );
-		EXPECT_FLOAT_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.19320551 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).Temp, 14.0 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0 ); 
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).Temp, 35.064466069323743 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.19320550334974979 );
 
-		EXPECT_FLOAT_EQ( NonAirSysOutput, 8023.9272 );
+		EXPECT_DOUBLE_EQ( NonAirSysOutput, 8023.9273066417645 );
 
 
 		// next run with cooling load and neutral supply air
@@ -1683,13 +1682,12 @@ namespace EnergyPlus {
 		NonAirSysOutput = 0.0;
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
 
-		EXPECT_EQ( DataLoopNode::Node( 1 ).MassFlowRate, DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->mDotDesignPrimAir );
-		EXPECT_FLOAT_EQ( DataLoopNode::Node( 15 ).Temp, 18.027306 );
-		EXPECT_FLOAT_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.25614846 ); 
-		EXPECT_FLOAT_EQ( DataLoopNode::Node( 39 ).Temp, 45.0 );
-		EXPECT_FLOAT_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.0 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).Temp, 18.027306264618733 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.25614844309380103 ); 
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).Temp, 45.0 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.0 );
 
-		EXPECT_FLOAT_EQ( NonAirSysOutput, -4318.4346 );
+		EXPECT_DOUBLE_EQ( NonAirSysOutput, -4318.4346465170929 );
 
 		// next run with heating load and neutral supply air
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired =  5000.0;
@@ -1701,13 +1699,12 @@ namespace EnergyPlus {
 		NonAirSysOutput = 0.0;
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
 
-		EXPECT_EQ( DataLoopNode::Node( 1 ).MassFlowRate, DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->mDotDesignPrimAir );
-		EXPECT_FLOAT_EQ( DataLoopNode::Node( 15 ).Temp, 14.0);
-		EXPECT_FLOAT_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0); 
-		EXPECT_FLOAT_EQ( DataLoopNode::Node( 39 ).Temp, 33.836239 );
-		EXPECT_FLOAT_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.10040605 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).Temp, 14.0);
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0); 
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).Temp, 33.836239364981424 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.10040605035467959 );
 
-		EXPECT_FLOAT_EQ( NonAirSysOutput, 4685.3999 );
+		EXPECT_DOUBLE_EQ( NonAirSysOutput, 4685.4000901131676 );
 
 	
 	}
