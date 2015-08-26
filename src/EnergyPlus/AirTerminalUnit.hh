@@ -91,7 +91,7 @@ public: // Methods		REMOVE ANY OF THESE THAT AREN'T COMMON (WITH SAME ARGS) TO A
 
 
 
-public: // Data
+protected: // Data
 
 	AirTerminalUnitType terminalType; // Type of air distribution unit  //Legacy For use during transition to OO
 	std::string name; // name of unit
