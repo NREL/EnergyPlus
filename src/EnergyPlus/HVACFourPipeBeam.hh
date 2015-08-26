@@ -10,7 +10,7 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <GlobalNames.hh>
-#include <PlantLocation.hh> // this is from https://github.com/NREL/EnergyPlus/pull/4945  assuming it goes in other wise maybe the same from using DataPlant
+#include <PlantLocation.hh> 
 
 namespace EnergyPlus {
 
@@ -217,19 +217,16 @@ private: // data
 	Real64 supAirHeatingRate; // Total cooling rate from supply air [W]
 	Real64 primAirFlow; // supply air flow per zone at standard elevation-adjusted density [m3/s]
 
-
-
 	bool myEnvrnFlag; // control when to re initialize for new environment period
 	bool mySizeFlag; // control when to run sizing method
 	bool plantLoopScanFlag; // control when to look up plant locations for water connections
 	bool zoneEquipmentListChecked; // control when to check zone equipment list was input correctly
 
-
-	Real64 tDBZoneAirTemp;
-	Real64 tDBSystemAir;
-	Real64 mDotSystemAir;
-	Real64 cpZoneAir;
-	Real64 cpSystemAir;
+	Real64 tDBZoneAirTemp; // current drybulb temperature of zone air, C
+	Real64 tDBSystemAir; // current drybulb temperature of primary supply air, C
+	Real64 mDotSystemAir; // current mass flow of primary supply air,kg/s
+	Real64 cpZoneAir; // current specific heat of zone air 
+	Real64 cpSystemAir; // current speci
 	Real64 qDotSystemAir;
 	Real64 qDotBeamCoolingMax;
 	Real64 qDotBeamHeatingMax;
