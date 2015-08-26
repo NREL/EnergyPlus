@@ -4531,7 +4531,7 @@ namespace SetPointManager {
 			SetTempAtOutHigh = OutAirSetPtMgr( SetPtMgrNum ).OutHighSetPt1;
 		}
 
-		if ( OutLowTemp < OutHighTemp && SetTempAtOutLow > SetTempAtOutHigh ) {
+		if ( OutLowTemp < OutHighTemp ) {
 
 			if ( OutDryBulbTemp <= OutLowTemp ) {
 				SetPt = SetTempAtOutLow;
