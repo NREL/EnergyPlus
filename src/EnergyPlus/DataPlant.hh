@@ -57,7 +57,8 @@ namespace DataPlant {
 		PumpOpSchemeType = 13, // Not really an OpScheme, just a placeholder
 		DemandOpSchemeType = 14, // Plcaeholder for demand side equipment such as coils
 		FreeRejectionOpSchemeType = 15, // Scheme Type for waterside economizers and the like
-		WSEconOpSchemeType = 16 // Scheme Type for waterside economizers and the like
+		WSEconOpSchemeType = 16, // Scheme Type for waterside economizers and the like
+		ThermalEnergyStorageSchemeType = 17 // Scheme Type for Simplified Thermal Energy Storage operation
 	};
 
 	// These are useful for SELECT CASE statements rather than listing all of the individual types listed above
