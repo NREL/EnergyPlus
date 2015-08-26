@@ -10,7 +10,7 @@ volume of a zone. These models are accessed using the RoomAirModelType
 input object. RoomAir modeling was added to EnergyPlus starting with
 Version 1.2. Although there are many types of analyses (comfort, indoor
 air quality, etc) that might benefit from localized modeling of how room
-ir varies across space, most for the room air models in EnergyPlus only
+air varies across space, most of the room air models in EnergyPlus only
 address the distribution of *temperature* within the zone. This allows surface
 heat transfer and air system heat balance calculations to be made taking
 into account natural thermal stratification of air and different types of
