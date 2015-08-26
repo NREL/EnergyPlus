@@ -129,6 +129,13 @@ namespace HeatBalanceSurfaceManager {
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
 
+	bool ManageSurfaceHeatBalancefirstTime( true );
+	bool InitSurfaceHeatBalancefirstTime( true );
+	bool ComputeIntSWAbsorpFactorsfirstTime( true ); // First time through routine
+	bool UpdateThermalHistoriesFirstTimeFlag( true );
+	bool CalculateZoneMRTfirstTime( true ); // Flag for first time calculations
+
+
 	// DERIVED TYPE DEFINITIONS:
 	// na
 
@@ -153,6 +160,16 @@ namespace HeatBalanceSurfaceManager {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state()
+	{
+		ManageSurfaceHeatBalancefirstTime = true;
+		InitSurfaceHeatBalancefirstTime = true;
+		ComputeIntSWAbsorpFactorsfirstTime = true;
+		UpdateThermalHistoriesFirstTimeFlag = true;
+		CalculateZoneMRTfirstTime = true;
+		//calcHeatBalanceInsideSurfFirstTime = true;
+	}
 
 	void
 	ManageSurfaceHeatBalance()
@@ -194,24 +211,24 @@ namespace HeatBalanceSurfaceManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
-		static bool firstTime( true );
+
 		int SurfNum;
 		int ConstrNum;
 
 		// FLOW:
-		if ( firstTime ) DisplayString( "Initializing Surfaces" );
+		if ( ManageSurfaceHeatBalancefirstTime ) DisplayString( "Initializing Surfaces" );
 		InitSurfaceHeatBalance(); // Initialize all heat balance related parameters
 
 		// Solve the zone heat balance 'Detailed' solution
 		// Call the outside and inside surface heat balances
-		if ( firstTime ) DisplayString( "Calculate Outside Surface Heat Balance" );
+		if ( ManageSurfaceHeatBalancefirstTime ) DisplayString( "Calculate Outside Surface Heat Balance" );
 		CalcHeatBalanceOutsideSurf();
-		if ( firstTime ) DisplayString( "Calculate Inside Surface Heat Balance" );
+		if ( ManageSurfaceHeatBalancefirstTime ) DisplayString( "Calculate Inside Surface Heat Balance" );
 		CalcHeatBalanceInsideSurf();
 
 		// The air heat balance must be called before the temperature history
 		// updates because there may be a radiant system in the building
-		if ( firstTime ) DisplayString( "Calculate Air Heat Balance" );
+		if ( ManageSurfaceHeatBalancefirstTime ) DisplayString( "Calculate Air Heat Balance" );
 		ManageAirHeatBalance();
 
 		// IF NECESSARY, do one final "average" heat balance pass.  This is only
@@ -239,7 +256,7 @@ namespace HeatBalanceSurfaceManager {
 		ReportSurfaceHeatBalance();
 		if ( ZoneSizingCalc ) GatherComponentLoadsSurface();
 
-		firstTime = false;
+		ManageSurfaceHeatBalancefirstTime = false;
 
 	}
 
@@ -331,7 +348,7 @@ namespace HeatBalanceSurfaceManager {
 		int iDElightRefPt; // Reference Point number for reading DElight Dump File (eplusout.delighteldmp)
 		Real64 dRefPtIllum; // tmp var for reading RefPt illuminance
 		// RJH DElight Modification End
-		static bool firstTime( true );
+
 		int MapNum;
 		int iwriteStatus;
 		bool errFlag;
@@ -342,7 +359,7 @@ namespace HeatBalanceSurfaceManager {
 
 		assert( equal_dimensions( TH, QH ) );
 
-		if ( firstTime ) DisplayString( "Initializing Outdoor environment for Surfaces" );
+		if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Initializing Outdoor environment for Surfaces" );
 		// Initialize zone outdoor environmental variables
 		// Bulk Initialization for Temperatures & WindSpeed
 		// using the zone, modify the zone  Dry/Wet BulbTemps
@@ -388,7 +405,7 @@ namespace HeatBalanceSurfaceManager {
 
 		// Do the Begin Environment initializations
 		if ( BeginEnvrnFlag ) {
-			if ( firstTime ) DisplayString( "Initializing Temperature and Flux Histories" );
+			if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Initializing Temperature and Flux Histories" );
 			InitThermalAndFluxHistories(); // Set initial temperature and flux histories
 		}
 
@@ -415,20 +432,20 @@ namespace HeatBalanceSurfaceManager {
 
 		// Set shading flag for exterior windows (except flags related to daylighting) and
 		// window construction (unshaded or shaded) to be used in heat balance calculation
-		if ( firstTime ) DisplayString( "Initializing Window Shading" );
+		if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Initializing Window Shading" );
 		WindowShadingManager();
 
 		// Calculate factors that are used to determine how much long-wave radiation from internal
 		// gains is absorbed by interior surfaces
-		if ( firstTime ) DisplayString( "Computing Interior Absorption Factors" );
+		if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Computing Interior Absorption Factors" );
 		ComputeIntThermalAbsorpFactors();
 
 		// Calculate factors for diffuse solar absorbed by room surfaces and interior shades
-		if ( firstTime ) DisplayString( "Computing Interior Diffuse Solar Absorption Factors" );
+		if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Computing Interior Diffuse Solar Absorption Factors" );
 		ComputeIntSWAbsorpFactors();
 
 		// Calculate factors for exchange of diffuse solar between zones through interzone windows
-		if ( firstTime ) DisplayString( "Computing Interior Diffuse Solar Exchange through Interzone Windows" );
+		if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Computing Interior Diffuse Solar Exchange through Interzone Windows" );
 		ComputeDifSolExcZonesWIZWindows( NumOfZones );
 
 		// For daylit zones, calculate interior daylight illuminance at reference points and
@@ -458,13 +475,13 @@ namespace HeatBalanceSurfaceManager {
 			}
 
 			if ( SunIsUp && ZoneDaylight( NZ ).TotalDaylRefPoints != 0 ) {
-				if ( firstTime ) DisplayString( "Computing Interior Daylighting Illumination" );
+				if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Computing Interior Daylighting Illumination" );
 				DayltgInteriorIllum( NZ );
 				if ( ! DoingSizing ) DayltgInteriorMapIllum( NZ );
 			}
 
 			if ( SunIsUp && NumOfTDDPipes > 0 && NZ == 1 ) {
-				if ( firstTime ) DisplayString( "Computing Interior Daylighting Illumination for TDD pipes" );
+				if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Computing Interior Daylighting Illumination for TDD pipes" );
 				DayltgInteriorTDDIllum();
 			}
 
@@ -590,7 +607,7 @@ namespace HeatBalanceSurfaceManager {
 
 		// The order of these initializations is important currently.  Over time we hope to
 		//  take the appropriate parts of these inits to the other heat balance managers
-		if ( firstTime ) DisplayString( "Initializing Solar Heat Gains" );
+		if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Initializing Solar Heat Gains" );
 		InitSolarHeatGains();
 		if ( SunIsUp && ( BeamSolarRad + GndSolarRad + DifSolarRad > 0.0 ) ) {
 			for ( NZ = 1; NZ <= NumOfZones; ++NZ ) {
@@ -609,17 +626,17 @@ namespace HeatBalanceSurfaceManager {
 			mapResultsToReport = false;
 		}
 
-		if ( firstTime ) DisplayString( "Initializing Internal Heat Gains" );
+		if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Initializing Internal Heat Gains" );
 		ManageInternalHeatGains( false );
-		if ( firstTime ) DisplayString( "Initializing Interior Solar Distribution" );
+		if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Initializing Interior Solar Distribution" );
 		InitIntSolarDistribution();
-		if ( firstTime ) DisplayString( "Initializing Interior Convection Coefficients" );
+		if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Initializing Interior Convection Coefficients" );
 		InitInteriorConvectionCoeffs( TempSurfInTmp );
 
 		if ( BeginSimFlag ) { // Now's the time to report surfaces, if desired
 			//    if (firstTime) CALL DisplayString('Reporting Surfaces')
 			//    CALL ReportSurfaces
-			if ( firstTime ) DisplayString( "Gathering Information for Predefined Reporting" );
+			if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Gathering Information for Predefined Reporting" );
 			GatherForPredefinedReport();
 		}
 
@@ -713,8 +730,8 @@ namespace HeatBalanceSurfaceManager {
 
 		if ( ZoneSizingCalc ) GatherComponentLoadsSurfAbsFact();
 
-		if ( firstTime ) DisplayString( "Completed Initializing Surface Heat Balance" );
-		firstTime = false;
+		if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Completed Initializing Surface Heat Balance" );
+		InitSurfaceHeatBalancefirstTime = false;
 
 	}
 
@@ -3094,7 +3111,7 @@ namespace HeatBalanceSurfaceManager {
 		Real64 AbsGl;
 		Real64 DividerRefl; // Window divider short-wave reflectance
 
-		static bool firstTime( true ); // First time through routine
+
 		static Array1D_bool FirstCalcZone; // for error message
 
 		// FLOW:
@@ -3103,9 +3120,9 @@ namespace HeatBalanceSurfaceManager {
 			VMULT.dimension( NumOfZones, 0.0 );
 			VCONV.dimension( NumOfZones, 0.0 );
 		}
-		if ( firstTime ) {
+		if ( ComputeIntSWAbsorpFactorsfirstTime ) {
 			FirstCalcZone.dimension( NumOfZones, true );
-			firstTime = false;
+			ComputeIntSWAbsorpFactorsfirstTime = false;
 		}
 
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
@@ -3759,7 +3776,7 @@ namespace HeatBalanceSurfaceManager {
 		static Array1D< Real64 > SumTime; // Amount of time that has elapsed from start of master history to
 		// the current time step
 
-		static bool FirstTimeFlag( true );
+
 		// FLOW:
 
 		//Tuned Assure safe to use shared linear indexing below
@@ -3770,7 +3787,7 @@ namespace HeatBalanceSurfaceManager {
 		assert( equal_dimensions( TsrcHist, TsrcHistM ) );
 		assert( equal_dimensions( TsrcHistM, QsrcHistM ) );
 
-		if ( FirstTimeFlag ) {
+		if ( UpdateThermalHistoriesFirstTimeFlag ) {
 			QExt1.dimension( TotSurfaces, 0.0 );
 			QInt1.dimension( TotSurfaces, 0.0 );
 			TempInt1.dimension( TotSurfaces, 0.0 );
@@ -3778,7 +3795,7 @@ namespace HeatBalanceSurfaceManager {
 			SumTime.dimension( TotSurfaces, 0.0 );
 			Qsrc1.dimension( TotSurfaces, 0.0 );
 			Tsrc1.dimension( TotSurfaces, 0.0 );
-			FirstTimeFlag = false;
+			UpdateThermalHistoriesFirstTimeFlag = false;
 		}
 
 		auto const l111( TH.index( 1, 1, 1 ) );
@@ -4028,7 +4045,7 @@ namespace HeatBalanceSurfaceManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool firstTime( true ); // Flag for first time calculations
+
 		Real64 SumAET; // Intermediate calculational variable (area*emissivity*T) sum
 		static Array1D< Real64 > SurfaceAE; // Product of area and emissivity for each surface
 		int SurfNum; // Surface number
@@ -4036,7 +4053,7 @@ namespace HeatBalanceSurfaceManager {
 		int ZoneNum; // Zone number
 
 		// FLOW:
-		if ( firstTime ) {
+		if ( CalculateZoneMRTfirstTime ) {
 			SurfaceAE.allocate( TotSurfaces );
 			ZoneAESum.allocate( NumOfZones );
 			SurfaceAE = 0.0;
@@ -4061,7 +4078,7 @@ namespace HeatBalanceSurfaceManager {
 			if ( ZoneAESum( ZoneNum ) > 0.01 ) {
 				MRT( ZoneNum ) = SumAET / ZoneAESum( ZoneNum );
 			} else {
-				if ( firstTime ) {
+				if ( CalculateZoneMRTfirstTime ) {
 					ShowWarningError( "Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + Zone( ZoneNum ).Name + "\"" );
 					ShowContinueError( "As a result, MRT will be set to MAT for that zone" );
 				}
@@ -4069,7 +4086,7 @@ namespace HeatBalanceSurfaceManager {
 			}
 		}
 
-		firstTime = false;
+		CalculateZoneMRTfirstTime = false;
 
 	}
 
@@ -4751,6 +4768,8 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 
 }
 
+
+
 void
 CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in, then only calculate surfaces that have this zone
 {
@@ -4879,7 +4898,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	static Array1D< Real64 > TempInsOld; // Holds previous iteration's value for convergence check
 	Real64 TempSurfOutTmp; // Local Temporary Surface temperature for the outside surface face
 	Real64 TempSurfInSat; // Local temperary surface dew point temperature
-	static bool firstTime( true ); // Used for trapping errors or other problems
+	static bool calcHeatBalanceInsideSurfFirstTime( true ); // Used for trapping errors or other problems
 	int OtherSideSurfNum; // Surface number index for other side of an interzone partition
 	static int MinIterations; // Minimum number of iterations for the inside heat balance
 	//  CHARACTER(len=25):: ErrMsg
@@ -4908,7 +4927,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	static int TimeStepInDay( 0 ); // time step number
 
 	// FLOW:
-	if ( firstTime ) {
+	if ( calcHeatBalanceInsideSurfFirstTime ) {
 		TempInsOld.allocate( TotSurfaces );
 		RefAirTemp.allocate( TotSurfaces );
 		if ( any_eq( HeatTransferAlgosUsed, UseEMPD ) ) {
@@ -5232,7 +5251,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 					} else { // Movable insulation present
 
-						if ( construct.SourceSinkPresent && firstTime ) ShowSevereError( "Movable insulation is not valid with embedded sources/sinks" );
+						if ( construct.SourceSinkPresent && calcHeatBalanceInsideSurfFirstTime ) ShowSevereError( "Movable insulation is not valid with embedded sources/sinks" );
 
 						F1 = HMovInsul / ( HMovInsul + HConvIn_surf + IterDampConst );
 
@@ -5245,7 +5264,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 				} else { // Window
 
-					if ( construct.SourceSinkPresent && firstTime ) ShowSevereError( "Windows are not allowed to have embedded sources/sinks" );
+					if ( construct.SourceSinkPresent && calcHeatBalanceInsideSurfFirstTime ) ShowSevereError( "Windows are not allowed to have embedded sources/sinks" );
 
 					if ( SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_TDD_Diffuser ) { // Tubular daylighting device
 						// Lookup up the TDD:DOME object
@@ -5691,7 +5710,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 	CalculateZoneMRT( ZoneToResimulate ); // Update here so that the proper value of MRT is available to radiant systems
 
-	firstTime = false;
+	calcHeatBalanceInsideSurfFirstTime = false;
 
 }
 

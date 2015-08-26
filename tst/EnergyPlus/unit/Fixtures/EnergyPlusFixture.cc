@@ -19,8 +19,8 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -39,6 +39,7 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/InputProcessor.hh>
@@ -108,6 +109,7 @@ namespace EnergyPlus {
 		DataGlobals::clear_state();
 		DataHeatBalance::clear_state();
 		DataHeatBalFanSys::clear_state();
+		DataHeatBalSurface::clear_state();
 		DataHVACGlobals::clear_state();
 		DataIPShortCuts::clear_state();
 		DataLoopNode::clear_state();
@@ -124,6 +126,7 @@ namespace EnergyPlus {
 		GlobalNames::clear_state();
 		HeatBalanceAirManager::clear_state();
 		HeatBalanceManager::clear_state();
+		HeatBalanceSurfaceManager::clear_state();
 		Humidifiers::clear_state();
 		HVACManager::clear_state();
 		InputProcessor::clear_state();

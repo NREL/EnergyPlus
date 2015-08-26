@@ -34,8 +34,6 @@ enum AirTerminalUnitType {
 // base class for all air distribution units.  zone air terminals for connecting to central air handlers
 class AirTerminalUnit
 {
-public:
-	friend class HVACFixture;
 
 protected: // Creation
 
@@ -82,7 +80,7 @@ protected: // Assignment
 	operator =( AirTerminalUnit && ) = default;
 #endif
 
-public: // Methods
+public: // Methods		REMOVE ANY OF THESE THAT AREN'T COMMON (WITH SAME ARGS) TO ALL SUB-TYPES
 
 	virtual
 	void

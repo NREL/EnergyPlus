@@ -36,6 +36,8 @@ namespace HeatBalanceSurfaceManager {
 	// Reporting routines for module
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageSurfaceHeatBalance();
