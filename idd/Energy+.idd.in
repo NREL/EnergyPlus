@@ -50745,7 +50745,6 @@ AirLoopHVAC:UnitarySystem,
   A9, \field Supply Fan Name
        \type object-list
        \object-list Fans
-       \object-list FansCVandOnOffandVAV
        \note Enter the name of the supply air fan if included in the unitary system.
   A10, \field Fan Placement
        \type choice
