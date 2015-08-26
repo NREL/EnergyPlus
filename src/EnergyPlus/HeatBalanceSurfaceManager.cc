@@ -129,13 +129,14 @@ namespace HeatBalanceSurfaceManager {
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
 
-	bool ManageSurfaceHeatBalancefirstTime( true );
-	bool InitSurfaceHeatBalancefirstTime( true );
-	bool ComputeIntSWAbsorpFactorsfirstTime( true ); // First time through routine
-	bool UpdateThermalHistoriesFirstTimeFlag( true );
-	bool CalculateZoneMRTfirstTime( true ); // Flag for first time calculations
-
-
+	namespace {
+		bool ManageSurfaceHeatBalancefirstTime( true );
+		bool InitSurfaceHeatBalancefirstTime( true );
+		bool ComputeIntSWAbsorpFactorsfirstTime( true ); // First time through routine
+		bool UpdateThermalHistoriesFirstTimeFlag( true );
+		bool CalculateZoneMRTfirstTime( true ); // Flag for first time calculations
+		bool calcHeatBalanceInsideSurfFirstTime( true ); // Used for trapping errors or other problems
+	}
 	// DERIVED TYPE DEFINITIONS:
 	// na
 
@@ -168,7 +169,7 @@ namespace HeatBalanceSurfaceManager {
 		ComputeIntSWAbsorpFactorsfirstTime = true;
 		UpdateThermalHistoriesFirstTimeFlag = true;
 		CalculateZoneMRTfirstTime = true;
-		//calcHeatBalanceInsideSurfFirstTime = true;
+		calcHeatBalanceInsideSurfFirstTime = true;
 	}
 
 	void
@@ -4253,7 +4254,7 @@ namespace HeatBalanceSurfaceManager {
 	// End of Reporting subroutines for the HB Module
 	// *****************************************************************************
 
-} // HeatBalanceSurfaceManager
+
 
 // *****************************************************************************
 // *****************************************************************************
@@ -4898,7 +4899,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	static Array1D< Real64 > TempInsOld; // Holds previous iteration's value for convergence check
 	Real64 TempSurfOutTmp; // Local Temporary Surface temperature for the outside surface face
 	Real64 TempSurfInSat; // Local temperary surface dew point temperature
-	static bool calcHeatBalanceInsideSurfFirstTime( true ); // Used for trapping errors or other problems
+
 	int OtherSideSurfNum; // Surface number index for other side of an interzone partition
 	static int MinIterations; // Minimum number of iterations for the inside heat balance
 	//  CHARACTER(len=25):: ErrMsg
@@ -6116,5 +6117,6 @@ GatherComponentLoadsSurfAbsFact()
 	//     permit others to do so.
 	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
+} // HeatBalanceSurfaceManager 
 
 } // EnergyPlus
