@@ -5,8 +5,13 @@
 
 // EnergyPlus Headers
 #include <SetPointManager.hh>
+#include <DataEnvironment.hh>
+#include <DataGlobals.hh>
 #include <DataPlant.hh>
 #include <DataLoopNode.hh>
+#include <ScheduleManager.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
  
@@ -184,5 +189,57 @@ TEST( SetPointManager, DefineReturnWaterHWSetPointManager )
 	DataLoopNode::Node.deallocate();
 	DataPlant::PlantLoop(1).LoopSide.deallocate();
 	DataPlant::PlantLoop.deallocate();
+
+}
+
+TEST_F( EnergyPlusFixture, CalcScheduledTESSetPoint )
+{
+	int const CoolOpComp ( 1 ); // a component that cools only (chillers)
+	int const DualOpComp ( 2 ); // a component that heats or cools (ice storage tank)
+
+	int schManNum = 1;
+	SetPointManager::SchTESSetPtMgr.allocate(schManNum);
+	SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp = 5;
+	SetPointManager::SchTESSetPtMgr(schManNum).ChargeCHWTemp = -5;
+
+	int const OnSched  = 1;
+	int const OffSched = 2;
+	std::string const idf_contents( delimited_string( {
+		"Schedule:Constant,MyScheduleOn,,1;",
+		"Schedule:Constant,MyScheduleOff,,0;",
+	} ) );
+	ASSERT_FALSE(process_idf(idf_contents));
+	DataGlobals::NumOfTimeStepInHour = 4;
+	DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
+	ScheduleManager::ProcessScheduleInput();
+	DataGlobals::TimeStep = 1;
+	DataGlobals::HourOfDay = 1;
+	DataEnvironment::DayOfWeek = 1;
+	DataEnvironment::DayOfYear_Schedule = 1;
+	ScheduleManager::UpdateScheduleValues();
+
+	SetPointManager::SchTESSetPtMgr(schManNum).CompOpType = CoolOpComp;
+
+		SetPointManager::SchTESSetPtMgr(schManNum).SchedPtr = OnSched;
+
+			SetPointManager::CalcScheduledTESSetPoint(schManNum);
+			EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
+
+		SetPointManager::SchTESSetPtMgr(schManNum).SchedPtr = OffSched;
+		SetPointManager::SchTESSetPtMgr(schManNum).SchedPtrCharge = OffSched;
+
+			SetPointManager::CalcScheduledTESSetPoint(schManNum);
+			EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
+
+		SetPointManager::SchTESSetPtMgr(schManNum).SchedPtr = OffSched;
+		SetPointManager::SchTESSetPtMgr(schManNum).SchedPtrCharge = OnSched;
+
+			SetPointManager::CalcScheduledTESSetPoint(schManNum);
+			EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).ChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
+
+	SetPointManager::SchTESSetPtMgr(schManNum).CompOpType = DualOpComp;
+
+		SetPointManager::CalcScheduledTESSetPoint(schManNum);
+		EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
 
 }
