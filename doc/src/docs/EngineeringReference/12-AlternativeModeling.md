@@ -4,15 +4,40 @@ Alternative Modeling Processes
 
 ### RoomAir Models
 
-The group of models described in this section is used to account for non-uniform room air temperatures that may occur within the interior air volume of a zone.  These models are accessed using the RoomAirModelType input object. RoomAir modeling was added to EnergyPlus starting with Version 1.2.  Although there are many types of analyses (comfort, indoor air quality, etc) that might benefit from localized modeling of how room air varies across space, only the *temperature* distribution of room air within the zone is currently addressed in EnergyPlus.  This allows surface heat transfer and air system heat balance calculations to be made taking into account natural thermal stratification of air and different types of intentional air distribution designs such as under-floor and side-wall displacement ventilation that purport to extract room air at higher-than-mean temperatures.  Note that EnergyPlus does **not** have completely general methods of modeling room air that are applicable to every conceivable type of airflow that might occur in a zone.  Such models (e.g. RANS-CFD) are too computationally expensive to use with EnergyPlus for the foreseeable future. The models that are available in EnergyPlus offer only limited modeling capabilities for select room airflow configurations.  Also note that because the complete mixing model for room air has long been the standard in building energy simulation, there is not currently a consensus on how to best model non-uniform air temperatures in buildings.  Therefore, it is up to the user to have a good understanding of when, where, and how to apply the room air models available in EnergyPlus.  The rest of this section provides some guidance in the way of examples and further discussion of the models available in EnergyPlus.
+The group of models described in this section is used to account for
+non-uniform room air temperatures that may occur within the interior air
+volume of a zone. These models are accessed using the RoomAirModelType
+input object. RoomAir modeling was added to EnergyPlus starting with
+Version 1.2. Although there are many types of analyses (comfort, indoor
+air quality, etc) that might benefit from localized modeling of how room
+ir varies across space, only the *temperature* distribution of room air
+within the zone is currently addressed in EnergyPlus. This allows surface
+heat transfer and air system heat balance calculations to be made taking
+into account natural thermal stratification of air and different types of
+intentional air distribution designs such as under-floor and side-wall
+displacement ventilation that purport to extract room air at
+higher-than-mean temperatures. Note that EnergyPlus does **not** have
+completely general methods of modeling room air that are applicable to
+every conceivable type of airflow that might occur in a zone. Such models
+(e.g. RANS-CFD) are too computationally expensive to use with EnergyPlus
+for the foreseeable future. The models that are available in EnergyPlus
+offer only limited modeling capabilities for select room airflow
+configurations. Also note that because the complete mixing model for room
+air has long been the standard in building energy simulation, there is not
+currently a consensus on how to best model non-uniform air temperatures in
+buildings. Therefore, it is up to the user to have a good understanding of
+when, where, and how to apply the room air models available in EnergyPlus.
+The rest of this section provides some guidance in the way of examples and
+further discussion of the models available in EnergyPlus.
 
 A new RoomAir model, RoomAirflowNetwork, is added to integrate the RoomAir model with the AirflowNetwork model. The model allows multiple Room Air nodes assocaited with AirflowNetwork intra zone nodes. The AirflowNetwork intra zone linkages provide links among the intra zone nodes. Users may specify airflow components among these links. The AirflowNetwork model calculates airflows of the links. The incoming airflows are part of zone heat and moisture balances of intra zone nodes. The new model also allows users to specify a node to be connected to surfaces to have convective heat transfer and/or moisture transfer between surfaces and the node, portion of internal gains and supply air and return air fractions from zone equipment and AirLoop terminals.     
 
-EnergyPlus offers the different types of air models listed in the table below along with the input objects associated with the use of that model.
+EnergyPlus offers the different types of air models listed in the table
+below along with the input objects associated with the use of that model.
 
 
 
-Table 43.  Summary of room air models available in EnergyPlus
+Table 43. Summary of room air models available in EnergyPlus
 
 <table class="table table-striped">
 <tr>
@@ -1998,11 +2023,21 @@ Bejan, A. 1994. Convection Heat Transfer 2nd ed, Wiley, USA.
 
 #### Overview
 
-The input object RoomAirSettings:AirflowNetwork lists multiple RoomAirflowNetwork nodes in a zone. The input object of RoomAirflowNetwork:Node defines a list of connections assigned to a particular RoomAirflowNetwork node, so that the connections will be used as components of node heat and moisture balance equations. In addition, the input objects of AirflowNetwork:IntraZone:Node and AirflowNetwork:IntraZone:Linkage specify airflow nodes, linkages, and associated flow components, so that the AirflowNetwork model is used to calculate intrazone linkage airflows, which will be a part of loads for the RoomAir node balances.
+The input object RoomAirSettings:AirflowNetwork lists multiple RoomAirflowNetwork
+nodes in a zone. The input object of RoomAirflowNetwork:Node defines a list of
+connections assigned to a particular RoomAirflowNetwork node, so that the
+connections will be used as components of node heat and moisture balance
+equations. In addition, the input objects of AirflowNetwork:IntraZone:Node and
+AirflowNetwork:IntraZone:Linkage specify airflow nodes, linkages, and associated
+flow components, so that the AirflowNetwork model is used to calculate intrazone
+linkage airflows, which will be a part of loads for the RoomAir node balances.
 
 #### Model description
 
-The model calculates each component of the governing equations first. Then heat and moisture balance equations are solved to get the node temperature and humidity ratio at the current time step. 
+The model calculates each component of the governing equations first. Then heat
+and moisture balance equations are solved to get the node temperature and
+humidity ratio at the current time step.
+
 Governing equations for each RoomAirflowNetwork node are described below:
 
 Energy balance equation
@@ -2115,7 +2150,21 @@ ${\sum\limits_{j = 1}^{{N_{i,HVAC}} F_{HVAC,j} {}/dot m_{sup,i,j} /left( T_{sup,
 
 #### Calculation procedures
 
-The AirflowNetwork model is called first to calculate intrazone linkage air flows based on node temperatures and humidity ratios at the previous time step. The linkage loads are summarized based on each node with all incoming airflow, while any outgoing airflows from the node of the interest are excluded in the node energy and moisture balances. When the RoomAirModelAirflowNetowrk module is called, it summarizes internal gains at each node based on specification provided in the RoomAirflowNetwork:Node:InternalGains object, convective heat transfer from adjacent walls specified in the RoomAirflowNetwork:Node:AdjacentSurfaceList object. These load components are used in the predictor to predict system loads based on thermostat setpoint and supply fraction in the controlled zone node. In the corrector, the supply air conditions defined in the RoomAirflowNetwork:Node:HVACEquipment object are added. After all load components are assembled together, the node energy and moisture balance equations are solved. The node temperature and humidity ratio are calculated at the current time step.    
+The AirflowNetwork model is called first to calculate intrazone linkage air
+flows based on node temperatures and humidity ratios at the previous time step.
+The linkage loads are summarized based on each node with all incoming airflow,
+while any outgoing airflows from the node of the interest are excluded in the
+node energy and moisture balances. When the RoomAirModelAirflowNetowrk module is
+called, it summarizes internal gains at each node based on specification
+provided in the RoomAirflowNetwork:Node:InternalGains object, convective heat
+transfer from adjacent walls specified in the
+RoomAirflowNetwork:Node:AdjacentSurfaceList object. These load components are
+used in the predictor to predict system loads based on thermostat setpoint and
+supply fraction in the controlled zone node. In the corrector, the supply air
+conditions defined in the RoomAirflowNetwork:Node:HVACEquipment object are added.
+After all load components are assembled together, the node energy and moisture
+balance equations are solved. The node temperature and humidity ratio are
+calculated at the current time step.    
  
 
 AirflowNetwork Model
