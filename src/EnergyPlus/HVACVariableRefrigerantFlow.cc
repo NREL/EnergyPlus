@@ -392,8 +392,8 @@ namespace HVACVariableRefrigerantFlow {
 				{ auto const SELECT_CASE_var( VRFTypeNum );
 				if ( SELECT_CASE_var == TypeOf_HeatPumpVRF ) {
 					MinCap = 0.0;
-					MaxCap = VRF( VRFNum ).HeatingCapacity; // should be greater than cooling capacity
-					OptCap = VRF( VRFNum ).HeatingCapacity; // connects to single loop, how to switch between cooling/heating capacity?
+					MaxCap = max( VRF( VRFNum ).CoolingCapacity, VRF( VRFNum ).HeatingCapacity ); // greater of cooling and heating capacity
+					OptCap = max( VRF( VRFNum ).CoolingCapacity, VRF( VRFNum ).HeatingCapacity ); // connects to single loop, need to switch between cooling/heating capacity?
 				} else {
 					ShowFatalError( "SimVRFCondenserPlant: Module called with incorrect VRFType=" + VRFType );
 				}}
@@ -4549,13 +4549,12 @@ namespace HVACVariableRefrigerantFlow {
 					rho = GetDensityGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
 
 					Cp = GetSpecificHeatGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
-					tmpCondVolFlowRate = VRF( VRFCond ).HeatingCapacity / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
-					if ( VRF( VRFCond ).HeatingCapacity != AutoSize ) {
+					tmpCondVolFlowRate = max( VRF( VRFCond ).CoolingCapacity, VRF( VRFCond ).HeatingCapacity ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
+					if( VRF( VRFCond ).HeatingCapacity != AutoSize && VRF( VRFCond ).CoolingCapacity != AutoSize ) {
 						VRF( VRFCond ).WaterCondVolFlowRate = tmpCondVolFlowRate;
 						ReportSizingOutput( "AirConditioner:VariableRefrigerantFlow", VRF( VRFCond ).Name, "Design Condenser Water Flow Rate [m3/s]", VRF( VRFCond ).WaterCondVolFlowRate );
 					}
 
-					RegisterPlantCompDesignFlow( VRF( VRFCond ).CondenserNodeNum, VRF( VRFCond ).WaterCondVolFlowRate );
 
 				} else {
 					ShowSevereError( "Autosizing of condenser water flow rate requires a condenser loop Sizing:Plant object" );
@@ -4569,6 +4568,8 @@ namespace HVACVariableRefrigerantFlow {
 			if ( ErrorsFound ) {
 				ShowFatalError( "Preceding sizing errors cause program termination" );
 			}
+
+			RegisterPlantCompDesignFlow( VRF( VRFCond ).CondenserNodeNum, VRF( VRFCond ).WaterCondVolFlowRate );
 
 		}
 
