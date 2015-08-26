@@ -38,6 +38,7 @@
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/Humidifiers.hh>
@@ -50,9 +51,12 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
+#include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantLoopSolver.hh>
 #include <EnergyPlus/PlantManager.hh>
+#include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -61,6 +65,7 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -125,6 +130,7 @@ namespace EnergyPlus {
 		ExteriorEnergyUse::clear_state();
 		GlobalNames::clear_state();
 		HeatBalanceAirManager::clear_state();
+		HeatBalanceIntRadExchange::clear_state();
 		HeatBalanceManager::clear_state();
 		HeatBalanceSurfaceManager::clear_state();
 		Humidifiers::clear_state();
@@ -138,6 +144,9 @@ namespace EnergyPlus {
 		OutputReportPredefined::clear_state();
 		OutsideEnergySources::clear_state();
 		PlantLoopSolver::clear_state();
+		PlantPressureSystem::clear_state();
+		Pipes::clear_state();
+		Pumps::clear_state();
 		ScheduleManager::clear_state();
 		VariableSpeedCoils::clear_state();
 		SetPointManager::clear_state();
@@ -146,6 +155,7 @@ namespace EnergyPlus {
 		SizingManager::clear_state();
 		SolarShading::clear_state();
 		SplitterComponent::clear_state();
+		SystemAvailabilityManager::clear_state();
 		VariableSpeedCoils::clear_state();
 		WaterCoils::clear_state();
 		WeatherManager::clear_state();
