@@ -60,6 +60,7 @@ namespace DataDefineEquip {
 		int NumControls; // number of controls (not used; =0)
 		Array1D_string EquipType; // Pointer indentifying type of subcomponent
 		Array1D_int EquipType_Num;
+		///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
 		std::shared_ptr< AirTerminalUnit > airTerminalPtr;
 		Array1D_string EquipName; // name of subcomponent
 		Array1D_int EquipIndex;

@@ -42,7 +42,7 @@ namespace FourPipeBeam {
 
 
 //	HVACFourPipeBeam::HVACFourPipeBeam(){}
-
+	///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
 	std::shared_ptr< AirTerminalUnit > 
 	HVACFourPipeBeam::fourPipeBeamFactory(
 		int EP_UNUSED(objectType),
@@ -89,6 +89,7 @@ namespace FourPipeBeam {
 		bool airNodeFound;
 		int aDUIndex;
 
+		///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
 		std::shared_ptr< HVACFourPipeBeam > thisBeam( new HVACFourPipeBeam() );
 
 		// find the number of cooled beam units

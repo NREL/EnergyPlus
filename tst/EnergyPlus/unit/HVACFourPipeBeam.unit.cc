@@ -1664,7 +1664,7 @@ namespace EnergyPlus {
 		EXPECT_NEAR( DataLoopNode::Node( 39 ).Temp, 35.064466069323743, 0.00001 );
 		EXPECT_NEAR( DataLoopNode::Node( 39 ).MassFlowRate, 0.19320550334974979, 0.00001 );
 
-		EXPECT_DOUBLE_EQ( NonAirSysOutput, 8023.9273066417645 );
+		EXPECT_NEAR( NonAirSysOutput, 8023.9273066417645, 0.0001);
 
 
 		// next run with cooling load and neutral supply air

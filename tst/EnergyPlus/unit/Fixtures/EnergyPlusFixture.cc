@@ -33,6 +33,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/GlobalNames.hh>
@@ -118,6 +119,7 @@ namespace EnergyPlus {
 		DataZoneEquipment::clear_state();
 		EMSManager::clear_state();
 		ExteriorEnergyUse::clear_state();
+		Fans::clear_state();
 		GlobalNames::clear_state();
 		HeatBalanceAirManager::clear_state();
 		HeatBalanceManager::clear_state();
