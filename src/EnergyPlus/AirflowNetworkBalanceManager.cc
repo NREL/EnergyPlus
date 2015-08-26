@@ -933,7 +933,7 @@ namespace AirflowNetworkBalanceManager {
 			}
 		} else {
 			ShowSevereError( RoutineName + "For an AirflowNetwork Simulation, at least one " + CurrentModuleObject + " object is required but none were found." );
-			ErrorsFound = true;
+			ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
 		}
 
 		// ==> Zone data validation
