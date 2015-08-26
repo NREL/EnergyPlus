@@ -19,7 +19,7 @@ namespace FourPipeBeam {
 class HVACFourPipeBeam : public AirTerminalUnit
 {
 
-public: // Creation
+protected: // Creation
 
 	// Default Constructor
 	HVACFourPipeBeam() :
@@ -97,6 +97,7 @@ public: // Creation
 		qDotZoneToCoolSetPt( 0.0 )
 	{}
 
+public: 
 	// Destructor
 	virtual
 	~HVACFourPipeBeam()
