@@ -132,9 +132,9 @@ ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     #  /xHost
 
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
-    ADD_CXX_RELEASE_DEFINITIONS("/Qansi-alias") # Enables more aggressive optimizations on floating-point data
-    ADD_CXX_RELEASE_DEFINITIONS("/fp:fast") # Enables more aggressive optimizations on floating-point data
-    ADD_CXX_RELEASE_DEFINITIONS("/Qprec-div-") # ???If this is equivalent to /Qno-prec-div, it disables the improved division accuracy in favor of speed
+    # ADD_CXX_RELEASE_DEFINITIONS("/Qansi-alias") # Enables more aggressive optimizations on floating-point data
+    # ADD_CXX_RELEASE_DEFINITIONS("/fp:fast") # Enables more aggressive optimizations on floating-point data
+    # ADD_CXX_RELEASE_DEFINITIONS("/Qprec-div-") # ???If this is equivalent to /Qno-prec-div, it disables the improved division accuracy in favor of speed
     ADD_CXX_RELEASE_DEFINITIONS("/Qip") # Enables inter-procedural optimnization within a single file
 
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
@@ -177,9 +177,9 @@ ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     #  -xHost
 
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
-    ADD_CXX_RELEASE_DEFINITIONS("-ansi-alias") # Enables more aggressive optimizations on floating-point data
-    ADD_CXX_RELEASE_DEFINITIONS("-fp:fast") # Enables more aggressive optimizations on floating-point data
-    ADD_CXX_RELEASE_DEFINITIONS("-prec-div-") # ???If this is equivalent to /Qno-prec-div, it disables the improved division accuracy in favor of speed
+    # ADD_CXX_RELEASE_DEFINITIONS("-ansi-alias") # Enables more aggressive optimizations on floating-point data
+    # ADD_CXX_RELEASE_DEFINITIONS("-fp:fast") # Enables more aggressive optimizations on floating-point data
+    # ADD_CXX_RELEASE_DEFINITIONS("-prec-div-") # ???If this is equivalent to /Qno-prec-div, it disables the improved division accuracy in favor of speed
     ADD_CXX_RELEASE_DEFINITIONS("-ip") # Enables inter-procedural optimnization within a single file
 
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
