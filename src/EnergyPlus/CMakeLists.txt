@@ -301,7 +301,7 @@ SET( SRC
   Humidifiers.cc
   Humidifiers.hh
 )
-
+ 
 SET( SRC_2
   Timer.h
   ICEngineElectricGenerator.cc
@@ -348,6 +348,8 @@ SET( SRC_2
   OutputReportTabularAnnual.hh
   OutputReports.cc
   OutputReports.hh
+  OutputReportData.cc
+  OutputReportData.hh
   OutsideEnergySources.cc
   OutsideEnergySources.hh
   PackagedTerminalHeatPump.cc

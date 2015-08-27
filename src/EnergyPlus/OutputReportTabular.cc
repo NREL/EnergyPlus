@@ -41,6 +41,7 @@
 #include <ManageElectricPower.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
+#include <OutputReportTabularAnnual.hh>
 #include <PollutionModule.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
@@ -457,6 +458,7 @@ namespace OutputReportTabular {
 
 		if ( GetInput ) {
 			GetInputTabularMonthly();
+			OutputReportTabularAnnual::GetInputTabularAnnual();
 			GetInputTabularTimeBins();
 			GetInputTabularStyle();
 			GetInputTabularPredefined();
@@ -472,12 +474,15 @@ namespace OutputReportTabular {
 			if ( IndexTypeKey == stepTypeZone ) {
 				gatherElapsedTimeBEPS += TimeStepZone;
 			}
-			GatherMonthlyResultsForTimestep( IndexTypeKey );
-			GatherBinResultsForTimestep( IndexTypeKey );
-			GatherBEPSResultsForTimestep( IndexTypeKey );
-			GatherSourceEnergyEndUseResultsForTimestep( IndexTypeKey );
-			GatherPeakDemandForTimestep( IndexTypeKey );
-			GatherHeatGainReport( IndexTypeKey );
+			if ( DoWeathSim ) {
+				GatherMonthlyResultsForTimestep( IndexTypeKey );
+				OutputReportTabularAnnual::GatherAnnualResultsForTimeStep( IndexTypeKey );
+				GatherBinResultsForTimestep( IndexTypeKey );
+				GatherBEPSResultsForTimestep( IndexTypeKey );
+				GatherSourceEnergyEndUseResultsForTimestep( IndexTypeKey );
+				GatherPeakDemandForTimestep( IndexTypeKey );
+				GatherHeatGainReport( IndexTypeKey );
+			}
 		}
 	}
 
@@ -4771,6 +4776,8 @@ namespace OutputReportTabular {
 
 		FillWeatherPredefinedEntries();
 		FillRemainingPredefinedEntries();
+		OutputReportTabularAnnual::GatherAnnualOneTimeEntries();
+
 		if ( WriteTabularFiles ) {
 			// call each type of report in turn
 			WriteBEPSTable();
@@ -4787,6 +4794,7 @@ namespace OutputReportTabular {
 			if ( DoWeathSim ) {
 				WriteMonthlyTables();
 				WriteTimeBinTables();
+				OutputReportTabularAnnual::WriteAnnualTables();
 			}
 		}
 		EchoInputFile = FindUnitNumber( DataStringGlobals::outputAuditFileName );

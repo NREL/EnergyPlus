@@ -3755,6 +3755,30 @@ namespace InputProcessor {
 
 	}
 
+	std::string
+	deAllCaps( std::string const & inString )
+	{
+		// Jason Glazer - August 2015
+		// turn all caps into caps only when first letter in word
+		std::string returnString;
+		bool wasSpace = true; //start out assuming a space so first character is in caps
+		for ( int i = 0; i != inString.size(); i++ ){
+			char curChar = inString[i];
+			if ( wasSpace ){
+				returnString.push_back( inString[i] );
+			}
+			else {
+				if ( curChar > 64 && curChar < 91 ){
+					curChar = curChar + 32;
+				}
+				returnString.push_back( curChar );
+			}
+			wasSpace = ( curChar == 32 );
+		}
+		return returnString;
+	}
+
+
 	void
 	VerifyName(
 		std::string const & NameToVerify,
@@ -5250,6 +5274,7 @@ namespace InputProcessor {
 		static std::string const MeterCustomDecrement( "METER:CUSTOMDECREMENT" );
 		static std::string const MeterCustomDifference( "METER:CUSTOMDIFFERENCE" );
 		static std::string const OutputTableMonthly( "OUTPUT:TABLE:MONTHLY" );
+		static std::string const OutputTableAnnual( "OUTPUT:TABLE:ANNUAL" );
 		static std::string const OutputTableTimeBins( "OUTPUT:TABLE:TIMEBINS" );
 		static std::string const OutputTableSummaries( "OUTPUT:TABLE:SUMMARYREPORTS" );
 		static std::string const EMSSensor( "ENERGYMANAGEMENTSYSTEM:SENSOR" );
@@ -5356,6 +5381,15 @@ namespace InputProcessor {
 				AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( Loop ) );
 			}
 			CurrentRecord = FindNextRecord( OutputTableMonthly, CurrentRecord );
+		}
+
+		CurrentRecord = FindFirstRecord( OutputTableAnnual );
+		while ( CurrentRecord != 0 ) {
+			for ( Loop = 5; Loop <= IDFRecords( CurrentRecord ).NumAlphas; Loop += 2 ) {
+				if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) continue;
+				AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( Loop ) );
+			}
+			CurrentRecord = FindNextRecord( OutputTableAnnual, CurrentRecord );
 		}
 
 		CurrentRecord = FindFirstRecord( OutputTableSummaries ); // summary tables, not all add to variable structure

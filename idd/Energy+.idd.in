@@ -93997,6 +93997,571 @@ Output:Table:Monthly,
        \key MinimumDuringHoursShown
        \note See instructions under AggregationType01
 
+Output:Table:Annual,
+       \memo Provides a generic method of setting up tables of annual results with one row per object. 
+       \memo The report has multiple columns that are each defined using a repeated group of fields 
+       \memo for any number of columns. A single Output:Table:Annual produces a single table in the 
+       \memo output. 
+       \extensible:3
+   A1, \field Name
+       \required-field
+       \type alpha
+   A2, \field Report Group Name
+       \type alpha
+       \note An optional text string for the name of the report group. If this input is not blank the 
+       \note table will appear as a subtable in a report so that multiple Output:Table:Annual tables 
+       \note are shown together under one heading. This is similar to how many of the predefined reports 
+       \note appear with multiple subtables. If the input is left blank it will appear by itself in a report.
+   A3, \field Filter
+       \type alpha
+       \note An optional text string that is compared to the names of the objects referenced by the 
+       \note variables and if they match are included in the table. A footnote will appear that indicates 
+       \note that the objects shown may not be all the objects that of that type that occur in the file. 
+   A4, \field Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Optional schedule name. If left blank, aggregation is performed for all hours simulated. If 
+       \note a schedule is specified, aggregation is performed for non-zero hours in the schedule.
+! The next two fields are repeated for each column
+   A4, \field Variable or Meter or EMS Variable or Field 1 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+       \note contain the name of a variable (see Output:Variable and eplusout.rdd), meter (see Output:Meter 
+       \note and eplusout.mdd), or EMS Internal Variable Name or IDF Object Field name. This value is shown 
+       \note using the aggregation method specified. 
+   A5, \field Aggregation Type for Variable or Meter 1
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HoursInTenPercentBins 
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key HoursInTenBinsPlusMinusTwoStdDev 
+       \key HoursInTenBinsPlusMinusThreeStdDev 
+       \key NoAggregation
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+       \note The method of aggregation for the selected variable or meter.
+       \note SumOrAverage adds up the values for every timestep in the month if the variable
+       \note   is a sum variable. If the variable is an average variable it reports the average value.
+       \note   This is probably the most common Aggregation Type option to choose.
+       \note Maximum and Minimum find the maximum and minimum value for the month and report it
+       \note   along with the time that it first occurred.  When Maximum or Minimum are selected a
+       \note   column is automatically shown in the output report for the time that it occurred.
+       \note   When Maximum or Minimum are used with an average variable the value is divided
+       \note   by the length of the timestep.
+       \note ValueWhenMaxMin looks at the previous variable in the report that sets a maximum or minimum
+       \note   and displays the value of the current variable at that same timestep.
+       \note   Order of the variables in the report is important when using ValueWhenMaxMin.
+       \note   This can be used when an outdoor temperature should be reported for the time of the
+       \note   maximum cooling load.
+       \note HoursNonZero adds up the elapsed time during the month that this variable is non-zero
+       \note   and would be appropriate to determine the number of hour that a fan operates.
+       \note HoursZero - The HoursZero option adds up the elapsed time during the month that this
+       \note   variable has a zero value and would be appropriate to determine the number of hour
+       \note   that a fan does not operate.
+       \note HoursPositive - The HoursPositive option adds up the elapsed time during the month that
+       \note   this variable has a positive value.  Hours with a zero value are not included.
+       \note HoursNonPositive - The HoursNonPositive option adds up the elapsed time during the month
+       \note   that this variable has non-positive value. Hours with a negative value and hours with a
+       \note   zero value are all included.
+       \note HoursNegative - The HoursNegative option adds up the elapsed time during the month that
+       \note   this variable has a negative value.  Hours with a zero value are not included.
+       \note HoursNonNegative - The HoursNonNegative option adds up the elapsed time during the month
+       \note   that this variable has non-negative value. Hours with a positive value and
+       \note   hours with a zero value are all included.
+       \note HoursInTenPercentBins - Creates 12 columns for the specified variable and shows the number 
+       \note   of hours in each of the following bins.
+       \note HourInTenBinsMinToMax - Creates 10 columns for the specified variable and shows the number 
+       \note   of hours in each of 10 bins based on the minimum and maximum value. The bin sizes will 
+       \note   be rounded up to the next most signficant digit value. 
+       \note HourInTenBinsZeroToMax - Creates 11 columns for the specified variable and shows the number 
+       \note   of hours in each of 10 bins from zero to the maximum value and a bin for hours below zero. 
+       \note   The bin sizes will be rounded up to the next most significant digit value.
+       \note HourInTenBinsMinToZero - Creates 11 columns for the specified variable and shows the number 
+       \note   of hours in each of 10 bins from zero to the minimum value and a bin for hours above zero. 
+       \note   The bin sizes will be rounded up to the next most significant digit value.
+       \note HoursInTenBinsPlusMinusTwoStdDev - Creates 12 columns for the specified variable and shows 
+       \note   the number of hours in each of ten bins from minus two standard deviations to plus two 
+       \note   standard deviations plus a bin for hours below two standard deviations and another for 
+       \note   hours above two standard deviations. No bin size rounding for this option. 
+       \note HoursInTenBinsPlusMinusThreeStdDev - Creates 12 columns for the specified variable and 
+       \note   shows the number of hours in each of ten bins from minus three standard deviations to 
+       \note   plus three standard deviations plus a bin for hours below three standard deviations and 
+       \note   another for hours above three standard deviations. No bin size rounding for this option. 
+       \note NoAggregation - For values that do not change such as IDF object field inputs and EMS 
+       \note   internal variables, the NoAggregation value should be used since no aggregation is possible 
+       \note   on values that do not change during the simulation.
+       \note SumOrAverageDuringHoursShown - Provides the sum or average of the named variable when
+       \note   during the hours that the previous variable displayed with any of the Aggregation Types
+       \note   starting with "Hours". For "sum" type variables adds up the values for each timestep
+       \note   and reports the sum of the value monthly during the hours reported on the previous
+       \note   variable. For "average" type variables, the value shown will be the average for the month
+       \note   during the hours reported on the previous variable.  Order of the variables in
+       \note   the report is important when using this Aggregation Type.
+       \note MaximumDuringHoursShown - Reports the maximum value and the time that the maximum value
+       \note   occurred but only during the hours reported with the previous "hours-" Aggregation Type.
+       \note   When the Maximum option is used with an average variable the value is divided
+       \note   by the length of the timestep.  Order of the variables in the report is important
+       \note   when using this Aggregation Type.
+       \note MinimumDuringHoursShown - Reports the minimum value and the time that the minimum value
+       \note   occurred but only during the hours reported with the previous "hours-" Aggregation Type.
+       \note   When the Minimum option is used with an average variable the value is divided
+       \note   by the length of the timestep.  Order of the variables in the report is important
+       \note   when using this Aggregation Type.
+   N1, \field Digits After Decimal 1
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A6, \field Variable or Meter or EMS Variable or Field 2 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A7, \field Aggregation Type for Variable or Meter 2
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HoursInTenPercentBins 
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key HoursInTenBinsPlusMinusTwoStdDev 
+       \key HoursInTenBinsPlusMinusThreeStdDev 
+       \key NoAggregation
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N2, \field Digits After Decimal 2
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A8, \field Variable or Meter or EMS Variable or Field 3 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A9, \field Aggregation Type for Variable or Meter 3
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HoursInTenPercentBins 
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key HoursInTenBinsPlusMinusTwoStdDev 
+       \key HoursInTenBinsPlusMinusThreeStdDev 
+       \key NoAggregation
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N3, \field Digits After Decimal 3
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A10,\field Variable or Meter or EMS Variable or Field 4 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A11,\field Aggregation Type for Variable or Meter 4
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HoursInTenPercentBins 
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key HoursInTenBinsPlusMinusTwoStdDev 
+       \key HoursInTenBinsPlusMinusThreeStdDev 
+       \key NoAggregation
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N4, \field Digits After Decimal 4
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A12,\field Variable or Meter or EMS Variable or Field 5 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A13,\field Aggregation Type for Variable or Meter 5
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HoursInTenPercentBins 
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key HoursInTenBinsPlusMinusTwoStdDev 
+       \key HoursInTenBinsPlusMinusThreeStdDev 
+       \key NoAggregation
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N5, \field Digits After Decimal 5
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A14,\field Variable or Meter or EMS Variable or Field 6 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A15,\field Aggregation Type for Variable or Meter 6
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HoursInTenPercentBins 
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key HoursInTenBinsPlusMinusTwoStdDev 
+       \key HoursInTenBinsPlusMinusThreeStdDev 
+       \key NoAggregation
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N6, \field Digits After Decimal 6
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A16,\field Variable or Meter or EMS Variable or Field 7 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A17,\field Aggregation Type for Variable or Meter 7
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HoursInTenPercentBins 
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key HoursInTenBinsPlusMinusTwoStdDev 
+       \key HoursInTenBinsPlusMinusThreeStdDev 
+       \key NoAggregation
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N7, \field Digits After Decimal 7
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A18,\field Variable or Meter or EMS Variable or Field 8 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A19,\field Aggregation Type for Variable or Meter 8
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HoursInTenPercentBins 
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key HoursInTenBinsPlusMinusTwoStdDev 
+       \key HoursInTenBinsPlusMinusThreeStdDev 
+       \key NoAggregation
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N8, \field Digits After Decimal 8
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A20,\field Variable or Meter or EMS Variable or Field 9 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A21,\field Aggregation Type for Variable or Meter 9
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HoursInTenPercentBins 
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key HoursInTenBinsPlusMinusTwoStdDev 
+       \key HoursInTenBinsPlusMinusThreeStdDev 
+       \key NoAggregation
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N9, \field Digits After Decimal 9
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A22,\field Variable or Meter or EMS Variable or Field 10 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A23,\field Aggregation Type for Variable or Meter 10
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HoursInTenPercentBins 
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key HoursInTenBinsPlusMinusTwoStdDev 
+       \key HoursInTenBinsPlusMinusThreeStdDev 
+       \key NoAggregation
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N10,\field Digits After Decimal 10
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A24,\field Variable or Meter or EMS Variable or Field 11 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A25,\field Aggregation Type for Variable or Meter 11
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HoursInTenPercentBins 
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key HoursInTenBinsPlusMinusTwoStdDev 
+       \key HoursInTenBinsPlusMinusThreeStdDev 
+       \key NoAggregation
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N11,\field Digits After Decimal 11
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A26,\field Variable or Meter or EMS Variable or Field 12 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A27,\field Aggregation Type for Variable or Meter 12
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HoursInTenPercentBins 
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key HoursInTenBinsPlusMinusTwoStdDev 
+       \key HoursInTenBinsPlusMinusThreeStdDev 
+       \key NoAggregation
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N12,\field Digits After Decimal 12
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A28,\field Variable or Meter or EMS Variable or Field 13 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A29,\field Aggregation Type for Variable or Meter 13
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HoursInTenPercentBins 
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key HoursInTenBinsPlusMinusTwoStdDev 
+       \key HoursInTenBinsPlusMinusThreeStdDev 
+       \key NoAggregation
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N13,\field Digits After Decimal 13
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A30,\field Variable or Meter or EMS Variable or Field 14 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A31,\field Aggregation Type for Variable or Meter 14
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HoursInTenPercentBins 
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key HoursInTenBinsPlusMinusTwoStdDev 
+       \key HoursInTenBinsPlusMinusThreeStdDev 
+       \key NoAggregation
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N14,\field Digits After Decimal 14
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A32,\field Variable or Meter or EMS Variable or Field 15 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A33,\field Aggregation Type for Variable or Meter 15
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HoursInTenPercentBins 
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key HoursInTenBinsPlusMinusTwoStdDev 
+       \key HoursInTenBinsPlusMinusThreeStdDev 
+       \key NoAggregation
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N15;\field Digits After Decimal 15
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+
+
+
 OutputControl:Table:Style,
        \memo default style for the OutputControl:Table:Style is comma -- this works well for
        \memo importing into spreadsheet programs such as Excel(tm) but not so well for word
