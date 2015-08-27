@@ -53298,7 +53298,8 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   N30, \field Compressor Speed at Loading Index 1 
        \type real
        \note Minimum compressor speed 
-       \note unit in Rev/Sec	   
+       \note unit in Rev/Sec	
+       \minimum> 0   
   A13, \field Loading Index 1 Evaporative Capacity Function of Temperature Curve Name
        \required-field
        \type object-list
@@ -53312,6 +53313,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   N31, \field Compressor Speed at Loading Index 2
        \type real
        \note unit in Rev/Sec
+       \minimum> 0
   A15, \field Loading Index 2 Evaporative Capacity Function of Temperature Curve Name
        \required-field
        \type object-list
@@ -53325,6 +53327,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   N32, \field Compressor Speed at Loading Index 3       
        \type real
        \note unit in Rev/Sec
+       \minimum> 0
   A17, \field Loading Index 3 Evaporative Capacity Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
@@ -53336,6 +53339,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   N33, \field Compressor Speed at Loading Index 4       
        \type real
        \note unit in Rev/Sec
+       \minimum> 0
   A19, \field Loading Index 4 Evaporative Capacity Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
@@ -53347,6 +53351,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   N34, \field Compressor Speed at Loading Index 5       
        \type real
        \note unit in Rev/Sec
+       \minimum> 0
   A21, \field Loading Index 5 Evaporative Capacity Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
@@ -53358,6 +53363,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   N35, \field Compressor Speed at Loading Index 6       
        \type real
        \note unit in Rev/Sec
+       \minimum> 0
   A23, \field Loading Index 6 Evaporative Capacity Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
@@ -53369,6 +53375,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   N36, \field Compressor Speed at Loading Index 7       
        \type real
        \note unit in Rev/Sec
+       \minimum> 0
   A25, \field Loading Index 7 Evaporative Capacity Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
@@ -53379,6 +53386,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   N37, \field Compressor Speed at Loading Index 8       
        \type real
        \note unit in Rev/Sec
+       \minimum> 0
   A27, \field Loading Index 8 Evaporative Capacity Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
@@ -53390,6 +53398,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   N38, \field Compressor Speed at Loading Index 9       
        \type real 
        \note unit in Rev/Sec
+       \minimum> 0
   A29, \field Loading Index 9 Evaporative Capacity Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves

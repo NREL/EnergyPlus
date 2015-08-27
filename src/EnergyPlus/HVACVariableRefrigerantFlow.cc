@@ -751,7 +751,7 @@ namespace HVACVariableRefrigerantFlow {
 			InputPowerMultiplier = 1.0;
 
 			// Check outdoor temperature to determine of defrost is active
-			if ( OutdoorDryBulb <= VRF( VRFCond ).MaxOATDefrost ) {
+			if ( OutdoorDryBulb <= VRF( VRFCond ).MaxOATDefrost && VRF( VRFCond ).CondenserType != WaterCooled) {
 
 				// Calculating adjustment factors for defrost
 				// Calculate delta w through outdoor coil by assuming a coil temp of 0.82*DBT-9.7(F) per DOE2.1E
@@ -773,7 +773,7 @@ namespace HVACVariableRefrigerantFlow {
 
 				if ( FractionalDefrostTime > 0.0 ) {
 					// Calculate defrost adjustment factors depending on defrost control strategy
-					if ( VRF( VRFCond ).DefrostStrategy == ReverseCycle && VRF( VRFCond ).DefrostControl == OnDemand ) {
+					if ( VRF( VRFCond ).DefrostStrategy == ReverseCycle ) {
 						LoadDueToDefrost = ( 0.01 * FractionalDefrostTime ) * ( 7.222 - OutdoorDryBulb ) * ( VRF( VRFCond ).HeatingCapacity / 1.01667 );
 						DefrostEIRTempModFac = CurveValue( VRF( VRFCond ).DefrostEIRPtr, max( 15.555, InletAirWetBulbC ), max( 15.555, OutdoorDryBulb ) );
 
@@ -805,7 +805,7 @@ namespace HVACVariableRefrigerantFlow {
 			TotalTUHeatingCapacity = TotalCondHeatingCapacity * VRF( VRFCond ).PipingCorrectionHeating;
 			if ( TotalCondHeatingCapacity > 0.0 ) {
 				HeatingPLR = ( TUHeatingLoad / VRF( VRFCond ).PipingCorrectionHeating ) / TotalCondHeatingCapacity;
-				HeatingPLR += LoadDueToDefrost / TotalCondHeatingCapacity;
+				HeatingPLR += ( LoadDueToDefrost * HeatingPLR ) / TotalCondHeatingCapacity;
 			} else {
 				HeatingPLR = 0.0;
 			}
@@ -1046,6 +1046,9 @@ namespace HVACVariableRefrigerantFlow {
 			VRFRTF = min( 1.0, ( CyclingRatio / PartLoadFraction ) );
 
 			VRF( VRFCond ).ElecHeatingPower = ( VRF( VRFCond ).RatedHeatingPower * TotHeatCapTempModFac ) * TotHeatEIRTempModFac * EIRFPLRModFac * VRFRTF * InputPowerMultiplier;
+
+			// adjust defrost power based on heating RTF
+			VRF( VRFCond ).DefrostPower *= VRFRTF;
 		}
 		VRF( VRFCond ).VRFCondRTF = VRFRTF;
 
@@ -1821,7 +1824,7 @@ namespace HVACVariableRefrigerantFlow {
 			if ( ! lAlphaFieldBlanks( 33 ) ) {
 				VRF( VRFNum ).DefrostEIRPtr = GetCurveIndex( cAlphaArgs( 33 ) );
 				if ( VRF( VRFNum ).DefrostEIRPtr > 0 ) {
-					// Verify Curve Object, only legal type is linear, quadratic, or cubic
+					// Verify Curve Object, only legal type is BiQuadratic
 					{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).DefrostEIRPtr ) );
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					} else {
@@ -1830,13 +1833,13 @@ namespace HVACVariableRefrigerantFlow {
 						ErrorsFound = true;
 					}}
 				} else {
-					if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
+					if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle ) {
 						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 33 ) + " not found:" + cAlphaArgs( 33 ) );
 						ErrorsFound = true;
 					}
 				}
 			} else {
-				if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
+				if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle ) {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 33 ) + " not found:" + cAlphaArgs( 33 ) );
 					ErrorsFound = true;
 				}

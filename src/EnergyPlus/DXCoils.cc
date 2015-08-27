@@ -14866,9 +14866,9 @@ Label50: ;
             
             // Modify total heating capacity based on defrost heating capacity multiplier
             // MaxHeatCap passed from parent object VRF Condenser and is used to limit capacity of TU's to that available from condenser
-            // if( present( MaxHeatCap ) ) {
-            // 	TotCap = min( MaxHeatCap, TotCap );
-            // }
+               if( present( MaxHeatCap ) ) {
+               	TotCap = min( MaxHeatCap, TotCap );
+               }
             
             PartHeatRatio = QZnHeating / TotCap;
             
