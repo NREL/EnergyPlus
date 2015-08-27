@@ -6412,6 +6412,14 @@ The zone terminal unit list identifies the terminal units that are connected to 
 
 Figure 249. Zone Terminal List connections in EnergyPlus objects
 
+
+#### References
+
+Raustad R. A variable refrigerant flow heat pump computer model in EnergyPlus, ASHRAE Transactions (2013), 119 (1):1–9.
+
+Hong T, Sun K, Zhang R, Hinokuma R, Kasahara S, Yura Y. Development and Validation of a New VRF Model in EnergyPlus. ASHRAE Winter Conference.
+
+
 Heat Exchangers <a name="HX"></a>
 ---------------
 
