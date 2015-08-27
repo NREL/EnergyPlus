@@ -1,6 +1,5 @@
 // C++ Headers
 #include <algorithm>
-#include <fstream>
 #include <memory>
 
 // ObjexxFCL Headers
@@ -9,6 +8,7 @@
 
 // EnergyPlus Headers
 #include <DataEnvironment.hh>
+#include <General.hh>
 #include <DataGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataReportingFlags.hh>
@@ -25,7 +25,7 @@ namespace EnergyPlus {
 	int simDay = 0;
 	int numIterYears = 0;
 	int const maxYearsToIterate = 10;
-	Real64 finalTempConvergenceCriteria = 0.5;//0.05; FOR TESTING ONLY
+	Real64 finalTempConvergenceCriteria = 0.05;
 	Real64 iterationTempConvergenceCriteria = 0.00001;
 
 	//******************************************************************************
@@ -138,9 +138,11 @@ namespace EnergyPlus {
 		//	and data structure containing daily average of required weather data.
 
 		// USE STATEMENTS:
+		using General::JulianDay;
 		using WeatherManager::GetNextEnvironment;
 		using WeatherManager::ManageWeather;
 		using WeatherManager::ResetEnvironmentCounter;
+		using WeatherManager::RPReadAllWeatherData;
 		using namespace DataEnvironment;
 		using namespace DataGlobals;
 		using namespace DataReportingFlags;
@@ -158,8 +160,10 @@ namespace EnergyPlus {
 		Real64 annualAveAirTemp_num;
 		int denominator;
 
-		// Save current environment to we can revert back when done
+		// Save current environment so we can revert back when done
 		int Envrn_reset = Envrn;
+		int TimeStep_reset = TimeStep;
+		int HourOfDay_reset = HourOfDay;
 		bool BeginEnvrnFlag_reset = BeginEnvrnFlag;
 		bool EndEnvrnFlag_reset = EndEnvrnFlag;
 		bool EndMonthFlag_reset = EndMonthFlag;
@@ -167,6 +171,19 @@ namespace EnergyPlus {
 		int DayOfSim_reset = DayOfSim;
 		std::string DayOfSimChr_reset = DayOfSimChr;
 		int NumOfWarmupDays_reset = NumOfWarmupDays;
+
+		++NumOfEnvrn;
+		++TotRunPers;
+		Environment.redimension( NumOfEnvrn );
+		RunPeriodInput.redimension( TotRunPers );
+		Environment( NumOfEnvrn ).KindOfEnvrn = ksReadAllWeatherData;
+		RPReadAllWeatherData = true;
+		WeathSimReq = true;
+		RunPeriodInput( TotRunPers ).StartDate = JulianDay( 1, 1, 0 );
+		RunPeriodInput( TotRunPers ).EndDate = JulianDay( 12, 31, 0 );
+		RunPeriodInput( TotRunPers ).MonWeekDay = 0;
+
+		SetupEnvironmentTypes();
 
 		ResetEnvironmentCounter();
 
@@ -261,7 +278,18 @@ namespace EnergyPlus {
 				tdwd.windSpeed = windSpeed_num / denominator;
 				tdwd.horizontalRadiation = horizSolarRad_num / denominator;
 				tdwd.airDensity = airDensity_num / denominator;
+
+				// Log data for domain initialization using KA model
 				annualAveAirTemp_num += tdwd.dryBulbTemp;
+
+				if (tdwd.dryBulbTemp < minDailyAirTemp ) {
+					minDailyAirTemp = tdwd.dryBulbTemp;
+					dayOfMinDailyAirTemp = DayOfSim;
+				}
+
+				if (tdwd.dryBulbTemp > maxDailyAirTemp ) {
+					maxDailyAirTemp = tdwd.dryBulbTemp;
+				}
 
 			} // ... End day loop.
 
@@ -270,8 +298,14 @@ namespace EnergyPlus {
 		annualAveAirTemp = annualAveAirTemp_num / NumDaysInYear; // Used for initalizing domain
 
 		// Reset Envrionment when done reading data
-		--NumOfEnvrn;
+		--NumOfEnvrn; // May need better way of eliminating the extra envrionment that was added to read the data
+		--TotRunPers;
+		RPReadAllWeatherData = false;
+		Environment.redimension( NumOfEnvrn );
+		RunPeriodInput.redimension( TotRunPers );
 		Envrn = Envrn_reset;
+		TimeStep = TimeStep_reset;
+		HourOfDay = HourOfDay_reset;
 		BeginEnvrnFlag = BeginEnvrnFlag_reset;
 		EndEnvrnFlag = EndEnvrnFlag_reset;
 		EndMonthFlag = EndMonthFlag_reset;
@@ -322,7 +356,6 @@ namespace EnergyPlus {
 		cellArray.allocate( totalNumCells );
 		cellDepths.allocate( totalNumCells );
 
-		// Setup cells surface layer cells
 		for ( int i = 1; i <= totalNumCells; ++i ) {
 
 			// Reference to thisCell
@@ -779,25 +812,19 @@ namespace EnergyPlus {
 
 		// USE STATEMENTS:
 		using DataGlobals::SecsInDay;
+		using namespace GroundTemperatureManager;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string objectName = "KAModelForFDModel";
-		int objectType = 1;
-		Real64 avgGroundTemp = annualAveAirTemp;
-		Real64 aveGroundTempAmplitiude = 12.0;
-		int phaseShiftDay = 21;
-		Real64 groundThemalDiffusivity = baseConductivity / ( baseDensity * baseSpecificHeat );
 		
 		// Temporary KA model for initialization
 		std::unique_ptr< KusudaGroundTempsModel > tempModel( new KusudaGroundTempsModel() );
 
-		//std::ofstream initTempsFile( "InitTemps.csv", std::ofstream::out );
-		tempModel->objectName = objectName;
-		tempModel->objectType = objectType;
-		tempModel->aveGroundTemp = avgGroundTemp;
-		tempModel->aveGroundTempAmplitude = aveGroundTempAmplitiude;
-		tempModel->phaseShiftInSecs = phaseShiftDay * SecsInDay;
-		tempModel->groundThermalDiffisivity = groundThemalDiffusivity;
+		tempModel->objectName = "KAModelForFDModel";
+		tempModel->objectType = objectType_KusudaGroundTemp;
+		tempModel->aveGroundTemp = annualAveAirTemp;
+		tempModel->aveGroundTempAmplitude = ( maxDailyAirTemp - minDailyAirTemp ) / 4.0; // Rough estimate here. Ground temps will not swing as far as the air temp.
+		tempModel->phaseShiftInSecs = dayOfMinDailyAirTemp * SecsInDay;
+		tempModel->groundThermalDiffisivity = baseConductivity / ( baseDensity * baseSpecificHeat );
 
 		// Intialize temperatures and volume
 		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
@@ -814,8 +841,6 @@ namespace EnergyPlus {
 			// Set cell volume
 			thisCell.volume = thisCell.thickness * thisCell.conductionArea;
 
-			// Delete me
-			//initTempsFile << thisCell.temperature << std::endl;
 		}
 
 		// Initialize freezing calculation variables
@@ -824,7 +849,7 @@ namespace EnergyPlus {
 		// Initialize the groundTemps array
 		groundTemps.dimension( { 1, NumDaysInYear }, { 1, totalNumCells }, 0.0 );
 
-		// Need to delete tempModel?
+		tempModel.reset();
 
 	}
 
@@ -942,21 +967,20 @@ namespace EnergyPlus {
 		Real64 dayFrac;		// Fraction of day
 
 		if ( depth < 0.0 ) {
-			ShowFatalError("FiniteDiffGroundTemps: Invalid depth passed.");
-		}
-
-		if ( simTimeInDays < 0 || simTimeInDays > 366 ) {
-			ShowFatalError("FiniteDiffGroundTemps: Invalid day passed.");
+			depth = 0.0;
 		}
 		
 		// Get index of nearest cell with depth less than depth
 		auto it = std::lower_bound( cellDepths.begin(), cellDepths.end(), depth );
 		j0 = std::distance( cellDepths.begin(), it );
 
+		// Compensate for 1-based array
+		++j0;
+
 		// Fraction of day
 		dayFrac = simTimeInDays - int( simTimeInDays );
 
-		if ( j0 < totalNumCells ) {
+		if ( j0 < totalNumCells - 1 ) {
 			// All depths within domain
 			j1 = j0 + 1;
 
@@ -1000,6 +1024,7 @@ namespace EnergyPlus {
 
 		} else {
 			// Requesting a temperature deeper than domain. Pass deepest point in domain.
+			j0 = totalNumCells;
 			j1 = j0;
 
 			if ( simTimeInDays <= 1 || simTimeInDays >= NumDaysInYear) {
@@ -1058,6 +1083,10 @@ namespace EnergyPlus {
 
 		simTimeInDays = seconds / SecsInDay;
 
+		if ( simTimeInDays > NumDaysInYear ) {
+			simTimeInDays = remainder( simTimeInDays, NumDaysInYear );
+		}
+
 		return getGroundTemp();
 	}
 
@@ -1083,17 +1112,16 @@ namespace EnergyPlus {
 
 		depth = _depth;
 
-		// Convert months to seconds. Puts 'seconds' time in middle of specified month
-		if ( month >= 1 && month <= 12 ) {
-			simTimeInDays = aveDaysInMonth * ( ( month - 1 ) + 0.5 );
-		} else {
-			ShowFatalError("FiniteDiffGroundTempsModel: Invalid month passed to ground temperature model");
+		// Convert months to days. Puts time in middle of specified month
+		simTimeInDays = aveDaysInMonth * ( ( month - 1 ) + 0.5 );
+
+		if ( simTimeInDays > NumDaysInYear ) {
+			simTimeInDays = remainder( simTimeInDays, NumDaysInYear );
 		}
-		
+
 		// Get and return ground temperature
 		return getGroundTemp();
 
-		return 0;
 	}
 
 	//******************************************************************************

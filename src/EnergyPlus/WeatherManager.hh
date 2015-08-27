@@ -204,6 +204,7 @@ namespace WeatherManager {
 	extern bool DatesShouldBeReset; // True when weekdays should be reset
 	extern bool StartDatesCycleShouldBeReset; // True when start dates on repeat should be reset
 	extern bool Jan1DatesShouldBeReset; // True if Jan 1 should signal reset of dates
+	extern bool RPReadAllWeatherData; // True if need to read all weather data prior to simulation
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WeatherManager
 	//PUBLIC  ProcessDateString

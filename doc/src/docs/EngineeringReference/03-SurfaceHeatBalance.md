@@ -4105,7 +4105,7 @@ The model does not consider the effects of vegitative canopy layers, snow cover,
 
 Allen, R.G., L.S. Pereira, D. Raes, M. Smith. 1998. *Crop Evapotranspiration - Guidelines for Computing Crop Water Requirements.* Food and Agriculture Organization of the United Nations.
 
-Herb, W.R., B. Janke, O. Mohseni, & H.G. Stefan. 2008. `Ground Surface Temperature Simulation for Different Land Covers.' Journal of Hydrology, 356: pp 327-343.
+Herb, W.R., B. Janke, O. Mohseni, & H.G. Stefan. 2008. 'Ground Surface Temperature Simulation for Different Land Covers.' Journal of Hydrology, 356: pp 327-343.
 
 Lee, E.S. 2013. An Improved Hydronic Loop System Solution Algorithm with a Zone-Coupled Horizontal Ground Heat Exchanger Model for Whole Building Energy Simulation. Ph.D. Diss. Oklahoma State University, Stillwater, OK.
 
@@ -4130,7 +4130,7 @@ Where:
 
 #### References
 
-Kusuda, T. and P.R. Achenbach. 1965. `Earth Temperatures and Thermal Diffusivity at Selected Stations in the United States.' *ASHRAE Transactions*. 71(1): 61-74.
+Kusuda, T. and P.R. Achenbach. 1965. 'Earth Temperatures and Thermal Diffusivity at Selected Stations in the United States.' *ASHRAE Transactions*. 71(1): 61-74.
 
 
 Undisturbed Ground Temperature Model: Xing

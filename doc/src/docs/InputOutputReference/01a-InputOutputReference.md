@@ -2631,7 +2631,7 @@ Site:GroundTemperature:Undisturbed:KusudaAchenbach may be used by all objects re
 
 If the parameters are left blank they can be autocalculated by including soil surface temperatures in the input using the Site:GroundTemperature:Shallow object. They can also be calculated by using the CalcSoilSurfTemp preprocessor. 
 
-Kusuda, T. and P.R. Achenbach. 1965. `Earth Temperatures and Thermal Diffusivity at Selected Stations in the United States.' *ASHRAE Transactions*. 71(1): 61-74.
+Kusuda, T. and P.R. Achenbach. 1965. 'Earth Temperatures and Thermal Diffusivity at Selected Stations in the United States.' *ASHRAE Transactions*. 71(1): 61-74.
 
 #### Field: Soil Thermal Conductivity
 
@@ -2675,7 +2675,7 @@ An IDF example:
 
 Site:GroundTemperature:Undisturbed:Xing may be used by all objects requiring "undisturbed" ground temperatures. It provides an undisturbed ground temperature based on the correlation developed by Xing, 2014. The correlation is a 5 parameter, 2 harmonic model based on the work of Lord Kelvin (Thomson, 1862). The average soil surface temperature and two sets of surface temperature amplitude and phase shift must be provided. Parameters for 4000+ international locations can be found in Xing, 2014.
 
-Thomson, W. 1862. `On the Reduction of Observations of Underground Temperature, with applications to Professor Forbes’ Edinburgh Observations and the continued Calton Hill Series.' Proceedings of the Royal Society of Edinburgh. IV: 342-346.
+Thomson, W. 1862. 'On the Reduction of Observations of Underground Temperature, with applications to Professor Forbes’ Edinburgh Observations and the continued Calton Hill Series.' Proceedings of the Royal Society of Edinburgh. IV: 342-346.
 
 Xing, L. 2014. Estimations of Undisturbed Ground Temperatures using Numerical and Analytical Modeling. Ph.D. Diss. Oklahoma State University, Stillwater, OK.
 

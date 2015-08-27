@@ -28,8 +28,19 @@ namespace EnergyPlus {
 			Real64 saturatedWaterContent; 
 			Real64 waterContent;
 			Real64 annualAveAirTemp;
+			Real64 minDailyAirTemp; // Set hi. Will be reset later
+			Real64 maxDailyAirTemp; // Set low. Will be reset later
+			Real64 dayOfMinDailyAirTemp;
 			Real64 depth;
 			Real64 simTimeInDays;
+
+		// Default constructor
+		FiniteDiffGroundTempsModel() :
+			minDailyAirTemp( 100.0 ),
+			maxDailyAirTemp( -100.0 ),
+			dayOfMinDailyAirTemp( 1 )
+
+		{}
 
 		struct instanceOfCellData {
 
@@ -63,12 +74,10 @@ namespace EnergyPlus {
 		struct instanceOfWeatherData
 			{
 				Real64 dryBulbTemp;
-				Real64 dewPointTemp;
-				Real64 barometricPressure;
-				Real64 airDensity;
 				Real64 relativeHumidity;
 				Real64 windSpeed;
 				Real64 horizontalRadiation;
+				Real64 airDensity;
 			};
 
 		Array1D< instanceOfWeatherData > weatherDataArray;

@@ -25,10 +25,10 @@ set( test_src
   ExteriorEnergyUse.unit.cc
   Fans.unit.cc
   FaultFoulingAirFilters.unit.cc
+  FiniteDifferenceGroundTemperatureModel.unit.cc
   FluidCoolers.unit.cc
   Furnaces.unit.cc
   GroundHeatExchangers.unit.cc
-  GroundTemperatureModels.unit.cc
   HeatBalanceManager.unit.cc
   HeatRecovery.unit.cc
   Humidifiers.unit.cc
@@ -37,6 +37,7 @@ set( test_src
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
+  KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
   ManageElectricPower.unit.cc
   HVACUnitarySystem.unit.cc
@@ -49,6 +50,10 @@ set( test_src
   RoomAirModelUserTempPattern.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
+  SiteBuildingSurfaceGroundTemperatures.unit.cc
+  SiteDeepGroundTemperatures.unit.cc
+  SiteFCFactorMethodGroundTemperatures.unit.cc
+  SiteShallowGroundTemperatures.unit.cc
   SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc
   SolarShading.unit.cc
@@ -62,6 +67,7 @@ set( test_src
   WaterThermalTanks.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
+  XingGroundTemperatureModel.unit.cc
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc

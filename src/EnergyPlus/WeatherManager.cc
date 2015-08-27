@@ -1714,7 +1714,9 @@ namespace WeatherManager {
 			OutOfRange.DirectRad = 0;
 			OutOfRange.DiffuseRad = 0;
 
-			PrintEnvrnStamp = true; // Set this to true so that on first non-warmup day (only) the environment header will print out
+			if ( !RPReadAllWeatherData ) {
+				PrintEnvrnStamp = true; // Set this to true so that on first non-warmup day (only) the environment header will print out
+			}
 
 			//    WeekDayCount=0  ! Reset weekday count (weather periods only)
 			for ( Loop = 1; Loop <= NumSpecialDays; ++Loop ) {
@@ -4972,7 +4974,7 @@ Label9999: ;
 
 		// Report the time stamp and the current weather to the output file
 
-		if ( ! WarmupFlag ) { // Write the required output information
+		if ( ! WarmupFlag && ! RPReadAllWeatherData ) { // Write the required output information
 
 			// The first time through in a non-warmup day, the environment header
 			// must be printed.  This must be done here and not in the generic
@@ -5057,12 +5059,8 @@ Label9999: ;
 		RPD2 = GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 		RP = GetNumObjectsFound( "RunPeriod" );
 		RPAW = GetNumObjectsFound( "RunPeriod:CustomRange" );
-		RPReadAllWeatherData = GetNumObjectsFound("Site:GroundTemperature:Undisturbed:FiniteDifference") > 0;
+
 		TotRunPers = RP + RPAW;
-		
-		//if ( RPReadAllWeatherData ) {
-		//	TotRunPers++;
-		//}
 		
 		NumOfEnvrn = TotDesDays + TotRunPers + RPD1 + RPD2;
 		if ( TotRunPers > 0 ) {
@@ -5579,22 +5577,6 @@ Label9999: ;
 				SetupWeekDaysByMonth( RunPeriodInput( 1 ).StartMonth, RunPeriodInput( 1 ).StartDay, RunPeriodInput( 1 ).DayOfWeek, RunPeriodInput( 1 ).MonWeekDay );
 			}
 		}
-
-		if ( RPReadAllWeatherData ) {
-			++NumOfEnvrn;
-			++TotRunPers;
-			Environment.redimension( NumOfEnvrn );
-			RunPeriodInput.redimension( TotRunPers );
-			Environment( NumOfEnvrn ).KindOfEnvrn = ksReadAllWeatherData;
-			WeathSimReq = true;
-			RunPeriodInput( TotRunPers ).StartDate = JulianDay( 1, 1, 0 );
-			RunPeriodInput( TotRunPers ).EndDate = JulianDay( 12, 31, 0 );
-			RunPeriodInput( TotRunPers ).MonWeekDay = 0;
-			if ( RunPeriodInput( TotRunPers ).DayOfWeek != 0 && ! ErrorsFound ) {
-				SetupWeekDaysByMonth( RunPeriodInput( TotRunPers ).StartMonth, RunPeriodInput( TotRunPers ).StartDay, RunPeriodInput( TotRunPers ).DayOfWeek, RunPeriodInput( TotRunPers ).MonWeekDay );
-			}
-		}
-
 	}
 
 	void
@@ -9187,7 +9169,7 @@ Label9998: ;
 			} else {
 				env.Title = runPer.Title;
 			}
-			if ( RPReadAllWeatherData && env.KindOfEnvrn == ksReadAllWeatherData ) {
+			if ( env.KindOfEnvrn == ksReadAllWeatherData ) {
 				env.cKindOfEnvrn = "ReadAllWeatherDataRunPeriod";
 			} else {
 				env.cKindOfEnvrn = "WeatherFileRunPeriod";
