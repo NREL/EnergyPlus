@@ -4908,9 +4908,9 @@ namespace DataHeatBalance {
 		Real64 htPeak; // heating peak value (hvac air heating + heated surface)
 		Real64 SHGSHtHvacHt; // hvac air heating
 		Real64 SHGSHtHvacCl; // hvac air cooling
-		Real64 SHGSHtSurfHt; // heated surface heating
 		Real64 SHGSHtHvacATUHt; // heating by air terminal unit at heat peak [W]
 		Real64 SHGSHtHvacATUCl; // cooling by air terminal unit at heat peak [W]
+		Real64 SHGSHtSurfHt; // heated surface heating
 		Real64 SHGSHtSurfCl; // cooled surface cooling
 		Real64 SHGSHtPeoplAdd; // people additions
 		Real64 SHGSHtLiteAdd; // lighing addition

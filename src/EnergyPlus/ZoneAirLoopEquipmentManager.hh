@@ -62,10 +62,10 @@ namespace ZoneAirLoopEquipmentManager {
 	void
 	UpdateZoneAirLoopEquipment();
 
-	void
-	ReportZoneAirLoopEquipment(
-		int const AirDistUnitNum
-	);
+	// void
+	// ReportZoneAirLoopEquipment(
+	// 	int const AirDistUnitNum
+	// );
 
 	//     NOTICE
 

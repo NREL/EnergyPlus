@@ -153,8 +153,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 		//  CALL RecordZoneAirLoopEquipment
 
-		//  CALL ReportZoneAirLoopEquipment
-		ReportZoneAirLoopEquipment( AirDistUnitNum );
+		// ReportZoneAirLoopEquipment( AirDistUnitNum );
 
 		SimZone = false;
 
@@ -500,10 +499,10 @@ namespace ZoneAirLoopEquipmentManager {
 		}
 		if ( EachOnceFlag( AirDistUnitNum )) {
 			AirDistUnit( AirDistUnitNum ).ZoneNum = ZoneNum;
-			ZoneEqNum = AirDistUnit( AirDistUnitNum ).ZoneEqNum;
-			if ( allocated( FinalZoneSizing ) ) {
-				AirDistUnit( AirDistUnitNum ).AccountForDOAS = FinalZoneSizing( ZoneEqNum ).AccountForDOAS;
-			}
+			// ZoneEqNum = AirDistUnit( AirDistUnitNum ).ZoneEqNum;
+			// if ( allocated( FinalZoneSizing ) ) {
+				// AirDistUnit( AirDistUnitNum ).AccountForDOAS = FinalZoneSizing( ZoneEqNum ).AccountForDOAS;
+			// }
 			EachOnceFlag( AirDistUnitNum ) = false;
 		}
 
@@ -751,11 +750,11 @@ namespace ZoneAirLoopEquipmentManager {
 
 	}
 
-	void
-		ReportZoneAirLoopEquipment( 
-		int const AirDistUnitNum 
-		)
-	{
+	// void
+		// ReportZoneAirLoopEquipment( 
+		// int const AirDistUnitNum 
+		// )
+	// {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Russ Taylor
 		//       DATE WRITTEN:    Nov 1997
@@ -767,12 +766,12 @@ namespace ZoneAirLoopEquipmentManager {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataHVACGlobals::TimeStepSys;
+		// using DataHVACGlobals::TimeStepSys;
 
 		//report the Direct Air Output
 		// AirDistUnit( AirDistUnitNum ).HeatGain = AirDistUnit( AirDistUnitNum ).HeatRate * TimeStepSys * SecInHour;
 		// AirDistUnit( AirDistUnitNum ).CoolGain = AirDistUnit( AirDistUnitNum ).CoolRate * TimeStepSys * SecInHour;
-	}
+	// }
 
 	//     NOTICE
 

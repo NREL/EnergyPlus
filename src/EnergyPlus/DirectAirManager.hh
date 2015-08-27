@@ -161,8 +161,8 @@ namespace DirectAirManager {
 		Real64 & LatOutputProvided // Latent output provided, kg/s, dehumidification = negative
 	);
 
-	void
-	ReportDirectAir( int & DirectAirNum );
+	// void
+	// ReportDirectAir( int & DirectAirNum );
 
 	//     NOTICE
 

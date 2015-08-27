@@ -630,7 +630,11 @@ namespace ZoneEquipmentManager {
 
 			}
 			else {
-				SupplyAirNode = ZoneEquipConfig( ControlledZoneNum ).InletNode( 1 );
+				if ( ZoneEquipConfig( ControlledZoneNum ).NumInletNodes > 0 ) {
+					SupplyAirNode = ZoneEquipConfig( ControlledZoneNum ).InletNode( 1 );
+				} else {
+					SupplyAirNode = 0;
+				}
 			}
 
 			// Sign convention: SysOutputProvided <0 Supply air is heated on entering zone (zone is cooled)
