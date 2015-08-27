@@ -5059,9 +5059,7 @@ Label9999: ;
 		RPD2 = GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 		RP = GetNumObjectsFound( "RunPeriod" );
 		RPAW = GetNumObjectsFound( "RunPeriod:CustomRange" );
-
 		TotRunPers = RP + RPAW;
-		
 		NumOfEnvrn = TotDesDays + TotRunPers + RPD1 + RPD2;
 		if ( TotRunPers > 0 ) {
 			WeathSimReq = true;
@@ -5095,15 +5093,11 @@ Label9999: ;
 		for ( Env = 1; Env <= TotRunPers; ++Env ) {
 			Environment( TotDesDays + RPD1 + RPD2 + Env ).KindOfEnvrn = ksRunPeriodWeather;
 		}
-		
-		//if ( RPReadAllWeatherData ) {
-		//	Environment( TotRunPers ).KindOfEnvrn = ksReadAllWeatherData;
-		//}
 
 		if ( TotDesDays >= 1 ) {
 			GetDesignDayData( TotDesDays, ErrorsFound );
 		}
-		
+
 		if ( RPD1 >= 1 || RPD2 >= 1 ) {
 			GetRunPeriodDesignData( ErrorsFound );
 		}
