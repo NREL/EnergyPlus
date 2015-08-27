@@ -5091,7 +5091,12 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			// check for saturation conditions of air
 			Real64 const HConvIn_surf( HConvInFD( SurfNum ) = HConvIn( SurfNum ) );
 			RhoVaporAirIn( SurfNum ) = min( PsyRhovFnTdbWPb_fast( MAT_zone, ZoneAirHumRat_zone, OutBaroPress ), PsyRhovFnTdbRh( MAT_zone, 1.0, HBSurfManInsideSurf ) );
-			HMassConvInFD( SurfNum ) = HConvIn_surf / ( PsyRhoAirFnPbTdbW_fast( OutBaroPress, MAT_zone, ZoneAirHumRat_zone ) * PsyCpAirFnWTdb_fast( ZoneAirHumRat_zone, MAT_zone ) );
+			Real64 const &RhoVaporAirIn_dummy = RhoVaporAirIn(SurfNum);
+			HMassConvInFD(SurfNum) = HConvIn_surf / (PsyRhoAirFnPbTdbW_fast(OutBaroPress, MAT_zone, ZoneAirHumRat_zone) * PsyCpAirFnWTdb_fast(ZoneAirHumRat_zone, MAT_zone));
+			Real64 HMassConvInFD_dummy;
+			HMassConvInFD_dummy = HMassConvInFD(SurfNum);
+			Real64 ZoneAirHumRat_dummy;
+			ZoneAirHumRat_dummy = ZoneAirHumRat_zone;
 
 			// Perform heat balance on the inside face of the surface ...
 			// The following are possibilities here:
@@ -5640,7 +5645,8 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 				SumHmARa( ZoneNum ) += FD_Area_fac * RhoAirZone;
 
-				SumHmARaW( ZoneNum ) += FD_Area_fac * RhoVaporSurfIn(SurfNum);  //RhoAirZone * Wsurf;
+				SumHmARaW(ZoneNum) += FD_Area_fac * RhoAirZone * Wsurf;
+
 			} else if ( surface.HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
 				// need to calculate the amount of moisture that is entering or
 				// leaving the zone  Qm [kg/sec] = hmi * Area * (Del Rhov)
@@ -5654,11 +5660,22 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 				RhoVaporSurfIn( SurfNum ) = MoistEMPDNew( SurfNum );
 				//SUMC(ZoneNum) = SUMC(ZoneNum)-MoistEMPDFlux(SurfNum)*Surface(SurfNum)%Area
 				Real64 const FD_Area_fac( HMassConvInFD( SurfNum ) * surface.Area );
+				Real64 RhoVaporAirIn_dummy;
+				RhoVaporAirIn_dummy = RhoVaporAirIn(SurfNum);
 				SumHmAW( ZoneNum ) += FD_Area_fac * ( RhoVaporSurfIn( SurfNum ) - RhoVaporAirIn( SurfNum ) );
+				Real64 SumHmAW_dummy;
+				SumHmAW_dummy = FD_Area_fac * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
+				Real64 MoistEMPDflux_mass;
+				MoistEMPDflux_mass = MoistEMPDFlux(SurfNum) / 0.1 * surface.Area;
 				// Real64 const surfInTemp( TempSurfInTmp( SurfNum ) );
 				Real64 const MAT_zone(MAT(ZoneNum));
 				SumHmARa(ZoneNum) += FD_Area_fac * PsyRhoAirFnPbTdbW(OutBaroPress, MAT_zone, PsyWFnTdbRhPb(MAT_zone, PsyRhFnTdbRhovLBnd0C(MAT_zone, RhoVaporAirIn(SurfNum)), OutBaroPress));  //surfInTemp, PsyWFnTdbRhPb( surfInTemp, PsyRhFnTdbRhovLBnd0C( surfInTemp, RhoVaporAirIn( SurfNum ) ), OutBaroPress ) );
 				SumHmARaW( ZoneNum ) += FD_Area_fac * RhoVaporSurfIn( SurfNum );
+				Real64 SumHmARa_dummy;
+				Real64 SumhmARaW_dummy;
+				SumHmARa_dummy = FD_Area_fac * PsyRhoAirFnPbTdbW(OutBaroPress, MAT_zone, PsyWFnTdbRhPb(MAT_zone, PsyRhFnTdbRhovLBnd0C(MAT_zone, RhoVaporAirIn(SurfNum)), OutBaroPress));
+				SumhmARaW_dummy = FD_Area_fac * RhoVaporSurfIn(SurfNum);
+				SumhmARaW_dummy = FD_Area_fac * RhoVaporSurfIn(SurfNum);
 			}
 		}
 	}

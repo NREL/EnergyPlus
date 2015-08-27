@@ -404,6 +404,7 @@ namespace MoistureBalanceEMPDManager {
 		using Psychrometrics::PsyRhFnTdbRhov;
 		using Psychrometrics::PsyRhovFnTdbRh;
 		using Psychrometrics::PsyPsatFnTemp;
+		using Psychrometrics::PsyRhovFnTdbWPb_fast;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -488,7 +489,7 @@ namespace MoistureBalanceEMPDManager {
 		RHaver = RVaver * 461.52 * ( Taver + KelvinConv ) * std::exp( -23.7093 + 4111.0 / ( Taver + 237.7 ));
 		PVsat = PsyPsatFnTemp( Taver, RoutineName );
 		Wsat = 0.622 * PVsat / ( OutBaroPress - PVsat );
-
+		
 		EMPDdiffusivity = (2.0e-7 * pow(Taver + KelvinConv, 0.81) / OutBaroPress) / material.EMPDmu * 461.52 * (Taver+KelvinConv);
 		
 		AT = material.MoistACoeff * material.MoistBCoeff * pow( RHaver, material.MoistBCoeff - 1 ) + material.MoistCCoeff * material.MoistCCoeff * material.MoistDCoeff * pow( RHaver, material.MoistDCoeff - 1 );
@@ -511,12 +512,10 @@ namespace MoistureBalanceEMPDManager {
 		flux_deep = hm_long * ( rv_surface - rv_deep );
 		flux_zone = hm_short * ( rv_surface - rho_vapor_air_in );
 		
-		moist_empd_new = rv_surface - flux_zone*RSurfaceLayer;
-
 		RHDeepOld = PsyRhFnTdbRhov( Taver, rv_deep_old );
 		RHSurfOld = PsyRhFnTdbRhov( Taver, rv_surf_old );
 		
-		RHsurface = RHSurfOld + TimeStepZone * 3600.0 * ( - flux_surf / ( material.Density * material.EMPDSurfaceDepth * AT ) );
+		RHsurface = RHSurfOld + TimeStepZone * 3600.0 * (-flux_surf / (material.Density * material.EMPDSurfaceDepth * AT));
 		if (material.EMPDDeepDepth <= 0.0) {
 			RHdeep = RHDeepOld;
 		} else {
@@ -525,6 +524,7 @@ namespace MoistureBalanceEMPDManager {
 		rv_surface = PsyRhovFnTdbRh( Taver, RHsurface );
 		rv_deep = PsyRhovFnTdbRh( Taver, RHdeep );
 
+		moist_empd_new = rv_surface - flux_zone*RSurfaceLayer;
 		moist_empd_flux = flux_zone*Lam;
 
 		// Calculate latent load
