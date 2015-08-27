@@ -1147,6 +1147,53 @@ namespace HVACVariableRefrigerantFlow {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad, FSEC
+		//       DATE WRITTEN   August 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Manages GetInput processing and program termination
+
+		// METHODOLOGY EMPLOYED:
+		// Calls "Get" routines to read in data.
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// na
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "GetVRFInput: " ); // include trailing blank space
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		bool ErrorsFound( false ); // If errors detected in input
+
+		// Flow
+		GetVRFInputData( ErrorsFound );
+
+		if ( ErrorsFound ) {
+			ShowFatalError( RoutineName + "Errors found in getting AirConditioner:VariableRefrigerantFlow system input. Preceding condition(s) causes termination." );
+		}
+
+	}
+
+	void
+	GetVRFInputData( bool & ErrorsFound )
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad, FSEC
 		//       DATE WRITTEN   August 2010
 		//       MODIFIED       July 2012, Chandan Sharma - FSEC: Added zone sys avail managers
 		//       RE-ENGINEERED  na
@@ -1200,7 +1247,7 @@ namespace HVACVariableRefrigerantFlow {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetVRFInput: " ); // include trailing blank space
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1218,7 +1265,6 @@ namespace HVACVariableRefrigerantFlow {
 		//    INTEGER :: checkNum
 		int IOStat; // Status
 		bool errFlag; // error flag for mining functions
-		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		Array1D_string cAlphaFieldNames;
@@ -2282,6 +2328,8 @@ namespace HVACVariableRefrigerantFlow {
 				if ( SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXCoolCoilType_Num ), cAllCoilTypes( CoilVRF_Cooling ) ) ) {
 					if( VRFTU( VRFTUNum ).TUListIndex > 0 && VRFTU( VRFTUNum ).IndexToTUInTUList > 0 ) {
 						TerminalUnitList( VRFTU( VRFTUNum ).TUListIndex ).CoolingCoilAvailSchPtr( VRFTU( VRFTUNum ).IndexToTUInTUList ) = GetDXCoilAvailSchPtr( DXCoolingCoilType, cAlphaArgs( 12 ), errFlag );
+					} else {
+						VRFTU( VRFTUNum ).CoolingCoilPresent = false;
 					}
 					errFlag = false;
 					GetDXCoilIndex( cAlphaArgs( 12 ), VRFTU( VRFTUNum ).CoolCoilIndex, errFlag, cAllCoilTypes( CoilVRF_Cooling ) );
@@ -2331,6 +2379,8 @@ namespace HVACVariableRefrigerantFlow {
 				if ( SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ), cAllCoilTypes( CoilVRF_Heating ) ) ) {
 					if( VRFTU( VRFTUNum ).TUListIndex > 0 && VRFTU( VRFTUNum ).IndexToTUInTUList > 0 ) {
 						TerminalUnitList( VRFTU( VRFTUNum ).TUListIndex ).HeatingCoilAvailSchPtr( VRFTU( VRFTUNum ).IndexToTUInTUList ) = GetDXCoilAvailSchPtr( DXHeatingCoilType, cAlphaArgs( 14 ), errFlag );
+					} else {
+						VRFTU( VRFTUNum ).HeatingCoilPresent = false;
 					}
 					errFlag = false;
 					GetDXCoilIndex( cAlphaArgs( 14 ), VRFTU( VRFTUNum ).HeatCoilIndex, errFlag, cAllCoilTypes( CoilVRF_Heating ) );
@@ -2379,7 +2429,7 @@ namespace HVACVariableRefrigerantFlow {
 				}
 			}
 
-			if ( ! VRFTU( VRFTUNum ).CoolingCoilPresent && ! VRFTU( VRFTUNum ).HeatingCoilPresent ) {
+			if ( ! VRFTU( VRFTUNum ).CoolingCoilPresent && VRFTU( VRFTUNum ).DXCoolCoilType_Num == 0 && ! VRFTU( VRFTUNum ).HeatingCoilPresent && VRFTU( VRFTUNum ).DXHeatCoilType_Num == 0 ) {
 				ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
 				ShowContinueError( "... no valid coils entered for this terminal unit. Simulation will not proceed." );
 				ErrorsFound = true;
@@ -2661,6 +2711,7 @@ namespace HVACVariableRefrigerantFlow {
 				ShowSevereError( "ZoneTerminalUnitList \"" + TerminalUnitList( NumList ).Name + "\"" );
 				ShowContinueError( "...Zone Terminal Unit = " + TerminalUnitList( NumList ).ZoneTUName( VRFNum ) + " improperly connected to system." );
 				ShowContinueError( "...either the ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object does not exist," );
+				ShowContinueError( "...the ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object name is mispelled," );
 				ShowContinueError( "...or the ZoneTerminalUnitList object is not named in an AirConditioner:VariableRefrigerantFlow object." );
 				ErrorsFound = true;
 			}
@@ -2774,10 +2825,6 @@ namespace HVACVariableRefrigerantFlow {
 				SetupEMSActuator( "Variable Refrigerant Flow Heat Pump", VRF( NumCond ).Name, "Operating Mode", "[integer]", VRF( NumCond ).EMSOverrideHPOperatingMode, VRF( NumCond ).EMSValueForHPOperatingMode );
 			}
 
-		}
-
-		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting AirConditioner:VariableRefrigerantFlow system input. Preceding condition(s) causes termination." );
 		}
 
 	}
