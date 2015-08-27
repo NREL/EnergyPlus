@@ -4226,7 +4226,7 @@ namespace DXCoils {
 
 			// Only required for reverse cycle heat pumps
 			DXCoil( DXCoilNum ).DefrostEIRFT = GetCurveIndex( Alphas( 5 ) ); // convert curve name to number
-			if ( SameString( Alphas( 6 ), "ReverseCycle" ) && SameString( Alphas( 7 ), "OnDemand" ) ) {
+			if ( SameString( Alphas( 6 ), "ReverseCycle" ) ) {
 				if ( DXCoil( DXCoilNum ).DefrostEIRFT == 0 ) {
 					if ( lAlphaBlanks( 5 ) ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
@@ -9028,7 +9028,7 @@ Label50: ;
 
 				if ( FractionalDefrostTime > 0.0 ) {
 					// Calculate defrost adjustment factors depending on defrost control strategy
-					if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle && DXCoil( DXCoilNum ).DefrostControl == OnDemand ) {
+					if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle ) {
 						LoadDueToDefrost = ( 0.01 * FractionalDefrostTime ) * ( 7.222 - OutdoorDryBulb ) * ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) / 1.01667 );
 						DefrostEIRTempModFac = CurveValue( DXCoil( DXCoilNum ).DefrostEIRFT, max( 15.555, InletAirWetBulbC ), max( 15.555, OutdoorDryBulb ) );
 						DXCoil( DXCoilNum ).DefrostPower = DefrostEIRTempModFac * ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) / 1.01667 ) * FractionalDefrostTime;
