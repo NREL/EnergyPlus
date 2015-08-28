@@ -32,6 +32,9 @@ namespace GlobalNames {
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE GlobalNames:
 
+	void
+	clear_state();
+
 	// Types
 
 	struct ComponentNameData

@@ -87,6 +87,9 @@ namespace DataZoneEquipment {
 
 	// Utility routines for module
 
+	void
+	clear_state();
+
 	// Types
 
 	struct EquipMeterData

@@ -15,16 +15,18 @@
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
-
 
 #include <fstream>
 #include <algorithm>
@@ -61,10 +63,13 @@ namespace EnergyPlus {
 		DataOutputs::clear_state();
 		DataSurfaces::clear_state();
 		DataZoneControls::clear_state();
+		DataZoneEquipment::clear_state();
 		ExteriorEnergyUse::clear_state();
+		GlobalNames::clear_state();
 		HeatBalanceManager::clear_state();
 		InputProcessor::clear_state();
 		OutputProcessor::clear_state();
+		WaterThermalTanks::clear_state();
 		ScheduleManager::clear_state();
 
 		{ 
