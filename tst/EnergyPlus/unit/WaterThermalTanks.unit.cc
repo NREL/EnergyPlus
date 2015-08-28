@@ -7,7 +7,7 @@
 #include <WaterThermalTanks.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include "Fixtures/WaterThermalTankFixture.hh"
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include "Fixtures/HVACFixture.hh"
 
 using namespace EnergyPlus;
@@ -88,7 +88,7 @@ TEST( WaterThermalTankData, GetDeadBandTemp )
 
 }
 
-TEST_F( WaterThermalTankFixture, HPWHZoneEquipSeqenceNumberWarning )
+TEST_F( HVACFixture, HPWHZoneEquipSeqenceNumberWarning )
 {
 	std::string const idf_objects = delimited_string({
 		"  Schedule:Constant, DummySch, , 1.0;",
@@ -308,14 +308,16 @@ TEST_F( WaterThermalTankFixture, HPWHZoneEquipSeqenceNumberWarning )
 	});
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
-
+	
+	DataZoneEquipment::ZoneEquipInputsFilled = false;
+	
 	bool ErrorsFound = false;
 	HeatBalanceManager::GetZoneData( ErrorsFound );
 	ASSERT_FALSE( ErrorsFound );
 	EXPECT_FALSE( WaterThermalTanks::GetWaterThermalTankInput() );
 }
 
-TEST_F( WaterThermalTankFixture, HPWHWrappedDummyNodeConfig )
+TEST_F( HVACFixture, HPWHWrappedDummyNodeConfig )
 {
 
 	// Unit test for #5127
@@ -487,6 +489,8 @@ TEST_F( WaterThermalTankFixture, HPWHWrappedDummyNodeConfig )
 	std::string const idf_objects = delimited_string(idf_lines);
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	DataZoneEquipment::ZoneEquipInputsFilled = false;
 
 	WaterThermalTanks::GetWaterThermalTankInput();
 
