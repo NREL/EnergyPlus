@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <list>
+#include <ostream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -495,7 +496,6 @@ namespace EnergyPlus {
 			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); annualTableIt++ ){
 				annualTableIt->writeTable( OutputReportTabular::unitsStyle );
 			}
-
 		}
 
 		void
@@ -950,6 +950,23 @@ namespace EnergyPlus {
 			return str.substr( strBegin, strRange );
 		}
 
+
+		void
+		AddAnnualTableOfContents( std::ostream & nameOfStream){
+			// Jason Glazer, August 2015
+			// This function is not part of the class but acts as an interface between procedural code and the class by
+			// invoking the writeTable member function for each of the AnnualTable objects
+			std::vector<AnnualTable>::iterator annualTableIt;
+			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); annualTableIt++ ){
+				annualTableIt->addTableOfContents( nameOfStream );
+			}
+		}
+
+		void
+		AnnualTable::addTableOfContents( std::ostream & nameOfStream ){
+			nameOfStream << "<p><b>" << m_name << "</b></p> |\n";
+			nameOfStream << "<a href=\"#" << OutputReportTabular::MakeAnchorName( m_name, "Entire Facility" ) << "\">" << "Entire Facility" << "</a>    |   \n";
+		}
 
 
 	} //OutputReportTabularAnnual

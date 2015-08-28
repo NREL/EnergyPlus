@@ -4,6 +4,7 @@
 // C++ Headers
 #include <string>
 #include <vector>
+#include <ostream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -36,6 +37,9 @@ namespace OutputReportTabularAnnual {
 
 	void
 	WriteAnnualTables();
+
+	void
+	AddAnnualTableOfContents( std::ostream & );
 
 	AnnualFieldSet::AggregationKind
 	stringToAggKind( std::string inString );
@@ -90,6 +94,9 @@ public:
 
 	void
 	writeTable( int unitsStyle );
+
+	void
+	addTableOfContents( std::ostream & );
 
 	void
 	clear_state(); // for unit tests

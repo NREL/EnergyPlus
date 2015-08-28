@@ -3361,6 +3361,7 @@ namespace OutputReportTabular {
 							}
 						}
 					}
+					OutputReportTabularAnnual::AddAnnualTableOfContents( tbl_stream );
 				}
 				//add entries specifically added using AddTOCEntry
 				for ( iEntry = 1; iEntry <= TOCEntriesCount; ++iEntry ) {
