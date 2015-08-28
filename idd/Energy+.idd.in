@@ -53047,7 +53047,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \memo Temperature Control 
        \memo It describes the Variable Refrigerant Flow system excluding the performance of indoor units
        \memo Indoor units are modeled separately, see ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
-       \min-fields 10
+       \min-fields 9
   A1 , \field Heat Pump Name
        \required-field
        \type alpha
@@ -53155,44 +53155,43 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \default 46.0 
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp
-  A6 , \field Outdoor Unit Fan Object Type
-       \type choice 
-       \key Fan:OnOff
-       \key Fan:ConstantVolume 
-       \default Fan:ConstantVolume 
-  A7 , \field Outdoor Unit Fan Object Name
-       \required-field
-       \type object-list
-       \object-list FansCVandOnOff
-  A8 , \field Outdoor Unit Evaporating Temperature Function of Superheating Curve Name    
+  N15, \field Outdoor Unit Fan Rated Power
+       \units W
+       \minimum> 0.0
+       \default 170.0 
+  N16, \field Outdoor Unit Fan Flow Rate
+       \units m3/s
+       \minimum> 0.0
+       \default 3.0 
+  A6 , \field Outdoor Unit Evaporating Temperature Function of Superheating Curve Name    
        \required-field   
        \type object-list
        \object-list QuadraticCurves
        \object-list UniVariateTables
-  A9 , \field Outdoor Unit Condensing Temperature Function of Subcooling Curve Name    
+  A7 , \field Outdoor Unit Condensing Temperature Function of Subcooling Curve Name    
        \required-field   
        \type object-list
        \object-list QuadraticCurves	 
        \object-list UniVariateTables  
-  N15, \field Diameter of main pipe connecting outdoor unit to indoor units
+  N17, \field Diameter of main pipe connecting outdoor unit to indoor units
        \note used to calculate the piping loss
        \type real 
        \units m
        \minimum 0.0
        \default 0.0254 
-  N16, \field Length of main pipe connecting outdoor unit to indoor units
+  N18, \field Length of main pipe connecting outdoor unit to indoor units
        \note used to calculate the heat loss of the main pipe
        \type real 
        \units m
        \minimum 0.0
        \default 30.0
-  N17, \field Equivalent length of main pipe connecting outdoor unit to indoor units
+  N19, \field Equivalent length of main pipe connecting outdoor unit to indoor units
        \note used to calculate the refrigerant pressure drop of the main pipe
        \type real 
        \units m
        \minimum 0.0
        \default 36.0
-  N18, \field Height difference between the outdoor unit node and 
+  N20, \field Height difference between the outdoor unit node and 
        \field indoor unit node of the main pipe
        \note Difference between outdoor unit height and indoor unit height
        \note Positive means outdoor unit is higher than indoor unit 
@@ -53200,41 +53199,41 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type real 
        \units m
        \default 5.0
-  N19, \field Insulation thickness of the main pipe
+  N21, \field Insulation thickness of the main pipe
        \type real 
        \units m
        \minimum 0.0	
 	   \default 0.02
-  N20, \field Thermal conductivity of the main pipe insulation material
+  N22, \field Thermal conductivity of the main pipe insulation material
        \type real 
        \units W/m-K
        \minimum 0.0	
 	   \default 0.032
-  N21, \field Crankcase Heater Power per Compressor
+  N23, \field Crankcase Heater Power per Compressor
        \type real
        \units W
        \default 33.0
        \note Enter the value of the resistive heater located in the compressor(s). This heater
        \note is used to warm the refrigerant and oil when the compressor is off
-  N22, \field Number of Compressors
+  N24, \field Number of Compressors
        \type integer
        \units dimensionless
        \default 2
        \note Enter the total number of compressor. This input is used only for crankcase
        \note heater calculations.
-  N23, \field Ratio of Compressor Size to Total Compressor Capacity
+  N25, \field Ratio of Compressor Size to Total Compressor Capacity
        \type real
        \units W/W
        \default 0.5
        \note Enter the ratio of the first stage compressor to total compressor capacity
        \note All other compressors are assumed to be equally sized. This inputs is used
        \note only for crankcase heater calculations
-  N24, \field Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater
+  N26, \field Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater
        \type real
        \units C
        \default 5.0
        \note Enter the maximum outdoor temperature above which the crankcase heaters are disabled
-  A10, \field Defrost Strategy
+  A8 , \field Defrost Strategy
        \type choice
        \key ReverseCycle
        \key Resistive
@@ -53244,7 +53243,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \note cooling to melt frost formation on the condenser coil
        \note The resistive strategy uses a resistive heater
        \note to melt the frost.
-  A11, \field Defrost Control
+  A9 , \field Defrost Control
        \type choice
        \key Timed
        \key OnDemand
@@ -53252,19 +53251,19 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \note Choose a defrost control type
        \note Either use a fixed Timed defrost period or select
        \note OnDemand to defrost only when necessary
-  A12, \field Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
+  A10, \field Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
        \type object-list
        \object-list LinearCurves
        \object-list QuadraticCubicCurves
        \object-list UniVariateTables
        \note A valid performance curve must be used if ReverseCycle defrost strategy is selected
-  N25, \field Defrost Time Period Fraction
+  N27, \field Defrost Time Period Fraction
        \type real
        \minimum 0.0
        \default 0.058333
        \note Fraction of time in defrost mode
        \note Only applicable if timed defrost control is specified
-  N26, \field Resistive Defrost Heater Capacity
+  N28, \field Resistive Defrost Heater Capacity
        \type real
        \minimum 0.0
        \default 0.0
@@ -53273,18 +53272,18 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \note Enter the size of the resistive defrost heating element
        \note Only applicable if resistive defrost strategy is specified
        \ip-units W
-  N27, \field Maximum Outdoor Dry-bulb Temperature for Defrost Operation
+  N29, \field Maximum Outdoor Dry-bulb Temperature for Defrost Operation
        \type real
        \units C
        \default 5.0
        \note Enter the maximum outdoor temperature above which the defrost operation is disabled
-  N28, \field Compressor maximum delta Pressure
+  N30, \field Compressor maximum delta Pressure
        \type real 
        \units Pa
        \default 4500000.0
        \minimum 0.0
        \maximum 50000000.0
-  N29, \field Number of Compressor Loading Index Entries
+  N31, \field Number of Compressor Loading Index Entries
        \required-field
        \type integer
        \default 2
@@ -53292,115 +53291,115 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \maximum 9
        \note First index represents minimal capacity operation 
        \note Last index represents full capacity operation 
-  N30, \field Compressor Speed at Loading Index 1 
+  N32, \field Compressor Speed at Loading Index 1 
        \type real
        \note Minimum compressor speed 
        \note unit in Rev/Sec	
        \minimum> 0   
-  A13, \field Loading Index 1 Evaporative Capacity Function of Temperature Curve Name
+  A11, \field Loading Index 1 Evaporative Capacity Function of Temperature Curve Name
        \required-field
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A14, \field Loading Index 1 Compressor Power Function of Temperature Curve Name
+  A12, \field Loading Index 1 Compressor Power Function of Temperature Curve Name
        \required-field
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N31, \field Compressor Speed at Loading Index 2
+  N33, \field Compressor Speed at Loading Index 2
        \type real
        \note unit in Rev/Sec
        \minimum> 0
-  A15, \field Loading Index 2 Evaporative Capacity Function of Temperature Curve Name
+  A13, \field Loading Index 2 Evaporative Capacity Function of Temperature Curve Name
        \required-field
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A16, \field Loading Index 2 Compressor Power Function of Temperature Curve Name
+  A14, \field Loading Index 2 Compressor Power Function of Temperature Curve Name
        \required-field
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N32, \field Compressor Speed at Loading Index 3       
+  N34, \field Compressor Speed at Loading Index 3       
        \type real
        \note unit in Rev/Sec
        \minimum> 0
-  A17, \field Loading Index 3 Evaporative Capacity Function of Temperature Curve Name       
+  A15, \field Loading Index 3 Evaporative Capacity Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A18, \field Loading Index 3 Compressor Power Function of Temperature Curve Name       
+  A16, \field Loading Index 3 Compressor Power Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N33, \field Compressor Speed at Loading Index 4       
+  N35, \field Compressor Speed at Loading Index 4       
        \type real
        \note unit in Rev/Sec
        \minimum> 0
-  A19, \field Loading Index 4 Evaporative Capacity Function of Temperature Curve Name       
+  A17, \field Loading Index 4 Evaporative Capacity Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A20, \field Loading Index 4 Compressor Power Function of Temperature Curve Name       
+  A18, \field Loading Index 4 Compressor Power Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N34, \field Compressor Speed at Loading Index 5       
+  N36, \field Compressor Speed at Loading Index 5       
        \type real
        \note unit in Rev/Sec
        \minimum> 0
-  A21, \field Loading Index 5 Evaporative Capacity Function of Temperature Curve Name       
+  A19, \field Loading Index 5 Evaporative Capacity Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A22, \field Loading Index 5 Compressor Power Function of Temperature Curve Name       
+  A20, \field Loading Index 5 Compressor Power Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N35, \field Compressor Speed at Loading Index 6       
+  N37, \field Compressor Speed at Loading Index 6       
        \type real
        \note unit in Rev/Sec
        \minimum> 0
-  A23, \field Loading Index 6 Evaporative Capacity Function of Temperature Curve Name       
+  A21, \field Loading Index 6 Evaporative Capacity Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A24, \field Loading Index 6 Compressor Power Function of Temperature Curve Name       
+  A22, \field Loading Index 6 Compressor Power Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N36, \field Compressor Speed at Loading Index 7       
+  N38, \field Compressor Speed at Loading Index 7       
        \type real
        \note unit in Rev/Sec
        \minimum> 0
-  A25, \field Loading Index 7 Evaporative Capacity Function of Temperature Curve Name       
+  A23, \field Loading Index 7 Evaporative Capacity Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A26, \field Loading Index 7 list
+  A24, \field Loading Index 7 list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N37, \field Compressor Speed at Loading Index 8       
+  N39, \field Compressor Speed at Loading Index 8       
        \type real
        \note unit in Rev/Sec
        \minimum> 0
-  A27, \field Loading Index 8 Evaporative Capacity Function of Temperature Curve Name       
+  A25, \field Loading Index 8 Evaporative Capacity Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A28, \field Loading Index 8 Compressor Power Function of Temperature Curve Name       
+  A26, \field Loading Index 8 Compressor Power Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N38, \field Compressor Speed at Loading Index 9       
+  N40, \field Compressor Speed at Loading Index 9       
        \type real 
        \note unit in Rev/Sec
        \minimum> 0
-  A29, \field Loading Index 9 Evaporative Capacity Function of Temperature Curve Name       
+  A27, \field Loading Index 9 Evaporative Capacity Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A30; \field Loading Index 9 Compressor Power Function of Temperature Curve Name       
+  A28; \field Loading Index 9 Compressor Power Function of Temperature Curve Name       
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables

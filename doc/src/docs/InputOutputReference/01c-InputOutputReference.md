@@ -14185,13 +14185,13 @@ This numeric field defines the minimum condensing temperature for the indoor uni
 
 This numeric field defines the maximum condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 46.0ºC is used.
 
-#### Field: Outdoor Unit Fan Object Type
+#### Field: Outdoor Unit Fan Rated Power
 
-This alpha field defines the type of fan in the VRF outdoor unit. The only valid choices are *Fan:OnOff* and *Fan:ConstantVolume*. The input requirements for these fan objects are described elsewhere in this document.
+This numeric field defines the rated power of the fan in the VRF outdoor unit. The current VRF-FluidTCtrl only supports constant speed fan. If this field is blank, the default value of 170W is used.
 
-#### Field: Outdoor Unit Fan Object Name
+#### Field: Outdoor Unit Fan Rated Flow Rate
 
-This alpha field defines the name of the fan component implemented in the VRF outdoor unit. It should match the name specified in the corresponding fan object.
+This numeric field defines the rated air volumetric flow rate (m<sup>3</sup>/s) of the fan in the VRF outdoor unit. The current VRF-FluidTCtrl only supports constant speed fan. If this field is blank, the default value of 3.0(m<sup>3</sup>/s) is used.
 
 #### Field: Outdoor Unit Evaporating Temperature Function of Superheating Curve Name    
 
@@ -14309,8 +14309,8 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     13,                      !- Variable Evaporating Temperature Maximum for Indoor Unit {C}
     42,                      !- Variable Condensing Temperature Minimum for Indoor Unit {C}
     46,                      !- Variable Evaporating Temperature Maximum for Indoor Unit {C}
-    Fan:ConstantVolume,      !- Outdoor Unit Fan Object Type
-    VRFOUFan,                !- Outdoor Unit Fan Object Name
+    ,                        !- Outdoor Unit Fan Rated Power {W}
+    ,                        !- Outdoor Unit Fan Rated Flow Rate {m3/s}
     OUEvapTempCurve,         !- Outdoor Unit Evaporating Temperature Function of Superheating Curve Name
     OUCondTempCurve,         !- Outdoor Unit Condensing Temperature Function of Subcooling Curve Name
     0.0508,                  !- Diameter of main pipe connecting outdoor unit to indoor units {m}

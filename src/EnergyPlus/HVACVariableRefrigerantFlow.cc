@@ -2191,72 +2191,19 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFNum ).IUCondTempHigh = rNumericArgs( 14 ); 
 			
 			//Get OU fan data
-			FanType = cAlphaArgs( 6 ); //- Outdoor Unit Fan Object Type
-			FanName = cAlphaArgs( 7 ); //- Outdoor Unit Fan Object Name
-			errFlag = false;
-			GetFanType( FanName, FanType_Num, errFlag, cCurrentModuleObject );
-			if ( errFlag ) {
-				ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
-				ShowContinueError( "Illegal " + cAlphaFieldNames( 7 ) + " = " + cAlphaArgs( 7 ) );
-				ErrorsFound = true;
-			}
-			if ( ! SameString( cFanTypes( FanType_Num ), FanType ) ) {
-				ShowContinueError( "Fan type specified = " + cAlphaArgs( 6 ) );
-				ShowContinueError( "Based on the fan name the type of fan actually used = " + cFanTypes( FanType_Num ) );
-				ErrorsFound = true;
-			}
-			if ( FanType_Num == FanType_SimpleOnOff || FanType_Num == FanType_SimpleConstVolume ) { // Validate the fan
-				
-				ValidateComponent( cFanTypes( FanType_Num ), FanName, IsNotOK, cCurrentModuleObject );
-				
-				if ( IsNotOK ) {
-					ShowContinueError( "...occurs in " + cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
-					ErrorsFound = true;
-				} else { // mine data from fan object
-
-					// Get the fan index
-					int OUFanIndex;
-					errFlag = false;
-					GetFanIndex( FanName, OUFanIndex, errFlag );
-					if ( errFlag ) {
-						ShowContinueError( "...occurs in " + cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
-						ErrorsFound = true;
-					}
-
-					// Get the Design Fan Volume Flow Rate
-					errFlag = false;
-					double OUFanVolFlowRate = GetFanDesignVolumeFlowRate( FanType, FanName, errFlag );
-					if ( errFlag ) {
-						ShowContinueError( "...occurs in " + cCurrentModuleObject + " =" + VRF( VRFNum ).Name );
-						ErrorsFound = true;
-					}
-					 
-					// Get rated OU fan power
-					double OUFanPower;
-					double DeltaP = EnergyPlus::Fans::Fan( OUFanIndex ).DeltaPress;
-					double TotEff = EnergyPlus::Fans::Fan( OUFanIndex ).FanEff; 
-					OUFanPower = ( OUFanVolFlowRate * DeltaP ) / TotEff;					
-	
-					VRF( VRFNum ).RatedCondFanPower = OUFanPower;  
-					VRF( VRFNum ).OUAirFlowRate = OUFanVolFlowRate; 
-				}
-
-			} else { 
-				ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
-				ShowContinueError( "Illegal " + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) );
-				ErrorsFound = true;
-			} 
+			VRF( VRFNum ).RatedCondFanPower = rNumericArgs( 15 );   
+			VRF( VRFNum ).OUAirFlowRate = rNumericArgs( 16 ); 
 			
 			// OUEvapTempCurve
-			int indexOUEvapTempCurve = GetCurveIndex( cAlphaArgs( 8 ) ); // convert curve name to index number	
+			int indexOUEvapTempCurve = GetCurveIndex( cAlphaArgs( 6 ) ); // convert curve name to index number	
 			// Verify curve name and type			
 			if ( indexOUEvapTempCurve == 0 ) {
-				if ( lAlphaFieldBlanks( 8 ) ) {
+				if ( lAlphaFieldBlanks( 6 ) ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", missing" );
-					ShowContinueError( "...required " + cAlphaFieldNames( 8 ) + " is blank." );
+					ShowContinueError( "...required " + cAlphaFieldNames( 6 ) + " is blank." );
 				} else {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", invalid" );
-					ShowContinueError( "...not found " + cAlphaFieldNames( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\"." );
+					ShowContinueError( "...not found " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"." );
 				}
 				ErrorsFound = true;
 			} else {
@@ -2269,7 +2216,7 @@ namespace HVACVariableRefrigerantFlow {
 												
 					} else {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", invalid" );
-						ShowContinueError( "...illegal " + cAlphaFieldNames( 8 ) + " type for this object = " + GetCurveType( indexOUEvapTempCurve ) );
+						ShowContinueError( "...illegal " + cAlphaFieldNames( 6 ) + " type for this object = " + GetCurveType( indexOUEvapTempCurve ) );
 						ShowContinueError( "... Curve type must be Quadratic." );
 						ErrorsFound = true;
 					}
@@ -2277,15 +2224,15 @@ namespace HVACVariableRefrigerantFlow {
 			}
 			
 			// OUCondTempCurve
-			int indexOUCondTempCurve = GetCurveIndex( cAlphaArgs( 9 ) ); // convert curve name to index number	
+			int indexOUCondTempCurve = GetCurveIndex( cAlphaArgs( 7 ) ); // convert curve name to index number	
 			// Verify curve name and type			
 			if ( indexOUCondTempCurve == 0 ) {
-				if ( lAlphaFieldBlanks( 9 ) ) {
+				if ( lAlphaFieldBlanks( 7 ) ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", missing" );
-					ShowContinueError( "...required " + cAlphaFieldNames( 9 ) + " is blank." );
+					ShowContinueError( "...required " + cAlphaFieldNames( 7 ) + " is blank." );
 				} else {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", invalid" );
-					ShowContinueError( "...not found " + cAlphaFieldNames( 9 ) + "=\"" + cAlphaArgs( 9 ) + "\"." );
+					ShowContinueError( "...not found " + cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\"." );
 				}
 				ErrorsFound = true;
 			} else {
@@ -2298,7 +2245,7 @@ namespace HVACVariableRefrigerantFlow {
 												
 					} else {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", invalid" );
-						ShowContinueError( "...illegal " + cAlphaFieldNames( 9 ) + " type for this object = " + GetCurveType( indexOUCondTempCurve ) );
+						ShowContinueError( "...illegal " + cAlphaFieldNames( 7 ) + " type for this object = " + GetCurveType( indexOUCondTempCurve ) );
 						ShowContinueError( "... Curve type must be Quadratic." );
 						ErrorsFound = true;
 					}
@@ -2306,99 +2253,99 @@ namespace HVACVariableRefrigerantFlow {
 			}
 			
 			// Pipe parameters
-			VRF( VRFNum ).RefPipDia      = rNumericArgs( 15 );
-			VRF( VRFNum ).RefPipLen      = rNumericArgs( 16 );
-			VRF( VRFNum ).RefPipEquLen   = rNumericArgs( 17 );
-			VRF( VRFNum ).RefPipHei      = rNumericArgs( 18 );
-			VRF( VRFNum ).RefPipInsThi   = rNumericArgs( 19 );
-			VRF( VRFNum ).RefPipInsCon   = rNumericArgs( 20 );
+			VRF( VRFNum ).RefPipDia      = rNumericArgs( 17 );
+			VRF( VRFNum ).RefPipLen      = rNumericArgs( 18 );
+			VRF( VRFNum ).RefPipEquLen   = rNumericArgs( 19 );
+			VRF( VRFNum ).RefPipHei      = rNumericArgs( 20 );
+			VRF( VRFNum ).RefPipInsThi   = rNumericArgs( 21 );
+			VRF( VRFNum ).RefPipInsCon   = rNumericArgs( 22 );
 			
 			// Check the RefPipEquLen 
-			if ( lNumericFieldBlanks( 17 ) && !lNumericFieldBlanks( 16 ) ) {
+			if ( lNumericFieldBlanks( 19 ) && !lNumericFieldBlanks( 18 ) ) {
 				VRF( VRFNum ).RefPipEquLen = 1.2 * VRF( VRFNum ).RefPipLen;
-				ShowWarningError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\", \" " + cNumericFieldNames( 17 ) + "\" is calculated based on" );
-				ShowContinueError( "...the provided \"" + cNumericFieldNames( 16 ) + "\" value." );
+				ShowWarningError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\", \" " + cNumericFieldNames( 19 ) + "\" is calculated based on" );
+				ShowContinueError( "...the provided \"" + cNumericFieldNames( 18 ) + "\" value." );
 			} 
 			if ( VRF( VRFNum ).RefPipEquLen < VRF( VRFNum ).RefPipLen ) {
 				VRF( VRFNum ).RefPipEquLen = 1.2 * VRF( VRFNum ).RefPipLen;
-				ShowWarningError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\", invalid \" " + cNumericFieldNames( 17 ) + "\" value." );
+				ShowWarningError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\", invalid \" " + cNumericFieldNames( 19 ) + "\" value." );
 				ShowContinueError( "...Equivalent length of main pipe should be greater than or equal to the actural length." );
-				ShowContinueError( "...The value is recalculated based on the provided \"" + cNumericFieldNames( 16 ) + "\" value." );
+				ShowContinueError( "...The value is recalculated based on the provided \"" + cNumericFieldNames( 18 ) + "\" value." );
 			}
 			
 			// Crank case
-			VRF( VRFNum ).CCHeaterPower = rNumericArgs( 21 );
-			VRF( VRFNum ).NumCompressors = rNumericArgs( 22 );
-			VRF( VRFNum ).CompressorSizeRatio = rNumericArgs( 23 );
-			VRF( VRFNum ).MaxOATCCHeater = rNumericArgs( 24 );
+			VRF( VRFNum ).CCHeaterPower = rNumericArgs( 23 );
+			VRF( VRFNum ).NumCompressors = rNumericArgs( 24 );
+			VRF( VRFNum ).CompressorSizeRatio = rNumericArgs( 25 );
+			VRF( VRFNum ).MaxOATCCHeater = rNumericArgs( 26 );
 			
 			//Defrost
-			if ( ! lAlphaFieldBlanks( 10 ) ) {
-				if ( SameString( cAlphaArgs( 10 ), "ReverseCycle" ) ) VRF( VRFNum ).DefrostStrategy = ReverseCycle;
-				if ( SameString( cAlphaArgs( 10 ), "Resistive" ) ) VRF( VRFNum ).DefrostStrategy = Resistive;
+			if ( ! lAlphaFieldBlanks( 8 ) ) {
+				if ( SameString( cAlphaArgs( 8 ), "ReverseCycle" ) ) VRF( VRFNum ).DefrostStrategy = ReverseCycle;
+				if ( SameString( cAlphaArgs( 8 ), "Resistive" ) ) VRF( VRFNum ).DefrostStrategy = Resistive;
 				if ( VRF( VRFNum ).DefrostStrategy == 0 ) {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 10 ) + " not found: " + cAlphaArgs( 10 ) );
+					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 8 ) + " not found: " + cAlphaArgs( 8 ) );
 					ErrorsFound = true;
 				}
 			} else {
 				VRF( VRFNum ).DefrostStrategy = ReverseCycle;
 			}
 
-			if ( ! lAlphaFieldBlanks( 11 ) ) {
-				if ( SameString( cAlphaArgs( 11 ), "Timed" ) ) VRF( VRFNum ).DefrostControl = Timed;
-				if ( SameString( cAlphaArgs( 11 ), "OnDemand" ) ) VRF( VRFNum ).DefrostControl = OnDemand;
+			if ( ! lAlphaFieldBlanks( 9 ) ) {
+				if ( SameString( cAlphaArgs( 9 ), "Timed" ) ) VRF( VRFNum ).DefrostControl = Timed;
+				if ( SameString( cAlphaArgs( 9 ), "OnDemand" ) ) VRF( VRFNum ).DefrostControl = OnDemand;
 				if ( VRF( VRFNum ).DefrostControl == 0 ) {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 11 ) + " not found: " + cAlphaArgs( 11 ) );
+					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 9 ) + " not found: " + cAlphaArgs( 9 ) );
 					ErrorsFound = true;
 				}
 			} else {
 				VRF( VRFNum ).DefrostControl = Timed;
 			}
 
-			if ( ! lAlphaFieldBlanks( 12 ) ) {
-				VRF( VRFNum ).DefrostEIRPtr = GetCurveIndex( cAlphaArgs( 12 ) );
+			if ( ! lAlphaFieldBlanks( 10 ) ) {
+				VRF( VRFNum ).DefrostEIRPtr = GetCurveIndex( cAlphaArgs( 10 ) );
 				if ( VRF( VRFNum ).DefrostEIRPtr > 0 ) {
 					// Verify Curve Object, only legal type is linear, quadratic, or cubic
 					{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).DefrostEIRPtr ) );
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					} else {
-						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 12 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).DefrostEIRPtr ) );
+						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 10 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).DefrostEIRPtr ) );
 						ShowContinueError( "... curve type must be BiQuadratic." );
 						ErrorsFound = true;
 					}}
 				} else {
 					if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
-						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 12 ) + " not found:" + cAlphaArgs( 12 ) );
+						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 10 ) + " not found:" + cAlphaArgs( 10 ) );
 						ErrorsFound = true;
 					}
 				}
 			} else {
 				if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 12 ) + " not found:" + cAlphaArgs( 12 ) );
+					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 10 ) + " not found:" + cAlphaArgs( 10 ) );
 					ErrorsFound = true;
 				}
 			}
 			
-			VRF( VRFNum ).DefrostFraction = rNumericArgs( 25 );
-			VRF( VRFNum ).DefrostCapacity = rNumericArgs( 26 );
-			VRF( VRFNum ).MaxOATDefrost = rNumericArgs( 27 );
+			VRF( VRFNum ).DefrostFraction = rNumericArgs( 27 );
+			VRF( VRFNum ).DefrostCapacity = rNumericArgs( 28 );
+			VRF( VRFNum ).MaxOATDefrost = rNumericArgs( 29 );
 			if ( VRF( VRFNum ).DefrostCapacity == 0.0 && VRF( VRFNum ).DefrostStrategy == Resistive ) {
-				ShowWarningError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cNumericFieldNames( 22 ) + " = 0.0 for defrost strategy = RESISTIVE." );
+				ShowWarningError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cNumericFieldNames( 28 ) + " = 0.0 for defrost strategy = RESISTIVE." );
 			}
 			
-			VRF( VRFNum ).CompMaxDeltaP  = rNumericArgs( 28 );
+			VRF( VRFNum ).CompMaxDeltaP  = rNumericArgs( 30 );
 			
 			// The new VRF model is Air cooled
 			VRF( VRFNum ).CondenserType = AirCooled; 
 			VRF( VRFNum ).CondenserNodeNum = 0; 
 			
 			// Evaporative Capacity & Compressor Power Curves corresponding to each Loading Index / compressor speed
-			NumOfCompSpd = rNumericArgs( 29 );   
+			NumOfCompSpd = rNumericArgs( 31 );   
 			VRF( VRFNum ).CompressorSpeed.dimension( NumOfCompSpd );
 			VRF( VRFNum ).OUCoolingCAPFT.dimension( NumOfCompSpd );
 			VRF( VRFNum ).OUCoolingPWRFT.dimension( NumOfCompSpd );
-			int Count1Index = 29; // the index of the last numeric field before compressor speed entries
-			int Count2Index = 11; // the index of the last alpha field before capacity/power curves
+			int Count1Index = 31; // the index of the last numeric field before compressor speed entries
+			int Count2Index = 9; // the index of the last alpha field before capacity/power curves
 			for ( NumCompSpd = 1; NumCompSpd <= NumOfCompSpd; NumCompSpd++ ) {
 				VRF( VRFNum ).CompressorSpeed( NumCompSpd ) = rNumericArgs( Count1Index + NumCompSpd );
 
@@ -2458,7 +2405,7 @@ namespace HVACVariableRefrigerantFlow {
 				
 			}
 		}
-
+		 
 		cCurrentModuleObject = "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow";
 		for ( VRFNum = 1; VRFNum <= NumVRFTU; ++VRFNum ) {
 			VRFTUNum = VRFNum;

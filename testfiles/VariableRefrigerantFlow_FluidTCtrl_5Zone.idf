@@ -117,10 +117,10 @@
     R410A,                   !- Refrigerant Type
     3.37,                    !- Reference Cooling COP
     2.80,                    !- Reference Heating COP
-    ,                        !- Minimum Outdoor AirTemperature in Cooling Mode {C}
-    ,                        !- Maximum Outdoor AirTemperature in Cooling Mode {C}
-    ,                        !- Minimum Outdoor AirTemperature in Heating Mode {C}
-    ,                        !- Maximum Outdoor AirTemperature in Heating Mode {C}
+    ,                        !- Minimum Outdoor Air Temperature in Cooling Mode {C}
+    ,                        !- Maximum Outdoor Air Temperature in Cooling Mode {C}
+    ,                        !- Minimum Outdoor Air Temperature in Heating Mode {C}
+    ,                        !- Maximum Outdoor Air Temperature in Heating Mode {C}
     3,                       !- Reference Outdoor Unit Superheating Degrees {C}
     3,                       !- Reference Outdoor Unit Subcooling Degrees {C}
     VariableTemp,            !- Refrigerant Temperature Control Algorithm for Indoor Unit
@@ -130,8 +130,8 @@
     13,                      !- Variable Evaporating Temperature Maximum for Indoor Unit {C}
     42,                      !- Variable Condensing Temperature Minimum for Indoor Unit {C}
     46,                      !- Variable Evaporating Temperature Maximum for Indoor Unit {C}
-    Fan:ConstantVolume,      !- Outdoor Unit Fan Object Type
-    VRFOUFan,                !- Outdoor Unit Fan Object Name
+    ,                        !- Outdoor Unit Fan Rated Power {W}
+    ,                        !- Outdoor Unit Fan Rated Flow Rate {m3/s}
     OUEvapTempCurve,         !- Outdoor Unit Evaporating Temperature Function of Superheating Curve Name
     OUCondTempCurve,         !- Outdoor Unit Condensing Temperature Function of Subcooling Curve Name
     0.0508,                  !- Diameter of main pipe connecting outdoor unit to indoor units {m}
@@ -294,16 +294,6 @@
     Dimensionless,           !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 	
-  Fan:ConstantVolume,
-    VRFOUFan,                !- Name
-    VRFAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    40.0,                    !- Pressure Rise {Pa}
-    3,                       !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    VRFOUInletNode,          !- Air Inlet Node Name
-    VRFOUReliefNode;         !- Air Outlet Node Name
 	
 !-   ===========  ALL OBJECTS IN CLASS: ZONETERMINALUNITLIST ===========
 
