@@ -119,7 +119,16 @@ private:
 	setupAggString();
 
 	Real64
-	AnnualTable::setEnergyUnitStringAndFactor( int const unitsStyle, std::string & unitString );
+	setEnergyUnitStringAndFactor( int const unitsStyle, std::string & unitString );
+
+	int
+	columnCountForAggregation( AnnualFieldSet::AggregationKind curAgg );
+	
+	std::string
+	trim( const std::string& str );
+
+	void
+	AnnualTable::fixUnitsPerSecond( std::string & unitString, Real64 & conversionFactor );
 
 
 }; // class AnnualTable
