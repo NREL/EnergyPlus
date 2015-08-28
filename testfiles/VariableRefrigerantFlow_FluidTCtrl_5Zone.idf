@@ -160,25 +160,7 @@
     Spd1Power,               !- Loading Index 2 Compressor Power Function of Temperature Curve Name
     100,                     !- Compressor Speed at Loading Index 3
     Spd2Cooling,             !- Loading Index 3 Evaporative Capacity Function of Temperature Curve Name
-    Spd2Power,               !- Loading Index 3 Compressor Power Function of Temperature Curve Name
-    ,                        !- Compressor Speed at Loading Index 4
-    ,                        !- Loading Index 4 Evaporative Capacity Function of Temperature Curve Name
-    ,                        !- Loading Index 4 Compressor Power Function of Temperature Curve Name
-    ,                        !- Compressor Speed at Loading Index 5
-    ,                        !- Loading Index 5 Evaporative Capacity Function of Temperature Curve Name
-    ,                        !- Loading Index 5 Compressor Power Function of Temperature Curve Name
-    ,                        !- Compressor Speed at Loading Index 6
-    ,                        !- Loading Index 6 Evaporative Capacity Function of Temperature Curve Name
-    ,                        !- Loading Index 6 Compressor Power Function of Temperature Curve Name
-    ,                        !- Compressor Speed at Loading Index 7
-    ,                        !- Loading Index 7 Evaporative Capacity Function of Temperature Curve Name
-    ,                        !- Loading Index 7 Compressor Power Function of Temperature Curve Name
-    ,                        !- Compressor Speed at Loading Index 8
-    ,                        !- Loading Index 8 Evaporative Capacity Function of Temperature Curve Name
-    ,                        !- Loading Index 8 Compressor Power Function of Temperature Curve Name
-    ,                        !- Compressor Speed at Loading Index 9
-    ,                        !- Loading Index 9 Evaporative Capacity Function of Temperature Curve Name
-    ;                        !- Loading Index 9 Compressor Power Function of Temperature Curve Name
+    Spd2Power;               !- Loading Index 3 Compressor Power Function of Temperature Curve Name
 
   Curve:Quadratic,
     OUEvapTempCurve,         !- Name

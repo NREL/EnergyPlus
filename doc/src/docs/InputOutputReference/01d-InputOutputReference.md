@@ -4284,7 +4284,7 @@ This coil object is specifically designed for the physics based VRF model applic
 
 #### Field: Name
 
-This alpha field defines a unique user-assigned name for an instance of a VRF DX cooling coil. Any reference to this DX cooling coil by another object will use this name. This cooling coil name must be entered in the AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl object. No other system type uses this specific coil (Ref. Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl).
+This alpha field defines a unique user-assigned name for an instance of a VRF DX cooling coil. Any reference to this DX cooling coil by another object will use this name. This cooling coil name must be entered in the AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl object. No other system type uses this specific coil.
 
 #### Field: Availability Schedule Name
 
@@ -4328,8 +4328,8 @@ Following is an example input for a Coil:Cooling:DX:VariableRefrigerantFlow:Flui
     TU1 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node
     autosize,                !- Rated Total Cooling Capacity {W}
     autosize,                !- Rated Sensible Heat Ratio
-	3,                       !- Indoor Unit Reference Superheating Degrees {C}    
-	IUEvapTempCurve,         !- Indoor Unit Evaporating Temperature Function of Superheating Curve Name    
+    3,                       !- Indoor Unit Reference Superheating Degrees {C}    
+    IUEvapTempCurve,         !- Indoor Unit Evaporating Temperature Function of Superheating Curve Name    
     ;                        !- Name of Water Storage Tank for Condensate Collection
 
   Curve:Quadratic,
@@ -4364,7 +4364,7 @@ Following is an example input for a Coil:Cooling:DX:VariableRefrigerantFlow:Flui
 
 * HVAC,Average, Cooling Coil VRF Evaporating Temperature [C]
 
-*  HVAC,Average, Cooling Coil VRF Super Heating Degrees [C]
+* HVAC,Average, Cooling Coil VRF Super Heating Degrees [C]
 
 Evaporative-cooled condenser:
 
@@ -4425,11 +4425,11 @@ This coil object is specifically designed for the physics based VRF model applic
 
 #### Field: Name
 
-This alpha field defines a unique user-assigned name for an instance of a VRF DX heating coil. Any reference to this DX heating coil by another object will use this name. This heating coil name must be entered in the AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl object. No other system type uses this specific coil(Ref. Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl).
+This alpha field defines a unique user-assigned name for an instance of a VRF DX heating coil. Any reference to this DX heating coil by another object will use this name. This heating coil name must be entered in the AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl object. No other system type uses this specific coil.
 
 #### Field: Availability Schedule
 
-This alpha field defines the name of the schedule (ref: Schedule) that denotes whether the DX heating coil can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.
+This alpha field defines the name of the schedule (ref: Schedule) that denotes whether the DX heating coil can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank the unit is always available.
 
 #### Field: Coil Air Inlet Node
 
@@ -4461,7 +4461,7 @@ Following is an example input for a Coil:Heating:DX:VariableRefrigerantFlow:Flui
     TU1 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node
     autosize,                !- Rated Total Heating Capacity {W}
     5,                       !- Indoor Unit Reference Subcooling Degrees {C}    
-	IUCondTempCurve;         !- Indoor Unit Condensing Temperature Function of Subcooling Curve Name
+    IUCondTempCurve;         !- Indoor Unit Condensing Temperature Function of Subcooling Curve Name
 
   Curve:Quadratic,
     IUCondTempCurve,         !- Name

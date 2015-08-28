@@ -13631,9 +13631,9 @@ A VRF system is an air-conditioning system that varies the refrigerant flow rate
 
 There are two alternative VRF models in EnergyPlus: 
 
- 1. **System curve based model (VRF_SysCurve)**. In this model, a number of system level curves are used to describe the VRF system performance. This model corresponds to the *AirConditioner:VariableRefrigerantFlow* object.
+ 1. **System curve based model (VRF-SysCurve)**. In this model, a number of system level curves are used to describe the VRF system performance. This model corresponds to the *AirConditioner:VariableRefrigerantFlow* object.
  
- 2. **Physics based model (VRF_FluidTCtrl)**. This model is able to consider the dynamics of more operational parameters and is applicable for fluid temperature control. This model corresponds to the *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object.
+ 2. **Physics based model (VRF-FluidTCtrl)**. This model is able to consider the dynamics of more operational parameters and is applicable for fluid temperature control. This model corresponds to the *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object.
  
 ( Please refer to the engineering reference for more technical details of the two models).
 
@@ -13662,10 +13662,10 @@ Figure 125. Variable Refrigerant Flow Schematic
 Energyplus object type and object name, and node name relationships are also shown in the following figure to aid in the assembly of this HVAC system type.
 
 ![VRFObjects](media/image311.png)
-*(a) VRF model based on system curves*
+*(a) VRF model based on system curves (VRF-SysCurve)*
 
-![VRFObjects](media/image311.png)
-*(b) VRF model based on physics (applicable for fluid temperature control)*
+![VRFObjects](media/image312.png)
+*(b) VRF model based on physics (VRF-FluidTCtrl)*
 
 Figure 126. Variable Refrigerant Flow Object Links
 
@@ -14119,7 +14119,7 @@ This alpha field defines the name of the schedule (ref: Schedule) that denotes w
 
 #### Field: Zone Terminal Unit List Name
 
-This alpha field defines the name of the zone terminal unit list. The name specified here should match the name of a valid ZoneTerminalUnitList object. In addition, each name specified in this list should match the name of a valid ZoneHVAC:TerminalUnit: VariableRefrigerantFlow object. All terminal units connected to this heat pump must be listed in this ZoneTerminalUnitList object.
+This alpha field defines the name of the zone terminal unit list. The name specified here should match the name of a valid ZoneTerminalUnitList object. In addition, each name specified in this list should match the name of a valid ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object. All terminal units connected to this heat pump must be listed in this ZoneTerminalUnitList object.
 
 #### Field: Refrigerant Type
 
@@ -14267,7 +14267,7 @@ This numeric field defines the outdoor air dry-bulb temperature above which outd
 
 #### Field: Compressor maximum delta Pressure
 
-This numeric field defines the maximum pressure increase that the compressor can provide. The value should be greater than 0. If this field is blank, the default value of 4500 kPa is used.
+This numeric field defines the maximum pressure increase that the compressor can provide. The value should be greater than 0. If this field is blank, the default value of 4,500,000 Pa is used.
 
 #### Field: Number of Compressor Loading Index Entries
 
@@ -14284,7 +14284,7 @@ This alpha field defines the name of a BiQuadratic curve for the VRF operational
 #### Field: Loading Index i Compressor Power Function of Temperature Curve Name
 
 This alpha field defines the name of a BiQuadratic curve for the VRF operational mode corresponding to the i-th loading index. It parameterizes the variation of compressor power as a function of operating conditions, i.e., evaporating and condensing temperatures. The output of this curve is the compressor power.
-Following is an example input for a AirConditioner:VariableRefrigerantFlow system.
+Following is an example input for a AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl system.
 
 
 ```idf

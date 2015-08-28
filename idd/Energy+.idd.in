@@ -53277,7 +53277,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type real
        \units C
        \default 5.0
-       \note Enter the maximum outdoor temperature above which the crankcase heaters are disabled
+       \note Enter the maximum outdoor temperature above which the defrost operation is disabled
   N28, \field Compressor maximum delta Pressure
        \type real 
        \units Pa

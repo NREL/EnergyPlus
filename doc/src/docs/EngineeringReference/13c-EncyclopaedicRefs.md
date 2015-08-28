@@ -4692,16 +4692,16 @@ There are two common types of VRF systems.
 
 There are two alternative VRF models availabe in EnergyPlus to simulate the energy performance of Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) air-conditioning systems: 
 
- 1. **System Curve based Model (VRF_SysCurve)**. In this model, a number of system level curves are used to describe the VRF system performance. It corresponds to the *AirConditioner:VariableRefrigerantFlow* object. 
+ 1. **System Curve based Model (VRF-SysCurve)**. In this model, a number of system level curves are used to describe the VRF system performance. It corresponds to the *AirConditioner:VariableRefrigerantFlow* object. 
  
- 2. **Physics based Model (VRF_FluidTCtrl)**. This model is able to consider the dynamics of more operational parameters and is applicable for fluid temperature control. This model corresponds to the *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object.
+ 2. **Physics based Model (VRF-FluidTCtrl)**. This model is able to consider the dynamics of more operational parameters and is applicable for fluid temperature control. This model corresponds to the *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object.
  
  
 ### Variable Refrigerant Flow Heat Pump Model (System Curve Based Model)
 
 #### Overview
 
-This section describes the System Curve based VRF Model (VRF_SysCurve), which can address both the heat pump and heat recovery operating modes and support air-, evaporatively-, or water-cooled condenser equipment ( throughout this section, the term “condenser” refers to the outdoor unit where the compressor is located. )
+This section describes the System Curve based VRF Model (VRF-SysCurve), which can address both the heat pump and heat recovery operating modes and support air-, evaporatively-, or water-cooled condenser equipment ( throughout this section, the term “condenser” refers to the outdoor unit where the compressor is located. )
 
 The figure below schematically depicts the AirConditioner:VariableRefrigerantFlow (VRF AC) system. The outdoor unit is connected directly to the zone terminal units using a zone terminal unit list (ref: ZoneTerminalUnitList). The VRF AC system conditions multiple zones and is controlled by thermostats located in each zone. Zone terminal units operate to meet the zone sensible cooling or sensible heating requirements as determined by the zone thermostat schedule. 
 
@@ -4719,7 +4719,7 @@ Figure 242. Variable Refrigerant Flow Heat Pump (draw through fan placement)
 
 ![](media/image5316.png)
 
-Figure 243. Energyplus object connections for VRF_SysCurve model 
+Figure 243. Energyplus object connections for VRF-SysCurve model 
 
 The terminal unit is able to model supply air fan operation in two modes: cycling fan – cycling coil (i.e., AUTO fan) and continuous fan – cycling coil (i.e., fan ON). Fan:Simple:OnOff must be used to model AUTO fan, while Fan:Simple:OnOff or Fan:Simple:ConstVolume can be used to model fan ON.
 
@@ -5378,11 +5378,11 @@ where:
 
 #### Overview
 
-This section describes the Physics based VRF Model (VRF_FluidTCtrl) to simulate the energy performance of Variable Refrigerant Flow (VRF) systems in the heat pump (HP) operation mode (either cooling or heating is provided but not simultaneously). 
+This section describes the Physics based VRF Model (VRF-FluidTCtrl) to simulate the energy performance of Variable Refrigerant Flow (VRF) systems in the heat pump (HP) operation mode (either cooling or heating is provided but not simultaneously). 
 
-Compared with the VRF_SysCurve model, VRF_FluidTCtrl model is more physics-based and thus able to consider the dynamics of more operational parameters which is essential for the description of many enhanced control logics (e.g., the adjustment of superheating degrees during small load operations). Furthermore, this model implements component-level curves rather than the system-level curves, and thus requires much fewer curves as model inputs. The definition of VRF performance data for simulation as part of ASHRAE Standard 205 will ensure VRF manufacturers provide adequate data to create the required performance curves.
+Compared with the VRF-SysCurve model, VRF-FluidTCtrl model is more physics-based and thus able to consider the dynamics of more operational parameters which is essential for the description of many enhanced control logics (e.g., the adjustment of superheating degrees during small load operations). Furthermore, this model implements component-level curves rather than the system-level curves, and thus requires much fewer curves as model inputs. The definition of VRF performance data for simulation as part of ASHRAE Standard 205 will ensure VRF manufacturers provide adequate data to create the required performance curves.
 
-The main features of the VRF_FluidTCtrl model include:
+The main features of the VRF-FluidTCtrl model include:
 
  * Introduction of separate curves for capacities and power inputs of indoor and outdoor units instead of overall curves for the entire system.
 
@@ -5394,46 +5394,46 @@ The main features of the VRF_FluidTCtrl model include:
 
  * Development of a physics-based model to calculate thermal loss in the refrigerant piping network (varies with refrigerant flow rate, operational conditions, pipe length, and pipe and insulation materials) instead of a constant correction factor.
 
-These features enhance the simulation accuracy of the VRF system performance in both heating and cooling modes, especially during low load operations. In addition, these features enable the modeling of a multi-stage control strategy to adjust the system capacity during low load conditions, as shown in Figure VRF_FluidTCtrl-1. Further more, the VRF_FluidTCtrl enables the potential simulation of demand response of VRF systems by directly slowing down the speed of compressors in the outdoor units with invertor technology.
+These features enhance the simulation accuracy of the VRF system performance in both heating and cooling modes, especially during low load operations. In addition, these features enable the modeling of a multi-stage control strategy to adjust the system capacity during low load conditions, as shown in Figure VRF-FluidTCtrl-1. Further more, the VRF-FluidTCtrl model enables the potential simulation of demand response of VRF systems by directly slowing down the speed of compressors in the outdoor units with invertor technology.
 
-![](media/VRF_FluidTCtrl-1a.png)
+![](media/VRF-FluidTCtrl-1a.png)
 
-Figure VRF_FluidTCtrl-1a. Multi-stage control strategy to adjust the system capacity during low load conditions
+Figure VRF-FluidTCtrl-1a. Multi-stage control strategy to adjust the system capacity during low load conditions
 
-Note that a number of calculation steps are coupled together in the VRF_FluidTCtrl model, for instance, the piping loss calculation and the system performance calculation. More specifically, the piping loss changes the operating conditions of the system, which may lead to a different control strategy and thus in reverse affect the amount of piping loss. This makes it difficult to obtain an analytical solution for a number of operational parameters (e.g., enthalpy of refrigerant entering the indoor unit), and therefore numerical iterations are employed to address this problem (refer to Figure VRF_FluidTCtrl-3 for more details). Therefore, the VRF_FluidTCtrl model can have a longer execution time to perform the simulation than the VRF_SysCurve model. 
+Note that a number of calculation steps are coupled together in the VRF-FluidTCtrl model, for instance, the piping loss calculation and the system performance calculation. More specifically, the piping loss changes the operating conditions of the system, which may lead to a different control strategy and thus in reverse affect the amount of piping loss. This makes it difficult to obtain an analytical solution for a number of operational parameters (e.g., enthalpy of refrigerant entering the indoor unit), and therefore numerical iterations are employed to address this problem (refer to Figure VRF-FluidTCtrl-3 for more details). Therefore, the VRF-FluidTCtrl model can have a longer execution time to perform the simulation than the VRF-SysCurve model. 
 
-The object connections for VRF_FluidTCtrl model is similar to those for VRF-SysCurve model. The difference lies in the object used to describe a specific components. For example, VRF-SysCurve model uses  *AirConditioner:VariableRefrigerantFlow* object to describe the VRF outdorr unit performance, while in VRF_FluidTCtrl model the *AirConditioner:VariableRefrigerantFlow* object is used.
+The object connections for VRF-FluidTCtrl model is similar to those for VRF-SysCurve model. The difference lies in the object used to describe a specific components. For example, VRF-SysCurve model uses  *AirConditioner:VariableRefrigerantFlow* object to describe the VRF outdoor unit performance, while in VRF-FluidTCtrl model the *AirConditioner:VariableRefrigerantFlow* object is used.
 
-![](media/VRF_FluidTCtrl-1b.png)
+![](media/VRF-FluidTCtrl-1b.png)
 
-Figure VRF_FluidTCtrl-1b. Energyplus object connections for VRF_FluidTCtrl model 
+Figure VRF-FluidTCtrl-1b. Energyplus object connections for VRF-FluidTCtrl model 
 
 
 #### Model Description
 
-Figures VRF_FluidTCtrl-2 and VRF_FluidTCtrl-3 illustrate the overall logic of the VRF_FluidTCtrl algorithms. Detailed calculation procedures and explanations of equations are described in the following sections.
+Figures VRF-FluidTCtrl-2 and VRF-FluidTCtrl-3 illustrate the overall logic of the VRF-FluidTCtrl algorithms. Detailed calculation procedures and explanations of equations are described in the following sections.
 
-![](media/VRF_FluidTCtrl-2a.png)
-
-*(a)	Heating Mode*
-
-![](media/VRF_FluidTCtrl-2b.png)
-
-*(b)	Cooling Mode*
-
-Figure VRF_FluidTCtrl-2. Schematic Pressure-Enthalpy Diagram for VRF Operation 
-
-![](media/VRF_FluidTCtrl-3a.png)
+![](media/VRF-FluidTCtrl-2a.png)
 
 *(a)	Heating Mode*
 
-![](media/VRF_FluidTCtrl-3b.png)
+![](media/VRF-FluidTCtrl-2b.png)
 
 *(b)	Cooling Mode*
 
-Figure VRF_FluidTCtrl-3. Flow Chart of the VRF_FluidTCtrl Model 
+Figure VRF-FluidTCtrl-2. Schematic Pressure-Enthalpy Diagram for VRF Operation 
 
-The VRF_FluidTCtrl algorithms are described in details below, including the models of both the indoor and outdoor unit(s) of the VRF system. Because of the different control algorithms used in the outdoor unit for cooling and heating modes, the heating and cooling modes are described separately.
+![](media/VRF-FluidTCtrl-3a.png)
+
+*(a)	Heating Mode*
+
+![](media/VRF-FluidTCtrl-3b.png)
+
+*(b)	Cooling Mode*
+
+Figure VRF-FluidTCtrl-3. Flow Chart of the VRF-FluidTCtrl Model 
+
+The VRF-FluidTCtrl algorithms are described in details below, including the models of both the indoor and outdoor unit(s) of the VRF system. Because of the different control algorithms used in the outdoor unit for cooling and heating modes, the heating and cooling modes are described separately.
 
 #### *Modeling of the indoor unit (I/U) - Part I*
 
@@ -5455,7 +5455,7 @@ The operation mode of the VRF system can therefore be determined from <span>$Q_{
 
 Evaluate the required coil surface air temperature <span>$T_{fs}$</span> and the required evaporator/condenser refrigerant temperature <span>$T_{e,req}/{T_{c,req}}$</span> for each indoor unit. 
 
-Assuming the coil air flow rate is at the maximum (<span>$G_{a,rate}$</span>), the suction air temperature after the indoor coil fan can be calculated for each indoor unit:
+Assuming the coil air flow rate is at the maximum (<span>$G_{a,rate}$</span>), the entering air temperature after the indoor coil fan can be calculated for each indoor unit:
 
 <div>$$T_{coil,in}=T_{in}+Q_{fan}/(G_{a,rate}\times{c_p}\times\rho_{in})$$</div>
 
@@ -5857,7 +5857,7 @@ a. Set <span>$rps$</span> at its minimum value (e.g., 18 <span>$rps$</span>).
 
 b. Update <span>${T_e}'$</span> to meet the required evaporative capacity, using equations described in Step 2c.4a.
 
-c. Update <span>$T_e$</span> to meet the updated <span>${T_e}'$</span>. Note that due to the <span>$T_e$</span> updates, the refrigerant state and flow rate are changed and thus the piping loss analysis should also re-performed (Step 2c.1). So is the calculation of <span>$C_{cap,operation}$</span> (Step 2c.2-2c.3).
+c. Update <span>$T_e$</span> to meet the updated <span>${T_e}'$</span>. Note that due to the <span>$T_e$</span> updates, the refrigerant state and flow rate are changed and thus the piping loss analysis should also be repeated (Step 2c.1). So is the calculation of <span>$C_{cap,operation}$</span> (Step 2c.2-2c.3).
 
 d. <span>$SH$</span> can be updated based on the updated <span>$T_e$</span>, using the equations shown in Step 1.2. 
 
@@ -5877,7 +5877,7 @@ Where
 
 <span>$T_c$</span>		effective condensing temperature (°C)
 
-<span>$N_{comp,rps}$</span>	compress power corresponding to <span>$rps$</span> (kW)
+<span>$N_{comp,rps}$</span>	compressor power corresponding to <span>$rps$</span> (kW)
 
 Table 2 – Outdoor unit compressor power at different Loading Index 
 
@@ -6239,7 +6239,7 @@ d. If the calculated <span>$rps$</span> is lower than the minimum <span>$rps$</s
 
 ##### Step 2h.5: Modify evaporating temperature to further reduce outdoor unit capacity 
 
-If the calculated <span>$rps$</span> is lower than the minimum <span>$rps$</span> (e.g. 18 <span>$rps$</span>), it means that the zone heating load (indoor unit side) is so low that it leads to an evaporative capacity (outdoor unit side) which is even lower than the system evaporative capacity corresponding to the minimum compressor speed. In this situation, the evaporating temperature <span>$Te$</span> as well as the superheating degree SH is modified to further reduce the outdoor unit capacity. More specifically: 
+If the calculated <span>$rps$</span> is lower than the minimum <span>$rps$</span> (e.g. 18 <span>$rps$</span>), it means that the zone heating load (indoor unit side) is so low that it leads to an evaporative capacity (outdoor unit side) which is even lower than the system evaporative capacity corresponding to the minimum compressor speed. In this situation, the evaporating temperature <span>$Te$</span> as well as the superheating degree <span>$SH$</span> is modified to further reduce the outdoor unit capacity. More specifically: 
 
 a. Set <span>$rps$</span> at its minimum value (e.g., 18 <span>$rps$</span>).
 
@@ -6247,7 +6247,7 @@ b. Update <span>$Te$</span> to meet the required evaporative capacity, using equ
 
 c. <span>$SH$</span> for each indoor unit can be updated using the equations shown in Step 1.2.
 
-It should be noted that, different from the corresponding step in the cooling mode (Step 2c.5), the <span>$Te$</span> and <span>$SH$</span> updates in the heating mode do not affect the refrigerant state and flow rate calculations (as shown in Step 2h.1). Therefore, the piping loss analysis does not need to be re-performed here.
+It should be noted that, different from the corresponding step in the cooling mode (Step 2c.5), the <span>$Te$</span> and <span>$SH$</span> updates in the heating mode do not affect the refrigerant state and flow rate calculations (as shown in Step 2h.1). Therefore, the piping loss analysis does not need to be repeated here.
 
 ##### Step 2h.6: Calculate the compressor power
 
@@ -6269,7 +6269,7 @@ Where
 
 <span>$T_{c,ref}$</span>		reference condensing temperature (°C) 
 
-<span>$N_{comp,rps}$</span>	compress power corresponding to rps (kW) 
+<span>$N_{comp,rps}$</span>	compressor power corresponding to rps (kW) 
 
 Table 4 – Outdoor unit compressor power at different Loading Index 
 
@@ -6327,7 +6327,7 @@ Where
 
 <span>$Q_{in,total}$</span>	total cooling load for the zone (kW)
 
-<span>$H_{coil,in}$</span>	enthalpy of the suction air of the indoor unit (kJ/kg)
+<span>$H_{coil,in}$</span>	enthalpy of the entering air of the indoor unit (kJ/kg)
 
 <span>$\rho_{in}$</span> density of indoor air,<span>$f_{\rho}(T_{in},W_{in})$</span> (kg/m<sup>3</sup>)
 
@@ -6375,7 +6375,7 @@ Where
 
 <span>$Q_{in,total}$</span>	total cooling load for the zone (kW)
 
-<span>$T_{coil,in}$</span>	temperature of the suction air of the indoor unit (°C)
+<span>$T_{coil,in}$</span>	temperature of the entering air of the indoor unit (°C)
 
 <span>$\rho_{in}$</span>density of indoor air,<span>$f_{\rho}(T_{in},W_{in})$</span>   (kg/m<sup>3</sup>)
 
@@ -6401,7 +6401,7 @@ Calculate electric power consumption by the indoor unit using the existing VAV f
 
 #### Additional energy consumption by defrost and crankcase heater 
 
-There may be additional energy consumption due to the defrost operation and crankcase heater operation. These components have no impact on the heat pump operations. The calculation methods in the VRF_FluidTCtrl model are the same as those in VRF_SysCurve model. Please refer to the VRF_SysCurve section for more details.
+There may be additional energy consumption due to the defrost operation and crankcase heater operation. These components have no impact on the heat pump operations. The calculation methods in the VRF-FluidTCtrl model are the same as those in VRF-SysCurve model. Please refer to the VRF-SysCurve section for more details.
 
 
 ### Zone Terminal Unit List
