@@ -30,7 +30,7 @@ set( test_src
   HeatBalanceManager.unit.cc
   HeatRecovery.unit.cc
   Humidifiers.unit.cc
-  HVACSizingSimulationManager.unit.cc 
+  HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
@@ -53,6 +53,7 @@ set( test_src
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
+  SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
   Vectors.unit.cc
   Vector.unit.cc

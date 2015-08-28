@@ -46,6 +46,7 @@
 #include <ScheduleManager.hh>
 #include <SolarShading.hh>
 #include <SurfaceGeometry.hh>
+#include <SurfaceOctree.hh>
 #include <UtilityRoutines.hh>
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
@@ -268,6 +269,7 @@ namespace HeatBalanceManager {
 		// Get the heat balance input at the beginning of the simulation only
 		if ( GetInputFlag ) {
 			GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
+			Octree::surfaceOctree.init( DataSurfaces::Surface ); // Set up surface octree
 			GetInputFlag = false;
 		}
 

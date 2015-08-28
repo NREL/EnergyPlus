@@ -452,6 +452,8 @@ SET( SRC_2
   SurfaceGroundHeatExchanger.hh
   SwimmingPool.cc
   SwimmingPool.hh
+  SurfaceOctree.cc
+  SurfaceOctree.hh
   SystemAvailabilityManager.cc
   SystemAvailabilityManager.hh
   SystemReports.cc
