@@ -7,7 +7,6 @@
 #include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Optional.hh>
-#include <ObjexxFCL/Vector2.fwd.hh>
 #include <ObjexxFCL/Vector3.fwd.hh>
 
 // EnergyPlus Headers
@@ -363,15 +362,6 @@ namespace DaylightingManager {
 	);
 
 	void
-	DayltgPierceSurface(
-		int const ISurf, // Surface index
-		Vector3< Real64 > const & R1, // Point from which ray originates
-		Vector3< Real64 > const & RN, // Unit vector along in direction of ray whose
-		int & IPIERC, // =1 if line through point R1 in direction of unit vector
-		Vector3< Real64 > & CP // Point that ray along RN intersects plane of surface
-	);
-
-	void
 	DayltgHitObstruction(
 		int const IHOUR, // Hour number
 		int const IWin, // Window index
@@ -543,7 +533,7 @@ namespace DaylightingManager {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

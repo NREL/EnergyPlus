@@ -1921,7 +1921,7 @@ namespace SolarShading {
 				Zone( ZoneNum ).FloorArea = HorizAreaSum;
 				ShowWarningError( "ComputeIntSolarAbsorpFactors: Solar distribution model is set to place solar gains on the zone floor," );
 				ShowContinueError( "...Zone=\"" + Zone( ZoneNum ).Name + "\" has no floor, but has approximate horizontal surfaces." );
-				ShowContinueError( "...these Tilt > 120°, (area=[" + RoundSigDigits( HorizAreaSum, 2 ) + "] m2) will be used." );
+				ShowContinueError( "...these Tilt > 120 degrees, (area=[" + RoundSigDigits( HorizAreaSum, 2 ) + "] m2) will be used." );
 			}
 
 			// Compute ISABSF
@@ -5431,7 +5431,7 @@ namespace SolarShading {
 						if ( FenSolAbsPtr == 0 ) {
 							// Put in the equivalent layer absorptions
 							for ( Lay = 1; Lay <= SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).NLayers; ++Lay ) {
-								AbWin = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinBmFtAbs( TimeStep, HourOfDay, Lay ) * CosInc * SunLitFract * SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay );
+								AbWin = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinBmFtAbs( HourOfDay, TimeStep, Lay ) * CosInc * SunLitFract * SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay );
 
 								// Add contribution of beam reflected from outside and inside reveal
 								AWinSurf( Lay, SurfNum ) = AbWin + SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing * SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinFtHemAbs( Lay ) + SurfaceWindow( SurfNum ).InsRevealDiffOntoGlazing * SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinBkHemAbs( Lay );
@@ -5541,7 +5541,7 @@ namespace SolarShading {
 						}
 						//Ground Diffuse transmitted by Complex Fen
 						DiffTransGnd = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinSkyGndTrans;
-						DiffTransBmGnd = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinBmGndTrans( TimeStep, HourOfDay );
+						DiffTransBmGnd = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinBmGndTrans( HourOfDay, TimeStep );
 						if ( GndSolarRad != 0.0 ) {
 							DGZoneWin = ( ( SurfaceWindow( SurfNum ).BmGndSolarInc * DiffTransBmGnd + SurfaceWindow( SurfNum ).SkyGndSolarInc * DiffTransGnd ) * Surface( SurfNum ).Area ) / ( GndSolarRad );
 						} else {
@@ -5687,8 +5687,8 @@ namespace SolarShading {
 						}
 					} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) {
 						// Need to check what effect, if any, defining these here has
-						TBmBm = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinDirSpecTrans( TimeStep, HourOfDay );
-						TBmDif = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinDirHemiTrans( TimeStep, HourOfDay ) - TBmBm;
+						TBmBm = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinDirSpecTrans( HourOfDay, TimeStep );
+						TBmDif = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinDirHemiTrans( HourOfDay, TimeStep ) - TBmBm;
 					} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowEQLModel ) {
 						// get ASHWAT fenestration model beam-beam and beam-diffuse properties
 						TBmBm = TBmBmEQL;
@@ -6374,12 +6374,12 @@ namespace SolarShading {
 							// Solar radiation from this window will be calculated only in case when this window is not scheduled surface gained
 							if ( FenSolAbsPtr == 0 ) {
 								// Current incoming direction number (Sun direction)
-								IBm = ComplexWind( SurfNum ).Geom( CurCplxFenState ).SolBmIndex( TimeStep, HourOfDay );
+								IBm = ComplexWind( SurfNum ).Geom( CurCplxFenState ).SolBmIndex( HourOfDay, TimeStep );
 
 								// Report variables for complex fenestration here
 								BSDFBeamDirectionRep( SurfNum ) = IBm;
-								BSDFBeamThetaRep( SurfNum ) = ComplexWind( SurfNum ).Geom( CurCplxFenState ).ThetaBm( TimeStep, HourOfDay );
-								BSDFBeamPhiRep( SurfNum ) = ComplexWind( SurfNum ).Geom( CurCplxFenState ).PhiBm( TimeStep, HourOfDay );
+								BSDFBeamThetaRep( SurfNum ) = ComplexWind( SurfNum ).Geom( CurCplxFenState ).ThetaBm( HourOfDay, TimeStep );
+								BSDFBeamPhiRep( SurfNum ) = ComplexWind( SurfNum ).Geom( CurCplxFenState ).PhiBm( HourOfDay, TimeStep );
 
 								BaseSurf = Surface( SurfNum ).BaseSurf;
 								// Get total number of back surfaces for current window (surface)
@@ -10760,7 +10760,7 @@ namespace SolarShading {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -132,7 +132,7 @@ namespace ICEngineElectricGenerator {
 
 		//SELECT and CALL MODELS
 		if ( GeneratorIndex == 0 ) {
-			GenNum = FindItemInList( GeneratorName, ICEngineGenerator.Name(), NumICEngineGenerators );
+			GenNum = FindItemInList( GeneratorName, ICEngineGenerator );
 			if ( GenNum == 0 ) ShowFatalError( "SimICEngineGenerator: Specified Generator not one of Valid ICEngine Generators " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -261,7 +261,7 @@ namespace ICEngineElectricGenerator {
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = FindItemInList( CompName, ICEngineGenerator.Name(), NumICEngineGenerators );
+			CompNum = FindItemInList( CompName, ICEngineGenerator );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimICEPlantHeatRecovery: ICE Generator Unit not found=" + CompName );
 				return;
@@ -346,7 +346,7 @@ namespace ICEngineElectricGenerator {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), ICEngineGenerator.Name(), GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), ICEngineGenerator, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";

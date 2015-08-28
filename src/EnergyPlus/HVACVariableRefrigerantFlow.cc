@@ -262,7 +262,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		// CompIndex accounting
 		if ( CompIndex == 0 ) {
-			VRFTUNum = FindItemInList( CompName, VRFTU.Name(), NumVRFTU );
+			VRFTUNum = FindItemInList( CompName, VRFTU );
 			if ( VRFTUNum == 0 ) {
 				ShowFatalError( "SimulateVRF: VRF Terminal Unit not found=" + CompName );
 			}
@@ -387,7 +387,7 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		if ( InitLoopEquip ) {
-			VRFNum = FindItemInList( VRFName, VRF.Name(), NumVRFCond );
+			VRFNum = FindItemInList( VRFName, VRF );
 			if ( VRFNum != 0 ) { // if 0, fall through to next
 				{ auto const SELECT_CASE_var( VRFTypeNum );
 				if ( SELECT_CASE_var == TypeOf_HeatPumpVRF ) {
@@ -732,7 +732,7 @@ namespace HVACVariableRefrigerantFlow {
 			InputPowerMultiplier = 1.0;
 
 			// Check outdoor temperature to determine of defrost is active
-			if ( OutdoorDryBulb <= VRF( VRFCond ).MaxOATDefrost ) {
+			if ( OutdoorDryBulb <= VRF( VRFCond ).MaxOATDefrost && VRF( VRFCond ).CondenserType != WaterCooled) {
 
 				// Calculating adjustment factors for defrost
 				// Calculate delta w through outdoor coil by assuming a coil temp of 0.82*DBT-9.7(F) per DOE2.1E
@@ -754,7 +754,7 @@ namespace HVACVariableRefrigerantFlow {
 
 				if ( FractionalDefrostTime > 0.0 ) {
 					// Calculate defrost adjustment factors depending on defrost control strategy
-					if ( VRF( VRFCond ).DefrostStrategy == ReverseCycle && VRF( VRFCond ).DefrostControl == OnDemand ) {
+					if ( VRF( VRFCond ).DefrostStrategy == ReverseCycle ) {
 						LoadDueToDefrost = ( 0.01 * FractionalDefrostTime ) * ( 7.222 - OutdoorDryBulb ) * ( VRF( VRFCond ).HeatingCapacity / 1.01667 );
 						DefrostEIRTempModFac = CurveValue( VRF( VRFCond ).DefrostEIRPtr, max( 15.555, InletAirWetBulbC ), max( 15.555, OutdoorDryBulb ) );
 
@@ -786,7 +786,7 @@ namespace HVACVariableRefrigerantFlow {
 			TotalTUHeatingCapacity = TotalCondHeatingCapacity * VRF( VRFCond ).PipingCorrectionHeating;
 			if ( TotalCondHeatingCapacity > 0.0 ) {
 				HeatingPLR = ( TUHeatingLoad / VRF( VRFCond ).PipingCorrectionHeating ) / TotalCondHeatingCapacity;
-				HeatingPLR += LoadDueToDefrost / TotalCondHeatingCapacity;
+				HeatingPLR += ( LoadDueToDefrost * HeatingPLR ) / TotalCondHeatingCapacity;
 			} else {
 				HeatingPLR = 0.0;
 			}
@@ -1027,6 +1027,9 @@ namespace HVACVariableRefrigerantFlow {
 			VRFRTF = min( 1.0, ( CyclingRatio / PartLoadFraction ) );
 
 			VRF( VRFCond ).ElecHeatingPower = ( VRF( VRFCond ).RatedHeatingPower * TotHeatCapTempModFac ) * TotHeatEIRTempModFac * EIRFPLRModFac * VRFRTF * InputPowerMultiplier;
+
+			// adjust defrost power based on heating RTF
+			VRF( VRFCond ).DefrostPower *= VRFRTF;
 		}
 		VRF( VRFCond ).VRFCondRTF = VRFRTF;
 
@@ -1188,7 +1191,6 @@ namespace HVACVariableRefrigerantFlow {
 		using WaterManager::SetupTankSupplyComponent;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataSizing::AutoSize;
-		using DataSizing::NumZoneHVACSizing;
 		using DataSizing::ZoneHVACSizing;
 
 		//    USE DataIPShortCuts
@@ -1308,7 +1310,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), TerminalUnitList.Name(), VRFNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), TerminalUnitList, VRFNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1354,7 +1356,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), VRF.Name(), VRFNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), VRF, VRFNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1668,7 +1670,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			VRF( VRFNum ).MinPLR = rNumericArgs( 10 );
 
-			VRF( VRFNum ).MasterZonePtr = FindItemInList( cAlphaArgs( 24 ), Zone.Name(), NumOfZones );
+			VRF( VRFNum ).MasterZonePtr = FindItemInList( cAlphaArgs( 24 ), Zone );
 
 			if ( SameString( cAlphaArgs( 25 ), "LoadPriority" ) ) {
 				VRF( VRFNum ).ThermostatPriority = LoadPriority;
@@ -1703,7 +1705,7 @@ namespace HVACVariableRefrigerantFlow {
 				}
 			}
 
-			VRF( VRFNum ).ZoneTUListPtr = FindItemInList( cAlphaArgs( 27 ), TerminalUnitList.Name(), NumVRFTULists );
+			VRF( VRFNum ).ZoneTUListPtr = FindItemInList( cAlphaArgs( 27 ), TerminalUnitList );
 			if ( VRF( VRFNum ).ZoneTUListPtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\"" );
 				ShowContinueError( cAlphaFieldNames( 27 ) + " = " + cAlphaArgs( 27 ) + " not found." );
@@ -1786,7 +1788,7 @@ namespace HVACVariableRefrigerantFlow {
 			if ( ! lAlphaFieldBlanks( 33 ) ) {
 				VRF( VRFNum ).DefrostEIRPtr = GetCurveIndex( cAlphaArgs( 33 ) );
 				if ( VRF( VRFNum ).DefrostEIRPtr > 0 ) {
-					// Verify Curve Object, only legal type is linear, quadratic, or cubic
+					// Verify Curve Object, only legal type is BiQuadratic
 					{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).DefrostEIRPtr ) );
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					} else {
@@ -1795,13 +1797,13 @@ namespace HVACVariableRefrigerantFlow {
 						ErrorsFound = true;
 					}}
 				} else {
-					if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
+					if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle ) {
 						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 33 ) + " not found:" + cAlphaArgs( 33 ) );
 						ErrorsFound = true;
 					}
 				}
 			} else {
-				if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
+				if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle ) {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 33 ) + " not found:" + cAlphaArgs( 33 ) );
 					ErrorsFound = true;
 				}
@@ -2083,7 +2085,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), VRFTU.Name(), VRFTUNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), VRFTU, VRFTUNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2388,7 +2390,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			VRFTU( VRFTUNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaFieldBlanks( 16 ) ) {
-				VRFTU( VRFTUNum ).HVACSizingIndex = FindItemInList( cAlphaArgs( 16 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
+				VRFTU( VRFTUNum ).HVACSizingIndex = FindItemInList( cAlphaArgs( 16 ), ZoneHVACSizing );
 				if ( VRFTU( VRFTUNum ).HVACSizingIndex == 0 ) {
 					ShowSevereError( cAlphaFieldNames( 16 ) + " = " + cAlphaArgs( 16 ) + " not found." );
 					ShowContinueError( "Occurs in " + cCurrentModuleObject + " = " + VRFTU( VRFTUNum).Name );
@@ -6095,7 +6097,7 @@ namespace HVACVariableRefrigerantFlow {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
