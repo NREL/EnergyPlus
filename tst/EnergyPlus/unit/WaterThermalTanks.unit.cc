@@ -316,7 +316,6 @@ TEST_F( HVACFixture, HPWHZoneEquipSeqenceNumberWarning )
 
 TEST_F( HVACFixture, HPWHWrappedDummyNodeConfig )
 {
-
 	// Unit test for #5127
 
 	std::vector<std::string> idf_lines({
