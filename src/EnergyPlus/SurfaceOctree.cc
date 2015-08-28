@@ -106,7 +106,7 @@ namespace Octree {
 	valid() const
 	{
 		if ( le( l_, c_ ) && le( c_, u_ ) ) {
-			Real const tol2( std::max( ObjexxFCL::magnitude_squared( l_ ), ObjexxFCL::magnitude_squared( u_ ) ) * ObjexxFCL::square( 4 * std::numeric_limits< Real >::epsilon() ) );
+			Real const tol2( std::max( ObjexxFCL::magnitude_squared( l_ ), ObjexxFCL::magnitude_squared( u_ ) ) * ObjexxFCL::square( 8 * std::numeric_limits< Real >::epsilon() ) );
 			if ( ObjexxFCL::distance_squared( c_, cen( l_, u_ ) ) <= tol2 ) {
 				Real const tol( std::sqrt( tol2 ) );
 				Vertex const d( u_ - l_ ); // Diagonal
