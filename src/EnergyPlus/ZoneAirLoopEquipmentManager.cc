@@ -473,7 +473,7 @@ namespace ZoneAirLoopEquipmentManager {
 		// na
 
 		// Using/Aliasing
-		using DataSizing::FinalZoneSizing;
+		// using DataSizing::FinalZoneSizing;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -489,7 +489,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		int ZoneEqNum;
+		// int ZoneEqNum;
 		static Array1D_bool EachOnceFlag;
 		// Do the Begin Simulation initializations
 		if ( MyOneTimeFlag ) {

@@ -118,6 +118,7 @@ TEST( DOASEffectOnZoneSizing, SizeZoneEquipment )
 	ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 	ZoneEquipConfig( 2 ).ExhaustNode.allocate( 1 );
 	ZoneMassBalanceFlag.allocate( 2 );
+	NumOfZones = 2;
 	MassConservation.allocate( NumOfZones );
 
 	AirflowNetworkNumOfExhFan = 0;
@@ -129,7 +130,6 @@ TEST( DOASEffectOnZoneSizing, SizeZoneEquipment )
 	ZoneThermostatSetPointLo( 2 ) = 22.;
 	ZoneThermostatSetPointHi( 1 ) = 24.;
 	ZoneThermostatSetPointHi( 2 ) = 24.;
-	NumOfZones = 2;
 	CurOverallSimDay = 1;
 	MyOneTimeFlag2 = false;
 	ZoneEquipConfig( 1 ).IsControlled = true;
