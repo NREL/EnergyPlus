@@ -23,6 +23,7 @@ set( test_src
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
+  FanCoilUnits.unit.cc
   Fans.unit.cc
   FaultFoulingAirFilters.unit.cc
   FluidCoolers.unit.cc
@@ -39,6 +40,7 @@ set( test_src
   LowTempRadiantSystem.unit.cc
   ManageElectricPower.unit.cc
   HVACUnitarySystem.unit.cc
+  HVACVariableRefrigerantFlow.unit.cc
   MixedAir.unit.cc
   MixerComponent.unit.cc
   PurchasedAirManager.unit.cc
@@ -60,6 +62,7 @@ set( test_src
   WaterCoils.unit.cc
   WaterThermalTanks.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
+  WeatherManager.unit.cc
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc
