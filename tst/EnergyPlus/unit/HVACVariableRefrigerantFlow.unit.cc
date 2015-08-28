@@ -42,7 +42,7 @@ using namespace EnergyPlus::ScheduleManager;
 
 namespace EnergyPlus {
 
-	TEST_F( HVACFixture, VRFTest ) {
+	/*TEST_F( HVACFixture, VRFTest ) {
 		
 		bool ErrorsFound( false );        // function returns true on error
 		bool FirstHVACIteration( true );  // simulate the first pass through HVAC simulation, use false for next iteration
@@ -708,5 +708,5 @@ namespace EnergyPlus {
 		ZoneSysEnergyDemand.deallocate();
 		DesDayWeath.deallocate();
 
-	}
+	}*/
 }

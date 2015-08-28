@@ -23,6 +23,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
 
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/FileSystem.hh>
@@ -71,6 +72,7 @@ namespace EnergyPlus {
 		OutputProcessor::clear_state();
 		WaterThermalTanks::clear_state();
 		ScheduleManager::clear_state();
+		WaterThermalTanks::clear_state();
 
 		{ 
 			IOFlags flags; 
