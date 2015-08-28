@@ -3330,6 +3330,21 @@ namespace Fans {
 
 	} // FanDesHeatGain
 
+	void
+	clear_state()
+	{
+		NumFans = 0;
+		NumNightVentPerf = 0;
+		GetFanInputFlag = true;
+		CheckEquipName.deallocate();
+		LocalTurnFansOn = false;
+		LocalTurnFansOff = false;
+		MySizeFlag.deallocate();
+		Fan.deallocate();
+		NightVentPerf.deallocate();
+		FanNumericFields.deallocate();
+	}
+
 	// End of Utility subroutines for the Fan Module
 	// *****************************************************************************
 

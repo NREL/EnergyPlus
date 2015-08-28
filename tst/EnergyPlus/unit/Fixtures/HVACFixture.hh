@@ -16,6 +16,8 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Fans.hh>
 
 namespace EnergyPlus {
 
@@ -44,7 +46,8 @@ namespace EnergyPlus {
 			MixedAir::clear_state();
 			NodeInputManager::clear_state();
 			OutAirNodeManager::clear_state();
-			
+			DXCoils::clear_state();
+			Fans::clear_state();
 			EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 		}
 	};

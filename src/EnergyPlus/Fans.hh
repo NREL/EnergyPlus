@@ -721,6 +721,8 @@ namespace Fans {
 		Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
 	);
 
+	void clear_state();
+
 	// End of Utility subroutines for the Fan Module
 	// *****************************************************************************
 

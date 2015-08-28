@@ -10404,6 +10404,34 @@ namespace WaterThermalTanks {
 		}
 	}
 
+	void
+	clear_state()
+	{
+		ValidSourceType.deallocate();
+		MyHPSizeFlag.deallocate();
+		CheckWTTEquipName.deallocate();
+		CheckHPWHEquipName.deallocate();
+
+		NumChilledWaterMixed = 0;
+		NumChilledWaterStratified = 0;
+		NumWaterHeaterMixed = 0;
+		NumWaterHeaterStratified = 0;
+		NumWaterThermalTank = 0;
+		NumWaterHeaterDesuperheater = 0;
+		NumHeatPumpWaterHeater = 0;
+
+		HPPartLoadRatio = 0.0;
+		GetWaterThermalTankInputFlag = true;
+		MixerInletAirSchedule = 0.0;
+		MdotAir = 0.0;
+		NumWaterHeaterSizing = 0;
+		AlreadyRated.deallocate();
+
+		WaterThermalTank.deallocate();
+		HPWaterHeater.deallocate();
+		WaterHeaterDesuperheater.deallocate();
+	}
+
 
 	//     NOTICE
 
