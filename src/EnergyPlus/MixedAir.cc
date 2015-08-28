@@ -3602,6 +3602,7 @@ namespace MixedAir {
 		Real64 ZoneMaxCO2; // Breathing-zone CO2 concentartion
 		Real64 ZoneMinCO2; // Minimum CO2 concentration in zone
 		Real64 ZoneContamControllerSched; // Schedule value for ZoneControl:ContaminantController
+		Real64 CO2PeopleGeneration; // CO2 generation from people at design level
 
 		static Real64 Ep( 1.0 ); // zone primary air fraction
 		static Real64 Er( 0.0 ); // zone secondary recirculation fraction
@@ -3821,9 +3822,13 @@ namespace MixedAir {
 								ZoneOAPeople = ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAPeopleRate( ZoneIndex );
 							} else {
 								ZoneOAPeople = 0.0;
+								CO2PeopleGeneration = 0.0;
 								for ( PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum ) {
 									if ( People( PeopleNum ).ZonePtr != ZoneNum ) continue;
 									ZoneOAPeople += People( PeopleNum ).NumberOfPeople * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAPeopleRate( ZoneIndex );
+									if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+										CO2PeopleGeneration += People( PeopleNum ).NumberOfPeople * People( PeopleNum ).CO2RateFactor * GetCurrentScheduleValue( People( PeopleNum ).ActivityLevelPtr );
+									}
 								}
 							}
 
@@ -3900,7 +3905,11 @@ namespace MixedAir {
 												}
 
 												// Calculate zone maximum target CO2 concentration in PPM
-												ZoneMaxCO2 = OutdoorCO2 + ( ZoneCO2GainFromPeople( ZoneNum ) * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * 1.0e6 ) / ZoneOAMax;
+												if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+													ZoneMaxCO2 = OutdoorCO2 + ( CO2PeopleGeneration * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * 1.0e6 ) / ZoneOAMax;
+												} else {
+													ZoneMaxCO2 = OutdoorCO2 + ( ZoneCO2GainFromPeople( ZoneNum ) * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * 1.0e6 ) / ZoneOAMax;
+												}
 
 												if ( ZoneMaxCO2 <= ZoneMinCO2 ) {
 													++VentilationMechanical( VentMechObjectNum ).CO2MaxMinLimitErrorCount;
