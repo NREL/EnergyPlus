@@ -307,9 +307,7 @@ TEST_F( HVACFixture, HPWHZoneEquipSeqenceNumberWarning )
 	});
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	
-	DataZoneEquipment::ZoneEquipInputsFilled = false;
-	
+
 	bool ErrorsFound = false;
 	HeatBalanceManager::GetZoneData( ErrorsFound );
 	ASSERT_FALSE( ErrorsFound );
@@ -487,8 +485,6 @@ TEST_F( HVACFixture, HPWHWrappedDummyNodeConfig )
 	std::string const idf_objects = delimited_string(idf_lines);
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
-
-	DataZoneEquipment::ZoneEquipInputsFilled = false;
 
 	WaterThermalTanks::GetWaterThermalTankInput();
 
