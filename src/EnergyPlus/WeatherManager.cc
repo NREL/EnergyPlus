@@ -147,10 +147,7 @@ namespace WeatherManager {
 	Real64 WeatherFileTimeZone( 0.0 );
 	Real64 WeatherFileElevation( 0.0 );
 	int WeatherFileUnitNumber; // File unit number for the weather file
-	Array1D< Real64 > GroundTemps( 12, 18.0 ); // Bldg Surface
-	Array1D< Real64 > GroundTempsFC( 12, 0.0 ); // F or C factor method
-	Array1D< Real64 > SurfaceGroundTemps( 12, 13.0 ); // Surface
-	Array1D< Real64 > DeepGroundTemps( 12, 16.0 ); // Deep
+	Array1D< Real64 > GroundTempsFCFromEPWHeader( 12, 0.0 ); // F or C factor method
 	Array1D< Real64 > GroundReflectances( 12, 0.2 ); // User Specified Ground Reflectances !EPTeam: Using DP causes big diffs
 	Real64 SnowGndRefModifier( 1.0 ); // Modifier to ground reflectance during snow
 	Real64 SnowGndRefModifierForDayltg( 1.0 ); // Modifier to ground reflectance during snow for daylighting
@@ -8189,18 +8186,18 @@ Label9999: ;
 						}
 						Line.erase( 0, Pos + 1 );
 					}
-					GroundTempsFC = 0.0;
+					GroundTempsFCFromEPWHeader = 0.0;
 					actcount = 0;
 					for ( Count = 1; Count <= 12; ++Count ) { // take the first set of ground temperatures.
 						Pos = index( Line, ',' );
 						if ( Pos != std::string::npos ) {
 							Number = ProcessNumber( Line.substr( 0, Pos ), errFlag );
-							GroundTempsFC( Count ) = Number;
+							GroundTempsFCFromEPWHeader( Count ) = Number;
 							++actcount;
 						} else {
 							if ( len( Line ) > 0 ) {
 								Number = ProcessNumber( Line.substr( 0, Pos ), errFlag );
-								GroundTempsFC( Count ) = Number;
+								GroundTempsFCFromEPWHeader( Count ) = Number;
 								++actcount;
 							}
 							break;

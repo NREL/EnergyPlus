@@ -91,10 +91,7 @@ namespace WeatherManager {
 	extern Real64 WeatherFileTimeZone;
 	extern Real64 WeatherFileElevation;
 	extern int WeatherFileUnitNumber; // File unit number for the weather file
-	extern Array1D< Real64 > GroundTemps; // Bldg Surface
-	extern Array1D< Real64 > GroundTempsFC; // F or C factor method
-	extern Array1D< Real64 > SurfaceGroundTemps; // Surface
-	extern Array1D< Real64 > DeepGroundTemps; // Deep
+	extern Array1D< Real64 > GroundTempsFCFromEPWHeader; // F or C factor method
 	extern Array1D< Real64 > GroundReflectances; // User Specified Ground Reflectances
 	extern Real64 SnowGndRefModifier; // Modifier to ground reflectance during snow
 	extern Real64 SnowGndRefModifierForDayltg; // Modifier to ground reflectance during snow for daylighting

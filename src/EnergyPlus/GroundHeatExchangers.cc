@@ -1327,10 +1327,6 @@ namespace GroundHeatExchangers {
 		int indexNum;
 		int pairNum;
 		bool allocated;
-		int const monthsInYear( 12 );
-		int monthIndex;
-		Real64 const LargeNumber( 10000.0 );
-		Real64 const AvgDaysInMonth( 365.0 / 12.0 );
 
 		// VERTICAL GLHE
 

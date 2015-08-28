@@ -41,6 +41,7 @@ namespace EnergyPlus {
 		using DataGlobals::OutputFileInits;
 		using DataGlobals::SecsInDay;
 		using WeatherManager::wthFCGroundTemps;
+		using WeatherManager::GroundTempsFCFromEPWHeader;
 		using namespace DataIPShortCuts;
 		using namespace GroundTemperatureManager;
 		using namespace ObjexxFCL::gio;
@@ -81,6 +82,9 @@ namespace EnergyPlus {
 
 		} else if ( wthFCGroundTemps ) {
 			FCGroundTemps = true;
+			for ( int i = 1; i <= 12; ++i ) {
+				thisModel->fcFactorGroundTemps( i ) = GroundTempsFCFromEPWHeader( i );
+			}
 		}
 
 		// Write Final Ground Temp Information to the initialization output file
@@ -98,7 +102,7 @@ namespace EnergyPlus {
 			return nullptr;
 		}
 	}
-	
+
 	//******************************************************************************
 
 	Real64

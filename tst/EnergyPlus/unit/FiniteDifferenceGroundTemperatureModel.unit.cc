@@ -20,12 +20,6 @@ TEST_F( GroundTempsFixture, FiniteDiffGroundTempModelTest )
 	using WeatherManager::NumDaysInYear;
 	using namespace DataIPShortCuts;
 
-	bool found = false;
-	int NumNums;
-	int NumAlphas;
-	int IOStat;
-	bool ErrorsFound = false;
-
 	std::shared_ptr< FiniteDiffGroundTempsModel > thisModel( new FiniteDiffGroundTempsModel() );
 
 	thisModel->objectType = objectType_FiniteDiffGroundTemp;

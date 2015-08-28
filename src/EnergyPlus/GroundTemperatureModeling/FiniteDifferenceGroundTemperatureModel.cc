@@ -171,6 +171,10 @@ namespace EnergyPlus {
 		int DayOfSim_reset = DayOfSim;
 		std::string DayOfSimChr_reset = DayOfSimChr;
 		int NumOfWarmupDays_reset = NumOfWarmupDays;
+		bool BeginDayFlag_reset = BeginDayFlag;
+		bool EndDayFlag_reset = EndDayFlag;
+		bool BeginHourFlag_reset = BeginHourFlag;
+		bool EndHourFlag_reset = EndHourFlag;
 
 		++NumOfEnvrn;
 		++TotRunPers;
@@ -313,6 +317,10 @@ namespace EnergyPlus {
 		DayOfSim = DayOfSim_reset;
 		DayOfSimChr = DayOfSimChr_reset;
 		NumOfWarmupDays = NumOfWarmupDays_reset;
+		BeginDayFlag = BeginDayFlag_reset;
+		EndDayFlag = EndDayFlag_reset;
+		BeginHourFlag = BeginHourFlag_reset;
+		EndHourFlag = EndHourFlag_reset;
 	}
 
 	//******************************************************************************
@@ -337,7 +345,6 @@ namespace EnergyPlus {
 		int surfaceLayerNumCells = surfaceLayerThickness / surfaceLayerCellThickness;
 		
 		// Center layer parameters
-		Real64 centerLayerThickness = 17.8;
 		Real64 centerLayerExpansionCoeff = 1.10879;
 		int centerLayerNumCells = 80; 
 		
@@ -348,7 +355,6 @@ namespace EnergyPlus {
 
 		// Other
 		Real64 currentCellDepth = 0.0;
-		Real64 cellThickness = surfaceLayerCellThickness;
 
 		totalNumCells = surfaceLayerNumCells + centerLayerNumCells + deepLayerNumCells;
 
@@ -498,10 +504,7 @@ namespace EnergyPlus {
 		Real64 vaporPressureSaturated_kPa;
 		Real64 vaporPressureActual_kPa;
 		Real64 currAirTempK;
-		Real64 QRAD_A;
-		Real64 QRAD_SO;
 		Real64 QRAD_NL;
-		Real64 ratio_SO;
 		Real64 netIncidentRadiation_MJhr;
 		Real64 netIncidentRadiation_Wm2;
 		Real64 slope_S;
@@ -518,9 +521,6 @@ namespace EnergyPlus {
 		Real64 const rho_water( 998.0 ); // [kg/m3]
 		Real64 const airSpecificHeat( 1003 ); // '[J/kg-K]
 		// evapotranspiration parameters
-		Real64 const meanSolarConstant( 0.08196 ); // 1367 [W/m2], entered in [MJ/m2-minute]
-		Real64 const A_s( 0.25 );
-		Real64 const B_s( 0.5 ); 
 		Real64 const absor_Corrected( 0.77 );
 		Real64 const convert_Wm2_To_MJhrmin( 3600.0 / 1000000.0 );
 		Real64 const convert_MJhrmin_To_Wm2( 1.0 / convert_Wm2_To_MJhrmin );
@@ -650,7 +650,6 @@ namespace EnergyPlus {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 numerator = 0.0;
 		Real64 denominator = 0.0;
-		Real64 neighborTemp = 0.0;
 		Real64 resistance = 0.0;
 
 		auto & thisCell = cellArray( cell );

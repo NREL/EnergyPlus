@@ -871,9 +871,6 @@ namespace PipeHeatTransfer {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MonthsInYear( 12 ); // Number of months in the year
-		int const AvgDaysInMonth( 30 ); // Average days in a month
-		Real64 const LargeNumber( 9999.9 ); // Large number (compared to temperature values)
 		static std::string const RoutineName( "InitPipesHeatTransfer" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -2035,7 +2032,6 @@ namespace PipeHeatTransfer {
 		// Using/Aliasing
 		using DataGlobals::SecsInDay;
 
-		Real64 soilDiffusivity = PipeHT( PipeHTNum ).SoilDiffusivityPerDay;
 		Real64 curSimTime = DayOfSim * SecsInDay;
 		Real64 TBND;
 
