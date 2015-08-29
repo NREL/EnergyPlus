@@ -38,6 +38,7 @@ public: // Types
 	using Surface = DataSurfaces::SurfaceData;
 	using Vertex = ObjexxFCL::Vector3< Real >;
 	using Surfaces = std::vector< Surface * >;
+	using size_type = Surfaces::size_type;
 
 public: // Creation
 
@@ -60,12 +61,12 @@ public: // Creation
 
 	// Box Constructor
 	SurfaceOctreeCube(
-	 std::uint16_t const depth,
+	 std::uint16_t const d,
 	 Vertex const & l,
 	 Vertex const & u,
 	 Real const w
 	) :
-	 depth_( depth ),
+	 d_( d ),
 	 l_( l ),
 	 u_( u ),
 	 c_( cen( l, u ) ),
@@ -90,9 +91,16 @@ public: // Properties
 
 	// Depth
 	std::uint16_t
+	d() const
+	{
+		return d_;
+	}
+
+	// Depth
+	std::uint16_t
 	depth() const
 	{
-		return depth_;
+		return d_;
 	}
 
 	// Lower Corner
@@ -116,9 +124,23 @@ public: // Properties
 		return c_;
 	}
 
+	// Center Point
+	Vertex const &
+	center() const
+	{
+		return c_;
+	}
+
 	// Width
 	Real
 	w() const
+	{
+		return w_;
+	}
+
+	// Width
+	Real
+	width() const
 	{
 		return w_;
 	}
@@ -203,7 +225,7 @@ private: // Methods
 
 	// Surface Branch Processing
 	void
-	surface_branch( Surface & surface );
+	surfaceBranch( Surface & surface );
 
 private: // Static Methods
 
@@ -228,12 +250,14 @@ private: // Static Methods
 	 Surface const & surface
 	);
 
+private: // Static Data
+
+	static std::uint16_t const maxDepth_ = 255u; // Max tree depth
+	static size_type const maxSurfaces_ = 10u; // Max surfaces in a cube before subdivision is processed //Do Tune this
+
 private: // Data
 
-	static std::uint16_t const maxDepth_ = 65535u; // Max tree depth //Do Tune this
-	static std::uint8_t const maxSurfaces_ = 10u; // Max surfaces in a cube before subdivision is processed //Do Tune this
-
-	std::uint16_t depth_ = 0u; // Depth in tree
+	std::uint16_t d_ = 0u; // Depth in tree
 	Vertex l_ = Vertex( 0.0 ); // Lower corner
 	Vertex u_ = Vertex( 0.0 ); // Upper corner
 	Vertex c_ = Vertex( 0.0 ); // Center point
