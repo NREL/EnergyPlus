@@ -17,6 +17,8 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -63,6 +65,8 @@ namespace EnergyPlus {
 		DataZoneControls::clear_state();
 		ExteriorEnergyUse::clear_state();
 		HeatBalanceManager::clear_state();
+		HVACVariableRefrigerantFlow::clear_state();
+		MixedAir::clear_state();
 		InputProcessor::clear_state();
 		OutputProcessor::clear_state();
 		ScheduleManager::clear_state();
