@@ -742,7 +742,6 @@ namespace EnergyPlus {
 		int EquipPtr( 1 );                // index to equipment list
 		int CurZoneNum( 1 );              // index to zone
 		int ZoneInletAirNode( 0 );        // zone inlet node number
-		Real64 DefrostWatts( 0.0 );       // calculation of VRF defrost power [W]
 		Real64 SysOutputProvided( 0.0 );  // function returns sensible capacity [W]
 		Real64 LatOutputProvided( 0.0 );  // function returns latent capacity [W]
 		Real64 CurLoad( 0.0 );
@@ -1645,10 +1644,10 @@ namespace EnergyPlus {
 		Cp = GetSpecificHeatGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, PlantSizData( 1 ).ExitTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
 		CondVolFlowRate = max( VRF( VRFCond ).CoolingCapacity, VRF( VRFCond ).HeatingCapacity ) / ( PlantSizData( 1 ).DeltaT * Cp * rho );
 
-		EXPECT_EQ( CondVolFlowRate, VRF( VRFCond ).WaterCondVolFlowRate );
+		EXPECT_DOUBLE_EQ( CondVolFlowRate, VRF( VRFCond ).WaterCondVolFlowRate );
 
 		rho = GetDensityGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, InitConvTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
-		EXPECT_EQ( VRF( VRFCond ).WaterCondenserDesignMassFlow, ( VRF( VRFCond ).WaterCondVolFlowRate * rho ) );
+		EXPECT_DOUBLE_EQ( VRF( VRFCond ).WaterCondenserDesignMassFlow, ( VRF( VRFCond ).WaterCondVolFlowRate * rho ) );
 
 		// set zone load to heating
 		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired = VRF( VRFCond ).HeatingCapacity; // set load equal to the VRF heating capacity
