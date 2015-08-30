@@ -14005,7 +14005,46 @@ Label50: ;
 		return SHR;
 	}
 
+	// Clears the global data in DXCoils.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
 
+		CurDXCoilNum = 0;
+		NumDXCoils = 0;
+		HPWHHeatingCapacity = 0.0;
+		HPWHHeatingCOP = 0.0;
+		NumVRFHeatingCoils = 0;
+		NumVRFCoolingCoils = 0;
+		NumDXHeatingCoils = 0;
+		NumDoe2DXCoils = 0;
+		NumDXHeatPumpWaterHeaterPumpedCoils = 0;
+		NumDXHeatPumpWaterHeaterWrappedCoils = 0;
+		NumDXMulSpeedCoils = 0;
+		NumDXMulModeCoils = 0;
+		NumDXMulSpeedCoolCoils = 0;
+		NumDXMulSpeedHeatCoils = 0;
+
+		GetCoilsInputFlag = true;
+		MyOneTimeFlag = true;
+
+		DXCoil.deallocate();
+		DXCoilNumericFields.deallocate();
+		DXCoilOutletTemp.deallocate();
+		DXCoilOutletHumRat.deallocate();
+		DXCoilPartLoadRatio.deallocate();
+		DXCoilFanOpMode.deallocate();
+		DXCoilFullLoadOutAirTemp.deallocate();
+		DXCoilFullLoadOutAirHumRat.deallocate();
+		DXCoilTotalCooling.deallocate();
+		DXCoilTotalHeating.deallocate();
+		DXCoilCoolInletAirWBTemp.deallocate();
+		DXCoilHeatInletAirDBTemp.deallocate();
+		DXCoilHeatInletAirWBTemp.deallocate();
+		CheckEquipName.deallocate();
+
+	}
 
 	//     NOTICE
 

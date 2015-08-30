@@ -18,9 +18,7 @@
 #include <DataSizing.hh>
 #include <DataZoneEquipment.hh>
 #include <DataZoneEnergyDemands.hh>
-#include <Fans.hh>
 #include <FluidProperties.hh>
-#include <DXCoils.hh>
 #include <HeatBalanceManager.hh>
 #include <HVACVariableRefrigerantFlow.hh>
 #include <OutputReportPredefined.hh>
@@ -43,8 +41,6 @@ using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEnergyDemands;
-using namespace EnergyPlus::DXCoils;
-using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::FluidProperties;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::HVACVariableRefrigerantFlow;
@@ -185,7 +181,7 @@ namespace EnergyPlus {
 			"  autosize,                 !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"  VRFFanSchedule,           !- Supply Air Fan Operating Mode Schedule Name",
 			"  drawthrough,              !- Supply Air Fan Placement",
-			"  Fan:ConstantVolume,       !- Supply Air Fan Object Type",
+			"  Fan:OnOff,                !- Supply Air Fan Object Type",
 			"  TU1 VRF Supply Fan,       !- Supply Air Fan Object Name",
 			"  OutdoorAir:Mixer,         !- Outside Air Mixer Object Type",
 			"  TU1 OA Mixer,             !- Outside Air Mixer Object Name",
@@ -196,7 +192,7 @@ namespace EnergyPlus {
 			"  30,                       !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
 			"  20;                       !- Zone Terminal Unit Off Parasitic Electric Energy Use{ W }",
 			" ",
-			"Fan:ConstantVolume,",
+			"Fan:OnOff,",
 			"  TU1 VRF Supply Fan,       !- Name",
 			"  VRFAvailSched,            !- Availability Schedule Name",
 			"  0.7,                      !- Fan Total Efficiency",
@@ -718,10 +714,6 @@ namespace EnergyPlus {
 		ASSERT_EQ( DefrostWatts, VRF( VRFCond ).DefrostPower ); // defrost power calculation check
 
 		// clean up
-		Fans::Fan.deallocate();
-		DXCoils::DXCoil.deallocate();
-		Fans::GetFanInputFlag = true;
-		DXCoils::GetCoilsInputFlag = true;
 		ZoneSysEnergyDemand.deallocate();
 
 	}
@@ -1587,7 +1579,6 @@ namespace EnergyPlus {
 		GetPlantLoopData();
 		GetPlantInput();
 
-		DXCoils::MyOneTimeFlag = true;
 		HVACVariableRefrigerantFlow::MyEnvrnFlag = true;
 		ZoneInletAirNode = GetVRFTUZoneInletAirNode( VRFTUNum ); // trigger GetVRFInput by calling a mining function
 
@@ -1672,10 +1663,6 @@ namespace EnergyPlus {
 		ASSERT_EQ( VRF( VRFCond ).WaterCondenserDesignMassFlow, Node( VRF( VRFCond ).CondenserOutletNodeNum ).MassFlowRate ); // outlet node should also be set
 
 		// clean up
-		Fans::Fan.deallocate();
-		DXCoils::DXCoil.deallocate();
-		Fans::GetFanInputFlag = true;
-		DXCoils::GetCoilsInputFlag = true;
 		ZoneSysEnergyDemand.deallocate();
 	}
 

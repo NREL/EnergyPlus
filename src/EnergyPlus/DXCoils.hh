@@ -1595,6 +1595,11 @@ namespace DXCoils {
 		int const SecCoilSHRFF
 		);
 
+	// Clears the global data in DXCoils.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	//     NOTICE
 
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois

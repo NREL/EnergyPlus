@@ -15,7 +15,10 @@
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -63,7 +66,10 @@ namespace EnergyPlus {
 		DataOutputs::clear_state();
 		DataSurfaces::clear_state();
 		DataZoneControls::clear_state();
+		DXCoils::clear_state();
 		ExteriorEnergyUse::clear_state();
+		Fans::clear_state();
+		GlobalNames::clear_state();
 		HeatBalanceManager::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
 		MixedAir::clear_state();
