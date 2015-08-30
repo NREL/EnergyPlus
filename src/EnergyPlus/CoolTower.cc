@@ -216,7 +216,7 @@ namespace CoolTower {
 			GetObjectItem( CurrentModuleObject, CoolTowerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), CoolTowerSys.Name(), CoolTowerNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), CoolTowerSys, CoolTowerNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -237,7 +237,7 @@ namespace CoolTower {
 			}
 
 			CoolTowerSys( CoolTowerNum ).ZoneName = cAlphaArgs( 3 ); // Name of zone where cooltower is serving
-			CoolTowerSys( CoolTowerNum ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
+			CoolTowerSys( CoolTowerNum ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone );
 			if ( CoolTowerSys( CoolTowerNum ).ZonePtr == 0 ) {
 				if ( lAlphaBlanks( 3 ) ) {
 					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 3 ) + " is required but input is blank." );
@@ -694,7 +694,7 @@ namespace CoolTower {
 	//*****************************************************************************************
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

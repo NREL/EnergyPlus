@@ -1561,6 +1561,10 @@ ShowErrorMessage(
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, DataStringGlobals::outputErrFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
 			DisplayString( "Trying to display error: \"" + ErrorMessage + "\"" );
+			if (write_stat == 600) {
+				DisplayString("ERROR: Could not open file "+DataStringGlobals::outputErrFileName+" for output (write). Write permission denied in output directory.");
+				std::exit( EXIT_FAILURE );
+			}
 			ShowFatalError( "ShowErrorMessage: Could not open file "+DataStringGlobals::outputErrFileName+" for output (write)." );
 		}
 		gio::write( StandardErrorOutput, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
@@ -1747,7 +1751,7 @@ ShowRecurringErrors()
 }
 
 //     NOTICE
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

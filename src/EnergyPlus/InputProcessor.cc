@@ -648,7 +648,7 @@ namespace InputProcessor {
 		errFlag = false;
 
 		if ( ! SqueezedSection.empty() ) {
-			if ( FindItemInList( SqueezedSection, SectionDef.Name(), NumSectionDefs ) > 0 ) {
+			if ( FindItemInList( SqueezedSection, SectionDef ) > 0 ) {
 				ShowSevereError( "IP: Already a Section called " + SqueezedSection + ". This definition ignored.", EchoInputFile );
 				// Error Condition
 				errFlag = true;
@@ -775,7 +775,7 @@ namespace InputProcessor {
 		WhichMinMax = 0;
 
 		if ( ! SqueezedObject.empty() ) {
-			if ( FindItemInList( SqueezedObject, ObjectDef.Name(), NumObjectDefs ) > 0 ) {
+			if ( FindItemInList( SqueezedObject, ObjectDef ) > 0 ) {
 				ShowSevereError( "IP: Already an Object called " + SqueezedObject + ". This definition ignored.", EchoInputFile );
 				// Error Condition
 				errFlag = true;
@@ -1310,7 +1310,7 @@ namespace InputProcessor {
 			ShowContinueError( "Will be processed as Section=" + SqueezedSection, EchoInputFile );
 		}
 		if ( ! has_prefix( SqueezedSection, "END" ) ) {
-			Found = FindItemInList( SqueezedSection, SectionDef.Name(), NumSectionDefs );
+			Found = FindItemInList( SqueezedSection, SectionDef );
 			if ( Found == 0 ) {
 				// Make sure this Section not an object name
 				if ( SortedIDD ) {
@@ -1451,7 +1451,7 @@ namespace InputProcessor {
 			}
 			if ( Found != 0 ) {
 				if ( ObjectDef( Found ).ObsPtr > 0 ) {
-					TFound = FindItemInList( SqueezedObject, RepObjects.OldName(), NumSecretObjects );
+					TFound = FindItemInList( SqueezedObject, RepObjects, &SecretObjects::OldName );
 					if ( TFound != 0 ) {
 						if ( RepObjects( TFound ).Transitioned ) {
 							if ( ! RepObjects( TFound ).Used ) ShowWarningError( "IP: Objects=\"" + stripped( ProposedObject ) + "\" are being transitioned to this object=\"" + RepObjects( TFound ).NewName + "\"" );
@@ -1482,7 +1482,7 @@ namespace InputProcessor {
 			TestingObject = false;
 			if ( Found == 0 ) {
 				// Check to see if it's a "secret" object
-				Found = FindItemInList( SqueezedObject, RepObjects.OldName(), NumSecretObjects );
+				Found = FindItemInList( SqueezedObject, RepObjects, &SecretObjects::OldName );
 				if ( Found == 0 ) {
 					ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Did not find \"" + stripped( ProposedObject ) + "\" in list of Objects", EchoInputFile );
 					// Will need to parse to next ;
@@ -1546,7 +1546,7 @@ namespace InputProcessor {
 					++NumMiscErrorsFound;
 				}
 				if ( ObjectDef( Found ).ObsPtr > 0 ) {
-					TFound = FindItemInList( SqueezedObject, RepObjects.OldName(), NumSecretObjects );
+					TFound = FindItemInList( SqueezedObject, RepObjects, &SecretObjects::OldName );
 					if ( TFound == 0 ) {
 						ShowWarningError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Obsolete object=" + stripped( ProposedObject ) + ", encountered.  Should be replaced with new object=" + ObsoleteObjectsRepNames( ObjectDef( Found ).ObsPtr ) );
 					} else if ( ! RepObjects( TFound ).Used && RepObjects( TFound ).Transitioned ) {
@@ -3420,6 +3420,60 @@ namespace InputProcessor {
 	int
 	FindItemInList(
 		std::string const & String,
+		Array1D_string const & ListOfItems,
+		int const NumItems
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda K. Lawrie
+		//       DATE WRITTEN   September 1997
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up a string in a similar list of
+		// items and returns the index of the item in the list, if
+		// found.  This routine is not case insensitive and doesn't need
+		// for most inputs -- they are automatically turned to UPPERCASE.
+		// If you need case insensitivity use FindItem.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		for ( int Count = 1; Count <= NumItems; ++Count ) {
+			if ( String == ListOfItems( Count ) ) return Count;
+		}
+		return 0; // Not found
+	}
+
+	int
+	FindItemInList(
+		std::string const & String,
 		Array1S_string const ListOfItems,
 		int const NumItems
 	)
@@ -3540,6 +3594,61 @@ namespace InputProcessor {
 	int
 	FindItem(
 		std::string const & String,
+		Array1D_string const & ListOfItems,
+		int const NumItems
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda K. Lawrie
+		//       DATE WRITTEN   April 1999
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up a string in a similar list of
+		// items and returns the index of the item in the list, if
+		// found.  This routine is case insensitive.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		int FindItem = FindItemInList( String, ListOfItems, NumItems );
+		if ( FindItem != 0 ) return FindItem;
+
+		for ( int Count = 1; Count <= NumItems; ++Count ) {
+			if ( equali( String, ListOfItems( Count ) ) ) return Count;
+		}
+		return 0; // Not found
+	}
+
+	int
+	FindItem(
+		std::string const & String,
 		Array1S_string const ListOfItems,
 		int const NumItems
 	)
@@ -3643,6 +3752,73 @@ namespace InputProcessor {
 		}
 
 		return ResultString;
+
+	}
+
+	void
+	VerifyName(
+		std::string const & NameToVerify,
+		Array1D_string const & NamesList,
+		int const NumOfNames,
+		bool & ErrorFound,
+		bool & IsBlank,
+		std::string const & StringToDisplay
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   February 2000
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine verifys that a new name can be added to the
+		// list of names for this item (i.e., that there isn't one of that
+		// name already and that this name is not blank).
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Found;
+
+		ErrorFound = false;
+		if ( NumOfNames > 0 ) {
+			Found = FindItem( NameToVerify, NamesList, NumOfNames );
+			if ( Found != 0 ) {
+				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+				ErrorFound = true;
+			}
+		}
+
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+		} else {
+			IsBlank = false;
+		}
 
 	}
 
@@ -6020,7 +6196,7 @@ namespace InputProcessor {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

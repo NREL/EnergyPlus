@@ -17,10 +17,12 @@ set( test_src
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
+  DemandResponse.unit.cc
   DXCoils.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
+  FanCoilUnits.unit.cc
   Fans.unit.cc
   FaultFoulingAirFilters.unit.cc
   FluidCoolers.unit.cc
@@ -37,6 +39,7 @@ set( test_src
   LowTempRadiantSystem.unit.cc
   ManageElectricPower.unit.cc
   HVACUnitarySystem.unit.cc
+  HVACVariableRefrigerantFlow.unit.cc
   MixedAir.unit.cc
   MixerComponent.unit.cc
   PurchasedAirManager.unit.cc
@@ -54,9 +57,11 @@ set( test_src
   SwimmingPool.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
+  VentilatedSlab.unit.cc
   WaterCoils.unit.cc
   WaterThermalTanks.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
+  WeatherManager.unit.cc
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc

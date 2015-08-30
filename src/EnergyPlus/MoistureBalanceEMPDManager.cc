@@ -158,7 +158,7 @@ namespace MoistureBalanceEMPDManager {
 			GetObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			//Load the material derived type from the input data.
-			MaterNum = FindItemInList( MaterialNames( 1 ), Material.Name(), TotMaterials );
+			MaterNum = FindItemInList( MaterialNames( 1 ), Material );
 			if ( MaterNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + " entered=" + MaterialNames( 1 ) + ", must match to a valid Material name." );
 				ErrorsFound = true;
@@ -646,7 +646,7 @@ namespace MoistureBalanceEMPDManager {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

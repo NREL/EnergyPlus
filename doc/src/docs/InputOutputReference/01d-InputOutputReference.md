@@ -981,7 +981,7 @@ The ZoneControl:ContaminantController object is used for any of the following tw
 
 1)      To control a zone to a specified indoor level of contaminants. When this zone is served by an AirLoopHVAC, the other zones served by the same AirLoopHVAC will have the same specified indoor level, if no objects in the other zones served by the same AirLoop are specified. Currently, the available contaminant controls are carbon dioxide and generic contaminant controls. The specified carbon dioxide setpoint is used to calculate the required outdoor airflow rate through the HVAC system to reach the setpoint. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = IndoorAirQualityProcedure.The specified generic contaminant setpoint is used to calculate the required outdoor airflow rate through the HVAC system to reach the setpoint. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = IndoorAirQualityProcedure-GenericContaminant.
 
-2)      To specify minimum CO2 concentration schedule name for a zone. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = ProportionalControl.    Carbon Dioxide Control Availability Schedule Name    determines the availability of    ProportionalControl   .
+2)      To specify minimum CO2 concentration schedule name for a zone. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy.    Carbon Dioxide Control Availability Schedule Name determines the availability of    ProportionalControl   .
 
 For the first purpose above, when multiple zones are served by an AirLoop, those zones that do not have a contaminant controller object specified in the input data file are automatically assigned a carbon dioxide setpoint. Zone objects entered in the input data file are internally assigned an index number from 1 to n (first defined Zone object = 1, next Zone object defined in the input file = 2, etc.). For zones served by an AirLoop that do not have a contaminant controller specified, the zone   s carbon dioxide setpoint will be the same as the zone with the next highest zone index number that has a contaminant controller specified. If a zone with a higher index number and contaminant controller specified does not exist, then the zone with the next lowest zone   index number that has a contaminant controller specified will be used. For example, assume an AirLoop serves zones 1 through 5, but one ZoneControl:ContaminantController object is specified for zone 2, a second ZoneControl:ContaminantController object is specified for zone 4, and no ZoneControl:ContaminantController objects are specified for zones 1, 3 and 5. In this case, zone 1 will be assigned the carbon dioxide setpoint schedule that was specified for zone 2, and zones 3 and 5 will be assigned the carbon dioxide setpoint schedule that was specified for zone 4.
 
@@ -1003,7 +1003,7 @@ This field contains the name of a schedule that contains the zone carbon dioxide
 
 #### Field:Minimum Carbon Dioxide Concentration Schedule Name
 
-This field contains the name of a schedule that contains the minimum zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. This field is used when the field    System Outdoor Air Method    = ProportionalControl in the Controller:MechanicalVentilation object.
+This field contains the name of a schedule that contains the minimum zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. This field is used when the field    System Outdoor Air Method    = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy in the Controller:MechanicalVentilation object.
 
 #### Field: Generic Contaminant Control Availability Schedule Name
 
@@ -17015,7 +17015,7 @@ This object is used in conjunction with an outdoor air controller (Ref. Controll
 
 Ventilation standards provide guidance on appropriate levels of outdoor ventilation air required for acceptable indoor air quality. The Ventilation Rate Procedure (VRP) of ASHRAE Standard 62.1-2007/2010 ([www.ashrae.org](http://www.ashrae.org)) requires outdoor ventilation rates to be determined based on the floor area of each occupied zone plus the number of people in each zone and considers the zone air distribution effectiveness and system ventilation efficiency. The outdoor air ventilation rate can be reset dynamically as operating conditions change (e.g., variations in occupancy). The Controller:MechanicalVentilation object implements the VRP for calculating these outdoor air ventilation requirements and resetting them based on varying occupancy levels and zone diversification. This is particularly useful for large air distribution systems that serve a number of different zone types with varying occupancy levels. This object can also be used to model the Indoor Air Quality Procedure (IAQP) as defined in Standard 62.1
 
-#### The first five inputs for this object are the name, the availability schedule, the zone outdoor air method, the system outdoor air method, and the zone maximum outdoor air fraction. The next three input fields define the zone name (or zone list name), the design specification outdoor air object name, and the design specification zone air distribution object name to be applied to this zone (or zone list). The last three fields are extensible
+The first five inputs for this object are the name, the availability schedule, the zone outdoor air method, the system outdoor air method, and the zone maximum outdoor air fraction. The next three input fields define the zone name (or zone list name), the design specification outdoor air object name, and the design specification zone air distribution object name to be applied to this zone (or zone list). The last three fields are extensible
 
 #### Field: Name
 
@@ -17029,9 +17029,9 @@ The name of a schedule whose values are greater than 0 when mechanical ventilati
 
 This field indicates whether the air loop is capable of doing demand controlled ventilation (DCV) to vary the amount of outdoor air based on actual number of occupants in spaces. Two choices: Yes and No. Default is No.
 
-#### Field: System Outdoor Air   Method
+#### Field: System Outdoor Air Method
 
-The method used to calculate the system minimum outdoor air flow. Several choices are allowed: **ZoneSum**, **VentilationRateProcedure,** **IndoorAirQualityProcedure,   ProportionalControl,** and **IndoorAirQualityProcedureGenericContaminant**.   ZoneSum sums the outdoor air flows across all zones served by the system. VentilationRateProcedure (VRP) uses the multi-zone equations defined in 62.1-2007 to calculate the system outdoor air flow. VRP considers zone air distribution effectiveness and zone diversification of outdoor air fractions. IndoorAirQualityProcedure (IAQP) is the other procedure defined in ASHRAE Standard 62.1-2007 for calculate the amount of outdoor air necessary to maintain the levels of indoor air carbon dioxide at or below the setpoint defined in the ZoneControl:ContaminantController object. Appendix A of the ASHRAE 62.1-2010 user   s manual discusses another method for implementing CO<sub>2</sub>-based DCV in a single zone system. This method (Proportional Control) calculates the required outdoor air flow rate which varies in proportion to the percentage of the CO<sub>2</sub> signal range. The IndoorAirQualityProcedure-GenericContaminant method calculates the amount of outdoor air necessary to maintain the levels of indoor air generic contaminant at or below the setpoint defined in the ZoneControl:ContaminantController object.
+The method used to calculate the system minimum outdoor air flow. Several choices are allowed: **ZoneSum**, **VentilationRateProcedure,** **IndoorAirQualityProcedure, ProportionalControlBasedonOccupancySchedule,** **ProportionalControlBasedonDesignOccupancy,** and **IndoorAirQualityProcedureGenericContaminant**.   ZoneSum sums the outdoor air flows across all zones served by the system. VentilationRateProcedure (VRP) uses the multi-zone equations defined in 62.1-2007 to calculate the system outdoor air flow. VRP considers zone air distribution effectiveness and zone diversification of outdoor air fractions. IndoorAirQualityProcedure (IAQP) is the other procedure defined in ASHRAE Standard 62.1-2007 for calculate the amount of outdoor air necessary to maintain the levels of indoor air carbon dioxide at or below the setpoint defined in the ZoneControl:ContaminantController object. Appendix A of the ASHRAE 62.1-2010 user's manual discusses another method for implementing CO<sub>2</sub>-based DCV in a single zone system. This method (Proportional Control) calculates the required outdoor air flow rate which varies in proportion to the percentage of the CO<sub>2</sub> signal range and has two choices to calculate occupancy-based outdoor air rate. The ProportionalControlBasedonOccupancySchedule choice uses the real occupancy at the current time step to calculate outdoor air rate, while the ProportionalControlBasedonDesignOccupancy uses the design occupancy level to calculate outdoor air rate. The former choice is a good approach to estimate outdoor air rate.  However, for practical applications, the zone controller usually does not have the real time occupancy information, and  the design occupancy level is assumed. The latter choice is used in the design stage. The IndoorAirQualityProcedure-GenericContaminant method calculates the amount of outdoor air necessary to maintain the levels of indoor air generic contaminant at or below the setpoint defined in the ZoneControl:ContaminantController object.
 
 Note: When System Outdoor Air Method = IndoorAirQualityProcedure or IndoorAirQualityProcedureGenericContaminant is specified, only the Zone &lt;x&gt; Name fields are used. The other field inputs described below are not used.
 
@@ -19139,7 +19139,7 @@ Demand limiting controls shut off or reduce the power to non-essential loads in 
 
 - turn on generators to meet some or all of the building's demand.
 
-The demand limiting controls implemented in EnergyPlus are intended to allow some of the more common demand limiting strategies. Currently, only Exterior:Lights, Lights, ElectricEquipment, and ZoneControl:Thermostat objects can be demand limited. Additional components will be demand limited in future releases.
+The demand limiting controls implemented in EnergyPlus are intended to allow some of the more common demand limiting strategies. Currently, only Exterior:Lights, Lights, ElectricEquipment, ZoneControl:Thermostat, and Controller:OutdoorAir objects can be demand limited. Additional components will be demand limited in future releases.
 
 ### DemandManagerAssignmentList
 
@@ -19581,6 +19581,75 @@ An example IDF showing how this object is used is provided below:
 ### DemandManager:Thermostats Outputs
 
 There are no output variables reported for the DemandManager:Thermostats object.
+
+
+### DemandManager:Ventilation
+
+The DemandManager:Ventilation object is used for limiting the ventilation rate calculated from the Controller:OutdoorAir object.
+
+#### Field: Name
+
+The name of the DemandManager:Ventilation object.
+
+#### Field: Availability Schedule Name
+
+The reference to the schedule object specifying the availability of this demand manager. A schedule value of zero indicates that this demand response (DR) is not applicable for that time period. A schedule greater than zero indicates that the demand response applies during the time period. If this field is blank, the schedule has values of one for all time period.
+
+#### Field: Limit Control
+
+This field specifies the type of limiting control. There are three options. The **FixedRate** option reduces the ventilation to a specified air flow rate. The **ReductionRatio** specifies the multiplier of the ventilation rate. The **Off** option disables the demand manager in the simulation.
+
+#### Field: Minimum Limit Duration
+
+The minimum amount of time [minutes] that the demand manager will continue to demand limit after being activated. This prevent loads from turning on and off every time step.
+
+#### Field: Fixed Rate
+
+This field specifies the amount of fixed ventilation rate when the demand manager is active and *FixedRate* limit control is applied. The unit is m3/s.
+
+#### Field: Reduction Ratio
+
+This field specifies the multiplier of the ventilation rate when the demand manager is active and *ReductionRatio* limit control is applied.
+
+#### Field: Limit Step Change
+
+NOT YET IMPLEMENTED.
+
+#### Field: Selection Control
+
+This field specifies which loads (ventilation rates) are selected to be limited. The **All** option simultaneously limits all of the loads listed in the demand manager. The **RotateMany** option limits all loads except for one which rotates sequentially through the loads listed. The **RotateOne** limits only one load which rotates sequentially through the loads listed. The time interval between rotations is set by the *Rotation Duration* field.
+
+#### Field: Rotation Duration
+
+If the **RotateOne** of **RotateMany** option is used for *Selection Control*, this field sets the time interval [minues] between rotations.
+
+#### Field: Controller Outdoor Air 1-10 Name
+
+The names of Controller:OutdoorAir objects defined elsewhere in the input file. These are the ventilation rates to be limited by this demand manager. Then objects are accommodated in the list by default. The IDD specification, however, is extensible and additional fields may be added by directly editing the IDD.
+
+An example IDF showing how this object is used is provided below:
+
+
+
+```idf
+   DemandManager:Ventilation,
+       Ventilation Manager,         !- Name
+       ,                            !- Availability Schedule Name
+       ReductionRatio,              !- Reset Control
+       60,                          !- Minimum Limit Duration {minutes}
+       ,                            !- Fixed Rate {m3/s}
+       0.5,                         !- Reduction Ratio
+       ,                            !- Limit Step Change
+       All,                         !- Selection Control
+       ,                            !- Rotation Duration {minutes}
+       OA Controller 1;             !- Controller:OutdoorAir Name
+```
+
+
+### DemandManager:Ventilation Outputs
+
+There are no output variables reported for the DemandManager:Ventilation object.
+
 
 Group -- Electric Load Center-Generator Specifications
 ------------------------------------------------------
@@ -21604,7 +21673,7 @@ This is the temperature of exhaust leaving the generator.   This output is avail
 
 ### Generator:MicroCHP
 
-This object is used to model small-scale combined heat and power (micro CHP) electric generators using the model developed by IEA/ECBCS Annex 42     see www.cogen-sim.net.     The model was developed for both internal combustion and Stirling cycle engines, but might be used for other types of residential CHP devices.
+This object is used to model small-scale combined heat and power (micro CHP) electric generators using the model developed by IEA/ECBCS [Annex 42](http://www.ecbcs.org/annexes/annex42.htm). The model was developed for both internal combustion and Stirling cycle engines, but might be used for other types of residential CHP devices.
 
 Note that unlike other component models in EnergyPlus, this model is not normalized. Therefore, performance coefficients developed for one type and capacity of CHP device cannot be used for a device with a different capacity.
 
@@ -21687,19 +21756,19 @@ This is the maximum temperature of cooling water inlet or outlet that can occur 
 
 #### Field: Electrical Efficiency Curve Name
 
-This is the name of Curve:Triquadratic object that defines the steady-state net electrical efficiency.   The electrical efficiency, <span>\({\eta_e}\)</span>, is a function of   the cooling water mass flow rate, <span>\({\dot m_{cw}}\)</span>, the temperature of the cooling water at the inlet, <span>\({T_{cw}}\)</span>, the steady-state net electrical power produced, <span>\({P_{net,ss}}\)</span>.
+This is the name of Curve:Triquadratic object that defines the steady-state net electrical efficiency.   The electrical efficiency, <span>$ \eta_e $</span>, is a function of the cooling water mass flow rate <span> $ \dot m_{cw}  $</span>, the temperature of the cooling water at the inlet, <span>$ T_{cw} $</span>, the steady-state net electrical power produced, <span>$ P_{net,ss} $</span>.
 
-           <span>\({\eta_e} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)\)</span>
+<div> \[ \eta_e = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right) \] </div>
 
-The associated Curve:Triquadratic object should be defined with the independent variables <span>\({P_{net,ss}},{\dot m_{cw}},{T_{cw}}\)</span>  corresponding to *x*, *y*, and *z*, respectively.
+The associated Curve:Triquadratic object should be defined with the independent variables <span> $ {P_{net,ss}},{\dot m_{cw}},{T_{cw}} $ </span>  corresponding to *x*, *y*, and *z*, respectively.
 
 #### Field: Thermal Efficiency Curve Name
 
-This is the name of a Curve:Triquadratic object that defines the steady-state net thermal efficiency.   The thermal efficiency, <span>\({\eta_q}\)</span>, is a function of   the cooling water mass flow rate, <span>\({\dot m_{cw}}\)</span>, the temperature of the cooling water at the inlet, <span>\({T_{cw}}\)</span>, the steady-state net electrical power produced, <span>\({P_{net,ss}}\)</span>.
+This is the name of a Curve:Triquadratic object that defines the steady-state net thermal efficiency.   The thermal efficiency, <span>$ \eta_q $</span>, is a function of the cooling water mass flow rate, <span>$ \dot m_{cw} $</span>, the temperature of the cooling water at the inlet, <span>$ T_{cw} $</span>, the steady-state net electrical power produced, <span> $ P_{net,ss} $ </span>.
 
-           <span>\({\eta_q} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right)\)</span>
+<div> \[ {\eta_q} = f\left( {{P_{net,ss}},{{\dot m}_{cw}},{T_{cw}}} \right) \] </div>
 
-The associated Curve:Triquadratic object should be defined with the independent variables <span>\({P_{net,ss}},{\dot m_{cw}},{T_{cw}}\)</span>  corresponding to *x*, *y*, and *z*, respectively.
+The associated Curve:Triquadratic object should be defined with the independent variables <span> $ {P_{net,ss}},{\dot m_{cw}},{T_{cw}} $ </span>  corresponding to *x*, *y*, and *z*, respectively.
 
 #### Field: Cooling Water Flow Rate Mode
 
@@ -21709,7 +21778,7 @@ For internal control, the following field is used to define a Biquadratic curve 
 
 #### Field: Cooling Water Flow Rate Curve Name
 
-This field contains the name of a Curve:Biquadratic object that defines the mass flow rate of cooling water, <span>\({\dot m_{cw}}\)</span>.   This field is only used if the prior field is set to    InternalControl.      The mass flow of cooling water is a function of steady-state power, <span>\({P_{net,ss}}\)</span>, and the inlet temperature of the cooling water, <span>\({T_{cw}}\)</span>.   The associated Curve:Biquadratic should be defined with the independent variables <span>\({P_{net,ss}}\)</span>  and <span>\({T_{cw}}\)</span>  corresponding to *x* and *y*, respectively.
+This field contains the name of a Curve:Biquadratic object that defines the mass flow rate of cooling water, <span> $ {\dot m_{cw}} $ </span>.   This field is only used if the prior field is set to InternalControl. The mass flow of cooling water is a function of steady-state power, <span> $ {P_{net,ss}} $ </span>, and the inlet temperature of the cooling water, <span> $ {T_{cw}} $ </span>.   The associated Curve:Biquadratic should be defined with the independent variables <span> $ {P_{net,ss}} $ </span> and <span> $ {T_{cw}} $ </span> corresponding to *x* and *y*, respectively.
 
 #### Field: Air Flow Rate Curve Name
 
@@ -21793,33 +21862,33 @@ An example IDF showing how this object is used is provided below:
 
 ```idf
    Generator:MicroCHP:NonNormalizedParameters,
-       SENERTECH5_5KW,                   !- Name
-       5500.0000,                             !- Maximum Electric Power {W}
-       0.0000,                                   !- Minimum Electric Power {W}
-       0.0000,                                   !- Minimum Cooling Water Flow Rate {kg/s}
-       80.0000,                                 !- Maximum Cooling Water Temperature {C}
-       SenerTechElEff,                   !- Electrical Efficiency Curve Name
-       SenerTechThermEff,             !- Thermal Efficiency Curve Name
-       InternalControl,                 !- Cooling Water Flow Rate Mode
-       SenerTechCoolWaterflow,   !- Cooling Water Flow Rate Curve Name
-       SenerTechAirFlow,               !- Air Flow Rate Curve Name
-       1000000000.0000,                 !- Maximum Net Electrical Power Rate of Change {W/s}
-       1000000000.0000,                 !- Maximum Fuel Flow Rate of Change {kg/s2}
-       741.0000,                               !- Heat Exchanger U-Factor Times Area Value {W/K}
-       13.7000,                                 !- Skin Loss U-Factor Times Area Value {W/K}
-       0.5000,                                   !- Skin Loss Radiative Fraction
-       63605.6000,                           !- Aggregated Thermal Mass of Energy Conversion Portion of Generator {W/K}
-       1000.7000,                             !- Aggregated Thermal Mass of Heat Recovery Portion of Generator {W/K}
-       0.0000,                                   !- Standby Power {W}
-       TimeDelay,                             !- Warm Up Mode
-       ,                                               !- Warm Up Fuel Flow Rate Coefficient
-       ,                                               !- Nominal Engine Operating Temperature {C}
-       ,                                               !- Warm Up Power Coefficient
-       ,                                               !- Warm Up Fuel Flow Rate Limit Ratio
-       60.0000,                                 !- Warm Up Delay Time {s}
-       0.0000,                                   !- Cool Down Power {W}
-       60.0000,                                 !- Cool Down Delay Time {s}
-       OptionalCoolDown;               !- Restart Mode
+       SENERTECH5_5KW,         !- Name
+       5500.0000,              !- Maximum Electric Power {W}
+       0.0000,                 !- Minimum Electric Power {W}
+       0.0000,                 !- Minimum Cooling Water Flow Rate {kg/s}
+       80.0000,                !- Maximum Cooling Water Temperature {C}
+       SenerTechElEff,         !- Electrical Efficiency Curve Name
+       SenerTechThermEff,      !- Thermal Efficiency Curve Name
+       InternalControl,        !- Cooling Water Flow Rate Mode
+       SenerTechCoolWaterflow, !- Cooling Water Flow Rate Curve Name
+       SenerTechAirFlow,       !- Air Flow Rate Curve Name
+       1000000000.0000,        !- Maximum Net Electrical Power Rate of Change {W/s}
+       1000000000.0000,        !- Maximum Fuel Flow Rate of Change {kg/s2}
+       741.0000,               !- Heat Exchanger U-Factor Times Area Value {W/K}
+       13.7000,                !- Skin Loss U-Factor Times Area Value {W/K}
+       0.5000,                 !- Skin Loss Radiative Fraction
+       63605.6000,             !- Aggregated Thermal Mass of Energy Conversion Portion of Generator {W/K}
+       1000.7000,              !- Aggregated Thermal Mass of Heat Recovery Portion of Generator {W/K}
+       0.0000,                 !- Standby Power {W}
+       TimeDelay,              !- Warm Up Mode
+       ,                       !- Warm Up Fuel Flow Rate Coefficient
+       ,                       !- Nominal Engine Operating Temperature {C}
+       ,                       !- Warm Up Power Coefficient
+       ,                       !- Warm Up Fuel Flow Rate Limit Ratio
+       60.0000,                !- Warm Up Delay Time {s}
+       0.0000,                 !- Cool Down Power {W}
+       60.0000,                !- Cool Down Delay Time {s}
+       OptionalCoolDown;       !- Restart Mode
 ```
 
 ### Generator:MicroCHP Outputs

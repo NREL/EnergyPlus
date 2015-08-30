@@ -404,13 +404,12 @@ namespace DataBSDFWindow {
 	struct BSDFBkSurfDescr
 	{
 		// Members
-		Array2D< Real64 > WinDHBkRefl; // Back directional hemispherical reflectance
-		// (hour, timestep)
-		// of this window for radiation from the
-		// back surface window
-		Array3D< Real64 > WinDirBkAbs; // back absorptance (layer, hr, timestep)
+		Array2D< Real64 > WinDHBkRefl; // Back directional hemispherical reflectance (hour, timestep)
+		// of this window for radiation from the back surface window
+		Array3D< Real64 > WinDirBkAbs; // back absorptance (hr, timestep, layer)
 		//   for beam radiation absorbed in this
 		//   window that comes from the back surface window
+		//Performance May be faster in (layer,hr,timestep) order (loops are not consistent)
 		//Note:  WinDHBkRefl and WinDirBkAbs are the same for all hours & timesteps if the back surface window is a
 		// Complex Fenestration; they depend on the sun direction if the back surface window is a regular window
 
@@ -421,7 +420,7 @@ namespace DataBSDFWindow {
 		// Member Constructor
 		BSDFBkSurfDescr(
 			Array2< Real64 > const & WinDHBkRefl, // Back directional hemispherical reflectance
-			Array3< Real64 > const & WinDirBkAbs // back absorptance (layer, hr, timestep)
+			Array3< Real64 > const & WinDirBkAbs // back absorptance (hr, timestep, layer)
 		) :
 			WinDHBkRefl( WinDHBkRefl ),
 			WinDirBkAbs( WinDirBkAbs )
@@ -449,15 +448,15 @@ namespace DataBSDFWindow {
 		Real64 WinBkHemVisRefl; // Window back hemispherical reflectance (visible spectrum)
 		//(for reflection of interior diffuse radiation)
 		int NLayers; // Number of absorbing layers in this window
-		Array3D< Real64 > WinBmFtAbs; // Front directional absorptance (layer, hour, timestep)
+		Array3D< Real64 > WinBmFtAbs; // Front directional absorptance (hour, timestep, layer)
 		Array1D< Real64 > WinSkyFtAbs; // Front absorptance (layer) averaged over sky
 		Array1D< Real64 > WinSkyGndAbs; // Front absorptance (layer) averaged over ground
 		// viewed part of gnd  (for ground-reflected sky radiation)
-		Array3D< Real64 > WinBmGndAbs; // Front absorptance (layer, hour, timestep) averaged
+		Array3D< Real64 > WinBmGndAbs; // Front absorptance (hour, timestep, layer) averaged
 		//over unshaded ground viewed by beam
 		Array1D< Real64 > WinFtHemAbs; // Front hemispherical absorptance (layers)
 		Array1D< Real64 > WinBkHemAbs; // Back hemispherical absorptance (layers)
-		Array3D< Real64 > WinToSurfBmTrans; // Beam transmittance (bk surf no, hour, timestep)
+		Array3D< Real64 > WinToSurfBmTrans; // Beam transmittance (hour, timestep, bk surf no)
 		//to back surface
 		//Note: the following will be evaluated only if the given back surface is a  window
 		Array1D< BSDFBkSurfDescr > BkSurf; // Structure dimensioned (bk surface no)
@@ -493,13 +492,13 @@ namespace DataBSDFWindow {
 			Real64 const WinBkHemRefl, // Window back hemispherical reflectance
 			Real64 const WinBkHemVisRefl, // Window back hemispherical reflectance (visible spectrum)
 			int const NLayers, // Number of absorbing layers in this window
-			Array3< Real64 > const & WinBmFtAbs, // Front directional absorptance (layer, hour, timestep)
+			Array3< Real64 > const & WinBmFtAbs, // Front directional absorptance (hour, timestep, layer)
 			Array1< Real64 > const & WinSkyFtAbs, // Front absorptance (layer) averaged over sky
 			Array1< Real64 > const & WinSkyGndAbs, // Front absorptance (layer) averaged over ground
-			Array3< Real64 > const & WinBmGndAbs, // Front absorptance (layer, hour, timestep) averaged
+			Array3< Real64 > const & WinBmGndAbs, // Front absorptance (hour, timestep, layer) averaged
 			Array1< Real64 > const & WinFtHemAbs, // Front hemispherical absorptance (layers)
 			Array1< Real64 > const & WinBkHemAbs, // Back hemispherical absorptance (layers)
-			Array3< Real64 > const & WinToSurfBmTrans, // Beam transmittance (bk surf no, hour, timestep)
+			Array3< Real64 > const & WinToSurfBmTrans, // Beam transmittance (hour, timestep, bk surf no)
 			Array1< BSDFBkSurfDescr > const & BkSurf, // Structure dimensioned (bk surface no)
 			Array1< Real64 > const & IntegratedFtAbs, // Sum of all back layer absorptances (for each back direction)
 			Array1< Real64 > const & IntegratedFtRefl, // Integrated back layer reflectance (for each back direction)
