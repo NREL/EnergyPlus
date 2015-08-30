@@ -718,17 +718,11 @@ namespace EnergyPlus {
 		ASSERT_EQ( DefrostWatts, VRF( VRFCond ).DefrostPower ); // defrost power calculation check
 
 		// clean up
-		StdRhoAir = 0.0;
 		Fans::Fan.deallocate();
 		DXCoils::DXCoil.deallocate();
-		DataLoopNode::Node.deallocate();
-		ScheduleManager::Schedule.deallocate();
 		Fans::GetFanInputFlag = true;
 		DXCoils::GetCoilsInputFlag = true;
-		ZoneEqSizing.deallocate();
-		FinalZoneSizing.deallocate();
 		ZoneSysEnergyDemand.deallocate();
-		DesDayWeath.deallocate();
 
 	}
 
@@ -1636,9 +1630,16 @@ namespace EnergyPlus {
 		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToHeatSP = -2000.0;
 
 		BeginEnvrnFlag = true;
-		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).Temp = 80.0;
-		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).HumRat = 0.008;
+		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).Temp = 24.0;
+		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).HumRat = 0.0093;
+		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).Enthalpy = 47794.1;
+		DataEnvironment::OutDryBulbTemp = 35.0;
+		DataEnvironment::OutHumRat = 0.017767; // 50% RH
+		DataEnvironment::OutBaroPress = 101325.0;
+		DataEnvironment::OutWetBulbTemp = 26.045;
 		SimulateVRF( VRFTU( VRFTUNum ).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
+		EXPECT_TRUE( VRF( VRFCond ).VRFCondPLR > 0.0 );
+		EXPECT_NEAR( SysOutputProvided, ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToCoolSP, 1.0 );
 
 		rho = GetDensityGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, PlantSizData( 1 ).ExitTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
 		Cp = GetSpecificHeatGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, PlantSizData( 1 ).ExitTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
@@ -1658,23 +1659,24 @@ namespace EnergyPlus {
 		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).Temp = 20.0; // TU inlet air temp
 		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).HumRat = 0.0056; // TU inlet air humrat
 		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).Enthalpy = 34823.5; // TU inlet air enthalpy
+		DataEnvironment::OutDryBulbTemp = 5.0;
+		DataEnvironment::OutHumRat = 0.00269; //50% RH
+		DataEnvironment::OutBaroPress = 101325.0;
+		DataEnvironment::OutWetBulbTemp = 1.34678;
 		SimulateVRF( VRFTU( VRFTUNum ).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
+
+		EXPECT_TRUE( VRF( VRFCond ).VRFCondPLR > 0.0 );
+		EXPECT_NEAR( SysOutputProvided, ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToHeatSP, 1.0 );
 
 		ASSERT_EQ( VRF( VRFCond ).WaterCondenserDesignMassFlow, Node( VRF( VRFCond ).CondenserNodeNum ).MassFlowRate ); // Condenser flow rate should be set for active cooling
 		ASSERT_EQ( VRF( VRFCond ).WaterCondenserDesignMassFlow, Node( VRF( VRFCond ).CondenserOutletNodeNum ).MassFlowRate ); // outlet node should also be set
 
 		// clean up
-		StdRhoAir = 0.0;
 		Fans::Fan.deallocate();
 		DXCoils::DXCoil.deallocate();
-		DataLoopNode::Node.deallocate();
-		ScheduleManager::Schedule.deallocate();
 		Fans::GetFanInputFlag = true;
 		DXCoils::GetCoilsInputFlag = true;
-		ZoneEqSizing.deallocate();
-		FinalZoneSizing.deallocate();
 		ZoneSysEnergyDemand.deallocate();
-		DesDayWeath.deallocate();
 	}
 
 }
