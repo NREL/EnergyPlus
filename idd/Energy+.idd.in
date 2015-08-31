@@ -53145,42 +53145,42 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   N11, \field Reference Evaporating Temperature for Indoor Unit 
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is ConstantTemp
-	   \note Evaporating temperature is the refrigerant temperature, not air temperature
+       \note Evaporating temperature is the refrigerant temperature, not air temperature
        \type real
        \units C       
        \default 6.0
   N12, \field Reference Condensing Temperature for Indoor Unit 
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is ConstantTemp
-	   \note Condensing temperature is the refrigerant temperature, not air temperature
+       \note Condensing temperature is the refrigerant temperature, not air temperature
        \type real
        \units C       
        \default 44.0
   N13, \field Variable Evaporating Temperature Minimum for Indoor Unit
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp 
-	   \note Evaporating temperature is the refrigerant temperature, not air temperature
+       \note Evaporating temperature is the refrigerant temperature, not air temperature
        \type real
        \units C       
        \default 4.0
   N14, \field Variable Evaporating Temperature Maximum for Indoor Unit
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp 
-	   \note Evaporating temperature is the refrigerant temperature, not air temperature
+       \note Evaporating temperature is the refrigerant temperature, not air temperature
        \type real
        \units C       
        \default 13.0
   N15, \field Variable Condensing Temperature Minimum for Indoor Unit
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp
-	   \note Condensing temperature is the refrigerant temperature, not air temperature
+       \note Condensing temperature is the refrigerant temperature, not air temperature
        \type real
        \units C       
        \default 42.0
   N16, \field Variable Condensing Temperature Maximum for Indoor Unit
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp
-	   \note Condensing temperature is the refrigerant temperature, not air temperature
+       \note Condensing temperature is the refrigerant temperature, not air temperature
        \type real
        \units C       
        \default 46.0 
