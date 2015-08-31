@@ -2665,6 +2665,7 @@ namespace WeatherManager {
 						TomorrowVariables.Month = WMonth;
 						TomorrowVariables.DayOfMonth = WDay;
 						TomorrowVariables.DayOfYear = JulianDay( WMonth, WDay, LeapYearAdd );
+						TomorrowVariables.DayOfYear_Schedule = JulianDay(WMonth, WDay, 1);
 						CalculateDailySolarCoeffs( TomorrowVariables.DayOfYear, A, B, C, AVSC, TomorrowVariables.EquationOfTime, TomorrowVariables.SinSolarDeclinAngle, TomorrowVariables.CosSolarDeclinAngle );
 						if ( CurDayOfWeek <= 7 ) {
 							CurDayOfWeek = mod( CurDayOfWeek, 7 ) + 1;
@@ -2982,9 +2983,9 @@ namespace WeatherManager {
 				{ auto const SELECT_CASE_var( WPSkyTemperature( Environment( Environ ).WP_Type1 ).CalculationType );
 
 				if ( SELECT_CASE_var == WP_ScheduleValue ) {
-					GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear, CurDayOfWeek );
+					GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek );
 				} else if ( SELECT_CASE_var == WP_DryBulbDelta ) {
-					GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear, CurDayOfWeek );
+					GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek );
 					for ( Hour = 1; Hour <= 24; ++Hour ) {
 						for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
 							TomorrowSkyTemp( TS, Hour ) = TomorrowOutDryBulbTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );
@@ -2992,7 +2993,7 @@ namespace WeatherManager {
 					}
 
 				} else if ( SELECT_CASE_var == WP_DewPointDelta ) {
-					GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear, CurDayOfWeek );
+					GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek );
 					for ( Hour = 1; Hour <= 24; ++Hour ) {
 						for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
 							TomorrowSkyTemp( TS, Hour ) = TomorrowOutDewPointTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );

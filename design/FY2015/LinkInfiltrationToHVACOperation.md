@@ -218,3 +218,22 @@ Infiltration(j).VolumeFlowRate = Infiltration(j).MassFlowRate / AirDensity;
 3. *Possible bug?* Currently, there does not appear to be any impact on the reported zone infiltration flow rate. It's not clear if infiltration and mixing adjustments are having an impact on the zone heat balance.  If not, this will be fixed. **Change calls to CalcAirFlowSimple**
 4. Add input fields for user control of return air flow rate.  This adusted return flow rate should automatically flow into the zone air mass balance calculations. **DataZoneEquipment::GetZoneEquipmentData1 and CalcZoneMassBalance.**
 
+## Issues Encountered
+1. Rescaling of return flow rates in ZoneEquipmentManager::CalcZoneMassBalance is overriding the return air flow rate adjustment - must skip this when using controlled return air or inform this somehow.  Perhaps the return air controls need to be at the air loop level?
+2. With mass balance off, getting max iteration errors with return air adjustment.  It's cyclical, and it appears to stem from this code in HVACManager::SimSelectedEquipment.
+```
+				if ( SimZoneEquipment ) {
+					if ( ( IterAir == 1 ) && ( ! FlowMaxAvailAlreadyReset ) ) { // don't do reset if already done in FirstHVACIteration
+						ResetTerminalUnitFlowLimits();
+						FlowResolutionNeeded = true;
+					} else {
+						ResolveAirLoopFlowLimits();
+						FlowResolutionNeeded = false;
+					}
+```
+This is within the IterAir loop in SimSelectedEquipment and it fires every time IterAir == 1, because FlowMaxAvailAlreadyReset is being set to false within the IterAir loop - seems like thst line should be *out*side the IterAir loop.  No, in fact it should be outside this routine. This code was added for CR7781 [#2561](https://github.com/NREL/EnergyPlus/issues/2561) on Feb 27, 2010 which stemmed from problems with some terminal units scheduled off for part of the year.
+https://github.com/NREL/EnergyPlusArchive/commit/c8c4ecb752714b44b8b15de074fad81d9139d685
+
+[ResetTerminalUnitFlowLimits](https://github.com/NREL/EnergyPlus/blame/develop/src/EnergyPlus/HVACManager.cc#L1613) resets all the terminal unit inlet node MassFlowRateMaxAvail (and Min) to the hard design flow rates without any regard to schedules or other things that may be varying.  This is find during FirstHVACIteration, but looks suspicious here.  This probably explains why I couldn't get the VAV terminal unit schedule to stick.  Note that IterAir is repeated up to six times (hardwired iteration limit) and then goes back up to the main HVAC iteration loop (HVACManagerIteration whcih is the one that has a user-controlled max that defaults to 20).
+
+

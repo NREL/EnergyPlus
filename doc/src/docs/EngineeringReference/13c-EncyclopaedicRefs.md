@@ -1274,7 +1274,7 @@ N = number of zones served by the air loop, which is provided in the input for a
 
 ### Proportional Control
 
-Like Ventilation Rate Procedure and the Indoor Air Quality Procedure, the following three objects must be included in the input data file in order to model CO<sub>2</sub>-based DCV with Proportional Control:
+The control has two choices: ProportionalControlBasedonOccupancySchedule and ProportionalControlBasedonDesignOccupancy. The difference is occupancy level. The former uses real time occupancy, while the latter uses design occupancy level. Like Ventilation Rate Procedure and the Indoor Air Quality Procedure, the following three objects must be included in the input data file in order to model CO<sub>2</sub>-based DCV with Proportional Control:
 
 n **AirLoopHVAC:OutdoorAirSystem** to simulate the mixed air box of the air loop
 
@@ -1311,6 +1311,9 @@ Where,
 <span>\({R_{a,i}}\)</span> = Required outdoor air flow rate per unit area, (m<sup>3</sup>/s)/m<sup>2</sup>
 
 <span>\({P_{z,i}}\)</span> = Design zone population, number of people
+
+When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy * current schedule value. When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy.
+
 
 <span>\({A_{z,i}}\)</span> = Zone floor area, m<sup>2</sup>
 
@@ -3205,6 +3208,54 @@ C<sub>p</sub>              = inlet node temperature of heat recover
 
 If the outlet node temperature is above the value of the Maximum Temp for Heat Recovery field, the outlet node temperature is reset to the value of Maximum Temp for Heat Recovery.
 
+#### Multi-Speed Fan with Water Coils In Unitary System 
+
+When modeling multi-speed fan and water coils in unitary system object, the coil's capacity is modulated using speed ratio or part-load ratio.  The system load is met by varying the supply air fan speed while operating the coils at maximum water flow. When there is no system load to meet, the water control valve is fully closed.  This method of capacity control is called two-position coil control. When the supply fan is cycling between stages, then the speed ratio is calculated, but when the unit cycles between the minimum fan speed and off-position, part-load ratio is calculated. The fan may be off or run at lowest speed continuously to provide ventilation air depending the fan operating schedule. When the fan is operating at the lowest fan speed (Speed = 1), then the water flow rate is reported as the average for the time step by multiplying the maximum water flow by part load ratio. The speed ratio and part-load ratio are calculated iteratively. The set of equations used for the multi-speed fan capacity control in unitary system for water coil AHU modeling are summarized next
+
+##### Cycling Between Stages:
+When the supply fan is cycling between consecutive speeds, then the speed ratio (SR) and the average mass flow rate are calculated as follows:
+
+<div>$${SR_{n}} = Abs({SystemLoad} - {FullLoadOutput_{n-1}}) / Abs({FullLoadOutput_{n}} - {FullLoadOutput_{n-1}})$$</div>
+<div>$${\dot m} = {\dot m_{on, n}} {SR_{n}} + {\dot m_{on, n-1}} (1 - {SR_{n}})$$</div>
+<div>$${\dot m{w}} = {\dot m_{w, max}}$$</div>
+
+##### Cycling OnOff at Lowest Stage:
+The average supply air flow rate calculation when the fan is running at the lowest fan speed level depends on the fan operating schedule and load. The unitary system part load ratio is given by:
+
+<div>$${PLR} = Abs({SystemLoad} - {NoLoadOutput}) / Abs({FullLoadOutput_{1}} - {NoLoadOutput})$$</div>
+
+###### Continuous Fan:
+<div>$${\dot m} = {\dot m_{on, 1}} {PLR} + {\dot m_{off}} (1 - {PLR})$$</div>
+
+###### Cycling Fan:
+<div>$${\dot m} = {\dot m_{on, 1}} {PLR}$$</div>
+<div>$${\dot m{w}} = {\dot m_{w, max}} * {PLR}$$</div>
+
+where:
+
+{SR_{n}}		=	 speed ratio of the water coil unitary system at speed n, (-)
+
+{PLR}			=	 part load ratio of the unitary system at speed 1, (-)
+
+{\dot m}		=	 average mass flow rate of supply air, (kg/s
+
+{\dot m_{on, n-1}}	=	mass flow rate of supply air at fan speed level n-1, (kg/s)
+
+{\dot m_{on, n}}}	=	mass flow rate of supply air at fan speed level n, (kg/s)
+
+{\dot m_{off}}	=	mass flow rate of supply air when the coils are off, (kg/s)
+
+{\dot m_{w}}	=	 average mass flow rate of chilled or hot water, (kg/s)
+
+{\dot m_{w, max}}	=	maximum or full mass flow rate of chilled or hot water, (kg/s)
+
+SystemLoad 	= system load to be met by the unitary system, (W)
+
+{FullLoadOutput_{n-1}} 	= fully load system output at fan speed level n-1, (W)
+
+{FullLoadOutput_{n}} 	= fully load system output at fan speed level n, (W)
+
+
 ### Forced-Air Furnace and Central Air Conditioning
 
 #### Overview
@@ -4682,9 +4733,9 @@ Variable Refrigerant Flow Heat Pumps <a name="VRF"></a>
 
 There are two common types of variable refrigerant flow heat pump systems:
 
-n cooling only or heating only air-conditioning systems (a.k.a. heat pump), or
+- cooling only or heating only air-conditioning systems (a.k.a. heat pump), or
 
-n heat recovery systems that allow simultaneous cooling and heating
+- heat recovery systems that allow simultaneous cooling and heating
 
 Energyplus models heat pump and heat recovery operating modes as described in the section entitled Variable Refrigerant Flow Heat Pump Model. The variable refrigerant flow model currently supports air-, evaporatively-, or water-cooled condenser equipment. Throughout this section, the term “condenser” refers to the outdoor unit where the compressor is located.
 
