@@ -7898,10 +7898,6 @@ namespace HVACVariableRefrigerantFlow {
 			} else {
 				CoolingPLR = 0.0;
 			}
-			
-			if(CoolingPLR > 1){
-				int aaa=0;
-			}
 
 		} else if ( HeatingLoad( VRFCond ) && TerminalUnitList( TUListNum ).HeatingCoilPresent( NumTUInList ) ) {
 			InletAirDryBulbC = SumHeatInletDB;
