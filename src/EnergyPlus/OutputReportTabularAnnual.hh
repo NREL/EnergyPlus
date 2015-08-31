@@ -135,7 +135,7 @@ private:
 	trim( const std::string& str );
 
 	void
-	AnnualTable::fixUnitsPerSecond( std::string & unitString, Real64 & conversionFactor );
+	fixUnitsPerSecond( std::string & unitString, Real64 & conversionFactor );
 
 
 }; // class AnnualTable

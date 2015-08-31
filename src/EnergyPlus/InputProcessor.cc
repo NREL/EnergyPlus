@@ -3762,7 +3762,7 @@ namespace InputProcessor {
 		// turn all caps into caps only when first letter in word
 		std::string returnString;
 		bool wasSpace = true; //start out assuming a space so first character is in caps
-		for ( int i = 0; i != inString.size(); i++ ){
+		for ( std::string::size_type i = 0; i != inString.size(); i++ ){
 			char curChar = inString[i];
 			if ( wasSpace ){
 				returnString.push_back( inString[i] );

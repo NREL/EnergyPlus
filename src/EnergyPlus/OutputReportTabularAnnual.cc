@@ -167,7 +167,7 @@ namespace EnergyPlus {
 			for ( std::vector<std::string>::iterator objNmIt = m_objectNames.begin(); objNmIt != m_objectNames.end(); objNmIt++ ){
 				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
 					foundKeyIndex = -1;
-					for ( int i = 0; i < fldStIt->m_namesOfKeys.size(); i++ ){
+					for ( std::string::size_type i = 0; i < fldStIt->m_namesOfKeys.size(); i++ ){
 						if ( fldStIt->m_namesOfKeys[i] == *objNmIt ){
 							foundKeyIndex = i;
 							break;
@@ -213,7 +213,7 @@ namespace EnergyPlus {
 			bool activeHoursShown = false; 
 			std::vector<AnnualFieldSet>::iterator fldStIt;
 			std::vector<AnnualFieldSet>::iterator fldStRemainIt;
-			for ( int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
+			for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
 				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
 					int curTypeOfVar = fldStIt->m_typeOfVar;
 					int curStepType = fldStIt->m_varStepType;
@@ -352,6 +352,14 @@ namespace EnergyPlus {
 									fldStIt->m_cell[row].deferedResults.push_back( curValue * elapsedTime ); //for averaging - weight by elapsed time
 								}
 								newDuration = oldDuration + elapsedTime;
+								break;
+							case AnnualFieldSet::AggregationKind::noAggregation:
+							case AnnualFieldSet::AggregationKind::valueWhenMaxMin:
+							case AnnualFieldSet::AggregationKind::sumOrAverageHoursShown:
+							case AnnualFieldSet::AggregationKind::maximumDuringHoursShown:
+							case AnnualFieldSet::AggregationKind::minimumDuringHoursShown:
+								// do nothing
+								break;
 							} // end switch fldStIt->m_aggregate
 
 							// if the new value has been set then set the monthly values to the
