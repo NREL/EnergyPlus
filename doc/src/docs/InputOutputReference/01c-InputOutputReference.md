@@ -14125,13 +14125,21 @@ This alpha field defines the name of the zone terminal unit list. The name speci
 
 This alpha field defines the name of the refrigerant used in the VRF system. The name specified here should match the name of a valid FluidProperties:Name object. 
 
+####Field: Rated Evaporative Capacity
+
+This numeric field defines the total evaporative capacity in watts at rated conditions. This is the capacity corresponding to the max compressor speed at rated conditions. The actual evaporative capacity is obtained by multiplying the rated capacity with the modification factor calculated by Evaporative Capacity Multiplier Function of Temperature Curve. The value must be greater than 0. If this field is left blank, a default value of 40,000 W is assumed.
+	   
+####Field: Rated Compressor Power Per Unit of Rated Evaporative Capacity
+
+This numeric field defines the rated compressor power per Watt of rated evaporative capacity. Rated compressor power corresponds to the max compressor speed at rated conditions. The actual compressor power is obtained by multiplying the rated power with the modification factor calculated by Compressor Power Multiplier Function of Temperature Curve. The value must be greater than 0. If this field is left blank, a default value of 0.35 W/W is assumed.
+	   
 ####Field: Reference Cooling COP
 
-This numeric field defines the cooling coefficient of performance at rated conditions. This value is only used for the initialization of the physics based VRF model at cooling mode. The value must be greater than 0. If this field is left blank, a default coefficient of performance of 3.3 is assumed.
+This numeric field defines the cooling coefficient of performance at rated conditions. This value is only used for the initialization of the physics based VRF model at cooling mode. Actual cooling COP is calculated by the physics-based model. The value must be greater than 0. If this field is left blank, a default coefficient of performance of 2.86 is assumed.
 
 ####Field: Reference Heating COP
 
-This numeric field defines the heating coefficient of performance at rated conditions. This value is only used for the initialization of the physics based VRF model at heating mode. The value must be greater than 0. If this field is left blank, a default coefficient of performance of 3.4 is assumed.
+This numeric field defines the heating coefficient of performance at rated conditions. This value is only used for the initialization of the physics based VRF model at heating mode. Actual heating COP is calculated by the physics-based model. The value must be greater than 0. If this field is left blank, a default coefficient of performance of 3.86 is assumed.
 
 ####Field: Minimum Outdoor Air Temperature in Cooling Mode
 
@@ -14185,13 +14193,13 @@ This numeric field defines the minimum condensing temperature for the indoor uni
 
 This numeric field defines the maximum condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 46.0ºC is used.
 
-#### Field: Outdoor Unit Fan Rated Power
-
-This numeric field defines the rated power of the fan in the VRF outdoor unit. The current VRF-FluidTCtrl only supports constant speed fan. If this field is blank, the default value of 170W is used.
-
-#### Field: Outdoor Unit Fan Rated Flow Rate
-
-This numeric field defines the rated air volumetric flow rate (m<sup>3</sup>/s) of the fan in the VRF outdoor unit. The current VRF-FluidTCtrl only supports constant speed fan. If this field is blank, the default value of 3.0(m<sup>3</sup>/s) is used.
+#### Field: Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity
+ 
+This numeric field defines the outdoor unit fan power per watt of rated evaporative capacity. If this field is blank, the default value of 4.25E-3 W/W is used.
+	   
+#### Field: Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity
+ 
+This numeric field defines the outdoor unit fan volumetric flow rate per watt of rated evaporative capacity. If this field is blank, the default value of 7.50E-5 m<sup>3</sup>/s-W is used.
 
 #### Field: Outdoor Unit Evaporating Temperature Function of Superheating Curve Name    
 
@@ -14277,13 +14285,14 @@ This numeric field defines the number of compressor loading index entries. Loadi
 
 This numeric field defines the compressor speed at the i-th loading index. The value must be greater than 0.
 
-#### Field: Loading Index i Evaporative Capacity Function of Temperature Curve Name
+#### Field: Loading Index i Evaporative Capacity Multiplier Function of Temperature Curve Name
 
-This alpha field defines the name of a BiQuadratic curve for the VRF operational mode corresponding to the i-th loading index. It parameterizes the variation of VRF evaporating capacity as a function of operating conditions, i.e., evaporating and condensing temperatures. The output of this curve is the capacity of the VRF system evaporator.
+This alpha field defines the name of a BiQuadratic curve for the VRF operational mode corresponding to the i-th loading index. It parameterizes the variation of VRF evaporating capacity as a function of operating conditions, i.e., evaporating and condensing temperatures. The output of this curve is a dimensionless multiplier to be applied on the rated evaporative capacity to calculate the actual capacity.
 
-#### Field: Loading Index i Compressor Power Function of Temperature Curve Name
+#### Field: Loading Index i Compressor Power Multiplier Function of Temperature Curve Name
 
-This alpha field defines the name of a BiQuadratic curve for the VRF operational mode corresponding to the i-th loading index. It parameterizes the variation of compressor power as a function of operating conditions, i.e., evaporating and condensing temperatures. The output of this curve is the compressor power.
+This alpha field defines the name of a BiQuadratic curve for the VRF operational mode corresponding to the i-th loading index. It parameterizes the variation of compressor power as a function of operating conditions, i.e., evaporating and condensing temperatures. The output of this curve is a dimensionless multiplier to be applied on the rated compressor power to calculate the actual compressor power.
+
 Following is an example input for a AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl system.
 
 
@@ -14294,8 +14303,10 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     VRFCondAvailSched,       !- Availability Schedule Name
     VRF Heat Pump TU List,   !- Zone Terminal Unit List Name
     R410A,                   !- Refrigerant Type
-    3.37,                    !- Reference Cooling COP
-    2.80,                    !- Reference Heating COP
+    41300,                   !- Rated Evaporative Capacity {W}
+    0.344,                   !- Rated Compressor Power Per Unit of Rated Evaporative Capacity {W/W}
+    2.91,                    !- Reference Cooling COP
+    3.91,                    !- Reference Heating COP
     ,                        !- Minimum Outdoor Air Temperature in Cooling Mode {C}
     ,                        !- Maximum Outdoor Air Temperature in Cooling Mode {C}
     ,                        !- Minimum Outdoor Air Temperature in Heating Mode {C}
@@ -14309,8 +14320,8 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     13,                      !- Variable Evaporating Temperature Maximum for Indoor Unit {C}
     42,                      !- Variable Condensing Temperature Minimum for Indoor Unit {C}
     46,                      !- Variable Evaporating Temperature Maximum for Indoor Unit {C}
-    ,                        !- Outdoor Unit Fan Rated Power {W}
-    ,                        !- Outdoor Unit Fan Rated Flow Rate {m3/s}
+    4.12E-3,                 !- Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity {W/W}
+    7.26E-5,                 !- Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity {m3/s-W}
     OUEvapTempCurve,         !- Outdoor Unit Evaporating Temperature Function of Superheating Curve Name
     OUCondTempCurve,         !- Outdoor Unit Condensing Temperature Function of Subcooling Curve Name
     0.0508,                  !- Diameter of main pipe connecting outdoor unit to indoor units {m}
@@ -14331,21 +14342,21 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     ,                        !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
     4500000,                 !- Compressor maximum delta Pressure {Pa}
     3,                       !- Number of Compressor Loading Index Entries
-    25,                      !- Compressor Speed at Loading Index 1
-    MinSpdCooling,           !- Loading Index 1 Evaporative Capacity Function of Temperature Curve Name
-    MinSpdPower,             !- Loading Index 1 Compressor Power Function of Temperature Curve Name
-    60,                      !- Compressor Speed at Loading Index 2
-    Spd1Cooling,             !- Loading Index 2 Evaporative Capacity Function of Temperature Curve Name
-    Spd1Power,               !- Loading Index 2 Compressor Power Function of Temperature Curve Name
-    100,                     !- Compressor Speed at Loading Index 3
-    Spd2Cooling,             !- Loading Index 3 Evaporative Capacity Function of Temperature Curve Name
-    Spd2Power;               !- Loading Index 3 Compressor Power Function of Temperature Curve Name
+    25,                      !- Compressor Speed at Loading Index 1 {rev/sec}
+    MinSpdCooling,           !- Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name
+    MinSpdPower,             !- Loading Index 1 Compressor Power Multiplier Function of Temperature Curve Name
+    60,                      !- Compressor Speed at Loading Index 2 {rev/sec}
+    Spd1Cooling,             !- Loading Index 2 Evaporative Capacity Multiplier Function of Temperature Curve Name
+    Spd1Power,               !- Loading Index 2 Compressor Power Multiplier Function of Temperature Curve Name
+    100,                     !- Compressor Speed at Loading Index 3 {rev/sec}
+    Spd2Cooling,             !- Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name
+    Spd2Power;               !- Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name
 
   Curve:Quadratic,
     OUEvapTempCurve,         !- Name
     0,                       !- Coefficient1 Constant
-    0.605,                   !- Coefficient2 x
-    0.025,                   !- Coefficient3 x**2
+    6.05E-1,                 !- Coefficient2 x
+    2.50E-2,                 !- Coefficient3 x**2
     0,                       !- Minimum Value of x    
     15,                      !- Maximum Value of x    
     ,                        !- Minimum Curve Output
@@ -14367,12 +14378,12 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
 	
   Curve:Biquadratic,
     MinSpdCooling,           !- Name
-    13193.9403,              !- Coefficient1 Constant
-    -51.8895,                !- Coefficient2 x
-    -0.8898,                 !- Coefficient3 x**2
-    495.8571,                !- Coefficient4 y
-    4.3531,                  !- Coefficient5 y**2
-    -3.577,                  !- Coefficient6 x*y
+    3.19E-01,                !- Coefficient1 Constant
+    -1.26E-03,               !- Coefficient2 x
+    -2.15E-05,               !- Coefficient3 x**2
+    1.20E-02,                !- Coefficient4 y
+    1.05E-04,                !- Coefficient5 y**2
+    -8.66E-05,               !- Coefficient6 x*y
     15,                      !- Minimum Value of x
     65,                      !- Maximum Value of x
     -30,                     !- Minimum Value of y
@@ -14385,12 +14396,12 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
 
   Curve:Biquadratic,
     MinSpdPower,             !- Name
-    1248.8,                  !- Coefficient1 Constant
-    -2.4353,                 !- Coefficient2 x
-    0.98357,                 !- Coefficient3 x**2
-    -0.48029,                !- Coefficient4 y
-    -0.11501,                !- Coefficient5 y**2
-    -0.14783,                !- Coefficient6 x*y
+    8.79E-02 ,               !- Coefficient1 Constant
+    -1.72E-04,               !- Coefficient2 x
+    6.93E-05 ,               !- Coefficient3 x**2
+    -3.38E-05,               !- Coefficient4 y
+    -8.10E-06,               !- Coefficient5 y**2
+    -1.04E-05,               !- Coefficient6 x*y
     15,                      !- Minimum Value of x
     65,                      !- Maximum Value of x
     -30,                     !- Minimum Value of y
@@ -14403,12 +14414,12 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
 
   Curve:Biquadratic,
     Spd1Cooling,             !- Name
-    33530.2468,              !- Coefficient1 Constant
-    -174.7425,               !- Coefficient2 x
-    -1.6964,                 !- Coefficient3 x**2
-    1225.2755,               !- Coefficient4 y
-    11.0102,                 !- Coefficient5 y**2
-    -9.1925,                 !- Coefficient6 x*y
+    8.12E-01 ,               !- Coefficient1 Constant
+    -4.23E-03,               !- Coefficient2 x
+    -4.11E-05,               !- Coefficient3 x**2
+    2.97E-02 ,               !- Coefficient4 y
+    2.67E-04 ,               !- Coefficient5 y**2
+    -2.23E-04,               !- Coefficient6 x*y
     15,                      !- Minimum Value of x
     65,                      !- Maximum Value of x
     -30,                     !- Minimum Value of y
@@ -14421,12 +14432,12 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
 
   Curve:Biquadratic,
     Spd1Power,               !- Name
-    4628.1,                  !- Coefficient1 Constant
-    -31.3,                   !- Coefficient2 x
-    2.0107,                  !- Coefficient3 x**2
-    40.109,                  !- Coefficient4 y
-    0.40639,                 !- Coefficient5 y**2
-    -0.49656,                !- Coefficient6 x*y
+    3.26E-01 ,               !- Coefficient1 Constant
+    -2.20E-03,               !- Coefficient2 x
+    1.42E-04 ,               !- Coefficient3 x**2
+    2.82E-03 ,               !- Coefficient4 y
+    2.86E-05 ,               !- Coefficient5 y**2
+    -3.50E-05,               !- Coefficient6 x*y
     15,                      !- Minimum Value of x
     65,                      !- Maximum Value of x
     -30,                     !- Minimum Value of y
@@ -14439,12 +14450,12 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
 
   Curve:Biquadratic,
     Spd2Cooling,             !- Name
-    54394.4436,              !- Coefficient1 Constant
-    -255.855,                !- Coefficient2 x
-    -2.934,                  !- Coefficient3 x**2
-    2020.7951,               !- Coefficient4 y
-    18.9596,                 !- Coefficient5 y**2
-    -15.1444,                !- Coefficient6 x*y
+    1.32E+00 ,               !- Coefficient1 Constant
+    -6.20E-03,               !- Coefficient2 x
+    -7.10E-05,               !- Coefficient3 x**2
+    4.89E-02 ,               !- Coefficient4 y
+    4.59E-04 ,               !- Coefficient5 y**2
+    -3.67E-04,               !- Coefficient6 x*y
     15,                      !- Minimum Value of x
     65,                      !- Maximum Value of x
     -30,                     !- Minimum Value of y
@@ -14457,12 +14468,12 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
 
   Curve:Biquadratic,
     Spd2Power,               !- Name
-    9315.6,                  !- Coefficient1 Constant
-    -52.674,                 !- Coefficient2 x
-    2.9405,                  !- Coefficient3 x**2
-    149.53,                  !- Coefficient4 y
-    1.0457,                  !- Coefficient5 y**2
-    -2.2269,                 !- Coefficient6 x*y
+    6.56E-01 ,               !- Coefficient1 Constant
+    -3.71E-03,               !- Coefficient2 x
+    2.07E-04 ,               !- Coefficient3 x**2
+    1.05E-02 ,               !- Coefficient4 y
+    7.36E-05 ,               !- Coefficient5 y**2
+    -1.57E-04,               !- Coefficient6 x*y
     15,                      !- Minimum Value of x
     65,                      !- Maximum Value of x
     -30,                     !- Minimum Value of y

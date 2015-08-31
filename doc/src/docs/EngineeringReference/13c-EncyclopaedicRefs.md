@@ -5465,7 +5465,7 @@ Where
 
 <span>$G_{a,rate}$</span>	volumetric flow rate of the air through the indoor unit, at the rated conditions (m<sup>3</sup>/s)
 
-<span>$Q_{fan}$</span>	sensible heat released by fan (kW)
+<span>$Q_{fan}$</span>	sensible heat released by fan (W)
 
 <span>$T_{coil,in}$</span>	temperature of air entering the indoor coil (°C)
 
@@ -5565,7 +5565,7 @@ Where
 
 <span>$G_i$</span>   	refrigerant flow rate for the i<sup>th</sup> indoor unit (kg/s) 
 
-<span>$Q_i$</span>   	total cooling load of the i<sup>th</sup> zone (kW) 
+<span>$Q_i$</span>   	total cooling load of the i<sup>th</sup> zone (W) 
 
 <span>$h_{Hexin}$</span>	enthalpy of the refrigerant entering the indoor unit (kJ/kg)
 
@@ -5681,7 +5681,7 @@ Where
 
 <span>$f_{g\_\lambda}$</span>	functions calculating the conductivity of superheating refrigerant 
 
-<span>$Q_{pipe}$</span> 	heat loss through the pipe (kW)
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
 
 <span>$T_a$</span> 	average of outdoor air temperature and indoor temperature (°C)
 
@@ -5707,11 +5707,11 @@ For the first iteration,
 
 Where
 
-<span>$N_{comp}$</span>	compressor power (kW)
+<span>$N_{comp}$</span>	compressor power (W)
 
-<span>$N'_{comp}$</span>	assumed compressor power for the first iteration (kW)
+<span>$N'_{comp}$</span>	assumed compressor power for the first iteration (W)
 
-<span>$Q_{in,total,i}$</span>	total cooling load for zone <span>$i$</span> (kW)
+<span>$Q_{in,total,i}$</span>	total cooling load for zone <span>$i$</span> (W)
 
 For the following iterations,
 
@@ -5725,9 +5725,9 @@ The heat rate released from the outdoor unit can be calculated by:
 
 Where
 
-<span>$Q_{out}$</span>	heat rate released from the outdoor unit (kW)
+<span>$Q_{out}$</span>	heat rate released from the outdoor unit (W)
 
-<span>$Q_{pipe}$</span> 	heat loss through the pipe (kW)
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
 
 ##### Step 2c.3: Calculate O/U effective condensing temperature
 
@@ -5781,7 +5781,8 @@ The required Loading Index can be calculated by the following procedures.
 
 a. Calculate the evaporative capacity at a variety of Loading Index:
 
-<div>$$Q_{rps}=C_{cap,system}\times(r_1+r_2T_c+r_3{T_e}'+r_4T_c^2+r_5T_c{T_e}'+r_6{T_e}'^2)$$</div>
+<div>$$M_{cap}=(r_1+r_2T_c+r_3{T_e}'+r_4T_c^2+r_5T_c{T_e}'+r_6{T_e}'^2)$$</div>
+<div>$$Q_{rps}=C_{cap,system} \times M_{cap} \times Q_{ref} $$</div>
 
 Where	
 
@@ -5795,7 +5796,11 @@ Where
 
 <span>$T_c$</span>	effective condensing temperature (°C)
 
-<span>$Q_{rps}$</span>	evaporative capacity corresponding to <span>$rps$</span> (kW) 
+<span>$M_{cap}$</span>	multiplier for the evaporative capacity calculation (--)
+
+<span>$Q_{rps}$</span>	evaporative capacity corresponding to <span>$rps$</span> (W) 
+
+<span>$Q_{ref}$</span>	rated evaporative capacity (W) 
 
 An example of resulting capacity for different <span>$rps$</span> (at <span>$T_c$</span>=36°C and <span>${T_e}'$</span>=9°C) is presented in Table 1.
 
@@ -5841,7 +5846,7 @@ Where
 
 <span>$h_{Compin}$</span>	enthalpy of refrigerant entering the compressor (kJ/kg)
 
-<span>$Q_{pipe}$</span> 	heat loss through the pipe (kW)
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
 
 For example, if the required capacity is 8 kW, the <span>$rps$</span> range is 30 to 36.
 
@@ -5867,7 +5872,8 @@ d. <span>$SH$</span> can be updated based on the updated <span>$T_e$</span>, usi
 
 a. Calculate the compressor power at a variety of loading index using the following equation. The resulting table (Table 2) from the same example used above is shown below. 
 
-<div>$$N_{comp,rps}=c_1+c_2T_c+c_3{T_e}'+c_4T_c^2+c_5T_c{T_e}'+c_6{T_e}'^2$$</div>
+<div>$$M_{comp}=c_1+c_2T_c+c_3{T_e}'+c_4T_c^2+c_5T_c{T_e}'+c_6{T_e}'^2$$</div>
+<div>$$N_{comp,rps}=M_{comp} \times N_{comp,ref}$$</div>
 
 Where	
 
@@ -5877,7 +5883,11 @@ Where
 
 <span>$T_c$</span>		effective condensing temperature (°C)
 
-<span>$N_{comp,rps}$</span>	compressor power corresponding to <span>$rps$</span> (kW)
+<span>$M_{comp}$</span>		multiplier for the compressor power calculation (--)
+
+<span>$N_{comp,ref}$</span>	rated compressor power  (W)
+
+<span>$N_{comp,rps}$</span>	compressor power corresponding to <span>$rps$</span> (W)
 
 Table 2 – Outdoor unit compressor power at different Loading Index 
 
@@ -5907,9 +5917,9 @@ Where
 
 <span>$e_{inv}$</span>	efficiency of the inverter of compressor  
 
-<span>$N_{fan}$</span>	electric power consumption by the outdoor fan (kW)
+<span>$N_{fan}$</span>	electric power consumption by the outdoor fan (W)
 
-<span>$N_{out}$</span>	total electric power consumption by the outdoor unit (kW)
+<span>$N_{out}$</span>	total electric power consumption by the outdoor unit (W)
 
 #### *Modeling of the outdoor unit (O/U) - Heating Mode*
 
@@ -5925,7 +5935,7 @@ Where
 
 <span>$G_i$</span>   	refrigerant flow rate for the i<sup>th</sup> indoor unit (kg/s) 
 
-<span>$Q_i$</span>   	total cooling load of the i<sup>th</sup> zone (kW) 
+<span>$Q_i$</span>   	total heating load of the i<sup>th</sup> zone (W) 
 
 <span>$h_{Hexin}$</span>	enthalpy of the refrigerant entering the indoor unit (kJ/kg)
 
@@ -6063,7 +6073,7 @@ Where
 
 <span>$f_{g\_\lambda}$</span>	functions calculating the conductivity of superheating refrigerant 
 
-<span>$Q_{pipe}$</span> 	heat loss through the pipe (kW)
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
 
 <span>$T_a$</span> 	average of outdoor air temperature and indoor temperature (°C)
 
@@ -6103,11 +6113,11 @@ For the first iteration,
 
 Where
 
-<span>$N_{comp}$</span>	compressor power (kW)
+<span>$N_{comp}$</span>	compressor power (W)
 
-<span>$N'_{comp}$</span>	assumed compressor power for the first iteration (kW)
+<span>$N'_{comp}$</span>	assumed compressor power for the first iteration (W)
 
-<span>$Q_{in,total,i}$</span>	total cooling load for zone <span>$i$</span> (kW)
+<span>$Q_{in,total,i}$</span>	total heating load for zone <span>$i$</span> (W)
 
 For the following iterations,
 
@@ -6121,9 +6131,9 @@ Calculate the heat rate extracted by the outdoor unit by:
 
 Where
 
-<span>$Q_{out}$</span>	heat rate extracted by the outdoor unit (kW)
+<span>$Q_{out}$</span>	heat rate extracted by the outdoor unit (W)
 
-<span>$Q_{pipe}$</span> 	heat loss through the pipe (kW)
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
 
 ##### Step 2h.3: Calculate O/U effective evaporating temperature
 
@@ -6163,11 +6173,11 @@ Where
 
 <span>${A_c}'$</span>,<span>${B_c}'$</span>,<span>${C_c}'$</span>   	coefficients (°C)
 
-<span>$SH$</span> 		superheating degrees for the outdoor unit (°C)
+<span>$SH$</span>			superheating degrees for the outdoor unit (°C)
 
-<span>$SH_{ref}$</span> 		reference superheating degrees for the outdoor unit (°C)
+<span>$SH_{ref}$</span>	reference superheating degrees for the outdoor unit (°C)
 
-<span>$Te_{req}$</span>		required evaporating temperature for the outdoor unit (°C)
+<span>$Te_{req}$</span>	required evaporating temperature for the outdoor unit (°C)
 
 <span>$Te$</span>		effective evaporating temperature (°C)
 
@@ -6177,7 +6187,8 @@ Calculate the required compressor Loading Index by the following procedures.
 
 a. Calculate the evaporative capacity at a variety of speeds:
 
-<div>$$Q_{rps}=C_{cap,system}\times(r_1+r_2{T_c}'+r_3T_e+r_4{T_c}'^2+r_5{T_c}'T_e+r_6T_e^2)$$</div>
+<div>$$M_{cap}=C_{cap,system}\times(r_1+r_2{T_c}'+r_3T_e+r_4{T_c}'^2+r_5{T_c}'T_e+r_6T_e^2)$$</div>
+<div>$$Q_{rps}=C_{cap,system} \times M_{cap} \times Q_{ref}$$</div>
 
 Where	
 
@@ -6189,9 +6200,13 @@ Where
 
 <span>$T_e$</span>   	effective evaporating temperature (°C)
 
+<span>$M_{cap}$</span>	multiplier for the evaporative capacity calculation (--)
+
 <span>${T_c}'$</span>	discharge saturated temperature at the compressor outlet (°C)
 
-<span>$Q_{rps}$</span>	evaporative capacity corresponding to <span>$rps$</span> (kW) 
+<span>$Q_{rps}$</span>	evaporative capacity corresponding to <span>$rps$</span> (W) 
+
+<span>$Q_{ref}$</span>	rated evaporative capacity (W) 
 
 An example of resulting capacity for different <span>$rps$</span> (at <span>${T_c}'$</span>=36°C and <span>$T_e$</span>=9°C) is presented in Table 3.
 
@@ -6229,7 +6244,7 @@ Where
 
 <span>$h_{Compin,real}$</span>	enthalpy of refrigerant entering the compressor at real conditions (It corresponds to <span>$SH$</span> and <span>$Te$</span> at real conditions) (kJ/kg)
 
-<span>$Q_{pipe}$</span> 	heat loss through the pipe (kW)
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
 
 For example, if the required capacity is 8 kW, the <span>$rps$</span> range is 30 to 36 <span>$rps$</span> based on Table 3.
 
@@ -6255,7 +6270,8 @@ It should be noted that, different from the corresponding step in the cooling mo
 
 a. Calculate the compressor power at a variety of Loading Index using the following equation. The resulting table (Table 4) from the same example is shown below.
 
-<div>$$N_{comp,rps}=c_1+c_2{T_c}'+c_3T_e+c_4{T_c}'^2+c_5{T_c}'T_e+c_6T_e^2$$</div>
+<div>$$M_{comp}=c_1+c_2{T_c}'+c_3T_e+c_4{T_c}'^2+c_5{T_c}'T_e+c_6T_e^2$$</div>
+<div>$$N_{comp,rps}=M_{comp} \times N_{comp,ref}$$</div>
 
 Where
 
@@ -6269,7 +6285,11 @@ Where
 
 <span>$T_{c,ref}$</span>		reference condensing temperature (°C) 
 
-<span>$N_{comp,rps}$</span>	compressor power corresponding to rps (kW) 
+<span>$M_{comp}$</span>		multiplier for the compressor power calculation (--)
+
+<span>$N_{comp,ref}$</span>	rated compressor power  (W)
+
+<span>$N_{comp,rps}$</span>	compressor power corresponding to <span>$rps$</span> (W)
 
 Table 4 – Outdoor unit compressor power at different Loading Index 
 
@@ -6325,7 +6345,7 @@ Where
 
 Where
 
-<span>$Q_{in,total}$</span>	total cooling load for the zone (kW)
+<span>$Q_{in,total}$</span>	total cooling load for the zone (W)
 
 <span>$H_{coil,in}$</span>	enthalpy of the entering air of the indoor unit (kJ/kg)
 
@@ -6373,7 +6393,7 @@ Where
 
 Where
 
-<span>$Q_{in,total}$</span>	total cooling load for the zone (kW)
+<span>$Q_{in,total}$</span>	total heating load for the zone (W)
 
 <span>$T_{coil,in}$</span>	temperature of the entering air of the indoor unit (°C)
 

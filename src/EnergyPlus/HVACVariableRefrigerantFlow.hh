@@ -299,6 +299,8 @@ namespace HVACVariableRefrigerantFlow {
 		
 		//The following are for the Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
 		std::string RefrigerantName; // Name of refrigerant, must match name in FluidName (see fluidpropertiesrefdata.idf)
+		Real64 RatedEvapCapacity; // Rated Evaporative Capacity [W]
+		Real64 RatedCompPower; // Rated Evaporative Capacity [W]
 		Real64 CondensingTemp; // VRV system outdoor unit condensing temperature [C]
 		Real64 EvaporatingTemp; // VRV system outdoor unit evaporating temperature [C]
 		Real64 IUEvaporatingTemp; // VRV system indoor unit evaporating temperature, min among all indoor units [C]
@@ -502,6 +504,8 @@ namespace HVACVariableRefrigerantFlow {
 			EMSOverrideHPOperatingMode( false ),
 			EMSValueForHPOperatingMode( 0.0 ),
 			HPOperatingModeErrorIndex( 0 ),
+			RatedEvapCapacity( 40000.0 ),
+			RatedCompPower( 14000.0 ),
 			CondensingTemp( 44.0 ),
 			EvaporatingTemp( 6.0 ),
 			IUEvaporatingTemp( 6.0 ), 
@@ -707,6 +711,8 @@ namespace HVACVariableRefrigerantFlow {
 			Real64 const EMSValueForHPOperatingMode,
 			int const HPOperatingModeErrorIndex,
 			std::string const RefrigerantName, 
+			Real64 const RatedEvapCapacity,           
+			Real64 const RatedCompPower,           
 			Real64 const CondensingTemp,           	
 			Real64 const EvaporatingTemp,          	
 			Real64 const IUEvaporatingTemp,       	
@@ -912,6 +918,8 @@ namespace HVACVariableRefrigerantFlow {
 			EMSValueForHPOperatingMode( EMSValueForHPOperatingMode ),
 			HPOperatingModeErrorIndex( HPOperatingModeErrorIndex ),
 			RefrigerantName( RefrigerantName ),
+			RatedEvapCapacity( RatedEvapCapacity ),     
+			RatedCompPower( RatedCompPower ),     
 			CondensingTemp( CondensingTemp ),           	
 			EvaporatingTemp( EvaporatingTemp ),          	
 			IUEvaporatingTemp( IUEvaporatingTemp ),       	
