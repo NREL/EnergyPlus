@@ -14361,8 +14361,8 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     15,                      !- Maximum Value of x    
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless;           !- Output Unit Type
+    Temperature,             !- Input Unit Type for X
+    Temperature;             !- Output Unit Type
 
   Curve:Quadratic,
     OUCondTempCurve,         !- Name
@@ -14373,8 +14373,8 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     20,                      !- Maximum Value of x    
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless;           !- Output Unit Type
+    Temperature,             !- Input Unit Type for X
+    Temperature;             !- Output Unit Type
 	
   Curve:Biquadratic,
     MinSpdCooling,           !- Name
@@ -14390,8 +14390,8 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     15,                      !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless,           !- Input Unit Type for Y
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
   Curve:Biquadratic,
@@ -14408,10 +14408,10 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     15,                      !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless,           !- Input Unit Type for Y
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
-
+	
   Curve:Biquadratic,
     Spd1Cooling,             !- Name
     8.12E-01 ,               !- Coefficient1 Constant
@@ -14426,8 +14426,8 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     15,                      !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless,           !- Input Unit Type for Y
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
   Curve:Biquadratic,
@@ -14444,8 +14444,8 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     15,                      !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless,           !- Input Unit Type for Y
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
   Curve:Biquadratic,
@@ -14462,8 +14462,8 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     15,                      !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless,           !- Input Unit Type for Y
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
   Curve:Biquadratic,
@@ -14480,8 +14480,8 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     15,                      !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless,           !- Input Unit Type for Y
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 	
 ```

@@ -4341,8 +4341,8 @@ Following is an example input for a Coil:Cooling:DX:VariableRefrigerantFlow:Flui
     15,                      !- Maximum Value of x    
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless;           !- Output Unit Type
+    Temperature,             !- Input Unit Type for X
+    Temperature;             !- Output Unit Type
 
 ```
 
@@ -4472,8 +4472,8 @@ Following is an example input for a Coil:Heating:DX:VariableRefrigerantFlow:Flui
     20,                      !- Maximum Value of x    
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless;           !- Output Unit Type
+    Temperature,             !- Input Unit Type for X
+    Temperature;             !- Output Unit Type
 
 ```
 

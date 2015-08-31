@@ -173,8 +173,8 @@
     15,                      !- Maximum Value of x    
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless;           !- Output Unit Type
+    Temperature,             !- Input Unit Type for X
+    Temperature;             !- Output Unit Type
 
   Curve:Quadratic,
     OUCondTempCurve,         !- Name
@@ -185,8 +185,8 @@
     20,                      !- Maximum Value of x    
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless;           !- Output Unit Type
+    Temperature,             !- Input Unit Type for X
+    Temperature;             !- Output Unit Type
 	
   Curve:Biquadratic,
     MinSpdCooling,           !- Name
@@ -202,8 +202,8 @@
     15,                      !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless,           !- Input Unit Type for Y
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
   Curve:Biquadratic,
@@ -220,10 +220,10 @@
     15,                      !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless,           !- Input Unit Type for Y
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
-
+	
   Curve:Biquadratic,
     Spd1Cooling,             !- Name
     8.12E-01 ,               !- Coefficient1 Constant
@@ -238,8 +238,8 @@
     15,                      !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless,           !- Input Unit Type for Y
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
   Curve:Biquadratic,
@@ -256,8 +256,8 @@
     15,                      !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless,           !- Input Unit Type for Y
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
   Curve:Biquadratic,
@@ -274,8 +274,8 @@
     15,                      !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless,           !- Input Unit Type for Y
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
   Curve:Biquadratic,
@@ -292,8 +292,8 @@
     15,                      !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless,           !- Input Unit Type for Y
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 	
 	
@@ -644,8 +644,8 @@
     15,                      !- Maximum Value of x    
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless;           !- Output Unit Type
+    Temperature,             !- Input Unit Type for X
+    Temperature;             !- Output Unit Type
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW ===========
 
@@ -703,8 +703,8 @@
     20,                      !- Maximum Value of x    
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
-    Dimensionless,           !- Input Unit Type for X
-    Dimensionless;           !- Output Unit Type
+    Temperature,             !- Input Unit Type for X
+    Temperature;             !- Output Unit Type
 
   Schedule:Compact,
     VRFAvailSched,           !- Name
