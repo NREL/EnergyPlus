@@ -917,7 +917,7 @@ namespace AirflowNetworkBalanceManager {
 				if ( SameString( MultizoneZoneData( i ).VentControl, "NoVent" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_Novent;
 
 				if ( MultizoneZoneData( i ).VentCtrNum < 4 ) {
-					if ( NumAlphas == 4 && ( ! lAlphaBlanks( 4 ) ) ) {
+					if ( NumAlphas >= 4 && ( ! lAlphaBlanks( 4 ) ) ) {
 						MultizoneZoneData( i ).VentingSchName = Alphas( 4 );
 						MultizoneZoneData( i ).VentingSchNum = GetScheduleIndex( MultizoneZoneData( i ).VentingSchName );
 						if ( MultizoneZoneData( i ).VentingSchNum == 0 ) {
