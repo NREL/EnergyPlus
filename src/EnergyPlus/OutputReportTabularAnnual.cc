@@ -44,8 +44,6 @@ namespace EnergyPlus {
 
 			static std::string const currentModuleObject( "Output:Table:Annual" );
 
-			int curTable; // index of the current table being processed in MonthlyInput
-			int curAggType; // kind of aggregation identified (see AggType parameters)
 			std::string curAggString; // Current aggregation sting
 			int jAlpha;
 			int numParams; // Number of elements combined
@@ -54,7 +52,7 @@ namespace EnergyPlus {
 			Array1D_string alphArray; // character string data
 			Array1D< Real64 > numArray; // numeric data
 			int IOStat; // IO Status when calling get input subroutine
-			static bool ErrorsFound( false );
+			// static bool ErrorsFound( false );
 			int objCount( 0 );
 			int indexNums( 0 );
 			std::string curVarMtr( "" );
@@ -112,7 +110,7 @@ namespace EnergyPlus {
 		{
 			m_annualFields.push_back(AnnualFieldSet(varName,aggKind, dgts)  );
 			m_annualFields.back().m_colHead = InputProcessor::deAllCaps(varName); // use the variable name for the column heading
-		};
+		}
 
 		void
 		AnnualTable::addFieldSet( std::string varName, std::string colName, AnnualFieldSet::AggregationKind aggKind, int dgts )
@@ -121,7 +119,7 @@ namespace EnergyPlus {
 		{
 			m_annualFields.push_back( AnnualFieldSet( varName, aggKind, dgts ) );
 			m_annualFields.back().m_colHead = colName; // use the user supplied column heading instead of just the variable name
-		};
+		}
 
 
 		void
@@ -141,7 +139,7 @@ namespace EnergyPlus {
 
 			std::vector<AnnualFieldSet>::iterator fldStIt;
 			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ )
-			{
+				{
 				keyCount = fldStIt->getVariableKeyCountandTypeFromFldSt( typeVar, avgSumVar, stepTypeVar, unitsVar );
 				fldStIt->getVariableKeysFromFldSt( typeVar, keyCount, fldStIt->m_namesOfKeys, fldStIt->m_indexesForKeyVar );
 				for ( std::string nm : fldStIt->m_namesOfKeys ){
@@ -204,7 +202,8 @@ namespace EnergyPlus {
 		{
 			// Jason Glazer, August 2015
 			// For each cell of the table, gather the value as indicated by the type of aggregation
-			int const isAverage( 1 );
+
+			// int const isAverage( 1 );
 			int const isSum( 2 );
 			int timestepTimeStamp;
 			Real64 elapsedTime = AnnualTable::getElapsedTime( kindOfTimeStep );
@@ -224,7 +223,7 @@ namespace EnergyPlus {
 							Real64 curValue = GetInternalVariableValue( curTypeOfVar, curVarNum );
 							// Get the value from the result array
 							Real64 oldResultValue = fldStIt->m_cell[row].result;
-							int oldTimeStamp = fldStIt->m_cell[row].timeStamp;
+							//int oldTimeStamp = fldStIt->m_cell[row].timeStamp;
 							Real64 oldDuration = fldStIt->m_cell[row].duration;
 							// Zero the revised values (as default if not set later)
 							Real64 newResultValue = 0.0;
@@ -384,7 +383,7 @@ namespace EnergyPlus {
 									else if ( fldStRemainIt->m_aggregate == AnnualFieldSet::AggregationKind::valueWhenMaxMin ) {
 										// this case is when the value should be set
 										int scanTypeOfVar = fldStRemainIt->m_typeOfVar;
-										int scanStepType = fldStRemainIt->m_varStepType;
+										//int scanStepType = fldStRemainIt->m_varStepType;
 										int scanVarNum = fldStRemainIt->m_cell[row].indexesForKeyVar;
 										if ( scanVarNum > 0 ){
 											Real64 scanValue = GetInternalVariableValue( scanTypeOfVar, scanVarNum );
@@ -404,7 +403,7 @@ namespace EnergyPlus {
 							if ( activeHoursShown ) {
 								for ( fldStRemainIt = fldStIt + 1; fldStRemainIt != m_annualFields.end(); fldStRemainIt++ ) {
 									int scanTypeOfVar = fldStRemainIt->m_typeOfVar;
-									int scanStepType = fldStRemainIt->m_varStepType;
+									//int scanStepType = fldStRemainIt->m_varStepType;
 									int scanVarNum = fldStRemainIt->m_cell[row].indexesForKeyVar;
 									Real64 oldScanValue = fldStRemainIt->m_cell[row].result;
 									if ( scanVarNum > 0 ){
@@ -553,7 +552,7 @@ namespace EnergyPlus {
 			int rowMax = m_objectNames.size() + 4;
 
 			rowHead.allocate( rowCount );
-			for ( int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
+			for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
 				rowHead(row + 1) = m_objectNames[row];
 			}
 			rowHead( rowSumAvg ) = "Annual Sum or Average";
@@ -597,7 +596,7 @@ namespace EnergyPlus {
 					minVal = storedMaxVal;
 					maxVal = storedMinVal;
 
-					for ( int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
+					for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
 						if ( fldStIt->m_cell[row].indexesForKeyVar >= 0 ){
 							if ( fldStIt->m_varAvgSum == isAverage ) { // if it is a average variable divide by duration
 								if ( fldStIt->m_cell[row].duration != 0.0 ) {
@@ -649,7 +648,7 @@ namespace EnergyPlus {
 					sumVal = 0.0;
 					minVal = storedMaxVal;
 					maxVal = storedMinVal;
-					for ( int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
+					for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
 						curVal = fldStIt->m_cell[row].result;
 						tableBody( columnRecount, row + 1 ) = OutputReportTabular::RealToStr( curVal, fldStIt->m_showDigits );
 						sumVal += curVal;
@@ -673,7 +672,7 @@ namespace EnergyPlus {
 					columnHead( columnRecount ) = fldStIt->m_colHead + curAggString + " [" + curUnits + ']';
 					minVal = storedMaxVal;
 					maxVal = storedMinVal;
-					for ( int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
+					for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
 						curVal = fldStIt->m_cell[row].result;
 						tableBody( columnRecount, row + 1 ) = OutputReportTabular::RealToStr( curVal, fldStIt->m_showDigits );
 						if ( curVal > maxVal ) maxVal = curVal;
@@ -698,7 +697,7 @@ namespace EnergyPlus {
 					columnHead( columnRecount ) = fldStIt->m_colHead + " {TIMESTAMP} ";
 					minVal = storedMaxVal;
 					maxVal = storedMinVal;
-					for ( int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
+					for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
 						curVal = fldStIt->m_cell[row].result;
 						//CR7788 the conversion factors were causing an overflow for the InchPound case since the
 						//value was very small

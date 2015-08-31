@@ -140,7 +140,7 @@ private:
 
 }; // class AnnualTable
 
-}; // namespace OutputReportTabularAnnual
+} // namespace OutputReportTabularAnnual
 
 } // EnergyPlus
 

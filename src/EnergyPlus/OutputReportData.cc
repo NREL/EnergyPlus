@@ -23,7 +23,7 @@ namespace EnergyPlus {
 		m_variMeter = varName;
 		m_aggregate = kindOfAggregation;
 		m_showDigits = numDigitsShown;
-	};
+	}
 
 	int
 	AnnualFieldSet::getVariableKeyCountandTypeFromFldSt( int &typeVar, int &avgSumVar, int &stepTypeVar, std::string &unitsVar )
@@ -31,7 +31,7 @@ namespace EnergyPlus {
 		int numkeys;
 		GetVariableKeyCountandType( m_variMeter, numkeys, typeVar, avgSumVar, stepTypeVar, unitsVar );  //call outputprocessor routine with member variable
 		return numkeys;
-	};
+	}
 
 	void
 	AnnualFieldSet::getVariableKeysFromFldSt( int &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int>  &indexesForKeyVar )
@@ -48,7 +48,7 @@ namespace EnergyPlus {
 			namesOfKeys.push_back( tempNamesOfKeys( iKey ) );
 			indexesForKeyVar.push_back( tempIndexesForKeyVar( iKey ) );
 		}
-	};
+	}
 
 
 
