@@ -31653,7 +31653,8 @@ ZoneControl:ContaminantController,
        \note Schedule values should be carbon dioxide concentration in parts per
        \note million (ppm)
        \note This field is used when the field System Outdoor Air Method =
-       \note ProportionalControl in Controller:MechanicalVentilation
+       \note ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy
+       \note in Controller:MechanicalVentilation
   A6 , \field Generic Contaminant Control Availability Schedule Name
        \note Availability schedule name for generic contaminant controller. Schedule value > 0 means
        \note the generic contaminant controller is enabled. If this field is blank, then generic
@@ -53265,7 +53266,8 @@ Controller:MechanicalVentilation,
         \key ZoneSum
         \key VentilationRateProcedure
         \key IndoorAirQualityProcedure
-        \key ProportionalControl
+        \key ProportionalControlBasedOnDesignOccupancy
+        \key ProportionalControlBasedonOccupancySchedule
         \key IndoorAirQualityProcedureGenericContaminant
         \default VentilationRateProcedure
    N1,  \field Zone Maximum Outdoor Air Fraction
