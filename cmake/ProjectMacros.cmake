@@ -93,6 +93,13 @@ endmacro()
 # Create test targets
 macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
   if( BUILD_TESTING )
+
+    IF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
+      # Disabled Warnings:
+      # 1684 conversion from pointer to same-sized integral type (potential portability problem) - Due to gtest...
+      ADD_CXX_DEFINITIONS("-diag-disable:1684")
+    endif ()
+
     add_executable( ${BASE_NAME}_tests ${SRC} )
 
     if( ENABLE_GTEST_DEBUG_MODE )
