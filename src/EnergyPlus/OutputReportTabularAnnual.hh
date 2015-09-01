@@ -137,6 +137,21 @@ private:
 	void
 	fixUnitsPerSecond( std::string & unitString, Real64 & conversionFactor );
 
+	bool
+	allRowsSameSizeDefferedVectors( std::vector<AnnualFieldSet>::iterator fldStIt );
+
+	void
+	convertUnitForDeferredResults( std::vector<AnnualFieldSet>::iterator fldStIt, int const unitsStyle );
+
+	std::vector<Real64>
+	calculateBins( int const numberOfBins, 
+		               std::vector<Real64> const valuesToBin,
+					   std::vector<Real64> const corrElapsedTime, 
+					   Real64 const topOfBins, 
+					   Real64 const bottomOfBins, 
+					   Real64 & timeAboveTopBin, 
+					   Real64 & timeBelowBottomBin );
+
 
 }; // class AnnualTable
 

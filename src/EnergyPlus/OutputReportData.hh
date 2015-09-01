@@ -54,7 +54,9 @@ namespace EnergyPlus {
 			m_varUnits(""),
 			m_typeOfVar(0),
 			m_keyCount(0),
-			m_varAvgSum(0)
+			m_varAvgSum(0),
+			m_topBinValue(0),
+			m_bottomBinValue(0)
 		{}
 
 		// constructor
@@ -66,7 +68,11 @@ namespace EnergyPlus {
 			Real64 result; // annual results
 			Real64 duration; // the time during which results are summed for use in averages
 			int timeStamp; // encoded timestamp of max or min
-			std::vector<Real64> deferedResults; //used for the binned cases when size of bins is being calculated later
+			std::vector<Real64> deferredResults; //used for the binned cases when size of bins is being calculated later
+			std::vector<Real64> deferredElapsed; //the elapsed time for each result 
+			Real64 m_timeAboveTopBin;
+			Real64 m_timeBelowBottomBin;
+			std::vector<Real64> m_timeInBin; // amount of time in each bin (usually 10 bins)
 		};
 
 		int
@@ -87,7 +93,11 @@ namespace EnergyPlus {
 		std::vector <std::string> m_namesOfKeys; // stored version of name of keys from getVariableKeys
 		std::vector <int> m_indexesForKeyVar; // stored version of name of keys from getVariableKeys
 		std::vector<AnnualCell> m_cell; // for each row contains the results and details for one cell of the table
-
+		Real64 m_bottomBinValue; // the bottom of the binning for a column
+		Real64 m_topBinValue; // the top of the binning for a column
+		Real64 m_timeAboveTopBinTotal;
+		Real64 m_timeBelowBottomBinTotal;
+		std::vector<Real64> m_timeInBinTotal; // amount of time in each bin (usually 10 bins)
 	};
 
 } // EnergyPlus

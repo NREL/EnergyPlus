@@ -345,11 +345,12 @@ namespace EnergyPlus {
 							case AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev:
 								//  for all of the binning options add the value to the deferred
 								if ( fldStIt->m_varAvgSum == isSum ) { // if it is a summed variable
-									fldStIt->m_cell[row].deferedResults.push_back( curValue );
+									fldStIt->m_cell[row].deferredResults.push_back( curValue /= secondsInTimeStep ); // divide by time just like max and min
 								}
 								else {
-									fldStIt->m_cell[row].deferedResults.push_back( curValue * elapsedTime ); //for averaging - weight by elapsed time
+									fldStIt->m_cell[row].deferredResults.push_back( curValue ); 
 								}
+								fldStIt->m_cell[row].deferredElapsed.push_back(elapsedTime); //save the amount of time for this particular value
 								newDuration = oldDuration + elapsedTime;
 								break;
 							case AnnualFieldSet::AggregationKind::noAggregation:
@@ -528,12 +529,16 @@ namespace EnergyPlus {
 			Real64 maxVal;
 			Real64 sumVal;
 			Real64 sumDuration;
+			bool createBinRangeTable = false;
 
 			static Real64 const storedMaxVal( std::numeric_limits< Real64 >::max() );
 			static Real64 const storedMinVal( std::numeric_limits< Real64 >::lowest() );
 
 			aggString = setupAggString();
 			Real64 energyUnitsConversionFactor = AnnualTable::setEnergyUnitStringAndFactor( unitsStyle, energyUnitsString );
+
+			// Compute the columns related to the binning schemes
+			computeBinColumns();
 
 			// first loop through and count how many 'columns' are defined
 			// since max and min actually define two columns (the value
@@ -650,6 +655,7 @@ namespace EnergyPlus {
 					maxVal = storedMinVal;
 					for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
 						curVal = fldStIt->m_cell[row].result;
+						curVal = curVal * curConversionFactor + curConversionOffset;
 						tableBody( columnRecount, row + 1 ) = OutputReportTabular::RealToStr( curVal, fldStIt->m_showDigits );
 						sumVal += curVal;
 						if ( curVal > maxVal ) maxVal = curVal;
@@ -674,6 +680,7 @@ namespace EnergyPlus {
 					maxVal = storedMinVal;
 					for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
 						curVal = fldStIt->m_cell[row].result;
+						curVal = curVal * curConversionFactor + curConversionOffset;
 						tableBody( columnRecount, row + 1 ) = OutputReportTabular::RealToStr( curVal, fldStIt->m_showDigits );
 						if ( curVal > maxVal ) maxVal = curVal;
 						if ( curVal < minVal ) minVal = curVal;
@@ -735,8 +742,62 @@ namespace EnergyPlus {
 					}
 				}
 				else if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToMax ){
+					// put in the name of the variable for the column
+					if ( fldStIt->m_varAvgSum == isSum ) { // if it is a summed variable
+						curUnits += "/s";
+					}
+					fixUnitsPerSecond( curUnits, curConversionFactor );
+					for ( int iBin = 0; iBin != 10; iBin++ ){
+						char binIndicator = iBin + 65;
+						columnHead( columnRecount - 9 + iBin) = fldStIt->m_colHead + curAggString + " BIN " + binIndicator; 
+						for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
+							tableBody( columnRecount - 9 + iBin, row + 1) = OutputReportTabular::RealToStr( fldStIt->m_cell[row].m_timeInBin[iBin], fldStIt->m_showDigits);
+						}
+						tableBody( columnRecount - 9 + iBin, rowSumAvg ) = OutputReportTabular::RealToStr( fldStIt->m_timeInBinTotal[iBin], fldStIt->m_showDigits );
+					}
+					createBinRangeTable = true;
 				}
-				else if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsZeroToMax || curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToZero ){
+				else if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsZeroToMax ){
+					// put in the name of the variable for the column
+					if ( fldStIt->m_varAvgSum == isSum ) { // if it is a summed variable
+						curUnits += "/s";
+					}
+					fixUnitsPerSecond( curUnits, curConversionFactor );
+					for ( int iBin = 0; iBin != 10; iBin++ ){
+						char binIndicator = iBin + 65;
+						columnHead( columnRecount - 9 + iBin ) = fldStIt->m_colHead + curAggString + " BIN " + binIndicator;
+						for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
+							tableBody( columnRecount - 9 + iBin, row + 1 ) = OutputReportTabular::RealToStr( fldStIt->m_cell[row].m_timeInBin[iBin], fldStIt->m_showDigits );
+						}
+						tableBody( columnRecount - 9 + iBin, rowSumAvg ) = OutputReportTabular::RealToStr( fldStIt->m_timeInBinTotal[iBin], fldStIt->m_showDigits );
+					}
+					columnHead( columnRecount - 10 ) = fldStIt->m_colHead + curAggString + " LESS THAN BIN A";
+					for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
+						tableBody( columnRecount - 10, row + 1 ) = OutputReportTabular::RealToStr( fldStIt->m_cell[row].m_timeBelowBottomBin, fldStIt->m_showDigits );
+					}
+					tableBody( columnRecount - 10, rowSumAvg ) = OutputReportTabular::RealToStr( fldStIt->m_timeBelowBottomBinTotal, fldStIt->m_showDigits );
+					createBinRangeTable = true;
+				}
+				else if (curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToZero ){
+					// put in the name of the variable for the column
+					if ( fldStIt->m_varAvgSum == isSum ) { // if it is a summed variable
+						curUnits += "/s";
+					}
+					fixUnitsPerSecond( curUnits, curConversionFactor );
+					for ( int iBin = 0; iBin != 10; iBin++ ){
+						char binIndicator = iBin + 65;
+						columnHead( columnRecount - 10 + iBin ) = fldStIt->m_colHead + curAggString + " BIN " + binIndicator;
+						for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
+							tableBody( columnRecount - 10 + iBin, row + 1 ) = OutputReportTabular::RealToStr( fldStIt->m_cell[row].m_timeInBin[iBin], fldStIt->m_showDigits );
+						}
+						tableBody( columnRecount - 10 + iBin, rowSumAvg ) = OutputReportTabular::RealToStr( fldStIt->m_timeInBinTotal[iBin], fldStIt->m_showDigits );
+					}
+					columnHead( columnRecount ) = fldStIt->m_colHead + curAggString + " MORE THAN BIN J";
+					for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
+						tableBody( columnRecount , row + 1 ) = OutputReportTabular::RealToStr( fldStIt->m_cell[row].m_timeAboveTopBin, fldStIt->m_showDigits );
+					}
+					tableBody( columnRecount, rowSumAvg ) = OutputReportTabular::RealToStr( fldStIt->m_timeAboveTopBinTotal, fldStIt->m_showDigits );
+					createBinRangeTable = true;
 				}
 				else if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenPercentBins || curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusTwoStdDev ||
 					curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev ){
@@ -748,7 +809,56 @@ namespace EnergyPlus {
 			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, m_name, "Entire Facility", "Custom Annual Report" );
 			}
+			// for the new binning aggregation types create a second table of the bin ranges
+			if ( createBinRangeTable ){
+				Array1D_string colHeadRange;
+				Array1D_int colWidthRange;
+				Array1D_string rowHeadRange;
+				Array2D_string tableBodyRange;
+				colHeadRange.allocate( 10 );
+				colWidthRange.allocate( 10 );
+				colWidthRange = 14; //array assignment - same for all columns
+				rowHeadRange.allocate( 2 );
+				rowHeadRange( 1 ) = ">=";
+				rowHeadRange( 2 ) = "<";
+				tableBodyRange.allocate( 10, 2 );
+				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+					int curAgg = fldStIt->m_aggregate;
+					if (( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToMax ) ||
+						( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsZeroToMax ) ||
+						( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToZero )){
+						tableBodyRange = ""; //set entire table to blank as default
+						Real64 binBottom = fldStIt->m_bottomBinValue;
+						Real64 binTop = fldStIt->m_topBinValue;
+						Real64 numBins = 10.;
+						Real64 intervalSize = ( binTop - binBottom ) /  numBins;
+						
+						// could not get the following to work using 
+						colHeadRange( 1 ) = "BIN A";
+						colHeadRange( 2 ) = "BIN B";
+						colHeadRange( 3 ) = "BIN C";
+						colHeadRange( 4 ) = "BIN D";
+						colHeadRange( 5 ) = "BIN E";
+						colHeadRange( 6 ) = "BIN F";
+						colHeadRange( 7 ) = "BIN G";
+						colHeadRange( 8 ) = "BIN H";
+						colHeadRange( 9 ) = "BIN I";
+						colHeadRange( 10 ) = "BIN J";
+						for ( int iBin = 0; iBin != 10; iBin++ ){
+							// colHeadRange( iBin + 1 ) = "BIN " + ( char )( iBin + 65 ); // not sure why this does not work
+							tableBodyRange( iBin + 1, 1 ) = OutputReportTabular::RealToStr( binBottom + float(iBin) * intervalSize, fldStIt->m_showDigits );
+							tableBodyRange( iBin + 1, 2 ) = OutputReportTabular::RealToStr( binBottom + float( iBin + 1) * intervalSize, fldStIt->m_showDigits );
+						}
+						OutputReportTabular::WriteSubtitle( "Bin Sizes for: " + fldStIt->m_colHead);
+						OutputReportTabular::WriteTable( tableBodyRange, rowHeadRange, colHeadRange, colWidthRange, true ); //transpose annual XML tables.
+						if ( sqlite ) {
+							sqlite->createSQLiteTabularDataRecords( tableBodyRange, rowHeadRange, colHeadRange,  m_name, "Entire Facility", "Bin Sizes" );
+						}
 
+					}
+
+				}
+			}
 		}
 
 
@@ -767,12 +877,12 @@ namespace EnergyPlus {
 			retStringVec[AnnualFieldSet::AggregationKind::hoursNonPositive] = " HOURS NON-POSITIVE ";
 			retStringVec[AnnualFieldSet::AggregationKind::hoursNegative] = " HOURS NEGATIVE ";
 			retStringVec[AnnualFieldSet::AggregationKind::hoursNonNegative] = " HOURS NON-NEGATIVE ";
-			retStringVec[AnnualFieldSet::AggregationKind::hoursInTenPercentBins] = " HOURS IN TEN PERCENT BINS ";
-			retStringVec[AnnualFieldSet::AggregationKind::hoursInTenBinsMinToMax] = " HOURS IN TEN BINS MIN TO MAX ";
-			retStringVec[AnnualFieldSet::AggregationKind::hoursInTenBinsZeroToMax] = " HOURS IN TEN BINS ZERO TO MAX ";
-			retStringVec[AnnualFieldSet::AggregationKind::hoursInTenBinsMinToZero] = " HOURS IN TEN BINS MIN TO ZERO ";
-			retStringVec[AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusTwoStdDev] = " HOURS IN TEN BINS PLUS OR MINUS TWO STD DEV ";
-			retStringVec[AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev] = " HOURS IN TEN BINS PLUS OR MINUS THREE STD DEV ";
+			retStringVec[AnnualFieldSet::AggregationKind::hoursInTenPercentBins] = " HOURS IN"; // " HOURS IN TEN PERCENT BINS ";
+			retStringVec[AnnualFieldSet::AggregationKind::hoursInTenBinsMinToMax] = " HOURS IN"; // " HOURS IN TEN BINS MIN TO MAX ";
+			retStringVec[AnnualFieldSet::AggregationKind::hoursInTenBinsZeroToMax] = " HOURS IN"; // " HOURS IN TEN BINS ZERO TO MAX ";
+			retStringVec[AnnualFieldSet::AggregationKind::hoursInTenBinsMinToZero] = " HOURS IN"; // " HOURS IN TEN BINS MIN TO ZERO ";
+			retStringVec[AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusTwoStdDev] = " HOURS IN"; // " HOURS IN TEN BINS PLUS OR MINUS TWO STD DEV ";
+			retStringVec[AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev] = " HOURS IN"; // " HOURS IN TEN BINS PLUS OR MINUS THREE STD DEV ";
 			retStringVec[AnnualFieldSet::AggregationKind::noAggregation] = " NO AGGREGATION ";
 			retStringVec[AnnualFieldSet::AggregationKind::sumOrAverageHoursShown] = " FOR HOURS SHOWN ";
 			retStringVec[AnnualFieldSet::AggregationKind::maximumDuringHoursShown] = " MAX FOR HOURS SHOWN ";
@@ -973,6 +1083,173 @@ namespace EnergyPlus {
 		AnnualTable::addTableOfContents( std::ostream & nameOfStream ){
 			nameOfStream << "<p><b>" << m_name << "</b></p> |\n";
 			nameOfStream << "<a href=\"#" << OutputReportTabular::MakeAnchorName( m_name, "Entire Facility" ) << "\">" << "Entire Facility" << "</a>    |   \n";
+		}
+
+		void
+		AnnualTable::computeBinColumns(){
+			std::vector<AnnualFieldSet>::iterator fldStIt;
+			Real64 const veryLarge = 1.0E280;
+			Real64 const verySmall = -1.0E280;
+			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+				int curAgg = fldStIt->m_aggregate;
+				// for columns with binning aggregation types compute the statistics 
+				if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToMax || 
+					curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsZeroToMax || 
+					curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToZero || 
+					curAgg == AnnualFieldSet::AggregationKind::hoursInTenPercentBins || 
+					curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusTwoStdDev ||
+					curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev ){
+					// the size the deferred vectors should be same for all rows
+					if ( allRowsSameSizeDefferedVectors( fldStIt )){
+						convertUnitForDeferredResults( fldStIt, OutputReportTabular::unitsStyle );
+						std::vector<Real64> deferredTotalForColumn;
+						Real64 minVal = veryLarge;
+						Real64 maxVal = verySmall;
+						Real64 sum = 0;
+						Real64 curVal = 0.0;
+						for ( unsigned int jDefRes = 0; jDefRes != fldStIt->m_cell[0].deferredResults.size(); jDefRes++ ){
+							sum = 0;
+							for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
+								curVal = fldStIt->m_cell[row].deferredResults[jDefRes];
+								sum += curVal;
+								if ( curVal > maxVal ){
+									maxVal = curVal;
+								}
+								if ( curVal < minVal ){
+									minVal = curVal;
+								}
+							}
+							deferredTotalForColumn.push_back( sum / float( m_objectNames.size() ) ); // put average value into the total row
+						}
+						if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToMax ){
+							fldStIt->m_topBinValue = maxVal;
+							fldStIt->m_bottomBinValue = minVal;
+						}
+						else if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsZeroToMax ){
+							fldStIt->m_topBinValue = maxVal;
+							fldStIt->m_bottomBinValue = 0.0;
+						}
+						else if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToZero ) {
+							fldStIt->m_topBinValue = 0.0;
+							fldStIt->m_bottomBinValue = minVal;
+						}
+						else if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenPercentBins ) {
+							fldStIt->m_topBinValue = 1.0;
+							fldStIt->m_bottomBinValue = 0.0;
+						}
+						else if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusTwoStdDev ) {
+						}
+						else if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev ){
+						}
+						// compute the actual amount of time spent in each bin and above and below 
+						for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
+							fldStIt->m_cell[row].m_timeInBin = calculateBins( 10, fldStIt->m_cell[row].deferredResults, fldStIt->m_cell[row].deferredElapsed, fldStIt->m_topBinValue, fldStIt->m_bottomBinValue, fldStIt->m_cell[row].m_timeAboveTopBin, fldStIt->m_cell[row].m_timeBelowBottomBin);
+						}
+						// do the total row binning
+						fldStIt->m_timeInBinTotal = calculateBins( 10, deferredTotalForColumn, fldStIt->m_cell[0].deferredElapsed, fldStIt->m_topBinValue, fldStIt->m_bottomBinValue, fldStIt->m_timeAboveTopBinTotal, fldStIt->m_timeBelowBottomBinTotal );
+					}
+				}
+			}
+		}
+
+		bool
+		AnnualTable::allRowsSameSizeDefferedVectors( std::vector<AnnualFieldSet>::iterator fldStIt ){
+			bool returnFlag = true;
+			unsigned int sizeOfDeferred = 0;
+			for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
+				if ( sizeOfDeferred == 0 ){
+					sizeOfDeferred = fldStIt->m_cell[row].deferredResults.size();
+				}
+				else {
+					if ( fldStIt->m_cell[row].deferredResults.size() != sizeOfDeferred ){
+						returnFlag = false;
+						return returnFlag;
+					}
+				}
+			}
+			return returnFlag;
+		}
+
+		void
+		AnnualTable::convertUnitForDeferredResults( std::vector<AnnualFieldSet>::iterator fldStIt, int const unitsStyle ){
+			Real64 curConversionFactor;
+			Real64 curConversionOffset;
+			std::string varNameWithUnits;
+			int indexUnitConv;
+			std::string curUnits;
+			std::string energyUnitsString;
+			int const isSum( 2 );
+			Real64 curSI; 
+			Real64 curIP;
+			Real64 energyUnitsConversionFactor = AnnualTable::setEnergyUnitStringAndFactor( unitsStyle, energyUnitsString );
+			//do the unit conversions
+			if ( unitsStyle == OutputReportTabular::unitsStyleInchPound ) {
+				varNameWithUnits = fldStIt->m_variMeter + '[' + fldStIt->m_varUnits + ']';
+				OutputReportTabular::LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
+				OutputReportTabular::GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
+			}
+			else { //just do the Joule conversion
+				//if units is in Joules, convert if specified
+				if ( fldStIt->m_varUnits == "J" ) {
+					curUnits = energyUnitsString;
+					curConversionFactor = energyUnitsConversionFactor;
+					curConversionOffset = 0.0;
+				}
+				else { //if not joules don't perform conversion
+					curUnits = fldStIt->m_varUnits;
+					curConversionFactor = 1.0;
+					curConversionOffset = 0.0;
+				}
+			}
+			if ( fldStIt->m_varAvgSum == isSum ) {
+				curUnits += "/s";
+			}
+			fixUnitsPerSecond( curUnits, curConversionFactor );
+			if ( curConversionFactor != 1.0 || curConversionOffset != 0.0 ){
+				for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
+					for ( unsigned int jDefRes = 0; jDefRes != fldStIt->m_cell[0].deferredResults.size(); jDefRes++ ){
+						curSI = fldStIt->m_cell[row].deferredResults[jDefRes];
+						curIP = curSI * curConversionFactor + curConversionOffset;
+						fldStIt->m_cell[row].deferredResults[jDefRes] = curIP;
+					}
+				}
+			}
+		}
+
+
+		std::vector<Real64>
+		AnnualTable::calculateBins( int const numberOfBins,
+			std::vector<Real64> valuesToBin,
+			std::vector<Real64> corrElapsedTime,
+			Real64 const topOfBins,
+			Real64 const bottomOfBins,
+			Real64 & timeAboveTopBin,
+			Real64 & timeBelowBottomBin )
+		{
+			std::vector<Real64>returnBins(0.0);
+			int binNum = 0;
+			returnBins.resize( numberOfBins );
+			Real64 intervalSize = ( topOfBins - bottomOfBins ) / float( numberOfBins );
+			timeAboveTopBin = 0.0;
+			timeBelowBottomBin = 0.0;
+			std::vector<Real64>::iterator elapsedTimeIt;
+			elapsedTimeIt = corrElapsedTime.begin();
+			std::vector<Real64>::iterator valueIt;
+			for ( valueIt = valuesToBin.begin(); valueIt != valuesToBin.end(); valueIt++ ){
+				if ( *valueIt < bottomOfBins ) {
+					timeBelowBottomBin += *elapsedTimeIt;
+				}
+				else if ( *valueIt >= topOfBins ) {
+					timeAboveTopBin += *elapsedTimeIt;
+				}
+				else {
+					// determine which bin the results are in
+					binNum = int( ( *valueIt - bottomOfBins ) / intervalSize );
+					returnBins[binNum] += *elapsedTimeIt;
+				}
+				elapsedTimeIt++;
+			}
+			return returnBins;
 		}
 
 
