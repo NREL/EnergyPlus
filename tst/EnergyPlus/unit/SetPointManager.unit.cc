@@ -1,5 +1,7 @@
 // EnergyPlus::Standalone ERV Unit Tests
 
+#include <fstream>
+
 // Google Test Headers
 #include <gtest/gtest.h>
 
@@ -302,21 +304,77 @@ TEST_F( EnergyPlusFixture, SetPointManagerDefineCondEntSetPointManager )
 	DataLoopNode::Node(condInletNodeNum).Temp = 10;
 
 	SetPointManager::DefineCondEntSetPointManager thisSPM;
-	thisSPM.MinTwrWbCurve = CurveManager::GetCurveIndex("MinDsnWBCurveName");
-	thisSPM.MinOaWbCurve = CurveManager::GetCurveIndex("MinActWBCurveName");
-	thisSPM.OptCondEntCurve = CurveManager::GetCurveIndex("OptCondEntCurveName");
-	thisSPM.CondEntTempSchedPtr = ScheduleManager::GetScheduleIndex("Condenser Loop Temp Schedule");
+	thisSPM.MinTwrWbCurve = CurveManager::GetCurveIndex("MINDSNWBCURVENAME");
+	thisSPM.MinOaWbCurve = CurveManager::GetCurveIndex("MINACTWBCURVENAME");
+	thisSPM.OptCondEntCurve = CurveManager::GetCurveIndex("OPTCONDENTCURVENAME");
+	thisSPM.CondEntTempSchedPtr = ScheduleManager::GetScheduleIndex("CONDENSER LOOP TEMP SCHEDULE");
 	thisSPM.LoopIndexPlantSide = chwLoopIndex;
 	thisSPM.ChillerIndexPlantSide = chillerBranchChW;
 	thisSPM.BranchIndexPlantSide = chillerCompIndex;
 	thisSPM.LoopIndexDemandSide = condLoopIndex;
 	thisSPM.ChillerIndexDemandSide = chillerBranchCW;
 	thisSPM.BranchIndexDemandSide = chillerCompIndex;
-		
-	// now start hitting all the code paths
-	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
-	DataPlant::PlantLoop(condLoopIndex).LoopSide(demandSide).Branch(chillerBranchCW).Comp(chillerCompIndex).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
+
+	std::ofstream myfile;
+	myfile.open("/tmp/setpoints");
+
+	// First-level switch: load > 0
 	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).MyLoad = 1000;
-	thisSPM.calculate();
-	EXPECT_TRUE(true);  //23, thisSPM.SetPt
+
+		// Second-level switch: Chiller type
+		DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
+		DataPlant::PlantLoop(condLoopIndex).LoopSide(demandSide).Branch(chillerBranchCW).Comp(chillerCompIndex).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
+
+			// Third-level switch: Weighted ratio > 9 && etc...
+			//WEIGHTED_RATIO > 0.9
+				// Now call and check
+				thisSPM.calculate();
+				EXPECT_TRUE(true);  //23, thisSPM.SetPt
+				myfile << thisSPM.SetPt << std::endl;
+
+			// Third-level switch: Weighted ratio < 9 || etc...
+			//WEIGHTED_RATIO > 0.9
+				// Now call and check
+				thisSPM.calculate();
+				EXPECT_TRUE(true);  //23, thisSPM.SetPt
+				myfile << thisSPM.SetPt << std::endl;
+
+		// Second-level switch: Chiller type
+		DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TypeOf_Num = DataPlant::TypeOf_Chiller_Indirect_Absorption;
+		DataPlant::PlantLoop(condLoopIndex).LoopSide(demandSide).Branch(chillerBranchCW).Comp(chillerCompIndex).TypeOf_Num = DataPlant::TypeOf_Chiller_Indirect_Absorption;
+		thisSPM.calculate();
+
+			// Third-level switch: Weighted ratio > 9 && etc...
+			//WEIGHTED_RATIO > 0.9
+				// Now call and check
+				thisSPM.calculate();
+				EXPECT_TRUE(true);  //23, thisSPM.SetPt
+				myfile << thisSPM.SetPt << std::endl;
+
+			// Third-level switch: Weighted ratio < 9 || etc...
+			//WEIGHTED_RATIO > 0.9
+				// Now call and check
+				thisSPM.calculate();
+				EXPECT_TRUE(true);  //23, thisSPM.SetPt
+				myfile << thisSPM.SetPt << std::endl;
+
+	// First-level switch: load <= 0
+	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).MyLoad = 0;
+
+		// Second-level switch never occurs for load <= 0
+
+			// Third-level switch: Weighted ratio > 9 && etc...
+			//WEIGHTED_RATIO > 0.9
+				// Now call and check
+				thisSPM.calculate();
+				EXPECT_TRUE(true);  //23, thisSPM.SetPt
+				myfile << thisSPM.SetPt << std::endl;
+
+			// Third-level switch: Weighted ratio < 9 || etc...
+			//WEIGHTED_RATIO > 0.9
+				// Now call and check
+				thisSPM.calculate();
+				EXPECT_TRUE(true);  //23, thisSPM.SetPt
+				myfile << thisSPM.SetPt << std::endl;
+
 }
