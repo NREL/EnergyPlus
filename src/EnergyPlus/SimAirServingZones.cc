@@ -1959,11 +1959,11 @@ namespace SimAirServingZones {
 
 			} // end loop over outlet branches
 
-			// sum and save the total loop return air mass flow rate
-			AirLoopFlow( AirLoopNum ).TotReturn = 0.0;
-			for ( InBranchNum = 1; InBranchNum <= AirToZoneNodeInfo( AirLoopNum ).NumReturnNodes; ++InBranchNum ) {
-				AirLoopFlow( AirLoopNum ).TotReturn += Node( AirToZoneNodeInfo( AirLoopNum ).AirLoopReturnNodeNum( InBranchNum ) ).MassFlowRate;
-			}
+			// sum and save the total loop return air mass flow rate - not used anywhere else
+			// AirLoopFlow( AirLoopNum ).TotReturn = 0.0;
+			// for ( InBranchNum = 1; InBranchNum <= AirToZoneNodeInfo( AirLoopNum ).NumReturnNodes; ++InBranchNum ) {
+			//	AirLoopFlow( AirLoopNum ).TotReturn += Node( AirToZoneNodeInfo( AirLoopNum ).AirLoopReturnNodeNum( InBranchNum ) ).MassFlowRate;
+			//}
 
 			// [DC/LBNL] Initialize flag for current air loop
 			AirLoopControlInfo( AirLoopNum ).NewFlowRateFlag = false;
