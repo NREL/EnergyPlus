@@ -481,6 +481,16 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   END IF
                 END DO
 
+              CASE('CONTROLLER:MECHANICALVENTILATION')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! assign the entire contents of IN to OUT to start
+                OutArgs=InArgs
+                ! just override a single value
+                IF ( SameString( InArgs(4), "ProportionalControl" ) ) THEN
+                  OutArgs(4) = 'ProportionalControlBasedonOccupancySchedule'
+                END IF
+              
               ! This was actually missed in the 8.1 to 8.2 transition, so it is included here as a redundancy
               CASE('HVACTEMPLATE:PLANT:CHILLEDWATERLOOP')
                 nodiff=.false.

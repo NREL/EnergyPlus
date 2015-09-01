@@ -678,15 +678,15 @@ ZoneAirMassFlowConservation,
        \key No
        \default No
        \note This optional choice input field allows users triggering the zone air mass flow
-       \note balance calculation when desired. This global object has two choice KEYs: “Yes” and
-       \note “No”. If this input field is specified as “Yes”, then EnergyPlus attempts to enforce
-       \note the zone air mass flow conservation, or else if it is specified as “No”, then EnergyPlus
+       \note balance calculation when desired. This global object has two choice KEYs: "Yes" and
+       \note "No". If this input field is specified as "Yes", then EnergyPlus attempts to enforce
+       \note the zone air mass flow conservation, or else if it is specified as "No", then EnergyPlus
        \note calculation defaults to zone air mass flow balance that does not include zone mixing
        \note objects and that assumes self-balanced simple flow objects per the default procedure,
        \note which may not necessarily enforce zone mass conservation unless the user specified
        \note a balanced flow to begin with. Mass conservation is enforced both for the receiving
        \note and source zones if there is at least one mixing object defined. The default input
-       \note is “No”. (Note that “No” input may also results in balanced flow depending on the
+       \note is "No". (Note that "No" input may also results in balanced flow depending on the
        \note system specified).
   A2;  \field Source Zone Infiltration Treatment
        \note This input field allows user to choose how zone infiltration flow is treated during
@@ -695,12 +695,12 @@ ZoneAirMassFlowConservation,
        \key AddInfiltrationFlow
        \key AdjustInfiltrationFlow
        \default AddInfiltrationFlow
-       \note It has two choice KEYs: “AddInfiltrationFlow” and “AdjustInfiltrationFlow”.  If this
-       \note input is specified as “AddInfiltrationFlow”, then energy plus adds infiltration air
+       \note It has two choice KEYs: "AddInfiltrationFlow" and "AdjustInfiltrationFlow".  If this
+       \note input is specified as "AddInfiltrationFlow", then energy plus adds infiltration air
        \note mass flow on top of the base flow, which is calculated using the infiltration object
        \note user inputs, in order to balance the zone air mass flow.  The additional infiltration
        \note air mass flow is not self-balanced.  If this input is specified as
-       \note “AdjustInfiltrationFlow”, then energy plus may adjust the base flow calculated using
+       \note "AdjustInfiltrationFlow", then energy plus may adjust the base flow calculated using
        \note the infiltration object user inputs in order to balance the zone air mass flow. If it
        \note is not required to adjust the base infiltration air flow calculated from the user
        \note specified infiltration object inputs, then the base infiltration air mass flow
@@ -4777,14 +4777,14 @@ WindowMaterial:Glazing,
        \key No
        \key Yes
        \default No
-  N13, \field Young’s modulus
+  N13, \field Young's modulus
        \note coefficient used for deflection calculations. Used only with complex
        \note fenestration when deflection model is set to TemperatureAndPressureInput
        \units Pa
        \type real
        \minimum> 0.0
        \default 7.2e10
-  N14; \field Poisson’s ratio
+  N14; \field Poisson's ratio
        \note coefficient used for deflection calculations. Used only with complex
        \note fenestration when deflection model is set to TemperatureAndPressureInput
        \type real
@@ -6149,7 +6149,7 @@ WindowMaterial:Blind:EquivalentLayer,
   N3 , \field Slat Crown
        \note Perpendicular length between the cord and the curve.
        \note Slat is assumed to be rectangular in cross section
-       \note and flat. Crown=0.0625x“Slat width”
+       \note and flat. Crown=0.0625x"Slat width"
        \type real
        \units m
        \minimum 0
@@ -6648,11 +6648,10 @@ WindowMaterial:Gap:EquivalentLayer,
        \key Sealed
        \key VentedIndoor
        \key VentedOutdoor
-       \reference GapVentTypeName
        \note Sealed means the gap is enclosed and gas tight, i.e., no venting to indoor or
        \note outdoor environment.  VentedIndoor means the gap is vented to indoor environment, and
        \note VentedOutdoor means the gap is vented to the outdoor environment. The gap types
-       \note VentedIndoor and VentedOutdoor are used with gas type “Air” only.
+       \note VentedIndoor and VentedOutdoor are used with gas type "Air" only.
   N2 , \field Conductivity Coefficient A
        \units W/m-K
        \type real
@@ -19943,7 +19942,6 @@ ElectricEquipment:ITE:AirCooled,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference ITEEquipmentNames
   A2 , \field Zone Name
        \required-field
        \type object-list
@@ -23562,7 +23560,6 @@ AirflowNetwork:Distribution:Linkage,
       \required-field
       \type alpha
       \note Enter a unique name for this object.
-      \reference AirflowNetwork LinkageNames
  A2 , \field Node 1 Name
       \required-field
       \type object-list
@@ -26639,7 +26636,7 @@ HVACTemplate:System:VRF,
       \type real
       \units C
       \default 5.0
-      \note Enter the maximum outdoor temperature above which the crankcase heaters are disabled.
+      \note Enter the maximum outdoor temperature above which defrost operation is disabled.
   A9, \field Condenser Type
       \type choice
       \key AirCooled
@@ -31656,7 +31653,8 @@ ZoneControl:ContaminantController,
        \note Schedule values should be carbon dioxide concentration in parts per
        \note million (ppm)
        \note This field is used when the field System Outdoor Air Method =
-       \note ProportionalControl in Controller:MechanicalVentilation
+       \note ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy
+       \note in Controller:MechanicalVentilation
   A6 , \field Generic Contaminant Control Availability Schedule Name
        \note Availability schedule name for generic contaminant controller. Schedule value > 0 means
        \note the generic contaminant controller is enabled. If this field is blank, then generic
@@ -31868,6 +31866,7 @@ ZoneHVAC:FourPipeFanCoil,
         \key CyclingFan
         \key VariableFanVariableFlow
         \key VariableFanConstantFlow
+        \key MultiStageFan
    N1 , \field Maximum Supply Air Flow Rate
         \required-field
         \autosizable
@@ -31913,7 +31912,7 @@ ZoneHVAC:FourPipeFanCoil,
         \note For ConstantFanVariableFlow a Fan:OnOff or Fan:ConstantVolume is valid.
         \note For CyclingFan, a Fan:OnOff is valid.
         \note For VariableFanVariableFlow or VariableFanConstantFlow a Fan:VariableVolume is valid.
-        \note The fan’s inlet node should be the same as the outdoor air mixer’s mixed air node.
+        \note The fan's inlet node should be the same as the outdoor air mixer's mixed air node.
    A10, \field Supply Air Fan Name
         \required-field
         \type object-list
@@ -31966,10 +31965,18 @@ ZoneHVAC:FourPipeFanCoil,
         \note Enter the name of an AvailabilityManagerAssignmentList object.
         \type object-list
         \object-list SystemAvailabilityManagerLists
-   A16; \field Design Specification ZoneHVAC Sizing Object Name
+   A16, \field Design Specification ZoneHVAC Sizing Object Name
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
         \type object-list
         \object-list DesignSpecificationZoneHVACSizingName
+   A17; \field Supply Air Fan Operating Mode Schedule Name
+        \type object-list
+        \object-list ScheduleNames
+        \note Enter the name of a schedule that controls fan operation. Schedule Name values of 0 denote
+        \note cycling fan operation (fan cycles with cooling coil). Schedule values greater
+        \note than 0 denote constant fan operation (fan runs continually regardless of coil operation).
+        \note The fan operating mode defaults to cycling fan operation if this field is left blank.
+        \note This input field is currently used with MultiStageFan capacity control method
 
 ZoneHVAC:WindowAirConditioner,
         \memo Window air conditioner. Forced-convection cooling-only unit with supply fan, direct
@@ -32625,7 +32632,7 @@ ZoneHVAC:Dehumidifier:DX,
    A5,  \field Water Removal Curve Name
         \required-field
         \type object-list
-        \object-list BiQuadraticCurves
+        \object-list BiquadraticCurves
         \object-list BiVariateTables
         \note Name of a curve that describes the water removal rate (normalized to rated conditions)
         \note as a function of the dry-bulb temperature and relative humidity of the air
@@ -32637,7 +32644,7 @@ ZoneHVAC:Dehumidifier:DX,
    A6,  \field Energy Factor Curve Name
         \required-field
         \type object-list
-        \object-list BiQuadraticCurves
+        \object-list BiquadraticCurves
         \object-list BiVariateTables
         \note Name of a curve that describes the energy factor (normalized to rated conditions)
         \note as a function of the dry-bulb temperature and relative humidity of the air
@@ -33005,11 +33012,11 @@ ZoneHVAC:UnitHeater,
         \key Yes
         \key No
         \note This choice field allows the user to define how the unit heater will operate
-        \note under “no heating load” or cooling conditions. If the “No” is selected, then
+        \note under "no heating load" or cooling conditions. If the "No" is selected, then
         \note the fan will not run unless there is a heating load. If the fan does not run,
         \note this effectively shuts the unit heater system off when there is no heating load.
-        \note If the “Yes” is selected, the unit heater is available and has a ConstantVolume
-        \note fan, or has an OnOff fan with “Supply Air Fan Operating Mode Schedule” value
+        \note If the "Yes" is selected, the unit heater is available and has a ConstantVolume
+        \note fan, or has an OnOff fan with "Supply Air Fan Operating Mode Schedule" value
         \note greater than zero, then the fan will always run regardless of the zone load.
    N2 , \field Maximum Hot Water or Steam Flow Rate
         \note Not used when heating coil is gas or electric
@@ -41179,7 +41186,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Recoverable waste heat at full load and rated conditions
   A18, \field Speed 1 Waste Heat Function of Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
@@ -41335,7 +41342,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Recoverable waste heat at full load and rated conditions
   A24, \field Speed 2 Waste Heat Function of Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
@@ -41482,7 +41489,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Recoverable waste heat at full load and rated conditions
   A30, \field Speed 3 Waste Heat Function of Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
@@ -41629,7 +41636,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Recoverable waste heat at full load and rated conditions
   A36, \field Speed 4 Waste Heat Function of Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
@@ -43640,7 +43647,7 @@ Coil:Heating:DX:MultiSpeed,
   A15, \field Speed 1 Waste Heat Function of Temperature Curve Name
        \required-field
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
@@ -43740,7 +43747,7 @@ Coil:Heating:DX:MultiSpeed,
   A21, \field Speed 2 Waste Heat Function of Temperature Curve Name
        \required-field
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
@@ -43830,7 +43837,7 @@ Coil:Heating:DX:MultiSpeed,
        \note recoverable waste heat at full load and rated conditions
   A27, \field Speed 3 Waste Heat Function of Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
@@ -43920,7 +43927,7 @@ Coil:Heating:DX:MultiSpeed,
        \note recoverable waste heat at full load and rated conditions
   A33, \field Speed 4 Waste Heat Function of Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
@@ -48246,8 +48253,8 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Table:OneIndependentVariable object can also be used
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
-       \note ffw = Fraction of the full load Water Flow	   
-	   
+       \note ffw = Fraction of the full load Water Flow
+
 Coil:WaterHeating:Desuperheater,
        \memo Desuperheater air heating coil. The heating energy provided by this coil is reclaimed
        \memo from the superheated refrigerant gas leaving a compressor and does not impact the
@@ -49728,7 +49735,7 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \minimum -99.0
        \note This numeric field defines the evaporative cooler air inlet node drybulb temperature minimum  
        \note limit in degrees Celsius. The evaporative cooler will be turned off when the evaporator cooler 
-       \note air inlet node dry-bulb temperature falls below this limit. The typical minimum value is 16°C. Users 
+       \note air inlet node dry-bulb temperature falls below this limit. The typical minimum value is 16degC. Users 
        \note are allowed to specify their own limits. If this field is left blank, then there is no drybulb lower
        \note temperature limit for evaporative cooler operation.
   N7 , \field Evaporative Operation Maximum Limit Wetbulb Temperature
@@ -49736,14 +49743,14 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \note when outdoor wetbulb temperature rises above this limit the cooler shuts down.
        \note This numeric field defines the evaporative cooler air inlet node wet-bulb temperature maximum 
        \note limit in degrees Celsius. The evaporative cooler will be turned off when the evaporative cooler 
-       \note air inlet node wet-bulb temperature exceeds this limit. The typical maximum value is 24°C. Users 
+       \note air inlet node wet-bulb temperature exceeds this limit. The typical maximum value is 24degC. Users 
        \note are allowed to specify their own limits. If this field is left blank, then there is no upper 
        \note wetbulb temperature limit for evaporative cooler operation.
   N8 ; \field Evaporative Operation Maximum Limit Drybulb Temperature
        \type real
        \note This numeric field defines the evaporative cooler air inlet node dry-bulb temperature maximum 
        \note limit in degrees Celsius. The evaporative cooler will be turned off when its air inlet node 
-       \note drybulb temperature exceeds this limit. The typical maximum value is 26°C. Users 
+       \note drybulb temperature exceeds this limit. The typical maximum value is 26degC. Users 
        \note are allowed to specify their own limits. If this field is left blank, then there is no upper
        \note temperature limit for evaporative cooler operation.
 
@@ -51085,19 +51092,19 @@ AirLoopHVAC:UnitarySystem,
   A25, \field Heat Recovery Water Outlet Node Name
        \type node
        \note Enter the name of the heat recovery water outlet node if plant water loop connections are present.
-  A26, \field Design Specification Multispeed Heat Pump Object Type
+  A26, \field Design Specification Multispeed Object Type
        \type choice
-       \key UnitarySystemPerformance:HeatPump:Multispeed
+       \key UnitarySystemPerformance:Multispeed
        \note Enter the type of performance specification object used to describe the multispeed coil.
-  A27; \field Design Specification Multispeed Heat Pump Object Name
+  A27; \field Design Specification Multispeed Object Name
        \type object-list
        \object-list UnitarySystemPerformaceNames
        \note Enter the name of the performance specification object used to describe the multispeed coil.
 
-UnitarySystemPerformance:HeatPump:Multispeed,
+UnitarySystemPerformance:Multispeed,
        \memo The UnitarySystemPerformance object is used to specify the air flow ratio at each
-       \memo operating speed. This object is primarily used for multispeed coils to allow operation
-       \memo at alternate flow rates different from those specified in the coil object.
+       \memo operating speed. This object is primarily used for multispeed DX and water coils to allow
+       \memo operation at alternate flow rates different from those specified in the coil object.
        \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
   A1 , \field Name
        \required-field
@@ -51643,7 +51650,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         \units m3/s
         \minimum 0.0
         \autosizable
-        \note Must be less than or equal to the fan’s maximum flow rate.
+        \note Must be less than or equal to the fan's maximum flow rate.
         \note Only used when fan operating mode is continuous (disregarded for cycling fan mode).
         \note This air flow rate is used when no heating or cooling is required (i.e., the DX coil
         \note compressor and supplemental heating coil are off). If this field is left blank or zero,
@@ -52383,7 +52390,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note Cooling is disabled above this temperature.
   A3 , \field Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note Enter a curve name that represents full load cooling capacity ratio as a
        \note function of outdoor dry-bulb temperature and indoor wet-bulb temperature.
@@ -52401,7 +52408,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note leave this field blank.
   A5 , \field Cooling Capacity Ratio Modifier Function of High Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note This curve object is used to describe the high outdoor temperature
        \note performance curve used to describe cooling capacity ratio.
@@ -52410,7 +52417,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note If a single performance curve is used, leave this field blank.
   A6 , \field Cooling Energy Input Ratio Modifier Function of Low Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note Enter a curve name that represents cooling energy ratio as a function of
        \note outdoor dry-bulb temperature and indoor wet-bulb temperature
@@ -52426,7 +52433,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note leave this field blank.
   A8 , \field Cooling Energy Input Ratio Modifier Function of High Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note This curve object is used to describe the high outdoor temperature
        \note performance curve used to describe cooling energy ratio.
@@ -52500,7 +52507,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note Enter the maximum outdoor temperature allowed for heating operation.
   A13, \field Heating Capacity Ratio Modifier Function of Low Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note Enter a curve name that represents full load heating capacity ratio as a
        \note function of outdoor wet-bulb temperature and indoor dry-bulb temperature.
@@ -52522,7 +52529,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note If a single performance curve is used, leave this field blank.
   A15, \field Heating Capacity Ratio Modifier Function of High Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note This curve object is used to describe the high outdoor temperature
        \note performance curve used to describe heating capacity ratio.
@@ -52531,7 +52538,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note If a single performance curve is used, leave this field blank.
   A16, \field Heating Energy Input Ratio Modifier Function of Low Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note Enter a curve name that represents heating energy ratio as a function of
        \note outdoor wet-bulb temperature and indoor dry-bulb temperature
@@ -52551,7 +52558,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note If a single performance curve is used, leave this field blank.
   A18, \field Heating Energy Input Ratio Modifier Function of High Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note This curve object is used to allow separate performance curves for heating energy.
        \note If a single performance curve is used, leave this field blank.
@@ -52640,7 +52647,7 @@ AirConditioner:VariableRefrigerantFlow,
        \type object-list
        \object-list LinearCurves
        \object-list QuadraticCubicCurves
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list UniVariateTables
        \object-list BiVariateTables
        \note PCF = a0 + a1*L + a2*L^2 + a3*L^3 + a4*H
@@ -52663,7 +52670,7 @@ AirConditioner:VariableRefrigerantFlow,
        \type object-list
        \object-list LinearCurves
        \object-list QuadraticCubicCurves
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list UniVariateTables
        \object-list BiVariateTables
        \note PCF = a0 + a1*L + a2*L^2 + a3*L^3 + a4*H
@@ -52719,7 +52726,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note OnDemand to defrost only when necessary.
   A33, \field Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note A valid performance curve must be used if reversecycle defrost strategy is selected.
   N20, \field Defrost Time Period Fraction
@@ -52742,7 +52749,7 @@ AirConditioner:VariableRefrigerantFlow,
        \type real
        \units C
        \default 5.0
-       \note Enter the maximum outdoor temperature above which the crankcase heaters are disabled.
+       \note Enter the maximum outdoor temperature above which defrost operation is disabled.
   A34, \field Condenser Type
        \type choice
        \key AirCooled
@@ -52840,7 +52847,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note recovery mode will not operate.
   A40, \field Heat Recovery Cooling Capacity Modifier Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note Enter the name of a performance curve which represents
        \note the change in cooling capacity when heat recovery is active
@@ -52862,7 +52869,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note from cooling only mode to heat recovery mode
   A41, \field Heat Recovery Cooling Energy Modifier Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note Enter the name of a performance curve which represents
        \note the change in cooling energy when heat recovery is active
@@ -52884,7 +52891,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note from cooling only mode to heat recovery mode
   A42, \field Heat Recovery Heating Capacity Modifier Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note Enter the name of a performance curve which represents
        \note the change in heating capacity when heat recovery is active
@@ -52906,7 +52913,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note from cooling only mode to heat recovery mode
   A43, \field Heat Recovery Heating Energy Modifier Curve Name
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note Enter the name of a performance curve which represents
        \note the change in heating electric consumption rate when heat recovery is active
@@ -53259,7 +53266,8 @@ Controller:MechanicalVentilation,
         \key ZoneSum
         \key VentilationRateProcedure
         \key IndoorAirQualityProcedure
-        \key ProportionalControl
+        \key ProportionalControlBasedOnDesignOccupancy
+        \key ProportionalControlBasedonOccupancySchedule
         \key IndoorAirQualityProcedureGenericContaminant
         \default VentilationRateProcedure
    N1,  \field Zone Maximum Outdoor Air Fraction
@@ -59165,6 +59173,7 @@ Chiller:Electric,
        \memo polynomial equations.  Three sets of coefficients are required.
   A1 , \field Name
        \required-field
+       \reference Chillers
   A2 , \field Condenser Type
        \type choice
        \key AirCooled
@@ -59304,6 +59313,7 @@ Chiller:Absorption:Indirect,
        \memo of part-load ratio, condenser temperature, and chilled water temperature.
   A1 , \field Name
        \type alpha
+       \reference Chillers
        \required-field
   N1 , \field Nominal Capacity
        \type real
@@ -59472,6 +59482,7 @@ Chiller:Absorption,
        \memo performance curves are generated by fitting catalog data to third order
        \memo polynomial equations.  Two sets of coefficients are required.
   A1 , \field Name
+       \reference Chillers
        \required-field
   N1 , \field Nominal Capacity
        \type real
@@ -59576,6 +59587,7 @@ Chiller:ConstantCOP,
        \memo This constant COP chiller model provides a means of quickly specifying a
        \memo Chiller where performance data is not available.
   A1 , \field Name
+       \reference Chillers
        \required-field
   N1 , \field Nominal Capacity
        \type real
@@ -59666,6 +59678,7 @@ Chiller:EngineDriven,
        \memo curves are generated by fitting catalog data to third order
        \memo polynomial equations.  Three sets of coefficients are required.
   A1 , \field Name
+       \reference Chillers
        \required-field
   A2 , \field Condenser Type
        \required-field
@@ -59854,6 +59867,7 @@ Chiller:CombustionTurbine,
        \memo curves are generated by fitting catalog data to third order
        \memo polynomial equations.  Three sets of coefficients are required.
   A1 , \field Name
+       \reference Chillers
        \required-field
   A2 , \field Condenser Type
        \type choice
@@ -62782,7 +62796,7 @@ EvaporativeFluidCooler:SingleSpeed,
        \default 0.008
        \units percent
        \note Rate of drift loss as a percentage of circulating spray water flow rate
-       \note Default value for this field in under investigation. For now Cooling tower’s drift loss
+       \note Default value for this field in under investigation. For now Cooling tower's drift loss
        \note percent default value is taken here.
   A8 , \field Blowdown Calculation Mode
        \type choice
@@ -62797,7 +62811,7 @@ EvaporativeFluidCooler:SingleSpeed,
        \note Blowdown is water intentionally drained from the basin in order to offset the build
        \note up of solids in the water that would otherwise occur because of evaporation.
        \note Ratio of solids in the blowdown water to solids in the make up water.
-       \note Default value for this field in under investigation. For now Cooling tower’s
+       \note Default value for this field in under investigation. For now Cooling tower's
        \note Blowdown Concentration Ratio percent default value is taken here.
   A9 , \field Blowdown Makeup Water Usage Schedule Name
        \type object-list
@@ -63023,7 +63037,7 @@ EvaporativeFluidCooler:TwoSpeed,
        \type real
        \units percent
        \default 0.008
-       \note Default value is under investigation. For now cooling tower’s default value is taken.
+       \note Default value is under investigation. For now cooling tower's default value is taken.
   A7 , \field Blowdown Calculation Mode
        \type choice
        \key ConcentrationRatio
@@ -63037,7 +63051,7 @@ EvaporativeFluidCooler:TwoSpeed,
        \note Blowdown is water intentionally drained from the Evaporative Fluid Cooler in order to offset the
        \note build up of solids in the water that would otherwise occur because of evaporation.
        \note Ratio of solids in the blowdown water to solids in the make up water.
-       \note Default value is under investigation. For now cooling tower’s default value is taken.
+       \note Default value is under investigation. For now cooling tower's default value is taken.
   A8 , \field Blowdown Makeup Water Usage Schedule Name
        \type object-list
        \object-list ScheduleNames
@@ -65046,7 +65060,7 @@ WaterHeater:HeatPump:PumpedCondenser,
        \required-field
        \type choice
        \key Coil:WaterHeating:AirToWaterHeatPump:Pumped
-	   \key Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed
+       \key Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed
        \default Coil:WaterHeating:AirToWaterHeatPump:Pumped
        \note Specify the type of DX coil used by this heat pump water heater. The only
        \note valid choice is Coil:WaterHeating:AirToWaterHeatPump:Pumped and Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed.
@@ -65432,6 +65446,7 @@ ThermalStorage:Ice:Simple,
   A1, \field Name
       \type alpha
       \required-field
+      \reference IceThermalStorageEquipment
   A2, \field Ice Storage Type
       \note IceOnCoilInternal = Ice-on-Coil, internal melt
       \note IceOnCoilExternal = Ice-on-Coil, external melt
@@ -65459,6 +65474,7 @@ ThermalStorage:Ice:Detailed,
        \memo The model uses polynomial equations to describe the system performance.
   A1 , \field Name
        \required-field
+       \reference IceThermalStorageEquipment
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -67102,6 +67118,343 @@ PlantEquipmentOperation:ComponentSetpoint,
        \key Cooling
        \key Dual
 
+PlantEquipmentOperation:ThermalEnergyStorage,
+       \memo Plant equipment operation scheme for simpler input to control thermal (ice)
+       \memo energy storage systems.  It replaces a host of setpoint managers with simple,
+       \memo single input values.  For more complex controls, use the ComponentSetpoint
+       \memo scheme.
+       \min-fields 7
+   A1, \field Name
+       \required-field
+       \reference ControlSchemeList
+   A2, \field On-Peak Schedule
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Charging Availability Schedule
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+   N1, \field Non-Charging Chilled Water Temperature
+       \note Single temperature for chiller outlet when not in cooling season
+       \note or during on-peak cooling (discharge)
+       \required-field
+       \type real
+       \units C
+   N2, \field Charging Chilled Water Temperature
+       \note Single temperature for chiller outlet when off-peak during cooling
+       \note season (charging)
+       \required-field
+       \type real
+       \units C
+   A4, \field Component 1 Object Type
+       \note This field is the type of object and should either be a chiller or some
+       \note ice storage equipment.
+       \required-field
+       \type choice
+       \key ThermalStorage:Ice:Simple
+       \key ThermalStorage:Ice:Detailed
+       \key Chiller:Electric:EIR
+       \key Chiller:Electric:ReformulatedEIR
+       \key Chiller:Electric
+       \key Chiller:Absorption:Indirect
+       \key Chiller:Absorption
+       \key Chiller:ConstantCOP
+       \key Chiller:EngineDriven
+       \key Chiller:CombustionTurbine
+   A5, \field Component 1 Name
+       \note This field is the name of either the chiller or ice storage equipment
+       \note on the loop.
+       \required-field
+       \type object-list
+       \object-list IceThermalStorageEquipment
+       \object-list Chillers
+   A6, \field Component 1 Demand Calculation Node Name
+       \note This field is the name of the inlet node for the component defined in
+       \note the two previous input fields.
+       \required-field
+       \type node
+   A7, \field Component 1 Setpoint Node Name
+       \note This field is the name of the outlet node for the component listed above.
+       \required-field
+       \type node
+   N3, \field Component 1 Flow Rate
+       \note This field is the flow rate for the component listed above.
+       \required-field
+       \type real
+       \units m3/s
+       \autosizable
+   A8, \field Component 1 Operation Type
+       \note This field is the operation type for the component listed above.  For this
+       \note plant equipment operation scheme, "Cooling" should be selected for chiller
+       \note equipment while ice storage equipment should be defined as "Dual".
+       \required-field
+       \type choice
+       \key Heating
+       \key Cooling
+       \key Dual
+   A9, \field Component 2 Object Type
+       \type choice
+       \key ThermalStorage:Ice:Simple
+       \key ThermalStorage:Ice:Detailed
+       \key Chiller:Electric:EIR
+       \key Chiller:Electric:ReformulatedEIR
+       \key Chiller:Electric
+       \key Chiller:Absorption:Indirect
+       \key Chiller:Absorption
+       \key Chiller:ConstantCOP
+       \key Chiller:EngineDriven
+       \key Chiller:CombustionTurbine
+   A10, \field Component 2 Name
+        \type object-list
+        \object-list IceThermalStorageEquipment
+        \object-list Chillers
+   A11, \field Component 2 Demand Calculation Node Name
+        \type node
+   A12, \field Component 2 Setpoint Node Name
+        \type node
+   N4,  \field Component 2 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A13, \field Component 2 Operation Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A14, \field Component 3 Object Type
+        \type choice
+        \key ThermalStorage:Ice:Simple
+        \key ThermalStorage:Ice:Detailed
+        \key Chiller:Electric:EIR
+        \key Chiller:Electric:ReformulatedEIR
+        \key Chiller:Electric
+        \key Chiller:Absorption:Indirect
+        \key Chiller:Absorption
+        \key Chiller:ConstantCOP
+        \key Chiller:EngineDriven
+        \key Chiller:CombustionTurbine
+   A15, \field Component 3 Name
+        \type object-list
+        \object-list IceThermalStorageEquipment
+        \object-list Chillers
+   A16, \field Component 3 Demand Calculation Node Name
+        \type node
+   A17, \field Component 3 Setpoint Node Name
+        \type node
+   N5,  \field Component 3 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A18, \field Component 3 Operation Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A19, \field Component 4 Object Type
+        \type choice
+        \key ThermalStorage:Ice:Simple
+        \key ThermalStorage:Ice:Detailed
+        \key Chiller:Electric:EIR
+        \key Chiller:Electric:ReformulatedEIR
+        \key Chiller:Electric
+        \key Chiller:Absorption:Indirect
+        \key Chiller:Absorption
+        \key Chiller:ConstantCOP
+        \key Chiller:EngineDriven
+        \key Chiller:CombustionTurbine
+   A20, \field Component 4 Name
+        \type object-list
+        \object-list IceThermalStorageEquipment
+        \object-list Chillers
+   A21, \field Component 4 Demand Calculation Node Name
+        \type node
+   A22, \field Component 4 Setpoint Node Name
+        \type node
+   N6,  \field Component 4 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A23, \field Component 4 Operation Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A24, \field Component 5 Object Type
+        \type choice
+        \key ThermalStorage:Ice:Simple
+        \key ThermalStorage:Ice:Detailed
+        \key Chiller:Electric:EIR
+        \key Chiller:Electric:ReformulatedEIR
+        \key Chiller:Electric
+        \key Chiller:Absorption:Indirect
+        \key Chiller:Absorption
+        \key Chiller:ConstantCOP
+        \key Chiller:EngineDriven
+        \key Chiller:CombustionTurbine
+   A25, \field Component 5 Name
+        \type object-list
+        \object-list IceThermalStorageEquipment
+        \object-list Chillers
+   A26, \field Component 5 Demand Calculation Node Name
+        \type node
+   A27, \field Component 5 Setpoint Node Name
+        \type node
+   N7,  \field Component 5 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A28, \field Component 5 Operation Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A29, \field Component 6 Object Type
+        \type choice
+        \key ThermalStorage:Ice:Simple
+        \key ThermalStorage:Ice:Detailed
+        \key Chiller:Electric:EIR
+        \key Chiller:Electric:ReformulatedEIR
+        \key Chiller:Electric
+        \key Chiller:Absorption:Indirect
+        \key Chiller:Absorption
+        \key Chiller:ConstantCOP
+        \key Chiller:EngineDriven
+        \key Chiller:CombustionTurbine
+   A30, \field Component 6 Name
+        \type object-list
+        \object-list IceThermalStorageEquipment
+        \object-list Chillers
+   A31, \field Component 6 Demand Calculation Node Name
+        \type node
+   A32, \field Component 6 Setpoint Node Name
+        \type node
+   N8,  \field Component 6 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A33, \field Component 6 Operation Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A34, \field Component 7 Object Type
+        \type choice
+        \key ThermalStorage:Ice:Simple
+        \key ThermalStorage:Ice:Detailed
+        \key Chiller:Electric:EIR
+        \key Chiller:Electric:ReformulatedEIR
+        \key Chiller:Electric
+        \key Chiller:Absorption:Indirect
+        \key Chiller:Absorption
+        \key Chiller:ConstantCOP
+        \key Chiller:EngineDriven
+        \key Chiller:CombustionTurbine
+   A35, \field Component 7 Name
+        \type object-list
+        \object-list IceThermalStorageEquipment
+        \object-list Chillers
+   A36, \field Component 7 Demand Calculation Node Name
+        \type node
+   A37, \field Component 7 Setpoint Node Name
+        \type node
+   N9,  \field Component 7 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A38, \field Component 7 Operation Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A39, \field Component 8 Object Type
+        \type choice
+        \key ThermalStorage:Ice:Simple
+        \key ThermalStorage:Ice:Detailed
+        \key Chiller:Electric:EIR
+        \key Chiller:Electric:ReformulatedEIR
+        \key Chiller:Electric
+        \key Chiller:Absorption:Indirect
+        \key Chiller:Absorption
+        \key Chiller:ConstantCOP
+        \key Chiller:EngineDriven
+        \key Chiller:CombustionTurbine
+   A40, \field Component 8 Name
+        \type object-list
+        \object-list IceThermalStorageEquipment
+        \object-list Chillers
+   A41, \field Component 8 Demand Calculation Node Name
+        \type node
+   A42, \field Component 8 Setpoint Node Name
+        \type node
+   N10, \field Component 8 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A43, \field Component 8 Operation Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A44, \field Component 9 Object Type
+        \type choice
+        \key ThermalStorage:Ice:Simple
+        \key ThermalStorage:Ice:Detailed
+        \key Chiller:Electric:EIR
+        \key Chiller:Electric:ReformulatedEIR
+        \key Chiller:Electric
+        \key Chiller:Absorption:Indirect
+        \key Chiller:Absorption
+        \key Chiller:ConstantCOP
+        \key Chiller:EngineDriven
+        \key Chiller:CombustionTurbine
+   A45, \field Component 9 Name
+        \type object-list
+        \object-list IceThermalStorageEquipment
+        \object-list Chillers
+   A46, \field Component 9 Demand Calculation Node Name
+        \type node
+   A47, \field Component 9 Setpoint Node Name
+        \type node
+   N11, \field Component 9 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A48, \field Component 9 Operation Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A49, \field Component 10 Object Type
+        \type choice
+        \key ThermalStorage:Ice:Simple
+        \key ThermalStorage:Ice:Detailed
+        \key Chiller:Electric:EIR
+        \key Chiller:Electric:ReformulatedEIR
+        \key Chiller:Electric
+        \key Chiller:Absorption:Indirect
+        \key Chiller:Absorption
+        \key Chiller:ConstantCOP
+        \key Chiller:EngineDriven
+        \key Chiller:CombustionTurbine
+   A50, \field Component 10 Name
+        \type object-list
+        \object-list IceThermalStorageEquipment
+        \object-list Chillers
+   A51, \field Component 10 Demand Calculation Node Name
+        \type node
+   A52, \field Component 10 Setpoint Node Name
+        \type node
+   N12, \field Component 10 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A53; \field Component 10 Operation Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+
 PlantEquipmentOperation:OutdoorDryBulbDifference,
        \memo Plant equipment operation scheme for outdoor dry-bulb temperature difference
        \memo operation. Specifies one or more groups of equipment which are available to operate
@@ -68389,7 +68742,7 @@ ExternalInterface:FunctionalMockupUnitImport,
        \required-field
        \type alpha
        \retaincase
-       \reference FMUFilename
+       \reference FMUFileName
   N1 , \field FMU Timeout
        \note in milli-seconds
        \type real
@@ -72541,14 +72894,14 @@ Refrigeration:AirChiller,
         \minimum 0.0
         \maximum 20.
         \note The rated difference between the air entering the refrigeration chiller and the
-        \note cooling source temperature in °C.
+        \note cooling source temperature in degC.
   N6 ,  \field Maximum Temperature Difference Between Inlet Air and Evaporating Temperature
         \type real
         \units deltaC
         \minimum 0.0
         \maximum 25.
         \note The maximum difference between the air entering the refrigeration chiller and the
-        \note cooling source temperature in °C used to limit capacity during pull-down.
+        \note cooling source temperature in degC used to limit capacity during pull-down.
         \note defaults to 1.3 times the Rated Temperature Difference DT1
   N7 ,  \field Coil Material Correction Factor
         \type real
@@ -73686,7 +74039,7 @@ Generator:MicroTurbine,
   A2, \field Electrical Power Function of Temperature and Elevation Curve Name
       \required-field
       \type object-list
-      \object-list BiQuadraticCurves
+      \object-list BiquadraticCurves
       \object-list BiVariateTables
       \note curve = a + b*T + c*T**2 + d*Elev + e*Elev**2 + f*T*Elev
       \note T = combustion air inlet temperature (C)
@@ -73774,7 +74127,7 @@ Generator:MicroTurbine,
       \minimum> 0.0
  A10, \field Heat Recovery Water Flow Rate Function of Temperature and Power Curve Name
       \type object-list
-      \object-list BiQuadraticCurves
+      \object-list BiquadraticCurves
       \object-list BiVariateTables
       \note curve = a + b*T + c*T**2 + d*Pnet + e*Pnet + f*T*Pnet
       \note T = heat recovery inlet water temperature
@@ -74626,7 +74979,7 @@ Generator:FuelCell:Inverter,
 
 Generator:MicroCHP,
       \memo Small-scale combined heat and power (micro CHP) electric generator using the model
-      \memo developed by IEA/ECBCS Annex 42 Ð see www.cogen-sim.net. The model was developed
+      \memo developed by IEA/ECBCS Annex 42 see www.cogen-sim.net. The model was developed
       \memo for both internal combustion and Stirling cycle
       \memo engines, but might be used for other types of residential CHP devices.
   A1, \field Name
@@ -74673,12 +75026,12 @@ Generator:MicroCHP:NonNormalizedParameters,
       \note TriQuadratic
       \type object-list
       \object-list TriQuadraticCurves
-      \object-list MultivariateTables
+      \object-list MultiVariateTables
   A3, \field Thermal Efficiency Curve Name
       \note TriQuadratic
       \type object-list
       \object-list TriQuadraticCurves
-      \object-list MultivariateTables
+      \object-list MultiVariateTables
   A4, \field Cooling Water Flow Rate Mode
       \type choice
       \key PlantControl
@@ -76728,7 +77081,7 @@ FaultModel:TemperatureSensorOffset:ReturnAir,
        \maximum< 10
        \default 0.0
        \units deltaC
-	   
+  
 FaultModel:EnthalpySensorOffset:ReturnAir,
    \memo This object describes return air enthalpy sensor offset
    \min-fields 3
@@ -76824,7 +77177,7 @@ FaultModel:HumidistatOffset,
        \note Required field for Type ThermostatOffsetDependent
        \type object-list
        \object-list ThermostatOffsetFaults   
-	   
+
 FaultModel:Fouling:AirFilter,
    \memo This object describes fault of dirty air filters
    \min-fields 4

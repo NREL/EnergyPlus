@@ -175,45 +175,49 @@ namespace SetPointManager {
 	int const iSPMType_SZOneStageHeating( 27 );
 	int const iSPMType_ReturnWaterResetChW( 28 );
 	int const iSPMType_ReturnWaterResetHW( 29 );
+	int const iSPMType_TESScheduled( 30 );
 
-	int const NumValidSPMTypes( 29 );
-	Array1D_string const cValidSPMTypes(
-		NumValidSPMTypes, {
-			"SetpointManager:Scheduled",
-			"SetpointManager:Scheduled:DualSetpoint",
-			"SetpointManager:OutdoorAirReset",
-			"SetpointManager:SingleZone:Reheat",
-			"SetpointManager:SingleZone:Heating",
-			"SetpointManager:SingleZone:Cooling",
-			"SetpointManager:SingleZone:Humidity:Minimum",
-			"SetpointManager:SingleZone:Humidity:Maximum",
-			"SetpointManager:MixedAir",
-			"SetpointManager:OutdoorAirPretreat",
-			"SetpointManager:Warmest",
-			"SetpointManager:Coldest",
-			"SetpointManager:WarmestTemperatureFlow",
-			"SetpointManager:ReturnAirBypassFlow",
-			"SetpointManager:MultiZone:Cooling:Average",
-			"SetpointManager:MultiZone:Heating:Average",
-			"SetpointManager:MultiZone:MinimumHumidity:Average",
-			"SetpointManager:MultiZone:MaximumHumidity:Average",
-			"SetpointManager:MultiZone:Humidity:Minimum",
-			"SetpointManager:MultiZone:Humidity:Maximum",
-			"SetpointManager:FollowOutdoorAirTemperature",
-			"SetpointManager:FollowSystemNodeTemperature",
-			"SetpointManager:FollowGroundTemperature",
-			"SetpointManager:CondenserEnteringReset",
-			"SetpointManager:CondenserEnteringReset:Ideal",
-			"SetpointManager:SingleZone:OneStageCooling",
+	int const NumValidSPMTypes( 30 );
+	Array1D_string const cValidSPMTypes( 
+		NumValidSPMTypes, { 
+			"SetpointManager:Scheduled", 
+			"SetpointManager:Scheduled:DualSetpoint", 
+			"SetpointManager:OutdoorAirReset", 
+			"SetpointManager:SingleZone:Reheat", 
+			"SetpointManager:SingleZone:Heating", 
+			"SetpointManager:SingleZone:Cooling", 
+			"SetpointManager:SingleZone:Humidity:Minimum", 
+			"SetpointManager:SingleZone:Humidity:Maximum", 
+			"SetpointManager:MixedAir", 
+			"SetpointManager:OutdoorAirPretreat", 
+			"SetpointManager:Warmest", 
+			"SetpointManager:Coldest", 
+			"SetpointManager:WarmestTemperatureFlow", 
+			"SetpointManager:ReturnAirBypassFlow", 
+			"SetpointManager:MultiZone:Cooling:Average", 
+			"SetpointManager:MultiZone:Heating:Average", 
+			"SetpointManager:MultiZone:MinimumHumidity:Average", 
+			"SetpointManager:MultiZone:MaximumHumidity:Average", 
+			"SetpointManager:MultiZone:Humidity:Minimum", 
+			"SetpointManager:MultiZone:Humidity:Maximum", 
+			"SetpointManager:FollowOutdoorAirTemperature", 
+			"SetpointManager:FollowSystemNodeTemperature", 
+			"SetpointManager:FollowGroundTemperature", 
+			"SetpointManager:CondenserEnteringReset", 
+			"SetpointManager:CondenserEnteringReset:Ideal", 
+			"SetpointManager:SingleZone:OneStageCooling", 
 			"SetpointManager:SingleZone:OneStageHeating",
 			"SetpointManager:ReturnTemperature:ChilledWater",
-			"SetpointManager:ReturnTemperature:HotWater"
+			"SetpointManager:ReturnTemperature:HotWater",
+			"SetpointManager:ScheduledTES"
 		}
 	);
 
 	//Type declarations in SetPointManager module
 
 	// This one is used for conflicting node checks and is DEALLOCATED at the end of VerifySetPointManagers
+	// Aug 2014 (RKS) The AllSetPtMgr structure is no longer deallocated because of additions of new ScheduledTES managers after all others are read
+
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumAllSetPtMgrs( 0 ); // Number of all Setpoint Managers found in input
@@ -246,6 +250,7 @@ namespace SetPointManager {
 	int NumSZOneStageHeatingSetPtMgrs( 0 ); // number of singel zone one stage heating setpoint managers
 	int NumReturnWaterResetChWSetPtMgrs( 0 ); // number of return water reset setpoint managers
 	int NumReturnWaterResetHWSetPtMgrs( 0 ); // number of hot-water return water reset setpoint managers
+	int NumSchTESSetPtMgrs( 0 ); // number of TES scheduled setpoint managers (created internally, not by user input)
 
 	bool ManagerOn( false );
 	bool GetInputFlag( true ); // First time, input is "gotten"
@@ -293,6 +298,7 @@ namespace SetPointManager {
 	Array1D< DefineSZOneStageHeatingSetPointManager > SZOneStageHeatingSetPtMgr; // single zone 1 stage heat
 	Array1D< DefineReturnWaterChWSetPointManager > ReturnWaterResetChWSetPtMgr; // return water reset
 	Array1D< DefineReturnWaterHWSetPointManager > ReturnWaterResetHWSetPtMgr; // hot-water return water reset
+	Array1D< DefineScheduledTESSetPointManager > SchTESSetPtMgr; // Array for TES Scheduled Setpoint Manager data
 
 	// Functions
 
@@ -2895,7 +2901,7 @@ namespace SetPointManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad, FSEC
 		//       DATE WRITTEN   July 2008
-		//       MODIFIED       na
+		//       MODIFIED       Rick Strand, Aug 2014 (removed deallocation of AllSetPtMgrs so ScheduledTES could also verify control nodes)
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE
@@ -3027,7 +3033,8 @@ namespace SetPointManager {
 
 		} // DO SetPtMgrNum = 1, AllSetPtMgrs
 
-		if ( allocated( AllSetPtMgr ) ) AllSetPtMgr.deallocate();
+		// Removed the following line for ScheduledTES control implementation
+		// if ( allocated( AllSetPtMgr ) ) AllSetPtMgr.deallocate();
 
 	}
 
@@ -4173,6 +4180,8 @@ namespace SetPointManager {
 		//                        Added new setpoint managers:
 		//                          SetpointManager:MultiZone:Humidity:Minimum
 		//                          SetpointManager:MultiZone:Humidity:Maximum
+		//                      Aug 2014 Rick Strand, UIUC
+		//                         SetpointManager:ScheduleTES (internally defined)
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE
@@ -4209,6 +4218,14 @@ namespace SetPointManager {
 
 		}
 
+		// The Scheduled TES Setpoint Managers
+		
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSchTESSetPtMgrs; ++SetPtMgrNum ) {
+			
+			CalcScheduledTESSetPoint( SetPtMgrNum );
+			
+		}
+		
 		// The Scheduled Dual Setpoint Managers
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumDualSchSetPtMgrs; ++SetPtMgrNum ) {
@@ -4427,6 +4444,52 @@ namespace SetPointManager {
 
 		this->SetPt = GetCurrentScheduleValue( this->SchedPtr );
 
+	}
+
+	void
+	CalcScheduledTESSetPoint( int & SetPtMgrNum )
+	{
+		
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   Aug 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+		
+		// PURPOSE OF THIS SUBROUTINE:
+		// Set the setpoint using a simple schedule, then modify the value based on TES simple controls logic
+		
+		// METHODOLOGY EMPLOYED:
+		// Modified schedule setpoint manager logic
+		
+		// REFERENCES:
+		// na
+		
+		// USE STATEMENTS:
+		
+		// Locals
+		// SUBROUTINE ARGUMENTS:
+		Real64 CurSchValOnPeak;
+		Real64 CurSchValCharge;
+		Real64 const OnVal( 0.5 );
+		int const CoolOpComp ( 1 ); // a component that cools only (chillers)
+		int const DualOpComp ( 2 ); // a component that heats or cools (ice storage tank)
+		
+		CurSchValOnPeak  = GetCurrentScheduleValue( SchTESSetPtMgr( SetPtMgrNum ).SchedPtr );
+		CurSchValCharge = GetCurrentScheduleValue( SchTESSetPtMgr( SetPtMgrNum ).SchedPtrCharge );
+		
+		if ( SchTESSetPtMgr( SetPtMgrNum ).CompOpType == CoolOpComp ) { //this is some sort of chiller
+			if ( CurSchValOnPeak >= OnVal ) {
+				SchTESSetPtMgr( SetPtMgrNum ).SetPt = SchTESSetPtMgr( SetPtMgrNum ).NonChargeCHWTemp;
+			} else if ( CurSchValCharge < OnVal ) {
+				SchTESSetPtMgr( SetPtMgrNum ).SetPt = SchTESSetPtMgr( SetPtMgrNum ).NonChargeCHWTemp;
+			} else {
+				SchTESSetPtMgr( SetPtMgrNum ).SetPt = SchTESSetPtMgr( SetPtMgrNum ).ChargeCHWTemp;
+			}
+		} else if ( SchTESSetPtMgr( SetPtMgrNum ).CompOpType == DualOpComp ) { // this is some sort of ice storage system
+			SchTESSetPtMgr( SetPtMgrNum ).SetPt = SchTESSetPtMgr( SetPtMgrNum ).NonChargeCHWTemp;
+		}
+		
 	}
 
 	void
@@ -7065,6 +7128,8 @@ namespace SetPointManager {
 		//                        Added new setpoint managers:
 		//                          SetpointManager:MultiZone:Humidity:Minimum
 		//                          SetpointManager:MultiZone:Humidity:Maximum
+		//                      Aug 2014 Rick Strand, UIUC
+		//                          SetpointManager:ScheduledTES (internally defined)
 
 		//       RE-ENGINEERED  na
 
@@ -7133,6 +7198,16 @@ namespace SetPointManager {
 
 		} // setpoint manger:scheduled
 
+		// Loop over all the Scheduled TES Setpoint Managers
+		
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSchTESSetPtMgrs; ++SetPtMgrNum ) {
+			
+			// only one setpoint for each scheduled TES setpoint manager and its a temperature setpoint
+			NodeNum = SchTESSetPtMgr( SetPtMgrNum ).CtrlNodeNum; // Get the node number
+			Node( NodeNum ).TempSetPoint = SchTESSetPtMgr( SetPtMgrNum ).SetPt;
+			
+		} // setpoint manger:scheduledTES
+		
 		// Loop over all the Scheduled Dual Setpoint Managers
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumDualSchSetPtMgrs; ++SetPtMgrNum ) {
@@ -7885,6 +7960,94 @@ namespace SetPointManager {
 		return HumRatCntrlType;
 	}
 
+	void
+	SetUpNewScheduledTESSetPtMgr(
+								 int const SchedPtr,
+								 int const SchedPtrCharge,
+								 Real64 NonChargeCHWTemp,
+								 Real64 ChargeCHWTemp,
+								 int const CompOpType,
+								 int const ControlNodeNum
+								 )
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   August 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+		
+		// PURPOSE OF THIS SUBROUTINE
+		// Set up new scheduled TES setpoint managers based on plant control Simple TES
+		
+		// METHODOLOGY EMPLOYED:
+		// Set up internally created scheduled setpoint managers to control the setpoints
+		// of various ice storage equipment with the user having to do this manually.  The
+		// point is to provide a simpler input description and take care of logic internally.
+		
+		// REFERENCES:
+		// na
+		
+		// USE STATEMENTS:
+		
+		// Locals
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+		
+		// DERIVED TYPE DEFINITIONS
+		// na
+		
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		bool ErrorsFoundinTESSchSetup( false );
+		int NodeNum;
+		
+		NumSchTESSetPtMgrs += 1;
+		NumAllSetPtMgrs    += 1;
+		
+		// allocate/redimension structures for new item
+		if ( NumSchTESSetPtMgrs == 1 ) { // first time through--main structure not allocated yet
+			SchTESSetPtMgr.allocate( 1 );
+		} else if ( NumSchTESSetPtMgrs > 1 ) { // no longer first time through--redimension to new size
+			SchTESSetPtMgr.redimension( NumSchTESSetPtMgrs );
+		}
+		AllSetPtMgr.redimension( NumAllSetPtMgrs );
+		
+		// Set up the scheduled TES setpoint manager information
+		SchTESSetPtMgr( NumSchTESSetPtMgrs ).SchedPtr = SchedPtr;
+		SchTESSetPtMgr( NumSchTESSetPtMgrs ).SchedPtrCharge = SchedPtrCharge;
+		SchTESSetPtMgr( NumSchTESSetPtMgrs ).NonChargeCHWTemp = NonChargeCHWTemp;
+		SchTESSetPtMgr( NumSchTESSetPtMgrs ).ChargeCHWTemp = ChargeCHWTemp;
+		SchTESSetPtMgr( NumSchTESSetPtMgrs ).CompOpType = CompOpType;
+		SchTESSetPtMgr( NumSchTESSetPtMgrs ).CtrlNodeNum = ControlNodeNum;
+		
+		// Set up the all setpoint manager information for "verification" that no other setpoint manager controls the node that this new ones does
+		AllSetPtMgr( NumAllSetPtMgrs ).CtrlNodes.allocate( 1 );
+		AllSetPtMgr( NumAllSetPtMgrs ).CtrlNodes( 1 ) = SchTESSetPtMgr( NumSchTESSetPtMgrs ).CtrlNodeNum;
+		AllSetPtMgr( NumAllSetPtMgrs ).Name = SchSetPtMgr( NumSchTESSetPtMgrs ).Name;
+		AllSetPtMgr( NumAllSetPtMgrs ).SPMType = iSPMType_TESScheduled;
+		AllSetPtMgr( NumAllSetPtMgrs ).CtrlTypeMode = iCtrlVarType_Temp;
+		AllSetPtMgr( NumAllSetPtMgrs ).NumCtrlNodes = 1;
+		
+		// Now verify that there is no overlap (no other SPM uses the node of the new setpoint manager)
+		ErrorsFoundinTESSchSetup = false;
+		VerifySetPointManagers( ErrorsFoundinTESSchSetup );
+		if ( ErrorsFoundinTESSchSetup ) {
+			ShowFatalError( "Errors found in verification step of SetUpNewScheduledTESSetPtMgr.  Program terminates." );
+		}
+		// Since all of the other setpoint managers not only been read and verified but also initialized, simulated, and updated,
+		// we must now also initialize, simulate, and update the current SchTESStPtMgr that was just added.  But the init and simulate
+		// steps are the same so we can call the simulate first.
+		
+		CalcScheduledTESSetPoint( NumSchTESSetPtMgrs );
+		
+		// Now update reusing code from Update routine specialized to only doing the current (new) setpoint manager and then we are done
+		
+		NodeNum = SchTESSetPtMgr( NumSchTESSetPtMgrs ).CtrlNodeNum; // Get the node number
+		Node( NodeNum ).TempSetPoint = SchTESSetPtMgr( NumSchTESSetPtMgrs ).SetPt;
+		
+	}   // end of SetUpNewScheduledTESSetPtMgr
+	
 	//     NOTICE
 
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
