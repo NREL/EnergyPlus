@@ -1226,8 +1226,8 @@ namespace EvaporativeCoolers {
 					// Face air velocity of 3m/s is assumed
 					PadAreaDes = IndirectVolFlowRateDes / 3.0;
 				}
-				} else { //zone equipment
-					// we have no zone equipment evap coolers yet
+			} else { //zone equipment
+				// we have no zone equipment evap coolers yet
 			}
 
 			if ( !HardSizeNoDesRun ) {
