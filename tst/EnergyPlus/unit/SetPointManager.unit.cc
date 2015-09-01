@@ -271,6 +271,14 @@ TEST_F( EnergyPlusFixture, SetPointManagerDefineCondEntSetPointManager )
     "Until: 24:00,30.0;       !- Field 3"
     });
 	ASSERT_FALSE( process_idf( idf_objects ) );
+	DataGlobals::NumOfTimeStepInHour = 4;
+	DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
+	ScheduleManager::ProcessScheduleInput();
+	DataGlobals::TimeStep = 1;
+	DataGlobals::HourOfDay = 1;
+	DataEnvironment::DayOfWeek = 1;
+	DataEnvironment::DayOfYear_Schedule = 1;
+	ScheduleManager::UpdateScheduleValues();
 
 	// a few constants for convenience
 	int const evapOutletNodeNum = 1;
@@ -287,13 +295,13 @@ TEST_F( EnergyPlusFixture, SetPointManagerDefineCondEntSetPointManager )
 	DataPlant::TotNumLoops = 2;
 	DataPlant::PlantLoop.allocate(2);
 	DataPlant::PlantReport.allocate(1);
-	DataPlant::PlantReport(1).CoolingDemand = 1200;
 
 	DataPlant::PlantLoop(chwLoopIndex).LoopSide.allocate(2);
 	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch.allocate(1);
 	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp.allocate(1);
 	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).NodeNumOut = evapOutletNodeNum;
-	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TempDesCondIn = 20;
+	Real64 const designCondenserEnteringTemp = 20;
+	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TempDesCondIn = designCondenserEnteringTemp;
 	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TempDesEvapOut = 5;
 	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).MaxLoad = 5000;
 
@@ -301,9 +309,10 @@ TEST_F( EnergyPlusFixture, SetPointManagerDefineCondEntSetPointManager )
 	DataPlant::PlantLoop(condLoopIndex).LoopSide(demandSide).Branch.allocate(1);
 	DataPlant::PlantLoop(condLoopIndex).LoopSide(demandSide).Branch(chillerBranchCW).Comp.allocate(1);
 	DataPlant::PlantLoop(condLoopIndex).LoopSide(demandSide).Branch(chillerBranchCW).Comp(chillerCompIndex).NodeNumIn  = condInletNodeNum;
+	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).MyLoad = 1000;
 
 	DataLoopNode::Node.allocate(2);
-	DataLoopNode::Node(evapOutletNodeNum).Temp = 22;
+	DataLoopNode::Node(evapOutletNodeNum).Temp = 7;
 	DataLoopNode::Node(condInletNodeNum).Temp = 10;
 
 	SetPointManager::DefineCondEntSetPointManager thisSPM;
@@ -317,68 +326,36 @@ TEST_F( EnergyPlusFixture, SetPointManagerDefineCondEntSetPointManager )
 	thisSPM.LoopIndexDemandSide = condLoopIndex;
 	thisSPM.ChillerIndexDemandSide = chillerBranchCW;
 	thisSPM.BranchIndexDemandSide = chillerCompIndex;
+	thisSPM.TypeNum = DataPlant::TypeOf_Chiller_Electric;
 
-	std::ofstream myfile;
-	myfile.open("/tmp/setpoints");
+	// switch: Weighted ratio > 9 && etc...
+	DataPlant::PlantReport(1).CoolingDemand = 4700;
 
-	// First-level switch: load > 0
-	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).MyLoad = 1000;
-
-		// Second-level switch: Chiller type
-		DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
-		DataPlant::PlantLoop(condLoopIndex).LoopSide(demandSide).Branch(chillerBranchCW).Comp(chillerCompIndex).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
-
-			// Third-level switch: Weighted ratio > 9 && etc...
-			//WEIGHTED_RATIO > 0.9
-				// Now call and check
-				thisSPM.calculate();
-				EXPECT_TRUE(true);  //23, thisSPM.SetPt
-				myfile << thisSPM.SetPt << std::endl;
-
-			// Third-level switch: Weighted ratio < 9 || etc...
-			//WEIGHTED_RATIO > 0.9
-				// Now call and check
-				thisSPM.calculate();
-				EXPECT_TRUE(true);  //23, thisSPM.SetPt
-				myfile << thisSPM.SetPt << std::endl;
-
-		// Second-level switch: Chiller type
-		DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TypeOf_Num = DataPlant::TypeOf_Chiller_Indirect_Absorption;
-		DataPlant::PlantLoop(condLoopIndex).LoopSide(demandSide).Branch(chillerBranchCW).Comp(chillerCompIndex).TypeOf_Num = DataPlant::TypeOf_Chiller_Indirect_Absorption;
+		// Now call and check
 		thisSPM.calculate();
+		EXPECT_NEAR(designCondenserEnteringTemp+1.0, thisSPM.SetPt, 0.001);
 
-			// Third-level switch: Weighted ratio > 9 && etc...
-			//WEIGHTED_RATIO > 0.9
-				// Now call and check
-				thisSPM.calculate();
-				EXPECT_TRUE(true);  //23, thisSPM.SetPt
-				myfile << thisSPM.SetPt << std::endl;
+	// switch: Weighted ratio < 9 || etc...
+	DataPlant::PlantReport(1).CoolingDemand = 4000;
 
-			// Third-level switch: Weighted ratio < 9 || etc...
-			//WEIGHTED_RATIO > 0.9
-				// Now call and check
-				thisSPM.calculate();
-				EXPECT_TRUE(true);  //23, thisSPM.SetPt
-				myfile << thisSPM.SetPt << std::endl;
+		// switch: OAWB>MinWb && DesignWB>MinDesignWB && CurLift>MinLift
+		DataEnvironment::OutWetBulbTemp = 40;
+		thisSPM.TowerDsnInletAirWetBulb = 35;
+		thisSPM.MinimumLiftTD = 2;
 
-	// First-level switch: load <= 0
-	DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).MyLoad = 0;
+			// Now call and check
+			thisSPM.calculate();
+			EXPECT_NEAR(32, thisSPM.SetPt, 0.001);
 
-		// Second-level switch never occurs for load <= 0
+		// switch: ELSE
+		DataEnvironment::OutWetBulbTemp = 30;
+		thisSPM.TowerDsnInletAirWetBulb = 20;
+		thisSPM.MinimumLiftTD = 5;
 
-			// Third-level switch: Weighted ratio > 9 && etc...
-			//WEIGHTED_RATIO > 0.9
-				// Now call and check
-				thisSPM.calculate();
-				EXPECT_TRUE(true);  //23, thisSPM.SetPt
-				myfile << thisSPM.SetPt << std::endl;
+			// Now call and check
+			thisSPM.calculate();
+			EXPECT_NEAR(30, thisSPM.SetPt, 0.001);
 
-			// Third-level switch: Weighted ratio < 9 || etc...
-			//WEIGHTED_RATIO > 0.9
-				// Now call and check
-				thisSPM.calculate();
-				EXPECT_TRUE(true);  //23, thisSPM.SetPt
-				myfile << thisSPM.SetPt << std::endl;
 }
 
 TEST_F( EnergyPlusFixture, CalcScheduledTESSetPoint )
