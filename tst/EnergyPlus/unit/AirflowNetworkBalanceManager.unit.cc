@@ -62,8 +62,6 @@ namespace EnergyPlus {
 
 		// Unit test for #5021
 
-		int i;
-
 		Zone.allocate( 1 );
 		Zone( 1 ).Name = "SALA DE AULA";
 
