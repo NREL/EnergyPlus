@@ -76,12 +76,14 @@ namespace MixedAir {
 	//                                        !  considering the zone air distribution effectiveness and the system ventilation efficiency
 	//INTEGER, PARAMETER :: SOAM_IAQP = 3     ! Use ASHRAE Standard 62.1-2007 IAQP to calculate the system level outdoor air flow rates
 	//                                        ! based on the CO2 setpoint
-	//INTEGER, PARAMETER :: SOAM_ProportionalControl = 4     ! Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
-	//                                                       ! to calculate the system level outdoor air flow rates
+	//INTEGER, PARAMETER :: SOAM_ProportionalControlSchOcc = 4     ! Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+	//                                                       ! to calculate the system level outdoor air flow rates based on scheduled occupancy
 	//INTEGER, PARAMETER :: SOAM_IAQPGC = 5   ! Use ASHRAE Standard 62.1-2004 IAQP to calculate the system level outdoor air flow rates
 	//                                        ! based on the generic contaminant setpoint
 	//INTEGER, PARAMETER :: SOAM_IAQPCOM = 6  ! Take the maximum outdoor air rate from both CO2 and generic contaminant controls
 	//                                        ! based on the generic contaminant setpoint
+	//INTEGER, PARAMETER :: SOAM_ProportionalControlDesOcc = 7     ! Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+	//                                                       ! to calculate the system level outdoor air flow rates based on design occupancy
 
 	extern Array1D_string const CurrentModuleObjects;
 
@@ -451,12 +453,12 @@ namespace MixedAir {
 		Array1D_string ZoneDesignSpecOAObjName; // name of the design specification outdoor air object
 		// for each zone in zone list
 		int CO2MaxMinLimitErrorCount; // Counter when max CO2 concentration < min CO2 concentration
-		// For SOAM_ProportionalControl
+		// For SOAM_ProportionalControlSchOcc
 		int CO2MaxMinLimitErrorIndex; // Index for max CO2 concentration < min CO2 concentration recurring error message
-		// For SOAM_ProportionalControl
-		int CO2GainErrorCount; // Counter when CO2 generation from people is zero for SOAM_ProportionalControl
+		// For SOAM_ProportionalControlSchOcc
+		int CO2GainErrorCount; // Counter when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
 		int CO2GainErrorIndex; // Index for recurring error message when CO2 generation from people is zero
-		// For SOAM_ProportionalControl
+		// For SOAM_ProportionalControlSchOcc
 		Array1D< Real64 > ZoneADEffCooling; // Zone air distribution effectiveness in cooling mode
 		// for each zone
 		Array1D< Real64 > ZoneADEffHeating; // Zone air distribution effectiveness in heating mode
@@ -510,7 +512,7 @@ namespace MixedAir {
 			Array1_string const & ZoneDesignSpecOAObjName, // name of the design specification outdoor air object
 			int const CO2MaxMinLimitErrorCount, // Counter when max CO2 concentration < min CO2 concentration
 			int const CO2MaxMinLimitErrorIndex, // Index for max CO2 concentration < min CO2 concentration recurring error message
-			int const CO2GainErrorCount, // Counter when CO2 generation from people is zero for SOAM_ProportionalControl
+			int const CO2GainErrorCount, // Counter when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
 			int const CO2GainErrorIndex, // Index for recurring error message when CO2 generation from people is zero
 			Array1< Real64 > const & ZoneADEffCooling, // Zone air distribution effectiveness in cooling mode
 			Array1< Real64 > const & ZoneADEffHeating, // Zone air distribution effectiveness in heating mode
@@ -975,7 +977,7 @@ namespace MixedAir {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

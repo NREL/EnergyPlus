@@ -6992,11 +6992,21 @@ The heating or cooling output of the unit ventilator is controlled by varying th
 
 Carrier offers a retrofit VSD motor for fan coil units. It claims up to 45% energy savings from such a retrofit, as well as increased comfort and less noise compared to a cycling fan (fan coil fans ar typically noisy and inefficient). Some other manufacturers are also offering units with VSD fans. Variable speed fans appear to offer an easy way to significantly increase the efficiency of what have typically been very inefficient units.
 
-EnergyPlus provides 4 capacity control methods for this unit: 1) multi-speed cycling fan with constant water flow rate; 2) constant speed continuous fan with variable water flow rate; 3) variable-speed fan with constant water flow rate; 4) variable-speed fan with variable water flow rate.
+EnergyPlus provides 5 capacity control methods for this unit:
+
+  1. multi-speed cycling fan with constant water flow rate
+
+  2. constant speed continuous fan with variable water flow rate
+
+  3. variable-speed fan with constant water flow rate
+
+  4. variable-speed fan with variable water flow rate
+
+  5. multi-speed fan with cycling between speeds and  constant water flow.
 
 In EnergyPlus the fan coil units are modeled as compound components. That is, they are assembled from other components. Fan coils contain an outdoor air mixer, a fan, a heating coil and a cooling coil. These components are described elsewhere in this document. The fan coil input simply requires the names of these four components, which have to be described elsewhere in the input. The input also requires the name of an availability schedule, maximum airflow rate, outdoor airflow rate, and maximum and minimum hot and cold water volumetric flow rates. The unit is connected to the zone inlet and exhaust nodes and the outdoor air by specifying unit inlet, and outlet air node names and the outdoor air mixer object name. The outdoor air mixer child object provides the outdoor air and relief air nodes names. Note that the unit air inlet node should be the same as a zone exhaust node and the unit outlet node should be the same as a zone inlet node. The fan coil unit is connected to a hot water loop (demand side) through its hot water coil and to a chilled water loop (demand side) through its cooling coil.
 
-Note that the type of fan component associated with the fan coil unit depends on the type of capacity control method chosen. For *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used. And for *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume*  should be chosen.
+Note that the type of fan component associated with the fan coil unit depends on the type of capacity control method chosen. For *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used, for *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume*, and for *MultiStageFan* a *Fan:OnOff* should be chosen.
 
 Fan coil units can be 4-pipe or 2-pipe. For 4-pipe units there are 2 supply pipes and 2 return pipes. For 2-pipe units there is a single supply pipe and a single return pipe and the supply is switched between hot and chilled water depending on the season. We model 4-pipe units, but the 4-pipe model can be used to model 2-pipe  units by using the coil availability schedules to make sure that either hot or chilled water is exclusively available.
 
@@ -7010,7 +7020,9 @@ The name of the schedule (ref: Schedule) that denotes whether the fan coil unit 
 
 ***Field: Capacity Control  Method***
 
-This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are ***ConstantFanVariableFlow***, ***CyclingFan***, ***VariableFanVariableFlow*** or ***VariableFanConstantFlow***. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load.
+This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are ***ConstantFanVariableFlow***, ***CyclingFan***, ***VariableFanVariableFlow***, ***VariableFanConstantFlow***, or ***MultiStageFan***. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load. For *MultiStageFan* the water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load. 
+
+***MultiStageFan:*** for a given load, the fan cycles between speeds when fan speed selected is higher than the minimum speed or the fan cycles on-off when the fan speed selected is the minimum and the fan operating schedule is cycling fan. When the fan is operating as a continuous fan, then the fan runs at minimum speed even when there is no load to meet. When the speed selected is higher than the minimum speed, then the fan cycles between consecutive speed regardless of the fan operating schdule type. The model selects at what fan speed to run depending on cooling or heating load. 
 
 #### Field: Maximum Supply Air Flow Rate
 
@@ -7140,8 +7152,9 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Four Pipe FanCoil zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
-
-
+#### Filed: Supply Air Fan Operating Mode Schedule Name
+This input field is the name of a schedule that controls fan operation. Schedule Name values of 0
+denote cycling fan operation (fan cycles with cooling coil). Schedule values greater than 0 denote constant fan operation (fan runs continually regardless of coil operation). The fan operating mode defaults to cycling fan operation if this field is left blank. This input field is currently used with *MultiStageFan* capacity control method only.
 
 
 An example input for a fan coil unit, including its constituent components, is shown below.
@@ -7270,9 +7283,14 @@ Curve:Cubic,
 
 * HVAC,Average, Fan Coil Fan Speed Level []
 
-* HVAC,Average,Fan Coil Part Load Ratio []
+* HVAC,Average, Fan Coil Part Load Ratio []
 
-* HVAC,Average,Fan Coil Availability Status []
+* HVAC,Average, Fan Coil Availability Status []
+
+* HVAC,Average, Fan Coil Part Load Ratio []
+
+* HVAC,Average, Fan Coil Speed Ratio []
+
 
 #### Fan Coil Heating Rate [W]
 
@@ -7312,15 +7330,19 @@ This field is the fraction of the system timestep the fan coil unit is running f
 
 #### Fan Coil Fan Speed Level []
 
-This field is indicates the speed chosen for the fan in the *CyclingFan* capacity control method.  A value of '0' means that the unit is off, '1' the fan is running at its low speed, '2' medium speed, and '3' high speed (maximum). This variable is defined only for the *CyclingFan* capacity control method.
+This field is indicates the speed chosen for the fan in the *CyclingFan* and *MultiStageFan* capacity control methods.  A value of '0' means that the unit is off, '1' the fan is running at its low speed, '2' medium speed, and '3' high speed (maximum). This variable is defined only for the *CyclingFan* and *MultiStageFan* capacity control methods.
 
 #### Fan Coil Part Load Ratio []
 
-When the capacity control method is *VariableFanVariableFlow* or *VariableFanConstantFlow,* this output variable reports the unit part load ratio (ratio of unit heating / cooling output to the maximum heating / cooling output). This variable is defined only for *VariableFanVariableFlow* or *VariableFanConstantFlow* capacity control methods.
+When the capacity control method is *VariableFanVariableFlow* or *VariableFanConstantFlow,* this output variable reports the unit part load ratio (ratio of unit heating / cooling output to the maximum heating / cooling output). This variable is defined only for *VariableFanVariableFlow*, *VariableFanConstantFlow* or *MultiStageFan* capacity control methods. The unit part load ratio is applicable to *MultiStageFan* only when the fan speed level selected is the minimum (Speed 1).  
 
 #### Fan Coil Availability Status []
 
 This is the availability status of the fan coil unit fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the fan coil unit  object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:\* Outputs). For multiple availability managers in an Availability Manager Assignment List (with or without Hybrid Ventilation Manager), rules to determine fan availability status are described in the section ‘Group – System Availability Managers’. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the “detailed” reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
+
+#### Fan Coil Speed Ratio []
+This output variable is the ratio of time in a system timestep that the fan coil unit is at rated speed between two consecutive speed levels ( [load – Capacity at Fan Speed i-1] / [Capacity at Fan Speed i – Capacity at Fan Speed i-1]). The fan speed ratio has minimum value of 0.0, and a maximum value of 1.0 and any value in between as it is averaged over the timestep. The value is 0.0 during Speed Level 1 operation.  Hydronic FanCoil units speed ratio depends on the fan speed and current load. The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep.
+
 
 ### ZoneHVAC:UnitVentilator
 
@@ -7427,6 +7449,10 @@ This field is the name of a fan (ref: Fan:OnOff, Fan:ConstantVolume, Fan: Variab
 #### Field: Coil Option
 
 This field allows the user to specify the coil operating options as one of the following options: **None**, **Heating**, **Cooling** or **HeatingAndCooling**. If **None** is selected, the unit ventilator does not have any coils, and any other input will be ignored. If either **Heating** or **Cooling** is selected, only a heating or cooling coil, respectively, is present. Thus, only four more inputs will be expected. If **HeatingAndCooling** is selected, both heating and cooling coil input must be entered, and the unit ventilator will have both a heating and a cooling coil.
+
+#### Field: Supply Air Fan Operating Mode Schedule Name
+
+This field is a schedule name (ref: Schedule) that determines the operating modes of the unit ventilator’s On:Off fan. A schedule value of 0 indicates cycling fan operation (fan cycles with cooling/heating coil). A schedule value greater than 0 (usually 1 is used) indicates constant fan operation (fan runs continually regardless of the coils operation). If this input field is left blank, then the operating mode of the On:Off fan type defaults to cycling operation.
 
 #### Field: Heating Coil Object Type
 
@@ -7691,7 +7717,7 @@ This field is the name of the heating coil that is part of the unit heater syste
 
 #### Field: Supply Air Fan Operating Mode Schedule Name
 
-This field is a schedule name (ref: Schedule) that determines whether the operating modes of unit heater’s On:Off fan. A schedule values of 0 indicates cycling fan operation (fan cycles with cooling/heating coil). A schedule values greater than 0 (usually 1 is used) indicate constant fan operation (fan runs continually regardless of coils operation). If this input field is left blank, then the operating mode of the OnOff fan type defaults to cycling operation.
+This field is a schedule name (ref: Schedule) that determines the operating modes of the unit heater’s On:Off fan. A schedule value of 0 indicates cycling fan operation (fan cycles with cooling/heating coil). A schedule value greater than 0 (usually 1 is used) indicates constant fan operation (fan runs continually regardless of the coils operation). If this input field is left blank, then the operating mode of the On:Off fan type defaults to cycling operation.
 
 #### Field: Supply Air Fan Operation During No Heating
 
@@ -10667,6 +10693,9 @@ Figure 1. Schematic of the EnergyPlus Unitary System
 
 Links to the fan, cooling coil, heating coil and reheat coil specifications are provided in the unitary system input data syntax. In addition, the control zone name and the system design operating conditions are specified by the unitary system inputs.
 
+#### Multi-Speed Fan and Water Coils In Unitary System
+Multi-speed fan chilled and hot water coils Air Handling Unit (AHU) can be modeled using Airloop Unitary System HVAC object (AirloopHVAC:UnitarySystem). AHU with chilled and hot water coils is setup by specifying Fan:OnOff and DesignSpecificationPerformance:MultiSpeed objects in Unitary System. The design specification performance object allows running the chilled and hot water coils capacity control using a multi-speed supply air fan. The multi-speed fan capacity control for chilled and hot water coil AHU is performed by modulating the supply air flow rate while maintaining a constant water flow rate. The chilled or hot water flow rates is set at maximum fixed flow rate when there is cooling or heating load and the water flow rate is set to zero when there is no load. Such control strategy is called two-position cooling or heating coil control. The fan speed selection depends on the current load, at lower load the fan is operated at minimum speed (Speed = 1) and the fan speed level increases progressively as the load increases until it reaches the maximum speed level specified. The multi-speed fan operation is modulated between the speeds to meet the current load. When the supply air fan is cycling between consecutive speeds levels, the speed ratio is calculated that indicates what fraction of the time step that the system run at the higher of the two speeds. At lower load, the fan may cycle on-off or run continuously depending the fan operating schedule specified.  When the fan is cycling a part-load ratio is calculated to reflect the proportion of the system timestep the fan and coils were operating. In continuous fan operating mode only the coil cycles on-off and the part-load ratio applies to the coil only. Multi-speed fan capacity control is allowed with load based control type only.
+
 #### Field: Name
 
 This alpha field contains the identifying name for the unitary system.
@@ -10949,11 +10978,11 @@ This alpha field contains the identifying name for the heat recovery side inlet 
 
 This alpha field contains the identifying name for the heat recovery side outlet node.
 
-#### Field: Design Specification Multispeed Heat Pump Object Type
+#### Field: Design Specification Multispeed Object Type
 
 This alpha field contains the identifying type for the design specification multispeed object. This field is only needed when multispeed cooling or heating coil is specified.
 
-#### Field: Design Specification Multispeed Heat Pump Object Name
+#### Field: Design Specification Multispeed Object Name
 
 This alpha field contains the identifying name for the design specification multispeed object. This field is only needed when multispeed cooling or heating coil is specified.
 
@@ -11022,10 +11051,10 @@ AirLoopHVAC:UnitarySystem,
    ,  !- Maximum Temperature for Heat Recovery (Maximum Heat Recovery Outlet Temperature?)
    ,  !- Heat Recovery Water Inlet Node Name
    ,  !- Heat Recovery Water Outlet Node Name
-   UnitarySystemPerformance:HeatPump:Multispeed,  !- Design Specification Multispeed Heat Pump Object Type
+   UnitarySystemPerformance:Multispeed,  !- Design Specification Multispeed Heat Pump Object Type
    MyMultispeedHPSpec;  !- Design Specification Multispeed Heat Pump Object Name
 
-UnitarySystemPerformance:HeatPump:Multispeed,
+UnitarySystemPerformance:Multispeed,
    MyMultispeedHPSpec,      !- Name
    4,                       !- Number of Speeds for Heating
    4,                       !- Number of Speeds for Cooling
@@ -11099,6 +11128,13 @@ Water to air heat pump outputs
 * HVAC,Average, Unitary System Requested Latent Cooling Rate [W]
 
 * HVAC,Average, Unitary System Requested Heating Rate [W]
+
+* HVAC,Average, Unitary System Water Coil Cycling Ratio []
+
+* HVAC,Average, Unitary System Water Coil Speed Ratio []
+
+* HVAC,Average, Unitary System Water Coil Speed Level []
+
 
 #### Unitary System Fan Part Load Ratio []
 
@@ -11192,7 +11228,16 @@ This output variable is the latent cooling requested from the zone humidistat in
 
 This output variable is the sensible heating requested from the zone thermostat in watts. This value is calculated using the unitary system outlet air and zone conditions, the specific heat of the zone air, and the supply air mass flow rate entering/leaving the system. This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 
-### UnitarySystemPerformance:HeatPump:Multispeed
+#### Unitary System Water Coil Cycling Ratio []
+This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the multispeed fan chilled water or hot water coil for the entire system timestep. The value is between 0.0 and 1.0 when the AHU is cycling on and off its lowest speed (fan speed 1) and 1.0 when the multispeed fan chilled water or hot water AHU operates at speed levels above 1.
+
+#### Unitary System Water Coil Speed Ratio []
+This output variable is the ratio of time in a system timestep that the AHU fan is at rated speed between two consecutive speed levels ( [System Load – Capacity at Fan Speed i-1] / [Capacity at Fan Speed i – Capacity at Fan Speed i-1]). The fan speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation. AHU speed ratio depends on the system load and the supply air fan speed. The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep. 
+
+#### Unitary System Water Coil Speed Level []
+This output variable reports the maximum speed needed when the system operates to meet the sensible load (heating or cooling) in a system timestep. When the value is 1, the AHU operates at Speed 1 (lowest speed). For this case the cycling ratio is between 0.0 and 1.0, while the speed ratio is 0.0. When the speed level is above the minimum (speed =1), the system operation is determined by the speed ratio. For example, when the speed ratio is 0.4 and the speed lever is 3, then the supply air fan and water coil operate at Speed 3 for 40% of a system timestep and at Speed 2 for 60% of a system timestep.
+
+### UnitarySystemPerformance:Multispeed
 
 #### Field: Name
 
@@ -11827,7 +11872,7 @@ This alpha input field contains the type of dehumidification control. The follow
 
 The default is **None**. For the other dehumidification control modes, the maximum humidity setpoint is required. This must be set using a **ZoneControl:Humidistat** object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. Supplemental heating coil (supplemental heating coil type and name) is a required input in AirToAir HeatPumps. The supplemental heating coil capacity must be adequate enough to meet the heating coil load and offset the excess cooling load due to extra dehumidification required to meet the high relative humidity setpoint.
 
-Note: the air-to-air heat pump’s fan, cooling coil, heating coil and supplementary heating coil must be connected in the air loop according to the configuration shown above (Figure 118) for the blow-through fan configuration. The only other valid configuration is with a draw-through fan placement, where the fan is located between the DX heating coil and the supplementary heating coil. In addition, the volumetric air flow rate specified in the direct air unit for the controlling zone should properly reflect the fractional volumetric air flow rate specified in the heat pump object.
+Note: the air-to-air heat pump’s fan, cooling coil, heating coil and supplementary heating coil must be connected in the air loop according to the configuration shown above (Figure 118) for the blow-through fan configuration. The only other valid configuration is with a draw-through fan placement, where the fan is located between the DX heating coil and the supplementary heating coil. 
 
 #### AirLoopHVAC:UnitaryHeatPump:AirToAir Example Specification
 
@@ -13789,7 +13834,7 @@ This choice field determines the logic used to simulate the “master” thermos
 
 #### Field: Thermostat Priority Schedule Name
 
-This alpha field identifies the schedule used when the previous field is set to Scheduled. Schedule values of 0 denote cooling mode while values of 1 denote heating mode. Any other values will force the system off.
+This alpha field identifies the schedule used when the previous field is set to Scheduled. Schedule values of 0 denote heating mode while values of 1 denote cooling mode. Any other values will force the system off.
 
 #### Field: Zone Terminal Unit List Name
 

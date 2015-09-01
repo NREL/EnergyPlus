@@ -357,7 +357,7 @@ namespace PlantManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alpha( 1 ), PlantLoop.Name(), LoopNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alpha( 1 ), PlantLoop, LoopNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alpha( 1 ) = "xxxxx";
@@ -2964,6 +2964,7 @@ namespace PlantManager {
 		// Using/Aliasing
 		using DataSizing::NumPltSizInput;
 		using DataSizing::PlantSizData;
+		using DataSizing::PlantSizingData;
 		using InputProcessor::FindItemInList;
 
 		// Locals
@@ -2984,7 +2985,7 @@ namespace PlantManager {
 		PlantSizNum = 0;
 		if ( PlantLoop( LoopNum ).PlantSizNum == 0 ) {
 			if ( NumPltSizInput > 0 ) {
-				PlantSizNum = FindItemInList( PlantLoop( LoopNum ).Name, PlantSizData.PlantLoopName(), NumPltSizInput );
+				PlantSizNum = FindItemInList( PlantLoop( LoopNum ).Name, PlantSizData, &PlantSizingData::PlantLoopName );
 				if ( PlantSizNum > 0 ) {
 					PlantLoop( LoopNum ).PlantSizNum = PlantSizNum;
 				}
@@ -3077,7 +3078,7 @@ namespace PlantManager {
 			// PlantSizData(PlantSizNum)%DesVolFlowRate = 0.0D0 ! DSU2
 		} else {
 			if ( NumPltSizInput > 0 ) {
-				PlantSizNum = FindItemInList( PlantLoop( LoopNum ).Name, PlantSizData.PlantLoopName(), NumPltSizInput );
+				PlantSizNum = FindItemInList( PlantLoop( LoopNum ).Name, PlantSizData, &PlantSizingData::PlantLoopName );
 			}
 		}
 		PlantLoop( LoopNum ).PlantSizNum = PlantSizNum;
@@ -3698,7 +3699,7 @@ namespace PlantManager {
 		int const nPumpsAfterIncrement = loop_side.TotalPumps = pumps.size() + 1;
 		pumps.redimension( nPumpsAfterIncrement );
 		pumps( nPumpsAfterIncrement ).PumpName = PumpName;
-		// pumps( nPumpsAfterIncrement ).PumpTypeOf = FindItemInList( PumpType, SimPlantEquipTypes, SimPlantEquipTypes.size() );
+		// pumps( nPumpsAfterIncrement ).PumpTypeOf = FindItemInList( PumpType, SimPlantEquipTypes );
 		pumps( nPumpsAfterIncrement ).BranchNum = BranchNum;
 		pumps( nPumpsAfterIncrement ).CompNum = CompNum;
 		pumps( nPumpsAfterIncrement ).PumpOutletNode = PumpOutletNode;
@@ -4461,7 +4462,7 @@ namespace PlantManager {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
