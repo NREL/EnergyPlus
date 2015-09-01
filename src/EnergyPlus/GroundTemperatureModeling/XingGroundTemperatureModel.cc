@@ -44,7 +44,7 @@ namespace EnergyPlus {
 		// New shared pointer for this model object
 		std::shared_ptr< XingGroundTempsModel > thisModel( new XingGroundTempsModel() );
 
-		std::string const cCurrentModuleObject = "Site:GroundTemperature:Undisturbed:Xing";
+		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_XingGroundTemp );
 		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
@@ -95,34 +95,36 @@ namespace EnergyPlus {
 		using WeatherManager::NumDaysInYear;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int n;
+		Real64 static tp( NumDaysInYear ); // Period of soil temperature cycle
+		Real64 Ts_1; // Amplitude of surface temperature
+		Real64 Ts_2; // Amplitude of surface temperature
+		Real64 PL_1; // Phase shift of surface temperature
+		Real64 PL_2; // Phase shift of surface temperature
+
+		Real64 term1;
+		Real64 term2;
+		Real64 term3;
+		Real64 term4;
+
 		Real64 retVal;
 		Real64 summation;
 
 		// Inits
-		summation = 0.0;
+		Ts_1 = surfTempAmplitude_1;
+		PL_1 = phaseShift_1;
+		Ts_2 = surfTempAmplitude_2;
+		PL_2 = phaseShift_2;
 
-		for ( int n = 1; n <= 2; ++n ) {
-			
-			Real64 static tp( NumDaysInYear ); // Period of soil temperature cycle
-			Real64 Ts_n; // Amplitude of surface temperature
-			Real64 PL_n; // Phase shift of surface temperature
-			
-			Real64 term1;
-			Real64 term2;
+		n = 1;
+		term1 = -depth * std::sqrt( ( n * Pi ) / ( groundThermalDiffisivity * tp ) );
+		term2 = ( 2 * Pi * n ) / tp * ( simTimeInDays - PL_1 ) - depth * std::sqrt( ( n * Pi ) / ( groundThermalDiffisivity * tp ) );
 
-			if ( n == 1 ) {
-				Ts_n = surfTempAmplitude_1;
-				PL_n = phaseShift_1;
-			} else if ( n == 2 ) {
-				Ts_n = surfTempAmplitude_2;
-				PL_n = phaseShift_2;
-			}
+		n = 2;
+		term3 = -depth * std::sqrt( ( n * Pi ) / ( groundThermalDiffisivity * tp ) );
+		term4 = ( 2 * Pi * n ) / tp * ( simTimeInDays - PL_2 ) - depth * std::sqrt( ( n * Pi ) / ( groundThermalDiffisivity * tp ) );
 
-			term1 = -depth * std::sqrt( ( n * Pi ) / ( groundThermalDiffisivity * tp ) );
-			term2 = ( 2 * Pi * n ) / tp * ( simTimeInDays - PL_n ) - depth * std::sqrt( ( n * Pi ) / ( groundThermalDiffisivity * tp ) );
-
-			summation += std::exp( term1 ) * Ts_n * std::cos( term2 );
-		}
+		summation = std::exp( term1 ) * Ts_1 * std::cos( term2 ) + std::exp( term3 ) * Ts_2 * std::cos( term4 );
 
 		retVal = aveGroundTemp - summation;
 

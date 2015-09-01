@@ -34,7 +34,7 @@ TEST_F( GroundTempsFixture, SiteDeepGroundTempTest )
 	
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_SiteDeepGroundTemp );
 
-	auto & thisModel = GetGroundTempModelAndInit( CurrentModuleObject, "TEST" );
+	auto thisModel = GetGroundTempModelAndInit( CurrentModuleObject, "TEST" );
 
 	EXPECT_NEAR( 21.0, thisModel->getGroundTempAtTimeInMonths( 0.0, 1 ), 0.1 );		// January
 	EXPECT_NEAR( 32.0, thisModel->getGroundTempAtTimeInMonths( 0.0, 12 ), 0.1 );	// December

@@ -48,7 +48,6 @@ namespace EnergyPlus {
 
 		// Locals
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		bool found = false;
 		int NumNums;
 		int NumAlphas;
 		int IOStat;
@@ -56,8 +55,11 @@ namespace EnergyPlus {
 		// New shared pointer for this model object
 		std::shared_ptr< SiteFCFactorMethodGroundTemps > thisModel( new SiteFCFactorMethodGroundTemps() );
 
-		std::string const cCurrentModuleObject = "Site:GroundTemperature:FCFactorMethod";
+		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_SiteFCFactorMethodGroundTemp );
 		int numCurrObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+
+		thisModel->objectType = objectType;
+		thisModel->objectName = objectName;
 
 		if ( numCurrObjects == 1 ) {
 
@@ -81,20 +83,22 @@ namespace EnergyPlus {
 			thisModel->errorsFound = true;
 
 		} else if ( wthFCGroundTemps ) {
-			FCGroundTemps = true;
+			
 			for ( int i = 1; i <= 12; ++i ) {
 				thisModel->fcFactorGroundTemps( i ) = GroundTempsFCFromEPWHeader( i );
 			}
+
+			FCGroundTemps = true;
 		}
 
 		// Write Final Ground Temp Information to the initialization output file
-		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:FCfactorMethod>, Months From Jan to Dec {C}";
-		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:FCfactorMethod";
-		for ( int i = 1; i <= 12; ++i ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << thisModel->fcFactorGroundTemps( i ); gio::write( OutputFileInits );
+		if ( FCGroundTemps ) {
+			gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:FCfactorMethod>, Months From Jan to Dec {C}";
+			gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:FCfactorMethod";
+			for	( int i = 1; i <= 12; ++i ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << thisModel->fcFactorGroundTemps( i ); gio::write( OutputFileInits );
+		}
 
-		found = true;
-
-		if ( found && !thisModel->errorsFound ) {
+		if ( FCGroundTemps && !thisModel->errorsFound ) {
 			groundTempModels.push_back( thisModel );
 			return thisModel;
 		} else {
@@ -124,7 +128,7 @@ namespace EnergyPlus {
 
 	Real64
 	SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInSeconds(
-		Real64 const _depth,
+		Real64 const EP_UNUSED( _depth ),
 		Real64 const _seconds
 	)
 	{
@@ -161,7 +165,7 @@ namespace EnergyPlus {
 
 	Real64
 	SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInMonths(
-		Real64 const depth,
+		Real64 const EP_UNUSED( _depth ),
 		int const _month
 	)
 	{

@@ -54,8 +54,11 @@ namespace EnergyPlus {
 		// New shared pointer for this model object
 		std::shared_ptr< SiteShallowGroundTemps > thisModel( new SiteShallowGroundTemps() );
 
-		std::string const cCurrentModuleObject = "Site:GroundTemperature:Shallow";
+		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_SiteShallowGroundTemp );
 		int numCurrObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+
+		thisModel->objectType = objectType;
+		thisModel->objectName = objectName;
 
 		if ( numCurrObjects == 1 ) {
 
@@ -118,7 +121,7 @@ namespace EnergyPlus {
 
 	Real64
 	SiteShallowGroundTemps::getGroundTempAtTimeInSeconds(
-		Real64 const _depth,
+		Real64 const EP_UNUSED( _depth ),
 		Real64 const _seconds
 	)
 	{
@@ -155,7 +158,7 @@ namespace EnergyPlus {
 
 	Real64
 	SiteShallowGroundTemps::getGroundTempAtTimeInMonths(
-		Real64 const depth,
+		Real64 const EP_UNUSED( _depth ),
 		int const _month
 	)
 	{
@@ -177,7 +180,6 @@ namespace EnergyPlus {
 
 		// Get and return ground temp
 		return getGroundTemp();
-
 	}
 
 	//******************************************************************************

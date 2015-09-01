@@ -62,7 +62,7 @@ namespace EnergyPlus {
 		std::shared_ptr< FiniteDiffGroundTempsModel > thisModel( new FiniteDiffGroundTempsModel() );
 
 		// Search through finite diff models here
-		std::string const cCurrentModuleObject = "Site:GroundTemperature:Undisturbed:FiniteDifference";
+		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_FiniteDiffGroundTemp );
 		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
@@ -98,7 +98,6 @@ namespace EnergyPlus {
 			ShowFatalError( "Site:GroundTemperature:Undisturbed:FiniteDifference--Errors getting input for ground temperature model" );
 			return nullptr;
 		}
-
 	}
 
 	//******************************************************************************
@@ -224,7 +223,7 @@ namespace EnergyPlus {
 				airDensity_num = 0.0;
 				denominator = 0;
 
-				auto & tdwd = weatherDataArray( DayOfSim ); // "This day weather data"
+				auto tdwd = weatherDataArray( DayOfSim ); // "This day weather data"
 
 				BeginDayFlag = true;
 				EndDayFlag = false;
@@ -365,7 +364,7 @@ namespace EnergyPlus {
 		for ( int i = 1; i <= totalNumCells; ++i ) {
 
 			// Reference to thisCell
-			auto & thisCell = cellArray( i );
+			auto thisCell = cellArray( i );
 
 			// Set the index 
 			thisCell.index = i;
@@ -535,9 +534,9 @@ namespace EnergyPlus {
 		resistance = 0.0;
 		surfConstantsSet = false;
 
-		auto & thisCell = cellArray( 1 );
-		auto & cellBelow_thisCell = cellArray( 2 );
-		auto & cwd = weatherDataArray( simDay ); // "Current Weather Day"
+		auto thisCell = cellArray( 1 );
+		auto cellBelow_thisCell = cellArray( 2 );
+		auto cwd = weatherDataArray( simDay ); // "Current Weather Day"
 
 		// Add effect from previous time step
 		numerator += thisCell.temperature_prevTimeStep;
@@ -652,9 +651,9 @@ namespace EnergyPlus {
 		Real64 denominator = 0.0;
 		Real64 resistance = 0.0;
 
-		auto & thisCell = cellArray( cell );
-		auto & cellAbove_thisCell = cellArray( cell - 1 );
-		auto & cellBelow_thisCell = cellArray( cell + 1 );
+		auto thisCell = cellArray( cell );
+		auto cellAbove_thisCell = cellArray( cell - 1 );
+		auto cellBelow_thisCell = cellArray( cell + 1 );
 
 		// add effect from cell history
 		numerator += thisCell.temperature_prevTimeStep;
@@ -704,8 +703,8 @@ namespace EnergyPlus {
 		Real64 HTBottom;
 		Real64 geothermalGradient;
 
-		auto & thisCell = cellArray( totalNumCells );
-		auto & cellAbove_thisCell = cellArray( totalNumCells - 1 );
+		auto thisCell = cellArray( totalNumCells );
+		auto cellAbove_thisCell = cellArray( totalNumCells - 1 );
 
 		numerator = 0.0;
 		denominator = 0.0;
@@ -752,7 +751,7 @@ namespace EnergyPlus {
 
 		for ( int cell = 1; cell <= totalNumCells; ++ cell ) {
 		
-			auto & thisCell = cellArray( cell );
+			auto thisCell = cellArray( cell );
 
 			if ( std::abs( thisCell.temperature - thisCell.temperature_finalConvergence ) >= finalTempConvergenceCriteria ) {
 				converged = false;
@@ -827,7 +826,7 @@ namespace EnergyPlus {
 
 		// Intialize temperatures and volume
 		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
-			auto & thisCell = cellArray( cell );
+			auto thisCell = cellArray( cell );
 			
 			Real64 depth = ( thisCell.maxZValue + thisCell.minZValue ) / 2.0;
 			
@@ -849,7 +848,6 @@ namespace EnergyPlus {
 		groundTemps.dimension( { 1, NumDaysInYear }, { 1, totalNumCells }, 0.0 );
 
 		tempModel.reset();
-
 	}
 
 	//******************************************************************************
@@ -887,7 +885,7 @@ namespace EnergyPlus {
 
 		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
 
-			auto & thisCell = cellArray( cell );
+			auto thisCell = cellArray( cell );
 
 			thisCell.temperature_prevTimeStep = thisCell.temperature;
 
@@ -912,7 +910,7 @@ namespace EnergyPlus {
 
 		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
 			
-			auto & thisCell = cellArray( cell );
+			auto thisCell = cellArray( cell );
 
 			evaluateSoilRhoCp( cell );
 
@@ -1120,7 +1118,6 @@ namespace EnergyPlus {
 
 		// Get and return ground temperature
 		return getGroundTemp();
-
 	}
 
 	//******************************************************************************
@@ -1185,7 +1182,7 @@ namespace EnergyPlus {
 			return;
 		}
 
-		auto & thisCell = cellArray( cell );
+		auto thisCell = cellArray( cell );
 
 		//'set some temperatures here for generalization -- these could be set in the input file
 		frzAllIce = -0.5;
@@ -1211,7 +1208,6 @@ namespace EnergyPlus {
 		thisCell.props.rhoCp = baseDensity * baseSpecificHeat; //rhoCP_soil;
 
 		thisCell.props.specificHeat = thisCell.props.rhoCp / thisCell.props.density;
-
 	}
 
 	//******************************************************************************

@@ -884,7 +884,6 @@ namespace PipeHeatTransfer {
 		static bool OneTimeInit( true ); // one time flag
 		Real64 FirstTemperatures; // initial temperature of every node in pipe (set to inlet temp) [C]
 		int PipeNum; // number of pipes
-		int MonthIndex;
 		int TimeIndex;
 		int LengthIndex;
 		int DepthIndex;

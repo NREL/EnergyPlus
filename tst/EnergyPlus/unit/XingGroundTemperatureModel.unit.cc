@@ -31,7 +31,7 @@ TEST_F( GroundTempsFixture, XingGroundTempsModelTest )
 	
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_XingGroundTemp );
 
-	auto & thisModel = GetGroundTempModelAndInit( CurrentModuleObject, "TEST" );
+	auto thisModel = GetGroundTempModelAndInit( CurrentModuleObject, "TEST" );
 
 	EXPECT_NEAR( -1.43, thisModel->getGroundTempAtTimeInSeconds( 0.0, 0.0 ), 0.01 );
 	EXPECT_NEAR( 2.15, thisModel->getGroundTempAtTimeInSeconds( 0.0, 6393600 ), 0.1 );		// March 15

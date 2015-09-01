@@ -77,7 +77,7 @@ namespace GroundTemperatureManager {
 
 		// Check if this instance of this model has already been retrieved
 		for ( int i = 0; i < numGTMs; ++i ) {
-			auto & currentModel( groundTempModels[i] );
+			auto currentModel( groundTempModels[i] );
 			// Check if the type and name match
 			if ( objectType == currentModel->objectType && objectName == currentModel->objectName) {
 				return groundTempModels[i];

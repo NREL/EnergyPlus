@@ -46,7 +46,7 @@ namespace EnergyPlus {
 		// New shared pointer for this model object
 		std::shared_ptr< KusudaGroundTempsModel > thisModel( new KusudaGroundTempsModel() );
 
-		std::string const cCurrentModuleObject = "Site:GroundTemperature:Undisturbed:KusudaAchenbach";
+		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_KusudaGroundTemp );
 		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
 		for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
