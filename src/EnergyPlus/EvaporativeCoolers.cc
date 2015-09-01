@@ -1040,7 +1040,7 @@ namespace EvaporativeCoolers {
 						"User-Specified Secondary Fan Flow Rate [m3/s]", IndirectVolFlowRateUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( IndirectVolFlowRateDes - IndirectVolFlowRateUser ) / IndirectVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-							ShowMessage( "SizeEvaporativeCooler:Indirect:ResearchSpecial: \nPotential issue with equipment sizing for " + EvapCond( EvapCoolNum ).EvapCoolerName );
+							ShowMessage( "SizeEvaporativeCooler:Indirect:ResearchSpecial: Potential issue with equipment sizing for " + EvapCond( EvapCoolNum ).EvapCoolerName );
 							ShowContinueError( "User-Specified Secondary Fan Flow Rate of " +
 								RoundSigDigits( IndirectVolFlowRateUser, 5 ) + " [m3/s]" );
 							ShowContinueError( "differs from Design Size Secondary Fan Flow Rate of " +
