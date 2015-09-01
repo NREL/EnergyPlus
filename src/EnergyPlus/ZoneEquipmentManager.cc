@@ -3555,7 +3555,7 @@ namespace ZoneEquipmentManager {
 			}
 			// Calculate an air loop return air flow rate
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
-				if ( ( AirLoopFlow(AirLoopNum).ZoneExhaust > ( AirLoopFlow(AirLoopNum).SupFlow + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced ) || AirLoopFlow(AirLoopNum).ZoneExhaust > ( AirLoopFlow(AirLoopNum).MaxOutAir + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced ) ) && !AirLoopFlow(AirLoopNum).FlowError && AirLoopsSimOnce ) {
+				if ( ( ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).RetFlowAdjustment ) > ( AirLoopFlow( AirLoopNum ).SupFlow + AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced ) || ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).RetFlowAdjustment ) > ( AirLoopFlow( AirLoopNum ).MaxOutAir + AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced ) ) && !AirLoopFlow( AirLoopNum ).FlowError && AirLoopsSimOnce ) {
 					if ( !isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance ) {
 						ShowWarningError( "In AirLoopHVAC " + PrimaryAirSystem(AirLoopNum).Name + " there is unbalanced exhaust air flow." );
 						ShowContinueErrorTimeStamp( "" );
@@ -3570,9 +3570,9 @@ namespace ZoneEquipmentManager {
 				if ( AirLoopFlow(AirLoopNum).ZoneMixingFlow < 0.0 ) {
 					// the source zone and the recieving zone are in different air loops
 					AirLoopFlow(AirLoopNum).ZoneExhaust = max(0.0, (AirLoopFlow(AirLoopNum).ZoneExhaust - AirLoopFlow(AirLoopNum).ZoneMixingFlow));
-					AirLoopFlow( AirLoopNum ).RetFlow = AirLoopFlow( AirLoopNum ).SupFlow - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced ) + AirLoopFlow( AirLoopNum ).RecircFlow + AirLoopFlow( AirLoopNum ).RetFlowAdjustment;
+					AirLoopFlow( AirLoopNum ).RetFlow = AirLoopFlow( AirLoopNum ).SupFlow - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment) + AirLoopFlow( AirLoopNum ).RecircFlow;
 				} else {
-					AirLoopFlow( AirLoopNum ).RetFlow = AirLoopFlow( AirLoopNum ).SupFlow - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced ) + AirLoopFlow( AirLoopNum ).RecircFlow + AirLoopFlow( AirLoopNum ).ZoneMixingFlow + AirLoopFlow( AirLoopNum ).RetFlowAdjustment;
+					AirLoopFlow( AirLoopNum ).RetFlow = AirLoopFlow( AirLoopNum ).SupFlow - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment) + AirLoopFlow( AirLoopNum ).RecircFlow + AirLoopFlow( AirLoopNum ).ZoneMixingFlow;
 				}
 			}
 
