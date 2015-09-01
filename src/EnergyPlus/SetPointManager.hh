@@ -1153,7 +1153,10 @@ namespace SetPointManager {
 		CompOpType( 0 ),
 		SetPt( 0.0 )
 		{}
-		
+
+		// Calculation method
+		void calculate();
+
 	};
 
 	// Object Data
@@ -1205,9 +1208,6 @@ namespace SetPointManager {
 
 	void
 	SimSetPointManagers();
-
-	void
-	CalcScheduledTESSetPoint( int & SetPtMgrNum );
 
 	void
 	UpdateSetPointManagers();

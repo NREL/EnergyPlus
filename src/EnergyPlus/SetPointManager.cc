@@ -4219,13 +4219,13 @@ namespace SetPointManager {
 		}
 
 		// The Scheduled TES Setpoint Managers
-		
+
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSchTESSetPtMgrs; ++SetPtMgrNum ) {
-			
-			CalcScheduledTESSetPoint( SetPtMgrNum );
-			
+
+			SchTESSetPtMgr( SetPtMgrNum ).calculate();
+
 		}
-		
+
 		// The Scheduled Dual Setpoint Managers
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumDualSchSetPtMgrs; ++SetPtMgrNum ) {
@@ -4447,9 +4447,9 @@ namespace SetPointManager {
 	}
 
 	void
-	CalcScheduledTESSetPoint( int & SetPtMgrNum )
+	DefineScheduledTESSetPointManager::calculate()
 	{
-		
+
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   Aug 2014
@@ -4461,33 +4461,27 @@ namespace SetPointManager {
 		
 		// METHODOLOGY EMPLOYED:
 		// Modified schedule setpoint manager logic
-		
-		// REFERENCES:
-		// na
-		
-		// USE STATEMENTS:
-		
+
 		// Locals
-		// SUBROUTINE ARGUMENTS:
 		Real64 CurSchValOnPeak;
 		Real64 CurSchValCharge;
 		Real64 const OnVal( 0.5 );
 		int const CoolOpComp ( 1 ); // a component that cools only (chillers)
 		int const DualOpComp ( 2 ); // a component that heats or cools (ice storage tank)
 		
-		CurSchValOnPeak  = GetCurrentScheduleValue( SchTESSetPtMgr( SetPtMgrNum ).SchedPtr );
-		CurSchValCharge = GetCurrentScheduleValue( SchTESSetPtMgr( SetPtMgrNum ).SchedPtrCharge );
+		CurSchValOnPeak  = GetCurrentScheduleValue( this->SchedPtr );
+		CurSchValCharge = GetCurrentScheduleValue( this->SchedPtrCharge );
 		
-		if ( SchTESSetPtMgr( SetPtMgrNum ).CompOpType == CoolOpComp ) { //this is some sort of chiller
+		if ( this->CompOpType == CoolOpComp ) { //this is some sort of chiller
 			if ( CurSchValOnPeak >= OnVal ) {
-				SchTESSetPtMgr( SetPtMgrNum ).SetPt = SchTESSetPtMgr( SetPtMgrNum ).NonChargeCHWTemp;
+				this->SetPt = this->NonChargeCHWTemp;
 			} else if ( CurSchValCharge < OnVal ) {
-				SchTESSetPtMgr( SetPtMgrNum ).SetPt = SchTESSetPtMgr( SetPtMgrNum ).NonChargeCHWTemp;
+				this->SetPt = this->NonChargeCHWTemp;
 			} else {
-				SchTESSetPtMgr( SetPtMgrNum ).SetPt = SchTESSetPtMgr( SetPtMgrNum ).ChargeCHWTemp;
+				this->SetPt = this->ChargeCHWTemp;
 			}
-		} else if ( SchTESSetPtMgr( SetPtMgrNum ).CompOpType == DualOpComp ) { // this is some sort of ice storage system
-			SchTESSetPtMgr( SetPtMgrNum ).SetPt = SchTESSetPtMgr( SetPtMgrNum ).NonChargeCHWTemp;
+		} else if ( this->CompOpType == DualOpComp ) { // this is some sort of ice storage system
+			this->SetPt = this->NonChargeCHWTemp;
 		}
 		
 	}
@@ -8039,7 +8033,7 @@ namespace SetPointManager {
 		// we must now also initialize, simulate, and update the current SchTESStPtMgr that was just added.  But the init and simulate
 		// steps are the same so we can call the simulate first.
 		
-		CalcScheduledTESSetPoint( NumSchTESSetPtMgrs );
+		SchTESSetPtMgr( NumSchTESSetPtMgrs ).calculate();
 		
 		// Now update reusing code from Update routine specialized to only doing the current (new) setpoint manager and then we are done
 		

@@ -411,24 +411,24 @@ TEST_F( EnergyPlusFixture, CalcScheduledTESSetPoint )
 
 		SetPointManager::SchTESSetPtMgr(schManNum).SchedPtr = OnSched;
 
-			SetPointManager::CalcScheduledTESSetPoint(schManNum);
+			SetPointManager::SchTESSetPtMgr(schManNum).calculate();
 			EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
 
 		SetPointManager::SchTESSetPtMgr(schManNum).SchedPtr = OffSched;
 		SetPointManager::SchTESSetPtMgr(schManNum).SchedPtrCharge = OffSched;
 
-			SetPointManager::CalcScheduledTESSetPoint(schManNum);
+			SetPointManager::SchTESSetPtMgr(schManNum).calculate();
 			EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
 
 		SetPointManager::SchTESSetPtMgr(schManNum).SchedPtr = OffSched;
 		SetPointManager::SchTESSetPtMgr(schManNum).SchedPtrCharge = OnSched;
 
-			SetPointManager::CalcScheduledTESSetPoint(schManNum);
+			SetPointManager::SchTESSetPtMgr(schManNum).calculate();
 			EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).ChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
 
 	SetPointManager::SchTESSetPtMgr(schManNum).CompOpType = DualOpComp;
 
-		SetPointManager::CalcScheduledTESSetPoint(schManNum);
+		SetPointManager::SchTESSetPtMgr(schManNum).calculate();
 		EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
 
 }
