@@ -11,7 +11,12 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -42,7 +47,12 @@ namespace EnergyPlus {
 			DataHVACGlobals::clear_state();
 			DataLoopNode::clear_state();
 			DataSizing::clear_state();
+			DXCoils::clear_state();
+			ExteriorEnergyUse::clear_state();
+			Fans::clear_state();
+			GlobalNames::clear_state();
 			Humidifiers::clear_state();
+			HVACVariableRefrigerantFlow::clear_state();
 			MixedAir::clear_state();
 			NodeInputManager::clear_state();
 			OutAirNodeManager::clear_state();

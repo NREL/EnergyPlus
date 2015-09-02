@@ -721,7 +721,10 @@ namespace Fans {
 		Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
 	);
 
-	void clear_state();
+	// Clears the global data in Fans.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 	// End of Utility subroutines for the Fan Module
 	// *****************************************************************************
