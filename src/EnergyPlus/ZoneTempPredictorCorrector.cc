@@ -4297,15 +4297,6 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName );
-		Real64 ZT_dummy;
-		Real64 ZoneAirHumRat_dummy;
-		Real64 OutBaroPress_dummy;
-		Real64 SumHmaW_dummy;
-		SumHmaW_dummy = SumHmAW(ZoneNum);
-		ZT_dummy = ZT(ZoneNum);
-		ZoneAirHumRat_dummy = ZoneAirHumRat(ZoneNum);
-		OutBaroPress_dummy = OutBaroPress;
-
 		H2OHtOfVap = PsyHgAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) );
 
 		// Check for the flow and NO flow condition

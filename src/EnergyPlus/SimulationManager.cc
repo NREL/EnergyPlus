@@ -519,7 +519,7 @@ namespace SimulationManager {
 					} // TimeStep loop
 
 					PreviousHour = HourOfDay;
-
+					
 				} // ... End hour loop.
 
 				if ( sqlite ) sqlite->sqliteCommit(); // one transaction per day

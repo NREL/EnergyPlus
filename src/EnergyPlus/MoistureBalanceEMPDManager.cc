@@ -405,12 +405,13 @@ namespace MoistureBalanceEMPDManager {
 		using Psychrometrics::PsyRhovFnTdbRh;
 		using Psychrometrics::PsyPsatFnTemp;
 		using Psychrometrics::PsyRhovFnTdbWPb_fast;
+		using DataMoistureBalanceEMPD::Lam;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const Lam( 0.1 ); // Heat of vaporization (J/kg)
+		// Real64 const Lam( 2500000.0 ); // Heat of vaporization (J/kg)
 		static std::string const RoutineName( "CalcMoistureEMPD" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -433,10 +434,11 @@ namespace MoistureBalanceEMPDManager {
 		int Flag; // Convergence flag (0 - converged)
 		static bool OneTimeFlag( true );
 		Real64 PVsurf; // Surface vapor pressure
-		Real64 PVsat; // saturation surface vapor pressure
+		Real64 PVsurf_layer; // Vapor pressure of surface layer
+		Real64 PVdeep_layer;
+		Real64 PVsat; // saturation vapor pressure at the surface
 		Real64 RHSurfOld;
 		Real64 RHDeepOld;
-		Real64 Wsat; // saturation humidity ratio
 		Real64 dEMPD;
 		Real64 dEMPDdeep;
 		Real64 EMPDdiffusivity;
@@ -455,7 +457,7 @@ namespace MoistureBalanceEMPDManager {
 		}
 
 		auto const & surface( Surface( SurfNum ) );
-		auto & moist_empd_new( MoistEMPDNew( SurfNum ) );
+		auto & moist_empd_new( MoistEMPDNew( SurfNum ) );		
 		auto & moist_empd_old( MoistEMPDOld( SurfNum ) );
 		auto const & h_mass_conv_in_fd( HMassConvInFD( SurfNum ) );
 		auto const & rho_vapor_air_in( RhoVaporAirIn( SurfNum ) );
@@ -484,59 +486,83 @@ namespace MoistureBalanceEMPDManager {
 			return;
 		}
 
-		Taver = 20;
+		Taver = TempSurfIn;
+		// Calculate average vapor density [kg/m^3], and RH for use in material property calculations.
 		RVaver = ( moist_empd_new + moist_empd_old ) * 0.5;
 		RHaver = RVaver * 461.52 * ( Taver + KelvinConv ) * std::exp( -23.7093 + 4111.0 / ( Taver + 237.7 ));
-		PVsat = PsyPsatFnTemp( Taver, RoutineName );
-		Wsat = 0.622 * PVsat / ( OutBaroPress - PVsat );
+
+		// Calculate the saturated vapor pressure, surface vapor pressure and dewpoint. Used to check for condensation in HeatBalanceSurfaceManager
+		PVsat = PsyPsatFnTemp(Taver, RoutineName);
+		PVsurf = RHaver * std::exp(23.7093 - 4111.0 / (Taver + 237.7));
+		TempSat = 4111.0 / (23.7093 - std::log(PVsurf)) + 35.45 - KelvinConv;
 		
+		// Convert vapor resistance factor (user input) to diffusivity. Evaluate at local surface temperature. 
+		// 2e-7*T^0.81/P = vapor diffusivity in air. [kg/m-s-Pa]
+		// 461.52 = universal gas constant for water [J/kg-K]
+		// EMPDdiffusivity = [m^2/s]
 		EMPDdiffusivity = (2.0e-7 * pow(Taver + KelvinConv, 0.81) / OutBaroPress) / material.EMPDmu * 461.52 * (Taver+KelvinConv);
 		
+		// Calculate slope of moisture sorption curve at current RH. [kg/kg-RH]
 		AT = material.MoistACoeff * material.MoistBCoeff * pow( RHaver, material.MoistBCoeff - 1 ) + material.MoistCCoeff * material.MoistCCoeff * material.MoistDCoeff * pow( RHaver, material.MoistDCoeff - 1 );
 		
+		// If coating vapor resistance factor equals 0, coating resistance is zero (avoid divide by zero). 
+		// Otherwise, calculate coating resistance with coating vapor resistance factor and thickness. [s/m]
 		if (material.EMPDmuCoating <= 0.0) {
 			Rcoating = 0;
 		} else {
 			Rcoating = material.EMPDCoatingThickness * material.EMPDmuCoating * OutBaroPress / (2.0e-7 * pow(Taver + KelvinConv, 0.81) * 461.52 * (Taver + KelvinConv));
 		}
 		
+		// Calculate mass-transfer coefficient between zone air and center of surface layer. [m/s]
 		hm_short = 1.0 / ( 0.5 * material.EMPDSurfaceDepth / EMPDdiffusivity + 1.0 / h_mass_conv_in_fd + Rcoating );
+		// Calculate mass-transfer coefficient between center of surface layer and center of deep layer. [m/s]
+		// If deep layer depth = 0, set mass-transfer coefficient to zero (simulates with no deep layer).
 		if (material.EMPDDeepDepth <= 0.0) {
 			hm_long = 0;
 		} else {
 		hm_long = 2.0 * EMPDdiffusivity / ( material.EMPDDeepDepth + material.EMPDSurfaceDepth );
 		}
+		// Calculate resistance between surface-layer/air interface and center of surface layer. [s/m]
+		// This is the physical surface of the material.
 		RSurfaceLayer = 1.0 / hm_short - 1.0 / h_mass_conv_in_fd - Rcoating;
 
+		// Calculate vapor flux leaving surface layer, entering deep layer, and entering zone.
 		flux_surf = hm_short * ( rv_surface - rho_vapor_air_in ) + hm_long * ( rv_surface - rv_deep );
 		flux_deep = hm_long * ( rv_surface - rv_deep );
 		flux_zone = hm_short * ( rv_surface - rho_vapor_air_in );
 		
+		// Convert stored vapor density from previous timestep to RH.
 		RHDeepOld = PsyRhFnTdbRhov( Taver, rv_deep_old );
 		RHSurfOld = PsyRhFnTdbRhov( Taver, rv_surf_old );
 		
+		// Calculate new surface layer RH using mass balance on surface layer
 		RHsurface = RHSurfOld + TimeStepZone * 3600.0 * (-flux_surf / (material.Density * material.EMPDSurfaceDepth * AT));
+		// Calculate new deep layer RH using mass balance on deep layer (unless depth <= 0).
 		if (material.EMPDDeepDepth <= 0.0) {
 			RHdeep = RHDeepOld;
 		} else {
 			RHdeep = RHDeepOld + TimeStepZone * 3600.0 * flux_deep / (material.Density * material.EMPDDeepDepth * AT);
 		}
+		// Convert calculated RH back to vapor density of surface and deep layers.
 		rv_surface = PsyRhovFnTdbRh( Taver, RHsurface );
 		rv_deep = PsyRhovFnTdbRh( Taver, RHdeep );
 
+		// Calculate surface-layer and deep-layer vapor pressures [Pa]
+		PVsurf_layer = RHsurface * std::exp(23.7093 - 4111.0 / (Taver + 237.7));
+		PVdeep_layer = RHdeep * std::exp(23.7093 - 4111.0 / (Taver + 237.7));
+
+		// Calculate vapor density at physical material surface (surface-layer/air interface). This is used to calculate total moisture flow terms for each zone in HeatBalanceSurfaceManager
 		moist_empd_new = rv_surface - flux_zone*RSurfaceLayer;
+
+		// Calculate heat flux from latent-sensible conversion due to moisture adsorption [W/m^2]
 		moist_empd_flux = flux_zone*Lam;
 
-		// Calculate latent load
-		PVsurf = RHaver * std::exp( 23.7093 - 4111.0 / ( Taver + 237.7 ) );
-		
-		// Calculate surface dew point temperature based on surface vapor density
-		TempSat = 4111.0 / ( 23.7093 - std::log( PVsurf ) ) + 35.45 - KelvinConv;
-
 		// Put results in the single precision reporting variable
+		// Will add RH and W of deep layer as outputs
+		// Need to also add moisture content (kg/kg) of surface and deep layers, and moisture flow from each surface (kg/s), per Rongpeng's suggestion
 		RhoVapEMPD( SurfNum ) = rv_surface;
 		RHEMPD( SurfNum ) = RHsurface * 100.0;
-		WSurfEMPD( SurfNum ) = rho_vapor_air_in;
+		WSurfEMPD( SurfNum ) = 0.622 * PVsurf_layer / (OutBaroPress - PVsurf_layer);
 
 	}
 
