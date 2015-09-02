@@ -30,7 +30,7 @@ namespace GroundTemperatureManager {
 	int const objectType_SiteFCFactorMethodGroundTemp( 6 );
 	int const objectType_XingGroundTemp( 7 );
 
-	Array1D_string const CurrentModuleObjects( 7, { "SITE:GROUNDTEMPERATURE:UNDISTURBED:KUSUDAACHENBACH", "SITE:GROUNDTEMPERATURE:UNDISTURBED:FINITEDIFFERENCE", "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "SITE:GROUNDTEMPERATURE:SHALLOW", "SITE:GROUNDTEMPERATURE:DEEP", "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "SITE:GROUNDTEMPERATURE:UNDISTURBED:XING"} );
+	Array1D_string const CurrentModuleObjects( 7, { "Site:Groundtemperature:Undisturbed:KusudaAchenbach", "Site:GroundTemperature:Undisturbed:FiniteDifference", "Site:GroundTemperature:BuildingSurface", "Site:GroundTemperature:Shallow", "Site:GroundTemperature:Deep", "Site:GroundTemperature:FCfactorMethod", "Site:GroundTemperature:Undisturbed:Xing"} );
 			
 	//******************************************************************************
 
@@ -49,24 +49,27 @@ namespace GroundTemperatureManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Called by objects requireing ground temperature models. Determines type and calls appropriate factory method.
 
+		// USE STATEMENTS:
+		using InputProcessor::MakeUPPERCase;
+
 		// Locals
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int objectType( 0 );
 	
 		// Set object type
-		if ( objectType_str == CurrentModuleObjects( objectType_KusudaGroundTemp ) ) {
+		if ( objectType_str == MakeUPPERCase( CurrentModuleObjects( objectType_KusudaGroundTemp ) ) ) {
 			objectType = objectType_KusudaGroundTemp;
-		} else if ( objectType_str == CurrentModuleObjects( objectType_FiniteDiffGroundTemp ) ) {
+		} else if ( objectType_str == MakeUPPERCase( CurrentModuleObjects( objectType_FiniteDiffGroundTemp ) ) ) {
 			objectType = objectType_FiniteDiffGroundTemp;
-		} else if ( objectType_str == CurrentModuleObjects( objectType_SiteBuildingSurfaceGroundTemp ) ) {
+		} else if ( objectType_str == MakeUPPERCase( CurrentModuleObjects( objectType_SiteBuildingSurfaceGroundTemp ) ) ) {
 			objectType = objectType_SiteBuildingSurfaceGroundTemp;
-		} else if ( objectType_str == CurrentModuleObjects( objectType_SiteShallowGroundTemp ) ){
+		} else if ( objectType_str == MakeUPPERCase( CurrentModuleObjects( objectType_SiteShallowGroundTemp ) ) ){
 			objectType = objectType_SiteShallowGroundTemp;
-		} else if ( objectType_str == CurrentModuleObjects( objectType_SiteDeepGroundTemp ) ) {
+		} else if ( objectType_str == MakeUPPERCase( CurrentModuleObjects( objectType_SiteDeepGroundTemp ) ) ) {
 			objectType = objectType_SiteDeepGroundTemp;
-		} else if ( objectType_str == CurrentModuleObjects( objectType_SiteFCFactorMethodGroundTemp ) ) {
+		} else if ( objectType_str == MakeUPPERCase( CurrentModuleObjects( objectType_SiteFCFactorMethodGroundTemp ) ) ) {
 			objectType = objectType_SiteFCFactorMethodGroundTemp;
-		} else if (objectType_str == CurrentModuleObjects( objectType_XingGroundTemp ) ) {
+		} else if (objectType_str == MakeUPPERCase( CurrentModuleObjects( objectType_XingGroundTemp ) ) ) {
 			objectType = objectType_XingGroundTemp;
 		} else {
 			// Error out if no ground temperature object types recognized
