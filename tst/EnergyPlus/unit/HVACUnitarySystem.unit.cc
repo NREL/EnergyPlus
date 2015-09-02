@@ -3,23 +3,24 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// EnergyPlus Headers
-#include <General.hh>
+// ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
+
+// EnergyPlus Headers
+#include <EnergyPlus/HVACUnitarySystem.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/HVACUnitarySystem.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Psychrometrics.hh>
-
-#include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterCoils.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::HVACUnitarySystem;
@@ -230,6 +231,7 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 	CurSysNum = 0;
 	CurOASysNum = 0;
 	CurZoneEqNum = 1;
+	DataEnvironment::StdRhoAir = 1000; // Prevent divide by zero in ReportSizingManager
 
 	UnitarySystem.allocate( 1 );
 	UnitarySystem( UnitarySysNum ).UnitarySystemType = "AirLoopHVAC:UnitarySystem";
@@ -446,7 +448,7 @@ TEST( HVACUnitarySystem, CalcUnitaryHeatingSystem ) {
 	HeatingLoad = true;
 	CoolingLoad = false;
 
-	// cycling fan mode 
+	// cycling fan mode
 	UnitarySystem( UnitarySysNum ).FanOpMode = CycFanCycCoil;
 
 	// heating load only
@@ -689,7 +691,7 @@ TEST( HVACUnitarySystem, CalcUnitaryCoolingSystem ) {
 	DataGlobals::DoingSizing = true;
 
 	WaterCoil( 1 ).TotWaterCoolingCoilRate = 0.0;
-	
+
 	CalcUnitaryCoolingSystem( UnitarySysNum, FirstHVACIteration, UnitarySystem( UnitarySysNum ).CoolingCycRatio, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat );
 
 	EXPECT_NEAR( 27530.0, WaterCoil( 1 ).TotWaterCoolingCoilRate, 2.0 );
