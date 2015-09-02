@@ -318,8 +318,6 @@
 	inline MA1c_double BmSolRefldInsReveal() const { return ma( &T::BmSolRefldInsReveal ); }
 	inline MA1c_double BmSolRefldInsRevealReport() const { return ma( &T::BmSolRefldInsRevealReport ); }
 	inline MA1c_double BmSolRefldOutsRevealReport() const { return ma( &T::BmSolRefldOutsRevealReport ); }
-	inline MA1c_double BmSolTransThruIntWinRep() const { return ma( &T::BmSolTransThruIntWinRep ); }
-	inline MA1c_double BmSolTransThruIntWinRepEnergy() const { return ma( &T::BmSolTransThruIntWinRepEnergy ); }
 	inline MA1c_double BulkTemperature() const { return ma( &T::BulkTemperature ); }
 	inline MA1c_double BypassFrac() const { return ma( &T::BypassFrac ); }
 	inline MA1c_double CoeffA0() const { return ma( &T::CoeffA0 ); }
@@ -407,8 +405,6 @@
 	inline MA1c_double DiffLatLossJ() const { return ma( &T::DiffLatLossJ ); }
 	inline MA1c_double DiffLatLossW() const { return ma( &T::DiffLatLossW ); }
 	inline MA1c_double DistPipeZoneHeatGain() const { return ma( &T::DistPipeZoneHeatGain ); }
-	inline MA1c_double DividerQRadInAbs() const { return ma( &T::DividerQRadInAbs ); }
-	inline MA1c_double DividerQRadOutAbs() const { return ma( &T::DividerQRadOutAbs ); }
 	inline MA1c_double DividerTempSurfIn() const { return ma( &T::DividerTempSurfIn ); }
 	inline MA1c_double DividerTempSurfInOld() const { return ma( &T::DividerTempSurfInOld ); }
 	inline MA1c_double DividerTempSurfOut() const { return ma( &T::DividerTempSurfOut ); }
@@ -459,8 +455,6 @@
 	inline MA1c_double FloorArea() const { return ma( &T::FloorArea ); }
 	inline MA1c_double FLOW() const { return ma( &T::FLOW ); }
 	inline MA1c_double FLOW2() const { return ma( &T::FLOW2 ); }
-	inline MA1c_double FrameQRadInAbs() const { return ma( &T::FrameQRadInAbs ); }
-	inline MA1c_double FrameQRadOutAbs() const { return ma( &T::FrameQRadOutAbs ); }
 	inline MA1c_double FrameTempSurfIn() const { return ma( &T::FrameTempSurfIn ); }
 	inline MA1c_double FrameTempSurfInOld() const { return ma( &T::FrameTempSurfInOld ); }
 	inline MA1c_double FrameTempSurfOut() const { return ma( &T::FrameTempSurfOut ); }
@@ -909,8 +903,6 @@
 	inline MA1_double BmSolRefldInsReveal() { return ma( &T::BmSolRefldInsReveal ); }
 	inline MA1_double BmSolRefldInsRevealReport() { return ma( &T::BmSolRefldInsRevealReport ); }
 	inline MA1_double BmSolRefldOutsRevealReport() { return ma( &T::BmSolRefldOutsRevealReport ); }
-	inline MA1_double BmSolTransThruIntWinRep() { return ma( &T::BmSolTransThruIntWinRep ); }
-	inline MA1_double BmSolTransThruIntWinRepEnergy() { return ma( &T::BmSolTransThruIntWinRepEnergy ); }
 	inline MA1_double BulkTemperature() { return ma( &T::BulkTemperature ); }
 	inline MA1_double BypassFrac() { return ma( &T::BypassFrac ); }
 	inline MA1_double CoeffA0() { return ma( &T::CoeffA0 ); }
@@ -998,8 +990,6 @@
 	inline MA1_double DiffLatLossJ() { return ma( &T::DiffLatLossJ ); }
 	inline MA1_double DiffLatLossW() { return ma( &T::DiffLatLossW ); }
 	inline MA1_double DistPipeZoneHeatGain() { return ma( &T::DistPipeZoneHeatGain ); }
-	inline MA1_double DividerQRadInAbs() { return ma( &T::DividerQRadInAbs ); }
-	inline MA1_double DividerQRadOutAbs() { return ma( &T::DividerQRadOutAbs ); }
 	inline MA1_double DividerTempSurfIn() { return ma( &T::DividerTempSurfIn ); }
 	inline MA1_double DividerTempSurfInOld() { return ma( &T::DividerTempSurfInOld ); }
 	inline MA1_double DividerTempSurfOut() { return ma( &T::DividerTempSurfOut ); }
@@ -1050,8 +1040,6 @@
 	inline MA1_double FloorArea() { return ma( &T::FloorArea ); }
 	inline MA1_double FLOW() { return ma( &T::FLOW ); }
 	inline MA1_double FLOW2() { return ma( &T::FLOW2 ); }
-	inline MA1_double FrameQRadInAbs() { return ma( &T::FrameQRadInAbs ); }
-	inline MA1_double FrameQRadOutAbs() { return ma( &T::FrameQRadOutAbs ); }
 	inline MA1_double FrameTempSurfIn() { return ma( &T::FrameTempSurfIn ); }
 	inline MA1_double FrameTempSurfInOld() { return ma( &T::FrameTempSurfInOld ); }
 	inline MA1_double FrameTempSurfOut() { return ma( &T::FrameTempSurfOut ); }
