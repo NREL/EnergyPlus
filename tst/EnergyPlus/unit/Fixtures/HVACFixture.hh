@@ -12,7 +12,6 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Humidifiers.hh>
-#include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -42,7 +41,6 @@ namespace EnergyPlus {
 			DataLoopNode::clear_state();
 			DataSizing::clear_state();
 			Humidifiers::clear_state();
-			HVACUnitarySystem::clear_state();
 			MixedAir::clear_state();
 			NodeInputManager::clear_state();
 			OutAirNodeManager::clear_state();

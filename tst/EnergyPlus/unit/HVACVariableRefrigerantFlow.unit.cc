@@ -16,9 +16,6 @@
 #include <DataSizing.hh>
 #include <DataZoneEquipment.hh>
 #include <DataZoneEnergyDemands.hh>
-#include <DXCoils.hh>
-#include <Fans.hh>
-#include <GlobalNames.hh>
 #include <HeatBalanceManager.hh>
 #include <HVACVariableRefrigerantFlow.hh>
 #include <OutputReportPredefined.hh>
@@ -37,11 +34,8 @@ using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEnergyDemands;
-using namespace EnergyPlus::DXCoils;
-using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::HVACVariableRefrigerantFlow;
-using namespace EnergyPlus::GlobalNames;
 using namespace EnergyPlus::OutputReportPredefined;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
@@ -178,7 +172,7 @@ namespace EnergyPlus {
 			"  autosize,                 !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"  VRFFanSchedule,           !- Supply Air Fan Operating Mode Schedule Name",
 			"  drawthrough,              !- Supply Air Fan Placement",
-			"  Fan:OnOff,                !- Supply Air Fan Object Type",
+			"  Fan:ConstantVolume,       !- Supply Air Fan Object Type",
 			"  TU1 VRF Supply Fan,       !- Supply Air Fan Object Name",
 			"  OutdoorAir:Mixer,         !- Outside Air Mixer Object Type",
 			"  TU1 OA Mixer,             !- Outside Air Mixer Object Name",
@@ -189,7 +183,7 @@ namespace EnergyPlus {
 			"  30,                       !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
 			"  20;                       !- Zone Terminal Unit Off Parasitic Electric Energy Use{ W }",
 			" ",
-			"Fan:OnOff,",
+			"Fan:ConstantVolume,",
 			"  TU1 VRF Supply Fan,       !- Name",
 			"  VRFAvailSched,            !- Availability Schedule Name",
 			"  0.7,                      !- Fan Total Efficiency",
@@ -651,11 +645,6 @@ namespace EnergyPlus {
 		GetCurveInput(); // read curves
 		GetZoneData( ErrorsFound ); // read zone data
 		EXPECT_FALSE( ErrorsFound ); 
-
-		Fans::GetFanInputFlag = true; // remove this when clear_state gets added to Fans
-		DXCoils::GetCoilsInputFlag = true; // remove this when clear_state gets added to DXCoils
-		GlobalNames::NumCoils = 0; // remove this when clear_state gets added to GlobalNames
-		GlobalNames::CoilNames.deallocate(); // remove this when clear_state gets added to GlobalNames
 
 		GetZoneEquipmentData(); // read equipment list and connections
 		ZoneInletAirNode = GetVRFTUZoneInletAirNode( VRFTUNum ); // trigger GetVRFInput by calling a mining function

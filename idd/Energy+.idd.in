@@ -31865,7 +31865,6 @@ ZoneHVAC:FourPipeFanCoil,
         \key CyclingFan
         \key VariableFanVariableFlow
         \key VariableFanConstantFlow
-        \key MultiStageFan
    N1 , \field Maximum Supply Air Flow Rate
         \required-field
         \autosizable
@@ -31964,18 +31963,10 @@ ZoneHVAC:FourPipeFanCoil,
         \note Enter the name of an AvailabilityManagerAssignmentList object.
         \type object-list
         \object-list SystemAvailabilityManagerLists
-   A16, \field Design Specification ZoneHVAC Sizing Object Name
+   A16; \field Design Specification ZoneHVAC Sizing Object Name
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
         \type object-list
         \object-list DesignSpecificationZoneHVACSizingName
-   A17; \field Supply Air Fan Operating Mode Schedule Name
-        \type object-list
-        \object-list ScheduleNames
-        \note Enter the name of a schedule that controls fan operation. Schedule Name values of 0 denote
-        \note cycling fan operation (fan cycles with cooling coil). Schedule values greater
-        \note than 0 denote constant fan operation (fan runs continually regardless of coil operation).
-        \note The fan operating mode defaults to cycling fan operation if this field is left blank.
-        \note This input field is currently used with MultiStageFan capacity control method
 
 ZoneHVAC:WindowAirConditioner,
         \memo Window air conditioner. Forced-convection cooling-only unit with supply fan, direct
@@ -51091,19 +51082,19 @@ AirLoopHVAC:UnitarySystem,
   A25, \field Heat Recovery Water Outlet Node Name
        \type node
        \note Enter the name of the heat recovery water outlet node if plant water loop connections are present.
-  A26, \field Design Specification Multispeed Object Type
+  A26, \field Design Specification Multispeed Heat Pump Object Type
        \type choice
-       \key UnitarySystemPerformance:Multispeed
+       \key UnitarySystemPerformance:HeatPump:Multispeed
        \note Enter the type of performance specification object used to describe the multispeed coil.
-  A27; \field Design Specification Multispeed Object Name
+  A27; \field Design Specification Multispeed Heat Pump Object Name
        \type object-list
        \object-list UnitarySystemPerformaceNames
        \note Enter the name of the performance specification object used to describe the multispeed coil.
 
-UnitarySystemPerformance:Multispeed,
+UnitarySystemPerformance:HeatPump:Multispeed,
        \memo The UnitarySystemPerformance object is used to specify the air flow ratio at each
-       \memo operating speed. This object is primarily used for multispeed DX and water coils to allow
-       \memo operation at alternate flow rates different from those specified in the coil object.
+       \memo operating speed. This object is primarily used for multispeed coils to allow operation
+       \memo at alternate flow rates different from those specified in the coil object.
        \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
   A1 , \field Name
        \required-field
