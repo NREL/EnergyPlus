@@ -179,6 +179,7 @@ namespace DXCoils {
 	Real64 HPWHHeatingCapacity( 0.0 ); // Used by Heat Pump:Water Heater object as total water heating capacity [W]
 	Real64 HPWHHeatingCOP( 0.0 ); // Used by Heat Pump:Water Heater object as water heating COP [W/W]
 	bool GetCoilsInputFlag( true ); // First time, input is "gotten"
+	bool MyOneTimeFlag( true ); // One time flag used to allocate MyEnvrnFlag and MySizeFlag
 	int NumVRFHeatingCoils( 0 ); // number of VRF heat pump heating coils
 	int NumVRFCoolingCoils( 0 ); // number of VRF heat pump cooling coils
 	int NumDXHeatingCoils( 0 ); // number of DX heat pump heating coils
@@ -4212,7 +4213,7 @@ namespace DXCoils {
 
 			// Only required for reverse cycle heat pumps
 			DXCoil( DXCoilNum ).DefrostEIRFT = GetCurveIndex( Alphas( 5 ) ); // convert curve name to number
-			if ( SameString( Alphas( 6 ), "ReverseCycle" ) && SameString( Alphas( 7 ), "OnDemand" ) ) {
+			if ( SameString( Alphas( 6 ), "ReverseCycle" ) ) {
 				if ( DXCoil( DXCoilNum ).DefrostEIRFT == 0 ) {
 					if ( lAlphaBlanks( 5 ) ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
@@ -5173,7 +5174,6 @@ namespace DXCoils {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Array1D_bool MyEnvrnFlag; // One time environment flag
 		static Array1D_bool MySizeFlag; // One time sizing flag
-		static bool MyOneTimeFlag( true ); // One time flag used to allocate MyEnvrnFlag and MySizeFlag
 		static bool CrankcaseHeaterReportVarFlag( true ); // One time flag used to report crankcase heater power for non-HP coils
 		Real64 RatedHeatPumpIndoorAirTemp; // Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
 		Real64 RatedHeatPumpIndoorHumRat; // Inlet humidity ratio to heat pump evaporator at rated conditions [kgWater/kgDryAir]
@@ -8742,7 +8742,7 @@ Label50: ;
 			InputPowerMultiplier = 1.0;
 
 			// Check outdoor temperature to determine of defrost is active
-			if ( OutdoorDryBulb <= DXCoil( DXCoilNum ).MaxOATDefrost ) {
+			if( OutdoorDryBulb <= DXCoil( DXCoilNum ).MaxOATDefrost && DXCoil( DXCoilNum ).CondenserType( Mode ) != WaterCooled ) {
 				// Calculate defrost adjustment factors depending on defrost control type
 				if ( DXCoil( DXCoilNum ).DefrostControl == Timed ) {
 					FractionalDefrostTime = DXCoil( DXCoilNum ).DefrostTime;
@@ -8758,7 +8758,7 @@ Label50: ;
 
 				if ( FractionalDefrostTime > 0.0 ) {
 					// Calculate defrost adjustment factors depending on defrost control strategy
-					if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle && DXCoil( DXCoilNum ).DefrostControl == OnDemand ) {
+					if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle ) {
 						LoadDueToDefrost = ( 0.01 * FractionalDefrostTime ) * ( 7.222 - OutdoorDryBulb ) * ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) / 1.01667 );
 						DefrostEIRTempModFac = CurveValue( DXCoil( DXCoilNum ).DefrostEIRFT, max( 15.555, InletAirWetBulbC ), max( 15.555, OutdoorDryBulb ) );
 						DXCoil( DXCoilNum ).DefrostPower = DefrostEIRTempModFac * ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) / 1.01667 ) * FractionalDefrostTime;
@@ -8825,7 +8825,7 @@ Label50: ;
 			}
 			EIR = DXCoil( DXCoilNum ).RatedEIR( Mode ) * EIRTempModFac * EIRFlowModFac;
 			// Calculate modified PartLoadRatio due to defrost (reverse-cycle defrost only)
-			PLRHeating = min( 1.0, ( PartLoadRatio + LoadDueToDefrost / TotCapAdj ) );
+			PLRHeating = min( 1.0, ( PartLoadRatio + ( LoadDueToDefrost * PartLoadRatio ) / TotCapAdj ) );
 			if ( DXCoil( DXCoilNum ).DXCoilType_Num != CoilVRF_Heating ) {
 				PLF = CurveValue( DXCoil( DXCoilNum ).PLFFPLR( Mode ), PLRHeating ); // Calculate part-load factor
 			} else {
@@ -14008,7 +14008,46 @@ Label50: ;
 		return SHR;
 	}
 
+	// Clears the global data in DXCoils.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
 
+		CurDXCoilNum = 0;
+		NumDXCoils = 0;
+		HPWHHeatingCapacity = 0.0;
+		HPWHHeatingCOP = 0.0;
+		NumVRFHeatingCoils = 0;
+		NumVRFCoolingCoils = 0;
+		NumDXHeatingCoils = 0;
+		NumDoe2DXCoils = 0;
+		NumDXHeatPumpWaterHeaterPumpedCoils = 0;
+		NumDXHeatPumpWaterHeaterWrappedCoils = 0;
+		NumDXMulSpeedCoils = 0;
+		NumDXMulModeCoils = 0;
+		NumDXMulSpeedCoolCoils = 0;
+		NumDXMulSpeedHeatCoils = 0;
+
+		GetCoilsInputFlag = true;
+		MyOneTimeFlag = true;
+
+		DXCoil.deallocate();
+		DXCoilNumericFields.deallocate();
+		DXCoilOutletTemp.deallocate();
+		DXCoilOutletHumRat.deallocate();
+		DXCoilPartLoadRatio.deallocate();
+		DXCoilFanOpMode.deallocate();
+		DXCoilFullLoadOutAirTemp.deallocate();
+		DXCoilFullLoadOutAirHumRat.deallocate();
+		DXCoilTotalCooling.deallocate();
+		DXCoilTotalHeating.deallocate();
+		DXCoilCoolInletAirWBTemp.deallocate();
+		DXCoilHeatInletAirDBTemp.deallocate();
+		DXCoilHeatInletAirWBTemp.deallocate();
+		CheckEquipName.deallocate();
+
+	}
 
 	//     NOTICE
 

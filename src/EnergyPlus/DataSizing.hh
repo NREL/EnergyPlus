@@ -95,8 +95,10 @@ namespace DataSizing {
 	//  considering the zone air distribution effectiveness and the system ventilation efficiency
 	extern int const SOAM_IAQP; // Use ASHRAE Standard 62.1-2007 IAQP to calculate the system level outdoor air flow rates
 	// based on the CO2 setpoint
-	extern int const SOAM_ProportionalControl; // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
-	// to calculate the system level outdoor air flow rates
+	extern int const SOAM_ProportionalControlSchOcc; // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+	// to calculate the system level outdoor air flow rates based on scheduled occupancy
+	extern int const SOAM_ProportionalControlDesOcc; // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+	// to calculate the system level outdoor air flow rates based on design occupancy
 	extern int const SOAM_IAQPGC; // Use ASHRAE Standard 62.1-2004 IAQP to calculate the system level outdoor air flow rates
 	// based on the generic contaminant setpoint
 	extern int const SOAM_IAQPCOM; // Take the maximum outdoor air rate from both CO2 and generic contaminant controls
