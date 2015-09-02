@@ -94349,7 +94349,7 @@ Output:Table:Monthly,
        \key MaximumDuringHoursShown
        \key MinimumDuringHoursShown
        \note See instructions under AggregationType01
-
+ 
 Output:Table:Annual,
        \memo Provides a generic method of setting up tables of annual results with one row per object. 
        \memo The report has multiple columns that are each defined using a repeated group of fields 
@@ -94359,18 +94359,12 @@ Output:Table:Annual,
    A1, \field Name
        \required-field
        \type alpha
-   A2, \field Report Group Name
-       \type alpha
-       \note An optional text string for the name of the report group. If this input is not blank the 
-       \note table will appear as a subtable in a report so that multiple Output:Table:Annual tables 
-       \note are shown together under one heading. This is similar to how many of the predefined reports 
-       \note appear with multiple subtables. If the input is left blank it will appear by itself in a report.
-   A3, \field Filter
+   A2, \field Filter
        \type alpha
        \note An optional text string that is compared to the names of the objects referenced by the 
        \note variables and if they match are included in the table. A footnote will appear that indicates 
        \note that the objects shown may not be all the objects that of that type that occur in the file. 
-   A4, \field Schedule Name
+   A3, \field Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note Optional schedule name. If left blank, aggregation is performed for all hours simulated. If 
@@ -94395,13 +94389,9 @@ Output:Table:Annual,
        \key HoursNonPositive
        \key HoursNegative
        \key HoursNonNegative
-       \key HoursInTenPercentBins 
        \key HourInTenBinsMinToMax 
        \key HourInTenBinsZeroToMax 
        \key HourInTenBinsMinToZero 
-       \key HoursInTenBinsPlusMinusTwoStdDev 
-       \key HoursInTenBinsPlusMinusThreeStdDev 
-       \key NoAggregation
        \key SumOrAverageDuringHoursShown
        \key MaximumDuringHoursShown
        \key MinimumDuringHoursShown
@@ -94434,8 +94424,6 @@ Output:Table:Annual,
        \note HoursNonNegative - The HoursNonNegative option adds up the elapsed time during the month
        \note   that this variable has non-negative value. Hours with a positive value and
        \note   hours with a zero value are all included.
-       \note HoursInTenPercentBins - Creates 12 columns for the specified variable and shows the number 
-       \note   of hours in each of the following bins.
        \note HourInTenBinsMinToMax - Creates 10 columns for the specified variable and shows the number 
        \note   of hours in each of 10 bins based on the minimum and maximum value. The bin sizes will 
        \note   be rounded up to the next most signficant digit value. 
@@ -94445,17 +94433,6 @@ Output:Table:Annual,
        \note HourInTenBinsMinToZero - Creates 11 columns for the specified variable and shows the number 
        \note   of hours in each of 10 bins from zero to the minimum value and a bin for hours above zero. 
        \note   The bin sizes will be rounded up to the next most significant digit value.
-       \note HoursInTenBinsPlusMinusTwoStdDev - Creates 12 columns for the specified variable and shows 
-       \note   the number of hours in each of ten bins from minus two standard deviations to plus two 
-       \note   standard deviations plus a bin for hours below two standard deviations and another for 
-       \note   hours above two standard deviations. No bin size rounding for this option. 
-       \note HoursInTenBinsPlusMinusThreeStdDev - Creates 12 columns for the specified variable and 
-       \note   shows the number of hours in each of ten bins from minus three standard deviations to 
-       \note   plus three standard deviations plus a bin for hours below three standard deviations and 
-       \note   another for hours above three standard deviations. No bin size rounding for this option. 
-       \note NoAggregation - For values that do not change such as IDF object field inputs and EMS 
-       \note   internal variables, the NoAggregation value should be used since no aggregation is possible 
-       \note   on values that do not change during the simulation.
        \note SumOrAverageDuringHoursShown - Provides the sum or average of the named variable when
        \note   during the hours that the previous variable displayed with any of the Aggregation Types
        \note   starting with "Hours". For "sum" type variables adds up the values for each timestep
@@ -94494,13 +94471,9 @@ Output:Table:Annual,
        \key HoursNonPositive
        \key HoursNegative
        \key HoursNonNegative
-       \key HoursInTenPercentBins 
        \key HourInTenBinsMinToMax 
        \key HourInTenBinsZeroToMax 
        \key HourInTenBinsMinToZero 
-       \key HoursInTenBinsPlusMinusTwoStdDev 
-       \key HoursInTenBinsPlusMinusThreeStdDev 
-       \key NoAggregation
        \key SumOrAverageDuringHoursShown
        \key MaximumDuringHoursShown
        \key MinimumDuringHoursShown
@@ -94525,13 +94498,9 @@ Output:Table:Annual,
        \key HoursNonPositive
        \key HoursNegative
        \key HoursNonNegative
-       \key HoursInTenPercentBins 
        \key HourInTenBinsMinToMax 
        \key HourInTenBinsZeroToMax 
        \key HourInTenBinsMinToZero 
-       \key HoursInTenBinsPlusMinusTwoStdDev 
-       \key HoursInTenBinsPlusMinusThreeStdDev 
-       \key NoAggregation
        \key SumOrAverageDuringHoursShown
        \key MaximumDuringHoursShown
        \key MinimumDuringHoursShown
@@ -94556,13 +94525,9 @@ Output:Table:Annual,
        \key HoursNonPositive
        \key HoursNegative
        \key HoursNonNegative
-       \key HoursInTenPercentBins 
        \key HourInTenBinsMinToMax 
        \key HourInTenBinsZeroToMax 
        \key HourInTenBinsMinToZero 
-       \key HoursInTenBinsPlusMinusTwoStdDev 
-       \key HoursInTenBinsPlusMinusThreeStdDev 
-       \key NoAggregation
        \key SumOrAverageDuringHoursShown
        \key MaximumDuringHoursShown
        \key MinimumDuringHoursShown
@@ -94587,13 +94552,9 @@ Output:Table:Annual,
        \key HoursNonPositive
        \key HoursNegative
        \key HoursNonNegative
-       \key HoursInTenPercentBins 
        \key HourInTenBinsMinToMax 
        \key HourInTenBinsZeroToMax 
        \key HourInTenBinsMinToZero 
-       \key HoursInTenBinsPlusMinusTwoStdDev 
-       \key HoursInTenBinsPlusMinusThreeStdDev 
-       \key NoAggregation
        \key SumOrAverageDuringHoursShown
        \key MaximumDuringHoursShown
        \key MinimumDuringHoursShown
@@ -94618,13 +94579,9 @@ Output:Table:Annual,
        \key HoursNonPositive
        \key HoursNegative
        \key HoursNonNegative
-       \key HoursInTenPercentBins 
        \key HourInTenBinsMinToMax 
        \key HourInTenBinsZeroToMax 
        \key HourInTenBinsMinToZero 
-       \key HoursInTenBinsPlusMinusTwoStdDev 
-       \key HoursInTenBinsPlusMinusThreeStdDev 
-       \key NoAggregation
        \key SumOrAverageDuringHoursShown
        \key MaximumDuringHoursShown
        \key MinimumDuringHoursShown
@@ -94649,13 +94606,9 @@ Output:Table:Annual,
        \key HoursNonPositive
        \key HoursNegative
        \key HoursNonNegative
-       \key HoursInTenPercentBins 
        \key HourInTenBinsMinToMax 
        \key HourInTenBinsZeroToMax 
        \key HourInTenBinsMinToZero 
-       \key HoursInTenBinsPlusMinusTwoStdDev 
-       \key HoursInTenBinsPlusMinusThreeStdDev 
-       \key NoAggregation
        \key SumOrAverageDuringHoursShown
        \key MaximumDuringHoursShown
        \key MinimumDuringHoursShown
@@ -94680,13 +94633,9 @@ Output:Table:Annual,
        \key HoursNonPositive
        \key HoursNegative
        \key HoursNonNegative
-       \key HoursInTenPercentBins 
        \key HourInTenBinsMinToMax 
        \key HourInTenBinsZeroToMax 
        \key HourInTenBinsMinToZero 
-       \key HoursInTenBinsPlusMinusTwoStdDev 
-       \key HoursInTenBinsPlusMinusThreeStdDev 
-       \key NoAggregation
        \key SumOrAverageDuringHoursShown
        \key MaximumDuringHoursShown
        \key MinimumDuringHoursShown
@@ -94711,13 +94660,9 @@ Output:Table:Annual,
        \key HoursNonPositive
        \key HoursNegative
        \key HoursNonNegative
-       \key HoursInTenPercentBins 
        \key HourInTenBinsMinToMax 
        \key HourInTenBinsZeroToMax 
        \key HourInTenBinsMinToZero 
-       \key HoursInTenBinsPlusMinusTwoStdDev 
-       \key HoursInTenBinsPlusMinusThreeStdDev 
-       \key NoAggregation
        \key SumOrAverageDuringHoursShown
        \key MaximumDuringHoursShown
        \key MinimumDuringHoursShown
@@ -94742,13 +94687,9 @@ Output:Table:Annual,
        \key HoursNonPositive
        \key HoursNegative
        \key HoursNonNegative
-       \key HoursInTenPercentBins 
        \key HourInTenBinsMinToMax 
        \key HourInTenBinsZeroToMax 
        \key HourInTenBinsMinToZero 
-       \key HoursInTenBinsPlusMinusTwoStdDev 
-       \key HoursInTenBinsPlusMinusThreeStdDev 
-       \key NoAggregation
        \key SumOrAverageDuringHoursShown
        \key MaximumDuringHoursShown
        \key MinimumDuringHoursShown
@@ -94773,13 +94714,9 @@ Output:Table:Annual,
        \key HoursNonPositive
        \key HoursNegative
        \key HoursNonNegative
-       \key HoursInTenPercentBins 
        \key HourInTenBinsMinToMax 
        \key HourInTenBinsZeroToMax 
        \key HourInTenBinsMinToZero 
-       \key HoursInTenBinsPlusMinusTwoStdDev 
-       \key HoursInTenBinsPlusMinusThreeStdDev 
-       \key NoAggregation
        \key SumOrAverageDuringHoursShown
        \key MaximumDuringHoursShown
        \key MinimumDuringHoursShown
@@ -94804,13 +94741,9 @@ Output:Table:Annual,
        \key HoursNonPositive
        \key HoursNegative
        \key HoursNonNegative
-       \key HoursInTenPercentBins 
        \key HourInTenBinsMinToMax 
        \key HourInTenBinsZeroToMax 
        \key HourInTenBinsMinToZero 
-       \key HoursInTenBinsPlusMinusTwoStdDev 
-       \key HoursInTenBinsPlusMinusThreeStdDev 
-       \key NoAggregation
        \key SumOrAverageDuringHoursShown
        \key MaximumDuringHoursShown
        \key MinimumDuringHoursShown
@@ -94835,13 +94768,9 @@ Output:Table:Annual,
        \key HoursNonPositive
        \key HoursNegative
        \key HoursNonNegative
-       \key HoursInTenPercentBins 
        \key HourInTenBinsMinToMax 
        \key HourInTenBinsZeroToMax 
        \key HourInTenBinsMinToZero 
-       \key HoursInTenBinsPlusMinusTwoStdDev 
-       \key HoursInTenBinsPlusMinusThreeStdDev 
-       \key NoAggregation
        \key SumOrAverageDuringHoursShown
        \key MaximumDuringHoursShown
        \key MinimumDuringHoursShown
@@ -94866,13 +94795,9 @@ Output:Table:Annual,
        \key HoursNonPositive
        \key HoursNegative
        \key HoursNonNegative
-       \key HoursInTenPercentBins 
        \key HourInTenBinsMinToMax 
        \key HourInTenBinsZeroToMax 
        \key HourInTenBinsMinToZero 
-       \key HoursInTenBinsPlusMinusTwoStdDev 
-       \key HoursInTenBinsPlusMinusThreeStdDev 
-       \key NoAggregation
        \key SumOrAverageDuringHoursShown
        \key MaximumDuringHoursShown
        \key MinimumDuringHoursShown
@@ -94897,13 +94822,9 @@ Output:Table:Annual,
        \key HoursNonPositive
        \key HoursNegative
        \key HoursNonNegative
-       \key HoursInTenPercentBins 
        \key HourInTenBinsMinToMax 
        \key HourInTenBinsZeroToMax 
        \key HourInTenBinsMinToZero 
-       \key HoursInTenBinsPlusMinusTwoStdDev 
-       \key HoursInTenBinsPlusMinusThreeStdDev 
-       \key NoAggregation
        \key SumOrAverageDuringHoursShown
        \key MaximumDuringHoursShown
        \key MinimumDuringHoursShown

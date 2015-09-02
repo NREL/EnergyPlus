@@ -53,7 +53,6 @@ public:
 	// Default Constructor
 	AnnualTable() :
 		m_name(""),
-		m_reportGroupName(""),
 		m_filter( "" ),
 		m_scheduleName( "" ),
 		m_scheduleNum(0)
@@ -62,12 +61,10 @@ public:
 	// Member Constructor
 	AnnualTable(
 		std::string name,
-		std::string reportGroupName,
 		std::string filter,
 		std::string scheduleName ) 
 	{
 		m_name = name;
-		m_reportGroupName = reportGroupName;
 		m_filter = filter;
 		m_scheduleName = scheduleName;
 		if ( !m_scheduleName.empty() ){
@@ -106,7 +103,6 @@ private:
 	// Members
 
 	std::string m_name; // identifier
-	std::string m_reportGroupName;
 	std::string m_filter;
 	std::string m_scheduleName;
 	int m_scheduleNum;

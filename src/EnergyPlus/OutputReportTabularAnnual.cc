@@ -61,7 +61,7 @@ namespace EnergyPlus {
 			std::string curAggTyp( "" );
 			int curNumDgts( 2 );
 			AnnualFieldSet::AggregationKind curAgg( AnnualFieldSet::AggregationKind::sumOrAvg );
-
+			 
 			objCount = InputProcessor::GetNumObjectsFound( currentModuleObject );
 			if ( objCount > 0 ) {
 				// if not a run period using weather do not create reports
@@ -75,10 +75,10 @@ namespace EnergyPlus {
 			numArray.dimension( numNums, 0.0 );
 			for ( int tabNum = 1 ; tabNum <= objCount; ++tabNum ) {
 				InputProcessor::GetObjectItem( currentModuleObject, tabNum, alphArray, numAlphas, numArray, numNums, IOStat );
-				if ( numAlphas >= 6 ) {
-					annualTables.push_back( AnnualTable(alphArray( 1 ), alphArray( 2 ), alphArray( 3 ), alphArray( 4 ) ));
+				if ( numAlphas >= 5 ) {
+					annualTables.push_back( AnnualTable(alphArray( 1 ), alphArray( 2 ), alphArray( 3 ) ));
 					// the remaining fields are repeating in groups of three and need to be added to the data structure
-					for ( jAlpha = 5; jAlpha <= numAlphas; jAlpha += 2 ) {
+					for ( jAlpha = 4; jAlpha <= numAlphas; jAlpha += 2 ) {
 						curVarMtr = alphArray( jAlpha );
 						if ( jAlpha <= numAlphas ){
 							std::string aggregationString = alphArray( jAlpha + 1 );
@@ -87,7 +87,7 @@ namespace EnergyPlus {
 						else {
 							curAgg = AnnualFieldSet::AggregationKind::sumOrAvg; // if missing aggregation type use SumOrAverage
 						}
-						indexNums = 1 + ( jAlpha - 4 ) / 2; // compute the corresponding field index in the numArray
+						indexNums = 1 + ( jAlpha - 3 ) / 2; // compute the corresponding field index in the numArray
 						if ( indexNums <= numNums ) {
 							curNumDgts = numArray( indexNums );
 						}

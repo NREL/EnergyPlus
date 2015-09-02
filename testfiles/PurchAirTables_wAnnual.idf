@@ -2329,10 +2329,9 @@
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 3
 
 
-
+ 
   Output:Table:Annual,
     Zone Electric Annual Summary,   !- Name
-    ,                               !- Report Group Name
     ,                               !- Filter
     INTERMITTENT,                   !- Schedule Name
     Zone Lights Electric Energy,  !- Variable or Meter or EMS Variable or Field 1 Name
@@ -2350,7 +2349,6 @@
 
   Output:Table:Annual,
     Window Annual Report,           !- Name
-    ,                               !- Report Group Name
     ,                               !- Filter
     ,                               !- Schedule Name
     Surface Window Transmitted Solar Radiation Rate,  !- Variable or Meter 1 Name
@@ -2386,7 +2384,6 @@
 
   Output:Table:Annual,
     Surface Annual Report,           !- Name
-    ,                               !- Report Group Name
     ,                               !- Filter
     ,                               !- Schedule Name
     Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 1 Name
@@ -2406,8 +2403,27 @@
     ;                        !- field Digits After Decimal 5
 
   Output:Table:Annual,
+    Roof Annual Report,           !- Name
+    roof,                           !- Filter
+    ,                               !- Schedule Name
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 1 Name
+    SumOrAverage,            !- Aggregation Type for Variable or Meter 1
+    ,                        !- field Digits After Decimal 1
+    Surface Inside Face Temperature, !- Variable or Meter 2 Name
+    SumOrAverage,            !- Aggregation Type for Variable or Meter 2
+    ,                        !- field Digits After Decimal 2
+    Surface Outside Face Temperature, !- Variable or Meter 3 Name
+    SumOrAverage,            !- Aggregation Type for Variable or Meter 3
+    ,                        !- field Digits After Decimal 3
+    Surface Inside Face Convection Heat Gain Rate per Area, !- Variable or Meter 4 Name
+    SumOrAverage,            !- Aggregation Type for Variable or Meter 4
+    ,                        !- field Digits After Decimal 4
+    Surface Outside Face Convection Heat Gain Rate per Area, !- Variable or Meter 5 Name
+    SumOrAverage,            !- Aggregation Type for Variable or Meter 5
+    ;                        !- field Digits After Decimal 5
+
+  Output:Table:Annual,
     Space Gains Annual Report,             !- Name
-    ,                               !- Report Group Name
     ,                               !- Filter
     ,                               !- Schedule Name
     Zone People Total Heating Energy,  !- Variable or Meter 1 Name
@@ -2440,7 +2456,6 @@
 
   Output:Table:Annual,
     Peak Space Gains Annual Report,        !- Name
-    ,                               !- Report Group Name
     ,                               !- Filter
     ,                               !- Schedule Name
     Zone People Total Heating Energy,  !- Variable or Meter 1 Name
@@ -2473,7 +2488,6 @@
 
   Output:Table:Annual,
     Space Gain Components at Cooling Peak Annual Report,  !- Name
-    ,                               !- Report Group Name
     ,                               !- Filter
     ,                               !- Schedule Name
     Zone Air System Sensible Cooling Rate,  !- Variable or Meter 1 Name
@@ -2509,7 +2523,6 @@
 
   Output:Table:Annual,
     Cooling Space Gain Max Min Bin Annual Report,  !- Name
-    ,                               !- Report Group Name
     ,                               !- Filter
     ,                               !- Schedule Name
     Zone Air System Sensible Cooling Rate,  !- Variable or Meter 1 Name
@@ -2527,7 +2540,6 @@
 
   Output:Table:Annual,
     Energy Consumption - Electricity & Natural Gas Annual Report,  !- Name
-    ,                               !- Report Group Name
     ,                               !- Filter
     ,                               !- Schedule Name
     Electricity:Facility,    !- Variable or Meter 1 Name
@@ -2544,8 +2556,25 @@
     ;                        !- field Digits After Decimal 4
 
   Output:Table:Annual,
+    Daytime Energy Consumption - Electricity & Natural Gas Annual Report,  !- Name
+    ,                               !- Filter
+    INTERMITTENT,                   !- Schedule Name
+    Electricity:Facility,    !- Variable or Meter 1 Name
+    SumOrAverage,            !- Aggregation Type for Variable or Meter 1
+    ,                        !- field Digits After Decimal 1
+    Electricity:Facility,    !- Variable or Meter 2 Name
+    Maximum,                 !- Aggregation Type for Variable or Meter 2
+    ,                        !- field Digits After Decimal 2
+    Gas:Facility,            !- Variable or Meter 3 Name
+    SumOrAverage,            !- Aggregation Type for Variable or Meter 3
+    ,                        !- field Digits After Decimal 3
+    Gas:Facility,            !- Variable or Meter 4 Name
+    Maximum,                 !- Aggregation Type for Variable or Meter 4
+    ;                        !- field Digits After Decimal 4
+
+
+  Output:Table:Annual,
     Outdoor Temperature Max Min Bin Annual Report,  !- Name
-    ,                               !- Report Group Name
     ,                               !- Filter
     ,                               !- Schedule Name
     Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 1 Name
@@ -2562,10 +2591,9 @@
     ;                        !- field Digits After Decimal 4
   
   Output:Table:Annual,
-    Outdoor Temperature Min Max Bin Annual Report,  !- Name
-    ,                               !- Report Group Name
+    Daytime Outdoor Temperature Min Max Bin Annual Report,  !- Name
     ,                               !- Filter
-    ,                               !- Schedule Name
+    INTERMITTENT,                   !- Schedule Name
     Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 1 Name
     SumOrAverage,             !- Aggregation Type for Variable or Meter 1
     ,                        !- field Digits After Decimal 1
@@ -2581,7 +2609,6 @@
 
   Output:Table:Annual,
     Outdoor Temperature Zero Max Bin Annual Report,  !- Name
-    ,                               !- Report Group Name
     ,                               !- Filter
     ,                               !- Schedule Name
     Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 1 Name
@@ -2599,7 +2626,6 @@
 
   Output:Table:Annual,
     Outdoor Temperature Min Zero Bin Annual Report,  !- Name
-    ,                               !- Report Group Name
     ,                               !- Filter
     ,                               !- Schedule Name
     Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 1 Name
