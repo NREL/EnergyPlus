@@ -17,6 +17,7 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>

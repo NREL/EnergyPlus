@@ -1291,6 +1291,7 @@ namespace HVACUnitarySystem {
 	ControlUnitarySystemtoSP(
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
 		bool const FirstHVACIteration, // True when first HVAC iteration
+		int & CompOn, // compressor on/off control
 		int const AirLoopNum, // Primary air loop number
 		Optional< Real64 const > OAUCoilOutTemp = _, // the coil inlet temperature of OutdoorAirUnit
 		Optional_bool HXUnitOn = _ // Flag to control HX for HXAssisted Cooling Coil
@@ -1384,13 +1385,15 @@ namespace HVACUnitarySystem {
 	ControlCoolingSystem(
 		int const UnitarySysNum, // index to Unitary System
 		bool const FirstHVACIteration, // First HVAC iteration flag
-		bool & HXUnitOn // flag to enable heat exchanger heat recovery
+		bool & HXUnitOn, // flag to enable heat exchanger heat recovery
+		int & CompOp // compressor on/off control
 	);
 
 	void
 	ControlHeatingSystem(
 		int const UnitarySysNum, // index to Unitary System
-		bool const FirstHVACIteration // First HVAC iteration flag
+		bool const FirstHVACIteration, // First HVAC iteration flag
+		int & CompOn // compressor on/off control
 	);
 
 	void
@@ -1419,6 +1422,7 @@ namespace HVACUnitarySystem {
 	SimMultiSpeedCoils(
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
 		bool const FirstHVACIteration, // True when first HVAC iteration
+		int & CompOn, // compressor on/off control
 		bool const SensibleLoad,
 		bool const LatentLoad,
 		Real64 const PartLoadFrac,
@@ -1611,6 +1615,11 @@ namespace HVACUnitarySystem {
 
 	int
 	GetUnitarySystemDXCoolingCoilIndex( std::string const & UnitarySystemName ); // Name of Unitary System object
+
+	// Clears the global data in HVACUnitarySystem.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 } // HVACUnitarySystem
 
