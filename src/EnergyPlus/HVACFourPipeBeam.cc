@@ -536,12 +536,9 @@ namespace FourPipeBeam {
 		// Using
 		using DataEnvironment::StdRhoAir;
 		using namespace DataSizing;
-		using DataHVACGlobals::SmallAirVolFlow;
 		using namespace InputProcessor;
-		using DataGlobals::AutoCalculate;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
-		//  USE BranchInputManager,  ONLY: MyPlantSizingIndex
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
