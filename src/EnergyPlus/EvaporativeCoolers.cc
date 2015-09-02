@@ -954,6 +954,7 @@ namespace EvaporativeCoolers {
 		Real64 PadDepthUser;			// Hardsized celdek pad depth for reporting
 
 		Real64 volFlowRateDes;			// Autosized volume flow rate for reporting
+		std::string CompType; // for ease in getting objects
 
 		//inits
 		CoolerOnOApath = false;
@@ -986,6 +987,20 @@ namespace EvaporativeCoolers {
 		if ( CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys ) {
 			HardSizeNoDesRun = true;
 		}
+
+		{ auto const SELECT_CASE_var( EvapCond( EvapCoolNum ).EvapCoolerType );
+		if ( SELECT_CASE_var == iEvapCoolerInDirectCELDEKPAD ) {
+			CompType = "EvaporativeCooler:Indirect:CelDekPad";
+		} else if ( SELECT_CASE_var == iEvapCoolerInDirectWETCOIL ) {
+			CompType = "EvaporativeCooler:Indirect:WetCoil";
+		} else if ( SELECT_CASE_var == iEvapCoolerInDirectRDDSpecial ) {
+			CompType = "EvaporativeCooler:Indirect:ResearchSpecial";
+		} else if ( SELECT_CASE_var == iEvapCoolerDirectResearchSpecial ) {
+			CompType = "EvaporativeCooler:Direct:ResearchSpecial";
+		} else if ( SELECT_CASE_var == iEvapCoolerDirectCELDEKPAD ) {
+			CompType = "EvaporativeCooler:Direct:CelDekPad";
+		}}
+
 		// Search once for the object on an air system
 		if ( CurSysNum > 0 ) { //central system
 			//where is this cooler located, is it on OA system or main loop?
@@ -1010,8 +1025,9 @@ namespace EvaporativeCoolers {
 		if ( CurSysNum > 0 ) { //central system
 			if ( !IsAutoSize && !SizingDesRunThisAirSys ) {
 				if ( EvapCond( EvapCoolNum ).IndirectVolFlowRate > 0.0 ) {
-					ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, 
-						"User-Specified Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).IndirectVolFlowRate );
+					if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectCELDEKPAD || EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectWETCOIL || EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial ) {
+						ReportSizingOutput( CompType, EvapCond( EvapCoolNum ).EvapCoolerName, "User-Specified Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).IndirectVolFlowRate );
+					}
 				}
 			} else {  // Autosize or hardsize with design data
 				if ( CoolerOnMainAirLoop ) {
@@ -1024,14 +1040,32 @@ namespace EvaporativeCoolers {
 					IndirectVolFlowRateDes = IndirectVolFlowRateDes * EvapCond( EvapCoolNum ).IndirectVolFlowScalingFactor;
 				}
 			}
-		} else { //zone equipment
-			// can't do zone equip evap coolers yet
+		} else if ( CurZoneEqNum > 0 ) { //zone equipment
+			if ( !IsAutoSize && !SizingDesRunThisAirSys ) {
+				if ( EvapCond( EvapCoolNum ).IndirectVolFlowRate > 0.0 ) {
+					// report for the indirect evap cooler types only
+					if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectCELDEKPAD || EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectWETCOIL || EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial ) {
+						ReportSizingOutput( CompType, EvapCond( EvapCoolNum ).EvapCoolerName,"User-Specified Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).IndirectVolFlowRate );
+					}
+				}
+			} else {  // Autosize or hardsize with design data
+				// zone equip evap coolers
+				IndirectVolFlowRateDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+				// apply scaling factor the secondary air fan flow rate
+				if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial ) {
+					IndirectVolFlowRateDes = IndirectVolFlowRateDes * EvapCond( EvapCoolNum ).IndirectVolFlowScalingFactor;
+				}
+			}
+
+		} else {
+
 		}
 		if ( !HardSizeNoDesRun ) {
 			if ( IsAutoSize ) {
 				EvapCond( EvapCoolNum ).IndirectVolFlowRate = IndirectVolFlowRateDes;
-				ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, 
-					"Design Size Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).IndirectVolFlowRate );
+				if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectCELDEKPAD || EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectWETCOIL || EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial ) {
+					ReportSizingOutput( CompType, EvapCond( EvapCoolNum ).EvapCoolerName, "Design Size Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).IndirectVolFlowRate );
+				}
 			} else {
 				if ( EvapCond( EvapCoolNum ).IndirectVolFlowRate > 0.0 && IndirectVolFlowRateDes > 0.0 ) {
 					IndirectVolFlowRateUser = EvapCond( EvapCoolNum ).IndirectVolFlowRate;
@@ -1062,7 +1096,7 @@ namespace EvaporativeCoolers {
 			if ( !IsAutoSize && !SizingDesRunThisAirSys ) {
 				// the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
 				//if ( EvapCond( EvapCoolNum ).VolFlowRate > 0.0 ) {
-					//ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, 
+					//ReportSizingOutput( CompType, EvapCond( EvapCoolNum ).EvapCoolerName, 
 						//"User-Specified Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
 				//}
 			} else {  // Autosize or hardsize with design data
@@ -1073,6 +1107,19 @@ namespace EvaporativeCoolers {
 				}
 				// no scaling factor on the volFlowRate in develop, so not doing it here
 			}
+		} else if ( CurZoneEqNum > 0 ) { //zone equipment
+			// zone equip evap coolers
+			
+			if ( !IsAutoSize && !SizingDesRunThisAirSys ) {
+				// the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
+				//if ( EvapCond( EvapCoolNum ).VolFlowRate > 0.0 ) {
+				//ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, 
+				//"User-Specified Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
+				//}
+			} else {  // Autosize or hardsize with design data
+				volFlowRateDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+			}
+
 		} else { //zone equipment
 			// can't do zone equip evap coolers yet
 		}
@@ -1082,6 +1129,12 @@ namespace EvaporativeCoolers {
 				// the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
 				//ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, 
 					//"Design Size Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).IndirectVolFlowRate );
+
+				// only these two evap coolers has primary air design flow rate
+				if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial || EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerDirectResearchSpecial  ) {
+					ReportSizingOutput( CompType, EvapCond( EvapCoolNum ).EvapCoolerName, "Design Size Primary Air Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
+				}
+
 			} else {
 				// the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
 				//if ( EvapCond( EvapCoolNum ).IndirectVolFlowRate > 0.0 && IndirectVolFlowRateDes > 0.0 ) {
@@ -1127,8 +1180,25 @@ namespace EvaporativeCoolers {
 					// Face air velocity of 3m/s is assumed
 					PadAreaDes = IndirectVolFlowRateDes / 3.0;
 				}
-			} else { // !zone equipment
-				// we have no zone equipment evap coolers yet
+			} else if ( CurZoneEqNum > 0 ) { //zone equipment
+				// zone equip evap coolers
+				if ( !IsAutoSize && !SizingDesRunThisAirSys ) {
+					HardSizeNoDesRun = true;
+					if ( EvapCond( EvapCoolNum ).PadArea > 0.0 ) {
+						// report for the indirect evap cooler types only
+						if ( EvapCond( EvapCoolNum ).PadArea > 0.0 ) {
+							ReportSizingOutput( "EvaporativeCooler:Direct:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName,
+								"User-Specified Celdek Pad Area [m2]", EvapCond( EvapCoolNum ).PadArea );
+						}
+					}
+				} else {  // Autosize or hardsize with design data
+					// zone equip evap coolers
+					IndirectVolFlowRateDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+					// Face air velocity of 3m/s is assumed
+					PadAreaDes = IndirectVolFlowRateDes / 3.0;
+				}				
+			} else {
+
 			}
 
 			if ( !HardSizeNoDesRun ) {
@@ -1210,7 +1280,7 @@ namespace EvaporativeCoolers {
 				}
 				if ( !IsAutoSize && !SizingDesRunThisAirSys ) {
 					HardSizeNoDesRun = true;
-					if ( EvapCond( EvapCoolNum ).PadArea > 0.0 ) {
+					if ( EvapCond( EvapCoolNum ).IndirectPadArea > 0.0 ) {
 						ReportSizingOutput( "EvaporativeCooler:Indirect:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName,
 							"User-Specified Celdek Pad Area [m2]", EvapCond( EvapCoolNum ).IndirectPadArea );
 					}
@@ -1226,8 +1296,24 @@ namespace EvaporativeCoolers {
 					// Face air velocity of 3m/s is assumed
 					PadAreaDes = IndirectVolFlowRateDes / 3.0;
 				}
-			} else { //zone equipment
-				// we have no zone equipment evap coolers yet
+			} else if ( CurZoneEqNum > 0 ) { //zone equipment
+				// zone equip evap coolers
+				if ( !IsAutoSize && !SizingDesRunThisAirSys ) {
+					HardSizeNoDesRun = true;
+					if ( EvapCond( EvapCoolNum ).IndirectPadArea > 0.0 ) {
+						// report for the indirect evap cooler types only
+						if ( EvapCond( EvapCoolNum ).PadArea > 0.0 ) {
+							ReportSizingOutput( "EvaporativeCooler:Indirect:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName,
+								"User-Specified Celdek Pad Area [m2]", EvapCond( EvapCoolNum ).IndirectPadArea );
+						}
+					}
+				} else {  // Autosize or hardsize with design data
+					// zone equip evap coolers
+					IndirectVolFlowRateDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+					// Face air velocity of 3m/s is assumed
+					PadAreaDes = IndirectVolFlowRateDes / 3.0;
+				}
+			} else {
 			}
 
 			if ( !HardSizeNoDesRun ) {
