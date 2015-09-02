@@ -625,30 +625,6 @@ namespace DirectAirManager {
 
 	}
 
-	// void
-	// ReportDirectAir( int & DirectAirNum )
-	// {
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR:          Russ Taylor
-		//       DATE WRITTEN:    Nov 1997
-
-		// PURPOSE OF THIS SUBROUTINE: This subroutine
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// Using/Aliasing
-		// using DataHVACGlobals::TimeStepSys;
-
-		//report the Direct Air Output
-		// DirectAir( DirectAirNum ).HeatRate = max( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 );
-		// DirectAir( DirectAirNum ).CoolRate = std::abs( min( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 ) );
-		// DirectAir( DirectAirNum ).HeatEnergy = max( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 ) * TimeStepSys * SecInHour;
-		// DirectAir( DirectAirNum ).CoolEnergy = std::abs( min( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 ) * TimeStepSys * SecInHour );
-
-	// }
-
 	//     NOTICE
 
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois

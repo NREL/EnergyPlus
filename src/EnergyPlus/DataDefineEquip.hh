@@ -20,7 +20,7 @@ namespace DataDefineEquip {
 
 	//MODULE PARAMETER DEFINITIONS
 	extern int const MaxZoneAirComponents;
-	//INTEGER, PARAMETER :: MaxZoneAirControls = 4
+
 	// Equipment Types covered by ZoneAirLoopEquipment:
 	extern int const DualDuctConstVolume;
 	extern int const DualDuctVAV;
@@ -108,67 +108,6 @@ namespace DataDefineEquip {
 			CoolRate( 0.0 ),
 			HeatGain( 0.0 ),
 			CoolGain( 0.0 )
-		{}
-
-		// Member Constructor
-		ZoneAirEquip(
-			std::string const & Name, // Name or identifier of this piece of equipment
-			int const OutletNodeNum, // index of outlet node
-			int const NumComponents, // number of subcomponents (=1)
-			int const NumControls, // number of controls (not used; =0)
-			Array1_string const & EquipType, // Pointer indentifying type of subcomponent
-			Array1_int const & EquipType_Num,
-			Array1_string const & EquipName, // name of subcomponent
-			Array1_int const & EquipIndex,
-			Real64 const UpStreamLeakFrac, // upstream nominal leakage fraction
-			Real64 const DownStreamLeakFrac, // downstream constant leakage fraction
-			Real64 const MassFlowRateUpStrLk, // current air mass flow rate of the upstream leak [kg/s]
-			Real64 const MassFlowRateDnStrLk, // current air mass flow rate of the downstream leak [kg/s]
-			Real64 const MassFlowRateTU, // current air mass flow rate tjrough the terminal unit [kg/s]
-			Real64 const MassFlowRateZSup, // current air mass flow rate of zone supply air [kg/s]
-			Real64 const MassFlowRateSup, // current air mass flow rate of supply air upstream of upstream leak [kg/s]
-			Real64 const MaxAvailDelta, // change in max avail mass low rate due to leaks [kg/s]
-			Real64 const MinAvailDelta, // change in min avail mass low rate due to leaks [kg/s]
-			int const InletNodeNum, // index of inlet node
-			int const ZoneEqNum, // index of zone equipment object for this terminal unit
-			Real64 const LeakLoadMult, // zome load multiplier to adjust for downstream leak
-			bool const UpStreamLeak, // if true, there is an upstream leak
-			bool const DownStreamLeak, // if true, there is an downstream leak
-			int const ZoneNum, // index of zone object for this terminal unit
-			bool const AccountForDOAS, // if true user has asked for DOAS
-			Real64 const HeatRate, // [W]
-			Real64 const CoolRate, // [W]
-			Real64 const HeatGain, // [J]
-			Real64 const CoolGain  // [J]
-		) :
-			Name( Name ),
-			OutletNodeNum( OutletNodeNum ),
-			NumComponents( NumComponents ),
-			NumControls( NumControls ),
-			EquipType( MaxZoneAirComponents, EquipType ),
-			EquipType_Num( MaxZoneAirComponents, EquipType_Num ),
-			EquipName( MaxZoneAirComponents, EquipName ),
-			EquipIndex( MaxZoneAirComponents, EquipIndex ),
-			UpStreamLeakFrac( UpStreamLeakFrac ),
-			DownStreamLeakFrac( DownStreamLeakFrac ),
-			MassFlowRateUpStrLk( MassFlowRateUpStrLk ),
-			MassFlowRateDnStrLk( MassFlowRateDnStrLk ),
-			MassFlowRateTU( MassFlowRateTU ),
-			MassFlowRateZSup( MassFlowRateZSup ),
-			MassFlowRateSup( MassFlowRateSup ),
-			MaxAvailDelta( MaxAvailDelta ),
-			MinAvailDelta( MinAvailDelta ),
-			InletNodeNum( InletNodeNum ),
-			ZoneEqNum( ZoneEqNum ),
-			LeakLoadMult( LeakLoadMult ),
-			UpStreamLeak( UpStreamLeak ),
-			DownStreamLeak( DownStreamLeak ),
-			ZoneNum( ZoneNum ),
-			AccountForDOAS( AccountForDOAS ),
-			HeatRate( HeatRate ),
-			CoolRate( CoolRate ),
-			HeatGain( HeatGain ),
-			CoolGain( CoolGain )
 		{}
 
 	};

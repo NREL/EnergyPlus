@@ -166,7 +166,7 @@ namespace ZoneEquipmentManager {
 		Real64 W90L, // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
 		Real64 & DOASSupTemp, // DOAS supply temperature [C]
 		Real64 & DOASSupHR // DOAS Supply Humidity ratio [kg Water / kg Dry Air]
-		);
+	);
 
 	//     NOTICE
 
