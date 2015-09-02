@@ -3,6 +3,9 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+// ObjexxFCL Headers
+#include <ObjexxFCL/gio.hh>
+
 // EnergyPlus Headers
 #include "Fixtures/HVACFixture.hh"
 
@@ -25,7 +28,6 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -242,6 +244,7 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 	CurSysNum = 0;
 	CurOASysNum = 0;
 	CurZoneEqNum = 1;
+	DataEnvironment::StdRhoAir = 1000; // Prevent divide by zero in ReportSizingManager
 
 	UnitarySystem.allocate( 1 );
 	UnitarySystem( UnitarySysNum ).UnitarySystemType = "AirLoopHVAC:UnitarySystem";

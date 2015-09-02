@@ -1274,7 +1274,7 @@ N = number of zones served by the air loop, which is provided in the input for a
 
 ### Proportional Control
 
-Like Ventilation Rate Procedure and the Indoor Air Quality Procedure, the following three objects must be included in the input data file in order to model CO<sub>2</sub>-based DCV with Proportional Control:
+The control has two choices: ProportionalControlBasedonOccupancySchedule and ProportionalControlBasedonDesignOccupancy. The difference is occupancy level. The former uses real time occupancy, while the latter uses design occupancy level. Like Ventilation Rate Procedure and the Indoor Air Quality Procedure, the following three objects must be included in the input data file in order to model CO<sub>2</sub>-based DCV with Proportional Control:
 
 n **AirLoopHVAC:OutdoorAirSystem** to simulate the mixed air box of the air loop
 
@@ -1311,6 +1311,9 @@ Where,
 <span>\({R_{a,i}}\)</span> = Required outdoor air flow rate per unit area, (m<sup>3</sup>/s)/m<sup>2</sup>
 
 <span>\({P_{z,i}}\)</span> = Design zone population, number of people
+
+When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy * current schedule value. When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy.
+
 
 <span>\({A_{z,i}}\)</span> = Zone floor area, m<sup>2</sup>
 
