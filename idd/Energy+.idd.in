@@ -18378,17 +18378,20 @@ RoomAirModelType,
       \note Mundt roomair model for displacement ventilation with single floor air node
       \note needs RoomAirSettings:OneNodeDisplacementVentilation object referencing this Zone
       \key ThreeNodeDisplacementVentilation
-      \note (UCSD three-node displacement ventilation model)
+      \note (ThreeNodeDisplacementVentilation = RoomAir modeling using UCSD three-node displacement ventilation model)
       \note needs RoomAirSettings:ThreeNodeDisplacementVentilation object referencing this Zone
       \key CrossVentilation
-      \note (UCSD two-zone cross ventilation model)
+      \note (CrossVentilation = RoomAir modeling using UCSD two-zone cross ventilation model)
       \note needs RoomAirSettings:CrossVentilation object referencing this Zone
       \key UnderFloorAirDistributionInterior
       \note 2-Node UFAD model for interior zones
       \note needs RoomAirSettings:UnderFloorAirDistributionInterior object referencing this Zone
       \key UnderFloorAirDistributionExterior
-      \note (2-Node UFAD model for exterior zones)
+      \note (UnderFloorAirDistributionExterior = RoomAir modeling using 2-Node UFAD model for exterior zones)
       \note needs RoomAirSettings:UnderFloorAirDistributionExterior object referencing this Zone
+      \key AirflowNetwork
+      \note (AirflowNetwork = RoomAir modeling using AirflowNetwork)
+      \note needs RoomAirSettings:AirflowNetwork object referencing this Zone
       \default Mixing
   A4; \field Air Temperature Coupling Strategy
       \type choice
@@ -19200,6 +19203,408 @@ RoomAirSettings:UnderFloorAirDistributionExterior,
        \type real
        \autocalculatable
        \default Autocalculate
+
+RoomAir:Node:AirflowNetwork,
+      \memo define an air node for some types of nodal air models
+  A1, \field Name
+      \type Alpha
+      \reference RoomAirflowNetworkNodes
+  A2, \field Zone Name
+      \required-field
+      \type object-list
+      \object-list ZoneNames
+  N1, \field Fraction of Zone Air Volume
+      \type real
+      \minimum 0.0
+      \maximum 1.0
+  A3, \field RoomAir:Node:AirflowNetwork:AdjacentSurfaceList Name
+      \type object-list
+      \object-list RoomAirNodeSurfaceLists
+  A4, \field RoomAir:Node:AirflowNetwork:InternalGains Name
+      \type object-list
+      \object-list RoomAirNodeGains
+  A5; \field RoomAir:Node:AirflowNetwork:HVACEquipment Name
+      \type object-list
+      \object-list RoomAirNodeHVACEquipment     
+      
+ RoomAir:Node:AirflowNetwork:AdjacentSurfaceList, 
+       \extensible:1
+       \min-fields 2
+  A1,  \field Name
+       \type Alpha
+       \reference RoomAirNodeSurfaceLists       
+  A2 , \field Surface 1 Name
+       \begin-extensible
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A3 , \field Surface 2 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A4 , \field Surface 3 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A5 , \field Surface 4 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A6 , \field Surface 5 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A7 , \field Surface 6 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A8, \field Surface 7 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A9, \field Surface 8 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A10, \field Surface 9 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A11, \field Surface 10 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A12, \field Surface 11 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A13, \field Surface 12 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A14, \field Surface 13 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A15, \field Surface 14 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A16, \field Surface 15 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A17, \field Surface 16 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A18, \field Surface 17 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A19, \field Surface 18 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A20, \field Surface 19 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A21, \field Surface 20 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A22; \field Surface 21 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+
+RoomAir:Node:AirflowNetwork:InternalGains,
+      \extensible:4
+      \min-fields 5
+      \memo define the internal gains that are associated with one particular RoomAir:Node
+  A1, \field Name
+      \type Alpha
+      \reference RoomAirNodeGains
+  A2, \field Internal Gain Object 1 Type
+      \begin-extensible
+      \type choice
+      \key People
+      \key Lights
+      \key ElectricEquipment
+      \key GasEquipment
+      \key HotWaterEquipment
+      \key SteamEquipment
+      \key OtherEquipment
+      \key ZoneBaseboard:OutdoorTemperatureControlled
+      \key ZoneContaminantSourceAndSink:CarbonDioxide
+      \key WaterUse:Equipment     
+      \key DaylightingDevice:Tubular
+      \key WaterHeater:Mixed
+      \key WaterHeater:Stratified
+      \key ThermalStorage:ChilledWater:Mixed
+      \key ThermalStorage:ChilledWater:Stratified
+      \key Generator:FuelCell
+      \key Generator:MicroCHP
+      \key ElectricLoadCenter:Transformer
+      \key ElectricLoadCenter:Inverter:Simple
+      \key ElectricLoadCenter:Inverter:FunctionOfPower
+      \key ElectricLoadCenter:Inverter:LookUpTable
+      \key ElectricLoadCenter:Storage:Battery
+      \key ElectricLoadCenter:Storage:Simple
+      \key Pipe:Indoor
+      \key Refrigeration:Case
+      \key Refrigeration:CompressorRack
+      \key Refrigeration:System:Condenser:AirCooled
+      \key Refrigeration:TranscriticalSystem:GasCooler:AirCooled
+      \key Refrigeration:System:SuctionPipe
+      \key Refrigeration:TranscriticalSystem:SuctionPipeMT
+      \key Refrigeration:TranscriticalSystem:SuctionPipeLT
+      \key Refrigeration:SecondarySystem:Receiver
+      \key Refrigeration:SecondarySystem:Pipe
+      \key Refrigeration:WalkIn
+      \key Pump:VariableSpeed
+      \key Pump:ConstantSpeed
+      \key Pump:VariableSpeed:Condensate
+      \key HeaderedPumps:VariableSpeed
+      \key HeaderedPumps:ConstantSpeed
+      \key ZoneContaminantSourceAndSink:GenericContaminant
+      \key PlantComponent:UserDefined
+      \key Coil:UserDefined
+      \key ZoneHVAC:ForcedAir:UserDefined
+      \key AirTerminal:SingleDuct:UserDefined   
+  A3, \field Internal Gain Object 1 Name
+      \type alpha
+  N1, \field Fraction of Gains to Node 1 
+      \type real
+      \mininum 0.0
+      \maximum 1.0
+      \note fraction applies to sensible, latent, carbon dioxide, and generic contaminant gains or losses  
+  A4, \field Internal Gain Object 2 Type
+      \type choice
+      \key People
+      \key Lights
+      \key ElectricEquipment
+      \key GasEquipment
+      \key HotWaterEquipment
+      \key SteamEquipment
+      \key OtherEquipment
+      \key ZoneBaseboard:OutdoorTemperatureControlled
+      \key ZoneContaminantSourceAndSink:CarbonDioxide
+      \key WaterUse:Equipment     
+      \key DaylightingDevice:Tubular
+      \key WaterHeater:Mixed
+      \key WaterHeater:Stratified
+      \key ThermalStorage:ChilledWater:Mixed
+      \key ThermalStorage:ChilledWater:Stratified
+      \key Generator:FuelCell
+      \key Generator:MicroCHP
+      \key ElectricLoadCenter:Transformer
+      \key ElectricLoadCenter:Inverter:Simple
+      \key ElectricLoadCenter:Inverter:FunctionOfPower
+      \key ElectricLoadCenter:Inverter:LookUpTable
+      \key ElectricLoadCenter:Storage:Battery
+      \key ElectricLoadCenter:Storage:Simple
+      \key Pipe:Indoor
+      \key Refrigeration:Case
+      \key Refrigeration:CompressorRack
+      \key Refrigeration:System:Condenser:AirCooled
+      \key Refrigeration:TranscriticalSystem:GasCooler:AirCooled
+      \key Refrigeration:System:SuctionPipe
+      \key Refrigeration:TranscriticalSystem:SuctionPipeMT
+      \key Refrigeration:TranscriticalSystem:SuctionPipeLT
+      \key Refrigeration:SecondarySystem:Receiver
+      \key Refrigeration:SecondarySystem:Pipe
+      \key Refrigeration:WalkIn
+      \key Pump:VariableSpeed
+      \key Pump:ConstantSpeed
+      \key Pump:VariableSpeed:Condensate
+      \key HeaderedPumps:VariableSpeed
+      \key HeaderedPumps:ConstantSpeed
+      \key ZoneContaminantSourceAndSink:GenericContaminant
+      \key PlantComponent:UserDefined
+      \key Coil:UserDefined
+      \key ZoneHVAC:ForcedAir:UserDefined
+      \key AirTerminal:SingleDuct:UserDefined  
+  A5, \field Internal Gain Object 2 Name
+      \type alpha
+  N2, \field Fraction of Gains to Node 2
+      \type real
+      \mininum 0.0
+      \maximum 1.0
+  A6, \field Internal Gain Object 3 Type
+      \type choice
+      \key People
+      \key Lights
+      \key ElectricEquipment
+      \key GasEquipment
+      \key HotWaterEquipment
+      \key SteamEquipment
+      \key OtherEquipment
+      \key ZoneBaseboard:OutdoorTemperatureControlled
+      \key ZoneContaminantSourceAndSink:CarbonDioxide
+      \key WaterUse:Equipment     
+      \key DaylightingDevice:Tubular
+      \key WaterHeater:Mixed
+      \key WaterHeater:Stratified
+      \key ThermalStorage:ChilledWater:Mixed
+      \key ThermalStorage:ChilledWater:Stratified
+      \key Generator:FuelCell
+      \key Generator:MicroCHP
+      \key ElectricLoadCenter:Transformer
+      \key ElectricLoadCenter:Inverter:Simple
+      \key ElectricLoadCenter:Inverter:FunctionOfPower
+      \key ElectricLoadCenter:Inverter:LookUpTable
+      \key ElectricLoadCenter:Storage:Battery
+      \key ElectricLoadCenter:Storage:Simple
+      \key Pipe:Indoor
+      \key Refrigeration:Case
+      \key Refrigeration:CompressorRack
+      \key Refrigeration:System:Condenser:AirCooled
+      \key Refrigeration:TranscriticalSystem:GasCooler:AirCooled
+      \key Refrigeration:System:SuctionPipe
+      \key Refrigeration:TranscriticalSystem:SuctionPipeMT
+      \key Refrigeration:TranscriticalSystem:SuctionPipeLT
+      \key Refrigeration:SecondarySystem:Receiver
+      \key Refrigeration:SecondarySystem:Pipe
+      \key Refrigeration:WalkIn
+      \key Pump:VariableSpeed
+      \key Pump:ConstantSpeed
+      \key Pump:VariableSpeed:Condensate
+      \key HeaderedPumps:VariableSpeed
+      \key HeaderedPumps:ConstantSpeed
+      \key ZoneContaminantSourceAndSink:GenericContaminant
+      \key PlantComponent:UserDefined
+      \key Coil:UserDefined
+      \key ZoneHVAC:ForcedAir:UserDefined
+      \key AirTerminal:SingleDuct:UserDefined  
+  A7, \field Internal Gain Object 3 Name
+      \type alpha
+  N3; \field Fraction of Gains to Node 3
+      \type real
+      \mininum 0.0
+      \maximum 1.0
+
+RoomAir:Node:AirflowNetwork:HVACEquipment,
+      \extensible:4
+      \memo define the zone equipment associated with one particular RoomAir:Node
+  A1, \field Name
+      \type Alpha
+      \reference RoomAirNodeHVACEquipment
+  A2, \field ZoneHVAC or Air Terminal Equipment Object Type 1
+      \begin-extensible
+      \type choice
+      \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+      \key ZoneHVAC:EnergyRecoveryVentilator
+      \key ZoneHVAC:FourPipeFanCoil
+      \key ZoneHVAC:OutdoorAirUnit
+      \key ZoneHVAC:PackagedTerminalAirConditioner
+      \key ZoneHVAC:PackagedTerminalHeatPump
+      \key ZoneHVAC:UnitHeater
+      \key ZoneHVAC:UnitVentilator
+      \key ZoneHVAC:VentilatedSlab
+      \key ZoneHVAC:WaterToAirHeatPump
+      \key ZoneHVAC:WindowAirConditioner
+      \key ZoneHVAC:Baseboard:RadiantConvective:Electric
+      \key ZoneHVAC:Baseboard:RadiantConvective:Water
+      \key ZoneHVAC:Baseboard:RadiantConvective:Steam
+      \key ZoneHVAC:Baseboard:Convective:Electric
+      \key ZoneHVAC:Baseboard:Convective:Water
+      \key ZoneHVAC:HighTemperatureRadiant
+      \key ZoneHVAC:Dehumidifier:DX
+      \key ZoneHVAC:IdealLoadsAirSystem
+      \key ZoneHVAC:RefrigerationChillerSet
+      \key Fan:ZoneExhaust
+      \key WaterHeater:HeatPump
+      \key AirTerminal:SingleDuct:Uncontrolled       
+      \key AirTerminal:DualDuct:ConstantVolume
+      \key AirTerminal:DualDuct:VAV
+      \key AirTerminal:SingleDuct:ConstantVolume:Reheat
+      \key AirTerminal:SingleDuct:VAV:Reheat
+      \key AirTerminal:SingleDuct:VAV:NoReheat
+      \key AirTerminal:SingleDuct:SeriesPIU:Reheat
+      \key AirTerminal:SingleDuct:ParallelPIU:Reheat
+      \key AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction
+      \key AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan
+      \key AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat
+      \key AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat
+      \key AirTerminal:SingleDuct:ConstantVolume:CooledBeam
+      \key AirTerminal:DualDuct:VAV:OutdoorAir
+      \key AirLoopHVACReturnAir
+  A3, \field ZoneHVAC or Air Terminal Equipment Object Name 1
+      \type alpha
+      \note for object type AirLoopHVACReturnAir, then enter zone return air node name 
+  N1, \field Fraction of Output or Supply Air from HVAC Equipment 1 
+      \type real
+      \minimum 0.0
+      \maximum 1.0
+      \note 
+  N2, \field Fraction of Input or Return Air to HVAC Equipment 1
+      \type real
+      \minimum 0.0
+      \maximum 1.0        
+  A4, \field ZoneHVAC or Air Terminal Equipment Object Type 2
+      \type choice
+      \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+      \key ZoneHVAC:EnergyRecoveryVentilator
+      \key ZoneHVAC:FourPipeFanCoil
+      \key ZoneHVAC:OutdoorAirUnit
+      \key ZoneHVAC:PackagedTerminalAirConditioner
+      \key ZoneHVAC:PackagedTerminalHeatPump
+      \key ZoneHVAC:UnitHeater
+      \key ZoneHVAC:UnitVentilator
+      \key ZoneHVAC:VentilatedSlab
+      \key ZoneHVAC:WaterToAirHeatPump
+      \key ZoneHVAC:WindowAirConditioner
+      \key ZoneHVAC:Baseboard:RadiantConvective:Electric
+      \key ZoneHVAC:Baseboard:RadiantConvective:Water
+      \key ZoneHVAC:Baseboard:RadiantConvective:Steam
+      \key ZoneHVAC:Baseboard:Convective:Electric
+      \key ZoneHVAC:Baseboard:Convective:Water
+      \key ZoneHVAC:HighTemperatureRadiant
+      \key ZoneHVAC:Dehumidifier:DX
+      \key ZoneHVAC:IdealLoadsAirSystem
+      \key ZoneHVAC:RefrigerationChillerSet
+      \key Fan:ZoneExhaust
+      \key WaterHeater:HeatPump
+      \key AirTerminal:SingleDuct:Uncontrolled       
+      \key AirTerminal:DualDuct:ConstantVolume
+      \key AirTerminal:DualDuct:VAV
+      \key AirTerminal:SingleDuct:ConstantVolume:Reheat
+      \key AirTerminal:SingleDuct:VAV:Reheat
+      \key AirTerminal:SingleDuct:VAV:NoReheat
+      \key AirTerminal:SingleDuct:SeriesPIU:Reheat
+      \key AirTerminal:SingleDuct:ParallelPIU:Reheat
+      \key AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction
+      \key AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan
+      \key AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat
+      \key AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat
+      \key AirTerminal:SingleDuct:ConstantVolume:CooledBeam
+      \key AirTerminal:DualDuct:VAV:OutdoorAir
+  A5, \field ZoneHVAC or Air Terminal Equipment Object Name 2
+      \type alpha
+  N3, \field Fraction of Output or Supply Air from HVAC Equipment 2 
+      \type real
+      \minimum 0.0
+      \maximum 1.0  
+  N4; \field Fraction of Input or Return Air to HVAC Equipment 2
+      \type real
+      \minimum 0.0
+      \maximum 1.0  
+
+RoomAirSettings:AirflowNetwork, 
+       \extensible:1
+       \memo RoomAir modeling using Airflow pressure network solver 
+       \min-fields 5
+  A1 , \field Name
+       \required-field
+       \type alpha
+  A2 , \field Zone Name
+       \note Name of Zone being described. Any existing zone name
+       \required-field
+       \type object-list
+       \object-list ZoneNames
+  A3 , \field Control Point RoomAirflowNetwork:Node Name
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+  A4 , \field RoomAirflowNetwork:Node Name 1
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+       \begin-extensible
+  A5 , \field RoomAirflowNetwork:Node Name 2
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+  A6 , \field RoomAirflowNetwork:Node Name 3
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+  A7 , \field RoomAirflowNetwork:Node Name 4
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+  A8 , \field RoomAirflowNetwork:Node Name 5
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+  A9 ; \field RoomAirflowNetwork:Node Name 6
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
 
 \group Internal Gains
 
@@ -23647,6 +24052,68 @@ AirflowNetwork:OccupantVentilationControl,
       \type object-list
       \object-list ScheduleNames
       \note If this field is blank, the closing probability check is bypassed and closing is true.
+
+AirflowNetwork:IntraZone:Node,
+      \min-fields 2
+      \memo This object represents a node in a zone in the combination of RoomAir and 
+      \memo AirflowNetwork model.
+ A1 , \field Name
+      \required-field
+      \type alpha
+      \reference AirflowNetworkNodeNames
+      \note Enter a unique name for this object.
+ A2 , \field RoomAir:Node:AirflowNetwork Name
+      \required-field
+      \type alpha
+      \object-list RoomAirflowNetworkNodes
+      \note Enter the name of a RoomAir:Node object defined in a RoomAirSettings:AirflowNetwork 
+      \note object.
+ A3 , \field Zone Name
+      \required-field
+      \type alpha
+      \object-list AirflowNetwork:MultiZone:Zone
+      \note Enter the name of a zone object defined in a AirflowNetwork:MultiZone:Zone
+      \note object.
+ N1 ; \field Node Height
+      \type real
+      \units m
+      \default 0.0
+      \note Enter the reference height used to calculate the relative pressure
+
+AirflowNetwork:IntraZone:Linkage,
+      \min-fields 4
+      \memo This object defines the connection between two nodes and a component used 
+      \memo in the combination of RoomAir and AirflowNetwork model.
+ A1 , \field Name
+      \required-field
+      \type alpha
+      \note Enter a unique name for this object.
+      \reference AirflowNetwork LinkageNames
+ A2 , \field Node 1 Name
+      \required-field
+      \type alpha
+      \object-list AirflowNetworkNodeNames
+      \object-list ZoneNames
+      \note Enter the name of zone or AirflowNetwork Node.
+ A3 , \field Node 2 Name
+      \required-field
+      \type alpha
+      \object-list AirflowNetworkNodeNames
+      \object-list ZoneNames
+      \note Enter the name of zone or AirflowNetwork Node.
+ A4 , \field Component Name
+      \type object-list
+      \object-list AirflowNetworkComponentNames
+      \note Enter the name of an AirflowNetwork component. A component is one of the
+      \note following AirflowNetwork:Multizone:Component objects:      
+      \note AirflowNetwork:MultiZone:Surface:Crack,
+      \note AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,
+      \note If the next field is specified, this field can be either blank or ignored.
+ A5 ; \field AirflowNetwork:MultiZone:Surface Name
+      \type object-list
+      \object-list SurfAndSubSurfNames
+      \note Only used when one of two nodes defined above are not located in the same zone, and
+      \note the input of the Component Name field in this object is ignored
 
 \group Exterior Equipment
        ! This equipment is used merely for reporting.
@@ -31653,7 +32120,8 @@ ZoneControl:ContaminantController,
        \note Schedule values should be carbon dioxide concentration in parts per
        \note million (ppm)
        \note This field is used when the field System Outdoor Air Method =
-       \note ProportionalControl in Controller:MechanicalVentilation
+       \note ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy
+       \note in Controller:MechanicalVentilation
   A6 , \field Generic Contaminant Control Availability Schedule Name
        \note Availability schedule name for generic contaminant controller. Schedule value > 0 means
        \note the generic contaminant controller is enabled. If this field is blank, then generic
@@ -31865,6 +32333,7 @@ ZoneHVAC:FourPipeFanCoil,
         \key CyclingFan
         \key VariableFanVariableFlow
         \key VariableFanConstantFlow
+        \key MultiStageFan
    N1 , \field Maximum Supply Air Flow Rate
         \required-field
         \autosizable
@@ -31963,10 +32432,18 @@ ZoneHVAC:FourPipeFanCoil,
         \note Enter the name of an AvailabilityManagerAssignmentList object.
         \type object-list
         \object-list SystemAvailabilityManagerLists
-   A16; \field Design Specification ZoneHVAC Sizing Object Name
+   A16, \field Design Specification ZoneHVAC Sizing Object Name
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
         \type object-list
         \object-list DesignSpecificationZoneHVACSizingName
+   A17; \field Supply Air Fan Operating Mode Schedule Name
+        \type object-list
+        \object-list ScheduleNames
+        \note Enter the name of a schedule that controls fan operation. Schedule Name values of 0 denote
+        \note cycling fan operation (fan cycles with cooling coil). Schedule values greater
+        \note than 0 denote constant fan operation (fan runs continually regardless of coil operation).
+        \note The fan operating mode defaults to cycling fan operation if this field is left blank.
+        \note This input field is currently used with MultiStageFan capacity control method
 
 ZoneHVAC:WindowAirConditioner,
         \memo Window air conditioner. Forced-convection cooling-only unit with supply fan, direct
@@ -51246,19 +51723,19 @@ AirLoopHVAC:UnitarySystem,
   A25, \field Heat Recovery Water Outlet Node Name
        \type node
        \note Enter the name of the heat recovery water outlet node if plant water loop connections are present.
-  A26, \field Design Specification Multispeed Heat Pump Object Type
+  A26, \field Design Specification Multispeed Object Type
        \type choice
-       \key UnitarySystemPerformance:HeatPump:Multispeed
+       \key UnitarySystemPerformance:Multispeed
        \note Enter the type of performance specification object used to describe the multispeed coil.
-  A27; \field Design Specification Multispeed Heat Pump Object Name
+  A27; \field Design Specification Multispeed Object Name
        \type object-list
        \object-list UnitarySystemPerformaceNames
        \note Enter the name of the performance specification object used to describe the multispeed coil.
 
-UnitarySystemPerformance:HeatPump:Multispeed,
+UnitarySystemPerformance:Multispeed,
        \memo The UnitarySystemPerformance object is used to specify the air flow ratio at each
-       \memo operating speed. This object is primarily used for multispeed coils to allow operation
-       \memo at alternate flow rates different from those specified in the coil object.
+       \memo operating speed. This object is primarily used for multispeed DX and water coils to allow
+       \memo operation at alternate flow rates different from those specified in the coil object.
        \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
   A1 , \field Name
        \required-field
@@ -53420,7 +53897,8 @@ Controller:MechanicalVentilation,
         \key ZoneSum
         \key VentilationRateProcedure
         \key IndoorAirQualityProcedure
-        \key ProportionalControl
+        \key ProportionalControlBasedOnDesignOccupancy
+        \key ProportionalControlBasedonOccupancySchedule
         \key IndoorAirQualityProcedureGenericContaminant
         \default VentilationRateProcedure
    N1,  \field Zone Maximum Outdoor Air Fraction

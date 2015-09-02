@@ -22,6 +22,7 @@ set( test_src
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
+  FanCoilUnits.unit.cc
   Fans.unit.cc
   FaultFoulingAirFilters.unit.cc
   FluidCoolers.unit.cc
@@ -46,6 +47,7 @@ set( test_src
   OutputProcessor.unit.cc
   OutputReportTabular.unit.cc
   ReportSizingManager.unit.cc
+  RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc

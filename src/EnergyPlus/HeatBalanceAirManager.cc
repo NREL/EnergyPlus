@@ -2812,6 +2812,7 @@ namespace HeatBalanceAirManager {
 		using DataRoomAirModel::RoomAirModel_UserDefined;
 		using DataRoomAirModel::RoomAirModel_UCSDUFI;
 		using DataRoomAirModel::RoomAirModel_UCSDUFE;
+		using DataRoomAirModel::RoomAirModel_AirflowNetwork;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2922,6 +2923,14 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).AirModelType = RoomAirModel_UserDefined;
 					AirModel( ZoneNum ).SimAirModel = true;
 					UserDefinedUsed = true;
+				} else if ( SELECT_CASE_var == "AIRFLOWNETWORK" ) {
+					AirModel( ZoneNum ).AirModelType = RoomAirModel_AirflowNetwork;
+					AirModel( ZoneNum ).SimAirModel = true;
+					ValidateComponent( "RoomAirSettings:AirflowNetwork", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					if ( IsNotOK ) {
+						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
+						ErrorsFound = true;
+					}
 					// Need to make sure that Room Air controls are used for this one.
 				} else {
 					ShowWarningError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
@@ -2977,6 +2986,8 @@ namespace HeatBalanceAirManager {
 				gio::write( OutputFileInits, RoomAirZoneFmt ) << Zone( ZoneNum ).Name << "UnderFloorAirDistributionExterior";
 			} else if ( SELECT_CASE_var == RoomAirModel_UserDefined ) {
 				gio::write( OutputFileInits, RoomAirZoneFmt ) << Zone( ZoneNum ).Name << "UserDefined";
+			} else if ( SELECT_CASE_var == RoomAirModel_AirflowNetwork ) {
+				gio::write( OutputFileInits, RoomAirZoneFmt ) << Zone( ZoneNum ).Name << "AirflowNetwork";
 			}}
 		}
 

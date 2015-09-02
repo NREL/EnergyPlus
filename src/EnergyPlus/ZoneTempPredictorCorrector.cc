@@ -30,6 +30,7 @@
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
+#include <RoomAirModelAirflowNetwork.hh>
 #include <RoomAirModelManager.hh>
 #include <ScheduleManager.hh>
 #include <ThermalComfort.hh>
@@ -2505,7 +2506,7 @@ namespace ZoneTempPredictorCorrector {
 		using DataRoomAirModel::XM2TMX;
 		using DataRoomAirModel::XM3TMX;
 		using DataRoomAirModel::XM4TMX;
-
+		using RoomAirModelAirflowNetwork::LoadPredictionRoomAirModelAirflowNetwork;
 		using General::TrimSigDigits;
 		using DataLoopNode::Node;
 		using ScheduleManager::GetCurrentScheduleValue;
@@ -2543,6 +2544,9 @@ namespace ZoneTempPredictorCorrector {
 		int I;
 		int Itemp;
 		Real64 SetpointOffset;
+		int RoomAirNode;
+		int LoopNode;
+		Real64 RAFNFrac;
 
 		// Staged thermostat setpoint
 		if ( NumStageCtrZone > 0 ) {
@@ -2643,7 +2647,15 @@ namespace ZoneTempPredictorCorrector {
 						//                    XM3TMX(ZoneNum),    XM4TMX(ZoneNum) ,   &
 						DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, XMATMX( ZoneNum ), XM2TMX( ZoneNum ), XM3TMX( ZoneNum ), XM4TMX( ZoneNum ), XM4TMX( ZoneNum ), MATMX( ZoneNum ), DSXMATMX( ZoneNum ), DSXM2TMX( ZoneNum ), DSXM3TMX( ZoneNum ), DSXM4TMX( ZoneNum ) );
 					}
-
+					if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
+						for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
+							auto & ThisRAFNNode( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ) );
+							DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, ThisRAFNNode.AirTemp, ThisRAFNNode.AirTempX1, ThisRAFNNode.AirTempX2, ThisRAFNNode.AirTempX3, ThisRAFNNode.AirTempX4,
+								ThisRAFNNode.AirTemp, ThisRAFNNode.AirTempDSX1, ThisRAFNNode.AirTempDSX2, ThisRAFNNode.AirTempDSX3, ThisRAFNNode.AirTempDSX4 );
+							DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, ThisRAFNNode.HumRat, ThisRAFNNode.HumRatX1, ThisRAFNNode.HumRatX2, ThisRAFNNode.HumRatX3, ThisRAFNNode.HumRatX4,
+								ThisRAFNNode.HumRat, ThisRAFNNode.HumRatDSX1, ThisRAFNNode.HumRatDSX2, ThisRAFNNode.HumRatDSX3, ThisRAFNNode.HumRatDSX4 );
+						}
+					}
 				} else { // reuse history data in DS terms from last zone time step to preserve information that would be lost
 					// do nothing because DS history would have been pushed prior and should be ready
 
@@ -2673,6 +2685,7 @@ namespace ZoneTempPredictorCorrector {
 
 			AIRRAT( ZoneNum ) = Zone( ZoneNum ).Volume * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / ( TimeStepSys * SecInHour );
 			AirCap = AIRRAT( ZoneNum );
+			RAFNFrac = 0.0;
 
 			// Calculate the various heat balance sums
 
@@ -2695,6 +2708,26 @@ namespace ZoneTempPredictorCorrector {
 				TempHistoryTerm = AirCap * ( 3.0 * ZTM1( ZoneNum ) - ( 3.0 / 2.0 ) * ZTM2( ZoneNum ) + ( 1.0 / 3.0 ) * ZTM3( ZoneNum ) );
 				TempDepZnLd( ZoneNum ) = ( 11.0 / 6.0 ) * AirCap + TempDepCoef;
 				TempIndZnLd( ZoneNum ) = TempHistoryTerm + TempIndCoef;
+			} else if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
+				// RoomAirflowNetworkModel - make dynamic term independent of TimeStepSys
+				if ( RoomAirflowNetworkZoneInfo( ZoneNum ).IsUsed ) {
+					RoomAirNode = RoomAirflowNetworkZoneInfo( ZoneNum ).ControlAirNodeID;
+					LoadPredictionRoomAirModelAirflowNetwork( ZoneNum, RoomAirNode );
+					TempDepCoef = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumHA + RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumLinkMCp;
+					TempIndCoef = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumIntSensibleGain
+						+ RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumHATsurf
+						- RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumHATref
+						+ RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumLinkMCpT + RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SysDepZoneLoadsLagged;
+					AirCap = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).AirVolume * ZoneVolCapMultpSens
+						* RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).RhoAir
+						* RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).CpAir
+						/ ( TimeStepSys*SecInHour );
+					AIRRAT( ZoneNum ) = AirCap;
+					TempHistoryTerm = AirCap * ( 3.0 * ZTM1( ZoneNum ) - ( 3.0 / 2.0 ) * ZTM2( ZoneNum ) + ( 1.0 / 3.0 ) * ZTM3( ZoneNum ) );
+					TempDepZnLd( ZoneNum ) = ( 11.0 / 6.0 ) * AirCap + TempDepCoef;
+					TempIndZnLd( ZoneNum ) = TempHistoryTerm + TempIndCoef;
+					if ( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).HasHVACAssigned ) RAFNFrac = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).HVAC( 1 ).SupplyFraction;
+				}
 			} else { // other imperfectly mixed room models
 				TempHistoryTerm = AirCap * ( 3.0 * ZTM1( ZoneNum ) - ( 3.0 / 2.0 ) * ZTM2( ZoneNum ) + ( 1.0 / 3.0 ) * ZTM3( ZoneNum ) );
 				TempDepZnLd( ZoneNum ) = ( 11.0 / 6.0 ) * AirCap + TempDepCoef;
@@ -2708,24 +2741,42 @@ namespace ZoneTempPredictorCorrector {
 					if ( PreviousTimeStep < TimeStepZone ) {
 						ZoneT1( ZoneNum ) = ZoneTM2( ZoneNum );
 						ZoneW1( ZoneNum ) = ZoneWM2( ZoneNum );
+						if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
+							for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
+								RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempT1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTM2;
+								RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatW1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWM2;
+							}
+						}
 					} else {
 						ZoneT1( ZoneNum ) = ZoneTMX( ZoneNum );
 						ZoneW1( ZoneNum ) = ZoneWMX( ZoneNum );
+						if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
+							for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
+								RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempT1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX;
+								RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatW1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX;
+							}
+						}
 					}
 					ShortenTimeStepSysRoomAir = true;
 				} else {
 					ZoneT1( ZoneNum ) = ZT( ZoneNum );
 					ZoneW1( ZoneNum ) = ZoneAirHumRat( ZoneNum );
+					if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
+						for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
+							RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempT1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTemp;
+							RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatW1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRat;
+						}
+					}
 				}
 				TempDepZnLd( ZoneNum ) = TempDepCoef;
 				TempIndZnLd( ZoneNum ) = TempIndCoef;
 			}
 
 			// Calculate the predicted zone load to be provided by the system with the given desired zone air temperature
-			CalcPredictedSystemLoad( ZoneNum );
+			CalcPredictedSystemLoad( ZoneNum, RAFNFrac );
 
 			// Calculate the predicted zone load to be provided by the system with the given desired humidity ratio
-			CalcPredictedHumidityRatio( ZoneNum );
+			CalcPredictedHumidityRatio( ZoneNum, RAFNFrac );
 
 		}
 
@@ -2950,7 +3001,7 @@ namespace ZoneTempPredictorCorrector {
 	}
 
 	void
-	CalcPredictedSystemLoad( int const ZoneNum )
+	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3025,6 +3076,7 @@ namespace ZoneTempPredictorCorrector {
 			} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
 				LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 			}
+			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
 			ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToHeatingSetPoint;
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
 			LoadToCoolingSetPoint = LoadToHeatingSetPoint;
@@ -3047,6 +3099,7 @@ namespace ZoneTempPredictorCorrector {
 			} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
 				LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * TempZoneThermostatSetPoint( ZoneNum ) - TempIndZnLd( ZoneNum );
 			}
+			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
 			ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToCoolingSetPoint;
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
 			LoadToHeatingSetPoint = LoadToCoolingSetPoint;
@@ -3076,6 +3129,8 @@ namespace ZoneTempPredictorCorrector {
 				LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * TempZoneThermostatSetPoint( ZoneNum ) - TempIndZnLd( ZoneNum );
 			}
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
+			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
+			if ( RAFNFrac > 0.0 ) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
 
 			//PH 3/2/04      ZoneSysEnergyDemand(ZoneNum)%TotalOutputRequired = LoadToHeatingSetPoint ! = LoadToCoolingSetPoint
 			// Note that LoadToHeatingSetPoint is generally not equal to LoadToCoolingSetPoint
@@ -3140,6 +3195,8 @@ namespace ZoneTempPredictorCorrector {
 				LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * ZoneThermostatSetPointLo( ZoneNum ) - TempIndZnLd( ZoneNum );
 				LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * ZoneThermostatSetPointHi( ZoneNum ) - TempIndZnLd( ZoneNum );
 			}
+			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
+			if ( RAFNFrac > 0.0 ) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
 
 			// Possible combinations:
 			// 1/  LoadToHeatingSetPoint > 0 & LoadToCoolingSetPoint > 0 -->  Heating required
@@ -3272,7 +3329,7 @@ namespace ZoneTempPredictorCorrector {
 	}
 
 	void
-	CalcPredictedHumidityRatio( int const ZoneNum )
+	CalcPredictedHumidityRatio( int const ZoneNum, Real64 RAFNFrac )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3330,6 +3387,7 @@ namespace ZoneTempPredictorCorrector {
 		Real64 LoadToDehumidifySetPoint; // Moisture load at dehumidifying set point
 		Real64 ZoneAirRH; // Zone air relative humidity
 		bool SingleSetPoint; // This determines whether both setpoint are equal or not
+		int RoomAirNode;
 
 		// FLOW:
 		LoadToHumidifySetPoint = 0.0;
@@ -3505,6 +3563,17 @@ namespace ZoneTempPredictorCorrector {
 			}
 			C = RhoAir * Zone( ZoneNum ).Volume * ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 
+			if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
+				RoomAirNode = RoomAirflowNetworkZoneInfo( ZoneNum ).ControlAirNodeID;
+				H2OHtOfVap = PsyHgAirFnWTdb( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).HumRat,
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).AirTemp );
+				A = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumLinkM + RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumHmARa;
+				B = ( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumIntLatentGain / H2OHtOfVap )
+					+ RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumLinkMW + RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumHmARaW;
+				C = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).RhoAir * RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).AirVolume
+					* ZoneVolCapMultpMoist / ( SecInHour * TimeStepSys );
+			}
+
 			// Use a 3rd Order derivative to predict zone moisture addition or removal and
 			// smooth the changes using the zone air capacitance.  Positive values of Moist Load means that
 			// this amount of moisture must be added to the zone to reach the setpoint.  Negative values represent
@@ -3525,6 +3594,7 @@ namespace ZoneTempPredictorCorrector {
 			} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
 				LoadToHumidifySetPoint = C * ( WZoneSetPoint - ZoneW1( ZoneNum ) ) + A * WZoneSetPoint - B;
 			}
+			if ( RAFNFrac > 0.0 ) LoadToHumidifySetPoint = LoadToHumidifySetPoint / RAFNFrac;
 			ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToHumidifyingSP = LoadToHumidifySetPoint;
 			WZoneSetPoint = PsyWFnTdbRhPb( ZT( ZoneNum ), ( ZoneRHDehumidifyingSetPoint / 100.0 ), OutBaroPress, RoutineName );
 			if ( ZoneAirSolutionAlgo == Use3rdOrder ) {
@@ -3539,6 +3609,7 @@ namespace ZoneTempPredictorCorrector {
 			} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
 				LoadToDehumidifySetPoint = C * ( WZoneSetPoint - ZoneW1( ZoneNum ) ) + A * WZoneSetPoint - B;
 			}
+			if ( RAFNFrac > 0.0 ) LoadToDehumidifySetPoint = LoadToDehumidifySetPoint / RAFNFrac;
 			ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToDehumidifyingSP = LoadToDehumidifySetPoint;
 
 			// The load is added to the TotalOutputRequired as in the Temperature Predictor.  There is also the remaining
@@ -3672,6 +3743,7 @@ namespace ZoneTempPredictorCorrector {
 		//unusd1208  LOGICAL,SAVE   :: MyEnvrnFlag = .TRUE.
 		Real64 TempSupplyAir;
 		Real64 ZoneMult;
+		int LoopNode;
 		//unused1208  REAL(r64)           :: TimeStepSeconds  ! dt term for denominator under Cz in Seconds
 
 		// FLOW:
@@ -3701,7 +3773,15 @@ namespace ZoneTempPredictorCorrector {
 						DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, MATOC( ZoneNum ), XMATOC( ZoneNum ), XM2TOC( ZoneNum ), XM3TOC( ZoneNum ), XM4TOC( ZoneNum ), MATOC( ZoneNum ), DSXMATOC( ZoneNum ), DSXM2TOC( ZoneNum ), DSXM3TOC( ZoneNum ), DSXM4TOC( ZoneNum ) );
 						DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, MATMX( ZoneNum ), XMATMX( ZoneNum ), XM2TMX( ZoneNum ), XM3TMX( ZoneNum ), XM4TMX( ZoneNum ), MATMX( ZoneNum ), DSXMATMX( ZoneNum ), DSXM2TMX( ZoneNum ), DSXM3TMX( ZoneNum ), DSXM4TMX( ZoneNum ) );
 					}
-
+					if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
+						for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
+							auto & ThisRAFNNode( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ) );
+							DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, ThisRAFNNode.AirTemp, ThisRAFNNode.AirTempX1, ThisRAFNNode.AirTempX2, ThisRAFNNode.AirTempX3, ThisRAFNNode.AirTempX4,
+								ThisRAFNNode.AirTemp, ThisRAFNNode.AirTempDSX1, ThisRAFNNode.AirTempDSX2, ThisRAFNNode.AirTempDSX3, ThisRAFNNode.AirTempDSX4 );
+							DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, ThisRAFNNode.HumRat, ThisRAFNNode.HumRatX1, ThisRAFNNode.HumRatX2, ThisRAFNNode.HumRatX3, ThisRAFNNode.HumRatX4,
+								ThisRAFNNode.HumRat, ThisRAFNNode.HumRatDSX1, ThisRAFNNode.HumRatDSX2, ThisRAFNNode.HumRatDSX3, ThisRAFNNode.HumRatDSX4 );
+						}
+					}
 				} else { // reuse history data in DS terms from last zone time step to preserve information that would be lost
 					// do nothing because DS history would have been pushed prior and should be ready?
 
@@ -3806,6 +3886,12 @@ namespace ZoneTempPredictorCorrector {
 						// Negligible flow, assume mixed - reasonable lagged starting value for first step time with significant flow
 						LoadCorrectionFactor( ZoneNum ) = 1.0;
 					}
+				} else if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
+					//Zone node used in the RoomAirflowNetwork model				
+					ZT( ZoneNum ) = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirflowNetworkZoneInfo( ZoneNum ).ControlAirNodeID ).AirTemp;
+					Node( ZoneNodeNum ).Temp = ZT( ZoneNum );
+					TempTstatAir( ZoneNum ) = ZT( ZoneNum );
+					LoadCorrectionFactor( ZoneNum ) = 1.0;
 				} else {
 					Node( ZoneNodeNum ).Temp = ZT( ZoneNum );
 					TempTstatAir( ZoneNum ) = ZT( ZoneNum );
@@ -3847,6 +3933,10 @@ namespace ZoneTempPredictorCorrector {
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZT( ZoneNum ) = ( AirCap * ZoneT1( ZoneNum ) + TempIndCoef ) / ( AirCap + TempDepCoef );
 				}}
+
+				if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
+					ZT( ZoneNum ) = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirflowNetworkZoneInfo( ZoneNum ).ControlAirNodeID ).AirTemp;
+				}
 
 				// No sensible load
 				SNLoad = 0.0;
@@ -3945,6 +4035,7 @@ namespace ZoneTempPredictorCorrector {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
+		int LoopNode;
 
 		// Push the temperature and humidity ratio histories
 
@@ -3984,6 +4075,21 @@ namespace ZoneTempPredictorCorrector {
 				MATMX( ZoneNum ) = ZTMX( ZoneNum );
 			}
 
+			// for RoomAirflowNetwork model
+			if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
+				for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempX4 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempX3;
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempX3 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempX2;
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempX2 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempX1;
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempX1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTemp;
+
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatX4 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatX3;
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatX3 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatX2;
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatX2 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatX1;
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatX1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRat;
+				}
+			}
+
 			if ( ZoneAirSolutionAlgo != Use3rdOrder ) {
 				ZoneTM2( ZoneNum ) = ZoneTMX( ZoneNum );
 				ZoneTMX( ZoneNum ) = ZTAV( ZoneNum ); // using average for whole zone time step.
@@ -3996,6 +4102,17 @@ namespace ZoneTempPredictorCorrector {
 					ZoneMXOC( ZoneNum ) = ZTOC( ZoneNum ); // using average for whole zone time step.
 					ZoneM2MX( ZoneNum ) = ZoneMXMX( ZoneNum );
 					ZoneMXMX( ZoneNum ) = ZTMX( ZoneNum ); // using average for whole zone time step.
+				}
+
+				if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
+					for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTM2 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX;
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTemp;
+//						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempT1;
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWM2 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX;
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRat;
+//						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatW1;
+					}
 				}
 			}
 		} // zone loop
@@ -4039,6 +4156,7 @@ namespace ZoneTempPredictorCorrector {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
+		int LoopNode;
 
 		// Push the temperature and humidity ratio histories back in time
 
@@ -4069,7 +4187,19 @@ namespace ZoneTempPredictorCorrector {
 				DSXM2TMX( ZoneNum ) = DSXMATMX( ZoneNum );
 				DSXMATMX( ZoneNum ) = MATMX( ZoneNum );
 			}
+			if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
+				for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempDSX4 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempDSX3;
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempDSX3 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempDSX2;
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempDSX2 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempDSX1;
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempDSX1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTemp;
 
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatDSX4 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatDSX3;
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatDSX3 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatDSX2;
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatDSX2 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatDSX1;
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatDSX1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRat;
+				}
+			}
 		} // zone loop
 
 		if ( ZoneAirSolutionAlgo != Use3rdOrder ) {
@@ -4086,6 +4216,16 @@ namespace ZoneTempPredictorCorrector {
 					ZoneMXOC( ZoneNum ) = ZTOC( ZoneNum ); // using average for whole zone time step.
 					ZoneM2MX( ZoneNum ) = ZoneMXMX( ZoneNum );
 					ZoneMXMX( ZoneNum ) = ZTMX( ZoneNum ); // using average for whole zone time step.
+				}
+				if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
+					for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTM2 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX;
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTemp;
+//						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempT1;
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWM2 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX;
+						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRat;
+//						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatW1;
+					}
 				}
 			} // zone loop
 		}
@@ -4128,6 +4268,7 @@ namespace ZoneTempPredictorCorrector {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
+		int LoopNode;
 
 		// REvert the temperature and humidity ratio histories
 
@@ -4160,6 +4301,17 @@ namespace ZoneTempPredictorCorrector {
 
 			}
 
+			if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
+				for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempX1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempX2;
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempX2 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempX3;
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempX3 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempX4;
+
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatX1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatX2;
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatX2 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatX3;
+					RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatX3 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatX4;
+				}
+			}
 		} // zone loop
 
 	}
@@ -4390,6 +4542,10 @@ namespace ZoneTempPredictorCorrector {
 		WZSat = PsyWFnTdbRhPb( ZT( ZoneNum ), 1.0, OutBaroPress, RoutineName );
 
 		if ( ZoneAirHumRatTemp( ZoneNum ) > WZSat ) ZoneAirHumRatTemp( ZoneNum ) = WZSat;
+
+		if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
+			ZoneAirHumRatTemp( ZoneNum ) = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirflowNetworkZoneInfo( ZoneNum ).ControlAirNodeID ).HumRat;
+		}
 
 		// Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone
 		ZoneNodeNum = Zone( ZoneNum ).SystemZoneNodeNumber;
