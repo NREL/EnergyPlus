@@ -1602,6 +1602,9 @@ namespace GroundHeatExchangers {
 
 				// Initialize ground temperature model and get pointer reference
 				slinkyGLHE( GLHENum ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ) , cAlphaArgs( 6 ) );
+				if ( slinkyGLHE ( GLHENum ).groundTempModel ) {
+					errorsFound = slinkyGLHE ( GLHENum ).groundTempModel->errorsFound;
+				}
 
 				//Check for Errors
 				if ( errorsFound ) {

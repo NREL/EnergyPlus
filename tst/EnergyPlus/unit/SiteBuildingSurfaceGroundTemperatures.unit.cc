@@ -8,7 +8,6 @@
 #include "Fixtures/GroundTempsFixture.hh"
 
 using namespace EnergyPlus;
-
 using namespace EnergyPlus::GroundTemperatureManager;
 
 TEST_F( GroundTempsFixture, SiteBuildingSurfaceGroundTempTest )

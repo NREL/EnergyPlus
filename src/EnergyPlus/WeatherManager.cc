@@ -7151,20 +7151,27 @@ Label9999: ;
 		// FLOW:
 		// Initialize Site:GroundTemperature:BuildingSurface object
 		siteBuildingSurfaceGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "" );
-		ErrorsFound = siteBuildingSurfaceGroundTempsPtr->errorsFound;
+		if ( siteBuildingSurfaceGroundTempsPtr ){
+			ErrorsFound = siteBuildingSurfaceGroundTempsPtr->errorsFound;
+		}
 
 		// Initialize Site:GroundTemperature:FCFactorMethod object
 		siteFCFactorMethodGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "" );
-		ErrorsFound = siteFCFactorMethodGroundTempsPtr->errorsFound;	
+		if ( siteFCFactorMethodGroundTempsPtr ) {
+			ErrorsFound = siteFCFactorMethodGroundTempsPtr->errorsFound;	
+		}
 
 		// Initialize Site:GroundTemperature:Shallow object
 		siteShallowGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:SHALLOW", "" );
-		ErrorsFound = siteShallowGroundTempsPtr->errorsFound;
-		
+		if ( siteShallowGroundTempsPtr ) {
+			ErrorsFound = siteShallowGroundTempsPtr->errorsFound;
+		}
+
 		// Initialize Site:GroundTemperature:Deep object
 		siteDeepGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:DEEP", "" );
-		ErrorsFound = siteDeepGroundTempsPtr->errorsFound;
-
+		if ( siteDeepGroundTempsPtr ) {
+			ErrorsFound = siteDeepGroundTempsPtr->errorsFound;
+		}
 	}
 
 	void

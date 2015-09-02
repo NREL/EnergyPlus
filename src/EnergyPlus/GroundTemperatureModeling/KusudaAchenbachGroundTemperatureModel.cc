@@ -81,7 +81,6 @@ namespace EnergyPlus {
 
 					std::shared_ptr< BaseGroundTempsModel > shallowObj = GetGroundTempModelAndInit( CurrentModuleObjects( objectType_SiteShallowGroundTemp ), "" );
 
-					
 					for ( int monthIndex = 1; monthIndex <= 12; ++monthIndex ) {
 						Real64 currMonthTemp = shallowObj->getGroundTempAtTimeInMonths( 0.0, monthIndex );
 						
