@@ -7234,11 +7234,11 @@ The maximum zone design heating volumetric flow rate expressed as a fraction of 
 
 The name of the DesignSpecification:ZoneAirDistribution object, defining the air distribution effectiveness and secondary recirculation air fraction, that applies to the zone or zone list. This object may be used for the same zone in the Controller:MechanicalVentilation object if no such DesignSpecification:ZoneAirDistribution object is specified.
 
-#### Field: Account for Dedicated Outside Air System
+#### Field: Account for Dedicated Outdoor Air System
 
 This is a choice field with choices *Yes* or *No*. The default is *No*. Choosing *Yes* means that the zone sizing calculation will use the subsequent inputs to calculate the heat gain or loss (heat gains are positive, heat loss is negative) imposed on the zone by a Dedicated Outdoor Air System (DOAS). This heat gain is then added to the zone design heat gain for the zone and the zone design air flow rate is adjusted to meet the DOAS heat gain plus the zone design heat gain.
 
-#### Field: Dedicated Outside Air System Control Strategy
+#### Field: Dedicated Outdoor Air System Control Strategy
 
 This is a choice field with a choice of three ideal control strategies for the DOA system. The choices are *NeutralSupplyAir*, *NeutralDehumidifiedSupplyAir*, or *ColdSupplyAir*. The default is *NeutralSupplyAir*.
 
@@ -7248,10 +7248,10 @@ This is a choice field with a choice of three ideal control strategies for the D
 
 *ColdSupplyAir* means that the ventilation air will be used to supply cooling to the zone. Cold outside air is heated to the upper setpoint; warm outside air is cooled to the lower setpoint. A good choice for the setpoints would be 12.2 and 14.4 degrees C.
 
-#### Field: Dedicated Outside Air Low Setpoint for Design
+#### Field: Dedicated Outdoor Air Low Temperatue Setpoint for Design
 The lower setpoint temperature to be used with the DOAS design control strategy. The units are degrees C. The default is autosized to the values given above for the three design control strategies.
 
-#### Field: Dedicated Outside Air High Setpoint for Design
+#### Field: Dedicated Outdoor Air High Temperature Setpoint for Design
 The higher setpoint temperature to be used with the DOAS design control strategy. The units are degrees C. The default is autosized to the values given above for the three design control strategies.
 
 An IDF example:
@@ -9649,9 +9649,84 @@ PlantEquipmentOperation:ComponentSetpoint,
 
 ### PlantEquipmentOperation:ThermalEnergyStorage
 
-Users of thermal energy storage, particularly ice storage systems, are often faced with a challenge of specifying input for these systems.  Essentially, they have to define various setpoint managers, temperature schedules, etc. in order to make the system functional.  This plant/condenser control type simplifies the input somewhat by eliminating both a setpoint manager and a schedule for each piece of equipment that makes up the ice storage system.  In fact, this operation scheme internally creates the setpoint managers required by the equipment listed as operated by the scheme defined by this syntax.  While the more complex definition is possible and provides more flexibility like hourly variation of setpoint temperatures at the outlet of each piece of equipment, this input provides the most convenient method for making the system to work and assumes a single charging setpoint temperature and a single discharging setpoint temperature.  For most systems, this is all that is needed.#### Field: NameThis field defines the name of the thermal energy (ice) storage plant equipment operation scheme that will be referenced by the PlantEquipmentOperationSchemes list in the plant input.#### Field: On-Peak ScheduleThis field defines the name of an integer schedule that determines when on-peak electric pricing is in effect.  This value is used to determine whether or not the ice storage system should be charging the ice storage unit.  In the schedule, a value of 1 (or greater) corresponds to being in the on-peak period while any value of 0 or less corresponds to being in the off-peak period.#### Field: Charging Availability ScheduleThis field defines the name of an integer schedule that determines whether or not the system may enter charging mode off-peak.  If the current value of the on-peak schedule is “off”, then charging can take place if the charging availability schedule is “on”.  If the on-peak schedule is “off” and charging availability is “off”, then charging is not allowed and the chiller and ice storage units controlled by this statement are operating to meet the non-charging chilled water temperature defined by the next input parameter. In this schedule, a value of 1 (or greater) corresponds to “on” when charging is available during an off-peak period while any value of 0 or less corresponds to chillers not being allowed to charge even during off-peak.#### Field: Non-Charging Chilled Water TemperatureThis field defines the chilled water temperature when the ice storage system is NOT in charging mode.  During these times, the storage system could be discharging or dormant depending on HVAC load conditions and ice storage controls.  This value is used as the setpoint temperature for chillers associated with this plant equipment operation scheme during non-cooling season and during cooling season during the on-peak period.  The cooling season and on-peak periods are defined by schedules reference to input above.#### Field: Charging Chilled Water TemperatureThis field defines the chilled water temperature when the ice storage system is in charging mode.  During these times, the chiller is producing a temperature low enough to generate ice in the ice storage unit.  This value is used as the setpoint temperature for chillers associated with this plant equipment operation scheme during the cooling season during the off-peak period.  The cooling season and on-peak periods are defined by schedules reference to input above.
-#### Field Set: (Component Object Type, Name, Demand Calculation Node, Setpoint Node, Flow Rate, Operation Type)#### Field: Component &lt;\#&gt; Object TypeThis field specifies the type of equipment controlled by scheme.  This must be a thermal energy storage device (simple or detailed ice storage) or a chiller.#### Field: Component &lt;\#&gt; NameThis field specifies the name of the controlled equipment.  This name must be defined in the input as a valid ice storage device or chiller.#### Field: Component &lt;\#&gt; Demand Calculation Node NameThe component demand will be calculated using the difference between the temperature at the demand node and the component set point temperature.#### Field: Component &lt;\#&gt; Setpoint Node NameEach component controlled under temperature based control will have its own set point different from the loop set point. This field specifies component set point node (Generally its outlet temperatures). This node is acted upon by a SetpointManager in order to obtain the setpoint at any simulation timestep.#### Field: Component &lt;\#&gt; Flow RateThis numeric field specifies the design flow rate for the component specified in earlier fields.  This flow rate is used to calculate the component demand. The field can be set to autosize, if the user wants the program to calculate the design flow. This would generally be set to autosize when the user does not know the component flow rate and does a sizing calculation for the corresponding component.#### Field: Component &lt;\#&gt; Operation TypeThis alpha field specifies the operation mode for the equipment. The equipment can be in any of the three modes viz. Cooling, Heating and Dual. Dual is used when the components both as heating and cooling equipment (for example heat pumps).  Ice storage units can potentially either heat or cool the circulating fluid and thus should be defined as Dual mode.An example IDF is shown below:
-```idf  PlantEquipmentOperationSchemes,    CW Loop Operation,       !- Name    PlantEquipmentOperation:ThermalEnergyStorage,  !- Control Scheme 1 Object Type    Chiller and Partial Ice Storage,  !- Control Scheme 1 Name    PlantOnSched;            !- Control Scheme 1 Schedule Name  PlantEquipmentOperation:ThermalEnergyStorage,    Chiller and Partial Ice Storage,  !- Name    OnPeakEnergy,            !- On-Peak Schedule Name    ChargingAvail,           !- Charging Availability Schedule Name    7.22,                    !- Non-charging Chilled Water Temperature    -5.0,                    !- Charging Chilled Water Temperature    Chiller:Electric,        !- Component 1 Object Type    Central Chiller,         !- Component 1 Name    Central Chiller Inlet Node,  !- Component 1 Demand Calculation Node Name    Central Chiller Outlet Node,  !- Component 1 Setpoint Node Name    autosize,                !- Component 1 Flow Rate {m3/s}    COOLING,                 !- Component 1 Operation Type    ThermalStorage:Ice:Detailed,  !- Component 2 Object Type    Ice Tank,                !- Component 2 Name    Ice Tank Inlet Node,     !- Component 2 Demand Calculation Node Name    Ice Tank Outlet Node,    !- Component 2 Setpoint Node Name    0.13506E-02,             !- Component 2 Flow Rate {m3/s}    DUAL;                    !- Component 2 Operation Type```
+Users of thermal energy storage, particularly ice storage systems, are often faced with a challenge of specifying input for these systems.  Essentially, they have to define various setpoint managers, temperature schedules, etc. in order to make the system functional.  This plant/condenser control type simplifies the input somewhat by eliminating both a setpoint manager and a schedule for each piece of equipment that makes up the ice storage system.  In fact, this operation scheme internally creates the setpoint managers required by the equipment listed as operated by the scheme defined by this syntax.  While the more complex definition is possible and provides more flexibility like hourly variation of setpoint temperatures at the outlet of each piece of equipment, this input provides the most convenient method for making the system to work and assumes a single charging setpoint temperature and a single discharging setpoint temperature.  For most systems, this is all that is needed.
+
+#### Field: Name
+
+This field defines the name of the thermal energy (ice) storage plant equipment operation scheme that will be referenced by the PlantEquipmentOperationSchemes list in the plant input.
+
+#### Field: On-Peak Schedule
+
+This field defines the name of an integer schedule that determines when on-peak electric pricing is in effect.  This value is used to determine whether or not the ice storage system should be charging the ice storage unit.  In the schedule, a value of 1 (or greater) corresponds to being in the on-peak period while any value of 0 or less corresponds to being in the off-peak period.
+
+#### Field: Charging Availability Schedule
+
+This field defines the name of an integer schedule that determines whether or not the system may enter charging mode off-peak.  If the current value of the on-peak schedule is “off”, then charging can take place if the charging availability schedule is “on”.  If the on-peak schedule is “off” and charging availability is “off”, then charging is not allowed and the chiller and ice storage units controlled by this statement are operating to meet the non-charging chilled water temperature defined by the next input parameter. In this schedule, a value of 1 (or greater) corresponds to “on” when charging is available during an off-peak period while any value of 0 or less corresponds to chillers not being allowed to charge even during off-peak.
+
+#### Field: Non-Charging Chilled Water Temperature
+
+This field defines the chilled water temperature when the ice storage system is NOT in charging mode.  During these times, the storage system could be discharging or dormant depending on HVAC load conditions and ice storage controls.  This value is used as the setpoint temperature for chillers associated with this plant equipment operation scheme during non-cooling season and during cooling season during the on-peak period.  The cooling season and on-peak periods are defined by schedules reference to input above.
+
+#### Field: Charging Chilled Water Temperature
+
+This field defines the chilled water temperature when the ice storage system is in charging mode.  During these times, the chiller is producing a temperature low enough to generate ice in the ice storage unit.  This value is used as the setpoint temperature for chillers associated with this plant equipment operation scheme during the cooling season during the off-peak period.  The cooling season and on-peak periods are defined by schedules reference to input above.
+
+#### Field Set: (Component Object Type, Name, Demand Calculation Node, Setpoint Node, Flow Rate, Operation Type)
+
+#### Field: Component &lt;\#&gt; Object Type
+
+This field specifies the type of equipment controlled by scheme.  This must be a thermal energy storage device (simple or detailed ice storage) or a chiller.
+
+#### Field: Component &lt;\#&gt; Name
+
+This field specifies the name of the controlled equipment.  This name must be defined in the input as a valid ice storage device or chiller.
+
+#### Field: Component &lt;\#&gt; Demand Calculation Node Name
+
+The component demand will be calculated using the difference between the temperature at the demand node and the component set point temperature.
+
+#### Field: Component &lt;\#&gt; Setpoint Node Name
+
+Each component controlled under temperature based control will have its own set point different from the loop set point. This field specifies component set point node (Generally its outlet temperatures). This node is acted upon by a SetpointManager in order to obtain the setpoint at any simulation timestep.
+
+#### Field: Component &lt;\#&gt; Flow Rate
+
+This numeric field specifies the design flow rate for the component specified in earlier fields.  This flow rate is used to calculate the component demand. The field can be set to autosize, if the user wants the program to calculate the design flow. This would generally be set to autosize when the user does not know the component flow rate and does a sizing calculation for the corresponding component.
+
+#### Field: Component &lt;\#&gt; Operation Type
+
+This alpha field specifies the operation mode for the equipment. The equipment can be in any of the three modes viz. Cooling, Heating and Dual. Dual is used when the components both as heating and cooling equipment (for example heat pumps).  Ice storage units can potentially either heat or cool the circulating fluid and thus should be defined as Dual mode.
+
+
+An example IDF is shown below:
+
+
+```idf
+  PlantEquipmentOperationSchemes,
+    CW Loop Operation,       !- Name
+    PlantEquipmentOperation:ThermalEnergyStorage,  !- Control Scheme 1 Object Type
+    Chiller and Partial Ice Storage,  !- Control Scheme 1 Name
+    PlantOnSched;            !- Control Scheme 1 Schedule Name
+
+  PlantEquipmentOperation:ThermalEnergyStorage,
+    Chiller and Partial Ice Storage,  !- Name
+    OnPeakEnergy,            !- On-Peak Schedule Name
+    ChargingAvail,           !- Charging Availability Schedule Name
+    7.22,                    !- Non-charging Chilled Water Temperature
+    -5.0,                    !- Charging Chilled Water Temperature
+    Chiller:Electric,        !- Component 1 Object Type
+    Central Chiller,         !- Component 1 Name
+    Central Chiller Inlet Node,  !- Component 1 Demand Calculation Node Name
+    Central Chiller Outlet Node,  !- Component 1 Setpoint Node Name
+    autosize,                !- Component 1 Flow Rate {m3/s}
+    COOLING,                 !- Component 1 Operation Type
+    ThermalStorage:Ice:Detailed,  !- Component 2 Object Type
+    Ice Tank,                !- Component 2 Name
+    Ice Tank Inlet Node,     !- Component 2 Demand Calculation Node Name
+    Ice Tank Outlet Node,    !- Component 2 Setpoint Node Name
+    0.13506E-02,             !- Component 2 Flow Rate {m3/s}
+    DUAL;                    !- Component 2 Operation Type
+```
 
 ### PlantEquipmentList
 
