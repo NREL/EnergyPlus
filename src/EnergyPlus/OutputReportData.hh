@@ -55,8 +55,8 @@ namespace EnergyPlus {
 			m_typeOfVar(0),
 			m_keyCount(0),
 			m_varAvgSum(0),
-			m_topBinValue(0),
-			m_bottomBinValue(0)
+			m_bottomBinValue( 0 ),
+			m_topBinValue( 0 )
 		{}
 
 		// constructor

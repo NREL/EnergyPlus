@@ -3,6 +3,7 @@
 #include <string>
 #include <list>
 #include <ostream>
+#include <algorithm>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -23,6 +24,7 @@
 #include <DataEnvironment.hh>
 #include <General.hh>
 #include <SQLiteProcedures.hh>
+#include <ScheduleManager.hh>
 
 
 namespace EnergyPlus {
@@ -137,13 +139,21 @@ namespace EnergyPlus {
 			Array1D_int indexesForKeyVar; // keyVarIndexes 
 			std::list<std::string> allKeys;
 
+			std::string filterFieldUpper = m_filter;
+			std::transform( filterFieldUpper.begin(), filterFieldUpper.end(), filterFieldUpper.begin(), ::toupper );
+			bool useFilter = (m_filter.size() != 0);
+
 			std::vector<AnnualFieldSet>::iterator fldStIt;
 			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ )
 				{
 				keyCount = fldStIt->getVariableKeyCountandTypeFromFldSt( typeVar, avgSumVar, stepTypeVar, unitsVar );
 				fldStIt->getVariableKeysFromFldSt( typeVar, keyCount, fldStIt->m_namesOfKeys, fldStIt->m_indexesForKeyVar );
 				for ( std::string nm : fldStIt->m_namesOfKeys ){
-					allKeys.push_back( nm ); // create list of all items
+					std::string nmUpper = nm;
+					std::transform( nmUpper.begin(), nmUpper.end(), nmUpper.begin(), ::toupper );
+					if ( !useFilter || nmUpper.find( filterFieldUpper ) != std::string::npos ){
+						allKeys.push_back( nm ); // create list of all items
+					}
 				}
 				fldStIt->m_typeOfVar = typeVar;
 				fldStIt->m_varAvgSum = avgSumVar;
@@ -210,6 +220,13 @@ namespace EnergyPlus {
 			Real64 secondsInTimeStep = AnnualTable::getSecondsInTimeStep( kindOfTimeStep );
 			bool activeMinMax = false; 
 			bool activeHoursShown = false; 
+			// if schedule is used and the current value is zero, don't gather values 
+			if ( m_scheduleNum != 0 ){
+				if ( ScheduleManager::GetCurrentScheduleValue( m_scheduleNum ) == 0.0 ){
+					return;
+				}
+			}
+			// loop through the fields
 			std::vector<AnnualFieldSet>::iterator fldStIt;
 			std::vector<AnnualFieldSet>::iterator fldStRemainIt;
 			for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
