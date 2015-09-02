@@ -46,7 +46,7 @@ TEST_F( GroundTempsFixture, FiniteDiffGroundTempModelTest )
 	Real64 solar_amp = 100;
 
 	for ( int day = 1; day <= NumDaysInYear; ++day ) {
-		auto tdwd = thisModel->weatherDataArray( day ); // "This day weather data"
+		auto & tdwd = thisModel->weatherDataArray( day ); // "This day weather data"
 
 		Real64 theta = 2 * Pi * day / NumDaysInYear;
 		Real64 omega = 2 * Pi * 130 / NumDaysInYear; // Shifts min to around the end of Jan
