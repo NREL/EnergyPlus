@@ -1256,7 +1256,7 @@ namespace HVACVariableRefrigerantFlow {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "GetVRFInput: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
