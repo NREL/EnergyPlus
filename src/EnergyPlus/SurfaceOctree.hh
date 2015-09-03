@@ -70,7 +70,8 @@ public: // Creation
 	 l_( l ),
 	 u_( u ),
 	 c_( cen( l, u ) ),
-	 w_( w )
+	 w_( w ),
+	 r_( 0.75 * ( w * w ) )
 	{
 #if defined(_MSC_VER) && _MSC_VER < 1900 && !defined(__INTEL_COMPILER) // Visual C++ 2013 doesn't support array initializers in member declaration
 		SurfaceOctreeCube * * p = &cubes_[ 0 ][ 0 ][ 0 ]; for ( int i = 0; i < 8; ++i ) p[ i ] = nullptr;
@@ -200,11 +201,59 @@ public: // Predicates
 	bool
 	contains( Surface const & surface ) const;
 
+	// Line Segment Intersects Enclosing Sphere?
+	bool
+	segmentIntersectsSphere( Vertex const & a, Vertex const & b ) const;
+
+	// Ray Intersects Enclosing Sphere?
+	bool
+	rayIntersectsSphere( Vertex const & a, Vertex const & dir ) const; // Ray is from a with direction dir
+
+	// Line Intersects Enclosing Sphere?
+	bool
+	lineIntersectsSphere( Vertex const & a, Vertex const & dir ) const;
+
+	// Line Segment Intersects Cube?
+	bool
+	segmentIntersectsCube( Vertex const & a, Vertex const & b ) const;
+
+	// Ray Intersects Cube?
+	bool
+	rayIntersectsCube( Vertex const & a, Vertex const & dir, Vertex const & dir_inv ) const;
+
+	// Line Intersects Cube?
+	bool
+	lineIntersectsCube( Vertex const & a, Vertex const & dir, Vertex const & dir_inv ) const;
+
 public: // Methods
 
 	// Surfaces Outer Cube Initilization
 	void
 	init( ObjexxFCL::Array1< Surface > & surfaces );
+
+	// Surfaces that Line Segment Intersects Enclosing Sphere
+	void
+	surfacesSegmentIntersectsSphere( Vertex const & a, Vertex const & b, Surfaces & surfaces );
+
+	// Surfaces that Ray Intersects Enclosing Sphere
+	void
+	surfacesRayIntersectsSphere( Vertex const & a, Vertex const & dir, Surfaces & surfaces );
+
+	// Surfaces that Line Intersects Enclosing Sphere
+	void
+	surfacesLineIntersectsSphere( Vertex const & a, Vertex const & dir, Surfaces & surfaces );
+
+	// Surfaces that Line Segment Intersects Cube
+	void
+	surfacesSegmentIntersectsCube( Vertex const & a, Vertex const & b, Surfaces & surfaces );
+
+	// Surfaces that Ray Intersects Cube
+	void
+	surfacesRayIntersectsCube( Vertex const & a, Vertex const & dir, Vertex const & dir_inv, Surfaces & surfaces );
+
+	// Surfaces that Line Intersects Cube
+	void
+	surfacesLineIntersectsCube( Vertex const & a, Vertex const & dir, Vertex const & dir_inv, Surfaces & surfaces );
 
 private: // Methods
 
@@ -262,6 +311,7 @@ private: // Data
 	Vertex u_ = Vertex( 0.0 ); // Upper corner
 	Vertex c_ = Vertex( 0.0 ); // Center point
 	Real w_ = 0.0; // Side width
+	Real r_ = 0.0; // Enclosing sphere radius
 #if defined(_MSC_VER) && _MSC_VER < 1900 && !defined(__INTEL_COMPILER) // Visual C++ 2013 doesn't support array initializers in member declaration
 	SurfaceOctreeCube * cubes_[ 2 ][ 2 ][ 2 ]; // Children (nullptrs if not present)
 #else

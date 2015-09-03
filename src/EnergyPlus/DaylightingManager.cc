@@ -1703,7 +1703,7 @@ namespace DaylightingManager {
 			// Unit vector normal to dome (pointing away from TDD)
 			// These are specific to the exterior.
 			// NOTE:  Preserve WNORM for later in the code.
-			WNORM2 = cross( U21, U23 ).normalized();
+			WNORM2 = cross( U21, U23 ).normalize();
 
 			// Azimuth and altitude of dome normal
 			// These are specific to the exterior.
@@ -5345,9 +5345,7 @@ namespace DaylightingManager {
 		// DERIVED TYPE DEFINITIONS:na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int ISurf; // Surface index
-		int IType; // Surface type/class
-		//  mirror surfaces of shading surfaces
+		int IType; // Surface type/class:  mirror surfaces of shading surfaces
 		static Vector3< Real64 > HP; // Hit coordinates, if ray hits an obstruction
 		int Pierce; // 1 if a particular obstruction is hit, 0 otherwise
 		Real64 Trans; // Solar transmittance of a shading surface
@@ -5360,7 +5358,7 @@ namespace DaylightingManager {
 		// Building elements are assumed to be opaque. A shadowing surface is opaque unless
 		// its transmittance schedule value is non-zero.
 
-		for ( ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
+		for ( int ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
 			if ( ! Surface( ISurf ).ShadowSurfPossibleObstruction ) continue;
 			IType = Surface( ISurf ).Class;
 			if ( ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) && ISurf != Surface( IWin ).BaseSurf ) {
@@ -5409,66 +5407,34 @@ namespace DaylightingManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine checks for interior obstructions between reference point and window element.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
+		// Preconditions
+		assert( magnitude( R2 - R1 ) > 0.0 ); // Protect normalize() from divide by zero
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int ISurf; // Surface index
 		int IType; // Surface type/class
 		static Vector3< Real64 > HP; // Hit coordinates, if ray hits an obstruction
-		Real64 r12; // Distance squared between R1 and R2 (distance squared is cheaper to compute)
-		Real64 d; // Distance squared between R1 and pierced surface
 		static Vector3< Real64 > RN; // Unit vector along ray
 
-		// FLOW:
 		IHit = 0;
-
-		r12 = distance_squared( R1, R2 );
-		RN = ( R2 - R1 ).normalized(); // Make unit vector
+		Real64 const d12( distance_squared( R1, R2 ) ); // Distance squared between R1 and R2 (distance squared is cheaper to compute)
+		RN = ( R2 - R1 ).normalize(); // Make unit vector
 
 		// Loop over obstructions, which can be building elements, like walls,
 		// or shadowing surfaces, like overhangs. Exclude base surface of window IWin.
-		for ( ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
-			IType = Surface( ISurf ).Class;
+		for ( int ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
+			auto const & surface( Surface( ISurf ) );
+			IType = surface.Class;
 
-			if ( ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) && ISurf != Surface( IWin ).BaseSurf && ISurf != Surface( Surface( IWin ).BaseSurf ).ExtBoundCond ) {
+			if ( (
+			 ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) &&
+			 ( ISurf != Surface( IWin ).BaseSurf ) && ( ISurf != Surface( Surface( IWin ).BaseSurf ).ExtBoundCond ) &&
+			 ( surface.Zone == Surface( IWin ).Zone ) ) // Wall/ceiling/floor is in same zone as window
+			 || ( surface.ShadowingSurf ) ) {
 
-				if ( Surface( ISurf ).Zone == Surface( IWin ).Zone ) { // Wall/ceiling/floor is in same zone as window
-					PierceSurface( ISurf, R1, RN, IHit, HP );
-					if ( IHit > 0 ) {
-						d = distance_squared( R1, HP );
-						if ( d > r12 ) { // Discount any hits farther than the window.
-							IHit = 0;
-						} else { // The hit is closer than the window.
-							break;
-						}
-					}
-				}
-
-			} else if ( Surface( ISurf ).ShadowingSurf ) {
-
+				// Check if ray pierces surface
 				PierceSurface( ISurf, R1, RN, IHit, HP );
 				if ( IHit > 0 ) {
-					d = distance_squared( R1, HP );
-					if ( d > r12 ) { // Discount any hits farther than the window.
+					if ( distance_squared( R1, HP ) > d12 ) { // Discount any hits farther than the window.
 						IHit = 0;
 					} else { // The hit is closer than the window.
 						break;
@@ -5500,57 +5466,36 @@ namespace DaylightingManager {
 		// Determines if a ray from point R1 on window IWin1 to point R2
 		// on window IWin2 hits an obstruction
 
-		// METHODOLOGY EMPLOYED:na
-		// REFERENCES:na
-		// USE STATEMENTS:na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS: na
-		// INTERFACE BLOCK SPECIFICATIONS: na
-		// DERIVED TYPE DEFINITIONS: na
+		// Preconditions
+		assert( magnitude( R2 - R1 ) > 0.0 ); // Protect normalize() from divide by zero
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int ISurf; // Surface index
 		int IType; // Surface type/class
 		static Vector3< Real64 > HP; // Hit coordinates, if ray hits an obstruction surface (m)
-		Real64 r12; // Distance squared between R1 and R2 (m) (distance squared is cheaper to compute)
-		Real64 d; // Distance squared between R1 and obstruction surface (m)
 		static Vector3< Real64 > RN; // Unit vector along ray from R1 to R2
 
-		// FLOW:
 		IHit = 0;
-
-		r12 = distance_squared( R1, R2 );
-		RN = ( R2 - R1 ).normalized(); // Unit vector
+		Real64 const d12( distance_squared( R1, R2 ) ); // Distance squared between R1 and R2 (m) (distance squared is cheaper to compute)
+		RN = ( R2 - R1 ).normalize(); // Unit vector
 
 		// Loop over obstructions, which can be building elements, like walls,
 		// or shadowing surfaces, like overhangs. Exclude base surface of window IWin1.
 		// Exclude base surface of window IWin2.
-		for ( ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
-			IType = Surface( ISurf ).Class;
+		for ( int ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
+			auto const & surface( Surface( ISurf ) );
+			IType = surface.Class;
 
-			if ( ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) && ISurf != Surface( IWin2 ).BaseSurf && ISurf != Surface( IWin1 ).BaseSurf && ISurf != Surface( Surface( IWin2 ).BaseSurf ).ExtBoundCond && ISurf != Surface( Surface( IWin1 ).BaseSurf ).ExtBoundCond ) {
+			if ( (
+			 ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) &&
+			 ( ISurf != Surface( IWin2 ).BaseSurf ) && ( ISurf != Surface( IWin1 ).BaseSurf ) &&
+			 ( ISurf != Surface( Surface( IWin2 ).BaseSurf ).ExtBoundCond ) && ( ISurf != Surface( Surface( IWin1 ).BaseSurf ).ExtBoundCond ) &&
+			 ( surface.Zone == Surface( IWin2 ).Zone ) ) // Wall/ceiling/floor is in same zone as destination window
+			 || ( surface.ShadowingSurf ) ) {
 
-				if ( Surface( ISurf ).Zone == Surface( IWin2 ).Zone ) { // Wall/ceiling/floor is in same zone as destination window
-					PierceSurface( ISurf, R1, RN, IHit, HP );
-					if ( IHit > 0 ) {
-						d = distance_squared( R1, HP );
-						if ( d > r12 ) { // Discount any hits farther than the window.
-							IHit = 0;
-						} else { // The hit is closer than the window.
-							break;
-						}
-					}
-				}
-
-			} else if ( Surface( ISurf ).ShadowingSurf ) {
-
+				// Check if ray pierces surface
 				PierceSurface( ISurf, R1, RN, IHit, HP );
 				if ( IHit > 0 ) {
-					d = distance_squared( R1, HP );
-					if ( d > r12 ) { // Discount any hits farther than the window.
+					if ( distance_squared( R1, HP ) > d12 ) { // Discount any hits farther than the window.
 						IHit = 0;
 					} else { // The hit is closer than the window.
 						break;
