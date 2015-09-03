@@ -136,21 +136,6 @@ namespace Fans {
 	// MODULE SUBROUTINES:
 	//*************************************************************************
 
-	// Functions
-	void
-	clear_state()
-	{
-		NumFans = 0 ; 
-		NumNightVentPerf = 0 ;
-		GetFanInputFlag = true ;
-		CheckEquipName.deallocate();
-		LocalTurnFansOn = false ;
-		LocalTurnFansOff = false ;
-		MySizeFlag.deallocate();
-		Fan.deallocate();
-		NightVentPerf.deallocate();
-		FanNumericFields.deallocate();
-	}
 
 	void
 	SimulateFanComponents(
@@ -3343,6 +3328,25 @@ namespace Fans {
 		return DesignHeatGain;
 
 	} // FanDesHeatGain
+
+	// Clears the global data in Fans.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumFans = 0;
+		NumNightVentPerf = 0;
+		GetFanInputFlag = true;
+		LocalTurnFansOn = false;
+		LocalTurnFansOff = false;
+
+		CheckEquipName.deallocate();
+		MySizeFlag.deallocate();
+		Fan.deallocate();
+		NightVentPerf.deallocate();
+		FanNumericFields.deallocate();
+
+	}
 
 	// End of Utility subroutines for the Fan Module
 	// *****************************************************************************

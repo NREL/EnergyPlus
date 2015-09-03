@@ -1,17 +1,16 @@
 
-
 Alternative Modeling Processes
 ==============================
 
 ### RoomAir Models
 
-The group of models described in this section is used to account for non-uniform room air temperatures that may occur within the interior air volume of a zone.  These models are accessed using the RoomAirModelType input object. RoomAir modeling was added to EnergyPlus starting with Version 1.2.  Although there are many types of analyses (comfort, indoor air quality, etc) that might benefit from localized modeling of how room air varies across space, only the *temperature* distribution of room air within the zone is currently addressed in EnergyPlus.  This allows surface heat transfer and air system heat balance calculations to be made taking into account natural thermal stratification of air and different types of intentional air distribution designs such as under-floor and side-wall displacement ventilation that purport to extract room air at higher-than-mean temperatures.  Note that EnergyPlus does **not** have completely general methods of modeling room air that are applicable to every conceivable type of airflow that might occur in a zone.  Such models (e.g. RANS-CFD) are too computationally expensive to use with EnergyPlus for the foreseeable future. The models that are available in EnergyPlus offer only limited modeling capabilities for select room airflow configurations.  Also note that because the complete mixing model for room air has long been the standard in building energy simulation, there is not currently a consensus on how to best model non-uniform air temperatures in buildings.  Therefore, it is up to the user to have a good understanding of when, where, and how to apply the room air models available in EnergyPlus.  The rest of this section provides some guidance in the way of examples and further discussion of the models available in EnergyPlus.
+The group of models described in this section is used to account for non-uniform room air temperatures that may occur within the interior air volume of a zone. These models are accessed using the RoomAirModelType input object. RoomAir modeling was added to EnergyPlus starting with Version 1.2. Although there are many types of analyses (comfort, indoor air quality, etc) that might benefit from localized modeling of how room air varies across space, most of the room air models in EnergyPlus only address the distribution of *temperature* within the zone. This allows surface heat transfer and air system heat balance calculations to be made taking into account natural thermal stratification of air and different types of intentional air distribution designs such as under-floor and side-wall displacement ventilation that purport to extract room air at higher-than-mean temperatures. The exception is the RoomAirflowNetwork model, which integrates the AirflowNetwork model and applies the nodal airflow model within zones. Note that EnergyPlus does **not** have completely general methods of modeling room air that are applicable to every conceivable type of airflow that might occur in a zone. Such models (e.g. RANS-CFD) are too computationally expensive to use with EnergyPlus for the foreseeable future. The models that are available in EnergyPlus offer only limited modeling capabilities for select room airflow configurations. Also note that because the complete mixing model for room air has long been the standard in building energy simulation, there is not currently a consensus on how to best model non-uniform air temperatures in buildings. Therefore, it is up to the user to have a good understanding of when, where, and how to apply the room air models available in EnergyPlus. The rest of this section provides some guidance in the way of examples and further discussion of the models available in EnergyPlus.
 
 EnergyPlus offers the different types of air models listed in the table below along with the input objects associated with the use of that model.
 
 
 
-Table 43.  Summary of room air models available in EnergyPlus
+Table 43. Summary of room air models available in EnergyPlus
 
 <table class="table table-striped">
 <tr>
@@ -54,7 +53,19 @@ Table 43.  Summary of room air models available in EnergyPlus
 <td>cross ventilation</td>
 <td>‘RoomAirModelType’, ‘RoomAirSettings:CrossVentilation’</td>
 </tr>
-
+<tr>
+<td>RoomAirflowNetwork</td>
+<td>Room air model using AirflowNetwork</td>
+<td>‘RoomAirModelType’, 
+‘RoomAirSettings:AirflowNetwork’
+‘RoomAirflowNetwork:Node’,
+‘RoomAirflowNetwork:Node:AdjacentSurfaceList’,
+‘RoomAirflowNetwork:Node:InternalGains’,
+‘RoomAirflowNetwork:Node:InternalGains’,
+‘AirflowNetwork:IntraZone:Node’,
+‘AirflowNetwork:IntraZone:Linkage’
+</td>
+</tr>
 </table>
 
 The room air models are coupled to the heat balance routines using the framework described by Griffith and Chen (2004).  Their framework was modified to include features needed for a comprehensive program for annual energy modeling rather than one for hourly load calculations.  The formulation is largely shifted from being based on the setpoint temperature to one based on the current mean air temperature.  This is necessary to allow for floating temperatures and dual setpoint control where there may be times that the mean zone temperatures are inside the dead band.  The coupling framework was also extended to allow for exhaust air flows (e.g. bathroom exhaust fans) in addition to air system return flows.
@@ -1981,6 +1992,133 @@ Awbi, H.B. & Hatton, A. 2000. Mixed convection from heated room surfaces, Energy
 
 Bejan, A. 1994. Convection Heat Transfer 2nd ed, Wiley, USA.
 
+### RoomAirflowNetwork Model
+
+#### Overview
+
+The RoomAirflowNetwork integrates the RoomAir model with the AirflowNetwork model. The model allows multiple Room Air nodes to be associated with AirflowNetwork intra zone nodes. The AirflowNetwork intra zone linkages provide links among the intra zone nodes and users may specify airflow components among these links. The AirflowNetwork model calculates airflows of the links. The incoming airflows are part of the zone heat and moisture balances of intra zone nodes. The model also allows users to specify a node to be connected to surfaces to have convective heat transfer and/or moisture transfer between surfaces and the node, portion of internal gains and supply air and return air fractions from zone equipment and AirLoop terminals.
+
+The input object RoomAirSettings:AirflowNetwork lists multiple RoomAirflowNetwork nodes in a zone. The input object of RoomAirflowNetwork:Node defines a list of connections assigned to a particular RoomAirflowNetwork node so that the connections will be used as components of node heat and moisture balance equations. In addition, the input objects AirflowNetwork:IntraZone:Node and AirflowNetwork:IntraZone:Linkage specify airflow nodes, linkages, and associated flow components, so that the AirflowNetwork model is used to calculate intrazone linkage airflows, which will be a part of loads for the RoomAir node balances.
+
+#### Model description
+
+The model calculates each component of the governing equations first. Then heat and moisture balance equations are solved to get the node temperature and humidity ratio at the current time step.
+
+Governing equations for each RoomAirflowNetwork node are described below:
+
+Energy balance equation
+
+<div>$${F_i}{C_{z,i}}\frac{{d{T_{z,i}}}}{{dt}} = \sum\limits_{j = 1}^{{N_{i,g}}} {{F_{gain,j}{\dot Q}_{i,j}}}  + \sum\limits_{j = 1}^{{N_{i,sur}}} {{h_{i,j}}} {A_j}\left( {{T_{s,j}} - {T_{z,i}}} \right) + \sum\limits_{j = 1}^{{N_{i,AFN}}} {{{\dot m}_{AFN i,j}}} {C_p}\left( {{T_{z,j}} - {T_{z,i}}} \right)\, + \sum\limits_{j = 1}^{{N_{i,HVAC}}} {{{F_{HVAC,j}}{\dot m}_{sup,i,j}}} {C_p}\left( {{T_{sup_j}} - {T_{z,i}}} \right)\ $$</div>
+
+where:
+
+F<sub>i</sub>	= Fraction of zone air volume for the ith node, defined in the Fraction of Zone Air Volume field of the RoomAir:Node:Airflownetwork
+
+C<sub>z,i</sub> 	= Volumetric heat capacity for the ith node: ρ<sub>air,i</sub>V C<sub>p</sub>C<sub>T</sub> 
+
+ρ<sub>air,i</sub> = Dry air density at the ith zone node 
+
+C<sub>p</sub> = zone dry air specific heat
+
+C<sub>T</sub> = sensible heat capacity multiplier (Detailed description is provided below)
+
+V	= Zone air volume
+
+T<sub>z,i</sub> 	= Air temperature at the ith zone RoomAir node
+
+N<sub>i,g</sub> 	= The number of internal gains for the ith node, defined in the RoomAir:Node:Airflownetwork:InternalGains object
+
+F<sub>gain,j</sub> 	= Fraction of internal gain from jth internal gain object defined in the RoomAir:Node:Airflownetwork:InternalGains object
+
+${\dot Q}_{i,j}$ 	= The amount of internal sensible gain at the jth internal gain object and ith node.
+ 
+${\sum\limits_{j = 1}^{N_{i,g}} F_{gain,j}{\dot Q}_{i,j}}$ = The total amount of internal sensible gains assigned to the ith node
+
+N<sub>i,sur</sub> 	= The number of adjacent surface with convective heat transfer for the ith node, defined in the RoomAir:Node:Airflownetwork:AdjacentSurfaceList object
+
+h<sub>j</sub> 	= Heat transfer coefficient between the jth adjacent surface and ith node
+
+A<sub>j</sub> 	= Area of the jth adjacent surface
+
+T<sub>s,j</sub> 	= Inside temperature at the jth adjacent surface
+
+${\sum\limits_{j = 1}^{N_{i,sur}} h_{j} A_j \left( T_{s,j} - T_{z,i}\right)}$ 	= The total amount of convective gains from adjacent surfaces attached to the ith node
+
+N<sub>i,AFN</sub> 	= The number of RoomAir:Node:Airflownetwork objects connected to the ith node. The links are defined in AirflowNetwork:IntraZone:Linkage objects.
+
+${\dot m}_{AFN,i,j}$ 	= Mass flow rate from the jth node to the ith node. The flow rates are calculated in the AirflowNetwork model. It should be pointed out that the outgoing flows from the ith node will not be used in the present energy and moisture balance calculations, because they are a part of energy and moisture balances.
+
+T<sub>z,j</sub>  	= Air temperature at the jth zone RoomAir node
+
+${\sum\limits_{j = 1}^{N_{i,g}} \dot m_{AFN i,j} {C_p}\left( T_{z,j} - T_{z,i} \right)}$  = The total amount of heat transfer driven by intra zonal flows
+
+N<sub>i,HVAC</sub> 	= The number of RoomAir:Node:Airflownetwork:HVACEquipment objects which provide supply air to the ith node.
+
+F<sub>HVAC,j</sub> 	= Fraction of output or supply air to the ith node from jth HVAC equipment defined in RoomAir:Node:Airflownetwork:HVACEquipment objects
+
+${\dot m}_{sup,i,j}$ 	= The supply mass flow rate from the jth HVAC equipment
+
+T<sub>sup,j</sub>   = Supply air temperature at the jth HVAC equipment
+
+${\sum\limits_{j = 1}^{N_{i,HVAC}} F_{HVAC,j} \dot m_{sup,i,j} \left( T_{sup,j} - T_{z,i}\right)}$  	= The total amount of heat transfer from HVAC equipment to the ith node
+
+Moisture balance equation
+
+<div>$${F_i}{M_{z,i}}\frac{{d{W_{z,i}}}}{{dt}} = \sum\limits_{j = 1}^{{N_{i,g}}} {{F_{gain,j}{\dot Q}_{i,j}}}  + \sum\limits_{j = 1}^{{N_{i,sur}}} {{h_{M,j}}} {A_j}\left( {{W_{s,j}} - {W_{z,i}}} \right) + \sum\limits_{j = 1}^{{N_{i,AFN}}} {{{\dot m}_{AFN i,j}}} \left( {{W_{z,j}} - {W_{z,i}}} \right)\, + \sum\limits_{j = 1}^{{N_{i,HVAC}}} {{{F_{HVAC,j}}{\dot m}_{sup,i,j}}} \left( {{W_{sup_j}} - {W_{z,i}}} \right)\ $$</div>
+
+where:
+
+Fi	= Fraction of zone air volume for the ith node, defined in the Fraction of Zone Air Volume of the RoomAir:Node:Airflownetwork
+
+M<sub>z,i</sub> 	= Mass for the ith node: ρ<sub>air,i</sub>V<sub>Cp</sub>C<sub>T</sub>
+
+ρ<sub>air,i</sub> = Dry air density at the ith zone RoomAir node 
+
+V	= Zone air volume 
+
+W<sub>z,i</sub> 	= Air humidity ratio at the ith zone RoomAir node
+
+N<sub>i,g</sub> 	= The number of internal gains for the ith node, defined in the RoomAir:Node:Airflownetwork:InternalGains object
+
+F<sub>gain,j</sub> = Fraction of internal gain from jth internal gain object defined in the RoomAir:Node:Airflownetwork:InternalGains object
+
+${\dot Q}_{i,j}$  	= The amount of internal latent gain at the jth internal gain object and ith node. 
+
+${\sum\limits_{j = 1}^{N_{i,g}} F_{gain,j}{\dot Q}_{i,j}}$  = The total amount of internal latent gains attached to the ith node 
+
+N<sub>i,sur</sub> 	= The number of adjacent surface with convective heat transfer for the ith node, defined in the RoomAir:Node:Airflownetwork:AdjacentSurfaceList object
+
+h<sub>M,j</sub> = Mass transfer coefficient between the jth adjacent surface and ith node
+
+A<sub>j</sub> 	= Area of the jth adjacent surface
+
+W<sub>s,j</sub> 	= Inside humidity ratio at the jth adjacent surface
+
+${\sum\limits_{j = 1}^{N_{i,sur}} h_{M,j} A_j \left( W_{s,j} - W_{z,i}\right)}$ 	= The total amount of convective moisture gains from adjacent surfaces attached to the ith node
+
+N<sub>i,AFN</sub> 	= The number of RoomAir:Node:Airflownetwork objects connected to the ith node. The links are defined in AirflowNetwork:IntraZone:Linkage objects.
+
+${\dot m}_{AFN,i,j}$ 	= Mass flow rate from the jth node to the ith node. The flow rates are calculated in the AirflowNetwork model. It should be pointed out that the outgoing flow from the ith node will not be used in the present calculation, because they are a part of energy balance.
+
+W<sub>z,j</sub>  	= Air humidity ratio at the jth zone RoomAir node
+
+${\sum\limits_{j = 1}^{N_{i,AFN}} \dot m_{AFN,i,j} \left( W_{z,j} - W_{z,i}\right)}$  = The total amount of moisture transfer driven by intra zonal flows
+
+N<sub>i,HVAC</sub> 	= The number of RoomAir:Node:Airflownetwork:HVACEquipment objects which provide supply air to the ith node.
+
+F<sub>HVAC,j</sub> 	= Fraction of output or supply air to the ith node from jth HVAC equipment defined in RoomAir:Node:Airflownetwork:HVACEquipment objects
+
+${\dot m}_{sup,i,j}$  	= The supply mass flow rate from the jth HVAC equipment
+
+W<sub>sup,j</sub>   = Supply air humidity ratio at the jth HVAC equipment
+
+${\sum\limits_{j = 1}^{N_{i,HVAC}} F_{HVAC,j} \dot m_{sup,i,j} \left( W_{sup,j} - W_{z,i}\right)}$ 	= The total amount of moisture transfer from HVAC equipment to the ith node
+
+#### Calculation procedures
+
+The AirflowNetwork model is called first to calculate intrazone linkage air flows based on node temperatures and humidity ratios at the previous time step. The linkage loads are summarized based on each node with all incoming airflow, while any outgoing airflows from the node of the interest are excluded in the node energy and moisture balances. When the RoomAirModelAirflowNetowrk module is called, it summarizes internal gains at each node based on specification provided in the RoomAirflowNetwork:Node:InternalGains object, convective heat transfer from adjacent walls specified in the RoomAirflowNetwork:Node:AdjacentSurfaceList object. These load components are used in the predictor to predict system loads based on thermostat setpoint and supply fraction in the controlled zone node. In the corrector, the supply air conditions defined in the RoomAirflowNetwork:Node:HVACEquipment object are added. After all load components are assembled together, the node energy and moisture balance equations are solved. The node temperature and humidity ratio are calculated at the current time step.
+ 
+
 AirflowNetwork Model
 --------------------
 
@@ -2741,6 +2879,11 @@ R    = The ratio of the maximum fan flow rate given in the inputs to the requ
 <span>\({\dot m_{fan,cal}}\)</span>       = The calculated supply fan flow rate
 
 <span>\({\dot m_{i,terminal,final}}\)</span>           = The final flow rate at each terminal adjusted by the ratio
+
+### Airflow Calculation Procedure using inputs of Intrazone nodes and linkages 
+
+The inputs of both AirflowNetwork:IntraZone:Node and AirflowNetwork:IntraZone:Linkage objects are treated as normal model nodes and linkages. Therefore, the calculation procedures are the same as above. 
+
 
 ### Integration of the AirflowNetwork Model
 

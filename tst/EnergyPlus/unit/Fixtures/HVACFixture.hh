@@ -26,8 +26,6 @@ namespace EnergyPlus {
 			Psychrometrics::cached_Twb.deallocate();
 			Psychrometrics::cached_Psat.deallocate();
 
-
-
 			EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 		}
 	};
