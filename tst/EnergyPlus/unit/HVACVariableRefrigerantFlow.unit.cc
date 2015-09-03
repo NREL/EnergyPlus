@@ -18,8 +18,7 @@
 #include <DataSizing.hh>
 #include <DataZoneEquipment.hh>
 #include <DataZoneEnergyDemands.hh>
-#include <FluidProperties.hh>
-#include <HeatBalanceManager.hh>
+#include <FluidProperties.hh>#include <HeatBalanceManager.hh>
 #include <HVACVariableRefrigerantFlow.hh>
 #include <OutputReportPredefined.hh>
 #include <PlantManager.hh>
@@ -656,10 +655,6 @@ namespace EnergyPlus {
 		EXPECT_FALSE( ErrorsFound ); 
 
 		GetZoneEquipmentData(); // read equipment list and connections
-		Fans::GetFanInputFlag = true;
-		DXCoils::GetCoilsInputFlag = true;
-		GlobalNames::CoilNames.deallocate();
-		GlobalNames::NumCoils = 0;
 		ZoneInletAirNode = GetVRFTUZoneInletAirNode( VRFTUNum ); // trigger GetVRFInput by calling a mining function
 
 		Schedule( VRF( VRFCond ).SchedPtr ).CurrentValue = 1.0; // enable the VRF condenser
