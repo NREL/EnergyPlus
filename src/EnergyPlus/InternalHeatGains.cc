@@ -5284,6 +5284,293 @@ namespace InternalHeatGains {
 		}
 	}
 
+	void
+	GetInternalGainDeviceIndex(
+		int const ZoneNum, // zone index pointer for which zone to sum gains for
+		int const IntGainTypeOfNum, // zone internal gain type number
+		std::string const & IntGainName, // Internal gain name
+		int & DeviceIndex, // Device index
+		bool & ErrorFound
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         B. Griffith
+		//       DATE WRITTEN   June 2012
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// utility to retrieve index pointer to a specific internal gain
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		using InputProcessor::SameString;
+		// na
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		bool Found;
+		int DeviceNum;
+
+		Found = false;
+
+		if ( ZoneIntGain( ZoneNum ).NumberOfDevices == 0 ) {
+			DeviceIndex = -1;
+			ErrorFound = true;
+			return;
+		}
+
+		for ( DeviceNum = 1; DeviceNum <= ZoneIntGain( ZoneNum ).NumberOfDevices; ++DeviceNum ) {
+			if ( SameString( ZoneIntGain( ZoneNum ).Device( DeviceNum ).CompObjectName, IntGainName ) ) {
+				if ( ZoneIntGain( ZoneNum ).Device( DeviceNum ).CompTypeOfNum != IntGainTypeOfNum ) {
+					ErrorFound = true;
+				}
+				else {
+					ErrorFound = false;
+				}
+				Found = true;
+				DeviceIndex = DeviceNum;
+				break;
+			}
+		}
+
+	}
+
+	void
+	SumInternalConvectionGainsByIndices(
+		int const ZoneNum, // zone index pointer for which zone to sum gains for
+		Array1S_int const DeviceIndexARR, // variable length 1-d array of integer device index pointers to include in summation
+		Array1A< Real64 > const FractionARR, // array of fractional multipliers to apply to devices
+		Real64 & SumConvGainRate
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         B. Griffith
+		//       DATE WRITTEN   June 2012
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// worker routine for summing a subset of the internal gains by index
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int NumberOfIndices;
+		int NumberOfFractions;
+		Real64 tmpSumConvGainRate;
+		int loop;
+		int DeviceNum;
+		Real64 DeviceFraction;
+
+		NumberOfIndices = isize( DeviceIndexARR );
+		NumberOfFractions = isize( FractionARR );
+		tmpSumConvGainRate = 0.0;
+
+		//remove this next safety check after testing code
+		if ( NumberOfIndices != NumberOfFractions ) { //throw error
+			ShowSevereError( "SumInternalConvectionGainsByIndices: bad arguments, sizes do not match" );
+		}
+
+		if ( ZoneIntGain( ZoneNum ).NumberOfDevices == 0 ) {
+			SumConvGainRate = 0.0;
+			return;
+		}
+
+		for ( loop = 1; loop <= NumberOfIndices; ++loop ) {
+			DeviceNum = DeviceIndexARR( loop );
+			DeviceFraction = FractionARR( loop );
+			tmpSumConvGainRate = tmpSumConvGainRate + ZoneIntGain( ZoneNum ).Device( DeviceNum ).ConvectGainRate * DeviceFraction;
+		}
+		SumConvGainRate = tmpSumConvGainRate;
+
+	}
+
+	void
+	SumInternalLatentGainsByIndices(
+		int const ZoneNum, // zone index pointer for which zone to sum gains for
+		Array1S_int const DeviceIndexARR, // variable length 1-d array of integer device index pointers to include in summation
+		Array1A< Real64 > const FractionARR, // array of fractional multipliers to apply to devices
+		Real64 & SumLatentGainRate
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         B. Griffith
+		//       DATE WRITTEN   June 2012
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// worker routine for summing a subset of the internal gains by index
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int NumberOfIndices;
+		int NumberOfFractions;
+		Real64 tmpSumLatentGainRate;
+		int loop;
+		int DeviceNum;
+		Real64 DeviceFraction;
+
+		NumberOfIndices = isize( DeviceIndexARR );
+		NumberOfFractions = isize( FractionARR );
+		tmpSumLatentGainRate = 0.0;
+
+		//remove this next safety check after testing code
+		if ( NumberOfIndices != NumberOfFractions ) { //throw error
+			ShowSevereError( "SumInternalLatentGainsByIndices: bad arguments, sizes do not match" );
+		}
+
+		if ( ZoneIntGain( ZoneNum ).NumberOfDevices == 0 ) {
+			SumLatentGainRate = 0.0;
+			return;
+		}
+
+		for ( loop = 1; loop <= NumberOfIndices; ++loop ) {
+			DeviceNum = DeviceIndexARR( loop );
+			DeviceFraction = FractionARR( loop );
+			tmpSumLatentGainRate = tmpSumLatentGainRate + ZoneIntGain( ZoneNum ).Device( DeviceNum ).LatentGainRate * DeviceFraction;
+		}
+		SumLatentGainRate = tmpSumLatentGainRate;
+
+	}
+
+	void
+	SumReturnAirConvectionGainsByIndices(
+		int const ZoneNum, // zone index pointer for which zone to sum gains for
+		Array1S_int const DeviceIndexARR, // variable length 1-d array of integer device index pointers to include in summation
+		Array1A< Real64 > const FractionARR, // array of fractional multipliers to apply to devices
+		Real64 & SumReturnAirGainRate
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         B. Griffith
+		//       DATE WRITTEN   June 2012
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// worker routine for summing a subset of the internal gains by index
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int NumberOfIndices;
+		int NumberOfFractions;
+		Real64 tmpSumReturnAirGainRate;
+		int loop;
+		int DeviceNum;
+		Real64 DeviceFraction;
+
+		NumberOfIndices = isize( DeviceIndexARR );
+		NumberOfFractions = isize( FractionARR );
+		tmpSumReturnAirGainRate = 0.0;
+
+		//remove this next safety check after testing code
+		if ( NumberOfIndices != NumberOfFractions ) { //throw error
+			ShowSevereError( "SumReturnAirConvectionGainsByIndice: bad arguments, sizes do not match" );
+		}
+
+		if ( ZoneIntGain( ZoneNum ).NumberOfDevices == 0 ) {
+			SumReturnAirGainRate = 0.0;
+			return;
+		}
+
+		for ( loop = 1; loop <= NumberOfIndices; ++loop ) {
+			DeviceNum = DeviceIndexARR( loop );
+			DeviceFraction = FractionARR( loop );
+			tmpSumReturnAirGainRate = tmpSumReturnAirGainRate + ZoneIntGain( ZoneNum ).Device( DeviceNum ).ReturnAirConvGainRate * DeviceFraction;
+		}
+		SumReturnAirGainRate = tmpSumReturnAirGainRate;
+
+	}
+
 	//     NOTICE
 
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois

@@ -479,6 +479,15 @@ public: // Creation
 		setup_real();
 	}
 
+	// Iterator Range Constructor Template
+	template< class Iterator, typename = decltype( *std::declval< Iterator & >(), void(), ++std::declval< Iterator & >(), void() ) >
+	inline
+	Array1D( Iterator const beg, Iterator const end ) :
+	 Super( beg, end )
+	{
+		setup_real();
+	}
+
 	// Range Named Constructor Template
 	template< typename U >
 	inline

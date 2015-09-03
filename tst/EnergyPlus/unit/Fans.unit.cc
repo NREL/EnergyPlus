@@ -57,6 +57,7 @@ TEST_F( FansTest, FanSizing )
 	Fan( FanNum ).FanType = "Fan:OnOff";
 	Fan( FanNum ).FanType_Num = FanType_SimpleOnOff;
 	Fan( FanNum ).MaxAirFlowRate = AutoSize;
+	Fan( FanNum ).FanEff = 0.4; // Prevent divide by zero computing RatedPower
 
 	FanNumericFields( FanNum ).FieldNames( 3 ) = "Maximum Flow Rate";
 
