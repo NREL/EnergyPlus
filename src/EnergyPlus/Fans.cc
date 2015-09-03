@@ -136,7 +136,6 @@ namespace Fans {
 	// MODULE SUBROUTINES:
 	//*************************************************************************
 
-
 	void
 	SimulateFanComponents(
 		std::string const & CompName,
