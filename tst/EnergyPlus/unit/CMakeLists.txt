@@ -18,6 +18,7 @@ set( test_src
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
+  DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc

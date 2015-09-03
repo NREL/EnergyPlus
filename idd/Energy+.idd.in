@@ -31083,9 +31083,33 @@ Sizing:Zone,
       \minimum 0
       \default 0.3
       \note This input is used for autosizing components when Heating Design Air Flow Method = DesignDayWithLimit.
-  A7; \field Design Specification Zone Air Distribution Object Name
+  A7, \field Design Specification Zone Air Distribution Object Name
       \type object-list
       \object-list DesignSpecificationZoneAirDistributionNames
+  A8, \field Account for Dedicated Outdoor Air System
+      \note account for effect of dedicated outdoor air system supplying air directly to the zone
+      \type choice
+      \key Yes
+      \key No
+      \default No
+  A9, \field Dedicated Outdoor Air System Control Strategy
+      \note 1)supply neutral ventilation air; 2)supply neutral dehumidified and reheated 
+      \note ventilation air; 3)supply cold ventilation air
+      \type choice
+      \key NeutralSupplyAir
+      \key NeutralDehumidifiedSupplyAir
+      \key ColdSupplyAir
+      \default NeutralSupplyAir
+  N17,\field Dedicated Outdoor Air Low Setpoint Temperature for Design
+      \type real
+      \units C
+      \autosizable
+      \default autosize
+  N18;\field Dedicated Outdoor Air High Setpoint Temperature for Design
+      \type real
+      \units C
+      \autosizable
+      \default autosize
 
 DesignSpecification:ZoneHVAC:Sizing,
   \min-fields 1
