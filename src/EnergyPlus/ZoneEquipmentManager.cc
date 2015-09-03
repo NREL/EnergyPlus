@@ -2646,7 +2646,7 @@ namespace ZoneEquipmentManager {
 
 		// Determine flow rate and temperature of supply air based on type of damper
 
-		bool AdjustZoneMixingFlowFlag( true );  // holds zone mixing flow calc status
+		bool AdjustZoneMassFlowFlag( true );  // holds zone mixing and infiltration flow calc status
 		FirstCall = true;
 		ErrorFlag = false;
 
@@ -2689,7 +2689,7 @@ namespace ZoneEquipmentManager {
 		// and controllers
 
 		if ( ZoneAirMassFlow.EnforceZoneMassBalance ) {
-			CalcAirFlowSimple( 0, AdjustZoneMixingFlowFlag );
+			CalcAirFlowSimple( 0, AdjustZoneMassFlowFlag );
 		}
 
 		for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
@@ -3579,9 +3579,9 @@ namespace ZoneEquipmentManager {
 				if ( AirLoopFlow(AirLoopNum).ZoneMixingFlow < 0.0 ) {
 					// the source zone and the recieving zone are in different air loops
 					AirLoopFlow(AirLoopNum).ZoneExhaust = max(0.0, (AirLoopFlow(AirLoopNum).ZoneExhaust - AirLoopFlow(AirLoopNum).ZoneMixingFlow));
-					AirLoopFlow( AirLoopNum ).RetFlow = AirLoopFlow( AirLoopNum ).SupFlow - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment) + AirLoopFlow( AirLoopNum ).RecircFlow;
+					AirLoopFlow( AirLoopNum ).RetFlow = max(0.0, AirLoopFlow( AirLoopNum ).SupFlow - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment) + AirLoopFlow( AirLoopNum ).RecircFlow );
 				} else {
-					AirLoopFlow( AirLoopNum ).RetFlow = AirLoopFlow( AirLoopNum ).SupFlow - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment) + AirLoopFlow( AirLoopNum ).RecircFlow + AirLoopFlow( AirLoopNum ).ZoneMixingFlow;
+					AirLoopFlow( AirLoopNum ).RetFlow = max(0.0, AirLoopFlow( AirLoopNum ).SupFlow - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment) + AirLoopFlow( AirLoopNum ).RecircFlow + AirLoopFlow( AirLoopNum ).ZoneMixingFlow);
 				}
 			}
 
@@ -3930,7 +3930,7 @@ namespace ZoneEquipmentManager {
 	void
 	CalcAirFlowSimple(
 		int const SysTimestepLoop, // System time step index
-		bool const AdjustZoneMixingFlowFlag // flags to adjust zone mxing mass flow rate
+		bool const AdjustZoneMassFlowFlag // flags to adjust zone mxing and infiltration mass flow rates
 	)
 	{
 
@@ -4435,7 +4435,7 @@ namespace ZoneEquipmentManager {
 					CpAir = PsyCpAirFnWTdb( ( ZHumRat( n ) + ZHumRat( m ) ) / 2.0, ( TZN + TZM ) / 2.0 ); // Use average conditions
 
 					Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
-					if ( ZoneMassBalanceFlag(n) && AdjustZoneMixingFlowFlag ) {
+					if ( ZoneMassBalanceFlag(n) && AdjustZoneMassFlowFlag ) {
 						if ( Mixing(j).MixingMassFlowRate > 0.0 ) {
 							Mixing(j).DesiredAirFlowRate = Mixing(j).MixingMassFlowRate / AirDensity;
 						}
@@ -4466,7 +4466,7 @@ namespace ZoneEquipmentManager {
 					CpAir = PsyCpAirFnWTdb( ( ZHumRat( n ) + ZHumRat( m ) ) / 2.0, ( TZN + TZM ) / 2.0 ); // Use average conditions
 
 					Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
-					if ( ZoneMassBalanceFlag(n) && AdjustZoneMixingFlowFlag ) {
+					if ( ZoneMassBalanceFlag(n) && AdjustZoneMassFlowFlag ) {
 						if ( Mixing(j).MixingMassFlowRate > 0.0 ) {
 							Mixing(j).DesiredAirFlowRate = Mixing(j).MixingMassFlowRate / AirDensity;
 						}
@@ -4495,7 +4495,7 @@ namespace ZoneEquipmentManager {
 				CpAir = PsyCpAirFnWTdb( ( ZHumRat( n ) + ZHumRat( m ) ) / 2.0, ( TZN + TZM ) / 2.0 ); // Use average conditions
 
 				Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
-				if ( ZoneMassBalanceFlag(n) && AdjustZoneMixingFlowFlag ) {
+				if ( ZoneMassBalanceFlag(n) && AdjustZoneMassFlowFlag ) {
 					if ( Mixing(j).MixingMassFlowRate > 0.0 ) {
 						Mixing(j).DesiredAirFlowRate = Mixing(j).MixingMassFlowRate / AirDensity;
 					}
@@ -4746,12 +4746,12 @@ namespace ZoneEquipmentManager {
 
 				if ( MCpI_temp < 0.0 ) MCpI_temp = 0.0;
 				Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
-				if ( AdjustZoneMixingFlowFlag && ZoneInfiltrationFlag(NZ) ) {
+				if ( AdjustZoneMassFlowFlag && ZoneInfiltrationFlag(NZ) ) {
 					if ( ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow ) {
-						if ( Infiltration(j).MassFlowRate > 0.0 ) {
+						//if ( Infiltration(j).MassFlowRate > 0.0 ) {
 							Infiltration(j).VolumeFlowRate = Infiltration(j).MassFlowRate / AirDensity;
 							MCpI_temp = Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
-						}
+						//}
 					}
 					if ( ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow ) {
 						Infiltration(j).VolumeFlowRate = Infiltration(j).VolumeFlowRate + MassConservation(NZ).InfiltrationMassFlowRate / AirDensity;
@@ -4767,7 +4767,7 @@ namespace ZoneEquipmentManager {
 				MCpI_temp = IVF * AirDensity * CpAir;
 				if ( MCpI_temp < 0.0 ) MCpI_temp = 0.0;
 				Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
-				if ( AdjustZoneMixingFlowFlag && ZoneInfiltrationFlag(NZ) ) {
+				if ( AdjustZoneMassFlowFlag && ZoneInfiltrationFlag(NZ) ) {
 					if ( ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow ) {
 						if ( Infiltration(j).MassFlowRate > 0.0 ) {
 							Infiltration(j).VolumeFlowRate = Infiltration(j).MassFlowRate / AirDensity;
@@ -4787,7 +4787,7 @@ namespace ZoneEquipmentManager {
 				MCpI_temp = IVF * AirDensity * CpAir;
 				if ( MCpI_temp < 0.0 ) MCpI_temp = 0.0;
 				Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
-				if ( AdjustZoneMixingFlowFlag && ZoneInfiltrationFlag(NZ) ) {
+				if ( AdjustZoneMassFlowFlag && ZoneInfiltrationFlag(NZ) ) {
 					if ( ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow ) {
 						if ( Infiltration(j).MassFlowRate > 0.0 ) {
 							Infiltration(j).VolumeFlowRate = Infiltration(j).MassFlowRate / AirDensity;

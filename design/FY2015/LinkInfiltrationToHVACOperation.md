@@ -215,7 +215,7 @@ Infiltration(j).VolumeFlowRate = Infiltration(j).MassFlowRate / AirDensity;
 ## Proposed Changes ##
 1. Currently, only zones with mixing objects (as source or receiving) are included in the zone mass balance.  Adjustment of infiltration will be extended to all zones when new field in ZoneAirMassFlowConservation is set to AllZones. **CalcZoneMassBalance and probably other functions.**
 2. Change meaning of exisiting field "Adjust Zone Mixing for Zone AirMass Flow Balance" to allow balancing of mixing only, infiltration only, or both.  Currently if this is set to no, the mass conservation is off.
-3. *Possible bug?* Currently, there does not appear to be any impact on the reported zone infiltration flow rate. It's not clear if infiltration and mixing adjustments are having an impact on the zone heat balance.  If not, this will be fixed. **Change calls to CalcAirFlowSimple**
+3. *This is ok* - Tested 5ZoneAirCooled_ZoneAirMassFlowBalance with mass conservation on and off.  There is an impact on the reported zone infiltration flow rates, but only on the summer design day. It's not clear if infiltration and mixing adjustments are having an impact on the zone heat balance. So no change is required for calls to CalcAirFlowSimple.
 4. Add input fields for user control of return air flow rate.  This adusted return flow rate should automatically flow into the zone air mass balance calculations. **DataZoneEquipment::GetZoneEquipmentData1 and CalcZoneMassBalance.**
 
 ## Issues Encountered
