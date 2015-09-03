@@ -21,7 +21,10 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 
-#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>#include <EnergyPlus/HVACUnitarySystem.hh>#include <EnergyPlus/MixedAir.hh>#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/HVACUnitarySystem.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 

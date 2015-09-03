@@ -6794,13 +6794,13 @@ namespace HVACUnitarySystem {
 
 		// Calculate residual based on output calculation flag
 		if ( SensibleLoad ) {
-			if ( std::abs( LoadToBeMet ) < 100.0) {
+			if ( std::abs( LoadToBeMet ) == 0.0) {
 				Residuum = ( SensOutput - LoadToBeMet ) / 100.0;
 			} else {
-				Residuum = 100.0 * ( SensOutput - LoadToBeMet ) / LoadToBeMet;
+				Residuum = ( SensOutput - LoadToBeMet ) / LoadToBeMet;
 			}
 		} else {
-			if ( std::abs( LoadToBeMet ) < 100.0 ) {
+			if ( std::abs( LoadToBeMet ) == 0.0 ) {
 				Residuum = ( LatOutput - LoadToBeMet ) / 100.0;
 			} else {
 				Residuum = ( LatOutput - LoadToBeMet ) / LoadToBeMet;
@@ -10537,7 +10537,7 @@ namespace HVACUnitarySystem {
 			assert( false );
 		}}
 
-		Residuum = ( Par( 2 ) - OutletAirTemp ) * 10.0; // need tight control on temperature
+		Residuum = Par( 2 ) - OutletAirTemp;
 
 		return Residuum;
 	}
@@ -10660,7 +10660,7 @@ namespace HVACUnitarySystem {
 			assert( false );
 		}}
 
-		Residuum = ( Par( 2 ) - OutletAirTemp ) * 10.0; // need tight control on temperature
+		Residuum = Par( 2 ) - OutletAirTemp;
 
 		return Residuum;
 	}
@@ -10883,7 +10883,7 @@ namespace HVACUnitarySystem {
 			assert( false );
 		}}
 
-		Residuum = ( Par( 2 ) - OutletAirTemp ) * 10.0; // need tight control on temperature
+		Residuum = Par( 2 ) - OutletAirTemp;
 
 		return Residuum;
 	}
@@ -11015,7 +11015,7 @@ namespace HVACUnitarySystem {
 			assert( false );
 		}}
 
-		Residuum = ( Par( 2 ) - OutletAirTemp ) * 10.0; // need tight control on temperature
+		Residuum = Par( 2 ) - OutletAirTemp;
 
 		return Residuum;
 	}
