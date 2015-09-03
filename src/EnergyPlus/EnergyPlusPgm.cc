@@ -372,8 +372,8 @@ EnergyPlusPgm( std::string const & filepath )
 			exit(EXIT_FAILURE);
 		}
 		ProgramPath = filepath + pathChar;
-		int dummy_argc = 0;
-		const char * dummy_argv[] = { nullptr };
+		int dummy_argc = 1;
+		const char * dummy_argv[1] = { "energyplus" };
 		CommandLineInterface::ProcessArgs( dummy_argc, dummy_argv );
 	}
 

@@ -1985,6 +1985,10 @@ The Airflow Network input objects are:
 
 **AirflowNetwork:MultiZone:WindPressureCoefficientValues**
 
+**AirflowNetwork:Intrazone:Node**
+
+**AirflowNetwork:Intrazone:Linkage**
+
 **AirflowNetwork:Distribution:Node**
 
 **AirflowNetwork:Distribution:Component:Leak**
@@ -3229,6 +3233,102 @@ AirlowNetwork:OccupantVentilationControl,
  ClosingProbabilitySch;   !- Closing Probability Schedule Name
 ```
 
+The next two objects of AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage are used with RoomAir:Node:AirflowNetwork objects together to simulate multiple internal airflows via multiple intrazone nodes and linkages in a thermal zone. The mixed-air assumption for zone air conditions is not always appropriate.  EnergyPlus includes several RoomAir models that can model the implications for different flow patterns on variations in temperature within the zone.  However none of them are generalized enough for different types of air flow situations and none are coupled tightly with AirflowNetwork.  A general RoomAir model based on pressure network solver will allow modeling a variety of spaces types not currently covered by existing models such as tall spaces.
+
+Recent advancements have been made to AirflowNetwork to model large horizontal openings.  This new development makes AirflowNetwork useful for not only modeling air movement between zones (and outdoors), but also within individual thermal zones.
+
+The possible combination will allow the EnergyPlus to simulate a thermal zone using a network approach by assuming internal nodes connected by user-defined patterns of temperatures and airflows. 
+It should be pointed out that the new model works when the MultizoneWithoutDistribution is selected in the field of AirflowNetwork Control of the AirflowNetwork:SimulationCOntrol object. The model cannot work with other choices.
+
+### AirflowNetwork:Intrazone:Node
+
+This object allows users to input multiple nodes in a zone. A single object represent a node. If there is only one node per zone, then use the AirflowNetwork:Multizone:Zone input object. The zone node is not defined in this object.
+
+#### Field: Name
+The name identifies the node for later reference and in the output listing. Each node should have a unique name. This name can be referenced as AirflowNetworkNodeNames.
+
+#### Field: RoomAir:Node:AirflowNetwork Name
+
+The name of a RoomAir:Node:AirflowNetwork object, which is also defined in a RoomAirSettings:AirflowNetwork object (zone based).
+
+#### Field: Zone Name
+
+The name of a zone object, which is also defined in a AirflowNetwork:MultiZone:Zone object (zone based).
+
+#### Field: Node Height
+
+This field requires input of node height in meters. 
+
+An IDF example is provided below:
+
+ VentilationControl,      !- Name
+
+```idf
+AirflowNetwork:IntraZone:Node,
+ LeftUpper,               !- Name 
+ LeftUpper,               !- RoomAir:Node:AirflowNetwork Name
+ NORTH_ZONE,              !- Zone Name
+ 4.572;                   !- Node Height {m}
+```
+
+### AirflowNetwork:Intrazone:Linkage
+
+The input object specifies a connection between two AirflowNetwork:Intrazone:Node objects and an AiflowNetwork component defined elsewhere. The object also allow users to specify a connection between an AirflowNetwork:Intrazone:Node and an adjacent zone defined in an AirflowNetwork:MultiZone:Zone object. This object provides flexibility to define a linkage either in the same zone or in two different zones.
+
+#### Field: Name
+
+The name identifies the linkage for later reference and in the output listing. Each linkage should have a unique name.
+
+#### Field: Node 1 Name
+
+The input designates a node name where airflow starts. The node name should be defined in an AirflowNetwork:Intrazone:Node object or an AirflowNetwork:MultiZone:Zone object. 
+
+#### Field: Node 2 Name
+
+The input designates a node name where airflow ends. The node name should be defined in an AirflowNetwork:Intrazone:Node object or an AirflowNetwork:MultiZone:Zone object. 
+
+Note: One of Node 1 and Node 2 should be defined as an AirflowNetwork:Intrazone:Node object. In other words, both nodes cannot be defined as AirflowNetwork:MultiZone:Zone object. This type of connection should be defined as an AirflowNetwork:MultiZone:Surface object.
+  
+#### Field: Component Name
+
+The input designates an AirflowNetwork component name associated with the two nodes. The component name should be one of the AirflowNetwork:Multizone:Component object names. The component is used for intrazone node connection only. If the next field is specified, the input of this field could be a blank.
+
+It should be pointed out that an AirflowNetwork:Multizone:Surface object allows following five AirflowNetwork:Multizone:Component objects:
+
+- AirflowNetwork:MultiZone:Component:DetailedOpening,
+- AirflowNetwork:MultiZone:Component:SimpleOpening,
+- AirflowNetwork:MultiZone:Surface:Crack,
+- AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,
+- AirflowNetwork:MultiZone:Component:HorizontalOpening
+
+However, an AirflowNetwork:Intrazone:Linkage object without a surface connection has connection with two intrazone nodes in the same zone and allows two AirflowNetwork:Multizone:Component objects due to lack of geometry inputs.
+ 
+- AirflowNetwork:MultiZone:Surface:Crack,
+- AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,
+
+
+#### Field: Connection Surface
+
+The input specifies an AirflowNetwork:Multizone:Surface object name, when the nodes defined above are not located in the same zone. The surface linkage will be connected by the above two nodes, instead of zone nodes in normal definition. In other words, the connection defined in an AirflowNetwork:Multizone:Surface is removed. Instead, this new connection replaces the the connection specified before. A warning message is issued to let users be aware of the changes. Since each AirflowNetwork:Multizone:Surface object has its own component defined in the Leakage Component Name field, the input of the Component Name field in this object will be ignored.  
+
+An IDF example is provided below:
+
+```idf
+AirflowNetwork:IntraZone:Linkage,
+ IntraZoneMiddleUpperLink, !- Name
+ LeftUpper,               !- Node 1 Name
+ CentralUpper,            !- Node 2 Name
+ CR-1;                    !- Component Name
+
+AirflowNetwork:IntraZone:Linkage,
+ IntraZoneLeftUpperLink,
+ LeftUpper,               !- Node 1 Name
+ EAST_ZONE_T,             !- Node 2 Name
+ CR-1,                    !- Component Name
+ Surface_11_T;            !- Surface Name
+
+```
+
 The previous sections of this AirflowNetwork model discussion describe input objects used for multizone airflow calculations. The following sections describe input objects used for air distribution system simulations. These objects work when control option “MultiZone with Distribution” or “MultiZone with Distribution Only During Fan Operation” is defined in the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object.
 
 The first section presents the input object for distribution system nodes. Although thermal zones are required to perform air distribution system simulations, the thermal zones are already defined in the multizone input section (described previously), so that there is no need to repeat the inputs for thermal zones when modeling an air distribution system. The same is also true for surface air leakage. This section has only one object: AirflowNetwork:Distribution:Node.
@@ -3982,6 +4082,15 @@ The AirflowNetwork linkage used in following output variables includes surfaces 
 * HVAC,Average,AFN Surface Closing Probability Status []
 
 
+**The following are reported only when an integrated model of RoomAir and AirflowNetwork is used:**
+
+* HVAC,Average, RoomAirflowNetwork Node Total Pressure [Pa]
+
+* HVAC,Average, RoomAirflowNetwork Node Temperature [C]
+
+* HVAC,Average, RoomAirflowNetwork Node Humidity Ratio [kgWater/kgDryAir]
+
+
 #### AFN Node Temperature [C]
 
 This is the AirflowNetwork node temperature output in degrees C. When a Fan:OnOff object is used and is scheduled to operate in the cycling fan operation mode, this value for AirflowNetwork:Distribution:Node objects reflects the temperature when the fan is operating (ON).
@@ -4158,7 +4267,7 @@ The time-step value of the venting setpoint temperature for the zone to which th
 
 #### AFN Surface Venting Availability Status [ ]
 
-A value of 1.0 means venting through the surface can occur if venting control conditions are satisfied. A value of 0.0 means venting through the surface cannot occur under any circumstances. This value is determined by the Venting Availability Schedule input (ref: AirflowNetwork:Multizone:Zone or AirflowNetwork:Multizone: Surface).
+A value of 1.0 means venting through the surface can occur if venting control conditions are satisfied. A value of 0.0 means venting through the surface cannot occur under any circumstances. This value is determined by the Venting Availability Schedule input (ref: AirflowNetwork:Multizone:Zone or AirflowNetwork:Multizone:Surface).
 
 #### AFN Zone Infiltration Sensible Heat Gain Rate [W]
 
@@ -4479,6 +4588,18 @@ This is the opening probability status at the current time step using an Airflow
 #### AFN Surface Closing Probability Status []
 
 This is the closing probability status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no closing probability control action. A value of 1 indicates that a window or door is forced to close when the opening status is 0. A value of 2 denotes that the status at the previous time step will be kept. 
+
+#### RoomAirflowNetwork Node Temperature [C]
+
+This is the RoomAirflowNetwork node temperature output in degrees C.
+ 
+#### RoomAirflowNetwork Node Humidity Ratio [kgWater/kgDryAir]
+
+This is the RoomAirflowNetwork node humidity ratio output in kgWater/kgDryAir.
+ 
+#### RoomAirflowNetwork Node Total Pressure [Pa]
+
+This is the RoomAirflowNetwork node total pressure in Pa with respect to outdoor barometric pressure. The total pressure is the sum of static pressure, dynamic pressure, and elevation impact at the node’s relative height.
 
 Group - Zone Equipment
 ----------------------
@@ -13834,7 +13955,7 @@ This choice field determines the logic used to simulate the “master” thermos
 
 #### Field: Thermostat Priority Schedule Name
 
-This alpha field identifies the schedule used when the previous field is set to Scheduled. Schedule values of 0 denote cooling mode while values of 1 denote heating mode. Any other values will force the system off.
+This alpha field identifies the schedule used when the previous field is set to Scheduled. Schedule values of 0 denote heating mode while values of 1 denote cooling mode. Any other values will force the system off.
 
 #### Field: Zone Terminal Unit List Name
 

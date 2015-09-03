@@ -406,6 +406,8 @@ SET( SRC_2
   ReportSizingManager.hh
   ReturnAirPathManager.cc
   ReturnAirPathManager.hh
+  RoomAirModelAirflowNetwork.cc
+  RoomAirModelAirflowNetwork.hh
   RoomAirModelManager.cc
   RoomAirModelManager.hh
   RoomAirModelUserTempPattern.cc
