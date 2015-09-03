@@ -126,7 +126,7 @@ namespace BaseboardElectric {
 
 		// Find the correct Baseboard Equipment
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( EquipName, Baseboard.EquipName(), NumBaseboards );
+			BaseboardNum = FindItemInList( EquipName, Baseboard, &BaseboardParams::EquipName );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "SimElectricBaseboard: Unit not found=" + EquipName );
 			}
@@ -249,7 +249,7 @@ namespace BaseboardElectric {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Baseboard.EquipName(), BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), Baseboard, &BaseboardParams::EquipName, BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					continue;

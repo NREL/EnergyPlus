@@ -93,6 +93,7 @@ namespace DXCoils {
 	extern Real64 HPWHHeatingCapacity; // Used by Heat Pump:Water Heater object as total water heating capacity [W]
 	extern Real64 HPWHHeatingCOP; // Used by Heat Pump:Water Heater object as water heating COP [W/W]
 	extern bool GetCoilsInputFlag; // First time, input is "gotten"
+	extern bool MyOneTimeFlag; // One time flag used to allocate MyEnvrnFlag and MySizeFlag
 	extern int NumVRFHeatingCoils; // number of VRF heat pump heating coils
 	extern int NumVRFCoolingCoils; // number of VRF heat pump cooling coils
 	extern int NumDXHeatingCoils; // number of DX heat pump heating coils
@@ -1594,9 +1595,14 @@ namespace DXCoils {
 		int const SecCoilSHRFF
 		);
 
+	// Clears the global data in DXCoils.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

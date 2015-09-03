@@ -154,7 +154,7 @@ namespace Photovoltaics {
 		}
 
 		if ( GeneratorIndex == 0 ) {
-			PVnum = FindItemInList( GeneratorName, PVarray.Name(), NumPVs );
+			PVnum = FindItemInList( GeneratorName, PVarray );
 			if ( PVnum == 0 ) {
 				ShowFatalError( "SimPhotovoltaicGenerator: Specified PV not one of valid Photovoltaic Generators " + GeneratorName );
 			}
@@ -290,7 +290,6 @@ namespace Photovoltaics {
 		using DataGlobals::KelvinConv;
 		//unused0909  USE DataEnvironment, ONLY: Longitude, TimeZoneMeridian
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using namespace DataHeatBalance;
 		using ScheduleManager::GetScheduleIndex;
 		using TranspiredCollector::GetTranspiredCollectorIndex;
@@ -346,7 +345,7 @@ namespace Photovoltaics {
 			GetObjectItem( cCurrentModuleObject, PVnum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PVarray.Name(), PVnum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), PVarray, PVnum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -354,7 +353,7 @@ namespace Photovoltaics {
 			PVarray( PVnum ).Name = cAlphaArgs( 1 );
 
 			PVarray( PVnum ).SurfaceName = cAlphaArgs( 2 );
-			PVarray( PVnum ).SurfacePtr = FindItemInList( cAlphaArgs( 2 ), Surface.Name(), TotSurfaces );
+			PVarray( PVnum ).SurfacePtr = FindItemInList( cAlphaArgs( 2 ), Surface );
 			// required-surface
 			if ( lAlphaFieldBlanks( 2 ) ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
@@ -446,7 +445,7 @@ namespace Photovoltaics {
 			{ auto const SELECT_CASE_var( PVarray( PVnum ).CellIntegrationMode );
 
 			if ( ( SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration ) || ( SELECT_CASE_var == iTranspiredCollectorCellIntegration ) || ( SELECT_CASE_var == iExteriorVentedCavityCellIntegration ) ) {
-				dupPtr = FindItemInList( PVarray( PVnum ).SurfaceName, PVarray( {PVnum + 1,NumPVs} ).SurfaceName(), ( NumPVs - PVnum ) );
+				dupPtr = FindItemInList( PVarray( PVnum ).SurfaceName, PVarray( {PVnum + 1,NumPVs} ), &PVArrayStruct::SurfaceName );
 				if ( dupPtr != 0 ) dupPtr += PVnum; // to correct for shortened array in find item
 				if ( dupPtr != 0 ) {
 					if ( PVarray( dupPtr ).CellIntegrationMode == iSurfaceOutsideFaceCellIntegration ) {
@@ -476,7 +475,7 @@ namespace Photovoltaics {
 				GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), tmpSimpleModuleParams.Name(), ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), tmpSimpleModuleParams, ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) { //repeat or blank name so don't add
 					ErrorsFound = true;
 					continue;
@@ -521,7 +520,7 @@ namespace Photovoltaics {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), tmpTNRSYSModuleParams.Name(), ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), tmpTNRSYSModuleParams, ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) { //repeat or blank name so don't add
 					ErrorsFound = true;
 					continue;
@@ -576,7 +575,7 @@ namespace Photovoltaics {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), tmpSNLModuleParams.name(), ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), tmpSNLModuleParams, &SNLModuleParamsStuct::name, ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) { //repeat or blank name so don't add
 					ErrorsFound = true;
 					continue;
@@ -633,7 +632,7 @@ namespace Photovoltaics {
 
 			if ( SELECT_CASE_var == iSimplePVModel ) {
 
-				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpSimpleModuleParams.Name(), NumSimplePVModuleTypes );
+				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpSimpleModuleParams );
 				if ( ThisParamObj > 0 ) {
 					PVarray( PVnum ).SimplePVModule = tmpSimpleModuleParams( ThisParamObj ); //entire structure assignment
 
@@ -647,7 +646,7 @@ namespace Photovoltaics {
 
 			} else if ( SELECT_CASE_var == iTRNSYSPVModel ) {
 
-				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpTNRSYSModuleParams.Name(), Num1DiodePVModuleTypes );
+				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpTNRSYSModuleParams );
 				if ( ThisParamObj > 0 ) {
 					PVarray( PVnum ).TRNSYSPVModule = tmpTNRSYSModuleParams( ThisParamObj ); //entire structure assignment
 				} else {
@@ -658,7 +657,7 @@ namespace Photovoltaics {
 
 			} else if ( SELECT_CASE_var == iSandiaPVModel ) {
 
-				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpSNLModuleParams.name(), NumSNLPVModuleTypes );
+				ThisParamObj = FindItemInList( PVarray( PVnum ).PerfObjName, tmpSNLModuleParams, &SNLModuleParamsStuct::name );
 				if ( ThisParamObj > 0 ) {
 					PVarray( PVnum ).SNLPVModule = tmpSNLModuleParams( ThisParamObj ); //entire structure assignment
 				} else {
@@ -1091,7 +1090,6 @@ namespace Photovoltaics {
 		// Using/Aliasing
 		using DataHeatBalance::QRadSWOutIncident;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataHVACGlobals::TimeStepSys;
 		using DataGlobals::TimeStep;
@@ -2645,7 +2643,6 @@ namespace Photovoltaics {
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::ExtVentedCavity;
 		using DataSurfaces::TotExtVentCav;
 
@@ -2748,7 +2745,7 @@ namespace Photovoltaics {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

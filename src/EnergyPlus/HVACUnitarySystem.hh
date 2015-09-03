@@ -1640,7 +1640,7 @@ namespace HVACUnitarySystem {
 	// *****************************************************************************
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of CalIFornia through Ernest OrlanDO Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -24,7 +24,7 @@ IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++
     ADD_CXX_DEFINITIONS("/nologo")
     ADD_CXX_DEFINITIONS("/EHsc")
     ADD_CXX_DEFINITIONS("/MP") # Enables multi-processor compilation of source within a single project
-    ADD_CXX_DEFINITIONS("/W1") # Increase to /W2 then /W3 as more serious warnings are addressed
+    STRING (REGEX REPLACE "/W3" "/W1" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}") # Increase to /W2 then /W3 as more serious warnings are addressed (using regex to avoid VC override warnings)
 
     ADD_CXX_DEFINITIONS("/wd4068 /wd4101 /wd4102 /wd4244 /wd4258 /wd4355 /wd4996") # Disables warning messages listed above
     ADD_CXX_DEFINITIONS("/DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
@@ -97,8 +97,9 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     if ( CMAKE_COMPILER_IS_GNUCXX ) # g++
       ADD_CXX_DEBUG_DEFINITIONS("-ffloat-store") # Improve debug run solution stability
       ADD_CXX_DEBUG_DEFINITIONS("-fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
+      ADD_CXX_DEBUG_DEFINITIONS("-D_GLIBCXX_DEBUG") # Standard container debug mode (bounds checking, ...)
     endif ()
-  
+
   ADD_CXX_DEBUG_DEFINITIONS("-ggdb") # Produces debugging information specifically for gdb
 
 ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
@@ -131,9 +132,9 @@ ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     #  /xHost
 
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
-    ADD_CXX_RELEASE_DEFINITIONS("/Qansi-alias") # Enables more aggressive optimizations on floating-point data
-    ADD_CXX_RELEASE_DEFINITIONS("/fp:fast") # Enables more aggressive optimizations on floating-point data
-    ADD_CXX_RELEASE_DEFINITIONS("/Qprec-div-") # ???If this is equivalent to /Qno-prec-div, it disables the improved division accuracy in favor of speed
+    # ADD_CXX_RELEASE_DEFINITIONS("/Qansi-alias") # Enables more aggressive optimizations on floating-point data
+    # ADD_CXX_RELEASE_DEFINITIONS("/fp:fast") # Enables more aggressive optimizations on floating-point data
+    # ADD_CXX_RELEASE_DEFINITIONS("/Qprec-div-") # ???If this is equivalent to /Qno-prec-div, it disables the improved division accuracy in favor of speed
     ADD_CXX_RELEASE_DEFINITIONS("/Qip") # Enables inter-procedural optimnization within a single file
 
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
@@ -163,6 +164,10 @@ ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     ADD_CXX_DEFINITIONS("-Wp64") # 64-bit warnings
     ADD_CXX_DEFINITIONS("-diag-disable:177,488,869,1786,2259,3280,11074,11075") # Disable warnings listed above
 
+    IF(NOT APPLE)
+      ADD_CXX_DEFINITIONS(-pthread)
+    ENDIF()
+
     # Optimization options that had no significant benefit for EnergyPlus
     #  -inline-factor=200
     #  -ipo instead of -ip
@@ -172,9 +177,9 @@ ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     #  -xHost
 
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
-    ADD_CXX_RELEASE_DEFINITIONS("-ansi-alias") # Enables more aggressive optimizations on floating-point data
-    ADD_CXX_RELEASE_DEFINITIONS("-fp:fast") # Enables more aggressive optimizations on floating-point data
-    ADD_CXX_RELEASE_DEFINITIONS("-prec-div-") # ???If this is equivalent to /Qno-prec-div, it disables the improved division accuracy in favor of speed
+    # ADD_CXX_RELEASE_DEFINITIONS("-ansi-alias") # Enables more aggressive optimizations on floating-point data
+    # ADD_CXX_RELEASE_DEFINITIONS("-fp:fast") # Enables more aggressive optimizations on floating-point data
+    # ADD_CXX_RELEASE_DEFINITIONS("-prec-div-") # ???If this is equivalent to /Qno-prec-div, it disables the improved division accuracy in favor of speed
     ADD_CXX_RELEASE_DEFINITIONS("-ip") # Enables inter-procedural optimnization within a single file
 
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS

@@ -229,7 +229,7 @@ namespace WaterCoils {
 
 		// Find the correct WaterCoilNumber with the Coil Name
 		if ( CompIndex == 0 ) {
-			CoilNum = FindItemInList( CompName, WaterCoil.Name(), NumWaterCoils );
+			CoilNum = FindItemInList( CompName, WaterCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "SimulateWaterCoilComponents: Coil not found=" + CompName );
 			}
@@ -403,7 +403,7 @@ namespace WaterCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), WaterCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), WaterCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -503,7 +503,7 @@ namespace WaterCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), WaterCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), WaterCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -612,7 +612,7 @@ namespace WaterCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), WaterCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), WaterCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -4805,7 +4805,7 @@ Label10: ;
 
 		// Find the correct Coil number
 		if ( CompIndex == 0 ) {
-			CoilNum = FindItemInList( CompName, WaterCoil.Name(), NumWaterCoils );
+			CoilNum = FindItemInList( CompName, WaterCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "CheckWaterCoilSchedule: Coil not found=" + CompName );
 			}
@@ -4879,7 +4879,7 @@ Label10: ;
 
 		WhichCoil = 0;
 		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil.Name(), NumWaterCoils );
+			WhichCoil = FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				// coil does not specify MaxWaterFlowRate
 				MaxWaterFlowRate = WaterCoil( WhichCoil ).MaxWaterVolFlowRate;
@@ -4955,7 +4955,7 @@ Label10: ;
 		NodeNumber = 0;
 		WhichCoil = 0;
 		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil.Name(), NumWaterCoils );
+			WhichCoil = FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = WaterCoil( WhichCoil ).AirInletNodeNum;
 			}
@@ -5029,7 +5029,7 @@ Label10: ;
 		WhichCoil = 0;
 		NodeNumber = 0;
 		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil.Name(), NumWaterCoils );
+			WhichCoil = FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = WaterCoil( WhichCoil ).AirOutletNodeNum;
 			}
@@ -5103,7 +5103,7 @@ Label10: ;
 		NodeNumber = 0;
 		WhichCoil = 0;
 		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil.Name(), NumWaterCoils );
+			WhichCoil = FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = WaterCoil( WhichCoil ).WaterInletNodeNum;
 			}
@@ -5177,7 +5177,7 @@ Label10: ;
 		NodeNumber = 0;
 		WhichCoil = 0;
 		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil.Name(), NumWaterCoils );
+			WhichCoil = FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = WaterCoil( WhichCoil ).WaterOutletNodeNum;
 			}
@@ -5246,7 +5246,7 @@ Label10: ;
 		}
 
 		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CoilType, "Coil:Cooling:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil.Name(), NumWaterCoils );
+			WhichCoil = FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				if ( SameString( CoilType, "Coil:Cooling:Water" ) && WaterCoil( WhichCoil ).DesAirVolFlowRate < 0.0 ) {
 					WaterCoil( WhichCoil ).DesAirVolFlowRate = CoilDesFlow;
@@ -5704,11 +5704,11 @@ Label10: ;
 
 		IndexNum = 0;
 		if ( CoilType == "COIL:HEATING:WATER" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil.Name(), NumWaterCoils );
+			IndexNum = FindItemInList( CoilName, WaterCoil );
 		} else if ( CoilType == "COIL:COOLING:WATER" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil.Name(), NumWaterCoils );
+			IndexNum = FindItemInList( CoilName, WaterCoil );
 		} else if ( CoilType == "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil.Name(), NumWaterCoils );
+			IndexNum = FindItemInList( CoilName, WaterCoil );
 		} else {
 			IndexNum = 0;
 		}
@@ -5777,13 +5777,13 @@ Label10: ;
 		Capacity = -1.0;
 
 		if ( CoilType == "COIL:HEATING:WATER" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil.Name(), NumWaterCoils );
+			IndexNum = FindItemInList( CoilName, WaterCoil );
 			Capacity = WaterCoil( IndexNum ).DesWaterHeatingCoilRate;
 		} else if ( CoilType == "COIL:COOLING:WATER" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil.Name(), NumWaterCoils );
+			IndexNum = FindItemInList( CoilName, WaterCoil );
 			Capacity = WaterCoil( IndexNum ).DesWaterCoolingCoilRate;
 		} else if ( CoilType == "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) {
-			IndexNum = FindItemInList( CoilName, WaterCoil.Name(), NumWaterCoils );
+			IndexNum = FindItemInList( CoilName, WaterCoil );
 			Capacity = WaterCoil( IndexNum ).DesWaterCoolingCoilRate;
 		} else {
 			IndexNum = 0;
@@ -5856,7 +5856,7 @@ Label10: ;
 
 		// Find the correct water coil
 		if ( CompIndex == 0 ) {
-			CoilNum = FindItemInList( CoilName, WaterCoil.Name(), NumWaterCoils );
+			CoilNum = FindItemInList( CoilName, WaterCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "UpdateWaterToAirCoilPlantConnection: Specified Coil not one of Valid water coils=" + CoilName );
 			}
@@ -5967,7 +5967,7 @@ Label10: ;
 		AvailSchIndex = 0;
 
 		if ( SameString( CoilType, "Coil:Heating:Water" ) || SameString( CoilType, "Coil:Cooling:Water" ) || SameString( CoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil.Name(), NumWaterCoils );
+			WhichCoil = FindItem( CoilName, WaterCoil );
 			if ( WhichCoil != 0 ) {
 				AvailSchIndex = WaterCoil( WhichCoil ).SchedPtr;
 			}
@@ -5989,7 +5989,7 @@ Label10: ;
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

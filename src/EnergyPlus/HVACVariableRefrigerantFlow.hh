@@ -77,7 +77,16 @@ namespace HVACVariableRefrigerantFlow {
 
 	//MODULE VARIABLE DECLARATIONS:
 	extern bool GetVRFInputFlag; // Flag set to make sure you get input once
+	extern bool MyOneTimeFlag; // One time flag used to allocate MyEnvrnFlag and MySizeFlag
+	extern bool MyOneTimeSizeFlag; // One time flag used to allocate MyEnvrnFlag and MySizeFlag
 	extern Array1D_bool CheckEquipName; // Flag set to check equipment connections once
+	extern bool ZoneEquipmentListNotChecked; // False after the Zone Equipment List has been checked for items
+	extern Array1D_bool MyEnvrnFlag; // Flag for initializing at beginning of each new environment
+	extern Array1D_bool MySizeFlag; // False after TU has been sized
+	extern Array1D_bool MyBeginTimeStepFlag; // Flag to sense beginning of time step
+	extern Array1D_bool MyVRFFlag; // used for sizing VRF inputs one time
+	extern Array1D_bool MyVRFCondFlag; // used to reset timer counter
+	extern Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 	extern int NumVRFCond; // total number of VRF condensers
 	extern int NumVRFTU; // total number of VRF terminal units
 	extern int NumVRFTULists; // The number of VRF TU lists
@@ -1344,12 +1353,17 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 & MaxLimit // Maximum terminal unit capacity for coils in same operating mode [W]
 	);
 
+	// Clears the global data in CurveManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	// End of Utility subroutines for the Module
 	// *****************************************************************************
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

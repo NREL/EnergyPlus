@@ -142,7 +142,9 @@ namespace HVACVariableRefrigerantFlow {
 
 	//MODULE VARIABLE DECLARATIONS:
 	bool GetVRFInputFlag( true ); // Flag set to make sure you get input once
-	Array1D_bool CheckEquipName; // Flag set to check equipment connections once
+	bool MyOneTimeFlag( true ); // One time flag used to allocate MyEnvrnFlag and MySizeFlag
+	bool MyOneTimeSizeFlag( true ); // One time flag used to allocate MyEnvrnFlag and MySizeFlag
+	bool ZoneEquipmentListNotChecked( true ); // False after the Zone Equipment List has been checked for items
 	int NumVRFCond( 0 ); // total number of VRF condensers
 	int NumVRFTU( 0 ); // total number of VRF terminal units
 	int NumVRFTULists( 0 ); // The number of VRF TU lists
@@ -153,19 +155,26 @@ namespace HVACVariableRefrigerantFlow {
 	Real64 CompOnFlowRatio( 0.0 ); // fan flow ratio when coil on
 	Real64 CompOffFlowRatio( 0.0 ); // fan flow ratio when coil off
 	Real64 FanSpeedRatio( 0.0 ); // ratio of air flow ratio passed to fan object
+	Real64 LoopDXCoolCoilRTF( 0.0 ); // holds value of DX cooling coil RTF
+	Real64 LoopDXHeatCoilRTF( 0.0 ); // holds value of DX heating coil RTF
+	Real64 CondenserWaterMassFlowRate( 0.0 ); // VRF water-cooled condenser mass flow rate (kg/s)
 	Array1D_bool HeatingLoad; // defines a heating load on VRFTerminalUnits
 	Array1D_bool CoolingLoad; // defines a cooling load on VRFTerminalUnits
 	Array1D_bool LastModeHeating; // defines last mode was heating mode
 	Array1D_bool LastModeCooling; // defines last mode was cooling mode
+	Array1D_bool CheckEquipName; // Flag set to check equipment connections once
+	Array1D_bool MyEnvrnFlag; // Flag for initializing at beginning of each new environment
+	Array1D_bool MySizeFlag; // False after TU has been sized
+	Array1D_bool MyBeginTimeStepFlag; // Flag to sense beginning of time step
+	Array1D_bool MyVRFFlag; // used for sizing VRF inputs one time
+	Array1D_bool MyVRFCondFlag; // used to reset timer counter
+	Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+	Array1D_int NumCoolingLoads; // number of TU's requesting cooling
+	Array1D_int NumHeatingLoads; // number of TU's requesting heating
 	Array1D< Real64 > MaxCoolingCapacity; // maximum capacity of any terminal unit
 	Array1D< Real64 > MaxHeatingCapacity; // maximum capacity of any terminal unit
 	Array1D< Real64 > CoolCombinationRatio; // ratio of terminal unit capacity to VRF condenser capacity
 	Array1D< Real64 > HeatCombinationRatio; // ratio of terminal unit capacity to VRF condenser capacity
-	Real64 LoopDXCoolCoilRTF( 0.0 ); // holds value of DX cooling coil RTF
-	Real64 LoopDXHeatCoilRTF( 0.0 ); // holds value of DX heating coil RTF
-	Real64 CondenserWaterMassFlowRate; // VRF water-cooled condenser mass flow rate (kg/s)
-	Array1D_int NumCoolingLoads; // number of TU's requesting cooling
-	Array1D_int NumHeatingLoads; // number of TU's requesting heating
 	Array1D< Real64 > MaxDeltaT; // maximum zone temperature difference from setpoint
 	Array1D< Real64 > MinDeltaT; // minimum zone temperature difference from setpoint
 	Array1D< Real64 > SumCoolingLoads; // sum of cooling loads
@@ -262,7 +271,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		// CompIndex accounting
 		if ( CompIndex == 0 ) {
-			VRFTUNum = FindItemInList( CompName, VRFTU.Name(), NumVRFTU );
+			VRFTUNum = FindItemInList( CompName, VRFTU );
 			if ( VRFTUNum == 0 ) {
 				ShowFatalError( "SimulateVRF: VRF Terminal Unit not found=" + CompName );
 			}
@@ -387,13 +396,13 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		if ( InitLoopEquip ) {
-			VRFNum = FindItemInList( VRFName, VRF.Name(), NumVRFCond );
+			VRFNum = FindItemInList( VRFName, VRF );
 			if ( VRFNum != 0 ) { // if 0, fall through to next
 				{ auto const SELECT_CASE_var( VRFTypeNum );
 				if ( SELECT_CASE_var == TypeOf_HeatPumpVRF ) {
 					MinCap = 0.0;
-					MaxCap = VRF( VRFNum ).HeatingCapacity; // should be greater than cooling capacity
-					OptCap = VRF( VRFNum ).HeatingCapacity; // connects to single loop, how to switch between cooling/heating capacity?
+					MaxCap = max( VRF( VRFNum ).CoolingCapacity, VRF( VRFNum ).HeatingCapacity ); // greater of cooling and heating capacity
+					OptCap = max( VRF( VRFNum ).CoolingCapacity, VRF( VRFNum ).HeatingCapacity ); // connects to single loop, need to switch between cooling/heating capacity?
 				} else {
 					ShowFatalError( "SimVRFCondenserPlant: Module called with incorrect VRFType=" + VRFType );
 				}}
@@ -732,7 +741,7 @@ namespace HVACVariableRefrigerantFlow {
 			InputPowerMultiplier = 1.0;
 
 			// Check outdoor temperature to determine of defrost is active
-			if ( OutdoorDryBulb <= VRF( VRFCond ).MaxOATDefrost ) {
+			if ( OutdoorDryBulb <= VRF( VRFCond ).MaxOATDefrost && VRF( VRFCond ).CondenserType != WaterCooled) {
 
 				// Calculating adjustment factors for defrost
 				// Calculate delta w through outdoor coil by assuming a coil temp of 0.82*DBT-9.7(F) per DOE2.1E
@@ -754,7 +763,7 @@ namespace HVACVariableRefrigerantFlow {
 
 				if ( FractionalDefrostTime > 0.0 ) {
 					// Calculate defrost adjustment factors depending on defrost control strategy
-					if ( VRF( VRFCond ).DefrostStrategy == ReverseCycle && VRF( VRFCond ).DefrostControl == OnDemand ) {
+					if ( VRF( VRFCond ).DefrostStrategy == ReverseCycle ) {
 						LoadDueToDefrost = ( 0.01 * FractionalDefrostTime ) * ( 7.222 - OutdoorDryBulb ) * ( VRF( VRFCond ).HeatingCapacity / 1.01667 );
 						DefrostEIRTempModFac = CurveValue( VRF( VRFCond ).DefrostEIRPtr, max( 15.555, InletAirWetBulbC ), max( 15.555, OutdoorDryBulb ) );
 
@@ -786,7 +795,7 @@ namespace HVACVariableRefrigerantFlow {
 			TotalTUHeatingCapacity = TotalCondHeatingCapacity * VRF( VRFCond ).PipingCorrectionHeating;
 			if ( TotalCondHeatingCapacity > 0.0 ) {
 				HeatingPLR = ( TUHeatingLoad / VRF( VRFCond ).PipingCorrectionHeating ) / TotalCondHeatingCapacity;
-				HeatingPLR += LoadDueToDefrost / TotalCondHeatingCapacity;
+				HeatingPLR += ( LoadDueToDefrost * HeatingPLR ) / TotalCondHeatingCapacity;
 			} else {
 				HeatingPLR = 0.0;
 			}
@@ -1027,6 +1036,9 @@ namespace HVACVariableRefrigerantFlow {
 			VRFRTF = min( 1.0, ( CyclingRatio / PartLoadFraction ) );
 
 			VRF( VRFCond ).ElecHeatingPower = ( VRF( VRFCond ).RatedHeatingPower * TotHeatCapTempModFac ) * TotHeatEIRTempModFac * EIRFPLRModFac * VRFRTF * InputPowerMultiplier;
+
+			// adjust defrost power based on heating RTF
+			VRF( VRFCond ).DefrostPower *= VRFRTF;
 		}
 		VRF( VRFCond ).VRFCondRTF = VRFRTF;
 
@@ -1188,7 +1200,6 @@ namespace HVACVariableRefrigerantFlow {
 		using WaterManager::SetupTankSupplyComponent;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataSizing::AutoSize;
-		using DataSizing::NumZoneHVACSizing;
 		using DataSizing::ZoneHVACSizing;
 
 		//    USE DataIPShortCuts
@@ -1308,7 +1319,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), TerminalUnitList.Name(), VRFNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), TerminalUnitList, VRFNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1354,7 +1365,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), VRF.Name(), VRFNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), VRF, VRFNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1668,7 +1679,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			VRF( VRFNum ).MinPLR = rNumericArgs( 10 );
 
-			VRF( VRFNum ).MasterZonePtr = FindItemInList( cAlphaArgs( 24 ), Zone.Name(), NumOfZones );
+			VRF( VRFNum ).MasterZonePtr = FindItemInList( cAlphaArgs( 24 ), Zone );
 
 			if ( SameString( cAlphaArgs( 25 ), "LoadPriority" ) ) {
 				VRF( VRFNum ).ThermostatPriority = LoadPriority;
@@ -1703,7 +1714,7 @@ namespace HVACVariableRefrigerantFlow {
 				}
 			}
 
-			VRF( VRFNum ).ZoneTUListPtr = FindItemInList( cAlphaArgs( 27 ), TerminalUnitList.Name(), NumVRFTULists );
+			VRF( VRFNum ).ZoneTUListPtr = FindItemInList( cAlphaArgs( 27 ), TerminalUnitList );
 			if ( VRF( VRFNum ).ZoneTUListPtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\"" );
 				ShowContinueError( cAlphaFieldNames( 27 ) + " = " + cAlphaArgs( 27 ) + " not found." );
@@ -1786,7 +1797,7 @@ namespace HVACVariableRefrigerantFlow {
 			if ( ! lAlphaFieldBlanks( 33 ) ) {
 				VRF( VRFNum ).DefrostEIRPtr = GetCurveIndex( cAlphaArgs( 33 ) );
 				if ( VRF( VRFNum ).DefrostEIRPtr > 0 ) {
-					// Verify Curve Object, only legal type is linear, quadratic, or cubic
+					// Verify Curve Object, only legal type is BiQuadratic
 					{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).DefrostEIRPtr ) );
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					} else {
@@ -1795,13 +1806,13 @@ namespace HVACVariableRefrigerantFlow {
 						ErrorsFound = true;
 					}}
 				} else {
-					if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
+					if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle ) {
 						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 33 ) + " not found:" + cAlphaArgs( 33 ) );
 						ErrorsFound = true;
 					}
 				}
 			} else {
-				if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
+				if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle ) {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 33 ) + " not found:" + cAlphaArgs( 33 ) );
 					ErrorsFound = true;
 				}
@@ -2083,7 +2094,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), VRFTU.Name(), VRFTUNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), VRFTU, VRFTUNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2388,7 +2399,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			VRFTU( VRFTUNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaFieldBlanks( 16 ) ) {
-				VRFTU( VRFTUNum ).HVACSizingIndex = FindItemInList( cAlphaArgs( 16 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
+				VRFTU( VRFTUNum ).HVACSizingIndex = FindItemInList( cAlphaArgs( 16 ), ZoneHVACSizing );
 				if ( VRFTU( VRFTUNum ).HVACSizingIndex == 0 ) {
 					ShowSevereError( cAlphaFieldNames( 16 ) + " = " + cAlphaArgs( 16 ) + " not found." );
 					ShowContinueError( "Occurs in " + cCurrentModuleObject + " = " + VRFTU( VRFTUNum).Name );
@@ -2846,14 +2857,6 @@ namespace HVACVariableRefrigerantFlow {
 		int InNode; // TU inlet node
 		int OutNode; // TU outlet node
 		int OutsideAirNode; // TU mixer outside air inlet node
-		static bool MyOneTimeFlag( true ); // False after allocating and initializing subroutine variables
-		static bool ZoneEquipmentListNotChecked( true ); // False after the Zone Equipment List has been checked for items
-		static Array1D_bool MyEnvrnFlag; // Flag for initializing at beginning of each new environment
-		static Array1D_bool MySizeFlag; // False after TU has been sized
-		static Array1D_bool MyBeginTimeStepFlag; // Flag to sense beginning of time step
-		static Array1D_bool MyVRFFlag; // used for sizing VRF inputs one time
-		static Array1D_bool MyVRFCondFlag; // used to reset timer counter
-		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		int NumTULoop; // loop counter, number of TU's in list
 		int ELLoop; // loop counter, number of zone equipment lists
 		int ListLoop; // loop counter, number of equipment is each list
@@ -3810,7 +3813,6 @@ namespace HVACVariableRefrigerantFlow {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Array1D_bool CheckVRFCombinationRatio;
-		static bool MyOneTimeFlag( true ); // One time flag used to allocate MyEnvrnFlag and MySizeFlag
 		bool FoundAll; // temporary variable used to check all terminal units
 		bool errFlag; // temporary variable used for error checking
 		Real64 TUCoolingCapacity; // total terminal unit cooling capacity
@@ -3897,10 +3899,10 @@ namespace HVACVariableRefrigerantFlow {
 		DataFracOfAutosizedCoolingCapacity = 1.0;
 		DataFracOfAutosizedHeatingCapacity = 1.0;
 
-		if ( MyOneTimeFlag ) {
+		if ( MyOneTimeSizeFlag ) {
 			// initialize the environment and sizing flags
 			CheckVRFCombinationRatio.dimension( NumVRFCond, true );
-			MyOneTimeFlag = false;
+			MyOneTimeSizeFlag = false;
 		}
 
 		CompType = "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow";
@@ -4518,6 +4520,7 @@ namespace HVACVariableRefrigerantFlow {
 		using ReportSizingManager::ReportSizingOutput;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
+		using PlantUtilities::InitComponentNodes;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4550,13 +4553,15 @@ namespace HVACVariableRefrigerantFlow {
 					rho = GetDensityGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
 
 					Cp = GetSpecificHeatGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
-					tmpCondVolFlowRate = VRF( VRFCond ).HeatingCapacity / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
-					if ( VRF( VRFCond ).HeatingCapacity != AutoSize ) {
+					tmpCondVolFlowRate = max( VRF( VRFCond ).CoolingCapacity, VRF( VRFCond ).HeatingCapacity ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
+					if( VRF( VRFCond ).HeatingCapacity != AutoSize && VRF( VRFCond ).CoolingCapacity != AutoSize ) {
 						VRF( VRFCond ).WaterCondVolFlowRate = tmpCondVolFlowRate;
 						ReportSizingOutput( "AirConditioner:VariableRefrigerantFlow", VRF( VRFCond ).Name, "Design Condenser Water Flow Rate [m3/s]", VRF( VRFCond ).WaterCondVolFlowRate );
 					}
 
-					RegisterPlantCompDesignFlow( VRF( VRFCond ).CondenserNodeNum, VRF( VRFCond ).WaterCondVolFlowRate );
+					rho = GetDensityGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, InitConvTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
+					VRF( VRFCond ).WaterCondenserDesignMassFlow = VRF( VRFCond ).WaterCondVolFlowRate * rho;
+					InitComponentNodes( 0.0, VRF( VRFCond ).WaterCondenserDesignMassFlow, VRF( VRFCond ).CondenserNodeNum, VRF( VRFCond ).CondenserOutletNodeNum, VRF( VRFCond ).SourceLoopNum, VRF( VRFCond ).SourceLoopSideNum, VRF( VRFCond ).SourceBranchNum, VRF( VRFCond ).SourceCompNum );
 
 				} else {
 					ShowSevereError( "Autosizing of condenser water flow rate requires a condenser loop Sizing:Plant object" );
@@ -4570,6 +4575,8 @@ namespace HVACVariableRefrigerantFlow {
 			if ( ErrorsFound ) {
 				ShowFatalError( "Preceding sizing errors cause program termination" );
 			}
+
+			RegisterPlantCompDesignFlow( VRF( VRFCond ).CondenserNodeNum, VRF( VRFCond ).WaterCondVolFlowRate );
 
 		}
 
@@ -6090,12 +6097,63 @@ namespace HVACVariableRefrigerantFlow {
 
 	}
 
+	// Clears the global data in HVACVariableRefrigerantFlow.
+	// Needed for unit tests, should not be normally called.
+	void
+		clear_state()
+	{
+		NumVRFCond = 0;
+		NumVRFTU = 0;
+		NumVRFTULists = 0;
+		CompOnMassFlow = 0.0;
+		OACompOnMassFlow = 0.0;
+		CompOffMassFlow = 0.0;
+		OACompOffMassFlow = 0.0;
+		CompOnFlowRatio = 0.0;
+		CompOffFlowRatio = 0.0;
+		FanSpeedRatio = 0.0;
+		LoopDXCoolCoilRTF = 0.0;
+		LoopDXHeatCoilRTF = 0.0;
+		CondenserWaterMassFlowRate = 0.0;
+
+		GetVRFInputFlag = true;
+		MyOneTimeFlag = true;
+		MyOneTimeSizeFlag = true;
+		ZoneEquipmentListNotChecked = true;
+
+		VRF.deallocate();
+		VRFTU.deallocate();
+		TerminalUnitList.deallocate();
+		VRFTUNumericFields.deallocate();
+		MaxCoolingCapacity.deallocate();
+		MaxHeatingCapacity.deallocate();
+		CoolCombinationRatio.deallocate();
+		HeatCombinationRatio.deallocate();
+		MaxDeltaT.deallocate();
+		MinDeltaT.deallocate();
+		LastModeCooling.deallocate();
+		LastModeHeating.deallocate();
+		HeatingLoad.deallocate();
+		CoolingLoad.deallocate();
+		NumCoolingLoads.deallocate();
+		SumCoolingLoads.deallocate();
+		NumHeatingLoads.deallocate();
+		SumHeatingLoads.deallocate();
+		CheckEquipName.deallocate();
+		MyEnvrnFlag.deallocate();
+		MySizeFlag.deallocate();
+		MyBeginTimeStepFlag.deallocate();
+		MyVRFFlag.deallocate();
+		MyVRFCondFlag.deallocate();
+		MyZoneEqFlag.deallocate();
+	}
+
 	// End of Utility subroutines for the Module
 	// *****************************************************************************
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
