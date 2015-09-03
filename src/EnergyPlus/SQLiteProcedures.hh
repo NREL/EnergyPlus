@@ -142,7 +142,8 @@ public:
 		std::string const & PeakHrMin, // time stamp of the peak
 		Real64 const PeakTemp, // temperature at peak [C]
 		Real64 const PeakHumRat, // humidity ratio at peak [kg water/kg dry air]
-		Real64 const MinOAVolFlow // zone design minimum outside air flow rate [m3/s]
+		Real64 const MinOAVolFlow, // zone design minimum outside air flow rate [m3/s]
+		Real64 const DOASHeatAddRate // zone design heat addition rate from the DOAS [W]
 	);
 
 	void addSQLiteSystemSizingRecord(

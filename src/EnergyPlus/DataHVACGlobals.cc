@@ -253,7 +253,6 @@ namespace DataHVACGlobals {
 
 	bool FirstTimeStepSysFlag( false ); // Set to true at the start of each sub-time step
 
-	Real64 SysUpdateTimeInc( 0.0 ); // System Update Time Increment - the adaptive time step used by the HVAC simulation
 	Real64 TimeStepSys( 0.0 ); // System Time Increment - the adaptive time step used by the HVAC simulation (hours)
 	Real64 SysTimeElapsed( 0.0 ); // elapsed system time in zone timestep (hours)
 	Real64 FracTimeStepZone( 0.0 ); // System time step divided by the zone time step
@@ -453,7 +452,6 @@ namespace DataHVACGlobals {
 	{
 		DXCT = 1;
 		FirstTimeStepSysFlag = false;
-		SysUpdateTimeInc = 0.0;
 		TimeStepSys = 0.0;
 		SysTimeElapsed = 0.0;
 		FracTimeStepZone = 0.0;
