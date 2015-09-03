@@ -16,6 +16,9 @@
 #include <DataSizing.hh>
 #include <DataZoneEquipment.hh>
 #include <DataZoneEnergyDemands.hh>
+#include <DXCoils.hh>
+#include <Fans.hh>
+#include <GlobalNames.hh>
 #include <HeatBalanceManager.hh>
 #include <HVACVariableRefrigerantFlow.hh>
 #include <OutputReportPredefined.hh>
@@ -34,6 +37,9 @@ using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEnergyDemands;
+using namespace EnergyPlus::DXCoils;
+using namespace EnergyPlus::Fans;
+using namespace EnergyPlus::GlobalNames;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::HVACVariableRefrigerantFlow;
 using namespace EnergyPlus::OutputReportPredefined;
@@ -171,7 +177,7 @@ namespace EnergyPlus {
 			"  autosize,                 !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"  VRFFanSchedule,           !- Supply Air Fan Operating Mode Schedule Name",
 			"  drawthrough,              !- Supply Air Fan Placement",
-			"  Fan:ConstantVolume,       !- Supply Air Fan Object Type",
+			"  Fan:OnOff,                !- Supply Air Fan Object Type",
 			"  TU1 VRF Supply Fan,       !- Supply Air Fan Object Name",
 			"  OutdoorAir:Mixer,         !- Outside Air Mixer Object Type",
 			"  TU1 OA Mixer,             !- Outside Air Mixer Object Name",
@@ -182,7 +188,7 @@ namespace EnergyPlus {
 			"  30,                       !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
 			"  20;                       !- Zone Terminal Unit Off Parasitic Electric Energy Use{ W }",
 			" ",
-			"Fan:ConstantVolume,",
+			"Fan:OnOff,",
 			"  TU1 VRF Supply Fan,       !- Name",
 			"  VRFAvailSched,            !- Availability Schedule Name",
 			"  0.7,                      !- Fan Total Efficiency",
@@ -646,6 +652,10 @@ namespace EnergyPlus {
 		EXPECT_FALSE( ErrorsFound ); 
 
 		GetZoneEquipmentData(); // read equipment list and connections
+		Fans::GetFanInputFlag = true;
+		DXCoils::GetCoilsInputFlag = true;
+		GlobalNames::CoilNames.deallocate();
+		GlobalNames::NumCoils = 0;
 		ZoneInletAirNode = GetVRFTUZoneInletAirNode( VRFTUNum ); // trigger GetVRFInput by calling a mining function
 
 		Schedule( VRF( VRFCond ).SchedPtr ).CurrentValue = 1.0; // enable the VRF condenser
