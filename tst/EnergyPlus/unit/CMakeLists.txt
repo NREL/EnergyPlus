@@ -6,7 +6,6 @@ set( test_src
   TestHelpers/IdfParser.hh
   Fixtures/EnergyPlusFixture.cc
   Fixtures/EnergyPlusFixture.hh
-  Fixtures/GroundTempsFixture.hh
   Fixtures/HVACFixture.hh
   Fixtures/IdfParserFixture.hh
   Fixtures/InputProcessorFixture.hh
@@ -33,7 +32,7 @@ set( test_src
   HeatBalanceManager.unit.cc
   HeatRecovery.unit.cc
   Humidifiers.unit.cc
-  HVACSizingSimulationManager.unit.cc 
+  HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc

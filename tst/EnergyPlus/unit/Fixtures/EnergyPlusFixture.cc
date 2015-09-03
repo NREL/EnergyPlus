@@ -16,6 +16,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -62,6 +63,7 @@ namespace EnergyPlus {
 		DataSurfaces::clear_state();
 		DataZoneControls::clear_state();
 		ExteriorEnergyUse::clear_state();
+		GroundTemperatureManager::clear_state();
 		HeatBalanceManager::clear_state();
 		InputProcessor::clear_state();
 		OutputProcessor::clear_state();

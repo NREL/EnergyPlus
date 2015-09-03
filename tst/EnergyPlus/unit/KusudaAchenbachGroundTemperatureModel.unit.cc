@@ -5,12 +5,14 @@
 
 // EnergyPlus Headers
 #include "EnergyPlus/DataIPShortCuts.hh"
-#include "Fixtures/GroundTempsFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
+#include "EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh"
+#include "EnergyPlus/GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::GroundTemperatureManager;
  
-TEST_F( GroundTempsFixture, KusudaAchenbachGroundTempModelTest1 )
+TEST_F( EnergyPlusFixture, KusudaAchenbachGroundTempModelTest1 )
 {
 	std::string const idf_objects = delimited_string({
 		"Version,8.4;",
@@ -40,7 +42,7 @@ TEST_F( GroundTempsFixture, KusudaAchenbachGroundTempModelTest1 )
 
 }
 
-TEST_F( GroundTempsFixture, KusudaAchenbachGroundTempModelTest2 ) // lNumericFieldBlanks not working correctly for this test
+TEST_F( EnergyPlusFixture, KusudaAchenbachGroundTempModelTest2 ) // lNumericFieldBlanks not working correctly for this test
 {
 	std::string const idf_objects = delimited_string({
 		"Version,8.4;",

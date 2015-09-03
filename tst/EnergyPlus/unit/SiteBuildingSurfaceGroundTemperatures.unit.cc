@@ -5,12 +5,14 @@
 
 // EnergyPlus Headers
 #include "EnergyPlus/DataIPShortCuts.hh"
-#include "Fixtures/GroundTempsFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
+#include "EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh"
+#include "EnergyPlus/GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::GroundTemperatureManager;
 
-TEST_F( GroundTempsFixture, SiteBuildingSurfaceGroundTempTest )
+TEST_F( EnergyPlusFixture, SiteBuildingSurfaceGroundTempTest )
 {
 	std::string const idf_objects = delimited_string({
 		"Version,8.4;",

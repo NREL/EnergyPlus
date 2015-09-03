@@ -6,14 +6,15 @@
 // EnergyPlus Headers
 #include "EnergyPlus/DataGlobals.hh"
 #include "EnergyPlus/DataIPShortCuts.hh"
-#include "Fixtures/GroundTempsFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
+#include "EnergyPlus/GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh"
+#include "EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh"
 #include "EnergyPlus/WeatherManager.hh"
 
 using namespace EnergyPlus;
-
 using namespace EnergyPlus::GroundTemperatureManager;
  
-TEST_F( GroundTempsFixture, FiniteDiffGroundTempModelTest )
+TEST_F( EnergyPlusFixture, FiniteDiffGroundTempModelTest )
 {
 
 	using DataGlobals::Pi;
