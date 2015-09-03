@@ -1115,6 +1115,7 @@ namespace HeatBalanceManager {
 					ZoneAirMassFlow.InfiltrationTreatment = AdjustInfiltrationFlow;
 					ZoneAirMassFlow.EnforceZoneMassBalance = true;
 					AlphaName( 2 ) = "AddInfiltrationFlow";
+					if ( !Contaminant.CO2Simulation ) Contaminant.SimulateContaminants = true;
 				} else if ( SELECT_CASE_var == "NONE" ) {
 					ZoneAirMassFlow.InfiltrationTreatment = NoInfiltrationFlow;
 					AlphaName( 2 ) = "None";
@@ -1138,7 +1139,7 @@ namespace HeatBalanceManager {
 							ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
 							AlphaName( 3 ) = "MixingSourceZonesOnly";
 						} else if ( SELECT_CASE_var == "ALLZONES" ) {
-							ZoneAirMassFlow.InfiltrationZoneType = AdjustInfiltrationFlow;
+							ZoneAirMassFlow.InfiltrationZoneType = AllZones;
 							AlphaName( 3 ) = "AllZones";
 						} else {
 							ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;

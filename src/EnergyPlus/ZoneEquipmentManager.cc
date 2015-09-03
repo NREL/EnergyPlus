@@ -3333,6 +3333,9 @@ namespace ZoneEquipmentManager {
 		using DataHeatBalance::ZoneAirMassFlow;
 		using DataHeatBalance::AddInfiltrationFlow;
 		using DataHeatBalance::AdjustInfiltrationFlow;
+		using DataHeatBalance::NoInfiltrationFlow;
+		using DataHeatBalance::MixingSourceZonesOnly;
+		using DataHeatBalance::AllZones;
 		using DataHeatBalFanSys::ZoneMassBalanceFlag;
 		using DataHeatBalFanSys::ZoneInfiltrationFlag;
 		using DataHeatBalFanSys::MixingMassFlowZone;
@@ -3373,6 +3376,7 @@ namespace ZoneEquipmentManager {
 		Real64 ZoneMixingNetAirMassFlowRate;
 		Real64 ZoneMixMassFlowRate;
 		Real64 ZoneMixingAirMassFlowRatePrevious;
+		Real64 ZoneReturnAirMassFlowRate;
 		Real64 ZoneInfiltrationMassFlowRate;
 		Real64 BuildingZoneMixingFlowOld;
 		Real64 BuildingZoneMixingFlow;
@@ -3424,6 +3428,7 @@ namespace ZoneEquipmentManager {
 				ZoneMixingAirMassFlowRate = 0.0;
 				ZoneMixingNetAirMassFlowRate = 0.0;
 				ZoneMixMassFlowRate = 0.0;
+				ZoneReturnAirMassFlowRate = 0.0;
 				ZoneInfiltrationMassFlowRate = 0.0;
 				ZoneMixingAirMassFlowRatePrevious = 0.0;
 
@@ -3445,36 +3450,40 @@ namespace ZoneEquipmentManager {
 				//
 				// Include zone mixing mass flow rate
 				if ( ZoneMassBalanceFlag( ZoneNum ) ) {
-					if (Iteration == 0) {
+					RetNode = ZoneEquipConfig( ZoneNum ).ReturnAirNode;
+					if ( RetNode > 0 ) {
+						ZoneReturnAirMassFlowRate = Node( RetNode ).MassFlowRate;
+					}
+					// Set zone mixing incoming mass flow rate
+					if ( (Iteration == 0) || ! ZoneAirMassFlow.BalanceMixing ){
 						ZoneMixingAirMassFlowRate = MixingMassFlowZone( ZoneNum );
 					} else {
-						RetNode = ZoneEquipConfig( ZoneNum ).ReturnAirNode;
-						if (RetNode > 0) {
-							ZoneMixingAirMassFlowRate = max(0.0, Node(RetNode).MassFlowRate + TotExhaustAirMassFlowRate - TotInletAirMassFlowRate + MassConservation(ZoneNum).MixingSourceMassFlowRate);
-						}
+						ZoneMixingAirMassFlowRate = max( 0.0, ZoneReturnAirMassFlowRate + TotExhaustAirMassFlowRate - TotInletAirMassFlowRate + MassConservation( ZoneNum ).MixingSourceMassFlowRate );
 					}
 					CalcZoneMixingFlowRateOfReceivingZone(ZoneNum, ZoneMixingAirMassFlowRate);
-					if (MassConservation(ZoneNum).IsOnlySourceZone) {
-						ZoneInfiltrationMassFlowRate = max(0.0, MassConservation(ZoneNum).MixingSourceMassFlowRate + TotExhaustAirMassFlowRate - TotInletAirMassFlowRate);
+					// Set zone infiltration flow rate
+					if ( MassConservation( ZoneNum ).InfiltrationPtr > 0 ) {
+						if ( MassConservation( ZoneNum ).IsOnlySourceZone || ( ZoneAirMassFlow.InfiltrationZoneType == AllZones ) ) {
+							ZoneInfiltrationMassFlowRate = MassConservation( ZoneNum ).MixingSourceMassFlowRate + TotExhaustAirMassFlowRate + ZoneReturnAirMassFlowRate - TotInletAirMassFlowRate;
 
-						if (MassConservation(ZoneNum).MixingSourceMassFlowRate > TotInletAirMassFlowRate) {
+						//if (MassConservation(ZoneNum).MixingSourceMassFlowRate > TotInletAirMassFlowRate) {
 
 							if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
-								if (ZoneInfiltrationMassFlowRate > ConvergenceTolerance) {
+								if (abs(ZoneInfiltrationMassFlowRate) > ConvergenceTolerance) {
 									ZoneInfiltrationFlag(ZoneNum) = true;
 									MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
-									Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate = ZoneInfiltrationMassFlowRate;
-									MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
+									MassConservation( ZoneNum ).IncludeInfilToZoneMassBal = 1;
+									Infiltration( MassConservation( ZoneNum ).InfiltrationPtr ).MassFlowRate += ZoneInfiltrationMassFlowRate;
+									Infiltration( MassConservation( ZoneNum ).InfiltrationPtr ).MassFlowRate = max( 0.0, Infiltration( MassConservation( ZoneNum ).InfiltrationPtr ).MassFlowRate );
 								} else {
 									MassConservation(ZoneNum).InfiltrationMassFlowRate = Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
 								}
-							}
-
-							if (ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
+							} else if (ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
 								if (ZoneInfiltrationMassFlowRate > ConvergenceTolerance) {
 									ZoneInfiltrationFlag(ZoneNum) = true;
 									MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
 									MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
+									Infiltration( MassConservation( ZoneNum ).InfiltrationPtr ).MassFlowRate += ZoneInfiltrationMassFlowRate;
 								} else {
 									MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
 								}
@@ -3489,11 +3498,11 @@ namespace ZoneEquipmentManager {
 							}
 						}
 					} else {
-						if (MassConservation(ZoneNum).InfiltrationPtr > 0) {
-							MassConservation(ZoneNum).InfiltrationMassFlowRate = Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
-						} else {
+						//if (MassConservation(ZoneNum).InfiltrationPtr > 0) {
+						//	MassConservation(ZoneNum).InfiltrationMassFlowRate = Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
+						//} else {
 							MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-						}
+						//}
 					}
 
 					MassConservation(ZoneNum).InMassFlowRate = TotInletAirMassFlowRate;
