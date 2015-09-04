@@ -334,6 +334,26 @@ namespace GlobalNames {
 
 	}
 
+	// Clears the global data in GlobalNames.
+	// Needed for unit tests, should not be normally called.
+	void
+		clear_state()
+	{
+		NumChillers = 0;
+		NumBoilers = 0;
+		NumBaseboards = 0;
+		NumCoils = 0;
+		CurMaxChillers = 0;
+		CurMaxBoilers = 0;
+		CurMaxBaseboards = 0;
+		CurMaxCoils = 0;
+
+		ChillerNames.deallocate();
+		BoilerNames.deallocate();
+		BaseboardNames.deallocate();
+		CoilNames.deallocate();
+	}
+
 	//     NOTICE
 
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
