@@ -79,6 +79,10 @@ namespace DataSizing {
 	int const InpDesAirFlow( 2 );
 	int const DesAirFlowWithLim( 3 );
 
+	int const DOANeutralSup( 1 );
+	int const DOANeutralDehumSup( 2 );
+	int const DOACoolSup( 3 );
+
 	// parameters for Type of Load to Size On
 	int const Sensible( 0 );
 	int const Latent( 1 );

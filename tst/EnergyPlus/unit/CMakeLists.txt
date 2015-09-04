@@ -18,6 +18,7 @@ set( test_src
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
+  DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
@@ -48,6 +49,7 @@ set( test_src
   OutputReportTabular.unit.cc
   OutputReportTabularAnnual.unit.cc
   ReportSizingManager.unit.cc
+  RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
