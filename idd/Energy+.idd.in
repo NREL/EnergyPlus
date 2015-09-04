@@ -32435,10 +32435,12 @@ ZoneHVAC:FourPipeFanCoil,
         \required-field
         \type choice
         \key Coil:Heating:Water
+        \key Coil:Heating:Electric
    A14, \field Heating Coil Name
         \required-field
         \type object-list
         \object-list HeatingCoilsWater
+        \object-list HeatingCoilsElectric
    N8 , \field Maximum Hot Water Flow Rate
         \required-field
         \autosizable
@@ -43374,6 +43376,7 @@ Coil:Heating:Electric,
        \type alpha
        \required-field
        \reference HeatingCoilName
+       \reference HeatingCoilsElectric
        \reference AFNCoilNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -51221,6 +51224,7 @@ AirLoopHVAC:UnitarySystem,
        \key Fan:OnOff
        \key Fan:ConstantVolume
        \key Fan:VariableVolume
+       \key Fan:ComponentModel
        \note Enter the type of supply air fan if included in the unitary system.
        \note Fan:ConstantVolume only works with continuous fan operating mode (i.e. supply
        \note air fan operating mode schedule values greater than 0).
@@ -51228,11 +51232,13 @@ AirLoopHVAC:UnitarySystem,
        \note input field above is left blank.
        \note Specify a Fan:VariableVolume when modeling VAV systems which used setpoint based control
        \note if the fan is included in the unitary system object.
+       \note The ComponentModel fan type may be substituted for the ConstantVolume or VariableVolume
+       \note fan types when more detailed fan modeling is required.
        \note The variable or constant volume fan may be specified on the branch instead of contained
        \note within the unitary system object (i.e., this field may be blank for certain configurations).
   A9, \field Supply Fan Name
        \type object-list
-       \object-list FansCVandOnOffandVAV
+       \object-list Fans
        \note Enter the name of the supply air fan if included in the unitary system.
   A10, \field Fan Placement
        \type choice
@@ -51266,6 +51272,7 @@ AirLoopHVAC:UnitarySystem,
        \key Coil:Heating:Water
        \key Coil:Heating:Steam
        \key Coil:Heating:Desuperheater
+       \key Coil:UserDefined
        \note Enter the type of heating coil if included in the unitary system.
   A13, \field Heating Coil Name
        \type object-list
@@ -51278,13 +51285,14 @@ AirLoopHVAC:UnitarySystem,
        \object-list HeatingCoilsElectricMultiStage
        \object-list HeatingCoilsGasMultiStage
        \object-list HeatingCoilsDesuperheater
+       \object-list UserDefinedCoil
        \note Enter the name of the heating coil if included in the unitary system.
   N1 , \field DX Heating Coil Sizing Ratio
        \type real
        \default 1.0
        \minimum> 0
        \note Used to adjust heat pump heating capacity with respect to DX cooling capacity
-       \note used only for heat pump configurations (i.e., a cooling and DX heating coil is used).
+       \note used only for heat pump configurations (i.e., a DX cooling and DX heating coil is used).
   A14, \field Cooling Coil Object Type
        \type choice
        \key Coil:Cooling:DX:SingleSpeed
@@ -51292,6 +51300,7 @@ AirLoopHVAC:UnitarySystem,
        \key Coil:Cooling:DX:MultiSpeed
        \key Coil:Cooling:DX:VariableSpeed
        \key Coil:Cooling:DX:TwoStageWithHumidityControlMode
+       \key Coil:Cooling:DX:SingleSpeed:ThermalStorage
        \key CoilSystem:Cooling:DX:HeatExchangerAssisted
        \key Coil:Cooling:WaterToAirHeatPump:ParameterEstimation
        \key Coil:Cooling:WaterToAirHeatPump:EquationFit
@@ -51299,6 +51308,7 @@ AirLoopHVAC:UnitarySystem,
        \key Coil:Cooling:Water
        \key Coil:Cooling:Water:DetailedGeometry
        \key CoilSystem:Cooling:Water:HeatExchangerAssisted
+       \key Coil:UserDefined
        \note Enter the type of cooling coil if included in the unitary system.
   A15, \field Cooling Coil Name
        \type object-list
@@ -51308,6 +51318,7 @@ AirLoopHVAC:UnitarySystem,
        \object-list CoolingCoilsWaterToAirHP
        \object-list CoolingCoilsWaterToAirVSHP
        \object-list CoolingCoilsWater
+       \object-list UserDefindedCoil
        \note Enter the name of the cooling coil if included in the unitary system.
   A16, \field Use DOAS DX Cooling Coil
        \type choice
@@ -51346,12 +51357,14 @@ AirLoopHVAC:UnitarySystem,
        \key Coil:Heating:Desuperheater
        \key Coil:Heating:Water
        \key Coil:Heating:Steam
+       \key Coil:UserDefined
        \note Enter the type of supplemental heating coil if included in the unitary system.
        \note Only required if dehumidification control type is "CoolReheat".
   A19, \field Supplemental Heating Coil Name
        \type object-list
        \object-list HeatingCoilName
        \object-list HeatingCoilsDesuperheater
+       \object-list UserDefinedCoil
        \note Enter the name of the supplemental heating coil if included in the unitary system.
        \note Only required if dehumidification control type is "CoolReheat".
   A20, \field Cooling Supply Air Flow Rate Method
@@ -69564,6 +69577,7 @@ ZoneHVAC:ForcedAir:UserDefined,
    A1,  \field Name
         \required-field
         \type alpha
+        \reference UserDefinedCoil
         \note This is the name of the coil
    A2 , \field Overall Model Simulation Program Calling Manager Name
         \type object-list
