@@ -3640,7 +3640,6 @@ namespace ZoneEquipmentManager {
 		using DataHeatBalance::AddInfiltrationFlow;
 		using DataHeatBalance::AdjustInfiltrationFlow;
 		using DataHeatBalance::NoInfiltrationFlow;
-		using DataHeatBalance::MixingSourceZonesOnly;
 		using DataHeatBalance::AllZones;
 		using DataHeatBalFanSys::ZoneMassBalanceFlag;
 		using DataHeatBalFanSys::ZoneInfiltrationFlag;
@@ -3790,13 +3789,16 @@ namespace ZoneEquipmentManager {
 								} else {
 									MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
 								}
+							} else if ( ZoneAirMassFlow.InfiltrationTreatment == NoInfiltrationFlow ) {
+								MassConservation( ZoneNum ).InfiltrationMassFlowRate = 0.0;
 							}
 						} else {
 							if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
 								MassConservation(ZoneNum).InfiltrationMassFlowRate = Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
-							}
-							if (ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
+							} else if (ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
 								MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+							} else if ( ZoneAirMassFlow.InfiltrationTreatment == NoInfiltrationFlow ) {
+								MassConservation( ZoneNum ).InfiltrationMassFlowRate = 0.0;
 							}
 						}
 					} else {
