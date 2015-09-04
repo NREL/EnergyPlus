@@ -49863,6 +49863,7 @@ Coil:Cooling:DX:SingleSpeed:ThermalStorage,
 EvaporativeCooler:Direct:CelDekPad,
        \memo Direct evaporative cooler with rigid media evaporative pad and recirculating water
        \memo pump. This model has no controls other than its availability schedule.
+       \min-fields 4
   A1 , \field Name
        \type alpha
        \reference EvapCoolerNames
@@ -49875,10 +49876,12 @@ EvaporativeCooler:Direct:CelDekPad,
        \units m2
        \minimum 0.0
        \autosizable
+       \default Autosize
   N2 , \field Direct Pad Depth
        \units m
        \minimum 0.0
        \autosizable
+       \default Autosize
   N3 , \field Recirculating Water Pump Power Consumption
        \units W
        \ip-units W
@@ -49896,6 +49899,7 @@ EvaporativeCooler:Indirect:CelDekPad,
        \memo Indirect evaporative cooler with rigid media evaporative pad, recirculating water
        \memo pump, and secondary air fan. This model has no controls other than its availability
        \memo schedule.
+       \min-fields 4
   A1 , \field Name
        \required-field
        \type alpha
@@ -49909,10 +49913,12 @@ EvaporativeCooler:Indirect:CelDekPad,
        \units m2
        \minimum 0.0
        \autosizable
+       \default Autosize
   N2 , \field Direct Pad Depth
        \units m
        \minimum 0.0
        \autosizable
+       \default Autosize
   N3 , \field Recirculating Water Pump Power Consumption
        \units W
        \ip-units W
@@ -50694,6 +50700,7 @@ HeatExchanger:AirToAir:FlatPlate,
       \minimum> 0.0
       \units m3/s
       \autosizable
+      \default Autosize
   N3, \field Nominal Supply Air Inlet Temperature
       \required-field
       \type real
