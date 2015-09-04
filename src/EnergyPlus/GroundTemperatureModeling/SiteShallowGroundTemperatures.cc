@@ -39,7 +39,6 @@ namespace EnergyPlus {
 		// USE STATEMENTS:
 		using DataEnvironment::GroundTemp_SurfaceObjInput;
 		using DataGlobals::OutputFileInits;
-		using DataGlobals::SecsInDay;
 		using namespace DataIPShortCuts;
 		using namespace GroundTemperatureManager;
 		using namespace ObjexxFCL::gio;

@@ -77,7 +77,16 @@ namespace HVACVariableRefrigerantFlow {
 
 	//MODULE VARIABLE DECLARATIONS:
 	extern bool GetVRFInputFlag; // Flag set to make sure you get input once
+	extern bool MyOneTimeFlag; // One time flag used to allocate MyEnvrnFlag and MySizeFlag
+	extern bool MyOneTimeSizeFlag; // One time flag used to allocate MyEnvrnFlag and MySizeFlag
 	extern Array1D_bool CheckEquipName; // Flag set to check equipment connections once
+	extern bool ZoneEquipmentListNotChecked; // False after the Zone Equipment List has been checked for items
+	extern Array1D_bool MyEnvrnFlag; // Flag for initializing at beginning of each new environment
+	extern Array1D_bool MySizeFlag; // False after TU has been sized
+	extern Array1D_bool MyBeginTimeStepFlag; // Flag to sense beginning of time step
+	extern Array1D_bool MyVRFFlag; // used for sizing VRF inputs one time
+	extern Array1D_bool MyVRFCondFlag; // used to reset timer counter
+	extern Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 	extern int NumVRFCond; // total number of VRF condensers
 	extern int NumVRFTU; // total number of VRF terminal units
 	extern int NumVRFTULists; // The number of VRF TU lists
@@ -1343,6 +1352,11 @@ namespace HVACVariableRefrigerantFlow {
 		Array1S< Real64 > const CapArray, // Array of coil capacities in either cooling or heating mode [W]
 		Real64 & MaxLimit // Maximum terminal unit capacity for coils in same operating mode [W]
 	);
+
+	// Clears the global data in CurveManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 	// End of Utility subroutines for the Module
 	// *****************************************************************************

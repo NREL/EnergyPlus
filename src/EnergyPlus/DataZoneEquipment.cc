@@ -93,6 +93,7 @@ namespace DataZoneEquipment {
 	int NumReturnAirPaths( 0 );
 	bool ZoneEquipInputsFilled( false );
 	bool ZoneEquipSimulatedOnce( false );
+	bool MyOneTimeFlag2( true );
 	int NumOfZoneEquipLists( 0 ); // The Number of Zone Equipment List objects
 	Array1D_int ZoneEquipAvail;
 

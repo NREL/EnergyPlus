@@ -31,7 +31,9 @@ namespace GroundTemperatureManager {
 	int const objectType_XingGroundTemp( 7 );
 
 	Array1D_string const CurrentModuleObjects( 7, { "Site:Groundtemperature:Undisturbed:KusudaAchenbach", "Site:GroundTemperature:Undisturbed:FiniteDifference", "Site:GroundTemperature:BuildingSurface", "Site:GroundTemperature:Shallow", "Site:GroundTemperature:Deep", "Site:GroundTemperature:FCfactorMethod", "Site:GroundTemperature:Undisturbed:Xing"} );
-			
+
+	std::vector < std::shared_ptr < BaseGroundTempsModel > > groundTempModels;
+
 	//******************************************************************************
 
 	std::shared_ptr< BaseGroundTempsModel >

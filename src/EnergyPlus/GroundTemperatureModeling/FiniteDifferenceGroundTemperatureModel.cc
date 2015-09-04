@@ -523,15 +523,10 @@ namespace EnergyPlus {
 		Real64 const convert_Wm2_To_MJhrmin( 3600.0 / 1000000.0 );
 		Real64 const convert_MJhrmin_To_Wm2( 1.0 / convert_Wm2_To_MJhrmin );
 
-		bool static surfConstantsSet;
-
-		using DataEnvironment::Elevation;
-
 		// initialize values
 		numerator = 0.0;
 		denominator = 0.0;
 		resistance = 0.0;
-		surfConstantsSet = false;
 
 		auto & thisCell = cellArray( 1 );
 		auto & cellBelow_thisCell = cellArray( 2 );
@@ -830,7 +825,9 @@ namespace EnergyPlus {
 			Real64 depth = ( thisCell.maxZValue + thisCell.minZValue ) / 2.0;
 			
 			// Initialize temperatures
-			thisCell.temperature = tempModel->getGroundTempAtTimeInSeconds( depth, 0.0 );  // Initialized at first day of year
+			if ( tempModel ) {
+				thisCell.temperature = tempModel->getGroundTempAtTimeInSeconds( depth, 0.0 );  // Initialized at first day of year
+			}
 			thisCell.temperature_finalConvergence = thisCell.temperature;
 			thisCell.temperature_prevIteration = thisCell.temperature;
 			thisCell.temperature_prevTimeStep = thisCell.temperature;

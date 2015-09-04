@@ -6,7 +6,6 @@ set( test_src
   TestHelpers/IdfParser.hh
   Fixtures/EnergyPlusFixture.cc
   Fixtures/EnergyPlusFixture.hh
-  Fixtures/GroundTempsFixture.hh
   Fixtures/HVACFixture.hh
   Fixtures/IdfParserFixture.hh
   Fixtures/InputProcessorFixture.hh
@@ -19,6 +18,7 @@ set( test_src
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
+  DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
@@ -33,7 +33,7 @@ set( test_src
   HeatBalanceManager.unit.cc
   HeatRecovery.unit.cc
   Humidifiers.unit.cc
-  HVACSizingSimulationManager.unit.cc 
+  HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
@@ -49,6 +49,7 @@ set( test_src
   OutputProcessor.unit.cc
   OutputReportTabular.unit.cc
   ReportSizingManager.unit.cc
+  RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc

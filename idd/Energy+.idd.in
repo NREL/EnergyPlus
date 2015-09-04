@@ -1733,84 +1733,9 @@ Site:GroundTemperature:Deep,
        \units C
        \type real
        \default 16
-       
-Site:GroundTemperature:Undisturbed:Xing,
-       \memo Undisturbed ground temperature object using the 
-       \memo Xing 2014 2 harmonic parameter model.
-  A1,  \field Name
-       \required-field
-  N1,  \field Soil Thermal Conductivity
-       \required-field
-       \type real
-       \units W/m-K
-       \minimum> 0.0
-  N2,  \field Soil Density
-       \required-field
-       \type real
-       \units kg/m3
-       \minimum> 0.0
-  N3,  \field Soil Specific Heat
-       \required-field
-       \type real
-       \units J/kg-K
-       \minimum> 0.0
-  N4,  \field Average Soil Surface Tempeature
-       \required-field
-       \type real
-       \units C
-  N5,  \field Soil Surface Temperature Amplitude 1
-       \required-field
-       \type real
-       \units deltaC
-  N6,  \field Soil Surface Temperature Amplitude 2
-       \required-field
-       \type real
-       \units deltaC
-  N7,  \field Phase Shift of Temperature Amplitude 1
-       \required-field
-       \type real
-       \units days
-  N8;  \field Phase Shift of Temperature Amplitude 2
-       \required-field
-       \type real
-       \units days
-       
-Site:GroundTemperature:Undisturbed:KusudaAchenbach,
-       \memo Undisturbed ground temperature object using the 
-       \memo Kusuda-Achenbach 1965 correlation.
-  A1,  \field Name
-       \required-field
-  N1,  \field Soil Thermal Conductivity
-       \required-field
-       \type real
-       \units W/m-K
-       \minimum> 0.0
-  N2,  \field Soil Density
-       \required-field
-       \type real
-       \units kg/m3
-       \minimum> 0.0
-  N3,  \field Soil Specific Heat
-       \required-field
-       \type real
-       \units J/kg-K
-       \minimum> 0.0
-  N4,  \field Average Soil Surface Temperature
-       \type real
-       \units C
-       \note Annual average surface temperature
-  N5,  \field Average Amplitude of Surface Temperature
-       \type real
-       \units deltaC
-       \note Annual average surface temperature variation from average.
-  N6;  \field Phase Shift of Minimum Surface Temperature
-       \type real
-       \units days
-       \note The phase shift of minimum surface temperature, or the day
-       \note of the year when the minimum surface temperature occurs.
-       
+
 Site:GroundTemperature:Undisturbed:FiniteDifference,
-       \memo Undisturbed ground temperature object using a 
+       \memo Undisturbed ground temperature object using a
        \memo detailed finite difference 1-D model
   A1,  \field Name
        \required-field
@@ -1851,8 +1776,83 @@ Site:GroundTemperature:Undisturbed:FiniteDifference,
        \note  = 0   : concrete or other solid, non-permeable ground surface material
        \note  = 0.5 : short grass, much like a manicured lawn
        \note  = 1   : standard reference state (12 cm grass)
-       \note  = 1.5 : wild growth       
-       
+       \note  = 1.5 : wild growth
+
+Site:GroundTemperature:Undisturbed:KusudaAchenbach,
+       \memo Undisturbed ground temperature object using the
+       \memo Kusuda-Achenbach 1965 correlation.
+  A1,  \field Name
+       \required-field
+  N1,  \field Soil Thermal Conductivity
+       \required-field
+       \type real
+       \units W/m-K
+       \minimum> 0.0
+  N2,  \field Soil Density
+       \required-field
+       \type real
+       \units kg/m3
+       \minimum> 0.0
+  N3,  \field Soil Specific Heat
+       \required-field
+       \type real
+       \units J/kg-K
+       \minimum> 0.0
+  N4,  \field Average Soil Surface Temperature
+       \type real
+       \units C
+       \note Annual average surface temperature
+  N5,  \field Average Amplitude of Surface Temperature
+       \type real
+       \units deltaC
+       \note Annual average surface temperature variation from average.
+  N6;  \field Phase Shift of Minimum Surface Temperature
+       \type real
+       \units days
+       \note The phase shift of minimum surface temperature, or the day
+       \note of the year when the minimum surface temperature occurs.
+
+Site:GroundTemperature:Undisturbed:Xing,
+       \memo Undisturbed ground temperature object using the
+       \memo Xing 2014 2 harmonic parameter model.
+  A1,  \field Name
+       \required-field
+  N1,  \field Soil Thermal Conductivity
+       \required-field
+       \type real
+       \units W/m-K
+       \minimum> 0.0
+  N2,  \field Soil Density
+       \required-field
+       \type real
+       \units kg/m3
+       \minimum> 0.0
+  N3,  \field Soil Specific Heat
+       \required-field
+       \type real
+       \units J/kg-K
+       \minimum> 0.0
+  N4,  \field Average Soil Surface Tempeature
+       \required-field
+       \type real
+       \units C
+  N5,  \field Soil Surface Temperature Amplitude 1
+       \required-field
+       \type real
+       \units deltaC
+  N6,  \field Soil Surface Temperature Amplitude 2
+       \required-field
+       \type real
+       \units deltaC
+  N7,  \field Phase Shift of Temperature Amplitude 1
+       \required-field
+       \type real
+       \units days
+  N8;  \field Phase Shift of Temperature Amplitude 2
+       \required-field
+       \type real
+       \units days
+
 Site:GroundDomain:Slab,
         \memo Ground-coupled slab model for on-grade and
         \memo in-grade cases with or without insulation.
@@ -1899,7 +1899,13 @@ Site:GroundDomain:Slab,
         \maximum 100
         \default 50
    A2,  \field Type of Undisturbed Ground Temperature Model
-   A3,  \field Name of Undisturbed Ground Temperature Model 
+        \required-field
+        \type alpha
+        \reference Site:GroundTemperature:Undisturbed:*
+   A3,  \field Name of Undisturbed Ground Temperature Model
+        \required-field
+        \type alpha
+        \reference Name of Site:GroundTemperature:Undisturbed:*
    N9,  \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
@@ -2020,7 +2026,13 @@ Site:GroundDomain:Basement,
         \maximum 100
         \default 50
    A2,  \field Type of Undisturbed Ground Temperature Model
-   A3,  \field Name of Undisturbed Ground Temperature Model 
+        \required-field
+        \type alpha
+        \reference Site:GroundTemperature:Undisturbed:*
+   A3,  \field Name of Undisturbed Ground Temperature Model
+        \required-field
+        \type alpha
+        \reference Name of Site:GroundTemperature:Undisturbed:*
    N9,  \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
@@ -2050,7 +2062,7 @@ Site:GroundDomain:Basement,
         \key Perimeter
         \key Full
         \default Full
-        \note This field specifies whether the horizontal insulation fully insulates 
+        \note This field specifies whether the horizontal insulation fully insulates
         \note the surface or is perimeter only insulation
    N10, \field Perimeter Horizontal Insulation Width
         \type real
@@ -18463,17 +18475,20 @@ RoomAirModelType,
       \note Mundt roomair model for displacement ventilation with single floor air node
       \note needs RoomAirSettings:OneNodeDisplacementVentilation object referencing this Zone
       \key ThreeNodeDisplacementVentilation
-      \note (UCSD three-node displacement ventilation model)
+      \note (ThreeNodeDisplacementVentilation = RoomAir modeling using UCSD three-node displacement ventilation model)
       \note needs RoomAirSettings:ThreeNodeDisplacementVentilation object referencing this Zone
       \key CrossVentilation
-      \note (UCSD two-zone cross ventilation model)
+      \note (CrossVentilation = RoomAir modeling using UCSD two-zone cross ventilation model)
       \note needs RoomAirSettings:CrossVentilation object referencing this Zone
       \key UnderFloorAirDistributionInterior
       \note 2-Node UFAD model for interior zones
       \note needs RoomAirSettings:UnderFloorAirDistributionInterior object referencing this Zone
       \key UnderFloorAirDistributionExterior
-      \note (2-Node UFAD model for exterior zones)
+      \note (UnderFloorAirDistributionExterior = RoomAir modeling using 2-Node UFAD model for exterior zones)
       \note needs RoomAirSettings:UnderFloorAirDistributionExterior object referencing this Zone
+      \key AirflowNetwork
+      \note (AirflowNetwork = RoomAir modeling using AirflowNetwork)
+      \note needs RoomAirSettings:AirflowNetwork object referencing this Zone
       \default Mixing
   A4; \field Air Temperature Coupling Strategy
       \type choice
@@ -19285,6 +19300,408 @@ RoomAirSettings:UnderFloorAirDistributionExterior,
        \type real
        \autocalculatable
        \default Autocalculate
+
+RoomAir:Node:AirflowNetwork,
+      \memo define an air node for some types of nodal air models
+  A1, \field Name
+      \type Alpha
+      \reference RoomAirflowNetworkNodes
+  A2, \field Zone Name
+      \required-field
+      \type object-list
+      \object-list ZoneNames
+  N1, \field Fraction of Zone Air Volume
+      \type real
+      \minimum 0.0
+      \maximum 1.0
+  A3, \field RoomAir:Node:AirflowNetwork:AdjacentSurfaceList Name
+      \type object-list
+      \object-list RoomAirNodeSurfaceLists
+  A4, \field RoomAir:Node:AirflowNetwork:InternalGains Name
+      \type object-list
+      \object-list RoomAirNodeGains
+  A5; \field RoomAir:Node:AirflowNetwork:HVACEquipment Name
+      \type object-list
+      \object-list RoomAirNodeHVACEquipment     
+      
+ RoomAir:Node:AirflowNetwork:AdjacentSurfaceList, 
+       \extensible:1
+       \min-fields 2
+  A1,  \field Name
+       \type Alpha
+       \reference RoomAirNodeSurfaceLists       
+  A2 , \field Surface 1 Name
+       \begin-extensible
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A3 , \field Surface 2 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A4 , \field Surface 3 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A5 , \field Surface 4 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A6 , \field Surface 5 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A7 , \field Surface 6 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A8, \field Surface 7 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A9, \field Surface 8 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A10, \field Surface 9 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A11, \field Surface 10 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A12, \field Surface 11 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A13, \field Surface 12 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A14, \field Surface 13 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A15, \field Surface 14 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A16, \field Surface 15 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A17, \field Surface 16 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A18, \field Surface 17 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A19, \field Surface 18 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A20, \field Surface 19 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A21, \field Surface 20 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A22; \field Surface 21 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+
+RoomAir:Node:AirflowNetwork:InternalGains,
+      \extensible:4
+      \min-fields 5
+      \memo define the internal gains that are associated with one particular RoomAir:Node
+  A1, \field Name
+      \type Alpha
+      \reference RoomAirNodeGains
+  A2, \field Internal Gain Object 1 Type
+      \begin-extensible
+      \type choice
+      \key People
+      \key Lights
+      \key ElectricEquipment
+      \key GasEquipment
+      \key HotWaterEquipment
+      \key SteamEquipment
+      \key OtherEquipment
+      \key ZoneBaseboard:OutdoorTemperatureControlled
+      \key ZoneContaminantSourceAndSink:CarbonDioxide
+      \key WaterUse:Equipment     
+      \key DaylightingDevice:Tubular
+      \key WaterHeater:Mixed
+      \key WaterHeater:Stratified
+      \key ThermalStorage:ChilledWater:Mixed
+      \key ThermalStorage:ChilledWater:Stratified
+      \key Generator:FuelCell
+      \key Generator:MicroCHP
+      \key ElectricLoadCenter:Transformer
+      \key ElectricLoadCenter:Inverter:Simple
+      \key ElectricLoadCenter:Inverter:FunctionOfPower
+      \key ElectricLoadCenter:Inverter:LookUpTable
+      \key ElectricLoadCenter:Storage:Battery
+      \key ElectricLoadCenter:Storage:Simple
+      \key Pipe:Indoor
+      \key Refrigeration:Case
+      \key Refrigeration:CompressorRack
+      \key Refrigeration:System:Condenser:AirCooled
+      \key Refrigeration:TranscriticalSystem:GasCooler:AirCooled
+      \key Refrigeration:System:SuctionPipe
+      \key Refrigeration:TranscriticalSystem:SuctionPipeMT
+      \key Refrigeration:TranscriticalSystem:SuctionPipeLT
+      \key Refrigeration:SecondarySystem:Receiver
+      \key Refrigeration:SecondarySystem:Pipe
+      \key Refrigeration:WalkIn
+      \key Pump:VariableSpeed
+      \key Pump:ConstantSpeed
+      \key Pump:VariableSpeed:Condensate
+      \key HeaderedPumps:VariableSpeed
+      \key HeaderedPumps:ConstantSpeed
+      \key ZoneContaminantSourceAndSink:GenericContaminant
+      \key PlantComponent:UserDefined
+      \key Coil:UserDefined
+      \key ZoneHVAC:ForcedAir:UserDefined
+      \key AirTerminal:SingleDuct:UserDefined   
+  A3, \field Internal Gain Object 1 Name
+      \type alpha
+  N1, \field Fraction of Gains to Node 1 
+      \type real
+      \mininum 0.0
+      \maximum 1.0
+      \note fraction applies to sensible, latent, carbon dioxide, and generic contaminant gains or losses  
+  A4, \field Internal Gain Object 2 Type
+      \type choice
+      \key People
+      \key Lights
+      \key ElectricEquipment
+      \key GasEquipment
+      \key HotWaterEquipment
+      \key SteamEquipment
+      \key OtherEquipment
+      \key ZoneBaseboard:OutdoorTemperatureControlled
+      \key ZoneContaminantSourceAndSink:CarbonDioxide
+      \key WaterUse:Equipment     
+      \key DaylightingDevice:Tubular
+      \key WaterHeater:Mixed
+      \key WaterHeater:Stratified
+      \key ThermalStorage:ChilledWater:Mixed
+      \key ThermalStorage:ChilledWater:Stratified
+      \key Generator:FuelCell
+      \key Generator:MicroCHP
+      \key ElectricLoadCenter:Transformer
+      \key ElectricLoadCenter:Inverter:Simple
+      \key ElectricLoadCenter:Inverter:FunctionOfPower
+      \key ElectricLoadCenter:Inverter:LookUpTable
+      \key ElectricLoadCenter:Storage:Battery
+      \key ElectricLoadCenter:Storage:Simple
+      \key Pipe:Indoor
+      \key Refrigeration:Case
+      \key Refrigeration:CompressorRack
+      \key Refrigeration:System:Condenser:AirCooled
+      \key Refrigeration:TranscriticalSystem:GasCooler:AirCooled
+      \key Refrigeration:System:SuctionPipe
+      \key Refrigeration:TranscriticalSystem:SuctionPipeMT
+      \key Refrigeration:TranscriticalSystem:SuctionPipeLT
+      \key Refrigeration:SecondarySystem:Receiver
+      \key Refrigeration:SecondarySystem:Pipe
+      \key Refrigeration:WalkIn
+      \key Pump:VariableSpeed
+      \key Pump:ConstantSpeed
+      \key Pump:VariableSpeed:Condensate
+      \key HeaderedPumps:VariableSpeed
+      \key HeaderedPumps:ConstantSpeed
+      \key ZoneContaminantSourceAndSink:GenericContaminant
+      \key PlantComponent:UserDefined
+      \key Coil:UserDefined
+      \key ZoneHVAC:ForcedAir:UserDefined
+      \key AirTerminal:SingleDuct:UserDefined  
+  A5, \field Internal Gain Object 2 Name
+      \type alpha
+  N2, \field Fraction of Gains to Node 2
+      \type real
+      \mininum 0.0
+      \maximum 1.0
+  A6, \field Internal Gain Object 3 Type
+      \type choice
+      \key People
+      \key Lights
+      \key ElectricEquipment
+      \key GasEquipment
+      \key HotWaterEquipment
+      \key SteamEquipment
+      \key OtherEquipment
+      \key ZoneBaseboard:OutdoorTemperatureControlled
+      \key ZoneContaminantSourceAndSink:CarbonDioxide
+      \key WaterUse:Equipment     
+      \key DaylightingDevice:Tubular
+      \key WaterHeater:Mixed
+      \key WaterHeater:Stratified
+      \key ThermalStorage:ChilledWater:Mixed
+      \key ThermalStorage:ChilledWater:Stratified
+      \key Generator:FuelCell
+      \key Generator:MicroCHP
+      \key ElectricLoadCenter:Transformer
+      \key ElectricLoadCenter:Inverter:Simple
+      \key ElectricLoadCenter:Inverter:FunctionOfPower
+      \key ElectricLoadCenter:Inverter:LookUpTable
+      \key ElectricLoadCenter:Storage:Battery
+      \key ElectricLoadCenter:Storage:Simple
+      \key Pipe:Indoor
+      \key Refrigeration:Case
+      \key Refrigeration:CompressorRack
+      \key Refrigeration:System:Condenser:AirCooled
+      \key Refrigeration:TranscriticalSystem:GasCooler:AirCooled
+      \key Refrigeration:System:SuctionPipe
+      \key Refrigeration:TranscriticalSystem:SuctionPipeMT
+      \key Refrigeration:TranscriticalSystem:SuctionPipeLT
+      \key Refrigeration:SecondarySystem:Receiver
+      \key Refrigeration:SecondarySystem:Pipe
+      \key Refrigeration:WalkIn
+      \key Pump:VariableSpeed
+      \key Pump:ConstantSpeed
+      \key Pump:VariableSpeed:Condensate
+      \key HeaderedPumps:VariableSpeed
+      \key HeaderedPumps:ConstantSpeed
+      \key ZoneContaminantSourceAndSink:GenericContaminant
+      \key PlantComponent:UserDefined
+      \key Coil:UserDefined
+      \key ZoneHVAC:ForcedAir:UserDefined
+      \key AirTerminal:SingleDuct:UserDefined  
+  A7, \field Internal Gain Object 3 Name
+      \type alpha
+  N3; \field Fraction of Gains to Node 3
+      \type real
+      \mininum 0.0
+      \maximum 1.0
+
+RoomAir:Node:AirflowNetwork:HVACEquipment,
+      \extensible:4
+      \memo define the zone equipment associated with one particular RoomAir:Node
+  A1, \field Name
+      \type Alpha
+      \reference RoomAirNodeHVACEquipment
+  A2, \field ZoneHVAC or Air Terminal Equipment Object Type 1
+      \begin-extensible
+      \type choice
+      \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+      \key ZoneHVAC:EnergyRecoveryVentilator
+      \key ZoneHVAC:FourPipeFanCoil
+      \key ZoneHVAC:OutdoorAirUnit
+      \key ZoneHVAC:PackagedTerminalAirConditioner
+      \key ZoneHVAC:PackagedTerminalHeatPump
+      \key ZoneHVAC:UnitHeater
+      \key ZoneHVAC:UnitVentilator
+      \key ZoneHVAC:VentilatedSlab
+      \key ZoneHVAC:WaterToAirHeatPump
+      \key ZoneHVAC:WindowAirConditioner
+      \key ZoneHVAC:Baseboard:RadiantConvective:Electric
+      \key ZoneHVAC:Baseboard:RadiantConvective:Water
+      \key ZoneHVAC:Baseboard:RadiantConvective:Steam
+      \key ZoneHVAC:Baseboard:Convective:Electric
+      \key ZoneHVAC:Baseboard:Convective:Water
+      \key ZoneHVAC:HighTemperatureRadiant
+      \key ZoneHVAC:Dehumidifier:DX
+      \key ZoneHVAC:IdealLoadsAirSystem
+      \key ZoneHVAC:RefrigerationChillerSet
+      \key Fan:ZoneExhaust
+      \key WaterHeater:HeatPump
+      \key AirTerminal:SingleDuct:Uncontrolled       
+      \key AirTerminal:DualDuct:ConstantVolume
+      \key AirTerminal:DualDuct:VAV
+      \key AirTerminal:SingleDuct:ConstantVolume:Reheat
+      \key AirTerminal:SingleDuct:VAV:Reheat
+      \key AirTerminal:SingleDuct:VAV:NoReheat
+      \key AirTerminal:SingleDuct:SeriesPIU:Reheat
+      \key AirTerminal:SingleDuct:ParallelPIU:Reheat
+      \key AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction
+      \key AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan
+      \key AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat
+      \key AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat
+      \key AirTerminal:SingleDuct:ConstantVolume:CooledBeam
+      \key AirTerminal:DualDuct:VAV:OutdoorAir
+      \key AirLoopHVACReturnAir
+  A3, \field ZoneHVAC or Air Terminal Equipment Object Name 1
+      \type alpha
+      \note for object type AirLoopHVACReturnAir, then enter zone return air node name 
+  N1, \field Fraction of Output or Supply Air from HVAC Equipment 1 
+      \type real
+      \minimum 0.0
+      \maximum 1.0
+      \note 
+  N2, \field Fraction of Input or Return Air to HVAC Equipment 1
+      \type real
+      \minimum 0.0
+      \maximum 1.0        
+  A4, \field ZoneHVAC or Air Terminal Equipment Object Type 2
+      \type choice
+      \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+      \key ZoneHVAC:EnergyRecoveryVentilator
+      \key ZoneHVAC:FourPipeFanCoil
+      \key ZoneHVAC:OutdoorAirUnit
+      \key ZoneHVAC:PackagedTerminalAirConditioner
+      \key ZoneHVAC:PackagedTerminalHeatPump
+      \key ZoneHVAC:UnitHeater
+      \key ZoneHVAC:UnitVentilator
+      \key ZoneHVAC:VentilatedSlab
+      \key ZoneHVAC:WaterToAirHeatPump
+      \key ZoneHVAC:WindowAirConditioner
+      \key ZoneHVAC:Baseboard:RadiantConvective:Electric
+      \key ZoneHVAC:Baseboard:RadiantConvective:Water
+      \key ZoneHVAC:Baseboard:RadiantConvective:Steam
+      \key ZoneHVAC:Baseboard:Convective:Electric
+      \key ZoneHVAC:Baseboard:Convective:Water
+      \key ZoneHVAC:HighTemperatureRadiant
+      \key ZoneHVAC:Dehumidifier:DX
+      \key ZoneHVAC:IdealLoadsAirSystem
+      \key ZoneHVAC:RefrigerationChillerSet
+      \key Fan:ZoneExhaust
+      \key WaterHeater:HeatPump
+      \key AirTerminal:SingleDuct:Uncontrolled       
+      \key AirTerminal:DualDuct:ConstantVolume
+      \key AirTerminal:DualDuct:VAV
+      \key AirTerminal:SingleDuct:ConstantVolume:Reheat
+      \key AirTerminal:SingleDuct:VAV:Reheat
+      \key AirTerminal:SingleDuct:VAV:NoReheat
+      \key AirTerminal:SingleDuct:SeriesPIU:Reheat
+      \key AirTerminal:SingleDuct:ParallelPIU:Reheat
+      \key AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction
+      \key AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan
+      \key AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat
+      \key AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat
+      \key AirTerminal:SingleDuct:ConstantVolume:CooledBeam
+      \key AirTerminal:DualDuct:VAV:OutdoorAir
+  A5, \field ZoneHVAC or Air Terminal Equipment Object Name 2
+      \type alpha
+  N3, \field Fraction of Output or Supply Air from HVAC Equipment 2 
+      \type real
+      \minimum 0.0
+      \maximum 1.0  
+  N4; \field Fraction of Input or Return Air to HVAC Equipment 2
+      \type real
+      \minimum 0.0
+      \maximum 1.0  
+
+RoomAirSettings:AirflowNetwork, 
+       \extensible:1
+       \memo RoomAir modeling using Airflow pressure network solver 
+       \min-fields 5
+  A1 , \field Name
+       \required-field
+       \type alpha
+  A2 , \field Zone Name
+       \note Name of Zone being described. Any existing zone name
+       \required-field
+       \type object-list
+       \object-list ZoneNames
+  A3 , \field Control Point RoomAirflowNetwork:Node Name
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+  A4 , \field RoomAirflowNetwork:Node Name 1
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+       \begin-extensible
+  A5 , \field RoomAirflowNetwork:Node Name 2
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+  A6 , \field RoomAirflowNetwork:Node Name 3
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+  A7 , \field RoomAirflowNetwork:Node Name 4
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+  A8 , \field RoomAirflowNetwork:Node Name 5
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+  A9 ; \field RoomAirflowNetwork:Node Name 6
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
 
 \group Internal Gains
 
@@ -23732,6 +24149,68 @@ AirflowNetwork:OccupantVentilationControl,
       \type object-list
       \object-list ScheduleNames
       \note If this field is blank, the closing probability check is bypassed and closing is true.
+
+AirflowNetwork:IntraZone:Node,
+      \min-fields 2
+      \memo This object represents a node in a zone in the combination of RoomAir and 
+      \memo AirflowNetwork model.
+ A1 , \field Name
+      \required-field
+      \type alpha
+      \reference AirflowNetworkNodeNames
+      \note Enter a unique name for this object.
+ A2 , \field RoomAir:Node:AirflowNetwork Name
+      \required-field
+      \type alpha
+      \object-list RoomAirflowNetworkNodes
+      \note Enter the name of a RoomAir:Node object defined in a RoomAirSettings:AirflowNetwork 
+      \note object.
+ A3 , \field Zone Name
+      \required-field
+      \type alpha
+      \object-list AirflowNetwork:MultiZone:Zone
+      \note Enter the name of a zone object defined in a AirflowNetwork:MultiZone:Zone
+      \note object.
+ N1 ; \field Node Height
+      \type real
+      \units m
+      \default 0.0
+      \note Enter the reference height used to calculate the relative pressure
+
+AirflowNetwork:IntraZone:Linkage,
+      \min-fields 4
+      \memo This object defines the connection between two nodes and a component used 
+      \memo in the combination of RoomAir and AirflowNetwork model.
+ A1 , \field Name
+      \required-field
+      \type alpha
+      \note Enter a unique name for this object.
+      \reference AirflowNetwork LinkageNames
+ A2 , \field Node 1 Name
+      \required-field
+      \type alpha
+      \object-list AirflowNetworkNodeNames
+      \object-list ZoneNames
+      \note Enter the name of zone or AirflowNetwork Node.
+ A3 , \field Node 2 Name
+      \required-field
+      \type alpha
+      \object-list AirflowNetworkNodeNames
+      \object-list ZoneNames
+      \note Enter the name of zone or AirflowNetwork Node.
+ A4 , \field Component Name
+      \type object-list
+      \object-list AirflowNetworkComponentNames
+      \note Enter the name of an AirflowNetwork component. A component is one of the
+      \note following AirflowNetwork:Multizone:Component objects:      
+      \note AirflowNetwork:MultiZone:Surface:Crack,
+      \note AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,
+      \note If the next field is specified, this field can be either blank or ignored.
+ A5 ; \field AirflowNetwork:MultiZone:Surface Name
+      \type object-list
+      \object-list SurfAndSubSurfNames
+      \note Only used when one of two nodes defined above are not located in the same zone, and
+      \note the input of the Component Name field in this object is ignored
 
 \group Exterior Equipment
        ! This equipment is used merely for reporting.
@@ -30701,9 +31180,33 @@ Sizing:Zone,
       \minimum 0
       \default 0.3
       \note This input is used for autosizing components when Heating Design Air Flow Method = DesignDayWithLimit.
-  A7; \field Design Specification Zone Air Distribution Object Name
+  A7, \field Design Specification Zone Air Distribution Object Name
       \type object-list
       \object-list DesignSpecificationZoneAirDistributionNames
+  A8, \field Account for Dedicated Outdoor Air System
+      \note account for effect of dedicated outdoor air system supplying air directly to the zone
+      \type choice
+      \key Yes
+      \key No
+      \default No
+  A9, \field Dedicated Outdoor Air System Control Strategy
+      \note 1)supply neutral ventilation air; 2)supply neutral dehumidified and reheated 
+      \note ventilation air; 3)supply cold ventilation air
+      \type choice
+      \key NeutralSupplyAir
+      \key NeutralDehumidifiedSupplyAir
+      \key ColdSupplyAir
+      \default NeutralSupplyAir
+  N17,\field Dedicated Outdoor Air Low Setpoint Temperature for Design
+      \type real
+      \units C
+      \autosizable
+      \default autosize
+  N18;\field Dedicated Outdoor Air High Setpoint Temperature for Design
+      \type real
+      \units C
+      \autosizable
+      \default autosize
 
 DesignSpecification:ZoneHVAC:Sizing,
   \min-fields 1
@@ -57302,7 +57805,13 @@ Pipe:Underground,
         \type alpha
         \required-field
    A7,  \field Type of Undisturbed Ground Temperature Model
-   A8;  \field Name of Undisturbed Ground Temperature Model 
+        \required-field
+        \type alpha
+        \reference Site:GroundTemperature:Undisturbed:*
+   A8;  \field Name of Undisturbed Ground Temperature Model
+        \required-field
+        \type alpha
+        \reference Name of Site:GroundTemperature:Undisturbed:*
 
 PipingSystem:Underground:Domain,
         \memo The ground domain object for underground piping system simulation.
@@ -57410,7 +57919,13 @@ PipingSystem:Underground:Domain,
         \maximum 100
         \default 50
    A5,  \field Type of Undisturbed Ground Temperature Model
-   A6,  \field Name of Undisturbed Ground Temperature Model 
+        \required-field
+        \type alpha
+        \reference Site:GroundTemperature:Undisturbed:*
+   A6,  \field Name of Undisturbed Ground Temperature Model
+        \required-field
+        \type alpha
+        \reference Name of Site:GroundTemperature:Undisturbed:*
    A7,  \field This Domain Includes Basement Surface Interaction
         \type choice
         \key Yes
@@ -64012,7 +64527,13 @@ GroundHeatExchanger:HorizontalTrench,
         \maximum 100
         \default 50
    A4,  \field Type of Undisturbed Ground Temperature Model
+        \required-field
+        \type alpha
+        \reference Site:GroundTemperature:Undisturbed:*
    A5,  \field Name of Undisturbed Ground Temperature Model
+        \required-field
+        \type alpha
+        \reference Name of Site:GroundTemperature:Undisturbed:*
    N16; \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
@@ -64024,9 +64545,9 @@ GroundHeatExchanger:HorizontalTrench,
         \note  = 0.5 : short grass, much like a manicured lawn
         \note  = 1   : standard reference state (12 cm grass)
         \note  = 1.5 : wild growth
-        
+
 GroundHeatExchanger:Slinky,
-        \memo This models a slinky horizontal heat exchanger 
+        \memo This models a slinky horizontal heat exchanger
         \memo placed in a series of trenches
         \memo The model uses the model developed by:
         \memo Xiong, Z., D.E. Fisher, and J.D. Spitler. 2015.
@@ -64049,7 +64570,7 @@ GroundHeatExchanger:Slinky,
         \type real
         \units W/m-K
         \minimum> 0
-        \default 1.08        
+        \default 1.08
    N3 , \field Soil Density
         \type real
         \units kg/m3
@@ -64081,7 +64602,7 @@ GroundHeatExchanger:Slinky,
         \units m
         \minimum> 0
         \ip-units in
-        \default 0.02667        
+        \default 0.02667
    N9 , \field Pipe Thickness
         \type real
         \units m
@@ -64099,14 +64620,14 @@ GroundHeatExchanger:Slinky,
         \units m
         \minimum> 0
         \ip-units ft
-        \default 1.0       
+        \default 1.0
    N11, \field Coil Pitch
         \note This is the center-to-center distance between coils
         \type real
         \units m
         \minimum> 0
         \ip-units ft
-        \default 0.20   
+        \default 0.20
    N12, \field Trench Depth
         \note This is the distance from the ground surface to the
         \note trench bottom
@@ -64114,24 +64635,24 @@ GroundHeatExchanger:Slinky,
         \units m
         \minimum> 0
         \ip-units ft
-        \default 1.8     
+        \default 1.8
    N13, \field Trench Length
         \note This is the total length of a single trench
-        \note This assumes the heat exchanger runs the full length 
+        \note This assumes the heat exchanger runs the full length
         \note of the trench
         \type real
         \units m
         \minimum> 0
         \ip-units ft
-        \default 10 
+        \default 10
    N14, \field Number of Trenches
-        \note This is the number of parallel trenches that 
+        \note This is the number of parallel trenches that
         \note has a heat exchanger, one per trench
         \type integer
         \minimum 1
         \default 1
    N15, \field Horizontal Spacing Between Pipes
-        \note This represents the average horizontal spacing 
+        \note This represents the average horizontal spacing
         \note between any two
         \note trenches for heat exchangers that have multiple trenches
         \type real
@@ -64140,7 +64661,13 @@ GroundHeatExchanger:Slinky,
         \ip-units ft
         \default 2.0
    A5,  \field Type of Undisturbed Ground Temperature Model
-   A6,  \field Name of Undisturbed Ground Temperature Model 
+        \required-field
+        \type alpha
+        \reference Site:GroundTemperature:Undisturbed:*
+   A6,  \field Name of Undisturbed Ground Temperature Model
+        \required-field
+        \type alpha
+        \reference Name of Site:GroundTemperature:Undisturbed:*
    N16; \field Maximum Length of Simulation
         \type real
         \units years

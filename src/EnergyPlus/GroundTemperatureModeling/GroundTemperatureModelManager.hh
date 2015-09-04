@@ -23,7 +23,7 @@ namespace GroundTemperatureManager {
 
 	extern Array1D_string const CurrentModuleObjects;
 
-	static std::vector < std::shared_ptr < BaseGroundTempsModel > > groundTempModels;
+	extern std::vector < std::shared_ptr < BaseGroundTempsModel > > groundTempModels;
 
 	std::shared_ptr< BaseGroundTempsModel >
 	GetGroundTempModelAndInit(
