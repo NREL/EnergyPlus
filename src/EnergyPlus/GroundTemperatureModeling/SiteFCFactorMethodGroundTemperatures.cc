@@ -47,6 +47,7 @@ namespace EnergyPlus {
 
 		// Locals
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		bool found = false;
 		int NumNums;
 		int NumAlphas;
 		int IOStat;
@@ -76,6 +77,7 @@ namespace EnergyPlus {
 			}
 
 			FCGroundTemps = true;
+			found = true;
 
 		} else if ( numCurrObjects > 1 ) {
 			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
@@ -88,10 +90,11 @@ namespace EnergyPlus {
 			}
 
 			FCGroundTemps = true;
+			found = true;
 
 		} else {
 			thisModel->fcFactorGroundTemps = 0.0;
-			FCGroundTemps = true;
+			found = true;
 		}
 
 		// Write Final Ground Temp Information to the initialization output file
@@ -101,7 +104,7 @@ namespace EnergyPlus {
 			for	( int i = 1; i <= 12; ++i ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << thisModel->fcFactorGroundTemps( i ); gio::write( OutputFileInits );
 		}
 
-		if ( FCGroundTemps && !thisModel->errorsFound ) {
+		if ( found && !thisModel->errorsFound ) {
 			groundTempModels.push_back( thisModel );
 			return thisModel;
 		} else {
