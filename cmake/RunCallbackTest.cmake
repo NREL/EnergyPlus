@@ -5,7 +5,7 @@
   # Currently the TestEnergyPlusCallbacks runner does not exit. Give it an idf and supporting files so that it will run.
   execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "${SOURCE_DIR}/testfiles/${IDF_FILE}" "${BINARY_DIR}/${TEST_DIR}/in.idf" )
   execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "${SOURCE_DIR}/weather/${EPW_FILE}" "${BINARY_DIR}/${TEST_DIR}/in.epw" )
-  execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "${BINARY_DIR}/Energy+.idd" "${BINARY_DIR}/${TEST_DIR}/Energy+.idd" )
+  execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "${BINARY_DIR}/Products/Energy+.idd" "${BINARY_DIR}/${TEST_DIR}/Energy+.idd" )
 
   # Find and execute the test executable, passing the argument of the directory to run in
   if( WIN32 )
