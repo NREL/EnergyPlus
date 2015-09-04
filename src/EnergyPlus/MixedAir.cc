@@ -3281,7 +3281,7 @@ namespace MixedAir {
 					// if flow rate has been specified by a manager, set it to the specified value
 					OAController( OAControllerNum ).MixMassFlow = AirLoopFlow( AirLoopNum ).ReqSupplyFrac * AirLoopFlow( AirLoopNum ).DesSupply;
 				} else {
-					OAController( OAControllerNum ).MixMassFlow = min( ( Node( OAController( OAControllerNum ).RetNode ).MassFlowRate + OAController( OAControllerNum ).ExhMassFlow ), AirLoopFlow( AirLoopNum ).DesSupply );
+					OAController( OAControllerNum ).MixMassFlow = Node( OAController( OAControllerNum ).RetNode ).MassFlowRate + OAController( OAControllerNum ).ExhMassFlow;
 				}
 			} else {
 				OAController( OAControllerNum ).ExhMassFlow = 0.0;
