@@ -27,13 +27,10 @@ namespace OutputReportTabularAnnual {
 	// these functions are not in the class and act as an interface between procedural code and object oriented
 
 	void
-	GetInputTabularAnnual(); 
+	GetInputTabularAnnual();
 
 	void
 	GatherAnnualResultsForTimeStep( int kindOfTypeStep );
-
-	void
-	GatherAnnualOneTimeEntries();
 
 	void
 	WriteAnnualTables();
@@ -44,7 +41,8 @@ namespace OutputReportTabularAnnual {
 	AnnualFieldSet::AggregationKind
 	stringToAggKind( std::string inString );
 
-
+	void
+	clear_state(); // for unit tests
 
 class AnnualTable
 {
@@ -62,7 +60,7 @@ public:
 	AnnualTable(
 		std::string name,
 		std::string filter,
-		std::string scheduleName ) 
+		std::string scheduleName )
 	{
 		m_name = name;
 		m_filter = filter;
@@ -87,16 +85,20 @@ public:
 	gatherForTimestep( int kindOfTypeStep );
 
 	void
-	gatherOneTimeEntries();
-
-	void
 	writeTable( int unitsStyle );
 
 	void
 	addTableOfContents( std::ostream & );
 
+	std::vector<std::string>
+	inspectTable();
+
+	std::vector<std::string>
+	inspectTableFieldSets(int);
+
 	void
-	clear_state(); // for unit tests
+	AnnualTable::clearTable();
+
 
 
 private:
@@ -112,7 +114,7 @@ private:
 	Real64
 	getElapsedTime( int );
 
-	Real64 
+	Real64
 	getSecondsInTimeStep( int );
 
 	void
@@ -126,7 +128,7 @@ private:
 
 	int
 	columnCountForAggregation( AnnualFieldSet::AggregationKind curAgg );
-	
+
 	std::string
 	trim( const std::string& str );
 
@@ -140,16 +142,20 @@ private:
 	convertUnitForDeferredResults( std::vector<AnnualFieldSet>::iterator fldStIt, int const unitsStyle );
 
 	std::vector<Real64>
-	calculateBins( int const numberOfBins, 
+	calculateBins( int const numberOfBins,
 		               std::vector<Real64> const valuesToBin,
-					   std::vector<Real64> const corrElapsedTime, 
-					   Real64 const topOfBins, 
-					   Real64 const bottomOfBins, 
-					   Real64 & timeAboveTopBin, 
+					   std::vector<Real64> const corrElapsedTime,
+					   Real64 const topOfBins,
+					   Real64 const bottomOfBins,
+					   Real64 & timeAboveTopBin,
 					   Real64 & timeBelowBottomBin );
 
+	void
+	columnHeadersToTitleCase();
 
 }; // class AnnualTable
+
+extern std::vector<AnnualTable> annualTables;
 
 } // namespace OutputReportTabularAnnual
 

@@ -4777,7 +4777,6 @@ namespace OutputReportTabular {
 
 		FillWeatherPredefinedEntries();
 		FillRemainingPredefinedEntries();
-		OutputReportTabularAnnual::GatherAnnualOneTimeEntries();
 
 		if ( WriteTabularFiles ) {
 			// call each type of report in turn

@@ -61,7 +61,7 @@ namespace EnergyPlus {
 			std::string curAggTyp( "" );
 			int curNumDgts( 2 );
 			AnnualFieldSet::AggregationKind curAgg( AnnualFieldSet::AggregationKind::sumOrAvg );
-			 
+
 			objCount = InputProcessor::GetNumObjectsFound( currentModuleObject );
 			if ( objCount > 0 ) {
 				// if not a run period using weather do not create reports
@@ -111,7 +111,7 @@ namespace EnergyPlus {
 		// into the class data.
 		{
 			m_annualFields.push_back(AnnualFieldSet(varName,aggKind, dgts)  );
-			m_annualFields.back().m_colHead = InputProcessor::deAllCaps(varName); // use the variable name for the column heading
+			m_annualFields.back().m_colHead = varName; // use the variable name for the column heading
 		}
 
 		void
@@ -127,16 +127,16 @@ namespace EnergyPlus {
 		void
 		AnnualTable::setupGathering()
 		// Jason Glazer, August 2015
-		// This method is used after GetInput for REPORT:TABLE:ANNUAL to set up how output variables, meters, 
-		// input fields, and ems variables are gathered. 
+		// This method is used after GetInput for REPORT:TABLE:ANNUAL to set up how output variables, meters,
+		// input fields, and ems variables are gathered.
 		{
 			int keyCount = 0;
 			int typeVar = 0;
 			int avgSumVar = 0;
 			int stepTypeVar = 0;
 			std::string unitsVar = "";
-			Array1D_string namesOfKeys; // keyNames 
-			Array1D_int indexesForKeyVar; // keyVarIndexes 
+			Array1D_string namesOfKeys; // keyNames
+			Array1D_int indexesForKeyVar; // keyVarIndexes
 			std::list<std::string> allKeys;
 
 			std::string filterFieldUpper = m_filter;
@@ -144,8 +144,7 @@ namespace EnergyPlus {
 			bool useFilter = (m_filter.size() != 0);
 
 			std::vector<AnnualFieldSet>::iterator fldStIt;
-			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ )
-				{
+			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
 				keyCount = fldStIt->getVariableKeyCountandTypeFromFldSt( typeVar, avgSumVar, stepTypeVar, unitsVar );
 				fldStIt->getVariableKeysFromFldSt( typeVar, keyCount, fldStIt->m_namesOfKeys, fldStIt->m_indexesForKeyVar );
 				for ( std::string nm : fldStIt->m_namesOfKeys ){
@@ -164,12 +163,12 @@ namespace EnergyPlus {
 			allKeys.sort();
 			allKeys.unique(); // will now just have a list of the unique keys that is sorted
 			std::copy( allKeys.begin(), allKeys.end(), back_inserter( m_objectNames) );  // copy list to the object names
-			// size all columns list of cells to be the size of the 
+			// size all columns list of cells to be the size of the
 			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ )
 			{
 				fldStIt->m_cell.resize( m_objectNames.size() );
 			}
-			// for each column (field set) set the rows cell to the output variable index (for variables) 
+			// for each column (field set) set the rows cell to the output variable index (for variables)
 			int foundKeyIndex;
 			int tableRowIndex = 0;
 			for ( std::vector<std::string>::iterator objNmIt = m_objectNames.begin(); objNmIt != m_objectNames.end(); objNmIt++ ){
@@ -218,9 +217,9 @@ namespace EnergyPlus {
 			int timestepTimeStamp;
 			Real64 elapsedTime = AnnualTable::getElapsedTime( kindOfTimeStep );
 			Real64 secondsInTimeStep = AnnualTable::getSecondsInTimeStep( kindOfTimeStep );
-			bool activeMinMax = false; 
-			bool activeHoursShown = false; 
-			// if schedule is used and the current value is zero, don't gather values 
+			bool activeMinMax = false;
+			bool activeHoursShown = false;
+			// if schedule is used and the current value is zero, don't gather values
 			if ( m_scheduleNum != 0 ){
 				if ( ScheduleManager::GetCurrentScheduleValue( m_scheduleNum ) == 0.0 ){
 					return;
@@ -251,7 +250,7 @@ namespace EnergyPlus {
 							int minuteCalculated = General::DetermineMinuteForReporting( kindOfTimeStep );
 							General::EncodeMonDayHrMin( timestepTimeStamp, DataEnvironment::Month, DataEnvironment::DayOfMonth, DataGlobals::HourOfDay, minuteCalculated );
 							// perform the selected aggregation type
-							// the following types of aggregations are not gathered at this point: 
+							// the following types of aggregations are not gathered at this point:
 							// noAggregation, valueWhenMaxMin, sumOrAverageHoursShown, 	maximumDuringHoursShown, minimumDuringHoursShown:
 							switch ( fldStIt->m_aggregate ){
 							case AnnualFieldSet::AggregationKind::sumOrAvg:
@@ -365,7 +364,7 @@ namespace EnergyPlus {
 									fldStIt->m_cell[row].deferredResults.push_back( curValue /= secondsInTimeStep ); // divide by time just like max and min
 								}
 								else {
-									fldStIt->m_cell[row].deferredResults.push_back( curValue ); 
+									fldStIt->m_cell[row].deferredResults.push_back( curValue );
 								}
 								fldStIt->m_cell[row].deferredElapsed.push_back(elapsedTime); //save the amount of time for this particular value
 								newDuration = oldDuration + elapsedTime;
@@ -483,7 +482,7 @@ namespace EnergyPlus {
 			}
 			return elapsedTime;
 		}
-		
+
 		Real64
 		AnnualTable::getSecondsInTimeStep( int kindOfTimeStep )
 		{
@@ -495,20 +494,6 @@ namespace EnergyPlus {
 				secondsInTimeStep = DataGlobals::TimeStepZoneSec;
 			}
 			return secondsInTimeStep;
-		}
-
-
-		void
-		GatherAnnualOneTimeEntries()
-		{
-
-		}
-
-
-		void
-		AnnualTable::gatherOneTimeEntries()
-		{
-
 		}
 
 		void
@@ -557,6 +542,9 @@ namespace EnergyPlus {
 			// Compute the columns related to the binning schemes
 			computeBinColumns();
 
+			// Use title case names of variables if available for column headers
+			columnHeadersToTitleCase();
+
 			// first loop through and count how many 'columns' are defined
 			// since max and min actually define two columns (the value
 			// and the timestamp).
@@ -564,12 +552,12 @@ namespace EnergyPlus {
 			std::vector<AnnualFieldSet>::iterator fldStIt;
 			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
 				columnCount += columnCountForAggregation( fldStIt->m_aggregate );
-			} 
+			}
 			columnHead.allocate( columnCount );
-			columnWidth.dimension( columnCount); 
+			columnWidth.dimension( columnCount);
 			columnWidth = 14; //array assignment - same for all columns
 			int rowCount = m_objectNames.size() + 4; // add blank, sum/avg, min, max rows.
-			int rowSumAvg = m_objectNames.size() + 2; 
+			int rowSumAvg = m_objectNames.size() + 2;
 			int rowMin = m_objectNames.size() + 3;
 			int rowMax = m_objectNames.size() + 4;
 
@@ -662,8 +650,8 @@ namespace EnergyPlus {
 						tableBody( columnRecount, rowMin ) = OutputReportTabular::RealToStr( maxVal, fldStIt->m_showDigits );
 					}
 				}
-				else if ( ( curAgg == AnnualFieldSet::AggregationKind::hoursZero ) || ( curAgg == AnnualFieldSet::AggregationKind::hoursNonZero ) || 
-					( curAgg == AnnualFieldSet::AggregationKind::hoursPositive ) || ( curAgg == AnnualFieldSet::AggregationKind::hoursNonPositive ) || 
+				else if ( ( curAgg == AnnualFieldSet::AggregationKind::hoursZero ) || ( curAgg == AnnualFieldSet::AggregationKind::hoursNonZero ) ||
+					( curAgg == AnnualFieldSet::AggregationKind::hoursPositive ) || ( curAgg == AnnualFieldSet::AggregationKind::hoursNonPositive ) ||
 					( curAgg == AnnualFieldSet::AggregationKind::hoursNegative ) || ( curAgg == AnnualFieldSet::AggregationKind::hoursNonNegative ) ) {
 					// put in the name of the variable for the column
 					columnHead( columnRecount ) = fldStIt->m_colHead + curAggString + " [HOURS]";
@@ -766,7 +754,7 @@ namespace EnergyPlus {
 					fixUnitsPerSecond( curUnits, curConversionFactor );
 					for ( int iBin = 0; iBin != 10; iBin++ ){
 						char binIndicator = iBin + 65;
-						columnHead( columnRecount - 9 + iBin) = fldStIt->m_colHead + curAggString + " BIN " + binIndicator; 
+						columnHead( columnRecount - 9 + iBin) = fldStIt->m_colHead + curAggString + " BIN " + binIndicator;
 						for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
 							tableBody( columnRecount - 9 + iBin, row + 1) = OutputReportTabular::RealToStr( fldStIt->m_cell[row].m_timeInBin[iBin], fldStIt->m_showDigits);
 						}
@@ -849,8 +837,8 @@ namespace EnergyPlus {
 						Real64 binTop = fldStIt->m_topBinValue;
 						Real64 numBins = 10.;
 						Real64 intervalSize = ( binTop - binBottom ) /  numBins;
-						
-						// could not get the following to work using 
+
+						// could not get the following to work using
 						colHeadRange( 1 ) = "BIN A";
 						colHeadRange( 2 ) = "BIN B";
 						colHeadRange( 3 ) = "BIN C";
@@ -970,7 +958,7 @@ namespace EnergyPlus {
 		AnnualFieldSet::AggregationKind
 		stringToAggKind( std::string inString )
 		// Jason Glazer, August 2015
-		// The function converts a string into an enumeration that describes the type of aggregation 
+		// The function converts a string into an enumeration that describes the type of aggregation
 		// used in REPORT:TABLE:ANNUAL.
 		{
 			AnnualFieldSet::AggregationKind outAggType;
@@ -1070,7 +1058,7 @@ namespace EnergyPlus {
 			return returnCount;
 		}
 
-		std::string 
+		std::string
 		AnnualTable::trim( const std::string& str )
 		{
 			std::string whitespace = " \t";
@@ -1109,11 +1097,11 @@ namespace EnergyPlus {
 			Real64 const verySmall = -1.0E280;
 			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
 				int curAgg = fldStIt->m_aggregate;
-				// for columns with binning aggregation types compute the statistics 
-				if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToMax || 
-					curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsZeroToMax || 
-					curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToZero || 
-					curAgg == AnnualFieldSet::AggregationKind::hoursInTenPercentBins || 
+				// for columns with binning aggregation types compute the statistics
+				if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToMax ||
+					curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsZeroToMax ||
+					curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToZero ||
+					curAgg == AnnualFieldSet::AggregationKind::hoursInTenPercentBins ||
 					curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusTwoStdDev ||
 					curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev ){
 					// the size the deferred vectors should be same for all rows
@@ -1158,7 +1146,7 @@ namespace EnergyPlus {
 						}
 						else if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev ){
 						}
-						// compute the actual amount of time spent in each bin and above and below 
+						// compute the actual amount of time spent in each bin and above and below
 						for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
 							fldStIt->m_cell[row].m_timeInBin = calculateBins( 10, fldStIt->m_cell[row].deferredResults, fldStIt->m_cell[row].deferredElapsed, fldStIt->m_topBinValue, fldStIt->m_bottomBinValue, fldStIt->m_cell[row].m_timeAboveTopBin, fldStIt->m_cell[row].m_timeBelowBottomBin);
 						}
@@ -1196,7 +1184,7 @@ namespace EnergyPlus {
 			std::string curUnits;
 			std::string energyUnitsString;
 			int const isSum( 2 );
-			Real64 curSI; 
+			Real64 curSI;
 			Real64 curIP;
 			Real64 energyUnitsConversionFactor = AnnualTable::setEnergyUnitStringAndFactor( unitsStyle, energyUnitsString );
 			//do the unit conversions
@@ -1269,6 +1257,83 @@ namespace EnergyPlus {
 			return returnBins;
 		}
 
+		void
+		AnnualTable::columnHeadersToTitleCase(){
+			std::vector<AnnualFieldSet>::iterator fldStIt;
+			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+				if ( fldStIt->m_variMeter == fldStIt->m_colHead ){
+					if ( fldStIt->m_indexesForKeyVar.size() > 0 ){
+						int varNum = fldStIt->m_indexesForKeyVar[0];
+						fldStIt->m_colHead = OutputProcessor::RVariableTypes[varNum].VarNameOnly;
+					}
+				}
+			}
+		}
+
+		void
+		clear_state(){ // for unit tests
+			std::vector<AnnualTable>::iterator annualTableIt;
+			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); annualTableIt++ ){
+				annualTableIt->clearTable();
+			}
+			annualTables.clear();
+		}
+
+		void
+		AnnualTable::clearTable(){
+			m_name = "";
+			m_filter = "";
+			m_scheduleName = "";
+			m_scheduleNum = 0;
+			m_objectNames.clear();
+			m_annualFields.clear();
+		}
+
+		std::vector<std::string>
+		AnnualTable::inspectTable(){
+			// added function just to inspect the main private AnnualTable members because no other
+			// interface to the AnnualTable class is output oriented except writeTable and that is very complex.
+			std::vector<std::string> ret;
+			ret.push_back( m_name );
+			ret.push_back( m_filter );
+			ret.push_back( m_scheduleName );
+			return ret;
+		}
+
+		std::vector<std::string>
+		AnnualTable::inspectTableFieldSets( int fldIndex ){
+			// added function just to inspect the private field set members of AnnualTable because no other
+			// interface to the AnnualTable class is output oriented except writeTable and that is very complex.
+			std::vector<std::string> ret;
+			AnnualFieldSet fldSt;
+			fldSt = m_annualFields[fldIndex];
+			ret.push_back( fldSt.m_colHead );
+			ret.push_back( fldSt.m_variMeter );
+			ret.push_back( fldSt.m_varUnits );
+			std::string outStr = std::to_string( fldSt.m_showDigits );
+			//ints
+			ret.push_back( outStr );
+			outStr = std::to_string( fldSt.m_typeOfVar );
+			ret.push_back( outStr );
+			outStr = std::to_string( fldSt.m_keyCount );
+			ret.push_back( outStr );
+			outStr = std::to_string( fldSt.m_varAvgSum );
+			ret.push_back( outStr );
+			outStr = std::to_string( fldSt.m_varStepType );
+			ret.push_back( outStr );
+			outStr = std::to_string( fldSt.m_aggregate );
+			ret.push_back( outStr );
+			//floats
+			outStr = std::to_string( fldSt.m_bottomBinValue );
+			ret.push_back( outStr );
+			outStr = std::to_string( fldSt.m_topBinValue );
+			ret.push_back( outStr );
+			outStr = std::to_string( fldSt.m_timeAboveTopBinTotal );
+			ret.push_back( outStr );
+			outStr = std::to_string( fldSt.m_timeBelowBottomBinTotal );
+			ret.push_back( outStr );
+			return ret;
+		}
 
 	} //OutputReportTabularAnnual
 

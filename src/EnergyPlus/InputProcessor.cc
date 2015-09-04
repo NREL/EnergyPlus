@@ -3755,30 +3755,6 @@ namespace InputProcessor {
 
 	}
 
-	std::string
-	deAllCaps( std::string const & inString )
-	{
-		// Jason Glazer - August 2015
-		// turn all caps into caps only when first letter in word
-		std::string returnString;
-		bool wasSpace = true; //start out assuming a space so first character is in caps
-		for ( std::string::size_type i = 0; i != inString.size(); i++ ){
-			char curChar = inString[i];
-			if ( wasSpace ){
-				returnString.push_back( inString[i] );
-			}
-			else {
-				if ( curChar > 64 && curChar < 91 ){
-					curChar = curChar + 32;
-				}
-				returnString.push_back( curChar );
-			}
-			wasSpace = ( curChar == 32 );
-		}
-		return returnString;
-	}
-
-
 	void
 	VerifyName(
 		std::string const & NameToVerify,
