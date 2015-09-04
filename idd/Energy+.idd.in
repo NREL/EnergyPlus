@@ -665,9 +665,12 @@ ZoneAirContaminantBalance,
        \object-list ScheduleNames
 
 ZoneAirMassFlowConservation,
-       \memo Enforces the zone air mass flow balance by adjusting zone mixing object flow rates.
-       \memo The infiltration object mass flow rate may also be adjusted or may add infiltration
-       \memo air flow to the base infiltration air flow.
+       \memo Enforces the zone air mass flow balance by adjusting zone mixing object and/or
+       \memo infiltration object mass flow rates. 
+       \memo If either mixing or infiltration is active, then the zone air mass flow
+       \memo balance calculation will attempt to enforce conservation of mass for each zone.
+       \note If mixing is "No" and infiltration is "None", then the zone air mass flow 
+       \note calculation defaults to assume self-balanced simple flow mixing and infiltration objects.
        \unique-object
        \min-fields 3
   A1,  \field Adjust Zone Mixing For Zone Air Mass Flow Balance
@@ -678,17 +681,6 @@ ZoneAirMassFlowConservation,
        \key Yes
        \key No
        \default No
-       \note This optional choice input field allows users triggering the zone air mass flow
-       \note balance calculation when desired. This global object has two choice KEYs: "Yes" and
-       \note "No". If this input field is specified as "Yes", then EnergyPlus attempts to enforce
-       \note the zone air mass flow conservation, or else if it is specified as "No", then EnergyPlus
-       \note calculation defaults to zone air mass flow balance that does not include zone mixing
-       \note objects and that assumes self-balanced simple flow objects per the default procedure,
-       \note which may not necessarily enforce zone mass conservation unless the user specified
-       \note a balanced flow to begin with. Mass conservation is enforced both for the receiving
-       \note and source zones if there is at least one mixing object defined. The default input
-       \note is "No". (Note that "No" input may also results in balanced flow depending on the
-       \note system specified).
   A2,  \field Infiltration Balancing Method
        \note This input field allows user to choose how zone infiltration flow is treated during
        \note the zone air mass flow balance calculation.
@@ -707,7 +699,8 @@ ZoneAirMassFlowConservation,
   A3;  \field Infiltration Balancing Zones
        \note This input field allows user to choose which zones are included in infiltration balancing.
        \note MixingSourceZonesOnly allows infiltration balancing only in zones which as source zones for mixing
-       \note AllZones allows infiltration balancing in any zone.
+       \note which also have an infiltration object defined.
+       \note AllZones allows infiltration balancing in any zone which has an infiltration object defined.
        \type choice
        \key MixingSourceZonesOnly
        \key AllZones

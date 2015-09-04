@@ -4766,6 +4766,14 @@ The conditions at this node represent the average state of the air in the zone. 
 
 The name of the return air node which attaches the zone to the return air path described above. Even if there is no return air or no return air path a unique name must be entered in this field. The conditions at this node represent the state of the air leaving the zone including any heat gain from light-heat-to-return.
 
+#### Field: Zone Return Air Flow Rate Fraction Schedule Name
+
+The name of a schedule to specify the return air flow rate as a fraction of the base return air. If the next field is blank, then the return air flow rate is the total supply inlet flow rate to the zone less the total exhaust node flow rate from the zone multiplied by this schedule name. If this field is left blank, the schedule defaults to 1.0 at all times.
+
+#### Field: Zone Return Air Flow Rate Basis Node or NodeList Name
+
+The name of a node or list of nodes (NodeList) that is used to calculate the return air flow rate for this zone. The sum of the current flow rates for this node(s) multiplied by the Zone Return Air Flow Rate Fraction Schedule determines the return air flow rate. If this field is blank, then the base return air flow rate is the total supply inlet flow rate to the zone less the total exhaust node flow rate from the zone.
+
 An example of this statement in an IDF is:
 
 ```idf
