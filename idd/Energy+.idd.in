@@ -1899,7 +1899,13 @@ Site:GroundDomain:Slab,
         \maximum 100
         \default 50
    A2,  \field Type of Undisturbed Ground Temperature Model
-   A3,  \field Name of Undisturbed Ground Temperature Model 
+        \required-field
+        \type alpha
+        \reference Site:GroundTemperature:Undisturbed:*
+   A3,  \field Name of Undisturbed Ground Temperature Model
+        \required-field
+        \type alpha
+        \reference Name of Site:GroundTemperature:Undisturbed:*
    N9,  \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
@@ -2020,7 +2026,13 @@ Site:GroundDomain:Basement,
         \maximum 100
         \default 50
    A2,  \field Type of Undisturbed Ground Temperature Model
-   A3,  \field Name of Undisturbed Ground Temperature Model 
+        \required-field
+        \type alpha
+        \reference Site:GroundTemperature:Undisturbed:*
+   A3,  \field Name of Undisturbed Ground Temperature Model
+        \required-field
+        \type alpha
+        \reference Name of Site:GroundTemperature:Undisturbed:*
    N9,  \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
@@ -57793,7 +57805,13 @@ Pipe:Underground,
         \type alpha
         \required-field
    A7,  \field Type of Undisturbed Ground Temperature Model
-   A8;  \field Name of Undisturbed Ground Temperature Model 
+        \required-field
+        \type alpha
+        \reference Site:GroundTemperature:Undisturbed:*
+   A8;  \field Name of Undisturbed Ground Temperature Model
+        \required-field
+        \type alpha
+        \reference Name of Site:GroundTemperature:Undisturbed:*
 
 PipingSystem:Underground:Domain,
         \memo The ground domain object for underground piping system simulation.
@@ -57901,7 +57919,13 @@ PipingSystem:Underground:Domain,
         \maximum 100
         \default 50
    A5,  \field Type of Undisturbed Ground Temperature Model
-   A6,  \field Name of Undisturbed Ground Temperature Model 
+        \required-field
+        \type alpha
+        \reference Site:GroundTemperature:Undisturbed:*
+   A6,  \field Name of Undisturbed Ground Temperature Model
+        \required-field
+        \type alpha
+        \reference Name of Site:GroundTemperature:Undisturbed:*
    A7,  \field This Domain Includes Basement Surface Interaction
         \type choice
         \key Yes
@@ -64503,7 +64527,13 @@ GroundHeatExchanger:HorizontalTrench,
         \maximum 100
         \default 50
    A4,  \field Type of Undisturbed Ground Temperature Model
+        \required-field
+        \type alpha
+        \reference Site:GroundTemperature:Undisturbed:*
    A5,  \field Name of Undisturbed Ground Temperature Model
+        \required-field
+        \type alpha
+        \reference Name of Site:GroundTemperature:Undisturbed:*
    N16; \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
@@ -64631,7 +64661,13 @@ GroundHeatExchanger:Slinky,
         \ip-units ft
         \default 2.0
    A5,  \field Type of Undisturbed Ground Temperature Model
-   A6,  \field Name of Undisturbed Ground Temperature Model 
+        \required-field
+        \type alpha
+        \reference Site:GroundTemperature:Undisturbed:*
+   A6,  \field Name of Undisturbed Ground Temperature Model
+        \required-field
+        \type alpha
+        \reference Name of Site:GroundTemperature:Undisturbed:*
    N16; \field Maximum Length of Simulation
         \type real
         \units years
