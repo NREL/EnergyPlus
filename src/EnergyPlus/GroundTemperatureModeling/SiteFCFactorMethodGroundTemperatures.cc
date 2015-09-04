@@ -39,7 +39,6 @@ namespace EnergyPlus {
 		// USE STATEMENTS:
 		using DataEnvironment::FCGroundTemps;
 		using DataGlobals::OutputFileInits;
-		using DataGlobals::SecsInDay;
 		using WeatherManager::wthFCGroundTemps;
 		using WeatherManager::GroundTempsFCFromEPWHeader;
 		using namespace DataIPShortCuts;
@@ -88,6 +87,10 @@ namespace EnergyPlus {
 				thisModel->fcFactorGroundTemps( i ) = GroundTempsFCFromEPWHeader( i );
 			}
 
+			FCGroundTemps = true;
+
+		} else {
+			thisModel->fcFactorGroundTemps = 0.0;
 			FCGroundTemps = true;
 		}
 
