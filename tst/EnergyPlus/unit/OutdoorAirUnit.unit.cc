@@ -7,13 +7,11 @@
 #include "Fixtures/HVACFixture.hh"
 #include <CurveManager.hh>
 #include <DataEnvironment.hh>
+#include <DataGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataSizing.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
-#include <DXCoils.hh>
-#include <Fans.hh>
-#include <GlobalNames.hh>
 #include <HeatBalanceManager.hh>
 #include "OutdoorAirUnit.hh"
 #include <Psychrometrics.hh>
@@ -22,13 +20,11 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::CurveManager;
 using namespace EnergyPlus::DataEnvironment;
+using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataZoneEnergyDemands;
 using namespace EnergyPlus::DataZoneEquipment;
-using namespace EnergyPlus::DXCoils;
-using namespace EnergyPlus::Fans;
-using namespace EnergyPlus::GlobalNames;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutdoorAirUnit;
 using namespace EnergyPlus::Psychrometrics;
@@ -262,12 +258,6 @@ namespace EnergyPlus {
 
 		FinalZoneSizing( CurZoneEqNum ).CoolDesTemp = 13.1; // 55.58 F
 		FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
-
-		Fans::GetFanInputFlag = true;
-		Fans::MyOneTimeFlag = true;
-		DXCoils::GetCoilsInputFlag = true;
-		GlobalNames::CoilNames.deallocate();
-		GlobalNames::NumCoils = 0;
 
 		ZoneInletNode = GetOutdoorAirUnitZoneInletNode( OAUnitNum );
 

@@ -108,6 +108,7 @@ namespace Fans {
 	int NumNightVentPerf( 0 ); // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
 	bool GetFanInputFlag( true ); // Flag set to make sure you get input once
 	bool MyOneTimeFlag( true );
+	Array1D_bool MyEnvrnFlag;
 	Array1D_bool CheckEquipName;
 	bool LocalTurnFansOn( false ); // If True, overrides fan schedule and cycles ZoneHVAC component fans on
 	bool LocalTurnFansOff( false ); // If True, overrides fan schedule and LocalTurnFansOn and
@@ -948,7 +949,6 @@ namespace Fans {
 		//unused0909  Integer             :: InNode
 		int OutNode;
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
-		static Array1D_bool MyEnvrnFlag;
 		int Loop;
 
 		// FLOW:
@@ -3340,9 +3340,11 @@ namespace Fans {
 		GetFanInputFlag = true;
 		LocalTurnFansOn = false;
 		LocalTurnFansOff = false;
+		MyOneTimeFlag = true;
 
 		CheckEquipName.deallocate();
 		MySizeFlag.deallocate();
+		MyEnvrnFlag.deallocate();
 		Fan.deallocate();
 		NightVentPerf.deallocate();
 		FanNumericFields.deallocate();
