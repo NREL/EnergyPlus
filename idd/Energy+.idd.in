@@ -39198,13 +39198,13 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
        \minimum> 0.0
        \autosizable
        \default autosize
-  N5 , \field Rated Primary Air Flow Rate per Meter
+  N5 , \field Rated Primary Air Flow Rate per Beam Length
        \note Primary air supply flow rate normalized by beam length.
        \type real
        \units m3/s-m
        \minimum> 0.0
        \default 0.035
-  N6 , \field Beam Rated Cooling Capacity per Meter
+  N6 , \field Beam Rated Cooling Capacity per Beam Length
        \note Sensible cooling capacity per meter of beam length at the rating point.
        \type real
        \units W/m
@@ -39216,7 +39216,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
        \units deltaC
        \minimum> 0.0
        \default 10.0
-  N8 , \field Beam Rated Chilled Water Volume Flow Rate per Meter
+  N8 , \field Beam Rated Chilled Water Volume Flow Rate per Beam Length
        \note The volume flow rate of chilled water per meter of beam length at the rating point.
        \type real
        \units m3/s-m
@@ -39246,7 +39246,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
        \type object-list
        \object-list UniVariateCurves
        \object-list UniVariateTables
-  N9 , \field Beam Rated Heating Capacity per Meter
+  N9 , \field Beam Rated Heating Capacity per Beam Length
        \note Sensible heating capacity per meter of beam length at the rating point.
        \type real
        \units W/m
@@ -39258,7 +39258,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
        \units deltaC
        \minimum> 0.0
        \default 27.8
-  N11, \field Beam Rated Hot Water Volume Flow Rate per Meter
+  N11, \field Beam Rated Hot Water Volume Flow Rate per Beam Length
        \note The volume flow rate of hoy water per meter of beam length at the rating point.
        \type real
        \units m3/s-m

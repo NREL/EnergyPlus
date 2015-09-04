@@ -6188,16 +6188,16 @@ The maximum hot water flow rate (m3/s) for the unit(s) serving the entire zone. 
 #### Field: Zone Total Beam Length (m)
 The total length of all the beams in the zone (m). The real spaces may actually have a number of individual beam units of a specific length and this is the length of individual beams times the total number of beams in the thermal zone. It need not be an even multiple of actual unit’s beam length but it can be if desired. This field is autosizable.
 
-#### Field: Rated Primary Air Flow Rate per Meter (m3/s-m)
+#### Field: Rated Primary Air Flow Rate per Beam Length (m3/s-m)
 This is the primary air volume flow rate at rating conditions divided by the length of the beam, in m3/s-m.  This "catalog" value for volume flow rate input is converted to a mass flow rate using standard air density at sea level. This value will be used for sizing the design primary air volume flow rate if the total beam length is not also autosized. The default is 0.035 m3/s-m.
 
-#### Field: Beam Rated Cooling Capacity per Meter (W/m)
+#### Field: Beam Rated Cooling Capacity per Beam Length (W/m)
 This is the beam cooling capacity at rating conditions divided by the length of the beam, in W/m.  This is only the cooling contributed by the chilled water circulating through the convector and is separate from any cooling (or heating) that may also be provided by the primary air. The default is 600 W/m.
 
 #### Field: Beam Rated Cooling Room Air Chilled Water Temperature Difference (Delta C)
 This input defines the value of the temperature difference between the room air and entering chilled water at the rating point, in delta Celsius.  This "catalog" input helps to define the operating conditions that correspond with Rated Beam Cooling Capacity per Meter. It is used to normalize the independent variable in the input field called Beam Cooling Capacity Temperature Difference Modification Factor Curve or Table Name. The default is 10.0 delta C.
  
-#### Field: Beam Rated Chilled Water Volume Flow Rate per Meter (m3/s-m)
+#### Field: Beam Rated Chilled Water Volume Flow Rate per Beam Length (m3/s-m)
 This input defines the value of the chilled water flow rate per meter length of beam at the rating point, in m3/s-m.  This input helps to define the operating conditions that correspond with Rated Beam Cooling Capacity per Meter. It is used to normalize the independent variable in the input field called Beam Cooling Capacity Chilled Water Flow Modification Factor Curve or Table Name.  The default is 0.00005 m3/s-m.
 
 #### Field: Beam Cooling Capacity Temperature Difference Modification Factor Curve Name
@@ -6209,13 +6209,13 @@ This field is the name of a curve or table object that describes how the beam co
 #### Field: Beam Cooling Capacity Chilled Water Flow Modification Factor Curve Name
 This field is the name of a curve or table object that describes how the beam convector’s cooling capacity varies as a function of the water flow rate.  The single independent variable is the ratio of the current fluid flow rate to the fluid flow rate at the rating point. The result of the curve or table is multiplied by the rated capacity to adjust the cooling capacity.  The model will adjust the chilled water flow rate to vary cooling power to meet the zone load, so for control purposes, the range of the independent variable must include all the way down to zero flow, with zero capacity at zero flow.
 
-#### Field: Beam Rated Heating Capacity per Meter (W/m)
+#### Field: Beam Rated Heating Capacity per Beam Length (W/m)
 This is the beam heating capacity at rating conditions divided by the length of the beam, in W/m.  This is only the heating contributed by the hot water circulating through the convector and is separate from any heating (or cooling) that may also be provided by the primary air.  The default is 1.200 W/m.
 
 #### Field: Beam Rated Heating Room Air Hot Water Temperature Difference (Delta C)
 This input defines the value of the temperature difference between the entering hot water and the room air at the rating point, in delta Celsius.  This input helps to define the operating conditions that correspond with Rated Beam Heating Capacity per Meter. It is used to normalize the independent variable in the input field called Beam Heating Capacity Temperature Difference Modification Factor Curve or Table Name. The default is 27.8 delta C.
  
-#### Field: Beam Rated Hot Water Volume Flow Rate per Meter (m3/s-m)
+#### Field: Beam Rated Hot Water Volume Flow Rate per Beam Length (m3/s-m)
 This input defines the value of the hot water flow rate per meter length of beam at the rating point, in m3/s/m, or more strictly m3/s-m.  This input helps to define the operating conditions that correspond with Rated Beam Heating Capacity per Meter.   It is used to normalize the independent variable in the input field called Beam Heating Capacity Hot Water Flow Modification Factor Curve or Table Name.  The default is 0.00005 m3/s-m.
 
 #### Field: Beam Heating Capacity Temperature Difference Modification Factor Curve Name
@@ -6245,16 +6245,16 @@ An example input follows:
         AUTOSIZE , !- Design Chilled Water Volume Flow Rate
         AUTOSIZE , !- Design Hot Water Volume Flow Rate
         AUTOSIZE , !- Zone Total Beam Length
-        0.036 , !- Rated Primary Air Flow Rate per Meter
-        597 , !- Rated Beam Cooling Capacity per Meter
+        0.036 , !- Rated Primary Air Flow Rate per Beam Length
+        597 , !- Rated Beam Cooling Capacity per Beam Length
         10.0 , !- Rated Cooling Room Air Chilled Water Temperature Difference
-        5.2E-5 , !- Rated Chilled Water Volume Flow Rate per Meter
+        5.2E-5 , !- Rated Chilled Water Volume Flow Rate per Beam Length
         CapModFuncOfTempDiff, !- Beam Cooling Capacity Temperature Difference Modification Factor Curve or Table Name
         CoolCapModFuncOfSAFlow, !- Beam Cooling Capacity Air Flow Modification Factor Curve or Table Name
         CapModFuncOfWaterFlow, !- Beam Cooling Capacity Chilled Water Flow Modification Factor Curve or Table Name
-        1548 , !- Rated Beam Heating Capacity per Meter
+        1548 , !- Rated Beam Heating Capacity per Beam Length
         27.8, !- Rated Heating Room Air Hot Water Temperature Difference
-        5.2E-5, !- Rated Hot Water Volume Flow Rate per Meter
+        5.2E-5, !- Rated Hot Water Volume Flow Rate per Beam Length
         CapModFuncOfTempDiff, !- Beam Heating Capacity Temperature Difference Modification Factor Curve or Table Name
         HeatCapModFuncOfSAFlow, !- Beam Heating Capacity Air Flow Modification Factor Curve or Table Name
         CapModFuncOfWaterFlow; !- Beam Heating Capacity Hot Water Flow Modification Factor Curve or Table Name
