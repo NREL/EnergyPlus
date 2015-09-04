@@ -14,6 +14,7 @@
 #include <DataZoneEquipment.hh>
 #include <HeatBalanceManager.hh>
 #include "OutdoorAirUnit.hh"
+#include <OutputReportPredefined.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 
@@ -27,6 +28,7 @@ using namespace EnergyPlus::DataZoneEnergyDemands;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutdoorAirUnit;
+using namespace OutputReportPredefined;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 
@@ -224,7 +226,7 @@ namespace EnergyPlus {
 		DataSizing::CurZoneEqNum = 1;
 		DataEnvironment::OutBaroPress = 101325; // sea level
 		DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-		StdRhoAir = PsyRhoAirFnPbTdbW( DataEnvironment::OutBaroPress, 20.0, 0.0 );
+		DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( DataEnvironment::OutBaroPress, 20.0, 0.0 );
 		ZoneEqSizing.allocate( 1 );
 		ZoneSizingRunDone = true;
 		ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = false;
@@ -261,10 +263,12 @@ namespace EnergyPlus {
 
 		ZoneInletNode = GetOutdoorAirUnitZoneInletNode( OAUnitNum );
 
+		// schedule values will get reset to 0 if initialized before GetInput
 		Schedule( 1 ).CurrentValue = 1.0; // enable the VRF condenser
 		Schedule( 2 ).CurrentValue = 1.0; // enable the terminal unit
 		Schedule( 3 ).CurrentValue = 1.0; // turn on fan
 
+		SetPredefinedTables();
 		SimOutdoorAirUnit( "ZONE1OUTAIR", CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
 
 		EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).MinOA, OutAirUnit( OAUnitNum ).OutAirVolFlow );
