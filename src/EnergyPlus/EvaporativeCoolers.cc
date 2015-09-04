@@ -984,9 +984,6 @@ namespace EvaporativeCoolers {
 		if ( SizingDesRunThisAirSys ) {
 			HardSizeNoDesRun = false; // Check if design infomation is available
 		}
-		if ( CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys ) {
-			HardSizeNoDesRun = true;
-		}
 
 		{ auto const SELECT_CASE_var( EvapCond( EvapCoolNum ).EvapCoolerType );
 		if ( SELECT_CASE_var == iEvapCoolerInDirectCELDEKPAD ) {
@@ -1021,6 +1018,9 @@ namespace EvaporativeCoolers {
 		IsAutoSize = false;
 		if ( EvapCond( EvapCoolNum ).IndirectVolFlowRate == AutoSize ) {
 			IsAutoSize = true;
+		}
+		if ( CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys ) {
+			HardSizeNoDesRun = true;
 		}
 		if ( CurSysNum > 0 ) { //central system
 			if ( !IsAutoSize && !SizingDesRunThisAirSys ) {
@@ -1092,6 +1092,9 @@ namespace EvaporativeCoolers {
 		if ( EvapCond( EvapCoolNum ).VolFlowRate == AutoSize ) {
 			IsAutoSize = true;
 		}
+		if ( CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys ) {
+			HardSizeNoDesRun = true;
+		}
 		if ( CurSysNum > 0 ) { //central system
 			if ( !IsAutoSize && !SizingDesRunThisAirSys ) {
 				// the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
@@ -1162,6 +1165,9 @@ namespace EvaporativeCoolers {
 			if ( EvapCond( EvapCoolNum ).PadArea == AutoSize ) {
 				IsAutoSize = true;
 			}
+			if ( CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys ) {
+				HardSizeNoDesRun = true;
+			}
 			if ( SizingDesRunThisAirSys ) HardSizeNoDesRun = false; // Check if design infomation is available
 			// Design air flow rate
 			if ( CurSysNum > 0 ) {  // central system
@@ -1228,6 +1234,9 @@ namespace EvaporativeCoolers {
 			IsAutoSize = false;
 			if ( EvapCond( EvapCoolNum ).PadDepth == AutoSize ) {
 				IsAutoSize = true;
+			}
+			if ( CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys ) {
+				HardSizeNoDesRun = true;
 			}
 			// The following regression equation is used to determine pad depth, 
 			// assuming saturation effectiveness of 70% and face air velocity of 3m/s: 
