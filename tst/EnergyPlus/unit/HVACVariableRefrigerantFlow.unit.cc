@@ -18,7 +18,8 @@
 #include <DataSizing.hh>
 #include <DataZoneEquipment.hh>
 #include <DataZoneEnergyDemands.hh>
-#include <FluidProperties.hh>#include <HeatBalanceManager.hh>
+#include <FluidProperties.hh>
+#include <HeatBalanceManager.hh>
 #include <HVACVariableRefrigerantFlow.hh>
 #include <OutputReportPredefined.hh>
 #include <PlantManager.hh>

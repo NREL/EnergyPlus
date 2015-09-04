@@ -811,7 +811,6 @@ namespace OutdoorAirUnit {
 		auto & GetWaterCoilMaxFlowRate( WaterCoils::GetCoilMaxWaterFlowRate );
 		using WaterCoils::SimulateWaterCoilComponents;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-		auto & GetHXAssistedCoilTypeNum( HVACHXAssistedCoolingCoil::GetCoilGroupTypeNum );
 		using DataSizing::AutoSize;
 
 		// Locals
@@ -843,7 +842,6 @@ namespace OutdoorAirUnit {
 		int compLoop; // local do loop index
 		Real64 rho;
 		bool errFlag;
-		int coilTypeNum;
 
 		// FLOW:
 		// Do the one time initializations
@@ -1106,29 +1104,10 @@ namespace OutdoorAirUnit {
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
 		int PltSizCoolNum; // index of plant sizing object for 1st cooling loop
 		bool ErrorsFound;
-		Real64 CoilInTemp;
-		Real64 CoilOutTemp;
-		Real64 CoilOutHumRat;
-		Real64 CoilInHumRat;
-		Real64 DesCoilLoad;
-		Real64 TempSteamIn;
-		Real64 EnthSteamInDry;
-		Real64 EnthSteamOutWet;
-		Real64 LatentHeatSteam;
-		Real64 SteamDensity;
 		Real64 RhoAir;
-		Real64 SizeAirMassFlow;
-		static int CoilWaterInletNode( 0 );
-		static int CoilWaterOutletNode( 0 );
-		static int CoilSteamInletNode( 0 );
-		static int CoilSteamOutletNode( 0 );
 		std::string CoolingCoilName;
 		std::string CoolingCoilType;
-		int SizeComp;
 		int CompNum;
-		Real64 rho;
-		Real64 Cp;
-		static int DummyWaterIndex( 1 );
 		bool IsAutoSize; // Indicator to autosize
 		Real64 OutAirVolFlowDes; // Autosized outdoor air flow for reporting
 		Real64 OutAirVolFlowUser; // Hardsized outdoor air flow for reporting
