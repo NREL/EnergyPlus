@@ -3631,6 +3631,7 @@ namespace ZoneEquipmentManager {
 		using DataAirSystems::PrimaryAirSystem;
 		using DataAirflowNetwork::AirflowNetworkNumOfExhFan;
 		using DataGlobals::isPulseZoneSizing;
+		using DataGlobals::DoingSizing;
 
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::MassConservation;
@@ -3770,9 +3771,6 @@ namespace ZoneEquipmentManager {
 					if ( MassConservation( ZoneNum ).InfiltrationPtr > 0 ) {
 						if ( MassConservation( ZoneNum ).IsOnlySourceZone || ( ZoneAirMassFlow.InfiltrationZoneType == AllZones ) ) {
 							ZoneInfiltrationMassFlowRate = MassConservation( ZoneNum ).MixingSourceMassFlowRate + TotExhaustAirMassFlowRate + ZoneReturnAirMassFlowRate - TotInletAirMassFlowRate;
-
-						//if (MassConservation(ZoneNum).MixingSourceMassFlowRate > TotInletAirMassFlowRate) {
-
 							if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
 								if (abs(ZoneInfiltrationMassFlowRate) > ConvergenceTolerance) {
 									ZoneInfiltrationFlag(ZoneNum) = true;
@@ -3794,7 +3792,6 @@ namespace ZoneEquipmentManager {
 								}
 							}
 						} else {
-
 							if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
 								MassConservation(ZoneNum).InfiltrationMassFlowRate = Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
 							}
@@ -3803,11 +3800,8 @@ namespace ZoneEquipmentManager {
 							}
 						}
 					} else {
-						//if (MassConservation(ZoneNum).InfiltrationPtr > 0) {
-						//	MassConservation(ZoneNum).InfiltrationMassFlowRate = Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
-						//} else {
+							// Zone has no infiltration objects
 							MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-						//}
 					}
 
 					MassConservation(ZoneNum).InMassFlowRate = TotInletAirMassFlowRate;
@@ -3832,20 +3826,24 @@ namespace ZoneEquipmentManager {
 					// Calculate standard return air flow rate using default method of inlets minus exhausts adjusted for "balanced" exhuast flow
 					StdReturnNodeMassFlow = max( 0.0, (Node( ZoneNode ).MassFlowRate + ZoneMixingNetAirMassFlowRate - ( TotExhaustAirMassFlowRate - ZoneEquipConfig( ZoneNum ).ZoneExhBalanced )));
 					if ( AirLoopNum > 0 ) {
-						// MJW?? -Not sure why this is different
 						if ( !PrimaryAirSystem( AirLoopNum ).OASysExists ) {
 							StdReturnNodeMassFlow = max( 0.0, (Node( ZoneNode ).MassFlowRate + ZoneMixingNetAirMassFlowRate - ( TotExhaustAirMassFlowRate - ZoneEquipConfig( ZoneNum ).ZoneExh )));
 						}
 					}
 
-					if ( ZoneEquipConfig( ZoneNum ).NumReturnFlowBasisNodes > 0 ) {
-						// Set base return air flow rate using basis node flow rates
-						for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneNum ).NumReturnFlowBasisNodes; ++NodeNum ) {
-							UserReturnNodeMassFlow += ZoneEquipConfig( ZoneNum ).ReturnFlowBasisNode( NodeNum );
-						}
-						UserReturnNodeMassFlow = max( 0.0, (UserReturnNodeMassFlow * GetCurrentScheduleValue( ZoneEquipConfig( ZoneNum ).ReturnFlowSchedPtrNum )));
+					// Make no return air flow adjustments during sizing
+					if ( DoingSizing || isPulseZoneSizing ) {
+						UserReturnNodeMassFlow = StdReturnNodeMassFlow;
 					} else {
-						UserReturnNodeMassFlow = max( 0.0, ( StdReturnNodeMassFlow * GetCurrentScheduleValue( ZoneEquipConfig( ZoneNum ).ReturnFlowSchedPtrNum )));
+						if ( ZoneEquipConfig( ZoneNum ).NumReturnFlowBasisNodes > 0 ) {
+							// Set base return air flow rate using basis node flow rates
+							for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneNum ).NumReturnFlowBasisNodes; ++NodeNum ) {
+								UserReturnNodeMassFlow += ZoneEquipConfig( ZoneNum ).ReturnFlowBasisNode( NodeNum );
+							}
+							UserReturnNodeMassFlow = max( 0.0, (UserReturnNodeMassFlow * GetCurrentScheduleValue( ZoneEquipConfig( ZoneNum ).ReturnFlowSchedPtrNum )));
+						} else {
+							UserReturnNodeMassFlow = max( 0.0, ( StdReturnNodeMassFlow * GetCurrentScheduleValue( ZoneEquipConfig( ZoneNum ).ReturnFlowSchedPtrNum )));
+						}
 					}
 					Node( RetNode ).MassFlowRate = UserReturnNodeMassFlow;
 					MassConservation( ZoneNum ).RetMassFlowRate = Node( RetNode ).MassFlowRate;
@@ -3890,7 +3888,6 @@ namespace ZoneEquipmentManager {
 				}
 			}
 
-// MJW?? This is messing with the user-specified return air flow rate - how to handle? This adjustment was there before ZoneAirMassFlowConservation was added
 			// adjust the zone return air flow rates to match the air loop return air flow rate
 			for ( ZoneNum1 = 1; ZoneNum1 <= NumOfZones; ++ZoneNum1 ) {
 				ZoneNum = ZoneNum1;
