@@ -124,7 +124,9 @@
   ZoneAirMassFlowConservation,
     Yes,                     !- Adjust Zone Mixing For Zone Air Mass Flow Balance
     AdjustInfiltrationFlow,  !- Infiltration Balancing Method
-    AllZones;                !- Infiltration Balancing Zones
+    AllZones;                !- Infiltration Balancing Zones  
+    
+  SurfaceConvectionAlgorithm:Inside,Simple;
 
   SurfaceConvectionAlgorithm:Outside,SimpleCombined;
 
