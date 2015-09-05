@@ -305,7 +305,7 @@ namespace HeatBalanceAirManager {
 
 			// flow
 
-			if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+			if (ZoneAirMassFlow.EnforceZoneMassBalance && ZoneAirMassFlow.BalanceMixing) {
 				for (Loop = 1; Loop <= TotMixing; ++Loop) {
 					ZoneMassBalanceFlag(Mixing(Loop).ZonePtr) = true;
 					ZoneMassBalanceFlag(Mixing(Loop).FromZone) = true;
