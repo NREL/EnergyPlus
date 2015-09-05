@@ -68,6 +68,11 @@ namespace DataSizing {
 	extern int const InpDesAirFlow;
 	extern int const DesAirFlowWithLim;
 
+	// parameters for DOAs control method
+	extern int const DOANeutralSup;
+	extern int const DOANeutralDehumSup;
+	extern int const DOACoolSup;
+
 	// parameters for Type of Load to Size On
 	extern int const Sensible;
 	extern int const Latent;
@@ -285,6 +290,11 @@ namespace DataSizing {
 		int ZoneAirDistributionIndex; // index to the zone air distribution object
 		int ZoneDesignSpecOAIndex; // index to the zone design spec OA object
 		Real64 ZoneSecondaryRecirculation; // the zone secondary air recirculation fraction
+		bool AccountForDOAS; // False: do nothing; True: calculate the effect of a DOA system on the zone sizing arrays
+		int DOASControlStrategy; // 1=supply neutral ventilation air; 2=supply neutral dehumidified ventilation air;
+		// 3=supply cold ventilation air
+		Real64 DOASLowSetpoint; // Dedicated Outside Air Low Setpoint for Design [C]
+		Real64 DOASHighSetpoint; // Dedicated Outside Air High Setpoint for Design [C]
 
 		// Default Constructor
 		ZoneSizingInputData() :
@@ -317,78 +327,11 @@ namespace DataSizing {
 			ZoneADEffHeating( 1.0 ),
 			ZoneAirDistributionIndex( 0 ),
 			ZoneDesignSpecOAIndex( 0 ),
-			ZoneSecondaryRecirculation( 0.0 )
-		{}
-
-		// Member Constructor
-		ZoneSizingInputData(
-			std::string const & ZoneName, // name of a zone
-			int const ZoneNum, // index of the zone
-			int const ZnCoolDgnSAMethod, // choice of how to get zone cooling design air temperature;
-			int const ZnHeatDgnSAMethod, // choice of how to get zone heating design air temperature;
-			Real64 const CoolDesTemp, // zone design cooling supply air temperature [C]
-			Real64 const HeatDesTemp, // zone design heating supply air temperature [C]
-			Real64 const CoolDesTempDiff, // zone design cooling supply air temperature difference [deltaC]
-			Real64 const HeatDesTempDiff, // zone design heating supply air temperature difference [deltaC]
-			Real64 const CoolDesHumRat, // zone design cooling supply air humidity ratio [kg-H2O/kg-air]
-			Real64 const HeatDesHumRat, // zone design heating supply air humidity ratio [kg-H2O/kg-air]
-			std::string const & DesignSpecOAObjName, // name of the design specification outdoor air object
-			int const OADesMethod, // choice of how to calculate minimum outside air;
-			Real64 const DesOAFlowPPer, // design outside air flow per person in zone [m3/s]
-			Real64 const DesOAFlowPerArea, // design outside air flow per zone area [m3/s / m2]
-			Real64 const DesOAFlow, // design outside air flow for the zone [m3/s]
-			int const CoolAirDesMethod, // choice of how to get zone cooling design air flow rates;
-			Real64 const DesCoolAirFlow, // design zone supply air flow rate [m3/s]
-			Real64 const DesCoolMinAirFlowPerArea, // design cooling minimum air flow rate per zone area [m3/s / m2]
-			Real64 const DesCoolMinAirFlow, // design cooling minimum air flow rate [m3/s]
-			Real64 const DesCoolMinAirFlowFrac, // design cooling minimum air flow rate fraction
-			int const HeatAirDesMethod, // choice of how to get zone heating design air flow rates;
-			Real64 const DesHeatAirFlow, // design zone heating supply air flow rate [m3/s]
-			Real64 const DesHeatMaxAirFlowPerArea, // design heating maximum air flow rate per zone area [m3/s / m2]
-			Real64 const DesHeatMaxAirFlow, // design heating maximum air flow rate [m3/s]
-			Real64 const DesHeatMaxAirFlowFrac, // design heating maximum air flow rate fraction
-			Real64 const HeatSizingFactor, // the zone heating sizing ratio
-			Real64 const CoolSizingFactor, // the zone cooling sizing ratio
-			Real64 const ZoneADEffCooling,
-			Real64 const ZoneADEffHeating,
-			std::string const & ZoneAirDistEffObjName, // name of the zone air distribution effectiveness object name
-			int const ZoneAirDistributionIndex, // index to the zone air distribution object
-			int const ZoneDesignSpecOAIndex, // index to the zone design spec OA object
-			Real64 const ZoneSecondaryRecirculation // the zone secondary air recirculation fraction
-		) :
-			ZoneName( ZoneName ),
-			ZoneNum( ZoneNum ),
-			ZnCoolDgnSAMethod( ZnCoolDgnSAMethod ),
-			ZnHeatDgnSAMethod( ZnHeatDgnSAMethod ),
-			CoolDesTemp( CoolDesTemp ),
-			HeatDesTemp( HeatDesTemp ),
-			CoolDesTempDiff( CoolDesTempDiff ),
-			HeatDesTempDiff( HeatDesTempDiff ),
-			CoolDesHumRat( CoolDesHumRat ),
-			HeatDesHumRat( HeatDesHumRat ),
-			DesignSpecOAObjName( DesignSpecOAObjName ),
-			OADesMethod( OADesMethod ),
-			DesOAFlowPPer( DesOAFlowPPer ),
-			DesOAFlowPerArea( DesOAFlowPerArea ),
-			DesOAFlow( DesOAFlow ),
-			CoolAirDesMethod( CoolAirDesMethod ),
-			DesCoolAirFlow( DesCoolAirFlow ),
-			DesCoolMinAirFlowPerArea( DesCoolMinAirFlowPerArea ),
-			DesCoolMinAirFlow( DesCoolMinAirFlow ),
-			DesCoolMinAirFlowFrac( DesCoolMinAirFlowFrac ),
-			HeatAirDesMethod( HeatAirDesMethod ),
-			DesHeatAirFlow( DesHeatAirFlow ),
-			DesHeatMaxAirFlowPerArea( DesHeatMaxAirFlowPerArea ),
-			DesHeatMaxAirFlow( DesHeatMaxAirFlow ),
-			DesHeatMaxAirFlowFrac( DesHeatMaxAirFlowFrac ),
-			HeatSizingFactor( HeatSizingFactor ),
-			CoolSizingFactor( CoolSizingFactor ),
-			ZoneADEffCooling( ZoneADEffCooling ),
-			ZoneADEffHeating( ZoneADEffHeating ),
-			ZoneAirDistEffObjName( ZoneAirDistEffObjName ),
-			ZoneAirDistributionIndex( ZoneAirDistributionIndex ),
-			ZoneDesignSpecOAIndex( ZoneDesignSpecOAIndex ),
-			ZoneSecondaryRecirculation( ZoneSecondaryRecirculation )
+			ZoneSecondaryRecirculation( 0.0 ),
+			AccountForDOAS( false ),
+			DOASControlStrategy( 0 ),
+			DOASLowSetpoint( 0.0 ),
+			DOASHighSetpoint( 0.0)
 		{}
 
 	};
@@ -437,8 +380,12 @@ namespace DataSizing {
 		//  (of the cooling design air flow rate)
 		Real64 HeatSizingFactor; // the zone heating sizing ratio
 		Real64 CoolSizingFactor; // the zone cooling sizing ratio
+		bool AccountForDOAS; // False: do nothing; True: calculate the effect of a DOA system on the zone sizing arrays
+		int DOASControlStrategy; // 1=supply neutral ventilation air; 2=supply neutral dehumidified ventilation air;
+		// 3=supply cold ventilation air
+		Real64 DOASLowSetpoint; // Dedicated Outside Air Low Setpoint for Design [C]
+		Real64 DOASHighSetpoint; // Dedicated Outside Air High Setpoint for Design [C]
 		int ActualZoneNum; // index into the Zone data array (in DataHeatBalance)
-		int SupplyAirNode; // node number of supply air node
 		Real64 DesHeatMassFlow; // zone design heating air mass flow rate [kg/s]
 		Real64 DesHeatOAFlowFrac; // zone design heating OA air volume fraction [-]
 		bool EMSOverrideDesHeatMassOn; // true if EMS is acting on this structure
@@ -514,8 +461,8 @@ namespace DataSizing {
 		//  (zone time step)
 		Array1D< Real64 > CoolFlowSeq; // daily sequence of zone cooling air mass flow rate
 		//  (zone time step)
-		Array1D< Real64 > HeatLoadSeq; // daily sequence of zone heating load zone time step)
-		Array1D< Real64 > CoolLoadSeq; // daily sequence of zone cooling load zone time step)
+		Array1D< Real64 > HeatLoadSeq; // daily sequence of zone heating load (zone time step)
+		Array1D< Real64 > CoolLoadSeq; // daily sequence of zone cooling load (zone time step)
 		Array1D< Real64 > HeatZoneTempSeq; // daily sequence of zone temperatures (heating, zone time step)
 		Array1D< Real64 > HeatOutTempSeq; // daily sequence of outdoor temperatures (heating, zone time step)
 		Array1D< Real64 > HeatZoneRetTempSeq; // daily sequence of zone return temperatures (heating,
@@ -549,6 +496,22 @@ namespace DataSizing {
 		Real64 ZpzHtgByZone; // OA Std 62.1 required fraction in heating mode
 		Real64 VozClgByZone; // value of required cooling vent to zone, used in 62.1 tabular report
 		Real64 VozHtgByZone; // value of required heating vent to zone, used in 62.1 tabular report
+		Real64 DOASHeatLoad; // current heating load from DOAS supply air [W]
+		Real64 DOASCoolLoad; // current cooling load from DOAS supply air [W]
+		Real64 DOASHeatAdd; // current heat addition rate from DOAS supply air [W]
+		Real64 DOASLatAdd; // current latent heat addition rate from DOAS supply air [W]
+		Real64 DOASSupMassFlow; // current mass flow rate of DOAS supply air [kg/s]
+		Real64 DOASSupTemp; // current DOAS supply air temperature [C]
+		Real64 DOASSupHumRat; // current DOAS supply air humidity ratio [kg H2O / kg dry air]
+		Real64 DOASTotCoolLoad; // current total cooling load imposed by DOAS supply air [W]
+		Array1D< Real64 > DOASHeatLoadSeq; // daily sequence of zone DOAS heating load (zone time step) [W]
+		Array1D< Real64 > DOASCoolLoadSeq; // daily sequence of zone DOAS cooling load (zone time step) [W]
+		Array1D< Real64 > DOASHeatAddSeq; // daily sequence of zone DOAS heat addition rate (zone time step) [W]
+		Array1D< Real64 > DOASLatAddSeq; // daily sequence of zone DOAS latent heat addition rate (zone time step) [W]
+		Array1D< Real64 > DOASSupMassFlowSeq; // daily sequence of zone DOAS supply mass flow rate (zone time step) [Kg/s]
+		Array1D< Real64 > DOASSupTempSeq; // daily sequence of zone DOAS supply temperature (zone time step) [C]
+		Array1D< Real64 > DOASSupHumRatSeq; // daily sequence of zone DOAS supply humidity ratio (zone time step) [kg H2O / kg dry air]
+		Array1D< Real64 > DOASTotCoolLoadSeq; // daily sequence of zone DOAS total cooling load (zone time step) [W]
 
 		// Default Constructor
 		ZoneSizingData() :
@@ -577,8 +540,11 @@ namespace DataSizing {
 			DesHeatMaxAirFlowFrac( 0.0 ),
 			HeatSizingFactor( 0.0 ),
 			CoolSizingFactor( 0.0 ),
+			AccountForDOAS( false ),
+			DOASControlStrategy( 0 ),
+			DOASLowSetpoint( 0.0 ),
+			DOASHighSetpoint( 0.0 ),
 			ActualZoneNum( 0 ),
-			SupplyAirNode( 0 ),
 			DesHeatMassFlow( 0.0 ),
 			DesHeatOAFlowFrac( 0.0 ),
 			EMSOverrideDesHeatMassOn( false ),
@@ -660,276 +626,15 @@ namespace DataSizing {
 			ZpzClgByZone( 0.0 ),
 			ZpzHtgByZone( 0.0 ),
 			VozClgByZone( 0.0 ),
-			VozHtgByZone( 0.0 )
-		{}
-
-		// Member Constructor
-		ZoneSizingData(
-			std::string const & ZoneName, // name of a zone
-			std::string const & CoolDesDay, // name of a cooling design day
-			std::string const & HeatDesDay, // name of a heating design day
-			int const ZnCoolDgnSAMethod, // choice of how to get zone cooling design air temperature;
-			int const ZnHeatDgnSAMethod, // choice of how to get zone heating design air temperature;
-			Real64 const CoolDesTemp, // zone design cooling supply air temperature [C]
-			Real64 const HeatDesTemp, // zone design heating supply air temperature [C]
-			Real64 const CoolDesTempDiff, // zone design cooling supply air temperature difference [deltaC]
-			Real64 const HeatDesTempDiff, // zone design heating supply air temperature difference [deltaC]
-			Real64 const CoolDesHumRat, // zone design cooling supply air humidity ratio [kg-H2O/kg-air]
-			Real64 const HeatDesHumRat, // zone design heating supply air humidity ratio [kg-H2O/kg-air]
-			int const ZoneDesignSpecOAIndex, // index to DesignSpecification:OutdoorAir object
-			int const OADesMethod, // choice of how to calculate minimum outside air;
-			Real64 const DesOAFlowPPer, // design outside air flow per person in zone [m3/s]
-			Real64 const DesOAFlowPerArea, // design outside air flow per zone area [m3/s / m2]
-			Real64 const DesOAFlow, // design outside air flow for the zone [m3/s]
-			int const CoolAirDesMethod, // choice of how to get zone cooling design air flow rates;
-			Real64 const InpDesCoolAirFlow, // design zone supply air flow rate [m3/s]
-			Real64 const DesCoolMinAirFlowPerArea, // design cooling minimum air flow rate per zone area [m3/s / m2]
-			Real64 const DesCoolMinAirFlow, // design cooling minimum air flow rate [m3/s]
-			Real64 const DesCoolMinAirFlowFrac, // design cooling minimum air flow rate fraction
-			int const HeatAirDesMethod, // choice of how to get zone heating design air flow rates;
-			Real64 const InpDesHeatAirFlow, // design zone heating supply air flow rate [m3/s]
-			Real64 const DesHeatMaxAirFlowPerArea, // design heating maximum air flow rate per zone area [m3/s / m2]
-			Real64 const DesHeatMaxAirFlow, // design heating maximum air flow rate [m3/s]
-			Real64 const DesHeatMaxAirFlowFrac, // design heating maximum air flow rate fraction
-			Real64 const HeatSizingFactor, // the zone heating sizing ratio
-			Real64 const CoolSizingFactor, // the zone cooling sizing ratio
-			int const ActualZoneNum, // index into the Zone data array (in DataHeatBalance)
-			int const SupplyAirNode, // node number of supply air node
-			Real64 const DesHeatMassFlow, // zone design heating air mass flow rate [kg/s]
-			Real64 const DesHeatOAFlowFrac, // zone design heating OA air volume fraction [-]
-			bool const EMSOverrideDesHeatMassOn, // true if EMS is acting on this structure
-			Real64 const EMSValueDesHeatMassFlow, // Value EMS directing to use for Design Heating air mass flow [kg/s]
-			Real64 const DesCoolMassFlow, // zone design cooling air mass flow rate [kg/s]
-			Real64 const DesCoolOAFlowFrac, // zone design cooling OA air volume fraction [-]
-			bool const EMSOverrideDesCoolMassOn, // true if EMS is acting on this structure
-			Real64 const EMSValueDesCoolMassFlow, // Value EMS directing to use for Design Cooling air mass flow [kg/s]
-			Real64 const DesHeatLoad, // zone design heating load [W]
-			bool const EMSOverrideDesHeatLoadOn, // true if EMS is acting on this structure
-			Real64 const EMSValueDesHeatLoad, // Value EMS directing to use for zone design heating load  [W]
-			Real64 const DesCoolLoad, // zone design cooling load [W]
-			bool const EMSOverrideDesCoolLoadOn, // true if EMS is acting on this structure
-			Real64 const EMSValueDesCoolLoad, // Value EMS directing to use for zone design cooling load  [W]
-			Real64 const DesHeatDens, // zone design heating air density [kg/m3]
-			Real64 const DesCoolDens, // zone design cooling air density [kg/m3]
-			Real64 const DesHeatVolFlow, // zone design heating air volume flow rate [m3/s]
-			bool const EMSOverrideDesHeatVolOn, // true if EMS is acting on this structure
-			Real64 const EMSValueDesHeatVolFlow, // Value EMS directing to use for Design Heating air volume flow [m3/s]
-			Real64 const DesCoolVolFlow, // zone design cooling air volume flow rate [m3/s]
-			bool const EMSOverrideDesCoolVolOn, // true if EMS is acting on this structure
-			Real64 const EMSValueDesCoolVolFlow, // Value EMS directing to use for Design cooling air volume flow [m3/s]
-			Real64 const DesHeatVolFlowMax, // zone design heating maximum air volume flow rate [m3/s]
-			Real64 const DesCoolVolFlowMin, // zone design cooling minimum air volume flow rate [m3/s]
-			Real64 const DesHeatCoilInTemp, // zone heating coil design air inlet temperature [C]
-			Real64 const DesCoolCoilInTemp, // zone cooling coil design air inlet temperature [C]
-			Real64 const DesHeatCoilInHumRat, // zone heating coil design air inlet humidity ratio [kg/kg]
-			Real64 const DesCoolCoilInHumRat, // zone cooling coil design air inlet humidity ratio [kg/kg]
-			Real64 const DesHeatCoilInTempTU, // zone heating coil design air inlet temperature (supply air)([C]
-			Real64 const DesCoolCoilInTempTU, // zone cooling coil design air inlet temperature (supply air)[C]
-			Real64 const DesHeatCoilInHumRatTU, // zone heating coil design air inlet humidity ratio
-			Real64 const DesCoolCoilInHumRatTU, // zone cooling coil design air inlet humidity ratio
-			Real64 const HeatMassFlow, // current zone heating air mass flow rate (HVAC time step)
-			Real64 const CoolMassFlow, // current zone cooling air mass flow rate (HVAC time step)
-			Real64 const HeatLoad, // current zone heating load (HVAC time step)
-			Real64 const CoolLoad, // current zone heating load (HVAC time step)
-			Real64 const HeatZoneTemp, // current zone temperature (heating, time step)
-			Real64 const HeatOutTemp, // current outdoor temperature (heating, time step)
-			Real64 const HeatZoneRetTemp, // current zone return temperature (heating, time step)
-			Real64 const HeatTstatTemp, // current zone thermostat temperature (heating, time step)
-			Real64 const CoolZoneTemp, // current zone temperature (cooling, time step)
-			Real64 const CoolOutTemp, // current Outdoor temperature (cooling, time step)
-			Real64 const CoolZoneRetTemp, // current zone return temperature (cooling, time step)
-			Real64 const CoolTstatTemp, // current zone thermostat temperature (cooling, time step)
-			Real64 const HeatZoneHumRat, // current zone humidity ratio (heating, time step)
-			Real64 const CoolZoneHumRat, // current zone humidity ratio (cooling, time step)
-			Real64 const HeatOutHumRat, // current outdoor humidity ratio (heating, time step)
-			Real64 const CoolOutHumRat, // current outdoor humidity ratio (cooling, time step)
-			Real64 const ZoneTempAtHeatPeak, // zone temp at max heating [C]
-			Real64 const ZoneRetTempAtHeatPeak, // zone return temp at max heating [C]
-			Real64 const OutTempAtHeatPeak, // outdoor temperature at max heating [C]
-			Real64 const ZoneTempAtCoolPeak, // zone temp at max cooling [C]
-			Real64 const ZoneRetTempAtCoolPeak, // zone return temp at max cooling [C]
-			Real64 const OutTempAtCoolPeak, // outdoor temperature at max cooling [C]
-			Real64 const ZoneHumRatAtHeatPeak, // zone humidity ratio at max heating [kg/kg]
-			Real64 const ZoneHumRatAtCoolPeak, // zone humidity ratio at max cooling [kg/kg]
-			Real64 const OutHumRatAtHeatPeak, // outdoor humidity at max heating [kg/kg]
-			Real64 const OutHumRatAtCoolPeak, // outdoor humidity at max cooling [kg/kg]
-			int const TimeStepNumAtHeatMax, // time step number (in day) at Heating peak
-			int const TimeStepNumAtCoolMax, // time step number (in day) at cooling peak
-			int const HeatDDNum, // design day index of design day causing heating peak
-			int const CoolDDNum, // design day index of design day causing heating peak
-			std::string const & cHeatDDDate, // date of design day causing heating peak
-			std::string const & cCoolDDDate, // date of design day causing cooling peak
-			Real64 const MinOA, // design minimum outside air in m3/s
-			Real64 const DesCoolMinAirFlow2, // design cooling minimum air flow rate [m3/s] derived from
-			Real64 const DesHeatMaxAirFlow2, // design heating maximum air flow rate [m3/s] derived from
-			Array1< Real64 > const & HeatFlowSeq, // daily sequence of zone heating air mass flow rate
-			Array1< Real64 > const & CoolFlowSeq, // daily sequence of zone cooling air mass flow rate
-			Array1< Real64 > const & HeatLoadSeq, // daily sequence of zone heating load zone time step)
-			Array1< Real64 > const & CoolLoadSeq, // daily sequence of zone cooling load zone time step)
-			Array1< Real64 > const & HeatZoneTempSeq, // daily sequence of zone temperatures (heating, zone time step)
-			Array1< Real64 > const & HeatOutTempSeq, // daily sequence of outdoor temperatures (heating, zone time step)
-			Array1< Real64 > const & HeatZoneRetTempSeq, // daily sequence of zone return temperatures (heating,
-			Array1< Real64 > const & HeatTstatTempSeq, // daily sequence of zone thermostat temperatures (heating, zone time step)
-			Array1< Real64 > const & DesHeatSetPtSeq, // daily sequence of indoor set point temperatures (zone time step)
-			Array1< Real64 > const & CoolZoneTempSeq, // daily sequence of zone temperatures (cooling, zone time step)
-			Array1< Real64 > const & CoolOutTempSeq, // daily sequence of outdoor temperatures (cooling, zone time step)
-			Array1< Real64 > const & CoolZoneRetTempSeq, // daily sequence of zone return temperatures (cooling,
-			Array1< Real64 > const & CoolTstatTempSeq, // daily sequence of zone thermostat temperatures (cooling, zone time step)
-			Array1< Real64 > const & DesCoolSetPtSeq, // daily sequence of indoor set point temperatures (zone time step)
-			Array1< Real64 > const & HeatZoneHumRatSeq, // daily sequence of zone humidity ratios (heating, zone time step)
-			Array1< Real64 > const & CoolZoneHumRatSeq, // daily sequence of zone humidity ratios (cooling, zone time step)
-			Array1< Real64 > const & HeatOutHumRatSeq, // daily sequence of outdoor humidity ratios (heating, zone time step)
-			Array1< Real64 > const & CoolOutHumRatSeq, // daily sequence of outdoor humidity ratios (cooling, zone time step)
-			Real64 const ZoneADEffCooling, // the zone air distribution effectiveness in cooling mode
-			Real64 const ZoneADEffHeating, // the zone air distribution effectiveness in heating mode
-			Real64 const ZoneSecondaryRecirculation, // the zone secondary air recirculation fraction
-			Real64 const ZonePrimaryAirFraction, // the zone primary air fraction for cooling based calculations
-			Real64 const ZonePrimaryAirFractionHtg, // the zone primary air fraction for heating based calculations
-			Real64 const ZoneOAFracCooling, // OA fraction in cooling mode
-			Real64 const ZoneOAFracHeating, // OA fraction in heating mode
-			Real64 const TotalOAFromPeople, // Zone OA required due to people
-			Real64 const TotalOAFromArea, // Zone OA required based on floor area
-			Real64 const TotPeopleInZone, // total number of people in the zone
-			Real64 const TotalZoneFloorArea, // total zone floor area
-			Real64 const ZonePeakOccupancy, // zone peak occupancy based on max schedule value
-			Real64 const SupplyAirAdjustFactor, // supply air adjustment factor for next time step if OA is capped
-			Real64 const ZpzClgByZone, // OA Std 62.1 required fraction in cooling mode
-			Real64 const ZpzHtgByZone, // OA Std 62.1 required fraction in heating mode
-			Real64 const VozClgByZone, // value of required cooling vent to zone, used in 62.1 tabular report
-			Real64 const VozHtgByZone // value of required heating vent to zone, used in 62.1 tabular report
-		) :
-			ZoneName( ZoneName ),
-			CoolDesDay( CoolDesDay ),
-			HeatDesDay( HeatDesDay ),
-			ZnCoolDgnSAMethod( ZnCoolDgnSAMethod ),
-			ZnHeatDgnSAMethod( ZnHeatDgnSAMethod ),
-			CoolDesTemp( CoolDesTemp ),
-			HeatDesTemp( HeatDesTemp ),
-			CoolDesTempDiff( CoolDesTempDiff ),
-			HeatDesTempDiff( HeatDesTempDiff ),
-			CoolDesHumRat( CoolDesHumRat ),
-			HeatDesHumRat( HeatDesHumRat ),
-			ZoneDesignSpecOAIndex( ZoneDesignSpecOAIndex ),
-			OADesMethod( OADesMethod ),
-			DesOAFlowPPer( DesOAFlowPPer ),
-			DesOAFlowPerArea( DesOAFlowPerArea ),
-			DesOAFlow( DesOAFlow ),
-			CoolAirDesMethod( CoolAirDesMethod ),
-			InpDesCoolAirFlow( InpDesCoolAirFlow ),
-			DesCoolMinAirFlowPerArea( DesCoolMinAirFlowPerArea ),
-			DesCoolMinAirFlow( DesCoolMinAirFlow ),
-			DesCoolMinAirFlowFrac( DesCoolMinAirFlowFrac ),
-			HeatAirDesMethod( HeatAirDesMethod ),
-			InpDesHeatAirFlow( InpDesHeatAirFlow ),
-			DesHeatMaxAirFlowPerArea( DesHeatMaxAirFlowPerArea ),
-			DesHeatMaxAirFlow( DesHeatMaxAirFlow ),
-			DesHeatMaxAirFlowFrac( DesHeatMaxAirFlowFrac ),
-			HeatSizingFactor( HeatSizingFactor ),
-			CoolSizingFactor( CoolSizingFactor ),
-			ActualZoneNum( ActualZoneNum ),
-			SupplyAirNode( SupplyAirNode ),
-			DesHeatMassFlow( DesHeatMassFlow ),
-			DesHeatOAFlowFrac( DesHeatOAFlowFrac ),
-			EMSOverrideDesHeatMassOn( EMSOverrideDesHeatMassOn ),
-			EMSValueDesHeatMassFlow( EMSValueDesHeatMassFlow ),
-			DesCoolMassFlow( DesCoolMassFlow ),
-			DesCoolOAFlowFrac( DesCoolOAFlowFrac ),
-			EMSOverrideDesCoolMassOn( EMSOverrideDesCoolMassOn ),
-			EMSValueDesCoolMassFlow( EMSValueDesCoolMassFlow ),
-			DesHeatLoad( DesHeatLoad ),
-			EMSOverrideDesHeatLoadOn( EMSOverrideDesHeatLoadOn ),
-			EMSValueDesHeatLoad( EMSValueDesHeatLoad ),
-			DesCoolLoad( DesCoolLoad ),
-			EMSOverrideDesCoolLoadOn( EMSOverrideDesCoolLoadOn ),
-			EMSValueDesCoolLoad( EMSValueDesCoolLoad ),
-			DesHeatDens( DesHeatDens ),
-			DesCoolDens( DesCoolDens ),
-			DesHeatVolFlow( DesHeatVolFlow ),
-			EMSOverrideDesHeatVolOn( EMSOverrideDesHeatVolOn ),
-			EMSValueDesHeatVolFlow( EMSValueDesHeatVolFlow ),
-			DesCoolVolFlow( DesCoolVolFlow ),
-			EMSOverrideDesCoolVolOn( EMSOverrideDesCoolVolOn ),
-			EMSValueDesCoolVolFlow( EMSValueDesCoolVolFlow ),
-			DesHeatVolFlowMax( DesHeatVolFlowMax ),
-			DesCoolVolFlowMin( DesCoolVolFlowMin ),
-			DesHeatCoilInTemp( DesHeatCoilInTemp ),
-			DesCoolCoilInTemp( DesCoolCoilInTemp ),
-			DesHeatCoilInHumRat( DesHeatCoilInHumRat ),
-			DesCoolCoilInHumRat( DesCoolCoilInHumRat ),
-			DesHeatCoilInTempTU( DesHeatCoilInTempTU ),
-			DesCoolCoilInTempTU( DesCoolCoilInTempTU ),
-			DesHeatCoilInHumRatTU( DesHeatCoilInHumRatTU ),
-			DesCoolCoilInHumRatTU( DesCoolCoilInHumRatTU ),
-			HeatMassFlow( HeatMassFlow ),
-			CoolMassFlow( CoolMassFlow ),
-			HeatLoad( HeatLoad ),
-			CoolLoad( CoolLoad ),
-			HeatZoneTemp( HeatZoneTemp ),
-			HeatOutTemp( HeatOutTemp ),
-			HeatZoneRetTemp( HeatZoneRetTemp ),
-			HeatTstatTemp( HeatTstatTemp ),
-			CoolZoneTemp( CoolZoneTemp ),
-			CoolOutTemp( CoolOutTemp ),
-			CoolZoneRetTemp( CoolZoneRetTemp ),
-			CoolTstatTemp( CoolTstatTemp ),
-			HeatZoneHumRat( HeatZoneHumRat ),
-			CoolZoneHumRat( CoolZoneHumRat ),
-			HeatOutHumRat( HeatOutHumRat ),
-			CoolOutHumRat( CoolOutHumRat ),
-			ZoneTempAtHeatPeak( ZoneTempAtHeatPeak ),
-			ZoneRetTempAtHeatPeak( ZoneRetTempAtHeatPeak ),
-			OutTempAtHeatPeak( OutTempAtHeatPeak ),
-			ZoneTempAtCoolPeak( ZoneTempAtCoolPeak ),
-			ZoneRetTempAtCoolPeak( ZoneRetTempAtCoolPeak ),
-			OutTempAtCoolPeak( OutTempAtCoolPeak ),
-			ZoneHumRatAtHeatPeak( ZoneHumRatAtHeatPeak ),
-			ZoneHumRatAtCoolPeak( ZoneHumRatAtCoolPeak ),
-			OutHumRatAtHeatPeak( OutHumRatAtHeatPeak ),
-			OutHumRatAtCoolPeak( OutHumRatAtCoolPeak ),
-			TimeStepNumAtHeatMax( TimeStepNumAtHeatMax ),
-			TimeStepNumAtCoolMax( TimeStepNumAtCoolMax ),
-			HeatDDNum( HeatDDNum ),
-			CoolDDNum( CoolDDNum ),
-			cHeatDDDate( cHeatDDDate ),
-			cCoolDDDate( cCoolDDDate ),
-			MinOA( MinOA ),
-			DesCoolMinAirFlow2( DesCoolMinAirFlow2 ),
-			DesHeatMaxAirFlow2( DesHeatMaxAirFlow2 ),
-			HeatFlowSeq( HeatFlowSeq ),
-			CoolFlowSeq( CoolFlowSeq ),
-			HeatLoadSeq( HeatLoadSeq ),
-			CoolLoadSeq( CoolLoadSeq ),
-			HeatZoneTempSeq( HeatZoneTempSeq ),
-			HeatOutTempSeq( HeatOutTempSeq ),
-			HeatZoneRetTempSeq( HeatZoneRetTempSeq ),
-			HeatTstatTempSeq( HeatTstatTempSeq ),
-			DesHeatSetPtSeq( DesHeatSetPtSeq ),
-			CoolZoneTempSeq( CoolZoneTempSeq ),
-			CoolOutTempSeq( CoolOutTempSeq ),
-			CoolZoneRetTempSeq( CoolZoneRetTempSeq ),
-			CoolTstatTempSeq( CoolTstatTempSeq ),
-			DesCoolSetPtSeq( DesCoolSetPtSeq ),
-			HeatZoneHumRatSeq( HeatZoneHumRatSeq ),
-			CoolZoneHumRatSeq( CoolZoneHumRatSeq ),
-			HeatOutHumRatSeq( HeatOutHumRatSeq ),
-			CoolOutHumRatSeq( CoolOutHumRatSeq ),
-			ZoneADEffCooling( ZoneADEffCooling ),
-			ZoneADEffHeating( ZoneADEffHeating ),
-			ZoneSecondaryRecirculation( ZoneSecondaryRecirculation ),
-			ZonePrimaryAirFraction( ZonePrimaryAirFraction ),
-			ZonePrimaryAirFractionHtg( ZonePrimaryAirFractionHtg ),
-			ZoneOAFracCooling( ZoneOAFracCooling ),
-			ZoneOAFracHeating( ZoneOAFracHeating ),
-			TotalOAFromPeople( TotalOAFromPeople ),
-			TotalOAFromArea( TotalOAFromArea ),
-			TotPeopleInZone( TotPeopleInZone ),
-			TotalZoneFloorArea( TotalZoneFloorArea ),
-			ZonePeakOccupancy( ZonePeakOccupancy ),
-			SupplyAirAdjustFactor( SupplyAirAdjustFactor ),
-			ZpzClgByZone( ZpzClgByZone ),
-			ZpzHtgByZone( ZpzHtgByZone ),
-			VozClgByZone( VozClgByZone ),
-			VozHtgByZone( VozHtgByZone )
+			VozHtgByZone( 0.0 ),
+			DOASHeatLoad( 0.0 ),
+			DOASCoolLoad( 0.0 ),
+			DOASHeatAdd(0.0),
+			DOASLatAdd(0.0),
+			DOASSupMassFlow( 0.0 ),
+			DOASSupTemp( 0.0 ),
+			DOASSupHumRat( 0.0 ),
+			DOASTotCoolLoad( 0.0 )
 		{}
 
 	};

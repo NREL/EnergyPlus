@@ -607,6 +607,30 @@ namespace UserDefinedComponents {
 	void
 	ReportAirTerminalUserDefined( int const CompNum );
 
+	void
+	GetUserDefinedCoilIndex(
+		std::string const & CoilName,
+		int & CoilIndex,
+		bool & ErrorsFound,
+		std::string const CurrentModuleObject
+	);
+
+	void
+	GetUserDefinedCoilAirInletNode(
+		std::string const & CoilName,
+		int & CoilAirInletNode,
+		bool & ErrorsFound,
+		std::string const CurrentModuleObject
+	);
+
+	void
+	GetUserDefinedCoilAirOutletNode(
+		std::string const & CoilName,
+		int & CoilAirOutletNode,
+		bool & ErrorsFound,
+		std::string const CurrentModuleObject
+	);
+
 	//     NOTICE
 
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
