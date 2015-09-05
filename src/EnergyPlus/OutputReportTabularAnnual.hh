@@ -97,7 +97,7 @@ public:
 	inspectTableFieldSets(int);
 
 	void
-	AnnualTable::clearTable();
+	clearTable();
 
 
 
