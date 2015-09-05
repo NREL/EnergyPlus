@@ -665,17 +665,14 @@ CheckThisAirSystemForSizing(
 	// na
 	int ThisAirSysSizineInputLoop;
 
+	AirLoopWasSized = false;
 	if ( SysSizingRunDone ) {
 		for ( ThisAirSysSizineInputLoop = 1; ThisAirSysSizineInputLoop <= NumSysSizInput; ++ThisAirSysSizineInputLoop ) {
 			if ( SysSizInput( ThisAirSysSizineInputLoop ).AirLoopNum == AirLoopNum ) {
 				AirLoopWasSized = true;
 				break;
-			} else {
-				AirLoopWasSized = false;
 			}
 		}
-	} else {
-		AirLoopWasSized = false;
 	}
 
 }
@@ -779,17 +776,14 @@ CheckThisZoneForSizing(
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int ThisSizingInput;
 
+	ZoneWasSized = false;
 	if ( ZoneSizingRunDone ) {
 		for ( ThisSizingInput = 1; ThisSizingInput <= NumZoneSizingInput; ++ThisSizingInput ) {
 			if ( ZoneSizingInput( ThisSizingInput ).ZoneNum == ZoneNum ) {
 				ZoneWasSized = true;
 				break;
-			} else {
-				ZoneWasSized = false;
 			}
 		}
-	} else {
-		ZoneWasSized = false;
 	}
 
 }

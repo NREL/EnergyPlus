@@ -740,7 +740,7 @@
     CounterFlow,             !- Flow Arrangement Type
     Yes,                     !- Economizer Lockout
     1.0,                     !- Ratio of Supply to Secondary hA Values
-    0.4333,                  !- Nominal Supply Air Flow Rate {m3/s}
+    Autosize,                !- Nominal Supply Air Flow Rate {m3/s}
     5.0,                     !- Nominal Supply Air Inlet Temperature {C}
     15.0,                    !- Nominal Supply Air Outlet Temperature {C}
     0.4333,                  !- Nominal Secondary Air Flow Rate {m3/s}
