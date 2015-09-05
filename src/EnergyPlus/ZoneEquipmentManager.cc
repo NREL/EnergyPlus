@@ -134,7 +134,7 @@ namespace ZoneEquipmentManager {
 	// These are purposefully not in the header file as an extern variable. No one outside of this should
 	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-		bool SizeZoneEquipmentOneTimeFlag( true );
+		
 		bool InitZoneEquipmentOneTimeFlag( true );
 	}
 
@@ -142,6 +142,7 @@ namespace ZoneEquipmentManager {
 	Array1D_int DefaultSimOrder;
 	int NumOfTimeStepInDay; // number of zone time steps in a day
 	bool GetZoneEquipmentInputFlag( true );
+	bool SizeZoneEquipmentOneTimeFlag( true );
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE ZoneEquipmentManager
 
@@ -544,7 +545,6 @@ namespace ZoneEquipmentManager {
 		using DataHVACGlobals::SmallTempDiff;
 		using General::RoundSigDigits;
 		using DataEnvironment::StdBaroPress;
-		using DataZoneEquipment::MyOneTimeFlag2;
 
 		// Parameters
 		static std::string const RoutineName( "SizeZoneEquipment" );
