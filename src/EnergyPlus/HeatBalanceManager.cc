@@ -269,7 +269,7 @@ namespace HeatBalanceManager {
 		// Get the heat balance input at the beginning of the simulation only
 		if ( GetInputFlag ) {
 			GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
-			Octree::surfaceOctree.init( DataSurfaces::Surface ); // Set up surface octree
+			surfaceOctree.init( DataSurfaces::Surface ); // Set up surface octree
 			GetInputFlag = false;
 		}
 

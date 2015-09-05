@@ -14,7 +14,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataSurfaces;
-using namespace EnergyPlus::Octree;
 using namespace EnergyPlus::SurfaceGeometry;
 using namespace ObjexxFCL;
 using Vertex = SurfaceOctreeCube::Vertex;
@@ -46,7 +45,7 @@ TEST( SurfaceOctreeTest, Basic )
 	Surface( 6 ).Vertex = { vertices(0,0,1), vertices(1,0,1), vertices(1,1,1), vertices(0,1,1) };
 	CalcSurfaceCentroid();
 
-	// SurfaceOctreeCube
+	// Surface octree
 	SurfaceOctreeCube const cube( Surface );
 
 	EXPECT_EQ( Vertex( 0.0, 0.0, 0.0 ), cube.l() );

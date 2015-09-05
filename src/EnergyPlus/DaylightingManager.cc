@@ -41,6 +41,7 @@
 #include <ScheduleManager.hh>
 #include <SolarReflectionManager.hh>
 #include <SQLiteProcedures.hh>
+#include <SurfaceOctree.hh>
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
 #include <WindowComplexManager.hh>
@@ -5322,13 +5323,11 @@ namespace DaylightingManager {
 		//                        is now a separate check for interior obstructions; exclude windows and
 		//                        doors as obstructors since if they are obstructors their base surfaces will
 		//                        also be obstructors
-		//       RE-ENGINEERED  na
+		//       RE-ENGINEERED  Sept 2015. Stuart Mentzer. Octree for performance.
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Determines the product of the solar transmittances of the obstructions hit by a ray
 		// from R1 in the direction of vector RN.
-
-		// METHODOLOGY EMPLOYED:na
 
 		// REFERENCES:
 		// Based on DOE-2.1E subroutine DHITSH.
@@ -5336,46 +5335,37 @@ namespace DaylightingManager {
 		// Using/Aliasing
 		using ScheduleManager::LookUpScheduleValue;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		//  (shading surfaces, building walls, etc.) that are hit
-
-		// SUBROUTINE PARAMETER DEFINITIONS:na
-		// INTERFACE BLOCK SPECIFICATIONS:na
-		// DERIVED TYPE DEFINITIONS:na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		// Local declarations
 		int IType; // Surface type/class:  mirror surfaces of shading surfaces
 		static Vector3< Real64 > HP; // Hit coordinates, if ray hits an obstruction
 		int Pierce; // 1 if a particular obstruction is hit, 0 otherwise
-		Real64 Trans; // Solar transmittance of a shading surface
-		// FLOW:
 
 		ObTrans = 1.0;
+		auto const & window( Surface( IWin ) );
+		auto const window_iBaseSurf( window.BaseSurf );
+		auto const & window_base( Surface( window_iBaseSurf ) );
+		auto const window_base_p( &window_base );
 
-		// Loop over obstructions, which can be building elements, like walls,
-		// or shadowing surfaces, like overhangs. Exclude base surface of window IWin.
-		// Building elements are assumed to be opaque. A shadowing surface is opaque unless
-		// its transmittance schedule value is non-zero.
+		// Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
+		// Building elements are assumed to be opaque
+		// A shadowing surface is opaque unless its transmittance schedule value is non-zero
+		if ( TotSurfaces < 100 ) { // Do simple linear search through surfaces //Do Tune this crossover heuristic
 
-		for ( int ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
-			if ( ! Surface( ISurf ).ShadowSurfPossibleObstruction ) continue;
-			IType = Surface( ISurf ).Class;
-			if ( ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) && ISurf != Surface( IWin ).BaseSurf ) {
-				PierceSurface( ISurf, R1, RN, Pierce, HP );
-				if ( Pierce > 0 ) { // Building element is hit (assumed opaque)
-					ObTrans = 0.0;
-					break;
-				}
-			} else if ( Surface( ISurf ).ShadowingSurf ) {
-				//!fw following check on mirror shadow surface can be removed with addition of above
-				//!fw check on ShadowSurfPossibleObstruction (which is false for mirror shadow surfaces)
-				if ( ! Surface( ISurf ).MirroredSurf ) { // This check skips mirror surfaces
+			for ( int ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
+				auto const & surface( Surface( ISurf ) );
+				if ( ! surface.ShadowSurfPossibleObstruction ) continue;
+				IType = surface.Class;
+				if ( ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) && ( ISurf != window_iBaseSurf ) ) {
+					PierceSurface( ISurf, R1, RN, Pierce, HP );
+					if ( Pierce > 0 ) { // Building element is hit (assumed opaque)
+						ObTrans = 0.0;
+						break;
+					}
+				} else if ( surface.ShadowingSurf ) {
 					PierceSurface( ISurf, R1, RN, Pierce, HP );
 					if ( Pierce > 0 ) { // Shading surface is hit
 						// Get solar transmittance of the shading surface
-						Trans = 0.0;
-						if ( Surface( ISurf ).SchedShadowSurfIndex > 0 ) Trans = LookUpScheduleValue( Surface( ISurf ).SchedShadowSurfIndex, IHOUR, 1 );
+						Real64 const Trans( surface.SchedShadowSurfIndex > 0 ? LookUpScheduleValue( surface.SchedShadowSurfIndex, IHOUR, 1 ) : 0.0 );
 						if ( Trans < 1.e-6 ) {
 							ObTrans = 0.0;
 							break;
@@ -5384,7 +5374,38 @@ namespace DaylightingManager {
 						}
 					}
 				}
-			} // End of test if building element or shading surface
+			}
+
+		} else { // Use surface octree to find candidate surfaces efficiently
+
+			Vector3< Real64 > const RN_inv( octree_inverse( RN ) );
+			SurfaceOctreeCube::Surfaces surfaces;
+			surfaceOctree.surfacesRayIntersectsCube( R1, RN, RN_inv, surfaces );
+			for ( auto const * surface_p : surfaces ) {
+				auto const & surface( *surface_p );
+				if ( ! surface.ShadowSurfPossibleObstruction ) continue;
+				IType = surface.Class;
+				if ( ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) && ( surface_p != window_base_p ) ) {
+					PierceSurface( surface, R1, RN, Pierce, HP );
+					if ( Pierce > 0 ) { // Building element is hit (assumed opaque)
+						ObTrans = 0.0;
+						break;
+					}
+				} else if ( surface.ShadowingSurf ) {
+					PierceSurface( surface, R1, RN, Pierce, HP );
+					if ( Pierce > 0 ) { // Shading surface is hit
+						// Get solar transmittance of the shading surface
+						Real64 const Trans( surface.SchedShadowSurfIndex > 0 ? LookUpScheduleValue( surface.SchedShadowSurfIndex, IHOUR, 1 ) : 0.0 );
+						if ( Trans < 1.e-6 ) {
+							ObTrans = 0.0;
+							break;
+						} else {
+							ObTrans *= Trans;
+						}
+					}
+				}
+			}
+
 		}
 
 	}
@@ -5402,7 +5423,7 @@ namespace DaylightingManager {
 		//       AUTHOR         Fred Winkelmann
 		//       DATE WRITTEN   July 1997
 		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+		//       RE-ENGINEERED  Sept 2015. Stuart Mentzer. Octree for performance.
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine checks for interior obstructions between reference point and window element.
@@ -5410,38 +5431,58 @@ namespace DaylightingManager {
 		// Preconditions
 		assert( magnitude( R2 - R1 ) > 0.0 ); // Protect normalize() from divide by zero
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		// Local declarations
 		int IType; // Surface type/class
 		static Vector3< Real64 > HP; // Hit coordinates, if ray hits an obstruction
 		static Vector3< Real64 > RN; // Unit vector along ray
 
 		IHit = 0;
-		Real64 const d12( distance_squared( R1, R2 ) ); // Distance squared between R1 and R2 (distance squared is cheaper to compute)
 		RN = ( R2 - R1 ).normalize(); // Make unit vector
+		Real64 const d12( distance( R1, R2 ) ); // Distance between R1 and R2
+		auto const & window( Surface( IWin ) );
+		auto const window_Zone( window.Zone );
+		auto const window_iBaseSurf( window.BaseSurf );
+		auto const & window_base( Surface( window_iBaseSurf ) );
+		auto const window_base_p( &window_base );
+		auto const window_base_iExtBoundCond( window_base.ExtBoundCond );
+		auto const & window_base_adjacent( Surface( window_base_iExtBoundCond ) );
+		auto const window_base_adjacent_p( &window_base_adjacent );
 
-		// Loop over obstructions, which can be building elements, like walls,
-		// or shadowing surfaces, like overhangs. Exclude base surface of window IWin.
-		for ( int ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
-			auto const & surface( Surface( ISurf ) );
-			IType = surface.Class;
+		// Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
+		if ( TotSurfaces < 100 ) { // Do simple linear search through surfaces //Do Tune this crossover heuristic
 
-			if ( (
-			 ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) &&
-			 ( ISurf != Surface( IWin ).BaseSurf ) && ( ISurf != Surface( Surface( IWin ).BaseSurf ).ExtBoundCond ) &&
-			 ( surface.Zone == Surface( IWin ).Zone ) ) // Wall/ceiling/floor is in same zone as window
-			 || ( surface.ShadowingSurf ) ) {
-
-				// Check if ray pierces surface
-				PierceSurface( ISurf, R1, RN, IHit, HP );
-				if ( IHit > 0 ) {
-					if ( distance_squared( R1, HP ) > d12 ) { // Discount any hits farther than the window.
-						IHit = 0;
-					} else { // The hit is closer than the window.
-						break;
-					}
+			for ( int ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
+				auto const & surface( Surface( ISurf ) );
+				IType = surface.Class;
+				if ( (
+				 ( surface.Zone == window.Zone ) && // Wall/ceiling/floor is in same zone as window
+				 ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) &&
+				 ( ISurf != window_iBaseSurf ) && ( ISurf != window_base_iExtBoundCond ) ) || // Exclude window's base or base-adjacent surfaces
+				 ( surface.ShadowingSurf ) ) // Shadowing surface
+				{
+					PierceSurface( ISurf, R1, RN, d12, IHit, HP ); // Check if R2-R1 segment pierces surface
+					if ( IHit > 0 ) break; // Segment pierces surface: Don't check the rest
 				}
-
 			}
+
+		} else { // Use surface octree to find candidate surfaces efficiently
+
+			SurfaceOctreeCube::Surfaces surfaces;
+			surfaceOctree.surfacesSegmentIntersectsCube( R1, R2, surfaces );
+			for ( auto const * surface_p : surfaces ) {
+				auto const & surface( *surface_p );
+				IType = surface.Class;
+				if ( (
+				 ( surface.Zone == window_Zone ) && // Surface is in same zone as window
+				 ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) && // Wall, ceiling/roof, or floor
+				 ( surface_p != window_base_p ) && ( surface_p != window_base_adjacent_p ) ) || // Exclude window's base or base-adjacent surfaces
+				 ( surface.ShadowingSurf ) ) // Shadowing surface
+				{
+					PierceSurface( surface, R1, RN, d12, IHit, HP ); // Check if R2-R1 segment pierces surface
+					if ( IHit > 0 ) break; // Segment pierces surface: Don't check the rest
+				}
+			}
+
 		}
 
 	}
@@ -5460,7 +5501,7 @@ namespace DaylightingManager {
 		//       AUTHOR         Fred Winkelmann
 		//       DATE WRITTEN   Feb 2004
 		//       MODIFIED na
-		//       RE-ENGINEERED  na
+		//       RE-ENGINEERED  Sept 2015. Stuart Mentzer. Octree for performance.
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Determines if a ray from point R1 on window IWin1 to point R2
@@ -5475,34 +5516,67 @@ namespace DaylightingManager {
 		static Vector3< Real64 > RN; // Unit vector along ray from R1 to R2
 
 		IHit = 0;
-		Real64 const d12( distance_squared( R1, R2 ) ); // Distance squared between R1 and R2 (m) (distance squared is cheaper to compute)
 		RN = ( R2 - R1 ).normalize(); // Unit vector
+		Real64 const d12( distance( R1, R2 ) ); // Distance squared between R1 and R2 (m)
 
-		// Loop over obstructions, which can be building elements, like walls,
-		// or shadowing surfaces, like overhangs. Exclude base surface of window IWin1.
-		// Exclude base surface of window IWin2.
-		for ( int ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
-			auto const & surface( Surface( ISurf ) );
-			IType = surface.Class;
+		auto const & window1( Surface( IWin1 ) );
+		auto const window1_Zone( window1.Zone );
+		auto const window1_iBaseSurf( window1.BaseSurf );
+		auto const & window1_base( Surface( window1_iBaseSurf ) );
+		auto const window1_base_p( &window1_base );
+		auto const window1_base_iExtBoundCond( window1_base.ExtBoundCond );
+		auto const & window1_base_adjacent( Surface( window1_base_iExtBoundCond ) );
+		auto const window1_base_adjacent_p( &window1_base_adjacent );
 
-			if ( (
-			 ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) &&
-			 ( ISurf != Surface( IWin2 ).BaseSurf ) && ( ISurf != Surface( IWin1 ).BaseSurf ) &&
-			 ( ISurf != Surface( Surface( IWin2 ).BaseSurf ).ExtBoundCond ) && ( ISurf != Surface( Surface( IWin1 ).BaseSurf ).ExtBoundCond ) &&
-			 ( surface.Zone == Surface( IWin2 ).Zone ) ) // Wall/ceiling/floor is in same zone as destination window
-			 || ( surface.ShadowingSurf ) ) {
+		auto const & window2( Surface( IWin2 ) );
+		auto const window2_Zone( window2.Zone );
+		auto const window2_iBaseSurf( window2.BaseSurf );
+		auto const & window2_base( Surface( window2_iBaseSurf ) );
+		auto const window2_base_p( &window2_base );
+		auto const window2_base_iExtBoundCond( window2_base.ExtBoundCond );
+		auto const & window2_base_adjacent( Surface( window2_base_iExtBoundCond ) );
+		auto const window2_base_adjacent_p( &window2_base_adjacent );
 
-				// Check if ray pierces surface
-				PierceSurface( ISurf, R1, RN, IHit, HP );
-				if ( IHit > 0 ) {
-					if ( distance_squared( R1, HP ) > d12 ) { // Discount any hits farther than the window.
-						IHit = 0;
-					} else { // The hit is closer than the window.
-						break;
-					}
+		// Preconditions
+		assert( window1_Zone == window2_Zone ); //? Is this correct? If not why the asymmetric check of surface in window2 zone?
+
+		// Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
+		if ( TotSurfaces < 100 ) { // Do simple linear search through surfaces //Do Tune this crossover heuristic
+
+			for ( int ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
+				auto const & surface( Surface( ISurf ) );
+				IType = surface.Class;
+				if ( (
+				 ( surface.Zone == window2_Zone ) && // Wall/ceiling/floor is in same zone as windows
+				 ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) && // Wall, ceiling/roof, or floor
+				 ( ISurf != window1_iBaseSurf ) && ( ISurf != window2_iBaseSurf ) && // Exclude windows' base surfaces
+				 ( ISurf != window1_base_iExtBoundCond ) && ( ISurf != window2_base_iExtBoundCond ) ) || // Exclude windows' base-adjacent surfaces
+				 ( surface.ShadowingSurf ) ) // Shadowing surface
+				{
+					PierceSurface( ISurf, R1, RN, d12, IHit, HP ); // Check if R2-R1 segment pierces surface
+					if ( IHit > 0 ) break; // Segment pierces surface: Don't check the rest
 				}
-
 			}
+
+		} else { // Use surface octree to find candidate surfaces efficiently
+
+			SurfaceOctreeCube::Surfaces surfaces;
+			surfaceOctree.surfacesSegmentIntersectsCube( R1, R2, surfaces );
+			for ( auto const * surface_p : surfaces ) {
+				auto const & surface( *surface_p );
+				IType = surface.Class;
+				if ( (
+				 ( surface.Zone == window2_Zone ) && // Surface is in same zone as window
+				 ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) && // Wall, ceiling/roof, or floor
+				 ( surface_p != window1_base_p ) && ( surface_p != window2_base_p ) && // Exclude windows' base surfaces
+				 ( surface_p != window1_base_adjacent_p ) && ( surface_p != window2_base_adjacent_p ) ) || // Exclude windows' base-adjacent surfaces
+				 ( surface.ShadowingSurf ) ) // Shadowing surface
+				{
+					PierceSurface( surface, R1, RN, d12, IHit, HP ); // Check if R2-R1 segment pierces surface
+					if ( IHit > 0 ) break; // Segment pierces surface: Don't check the rest
+				}
+			}
+
 		}
 
 	}

@@ -18,8 +18,6 @@ namespace EnergyPlus {
 // Forward
 namespace DataSurfaces { struct SurfaceData; }
 
-namespace Octree {
-
 // Package: Surface Octree System
 //
 // Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
@@ -321,10 +319,21 @@ private: // Data
 
 }; // SurfaceOctreeCube
 
+// Octree-Safe Vector Inverse
+inline
+SurfaceOctreeCube::Vertex
+octree_inverse( SurfaceOctreeCube::Vertex const & v )
+{
+	return SurfaceOctreeCube::Vertex(
+	 ( v.x != 0.0 ? 1.0 / v.x : 0.0 ),
+	 ( v.y != 0.0 ? 1.0 / v.y : 0.0 ),
+	 ( v.z != 0.0 ? 1.0 / v.z : 0.0 )
+	);
+}
+
 // Globals
 extern SurfaceOctreeCube surfaceOctree;
 
-} // Octree
 } // EnergyPlus
 
 //=================================================================================

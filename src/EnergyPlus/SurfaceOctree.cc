@@ -11,7 +11,6 @@
 #include <limits>
 
 namespace EnergyPlus {
-namespace Octree {
 
 // Package: Surface Octree System
 //
@@ -25,6 +24,11 @@ namespace Octree {
 //
 // Notes:
 //  This code is experimental at this time
+//  Initial octree is for use in daylighting
+//   Surfaces without vertices are omitted
+//   Transparent surfaces are omitted (can't obstruct light)
+//  Parameters to support variants for different purposes is anticipated
+//  The use of multiple octrees for faster lookups of surface type subsets may be beneficial (avoid post-lookup conditional filtering)
 //  Variations and parameter tuning are planned to improve performance
 //  Initial simple design uses "tight" cubes (no overlap) and surfaces filtering down to deepest cube they fit in completely
 //  Alt: Use "loose" cubes oversied by x2 or some other factor to allow surfaces to filter down further: This requires more cubes to be processed for a given operation
@@ -233,7 +237,12 @@ namespace Octree {
 		surfaces_.clear();
 		surfaces_.reserve( surfaces.size() );
 		for( Surface & surface : surfaces ) {
-			if ( ! surface.Vertex.empty() ) surfaces_.push_back( &surface ); // Skip no-vertex "surfaces"
+			if (
+			 ( ! surface.Vertex.empty() ) && // Skip no-vertex "surfaces"
+			 ( ! surface.IsTransparent ) // Skip transparent surfaces
+			) {
+				surfaces_.push_back( &surface );
+			}
 		}
 
 		// No surfaces handler
@@ -459,7 +468,6 @@ namespace Octree {
 // Globals
 SurfaceOctreeCube surfaceOctree;
 
-} // Octree
 } // EnergyPlus
 
 //=================================================================================
