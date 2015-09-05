@@ -49985,6 +49985,7 @@ Coil:Cooling:DX:SingleSpeed:ThermalStorage,
 EvaporativeCooler:Direct:CelDekPad,
        \memo Direct evaporative cooler with rigid media evaporative pad and recirculating water
        \memo pump. This model has no controls other than its availability schedule.
+       \min-fields 4
   A1 , \field Name
        \type alpha
        \reference EvapCoolerNames
@@ -49996,9 +49997,13 @@ EvaporativeCooler:Direct:CelDekPad,
   N1 , \field Direct Pad Area
        \units m2
        \minimum 0.0
+       \autosizable
+       \default Autosize
   N2 , \field Direct Pad Depth
        \units m
        \minimum 0.0
+       \autosizable
+       \default Autosize
   N3 , \field Recirculating Water Pump Power Consumption
        \units W
        \ip-units W
@@ -50016,6 +50021,7 @@ EvaporativeCooler:Indirect:CelDekPad,
        \memo Indirect evaporative cooler with rigid media evaporative pad, recirculating water
        \memo pump, and secondary air fan. This model has no controls other than its availability
        \memo schedule.
+       \min-fields 4
   A1 , \field Name
        \required-field
        \type alpha
@@ -50028,9 +50034,13 @@ EvaporativeCooler:Indirect:CelDekPad,
   N1 , \field Direct Pad Area
        \units m2
        \minimum 0.0
+       \autosizable
+       \default Autosize
   N2 , \field Direct Pad Depth
        \units m
        \minimum 0.0
+       \autosizable
+       \default Autosize
   N3 , \field Recirculating Water Pump Power Consumption
        \units W
        \ip-units W
@@ -50811,6 +50821,8 @@ HeatExchanger:AirToAir:FlatPlate,
       \type real
       \minimum> 0.0
       \units m3/s
+      \autosizable
+      \default Autosize
   N3, \field Nominal Supply Air Inlet Temperature
       \required-field
       \type real
@@ -50824,6 +50836,7 @@ HeatExchanger:AirToAir:FlatPlate,
       \type real
       \minimum> 0.0
       \units m3/s
+      \autosizable
   N6, \field Nominal Secondary Air Inlet Temperature
       \required-field
       \type real
@@ -51050,12 +51063,14 @@ HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1,
        \type real
        \units m3/s
        \minimum> 0.0
+       \autosizable
   N2 , \field Nominal Air Face Velocity
        \required-field
        \type real
        \units m/s
        \minimum> 0.0
        \maximum 6.0
+       \autosizable
   N3 , \field Nominal Electric Power
        \note Parasitic electric power (e.g., desiccant wheel motor)
        \type real
@@ -65949,7 +65964,6 @@ WaterHeater:HeatPump:PumpedCondenser,
        \memo This object models an air-source heat pump for water heating where the water is pumped out of the tank,
        \memo through a heating coil and returned to the tank. 
        \memo For wrapped condenser HPWHs, see WaterHeater:HeatPump:WrappedCondenser.
-       \memo see 
        \memo WaterHeater:HeatPump:PumpedCondenser is a compound object that references other component objects -
        \memo Coil:WaterHeating:AirToWaterHeatPump:*, Fan:OnOff, WaterHeater:Mixed or WaterHeater:Stratified
   A1 , \field Name
@@ -78099,7 +78113,7 @@ FaultModel:TemperatureSensorOffset:ReturnAir,
        \maximum< 10
        \default 0.0
        \units deltaC
-  
+
 FaultModel:EnthalpySensorOffset:ReturnAir,
    \memo This object describes return air enthalpy sensor offset
    \min-fields 3
