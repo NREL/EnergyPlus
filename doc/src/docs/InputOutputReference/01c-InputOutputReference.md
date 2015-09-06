@@ -14506,13 +14506,13 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     ,                        !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
     4500000,                 !- Compressor maximum delta Pressure {Pa}
     3,                       !- Number of Compressor Loading Index Entries
-    25,                      !- Compressor Speed at Loading Index 1 {rev/sec}
+    1500,                    !- Compressor Speed at Loading Index 1 {rev/min}
     MinSpdCooling,           !- Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name
     MinSpdPower,             !- Loading Index 1 Compressor Power Multiplier Function of Temperature Curve Name
-    60,                      !- Compressor Speed at Loading Index 2 {rev/sec}
+    3600,                    !- Compressor Speed at Loading Index 2 {rev/min}
     Spd1Cooling,             !- Loading Index 2 Evaporative Capacity Multiplier Function of Temperature Curve Name
     Spd1Power,               !- Loading Index 2 Compressor Power Multiplier Function of Temperature Curve Name
-    100,                     !- Compressor Speed at Loading Index 3 {rev/sec}
+    6000,                    !- Compressor Speed at Loading Index 3 {rev/min}
     Spd2Cooling,             !- Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name
     Spd2Power;               !- Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name
 
@@ -14771,7 +14771,7 @@ For the pysics based VRF model (VRF-FluidTCtrl) only:
 
 * VRF Heat Pump Compressor Electric Power at Heating Mode [W]
 
-* VRF Heat Pump Compressor Rotating Speed [rev/sec]
+* VRF Heat Pump Compressor Rotating Speed [rev/min]
 
 * VRF Heat Pump Outdoor Unit Fan Power [W]
 
@@ -14933,7 +14933,7 @@ This output only applies for the VRF-FluidTCtrl model. This is the electric powe
 
 This output only applies for the VRF-FluidTCtrl model. This is the electric power of the compressor running at the heating mode. This value is related with the compressor speed as well as the operational conditions, i.e., evaporating and condensing temperatures of the system.
 
-#### VRF Heat Pump Compressor Rotating Speed [rev/sec]
+#### VRF Heat Pump Compressor Rotating Speed [rev/min]
 
 This output only applies for the VRF-FluidTCtrl model. This is the rotating speed of the compressor, which indicates the loading index.
 

@@ -350,7 +350,6 @@
 !      percent
 !      ppm
 !      rev/min
-!      rev/sec
 !      s
 !      V
 !      VA
@@ -19357,7 +19356,7 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \type alpha
   N1, \field Fraction of Gains to Node 1 
       \type real
-      \mininum 0.0
+      \minimum 0.0
       \maximum 1.0
       \note fraction applies to sensible, latent, carbon dioxide, and generic contaminant gains or losses  
   A4, \field Internal Gain Object 2 Type
@@ -19410,7 +19409,7 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \type alpha
   N2, \field Fraction of Gains to Node 2
       \type real
-      \mininum 0.0
+      \minimum 0.0
       \maximum 1.0
   A6, \field Internal Gain Object 3 Type
       \type choice
@@ -19462,7 +19461,7 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \type alpha
   N3; \field Fraction of Gains to Node 3
       \type real
-      \mininum 0.0
+      \minimum 0.0
       \maximum 1.0
 
 RoomAir:Node:AirflowNetwork:HVACEquipment,
@@ -33934,7 +33933,7 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
   A8 ,  \field Supply Air Fan Object Name
         \required-field
         \type object-list
-        \object-list FansCVandOnOff
+        \object-list FansCVandOnOffandVAV
   A9 ,  \field Outside Air Mixer Object Type
         \type choice
         \key OutdoorAir:Mixer
@@ -43363,8 +43362,8 @@ Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,
   A5;  \field Indoor Unit Condensing Temperature Function of Subcooling Curve Name    
        \required-field   
        \type object-list
-       \object-list QuadraticCurves	  
-       \object-list UniVariateTables 
+       \object-list QuadraticCurves
+       \object-list UniVariateTables
 
 Coil:Heating:Water,
        \memo Hot water heating coil, NTU-effectiveness model, assumes a cross-flow heat exchanger.
@@ -53717,7 +53716,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   A7 , \field Outdoor Unit Condensing Temperature Function of Subcooling Curve Name    
        \required-field   
        \type object-list
-       \object-list QuadraticCurves	 
+       \object-list QuadraticCurves
        \object-list UniVariateTables  
   N17, \field Diameter of main pipe connecting outdoor unit to indoor units
        \note used to calculate the piping loss
@@ -53840,7 +53839,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   N32, \field Compressor Speed at Loading Index 1 
        \type real
        \note Minimum compressor speed 
-       \units rev/sec	
+       \units rev/min
        \minimum> 0   
   A11, \field Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \required-field
@@ -53854,7 +53853,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \object-list BiVariateTables
   N33, \field Compressor Speed at Loading Index 2
        \type real
-       \units rev/sec
+       \units rev/min
        \minimum> 0
   A13, \field Loading Index 2 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \required-field
@@ -53868,7 +53867,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \object-list BiVariateTables
   N34, \field Compressor Speed at Loading Index 3       
        \type real
-       \units rev/sec
+       \units rev/min
        \minimum> 0
   A15, \field Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name       
        \type object-list
@@ -53880,7 +53879,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \object-list BiVariateTables
   N35, \field Compressor Speed at Loading Index 4       
        \type real
-       \units rev/sec
+       \units rev/min
        \minimum> 0
   A17, \field Loading Index 4 Evaporative Capacity Multiplier Function of Temperature Curve Name       
        \type object-list
@@ -53892,7 +53891,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \object-list BiVariateTables
   N36, \field Compressor Speed at Loading Index 5       
        \type real
-       \units rev/sec
+       \units rev/min
        \minimum> 0
   A19, \field Loading Index 5 Evaporative Capacity Multiplier Function of Temperature Curve Name       
        \type object-list
@@ -53904,7 +53903,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \object-list BiVariateTables
   N37, \field Compressor Speed at Loading Index 6       
        \type real
-       \units rev/sec
+       \units rev/min
        \minimum> 0
   A21, \field Loading Index 6 Evaporative Capacity Multiplier Function of Temperature Curve Name       
        \type object-list
@@ -53916,7 +53915,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \object-list BiVariateTables
   N38, \field Compressor Speed at Loading Index 7       
        \type real
-       \units rev/sec
+       \units rev/min
        \minimum> 0
   A23, \field Loading Index 7 Evaporative Capacity Multiplier Function of Temperature Curve Name       
        \type object-list
@@ -53927,7 +53926,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \object-list BiVariateTables
   N39, \field Compressor Speed at Loading Index 8       
        \type real
-       \units rev/sec
+       \units rev/min
        \minimum> 0
   A25, \field Loading Index 8 Evaporative Capacity Multiplier Function of Temperature Curve Name       
        \type object-list
@@ -53939,7 +53938,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \object-list BiVariateTables
   N40, \field Compressor Speed at Loading Index 9       
        \type real 
-       \units rev/sec
+       \units rev/min
        \minimum> 0
   A27, \field Loading Index 9 Evaporative Capacity Multiplier Function of Temperature Curve Name       
        \type object-list

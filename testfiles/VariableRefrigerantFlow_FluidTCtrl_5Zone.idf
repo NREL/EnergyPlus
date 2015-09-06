@@ -117,8 +117,6 @@
     R410A,                   !- Refrigerant Type
     41300,                   !- Rated Evaporative Capacity {W}
     0.344,                   !- Rated Compressor Power Per Unit of Rated Evaporative Capacity {W/W}
-    2.91,                    !- Reference Cooling COP
-    3.91,                    !- Reference Heating COP
     ,                        !- Minimum Outdoor Air Temperature in Cooling Mode {C}
     ,                        !- Maximum Outdoor Air Temperature in Cooling Mode {C}
     ,                        !- Minimum Outdoor Air Temperature in Heating Mode {C}
@@ -154,13 +152,13 @@
     ,                        !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
     4500000,                 !- Compressor maximum delta Pressure {Pa}
     3,                       !- Number of Compressor Loading Index Entries
-    25,                      !- Compressor Speed at Loading Index 1 {rev/sec}
+    1500,                    !- Compressor Speed at Loading Index 1 {rev/min}
     MinSpdCooling,           !- Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name
     MinSpdPower,             !- Loading Index 1 Compressor Power Multiplier Function of Temperature Curve Name
-    60,                      !- Compressor Speed at Loading Index 2 {rev/sec}
+    3600,                    !- Compressor Speed at Loading Index 2 {rev/min}
     Spd1Cooling,             !- Loading Index 2 Evaporative Capacity Multiplier Function of Temperature Curve Name
     Spd1Power,               !- Loading Index 2 Compressor Power Multiplier Function of Temperature Curve Name
-    100,                     !- Compressor Speed at Loading Index 3 {rev/sec}
+    6000,                    !- Compressor Speed at Loading Index 3 {rev/min}
     Spd2Cooling,             !- Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name
     Spd2Power;               !- Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name
 

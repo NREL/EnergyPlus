@@ -128,7 +128,7 @@ namespace DataHVACGlobals {
 	Array1D_string const cFurnaceTypes( NumUnitarySystemTypes, { "AirLoopHVAC:Unitary:Furnace:HeatOnly", "AirLoopHVAC:Unitary:Furnace:HeatCool", "AirLoopHVAC:UnitaryHeatOnly", "AirLoopHVAC:UnitaryHeatCool", "AirLoopHVAC:UnitaryHeatPump:AirToAir", "AirLoopHVAC:UnitaryHeatPump:WaterToAir", "AirLoopHVAC:UnitarySystem" } );
 
 	// parameters describing coil types
-	int const NumAllCoilTypes( 33 );
+	int const NumAllCoilTypes( 34 );
 
 	int const CoilDX_CoolingSingleSpeed( 1 );
 	int const CoilDX_HeatingEmpirical( 2 );
@@ -136,39 +136,43 @@ namespace DataHVACGlobals {
 	int const CoilDX_CoolingHXAssisted( 4 );
 	int const CoilDX_CoolingTwoStageWHumControl( 5 );
 	int const CoilDX_HeatPumpWaterHeaterPumped( 6 );
-	int const CoilDX_MultiSpeedCooling( 7 );
-	int const CoilDX_MultiSpeedHeating( 8 );
+	int const CoilDX_HeatPumpWaterHeaterWrapped( 7 );
+	int const CoilDX_MultiSpeedCooling( 8 );
+	int const CoilDX_MultiSpeedHeating( 9 );
 
-	int const Coil_HeatingGas( 9 );
-	int const Coil_HeatingGas_MultiStage( 10 );
-	int const Coil_HeatingElectric( 11 );
-	int const Coil_HeatingElectric_MultiStage( 12 );
-	int const Coil_HeatingDesuperheater( 13 );
+	int const Coil_HeatingGas( 10 );
+	int const Coil_HeatingGas_MultiStage( 11 );
+	int const Coil_HeatingElectric( 12 );
+	int const Coil_HeatingElectric_MultiStage( 13 );
+	int const Coil_HeatingDesuperheater( 14 );
 
-	int const Coil_CoolingWater( 14 );
-	int const Coil_CoolingWaterDetailed( 15 );
-	int const Coil_HeatingWater( 16 );
-	int const Coil_HeatingSteam( 17 );
-	int const CoilWater_CoolingHXAssisted( 18 );
+	int const Coil_CoolingWater( 15 );
+	int const Coil_CoolingWaterDetailed( 16 );
+	int const Coil_HeatingWater( 17 );
+	int const Coil_HeatingSteam( 18 );
+	int const CoilWater_CoolingHXAssisted( 19 );
 
-	int const Coil_CoolingWaterToAirHP( 19 );
-	int const Coil_HeatingWaterToAirHP( 20 );
-	int const Coil_CoolingWaterToAirHPSimple( 21 );
-	int const Coil_HeatingWaterToAirHPSimple( 22 );
-	int const CoilVRF_Cooling( 23 );
-	int const CoilVRF_Heating( 24 );
+	int const Coil_CoolingWaterToAirHP( 20 );
+	int const Coil_HeatingWaterToAirHP( 21 );
+	int const Coil_CoolingWaterToAirHPSimple( 22 );
+	int const Coil_HeatingWaterToAirHPSimple( 23 );
+	int const CoilVRF_Cooling( 24 );
+	int const CoilVRF_Heating( 25 );
 
-	int const CoilDX_PackagedThermalStorageCooling( 25 );
+	int const Coil_UserDefined( 26 );
+	int const CoilDX_PackagedThermalStorageCooling( 27 );
 
-	int const Coil_CoolingWaterToAirHPVSEquationFit( 26 );
-	int const Coil_HeatingWaterToAirHPVSEquationFit( 27 );
-	int const Coil_CoolingAirToAirVariableSpeed( 28 );
-	int const Coil_HeatingAirToAirVariableSpeed( 29 );
-	int const CoilDX_HeatPumpWaterHeaterVariableSpeed( 30 );
-	int const CoilDX_HeatPumpWaterHeaterWrapped( 31 );
+	int const Coil_CoolingWaterToAirHPVSEquationFit( 28 );
+	int const Coil_HeatingWaterToAirHPVSEquationFit( 29 );
+	int const Coil_CoolingAirToAirVariableSpeed( 30 );
+	int const Coil_HeatingAirToAirVariableSpeed( 31 );
+	int const CoilDX_HeatPumpWaterHeaterVariableSpeed( 32 );
 	
-	int const CoilVRF_FluidTCtrl_Cooling( 32 );
-	int const CoilVRF_FluidTCtrl_Heating( 33 );
+	int const CoilVRF_FluidTCtrl_Cooling( 33 );
+	int const CoilVRF_FluidTCtrl_Heating( 34 );
+
+	Array1D_string const cAllCoilTypes( NumAllCoilTypes, { "Coil:Cooling:DX:SingleSpeed", "Coil:Heating:DX:SingleSpeed", "Coil:Cooling:DX:TwoSpeed", "CoilSystem:Cooling:DX:HeatExchangerAssisted", "Coil:Cooling:DX:TwoStageWithHumidityControlMode", "Coil:WaterHeating:AirToWaterHeatPump:Pumped", "Coil:WaterHeating:AirToWaterHeatPump:Wrapped", "Coil:Cooling:DX:MultiSpeed", "Coil:Heating:DX:MultiSpeed", "Coil:Heating:Gas", "Coil:Heating:Gas:MultiStage", "Coil:Heating:Electric", "Coil:Heating:Electric:MultiStage", "Coil:Heating:Desuperheater", "Coil:Cooling:Water", "Coil:Cooling:Water:DetailedGeometry", "Coil:Heating:Water", "Coil:Heating:Steam", "CoilSystem:Cooling:Water:HeatExchangerAssisted", "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", "Coil:Cooling:WaterToAirHeatPump:EquationFit", "Coil:Heating:WaterToAirHeatPump:EquationFit", "Coil:Cooling:DX:VariableRefrigerantFlow", "Coil:Heating:DX:VariableRefrigerantFlow", "Coil:UserDefined", "Coil:Cooling:DX:SingleSpeed:ThermalStorage", "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Cooling:DX:VariableSpeed", "Coil:Heating:DX:VariableSpeed", "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl", "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl" } );
+
 
 	// Water to air HP coil types
 	int const WatertoAir_Simple( 1 );
@@ -180,8 +184,6 @@ namespace DataHVACGlobals {
 	int const WaterCycling( 1 ); // water flow cycles with compressor
 	int const WaterConstant( 2 ); // water flow is constant
 	int const WaterConstantOnDemand( 3 ); // water flow is constant whenever the coil is operational - this is the only method used in EP V7.2 and earlier
-
-	Array1D_string const cAllCoilTypes( NumAllCoilTypes, { "Coil:Cooling:DX:SingleSpeed", "Coil:Heating:DX:SingleSpeed", "Coil:Cooling:DX:TwoSpeed", "CoilSystem:Cooling:DX:HeatExchangerAssisted", "Coil:Cooling:DX:TwoStageWithHumidityControlMode", "Coil:WaterHeating:AirToWaterHeatPump:Pumped", "Coil:Cooling:DX:MultiSpeed", "Coil:Heating:DX:MultiSpeed", "Coil:Heating:Gas", "Coil:Heating:Gas:MultiStage", "Coil:Heating:Electric", "Coil:Heating:Electric:MultiStage", "Coil:Heating:Desuperheater", "Coil:Cooling:Water", "Coil:Cooling:Water:DetailedGeometry", "Coil:Heating:Water", "Coil:Heating:Steam", "CoilSystem:Cooling:Water:HeatExchangerAssisted", "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", "Coil:Cooling:WaterToAirHeatPump:EquationFit", "Coil:Heating:WaterToAirHeatPump:EquationFit", "Coil:Cooling:DX:VariableRefrigerantFlow", "Coil:Heating:DX:VariableRefrigerantFlow", "Coil:Cooling:DX:SingleSpeed:ThermalStorage", "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Cooling:DX:VariableSpeed", "Coil:Heating:DX:VariableSpeed", "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", "Coil:WaterHeating:AirToWaterHeatPump:Wrapped", "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl", "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl" } );
 
 	// parameters describing coil performance types
 	int const CoilPerfDX_CoolBypassEmpirical( 100 );
@@ -256,7 +258,6 @@ namespace DataHVACGlobals {
 
 	bool FirstTimeStepSysFlag( false ); // Set to true at the start of each sub-time step
 
-	Real64 SysUpdateTimeInc( 0.0 ); // System Update Time Increment - the adaptive time step used by the HVAC simulation
 	Real64 TimeStepSys( 0.0 ); // System Time Increment - the adaptive time step used by the HVAC simulation (hours)
 	Real64 SysTimeElapsed( 0.0 ); // elapsed system time in zone timestep (hours)
 	Real64 FracTimeStepZone( 0.0 ); // System time step divided by the zone time step
@@ -322,6 +323,128 @@ namespace DataHVACGlobals {
 	bool SimNonZoneEquipmentFlag; // True when non-zone equipment components need to be (re)simulated
 	bool ZoneMassBalanceHVACReSim; // True when zone air mass flow balance and air loop needs (re)simulated
 
+	int const NumZoneHVACTerminalTypes( 37 );
+
+	Array1D_string const ZoneHVACTerminalTypes( NumZoneHVACTerminalTypes,
+	{
+		"ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",
+		"ZONEHVAC:ENERGYRECOVERYVENTILATOR",
+		"ZONEHVAC:FOURPIPEFANCOIL",
+		"ZONEHVAC:OUTDOORAIRUNIT",
+		"ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER",
+		"ZONEHVAC:PACKAGEDTERMINALHEATPUMP",
+		"ZONEHVAC:UNITHEATER",
+		"ZONEHVAC:UNITVENTILATOR",
+		"ZONEHVAC:VENTILATEDSLAB",
+		"ZONEHVAC:WATERTOAIRHEATPUMP",
+		"ZONEHVAC:WINDOWAIRCONDITIONER",
+		"ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC",
+		"ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER",
+		"ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM",
+		"ZONEHVAC:BASEBOARD:CONVECTIVE:ELECTRIC",
+		"ZONEHVAC:BASEBOARD:CONVECTIVE:WATER",
+		"ZONEHVAC:HIGHTEMPERATURERADIANT",
+		"ZONEHVAC:DEHUMIDIFIER:DX",
+		"ZONEHVAC:IDEALLOADSAIRSYSTEM",
+		"ZONEHVAC:REFRIGERATIONCHILLERSET",
+		"FAN:ZONEEXHAUST",
+		"WATERHEATER:HEATPUMP",
+		"AIRTERMINAL:SINGLEDUCT:UNCONTROLLED",
+		"AIRTERMINAL:DUALDUCT:CONSTANTVOLUME",
+		"AIRTERMINAL:DUALDUCT:VAV",
+		"AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT",
+		"AIRTERMINAL:SINGLEDUCT:VAV:REHEAT",
+		"AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT",
+		"AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT",
+		"AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT",
+		"AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEINDUCTION",
+		"AIRTERMINAL:SINGLEDUCT:VAV:REHEAT:VARIABLESPEEDFAN",
+		"AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:REHEAT",
+		"AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:NOREHEAT",
+		"AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:COOLEDBEAM",
+		"AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR",
+		"AIRLOOPHVACRETURNAIR"
+	} );
+
+	Array1D_string const ccZoneHVACTerminalTypes( NumZoneHVACTerminalTypes,
+	{
+		"ZoneHVAC:TerminalUnit:VariableRefrigerantFlow",
+		"ZoneHVAC:EnergyRecoveryVentilator",
+		"ZoneHVAC:FourPipeFanCoil",
+		"ZoneHVAC:OutdoorAirUnit",
+		"ZoneHVAC:PackagedTerminalAirConditioner",
+		"ZoneHVAC:PackagedTerminalHeatPump",
+		"ZoneHVAC:UnitHeater",
+		"ZoneHVAC:UnitVentilator",
+		"ZoneHVAC:VentilatedSlab",
+		"ZoneHVAC:WaterToAirHeatPump",
+		"ZoneHVAC:WindowAirConditioner",
+		"ZoneHVAC:Baseboard:RadiantConvective:Electric",
+		"ZoneHVAC:Baseboard:RadiantConvective:Water",
+		"ZoneHVAC:Baseboard:RadiantConvective:Steam",
+		"ZoneHVAC:Baseboard:Convective:Electric",
+		"ZoneHVAC:Baseboard:Convective:Water",
+		"ZoneHVAC:HighTemperatureRadiant",
+		"ZoneHVAC:Dehumidifier:DX",
+		"ZoneHVAC:IdealLoadsAirSystem",
+		"ZoneHVAC:RefrigerationChillerSet",
+		"Fan:ZoneExhaust",
+		"WaterHeater:HeatPump",
+		"AirTerminal:SingleDuct:Uncontrolled",
+		"AirTerminal:DualDuct:ConstantVolume",
+		"AirTerminal:DualDuct:VAV",
+		"AirTerminal:SingleDuct:ConstantVolume:Reheat",
+		"AirTerminal:SingleDuct:VAV:Reheat",
+		"AirTerminal:SingleDuct:VAV:NoReheat",
+		"AirTerminal:SingleDuct:SeriesPIU:Reheat",
+		"AirTerminal:SingleDuct:ParallelPIU:Reheat",
+		"AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction",
+		"AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan",
+		"AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat",
+		"AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat",
+		"AirTerminal:SingleDuct:ConstantVolume:CooledBeam",
+		"AirTerminal:DualDuct:VAV:OutdoorAir",
+		"AirLoopHVACReturnAir"
+	} );
+
+	int const ZoneEquipTypeOf_VariableRefrigerantFlow( 1 );
+	int const ZoneEquipTypeOf_EnergyRecoveryVentilator( 2 );
+	int const ZoneEquipTypeOf_FourPipeFanCoil( 3 );
+	int const ZoneEquipTypeOf_OutdoorAirUnit( 4 );
+	int const ZoneEquipTypeOf_PackagedTerminalAirConditioner( 5 );
+	int const ZoneEquipTypeOf_PackagedTerminalHeatPump( 6 );
+	int const ZoneEquipTypeOf_UnitHeater( 7 );
+	int const ZoneEquipTypeOf_UnitVentilator( 8 );
+	int const ZoneEquipTypeOf_VentilatedSlab( 9 );
+	int const ZoneEquipTypeOf_WaterToAirHeatPump( 10 );
+	int const ZoneEquipTypeOf_WindowAirConditioner( 11 );
+	int const ZoneEquipTypeOf_BaseboardRadiantConvectiveElectric( 12 );
+	int const ZoneEquipTypeOf_BaseboardRadiantConvectiveWater( 13 );
+	int const ZoneEquipTypeOf_BaseboardRadiantConvectiveSteam( 14 );
+	int const ZoneEquipTypeOf_BaseboardConvectiveElectric( 15 );
+	int const ZoneEquipTypeOf_BaseboardConvectiveWater( 16 );
+	int const ZoneEquipTypeOf_HighTemperatureRadiant( 17 );
+	int const ZoneEquipTypeOf_DehumidifierDX( 18 );
+	int const ZoneEquipTypeOf_IdealLoadsAirSystem( 19 );
+	int const ZoneEquipTypeOf_RefrigerationChillerSet( 20 );
+	int const ZoneEquipTypeOf_FanZoneExhaust( 21 );
+	int const ZoneEquipTypeOf_WaterHeaterHeatPump( 22 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctUncontrolled( 23 );
+	int const ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume( 24 );
+	int const ZoneEquipTypeOf_AirTerminalDualDuctVAV( 25 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat( 26 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheat( 27 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVNoReheat( 28 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctSeriesPIUReheat( 29 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctParallelPIUReheat( 30 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctCAVFourPipeInduction( 31 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheatVariableSpeedFan( 32 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolReheat( 33 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolNoReheat( 34 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeCooledBeam( 35 );
+	int const ZoneEquipTypeOf_AirTerminalDualDuctVAVOutdoorAir( 36 );
+	int const ZoneEquipTypeOf_AirLoopHVACReturnAir( 37 );
+
 	// Object Data
 	Array1D< ZoneCompTypeData > ZoneComp;
 	OptStartDataType OptStartData; // For optimum start
@@ -334,7 +457,6 @@ namespace DataHVACGlobals {
 	{
 		DXCT = 1;
 		FirstTimeStepSysFlag = false;
-		SysUpdateTimeInc = 0.0;
 		TimeStepSys = 0.0;
 		SysTimeElapsed = 0.0;
 		FracTimeStepZone = 0.0;
