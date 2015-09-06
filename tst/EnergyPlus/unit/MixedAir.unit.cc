@@ -16,6 +16,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 
 #include "Fixtures/HVACFixture.hh"
+#include <EnergyPlus/OutAirNodeManager.hh>
 
 using namespace EnergyPlus::MixedAir;
 using namespace EnergyPlus::DataContaminantBalance;

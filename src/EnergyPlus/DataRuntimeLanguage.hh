@@ -703,6 +703,8 @@ namespace DataRuntimeLanguage {
 	extern std::unordered_set< std::tuple< std::string, std::string, std::string >, EMSActuatorKey_hash > EMSActuator_lookup; // Fast duplicate lookup structure
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ValidateEMSVariableName(
