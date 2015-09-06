@@ -5341,9 +5341,10 @@ namespace DaylightingManager {
 		int Pierce; // 1 if a particular obstruction is hit, 0 otherwise
 
 		ObTrans = 1.0;
+
 		auto const & window( Surface( IWin ) );
 		auto const window_iBaseSurf( window.BaseSurf );
-		auto const & window_base( Surface( window_iBaseSurf ) );
+		auto const & window_base( window_iBaseSurf > 0 ? Surface( window_iBaseSurf ) : window );
 		auto const window_base_p( &window_base );
 
 		// Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
@@ -5439,13 +5440,14 @@ namespace DaylightingManager {
 		IHit = 0;
 		RN = ( R2 - R1 ).normalize(); // Make unit vector
 		Real64 const d12( distance( R1, R2 ) ); // Distance between R1 and R2
+
 		auto const & window( Surface( IWin ) );
 		auto const window_Zone( window.Zone );
 		auto const window_iBaseSurf( window.BaseSurf );
-		auto const & window_base( Surface( window_iBaseSurf ) );
+		auto const & window_base( window_iBaseSurf > 0 ? Surface( window_iBaseSurf ) : window );
 		auto const window_base_p( &window_base );
 		auto const window_base_iExtBoundCond( window_base.ExtBoundCond );
-		auto const & window_base_adjacent( Surface( window_base_iExtBoundCond ) );
+		auto const & window_base_adjacent( window_base_iExtBoundCond > 0 ? Surface( window_base_iExtBoundCond ) : window_base );
 		auto const window_base_adjacent_p( &window_base_adjacent );
 
 		// Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
@@ -5520,25 +5522,24 @@ namespace DaylightingManager {
 		Real64 const d12( distance( R1, R2 ) ); // Distance squared between R1 and R2 (m)
 
 		auto const & window1( Surface( IWin1 ) );
-		auto const window1_Zone( window1.Zone );
 		auto const window1_iBaseSurf( window1.BaseSurf );
-		auto const & window1_base( Surface( window1_iBaseSurf ) );
+		auto const & window1_base( window1_iBaseSurf > 0 ? Surface( window1_iBaseSurf ) : window1 );
 		auto const window1_base_p( &window1_base );
 		auto const window1_base_iExtBoundCond( window1_base.ExtBoundCond );
-		auto const & window1_base_adjacent( Surface( window1_base_iExtBoundCond ) );
+		auto const & window1_base_adjacent( window1_base_iExtBoundCond > 0 ? Surface( window1_base_iExtBoundCond ) : window1_base );
 		auto const window1_base_adjacent_p( &window1_base_adjacent );
 
 		auto const & window2( Surface( IWin2 ) );
 		auto const window2_Zone( window2.Zone );
 		auto const window2_iBaseSurf( window2.BaseSurf );
-		auto const & window2_base( Surface( window2_iBaseSurf ) );
+		auto const & window2_base( window2_iBaseSurf > 0 ? Surface( window2_iBaseSurf ) : window2 );
 		auto const window2_base_p( &window2_base );
 		auto const window2_base_iExtBoundCond( window2_base.ExtBoundCond );
-		auto const & window2_base_adjacent( Surface( window2_base_iExtBoundCond ) );
+		auto const & window2_base_adjacent( window2_base_iExtBoundCond > 0 ? Surface( window2_base_iExtBoundCond ) : window2_base );
 		auto const window2_base_adjacent_p( &window2_base_adjacent );
 
 		// Preconditions
-		assert( window1_Zone == window2_Zone ); //? Is this correct? If not why the asymmetric check of surface in window2 zone?
+		assert( window1.Zone == window2_Zone ); //? Is this correct? If not why the asymmetric check of surface in window2 zone?
 
 		// Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
 		if ( TotSurfaces < 100 ) { // Do simple linear search through surfaces //Do Tune this crossover heuristic
