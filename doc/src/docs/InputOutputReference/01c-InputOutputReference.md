@@ -14173,14 +14173,6 @@ This numeric field defines the total evaporative capacity in watts at rated cond
 ####Field: Rated Compressor Power Per Unit of Rated Evaporative Capacity
 
 This numeric field defines the rated compressor power per Watt of rated evaporative capacity. Rated compressor power corresponds to the max compressor speed at rated conditions. The actual compressor power is obtained by multiplying the rated power with the modification factor calculated by Compressor Power Multiplier Function of Temperature Curve. The value must be greater than 0. If this field is left blank, a default value of 0.35 W/W is assumed.
-	   
-####Field: Reference Cooling COP
-
-This numeric field defines the cooling coefficient of performance at rated conditions. This value is only used for the initialization of the physics based VRF model at cooling mode. Actual cooling COP is calculated by the physics-based model. The value must be greater than 0. If this field is left blank, a default coefficient of performance of 2.86 is assumed.
-
-####Field: Reference Heating COP
-
-This numeric field defines the heating coefficient of performance at rated conditions. This value is only used for the initialization of the physics based VRF model at heating mode. Actual heating COP is calculated by the physics-based model. The value must be greater than 0. If this field is left blank, a default coefficient of performance of 3.86 is assumed.
 
 ####Field: Minimum Outdoor Air Temperature in Cooling Mode
 
@@ -14346,8 +14338,6 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     R410A,                   !- Refrigerant Type
     41300,                   !- Rated Evaporative Capacity {W}
     0.344,                   !- Rated Compressor Power Per Unit of Rated Evaporative Capacity {W/W}
-    2.91,                    !- Reference Cooling COP
-    3.91,                    !- Reference Heating COP
     ,                        !- Minimum Outdoor Air Temperature in Cooling Mode {C}
     ,                        !- Maximum Outdoor Air Temperature in Cooling Mode {C}
     ,                        !- Minimum Outdoor Air Temperature in Heating Mode {C}
