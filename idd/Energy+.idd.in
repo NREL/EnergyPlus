@@ -32357,7 +32357,7 @@ ZoneHVAC:FourPipeFanCoil,
         \key CyclingFan
         \key VariableFanVariableFlow
         \key VariableFanConstantFlow
-        \key MultiStageFan
+        \key MultiSpeedFan
    N1 , \field Maximum Supply Air Flow Rate
         \required-field
         \autosizable
