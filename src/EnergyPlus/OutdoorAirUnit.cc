@@ -284,11 +284,13 @@ namespace OutdoorAirUnit {
 		using namespace DataSurfaceLists;
 		using OutAirNodeManager::CheckAndAddAirNodeNumber;
 		using WaterCoils::GetCoilWaterInletNode;
+		using WaterCoils::GetWaterCoilIndex;
 		auto & GetWCoilInletNode( WaterCoils::GetCoilInletNode );
 		auto & GetWCoilOutletNode( WaterCoils::GetCoilOutletNode );
 		using WaterCoils::GetCoilWaterOutletNode;
 		using HeatingCoils::GetCoilInletNode;
 		using HeatingCoils::GetCoilOutletNode;
+		auto & GetHeatingCoilIndex( HeatingCoils::GetCoilIndex );
 		auto & GetElecCoilInletNode( HeatingCoils::GetCoilInletNode );
 		auto & GetElecCoilOutletNode( HeatingCoils::GetCoilOutletNode );
 		auto & GetHXAssistedCoilFlowRate( HVACHXAssistedCoolingCoil::GetCoilMaxWaterFlowRate );
@@ -587,7 +589,7 @@ namespace OutdoorAirUnit {
 						if ( SELECT_CASE_var == "COIL:COOLING:WATER" ) {
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = WaterCoil_Cooling;
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilPlantTypeOfNum = TypeOf_CoilWaterCooling;
-							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex = 0;
+							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex = GetWaterCoilIndex( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirInletNode = GetWCoilInletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirOutletNode = GetWCoilOutletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilWaterInletNode = GetCoilWaterInletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
@@ -598,7 +600,7 @@ namespace OutdoorAirUnit {
 						} else if ( SELECT_CASE_var == "COIL:HEATING:WATER" ) {
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = WaterCoil_SimpleHeat;
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilPlantTypeOfNum = TypeOf_CoilWaterSimpleHeating;
-							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex = 0;
+							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex = GetWaterCoilIndex( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirInletNode = GetWCoilInletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirOutletNode = GetWCoilOutletNode( "Coil:Heating:Water", OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilWaterInletNode = GetCoilWaterInletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
@@ -621,6 +623,7 @@ namespace OutdoorAirUnit {
 
 						} else if ( SELECT_CASE_var == "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) {
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = WaterCoil_DetailedCool;
+							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex = GetWaterCoilIndex( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilPlantTypeOfNum = TypeOf_CoilWaterDetailedFlatCooling;
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirInletNode = GetWCoilInletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirOutletNode = GetWCoilOutletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
@@ -640,11 +643,15 @@ namespace OutdoorAirUnit {
 
 						} else if ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC" ) {
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = Coil_ElectricHeat;
+							// Get OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex, 2 types of mining functions to choose from
+							GetHeatingCoilIndex( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirInletNode = GetElecCoilInletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirOutletNode = GetElecCoilOutletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 
 						} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = Coil_GasHeat;
+							// Get OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex, 2 types of mining functions to choose from
+							GetHeatingCoilIndex( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirInletNode = GetCoilInletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirOutletNode = GetCoilOutletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 
@@ -1590,7 +1597,6 @@ namespace OutdoorAirUnit {
 		for ( EquipNum = 1; EquipNum <= OutAirUnit( OAUnitNum ).NumComponents; ++EquipNum ) {
 			EquipType = OutAirUnit( OAUnitNum ).OAEquip( EquipNum ).ComponentType;
 			EquipName = OutAirUnit( OAUnitNum ).OAEquip( EquipNum ).ComponentName;
-//			if( OutAirUnit( OAUnitNum ).OAEquip( EquipNum ).MaxVolWaterFlow == AutoSize ) Sim = false;
 			SimOutdoorAirEquipComps( OAUnitNum, EquipType, EquipName, EquipNum, OutAirUnit( OAUnitNum ).OAEquip( EquipNum ).ComponentType_Num, FirstHVACIteration, OutAirUnit( OAUnitNum ).OAEquip( EquipNum ).ComponentIndex, Sim );
 		}
 

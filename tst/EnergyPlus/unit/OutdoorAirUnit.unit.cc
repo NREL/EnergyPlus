@@ -8,6 +8,7 @@
 #include <CurveManager.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
+#include <DataHVACGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataSizing.hh>
 #include <DataZoneEnergyDemands.hh>
@@ -22,6 +23,7 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::CurveManager;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataGlobals;
+using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataZoneEnergyDemands;
@@ -47,6 +49,8 @@ namespace EnergyPlus {
 		
 		std::string const idf_objects = delimited_string( {
 			"Version,8.3;",
+			" ",
+			"Output:Diagnostics, DisplayExtraWarnings;",
 			" ",
 			"Zone,",
 			"  SPACE1-1,                !- Name",
@@ -196,10 +200,10 @@ namespace EnergyPlus {
 			"  0.0,                     !- Coefficient4 y",
 			"  0.0,                     !- Coefficient5 y**2",
 			"  0.0,                     !- Coefficient6 x*y",
-			"  15,                      !- Minimum Value of x",
-			"  24,                      !- Maximum Value of x",
-			"  -5,                      !- Minimum Value of y",
-			"  23,                      !- Maximum Value of y",
+			"  5,                       !- Minimum Value of x",
+			"  36,                      !- Maximum Value of x",
+			"  5,                       !- Minimum Value of y",
+			"  36,                      !- Maximum Value of y",
 			"  ,                        !- Minimum Curve Output",
 			"  ,                        !- Maximum Curve Output",
 			"  Temperature,             !- Input Unit Type for X",
@@ -211,7 +215,7 @@ namespace EnergyPlus {
 			"  1.0,                     !- Coefficient1 Constant",
 			"  0.0,                     !- Coefficient2 x",
 			"  0.0,                     !- Coefficient3 x**2",
-			"  1.0,                     !- Minimum Value of x",
+			"  0.0,                     !- Minimum Value of x",
 			"  1.5,                     !- Maximum Value of x",
 			"  ,                        !- Minimum Curve Output",
 			"  ,                        !- Maximum Curve Output",
