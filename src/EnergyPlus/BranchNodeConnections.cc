@@ -628,9 +628,9 @@ namespace BranchNodeConnections {
 					if (NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Sensor)) continue;
 					if (NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Actuator)) continue;
 					if (NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_SetPoint)) continue;
-					ShowSevereError("Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName + "\", The same zone node appears more than once.");
-					ShowContinueError("Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
-					ShowContinueError("Reference Object=" + NodeConnections(Loop2).ObjectType + ", Name=" + NodeConnections(Loop2).ObjectName);
+					ShowSevereError("Node Connection Error, Node Name=\"" + NodeConnections(Loop1).NodeName + "\", The same zone node appears more than once.");
+					ShowContinueError("Reference Object=" + NodeConnections(Loop1).ObjectType + ", Object Name=" + NodeConnections(Loop1).ObjectName);
+					ShowContinueError("Reference Object=" + NodeConnections(Loop2).ObjectType + ", Object Name=" + NodeConnections(Loop2).ObjectName);
 					++ErrorCounter;
 				}
 			}
