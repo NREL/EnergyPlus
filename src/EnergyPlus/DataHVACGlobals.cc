@@ -128,7 +128,7 @@ namespace DataHVACGlobals {
 	Array1D_string const cFurnaceTypes( NumUnitarySystemTypes, { "AirLoopHVAC:Unitary:Furnace:HeatOnly", "AirLoopHVAC:Unitary:Furnace:HeatCool", "AirLoopHVAC:UnitaryHeatOnly", "AirLoopHVAC:UnitaryHeatCool", "AirLoopHVAC:UnitaryHeatPump:AirToAir", "AirLoopHVAC:UnitaryHeatPump:WaterToAir", "AirLoopHVAC:UnitarySystem" } );
 
 	// parameters describing coil types
-	int const NumAllCoilTypes( 31 );
+	int const NumAllCoilTypes( 32 );
 
 	int const CoilDX_CoolingSingleSpeed( 1 );
 	int const CoilDX_HeatingEmpirical( 2 );
@@ -136,36 +136,39 @@ namespace DataHVACGlobals {
 	int const CoilDX_CoolingHXAssisted( 4 );
 	int const CoilDX_CoolingTwoStageWHumControl( 5 );
 	int const CoilDX_HeatPumpWaterHeaterPumped( 6 );
-	int const CoilDX_HeatPumpWaterHeaterWrapped( 31 );
-	int const CoilDX_MultiSpeedCooling( 7 );
-	int const CoilDX_MultiSpeedHeating( 8 );
+	int const CoilDX_HeatPumpWaterHeaterWrapped( 7 );
+	int const CoilDX_MultiSpeedCooling( 8 );
+	int const CoilDX_MultiSpeedHeating( 9 );
 
-	int const Coil_HeatingGas( 9 );
-	int const Coil_HeatingGas_MultiStage( 10 );
-	int const Coil_HeatingElectric( 11 );
-	int const Coil_HeatingElectric_MultiStage( 12 );
-	int const Coil_HeatingDesuperheater( 13 );
+	int const Coil_HeatingGas( 10 );
+	int const Coil_HeatingGas_MultiStage( 11 );
+	int const Coil_HeatingElectric( 12 );
+	int const Coil_HeatingElectric_MultiStage( 13 );
+	int const Coil_HeatingDesuperheater( 14 );
 
-	int const Coil_CoolingWater( 14 );
-	int const Coil_CoolingWaterDetailed( 15 );
-	int const Coil_HeatingWater( 16 );
-	int const Coil_HeatingSteam( 17 );
-	int const CoilWater_CoolingHXAssisted( 18 );
+	int const Coil_CoolingWater( 15 );
+	int const Coil_CoolingWaterDetailed( 16 );
+	int const Coil_HeatingWater( 17 );
+	int const Coil_HeatingSteam( 18 );
+	int const CoilWater_CoolingHXAssisted( 19 );
 
-	int const Coil_CoolingWaterToAirHP( 19 );
-	int const Coil_HeatingWaterToAirHP( 20 );
-	int const Coil_CoolingWaterToAirHPSimple( 21 );
-	int const Coil_HeatingWaterToAirHPSimple( 22 );
-	int const CoilVRF_Cooling( 23 );
-	int const CoilVRF_Heating( 24 );
+	int const Coil_CoolingWaterToAirHP( 20 );
+	int const Coil_HeatingWaterToAirHP( 21 );
+	int const Coil_CoolingWaterToAirHPSimple( 22 );
+	int const Coil_HeatingWaterToAirHPSimple( 23 );
+	int const CoilVRF_Cooling( 24 );
+	int const CoilVRF_Heating( 25 );
 
-	int const CoilDX_PackagedThermalStorageCooling( 25 );
+	int const Coil_UserDefined( 26 );
+	int const CoilDX_PackagedThermalStorageCooling( 27 );
 
-	int const Coil_CoolingWaterToAirHPVSEquationFit( 26 );
-	int const Coil_HeatingWaterToAirHPVSEquationFit( 27 );
-	int const Coil_CoolingAirToAirVariableSpeed( 28 );
-	int const Coil_HeatingAirToAirVariableSpeed( 29 );
-	int const CoilDX_HeatPumpWaterHeaterVariableSpeed( 30 );
+	int const Coil_CoolingWaterToAirHPVSEquationFit( 28 );
+	int const Coil_HeatingWaterToAirHPVSEquationFit( 29 );
+	int const Coil_CoolingAirToAirVariableSpeed( 30 );
+	int const Coil_HeatingAirToAirVariableSpeed( 31 );
+	int const CoilDX_HeatPumpWaterHeaterVariableSpeed( 32 );
+
+	Array1D_string const cAllCoilTypes( NumAllCoilTypes, { "Coil:Cooling:DX:SingleSpeed", "Coil:Heating:DX:SingleSpeed", "Coil:Cooling:DX:TwoSpeed", "CoilSystem:Cooling:DX:HeatExchangerAssisted", "Coil:Cooling:DX:TwoStageWithHumidityControlMode", "Coil:WaterHeating:AirToWaterHeatPump:Pumped", "Coil:WaterHeating:AirToWaterHeatPump:Wrapped", "Coil:Cooling:DX:MultiSpeed", "Coil:Heating:DX:MultiSpeed", "Coil:Heating:Gas", "Coil:Heating:Gas:MultiStage", "Coil:Heating:Electric", "Coil:Heating:Electric:MultiStage", "Coil:Heating:Desuperheater", "Coil:Cooling:Water", "Coil:Cooling:Water:DetailedGeometry", "Coil:Heating:Water", "Coil:Heating:Steam", "CoilSystem:Cooling:Water:HeatExchangerAssisted", "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", "Coil:Cooling:WaterToAirHeatPump:EquationFit", "Coil:Heating:WaterToAirHeatPump:EquationFit", "Coil:Cooling:DX:VariableRefrigerantFlow", "Coil:Heating:DX:VariableRefrigerantFlow", "Coil:UserDefined", "Coil:Cooling:DX:SingleSpeed:ThermalStorage", "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Cooling:DX:VariableSpeed", "Coil:Heating:DX:VariableSpeed", "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed" } );
 
 	// Water to air HP coil types
 	int const WatertoAir_Simple( 1 );
@@ -177,8 +180,6 @@ namespace DataHVACGlobals {
 	int const WaterCycling( 1 ); // water flow cycles with compressor
 	int const WaterConstant( 2 ); // water flow is constant
 	int const WaterConstantOnDemand( 3 ); // water flow is constant whenever the coil is operational - this is the only method used in EP V7.2 and earlier
-
-	Array1D_string const cAllCoilTypes( NumAllCoilTypes, { "Coil:Cooling:DX:SingleSpeed", "Coil:Heating:DX:SingleSpeed", "Coil:Cooling:DX:TwoSpeed", "CoilSystem:Cooling:DX:HeatExchangerAssisted", "Coil:Cooling:DX:TwoStageWithHumidityControlMode", "Coil:WaterHeating:AirToWaterHeatPump:Pumped", "Coil:Cooling:DX:MultiSpeed", "Coil:Heating:DX:MultiSpeed", "Coil:Heating:Gas", "Coil:Heating:Gas:MultiStage", "Coil:Heating:Electric", "Coil:Heating:Electric:MultiStage", "Coil:Heating:Desuperheater", "Coil:Cooling:Water", "Coil:Cooling:Water:DetailedGeometry", "Coil:Heating:Water", "Coil:Heating:Steam", "CoilSystem:Cooling:Water:HeatExchangerAssisted", "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", "Coil:Cooling:WaterToAirHeatPump:EquationFit", "Coil:Heating:WaterToAirHeatPump:EquationFit", "Coil:Cooling:DX:VariableRefrigerantFlow", "Coil:Heating:DX:VariableRefrigerantFlow", "Coil:Cooling:DX:SingleSpeed:ThermalStorage", "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Cooling:DX:VariableSpeed", "Coil:Heating:DX:VariableSpeed", "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", "Coil:WaterHeating:AirToWaterHeatPump:Wrapped" } );
 
 	// parameters describing coil performance types
 	int const CoilPerfDX_CoolBypassEmpirical( 100 );
@@ -253,7 +254,6 @@ namespace DataHVACGlobals {
 
 	bool FirstTimeStepSysFlag( false ); // Set to true at the start of each sub-time step
 
-	Real64 SysUpdateTimeInc( 0.0 ); // System Update Time Increment - the adaptive time step used by the HVAC simulation
 	Real64 TimeStepSys( 0.0 ); // System Time Increment - the adaptive time step used by the HVAC simulation (hours)
 	Real64 SysTimeElapsed( 0.0 ); // elapsed system time in zone timestep (hours)
 	Real64 FracTimeStepZone( 0.0 ); // System time step divided by the zone time step
@@ -453,7 +453,6 @@ namespace DataHVACGlobals {
 	{
 		DXCT = 1;
 		FirstTimeStepSysFlag = false;
-		SysUpdateTimeInc = 0.0;
 		TimeStepSys = 0.0;
 		SysTimeElapsed = 0.0;
 		FracTimeStepZone = 0.0;

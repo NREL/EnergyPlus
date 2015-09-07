@@ -18,6 +18,7 @@ set( test_src
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
+  DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
@@ -31,7 +32,8 @@ set( test_src
   HeatBalanceManager.unit.cc
   HeatRecovery.unit.cc
   Humidifiers.unit.cc
-  HVACSizingSimulationManager.unit.cc
+  HVACFourPipeBeam.unit.cc
+  HVACSizingSimulationManager.unit.cc 
   HVACStandaloneERV.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc

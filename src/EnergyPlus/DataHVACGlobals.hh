@@ -149,6 +149,7 @@ namespace DataHVACGlobals {
 	extern int const CoilVRF_Cooling;
 	extern int const CoilVRF_Heating;
 
+	extern int const Coil_UserDefined;
 	extern int const CoilDX_PackagedThermalStorageCooling;
 
 	extern int const Coil_CoolingWaterToAirHPVSEquationFit;
@@ -156,6 +157,8 @@ namespace DataHVACGlobals {
 	extern int const Coil_CoolingAirToAirVariableSpeed;
 	extern int const Coil_HeatingAirToAirVariableSpeed;
 	extern int const CoilDX_HeatPumpWaterHeaterVariableSpeed;
+
+	extern Array1D_string const cAllCoilTypes;
 
 	// Water to air HP coil types
 	extern int const WatertoAir_Simple;
@@ -167,8 +170,6 @@ namespace DataHVACGlobals {
 	extern int const WaterCycling; // water flow cycles with compressor
 	extern int const WaterConstant; // water flow is constant
 	extern int const WaterConstantOnDemand; // water flow is constant whenever the coil is operational - this is the only method used in EP V7.2 and earlier
-
-	extern Array1D_string const cAllCoilTypes;
 
 	// parameters describing coil performance types
 	extern int const CoilPerfDX_CoolBypassEmpirical;
@@ -243,7 +244,6 @@ namespace DataHVACGlobals {
 
 	extern bool FirstTimeStepSysFlag; // Set to true at the start of each sub-time step
 
-	extern Real64 SysUpdateTimeInc; // System Update Time Increment - the adaptive time step used by the HVAC simulation
 	extern Real64 TimeStepSys; // System Time Increment - the adaptive time step used by the HVAC simulation (hours)
 	extern Real64 SysTimeElapsed; // elapsed system time in zone timestep (hours)
 	extern Real64 FracTimeStepZone; // System time step divided by the zone time step
