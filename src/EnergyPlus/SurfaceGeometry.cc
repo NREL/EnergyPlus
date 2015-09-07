@@ -8376,10 +8376,12 @@ namespace SurfaceGeometry {
 		bool IsCoPlanar;
 		Real64 OutOfLine;
 		int LastVertexInError;
+		Real64 DotProd; // Dot product of two adjacent sides - to test for right angle
 
 		// Object Data
 		PlaneEq BasePlane;
 		Vector TVect;
+		Vector TVect2;
 		Vector CoordinateTransVector;
 
 		ErrorInSurface = false;
@@ -8441,8 +8443,8 @@ namespace SurfaceGeometry {
 			BaseZLLC = Surface( ThisSurf ).Vertex( 2 ).z;
 			TVect = Surface( ThisSurf ).Vertex( 3 ) - Surface( ThisSurf ).Vertex( 2 );
 			ThisWidth = VecLength( TVect );
-			TVect = Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 1 );
-			ThisHeight = VecLength( TVect );
+			TVect2 = Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 1 );
+			ThisHeight = VecLength( TVect2 );
 			Surface( ThisSurf ).Width = ThisWidth;
 			Surface( ThisSurf ).Height = ThisHeight; // For a horizontal surface this is actually length!
 			if ( Surface( ThisSurf ).Sides == 3 ) Surface( ThisSurf ).Shape = Triangle;
@@ -8450,8 +8452,13 @@ namespace SurfaceGeometry {
 				Diagonal1 = VecLength( Surface( ThisSurf ).Vertex( 1 ) - Surface( ThisSurf ).Vertex( 3 ) );
 				Diagonal2 = VecLength( Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 4 ) );
 				// Test for rectangularity
-				if ( std::abs( Diagonal1 - Diagonal2 ) < 0.020 ) {
-					Surface( ThisSurf ).Shape = Rectangle;
+				if ( std::abs( Diagonal1 - Diagonal2 ) < 0.020 ) { // This tolerance may need to be tightened?
+					DotProd = dot( TVect, TVect2 );
+					if ( abs( DotProd ) < 0.0001 ) { // Not sure yet how tight this tolerance should be?
+						Surface( ThisSurf ).Shape = Rectangle;
+					} else {
+						Surface( ThisSurf ).Shape = Quadrilateral;
+					}
 				} else {
 					Surface( ThisSurf ).Shape = Quadrilateral;
 				}
