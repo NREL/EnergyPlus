@@ -23,6 +23,8 @@ namespace HeatBalanceAirManager {
 	// Reporting routines for module
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageAirHeatBalance();

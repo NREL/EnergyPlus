@@ -18,6 +18,7 @@ SET( SRC
   AirflowNetworkBalanceManager.hh
   AirflowNetworkSolver.cc
   AirflowNetworkSolver.hh
+  AirTerminalUnit.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
   BaseboardRadiator.cc
@@ -248,6 +249,8 @@ SET( SRC
   HVACDXSystem.hh
   HVACDuct.cc
   HVACDuct.hh
+  HVACFourPipeBeam.cc
+  HVACFourPipeBeam.hh
   HVACHXAssistedCoolingCoil.cc
   HVACHXAssistedCoolingCoil.hh
   HVACInterfaceManager.cc
@@ -374,6 +377,7 @@ SET( SRC_2
   PlantHeatExchangerFluidToFluid.hh
   PlantLoadProfile.cc
   PlantLoadProfile.hh
+  PlantLocation.hh
   PlantLoopEquip.cc
   PlantLoopEquip.hh
   PlantLoopSolver.cc
@@ -406,6 +410,8 @@ SET( SRC_2
   ReportSizingManager.hh
   ReturnAirPathManager.cc
   ReturnAirPathManager.hh
+  RoomAirModelAirflowNetwork.cc
+  RoomAirModelAirflowNetwork.hh
   RoomAirModelManager.cc
   RoomAirModelManager.hh
   RoomAirModelUserTempPattern.cc

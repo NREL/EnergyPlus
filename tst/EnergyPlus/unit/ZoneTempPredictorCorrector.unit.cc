@@ -17,6 +17,8 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataAirflowNetwork.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -33,6 +35,7 @@ using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataAirflowNetwork;
 using namespace EnergyPlus::Psychrometrics;
+using namespace EnergyPlus::DataRoomAirModel;
 
 
 TEST( ZoneTempPredictorCorrector, CorrectZoneHumRatTest )
@@ -101,6 +104,8 @@ TEST( ZoneTempPredictorCorrector, CorrectZoneHumRatTest )
 	ZoneAirSolutionAlgo = UseEulerMethod;
 	ZoneAirHumRatTemp.allocate( 1 );
 	ZoneW1.allocate( 1 );
+
+	AirModel.allocate( 1 );
 
 
 // Case 1 - All flows at the same humrat
@@ -227,5 +232,6 @@ TEST( ZoneTempPredictorCorrector, CorrectZoneHumRatTest )
 	MDotOA.deallocate();
 	ZoneAirHumRatTemp.deallocate();
 	ZoneW1.deallocate();
+	AirModel.deallocate( );
 
 }

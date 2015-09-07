@@ -219,6 +219,9 @@ namespace DataHeatBalFanSys {
 	// Object Data
 	extern Array1D< ZoneComfortControlsFangerData > ZoneComfortControlsFanger;
 
+	void
+	clear_state();
+
 } // DataHeatBalFanSys
 
 } // EnergyPlus

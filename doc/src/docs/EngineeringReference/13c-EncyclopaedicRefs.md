@@ -1274,7 +1274,7 @@ N = number of zones served by the air loop, which is provided in the input for a
 
 ### Proportional Control
 
-Like Ventilation Rate Procedure and the Indoor Air Quality Procedure, the following three objects must be included in the input data file in order to model CO<sub>2</sub>-based DCV with Proportional Control:
+The control has two choices: ProportionalControlBasedonOccupancySchedule and ProportionalControlBasedonDesignOccupancy. The difference is occupancy level. The former uses real time occupancy, while the latter uses design occupancy level. Like Ventilation Rate Procedure and the Indoor Air Quality Procedure, the following three objects must be included in the input data file in order to model CO<sub>2</sub>-based DCV with Proportional Control:
 
 n **AirLoopHVAC:OutdoorAirSystem** to simulate the mixed air box of the air loop
 
@@ -1311,6 +1311,9 @@ Where,
 <span>\({R_{a,i}}\)</span> = Required outdoor air flow rate per unit area, (m<sup>3</sup>/s)/m<sup>2</sup>
 
 <span>\({P_{z,i}}\)</span> = Design zone population, number of people
+
+When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy * current schedule value. When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy.
+
 
 <span>\({A_{z,i}}\)</span> = Zone floor area, m<sup>2</sup>
 
@@ -2687,7 +2690,7 @@ There are two types of control types allowed to be specified in the unitary syst
 
 
 
-Setpoint based control:
+####Setpoint based control:
 
 The unitary system calculates the current sensible load using the temperature of the inlet node and the System Node Setpoint Temp on the control node. If the control node is not the outlet node, the desired outlet node temperature is adjusted for the current temperature difference between the outlet node and the control node. Likewise, the current latent load is calculated using the humidity ratio of the inlet node and the System Node Humidity Ratio Max on the control node. The controls determine the required coil run-time fraction and dehumidification mode (if applicable) using the steps outlined below.
 
@@ -2709,7 +2712,7 @@ If the humidity control type is CoolReheat, the coil is re-simulated to achieve 
 
 
 
-Load based control:
+####Load based control:
 
 While the unitary system may be configured to serve multiple zones, system operation is controlled by a thermostat located in a single “control” zone. One of the key parameters for the unitary system component is the fraction of the total system air flow that goes through the control zone. This fraction is calculated as the ratio of the maximum air mass flow rate for the air loop’s supply inlet node for the control zone (e.g., AirTerminal:SingleDuct:Uncontrolled, field = Maximum Air Flow Rate, converted to mass flow) to the sum of the maximum air mass flow rates for the air loop’s supply inlet nodes for all zones served by this air loop. The unitary system module scales the calculated load for the control zone upward based on this fraction to determine the total load to be met by the unitary system. The module then proceeds to calculate the required part-load ratio for the system coil and the supply air fan to meet this total load. The heating or cooling capacity delivered by the unitary system is distributed to all of the zones served by this system via the terminal units that supply air to each zone. The supply air fraction that goes though the control zone is calculated as follows:
 
@@ -2717,11 +2720,11 @@ While the unitary system may be configured to serve multiple zones, system opera
 
 where:
 
-<span>\({\dot m_{TUMax\,ControlledZone}}\)</span>    =    maximum air mass flow rate for the air loop’s supply inlet node (terminal unit) for the control zone (kg/s)
+<span>${\dot m_{TUMax\,ControlledZone}}$</span>    =    maximum air mass flow rate for the air loop’s supply inlet node (terminal unit) for the control zone (kg/s)
 
-<span>\({\dot m_{TUMax\,Zone\,j}}\)</span>            =    maximum air mass flow rate for the air loop’s supply inlet node for the jth zone (kg/s)
+<span>${\dot m_{TUMax\,Zone\,j}}$</span>            =    maximum air mass flow rate for the air loop’s supply inlet node for the jth zone (kg/s)
 
-<span>\(NumOfZones\)</span>                =    number of zones, or number of air loop supply air inlet nodes for all zones served by the air loop (-)
+<span>$NumOfZones$</span>                =    number of zones, or number of air loop supply air inlet nodes for all zones served by the air loop (-)
 
 The unitary system component is able to model supply air fan operation in two modes: cycling fan – cycling coil (i.e., AUTO fan) and continuous fan – cycling coil (i.e., fan ON). Fan:OnOff must be used to model AUTO fan, while Fan:OnOff or Fan:ConstantVolume can be used to model fan ON. The fan operation mode is specified using a supply air fan operating mode schedule where schedule values of 0 denote cycling fan operation and schedule values other than 0 (a 1 is usually used) denote continuous fan operation. Using this schedule, the unitary system fan may be cycled with cooling or heating coil operation or operated continuously based on time of day (e.g., cycling fan operation at night and continuous fan operation during the daytime). If the fan operating mode schedule name field is left blank in the unitary system object, the unitary system assumes cycling or AUTO fan mode operation throughout the simulation.
 
@@ -2738,28 +2741,25 @@ If the supply air fan operating mode schedule requests cycling fan operation, th
 The model then calculates the unitary system’s sensible cooling energy rate delivered to the zones being served when the system runs at full-load conditions and when the cooling coil is OFF. If the supply air fan cycles with the compressor, then the sensible cooling energy rate is zero when the cooling coil is OFF. However if the fan is configured to run continuously regardless of coil operation, then the sensible cooling energy rate will probably not be zero when the cooling coil is OFF. Calculating the sensible cooling energy rate involves modeling the supply air fan (and associated fan heat), the cooling coil, and the heating and reheat coil (simply to pass the air properties and mass flow rate from its inlet node to its outlet node). For each of these cases (full load and cooling coil OFF), the sensible cooling energy rate delivered by the unitary system is calculated as follows:
 
 
-
-<div>$$Full\;Cool\;Output = (Mass\;Flow\;Rat{e_{ful\;load}}){({h_{out,full\;load}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;full\;load}}$$</div>
+<div>$$Full\;Cool\;Output = (Mass\;Flow\;Rat{e_{full\;load}}){({h_{out,full\;load}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;full\;load}}$$</div>
 
 <div>$$No\;Cool\;Output = (Mass\;Flow\;Rat{e_{coil\;off}}){({h_{out,\;coil\;off}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;coil\;off}}$$</div>
 
 where:
 
-*Mass Flow Rate<sub>full\\ load</sub>* = air mass flow rate through unitary system at full-load conditions, kg/s
+*Mass Flow Rate<sub>full load</sub>* = air mass flow rate through unitary system at full-load conditions, kg/s
 
-*h<sub>out,\\ full\\ load</sub>* = enthalpy of air exiting the unitary system at full-load conditions, J/kg
+*h<sub>out, full load</sub>* = enthalpy of air exiting the unitary system at full-load conditions, J/kg
 
-*h<sub>control\\ zone</sub>*<sub> </sub> = enthalpy of air in the control zone (where thermostat is located), J/kg
+*h<sub>control zone</sub>*<sub> </sub> = enthalpy of air in the control zone (where thermostat is located), J/kg
 
-*HR<sub>min</sub>      =* enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio
+*HR<sub>min</sub>      =* enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the unitary system exiting air or the air in the control zone
 
-of the unitary system exiting air or the air in the control zone
+*Mass Flow Rate<sub>coil off</sub>* = air mass flow rate through the unitary system with the cooling coil OFF, kg/s
 
-*Mass Flow Rate<sub>coil\\ off</sub>* = air mass flow rate through the unitary system with the cooling coil OFF, kg/s
+*h<sub>out, coil off</sub>*  = enthalpy of air exiting the unitary system with the cooling coil OFF, J/kg
 
-*h<sub>out,\\ coil\\ off</sub>*  = enthalpy of air exiting the unitary system with the cooling coil OFF, J/kg
-
-Δ<sub>sen,</sub> *<sub>full\\ load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ<sub>sen,</sub> *<sub>full load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;full\;load}} = \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {Mass\;Flow\;Rat{e_{_{full\;load}}} - \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -2767,7 +2767,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ<sub>sen,coil\\ off</sub>**=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+Δ<sub>sen,coil off</sub>=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;coil\;off}} = \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {Mass\;Flow\;Rat{e_{_{coil\;off}}} - \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;coil\;off}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -2781,19 +2781,19 @@ Since the part-load performance of the cooling coil is frequently non-linear, an
 
 where:
 
-<span>\({Q_{UnitarySystem}}\)</span>= Unitary system delivered sensible capacity (W)
+<span>${Q_{UnitarySystem}}$</span>= Unitary system delivered sensible capacity (W)
 
 If the unitary system has been specified with cycling fan/cycling coil (AUTO fan), then the unitary system’s operating supply air mass flow rate is multiplied by PartLoadRatio to determine the average air mass flow rate for the system simulation time step. In this case, the air conditions at nodes downstream of the cooling coil represent the full-load (steady-state) values when the coil is operating.
 
 If the fan operates continuously (i.e., when the supply air fan operating mode schedule values are NOT equal to 0), the operating air mass flow rate through the unitary system is calculated as the average of the user-specified air flow rate when the cooling coil is ON and the user-specified air flow rate when the cooling coil is OFF (user-specified supply air volumetric flow rates converted to dry air mass flow rates).
 
-<div>$${\mathop m\limits^ \bullet_{UnitarySystem}} = PartLoadRatio\left( {{{\mathop m\limits^ \bullet  }_{CoolCoilON}}} \right) + \left( {1 - PartLoadRatio} \right)\left( {{{\mathop m\limits^ \bullet  }_{CoilOFF}}} \right)$$</div>
+<div>$${{\mathop m\limits^ \bullet  }_{UnitarySystem}} = PartLoadRatio\left( {{{\mathop m\limits^ \bullet  }_{CoolCoilON}}} \right) + \left( {1 - PartLoadRatio} \right)\left( {{{\mathop m\limits^ \bullet  }_{CoilOFF}}} \right)$$</div>
 
 where:
 
-<span>\(\mathop m\limits^ \bullet  CoolCoilON\)</span> = air mass flow rate through unitary system when the cooling coil is ON (kg/s)
+<span>$\mathop m\limits^ \bullet  <sub>CoolCoilON</sub>$</span> = air mass flow rate through unitary system when the cooling coil is ON (kg/s)
 
-<span>\(\mathop m\limits^ \bullet  CoilOFF\)</span> = air mass flow rate through unitary system when no cooling or heating is needed (kg/s)
+<span>$\mathop m\limits^ \bullet  <sub>CoilOFF</sub>$</span> = air mass flow rate through unitary system when no cooling or heating is needed (kg/s)
 
 In this case, the air conditions at nodes downstream of the cooling coil are calculated as the average conditions over the simulation time step (i.e., the weighted average of full-load conditions when the coil is operating and inlet air conditions when the coil is OFF).
 
@@ -2805,35 +2805,34 @@ After the unitary system cooling load is determined as described in Eq. above, t
 
 The model calculates the unitary system’s sensible cooling energy rate delivered to the zones being served when the system runs at full-load conditions at the highest speed and when the DX cooling coil is OFF. If the supply air fan cycles with the compressor, then the sensible cooling energy rate is zero when the cooling coil is OFF. However if the fan is scheduled to run continuously regardless of coil operation, then the sensible cooling energy rate will not be zero when the cooling coil is OFF. Calculating the sensible cooling energy rate involves modeling the supply air fan (and associated fan heat) and the multi/variable speed DX cooling coil. The multi/variable speed DX heating coil and the supplemental heating coil are also modeled, but only to pass the air properties and mass flow rate from their inlet nodes to their outlet nodes. For each of these cases (full load at highest cooling speed and DX cooling coil OFF), the sensible cooling energy rate delivered by the unitary system is calculated as follows:
 
-<span>\(FullCoolOutpu{t_{Highest\;Speed}} = ({\dot m_{HighestSpeed}}){({h_{out,full\;load}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;HighestSpeed}}\)</span><span>\(NoCoolOutput = ({\dot m_{CoilOff}}){({h_{out,\;coil\;off}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;coil\;off}}\)</span>
+<div>$$FullCoolOutpu{t_{Highest\;Speed}} = ({\dot m_{HighestSpeed}}){({h_{out,full\;load}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;HighestSpeed}}$$</div>
+<div>$$NoCoolOutput = ({\dot m_{CoilOff}}){({h_{out,\;coil\;off}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;coil\;off}}$$</div>
 
 where:
 
-*<span>\({\dot m_{HighestSpeed}}\)</span>* = air mass flow rate through unitary system at the highest cooling speed [kg/s]
+*<span>${\dot m_{HighestSpeed}}$</span>* = air mass flow rate through unitary system at the highest cooling speed [kg/s]
 
-*h<sub>out,\\ full\\ load</sub>*   = enthalpy of air exiting the unitary system at full-load conditions [J/kg]
+*h<sub>out, full load</sub>*   = enthalpy of air exiting the unitary system at full-load conditions [J/kg]
 
-*h<sub>control \\ zone</sub>*   = enthalpy of air leaving the control zone (where thermostat is located) [J/kg]
+*h<sub>control zone</sub>*   = enthalpy of air leaving the control zone (where thermostat is located) [J/kg]
 
 *HR<sub>min</sub>=* the minimum humidity ratio of the unitary system exiting air or the air leaving the control zone [kg/kg]
 
-<span>\({\dot m_{CoilOff}}\)</span> = air mass flow rate through the unitary system with the cooling coil OFF [kg/s]
+<span>${\dot m_{CoilOff}}$</span> = air mass flow rate through the unitary system with the cooling coil OFF [kg/s]
 
-*h<sub>out,coil \\ off</sub>*    = enthalpy of air exiting the unitary system with the cooling coil OFF [J/kg]
+*h<sub>out,coil off</sub>*    = enthalpy of air exiting the unitary system with the cooling coil OFF [J/kg]
 
-Δ<sub>sen,</sub> *<sub>full\\ load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ<sub>*sen,*</sub> *<sub>HighestSpeed</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
+
+Δ<sub>*sen,coil off*</sub>=Sensible load difference between the system output node and the zone inlet node with the cooling coil OFF conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;HighestSpeed}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad \quad  + \left( {{{\dot m}_{_{HighestSpeed}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
+
+<div>$$\begin{array}{l}{\Delta_{sen,\;coil\;off}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {{{\dot m}_{_{coil\;off}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;coil\;off}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
 where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
-
-Δ<sub>sen,coil\\ off</sub>**=Sensible load difference between the system output node and the zone inlet node with the cooling coil OFF conditions
-
-<div>$$\begin{array}{l}{\Delta_{sen,\;coil\;off}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {{{\dot m}_{_{coil\;off}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;coil\;off}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
-
-
 
 If the unitary system’s sensible cooling rate at the highest speed (full load, no cycling) is insufficient to meet the entire cooling load, the controlled zone conditions will not be met. The reported cycling rate and speed ratio are 1, and the speed number is set to the highest index number. If the total sensible cooling load to be met by the system is less than the sensible cooling rate at the highest speed, then the following steps are performed.
 
@@ -2843,23 +2842,23 @@ If the unitary system’s sensible cooling rate at the highest speed (full load,
 
 where
 
-*<span>\({\dot m_{Speed1}}\)</span>* = air mass flow rate through unitary system at Speed 1 [kg/s]
+*<span>${\dot m_{Speed1}}$</span>* = air mass flow rate through unitary system at Speed 1 [kg/s]
 
-Δ<sub>sen,</sub> <sub>Speed1</sub>**=Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
+Δ<sub>*sen,*</sub> <sub>*Speed1*</sub>=Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;Speed1}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {{{\dot m}_{_{Speed1}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
 ·        If the sensible cooling energy rate delivered by the unitary system at Speed 1 is greater or equal to the sensible load, the cycling ratio (part-load ratio) for the unitary system is estimated.
 
-<div>$$\begin{array}{l}CyclingRatio = \frac{{\left( {ABS(CoolingCoilSensibleLoad)} \right)}}{{FullCoolingCoilCapacity}}\\ = MAX\left( {0.0,\frac{{\left( {UnitarySystemCoolingLoad - AddedFanHeat} \right)}}{{\left( {FullCoolOutpu{t_{speed1}} - AddedFanHea{t_{speed1}}} \right)}}} \right)\end{array}$$</div>
+<div>$$\begin{array}{l}CyclingRatio = \frac{{\left( {ABS(CoolingCoilSensibleLoad)} \right)}}{{FullCoolingCoilCapacity}}\\ = MAX\left( {0.0,\frac{{\left( {UnitarySystemCoolingLoad - AddedFanHeat} \right)}}{{\left( {FullCoolOutpu{t_{Speed1}} - AddedFanHea{t_{Speed1}}} \right)}}} \right)\end{array}$$</div>
 
 
 
 where
 
-AddedFanHeat  = generated supply air fan heat, which is a function of part load ratio and as internal component cooling load [W].
+*AddedFanHeat*  = generated supply air fan heat, which is a function of part load ratio and as internal component cooling load [W].
 
-AddedFanHeat<sub>Speed1</sub>        = generated supply air fan heat at Speed 1 (part load ratio=1) [W].
+*AddedFanHeat<sub>Speed1</sub>*        = generated supply air fan heat at Speed 1 (part load ratio=1) [W].
 
 Since the part-load performance of the DX cooling coil is frequently non-linear,and the supply air fan heat varies based on cooling coil operation for the case of cycling fan/cycling coil (AUTO fan), the final part-load ratio for the cooling coil compressor and fan are determined through iterative calculations (successive modeling of the cooling coil and fan) until the unitary system’s cooling output matches the cooling load to be met within the convergence tolerance. The convergence tolerance is fixed at 0.001 and is calculated based on the difference between the load to be met and the unitary system’s cooling output divided by the load to be met.
 
@@ -2873,17 +2872,17 @@ Unitary systemOutput<sub>Cycling</sub> = unitary system delivered sensible capac
 
 where
 
-<span>\({\mathop m\limits^ \bullet_{UnitarySystem}}\)</span>      = average air mass flow rate defined in the next section [kg/s]
+<span>${\dot m{_{UnitarySystem}}}$</span>      = average air mass flow rate defined in the next section [kg/s]
 
-h<sub>out,</sub>        = enthalpy of air exiting the unitary system at part load conditions [J/kg]
+*h<sub>out,</sub>*        = enthalpy of air exiting the unitary system at part load conditions [J/kg]
 
-Δ<sub>cycling</sub>    =average sensible load difference between the system output node and the zone inlet node
+Δ<sub>*cycling*</sub>    =average sensible load difference between the system output node and the zone inlet node
 
 <div>$${\Delta_{cycling}} = \frac{{{{\mathop m\limits^ \bullet  }_{ZoneInlet}}}}{{frac}}\left( {{h_{ZoneInlet}} - {h_{ControlZone}}} \right) + \left( {{{\mathop m\limits^ \bullet  }_{UnitarySystem}} - \frac{{{{\mathop m\limits^ \bullet  }_{ZoneInlet}}}}{{frac}}} \right)\left( {{h_{Out}} - {h_{ControlZone}}} \right)$$</div>
 
 
 
-<span>\({\dot m_{_{ZoneInlet}}}\)</span> = Air mass flow rate in the supply inlet node in the controlled zone [kg/s]
+<span>${\dot m{_{ZoneInlet}}}$</span> = Air mass flow rate in the supply inlet node in the controlled zone [kg/s]
 
 For this case where speed 1 operation was able to meet the required cooling load, the speed ratio is set to zero and speed number is equal to 1.
 
@@ -2897,13 +2896,13 @@ Although a linear relationship is assumed by applying the speed ratio to obtain 
 
 where:
 
-Unitary systemOutput<sub>Speed,n</sub>= unitary system delivered sensible capacity between two consecutive speeds at a specific speed ratio (W)
+*UnitarySystemOutput<sub>Speedn</sub>*= unitary system delivered sensible capacity between two consecutive speeds at a specific speed ratio (W)
 
-<div>$$\begin{array}{l}UnitarySystemOutpu{t_{SpeedRatio}} = (SpeedRatio)FullCoolOutpu{t_{speedn}} + \\\(1 - SpeedRatio)FullCoolOutpu{t_{speedn - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}$$</div>
+<div>$$\begin{array}{l}UnitarySystemOutpu{t_{SpeedRatio}} = (SpeedRatio)FullCoolOutpu{t_{Speedn}} + \\\quad \quad \quad \quad \quad (1 - SpeedRatio)FullCoolOutpu{t_{Speedn - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}$$</div>
 
 Where
 
-AddedFanHeat<sub>SpeedRatio</sub>          = generated supply air fan heat at a specific speed ratio [W]
+*AddedFanHeat<sub>SpeedRatio</sub>*          = generated supply air fan heat at a specific speed ratio [W]
 
 In this case, the reported cycling ratio is 1 and speed number is equal to n.
 
@@ -2913,19 +2912,19 @@ Speed 1 operation
 
 If the unitary system has been specified with cycling fan/cycling coil (AUTO fan), then the unitary system’s operating supply air mass flow rate is determined by the cycling ratio (PartLoadRatio) for Speed 1. The supply air mass flow rate is multiplied by the cycling ratio to determine the average air mass flow rate for the system simulation time step. The air conditions at nodes downstream of the cooling coils represent the full-load (steady-state) values when the coil is operating.
 
-<div>$${\mathop m\limits^ \bullet_{UnitarySystem}} = \left( {CyclingRatio} \right){\mathop m\limits^ \bullet_{speed1}}$$</div>
+<div>$${{\mathop m\limits^ \bullet  }_{UnitarySystem}} = \left( {CyclingRatio} \right){{\mathop m\limits^ \bullet  }_{Speed1}}$$</div>
 
 If the fan operates continuously (i.e., when the supply air fan operating mode schedule values are NOT equal to 0), the operating air mass flow rate through the unitary system is calculated as the average of the user-specified air flow rate when the unitary system cooling coil is ON at Speed 1 and the user-specified air flow rate when the unitary system cooling coil is OFF (user-specified supply air volumetric flow rates converted to dry air mass flow rates).
 
-<div>$${\mathop m\limits^ \bullet_{UnitarySystem}} = \left( {CyclingRatio} \right){\mathop m\limits^ \bullet_{speed1}} + \left( {1 - CyclingRatio} \right){\mathop m\limits^ \bullet_{coiloff}}$$</div>
+<div>$${{\mathop m\limits^ \bullet  }_{UnitarySystem}} = \left( {CyclingRatio} \right){{\mathop m\limits^ \bullet  }_{Speed1}} + \left( {1 - CyclingRatio} \right){{\mathop m\limits^ \bullet  }_{CoilOff}}$$</div>
 
 where:
 
-<span>\({\mathop m\limits^ \bullet_{UnitarySystem}}\)</span> = average air mass flow rate through unitary system [kg/s]
+<span>${\dot m_{UnitarySystem}}$</span> = average air mass flow rate through unitary system [kg/s]
 
-<span>\({\dot m_{Speed1}}\)</span>= air mass flow rate through unitary system when cooling coil is ON at Speed 1 [kg/s]
+<span>${\dot m_{Speed1}}$</span>= air mass flow rate through unitary system when cooling coil is ON at Speed 1 [kg/s]
 
-<span>\({\dot m_{CoilOff}}\)</span> = air mass flow rate through unitary system when no heating or cooling is needed [kg/s]
+<span>${\dot m_{CoilOff}}$</span> = air mass flow rate through unitary system when no heating or cooling is needed [kg/s]
 
 In this case, the air conditions at nodes downstream of the cooling coils are calculated as the average conditions over the simulation time step (i.e., the weighted average of full-load conditions when the coil is operating and inlet air conditions when the coil is OFF).
 
@@ -2933,15 +2932,15 @@ In this case, the air conditions at nodes downstream of the cooling coils are ca
 
 When the unitary system operates at higher speeds to meet the required cooling load, the supply air mass flow rate is linearly interpolated between two consecutive speeds:
 
-<div>$${\mathop m\limits^ \bullet_{UnitarySystem}} = \left( {SpeedRatio} \right){\mathop m\limits^ \bullet_{Speedn}} + \left( {1 - SpeedRatio} \right){\mathop m\limits^ \bullet_{Speedn - 1}}$$</div>
+<div>$${{\mathop m\limits^ \bullet  }_{UnitarySystem}} = \left( {SpeedRatio} \right){{\mathop m\limits^ \bullet  }_{Speedn}} + \left( {1 - SpeedRatio} \right){{\mathop m\limits^ \bullet  }_{Speedn - 1}}$$</div>
 
 where:
 
-<span>\({\mathop m\limits^ \bullet_{UnitarySystem}}\)</span>= average air mass flow rate through the unitary system for the time step [kg/s]
+<span>${{\mathop m\limits^ \bullet  }_{UnitarySystem}}$</span>= average air mass flow rate through the unitary system for the time step [kg/s]
 
-<span>\({\dot m_{Speed\;n}}\)</span>= air mass flow rate through unitary system when cooling coil is ON at Speed n [kg/s]
+<span>${\dot m_{Speedn}}$</span>= air mass flow rate through unitary system when cooling coil is ON at Speed n [kg/s]
 
-<span>\({\dot m_{Speed\;n - 1}}\)</span>= air mass flow rate through unitary system when cooling coil is ON at Speed n-1 [kg/s]
+<span>${\dot m_{Speedn - 1}}$</span>= air mass flow rate through unitary system when cooling coil is ON at Speed n-1 [kg/s]
 
 For this case of higher speed operation, the air conditions at nodes downstream of the cooling coils are determined by the delivered cooling capacity and supply air mass flow rates between two consecutive speeds.
 
@@ -2965,19 +2964,19 @@ The model then calculates the unitary system’s sensible heating energy rate de
 
 where:
 
-*Mass Flow Rate <sub>full\\ load</sub>*  = air mass flow rate through unitary system at full-load conditions, kg/s
+*Mass Flow Rate <sub>full load</sub>*  = air mass flow rate through unitary system at full-load conditions, kg/s
 
-*h<sub>out,\\ full\\ load</sub>*  = enthalpy of air exiting the unitary system at full-load conditions, J/kg
+*h<sub>out, full load</sub>*  = enthalpy of air exiting the unitary system at full-load conditions, J/kg
 
-*h<sub>control \\ zone</sub>*  = enthalpy of air leaving the control zone (where thermostat is located), J/kg
+*h<sub>control zone</sub>*  = enthalpy of air leaving the control zone (where thermostat is located), J/kg
 
 *HR<sub>min</sub>=* enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the unitary system exiting air or the air leaving the control zone
 
-*Mass Flow Rate <sub>coil \\ off</sub>*  = air mass flow rate through the unitary system with the heating coil OFF, kg/s
+*Mass Flow Rate <sub>coil off</sub>*  = air mass flow rate through the unitary system with the heating coil OFF, kg/s
 
-*h<sub>out,\\ coil \\ off</sub>*  = enthalpy of air exiting the unitary system with the heating coil OFF, J/kg
+*h<sub>out, coil off</sub>*  = enthalpy of air exiting the unitary system with the heating coil OFF, J/kg
 
-Δ<sub>sen,</sub> *<sub>full\\ load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ<sub>sen,</sub> *<sub>full load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;full\;load}} = \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {Mass\;Flow\;Rat{e_{_{full\;load}}} - \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -2985,7 +2984,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ<sub>sen,coil\\ off</sub>**=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+Δ<sub>sen,coil off</sub>=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;coil\;off}} = \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {Mass\;Flow\;Rat{e_{_{coil\;off}}} - \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;coil\;off}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -2999,23 +2998,21 @@ Since the part-load performance of the  heating coil is frequently non-linear, 
 
 where:
 
-<span>\({Q_{UnitarySystem}}\)</span>= Unitary system delivered sensible capacity (W)
+<span>${Q_{UnitarySystem}}$</span>= Unitary system delivered sensible capacity (W)
 
 If the unitary system’s  heating coil output at full load is insufficient to meet the entire heating load, PartLoadRatio is set equal to 1.0 (compressor and fan are not cycling) and the remaining heating load is passed to the supplemental heating coil. If the unitary system model determines that the outdoor air temperature is below the minimum outdoor air temperature for compressor operation, the compressor is turned off and the entire heating load is passed to the supplemental gas or electric heating coil. The unitary system exiting air conditions and energy consumption are calculated and reported by the individual component models (fan,  heating coil, and supplemental gas or electric heating coil).
 
 If the unitary system has been specified with cycling fan/cycling coil (AUTO fan), then the unitary system’s operating supply air mass flow rate is multiplied by PartLoadRatio to determine the average air mass flow rate for the system simulation time step. The air conditions at nodes downstream of the heating coils represent the full-load (steady-state) values when the coils are operating. If the fan operates continuously (i.e., when the supply air fan operating mode schedule values are NOT equal to 0), the operating air mass flow rate through the unitary system is calculated as the average of the user-specified air flow rate when the unitary system heating coil is ON and the user-specified air flow rate when the unitary system heating coil is OFF (user-specified supply air volumetric flow rates converted to dry air mass flow rates).
 
-<div>$${\mathop m\limits^ \bullet_{UnitarySystem}} = PartLoadRatio\left( {{{\mathop m\limits^ \bullet  }_{HeatCoilON}}} \right) + \left( {1 - PartLoadRatio} \right)\left( {{{\mathop m\limits^ \bullet  }_{CoilOFF}}} \right)$$</div>
+<div>$${{\mathop m\limits^ \bullet  }_{UnitarySystem}} = PartLoadRatio\left( {{{\mathop m\limits^ \bullet  }_{HeatCoilON}}} \right) + \left( {1 - PartLoadRatio} \right)\left( {{{\mathop m\limits^ \bullet  }_{CoilOFF}}} \right)$$</div>
 
 where:
 
-<span>\(\mathop m\limits^ \bullet  HeatCoilON\)</span> = air mass flow rate through unitary system when the heating coil is ON (kg/s)
+<span>${\dot m_{HeatCoilON}}$</span> = air mass flow rate through unitary system when the heating coil is ON (kg/s)
 
-<span>\(\mathop m\limits^ \bullet  CoilOFF\)</span> = air mass flow rate through unitary system when no heating or cooling is needed (kg/s)
+<span>${\dot m_{CoilOFF}}$</span> = air mass flow rate through unitary system when no heating or cooling is needed (kg/s)
 
 In this case, the air conditions at nodes downstream of the heating coils are calculated as the average conditions over the simulation time step (i.e., the weighted average of full-load conditions when the coils are operating and inlet air conditions when the coils are OFF).
-
-
 
 #### Heating Operation (multi or variable speed coils )
 
@@ -3029,19 +3026,19 @@ The model calculates the unitary system’s sensible heating energy rate deliver
 
 where:
 
-*<span>\({\dot m_{HighestSpeed}}\)</span>* = air mass flow rate through unitary system at the highest heating speed [kg/s]
+*<span>${\dot m_{HighestSpeed}}$</span>* = air mass flow rate through unitary system at the highest heating speed [kg/s]
 
-*h<sub>out,\\ full\\ load</sub>*   = enthalpy of air exiting the unitary system at full-load conditions [J/kg]
+*h<sub>out, full load</sub>*   = enthalpy of air exiting the unitary system at full-load conditions [J/kg]
 
-*h<sub>control \\ zone</sub>*   = enthalpy of air leaving the control zone (where thermostat is located) [J/kg]
+*h<sub>control zone</sub>*   = enthalpy of air leaving the control zone (where thermostat is located) [J/kg]
 
 *HR<sub>min</sub>=* enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the unitary system exiting air or the air leaving the control zone
 
-<span>\({\dot m_{CoilOff}}\)</span>= air mass flow rate through the unitary system with the heating coil OFF [kg/s]
+<span>${\dot m_{CoilOff}}$</span>= air mass flow rate through the unitary system with the heating coil OFF [kg/s]
 
-*h<sub>out,coil \\ off</sub>*    = enthalpy of air exiting the unitary system with the heating coil OFF [J/kg]
+*h<sub>out,coil off</sub>*    = enthalpy of air exiting the unitary system with the heating coil OFF [J/kg]
 
-Δ<sub>sen,</sub> *<sub>full\\ load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ<sub>sen,</sub> *<sub>full load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;HighestSpeed}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad \quad  + \left( {{{\dot m}_{_{HighestSpeed}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -3049,7 +3046,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ<sub>sen,coil\\ off</sub>**=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+Δ*<sub>sen,coil off</sub>*=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;coil\;off}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {{{\dot m}_{_{coil\;off}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;coil\;off}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -3063,9 +3060,9 @@ If the total heating load to be met by the system is less than the sensible heat
 
 where:
 
-*<span>\({\dot m_{Speed1}}\)</span>* = air mass flow rate through unitary system at Speed 1 [kg/s]
+*<span>${\dot m_{Speed1}}$</span>* = air mass flow rate through unitary system at Speed 1 [kg/s]
 
-Δ<sub>sen,</sub> <sub>Speed1</sub>**=Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
+Δ*<sub>sen,</sub> <sub>Speed1</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;Speed1}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {{{\dot m}_{_{Speed1}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -3077,9 +3074,9 @@ where:
 
 where
 
-AddedFanHeat        = generated supply air fan heat, which is a function of part load ratio and as internal component heating load [W].
+*AddedFanHeat*        = generated supply air fan heat, which is a function of part load ratio and as internal component heating load [W].
 
-AddedFanHeat<sub>Speed1</sub>  = generated supply air fan heat at Speed 1 (part load ratio=1) [W].
+*AddedFanHeat<sub>Speed1</sub>*  = generated supply air fan heat at Speed 1 (part load ratio=1) [W].
 
 Since the part-load performance of the DX heating coil is frequently non-linear, and the supply air fan heat varies based on heating coil operation for the case of cycling fan/cycling coil (AUTO fan), the final part-load ratio for the heating coil compressor and fan are determined through iterative calculations (successive modeling of the heating coil and fan) until the unitary system’s heating output matches the heating load to be met within the convergence tolerance. The convergence tolerance is fixed at 0.001 and is calculated based on the difference between the load to be met and the unitary system’s heating output divided by the load to be met.
 
@@ -3087,25 +3084,25 @@ Since the part-load performance of the DX heating coil is frequently non-linear,
 
 where:
 
-Unitary systemOutput<sub>Cycling</sub>= unitary system delivered sensible capacity for Speed 1 operating at a specific cycling ratio (W)
+*UnitarySystemOutput<sub>cycling</sub>* = unitary system delivered sensible capacity for Speed 1 operating at a specific cycling ratio (W)
 
-<div>$$UnitarySystemOutpu{t_{cycling}} = {\mathop m\limits^ \bullet_{UnitarySystem}}{\left( {{h_{out}} - {h_{ControlZone}}} \right)_{HR\min }} - {\Delta_{cycling}}$$</div>
+<div>$$UnitarySystemOutpu{t_{cycling}} = {{\mathop m\limits^ \bullet  }_{UnitarySystem}}{\left( {{h_{out}} - {h_{ControlZone}}} \right)_{HR\min }} - {\Delta_{cycling}}$$</div>
 
 where
 
-<span>\({\mathop m\limits^ \bullet_{UnitarySystem}}\)</span> = average air mass flow rate defined in the next section [kg/s]
+<span>${{\mathop m\limits^ \bullet  }_{UnitarySystem}}$</span> = average air mass flow rate defined in the next section [kg/s]
 
-h<sub>out,</sub>              = enthalpy of air exiting the unitary system at part load conditions [J/kg]
+*h<sub>out,</sub>*              = enthalpy of air exiting the unitary system at part load conditions [J/kg]
 
-Δ<sub>cycling</sub>          =average sensible load difference between the system output node and the zone inlet node
+Δ*<sub>cycling</sub>*          =average sensible load difference between the system output node and the zone inlet node
 
 <div>$${\Delta_{cycling}} = \frac{{{{\mathop m\limits^ \bullet  }_{ZoneInlet}}}}{{frac}}\left( {{h_{ZoneInlet}} - {h_{ControlZone}}} \right) + \left( {{{\mathop m\limits^ \bullet  }_{UnitarySystem}} - \frac{{{{\mathop m\limits^ \bullet  }_{ZoneInlet}}}}{{frac}}} \right)\left( {{h_{Out}} - {h_{ControlZone}}} \right)$$</div>
 
-<span>\({\dot m_{_{ZoneInlet}}}\)</span>       = Air mass flow rate in the supply inlet node in the controlled zone [kg/s]
+<span>${\dot m_{ZoneInlet}}$</span>       = Air mass flow rate in the supply inlet node in the controlled zone [kg/s]
 
-For this case where speed 1 operation was able to meet the required heating load, the speed ratio is set to zero and speed number is equal to 1.
+For this case where Speed 1 operation was able to meet the required heating load, the speed ratio is set to zero and speed number is equal to 1.
 
-3.    If the unitary system’s heating output at full load for Speed 1 is insufficient to meet the entire heatling load, the Cycling ratio (PartLoadRatio) is set equal to 1.0 (compressor and fan are not cycling). Then the heating speed is increased and the delivered sensible capacity is calculated. If the full load sensible capacity at Speed n is greater than or equal to the sensible load, the speed ratio for the unitary system is estimated:
+3.    If the unitary system’s heating output at full load for Speed 1 is insufficient to meet the entire heating load, the Cycling ratio (PartLoadRatio) is set equal to 1.0 (compressor and fan are not cycling). Then the heating speed is increased and the delivered sensible capacity is calculated. If the full load sensible capacity at Speed n is greater than or equal to the sensible load, the speed ratio for the unitary system is estimated:
 
 <div>$$SpeedRatio = \frac{{ABS\left( {UnitarySystemHeatingLoad - AddedFanHeat - FullHeatOutpu{t_{Speedn - 1}}} \right)}}{{ABS\left( {FullHeatOutpu{t_{Speedn}} - FullHeatOutpu{t_{Speedn - 1}}} \right)}}$$</div>
 
@@ -3115,13 +3112,13 @@ Although a linear relationship is assumed by applying the speed ratio to obtain 
 
 where:
 
-UnitarySystemOutput<sub>SpeedRatio</sub>= unitary system delivered sensible capacity between two consecutive speeds at a specific ratio [W]
+*UnitarySystemOutput<sub>SpeedRatio</sub>*= unitary system delivered sensible capacity between two consecutive speeds at a specific ratio [W]
 
-<div>$$\begin{array}{l}UnitarySystemOutpu{t_{SpeedRatio}} = (SpeedRatio)FullHeatOutpu{t_{speedn}} + \\\(1 - SpeedRatio)FullHeatOutpu{t_{speedn - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}$$</div>
+<div>$$\begin{array}{l}UnitarySystemOutpu{t_{SpeedRatio}} = (SpeedRatio)FullHeatOutpu{t_{speedn}} + \\\quad \quad \quad \quad (1 - SpeedRatio)FullHeatOutpu{t_{speedn - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}$$</div>
 
 Where
 
-AddedFanHeat<sub>SpeedRatio</sub>          = generated supply air fan heat at a specific speed ratio [W]
+*AddedFanHeat<sub>SpeedRatio</sub>*          = generated supply air fan heat at a specific speed ratio [W]
 
 In this case, the reported cycling ratio is 1 and speed number is equal to n.
 
@@ -3143,13 +3140,14 @@ The unitary system’s sensible cooling load to be met and the full load cooling
 
 <div>$$PartLoadRatio = MAX\left( {0.0,\frac{{\left( {UnitarySystemCoolingLoad - NoCoolOutput} \right)}}{{\left( {FullCoolOutput - NoCoolOutput} \right)}}} \right)$$</div>
 
-hen the unitary system’s sensible cooling capacity meets the system sensible cooling load at a given sensible part load ratio, then the Unitary system meets the controlled zone cooling setpoint temperature. If a moisture (latent) load exists because the control zone humidity has exceeded the setpoint, the total moisture load to be met by the unitary systems (Unitary systemMoistureLoad) is calculated based on the control zone moisture load and the control zone air flow fraction.
+When the unitary system’s sensible cooling capacity meets the system sensible cooling load at a given sensible part load ratio, then the Unitary system meets the controlled zone cooling setpoint temperature. If a moisture (latent) load exists because the control zone humidity has exceeded the setpoint, the total moisture load to be met by the unitary systems (Unitary systemMoistureLoad) is calculated based on the control zone moisture load and the control zone air flow fraction.
 
 <div>$$UnitarySystemMoistureLoad = \frac{{ControlZoneMoistureLoad}}{{ControlZoneAirFlowFraction}}$$</div>
 
 Then the *LatentPartLoadRatio* required to meet the high humidity setpoint is calculated as follows:
 
-<span>\(LatentPartLoadRatio = MIN\left( {PL{R_{Min}},\frac{{\left( {UnitarySystemMoistureLoad - NoLatentOutput} \right)}}{{\left( {FullLatentOutput - NoLatentOutput} \right)}}} \right)\)</span>The model uses the greater of the two part-load ratios, *PartLoadRatio* or *LatentPartLoadRatio*, to determine the operating part-load ratio of the Unitary system’s DX cooling coil.
+<div>$$LatentPartLoadRatio = MIN\left( {PL{R_{Min}},\frac{{\left( {UnitarySystemMoistureLoad - NoLatentOutput} \right)}}{{\left( {FullLatentOutput - NoLatentOutput} \right)}}} \right)$$</div>
+The model uses the greater of the two part-load ratios, *PartLoadRatio* or *LatentPartLoadRatio*, to determine the operating part-load ratio of the Unitary system’s DX cooling coil.
 
 <div>$$LatentPartLoadRatio = MAX\left( {PartLoadRatio,LatentPartLoadRatio} \right)$$</div>
 
@@ -3157,23 +3155,23 @@ As previously described, iterations are performed to converge on the solution wi
 
 Where,
 
-<span>\(ControlZoneCoolingLoad\)</span>= the control zone sensible cooling load to the cooling setpoint, (W).
+<span>$ControlZoneCoolingLoad$</span>= the control zone sensible cooling load to the cooling setpoint, (W).
 
-<span>\(ControlZoneMoistureLoad\)</span>          = the control zone moisture load to the dehumidifying relative humidity setpoint, (W).
+<span>$ControlZoneMoistureLoad$</span>          = the control zone moisture load to the dehumidifying relative humidity setpoint, (W).
 
-<span>\(ControlZoneAirFlowFraction\)</span>     = the supply air fraction that goes though the control zone, (-).
+<span>$ControlZoneAirFlowFraction$</span>     = the supply air fraction that goes though the control zone, (-).
 
-<span>\(FullLatentOutput\)</span> =the Unitary system’s latent cooling energy rate at full-load conditions, W
+<span>$FullLatentOutput$</span> =the Unitary system’s latent cooling energy rate at full-load conditions, W
 
-<span>\(NoLatentOutput\)</span>   = the Unitary system’s latent cooling energy rate with cooling coil OFF, W
+<span>$NoLatentOutput$</span>   = the Unitary system’s latent cooling energy rate with cooling coil OFF, W
 
-<span>\(PartLoadRatio\)</span>     = the unitary system’s part-load-ratio required to meet system sensible load, (-).
+<span>$PartLoadRatio$</span>     = the unitary system’s part-load-ratio required to meet system sensible load, (-).
 
-<span>\(LatentPartLoadRatio\)</span>= the unitary system’s part-load-ratio required to meet system moisture load, (-).
+<span>$LatentPartLoadRatio$</span>= the unitary system’s part-load-ratio required to meet system moisture load, (-).
 
-<span>\(PL{R_{Min}}\)</span>*=*the minimum part-load ratio, which is usually 0.0. For the case when the latent capacity degradation model is used (Ref: DX Cooling Coil Model), this value is the minimum part-load ratio at which the cooling coil will dehumidify the air.
+<span>$PL{R_{Min}}$</span>*=*the minimum part-load ratio, which is usually 0.0. For the case when the latent capacity degradation model is used (Ref: DX Cooling Coil Model), this value is the minimum part-load ratio at which the cooling coil will dehumidify the air.
 
-When the predicted zone air temperature is above the heating setpoint and if there is a dehumidification load, the supplemental heating coil load is required to offset the excess cooling as shown in Figure 228. If the model determines that the LatentPartLoadRatio is to be used as the operating part-load ratio of the unitary system’s cooling coil, the supplemental heating coil is used to offset the excess sensible capacity provided by the unitary system cooling coil. The model first checks the sensible load that exists for the current simulation time step (predicted zone temperature with no HVAC operation compared to the thermostat setpoint temperatures). If a sensible cooling load or no sensible cooling or heating load exists, the model calculates the difference between the sensible heating load required to reach or maintain the heating dry-bulb temperature setpoint and the actual sensible cooling energy rate delivered by the unit (with LatentPartLoadRatio). In this case, thesupplemental heating coil is used to offset the excess sensible cooling energy provided by the cooling coil (if any) that could have caused an overshoot of the heating dry-bulb temperature setpoint. Note that when a humidistat is used and high humidity control is required, the zone dry-bulb temperature will typically move toward the heating temperature setpoint when a high moisture (latent) load exists.
+When the predicted zone air temperature is above the heating setpoint and if there is a dehumidification load, the supplemental heating coil load is required to offset the excess cooling as shown in Figure 228. If the model determines that the LatentPartLoadRatio is to be used as the operating part-load ratio of the unitary system’s cooling coil, the supplemental heating coil is used to offset the excess sensible capacity provided by the unitary system cooling coil. The model first checks the sensible load that exists for the current simulation time step (predicted zone temperature with no HVAC operation compared to the thermostat setpoint temperatures). If a sensible cooling load or no sensible cooling or heating load exists, the model calculates the difference between the sensible heating load required to reach or maintain the heating dry-bulb temperature setpoint and the actual sensible cooling energy rate delivered by the unit (with LatentPartLoadRatio). In this case, the supplemental heating coil is used to offset the excess sensible cooling energy provided by the cooling coil (if any) that could have caused an overshoot of the heating dry-bulb temperature setpoint. Note that when a humidistat is used and high humidity control is required, the zone dry-bulb temperature will typically move toward the heating temperature setpoint when a high moisture (latent) load exists.
 
 ![HiHumidControl](media/image5015.png)
 
@@ -3193,17 +3191,65 @@ Waste heat calculations are done when the multi speed cooling and heating coils 
 
 where
 
-T<sub>outlet</sub>            = outlet node temperature of heat recovery, C
+*T<sub>outlet</sub>*            = outlet node temperature of heat recovery, C
 
-T<sub>inlet</sub> = inlet node temperature of heat recovery, C
+*T<sub>inlet</sub>* = inlet node temperature of heat recovery, C
 
-Q<sub>WasteHeat</sub>      = recoverable waste heat generated by its child objects, W
+*Q<sub>WasteHeat</sub>*      = recoverable waste heat generated by its child objects, W
 
-C<sub>p</sub>              = inlet node temperature of heat recovery, C
+*C<sub>p</sub>*              = inlet node temperature of heat recovery, C
 
-<span>\({\dot m_{hr}}\)</span>            = mass flow rate of heat recovery, kg/s
+<span>${\dot m_{hr}}$</span>            = mass flow rate of heat recovery, kg/s
 
 If the outlet node temperature is above the value of the Maximum Temp for Heat Recovery field, the outlet node temperature is reset to the value of Maximum Temp for Heat Recovery.
+
+#### Multi-Speed Fan with Water Coils In Unitary System 
+
+When modeling multi-speed fan and water coils in unitary system object, the coil's capacity is modulated using speed ratio or part-load ratio.  The system load is met by varying the supply air fan speed while operating the coils at maximum water flow. When there is no system load to meet, the water control valve is fully closed.  This method of capacity control is called two-position coil control. When the supply fan is cycling between stages, then the speed ratio is calculated, but when the unit cycles between the minimum fan speed and off-position, part-load ratio is calculated. The fan may be off or run at lowest speed continuously to provide ventilation air depending the fan operating schedule. When the fan is operating at the lowest fan speed (Speed = 1), then the water flow rate is reported as the average for the time step by multiplying the maximum water flow by part load ratio. The speed ratio and part-load ratio are calculated iteratively. The set of equations used for the multi-speed fan capacity control in unitary system for water coil AHU modeling are summarized next
+
+##### Cycling Between Stages:
+When the supply fan is cycling between consecutive speeds, then the speed ratio (SR) and the average mass flow rate are calculated as follows:
+
+<div>$${SR_{n}} = Abs({SystemLoad} - {FullLoadOutput_{n-1}}) / Abs({FullLoadOutput_{n}} - {FullLoadOutput_{n-1}})$$</div>
+<div>$${\dot m} = {\dot m_{on, n}} {SR_{n}} + {\dot m_{on, n-1}} (1 - {SR_{n}})$$</div>
+<div>$${\dot m{w}} = {\dot m_{w, max}}$$</div>
+
+##### Cycling OnOff at Lowest Stage:
+The average supply air flow rate calculation when the fan is running at the lowest fan speed level depends on the fan operating schedule and load. The unitary system part load ratio is given by:
+
+<div>$${PLR} = Abs({SystemLoad} - {NoLoadOutput}) / Abs({FullLoadOutput_{1}} - {NoLoadOutput})$$</div>
+
+###### Continuous Fan:
+<div>$${\dot m} = {\dot m_{on, 1}} {PLR} + {\dot m_{off}} (1 - {PLR})$$</div>
+
+###### Cycling Fan:
+<div>$${\dot m} = {\dot m_{on, 1}} {PLR}$$</div>
+<div>$${\dot m{w}} = {\dot m_{w, max}} * {PLR}$$</div>
+
+where:
+
+{SR_{n}}		=	 speed ratio of the water coil unitary system at speed n, (-)
+
+{PLR}			=	 part load ratio of the unitary system at speed 1, (-)
+
+{\dot m}		=	 average mass flow rate of supply air, (kg/s
+
+{\dot m_{on, n-1}}	=	mass flow rate of supply air at fan speed level n-1, (kg/s)
+
+{\dot m_{on, n}}}	=	mass flow rate of supply air at fan speed level n, (kg/s)
+
+{\dot m_{off}}	=	mass flow rate of supply air when the coils are off, (kg/s)
+
+{\dot m_{w}}	=	 average mass flow rate of chilled or hot water, (kg/s)
+
+{\dot m_{w, max}}	=	maximum or full mass flow rate of chilled or hot water, (kg/s)
+
+SystemLoad 	= system load to be met by the unitary system, (W)
+
+{FullLoadOutput_{n-1}} 	= fully load system output at fan speed level n-1, (W)
+
+{FullLoadOutput_{n}} 	= fully load system output at fan speed level n, (W)
+
 
 ### Forced-Air Furnace and Central Air Conditioning
 
