@@ -351,6 +351,7 @@ namespace HVACUnitarySystem {
 		int SpeedNum; // speed number of active multi- or variable-speed coil
 		Real64 SpeedRatio; // current compressor speed ratio (variable speed)
 		Real64 CycRatio; // cycling part load ratio (variable speed)
+		int TESOpMode; // operating mode of TES DX cooling coil
 		// Warning message variables
 		int HXAssistedSensPLRIter; // used in HX Assisted calculations
 		int HXAssistedSensPLRIterIndex; // used in HX Assisted calculations
@@ -418,6 +419,7 @@ namespace HVACUnitarySystem {
 		int CoolIndexAvail; // Index used to minimize the occurrence of output warnings
 		int HeatCountAvail; // Counter used to minimize the occurrence of output warnings
 		int HeatIndexAvail; // Index used to minimize the occurrence of output warnings
+		bool FirstPass; // used to determine when first call is made
 
 		// Default Constructor
 		UnitarySystemData() :
@@ -600,6 +602,7 @@ namespace HVACUnitarySystem {
 			SpeedNum( 0 ),
 			SpeedRatio( 0.0 ),
 			CycRatio( 0.0 ),
+			TESOpMode( 0 ),
 			HXAssistedSensPLRIter( 0 ),
 			HXAssistedSensPLRIterIndex( 0 ),
 			HXAssistedSensPLRFail( 0 ),
@@ -663,7 +666,8 @@ namespace HVACUnitarySystem {
 			CoolCountAvail( 0 ),
 			CoolIndexAvail( 0 ),
 			HeatCountAvail( 0 ),
-			HeatIndexAvail( 0 )
+			HeatIndexAvail( 0 ),
+			FirstPass( true )
 		{}
 
 		// Member Constructor
@@ -860,6 +864,7 @@ namespace HVACUnitarySystem {
 			int const SpeedNum, // speed number of active multi- or variable-speed coil
 			Real64 const SpeedRatio, // current compressor speed ratio (variable speed)
 			Real64 const CycRatio, // cycling part load ratio (variable speed)
+			int const TESOpMode, // operting mode of TES DX Cooling coil
 			int const HXAssistedSensPLRIter, // used in HX Assisted calculations
 			int const HXAssistedSensPLRIterIndex, // used in HX Assisted calculations
 			int const HXAssistedSensPLRFail, // used in HX Assisted calculations
@@ -923,7 +928,8 @@ namespace HVACUnitarySystem {
 			int const CoolCountAvail, // Counter used to minimize the occurrence of output warnings
 			int const CoolIndexAvail, // Index used to minimize the occurrence of output warnings
 			int const HeatCountAvail, // Counter used to minimize the occurrence of output warnings
-			int const HeatIndexAvail // Index used to minimize the occurrence of output warnings
+			int const HeatIndexAvail, // Index used to minimize the occurrence of output warnings
+			bool const FirstPass // used to determine when first call is made
 		) :
 			UnitarySystemType( UnitarySystemType ),
 			UnitarySystemType_Num( UnitarySystemType_Num ),
@@ -1117,6 +1123,7 @@ namespace HVACUnitarySystem {
 			SpeedNum( SpeedNum ),
 			SpeedRatio( SpeedRatio ),
 			CycRatio( CycRatio ),
+			TESOpMode( TESOpMode ),
 			HXAssistedSensPLRIter( HXAssistedSensPLRIter ),
 			HXAssistedSensPLRIterIndex( HXAssistedSensPLRIterIndex ),
 			HXAssistedSensPLRFail( HXAssistedSensPLRFail ),
@@ -1180,7 +1187,8 @@ namespace HVACUnitarySystem {
 			CoolCountAvail( CoolCountAvail ),
 			CoolIndexAvail( CoolIndexAvail ),
 			HeatCountAvail( HeatCountAvail ),
-			HeatIndexAvail( HeatIndexAvail )
+			HeatIndexAvail( HeatIndexAvail ),
+			FirstPass( FirstPass )
 		{}
 
 	};
@@ -1290,9 +1298,9 @@ namespace HVACUnitarySystem {
 	void
 	ControlUnitarySystemtoSP(
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
+		int const AirLoopNum, // Primary air loop number
 		bool const FirstHVACIteration, // True when first HVAC iteration
 		int & CompOn, // compressor on/off control
-		int const AirLoopNum, // Primary air loop number
 		Optional< Real64 const > OAUCoilOutTemp = _, // the coil inlet temperature of OutdoorAirUnit
 		Optional_bool HXUnitOn = _ // Flag to control HX for HXAssisted Cooling Coil
 	);
@@ -1300,8 +1308,8 @@ namespace HVACUnitarySystem {
 	void
 	ControlUnitarySystemtoLoad(
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
-		bool const FirstHVACIteration, // True when first HVAC iteration
 		int const AirLoopNum, // Primary air loop number
+		bool const FirstHVACIteration, // True when first HVAC iteration
 		int & CompOn, // Determines if compressor is on or off
 		Optional< Real64 const > OAUCoilOutTemp = _, // the coil inlet temperature of OutdoorAirUnit
 		Optional_bool HXUnitOn = _ // Flag to control HX for HXAssisted Cooling Coil
@@ -1310,6 +1318,7 @@ namespace HVACUnitarySystem {
 	void
 	ControlUnitarySystemOutput(
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
+		int const AirLoopNum, // Index to air loop
 		bool const FirstHVACIteration, // True when first HVAC iteration
 		Real64 & OnOffAirFlowRatio, // ratio of heating PLR to cooling PLR (is this correct?)
 		Real64 const ZoneLoad,
@@ -1334,6 +1343,7 @@ namespace HVACUnitarySystem {
 	void
 	CalcUnitarySystemToLoad(
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
+		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration, // True when first HVAC iteration
 		Real64 const CoolPLR, // operating cooling part-load ratio []
 		Real64 const HeatPLR, // operating cooling part-load ratio []
@@ -1349,6 +1359,7 @@ namespace HVACUnitarySystem {
 	void
 	CalcUnitaryCoolingSystem(
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
+		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration, // True when first HVAC iteration
 		Real64 const PartLoadRatio, // coil operating part-load ratio
 		int const CompOn, // compressor control (0=off, 1=on)
@@ -1360,6 +1371,7 @@ namespace HVACUnitarySystem {
 	void
 	CalcUnitaryHeatingSystem(
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
+		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration, // True when first HVAC iteration
 		Real64 const PartLoadRatio, // coil operating part-load ratio
 		int const CompOn, // comrpressor control (0=off, 1=on)
@@ -1384,6 +1396,7 @@ namespace HVACUnitarySystem {
 	void
 	ControlCoolingSystem(
 		int const UnitarySysNum, // index to Unitary System
+		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration, // First HVAC iteration flag
 		bool & HXUnitOn, // flag to enable heat exchanger heat recovery
 		int & CompOp // compressor on/off control
@@ -1392,13 +1405,15 @@ namespace HVACUnitarySystem {
 	void
 	ControlHeatingSystem(
 		int const UnitarySysNum, // index to Unitary System
-		bool const FirstHVACIteration, // First HVAC iteration flag
+		int const AirLoopNum, // index to air loop
+		bool const FirstHVACIteration // First HVAC iteration flag
 		int & CompOn // compressor on/off control
 	);
 
 	void
 	ControlSuppHeatSystem(
 		int const UnitarySysNum, // index to Unitary System
+		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration // First HVAC iteration flag
 	);
 
@@ -1421,6 +1436,7 @@ namespace HVACUnitarySystem {
 	void
 	SimMultiSpeedCoils(
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
+		int const AirLoopNum, // Index to air loop
 		bool const FirstHVACIteration, // True when first HVAC iteration
 		int & CompOn, // compressor on/off control
 		bool const SensibleLoad,
@@ -1433,6 +1449,7 @@ namespace HVACUnitarySystem {
 	void
 	CalcPassiveSystem(
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
+		int const AirLoopNum, // Index to air loop
 		bool const FirstHVACIteration // True when first HVAC iteration
 	);
 
@@ -1535,6 +1552,12 @@ namespace HVACUnitarySystem {
 	CoolWatertoAirHPTempResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
 		Array1< Real64 > const & Par // par(1) = CoolWatertoAirHP coil number
+	);
+
+	Real64
+	TESIceStorageCoilOutletResidual(
+		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+		Array1< Real64 > const & Par // par( 1 ) = double( UnitarySysNum );
 	);
 
 	Real64

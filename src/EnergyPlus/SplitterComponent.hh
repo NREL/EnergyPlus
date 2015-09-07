@@ -125,6 +125,8 @@ namespace SplitterComponent {
 	extern Array1D< SplitterConditions > SplitterCond;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimAirLoopSplitter(

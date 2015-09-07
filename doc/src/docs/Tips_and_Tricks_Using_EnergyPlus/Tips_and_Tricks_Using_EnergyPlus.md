@@ -1426,6 +1426,7 @@ Zone HVAC Air Loop Terminal Units
 * AirTerminal:SingleDuct:SeriesPIU:Reheat
 * AirTerminal:SingleDuct:ParallelPIU:Reheat
 * AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction
+* AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam
 * AirTerminal:SingleDuct:ConstantVolume:CooledBeam
 * AirTerminal:DualDuct:ConstantVolume
 * AirTerminal:DualDuct:VAV

@@ -31,6 +31,20 @@
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include "Fixtures/HVACFixture.hh"
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DXCoils.hh>
+using namespace EnergyPlus::HeatBalanceManager;
+using namespace EnergyPlus::DataZoneEnergyDemands;
+using namespace EnergyPlus::DataHeatBalFanSys;
+using namespace EnergyPlus::ScheduleManager;
+using namespace EnergyPlus::DataEnvironment;
+using namespace EnergyPlus::DXCoils;
+
 using namespace EnergyPlus;
 using namespace EnergyPlus::HVACUnitarySystem;
 using namespace ObjexxFCL;
@@ -61,13 +75,27 @@ using WaterCoils::WaterCoil_Cooling;
 using WaterCoils::SimpleAnalysis;
 using General::TrimSigDigits;
 
-TEST( SetOnOffMassFlowRateTest, Test1 )
+TEST_F( HVACFixture, SetOnOffMassFlowRateTest )
 {
-	ShowMessage( "Begin Test: SetOnOffMassFlowRateTest, Test1" );
+		std::string const idf_objects = delimited_string( {
+		"Version,8.3;",
+		"  ",
+		"ScheduleTypeLimits,",
+		"  Any Number;             !- Name",
+		"  ",
+		"Schedule:Compact,",
+		"  FanAndCoilAvailSched,   !- Name",
+		"  Any Number,             !- Schedule Type Limits Name",
+		"  Through: 12/31,         !- Field 1",
+		"  For: AllDays,           !- Field 2",
+		"  Until: 24:00, 1.0;      !- Field 3",
+	} );
 
+	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
 	int UnitarySysNum( 1 );
 	Real64 OnOffAirFlowRatio; // This is a return value
 	Real64 PartLoadRatio( 1.0 );
+	DataHVACGlobals::TurnFansOn = true; // enable fan to run
 	MultiOrVarSpeedHeatCoil.allocate( 1 );
 	MultiOrVarSpeedHeatCoil( UnitarySysNum ) = true;
 	MultiOrVarSpeedCoolCoil.allocate( 1 );
@@ -78,6 +106,10 @@ TEST( SetOnOffMassFlowRateTest, Test1 )
 	MSHPMassFlowRateHigh = 0.0;
 
 	UnitarySystem.allocate( 1 );
+	UnitarySystem( UnitarySysNum ).SysAvailSchedPtr = GetScheduleIndex( "FanAndCoilAvailSched" ); // "Get" the schedule inputs
+	UnitarySystem( UnitarySysNum ).FanAvailSchedPtr = GetScheduleIndex( "FanAndCoilAvailSched" );
+	Schedule( 1 ).CurrentValue = 1.0; // set availability and fan schedule to 1
+
 	UnitarySystem( UnitarySysNum ).HeatMassFlowRate.allocate( 3 );
 	UnitarySystem( UnitarySysNum ).CoolMassFlowRate.allocate( 3 );
 	UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio.allocate( 3 );
@@ -233,6 +265,7 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 	//	int const FractionOfAutosizedCoolingCapacity( 11 );
 	//	int const FractionOfAutosizedHeatingCapacity( 12 );
 
+	HVACUnitarySystem::NumUnitarySystem = 50; // trick code so that UnitarySystemNumericFields.deallocate(); does not occur within code called from unit test
 	InitializePsychRoutines();
 	FinalZoneSizing.allocate( 1 );
 	ZoneEqSizing.allocate( 1 );
@@ -246,7 +279,7 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 	CurZoneEqNum = 1;
 	DataEnvironment::StdRhoAir = 1000; // Prevent divide by zero in ReportSizingManager
 
-	UnitarySystem.allocate( 1 );
+	UnitarySystem.allocate( HVACUnitarySystem::NumUnitarySystem );
 	UnitarySystem( UnitarySysNum ).UnitarySystemType = "AirLoopHVAC:UnitarySystem";
 	UnitarySystem( UnitarySysNum ).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
 	UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
@@ -287,10 +320,10 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 		UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = AutoSize;
 		UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = AutoSize;
 
-		// when l = 2, MaxCoolAirVolFlow is already set to 1.005 on previous call and represents floor area x flow rate ratio
-		if ( iSizingType == DataSizing::FlowPerFloorArea ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.005;
+		// for FractionOfAutosizedCoolingAirflow, set sizing data to 1.005 and UnitarySystem MaxCoolAirVolFlow to 1, they will multiply and yield 1.005
 		if ( iSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 1.005;
 		if ( iSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.0;
+		// for FlowPerCoolingCapacity, do the division so sizing will yield 1.005
 		if ( iSizingType == DataSizing::FlowPerCoolingCapacity ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.005 / 18827.616766698276;
 
 		SizeUnitarySystem( UnitarySysNum, FirstHVACIteration, AirLoopNum );
@@ -325,10 +358,10 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 		UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = AutoSize;
 		UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = AutoSize;
 
-		// when l = 2, MaxCoolAirVolFlow is already set to 1.005 on previous call and represents floor area x flow rate ratio
-		if ( iSizingType == DataSizing::FlowPerFloorArea ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.005;
+		// for FractionOfAutosizedHeatingAirflow, set sizing data to 1.005 and UnitarySystem MaxHeatAirVolFlow to 1, they will multiply and yield 1.005
 		if ( iSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 1.005;
 		if ( iSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.0;
+		// for FlowPerHeatingCapacity, do the division so sizing will yield 1.005
 		if ( iSizingType == DataSizing::FlowPerHeatingCapacity ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.005 / 15148.243236712493;
 
 		SizeUnitarySystem( UnitarySysNum, FirstHVACIteration, AirLoopNum );
@@ -373,13 +406,15 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 		UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = AutoSize;
 		UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = AutoSize;
 
-		// when l = 2, MaxCoolAirVolFlow is already set to 1.005 on previous call and represents floor area x flow rate ratio
-		if ( iSizingType == DataSizing::FlowPerFloorArea ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.005;
+		// for FractionOfAutosizedCoolingAirflow, set sizing data to 1.005 and UnitarySystem MaxCoolAirVolFlow to 1, they will multiply and yield 1.005
 		if ( iCoolingSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 1.005;
 		if ( iCoolingSizingType == DataSizing::FractionOfAutosizedCoolingAirflow ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.0;
+		// for FlowPerCoolingCapacity, do the division so sizing will yield 1.005
 		if ( iCoolingSizingType == DataSizing::FlowPerCoolingCapacity ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.005 / 18827.616766698276;
+		// for FractionOfAutosizedHeatingAirflow, set sizing data to 1.005 and UnitarySystem MaxHeatAirVolFlow to 1, they will multiply and yield 1.005
 		if ( iHeatingSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 1.005;
 		if ( iHeatingSizingType == DataSizing::FractionOfAutosizedHeatingAirflow ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.0;
+		// for FlowPerHeatingCapacity, do the division so sizing will yield 1.005
 		if ( iHeatingSizingType == DataSizing::FlowPerHeatingCapacity ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 1.005 / 1431.9234900374995;
 
 		SizeUnitarySystem( UnitarySysNum, FirstHVACIteration, AirLoopNum );
@@ -389,7 +424,6 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 		EXPECT_EQ( 1.005, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
 		EXPECT_EQ( 1.005, UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow );
 		EXPECT_EQ( 18827.616766698276, ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad );
-		// why is the heating capacity so much lower ???
 		EXPECT_EQ( 1431.9234900374995, ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad );
 
 	}
@@ -410,6 +444,7 @@ TEST( HVACUnitarySystem, CalcUnitaryHeatingSystem ) {
 	ShowMessage( "Begin Test: HVACUnitarySystem, CalcUnitaryHeatingSystem" );
 
 	int UnitarySysNum( 1 );
+	int AirLoopNum( 1 );
 	bool FirstHVACIteration( false );
 	int CompOn( 1 );
 	Real64 OnOffAirFlowRatio( 1.0 );
@@ -537,7 +572,7 @@ TEST( HVACUnitarySystem, CalcUnitaryHeatingSystem ) {
 	DataGlobals::DoingSizing = true;
 	WaterCoil( 1 ).TotWaterHeatingCoilRate = 0.0;
 
-	CalcUnitaryHeatingSystem( UnitarySysNum, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCycRatio, CompOn, OnOffAirFlowRatio );
+	CalcUnitaryHeatingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCycRatio, CompOn, OnOffAirFlowRatio );
 
 	EXPECT_NEAR( 15750.0, WaterCoil( 1 ).TotWaterHeatingCoilRate, 2.0 );
 
@@ -554,6 +589,7 @@ TEST( HVACUnitarySystem, CalcUnitaryCoolingSystem ) {
 
 	int CompOn( 1 );
 	int UnitarySysNum( 1 );
+	int AirLoopNum( 1 );
 	bool FirstHVACIteration( false );
 	Real64 OnOffAirFlowRatio( 1.0 );
 	Real64 CoilCoolHeatRat( 1.0 );
@@ -698,7 +734,7 @@ TEST( HVACUnitarySystem, CalcUnitaryCoolingSystem ) {
 
 	WaterCoil( 1 ).TotWaterCoolingCoilRate = 0.0;
 	
-	CalcUnitaryCoolingSystem( UnitarySysNum, FirstHVACIteration, UnitarySystem( UnitarySysNum ).CoolingCycRatio, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat );
+	CalcUnitaryCoolingSystem( UnitarySysNum, FirstHVACIteration, AirLoopNum, UnitarySystem( UnitarySysNum ).CoolingCycRatio, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat );
 
 	EXPECT_NEAR( 27530.0, WaterCoil( 1 ).TotWaterCoolingCoilRate, 2.0 );
 
