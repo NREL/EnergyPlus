@@ -5539,7 +5539,7 @@ namespace DaylightingManager {
 		auto const window2_base_adjacent_p( &window2_base_adjacent );
 
 		// Preconditions
-		assert( window1.Zone == window2_Zone ); //? Is this correct? If not why the asymmetric check of surface in window2 zone?
+//		assert( window1.Zone == window2_Zone ); //? This is violated in PurchAirWithDoubleFacadeDaylighting so then why the asymmetry of only checking for wall/roof/floor for window2 zone below?
 
 		// Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
 		if ( TotSurfaces < 100 ) { // Do simple linear search through surfaces //Do Tune this crossover heuristic

@@ -297,11 +297,6 @@ private: // Static Methods
 	 Surface const & surface
 	);
 
-private: // Static Data
-
-	static std::uint16_t const maxDepth_ = 255u; // Max tree depth
-	static size_type const maxSurfaces_ = 10u; // Max surfaces in a cube before subdivision is processed //Do Tune this
-
 private: // Data
 
 	std::uint16_t d_ = 0u; // Depth in tree

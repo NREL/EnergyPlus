@@ -73,7 +73,7 @@ namespace EnergyPlus {
 	SurfaceOctreeCube::
 	rayIntersectsSphere( Vertex const & a, Vertex const & dir ) const // Ray is from a with direction of unit vector dir
 	{
-		assert( std::abs( dir.mag_squared() - 1.0 ) < 2 * std::numeric_limits< Real >::epsilon() ); // Check unit vector
+		assert( std::abs( dir.mag_squared() - 1.0 ) < 4 * std::numeric_limits< Real >::epsilon() ); // Check unit vector
 		//Do Test if it is worth it to check a in sphere first (depends how often that is true)
 		Vertex const ac( c_ - a );
 		Real const projection_fac( dot( ac, dir ) );
@@ -89,7 +89,7 @@ namespace EnergyPlus {
 	SurfaceOctreeCube::
 	lineIntersectsSphere( Vertex const & a, Vertex const & dir ) const
 	{
-		assert( std::abs( dir.mag_squared() - 1.0 ) < 2 * std::numeric_limits< Real >::epsilon() ); // Check unit vector
+		assert( std::abs( dir.mag_squared() - 1.0 ) < 4 * std::numeric_limits< Real >::epsilon() ); // Check unit vector
 		Vertex const ac( c_ - a );
 		return ac.mag_squared() - ObjexxFCL::square( ObjexxFCL::dot( ac, dir ) ) <= r_;
 	}
@@ -126,10 +126,10 @@ namespace EnergyPlus {
 		// Note: dir_inv coordinates corresponding to a zero dir coordinate are not used and can be set to zero
 		//Do Try 0 <= tmax <= seg_length for segmentIntersectsCube: Faster?
 
-		assert( std::abs( dir.mag_squared() - 1.0 ) < 2 * std::numeric_limits< Real >::epsilon() ); // Check unit vector
-		assert( ( dir.x == 0.0 ) || ( std::abs( dir_inv.x - ( 1.0 / dir.x ) ) < 2* std::numeric_limits< Real >::epsilon() * std::abs( dir_inv.x ) ) );
-		assert( ( dir.y == 0.0 ) || ( std::abs( dir_inv.y - ( 1.0 / dir.y ) ) < 2* std::numeric_limits< Real >::epsilon() * std::abs( dir_inv.y ) ) );
-		assert( ( dir.z == 0.0 ) || ( std::abs( dir_inv.z - ( 1.0 / dir.z ) ) < 2* std::numeric_limits< Real >::epsilon() * std::abs( dir_inv.z ) ) );
+		assert( std::abs( dir.mag_squared() - 1.0 ) < 4 * std::numeric_limits< Real >::epsilon() ); // Check unit vector
+		assert( ( dir.x == 0.0 ) || ( std::abs( dir_inv.x - ( 1.0 / dir.x ) ) < 2 * std::numeric_limits< Real >::epsilon() * std::abs( dir_inv.x ) ) );
+		assert( ( dir.y == 0.0 ) || ( std::abs( dir_inv.y - ( 1.0 / dir.y ) ) < 2 * std::numeric_limits< Real >::epsilon() * std::abs( dir_inv.y ) ) );
+		assert( ( dir.z == 0.0 ) || ( std::abs( dir_inv.z - ( 1.0 / dir.z ) ) < 2 * std::numeric_limits< Real >::epsilon() * std::abs( dir_inv.z ) ) );
 
 		// Check if ray origin (a) is in cube
 		if ( contains( a ) ) return true;
@@ -183,7 +183,7 @@ namespace EnergyPlus {
 	{
 		// Note: dir_inv coordinates corresponding to a zero dir coordinate are not used and can be set to zero
 
-		assert( std::abs( dir.mag_squared() - 1.0 ) < 2 * std::numeric_limits< Real >::epsilon() ); // Check unit vector
+		assert( std::abs( dir.mag_squared() - 1.0 ) < 4 * std::numeric_limits< Real >::epsilon() ); // Check unit vector
 		assert( ( dir.x == 0.0 ) || ( std::abs( dir_inv.x - ( 1.0 / dir.x ) ) < 2 * std::numeric_limits< Real >::epsilon() * std::abs( dir_inv.x ) ) );
 		assert( ( dir.y == 0.0 ) || ( std::abs( dir_inv.y - ( 1.0 / dir.y ) ) < 2 * std::numeric_limits< Real >::epsilon() * std::abs( dir_inv.y ) ) );
 		assert( ( dir.z == 0.0 ) || ( std::abs( dir_inv.z - ( 1.0 / dir.z ) ) < 2 * std::numeric_limits< Real >::epsilon() * std::abs( dir_inv.z ) ) );
@@ -388,9 +388,9 @@ namespace EnergyPlus {
 	valid() const
 	{
 		if ( le( l_, c_ ) && le( c_, u_ ) ) {
-			Real const tol2( std::max( std::max( ObjexxFCL::magnitude_squared( l_ ), ObjexxFCL::magnitude_squared( u_ ) ) * ( 2 * std::numeric_limits< Real >::epsilon() ), 2 * std::numeric_limits< Real >::min() ) );
+			Real const tol2( std::max( std::max( ObjexxFCL::magnitude_squared( l_ ), ObjexxFCL::magnitude_squared( u_ ) ) * ( 4 * std::numeric_limits< Real >::epsilon() ), 2 * std::numeric_limits< Real >::min() ) );
 			if ( ObjexxFCL::distance_squared( c_, cen( l_, u_ ) ) <= tol2 ) {
-				Real const tol( std::max( std::sqrt( std::max( ObjexxFCL::magnitude_squared( l_ ), ObjexxFCL::magnitude_squared( u_ ) ) ) * ( 2 * std::numeric_limits< Real >::epsilon() ), 2 * std::numeric_limits< Real >::min() ) );
+				Real const tol( std::max( std::sqrt( std::max( ObjexxFCL::magnitude_squared( l_ ), ObjexxFCL::magnitude_squared( u_ ) ) ) * ( 4 * std::numeric_limits< Real >::epsilon() ), 2 * std::numeric_limits< Real >::min() ) );
 				Vertex const d( u_ - l_ ); // Diagonal
 				return ( std::abs( d.x - w_ ) <= tol ) && ( std::abs( d.x - d.y ) <= tol ) && ( std::abs( d.x - d.z ) <= tol ); // Uniform side witdths?
 			}
@@ -403,7 +403,7 @@ namespace EnergyPlus {
 	SurfaceOctreeCube::
 	branch()
 	{
-		if ( ( surfaces_.size() > maxSurfaces_ ) && ( d_ < maxDepth_ ) ) {
+		if ( ( surfaces_.size() > 8u ) && ( d_ < 255u ) ) { //Do Tune max surfaces and max depth parameters
 			// Assign Surfaces to cubes containing them //Do Try loose cubes
 			Surfaces surfaces_all;
 			surfaces_all.swap( surfaces_ );
