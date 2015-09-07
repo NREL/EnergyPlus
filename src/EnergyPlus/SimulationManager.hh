@@ -35,6 +35,8 @@ namespace SimulationManager {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageSimulation();

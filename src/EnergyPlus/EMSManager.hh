@@ -37,7 +37,9 @@ namespace EMSManager {
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Functions
-
+	void
+	clear_state();
+	
 	void
 	CheckIfAnyEMS();
 

@@ -128,7 +128,7 @@ namespace DataHVACGlobals {
 	Array1D_string const cFurnaceTypes( NumUnitarySystemTypes, { "AirLoopHVAC:Unitary:Furnace:HeatOnly", "AirLoopHVAC:Unitary:Furnace:HeatCool", "AirLoopHVAC:UnitaryHeatOnly", "AirLoopHVAC:UnitaryHeatCool", "AirLoopHVAC:UnitaryHeatPump:AirToAir", "AirLoopHVAC:UnitaryHeatPump:WaterToAir", "AirLoopHVAC:UnitarySystem" } );
 
 	// parameters describing coil types
-	int const NumAllCoilTypes( 32 );
+	int const NumAllCoilTypes( 34 );
 
 	int const CoilDX_CoolingSingleSpeed( 1 );
 	int const CoilDX_HeatingEmpirical( 2 );
@@ -167,8 +167,12 @@ namespace DataHVACGlobals {
 	int const Coil_CoolingAirToAirVariableSpeed( 30 );
 	int const Coil_HeatingAirToAirVariableSpeed( 31 );
 	int const CoilDX_HeatPumpWaterHeaterVariableSpeed( 32 );
+	
+	int const CoilVRF_FluidTCtrl_Cooling( 33 );
+	int const CoilVRF_FluidTCtrl_Heating( 34 );
 
-	Array1D_string const cAllCoilTypes( NumAllCoilTypes, { "Coil:Cooling:DX:SingleSpeed", "Coil:Heating:DX:SingleSpeed", "Coil:Cooling:DX:TwoSpeed", "CoilSystem:Cooling:DX:HeatExchangerAssisted", "Coil:Cooling:DX:TwoStageWithHumidityControlMode", "Coil:WaterHeating:AirToWaterHeatPump:Pumped", "Coil:WaterHeating:AirToWaterHeatPump:Wrapped", "Coil:Cooling:DX:MultiSpeed", "Coil:Heating:DX:MultiSpeed", "Coil:Heating:Gas", "Coil:Heating:Gas:MultiStage", "Coil:Heating:Electric", "Coil:Heating:Electric:MultiStage", "Coil:Heating:Desuperheater", "Coil:Cooling:Water", "Coil:Cooling:Water:DetailedGeometry", "Coil:Heating:Water", "Coil:Heating:Steam", "CoilSystem:Cooling:Water:HeatExchangerAssisted", "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", "Coil:Cooling:WaterToAirHeatPump:EquationFit", "Coil:Heating:WaterToAirHeatPump:EquationFit", "Coil:Cooling:DX:VariableRefrigerantFlow", "Coil:Heating:DX:VariableRefrigerantFlow", "Coil:UserDefined", "Coil:Cooling:DX:SingleSpeed:ThermalStorage", "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Cooling:DX:VariableSpeed", "Coil:Heating:DX:VariableSpeed", "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed" } );
+	Array1D_string const cAllCoilTypes( NumAllCoilTypes, { "Coil:Cooling:DX:SingleSpeed", "Coil:Heating:DX:SingleSpeed", "Coil:Cooling:DX:TwoSpeed", "CoilSystem:Cooling:DX:HeatExchangerAssisted", "Coil:Cooling:DX:TwoStageWithHumidityControlMode", "Coil:WaterHeating:AirToWaterHeatPump:Pumped", "Coil:WaterHeating:AirToWaterHeatPump:Wrapped", "Coil:Cooling:DX:MultiSpeed", "Coil:Heating:DX:MultiSpeed", "Coil:Heating:Gas", "Coil:Heating:Gas:MultiStage", "Coil:Heating:Electric", "Coil:Heating:Electric:MultiStage", "Coil:Heating:Desuperheater", "Coil:Cooling:Water", "Coil:Cooling:Water:DetailedGeometry", "Coil:Heating:Water", "Coil:Heating:Steam", "CoilSystem:Cooling:Water:HeatExchangerAssisted", "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", "Coil:Cooling:WaterToAirHeatPump:EquationFit", "Coil:Heating:WaterToAirHeatPump:EquationFit", "Coil:Cooling:DX:VariableRefrigerantFlow", "Coil:Heating:DX:VariableRefrigerantFlow", "Coil:UserDefined", "Coil:Cooling:DX:SingleSpeed:ThermalStorage", "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Cooling:DX:VariableSpeed", "Coil:Heating:DX:VariableSpeed", "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl", "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl" } );
+
 
 	// Water to air HP coil types
 	int const WatertoAir_Simple( 1 );

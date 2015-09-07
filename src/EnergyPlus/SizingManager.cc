@@ -81,6 +81,12 @@ namespace SizingManager {
 	// MODULE SUBROUTINES:
 
 	// Functions
+	void
+	clear_state()
+	{
+	 NumAirLoops = 0;
+	}
+
 
 	void
 	ManageSizing()

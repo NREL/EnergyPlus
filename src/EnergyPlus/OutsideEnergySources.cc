@@ -69,12 +69,28 @@ namespace OutsideEnergySources {
 	int NumDistrictUnits( 0 );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE OutsideEnergySources
-
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool SimOutsideEnergyGetInputFlag( true );
+	}
 	// Object Data
 	Array1D< OutsideEnergySourceSpecs > EnergySource;
 	Array1D< ReportVars > EnergySourceReport;
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumDistrictUnits = 0;
+		SimOutsideEnergyGetInputFlag = true;
+		EnergySource.deallocate();
+		EnergySourceReport.deallocate();
+	}
+
 
 	void
 	SimOutsideEnergy(
@@ -123,7 +139,9 @@ namespace OutsideEnergySources {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // Get input once and once only
+		/////////// hoisted into namespace SimOutsideEnergyGetInputFlag ////////////
+		// static bool GetInputFlag( true ); // Get input once and once only
+		/////////////////////////////////////////////////
 		int EqNum;
 		Real64 InletTemp;
 		Real64 OutletTemp;
@@ -131,9 +149,9 @@ namespace OutsideEnergySources {
 		//FLOW
 
 		//GET INPUT
-		if ( GetInputFlag ) {
+		if ( SimOutsideEnergyGetInputFlag ) {
 			GetOutsideEnergySourcesInput();
-			GetInputFlag = false;
+			SimOutsideEnergyGetInputFlag = false;
 		}
 
 		// Find the correct Equipment
