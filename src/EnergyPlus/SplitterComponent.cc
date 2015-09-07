@@ -78,6 +78,14 @@ namespace SplitterComponent {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state()
+	{
+		GetSplitterInputFlag = true ;
+		NumSplitters = 0; 
+		CheckEquipName.deallocate();
+		SplitterCond.deallocate();
+	}
 
 	void
 	SimAirLoopSplitter(

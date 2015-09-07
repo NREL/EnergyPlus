@@ -208,6 +208,60 @@ namespace DataRuntimeLanguage {
 	std::unordered_set< std::tuple< std::string, std::string, std::string >, EMSActuatorKey_hash > EMSActuator_lookup; // Fast duplicate lookup structure
 
 	// Functions
+	void
+	clear_state()
+	{
+		EMSProgram.deallocate();
+		NumProgramCallManagers = 0 ; 
+		NumSensors =  0 ; 
+		numActuatorsUsed = 0 ; 
+		numEMSActuatorsAvailable = 0 ; 
+		maxEMSActuatorsAvailable = 0 ; 
+		NumInternalVariablesUsed = 0 ; 
+		numEMSInternalVarsAvailable = 0 ; 
+		maxEMSInternalVarsAvailable = 0 ; 
+		varsAvailableAllocInc = 1000 ;
+		NumErlPrograms = 0 ;
+		NumErlSubroutines = 0 ;
+		NumUserGlobalVariables = 0 ;
+		NumErlVariables = 0 ;
+		NumErlStacks = 0 ;
+		NumExpressions = 0 ;
+		NumEMSOutputVariables = 0 ;
+		NumEMSMeteredOutputVariables = 0 ; 
+		NumErlTrendVariables = 0 ;
+		NumEMSCurveIndices = 0 ; 
+		NumEMSConstructionIndices = 0 ; 
+		NumExternalInterfaceGlobalVariables = 0 ; 
+		NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables =  0 ; 
+		NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables = 0 ; 
+		NumExternalInterfaceActuatorsUsed = 0 ; 
+		NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed = 0 ; 
+		NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed = 0 ; 
+		OutputEMSFileUnitNum = 0 ; 
+		OutputEDDFile = false ; 
+		OutputFullEMSTrace = false ; 
+		OutputEMSErrors = false ; 
+		OutputEMSActuatorAvailFull = false ; 
+		OutputEMSActuatorAvailSmall = false ; 
+		OutputEMSInternalVarsFull = false ; 
+		OutputEMSInternalVarsSmall = false ; 
+		EMSConstructActuatorChecked.deallocate();
+		EMSConstructActuatorIsOkay.deallocate();
+		ErlVariable.deallocate(); // holds Erl variables in a structure array
+		ErlStack.deallocate(); // holds Erl programs in separate "stacks"
+		ErlExpression.deallocate(); // holds Erl expressions in structure array
+		PossibleOperators.deallocate(); // hard library of available operators and functions
+		TrendVariable.deallocate(); // holds Erl trend varialbes in a structure array
+		Sensor.deallocate(); // EMS:SENSOR objects used (from output variables)
+		EMSActuatorAvailable.deallocate(); // actuators that could be used
+		EMSActuatorUsed.deallocate(); // actuators that are used
+		EMSInternalVarsAvailable.deallocate(); // internal data that could be used
+		EMSInternalVarsUsed.deallocate(); // internal data that are used
+		EMSProgramCallManager.deallocate(); // program calling managers
+		EMSActuator_lookup.clear(); // Fast duplicate lookup structure
+	
+	}
 
 	void
 	ValidateEMSVariableName(

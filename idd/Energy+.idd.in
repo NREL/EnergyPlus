@@ -32435,10 +32435,12 @@ ZoneHVAC:FourPipeFanCoil,
         \required-field
         \type choice
         \key Coil:Heating:Water
+        \key Coil:Heating:Electric
    A14, \field Heating Coil Name
         \required-field
         \type object-list
         \object-list HeatingCoilsWater
+        \object-list HeatingCoilsElectric
    N8 , \field Maximum Hot Water Flow Rate
         \required-field
         \autosizable
@@ -39125,6 +39127,170 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
        \type object-list
        \object-list ZoneMixers
 
+AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
+       \memo Central air system terminal unit, single duct, constant volume, 
+       \memo with heating and/or cooling.  
+       \memo Operates as two-pipe unit if heating or cooling water is omitted.
+       \memo Heating and/or cooling can be scheduled off for dedicated ventilation.
+  A1 , \field Name
+       \type alpha
+       \required-field
+  A2 , \field Primary Air Availability Schedule Name
+       \note Primary air is supplied by central air handling unit and must be on for heating or cooling.
+       \note Schedule value > 0 means the primary air supply is available.
+       \note If this field is blank, the primary air supply is always available.
+       \type object-list
+       \object-list ScheduleNames
+  A3 , \field Cooling Availability Schedule Name
+       \note Cooling operation can be controlled separately using this availability schedule.
+       \note Schedule value > 0 means beam cooling is available.
+       \note If this field is blank, the beam cooling is always available (as long as primary air is also available).
+       \type object-list
+       \object-list ScheduleNames
+  A4 , \field Heating Availability Schedule Name
+       \note Heating operation can be controlled separately using this availability schedule.
+       \note Schedule value > 0 means beam heating is available.
+       \note If this field is blank, the beam heating is always available (as long as primary air is also available).
+       \type object-list
+       \object-list ScheduleNames
+  A5 , \field Primary Air Inlet Node Name
+       \note Name of the air system node for primary supply air entering the air distribution unit.
+       \type node
+       \required-field
+  A6 , \field Primary Air Outlet Node Name
+       \note Name of the air system node for primary supply air leaving the air distribution unit and entering the zone.
+       \type node
+       \required-field
+  A7 , \field Chilled Water Inlet Node Name
+       \note Name of the plant system node for chilled water entering the beam.
+       \note The two chilled water nodes can (only) be omitted to model a two-pipe heating only beam.
+       \type node
+  A8 , \field Chilled Water Outlet Node Name
+       \note Name of the plant system node for chilled water leaving the beam.
+       \type node
+  A9 , \field Hot Water Inlet Node Name
+       \note Name of the plant system node for hot water entering the beam.
+       \note The two hot water nodes can (only) be omitted to model a two-pipe cooling-only beam.
+       \type node
+  A10, \field Hot Water Outlet Node Name
+       \note Name of the plant system node for hot water leaving the beam.
+       \type node
+  N1 , \field Design Primary Air Volume Flow Rate
+       \type real
+       \units m3/s
+       \minimum 0.0
+       \autosizable
+       \default autosize
+  N2 , \field Design Chilled Water Volume Flow Rate
+       \type real
+       \units m3/s
+       \minimum 0.0
+       \autosizable
+       \default autosize
+  N3 , \field Design Hot Water Volume Flow Rate
+       \type real
+       \units m3/s
+       \minimum 0.0
+       \autosizable
+       \default autosize
+  N4 , \field Zone Total Beam Length
+       \note Sum of the length of all the beam units in the zone represented by this terminal unit.
+       \type real
+       \units m
+       \minimum> 0.0
+       \autosizable
+       \default autosize
+  N5 , \field Rated Primary Air Flow Rate per Beam Length
+       \note Primary air supply flow rate normalized by beam length.
+       \type real
+       \units m3/s-m
+       \minimum> 0.0
+       \default 0.035
+  N6 , \field Beam Rated Cooling Capacity per Beam Length
+       \note Sensible cooling capacity per meter of beam length at the rating point.
+       \type real
+       \units W/m
+       \minimum> 0.0
+       \default 600.0
+  N7 , \field Beam Rated Cooling Room Air Chilled Water Temperature Difference
+       \note Difference in temperature between the zone air and the entering chilled water at the rating point.
+       \type real
+       \units deltaC
+       \minimum> 0.0
+       \default 10.0
+  N8 , \field Beam Rated Chilled Water Volume Flow Rate per Beam Length
+       \note The volume flow rate of chilled water per meter of beam length at the rating point.
+       \type real
+       \units m3/s-m
+       \minimum> 0.0
+       \default 0.00005
+  A11, \field Beam Cooling Capacity Temperature Difference Modification Factor Curve Name
+       \note Adjusts beam cooling capacity when the temperature difference between entering water and zone air
+       \note is different than at the rating point.  Single independent variable is the ratio of the current 
+       \note temperature difference divided by the rating point temperature difference.
+       \note This field is required when beam is connected to a chilled water plant.
+       \type object-list
+       \object-list UniVariateCurves
+       \object-list UniVariateTables
+  A12, \field Beam Cooling Capacity Air Flow Modification Factor Curve Name
+       \note Adjusts beam cooling capacity when the primary air supply flow rate is different 
+       \note than at the rating point. The single independent variable is the current normalized
+       \note air flow rate divided by the normalized air flow rate at the rating point.
+       \note This field is required when beam is connected to a chilled water plant.
+       \type object-list
+       \object-list UniVariateCurves
+       \object-list UniVariateTables
+  A13, \field Beam Cooling Capacity Chilled Water Flow Modification Factor Curve Name
+       \note Adjusts beam cooling capacity when the normalized chilled water flow rate is different 
+       \note than at the rating point. The single independent variable is the current normalized
+       \note chilled water flow rate divided by the normalized chilled water flow rate at the rating point.
+       \note This field is required when beam is connected to a chilled water plant.
+       \type object-list
+       \object-list UniVariateCurves
+       \object-list UniVariateTables
+  N9 , \field Beam Rated Heating Capacity per Beam Length
+       \note Sensible heating capacity per meter of beam length at the rating point.
+       \type real
+       \units W/m
+       \minimum> 0.0
+       \default 1500.0
+  N10, \field Beam Rated Heating Room Air Hot Water Temperature Difference
+       \note Difference in temperature between the zone air and the entering hot water at the rating point.
+       \type real
+       \units deltaC
+       \minimum> 0.0
+       \default 27.8
+  N11, \field Beam Rated Hot Water Volume Flow Rate per Beam Length
+       \note The volume flow rate of hoy water per meter of beam length at the rating point.
+       \type real
+       \units m3/s-m
+       \minimum> 0.0
+       \default 0.00005
+  A14, \field Beam Heating Capacity Temperature Difference Modification Factor Curve Name
+       \note Adjusts beam heating capacity when the temperature difference between entering water and zone air
+       \note is different than at the rating point.  Single independent variable is the ratio of the current 
+       \note temperature difference divided by the rating point temperature difference.
+       \note This field is required when beam is connected to a hot water plant.
+       \type object-list
+       \object-list UniVariateCurves
+       \object-list UniVariateTables
+  A15, \field Beam Heating Capacity Air Flow Modification Factor Curve Name
+       \note Adjusts beam heating capacity when the primary air supply flow rate is different 
+       \note than at the rating point. The single independent variable is the current normalized
+       \note air flow rate divided by the normalized air flow rate at the rating point.
+       \note This field is required when beam is connected to a hot water plant.
+       \type object-list
+       \object-list UniVariateCurves
+       \object-list UniVariateTables
+  A16; \field Beam Heating Capacity Hot Water Flow Modification Factor Curve Name
+       \note Adjusts beam heating capacity when the normalized hot water flow rate is different 
+       \note than at the rating point. The single independent variable is the current normalized
+       \note hot water flow rate divided by the normalized hot water flow rate at the rating point.
+       \note This field is required when beam is connected to a hot water plant.
+       \type object-list
+       \object-list UniVariateCurves
+       \object-list UniVariateTables
+
 AirTerminal:SingleDuct:ConstantVolume:CooledBeam,
        \memo Central air system terminal unit, single duct, constant volume, with cooled beam
        \memo (active or passive).
@@ -43374,6 +43540,7 @@ Coil:Heating:Electric,
        \type alpha
        \required-field
        \reference HeatingCoilName
+       \reference HeatingCoilsElectric
        \reference AFNCoilNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -49863,6 +50030,7 @@ Coil:Cooling:DX:SingleSpeed:ThermalStorage,
 EvaporativeCooler:Direct:CelDekPad,
        \memo Direct evaporative cooler with rigid media evaporative pad and recirculating water
        \memo pump. This model has no controls other than its availability schedule.
+       \min-fields 4
   A1 , \field Name
        \type alpha
        \reference EvapCoolerNames
@@ -49874,9 +50042,13 @@ EvaporativeCooler:Direct:CelDekPad,
   N1 , \field Direct Pad Area
        \units m2
        \minimum 0.0
+       \autosizable
+       \default Autosize
   N2 , \field Direct Pad Depth
        \units m
        \minimum 0.0
+       \autosizable
+       \default Autosize
   N3 , \field Recirculating Water Pump Power Consumption
        \units W
        \ip-units W
@@ -49894,6 +50066,7 @@ EvaporativeCooler:Indirect:CelDekPad,
        \memo Indirect evaporative cooler with rigid media evaporative pad, recirculating water
        \memo pump, and secondary air fan. This model has no controls other than its availability
        \memo schedule.
+       \min-fields 4
   A1 , \field Name
        \required-field
        \type alpha
@@ -49906,9 +50079,13 @@ EvaporativeCooler:Indirect:CelDekPad,
   N1 , \field Direct Pad Area
        \units m2
        \minimum 0.0
+       \autosizable
+       \default Autosize
   N2 , \field Direct Pad Depth
        \units m
        \minimum 0.0
+       \autosizable
+       \default Autosize
   N3 , \field Recirculating Water Pump Power Consumption
        \units W
        \ip-units W
@@ -50689,6 +50866,8 @@ HeatExchanger:AirToAir:FlatPlate,
       \type real
       \minimum> 0.0
       \units m3/s
+      \autosizable
+      \default Autosize
   N3, \field Nominal Supply Air Inlet Temperature
       \required-field
       \type real
@@ -50702,6 +50881,7 @@ HeatExchanger:AirToAir:FlatPlate,
       \type real
       \minimum> 0.0
       \units m3/s
+      \autosizable
   N6, \field Nominal Secondary Air Inlet Temperature
       \required-field
       \type real
@@ -50928,12 +51108,14 @@ HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1,
        \type real
        \units m3/s
        \minimum> 0.0
+       \autosizable
   N2 , \field Nominal Air Face Velocity
        \required-field
        \type real
        \units m/s
        \minimum> 0.0
        \maximum 6.0
+       \autosizable
   N3 , \field Nominal Electric Power
        \note Parasitic electric power (e.g., desiccant wheel motor)
        \type real
@@ -51221,6 +51403,7 @@ AirLoopHVAC:UnitarySystem,
        \key Fan:OnOff
        \key Fan:ConstantVolume
        \key Fan:VariableVolume
+       \key Fan:ComponentModel
        \note Enter the type of supply air fan if included in the unitary system.
        \note Fan:ConstantVolume only works with continuous fan operating mode (i.e. supply
        \note air fan operating mode schedule values greater than 0).
@@ -51228,11 +51411,13 @@ AirLoopHVAC:UnitarySystem,
        \note input field above is left blank.
        \note Specify a Fan:VariableVolume when modeling VAV systems which used setpoint based control
        \note if the fan is included in the unitary system object.
+       \note The ComponentModel fan type may be substituted for the ConstantVolume or VariableVolume
+       \note fan types when more detailed fan modeling is required.
        \note The variable or constant volume fan may be specified on the branch instead of contained
        \note within the unitary system object (i.e., this field may be blank for certain configurations).
   A9, \field Supply Fan Name
        \type object-list
-       \object-list FansCVandOnOffandVAV
+       \object-list Fans
        \note Enter the name of the supply air fan if included in the unitary system.
   A10, \field Fan Placement
        \type choice
@@ -51266,6 +51451,7 @@ AirLoopHVAC:UnitarySystem,
        \key Coil:Heating:Water
        \key Coil:Heating:Steam
        \key Coil:Heating:Desuperheater
+       \key Coil:UserDefined
        \note Enter the type of heating coil if included in the unitary system.
   A13, \field Heating Coil Name
        \type object-list
@@ -51278,13 +51464,14 @@ AirLoopHVAC:UnitarySystem,
        \object-list HeatingCoilsElectricMultiStage
        \object-list HeatingCoilsGasMultiStage
        \object-list HeatingCoilsDesuperheater
+       \object-list UserDefinedCoil
        \note Enter the name of the heating coil if included in the unitary system.
   N1 , \field DX Heating Coil Sizing Ratio
        \type real
        \default 1.0
        \minimum> 0
        \note Used to adjust heat pump heating capacity with respect to DX cooling capacity
-       \note used only for heat pump configurations (i.e., a cooling and DX heating coil is used).
+       \note used only for heat pump configurations (i.e., a DX cooling and DX heating coil is used).
   A14, \field Cooling Coil Object Type
        \type choice
        \key Coil:Cooling:DX:SingleSpeed
@@ -51292,6 +51479,7 @@ AirLoopHVAC:UnitarySystem,
        \key Coil:Cooling:DX:MultiSpeed
        \key Coil:Cooling:DX:VariableSpeed
        \key Coil:Cooling:DX:TwoStageWithHumidityControlMode
+       \key Coil:Cooling:DX:SingleSpeed:ThermalStorage
        \key CoilSystem:Cooling:DX:HeatExchangerAssisted
        \key Coil:Cooling:WaterToAirHeatPump:ParameterEstimation
        \key Coil:Cooling:WaterToAirHeatPump:EquationFit
@@ -51299,6 +51487,7 @@ AirLoopHVAC:UnitarySystem,
        \key Coil:Cooling:Water
        \key Coil:Cooling:Water:DetailedGeometry
        \key CoilSystem:Cooling:Water:HeatExchangerAssisted
+       \key Coil:UserDefined
        \note Enter the type of cooling coil if included in the unitary system.
   A15, \field Cooling Coil Name
        \type object-list
@@ -51308,6 +51497,7 @@ AirLoopHVAC:UnitarySystem,
        \object-list CoolingCoilsWaterToAirHP
        \object-list CoolingCoilsWaterToAirVSHP
        \object-list CoolingCoilsWater
+       \object-list UserDefindedCoil
        \note Enter the name of the cooling coil if included in the unitary system.
   A16, \field Use DOAS DX Cooling Coil
        \type choice
@@ -51346,12 +51536,14 @@ AirLoopHVAC:UnitarySystem,
        \key Coil:Heating:Desuperheater
        \key Coil:Heating:Water
        \key Coil:Heating:Steam
+       \key Coil:UserDefined
        \note Enter the type of supplemental heating coil if included in the unitary system.
        \note Only required if dehumidification control type is "CoolReheat".
   A19, \field Supplemental Heating Coil Name
        \type object-list
        \object-list HeatingCoilName
        \object-list HeatingCoilsDesuperheater
+       \object-list UserDefinedCoil
        \note Enter the name of the supplemental heating coil if included in the unitary system.
        \note Only required if dehumidification control type is "CoolReheat".
   A20, \field Cooling Supply Air Flow Rate Method
@@ -65423,7 +65615,6 @@ WaterHeater:HeatPump:PumpedCondenser,
        \memo This object models an air-source heat pump for water heating where the water is pumped out of the tank,
        \memo through a heating coil and returned to the tank. 
        \memo For wrapped condenser HPWHs, see WaterHeater:HeatPump:WrappedCondenser.
-       \memo see 
        \memo WaterHeater:HeatPump:PumpedCondenser is a compound object that references other component objects -
        \memo Coil:WaterHeating:AirToWaterHeatPump:*, Fan:OnOff, WaterHeater:Mixed or WaterHeater:Stratified
   A1 , \field Name
@@ -69564,6 +69755,7 @@ ZoneHVAC:ForcedAir:UserDefined,
    A1,  \field Name
         \required-field
         \type alpha
+        \reference UserDefinedCoil
         \note This is the name of the coil
    A2 , \field Overall Model Simulation Program Calling Manager Name
         \type object-list
@@ -77572,7 +77764,7 @@ FaultModel:TemperatureSensorOffset:ReturnAir,
        \maximum< 10
        \default 0.0
        \units deltaC
-  
+
 FaultModel:EnthalpySensorOffset:ReturnAir,
    \memo This object describes return air enthalpy sensor offset
    \min-fields 3

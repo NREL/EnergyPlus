@@ -542,6 +542,8 @@ namespace Fans {
 	extern Array1D< FanNumericFieldData > FanNumericFields;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimulateFanComponents(
