@@ -112,6 +112,8 @@ namespace Fans {
 	bool LocalTurnFansOff( false ); // If True, overrides fan schedule and LocalTurnFansOn and
 	// forces ZoneHVAC comp fans off
 	static Array1D_bool MySizeFlag;
+	bool MyOneTimeFlag( true );
+	static Array1D_bool MyEnvrnFlag;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -944,9 +946,7 @@ namespace Fans {
 		int OutletNode;
 		//unused0909  Integer             :: InNode
 		int OutNode;
-		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
-		static Array1D_bool MyEnvrnFlag;
 		int Loop;
 
 		// FLOW:
@@ -3338,9 +3338,11 @@ namespace Fans {
 		GetFanInputFlag = true;
 		LocalTurnFansOn = false;
 		LocalTurnFansOff = false;
+		MyOneTimeFlag = true;
 
 		CheckEquipName.deallocate();
 		MySizeFlag.deallocate();
+		MyEnvrnFlag.deallocate();
 		Fan.deallocate();
 		NightVentPerf.deallocate();
 		FanNumericFields.deallocate();

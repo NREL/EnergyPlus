@@ -195,6 +195,7 @@ namespace HVACUnitarySystem {
 
 	//MODULE VARIABLE DECLARATIONS:
 	bool GetInputFlag( true ); // Flag to get input only once
+	bool MyOneTimeFlag( true ); // one time flag
 	bool EconomizerFlag( false ); // holds air loop economizer status
 	bool HeatingLoad( false ); // True when zone needs heating
 	bool CoolingLoad( false ); // True when zone needs cooling
@@ -215,8 +216,13 @@ namespace HVACUnitarySystem {
 
 	// Allocatable types
 	Array1D_bool CheckEquipName;
+	Array1D_bool MyEnvrnFlag; // environment flag
 	Array1D_bool MultiOrVarSpeedHeatCoil;
 	Array1D_bool MultiOrVarSpeedCoolCoil;
+	Array1D_bool MyPlantScanFlag; // used for finding on heat recovery plant loop
+	Array1D_bool MySuppCoilPlantScanFlag; // used for finding on heat recovery plant loop
+	Array1D_bool MySetPointCheckFlag; // tests for set point
+	Array1D_bool MySizingCheckFlag; // tests for sizing
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -355,9 +361,9 @@ namespace HVACUnitarySystem {
 		{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).ControlType );
 		if ( SELECT_CASE_var == SetPointBased ) {
 			if ( present( ZoneEquipment ) ) {
-				ControlUnitarySystemtoSP( UnitarySysNum, AirLoopNum, FirstHVACIteration, CompOn, 0, OAUCoilOutTemp, HXUnitOn );
+				ControlUnitarySystemtoSP( UnitarySysNum, 0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn );
 			} else {
-				ControlUnitarySystemtoSP( UnitarySysNum, AirLoopNum, FirstHVACIteration, CompOn, AirLoopNum, OAUCoilOutTemp, HXUnitOn );
+				ControlUnitarySystemtoSP( UnitarySysNum, AirLoopNum, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn );
 			}
 		} else if ( SELECT_CASE_var == LoadBased ) {
 			if ( present( ZoneEquipment ) ) {
@@ -477,12 +483,6 @@ namespace HVACUnitarySystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static Array1D_bool MyEnvrnFlag; // environment flag
-		static Array1D_bool MyPlantScanFlag; // used for finding on heat recovery plant loop
-		static Array1D_bool MySuppCoilPlantScanFlag; // used for finding on heat recovery plant loop
-		static Array1D_bool MySetPointCheckFlag; // tests for set point
-		static Array1D_bool MySizingCheckFlag; // tests for sizing
-		static bool MyOneTimeFlag( true ); // one time flag
 		static std::string CoolingCoilType; // Coil:Cooling:Water or Coil:Cooling:Water:DetailedGeometry
 		static std::string CoolingCoilName; // Coil:Cooling:Water or Coil:Cooling:Water:DetailedGeometry
 		static std::string HeatingCoilType; // Coil:Heating:Water or Coil:Heating:Steam
@@ -8316,7 +8316,7 @@ namespace HVACUnitarySystem {
 								SolveRegulaFalsi( Acc, MaxIte, SolFla, SpeedRatio, DXCoilVarSpeedResidual, 0.0, 1.0, Par );
 								UnitarySystem( UnitarySysNum ).CoolingCycRatio = CycRatio;
 								UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = SpeedRatio;
-								CalcPassiveSystem( UnitarySysNum, FirstHVACIteration );
+								CalcPassiveSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration );
 								UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac = SpeedRatio;
 								CalcPassiveSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration );
 								PartLoadFrac = SpeedRatio;
@@ -8325,7 +8325,7 @@ namespace HVACUnitarySystem {
 								Par( 4 ) = SpeedRatio;
 								SolveRegulaFalsi( Acc, MaxIte, SolFla, CycRatio, DXCoilCyclingResidual, 0.0, 1.0, Par );
 								UnitarySystem( UnitarySysNum ).CoolingCycRatio = CycRatio;
-								CalcPassiveSystem( UnitarySysNum, FirstHVACIteration );
+								CalcPassiveSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration );
 								UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac = CycRatio;
 								CalcPassiveSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration );
 								PartLoadFrac = CycRatio;
@@ -8817,7 +8817,7 @@ namespace HVACUnitarySystem {
 	ControlHeatingSystem(
 		int const UnitarySysNum, // index to Unitary System
 		int const AirLoopNum, // index to air loop
-		bool const FirstHVACIteration // First HVAC iteration flag
+		bool const FirstHVACIteration, // First HVAC iteration flag
 		int & CompOn // compressor on/off control
 	)
 	{
@@ -12924,6 +12924,7 @@ namespace HVACUnitarySystem {
 	clear_state()
 	{
 	GetInputFlag = true;
+	MyOneTimeFlag = true;
 	EconomizerFlag = false;
 	HeatingLoad = false;
 	CoolingLoad = false;
@@ -12944,11 +12945,16 @@ namespace HVACUnitarySystem {
 
 	// Allocatable types
 	CheckEquipName.deallocate();
+	MyEnvrnFlag.deallocate();
 	MultiOrVarSpeedHeatCoil.deallocate();
 	MultiOrVarSpeedCoolCoil.deallocate();
 	DesignSpecMSHP.deallocate();
 	UnitarySystem.deallocate();
 	UnitarySystemNumericFields.deallocate();
+	MyPlantScanFlag.deallocate();
+	MySuppCoilPlantScanFlag.deallocate();
+	MySetPointCheckFlag.deallocate();
+	MySizingCheckFlag.deallocate();
 	}
 } // HVACUnitarySystem
 

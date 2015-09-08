@@ -80,6 +80,7 @@ namespace HVACUnitarySystem {
 
 	// Allocatable types
 	extern Array1D_bool CheckEquipName;
+	extern Array1D_bool MyEnvrnFlag;
 	extern Array1D_bool MultiOrVarSpeedHeatCoil;
 	extern Array1D_bool MultiOrVarSpeedCoolCoil;
 
@@ -1406,7 +1407,7 @@ namespace HVACUnitarySystem {
 	ControlHeatingSystem(
 		int const UnitarySysNum, // index to Unitary System
 		int const AirLoopNum, // index to air loop
-		bool const FirstHVACIteration // First HVAC iteration flag
+		bool const FirstHVACIteration, // First HVAC iteration flag
 		int & CompOn // compressor on/off control
 	);
 
