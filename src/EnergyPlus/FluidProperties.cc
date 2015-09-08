@@ -4111,14 +4111,14 @@ namespace FluidProperties {
 				RefrigErrorTracking( RefrigNum ).SatSupEnthalpyErrCount += SatErrCount;
 				// send warning
 				if ( RefrigErrorTracking( RefrigNum ).SatTempDensityErrCount <= RefrigerantErrorLimitTest ) {
-					ShowSevereMessage( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] is saturated at the given conditions, saturated enthalpy at given temperature returned. **" );
+					ShowWarningMessage( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] is saturated at the given conditions, saturated enthalpy at given temperature returned. **" );
 					ShowContinueError( "...Called From:" + CalledFrom );
 					ShowContinueError( "Refrigerant temperature = " + RoundSigDigits( Temperature, 2 ) );
 					ShowContinueError( "Refrigerant pressure = " + RoundSigDigits( Pressure, 0 ) );
 					ShowContinueError( "Returned Enthalpy value = " + RoundSigDigits( ReturnValue, 3 ) );
 					ShowContinueErrorTimeStamp( "" );
 				}
-				ShowRecurringSevereErrorAtEnd( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] saturated at the given conditions **", RefrigErrorTracking( RefrigNum ).SatSupEnthalpyErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
+				ShowRecurringWarningErrorAtEnd( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] saturated at the given conditions **", RefrigErrorTracking( RefrigNum ).SatSupEnthalpyErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
 			}
 			return ReturnValue;
 		}
@@ -4623,7 +4623,7 @@ namespace FluidProperties {
 			RefrigErrorTracking( RefrigNum ).SatSupDensityErrCount += SatErrCount;
 			// send warning
 			if ( RefrigErrorTracking( RefrigNum ).SatSupDensityErrCount <= RefrigerantErrorLimitTest ) {
-				ShowSevereMessage( RoutineName + ": Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] is saturated at the given conditions, saturated density at given temperature returned. **" );
+				ShowWarningMessage( RoutineName + ": Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] is saturated at the given conditions, saturated density at given temperature returned. **" );
 				ShowContinueError( "...Called From:" + CalledFrom );
 				ShowContinueError( "Refrigerant temperature = " + RoundSigDigits( Temperature, 2 ) );
 				ShowContinueError( "Refrigerant pressure = " + RoundSigDigits( Pressure, 0 ) );
@@ -4631,7 +4631,7 @@ namespace FluidProperties {
 				ShowContinueErrorTimeStamp( "" );
 			}
 			if ( SatErrCount > 0 ) {
-				ShowRecurringSevereErrorAtEnd( RoutineName + ": Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] saturated at the given conditions **", RefrigErrorTracking( RefrigNum ).SatSupEnthalpyErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
+				ShowRecurringWarningErrorAtEnd( RoutineName + ": Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] saturated at the given conditions **", RefrigErrorTracking( RefrigNum ).SatSupEnthalpyErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
 			}
 			return saturated_density;
 		}
@@ -5737,12 +5737,12 @@ namespace FluidProperties {
 			++TempRangeErrCount;
 			// send warning
 			if ( TempRangeErrCount <= RefrigerantErrorLimitTest ) {
-				ShowSevereError( "GetInterpolatedSatProp: Saturation temperature for interpolation is out of range of data supplied: **" );
+				ShowWarningError( "GetInterpolatedSatProp: Saturation temperature for interpolation is out of range of data supplied: **" );
 				ShowContinueErrorTimeStamp( " Called from:" + CalledFrom );
 				ShowContinueError( "Refrigerant temperature = " + RoundSigDigits( Temperature, 2 ) );
 				ShowContinueError( "Returned saturated property value = " + RoundSigDigits( ReturnValue, 3 ) );
 			} else {
-				ShowRecurringSevereErrorAtEnd( "GetInterpolatedSatProp: Refrigerant temperature for interpolation out of range error", TempRangeErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
+				ShowRecurringWarningErrorAtEnd( "GetInterpolatedSatProp: Refrigerant temperature for interpolation out of range error", TempRangeErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
 			}
 		}
 

@@ -25,7 +25,7 @@ set( test_src
   ExteriorEnergyUse.unit.cc
   FanCoilUnits.unit.cc
   Fans.unit.cc
-  FaultFoulingAirFilters.unit.cc
+  FaultsManager.unit.cc
   FluidCoolers.unit.cc
   Furnaces.unit.cc
   GroundHeatExchangers.unit.cc
