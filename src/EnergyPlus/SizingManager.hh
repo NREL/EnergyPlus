@@ -122,7 +122,8 @@ namespace SizingManager {
 		Real64 const PeakHumRat, // humidity ratio at peak [kg water/kg dry air]
 		Real64 const FloorArea, // zone floor area [m2]
 		Real64 const TotOccs, // design number of occupants for the zone
-		Real64 const MinOAVolFlow // zone design minimum outside air flow rate [m3/s]
+		Real64 const MinOAVolFlow, // zone design minimum outside air flow rate [m3/s]
+		Real64 const DOASHeatAddRate // zone design heat addition rate from the DOAS [W]
 	);
 
 	void

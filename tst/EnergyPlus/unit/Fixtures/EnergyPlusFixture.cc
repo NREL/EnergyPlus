@@ -33,7 +33,9 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/GlobalNames.hh>
@@ -43,6 +45,7 @@
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HVACManager.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -126,8 +129,10 @@ namespace EnergyPlus {
 		DataZoneControls::clear_state();
 		DataZoneEnergyDemands::clear_state();
 		DataZoneEquipment::clear_state();
+		DXCoils::clear_state();
 		EMSManager::clear_state();
 		ExteriorEnergyUse::clear_state();
+		Fans::clear_state();
 		GlobalNames::clear_state();
 		HeatBalanceAirManager::clear_state();
 		HeatBalanceIntRadExchange::clear_state();
@@ -135,6 +140,7 @@ namespace EnergyPlus {
 		HeatBalanceSurfaceManager::clear_state();
 		Humidifiers::clear_state();
 		HVACManager::clear_state();
+		HVACVariableRefrigerantFlow::clear_state();
 		InputProcessor::clear_state();
 		InternalHeatGains::clear_state();
 		MixedAir::clear_state();

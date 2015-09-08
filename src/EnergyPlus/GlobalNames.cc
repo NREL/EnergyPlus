@@ -68,26 +68,6 @@ namespace GlobalNames {
 	// Functions
 
 	void
-	clear_state()
-	{
-		NumChillers = 0;
-		NumBoilers = 0;
-		NumBaseboards = 0;
-		NumCoils = 0;
-		numAirDistUnits = 0;
-		CurMaxChillers = 0;
-		CurMaxBoilers = 0;
-		CurMaxBaseboards = 0;
-		CurMaxCoils = 0;
-		ChillerNames.deallocate();
-		BoilerNames.deallocate();
-		BaseboardNames.deallocate();
-		CoilNames.deallocate();
-		aDUNames.deallocate();
-	
-	}
-
-	void
 	VerifyUniqueChillerName(
 		std::string const & TypeToVerify,
 		std::string const & NameToVerify,
@@ -384,6 +364,27 @@ namespace GlobalNames {
 
 	}
 
+	// Clears the global data in GlobalNames.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumChillers = 0;
+		NumBoilers = 0;
+		NumBaseboards = 0;
+		NumCoils = 0;
+		numAirDistUnits = 0;
+		CurMaxChillers = 0;
+		CurMaxBoilers = 0;
+		CurMaxBaseboards = 0;
+		CurMaxCoils = 0;
+
+		ChillerNames.deallocate();
+		BoilerNames.deallocate();
+		BaseboardNames.deallocate();
+		CoilNames.deallocate();
+		aDUNames.deallocate();
+	}
 
 	//     NOTICE
 

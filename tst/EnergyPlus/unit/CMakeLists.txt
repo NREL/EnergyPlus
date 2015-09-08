@@ -19,12 +19,14 @@ set( test_src
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
+  DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
+  FanCoilUnits.unit.cc
   Fans.unit.cc
-  FaultFoulingAirFilters.unit.cc
+  FaultsManager.unit.cc
   FluidCoolers.unit.cc
   Furnaces.unit.cc
   GroundHeatExchangers.unit.cc
@@ -47,6 +49,7 @@ set( test_src
   OutputProcessor.unit.cc
   OutputReportTabular.unit.cc
   ReportSizingManager.unit.cc
+  RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc

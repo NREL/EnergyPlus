@@ -42,7 +42,7 @@ namespace FourPipeBeam {
 
 
 //	HVACFourPipeBeam::HVACFourPipeBeam(){}
-
+	///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
 	std::shared_ptr< AirTerminalUnit > 
 	HVACFourPipeBeam::fourPipeBeamFactory(
 		int EP_UNUSED(objectType),
@@ -89,6 +89,7 @@ namespace FourPipeBeam {
 		bool airNodeFound;
 		int aDUIndex;
 
+		///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
 		std::shared_ptr< HVACFourPipeBeam > thisBeam( new HVACFourPipeBeam() );
 
 		// find the number of cooled beam units
@@ -535,12 +536,9 @@ namespace FourPipeBeam {
 		// Using
 		using DataEnvironment::StdRhoAir;
 		using namespace DataSizing;
-		using DataHVACGlobals::SmallAirVolFlow;
 		using namespace InputProcessor;
-		using DataGlobals::AutoCalculate;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
-		//  USE BranchInputManager,  ONLY: MyPlantSizingIndex
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
@@ -862,9 +860,12 @@ namespace FourPipeBeam {
 			}
 		}
 		this->calc();
-		Residuum = (  ( this->qDotZoneReq - this->qDotTotalDelivered ) 
+		if ( this->qDotZoneReq != 0.0 ) {
+			Residuum = (  ( this->qDotZoneReq - this->qDotTotalDelivered ) 
 						/ this->qDotZoneReq );
-
+		} else {
+			Residuum = 1.0;
+		}
 		return Residuum;
 
 	}
@@ -1090,7 +1091,11 @@ namespace FourPipeBeam {
 											/ this->mDotNormRatedPrimAir) );
 			this->qDotBeamCooling = -1.0 * this->qDotNormRatedCooling * fModCoolDeltaT * fModCoolAirMdot * fModCoolCWMdot * this->totBeamLength;
 			cp = GetSpecificHeatGlycol(PlantLoop(this->cWLocation.loopNum).FluidName, this->cWTempIn, PlantLoop(this->cWLocation.loopNum).FluidIndex, routineName);
-			this->cWTempOut = this->cWTempIn - ( this->qDotBeamCooling / (this->mDotCW * cp ) );
+			if ( this->mDotCW > 0.0 ) {
+				this->cWTempOut = this->cWTempIn - ( this->qDotBeamCooling / (this->mDotCW * cp ) );
+			} else {
+				this->cWTempOut = this->cWTempIn;
+			}
 			// check if non physical temperature rise, can't be warmer than air
 			if ( this->cWTempOut > (std::max( this->tDBSystemAir , this->tDBZoneAirTemp ) - 1.0 ) ) {
 				// throw recurring warning as this indicates a problem in beam model input
@@ -1136,7 +1141,11 @@ namespace FourPipeBeam {
 											/ this->mDotNormRatedPrimAir) );
 			this->qDotBeamHeating = this->qDotNormRatedHeating * fModHeatDeltaT * fModHeatAirMdot * fModHeatHWMdot * this->totBeamLength;
 			cp = GetSpecificHeatGlycol(PlantLoop(this->hWLocation.loopNum).FluidName, this->hWTempIn, PlantLoop(this->hWLocation.loopNum).FluidIndex, routineName);
-			this->hWTempOut = this->hWTempIn - ( this->qDotBeamHeating / (this->mDotHW * cp ) );
+			if ( this->mDotHW > 0.0 ) {
+				this->hWTempOut = this->hWTempIn - ( this->qDotBeamHeating / (this->mDotHW * cp ) );
+			} else {
+				this->hWTempOut = this->hWTempIn;
+			}
 			// check if non physical temperature drop, can't be cooler than air
 			if ( this->hWTempOut < (std::min( this->tDBSystemAir , this->tDBZoneAirTemp ) + 1.0 ) ) {
 				// throw recurring warning as this indicates a problem in beam model input
@@ -1175,9 +1184,12 @@ namespace FourPipeBeam {
 		this->mDotHW = 0.0;
 		this->mDotCW = cWFlow;
 		this->calc();
-		Residuum = ( ( ( this->qDotZoneToCoolSetPt - this->qDotSystemAir )- this->qDotBeamCooling ) 
+		if ( this->qDotBeamCoolingMax != 0.0 ) { 
+			Residuum = ( ( ( this->qDotZoneToCoolSetPt - this->qDotSystemAir )- this->qDotBeamCooling ) 
 						/ this->qDotBeamCoolingMax );
-
+		} else {
+			Residuum = 1.0;
+		}
 		return Residuum;
 	}
 	Real64 HVACFourPipeBeam::residualHeating( 
@@ -1189,8 +1201,12 @@ namespace FourPipeBeam {
 		this->mDotHW = hWFlow;
 		this->mDotCW = 0.0;
 		this->calc();
-		Residuum = ( ( ( this->qDotZoneToHeatSetPt - this->qDotSystemAir ) - this->qDotBeamHeating ) 
-						/ this->qDotBeamHeatingMax );
+		if ( this->qDotBeamHeatingMax != 0.0 ) {
+			Residuum = ( ( ( this->qDotZoneToHeatSetPt - this->qDotSystemAir ) - this->qDotBeamHeating ) 
+							/ this->qDotBeamHeatingMax );
+		} else {
+			Residuum = 1.0;
+		}
 
 		return Residuum;
 	}

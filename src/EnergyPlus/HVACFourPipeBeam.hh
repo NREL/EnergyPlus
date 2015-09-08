@@ -19,7 +19,7 @@ namespace FourPipeBeam {
 class HVACFourPipeBeam : public AirTerminalUnit
 {
 
-protected: // Creation
+private: // Creation
 
 	// Default Constructor
 	HVACFourPipeBeam() :
@@ -105,7 +105,7 @@ public:
 
 public: // Methods		MARK ANY THAT DON'T ALTER STATE const !!!
 
-
+	///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
 	static std::shared_ptr< AirTerminalUnit >
 	fourPipeBeamFactory(
 		int objectType,
@@ -227,22 +227,22 @@ private: // data
 	Real64 tDBSystemAir; // current drybulb temperature of primary supply air, C
 	Real64 mDotSystemAir; // current mass flow of primary supply air,kg/s
 	Real64 cpZoneAir; // current specific heat of zone air 
-	Real64 cpSystemAir; // current speci
-	Real64 qDotSystemAir;
-	Real64 qDotBeamCoolingMax;
-	Real64 qDotBeamHeatingMax;
-	Real64 qDotTotalDelivered;
-	Real64 qDotBeamCooling;
-	Real64 qDotBeamHeating;
-	Real64 qDotZoneReq;
-	Real64 qDotBeamReq;
-	Real64 qDotZoneToHeatSetPt;
-	Real64 qDotZoneToCoolSetPt;
+	Real64 cpSystemAir; // current specific heat of primary supply air
+	Real64 qDotSystemAir; // current heat transfer rate of primary supply air wrt zone, W
+	Real64 qDotBeamCoolingMax; // current beam cooling rate at maximum chilled water flow rate, W
+	Real64 qDotBeamHeatingMax; // curent beam heating rate at maximum hot water flow rate, W
+	Real64 qDotTotalDelivered; // current combined heat transfer rate of primary supply air and beam, W
+	Real64 qDotBeamCooling; // current beam cooling rate, W
+	Real64 qDotBeamHeating; // current beam heating rate, W
+	Real64 qDotZoneReq; // current zone sensible requested load to setpoint, W
+	Real64 qDotBeamReq; // current load requested of beam, W
+	Real64 qDotZoneToHeatSetPt; // current zone sensible load to heating setpoint, W
+	Real64 qDotZoneToCoolSetPt; // current zone sensible load to cooling setpoint, W
 
 }; // HVACFourPipeBeam
 
 
-
+	///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
 extern Array1D< std::shared_ptr< HVACFourPipeBeam > > FourPipeBeams; // dimension to number of machines
 
 

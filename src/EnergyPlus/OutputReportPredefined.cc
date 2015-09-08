@@ -257,6 +257,8 @@ namespace OutputReportPredefined {
 	int pdchZnClPkIndHum;
 	int pdchZnClPkOATemp;
 	int pdchZnClPkOAHum;
+	int pdchZnClPkOAMinFlow;
+	int pdchZnClPkDOASHeatGain;
 	int pdstZoneHtSize;
 	int pdchZnHtCalcDesLd;
 	int pdchZnHtUserDesLd;
@@ -270,6 +272,8 @@ namespace OutputReportPredefined {
 	int pdchZnHtPkIndHum;
 	int pdchZnHtPkOATemp;
 	int pdchZnHtPkOAHum;
+	int pdchZnHtPkOAMinFlow;
+	int pdchZnHtPkDOASHeatGain;
 	int pdstSystemSize;
 	int pdchSysSizCalcClAir;
 	int pdchSysSizUserClAir;
@@ -412,6 +416,8 @@ namespace OutputReportPredefined {
 	int pdstSHGSannual;
 	int pdchSHGSAnHvacHt;
 	int pdchSHGSAnHvacCl;
+	int pdchSHGSAnHvacATUHt;
+	int pdchSHGSAnHvacATUCl;
 	int pdchSHGSAnSurfHt;
 	int pdchSHGSAnSurfCl;
 	int pdchSHGSAnPeoplAdd;
@@ -431,6 +437,8 @@ namespace OutputReportPredefined {
 	int pdchSHGSClTimePeak;
 	int pdchSHGSClHvacHt;
 	int pdchSHGSClHvacCl;
+	int pdchSHGSClHvacATUHt;
+	int pdchSHGSClHvacATUCl;
 	int pdchSHGSClSurfHt;
 	int pdchSHGSClSurfCl;
 	int pdchSHGSClPeoplAdd;
@@ -450,6 +458,8 @@ namespace OutputReportPredefined {
 	int pdchSHGSHtTimePeak;
 	int pdchSHGSHtHvacHt;
 	int pdchSHGSHtHvacCl;
+	int pdchSHGSHtHvacATUHt;
+	int pdchSHGSHtHvacATUCl;
 	int pdchSHGSHtSurfHt;
 	int pdchSHGSHtSurfCl;
 	int pdchSHGSHtPeoplAdd;
@@ -1514,8 +1524,8 @@ namespace OutputReportPredefined {
 		pdchZnClPkIndHum = newPreDefColumn( pdstZoneClSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
 		pdchZnClPkOATemp = newPreDefColumn( pdstZoneClSize, "Outdoor Temperature at Peak Load [C]" );
 		pdchZnClPkOAHum = newPreDefColumn( pdstZoneClSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
-		addFootNoteSubTable( pdstZoneClSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads." );
-
+		pdchZnClPkOAMinFlow = newPreDefColumn( pdstZoneClSize, "Minimum Outdoor Air Flow Rate [m3/s]" );
+		pdchZnClPkDOASHeatGain = newPreDefColumn( pdstZoneClSize, "Heat Gain Rate from DOAS [W]" );		addFootNoteSubTable( pdstZoneClSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads." );
 		pdstZoneHtSize = newPreDefSubTable( pdrSizing, "Zone Sensible Heating" );
 
 		pdchZnHtCalcDesLd = newPreDefColumn( pdstZoneHtSize, "Calculated Design Load [W]" );
@@ -1530,8 +1540,8 @@ namespace OutputReportPredefined {
 		pdchZnHtPkIndHum = newPreDefColumn( pdstZoneHtSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
 		pdchZnHtPkOATemp = newPreDefColumn( pdstZoneHtSize, "Outdoor Temperature at Peak Load [C]" );
 		pdchZnHtPkOAHum = newPreDefColumn( pdstZoneHtSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
-		addFootNoteSubTable( pdstZoneHtSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads." );
-
+		pdchZnHtPkOAMinFlow = newPreDefColumn( pdstZoneHtSize, "Minimum Outdoor Air Flow Rate [m3/s]" );
+		pdchZnHtPkDOASHeatGain = newPreDefColumn( pdstZoneHtSize, "Heat Gain Rate from DOAS [W]" );		addFootNoteSubTable( pdstZoneHtSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads." );
 		pdstSystemSize = newPreDefSubTable( pdrSizing, "System Design Air Flow Rates" );
 
 		pdchSysSizCalcClAir = newPreDefColumn( pdstSystemSize, "Calculated cooling [m3/s]" );
@@ -1699,13 +1709,15 @@ namespace OutputReportPredefined {
 		pdchEMotherJmaxvalue = newPreDefColumn( pdstEMotherJvalues, "Maximum Value [W]" );
 		pdchEMotherJmaxvaluetime = newPreDefColumn( pdstEMotherJvalues, "Timestamp of Maximum" );
 
-		// Sensible Heat Gas Component Report
+		// Sensible Heat Gain Component Report
 		pdrSensibleGain = newPreDefReport( "SensibleHeatGainSummary", "SHGS", "Sensible Heat Gain Summary" );
 
 		pdstSHGSannual = newPreDefSubTable( pdrSensibleGain, "Annual Building Sensible Heat Gain Components" );
 
-		pdchSHGSAnHvacHt = newPreDefColumn( pdstSHGSannual, "HVAC Input Sensible Air Heating [GJ]" );
-		pdchSHGSAnHvacCl = newPreDefColumn( pdstSHGSannual, "HVAC Input Sensible Air Cooling [GJ]" );
+		pdchSHGSAnHvacHt = newPreDefColumn( pdstSHGSannual, "HVAC Zone Eq & Other Sensible Air Heating [GJ]" );
+		pdchSHGSAnHvacCl = newPreDefColumn( pdstSHGSannual, "HVAC Zone Eq & Other Sensible Air Cooling [GJ]" );
+		pdchSHGSAnHvacATUHt = newPreDefColumn( pdstSHGSannual, "HVAC Terminal Unit Sensible Air Heating [GJ]" );
+		pdchSHGSAnHvacATUCl = newPreDefColumn( pdstSHGSannual, "HVAC Terminal Unit Sensible Air Cooling [GJ]" );
 		pdchSHGSAnSurfHt = newPreDefColumn( pdstSHGSannual, "HVAC Input Heated Surface Heating [GJ]" );
 		pdchSHGSAnSurfCl = newPreDefColumn( pdstSHGSannual, "HVAC Input Cooled Surface Cooling [GJ]" );
 		pdchSHGSAnPeoplAdd = newPreDefColumn( pdstSHGSannual, "People Sensible Heat Addition [GJ]" );
@@ -1724,8 +1736,10 @@ namespace OutputReportPredefined {
 		pdstSHGSpkCl = newPreDefSubTable( pdrSensibleGain, "Peak Cooling Sensible Heat Gain Components" );
 
 		pdchSHGSClTimePeak = newPreDefColumn( pdstSHGSpkCl, "Time of Peak" );
-		pdchSHGSClHvacHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Input Sensible Air Heating [W]" );
-		pdchSHGSClHvacCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Input Sensible Air Cooling [W]" );
+		pdchSHGSClHvacHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Zone Eq & Other Sensible Air Heating [W]" );
+		pdchSHGSClHvacCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Zone Eq & Other Sensible Air Cooling [W]" );
+		pdchSHGSClHvacATUHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Terminal Unit Sensible Air Heating [W]" );
+		pdchSHGSClHvacATUCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Terminal Unit Sensible Air Cooling [W]" );
 		pdchSHGSClSurfHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Input Heated Surface Heating [W]" );
 		pdchSHGSClSurfCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Input Cooled Surface Cooling [W]" );
 		pdchSHGSClPeoplAdd = newPreDefColumn( pdstSHGSpkCl, "People Sensible Heat Addition [W]" );
@@ -1744,8 +1758,10 @@ namespace OutputReportPredefined {
 		pdstSHGSpkHt = newPreDefSubTable( pdrSensibleGain, "Peak Heating Sensible Heat Gain Components" );
 
 		pdchSHGSHtTimePeak = newPreDefColumn( pdstSHGSpkHt, "Time of Peak" );
-		pdchSHGSHtHvacHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Input Sensible Air Heating [W]" );
-		pdchSHGSHtHvacCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Input Sensible Air Cooling [W]" );
+		pdchSHGSHtHvacHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Zone Eq & Other Sensible Air Heating [W]" );
+		pdchSHGSHtHvacCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Zone Eq & Other Sensible Air Cooling [W]" );
+		pdchSHGSHtHvacATUHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Terminal Unit Sensible Air Heating [W]" );
+		pdchSHGSHtHvacATUCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Terminal Unit Sensible Air Cooling [W]" );
 		pdchSHGSHtSurfHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Input Heated Surface Heating [W]" );
 		pdchSHGSHtSurfCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Input Cooled Surface Cooling [W]" );
 		pdchSHGSHtPeoplAdd = newPreDefColumn( pdstSHGSpkHt, "People Sensible Heat Addition [W]" );
