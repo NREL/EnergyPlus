@@ -574,6 +574,8 @@ namespace WaterCoils {
 	extern Array1D< WaterCoilNumericFieldData > WaterCoilNumericFields;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimulateWaterCoilComponents(

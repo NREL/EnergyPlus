@@ -147,7 +147,14 @@ namespace WaterCoils {
 	Array1D_int PartWetCoolCoilErrs; // error counting for detailed coils
 	bool GetWaterCoilsInputFlag( true ); // Flag set to make sure you get input once
 	Array1D_bool CheckEquipName;
-
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitWaterCoilOneTimeFlag( true );
+	}
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
 
@@ -171,6 +178,22 @@ namespace WaterCoils {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumWaterCoils = 0; 
+		InitWaterCoilOneTimeFlag = true;
+		MySizeFlag.deallocate();
+		MyUAAndFlowCalcFlag.deallocate();
+		MyCoilDesignFlag.deallocate();
+		CoilWarningOnceFlag.deallocate();
+		WaterTempCoolCoilErrs.deallocate();
+		PartWetCoolCoilErrs.deallocate();
+		GetWaterCoilsInputFlag = true;
+		CheckEquipName.deallocate();
+		WaterCoil.deallocate();
+		WaterCoilNumericFields.deallocate();
+	}
 
 	void
 	SimulateWaterCoilComponents(
@@ -824,8 +847,9 @@ namespace WaterCoils {
 
 		static Array1D< Real64 > DesCpAir; // CpAir at Design Inlet Air Temp
 		static Array1D< Real64 > DesUARangeCheck; // Value for range check based on Design Inlet Air Humidity Ratio
-
-		static bool MyOneTimeFlag( true );
+		/////////// hoisted into namespace InitWaterCoilOneTimeFlag
+		//static bool MyOneTimeFlag( true );
+		/////////////////////////
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MyCoilReportFlag;
 		static Array1D_bool PlantLoopScanFlag;
@@ -879,7 +903,7 @@ namespace WaterCoils {
 
 		// FLOW:
 
-		if ( MyOneTimeFlag ) {
+		if ( InitWaterCoilOneTimeFlag ) {
 			// initialize the environment and sizing flags
 			MyEnvrnFlag.allocate( NumWaterCoils );
 			MySizeFlag.allocate( NumWaterCoils );
@@ -899,7 +923,7 @@ namespace WaterCoils {
 			MyUAAndFlowCalcFlag = true;
 			MyCoilDesignFlag = true;
 			MyCoilReportFlag = true;
-			MyOneTimeFlag = false;
+			InitWaterCoilOneTimeFlag = false;
 			PlantLoopScanFlag = true;
 		}
 
@@ -1663,9 +1687,9 @@ namespace WaterCoils {
 				DataWaterLoopNum = WaterCoil ( CoilNum ).WaterLoopNum;
 
 				if ( WaterCoil( CoilNum ).WaterCoilModel == CoilModel_Detailed ) { // 'DETAILED FLAT FIN'
-					CompType = cAllCoilTypes(15);
+					CompType = cAllCoilTypes(Coil_CoolingWaterDetailed); // Coil:Cooling:Water:DetailedGeometry
 				} else {
-					CompType = cAllCoilTypes(14);
+					CompType = cAllCoilTypes(Coil_CoolingWater); // Coil:Cooling:Water
 				}
 				bPRINT = false; // do not print this sizing request since the autosized value is needed and this input may not be autosized (we should print this!)
 				TempSize = AutoSize; // get the autosized air volume flow rate for use in other calculations
@@ -1927,7 +1951,7 @@ namespace WaterCoils {
 				bPRINT = false; // do not print this sizing request
 				TempSize = AutoSize; // get the autosized air volume flow rate for use in other calculations
 				SizingString.clear(); // doesn't matter
-				CompType = cAllCoilTypes(16); // "Coil:Heating:Water"
+				CompType = cAllCoilTypes(Coil_HeatingWater); // "Coil:Heating:Water"
 				CompName = WaterCoil( CoilNum ).Name;
 				RequestSizing( CompType, CompName, HeatingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName );
 				// reset the design air volume flow rate for air loop coils only
