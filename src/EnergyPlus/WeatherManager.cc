@@ -324,10 +324,11 @@ namespace WeatherManager {
 		WeatherFileTimeZone = 0.0 ;
 		WeatherFileElevation = 0.0 ;
 		WeatherFileUnitNumber = 0 ; // File unit number for the weather file
-		GroundTemps			= Array1D< Real64 >( 12, 18.0 );
-		GroundTempsFC		= Array1D< Real64 >( 12, 0.0 );
-		SurfaceGroundTemps	= Array1D< Real64 >( 12, 13.0 );
-		DeepGroundTemps		= Array1D< Real64 >( 12, 16.0 );
+		siteShallowGroundTempsPtr.reset();
+		siteBuildingSurfaceGroundTempsPtr.reset();
+		siteFCFactorMethodGroundTempsPtr.reset();
+		siteDeepGroundTempsPtr.reset();
+		GroundTempsFCFromEPWHeader = Array1D< Real64 > ( 12, 0.0 );
 		GroundReflectances	= Array1D< Real64 >( 12, 0.2 );
 
 		SnowGndRefModifier = 1.0 ; // Modifier to ground reflectance during snow
