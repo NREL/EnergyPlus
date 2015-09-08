@@ -56,11 +56,6 @@
 #include <EnergyPlus/PlantManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/WaterThermalTanks.hh>
-
-#include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -70,6 +65,7 @@
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
@@ -144,7 +140,6 @@ namespace EnergyPlus {
 		OutputReportPredefined::clear_state();
 		OutsideEnergySources::clear_state();
 		PlantLoopSolver::clear_state();
-		WaterThermalTanks::clear_state();
 		ScheduleManager::clear_state();
 		SetPointManager::clear_state();
 		SimAirServingZones::clear_state();
@@ -154,6 +149,7 @@ namespace EnergyPlus {
 		SplitterComponent::clear_state();
 		VariableSpeedCoils::clear_state();
 		WaterCoils::clear_state();
+		WaterThermalTanks::clear_state();
 		WeatherManager::clear_state();
 		ZoneAirLoopEquipmentManager::clear_state();
 		ZoneEquipmentManager::clear_state();
