@@ -2578,7 +2578,7 @@ An IDF example:
 ```idf
 Site:GroundTemperature:Deep,  16,16,16,16,16,16,16,16,16,16,16,16;
 ```
-<<<<<<< HEAD
+
 
 ### Site:GroundDomain:Slab
 
@@ -3219,8 +3219,7 @@ Climate related variables appear in two places for EnergyPlus outputs. Certain o
 Variables related to ambient environment data are available at timestep and higher resolutions. Below is a variable dictionary of these variables and subsequent definitions:
 
 * Zone,Average,Site Outdoor Air Drybulb Temperature [C]
-=======
->>>>>>> e6b22d2ae9b5522bdb7d176915f857e4ba903111
+
 
 ### Site:GroundDomain:Slab
 

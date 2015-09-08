@@ -295,11 +295,11 @@ namespace PlantPipingSystemsManager {
 	InitAndSimGroundDomains()
 	{
 
-			// SUBROUTINE INFORMATION:
-			//       AUTHOR         Matt Mitchell	
-			//       DATE WRITTEN   Spring 2014
-			//       MODIFIED       by Sushobhit Acharya, March 2015
-			//       RE-ENGINEERED  na
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Spring 2014
+		//       MODIFIED       by Sushobhit Acharya, March 2015
+		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>

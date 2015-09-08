@@ -1873,20 +1873,20 @@ Site:GroundDomain:Slab,
         \default 4
         \minimum 2
    A10, \field Mesh Type
-		\required-field
+        \required-field
         \type choice
         \key Uniform
         \key Geometric
         \default Geometric
    N18, \field Geometric Coefficient
-		\note optional
+        \note optional
         \type real
-		\minimum 1
+        \minimum 1
         \default 1.7
         \maximum 2
    A11; \field Simulation Timestep
         \type choice
-		\key Daily
+        \key Daily
         \key Hourly
         \key Timestep
         \default Hourly
@@ -1944,20 +1944,20 @@ Site:GroundDomain:Basement,
         \type real
         \units C
         \note Annual average ground surface temperature.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provide
         \note monthly average ground surface temperatures.
    N10, \field Kusuda-Achenbach Average Amplitude of Ground Surface Temperature
         \type real
         \units deltaC
         \note Annual average ground surface temperature variation from average.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provide
         \note monthly average ground surface temperatures.
    N11, \field Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature
         \type real
         \units days
         \note The phase shift of minimum ground surface temperature, or the day
         \note of the year when the minimum ground surface temperature occurs.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provide
         \note monthly average ground surface temperatures.
    N12, \field Evapotranspiration Ground Cover Parameter
         \type real
@@ -53780,7 +53780,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list ZoneTerminalUnitListNames
        \note Enter the name of a ZoneTerminalUnitList. This list connects zone terminal units to this
-       \note heat pump	   
+       \note heat pump
   A4 , \field Refrigerant Type
        \type object-list
        \object-list FluidNames
@@ -53935,13 +53935,13 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   N21, \field Insulation thickness of the main pipe
        \type real 
        \units m
-       \minimum 0.0	
-	   \default 0.02
+       \minimum 0.0
+       \default 0.02
   N22, \field Thermal conductivity of the main pipe insulation material
        \type real 
        \units W/m-K
-       \minimum 0.0	
-	   \default 0.032
+       \minimum 0.0
+       \default 0.032
   N23, \field Crankcase Heater Power per Compressor
        \type real
        \units W
@@ -54136,7 +54136,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-	   
+
 ZoneTerminalUnitList,
           \memo List of variable refrigerant flow (VRF) terminal units served by a given VRF condensing
           \memo unit. See ZoneHVAC:TerminalUnit:VariableRefrigerantFlow and
