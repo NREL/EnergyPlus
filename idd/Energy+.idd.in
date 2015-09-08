@@ -1737,6 +1737,7 @@ Site:GroundTemperature:Deep,
 Site:GroundTemperature:Undisturbed:FiniteDifference,
        \memo Undisturbed ground temperature object using a
        \memo detailed finite difference 1-D model
+       \min-fields 7
   A1,  \field Name
        \required-field
   N1,  \field Soil Thermal Conductivity
@@ -1756,18 +1757,19 @@ Site:GroundTemperature:Undisturbed:FiniteDifference,
        \minimum> 0.0
   N4,  \field Soil Moisture Content Volume Fraction
        \type real
-       \type percent
+       \units percent
        \minimum 0
        \maximum 100
        \default 30
   N5,  \field Soil Moisture Content Volume Fraction at Saturation
        \type real
-       \type percent
+       \units percent
        \minimum 0
        \maximum 100
        \default 50
    N6; \field Evapotranspiration Ground Cover Parameter
        \type real
+       \units dimensionless
        \minimum 0
        \maximum 1.5
        \default 0.4
@@ -1781,6 +1783,7 @@ Site:GroundTemperature:Undisturbed:FiniteDifference,
 Site:GroundTemperature:Undisturbed:KusudaAchenbach,
        \memo Undisturbed ground temperature object using the
        \memo Kusuda-Achenbach 1965 correlation.
+       \min-fields 7
   A1,  \field Name
        \required-field
   N1,  \field Soil Thermal Conductivity
@@ -1802,19 +1805,29 @@ Site:GroundTemperature:Undisturbed:KusudaAchenbach,
        \type real
        \units C
        \note Annual average surface temperature
+       \note If left blank the Site:GroundTemperature:Shallow object must be included in the input
+       \note The soil temperature, amplitude, and phase shift must all be included or omitted together
   N5,  \field Average Amplitude of Surface Temperature
        \type real
        \units deltaC
+       \minimum 0
        \note Annual average surface temperature variation from average.
+       \note If left blank the Site:GroundTemperature:Shallow object must be included in the input
+       \note The soil temperature, amplitude, and phase shift must all be included or omitted together
   N6;  \field Phase Shift of Minimum Surface Temperature
        \type real
        \units days
+       \minimum 0
+       \maximum< 365
        \note The phase shift of minimum surface temperature, or the day
        \note of the year when the minimum surface temperature occurs.
+       \note If left blank the Site:GroundTemperature:Shallow object must be included in the input
+       \note The soil temperature, amplitude, and phase shift must all be included or omitted together
 
 Site:GroundTemperature:Undisturbed:Xing,
        \memo Undisturbed ground temperature object using the
        \memo Xing 2014 2 harmonic parameter model.
+       \min-fields 9
   A1,  \field Name
        \required-field
   N1,  \field Soil Thermal Conductivity
@@ -1848,10 +1861,12 @@ Site:GroundTemperature:Undisturbed:Xing,
        \required-field
        \type real
        \units days
+       \maximum< 365
   N8;  \field Phase Shift of Temperature Amplitude 2
        \required-field
        \type real
        \units days
+       \maximum< 365
 
 Site:GroundDomain:Slab,
         \memo Ground-coupled slab model for on-grade and
@@ -1898,14 +1913,15 @@ Site:GroundDomain:Slab,
         \minimum 0
         \maximum 100
         \default 50
-   A2,  \field Type of Undisturbed Ground Temperature Model
+   A2,  \field Undisturbed Ground Temperature Model Type
         \required-field
-        \type alpha
-        \reference Site:GroundTemperature:Undisturbed:*
-   A3,  \field Name of Undisturbed Ground Temperature Model
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A3,  \field Undisturbed Ground Temperature Model Name
         \required-field
-        \type alpha
-        \reference Name of Site:GroundTemperature:Undisturbed:*
+        \type object-list
    N9,  \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
@@ -2025,14 +2041,15 @@ Site:GroundDomain:Basement,
         \minimum 0
         \maximum 100
         \default 50
-   A2,  \field Type of Undisturbed Ground Temperature Model
+   A2,  \field Undisturbed Ground Temperature Model Type
         \required-field
-        \type alpha
-        \reference Site:GroundTemperature:Undisturbed:*
-   A3,  \field Name of Undisturbed Ground Temperature Model
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A3,  \field Undisturbed Ground Temperature Model Name
         \required-field
-        \type alpha
-        \reference Name of Site:GroundTemperature:Undisturbed:*
+        \type object-list
    N9,  \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
@@ -57804,14 +57821,15 @@ Pipe:Underground,
    A6,  \field Soil Material Name
         \type alpha
         \required-field
-   A7,  \field Type of Undisturbed Ground Temperature Model
+   A7,  \field Undisturbed Ground Temperature Model Type
         \required-field
-        \type alpha
-        \reference Site:GroundTemperature:Undisturbed:*
-   A8;  \field Name of Undisturbed Ground Temperature Model
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A8;  \field Undisturbed Ground Temperature Model Name
         \required-field
-        \type alpha
-        \reference Name of Site:GroundTemperature:Undisturbed:*
+        \type object-list
 
 PipingSystem:Underground:Domain,
         \memo The ground domain object for underground piping system simulation.
@@ -57918,14 +57936,15 @@ PipingSystem:Underground:Domain,
         \minimum 0
         \maximum 100
         \default 50
-   A5,  \field Type of Undisturbed Ground Temperature Model
+   A5,  \field Undisturbed Ground Temperature Model Type
         \required-field
-        \type alpha
-        \reference Site:GroundTemperature:Undisturbed:*
-   A6,  \field Name of Undisturbed Ground Temperature Model
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A6,  \field Undisturbed Ground Temperature Model Name
         \required-field
-        \type alpha
-        \reference Name of Site:GroundTemperature:Undisturbed:*
+        \type object-list
    A7,  \field This Domain Includes Basement Surface Interaction
         \type choice
         \key Yes
@@ -64526,14 +64545,15 @@ GroundHeatExchanger:HorizontalTrench,
         \minimum 0
         \maximum 100
         \default 50
-   A4,  \field Type of Undisturbed Ground Temperature Model
+   A4,  \field Undisturbed Ground Temperature Model Type
         \required-field
-        \type alpha
-        \reference Site:GroundTemperature:Undisturbed:*
-   A5,  \field Name of Undisturbed Ground Temperature Model
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A5,  \field Undisturbed Ground Temperature Model Name
         \required-field
-        \type alpha
-        \reference Name of Site:GroundTemperature:Undisturbed:*
+        \type object-list
    N16; \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
@@ -64660,14 +64680,15 @@ GroundHeatExchanger:Slinky,
         \minimum> 0
         \ip-units ft
         \default 2.0
-   A5,  \field Type of Undisturbed Ground Temperature Model
+   A5,  \field Undisturbed Ground Temperature Model Type
         \required-field
-        \type alpha
-        \reference Site:GroundTemperature:Undisturbed:*
-   A6,  \field Name of Undisturbed Ground Temperature Model
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A6,  \field Undisturbed Ground Temperature Model Name
         \required-field
-        \type alpha
-        \reference Name of Site:GroundTemperature:Undisturbed:*
+        \type object-list
    N16; \field Maximum Length of Simulation
         \type real
         \units years
