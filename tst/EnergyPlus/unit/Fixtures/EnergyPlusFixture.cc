@@ -7,30 +7,72 @@
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
 #include "../TestHelpers/IdfParser.hh"
+// A to Z order
+#include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataBranchNodeConnections.hh>
+#include <EnergyPlus/DataConvergParams.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DXCoils.hh>
-#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
-#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/HVACManager.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutsideEnergySources.hh>
+#include <EnergyPlus/PlantLoopSolver.hh>
+#include <EnergyPlus/PlantManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/OutputReportTabularAnnual.hh>
 
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/SetPointManager.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
-
+#include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include <fstream>
 #include <algorithm>
@@ -59,25 +101,62 @@ namespace EnergyPlus {
 	}
 
 	void EnergyPlusFixture::TearDown() {
+
+		// A to Z order
+		BranchInputManager::clear_state();
 		CurveManager::clear_state();
+		DataAirLoop::clear_state();
+		DataBranchNodeConnections::clear_state();
+		DataConvergParams::clear_state();
+		DataDefineEquip::clear_state();
 		DataEnvironment::clear_state();
 		DataGlobals::clear_state();
 		DataHeatBalance::clear_state();
+		DataHeatBalFanSys::clear_state();
+		DataHVACGlobals::clear_state();
 		DataIPShortCuts::clear_state();
+		DataLoopNode::clear_state();
 		DataOutputs::clear_state();
+		DataPlant::clear_state();
+		DataRuntimeLanguage::clear_state();
+		DataSizing::clear_state();
 		DataSurfaces::clear_state();
 		DataZoneControls::clear_state();
+		DataZoneEnergyDemands::clear_state();
+		DataZoneEquipment::clear_state();
 		DXCoils::clear_state();
+		EMSManager::clear_state();
 		ExteriorEnergyUse::clear_state();
 		Fans::clear_state();
 		GlobalNames::clear_state();
+		HeatBalanceAirManager::clear_state();
 		HeatBalanceManager::clear_state();
+		Humidifiers::clear_state();
+		HVACManager::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
-		MixedAir::clear_state();
 		InputProcessor::clear_state();
+		InternalHeatGains::clear_state();
+		MixedAir::clear_state();
+		NodeInputManager::clear_state();
+		OutAirNodeManager::clear_state();
 		OutputProcessor::clear_state();
-		ScheduleManager::clear_state();
+		OutputReportPredefined::clear_state();
 		OutputReportTabularAnnual::clear_state();
+		OutsideEnergySources::clear_state();
+		PlantLoopSolver::clear_state();
+		ScheduleManager::clear_state();
+		SetPointManager::clear_state();
+		SimAirServingZones::clear_state();
+		SimulationManager::clear_state();
+		SizingManager::clear_state();
+		SolarShading::clear_state();
+		SplitterComponent::clear_state();
+		VariableSpeedCoils::clear_state();
+		WaterCoils::clear_state();
+		WeatherManager::clear_state();
+		ZoneAirLoopEquipmentManager::clear_state();
+		ZoneEquipmentManager::clear_state();
+		ZoneTempPredictorCorrector::clear_state();
 
 		{
 			IOFlags flags;

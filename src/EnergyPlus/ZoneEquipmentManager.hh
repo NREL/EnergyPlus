@@ -26,6 +26,8 @@ namespace ZoneEquipmentManager {
 	extern Array1D_int DefaultSimOrder;
 	extern int NumOfTimeStepInDay; // number of zone time steps in a day
 	extern bool GetZoneEquipmentInputFlag;
+	extern bool SizeZoneEquipmentOneTimeFlag;
+
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE ZoneEquipmentManager
 
@@ -72,6 +74,8 @@ namespace ZoneEquipmentManager {
 	extern Array1D< SimulationOrder > PrioritySimOrder;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageZoneEquipment(
