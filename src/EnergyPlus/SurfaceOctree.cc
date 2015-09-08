@@ -280,52 +280,52 @@ namespace EnergyPlus {
 		branch();
 	}
 
-	// Surfaces that Line Segment Intersects Enclosing Sphere
+	// Surfaces that Line Segment Intersects Cube's Enclosing Sphere
 	void
 	SurfaceOctreeCube::
 	surfacesSegmentIntersectsSphere( Vertex const & a, Vertex const & b, Surfaces & surfaces )
 	{
 		if ( segmentIntersectsSphere( a, b ) ) {
 			// Add this cube's surfaces
-			surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
+			if ( ! surfaces_.empty() ) surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
 
 			// Recurse
 			SurfaceOctreeCube * * p = &cubes_[ 0 ][ 0 ][ 0 ];
-			for ( int i = 0; i < 8; ++i ) { //Do Try unrolling (no loop)
+			for ( int i = 0; i < 8; ++i ) {
 				if ( p[ i ] ) p[ i ]->surfacesSegmentIntersectsSphere( a, b, surfaces );
 			}
 		}
 	}
 
-	// Surfaces that Ray Intersects Enclosing Sphere
+	// Surfaces that Ray Intersects Cube's Enclosing Sphere
 	void
 	SurfaceOctreeCube::
 	surfacesRayIntersectsSphere( Vertex const & a, Vertex const & dir, Surfaces & surfaces )
 	{
 		if ( rayIntersectsSphere( a, dir ) ) {
 			// Add this cube's surfaces
-			surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
+			if ( ! surfaces_.empty() ) surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
 
 			// Recurse
 			SurfaceOctreeCube * * p = &cubes_[ 0 ][ 0 ][ 0 ];
-			for ( int i = 0; i < 8; ++i ) { //Do Try unrolling (no loop)
+			for ( int i = 0; i < 8; ++i ) {
 				if ( p[ i ] ) p[ i ]->surfacesRayIntersectsSphere( a, dir, surfaces );
 			}
 		}
 	}
 
-	// Surfaces that Line Intersects Enclosing Sphere
+	// Surfaces that Line Intersects Cube's Enclosing Sphere
 	void
 	SurfaceOctreeCube::
 	surfacesLineIntersectsSphere( Vertex const & a, Vertex const & dir, Surfaces & surfaces )
 	{
 		if ( lineIntersectsSphere( a, dir ) ) {
 			// Add this cube's surfaces
-			surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
+			if ( ! surfaces_.empty() ) surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
 
 			// Recurse
 			SurfaceOctreeCube * * p = &cubes_[ 0 ][ 0 ][ 0 ];
-			for ( int i = 0; i < 8; ++i ) { //Do Try unrolling (no loop)
+			for ( int i = 0; i < 8; ++i ) {
 				if ( p[ i ] ) p[ i ]->surfacesLineIntersectsSphere( a, dir, surfaces );
 			}
 		}
@@ -338,11 +338,11 @@ namespace EnergyPlus {
 	{
 		if ( segmentIntersectsCube( a, b ) ) {
 			// Add this cube's surfaces
-			surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
+			if ( ! surfaces_.empty() ) surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
 
 			// Recurse
 			SurfaceOctreeCube * * p = &cubes_[ 0 ][ 0 ][ 0 ];
-			for ( int i = 0; i < 8; ++i ) { //Do Try unrolling (no loop)
+			for ( int i = 0; i < 8; ++i ) {
 				if ( p[ i ] ) p[ i ]->surfacesSegmentIntersectsCube( a, b, surfaces );
 			}
 		}
@@ -355,11 +355,11 @@ namespace EnergyPlus {
 	{
 		if ( rayIntersectsCube( a, dir, dir_inv ) ) {
 			// Add this cube's surfaces
-			surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
+			if ( ! surfaces_.empty() ) surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
 
 			// Recurse
 			SurfaceOctreeCube * * p = &cubes_[ 0 ][ 0 ][ 0 ];
-			for ( int i = 0; i < 8; ++i ) { //Do Try unrolling (no loop)
+			for ( int i = 0; i < 8; ++i ) {
 				if ( p[ i ] ) p[ i ]->surfacesRayIntersectsCube( a, dir, dir_inv, surfaces );
 			}
 		}
@@ -372,11 +372,11 @@ namespace EnergyPlus {
 	{
 		if ( lineIntersectsCube( a, dir, dir_inv ) ) {
 			// Add this cube's surfaces
-			surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
+			if ( ! surfaces_.empty() ) surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
 
 			// Recurse
 			SurfaceOctreeCube * * p = &cubes_[ 0 ][ 0 ][ 0 ];
-			for ( int i = 0; i < 8; ++i ) { //Do Try unrolling (no loop)
+			for ( int i = 0; i < 8; ++i ) {
 				if ( p[ i ] ) p[ i ]->surfacesLineIntersectsCube( a, dir, dir_inv, surfaces );
 			}
 		}

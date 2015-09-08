@@ -229,15 +229,15 @@ public: // Methods
 	void
 	init( ObjexxFCL::Array1< Surface > & surfaces );
 
-	// Surfaces that Line Segment Intersects Enclosing Sphere
+	// Surfaces that Line Segment Intersects Cube's Enclosing Sphere
 	void
 	surfacesSegmentIntersectsSphere( Vertex const & a, Vertex const & b, Surfaces & surfaces );
 
-	// Surfaces that Ray Intersects Enclosing Sphere
+	// Surfaces that Ray Intersects Cube's Enclosing Sphere
 	void
 	surfacesRayIntersectsSphere( Vertex const & a, Vertex const & dir, Surfaces & surfaces );
 
-	// Surfaces that Line Intersects Enclosing Sphere
+	// Surfaces that Line Intersects Cube's Enclosing Sphere
 	void
 	surfacesLineIntersectsSphere( Vertex const & a, Vertex const & dir, Surfaces & surfaces );
 
@@ -252,6 +252,46 @@ public: // Methods
 	// Surfaces that Line Intersects Cube
 	void
 	surfacesLineIntersectsCube( Vertex const & a, Vertex const & dir, Vertex const & dir_inv, Surfaces & surfaces );
+
+	// Seek a Surface that Line Segment Intersects Cube and Satisfies Predicate
+	template< typename Predicate >
+	bool
+	hasSurfaceSegmentIntersectsCube( Vertex const & a, Vertex const & b, Predicate predicate )
+	{
+		if ( segmentIntersectsCube( a, b ) ) {
+			// Try this cube's surfaces
+			for ( auto const * surface_p : surfaces_ ) {
+				if ( predicate( *surface_p ) ) return true;
+			}
+
+			// Recurse
+			SurfaceOctreeCube * * p = &cubes_[ 0 ][ 0 ][ 0 ];
+			for ( int i = 0; i < 8; ++i ) {
+				if ( p[ i ] && p[ i ]->hasSurfaceSegmentIntersectsCube( a, b, predicate ) ) return true;
+			}
+		}
+		return false;
+	}
+
+	// Process Surfaces that Ray Intersects Cube
+	template< typename Predicate >
+	bool
+	transmittanceSurfacesRayIntersectsCube( Vertex const & a, Vertex const & dir, Vertex const & dir_inv, Predicate predicate )
+	{
+		if ( rayIntersectsCube( a, dir, dir_inv ) ) {
+			// Process this cube's surfaces
+			for ( auto const * surface_p : surfaces_ ) {
+				if ( predicate( *surface_p ) ) return true; // Transmittance reached zero so don't need to process more surfaces
+			}
+
+			// Recurse
+			SurfaceOctreeCube * * p = &cubes_[ 0 ][ 0 ][ 0 ];
+			for ( int i = 0; i < 8; ++i ) {
+				if ( p[ i ] && p[ i ]->transmittanceSurfacesRayIntersectsCube( a, dir, dir_inv, predicate ) ) return true;
+			}
+		}
+		return false;
+	}
 
 private: // Methods
 

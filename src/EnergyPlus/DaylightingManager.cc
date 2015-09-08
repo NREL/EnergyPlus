@@ -5379,18 +5379,15 @@ namespace DaylightingManager {
 
 		} else { // Use surface octree to find candidate surfaces efficiently
 
-			Vector3< Real64 > const RN_inv( octree_inverse( RN ) );
-			SurfaceOctreeCube::Surfaces surfaces;
-			surfaceOctree.surfacesRayIntersectsCube( R1, RN, RN_inv, surfaces );
-			for ( auto const * surface_p : surfaces ) {
-				auto const & surface( *surface_p );
-				if ( ! surface.ShadowSurfPossibleObstruction ) continue;
-				IType = surface.Class;
-				if ( ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) && ( surface_p != window_base_p ) ) {
+			// Lambda to test for surface hit and update transmittance if hit
+			auto solarTransmittance = [=,&R1,&ObTrans,&Pierce]( SurfaceData const & surface ) -> bool {
+				if ( ! surface.ShadowSurfPossibleObstruction ) return false; //Do Consider separate octree without filtered surfaces
+				auto const sClass( surface.Class );
+				if ( ( sClass == SurfaceClass_Wall || sClass == SurfaceClass_Roof || sClass == SurfaceClass_Floor ) && ( &surface != window_base_p ) ) {
 					PierceSurface( surface, R1, RN, Pierce, HP );
 					if ( Pierce > 0 ) { // Building element is hit (assumed opaque)
 						ObTrans = 0.0;
-						break;
+						return true;
 					}
 				} else if ( surface.ShadowingSurf ) {
 					PierceSurface( surface, R1, RN, Pierce, HP );
@@ -5399,13 +5396,19 @@ namespace DaylightingManager {
 						Real64 const Trans( surface.SchedShadowSurfIndex > 0 ? LookUpScheduleValue( surface.SchedShadowSurfIndex, IHOUR, 1 ) : 0.0 );
 						if ( Trans < 1.e-6 ) {
 							ObTrans = 0.0;
-							break;
+							return true;
 						} else {
 							ObTrans *= Trans;
+							return ObTrans == 0.0;
 						}
 					}
 				}
-			}
+				return false;
+			};
+
+			// Check octree surface candidates for hits: short circuits if zero transmittance reached
+			Vector3< Real64 > const RN_inv( octree_inverse( RN ) );
+			surfaceOctree.transmittanceSurfacesRayIntersectsCube( R1, RN, RN_inv, solarTransmittance );
 
 		}
 
@@ -5469,21 +5472,24 @@ namespace DaylightingManager {
 
 		} else { // Use surface octree to find candidate surfaces efficiently
 
-			SurfaceOctreeCube::Surfaces surfaces;
-			surfaceOctree.surfacesSegmentIntersectsCube( R1, R2, surfaces );
-			for ( auto const * surface_p : surfaces ) {
-				auto const & surface( *surface_p );
-				IType = surface.Class;
+			// Lambda to test for surface hit
+			auto surfaceHit = [=,&R1,&IHit]( SurfaceData const & surface ) -> bool {
+				auto const sClass( surface.Class );
 				if ( (
 				 ( surface.Zone == window_Zone ) && // Surface is in same zone as window
-				 ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) && // Wall, ceiling/roof, or floor
-				 ( surface_p != window_base_p ) && ( surface_p != window_base_adjacent_p ) ) || // Exclude window's base or base-adjacent surfaces
+				 ( sClass == SurfaceClass_Wall || sClass == SurfaceClass_Roof || sClass == SurfaceClass_Floor ) && // Wall, ceiling/roof, or floor
+				 ( &surface != window_base_p ) && ( &surface != window_base_adjacent_p ) ) || // Exclude window's base or base-adjacent surfaces
 				 ( surface.ShadowingSurf ) ) // Shadowing surface
 				{
 					PierceSurface( surface, R1, RN, d12, IHit, HP ); // Check if R2-R1 segment pierces surface
-					if ( IHit > 0 ) break; // Segment pierces surface: Don't check the rest
+					return IHit > 0; // Segment pierces surface
+				} else {
+					return false;
 				}
-			}
+			};
+
+			// Check octree surface candidates until a hit is found, if any
+			surfaceOctree.hasSurfaceSegmentIntersectsCube( R1, R2, surfaceHit );
 
 		}
 
@@ -5561,22 +5567,25 @@ namespace DaylightingManager {
 
 		} else { // Use surface octree to find candidate surfaces efficiently
 
-			SurfaceOctreeCube::Surfaces surfaces;
-			surfaceOctree.surfacesSegmentIntersectsCube( R1, R2, surfaces );
-			for ( auto const * surface_p : surfaces ) {
-				auto const & surface( *surface_p );
-				IType = surface.Class;
+			// Lambda to test for surface hit
+			auto surfaceHit = [=,&R1,&IHit]( SurfaceData const & surface ) -> bool {
+				auto const sClass( surface.Class );
 				if ( (
 				 ( surface.Zone == window2_Zone ) && // Surface is in same zone as window
-				 ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) && // Wall, ceiling/roof, or floor
-				 ( surface_p != window1_base_p ) && ( surface_p != window2_base_p ) && // Exclude windows' base surfaces
-				 ( surface_p != window1_base_adjacent_p ) && ( surface_p != window2_base_adjacent_p ) ) || // Exclude windows' base-adjacent surfaces
+				 ( sClass == SurfaceClass_Wall || sClass == SurfaceClass_Roof || sClass == SurfaceClass_Floor ) && // Wall, ceiling/roof, or floor
+				 ( &surface != window1_base_p ) && ( &surface != window2_base_p ) && // Exclude windows' base surfaces
+				 ( &surface != window1_base_adjacent_p ) && ( &surface != window2_base_adjacent_p ) ) || // Exclude windows' base-adjacent surfaces
 				 ( surface.ShadowingSurf ) ) // Shadowing surface
 				{
 					PierceSurface( surface, R1, RN, d12, IHit, HP ); // Check if R2-R1 segment pierces surface
-					if ( IHit > 0 ) break; // Segment pierces surface: Don't check the rest
+					return IHit > 0; // Segment pierces surface
+				} else {
+					return false;
 				}
-			}
+			};
+
+			// Check octree surface candidates until a hit is found, if any
+			surfaceOctree.hasSurfaceSegmentIntersectsCube( R1, R2, surfaceHit );
 
 		}
 
