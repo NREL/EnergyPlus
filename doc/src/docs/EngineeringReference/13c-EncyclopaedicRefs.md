@@ -1,5 +1,5 @@
 <!--RemoveStart-->
-Simulation Models – Encyclopedic Reference
+Simulation Models – Encyclopedic Reference 
 ==========================================
 
 The following descriptions are grouped alphabetically (as much as possible) with some also having additional tags of “Heat Balance”, “HVAC”, and “Plant”.  With the integrated solution, these designations signify where the effects of these models have their first impacts.
@@ -1274,7 +1274,7 @@ N = number of zones served by the air loop, which is provided in the input for a
 
 ### Proportional Control
 
-Like Ventilation Rate Procedure and the Indoor Air Quality Procedure, the following three objects must be included in the input data file in order to model CO<sub>2</sub>-based DCV with Proportional Control:
+The control has two choices: ProportionalControlBasedonOccupancySchedule and ProportionalControlBasedonDesignOccupancy. The difference is occupancy level. The former uses real time occupancy, while the latter uses design occupancy level. Like Ventilation Rate Procedure and the Indoor Air Quality Procedure, the following three objects must be included in the input data file in order to model CO<sub>2</sub>-based DCV with Proportional Control:
 
 n **AirLoopHVAC:OutdoorAirSystem** to simulate the mixed air box of the air loop
 
@@ -1311,6 +1311,9 @@ Where,
 <span>\({R_{a,i}}\)</span> = Required outdoor air flow rate per unit area, (m<sup>3</sup>/s)/m<sup>2</sup>
 
 <span>\({P_{z,i}}\)</span> = Design zone population, number of people
+
+When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy * current schedule value. When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy.
+
 
 <span>\({A_{z,i}}\)</span> = Zone floor area, m<sup>2</sup>
 
@@ -2687,7 +2690,7 @@ There are two types of control types allowed to be specified in the unitary syst
 
 
 
-Setpoint based control:
+####Setpoint based control:
 
 The unitary system calculates the current sensible load using the temperature of the inlet node and the System Node Setpoint Temp on the control node. If the control node is not the outlet node, the desired outlet node temperature is adjusted for the current temperature difference between the outlet node and the control node. Likewise, the current latent load is calculated using the humidity ratio of the inlet node and the System Node Humidity Ratio Max on the control node. The controls determine the required coil run-time fraction and dehumidification mode (if applicable) using the steps outlined below.
 
@@ -2709,7 +2712,7 @@ If the humidity control type is CoolReheat, the coil is re-simulated to achieve 
 
 
 
-Load based control:
+####Load based control:
 
 While the unitary system may be configured to serve multiple zones, system operation is controlled by a thermostat located in a single “control” zone. One of the key parameters for the unitary system component is the fraction of the total system air flow that goes through the control zone. This fraction is calculated as the ratio of the maximum air mass flow rate for the air loop’s supply inlet node for the control zone (e.g., AirTerminal:SingleDuct:Uncontrolled, field = Maximum Air Flow Rate, converted to mass flow) to the sum of the maximum air mass flow rates for the air loop’s supply inlet nodes for all zones served by this air loop. The unitary system module scales the calculated load for the control zone upward based on this fraction to determine the total load to be met by the unitary system. The module then proceeds to calculate the required part-load ratio for the system coil and the supply air fan to meet this total load. The heating or cooling capacity delivered by the unitary system is distributed to all of the zones served by this system via the terminal units that supply air to each zone. The supply air fraction that goes though the control zone is calculated as follows:
 
@@ -2717,11 +2720,11 @@ While the unitary system may be configured to serve multiple zones, system opera
 
 where:
 
-<span>\({\dot m_{TUMax\,ControlledZone}}\)</span>    =    maximum air mass flow rate for the air loop’s supply inlet node (terminal unit) for the control zone (kg/s)
+<span>${\dot m_{TUMax\,ControlledZone}}$</span>    =    maximum air mass flow rate for the air loop’s supply inlet node (terminal unit) for the control zone (kg/s)
 
-<span>\({\dot m_{TUMax\,Zone\,j}}\)</span>            =    maximum air mass flow rate for the air loop’s supply inlet node for the jth zone (kg/s)
+<span>${\dot m_{TUMax\,Zone\,j}}$</span>            =    maximum air mass flow rate for the air loop’s supply inlet node for the jth zone (kg/s)
 
-<span>\(NumOfZones\)</span>                =    number of zones, or number of air loop supply air inlet nodes for all zones served by the air loop (-)
+<span>$NumOfZones$</span>                =    number of zones, or number of air loop supply air inlet nodes for all zones served by the air loop (-)
 
 The unitary system component is able to model supply air fan operation in two modes: cycling fan – cycling coil (i.e., AUTO fan) and continuous fan – cycling coil (i.e., fan ON). Fan:OnOff must be used to model AUTO fan, while Fan:OnOff or Fan:ConstantVolume can be used to model fan ON. The fan operation mode is specified using a supply air fan operating mode schedule where schedule values of 0 denote cycling fan operation and schedule values other than 0 (a 1 is usually used) denote continuous fan operation. Using this schedule, the unitary system fan may be cycled with cooling or heating coil operation or operated continuously based on time of day (e.g., cycling fan operation at night and continuous fan operation during the daytime). If the fan operating mode schedule name field is left blank in the unitary system object, the unitary system assumes cycling or AUTO fan mode operation throughout the simulation.
 
@@ -2738,28 +2741,25 @@ If the supply air fan operating mode schedule requests cycling fan operation, th
 The model then calculates the unitary system’s sensible cooling energy rate delivered to the zones being served when the system runs at full-load conditions and when the cooling coil is OFF. If the supply air fan cycles with the compressor, then the sensible cooling energy rate is zero when the cooling coil is OFF. However if the fan is configured to run continuously regardless of coil operation, then the sensible cooling energy rate will probably not be zero when the cooling coil is OFF. Calculating the sensible cooling energy rate involves modeling the supply air fan (and associated fan heat), the cooling coil, and the heating and reheat coil (simply to pass the air properties and mass flow rate from its inlet node to its outlet node). For each of these cases (full load and cooling coil OFF), the sensible cooling energy rate delivered by the unitary system is calculated as follows:
 
 
-
-<div>$$Full\;Cool\;Output = (Mass\;Flow\;Rat{e_{ful\;load}}){({h_{out,full\;load}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;full\;load}}$$</div>
+<div>$$Full\;Cool\;Output = (Mass\;Flow\;Rat{e_{full\;load}}){({h_{out,full\;load}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;full\;load}}$$</div>
 
 <div>$$No\;Cool\;Output = (Mass\;Flow\;Rat{e_{coil\;off}}){({h_{out,\;coil\;off}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;coil\;off}}$$</div>
 
 where:
 
-*Mass Flow Rate<sub>full\\ load</sub>* = air mass flow rate through unitary system at full-load conditions, kg/s
+*Mass Flow Rate<sub>full load</sub>* = air mass flow rate through unitary system at full-load conditions, kg/s
 
-*h<sub>out,\\ full\\ load</sub>* = enthalpy of air exiting the unitary system at full-load conditions, J/kg
+*h<sub>out, full load</sub>* = enthalpy of air exiting the unitary system at full-load conditions, J/kg
 
-*h<sub>control\\ zone</sub>*<sub> </sub> = enthalpy of air in the control zone (where thermostat is located), J/kg
+*h<sub>control zone</sub>*<sub> </sub> = enthalpy of air in the control zone (where thermostat is located), J/kg
 
-*HR<sub>min</sub>      =* enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio
+*HR<sub>min</sub>      =* enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the unitary system exiting air or the air in the control zone
 
-of the unitary system exiting air or the air in the control zone
+*Mass Flow Rate<sub>coil off</sub>* = air mass flow rate through the unitary system with the cooling coil OFF, kg/s
 
-*Mass Flow Rate<sub>coil\\ off</sub>* = air mass flow rate through the unitary system with the cooling coil OFF, kg/s
+*h<sub>out, coil off</sub>*  = enthalpy of air exiting the unitary system with the cooling coil OFF, J/kg
 
-*h<sub>out,\\ coil\\ off</sub>*  = enthalpy of air exiting the unitary system with the cooling coil OFF, J/kg
-
-Δ<sub>sen,</sub> *<sub>full\\ load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ<sub>sen,</sub> *<sub>full load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;full\;load}} = \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {Mass\;Flow\;Rat{e_{_{full\;load}}} - \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -2767,7 +2767,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ<sub>sen,coil\\ off</sub>**=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+Δ<sub>sen,coil off</sub>=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;coil\;off}} = \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {Mass\;Flow\;Rat{e_{_{coil\;off}}} - \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;coil\;off}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -2781,19 +2781,19 @@ Since the part-load performance of the cooling coil is frequently non-linear, an
 
 where:
 
-<span>\({Q_{UnitarySystem}}\)</span>= Unitary system delivered sensible capacity (W)
+<span>${Q_{UnitarySystem}}$</span>= Unitary system delivered sensible capacity (W)
 
 If the unitary system has been specified with cycling fan/cycling coil (AUTO fan), then the unitary system’s operating supply air mass flow rate is multiplied by PartLoadRatio to determine the average air mass flow rate for the system simulation time step. In this case, the air conditions at nodes downstream of the cooling coil represent the full-load (steady-state) values when the coil is operating.
 
 If the fan operates continuously (i.e., when the supply air fan operating mode schedule values are NOT equal to 0), the operating air mass flow rate through the unitary system is calculated as the average of the user-specified air flow rate when the cooling coil is ON and the user-specified air flow rate when the cooling coil is OFF (user-specified supply air volumetric flow rates converted to dry air mass flow rates).
 
-<div>$${\mathop m\limits^ \bullet_{UnitarySystem}} = PartLoadRatio\left( {{{\mathop m\limits^ \bullet  }_{CoolCoilON}}} \right) + \left( {1 - PartLoadRatio} \right)\left( {{{\mathop m\limits^ \bullet  }_{CoilOFF}}} \right)$$</div>
+<div>$${{\mathop m\limits^ \bullet  }_{UnitarySystem}} = PartLoadRatio\left( {{{\mathop m\limits^ \bullet  }_{CoolCoilON}}} \right) + \left( {1 - PartLoadRatio} \right)\left( {{{\mathop m\limits^ \bullet  }_{CoilOFF}}} \right)$$</div>
 
 where:
 
-<span>\(\mathop m\limits^ \bullet  CoolCoilON\)</span> = air mass flow rate through unitary system when the cooling coil is ON (kg/s)
+<span>$\mathop m\limits^ \bullet  <sub>CoolCoilON</sub>$</span> = air mass flow rate through unitary system when the cooling coil is ON (kg/s)
 
-<span>\(\mathop m\limits^ \bullet  CoilOFF\)</span> = air mass flow rate through unitary system when no cooling or heating is needed (kg/s)
+<span>$\mathop m\limits^ \bullet  <sub>CoilOFF</sub>$</span> = air mass flow rate through unitary system when no cooling or heating is needed (kg/s)
 
 In this case, the air conditions at nodes downstream of the cooling coil are calculated as the average conditions over the simulation time step (i.e., the weighted average of full-load conditions when the coil is operating and inlet air conditions when the coil is OFF).
 
@@ -2805,35 +2805,34 @@ After the unitary system cooling load is determined as described in Eq. above, t
 
 The model calculates the unitary system’s sensible cooling energy rate delivered to the zones being served when the system runs at full-load conditions at the highest speed and when the DX cooling coil is OFF. If the supply air fan cycles with the compressor, then the sensible cooling energy rate is zero when the cooling coil is OFF. However if the fan is scheduled to run continuously regardless of coil operation, then the sensible cooling energy rate will not be zero when the cooling coil is OFF. Calculating the sensible cooling energy rate involves modeling the supply air fan (and associated fan heat) and the multi/variable speed DX cooling coil. The multi/variable speed DX heating coil and the supplemental heating coil are also modeled, but only to pass the air properties and mass flow rate from their inlet nodes to their outlet nodes. For each of these cases (full load at highest cooling speed and DX cooling coil OFF), the sensible cooling energy rate delivered by the unitary system is calculated as follows:
 
-<span>\(FullCoolOutpu{t_{Highest\;Speed}} = ({\dot m_{HighestSpeed}}){({h_{out,full\;load}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;HighestSpeed}}\)</span><span>\(NoCoolOutput = ({\dot m_{CoilOff}}){({h_{out,\;coil\;off}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;coil\;off}}\)</span>
+<div>$$FullCoolOutpu{t_{Highest\;Speed}} = ({\dot m_{HighestSpeed}}){({h_{out,full\;load}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;HighestSpeed}}$$</div>
+<div>$$NoCoolOutput = ({\dot m_{CoilOff}}){({h_{out,\;coil\;off}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;coil\;off}}$$</div>
 
 where:
 
-*<span>\({\dot m_{HighestSpeed}}\)</span>* = air mass flow rate through unitary system at the highest cooling speed [kg/s]
+*<span>${\dot m_{HighestSpeed}}$</span>* = air mass flow rate through unitary system at the highest cooling speed [kg/s]
 
-*h<sub>out,\\ full\\ load</sub>*   = enthalpy of air exiting the unitary system at full-load conditions [J/kg]
+*h<sub>out, full load</sub>*   = enthalpy of air exiting the unitary system at full-load conditions [J/kg]
 
-*h<sub>control \\ zone</sub>*   = enthalpy of air leaving the control zone (where thermostat is located) [J/kg]
+*h<sub>control zone</sub>*   = enthalpy of air leaving the control zone (where thermostat is located) [J/kg]
 
 *HR<sub>min</sub>=* the minimum humidity ratio of the unitary system exiting air or the air leaving the control zone [kg/kg]
 
-<span>\({\dot m_{CoilOff}}\)</span> = air mass flow rate through the unitary system with the cooling coil OFF [kg/s]
+<span>${\dot m_{CoilOff}}$</span> = air mass flow rate through the unitary system with the cooling coil OFF [kg/s]
 
-*h<sub>out,coil \\ off</sub>*    = enthalpy of air exiting the unitary system with the cooling coil OFF [J/kg]
+*h<sub>out,coil off</sub>*    = enthalpy of air exiting the unitary system with the cooling coil OFF [J/kg]
 
-Δ<sub>sen,</sub> *<sub>full\\ load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ<sub>*sen,*</sub> *<sub>HighestSpeed</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
+
+Δ<sub>*sen,coil off*</sub>=Sensible load difference between the system output node and the zone inlet node with the cooling coil OFF conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;HighestSpeed}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad \quad  + \left( {{{\dot m}_{_{HighestSpeed}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
+
+<div>$$\begin{array}{l}{\Delta_{sen,\;coil\;off}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {{{\dot m}_{_{coil\;off}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;coil\;off}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
 where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
-
-Δ<sub>sen,coil\\ off</sub>**=Sensible load difference between the system output node and the zone inlet node with the cooling coil OFF conditions
-
-<div>$$\begin{array}{l}{\Delta_{sen,\;coil\;off}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {{{\dot m}_{_{coil\;off}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;coil\;off}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
-
-
 
 If the unitary system’s sensible cooling rate at the highest speed (full load, no cycling) is insufficient to meet the entire cooling load, the controlled zone conditions will not be met. The reported cycling rate and speed ratio are 1, and the speed number is set to the highest index number. If the total sensible cooling load to be met by the system is less than the sensible cooling rate at the highest speed, then the following steps are performed.
 
@@ -2843,23 +2842,23 @@ If the unitary system’s sensible cooling rate at the highest speed (full load,
 
 where
 
-*<span>\({\dot m_{Speed1}}\)</span>* = air mass flow rate through unitary system at Speed 1 [kg/s]
+*<span>${\dot m_{Speed1}}$</span>* = air mass flow rate through unitary system at Speed 1 [kg/s]
 
-Δ<sub>sen,</sub> <sub>Speed1</sub>**=Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
+Δ<sub>*sen,*</sub> <sub>*Speed1*</sub>=Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;Speed1}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {{{\dot m}_{_{Speed1}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
 ·        If the sensible cooling energy rate delivered by the unitary system at Speed 1 is greater or equal to the sensible load, the cycling ratio (part-load ratio) for the unitary system is estimated.
 
-<div>$$\begin{array}{l}CyclingRatio = \frac{{\left( {ABS(CoolingCoilSensibleLoad)} \right)}}{{FullCoolingCoilCapacity}}\\ = MAX\left( {0.0,\frac{{\left( {UnitarySystemCoolingLoad - AddedFanHeat} \right)}}{{\left( {FullCoolOutpu{t_{speed1}} - AddedFanHea{t_{speed1}}} \right)}}} \right)\end{array}$$</div>
+<div>$$\begin{array}{l}CyclingRatio = \frac{{\left( {ABS(CoolingCoilSensibleLoad)} \right)}}{{FullCoolingCoilCapacity}}\\ = MAX\left( {0.0,\frac{{\left( {UnitarySystemCoolingLoad - AddedFanHeat} \right)}}{{\left( {FullCoolOutpu{t_{Speed1}} - AddedFanHea{t_{Speed1}}} \right)}}} \right)\end{array}$$</div>
 
 
 
 where
 
-AddedFanHeat  = generated supply air fan heat, which is a function of part load ratio and as internal component cooling load [W].
+*AddedFanHeat*  = generated supply air fan heat, which is a function of part load ratio and as internal component cooling load [W].
 
-AddedFanHeat<sub>Speed1</sub>        = generated supply air fan heat at Speed 1 (part load ratio=1) [W].
+*AddedFanHeat<sub>Speed1</sub>*        = generated supply air fan heat at Speed 1 (part load ratio=1) [W].
 
 Since the part-load performance of the DX cooling coil is frequently non-linear,and the supply air fan heat varies based on cooling coil operation for the case of cycling fan/cycling coil (AUTO fan), the final part-load ratio for the cooling coil compressor and fan are determined through iterative calculations (successive modeling of the cooling coil and fan) until the unitary system’s cooling output matches the cooling load to be met within the convergence tolerance. The convergence tolerance is fixed at 0.001 and is calculated based on the difference between the load to be met and the unitary system’s cooling output divided by the load to be met.
 
@@ -2873,17 +2872,17 @@ Unitary systemOutput<sub>Cycling</sub> = unitary system delivered sensible capac
 
 where
 
-<span>\({\mathop m\limits^ \bullet_{UnitarySystem}}\)</span>      = average air mass flow rate defined in the next section [kg/s]
+<span>${\dot m{_{UnitarySystem}}}$</span>      = average air mass flow rate defined in the next section [kg/s]
 
-h<sub>out,</sub>        = enthalpy of air exiting the unitary system at part load conditions [J/kg]
+*h<sub>out,</sub>*        = enthalpy of air exiting the unitary system at part load conditions [J/kg]
 
-Δ<sub>cycling</sub>    =average sensible load difference between the system output node and the zone inlet node
+Δ<sub>*cycling*</sub>    =average sensible load difference between the system output node and the zone inlet node
 
 <div>$${\Delta_{cycling}} = \frac{{{{\mathop m\limits^ \bullet  }_{ZoneInlet}}}}{{frac}}\left( {{h_{ZoneInlet}} - {h_{ControlZone}}} \right) + \left( {{{\mathop m\limits^ \bullet  }_{UnitarySystem}} - \frac{{{{\mathop m\limits^ \bullet  }_{ZoneInlet}}}}{{frac}}} \right)\left( {{h_{Out}} - {h_{ControlZone}}} \right)$$</div>
 
 
 
-<span>\({\dot m_{_{ZoneInlet}}}\)</span> = Air mass flow rate in the supply inlet node in the controlled zone [kg/s]
+<span>${\dot m{_{ZoneInlet}}}$</span> = Air mass flow rate in the supply inlet node in the controlled zone [kg/s]
 
 For this case where speed 1 operation was able to meet the required cooling load, the speed ratio is set to zero and speed number is equal to 1.
 
@@ -2897,13 +2896,13 @@ Although a linear relationship is assumed by applying the speed ratio to obtain 
 
 where:
 
-Unitary systemOutput<sub>Speed,n</sub>= unitary system delivered sensible capacity between two consecutive speeds at a specific speed ratio (W)
+*UnitarySystemOutput<sub>Speedn</sub>*= unitary system delivered sensible capacity between two consecutive speeds at a specific speed ratio (W)
 
-<div>$$\begin{array}{l}UnitarySystemOutpu{t_{SpeedRatio}} = (SpeedRatio)FullCoolOutpu{t_{speedn}} + \\\(1 - SpeedRatio)FullCoolOutpu{t_{speedn - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}$$</div>
+<div>$$\begin{array}{l}UnitarySystemOutpu{t_{SpeedRatio}} = (SpeedRatio)FullCoolOutpu{t_{Speedn}} + \\\quad \quad \quad \quad \quad (1 - SpeedRatio)FullCoolOutpu{t_{Speedn - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}$$</div>
 
 Where
 
-AddedFanHeat<sub>SpeedRatio</sub>          = generated supply air fan heat at a specific speed ratio [W]
+*AddedFanHeat<sub>SpeedRatio</sub>*          = generated supply air fan heat at a specific speed ratio [W]
 
 In this case, the reported cycling ratio is 1 and speed number is equal to n.
 
@@ -2913,19 +2912,19 @@ Speed 1 operation
 
 If the unitary system has been specified with cycling fan/cycling coil (AUTO fan), then the unitary system’s operating supply air mass flow rate is determined by the cycling ratio (PartLoadRatio) for Speed 1. The supply air mass flow rate is multiplied by the cycling ratio to determine the average air mass flow rate for the system simulation time step. The air conditions at nodes downstream of the cooling coils represent the full-load (steady-state) values when the coil is operating.
 
-<div>$${\mathop m\limits^ \bullet_{UnitarySystem}} = \left( {CyclingRatio} \right){\mathop m\limits^ \bullet_{speed1}}$$</div>
+<div>$${{\mathop m\limits^ \bullet  }_{UnitarySystem}} = \left( {CyclingRatio} \right){{\mathop m\limits^ \bullet  }_{Speed1}}$$</div>
 
 If the fan operates continuously (i.e., when the supply air fan operating mode schedule values are NOT equal to 0), the operating air mass flow rate through the unitary system is calculated as the average of the user-specified air flow rate when the unitary system cooling coil is ON at Speed 1 and the user-specified air flow rate when the unitary system cooling coil is OFF (user-specified supply air volumetric flow rates converted to dry air mass flow rates).
 
-<div>$${\mathop m\limits^ \bullet_{UnitarySystem}} = \left( {CyclingRatio} \right){\mathop m\limits^ \bullet_{speed1}} + \left( {1 - CyclingRatio} \right){\mathop m\limits^ \bullet_{coiloff}}$$</div>
+<div>$${{\mathop m\limits^ \bullet  }_{UnitarySystem}} = \left( {CyclingRatio} \right){{\mathop m\limits^ \bullet  }_{Speed1}} + \left( {1 - CyclingRatio} \right){{\mathop m\limits^ \bullet  }_{CoilOff}}$$</div>
 
 where:
 
-<span>\({\mathop m\limits^ \bullet_{UnitarySystem}}\)</span> = average air mass flow rate through unitary system [kg/s]
+<span>${\dot m_{UnitarySystem}}$</span> = average air mass flow rate through unitary system [kg/s]
 
-<span>\({\dot m_{Speed1}}\)</span>= air mass flow rate through unitary system when cooling coil is ON at Speed 1 [kg/s]
+<span>${\dot m_{Speed1}}$</span>= air mass flow rate through unitary system when cooling coil is ON at Speed 1 [kg/s]
 
-<span>\({\dot m_{CoilOff}}\)</span> = air mass flow rate through unitary system when no heating or cooling is needed [kg/s]
+<span>${\dot m_{CoilOff}}$</span> = air mass flow rate through unitary system when no heating or cooling is needed [kg/s]
 
 In this case, the air conditions at nodes downstream of the cooling coils are calculated as the average conditions over the simulation time step (i.e., the weighted average of full-load conditions when the coil is operating and inlet air conditions when the coil is OFF).
 
@@ -2933,15 +2932,15 @@ In this case, the air conditions at nodes downstream of the cooling coils are ca
 
 When the unitary system operates at higher speeds to meet the required cooling load, the supply air mass flow rate is linearly interpolated between two consecutive speeds:
 
-<div>$${\mathop m\limits^ \bullet_{UnitarySystem}} = \left( {SpeedRatio} \right){\mathop m\limits^ \bullet_{Speedn}} + \left( {1 - SpeedRatio} \right){\mathop m\limits^ \bullet_{Speedn - 1}}$$</div>
+<div>$${{\mathop m\limits^ \bullet  }_{UnitarySystem}} = \left( {SpeedRatio} \right){{\mathop m\limits^ \bullet  }_{Speedn}} + \left( {1 - SpeedRatio} \right){{\mathop m\limits^ \bullet  }_{Speedn - 1}}$$</div>
 
 where:
 
-<span>\({\mathop m\limits^ \bullet_{UnitarySystem}}\)</span>= average air mass flow rate through the unitary system for the time step [kg/s]
+<span>${{\mathop m\limits^ \bullet  }_{UnitarySystem}}$</span>= average air mass flow rate through the unitary system for the time step [kg/s]
 
-<span>\({\dot m_{Speed\;n}}\)</span>= air mass flow rate through unitary system when cooling coil is ON at Speed n [kg/s]
+<span>${\dot m_{Speedn}}$</span>= air mass flow rate through unitary system when cooling coil is ON at Speed n [kg/s]
 
-<span>\({\dot m_{Speed\;n - 1}}\)</span>= air mass flow rate through unitary system when cooling coil is ON at Speed n-1 [kg/s]
+<span>${\dot m_{Speedn - 1}}$</span>= air mass flow rate through unitary system when cooling coil is ON at Speed n-1 [kg/s]
 
 For this case of higher speed operation, the air conditions at nodes downstream of the cooling coils are determined by the delivered cooling capacity and supply air mass flow rates between two consecutive speeds.
 
@@ -2965,19 +2964,19 @@ The model then calculates the unitary system’s sensible heating energy rate de
 
 where:
 
-*Mass Flow Rate <sub>full\\ load</sub>*  = air mass flow rate through unitary system at full-load conditions, kg/s
+*Mass Flow Rate <sub>full load</sub>*  = air mass flow rate through unitary system at full-load conditions, kg/s
 
-*h<sub>out,\\ full\\ load</sub>*  = enthalpy of air exiting the unitary system at full-load conditions, J/kg
+*h<sub>out, full load</sub>*  = enthalpy of air exiting the unitary system at full-load conditions, J/kg
 
-*h<sub>control \\ zone</sub>*  = enthalpy of air leaving the control zone (where thermostat is located), J/kg
+*h<sub>control zone</sub>*  = enthalpy of air leaving the control zone (where thermostat is located), J/kg
 
 *HR<sub>min</sub>=* enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the unitary system exiting air or the air leaving the control zone
 
-*Mass Flow Rate <sub>coil \\ off</sub>*  = air mass flow rate through the unitary system with the heating coil OFF, kg/s
+*Mass Flow Rate <sub>coil off</sub>*  = air mass flow rate through the unitary system with the heating coil OFF, kg/s
 
-*h<sub>out,\\ coil \\ off</sub>*  = enthalpy of air exiting the unitary system with the heating coil OFF, J/kg
+*h<sub>out, coil off</sub>*  = enthalpy of air exiting the unitary system with the heating coil OFF, J/kg
 
-Δ<sub>sen,</sub> *<sub>full\\ load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ<sub>sen,</sub> *<sub>full load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;full\;load}} = \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {Mass\;Flow\;Rat{e_{_{full\;load}}} - \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -2985,7 +2984,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ<sub>sen,coil\\ off</sub>**=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+Δ<sub>sen,coil off</sub>=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;coil\;off}} = \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {Mass\;Flow\;Rat{e_{_{coil\;off}}} - \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;coil\;off}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -2999,23 +2998,21 @@ Since the part-load performance of the  heating coil is frequently non-linear, 
 
 where:
 
-<span>\({Q_{UnitarySystem}}\)</span>= Unitary system delivered sensible capacity (W)
+<span>${Q_{UnitarySystem}}$</span>= Unitary system delivered sensible capacity (W)
 
 If the unitary system’s  heating coil output at full load is insufficient to meet the entire heating load, PartLoadRatio is set equal to 1.0 (compressor and fan are not cycling) and the remaining heating load is passed to the supplemental heating coil. If the unitary system model determines that the outdoor air temperature is below the minimum outdoor air temperature for compressor operation, the compressor is turned off and the entire heating load is passed to the supplemental gas or electric heating coil. The unitary system exiting air conditions and energy consumption are calculated and reported by the individual component models (fan,  heating coil, and supplemental gas or electric heating coil).
 
 If the unitary system has been specified with cycling fan/cycling coil (AUTO fan), then the unitary system’s operating supply air mass flow rate is multiplied by PartLoadRatio to determine the average air mass flow rate for the system simulation time step. The air conditions at nodes downstream of the heating coils represent the full-load (steady-state) values when the coils are operating. If the fan operates continuously (i.e., when the supply air fan operating mode schedule values are NOT equal to 0), the operating air mass flow rate through the unitary system is calculated as the average of the user-specified air flow rate when the unitary system heating coil is ON and the user-specified air flow rate when the unitary system heating coil is OFF (user-specified supply air volumetric flow rates converted to dry air mass flow rates).
 
-<div>$${\mathop m\limits^ \bullet_{UnitarySystem}} = PartLoadRatio\left( {{{\mathop m\limits^ \bullet  }_{HeatCoilON}}} \right) + \left( {1 - PartLoadRatio} \right)\left( {{{\mathop m\limits^ \bullet  }_{CoilOFF}}} \right)$$</div>
+<div>$${{\mathop m\limits^ \bullet  }_{UnitarySystem}} = PartLoadRatio\left( {{{\mathop m\limits^ \bullet  }_{HeatCoilON}}} \right) + \left( {1 - PartLoadRatio} \right)\left( {{{\mathop m\limits^ \bullet  }_{CoilOFF}}} \right)$$</div>
 
 where:
 
-<span>\(\mathop m\limits^ \bullet  HeatCoilON\)</span> = air mass flow rate through unitary system when the heating coil is ON (kg/s)
+<span>${\dot m_{HeatCoilON}}$</span> = air mass flow rate through unitary system when the heating coil is ON (kg/s)
 
-<span>\(\mathop m\limits^ \bullet  CoilOFF\)</span> = air mass flow rate through unitary system when no heating or cooling is needed (kg/s)
+<span>${\dot m_{CoilOFF}}$</span> = air mass flow rate through unitary system when no heating or cooling is needed (kg/s)
 
 In this case, the air conditions at nodes downstream of the heating coils are calculated as the average conditions over the simulation time step (i.e., the weighted average of full-load conditions when the coils are operating and inlet air conditions when the coils are OFF).
-
-
 
 #### Heating Operation (multi or variable speed coils )
 
@@ -3029,19 +3026,19 @@ The model calculates the unitary system’s sensible heating energy rate deliver
 
 where:
 
-*<span>\({\dot m_{HighestSpeed}}\)</span>* = air mass flow rate through unitary system at the highest heating speed [kg/s]
+*<span>${\dot m_{HighestSpeed}}$</span>* = air mass flow rate through unitary system at the highest heating speed [kg/s]
 
-*h<sub>out,\\ full\\ load</sub>*   = enthalpy of air exiting the unitary system at full-load conditions [J/kg]
+*h<sub>out, full load</sub>*   = enthalpy of air exiting the unitary system at full-load conditions [J/kg]
 
-*h<sub>control \\ zone</sub>*   = enthalpy of air leaving the control zone (where thermostat is located) [J/kg]
+*h<sub>control zone</sub>*   = enthalpy of air leaving the control zone (where thermostat is located) [J/kg]
 
 *HR<sub>min</sub>=* enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the unitary system exiting air or the air leaving the control zone
 
-<span>\({\dot m_{CoilOff}}\)</span>= air mass flow rate through the unitary system with the heating coil OFF [kg/s]
+<span>${\dot m_{CoilOff}}$</span>= air mass flow rate through the unitary system with the heating coil OFF [kg/s]
 
-*h<sub>out,coil \\ off</sub>*    = enthalpy of air exiting the unitary system with the heating coil OFF [J/kg]
+*h<sub>out,coil off</sub>*    = enthalpy of air exiting the unitary system with the heating coil OFF [J/kg]
 
-Δ<sub>sen,</sub> *<sub>full\\ load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ<sub>sen,</sub> *<sub>full load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;HighestSpeed}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad \quad  + \left( {{{\dot m}_{_{HighestSpeed}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -3049,7 +3046,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ<sub>sen,coil\\ off</sub>**=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+Δ*<sub>sen,coil off</sub>*=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;coil\;off}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {{{\dot m}_{_{coil\;off}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;coil\;off}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -3063,9 +3060,9 @@ If the total heating load to be met by the system is less than the sensible heat
 
 where:
 
-*<span>\({\dot m_{Speed1}}\)</span>* = air mass flow rate through unitary system at Speed 1 [kg/s]
+*<span>${\dot m_{Speed1}}$</span>* = air mass flow rate through unitary system at Speed 1 [kg/s]
 
-Δ<sub>sen,</sub> <sub>Speed1</sub>**=Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
+Δ*<sub>sen,</sub> <sub>Speed1</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;Speed1}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {{{\dot m}_{_{Speed1}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -3077,9 +3074,9 @@ where:
 
 where
 
-AddedFanHeat        = generated supply air fan heat, which is a function of part load ratio and as internal component heating load [W].
+*AddedFanHeat*        = generated supply air fan heat, which is a function of part load ratio and as internal component heating load [W].
 
-AddedFanHeat<sub>Speed1</sub>  = generated supply air fan heat at Speed 1 (part load ratio=1) [W].
+*AddedFanHeat<sub>Speed1</sub>*  = generated supply air fan heat at Speed 1 (part load ratio=1) [W].
 
 Since the part-load performance of the DX heating coil is frequently non-linear, and the supply air fan heat varies based on heating coil operation for the case of cycling fan/cycling coil (AUTO fan), the final part-load ratio for the heating coil compressor and fan are determined through iterative calculations (successive modeling of the heating coil and fan) until the unitary system’s heating output matches the heating load to be met within the convergence tolerance. The convergence tolerance is fixed at 0.001 and is calculated based on the difference between the load to be met and the unitary system’s heating output divided by the load to be met.
 
@@ -3087,25 +3084,25 @@ Since the part-load performance of the DX heating coil is frequently non-linear,
 
 where:
 
-Unitary systemOutput<sub>Cycling</sub>= unitary system delivered sensible capacity for Speed 1 operating at a specific cycling ratio (W)
+*UnitarySystemOutput<sub>cycling</sub>* = unitary system delivered sensible capacity for Speed 1 operating at a specific cycling ratio (W)
 
-<div>$$UnitarySystemOutpu{t_{cycling}} = {\mathop m\limits^ \bullet_{UnitarySystem}}{\left( {{h_{out}} - {h_{ControlZone}}} \right)_{HR\min }} - {\Delta_{cycling}}$$</div>
+<div>$$UnitarySystemOutpu{t_{cycling}} = {{\mathop m\limits^ \bullet  }_{UnitarySystem}}{\left( {{h_{out}} - {h_{ControlZone}}} \right)_{HR\min }} - {\Delta_{cycling}}$$</div>
 
 where
 
-<span>\({\mathop m\limits^ \bullet_{UnitarySystem}}\)</span> = average air mass flow rate defined in the next section [kg/s]
+<span>${{\mathop m\limits^ \bullet  }_{UnitarySystem}}$</span> = average air mass flow rate defined in the next section [kg/s]
 
-h<sub>out,</sub>              = enthalpy of air exiting the unitary system at part load conditions [J/kg]
+*h<sub>out,</sub>*              = enthalpy of air exiting the unitary system at part load conditions [J/kg]
 
-Δ<sub>cycling</sub>          =average sensible load difference between the system output node and the zone inlet node
+Δ*<sub>cycling</sub>*          =average sensible load difference between the system output node and the zone inlet node
 
 <div>$${\Delta_{cycling}} = \frac{{{{\mathop m\limits^ \bullet  }_{ZoneInlet}}}}{{frac}}\left( {{h_{ZoneInlet}} - {h_{ControlZone}}} \right) + \left( {{{\mathop m\limits^ \bullet  }_{UnitarySystem}} - \frac{{{{\mathop m\limits^ \bullet  }_{ZoneInlet}}}}{{frac}}} \right)\left( {{h_{Out}} - {h_{ControlZone}}} \right)$$</div>
 
-<span>\({\dot m_{_{ZoneInlet}}}\)</span>       = Air mass flow rate in the supply inlet node in the controlled zone [kg/s]
+<span>${\dot m_{ZoneInlet}}$</span>       = Air mass flow rate in the supply inlet node in the controlled zone [kg/s]
 
-For this case where speed 1 operation was able to meet the required heating load, the speed ratio is set to zero and speed number is equal to 1.
+For this case where Speed 1 operation was able to meet the required heating load, the speed ratio is set to zero and speed number is equal to 1.
 
-3.    If the unitary system’s heating output at full load for Speed 1 is insufficient to meet the entire heatling load, the Cycling ratio (PartLoadRatio) is set equal to 1.0 (compressor and fan are not cycling). Then the heating speed is increased and the delivered sensible capacity is calculated. If the full load sensible capacity at Speed n is greater than or equal to the sensible load, the speed ratio for the unitary system is estimated:
+3.    If the unitary system’s heating output at full load for Speed 1 is insufficient to meet the entire heating load, the Cycling ratio (PartLoadRatio) is set equal to 1.0 (compressor and fan are not cycling). Then the heating speed is increased and the delivered sensible capacity is calculated. If the full load sensible capacity at Speed n is greater than or equal to the sensible load, the speed ratio for the unitary system is estimated:
 
 <div>$$SpeedRatio = \frac{{ABS\left( {UnitarySystemHeatingLoad - AddedFanHeat - FullHeatOutpu{t_{Speedn - 1}}} \right)}}{{ABS\left( {FullHeatOutpu{t_{Speedn}} - FullHeatOutpu{t_{Speedn - 1}}} \right)}}$$</div>
 
@@ -3115,13 +3112,13 @@ Although a linear relationship is assumed by applying the speed ratio to obtain 
 
 where:
 
-UnitarySystemOutput<sub>SpeedRatio</sub>= unitary system delivered sensible capacity between two consecutive speeds at a specific ratio [W]
+*UnitarySystemOutput<sub>SpeedRatio</sub>*= unitary system delivered sensible capacity between two consecutive speeds at a specific ratio [W]
 
-<div>$$\begin{array}{l}UnitarySystemOutpu{t_{SpeedRatio}} = (SpeedRatio)FullHeatOutpu{t_{speedn}} + \\\(1 - SpeedRatio)FullHeatOutpu{t_{speedn - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}$$</div>
+<div>$$\begin{array}{l}UnitarySystemOutpu{t_{SpeedRatio}} = (SpeedRatio)FullHeatOutpu{t_{speedn}} + \\\quad \quad \quad \quad (1 - SpeedRatio)FullHeatOutpu{t_{speedn - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}$$</div>
 
 Where
 
-AddedFanHeat<sub>SpeedRatio</sub>          = generated supply air fan heat at a specific speed ratio [W]
+*AddedFanHeat<sub>SpeedRatio</sub>*          = generated supply air fan heat at a specific speed ratio [W]
 
 In this case, the reported cycling ratio is 1 and speed number is equal to n.
 
@@ -3143,13 +3140,14 @@ The unitary system’s sensible cooling load to be met and the full load cooling
 
 <div>$$PartLoadRatio = MAX\left( {0.0,\frac{{\left( {UnitarySystemCoolingLoad - NoCoolOutput} \right)}}{{\left( {FullCoolOutput - NoCoolOutput} \right)}}} \right)$$</div>
 
-hen the unitary system’s sensible cooling capacity meets the system sensible cooling load at a given sensible part load ratio, then the Unitary system meets the controlled zone cooling setpoint temperature. If a moisture (latent) load exists because the control zone humidity has exceeded the setpoint, the total moisture load to be met by the unitary systems (Unitary systemMoistureLoad) is calculated based on the control zone moisture load and the control zone air flow fraction.
+When the unitary system’s sensible cooling capacity meets the system sensible cooling load at a given sensible part load ratio, then the Unitary system meets the controlled zone cooling setpoint temperature. If a moisture (latent) load exists because the control zone humidity has exceeded the setpoint, the total moisture load to be met by the unitary systems (Unitary systemMoistureLoad) is calculated based on the control zone moisture load and the control zone air flow fraction.
 
 <div>$$UnitarySystemMoistureLoad = \frac{{ControlZoneMoistureLoad}}{{ControlZoneAirFlowFraction}}$$</div>
 
 Then the *LatentPartLoadRatio* required to meet the high humidity setpoint is calculated as follows:
 
-<span>\(LatentPartLoadRatio = MIN\left( {PL{R_{Min}},\frac{{\left( {UnitarySystemMoistureLoad - NoLatentOutput} \right)}}{{\left( {FullLatentOutput - NoLatentOutput} \right)}}} \right)\)</span>The model uses the greater of the two part-load ratios, *PartLoadRatio* or *LatentPartLoadRatio*, to determine the operating part-load ratio of the Unitary system’s DX cooling coil.
+<div>$$LatentPartLoadRatio = MIN\left( {PL{R_{Min}},\frac{{\left( {UnitarySystemMoistureLoad - NoLatentOutput} \right)}}{{\left( {FullLatentOutput - NoLatentOutput} \right)}}} \right)$$</div>
+The model uses the greater of the two part-load ratios, *PartLoadRatio* or *LatentPartLoadRatio*, to determine the operating part-load ratio of the Unitary system’s DX cooling coil.
 
 <div>$$LatentPartLoadRatio = MAX\left( {PartLoadRatio,LatentPartLoadRatio} \right)$$</div>
 
@@ -3157,23 +3155,23 @@ As previously described, iterations are performed to converge on the solution wi
 
 Where,
 
-<span>\(ControlZoneCoolingLoad\)</span>= the control zone sensible cooling load to the cooling setpoint, (W).
+<span>$ControlZoneCoolingLoad$</span>= the control zone sensible cooling load to the cooling setpoint, (W).
 
-<span>\(ControlZoneMoistureLoad\)</span>          = the control zone moisture load to the dehumidifying relative humidity setpoint, (W).
+<span>$ControlZoneMoistureLoad$</span>          = the control zone moisture load to the dehumidifying relative humidity setpoint, (W).
 
-<span>\(ControlZoneAirFlowFraction\)</span>     = the supply air fraction that goes though the control zone, (-).
+<span>$ControlZoneAirFlowFraction$</span>     = the supply air fraction that goes though the control zone, (-).
 
-<span>\(FullLatentOutput\)</span> =the Unitary system’s latent cooling energy rate at full-load conditions, W
+<span>$FullLatentOutput$</span> =the Unitary system’s latent cooling energy rate at full-load conditions, W
 
-<span>\(NoLatentOutput\)</span>   = the Unitary system’s latent cooling energy rate with cooling coil OFF, W
+<span>$NoLatentOutput$</span>   = the Unitary system’s latent cooling energy rate with cooling coil OFF, W
 
-<span>\(PartLoadRatio\)</span>     = the unitary system’s part-load-ratio required to meet system sensible load, (-).
+<span>$PartLoadRatio$</span>     = the unitary system’s part-load-ratio required to meet system sensible load, (-).
 
-<span>\(LatentPartLoadRatio\)</span>= the unitary system’s part-load-ratio required to meet system moisture load, (-).
+<span>$LatentPartLoadRatio$</span>= the unitary system’s part-load-ratio required to meet system moisture load, (-).
 
-<span>\(PL{R_{Min}}\)</span>*=*the minimum part-load ratio, which is usually 0.0. For the case when the latent capacity degradation model is used (Ref: DX Cooling Coil Model), this value is the minimum part-load ratio at which the cooling coil will dehumidify the air.
+<span>$PL{R_{Min}}$</span>*=*the minimum part-load ratio, which is usually 0.0. For the case when the latent capacity degradation model is used (Ref: DX Cooling Coil Model), this value is the minimum part-load ratio at which the cooling coil will dehumidify the air.
 
-When the predicted zone air temperature is above the heating setpoint and if there is a dehumidification load, the supplemental heating coil load is required to offset the excess cooling as shown in Figure 228. If the model determines that the LatentPartLoadRatio is to be used as the operating part-load ratio of the unitary system’s cooling coil, the supplemental heating coil is used to offset the excess sensible capacity provided by the unitary system cooling coil. The model first checks the sensible load that exists for the current simulation time step (predicted zone temperature with no HVAC operation compared to the thermostat setpoint temperatures). If a sensible cooling load or no sensible cooling or heating load exists, the model calculates the difference between the sensible heating load required to reach or maintain the heating dry-bulb temperature setpoint and the actual sensible cooling energy rate delivered by the unit (with LatentPartLoadRatio). In this case, thesupplemental heating coil is used to offset the excess sensible cooling energy provided by the cooling coil (if any) that could have caused an overshoot of the heating dry-bulb temperature setpoint. Note that when a humidistat is used and high humidity control is required, the zone dry-bulb temperature will typically move toward the heating temperature setpoint when a high moisture (latent) load exists.
+When the predicted zone air temperature is above the heating setpoint and if there is a dehumidification load, the supplemental heating coil load is required to offset the excess cooling as shown in Figure 228. If the model determines that the LatentPartLoadRatio is to be used as the operating part-load ratio of the unitary system’s cooling coil, the supplemental heating coil is used to offset the excess sensible capacity provided by the unitary system cooling coil. The model first checks the sensible load that exists for the current simulation time step (predicted zone temperature with no HVAC operation compared to the thermostat setpoint temperatures). If a sensible cooling load or no sensible cooling or heating load exists, the model calculates the difference between the sensible heating load required to reach or maintain the heating dry-bulb temperature setpoint and the actual sensible cooling energy rate delivered by the unit (with LatentPartLoadRatio). In this case, the supplemental heating coil is used to offset the excess sensible cooling energy provided by the cooling coil (if any) that could have caused an overshoot of the heating dry-bulb temperature setpoint. Note that when a humidistat is used and high humidity control is required, the zone dry-bulb temperature will typically move toward the heating temperature setpoint when a high moisture (latent) load exists.
 
 ![HiHumidControl](media/image5015.png)
 
@@ -3193,15 +3191,15 @@ Waste heat calculations are done when the multi speed cooling and heating coils 
 
 where
 
-T<sub>outlet</sub>            = outlet node temperature of heat recovery, C
+*T<sub>outlet</sub>*            = outlet node temperature of heat recovery, C
 
-T<sub>inlet</sub> = inlet node temperature of heat recovery, C
+*T<sub>inlet</sub>* = inlet node temperature of heat recovery, C
 
-Q<sub>WasteHeat</sub>      = recoverable waste heat generated by its child objects, W
+*Q<sub>WasteHeat</sub>*      = recoverable waste heat generated by its child objects, W
 
-C<sub>p</sub>              = inlet node temperature of heat recovery, C
+*C<sub>p</sub>*              = inlet node temperature of heat recovery, C
 
-<span>\({\dot m_{hr}}\)</span>            = mass flow rate of heat recovery, kg/s
+<span>${\dot m_{hr}}$</span>            = mass flow rate of heat recovery, kg/s
 
 If the outlet node temperature is above the value of the Maximum Temp for Heat Recovery field, the outlet node temperature is reset to the value of Maximum Temp for Heat Recovery.
 
@@ -4725,22 +4723,33 @@ Tang,C. C. 2005. Modeling Packaged Heat Pumps in Quasi-Steady State Energy Simul
 
 Murugappan, Arun. 2002.  Implementing Ground Source Heat Pump and Ground Loop Heat Exchanger Models in the EnergyPlus Simulation Environment, M.S. Thesis, Department of Mechanical and Aerospace Engineering, Oklahoma State University (downloadable from [http://www.hvac.okstate.edu/](http://www.hvac.okstate.edu))
 
+
+
 Variable Refrigerant Flow Heat Pumps <a name="VRF"></a>
 ------------------------------------
 
-There are two common types of variable refrigerant flow heat pump systems:
+A Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) system is an air-conditioning system that varies the refrigerant flow rate using variable speed compressor(s) in the outdoor unit, and the electronic expansion valves (EEVs) located in each indoor unit. The system meets the space cooling or heating load requirements by maintaining the zone air temperature at the setpoint. The ability to control the refrigerant mass flow rate according to the cooling and/or heating load enables the use of as many as 60 or more indoor units with differing capacities in conjunction with one single outdoor unit. This unlocks the possibility of having individualized comfort control, simultaneous heating and cooling in different zones, and heat recovery from one zone to another. It may also lead to more efficient operations during part-load conditions.
 
-- cooling only or heating only air-conditioning systems (a.k.a. heat pump), or
+There are two common types of VRF systems. 
 
-- heat recovery systems that allow simultaneous cooling and heating
+ * Heat Pump (HP) type: the most general type that can be used for either cooling or heating, but not simultaneously. 
+ 
+ * Heat Recovery (HR) type: can deliver simultaneous heating and cooling to different zones by transferring heat between the cooling and heating indoor units. This generally occurs in the winter season in medium-sized to large-sized commercial buildings with a substantial core such as computer rooms.
 
-Energyplus models heat pump and heat recovery operating modes as described in the section entitled Variable Refrigerant Flow Heat Pump Model. The variable refrigerant flow model currently supports air-, evaporatively-, or water-cooled condenser equipment. Throughout this section, the term “condenser” refers to the outdoor unit where the compressor is located.
+There are two alternative VRF models availabe in EnergyPlus to simulate the energy performance of Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) air-conditioning systems: 
 
-### Variable Refrigerant Flow Heat Pump Model
+ 1. **System Curve based Model (VRF-SysCurve)**. In this model, a number of system level curves are used to describe the VRF system performance. It corresponds to the *AirConditioner:VariableRefrigerantFlow* object. 
+ 
+ 2. **Physics based Model (VRF-FluidTCtrl)**. This model is able to consider the dynamics of more operational parameters and is applicable for fluid temperature control. This model corresponds to the *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object.
+ 
+ 
+### Variable Refrigerant Flow Heat Pump Model (System Curve Based Model)
 
 #### Overview
 
-The figure below schematically depicts the AirConditioner:VariableRefrigerantFlow (VRF AC) system. The outdoor unit is connected directly to the zone terminal units using a zone terminal unit list (ref: ZoneTerminalUnitList). The VRF AC system conditions multiple zones and is controlled by thermostats located in each zone. Zone terminal units operate to meet the zone sensible cooling or sensible heating requirements as determined by the zone thermostat schedule.
+This section describes the System Curve based VRF Model (VRF-SysCurve), which can address both the heat pump and heat recovery operating modes and support air-, evaporatively-, or water-cooled condenser equipment ( throughout this section, the term “condenser” refers to the outdoor unit where the compressor is located. )
+
+The figure below schematically depicts the AirConditioner:VariableRefrigerantFlow (VRF AC) system. The outdoor unit is connected directly to the zone terminal units using a zone terminal unit list (ref: ZoneTerminalUnitList). The VRF AC system conditions multiple zones and is controlled by thermostats located in each zone. Zone terminal units operate to meet the zone sensible cooling or sensible heating requirements as determined by the zone thermostat schedule. 
 
 When the heat pump does not operate to reclaim waste heat, the VRF AC system can only operate in either cooling *or* heating mode. Based on the master thermostat priority control selection, the operating mode is determined by polling the appropriate zone(s) served by the VRF HP system. When the system is operating in cooling mode, the cooling coils will be enabled only in the terminal units where zone cooling is required. When the system is operating in heating mode, the heating coils will be enabled only in the terminal units where zone heating is required. Supply air fans will continue to operate if the zone terminal unit’s fan operating mode is set to continuous fan.
 
@@ -4756,7 +4765,7 @@ Figure 242. Variable Refrigerant Flow Heat Pump (draw through fan placement)
 
 ![](media/image5316.png)
 
-Figure 243. Variable Refrigerant Flow object connections in Energyplus
+Figure 243. Energyplus object connections for VRF-SysCurve model 
 
 The terminal unit is able to model supply air fan operation in two modes: cycling fan – cycling coil (i.e., AUTO fan) and continuous fan – cycling coil (i.e., fan ON). Fan:Simple:OnOff must be used to model AUTO fan, while Fan:Simple:OnOff or Fan:Simple:ConstVolume can be used to model fan ON.
 
@@ -5410,6 +5419,1057 @@ where:
 
 <div>$$RTF = \left( {{\raise0.7ex\hbox{${PLR}$} \!\mathord{\left/ {\vphantom {{PLR} {PartLoadFrac}}}\right.}\!\lower0.7ex\hbox{${PartLoadFrac}$}}} \right) = runtime\;fraction\;of\;the\;heating\;coil$$</div>
 
+
+### Variable Refrigerant Flow Heat Pump Model (Physics Based Model)
+
+#### Overview
+
+This section describes the Physics based VRF Model (VRF-FluidTCtrl) to simulate the energy performance of Variable Refrigerant Flow (VRF) systems in the heat pump (HP) operation mode (either cooling or heating is provided but not simultaneously). 
+
+Compared with the VRF-SysCurve model, VRF-FluidTCtrl model is more physics-based and thus able to consider the dynamics of more operational parameters which is essential for the description of many enhanced control logics (e.g., the adjustment of superheating degrees during small load operations). Furthermore, this model implements component-level curves rather than the system-level curves, and thus requires much fewer curves as model inputs. The definition of VRF performance data for simulation as part of ASHRAE Standard 205 will ensure VRF manufacturers provide adequate data to create the required performance curves.
+
+The main features of the VRF-FluidTCtrl model include:
+
+ * Introduction of separate curves for capacities and power inputs of indoor and outdoor units instead of overall curves for the entire system.
+
+ * Allowing of variable evaporating and condensing temperatures in the indoor and outdoor units under various operational conditions.
+
+ * Allowing of variable fan speed based on the temperature and zone load in the indoor unit.
+
+ * Allowing of further modifications of operational parameters (e.g., evaporating temperature, superheating degrees, and supply air flow rate) during low load conditions.
+
+ * Development of a physics-based model to calculate thermal loss in the refrigerant piping network (varies with refrigerant flow rate, operational conditions, pipe length, and pipe and insulation materials) instead of a constant correction factor.
+
+These features enhance the simulation accuracy of the VRF system performance in both heating and cooling modes, especially during low load operations. In addition, these features enable the modeling of a multi-stage control strategy to adjust the system capacity during low load conditions, as shown in Figure VRF-FluidTCtrl-1. Further more, the VRF-FluidTCtrl model enables the potential simulation of demand response of VRF systems by directly slowing down the speed of compressors in the outdoor units with invertor technology.
+
+![](media/VRF-FluidTCtrl-1a.png)
+
+Figure VRF-FluidTCtrl-1a. Multi-stage control strategy to adjust the system capacity during low load conditions
+
+Note that a number of calculation steps are coupled together in the VRF-FluidTCtrl model, for instance, the piping loss calculation and the system performance calculation. More specifically, the piping loss changes the operating conditions of the system, which may lead to a different control strategy and thus in reverse affect the amount of piping loss. This makes it difficult to obtain an analytical solution for a number of operational parameters (e.g., enthalpy of refrigerant entering the indoor unit), and therefore numerical iterations are employed to address this problem (refer to Figure VRF-FluidTCtrl-3 for more details). Therefore, the VRF-FluidTCtrl model can have a longer execution time to perform the simulation than the VRF-SysCurve model. 
+
+The object connections for VRF-FluidTCtrl model is similar to those for VRF-SysCurve model. The difference lies in the object used to describe a specific components. For example, VRF-SysCurve model uses  *AirConditioner:VariableRefrigerantFlow* object to describe the VRF outdoor unit performance, while in VRF-FluidTCtrl model the *AirConditioner:VariableRefrigerantFlow* object is used.
+
+![](media/VRF-FluidTCtrl-1b.png)
+
+Figure VRF-FluidTCtrl-1b. Energyplus object connections for VRF-FluidTCtrl model 
+
+
+#### Model Description
+
+Figures VRF-FluidTCtrl-2 and VRF-FluidTCtrl-3 illustrate the overall logic of the VRF-FluidTCtrl algorithms. Detailed calculation procedures and explanations of equations are described in the following sections.
+
+![](media/VRF-FluidTCtrl-2a.png)
+
+*(a)	Heating Mode*
+
+![](media/VRF-FluidTCtrl-2b.png)
+
+*(b)	Cooling Mode*
+
+Figure VRF-FluidTCtrl-2. Schematic Pressure-Enthalpy Diagram for VRF Operation 
+
+![](media/VRF-FluidTCtrl-3a.png)
+
+*(a)	Heating Mode*
+
+![](media/VRF-FluidTCtrl-3b.png)
+
+*(b)	Cooling Mode*
+
+Figure VRF-FluidTCtrl-3. Flow Chart of the VRF-FluidTCtrl Model 
+
+The VRF-FluidTCtrl algorithms are described in details below, including the models of both the indoor and outdoor unit(s) of the VRF system. Because of the different control algorithms used in the outdoor unit for cooling and heating modes, the heating and cooling modes are described separately.
+
+#### *Modeling of the indoor unit (I/U) - Part I*
+
+##### Step 1.1: Obtaining zonal load/condition information
+
+Obtain the following information for each zone from the zone modules within EnergyPlus: 
+
+* zone sensible loads <span>$Q_{in, sensible}$</span>
+
+* zone total loads <span>$Q_{in, total}$</span>
+
+* indoor air temperature <span>$T_{in}$</span>
+
+* indoor air humidity ratio <span>$W_{in}$</span>
+
+The operation mode of the VRF system can therefore be determined from <span>$Q_{in, sensible}$</span>.
+
+##### Step 1.2: Calculate I/U required evaporator/condenser temperature
+
+Evaluate the required coil surface air temperature <span>$T_{fs}$</span> and the required evaporator/condenser refrigerant temperature <span>$T_{e,req}/{T_{c,req}}$</span> for each indoor unit. 
+
+Assuming the coil air flow rate is at the maximum (<span>$G_{a,rate}$</span>), the entering air temperature after the indoor coil fan can be calculated for each indoor unit:
+
+<div>$$T_{coil,in}=T_{in}+Q_{fan}/(G_{a,rate}\times{c_p}\times\rho_{in})$$</div>
+
+Where
+
+<span>$c_p$</span>	air heat capacity (kJ/(kg<span>$\cdot$</span>K))
+
+<span>$G_{a,rate}$</span>	volumetric flow rate of the air through the indoor unit, at the rated conditions (m<sup>3</sup>/s)
+
+<span>$Q_{fan}$</span>	sensible heat released by fan (W)
+
+<span>$T_{coil,in}$</span>	temperature of air entering the indoor coil (°C)
+
+<span>$\rho_{in}$</span>  	density of indoor air, <span>$f_{\rho}(T_{in},W_{in})$</span>  (kg/m<sup>3</sup>)
+
+The supply air temperature <span>$T_{out}$</span> can be calculated by:
+
+<div>$$T_{out}=T_{coil,in}-Q_{in, sensible}/(G_{a,rate}\times{c_p}\times\rho_{in})$$</div>
+
+Where
+
+<span>$T_{out}$</span>	temperature of the air leaving the indoor unit (supply air) (°C)
+
+The coil surface air temperature <span>$T_{fs}$</span> can be calculated, given the bypass factor <span>$BF$</span>:
+
+<div>$$T_{fs}= T_{coil,in}-(T_{coil,in}-T_{out})/(1-BF)$$</div>
+
+Where
+
+<span>$BF$</span>	bypass factor (different values for cooling mode and heating mode) 
+
+<span>$T_{fs}$</span>	indoor unit coil surface air temperature (°C)
+
+In the cooling mode, the superheating degree <span>$SH$</span> is given and thus the required evaporating temperature <span>$Te_{req}$</span> for the associated indoor unit can be obtained:
+
+<div>$$Te_{req}=T_{fs}-[A_c\cdot SH^2+B_c\cdot SH+C_c]$$</div>
+ 
+Where
+
+<span>$A_c$</span>, <span>$B_c$</span>, <span>$C_c$</span>   	coefficients (°C)
+
+<span>$SH$</span> 		superheating degrees for the indoor unit (°C) 
+
+<span>$SH_{ref}$</span> 		reference superheating degrees for the indoor unit (e.g., 3) (°C)
+
+<span>$Te_{req}$</span>		required evaporating temperature for a specific indoor unit (°C)
+
+In the heating mode, the subcooling degree <span>$SC$</span> is given and thus the required condensing temperature <span>$Tc_{req}$</span> for the associated indoor unit can be obtained:
+
+<div>$$Tc_{req}=T_{fs}+[A_h\cdot SC^2+B_h\cdot SC+C_h]$$</div>
+ 
+Where
+
+<span>$A_h$</span>, <span>$B_h$</span>, <span>$C_h$</span>  	coefficients (°C)
+
+<span>$SC$</span> 		subcooling degrees for the indoor unit (°C) 
+
+<span>$SC_{ref}$</span> 		reference subcooling degrees for the indoor unit (e.g., 5) (°C)
+
+<span>$Tc_{req}$</span>		required condensing temperature for a specific indoor unit (°C)
+
+##### Step 1.3: Calculate effective evaporating /condensing temperature
+
+There are two refrigerant temperature control strategies for the indoor unit: (1) *ConstantTemp*, (2) *VariableTemp*.
+
+ - In the *ConstantTemp* strategy, <span>$T_e$</span> and <span>$T_c$</span> are kept at constant values provided by the user.
+
+ - In the *VariableTemp* strategy, <span>$T_e$</span> and <span>$T_c$</span> are determined using the equations below:
+
+In the cooling mode:
+
+<div>$$Te=min\{max[min(Te_{req,i}),Te_{min}],Te_{max}\}$$</div>
+ 
+Where
+
+<span>$Te_{req,i}$</span>		required evaporating temperature for the ith indoor unit (°C)
+
+<span>$Te_{min}$</span>		minimum evaporating temperature for the indoor unit (e.g. 3) (°C)
+
+<span>$Te_{max}$</span>		maximum evaporating temperature for the indoor unit (e.g. 13) (°C)
+
+In the heating mode:
+
+<div>$$Tc=min\{max[min(Tc_{req,i}),Tc_{min}],Tc_{max}\}$$</div>
+ 
+Where
+
+<span>$Tc_{req,i}$</span>		required condensing temperature for the ith indoor unit (°C)
+
+<span>$Tc_{min}$</span>		minimum condensing temperature for the indoor unit (e.g. 42) (°C)
+
+<span>$Tc_{max}$</span>		maximum condensing temperature for the indoor unit (e.g. 46) (°C)
+
+#### *Modeling of the outdoor unit (O/U) - Cooling Mode*
+
+##### Step 2c.1: Piping loss calculation in the cooling mode
+
+Piping loss occurs when the refrigerant flows through the main pipe connecting the indoor and outdoor units. It includes both the refrigerant pressure drop and heat loss. It affects the VRF system operation in several ways. First, the heat loss creates an extra load to the system and leads to higher energy consumptions. Second, the pressure drop and heat loss changes the operational conditions of the compressor (i.e., compressor suction pressure and compressor suction temperature) and thus affects its operational performance. Therefore, the piping loss calculation is critical for the analysis of the whole system.
+
+Note that the change of compressor operational conditions may lead to different control strategies of the system, which in reverse affects the amount of piping loss. So the piping loss analysis and system performance analysis are coupled together. Numerical iterations are designed to address the coupling effect, as described below.
+
+Calculate the refrigerant flow rate for each indoor unit using assumed <span>$h_{Hexin}$</span>:
+
+<div>$$G_i=Q_i/(h_{Hexout,i}-h_{Hexin})$$</div>
+
+Where
+
+<span>$G_i$</span>   	refrigerant flow rate for the i<sup>th</sup> indoor unit (kg/s) 
+
+<span>$Q_i$</span>   	total cooling load of the i<sup>th</sup> zone (W) 
+
+<span>$h_{Hexin}$</span>	enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+
+<span>$h_{Hexout,i}$</span>	enthalpy of the refrigerant leaving a specific indoor unit (kJ/kg)
+
+<span>$h_{Hexout,i}$</span> is a function of <span>$P_e$</span>, <span>$T_e$</span>, and <span>$SH_i$</span>. It can be calculated using refrigerant thermodynamic property equations <span>$f_{g\_h}(P_e,T_e+SH_i)$</span>.
+
+The enthalpy of the refrigerant in the main loop <span>$h_{Hexout}$</span> can be obtained by calculating the weighted average of the enthalpy of the refrigerant in each indoor unit:
+
+<div>$$h_{Hexout}=\sum(h_{Hexout,i}\times{G_i}/{G_{tot}})$$</div>
+
+<div>$$G_{tot}=\sum{G_i}$$</div>
+
+Where
+
+<span>$G_{tot}$</span>   	refrigerant flow rate in the main loop (kg/s) 
+
+<span>$h_{Hexout}$</span>	enthalpy of the main loop refrigerant leaving indoor units (kJ/kg)
+
+The viscosity of the refrigerant within the pipe can be calculated via:
+
+<div>$$k_{v,1}=P_e/4926000$$</div>
+
+<div>$$k_{v,2}=h_{Hexout}/383.55$$</div>
+
+<div>$$k_{v,3}=(T_{Hexout}+273.15)/344.39$$</div>
+
+<div>$$\mu=10^6\times(4.302\times{k_{v,1}}+0.81622\times{k_{v,1}}^2-120.98\times{k_{v,2}}+139.17\times{k_{v,2}}^2+118.76\times{k_{v,3}}+81.04\times{k_{v,3}}^2+5.7858\times{k_{v,1}}\times{k_{v,2}}-8.3817\times{k_{v,1}}\times{k_{v,3}}-218.48\times{k_{v,2}}\times{k_{v,3}}+21.58)$$</div>
+
+Where
+
+<span>$\mu$</span>	viscosity of the refrigerant within the pipe (Pa-s)
+
+<span>$k_{v,i}$</span>	coefficients to calculate the refrigerant viscosity 
+
+<span>$T_{Hexout}$</span>	temperature of main loop refrigerant leaving indoor units, <span>$f_{g\_t}(P_e,h_{Hexout})$</span> (°C)
+
+<span>$f_{g\_t}$</span> 	functions calculating the temperature of superheating refrigerant 
+
+Given <span>$h_{Hexout}$</span> and <span>$P_e=f_{s\_p}(T_e)$</span>, the following dimensionless quantities describing the refrigerant flow state can be obtained:
+
+<div>$$Re=G_{tot}/3600/(0.25\times\pi\times{D^2})\times{D}/\mu$$</div>
+
+<div>$$Pr=\mu\times{f_{g\_Cp}(P_e,h_{Hexout})}\times{0.001}/f_{g\_\lambda}(P_e,h_{Hexout})$$</div>
+
+<div>$$Nu=0.023\times{Re^{0.8}\times{Pr^{0.3}}}$$</div>
+
+<div>$$St=Nu/Re/Pr$$</div>
+
+Where
+
+<span>$P_e$</span>  	evaporating pressure (Pa) 
+
+<span>$Re$</span> 	Reynolds number 
+
+<span>$Pr$</span> 	Prandtl number 
+
+<span>$Nu$</span> 	Nusselt number 
+
+<span>$St$</span> 	Stanton number 
+
+<span>$\mu$</span>	viscosity of the refrigerant within the pipe (Pa-s)
+
+<span>$f_{s\_p}$</span> 	functions calculating the pressure of saturated refrigerant 
+
+<span>$f_{g\_Cp}$</span> 	functions calculating the specific heat of superheating refrigerant 
+
+<span>$f_{g\_\lambda}$</span>	functions calculating the conductivity of superheating refrigerant 
+
+Then the piping pressure loss <span>$\Delta{P_{pipe}}$</span> can be obtained using the above dimensionless quantities:
+
+<div>$$\Delta{P_{pipe}}=8\times{St}\times{Pr^{2/3}}\times{L/D}\times{f_{g\_\rho}(P_e,h_{Hexout})}\times{V^2}/2+H\times{f_{g\_\rho}(P_e,h_{Hexout})}\times9.80665$$</div>
+
+<div>$$P_s=P_e-\Delta{P_{pipe}}$$</div>
+
+Where
+
+<span>$f_{g\_\rho}$</span>	functions calculating the density of superheating refrigerant 
+
+<span>$D$</span>   	main pipe diameter (m) 
+
+<span>$H$</span> 	height difference between the outdoor unit node and indoor unit node of the main pipe (m)
+
+<span>$L$</span>   	main pipe length (m) 
+
+<span>$P_s$</span>   	compressor suction pressure (Pa) 
+
+<span>$\Delta{P_{pipe}}$</span>	pressure drop in the pipe (Pa)
+
+<span>$V$</span>	refrigerant flow velocity (m/s)
+
+The suction saturated temperature <span>$T'_e$</span> (i.e., saturated vapor temperature corresponding to the compressor suction pressure) can be obtained via refrigerant thermodynamic property equations:
+
+<div>$$T'_e=f_{s\_t}(P_e-\Delta{P_{pipe}})$$</div>
+
+Where
+
+<span>$f_{s\_t}$</span>	functions calculating the temperature of saturated refrigerant
+
+<span>$T'_e$</span>   	suction saturated temperature at the compressor inlet (°C)
+
+The heat loss through the pipe can be obtained via:
+
+<div>$$k_1=Nu\times{f_{g\_\lambda}(P_e,h_{Hexout})}$$</div>
+
+<div>$$k_2=2\times{\lambda_i}/Ln(1+2\times{W_i}/D)$$</div>
+
+<div>$$k_3=h\times(D+2\times{W_i})$$</div>
+
+<div>$$Q_{pipe}=(\pi\times{L})\times(T_a-T_{Hexout})/(1/k_1+1/k_2+1/k_3)$$</div>
+
+Where
+
+<span>$f_{g\_\lambda}$</span>	functions calculating the conductivity of superheating refrigerant 
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+<span>$T_a$</span> 	average of outdoor air temperature and indoor temperature (°C)
+
+<span>$T_{Hexout}$</span>	temperature of main pipe refrigerant leaving indoor units (°C) 
+
+<span>$w_i$</span>	pipe insulation thickness (m) 
+
+<span>$k_i$</span>	coefficients for the piping loss calculation  
+
+Note that <span>$Q_{pipe}$</span> is calculated using an assumed <span>$h_{Hexin}$</span>. Its value affects the compressor operation calculations as shown in Step 2c.2~2c.6 and may change the value of condensing temperature <span>$T_c$</span>. This leads to an updated <span>$h_{Hexin}=f(P_c,T_c-SC)$</span>. If the difference between the calculated <span>$h_{Hexin}$</span> and the assumed <span>$h_{Hexin}$</span> is higher than the assigned tolerance (5%), a new round of iteration is performed using the calculated <span>$h_{Hexin}$</span>.
+
+##### Step 2c.2: Initialize O/U operation conditions
+
+The compressor operation is coupled with a number operational parameters, which makes it difficult to obtain an analytical solution. In the algorithm, an iterative approach is designed to obtain the energy consumption of the compressor (Step 2c.2 – 2c.6).
+
+For the first iteration, 
+
+* Initialize outdoor unit <span>$SC$</span> with the reference value (from IDF input, e.g., 5°C)
+
+* Initialize the compressor power <span>$N_{comp}$</span> with the value calculated from the reference <span>$COP$</span> (e.g., 3.5):
+
+<div>$$N'_{comp}=\frac{\sum_iQ_{in,total,i}}{COP}$$</div>
+
+Where
+
+<span>$N_{comp}$</span>	compressor power (W)
+
+<span>$N'_{comp}$</span>	assumed compressor power for the first iteration (W)
+
+<span>$Q_{in,total,i}$</span>	total cooling load for zone <span>$i$</span> (W)
+
+For the following iterations,
+
+* Initialize <span>$SC$</span> with the calculated value in the previous iteration  
+
+* Initialize the compressor power <span>$N_{comp}$</span> with the calculated value in the previous iteration
+
+The heat rate released from the outdoor unit can be calculated by:
+
+<div>$$Q_{out}=\sum_iQ_{in,total,i}+N_{comp}+Q_{pipe}$$</div> 
+
+Where
+
+<span>$Q_{out}$</span>	heat rate released from the outdoor unit (W)
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+##### Step 2c.3: Calculate O/U effective condensing temperature
+
+ (1) Calculate the required coil surface air temperature <span>${T_{fs}}'$</span> for the outdoor unit.
+
+The temperature of the air leaving the outdoor unit <span>${T_{out}}'$</span> can be calculated by:
+ 
+<div>$${T_{out}}'={T_{in}}'+Q_{out}/({G_{a,rate}}'\times{c_p}\times{{\rho_{in}}'})$$</div>
+ 
+Where
+
+<span>${G_{a,rate}}'$</span>	volumetric flow rate of the air through the outdoor unit, at the rating conditions (m<sup>3</sup>/s)
+
+<span>${T_{out}}'$</span>	temperature of the air leaving the outdoor unit (°C)
+
+<span>${T_{in}}'$</span>	temperature of the air entering the outdoor unit, i.e., outdoor air (°C)
+
+<span>${\rho_{in}}'$</span>  	air density at outdoor conditions,<span>$f_{\rho}({T_{in}}',{W_{in}}')$</span>   (kg/m<sup>3</sup>)
+
+The condenser surface temperature <span>${T_{fs}}'$</span> can be calculated by:
+ 
+<div>$${T_{fs}}'={T_{in}}'+({T_{out}}'-{T_{in}}')/(1-{BF_c}')$$</div>
+ 
+Where
+
+<span>${BF_c}'$</span> 	bypass factor for the outdoor unit  
+
+(2) Calculate required condensing temperature for the outdoor unit <span>$Tc_{req}$</span> and then the effective condensing temperature <span>$Tc$</span> (between 42-46°C)
+ 
+<div>$$Tc_{req}={T_{fs}}'+[A_h\cdot SC^2+B_h\cdot SC+C_h]$$</div>
+
+<div>$$Tc=Tc_{req}$$</div>
+
+Where	
+
+<span>$A_h$</span>,<span>$B_h$</span>,<span>$C_h$</span>   	coefficients (°C)
+
+<span>$SC$</span> 		subcooling degrees for the outdoor unit (°C)
+
+<span>$SC_{ref}$</span> 		reference subcooling degrees for the outdoor unit (°C)
+
+<span>$Tc_{req}$</span>		required condensing temperature for the outdoor unit (°C)
+
+<span>$Tc$</span>		effective condensing temperature (°C)
+
+##### Step 2c.4: Calculate required Loading Index 
+
+Loading Index is used to describe the operational mode of the compressor system. The first index represents minimal capacity operation, while the last index represents full capacity operation. 
+
+The required Loading Index can be calculated by the following procedures. 
+
+a. Calculate the evaporative capacity at a variety of Loading Index:
+
+<div>$$M_{cap}=(r_1+r_2T_c+r_3{T_e}'+r_4T_c^2+r_5T_c{T_e}'+r_6{T_e}'^2)$$</div>
+<div>$$Q_{rps}=C_{cap,system} \times M_{cap} \times Q_{ref} $$</div>
+
+Where	
+
+<span>$C_{cap,system}$</span>	evaporative capacity correction factor, describing the possible system configuration difference between test bed and real system (a constant value obtained from manufacturer data)  
+
+<span>$r_1$</span>,…,<span>$r_6$</span>  	empirical coefficients corresponding to <span>$rps$</span>  
+
+<span>$rps$</span>	compressor speed (r/s) 
+
+<span>${T_e}'$</span>   	suction saturated temperature at the compressor inlet (°C)
+
+<span>$T_c$</span>	effective condensing temperature (°C)
+
+<span>$M_{cap}$</span>	multiplier for the evaporative capacity calculation (--)
+
+<span>$Q_{rps}$</span>	evaporative capacity corresponding to <span>$rps$</span> (W) 
+
+<span>$Q_{ref}$</span>	rated evaporative capacity (W) 
+
+An example of resulting capacity for different <span>$rps$</span> (at <span>$T_c$</span>=36°C and <span>${T_e}'$</span>=9°C) is presented in Table 1.
+
+Table 1– Evaporative capacity at different Loading Index 
+
+| Loading Index (<span>$rps$</span>) | Evaporative Capacity (kW),<span>$T_c$</span>=36°C,<span>${T_e}'$</span>=9°C| Loading Index (<span>$rps$</span>) | Evaporative Capacity (kW),<span>$T_c$</span>=36°C,<span>${T_e}'$</span>=9°C|
+|---------------------|-----------------------------|---------------------|-----------------------------|
+|    1 (18)           |    3.951                    |    2 (25)           |    5.400                    |
+|    3 (30)           |    6.435                    |    4 (36)           |    8.516                    |
+|    5 (45)           |    10.756                   |    6 (60)           |    14.445                   |
+|    7 (75)           |    18.412                   |    8 (90)           |    22.045                   |
+|    9 (108)          |    26.162                   |                     |                             |
+
+b. Find the <span>$rps$</span> range that covers the required evaporative capacity <span>$Q_{rps,modify}$</span>.  
+
+<div>$$Q_{rps,modify}=C_{cap,operation}\times(\sum{Q_{in,total}}+Q_{pipe})$$</div>
+
+<div>$$C_{cap,operation}=C_{cap,density}\times{C_{cap,enthalpy}}$$</div>
+
+<div>$$C_{cap,density}=\rho_{test}/\rho_{real}$$</div>
+
+<div>$$C_{cap,enthalpy}=\frac{h_{Evapout,test}-h_{Evapin,test}}{h_{Compin,real}-h_{Evapin,real}}$$</div>
+
+<div>$$h_{Compin,real}=h_{Hexout,real}+Q_{pipe}/G_{tot}$$</div>
+
+Where	
+
+<span>$C_{cap,operation}$</span> evaporative capacity correction factor, describing the operational difference between test cases and real cases (i.e., <span>$SH$</span> and <span>$SC$</span>)  
+
+<span>$C_{cap,density}$</span> evaporative capacity correction factor, describing the variations of refrigerant density at test conditions and real operational conditions  
+
+<span>$C_{cap,enthalpy}$</span> evaporative capacity correction factor, describing the variations of refrigerant enthalpy at test conditions and real operational conditions  
+
+<span>$G_{tot}$</span>   	refrigerant flow rate in the main loop (kg/s) 
+
+<span>$h_{Evapin,real}$</span> enthalpy of refrigerant entering the evaporators (IU) at real conditions [kJ/kg]
+
+<span>$h_{Evapout,real}$</span> average enthalpy of refrigerant leaving the evaporators (IU) at real conditions [kJ/kg] 
+
+<span>$h_{Evapin,test}$</span> enthalpy of refrigerant entering the evaporator at test conditions (It corresponds to <span>$SC$</span> at test condition(e.g., 5 °C)  and Tc) (kJ/kg)
+
+<span>$h_{Evapout,test}$</span> enthalpy of refrigerant leaving the evaporator at test conditions  (It corresponds to <span>$SH$</span> at test condition(e.g., 8 °C)  and Te) (kJ/kg) 
+
+<span>$h_{Compin}$</span>	enthalpy of refrigerant entering the compressor (kJ/kg)
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+For example, if the required capacity is 8 kW, the <span>$rps$</span> range is 30 to 36.
+
+c. Calculate the <span>$rps$</span> that meets the required capacity by interpolation. In the above example, the resulting <span>$rps$</span> is 34.5 <span>$rps$</span>.
+
+d. If the calculated <span>$rps$</span> is lower than the minimum <span>$rps$</span> (e.g. 18<span>$rps$</span>), go to Step 2c.5, otherwise skip Step 2c.5 and directly go to Step 2c. 6.
+
+##### Step 2c.5: Modify evaporating temperature to further reduce outdoor unit capacity
+
+If the calculated <span>$rps$</span> is lower than the minimum <span>$rps$</span> (e.g. 18<span>$rps$</span>), it means that the zone cooling load is even lower than the system evaporative capacity corresponding to the minimum compressor speed. In this situation, the evaporating temperature <span>$T_e$</span> as well as the superheating degree <span>$SH$</span> is modified to further reduce the outdoor unit capacity. More specifically: 
+
+a. Set <span>$rps$</span> at its minimum value (e.g., 18 <span>$rps$</span>).
+
+b. Update <span>${T_e}'$</span> to meet the required evaporative capacity, using equations described in Step 2c.4a.
+
+c. Update <span>$T_e$</span> to meet the updated <span>${T_e}'$</span>. Note that due to the <span>$T_e$</span> updates, the refrigerant state and flow rate are changed and thus the piping loss analysis should also be repeated (Step 2c.1). So is the calculation of <span>$C_{cap,operation}$</span> (Step 2c.2-2c.3).
+
+d. <span>$SH$</span> can be updated based on the updated <span>$T_e$</span>, using the equations shown in Step 1.2. 
+
+##### Step 2c.6: Calculate the compressor power
+
+(1) Calculate the compressor power by the following procedures.
+
+a. Calculate the compressor power at a variety of loading index using the following equation. The resulting table (Table 2) from the same example used above is shown below. 
+
+<div>$$M_{comp}=c_1+c_2T_c+c_3{T_e}'+c_4T_c^2+c_5T_c{T_e}'+c_6{T_e}'^2$$</div>
+<div>$$N_{comp,rps}=M_{comp} \times N_{comp,ref}$$</div>
+
+Where	
+
+<span>$c_1$</span>,…,<span>$c_6$</span>   	empirical coefficients corresponding to <span>$rps$</span>  
+
+<span>${T_e}'$</span> 		suction saturated temperature at the compressor inlet (°C)
+
+<span>$T_c$</span>		effective condensing temperature (°C)
+
+<span>$M_{comp}$</span>		multiplier for the compressor power calculation (--)
+
+<span>$N_{comp,ref}$</span>	rated compressor power  (W)
+
+<span>$N_{comp,rps}$</span>	compressor power corresponding to <span>$rps$</span> (W)
+
+Table 2 – Outdoor unit compressor power at different Loading Index 
+
+| Loading Index (<span>$rps$</span>) | Elec. Power (kW), <span>$T_c$</span>=36°C, <span>${T_e}'$</span>=9°C| Loading Index (<span>$rps$</span>) | Elec. Power (kW), <span>$T_c$</span>=36°C, <span>${T_e}'$</span>=9°C|
+|---------------------|----------------------------|---------------------|----------------------------|
+|    1 (18)           |    0.527                   |    2 (25)           |    0.766                   |
+|    3 (30)           |    0.936                   |    4 (36)           |    1.227                   |
+|    5 (45)           |    1.546                   |    6 (60)           |    2.149                   |
+|    7 (75)           |    2.760                   |    8 (90)           |    3.357                   |
+|    9 (108)          |    4.359                   |                     |                            |
+
+b. According to the <span>$rps$</span> range determined, calculate the compressor power <span>$N_{comp}$</span>  by interpolation. In the above example, the compressor power is 1.155 kW. 
+
+(2) Compare the calculated <span>$N_{comp}$</span> above with the initialized <span>${N_{comp}}'$</span> in Step 2c.2:
+
+* If  <span>${N_{comp}}'-N_{comp}>\delta$</span> then go to Step 2c.2 for a new round of iteration.
+
+* Else, end the iteration and go to Step 2c.7.
+
+##### Step 2c.7: Total power consumption of the outdoor unit
+
+Calculate the total electric power consumption by the outdoor unit:
+
+<div>$$N_{out}=N_{fan}+N_{comp}/e_{inv}$$</div>
+
+Where	
+
+<span>$e_{inv}$</span>	efficiency of the inverter of compressor  
+
+<span>$N_{fan}$</span>	electric power consumption by the outdoor fan (W)
+
+<span>$N_{out}$</span>	total electric power consumption by the outdoor unit (W)
+
+#### *Modeling of the outdoor unit (O/U) - Heating Mode*
+
+##### Step 2h.1: Piping loss calculation in the heating mode
+
+Similarly to that in the cooling mode, the piping loss analysis in the heating mode needs to address the coupling effect between the piping loss and system operations. However, due to the control strategy difference between the two modes, the piping loss algorithm in the heating mode requires different calculation steps and more numerical iterations, as shown below.
+
+Calculate the refrigerant flow rate for each indoor unit using assumed <span>$h_{Hexin}$</span>:
+
+<div>$$G_i=Q_i/(h_{Hexin}-h_{Hexout,i})$$</div>
+
+Where
+
+<span>$G_i$</span>   	refrigerant flow rate for the i<sup>th</sup> indoor unit (kg/s) 
+
+<span>$Q_i$</span>   	total heating load of the i<sup>th</sup> zone (W) 
+
+<span>$h_{Hexin}$</span>	enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+
+<span>$h_{Hexout,i}$</span>	enthalpy of the refrigerant leaving a specific indoor unit (kJ/kg)
+
+<span>$h_{Hexout,i}$</span> is a function of <span>$P_c$</span>, <span>$T_c$</span>, and <span>$SC_i$</span>. It can be calculated using refrigerant thermodynamic property equations <span>$f_{g\_h}(P_c,T_c-SC_i)$</span>.
+
+The refrigerant flow rate in the main loop can be obtained by summing up the flow rate in each indoor unit:
+
+<div>$$G_{tot}=\sum{G_i}$$</div>
+
+Where
+
+<span>$G_{tot}$</span>   	refrigerant flow rate in the main loop (kg/s) 
+
+Calculate the average refrigerant pressure and enthalpy within the pipes, using assumed piping pressure loss <span>$\Delta{P_{pipe}}$</span> and <span>$h_{Tdi}$</span>: 
+
+<div>$$P_{ave}=P_c+\Delta{P_{pipe}}/2$$</div>
+
+<div>$$h_{ave}=(h_{Hexin}+h_{Tdi})/2$$</div>
+
+Where
+
+<span>$h_{ave}$</span> 	average refrigerant enthalpy within the main pipe (kJ/kg)
+
+<span>$h_{Hexin}$</span>	enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+
+<span>$h_{Tdi}$</span> enthalpy of the refrigerant leaving the compressor (kJ/kg)
+
+<span>$P_{ave}$</span> 	average refrigerant pressure within the main pipe (Pa)
+
+<span>$P_c$</span>   	condensing pressure (Pa) 
+
+<span>$\Delta{P_{pipe}}$</span>	pressure drop in the main pipe (Pa)
+
+The viscosity of the refrigerant within the pipe can be calculated given <span>$P_{ave}$</span> and <span>$h_{ave}$</span>, using the following equations:
+
+<div>$$k_{v,1}=P_{ave}/4926000$$</div>
+
+<div>$$k_{v,2}=h_{ave}/383.55$$</div>
+
+<div>$$k_{v,3}=(T_{ave}+273.15)/344.39$$</div>
+
+<div>$$\mu=10^6\times(4.302\times{k_{v,1}}+0.81622\times{k_{v,1}}^2-120.98\times{k_{v,2}}+139.17\times{k_{v,2}}^2+118.76\times{k_{v,3}}+81.04\times{k_{v,3}}^2+5.7858\times{k_{v,1}}\times{k_{v,2}}-8.3817\times{k_{v,1}}\times{k_{v,3}}-218.48\times{k_{v,2}}\times{k_{v,3}}+21.58)$$</div>
+
+Where
+
+<span>$\mu$</span>	viscosity of the refrigerant within the pipe (Pa-s)
+
+<span>$k_{v,i}$</span>	coefficients to calculate the refrigerant viscosity 
+
+<span>$h_{ave}$</span> 	average refrigerant enthalpy within the pipes (kJ/kg)
+
+<span>$P_{ave}$</span> 	average refrigerant pressure within the pipes (Pa)
+
+<span>$T_{ave}$</span>	average temperature of refrigerant leaving indoor units, which corresponds to <span>$P_{ave}$</span> and <span>$h_{ave}$</span> (°C)
+
+Given <span>$P_{ave}$</span> and <span>$h_{ave}$</span>, the following dimensionless quantities describing the refrigerant flow state can be obtained:
+
+<div>$$Re=G_{tot}/3600/(0.25\times\pi\times{D^2})\times{D}/\mu$$</div>
+
+<div>$$Pr=\mu\times{f_{g\_Cp}(P_{ave},h_{ave})}\times{0.001}/f_{g\_\lambda}(P_{ave},h_{ave})$$</div>
+
+<div>$$Nu=0.023\times{Re^{0.8}\times{Pr^{0.4}}}$$</div>
+
+<div>$$St=Nu/Re/Pr$$</div>
+
+Where
+
+<span>$Re$</span> 	Reynolds number 
+
+<span>$Pr$</span> 	Prandtl number 
+
+<span>$Nu$</span> 	Nusselt number 
+
+<span>$St$</span> 	Stanton number 
+
+<span>$\mu$</span>	viscosity of the refrigerant within the pipe (Pa-s)
+
+<span>$f_{g\_Cp}$</span> 	functions calculating the specific heat of superheating refrigerant 
+
+<span>$f_{g\_\lambda}$</span>	functions calculating the conductivity of superheating refrigerant 
+
+Then the piping pressure loss <span>$\Delta{P_{pipe}}$</span> can be obtained using the above dimensionless quantities:
+
+<div>$$\Delta{P_{pipe}}=8\times{St}\times{Pr^{2/3}}\times{L/D}\times{f_{g\_\rho}(P_{ave},h_{ave})}\times{V^2}/2-H\times{f_{g\_\rho}(P_{ave},h_{ave})}\times9.80665$$</div>
+
+Where
+
+<span>$f_{g\_\rho}$</span>	functions calculating the density of superheating refrigerant 
+
+<span>$D$</span>   	main pipe diameter (m) 
+
+<span>$H$</span> 	height difference between the outdoor unit node and indoor unit node of the main pipe (m)
+
+<span>$L$</span>   	main pipe length (m) 
+
+<span>$St$</span> 	Stanton number 
+
+<span>$Re$</span> 	Reynolds number 
+
+<span>$Pr$</span> 	Prandtl number 
+
+<span>$\Delta{P_{pipe}}$</span>	pressure drop in the pipe (Pa)
+
+<span>$V$</span>	refrigerant flow velocity (m/s)
+
+Compare the calculated <span>$\Delta{P_{pipe}}$</span> and the one assumed above. If the difference is higher than the assigned tolerance (5%), a new round of iteration is performed using the calculated <span>$\Delta{P_{pipe}}$</span>.
+
+The compressor discharge saturated temperature <span>$T'_c$</span> (i.e., saturated vapor temperature corresponding to compressor discharge pressure) can be obtained via:
+
+<div>$$T'_c=f_{s\_t}(P_c+\Delta{P_{pipe}})$$</div>
+
+Where
+
+<span>$f_{s\_t}$</span>	functions calculating the temperature of saturated refrigerant
+
+<span>$T'_c$</span>    	discharge saturated temperature at the compressor outlet (°C)
+
+<span>$P_c$</span>    	condensing pressure (Pa)
+
+<span>$\Delta{P_{pipe}}$</span>	pressure drop in the pipe (Pa)
+
+The heat loss through the pipe can be obtained via:
+
+<div>$$k_1=Nu\times{f_{g\_\lambda}(P_{ave},h_{ave})}$$</div>
+
+<div>$$k_2=2\times{\lambda_i}/Ln(1+2\times{W_i}/D)$$</div>
+
+<div>$$k_3=h\times(D+2\times{W_i})$$</div>
+
+<div>$$Q_{pipe}=(\pi\times{L})\times(T_a-T_{Hexin})/(1/k_1+1/k_2+1/k_3)$$</div>
+
+Where
+
+<span>$f_{g\_\lambda}$</span>	functions calculating the conductivity of superheating refrigerant 
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+<span>$T_a$</span> 	average of outdoor air temperature and indoor temperature (°C)
+
+<span>$T_{Hexin}$</span>	average of entering indoor units (°C)
+
+<span>$w_i$</span>	pipe insulation thickness (m) 
+
+<span>$k_i$</span>	coefficients for the piping loss calculation  
+
+The enthalpy of the refrigerant entering the indoor unit can be updated using the calculated <span>$Q_{pipe}$</span>:
+
+<div>$$h_{Tdi}=h_{Hexin}+Q_{pipe}/G_{tot}$$</div>
+
+Where
+
+<span>$h_{Hexin}$</span>	enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+
+<span>$h_{Tdi}$</span> enthalpy of the refrigerant leaving the compressor (kJ/kg)
+
+<span>$G_{tot}$</span>   	refrigerant flow rate in the main loop (kg/s) 
+
+Compare the calculated <span>$h_{Tdi}$</span> and the one assumed above. If the difference is higher than the assigned tolerance (5%), a new round of iteration is performed using the calculated <span>$h_{Tdi}$</span>.
+
+Note that <span>$Q_{pipe}$</span> is calculated using an assumed <span>$h_{Hexin}$</span> at the beginning of the piping loss algorithm. Its value affects the compressor operation calculations as shown in Step 2h.2~2h.6 and may change the value of evaporating temperature <span>$T_e$</span>. This leads to an updated <span>$h_{Hexin}=f(P_e,T_e+SH,N_{comp},G_{tot})$</span>. If the difference between the calculated result and the assumed value is higher than the assigned tolerance (5%), a new round of iteration is performed using the calculated <span>$h_{Hexin}$</span>.
+
+##### Step 2h.2: Initialize O/U operation conditions
+
+Similar to that in cooling mode, an iteration approach is designed to determine the energy consumption of the compressor (Step 2h. 2 to Step 2h. 6).
+
+For the first iteration, 
+
+* Initialize outdoor unit <span>$SH$</span> with the reference value (from IDF input, e.g., 1.5°C)
+
+* Iinitialize the compressor power <span>$N_{comp}$</span> with the value calculated from the reference <span>$COP$</span> (e.g., 3.5):
+
+<div>$$N'_{comp}=\frac{\sum_iQ_{in,total,i}}{COP}$$</div>
+
+Where
+
+<span>$N_{comp}$</span>	compressor power (W)
+
+<span>$N'_{comp}$</span>	assumed compressor power for the first iteration (W)
+
+<span>$Q_{in,total,i}$</span>	total heating load for zone <span>$i$</span> (W)
+
+For the following iterations,
+
+* Initialize <span>$SH$</span> with the calculated value in the previous iteration  
+
+* Initialize the compressor power <span>$N_{comp}$</span> with the calculated value in the previous iteration
+
+Calculate the heat rate extracted by the outdoor unit by:
+
+<div>$$Q_{out}=\sum_iQ_{in,total,i}+Q_{pipe}-N_{comp}$$</div> 
+
+Where
+
+<span>$Q_{out}$</span>	heat rate extracted by the outdoor unit (W)
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+##### Step 2h.3: Calculate O/U effective evaporating temperature
+
+(1) Calculate the required coil surface air temperature <span>${T_{fs}}'$</span> for the outdoor unit.
+
+The enthalpy of the air leaving the outdoor unit can be calculated by:
+ 
+<div>$${H_{fs}}'={H_{in}}'-Q_{out}/({G_{a,rate}}'\times{\rho_o})/(1-BF')$$</div>
+
+The coil surface air temperature <span>${T_{fs}}'$</span> can be calculated from the <span>${H_{fs}}'$</span>:
+
+<div>$$if\quad{H_{fs}}'<H_{98\%,W_o}\quad{then}\quad{T_{fs}}'=f({H_{fs}}',98\%)$$</div>
+
+<div>$$if\quad{H_{fs}}'\ge{H_{98\%,W_o}}\quad{then}\quad{T_{fs}}'=f({H_{fs}}',W_o)$$</div>
+ 
+Where
+
+<span>$BF'$</span> 	bypass factor for the outdoor unit  
+
+<span>${G_{a,rate}}'$</span>	volumetric flow rate of the air through the outdoor unit, at the rating conditions (m<sup>3</sup>/s)
+
+<span>${H_{fs}}'$</span>	enthalpy of the air leaving the outdoor unit (kJ/kg)
+
+<span>${H_{in}}'$</span>	enthalpy of the air entering the outdoor unit, i.e., outdoor air (kJ/kg)
+
+<span>$W_o$</span>       humidity ratio of the outdoor air (kg/kg)
+
+<span>$\rho_o$</span>     density of the outdoor air (kg/m<sup>3</sup>)
+
+(2) Calculate required evaporating temperature for the outdoor unit <span>$Te_{req}$</span> and then the effective evaporating temperature <span>$Te$</span>.
+ 
+<div>$$Te_{req}={T_{fs}}'-[{A_c}'\cdot SH^2+{B_c}'\cdot SH+{C_c}']$$</div>
+
+<div>$$Te=Te_{req}$$</div>
+
+Where	
+
+<span>${A_c}'$</span>,<span>${B_c}'$</span>,<span>${C_c}'$</span>   	coefficients (°C)
+
+<span>$SH$</span>			superheating degrees for the outdoor unit (°C)
+
+<span>$SH_{ref}$</span>	reference superheating degrees for the outdoor unit (°C)
+
+<span>$Te_{req}$</span>	required evaporating temperature for the outdoor unit (°C)
+
+<span>$Te$</span>		effective evaporating temperature (°C)
+
+##### Step 2h.4: Calculate required compressor Loading Index
+
+Calculate the required compressor Loading Index by the following procedures.
+
+a. Calculate the evaporative capacity at a variety of speeds:
+
+<div>$$M_{cap}=C_{cap,system}\times(r_1+r_2{T_c}'+r_3T_e+r_4{T_c}'^2+r_5{T_c}'T_e+r_6T_e^2)$$</div>
+<div>$$Q_{rps}=C_{cap,system} \times M_{cap} \times Q_{ref}$$</div>
+
+Where	
+
+<span>$C_{cap,system}$</span>	evaporative capacity correction factor, describing the possible system configuration difference between test bed and real system (obtained from manufacturer data)  
+
+<span>$r_1$</span>,…,<span>$r_6$</span>  	empirical coefficients corresponding to <span>$rps$</span>  
+
+<span>$rps$</span>	compressor speed (r/s) 
+
+<span>$T_e$</span>   	effective evaporating temperature (°C)
+
+<span>$M_{cap}$</span>	multiplier for the evaporative capacity calculation (--)
+
+<span>${T_c}'$</span>	discharge saturated temperature at the compressor outlet (°C)
+
+<span>$Q_{rps}$</span>	evaporative capacity corresponding to <span>$rps$</span> (W) 
+
+<span>$Q_{ref}$</span>	rated evaporative capacity (W) 
+
+An example of resulting capacity for different <span>$rps$</span> (at <span>${T_c}'$</span>=36°C and <span>$T_e$</span>=9°C) is presented in Table 3.
+
+Table 3– evaporative capacity at different Loading Index 
+
+| Loading Index (<span>$rps$</span>) | Evaporative Capacity (kW),<span>${T_c}'$</span>=36°C,<span>$T_e$</span>=9°C| Loading Index (<span>$rps$</span>) | Evaporative Capacity (kW),<span>${T_c}'$</span>=36°C,<span>$T_e$</span>=9°C|
+|---------------------|-----------------------------|---------------------|-----------------------------|
+|    1 (18)           |    3.951                    |    2 (25)           |    5.400                    |
+|    3 (30)           |    6.435                    |    4 (36)           |    8.516                    |
+|    5 (45)           |    10.756                   |    6 (60)           |    14.445                   |
+|    7 (75)           |    18.412                   |    8 (90)           |    22.045                   |
+|    9 (108)          |    26.162                   |                     |                             |
+
+b. Find the <span>$rps$</span> range that covers the required evaporative capacity <span>$Q_{rps,modify}$</span>.  
+
+<div>$$Q_{rps,modify}=C_{cap,operation}\times(\sum{Q_{in,total}}+Q_{pipe}-N_{comp})$$</div>
+
+<div>$$C_{cap,operation}=C_{cap,density}\times{C_{cap,enthalpy}}$$</div>
+
+<div>$$C_{cap,density}=\rho_{test}/\rho_{real}$$</div>
+
+<div>$$C_{cap,enthalpy}=\frac{h_{Evapout,test}-h_{Condout,test}}{h_{Compin,real}-h_{Condout,real}}$$</div>
+
+Where	
+
+<span>$C_{cap,operation}$</span>	evaporative capacity correction factor, describing the operational difference between test cases and real cases (i.e., <span>$SH$</span> and <span>$SC$</span>)  
+
+<span>$C_{cap,density}$</span>	evaporative capacity correction factor, describing the variations of refrigerant density at test conditions and real operational conditions  
+
+<span>$C_{cap,enthalpy}$</span>	evaporative capacity correction factor, describing the variations of refrigerant enthalpy at test conditions and real operational conditions  
+
+<span>$h_{Condout,test}$</span> 	enthalpy of refrigerant leaving the condensers (IU) at test conditions  (It corresponds to <span>$SH$</span> at test condition(e.g., 8°C)  and <span>$Te$</span>) (kJ/kg) 
+
+<span>$h_{Condout,real}$</span> 	average enthalpy of refrigerant leaving the condensers (IU) at real conditions (kJ/kg)
+
+<span>$h_{Compin,real}$</span>	enthalpy of refrigerant entering the compressor at real conditions (It corresponds to <span>$SH$</span> and <span>$Te$</span> at real conditions) (kJ/kg)
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+For example, if the required capacity is 8 kW, the <span>$rps$</span> range is 30 to 36 <span>$rps$</span> based on Table 3.
+
+c. Calculate the <span>$rps$</span> that meets the need by interpolation. In the above example, the resulting <span>$rps$</span> is 34.5 <span>$rps$</span>.
+
+d. If the calculated <span>$rps$</span> is lower than the minimum <span>$rps$</span> (e.g. 18<span>$rps$</span>), go to Step 2h. 5; otherwise, skip Step 2h. 5 and go to Step 2h. 6.
+
+##### Step 2h.5: Modify evaporating temperature to further reduce outdoor unit capacity 
+
+If the calculated <span>$rps$</span> is lower than the minimum <span>$rps$</span> (e.g. 18 <span>$rps$</span>), it means that the zone heating load (indoor unit side) is so low that it leads to an evaporative capacity (outdoor unit side) which is even lower than the system evaporative capacity corresponding to the minimum compressor speed. In this situation, the evaporating temperature <span>$Te$</span> as well as the superheating degree <span>$SH$</span> is modified to further reduce the outdoor unit capacity. More specifically: 
+
+a. Set <span>$rps$</span> at its minimum value (e.g., 18 <span>$rps$</span>).
+
+b. Update <span>$Te$</span> to meet the required evaporative capacity, using equations described in Step 2h.4a.
+
+c. <span>$SH$</span> for each indoor unit can be updated using the equations shown in Step 1.2.
+
+It should be noted that, different from the corresponding step in the cooling mode (Step 2c.5), the <span>$Te$</span> and <span>$SH$</span> updates in the heating mode do not affect the refrigerant state and flow rate calculations (as shown in Step 2h.1). Therefore, the piping loss analysis does not need to be repeated here.
+
+##### Step 2h.6: Calculate the compressor power
+
+(1) Calculate the compressor power by the following procedures.
+
+a. Calculate the compressor power at a variety of Loading Index using the following equation. The resulting table (Table 4) from the same example is shown below.
+
+<div>$$M_{comp}=c_1+c_2{T_c}'+c_3T_e+c_4{T_c}'^2+c_5{T_c}'T_e+c_6T_e^2$$</div>
+<div>$$N_{comp,rps}=M_{comp} \times N_{comp,ref}$$</div>
+
+Where
+
+<span>$c_1$</span>,…,<span>$c_6$</span>   	empirical coefficients corresponding to <span>$rps$</span>  
+
+<span>$T_e$</span>		effective evaporating temperature (°C)
+
+<span>$T_{e,ref}$</span>		reference evaporating temperature (°C)
+
+<span>${T_c}'$</span>   		discharge saturated temperature at the compressor outlet (°C)
+
+<span>$T_{c,ref}$</span>		reference condensing temperature (°C) 
+
+<span>$M_{comp}$</span>		multiplier for the compressor power calculation (--)
+
+<span>$N_{comp,ref}$</span>	rated compressor power  (W)
+
+<span>$N_{comp,rps}$</span>	compressor power corresponding to <span>$rps$</span> (W)
+
+Table 4 – Outdoor unit compressor power at different Loading Index 
+
+| Loading Index (<span>$rps$</span>) | Elec. Power (kW), <span>${T_c}'$</span>=36°C, <span>$T_e$</span>=9°C| Loading Index (<span>$rps$</span>) | Elec. Power (kW), <span>${T_c}'$</span>=36°C, <span>$T_e$</span>=9°C|
+|---------------------|----------------------------|---------------------|----------------------------|
+|    1 (18)           |    0.527                   |    2 (25)           |    0.766                   |
+|    3 (30)           |    0.936                   |    4 (36)           |    1.227                   |
+|    5 (45)           |    1.546                   |    6 (60)           |    2.149                   |
+|    7 (75)           |    2.760                   |    8 (90)           |    3.357                   |
+|    9 (108)          |    4.359                   |                     |                            |
+
+b. According to the <span>$rps$</span> range determined, calculate the compressor power <span>$N_{comp}$</span>  by interpolation. In the above example, the compressor power is 1.155 kW. 
+
+(2) Compare the calculated <span>$N_{comp}$</span> above with the initialized <span>${N_{comp}}'$</span> in Step 2h.2:
+
+* If  <span>${N_{comp}}'-N_{comp}>\delta$</span> then go to Step 2h.2 for a new round of iteration.
+
+* Else, end the iteration and go to Step 2h.7.
+
+##### Step 2h.7: Total power consumption of the outdoor unit
+
+Same as that in the cooling mode (Step 2c. 7)
+
+#### *Modeling of the indoor unit (I/U) - Part II - Cooling Mode*
+##### Step 3c.1: Update air flow rate for each indoor unit
+(1) Calculate coil surface temperature for each indoor unit:
+
+<div>$$T_{fs}=T_e+[A_c\cdot SH^2+B_c\cdot SH+C_c]$$</div>
+
+Where	
+
+<span>$T_e$</span>	evaporating temperature decided in the outdoor unit calculations (°C)
+
+<span>$T_{fs}$</span>	coil surface temperature (°C)
+
+<span>$SH$</span>	superheating degrees decided in the outdoor unit calculations (°C)
+
+2)	Calculate the enthalpy of the air at the coil surface, <span>$H_{fs}$</span>:
+
+<div>$$if\quad{T_{fs}}<T_{98\%,W_{in}}\quad{then}\quad{H_{fs}}=f(T_{fs},98\%)$$</div>
+
+<div>$$if\quad{T_{fs}}\ge{T_{98\%,W_{in}}}\quad{then}\quad{H_{fs}}=f(T_{fs},W_{in})$$</div>
+
+Where
+
+<span>$T_{98\%,W_{in}}$</span>	dew point temperature of the indoor air (°C)
+
+<span>$H_{fs}$</span> 		enthalpy of the air at the coil surface (kJ/kg)
+
+3)	Calculate the required air flow rate <span>$G_a$</span> for each indoor unit:
+
+<div>$$G_a=Q_{in,total}/[(H_{coil,in}-H_{fs})\times{(1-BF)}\times{\rho_{in}}]$$</div> 
+
+Where
+
+<span>$Q_{in,total}$</span>	total cooling load for the zone (W)
+
+<span>$H_{coil,in}$</span>	enthalpy of the entering air of the indoor unit (kJ/kg)
+
+<span>$\rho_{in}$</span> density of indoor air,<span>$f_{\rho}(T_{in},W_{in})$</span> (kg/m<sup>3</sup>)
+
+4)	Decide whether to modify <span>$SH$</span> for further indoor unit capacity reduction.
+
+* If <span>$G_a$</span> < <span>$G_{a,min}$</span> (e.g., <span>$0.7\times$</span><span>$G_{a,rate}$</span>) go to Step 3c. 2
+
+* Else, directly go to Step 3c. 3
+
+##### Step 3c.2: Modify <span>$SH$</span> to adjust the indoor unit capacity 
+
+Set <span>$G_a$</span> at its minimum value (e.g., <span>$0.7\times$</span><span>$G_{a,rate}$</span>).
+
+The required coil surface temperature <span>$T_{fs}$</span> can be determined as described in Step 1.2.
+
+Given <span>$T_{fs}$</span> and <span>$T_e$</span>, <span>$SH$</span> can be determined using the equation shown in Step 1.3.
+
+* If <span>$SH$</span> > 15°C, Set <span>$SH$</span> as 15°C. On/Off control strategy may be implemented when needed.
+
+#####Step 3c. 3: Total power consumption of the indoor unit
+
+The power consumption of the indoor unit comes from the fan operations. This can be calculated using the existing VAV fan model in EnergyPlus. Please refer to the current EnergyPlus Engineering Reference for more details.
+
+#### *Modeling of the indoor unit (I/U) - Part II - Heating Mode*
+
+#####Step 3h.1:  Update air flow rate for each indoor unit.
+
+1)	Calculate coil surface temperature for all the indoor units:
+
+<div>$$T_{fs}=T_c-[A_h\cdot SC^2+B_h\cdot SC+C_h]$$</div>
+
+Where
+
+<span>$T_c$</span>	condensing temperature decided in the outdoor unit calculations (°C)
+
+<span>$T_{fs}$</span>	coil surface temperature (°C)
+
+<span>$SC$</span>	subcooling degrees decided in the outdoor unit calculations (°C)
+
+2)	Calculate the required air flow rate <span>$G_a$</span> for each indoor unit:
+
+<div>$$G_a=Q_{in,total}/[(T_{fs}-T_{coil,in})\times{(1-BF)}\times{\rho_{in}}]$$</div> 
+
+Where
+
+<span>$Q_{in,total}$</span>	total heating load for the zone (W)
+
+<span>$T_{coil,in}$</span>	temperature of the entering air of the indoor unit (°C)
+
+<span>$\rho_{in}$</span>density of indoor air,<span>$f_{\rho}(T_{in},W_{in})$</span>   (kg/m<sup>3</sup>)
+
+3)	Decide whether to modify <span>$SH$</span> for further indoor unit capacity reduction
+
+* If <span>$G_a$</span> < <span>$G_{a,min}$</span> (e.g., <span>$0.7\times$</span><span>$G_{a,rate}$</span>) go to Step 3h. 2
+
+* Else, directly go to Step 3h. 3 
+
+##### Step 3h.2:  Modify <span>$SC$</span> to modify the indoor unit capacity
+
+Set <span>$G_a$</span> at its minimum value (<span>$0.7\times$</span><span>$G_{a,rate}$</span>).
+
+The required coil surface temperature <span>$T_{fs}$</span> can be determined as described in Step 2.
+
+Given <span>$T_{fs}$</span> and <span>$T_e$</span>, <span>$SC$</span> can be determined using the equation shown in Step 1.3.
+
+* If <span>$SC$</span> > 20°C, Set <span>$SC$</span> as 20°C. On/Off control strategy may be implemented when needed.
+
+##### Step 3h.3: Total power consumption of the indoor unit
+
+Calculate electric power consumption by the indoor unit using the existing VAV fan model in EnergyPlus. Please refer to the current EnergyPlus Engineering Reference for more details.
+
+#### Additional energy consumption by defrost and crankcase heater 
+
+There may be additional energy consumption due to the defrost operation and crankcase heater operation. These components have no impact on the heat pump operations. The calculation methods in the VRF-FluidTCtrl model are the same as those in VRF-SysCurve model. Please refer to the VRF-SysCurve section for more details.
+
+
 ### Zone Terminal Unit List
 
 The zone terminal unit list identifies the terminal units that are connected to a single variable refrigerant flow heat pump. The zone terminal unit list is used exclusively in the variable refrigerant flow (VRF) heat pump object (ref: AirConditioner:VariableRefrigerantFlow) and VRF zone terminal units (ref: ZoneHVAC: TerminalUnit:VariableRefrigerantFlow). Up to 20 terminal units may be connected to a single VRF outdoor condensing unit. This list is extensible if additional indoor terminal units are required. The following figure shows the connection scheme between the zone terminal units, the zone terminal unit list, and finally the VRF AC system. The zone terminal units are connected to the zone through zone inlet and outlet zone nodes. Each zone terminal unit is entered in a list which represents all terminal units connected to a single VRF AC system. And finally, the zone terminal unit list name is entered in the corresponding VRF AC object.
@@ -5417,6 +6477,14 @@ The zone terminal unit list identifies the terminal units that are connected to 
 ![](media/image5454.png)
 
 Figure 249. Zone Terminal List connections in EnergyPlus objects
+
+
+#### References
+
+Raustad R. A variable refrigerant flow heat pump computer model in EnergyPlus, ASHRAE Transactions (2013), 119 (1):1–9.
+
+Hong T, Sun K, Zhang R, Hinokuma R, Kasahara S, Yura Y. Development and Validation of a New VRF Model in EnergyPlus. ASHRAE Winter Conference.
+
 
 Heat Exchangers <a name="HX"></a>
 ---------------
