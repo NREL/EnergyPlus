@@ -154,13 +154,13 @@ namespace DirectAirManager {
 		}
 
 		// With the correct DirectAirNum to Initialize the system
-		InitDirectAir( DirectAirNum, FirstHVACIteration );
+		InitDirectAir( DirectAirNum, ControlledZoneNum, FirstHVACIteration );
 
 		CalcDirectAir( DirectAirNum, ControlledZoneNum, SensOutputProvided, LatOutputProvided );
 
 		// No Update
 
-		ReportDirectAir( DirectAirNum );
+		// ReportDirectAir( DirectAirNum );
 
 	}
 
@@ -265,6 +265,7 @@ namespace DirectAirManager {
 						if ( DirectAir( DirectAirNum ).ZoneSupplyAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
+							ZoneEquipConfig( CtrlZone ).SDUNum = DirectAirNum;
 						}
 					}
 				}
@@ -312,6 +313,7 @@ namespace DirectAirManager {
 	void
 	InitDirectAir(
 		int const DirectAirNum,
+		int const ControlledZoneNum,
 		bool const FirstHVACIteration
 	)
 	{
@@ -338,6 +340,7 @@ namespace DirectAirManager {
 		using DataAirflowNetwork::AirflowNetworkControlMultizone;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
+		using DataZoneEquipment::ZoneEquipConfig;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -383,6 +386,9 @@ namespace DirectAirManager {
 		if ( ! SysSizingCalc && MySizeFlag( DirectAirNum ) ) {
 
 			SizeDirectAir( DirectAirNum );
+
+			DirectAir( DirectAirNum ).ZoneEqNum = ControlledZoneNum;
+			DirectAir( DirectAirNum ).ZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
 
 			MySizeFlag( DirectAirNum ) = false;
 		}
@@ -616,30 +622,6 @@ namespace DirectAirManager {
 		}
 
 		DirectAir( DirectAirNum ).SensOutputProvided = SensOutputProvided;
-
-	}
-
-	void
-	ReportDirectAir( int & DirectAirNum )
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR:          Russ Taylor
-		//       DATE WRITTEN:    Nov 1997
-
-		// PURPOSE OF THIS SUBROUTINE: This subroutine
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// Using/Aliasing
-		using DataHVACGlobals::TimeStepSys;
-
-		//report the Direct Air Output
-		DirectAir( DirectAirNum ).HeatRate = max( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 );
-		DirectAir( DirectAirNum ).CoolRate = std::abs( min( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 ) );
-		DirectAir( DirectAirNum ).HeatEnergy = max( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 ) * TimeStepSys * SecInHour;
-		DirectAir( DirectAirNum ).CoolEnergy = std::abs( min( DirectAir( DirectAirNum ).SensOutputProvided, 0.0 ) * TimeStepSys * SecInHour );
 
 	}
 

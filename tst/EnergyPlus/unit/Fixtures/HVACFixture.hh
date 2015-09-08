@@ -6,20 +6,6 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
-#include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DXCoils.hh>
-#include <EnergyPlus/ExteriorEnergyUse.hh>
-#include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Humidifiers.hh>
-#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
-#include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
 namespace EnergyPlus {

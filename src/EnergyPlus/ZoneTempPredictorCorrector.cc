@@ -24,6 +24,7 @@
 #include <DataZoneControls.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
+#include <EMSManager.hh>
 #include <FaultsManager.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
@@ -36,6 +37,7 @@
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
 #include <ZonePlenum.hh>
+#include <DirectAirManager.hh>
 
 namespace EnergyPlus {
 
@@ -160,6 +162,15 @@ namespace ZoneTempPredictorCorrector {
 	// Number of zone with staged controlled objects
 	int NumStageCtrZone( 0 );
 
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitZoneAirSetPointsOneTimeFlag( true );
+		bool SetupOscillationOutputFlag( true );
+	}
 	Array1D< Real64 > ZoneSetPointLast;
 	Array1D< Real64 > TempIndZnLd;
 	Array1D< Real64 > TempDepZnLd;
@@ -183,6 +194,37 @@ namespace ZoneTempPredictorCorrector {
 	Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
 
 	// Functions
+	void
+	clear_state()
+	{
+	
+		NumSingleTempHeatingControls = 0;
+		NumSingleTempCoolingControls = 0;
+		NumSingleTempHeatCoolControls = 0;
+		NumDualTempHeatCoolControls = 0;
+		NumSingleFangerHeatingControls = 0;
+		NumSingleFangerCoolingControls = 0;
+		NumSingleFangerHeatCoolControls = 0;
+		NumDualFangerHeatCoolControls = 0;
+		NumStageCtrZone = 0;
+		InitZoneAirSetPointsOneTimeFlag = true ;
+		SetupOscillationOutputFlag =  true;
+		ZoneSetPointLast.deallocate();
+		TempIndZnLd.deallocate();
+		TempDepZnLd.deallocate();
+		ZoneAirRelHum.deallocate();
+		ZoneTempHist.deallocate();
+		ZoneTempOscillate.deallocate();
+		AnyZoneTempOscillate= 0.0;
+		SetPointSingleHeating.deallocate();
+		SetPointSingleCooling.deallocate();
+		SetPointSingleHeatCool.deallocate();
+		SetPointDualHeatCool.deallocate();
+		SetPointSingleHeatingFanger.deallocate();
+		SetPointSingleCoolingFanger.deallocate();
+		SetPointSingleHeatCoolFanger.deallocate();
+		SetPointDualHeatCoolFanger.deallocate();
+	}
 
 	void
 	ManageZoneAirUpdates(
@@ -1958,7 +2000,9 @@ namespace ZoneTempPredictorCorrector {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
 		int ZoneNum;
-		static bool MyOneTimeFlag( true );
+		//////////// hoisted into namespace changed to InitZoneAirSetPointsOneTimeFlag////////////
+		//static bool MyOneTimeFlag( true );
+		//////////////////////////////////////
 		static bool MyEnvrnFlag( true );
 		static bool MyDayFlag( true );
 		static bool ErrorsFound( false );
@@ -1968,7 +2012,7 @@ namespace ZoneTempPredictorCorrector {
 		int SurfNum;
 
 		// FLOW:
-		if ( MyOneTimeFlag ) {
+		if ( InitZoneAirSetPointsOneTimeFlag ) {
 			TempZoneThermostatSetPoint.dimension( NumOfZones, 0.0 );
 			ZoneThermostatSetPointHi.dimension( NumOfZones, 0.0 );
 			ZoneThermostatSetPointLo.dimension( NumOfZones, 0.0 );
@@ -2112,7 +2156,7 @@ namespace ZoneTempPredictorCorrector {
 				SetupOutputVariable( "Zone Group Sensible Cooling Rate [W]", GroupSNLoadCoolRate( Loop ), "System", "Average", ZoneGroup( Loop ).Name );
 			} // Loop
 
-			MyOneTimeFlag = false;
+			InitZoneAirSetPointsOneTimeFlag = false;
 		}
 
 		// Do the Begin Environment initializations
@@ -3267,6 +3311,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		ZoneSetPointLast( ZoneNum ) = ZoneSetPoint;
+//		TempZoneThermostatSetPoint( ZoneNum ) = ZoneSetPoint; // needed to fix Issue # 5048
 
 		// Save the unmultiplied zone load to a report variable
 		SNLoadPredictedRate( ZoneNum ) = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired * LoadCorrectionFactor( ZoneNum );
@@ -4975,14 +5020,15 @@ namespace ZoneTempPredictorCorrector {
 		using namespace DataHeatBalSurface;
 		using DataLoopNode::Node;
 		using DataZoneEquipment::ZoneEquipConfig;
+		using DataDefineEquip::AirDistUnit;
 		using ZonePlenum::ZoneRetPlenCond;
 		using ZonePlenum::ZoneSupPlenCond;
 		using ZonePlenum::NumZoneReturnPlenums;
 		using ZonePlenum::NumZoneSupplyPlenums;
-		using DataDefineEquip::AirDistUnit;
 		using General::RoundSigDigits;
 		using InternalHeatGains::SumAllInternalConvectionGains;
 		using InternalHeatGains::SumAllReturnAirConvectionGains;
+		using DirectAirManager::DirectAir;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5010,10 +5056,13 @@ namespace ZoneTempPredictorCorrector {
 		int ADUNum;
 		int ADUInNode;
 		int ADUOutNode;
+		int SDUNum;
 		Real64 SumSysMCp;
 		Real64 SumSysMCpT;
 		Real64 Threshold;
 		Real64 SumRetAirGains;
+		Real64 ADUHeatAddRate;
+		Real64 SDUHeatAddRate;
 
 		SumIntGains = 0.0; // Zone sum of convective internal gains
 		SumHADTsurfs = 0.0; // Zone sum of Hc*Area*(Tsurf - Tz)
@@ -5025,6 +5074,10 @@ namespace ZoneTempPredictorCorrector {
 		imBalance = 0.0;
 		SumSysMCp = 0.0;
 		SumSysMCpT = 0.0;
+		ADUHeatAddRate = 0.0;
+		SDUHeatAddRate = 0.0;
+		ADUNum = 0;
+		SDUNum = 0;
 
 		// Sum all convective internal gains: SumIntGain
 		SumAllInternalConvectionGains( ZoneNum, SumIntGains );
@@ -5089,6 +5142,30 @@ namespace ZoneTempPredictorCorrector {
 				SumMCpDTsystem += MassFlowRate * CpAir * ( NodeTemp - MAT( ZoneNum ) );
 
 			} // NodeNum
+
+			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ADUNum > 0 ) {
+				ADUNum = ZoneEquipConfig( ZoneEquipConfigNum ).ADUNum;
+				NodeTemp = Node( AirDistUnit( ADUNum ).OutletNodeNum ).Temp;
+				MassFlowRate = Node( AirDistUnit( ADUNum ).OutletNodeNum ).MassFlowRate;
+				CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
+				ADUHeatAddRate = MassFlowRate * CpAir * ( NodeTemp - MAT( ZoneNum ) );
+				AirDistUnit( ADUNum ).HeatRate = max( 0.0, ADUHeatAddRate );
+				AirDistUnit( ADUNum ).CoolRate = std::abs( min( 0.0, ADUHeatAddRate ) );
+				AirDistUnit( ADUNum ).HeatGain = AirDistUnit( ADUNum ).HeatRate * TimeStepSys * SecInHour;
+				AirDistUnit( ADUNum ).CoolGain = AirDistUnit( ADUNum ).CoolRate * TimeStepSys * SecInHour;
+			}
+
+			if ( ZoneEquipConfig( ZoneEquipConfigNum ).SDUNum > 0 ) {
+				SDUNum = ZoneEquipConfig( ZoneEquipConfigNum ).SDUNum;
+				NodeTemp = Node( DirectAir( SDUNum ).ZoneSupplyAirNode ).Temp;
+				MassFlowRate = Node( DirectAir( SDUNum ).ZoneSupplyAirNode ).MassFlowRate;
+				CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
+				SDUHeatAddRate = MassFlowRate * CpAir * ( NodeTemp - MAT( ZoneNum ) );
+				DirectAir( SDUNum ).HeatRate = max( SDUHeatAddRate, 0.0 );
+				DirectAir( SDUNum ).CoolRate = std::abs( min( SDUHeatAddRate, 0.0 ) );
+				DirectAir( SDUNum ).HeatEnergy = DirectAir( SDUNum ).HeatRate * TimeStepSys * SecInHour;
+				DirectAir( SDUNum ).CoolEnergy = DirectAir( SDUNum ).CoolRate * TimeStepSys * SecInHour;
+			}
 
 		} else if ( ZoneRetPlenumAirFlag ) {
 			for ( NodeNum = 1; NodeNum <= ZoneRetPlenCond( ZoneRetPlenumNum ).NumInletNodes; ++NodeNum ) {
@@ -5410,7 +5487,9 @@ namespace ZoneTempPredictorCorrector {
 		Real64 Diff12;
 		Real64 Diff23;
 		Real64 Diff34;
-		static bool SetupOscillationOutputFlag( true );
+		/////////// hoisted into namespace ////////////
+		//static bool SetupOscillationOutputFlag( true );
+		/////////////////////////////////////////////////
 		bool isAnyZoneOscillating;
 
 		//first time run allocate arrays and setup output variable

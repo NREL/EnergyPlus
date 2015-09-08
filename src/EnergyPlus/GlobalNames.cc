@@ -50,6 +50,7 @@ namespace GlobalNames {
 	int NumBoilers( 0 );
 	int NumBaseboards( 0 );
 	int NumCoils( 0 );
+	int numAirDistUnits( 0 );
 	int CurMaxChillers( 0 );
 	int CurMaxBoilers( 0 );
 	int CurMaxBaseboards( 0 );
@@ -62,6 +63,7 @@ namespace GlobalNames {
 	Array1D< ComponentNameData > BoilerNames;
 	Array1D< ComponentNameData > BaseboardNames;
 	Array1D< ComponentNameData > CoilNames;
+	Array1D< ComponentNameData > aDUNames;
 
 	// Functions
 
@@ -334,6 +336,34 @@ namespace GlobalNames {
 
 	}
 
+	void
+	VerifyUniqueADUName(
+		std::string const & TypeToVerify,
+		std::string const & NameToVerify,
+		bool & ErrorFound,
+		std::string const & StringToDisplay
+	)
+	{
+
+		ComponentNameData aDUData;
+		ErrorFound = false;
+		int Found = 0;
+
+		if ( numAirDistUnits > 0 ) Found = FindItemInList( NameToVerify, aDUNames, &ComponentNameData::CompName, numAirDistUnits );
+
+		if ( Found != 0 ) {
+			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + aDUNames( Found ).CompType + "\"" );
+			ShowContinueError( "...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\"." );
+			ErrorFound = true;
+		} else {
+			++numAirDistUnits;
+			aDUData.CompType = MakeUPPERCase( TypeToVerify );
+			aDUData.CompName = NameToVerify;
+			aDUNames.push_back( aDUData );
+		}
+
+	}
+
 	// Clears the global data in GlobalNames.
 	// Needed for unit tests, should not be normally called.
 	void
@@ -343,6 +373,7 @@ namespace GlobalNames {
 		NumBoilers = 0;
 		NumBaseboards = 0;
 		NumCoils = 0;
+		numAirDistUnits = 0;
 		CurMaxChillers = 0;
 		CurMaxBoilers = 0;
 		CurMaxBaseboards = 0;
@@ -352,6 +383,7 @@ namespace GlobalNames {
 		BoilerNames.deallocate();
 		BaseboardNames.deallocate();
 		CoilNames.deallocate();
+		aDUNames.deallocate();
 	}
 
 	//     NOTICE

@@ -18,19 +18,21 @@ set( test_src
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
+  DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
   FanCoilUnits.unit.cc
   Fans.unit.cc
-  FaultFoulingAirFilters.unit.cc
+  FaultsManager.unit.cc
   FluidCoolers.unit.cc
   Furnaces.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
   HeatRecovery.unit.cc
   Humidifiers.unit.cc
+  HVACFourPipeBeam.unit.cc
   HVACSizingSimulationManager.unit.cc 
   HVACStandaloneERV.unit.cc
   ICSCollector.unit.cc
