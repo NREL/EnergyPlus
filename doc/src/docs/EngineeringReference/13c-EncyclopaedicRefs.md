@@ -1,5 +1,5 @@
 <!--RemoveStart-->
-Simulation Models – Encyclopedic Reference
+Simulation Models – Encyclopedic Reference 
 ==========================================
 
 The following descriptions are grouped alphabetically (as much as possible) with some also having additional tags of “Heat Balance”, “HVAC”, and “Plant”.  With the integrated solution, these designations signify where the effects of these models have their first impacts.
@@ -4723,22 +4723,33 @@ Tang,C. C. 2005. Modeling Packaged Heat Pumps in Quasi-Steady State Energy Simul
 
 Murugappan, Arun. 2002.  Implementing Ground Source Heat Pump and Ground Loop Heat Exchanger Models in the EnergyPlus Simulation Environment, M.S. Thesis, Department of Mechanical and Aerospace Engineering, Oklahoma State University (downloadable from [http://www.hvac.okstate.edu/](http://www.hvac.okstate.edu))
 
+
+
 Variable Refrigerant Flow Heat Pumps <a name="VRF"></a>
 ------------------------------------
 
-There are two common types of variable refrigerant flow heat pump systems:
+A Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) system is an air-conditioning system that varies the refrigerant flow rate using variable speed compressor(s) in the outdoor unit, and the electronic expansion valves (EEVs) located in each indoor unit. The system meets the space cooling or heating load requirements by maintaining the zone air temperature at the setpoint. The ability to control the refrigerant mass flow rate according to the cooling and/or heating load enables the use of as many as 60 or more indoor units with differing capacities in conjunction with one single outdoor unit. This unlocks the possibility of having individualized comfort control, simultaneous heating and cooling in different zones, and heat recovery from one zone to another. It may also lead to more efficient operations during part-load conditions.
 
-- cooling only or heating only air-conditioning systems (a.k.a. heat pump), or
+There are two common types of VRF systems. 
 
-- heat recovery systems that allow simultaneous cooling and heating
+ * Heat Pump (HP) type: the most general type that can be used for either cooling or heating, but not simultaneously. 
+ 
+ * Heat Recovery (HR) type: can deliver simultaneous heating and cooling to different zones by transferring heat between the cooling and heating indoor units. This generally occurs in the winter season in medium-sized to large-sized commercial buildings with a substantial core such as computer rooms.
 
-Energyplus models heat pump and heat recovery operating modes as described in the section entitled Variable Refrigerant Flow Heat Pump Model. The variable refrigerant flow model currently supports air-, evaporatively-, or water-cooled condenser equipment. Throughout this section, the term “condenser” refers to the outdoor unit where the compressor is located.
+There are two alternative VRF models availabe in EnergyPlus to simulate the energy performance of Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) air-conditioning systems: 
 
-### Variable Refrigerant Flow Heat Pump Model
+ 1. **System Curve based Model (VRF-SysCurve)**. In this model, a number of system level curves are used to describe the VRF system performance. It corresponds to the *AirConditioner:VariableRefrigerantFlow* object. 
+ 
+ 2. **Physics based Model (VRF-FluidTCtrl)**. This model is able to consider the dynamics of more operational parameters and is applicable for fluid temperature control. This model corresponds to the *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object.
+ 
+ 
+### Variable Refrigerant Flow Heat Pump Model (System Curve Based Model)
 
 #### Overview
 
-The figure below schematically depicts the AirConditioner:VariableRefrigerantFlow (VRF AC) system. The outdoor unit is connected directly to the zone terminal units using a zone terminal unit list (ref: ZoneTerminalUnitList). The VRF AC system conditions multiple zones and is controlled by thermostats located in each zone. Zone terminal units operate to meet the zone sensible cooling or sensible heating requirements as determined by the zone thermostat schedule.
+This section describes the System Curve based VRF Model (VRF-SysCurve), which can address both the heat pump and heat recovery operating modes and support air-, evaporatively-, or water-cooled condenser equipment ( throughout this section, the term “condenser” refers to the outdoor unit where the compressor is located. )
+
+The figure below schematically depicts the AirConditioner:VariableRefrigerantFlow (VRF AC) system. The outdoor unit is connected directly to the zone terminal units using a zone terminal unit list (ref: ZoneTerminalUnitList). The VRF AC system conditions multiple zones and is controlled by thermostats located in each zone. Zone terminal units operate to meet the zone sensible cooling or sensible heating requirements as determined by the zone thermostat schedule. 
 
 When the heat pump does not operate to reclaim waste heat, the VRF AC system can only operate in either cooling *or* heating mode. Based on the master thermostat priority control selection, the operating mode is determined by polling the appropriate zone(s) served by the VRF HP system. When the system is operating in cooling mode, the cooling coils will be enabled only in the terminal units where zone cooling is required. When the system is operating in heating mode, the heating coils will be enabled only in the terminal units where zone heating is required. Supply air fans will continue to operate if the zone terminal unit’s fan operating mode is set to continuous fan.
 
@@ -4754,7 +4765,7 @@ Figure 242. Variable Refrigerant Flow Heat Pump (draw through fan placement)
 
 ![](media/image5316.png)
 
-Figure 243. Variable Refrigerant Flow object connections in Energyplus
+Figure 243. Energyplus object connections for VRF-SysCurve model 
 
 The terminal unit is able to model supply air fan operation in two modes: cycling fan – cycling coil (i.e., AUTO fan) and continuous fan – cycling coil (i.e., fan ON). Fan:Simple:OnOff must be used to model AUTO fan, while Fan:Simple:OnOff or Fan:Simple:ConstVolume can be used to model fan ON.
 
@@ -5408,6 +5419,1057 @@ where:
 
 <div>$$RTF = \left( {{\raise0.7ex\hbox{${PLR}$} \!\mathord{\left/ {\vphantom {{PLR} {PartLoadFrac}}}\right.}\!\lower0.7ex\hbox{${PartLoadFrac}$}}} \right) = runtime\;fraction\;of\;the\;heating\;coil$$</div>
 
+
+### Variable Refrigerant Flow Heat Pump Model (Physics Based Model)
+
+#### Overview
+
+This section describes the Physics based VRF Model (VRF-FluidTCtrl) to simulate the energy performance of Variable Refrigerant Flow (VRF) systems in the heat pump (HP) operation mode (either cooling or heating is provided but not simultaneously). 
+
+Compared with the VRF-SysCurve model, VRF-FluidTCtrl model is more physics-based and thus able to consider the dynamics of more operational parameters which is essential for the description of many enhanced control logics (e.g., the adjustment of superheating degrees during small load operations). Furthermore, this model implements component-level curves rather than the system-level curves, and thus requires much fewer curves as model inputs. The definition of VRF performance data for simulation as part of ASHRAE Standard 205 will ensure VRF manufacturers provide adequate data to create the required performance curves.
+
+The main features of the VRF-FluidTCtrl model include:
+
+ * Introduction of separate curves for capacities and power inputs of indoor and outdoor units instead of overall curves for the entire system.
+
+ * Allowing of variable evaporating and condensing temperatures in the indoor and outdoor units under various operational conditions.
+
+ * Allowing of variable fan speed based on the temperature and zone load in the indoor unit.
+
+ * Allowing of further modifications of operational parameters (e.g., evaporating temperature, superheating degrees, and supply air flow rate) during low load conditions.
+
+ * Development of a physics-based model to calculate thermal loss in the refrigerant piping network (varies with refrigerant flow rate, operational conditions, pipe length, and pipe and insulation materials) instead of a constant correction factor.
+
+These features enhance the simulation accuracy of the VRF system performance in both heating and cooling modes, especially during low load operations. In addition, these features enable the modeling of a multi-stage control strategy to adjust the system capacity during low load conditions, as shown in Figure VRF-FluidTCtrl-1. Further more, the VRF-FluidTCtrl model enables the potential simulation of demand response of VRF systems by directly slowing down the speed of compressors in the outdoor units with invertor technology.
+
+![](media/VRF-FluidTCtrl-1a.png)
+
+Figure VRF-FluidTCtrl-1a. Multi-stage control strategy to adjust the system capacity during low load conditions
+
+Note that a number of calculation steps are coupled together in the VRF-FluidTCtrl model, for instance, the piping loss calculation and the system performance calculation. More specifically, the piping loss changes the operating conditions of the system, which may lead to a different control strategy and thus in reverse affect the amount of piping loss. This makes it difficult to obtain an analytical solution for a number of operational parameters (e.g., enthalpy of refrigerant entering the indoor unit), and therefore numerical iterations are employed to address this problem (refer to Figure VRF-FluidTCtrl-3 for more details). Therefore, the VRF-FluidTCtrl model can have a longer execution time to perform the simulation than the VRF-SysCurve model. 
+
+The object connections for VRF-FluidTCtrl model is similar to those for VRF-SysCurve model. The difference lies in the object used to describe a specific components. For example, VRF-SysCurve model uses  *AirConditioner:VariableRefrigerantFlow* object to describe the VRF outdoor unit performance, while in VRF-FluidTCtrl model the *AirConditioner:VariableRefrigerantFlow* object is used.
+
+![](media/VRF-FluidTCtrl-1b.png)
+
+Figure VRF-FluidTCtrl-1b. Energyplus object connections for VRF-FluidTCtrl model 
+
+
+#### Model Description
+
+Figures VRF-FluidTCtrl-2 and VRF-FluidTCtrl-3 illustrate the overall logic of the VRF-FluidTCtrl algorithms. Detailed calculation procedures and explanations of equations are described in the following sections.
+
+![](media/VRF-FluidTCtrl-2a.png)
+
+*(a)	Heating Mode*
+
+![](media/VRF-FluidTCtrl-2b.png)
+
+*(b)	Cooling Mode*
+
+Figure VRF-FluidTCtrl-2. Schematic Pressure-Enthalpy Diagram for VRF Operation 
+
+![](media/VRF-FluidTCtrl-3a.png)
+
+*(a)	Heating Mode*
+
+![](media/VRF-FluidTCtrl-3b.png)
+
+*(b)	Cooling Mode*
+
+Figure VRF-FluidTCtrl-3. Flow Chart of the VRF-FluidTCtrl Model 
+
+The VRF-FluidTCtrl algorithms are described in details below, including the models of both the indoor and outdoor unit(s) of the VRF system. Because of the different control algorithms used in the outdoor unit for cooling and heating modes, the heating and cooling modes are described separately.
+
+#### *Modeling of the indoor unit (I/U) - Part I*
+
+##### Step 1.1: Obtaining zonal load/condition information
+
+Obtain the following information for each zone from the zone modules within EnergyPlus: 
+
+* zone sensible loads <span>$Q_{in, sensible}$</span>
+
+* zone total loads <span>$Q_{in, total}$</span>
+
+* indoor air temperature <span>$T_{in}$</span>
+
+* indoor air humidity ratio <span>$W_{in}$</span>
+
+The operation mode of the VRF system can therefore be determined from <span>$Q_{in, sensible}$</span>.
+
+##### Step 1.2: Calculate I/U required evaporator/condenser temperature
+
+Evaluate the required coil surface air temperature <span>$T_{fs}$</span> and the required evaporator/condenser refrigerant temperature <span>$T_{e,req}/{T_{c,req}}$</span> for each indoor unit. 
+
+Assuming the coil air flow rate is at the maximum (<span>$G_{a,rate}$</span>), the entering air temperature after the indoor coil fan can be calculated for each indoor unit:
+
+<div>$$T_{coil,in}=T_{in}+Q_{fan}/(G_{a,rate}\times{c_p}\times\rho_{in})$$</div>
+
+Where
+
+<span>$c_p$</span>	air heat capacity (kJ/(kg<span>$\cdot$</span>K))
+
+<span>$G_{a,rate}$</span>	volumetric flow rate of the air through the indoor unit, at the rated conditions (m<sup>3</sup>/s)
+
+<span>$Q_{fan}$</span>	sensible heat released by fan (W)
+
+<span>$T_{coil,in}$</span>	temperature of air entering the indoor coil (°C)
+
+<span>$\rho_{in}$</span>  	density of indoor air, <span>$f_{\rho}(T_{in},W_{in})$</span>  (kg/m<sup>3</sup>)
+
+The supply air temperature <span>$T_{out}$</span> can be calculated by:
+
+<div>$$T_{out}=T_{coil,in}-Q_{in, sensible}/(G_{a,rate}\times{c_p}\times\rho_{in})$$</div>
+
+Where
+
+<span>$T_{out}$</span>	temperature of the air leaving the indoor unit (supply air) (°C)
+
+The coil surface air temperature <span>$T_{fs}$</span> can be calculated, given the bypass factor <span>$BF$</span>:
+
+<div>$$T_{fs}= T_{coil,in}-(T_{coil,in}-T_{out})/(1-BF)$$</div>
+
+Where
+
+<span>$BF$</span>	bypass factor (different values for cooling mode and heating mode) 
+
+<span>$T_{fs}$</span>	indoor unit coil surface air temperature (°C)
+
+In the cooling mode, the superheating degree <span>$SH$</span> is given and thus the required evaporating temperature <span>$Te_{req}$</span> for the associated indoor unit can be obtained:
+
+<div>$$Te_{req}=T_{fs}-[A_c\cdot SH^2+B_c\cdot SH+C_c]$$</div>
+ 
+Where
+
+<span>$A_c$</span>, <span>$B_c$</span>, <span>$C_c$</span>   	coefficients (°C)
+
+<span>$SH$</span> 		superheating degrees for the indoor unit (°C) 
+
+<span>$SH_{ref}$</span> 		reference superheating degrees for the indoor unit (e.g., 3) (°C)
+
+<span>$Te_{req}$</span>		required evaporating temperature for a specific indoor unit (°C)
+
+In the heating mode, the subcooling degree <span>$SC$</span> is given and thus the required condensing temperature <span>$Tc_{req}$</span> for the associated indoor unit can be obtained:
+
+<div>$$Tc_{req}=T_{fs}+[A_h\cdot SC^2+B_h\cdot SC+C_h]$$</div>
+ 
+Where
+
+<span>$A_h$</span>, <span>$B_h$</span>, <span>$C_h$</span>  	coefficients (°C)
+
+<span>$SC$</span> 		subcooling degrees for the indoor unit (°C) 
+
+<span>$SC_{ref}$</span> 		reference subcooling degrees for the indoor unit (e.g., 5) (°C)
+
+<span>$Tc_{req}$</span>		required condensing temperature for a specific indoor unit (°C)
+
+##### Step 1.3: Calculate effective evaporating /condensing temperature
+
+There are two refrigerant temperature control strategies for the indoor unit: (1) *ConstantTemp*, (2) *VariableTemp*.
+
+ - In the *ConstantTemp* strategy, <span>$T_e$</span> and <span>$T_c$</span> are kept at constant values provided by the user.
+
+ - In the *VariableTemp* strategy, <span>$T_e$</span> and <span>$T_c$</span> are determined using the equations below:
+
+In the cooling mode:
+
+<div>$$Te=min\{max[min(Te_{req,i}),Te_{min}],Te_{max}\}$$</div>
+ 
+Where
+
+<span>$Te_{req,i}$</span>		required evaporating temperature for the ith indoor unit (°C)
+
+<span>$Te_{min}$</span>		minimum evaporating temperature for the indoor unit (e.g. 3) (°C)
+
+<span>$Te_{max}$</span>		maximum evaporating temperature for the indoor unit (e.g. 13) (°C)
+
+In the heating mode:
+
+<div>$$Tc=min\{max[min(Tc_{req,i}),Tc_{min}],Tc_{max}\}$$</div>
+ 
+Where
+
+<span>$Tc_{req,i}$</span>		required condensing temperature for the ith indoor unit (°C)
+
+<span>$Tc_{min}$</span>		minimum condensing temperature for the indoor unit (e.g. 42) (°C)
+
+<span>$Tc_{max}$</span>		maximum condensing temperature for the indoor unit (e.g. 46) (°C)
+
+#### *Modeling of the outdoor unit (O/U) - Cooling Mode*
+
+##### Step 2c.1: Piping loss calculation in the cooling mode
+
+Piping loss occurs when the refrigerant flows through the main pipe connecting the indoor and outdoor units. It includes both the refrigerant pressure drop and heat loss. It affects the VRF system operation in several ways. First, the heat loss creates an extra load to the system and leads to higher energy consumptions. Second, the pressure drop and heat loss changes the operational conditions of the compressor (i.e., compressor suction pressure and compressor suction temperature) and thus affects its operational performance. Therefore, the piping loss calculation is critical for the analysis of the whole system.
+
+Note that the change of compressor operational conditions may lead to different control strategies of the system, which in reverse affects the amount of piping loss. So the piping loss analysis and system performance analysis are coupled together. Numerical iterations are designed to address the coupling effect, as described below.
+
+Calculate the refrigerant flow rate for each indoor unit using assumed <span>$h_{Hexin}$</span>:
+
+<div>$$G_i=Q_i/(h_{Hexout,i}-h_{Hexin})$$</div>
+
+Where
+
+<span>$G_i$</span>   	refrigerant flow rate for the i<sup>th</sup> indoor unit (kg/s) 
+
+<span>$Q_i$</span>   	total cooling load of the i<sup>th</sup> zone (W) 
+
+<span>$h_{Hexin}$</span>	enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+
+<span>$h_{Hexout,i}$</span>	enthalpy of the refrigerant leaving a specific indoor unit (kJ/kg)
+
+<span>$h_{Hexout,i}$</span> is a function of <span>$P_e$</span>, <span>$T_e$</span>, and <span>$SH_i$</span>. It can be calculated using refrigerant thermodynamic property equations <span>$f_{g\_h}(P_e,T_e+SH_i)$</span>.
+
+The enthalpy of the refrigerant in the main loop <span>$h_{Hexout}$</span> can be obtained by calculating the weighted average of the enthalpy of the refrigerant in each indoor unit:
+
+<div>$$h_{Hexout}=\sum(h_{Hexout,i}\times{G_i}/{G_{tot}})$$</div>
+
+<div>$$G_{tot}=\sum{G_i}$$</div>
+
+Where
+
+<span>$G_{tot}$</span>   	refrigerant flow rate in the main loop (kg/s) 
+
+<span>$h_{Hexout}$</span>	enthalpy of the main loop refrigerant leaving indoor units (kJ/kg)
+
+The viscosity of the refrigerant within the pipe can be calculated via:
+
+<div>$$k_{v,1}=P_e/4926000$$</div>
+
+<div>$$k_{v,2}=h_{Hexout}/383.55$$</div>
+
+<div>$$k_{v,3}=(T_{Hexout}+273.15)/344.39$$</div>
+
+<div>$$\mu=10^6\times(4.302\times{k_{v,1}}+0.81622\times{k_{v,1}}^2-120.98\times{k_{v,2}}+139.17\times{k_{v,2}}^2+118.76\times{k_{v,3}}+81.04\times{k_{v,3}}^2+5.7858\times{k_{v,1}}\times{k_{v,2}}-8.3817\times{k_{v,1}}\times{k_{v,3}}-218.48\times{k_{v,2}}\times{k_{v,3}}+21.58)$$</div>
+
+Where
+
+<span>$\mu$</span>	viscosity of the refrigerant within the pipe (Pa-s)
+
+<span>$k_{v,i}$</span>	coefficients to calculate the refrigerant viscosity 
+
+<span>$T_{Hexout}$</span>	temperature of main loop refrigerant leaving indoor units, <span>$f_{g\_t}(P_e,h_{Hexout})$</span> (°C)
+
+<span>$f_{g\_t}$</span> 	functions calculating the temperature of superheating refrigerant 
+
+Given <span>$h_{Hexout}$</span> and <span>$P_e=f_{s\_p}(T_e)$</span>, the following dimensionless quantities describing the refrigerant flow state can be obtained:
+
+<div>$$Re=G_{tot}/3600/(0.25\times\pi\times{D^2})\times{D}/\mu$$</div>
+
+<div>$$Pr=\mu\times{f_{g\_Cp}(P_e,h_{Hexout})}\times{0.001}/f_{g\_\lambda}(P_e,h_{Hexout})$$</div>
+
+<div>$$Nu=0.023\times{Re^{0.8}\times{Pr^{0.3}}}$$</div>
+
+<div>$$St=Nu/Re/Pr$$</div>
+
+Where
+
+<span>$P_e$</span>  	evaporating pressure (Pa) 
+
+<span>$Re$</span> 	Reynolds number 
+
+<span>$Pr$</span> 	Prandtl number 
+
+<span>$Nu$</span> 	Nusselt number 
+
+<span>$St$</span> 	Stanton number 
+
+<span>$\mu$</span>	viscosity of the refrigerant within the pipe (Pa-s)
+
+<span>$f_{s\_p}$</span> 	functions calculating the pressure of saturated refrigerant 
+
+<span>$f_{g\_Cp}$</span> 	functions calculating the specific heat of superheating refrigerant 
+
+<span>$f_{g\_\lambda}$</span>	functions calculating the conductivity of superheating refrigerant 
+
+Then the piping pressure loss <span>$\Delta{P_{pipe}}$</span> can be obtained using the above dimensionless quantities:
+
+<div>$$\Delta{P_{pipe}}=8\times{St}\times{Pr^{2/3}}\times{L/D}\times{f_{g\_\rho}(P_e,h_{Hexout})}\times{V^2}/2+H\times{f_{g\_\rho}(P_e,h_{Hexout})}\times9.80665$$</div>
+
+<div>$$P_s=P_e-\Delta{P_{pipe}}$$</div>
+
+Where
+
+<span>$f_{g\_\rho}$</span>	functions calculating the density of superheating refrigerant 
+
+<span>$D$</span>   	main pipe diameter (m) 
+
+<span>$H$</span> 	height difference between the outdoor unit node and indoor unit node of the main pipe (m)
+
+<span>$L$</span>   	main pipe length (m) 
+
+<span>$P_s$</span>   	compressor suction pressure (Pa) 
+
+<span>$\Delta{P_{pipe}}$</span>	pressure drop in the pipe (Pa)
+
+<span>$V$</span>	refrigerant flow velocity (m/s)
+
+The suction saturated temperature <span>$T'_e$</span> (i.e., saturated vapor temperature corresponding to the compressor suction pressure) can be obtained via refrigerant thermodynamic property equations:
+
+<div>$$T'_e=f_{s\_t}(P_e-\Delta{P_{pipe}})$$</div>
+
+Where
+
+<span>$f_{s\_t}$</span>	functions calculating the temperature of saturated refrigerant
+
+<span>$T'_e$</span>   	suction saturated temperature at the compressor inlet (°C)
+
+The heat loss through the pipe can be obtained via:
+
+<div>$$k_1=Nu\times{f_{g\_\lambda}(P_e,h_{Hexout})}$$</div>
+
+<div>$$k_2=2\times{\lambda_i}/Ln(1+2\times{W_i}/D)$$</div>
+
+<div>$$k_3=h\times(D+2\times{W_i})$$</div>
+
+<div>$$Q_{pipe}=(\pi\times{L})\times(T_a-T_{Hexout})/(1/k_1+1/k_2+1/k_3)$$</div>
+
+Where
+
+<span>$f_{g\_\lambda}$</span>	functions calculating the conductivity of superheating refrigerant 
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+<span>$T_a$</span> 	average of outdoor air temperature and indoor temperature (°C)
+
+<span>$T_{Hexout}$</span>	temperature of main pipe refrigerant leaving indoor units (°C) 
+
+<span>$w_i$</span>	pipe insulation thickness (m) 
+
+<span>$k_i$</span>	coefficients for the piping loss calculation  
+
+Note that <span>$Q_{pipe}$</span> is calculated using an assumed <span>$h_{Hexin}$</span>. Its value affects the compressor operation calculations as shown in Step 2c.2~2c.6 and may change the value of condensing temperature <span>$T_c$</span>. This leads to an updated <span>$h_{Hexin}=f(P_c,T_c-SC)$</span>. If the difference between the calculated <span>$h_{Hexin}$</span> and the assumed <span>$h_{Hexin}$</span> is higher than the assigned tolerance (5%), a new round of iteration is performed using the calculated <span>$h_{Hexin}$</span>.
+
+##### Step 2c.2: Initialize O/U operation conditions
+
+The compressor operation is coupled with a number operational parameters, which makes it difficult to obtain an analytical solution. In the algorithm, an iterative approach is designed to obtain the energy consumption of the compressor (Step 2c.2 – 2c.6).
+
+For the first iteration, 
+
+* Initialize outdoor unit <span>$SC$</span> with the reference value (from IDF input, e.g., 5°C)
+
+* Initialize the compressor power <span>$N_{comp}$</span> with the value calculated from the reference <span>$COP$</span> (e.g., 3.5):
+
+<div>$$N'_{comp}=\frac{\sum_iQ_{in,total,i}}{COP}$$</div>
+
+Where
+
+<span>$N_{comp}$</span>	compressor power (W)
+
+<span>$N'_{comp}$</span>	assumed compressor power for the first iteration (W)
+
+<span>$Q_{in,total,i}$</span>	total cooling load for zone <span>$i$</span> (W)
+
+For the following iterations,
+
+* Initialize <span>$SC$</span> with the calculated value in the previous iteration  
+
+* Initialize the compressor power <span>$N_{comp}$</span> with the calculated value in the previous iteration
+
+The heat rate released from the outdoor unit can be calculated by:
+
+<div>$$Q_{out}=\sum_iQ_{in,total,i}+N_{comp}+Q_{pipe}$$</div> 
+
+Where
+
+<span>$Q_{out}$</span>	heat rate released from the outdoor unit (W)
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+##### Step 2c.3: Calculate O/U effective condensing temperature
+
+ (1) Calculate the required coil surface air temperature <span>${T_{fs}}'$</span> for the outdoor unit.
+
+The temperature of the air leaving the outdoor unit <span>${T_{out}}'$</span> can be calculated by:
+ 
+<div>$${T_{out}}'={T_{in}}'+Q_{out}/({G_{a,rate}}'\times{c_p}\times{{\rho_{in}}'})$$</div>
+ 
+Where
+
+<span>${G_{a,rate}}'$</span>	volumetric flow rate of the air through the outdoor unit, at the rating conditions (m<sup>3</sup>/s)
+
+<span>${T_{out}}'$</span>	temperature of the air leaving the outdoor unit (°C)
+
+<span>${T_{in}}'$</span>	temperature of the air entering the outdoor unit, i.e., outdoor air (°C)
+
+<span>${\rho_{in}}'$</span>  	air density at outdoor conditions,<span>$f_{\rho}({T_{in}}',{W_{in}}')$</span>   (kg/m<sup>3</sup>)
+
+The condenser surface temperature <span>${T_{fs}}'$</span> can be calculated by:
+ 
+<div>$${T_{fs}}'={T_{in}}'+({T_{out}}'-{T_{in}}')/(1-{BF_c}')$$</div>
+ 
+Where
+
+<span>${BF_c}'$</span> 	bypass factor for the outdoor unit  
+
+(2) Calculate required condensing temperature for the outdoor unit <span>$Tc_{req}$</span> and then the effective condensing temperature <span>$Tc$</span> (between 42-46°C)
+ 
+<div>$$Tc_{req}={T_{fs}}'+[A_h\cdot SC^2+B_h\cdot SC+C_h]$$</div>
+
+<div>$$Tc=Tc_{req}$$</div>
+
+Where	
+
+<span>$A_h$</span>,<span>$B_h$</span>,<span>$C_h$</span>   	coefficients (°C)
+
+<span>$SC$</span> 		subcooling degrees for the outdoor unit (°C)
+
+<span>$SC_{ref}$</span> 		reference subcooling degrees for the outdoor unit (°C)
+
+<span>$Tc_{req}$</span>		required condensing temperature for the outdoor unit (°C)
+
+<span>$Tc$</span>		effective condensing temperature (°C)
+
+##### Step 2c.4: Calculate required Loading Index 
+
+Loading Index is used to describe the operational mode of the compressor system. The first index represents minimal capacity operation, while the last index represents full capacity operation. 
+
+The required Loading Index can be calculated by the following procedures. 
+
+a. Calculate the evaporative capacity at a variety of Loading Index:
+
+<div>$$M_{cap}=(r_1+r_2T_c+r_3{T_e}'+r_4T_c^2+r_5T_c{T_e}'+r_6{T_e}'^2)$$</div>
+<div>$$Q_{rps}=C_{cap,system} \times M_{cap} \times Q_{ref} $$</div>
+
+Where	
+
+<span>$C_{cap,system}$</span>	evaporative capacity correction factor, describing the possible system configuration difference between test bed and real system (a constant value obtained from manufacturer data)  
+
+<span>$r_1$</span>,…,<span>$r_6$</span>  	empirical coefficients corresponding to <span>$rps$</span>  
+
+<span>$rps$</span>	compressor speed (r/s) 
+
+<span>${T_e}'$</span>   	suction saturated temperature at the compressor inlet (°C)
+
+<span>$T_c$</span>	effective condensing temperature (°C)
+
+<span>$M_{cap}$</span>	multiplier for the evaporative capacity calculation (--)
+
+<span>$Q_{rps}$</span>	evaporative capacity corresponding to <span>$rps$</span> (W) 
+
+<span>$Q_{ref}$</span>	rated evaporative capacity (W) 
+
+An example of resulting capacity for different <span>$rps$</span> (at <span>$T_c$</span>=36°C and <span>${T_e}'$</span>=9°C) is presented in Table 1.
+
+Table 1– Evaporative capacity at different Loading Index 
+
+| Loading Index (<span>$rps$</span>) | Evaporative Capacity (kW),<span>$T_c$</span>=36°C,<span>${T_e}'$</span>=9°C| Loading Index (<span>$rps$</span>) | Evaporative Capacity (kW),<span>$T_c$</span>=36°C,<span>${T_e}'$</span>=9°C|
+|---------------------|-----------------------------|---------------------|-----------------------------|
+|    1 (18)           |    3.951                    |    2 (25)           |    5.400                    |
+|    3 (30)           |    6.435                    |    4 (36)           |    8.516                    |
+|    5 (45)           |    10.756                   |    6 (60)           |    14.445                   |
+|    7 (75)           |    18.412                   |    8 (90)           |    22.045                   |
+|    9 (108)          |    26.162                   |                     |                             |
+
+b. Find the <span>$rps$</span> range that covers the required evaporative capacity <span>$Q_{rps,modify}$</span>.  
+
+<div>$$Q_{rps,modify}=C_{cap,operation}\times(\sum{Q_{in,total}}+Q_{pipe})$$</div>
+
+<div>$$C_{cap,operation}=C_{cap,density}\times{C_{cap,enthalpy}}$$</div>
+
+<div>$$C_{cap,density}=\rho_{test}/\rho_{real}$$</div>
+
+<div>$$C_{cap,enthalpy}=\frac{h_{Evapout,test}-h_{Evapin,test}}{h_{Compin,real}-h_{Evapin,real}}$$</div>
+
+<div>$$h_{Compin,real}=h_{Hexout,real}+Q_{pipe}/G_{tot}$$</div>
+
+Where	
+
+<span>$C_{cap,operation}$</span> evaporative capacity correction factor, describing the operational difference between test cases and real cases (i.e., <span>$SH$</span> and <span>$SC$</span>)  
+
+<span>$C_{cap,density}$</span> evaporative capacity correction factor, describing the variations of refrigerant density at test conditions and real operational conditions  
+
+<span>$C_{cap,enthalpy}$</span> evaporative capacity correction factor, describing the variations of refrigerant enthalpy at test conditions and real operational conditions  
+
+<span>$G_{tot}$</span>   	refrigerant flow rate in the main loop (kg/s) 
+
+<span>$h_{Evapin,real}$</span> enthalpy of refrigerant entering the evaporators (IU) at real conditions [kJ/kg]
+
+<span>$h_{Evapout,real}$</span> average enthalpy of refrigerant leaving the evaporators (IU) at real conditions [kJ/kg] 
+
+<span>$h_{Evapin,test}$</span> enthalpy of refrigerant entering the evaporator at test conditions (It corresponds to <span>$SC$</span> at test condition(e.g., 5 °C)  and Tc) (kJ/kg)
+
+<span>$h_{Evapout,test}$</span> enthalpy of refrigerant leaving the evaporator at test conditions  (It corresponds to <span>$SH$</span> at test condition(e.g., 8 °C)  and Te) (kJ/kg) 
+
+<span>$h_{Compin}$</span>	enthalpy of refrigerant entering the compressor (kJ/kg)
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+For example, if the required capacity is 8 kW, the <span>$rps$</span> range is 30 to 36.
+
+c. Calculate the <span>$rps$</span> that meets the required capacity by interpolation. In the above example, the resulting <span>$rps$</span> is 34.5 <span>$rps$</span>.
+
+d. If the calculated <span>$rps$</span> is lower than the minimum <span>$rps$</span> (e.g. 18<span>$rps$</span>), go to Step 2c.5, otherwise skip Step 2c.5 and directly go to Step 2c. 6.
+
+##### Step 2c.5: Modify evaporating temperature to further reduce outdoor unit capacity
+
+If the calculated <span>$rps$</span> is lower than the minimum <span>$rps$</span> (e.g. 18<span>$rps$</span>), it means that the zone cooling load is even lower than the system evaporative capacity corresponding to the minimum compressor speed. In this situation, the evaporating temperature <span>$T_e$</span> as well as the superheating degree <span>$SH$</span> is modified to further reduce the outdoor unit capacity. More specifically: 
+
+a. Set <span>$rps$</span> at its minimum value (e.g., 18 <span>$rps$</span>).
+
+b. Update <span>${T_e}'$</span> to meet the required evaporative capacity, using equations described in Step 2c.4a.
+
+c. Update <span>$T_e$</span> to meet the updated <span>${T_e}'$</span>. Note that due to the <span>$T_e$</span> updates, the refrigerant state and flow rate are changed and thus the piping loss analysis should also be repeated (Step 2c.1). So is the calculation of <span>$C_{cap,operation}$</span> (Step 2c.2-2c.3).
+
+d. <span>$SH$</span> can be updated based on the updated <span>$T_e$</span>, using the equations shown in Step 1.2. 
+
+##### Step 2c.6: Calculate the compressor power
+
+(1) Calculate the compressor power by the following procedures.
+
+a. Calculate the compressor power at a variety of loading index using the following equation. The resulting table (Table 2) from the same example used above is shown below. 
+
+<div>$$M_{comp}=c_1+c_2T_c+c_3{T_e}'+c_4T_c^2+c_5T_c{T_e}'+c_6{T_e}'^2$$</div>
+<div>$$N_{comp,rps}=M_{comp} \times N_{comp,ref}$$</div>
+
+Where	
+
+<span>$c_1$</span>,…,<span>$c_6$</span>   	empirical coefficients corresponding to <span>$rps$</span>  
+
+<span>${T_e}'$</span> 		suction saturated temperature at the compressor inlet (°C)
+
+<span>$T_c$</span>		effective condensing temperature (°C)
+
+<span>$M_{comp}$</span>		multiplier for the compressor power calculation (--)
+
+<span>$N_{comp,ref}$</span>	rated compressor power  (W)
+
+<span>$N_{comp,rps}$</span>	compressor power corresponding to <span>$rps$</span> (W)
+
+Table 2 – Outdoor unit compressor power at different Loading Index 
+
+| Loading Index (<span>$rps$</span>) | Elec. Power (kW), <span>$T_c$</span>=36°C, <span>${T_e}'$</span>=9°C| Loading Index (<span>$rps$</span>) | Elec. Power (kW), <span>$T_c$</span>=36°C, <span>${T_e}'$</span>=9°C|
+|---------------------|----------------------------|---------------------|----------------------------|
+|    1 (18)           |    0.527                   |    2 (25)           |    0.766                   |
+|    3 (30)           |    0.936                   |    4 (36)           |    1.227                   |
+|    5 (45)           |    1.546                   |    6 (60)           |    2.149                   |
+|    7 (75)           |    2.760                   |    8 (90)           |    3.357                   |
+|    9 (108)          |    4.359                   |                     |                            |
+
+b. According to the <span>$rps$</span> range determined, calculate the compressor power <span>$N_{comp}$</span>  by interpolation. In the above example, the compressor power is 1.155 kW. 
+
+(2) Compare the calculated <span>$N_{comp}$</span> above with the initialized <span>${N_{comp}}'$</span> in Step 2c.2:
+
+* If  <span>${N_{comp}}'-N_{comp}>\delta$</span> then go to Step 2c.2 for a new round of iteration.
+
+* Else, end the iteration and go to Step 2c.7.
+
+##### Step 2c.7: Total power consumption of the outdoor unit
+
+Calculate the total electric power consumption by the outdoor unit:
+
+<div>$$N_{out}=N_{fan}+N_{comp}/e_{inv}$$</div>
+
+Where	
+
+<span>$e_{inv}$</span>	efficiency of the inverter of compressor  
+
+<span>$N_{fan}$</span>	electric power consumption by the outdoor fan (W)
+
+<span>$N_{out}$</span>	total electric power consumption by the outdoor unit (W)
+
+#### *Modeling of the outdoor unit (O/U) - Heating Mode*
+
+##### Step 2h.1: Piping loss calculation in the heating mode
+
+Similarly to that in the cooling mode, the piping loss analysis in the heating mode needs to address the coupling effect between the piping loss and system operations. However, due to the control strategy difference between the two modes, the piping loss algorithm in the heating mode requires different calculation steps and more numerical iterations, as shown below.
+
+Calculate the refrigerant flow rate for each indoor unit using assumed <span>$h_{Hexin}$</span>:
+
+<div>$$G_i=Q_i/(h_{Hexin}-h_{Hexout,i})$$</div>
+
+Where
+
+<span>$G_i$</span>   	refrigerant flow rate for the i<sup>th</sup> indoor unit (kg/s) 
+
+<span>$Q_i$</span>   	total heating load of the i<sup>th</sup> zone (W) 
+
+<span>$h_{Hexin}$</span>	enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+
+<span>$h_{Hexout,i}$</span>	enthalpy of the refrigerant leaving a specific indoor unit (kJ/kg)
+
+<span>$h_{Hexout,i}$</span> is a function of <span>$P_c$</span>, <span>$T_c$</span>, and <span>$SC_i$</span>. It can be calculated using refrigerant thermodynamic property equations <span>$f_{g\_h}(P_c,T_c-SC_i)$</span>.
+
+The refrigerant flow rate in the main loop can be obtained by summing up the flow rate in each indoor unit:
+
+<div>$$G_{tot}=\sum{G_i}$$</div>
+
+Where
+
+<span>$G_{tot}$</span>   	refrigerant flow rate in the main loop (kg/s) 
+
+Calculate the average refrigerant pressure and enthalpy within the pipes, using assumed piping pressure loss <span>$\Delta{P_{pipe}}$</span> and <span>$h_{Tdi}$</span>: 
+
+<div>$$P_{ave}=P_c+\Delta{P_{pipe}}/2$$</div>
+
+<div>$$h_{ave}=(h_{Hexin}+h_{Tdi})/2$$</div>
+
+Where
+
+<span>$h_{ave}$</span> 	average refrigerant enthalpy within the main pipe (kJ/kg)
+
+<span>$h_{Hexin}$</span>	enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+
+<span>$h_{Tdi}$</span> enthalpy of the refrigerant leaving the compressor (kJ/kg)
+
+<span>$P_{ave}$</span> 	average refrigerant pressure within the main pipe (Pa)
+
+<span>$P_c$</span>   	condensing pressure (Pa) 
+
+<span>$\Delta{P_{pipe}}$</span>	pressure drop in the main pipe (Pa)
+
+The viscosity of the refrigerant within the pipe can be calculated given <span>$P_{ave}$</span> and <span>$h_{ave}$</span>, using the following equations:
+
+<div>$$k_{v,1}=P_{ave}/4926000$$</div>
+
+<div>$$k_{v,2}=h_{ave}/383.55$$</div>
+
+<div>$$k_{v,3}=(T_{ave}+273.15)/344.39$$</div>
+
+<div>$$\mu=10^6\times(4.302\times{k_{v,1}}+0.81622\times{k_{v,1}}^2-120.98\times{k_{v,2}}+139.17\times{k_{v,2}}^2+118.76\times{k_{v,3}}+81.04\times{k_{v,3}}^2+5.7858\times{k_{v,1}}\times{k_{v,2}}-8.3817\times{k_{v,1}}\times{k_{v,3}}-218.48\times{k_{v,2}}\times{k_{v,3}}+21.58)$$</div>
+
+Where
+
+<span>$\mu$</span>	viscosity of the refrigerant within the pipe (Pa-s)
+
+<span>$k_{v,i}$</span>	coefficients to calculate the refrigerant viscosity 
+
+<span>$h_{ave}$</span> 	average refrigerant enthalpy within the pipes (kJ/kg)
+
+<span>$P_{ave}$</span> 	average refrigerant pressure within the pipes (Pa)
+
+<span>$T_{ave}$</span>	average temperature of refrigerant leaving indoor units, which corresponds to <span>$P_{ave}$</span> and <span>$h_{ave}$</span> (°C)
+
+Given <span>$P_{ave}$</span> and <span>$h_{ave}$</span>, the following dimensionless quantities describing the refrigerant flow state can be obtained:
+
+<div>$$Re=G_{tot}/3600/(0.25\times\pi\times{D^2})\times{D}/\mu$$</div>
+
+<div>$$Pr=\mu\times{f_{g\_Cp}(P_{ave},h_{ave})}\times{0.001}/f_{g\_\lambda}(P_{ave},h_{ave})$$</div>
+
+<div>$$Nu=0.023\times{Re^{0.8}\times{Pr^{0.4}}}$$</div>
+
+<div>$$St=Nu/Re/Pr$$</div>
+
+Where
+
+<span>$Re$</span> 	Reynolds number 
+
+<span>$Pr$</span> 	Prandtl number 
+
+<span>$Nu$</span> 	Nusselt number 
+
+<span>$St$</span> 	Stanton number 
+
+<span>$\mu$</span>	viscosity of the refrigerant within the pipe (Pa-s)
+
+<span>$f_{g\_Cp}$</span> 	functions calculating the specific heat of superheating refrigerant 
+
+<span>$f_{g\_\lambda}$</span>	functions calculating the conductivity of superheating refrigerant 
+
+Then the piping pressure loss <span>$\Delta{P_{pipe}}$</span> can be obtained using the above dimensionless quantities:
+
+<div>$$\Delta{P_{pipe}}=8\times{St}\times{Pr^{2/3}}\times{L/D}\times{f_{g\_\rho}(P_{ave},h_{ave})}\times{V^2}/2-H\times{f_{g\_\rho}(P_{ave},h_{ave})}\times9.80665$$</div>
+
+Where
+
+<span>$f_{g\_\rho}$</span>	functions calculating the density of superheating refrigerant 
+
+<span>$D$</span>   	main pipe diameter (m) 
+
+<span>$H$</span> 	height difference between the outdoor unit node and indoor unit node of the main pipe (m)
+
+<span>$L$</span>   	main pipe length (m) 
+
+<span>$St$</span> 	Stanton number 
+
+<span>$Re$</span> 	Reynolds number 
+
+<span>$Pr$</span> 	Prandtl number 
+
+<span>$\Delta{P_{pipe}}$</span>	pressure drop in the pipe (Pa)
+
+<span>$V$</span>	refrigerant flow velocity (m/s)
+
+Compare the calculated <span>$\Delta{P_{pipe}}$</span> and the one assumed above. If the difference is higher than the assigned tolerance (5%), a new round of iteration is performed using the calculated <span>$\Delta{P_{pipe}}$</span>.
+
+The compressor discharge saturated temperature <span>$T'_c$</span> (i.e., saturated vapor temperature corresponding to compressor discharge pressure) can be obtained via:
+
+<div>$$T'_c=f_{s\_t}(P_c+\Delta{P_{pipe}})$$</div>
+
+Where
+
+<span>$f_{s\_t}$</span>	functions calculating the temperature of saturated refrigerant
+
+<span>$T'_c$</span>    	discharge saturated temperature at the compressor outlet (°C)
+
+<span>$P_c$</span>    	condensing pressure (Pa)
+
+<span>$\Delta{P_{pipe}}$</span>	pressure drop in the pipe (Pa)
+
+The heat loss through the pipe can be obtained via:
+
+<div>$$k_1=Nu\times{f_{g\_\lambda}(P_{ave},h_{ave})}$$</div>
+
+<div>$$k_2=2\times{\lambda_i}/Ln(1+2\times{W_i}/D)$$</div>
+
+<div>$$k_3=h\times(D+2\times{W_i})$$</div>
+
+<div>$$Q_{pipe}=(\pi\times{L})\times(T_a-T_{Hexin})/(1/k_1+1/k_2+1/k_3)$$</div>
+
+Where
+
+<span>$f_{g\_\lambda}$</span>	functions calculating the conductivity of superheating refrigerant 
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+<span>$T_a$</span> 	average of outdoor air temperature and indoor temperature (°C)
+
+<span>$T_{Hexin}$</span>	average of entering indoor units (°C)
+
+<span>$w_i$</span>	pipe insulation thickness (m) 
+
+<span>$k_i$</span>	coefficients for the piping loss calculation  
+
+The enthalpy of the refrigerant entering the indoor unit can be updated using the calculated <span>$Q_{pipe}$</span>:
+
+<div>$$h_{Tdi}=h_{Hexin}+Q_{pipe}/G_{tot}$$</div>
+
+Where
+
+<span>$h_{Hexin}$</span>	enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+
+<span>$h_{Tdi}$</span> enthalpy of the refrigerant leaving the compressor (kJ/kg)
+
+<span>$G_{tot}$</span>   	refrigerant flow rate in the main loop (kg/s) 
+
+Compare the calculated <span>$h_{Tdi}$</span> and the one assumed above. If the difference is higher than the assigned tolerance (5%), a new round of iteration is performed using the calculated <span>$h_{Tdi}$</span>.
+
+Note that <span>$Q_{pipe}$</span> is calculated using an assumed <span>$h_{Hexin}$</span> at the beginning of the piping loss algorithm. Its value affects the compressor operation calculations as shown in Step 2h.2~2h.6 and may change the value of evaporating temperature <span>$T_e$</span>. This leads to an updated <span>$h_{Hexin}=f(P_e,T_e+SH,N_{comp},G_{tot})$</span>. If the difference between the calculated result and the assumed value is higher than the assigned tolerance (5%), a new round of iteration is performed using the calculated <span>$h_{Hexin}$</span>.
+
+##### Step 2h.2: Initialize O/U operation conditions
+
+Similar to that in cooling mode, an iteration approach is designed to determine the energy consumption of the compressor (Step 2h. 2 to Step 2h. 6).
+
+For the first iteration, 
+
+* Initialize outdoor unit <span>$SH$</span> with the reference value (from IDF input, e.g., 1.5°C)
+
+* Iinitialize the compressor power <span>$N_{comp}$</span> with the value calculated from the reference <span>$COP$</span> (e.g., 3.5):
+
+<div>$$N'_{comp}=\frac{\sum_iQ_{in,total,i}}{COP}$$</div>
+
+Where
+
+<span>$N_{comp}$</span>	compressor power (W)
+
+<span>$N'_{comp}$</span>	assumed compressor power for the first iteration (W)
+
+<span>$Q_{in,total,i}$</span>	total heating load for zone <span>$i$</span> (W)
+
+For the following iterations,
+
+* Initialize <span>$SH$</span> with the calculated value in the previous iteration  
+
+* Initialize the compressor power <span>$N_{comp}$</span> with the calculated value in the previous iteration
+
+Calculate the heat rate extracted by the outdoor unit by:
+
+<div>$$Q_{out}=\sum_iQ_{in,total,i}+Q_{pipe}-N_{comp}$$</div> 
+
+Where
+
+<span>$Q_{out}$</span>	heat rate extracted by the outdoor unit (W)
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+##### Step 2h.3: Calculate O/U effective evaporating temperature
+
+(1) Calculate the required coil surface air temperature <span>${T_{fs}}'$</span> for the outdoor unit.
+
+The enthalpy of the air leaving the outdoor unit can be calculated by:
+ 
+<div>$${H_{fs}}'={H_{in}}'-Q_{out}/({G_{a,rate}}'\times{\rho_o})/(1-BF')$$</div>
+
+The coil surface air temperature <span>${T_{fs}}'$</span> can be calculated from the <span>${H_{fs}}'$</span>:
+
+<div>$$if\quad{H_{fs}}'<H_{98\%,W_o}\quad{then}\quad{T_{fs}}'=f({H_{fs}}',98\%)$$</div>
+
+<div>$$if\quad{H_{fs}}'\ge{H_{98\%,W_o}}\quad{then}\quad{T_{fs}}'=f({H_{fs}}',W_o)$$</div>
+ 
+Where
+
+<span>$BF'$</span> 	bypass factor for the outdoor unit  
+
+<span>${G_{a,rate}}'$</span>	volumetric flow rate of the air through the outdoor unit, at the rating conditions (m<sup>3</sup>/s)
+
+<span>${H_{fs}}'$</span>	enthalpy of the air leaving the outdoor unit (kJ/kg)
+
+<span>${H_{in}}'$</span>	enthalpy of the air entering the outdoor unit, i.e., outdoor air (kJ/kg)
+
+<span>$W_o$</span>       humidity ratio of the outdoor air (kg/kg)
+
+<span>$\rho_o$</span>     density of the outdoor air (kg/m<sup>3</sup>)
+
+(2) Calculate required evaporating temperature for the outdoor unit <span>$Te_{req}$</span> and then the effective evaporating temperature <span>$Te$</span>.
+ 
+<div>$$Te_{req}={T_{fs}}'-[{A_c}'\cdot SH^2+{B_c}'\cdot SH+{C_c}']$$</div>
+
+<div>$$Te=Te_{req}$$</div>
+
+Where	
+
+<span>${A_c}'$</span>,<span>${B_c}'$</span>,<span>${C_c}'$</span>   	coefficients (°C)
+
+<span>$SH$</span>			superheating degrees for the outdoor unit (°C)
+
+<span>$SH_{ref}$</span>	reference superheating degrees for the outdoor unit (°C)
+
+<span>$Te_{req}$</span>	required evaporating temperature for the outdoor unit (°C)
+
+<span>$Te$</span>		effective evaporating temperature (°C)
+
+##### Step 2h.4: Calculate required compressor Loading Index
+
+Calculate the required compressor Loading Index by the following procedures.
+
+a. Calculate the evaporative capacity at a variety of speeds:
+
+<div>$$M_{cap}=C_{cap,system}\times(r_1+r_2{T_c}'+r_3T_e+r_4{T_c}'^2+r_5{T_c}'T_e+r_6T_e^2)$$</div>
+<div>$$Q_{rps}=C_{cap,system} \times M_{cap} \times Q_{ref}$$</div>
+
+Where	
+
+<span>$C_{cap,system}$</span>	evaporative capacity correction factor, describing the possible system configuration difference between test bed and real system (obtained from manufacturer data)  
+
+<span>$r_1$</span>,…,<span>$r_6$</span>  	empirical coefficients corresponding to <span>$rps$</span>  
+
+<span>$rps$</span>	compressor speed (r/s) 
+
+<span>$T_e$</span>   	effective evaporating temperature (°C)
+
+<span>$M_{cap}$</span>	multiplier for the evaporative capacity calculation (--)
+
+<span>${T_c}'$</span>	discharge saturated temperature at the compressor outlet (°C)
+
+<span>$Q_{rps}$</span>	evaporative capacity corresponding to <span>$rps$</span> (W) 
+
+<span>$Q_{ref}$</span>	rated evaporative capacity (W) 
+
+An example of resulting capacity for different <span>$rps$</span> (at <span>${T_c}'$</span>=36°C and <span>$T_e$</span>=9°C) is presented in Table 3.
+
+Table 3– evaporative capacity at different Loading Index 
+
+| Loading Index (<span>$rps$</span>) | Evaporative Capacity (kW),<span>${T_c}'$</span>=36°C,<span>$T_e$</span>=9°C| Loading Index (<span>$rps$</span>) | Evaporative Capacity (kW),<span>${T_c}'$</span>=36°C,<span>$T_e$</span>=9°C|
+|---------------------|-----------------------------|---------------------|-----------------------------|
+|    1 (18)           |    3.951                    |    2 (25)           |    5.400                    |
+|    3 (30)           |    6.435                    |    4 (36)           |    8.516                    |
+|    5 (45)           |    10.756                   |    6 (60)           |    14.445                   |
+|    7 (75)           |    18.412                   |    8 (90)           |    22.045                   |
+|    9 (108)          |    26.162                   |                     |                             |
+
+b. Find the <span>$rps$</span> range that covers the required evaporative capacity <span>$Q_{rps,modify}$</span>.  
+
+<div>$$Q_{rps,modify}=C_{cap,operation}\times(\sum{Q_{in,total}}+Q_{pipe}-N_{comp})$$</div>
+
+<div>$$C_{cap,operation}=C_{cap,density}\times{C_{cap,enthalpy}}$$</div>
+
+<div>$$C_{cap,density}=\rho_{test}/\rho_{real}$$</div>
+
+<div>$$C_{cap,enthalpy}=\frac{h_{Evapout,test}-h_{Condout,test}}{h_{Compin,real}-h_{Condout,real}}$$</div>
+
+Where	
+
+<span>$C_{cap,operation}$</span>	evaporative capacity correction factor, describing the operational difference between test cases and real cases (i.e., <span>$SH$</span> and <span>$SC$</span>)  
+
+<span>$C_{cap,density}$</span>	evaporative capacity correction factor, describing the variations of refrigerant density at test conditions and real operational conditions  
+
+<span>$C_{cap,enthalpy}$</span>	evaporative capacity correction factor, describing the variations of refrigerant enthalpy at test conditions and real operational conditions  
+
+<span>$h_{Condout,test}$</span> 	enthalpy of refrigerant leaving the condensers (IU) at test conditions  (It corresponds to <span>$SH$</span> at test condition(e.g., 8°C)  and <span>$Te$</span>) (kJ/kg) 
+
+<span>$h_{Condout,real}$</span> 	average enthalpy of refrigerant leaving the condensers (IU) at real conditions (kJ/kg)
+
+<span>$h_{Compin,real}$</span>	enthalpy of refrigerant entering the compressor at real conditions (It corresponds to <span>$SH$</span> and <span>$Te$</span> at real conditions) (kJ/kg)
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+For example, if the required capacity is 8 kW, the <span>$rps$</span> range is 30 to 36 <span>$rps$</span> based on Table 3.
+
+c. Calculate the <span>$rps$</span> that meets the need by interpolation. In the above example, the resulting <span>$rps$</span> is 34.5 <span>$rps$</span>.
+
+d. If the calculated <span>$rps$</span> is lower than the minimum <span>$rps$</span> (e.g. 18<span>$rps$</span>), go to Step 2h. 5; otherwise, skip Step 2h. 5 and go to Step 2h. 6.
+
+##### Step 2h.5: Modify evaporating temperature to further reduce outdoor unit capacity 
+
+If the calculated <span>$rps$</span> is lower than the minimum <span>$rps$</span> (e.g. 18 <span>$rps$</span>), it means that the zone heating load (indoor unit side) is so low that it leads to an evaporative capacity (outdoor unit side) which is even lower than the system evaporative capacity corresponding to the minimum compressor speed. In this situation, the evaporating temperature <span>$Te$</span> as well as the superheating degree <span>$SH$</span> is modified to further reduce the outdoor unit capacity. More specifically: 
+
+a. Set <span>$rps$</span> at its minimum value (e.g., 18 <span>$rps$</span>).
+
+b. Update <span>$Te$</span> to meet the required evaporative capacity, using equations described in Step 2h.4a.
+
+c. <span>$SH$</span> for each indoor unit can be updated using the equations shown in Step 1.2.
+
+It should be noted that, different from the corresponding step in the cooling mode (Step 2c.5), the <span>$Te$</span> and <span>$SH$</span> updates in the heating mode do not affect the refrigerant state and flow rate calculations (as shown in Step 2h.1). Therefore, the piping loss analysis does not need to be repeated here.
+
+##### Step 2h.6: Calculate the compressor power
+
+(1) Calculate the compressor power by the following procedures.
+
+a. Calculate the compressor power at a variety of Loading Index using the following equation. The resulting table (Table 4) from the same example is shown below.
+
+<div>$$M_{comp}=c_1+c_2{T_c}'+c_3T_e+c_4{T_c}'^2+c_5{T_c}'T_e+c_6T_e^2$$</div>
+<div>$$N_{comp,rps}=M_{comp} \times N_{comp,ref}$$</div>
+
+Where
+
+<span>$c_1$</span>,…,<span>$c_6$</span>   	empirical coefficients corresponding to <span>$rps$</span>  
+
+<span>$T_e$</span>		effective evaporating temperature (°C)
+
+<span>$T_{e,ref}$</span>		reference evaporating temperature (°C)
+
+<span>${T_c}'$</span>   		discharge saturated temperature at the compressor outlet (°C)
+
+<span>$T_{c,ref}$</span>		reference condensing temperature (°C) 
+
+<span>$M_{comp}$</span>		multiplier for the compressor power calculation (--)
+
+<span>$N_{comp,ref}$</span>	rated compressor power  (W)
+
+<span>$N_{comp,rps}$</span>	compressor power corresponding to <span>$rps$</span> (W)
+
+Table 4 – Outdoor unit compressor power at different Loading Index 
+
+| Loading Index (<span>$rps$</span>) | Elec. Power (kW), <span>${T_c}'$</span>=36°C, <span>$T_e$</span>=9°C| Loading Index (<span>$rps$</span>) | Elec. Power (kW), <span>${T_c}'$</span>=36°C, <span>$T_e$</span>=9°C|
+|---------------------|----------------------------|---------------------|----------------------------|
+|    1 (18)           |    0.527                   |    2 (25)           |    0.766                   |
+|    3 (30)           |    0.936                   |    4 (36)           |    1.227                   |
+|    5 (45)           |    1.546                   |    6 (60)           |    2.149                   |
+|    7 (75)           |    2.760                   |    8 (90)           |    3.357                   |
+|    9 (108)          |    4.359                   |                     |                            |
+
+b. According to the <span>$rps$</span> range determined, calculate the compressor power <span>$N_{comp}$</span>  by interpolation. In the above example, the compressor power is 1.155 kW. 
+
+(2) Compare the calculated <span>$N_{comp}$</span> above with the initialized <span>${N_{comp}}'$</span> in Step 2h.2:
+
+* If  <span>${N_{comp}}'-N_{comp}>\delta$</span> then go to Step 2h.2 for a new round of iteration.
+
+* Else, end the iteration and go to Step 2h.7.
+
+##### Step 2h.7: Total power consumption of the outdoor unit
+
+Same as that in the cooling mode (Step 2c. 7)
+
+#### *Modeling of the indoor unit (I/U) - Part II - Cooling Mode*
+##### Step 3c.1: Update air flow rate for each indoor unit
+(1) Calculate coil surface temperature for each indoor unit:
+
+<div>$$T_{fs}=T_e+[A_c\cdot SH^2+B_c\cdot SH+C_c]$$</div>
+
+Where	
+
+<span>$T_e$</span>	evaporating temperature decided in the outdoor unit calculations (°C)
+
+<span>$T_{fs}$</span>	coil surface temperature (°C)
+
+<span>$SH$</span>	superheating degrees decided in the outdoor unit calculations (°C)
+
+2)	Calculate the enthalpy of the air at the coil surface, <span>$H_{fs}$</span>:
+
+<div>$$if\quad{T_{fs}}<T_{98\%,W_{in}}\quad{then}\quad{H_{fs}}=f(T_{fs},98\%)$$</div>
+
+<div>$$if\quad{T_{fs}}\ge{T_{98\%,W_{in}}}\quad{then}\quad{H_{fs}}=f(T_{fs},W_{in})$$</div>
+
+Where
+
+<span>$T_{98\%,W_{in}}$</span>	dew point temperature of the indoor air (°C)
+
+<span>$H_{fs}$</span> 		enthalpy of the air at the coil surface (kJ/kg)
+
+3)	Calculate the required air flow rate <span>$G_a$</span> for each indoor unit:
+
+<div>$$G_a=Q_{in,total}/[(H_{coil,in}-H_{fs})\times{(1-BF)}\times{\rho_{in}}]$$</div> 
+
+Where
+
+<span>$Q_{in,total}$</span>	total cooling load for the zone (W)
+
+<span>$H_{coil,in}$</span>	enthalpy of the entering air of the indoor unit (kJ/kg)
+
+<span>$\rho_{in}$</span> density of indoor air,<span>$f_{\rho}(T_{in},W_{in})$</span> (kg/m<sup>3</sup>)
+
+4)	Decide whether to modify <span>$SH$</span> for further indoor unit capacity reduction.
+
+* If <span>$G_a$</span> < <span>$G_{a,min}$</span> (e.g., <span>$0.7\times$</span><span>$G_{a,rate}$</span>) go to Step 3c. 2
+
+* Else, directly go to Step 3c. 3
+
+##### Step 3c.2: Modify <span>$SH$</span> to adjust the indoor unit capacity 
+
+Set <span>$G_a$</span> at its minimum value (e.g., <span>$0.7\times$</span><span>$G_{a,rate}$</span>).
+
+The required coil surface temperature <span>$T_{fs}$</span> can be determined as described in Step 1.2.
+
+Given <span>$T_{fs}$</span> and <span>$T_e$</span>, <span>$SH$</span> can be determined using the equation shown in Step 1.3.
+
+* If <span>$SH$</span> > 15°C, Set <span>$SH$</span> as 15°C. On/Off control strategy may be implemented when needed.
+
+#####Step 3c. 3: Total power consumption of the indoor unit
+
+The power consumption of the indoor unit comes from the fan operations. This can be calculated using the existing VAV fan model in EnergyPlus. Please refer to the current EnergyPlus Engineering Reference for more details.
+
+#### *Modeling of the indoor unit (I/U) - Part II - Heating Mode*
+
+#####Step 3h.1:  Update air flow rate for each indoor unit.
+
+1)	Calculate coil surface temperature for all the indoor units:
+
+<div>$$T_{fs}=T_c-[A_h\cdot SC^2+B_h\cdot SC+C_h]$$</div>
+
+Where
+
+<span>$T_c$</span>	condensing temperature decided in the outdoor unit calculations (°C)
+
+<span>$T_{fs}$</span>	coil surface temperature (°C)
+
+<span>$SC$</span>	subcooling degrees decided in the outdoor unit calculations (°C)
+
+2)	Calculate the required air flow rate <span>$G_a$</span> for each indoor unit:
+
+<div>$$G_a=Q_{in,total}/[(T_{fs}-T_{coil,in})\times{(1-BF)}\times{\rho_{in}}]$$</div> 
+
+Where
+
+<span>$Q_{in,total}$</span>	total heating load for the zone (W)
+
+<span>$T_{coil,in}$</span>	temperature of the entering air of the indoor unit (°C)
+
+<span>$\rho_{in}$</span>density of indoor air,<span>$f_{\rho}(T_{in},W_{in})$</span>   (kg/m<sup>3</sup>)
+
+3)	Decide whether to modify <span>$SH$</span> for further indoor unit capacity reduction
+
+* If <span>$G_a$</span> < <span>$G_{a,min}$</span> (e.g., <span>$0.7\times$</span><span>$G_{a,rate}$</span>) go to Step 3h. 2
+
+* Else, directly go to Step 3h. 3 
+
+##### Step 3h.2:  Modify <span>$SC$</span> to modify the indoor unit capacity
+
+Set <span>$G_a$</span> at its minimum value (<span>$0.7\times$</span><span>$G_{a,rate}$</span>).
+
+The required coil surface temperature <span>$T_{fs}$</span> can be determined as described in Step 2.
+
+Given <span>$T_{fs}$</span> and <span>$T_e$</span>, <span>$SC$</span> can be determined using the equation shown in Step 1.3.
+
+* If <span>$SC$</span> > 20°C, Set <span>$SC$</span> as 20°C. On/Off control strategy may be implemented when needed.
+
+##### Step 3h.3: Total power consumption of the indoor unit
+
+Calculate electric power consumption by the indoor unit using the existing VAV fan model in EnergyPlus. Please refer to the current EnergyPlus Engineering Reference for more details.
+
+#### Additional energy consumption by defrost and crankcase heater 
+
+There may be additional energy consumption due to the defrost operation and crankcase heater operation. These components have no impact on the heat pump operations. The calculation methods in the VRF-FluidTCtrl model are the same as those in VRF-SysCurve model. Please refer to the VRF-SysCurve section for more details.
+
+
 ### Zone Terminal Unit List
 
 The zone terminal unit list identifies the terminal units that are connected to a single variable refrigerant flow heat pump. The zone terminal unit list is used exclusively in the variable refrigerant flow (VRF) heat pump object (ref: AirConditioner:VariableRefrigerantFlow) and VRF zone terminal units (ref: ZoneHVAC: TerminalUnit:VariableRefrigerantFlow). Up to 20 terminal units may be connected to a single VRF outdoor condensing unit. This list is extensible if additional indoor terminal units are required. The following figure shows the connection scheme between the zone terminal units, the zone terminal unit list, and finally the VRF AC system. The zone terminal units are connected to the zone through zone inlet and outlet zone nodes. Each zone terminal unit is entered in a list which represents all terminal units connected to a single VRF AC system. And finally, the zone terminal unit list name is entered in the corresponding VRF AC object.
@@ -5415,6 +6477,14 @@ The zone terminal unit list identifies the terminal units that are connected to 
 ![](media/image5454.png)
 
 Figure 249. Zone Terminal List connections in EnergyPlus objects
+
+
+#### References
+
+Raustad R. A variable refrigerant flow heat pump computer model in EnergyPlus, ASHRAE Transactions (2013), 119 (1):1–9.
+
+Hong T, Sun K, Zhang R, Hinokuma R, Kasahara S, Yura Y. Development and Validation of a New VRF Model in EnergyPlus. ASHRAE Winter Conference.
+
 
 Heat Exchangers <a name="HX"></a>
 ---------------

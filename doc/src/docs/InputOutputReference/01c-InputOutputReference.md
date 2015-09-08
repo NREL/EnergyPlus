@@ -14005,24 +14005,38 @@ This output field is the mass flow rate of air, in kg/s, being bypassed from the
 
 This output field is the dry-bulb set point temperature in degrees Celsius. This set point temperature is calculated by the model based on the zone cooling/heating loads calculated by EnergyPlus, and the priority control mode and the dehumidification control type specified for this unitary system. The CBVAV system attempts to achieve the outlet air set point temperature to the extent possible.
 
+
+
 Group – Variable Refrigerant Flow Equipment
 -------------------------------------------
 
-### AirConditioner:VariableRefrigerantFlow
+This group of EnergyPlus input objects describes the configurations of Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) air-conditioning systems. 
 
-This model simulates a variable-refrigerant-flow (or variable-refrigerant-volume) air-conditioning system. This system type models direct-expansion cooling and/or heating coils configured in a zone terminal unit. For this system type, the zone terminal units are “connected” to a zone via the zone inlet and exhaust nodes. The zone terminal units are identified in a ZoneTerminalUnitList object. And finally, the name of the ZoneTerminalUnitList object is entered as an input to the AirConditioner:VariableRefrigerantFlow object. The Energyplus connection methodology is shown as dashed and greyed arrows in the figure below according to the following rules:
+A VRF system is an air-conditioning system that varies the refrigerant flow rate using variable speed compressor(s) in the outdoor unit, and the electronic expansion valves (EEVs) located in each indoor unit. The system meets the space cooling or heating load requirements by maintaining the zone air temperature at the setpoint. The ability to control the refrigerant mass flow rate according to the cooling and/or heating load enables the use of as many as 60 or more indoor units with differing capacities in conjunction with one single outdoor unit. This unlocks the possibility of having individualized comfort control, simultaneous heating and cooling in different zones, and heat recovery from one zone to another. It may also lead to more efficient operations during part-load conditions.
 
-1.    The zone inlet and zone exhaust node names are defined in a ZoneHVAC:EquipmentConnections object (bottom of figure).
+There are two alternative VRF models in EnergyPlus: 
 
-2.    A ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object will identify these zone exhaust and zone inlet node names as the terminal unit’s air inlet and air outlet nodes, respectively.
+ 1. **System curve based model (VRF-SysCurve)**. In this model, a number of system level curves are used to describe the VRF system performance. This model corresponds to the *AirConditioner:VariableRefrigerantFlow* object.
+ 
+ 2. **Physics based model (VRF-FluidTCtrl)**. This model is able to consider the dynamics of more operational parameters and is applicable for fluid temperature control. This model corresponds to the *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object.
+ 
+( Please refer to the engineering reference for more technical details of the two models).
 
-3.    All zone terminal units that are connected to the same AirConditioner: VariableRefrigerantFlow object are listed in a ZoneTerminalUnitList object.
+In the VRF system model, direct-expansion cooling and/or heating coils are configured in a zone terminal unit, which is connected to a zone via the zone inlet and exhaust nodes. The zone terminal units are identified in a *ZoneTerminalUnitList* object, the name of which is entered as an input to the *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object. 
 
-4.    The name of the ZoneTerminalUnitList object is an input to the AirConditioner: VariableRefrigerantFlow object.
+The Energyplus connection methodology is shown as dashed and greyed arrows in the figure below according to the following rules:
 
-5.    The AirCondtiioner:VariableRefrigerantFlow object is not listed in an AirloopHVAC object and, therefore, can only be simulated if the terminal units are connected to the AirCondtiioner:VariableRefrigerantFlow object using the ZoneTerminalUnitList.
-
-6.    Secondary ZoneHVAC equipment objects may be used in the same zones as the terminal units for other purposes (e.g., code compliance)
+  * The zone inlet and zone exhaust node names are defined in a *ZoneHVAC:EquipmentConnections* object (bottom of figure).
+  
+  * A *ZoneHVAC:TerminalUnit:VariableRefrigerantFlow* object will identify these zone exhaust and zone inlet node names as the terminal unit’s air inlet and air outlet nodes, respectively.
+  
+  * All zone terminal units that are connected to the same *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object are listed in a *ZoneTerminalUnitList* object.
+  
+  * The name of the *ZoneTerminalUnitList* object is an input to the *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object.
+  
+  * The *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* or *AirConditioner:VariableRefrigerantFlow* object is not listed in an AirloopHVAC object, and therefore, can only be simulated if the terminal units are connected to the *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object using the ZoneTerminalUnitList.
+  
+  * Secondary ZoneHVAC equipment objects may be used in the same zones as the terminal units for other purposes (e.g., code compliance)
 
 The following schematic demonstrates these connection rules.
 
@@ -14033,8 +14047,15 @@ Figure 125. Variable Refrigerant Flow Schematic
 Energyplus object type and object name, and node name relationships are also shown in the following figure to aid in the assembly of this HVAC system type.
 
 ![VRFObjects](media/image311.png)
+*(a) VRF model based on system curves (VRF-SysCurve)*
+
+![VRFObjects](media/image312.png)
+*(b) VRF model based on physics (VRF-FluidTCtrl)*
 
 Figure 126. Variable Refrigerant Flow Object Links
+
+
+### AirConditioner:VariableRefrigerantFlow
 
 #### Field: Heat Pump Name
 
@@ -14471,6 +14492,376 @@ AirConditioner:VariableRefrigerantFlow,
 
 
 
+### AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl
+
+#### Field: Heat Pump Name 
+
+This alpha field defines a unique user-assigned name for an instance of a variable refrigerant flow heat pump. Any reference to this heat pump will use this name. Since this object is not listed in an AirloopHVAC object, the most likely use of this name would be for reporting purposes.
+
+#### Field: Availability Schedule Name
+
+This alpha field defines the name of the schedule (ref: Schedule) that denotes whether the heat pump operates during a given time period. A schedule value equal to 0 denotes that the heat pump must be off for that time period. A value other than 0 denotes that the heat pump is available to operate during that time period. This schedule may be used to completely disable the heat pump (and all of its terminal units) as required. If this field is blank, the unit is enabled the entire simulation.
+
+#### Field: Zone Terminal Unit List Name
+
+This alpha field defines the name of the zone terminal unit list. The name specified here should match the name of a valid ZoneTerminalUnitList object. In addition, each name specified in this list should match the name of a valid ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object. All terminal units connected to this heat pump must be listed in this ZoneTerminalUnitList object.
+
+#### Field: Refrigerant Type
+
+This alpha field defines the name of the refrigerant used in the VRF system. The name specified here should match the name of a valid FluidProperties:Name object. 
+
+####Field: Rated Evaporative Capacity
+
+This numeric field defines the total evaporative capacity in watts at rated conditions. This is the capacity corresponding to the max compressor speed at rated conditions. The actual evaporative capacity is obtained by multiplying the rated capacity with the modification factor calculated by Evaporative Capacity Multiplier Function of Temperature Curve. The value must be greater than 0. If this field is left blank, a default value of 40,000 W is assumed.
+	   
+####Field: Rated Compressor Power Per Unit of Rated Evaporative Capacity
+
+This numeric field defines the rated compressor power per Watt of rated evaporative capacity. Rated compressor power corresponds to the max compressor speed at rated conditions. The actual compressor power is obtained by multiplying the rated power with the modification factor calculated by Compressor Power Multiplier Function of Temperature Curve. The value must be greater than 0. If this field is left blank, a default value of 0.35 W/W is assumed.
+
+####Field: Minimum Outdoor Air Temperature in Cooling Mode
+
+This numeric field defines the minimum outdoor dry-bulb temperature allowed for cooling operation. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6ºC.
+
+####Field: Maximum Outdoor Air Temperature in Cooling Mode
+
+This numeric field defines the maximum outdoor dry-bulb temperature allowed for cooling operation. Above this temperature, cooling is disabled. If this field is left blank, the default value is 43ºC.
+
+####Field: Minimum Outdoor Air Temperature in Heating Mode
+
+This numeric field defines the minimum outdoor temperature allowed for heating operation. Below this temperature, heating is disabled. If this field is left blank, the default value is -20ºC.
+
+####Field: Maximum Outdoor Air Temperature in Heating Mode
+
+This numeric field defines the maximum outdoor temperature allowed for heating operation. Above this temperature, heating is disabled. If this field is left blank, the default value is 16ºC.
+
+#### Field: Outdoor Unit Reference Superheating 
+
+This numeric field defines the reference superheating degrees of the outdoor unit. If this field is blank, the default value of 3.0ºC is used. 
+
+#### Field: Outdoor Unit Reference Subcooling 
+
+This numeric field defines the reference subcooling degrees of the outdoor unit. If this field is blank, the default value of 3.0ºC is used. 
+
+#### Field: Refrigerant Temperature Control Algorithm for Indoor Unit
+
+This alpha field specifies the algorithm for the refrigerant temperature control. Two choices are available: ConstantTemp or VariableTemp. The indoor unit evaporating temperature at cooling mode or condensing temperature at heating are fixed in the ConstantTemp algorithm, while in VariableTemp algorithm they can be varied.
+
+#### Field: Reference Evaporating Temperature for Indoor Unit 
+
+This numeric field defines the reference evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is ConstantTemp. If this field is blank, the default value of 6.0ºC is used.
+
+#### Field: Reference Condensing Temperature for Indoor Unit 
+
+This numeric field defines the reference condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is ConstantTemp. If this field is blank, the default value of 44.0ºC is used.
+
+#### Field: Variable Evaporating Temperature Minimum for Indoor Unit
+
+This numeric field defines the minimum evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 4.0ºC is used.
+
+#### Field: Variable Evaporating Temperature Maximum for Indoor Unit
+
+This numeric field defines the maximum evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 13.0ºC is used.
+
+#### Field: Variable Condensing Temperature Minimum for Indoor Unit
+
+This numeric field defines the minimum condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 42.0ºC is used.
+
+#### Field: Variable Condensing Temperature Maximum for Indoor Unit
+
+This numeric field defines the maximum condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 46.0ºC is used.
+
+#### Field: Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity
+ 
+This numeric field defines the outdoor unit fan power per watt of rated evaporative capacity. If this field is blank, the default value of 4.25E-3 W/W is used.
+	   
+#### Field: Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity
+ 
+This numeric field defines the outdoor unit fan volumetric flow rate per watt of rated evaporative capacity. If this field is blank, the default value of 7.50E-5 m<sup>3</sup>/s-W is used.
+
+#### Field: Outdoor Unit Evaporating Temperature Function of Superheating Curve Name    
+
+This alpha field defines the name of a quadratic performance curve that parameterizes the variation of outdoor unit evaporating temperature as a function of superheating degrees. The output of this curve is the temperature difference between the coil surface air temperature and the evaporating temperature.
+
+#### Field: Outdoor Unit Condensing Temperature Function of Subcooling Curve Name    
+
+This alpha field defines the name of a quadratic performance curve that parameterizes the variation of outdoor unit condensing temperature as a function of subcooling degrees. The output of this curve is the temperature difference between the condensing temperature and the coil surface air temperature.
+
+#### Field: Diameter of main pipe connecting outdoor unit to indoor units
+
+This numeric field defines the diameter of main pipe connecting outdoor unit to indoor units. This value is used to calculate the piping loss of the refrigerant when going through the main pipe, including the heat loss and pressure drop. If this field is blank, the default value of 0.0254m is used.
+
+#### Field: Length of main pipe connecting outdoor unit to indoor units
+
+This numeric field defines the length of main pipe connecting outdoor unit to indoor units. This value is used to calculate the heat loss of the refrigerant when going through the main pipe. The value should be greater than 0. If this field is blank, the default value of 30m is used.
+
+#### Field: Equivalent length of main pipe connecting outdoor unit to indoor units
+
+This numeric field defines the equivalent length of main pipe connecting outdoor unit to indoor units. This value is used to calculate the pressure drop of the refrigerant when going through the main pipe. The value should be greater than the real pipe length specified in the above field. If this field is blank, the default value of 36m is used.
+
+#### Field: Height difference between the outdoor unit node and indoor unit node of the main pipe
+
+This numeric field defines the height difference between the outdoor unit node and indoor unit node of the main pipe. This value is used to calculate the piping loss of the refrigerant when going through the main pipe. The value can be positive, zero, or negative. Positive means outdoor unit is higher than indoor unit, while negative means outdoor unit is lower than indoor unit.
+
+#### Field: Insulation thickness of the main pipe
+
+This numeric field defines the insulation thickness of the main pipe. This value is used to calculate the heat loss of the refrigerant when going through the main pipe. The value should be greater than 0. If this field is blank, the default value of 0.02m is used.
+
+#### Field: Thermal conductivity of the main pipe insulation material
+
+This numeric field defines the thermal conductivity of the main pipe insulation material. This value is used to calculate the heat loss of the refrigerant when going through the main pipe. The value should be greater than 0. If this field is blank, the default value of 0.032 W/m-K is used.
+
+#### Field: Crankcase Heater Power per Compressor
+
+This numeric field defines the electrical power consumed by the crankcase heater in watts for each compressor. This crankcase heater power is consumed to warm the refrigerant and oil when the compressor is off when the outdoor temperature is below the maximum outdoor dry-bulb temperature for crankcase heater operation. The minimum value for this field is 0. If this field is left blank, the default value is 33 watts. Crankcase heater electrical consumption is applied only when the compressor is off or is applied during the off cycle when the compressor is cycling below the Minimum Heat Pump Part-Load Ratio. This field is only used to calculate crankcase heater power and has no impact on heat pump performance.
+
+#### Field: Number of Compressors
+
+This numeric field defines the number of compressors in the heat pump condensing unit and is used exclusively to determine the operating characteristics of the crankcase heater. For example, if the number of compressors is 3, one crankcase heater will operate when the heat pump condensing unit’s part-load ratio is less than or equal to 0.67 (when the ratio of compressor size to total compressor capacity input is 0.33) and the outdoor temperature is below the maximum outdoor temperature for crankcase heater operation. Similarly, two crankcase heaters will operate when the heat pump condensing unit’s PLR is less than or equal to 0.33 and the outdoor temperature is below the maximum outdoor temperature for crankcase heater operation. If the heat pump condensing unit is off, all 3 crankcase heaters will operate if the outdoor temperature is below the maximum outdoor temperature for crankcase heater operation. The minimum value for this field is 1. If this field is left blank, the default value is 2. This field is only used to calculate crankcase heater power and has no impact on heat pump performance.
+
+#### Field: Ratio of Compressor Size to Total Compressor Capacity
+
+This numeric field defines the size of the first stage compressor to the total compressor capacity and is used exclusively for calculating crankcase heater energy. If this field and the previous field are left blank, the default value is 0.5.  If this field is left blank and the previous field is not blank, the compressors are assumed to be equally sized. When the number of compressors is greater than 2, the 2<sup>nd</sup> stage compressor and all additional compressors are assumed to be equally sized. This field is only used to calculate crankcase heater power and has no impact on heat pump performance.
+
+#### Field: Maximum Outdoor Dry-bulb Temperature for Crankcase Heater
+
+This numeric field defines the maximum outdoor temperature, in degrees Celsius, below which the crankcase heater will operate. If this field is left blank, the default value is 5°C. This field is only used to calculate crankcase heater power and has no impact on heat pump performance.
+
+#### Field: Defrost Strategy
+
+This alpha field has two choices: reverse-cycle or resistive. If the reverse-cycle strategy is selected, the heating cycle is reversed periodically to provide heat to melt frost accumulated on the outdoor coil. If a resistive defrost strategy is selected, the frost is melted using an electric resistance heater. If this input field is left blank, the default defrost strategy is reverse-cycle. Defrost can be disabled by entering a resistive defrost strategy using a timed defrost control, a 0 defrost time period fraction and a 0 resistive defrost heater capacity in the following inputs fields. This method is used when the Maximum Outdoor Dry-Bulb Temperature for Defrost Operation field value is greater than the expected minimum outdoor dry-bulb temperature simulated in the weather file.
+
+#### Field: Defrost Control
+
+This alpha field has two choices: timed or on-demand. If timed control is selected, the defrost time period is calculated based on a fixed value of compressor runtime whether or not frost has actually accumulated. For timed defrost control, the fractional amount of time the unit is in defrost is entered in the input field “Defrost Time Period Fraction” described below. If on-demand defrost control is selected, the defrost time period is calculated based on outdoor weather (humidity ratio) conditions. Regardless of which defrost control is selected, defrost does not occur above the user specified outdoor temperature entered in the input field “Maximum Outdoor Dry-bulb Temperature for Defrost Operation” described above. If this input field is left blank, the default defrost control is timed.
+
+#### Field: Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
+
+This alpha field defines the name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) during reverse-cycle defrost periods as a function of the outdoor air dry-bulb temperature and the weighted average wet-bulb temperature of the air entering the indoor terminal units. The output of this curve is multiplied by the coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the indoor and outdoor coils are operating. The curve is normalized to a value of 1.0 at the rating point conditions.
+
+#### Field: Defrost Time Period Fraction
+
+This numeric field defines the fraction of compressor runtime when the defrost cycle is active. For example, if the defrost cycle is active for 3.5 minutes for every 60 minutes of compressor runtime, then the user should enter 3.5/60 = 0.058333. The value for this input field must be greater than or equal to 0. If this input field is left blank, the default value is 0.058333.
+
+#### Field: Resistive Defrost Heater Capacity
+
+This numeric field defines the capacity of the resistive defrost heating element in Watts. This input field is used only when the selected defrost strategy is ‘resistive’ (see input field “Defrost Strategy” above). The value for this input field must be greater than or equal to 0. If this input field is left blank, the default value is 0.
+
+#### Field: Maximum Outdoor Dry-bulb Temperature for Defrost Operation
+
+This numeric field defines the outdoor air dry-bulb temperature above which outdoor coil defrosting is disabled. If this input field is left blank, the default value is 5°C. Defrost can be completely eliminated by selecting a temperature lower than the minimum expected outdoor temperature found in the weather file.
+
+#### Field: Compressor maximum delta Pressure
+
+This numeric field defines the maximum pressure increase that the compressor can provide. The value should be greater than 0. If this field is blank, the default value of 4,500,000 Pa is used.
+
+#### Field: Number of Compressor Loading Index Entries
+
+This numeric field defines the number of compressor loading index entries. Loading index specifies the VRF operational modes at various load conditions. In a single compressor system, loading index reflects the compressor speed. The model requires at least two loading indices. The first index represents the minimal capacity operation, while the last index represents full capacity operation.
+
+#### Field: Compressor Speed at Loading Index i 
+
+This numeric field defines the compressor speed at the i-th loading index. The value must be greater than 0.
+
+#### Field: Loading Index i Evaporative Capacity Multiplier Function of Temperature Curve Name
+
+This alpha field defines the name of a BiQuadratic curve for the VRF operational mode corresponding to the i-th loading index. It parameterizes the variation of VRF evaporating capacity as a function of operating conditions, i.e., evaporating and condensing temperatures. The output of this curve is a dimensionless multiplier to be applied on the rated evaporative capacity to calculate the actual capacity.
+
+#### Field: Loading Index i Compressor Power Multiplier Function of Temperature Curve Name
+
+This alpha field defines the name of a BiQuadratic curve for the VRF operational mode corresponding to the i-th loading index. It parameterizes the variation of compressor power as a function of operating conditions, i.e., evaporating and condensing temperatures. The output of this curve is a dimensionless multiplier to be applied on the rated compressor power to calculate the actual compressor power.
+
+Following is an example input for a AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl system.
+
+
+```idf
+
+  AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
+    VRF Heat Pump,           !- Heat Pump Name
+    VRFCondAvailSched,       !- Availability Schedule Name
+    VRF Heat Pump TU List,   !- Zone Terminal Unit List Name
+    R410A,                   !- Refrigerant Type
+    41300,                   !- Rated Evaporative Capacity {W}
+    0.344,                   !- Rated Compressor Power Per Unit of Rated Evaporative Capacity {W/W}
+    ,                        !- Minimum Outdoor Air Temperature in Cooling Mode {C}
+    ,                        !- Maximum Outdoor Air Temperature in Cooling Mode {C}
+    ,                        !- Minimum Outdoor Air Temperature in Heating Mode {C}
+    ,                        !- Maximum Outdoor Air Temperature in Heating Mode {C}
+    3,                       !- Reference Outdoor Unit Superheating Degrees {C}
+    3,                       !- Reference Outdoor Unit Subcooling Degrees {C}
+    VariableTemp,            !- Refrigerant Temperature Control Algorithm for Indoor Unit
+    ,                        !- Reference Evaporating Temperature for Indoor Unit {C}
+    ,                        !- Reference Condensing Temperature for Indoor Unit {C}
+    6,                       !- Variable Evaporating Temperature Minimum for Indoor Unit {C}
+    13,                      !- Variable Evaporating Temperature Maximum for Indoor Unit {C}
+    42,                      !- Variable Condensing Temperature Minimum for Indoor Unit {C}
+    46,                      !- Variable Evaporating Temperature Maximum for Indoor Unit {C}
+    4.12E-3,                 !- Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity {W/W}
+    7.26E-5,                 !- Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity {m3/s-W}
+    OUEvapTempCurve,         !- Outdoor Unit Evaporating Temperature Function of Superheating Curve Name
+    OUCondTempCurve,         !- Outdoor Unit Condensing Temperature Function of Subcooling Curve Name
+    0.0508,                  !- Diameter of main pipe connecting outdoor unit to indoor units {m}
+    30,                      !- Length of main pipe connecting outdoor unit to indoor units {m}
+    36,                      !- Equivalent length of main pipe connecting outdoor unit to indoor units {m}
+    5,                       !- Height difference between the outdoor unit node and indoor unit node of the main pipe {m}
+    0.02,                    !- Insulation thickness of the main pipe {m}
+    0.032,                   !- Thermal conductivity of the main pipe insulation material {W/m-K}
+    33,                      !- Crankcase Heater Power per Compressor {W}
+    1,                       !- Number of Compressors
+    0.33,                    !- Ratio of Compressor Size to Total Compressor Capacity
+    7,                       !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater {C}
+    ,                        !- Defrost Strategy
+    ,                        !- Defrost Control
+    ,                        !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
+    ,                        !- Defrost Time Period Fraction
+    ,                        !- Resistive Defrost Heater Capacity {W}
+    ,                        !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
+    4500000,                 !- Compressor maximum delta Pressure {Pa}
+    3,                       !- Number of Compressor Loading Index Entries
+    1500,                    !- Compressor Speed at Loading Index 1 {rev/min}
+    MinSpdCooling,           !- Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name
+    MinSpdPower,             !- Loading Index 1 Compressor Power Multiplier Function of Temperature Curve Name
+    3600,                    !- Compressor Speed at Loading Index 2 {rev/min}
+    Spd1Cooling,             !- Loading Index 2 Evaporative Capacity Multiplier Function of Temperature Curve Name
+    Spd1Power,               !- Loading Index 2 Compressor Power Multiplier Function of Temperature Curve Name
+    6000,                    !- Compressor Speed at Loading Index 3 {rev/min}
+    Spd2Cooling,             !- Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name
+    Spd2Power;               !- Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name
+
+  Curve:Quadratic,
+    OUEvapTempCurve,         !- Name
+    0,                       !- Coefficient1 Constant
+    6.05E-1,                 !- Coefficient2 x
+    2.50E-2,                 !- Coefficient3 x**2
+    0,                       !- Minimum Value of x    
+    15,                      !- Maximum Value of x    
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature;             !- Output Unit Type
+
+  Curve:Quadratic,
+    OUCondTempCurve,         !- Name
+    0,                       !- Coefficient1 Constant
+    -2.91,                   !- Coefficient2 x
+    1.180,                   !- Coefficient3 x**2
+    0,                       !- Minimum Value of x    
+    20,                      !- Maximum Value of x    
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature;             !- Output Unit Type
+	
+  Curve:Biquadratic,
+    MinSpdCooling,           !- Name
+    3.19E-01,                !- Coefficient1 Constant
+    -1.26E-03,               !- Coefficient2 x
+    -2.15E-05,               !- Coefficient3 x**2
+    1.20E-02,                !- Coefficient4 y
+    1.05E-04,                !- Coefficient5 y**2
+    -8.66E-05,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    MinSpdPower,             !- Name
+    8.79E-02 ,               !- Coefficient1 Constant
+    -1.72E-04,               !- Coefficient2 x
+    6.93E-05 ,               !- Coefficient3 x**2
+    -3.38E-05,               !- Coefficient4 y
+    -8.10E-06,               !- Coefficient5 y**2
+    -1.04E-05,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+	
+  Curve:Biquadratic,
+    Spd1Cooling,             !- Name
+    8.12E-01 ,               !- Coefficient1 Constant
+    -4.23E-03,               !- Coefficient2 x
+    -4.11E-05,               !- Coefficient3 x**2
+    2.97E-02 ,               !- Coefficient4 y
+    2.67E-04 ,               !- Coefficient5 y**2
+    -2.23E-04,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    Spd1Power,               !- Name
+    3.26E-01 ,               !- Coefficient1 Constant
+    -2.20E-03,               !- Coefficient2 x
+    1.42E-04 ,               !- Coefficient3 x**2
+    2.82E-03 ,               !- Coefficient4 y
+    2.86E-05 ,               !- Coefficient5 y**2
+    -3.50E-05,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    Spd2Cooling,             !- Name
+    1.32E+00 ,               !- Coefficient1 Constant
+    -6.20E-03,               !- Coefficient2 x
+    -7.10E-05,               !- Coefficient3 x**2
+    4.89E-02 ,               !- Coefficient4 y
+    4.59E-04 ,               !- Coefficient5 y**2
+    -3.67E-04,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    Spd2Power,               !- Name
+    6.56E-01 ,               !- Coefficient1 Constant
+    -3.71E-03,               !- Coefficient2 x
+    2.07E-04 ,               !- Coefficient3 x**2
+    1.05E-02 ,               !- Coefficient4 y
+    7.36E-05 ,               !- Coefficient5 y**2
+    -1.57E-04,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+	
+```
+
+
 ### Variable Refrigerant Flow (VRF) Air Conditioner Outputs
 
 * HVAC,Average,VRF Heat Pump Total Cooling Rate [W]
@@ -14575,6 +14966,25 @@ Alternate Fuel types (e.g., FuelType = NaturalGas):
 
 * HVAC,Sum,VRF Heat Pump Defrost &lt;FuelType&gt; Energy [J]
 
+
+
+For the pysics based VRF model (VRF-FluidTCtrl) only:
+
+* VRF Heat Pump Indoor Unit Evaporating Temperature at Cooling Mode [C]
+
+* VRF Heat Pump Outdoor Unit Condensing Temperature at Cooling Mode [C]
+
+* VRF Heat Pump Indoor Unit Condensing Temperature at Heating Mode [C]
+
+* VRF Heat Pump Outdoor Unit Evaporating Temperature at Heating Mode [C]
+
+* VRF Heat Pump Compressor Electric Power at Cooling Mode [W]
+
+* VRF Heat Pump Compressor Electric Power at Heating Mode [W]
+
+* VRF Heat Pump Compressor Rotating Speed [rev/min]
+
+* VRF Heat Pump Outdoor Unit Fan Power [W]
 
 
 Note: refer to the rdd file after a simulation for exact output variable names
@@ -14708,6 +15118,41 @@ This output is the electric consumption of the heat pump’s basin heater (for e
 #### VRF Heat Pump Heat Recovery Status Change Multiplier []
 
 This output applies only when heat recovery is used and represents the multiplier used to derate the capacity of the system when transitioning from cooling or heating mode to heat recovery mode. This value is 1 when derating does not apply (i.e., the system has not recently changed modes to provide heat recovery). Derating during a transition period is applied according to the inputs for Heat Recovery Fraction and Heat Recovery Time Constant. To turn transition derating off, set Heat Recovery Fraction to 1. Refer to the engineering reference document discussion on the variable refrigerant flow heat pump model section for transition from cooling only mode to heat recovery mode for a more detailed description.
+
+
+#### VRF Heat Pump Indoor Unit Evaporating Temperature at Cooling Mode [C]
+
+This output only applies for the VRF-FluidTCtrl model. This is the evaporating temperature of the VRF system operating at cooling mode. This value is manipulated by the VRF system considering the load conditions of all the zones it serves. It affects the indoor unit cooling coil surface temperature and thus the cooling capacity of the indoor unit. It also affects the compressor operating conditions and thus the compressor energy consumption.
+
+#### VRF Heat Pump Outdoor Unit Condensing Temperature at Cooling Mode [C]
+
+This output only applies for the VRF-FluidTCtrl model. This is the condensing temperature of the VRF system operating at cooling mode. This value is related with the outdoor air conditions as well as the system operational mode. It affects the condensing capacity of the outdoor unit. It also affects the compressor operating conditions and thus the compressor energy consumption.
+
+#### VRF Heat Pump Indoor Unit Condensing Temperature at Heating Mode [C]
+
+This output only applies for the VRF-FluidTCtrl model. This is the condensing temperature of the VRF system operating at heating mode. This value is manipulated by the VRF system considering the load conditions of all the zones it serves. It affects the indoor unit heating coil surface temperature and thus the heating capacity of the indoor unit. It also affects the compressor operating conditions and thus the compressor energy consumption.
+
+#### VRF Heat Pump Outdoor Unit Evaporating Temperature at Heating Mode [C]
+
+This output only applies for the VRF-FluidTCtrl model. This is the evaporating temperature of the VRF system operating at heating mode. This value is related with the outdoor air conditions as well as the system operational mode. It affects the evaporating capacity of the outdoor unit. It also affects the compressor operating conditions and thus the compressor energy consumption.
+
+#### VRF Heat Pump Compressor Electric Power at Cooling Mode [W]
+
+This output only applies for the VRF-FluidTCtrl model. This is the electric power of the compressor running at the cooling mode. This value is related with the compressor speed as well as the operational conditions, i.e., evaporating and condensing temperatures of the system.
+
+#### VRF Heat Pump Compressor Electric Power at Heating Mode [W]
+
+This output only applies for the VRF-FluidTCtrl model. This is the electric power of the compressor running at the heating mode. This value is related with the compressor speed as well as the operational conditions, i.e., evaporating and condensing temperatures of the system.
+
+#### VRF Heat Pump Compressor Rotating Speed [rev/min]
+
+This output only applies for the VRF-FluidTCtrl model. This is the rotating speed of the compressor, which indicates the loading index.
+
+#### VRF Heat Pump Outdoor Unit Fan Power [W]
+
+This output only applies for the VRF-FluidTCtrl model. This is the power consumed by the fan located in the VRF outdoor unit.
+
+
 
 ### ZoneTerminalUnitList
 
