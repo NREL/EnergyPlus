@@ -23,10 +23,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DXCoils.hh>
-#include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -57,12 +54,8 @@ using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DXCoils;
-using namespace EnergyPlus::Fans;
-using namespace EnergyPlus::GlobalNames;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::WaterCoils;
-using namespace EnergyPlus::HeatingCoils;
 using namespace EnergyPlus::OutputReportPredefined;
 using namespace EnergyPlus::VariableSpeedCoils;
 using General::TrimSigDigits;
@@ -231,9 +224,6 @@ TEST_F( HVACFixture, SetOnOffMassFlowRateTest )
 	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
 	EXPECT_EQ( 0.2, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.2, MSHPMassFlowRateHigh );
-
-	// Clean up
-	Node.deallocate();
 
 }
 
@@ -433,9 +423,6 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
-	cached_Twb.deallocate();
-	cached_Psat.deallocate();
-
 }
 TEST( HVACUnitarySystem, CalcUnitaryHeatingSystem ) {
 
@@ -574,13 +561,8 @@ TEST( HVACUnitarySystem, CalcUnitaryHeatingSystem ) {
 
 	EXPECT_NEAR( 15750.0, WaterCoil( 1 ).TotWaterHeatingCoilRate, 2.0 );
 
-	// Clean up
-	DataGlobals::DoingSizing = false;
-	PlantLoop.deallocate();
-	WaterCoil.allocate( 1 );
-	Node.deallocate();
-
 }
+
 TEST( HVACUnitarySystem, CalcUnitaryCoolingSystem ) {
 
 	ShowMessage( "Begin Test: HVACUnitarySystem, CalcUnitaryCoolingSystem" );
@@ -736,16 +718,9 @@ TEST( HVACUnitarySystem, CalcUnitaryCoolingSystem ) {
 
 	EXPECT_NEAR( 27530.0, WaterCoil( 1 ).TotWaterCoolingCoilRate, 2.0 );
 
-	// Clean up
-//	MyUAAndFlowCalcFlag.deallocate();
-//	Node.deallocate();
-//	PlantLoop.deallocate();
-//	WaterCoil.allocate( 1 );
-
 }
 
 TEST_F( HVACFixture, UnitarySystem_GetInput ) {
-	UnitarySystemData thisUnSys;
 
 	bool ErrorsFound( false );
 	bool FirstHVACIteration( false );
@@ -959,15 +934,10 @@ TEST_F( HVACFixture, UnitarySystem_GetInput ) {
 
 	GetZoneEquipmentData1(); // read zone equipment configuration and list objects
 
-	ZoneEqSizing.deallocate();
 	ZoneEqSizing.allocate( 1 );
 	ZoneEquipList( 1 ).EquipIndex.allocate( 1 );
 	ZoneEquipList( 1 ).EquipIndex( 1 ) = 1; // initialize equipment index for ZoneHVAC
 	
-	Fans::GetFanInputFlag = true;
-	DXCoils::GetCoilsInputFlag = true;
-	GlobalNames::NumCoils = 0;
-	GlobalNames::CoilNames.deallocate();
 	GetUnitarySystemInput(); // get UnitarySystem input from object above
 	HVACUnitarySystem::GetInputFlag = false; // don't call GetInput more than once (SimUnitarySystem call below will call GetInput if this flag is not set to false)
 
@@ -1053,22 +1023,15 @@ TEST_F( HVACFixture, UnitarySystem_GetInput ) {
 	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate );
 
 
-	// clean up non clear-state arrays and reset scalars
+	// clean up non clear-state arrays
 	ZoneSysEnergyDemand.deallocate();
 	ZoneSysMoistureDemand.deallocate();
 	CurDeadBandOrSetback.deallocate();
 	TempControlType.deallocate();
-//	DataGlobals::BeginEnvrnFlag = false;
-//	DataEnvironment::StdRhoAir = 0.0;
-//	DataEnvironment::OutDryBulbTemp = 0.0;
-//	DataEnvironment::OutHumRat = 0.0;
-//	DataEnvironment::OutBaroPress=0.0;
-//	DataEnvironment::OutWetBulbTemp = 0.0;
 
 }
 
 TEST_F( HVACFixture, UnitarySystem_VarSpeedCoils ) {
-	UnitarySystemData thisUnSys;
 
 	bool ErrorsFound( false );
 	bool FirstHVACIteration( false );
@@ -1379,8 +1342,6 @@ TEST_F( HVACFixture, UnitarySystem_VarSpeedCoils ) {
 
 	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
 
-	HeatingCoils::GetCoilsInputFlag = true;
-	HeatingCoils::HeatingCoil.deallocate();
 	GetZoneData( ErrorsFound ); // read zone data
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
 
@@ -1391,11 +1352,6 @@ TEST_F( HVACFixture, UnitarySystem_VarSpeedCoils ) {
 	ZoneEquipList( 1 ).EquipIndex.allocate( 1 );
 	ZoneEquipList( 1 ).EquipIndex( 1 ) = 1; // initialize equipment index for ZoneHVAC
 	
-//	Fans::GetFanInputFlag = true;
-//	DXCoils::GetCoilsInputFlag = true;
-//	GlobalNames::NumCoils = 0;
-//	GlobalNames::CoilNames.deallocate();
-//	DataBranchNodeConnections::NumCompSets = 0;
 	GetUnitarySystemInput(); // get UnitarySystem input from object above
 	HVACUnitarySystem::GetInputFlag = false; // don't call GetInput more than once (SimUnitarySystem call below will call GetInput if this flag is not set to false)
 
@@ -1484,16 +1440,10 @@ TEST_F( HVACFixture, UnitarySystem_VarSpeedCoils ) {
 	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate );
 
 
-	// clean up non clear-state arrays and reset scalars
+	// clean up non clear-state arrays
 	ZoneSysEnergyDemand.deallocate();
 	ZoneSysMoistureDemand.deallocate();
 	CurDeadBandOrSetback.deallocate();
 	TempControlType.deallocate();
-//	DataGlobals::BeginEnvrnFlag = false;
-//	DataEnvironment::StdRhoAir = 0.0;
-//	DataEnvironment::OutDryBulbTemp = 0.0;
-//	DataEnvironment::OutHumRat = 0.0;
-//	DataEnvironment::OutBaroPress=0.0;
-//	DataEnvironment::OutWetBulbTemp = 0.0;
 
 }

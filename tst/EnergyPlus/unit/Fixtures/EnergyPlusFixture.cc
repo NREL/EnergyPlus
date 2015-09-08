@@ -40,6 +40,7 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/Humidifiers.hh>
@@ -128,6 +129,7 @@ namespace EnergyPlus {
 		GlobalNames::clear_state();
 		HeatBalanceAirManager::clear_state();
 		HeatBalanceManager::clear_state();
+		HeatingCoils::clear_state();
 		Humidifiers::clear_state();
 		HVACManager::clear_state();
 		HVACUnitarySystem::clear_state();
