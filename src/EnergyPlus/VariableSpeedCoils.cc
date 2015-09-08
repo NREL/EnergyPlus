@@ -359,7 +359,7 @@ namespace VariableSpeedCoils {
 		int NumHeat; // Counter for heating coil, water source
 		int NumHeatAS; // Counter for heating coil, air source
 		int NumHPWHAirToWater; //counter for air source HPWH
-		int WatertoAirHPNum; // Counter
+		int CoilCounter; // Counter
 		int I; // Loop index increment
 		int NumAlphas; // Number of variables in String format
 		int NumNums; // Number of variables in Numeric format
@@ -392,7 +392,7 @@ namespace VariableSpeedCoils {
 		DXCoilNum = 0;
 
 		if ( NumWatertoAirHPs <= 0 ) {
-			ShowSevereError( "No Equipment found in variable speed coil module" );
+			ShowSevereError( "No Equipment found in GetVarSpeedCoilInput" );
 			ErrorsFound = true;
 		}
 
@@ -430,12 +430,12 @@ namespace VariableSpeedCoils {
 		// Get the data for cooling coil, WATER SOURCE
 		CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit"; //for reporting
 
-		for ( WatertoAirHPNum = 1; WatertoAirHPNum <= NumCool; ++WatertoAirHPNum ) {
+		for ( CoilCounter = 1; CoilCounter <= NumCool; ++CoilCounter ) {
 
 			++DXCoilNum;
 			AlfaFieldIncre = 1;
 
-			GetObjectItem( CurrentModuleObject, DXCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			GetObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -774,7 +774,7 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSRatedWaterVolFlowPerRatedTotCap( I ) = VarSpeedCoil( DXCoilNum ).MSRatedWaterVolFlowRate( I ) / VarSpeedCoil( DXCoilNum ).MSRatedTotCap( I );
 			}
 
-			SetupOutputVariable( "Cooling Coil Electric Energy [J]", VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Cooling", _, "System" );
+			SetupOutputVariable( "Cooling Coil Electric Energy [J]", VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Cooling", "WSHP Coil", "System" );
 
 			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 
@@ -808,12 +808,12 @@ namespace VariableSpeedCoils {
 		// Get the data for cooling coil, AIR SOURCE
 		CurrentModuleObject = "Coil:Cooling:DX:VariableSpeed"; //for reporting
 
-		for ( WatertoAirHPNum = 1; WatertoAirHPNum <= NumCoolAS; ++WatertoAirHPNum ) {
+		for ( CoilCounter = 1; CoilCounter <= NumCoolAS; ++CoilCounter ) {
 
 			++DXCoilNum;
 			AlfaFieldIncre = 1;
 
-			GetObjectItem( CurrentModuleObject, DXCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			GetObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -1133,7 +1133,7 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSRatedEvapCondVolFlowPerRatedTotCap( I ) = VarSpeedCoil( DXCoilNum ).EvapCondAirFlow( I ) / VarSpeedCoil( DXCoilNum ).MSRatedTotCap( I );
 			}
 
-			SetupOutputVariable( "Cooling Coil Electric Energy [J]", VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Cooling", _, "System" );
+			SetupOutputVariable( "Cooling Coil Electric Energy [J]", VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Cooling", "VS DX Coil", "System" );
 
 			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 
@@ -1161,11 +1161,11 @@ namespace VariableSpeedCoils {
 		// Get the data for heating coil, WATER SOURCE
 		CurrentModuleObject = "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit";
 
-		for ( WatertoAirHPNum = 1; WatertoAirHPNum <= NumHeat; ++WatertoAirHPNum ) {
+		for ( CoilCounter = 1; CoilCounter <= NumHeat; ++CoilCounter ) {
 
 			++DXCoilNum;
 
-			GetObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			GetObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -1500,7 +1500,7 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSRatedWaterVolFlowPerRatedTotCap( I ) = VarSpeedCoil( DXCoilNum ).MSRatedWaterVolFlowRate( I ) / VarSpeedCoil( DXCoilNum ).MSRatedTotCap( I );
 			}
 
-			SetupOutputVariable( "Heating Coil Electric Energy [J]", VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil Electric Energy [J]", VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Heating", "WSHP", "System" );
 
 			SetupOutputVariable( "Heating Coil Heating Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 
@@ -1517,11 +1517,11 @@ namespace VariableSpeedCoils {
 		// Get the data for heating coil, AIR SOURCE
 		CurrentModuleObject = "COIL:HEATING:DX:VARIABLESPEED";
 
-		for ( WatertoAirHPNum = 1; WatertoAirHPNum <= NumHeatAS; ++WatertoAirHPNum ) {
+		for ( CoilCounter = 1; CoilCounter <= NumHeatAS; ++CoilCounter ) {
 
 			++DXCoilNum;
 
-			GetObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			GetObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -1825,7 +1825,7 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowPerRatedTotCap( I ) = VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( I ) / VarSpeedCoil( DXCoilNum ).MSRatedTotCap( I );
 			}
 
-			SetupOutputVariable( "Heating Coil Electric Energy [J]", VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil Electric Energy [J]", VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Heating", "VS DX Coil", "System" );
 
 			SetupOutputVariable( "Heating Coil Heating Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 
@@ -1844,12 +1844,12 @@ namespace VariableSpeedCoils {
 		//------------------------VARIABLE-SPEED AIR SOURCE HPWH---BEGIN
 		CurrentModuleObject = "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED"; //for reporting
 
-		for (WatertoAirHPNum = 1; WatertoAirHPNum <= NumHPWHAirToWater; ++WatertoAirHPNum) {
+		for (CoilCounter = 1; CoilCounter <= NumHPWHAirToWater; ++CoilCounter) {
 
 			++DXCoilNum;
 			AlfaFieldIncre = 1;
 
-			GetObjectItem(CurrentModuleObject, DXCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+			GetObjectItem(CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -2334,12 +2334,12 @@ namespace VariableSpeedCoils {
 						SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Energy [J]", VarSpeedCoil( DXCoilNum ).EvapCondPumpElecConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
 						if ( VarSpeedCoil( DXCoilNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
 							SetupOutputVariable( "Cooling Coil Basin Heater Electric Power [W]", VarSpeedCoil( DXCoilNum ).BasinHeaterPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-							SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy [J]", VarSpeedCoil( DXCoilNum ).BasinHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
+							SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy [J]", VarSpeedCoil( DXCoilNum ).BasinHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "COOLING", "VS DX Coil", "System" );
 						}
 					}
 
 					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Power [W]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Energy [J]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
+					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Energy [J]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "COOLING", "VS DX Coil", "System" );
 				} else {
 					// air source heating coils
 					SetupOutputVariable( "Heating Coil Air Mass Flow Rate [kg/s]", VarSpeedCoil( DXCoilNum ).AirMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
@@ -2358,9 +2358,9 @@ namespace VariableSpeedCoils {
 					SetupOutputVariable( "Heating Coil Neighboring Speed Levels Ratio []", VarSpeedCoil( DXCoilNum ).SpeedRatioReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 
 					SetupOutputVariable( "Heating Coil Defrost Electric Power [W]", VarSpeedCoil( DXCoilNum ).DefrostPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Defrost Electric Energy [J]", VarSpeedCoil( DXCoilNum ).DefrostConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
+					SetupOutputVariable( "Heating Coil Defrost Electric Energy [J]", VarSpeedCoil( DXCoilNum ).DefrostConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", "VS DX Coil", "System" );
 					SetupOutputVariable( "Heating Coil Crankcase Heater Electric Power [W]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Crankcase Heater Electric Energy [J]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
+					SetupOutputVariable( "Heating Coil Crankcase Heater Electric Energy [J]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", "VS DX Coil", "System" );
 
 				}
 			} else {
@@ -4317,8 +4317,13 @@ namespace VariableSpeedCoils {
 		// count the powr separately
 		Winput *= RuntimeFrac; //+ VarSpeedCoil(DXCoilNum)%CrankcaseHeaterPower &
 		//+ VarSpeedCoil(DXCoilNum)%BasinHeaterPower + VarSpeedCoil(DXCoilNum)%EvapCondPumpElecPower
-		QSource *= PartLoadRatio;
 		QWasteHeat *= PartLoadRatio;
+		// use runtime fraction adjusted Work input for QSource
+		QSource = QLoadTotal + Winput - QWasteHeat;
+		if ( QSource < 0 ) {
+			QSource = 0.0;
+			QWasteHeat = QLoadTotal + Winput;
+		}
 
 		//  Add power to global variable so power can be summed by parent object
 		DXElecCoolingPower = Winput;
@@ -5268,13 +5273,10 @@ namespace VariableSpeedCoils {
 
 		}
 
-		QSource = QLoadTotal + QWasteHeat - Winput;
+
 		QSensible = QLoadTotal;
 
-		if ( QSource < 0 ) {
-			QSource = 0.0;
-			QWasteHeat = Winput - QLoadTotal;
-		}
+
 
 		// calculate coil outlet state variables
 		LoadSideOutletEnth = LoadSideInletEnth + QLoadTotal / LoadSideMassFlowRate;
@@ -5301,8 +5303,13 @@ namespace VariableSpeedCoils {
 		QSensible *= PartLoadRatio;
 		// count the powr separately
 		Winput *= RuntimeFrac; //+ VarSpeedCoil(DXCoilNum)%CrankcaseHeaterPower
-		QSource *= PartLoadRatio;
 		QWasteHeat *= PartLoadRatio;
+		// use runtime fraction adjusted Work input for QSource
+		QSource = QLoadTotal + QWasteHeat - Winput;
+		if ( QSource < 0 ) {
+			QSource = 0.0;
+			QWasteHeat = Winput - QLoadTotal;
+		}
 
 		//  Add power to global variable so power can be summed by parent object
 		DXElecHeatingPower = Winput;

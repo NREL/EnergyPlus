@@ -36,6 +36,8 @@ namespace HeatBalanceSurfaceManager {
 	// Reporting routines for module
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageSurfaceHeatBalance();
@@ -106,7 +108,7 @@ namespace HeatBalanceSurfaceManager {
 	// End of Reporting subroutines for the HB Module
 	// *****************************************************************************
 
-} // HeatBalanceSurfaceManager
+
 
 // *****************************************************************************
 // *****************************************************************************
@@ -136,6 +138,7 @@ CalcExteriorVentedCavity( int const SurfNum ); // index of surface
 void
 GatherComponentLoadsSurfAbsFact();
 
+} // HeatBalanceSurfaceManager
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************

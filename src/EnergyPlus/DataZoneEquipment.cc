@@ -100,6 +100,8 @@ namespace DataZoneEquipment {
 	Array1D_bool CrossMixingReportFlag;
 	Array1D_bool MixingReportFlag;
 	Array1D< Real64 > VentMCP;
+	Array1D< Real64 > ZMAT;
+	Array1D< Real64 > ZHumRat; 
 
 	// Utility routines for module
 
@@ -126,6 +128,8 @@ namespace DataZoneEquipment {
 		CrossMixingReportFlag.deallocate();
 		MixingReportFlag.deallocate();
 		VentMCP.deallocate();
+		ZMAT.deallocate();
+		ZHumRat.deallocate();
 		ZoneEquipConfig.deallocate();
 		ZoneEquipList.deallocate();
 		HeatingControlList.deallocate();

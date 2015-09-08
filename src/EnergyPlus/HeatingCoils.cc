@@ -438,7 +438,7 @@ namespace HeatingCoils {
 			// Setup Report variables for the Electric Coils
 			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", HeatingCoil( CoilNum ).HeatingCoilLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", HeatingCoil( CoilNum ).HeatingCoilRate, "System", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Electric Energy [J]", HeatingCoil( CoilNum ).ElecUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Electric", "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil Electric Energy [J]", HeatingCoil( CoilNum ).ElecUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Electric", "Heating","Heat Coil", "System" );
 			SetupOutputVariable( "Heating Coil Electric Power [W]", HeatingCoil( CoilNum ).ElecUseRate, "System", "Average", HeatingCoil( CoilNum ).Name );
 
 		}
@@ -570,7 +570,7 @@ namespace HeatingCoils {
 			// Setup Report variables for the Gas Coils
 			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", HeatingCoil( CoilNum ).HeatingCoilLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", HeatingCoil( CoilNum ).HeatingCoilRate, "System", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Gas Energy [J]", HeatingCoil( CoilNum ).GasUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Gas", "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil Gas Energy [J]", HeatingCoil( CoilNum ).GasUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Gas", "Heating", "Heat Coil", "System" );
 			SetupOutputVariable( "Heating Coil Gas Rate [W]", HeatingCoil( CoilNum ).GasUseRate, "System", "Average", HeatingCoil( CoilNum ).Name );
 			SetupOutputVariable( "Heating Coil Electric Energy [J]", HeatingCoil( CoilNum ).ElecUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Electricity", "Heating", _, "System" );
 			SetupOutputVariable( "Heating Coil Electric Power [W]", HeatingCoil( CoilNum ).ElecUseRate, "System", "Average", HeatingCoil( CoilNum ).Name );

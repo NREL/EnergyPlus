@@ -1401,6 +1401,7 @@ namespace PlantCondLoopOperation {
 
 						if ( rNumericArgs( CompNumN ) == AutoSize ) {
 							for ( Num = 1; Num <= SaveNumPlantComps; ++Num ) {
+							// this is all wrong, also needs updatedating for new coincident sizing 
 								CompInNode = CompDesWaterFlow( Num ).SupNode;
 								CompFlowRate = CompDesWaterFlow( Num ).DesVolFlowRate;
 								if ( CompInNode == PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).DemandNodeNum ) {
