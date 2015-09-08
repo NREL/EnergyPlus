@@ -1740,6 +1740,7 @@ Site:GroundTemperature:Undisturbed:FiniteDifference,
        \min-fields 7
   A1,  \field Name
        \required-field
+       \reference UndisturbedGroundTempModels
   N1,  \field Soil Thermal Conductivity
        \required-field
        \type real
@@ -1786,6 +1787,7 @@ Site:GroundTemperature:Undisturbed:KusudaAchenbach,
        \min-fields 7
   A1,  \field Name
        \required-field
+       \reference UndisturbedGroundTempModels
   N1,  \field Soil Thermal Conductivity
        \required-field
        \type real
@@ -1830,6 +1832,7 @@ Site:GroundTemperature:Undisturbed:Xing,
        \min-fields 9
   A1,  \field Name
        \required-field
+       \reference UndisturbedGroundTempModels
   N1,  \field Soil Thermal Conductivity
        \required-field
        \type real
@@ -1922,6 +1925,7 @@ Site:GroundDomain:Slab,
    A3,  \field Undisturbed Ground Temperature Model Name
         \required-field
         \type object-list
+        \object-list UndisturbedGroundTempModels
    N9,  \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
@@ -2050,6 +2054,7 @@ Site:GroundDomain:Basement,
    A3,  \field Undisturbed Ground Temperature Model Name
         \required-field
         \type object-list
+        \object-list UndisturbedGroundTempModels
    N9,  \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
@@ -57830,6 +57835,7 @@ Pipe:Underground,
    A8;  \field Undisturbed Ground Temperature Model Name
         \required-field
         \type object-list
+        \object-list UndisturbedGroundTempModels
 
 PipingSystem:Underground:Domain,
         \memo The ground domain object for underground piping system simulation.
@@ -57945,6 +57951,7 @@ PipingSystem:Underground:Domain,
    A6,  \field Undisturbed Ground Temperature Model Name
         \required-field
         \type object-list
+        \object-list UndisturbedGroundTempModels
    A7,  \field This Domain Includes Basement Surface Interaction
         \type choice
         \key Yes
@@ -64554,6 +64561,7 @@ GroundHeatExchanger:HorizontalTrench,
    A5,  \field Undisturbed Ground Temperature Model Name
         \required-field
         \type object-list
+        \object-list UndisturbedGroundTempModels
    N16; \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
@@ -64689,6 +64697,7 @@ GroundHeatExchanger:Slinky,
    A6,  \field Undisturbed Ground Temperature Model Name
         \required-field
         \type object-list
+        \object-list UndisturbedGroundTempModels
    N16; \field Maximum Length of Simulation
         \type real
         \units years
