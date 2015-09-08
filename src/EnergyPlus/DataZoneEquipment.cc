@@ -136,26 +136,6 @@ namespace DataZoneEquipment {
 	}
 
 	void
-	clear_state()
-	{
-		NumSupplyAirPaths = 0;
-		NumReturnAirPaths = 0;
-		ZoneEquipInputsFilled = false;
-		ZoneEquipSimulatedOnce = false;
-		NumOfZoneEquipLists = 0;
-		ZoneEquipAvail.deallocate();
-		CrossMixingReportFlag.deallocate();
-		MixingReportFlag.deallocate();
-		VentMCP.deallocate();
-		ZoneEquipConfig.deallocate();
-		ZoneEquipList.deallocate();
-		HeatingControlList.deallocate();
-		CoolingControlList.deallocate();
-		SupplyAirPath.deallocate();
-		ReturnAirPath.deallocate();
-	}
-
-	void
 	GetZoneEquipmentData()
 	{
 
