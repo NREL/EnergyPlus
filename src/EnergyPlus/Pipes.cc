@@ -71,6 +71,13 @@ namespace Pipes {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state()
+	{
+		int NumLocalPipes = 0;
+		GetPipeInputFlag = true;;
+		LocalPipe.deallocate();
+	}
 
 	void
 	SimPipes(

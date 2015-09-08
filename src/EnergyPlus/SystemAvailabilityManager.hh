@@ -727,6 +727,8 @@ namespace SystemAvailabilityManager {
 	extern Array1D< DefineASHRAEAdaptiveOptimumStartCoeffs > ASHRAEOptSCoeffHeating;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageSystemAvailability();

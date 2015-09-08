@@ -1164,9 +1164,9 @@ namespace HWBaseboardRadiator {
 				// Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
 				DistributeBBRadGains();
 				// Now "simulate" the system by recalculating the heat balances
-				CalcHeatBalanceOutsideSurf( ZoneNum );
+				HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
 
-				CalcHeatBalanceInsideSurf( ZoneNum );
+				HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
 
 				// Here an assumption is made regarding radiant heat transfer to people.
 				// While the radiant heat transfer to people array will be used by the thermal comfort
