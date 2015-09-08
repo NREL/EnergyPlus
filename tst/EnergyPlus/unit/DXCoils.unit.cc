@@ -25,6 +25,7 @@ using namespace DataSizing;
 using namespace CurveManager;
 using namespace OutputReportPredefined;
 using namespace ScheduleManager;
+using namespace DataEnvironment;
 
 namespace EnergyPlus {
 
@@ -607,7 +608,7 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( HVACFixture, TestSingleSpeedDefrostCOP ) {
-		// Test that the COP calculation is correct when the defrost is on. #4973
+		// Test that the COP calculation is correct when the defrost is on. #4973 
 
 		using CurveManager::Quadratic;
 		using CurveManager::BiQuadratic;
@@ -892,4 +893,227 @@ namespace EnergyPlus {
 		// clear
 		DXCoil.deallocate();
 	}
-}
+
+	TEST_F( HVACFixture, TestMultiSpeedWasteHeat )
+	{
+		// Test the waste heat function #4536
+
+		using Psychrometrics::PsyTwbFnTdbWPb;
+		using Psychrometrics::PsyHFnTdbW;
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.3;",
+			" Schedule:Compact,",
+			"	FanAndCoilAvailSched, !- Name",
+			"	Fraction,             !- Schedule Type Limits Name",
+			"	Through: 12/31,       !- Field 1",
+			"	For: AllDays,         !- Field 2",
+			"	Until: 24:00, 1.0;    !- Field 3",
+			" OutdoorAir:Node,",
+			"	Outdoor Condenser Air Node, !- Name",
+			"	1.0;                     !- Height Above Ground{ m }",
+			" Coil:Cooling:DX:MultiSpeed,",
+			"  Heat Pump ACDXCoil 1, !- Name",
+			"  FanAndCoilAvailSched, !- Availability Schedule Name",
+			"  DX Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
+			"  Heating Coil Air Inlet Node, !- Air Outlet Node Name",
+			"  Outdoor Condenser Air Node, !- Condenser Air Inlet Node Name",
+			"  AirCooled, !- Condenser Type",
+			"  , !- Supply Water Storage Tank Name",
+			"  , !- Condensate Collection Water Storage Tank Name",
+			"  No, !- Apply Part Load Fraction to Speeds Greater than 1",
+			"  No, !- Apply Latent Degradation to Speeds Greater than 1",
+			"  200.0, !- Crankcase Heater Capacity{ W }",
+			"  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
+			"  , !- Basin Heater Capacity{ W / K }",
+			"  , !- Basin Heater Setpoint Temperature{ C }",
+			"  , !- Basin Heater Operating Schedule Name",
+			"  Electricity, !- Fuel Type",
+			"  4, !- Number of Speeds",
+			"  7500, !- Speed 1 Gross Rated Total Cooling Capacity{ W }",
+			"  0.75, !- Speed 1 Gross Rated Sensible Heat Ratio",
+			"  3.0, !- Speed 1 Gross Rated Cooling COP{ W / W }",
+			"  0.40, !- Speed 1 Rated Air Flow Rate{ m3 / s }",
+			"  453.3, !- Rated Evaporator Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+			"  HPACCoolCapFT Speed, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+			"  HPACCoolCapFF Speed, !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name",
+			"  HPACCOOLEIRFT Speed, !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+			"  HPACCOOLEIRFF Speed, !- Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name",
+			"  HPACCOOLPLFFPLR Speed, !- Speed 1 Part Load Fraction Correlation Curve Name",
+			"  1000.0, !- Speed 1 Nominal Time for Condensate Removal to Begin{ s }",
+			"  1.5, !- Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity{ dimensionless }",
+			"  3.0, !- Speed 1 Maximum Cycling Rate{ cycles / hr }",
+			"  45.0, !- Speed 1 Latent Capacity Time Constant{ s }",
+			"  0.2, !- Speed 1 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+			"  , !- Speed 1 Waste Heat Function of Temperature Curve Name",
+			"  0.9, !- Speed 1 Evaporative Condenser Effectiveness{ dimensionless }",
+			"  0.05, !- Speed 1 Evaporative Condenser Air Flow Rate{ m3 / s }",
+			"  50, !- Speed 1 Rated Evaporative Condenser Pump Power Consumption{ W }",
+			"  17500, !- Speed 2 Gross Rated Total Cooling Capacity{ W }",
+			"  0.75, !- Speed 2 Gross Rated Sensible Heat Ratio",
+			"  3.0, !- Speed 2 Gross Rated Cooling COP{ W / W }",
+			"  0.85, !- Speed 2 Rated Air Flow Rate{ m3 / s }",
+			"  523.3, !- Rated Evaporator Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+			"  HPACCoolCapFT Speed, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
+			"  HPACCoolCapFF Speed, !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name",
+			"  HPACCOOLEIRFT Speed, !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+			"  HPACCOOLEIRFF Speed, !- Speed 2 Energy Input Ratio Function of Flow Fraction Curve Name",
+			"  HPACCOOLPLFFPLR Speed, !- Speed 2 Part Load Fraction Correlation Curve Name",
+			"  1000.0, !- Speed 2 Nominal Time for Condensate Removal to Begin{ s }",
+			"  1.5, !- Speed 2 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }",
+			"  3.0, !- Speed 2 Maximum Cycling Rate{ cycles / hr }",
+			"  45.0, !- Speed 2 Latent Capacity Time Constant{ s }",
+			"  0.2, !- Speed 2 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+			"  , !- Speed 2 Waste Heat Function of Temperature Curve Name",
+			"  0.9, !- Speed 2 Evaporative Condenser Effectiveness{ dimensionless }",
+			"  0.1, !- Speed 2 Evaporative Condenser Air Flow Rate{ m3 / s }",
+			"  60, !- Speed 2 Rated Evaporative Condenser Pump Power Consumption{ W }",
+			"  25500, !- Speed 3 Gross Rated Total Cooling Capacity{ W }",
+			"  0.75, !- Speed 3 Gross Rated Sensible Heat Ratio",
+			"  3.0, !- Speed 3 Gross Rated Cooling COP{ W / W }",
+			"  1.25, !- Speed 3 Rated Air Flow Rate{ m3 / s }",
+			"  573.3, !- Rated Evaporator Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+			"  HPACCoolCapFT Speed, !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
+			"  HPACCoolCapFF Speed, !- Speed 3 Total Cooling Capacity Function of Flow Fraction Curve Name",
+			"  HPACCOOLEIRFT Speed, !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+			"  HPACCOOLEIRFF Speed, !- Speed 3 Energy Input Ratio Function of Flow Fraction Curve Name",
+			"  HPACCOOLPLFFPLR Speed, !- Speed 3 Part Load Fraction Correlation Curve Name",
+			"  1000.0, !- Speed 3 Nominal Time for Condensate Removal to Begin{ s }",
+			"  1.5, !- Speed 3 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }",
+			"  3.0, !- Speed 3 Maximum Cycling Rate{ cycles / hr }",
+			"  45.0, !- Speed 3 Latent Capacity Time Constant{ s }",
+			"  0.2, !- Speed 3 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+			"  , !- Speed 3 Waste Heat Function of Temperature Curve Name",
+			"  0.9, !- Speed 3 Evaporative Condenser Effectiveness{ dimensionless }",
+			"  0.2, !- Speed 3 Evaporative Condenser Air Flow Rate{ m3 / s }",
+			"  80, !- Speed 3 Rated Evaporative Condenser Pump Power Consumption{ W }",
+			"  35500, !- Speed 4 Gross Rated Total Cooling Capacity{ W }",
+			"  0.75, !- Speed 4 Gross Rated Sensible Heat Ratio",
+			"  3.0, !- Speed 4 Gross Rated Cooling COP{ W / W }",
+			"  1.75, !- Speed 4 Rated Air Flow Rate{ m3 / s }",
+			"  673.3, !- Rated Evaporator Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+			"  HPACCoolCapFT Speed, !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
+			"  HPACCoolCapFF Speed, !- Speed 4 Total Cooling Capacity Function of Flow Fraction Curve Name",
+			"  HPACCOOLEIRFT Speed, !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+			"  HPACCOOLEIRFF Speed, !- Speed 4 Energy Input Ratio Function of Flow Fraction Curve Name",
+			"  HPACCOOLPLFFPLR Speed, !- Speed 4 Part Load Fraction Correlation Curve Name",
+			"  1000.0, !- Speed 4 Nominal Time for Condensate Removal to Begin{ s }",
+			"  1.5, !- Speed 4 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }",
+			"  3.0, !- Speed 4 Maximum Cycling Rate{ cycles / hr }",
+			"  45.0, !- Speed 4 Latent Capacity Time Constant{ s }",
+			"  0.2, !- Speed 4 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+			"  , !- Speed 4 Waste Heat Function of Temperature Curve Name",
+			"  0.9, !- Speed 4 Evaporative Condenser Effectiveness{ dimensionless }",
+			"  0.3, !- Speed 4 Evaporative Condenser Air Flow Rate{ m3 / s }",
+			" 100;                     !- Speed 4 Rated Evaporative Condenser Pump Power Consumption{ W }",
+			" Curve:Biquadratic,",
+			"  HPACCoolCapFT Speed, !- Name",
+			"  1.0, !- Coefficient1 Constant",
+			"  0.0, !- Coefficient2 x",
+			"  0.0, !- Coefficient3 x**2",
+			"  0.0, !- Coefficient4 y",
+			"  0.0, !- Coefficient5 y**2",
+			"  0.0, !- Coefficient6 x*y",
+			"  12.77778, !- Minimum Value of x",
+			"  23.88889, !- Maximum Value of x",
+			"  23.88889, !- Minimum Value of y",
+			"  46.11111, !- Maximum Value of y",
+			"  , !- Minimum Curve Output",
+			"  , !- Maximum Curve Output",
+			"  Temperature, !- Input Unit Type for X",
+			"  Temperature, !- Input Unit Type for Y",
+			"  Dimensionless;           !- Output Unit Type",
+			" Curve:Cubic,",
+			"  HPACCoolCapFF Speed, !- Name",
+			"  .47278589, !- Coefficient1 Constant",
+			"  1.2433415, !- Coefficient2 x",
+			"  -1.0387055, !- Coefficient3 x**2",
+			"  .32257813, !- Coefficient4 x**3",
+			"  0.5, !- Minimum Value of x",
+			"  1.5;                   !- Maximum Value of x",
+			" Curve:Biquadratic,",
+			"  HPACCOOLEIRFT Speed, !- Name",
+			"  0.632475E+00, !- Coefficient1 Constant",
+			"  -0.121321E-01, !- Coefficient2 x",
+			"  0.507773E-03, !- Coefficient3 x**2",
+			"  0.155377E-01, !- Coefficient4 y",
+			"  0.272840E-03, !- Coefficient5 y**2",
+			"  -0.679201E-03, !- Coefficient6 x*y",
+			"  12.77778, !- Minimum Value of x",
+			"  23.88889, !- Maximum Value of x",
+			"  23.88889, !- Minimum Value of y",
+			"  46.11111, !- Maximum Value of y",
+			"  , !- Minimum Curve Output",
+			"  , !- Maximum Curve Output",
+			"  Temperature, !- Input Unit Type for X",
+			"  Temperature, !- Input Unit Type for Y",
+			"  Dimensionless;           !- Output Unit Type",
+			"Curve:Cubic,",
+			"  HPACCOOLEIRFF Speed, !- Name",
+			"  .47278589, !- Coefficient1 Constant",
+			"  1.2433415, !- Coefficient2 x",
+			"  -1.0387055, !- Coefficient3 x**2",
+			"  .32257813, !- Coefficient4 x**3",
+			"  0.5, !- Minimum Value of x",
+			"  1.5;                     !- Maximum Value of x",
+			"Curve:Quadratic,",
+			"  HPACCOOLPLFFPLR Speed, !- Name",
+			"  0.85, !- Coefficient1 Constant",
+			"  0.15, !- Coefficient2 x",
+			"  0.0, !- Coefficient3 x**2",
+			"  0.0, !- Minimum Value of x",
+			"  1.0;                     !- Maximum Value of x",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		// Case 1 test
+		GetDXCoils( );
+
+		EXPECT_EQ( FuelTypeElectricity, DXCoil( 1 ).FuelType );
+		EXPECT_EQ( 0, DXCoil( 1 ).MSWasteHeat( 2 ) );
+
+		// Test calculations of the waste heat function #5162
+
+		// Case 2 test waste heat is zero when the parent has not heat recovery inputs
+		DXCoil( 1 ).FuelType = FuelTypeNaturalGas;
+		DXCoil( 1 ).MSHPHeatRecActive = false;
+
+		OutDryBulbTemp = 35;
+		OutHumRat = 0.0128;
+		OutBaroPress = 101325;
+		OutWetBulbTemp = PsyTwbFnTdbWPb( OutDryBulbTemp, OutHumRat, OutBaroPress);
+
+		DXCoil( 1 ).MSRatedAirMassFlowRate( 1 ) = DXCoil( 1 ).MSRatedAirVolFlowRate( 1 ) * 1.2;
+		DXCoil( 1 ).MSRatedAirMassFlowRate( 2 ) = DXCoil( 1 ).MSRatedAirVolFlowRate( 2 ) * 1.2;
+		DXCoil( 1 ).InletAirMassFlowRate = DXCoil( 1 ).MSRatedAirMassFlowRate( 2 );
+		MSHPMassFlowRateLow = DXCoil( 1 ).MSRatedAirMassFlowRate( 1 );
+		MSHPMassFlowRateHigh = DXCoil( 1 ).MSRatedAirMassFlowRate( 2 );
+
+		DXCoil( 1 ).InletAirTemp = 25.0;
+		DXCoil( 1 ).InletAirHumRat = 0.005;
+		DXCoil( 1 ).InletAirEnthalpy = PsyHFnTdbW( 25.0, 0.005 );
+
+		DXCoil( 1 ).SchedPtr = 1;
+		Schedule( DXCoil( 1 ).SchedPtr ).CurrentValue = 1.0; // enable the VRF condenser
+		DXCoil( 1 ).MSRatedCBF( 1 ) = 0.1262;
+		DXCoil( 1 ).MSRatedCBF( 2 ) = 0.0408;
+
+		CalcMultiSpeedDXCoilCooling( 1, 1, 1, 2, 1, 1 );
+		
+		EXPECT_EQ( 0, MSHPWasteHeat );
+
+		// Case 3 heat recovery is true and no waste heat function cuvre
+		DXCoil( 1 ).MSWasteHeat( 1 ) = 0;
+		DXCoil( 1 ).MSWasteHeat( 2 ) = 0;
+		DXCoil( 1 ).MSHPHeatRecActive = true;
+
+		CalcMultiSpeedDXCoilCooling( 1, 1, 1, 2, 1, 1 );
+
+		EXPECT_NEAR( 1303.4304, MSHPWasteHeat, 0.001 );
+
+		// clear
+		DXCoil.deallocate( );
+
+	}
+} 

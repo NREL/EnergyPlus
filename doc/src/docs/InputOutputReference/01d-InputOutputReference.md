@@ -5367,7 +5367,7 @@ Coil:Cooling:DX:TwoStageWithHumidityControlMode,
    CoilPerformance:DX:Cooling,                 !- Normal Mode Stage 1 Coil Performance Object Type
    DOAS Standard Perf 1,                             !- Normal Mode Stage 1 Coil Performance Name
    CoilPerformance:DX:Cooling,                 !- Normal Mode Stage 1+2 Coil Performance Object Type
-   DOAS Standard Perf 1+2,                         !- Normal Mode Stage 1+2 Coil Performance Name
+   DOAS Standard Perf 1+2,                  When the fuel type is not electricity and the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed does not require waste heat calculations, this field is ignored. If the field is blank, a warning will be issues and simulation continues. When the fuel type is not electricity and the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed requires waste heat calculations, if this field is left blank, the program assumes a constant value of 1 to make simulation continue and a warning will be issued.        !- Normal Mode Stage 1+2 Coil Performance Name
    CoilPerformance:DX:Cooling,                 !- Dehumidification Mode 1 Stage 1 Coil Performance Object Type
    DOAS Dehumid Perf 1,                               !- Dehumidification Mode 1 Stage 1 Coil Performance Name
    CoilPerformance:DX:Cooling,                 !- Dehumidification Mode 1 Stage 1+2 Coil Performance Object Type
@@ -5406,7 +5406,7 @@ This optional alpha field specifies the outdoor air node name used to define the
 
 #### Field: Condenser Type
 
-#### The type of condenser used by the multispeed DX cooling coil. Valid choices for this input field areAirCooled orEvaporativelyCooled. The default for this field isAirCooled.
+The type of condenser used by the multispeed DX cooling coil. Valid choices for this input field areAirCooled orEvaporativelyCooled. The default for this field isAirCooled.
 
 #### Field: Supply Water Storage Tank Name
 
@@ -5534,7 +5534,7 @@ The fraction of energy input to the cooling coil that is available as recoverabl
 
 #### Field: Speed &lt;x&gt; Waste Heat Function of Temperature Curve Name
 
-The name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of the waste heat recovery as a function of outdoor dry-bulb temperature and the entering coil dry-bulb temperature at Speed &lt;x&gt;. The output of this curve is multiplied by the rated waste heat fraction at specific temperature operating conditions (i.e., at temperatures different from the rating point). The curve is normalized to a value of 1.0 at the rating point. When the fuel type is electricity, this field can remain blank since it is ignored by the program in this instance.
+The name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of the waste heat recovery as a function of outdoor dry-bulb temperature and the entering coil dry-bulb temperature at Speed &lt;x&gt;. The output of this curve is multiplied by the rated waste heat fraction at specific temperature operating conditions (i.e., at temperatures different from the rating point). The curve is normalized to a value of 1.0 at the rating point. When the fuel type is electricity, this field can remain blank since it is ignored by the program in this instance. When the fuel type is not electricity and the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed does not require waste heat calculations, this field is ignored. If the field is blank, a warning will be issues and simulation continues. When the fuel type is not electricity and the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed requires waste heat calculations, if this field is left blank, the program assumes a constant value of 1 to make simulation continue and a warning will be issued.   
 
 #### Field: Speed &lt;x&gt; Evaporative Condenser Effectiveness
 
@@ -6822,8 +6822,6 @@ This is the runtime fraction of the DX heating coil compressor and outdoor fan(s
 
 ### Coil:Heating:DX:MultiSpeed
 
-### Coil:Heating:DX:MultiSpeed
-
 This component models a DX heating unit with multiple discrete levels of heating capacity. Currently, this heating coil can only be referenced by a AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed compound object. The multispeed DX heating coil can have from two to four operating speeds. When the coil operates at Speed 1 (the lowest speed), its performance is very similar to the Coil:Heating:DX:SingleSpeed object where the impacts of part-load ratio can be included. When the coil operates at higher speeds (above Speed 1), the linear approximation methodology is applied. The coil outputs at two consecutive speeds are linearly interpolated to meet the required heating capacity during an HVAC system timestep. When the coil performs above the lowest speed, the user can choose if they want to include part-load ratio impacts at the higher speeds.
 
 The multispeed unit is described by specifying the performance at different operating speeds. Each speed has its own set of input specifications: full load capacity, COP and air flow rate at rated conditions, along with modifier curves to determine performance when actual operating conditions are different from the rated conditions.
@@ -6972,7 +6970,7 @@ The fraction of heat input to heating that is available as recoverable waste hea
 
 #### Field: Speed &lt;x&gt; Waste Heat Function of Temperature Curve Name
 
-The name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the waste heat recovery as a function of outdoor dry-bulb temperature and the entering coil dry-bulb temperature for Speed &lt;x&gt;. The output of this curve is multiplied by the rated recoverable waste heat at specific temperature operating conditions (i.e., at temperatures different from the rating point). The curve is normalized to a value of 1.0 at the rating point. When the fuel type is electricity, the field is either left blank or ignored by the program.
+The name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the waste heat recovery as a function of outdoor dry-bulb temperature and the entering coil dry-bulb temperature for Speed &lt;x&gt;. The output of this curve is multiplied by the rated recoverable waste heat at specific temperature operating conditions (i.e., at temperatures different from the rating point). The curve is normalized to a value of 1.0 at the rating point. When the fuel type is electricity, the field is either left blank or ignored by the program. When the fuel type is not electricity and the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed does not require waste heat calculations, this field is ignored. If the field is blank, a warning will be issues and simulation continues. When the fuel type is not electricity and the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed requires waste heat calculations, if this field is left blank, the program assumes a constant value of 1 to make simulation continue and a warning will be issued. 
 
 #### Field: Zone Name for Evaporator Placement
 
