@@ -26,6 +26,8 @@ namespace ZoneEquipmentManager {
 	extern Array1D_int DefaultSimOrder;
 	extern int NumOfTimeStepInDay; // number of zone time steps in a day
 	extern bool GetZoneEquipmentInputFlag;
+	extern bool SizeZoneEquipmentOneTimeFlag;
+
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE ZoneEquipmentManager
 
@@ -72,6 +74,8 @@ namespace ZoneEquipmentManager {
 	extern Array1D< SimulationOrder > PrioritySimOrder;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageZoneEquipment(
@@ -154,6 +158,19 @@ namespace ZoneEquipmentManager {
 
 	void
 	ReportZoneEquipment();
+
+	void
+	CalcDOASSupCondsForSizing(
+		Real64 OutDB, // outside air temperature [C]
+		Real64 OutHR, // outside humidity ratio [kg Water / kg Dry Air]
+		int DOASControl, // dedicated outside air control strategy
+		Real64 DOASLowTemp, // DOAS low setpoint [C]
+		Real64 DOASHighTemp, // DOAS high setpoint [C]
+		Real64 W90H, // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
+		Real64 W90L, // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
+		Real64 & DOASSupTemp, // DOAS supply temperature [C]
+		Real64 & DOASSupHR // DOAS Supply Humidity ratio [kg Water / kg Dry Air]
+	);
 
 	//     NOTICE
 
