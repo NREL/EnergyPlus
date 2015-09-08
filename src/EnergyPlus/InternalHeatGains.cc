@@ -106,6 +106,11 @@ namespace InternalHeatGains {
 	//PUBLIC  GetInternalGainDeviceIndex
 
 	// Functions
+	void
+	clear_state()
+	{
+		GetInternalHeatGainsInputFlag = true;
+	}
 
 	void
 	ManageInternalHeatGains( Optional_bool_const InitOnly ) // when true, just calls the get input, if appropriate and returns.

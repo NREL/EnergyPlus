@@ -6131,6 +6131,217 @@ AirLoopHVAC:ZoneMixer,
 
 There are no specific outputs for the four pipe induction terminal units.
 
+### AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam
+
+The four-pipe beam air terminal system is a mixed air-hydronic system. A central, single-duct forced-air system that supplies conditioned air to the zones. Chilled water circulates through ceiling-mounted fin-tube convector units to provide sensible cooling. Hot water circulates through the same convectors to provide heating.  Water flow rate through the beam unit is varied to meet the zone sensible cooling or heating load. Any dehumidification is done by the central forced-air system. Thermodynamically, the cooled beam system resembles the four-pipe induction unit (**AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction**).
+ 
+To model a typical four-pipe beam system the user will need to define a conventional central constant volume forced air system in order to deliver primary air to the beam. This central system (usually) provides outside air for ventilation.  Primary air is normally delivered at a fixed temperature but could be reset by a schedule or using an outdoor air reset setpoint manager. On the supply side of this air loop there will be the usual central conditioning equipment: outside air mixer, fan, heating and cooling coil. On the zone equipment (demand) side of the loop, the four-pipe beams will be represented as air terminal units. Because the four-pipe beam can provide heating the system can avoid over-cooling zones during times of low load with cool primary air temperatures, similar to the action of a reheat coil in a VAV terminal.  Therefore it is not necessary to have additional zone equipment (such as baseboard heaters) to handle heating (or reheating) loads.
+
+Although the four-pipe beam equipment in a zone is treated by the program as a single terminal unit, the actual installation will often have multiple beam units in each zone. In this model, it is only the total length of all the beams and the total air flow of all the units that are described, not the number of individual beam units. 
+
+If needed, the program (in its sizing calculation for the system) determines the total length of beams and primary supply air flow that is needed to meet the zone design loads. The four pipe beam air terminal sizing differs from other air terminals in that the primary supply air flow rate is sized using the entire performance model and the flow rate is not the direct result from the Sizing:Zone and Sizing:System calculations. The flow rates will be somewhere between what an air terminal would size out using *VentilationRequirement* or *Sensible* in the Sizing:System object (either setting can be used). 
+
+The model includes two different types of inputs for flow rates, “design” and “rated … per-meter.”  The design values are the actual sizes of the flow rates as viewed from the zone and central air handler (but before zone multipliers).  The design values include all the individual beam units and their lengths.  The rated per-meter values are used to characterize product performance at nominal rating conditions in such a way that it can be scaled to match the size of a zone.  The performance characteristics at the rating point are not fixed in the program and can be entered by the user when they differ from default values.  The rated per meter values are normalized by the linear dimensions of the beam and are generally obtained from product catalog data by dividing by the length of the beam.  The rated primary air flow rate is assumed to be for sea level conditions while the design primary air flow rate is modeled for the location elevation above sea level. 
+ 
+#### Field: Name
+A unique user-assigned name for a particular beam unit. Any reference to this unit by another object will use this name.
+
+#### Field: Primary Air Availability Schedule Name
+The name of the schedule that denotes whether the terminal unit is operating to provide primary air during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit is on and requesting primary air flow during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.
+
+#### Field: Cooling Availability Schedule Name
+The name of the schedule that denotes whether the terminal unit is operating to provide cooling during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit is on and available for beam cooling during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods. The primary air availability schedule named in the previous input field must have a value that is “on” during times that cooling is available.
+ 
+#### Field: Heating Availability Schedule Name
+The name of the schedule that denotes whether the terminal unit can operate to provide heating during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit is on and available for beam heating during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods. The primary air availability schedule named in the input field above must have a value that is “on” during times that heating is available.
+ 
+#### Field: Primary Air Inlet Node Name
+The name of the HVAC system air node from which the unit draws its primary air.
+ 
+#### Field: Primary Air Outlet Node Name
+The name of the HVAC system air node that connects this terminal unit to the zone. The will be the same as one of the zone inlet nodes.
+ 
+#### Field: Chilled Water Inlet Node Name
+The name of the chilled water inlet node.  If desired, the chilled water node connections can be omitted and the model will assume the intent is to model a two-pipe heating only beam.
+ 
+#### Field: Chilled Water Outlet Node Name
+The name of the chilled water outlet node.
+
+#### Field: Hot Water Inlet Node Name
+The name of the hot water inlet node.  If desired, the hot water node connections can be omitted and the model will assume the intent is to model a two-pipe cooling only beam.
+
+#### Field: Hot Water Outlet Node Name
+The name of the hot water outlet node.
+
+#### Field: Design Primary Air Volume Flow Rate
+This is the air flow rate (m3/s) of the primary air entering the air terminal unit from the central air handling unit. This input can be autosized.
+  
+#### Field: Design Chilled Water Volume Flow Rate
+The maximum chilled water flow rate (m3/s) for the unit(s) serving the entire zone. This input can be autosized based on the zone design load.
+
+#### Field: Design Hot Water Volume Flow Rate
+The maximum hot water flow rate (m3/s) for the unit(s) serving the entire zone. This input can be autosized based on the zone design load.
+
+#### Field: Zone Total Beam Length (m)
+The total length of all the beams in the zone (m). The real spaces may actually have a number of individual beam units of a specific length and this is the length of individual beams times the total number of beams in the thermal zone. It need not be an even multiple of actual unit’s beam length but it can be if desired. This field is autosizable.
+
+#### Field: Rated Primary Air Flow Rate per Beam Length (m3/s-m)
+This is the primary air volume flow rate at rating conditions divided by the length of the beam, in m3/s-m.  This "catalog" value for volume flow rate input is converted to a mass flow rate using standard air density at sea level. This value will be used for sizing the design primary air volume flow rate if the total beam length is not also autosized. The default is 0.035 m3/s-m.
+
+#### Field: Beam Rated Cooling Capacity per Beam Length (W/m)
+This is the beam cooling capacity at rating conditions divided by the length of the beam, in W/m.  This is only the cooling contributed by the chilled water circulating through the convector and is separate from any cooling (or heating) that may also be provided by the primary air. The default is 600 W/m.
+
+#### Field: Beam Rated Cooling Room Air Chilled Water Temperature Difference (Delta C)
+This input defines the value of the temperature difference between the room air and entering chilled water at the rating point, in delta Celsius.  This "catalog" input helps to define the operating conditions that correspond with Rated Beam Cooling Capacity per Meter. It is used to normalize the independent variable in the input field called Beam Cooling Capacity Temperature Difference Modification Factor Curve or Table Name. The default is 10.0 delta C.
+ 
+#### Field: Beam Rated Chilled Water Volume Flow Rate per Beam Length (m3/s-m)
+This input defines the value of the chilled water flow rate per meter length of beam at the rating point, in m3/s-m.  This input helps to define the operating conditions that correspond with Rated Beam Cooling Capacity per Meter. It is used to normalize the independent variable in the input field called Beam Cooling Capacity Chilled Water Flow Modification Factor Curve or Table Name.  The default is 0.00005 m3/s-m.
+
+#### Field: Beam Cooling Capacity Temperature Difference Modification Factor Curve Name
+This field is the name of a curve or table object that describes how the beam convector’s cooling capacity varies as a function of the temperature difference between the zone air and the entering chilled water.  The single independent variable is the ratio of the current simulation results for the difference between the air and entering water and the difference at the rating point. The result of the curve or table is multiplied by the rated capacity to adjust the cooling capacity.
+
+#### Field: Beam Cooling Capacity Air Flow Modification Factor Curve Name
+This field is the name of a curve or table object that describes how the beam convector's cooling capacity varies as a function of the primary air flow rate.  The single independent variable is the ratio of the current primary air flow rate and the primary air flow rate at the rating point. The result of the curve or table is multiplied by the rated capacity to adjust the cooling capacity.  The factor is useful to adjust for a range of primary air flow rates that a given product can accommodate.  However since this is a constant volume air terminal, the modification does not typically vary during the simulation and the range of independent variable does not need to be all that broad in practice.
+ 
+#### Field: Beam Cooling Capacity Chilled Water Flow Modification Factor Curve Name
+This field is the name of a curve or table object that describes how the beam convector’s cooling capacity varies as a function of the water flow rate.  The single independent variable is the ratio of the current fluid flow rate to the fluid flow rate at the rating point. The result of the curve or table is multiplied by the rated capacity to adjust the cooling capacity.  The model will adjust the chilled water flow rate to vary cooling power to meet the zone load, so for control purposes, the range of the independent variable must include all the way down to zero flow, with zero capacity at zero flow.
+
+#### Field: Beam Rated Heating Capacity per Beam Length (W/m)
+This is the beam heating capacity at rating conditions divided by the length of the beam, in W/m.  This is only the heating contributed by the hot water circulating through the convector and is separate from any heating (or cooling) that may also be provided by the primary air.  The default is 1.200 W/m.
+
+#### Field: Beam Rated Heating Room Air Hot Water Temperature Difference (Delta C)
+This input defines the value of the temperature difference between the entering hot water and the room air at the rating point, in delta Celsius.  This input helps to define the operating conditions that correspond with Rated Beam Heating Capacity per Meter. It is used to normalize the independent variable in the input field called Beam Heating Capacity Temperature Difference Modification Factor Curve or Table Name. The default is 27.8 delta C.
+ 
+#### Field: Beam Rated Hot Water Volume Flow Rate per Beam Length (m3/s-m)
+This input defines the value of the hot water flow rate per meter length of beam at the rating point, in m3/s/m, or more strictly m3/s-m.  This input helps to define the operating conditions that correspond with Rated Beam Heating Capacity per Meter.   It is used to normalize the independent variable in the input field called Beam Heating Capacity Hot Water Flow Modification Factor Curve or Table Name.  The default is 0.00005 m3/s-m.
+
+#### Field: Beam Heating Capacity Temperature Difference Modification Factor Curve Name
+This field is the name of a curve or table object that describes how the beam convector’s heating capacity varies as a function of the temperature difference between the entering hot water and the zone air.  The single independent variable is the ratio of the current simulation results for the difference between the water and air and the difference at the rating point. The result of the curve or table is multiplied by the rated capacity to adjust the heating capacity.
+
+#### Field: Beam Heating Capacity Air Flow Modification Factor Curve Name
+This field is the name of a curve or table object that describes how the beam convectors heating capacity varies as a function of the primary air flow rate.  The single independent variable is the ratio of the current primary air flow rate and the primary air flow rate at the rating point. The result of the curve or table is multiplied by the rated capacity to adjust the heating capacity.  The factor is useful to adjust for a range of primary air rates that a given product can accommodate.  However since this is a constant volume air terminal, the modification does not typically vary during the simulation and the range of independent variable does not need to be all that broad in practice.
+
+#### Field: Beam Heating Capacity Hot Water Flow Modification Factor Curve Name
+This field is the name of a curve or table object that describes how the beam convector’s heating capacity varies as a function of the water flow rate.  The single independent variable is the ratio of the current fluid flow rate to the fluid flow rate at the rating point. The result of the curve or table is multiplied by the rated capacity to adjust the heating capacity.  The model will adjust the hot water flow rate to vary heating power to meet the zone load, so for control purposes, the range of the independent variable must include all the way down to zero flow, with zero capacity at zero flow.
+
+
+An example input follows:
+
+      AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
+        Zone One 4pipe Beam, !- Name
+        ALWAYS_ON , !- Primary Air Availability Schedule Name
+        ALWAYS_ON , !- Cooling Availability Schedule Name
+        ALWAYS_ON , !- Heating Availability Schedule Name
+        Zone One 4pipe Beam Inlet Node Name , !- Primary Air Inlet Node Name
+        Zone One 4pipe Beam Outlet Node Name , !- Primary Air Outlet Node Name
+        Zone One 4pipe Beam CW Inlet Node , !- Chilled Water Inlet Node Name
+        Zone One 4pipe Beam CW Outlet Node , !- Chilled Water Outlet Node Name
+        Zone One 4pipe Beam HW Inlet Node , !- Hot Water Inlet Node Name
+        Zone One 4pipe Beam HW Outlet Node, !- Hot Water Outlet Node Name
+        AUTOSIZE , !- Design Primary Air Volume Flow Rate
+        AUTOSIZE , !- Design Chilled Water Volume Flow Rate
+        AUTOSIZE , !- Design Hot Water Volume Flow Rate
+        AUTOSIZE , !- Zone Total Beam Length
+        0.036 , !- Rated Primary Air Flow Rate per Beam Length
+        597 , !- Rated Beam Cooling Capacity per Beam Length
+        10.0 , !- Rated Cooling Room Air Chilled Water Temperature Difference
+        5.2E-5 , !- Rated Chilled Water Volume Flow Rate per Beam Length
+        CapModFuncOfTempDiff, !- Beam Cooling Capacity Temperature Difference Modification Factor Curve or Table Name
+        CoolCapModFuncOfSAFlow, !- Beam Cooling Capacity Air Flow Modification Factor Curve or Table Name
+        CapModFuncOfWaterFlow, !- Beam Cooling Capacity Chilled Water Flow Modification Factor Curve or Table Name
+        1548 , !- Rated Beam Heating Capacity per Beam Length
+        27.8, !- Rated Heating Room Air Hot Water Temperature Difference
+        5.2E-5, !- Rated Hot Water Volume Flow Rate per Beam Length
+        CapModFuncOfTempDiff, !- Beam Heating Capacity Temperature Difference Modification Factor Curve or Table Name
+        HeatCapModFuncOfSAFlow, !- Beam Heating Capacity Air Flow Modification Factor Curve or Table Name
+        CapModFuncOfWaterFlow; !- Beam Heating Capacity Hot Water Flow Modification Factor Curve or Table Name
+    
+      Curve:Linear,  ! y = x
+        CapModFuncOfTempDiff, !-Name
+        0, !_ Coef Const
+        1, !- Coef x
+        0,  !- min x
+        1.5, !- max x
+        0.0 , !- min y
+        1.5; ! max y
+    
+      Table:OneIndependentVariable,
+        CoolCapModFuncOfSAFlow, !- Name
+        quadratic,!- Curve Type
+        EvaluateCurveToLimits,!- Interpolation Method
+        0.714,!- min x
+        1.2857,!- max x
+        0.8234,!- min y
+        1.1256,!- max y
+        dimensionless, !-
+        dimensionless, !- 
+        , !- normalization ref
+        0.714286, 0.823403,
+        1.0,      1.0,
+        1.2857,   1.1256;
+    
+      Table:OneIndependentVariable,
+        CapModFuncOfWaterFlow, !- Name
+        quadratic,!- Curve Type
+        EvaluateCurveToLimits,!- Interpolation Method
+        0.0,!- min x
+        1.333333,!- max x
+        0.0,!- min y
+        1.04,!- max y
+        dimensionless, !-
+        dimensionless, !- 
+         , !- normalization ref
+        0.0,      0.0,
+        0.05,     0.001,
+        0.33333,  0.71,
+        0.5,      0.85,
+        0.666667, 0.92,
+        0.833333, 0.97,
+        1.0,      1.0,
+        1.333333, 1.04;
+       
+      Table:OneIndependentVariable,
+        HeatCapModFuncOfSAFlow, !- Name
+        quadratic,!- Curve Type
+        EvaluateCurveToLimits,!- Interpolation Method
+        0.714,!- min x
+        1.2857,!- max x
+        0.8554,!- min y
+        1.0778,!- max y
+        dimensionless, !-
+        dimensionless, !- 
+        , !- normalization ref
+        0.714286, 0.8554,
+        1.0,      1.0,
+        1.2857,   1.0778; 
+
+
+### AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam Outputs
+
+#### Zone Air Terminal Beam Sensible Cooling Rate [W]
+#### Zone Air Terminal Beam Sensible Cooling Energy [J]
+These are the sensible cooling power and energy delivered by the beams to the zone, exclusive of any cooling or heating done by the primary air.
+
+#### Zone Air Terminal Beam Sensible Heating Rate [W]
+#### Zone Air Terminal Beam Sensible Heating Energy [J]
+These are the sensible heating power and energy delivered by the beams to the zone, exclusive of any cooling or heating done by the primary air.
+
+#### Zone Air Terminal Primary Air Sensible Cooling Rate [W]
+Sensible cooling by the primary air to the zone, exclusive of any cooling or heating done by the beams.
+
+#### Zone Air Terminal Primary Air Sensible Cooling Energy [J]
+Sensible cooling by the primary air to the zone, exclusive of any cooling or heating done by the beams.
+
+#### Zone Air Terminal Primary Air Sensible Heating Rate [W]
+Heating by the primary air to the zone, exclusive of any cooling or heating done by the beams.
+
+#### Zone Air Terminal Primary Air Sensible Heating Energy [J]
+Heating by the primary air to the zone, exclusive of any cooling or heating done by the beams.
+
+#### Zone Air Terminal Primary Air Flow Rate [m3/s]
+Air flow rate from the central air handler into the zone in m3/s.  Note that this does not include any of the secondary air flow that is induced by the convector and nozzle action (the model does not resolve secondary air flow rate and the result are not available).  
+
+
 ### AirTerminal:SingleDuct:ConstantVolume:CooledBeam
 
 The Cooled Beam system is a mixed air-hydronic system. A central, single-duct forced-air system supplies conditioned ventilation air to the zones. Sensible cooling is done by chilled water circulating through ceiling mounted cooled beam units. Chilled water flow rate through the cooled beam units is varied to meet the zone sensible cooling load. Any dehumidification is done by the central ventilation air system. Heating is usually accomplished with hot water radiators. Thermodynamically, the cooled beam system resembles the four-pipe induction unit.
@@ -7104,9 +7315,9 @@ This is the availability status of the ideal loads object as set by the hybrid v
 
 ### ZoneHVAC:FourPipeFanCoil
 
-What is a fan coil unit? Like many HVAC terms, “fan coil unit” is used rather loosely. Sometimes it is used for terminal units that would be better described as powered induction units. Carrier and others use the term for the room side of refrigerant-based split systems. Here we are modeling in-room forced-convection hydronic units. Typically these units are small (200 – 1200 cfm) and self-contained. They are mostly used in exterior zones, usually in hotels, apartments, or offices. They may be connected to ducted outside air, or have a direct outside air vent, but they do not have outside air economizers. Units with outside air economizers are marketed (in the United States) as unit ventilators. Unit ventilators are typically bigger than fan coils and are widely used in classrooms or other applications where ventilation is a priority. If a zonal unit with an outside economizer is desired, *ZoneHVAC:UnitVentilator* should be used.
+What is a fan coil unit? Like many HVAC terms, “fan coil unit” is used rather loosely. Sometimes it is used for terminal units that would be better described as powered induction units. Carrier and others use the term for the room side of refrigerant-based split systems. Here we are modeling in-room forced-convection hydronic units. The hydronic heating coil may be replaced with an electric heating coil. Typically these units are small (200 – 1200 cfm) and self-contained. They are mostly used in exterior zones, usually in hotels, apartments, or offices. They may be connected to ducted outside air, or have a direct outside air vent, but they do not have outside air economizers. Units with outside air economizers are marketed (in the United States) as unit ventilators. Unit ventilators are typically bigger than fan coils and are widely used in classrooms or other applications where ventilation is a priority. If a zonal unit with an outside economizer is desired, *ZoneHVAC:UnitVentilator* should be used.
 
-The heating or cooling output of the unit ventilator is controlled by varying the air flow rate, the water flow rate, or both. Air flow rate can be controlled by cycling the fan on/off or with a variable speed fan drive. The most common setup is a two or three speed fan with the speed selected by hand. The fan then cycles on/off to control heating / cooling output. The controls are often a wall mounted thermostat with hand selection of heating/cooling and fan speed (off/low/medium/high). These controls may also be mounted on the unit
+The heating or cooling output of the unit ventilator is controlled by varying the air flow rate, the water flow rate, or both. Air flow rate can be controlled by cycling the fan on/off or with a variable speed fan drive. The most common setup is a two or three speed fan with the speed selected by hand. The fan then cycles on/off to control heating / cooling output. The controls are often a wall mounted thermostat with hand selection of heating/cooling and fan speed (off/low/medium/high). These controls may also be mounted on the unit.
 
 Carrier offers a retrofit VSD motor for fan coil units. It claims up to 45% energy savings from such a retrofit, as well as increased comfort and less noise compared to a cycling fan (fan coil fans ar typically noisy and inefficient). Some other manufacturers are also offering units with VSD fans. Variable speed fans appear to offer an easy way to significantly increase the efficiency of what have typically been very inefficient units.
 
@@ -7122,11 +7333,11 @@ EnergyPlus provides 5 capacity control methods for this unit:
 
   5. multi-speed fan with cycling between speeds and  constant water flow.
 
-In EnergyPlus the fan coil units are modeled as compound components. That is, they are assembled from other components. Fan coils contain an outdoor air mixer, a fan, a heating coil and a cooling coil. These components are described elsewhere in this document. The fan coil input simply requires the names of these four components, which have to be described elsewhere in the input. The input also requires the name of an availability schedule, maximum airflow rate, outdoor airflow rate, and maximum and minimum hot and cold water volumetric flow rates. The unit is connected to the zone inlet and exhaust nodes and the outdoor air by specifying unit inlet, and outlet air node names and the outdoor air mixer object name. The outdoor air mixer child object provides the outdoor air and relief air nodes names. Note that the unit air inlet node should be the same as a zone exhaust node and the unit outlet node should be the same as a zone inlet node. The fan coil unit is connected to a hot water loop (demand side) through its hot water coil and to a chilled water loop (demand side) through its cooling coil.
+In EnergyPlus the fan coil units are modeled as compound components. That is, they are assembled from other components. Fan coils contain an outdoor air mixer, a fan, a heating coil and a cooling coil. These components are described elsewhere in this document. The fan coil input simply requires the names of these four components, which have to be described elsewhere in the input. The input also requires the name of an availability schedule, maximum airflow rate, outdoor airflow rate, and maximum and minimum hot (for hydronic heating coil only) and cold water volumetric flow rates. The unit is connected to the zone inlet and exhaust nodes and the outdoor air by specifying unit inlet, and outlet air node names and the outdoor air mixer object name. The outdoor air mixer child object provides the outdoor air and relief air nodes names. Note that the unit air inlet node should be the same as a zone exhaust node and the unit outlet node should be the same as a zone inlet node. The fan coil unit is connected to a hot water loop through its hot water coil or with no hot water loop when using an electric coil (demand side) and to a chilled water loop (demand side) through its cooling coil.
 
 Note that the type of fan component associated with the fan coil unit depends on the type of capacity control method chosen. For *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used, for *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume*, and for *MultiStageFan* a *Fan:OnOff* should be chosen.
 
-Fan coil units can be 4-pipe or 2-pipe. For 4-pipe units there are 2 supply pipes and 2 return pipes. For 2-pipe units there is a single supply pipe and a single return pipe and the supply is switched between hot and chilled water depending on the season. We model 4-pipe units, but the 4-pipe model can be used to model 2-pipe  units by using the coil availability schedules to make sure that either hot or chilled water is exclusively available.
+Fan coil units can be 4-pipe or 2-pipe. For 4-pipe units there are 2 supply pipes and 2 return pipes. For 2-pipe units there is a single supply pipe and a single return pipe and the supply is switched between hot and chilled water depending on the season. EnergyPlus models 4-pipe units, but the 4-pipe model can be used to model 2-pipe units by using the coil availability schedules to make sure that either hot or chilled water is exclusively available. Fan coil units with hydronic heat can instead be modeled using an electric heating coil if desired (i.e., replace the hydronic heating coil with an electric heating coil).
 
 #### Field: Name
 
@@ -7160,7 +7371,7 @@ If the fan coil unit uses outdoor air, this field specifies the outdoor air volu
 
 #### Field: Outdoor Air Schedule Name
 
-#### The name of a schedule whose values (0.0 to 1.0) are used as multipliers to alter the outdoor air flow rate. If this field is left blank, the values will default to 1.0.
+The name of a schedule whose values (0.0 to 1.0) are used as multipliers to alter the outdoor air flow rate. If this field is left blank, the values will default to 1.0.
 
 #### Field: Air Inlet Node Name
 
@@ -7236,25 +7447,29 @@ The convergence tolerance for the control of the unit cooling output. The unit i
 
 #### Field: Heating Coil Object Type
 
-This field is the type of coil that is used for heating in the fan coil system. It is used in conjunction with the heating coil name (see next field) to specify the heating coil present within the system. The only allowable heating coil type is:
+This field is the type of coil that is used for heating in the fan coil system. It is used in conjunction with the heating coil name (see next field) to specify the heating coil present within the system. The only allowable heating coil types are:
 
 * Coil:Heating:Water
+
+* Coil:Heating:Electric
 
 #### Field: Heating Coil Name
 
 The name of the heating coil component that composes part of the fan coil unit. The heating coil air inlet node should be the same as the cooling coil outlet node. The heating coil air outlet node should be the same as the fan coil air outlet node.
 
-Only the following coil type can be used:
+Only the following coil types can be used:
 
 * Coil:Heating:Water
 
+* Coil:Heating:Electric
+
 #### Field: Maximum Hot Water Flow Rate
 
-The maximum hot water volumetric flow rate (m<sup>3</sup>/sec) through the fan coil unit’s heating coil.
+The maximum hot water volumetric flow rate (m<sup>3</sup>/sec) through the fan coil unit’s heating coil. This field is not used with an electric heating coil.
 
 #### Field: Minimum Hot Water Flow Rate
 
-The minimum hot water volumetric flow rate (m<sup>3</sup>/sec) through the fan coil unit’s heating coil.
+The minimum hot water volumetric flow rate (m<sup>3</sup>/sec) through the fan coil unit’s heating coil. This field is not used with an electric heating coil.
 
 #### Field: Heating Convergence Tolerance
 
@@ -7362,7 +7577,7 @@ Curve:Exponent,
     0.0,                     !- Coefficient1 Constant
     1.0,                     !- Coefficient2 Constant
     3.0,                     !- Coefficient3 Constant
-   0.0,                     !- Minimum Value of x
+    0.0,                     !- Minimum Value of x
     1.5,                     !- Maximum Value of x
     0.01,                    !- Minimum Curve Output
     1.5;                     !- Maximum Curve Output
@@ -7372,7 +7587,7 @@ Curve:Cubic,
    0.33856828,              !- Coefficient1 Constant
    1.72644131,              !- Coefficient2 x
    -1.49280132,             !- Coefficient3 x**2
-  0.42776208,              !- Coefficient4 x**3
+   0.42776208,              !- Coefficient4 x**3
    0.5,                     !- Minimum Value of x
    1.5,                     !- Maximum Value of x
    0.3,                     !- Minimum Curve Output
@@ -10803,7 +11018,7 @@ are compound components usually placed in the primary air loop as the sole compo
 
 The AirloopHVAC:UnitarySystem object is intended to replace all other air loop equipment, although other system types are still available. This system is unique in that it can accommodate all fan and coil types whereas other system types are specific to the type of fan and coil available for simulation. Additionally, although the AirloopHVAC:UnitarySystem is intended for use in the primary airloop, this object can be modeled as zone equipment (i.e., listed in a ZoneHVAC:EquipmentList) or as an outside air system component (i.e., listed in a AirLoopHVAC:OutdoorAirSystem:EquipmentList).
 
-The AirLoopHVAC:UnitarySystem object is a “virtual” component that consists of a fan component (OnOff, ConstantVolume, or VariableVolume), a cooling coil component, a heating coil component, and a reheat coil as shown in Figure 117. When a draw through configuration is desired, the fan is placed directly after the heating coil. If dehumidification control is selected, a reheat coil component is also required. If the reheat coil is present and the dehumidification control type input is not specified as CoolReheat, the reheat coil will not be active.  All of the fan and coil components are optional which allows the AirLoopHVAC:UnitarySystem object to be configured for heating-only, cooling-only, or both heating and cooling.  It may also be applied without a fan, controlling one or more coils, similar to the function of CoilSystem:Cooling:DX.
+The AirLoopHVAC:UnitarySystem object is a “virtual” component that consists of a fan component (OnOff, ConstantVolume, VariableVolume, or ComponentModel), a cooling coil component, a heating coil component, and a reheat coil as shown in Figure 117. When a draw through configuration is desired, the fan is placed directly after the heating coil. If dehumidification control is selected, a reheat coil component is also required. If the reheat coil is present and the dehumidification control type input is not specified as CoolReheat, the reheat coil will not be active.  All of the fan and coil components are optional which allows the AirLoopHVAC:UnitarySystem object to be configured for fan-only, heating-only, cooling-only, or both heating and cooling.  It may also be applied without a fan, controlling one or more coils, similar to the function of CoilSystem:Cooling:DX.
 
 ![](media/image294.png)
 
@@ -10852,7 +11067,7 @@ This alpha field contains the unitary system outlet node name.
 
 #### Field: Supply Fan Object Type
 
-This alpha field contains the identifying type of supply air fan specified for the unitary system. Fan type must be **Fan:OnOff,** **Fan:ConstantVolume, or Fan:VariableVolume**. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e. Supply Air Fan Operating Mode Schedule values are at times 0). Fan:VariableVolume is used for variable air volume systems or multi- or variable-speed coils.
+This alpha field contains the identifying type of supply air fan specified for the unitary system. Fan type must be **Fan:OnOff,** **Fan:ConstantVolume, Fan:VariableVolume, or Fan:ComponentModel**. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e. Supply Air Fan Operating Mode Schedule values are at times 0). Fan:VariableVolume is used for variable air volume systems or multi- or variable-speed coils. The Fan:ComponentModel may be used in place of the ConstantVolume or VariableVolume fan types to more accurately represent fan performance.
 
 #### Field: Supply Fan Name
 
@@ -10898,6 +11113,8 @@ This alpha field contains the identifying type of heating coil specified in the 
 
 * Coil:Heating:Desuperheater
 
+* Coil:UserDefined
+
 #### Field: Heating Coil Name
 
 This alpha field contains the identifying name given to the unitary system heating coil.
@@ -10911,6 +11128,8 @@ This numeric field is used to adjust heat pump heating capacity with respect to 
 This alpha field contains the identifying type of cooling coil specified in the unitary system. Allowable coil types are:
 
 * Coil:Cooling:DX:SingleSpeed
+
+* Coil:Cooling:DX:SingleSpeed:ThermalStorage
 
 * Coil:Cooling:DX:TwoSpeed
 
@@ -10934,6 +11153,8 @@ This alpha field contains the identifying type of cooling coil specified in the 
 
 * CoilSystem:Cooling:Water:HeatExchangerAssisted
 
+* Coil:UserDefined
+
 #### Field: Cooling Coil Name
 
 This alpha field contains the identifying name given to the unitary system cooling coil.
@@ -10952,7 +11173,7 @@ This alpha field defines the latent load control method. Available choices are S
 
 #### Field: Supplemental Heating Coil Object Type
 
-This alpha field contains the identifying type of supplemental heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. supplemental heating type must be one of:
+This alpha field contains the identifying type of supplemental heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The Coil:UserDefined object must be configured as a heating coil. Supplemental heating type must be one of:
 
 * Coil:Heating:Electric
 
@@ -10963,6 +11184,8 @@ This alpha field contains the identifying type of supplemental heating coil spec
 * Coil:Heating:Water
 
 * Coil:Heating:Steam
+
+* Coil:UserDefined
 
 #### Field: Supplemental Heating Coil Name
 
@@ -13779,24 +14002,38 @@ This output field is the mass flow rate of air, in kg/s, being bypassed from the
 
 This output field is the dry-bulb set point temperature in degrees Celsius. This set point temperature is calculated by the model based on the zone cooling/heating loads calculated by EnergyPlus, and the priority control mode and the dehumidification control type specified for this unitary system. The CBVAV system attempts to achieve the outlet air set point temperature to the extent possible.
 
+
+
 Group – Variable Refrigerant Flow Equipment
 -------------------------------------------
 
-### AirConditioner:VariableRefrigerantFlow
+This group of EnergyPlus input objects describes the configurations of Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) air-conditioning systems. 
 
-This model simulates a variable-refrigerant-flow (or variable-refrigerant-volume) air-conditioning system. This system type models direct-expansion cooling and/or heating coils configured in a zone terminal unit. For this system type, the zone terminal units are “connected” to a zone via the zone inlet and exhaust nodes. The zone terminal units are identified in a ZoneTerminalUnitList object. And finally, the name of the ZoneTerminalUnitList object is entered as an input to the AirConditioner:VariableRefrigerantFlow object. The Energyplus connection methodology is shown as dashed and greyed arrows in the figure below according to the following rules:
+A VRF system is an air-conditioning system that varies the refrigerant flow rate using variable speed compressor(s) in the outdoor unit, and the electronic expansion valves (EEVs) located in each indoor unit. The system meets the space cooling or heating load requirements by maintaining the zone air temperature at the setpoint. The ability to control the refrigerant mass flow rate according to the cooling and/or heating load enables the use of as many as 60 or more indoor units with differing capacities in conjunction with one single outdoor unit. This unlocks the possibility of having individualized comfort control, simultaneous heating and cooling in different zones, and heat recovery from one zone to another. It may also lead to more efficient operations during part-load conditions.
 
-1.    The zone inlet and zone exhaust node names are defined in a ZoneHVAC:EquipmentConnections object (bottom of figure).
+There are two alternative VRF models in EnergyPlus: 
 
-2.    A ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object will identify these zone exhaust and zone inlet node names as the terminal unit’s air inlet and air outlet nodes, respectively.
+ 1. **System curve based model (VRF-SysCurve)**. In this model, a number of system level curves are used to describe the VRF system performance. This model corresponds to the *AirConditioner:VariableRefrigerantFlow* object.
+ 
+ 2. **Physics based model (VRF-FluidTCtrl)**. This model is able to consider the dynamics of more operational parameters and is applicable for fluid temperature control. This model corresponds to the *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object.
+ 
+( Please refer to the engineering reference for more technical details of the two models).
 
-3.    All zone terminal units that are connected to the same AirConditioner: VariableRefrigerantFlow object are listed in a ZoneTerminalUnitList object.
+In the VRF system model, direct-expansion cooling and/or heating coils are configured in a zone terminal unit, which is connected to a zone via the zone inlet and exhaust nodes. The zone terminal units are identified in a *ZoneTerminalUnitList* object, the name of which is entered as an input to the *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object. 
 
-4.    The name of the ZoneTerminalUnitList object is an input to the AirConditioner: VariableRefrigerantFlow object.
+The Energyplus connection methodology is shown as dashed and greyed arrows in the figure below according to the following rules:
 
-5.    The AirCondtiioner:VariableRefrigerantFlow object is not listed in an AirloopHVAC object and, therefore, can only be simulated if the terminal units are connected to the AirCondtiioner:VariableRefrigerantFlow object using the ZoneTerminalUnitList.
-
-6.    Secondary ZoneHVAC equipment objects may be used in the same zones as the terminal units for other purposes (e.g., code compliance)
+  * The zone inlet and zone exhaust node names are defined in a *ZoneHVAC:EquipmentConnections* object (bottom of figure).
+  
+  * A *ZoneHVAC:TerminalUnit:VariableRefrigerantFlow* object will identify these zone exhaust and zone inlet node names as the terminal unit’s air inlet and air outlet nodes, respectively.
+  
+  * All zone terminal units that are connected to the same *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object are listed in a *ZoneTerminalUnitList* object.
+  
+  * The name of the *ZoneTerminalUnitList* object is an input to the *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object.
+  
+  * The *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* or *AirConditioner:VariableRefrigerantFlow* object is not listed in an AirloopHVAC object, and therefore, can only be simulated if the terminal units are connected to the *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object using the ZoneTerminalUnitList.
+  
+  * Secondary ZoneHVAC equipment objects may be used in the same zones as the terminal units for other purposes (e.g., code compliance)
 
 The following schematic demonstrates these connection rules.
 
@@ -13807,8 +14044,15 @@ Figure 125. Variable Refrigerant Flow Schematic
 Energyplus object type and object name, and node name relationships are also shown in the following figure to aid in the assembly of this HVAC system type.
 
 ![VRFObjects](media/image311.png)
+*(a) VRF model based on system curves (VRF-SysCurve)*
+
+![VRFObjects](media/image312.png)
+*(b) VRF model based on physics (VRF-FluidTCtrl)*
 
 Figure 126. Variable Refrigerant Flow Object Links
+
+
+### AirConditioner:VariableRefrigerantFlow
 
 #### Field: Heat Pump Name
 
@@ -14245,6 +14489,376 @@ AirConditioner:VariableRefrigerantFlow,
 
 
 
+### AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl
+
+#### Field: Heat Pump Name 
+
+This alpha field defines a unique user-assigned name for an instance of a variable refrigerant flow heat pump. Any reference to this heat pump will use this name. Since this object is not listed in an AirloopHVAC object, the most likely use of this name would be for reporting purposes.
+
+#### Field: Availability Schedule Name
+
+This alpha field defines the name of the schedule (ref: Schedule) that denotes whether the heat pump operates during a given time period. A schedule value equal to 0 denotes that the heat pump must be off for that time period. A value other than 0 denotes that the heat pump is available to operate during that time period. This schedule may be used to completely disable the heat pump (and all of its terminal units) as required. If this field is blank, the unit is enabled the entire simulation.
+
+#### Field: Zone Terminal Unit List Name
+
+This alpha field defines the name of the zone terminal unit list. The name specified here should match the name of a valid ZoneTerminalUnitList object. In addition, each name specified in this list should match the name of a valid ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object. All terminal units connected to this heat pump must be listed in this ZoneTerminalUnitList object.
+
+#### Field: Refrigerant Type
+
+This alpha field defines the name of the refrigerant used in the VRF system. The name specified here should match the name of a valid FluidProperties:Name object. 
+
+####Field: Rated Evaporative Capacity
+
+This numeric field defines the total evaporative capacity in watts at rated conditions. This is the capacity corresponding to the max compressor speed at rated conditions. The actual evaporative capacity is obtained by multiplying the rated capacity with the modification factor calculated by Evaporative Capacity Multiplier Function of Temperature Curve. The value must be greater than 0. If this field is left blank, a default value of 40,000 W is assumed.
+	   
+####Field: Rated Compressor Power Per Unit of Rated Evaporative Capacity
+
+This numeric field defines the rated compressor power per Watt of rated evaporative capacity. Rated compressor power corresponds to the max compressor speed at rated conditions. The actual compressor power is obtained by multiplying the rated power with the modification factor calculated by Compressor Power Multiplier Function of Temperature Curve. The value must be greater than 0. If this field is left blank, a default value of 0.35 W/W is assumed.
+
+####Field: Minimum Outdoor Air Temperature in Cooling Mode
+
+This numeric field defines the minimum outdoor dry-bulb temperature allowed for cooling operation. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6ºC.
+
+####Field: Maximum Outdoor Air Temperature in Cooling Mode
+
+This numeric field defines the maximum outdoor dry-bulb temperature allowed for cooling operation. Above this temperature, cooling is disabled. If this field is left blank, the default value is 43ºC.
+
+####Field: Minimum Outdoor Air Temperature in Heating Mode
+
+This numeric field defines the minimum outdoor temperature allowed for heating operation. Below this temperature, heating is disabled. If this field is left blank, the default value is -20ºC.
+
+####Field: Maximum Outdoor Air Temperature in Heating Mode
+
+This numeric field defines the maximum outdoor temperature allowed for heating operation. Above this temperature, heating is disabled. If this field is left blank, the default value is 16ºC.
+
+#### Field: Outdoor Unit Reference Superheating 
+
+This numeric field defines the reference superheating degrees of the outdoor unit. If this field is blank, the default value of 3.0ºC is used. 
+
+#### Field: Outdoor Unit Reference Subcooling 
+
+This numeric field defines the reference subcooling degrees of the outdoor unit. If this field is blank, the default value of 3.0ºC is used. 
+
+#### Field: Refrigerant Temperature Control Algorithm for Indoor Unit
+
+This alpha field specifies the algorithm for the refrigerant temperature control. Two choices are available: ConstantTemp or VariableTemp. The indoor unit evaporating temperature at cooling mode or condensing temperature at heating are fixed in the ConstantTemp algorithm, while in VariableTemp algorithm they can be varied.
+
+#### Field: Reference Evaporating Temperature for Indoor Unit 
+
+This numeric field defines the reference evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is ConstantTemp. If this field is blank, the default value of 6.0ºC is used.
+
+#### Field: Reference Condensing Temperature for Indoor Unit 
+
+This numeric field defines the reference condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is ConstantTemp. If this field is blank, the default value of 44.0ºC is used.
+
+#### Field: Variable Evaporating Temperature Minimum for Indoor Unit
+
+This numeric field defines the minimum evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 4.0ºC is used.
+
+#### Field: Variable Evaporating Temperature Maximum for Indoor Unit
+
+This numeric field defines the maximum evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 13.0ºC is used.
+
+#### Field: Variable Condensing Temperature Minimum for Indoor Unit
+
+This numeric field defines the minimum condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 42.0ºC is used.
+
+#### Field: Variable Condensing Temperature Maximum for Indoor Unit
+
+This numeric field defines the maximum condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 46.0ºC is used.
+
+#### Field: Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity
+ 
+This numeric field defines the outdoor unit fan power per watt of rated evaporative capacity. If this field is blank, the default value of 4.25E-3 W/W is used.
+	   
+#### Field: Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity
+ 
+This numeric field defines the outdoor unit fan volumetric flow rate per watt of rated evaporative capacity. If this field is blank, the default value of 7.50E-5 m<sup>3</sup>/s-W is used.
+
+#### Field: Outdoor Unit Evaporating Temperature Function of Superheating Curve Name    
+
+This alpha field defines the name of a quadratic performance curve that parameterizes the variation of outdoor unit evaporating temperature as a function of superheating degrees. The output of this curve is the temperature difference between the coil surface air temperature and the evaporating temperature.
+
+#### Field: Outdoor Unit Condensing Temperature Function of Subcooling Curve Name    
+
+This alpha field defines the name of a quadratic performance curve that parameterizes the variation of outdoor unit condensing temperature as a function of subcooling degrees. The output of this curve is the temperature difference between the condensing temperature and the coil surface air temperature.
+
+#### Field: Diameter of main pipe connecting outdoor unit to indoor units
+
+This numeric field defines the diameter of main pipe connecting outdoor unit to indoor units. This value is used to calculate the piping loss of the refrigerant when going through the main pipe, including the heat loss and pressure drop. If this field is blank, the default value of 0.0254m is used.
+
+#### Field: Length of main pipe connecting outdoor unit to indoor units
+
+This numeric field defines the length of main pipe connecting outdoor unit to indoor units. This value is used to calculate the heat loss of the refrigerant when going through the main pipe. The value should be greater than 0. If this field is blank, the default value of 30m is used.
+
+#### Field: Equivalent length of main pipe connecting outdoor unit to indoor units
+
+This numeric field defines the equivalent length of main pipe connecting outdoor unit to indoor units. This value is used to calculate the pressure drop of the refrigerant when going through the main pipe. The value should be greater than the real pipe length specified in the above field. If this field is blank, the default value of 36m is used.
+
+#### Field: Height difference between the outdoor unit node and indoor unit node of the main pipe
+
+This numeric field defines the height difference between the outdoor unit node and indoor unit node of the main pipe. This value is used to calculate the piping loss of the refrigerant when going through the main pipe. The value can be positive, zero, or negative. Positive means outdoor unit is higher than indoor unit, while negative means outdoor unit is lower than indoor unit.
+
+#### Field: Insulation thickness of the main pipe
+
+This numeric field defines the insulation thickness of the main pipe. This value is used to calculate the heat loss of the refrigerant when going through the main pipe. The value should be greater than 0. If this field is blank, the default value of 0.02m is used.
+
+#### Field: Thermal conductivity of the main pipe insulation material
+
+This numeric field defines the thermal conductivity of the main pipe insulation material. This value is used to calculate the heat loss of the refrigerant when going through the main pipe. The value should be greater than 0. If this field is blank, the default value of 0.032 W/m-K is used.
+
+#### Field: Crankcase Heater Power per Compressor
+
+This numeric field defines the electrical power consumed by the crankcase heater in watts for each compressor. This crankcase heater power is consumed to warm the refrigerant and oil when the compressor is off when the outdoor temperature is below the maximum outdoor dry-bulb temperature for crankcase heater operation. The minimum value for this field is 0. If this field is left blank, the default value is 33 watts. Crankcase heater electrical consumption is applied only when the compressor is off or is applied during the off cycle when the compressor is cycling below the Minimum Heat Pump Part-Load Ratio. This field is only used to calculate crankcase heater power and has no impact on heat pump performance.
+
+#### Field: Number of Compressors
+
+This numeric field defines the number of compressors in the heat pump condensing unit and is used exclusively to determine the operating characteristics of the crankcase heater. For example, if the number of compressors is 3, one crankcase heater will operate when the heat pump condensing unit’s part-load ratio is less than or equal to 0.67 (when the ratio of compressor size to total compressor capacity input is 0.33) and the outdoor temperature is below the maximum outdoor temperature for crankcase heater operation. Similarly, two crankcase heaters will operate when the heat pump condensing unit’s PLR is less than or equal to 0.33 and the outdoor temperature is below the maximum outdoor temperature for crankcase heater operation. If the heat pump condensing unit is off, all 3 crankcase heaters will operate if the outdoor temperature is below the maximum outdoor temperature for crankcase heater operation. The minimum value for this field is 1. If this field is left blank, the default value is 2. This field is only used to calculate crankcase heater power and has no impact on heat pump performance.
+
+#### Field: Ratio of Compressor Size to Total Compressor Capacity
+
+This numeric field defines the size of the first stage compressor to the total compressor capacity and is used exclusively for calculating crankcase heater energy. If this field and the previous field are left blank, the default value is 0.5.  If this field is left blank and the previous field is not blank, the compressors are assumed to be equally sized. When the number of compressors is greater than 2, the 2<sup>nd</sup> stage compressor and all additional compressors are assumed to be equally sized. This field is only used to calculate crankcase heater power and has no impact on heat pump performance.
+
+#### Field: Maximum Outdoor Dry-bulb Temperature for Crankcase Heater
+
+This numeric field defines the maximum outdoor temperature, in degrees Celsius, below which the crankcase heater will operate. If this field is left blank, the default value is 5°C. This field is only used to calculate crankcase heater power and has no impact on heat pump performance.
+
+#### Field: Defrost Strategy
+
+This alpha field has two choices: reverse-cycle or resistive. If the reverse-cycle strategy is selected, the heating cycle is reversed periodically to provide heat to melt frost accumulated on the outdoor coil. If a resistive defrost strategy is selected, the frost is melted using an electric resistance heater. If this input field is left blank, the default defrost strategy is reverse-cycle. Defrost can be disabled by entering a resistive defrost strategy using a timed defrost control, a 0 defrost time period fraction and a 0 resistive defrost heater capacity in the following inputs fields. This method is used when the Maximum Outdoor Dry-Bulb Temperature for Defrost Operation field value is greater than the expected minimum outdoor dry-bulb temperature simulated in the weather file.
+
+#### Field: Defrost Control
+
+This alpha field has two choices: timed or on-demand. If timed control is selected, the defrost time period is calculated based on a fixed value of compressor runtime whether or not frost has actually accumulated. For timed defrost control, the fractional amount of time the unit is in defrost is entered in the input field “Defrost Time Period Fraction” described below. If on-demand defrost control is selected, the defrost time period is calculated based on outdoor weather (humidity ratio) conditions. Regardless of which defrost control is selected, defrost does not occur above the user specified outdoor temperature entered in the input field “Maximum Outdoor Dry-bulb Temperature for Defrost Operation” described above. If this input field is left blank, the default defrost control is timed.
+
+#### Field: Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
+
+This alpha field defines the name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) during reverse-cycle defrost periods as a function of the outdoor air dry-bulb temperature and the weighted average wet-bulb temperature of the air entering the indoor terminal units. The output of this curve is multiplied by the coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the indoor and outdoor coils are operating. The curve is normalized to a value of 1.0 at the rating point conditions.
+
+#### Field: Defrost Time Period Fraction
+
+This numeric field defines the fraction of compressor runtime when the defrost cycle is active. For example, if the defrost cycle is active for 3.5 minutes for every 60 minutes of compressor runtime, then the user should enter 3.5/60 = 0.058333. The value for this input field must be greater than or equal to 0. If this input field is left blank, the default value is 0.058333.
+
+#### Field: Resistive Defrost Heater Capacity
+
+This numeric field defines the capacity of the resistive defrost heating element in Watts. This input field is used only when the selected defrost strategy is ‘resistive’ (see input field “Defrost Strategy” above). The value for this input field must be greater than or equal to 0. If this input field is left blank, the default value is 0.
+
+#### Field: Maximum Outdoor Dry-bulb Temperature for Defrost Operation
+
+This numeric field defines the outdoor air dry-bulb temperature above which outdoor coil defrosting is disabled. If this input field is left blank, the default value is 5°C. Defrost can be completely eliminated by selecting a temperature lower than the minimum expected outdoor temperature found in the weather file.
+
+#### Field: Compressor maximum delta Pressure
+
+This numeric field defines the maximum pressure increase that the compressor can provide. The value should be greater than 0. If this field is blank, the default value of 4,500,000 Pa is used.
+
+#### Field: Number of Compressor Loading Index Entries
+
+This numeric field defines the number of compressor loading index entries. Loading index specifies the VRF operational modes at various load conditions. In a single compressor system, loading index reflects the compressor speed. The model requires at least two loading indices. The first index represents the minimal capacity operation, while the last index represents full capacity operation.
+
+#### Field: Compressor Speed at Loading Index i 
+
+This numeric field defines the compressor speed at the i-th loading index. The value must be greater than 0.
+
+#### Field: Loading Index i Evaporative Capacity Multiplier Function of Temperature Curve Name
+
+This alpha field defines the name of a BiQuadratic curve for the VRF operational mode corresponding to the i-th loading index. It parameterizes the variation of VRF evaporating capacity as a function of operating conditions, i.e., evaporating and condensing temperatures. The output of this curve is a dimensionless multiplier to be applied on the rated evaporative capacity to calculate the actual capacity.
+
+#### Field: Loading Index i Compressor Power Multiplier Function of Temperature Curve Name
+
+This alpha field defines the name of a BiQuadratic curve for the VRF operational mode corresponding to the i-th loading index. It parameterizes the variation of compressor power as a function of operating conditions, i.e., evaporating and condensing temperatures. The output of this curve is a dimensionless multiplier to be applied on the rated compressor power to calculate the actual compressor power.
+
+Following is an example input for a AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl system.
+
+
+```idf
+
+  AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
+    VRF Heat Pump,           !- Heat Pump Name
+    VRFCondAvailSched,       !- Availability Schedule Name
+    VRF Heat Pump TU List,   !- Zone Terminal Unit List Name
+    R410A,                   !- Refrigerant Type
+    41300,                   !- Rated Evaporative Capacity {W}
+    0.344,                   !- Rated Compressor Power Per Unit of Rated Evaporative Capacity {W/W}
+    ,                        !- Minimum Outdoor Air Temperature in Cooling Mode {C}
+    ,                        !- Maximum Outdoor Air Temperature in Cooling Mode {C}
+    ,                        !- Minimum Outdoor Air Temperature in Heating Mode {C}
+    ,                        !- Maximum Outdoor Air Temperature in Heating Mode {C}
+    3,                       !- Reference Outdoor Unit Superheating Degrees {C}
+    3,                       !- Reference Outdoor Unit Subcooling Degrees {C}
+    VariableTemp,            !- Refrigerant Temperature Control Algorithm for Indoor Unit
+    ,                        !- Reference Evaporating Temperature for Indoor Unit {C}
+    ,                        !- Reference Condensing Temperature for Indoor Unit {C}
+    6,                       !- Variable Evaporating Temperature Minimum for Indoor Unit {C}
+    13,                      !- Variable Evaporating Temperature Maximum for Indoor Unit {C}
+    42,                      !- Variable Condensing Temperature Minimum for Indoor Unit {C}
+    46,                      !- Variable Evaporating Temperature Maximum for Indoor Unit {C}
+    4.12E-3,                 !- Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity {W/W}
+    7.26E-5,                 !- Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity {m3/s-W}
+    OUEvapTempCurve,         !- Outdoor Unit Evaporating Temperature Function of Superheating Curve Name
+    OUCondTempCurve,         !- Outdoor Unit Condensing Temperature Function of Subcooling Curve Name
+    0.0508,                  !- Diameter of main pipe connecting outdoor unit to indoor units {m}
+    30,                      !- Length of main pipe connecting outdoor unit to indoor units {m}
+    36,                      !- Equivalent length of main pipe connecting outdoor unit to indoor units {m}
+    5,                       !- Height difference between the outdoor unit node and indoor unit node of the main pipe {m}
+    0.02,                    !- Insulation thickness of the main pipe {m}
+    0.032,                   !- Thermal conductivity of the main pipe insulation material {W/m-K}
+    33,                      !- Crankcase Heater Power per Compressor {W}
+    1,                       !- Number of Compressors
+    0.33,                    !- Ratio of Compressor Size to Total Compressor Capacity
+    7,                       !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater {C}
+    ,                        !- Defrost Strategy
+    ,                        !- Defrost Control
+    ,                        !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
+    ,                        !- Defrost Time Period Fraction
+    ,                        !- Resistive Defrost Heater Capacity {W}
+    ,                        !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
+    4500000,                 !- Compressor maximum delta Pressure {Pa}
+    3,                       !- Number of Compressor Loading Index Entries
+    1500,                    !- Compressor Speed at Loading Index 1 {rev/min}
+    MinSpdCooling,           !- Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name
+    MinSpdPower,             !- Loading Index 1 Compressor Power Multiplier Function of Temperature Curve Name
+    3600,                    !- Compressor Speed at Loading Index 2 {rev/min}
+    Spd1Cooling,             !- Loading Index 2 Evaporative Capacity Multiplier Function of Temperature Curve Name
+    Spd1Power,               !- Loading Index 2 Compressor Power Multiplier Function of Temperature Curve Name
+    6000,                    !- Compressor Speed at Loading Index 3 {rev/min}
+    Spd2Cooling,             !- Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name
+    Spd2Power;               !- Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name
+
+  Curve:Quadratic,
+    OUEvapTempCurve,         !- Name
+    0,                       !- Coefficient1 Constant
+    6.05E-1,                 !- Coefficient2 x
+    2.50E-2,                 !- Coefficient3 x**2
+    0,                       !- Minimum Value of x    
+    15,                      !- Maximum Value of x    
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature;             !- Output Unit Type
+
+  Curve:Quadratic,
+    OUCondTempCurve,         !- Name
+    0,                       !- Coefficient1 Constant
+    -2.91,                   !- Coefficient2 x
+    1.180,                   !- Coefficient3 x**2
+    0,                       !- Minimum Value of x    
+    20,                      !- Maximum Value of x    
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature;             !- Output Unit Type
+	
+  Curve:Biquadratic,
+    MinSpdCooling,           !- Name
+    3.19E-01,                !- Coefficient1 Constant
+    -1.26E-03,               !- Coefficient2 x
+    -2.15E-05,               !- Coefficient3 x**2
+    1.20E-02,                !- Coefficient4 y
+    1.05E-04,                !- Coefficient5 y**2
+    -8.66E-05,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    MinSpdPower,             !- Name
+    8.79E-02 ,               !- Coefficient1 Constant
+    -1.72E-04,               !- Coefficient2 x
+    6.93E-05 ,               !- Coefficient3 x**2
+    -3.38E-05,               !- Coefficient4 y
+    -8.10E-06,               !- Coefficient5 y**2
+    -1.04E-05,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+	
+  Curve:Biquadratic,
+    Spd1Cooling,             !- Name
+    8.12E-01 ,               !- Coefficient1 Constant
+    -4.23E-03,               !- Coefficient2 x
+    -4.11E-05,               !- Coefficient3 x**2
+    2.97E-02 ,               !- Coefficient4 y
+    2.67E-04 ,               !- Coefficient5 y**2
+    -2.23E-04,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    Spd1Power,               !- Name
+    3.26E-01 ,               !- Coefficient1 Constant
+    -2.20E-03,               !- Coefficient2 x
+    1.42E-04 ,               !- Coefficient3 x**2
+    2.82E-03 ,               !- Coefficient4 y
+    2.86E-05 ,               !- Coefficient5 y**2
+    -3.50E-05,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    Spd2Cooling,             !- Name
+    1.32E+00 ,               !- Coefficient1 Constant
+    -6.20E-03,               !- Coefficient2 x
+    -7.10E-05,               !- Coefficient3 x**2
+    4.89E-02 ,               !- Coefficient4 y
+    4.59E-04 ,               !- Coefficient5 y**2
+    -3.67E-04,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    Spd2Power,               !- Name
+    6.56E-01 ,               !- Coefficient1 Constant
+    -3.71E-03,               !- Coefficient2 x
+    2.07E-04 ,               !- Coefficient3 x**2
+    1.05E-02 ,               !- Coefficient4 y
+    7.36E-05 ,               !- Coefficient5 y**2
+    -1.57E-04,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+	
+```
+
+
 ### Variable Refrigerant Flow (VRF) Air Conditioner Outputs
 
 * HVAC,Average,VRF Heat Pump Total Cooling Rate [W]
@@ -14349,6 +14963,25 @@ Alternate Fuel types (e.g., FuelType = NaturalGas):
 
 * HVAC,Sum,VRF Heat Pump Defrost &lt;FuelType&gt; Energy [J]
 
+
+
+For the pysics based VRF model (VRF-FluidTCtrl) only:
+
+* VRF Heat Pump Indoor Unit Evaporating Temperature at Cooling Mode [C]
+
+* VRF Heat Pump Outdoor Unit Condensing Temperature at Cooling Mode [C]
+
+* VRF Heat Pump Indoor Unit Condensing Temperature at Heating Mode [C]
+
+* VRF Heat Pump Outdoor Unit Evaporating Temperature at Heating Mode [C]
+
+* VRF Heat Pump Compressor Electric Power at Cooling Mode [W]
+
+* VRF Heat Pump Compressor Electric Power at Heating Mode [W]
+
+* VRF Heat Pump Compressor Rotating Speed [rev/min]
+
+* VRF Heat Pump Outdoor Unit Fan Power [W]
 
 
 Note: refer to the rdd file after a simulation for exact output variable names
@@ -14482,6 +15115,41 @@ This output is the electric consumption of the heat pump’s basin heater (for e
 #### VRF Heat Pump Heat Recovery Status Change Multiplier []
 
 This output applies only when heat recovery is used and represents the multiplier used to derate the capacity of the system when transitioning from cooling or heating mode to heat recovery mode. This value is 1 when derating does not apply (i.e., the system has not recently changed modes to provide heat recovery). Derating during a transition period is applied according to the inputs for Heat Recovery Fraction and Heat Recovery Time Constant. To turn transition derating off, set Heat Recovery Fraction to 1. Refer to the engineering reference document discussion on the variable refrigerant flow heat pump model section for transition from cooling only mode to heat recovery mode for a more detailed description.
+
+
+#### VRF Heat Pump Indoor Unit Evaporating Temperature at Cooling Mode [C]
+
+This output only applies for the VRF-FluidTCtrl model. This is the evaporating temperature of the VRF system operating at cooling mode. This value is manipulated by the VRF system considering the load conditions of all the zones it serves. It affects the indoor unit cooling coil surface temperature and thus the cooling capacity of the indoor unit. It also affects the compressor operating conditions and thus the compressor energy consumption.
+
+#### VRF Heat Pump Outdoor Unit Condensing Temperature at Cooling Mode [C]
+
+This output only applies for the VRF-FluidTCtrl model. This is the condensing temperature of the VRF system operating at cooling mode. This value is related with the outdoor air conditions as well as the system operational mode. It affects the condensing capacity of the outdoor unit. It also affects the compressor operating conditions and thus the compressor energy consumption.
+
+#### VRF Heat Pump Indoor Unit Condensing Temperature at Heating Mode [C]
+
+This output only applies for the VRF-FluidTCtrl model. This is the condensing temperature of the VRF system operating at heating mode. This value is manipulated by the VRF system considering the load conditions of all the zones it serves. It affects the indoor unit heating coil surface temperature and thus the heating capacity of the indoor unit. It also affects the compressor operating conditions and thus the compressor energy consumption.
+
+#### VRF Heat Pump Outdoor Unit Evaporating Temperature at Heating Mode [C]
+
+This output only applies for the VRF-FluidTCtrl model. This is the evaporating temperature of the VRF system operating at heating mode. This value is related with the outdoor air conditions as well as the system operational mode. It affects the evaporating capacity of the outdoor unit. It also affects the compressor operating conditions and thus the compressor energy consumption.
+
+#### VRF Heat Pump Compressor Electric Power at Cooling Mode [W]
+
+This output only applies for the VRF-FluidTCtrl model. This is the electric power of the compressor running at the cooling mode. This value is related with the compressor speed as well as the operational conditions, i.e., evaporating and condensing temperatures of the system.
+
+#### VRF Heat Pump Compressor Electric Power at Heating Mode [W]
+
+This output only applies for the VRF-FluidTCtrl model. This is the electric power of the compressor running at the heating mode. This value is related with the compressor speed as well as the operational conditions, i.e., evaporating and condensing temperatures of the system.
+
+#### VRF Heat Pump Compressor Rotating Speed [rev/min]
+
+This output only applies for the VRF-FluidTCtrl model. This is the rotating speed of the compressor, which indicates the loading index.
+
+#### VRF Heat Pump Outdoor Unit Fan Power [W]
+
+This output only applies for the VRF-FluidTCtrl model. This is the power consumed by the fan located in the VRF outdoor unit.
+
+
 
 ### ZoneTerminalUnitList
 

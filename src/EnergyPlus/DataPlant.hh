@@ -268,6 +268,7 @@ namespace DataPlant {
 	extern int const TypeOf_CoolingTower_VarSpdMerkel;
 	extern int const TypeOf_SwimmingPool_Indoor;
 	extern int const TypeOf_GrndHtExchgSlinky;
+	extern int const TypeOf_FourPipeBeamAirTerminal;
 
 	// Parameters for General Equipment Types
 	extern int const NumGeneralEquipTypes;
@@ -2316,6 +2317,12 @@ namespace DataPlant {
 	extern Array1D< PlantCallingOrderInfoStruct > PlantCallingOrderInfo;
 
 	// Functions
+
+	// Clears the global data in DataPlant.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 
 	void
 	ScanPlantLoopsForObject(

@@ -189,6 +189,8 @@ namespace ZoneTempPredictorCorrector {
 	extern Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageZoneAirUpdates(

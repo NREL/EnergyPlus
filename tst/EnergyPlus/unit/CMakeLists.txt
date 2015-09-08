@@ -25,7 +25,7 @@ set( test_src
   ExteriorEnergyUse.unit.cc
   FanCoilUnits.unit.cc
   Fans.unit.cc
-  FaultFoulingAirFilters.unit.cc
+  FaultsManager.unit.cc
   FiniteDifferenceGroundTemperatureModel.unit.cc
   FluidCoolers.unit.cc
   Furnaces.unit.cc
@@ -33,6 +33,7 @@ set( test_src
   HeatBalanceManager.unit.cc
   HeatRecovery.unit.cc
   Humidifiers.unit.cc
+  HVACFourPipeBeam.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
   ICSCollector.unit.cc

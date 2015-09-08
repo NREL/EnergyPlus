@@ -128,10 +128,21 @@ namespace ZoneEquipmentManager {
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
+		namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		
+		bool InitZoneEquipmentOneTimeFlag( true );
+	}
+
 	Array1D< Real64 > AvgData; // scratch array for storing averaged data
 	Array1D_int DefaultSimOrder;
 	int NumOfTimeStepInDay; // number of zone time steps in a day
 	bool GetZoneEquipmentInputFlag( true );
+	bool SizeZoneEquipmentOneTimeFlag( true );
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE ZoneEquipmentManager
 
@@ -139,6 +150,17 @@ namespace ZoneEquipmentManager {
 	Array1D< SimulationOrder > PrioritySimOrder;
 
 	// Functions
+	void
+	clear_state()
+	{
+		SizeZoneEquipmentOneTimeFlag = true;
+		InitZoneEquipmentOneTimeFlag =  true;
+		AvgData.deallocate(); // scratch array for storing averaged data
+		DefaultSimOrder.deallocate();
+		NumOfTimeStepInDay = 0; // number of zone time steps in a day
+		GetZoneEquipmentInputFlag = true ;
+		PrioritySimOrder.deallocate();
+	}
 
 	void
 	ManageZoneEquipment(
@@ -319,7 +341,9 @@ namespace ZoneEquipmentManager {
 		int ZoneExhNode;
 		int ControlledZoneNum;
 		int ZoneReturnAirNode;
-		static bool MyOneTimeFlag( true );
+		/////////// hoisted into namespace InitZoneEquipmentOneTimeFlag////////////
+		//static bool MyOneTimeFlag( true );
+		///////////////////////////
 		static bool MyEnvrnFlag( true );
 		int ZoneEquipType; // Type of zone equipment
 		int TotalNumComp; // Total number of zone components of ZoneEquipType
@@ -327,8 +351,8 @@ namespace ZoneEquipmentManager {
 		int ZoneEquipCount;
 		// Flow
 
-		if ( MyOneTimeFlag ) {
-			MyOneTimeFlag = false;
+		if ( InitZoneEquipmentOneTimeFlag ) {
+			InitZoneEquipmentOneTimeFlag = false;
 			TermUnitSizing.allocate( NumOfZones );
 			ZoneEqSizing.allocate( NumOfZones );
 			// setup zone equipment sequenced demand storage
@@ -521,7 +545,6 @@ namespace ZoneEquipmentManager {
 		using DataHVACGlobals::SmallTempDiff;
 		using General::RoundSigDigits;
 		using DataEnvironment::StdBaroPress;
-		using DataZoneEquipment::MyOneTimeFlag2;
 
 		// Parameters
 		static std::string const RoutineName( "SizeZoneEquipment" );
@@ -565,9 +588,9 @@ namespace ZoneEquipmentManager {
 		Real64 HR90H; // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
 		Real64 HR90L; // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
 
-		if ( MyOneTimeFlag2 ) {
+		if ( SizeZoneEquipmentOneTimeFlag ) {
 			SetUpZoneSizingArrays();
-			MyOneTimeFlag2 = false;
+			SizeZoneEquipmentOneTimeFlag = false;
 		}
 
 		for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
