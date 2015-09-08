@@ -1,12 +1,15 @@
 #ifndef DataDefineEquip_hh_INCLUDED
 #define DataDefineEquip_hh_INCLUDED
 
+// C++ Headers
+#include <memory>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <AirTerminalUnit.hh>
 
 namespace EnergyPlus {
 
@@ -20,7 +23,7 @@ namespace DataDefineEquip {
 
 	//MODULE PARAMETER DEFINITIONS
 	extern int const MaxZoneAirComponents;
-	//INTEGER, PARAMETER :: MaxZoneAirControls = 4
+
 	// Equipment Types covered by ZoneAirLoopEquipment:
 	extern int const DualDuctConstVolume;
 	extern int const DualDuctVAV;
@@ -38,6 +41,7 @@ namespace DataDefineEquip {
 	extern int const SingleDuctUserDefined;
 	extern int const SingleDuctInletATMixer;
 	extern int const SingleDuctSupplyATMixer;
+	extern int const SingleDuctConstVolFourPipeBeam;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -56,6 +60,8 @@ namespace DataDefineEquip {
 		int NumControls; // number of controls (not used; =0)
 		Array1D_string EquipType; // Pointer indentifying type of subcomponent
 		Array1D_int EquipType_Num;
+		///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
+		std::shared_ptr< AirTerminalUnit > airTerminalPtr;
 		Array1D_string EquipName; // name of subcomponent
 		Array1D_int EquipIndex;
 		Real64 UpStreamLeakFrac; // upstream nominal leakage fraction
@@ -72,6 +78,12 @@ namespace DataDefineEquip {
 		Real64 LeakLoadMult; // zome load multiplier to adjust for downstream leak
 		bool UpStreamLeak; // if true, there is an upstream leak
 		bool DownStreamLeak; // if true, there is an downstream leak
+		int ZoneNum; // index of the zone object for this terminal unit
+	 	bool AccountForDOAS; // if true user has asked for DOAS
+		Real64 HeatRate; // [W]
+		Real64 CoolRate; // [W]
+		Real64 HeatGain; // [J]
+		Real64 CoolGain; // [J]
 
 		// Default Constructor
 		ZoneAirEquip() :
@@ -80,6 +92,7 @@ namespace DataDefineEquip {
 			NumControls( 0 ),
 			EquipType( MaxZoneAirComponents ),
 			EquipType_Num( MaxZoneAirComponents, 0 ),
+			airTerminalPtr( nullptr ),
 			EquipName( MaxZoneAirComponents ),
 			EquipIndex( MaxZoneAirComponents, 0 ),
 			UpStreamLeakFrac( 0.0 ),
@@ -95,62 +108,24 @@ namespace DataDefineEquip {
 			ZoneEqNum( 0 ),
 			LeakLoadMult( 0.0 ),
 			UpStreamLeak( false ),
-			DownStreamLeak( false )
-		{}
-
-		// Member Constructor
-		ZoneAirEquip(
-			std::string const & Name, // Name or identifier of this piece of equipment
-			int const OutletNodeNum, // index of outlet node
-			int const NumComponents, // number of subcomponents (=1)
-			int const NumControls, // number of controls (not used; =0)
-			Array1_string const & EquipType, // Pointer indentifying type of subcomponent
-			Array1_int const & EquipType_Num,
-			Array1_string const & EquipName, // name of subcomponent
-			Array1_int const & EquipIndex,
-			Real64 const UpStreamLeakFrac, // upstream nominal leakage fraction
-			Real64 const DownStreamLeakFrac, // downstream constant leakage fraction
-			Real64 const MassFlowRateUpStrLk, // current air mass flow rate of the upstream leak [kg/s]
-			Real64 const MassFlowRateDnStrLk, // current air mass flow rate of the downstream leak [kg/s]
-			Real64 const MassFlowRateTU, // current air mass flow rate tjrough the terminal unit [kg/s]
-			Real64 const MassFlowRateZSup, // current air mass flow rate of zone supply air [kg/s]
-			Real64 const MassFlowRateSup, // current air mass flow rate of supply air upstream of upstream leak [kg/s]
-			Real64 const MaxAvailDelta, // change in max avail mass low rate due to leaks [kg/s]
-			Real64 const MinAvailDelta, // change in min avail mass low rate due to leaks [kg/s]
-			int const InletNodeNum, // index of inlet node
-			int const ZoneEqNum, // index of zone equipment object for this terminal unit
-			Real64 const LeakLoadMult, // zome load multiplier to adjust for downstream leak
-			bool const UpStreamLeak, // if true, there is an upstream leak
-			bool const DownStreamLeak // if true, there is an downstream leak
-		) :
-			Name( Name ),
-			OutletNodeNum( OutletNodeNum ),
-			NumComponents( NumComponents ),
-			NumControls( NumControls ),
-			EquipType( MaxZoneAirComponents, EquipType ),
-			EquipType_Num( MaxZoneAirComponents, EquipType_Num ),
-			EquipName( MaxZoneAirComponents, EquipName ),
-			EquipIndex( MaxZoneAirComponents, EquipIndex ),
-			UpStreamLeakFrac( UpStreamLeakFrac ),
-			DownStreamLeakFrac( DownStreamLeakFrac ),
-			MassFlowRateUpStrLk( MassFlowRateUpStrLk ),
-			MassFlowRateDnStrLk( MassFlowRateDnStrLk ),
-			MassFlowRateTU( MassFlowRateTU ),
-			MassFlowRateZSup( MassFlowRateZSup ),
-			MassFlowRateSup( MassFlowRateSup ),
-			MaxAvailDelta( MaxAvailDelta ),
-			MinAvailDelta( MinAvailDelta ),
-			InletNodeNum( InletNodeNum ),
-			ZoneEqNum( ZoneEqNum ),
-			LeakLoadMult( LeakLoadMult ),
-			UpStreamLeak( UpStreamLeak ),
-			DownStreamLeak( DownStreamLeak )
+			DownStreamLeak( false ),
+			ZoneNum( 0 ),
+			AccountForDOAS( false ),
+			HeatRate( 0.0 ),
+			CoolRate( 0.0 ),
+			HeatGain( 0.0 ),
+			CoolGain( 0.0 )
 		{}
 
 	};
 
 	// Object Data
 	extern Array1D< ZoneAirEquip > AirDistUnit; // Used to specify zone related
+
+	// Clears the global data in DataDefineEquip.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 } // DataDefineEquip
 
