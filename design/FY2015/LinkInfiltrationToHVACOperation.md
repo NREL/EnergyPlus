@@ -3,7 +3,7 @@
 **Michael J. Witte, GARD Analytics, Inc.**
 
  - Original August 7, 2015
- - Add highlights from [NFP-LinkInfiltrationToHVAC.docc](https://github.com/NREL/EnergyPlusDevSupport/blob/master/DesignDocuments/Proposals/NFP-LinkInfiltrationToHVAC.docc)
+ - Add highlights from [NFP-LinkInfiltrationToHVAC.doc](https://github.com/NREL/EnergyPlusDevSupport/blob/master/DesignDocuments/Proposals/NFP-LinkInfiltrationToHVAC.doc)
 
  
 ## Background
