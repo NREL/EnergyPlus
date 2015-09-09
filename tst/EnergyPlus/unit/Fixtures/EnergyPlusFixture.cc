@@ -72,6 +72,7 @@
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
@@ -164,6 +165,7 @@ namespace EnergyPlus {
 		SystemAvailabilityManager::clear_state();
 		VariableSpeedCoils::clear_state();
 		WaterCoils::clear_state();
+		WaterThermalTanks::clear_state();
 		WeatherManager::clear_state();
 		ZoneAirLoopEquipmentManager::clear_state();
 		ZoneEquipmentManager::clear_state();
