@@ -24,6 +24,8 @@ namespace HVACManager {
 	// and zone equipment simulations
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageHVAC();
