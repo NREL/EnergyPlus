@@ -27,9 +27,9 @@ namespace HeatBalanceSurfaceManager {
 	// Initialization routines for module
 
 	// Algorithms for the module
-	// These are now external subroutines
-	//PUBLIC  CalcHeatBalanceOutsideSurf  ! The heat balance routines are now public because the
-	//PUBLIC  CalcHeatBalanceInsideSurf   ! radiant systems need access to them in order to simulate
+	// These old external subroutines have been moved into the namespace and are no longer externals
+	// CalcHeatBalanceOutsideSurf  ! The heat balance routines are now public because the
+	//  CalcHeatBalanceInsideSurf   ! radiant systems need access to them in order to simulate
 
 	// Record Keeping/Utility Routines for Module
 
@@ -115,7 +115,7 @@ namespace HeatBalanceSurfaceManager {
 // *****************************************************************************
 // *****************************************************************************
 
-// EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager)
+// Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) but now moved into namespace HeatBalanceSurfaceManager
 
 void
 CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate = _ ); // if passed in, then only calculate surfaces that have this zone
