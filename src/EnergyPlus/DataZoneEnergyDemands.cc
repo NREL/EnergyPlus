@@ -53,6 +53,17 @@ namespace DataZoneEnergyDemands {
 	//     permit others to do so.
 	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
+	void
+	clear_state()
+	{
+		DeadBandOrSetback.deallocate();
+		Setback.deallocate();
+		CurDeadBandOrSetback.deallocate();
+		ZoneSysEnergyDemand.deallocate();
+		ZoneSysMoistureDemand.deallocate();
+	
+	}
+
 } // DataZoneEnergyDemands
 
 } // EnergyPlus

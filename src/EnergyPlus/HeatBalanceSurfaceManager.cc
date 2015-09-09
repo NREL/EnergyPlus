@@ -1782,8 +1782,57 @@ namespace HeatBalanceSurfaceManager {
 		BSDFBeamPhiRep = 0.0;
 		OpaqSurfInsFaceBeamSolAbsorbed = 0.0;
 
-		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-			SurfaceWindow( SurfNum ).InitSolarHeatGains();
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) { // Faster "inline" than calling SurfaceWindow( SurfNum ).InitSolarHeatGains()
+			auto & window( SurfaceWindow( SurfNum ) );
+			window.FrameQRadOutAbs = 0.0;
+			window.FrameQRadInAbs = 0.0;
+			window.DividerQRadOutAbs = 0.0;
+			window.DividerQRadInAbs = 0.0;
+			window.ExtBeamAbsByShade = 0.0;
+			window.ExtDiffAbsByShade = 0.0;
+			window.IntBeamAbsByShade = 0.0;
+			window.IntSWAbsByShade = 0.0;
+			window.InitialDifSolAbsByShade = 0.0;
+			window.IntLWAbsByShade = 0.0;
+			window.ConvHeatFlowNatural = 0.0;
+			window.ConvHeatGainToZoneAir = 0.0;
+			window.RetHeatGainToZoneAir = 0.0;
+			window.DividerConduction = 0.0;
+			window.BlTsolBmBm = 0.0;
+			window.BlTsolBmDif = 0.0;
+			window.BlTsolDifDif = 0.0;
+			window.BlGlSysTsolBmBm = 0.0;
+			window.BlGlSysTsolDifDif = 0.0;
+			window.ScTsolBmBm = 0.0;
+			window.ScTsolBmDif = 0.0;
+			window.ScTsolDifDif = 0.0;
+			window.ScGlSysTsolBmBm = 0.0;
+			window.ScGlSysTsolDifDif = 0.0;
+			window.GlTsolBmBm = 0.0;
+			window.GlTsolBmDif = 0.0;
+			window.GlTsolDifDif = 0.0;
+			window.BmSolTransThruIntWinRep = 0.0;
+			window.BmSolAbsdOutsReveal = 0.0;
+			window.BmSolRefldOutsRevealReport = 0.0;
+			window.BmSolAbsdInsReveal = 0.0;
+			window.BmSolRefldInsReveal = 0.0;
+			window.BmSolRefldInsRevealReport = 0.0;
+			window.OutsRevealDiffOntoGlazing = 0.0;
+			window.InsRevealDiffOntoGlazing = 0.0;
+			window.InsRevealDiffIntoZone = 0.0;
+			window.OutsRevealDiffOntoFrame = 0.0;
+			window.InsRevealDiffOntoFrame = 0.0;
+			window.InsRevealDiffOntoGlazingReport = 0.0;
+			window.InsRevealDiffIntoZoneReport = 0.0;
+			window.InsRevealDiffOntoFrameReport = 0.0;
+			window.BmSolAbsdInsRevealReport = 0.0;
+			window.BmSolTransThruIntWinRepEnergy = 0.0;
+			window.BmSolRefldOutsRevealRepEnergy = 0.0;
+			window.BmSolRefldInsRevealRepEnergy = 0.0;
+			window.ProfileAngHor = 0.0;
+			window.ProfileAngVert = 0.0;
+			window.SkySolarInc = 0.0;
+			window.GndSolarInc = 0.0;
 		}
 
 		WinHeatGain = 0.0;
@@ -1835,8 +1884,6 @@ namespace HeatBalanceSurfaceManager {
 		ZnOpqSurfExtFaceCondGnRepEnrg = 0.0;
 		ZnOpqSurfExtFaceCondLsRepEnrg = 0.0;
 		WinShadingAbsorbedSolarEnergy = 0.0;
-		BmIncInsSurfAmountRepEnergy = 0.0;
-		IntBmIncInsSurfAmountRepEnergy = 0.0;
 
 		if ( ! SunIsUp || ( BeamSolarRad + GndSolarRad + DifSolarRad <= 0.0 ) ) { // Sun is down
 
@@ -4130,17 +4177,20 @@ namespace HeatBalanceSurfaceManager {
 
 		// update inside face radiation reports
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-			QdotRadNetSurfInRep( SurfNum ) = NetLWRadToSurf( SurfNum ) * Surface( SurfNum ).Area;
-			QdotRadNetSurfInRepPerArea( SurfNum ) = NetLWRadToSurf( SurfNum );
+			Real64 const surfaceArea( Surface( SurfNum ).Area );
+//Tuned Replaced by one line form below for speed
+//			QdotRadNetSurfInRep( SurfNum ) = NetLWRadToSurf( SurfNum ) * surfaceArea;
+//			QdotRadNetSurfInRepPerArea( SurfNum ) = NetLWRadToSurf( SurfNum );
+			QdotRadNetSurfInRep( SurfNum ) = ( QdotRadNetSurfInRepPerArea( SurfNum ) = NetLWRadToSurf( SurfNum ) ) * surfaceArea;
 			QRadNetSurfInReport( SurfNum ) = QdotRadNetSurfInRep( SurfNum ) * TimeStepZoneSec;
 
 			if ( Surface( SurfNum ).Class != SurfaceClass_Window ) { // not a window...
 				QdotRadSolarInRepPerArea( SurfNum ) = QRadSWInAbs( SurfNum ) - QRadSWLightsInAbs( SurfNum );
-				QdotRadSolarInRep( SurfNum ) = QdotRadSolarInRepPerArea( SurfNum ) * Surface( SurfNum ).Area;
+				QdotRadSolarInRep( SurfNum ) = QdotRadSolarInRepPerArea( SurfNum ) * surfaceArea;
 				QRadSolarInReport( SurfNum ) = QdotRadSolarInRep( SurfNum ) * TimeStepZoneSec;
 
 				QdotRadLightsInRepPerArea( SurfNum ) = QRadSWLightsInAbs( SurfNum );
-				QdotRadLightsInRep( SurfNum ) = QdotRadLightsInRepPerArea( SurfNum ) * Surface( SurfNum ).Area;
+				QdotRadLightsInRep( SurfNum ) = QdotRadLightsInRepPerArea( SurfNum ) * surfaceArea;
 				QRadLightsInReport( SurfNum ) = QdotRadLightsInRep( SurfNum ) * TimeStepZoneSec;
 
 				if ( ZoneSizingCalc && CompLoadReportIsReq ) {
@@ -4152,12 +4202,16 @@ namespace HeatBalanceSurfaceManager {
 
 			}
 
-			QdotRadIntGainsInRepPerArea( SurfNum ) = QRadThermInAbs( SurfNum );
-			QdotRadIntGainsInRep( SurfNum ) = QdotRadIntGainsInRepPerArea( SurfNum ) * Surface( SurfNum ).Area;
+//Tuned Replaced by one line form below for speed
+//			QdotRadIntGainsInRepPerArea( SurfNum ) = QRadThermInAbs( SurfNum );
+//			QdotRadIntGainsInRep( SurfNum ) = QdotRadIntGainsInRepPerArea( SurfNum ) * surfaceArea;
+			QdotRadIntGainsInRep( SurfNum ) = ( QdotRadIntGainsInRepPerArea( SurfNum ) = QRadThermInAbs( SurfNum ) ) * surfaceArea;
 			QRadIntGainsInReport( SurfNum ) = QdotRadIntGainsInRep( SurfNum ) * TimeStepZoneSec;
 
-			QdotRadHVACInRepPerArea( SurfNum ) = QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum );
-			QdotRadHVACInRep( SurfNum ) = QdotRadHVACInRepPerArea( SurfNum ) * Surface( SurfNum ).Area;
+//Tuned Replaced by one line form below for speed
+//			QdotRadHVACInRepPerArea( SurfNum ) = QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum );
+//			QdotRadHVACInRep( SurfNum ) = QdotRadHVACInRepPerArea( SurfNum ) * surfaceArea;
+			QdotRadHVACInRep( SurfNum ) = ( QdotRadHVACInRepPerArea( SurfNum ) = QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) * surfaceArea;
 			QRadHVACInReport( SurfNum ) = QdotRadHVACInRep( SurfNum ) * TimeStepZoneSec;
 
 			if ( Surface( SurfNum ).Class == SurfaceClass_Floor || Surface( SurfNum ).Class == SurfaceClass_Wall || Surface( SurfNum ).Class == SurfaceClass_IntMass || Surface( SurfNum ).Class == SurfaceClass_Roof || Surface( SurfNum ).Class == SurfaceClass_Door ) {
@@ -4935,7 +4989,11 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 	//Tuned Relevant surfaces (set below) for performance/scalability //Do Store this once for all relevant Zones at higher level
 	std::vector< int > SurfToResimulate;
-	if ( ! PartialResimulate ) SurfToResimulate.reserve( TotSurfaces ); // Avoid resizing
+	std::vector< int > HTSurfToResimulate; // Heat transfer surfaces
+	if ( ! PartialResimulate ) { // Avoid resizing
+		SurfToResimulate.reserve( TotSurfaces );
+		HTSurfToResimulate.reserve( TotSurfaces );
+	}
 
 	// determine reference air temperatures
 	for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
@@ -4946,9 +5004,11 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 				continue; // skip surfaces that are not associated with this zone
 			} else { // Surface is relevant for ZoneToResimulate
 				SurfToResimulate.push_back( SurfNum );
+				if ( Surface( SurfNum ).HeatTransSurf ) HTSurfToResimulate.push_back( SurfNum ); // Skip non-heat transfer surfaces
 			}
 		} else {
 			SurfToResimulate.push_back( SurfNum );
+			if ( Surface( SurfNum ).HeatTransSurf ) HTSurfToResimulate.push_back( SurfNum ); // Skip non-heat transfer surfaces
 		}
 
 		// These conditions are not used in every SurfNum loop here so we don't use them to skip surfaces
@@ -5011,6 +5071,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 		}}
 	}
 	auto const nSurfToResimulate( SurfToResimulate.size() );
+	auto const nHTSurfToResimulate( HTSurfToResimulate.size() );
 
 	InsideSurfIterations = 0;
 	// Following variables must be reset due to possible recall of this routine by radiant and Resimulate routines.
@@ -5028,10 +5089,12 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 		WinGainConvShadeToZoneRep = 0.0;
 		OtherConvGainInsideFaceToZoneRep = 0.0;
 		WinGainIRShadeToZoneRep = 0.0;
-		SurfaceWindow.FrameQRadOutAbs() = 0.0;
-		SurfaceWindow.FrameQRadInAbs() = 0.0;
-		SurfaceWindow.DividerQRadOutAbs() = 0.0;
-		SurfaceWindow.DividerQRadInAbs() = 0.0;
+		for ( auto & window : SurfaceWindow ) {
+			window.FrameQRadOutAbs = 0.0;
+			window.FrameQRadInAbs = 0.0;
+			window.DividerQRadOutAbs = 0.0;
+			window.DividerQRadInAbs = 0.0;
+		}
 	}
 
 	//Tuned Precompute whether CTF temperature limits will be needed //? Can we do this just once in the FirstTime block to save a little more time (with static array)
@@ -5065,10 +5128,9 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			InitInteriorConvectionCoeffs( TempSurfIn, ZoneToResimulate );
 		}
 
-		for ( std::vector< int >::size_type iSurfToResimulate = 0u; iSurfToResimulate < nSurfToResimulate; ++iSurfToResimulate ) { // Perform a heat balance on all of the relevant inside surfaces...
-			SurfNum = SurfToResimulate[ iSurfToResimulate ];
+		for ( std::vector< int >::size_type iHTSurfToResimulate = 0u; iHTSurfToResimulate < nHTSurfToResimulate; ++iHTSurfToResimulate ) { // Perform a heat balance on all of the relevant inside surfaces...
+			SurfNum = HTSurfToResimulate[ iHTSurfToResimulate ]; // Heat transfer surfaces only
 			auto & surface( Surface( SurfNum ) );
-			if ( ! surface.HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 			if ( surface.Class == SurfaceClass_TDD_Dome ) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
 			if ( ( ZoneNum = surface.Zone ) == 0 ) continue; // Skip non-heat transfer surfaces
 
@@ -5543,11 +5605,8 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 		// Convergence check
 		MaxDelTemp = 0.0;
-		for ( std::vector< int >::size_type iSurfToResimulate = 0u; iSurfToResimulate < nSurfToResimulate; ++iSurfToResimulate ) { // Loop through all relevant surfaces to check for convergence...
-			SurfNum = SurfToResimulate[ iSurfToResimulate ];
-
-			if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
-
+		for ( std::vector< int >::size_type iHTSurfToResimulate = 0u; iHTSurfToResimulate < nHTSurfToResimulate; ++iHTSurfToResimulate ) { // Loop through all relevant surfaces to check for convergence...
+			SurfNum = HTSurfToResimulate[ iHTSurfToResimulate ]; // Heat transfer surfaces only
 			ConstrNum = Surface( SurfNum ).Construction;
 			if ( Construct( ConstrNum ).TransDiff <= 0.0 ) { // Opaque surface
 				MaxDelTemp = max( std::abs( TempSurfIn( SurfNum ) - TempInsOld( SurfNum ) ), MaxDelTemp );
@@ -5610,10 +5669,9 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 	// Update SumHmXXXX
 	if ( useCondFDHTalg || any_eq( HeatTransferAlgosUsed, UseEMPD ) || any_eq( HeatTransferAlgosUsed, UseHAMT ) ) {
-		for ( std::vector< int >::size_type iSurfToResimulate = 0u; iSurfToResimulate < nSurfToResimulate; ++iSurfToResimulate ) {
-			SurfNum = SurfToResimulate[ iSurfToResimulate ];
+		for ( std::vector< int >::size_type iHTSurfToResimulate = 0u; iHTSurfToResimulate < nHTSurfToResimulate; ++iHTSurfToResimulate ) {
+			SurfNum = HTSurfToResimulate[ iHTSurfToResimulate ]; // Heat transfer surfaces only
 			auto const & surface( Surface( SurfNum ) );
-			if ( ! surface.HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 			if ( surface.Class == SurfaceClass_Window ) continue;
 
 			ZoneNum = surface.Zone;

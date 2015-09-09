@@ -16130,15 +16130,15 @@ DO iSys = 1, numCompactSysUnitarySystem
   CALL AddToObjStr('Heat Recovery Water Inlet Node Name', '')
   CALL AddToObjStr('Heat Recovery Water Outlet Node Name', '')
   IF (.NOT. isMultiSpeed) THEN
-    CALL AddToObjStr('Design Specification Multispeed Heat Pump Object Type', '')
-    CALL AddToObjStr('Design Specification Multispeed Heat Pump Object Name', '',.TRUE.)
+    CALL AddToObjStr('Design Specification Multispeed Object Type', '')
+    CALL AddToObjStr('Design Specification Multispeed Object Name', '',.TRUE.)
   ELSE
-    CALL AddToObjStr('Design Specification Multispeed Heat Pump Object Type', 'UnitarySystemPerformance:HeatPump:Multispeed')
-    CALL AddToObjFld('Design Specification Multispeed Heat Pump Object Name', base + ussAirHandlerNameOff, &
+    CALL AddToObjStr('Design Specification Multispeed Object Type', 'UnitarySystemPerformance:Multispeed')
+    CALL AddToObjFld('Design Specification Multispeed Object Name', base + ussAirHandlerNameOff, &
                      ' Unitary System MultiSpeed Performance',.TRUE.)
 
-    !Object ==> UnitarySystemPerformance:HeatPump:Multispeed
-    CALL CreateNewObj('UnitarySystemPerformance:HeatPump:Multispeed')
+    !Object ==> UnitarySystemPerformance:Multispeed
+    CALL CreateNewObj('UnitarySystemPerformance:Multispeed')
     CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Unitary System MultiSpeed Performance')
     CALL AddToObjFld('Number of Speeds for Heating', base + ussHeatCoilNumSpeedOff,'')
     CALL AddToObjFld('Number of Speeds for Cooling', base + ussCoolCoilNumSpeedOff,'')
