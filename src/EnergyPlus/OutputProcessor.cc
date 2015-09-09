@@ -2971,8 +2971,8 @@ namespace OutputProcessor {
 
 	}
 
-	void 
-	ResetAccumulationWhenWarmupComplete( bool curWarmupFlag )
+	void
+	ResetAccumulationWhenWarmupComplete()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
@@ -2981,7 +2981,7 @@ namespace OutputProcessor {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Resets the accumulating meter values. Needed after warmup period is over to 
+		// Resets the accumulating meter values. Needed after warmup period is over to
 		// reset the totals on meters so that they are not accumulated over the warmup period
 
 		// METHODOLOGY EMPLOYED:
@@ -3008,62 +3008,51 @@ namespace OutputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Meter; // Loop Control
 		int Loop; // Loop Variable
-		bool statusOfWarmupFlag;
-		static bool prevStatusOfWarmupFlag; 
 
-		statusOfWarmupFlag = curWarmupFlag; 
+		for ( Meter = 1; Meter <= NumEnergyMeters; ++Meter ) {
+			EnergyMeters( Meter ).HRValue = 0.0;
+			EnergyMeters( Meter ).HRMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).HRMaxValDate = 0;
+			EnergyMeters( Meter ).HRMinVal = MinSetValue;
+			EnergyMeters( Meter ).HRMinValDate = 0;
 
-		// only reset the meters if the current warmupflag is false and previous call it was true
-		// this should happen just for one call right after warmup has compeleted
-		if ( !statusOfWarmupFlag && prevStatusOfWarmupFlag ) {
+			EnergyMeters( Meter ).DYValue = 0.0;
+			EnergyMeters( Meter ).DYMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).DYMaxValDate = 0;
+			EnergyMeters( Meter ).DYMinVal = MinSetValue;
+			EnergyMeters( Meter ).DYMinValDate = 0;
 
-			for ( Meter = 1; Meter <= NumEnergyMeters; ++Meter ) {
-				EnergyMeters( Meter ).HRValue = 0.0;
-				EnergyMeters( Meter ).HRMaxVal = MaxSetValue;
-				EnergyMeters( Meter ).HRMaxValDate = 0;
-				EnergyMeters( Meter ).HRMinVal = MinSetValue;
-				EnergyMeters( Meter ).HRMinValDate = 0;
+			EnergyMeters( Meter ).MNValue = 0.0;
+			EnergyMeters( Meter ).MNMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).MNMaxValDate = 0;
+			EnergyMeters( Meter ).MNMinVal = MinSetValue;
+			EnergyMeters( Meter ).MNMinValDate = 0;
 
-				EnergyMeters( Meter ).DYValue = 0.0;
-				EnergyMeters( Meter ).DYMaxVal = MaxSetValue;
-				EnergyMeters( Meter ).DYMaxValDate = 0;
-				EnergyMeters( Meter ).DYMinVal = MinSetValue;
-				EnergyMeters( Meter ).DYMinValDate = 0;
-
-				EnergyMeters( Meter ).MNValue = 0.0;
-				EnergyMeters( Meter ).MNMaxVal = MaxSetValue;
-				EnergyMeters( Meter ).MNMaxValDate = 0;
-				EnergyMeters( Meter ).MNMinVal = MinSetValue;
-				EnergyMeters( Meter ).MNMinValDate = 0;
-
-				EnergyMeters( Meter ).SMValue = 0.0;
-				EnergyMeters( Meter ).SMMaxVal = MaxSetValue;
-				EnergyMeters( Meter ).SMMaxValDate = 0;
-				EnergyMeters( Meter ).SMMinVal = MinSetValue;
-				EnergyMeters( Meter ).SMMinValDate = 0;
-
-			}
-
-			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
-				RVar >>= RVariableTypes( Loop ).VarPtr;
-				auto & rVar( RVar() );
-				if ( rVar.ReportFreq == ReportMonthly || rVar.ReportFreq == ReportSim ) {
-					rVar.StoreValue = 0.0;
-					rVar.NumStored = 0;
-				}
-			} 
-
-			for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
-				IVar >>= IVariableTypes( Loop ).VarPtr;
-				auto & iVar( IVar() );
-				if ( iVar.ReportFreq == ReportMonthly || iVar.ReportFreq == ReportSim ) {
-					iVar.StoreValue = 0;
-					iVar.NumStored = 0;
-				}
-			} 
+			EnergyMeters( Meter ).SMValue = 0.0;
+			EnergyMeters( Meter ).SMMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).SMMaxValDate = 0;
+			EnergyMeters( Meter ).SMMinVal = MinSetValue;
+			EnergyMeters( Meter ).SMMinValDate = 0;
 
 		}
-		prevStatusOfWarmupFlag = statusOfWarmupFlag; // update for next time routine is called
+
+		for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
+			RVar >>= RVariableTypes( Loop ).VarPtr;
+			auto & rVar( RVar() );
+			if ( rVar.ReportFreq == ReportMonthly || rVar.ReportFreq == ReportSim ) {
+				rVar.StoreValue = 0.0;
+				rVar.NumStored = 0;
+			}
+		}
+
+		for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
+			IVar >>= IVariableTypes( Loop ).VarPtr;
+			auto & iVar( IVar() );
+			if ( iVar.ReportFreq == ReportMonthly || iVar.ReportFreq == ReportSim ) {
+				iVar.StoreValue = 0;
+				iVar.NumStored = 0;
+			}
+		}
 	}
 
 
@@ -8280,7 +8269,7 @@ AddToOutputVariableList(
 }
 
 	//     NOTICE
-	
+
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.

@@ -5051,8 +5051,7 @@ namespace HeatBalanceManager {
 		using namespace DataReportingFlags;
 		using DataGlobals::KindOfSim;
 		using DataGlobals::ksHVACSizeDesignDay;
-		using OutputProcessor::ResetAccumulationWhenWarmupComplete;
-		
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -5075,7 +5074,6 @@ namespace HeatBalanceManager {
 		// Time step level reporting:
 
 		ReportScheduleValues();
-		ResetAccumulationWhenWarmupComplete( WarmupFlag );
 		if ( !WarmupFlag && DoOutputReporting ) {
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );

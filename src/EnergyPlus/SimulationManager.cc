@@ -241,6 +241,7 @@ namespace SimulationManager {
 		using PlantPipingSystemsManager::InitAndSimGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
+		using OutputProcessor::ResetAccumulationWhenWarmupComplete;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -461,6 +462,8 @@ namespace SimulationManager {
 				}
 				BeginDayFlag = true;
 				EndDayFlag = false;
+				ResetAccumulationWhenWarmupComplete();
+
 
 				if ( WarmupFlag ) {
 					++NumOfWarmupDays;
