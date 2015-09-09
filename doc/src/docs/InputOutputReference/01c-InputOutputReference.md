@@ -6553,7 +6553,7 @@ A unique user assigned name for a particular inlet side mixer terminal unit. Any
 
 #### Field: ZoneHVAC Terminal Unit Object Type
 
-The type of zone AC unit to which this terminal unit will be connected. Currently only ZoneHVAC:FourPipeFanCoil can be used.
+The type of zone AC unit to which this terminal unit will be connected. This is a choice field. The choices are ZoneHVAC:FourPipeFanCoil or ZoneHVAC:WaterToAirHeatPump.
 
 #### Field: ZoneHVAC Terminal Unit Name
 
@@ -6599,7 +6599,7 @@ A unique user assigned name for a particular supply side mixer terminal unit. An
 
 #### Field: ZoneHVAC Terminal Unit Object Type
 
-The type of zone AC unit to which this terminal unit will be connected. Currently only ZoneHVAC:FourPipeFanCoil can be used.
+The type of zone AC unit to which this terminal unit will be connected. This is a choice field. The choices are ZoneHVAC:FourPipeFanCoil or ZoneHVAC:WaterToAirHeatPump.
 
 #### Field: ZoneHVAC Terminal Unit Name
 
