@@ -136,6 +136,16 @@ namespace HeatBalanceManager {
 
 	// MODULE VARIABLE DECLARATIONS:
 
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool ManageHeatBalanceGetInputFlag( true );
+	}
+
+
 	//Real Variables for the Heat Balance Simulation
 	//Variables used to determine warmup convergence
 	Array1D< Real64 > MaxCoolLoadPrevDay; // Max cooling load from the previous day
@@ -190,6 +200,7 @@ namespace HeatBalanceManager {
 	void
 	clear_state()
 	{
+		ManageHeatBalanceGetInputFlag = true;
 		MaxCoolLoadPrevDay.deallocate();
 		MaxCoolLoadZone.deallocate();
 		MaxHeatLoadPrevDay.deallocate();
@@ -261,14 +272,16 @@ namespace HeatBalanceManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true );
+		//////////// hoisted into namespace changed ManageHeatBalanceGetInputFlag////////////
+		// static bool GetInputFlag( true );
+		////////////////////////////////////////////////
 
 		// FLOW:
 
 		// Get the heat balance input at the beginning of the simulation only
-		if ( GetInputFlag ) {
+		if ( ManageHeatBalanceGetInputFlag ) {
 			GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
-			GetInputFlag = false;
+			ManageHeatBalanceGetInputFlag = false;
 		}
 
 		// These Inits will still have to be looked at as the routines are re-engineered further

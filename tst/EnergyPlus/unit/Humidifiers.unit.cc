@@ -10,7 +10,8 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Humidifiers.hh>
-
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include "Fixtures/HVACFixture.hh"
 
 using namespace EnergyPlus::Humidifiers;

@@ -65,6 +65,8 @@ namespace SimAirServingZones {
 	// Simulation subroutines for the module
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageAirLoops(

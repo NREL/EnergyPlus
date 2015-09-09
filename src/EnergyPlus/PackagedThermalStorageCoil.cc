@@ -103,6 +103,9 @@ namespace PackagedThermalStorageCoil {
 	int const WaterSupplyFromMains( 101 );
 	int const WaterSupplyFromTank( 102 );
 
+	// Dehumidification control modes (DehumidControlMode)
+	int const DehumidControl_CoolReheat( 2 );
+
 	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
@@ -2204,6 +2207,8 @@ namespace PackagedThermalStorageCoil {
 		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).Temp;
 		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).HumRat;
 		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRate;
+		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMinAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMinAvail;
+		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMaxAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMaxAvail;
 		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat );
 
 		Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).Temp;
@@ -2475,6 +2480,8 @@ namespace PackagedThermalStorageCoil {
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat = EvapOutletAirHumRat;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = EvapOutletAirEnthalpy;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRate = EvapAirMassFlow;
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMinAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMinAvail;
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMaxAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMaxAvail;
 
 			// determine condenser leaving conditions
 			QdotCond = TotCap * RuntimeFraction + ElecCoolingPower;
@@ -2510,6 +2517,8 @@ namespace PackagedThermalStorageCoil {
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).Temp;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).HumRat;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRate;
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMinAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMinAvail;
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMaxAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMaxAvail;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat );
 
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).Temp;
@@ -2859,6 +2868,8 @@ namespace PackagedThermalStorageCoil {
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat = EvapOutletAirHumRat;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = EvapOutletAirEnthalpy;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRate = EvapAirMassFlow;
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMinAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMinAvail;
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMaxAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMaxAvail;
 
 			// determine condenser leaving conditions
 			QdotCond = EvapTotCap * EvapRuntimeFraction + EvapElecCoolingPower + TotChargeCap + ChargeElectricCoolingPower;
@@ -2928,6 +2939,8 @@ namespace PackagedThermalStorageCoil {
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).Temp;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).HumRat;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRate;
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMinAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMinAvail;
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMaxAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMaxAvail;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat );
 
 			TESCoil( TESCoilNum ).EvapTotCoolingRate = 0.0;
@@ -3297,6 +3310,8 @@ namespace PackagedThermalStorageCoil {
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat = EvapOutletAirHumRat;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = EvapOutletAirEnthalpy;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRate = EvapAirMassFlow;
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMinAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMinAvail;
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMaxAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMaxAvail;
 
 			// determine condenser leaving conditions
 			QdotCond = EvapTotCap * EvapRuntimeFraction + EvapElecCoolingPower;
@@ -3341,6 +3356,8 @@ namespace PackagedThermalStorageCoil {
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).Temp;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).HumRat;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRate;
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMinAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMinAvail;
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMaxAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMaxAvail;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat );
 			//nothing happens at condenser
 			Node( TESCoil( TESCoilNum ).CondAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).Temp;
@@ -3428,6 +3445,8 @@ namespace PackagedThermalStorageCoil {
 		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).Temp;
 		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).HumRat;
 		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRate;
+		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMinAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMinAvail;
+		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMaxAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMaxAvail;
 		Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat );
 
 		// first deal with condenser
@@ -3795,6 +3814,8 @@ namespace PackagedThermalStorageCoil {
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat = EvapOutletAirHumRat;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = EvapOutletAirEnthalpy;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRate = EvapAirMassFlow;
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMinAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMinAvail;
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMaxAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMaxAvail;
 			TESCoil( TESCoilNum ).ElecCoolingPower = ElecCoolingPower + TESCoil( TESCoilNum ).AncillaryControlsPower;
 			TESCoil( TESCoilNum ).ElecCoolingEnergy = TESCoil( TESCoilNum ).ElecCoolingPower * TimeStepSys * SecInHour;
 			TESCoil( TESCoilNum ).RuntimeFraction = RuntimeFraction;
@@ -3829,6 +3850,8 @@ namespace PackagedThermalStorageCoil {
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).Temp;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).HumRat;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRate = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRate;
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMinAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMinAvail;
+			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).MassFlowRateMaxAvail = Node( TESCoil( TESCoilNum ).EvapAirInletNodeNum ).MassFlowRateMaxAvail;
 			Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Enthalpy = PsyHFnTdbW( Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).Temp, Node( TESCoil( TESCoilNum ).EvapAirOutletNodeNum ).HumRat );
 		}
 
@@ -3849,6 +3872,366 @@ namespace PackagedThermalStorageCoil {
 			UpdateEvaporativeCondenserWaterUse( TESCoilNum, Node( TESCoil( TESCoilNum ).CondAirInletNodeNum ).HumRat, TESCoil( TESCoilNum ).CondAirInletNodeNum );
 		}
 
+	}
+
+    void
+	ControlTESIceStorageTankCoil (
+		std::string const CoilName,       // child object coil name
+		int CoilIndex,                    // child object coil index
+		std::string SystemType,           // parent object system type
+		int const FanOpMode,              // parent object fan operating mode
+		Real64 const DesiredOutletTemp,   // desired outlet temperature [C]
+		Real64 const DesiredOutletHumRat, // desired outlet humidity ratio [kg/kg]
+		Real64 & PartLoadFrac,            // value based on coil operation, if possible, as PLR required to meet T or w set point
+		int & TESOpMode,                  // value determined in InitTESCoil and passed back to parent for use in iteration routines 
+		int & ControlType,                // parent object dehumidification control type (e.g., None, Multimode, CoolReheat)
+		int & SensPLRIter,                // iteration number of Sensible PLR Iteration warning message
+		int & SensPLRIterIndex,           // index to Sensible PLR Iteration warning message
+		int & SensPLRFail,                // iteration number of Sensible PLR Iteration fail warning message
+		int & SensPLRFailIndex,           // index to Sensible PLR Iteration fail warning message
+		int & LatPLRIter,                 // iteration number of Latent PLR Iteration warning message
+		int & LatPLRIterIndex,            // index to Latent PLR Iteration warning message
+		int & LatPLRFail,                 // iteration number of Latent PLR Iteration fail warning message
+		int & LatPLRFailIndex             // index to Latent PLR Iteration fail warning message
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         R. Raustad (based on HVACDXSystem code)
+		//       DATE WRITTEN   July 13, 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Provides a common routine for parent objects. Parent objects will call this routine to determine the coil PLR.
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using General::SolveRegulaFalsi;
+		using General::RoundSigDigits;
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		int const MaxIte( 500 ); // Maximum number of iterations for solver
+		Real64 const Acc( 1.e-3 ); // Accuracy of solver result
+		Real64 const HumRatAcc( 1.e-6 ); // Accuracy of solver result
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int InletNode;
+		int OutletNode;
+		Real64 NoOutput;
+		Real64 NoLoadHumRatOut;
+		Real64 FullOutput;
+		Real64 FullLoadHumRatOut;
+		Real64 ReqOutput;
+		Real64 OutletHumRatDXCoil;
+		int SolFlag; // return flag from RegulaFalsi for sensible load
+		Array1D< Real64 > Par( 5 ); // Parameter array passed to solver
+
+		InletNode = TESCoil( CoilIndex ).EvapAirInletNodeNum;
+		OutletNode = TESCoil( CoilIndex ).EvapAirOutletNodeNum;
+
+		// First get the control mode that the child coil is in
+		SimTESCoil( CoilName, CoilIndex, FanOpMode, TESOpMode, PartLoadFrac );
+		if ( TESOpMode == OffMode || TESOpMode == ChargeOnlyMode ) { // cannot cool
+			PartLoadFrac = 0.0;
+		} else {
+			// Get no load result
+			PartLoadFrac = 0.0;
+			SimTESCoil( CoilName, CoilIndex, FanOpMode, TESOpMode, PartLoadFrac );
+			NoOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
+			NoLoadHumRatOut = Node( OutletNode ).HumRat;
+
+			// Get full load result
+			PartLoadFrac = 1.0;
+			SimTESCoil( CoilName, CoilIndex, FanOpMode, TESOpMode, PartLoadFrac );
+			FullOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
+			FullLoadHumRatOut = Node( OutletNode ).HumRat;
+
+			ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesiredOutletTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
+			//         IF NoOutput is lower than (more cooling than required) or very near the ReqOutput, do not run the compressor
+			if ( ( NoOutput - ReqOutput ) < Acc ) {
+				PartLoadFrac = 0.0;
+				//         If the FullOutput is greater than (insufficient cooling) or very near the ReqOutput,
+				//         run the compressor at PartLoadFrac = 1.
+			} else if ( ( FullOutput - ReqOutput ) > Acc ) {
+				PartLoadFrac = 1.0;
+				//         Else find the PLR to meet the load
+			} else {
+				if ( Node( OutletNode ).Temp > DesiredOutletTemp ) {
+					PartLoadFrac = 1.0;
+				} else {
+					Par( 1 ) = double( CoilIndex );
+					Par( 2 ) = DesiredOutletTemp;
+					Par( 3 ) = TESOpMode;
+					Par( 4 ) = OutletNode;
+					Par( 5 ) = double( FanOpMode );
+					SolveRegulaFalsi( Acc, MaxIte, SolFlag, PartLoadFrac, TESCoilResidualFunction, 0.0, 1.0, Par );
+					if ( SolFlag == -1 ) {
+						if ( ! WarmupFlag ) {
+							if ( SensPLRIter < 1 ) {
+								++SensPLRIter;
+								ShowWarningError( SystemType + " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " + CoilName );
+								ShowContinueError( "Estimated part-load ratio  = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
+								ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
+								ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
+							}
+							ShowRecurringWarningErrorAtEnd( SystemType + " \"" + CoilName + "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.", SensPLRIterIndex, PartLoadFrac, PartLoadFrac );
+						}
+					} else if ( SolFlag == -2 ) {
+						PartLoadFrac = ReqOutput / FullOutput;
+						if ( ! WarmupFlag ) {
+							if ( SensPLRFail < 1 ) {
+								++SensPLRFail;
+								ShowWarningError( SystemType + " - DX unit sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + CoilName );
+								ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
+								ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
+							}
+							ShowRecurringWarningErrorAtEnd( SystemType + " \"" + CoilName + "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.", SensPLRFailIndex, PartLoadFrac, PartLoadFrac );
+						}
+
+					}
+
+				}
+				//         If system does not operate to meet sensible load, use no load humidity ratio to test against humidity setpoint,
+				//         else use operating humidity ratio to test against humidity setpoint
+				if ( PartLoadFrac == 0.0 ) {
+					OutletHumRatDXCoil = NoLoadHumRatOut;
+				} else {
+					OutletHumRatDXCoil = Node( OutletNode ).HumRat;
+				}
+				// If humidity setpoint is not satisfied and humidity control type is CoolReheat,
+				// then overcool to meet moisture load
+
+				if ( ( OutletHumRatDXCoil > DesiredOutletHumRat ) && ( PartLoadFrac < 1.0 ) && ( ControlType == DehumidControl_CoolReheat ) ) {
+					//           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
+					//           do not run the compressor
+					if ( ( NoLoadHumRatOut - DesiredOutletHumRat ) < HumRatAcc ) {
+						//PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented out
+						//           If the FullLoadHumRatOut is greater than (insufficient dehumidification) or very near the DesOutHumRat,
+						//           run the compressor at PartLoadFrac = 1.
+					} else if ( ( DesiredOutletHumRat - FullLoadHumRatOut ) < HumRatAcc ) {
+						PartLoadFrac = 1.0;
+						//           Else find the PLR to meet the load
+					} else {
+						Par( 1 ) = double( CoilIndex );
+						Par( 2 ) = DesiredOutletHumRat;
+						Par( 3 ) = TESOpMode;
+						Par( 4 ) = OutletNode;
+						Par( 5 ) = double( FanOpMode );
+						SolveRegulaFalsi( HumRatAcc, MaxIte, SolFlag, PartLoadFrac, TESCoilHumRatResidualFunction, 0.0, 1.0, Par );
+						if ( SolFlag == -1 ) {
+							if ( ! WarmupFlag ) {
+								if ( LatPLRIter < 1 ) {
+									++LatPLRIter;
+									ShowWarningError( SystemType + " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " + CoilName );
+									ShowContinueError( "Estimated part-load ratio   = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
+									ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
+									ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
+								}
+								ShowRecurringWarningErrorAtEnd( SystemType + " \"" + CoilName + "\" - Iteration limit exceeded calculating latent part-load ratio error continues. Latent PLR statistics follow.", LatPLRIterIndex, PartLoadFrac, PartLoadFrac );
+							}
+						} else if ( SolFlag == -2 ) {
+							//               RegulaFalsi returns PLR = minPLR when a solution cannot be found, recalculate PartLoadFrac.
+							if ( NoLoadHumRatOut - FullLoadHumRatOut != 0.0 ) {
+								PartLoadFrac = ( NoLoadHumRatOut - DesiredOutletHumRat ) / ( NoLoadHumRatOut - FullLoadHumRatOut );
+							} else {
+								PartLoadFrac = 1.0;
+							}
+							if ( ! WarmupFlag ) {
+								if ( LatPLRFail < 1 ) {
+									++LatPLRFail;
+									ShowWarningError( SystemType + " - DX unit latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + CoilName );
+									ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
+									ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
+								}
+								ShowRecurringWarningErrorAtEnd( SystemType + " \"" + CoilName + "\" - DX unit latent part-load ratio calculation failed error continues. Latent PLR statistics follow.", LatPLRFailIndex, PartLoadFrac, PartLoadFrac );
+							}
+						}
+					}
+				} // End if humidity ratio setpoint not met - CoolReheat humidity control
+
+			} // operating mode can cool
+			if ( PartLoadFrac > 1.0 ) {
+				PartLoadFrac = 1.0;
+			} else if ( PartLoadFrac < 0.0 ) {
+				PartLoadFrac = 0.0;
+			}
+		}
+	}
+
+	Real64
+	TESCoilResidualFunction(
+		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+		Array1< Real64 > const & Par // par(1) = DX coil number
+	)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Brent Griffith
+		//       DATE WRITTEN   April 2013
+		//       MODIFIED
+		//       RE-ENGINEERED
+
+		// PURPOSE OF THIS FUNCTION:
+		// Calculates residual function (desired outlet temp - actual outlet temp)
+		// TES Coil output depends on the part load ratio which is being varied to zero the residual.
+
+		// METHODOLOGY EMPLOYED:
+		// Calls appropriate calculation routine depending on operating mode
+		// to get outlet temperature at the given cycling ratio
+		// and calculates the residual as defined above
+
+		// REFERENCES:
+
+		// Using/Aliasing
+//		using PackagedThermalStorageCoil::CalcTESCoilCoolingOnlyMode;
+//		using PackagedThermalStorageCoil::CalcTESCoilCoolingAndChargeMode;
+//		using PackagedThermalStorageCoil::CalcTESCoilCoolingAndDischargeMode;
+//		using PackagedThermalStorageCoil::CalcTESCoilDischargeOnlyMode;
+
+		// Return value
+		Real64 Residuum; // residual to be minimized to zero
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// par(2) = desired air outlet temperature [C]
+		// par(3) = TES coil operating mode
+		// par(4) = outlet node number
+		// par(5) = supply air fan operating mode (ContFanCycCoil)
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int CoilIndex; // index of this coil
+		Real64 OutletAirTemp; // outlet air temperature [C]
+		int FanOpMode; // Supply air fan operating mode
+		int TESOpMode;
+		int OutletNodeNum;
+
+		CoilIndex = int( Par( 1 ) );
+		FanOpMode = int( Par( 5 ) );
+		OutletNodeNum = int( Par( 4 ) );
+		TESOpMode = int( Par( 3 ) );
+
+		{ auto const SELECT_CASE_var( TESOpMode );
+		if ( SELECT_CASE_var == CoolingOnlyMode ) {
+			CalcTESCoilCoolingOnlyMode( CoilIndex, FanOpMode, PartLoadRatio );
+		} else if ( SELECT_CASE_var == CoolingAndChargeMode ) {
+			CalcTESCoilCoolingAndChargeMode( CoilIndex, FanOpMode, PartLoadRatio );
+		} else if ( SELECT_CASE_var == CoolingAndDischargeMode ) {
+			CalcTESCoilCoolingAndDischargeMode( CoilIndex, FanOpMode, PartLoadRatio );
+		} else if ( SELECT_CASE_var == DischargeOnlyMode ) {
+			CalcTESCoilDischargeOnlyMode( CoilIndex, PartLoadRatio );
+		}}
+
+		OutletAirTemp = Node( OutletNodeNum ).Temp;
+		Residuum = Par( 2 ) - OutletAirTemp;
+
+		return Residuum;
+	}
+
+	Real64
+	TESCoilHumRatResidualFunction(
+		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+		Array1< Real64 > const & Par // par(1) = DX coil number
+	)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Brent Griffith
+		//       DATE WRITTEN   April 2013
+		//       MODIFIED
+		//       RE-ENGINEERED
+
+		// PURPOSE OF THIS FUNCTION:
+		// Calculates residual function (desired outlet humrat - actual outlet humrat)
+		// TES Coil output depends on the part load ratio which is being varied to zero the residual.
+
+		// METHODOLOGY EMPLOYED:
+		// Calls appropriate calculation routine depending on operating mode
+		// to get outlet hum rat at the given cycling ratio
+		// and calculates the residual as defined above
+
+		// REFERENCES:
+
+		// Using/Aliasing
+//		using PackagedThermalStorageCoil::CalcTESCoilCoolingOnlyMode;
+//		using PackagedThermalStorageCoil::CalcTESCoilCoolingAndChargeMode;
+//		using PackagedThermalStorageCoil::CalcTESCoilCoolingAndDischargeMode;
+//		using PackagedThermalStorageCoil::CalcTESCoilDischargeOnlyMode;
+
+		// Return value
+		Real64 Residuum; // residual to be minimized to zero
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// par(2) = desired air outlet hum rat [kg_h20/kg_dryair]
+		// par(3) = TES coil operating mode
+		// par(4) = outlet node number
+		// par(5) = supply air fan operating mode (ContFanCycCoil)
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int CoilIndex; // index of this coil
+		Real64 OutletAirHumRat; // outlet air humidity ratio [kg_H20/Kg_dryair]
+		int FanOpMode; // Supply air fan operating mode
+		int TESOpMode;
+		int OutletNodeNum;
+
+		CoilIndex = int( Par( 1 ) );
+		FanOpMode = int( Par( 5 ) );
+		OutletNodeNum = int( Par( 4 ) );
+		TESOpMode = int( Par( 3 ) );
+
+		{ auto const SELECT_CASE_var( TESOpMode );
+		if ( SELECT_CASE_var == CoolingOnlyMode ) {
+			CalcTESCoilCoolingOnlyMode( CoilIndex, FanOpMode, PartLoadRatio );
+		} else if ( SELECT_CASE_var == CoolingAndChargeMode ) {
+			CalcTESCoilCoolingAndChargeMode( CoilIndex, FanOpMode, PartLoadRatio );
+		} else if ( SELECT_CASE_var == CoolingAndDischargeMode ) {
+			CalcTESCoilCoolingAndDischargeMode( CoilIndex, FanOpMode, PartLoadRatio );
+		} else if ( SELECT_CASE_var == DischargeOnlyMode ) {
+			CalcTESCoilDischargeOnlyMode( CoilIndex, PartLoadRatio );
+		}}
+
+		OutletAirHumRat = Node( OutletNodeNum ).HumRat;
+		Residuum = Par( 2 ) - OutletAirHumRat;
+
+		return Residuum;
 	}
 
 	void
@@ -4321,6 +4704,209 @@ namespace PackagedThermalStorageCoil {
 				ShowSevereError( "GetTESCoilIndex: TES Cooling Coil not found=" + CoilName );
 			}
 			ErrorsFound = true;
+		}
+
+	}
+
+	void
+	GetTESCoilAirInletNode(
+		std::string const & CoilName,
+		int & CoilAirInletNode,
+		bool & ErrorsFound,
+		std::string const CurrentModuleObject
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   July 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine gets a given TES Cooling Coil's air inlet node -- issues error message if that
+		// coil is not a legal TES Cooling Coil and sets air node to 0, otherwise, returns inlet air node number.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItem;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int CoilIndex;
+
+		// Obtains and allocates TESCoil related parameters from input file
+		if ( GetTESInputFlag ) { // First time subroutine has been called, get input data
+			GetTESCoilInput();
+			GetTESInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
+		}
+
+		if ( NumTESCoils > 0 ) {
+			CoilIndex = FindItem( CoilName, TESCoil.Name(), NumTESCoils );
+		} else {
+			CoilIndex = 0;
+		}
+
+		if ( CoilIndex == 0 ) {
+			ShowSevereError( CurrentModuleObject + ", GetTESCoilAirInletNode: TES Cooling Coil not found=" + CoilName );
+			ErrorsFound = true;
+			CoilAirInletNode = 0;
+		} else {
+			CoilAirInletNode = TESCoil( CoilIndex ).EvapAirInletNodeNum;
+		}
+
+	}
+
+	void
+	GetTESCoilAirOutletNode(
+		std::string const & CoilName,
+		int & CoilAirOutletNode,
+		bool & ErrorsFound,
+		std::string const CurrentModuleObject
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   July 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine gets a given TES Cooling Coil's air outlet node -- issues error message if that
+		// coil is not a legal TES Cooling Coil and sets air node to 0, otherwise, returns outlet air node number.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItem;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int CoilIndex;
+
+		// Obtains and allocates TESCoil related parameters from input file
+		if ( GetTESInputFlag ) { // First time subroutine has been called, get input data
+			GetTESCoilInput();
+			GetTESInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
+		}
+
+		if ( NumTESCoils > 0 ) {
+			CoilIndex = FindItem( CoilName, TESCoil.Name(), NumTESCoils );
+		} else {
+			CoilIndex = 0;
+		}
+
+		if ( CoilIndex == 0 ) {
+			ShowSevereError( CurrentModuleObject + ", GetTESCoilAirOutletNode: TES Cooling Coil not found=" + CoilName );
+			ErrorsFound = true;
+			CoilAirOutletNode = 0;
+		} else {
+			CoilAirOutletNode = TESCoil( CoilIndex ).EvapAirOutletNodeNum;
+		}
+
+	}
+
+	void
+	GetTESCoilCoolingCapacity(
+		std::string const & CoilName,
+		Real64 & CoilCoolCapacity,
+		bool & ErrorsFound,
+		std::string const CurrentModuleObject
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   July 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine gets a given TES Cooling Coil's cooling only capacity -- issues error message if that
+		// coil is not a legal TES Cooling Coil and sets capacity to 0, otherwise, returns cooling capacity.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItem;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int CoilIndex;
+
+		// Obtains and allocates TESCoil related parameters from input file
+		if ( GetTESInputFlag ) { // First time subroutine has been called, get input data
+			GetTESCoilInput();
+			GetTESInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
+		}
+
+		if ( NumTESCoils > 0 ) {
+			CoilIndex = FindItem( CoilName, TESCoil.Name(), NumTESCoils );
+		} else {
+			CoilIndex = 0;
+		}
+
+		if ( CoilIndex == 0 ) {
+			ShowSevereError( CurrentModuleObject + ", GetTESCoilCoolingCapacity: TES Cooling Coil not found=" + CoilName );
+			ErrorsFound = true;
+			CoilCoolCapacity = 0.0;
+		} else {
+			if ( TESCoil( CoilIndex ).CoolingOnlyModeIsAvailable ) { // get input data for this mode
+				CoilCoolCapacity = TESCoil( CoilIndex ).CoolingOnlyRatedTotCap;
+			} else if ( TESCoil( CoilIndex ).CoolingAndChargeModeAvailable ) {
+				CoilCoolCapacity = TESCoil( CoilIndex ).CoolingAndChargeRatedTotCap;
+			} else if ( TESCoil( CoilIndex ).CoolingAndDischargeModeAvailable ) {
+				CoilCoolCapacity = TESCoil( CoilIndex ).CoolingAndDischargeRatedTotCap;
+			} else {
+				CoilCoolCapacity = 0.0;
+			}
 		}
 
 	}
