@@ -131,7 +131,6 @@ namespace DataEnvironment {
 	Real64 SkyBrightness; // Sky brightness (see subr. DayltgLuminousEfficacy)
 	Real64 StdBaroPress( StdPressureSeaLevel ); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
 	Real64 StdRhoAir; // Standard "rho air" set in WeatherManager - based on StdBaroPress
-	Real64 const stdAtmosphericPressure( 101325.0 ); // one atmosphere, sea level standard pressure 101325 Pa
 	Real64 rhoAirSTP; // Standard density of dry air at 101325 Pa, 20.0C temperaure 
 	Real64 TimeZoneNumber; // Time Zone Number of building location
 	Real64 TimeZoneMeridian; // Standard Meridian of TimeZone

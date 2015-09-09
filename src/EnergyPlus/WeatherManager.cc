@@ -774,7 +774,7 @@ namespace WeatherManager {
 
 			SetupInterpolationValues();
 			TimeStepFraction = 1.0 / double( NumOfTimeStepInHour );
-			rhoAirSTP = Psychrometrics::PsyRhoAirFnPbTdbW( stdAtmosphericPressure, constant_twenty, constant_zero );
+			rhoAirSTP = Psychrometrics::PsyRhoAirFnPbTdbW( StdPressureSeaLevel, constant_twenty, constant_zero );
 			OpenWeatherFile( ErrorsFound ); // moved here because of possibility of special days on EPW file
 			CloseWeatherFile();
 			ReadUserWeatherInput();
