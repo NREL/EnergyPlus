@@ -2442,13 +2442,15 @@ where
 
 *q<sub>oncycloss,n</sub>* and *q<sub>offcycloss,n</sub>* are defined as:
 
-<div>$${q_{oncycloss,n}} = {UA_{tank}}({T_{amb}} - {T_n})$$</div>
+<div>$${q_{oncycloss,n}} = ({UA_{tank}} + UA_add,n)({T_{amb}} - {T_n})$$</div>
 
 <div>$${q_{offcycloss,n}} = ({UA_{tank} + UA_{flue}})({T_{amb}} - {T_n})$$</div>
 
 where
 
 *UA<sub>tank</sub>* = loss coefficient to ambient environment for the tank
+
+*UA<sub>add,n</sub>* = additional node loss coefficient
 
 *UA<sub>flue</sub>* = additional off-cycle flue loss coefficient to ambient environment  (zero when on)
 

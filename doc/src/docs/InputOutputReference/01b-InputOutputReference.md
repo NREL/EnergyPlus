@@ -16019,7 +16019,7 @@ An additional destratification conductivity [W/m-K] is added to the fluid conduc
 
 #### Field: Node 1-10 Additional Loss Coefficient
 
-An additional heat gain coefficient [W/m-K] added to the skin gains for a given node to account for thermal shorting due to pipe penetrations, tank feet, and any other loss effects.
+An additional heat gain coefficient [W/K] added to the skin gains for a given node to account for thermal shorting due to pipe penetrations, tank feet, and any other loss effects.
 
 
 
@@ -17030,7 +17030,7 @@ An additional destratification conductivity [W/m-K] is added to the fluid conduc
 
 #### Field: Node 1-12 Additional Loss Coefficient
 
-An additional loss coefficient [W/m-K] added to the skin losses for a given node to account for thermal shorting due to pipe penetrations, water heater feet, and any other loss effects.
+An additional loss coefficient [W/K] added to the skin losses for a given node to account for thermal shorting due to pipe penetrations, water heater feet, and any other loss effects.
 
 #### Field: Source Side Flow Control Mode
 
