@@ -74,8 +74,8 @@ namespace Pipes {
 	void
 	clear_state()
 	{
-		int NumLocalPipes = 0;
-		GetPipeInputFlag = true;;
+		NumLocalPipes = 0;
+		GetPipeInputFlag = true;
 		LocalPipe.deallocate();
 	}
 
