@@ -212,6 +212,7 @@ namespace OutputProcessor {
 		int LHourP( -1 ); // Helps set hours for timestamp output
 		Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
 		Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
+		bool GetMeterIndexFirstCall( true ); //trigger setup in GetMeterIndex
 	}
 
 	// All routines should be listed here whether private or not
@@ -313,6 +314,7 @@ namespace OutputProcessor {
 		LHourP = -1;
 		LStartMin = -1.0;
 		LEndMin = -1.0;
+		GetMeterIndexFirstCall = true ;
 		TimeValue.deallocate();
 		RVariableTypes.deallocate();
 		IVariableTypes.deallocate();
@@ -6674,10 +6676,12 @@ GetMeterIndex( std::string const & MeterName )
 	static Array1D_string ValidMeterNames;
 	static Array1D_int iValidMeterNames;
 	static int NumValidMeters( 0 );
-	static bool FirstCall( true );
+	//////////// hoisted into namespace changed to GetMeterIndexFirstCall////////////
+	// static bool FirstCall( true );
+	////////////////////////////////////////////////
 	int Found;
 
-	if ( FirstCall || ( NumValidMeters != NumEnergyMeters ) ) {
+	if ( GetMeterIndexFirstCall || ( NumValidMeters != NumEnergyMeters ) ) {
 		NumValidMeters = NumEnergyMeters;
 		ValidMeterNames.allocate( NumValidMeters );
 		for ( Found = 1; Found <= NumValidMeters; ++Found ) {
@@ -6685,7 +6689,7 @@ GetMeterIndex( std::string const & MeterName )
 		}
 		iValidMeterNames.allocate( NumValidMeters );
 		SetupAndSort( ValidMeterNames, iValidMeterNames );
-		FirstCall = false;
+		GetMeterIndexFirstCall = false;
 	}
 
 	MeterIndex = FindItemInSortedList( MeterName, ValidMeterNames, NumValidMeters );
