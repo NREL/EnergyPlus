@@ -2518,6 +2518,45 @@ namespace HVACUnitarySystem {
 	{
 
 		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad, FSEC
+		//       DATE WRITTEN   September 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+		//
+		// PURPOSE OF THIS SUBROUTINE:
+		// Manages GetInput processing and program termination
+		
+		// METHODOLOGY EMPLOYED:
+		// Calls "Get" routines to read in data.
+			
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "GetUnitarySystemInput: " ); // include trailing blank space
+		
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+			
+		// DERIVED TYPE DEFINITIONS
+		// na
+			
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		bool ErrorFlag( false ); // true if errors detected in GetUnitarySystemInputData
+		
+		// Flow
+		GetUnitarySystemInputData( ErrorFlag );
+		
+		if( ErrorFlag ) {
+			ShowFatalError( RoutineName + "Errors found in getting AirLoopHVAC:UnitarySystem input. Preceding condition(s) causes termination." );
+		}
+
+	}
+
+	void
+	GetUnitarySystemInputData(
+		bool & ErrorsFound // true if errors detected in input
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad
 		//       DATE WRITTEN   February 2013
 		//       RE-ENGINEERED  na
@@ -2629,7 +2668,6 @@ namespace HVACUnitarySystem {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetUnitarySystemInput: " ); // include trailing blank space
 		static std::string const getAirLoopHVACHeatCoolInput( "GetAirLoopHVACHeatCoolInput" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -2660,7 +2698,6 @@ namespace HVACUnitarySystem {
 		Real64 FanVolFlowRate; // Fan Max Flow Rate from Fan object (for comparisons to validity)
 		Real64 SteamDensity; // steam density
 		Real64 TotalFloorAreaOnAirLoop; // AirloopHVAC total floor area served
-		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		bool AirNodeFound; // used in error checking
@@ -4963,9 +5000,16 @@ namespace HVACUnitarySystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iCoolFlowPerCoolCapNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( Alphas( iCoolSAFMAlphaNum ), "None" ) || lAlphaBlanks( iCoolSAFMAlphaNum ) ) {
+			} else if ( SameString( Alphas( iCoolSAFMAlphaNum ), "None" ) ) {
 				UnitarySystem( UnitarySysNum ).CoolingSAFMethod = None;
 				//          UnitarySystem(UnitarySysNum)%RequestAutosize = .TRUE. ! ??
+			} else if( lAlphaBlanks( iCoolSAFMAlphaNum ) ) {
+				if( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Input for " + cAlphaFields( iCoolSAFMAlphaNum ) + " is blank." );
+					ShowContinueError( "Blank field not allowed when cooling coil is present." );
+					ErrorsFound = true;
+				}
 			} else {
 				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 				ShowContinueError( "Illegal " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
@@ -5064,9 +5108,16 @@ namespace HVACUnitarySystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iHeatFlowPerHeatCapNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( Alphas( iHeatSAFMAlphaNum ), "None" ) || lAlphaBlanks( iHeatSAFMAlphaNum ) ) {
+			} else if ( SameString( Alphas( iHeatSAFMAlphaNum ), "None" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingSAFMethod = None;
 				//          UnitarySystem(UnitarySysNum)%RequestAutosize = .TRUE. ! ??
+			} else if( lAlphaBlanks( iHeatSAFMAlphaNum ) ) {
+				if( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Input for " + cAlphaFields( iHeatSAFMAlphaNum ) + " is blank." );
+					ShowContinueError( "Blank field not allowed when heating coil is present." );
+					ErrorsFound = true;
+				}
 			} else {
 				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 				ShowContinueError( "Illegal " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
@@ -5701,10 +5752,6 @@ namespace HVACUnitarySystem {
 			}
 
 		} //End of the Unitary System Loop
-
-		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );
-		}
 
 		// Setup Report variables for the Unitary System that are not reported in the components themselves
 		for ( UnitarySysNum = 1; UnitarySysNum <= NumUnitarySystem; ++UnitarySysNum ) {
