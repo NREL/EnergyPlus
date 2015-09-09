@@ -1052,15 +1052,7 @@ TEST_F( HVACFixture, VRFTest_SysCurve ) {
 		// Author: R. Raustad, FSEC
 		
 		bool ErrorsFound( false );        // function returns true on error
-		bool FirstHVACIteration( true );  // simulate the first pass through HVAC simulation, use false for next iteration
-		int VRFCond( 1 );                 // index to VRF condenser
 		int VRFTUNum( 1 );                // index to VRF terminal unit
-		int EquipPtr( 1 );                // index to equipment list
-		int CurZoneNum( 1 );              // index to zone
-		int ZoneInletAirNode( 0 );        // zone inlet node number
-		Real64 DefrostWatts( 0.0 );       // calculation of VRF defrost power [W]
-		Real64 SysOutputProvided( 0.0 );  // function returns sensible capacity [W]
-		Real64 LatOutputProvided( 0.0 );  // function returns latent capacity [W]
 		
 		std::string const idf_objects = delimited_string( {
 			"Version,8.3;",
@@ -1655,10 +1647,10 @@ TEST_F( HVACFixture, VRFTest_SysCurve ) {
 		GetZoneEquipmentData(); // read equipment list and connections
 		GetVRFInputData( ErrorsFound );
 		EXPECT_TRUE( ErrorsFound ); 
-		EXPECT_EQ( 0, VRFTU( 1 ).VRFSysNum );
-		EXPECT_EQ( 0, VRFTU( 1 ).ZoneNum );
-		EXPECT_EQ( 0, VRFTU( 1 ).TUListIndex );
-		EXPECT_EQ( 0, VRFTU( 1 ).IndexToTUInTUList );
+		EXPECT_EQ( 0, VRFTU( VRFTUNum ).VRFSysNum );
+		EXPECT_EQ( 0, VRFTU( VRFTUNum ).ZoneNum );
+		EXPECT_EQ( 0, VRFTU( VRFTUNum ).TUListIndex );
+		EXPECT_EQ( 0, VRFTU( VRFTUNum ).IndexToTUInTUList );
 
 		// clean up
 		ZoneSysEnergyDemand.deallocate();
