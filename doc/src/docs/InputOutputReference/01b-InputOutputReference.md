@@ -4116,7 +4116,7 @@ None of these applications are necessarily recommended but these and other uses 
 
 - Other than zone thermostat setpoints, the sizing calculations generally know nothing about the system control inputs such as setpoints and availability schedules. The user must coordinate sizing inputs with the actual simulation control inputs.
 
-- The sizing calculations only recognize the presence of central heating and cooling coils, preheat and precool coils and reheat coils. These are assumed to deliver the various supply temperatures specified in the Sizing:System and Sizing:Zone objects. The impact of ther components such as heat recovery, dehumidifiers, fans, and pumps are not accounted for in the sizing calculations.
+- The sizing calculations only recognize the presence of central heating and cooling coils, preheat and precool coils and reheat coils. These are assumed to deliver the various supply temperatures specified in the Sizing:System and Sizing:Zone objects. The impact of other components such as heat recovery, dehumidifiers, and pumps are not accounted for in the sizing calculations. Central supply and return fan temperature rise is taken into account in sizing the central cooling coils.
 
 #### Component Autosizing
 
@@ -7140,6 +7140,8 @@ The Sizing:Zone object is also the place where the user can specify the design o
 
 The user can also place limits on the heating and design cooling air flow rates. See * Heating Design Air Flow Method* and *Cooling Design Air Flow Method* below and the explanations of the various heating and cooling flow input fields.
 
+The user can ask the zone design calculation to take into account the effect of a Dedicated Outdoor Air System on the zone design loads and airflow rates. The design calculation will calculate the heat addition rate to the zone of an idealized SOA system and add or subtract the result from the total zone loads and flow rates. 
+
 #### Field: Zone Name
 
 The name of the Zone corresponding to this Sizing:Zone object. This is the zone for which the design air flow calculation will be made using the input data of this Sizing:Zone Object.
@@ -7232,6 +7234,26 @@ The maximum zone design heating volumetric flow rate expressed as a fraction of 
 
 The name of the DesignSpecification:ZoneAirDistribution object, defining the air distribution effectiveness and secondary recirculation air fraction, that applies to the zone or zone list. This object may be used for the same zone in the Controller:MechanicalVentilation object if no such DesignSpecification:ZoneAirDistribution object is specified.
 
+#### Field: Account for Dedicated Outdoor Air System
+
+This is a choice field with choices *Yes* or *No*. The default is *No*. Choosing *Yes* means that the zone sizing calculation will use the subsequent inputs to calculate the heat gain or loss (heat gains are positive, heat loss is negative) imposed on the zone by a Dedicated Outdoor Air System (DOAS). This heat gain is then added to the zone design heat gain for the zone and the zone design air flow rate is adjusted to meet the DOAS heat gain plus the zone design heat gain.
+
+#### Field: Dedicated Outdoor Air System Control Strategy
+
+This is a choice field with a choice of three ideal control strategies for the DOA system. The choices are *NeutralSupplyAir*, *NeutralDehumidifiedSupplyAir*, or *ColdSupplyAir*. The default is *NeutralSupplyAir*.
+
+*NeutralSupplyAir* implies that the ventilation air supplied to the zone will cause little heating or cooling. The air will be heated or cooled to keep it between the low and high temperature setpoints specified in the subsequent two fields. A good choice for these fields might be 21.1 and 23.9 degrees C.
+
+*NeutralDehumidifiedSupplyAir* means that the ventilation air will be cooled and dehumidified and then reheated to a neutral temperature. The ventilation air is cooled to the lower setpoint temperature (if necessary) and reheated to the upper setpoint temperature. A good choice for the setpoints would be 14.4 and 22.2 degrees C.
+
+*ColdSupplyAir* means that the ventilation air will be used to supply cooling to the zone. Cold outside air is heated to the upper setpoint; warm outside air is cooled to the lower setpoint. A good choice for the setpoints would be 12.2 and 14.4 degrees C.
+
+#### Field: Dedicated Outdoor Air Low Temperatue Setpoint for Design
+The lower setpoint temperature to be used with the DOAS design control strategy. The units are degrees C. The default is autosized to the values given above for the three design control strategies.
+
+#### Field: Dedicated Outdoor Air High Temperature Setpoint for Design
+The higher setpoint temperature to be used with the DOAS design control strategy. The units are degrees C. The default is autosized to the values given above for the three design control strategies.
+
 An IDF example:
 
 ```idf
@@ -7254,7 +7276,11 @@ Sizing:Zone,
     ,                        !- heating max air flow per zone area {m3/s-m2}
     ,                        !- heating max air flow {m3/s}
     ,                        !- fraction of the cooling design air flow rate
-    DSZADO1;                 !- Design Specification Zone Air Distribution Object Name
+    DSZADO1,                 !- Design Specification Zone Air Distribution Object Name
+    Yes,                     !- Account for Dedicated Outside Air System
+    ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
+    12.2,                    !- Dedicated Outside Air Low Setpoint for Design
+    14.4;                    !- Dedicated Outside Air High Setpoint for Design
 
 DesignSpecification:OutdoorAir,
     DSOA1,                   !- Name
@@ -8293,19 +8319,13 @@ This alpha field is used as an identifying field for the pipe.
 
 This references a Material object that contains the soil properties and thickness.  Note that when defining the soil layer, the thickness should be the thickness of soil between the pipe wall and the ground surface.
 
-#### Field: Average Soil Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-If a GroundTemperatures:Surface object is not given in the input, this is \#1 of 3 inputs that must be given directly.  This represents the annual average soil temperature above the pipe.  This field can be calculated in advance using the separate CalcSoilSurfTemp program.
+This is the type of undisturbed ground temperature object that is used to determine the ground temperature.
 
-#### Field: Amplitude of Soil Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-If a GroundTemperatures:Surface object is not given in the input, this is \#2 of 3 inputs that must be given directly.  This represents the annual average soil temperature variation from the average temperature itself.  For example, if this were represented as a sine wave, this would simply be the amplitude of the curve.  This field can be calculated in advance using the separate CalcSoilSurfTemp program.
-
-#### Field: Phase Constant of Soil Surface Temperature
-
-If a GroundTemperatures:Surface object is not given in the input, this is \#3 of 3 inputs that must be given directly.  This represents the time elapsed from the beginning of the year to the date of minimum surface temperature.  For example, if this were represented as a sine wave, this would simply be the phase shift of the curve.  This field can be calculated in advance using the separate CalcSoilSurfTemp program
-
-In order to avoid having to run the preprocessor program to generate soil temperature, the user may choose to simply input a GroundTemperatures:Surface object.  This object inputs average monthly surface temperatures.  These temperatures are then used within the model to develop average ground surface data.  This ground surface data can then be used as part of the model boundary condition set.  Without a set of surface ground temperatures, the model will require user input of the three last input fields.
+This is the name of the undisturbed ground temperature object that is used to determine the ground temperature.
 
 An example of this object in an IDF is:
 
@@ -8318,11 +8338,10 @@ Pipe:Underground,
     Water,                              !- Fluid Name
     SunExposed,                         !- Sun Exposure
     0.05,                               !- Pipe Inside Diameter    
-    20.0,                               !- pipe Length
+    20.0,                               !- Pipe Length
     Buried Pipe Soil,                   !- Soil Material
-    13,                                 !- Average Soil Surface Temperature
-    1.5,                                !- Amplitude of Soil Surface Temperature
-    30;                                 !- Phase Constant of Soil Surface Temperature
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps;                            !- Name of Undisturbed Ground Temperature Object
 
   Construction,
     Insulated Buried Pipe,              !- Name
@@ -8459,17 +8478,13 @@ A nominal value of soil moisture content to be used when evaluating soil thermal
 
 A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil
 
-#### Field: Kusuda-Achenbach Average Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-The annual average surface temperature to be applied to the Kusuda-Achenbach farfield boundary temperature correlation.
+The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
-#### Field: Kusuda-Achenbach Average Amplitude of Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-The annual average surface temperature variation from average.  This is also used in the Kusuda-Achenbach temperature correlation.
-
-#### Field: Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-
-The phase shift of minimum surface temperature, or the day of the year when the minimum surface temperature occurs.
+The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
 #### Field: This Domain Includes Basement Surface Interaction
 
@@ -8622,9 +8637,8 @@ An example of this object in an IDF is offered here for a foundation heat exchan
     2576,                    !- GroundSpecificHeat
     30,                      !- MoistureContent
     50,                      !- MoistureContentAtSaturation
-    15.5,                    !- KusudaGroundTemp
-    12.8,                    !- KusudaGroundTempAmplitude
-    17.3,                    !- KusudaPhaseShift
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps,                 !- Name of Undisturbed Ground Temperature Object
     Yes,                     !- DomainHasBasement
     6,                       !- BasementWidthInDomain
     2.5,                     !- BasementDepthInDomain
@@ -9315,6 +9329,8 @@ This alpha field contains the keyword for the type of control scheme used. The o
 
 - PlantEquipmentOperation:ComponentSetpoint
 
+- PlantEquipmentOperation:ThermalEnergyStorage
+
 - PlantEquipmentOperation:UserDefined
 
 #### Field: Control Scheme &lt;\#&gt; Name
@@ -9619,6 +9635,86 @@ PlantEquipmentOperation:ComponentSetpoint,
     COOLING;                 !- Operation 2 Type
 ```
 
+### PlantEquipmentOperation:ThermalEnergyStorage
+
+Users of thermal energy storage, particularly ice storage systems, are often faced with a challenge of specifying input for these systems.  Essentially, they have to define various setpoint managers, temperature schedules, etc. in order to make the system functional.  This plant/condenser control type simplifies the input somewhat by eliminating both a setpoint manager and a schedule for each piece of equipment that makes up the ice storage system.  In fact, this operation scheme internally creates the setpoint managers required by the equipment listed as operated by the scheme defined by this syntax.  While the more complex definition is possible and provides more flexibility like hourly variation of setpoint temperatures at the outlet of each piece of equipment, this input provides the most convenient method for making the system to work and assumes a single charging setpoint temperature and a single discharging setpoint temperature.  For most systems, this is all that is needed.
+
+#### Field: Name
+
+This field defines the name of the thermal energy (ice) storage plant equipment operation scheme that will be referenced by the PlantEquipmentOperationSchemes list in the plant input.
+
+#### Field: On-Peak Schedule
+
+This field defines the name of an integer schedule that determines when on-peak electric pricing is in effect.  This value is used to determine whether or not the ice storage system should be charging the ice storage unit.  In the schedule, a value of 1 (or greater) corresponds to being in the on-peak period while any value of 0 or less corresponds to being in the off-peak period.
+
+#### Field: Charging Availability Schedule
+
+This field defines the name of an integer schedule that determines whether or not the system may enter charging mode off-peak.  If the current value of the on-peak schedule is “off”, then charging can take place if the charging availability schedule is “on”.  If the on-peak schedule is “off” and charging availability is “off”, then charging is not allowed and the chiller and ice storage units controlled by this statement are operating to meet the non-charging chilled water temperature defined by the next input parameter. In this schedule, a value of 1 (or greater) corresponds to “on” when charging is available during an off-peak period while any value of 0 or less corresponds to chillers not being allowed to charge even during off-peak.
+
+#### Field: Non-Charging Chilled Water Temperature
+
+This field defines the chilled water temperature when the ice storage system is NOT in charging mode.  During these times, the storage system could be discharging or dormant depending on HVAC load conditions and ice storage controls.  This value is used as the setpoint temperature for chillers associated with this plant equipment operation scheme during non-cooling season and during cooling season during the on-peak period.  The cooling season and on-peak periods are defined by schedules reference to input above.
+
+#### Field: Charging Chilled Water Temperature
+
+This field defines the chilled water temperature when the ice storage system is in charging mode.  During these times, the chiller is producing a temperature low enough to generate ice in the ice storage unit.  This value is used as the setpoint temperature for chillers associated with this plant equipment operation scheme during the cooling season during the off-peak period.  The cooling season and on-peak periods are defined by schedules reference to input above.
+
+#### Field Set: (Component Object Type, Name, Demand Calculation Node, Setpoint Node, Flow Rate, Operation Type)
+
+#### Field: Component &lt;\#&gt; Object Type
+
+This field specifies the type of equipment controlled by scheme.  This must be a thermal energy storage device (simple or detailed ice storage) or a chiller.
+
+#### Field: Component &lt;\#&gt; Name
+
+This field specifies the name of the controlled equipment.  This name must be defined in the input as a valid ice storage device or chiller.
+
+#### Field: Component &lt;\#&gt; Demand Calculation Node Name
+
+The component demand will be calculated using the difference between the temperature at the demand node and the component set point temperature.
+
+#### Field: Component &lt;\#&gt; Setpoint Node Name
+
+Each component controlled under temperature based control will have its own set point different from the loop set point. This field specifies component set point node (Generally its outlet temperatures). This node is acted upon by a SetpointManager in order to obtain the setpoint at any simulation timestep.
+
+#### Field: Component &lt;\#&gt; Flow Rate
+
+This numeric field specifies the design flow rate for the component specified in earlier fields.  This flow rate is used to calculate the component demand. The field can be set to autosize, if the user wants the program to calculate the design flow. This would generally be set to autosize when the user does not know the component flow rate and does a sizing calculation for the corresponding component.
+
+#### Field: Component &lt;\#&gt; Operation Type
+
+This alpha field specifies the operation mode for the equipment. The equipment can be in any of the three modes viz. Cooling, Heating and Dual. Dual is used when the components both as heating and cooling equipment (for example heat pumps).  Ice storage units can potentially either heat or cool the circulating fluid and thus should be defined as Dual mode.
+
+
+An example IDF is shown below:
+
+
+```idf
+  PlantEquipmentOperationSchemes,
+    CW Loop Operation,       !- Name
+    PlantEquipmentOperation:ThermalEnergyStorage,  !- Control Scheme 1 Object Type
+    Chiller and Partial Ice Storage,  !- Control Scheme 1 Name
+    PlantOnSched;            !- Control Scheme 1 Schedule Name
+
+  PlantEquipmentOperation:ThermalEnergyStorage,
+    Chiller and Partial Ice Storage,  !- Name
+    OnPeakEnergy,            !- On-Peak Schedule Name
+    ChargingAvail,           !- Charging Availability Schedule Name
+    7.22,                    !- Non-charging Chilled Water Temperature
+    -5.0,                    !- Charging Chilled Water Temperature
+    Chiller:Electric,        !- Component 1 Object Type
+    Central Chiller,         !- Component 1 Name
+    Central Chiller Inlet Node,  !- Component 1 Demand Calculation Node Name
+    Central Chiller Outlet Node,  !- Component 1 Setpoint Node Name
+    autosize,                !- Component 1 Flow Rate {m3/s}
+    COOLING,                 !- Component 1 Operation Type
+    ThermalStorage:Ice:Detailed,  !- Component 2 Object Type
+    Ice Tank,                !- Component 2 Name
+    Ice Tank Inlet Node,     !- Component 2 Demand Calculation Node Name
+    Ice Tank Outlet Node,    !- Component 2 Setpoint Node Name
+    0.13506E-02,             !- Component 2 Flow Rate {m3/s}
+    DUAL;                    !- Component 2 Operation Type
+```
 
 ### PlantEquipmentList
 

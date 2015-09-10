@@ -75,6 +75,15 @@ namespace HeatBalanceAirManager {
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
 
+
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool ManageAirHeatBalanceGetInputFlag( true );
+	}
 	//         Subroutine Specifications for the Heat Balance Module
 	// Driver Routines
 
@@ -89,6 +98,12 @@ namespace HeatBalanceAirManager {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state()
+	{
+		ManageAirHeatBalanceGetInputFlag =  true;
+	}
+
 
 	void
 	ManageAirHeatBalance()
@@ -129,14 +144,15 @@ namespace HeatBalanceAirManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true );
-
+		/////////// hoisted into namespace changed to ManageAirHeatBalanceGetInputFlag////////////
+		//static bool ManageAirHeatBalanceGetInputFlag( true );
+		/////////////////////////////////////////////
 		// FLOW:
 
 		// Obtains and Allocates heat balance related parameters from input file
-		if ( GetInputFlag ) {
+		if ( ManageAirHeatBalanceGetInputFlag ) {
 			GetAirHeatBalanceInput();
-			GetInputFlag = false;
+			ManageAirHeatBalanceGetInputFlag = false;
 		}
 
 		InitAirHeatBalance(); // Initialize all heat balance related parameters
@@ -2796,6 +2812,7 @@ namespace HeatBalanceAirManager {
 		using DataRoomAirModel::RoomAirModel_UserDefined;
 		using DataRoomAirModel::RoomAirModel_UCSDUFI;
 		using DataRoomAirModel::RoomAirModel_UCSDUFE;
+		using DataRoomAirModel::RoomAirModel_AirflowNetwork;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2906,6 +2923,14 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).AirModelType = RoomAirModel_UserDefined;
 					AirModel( ZoneNum ).SimAirModel = true;
 					UserDefinedUsed = true;
+				} else if ( SELECT_CASE_var == "AIRFLOWNETWORK" ) {
+					AirModel( ZoneNum ).AirModelType = RoomAirModel_AirflowNetwork;
+					AirModel( ZoneNum ).SimAirModel = true;
+					ValidateComponent( "RoomAirSettings:AirflowNetwork", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					if ( IsNotOK ) {
+						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
+						ErrorsFound = true;
+					}
 					// Need to make sure that Room Air controls are used for this one.
 				} else {
 					ShowWarningError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
@@ -2961,6 +2986,8 @@ namespace HeatBalanceAirManager {
 				gio::write( OutputFileInits, RoomAirZoneFmt ) << Zone( ZoneNum ).Name << "UnderFloorAirDistributionExterior";
 			} else if ( SELECT_CASE_var == RoomAirModel_UserDefined ) {
 				gio::write( OutputFileInits, RoomAirZoneFmt ) << Zone( ZoneNum ).Name << "UserDefined";
+			} else if ( SELECT_CASE_var == RoomAirModel_AirflowNetwork ) {
+				gio::write( OutputFileInits, RoomAirZoneFmt ) << Zone( ZoneNum ).Name << "AirflowNetwork";
 			}}
 		}
 

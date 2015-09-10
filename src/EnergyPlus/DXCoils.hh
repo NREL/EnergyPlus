@@ -87,12 +87,14 @@ namespace DXCoils {
 	extern Array1D< Real64 > DXCoilCoolInletAirWBTemp; // DX cooling coil inlet air wet-bulb temp [C]
 	extern Array1D< Real64 > DXCoilHeatInletAirDBTemp; // DX heating coil inlet air dry-bulb temp [C]
 	extern Array1D< Real64 > DXCoilHeatInletAirWBTemp; // DX heating coil inlet air wet-bulb temp [C]
+	
 	extern int CurDXCoilNum;
 
 	extern int NumDXCoils; // Total number of DX coils
 	extern Real64 HPWHHeatingCapacity; // Used by Heat Pump:Water Heater object as total water heating capacity [W]
 	extern Real64 HPWHHeatingCOP; // Used by Heat Pump:Water Heater object as water heating COP [W/W]
 	extern bool GetCoilsInputFlag; // First time, input is "gotten"
+	extern bool MyOneTimeFlag; // One time flag used to allocate MyEnvrnFlag and MySizeFlag
 	extern int NumVRFHeatingCoils; // number of VRF heat pump heating coils
 	extern int NumVRFCoolingCoils; // number of VRF heat pump cooling coils
 	extern int NumDXHeatingCoils; // number of DX heat pump heating coils
@@ -441,6 +443,22 @@ namespace DXCoils {
 		int MSSpeedNumHS; // current high speed number of multspeed HP
 		Real64 MSSpeedRatio; // current speed ratio of multspeed HP
 		Real64 MSCycRatio; // current cycling ratio of multspeed HP
+		
+		//The following members are for VRF Coils (FluidTCtrl Model)
+		int VRFIUPtr; // index to the VRF Indoor Unit where the coil is placed
+		int VRFOUPtr; // index to the VRF Outdoor Unit that the coil serves
+		Real64 EvaporatingTemp; // indoor unit evaporating temperature [C]
+		Real64 CondensingTemp; // indoor unit condensing temperature [C]
+		Real64 C1Te; // VRF Indoor Unit Coefficient 1 to calculate Te,req [--]
+		Real64 C2Te; // VRF Indoor Unit Coefficient 2 to calculate Te,req [--]
+		Real64 C3Te; // VRF Indoor Unit Coefficient 3 to calculate Te,req [--]
+		Real64 C1Tc; // VRF Indoor Unit Coefficient 1 to calculate Tc,req [--]
+		Real64 C2Tc; // VRF Indoor Unit Coefficient 2 to calculate Tc,req [--]
+		Real64 C3Tc; // VRF Indoor Unit Coefficient 3 to calculate Tc,req [--]
+		Real64 SH; // Superheating degrees [C]
+		Real64 SC; // Subcooling  degrees [C]
+		Real64 ActualSH; // Actual superheating degrees [C]
+		Real64 ActualSC; // Actual subcooling degrees [C]
 
 		// Default Constructor
 		DXCoilData() :
@@ -661,9 +679,21 @@ namespace DXCoils {
 			MSSpeedNumLS( 1 ),
 			MSSpeedNumHS( 2 ),
 			MSSpeedRatio( 0.0 ),
-			MSCycRatio( 0.0 )
-
-
+			MSCycRatio( 0.0 ),
+			VRFIUPtr( 0 ),
+			VRFOUPtr( 0 ),
+			EvaporatingTemp( 4.0 ),  
+			CondensingTemp( 40.0 ), 
+			C1Te( 0.0 ),	                
+			C2Te( 0.0 ),                 
+			C3Te( 0.0 ),                 
+			C1Tc( 0.0 ),	                
+			C2Tc( 0.0 ),                 
+			C3Tc( 0.0 ),                 
+			SH( 0.0 ),                   
+			SC( 0.0 ),                   
+			ActualSH( 0.0 ),             
+			ActualSC( 0.0 ) 
 		{}
 
 		// Member Constructor
@@ -924,7 +954,21 @@ namespace DXCoils {
 			int const MSSpeedNumLS, // current low speed number of multspeed HP
 			int const MSSpeedNumHS, // current high speed number of multspeed HP
 			Real64 const MSSpeedRatio, // current speed ratio of multspeed HP
-			Real64 const MSCycRatio // current cycling ratio of multspeed HP
+			Real64 const MSCycRatio, // current cycling ratio of multspeed HP
+			int const VRFIUPtr,  // index to the VRF Indoor Unit where the coil is placed
+			int const VRFOUPtr,  // index to the VRF Outdoor Unit that the coil serves
+			Real64 const EvaporatingTemp, // indoor unit evaporating temperature [C]
+			Real64 const CondensingTemp, // indoor unit condensing temperature [C]
+			Real64 const C1Te, // Indoor Unit Coefficient 1 to calculate Te,req [--]
+			Real64 const C2Te, // Indoor Unit Coefficient 2 to calculate Te,req [--]
+			Real64 const C3Te, // Indoor Unit Coefficient 3 to calculate Te,req [--]
+			Real64 const C1Tc, // Indoor Unit Coefficient 1 to calculate Tc,req [--]
+			Real64 const C2Tc, // Indoor Unit Coefficient 2 to calculate Tc,req [--]
+			Real64 const C3Tc, // Indoor Unit Coefficient 3 to calculate Tc,req [--]
+			Real64 const SH  , // Superheating degrees [C]
+			Real64 const SC  , // Subcooling degrees [C]
+			Real64 const ActualSH, // Actual superheating [C]
+			Real64 const ActualSC // Actual subcooling [C]
 		) :
 			Name( Name ),
 			DXCoilType( DXCoilType ),
@@ -1182,8 +1226,21 @@ namespace DXCoils {
 			MSSpeedNumLS( MSSpeedNumLS ),
 			MSSpeedNumHS( MSSpeedNumHS ),
 			MSSpeedRatio( MSSpeedRatio ),
-			MSCycRatio( MSCycRatio )
-
+			MSCycRatio( MSCycRatio ),
+			VRFIUPtr( VRFIUPtr ),
+			VRFOUPtr( VRFOUPtr ),
+			EvaporatingTemp( EvaporatingTemp ),
+			CondensingTemp( CondensingTemp ),
+			C1Te( C1Te ),
+			C2Te( C2Te ),
+			C3Te( C3Te ),
+			C1Tc( C1Tc ),
+			C2Tc( C2Tc ),
+			C3Tc( C3Tc ),   
+			SH( SH ),
+			SC( SC ),
+			ActualSH( ActualSH ),
+			ActualSC( ActualSC )
 		{}
 
 	};
@@ -1593,6 +1650,75 @@ namespace DXCoils {
 		int const SecCoilSHRFT,
 		int const SecCoilSHRFF
 		);
+
+	// Begin of Methods for New VRF Model: Fluid Temperature Control
+	//******************************************************************************
+	void
+	CalcVRFCoolingCoil_FluidTCtrl(
+		int const DXCoilNum, // the number of the DX coil to be simulated
+		int const CompOp, // compressor operation; 1=on, 0=off
+		bool const FirstHVACIteration, // true if this is the first iteration of HVAC
+		Real64 const PartLoadRatio, // sensible cooling load / full load sensible cooling capacity
+		int const FanOpMode, // Allows parent object to control fan operation
+		Real64 const CompCycRatio, // cycling ratio of VRF condenser
+		Optional_int_const PerfMode, // Performance mode for MultiMode DX coil; Always 1 for other coil types
+		Optional< Real64 const > OnOffAirFlowRatio // ratio of compressor on airflow to compressor off airflow
+	);
+	
+	void
+	CalcVRFHeatingCoil_FluidTCtrl(
+		int const CompOp, // compressor operation; 1=on, 0=off
+		int const DXCoilNum, // the number of the DX heating coil to be simulated
+		Real64 const PartLoadRatio, // sensible cooling load / full load sensible cooling capacity
+		int const FanOpMode, // Allows parent object to control fan mode
+		Optional< Real64 const > OnOffAirFlowRatio, // ratio of compressor on airflow to compressor off airflow
+		Optional< Real64 const > MaxHeatCap // maximum allowed heating capacity
+	);
+	
+	void
+	CalcVRFIUEvapCondTemp(
+		int const VRFTUNum, // the number of the VRF TU to be simulated
+		Real64 & EvapTemp, // evaporating temperature
+		Real64 & CondTemp  // condensing temperature 
+	);
+	
+	void
+	CalcVRFIUAirFlow (
+		int const ZoneIndex,  // index to zone where the VRF Terminal Unit resides 
+		int const Mode,       // mode 0 for cooling, 1 for heating, 2 for neither cooling nor heating
+		Real64 const Temp,    // evaporating or condensing temperature
+		int const CoolCoil,   // index to VRFTU cooling coil 
+		int const HeatCoil,   // index to VRFTU heating coil
+		bool SHSCModify,      // indicate whether SH/SC would be modified
+		Real64 & FanSpdRatio, // fan speed ratio
+		Real64 & Wout,    // outlet air humidity ratio
+		Real64 & Toutlet, // outlet air temperature
+		Real64 & Houtlet, // outlet air enthalpy
+		Real64 & HcoilIn, // inlet air enthalpy
+		Real64 & TcoilIn, // coil inlet temperature
+		Real64 & SHact,   // actual SH
+		Real64 & SCact    // actual SC
+	);
+	
+	Real64 
+	FanSpdResidualCool( 
+		Real64 const FanSpdRto, // indoor unit fan speed ratio  
+		Array1< Real64 > const & Par // array of parameters
+	);
+	
+	Real64 
+	FanSpdResidualHeat( 
+		Real64 FanSpdRto, // indoor unit fan speed ratio  
+		Array1< Real64 > const & Par // array of parameters
+	);
+	// End of Methods for New VRF Model: Fluid Temperature Control
+	// *****************************************************************************
+
+	// Clears the global data in DXCoils.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 
 	//     NOTICE
 

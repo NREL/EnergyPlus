@@ -126,11 +126,11 @@ EnergyPlusPgm( std::string const & filepath )
 	//      (Conjunction Of Multizone Infiltration Specialists) developed by a multinational, multi-institutional
 	//      effort under the auspices of the International Energy Agency's Buildings and Community Systems Agreement
 	//      working group focusing on multizone air flow modeling (Annex 23) and now administered by the Swiss Federal
-	//      Laboratories for Materials Testing and Research (EMPA), Division 175, Überlandstrasse 129, CH-8600 Dübendorf,
+	//      Laboratories for Materials Testing and Research (EMPA), Division 175, Uberlandstrasse 129, CH-8600 Dubendorf,
 	//      Switzerland.
 
 	//      The EnergyPlus v1.2 model for displacement ventilation and cross-ventilation was developed
-	//      by Guilherme Carrilho da Graça and Paul Linden of the Department of Mechanical and Aerospace
+	//      by Guilherme Carrilho da Graca and Paul Linden of the Department of Mechanical and Aerospace
 	//      Engineering, University of California, San Diego.
 
 	//      The EnergyPlus models for UFAD served zones were developed by Anna Liu and Paul Linden at the Department
@@ -310,6 +310,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	get_environment_variable( cReportDuringWarmup, cEnvValue );
 	if ( ! cEnvValue.empty() ) ReportDuringWarmup = env_var_on( cEnvValue ); // Yes or True
+	if ( ReverseDD ) ReportDuringWarmup = false; // force to false for ReverseDD runs
 
 	get_environment_variable( cReportDuringHVACSizingSimulation, cEnvValue);
 	if ( ! cEnvValue.empty() ) ReportDuringHVACSizingSimulation = env_var_on( cEnvValue ); // Yes or True
@@ -371,8 +372,8 @@ EnergyPlusPgm( std::string const & filepath )
 			exit(EXIT_FAILURE);
 		}
 		ProgramPath = filepath + pathChar;
-		int dummy_argc = 0;
-		const char * dummy_argv[] = { nullptr };
+		int dummy_argc = 1;
+		const char * dummy_argv[1] = { "energyplus" };
 		CommandLineInterface::ProcessArgs( dummy_argc, dummy_argv );
 	}
 

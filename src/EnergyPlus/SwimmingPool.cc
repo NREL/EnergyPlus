@@ -66,7 +66,7 @@ namespace SwimmingPool {
 	// 2. Janis, R. and W. Tao (2005). Mechanical and Electrical Systems in Buildings. 3rd ed. Upper
 	//    Saddle River, NJ: Pearson Education, Inc., p.246.
 	// 3. Kittler, R. (1989). Indoor Natatorium Design and Energy Recycling. ASHRAE Transactions 95(1), p.521-526.
-	// 4. Smith, C., R. Jones, and G. Löf (1993). Energy Requirements and Potential Savings for Heated
+	// 4. Smith, C., R. Jones, and G. Lof (1993). Energy Requirements and Potential Savings for Heated
 	//    Indoor Swimming Pools. ASHRAE Transactions 99(2), p.864-874.
 	// USE STATEMENTS:
 	// Use statements for data only modules
@@ -775,7 +775,7 @@ namespace SwimmingPool {
 		//  2. Janis, R. and W. Tao (2005). Mechanical and Electrical Systems in Buildings. 3rd ed. Upper
 		//     Saddle River, NJ: Pearson Education, Inc., p.246.
 		//  3. Kittler, R. (1989). Indoor Natatorium Design and Energy Recycling. ASHRAE Transactions 95(1), p.521-526.
-		//  4. Smith, C., R. Jones, and G. Löf (1993). Energy Requirements and Potential Savings for Heated
+		//  4. Smith, C., R. Jones, and G. Lof (1993). Energy Requirements and Potential Savings for Heated
 		//     Indoor Swimming Pools. ASHRAE Transactions 99(2), p.864-874.
 
 		// Using/Aliasing

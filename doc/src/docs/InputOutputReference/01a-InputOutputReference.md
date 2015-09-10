@@ -2545,12 +2545,13 @@ An IDF example:
 Site:GroundTemperature:BuildingSurface,19,20,20,20,20,20,20,20,20,20,20,20;
 ```
 
-
 ### Site:GroundTemperature:Shallow
 
 Site:GroundTemperature:Shallow are used by the Surface Ground Heat Exchanger (i.e. object: GroundHeatExchanger:Surface). Only one shallow ground temperature object can be included.
 
 Note that the ground temperatures included in full year weather files may be suitable of being used for the values in these fields – namely, the .5 m depth temperatures that are calculated for “undisturbed” soil of “typical” conditions. However, you may wish to use some other change effect – based on the weather conditions of the building location.
+
+This object may be used for objects requiring "undisturbed" ground temperatures. In these instances, the "name" input field is not required. 
 
 #### Field: Month Temperature(s) – 12 fields in all
 
@@ -2569,6 +2570,8 @@ Site:GroundTemperature:Deep are used by the Pond Ground Heat Exchanger object (i
 
 Note that the ground temperatures included in full year weather files may be suitable of being used for the values in these fields – namely, the 4 m depth temperatures that are calculated for “undisturbed” soil of “typical” conditions. However, you may wish to use some other change effect – based on the weather conditions or special knowledge of the building location.
 
+This object may be used for objects requiring "undisturbed" ground temperatures. In these instances, the "name" input field is not required. 
+
 #### Field: Month Temperature(s) – 12 fields in all
 
 Each numeric field is the monthly deep ground temperature (degrees Celsius) used for the indicated month (January=1<sup>st</sup> field, February=2<sup>nd</sup> field, etc.)
@@ -2578,6 +2581,151 @@ An IDF example:
 ```idf
 Site:GroundTemperature:Deep,  16,16,16,16,16,16,16,16,16,16,16,16;
 ```
+
+
+###Site:GroundTemperature:Undisturbed:FiniteDifference
+
+Site:GroundTemperature:Undisturbed:FiniteDifference may be used by all objects requiring "undisturbed" ground temperatures. The object uses a 1D finite difference heat transfer model which uses the weather file to obtain surface boundary conditions. An annual simulation is run on the model during it's initialization until the annual ground temperature profile has reached steady periodic behavior. Once steady periodic behavior is reached, the ground tempeatures are cached for retrieval during the rest of the simulation.
+
+#### Field: Soil Thermal Conductivity
+
+The thermal conductivity of the soil, in W/m-K.
+
+#### Field: Soil Density
+
+The bulk density of the soil, in kg/m3.
+
+#### Field: Soil Specific Heat
+
+The specific heat of dry soil, in J/kg-K.
+
+#### Field: Soil Moisture Content Volume Fraction
+
+A nominal value of soil moisture content to be used when evaluating soil thermal properties.
+
+#### Field: Soil Moisture Content Volume Fraction at Saturation
+
+A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil.
+
+#### Field: Evapotranspiration Ground Cover Parameter
+
+Numeric field specifies the ground cover effects used in the evapotranspiration model at the ground surface heat balance. The values range from 0 (solid, non-permeable ground surface) to 1.5 (wild growth).
+
+An IDF example:
+
+```
+  Site:GroundTemperature:Undisturbed:FiniteDifference,
+    FDTemps,     !- Name of object
+    1.08,        !- Soil Thermal Conductivity {W/m-K}
+    962,         !- Soil Density {kg/m3}
+    2576,        !- Soil Specific Heat {J/kg-K}
+    30,          !- Soil Moisture Content Volume Fraction {percent}
+    50,          !- Soil Moisture Content Volume Fraction at Saturation {percent} 
+    0.408;       !- Evapotranspiration Ground Cover Parameter
+```
+
+
+###Site:GroundTemperature:Undisturbed:KusduaAchenbach
+
+Site:GroundTemperature:Undisturbed:KusudaAchenbach may be used by all objects requiring "undisturbed" ground temperatures. It provides an undisturbed ground temperature based on the correlation developed by Kusuda T. and P. Achenbach. 1965. The correlation uses three parameters for ground temperature at the surface to define a correlation for undisturbed ground temperatures as a function of depth and time. If one thinks of the ground temperature for a given depth as a sinusoid, the average ground temperature, amplitude (average difference between maximum ground temperature and minimum ground temperature), and the phase shift (day of minimum surface temperature) are all required to define the correlation.
+
+If the parameters are left blank they can be autocalculated by including soil surface temperatures in the input using the Site:GroundTemperature:Shallow object. They can also be calculated by using the CalcSoilSurfTemp preprocessor. 
+
+Kusuda, T. and P.R. Achenbach. 1965. 'Earth Temperatures and Thermal Diffusivity at Selected Stations in the United States.' *ASHRAE Transactions*. 71(1): 61-74.
+
+#### Field: Soil Thermal Conductivity
+
+The thermal conductivity of the soil, in W/m-K.
+
+#### Field: Soil Density
+
+The bulk density of the soil, in kg/m3.
+
+#### Field: Soil Specific Heat
+
+The specific heat of dry soil, in J/kg-K.
+
+#### Field: Average Annual Ground Surface Temperature
+
+This is the average ground surface temperature throughout the entire year, in °C.
+
+#### Field: Average Amplitude of Annual Ground Surface Temperature
+
+This is the average amplitude of the ground surface temperature, in °C.
+
+#### Field: Phase Shift of Minimum Surface Temperature
+
+This is day of the year which has the lowest ground surface temperature.
+
+An IDF example:
+
+```idf
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach,
+    KATemps,    !- Name of object
+    1.08,       !- Soil Thermal Conductivity {W/m-K}
+    962,        !- Soil Density {kg/m3}
+    2576,       !- Soil Specific Heat {J/kg-K}
+    15.5,       !- Average Soil Surface Temperature {C}
+    12.0,       !- Average Amplitude of Surface Temperature {deltaC}
+    21;         !- Phase Shift of Minimum Surface Temperature {days}
+```
+
+
+###Site:GroundTemperature:Undisturbed:Xing
+
+Site:GroundTemperature:Undisturbed:Xing may be used by all objects requiring "undisturbed" ground temperatures. It provides an undisturbed ground temperature based on the correlation developed by Xing, 2014. The correlation is a 5 parameter, 2 harmonic model based on the work of Lord Kelvin (Thomson, 1862). The average soil surface temperature and two sets of surface temperature amplitude and phase shift must be provided. Parameters for 4000+ international locations can be found in Xing, 2014.
+
+Thomson, W. 1862. 'On the Reduction of Observations of Underground Temperature, with applications to Professor Forbes’ Edinburgh Observations and the continued Calton Hill Series.' Proceedings of the Royal Society of Edinburgh. IV: 342-346.
+
+Xing, L. 2014. Estimations of Undisturbed Ground Temperatures using Numerical and Analytical Modeling. Ph.D. Diss. Oklahoma State University, Stillwater, OK.
+
+#### Field: Soil Thermal Conductivity
+
+The thermal conductivity of the soil, in W/m-K.
+
+#### Field: Soil Density
+
+The bulk density of the soil, in kg/m3.
+
+#### Field: Soil Specific Heat
+
+The specific heat of dry soil, in J/kg-K.
+
+#### Field: Average Soil Surface Temperature
+
+The average annual surface temperature of the soil, in deg C.
+
+#### Field: Soil Surface Temperature Amplitude 1
+
+First soil surface temperature amplitude parameter, in deg C.
+
+#### Field: Soil Surface Temperature Amplitude 2
+
+Second soil surface temperature amplitude parameter, in deg C.
+
+#### Field: Phase Shift of Surface Temperature Amplitude 1
+
+Phase shift of surface temperature amplitude 1, in days.
+
+#### Field: Phase Shift of Surface Temperature Amplitude 2
+
+Phase shift of surface temperature amplitude 2, in days.
+
+An IDF example:
+
+```
+  Site:GroundTemperature:Undisturbed:Xing,
+    Chicago-Ohare,    !- Name of object
+    1.08,         !- Soil Thermal Conductivity {W/m-K}
+    962,          !- Soil Density {kg/m3}
+    2576,         !- Soil Specific Heat {J/kg-K}
+    11.1,         !- Average Soil Surface Tempeature {C}
+    13.4,         !- Soil Surface Temperature Amplitude 1 {deltaC}
+    0.7,          !- Soil Surface Temperature Amplitude 2 {deltaC}
+    25,           !- Phase Shift of Temperature Amplitude 1 {days}
+    30;           !- Phase Shift of Temperature Amplitude 2 {days}
+```
+
 
 ### Site:GroundDomain:Slab
 
@@ -16410,9 +16558,184 @@ An example input is:
     Autocalculate,           !- Coefficient B
     Autocalculate,           !- Coefficient C
     Autocalculate,           !- Coefficient D
-   Autocalculate;           !- Coefficient E
+    Autocalculate;           !- Coefficient E
 ```
 
+### RoomAirflowNetwork Model
+
+This model simulates a thermal zone using a network approach by assuming intra-zone nodes connected by user-defined patterns of airflows. The new model also allows users to specify a node to be connected to surfaces to have convective heat transfer between surfaces and the node, portion of internal gains and supply air and return air fractions from zone equipment. The model requires following objects to work together:
+
+    RoomAirSettings:AirflowNetwork
+    RoomAir:Node:AirflowNetwork
+    RoomAir:Node:AirflowNetwork:AdjacentSurfaceList
+    RoomAir:Node:AirflowNetwork:InternalGains
+    RoomAir:Node:AirflowNetwork:HVACEquipment
+    AirflowNetwork:Intrazone:Node
+    AirflowNetwork:Intrazone:Linkage
+
+The first *five* **objects** are described below. The last two objects are described in the Airflow Network Model section. 
+
+### RoomAirSettings:AirflowNetwork
+
+This object provides inputs in a thermal zone needed for the RoomAirflowNetwork model.  The inputs specify a thermal zone and a list of RoomAir nodes. The object gives a summary of the model configuration in a zone.
+
+#### Field: Name
+
+This is a unique character string associated with this instance of the RoomAirSettings:AirflowNetwork object.
+ 
+#### Field: Zone Name
+
+The name of the EnergyPlus thermal zone corresponding to the RoomAir model zone.
+
+#### Field: Control Point RoomAir:Node Name
+
+This is the name of a RoomAir:Node:AirflowNetwork object that contains the sensor for zone HVAC controls.  The conditions at this node will be used for thermostatic, humidistatic, or comfort based control decisions. The zone node defined in a Zone object is required.  
+
+#### Field: RoomAir:Node:AirflowNetwork x Name
+
+The name of a RoomAir:Node:AirflowNetwork object defined elsewhere.  This node will receive the fraction of internal gains, and HVAC equipment, and a list of surface names exposed to this node with convective heat transfer. 
+
+An IDF example input is:
+
+```idf
+  RoomAirSettings:AirflowNetwork,
+    NORTH_ZONE,     !- Name 
+    NORTH_ZONE,              !- Zone Name
+    RoomAir Schedule,        !- Availability Schedule Name
+    NORTH_ZONE,              !- Control Point RoomAir:Node Name
+    LeftUpper,               !- RoomAir:Node:AirflowNetwork 1 Name
+    CentralUpper,            !- RoomAir:Node:AirflowNetwork 2 Name
+    NORTH_ZONE,              !- RoomAir:Node:AirflowNetwork 3 Name
+    LeftMiddle,              !- RoomAir:Node:AirflowNetwork 4 Name
+    LeftLower,               !- RoomAir:Node:AirflowNetwork 5 Name
+    CentralLower;            !- RoomAir:Node:AirflowNetwork 6 Name
+```
+
+### RoomAir:Node:AirflowNetwork
+
+This object is used to define a node in a thermal zone. The input specifies the fraction of zone volume and provides a list of names to define fraction of internal gains, surface connection and HVAC equipment.
+
+#### Field: Name
+
+This is a unique character string associated with this instance of the RoomAirSettings:AirflowNetwork object. 
+
+#### Field: Zone Name
+
+The name of the EnergyPlus thermal zone and is defined in an RoomAirSettings:AirflowNetwork object.
+
+#### Field: Fraction of Zone Air Volume
+
+The field specifies a fraction of the overall zone air volume that is assigned to this RoomAir:Node:AirflowNetwork object. The fraction will be used to calculate zone air storage term. See corresponding sections in Engineering Reference for its use in the node energy and moisture balance equations.
+
+#### Field: RoomAir:Node:AirflowNetwork:AdjacentSurfaceList Name
+
+The field specifies a name to provide a list of connected adjacent surfaces with convective heat transfer between surfaces and this particular node.  When a moisture mode is assigned to surfaces, convective moisture transfer will be calculated. See corresponding sections in Engineering Reference for its use in the node energy and moisture balance equations.
+
+#### Field: RoomAir:Node:AirflowNetwork:InternalGains Name
+
+The field specifies a name to provide a list of internal gain objects and associated fractions assigned to this particular node. See corresponding sections in Engineering Reference for its use in the node energy and moisture balance equations.
+
+#### Field: RoomAir:Node:AirflowNetwork:HVACEquipment Name
+
+The field specifies a name to provide a list of HVAC equipment, including AirLoop terminals and zone equipment. See corresponding sections in Engineering Reference for its use in the node energy and moisture balance equations.
+
+```idf
+  RoomAir:Node:AirflowNetwork,
+    LeftUpper,         !- Name
+    NORTH_ZONE,        !- Zone Name
+    0.15,              !- Fraction of Zone Air Volume
+    Surface_18_T_List, !- RoomAir:Node:AirflowNetwork:AdjacentSurfaceList Name
+    LeftUpper_Gain,    !- RoomAir:Node:AirflowNetwork:InternalGains Name
+    LeftUpper_HVAC;    !- RoomAir:Node:AirflowNetwork:HVACEquipment Name
+```
+
+### RoomAir:Node:AirflowNetwork:AdjacentSurfaceList
+
+This object is used to provide a list of connected adjacent surfaces with convective heat transfer between surfaces and this particular node. When a moisture mode is assigned to surfaces, convective moisture transfer will be calculated. It should be pointed out that a fraction of a surface exposed to this particular node is not allowed.
+
+#### Field: Name
+
+This is a unique character string associated with this instance of the RoomAir:Node:AirflowNetwork:AdjacentSurfaceList object. 
+
+#### Field: Surface x Name
+
+The field specifies a surface name based on the order from 1 to 21. The maximum number of surfaces can be extensible.
+
+```idf
+  RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,
+    Surface_18_T_List, !- Name
+    Surface_18_T;      !- Surface 1 Name
+```
+### RoomAir:Node:AirflowNetwork:InternalGains
+
+This object is used to define a list of internal gains in the same zone and associated fraction assigned to this particular node. 
+
+#### Field: Name
+
+This is a unique character string associated with this instance of the RoomAir:Node:AirflowNetwork:InternalGains object. 
+
+#### Field: Internal Gain Object x Type
+
+The field specifies an internal gain object type based on the list in the Energy+. 
+
+#### Field: Internal Gain Object x Name
+
+The field specifies an internal gain object name based on the list in the Energy+.
+ 
+#### Field: Fraction of Gains to Node x
+
+The field specifies a fraction of the particular internal gain object assigned to this node. 
+
+```idf
+  RoomAir:Node:AirflowNetwork:InternalGains,
+    CentralUpper_Gain,        !- Name
+    People,                !- Internal Gain Object 1 Type
+    NORTH_ZONE People,     !- Internal Gain Object 1 Name
+    0.15,                  !- Fraction of Gains to Node 1
+    Lights,                !- Internal Gain Object 2 Type
+    NORTH_ZONE Lights,     !- Internal Gain Object 2 Name
+    0.15,                  !- Fraction of Gains to Node 2
+    ElectricEquipment,     !- Internal Gain Object 3 Type
+    NORTH_ZONE Equip,     !- Internal Gain Object 3 Name
+    0.15;                  !- Fraction of Gains to Node 3
+```
+
+{Field set: 3 fields (Internal Gain Object x Type, Internal Gain Object x Name, and Fraction of Gains to Node x). are extensible.}
+
+### RoomAir:Node:AirflowNetwork:HVACEquipment
+
+This object is used to define a list of HVAC equipment objects in the same zone and associated fractions assigned to this particular node. 
+
+#### Field: Name
+
+This is a unique character string associated with this instance of the RoomAir:Node:AirflowNetwork:HVACEquipment object. 
+
+#### Field: ZoneHVAC or Air Terminal Equipment Object Type x
+
+The field specifies an object type of ZoneHVAC equipment or terminal type based on the list in the Energy+.idd.
+
+#### Field: ZoneHVAC or Air Terminal Equipment Object Name x
+
+The field specifies the object name based on the object type defined in the previous field.  
+
+#### Field: Fraction of Output or Supply Air from HVAC Equipment x 
+
+The field specifies a fraction of supply air from the particular equipment to this node. 
+
+#### Field: Fraction of Input or Return Air from HVAC Equipment x 
+
+The field specifies a fraction of return air from the particular equipment to this node. 
+
+```idf
+  RoomAir:Node:AirflowNetwork:HVACEquipment,
+    CentralUpper_HVAC,        !- Name
+    ZoneHVAC:PackagedTerminalAirConditioner, !- ZoneHVAC or Air Terminal Equipment Object Type 1
+    NORTH_ZONE PTAC,       !- ZoneHVAC or Air Terminal Equipment Object Name 1
+    0.14,                   !- Fraction of Output or Supply Air from HVAC Equipment 1 
+    0.14;                   !- Fraction of Input or Return Air to HVAC Equipment 1
+```
+
+{Field set: 4 fields (ZoneHVAC or Air Terminal Equipment Object Type x, ZoneHVAC or Air Terminal Equipment Object Name x, Fraction of Output or Supply Air from HVAC Equipment x, and Fraction of Input or Return Air from HVAC Equipment x) are extensible.}
 
 ### Room Air Model Outputs
 
@@ -16634,6 +16957,54 @@ The convective heat gain from windows in an UnderFloorAirDistributionExterior zo
 This output, (Phi) is a measure of temperature stratification in the space. It is the difference between the occupied subzone temperature and the supply temperature divided by difference between the return temperature and the supply temperature. Technically it is equal to Kc. As phi approaches 1, the space is fully mixed. As phi approaches 0, the space becomes fully stratified. Expressed as an equation:
 
 *(T<sub>occ</sub>* – *T<sub>sup</sub>) / (T<sub>ret</sub>* *- T<sub>sup</sub>)*
+
+### RoomAirflowNetwork Model Outputs
+
+* HVAC,Average,RoomAirflowNetwork Node Temperature [C]
+
+* HVAC,Average,RoomAirflowNetwork Node Humidity Ratio [kgWater/kgDryAir]
+
+* HVAC,Average,RoomAirflowNetwork Node Relative Humidity [%]
+
+* HVAC,Average,RoomAirflowNetwork Node SumIntSensibleGain [W]
+
+* HVAC,Average,RoomAirflowNetwork Node SumIntLatentGain [W]
+
+* HVAC,Average,RoomAirflowNetwork Node NonAirSystemResponse [W]
+
+* HVAC,Average,RoomAirflowNetwork Node SysDepZoneLoadsLagged [W]
+
+* HVAC,Average,RoomAirflowNetwork Node HVAC Supply Fraction []
+
+* HVAC,Average,RoomAirflowNetwork Node HVAC Return Fraction []
+
+#### RoomAirflowNetwork Node Temperature [C]
+
+The temperature at a Room Air Node in a zone in degrees C.
+
+#### HVAC,Average,RoomAirflowNetwork Node Humidity Ratio [kgWater/kgDryAir]
+
+The humidity ratio at a Room Air Node in a zone in kgWater/kgDryAir.
+
+#### RoomAirflowNetwork Node Relative Humidity [%]
+
+The relative humidity ratio at a Room Air Node in a zone in percent.
+
+#### HVAC,Average,RoomAirflowNetwork Node SumIntSensibleGain [W]
+
+A sum of internal sensible gains assigned to a Room Air node in a zone.
+
+#### HVAC,Average,RoomAirflowNetwork Node SumIntLatentGain [W]
+
+A sum of internal latent gains assigned to a Room Air node in a zone.
+
+#### HVAC,Average,RoomAirflowNetwork Node NonAirSystemResponse [W]
+
+A sum of system convective gains, collected via NonAirSystemResponse, and assigned to a Room Air node in a zone. 
+
+#### HVAC,Average,RoomAirflowNetwork Node SysDepZoneLoadsLagged [W]
+
+A sum of SysDepZoneLoads saved to be added to zone heat balance at the next HVAC time step. A typical system is a zone dehumidifier.
 
 Group – Internal Gains (People, Lights, Other internal zone equipment)
 ----------------------------------------------------------------------
