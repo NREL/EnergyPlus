@@ -1405,7 +1405,7 @@ namespace WaterThermalTanks {
 	void
 	CalcWaterThermalTankZoneGains();
 
-	void
+	bool
 	GetWaterThermalTankInput();
 
 	void
@@ -1602,6 +1602,8 @@ namespace WaterThermalTanks {
 		Real64 & MdotWater, // water flow rate
 		bool const FirstHVACIteration // TRUE if First iteration of simulation
 	);
+
+	void clear_state();
 
 	//     NOTICE
 
