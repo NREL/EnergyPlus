@@ -82,7 +82,10 @@ namespace HeatPumpWaterToWaterSimple {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumGSHPs( 0 ); // Number of GSHPs specified in input
-
+	namespace {
+		bool GetInputFlag( true ); // then TRUE, calls subroutine to read input file.
+		bool InitWatertoWaterHPOneTimeFlag( true );
+	}
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Driver/Manager Routines
@@ -102,6 +105,14 @@ namespace HeatPumpWaterToWaterSimple {
 	// MODULE SUBROUTINES:
 
 	// Functions
+	void
+	clear_state(){
+		NumGSHPs = 0;
+		GetInputFlag = true;
+		InitWatertoWaterHPOneTimeFlag = true;
+		GSHP.deallocate();
+		GSHPReport.deallocate();
+	}
 
 	void
 	SimHPWatertoWaterSimple(
@@ -152,7 +163,6 @@ namespace HeatPumpWaterToWaterSimple {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // then TRUE, calls subroutine to read input file.
 
 		//Get input from IDF
 		if ( GetInputFlag ) {
@@ -484,15 +494,15 @@ namespace HeatPumpWaterToWaterSimple {
 		static Real64 CurrentSimTime( 0.0 ); // Current Simulation Time
 		static Real64 PrevSimTime( 0.0 ); // Previous Simulation Time
 		static Array1D_bool MyPlanScanFlag;
-		static bool MyOneTimeFlag( true );
+
 		int LoopNum;
 		int LoopSideNum;
 		Real64 rho; // local fluid density
 
-		if ( MyOneTimeFlag ) {
+		if ( InitWatertoWaterHPOneTimeFlag ) {
 			MyPlanScanFlag.allocate( NumGSHPs );
 			MyEnvrnFlag.allocate( NumGSHPs );
-			MyOneTimeFlag = false;
+			InitWatertoWaterHPOneTimeFlag = false;
 			MyEnvrnFlag = true;
 			MyPlanScanFlag = true;
 		}

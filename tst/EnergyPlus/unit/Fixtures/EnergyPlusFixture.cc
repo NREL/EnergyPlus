@@ -41,6 +41,7 @@
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HVACManager.hh>
@@ -130,6 +131,7 @@ namespace EnergyPlus {
 		GroundTemperatureManager::clear_state();
 		HeatBalanceAirManager::clear_state();
 		HeatBalanceManager::clear_state();
+		HeatPumpWaterToWaterSimple::clear_state();
 		Humidifiers::clear_state();
 		HVACManager::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();

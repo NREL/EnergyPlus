@@ -358,6 +358,8 @@ namespace HeatPumpWaterToWaterSimple {
 	extern Array1D< ReportVars > GSHPReport;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimHPWatertoWaterSimple(
