@@ -4046,6 +4046,7 @@ namespace MixedAir {
 		}
 
 		OutAirMinFrac = min( max( OutAirMinFrac, 0.0 ), 1.0 );
+		// At this point, OutAirMinFrac is still based on AirLoopFlow.DesSupply
 		if ( AirLoopNum > 0 ) {
 			AirLoopFlow( AirLoopNum ).MinOutAir = OutAirMinFrac * AirLoopFlow( AirLoopNum ).DesSupply;
 		}
@@ -4212,7 +4213,6 @@ namespace MixedAir {
 			MinOAflowfracVal = min( max( MinOAflowfracVal, 0.0 ), 1.0 );
 			if ( MinOAflowfracVal > OutAirMinFrac ) {
 				OutAirMinFrac = MinOAflowfracVal;
-				if ( AirLoopNum > 0 ) AirLoopFlow( AirLoopNum ).MinOutAir = OutAirMinFrac * OAController( OAControllerNum ).MixMassFlow;
 			}
 			OASignal = max( MinOAflowfracVal, OASignal );
 		}
@@ -4222,7 +4222,6 @@ namespace MixedAir {
 			MaxOAflowfracVal = min( max( MaxOAflowfracVal, 0.0 ), 1.0 );
 			if ( MaxOAflowfracVal < OutAirMinFrac ) {
 				OutAirMinFrac = MaxOAflowfracVal;
-				if ( AirLoopNum > 0 ) AirLoopFlow( AirLoopNum ).MinOutAir = OutAirMinFrac * OAController( OAControllerNum ).MixMassFlow;
 			}
 			OASignal = min( MaxOAflowfracVal, OASignal );
 
@@ -4286,6 +4285,7 @@ namespace MixedAir {
 		// save the min outside air flow fraction and max outside air mass flow rate
 		if ( AirLoopNum > 0 ) {
 			AirLoopFlow( AirLoopNum ).OAMinFrac = OutAirMinFrac;
+			AirLoopFlow( AirLoopNum ).MinOutAir = OutAirMinFrac * OAController( OAControllerNum ).MixMassFlow;
 			if ( OAController( OAControllerNum ).MixMassFlow > 0.0 ) {
 				AirLoopFlow( AirLoopNum ).OAFrac = OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow;
 			} else {
@@ -4325,7 +4325,7 @@ namespace MixedAir {
 							AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked = true;
 							OAController( OAControllerNum ).OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
 							AirLoopFlow( AirLoopNum ).OAFrac = OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow;
-							AirLoopFlow( AirLoopNum ).OAMinFrac = AirLoopFlow( AirLoopNum ).OAFrac;
+							// MJW Why reset this?  AirLoopFlow( AirLoopNum ).OAMinFrac = AirLoopFlow( AirLoopNum ).OAFrac;
 						} else { // IF (MixedAirTempAtMinOAFlow .LE. Node(OAController(OAControllerNum)%MixNode)%TempSetPoint) THEN
 							AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked = false;
 							OAController( OAControllerNum ).HRHeatingCoilActive = 0;
@@ -4348,7 +4348,7 @@ namespace MixedAir {
 			if ( AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked ) {
 				OAController( OAControllerNum ).OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
 				AirLoopFlow( AirLoopNum ).OAFrac = OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow;
-				AirLoopFlow( AirLoopNum ).OAMinFrac = AirLoopFlow( AirLoopNum ).OAFrac;
+				// MJW Why reset this? AirLoopFlow( AirLoopNum ).OAMinFrac = AirLoopFlow( AirLoopNum ).OAFrac;
 			}
 
 			// turn on OA heat exchanger any time heating is active and user requests the special bypass control
@@ -4359,7 +4359,7 @@ namespace MixedAir {
 				// reset the OA flow to minimum
 				OAController( OAControllerNum ).OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
 				AirLoopFlow( AirLoopNum ).OAFrac = OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow;
-				AirLoopFlow( AirLoopNum ).OAMinFrac = AirLoopFlow( AirLoopNum ).OAFrac;
+				// MJW Why reset this? AirLoopFlow( AirLoopNum ).OAMinFrac = AirLoopFlow( AirLoopNum ).OAFrac;
 
 				// The airloop needs to be simulated again so that the heating coil & HX can be resimulated
 				if ( AirLoopControlInfo( AirLoopNum ).HeatRecoveryResimFlag && AirLoopControlInfo( AirLoopNum ).OASysComponentsSimulated ) {
