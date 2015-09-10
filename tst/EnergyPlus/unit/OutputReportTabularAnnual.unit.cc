@@ -97,7 +97,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering )
 	DataGlobals::DoWeathSim = true;
 
 	GetInputTabularAnnual(); // this also calls setupGathering
-	EXPECT_EQ( OutputReportTabularAnnual::annualTables.size(), 1 );
+	EXPECT_EQ( OutputReportTabularAnnual::annualTables.size(), 1u );
 
 	std::vector<AnnualTable>::iterator firstTable = OutputReportTabularAnnual::annualTables.begin();
 	std::vector<std::string> fieldSetParams = firstTable->inspectTableFieldSets( 0 );
@@ -144,7 +144,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularAnnual_GatherResults )
 	DataGlobals::TimeStepZone = 0.25;
 
 	GetInputTabularAnnual();
-	EXPECT_EQ( OutputReportTabularAnnual::annualTables.size(), 1 );
+	EXPECT_EQ( OutputReportTabularAnnual::annualTables.size(), 1u );
 
 	extLitPow = 2.01;
 	extLitUse = 1.01;
