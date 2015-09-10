@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstdio>
 #include <string>
+#include <memory>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -23,6 +24,7 @@
 #include <DisplayRoutines.hh>
 #include <EMSManager.hh>
 #include <General.hh>
+#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -62,6 +64,7 @@ namespace WeatherManager {
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
 	using namespace DataEnvironment;
+	using namespace GroundTemperatureManager;
 	using namespace DataReportingFlags;
 	using DataSystemVariables::iASCII_CR;
 	using DataSystemVariables::iUnicode_end;
@@ -153,10 +156,7 @@ namespace WeatherManager {
 	Real64 WeatherFileTimeZone( 0.0 );
 	Real64 WeatherFileElevation( 0.0 );
 	int WeatherFileUnitNumber; // File unit number for the weather file
-	Array1D< Real64 > GroundTemps( 12, 18.0 ); // Bldg Surface
-	Array1D< Real64 > GroundTempsFC( 12, 0.0 ); // F or C factor method
-	Array1D< Real64 > SurfaceGroundTemps( 12, 13.0 ); // Surface
-	Array1D< Real64 > DeepGroundTemps( 12, 16.0 ); // Deep
+	Array1D< Real64 > GroundTempsFCFromEPWHeader( 12, 0.0 ); // F or C factor method
 	Array1D< Real64 > GroundReflectances( 12, 0.2 ); // User Specified Ground Reflectances !EPTeam: Using DP causes big diffs
 	Real64 SnowGndRefModifier( 1.0 ); // Modifier to ground reflectance during snow
 	Real64 SnowGndRefModifierForDayltg( 1.0 ); // Modifier to ground reflectance during snow for daylighting
@@ -266,6 +266,7 @@ namespace WeatherManager {
 	bool DatesShouldBeReset( false ); // True when weekdays should be reset
 	bool StartDatesCycleShouldBeReset( false ); // True when start dates on repeat should be reset
 	bool Jan1DatesShouldBeReset( false ); // True if Jan 1 should signal reset of dates
+	bool RPReadAllWeatherData( false ); // True if need to read all weather data prior to simulation
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WeatherManager
 	//PUBLIC  ProcessDateString
@@ -289,6 +290,11 @@ namespace WeatherManager {
 	Array1D< WeatherProperties > WPSkyTemperature;
 	Array1D< SpecialDayData > SpecialDays;
 	Array1D< DataPeriodData > DataPeriods;
+
+	std::shared_ptr< BaseGroundTempsModel > siteShallowGroundTempsPtr;
+	std::shared_ptr< BaseGroundTempsModel > siteBuildingSurfaceGroundTempsPtr;
+	std::shared_ptr< BaseGroundTempsModel > siteFCFactorMethodGroundTempsPtr;
+	std::shared_ptr< BaseGroundTempsModel > siteDeepGroundTempsPtr;
 
 	static gio::Fmt fmtA( "(A)" );
 	static gio::Fmt fmtAN( "(A,$)" );
@@ -318,10 +324,11 @@ namespace WeatherManager {
 		WeatherFileTimeZone = 0.0 ;
 		WeatherFileElevation = 0.0 ;
 		WeatherFileUnitNumber = 0 ; // File unit number for the weather file
-		GroundTemps			= Array1D< Real64 >( 12, 18.0 );
-		GroundTempsFC		= Array1D< Real64 >( 12, 0.0 );
-		SurfaceGroundTemps	= Array1D< Real64 >( 12, 13.0 );
-		DeepGroundTemps		= Array1D< Real64 >( 12, 16.0 );
+		siteShallowGroundTempsPtr.reset();
+		siteBuildingSurfaceGroundTempsPtr.reset();
+		siteFCFactorMethodGroundTempsPtr.reset();
+		siteDeepGroundTempsPtr.reset();
+		GroundTempsFCFromEPWHeader = Array1D< Real64 > ( 12, 0.0 );
 		GroundReflectances	= Array1D< Real64 >( 12, 0.2 );
 
 		SnowGndRefModifier = 1.0 ; // Modifier to ground reflectance during snow
@@ -1947,7 +1954,9 @@ namespace WeatherManager {
 			OutOfRange.DirectRad = 0;
 			OutOfRange.DiffuseRad = 0;
 
-			PrintEnvrnStamp = true; // Set this to true so that on first non-warmup day (only) the environment header will print out
+			if ( !RPReadAllWeatherData ) {
+				PrintEnvrnStamp = true; // Set this to true so that on first non-warmup day (only) the environment header will print out
+			}
 
 			//    WeekDayCount=0  ! Reset weekday count (weather periods only)
 			for ( Loop = 1; Loop <= NumSpecialDays; ++Loop ) {
@@ -2237,6 +2246,7 @@ namespace WeatherManager {
 		using General::JulianDay;
 		using ScheduleManager::UpdateScheduleValues;
 		using InputProcessor::SameString;
+		using namespace GroundTemperatureManager;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2283,11 +2293,11 @@ namespace WeatherManager {
 		CurrentTime = ( HourOfDay - 1 ) + TimeStep * ( TimeStepFraction );
 		SimTimeSteps = ( DayOfSim - 1 ) * 24 * NumOfTimeStepInHour + ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
 
-		GroundTemp = GroundTemps( Month );
+		GroundTemp = siteBuildingSurfaceGroundTempsPtr->getGroundTempAtTimeInMonths( 0, Month );
 		GroundTempKelvin = GroundTemp + KelvinConv;
-		GroundTempFC = GroundTempsFC( Month );
-		GroundTemp_Surface = SurfaceGroundTemps( Month );
-		GroundTemp_Deep = DeepGroundTemps( Month );
+		GroundTempFC = siteFCFactorMethodGroundTempsPtr->getGroundTempAtTimeInMonths( 0, Month );
+		GroundTemp_Surface = siteShallowGroundTempsPtr->getGroundTempAtTimeInMonths( 0, Month );
+		GroundTemp_Deep = siteDeepGroundTempsPtr->getGroundTempAtTimeInMonths( 0, Month );
 		GndReflectance = GroundReflectances( Month );
 		GndReflectanceForDayltg = GndReflectance;
 
@@ -5203,7 +5213,7 @@ Label9999: ;
 
 		// Report the time stamp and the current weather to the output file
 
-		if ( ! WarmupFlag ) { // Write the required output information
+		if ( ! WarmupFlag && ! RPReadAllWeatherData ) { // Write the required output information
 
 			// The first time through in a non-warmup day, the environment header
 			// must be printed.  This must be done here and not in the generic
@@ -5307,7 +5317,7 @@ Label9999: ;
 		DesignDay.allocate( TotDesDays );
 		Environment.allocate( NumOfEnvrn );
 
-		// Set all Environments to False and then the weather environment will be set
+		// Set all Environments to DesignDay and then the weather environment will be set
 		//  in the get annual run data subroutine
 		for ( Env = 1; Env <= TotDesDays; ++Env ) {
 			Environment( Env ).KindOfEnvrn = ksDesignDay;
@@ -5800,7 +5810,6 @@ Label9999: ;
 				SetupWeekDaysByMonth( RunPeriodInput( 1 ).StartMonth, RunPeriodInput( 1 ).StartDay, RunPeriodInput( 1 ).DayOfWeek, RunPeriodInput( 1 ).MonWeekDay );
 			}
 		}
-
 	}
 
 	void
@@ -7362,6 +7371,7 @@ Label9999: ;
 		using namespace DataIPShortCuts;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
+		using namespace GroundTemperatureManager;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -7377,156 +7387,33 @@ Label9999: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		int GndNumAlpha; // Number of construction alpha names being passed
-		int GndNumProp; // dummy variable for properties being passed
-		int IOStat; // IO Status when calling get input subroutine
-		int I; // Loop counter variable
-		Array1D_string GndAlphas( 1 ); // Construction Alpha names defined
-		Array1D< Real64 > GndProps( 12 ); // Temporary array to transfer ground temperatures
-		static bool GenErrorMessage( false );
-
 		// Formats
 		static gio::Fmt Format_720( "(' ',A,12(', ',F6.2))" );
 
 		// FLOW:
-		cCurrentModuleObject = "Site:GroundTemperature:BuildingSurface";
-		I = GetNumObjectsFound( cCurrentModuleObject );
-		if ( I == 1 ) {
-			//Get the object names for each construction from the input processor
-			GetObjectItem( cCurrentModuleObject, 1, GndAlphas, GndNumAlpha, GndProps, GndNumProp, IOStat );
-
-			if ( GndNumProp < 12 ) {
-				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
-				ErrorsFound = true;
-			}
-
-			//Assign the ground temps to the variable
-			for ( I = 1; I <= 12; ++I ) {
-				GroundTemps( I ) = GndProps( I );
-				if ( GroundTemps( I ) < 15.0 || GroundTemps( I ) > 25.0 ) GenErrorMessage = true;
-			}
-
-			GroundTempObjInput = true;
-
-		} else if ( I > 1 ) {
-			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
-			ErrorsFound = true;
-		} else {
-			GroundTemps = 18.0;
+		// Initialize Site:GroundTemperature:BuildingSurface object
+		siteBuildingSurfaceGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "" );
+		if ( siteBuildingSurfaceGroundTempsPtr ){
+			ErrorsFound = siteBuildingSurfaceGroundTempsPtr->errorsFound;
 		}
 
-		if ( GenErrorMessage ) {
-			ShowWarningError( cCurrentModuleObject + ": Some values fall outside the range of 15-25C." );
-			ShowContinueError( "These values may be inappropriate.  Please consult the Input Output Reference for more details." );
+		// Initialize Site:GroundTemperature:FCFactorMethod object
+		siteFCFactorMethodGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "" );
+		if ( siteFCFactorMethodGroundTempsPtr ) {
+			ErrorsFound = siteFCFactorMethodGroundTempsPtr->errorsFound;	
 		}
 
-		// Write Final Ground Temp Information to the initialization output file
-		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:BuildingSurface>, Months From Jan to Dec {C}";
-		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:BuildingSurface";
-		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << GroundTemps( I ); gio::write( OutputFileInits );
-
-		//Added for ground temperatures for F and C factor defined surfaces
-		cCurrentModuleObject = "Site:GroundTemperature:FCfactorMethod";
-		I = GetNumObjectsFound( cCurrentModuleObject );
-		if ( I == 1 ) {
-			GetObjectItem( cCurrentModuleObject, 1, GndAlphas, GndNumAlpha, GndProps, GndNumProp, IOStat );
-
-			if ( GndNumProp < 12 ) {
-				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
-				ErrorsFound = true;
-			}
-
-			FCGroundTemps = true;
-			// overwrite values read from weather file for the 0.5m set ground temperatures
-			for ( I = 1; I <= 12; ++I ) {
-				GroundTempsFC( I ) = GndProps( I );
-			}
-
-		} else if ( I > 1 ) {
-			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
-			ErrorsFound = true;
-
-		} else if ( wthFCGroundTemps ) {
-			FCGroundTemps = true;
+		// Initialize Site:GroundTemperature:Shallow object
+		siteShallowGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:SHALLOW", "" );
+		if ( siteShallowGroundTempsPtr ) {
+			ErrorsFound = siteShallowGroundTempsPtr->errorsFound;
 		}
 
-		if ( FCGroundTemps ) { // Write Ground Temp Information to the initialization output file
-			gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:FCfactorMethod>, Months From Jan to Dec {C}";
-			gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:FCfactorMethod";
-			for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << GroundTempsFC( I ); gio::write( OutputFileInits );
+		// Initialize Site:GroundTemperature:Deep object
+		siteDeepGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:DEEP", "" );
+		if ( siteDeepGroundTempsPtr ) {
+			ErrorsFound = siteDeepGroundTempsPtr->errorsFound;
 		}
-
-		PubGroundTempSurfFlag = false;
-		cCurrentModuleObject = "Site:GroundTemperature:Shallow";
-		I = GetNumObjectsFound( cCurrentModuleObject );
-		if ( I == 1 ) {
-			//Get the object names for each construction from the input processor
-			GetObjectItem( cCurrentModuleObject, 1, GndAlphas, GndNumAlpha, GndProps, GndNumProp, IOStat );
-
-			if ( GndNumProp < 12 ) {
-				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
-				ErrorsFound = true;
-			}
-
-			//Assign the ground temps to the variable
-			for ( I = 1; I <= 12; ++I ) {
-				SurfaceGroundTemps( I ) = GndProps( I );
-			}
-
-			GroundTemp_SurfaceObjInput = true;
-
-		} else if ( I > 1 ) {
-			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
-			ErrorsFound = true;
-		} else {
-			SurfaceGroundTemps = 13.0;
-		}
-
-		// Write Final Ground Temp Information to the initialization output file
-		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:Shallow>, Months From Jan to Dec {C}";
-		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:Shallow";
-		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << SurfaceGroundTemps( I ); gio::write( OutputFileInits );
-
-		cCurrentModuleObject = "Site:GroundTemperature:Deep";
-		I = GetNumObjectsFound( cCurrentModuleObject );
-		if ( I == 1 ) {
-			//Get the object names for each construction from the input processor
-			GetObjectItem( cCurrentModuleObject, 1, GndAlphas, GndNumAlpha, GndProps, GndNumProp, IOStat );
-
-			if ( GndNumProp < 12 ) {
-				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
-				ErrorsFound = true;
-			}
-
-			//Assign the ground temps to the variable
-			for ( I = 1; I <= 12; ++I ) {
-				DeepGroundTemps( I ) = GndProps( I );
-			}
-
-			GroundTemp_DeepObjInput = true;
-
-		} else if ( I > 1 ) {
-			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
-			ErrorsFound = true;
-		} else {
-			DeepGroundTemps = 16.0;
-		}
-
-		// Write Final Ground Temp Information to the initialization output file
-		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:Deep>, Months From Jan to Dec {C}";
-		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:Deep";
-		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << DeepGroundTemps( I ); gio::write( OutputFileInits );
-
-		//Assigning the ground temperature array to a public array for use in other subroutines
-		//Main use is for PlantPipeHeatTransfer, where the buried pipe model needs to average
-		// a full year's worth of data at the beginning of the simulation
-		if ( GroundTemp_SurfaceObjInput ) {
-			PubGroundTempSurfFlag = true;
-			for ( I = 1; I <= 12; ++I ) {
-				PubGroundTempSurface( I ) = SurfaceGroundTemps( I );
-			}
-		}
-
 	}
 
 	void
@@ -8548,18 +8435,18 @@ Label9999: ;
 						}
 						Line.erase( 0, Pos + 1 );
 					}
-					GroundTempsFC = 0.0;
+					GroundTempsFCFromEPWHeader = 0.0;
 					actcount = 0;
 					for ( Count = 1; Count <= 12; ++Count ) { // take the first set of ground temperatures.
 						Pos = index( Line, ',' );
 						if ( Pos != std::string::npos ) {
 							Number = ProcessNumber( Line.substr( 0, Pos ), errFlag );
-							GroundTempsFC( Count ) = Number;
+							GroundTempsFCFromEPWHeader( Count ) = Number;
 							++actcount;
 						} else {
 							if ( len( Line ) > 0 ) {
 								Number = ProcessNumber( Line.substr( 0, Pos ), errFlag );
-								GroundTempsFC( Count ) = Number;
+								GroundTempsFCFromEPWHeader( Count ) = Number;
 								++actcount;
 							}
 							break;
@@ -9403,126 +9290,137 @@ Label9998: ;
 
 		// Transfer weather file information to the Environment derived type
 		Envrn = TotDesDays + 1;
+
 		// Sizing Periods from Weather File
 		for ( Loop = 1; Loop <= TotRunDesPers; ++Loop ) {
-			Environment( Envrn ).StartMonth = RunPeriodDesignInput( Loop ).StartMonth;
-			Environment( Envrn ).StartDay = RunPeriodDesignInput( Loop ).StartDay;
-			Environment( Envrn ).StartJDay = JulianDay( RunPeriodDesignInput( Loop ).StartMonth, RunPeriodDesignInput( Loop ).StartDay, LeapYearAdd );
-			Environment( Envrn ).TotalDays = RunPeriodDesignInput( Loop ).TotalDays;
-			Environment( Envrn ).EndMonth = RunPeriodDesignInput( Loop ).EndMonth;
-			Environment( Envrn ).EndDay = RunPeriodDesignInput( Loop ).EndDay;
-			Environment( Envrn ).EndJDay = JulianDay( RunPeriodDesignInput( Loop ).EndMonth, RunPeriodDesignInput( Loop ).EndDay, LeapYearAdd );
-			Environment( Envrn ).NumSimYears = RunPeriodDesignInput( Loop ).NumSimYears;
-			if ( Environment( Envrn ).StartJDay <= Environment( Envrn ).EndJDay ) {
-				Environment( Envrn ).TotalDays = ( Environment( Envrn ).EndJDay - Environment( Envrn ).StartJDay + 1 ) * Environment( Envrn ).NumSimYears;
+			auto & env = Environment( Envrn );
+			auto & runPer = RunPeriodDesignInput( Loop );
+
+			env.StartMonth = runPer.StartMonth;
+			env.StartDay = runPer.StartDay;
+			env.StartJDay = JulianDay( runPer.StartMonth, runPer.StartDay, LeapYearAdd );
+			env.TotalDays = runPer.TotalDays;
+			env.EndMonth = runPer.EndMonth;
+			env.EndDay = runPer.EndDay;
+			env.EndJDay = JulianDay( runPer.EndMonth, runPer.EndDay, LeapYearAdd );
+			env.NumSimYears = runPer.NumSimYears;
+			if ( env.StartJDay <= env.EndJDay ) {
+				env.TotalDays = ( env.EndJDay - env.StartJDay + 1 ) * env.NumSimYears;
 			} else {
-				Environment( Envrn ).TotalDays = ( JulianDay( 12, 31, LeapYearAdd ) - Environment( Envrn ).StartJDay + 1 + Environment( Envrn ).EndJDay ) * Environment( Envrn ).NumSimYears;
+				env.TotalDays = ( JulianDay( 12, 31, LeapYearAdd ) - env.StartJDay + 1 + env.EndJDay ) * env.NumSimYears;
 			}
-			TotRunDesPersDays += Environment( Envrn ).TotalDays;
-			Environment( Envrn ).UseDST = RunPeriodDesignInput( Loop ).UseDST;
-			Environment( Envrn ).UseHolidays = RunPeriodDesignInput( Loop ).UseHolidays;
-			Environment( Envrn ).Title = RunPeriodDesignInput( Loop ).Title;
-			Environment( Envrn ).cKindOfEnvrn = RunPeriodDesignInput( Loop ).PeriodType;
-			Environment( Envrn ).KindOfEnvrn = ksRunPeriodDesign;
-			Environment( Envrn ).DesignDayNum = 0;
-			Environment( Envrn ).RunPeriodDesignNum = Loop;
-			Environment( Envrn ).DayOfWeek = RunPeriodDesignInput( Loop ).DayOfWeek;
-			Environment( Envrn ).MonWeekDay = RunPeriodDesignInput( Loop ).MonWeekDay;
-			Environment( Envrn ).SetWeekDays = false;
-			Environment( Envrn ).ApplyWeekendRule = RunPeriodDesignInput( Loop ).ApplyWeekendRule;
-			Environment( Envrn ).UseRain = RunPeriodDesignInput( Loop ).UseRain;
-			Environment( Envrn ).UseSnow = RunPeriodDesignInput( Loop ).UseSnow;
+			TotRunDesPersDays += env.TotalDays;
+			env.UseDST = runPer.UseDST;
+			env.UseHolidays = runPer.UseHolidays;
+			env.Title = runPer.Title;
+			env.cKindOfEnvrn = runPer.PeriodType;
+			env.KindOfEnvrn = ksRunPeriodDesign;
+			env.DesignDayNum = 0;
+			env.RunPeriodDesignNum = Loop;
+			env.DayOfWeek = runPer.DayOfWeek;
+			env.MonWeekDay = runPer.MonWeekDay;
+			env.SetWeekDays = false;
+			env.ApplyWeekendRule = runPer.ApplyWeekendRule;
+			env.UseRain = runPer.UseRain;
+			env.UseSnow = runPer.UseSnow;
 			++Envrn;
 		}
 
 		// RunPeriods from weather file
 		for ( Loop = 1; Loop <= TotRunPers; ++Loop ) { // Run Periods.
-			Environment( Envrn ).StartMonth = RunPeriodInput( Loop ).StartMonth;
-			Environment( Envrn ).StartDay = RunPeriodInput( Loop ).StartDay;
-			Environment( Envrn ).EndMonth = RunPeriodInput( Loop ).EndMonth;
-			Environment( Envrn ).EndDay = RunPeriodInput( Loop ).EndDay;
-			Environment( Envrn ).NumSimYears = RunPeriodInput( Loop ).NumSimYears;
-			if ( RunPeriodInput( Loop ).ActualWeather ) {
-				Environment( Envrn ).CurrentYear = RunPeriodInput( Loop ).StartYear;
-				Environment( Envrn ).IsLeapYear = IsLeapYear( RunPeriodInput( Loop ).StartYear );
-				Environment( Envrn ).TreatYearsAsConsecutive = true;
-				Environment( Envrn ).StartYear = RunPeriodInput( Loop ).StartYear;
-				Environment( Envrn ).EndYear = RunPeriodInput( Loop ).EndYear;
-				JGDate( GregorianToJulian, Environment( Envrn ).StartDate, Environment( Envrn ).StartYear, Environment( Envrn ).StartMonth, Environment( Envrn ).StartDay );
-				JGDate( GregorianToJulian, Environment( Envrn ).EndDate, Environment( Envrn ).EndYear, Environment( Envrn ).EndMonth, Environment( Envrn ).EndDay );
-				Environment( Envrn ).StartJDay = Environment( Envrn ).StartDate;
-				Environment( Envrn ).EndJDay = Environment( Envrn ).EndDate;
-				Environment( Envrn ).TotalDays = Environment( Envrn ).EndDate - Environment( Envrn ).StartDate + 1;
-				Environment( Envrn ).RawSimDays = Environment( Envrn ).EndDate - Environment( Envrn ).StartDate + 1;
-				Environment( Envrn ).MatchYear = true;
-				Environment( Envrn ).ActualWeather = true;
-			} else if ( RunPeriodInput( Loop ).BeginYear < 100 ) { // std RunPeriod
-				Environment( Envrn ).CurrentYear = 0;
+			auto & env = Environment( Envrn );
+			auto & runPer = RunPeriodInput( Loop );
+
+			env.StartMonth = runPer.StartMonth;
+			env.StartDay = runPer.StartDay;
+			env.EndMonth = runPer.EndMonth;
+			env.EndDay = runPer.EndDay;
+			env.NumSimYears = runPer.NumSimYears;
+			if ( runPer.ActualWeather ) {
+				env.CurrentYear = runPer.StartYear;
+				env.IsLeapYear = IsLeapYear( runPer.StartYear );
+				env.TreatYearsAsConsecutive = true;
+				env.StartYear = runPer.StartYear;
+				env.EndYear = runPer.EndYear;
+				JGDate( GregorianToJulian, env.StartDate, env.StartYear, env.StartMonth, env.StartDay );
+				JGDate( GregorianToJulian, env.EndDate, env.EndYear, env.EndMonth, env.EndDay );
+				env.StartJDay = env.StartDate;
+				env.EndJDay = env.EndDate;
+				env.TotalDays = env.EndDate - env.StartDate + 1;
+				env.RawSimDays = env.EndDate - env.StartDate + 1;
+				env.MatchYear = true;
+				env.ActualWeather = true;
+			} else if ( runPer.BeginYear < 100 ) { // std RunPeriod
+				env.CurrentYear = 0;
 				if ( ! WFAllowsLeapYears ) {
-					Environment( Envrn ).IsLeapYear = false; // explicit set
+					env.IsLeapYear = false; // explicit set
 					LocalLeapYearAdd = 0;
 				} else {
-					Environment( Envrn ).IsLeapYear = true; // explicit set
+					env.IsLeapYear = true; // explicit set
 					LocalLeapYearAdd = 1;
 				}
-				Environment( Envrn ).TreatYearsAsConsecutive = false;
-				Environment( Envrn ).RollDayTypeOnRepeat = RunPeriodInput( Loop ).RollDayTypeOnRepeat;
-				Environment( Envrn ).StartJDay = JulianDay( RunPeriodInput( Loop ).StartMonth, RunPeriodInput( Loop ).StartDay, LocalLeapYearAdd );
-				Environment( Envrn ).EndJDay = JulianDay( RunPeriodInput( Loop ).EndMonth, RunPeriodInput( Loop ).EndDay, LocalLeapYearAdd );
+				env.TreatYearsAsConsecutive = false;
+				env.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
+				env.StartJDay = JulianDay( runPer.StartMonth, runPer.StartDay, LocalLeapYearAdd );
+				env.EndJDay = JulianDay( runPer.EndMonth, runPer.EndDay, LocalLeapYearAdd );
 				// need message if isleapyear and wfleapyearind=0
-				if ( Environment( Envrn ).StartJDay <= Environment( Envrn ).EndJDay ) {
-					Environment( Envrn ).RawSimDays = ( Environment( Envrn ).EndJDay - Environment( Envrn ).StartJDay + 1 );
-					Environment( Envrn ).TotalDays = ( Environment( Envrn ).EndJDay - Environment( Envrn ).StartJDay + 1 ) * Environment( Envrn ).NumSimYears;
+				if ( env.StartJDay <= env.EndJDay ) {
+					env.RawSimDays = ( env.EndJDay - env.StartJDay + 1 );
+					env.TotalDays = ( env.EndJDay - env.StartJDay + 1 ) * env.NumSimYears;
 				} else {
-					Environment( Envrn ).RawSimDays = ( JulianDay( 12, 31, LeapYearAdd ) - Environment( Envrn ).StartJDay + 1 + Environment( Envrn ).EndJDay );
-					Environment( Envrn ).TotalDays = ( JulianDay( 12, 31, LeapYearAdd ) - Environment( Envrn ).StartJDay + 1 + Environment( Envrn ).EndJDay ) * Environment( Envrn ).NumSimYears;
+					env.RawSimDays = ( JulianDay( 12, 31, LeapYearAdd ) - env.StartJDay + 1 + env.EndJDay );
+					env.TotalDays = ( JulianDay( 12, 31, LeapYearAdd ) - env.StartJDay + 1 + env.EndJDay ) * env.NumSimYears;
 				}
 
 			} else { // Using Runperiod and StartYear option.
-				Environment( Envrn ).CurrentYear = RunPeriodInput( Loop ).BeginYear;
-				Environment( Envrn ).IsLeapYear = IsLeapYear( Environment( Envrn ).CurrentYear );
-				Environment( Envrn ).TreatYearsAsConsecutive = true;
-				Environment( Envrn ).RollDayTypeOnRepeat = RunPeriodInput( Loop ).RollDayTypeOnRepeat;
-				Environment( Envrn ).StartJDay = JulianDay( RunPeriodInput( Loop ).StartMonth, RunPeriodInput( Loop ).StartDay, LeapYearAdd );
-				Environment( Envrn ).EndJDay = JulianDay( RunPeriodInput( Loop ).EndMonth, RunPeriodInput( Loop ).EndDay, LeapYearAdd );
-				Environment( Envrn ).TotalDays = 0;
-				for ( Loop1 = 1; Loop1 <= Environment( Envrn ).NumSimYears; ++Loop1 ) {
-					if ( ! IsLeapYear( RunPeriodInput( Loop ).BeginYear - 1 + Loop1 ) || ! WFAllowsLeapYears ) {
-						JDay1 = JulianDay( RunPeriodInput( Loop ).StartMonth, RunPeriodInput( Loop ).StartDay, 0 );
-						JDay2 = JulianDay( RunPeriodInput( Loop ).EndMonth, RunPeriodInput( Loop ).EndDay, 0 );
+				env.CurrentYear = runPer.BeginYear;
+				env.IsLeapYear = IsLeapYear( env.CurrentYear );
+				env.TreatYearsAsConsecutive = true;
+				env.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
+				env.StartJDay = JulianDay( runPer.StartMonth, runPer.StartDay, LeapYearAdd );
+				env.EndJDay = JulianDay( runPer.EndMonth, runPer.EndDay, LeapYearAdd );
+				env.TotalDays = 0;
+				for ( Loop1 = 1; Loop1 <= env.NumSimYears; ++Loop1 ) {
+					if ( ! IsLeapYear( runPer.BeginYear - 1 + Loop1 ) || ! WFAllowsLeapYears ) {
+						JDay1 = JulianDay( runPer.StartMonth, runPer.StartDay, 0 );
+						JDay2 = JulianDay( runPer.EndMonth, runPer.EndDay, 0 );
 						if ( JDay1 <= JDay2 ) {
-							if ( Loop1 == 1 ) Environment( Envrn ).RawSimDays = ( JDay2 - JDay1 + 1 );
-							Environment( Envrn ).TotalDays += ( JDay2 - JDay1 + 1 );
+							if ( Loop1 == 1 ) env.RawSimDays = ( JDay2 - JDay1 + 1 );
+							env.TotalDays += ( JDay2 - JDay1 + 1 );
 						} else {
-							if ( Loop1 == 1 ) Environment( Envrn ).RawSimDays = JulianDay( 12, 31, 0 ) - JDay1 + 1 + JDay2;
-							Environment( Envrn ).TotalDays += JulianDay( 12, 31, 0 ) - JDay1 + 1 + JDay2;
+							if ( Loop1 == 1 ) env.RawSimDays = JulianDay( 12, 31, 0 ) - JDay1 + 1 + JDay2;
+							env.TotalDays += JulianDay( 12, 31, 0 ) - JDay1 + 1 + JDay2;
 						}
 					} else { // Leap Year
-						JDay1 = JulianDay( RunPeriodInput( Loop ).StartMonth, RunPeriodInput( Loop ).StartDay, 1 );
-						JDay2 = JulianDay( RunPeriodInput( Loop ).EndMonth, RunPeriodInput( Loop ).EndDay, 1 );
+						JDay1 = JulianDay( runPer.StartMonth, runPer.StartDay, 1 );
+						JDay2 = JulianDay( runPer.EndMonth, runPer.EndDay, 1 );
 						if ( JDay1 <= JDay2 ) {
-							Environment( Envrn ).TotalDays += ( JDay2 - JDay1 + 1 );
+							env.TotalDays += ( JDay2 - JDay1 + 1 );
 						} else {
-							Environment( Envrn ).TotalDays += JulianDay( 12, 31, 1 ) - JDay1 + 1 + JDay2;
+							env.TotalDays += JulianDay( 12, 31, 1 ) - JDay1 + 1 + JDay2;
 						}
 					}
 				}
 			}
-			Environment( Envrn ).UseDST = RunPeriodInput( Loop ).UseDST;
-			Environment( Envrn ).UseHolidays = RunPeriodInput( Loop ).UseHolidays;
-			if ( RunPeriodInput( Loop ).Title == BlankString ) {
-				Environment( Envrn ).Title = WeatherFileLocationTitle;
+			env.UseDST = runPer.UseDST;
+			env.UseHolidays = runPer.UseHolidays;
+			if ( runPer.Title == BlankString ) {
+				env.Title = WeatherFileLocationTitle;
 			} else {
-				Environment( Envrn ).Title = RunPeriodInput( Loop ).Title;
+				env.Title = runPer.Title;
 			}
-			Environment( Envrn ).cKindOfEnvrn = "WeatherFileRunPeriod";
-			Environment( Envrn ).KindOfEnvrn = ksRunPeriodWeather;
-			Environment( Envrn ).DayOfWeek = RunPeriodInput( Loop ).DayOfWeek;
-			Environment( Envrn ).MonWeekDay = RunPeriodInput( Loop ).MonWeekDay;
-			Environment( Envrn ).SetWeekDays = false;
-			Environment( Envrn ).ApplyWeekendRule = RunPeriodInput( Loop ).ApplyWeekendRule;
-			Environment( Envrn ).UseRain = RunPeriodInput( Loop ).UseRain;
-			Environment( Envrn ).UseSnow = RunPeriodInput( Loop ).UseSnow;
+			if ( env.KindOfEnvrn == ksReadAllWeatherData ) {
+				env.cKindOfEnvrn = "ReadAllWeatherDataRunPeriod";
+			} else {
+				env.cKindOfEnvrn = "WeatherFileRunPeriod";
+				env.KindOfEnvrn = ksRunPeriodWeather;
+			}
+			env.DayOfWeek = runPer.DayOfWeek;
+			env.MonWeekDay = runPer.MonWeekDay;
+			env.SetWeekDays = false;
+			env.ApplyWeekendRule = runPer.ApplyWeekendRule;
+			env.UseRain = runPer.UseRain;
+			env.UseSnow = runPer.UseSnow;
 			++Envrn;
 		}
 
