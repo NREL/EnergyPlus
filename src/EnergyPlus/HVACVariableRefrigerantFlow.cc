@@ -3935,7 +3935,7 @@ namespace HVACVariableRefrigerantFlow {
 								CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 							} else {
 							// Algorithm Type: VRF model based on system curve
-							CalcVRF( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
+								CalcVRF( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 							}
 
 							// if zone temp will overshoot, pass the LoadToHeatingSP as the load to meet
@@ -4015,7 +4015,7 @@ namespace HVACVariableRefrigerantFlow {
 								CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 							} else {
 							// Algorithm Type: VRF model based on system curve
-							CalcVRF( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
+								CalcVRF( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 							}
 							
 							// if zone temp will overshoot, pass the LoadToHeatingSP as the load to meet
