@@ -348,7 +348,7 @@ namespace HVACVariableRefrigerantFlow {
 				CalcVRFIUTeTc_FluidTCtrl( VRFCondenser ); // Get the VRF IU Te/Tc
 			} else {
 			// Algorithm Type: VRF model based on system curve 
-			CalcVRFCondenser( VRFCondenser, FirstHVACIteration );
+				CalcVRFCondenser( VRFCondenser, FirstHVACIteration );
 			}
 		
 			ReportVRFCondenser( VRFCondenser );
@@ -3115,7 +3115,7 @@ namespace HVACVariableRefrigerantFlow {
 				}
 			} else if ( VRFTU( VRFTUNum ).FanPlace == DrawThru ) {
 				if ( VRFTU( VRFTUNum ).CoolingCoilPresent ) {
-					if ( ! VRFTU( VRFTUNum ).OAMixerUsed ) {
+					if ( !VRFTU( VRFTUNum ).OAMixerUsed ) {
 						if ( VRFTU( VRFTUNum ).VRFTUInletNodeNum != CCoilInletNodeNum ) {
 							ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Cooling coil inlet node name must be the same" );
 							ShowContinueError( "as the terminal unit air inlet node name when draw through fan is specified." );
@@ -3188,7 +3188,11 @@ namespace HVACVariableRefrigerantFlow {
 		if ( NumVRFTULists != NumVRFCond ) {
 			ShowSevereError( "The number of AirConditioner:VariableRefrigerantFlow objects (" + TrimSigDigits( NumVRFCond ) + ") does not match the number of ZoneTerminalUnitList objects (" + TrimSigDigits( NumVRFTULists ) + ")." );
 			for ( NumCond = 1; NumCond <= NumVRFCond; ++NumCond ) {
-				ShowContinueError( "...AirConditioner:VariableRefrigerantFlow = " + VRF( NumCond ).Name + " specifies Zone Terminal Unit List Name = " + TerminalUnitList( VRF( NumCond ).ZoneTUListPtr ).Name );
+				if ( VRF( NumCond ).ZoneTUListPtr > 0 ){
+					ShowContinueError( "...AirConditioner:VariableRefrigerantFlow = " + VRF( NumCond ).Name + " specifies Zone Terminal Unit List Name = " + TerminalUnitList( VRF( NumCond ).ZoneTUListPtr ).Name );
+				} else {
+					ShowContinueError( "...AirConditioner:VariableRefrigerantFlow = " + VRF( NumCond ).Name + " Zone Terminal Unit List Name not found." );
+				}
 			}
 			ShowContinueError( "...listing ZoneTerminalUnitList objects." );
 			for ( NumList = 1; NumList <= NumVRFTULists; ++NumList ) {
@@ -3708,9 +3712,9 @@ namespace HVACVariableRefrigerantFlow {
 			
 			//@@ XP following codes are temperarily disabled.
 			if ( VRF( VRFCond ).VRFAlgorithmTypeNum != AlgorithmTypeFluidTCtrl ) {
-			if ( ! any( TerminalUnitList( TUListIndex ).IsSimulated ) ) {
-				InitializeOperatingMode( FirstHVACIteration, VRFCond, TUListIndex, OnOffAirFlowRatio );
-			} // IF(.NOT. ANY(TerminalUnitList(TUListNum)%IsSimulated))THEN
+				if ( ! any( TerminalUnitList( TUListIndex ).IsSimulated ) ) {
+					InitializeOperatingMode( FirstHVACIteration, VRFCond, TUListIndex, OnOffAirFlowRatio );
+				} // IF(.NOT. ANY(TerminalUnitList(TUListNum)%IsSimulated))THEN
 			}
 			//*** End of Operating Mode Initialization done at beginning of each iteration ***!
 
@@ -3898,7 +3902,7 @@ namespace HVACVariableRefrigerantFlow {
 				CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 			} else {
 			// Algorithm Type: VRF model based on system curve
-			CalcVRF( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
+				CalcVRF( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 			}
 			
 			// If the Terminal Unit has a net cooling capacity (TempOutput < 0) and
@@ -3979,7 +3983,7 @@ namespace HVACVariableRefrigerantFlow {
 								CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 							} else {
 							// Algorithm Type: VRF model based on system curve
-							CalcVRF( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
+								CalcVRF( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 							}
 							
 							// if zone temp will overshoot, pass the LoadToCoolingSP as the load to meet
@@ -4057,7 +4061,7 @@ namespace HVACVariableRefrigerantFlow {
 							CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 						} else {
 						// Algorithm Type: VRF model based on system curve
-						CalcVRF( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
+							CalcVRF( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 						}
 							
 						// if zone temp will overshoot, pass the LoadToCoolingSP as the load to meet
@@ -4094,7 +4098,7 @@ namespace HVACVariableRefrigerantFlow {
 							CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 						} else {
 						// Algorithm Type: VRF model based on system curve
-						CalcVRF( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
+							CalcVRF( VRFTUNum, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 						}
 							
 						// if zone temp will overshoot, pass the LoadToHeatingSP as the load to meet
@@ -4931,7 +4935,7 @@ namespace HVACVariableRefrigerantFlow {
 				CalcVRF_FluidTCtrl( VRFTUNum, true, 0.0, TUCoolingCapacity, OnOffAirFlowRat );
 			} else {
 			// Algorithm Type: VRF model based on system curve
-			CalcVRF( VRFTUNum, true, 0.0, TUCoolingCapacity, OnOffAirFlowRat );
+				CalcVRF( VRFTUNum, true, 0.0, TUCoolingCapacity, OnOffAirFlowRat );
 			}
 							
 			//    ZoneEqDXCoil = .FALSE.
@@ -5302,8 +5306,8 @@ namespace HVACVariableRefrigerantFlow {
 			CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided );
 		} else {
 		// Algorithm Type: VRF model based on system curve
-		ControlVRF( VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio );
-		CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided );
+			ControlVRF( VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio );
+			CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided );
 		}
 		
 		VRFTU( VRFTUNum ).TerminalUnitSensibleRate = SysOutputProvided;
@@ -5411,7 +5415,7 @@ namespace HVACVariableRefrigerantFlow {
 			CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, 0.0, NoCompOutput, OnOffAirFlowRatio );
 		} else {
 		// Algorithm Type: VRF model based on system curve
-		CalcVRF( VRFTUNum, FirstHVACIteration, 0.0, NoCompOutput, OnOffAirFlowRatio );
+			CalcVRF( VRFTUNum, FirstHVACIteration, 0.0, NoCompOutput, OnOffAirFlowRatio );
 		}
 
 		if ( VRFCoolingMode && HRHeatingMode ) {
@@ -5435,7 +5439,7 @@ namespace HVACVariableRefrigerantFlow {
 			CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio );
 		} else {
 		// Algorithm Type: VRF model based on system curve
-		CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio );
+			CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio );
 		}
 		PartLoadRatio = 0.0;
 
@@ -5489,7 +5493,7 @@ namespace HVACVariableRefrigerantFlow {
 						CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio );
 					} else {
 					// Algorithm Type: VRF model based on system curve
-					CalcVRF( VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio );
+						CalcVRF( VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio );
 					}
 					
 					if ( VRFHeatingMode && TempOutput > QZnReq ) ContinueIter = false;
@@ -5527,7 +5531,7 @@ namespace HVACVariableRefrigerantFlow {
 								CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio );
 							} else {
 							// Algorithm Type: VRF model based on system curve
-							CalcVRF( VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio );
+								CalcVRF( VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio );
 							}
 							
 							ShowContinueError( " Load requested = " + TrimSigDigits( QZnReq, 5 ) + ", Load delivered = " + TrimSigDigits( TempOutput, 5 ) );
@@ -6094,7 +6098,7 @@ namespace HVACVariableRefrigerantFlow {
 			CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio );
 		} else {
 		// Algorithm Type: VRF model based on system curve
-		CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio );
+			CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio );
 		}
 		
 		PLRResidual = ( ActualOutput - QZnReq ) / QZnReqTemp;
@@ -6154,18 +6158,18 @@ namespace HVACVariableRefrigerantFlow {
 		AirRelNode = VRFTU( VRFTUNum ).VRFTUOAMixerRelNodeNum;
 
 		if ( VRF( VRFTU( VRFTUNum ).VRFSysNum  ).VRFAlgorithmTypeNum != AlgorithmTypeFluidTCtrl ) {
-		if ( VRFTU( VRFTUNum ).OpMode == CycFanCycCoil ) {
-			AverageUnitMassFlow = ( PartLoadRatio * CompOnMassFlow ) + ( ( 1 - PartLoadRatio ) * CompOffMassFlow );
-			AverageOAMassFlow = ( PartLoadRatio * OACompOnMassFlow ) + ( ( 1 - PartLoadRatio ) * OACompOffMassFlow );
-		} else {
-			AverageUnitMassFlow = CompOnMassFlow;
-			AverageOAMassFlow = OACompOnMassFlow;
-		}
-		if ( CompOffFlowRatio > 0.0 ) {
-			FanSpeedRatio = ( PartLoadRatio * CompOnFlowRatio ) + ( ( 1 - PartLoadRatio ) * CompOffFlowRatio );
-		} else {
-			FanSpeedRatio = CompOnFlowRatio;
-		}
+			if ( VRFTU( VRFTUNum ).OpMode == CycFanCycCoil ) {
+				AverageUnitMassFlow = ( PartLoadRatio * CompOnMassFlow ) + ( ( 1 - PartLoadRatio ) * CompOffMassFlow );
+				AverageOAMassFlow = ( PartLoadRatio * OACompOnMassFlow ) + ( ( 1 - PartLoadRatio ) * OACompOffMassFlow );
+			} else {
+				AverageUnitMassFlow = CompOnMassFlow;
+				AverageOAMassFlow = OACompOnMassFlow;
+			}
+			if ( CompOffFlowRatio > 0.0 ) {
+				FanSpeedRatio = ( PartLoadRatio * CompOnFlowRatio ) + ( ( 1 - PartLoadRatio ) * CompOffFlowRatio );
+			} else {
+				FanSpeedRatio = CompOnFlowRatio;
+			}
 		}
 
 		// if the terminal unit and fan are scheduled on then set flow rate
@@ -6186,19 +6190,19 @@ namespace HVACVariableRefrigerantFlow {
 					OnOffAirFlowRatio = 0.0;
 				}
 			} else {
-			Node( InletNode ).MassFlowRate = AverageUnitMassFlow;
-			Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow;
-			if ( OutsideAirNode > 0 ) {
-				Node( OutsideAirNode ).MassFlowRate = AverageOAMassFlow;
-				Node( OutsideAirNode ).MassFlowRateMaxAvail = AverageOAMassFlow;
-				Node( AirRelNode ).MassFlowRate = AverageOAMassFlow;
-				Node( AirRelNode ).MassFlowRateMaxAvail = AverageOAMassFlow;
-			}
-			if ( AverageUnitMassFlow > 0.0 ) {
-				OnOffAirFlowRatio = CompOnMassFlow / AverageUnitMassFlow;
-			} else {
-				OnOffAirFlowRatio = 0.0;
-			}
+				Node( InletNode ).MassFlowRate = AverageUnitMassFlow;
+				Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow;
+				if ( OutsideAirNode > 0 ) {
+					Node( OutsideAirNode ).MassFlowRate = AverageOAMassFlow;
+					Node( OutsideAirNode ).MassFlowRateMaxAvail = AverageOAMassFlow;
+					Node( AirRelNode ).MassFlowRate = AverageOAMassFlow;
+					Node( AirRelNode ).MassFlowRateMaxAvail = AverageOAMassFlow;
+				}
+				if ( AverageUnitMassFlow > 0.0 ) {
+					OnOffAirFlowRatio = CompOnMassFlow / AverageUnitMassFlow;
+				} else {
+					OnOffAirFlowRatio = 0.0;
+				}
 			}
 
 		} else { // terminal unit and/or fan is off
@@ -6357,7 +6361,7 @@ namespace HVACVariableRefrigerantFlow {
 						CalcVRF_FluidTCtrl( TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 					} else {
 					// Algorithm Type: VRF model based on system curve
-					CalcVRF( TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
+						CalcVRF( TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 					}
 					
 					LoadToCoolingSP = ZoneSysEnergyDemand( ThisZoneNum ).OutputRequiredToCoolingSP;
@@ -6385,7 +6389,7 @@ namespace HVACVariableRefrigerantFlow {
 										CalcVRF_FluidTCtrl( TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 									} else {
 									// Algorithm Type: VRF model based on system curve
-									CalcVRF( TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
+										CalcVRF( TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 									}
 									
 									if ( TempOutput < LoadToHeatingSP ) {
@@ -6429,7 +6433,7 @@ namespace HVACVariableRefrigerantFlow {
 										CalcVRF_FluidTCtrl( TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 									} else {
 									// Algorithm Type: VRF model based on system curve
-									CalcVRF( TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
+										CalcVRF( TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 									}
 									
 									if ( TempOutput > LoadToCoolingSP ) {
@@ -6540,7 +6544,7 @@ namespace HVACVariableRefrigerantFlow {
 					CalcVRF_FluidTCtrl( VRF( VRFCond ).MasterZoneTUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 				} else {
 				// Algorithm Type: VRF model based on system curve
-				CalcVRF( VRF( VRFCond ).MasterZoneTUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
+					CalcVRF( VRF( VRFCond ).MasterZoneTUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio );
 				}
 									
 				LoadToCoolingSP = ZoneSysEnergyDemand( VRF( VRFCond ).MasterZonePtr ).OutputRequiredToCoolingSP;
