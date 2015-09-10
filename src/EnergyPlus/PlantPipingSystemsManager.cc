@@ -398,20 +398,20 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainNum ).AggregateHeatFlux += GetZoneInterfaceHeatFlux( DomainNum );
 				PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
 				PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
-						
+
 					Xmax = ubound( PipingSystemDomains( DomainNum ).Cells, 1 );
 					Ymax = ubound( PipingSystemDomains( DomainNum ).Cells, 2 );
 					Zmax = ubound( PipingSystemDomains( DomainNum ).Cells, 3 );
 					Y = Ymax;
 					SlabArea = ( PipingSystemDomains( DomainNum ).SlabLength / 2 ) * ( PipingSystemDomains( DomainNum ).SlabWidth / 2 );
 
-					//Set ZoneTemp equal to the average air temperature of the zones the coupled surfaces are part of. 
+					//Set ZoneTemp equal to the average air temperature of the zones the coupled surfaces are part of.
 					for ( SurfCtr = 1; SurfCtr <= isize( PipingSystemDomains( DomainNum ).ZoneCoupledSurfaces ); ++SurfCtr ) {
 						ZoneNum = PipingSystemDomains( DomainNum ).ZoneCoupledSurfaces( SurfCtr ).Zone;
 						RunningTemp += ZTAV( ZoneNum );
 					}
 					ZoneTemp = RunningTemp / ( SurfCtr - 1 );
-																
+
 					WeightingFactor.allocate( { 0, Xmax }, { 0, Zmax } );
 					WeightedHeatFlux.allocate( { 0, Xmax }, { 0, Zmax } );
 					PipingSystemDomains( DomainNum ).WeightedHeatFlux.allocate( { 0, Xmax }, { 0, Zmax } );
@@ -431,7 +431,7 @@ namespace PlantPipingSystemsManager {
 					//Get heat flux for center cell first
 					WeightedHeatFlux( Xmax, Zmax ) = PipingSystemDomains( DomainNum ).HeatFlux * SlabArea / WeightingFactorTimesArea;
 
-					//Then get temperature weighted heat flux for each cell 
+					//Then get temperature weighted heat flux for each cell
 					for ( Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
 						for ( X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
 							// Zone interface cells
@@ -442,7 +442,7 @@ namespace PlantPipingSystemsManager {
 					}
 					//Finally, assign heat flux values to PipingSystem arrays for temperture calculations for this time step
 					PipingSystemDomains( DomainNum ).WeightedHeatFlux = WeightedHeatFlux;
-					
+
 				} else { // Coupled basement
 				// basement walls
 				PipingSystemDomains( DomainNum ).AggregateWallHeatFlux += GetBasementWallHeatFlux( DomainNum );
@@ -1359,7 +1359,7 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).Extents.Zmax = Domain( ZoneCoupledDomainCtr ).PerimeterOffset + PipingSystemDomains( DomainCtr ).SlabLength / 2;
 
 				// Get mesh parameters
-				
+
 				// Mesh inputs
 				{ auto const meshDistribution( uppercased( cAlphaArgs( 10 ) ) );
 				if ( meshDistribution == "UNIFORM" ) {
@@ -1371,7 +1371,7 @@ namespace PlantPipingSystemsManager {
 					PipingSystemDomains( DomainCtr ).Mesh.X.MeshDistribution = MeshDistribution_Geometric;
 					PipingSystemDomains( DomainCtr ).Mesh.Y.MeshDistribution = MeshDistribution_Geometric;
 					PipingSystemDomains( DomainCtr ).Mesh.Z.MeshDistribution = MeshDistribution_Geometric;
-					
+
 					PipingSystemDomains( DomainCtr ).Mesh.X.GeometricSeriesCoefficient = rNumericArgs( 18 );
 					PipingSystemDomains( DomainCtr ).Mesh.Y.GeometricSeriesCoefficient = rNumericArgs( 18 );
 					PipingSystemDomains( DomainCtr ).Mesh.Z.GeometricSeriesCoefficient = rNumericArgs( 18 );
@@ -1383,7 +1383,7 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).Mesh.X.RegionMeshCount = rNumericArgs( 15 );
 				PipingSystemDomains( DomainCtr ).Mesh.Y.RegionMeshCount = rNumericArgs( 16 );
 				PipingSystemDomains( DomainCtr ).Mesh.Z.RegionMeshCount = rNumericArgs( 17 );
-				
+
 				// Soil properties
 				PipingSystemDomains( DomainCtr ).GroundProperties.Conductivity = Domain( ZoneCoupledDomainCtr ).SoilConductivity;
 				PipingSystemDomains( DomainCtr ).GroundProperties.Density = Domain( ZoneCoupledDomainCtr ).SoilDensity;
@@ -1435,7 +1435,7 @@ namespace PlantPipingSystemsManager {
 					}
 					PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays = Domain( ZoneCoupledDomainCtr ).MonthOfMinSurfTemp * AvgDaysInMonth;
 				}
-				
+
 				//Determine number of slab cells in slab-in-grade configuration - set minimum slab cell thickness of 1 in
 				PipingSystemDomains( DomainCtr ).NumSlabCells = PipingSystemDomains( DomainCtr ).SlabThickness / 0.0254;
 				if ( PipingSystemDomains( DomainCtr ).NumSlabCells > PipingSystemDomains( DomainCtr ).Mesh.Y.RegionMeshCount ) {
@@ -1444,7 +1444,7 @@ namespace PlantPipingSystemsManager {
 				if ( PipingSystemDomains( DomainCtr ).NumSlabCells < 1 ) {
 					PipingSystemDomains( DomainCtr ).NumSlabCells = 1;
 				}
-			
+
 				// Unit conversion
 				PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTemp = PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays * SecsInDay;
 
@@ -1915,7 +1915,7 @@ namespace PlantPipingSystemsManager {
 		using namespace DataLoopNode;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
-		
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -4911,13 +4911,13 @@ namespace PlantPipingSystemsManager {
 				// Side X direction
 				SideXLocation = PipingSystemDomains( DomainNum ).PerimeterOffset - CellWidth / 2.0;
 				// Insulation Edge X direction
-				if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag && !PipingSystemDomains( DomainNum ).FullHorizInsPresent ) { 
+				if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag && !PipingSystemDomains( DomainNum ).FullHorizInsPresent ) {
 					SideXInsulationLocation = SideXLocation + PipingSystemDomains( DomainNum ).HorizInsWidth;
 				}
 				if ( !allocated( PipingSystemDomains( DomainNum ).Partitions.X ) ) {
 					// Partition at insulation edges in the X direction, if horizontal insulation present
 					if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ) {
-						if ( !PipingSystemDomains( DomainNum ).FullHorizInsPresent ) { 
+						if ( !PipingSystemDomains( DomainNum ).FullHorizInsPresent ) {
 							PipingSystemDomains( DomainNum ).Partitions.X.allocate( { 0, 1 } );
 							// Side X direction
 							PipingSystemDomains( DomainNum ).Partitions.X( 0 ) = MeshPartition( SideXLocation, PartitionType_XSide, CellWidth );
@@ -4942,7 +4942,7 @@ namespace PlantPipingSystemsManager {
 
 					// Partition at insulation edges in the X direction, if horizontal insulation present
 					if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ) {
-						if ( !PipingSystemDomains( DomainNum ).FullHorizInsPresent ) { 
+						if ( !PipingSystemDomains( DomainNum ).FullHorizInsPresent ) {
 							PipingSystemDomains( DomainNum ).Partitions.X.allocate( { 0, PreviousUbound + 4 } );
 							PipingSystemDomains( DomainNum ).Partitions.X( { 0, PreviousUbound } ) = PreviousEntries;
 							// Side X direction
@@ -5014,13 +5014,13 @@ namespace PlantPipingSystemsManager {
 				// Side Z direction
 				SideZLocation = PipingSystemDomains( DomainNum ).PerimeterOffset - CellWidth / 2.0;
 				// Insulation Edge Z direction
-				if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag && !PipingSystemDomains( DomainNum ).FullHorizInsPresent ) { 
+				if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag && !PipingSystemDomains( DomainNum ).FullHorizInsPresent ) {
 					SideZInsulationLocation = SideZLocation + PipingSystemDomains( DomainNum ).HorizInsWidth;
 				}
 				if ( !allocated( PipingSystemDomains( DomainNum ).Partitions.Z ) ) {
 					// Partition at insulation edges in the Z direction, if horizontal insulation present
 					if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ) {
-						if ( !PipingSystemDomains( DomainNum ).FullHorizInsPresent ) { 
+						if ( !PipingSystemDomains( DomainNum ).FullHorizInsPresent ) {
 							PipingSystemDomains( DomainNum ).Partitions.Z.allocate( { 0, 1 } );
 							// Side Z direction
 							PipingSystemDomains( DomainNum ).Partitions.Z( 0 ) = MeshPartition( SideZLocation, PartitionType_ZSide, CellWidth );
@@ -5045,7 +5045,7 @@ namespace PlantPipingSystemsManager {
 
 					// Partition at insulation edges in the Z direction, if horizontal insulation present
 					if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ) {
-						if ( !PipingSystemDomains( DomainNum ).FullHorizInsPresent ) { 
+						if ( !PipingSystemDomains( DomainNum ).FullHorizInsPresent ) {
 							PipingSystemDomains( DomainNum ).Partitions.Z.allocate( { 0, PreviousUbound + 2 } );
 							PipingSystemDomains( DomainNum ).Partitions.Z( { 0, PreviousUbound } ) = PreviousEntries;
 							// Side Z direction
@@ -5814,7 +5814,7 @@ namespace PlantPipingSystemsManager {
 							}
 						} else if ( CellXIndex == MinXIndex &&  CellZIndex > MinZIndex ) { // X side interface
 							// Check if vertical insulation present
-							if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ) { 
+							if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ) {
 								if ( CellYIndex <= cells.u2() && CellYIndex >= InsulationYIndex ) { // Check depth of vertical insulation
 									CellType = CellType_VertInsulation;
 									++TotNumCells;
@@ -5825,7 +5825,7 @@ namespace PlantPipingSystemsManager {
 								++TotNumCells;
 								++NumGroundSurfaceCells;
 							}
-							if ( !PipingSystemDomains( DomainNum ).SlabInGradeFlag ) {//Apply insulation to sides of slab in slab-on-grade configuration 
+							if ( !PipingSystemDomains( DomainNum ).SlabInGradeFlag ) {//Apply insulation to sides of slab in slab-on-grade configuration
 								if ( CellYIndex <= cells.u2( ) && CellYIndex > YIndex ) {// Check depth of slab
 									CellType = CellType_SlabOnGradeEdgeInsu;
 									++TotNumCells;
@@ -5843,7 +5843,7 @@ namespace PlantPipingSystemsManager {
 								++TotNumCells;
 								++NumGroundSurfaceCells;
 							}
-							if ( !PipingSystemDomains( DomainNum ).SlabInGradeFlag ) { //Apply insulation to sides of slab in slab-on-grade configuration 
+							if ( !PipingSystemDomains( DomainNum ).SlabInGradeFlag ) { //Apply insulation to sides of slab in slab-on-grade configuration
 								if ( CellYIndex <= cells.u2( ) && CellYIndex > YIndex ) { // Check depth of slab
 									CellType = CellType_SlabOnGradeEdgeInsu;
 									++TotNumCells;
@@ -6414,7 +6414,7 @@ namespace PlantPipingSystemsManager {
 
 		// Object Data
 		DistributionStructure ThisMesh;
-		
+
 		ThisMesh.MeshDistribution = 0; // From Enum: MeshDistribution
 		ThisMesh.RegionMeshCount = 0;
 		ThisMesh.GeometricSeriesCoefficient = 0.0;
@@ -6429,7 +6429,7 @@ namespace PlantPipingSystemsManager {
 		} else {
 			// Error
 		}}
-		
+
 		if ( ThisMesh.RegionMeshCount > 0 ) {
 			RetVal.allocate( {0,ThisMesh.RegionMeshCount - 1} );
 			RetMaxIndex = ThisMesh.RegionMeshCount - 1;
@@ -6525,7 +6525,7 @@ namespace PlantPipingSystemsManager {
 					if ( allocated( RetVal ) ) RetVal.deallocate( );
 					RetVal.allocate( { 0, NumCells - 1 } );
 					RetMaxIndex = NumCells - 1;
-					
+
 					CellWidth = GridWidth / NumCells;
 
 					for ( I = 0; I <= NumCells - 1; ++I ) {
@@ -6649,12 +6649,12 @@ namespace PlantPipingSystemsManager {
 
 		// USE STATEMENTS:
 		// na
-		
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	
+
 		auto & cells( PipingSystemDomains( DomainNum ).Cells );
 		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
 			for ( int Y = cells.l2(), Y_end = cells.u2(); Y <= Y_end; ++Y ) {
@@ -9001,7 +9001,7 @@ namespace PlantPipingSystemsManager {
 		int SegCtr2;
 		Real64 ThisCellTemp;
 
-		
+
 		//'initialize cell properties
 		auto & cells( PipingSystemDomains( DomainNum ).Cells );
 		for ( int X = cells.l1(), X_end = cells.u1(); X <= X_end; ++X ) {
@@ -9040,7 +9040,7 @@ namespace PlantPipingSystemsManager {
 					} else if ( SELECT_CASE_var == CellType_SlabOnGradeEdgeInsu ) {//These cells insulate the slab sides. Give them some properties
 						cell.MyBase.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
 						cell.MyBase.Properties.Conductivity = 0.000001; //Assign low conductivity
-					} else if ( SELECT_CASE_var == CellType_ZoneGroundInterface ) { 
+					} else if ( SELECT_CASE_var == CellType_ZoneGroundInterface ) {
 							cell.MyBase.Properties = PipingSystemDomains( DomainNum ).SlabProperties;
 					}}
 				}
@@ -9114,7 +9114,7 @@ namespace PlantPipingSystemsManager {
 					cell.MyBase.Temperature = ThisCellTemp;
 					cell.MyBase.Temperature_PrevIteration = ThisCellTemp;
 					cell.MyBase.Temperature_PrevTimeStep = ThisCellTemp;
-					
+
 
 					if ( cell.CellType == CellType_Pipe ) {
 
