@@ -2445,7 +2445,7 @@ namespace HVACUnitarySystem {
 			SizingMethod = MaxHeaterOutletTempSizing;
 			PrintFlag = true;
 			TempSize = UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp;
-			FieldNum = 18; // N18, \field Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
+			FieldNum = 17; // N17, \field Maximum Supply Air Temperature
 			SizingString = UnitarySystemNumericFields( UnitarySysNum ).FieldNames( FieldNum ) + " [C]";
 			RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 			UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp = TempSize;
