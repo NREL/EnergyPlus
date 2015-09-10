@@ -40,6 +40,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -135,6 +136,7 @@ namespace EnergyPlus {
 		ExteriorEnergyUse::clear_state();
 		Fans::clear_state();
 		GlobalNames::clear_state();
+		GroundTemperatureManager::clear_state();
 		HeatBalanceAirManager::clear_state();
 		HeatBalanceIntRadExchange::clear_state();
 		HeatBalanceManager::clear_state();
