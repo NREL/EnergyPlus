@@ -430,7 +430,7 @@ SimulationControl,
       \type integer
       \minimum 1
       \default 1
-      
+
 
 Building,
        \memo Describes parameters that are used during the simulation
@@ -19344,14 +19344,14 @@ RoomAir:Node:AirflowNetwork,
       \object-list RoomAirNodeGains
   A5; \field RoomAir:Node:AirflowNetwork:HVACEquipment Name
       \type object-list
-      \object-list RoomAirNodeHVACEquipment     
-      
- RoomAir:Node:AirflowNetwork:AdjacentSurfaceList, 
+      \object-list RoomAirNodeHVACEquipment
+
+ RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,
        \extensible:1
        \min-fields 2
   A1,  \field Name
        \type Alpha
-       \reference RoomAirNodeSurfaceLists       
+       \reference RoomAirNodeSurfaceLists
   A2 , \field Surface 1 Name
        \begin-extensible
        \type object-list
@@ -19436,7 +19436,7 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \key OtherEquipment
       \key ZoneBaseboard:OutdoorTemperatureControlled
       \key ZoneContaminantSourceAndSink:CarbonDioxide
-      \key WaterUse:Equipment     
+      \key WaterUse:Equipment
       \key DaylightingDevice:Tubular
       \key WaterHeater:Mixed
       \key WaterHeater:Stratified
@@ -19470,14 +19470,14 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \key PlantComponent:UserDefined
       \key Coil:UserDefined
       \key ZoneHVAC:ForcedAir:UserDefined
-      \key AirTerminal:SingleDuct:UserDefined   
+      \key AirTerminal:SingleDuct:UserDefined
   A3, \field Internal Gain Object 1 Name
       \type alpha
-  N1, \field Fraction of Gains to Node 1 
+  N1, \field Fraction of Gains to Node 1
       \type real
       \minimum 0.0
       \maximum 1.0
-      \note fraction applies to sensible, latent, carbon dioxide, and generic contaminant gains or losses  
+      \note fraction applies to sensible, latent, carbon dioxide, and generic contaminant gains or losses
   A4, \field Internal Gain Object 2 Type
       \type choice
       \key People
@@ -19489,7 +19489,7 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \key OtherEquipment
       \key ZoneBaseboard:OutdoorTemperatureControlled
       \key ZoneContaminantSourceAndSink:CarbonDioxide
-      \key WaterUse:Equipment     
+      \key WaterUse:Equipment
       \key DaylightingDevice:Tubular
       \key WaterHeater:Mixed
       \key WaterHeater:Stratified
@@ -19523,7 +19523,7 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \key PlantComponent:UserDefined
       \key Coil:UserDefined
       \key ZoneHVAC:ForcedAir:UserDefined
-      \key AirTerminal:SingleDuct:UserDefined  
+      \key AirTerminal:SingleDuct:UserDefined
   A5, \field Internal Gain Object 2 Name
       \type alpha
   N2, \field Fraction of Gains to Node 2
@@ -19541,7 +19541,7 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \key OtherEquipment
       \key ZoneBaseboard:OutdoorTemperatureControlled
       \key ZoneContaminantSourceAndSink:CarbonDioxide
-      \key WaterUse:Equipment     
+      \key WaterUse:Equipment
       \key DaylightingDevice:Tubular
       \key WaterHeater:Mixed
       \key WaterHeater:Stratified
@@ -19575,7 +19575,7 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \key PlantComponent:UserDefined
       \key Coil:UserDefined
       \key ZoneHVAC:ForcedAir:UserDefined
-      \key AirTerminal:SingleDuct:UserDefined  
+      \key AirTerminal:SingleDuct:UserDefined
   A7, \field Internal Gain Object 3 Name
       \type alpha
   N3; \field Fraction of Gains to Node 3
@@ -19614,7 +19614,7 @@ RoomAir:Node:AirflowNetwork:HVACEquipment,
       \key ZoneHVAC:RefrigerationChillerSet
       \key Fan:ZoneExhaust
       \key WaterHeater:HeatPump
-      \key AirTerminal:SingleDuct:Uncontrolled       
+      \key AirTerminal:SingleDuct:Uncontrolled
       \key AirTerminal:DualDuct:ConstantVolume
       \key AirTerminal:DualDuct:VAV
       \key AirTerminal:SingleDuct:ConstantVolume:Reheat
@@ -19631,16 +19631,15 @@ RoomAir:Node:AirflowNetwork:HVACEquipment,
       \key AirLoopHVACReturnAir
   A3, \field ZoneHVAC or Air Terminal Equipment Object Name 1
       \type alpha
-      \note for object type AirLoopHVACReturnAir, then enter zone return air node name 
-  N1, \field Fraction of Output or Supply Air from HVAC Equipment 1 
+      \note for object type AirLoopHVACReturnAir, then enter zone return air node name
+  N1, \field Fraction of Output or Supply Air from HVAC Equipment 1
       \type real
       \minimum 0.0
       \maximum 1.0
-      \note 
   N2, \field Fraction of Input or Return Air to HVAC Equipment 1
       \type real
       \minimum 0.0
-      \maximum 1.0        
+      \maximum 1.0
   A4, \field ZoneHVAC or Air Terminal Equipment Object Type 2
       \type choice
       \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
@@ -19665,7 +19664,7 @@ RoomAir:Node:AirflowNetwork:HVACEquipment,
       \key ZoneHVAC:RefrigerationChillerSet
       \key Fan:ZoneExhaust
       \key WaterHeater:HeatPump
-      \key AirTerminal:SingleDuct:Uncontrolled       
+      \key AirTerminal:SingleDuct:Uncontrolled
       \key AirTerminal:DualDuct:ConstantVolume
       \key AirTerminal:DualDuct:VAV
       \key AirTerminal:SingleDuct:ConstantVolume:Reheat
@@ -19681,18 +19680,18 @@ RoomAir:Node:AirflowNetwork:HVACEquipment,
       \key AirTerminal:DualDuct:VAV:OutdoorAir
   A5, \field ZoneHVAC or Air Terminal Equipment Object Name 2
       \type alpha
-  N3, \field Fraction of Output or Supply Air from HVAC Equipment 2 
+  N3, \field Fraction of Output or Supply Air from HVAC Equipment 2
       \type real
       \minimum 0.0
-      \maximum 1.0  
+      \maximum 1.0
   N4; \field Fraction of Input or Return Air to HVAC Equipment 2
       \type real
       \minimum 0.0
-      \maximum 1.0  
+      \maximum 1.0
 
-RoomAirSettings:AirflowNetwork, 
+RoomAirSettings:AirflowNetwork,
        \extensible:1
-       \memo RoomAir modeling using Airflow pressure network solver 
+       \memo RoomAir modeling using Airflow pressure network solver
        \min-fields 5
   A1 , \field Name
        \required-field
@@ -20550,7 +20549,7 @@ ElectricEquipment:ITE:AirCooled,
   A9,  \field Environmental Class
        \note Specifies the allowable operating conditions for the air inlet conditions.
        \note Used for reporting time outside allowable conditions.
-       \type choice 
+       \type choice
        \key None
        \key A1
        \key A2
@@ -20567,7 +20566,7 @@ ElectricEquipment:ITE:AirCooled,
        \note ZoneAirNode = ITE air inlet condition is  the average zone condition. 
        \note All heat output is added to the zone air heat balance as a convective gain. 
        \note RoomAirModel = ITE air inlet and outlet are connected to room air model nodes. 
-       \type choice 
+       \type choice
        \key AdjustedSupply
        \key ZoneAirNode
        \key RoomAirModel
@@ -20700,7 +20699,7 @@ SwimmingPool:Indoor,
   A4,  \field Make-up Water Supply Schedule Name
        \required-field
        \type object-list
-       \object-list ScheduleNames  
+       \object-list ScheduleNames
   A5,  \field Cover Schedule Name
        \required-field
        \type object-list
@@ -24224,7 +24223,7 @@ AirflowNetwork:IntraZone:Linkage,
       \type object-list
       \object-list AirflowNetworkComponentNames
       \note Enter the name of an AirflowNetwork component. A component is one of the
-      \note following AirflowNetwork:Multizone:Component objects:      
+      \note following AirflowNetwork:Multizone:Component objects: 
       \note AirflowNetwork:MultiZone:Surface:Crack,
       \note AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,
       \note If the next field is specified, this field can be either blank or ignored.
@@ -41473,7 +41472,7 @@ Coil:Cooling:DX:SingleSpeed,
        \note capacity and total electric power input of DX cooling coils per ANSI/ASHRAE 127.   
   A18; \field Zone Name for Condenser Placement
        \type object-list
-       \object-list ZoneNames 
+       \object-list ZoneNames
        \note This input field is name of a conditioned or unconditioned zone where the secondary 
        \note coil (condenser) of DX system or a heat pump is to be placed.  This is an optional 
        \note input field specified only when user desires to reject the condenser heat into a  
@@ -41742,12 +41741,12 @@ Coil:Cooling:DX:TwoSpeed,
        \note ff = fraction of the full load flow
   A21; \field Zone Name for Condenser Placement
        \type object-list
-       \object-list ZoneNames 
+       \object-list ZoneNames
        \note This input field is name of a conditioned or unconditioned zone where the secondary 
        \note coil (condenser) of DX system or a heat pump is to be placed.  This is an optional 
        \note input field specified only when user desires to reject the condenser heat into a  
        \note zone. The heat rejected is modelled as internal sensible heat gain of the zone.
-   
+
 Coil:Cooling:DX:MultiSpeed,
        \memo Direct expansion (DX) cooling coil and condensing unit (includes electric or
        \memo engine-driven compressor and condenser fan), multi-speed (or variable-speed).
@@ -42461,7 +42460,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Rated power consumed by the evaporative condenser's water pump at Speed 4
   A37; \field Zone Name for Condenser Placement
        \type object-list
-       \object-list ZoneNames 
+       \object-list ZoneNames
        \note This input field is name of a conditioned or unconditioned zone where the secondary 
        \note coil (condenser) of DX system or a heat pump is to be placed.  This is an optional 
        \note input field specified only when user desires to reject the condenser heat into a  
@@ -43554,7 +43553,7 @@ Coil:Heating:DX:VariableRefrigerantFlow,
        \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
        \note ff = fraction of the full load flow
 
-Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl, 
+Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \memo This is a key object in the new physics based VRF model applicable for Fluid
        \memo Temperature Control. It describes the the indoor unit coil of the system at cooling mode.
        \memo Used with ZoneHVAC:TerminalUnit:VariableRefrigerantFlow. 
@@ -43591,20 +43590,20 @@ Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \type real
        \minimum> 0.0
        \note Supply air fan heat is not included
-  N3,  \field Indoor Unit Reference Superheating 
+  N3,  \field Indoor Unit Reference Superheating
        \type real
-       \units deltaC 
+       \units deltaC
        \minimum 0.0
        \default 5.0
-  A5,  \field Indoor Unit Evaporating Temperature Function of Superheating Curve Name    
-       \required-field   
+  A5,  \field Indoor Unit Evaporating Temperature Function of Superheating Curve Name
+       \required-field
        \type object-list
        \object-list QuadraticCurves
        \object-list UniVariateTables
   A6;  \field Name of Water Storage Tank for Condensate Collection
        \type object-list
        \object-list WaterStorageTankNames
- 
+
 Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \memo This is a key object in the new physics based VRF model applicable for Fluid
        \memo Temperature Control. It describes the the indoor unit coil of the system at heating mode.
@@ -43637,13 +43636,13 @@ Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \minimum> 0.0
        \autosizable
        \note Supply air fan heat is not included
-  N2,  \field Indoor Unit Reference Subcooling 
-       \type real 
+  N2,  \field Indoor Unit Reference Subcooling
+       \type real
        \units deltaC
        \minimum 0.0
        \default 5.0
-  A5;  \field Indoor Unit Condensing Temperature Function of Subcooling Curve Name    
-       \required-field   
+  A5;  \field Indoor Unit Condensing Temperature Function of Subcooling Curve Name
+       \required-field
        \type object-list
        \object-list QuadraticCurves
        \object-list UniVariateTables
@@ -44330,8 +44329,8 @@ Coil:Heating:DX:SingleSpeed,
        \note This input field is name of sensible heat ratio modifier curve.  The value 
        \note of this curve modifies the nominal sensible heat ratio for current time step depending 
        \note on the secondary coil air flow fraction. This is an optional input field.  If this input
-       \note field is left blank, then the nominal sensible heat ratio specified will be used.   
-   
+       \note field is left blank, then the nominal sensible heat ratio specified will be used.
+
 Coil:Heating:DX:MultiSpeed,
        \memo Direct expansion (DX) heating coil (air-to-air heat pump) and compressor unit
        \memo (includes electric or engine-driven compressor and outdoor fan), multi-speed
@@ -44846,7 +44845,7 @@ Coil:Heating:DX:MultiSpeed,
        \type real
        \units m3/s
        \minimum> 0.0
-       \default 1.25   
+       \default 1.25
        \note This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  
        \note The secondary air flow rate is determined by multiplying the primary DX coil rated air 
        \note flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil 
@@ -44896,7 +44895,7 @@ Coil:Heating:DX:MultiSpeed,
        \type real
        \units m3/s
        \minimum> 0.0
-       \default 1.25   
+       \default 1.25
        \note This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  
        \note The secondary air flow rate is determined by multiplying the primary DX coil rated air 
        \note flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil 
@@ -44941,12 +44940,12 @@ Coil:Heating:DX:MultiSpeed,
        \autosizable
        \note This input value is the secondary coil (evaporator) air flow rate when the heat pump 
        \note is working in heating mode or the secondary DX coil (condenser) air flow rate when the 
-       \note heat pump is working in cooling mode.  
+       \note heat pump is working in cooling mode.
   N37, \field Speed 3 Secondary Coil Fan Flow Scaling Factor
        \type real
        \units m3/s
        \minimum> 0.0
-       \default 1.25   
+       \default 1.25
        \note This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  
        \note The secondary air flow rate is determined by multiplying the primary DX coil rated air 
        \note flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil 
@@ -45033,8 +45032,8 @@ Coil:Heating:DX:MultiSpeed,
        \note This input field is name of sensible heat ratio modifier curve.  The value 
        \note of this curve modifies the nominal sensible heat ratio for current time step depending 
        \note on the secondary coil air flow fraction. This is an optional input field.  If this input
-       \note field is left blank, then the nominal sensible heat ratio specified will be used.   
-      
+       \note field is left blank, then the nominal sensible heat ratio specified will be used.
+
 Coil:Heating:DX:VariableSpeed,
         \memo Direct expansion (DX) heating coil (air-to-air heat pump) and compressor unit
         \memo (includes electric compressor and outdoor fan), variable-speed, with defrost
@@ -48222,7 +48221,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum> 0
        \note Water Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
-       \note Can optionally include condenser pump heat. 
+       \note Can optionally include condenser pump heat.
   N4 , \field Rated Evaporator Inlet Air Dry-Bulb Temperature
        \type real
        \units C
@@ -48347,7 +48346,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note PLR = part load ratio (heating delivered/steady state heating capacity).
        \note Use curve coefficients of 1,0,0 or leave this field blank when neglecting performance impacts
        \note due to variations in part load ratio.
-  N12, \field Rated Water Heating Capacity at speed 1
+  N12, \field Rated Water Heating Capacity at Speed 1
        \required-field
        \type real
        \units W
@@ -48355,7 +48354,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N13, \field Rated Water Heating COP at speed 1
+  N13, \field Rated Water Heating COP at Speed 1
        \required-field
        \type real
        \units W/W
@@ -48364,8 +48363,8 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N14, \field Rated Sensible Heat Ratio at speed 1
-       \required-field 
+  N14, \field Rated Sensible Heat Ratio at Speed 1
+       \required-field
        \type real
        \minimum 0.5
        \maximum 1
@@ -48438,14 +48437,14 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
        \note ffw = Fraction of the full load Water Flow
-  N18, \field Rated Water Heating Capacity at speed 2
+  N18, \field Rated Water Heating Capacity at Speed 2
        \type real
        \units W
        \minimum> 0
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N19, \field Rated Water Heating COP at speed 2
+  N19, \field Rated Water Heating COP at Speed 2
        \type real
        \units W/W
        \minimum> 0
@@ -48453,7 +48452,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N20, \field Rated Sensible Heat Ratio at speed 2 
+  N20, \field Rated Sensible Heat Ratio at Speed 2
        \type real
        \minimum 0.5
        \maximum 1
@@ -48524,7 +48523,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N25, \field Rated Water Heating COP at speed 3
+  N25, \field Rated Water Heating COP at Speed 3
        \type real
        \units W/W
        \minimum> 0
@@ -48532,7 +48531,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N26, \field Rated Sensible Heat Ratio at speed 3 
+  N26, \field Rated Sensible Heat Ratio at Speed 3
        \type real
        \minimum 0.5
        \maximum 1
@@ -48596,14 +48595,14 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
        \note ffw = Fraction of the full load Water Flow
-  N30, \field Rated Water Heating Capacity at speed 4
+  N30, \field Rated Water Heating Capacity at Speed 4
        \type real
        \units W
        \minimum> 0
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N31, \field Rated Water Heating COP at speed 4
+  N31, \field Rated Water Heating COP at Speed 4
        \type real
        \units W/W
        \minimum> 0
@@ -48611,7 +48610,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N32, \field Rated Sensible Heat Ratio at speed 4 
+  N32, \field Rated Sensible Heat Ratio at Speed 4
        \type real
        \minimum 0.5
        \maximum 1
@@ -48675,14 +48674,14 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
        \note ffw = Fraction of the full load Water Flow
-  N36, \field Rated Water Heating Capacity at speed 5
+  N36, \field Rated Water Heating Capacity at Speed 5
        \type real
        \units W
        \minimum> 0
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N37, \field Rated Water Heating COP at speed 5
+  N37, \field Rated Water Heating COP at Speed 5
        \type real
        \units W/W
        \minimum> 0
@@ -48690,7 +48689,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N38, \field Rated Sensible Heat Ratio at speed 5 
+  N38, \field Rated Sensible Heat Ratio at Speed 5
        \type real
        \minimum 0.5
        \maximum 1
@@ -48754,14 +48753,14 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
        \note ffw = Fraction of the full load Water Flow
-  N42, \field Rated Water Heating Capacity at speed 6
+  N42, \field Rated Water Heating Capacity at Speed 6
        \type real
        \units W
        \minimum> 0
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N43, \field Rated Water Heating COP at speed 6
+  N43, \field Rated Water Heating COP at Speed 6
        \type real
        \units W/W
        \minimum> 0
@@ -48769,7 +48768,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N44, \field Rated Sensible Heat Ratio at speed 6 
+  N44, \field Rated Sensible Heat Ratio at Speed 6
        \type real
        \minimum 0.5
        \maximum 1
@@ -48833,14 +48832,14 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
        \note ffw = Fraction of the full load Water Flow
-  N48, \field Rated Water Heating Capacity at speed 7
+  N48, \field Rated Water Heating Capacity at Speed 7
        \type real
        \units W
        \minimum> 0
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N49, \field Rated Water Heating COP at speed 7
+  N49, \field Rated Water Heating COP at Speed 7
        \type real
        \units W/W
        \minimum> 0
@@ -48848,7 +48847,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N50, \field Rated Sensible Heat Ratio at speed 7 
+  N50, \field Rated Sensible Heat Ratio at Speed 7
        \type real
        \minimum 0.5
        \maximum 1
@@ -48912,14 +48911,14 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
        \note ffw = Fraction of the full load Water Flow
-  N54, \field Rated Water Heating Capacity at speed 8
+  N54, \field Rated Water Heating Capacity at Speed 8
        \type real
        \units W
        \minimum> 0
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N55, \field Rated Water Heating COP at speed 8
+  N55, \field Rated Water Heating COP at Speed 8
        \type real
        \units W/W
        \minimum> 0
@@ -48927,7 +48926,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N56, \field Rated Sensible Heat Ratio at speed 8 
+  N56, \field Rated Sensible Heat Ratio at Speed 8
        \type real
        \minimum 0.5
        \maximum 1
@@ -48991,14 +48990,14 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
        \note ffw = Fraction of the full load Water Flow
-  N60, \field Rated Water Heating Capacity at speed 9
+  N60, \field Rated Water Heating Capacity at Speed 9
        \type real
        \units W
        \minimum> 0
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N61, \field Rated Water Heating COP at speed 9
+  N61, \field Rated Water Heating COP at Speed 9
        \type real
        \units W/W
        \minimum> 0
@@ -49006,7 +49005,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N62, \field Rated Sensible Heat Ratio at speed 9 
+  N62, \field Rated Sensible Heat Ratio at Speed 9
        \type real
        \minimum 0.5
        \maximum 1
@@ -49070,14 +49069,14 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
        \note ffw = Fraction of the full load Water Flow
-  N66, \field Rated Water Heating Capacity at speed 10
+  N66, \field Rated Water Heating Capacity at Speed 10
        \type real
        \units W
        \minimum> 0
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N67, \field Rated Water Heating COP at speed 10
+  N67, \field Rated Water Heating COP at Speed 10
        \type real
        \units W/W
        \minimum> 0
@@ -49085,7 +49084,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N68, \field Rated Sensible Heat Ratio at speed 10 
+  N68, \field Rated Sensible Heat Ratio at Speed 10
        \type real
        \minimum 0.5
        \maximum 1
@@ -50462,7 +50461,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \note Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1,
        \note Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay,
        \note Table:OneIndependentVariable
-  N5 , \field Secondary Air Design Flow Rate  
+  N5 , \field Secondary Air Design Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
@@ -50497,7 +50496,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \type node
   A8 , \field Primary Air Outlet Node Name
        \type node
-  N9 , \field Primary Design Air Flow Rate  
+  N9 , \field Primary Design Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
@@ -50526,7 +50525,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \note up of solids in the water that would otherwise occur because of evaporation.
        \note Ratio of solids in the blowdown water to solids in the make up water.
        \note A typical value is 3.  If left blank then there is no blowdown.
-  N13, \field Evaporative Operation Minimum Limit Secondary Air Drybulb Temperature 
+  N13, \field Evaporative Operation Minimum Limit Secondary Air Drybulb Temperature
        \type real
        \note This input field value defines the secondary air inlet node drybulb temperature 
        \note limits in degreeCelsius. When the secondary side entering air dry bulb temperature 
@@ -50595,7 +50594,7 @@ EvaporativeCooler:Direct:ResearchSpecial,
   N2 , \field Recirculating Water Pump Design Power
        \units W
        \ip-units W
-       \minimum 0.0  
+       \minimum 0.0
        \note This is the design water pump or spray for evaporation at the primary air design air flow rates
        \note and cooler design effectiveness
        \autosizable
@@ -50741,7 +50740,7 @@ Humidifier:Steam:Gas,
       \units dimensionless
       \minimum> 0.0
       \maximum 1.0
-      \default 0.80   
+      \default 0.80
       \note Based on the higher heating value of fuel.
       \note If "Rated Gas Use Rate" in the field above is not auto-sized and the Inlet Water 
       \note Temperature Option input field is specified as FixedInletWaterTemperature, then the 
@@ -50771,7 +50770,7 @@ Humidifier:Steam:Gas,
       \units W
       \minimum 0.0
       \ip-units W
-      \default 0.0   
+      \default 0.0
       \note The auxiliary electric power input in watts. This amount of power will be consumed
       \note whenever the unit is available (as defined by the availability schedule). This 
       \note electric power is used for control purpose only.
@@ -50781,7 +50780,7 @@ Humidifier:Steam:Gas,
       \type node
   A6, \field Water Storage Tank Name
       \type object-list
-      \object-list WaterStorageTankNames  
+      \object-list WaterStorageTankNames
   A7; \field Inlet Water Temperature Option
       \note The inlet water temperature can be fixed at 20C as it is done for electric steam 
       \note humidifier or it can be allowed to vary with temperature of the water source.  
@@ -50792,9 +50791,9 @@ Humidifier:Steam:Gas,
       \note inlet water temperature of 20C will be assumed.  
       \type choice
       \key FixedInletWaterTemperature
-      \key VariableInletWaterTemperature 
-      \default FixedInletWaterTemperature  
-  
+      \key VariableInletWaterTemperature
+      \default FixedInletWaterTemperature
+
 Dehumidifier:Desiccant:NoFans,
        \memo This object models a solid desiccant dehumidifier. The process
        \memo air stream is the air which is dehumidified. The regeneration air
@@ -53875,7 +53874,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list ZoneTerminalUnitListNames
        \note Enter the name of a ZoneTerminalUnitList. This list connects zone terminal units to this
-       \note heat pump	   
+       \note heat pump
   A4 , \field Refrigerant Type
        \type object-list
        \object-list FluidNames
@@ -53924,61 +53923,61 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \default 16.0
        \note Enter the maximum outdoor temperature allowed for heating operation
        \note Heating is disabled below this temperature
-  N7 , \field Reference Outdoor Unit Superheating 
+  N7 , \field Reference Outdoor Unit Superheating
        \type real
-       \units deltaC  
+       \units deltaC
        \default 3
-  N8 , \field Reference Outdoor Unit Subcooling 
-       \type real 
-       \units deltaC    
+  N8 , \field Reference Outdoor Unit Subcooling
+       \type real
+       \units deltaC
        \default 5
   A5 , \field Refrigerant Temperature Control Algorithm for Indoor Unit
        \type choice
        \key ConstantTemp
        \key VariableTemp
        \default VariableTemp
-  N9 , \field Reference Evaporating Temperature for Indoor Unit 
+  N9 , \field Reference Evaporating Temperature for Indoor Unit
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is ConstantTemp
        \note Evaporating temperature is the refrigerant temperature, not air temperature
        \type real
-       \units C       
+       \units C
        \default 6.0
-  N10, \field Reference Condensing Temperature for Indoor Unit 
+  N10, \field Reference Condensing Temperature for Indoor Unit
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is ConstantTemp
        \note Condensing temperature is the refrigerant temperature, not air temperature
        \type real
-       \units C       
+       \units C
        \default 44.0
   N11, \field Variable Evaporating Temperature Minimum for Indoor Unit
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp 
        \note Evaporating temperature is the refrigerant temperature, not air temperature
        \type real
-       \units C       
+       \units C
        \default 4.0
   N12, \field Variable Evaporating Temperature Maximum for Indoor Unit
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp 
        \note Evaporating temperature is the refrigerant temperature, not air temperature
        \type real
-       \units C       
+       \units C
        \default 13.0
   N13, \field Variable Condensing Temperature Minimum for Indoor Unit
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp
        \note Condensing temperature is the refrigerant temperature, not air temperature
        \type real
-       \units C       
+       \units C
        \default 42.0
   N14, \field Variable Condensing Temperature Maximum for Indoor Unit
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp
        \note Condensing temperature is the refrigerant temperature, not air temperature
        \type real
-       \units C       
-       \default 46.0 
+       \units C
+       \default 46.0
   N15, \field Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity
        \note Enter the outdoor unit fan power per Watt of rated evaporative capacity [W/W]
        \units dimensionless
@@ -53991,52 +53990,51 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \minimum> 0.0
        \default 7.50E-5
        \type real
-  A6 , \field Outdoor Unit Evaporating Temperature Function of Superheating Curve Name    
-       \required-field   
+  A6 , \field Outdoor Unit Evaporating Temperature Function of Superheating Curve Name
+       \required-field
        \type object-list
        \object-list QuadraticCurves
        \object-list UniVariateTables
-  A7 , \field Outdoor Unit Condensing Temperature Function of Subcooling Curve Name    
-       \required-field   
+  A7 , \field Outdoor Unit Condensing Temperature Function of Subcooling Curve Name
+       \required-field
        \type object-list
        \object-list QuadraticCurves
-       \object-list UniVariateTables  
-  N17, \field Diameter of main pipe connecting outdoor unit to indoor units
+       \object-list UniVariateTables
+  N17, \field Diameter of Main Pipe Connecting Outdoor Unit to Indoor Units
        \note used to calculate the piping loss
-       \type real 
+       \type real
        \units m
        \minimum 0.0
-       \default 0.0762 
-  N18, \field Length of main pipe connecting outdoor unit to indoor units
+       \default 0.0762
+  N18, \field Length of Main Pipe Connecting Outdoor Unit to Indoor Units
        \note used to calculate the heat loss of the main pipe
-       \type real 
+       \type real
        \units m
        \minimum 0.0
        \default 30.0
-  N19, \field Equivalent length of main pipe connecting outdoor unit to indoor units
+  N19, \field Equivalent Length of Main Pipe Connecting Outdoor Unit to Indoor Units
        \note used to calculate the refrigerant pressure drop of the main pipe
-       \type real 
+       \type real
        \units m
        \minimum 0.0
        \default 36.0
-  N20, \field Height difference between the outdoor unit node and 
-       \field indoor unit node of the main pipe
+  N20, \field Height Difference Between Outdoor Unit and Indoor Units
        \note Difference between outdoor unit height and indoor unit height
        \note Positive means outdoor unit is higher than indoor unit 
        \note Negative means outdoor unit is lower than indoor unit 
-       \type real 
+       \type real
        \units m
        \default 5.0
-  N21, \field Insulation thickness of the main pipe
-       \type real 
+  N21, \field Main Pipe Insulation Thickness
+       \type real
        \units m
-       \minimum 0.0	
-	   \default 0.02
-  N22, \field Thermal conductivity of the main pipe insulation material
-       \type real 
+       \minimum 0.0
+       \default 0.02
+  N22, \field Main Pipe Insulation Thermal Conductivity
+       \type real
        \units W/m-K
-       \minimum 0.0	
-	   \default 0.032
+       \minimum 0.0
+       \default 0.032
   N23, \field Crankcase Heater Power per Compressor
        \type real
        \units W
@@ -54106,7 +54104,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \default 5.0
        \note Enter the maximum outdoor temperature above which the defrost operation is disabled
   N30, \field Compressor maximum delta Pressure
-       \type real 
+       \type real
        \units Pa
        \default 4500000.0
        \minimum 0.0
@@ -54123,7 +54121,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type real
        \note Minimum compressor speed 
        \units rev/min
-       \minimum> 0   
+       \minimum> 0
   A11, \field Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \required-field
        \type object-list
@@ -54148,90 +54146,90 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N34, \field Compressor Speed at Loading Index 3       
+  N34, \field Compressor Speed at Loading Index 3
        \type real
        \units rev/min
        \minimum> 0
-  A15, \field Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name       
+  A15, \field Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A16, \field Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name       
+  A16, \field Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N35, \field Compressor Speed at Loading Index 4       
+  N35, \field Compressor Speed at Loading Index 4
        \type real
        \units rev/min
        \minimum> 0
-  A17, \field Loading Index 4 Evaporative Capacity Multiplier Function of Temperature Curve Name       
+  A17, \field Loading Index 4 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A18, \field Loading Index 4 Compressor Power Multiplier Function of Temperature Curve Name       
+  A18, \field Loading Index 4 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N36, \field Compressor Speed at Loading Index 5       
+  N36, \field Compressor Speed at Loading Index 5
        \type real
        \units rev/min
        \minimum> 0
-  A19, \field Loading Index 5 Evaporative Capacity Multiplier Function of Temperature Curve Name       
+  A19, \field Loading Index 5 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A20, \field Loading Index 5 Compressor Power Multiplier Function of Temperature Curve Name       
+  A20, \field Loading Index 5 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N37, \field Compressor Speed at Loading Index 6       
+  N37, \field Compressor Speed at Loading Index 6
        \type real
        \units rev/min
        \minimum> 0
-  A21, \field Loading Index 6 Evaporative Capacity Multiplier Function of Temperature Curve Name       
+  A21, \field Loading Index 6 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A22, \field Loading Index 6 Compressor Power Multiplier Function of Temperature Curve Name       
+  A22, \field Loading Index 6 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N38, \field Compressor Speed at Loading Index 7       
+  N38, \field Compressor Speed at Loading Index 7
        \type real
        \units rev/min
        \minimum> 0
-  A23, \field Loading Index 7 Evaporative Capacity Multiplier Function of Temperature Curve Name       
+  A23, \field Loading Index 7 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
   A24, \field Loading Index 7 list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N39, \field Compressor Speed at Loading Index 8       
+  N39, \field Compressor Speed at Loading Index 8
        \type real
        \units rev/min
        \minimum> 0
-  A25, \field Loading Index 8 Evaporative Capacity Multiplier Function of Temperature Curve Name       
+  A25, \field Loading Index 8 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A26, \field Loading Index 8 Compressor Power Multiplier Function of Temperature Curve Name       
+  A26, \field Loading Index 8 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N40, \field Compressor Speed at Loading Index 9       
-       \type real 
+  N40, \field Compressor Speed at Loading Index 9
+       \type real
        \units rev/min
        \minimum> 0
-  A27, \field Loading Index 9 Evaporative Capacity Multiplier Function of Temperature Curve Name       
+  A27, \field Loading Index 9 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A28; \field Loading Index 9 Compressor Power Multiplier Function of Temperature Curve Name       
+  A28; \field Loading Index 9 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-	   
+
 ZoneTerminalUnitList,
           \memo List of variable refrigerant flow (VRF) terminal units served by a given VRF condensing
           \memo unit. See ZoneHVAC:TerminalUnit:VariableRefrigerantFlow and
@@ -74964,7 +74962,7 @@ DemandManager:Thermostats,
        \note can be selected by entering <Zone Name><space><Global Thermostat Object Name>.
        \type object-list
        \object-list ZoneControlThermostaticNames
-       
+
   DemandManager:Ventilation,
        \memo used for demand limiting Controller:OutdoorAir objects.
        \extensible:1 Duplicate the last field Controller:OutdoorAir Name
@@ -78393,7 +78391,7 @@ FaultModel:ThermostatOffset,
        \default 2
        \units deltaC
 
-FaultModel:HumidistatOffset, 
+FaultModel:HumidistatOffset,
    \memo This object describes fault of humidistat offset
    \min-fields 4
    A1, \field Name
@@ -78405,7 +78403,7 @@ FaultModel:HumidistatOffset,
        \required-field
        \type object-list
        \object-list ZoneControlHumidistatNames
-   A3, \field Humidistat Offset Type 
+   A3, \field Humidistat Offset Type
        \note Two types are available: 
        \note Type ThermostatOffsetIndependent
        \note Type ThermostatOffsetDependent
@@ -78420,8 +78418,8 @@ FaultModel:HumidistatOffset,
    A5, \field Severity Schedule Name
        \note This field is applicable for Type ThermostatOffsetIndependent
        \type object-list
-       \object-list ScheduleNames 
-   N1, \field Reference Humidistat Offset       
+       \object-list ScheduleNames
+   N1, \field Reference Humidistat Offset
        \note Required field for Type ThermostatOffsetIndependent
        \type real
        \minimum> -20
@@ -78432,7 +78430,7 @@ FaultModel:HumidistatOffset,
        \note Enter the name of a FaultModel:ThermostatOffset object
        \note Required field for Type ThermostatOffsetDependent
        \type object-list
-       \object-list ThermostatOffsetFaults   
+       \object-list ThermostatOffsetFaults
 
 FaultModel:Fouling:AirFilter,
    \memo This object describes fault of dirty air filters
@@ -78452,21 +78450,21 @@ FaultModel:Fouling:AirFilter,
        \note Enter the name of a fan object
        \required-field
        \type object-list
-       \object-list FansCVandOnOffandVAV 
+       \object-list FansCVandOnOffandVAV
    A4, \field Availability Schedule Name
        \type object-list
        \object-list ScheduleNames
-   A5, \field Pressure Fraction Schedule Name 
+   A5, \field Pressure Fraction Schedule Name
        \note Enter the name of a schedule 
        \note describing the variations of the fan pressure rise 
        \note in terms of multipliers to the fan design pressure rise
        \type object-list
-       \object-list ScheduleNames   
+       \object-list ScheduleNames
    A6; \field Fan Curve Name
        \note The curve describes the relationship between 
        \note the fan pressure rise and air flow rate
        \required-field
-       \type object-list 
+       \type object-list
        \object-list CubicCurves
        \object-list UniVariateTables
 
