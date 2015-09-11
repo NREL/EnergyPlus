@@ -136,8 +136,6 @@ namespace Fans {
 	// MODULE SUBROUTINES:
 	//*************************************************************************
 
-	// Functions
-
 	void
 	SimulateFanComponents(
 		std::string const & CompName,
@@ -192,7 +190,7 @@ namespace Fans {
 		}
 
 		if ( CompIndex == 0 ) {
-			FanNum = FindItemInList( CompName, Fan.FanName(), NumFans );
+			FanNum = FindItemInList( CompName, Fan, &FanEquipConditions::FanName );
 			if ( FanNum == 0 ) {
 				ShowFatalError( "SimulateFanComponents: Fan not found=" + CompName );
 			}
@@ -398,7 +396,7 @@ namespace Fans {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -452,7 +450,7 @@ namespace Fans {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -525,7 +523,7 @@ namespace Fans {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -645,7 +643,7 @@ namespace Fans {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -719,7 +717,7 @@ namespace Fans {
 			GetObjectItem( cCurrentModuleObject, NVPerfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), NightVentPerf.FanName(), NVPerfNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), NightVentPerf, &NightVentPerfData::FanName, NVPerfNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -759,7 +757,7 @@ namespace Fans {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1480,21 +1478,21 @@ namespace Fans {
 		//unused0909   Win        = Fan(FanNum)%InletAirHumRat
 		RhoAir = Fan( FanNum ).RhoAirStdInit;
 		MassFlow = Fan( FanNum ).InletAirMassFlowRate;
-		
+
 		//Faulty fan operations_Jun. 2015, zrp
 		//Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-		if ( Fan( FanNum ).FaultyFilterFlag && ( FaultsManager::NumFaultyAirFilter > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ) { 
-			
+		if ( Fan( FanNum ).FaultyFilterFlag && ( FaultsManager::NumFaultyAirFilter > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ) {
+
 			int iFault = Fan( FanNum ).FaultyFilterIndex;
-			
+
 			// Check fault availability schedules
 			if ( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).AvaiSchedPtr ) > 0.0 ) {
-				Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec] 
+				Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec]
 
-				FanDesignFlowRateDec = CalFaultyFanAirFlowReduction( Fan( FanNum ).FanName, Fan( FanNum ).MaxAirFlowRate, Fan( FanNum ).DeltaPress, 
-					( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) - 1 ) * Fan( FanNum ).DeltaPress, 
+				FanDesignFlowRateDec = CalFaultyFanAirFlowReduction( Fan( FanNum ).FanName, Fan( FanNum ).MaxAirFlowRate, Fan( FanNum ).DeltaPress,
+					( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) - 1 ) * Fan( FanNum ).DeltaPress,
 					FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterFanCurvePtr );
-				
+
 				//Update MassFlow & DeltaPress of the fan
 				MassFlow = min( MassFlow, Fan( FanNum ).MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir );
 				DeltaPress = GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) * Fan( FanNum ).DeltaPress;
@@ -1508,7 +1506,7 @@ namespace Fans {
 
 		MassFlow = min( MassFlow, Fan( FanNum ).MaxAirMassFlowRate );
 		MassFlow = max( MassFlow, Fan( FanNum ).MinAirMassFlowRate );
-		
+
 		//Determine the Fan Schedule for the Time step
 		if ( ( GetCurrentScheduleValue( Fan( FanNum ).AvailSchedPtrNum ) > 0.0 || LocalTurnFansOn ) && ! LocalTurnFansOff && MassFlow > 0.0 ) {
 			//Fan is operating
@@ -1639,22 +1637,22 @@ namespace Fans {
 		//unused0909  Win         = Fan(FanNum)%InletAirHumRat
 		RhoAir = Fan( FanNum ).RhoAirStdInit;
 		MassFlow = Fan( FanNum ).InletAirMassFlowRate;
-		
+
 		//Faulty fan operations_Apr. 2015, zrp
 		//Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
 		if ( Fan( FanNum ).FaultyFilterFlag && ( FaultsManager::NumFaultyAirFilter > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( !Fan( FanNum ).EMSMaxMassFlowOverrideOn ) ) {
-			
+
 			int iFault = Fan( FanNum ).FaultyFilterIndex;
-			
+
 			// Check fault availability schedules
 			if ( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).AvaiSchedPtr ) > 0.0 ) {
-				Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec] 
+				Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec]
 
-				FanDesignFlowRateDec = CalFaultyFanAirFlowReduction( Fan( FanNum ).FanName, Fan( FanNum ).MaxAirFlowRate, Fan( FanNum ).DeltaPress, 
-					( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) - 1 ) * Fan( FanNum ).DeltaPress, 
+				FanDesignFlowRateDec = CalFaultyFanAirFlowReduction( Fan( FanNum ).FanName, Fan( FanNum ).MaxAirFlowRate, Fan( FanNum ).DeltaPress,
+					( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) - 1 ) * Fan( FanNum ).DeltaPress,
 					FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterFanCurvePtr );
-				
-				//Update MassFlow & DeltaPress of the fan 
+
+				//Update MassFlow & DeltaPress of the fan
 				MaxAirFlowRate = Fan( FanNum ).MaxAirFlowRate - FanDesignFlowRateDec;
 				MaxAirMassFlowRate = Fan( FanNum ).MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir;
 				DeltaPress = GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) * Fan( FanNum ).DeltaPress;
@@ -1665,9 +1663,9 @@ namespace Fans {
 		if ( Fan( FanNum ).EMSFanPressureOverrideOn ) DeltaPress = Fan( FanNum ).EMSFanPressureValue;
 		if ( Fan( FanNum ).EMSFanEffOverrideOn ) FanEff = Fan( FanNum ).EMSFanEffValue;
 		if ( Fan( FanNum ).EMSMaxMassFlowOverrideOn ) MassFlow = Fan( FanNum ).EMSAirMassFlowValue;
-		
+
 		MassFlow = min( MassFlow, MaxAirMassFlowRate );
-		
+
 		//Determine the Fan Schedule for the Time step
 		if ( ( GetCurrentScheduleValue( Fan( FanNum ).AvailSchedPtrNum ) > 0.0 || LocalTurnFansOn ) && ! LocalTurnFansOff && MassFlow > 0.0 ) {
 			//Fan is operating - calculate power loss and enthalpy rise
@@ -1803,7 +1801,7 @@ namespace Fans {
 		Real64 SpeedRaisedToPower; // Result of the speed ratio raised to the power of n (Curve object)
 		Real64 EffRatioAtSpeedRatio; // Efficeincy ratio at current speed ratio (Curve object)
 		static int ErrCount( 0 );
-		
+
 		//unused0909   Tin        = Fan(FanNum)%InletAirTemp
 		//unused0909   Win        = Fan(FanNum)%InletAirHumRat
 		MassFlow = Fan( FanNum ).InletAirMassFlowRate;
@@ -1815,28 +1813,28 @@ namespace Fans {
 		//Faulty fan operations_Apr. 2015, zrp
 		//Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
 		if ( Fan( FanNum ).FaultyFilterFlag && ( FaultsManager::NumFaultyAirFilter > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( !Fan( FanNum ).EMSMaxMassFlowOverrideOn ) ) {
-			
+
 			int iFault = Fan( FanNum ).FaultyFilterIndex;
-			
+
 			// Check fault availability schedules
 			if ( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).AvaiSchedPtr ) > 0.0 ) {
-				Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec] 
+				Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec]
 
-				FanDesignFlowRateDec = CalFaultyFanAirFlowReduction( Fan( FanNum ).FanName, Fan( FanNum ).MaxAirFlowRate, Fan( FanNum ).DeltaPress, 
-					( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) - 1 ) * Fan( FanNum ).DeltaPress, 
+				FanDesignFlowRateDec = CalFaultyFanAirFlowReduction( Fan( FanNum ).FanName, Fan( FanNum ).MaxAirFlowRate, Fan( FanNum ).DeltaPress,
+					( GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) - 1 ) * Fan( FanNum ).DeltaPress,
 					FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterFanCurvePtr );
-				
+
 				//Update MassFlow & DeltaPress of the fan
 				MaxAirMassFlowRate = Fan( FanNum ).MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir;
 				DeltaPress = GetCurrentScheduleValue( FaultsManager::FaultsFouledAirFilters( iFault ).FaultyAirFilterPressFracSchePtr ) * Fan( FanNum ).DeltaPress;
 			}
 		}
-		
+
 		//EMS overwrite MassFlow, DeltaPress, and FanEff
 		if ( Fan( FanNum ).EMSMaxMassFlowOverrideOn ) MassFlow = Fan( FanNum ).EMSAirMassFlowValue;
 		if ( Fan( FanNum ).EMSFanPressureOverrideOn ) DeltaPress = Fan( FanNum ).EMSFanPressureValue;
 		if ( Fan( FanNum ).EMSFanEffOverrideOn ) FanEff = Fan( FanNum ).EMSFanEffValue;
-		
+
 		MassFlow = min( MassFlow, MaxAirMassFlowRate );
 		MassFlow = max( MassFlow, Fan( FanNum ).MinAirMassFlowRate );
 		Fan( FanNum ).FanRuntimeFraction = 0.0;
@@ -2551,7 +2549,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		FanIndex = FindItemInList( FanName, Fan.FanName(), NumFans );
+		FanIndex = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( FanIndex == 0 ) {
 			if ( present( ThisObjectType ) ) {
 				ShowSevereError( ThisObjectType() + ", GetFanIndex: Fan not found=" + FanName );
@@ -2709,7 +2707,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		FanIndex = FindItemInList( FanName, Fan.FanName(), NumFans );
+		FanIndex = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( FanIndex == 0 ) {
 			if ( present( ThisObjectType ) && present( ThisObjectName ) ) {
 				ShowSevereError( "GetFanType: " + ThisObjectType() + "=\"" + ThisObjectName() + "\", invalid Fan specified=\"" + FanName + "\"." );
@@ -2782,7 +2780,7 @@ namespace Fans {
 		if ( present( FanIndex ) ) {
 			DesignVolumeFlowRate = Fan( FanIndex ).MaxAirFlowRate;
 		} else {
-			WhichFan = FindItemInList( FanName, Fan.FanName(), NumFans );
+			WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 			if ( WhichFan != 0 ) {
 				DesignVolumeFlowRate = Fan( WhichFan ).MaxAirFlowRate;
 			} else {
@@ -2849,7 +2847,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		WhichFan = FindItemInList( FanName, Fan.FanName(), NumFans );
+		WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( WhichFan != 0 ) {
 			NodeNumber = Fan( WhichFan ).InletNodeNum;
 		} else {
@@ -2914,7 +2912,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		WhichFan = FindItemInList( FanName, Fan.FanName(), NumFans );
+		WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( WhichFan != 0 ) {
 			NodeNumber = Fan( WhichFan ).OutletNodeNum;
 		} else {
@@ -2979,7 +2977,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		WhichFan = FindItemInList( FanName, Fan.FanName(), NumFans );
+		WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( WhichFan != 0 ) {
 			FanAvailSchPtr = Fan( WhichFan ).AvailSchedPtrNum;
 		} else {
@@ -3050,11 +3048,11 @@ namespace Fans {
 				FanType = Fan( WhichFan ).FanType;
 				FanName = Fan( WhichFan ).FanName;
 			} else {
-				WhichFan = FindItemInList( FanName, Fan.FanName(), NumFans );
+				WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 				IndexIn = WhichFan;
 			}
 		} else {
-			WhichFan = FindItemInList( FanName, Fan.FanName(), NumFans );
+			WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		}
 
 		if ( WhichFan != 0 ) {
@@ -3121,7 +3119,7 @@ namespace Fans {
 		}
 
 		if ( FanNum == 0 ) {
-			WhichFan = FindItemInList( FanName, Fan.FanName(), NumFans );
+			WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		} else {
 			WhichFan = FanNum;
 		}
@@ -3165,7 +3163,6 @@ namespace Fans {
 		// REFERENCES: EnergyPlus Engineering Reference
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		Real64 DesignDeltaT; // returned delta T of matched fan [delta deg C]
@@ -3195,10 +3192,10 @@ namespace Fans {
 		return DesignDeltaT;
 
 	} // FanDesDT
-	
-	Real64 
+
+	Real64
 	CalFaultyFanAirFlowReduction(
-		std::string const FanName,            // name of the fan 
+		std::string const & FanName,          // name of the fan
 		Real64 const FanDesignAirFlowRate,    // Fan Design Volume Flow Rate [m3/sec]
 		Real64 const FanDesignDeltaPress,     // Fan Design Delta Pressure [Pa]
 		Real64 const FanFaultyDeltaPressInc,  // Increase of Fan Delta Pressure in the Faulty Case [Pa]
@@ -3213,7 +3210,7 @@ namespace Fans {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Calculate the decrease of the fan air flow rate, given the fan curve 
+		// Calculate the decrease of the fan air flow rate, given the fan curve
 		// and the increase of fan pressure rise due to fouling air filters
 
 		// METHODOLOGY EMPLOYED:
@@ -3246,30 +3243,30 @@ namespace Fans {
 		// FLOW
 
 		// Check whether the fan curve covers the design operational point of the fan
-		FanCalDeltaPress = CurveValue( FanCurvePtr, FanDesignAirFlowRate );		
+		FanCalDeltaPress = CurveValue( FanCurvePtr, FanDesignAirFlowRate );
 		if ( ( FanCalDeltaPress < 0.9 * FanDesignDeltaPress ) || ( FanCalDeltaPress > 1.1 * FanDesignDeltaPress ) ) {
 			ShowWarningError( "The design operatinal point of the fan " + FanName + " does not fall " );
 			ShowContinueError( "on the fan curve provided in the FaultModel:Fouling:AirFilter object. " );
-			return 0.0; 
-		} 
+			return 0.0;
+		}
 
-		// Calculate the Fan Volume Flow Rate in the Faulty Case 
+		// Calculate the Fan Volume Flow Rate in the Faulty Case
 		FanFaultyAirFlowRate = FanDesignAirFlowRate;
-		FanCalDeltaPresstemp = CurveValue( FanCurvePtr, FanFaultyAirFlowRate );	
-		FanCalDeltaPress = FanCalDeltaPresstemp; 	
+		FanCalDeltaPresstemp = CurveValue( FanCurvePtr, FanFaultyAirFlowRate );
+		FanCalDeltaPress = FanCalDeltaPresstemp;
 
 		while ( FanCalDeltaPress < ( FanDesignDeltaPress + FanFaultyDeltaPressInc ) ) {
 			FanFaultyAirFlowRate = FanFaultyAirFlowRate - 0.005;
-			FanCalDeltaPresstemp = CurveValue( FanCurvePtr, FanFaultyAirFlowRate );	
+			FanCalDeltaPresstemp = CurveValue( FanCurvePtr, FanFaultyAirFlowRate );
 
 			if ( ( FanCalDeltaPresstemp <= FanCalDeltaPress ) || ( FanFaultyAirFlowRate <= PerfCurve( FanCurvePtr ).Var1Min ) ) {
 			// The new operatinal point of the fan go beyond the fan selection range
 				ShowWarningError( "The operatinal point of the fan " + FanName + " may go beyond the fan selection " );
 				ShowContinueError( "range in the faulty fouling air filter cases" );
-				break; 
+				break;
 			}
 
-			FanCalDeltaPress = FanCalDeltaPresstemp; 	
+			FanCalDeltaPress = FanCalDeltaPresstemp;
 		}
 
 		return FanDesignAirFlowRate - FanFaultyAirFlowRate;
@@ -3297,7 +3294,6 @@ namespace Fans {
 		// REFERENCES: EnergyPlus Engineering Reference
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using DataSizing::CurSysNum;
 		using DataAirLoop::AirLoopControlInfo;
 
@@ -3332,12 +3328,31 @@ namespace Fans {
 
 	} // FanDesHeatGain
 
+	// Clears the global data in Fans.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumFans = 0;
+		NumNightVentPerf = 0;
+		GetFanInputFlag = true;
+		LocalTurnFansOn = false;
+		LocalTurnFansOff = false;
+
+		CheckEquipName.deallocate();
+		MySizeFlag.deallocate();
+		Fan.deallocate();
+		NightVentPerf.deallocate();
+		FanNumericFields.deallocate();
+
+	}
+
 	// End of Utility subroutines for the Fan Module
 	// *****************************************************************************
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -193,8 +193,103 @@ namespace DataHeatBalSurface {
 	Array1D_bool RecDifShortFromZ; // True if Zone gets short radiation from another
 	bool InterZoneWindow( false ); // True if there is an interzone window
 
+	// Functions
+
+	// Clears the global data in DataHeatBalSurface.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		SUMH.deallocate(); 
+		MaxSurfaceTempLimit = 200.0 ;
+		MaxSurfaceTempLimitBeforeFatal = 500.0 ;
+		CTFConstInPart.deallocate();
+		CTFConstOutPart.deallocate();
+		TempSurfIn.deallocate();
+		TempSurfInTmp.deallocate();
+		HcExtSurf.deallocate();
+		HAirExtSurf.deallocate();
+		HSkyExtSurf.deallocate();
+		HGrdExtSurf.deallocate();
+		TempSource.deallocate();
+		TempSurfInRep.deallocate();
+		QConvInReport.deallocate();
+		QdotConvInRep.deallocate();
+		QdotConvInRepPerArea.deallocate();
+		QRadNetSurfInReport.deallocate();
+		QdotRadNetSurfInRep.deallocate();
+		QdotRadNetSurfInRepPerArea.deallocate();
+		QRadSolarInReport.deallocate(); 
+		QdotRadSolarInRep.deallocate();
+		QdotRadSolarInRepPerArea.deallocate();
+		QRadLightsInReport.deallocate();
+		QdotRadLightsInRep.deallocate();
+		QdotRadLightsInRepPerArea.deallocate();
+		QRadIntGainsInReport.deallocate();
+		QdotRadIntGainsInRep.deallocate();
+		QdotRadIntGainsInRepPerArea.deallocate();
+		QRadHVACInReport.deallocate();
+		QdotRadHVACInRep.deallocate();
+		QdotRadHVACInRepPerArea.deallocate();
+		QConvOutReport.deallocate();
+		QdotConvOutRep.deallocate();
+		QdotConvOutRepPerArea.deallocate();
+		QRadOutReport.deallocate();
+		QdotRadOutRep.deallocate();
+		QdotRadOutRepPerArea.deallocate();
+		OpaqSurfInsFaceCondGainRep.deallocate();
+		OpaqSurfInsFaceCondLossRep.deallocate();
+		OpaqSurfInsFaceConduction.deallocate();
+		OpaqSurfInsFaceConductionFlux.deallocate();
+		OpaqSurfInsFaceConductionEnergy.deallocate();
+		OpaqSurfExtFaceCondGainRep.deallocate();
+		OpaqSurfExtFaceCondLossRep.deallocate();
+		OpaqSurfOutsideFaceConduction.deallocate();
+		OpaqSurfOutsideFaceConductionFlux.deallocate();
+		OpaqSurfOutsideFaceConductionEnergy.deallocate();
+		OpaqSurfAvgFaceCondGainRep.deallocate();
+		OpaqSurfAvgFaceCondLossRep.deallocate();
+		OpaqSurfAvgFaceConduction.deallocate();
+		OpaqSurfAvgFaceConductionFlux.deallocate(); 
+		OpaqSurfAvgFaceConductionEnergy.deallocate();
+		OpaqSurfStorageGainRep.deallocate();
+		OpaqSurfStorageCondLossRep.deallocate();
+		OpaqSurfStorageConduction.deallocate();
+		OpaqSurfStorageConductionFlux.deallocate();
+		OpaqSurfStorageConductionEnergy.deallocate();
+		OpaqSurfInsFaceBeamSolAbsorbed.deallocate();
+		TempSurfOut.deallocate();
+		QRadSWOutMvIns.deallocate();
+		QC.deallocate();
+		QD.deallocate();
+		QDforDaylight.deallocate();
+		QDV.deallocate();
+		TCONV.deallocate();
+		VMULT.deallocate();
+		VCONV.deallocate();
+		NetLWRadToSurf.deallocate();
+		ZoneMRT.deallocate();
+		QRadSWLightsInAbs.deallocate();
+		QRadSWOutAbs.deallocate();
+		QRadSWInAbs.deallocate();
+		InitialDifSolInAbs.deallocate();
+		InitialDifSolInTrans.deallocate();
+		TH.deallocate();
+		QH.deallocate();
+		THM.deallocate();
+		QHM.deallocate();
+		TsrcHist.deallocate();
+		QsrcHist.deallocate();
+		TsrcHistM.deallocate();
+		QsrcHistM.deallocate();
+		FractDifShortZtoZ.deallocate();
+		RecDifShortFromZ.deallocate();
+		InterZoneWindow = false;
+
+	}
+
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
@@ -211,6 +306,7 @@ namespace DataHeatBalSurface {
 	//     distribute copies to the public, perform publicly and display publicly, and to
 	//     permit others to do so.
 	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+
 
 } // DataHeatBalSurface
 

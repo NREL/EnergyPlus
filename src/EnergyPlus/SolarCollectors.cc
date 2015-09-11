@@ -49,7 +49,6 @@ namespace SolarCollectors {
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataSurfaces::Surface;
-	using DataSurfaces::TotSurfaces;
 	using DataSurfaces::SurfSunlitArea;
 	using DataSurfaces::SurfSunlitFrac;
 	using DataSurfaces::SurfaceClass_Detached_F;
@@ -142,7 +141,7 @@ namespace SolarCollectors {
 		}
 
 		if ( CompIndex == 0 ) {
-			CollectorNum = FindItemInList( CompName, Collector.Name(), NumOfCollectors );
+			CollectorNum = FindItemInList( CompName, Collector );
 			if ( CollectorNum == 0 ) {
 				ShowFatalError( "SimSolarCollector: Specified solar collector not Valid =" + CompName );
 			}
@@ -218,8 +217,6 @@ namespace SolarCollectors {
 		using General::RoundSigDigits;
 		using DataSurfaces::Surface;
 		using DataSurfaces::OSCM;
-		using DataSurfaces::TotOSCM;
-		using DataSurfaces::TotSurfaces;
 
 		// Locals
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -311,7 +308,7 @@ namespace SolarCollectors {
 				// Collector module parameters name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Parameters.Name(), ParametersNum - 1, IsNotOK, IsBlank, CurrentModuleParamObject );
+				VerifyName( cAlphaArgs( 1 ), Parameters, ParametersNum - 1, IsNotOK, IsBlank, CurrentModuleParamObject );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -391,7 +388,7 @@ namespace SolarCollectors {
 				// Collector name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Collector.Name(), CollectorNum - 1, IsNotOK, IsBlank, CurrentModuleObject );
+				VerifyName( cAlphaArgs( 1 ), Collector, CollectorNum - 1, IsNotOK, IsBlank, CurrentModuleObject );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -400,7 +397,7 @@ namespace SolarCollectors {
 				Collector( CollectorNum ).TypeNum = TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant !DSU
 
 				// Get parameters object
-				ParametersNum = FindItemInList( cAlphaArgs( 2 ), Parameters.Name(), NumOfParameters );
+				ParametersNum = FindItemInList( cAlphaArgs( 2 ), Parameters );
 
 				if ( ParametersNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": " + CurrentModuleParamObject + " object called " + cAlphaArgs( 2 ) + " not found." );
@@ -410,7 +407,7 @@ namespace SolarCollectors {
 				}
 
 				// Get surface object
-				SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface.Name(), TotSurfaces );
+				SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Surface " + cAlphaArgs( 3 ) + " not found." );
@@ -489,7 +486,7 @@ namespace SolarCollectors {
 				// Collector module parameters name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Parameters.Name(), ParametersNum - 1, IsNotOK, IsBlank, CurrentModuleParamObject );
+				VerifyName( cAlphaArgs( 1 ), Parameters, ParametersNum - 1, IsNotOK, IsBlank, CurrentModuleParamObject );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -577,7 +574,7 @@ namespace SolarCollectors {
 				// Collector name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Collector.Name(), CollectorNum - 1, IsNotOK, IsBlank, CurrentModuleObject );
+				VerifyName( cAlphaArgs( 1 ), Collector, CollectorNum - 1, IsNotOK, IsBlank, CurrentModuleObject );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -588,7 +585,7 @@ namespace SolarCollectors {
 				Collector( CollectorNum ).InitICS = true;
 
 				// Get parameters object
-				ParametersNum = FindItemInList( cAlphaArgs( 2 ), Parameters.Name(), NumOfParameters );
+				ParametersNum = FindItemInList( cAlphaArgs( 2 ), Parameters );
 
 				if ( ParametersNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": " + CurrentModuleParamObject + " object called " + cAlphaArgs( 2 ) + " not found." );
@@ -610,7 +607,7 @@ namespace SolarCollectors {
 					Collector( CollectorNum ).AreaRatio = Collector( CollectorNum ).SideArea / Collector( CollectorNum ).Area;
 				}
 				// Get surface object
-				SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface.Name(), TotSurfaces );
+				SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Surface " + cAlphaArgs( 3 ) + " not found." );
@@ -659,7 +656,7 @@ namespace SolarCollectors {
 				} else if ( SameString( cAlphaArgs( 4 ), "OtherSideConditionsModel" ) ) {
 					Collector( CollectorNum ).OSCMName = cAlphaArgs( 5 );
 					Collector( CollectorNum ).OSCM_ON = true;
-					Found = FindItemInList( Collector( CollectorNum ).OSCMName, OSCM.Name(), TotOSCM );
+					Found = FindItemInList( Collector( CollectorNum ).OSCMName, OSCM );
 					if ( Found == 0 ) {
 						ShowSevereError( cAlphaFieldNames( 5 ) + " not found=" + Collector( CollectorNum ).OSCMName + " in " + CurrentModuleObject + " =" + Collector( CollectorNum ).Name );
 						ErrorsFound = true;
@@ -2220,7 +2217,6 @@ namespace SolarCollectors {
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::ExtVentedCavity;
 		using DataSurfaces::TotExtVentCav;
 
@@ -2311,7 +2307,7 @@ namespace SolarCollectors {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

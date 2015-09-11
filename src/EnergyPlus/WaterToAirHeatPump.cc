@@ -172,7 +172,7 @@ namespace WaterToAirHeatPump {
 		}
 
 		if ( CompIndex == 0 ) {
-			HPNum = FindItemInList( CompName, WatertoAirHP.Name(), NumWatertoAirHPs );
+			HPNum = FindItemInList( CompName, WatertoAirHP );
 			if ( HPNum == 0 ) {
 				ShowFatalError( "WaterToAir HP not found=" + CompName );
 			}
@@ -320,7 +320,7 @@ namespace WaterToAirHeatPump {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), WatertoAirHP.Name(), HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), WatertoAirHP, HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -427,7 +427,7 @@ namespace WaterToAirHeatPump {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), WatertoAirHP.Name(), HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), WatertoAirHP, HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -2327,7 +2327,7 @@ namespace WaterToAirHeatPump {
 			GetCoilsInputFlag = false;
 		}
 
-		IndexNum = FindItemInList( CoilName, WatertoAirHP.Name(), NumWatertoAirHPs );
+		IndexNum = FindItemInList( CoilName, WatertoAirHP );
 
 		if ( IndexNum == 0 ) {
 			ShowSevereError( "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
@@ -2394,7 +2394,7 @@ namespace WaterToAirHeatPump {
 		}
 
 		if ( SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) || SameString( CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) ) {
-			WhichCoil = FindItemInList( CoilName, WatertoAirHP.Name(), NumWatertoAirHPs );
+			WhichCoil = FindItemInList( CoilName, WatertoAirHP );
 			if ( WhichCoil != 0 ) {
 				if ( SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) ) {
 					CoilCapacity = WatertoAirHP( WhichCoil ).HeatingCapacity;
@@ -2470,7 +2470,7 @@ namespace WaterToAirHeatPump {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, WatertoAirHP.Name(), NumWatertoAirHPs );
+		WhichCoil = FindItemInList( CoilName, WatertoAirHP );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = WatertoAirHP( WhichCoil ).AirInletNodeNum;
 		}
@@ -2539,7 +2539,7 @@ namespace WaterToAirHeatPump {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, WatertoAirHP.Name(), NumWatertoAirHPs );
+		WhichCoil = FindItemInList( CoilName, WatertoAirHP );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = WatertoAirHP( WhichCoil ).AirOutletNodeNum;
 		}

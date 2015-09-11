@@ -27,15 +27,17 @@ namespace HeatBalanceSurfaceManager {
 	// Initialization routines for module
 
 	// Algorithms for the module
-	// These are now external subroutines
-	//PUBLIC  CalcHeatBalanceOutsideSurf  ! The heat balance routines are now public because the
-	//PUBLIC  CalcHeatBalanceInsideSurf   ! radiant systems need access to them in order to simulate
+	// These old external subroutines have been moved into the namespace and are no longer externals
+	// CalcHeatBalanceOutsideSurf  ! The heat balance routines are now public because the
+	//  CalcHeatBalanceInsideSurf   ! radiant systems need access to them in order to simulate
 
 	// Record Keeping/Utility Routines for Module
 
 	// Reporting routines for module
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageSurfaceHeatBalance();
@@ -106,14 +108,14 @@ namespace HeatBalanceSurfaceManager {
 	// End of Reporting subroutines for the HB Module
 	// *****************************************************************************
 
-} // HeatBalanceSurfaceManager
+
 
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
 
-// EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager)
+// Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) but now moved into namespace HeatBalanceSurfaceManager
 
 void
 CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate = _ ); // if passed in, then only calculate surfaces that have this zone
@@ -136,29 +138,33 @@ CalcExteriorVentedCavity( int const SurfNum ); // index of surface
 void
 GatherComponentLoadsSurfAbsFact();
 
+} // HeatBalanceSurfaceManager
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
 
-//     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-//     and The Regents of the University of California through Ernest Orlando Lawrence
-//     Berkeley National Laboratory.  All rights reserved.
-//     Portions of the EnergyPlus software package have been developed and copyrighted
-//     by other individuals, companies and institutions.  These portions have been
-//     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in main.cc.
-//     NOTICE: The U.S. Government is granted for itself and others acting on its
-//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-//     reproduce, prepare derivative works, and perform publicly and display publicly.
-//     Beginning five (5) years after permission to assert copyright is granted,
-//     subject to two possible five year renewals, the U.S. Government is granted for
-//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-//     worldwide license in this data to reproduce, prepare derivative works,
-//     distribute copies to the public, perform publicly and display publicly, and to
-//     permit others to do so.
-//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	//     NOTICE
+	
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
+	//     and The Regents of the University of California through Ernest Orlando Lawrence
+	//     Berkeley National Laboratory.  All rights reserved.
+	
+	//     Portions of the EnergyPlus software package have been developed and copyrighted
+	//     by other individuals, companies and institutions.  These portions have been
+	//     incorporated into the EnergyPlus software package under license.   For a complete
+	//     list of contributors, see "Notice" located in main.cc.
+	
+	//     NOTICE: The U.S. Government is granted for itself and others acting on its
+	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
+	//     reproduce, prepare derivative works, and perform publicly and display publicly.
+	//     Beginning five (5) years after permission to assert copyright is granted,
+	//     subject to two possible five year renewals, the U.S. Government is granted for
+	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
+	//     worldwide license in this data to reproduce, prepare derivative works,
+	//     distribute copies to the public, perform publicly and display publicly, and to
+	//     permit others to do so.
+	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

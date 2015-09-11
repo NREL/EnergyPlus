@@ -156,6 +156,13 @@ namespace SimulationManager {
 	// MODULE SUBROUTINES:
 
 	// Functions
+	void
+	clear_state()
+	{
+		RunPeriodsInInput = false ;
+		RunControlInInput = false ;
+	}
+
 
 	void
 	ManageSimulation()
@@ -2480,7 +2487,7 @@ namespace SimulationManager {
 		std::string ErrorMessage;
 
 		gio::close( CacheIPErrorFile );
-		gio::open( CacheIPErrorFile, "eplusout.iperr" );
+		gio::open( CacheIPErrorFile, DataStringGlobals::outputIperrFileName );
 		iostatus = 0;
 		while ( iostatus == 0 ) {
 			{ IOFlags flags; gio::read( CacheIPErrorFile, fmtA, flags ) >> ErrorMessage; iostatus = flags.ios(); }
@@ -2778,8 +2785,8 @@ Resimulate(
 	if ( ResimHB ) {
 		// Surface simulation
 		InitSurfaceHeatBalance();
-		CalcHeatBalanceOutsideSurf();
-		CalcHeatBalanceInsideSurf();
+		HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf();
+		HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
 
 		// Air simulation
 		InitAirHeatBalance();
@@ -2804,7 +2811,7 @@ Resimulate(
 }
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

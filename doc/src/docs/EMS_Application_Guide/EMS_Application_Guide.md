@@ -1,4 +1,4 @@
-![](EMS_Application_Guide/media/ep.gif)
+![](media/ep.gif)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
@@ -1201,6 +1201,12 @@ The internal variable called “Outdoor Air Controller Minimum Mass Flow Rate”
 
 The internal variable called “Pump Maximum Mass Flow Rate” provides information about the size of the pump. The units are kg/s. This is the mass flow rate associated with the volume flow rate entered into the Rated Flow Rate (m<sup>3</sup>/s) in the various pump input objects. This internal variable is useful for scaling the flow rates assigned to the “Pump Mass Flow Rate” control in the “Pump” EMS actuator.
 
+### Unitary Systems
+
+#### Unitary System Control Zone Mass Flow Fraction
+
+The internal variable called “Unitary System Control Zone Mass Flow Fraction” is used to adjust the zone load such that the total load met by the HVAC system, when distributed to the conditioned zones, will meet the controlling zones load. The controlling zone is the zone with the thermostat. See the AirloopHVAC:UnitarySystem input field named "Controlling Zone or Thermostat Location."
+
 ### Low Temperature Radiant Hydronic
 
 #### Constant Flow Low Temp Radiant Design Water Mass Flow Rate
@@ -1215,6 +1221,17 @@ The internal variable called “Hydronic Low Temp Radiant Design Water Mass Flow
 
 The internal variable called “Hydronic Low Temp Radiant Design Water Mass Flow Rate for Heating” provides information about the cooling design water flow rate for radiant systems defined using a ZoneHVAC:LowTemperatureRadiant:VariableFlow input object. The units are m<sup>3</sup>/s. This internal variable is useful for scaling the flow rates assigned to the “Water Mass Flow Rate” control in the “Hydronic Low Temp Radiant” EMS actuator.
 
+### Boiler Nominal Ratings
+
+#### Boiler Nominal Capacity
+
+The internal variable called “Boiler Nominal Capacity” provides information about the nominal heating capacity of boiler equipment. The units are Watts. 
+
+### Chiller Nominal Ratings
+
+#### Chiller Nominal Capacity
+
+The internal variable called “Chiller Nominal Capacity” provides information about the nominal cooling capacity of chiller equipment. The units are Watts. 
 
 
 On-Site Electricity Production
@@ -1717,13 +1734,13 @@ The best calling point will depend on the type of actuator being controlled and 
 
 This section starts with a series of three figures and then discusses them and the 14 calling points. Figure 1 shows the overall flow of an EnergyPlus model with some EMS calling points. Figure 2 shows the sequence for a single timestep with the remaining EMS calling points. Figure 3 is similar but shows the calling points for shortened system timesteps. These diagram the flow of procedures during a run from top to bottom.
 
-![EMSCallingPointDiagOverall](EMS_Application_Guide/media/image003.jpg)
+![EMSCallingPointDiagOverall](media/image003.jpg)
 
 Figure 1. Overall Program Flow and EMS Calling Points
 
 
 
-![EMSCallingPointDiagTimestep](EMS_Application_Guide/media/image004.jpg)
+![EMSCallingPointDiagTimestep](media/image004.jpg)
 
 Figure 2. Timestep Sequence with EMS Calling Points
 
@@ -1731,7 +1748,7 @@ Figure 2. Timestep Sequence with EMS Calling Points
 
 
 
-![EMSCallingPointDiagSystemTimestep](EMS_Application_Guide/media/image005.jpg)
+![EMSCallingPointDiagSystemTimestep](media/image005.jpg)
 
 Figure 3. System Timestep Sequence with EMS Calling Points
 
@@ -2578,7 +2595,7 @@ EnergyManagementSystem:Program,
    SET Tmax = @MAX Tmax        TzoneVAV1_3  ,
    SET Tmax = @MAX Tmax        TzoneVAV1_4  ,
    SET Tmax = @MAX Tmax        TzoneVAV1_5  ,
-   IF Tmin &lt; VAV1_heating_TurnOn ,
+   IF Tmin < VAV1_heating_TurnOn ,
      SET VAV_1_NightCycleStatus = CycleOn,
      RETURN,  ! need to exit early or cooling check could also trigger
    ELSEIF Tmin &gt; VAV1_heating_TurnOff,
@@ -2586,7 +2603,7 @@ EnergyManagementSystem:Program,
    ENDIF,
    IF Tmax &gt; VAV1_cooling_TurnOn,
      SET VAV_1_NightCycleStatus = CycleOn,
-   ELSEIF Tmax &lt; VAV1_cooling_TurnOff,
+   ELSEIF Tmax < VAV1_cooling_TurnOff,
      SET VAV_1_NightCycleStatus = NoAction   ,
    ENDIF;
 ```
@@ -2639,7 +2656,7 @@ Because we do not know the exactly what the user had in mind, for this example w
 
 <div>$$
   F_{open} = \begin{array}{ll}
-    0.0 & RH < 25\% \\
+    0.0 & RH &lt; 25\% \\
     \frac{RH-25}{60-25} & 25\% \leq RH \leq 60\% \\
     1.0 & RH > 60\%  
   \end{array}
@@ -2671,7 +2688,7 @@ EnergyManagementSystem:ProgramCallingManager,
 
 EnergyManagementSystem:Program,
   RH_OpeningController ,     ! Name
-  IF ZoneRH &lt; 25,
+  IF ZoneRH < 25,
     SET MyOpenFactor = 0.0 ,
   ELSEIF ZoneRH &gt; 60,
     SET MyOpenFactor = 1.0 ,
@@ -2743,7 +2760,7 @@ The EMS input objects for this example follow and are contained in the example f
    IF PMVrunningAvg &gt; 2.5,
      SET tmpError = @FatalHaltEp 1002.50, ! error code "1002.50" for comfort avg over 2.5
    ENDIF,
-   IF PMVrunningAvg &lt; 0.0 - 1.3,
+   IF PMVrunningAvg < 0.0 - 1.3,
      SET tmpError = @FatalHaltEp 9001.30, ! error code "9001.30" for comfort avg under - 1.3
    ENDIF;
 ```
@@ -2788,11 +2805,11 @@ Schedule:Constant,
       Set myCLGSETP_SCH_Override = 30.0  ,
     ELSEIF (Holiday == 3.0) && (DayOfMonth == 21) && (Month == 1),  !winter design day
       Set myCLGSETP_SCH_Override = 30.0 ,
-    ELSEIF HOUR &lt; 6       ,
+    ELSEIF HOUR < 6       ,
       Set myCLGSETP_SCH_Override = 30.0  ,
-    ELSEIF (Hour &gt;= 6) && (Hour &lt; 22)  && (DayOfWeek &gt;=2) && (DayOfWeek &lt;=6) ,
+    ELSEIF (Hour &gt;= 6) && (Hour < 22)  && (DayOfWeek &gt;=2) && (DayOfWeek <=6) ,
       Set myCLGSETP_SCH_Override = 24.0  ,
-    ELSEIF (Hour &gt;= 6) && (hour &lt; 18) && (DayOfWeek == 7)
+    ELSEIF (Hour &gt;= 6) && (hour < 18) && (DayOfWeek == 7)
       Set myCLGSETP_SCH_Override = 24.0  ,
     ELSEIF (Hour &gt;= 6) && (hour &gt;= 18) && (DayOfWeek == 7)
       Set myCLGSETP_SCH_Override = 30.0  ,
@@ -2818,15 +2835,15 @@ Schedule:Constant,
      Set myHTGSETP_SCH = 15.6  ,
    ELSEIF (Holiday == 3.0) && (DayOfYear == 21),  !winter design day
      Set myHTGSETP_SCH = 21.0 ,
-   ELSEIF HOUR &lt; 5       ,        
+   ELSEIF HOUR < 5       ,        
      Set myHTGSETP_SCH = 15.6  ,
-   ELSEIF (Hour &gt;= 5) && (Hour &lt; 19)  && (DayOfWeek &gt;=2) && (DayOfWeek &lt;=6) ,
+   ELSEIF (Hour >= 5) && (Hour < 19)  && (DayOfWeek &gt;=2) && (DayOfWeek <=6) ,
      Set myHTGSETP_SCH = 21.0  ,
-   ELSEIF (Hour &gt;= 6) && (hour &lt; 17) && (DayOfWeek == 7),
+   ELSEIF (Hour >= 6) && (hour < 17) && (DayOfWeek == 7),
      Set myHTGSETP_SCH = 21.0  ,
-   ELSEIF (Hour &gt;= 6) && (hour &gt;= 17) && (DayOfWeek == 7) ,
+   ELSEIF (Hour >= 6) && (hour <= 17) && (DayOfWeek == 7) ,
      Set myHTGSETP_SCH = 15.6   ,
-   ELSEIF (Hour &gt;= 19)          ,
+   ELSEIF (Hour >= 19)          ,
      Set myHTGSETP_SCH = 15.6   ,
    ENDIF;
 ```
@@ -2915,7 +2932,7 @@ EnergyManagementSystem:Program,
   Set IncidentAngleRad = @ArcCos Solar_Beam_Incident_Cos,
   Set IncidentAngle   = @RadToDeg IncidentAngleRad,
   !
-  IF IncidentAngle &lt; 45 , ! Block intense direct sun
+  IF IncidentAngle < 45 , ! Block intense direct sun
    Set Zn001_Wall001_Win001_Shading_Deploy_Status = Shade_Status_Interior_Blind_On,
   ELSEIF Zone_Sensible_Cool_Rate &gt; 20, ! block to reduce cooling loads
    Set Zn001_Wall001_Win001_Shading_Deploy_Status = Shade_Status_Interior_Blind_On,
@@ -3061,17 +3078,17 @@ EnergyManagementSystem:ProgramCallingManager,
 EnergyManagementSystem:Program,
   Determine_Purch_Air_State,     ! Name
   ! State representation:  1.0 is heating, 2.0 is cooling
-  IF (Sensible_Load_Zone_1 &lt;= 0.0) ,
+  IF (Sensible_Load_Zone_1 <= 0.0) ,
     SET Zone_1_State = 2.0,
   ELSEIF (Sensible_Load_Zone_1 &gt; 0.0) ,
     SET Zone_1_State = 1.0,
   ENDIF,
-  IF (Sensible_Load_Zone_2 &lt;= 0.0) ,
+  IF (Sensible_Load_Zone_2 <= 0.0) ,
     SET Zone_2_State = 2.0,
   ELSEIF (Sensible_Load_Zone_2 &gt; 0.0) ,
     SET Zone_2_State = 1.0,
   ENDIF,
-  IF (Sensible_Load_Zone_3 &lt;= 0.0) ,
+  IF (Sensible_Load_Zone_3 <= 0.0) ,
     SET Zone_3_State = 2.0,
   ELSEIF (Sensible_Load_Zone_3 &gt; 0.0) ,
     SET Zone_3_State = 1.0,
@@ -3144,7 +3161,7 @@ One tension often arises with modeling when options being evaluated have an indi
 
 ### EMS Design Discussion
 
-Examining the vendor’s literature for one line of commercial packaged single-zone HVAC air systems shows that the nominal product sizes include 1200 cfm, 1600 cfm, 2000 cfm, 2400 cfm, 3000 cfm, 3400, cfm, and 4000 cfm. The literature also classifies units by tonnage of cooling capacity; however, in EnergyPlus modeling it is simpler to classify by air flow rate rather than by cooling capacity (because the direct expansion models have a tight range for allowable cooling capacity per air flow rate and size themselves off the flow rate). We construct the following simple model to select the next higher air flow rate product that uses the volume flow determined during the usual autosizing calculations, <span>$\dot{V}_{size}$</span>, and threshold values taken from the nominal product sizes (in m<sup>3</sup>/s):
+Examining the vendor’s literature for one line of commercial packaged single-zone HVAC air systems shows that the nominal product sizes include 1200 cfm, 1600 cfm, 2000 cfm, 2400 cfm, 3000 cfm, 3400, cfm, and 4000 cfm. The literature also classifies units by tonnage of cooling capacity; however, in EnergyPlus modeling it is simpler to classify by air flow rate rather than by cooling capacity (because the direct expansion models have a tight range for allowable cooling capacity per air flow rate and size themselves off the flow rate). We construct the following simple model to select the next higher air flow rate product that uses the volume flow determined during the usual autosizing calculations, <span>\(\dot{V}_{size}\)</span>, and threshold values taken from the nominal product sizes (in m<sup>3</sup>/s):
 
 <table class="table table-striped">
   <tr>
@@ -3152,32 +3169,32 @@ Examining the vendor’s literature for one line of commercial packaged single-z
     <th>Selection</th>
   </tr>
   <tr>
-    <td><span>$0 < \dot{V}_{size} \leq 0.566 $</span></td>
-    <td><span>$ \dot{V}= 0.566$</span></td>
+    <td><span>\(0 &lt; \dot{V}_{size} \leq 0.566 \)</span></td>
+    <td><span>\(\dot{V}= 0.566\)</span></td>
   </tr>
   <tr>
-    <td><span>$0.566 < \dot{V}_{size} \leq 0.755 $</span></td>
-    <td><span>$ \dot{V}= 0.755$</span></td>
+    <td><span>\(0.566 &lt; \dot{V}_{size} \leq 0.755 \)</span></td>
+    <td><span>\(\dot{V}= 0.755\)</span></td>
   </tr>
   <tr>
-    <td><span>$0.755 < \dot{V}_{size} \leq 0.944 $</span></td>
-    <td><span>$ \dot{V}= 0.944$</span></td>
+    <td><span>\(0.755 &lt; \dot{V}_{size} \leq 0.944 \)</span></td>
+    <td><span>\(\dot{V}= 0.944\)</span></td>
   </tr>
   <tr>
-    <td><span>$0.944 < \dot{V}_{size} \leq 1.133 $</span></td>
-    <td><span>$ \dot{V}= 1.133$</span></td>
+    <td><span>\(0.944 &lt; \dot{V}_{size} \leq 1.133 \)</span></td>
+    <td><span>\(\dot{V}= 1.133\)</span></td>
   </tr>
   <tr>
-    <td><span>$1.133 < \dot{V}_{size} \leq 1.416 $</span></td>
-    <td><span>$ \dot{V}= 1.416$</span></td>
+    <td><span>\(1.133 &lt; \dot{V}_{size} \leq 1.416 \)</span></td>
+    <td><span>\(\dot{V}= 1.416\)</span></td>
   </tr>
   <tr>
-    <td><span>$1.416 < \dot{V}_{size} \leq 1.604 $</span></td>
-    <td><span>$ \dot{V}= 1.604$</span></td>
+    <td><span>\(1.416 &lt; \dot{V}_{size} \leq 1.604 \)</span></td>
+    <td><span>\(\dot{V}= 1.604\)</span></td>
   </tr>
   <tr>
-    <td><span>$1.604 < \dot{V}_{size} \leq 1.888 $</span></td>
-    <td><span>$ \dot{V}= 1.888$</span></td>
+    <td><span>\(1.604 &lt; \dot{V}_{size} \leq 1.888 \)</span></td>
+    <td><span>\(\dot{V}= 1.888\)</span></td>
   </tr>
 </table>
 
@@ -3246,19 +3263,19 @@ EnergyManagementSystem:Subroutine,
   Select_Discrete_Nominal_Air_Flow,
   ! argMainVdot          Input
   ! argDiscreteMainVdot         Output
-  IF (argMainVdot &lt;= 0.56628) , ! 1200 cfm
+  IF (argMainVdot <= 0.56628) , ! 1200 cfm
     SET argDiscreteMainVdot = 0.56628 ,
-  ELSEIF (argMainVdot &gt; 0.56628) && (argMainVdot &lt;= 0.75504) , ! 1600 CFM
+  ELSEIF (argMainVdot &gt; 0.56628) && (argMainVdot <= 0.75504) , ! 1600 CFM
     SET argDiscreteMainVdot = 0.75504 ,
-  ELSEIF (argMainVdot &gt; 0.75504) && (argMainVdot &lt;= 0.9438 ) , ! 2000 CFM
+  ELSEIF (argMainVdot &gt; 0.75504) && (argMainVdot <= 0.9438 ) , ! 2000 CFM
     SET argDiscreteMainVdot = 0.9438 ,
-  ELSEIF (argMainVdot &gt; 0.9438) && (argMainVdot &lt;= 1.13256 ) , ! 2400 CFM
+  ELSEIF (argMainVdot &gt; 0.9438) && (argMainVdot <= 1.13256 ) , ! 2400 CFM
     SET argDiscreteMainVdot = 1.13256 ,
-  ELSEIF (argMainVdot &gt; 1.13256) && (argMainVdot &lt;= 1.4157 ) , ! 3000 CFM
+  ELSEIF (argMainVdot &gt; 1.13256) && (argMainVdot <= 1.4157 ) , ! 3000 CFM
     SET argDiscreteMainVdot = 1.4157 ,
-  ELSEIF (argMainVdot &gt; 1.4157) && (argMainVdot &lt;= 1.60446 ) , ! 3400 CFM
+  ELSEIF (argMainVdot &gt; 1.4157) && (argMainVdot <= 1.60446 ) , ! 3400 CFM
     SET argDiscreteMainVdot = 1.60446 ,
-  ELSEIF (argMainVdot &gt; 1.60446) && (argMainVdot &lt;= 1.8879 ) , ! 4000 CFM
+  ELSEIF (argMainVdot &gt; 1.60446) && (argMainVdot <= 1.8879 ) , ! 4000 CFM
     SET argDiscreteMainVdot = 1.8879 ,
   ELSEIF (argMainVdot &gt; 1.8879), ! too high
     set dummy = @SevereWarnEP 666.0,
@@ -3566,12 +3583,12 @@ EnergyManagementSystem:Subroutine,
   Set argCrntDmnd = argCrntDmnd,
   Set argTargetDemand = argTargetDemand,
   SET argDmndMngrState = DmndStateX1, ! initialize to last state then model changes
-  IF (argCrntDmnd &gt; Level1Demand) && (argCrntDmnd &lt;argTargetDemand) && (argTrendDirection &gt; 0.0),
+  IF (argCrntDmnd &gt; Level1Demand) && (argCrntDmnd <argTargetDemand) && (argTrendDirection &gt; 0.0),
 
 
-    IF DmndStateX1 &lt;= 1.0,
+    IF DmndStateX1 <= 1.0,
       SET argDmndMngrState = 1.0,
-    ELSEIF (DmndStateX1 == 2.0) && (DmndStateX2 &lt; 2.0),
+    ELSEIF (DmndStateX1 == 2.0) && (DmndStateX2 < 2.0),
       SET argDmndMngrState = 2.0,  ! go at least two timesteps at 2.0
     ELSEIF (DmndStateX1 == 3.0) && (DmndStateX2 == 3.0),
       SET argDmndMngrState = 2.0,
@@ -3580,8 +3597,8 @@ EnergyManagementSystem:Subroutine,
     ENDIF,
 
 
-  ELSEIF (argCrntDmnd &gt; argTargetDemand) && (argTrendDirection &lt; 0.0),
-    IF DmndStateX1 &lt;= 2.0,
+  ELSEIF (argCrntDmnd &gt; argTargetDemand) && (argTrendDirection < 0.0),
+    IF DmndStateX1 <= 2.0,
       SET argDmndMngrState = 2.0,
     ELSEIF (DmndStateX1 == 3.0) && (DmndStateX2 == 2.0) , ! go at least two timesteps at 3.0
       SET argDmndMngrState = 3.0,
@@ -3868,7 +3885,7 @@ The main input objects that implement this example of plant loop control are lis
 
   EnergyManagementSystem:Program,
     TowerControl,
-    IF (OutdoorTemp &lt; 6.0),
+    IF (OutdoorTemp < 6.0),
       SET Actuator_Loop = 0.0,
       SET PumpFlowOverride = 0.0,
       SET PumpFlowOverrideReport = 1.0,
@@ -3978,7 +3995,7 @@ Referring to the cooling capacity equation above, a new equation must be develop
     SET C4 = 0.011042676, !-  -0.011042676
     SET C5 = 0.000005249,
     SET C6 = 0.000009720, !-  -0.000009720
-    IF OAT &lt; 31.0,
+    IF OAT < 31.0,
       SET CurveInput = C1 + (C2*IVOne) + (C3*IVOne*IVone) - (C4*IVTwo) + (C5*IVTwo*IVTwo) - (C6*IVThree),
     ELSE,
       SET CurveInput = C1 - (C2a*IVOne) + (C3*IVOne*IVone) - (C4*IVTwo) + (C5*IVTwo*IVTwo) - (C6*IVThree),
@@ -4072,7 +4089,7 @@ Referring to the cooling capacity equation above, a new equation must be develop
 
 
 
-![](EMS_Application_Guide/media/image011.jpg)
+![](media/image011.jpg)
 
 Figure 4. Results of Performance Curve Override
 
@@ -4263,41 +4280,41 @@ The main input objects that implement this example of EMS-based thermochromic gl
 
   EnergyManagementSystem:Program,
     ZN_1_wall_south_Window_1_Control,
-    IF Win1_Tout &lt;= 26.0 ,
+    IF Win1_Tout <= 26.0 ,
       Set Win1_Construct = TCwindow_25,
-    ELSEIF Win1_Tout &lt;= 28.0 ,
+    ELSEIF Win1_Tout <= 28.0 ,
       SEt Win1_Construct = TCwindow_27,
-    ELSEIF Win1_Tout &lt;= 30.0 ,
+    ELSEIF Win1_Tout <= 30.0 ,
       SET Win1_Construct = TCwindow_29,
-    ELSEIF Win1_Tout &lt;= 32.0 ,
+    ELSEIF Win1_Tout <= 32.0 ,
       SET Win1_Construct = TCwindow_31,
-    ELSEIF Win1_Tout &lt;= 34.0 ,
+    ELSEIF Win1_Tout <= 34.0 ,
       SET Win1_Construct = TCwindow_33,
-    ELSEIF Win1_Tout &lt;= 36.0 ,
+    ELSEIF Win1_Tout <= 36.0 ,
       SET Win1_Construct = TCwindow_35,
-    ELSEIF Win1_Tout &lt;= 38.0 ,
+    ELSEIF Win1_Tout <= 38.0 ,
       SET Win1_Construct = TCwindow_37,
-    ELSEIF Win1_Tout &lt;= 40.0 ,
+    ELSEIF Win1_Tout <= 40.0 ,
       SET Win1_Construct = TCwindow_39,
-    ELSEIF Win1_Tout &lt;= 42.0 ,
+    ELSEIF Win1_Tout <= 42.0 ,
       SET Win1_Construct = TCwindow_41,
-    ELSEIF Win1_Tout &lt;= 44.0 ,
+    ELSEIF Win1_Tout <= 44.0 ,
       SET Win1_Construct = TCwindow_43,
-    ELSEIF Win1_Tout &lt;= 47.5 ,
+    ELSEIF Win1_Tout <= 47.5 ,
       SET Win1_Construct = TCwindow_45,
-    ELSEIF Win1_Tout &lt;= 52.5 ,
+    ELSEIF Win1_Tout <= 52.5 ,
       SET Win1_Construct = TCwindow_50,
-    ELSEIF Win1_Tout &lt;= 57.5 ,
+    ELSEIF Win1_Tout <= 57.5 ,
       SET Win1_Construct = TCwindow_55,
-    ELSEIF Win1_Tout &lt;= 62.5 ,
+    ELSEIF Win1_Tout <= 62.5 ,
       SET Win1_Construct = TCwindow_60,
-    ELSEIF Win1_Tout &lt;= 67.5 ,
+    ELSEIF Win1_Tout <= 67.5 ,
       SET Win1_Construct = TCwindow_65,
-    ELSEIF Win1_Tout &lt;= 72.5 ,
+    ELSEIF Win1_Tout <= 72.5 ,
       SET Win1_Construct = TCwindow_70,
-    ELSEIF Win1_Tout &lt;= 77.5 ,
+    ELSEIF Win1_Tout <= 77.5 ,
       SET Win1_Construct = TCwindow_75,
-    ELSEIF Win1_Tout &lt;= 82.5 ,
+    ELSEIF Win1_Tout <= 82.5 ,
       SET Win1_Construct = TCwindow_80,
     ELSE ,
       SET Win1_Construct = TCwindow_85,

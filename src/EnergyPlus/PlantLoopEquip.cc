@@ -659,7 +659,7 @@ namespace PlantLoopEquip {
 				}
 
 				// HEAT PUMP WATER HEATER
-			} else if ( EquipTypeNum == TypeOf_HeatPumpWtrHeater ) {
+			} else if ( EquipTypeNum == TypeOf_HeatPumpWtrHeaterPumped || EquipTypeNum == TypeOf_HeatPumpWtrHeaterWrapped ) {
 				SimWaterThermalTank( EquipTypeNum, sim_component.Name, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration, LoopNum, LoopSideNum ); //DSU
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
@@ -1036,6 +1036,8 @@ namespace PlantLoopEquip {
 
 			} else if ( EquipTypeNum == TypeOf_CooledBeamAirTerminal ) {
 
+			} else if ( EquipTypeNum == TypeOf_FourPipeBeamAirTerminal ) {
+
 			} else if ( EquipTypeNum == TypeOf_MultiSpeedHeatPumpRecovery ) {
 
 			} else if ( EquipTypeNum == TypeOf_UnitarySystemRecovery ) {
@@ -1133,7 +1135,7 @@ namespace PlantLoopEquip {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

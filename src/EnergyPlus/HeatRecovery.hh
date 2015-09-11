@@ -166,7 +166,8 @@ namespace HeatRecovery {
 		int LowFlowErrIndex; // Index to recurring warning message
 		int UnBalancedErrCount; // Counter for recurring warning message
 		int UnBalancedErrIndex; // Index to recurring warning message
-
+		bool myEnvrnFlag; // one-time-init flag
+		
 		// Default Constructor
 		HeatExchCond() :
 			ExchTypeNum( 0 ),
@@ -245,172 +246,8 @@ namespace HeatRecovery {
 			LowFlowErrCount( 0 ),
 			LowFlowErrIndex( 0 ),
 			UnBalancedErrCount( 0 ),
-			UnBalancedErrIndex( 0 )
-		{}
-
-		// Member Constructor
-		HeatExchCond(
-			std::string const & Name, // name of component
-			int const ExchTypeNum, // Integer equivalent to ExchType
-			int const HeatExchPerfTypeNum, // Desiccant balanced heat exchanger performance data type num
-			std::string const & HeatExchPerfName, // Desiccant balanced heat exchanger performance data name
-			int const SchedPtr, // index of schedule
-			int const FlowArr, // flow Arrangement:
-			int const EconoLockOut, // 1: Yes;  0: No
-			Real64 const hARatio, // ratio of supply side h*A to secondary side h*A
-			Real64 const NomSupAirVolFlow, // nominal supply air volume flow rate (m3/s)
-			Real64 const NomSupAirInTemp, // nominal supply air inlet temperature (C)
-			Real64 const NomSupAirOutTemp, // nominal supply air outlet temperature (C)
-			Real64 const NomSecAirVolFlow, // nominal secondary air volume flow rate (m3/s)
-			Real64 const NomSecAirInTemp, // nominal secondary air inlet temperature (C)
-			Real64 const NomElecPower, // nominal electric power consumption [W]
-			Real64 const UA0, // (Uavg*A) at nominal condition
-			Real64 const mTSup0, // product mDot*Tabs, supply  air, nominal cond.
-			Real64 const mTSec0, // product mDot*Tabs, exhaust air, nominal cond
-			Real64 const NomSupAirMassFlow, // nominal supply air mass flow rate (kg/s)
-			Real64 const NomSecAirMassFlow, // nominal secondary air mass flow rate (kg/s)
-			int const SupInletNode, // supply air inlet node number
-			int const SupOutletNode, // supply air outlet node number
-			int const SecInletNode, // secondary air inlet node number
-			int const SecOutletNode, // secondary air outlet node number
-			Real64 const SupInTemp, // supply air inlet temperature (C)
-			Real64 const SupInHumRat, // supply air inlet humidity ratio (kg water/kg dry air)
-			Real64 const SupInEnth, // supply air inlet enthalpy (J/kg)
-			Real64 const SupInMassFlow, // supply air inlet mass flow rate (kg/s)
-			Real64 const SecInTemp, // secondary air inlet temperature (C)
-			Real64 const SecInHumRat, // secondary air inlet humidity ratio (kg water/kg dry air)
-			Real64 const SecInEnth, // secondary air inlet enthalpy (J/kg)
-			Real64 const SecInMassFlow, // secondary air inlet mass flow rate (kg/s)
-			int const PerfDataIndex, // Performance data index allocating performance data number to heat exchanger
-			Real64 const FaceArea, // face area of balanced desiccant heat exchangers to determine face velocity [m2]
-			bool const UnbalancedWarningFlag, // Used to print one-time warning when unbalanced flow exists (then set to FALSE)
-			Real64 const HeatEffectSensible100, // heating sensible effectiveness at 100% rated air flow
-			Real64 const HeatEffectSensible75, // heating sensible effectiveness at 75% rated air flow
-			Real64 const HeatEffectLatent100, // heating latent effectiveness at 100% rated air flow
-			Real64 const HeatEffectLatent75, // heating latent effectiveness at 75% rated air flow
-			Real64 const CoolEffectSensible100, // cooling sensible effectiveness at 100% rated air flow
-			Real64 const CoolEffectSensible75, // cooling sensible effectiveness at 75% rated air flow
-			Real64 const CoolEffectLatent100, // cooling latent effectiveness at 100% rated air flow
-			Real64 const CoolEffectLatent75, // cooling latent effectiveness at 75% rated air flow
-			int const HeatExchEconoMode, // generic heat exchanger economize mode option
-			int const ExchConfigNum, // parameter equivalent of HX configuration, plate or rotary
-			std::string const & FrostControlType, // type of frost control used if any
-			Real64 const ThresholdTemperature, // threshold temperature for frost control
-			Real64 const InitialDefrostTime, // initial defrost time
-			Real64 const RateofDefrostTimeIncrease, // rate of change of defrost time
-			Real64 const DefrostFraction, // fraction of time HX is in frost control mode
-			bool const ControlToTemperatureSetPoint, // temperature control flag for generic HX
-			Real64 const SupOutTemp, // supply air outlet temperature (C)
-			Real64 const SupOutHumRat, // supply air outlet humidity ratio (kg water/kg dry air)
-			Real64 const SupOutEnth, // supply air outlet enthalpy (J/kg)
-			Real64 const SupOutMassFlow, // supply air outlet mass flow rate (kg/s)
-			Real64 const SecOutTemp, // secondary air outlet temperature (C)
-			Real64 const SecOutHumRat, // secondary air outlet humidity ratio (kg water/kg dry air)
-			Real64 const SecOutEnth, // secondary air outlet enthalpy (J/kg)
-			Real64 const SecOutMassFlow, // secondary air outlet mass flow rate (kg/s)
-			Real64 const SensHeatingRate, // rate of sensible heat being added to the supply (primary) air [W]
-			Real64 const SensHeatingEnergy, // sensible heat added to the supply (primary) air [J]
-			Real64 const LatHeatingRate, // rate of latent heat being added to the supply (primary) air [W]
-			Real64 const LatHeatingEnergy, // latent heat added to the supply (primary) air [J]
-			Real64 const TotHeatingRate, // rate of total heat being added to the supply (primary) air [W]
-			Real64 const TotHeatingEnergy, // total heat added to the supply (primary) air [J]
-			Real64 const SensCoolingRate, // rate of sensible heat being removed from the supply (primary) air [W]
-			Real64 const SensCoolingEnergy, // sensible heat removed from the supply (primary) air [J]
-			Real64 const LatCoolingRate, // rate of latent heat being removed from the supply (primary) air [W]
-			Real64 const LatCoolingEnergy, // latent heat removed from the supply (primary) air [J]
-			Real64 const TotCoolingRate, // rate of total heat being removed from the supply (primary) air [W]
-			Real64 const TotCoolingEnergy, // total heat removed from the supply (primary) air [J]
-			Real64 const ElecUseEnergy, // electricity consumption [J]
-			Real64 const ElecUseRate, // electricity consumption rate [W]
-			Real64 const SensEffectiveness, // heat exchanger sensible effectiveness [-]
-			Real64 const LatEffectiveness, // heat exchanger latent effectiveness [-]
-			Real64 const SupBypassMassFlow, // supply air mass flow rate bypassing the heat exchanger [kg/s]
-			Real64 const SecBypassMassFlow, // secondary air mass flow rate bypassing the heat exchanger [kg/s]
-			int const LowFlowErrCount, // Counter for recurring warning message
-			int const LowFlowErrIndex, // Index to recurring warning message
-			int const UnBalancedErrCount, // Counter for recurring warning message
-			int const UnBalancedErrIndex // Index to recurring warning message
-		) :
-			Name( Name ),
-			ExchTypeNum( ExchTypeNum ),
-			HeatExchPerfTypeNum( HeatExchPerfTypeNum ),
-			HeatExchPerfName( HeatExchPerfName ),
-			SchedPtr( SchedPtr ),
-			FlowArr( FlowArr ),
-			EconoLockOut( EconoLockOut ),
-			hARatio( hARatio ),
-			NomSupAirVolFlow( NomSupAirVolFlow ),
-			NomSupAirInTemp( NomSupAirInTemp ),
-			NomSupAirOutTemp( NomSupAirOutTemp ),
-			NomSecAirVolFlow( NomSecAirVolFlow ),
-			NomSecAirInTemp( NomSecAirInTemp ),
-			NomElecPower( NomElecPower ),
-			UA0( UA0 ),
-			mTSup0( mTSup0 ),
-			mTSec0( mTSec0 ),
-			NomSupAirMassFlow( NomSupAirMassFlow ),
-			NomSecAirMassFlow( NomSecAirMassFlow ),
-			SupInletNode( SupInletNode ),
-			SupOutletNode( SupOutletNode ),
-			SecInletNode( SecInletNode ),
-			SecOutletNode( SecOutletNode ),
-			SupInTemp( SupInTemp ),
-			SupInHumRat( SupInHumRat ),
-			SupInEnth( SupInEnth ),
-			SupInMassFlow( SupInMassFlow ),
-			SecInTemp( SecInTemp ),
-			SecInHumRat( SecInHumRat ),
-			SecInEnth( SecInEnth ),
-			SecInMassFlow( SecInMassFlow ),
-			PerfDataIndex( PerfDataIndex ),
-			FaceArea( FaceArea ),
-			UnbalancedWarningFlag( UnbalancedWarningFlag ),
-			HeatEffectSensible100( HeatEffectSensible100 ),
-			HeatEffectSensible75( HeatEffectSensible75 ),
-			HeatEffectLatent100( HeatEffectLatent100 ),
-			HeatEffectLatent75( HeatEffectLatent75 ),
-			CoolEffectSensible100( CoolEffectSensible100 ),
-			CoolEffectSensible75( CoolEffectSensible75 ),
-			CoolEffectLatent100( CoolEffectLatent100 ),
-			CoolEffectLatent75( CoolEffectLatent75 ),
-			HeatExchEconoMode( HeatExchEconoMode ),
-			ExchConfigNum( ExchConfigNum ),
-			FrostControlType( FrostControlType ),
-			ThresholdTemperature( ThresholdTemperature ),
-			InitialDefrostTime( InitialDefrostTime ),
-			RateofDefrostTimeIncrease( RateofDefrostTimeIncrease ),
-			DefrostFraction( DefrostFraction ),
-			ControlToTemperatureSetPoint( ControlToTemperatureSetPoint ),
-			SupOutTemp( SupOutTemp ),
-			SupOutHumRat( SupOutHumRat ),
-			SupOutEnth( SupOutEnth ),
-			SupOutMassFlow( SupOutMassFlow ),
-			SecOutTemp( SecOutTemp ),
-			SecOutHumRat( SecOutHumRat ),
-			SecOutEnth( SecOutEnth ),
-			SecOutMassFlow( SecOutMassFlow ),
-			SensHeatingRate( SensHeatingRate ),
-			SensHeatingEnergy( SensHeatingEnergy ),
-			LatHeatingRate( LatHeatingRate ),
-			LatHeatingEnergy( LatHeatingEnergy ),
-			TotHeatingRate( TotHeatingRate ),
-			TotHeatingEnergy( TotHeatingEnergy ),
-			SensCoolingRate( SensCoolingRate ),
-			SensCoolingEnergy( SensCoolingEnergy ),
-			LatCoolingRate( LatCoolingRate ),
-			LatCoolingEnergy( LatCoolingEnergy ),
-			TotCoolingRate( TotCoolingRate ),
-			TotCoolingEnergy( TotCoolingEnergy ),
-			ElecUseEnergy( ElecUseEnergy ),
-			ElecUseRate( ElecUseRate ),
-			SensEffectiveness( SensEffectiveness ),
-			LatEffectiveness( LatEffectiveness ),
-			SupBypassMassFlow( SupBypassMassFlow ),
-			SecBypassMassFlow( SecBypassMassFlow ),
-			LowFlowErrCount( LowFlowErrCount ),
-			LowFlowErrIndex( LowFlowErrIndex ),
-			UnBalancedErrCount( UnBalancedErrCount ),
-			UnBalancedErrIndex( UnBalancedErrIndex )
+			UnBalancedErrIndex( 0 ),
+			myEnvrnFlag( true )
 		{}
 
 	};
@@ -1373,7 +1210,7 @@ namespace HeatRecovery {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

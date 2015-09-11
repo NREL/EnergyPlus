@@ -22,54 +22,40 @@
 #include <cstddef>
 #include <ios>
 #include <limits>
-#include <typeinfo>
+#include <type_traits>
 
 namespace ObjexxFCL {
 
 template< class A, class B >
 inline
 bool
-same_type_as( A const & a, B const & b )
+same_type_as( A const &, B const & )
 {
-	return ( typeid( a ) == typeid( b ) );
+	return std::is_same< A, B >::value;
 }
 
 template< class A, class B >
 inline
 bool
-SAME_TYPE_AS( A const & a, B const & b )
+SAME_TYPE_AS( A const &, B const & )
 {
-	return ( typeid( a ) == typeid( b ) );
+	return std::is_same< A, B >::value;
 }
 
 template< class A, class B >
 inline
 bool
-extends_type_of( A const & a, B const & b )
+extends_type_of( A const &, B const & )
 {
-#ifdef OBJEXXFCL_FULL_EXTENDS_TYPE_OF // Full support for dynamic type of b
-	if ( typeid( a ) == typeid( b ) ) { // Simpler than adding double dispatch to all classes
-		return true;
-	} else if ( a.super() ) { // Requires virtual super() returning pointer to super class
-		return extends_type_of( *a.super(), b ); // Recurse up inheritance hierarchy
-	} else {
-		return false;
-	}
-#else // Support for static type of b
-	assert( typeid( b ) == typeid( B ) ); // Check that we are safe using simple support
-#ifdef NDEBUG
-	static_cast< void >( b ); // Suppress unused warning
-#endif
-	return ( dynamic_cast< B const * >( &a ) != nullptr );
-#endif
+	return std::is_same< A, B >::value || std::is_base_of< B, A >::value;
 }
 
 template< class A, class B >
 inline
 bool
-EXTENDS_TYPE_OF( A const & a, B const & b )
+EXTENDS_TYPE_OF( A const &, B const & )
 {
-	return extends_type_of( a, b );
+	return std::is_same< A, B >::value || std::is_base_of< B, A >::value;
 }
 
 // is_a: Type Test for const Reference Argument

@@ -2130,7 +2130,7 @@
 
 !********** Indoor Heat Pump Water Heater Inputs (uses zone and outdoor air) in Zone 5 ****************
 
-  WaterHeater:HeatPump,
+  WaterHeater:HeatPump:PumpedCondenser,
     Zone5HeatPumpWaterHeater,!- Name
     HeatPumpWaterHeaterSch,  !- Availability Schedule Name
     HPWHTempSch,             !- Compressor Setpoint Temperature Schedule Name
@@ -2151,9 +2151,10 @@
     HPWHTank,                !- Tank Name
     ,                        !- Tank Use Side Inlet Node Name
     ,                        !- Tank Use Side Outlet Node Name
-    Coil:WaterHeating:AirToWaterHeatPump,  !- DX Coil Object Type
+    Coil:WaterHeating:AirToWaterHeatPump:Pumped,  !- DX Coil Object Type
     HPWHDXCoil,              !- DX Coil Name
     5.0,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Zone,                    !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
     Fan:OnOff,               !- Fan Object Type
@@ -2165,7 +2166,8 @@
     HPWHInletAirMixerNode,   !- Inlet Air Mixer Node Name
     HPWHOutletAirSplitterNode,  !- Outlet Air Splitter Node Name
     HPWHMixerInletAirSch,    !- Inlet Air Mixer Schedule Name
-    Heater2;                 !- Control Sensor Location In Stratified Tank
+    ,                        !- Tank Element Control Logic
+    0.154465;                !- Control Sensor 1 Height In Stratified Tank
 
   WaterHeater:Stratified,
   HPWHTank,                           !- Name
@@ -2219,21 +2221,9 @@
   ,                                   !- Use Side Design Flow Rate
   ,                                   !- Source Side Design Flow Rate
   ,                                   !- Indirect Water Heating Recovery Time
-  10,                                 !- Number of Nodes
-  ,                                   !- Additional Destratification Conductivity
-  ,                                   !- Node 1 Additional Loss Coefficient
-  ,                                   !- Node 2 Additional Loss Coefficient
-  ,                                   !- Node 3 Additional Loss Coefficient
-  ,                                   !- Node 4 Additional Loss Coefficient
-  ,                                   !- Node 5 Additional Loss Coefficient
-  ,                                   !- Node 6 Additional Loss Coefficient
-  ,                                   !- Node 7 Additional Loss Coefficient
-  ,                                   !- Node 8 Additional Loss Coefficient
-  ,                                   !- Node 9 Additional Loss Coefficient
-  ,                                   !- Node 10 Additional Loss Coefficient
-  ,                                   !- Source Side Flow Control Mode
-  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
-  Coil:WaterHeating:AirToWaterHeatPump,
+  10;                                 !- Number of Nodes
+
+  Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     HPWHDXCoil,              !- Name
     4000.0,                  !- Rated Heating Capacity {W}
     3.2,                     !- Rated COP {W/W}
@@ -2377,7 +2367,7 @@
 !*********** End of Indoor Heat Pump Water Heater Inputs (uses zone and outdoor air) in Zone 5 ********
 !*********** Indoor Heat Pump Water Heater Inputs (uses no outdoor air) in Zone 4 ******
 
-  WaterHeater:HeatPump,
+  WaterHeater:HeatPump:PumpedCondenser,
     Zone4HeatPumpWaterHeater,!- Name
     HeatPumpWaterHeaterSch,  !- Availability Schedule Name
     HPWHTempSch,             !- Compressor Setpoint Temperature Schedule Name
@@ -2398,9 +2388,10 @@
     Zone4HPWHTank,           !- Tank Name
     ,                        !- Tank Use Side Inlet Node Name
     ,                        !- Tank Use Side Outlet Node Name
-    Coil:WaterHeating:AirToWaterHeatPump,  !- DX Coil Object Type
+    Coil:WaterHeating:AirToWaterHeatPump:Pumped,  !- DX Coil Object Type
     Zone4HPWHDXCoil,         !- DX Coil Name
     5.0,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Zone,                    !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
     Fan:OnOff,               !- Fan Object Type
@@ -2412,7 +2403,8 @@
     ,                        !- Inlet Air Mixer Node Name
     ,                        !- Outlet Air Splitter Node Name
     ,                        !- Inlet Air Mixer Schedule Name
-    Heater2;                 !- Control Sensor Location In Stratified Tank
+    ,                        !- Tank Element Control Logic
+    0.154465;                !- Control Sensor 1 Height In Stratified Tank
 
   WaterHeater:Stratified,
   Zone4HPWHTank,                      !- Name
@@ -2466,21 +2458,9 @@
   ,                                   !- Use Side Design Flow Rate
   ,                                   !- Source Side Design Flow Rate
   ,                                   !- Indirect Water Heating Recovery Time
-  10,                                 !- Number of Nodes
-  ,                                   !- Additional Destratification Conductivity
-  ,                                   !- Node 1 Additional Loss Coefficient
-  ,                                   !- Node 2 Additional Loss Coefficient
-  ,                                   !- Node 3 Additional Loss Coefficient
-  ,                                   !- Node 4 Additional Loss Coefficient
-  ,                                   !- Node 5 Additional Loss Coefficient
-  ,                                   !- Node 6 Additional Loss Coefficient
-  ,                                   !- Node 7 Additional Loss Coefficient
-  ,                                   !- Node 8 Additional Loss Coefficient
-  ,                                   !- Node 9 Additional Loss Coefficient
-  ,                                   !- Node 10 Additional Loss Coefficient
-  ,                                   !- Source Side Flow Control Mode
-  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
-  Coil:WaterHeating:AirToWaterHeatPump,
+  10;                                 !- Number of Nodes
+
+  Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     Zone4HPWHDXCoil,         !- Name
     4000.0,                  !- Rated Heating Capacity {W}
     3.2,                     !- Rated COP {W/W}
@@ -2524,7 +2504,7 @@
 !*********** End of Indoor Heat Pump Water Heater Inputs (uses no outdoor air) in Zone 4 ******
 !*********** Indoor Heat Pump Water Heater Inputs (uses no outdoor air) in Zone 4 ******
 
-  WaterHeater:HeatPump,
+  WaterHeater:HeatPump:PumpedCondenser,
     Zone4bHeatPumpWaterHeater,!- Name
     HeatPumpWaterHeaterSch,  !- Availability Schedule Name
     HPWHTempSch,             !- Compressor Setpoint Temperature Schedule Name
@@ -2545,9 +2525,10 @@
     Zone4bHPWHTank,           !- Tank Name
     Water Heater Use Inlet Node,                        !- Tank Use Side Inlet Node Name
     Water Heater Use Outlet Node,                        !- Tank Use Side Outlet Node Name
-    Coil:WaterHeating:AirToWaterHeatPump,  !- DX Coil Object Type
+    Coil:WaterHeating:AirToWaterHeatPump:Pumped,  !- DX Coil Object Type
     Zone4bHPWHDXCoil,         !- DX Coil Name
     5.0,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Zone,                    !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
     Fan:OnOff,               !- Fan Object Type
@@ -2559,7 +2540,8 @@
     ,                        !- Inlet Air Mixer Node Name
     ,                        !- Outlet Air Splitter Node Name
     ,                        !- Inlet Air Mixer Schedule Name
-    Heater2;                 !- Control Sensor Location In Stratified Tank
+    ,                        !- Tank Element Control Logic
+    0.154465;                !- Control Sensor 1 Height In Stratified Tank
 
   WaterHeater:Stratified,
   Zone4bHPWHTank,                     !- Name
@@ -2613,21 +2595,9 @@
   autosize,                           !- Use Side Design Flow Rate
   ,                                   !- Source Side Design Flow Rate
   ,                                   !- Indirect Water Heating Recovery Time
-  10,                                 !- Number of Nodes
-  ,                                   !- Additional Destratification Conductivity
-  ,                                   !- Node 1 Additional Loss Coefficient
-  ,                                   !- Node 2 Additional Loss Coefficient
-  ,                                   !- Node 3 Additional Loss Coefficient
-  ,                                   !- Node 4 Additional Loss Coefficient
-  ,                                   !- Node 5 Additional Loss Coefficient
-  ,                                   !- Node 6 Additional Loss Coefficient
-  ,                                   !- Node 7 Additional Loss Coefficient
-  ,                                   !- Node 8 Additional Loss Coefficient
-  ,                                   !- Node 9 Additional Loss Coefficient
-  ,                                   !- Node 10 Additional Loss Coefficient
-  ,                                   !- Source Side Flow Control Mode
-  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
-  Coil:WaterHeating:AirToWaterHeatPump,
+  10;                                 !- Number of Nodes
+
+  Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     Zone4bHPWHDXCoil,         !- Name
     4000,                  !- Rated Heating Capacity {W}
     3.2,                     !- Rated COP {W/W}
@@ -2671,7 +2641,7 @@
 !*********** End of Indoor Heat Pump Water Heater Inputs (uses no outdoor air) in Zone 4 ******
 !*********** Outdoor Heat Pump Water Heater Inputs ***********************
 
-  WaterHeater:HeatPump,
+  WaterHeater:HeatPump:PumpedCondenser,
     OutdoorHeatPumpWaterHeater,  !- Name
     PlantHPWHSch,            !- Availability Schedule Name
     HPWHTempSch,             !- Compressor Setpoint Temperature Schedule Name
@@ -2692,9 +2662,10 @@
     HPWHOutdoorTank,         !- Tank Name
     ,                        !- Tank Use Side Inlet Node Name
     ,                        !- Tank Use Side Outlet Node Name
-    Coil:WaterHeating:AirToWaterHeatPump,  !- DX Coil Object Type
+    Coil:WaterHeating:AirToWaterHeatPump:Pumped,  !- DX Coil Object Type
     HPWHOutdoorDXCoil,       !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
     Fan:OnOff,               !- Fan Object Type
@@ -2706,7 +2677,8 @@
     ,                        !- Inlet Air Mixer Node Name
     ,                        !- Outlet Air Splitter Node Name
     ,                        !- Inlet Air Mixer Schedule Name
-    Heater2;                 !- Control Sensor Location In Stratified Tank
+    ,                        !- Tank Element Control Logic
+    0.154465;                !- Control Sensor 1 Height In Stratified Tank
 
   WaterHeater:Stratified,
   HPWHOutdoorTank,                    !- Name
@@ -2760,24 +2732,12 @@
   ,                                   !- Use Side Design Flow Rate
   ,                                   !- Source Side Design Flow Rate
   ,                                   !- Indirect Water Heating Recovery Time
-  10,                                 !- Number of Nodes
-  ,                                   !- Additional Destratification Conductivity
-  ,                                   !- Node 1 Additional Loss Coefficient
-  ,                                   !- Node 2 Additional Loss Coefficient
-  ,                                   !- Node 3 Additional Loss Coefficient
-  ,                                   !- Node 4 Additional Loss Coefficient
-  ,                                   !- Node 5 Additional Loss Coefficient
-  ,                                   !- Node 6 Additional Loss Coefficient
-  ,                                   !- Node 7 Additional Loss Coefficient
-  ,                                   !- Node 8 Additional Loss Coefficient
-  ,                                   !- Node 9 Additional Loss Coefficient
-  ,                                   !- Node 10 Additional Loss Coefficient
-  ,                                   !- Source Side Flow Control Mode
-  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
+  10;                                 !- Number of Nodes
+
   OutdoorAir:Node,
     HPWHOutdoorTank OA Node; !- Name
 
-  Coil:WaterHeating:AirToWaterHeatPump,
+  Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     HPWHOutdoorDXCoil,       !- Name
     4000.0,                  !- Rated Heating Capacity {W}
     3.2,                     !- Rated COP {W/W}
@@ -2849,7 +2809,7 @@
     For: AllDays,            !- Field 2
     Until: 24:00,21.0;       !- Field 3
 
-  WaterHeater:HeatPump,
+  WaterHeater:HeatPump:PumpedCondenser,
     ScheduledHeatPumpWaterHeater,  !- Name
     ScheduledHPWHSch,        !- Availability Schedule Name
     HPWHTempSch,             !- Compressor Setpoint Temperature Schedule Name
@@ -2870,9 +2830,10 @@
     HPWHScheduledTank,       !- Tank Name
     ,                        !- Tank Use Side Inlet Node Name
     ,                        !- Tank Use Side Outlet Node Name
-    Coil:WaterHeating:AirToWaterHeatPump,  !- DX Coil Object Type
+    Coil:WaterHeating:AirToWaterHeatPump:Pumped,  !- DX Coil Object Type
     HPWHScheduledDXCoil,     !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Schedule,                !- Compressor Location
     ScheduledCompressorTemp, !- Compressor Ambient Temperature Schedule Name
     Fan:OnOff,               !- Fan Object Type
@@ -2884,7 +2845,8 @@
     ,                        !- Inlet Air Mixer Node Name
     ,                        !- Outlet Air Splitter Node Name
     ,                        !- Inlet Air Mixer Schedule Name
-    Heater2;                 !- Control Sensor Location In Stratified Tank
+    ,                        !- Tank Element Control Logic
+    0.154465;                !- Control Sensor 1 Height In Stratified Tank
 
   WaterHeater:Stratified,
   HPWHScheduledTank,                  !- Name
@@ -2938,21 +2900,9 @@
   ,                                   !- Use Side Design Flow Rate
   ,                                   !- Source Side Design Flow Rate
   ,                                   !- Indirect Water Heating Recovery Time
-  10,                                 !- Number of Nodes
-  ,                                   !- Additional Destratification Conductivity
-  ,                                   !- Node 1 Additional Loss Coefficient
-  ,                                   !- Node 2 Additional Loss Coefficient
-  ,                                   !- Node 3 Additional Loss Coefficient
-  ,                                   !- Node 4 Additional Loss Coefficient
-  ,                                   !- Node 5 Additional Loss Coefficient
-  ,                                   !- Node 6 Additional Loss Coefficient
-  ,                                   !- Node 7 Additional Loss Coefficient
-  ,                                   !- Node 8 Additional Loss Coefficient
-  ,                                   !- Node 9 Additional Loss Coefficient
-  ,                                   !- Node 10 Additional Loss Coefficient
-  ,                                   !- Source Side Flow Control Mode
-  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
-  Coil:WaterHeating:AirToWaterHeatPump,
+  10;                                 !- Number of Nodes
+
+  Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     HPWHScheduledDXCoil,     !- Name
     4000.0,                  !- Rated Heating Capacity {W}
     3.2,                     !- Rated COP {W/W}
@@ -3048,21 +2998,9 @@
   ,                                   !- Use Side Design Flow Rate
   ,                                   !- Source Side Design Flow Rate
   ,                                   !- Indirect Water Heating Recovery Time
-  10,                                 !- Number of Nodes
-  ,                                   !- Additional Destratification Conductivity
-  ,                                   !- Node 1 Additional Loss Coefficient
-  ,                                   !- Node 2 Additional Loss Coefficient
-  ,                                   !- Node 3 Additional Loss Coefficient
-  ,                                   !- Node 4 Additional Loss Coefficient
-  ,                                   !- Node 5 Additional Loss Coefficient
-  ,                                   !- Node 6 Additional Loss Coefficient
-  ,                                   !- Node 7 Additional Loss Coefficient
-  ,                                   !- Node 8 Additional Loss Coefficient
-  ,                                   !- Node 9 Additional Loss Coefficient
-  ,                                   !- Node 10 Additional Loss Coefficient
-  ,                                   !- Source Side Flow Control Mode
-  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
-  Site:WaterMainsTemperature,
+  10;                                 !- Number of Nodes
+
+ Site:WaterMainsTemperature,
     CORRELATION,             !- Calculation Method
     ,                        !- Temperature Schedule Name
     9.69,                    !- Annual Average Outdoor Air Temperature {C}
@@ -3240,18 +3178,18 @@
     SPACE4-1 ATU,            !- Zone Equipment 1 Name
     3,                       !- Zone Equipment 1 Cooling Sequence
     3,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    WaterHeater:HeatPump,    !- Zone Equipment 2 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,    !- Zone Equipment 2 Object Type
     Zone4HeatPumpWaterHeater,!- Zone Equipment 2 Name
     1,                       !- Zone Equipment 2 Cooling Sequence
     1,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    WaterHeater:HeatPump,    !- Zone Equipment 2 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,    !- Zone Equipment 2 Object Type
 	Zone4bHeatPumpWaterHeater,!- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2;                       !- Zone Equipment 2 Heating or No-Load Sequence
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
-    WaterHeater:HeatPump,    !- Zone Equipment 1 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,    !- Zone Equipment 1 Object Type
     Zone5HeatPumpWaterHeater,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
@@ -3781,7 +3719,7 @@
     Central HPWH Branch,     !- Name
     0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
-    WaterHeater:HeatPump,    !- Component 1 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,    !- Component 1 Object Type
     PlantHeatPumpWaterHeater,!- Component 1 Name
     HPWH Use Inlet Node,     !- Component 1 Inlet Node Name
     HPWH Use Outlet Node,    !- Component 1 Outlet Node Name
@@ -3992,12 +3930,12 @@
 
   PlantEquipmentList,
     heating plant,           !- Name
-    WaterHeater:HeatPump,    !- Equipment 1 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,    !- Equipment 1 Object Type
     PlantHeatPumpWaterHeater;!- Equipment 1 Name
 
 !************** Plant Heat Pump Water Heater Inputs ***********************
 
-  WaterHeater:HeatPump,
+  WaterHeater:HeatPump:PumpedCondenser,
     PlantHeatPumpWaterHeater,!- Name
     PlantHPWHSch,            !- Availability Schedule Name
     PlantHPWHTempSch,        !- Compressor Setpoint Temperature Schedule Name
@@ -4018,9 +3956,10 @@
     HPWHPlantTank,           !- Tank Name
     HPWH Use Inlet Node,     !- Tank Use Side Inlet Node Name
     HPWH Use Outlet Node,    !- Tank Use Side Outlet Node Name
-    Coil:WaterHeating:AirToWaterHeatPump,  !- DX Coil Object Type
+    Coil:WaterHeating:AirToWaterHeatPump:Pumped,  !- DX Coil Object Type
     HPWHPlantDXCoil,         !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
     Fan:OnOff,               !- Fan Object Type
@@ -4032,7 +3971,8 @@
     ,                        !- Inlet Air Mixer Node Name
     ,                        !- Outlet Air Splitter Node Name
     ,                        !- Inlet Air Mixer Schedule Name
-    Heater2;                 !- Control Sensor Location In Stratified Tank
+    ,                        !- Tank Element Control Logic
+    0.194613;                !- Control Sensor 1 Height In Stratified Tank
 
   WaterHeater:Stratified,
   HPWHPlantTank,                            !- Name
@@ -4086,24 +4026,12 @@
   autosize,                                 !- Use Side Design Flow Rate
   ,                                         !- Source Side Design Flow Rate
   ,                                         !- Indirect Water Heating Recovery Time
-  10,                                       !- Number of Nodes
-  ,                                         !- Additional Destratification Conductivity
-  ,                                         !- Node 1 Additional Loss Coefficient
-  ,                                         !- Node 2 Additional Loss Coefficient
-  ,                                         !- Node 3 Additional Loss Coefficient
-  ,                                         !- Node 4 Additional Loss Coefficient
-  ,                                         !- Node 5 Additional Loss Coefficient
-  ,                                         !- Node 6 Additional Loss Coefficient
-  ,                                         !- Node 7 Additional Loss Coefficient
-  ,                                         !- Node 8 Additional Loss Coefficient
-  ,                                         !- Node 9 Additional Loss Coefficient
-  ,                                         !- Node 10 Additional Loss Coefficient
-  ,                                         !- Source Side Flow Control Mode
-  ;                                         !- Indirect Alternate Setpoint Temperature Schedule Name
+  10;                                       !- Number of Nodes
+
   OutdoorAir:Node,
     HPWHPlantTank OA Node;   !- Name
 
-  Coil:WaterHeating:AirToWaterHeatPump,
+  Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     HPWHPlantDXCoil,         !- Name
     25000.0,                 !- Rated Heating Capacity {W}
     3.2,                     !- Rated COP {W/W}
@@ -4964,14 +4892,14 @@ Connector:Splitter,
 
 PlantEquipmentList,
    DHW Plant Equipment,    !- Name
-   WaterHeater:HeatPump,   !- Equipment 1 Object Type
+   WaterHeater:HeatPump:PumpedCondenser,   !- Equipment 1 Object Type
    Zone4bHeatPumpWaterHeater;!- Equipment 1 Name
 
 Branch,
    Water Heater Branch,            !- Name
    autosize,                       !- Maximum Flow Rate {m^3/s}
    ,                               !- Pressure Drop Curve Name
-   WaterHeater:HeatPump,           !- Component 1 Object Type
+   WaterHeater:HeatPump:PumpedCondenser,           !- Component 1 Object Type
    Zone4bHeatPumpWaterHeater,                    !- Component 1 Name
    Water Heater Use Inlet Node,    !- Component 1 Inlet Node Name
    Water Heater Use Outlet Node;           !- Component 1 Outlet Node Name

@@ -864,9 +864,9 @@ namespace ReportSizingManager {
 								AutosizeDes = ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad;
 							} else {
 								CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-								CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
-								CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
 								CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+								CoilOutTemp = min( CoilInTemp, FinalZoneSizing( CurZoneEqNum ).CoolDesTemp);
+								CoilOutHumRat = min( CoilInHumRat, FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat);
 								AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow * ( PsyHFnTdbW( CoilInTemp, CoilInHumRat ) - PsyHFnTdbW( CoilOutTemp, CoilOutHumRat ) );
 								DesVolFlow = FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow / StdRhoAir;
 							}
@@ -889,8 +889,8 @@ namespace ReportSizingManager {
 									CoilInTemp = FinalZoneSizing ( CurZoneEqNum ).DesCoolCoilInTemp;
 									CoilInHumRat = FinalZoneSizing ( CurZoneEqNum ).DesCoolCoilInHumRat;
 								}
-								CoilOutTemp = FinalZoneSizing ( CurZoneEqNum ).CoolDesTemp;
-								CoilOutHumRat = FinalZoneSizing ( CurZoneEqNum ).CoolDesHumRat;
+								CoilOutTemp = min( CoilInTemp, FinalZoneSizing( CurZoneEqNum ).CoolDesTemp );
+								CoilOutHumRat = min( CoilInHumRat, FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat);
 								TimeStepNumAtMax = FinalZoneSizing ( CurZoneEqNum ).TimeStepNumAtCoolMax;
 								DDNum = FinalZoneSizing ( CurZoneEqNum ).CoolDDNum;
 								if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
@@ -1531,6 +1531,8 @@ namespace ReportSizingManager {
 							} else {
 								rhoair = PsyRhoAirFnPbTdbW ( StdBaroPress, CoilInTemp, CoilInHumRat, CallingRoutine );
 							}
+							CoilOutTemp = min( CoilInTemp, CoilOutTemp );
+							CoilOutHumRat = min( CoilInHumRat, CoilOutHumRat );
 							CoilInEnth = PsyHFnTdbW ( CoilInTemp, CoilInHumRat );
 							CoilInWetBulb = PsyTwbFnTdbWPb ( CoilInTemp, CoilInHumRat, StdBaroPress, CallingRoutine );
 							CoilOutEnth = PsyHFnTdbW ( CoilOutTemp, CoilOutHumRat );
@@ -1570,8 +1572,10 @@ namespace ReportSizingManager {
 				} else if ( SizingType == HeatingCapacitySizing ) {
 					DataFracOfAutosizedHeatingCapacity = 1.0;
 					if (CurOASysNum > 0) {
-						if (OASysEqSizing(CurOASysNum).HeatingAirFlow) {
+						if (OASysEqSizing(CurOASysNum).AirFlow) {
 							DesVolFlow = OASysEqSizing(CurOASysNum).AirVolFlow;
+						} else if (OASysEqSizing(CurOASysNum).HeatingAirFlow) {
+							DesVolFlow = OASysEqSizing(CurOASysNum).HeatingAirVolFlow;
 						} else {
 							DesVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
 						}
@@ -2107,7 +2111,7 @@ namespace ReportSizingManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

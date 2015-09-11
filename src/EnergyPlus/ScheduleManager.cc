@@ -95,6 +95,15 @@ namespace ScheduleManager {
 	bool ScheduleInputProcessed( false ); // This is false until the Schedule Input has been processed.
 	bool ScheduleDSTSFileWarningIssued( false );
 
+		namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool CheckScheduleValueMinMaxRunOnceOnly (true );
+	}
+
 	//Derived Types Variables
 
 	// Object Data
@@ -110,6 +119,24 @@ namespace ScheduleManager {
 	//*************************************************************************
 
 	// Functions
+
+	// Clears the global data in ScheduleManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumScheduleTypes = 0;
+		NumDaySchedules = 0;
+		NumWeekSchedules = 0;
+		NumSchedules = 0;
+		ScheduleInputProcessed = false;
+		ScheduleDSTSFileWarningIssued = false;
+		CheckScheduleValueMinMaxRunOnceOnly = true;
+		ScheduleType.deallocate();
+		DaySchedule.deallocate();
+		WeekSchedule.deallocate();
+		Schedule.deallocate();
+	}
 
 	void
 	ProcessScheduleInput()
@@ -473,7 +500,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), ScheduleType( {1,NumScheduleTypes} ).Name(), LoopIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), ScheduleType( {1,NumScheduleTypes} ), LoopIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -532,7 +559,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DaySchedule.Name(), Count, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DaySchedule, Count, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -541,7 +568,7 @@ namespace ScheduleManager {
 			DaySchedule( Count ).Name = Alphas( 1 );
 			// Validate ScheduleType
 			if ( NumScheduleTypes > 0 ) {
-				CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
+				CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -588,7 +615,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DaySchedule.Name(), Count, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DaySchedule, Count, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -597,7 +624,7 @@ namespace ScheduleManager {
 			DaySchedule( Count ).Name = Alphas( 1 );
 			// Validate ScheduleType
 			if ( NumScheduleTypes > 0 ) {
-				CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
+				CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -672,7 +699,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DaySchedule.Name(), Count, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DaySchedule, Count, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -681,7 +708,7 @@ namespace ScheduleManager {
 			DaySchedule( Count ).Name = Alphas( 1 );
 			// Validate ScheduleType
 			if ( NumScheduleTypes > 0 ) {
-				CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
+				CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -798,7 +825,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), WeekSchedule( {1,NumRegWeekSchedules} ).Name(), LoopIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), WeekSchedule( {1,NumRegWeekSchedules} ), LoopIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -806,7 +833,7 @@ namespace ScheduleManager {
 			WeekSchedule( LoopIndex ).Name = Alphas( 1 );
 			// Rest of Alphas are processed into Pointers
 			for ( InLoopIndex = 1; InLoopIndex <= MaxDayTypes; ++InLoopIndex ) {
-				DayIndex = FindItemInList( Alphas( InLoopIndex + 1 ), DaySchedule( {1,NumRegDaySchedules} ).Name(), NumRegDaySchedules );
+				DayIndex = FindItemInList( Alphas( InLoopIndex + 1 ), DaySchedule( {1,NumRegDaySchedules} ) );
 				if ( DayIndex == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( InLoopIndex + 1 ) + " \"" + Alphas( InLoopIndex + 1 ) + "\" not Found", UnitNumber );
 					ErrorsFound = true;
@@ -824,7 +851,7 @@ namespace ScheduleManager {
 			IsNotOK = false;
 			IsBlank = false;
 			if ( Count > 0 ) {
-				VerifyName( Alphas( 1 ), WeekSchedule( {1,Count} ).Name(), Count, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), WeekSchedule( {1,Count} ), Count, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -835,7 +862,7 @@ namespace ScheduleManager {
 			AllDays = false;
 			// Rest of Alphas are processed into Pointers
 			for ( InLoopIndex = 2; InLoopIndex <= NumAlphas; InLoopIndex += 2 ) {
-				DayIndex = FindItemInList( Alphas( InLoopIndex + 1 ), DaySchedule( {1,NumRegDaySchedules} ).Name(), NumRegDaySchedules );
+				DayIndex = FindItemInList( Alphas( InLoopIndex + 1 ), DaySchedule( {1,NumRegDaySchedules} ) );
 				if ( DayIndex == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( InLoopIndex + 1 ) + " \"" + Alphas( InLoopIndex + 1 ) + "\" not Found", UnitNumber );
 					ShowContinueError( "ref: " + cAlphaFields( InLoopIndex ) + " \"" + Alphas( InLoopIndex ) + "\"" );
@@ -873,7 +900,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), LoopIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), LoopIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -882,7 +909,7 @@ namespace ScheduleManager {
 			Schedule( LoopIndex ).SchType = ScheduleInput_year;
 			// Validate ScheduleType
 			if ( NumScheduleTypes > 0 ) {
-				CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
+				CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -897,7 +924,7 @@ namespace ScheduleManager {
 			DaysInYear = 0;
 			// Rest of Alphas (Weekschedules) are processed into Pointers
 			for ( InLoopIndex = 3; InLoopIndex <= NumAlphas; ++InLoopIndex ) {
-				WeekIndex = FindItemInList( Alphas( InLoopIndex ), WeekSchedule( {1,NumRegWeekSchedules} ).Name(), NumRegWeekSchedules );
+				WeekIndex = FindItemInList( Alphas( InLoopIndex ), WeekSchedule( {1,NumRegWeekSchedules} ) );
 				if ( WeekIndex == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( InLoopIndex ) + "=\"" + Alphas( InLoopIndex ) + "\" not found.", UnitNumber );
 					ErrorsFound = true;
@@ -976,7 +1003,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -985,7 +1012,7 @@ namespace ScheduleManager {
 			Schedule( SchNum ).Name = Alphas( 1 );
 			Schedule( SchNum ).SchType = ScheduleInput_compact;
 			// Validate ScheduleType
-			CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
+			CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 			if ( CheckIndex == 0 ) {
 				if ( ! lAlphaBlanks( 2 ) ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -1264,7 +1291,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1275,7 +1302,7 @@ namespace ScheduleManager {
 			// Validate ScheduleType
 			if ( NumScheduleTypes > 0 ) {
 				CheckIndex = 0;
-				if ( ! lAlphaBlanks( 2 ) ) CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
+				if ( ! lAlphaBlanks( 2 ) ) CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
 						ShowWarningError( "ProcessScheduleInput: For " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -1582,7 +1609,7 @@ namespace ScheduleManager {
 			GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1592,7 +1619,7 @@ namespace ScheduleManager {
 			Schedule( SchNum ).SchType = ScheduleInput_constant;
 			// Validate ScheduleType
 			if ( NumScheduleTypes > 0 ) {
-				CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
+				CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -1631,7 +1658,7 @@ namespace ScheduleManager {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" ); // Bug fix
+			VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" ); // Bug fix
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1641,7 +1668,7 @@ namespace ScheduleManager {
 			Schedule( SchNum ).SchType = ScheduleInput_external;
 
 			// Validate ScheduleType
-			CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
+			CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 			if ( CheckIndex == 0 ) {
 				if ( ! lAlphaBlanks( 2 ) ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -1682,9 +1709,9 @@ namespace ScheduleManager {
 			IsBlank = false;
 
 			if ( NumExternalInterfaceSchedules >= 1 ) {
-				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + Alphas( 1 ) + "\" is defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitImport:To:Schedule. This will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitImport." );
+				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + Alphas( 1 ) + "\" is defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitImport:To:Schedule. This will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitImport." );
 			} else {
-				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			}
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -1696,7 +1723,7 @@ namespace ScheduleManager {
 			Schedule( SchNum ).SchType = ScheduleInput_external;
 
 			// Validate ScheduleType
-			CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
+			CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 			if ( CheckIndex == 0 ) {
 				if ( ! lAlphaBlanks( 2 ) ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -1738,9 +1765,9 @@ namespace ScheduleManager {
 			IsBlank = false;
 
 			if ( NumExternalInterfaceSchedules >= 1 ) {
-				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + Alphas( 1 ) + "\" is defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitExport:To:Schedule. This will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitExport." );
+				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + Alphas( 1 ) + "\" is defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitExport:To:Schedule. This will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitExport." );
 			} else {
-				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			}
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -1752,7 +1779,7 @@ namespace ScheduleManager {
 			Schedule( SchNum ).SchType = ScheduleInput_external;
 
 			// Validate ScheduleType
-			CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ).Name(), NumScheduleTypes );
+			CheckIndex = FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 			if ( CheckIndex == 0 ) {
 				if ( ! lAlphaBlanks( 2 ) ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -2513,7 +2540,7 @@ namespace ScheduleManager {
 		}
 
 		if ( NumSchedules > 0 ) {
-			GetScheduleIndex = FindItemInList( ScheduleName, Schedule( {1,NumSchedules} ).Name(), NumSchedules );
+			GetScheduleIndex = FindItemInList( ScheduleName, Schedule( {1,NumSchedules} ) );
 			if ( GetScheduleIndex > 0 ) {
 				if ( ! Schedule( GetScheduleIndex ).Used ) {
 					Schedule( GetScheduleIndex ).Used = true;
@@ -2638,7 +2665,7 @@ namespace ScheduleManager {
 		}
 
 		if ( NumDaySchedules > 0 ) {
-			GetDayScheduleIndex = FindItemInList( ScheduleName, DaySchedule( {1,NumDaySchedules} ).Name(), NumDaySchedules );
+			GetDayScheduleIndex = FindItemInList( ScheduleName, DaySchedule( {1,NumDaySchedules} ) );
 			if ( GetDayScheduleIndex > 0 ) {
 				DaySchedule( GetDayScheduleIndex ).Used = true;
 			}
@@ -3473,15 +3500,16 @@ namespace ScheduleManager {
 		Real64 MaxValue( 0.0 ); // For total maximum
 		bool MinValueOk;
 		bool MaxValueOk;
-		static bool RunOnceOnly( true );
-
+		/////////// hoisted into namespace CheckScheduleValueMinMaxRunOnceOnly////////////
+		//static bool RunOnceOnly( true );
+		/////////////////////////////////////////////////
 		//precompute the dayschedule max and min so that it is not in nested loop
-		if ( RunOnceOnly ) {
+		if ( CheckScheduleValueMinMaxRunOnceOnly ) {
 			for ( Loop = 0; Loop <= NumDaySchedules; ++Loop ) {
 				DaySchedule( Loop ).TSValMin = minval( DaySchedule( Loop ).TSValue );
 				DaySchedule( Loop ).TSValMax = maxval( DaySchedule( Loop ).TSValue );
 			}
-			RunOnceOnly = false;
+			CheckScheduleValueMinMaxRunOnceOnly = false;
 		}
 
 		if ( ScheduleIndex == -1 ) {
@@ -4736,7 +4764,7 @@ namespace ScheduleManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

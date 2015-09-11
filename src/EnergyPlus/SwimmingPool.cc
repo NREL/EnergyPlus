@@ -66,7 +66,7 @@ namespace SwimmingPool {
 	// 2. Janis, R. and W. Tao (2005). Mechanical and Electrical Systems in Buildings. 3rd ed. Upper
 	//    Saddle River, NJ: Pearson Education, Inc., p.246.
 	// 3. Kittler, R. (1989). Indoor Natatorium Design and Energy Recycling. ASHRAE Transactions 95(1), p.521-526.
-	// 4. Smith, C., R. Jones, and G. Löf (1993). Energy Requirements and Potential Savings for Heated
+	// 4. Smith, C., R. Jones, and G. Lof (1993). Energy Requirements and Potential Savings for Heated
 	//    Indoor Swimming Pools. ASHRAE Transactions 99(2), p.864-874.
 	// USE STATEMENTS:
 	// Use statements for data only modules
@@ -166,7 +166,7 @@ namespace SwimmingPool {
 
 		}
 
-		if ( NumSwimmingPools > 0 ) CalcHeatBalanceInsideSurf();
+		if ( NumSwimmingPools > 0 ) HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
 
 		ReportSwimmingPool();
 
@@ -289,7 +289,7 @@ namespace SwimmingPool {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Pool.Name(), Item, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), Pool, Item, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -425,7 +425,6 @@ namespace SwimmingPool {
 				TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 6 ), Alphas( 7 ), "Hot Water Nodes" );
 			}
 			Pool( Item ).WaterVolFlowMax = Numbers( 6 );
-
 			Pool( Item ).MiscPowerFactor = Numbers( 7 );
 			if ( Pool( Item ).MiscPowerFactor < MinPowerFactor ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + " has a miscellaneous power factor less than zero." );
@@ -485,8 +484,8 @@ namespace SwimmingPool {
 		// Set up the output variables for swimming pools
 		// CurrentModuleObject = "SwimmingPool:Indoor"
 		for ( Item = 1; Item <= NumSwimmingPools; ++Item ) {
-			SetupOutputVariable( "Indoor Pool Makeup Water Rate [m3/s]", Pool( Item ).MakeUpWaterMassFlowRate, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Makeup Water Volume [m3]", Pool( Item ).MakeUpWaterMass, "System", "Sum", Pool( Item ).Name, _, "MainsWater", "Heating", _, "System");
+			SetupOutputVariable( "Indoor Pool Makeup Water Rate [m3/s]", Pool(Item).MakeUpWaterVolFlowRate, "System", "Average", Pool(Item).Name);
+			SetupOutputVariable( "Indoor Pool Makeup Water Volume [m3]", Pool( Item ).MakeUpWaterVol, "System", "Sum", Pool( Item ).Name, _, "MainsWater", "Heating", _, "System");
 			SetupOutputVariable( "Indoor Pool Makeup Water Temperature [C]", Pool( Item ).CurMakeupWaterTemp, "System", "Average", Pool( Item ).Name );
 			SetupOutputVariable( "Indoor Pool Water Temperature [C]", Pool( Item ).PoolWaterTemp, "System", "Average", Pool( Item ).Name );
 			SetupOutputVariable( "Indoor Pool Inlet Water Temperature [C]", Pool( Item ).WaterInletTemp, "System", "Average", Pool( Item ).Name );
@@ -631,10 +630,9 @@ namespace SwimmingPool {
 			Density =GetDensityGlycol( "WATER", Pool( PoolNum ).PoolWaterTemp, Pool( PoolNum ).GlycolIndex, RoutineName );
 			Pool( PoolNum ).WaterMass = Surface( Pool( PoolNum ).SurfacePtr ).Area * Pool( PoolNum ).AvgDepth * Density;
 			Pool( PoolNum ).WaterMassFlowRateMax = Pool( PoolNum ).WaterVolFlowMax * Density;
-
 			if ( ! MyPlantScanFlagPool( PoolNum ) ) {
 				if ( Pool( PoolNum ).WaterInletNode > 0 ) {
-					InitComponentNodes( 0.0, Pool( PoolNum ).WaterVolFlowMax, Pool( PoolNum ).WaterInletNode, Pool( PoolNum ).WaterOutletNode, Pool( PoolNum ).HWLoopNum, Pool( PoolNum ).HWLoopSide, Pool( PoolNum ).HWBranchNum, Pool( PoolNum ).HWCompNum );
+					InitComponentNodes( 0.0, Pool( PoolNum ).WaterMassFlowRateMax, Pool( PoolNum ).WaterInletNode, Pool( PoolNum ).WaterOutletNode, Pool( PoolNum ).HWLoopNum, Pool( PoolNum ).HWLoopSide, Pool( PoolNum ).HWBranchNum, Pool( PoolNum ).HWCompNum );
 				}
 			}
 		}
@@ -778,7 +776,7 @@ namespace SwimmingPool {
 		//  2. Janis, R. and W. Tao (2005). Mechanical and Electrical Systems in Buildings. 3rd ed. Upper
 		//     Saddle River, NJ: Pearson Education, Inc., p.246.
 		//  3. Kittler, R. (1989). Indoor Natatorium Design and Energy Recycling. ASHRAE Transactions 95(1), p.521-526.
-		//  4. Smith, C., R. Jones, and G. Löf (1993). Energy Requirements and Potential Savings for Heated
+		//  4. Smith, C., R. Jones, and G. Lof (1993). Energy Requirements and Potential Savings for Heated
 		//     Indoor Swimming Pools. ASHRAE Transactions 99(2), p.864-874.
 
 		// Using/Aliasing
@@ -871,7 +869,6 @@ namespace SwimmingPool {
 		Pool( PoolNum ).MakeUpWaterMassFlowRate = EvapRate;
 		EvapEnergyLossPerArea = -EvapRate *  PsyHfgAirFnWTdb( ZoneAirHumRatAvg( ZoneNum ), MAT( ZoneNum ) ) / Surface( SurfNum ).Area;
 		Pool( PoolNum ).EvapHeatLossRate = EvapEnergyLossPerArea * Surface( SurfNum ).Area;
-
 		// LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
 		// to the air directly and added to the zone air heat balance
 		LWsum = ( QRadThermInAbs( SurfNum ) +  NetLWRadToSurf( SurfNum ) + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) );
@@ -1239,13 +1236,31 @@ namespace SwimmingPool {
 			Pool( PoolNum ).MakeUpWaterMass = Pool( PoolNum ).MakeUpWaterMassFlowRate * TimeStepSys * SecInHour;
 			Pool( PoolNum ).EvapEnergyLoss = Pool( PoolNum ).EvapHeatLossRate * TimeStepSys * SecInHour;
 
+			Pool( PoolNum ).MakeUpWaterVolFlowRate = MakeUpWaterVolFlowFunct(Pool( PoolNum ).MakeUpWaterMassFlowRate, Density);
+			Pool( PoolNum ).MakeUpWaterVol = MakeUpWaterVolFunct(Pool( PoolNum ).MakeUpWaterMass, Density);
 		}
 
 	}
 
+	Real64
+	MakeUpWaterVolFlowFunct( Real64 MakeUpWaterMassFlowRate, Real64 Density )
+	{
+		Real64 MakeUpWaterVolumeFlow;
+		MakeUpWaterVolumeFlow = MakeUpWaterMassFlowRate * Density;
+		return MakeUpWaterVolumeFlow;
+	}
+
+	Real64
+	MakeUpWaterVolFunct( Real64 MakeUpWaterMass, Real64 Density )
+	{
+		Real64 MakeUpWaterVolume;
+		MakeUpWaterVolume = MakeUpWaterMass * Density;
+		return MakeUpWaterVolume;
+	}
+
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

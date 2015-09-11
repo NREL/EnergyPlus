@@ -32,29 +32,29 @@ namespace TARCOGCommon {
 	void
 	matrixQBalance(
 		int const nlayer,
-		Array2A< Real64 > a,
-		Array1A< Real64 > b,
-		Array1A< Real64 > const scon,
-		Array1A< Real64 > const thick,
-		Array1A< Real64 > const hcgas,
+		Array2< Real64 > & a,
+		Array1< Real64 > & b,
+		Array1< Real64 > const & scon,
+		Array1< Real64 > const & thick,
+		Array1< Real64 > const & hcgas,
 		Real64 const hcout,
 		Real64 const hcin,
-		Array1A< Real64 > const asol,
-		Array1A< Real64 > const qv,
+		Array1< Real64 > const & asol,
+		Array1< Real64 > const & qv,
 		Real64 const Tin,
 		Real64 const Tout,
 		Real64 const Gin,
 		Real64 const Gout,
-		Array1A< Real64 > const theta,
-		Array1A< Real64 > const tir,
-		Array1A< Real64 > const rir,
-		Array1A< Real64 > const emis
+		Array1< Real64 > const & theta,
+		Array1< Real64 > const & tir,
+		Array1< Real64 > const & rir,
+		Array1< Real64 > const & emis
 	);
 
 	void
 	EquationsSolver(
-		Array2A< Real64 > a,
-		Array1A< Real64 > b,
+		Array2< Real64 > & a,
+		Array1< Real64 > & b,
 		int const n,
 		int & nperr,
 		std::string & ErrorMessage
@@ -62,9 +62,9 @@ namespace TARCOGCommon {
 
 	void
 	ludcmp(
-		Array2A< Real64 > a,
+		Array2< Real64 > & a,
 		int const n,
-		Array1A_int indx,
+		Array1_int & indx,
 		Real64 & d,
 		int & nperr,
 		std::string & ErrorMessage
@@ -83,7 +83,7 @@ namespace TARCOGCommon {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

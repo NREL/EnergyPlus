@@ -206,7 +206,7 @@ namespace loc {
 		}
 
 		if ( InitLoopEquip ) {
-			SurfaceGHENum = FindItemInList( CompName, SurfaceGHE.Name(), NumOfSurfaceGHEs );
+			SurfaceGHENum = FindItemInList( CompName, SurfaceGHE );
 			CompIndex = SurfaceGHENum;
 			return;
 		}
@@ -263,7 +263,6 @@ namespace loc {
 
 		// Using/Aliasing
 		using DataHeatBalance::Construct;
-		using DataHeatBalance::TotConstructs;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::FindItemInList;
@@ -325,7 +324,7 @@ namespace loc {
 			// General user input data
 			SurfaceGHE( Item ).Name = cAlphaArgs( 1 );
 			SurfaceGHE( Item ).ConstructionName = cAlphaArgs( 2 );
-			SurfaceGHE( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+			SurfaceGHE( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct );
 
 			if ( SurfaceGHE( Item ).ConstructionNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
@@ -1731,7 +1730,7 @@ namespace loc {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

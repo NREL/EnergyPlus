@@ -89,7 +89,6 @@ namespace DataSurfaceLists {
 		using InputProcessor::GetObjectDefMaxArgs;
 		using InputProcessor::VerifyName;
 		using DataHeatBalance::Zone;
-		using DataGlobals::NumOfZones;
 		using General::RoundSigDigits;
 
 		// Locals
@@ -159,7 +158,7 @@ namespace DataSurfaceLists {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), SurfList.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject1 + " Name" );
+				VerifyName( Alphas( 1 ), SurfList, Item - 1, IsNotOK, IsBlank, CurrentModuleObject1 + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -168,7 +167,7 @@ namespace DataSurfaceLists {
 				SurfList( Item ).Name = Alphas( 1 );
 				SurfList( Item ).NumOfSurfaces = NumAlphas - 1;
 
-				NameConflict = FindItemInList( SurfList( Item ).Name, Surface.Name(), TotSurfaces );
+				NameConflict = FindItemInList( SurfList( Item ).Name, Surface );
 				if ( NameConflict > 0 ) { // A surface list has the same name as a surface--not allowed
 					ShowSevereError( CurrentModuleObject1 + " = " + SurfList( Item ).Name + " has the same name as a surface; this is not allowed." );
 					ErrorsFound = true;
@@ -186,7 +185,7 @@ namespace DataSurfaceLists {
 				SumOfAllFractions = 0.0;
 				for ( SurfNum = 1; SurfNum <= SurfList( Item ).NumOfSurfaces; ++SurfNum ) {
 					SurfList( Item ).SurfName( SurfNum ) = Alphas( SurfNum + 1 );
-					SurfList( Item ).SurfPtr( SurfNum ) = FindItemInList( Alphas( SurfNum + 1 ), Surface.Name(), TotSurfaces );
+					SurfList( Item ).SurfPtr( SurfNum ) = FindItemInList( Alphas( SurfNum + 1 ), Surface );
 					if ( SurfList( Item ).SurfPtr( SurfNum ) == 0 ) {
 						ShowSevereError( cAlphaFields( SurfNum + 1 ) + " in " + CurrentModuleObject1 + " statement not found = " + SurfList( Item ).SurfName( SurfNum ) );
 						ErrorsFound = true;
@@ -244,7 +243,7 @@ namespace DataSurfaceLists {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), SlabList.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject2 + " Name" );
+				VerifyName( Alphas( 1 ), SlabList, Item - 1, IsNotOK, IsBlank, CurrentModuleObject2 + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -253,7 +252,7 @@ namespace DataSurfaceLists {
 				SlabList( Item ).Name = Alphas( 1 );
 				SlabList( Item ).NumOfSurfaces = ( ( NumAlphas - 1 ) / 4 );
 
-				NameConflict = FindItemInList( SlabList( Item ).Name, Surface.Name(), TotSurfaces );
+				NameConflict = FindItemInList( SlabList( Item ).Name, Surface );
 				if ( NameConflict > 0 ) { // A surface list has the same name as a surface--not allowed
 					ShowSevereError( CurrentModuleObject2 + " = " + SlabList( Item ).Name + " has the same name as a slab; this is not allowed." );
 					ErrorsFound = true;
@@ -279,14 +278,14 @@ namespace DataSurfaceLists {
 				NumArray = 1;
 				for ( SurfNum = 1; SurfNum <= SlabList( Item ).NumOfSurfaces; ++SurfNum ) {
 					SlabList( Item ).ZoneName( SurfNum ) = Alphas( AlphaArray );
-					SlabList( Item ).ZonePtr = FindItemInList( Alphas( AlphaArray ), Zone.Name(), NumOfZones );
+					SlabList( Item ).ZonePtr = FindItemInList( Alphas( AlphaArray ), Zone );
 					if ( SlabList( Item ).ZonePtr( SurfNum ) == 0 ) {
 						ShowSevereError( cAlphaFields( AlphaArray + 1 ) + " in " + CurrentModuleObject2 + " Zone not found = " + SlabList( Item ).SurfName( SurfNum ) );
 						ErrorsFound = true;
 					}
 
 					SlabList( Item ).SurfName( SurfNum ) = Alphas( AlphaArray + 1 );
-					SlabList( Item ).SurfPtr( SurfNum ) = FindItemInList( Alphas( AlphaArray + 1 ), Surface.Name(), TotSurfaces );
+					SlabList( Item ).SurfPtr( SurfNum ) = FindItemInList( Alphas( AlphaArray + 1 ), Surface );
 					if ( SlabList( Item ).SurfPtr( SurfNum ) == 0 ) {
 						ShowSevereError( cAlphaFields( AlphaArray + 1 ) + " in " + CurrentModuleObject2 + " statement not found = " + SlabList( Item ).SurfName( SurfNum ) );
 						ErrorsFound = true;
@@ -432,7 +431,7 @@ namespace DataSurfaceLists {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

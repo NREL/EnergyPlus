@@ -165,7 +165,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			GSHPNum = FindItemInList( GSHPName, GSHP.Name(), NumGSHPs );
+			GSHPNum = FindItemInList( GSHPName, GSHP );
 			if ( GSHPNum == 0 ) {
 				ShowFatalError( "SimHPWatertoWaterCOOLING: Unit not found=" + GSHPName );
 			}
@@ -276,7 +276,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 			GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			IsNotOK = false;
 			IsBlank = true;
-			VerifyName( AlphArray( 1 ), GSHP.Name(), GSHPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
+			VerifyName( AlphArray( 1 ), GSHP, GSHPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;

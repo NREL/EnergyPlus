@@ -33,6 +33,11 @@ namespace DataIPShortCuts {
 	extern Array1D< Real64 > rNumericArgs;
 	extern std::string cCurrentModuleObject;
 
+	// Clears the global data in DataIPShortCuts.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 } // DataIPShortCuts
 
 } // EnergyPlus

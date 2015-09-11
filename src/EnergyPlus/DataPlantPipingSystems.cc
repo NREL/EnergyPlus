@@ -46,7 +46,7 @@ namespace DataPlantPipingSystems {
 	int const PartitionType_ZSideWall( -8 );
 	int const PartitionType_FloorInside( -9 );
 	int const PartitionType_UnderFloor( -10 );
-	int const PartitionType_HorizInsXSide( 11 );
+	int const PartitionType_HorizInsXSide( -11 );
 	int const PartitionType_VertInsLowerEdge( -12 );
 	int const PartitionType_HorizInsZSide( -13 );
 
@@ -114,7 +114,7 @@ namespace DataPlantPipingSystems {
 	Array1D< PipeSegmentInfo > PipingSystemSegments;
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
