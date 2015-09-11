@@ -781,7 +781,7 @@ namespace WeatherManager {
 
 			SetupInterpolationValues();
 			TimeStepFraction = 1.0 / double( NumOfTimeStepInHour );
-			rhoAirSTP = Psychrometrics::PsyRhoAirFnPbTdbW( stdAtmosphericPressure, constant_twenty, constant_zero );
+			rhoAirSTP = Psychrometrics::PsyRhoAirFnPbTdbW( StdPressureSeaLevel, constant_twenty, constant_zero );
 			OpenWeatherFile( ErrorsFound ); // moved here because of possibility of special days on EPW file
 			CloseWeatherFile();
 			ReadUserWeatherInput();
@@ -4885,8 +4885,7 @@ Label9999: ;
 		}
 
 		if ( ! ErrorsFound ) {
-			StdBaroPress = 101.325 * std::pow( 1.0 - 2.25577e-05 * Elevation, 5.2559 );
-			StdBaroPress *= 1000.0;
+			StdBaroPress = StdPressureSeaLevel * std::pow( 1.0 - 2.25577e-05 * Elevation, 5.2559 );
 			StdRhoAir = PsyRhoAirFnPbTdbW( StdBaroPress, constant_twenty, constant_zero );
 			// Write Final Location Information to the initialization output file
 			gio::write( OutputFileInits, LocHdFormat );
