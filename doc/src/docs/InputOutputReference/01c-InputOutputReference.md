@@ -14583,27 +14583,27 @@ This alpha field defines the name of a quadratic performance curve that paramete
 
 This alpha field defines the name of a quadratic performance curve that parameterizes the variation of outdoor unit condensing temperature as a function of subcooling degrees. The output of this curve is the temperature difference between the condensing temperature and the coil surface air temperature.
 
-#### Field: Diameter of main pipe connecting outdoor unit to indoor units
+#### Field: Diameter of Main Pipe Connecting Outdoor Unit to Indoor Units
 
 This numeric field defines the diameter of main pipe connecting outdoor unit to indoor units. This value is used to calculate the piping loss of the refrigerant when going through the main pipe, including the heat loss and pressure drop. If this field is blank, the default value of 0.0254m is used.
 
-#### Field: Length of main pipe connecting outdoor unit to indoor units
+#### Field: Length of Main Pipe Connecting Outdoor Unit to Indoor Units
 
 This numeric field defines the length of main pipe connecting outdoor unit to indoor units. This value is used to calculate the heat loss of the refrigerant when going through the main pipe. The value should be greater than 0. If this field is blank, the default value of 30m is used.
 
-#### Field: Equivalent length of main pipe connecting outdoor unit to indoor units
+#### Field: Equivalent Length of Main Pipe Connecting Outdoor Unit to Indoor Units
 
 This numeric field defines the equivalent length of main pipe connecting outdoor unit to indoor units. This value is used to calculate the pressure drop of the refrigerant when going through the main pipe. The value should be greater than the real pipe length specified in the above field. If this field is blank, the default value of 36m is used.
 
-#### Field: Height difference between the outdoor unit node and indoor unit node of the main pipe
+#### Field: Height Difference Between Outdoor Unit and Indoor Units
 
 This numeric field defines the height difference between the outdoor unit node and indoor unit node of the main pipe. This value is used to calculate the piping loss of the refrigerant when going through the main pipe. The value can be positive, zero, or negative. Positive means outdoor unit is higher than indoor unit, while negative means outdoor unit is lower than indoor unit.
 
-#### Field: Insulation thickness of the main pipe
+#### Field: Main Pipe Insulation Thickness
 
 This numeric field defines the insulation thickness of the main pipe. This value is used to calculate the heat loss of the refrigerant when going through the main pipe. The value should be greater than 0. If this field is blank, the default value of 0.02m is used.
 
-#### Field: Thermal conductivity of the main pipe insulation material
+#### Field: Main Pipe Insulation Thermal Conductivity
 
 This numeric field defines the thermal conductivity of the main pipe insulation material. This value is used to calculate the heat loss of the refrigerant when going through the main pipe. The value should be greater than 0. If this field is blank, the default value of 0.032 W/m-K is used.
 
