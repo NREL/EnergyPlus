@@ -953,7 +953,6 @@ namespace AirflowNetworkBalanceManager {
 			}
 		} else {
 			ShowSevereError( RoutineName + "For an AirflowNetwork Simulation, at least one " + CurrentModuleObject + " object is required but none were found." );
-			ErrorsFound = true;
 			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
 		}
 
@@ -2279,11 +2278,11 @@ namespace AirflowNetworkBalanceManager {
 				if ( IntraZoneNodeData( i ).RAFNNodeNum == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "='" + Alphas( 1 ) + "' invalid name " + cAlphaFields( 2 ) + "='" + Alphas( 2 ) );
 					ErrorsFound = true;
-				}
+			}
 				IntraZoneNodeData( i ).AFNZoneNum = FindItemInList( Alphas( 3 ), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones );
 				if ( MultizoneZoneData( IntraZoneNodeData( i ).AFNZoneNum ).RAFNNodeNum == 0 ) {
 					GetRAFNNodeNum( MultizoneZoneData( IntraZoneNodeData( i ).AFNZoneNum ).ZoneName, IntraZoneNodeData( i ).ZoneNum, MultizoneZoneData( IntraZoneNodeData( i ).AFNZoneNum ).RAFNNodeNum, Errorfound1 );
-				}
+		}
 				if ( IntraZoneNodeData( i ).ZoneNum == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "='" + Alphas( 1 ) + "' the Zone is not defined for " + cAlphaFields( 3 ) + "='" + Alphas( 3 ) );
 					ErrorsFound = true;
@@ -3248,7 +3247,7 @@ namespace AirflowNetworkBalanceManager {
 						ShowSevereError( RoutineName + AirflowNetworkLinkageData( count ).CompName + ": The component is not allowed in " + AirflowNetworkLinkageData( count ).Name );
 						ShowContinueError( "The allowed component type is either AirflowNetwork:MultiZone:Surface:Crack or AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea." );
 						ErrorsFound = true;
-					}
+			}
 					found = true;
 					break;
 				}
@@ -3297,7 +3296,7 @@ namespace AirflowNetworkBalanceManager {
 									RoomAirflowNetworkZoneInfo( n ).Node( j ).Link( k ).AirflowNetworkLinkageDataID = m;
 									k = k + 1;
 									if ( k > AirflowNetworkNodeData( i ).NumOfLinks ) break;
-								}
+		}
 							}
 						}
 					}
@@ -3746,9 +3745,9 @@ namespace AirflowNetworkBalanceManager {
 						if ( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( AirflowNetworkNodeData( i ).RAFNNodeNum ).AirflowNetworkNodeID == i ) {
 							AirflowNetworkNodeSimu( i ).TZ = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( AirflowNetworkNodeData( i ).RAFNNodeNum ).AirTemp;
 							AirflowNetworkNodeSimu( i ).WZ = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( AirflowNetworkNodeData( i ).RAFNNodeNum ).HumRat;
-						}
-					}
 				}
+			}
+		}
 			}
 		}
 
@@ -4720,7 +4719,7 @@ namespace AirflowNetworkBalanceManager {
 				ZoneNum = AirflowNetworkNodeData( i ).EPlusZoneNum;
 				if ( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( AirflowNetworkNodeData( i ).RAFNNodeNum ).AirflowNetworkNodeID == i ) {
 					MV( i ) = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( AirflowNetworkNodeData( i ).RAFNNodeNum ).AirTemp*1.0e10;
-				}
+		}
 			}
 		}
 
@@ -4989,7 +4988,7 @@ namespace AirflowNetworkBalanceManager {
 				if ( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( AirflowNetworkNodeData( i ).RAFNNodeNum ).AirflowNetworkNodeID == i ) {
 					MV( i ) = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( AirflowNetworkNodeData( i ).RAFNNodeNum ).HumRat*1.0e10;
 				}
-			}
+		}
 		}
 
 		// Check singularity
