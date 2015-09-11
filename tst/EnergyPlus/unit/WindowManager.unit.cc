@@ -56,8 +56,8 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 		"WindowProperty:FrameAndDivider,",
 	  "  WindowFrame,             !- Name",
 	  "  0.05,                    !- Frame Width {m}",
-	  "  0.05,                    !- Frame Outside Projection {m}",
-	  "  0.05,                    !- Frame Inside Projection {m}",
+	  "  0.00,                    !- Frame Outside Projection {m}",
+	  "  0.00,                    !- Frame Inside Projection {m}",
 	  "  5.0,                     !- Frame Conductance {W/m2-K}",
 	  "  1.2,                     !- Ratio of Frame-Edge Glass Conductance to Center-Of-Glass Conductance",
 	  "  0.8,                     !- Frame Solar Absorptance",
@@ -67,8 +67,8 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 	  "  0.02,                    !- Divider Width {m}",
 	  "  2,                       !- Number of Horizontal Dividers",
 	  "  2,                       !- Number of Vertical Dividers",
-	  "  0.02,                    !- Divider Outside Projection {m}",
-	  "  0.02,                    !- Divider Inside Projection {m}",
+	  "  0.00,                    !- Divider Outside Projection {m}",
+	  "  0.00,                    !- Divider Inside Projection {m}",
 	  "  5.0,                     !- Divider Conductance {W/m2-K}",
 	  "  1.2,                     !- Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance",
 	  "  0.8,                     !- Divider Solar Absorptance",
@@ -248,6 +248,6 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 
 	}
 
-	EXPECT_NEAR(DataSurfaces::WinGainFrameDividerToZoneRep( winNum ), -464.4, 0.1);
+	EXPECT_NEAR(DataSurfaces::WinGainFrameDividerToZoneRep( winNum ), -331.4, 0.1);
 
 }
