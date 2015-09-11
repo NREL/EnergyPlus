@@ -4608,7 +4608,6 @@ namespace HeatBalanceManager {
 		MCPTM.dimension( NumOfZones, 0.0 );
 		MixingMassFlowZone.dimension( NumOfZones, 0.0 );
 		MixingMassFlowXHumRat.dimension( NumOfZones, 0.0 );
-		ZoneMassBalanceRepVarFlag.dimension( NumOfZones, true );
 		ZoneReOrder.allocate( NumOfZones );
 		ZoneMassBalanceFlag.dimension( NumOfZones, false );
 		ZoneInfiltrationFlag.dimension( NumOfZones, false );

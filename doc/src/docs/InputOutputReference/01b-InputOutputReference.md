@@ -4054,49 +4054,49 @@ ZoneAirMassFlowConservation,
 
 ### ZoneAirMassFlowConservation Outputs
 
-Current ZoneAirMassFlowConservation output variables:
+Current ZoneAirMassFlowConservation output variables (only applicable variables will be generated):
 
-* HVAC, Average, Zone Supply Air Mass Flow Rate [kg/s]
+* HVAC, Average, Zone Air Mass Balance Supply Mass Flow Rate [kg/s]
 
-* HVAC, Average, Zone Exhaust Air Mass Flow Rate [kg/s]
+* HVAC, Average, Zone Air Mass Balance Exhaust Mass Flow Rate [kg/s]
 
-* HVAC, Average, Zone Return Air Mass Flow Rate [kg/s]
+* HVAC, Average, Zone Air Mass Balance Return Mass Flow Rate [kg/s]
 
-* HVAC, Average, Zone Mixing Receiving Air Mass Flow Rate [kg/s]
+* HVAC, Average, Zone Air Mass Balance Mixing Receiving Mass Flow Rate [kg/s]
 
-* HVAC, Average, Zone Mixing Source Air Mass Flow Rate [kg/s]
+* HVAC, Average, Zone Air Mass Balance Mixing Source Mass Flow Rate [kg/s]
 
 * HVAC, Average, Zone Infiltration Air Mass Flow Balance Status, []
 
 * HVAC, Average, Zone Mass Balance Infiltration Air Mass Flow Rate, [kg/s]
 
-#### Zone Supply Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Supply Mass Flow Rate [kg/s]
 
 This output variable represents the total supply air mass flow rate of a zone. The value is determined by summing the supply air mass flow rates contributions from all supply air inlet nodes of a zone.
 
-#### Zone Exhaust Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Exhaust Mass Flow Rate [kg/s]
 
 This output variable represents the total exhaust air mass flow rate of a zone. The value is determined by summing the exhaust air mass flow rates contributions from all exhaust air nodes of a zone.
 
-#### Zone Return Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Return Mass Flow Rate [kg/s]
 
 This output variable represents the total return air mass flow rate of a zone. The value is determined by summing the return air mass flow rates contributions from return air nodes of a zone.
 
-#### Zone Mixing Receiving Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Mixing Receiving Mass Flow Rate [kg/s]
 
 This output variable represents the total zone mixing air mass flow rate of a receiving zone from one or more mixing objects. The value is determined by summing the air mass flow contributions from all zone mixing objects connected to a single receiving zone.
 
-#### Zone Mixing Source Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Mixing Source Mass Flow Rate [kg/s]
 
 This output variable represents the total zone mixing source air mass flow rate of a source zone feeding one or more mixing objects. The value is determined by summing the air mass flow contributions from all zone mixing objects connected to a single source zone.
 
-#### Zone Infiltration Air Mass Flow Balance Status []
+#### Zone Air Mass Balance Infiltration Status []
 
 This output variable indicates the status of the infiltration object mass flow rate use for balancing the zone mass flow at each time step. It has values of either **0** or **1**.  If the value of this report variable is **0** then the zone infiltration object mass flow rate is not used in the zone mass conservation calculation, hence the infiltration rate calculated based on the user specified inputs is manintained and the infiltration rate is assumed as self-balanced for the current timestep.  If the value is 1 then the zone infiltration object mass flow rate is included in the zone air mass flow balance calculation, hence the user specified infiltration rate is modified and it is considered as incoming flow to the zone, i.e., self-balanced assumption is not valid for this zone and current time step.
 
-#### Zone Mass Balance Infiltration Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Infiltration Mass Flow Rate [kg/s]
 
-This output variable represents the zone infiltration air mass flow rate in kg/s.  This output variable is reported only for source zones and when the zone air mass flow balance is active.  Its value depends on the Infiltration Balancing Method specified.  When the infiltration method is *AddInfiltrationFlow* this output represents the additional infiltration air mass flow rate added on top of the base infiltration air flow in order to balance the zone air mass flow. In this case, the base infiltration air mass flow calculated using the user specified input is assumed self-balanced.  When the infiltration method is *AdjustInfiltrationFlow* and the value of "Zone Infiltration Air Mass Flow Balance Status" is **1**, this output represents the infiltration air mass flow rate required to balance the zone air mass flow. This value could be negative if the zone supply exceeds all other outflows. If the value of "Zone Infiltration Air Mass Flow Balance Status" is **0**, then this output is the self-balanced base infiltration flow rate for current timestep.
+This output variable represents the zone infiltration air mass flow rate in kg/s.  This output variable is reported only for source zones and when the zone air mass flow balance is active.  Its value depends on the Infiltration Balancing Method specified.  When the infiltration method is *AddInfiltrationFlow* this output represents the additional infiltration air mass flow rate added on top of the base infiltration air flow in order to balance the zone air mass flow. In this case, the base infiltration air mass flow calculated using the user specified input is assumed self-balanced.  When the infiltration method is *AdjustInfiltrationFlow* and the value of "Zone Air Mass Balance Infiltration Status" is **1**, this output represents the infiltration air mass flow rate required to balance the zone air mass flow. This value could be negative if the zone supply exceeds all other outflows. If the value of "Zone Air Mass Balance Infiltration Status" is **0**, then this output is the self-balanced base infiltration flow rate for current timestep.
 
 Group – Design Objects
 ----------------------
