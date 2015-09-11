@@ -22751,6 +22751,7 @@ AirflowNetwork:MultiZone:Zone,
       \memo both exterior and interior.
   A1, \field Zone Name
       \required-field
+      \reference AirFlowNetworkMultizoneZones
       \type object-list
       \object-list ZoneNames
       \note Enter the zone name where ventilation control is required.
@@ -24187,8 +24188,8 @@ AirflowNetwork:IntraZone:Node,
       \note object.
  A3 , \field Zone Name
       \required-field
-      \type alpha
-      \object-list AirflowNetwork:MultiZone:Zone
+      \type object-list
+      \object-list AirFlowNetworkMultizoneZones
       \note Enter the name of a zone object defined in a AirflowNetwork:MultiZone:Zone
       \note object.
  N1 ; \field Node Height
@@ -51745,7 +51746,7 @@ AirLoopHVAC:UnitarySystem,
        \object-list CoolingCoilsWaterToAirHP
        \object-list CoolingCoilsWaterToAirVSHP
        \object-list CoolingCoilsWater
-       \object-list UserDefindedCoil
+       \object-list UserDefinedCoil
        \note Enter the name of the cooling coil if included in the unitary system.
   A16, \field Use DOAS DX Cooling Coil
        \type choice
