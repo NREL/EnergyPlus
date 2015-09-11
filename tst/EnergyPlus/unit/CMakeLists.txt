@@ -71,6 +71,7 @@ set( test_src
   WaterThermalTanks.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
+  WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
