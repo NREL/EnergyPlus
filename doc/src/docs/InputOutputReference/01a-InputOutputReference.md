@@ -19153,7 +19153,7 @@ The steam equipment district heating consumption in Watts (for power) or Joules 
 
 Note that zone energy consumption is not reported for OTHER EQUIPMENT and does not go on any meter.
 
-### ElectricEquipment :ITE:AirCooled
+### ElectricEquipment:ITE:AirCooled
 
 This object describes air-cooled electric information technology equipment (ITE) which has variable power consumption as a function of loading and temperature.
 
