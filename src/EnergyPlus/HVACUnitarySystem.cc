@@ -2445,8 +2445,8 @@ namespace HVACUnitarySystem {
 			SizingMethod = MaxHeaterOutletTempSizing;
 			PrintFlag = true;
 			TempSize = UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp;
-			FieldNum = 18; // N18, \field Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
-			SizingString = UnitarySystemNumericFields( UnitarySysNum ).FieldNames( FieldNum ) + " [m3/s]";
+			FieldNum = 17; // N17, \field Maximum Supply Air Temperature
+			SizingString = UnitarySystemNumericFields( UnitarySysNum ).FieldNames( FieldNum ) + " [C]";
 			RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 			UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp = TempSize;
 
@@ -3268,7 +3268,14 @@ namespace HVACUnitarySystem {
 						ErrorsFound = true;
 						errFlag = false;
 					}
-
+					// Get DX heating coil capacity
+					UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = GetCoilCapacityVariableSpeed( HeatingCoilType, HeatingCoilName, errFlag );
+					if ( UnitarySystem( UnitarySysNum ).DesignHeatingCapacity == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
+					if ( errFlag ) {
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ErrorsFound = true;
+						errFlag = false;
+					}
 				}
 			} else if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating ) {
 				UnitarySystem( UnitarySysNum ).DXHeatingCoil = true;

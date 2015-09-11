@@ -239,6 +239,11 @@ SET( SRC
   GlobalNames.hh
   GroundHeatExchangers.cc
   GroundHeatExchangers.hh
+  GroundTemperatureModeling/BaseGroundTemperatureModel.hh
+  GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.cc
+  GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh
+  GroundTemperatureModeling/GroundTemperatureModelManager.cc
+  GroundTemperatureModeling/GroundTemperatureModelManager.hh
   HVACControllers.cc
   HVACControllers.hh
   HVACCooledBeam.cc
@@ -303,10 +308,22 @@ SET( SRC
   HighTempRadiantSystem.hh
   Humidifiers.cc
   Humidifiers.hh
+  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
+  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
 )
  
 SET( SRC_2
   Timer.h
+  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc
+  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh
+  GroundTemperatureModeling/SiteDeepGroundTemperatures.cc
+  GroundTemperatureModeling/SiteDeepGroundTemperatures.hh
+  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.cc
+  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh
+  GroundTemperatureModeling/SiteShallowGroundTemperatures.cc
+  GroundTemperatureModeling/SiteShallowGroundTemperatures.hh
+  GroundTemperatureModeling/XingGroundTemperatureModel.cc
+  GroundTemperatureModeling/XingGroundTemperatureModel.hh
   ICEngineElectricGenerator.cc
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc

@@ -2545,12 +2545,13 @@ An IDF example:
 Site:GroundTemperature:BuildingSurface,19,20,20,20,20,20,20,20,20,20,20,20;
 ```
 
-
 ### Site:GroundTemperature:Shallow
 
 Site:GroundTemperature:Shallow are used by the Surface Ground Heat Exchanger (i.e. object: GroundHeatExchanger:Surface). Only one shallow ground temperature object can be included.
 
 Note that the ground temperatures included in full year weather files may be suitable of being used for the values in these fields – namely, the .5 m depth temperatures that are calculated for “undisturbed” soil of “typical” conditions. However, you may wish to use some other change effect – based on the weather conditions of the building location.
+
+This object may be used for objects requiring "undisturbed" ground temperatures. In these instances, the "name" input field is not required. 
 
 #### Field: Month Temperature(s) – 12 fields in all
 
@@ -2569,6 +2570,8 @@ Site:GroundTemperature:Deep are used by the Pond Ground Heat Exchanger object (i
 
 Note that the ground temperatures included in full year weather files may be suitable of being used for the values in these fields – namely, the 4 m depth temperatures that are calculated for “undisturbed” soil of “typical” conditions. However, you may wish to use some other change effect – based on the weather conditions or special knowledge of the building location.
 
+This object may be used for objects requiring "undisturbed" ground temperatures. In these instances, the "name" input field is not required. 
+
 #### Field: Month Temperature(s) – 12 fields in all
 
 Each numeric field is the monthly deep ground temperature (degrees Celsius) used for the indicated month (January=1<sup>st</sup> field, February=2<sup>nd</sup> field, etc.)
@@ -2578,6 +2581,151 @@ An IDF example:
 ```idf
 Site:GroundTemperature:Deep,  16,16,16,16,16,16,16,16,16,16,16,16;
 ```
+
+
+###Site:GroundTemperature:Undisturbed:FiniteDifference
+
+Site:GroundTemperature:Undisturbed:FiniteDifference may be used by all objects requiring "undisturbed" ground temperatures. The object uses a 1D finite difference heat transfer model which uses the weather file to obtain surface boundary conditions. An annual simulation is run on the model during it's initialization until the annual ground temperature profile has reached steady periodic behavior. Once steady periodic behavior is reached, the ground tempeatures are cached for retrieval during the rest of the simulation.
+
+#### Field: Soil Thermal Conductivity
+
+The thermal conductivity of the soil, in W/m-K.
+
+#### Field: Soil Density
+
+The bulk density of the soil, in kg/m3.
+
+#### Field: Soil Specific Heat
+
+The specific heat of dry soil, in J/kg-K.
+
+#### Field: Soil Moisture Content Volume Fraction
+
+A nominal value of soil moisture content to be used when evaluating soil thermal properties.
+
+#### Field: Soil Moisture Content Volume Fraction at Saturation
+
+A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil.
+
+#### Field: Evapotranspiration Ground Cover Parameter
+
+Numeric field specifies the ground cover effects used in the evapotranspiration model at the ground surface heat balance. The values range from 0 (solid, non-permeable ground surface) to 1.5 (wild growth).
+
+An IDF example:
+
+```
+  Site:GroundTemperature:Undisturbed:FiniteDifference,
+    FDTemps,     !- Name of object
+    1.08,        !- Soil Thermal Conductivity {W/m-K}
+    962,         !- Soil Density {kg/m3}
+    2576,        !- Soil Specific Heat {J/kg-K}
+    30,          !- Soil Moisture Content Volume Fraction {percent}
+    50,          !- Soil Moisture Content Volume Fraction at Saturation {percent} 
+    0.408;       !- Evapotranspiration Ground Cover Parameter
+```
+
+
+###Site:GroundTemperature:Undisturbed:KusduaAchenbach
+
+Site:GroundTemperature:Undisturbed:KusudaAchenbach may be used by all objects requiring "undisturbed" ground temperatures. It provides an undisturbed ground temperature based on the correlation developed by Kusuda T. and P. Achenbach. 1965. The correlation uses three parameters for ground temperature at the surface to define a correlation for undisturbed ground temperatures as a function of depth and time. If one thinks of the ground temperature for a given depth as a sinusoid, the average ground temperature, amplitude (average difference between maximum ground temperature and minimum ground temperature), and the phase shift (day of minimum surface temperature) are all required to define the correlation.
+
+If the parameters are left blank they can be autocalculated by including soil surface temperatures in the input using the Site:GroundTemperature:Shallow object. They can also be calculated by using the CalcSoilSurfTemp preprocessor. 
+
+Kusuda, T. and P.R. Achenbach. 1965. 'Earth Temperatures and Thermal Diffusivity at Selected Stations in the United States.' *ASHRAE Transactions*. 71(1): 61-74.
+
+#### Field: Soil Thermal Conductivity
+
+The thermal conductivity of the soil, in W/m-K.
+
+#### Field: Soil Density
+
+The bulk density of the soil, in kg/m3.
+
+#### Field: Soil Specific Heat
+
+The specific heat of dry soil, in J/kg-K.
+
+#### Field: Average Annual Ground Surface Temperature
+
+This is the average ground surface temperature throughout the entire year, in °C.
+
+#### Field: Average Amplitude of Annual Ground Surface Temperature
+
+This is the average amplitude of the ground surface temperature, in °C.
+
+#### Field: Phase Shift of Minimum Surface Temperature
+
+This is day of the year which has the lowest ground surface temperature.
+
+An IDF example:
+
+```idf
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach,
+    KATemps,    !- Name of object
+    1.08,       !- Soil Thermal Conductivity {W/m-K}
+    962,        !- Soil Density {kg/m3}
+    2576,       !- Soil Specific Heat {J/kg-K}
+    15.5,       !- Average Soil Surface Temperature {C}
+    12.0,       !- Average Amplitude of Surface Temperature {deltaC}
+    21;         !- Phase Shift of Minimum Surface Temperature {days}
+```
+
+
+###Site:GroundTemperature:Undisturbed:Xing
+
+Site:GroundTemperature:Undisturbed:Xing may be used by all objects requiring "undisturbed" ground temperatures. It provides an undisturbed ground temperature based on the correlation developed by Xing, 2014. The correlation is a 5 parameter, 2 harmonic model based on the work of Lord Kelvin (Thomson, 1862). The average soil surface temperature and two sets of surface temperature amplitude and phase shift must be provided. Parameters for 4000+ international locations can be found in Xing, 2014.
+
+Thomson, W. 1862. 'On the Reduction of Observations of Underground Temperature, with applications to Professor Forbes’ Edinburgh Observations and the continued Calton Hill Series.' Proceedings of the Royal Society of Edinburgh. IV: 342-346.
+
+Xing, L. 2014. Estimations of Undisturbed Ground Temperatures using Numerical and Analytical Modeling. Ph.D. Diss. Oklahoma State University, Stillwater, OK.
+
+#### Field: Soil Thermal Conductivity
+
+The thermal conductivity of the soil, in W/m-K.
+
+#### Field: Soil Density
+
+The bulk density of the soil, in kg/m3.
+
+#### Field: Soil Specific Heat
+
+The specific heat of dry soil, in J/kg-K.
+
+#### Field: Average Soil Surface Temperature
+
+The average annual surface temperature of the soil, in deg C.
+
+#### Field: Soil Surface Temperature Amplitude 1
+
+First soil surface temperature amplitude parameter, in deg C.
+
+#### Field: Soil Surface Temperature Amplitude 2
+
+Second soil surface temperature amplitude parameter, in deg C.
+
+#### Field: Phase Shift of Surface Temperature Amplitude 1
+
+Phase shift of surface temperature amplitude 1, in days.
+
+#### Field: Phase Shift of Surface Temperature Amplitude 2
+
+Phase shift of surface temperature amplitude 2, in days.
+
+An IDF example:
+
+```
+  Site:GroundTemperature:Undisturbed:Xing,
+    Chicago-Ohare,    !- Name of object
+    1.08,         !- Soil Thermal Conductivity {W/m-K}
+    962,          !- Soil Density {kg/m3}
+    2576,         !- Soil Specific Heat {J/kg-K}
+    11.1,         !- Average Soil Surface Tempeature {C}
+    13.4,         !- Soil Surface Temperature Amplitude 1 {deltaC}
+    0.7,          !- Soil Surface Temperature Amplitude 2 {deltaC}
+    25,           !- Phase Shift of Temperature Amplitude 1 {days}
+    30;           !- Phase Shift of Temperature Amplitude 2 {days}
+```
+
 
 ### Site:GroundDomain:Slab
 

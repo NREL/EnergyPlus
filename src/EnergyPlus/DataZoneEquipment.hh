@@ -85,7 +85,8 @@ namespace DataZoneEquipment {
 	extern Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
 	extern Array1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
 	extern Array1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
-
+	extern Array1D< Real64 > ZMAT; // Zone air temperature for zone air mixing
+	extern Array1D< Real64 > ZHumRat; // Zone air humidity ratio zone air mixing
 	// Utility routines for module
 
 	// Types
@@ -484,7 +485,7 @@ namespace DataZoneEquipment {
 	extern Array1D< ReturnAir > ReturnAirPath;
 
 	// Functions
-		// Clears the global data in DataZoneEquipment.
+	// Clears the global data in DataZoneEquipment.
 	// Needed for unit tests, should not be normally called.
 	void
 	clear_state();
