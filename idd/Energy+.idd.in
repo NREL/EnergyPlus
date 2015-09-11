@@ -430,7 +430,7 @@ SimulationControl,
       \type integer
       \minimum 1
       \default 1
-      
+
 
 Building,
        \memo Describes parameters that are used during the simulation
@@ -1733,6 +1733,143 @@ Site:GroundTemperature:Deep,
        \type real
        \default 16
 
+Site:GroundTemperature:Undisturbed:FiniteDifference,
+       \memo Undisturbed ground temperature object using a
+       \memo detailed finite difference 1-D model
+       \min-fields 7
+  A1,  \field Name
+       \required-field
+       \reference UndisturbedGroundTempModels
+  N1,  \field Soil Thermal Conductivity
+       \required-field
+       \type real
+       \units W/m-K
+       \minimum> 0.0
+  N2,  \field Soil Density
+       \required-field
+       \type real
+       \units kg/m3
+       \minimum> 0.0
+  N3,  \field Soil Specific Heat
+       \required-field
+       \type real
+       \units J/kg-K
+       \minimum> 0.0
+  N4,  \field Soil Moisture Content Volume Fraction
+       \type real
+       \units percent
+       \minimum 0
+       \maximum 100
+       \default 30
+  N5,  \field Soil Moisture Content Volume Fraction at Saturation
+       \type real
+       \units percent
+       \minimum 0
+       \maximum 100
+       \default 50
+   N6; \field Evapotranspiration Ground Cover Parameter
+       \type real
+       \units dimensionless
+       \minimum 0
+       \maximum 1.5
+       \default 0.4
+       \note This specifies the ground cover effects during evapotranspiration
+       \note  calculations.  The value roughly represents the following cases:
+       \note  = 0   : concrete or other solid, non-permeable ground surface material
+       \note  = 0.5 : short grass, much like a manicured lawn
+       \note  = 1   : standard reference state (12 cm grass)
+       \note  = 1.5 : wild growth
+
+Site:GroundTemperature:Undisturbed:KusudaAchenbach,
+       \memo Undisturbed ground temperature object using the
+       \memo Kusuda-Achenbach 1965 correlation.
+       \min-fields 7
+  A1,  \field Name
+       \required-field
+       \reference UndisturbedGroundTempModels
+  N1,  \field Soil Thermal Conductivity
+       \required-field
+       \type real
+       \units W/m-K
+       \minimum> 0.0
+  N2,  \field Soil Density
+       \required-field
+       \type real
+       \units kg/m3
+       \minimum> 0.0
+  N3,  \field Soil Specific Heat
+       \required-field
+       \type real
+       \units J/kg-K
+       \minimum> 0.0
+  N4,  \field Average Soil Surface Temperature
+       \type real
+       \units C
+       \note Annual average surface temperature
+       \note If left blank the Site:GroundTemperature:Shallow object must be included in the input
+       \note The soil temperature, amplitude, and phase shift must all be included or omitted together
+  N5,  \field Average Amplitude of Surface Temperature
+       \type real
+       \units deltaC
+       \minimum 0
+       \note Annual average surface temperature variation from average.
+       \note If left blank the Site:GroundTemperature:Shallow object must be included in the input
+       \note The soil temperature, amplitude, and phase shift must all be included or omitted together
+  N6;  \field Phase Shift of Minimum Surface Temperature
+       \type real
+       \units days
+       \minimum 0
+       \maximum< 365
+       \note The phase shift of minimum surface temperature, or the day
+       \note of the year when the minimum surface temperature occurs.
+       \note If left blank the Site:GroundTemperature:Shallow object must be included in the input
+       \note The soil temperature, amplitude, and phase shift must all be included or omitted together
+
+Site:GroundTemperature:Undisturbed:Xing,
+       \memo Undisturbed ground temperature object using the
+       \memo Xing 2014 2 harmonic parameter model.
+       \min-fields 9
+  A1,  \field Name
+       \required-field
+       \reference UndisturbedGroundTempModels
+  N1,  \field Soil Thermal Conductivity
+       \required-field
+       \type real
+       \units W/m-K
+       \minimum> 0.0
+  N2,  \field Soil Density
+       \required-field
+       \type real
+       \units kg/m3
+       \minimum> 0.0
+  N3,  \field Soil Specific Heat
+       \required-field
+       \type real
+       \units J/kg-K
+       \minimum> 0.0
+  N4,  \field Average Soil Surface Tempeature
+       \required-field
+       \type real
+       \units C
+  N5,  \field Soil Surface Temperature Amplitude 1
+       \required-field
+       \type real
+       \units deltaC
+  N6,  \field Soil Surface Temperature Amplitude 2
+       \required-field
+       \type real
+       \units deltaC
+  N7,  \field Phase Shift of Temperature Amplitude 1
+       \required-field
+       \type real
+       \units days
+       \maximum< 365
+  N8;  \field Phase Shift of Temperature Amplitude 2
+       \required-field
+       \type real
+       \units days
+       \maximum< 365
+
 Site:GroundDomain:Slab,
         \memo Ground-coupled slab model for on-grade and
         \memo in-grade cases with or without insulation.
@@ -1778,26 +1915,17 @@ Site:GroundDomain:Slab,
         \minimum 0
         \maximum 100
         \default 50
-   N9,  \field Kusuda-Achenbach Average Ground Surface Temperature
-        \type real
-        \units C
-        \note Annual average ground surface temperature.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
-        \note monthly average ground surface temperatures.
-   N10, \field Kusuda-Achenbach Average Amplitude of Ground Surface Temperature
-        \type real
-        \units deltaC
-        \note Annual average ground surface temperature variation from average.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
-        \note monthly average ground surface temperatures.
-   N11, \field Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature
-        \type real
-        \units days
-        \note The phase shift of minimum ground surface temperature, or the day
-        \note of the year when the minimum ground surface temperature occurs.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
-        \note monthly average ground surface temperatures.
-   N12, \field Evapotranspiration Ground Cover Parameter
+   A2,  \field Undisturbed Ground Temperature Model Type
+        \required-field
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A3,  \field Undisturbed Ground Temperature Model Name
+        \required-field
+        \type object-list
+        \object-list UndisturbedGroundTempModels
+   N9,  \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
         \maximum 1.5
@@ -1808,60 +1936,60 @@ Site:GroundDomain:Slab,
         \note  = 0.5 : short grass, much like a manicured lawn
         \note  = 1   : standard reference state (12 cm grass)
         \note  = 1.5 : wild growth
-   A2,  \field Slab Boundary Condition Model Name
+   A4,  \field Slab Boundary Condition Model Name
         \required-field
         \type object-list
         \object-list OSCMNames
-   A3,  \field Slab Location
+   A5,  \field Slab Location
         \required-field
         \type choice
         \key InGrade
         \key OnGrade
         \note This field specifies whether the slab is located "in-grade" or "on-grade"
-   A4,  \field Slab Material Name
+   A6,  \field Slab Material Name
         \type object-list
         \object-list MaterialName
         \note Only applicable for the in-grade case
-   A5,  \field Horizontal Insulation
+   A7,  \field Horizontal Insulation
         \type choice
         \key Yes
         \key No
         \default No
         \note This field specifies the presence of insulation beneath the slab.
         \note Only required for in-grade case.
-   A6,  \field Horizontal Insulation Material Name
+   A8,  \field Horizontal Insulation Material Name
         \type object-list
         \object-list MaterialName
         \note This field specifies the horizontal insulation material.
-   A7,  \field Horizontal Insulation Extents
+   A9,  \field Horizontal Insulation Extents
         \type choice
         \key Full
         \key Perimeter
         \default Full
         \note This field specifies whether the horizontal insulation fully insulates
         \note the surface or is perimeter only insulation
-   N13, \field Perimeter Insulation Width
+   N10, \field Perimeter Insulation Width
         \type real
         \units m
         \minimum> 0.0
         \note This field specifies the width of the underfloor perimeter insulation
-   A8,  \field Vertical Insulation
+   A10, \field Vertical Insulation
         \type choice
         \key Yes
         \key No
         \default No
         \note This field specifies the presence of vertical insulation at the slab edge.
-   A9,  \field Vertical Insulation Material Name
+   A11, \field Vertical Insulation Material Name
         \type object-list
         \object-list MaterialName
         \note This field specifies the vertical insulation material.
-   N14, \field Vertical Insulation Depth
+   N11, \field Vertical Insulation Depth
         \type real
         \units m
         \minimum> 0.0
         \note Only used when including vertical insulation
         \note This field specifies the depth of the vertical insulation
-   A10; \field Simulation Timestep
+   A12; \field Simulation Timestep
         \type choice
         \key Hourly
         \key Timestep
@@ -1916,26 +2044,17 @@ Site:GroundDomain:Basement,
         \minimum 0
         \maximum 100
         \default 50
-   N9,  \field Kusuda-Achenbach Average Ground Surface Temperature
-        \type real
-        \units C
-        \note Annual average ground surface temperature.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
-        \note monthly average ground surface temperatures.
-   N10, \field Kusuda-Achenbach Average Amplitude of Ground Surface Temperature
-        \type real
-        \units deltaC
-        \note Annual average ground surface temperature variation from average.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
-        \note monthly average ground surface temperatures.
-   N11, \field Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature
-        \type real
-        \units days
-        \note The phase shift of minimum ground surface temperature, or the day
-        \note of the year when the minimum ground surface temperature occurs.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
-        \note monthly average ground surface temperatures.
-   N12, \field Evapotranspiration Ground Cover Parameter
+   A2,  \field Undisturbed Ground Temperature Model Type
+        \required-field
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A3,  \field Undisturbed Ground Temperature Model Name
+        \required-field
+        \type object-list
+        \object-list UndisturbedGroundTempModels
+   N9,  \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
         \maximum 1.5
@@ -1946,61 +2065,61 @@ Site:GroundDomain:Basement,
         \note  = 0.5 : short grass, much like a manicured lawn
         \note  = 1   : standard reference state (12 cm grass)
         \note  = 1.5 : wild growth
-   A2,  \field Basement Floor Boundary Condition Model Name
+   A4,  \field Basement Floor Boundary Condition Model Name
         \required-field
         \type object-list
         \object-list OSCMNames
-   A3,  \field Horizontal Insulation
+   A5,  \field Horizontal Insulation
         \type choice
         \key Yes
         \key No
         \default No
         \note This field specifies the presence of insulation beneath the basement floor.
-   A4,  \field Horizontal Insulation Material Name
+   A6,  \field Horizontal Insulation Material Name
         \type object-list
         \object-list MaterialName
-   A5,  \field Horizontal Insulation Extents
+   A7,  \field Horizontal Insulation Extents
         \type choice
         \key Perimeter
         \key Full
         \default Full
-        \note This field specifies whether the horizontal insulation fully insulates 
+        \note This field specifies whether the horizontal insulation fully insulates
         \note the surface or is perimeter only insulation
-   N13, \field Perimeter Horizontal Insulation Width
+   N10, \field Perimeter Horizontal Insulation Width
         \type real
         \units m
         \minimum> 0.0
         \note Width of horizontal perimeter insulation measured from
         \note foundation wall inside surface.
-   N14, \field Basement Wall Depth
+   N11, \field Basement Wall Depth
         \type real
         \units m
         \minimum> 0.0
         \note Depth measured from ground surface.
-   A6,  \field Basement Wall Boundary Condition Model Name
+   A8,  \field Basement Wall Boundary Condition Model Name
         \required-field
         \type object-list
         \object-list OSCMNames
-   A7,  \field Vertical Insulation
+   A9,  \field Vertical Insulation
         \type choice
         \key Yes
         \key No
         \default No
-   A8, \field Basement Wall Vertical Insulation Material Name
+   A10, \field Basement Wall Vertical Insulation Material Name
         \type object-list
         \object-list MaterialName
-   N15, \field Vertical Insulation Depth
+   N12, \field Vertical Insulation Depth
         \type real
         \units m
         \minimum> 0.0
         \note Depth measured from the ground surface.
-   A9, \field Simulation Timestep
+   A11, \field Simulation Timestep
         \type choice
         \key Timestep
         \key Hourly
         \default Hourly
         \note This field specifies the basement domain simulation interval.
-   N16; \field Mesh Density Parameter
+   N13; \field Mesh Density Parameter
         \type integer
         \default 4
         \minimum 2
@@ -19224,14 +19343,14 @@ RoomAir:Node:AirflowNetwork,
       \object-list RoomAirNodeGains
   A5; \field RoomAir:Node:AirflowNetwork:HVACEquipment Name
       \type object-list
-      \object-list RoomAirNodeHVACEquipment     
-      
- RoomAir:Node:AirflowNetwork:AdjacentSurfaceList, 
+      \object-list RoomAirNodeHVACEquipment
+
+ RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,
        \extensible:1
        \min-fields 2
   A1,  \field Name
        \type Alpha
-       \reference RoomAirNodeSurfaceLists       
+       \reference RoomAirNodeSurfaceLists
   A2 , \field Surface 1 Name
        \begin-extensible
        \type object-list
@@ -19316,7 +19435,7 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \key OtherEquipment
       \key ZoneBaseboard:OutdoorTemperatureControlled
       \key ZoneContaminantSourceAndSink:CarbonDioxide
-      \key WaterUse:Equipment     
+      \key WaterUse:Equipment
       \key DaylightingDevice:Tubular
       \key WaterHeater:Mixed
       \key WaterHeater:Stratified
@@ -19350,14 +19469,14 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \key PlantComponent:UserDefined
       \key Coil:UserDefined
       \key ZoneHVAC:ForcedAir:UserDefined
-      \key AirTerminal:SingleDuct:UserDefined   
+      \key AirTerminal:SingleDuct:UserDefined
   A3, \field Internal Gain Object 1 Name
       \type alpha
-  N1, \field Fraction of Gains to Node 1 
+  N1, \field Fraction of Gains to Node 1
       \type real
       \minimum 0.0
       \maximum 1.0
-      \note fraction applies to sensible, latent, carbon dioxide, and generic contaminant gains or losses  
+      \note fraction applies to sensible, latent, carbon dioxide, and generic contaminant gains or losses
   A4, \field Internal Gain Object 2 Type
       \type choice
       \key People
@@ -19369,7 +19488,7 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \key OtherEquipment
       \key ZoneBaseboard:OutdoorTemperatureControlled
       \key ZoneContaminantSourceAndSink:CarbonDioxide
-      \key WaterUse:Equipment     
+      \key WaterUse:Equipment
       \key DaylightingDevice:Tubular
       \key WaterHeater:Mixed
       \key WaterHeater:Stratified
@@ -19403,7 +19522,7 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \key PlantComponent:UserDefined
       \key Coil:UserDefined
       \key ZoneHVAC:ForcedAir:UserDefined
-      \key AirTerminal:SingleDuct:UserDefined  
+      \key AirTerminal:SingleDuct:UserDefined
   A5, \field Internal Gain Object 2 Name
       \type alpha
   N2, \field Fraction of Gains to Node 2
@@ -19421,7 +19540,7 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \key OtherEquipment
       \key ZoneBaseboard:OutdoorTemperatureControlled
       \key ZoneContaminantSourceAndSink:CarbonDioxide
-      \key WaterUse:Equipment     
+      \key WaterUse:Equipment
       \key DaylightingDevice:Tubular
       \key WaterHeater:Mixed
       \key WaterHeater:Stratified
@@ -19455,7 +19574,7 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \key PlantComponent:UserDefined
       \key Coil:UserDefined
       \key ZoneHVAC:ForcedAir:UserDefined
-      \key AirTerminal:SingleDuct:UserDefined  
+      \key AirTerminal:SingleDuct:UserDefined
   A7, \field Internal Gain Object 3 Name
       \type alpha
   N3; \field Fraction of Gains to Node 3
@@ -19494,7 +19613,7 @@ RoomAir:Node:AirflowNetwork:HVACEquipment,
       \key ZoneHVAC:RefrigerationChillerSet
       \key Fan:ZoneExhaust
       \key WaterHeater:HeatPump
-      \key AirTerminal:SingleDuct:Uncontrolled       
+      \key AirTerminal:SingleDuct:Uncontrolled
       \key AirTerminal:DualDuct:ConstantVolume
       \key AirTerminal:DualDuct:VAV
       \key AirTerminal:SingleDuct:ConstantVolume:Reheat
@@ -19511,16 +19630,15 @@ RoomAir:Node:AirflowNetwork:HVACEquipment,
       \key AirLoopHVACReturnAir
   A3, \field ZoneHVAC or Air Terminal Equipment Object Name 1
       \type alpha
-      \note for object type AirLoopHVACReturnAir, then enter zone return air node name 
-  N1, \field Fraction of Output or Supply Air from HVAC Equipment 1 
+      \note for object type AirLoopHVACReturnAir, then enter zone return air node name
+  N1, \field Fraction of Output or Supply Air from HVAC Equipment 1
       \type real
       \minimum 0.0
       \maximum 1.0
-      \note 
   N2, \field Fraction of Input or Return Air to HVAC Equipment 1
       \type real
       \minimum 0.0
-      \maximum 1.0        
+      \maximum 1.0
   A4, \field ZoneHVAC or Air Terminal Equipment Object Type 2
       \type choice
       \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
@@ -19545,7 +19663,7 @@ RoomAir:Node:AirflowNetwork:HVACEquipment,
       \key ZoneHVAC:RefrigerationChillerSet
       \key Fan:ZoneExhaust
       \key WaterHeater:HeatPump
-      \key AirTerminal:SingleDuct:Uncontrolled       
+      \key AirTerminal:SingleDuct:Uncontrolled
       \key AirTerminal:DualDuct:ConstantVolume
       \key AirTerminal:DualDuct:VAV
       \key AirTerminal:SingleDuct:ConstantVolume:Reheat
@@ -19561,18 +19679,18 @@ RoomAir:Node:AirflowNetwork:HVACEquipment,
       \key AirTerminal:DualDuct:VAV:OutdoorAir
   A5, \field ZoneHVAC or Air Terminal Equipment Object Name 2
       \type alpha
-  N3, \field Fraction of Output or Supply Air from HVAC Equipment 2 
+  N3, \field Fraction of Output or Supply Air from HVAC Equipment 2
       \type real
       \minimum 0.0
-      \maximum 1.0  
+      \maximum 1.0
   N4; \field Fraction of Input or Return Air to HVAC Equipment 2
       \type real
       \minimum 0.0
-      \maximum 1.0  
+      \maximum 1.0
 
-RoomAirSettings:AirflowNetwork, 
+RoomAirSettings:AirflowNetwork,
        \extensible:1
-       \memo RoomAir modeling using Airflow pressure network solver 
+       \memo RoomAir modeling using Airflow pressure network solver
        \min-fields 5
   A1 , \field Name
        \required-field
@@ -20430,7 +20548,7 @@ ElectricEquipment:ITE:AirCooled,
   A9,  \field Environmental Class
        \note Specifies the allowable operating conditions for the air inlet conditions.
        \note Used for reporting time outside allowable conditions.
-       \type choice 
+       \type choice
        \key None
        \key A1
        \key A2
@@ -20447,7 +20565,7 @@ ElectricEquipment:ITE:AirCooled,
        \note ZoneAirNode = ITE air inlet condition is  the average zone condition. 
        \note All heat output is added to the zone air heat balance as a convective gain. 
        \note RoomAirModel = ITE air inlet and outlet are connected to room air model nodes. 
-       \type choice 
+       \type choice
        \key AdjustedSupply
        \key ZoneAirNode
        \key RoomAirModel
@@ -20580,7 +20698,7 @@ SwimmingPool:Indoor,
   A4,  \field Make-up Water Supply Schedule Name
        \required-field
        \type object-list
-       \object-list ScheduleNames  
+       \object-list ScheduleNames
   A5,  \field Cover Schedule Name
        \required-field
        \type object-list
@@ -24104,7 +24222,7 @@ AirflowNetwork:IntraZone:Linkage,
       \type object-list
       \object-list AirflowNetworkComponentNames
       \note Enter the name of an AirflowNetwork component. A component is one of the
-      \note following AirflowNetwork:Multizone:Component objects:      
+      \note following AirflowNetwork:Multizone:Component objects: 
       \note AirflowNetwork:MultiZone:Surface:Crack,
       \note AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,
       \note If the next field is specified, this field can be either blank or ignored.
@@ -41366,7 +41484,7 @@ Coil:Cooling:DX:SingleSpeed,
        \note capacity and total electric power input of DX cooling coils per ANSI/ASHRAE 127.   
   A18; \field Zone Name for Condenser Placement
        \type object-list
-       \object-list ZoneNames 
+       \object-list ZoneNames
        \note This input field is name of a conditioned or unconditioned zone where the secondary 
        \note coil (condenser) of DX system or a heat pump is to be placed.  This is an optional 
        \note input field specified only when user desires to reject the condenser heat into a  
@@ -41635,12 +41753,12 @@ Coil:Cooling:DX:TwoSpeed,
        \note ff = fraction of the full load flow
   A21; \field Zone Name for Condenser Placement
        \type object-list
-       \object-list ZoneNames 
+       \object-list ZoneNames
        \note This input field is name of a conditioned or unconditioned zone where the secondary 
        \note coil (condenser) of DX system or a heat pump is to be placed.  This is an optional 
        \note input field specified only when user desires to reject the condenser heat into a  
        \note zone. The heat rejected is modelled as internal sensible heat gain of the zone.
-   
+
 Coil:Cooling:DX:MultiSpeed,
        \memo Direct expansion (DX) cooling coil and condensing unit (includes electric or
        \memo engine-driven compressor and condenser fan), multi-speed (or variable-speed).
@@ -42354,7 +42472,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Rated power consumed by the evaporative condenser's water pump at Speed 4
   A37; \field Zone Name for Condenser Placement
        \type object-list
-       \object-list ZoneNames 
+       \object-list ZoneNames
        \note This input field is name of a conditioned or unconditioned zone where the secondary 
        \note coil (condenser) of DX system or a heat pump is to be placed.  This is an optional 
        \note input field specified only when user desires to reject the condenser heat into a  
@@ -43447,7 +43565,7 @@ Coil:Heating:DX:VariableRefrigerantFlow,
        \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
        \note ff = fraction of the full load flow
 
-Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl, 
+Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \memo This is a key object in the new physics based VRF model applicable for Fluid
        \memo Temperature Control. It describes the the indoor unit coil of the system at cooling mode.
        \memo Used with ZoneHVAC:TerminalUnit:VariableRefrigerantFlow. 
@@ -43484,20 +43602,20 @@ Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \type real
        \minimum> 0.0
        \note Supply air fan heat is not included
-  N3,  \field Indoor Unit Reference Superheating 
+  N3,  \field Indoor Unit Reference Superheating
        \type real
-       \units deltaC 
+       \units deltaC
        \minimum 0.0
        \default 5.0
-  A5,  \field Indoor Unit Evaporating Temperature Function of Superheating Curve Name    
-       \required-field   
+  A5,  \field Indoor Unit Evaporating Temperature Function of Superheating Curve Name
+       \required-field
        \type object-list
        \object-list QuadraticCurves
        \object-list UniVariateTables
   A6;  \field Name of Water Storage Tank for Condensate Collection
        \type object-list
        \object-list WaterStorageTankNames
- 
+
 Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \memo This is a key object in the new physics based VRF model applicable for Fluid
        \memo Temperature Control. It describes the the indoor unit coil of the system at heating mode.
@@ -43530,13 +43648,13 @@ Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \minimum> 0.0
        \autosizable
        \note Supply air fan heat is not included
-  N2,  \field Indoor Unit Reference Subcooling 
-       \type real 
+  N2,  \field Indoor Unit Reference Subcooling
+       \type real
        \units deltaC
        \minimum 0.0
        \default 5.0
-  A5;  \field Indoor Unit Condensing Temperature Function of Subcooling Curve Name    
-       \required-field   
+  A5;  \field Indoor Unit Condensing Temperature Function of Subcooling Curve Name
+       \required-field
        \type object-list
        \object-list QuadraticCurves
        \object-list UniVariateTables
@@ -44223,8 +44341,8 @@ Coil:Heating:DX:SingleSpeed,
        \note This input field is name of sensible heat ratio modifier curve.  The value 
        \note of this curve modifies the nominal sensible heat ratio for current time step depending 
        \note on the secondary coil air flow fraction. This is an optional input field.  If this input
-       \note field is left blank, then the nominal sensible heat ratio specified will be used.   
-   
+       \note field is left blank, then the nominal sensible heat ratio specified will be used.
+
 Coil:Heating:DX:MultiSpeed,
        \memo Direct expansion (DX) heating coil (air-to-air heat pump) and compressor unit
        \memo (includes electric or engine-driven compressor and outdoor fan), multi-speed
@@ -44739,7 +44857,7 @@ Coil:Heating:DX:MultiSpeed,
        \type real
        \units m3/s
        \minimum> 0.0
-       \default 1.25   
+       \default 1.25
        \note This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  
        \note The secondary air flow rate is determined by multiplying the primary DX coil rated air 
        \note flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil 
@@ -44789,7 +44907,7 @@ Coil:Heating:DX:MultiSpeed,
        \type real
        \units m3/s
        \minimum> 0.0
-       \default 1.25   
+       \default 1.25
        \note This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  
        \note The secondary air flow rate is determined by multiplying the primary DX coil rated air 
        \note flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil 
@@ -44834,12 +44952,12 @@ Coil:Heating:DX:MultiSpeed,
        \autosizable
        \note This input value is the secondary coil (evaporator) air flow rate when the heat pump 
        \note is working in heating mode or the secondary DX coil (condenser) air flow rate when the 
-       \note heat pump is working in cooling mode.  
+       \note heat pump is working in cooling mode.
   N37, \field Speed 3 Secondary Coil Fan Flow Scaling Factor
        \type real
        \units m3/s
        \minimum> 0.0
-       \default 1.25   
+       \default 1.25
        \note This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  
        \note The secondary air flow rate is determined by multiplying the primary DX coil rated air 
        \note flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil 
@@ -44926,8 +45044,8 @@ Coil:Heating:DX:MultiSpeed,
        \note This input field is name of sensible heat ratio modifier curve.  The value 
        \note of this curve modifies the nominal sensible heat ratio for current time step depending 
        \note on the secondary coil air flow fraction. This is an optional input field.  If this input
-       \note field is left blank, then the nominal sensible heat ratio specified will be used.   
-      
+       \note field is left blank, then the nominal sensible heat ratio specified will be used.
+
 Coil:Heating:DX:VariableSpeed,
         \memo Direct expansion (DX) heating coil (air-to-air heat pump) and compressor unit
         \memo (includes electric compressor and outdoor fan), variable-speed, with defrost
@@ -48115,7 +48233,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum> 0
        \note Water Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
-       \note Can optionally include condenser pump heat. 
+       \note Can optionally include condenser pump heat.
   N4 , \field Rated Evaporator Inlet Air Dry-Bulb Temperature
        \type real
        \units C
@@ -48240,7 +48358,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note PLR = part load ratio (heating delivered/steady state heating capacity).
        \note Use curve coefficients of 1,0,0 or leave this field blank when neglecting performance impacts
        \note due to variations in part load ratio.
-  N12, \field Rated Water Heating Capacity at speed 1
+  N12, \field Rated Water Heating Capacity at Speed 1
        \required-field
        \type real
        \units W
@@ -48248,7 +48366,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N13, \field Rated Water Heating COP at speed 1
+  N13, \field Rated Water Heating COP at Speed 1
        \required-field
        \type real
        \units W/W
@@ -48257,8 +48375,8 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N14, \field Rated Sensible Heat Ratio at speed 1
-       \required-field 
+  N14, \field Rated Sensible Heat Ratio at Speed 1
+       \required-field
        \type real
        \minimum 0.5
        \maximum 1
@@ -48331,14 +48449,14 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
        \note ffw = Fraction of the full load Water Flow
-  N18, \field Rated Water Heating Capacity at speed 2
+  N18, \field Rated Water Heating Capacity at Speed 2
        \type real
        \units W
        \minimum> 0
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N19, \field Rated Water Heating COP at speed 2
+  N19, \field Rated Water Heating COP at Speed 2
        \type real
        \units W/W
        \minimum> 0
@@ -48346,7 +48464,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N20, \field Rated Sensible Heat Ratio at speed 2 
+  N20, \field Rated Sensible Heat Ratio at Speed 2
        \type real
        \minimum 0.5
        \maximum 1
@@ -48417,7 +48535,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N25, \field Rated Water Heating COP at speed 3
+  N25, \field Rated Water Heating COP at Speed 3
        \type real
        \units W/W
        \minimum> 0
@@ -48425,7 +48543,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N26, \field Rated Sensible Heat Ratio at speed 3 
+  N26, \field Rated Sensible Heat Ratio at Speed 3
        \type real
        \minimum 0.5
        \maximum 1
@@ -48489,14 +48607,14 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
        \note ffw = Fraction of the full load Water Flow
-  N30, \field Rated Water Heating Capacity at speed 4
+  N30, \field Rated Water Heating Capacity at Speed 4
        \type real
        \units W
        \minimum> 0
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N31, \field Rated Water Heating COP at speed 4
+  N31, \field Rated Water Heating COP at Speed 4
        \type real
        \units W/W
        \minimum> 0
@@ -48504,7 +48622,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N32, \field Rated Sensible Heat Ratio at speed 4 
+  N32, \field Rated Sensible Heat Ratio at Speed 4
        \type real
        \minimum 0.5
        \maximum 1
@@ -48568,14 +48686,14 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
        \note ffw = Fraction of the full load Water Flow
-  N36, \field Rated Water Heating Capacity at speed 5
+  N36, \field Rated Water Heating Capacity at Speed 5
        \type real
        \units W
        \minimum> 0
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N37, \field Rated Water Heating COP at speed 5
+  N37, \field Rated Water Heating COP at Speed 5
        \type real
        \units W/W
        \minimum> 0
@@ -48583,7 +48701,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N38, \field Rated Sensible Heat Ratio at speed 5 
+  N38, \field Rated Sensible Heat Ratio at Speed 5
        \type real
        \minimum 0.5
        \maximum 1
@@ -48647,14 +48765,14 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
        \note ffw = Fraction of the full load Water Flow
-  N42, \field Rated Water Heating Capacity at speed 6
+  N42, \field Rated Water Heating Capacity at Speed 6
        \type real
        \units W
        \minimum> 0
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N43, \field Rated Water Heating COP at speed 6
+  N43, \field Rated Water Heating COP at Speed 6
        \type real
        \units W/W
        \minimum> 0
@@ -48662,7 +48780,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N44, \field Rated Sensible Heat Ratio at speed 6 
+  N44, \field Rated Sensible Heat Ratio at Speed 6
        \type real
        \minimum 0.5
        \maximum 1
@@ -48726,14 +48844,14 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
        \note ffw = Fraction of the full load Water Flow
-  N48, \field Rated Water Heating Capacity at speed 7
+  N48, \field Rated Water Heating Capacity at Speed 7
        \type real
        \units W
        \minimum> 0
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N49, \field Rated Water Heating COP at speed 7
+  N49, \field Rated Water Heating COP at Speed 7
        \type real
        \units W/W
        \minimum> 0
@@ -48741,7 +48859,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N50, \field Rated Sensible Heat Ratio at speed 7 
+  N50, \field Rated Sensible Heat Ratio at Speed 7
        \type real
        \minimum 0.5
        \maximum 1
@@ -48805,14 +48923,14 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
        \note ffw = Fraction of the full load Water Flow
-  N54, \field Rated Water Heating Capacity at speed 8
+  N54, \field Rated Water Heating Capacity at Speed 8
        \type real
        \units W
        \minimum> 0
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N55, \field Rated Water Heating COP at speed 8
+  N55, \field Rated Water Heating COP at Speed 8
        \type real
        \units W/W
        \minimum> 0
@@ -48820,7 +48938,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N56, \field Rated Sensible Heat Ratio at speed 8 
+  N56, \field Rated Sensible Heat Ratio at Speed 8
        \type real
        \minimum 0.5
        \maximum 1
@@ -48884,14 +49002,14 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
        \note ffw = Fraction of the full load Water Flow
-  N60, \field Rated Water Heating Capacity at speed 9
+  N60, \field Rated Water Heating Capacity at Speed 9
        \type real
        \units W
        \minimum> 0
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N61, \field Rated Water Heating COP at speed 9
+  N61, \field Rated Water Heating COP at Speed 9
        \type real
        \units W/W
        \minimum> 0
@@ -48899,7 +49017,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N62, \field Rated Sensible Heat Ratio at speed 9 
+  N62, \field Rated Sensible Heat Ratio at Speed 9
        \type real
        \minimum 0.5
        \maximum 1
@@ -48963,14 +49081,14 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note quadratic curve = a + b*ffw + c*ffw**2
        \note cubic curve = a + b*ffw + c*ffw**2 + d*ffw**3
        \note ffw = Fraction of the full load Water Flow
-  N66, \field Rated Water Heating Capacity at speed 10
+  N66, \field Rated Water Heating Capacity at Speed 10
        \type real
        \units W
        \minimum> 0
        \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
-  N67, \field Rated Water Heating COP at speed 10
+  N67, \field Rated Water Heating COP at Speed 10
        \type real
        \units W/W
        \minimum> 0
@@ -48978,7 +49096,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note Heating coefficient of performance at the rated inlet air and water temperatures,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
-  N68, \field Rated Sensible Heat Ratio at speed 10 
+  N68, \field Rated Sensible Heat Ratio at Speed 10
        \type real
        \minimum 0.5
        \maximum 1
@@ -50355,7 +50473,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \note Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1,
        \note Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay,
        \note Table:OneIndependentVariable
-  N5 , \field Secondary Air Design Flow Rate  
+  N5 , \field Secondary Air Design Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
@@ -50390,7 +50508,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \type node
   A8 , \field Primary Air Outlet Node Name
        \type node
-  N9 , \field Primary Design Air Flow Rate  
+  N9 , \field Primary Design Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
@@ -50419,7 +50537,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \note up of solids in the water that would otherwise occur because of evaporation.
        \note Ratio of solids in the blowdown water to solids in the make up water.
        \note A typical value is 3.  If left blank then there is no blowdown.
-  N13, \field Evaporative Operation Minimum Limit Secondary Air Drybulb Temperature 
+  N13, \field Evaporative Operation Minimum Limit Secondary Air Drybulb Temperature
        \type real
        \note This input field value defines the secondary air inlet node drybulb temperature 
        \note limits in degreeCelsius. When the secondary side entering air dry bulb temperature 
@@ -50488,7 +50606,7 @@ EvaporativeCooler:Direct:ResearchSpecial,
   N2 , \field Recirculating Water Pump Design Power
        \units W
        \ip-units W
-       \minimum 0.0  
+       \minimum 0.0
        \note This is the design water pump or spray for evaporation at the primary air design air flow rates
        \note and cooler design effectiveness
        \autosizable
@@ -50634,7 +50752,7 @@ Humidifier:Steam:Gas,
       \units dimensionless
       \minimum> 0.0
       \maximum 1.0
-      \default 0.80   
+      \default 0.80
       \note Based on the higher heating value of fuel.
       \note If "Rated Gas Use Rate" in the field above is not auto-sized and the Inlet Water 
       \note Temperature Option input field is specified as FixedInletWaterTemperature, then the 
@@ -50664,7 +50782,7 @@ Humidifier:Steam:Gas,
       \units W
       \minimum 0.0
       \ip-units W
-      \default 0.0   
+      \default 0.0
       \note The auxiliary electric power input in watts. This amount of power will be consumed
       \note whenever the unit is available (as defined by the availability schedule). This 
       \note electric power is used for control purpose only.
@@ -50674,7 +50792,7 @@ Humidifier:Steam:Gas,
       \type node
   A6, \field Water Storage Tank Name
       \type object-list
-      \object-list WaterStorageTankNames  
+      \object-list WaterStorageTankNames
   A7; \field Inlet Water Temperature Option
       \note The inlet water temperature can be fixed at 20C as it is done for electric steam 
       \note humidifier or it can be allowed to vary with temperature of the water source.  
@@ -50685,9 +50803,9 @@ Humidifier:Steam:Gas,
       \note inlet water temperature of 20C will be assumed.  
       \type choice
       \key FixedInletWaterTemperature
-      \key VariableInletWaterTemperature 
-      \default FixedInletWaterTemperature  
-  
+      \key VariableInletWaterTemperature
+      \default FixedInletWaterTemperature
+
 Dehumidifier:Desiccant:NoFans,
        \memo This object models a solid desiccant dehumidifier. The process
        \memo air stream is the air which is dehumidified. The regeneration air
@@ -53768,7 +53886,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list ZoneTerminalUnitListNames
        \note Enter the name of a ZoneTerminalUnitList. This list connects zone terminal units to this
-       \note heat pump	   
+       \note heat pump
   A4 , \field Refrigerant Type
        \type object-list
        \object-list FluidNames
@@ -53817,61 +53935,61 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \default 16.0
        \note Enter the maximum outdoor temperature allowed for heating operation
        \note Heating is disabled below this temperature
-  N7 , \field Reference Outdoor Unit Superheating 
+  N7 , \field Reference Outdoor Unit Superheating
        \type real
-       \units deltaC  
+       \units deltaC
        \default 3
-  N8 , \field Reference Outdoor Unit Subcooling 
-       \type real 
-       \units deltaC    
+  N8 , \field Reference Outdoor Unit Subcooling
+       \type real
+       \units deltaC
        \default 5
   A5 , \field Refrigerant Temperature Control Algorithm for Indoor Unit
        \type choice
        \key ConstantTemp
        \key VariableTemp
        \default VariableTemp
-  N9 , \field Reference Evaporating Temperature for Indoor Unit 
+  N9 , \field Reference Evaporating Temperature for Indoor Unit
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is ConstantTemp
        \note Evaporating temperature is the refrigerant temperature, not air temperature
        \type real
-       \units C       
+       \units C
        \default 6.0
-  N10, \field Reference Condensing Temperature for Indoor Unit 
+  N10, \field Reference Condensing Temperature for Indoor Unit
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is ConstantTemp
        \note Condensing temperature is the refrigerant temperature, not air temperature
        \type real
-       \units C       
+       \units C
        \default 44.0
   N11, \field Variable Evaporating Temperature Minimum for Indoor Unit
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp 
        \note Evaporating temperature is the refrigerant temperature, not air temperature
        \type real
-       \units C       
+       \units C
        \default 4.0
   N12, \field Variable Evaporating Temperature Maximum for Indoor Unit
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp 
        \note Evaporating temperature is the refrigerant temperature, not air temperature
        \type real
-       \units C       
+       \units C
        \default 13.0
   N13, \field Variable Condensing Temperature Minimum for Indoor Unit
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp
        \note Condensing temperature is the refrigerant temperature, not air temperature
        \type real
-       \units C       
+       \units C
        \default 42.0
   N14, \field Variable Condensing Temperature Maximum for Indoor Unit
        \note This field is used if Refrigerant Temperature Control Algorithm 
        \note is VariableTemp
        \note Condensing temperature is the refrigerant temperature, not air temperature
        \type real
-       \units C       
-       \default 46.0 
+       \units C
+       \default 46.0
   N15, \field Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity
        \note Enter the outdoor unit fan power per Watt of rated evaporative capacity [W/W]
        \units dimensionless
@@ -53884,52 +54002,51 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \minimum> 0.0
        \default 7.50E-5
        \type real
-  A6 , \field Outdoor Unit Evaporating Temperature Function of Superheating Curve Name    
-       \required-field   
+  A6 , \field Outdoor Unit Evaporating Temperature Function of Superheating Curve Name
+       \required-field
        \type object-list
        \object-list QuadraticCurves
        \object-list UniVariateTables
-  A7 , \field Outdoor Unit Condensing Temperature Function of Subcooling Curve Name    
-       \required-field   
+  A7 , \field Outdoor Unit Condensing Temperature Function of Subcooling Curve Name
+       \required-field
        \type object-list
        \object-list QuadraticCurves
-       \object-list UniVariateTables  
-  N17, \field Diameter of main pipe connecting outdoor unit to indoor units
+       \object-list UniVariateTables
+  N17, \field Diameter of Main Pipe Connecting Outdoor Unit to Indoor Units
        \note used to calculate the piping loss
-       \type real 
+       \type real
        \units m
        \minimum 0.0
-       \default 0.0762 
-  N18, \field Length of main pipe connecting outdoor unit to indoor units
+       \default 0.0762
+  N18, \field Length of Main Pipe Connecting Outdoor Unit to Indoor Units
        \note used to calculate the heat loss of the main pipe
-       \type real 
+       \type real
        \units m
        \minimum 0.0
        \default 30.0
-  N19, \field Equivalent length of main pipe connecting outdoor unit to indoor units
+  N19, \field Equivalent Length of Main Pipe Connecting Outdoor Unit to Indoor Units
        \note used to calculate the refrigerant pressure drop of the main pipe
-       \type real 
+       \type real
        \units m
        \minimum 0.0
        \default 36.0
-  N20, \field Height difference between the outdoor unit node and 
-       \field indoor unit node of the main pipe
+  N20, \field Height Difference Between Outdoor Unit and Indoor Units
        \note Difference between outdoor unit height and indoor unit height
        \note Positive means outdoor unit is higher than indoor unit 
        \note Negative means outdoor unit is lower than indoor unit 
-       \type real 
+       \type real
        \units m
        \default 5.0
-  N21, \field Insulation thickness of the main pipe
-       \type real 
+  N21, \field Main Pipe Insulation Thickness
+       \type real
        \units m
-       \minimum 0.0	
-	   \default 0.02
-  N22, \field Thermal conductivity of the main pipe insulation material
-       \type real 
+       \minimum 0.0
+       \default 0.02
+  N22, \field Main Pipe Insulation Thermal Conductivity
+       \type real
        \units W/m-K
-       \minimum 0.0	
-	   \default 0.032
+       \minimum 0.0
+       \default 0.032
   N23, \field Crankcase Heater Power per Compressor
        \type real
        \units W
@@ -53999,7 +54116,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \default 5.0
        \note Enter the maximum outdoor temperature above which the defrost operation is disabled
   N30, \field Compressor maximum delta Pressure
-       \type real 
+       \type real
        \units Pa
        \default 4500000.0
        \minimum 0.0
@@ -54016,7 +54133,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type real
        \note Minimum compressor speed 
        \units rev/min
-       \minimum> 0   
+       \minimum> 0
   A11, \field Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \required-field
        \type object-list
@@ -54041,90 +54158,90 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N34, \field Compressor Speed at Loading Index 3       
+  N34, \field Compressor Speed at Loading Index 3
        \type real
        \units rev/min
        \minimum> 0
-  A15, \field Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name       
+  A15, \field Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A16, \field Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name       
+  A16, \field Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N35, \field Compressor Speed at Loading Index 4       
+  N35, \field Compressor Speed at Loading Index 4
        \type real
        \units rev/min
        \minimum> 0
-  A17, \field Loading Index 4 Evaporative Capacity Multiplier Function of Temperature Curve Name       
+  A17, \field Loading Index 4 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A18, \field Loading Index 4 Compressor Power Multiplier Function of Temperature Curve Name       
+  A18, \field Loading Index 4 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N36, \field Compressor Speed at Loading Index 5       
+  N36, \field Compressor Speed at Loading Index 5
        \type real
        \units rev/min
        \minimum> 0
-  A19, \field Loading Index 5 Evaporative Capacity Multiplier Function of Temperature Curve Name       
+  A19, \field Loading Index 5 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A20, \field Loading Index 5 Compressor Power Multiplier Function of Temperature Curve Name       
+  A20, \field Loading Index 5 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N37, \field Compressor Speed at Loading Index 6       
+  N37, \field Compressor Speed at Loading Index 6
        \type real
        \units rev/min
        \minimum> 0
-  A21, \field Loading Index 6 Evaporative Capacity Multiplier Function of Temperature Curve Name       
+  A21, \field Loading Index 6 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A22, \field Loading Index 6 Compressor Power Multiplier Function of Temperature Curve Name       
+  A22, \field Loading Index 6 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N38, \field Compressor Speed at Loading Index 7       
+  N38, \field Compressor Speed at Loading Index 7
        \type real
        \units rev/min
        \minimum> 0
-  A23, \field Loading Index 7 Evaporative Capacity Multiplier Function of Temperature Curve Name       
+  A23, \field Loading Index 7 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
   A24, \field Loading Index 7 list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N39, \field Compressor Speed at Loading Index 8       
+  N39, \field Compressor Speed at Loading Index 8
        \type real
        \units rev/min
        \minimum> 0
-  A25, \field Loading Index 8 Evaporative Capacity Multiplier Function of Temperature Curve Name       
+  A25, \field Loading Index 8 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A26, \field Loading Index 8 Compressor Power Multiplier Function of Temperature Curve Name       
+  A26, \field Loading Index 8 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  N40, \field Compressor Speed at Loading Index 9       
-       \type real 
+  N40, \field Compressor Speed at Loading Index 9
+       \type real
        \units rev/min
        \minimum> 0
-  A27, \field Loading Index 9 Evaporative Capacity Multiplier Function of Temperature Curve Name       
+  A27, \field Loading Index 9 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A28; \field Loading Index 9 Compressor Power Multiplier Function of Temperature Curve Name       
+  A28; \field Loading Index 9 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-	   
+
 ZoneTerminalUnitList,
           \memo List of variable refrigerant flow (VRF) terminal units served by a given VRF condensing
           \memo unit. See ZoneHVAC:TerminalUnit:VariableRefrigerantFlow and
@@ -58407,23 +58524,16 @@ Pipe:Underground,
    A6,  \field Soil Material Name
         \type alpha
         \required-field
-   N3,  \field Average Soil Surface Temperature
-        \note optional
-        \units C
-        \type real
-        \default 0
-   N4,  \field Amplitude of Soil Surface Temperature
-        \note optional
-        \units deltaC
-        \type real
-        \minimum 0
-        \default 0
-   N5;  \field Phase Constant of Soil Surface Temperature
-        \note optional
-        \units days
-        \type real
-        \minimum 0
-        \default 0
+   A7,  \field Undisturbed Ground Temperature Model Type
+        \required-field
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A8;  \field Undisturbed Ground Temperature Model Name
+        \required-field
+        \type object-list
+        \object-list UndisturbedGroundTempModels
 
 PipingSystem:Underground:Domain,
         \memo The ground domain object for underground piping system simulation.
@@ -58530,58 +58640,56 @@ PipingSystem:Underground:Domain,
         \minimum 0
         \maximum 100
         \default 50
-   N15, \field Kusuda-Achenbach Average Surface Temperature
+   A5,  \field Undisturbed Ground Temperature Model Type
         \required-field
-        \type real
-        \units C
-   N16, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A6,  \field Undisturbed Ground Temperature Model Name
         \required-field
-        \type real
-        \units deltaC
-   N17, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-        \required-field
-        \type real
-        \units days
-   A5,  \field This Domain Includes Basement Surface Interaction
+        \type object-list
+        \object-list UndisturbedGroundTempModels
+   A7,  \field This Domain Includes Basement Surface Interaction
         \type choice
         \key Yes
         \key No
         \default No
         \note if Yes, then the following basement inputs are used
         \note if No, then the following basement inputs are *ignored*
-   N18, \field Width of Basement Floor in Ground Domain
+   N15, \field Width of Basement Floor in Ground Domain
         \type real
         \units m
         \note Required only if Domain Has Basement Interaction
-   N19, \field Depth of Basement Wall In Ground Domain
+   N16, \field Depth of Basement Wall In Ground Domain
         \type real
         \units m
         \note Required only if Domain Has Basement Interaction
-   A6,  \field Shift Pipe X Coordinates By Basement Width
+   A8,  \field Shift Pipe X Coordinates By Basement Width
         \type choice
         \key Yes
         \key No
         \note Required only if Domain Has Basement Interaction
-   A7,  \field Name of Basement Wall Boundary Condition Model
+   A9,  \field Name of Basement Wall Boundary Condition Model
         \type object-list
         \object-list OSCMNames
         \note Required only if Domain Has Basement Interaction
-   A8,  \field Name of Basement Floor Boundary Condition Model
+   A10,  \field Name of Basement Floor Boundary Condition Model
         \type object-list
         \object-list OSCMNames
         \note Required only if Domain Has Basement Interaction
-   N20, \field Convergence Criterion for the Outer Cartesian Domain Iteration Loop
+   N17, \field Convergence Criterion for the Outer Cartesian Domain Iteration Loop
         \type real
         \units deltaC
         \minimum 0.000001
         \maximum 0.5
         \default 0.001
-   N21, \field Maximum Iterations in the Outer Cartesian Domain Iteration Loop
+   N18, \field Maximum Iterations in the Outer Cartesian Domain Iteration Loop
         \type integer
         \minimum 3
         \maximum 10000
         \default 500
-   N22, \field Evapotranspiration Ground Cover Parameter
+   N19, \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
         \maximum 1.5
@@ -58592,37 +58700,37 @@ PipingSystem:Underground:Domain,
         \note  = 0.5 : short grass, much like a manicured lawn
         \note  = 1   : standard reference state (12 cm grass)
         \note  = 1.5 : wild growth
-   N23, \field Number of Pipe Circuits Entered for this Domain
+   N20, \field Number of Pipe Circuits Entered for this Domain
         \required-field
         \type integer
         \minimum 1
-   A9,  \field Pipe Circuit 1
+   A11,  \field Pipe Circuit 1
         \required-field
         \begin-extensible
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames
         \note Name of a pipe circuit to be simulated in this domain
-   A10, \field Pipe Circuit 2
+   A12, \field Pipe Circuit 2
         \note optional
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames
         \note Name of a pipe circuit to be simulated in this domain
-   A11, \field Pipe Circuit 3
+   A13, \field Pipe Circuit 3
         \note optional
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames
         \note Name of a pipe circuit to be simulated in this domain
-   A12, \field Pipe Circuit 4
+   A14, \field Pipe Circuit 4
         \note optional
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames
         \note Name of a pipe circuit to be simulated in this domain
-   A13, \field Pipe Circuit 5
+   A15, \field Pipe Circuit 5
         \note optional
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames
         \note Name of a pipe circuit to be simulated in this domain
-   A14; \field Pipe Circuit 6
+   A16; \field Pipe Circuit 6
         \note optional
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames
@@ -65142,28 +65250,17 @@ GroundHeatExchanger:HorizontalTrench,
         \minimum 0
         \maximum 100
         \default 50
-   N16, \field Kusuda-Achenbach Average Surface Temperature
-        \note This is the parameter for average annual surface temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found in the input
-        \note The undisturbed ground temperature will be approximated from this object
-        \type real
-        \units C
-   N17, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
-        \note This is the parameter for annual average amplitude from average surface temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found in the input
-        \note The undisturbed ground temperature will be approximated from this object
-        \type real
-        \units deltaC
-   N18, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-        \note This is the parameter for phase shift from minimum surface temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found in the input
-        \note The undisturbed ground temperature will be approximated from this object
-        \type real
-        \units days
-   N19; \field Evapotranspiration Ground Cover Parameter
+   A4,  \field Undisturbed Ground Temperature Model Type
+        \required-field
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A5,  \field Undisturbed Ground Temperature Model Name
+        \required-field
+        \type object-list
+        \object-list UndisturbedGroundTempModels
+   N16; \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
         \maximum 1.5
@@ -65174,9 +65271,9 @@ GroundHeatExchanger:HorizontalTrench,
         \note  = 0.5 : short grass, much like a manicured lawn
         \note  = 1   : standard reference state (12 cm grass)
         \note  = 1.5 : wild growth
-        
+
 GroundHeatExchanger:Slinky,
-        \memo This models a slinky horizontal heat exchanger 
+        \memo This models a slinky horizontal heat exchanger
         \memo placed in a series of trenches
         \memo The model uses the model developed by:
         \memo Xiong, Z., D.E. Fisher, and J.D. Spitler. 2015.
@@ -65199,7 +65296,7 @@ GroundHeatExchanger:Slinky,
         \type real
         \units W/m-K
         \minimum> 0
-        \default 1.08        
+        \default 1.08
    N3 , \field Soil Density
         \type real
         \units kg/m3
@@ -65231,7 +65328,7 @@ GroundHeatExchanger:Slinky,
         \units m
         \minimum> 0
         \ip-units in
-        \default 0.02667        
+        \default 0.02667
    N9 , \field Pipe Thickness
         \type real
         \units m
@@ -65249,14 +65346,14 @@ GroundHeatExchanger:Slinky,
         \units m
         \minimum> 0
         \ip-units ft
-        \default 1.0       
+        \default 1.0
    N11, \field Coil Pitch
         \note This is the center-to-center distance between coils
         \type real
         \units m
         \minimum> 0
         \ip-units ft
-        \default 0.20   
+        \default 0.20
    N12, \field Trench Depth
         \note This is the distance from the ground surface to the
         \note trench bottom
@@ -65264,24 +65361,24 @@ GroundHeatExchanger:Slinky,
         \units m
         \minimum> 0
         \ip-units ft
-        \default 1.8     
+        \default 1.8
    N13, \field Trench Length
         \note This is the total length of a single trench
-        \note This assumes the heat exchanger runs the full length 
+        \note This assumes the heat exchanger runs the full length
         \note of the trench
         \type real
         \units m
         \minimum> 0
         \ip-units ft
-        \default 10 
+        \default 10
    N14, \field Number of Trenches
-        \note This is the number of parallel trenches that 
+        \note This is the number of parallel trenches that
         \note has a heat exchanger, one per trench
         \type integer
         \minimum 1
         \default 1
    N15, \field Horizontal Spacing Between Pipes
-        \note This represents the average horizontal spacing 
+        \note This represents the average horizontal spacing
         \note between any two
         \note trenches for heat exchangers that have multiple trenches
         \type real
@@ -65289,39 +65386,17 @@ GroundHeatExchanger:Slinky,
         \minimum> 0
         \ip-units ft
         \default 2.0
-   N16, \field Kusuda-Achenbach Average Surface Temperature
-        \note This is the parameter for average annual surface
-        \note temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found 
-        \note in the input
-        \note The undisturbed ground temperature will be 
-        \note approximated from this object
-        \type real
-        \units C
-   N17, \field Kusuda-Achenbach Average Amplitude of Surface 
-        \note Temperature
-        \note This is the parameter for annual average amplitude from
-        \note average surface temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found 
-        \note in the input
-        \note The undisturbed ground temperature will be approximated
-        \note from this object
-        \type real
-        \units deltaC
-   N18, \field Kusuda-Achenbach Phase Shift of Minimum Surface 
-        \note Temperature
-        \note This is the parameter for phase shift from minimum
-        \note surface temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found 
-        \note in the input
-        \note The undisturbed ground temperature will be approximated
-        \note from this object
-        \type real
-        \units days
-   N19; \field Maximum Length of Simulation
+   A5,  \field Undisturbed Ground Temperature Model Type
+        \required-field
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A6,  \field Undisturbed Ground Temperature Model Name
+        \required-field
+        \type object-list
+        \object-list UndisturbedGroundTempModels
+   N16; \field Maximum Length of Simulation
         \type real
         \units years
 
@@ -74899,7 +74974,7 @@ DemandManager:Thermostats,
        \note can be selected by entering <Zone Name><space><Global Thermostat Object Name>.
        \type object-list
        \object-list ZoneControlThermostaticNames
-       
+
   DemandManager:Ventilation,
        \memo used for demand limiting Controller:OutdoorAir objects.
        \extensible:1 Duplicate the last field Controller:OutdoorAir Name
@@ -78328,7 +78403,7 @@ FaultModel:ThermostatOffset,
        \default 2
        \units deltaC
 
-FaultModel:HumidistatOffset, 
+FaultModel:HumidistatOffset,
    \memo This object describes fault of humidistat offset
    \min-fields 4
    A1, \field Name
@@ -78340,7 +78415,7 @@ FaultModel:HumidistatOffset,
        \required-field
        \type object-list
        \object-list ZoneControlHumidistatNames
-   A3, \field Humidistat Offset Type 
+   A3, \field Humidistat Offset Type
        \note Two types are available: 
        \note Type ThermostatOffsetIndependent
        \note Type ThermostatOffsetDependent
@@ -78355,8 +78430,8 @@ FaultModel:HumidistatOffset,
    A5, \field Severity Schedule Name
        \note This field is applicable for Type ThermostatOffsetIndependent
        \type object-list
-       \object-list ScheduleNames 
-   N1, \field Reference Humidistat Offset       
+       \object-list ScheduleNames
+   N1, \field Reference Humidistat Offset
        \note Required field for Type ThermostatOffsetIndependent
        \type real
        \minimum> -20
@@ -78367,7 +78442,7 @@ FaultModel:HumidistatOffset,
        \note Enter the name of a FaultModel:ThermostatOffset object
        \note Required field for Type ThermostatOffsetDependent
        \type object-list
-       \object-list ThermostatOffsetFaults   
+       \object-list ThermostatOffsetFaults
 
 FaultModel:Fouling:AirFilter,
    \memo This object describes fault of dirty air filters
@@ -78387,21 +78462,21 @@ FaultModel:Fouling:AirFilter,
        \note Enter the name of a fan object
        \required-field
        \type object-list
-       \object-list FansCVandOnOffandVAV 
+       \object-list FansCVandOnOffandVAV
    A4, \field Availability Schedule Name
        \type object-list
        \object-list ScheduleNames
-   A5, \field Pressure Fraction Schedule Name 
+   A5, \field Pressure Fraction Schedule Name
        \note Enter the name of a schedule 
        \note describing the variations of the fan pressure rise 
        \note in terms of multipliers to the fan design pressure rise
        \type object-list
-       \object-list ScheduleNames   
+       \object-list ScheduleNames
    A6; \field Fan Curve Name
        \note The curve describes the relationship between 
        \note the fan pressure rise and air flow rate
        \required-field
-       \type object-list 
+       \type object-list
        \object-list CubicCurves
        \object-list UniVariateTables
 
@@ -95540,6 +95615,492 @@ Output:Table:Monthly,
        \key MaximumDuringHoursShown
        \key MinimumDuringHoursShown
        \note See instructions under AggregationType01
+ 
+Output:Table:Annual,
+       \memo Provides a generic method of setting up tables of annual results with one row per object. 
+       \memo The report has multiple columns that are each defined using a repeated group of fields 
+       \memo for any number of columns. A single Output:Table:Annual produces a single table in the 
+       \memo output. 
+       \extensible:3
+   A1, \field Name
+       \required-field
+       \type alpha
+   A2, \field Filter
+       \type alpha
+       \note An optional text string that is compared to the names of the objects referenced by the 
+       \note variables and if they match are included in the table. A footnote will appear that indicates 
+       \note that the objects shown may not be all the objects that of that type that occur in the file. 
+   A3, \field Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Optional schedule name. If left blank, aggregation is performed for all hours simulated. If 
+       \note a schedule is specified, aggregation is performed for non-zero hours in the schedule.
+! The next two fields are repeated for each column
+   A4, \field Variable or Meter or EMS Variable or Field 1 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+       \note contain the name of a variable (see Output:Variable and eplusout.rdd), meter (see Output:Meter 
+       \note and eplusout.mdd), or EMS Internal Variable Name or IDF Object Field name. This value is shown 
+       \note using the aggregation method specified. 
+   A5, \field Aggregation Type for Variable or Meter 1
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+       \note The method of aggregation for the selected variable or meter.
+       \note SumOrAverage adds up the values for every timestep in the month if the variable
+       \note   is a sum variable. If the variable is an average variable it reports the average value.
+       \note   This is probably the most common Aggregation Type option to choose.
+       \note Maximum and Minimum find the maximum and minimum value for the month and report it
+       \note   along with the time that it first occurred.  When Maximum or Minimum are selected a
+       \note   column is automatically shown in the output report for the time that it occurred.
+       \note   When Maximum or Minimum are used with an average variable the value is divided
+       \note   by the length of the timestep.
+       \note ValueWhenMaxMin looks at the previous variable in the report that sets a maximum or minimum
+       \note   and displays the value of the current variable at that same timestep.
+       \note   Order of the variables in the report is important when using ValueWhenMaxMin.
+       \note   This can be used when an outdoor temperature should be reported for the time of the
+       \note   maximum cooling load.
+       \note HoursNonZero adds up the elapsed time during the month that this variable is non-zero
+       \note   and would be appropriate to determine the number of hour that a fan operates.
+       \note HoursZero - The HoursZero option adds up the elapsed time during the month that this
+       \note   variable has a zero value and would be appropriate to determine the number of hour
+       \note   that a fan does not operate.
+       \note HoursPositive - The HoursPositive option adds up the elapsed time during the month that
+       \note   this variable has a positive value.  Hours with a zero value are not included.
+       \note HoursNonPositive - The HoursNonPositive option adds up the elapsed time during the month
+       \note   that this variable has non-positive value. Hours with a negative value and hours with a
+       \note   zero value are all included.
+       \note HoursNegative - The HoursNegative option adds up the elapsed time during the month that
+       \note   this variable has a negative value.  Hours with a zero value are not included.
+       \note HoursNonNegative - The HoursNonNegative option adds up the elapsed time during the month
+       \note   that this variable has non-negative value. Hours with a positive value and
+       \note   hours with a zero value are all included.
+       \note HourInTenBinsMinToMax - Creates 10 columns for the specified variable and shows the number 
+       \note   of hours in each of 10 bins based on the minimum and maximum value. The bin sizes will 
+       \note   be rounded up to the next most signficant digit value. 
+       \note HourInTenBinsZeroToMax - Creates 11 columns for the specified variable and shows the number 
+       \note   of hours in each of 10 bins from zero to the maximum value and a bin for hours below zero. 
+       \note   The bin sizes will be rounded up to the next most significant digit value.
+       \note HourInTenBinsMinToZero - Creates 11 columns for the specified variable and shows the number 
+       \note   of hours in each of 10 bins from zero to the minimum value and a bin for hours above zero. 
+       \note   The bin sizes will be rounded up to the next most significant digit value.
+       \note SumOrAverageDuringHoursShown - Provides the sum or average of the named variable when
+       \note   during the hours that the previous variable displayed with any of the Aggregation Types
+       \note   starting with "Hours". For "sum" type variables adds up the values for each timestep
+       \note   and reports the sum of the value monthly during the hours reported on the previous
+       \note   variable. For "average" type variables, the value shown will be the average for the month
+       \note   during the hours reported on the previous variable.  Order of the variables in
+       \note   the report is important when using this Aggregation Type.
+       \note MaximumDuringHoursShown - Reports the maximum value and the time that the maximum value
+       \note   occurred but only during the hours reported with the previous "hours-" Aggregation Type.
+       \note   When the Maximum option is used with an average variable the value is divided
+       \note   by the length of the timestep.  Order of the variables in the report is important
+       \note   when using this Aggregation Type.
+       \note MinimumDuringHoursShown - Reports the minimum value and the time that the minimum value
+       \note   occurred but only during the hours reported with the previous "hours-" Aggregation Type.
+       \note   When the Minimum option is used with an average variable the value is divided
+       \note   by the length of the timestep.  Order of the variables in the report is important
+       \note   when using this Aggregation Type.
+   N1, \field Digits After Decimal 1
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A6, \field Variable or Meter or EMS Variable or Field 2 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A7, \field Aggregation Type for Variable or Meter 2
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N2, \field Digits After Decimal 2
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A8, \field Variable or Meter or EMS Variable or Field 3 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A9, \field Aggregation Type for Variable or Meter 3
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N3, \field Digits After Decimal 3
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A10,\field Variable or Meter or EMS Variable or Field 4 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A11,\field Aggregation Type for Variable or Meter 4
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N4, \field Digits After Decimal 4
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A12,\field Variable or Meter or EMS Variable or Field 5 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A13,\field Aggregation Type for Variable or Meter 5
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N5, \field Digits After Decimal 5
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A14,\field Variable or Meter or EMS Variable or Field 6 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A15,\field Aggregation Type for Variable or Meter 6
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N6, \field Digits After Decimal 6
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A16,\field Variable or Meter or EMS Variable or Field 7 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A17,\field Aggregation Type for Variable or Meter 7
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N7, \field Digits After Decimal 7
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A18,\field Variable or Meter or EMS Variable or Field 8 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A19,\field Aggregation Type for Variable or Meter 8
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N8, \field Digits After Decimal 8
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A20,\field Variable or Meter or EMS Variable or Field 9 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A21,\field Aggregation Type for Variable or Meter 9
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N9, \field Digits After Decimal 9
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A22,\field Variable or Meter or EMS Variable or Field 10 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A23,\field Aggregation Type for Variable or Meter 10
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N10,\field Digits After Decimal 10
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A24,\field Variable or Meter or EMS Variable or Field 11 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A25,\field Aggregation Type for Variable or Meter 11
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N11,\field Digits After Decimal 11
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A26,\field Variable or Meter or EMS Variable or Field 12 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A27,\field Aggregation Type for Variable or Meter 12
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N12,\field Digits After Decimal 12
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A28,\field Variable or Meter or EMS Variable or Field 13 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A29,\field Aggregation Type for Variable or Meter 13
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N13,\field Digits After Decimal 13
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A30,\field Variable or Meter or EMS Variable or Field 14 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A31,\field Aggregation Type for Variable or Meter 14
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N14,\field Digits After Decimal 14
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+   A32,\field Variable or Meter or EMS Variable or Field 15 Name
+       \begin-extensible
+       \type external-list
+       \external-list autoRDDvariableMeter
+   A33,\field Aggregation Type for Variable or Meter 15
+       \type choice
+       \key SumOrAverage
+       \key Maximum
+       \key Minimum
+       \key ValueWhenMaximumOrMinimum
+       \key HoursNonZero
+       \key HoursZero
+       \key HoursPositive
+       \key HoursNonPositive
+       \key HoursNegative
+       \key HoursNonNegative
+       \key HourInTenBinsMinToMax 
+       \key HourInTenBinsZeroToMax 
+       \key HourInTenBinsMinToZero 
+       \key SumOrAverageDuringHoursShown
+       \key MaximumDuringHoursShown
+       \key MinimumDuringHoursShown
+   N15;\field Digits After Decimal 15
+       \type integer
+       \default 2
+       \minimum 0
+       \maximum 10
+
+
 
 OutputControl:Table:Style,
        \memo default style for the OutputControl:Table:Style is comma -- this works well for
