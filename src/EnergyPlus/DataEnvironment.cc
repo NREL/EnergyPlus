@@ -49,6 +49,7 @@ namespace DataEnvironment {
 	Real64 const EarthRadius( 6356000.0 ); // Radius of the Earth (m)
 	Real64 const AtmosphericTempGradient( 0.0065 ); // Standard atmospheric air temperature gradient (K/m)
 	Real64 const SunIsUpValue( 0.00001 ); // if Cos Zenith Angle of the sun is >= this value, the sun is "up"
+	Real64 const StdPressureSeaLevel( 101325.0 ); // Standard barometric pressure at sea level (Pa)
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -126,9 +127,8 @@ namespace DataEnvironment {
 	Real64 PDIFLW; // Luminous efficacy (lum/W) of sky diffuse solar radiation
 	Real64 SkyClearness; // Sky clearness (see subr. DayltgLuminousEfficacy)
 	Real64 SkyBrightness; // Sky brightness (see subr. DayltgLuminousEfficacy)
-	Real64 StdBaroPress( 101325.0 ); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
+	Real64 StdBaroPress( StdPressureSeaLevel ); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
 	Real64 StdRhoAir; // Standard "rho air" set in WeatherManager - based on StdBaroPress
-	Real64 const stdAtmosphericPressure( 101325.0 ); // one atmosphere, sea level standard pressure 101325 Pa
 	Real64 rhoAirSTP; // Standard density of dry air at 101325 Pa, 20.0C temperaure 
 	Real64 TimeZoneNumber; // Time Zone Number of building location
 	Real64 TimeZoneMeridian; // Standard Meridian of TimeZone
