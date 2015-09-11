@@ -1249,8 +1249,7 @@ namespace AirflowNetworkBalanceManager {
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 1 ) + " = " + MultizoneSurfaceData( i ).SurfName );
 				ShowContinueError( "..Zone for inside surface must be defined in a AirflowNetwork:MultiZone:Zone object.  Could not find Zone = " + Zone( Surface( MultizoneSurfaceData( i ).SurfNum ).Zone ).Name );
-				ErrorsFound = true;
-				continue;
+				ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
 			}
 
 			// Get the number of external surfaces
