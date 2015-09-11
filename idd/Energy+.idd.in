@@ -36607,6 +36607,7 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
         \units m
         \minimum> 0
         \autosizable
+        \default autosize
    A5 , \field Temperature Control Type
         \note (Temperature on which unit is controlled)
         \type choice
@@ -36764,6 +36765,7 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
         \units m
         \minimum> 0
         \autosizable
+        \default autosize
    A5 , \field Temperature Control Type
         \note Temperature used to control system
         \type choice
