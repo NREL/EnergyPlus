@@ -39,7 +39,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularAnnual_GetInput )
 
 	GetInputTabularAnnual();
 
-	EXPECT_EQ( OutputReportTabularAnnual::annualTables.size(), 1 );
+	EXPECT_EQ( OutputReportTabularAnnual::annualTables.size(), 1u );
 
 	std::vector<AnnualTable>::iterator firstTable = OutputReportTabularAnnual::annualTables.begin();
 
