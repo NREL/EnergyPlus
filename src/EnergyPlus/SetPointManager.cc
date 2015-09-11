@@ -4747,7 +4747,7 @@ namespace SetPointManager {
 		Real64 EnthMixAtMinOA;
 		Real64 HumRatMixAtMinOA;
 		int AirLoopNum;
-		Real64 MinOAFrac;
+		Real64 OAFrac;
 		int LoopInNode;
 		static Real64 ExtrRateNoHC( 0.0 ); // the heating (>0) or cooling (<0) that can be done by supply air at TSupNoHC [W]
 
@@ -4759,7 +4759,7 @@ namespace SetPointManager {
 		RetNode = SingZoneRhSetPtMgr( SetPtMgrNum ).RetNode;
 		OAMixOAInNode = SingZoneRhSetPtMgr( SetPtMgrNum ).OAInNode;
 		AirLoopNum = SingZoneRhSetPtMgr( SetPtMgrNum ).AirLoopNum;
-		MinOAFrac = AirLoopFlow( AirLoopNum ).OAMinFrac;
+		OAFrac = AirLoopFlow( AirLoopNum ).OAFrac;
 		ZoneMassFlow = Node( ZoneInletNode ).MassFlowRate;
 		ZoneLoad = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired;
 		ZoneLoadToCoolSetPt = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToCoolingSP;
@@ -4768,8 +4768,8 @@ namespace SetPointManager {
 		ZoneTemp = Node( ZoneNode ).Temp;
 		LoopInNode = SingZoneRhSetPtMgr( SetPtMgrNum ).LoopInNode;
 		if ( OAMixOAInNode > 0 ) {
-			HumRatMixAtMinOA = ( 1.0 - MinOAFrac ) * Node( RetNode ).HumRat + MinOAFrac * Node( OAMixOAInNode ).HumRat;
-			EnthMixAtMinOA = ( 1.0 - MinOAFrac ) * Node( RetNode ).Enthalpy + MinOAFrac * Node( OAMixOAInNode ).Enthalpy;
+			HumRatMixAtMinOA = ( 1.0 - OAFrac ) * Node( RetNode ).HumRat + OAFrac * Node( OAMixOAInNode ).HumRat;
+			EnthMixAtMinOA = ( 1.0 - OAFrac ) * Node( RetNode ).Enthalpy + OAFrac * Node( OAMixOAInNode ).Enthalpy;
 			TMixAtMinOA = PsyTdbFnHW( EnthMixAtMinOA, HumRatMixAtMinOA );
 		} else {
 			TMixAtMinOA = Node( LoopInNode ).Temp;
