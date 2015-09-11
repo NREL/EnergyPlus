@@ -4308,6 +4308,8 @@ namespace ZoneEquipmentManager {
 		using CoolTower::ManageCoolTower;
 		using ThermalChimney::ManageThermalChimney;
 		using DataZoneEquipment::ZoneEquipAvail;
+		using DataZoneEquipment::ZMAT;
+		using DataZoneEquipment::ZHumRat;
 		using DataHVACGlobals::CycleOn;
 		using DataHVACGlobals::CycleOnZoneFansOnly;
 		using DataContaminantBalance::Contaminant;
@@ -4368,8 +4370,7 @@ namespace ZoneEquipmentManager {
 		Real64 VVF; // DESIGN VENTILATION FLOW RATE (M**3/SEC)
 		Real64 MCpI_temp;
 		Real64 VAMFL_temp;
-		static Array1D< Real64 > ZMAT; // Zone air temperature
-		static Array1D< Real64 > ZHumRat; // Zone air humidity ratio
+
 		Real64 Cw; // Opening effectivenss
 		Real64 Cd; // Discharge coefficent
 		Real64 angle; // Angle between wind direction and effective angle

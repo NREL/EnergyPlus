@@ -2785,8 +2785,8 @@ Resimulate(
 	if ( ResimHB ) {
 		// Surface simulation
 		InitSurfaceHeatBalance();
-		CalcHeatBalanceOutsideSurf();
-		CalcHeatBalanceInsideSurf();
+		HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf();
+		HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
 
 		// Air simulation
 		InitAirHeatBalance();
