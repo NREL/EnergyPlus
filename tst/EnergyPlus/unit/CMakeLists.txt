@@ -49,7 +49,9 @@ set( test_src
   MixerComponent.unit.cc
   PurchasedAirManager.unit.cc
   OutputProcessor.unit.cc
+  OutputReportData.unit.cc
   OutputReportTabular.unit.cc
+  OutputReportTabularAnnual.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc

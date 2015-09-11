@@ -63,6 +63,10 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/OutputReportTabularAnnual.hh>
+
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -151,6 +155,7 @@ namespace EnergyPlus {
 		OutAirNodeManager::clear_state();
 		OutputProcessor::clear_state();
 		OutputReportPredefined::clear_state();
+		OutputReportTabularAnnual::clear_state();
 		OutsideEnergySources::clear_state();
 		PlantLoopSolver::clear_state();
 		PlantPressureSystem::clear_state();
@@ -173,12 +178,11 @@ namespace EnergyPlus {
 		ZoneEquipmentManager::clear_state();
 		ZoneTempPredictorCorrector::clear_state();
 
-
-		{ 
-			IOFlags flags; 
+		{
+			IOFlags flags;
 			flags.DISPOSE( "DELETE" );
 			gio::close( OutputProcessor::OutputFileMeterDetails, flags );
-			gio::close( DataGlobals::OutputFileStandard, flags ); 
+			gio::close( DataGlobals::OutputFileStandard, flags );
 			gio::close( DataGlobals::OutputFileInits, flags );
 			gio::close( DataGlobals::OutputFileDebug, flags );
 			gio::close( DataGlobals::OutputFileZoneSizing, flags );
@@ -356,17 +360,17 @@ namespace EnergyPlus {
 					num_1 = FindItemInList( IDFRecords( which ).Name, ListOfObjects, NumObjectDefs );
 				}
 				if ( ObjectDef( num_1 ).NameAlpha1 && IDFRecords( which ).NumAlphas > 0 ) {
-					error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name + 
-									", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) + 
+					error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name +
+									", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) +
 									"], Object Type Preceding=" + IDFRecords( which ).Name + ", Object Name=" + IDFRecords( which ).Alphas( 1 ) + DataStringGlobals::NL;
 				} else {
-					error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name + 
-									", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) + 
+					error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name +
+									", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) +
 									"], Object Type Preceding=" + IDFRecords( which ).Name + ", Name field not recorded for Object." + DataStringGlobals::NL;
 				}
 			} else {
-				error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name + 
-								", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) + 
+				error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name +
+								", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) +
 								"], No prior Objects." + DataStringGlobals::NL;
 			}
 		}
@@ -456,7 +460,7 @@ namespace EnergyPlus {
 			}
 
 			if ( ! file_exists ) {
-				EXPECT_TRUE( file_exists ) << 
+				EXPECT_TRUE( file_exists ) <<
 					"Energy+.idd does not exist at search location." << std::endl << "IDD search location: \"" << idd_location << "\"";
 				errors_found = true;
 				return errors_found;
@@ -490,14 +494,14 @@ namespace EnergyPlus {
 		return errors_found;
 	}
 
-	bool EnergyPlusFixture::compare_idf( 
-		std::string const & name, 
-		int const num_alphas, 
-		int const num_numbers, 
-		std::vector< std::string > const & alphas, 
-		std::vector< bool > const & alphas_blank, 
-		std::vector< Real64 > const & numbers, 
-		std::vector< bool > const & numbers_blank 
+	bool EnergyPlusFixture::compare_idf(
+		std::string const & name,
+		int const num_alphas,
+		int const num_numbers,
+		std::vector< std::string > const & alphas,
+		std::vector< bool > const & alphas_blank,
+		std::vector< Real64 > const & numbers,
+		std::vector< bool > const & numbers_blank
 	)
 	{
 		using namespace InputProcessor;
@@ -510,7 +514,7 @@ namespace EnergyPlus {
 
 		EXPECT_GT( index, 0 ) << "Could not find \"" << name << "\". Make sure to run process_idf first.";
 		if ( index < 1 ) return false;
-		
+
 		index = iListOfObjects( index );
 		index = ObjectStartRecord( index );
 
