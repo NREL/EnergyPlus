@@ -180,6 +180,14 @@ namespace DataHeatBalSurface {
 	extern Array1D_bool RecDifShortFromZ; // True if Zone gets short radiation from another
 	extern bool InterZoneWindow; // True if there is an interzone window
 
+	// Functions
+
+	// Clears the global data in DataHeatBalSurface.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
+
 } // DataHeatBalSurface
 
 } // EnergyPlus
