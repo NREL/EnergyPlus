@@ -1734,6 +1734,143 @@ Site:GroundTemperature:Deep,
        \type real
        \default 16
 
+Site:GroundTemperature:Undisturbed:FiniteDifference,
+       \memo Undisturbed ground temperature object using a
+       \memo detailed finite difference 1-D model
+       \min-fields 7
+  A1,  \field Name
+       \required-field
+       \reference UndisturbedGroundTempModels
+  N1,  \field Soil Thermal Conductivity
+       \required-field
+       \type real
+       \units W/m-K
+       \minimum> 0.0
+  N2,  \field Soil Density
+       \required-field
+       \type real
+       \units kg/m3
+       \minimum> 0.0
+  N3,  \field Soil Specific Heat
+       \required-field
+       \type real
+       \units J/kg-K
+       \minimum> 0.0
+  N4,  \field Soil Moisture Content Volume Fraction
+       \type real
+       \units percent
+       \minimum 0
+       \maximum 100
+       \default 30
+  N5,  \field Soil Moisture Content Volume Fraction at Saturation
+       \type real
+       \units percent
+       \minimum 0
+       \maximum 100
+       \default 50
+   N6; \field Evapotranspiration Ground Cover Parameter
+       \type real
+       \units dimensionless
+       \minimum 0
+       \maximum 1.5
+       \default 0.4
+       \note This specifies the ground cover effects during evapotranspiration
+       \note  calculations.  The value roughly represents the following cases:
+       \note  = 0   : concrete or other solid, non-permeable ground surface material
+       \note  = 0.5 : short grass, much like a manicured lawn
+       \note  = 1   : standard reference state (12 cm grass)
+       \note  = 1.5 : wild growth
+
+Site:GroundTemperature:Undisturbed:KusudaAchenbach,
+       \memo Undisturbed ground temperature object using the
+       \memo Kusuda-Achenbach 1965 correlation.
+       \min-fields 7
+  A1,  \field Name
+       \required-field
+       \reference UndisturbedGroundTempModels
+  N1,  \field Soil Thermal Conductivity
+       \required-field
+       \type real
+       \units W/m-K
+       \minimum> 0.0
+  N2,  \field Soil Density
+       \required-field
+       \type real
+       \units kg/m3
+       \minimum> 0.0
+  N3,  \field Soil Specific Heat
+       \required-field
+       \type real
+       \units J/kg-K
+       \minimum> 0.0
+  N4,  \field Average Soil Surface Temperature
+       \type real
+       \units C
+       \note Annual average surface temperature
+       \note If left blank the Site:GroundTemperature:Shallow object must be included in the input
+       \note The soil temperature, amplitude, and phase shift must all be included or omitted together
+  N5,  \field Average Amplitude of Surface Temperature
+       \type real
+       \units deltaC
+       \minimum 0
+       \note Annual average surface temperature variation from average.
+       \note If left blank the Site:GroundTemperature:Shallow object must be included in the input
+       \note The soil temperature, amplitude, and phase shift must all be included or omitted together
+  N6;  \field Phase Shift of Minimum Surface Temperature
+       \type real
+       \units days
+       \minimum 0
+       \maximum< 365
+       \note The phase shift of minimum surface temperature, or the day
+       \note of the year when the minimum surface temperature occurs.
+       \note If left blank the Site:GroundTemperature:Shallow object must be included in the input
+       \note The soil temperature, amplitude, and phase shift must all be included or omitted together
+
+Site:GroundTemperature:Undisturbed:Xing,
+       \memo Undisturbed ground temperature object using the
+       \memo Xing 2014 2 harmonic parameter model.
+       \min-fields 9
+  A1,  \field Name
+       \required-field
+       \reference UndisturbedGroundTempModels
+  N1,  \field Soil Thermal Conductivity
+       \required-field
+       \type real
+       \units W/m-K
+       \minimum> 0.0
+  N2,  \field Soil Density
+       \required-field
+       \type real
+       \units kg/m3
+       \minimum> 0.0
+  N3,  \field Soil Specific Heat
+       \required-field
+       \type real
+       \units J/kg-K
+       \minimum> 0.0
+  N4,  \field Average Soil Surface Tempeature
+       \required-field
+       \type real
+       \units C
+  N5,  \field Soil Surface Temperature Amplitude 1
+       \required-field
+       \type real
+       \units deltaC
+  N6,  \field Soil Surface Temperature Amplitude 2
+       \required-field
+       \type real
+       \units deltaC
+  N7,  \field Phase Shift of Temperature Amplitude 1
+       \required-field
+       \type real
+       \units days
+       \maximum< 365
+  N8;  \field Phase Shift of Temperature Amplitude 2
+       \required-field
+       \type real
+       \units days
+       \maximum< 365
+
 Site:GroundDomain:Slab,
         \memo Ground-coupled slab model for on-grade and
         \memo in-grade cases with or without insulation.
@@ -1779,26 +1916,17 @@ Site:GroundDomain:Slab,
         \minimum 0
         \maximum 100
         \default 50
-   N9,  \field Kusuda-Achenbach Average Ground Surface Temperature
-        \type real
-        \units C
-        \note Annual average ground surface temperature.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provide
-        \note monthly average ground surface temperatures.
-   N10, \field Kusuda-Achenbach Average Amplitude of Ground Surface Temperature
-        \type real
-        \units deltaC
-        \note Annual average ground surface temperature variation from average.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provide
-        \note monthly average ground surface temperatures.
-   N11, \field Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature
-        \type real
-        \units days
-        \note The phase shift of minimum ground surface temperature, or the day
-        \note of the year when the minimum ground surface temperature occurs.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provide
-        \note monthly average ground surface temperatures.
-   N12, \field Evapotranspiration Ground Cover Parameter
+   A2,  \field Undisturbed Ground Temperature Model Type
+        \required-field
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A3,  \field Undisturbed Ground Temperature Model Name
+        \required-field
+        \type object-list
+        \object-list UndisturbedGroundTempModels
+   N9,  \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
         \maximum 1.5
@@ -1809,82 +1937,84 @@ Site:GroundDomain:Slab,
         \note  = 0.5 : short grass, much like a manicured lawn
         \note  = 1   : standard reference state (12 cm grass)
         \note  = 1.5 : wild growth
-   A2,  \field Slab Boundary Condition Model Name
+   A4,  \field Slab Boundary Condition Model Name
         \required-field
         \type object-list
         \object-list OSCMNames
-   A3,  \field Slab Location
+   A5,  \field Slab Location
         \required-field
         \type choice
         \key InGrade
         \key OnGrade
         \note This field specifies whether the slab is located "in-grade" or "on-grade"
-   A4,  \field Slab Material Name
+   A6,  \field Slab Material Name
         \type object-list
         \object-list MaterialName
-   A5,  \field Horizontal Insulation
+        \note Only applicable for the in-grade case
+   A7,  \field Horizontal Insulation
         \type choice
         \key Yes
         \key No
         \default No
         \note This field specifies the presence of insulation beneath the slab.
-   A6,  \field Horizontal Insulation Material Name
+        \note Only required for in-grade case.
+   A8,  \field Horizontal Insulation Material Name
         \type object-list
         \object-list MaterialName
         \note This field specifies the horizontal insulation material.
-   A7,  \field Horizontal Insulation Extents
+   A9,  \field Horizontal Insulation Extents
         \type choice
         \key Full
         \key Perimeter
         \default Full
         \note This field specifies whether the horizontal insulation fully insulates
         \note the surface or is perimeter only insulation
-   N13, \field Perimeter Insulation Width
+   N10, \field Perimeter Insulation Width
         \type real
         \units m
         \minimum> 0.0
         \note This field specifies the width of the underfloor perimeter insulation
-   A8,  \field Vertical Insulation
+   A10, \field Vertical Insulation
         \type choice
         \key Yes
         \key No
         \default No
         \note This field specifies the presence of vertical insulation at the slab edge.
-   A9,  \field Vertical Insulation Material Name
+   A11, \field Vertical Insulation Material Name
         \type object-list
         \object-list MaterialName
         \note This field specifies the vertical insulation material.
-   N14, \field Vertical Insulation Depth
+   N11, \field Vertical Insulation Depth
         \type real
         \units m
         \minimum> 0.0
         \note Only used when including vertical insulation
         \note This field specifies the depth of the vertical insulation
-   N15, \field X-direction Mesh Density Parameter
+   N12, \field X-direction Mesh Density Parameter
         \type integer
         \default 4
         \minimum 2
-   N16, \field Y-direction (vertical) Mesh Density Parameter
+   N13, \field Y-direction (vertical) Mesh Density Parameter
         \type integer
         \default 4
         \minimum 2
-   N17, \field Z-direction Mesh Density Parameter
+   N14, \field Z-direction Mesh Density Parameter
         \type integer
         \default 4
         \minimum 2
-   A10, \field Mesh Type
+   A12, \field Mesh Type
         \required-field
         \type choice
         \key Uniform
         \key Geometric
         \default Geometric
-   N18, \field Geometric Coefficient
+   N15, \field Geometric Coefficient
         \note optional
         \type real
         \minimum 1
         \default 1.7
         \maximum 2
-   A11; \field Simulation Timestep
+   A13; \field Simulation Timestep
         \type choice
         \key Daily
         \key Hourly
@@ -1940,26 +2070,17 @@ Site:GroundDomain:Basement,
         \minimum 0
         \maximum 100
         \default 50
-   N9,  \field Kusuda-Achenbach Average Ground Surface Temperature
-        \type real
-        \units C
-        \note Annual average ground surface temperature.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provide
-        \note monthly average ground surface temperatures.
-   N10, \field Kusuda-Achenbach Average Amplitude of Ground Surface Temperature
-        \type real
-        \units deltaC
-        \note Annual average ground surface temperature variation from average.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provide
-        \note monthly average ground surface temperatures.
-   N11, \field Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature
-        \type real
-        \units days
-        \note The phase shift of minimum ground surface temperature, or the day
-        \note of the year when the minimum ground surface temperature occurs.
-        \note If left blank, Site:GroundTemperature:Shallow must be used to provide
-        \note monthly average ground surface temperatures.
-   N12, \field Evapotranspiration Ground Cover Parameter
+   A2,  \field Undisturbed Ground Temperature Model Type
+        \required-field
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A3,  \field Undisturbed Ground Temperature Model Name
+        \required-field
+        \type object-list
+        \object-list UndisturbedGroundTempModels
+   N9,  \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
         \maximum 1.5
@@ -1970,62 +2091,62 @@ Site:GroundDomain:Basement,
         \note  = 0.5 : short grass, much like a manicured lawn
         \note  = 1   : standard reference state (12 cm grass)
         \note  = 1.5 : wild growth
-   A2,  \field Basement Floor Boundary Condition Model Name
+   A4,  \field Basement Floor Boundary Condition Model Name
         \required-field
         \type object-list
         \object-list OSCMNames
-   A3,  \field Horizontal Insulation
+   A5,  \field Horizontal Insulation
         \type choice
         \key Yes
         \key No
         \default No
         \note This field specifies the presence of insulation beneath the basement floor.
-   A4,  \field Horizontal Insulation Material Name
+   A6,  \field Horizontal Insulation Material Name
         \type object-list
         \object-list MaterialName
-   A5,  \field Horizontal Insulation Extents
+   A7,  \field Horizontal Insulation Extents
         \type choice
         \key Perimeter
         \key Full
         \default Full
-        \note This field specifies whether the horizontal insulation fully insulates 
+        \note This field specifies whether the horizontal insulation fully insulates
         \note the surface or is perimeter only insulation
-   N13, \field Perimeter Horizontal Insulation Width
+   N10, \field Perimeter Horizontal Insulation Width
         \type real
         \units m
         \minimum> 0.0
         \note Width of horizontal perimeter insulation measured from
         \note foundation wall inside surface.
-   N14, \field Basement Wall Depth
+   N11, \field Basement Wall Depth
         \type real
         \units m
         \minimum> 0.0
         \note Depth measured from ground surface.
-   A6,  \field Basement Wall Boundary Condition Model Name
+   A8,  \field Basement Wall Boundary Condition Model Name
         \required-field
         \type object-list
         \object-list OSCMNames
-   A7,  \field Vertical Insulation
+   A9,  \field Vertical Insulation
         \type choice
         \key Yes
         \key No
         \default No
-   A8, \field Basement Wall Vertical Insulation Material Name
+   A10, \field Basement Wall Vertical Insulation Material Name
         \type object-list
         \object-list MaterialName
-   N15, \field Vertical Insulation Depth
+   N12, \field Vertical Insulation Depth
         \type real
         \units m
         \minimum> 0.0
         \note Depth measured from the ground surface.
-   A9, \field Simulation Timestep
+   A11, \field Simulation Timestep
         \type choice
         \key Timestep
         \key Hourly
         \key Daily
         \default Hourly
         \note This field specifies the basement domain simulation interval.
-   N16; \field Mesh Density Parameter
+   N13; \field Mesh Density Parameter
         \type integer
         \default 4
         \minimum 2
@@ -58419,23 +58540,16 @@ Pipe:Underground,
    A6,  \field Soil Material Name
         \type alpha
         \required-field
-   N3,  \field Average Soil Surface Temperature
-        \note optional
-        \units C
-        \type real
-        \default 0
-   N4,  \field Amplitude of Soil Surface Temperature
-        \note optional
-        \units deltaC
-        \type real
-        \minimum 0
-        \default 0
-   N5;  \field Phase Constant of Soil Surface Temperature
-        \note optional
-        \units days
-        \type real
-        \minimum 0
-        \default 0
+   A7,  \field Undisturbed Ground Temperature Model Type
+        \required-field
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A8;  \field Undisturbed Ground Temperature Model Name
+        \required-field
+        \type object-list
+        \object-list UndisturbedGroundTempModels
 
 PipingSystem:Underground:Domain,
         \memo The ground domain object for underground piping system simulation.
@@ -58542,58 +58656,56 @@ PipingSystem:Underground:Domain,
         \minimum 0
         \maximum 100
         \default 50
-   N15, \field Kusuda-Achenbach Average Surface Temperature
+   A5,  \field Undisturbed Ground Temperature Model Type
         \required-field
-        \type real
-        \units C
-   N16, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A6,  \field Undisturbed Ground Temperature Model Name
         \required-field
-        \type real
-        \units deltaC
-   N17, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-        \required-field
-        \type real
-        \units days
-   A5,  \field This Domain Includes Basement Surface Interaction
+        \type object-list
+        \object-list UndisturbedGroundTempModels
+   A7,  \field This Domain Includes Basement Surface Interaction
         \type choice
         \key Yes
         \key No
         \default No
         \note if Yes, then the following basement inputs are used
         \note if No, then the following basement inputs are *ignored*
-   N18, \field Width of Basement Floor in Ground Domain
+   N15, \field Width of Basement Floor in Ground Domain
         \type real
         \units m
         \note Required only if Domain Has Basement Interaction
-   N19, \field Depth of Basement Wall In Ground Domain
+   N16, \field Depth of Basement Wall In Ground Domain
         \type real
         \units m
         \note Required only if Domain Has Basement Interaction
-   A6,  \field Shift Pipe X Coordinates By Basement Width
+   A8,  \field Shift Pipe X Coordinates By Basement Width
         \type choice
         \key Yes
         \key No
         \note Required only if Domain Has Basement Interaction
-   A7,  \field Name of Basement Wall Boundary Condition Model
+   A9,  \field Name of Basement Wall Boundary Condition Model
         \type object-list
         \object-list OSCMNames
         \note Required only if Domain Has Basement Interaction
-   A8,  \field Name of Basement Floor Boundary Condition Model
+   A10,  \field Name of Basement Floor Boundary Condition Model
         \type object-list
         \object-list OSCMNames
         \note Required only if Domain Has Basement Interaction
-   N20, \field Convergence Criterion for the Outer Cartesian Domain Iteration Loop
+   N17, \field Convergence Criterion for the Outer Cartesian Domain Iteration Loop
         \type real
         \units deltaC
         \minimum 0.000001
         \maximum 0.5
         \default 0.001
-   N21, \field Maximum Iterations in the Outer Cartesian Domain Iteration Loop
+   N18, \field Maximum Iterations in the Outer Cartesian Domain Iteration Loop
         \type integer
         \minimum 3
         \maximum 10000
         \default 500
-   N22, \field Evapotranspiration Ground Cover Parameter
+   N19, \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
         \maximum 1.5
@@ -58604,37 +58716,37 @@ PipingSystem:Underground:Domain,
         \note  = 0.5 : short grass, much like a manicured lawn
         \note  = 1   : standard reference state (12 cm grass)
         \note  = 1.5 : wild growth
-   N23, \field Number of Pipe Circuits Entered for this Domain
+   N20, \field Number of Pipe Circuits Entered for this Domain
         \required-field
         \type integer
         \minimum 1
-   A9,  \field Pipe Circuit 1
+   A11,  \field Pipe Circuit 1
         \required-field
         \begin-extensible
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames
         \note Name of a pipe circuit to be simulated in this domain
-   A10, \field Pipe Circuit 2
+   A12, \field Pipe Circuit 2
         \note optional
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames
         \note Name of a pipe circuit to be simulated in this domain
-   A11, \field Pipe Circuit 3
+   A13, \field Pipe Circuit 3
         \note optional
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames
         \note Name of a pipe circuit to be simulated in this domain
-   A12, \field Pipe Circuit 4
+   A14, \field Pipe Circuit 4
         \note optional
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames
         \note Name of a pipe circuit to be simulated in this domain
-   A13, \field Pipe Circuit 5
+   A15, \field Pipe Circuit 5
         \note optional
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames
         \note Name of a pipe circuit to be simulated in this domain
-   A14; \field Pipe Circuit 6
+   A16; \field Pipe Circuit 6
         \note optional
         \type object-list
         \object-list PipingSystemUndergroundCircuitNames
@@ -65154,28 +65266,17 @@ GroundHeatExchanger:HorizontalTrench,
         \minimum 0
         \maximum 100
         \default 50
-   N16, \field Kusuda-Achenbach Average Surface Temperature
-        \note This is the parameter for average annual surface temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found in the input
-        \note The undisturbed ground temperature will be approximated from this object
-        \type real
-        \units C
-   N17, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
-        \note This is the parameter for annual average amplitude from average surface temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found in the input
-        \note The undisturbed ground temperature will be approximated from this object
-        \type real
-        \units deltaC
-   N18, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-        \note This is the parameter for phase shift from minimum surface temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found in the input
-        \note The undisturbed ground temperature will be approximated from this object
-        \type real
-        \units days
-   N19; \field Evapotranspiration Ground Cover Parameter
+   A4,  \field Undisturbed Ground Temperature Model Type
+        \required-field
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A5,  \field Undisturbed Ground Temperature Model Name
+        \required-field
+        \type object-list
+        \object-list UndisturbedGroundTempModels
+   N16; \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
         \maximum 1.5
@@ -65186,9 +65287,9 @@ GroundHeatExchanger:HorizontalTrench,
         \note  = 0.5 : short grass, much like a manicured lawn
         \note  = 1   : standard reference state (12 cm grass)
         \note  = 1.5 : wild growth
-        
+
 GroundHeatExchanger:Slinky,
-        \memo This models a slinky horizontal heat exchanger 
+        \memo This models a slinky horizontal heat exchanger
         \memo placed in a series of trenches
         \memo The model uses the model developed by:
         \memo Xiong, Z., D.E. Fisher, and J.D. Spitler. 2015.
@@ -65211,7 +65312,7 @@ GroundHeatExchanger:Slinky,
         \type real
         \units W/m-K
         \minimum> 0
-        \default 1.08        
+        \default 1.08
    N3 , \field Soil Density
         \type real
         \units kg/m3
@@ -65243,7 +65344,7 @@ GroundHeatExchanger:Slinky,
         \units m
         \minimum> 0
         \ip-units in
-        \default 0.02667        
+        \default 0.02667
    N9 , \field Pipe Thickness
         \type real
         \units m
@@ -65261,14 +65362,14 @@ GroundHeatExchanger:Slinky,
         \units m
         \minimum> 0
         \ip-units ft
-        \default 1.0       
+        \default 1.0
    N11, \field Coil Pitch
         \note This is the center-to-center distance between coils
         \type real
         \units m
         \minimum> 0
         \ip-units ft
-        \default 0.20   
+        \default 0.20
    N12, \field Trench Depth
         \note This is the distance from the ground surface to the
         \note trench bottom
@@ -65276,24 +65377,24 @@ GroundHeatExchanger:Slinky,
         \units m
         \minimum> 0
         \ip-units ft
-        \default 1.8     
+        \default 1.8
    N13, \field Trench Length
         \note This is the total length of a single trench
-        \note This assumes the heat exchanger runs the full length 
+        \note This assumes the heat exchanger runs the full length
         \note of the trench
         \type real
         \units m
         \minimum> 0
         \ip-units ft
-        \default 10 
+        \default 10
    N14, \field Number of Trenches
-        \note This is the number of parallel trenches that 
+        \note This is the number of parallel trenches that
         \note has a heat exchanger, one per trench
         \type integer
         \minimum 1
         \default 1
    N15, \field Horizontal Spacing Between Pipes
-        \note This represents the average horizontal spacing 
+        \note This represents the average horizontal spacing
         \note between any two
         \note trenches for heat exchangers that have multiple trenches
         \type real
@@ -65301,39 +65402,17 @@ GroundHeatExchanger:Slinky,
         \minimum> 0
         \ip-units ft
         \default 2.0
-   N16, \field Kusuda-Achenbach Average Surface Temperature
-        \note This is the parameter for average annual surface
-        \note temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found 
-        \note in the input
-        \note The undisturbed ground temperature will be 
-        \note approximated from this object
-        \type real
-        \units C
-   N17, \field Kusuda-Achenbach Average Amplitude of Surface 
-        \note Temperature
-        \note This is the parameter for annual average amplitude from
-        \note average surface temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found 
-        \note in the input
-        \note The undisturbed ground temperature will be approximated
-        \note from this object
-        \type real
-        \units deltaC
-   N18, \field Kusuda-Achenbach Phase Shift of Minimum Surface 
-        \note Temperature
-        \note This is the parameter for phase shift from minimum
-        \note surface temperature
-        \note This is an optional input in that if it is missing, a
-        \note Site:GroundTemperature:Shallow object must be found 
-        \note in the input
-        \note The undisturbed ground temperature will be approximated
-        \note from this object
-        \type real
-        \units days
-   N19; \field Maximum Length of Simulation
+   A5,  \field Undisturbed Ground Temperature Model Type
+        \required-field
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+   A6,  \field Undisturbed Ground Temperature Model Name
+        \required-field
+        \type object-list
+        \object-list UndisturbedGroundTempModels
+   N16; \field Maximum Length of Simulation
         \type real
         \units years
 

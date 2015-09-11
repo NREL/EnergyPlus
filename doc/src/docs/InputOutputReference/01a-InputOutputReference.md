@@ -2545,12 +2545,13 @@ An IDF example:
 Site:GroundTemperature:BuildingSurface,19,20,20,20,20,20,20,20,20,20,20,20;
 ```
 
-
 ### Site:GroundTemperature:Shallow
 
 Site:GroundTemperature:Shallow are used by the Surface Ground Heat Exchanger (i.e. object: GroundHeatExchanger:Surface). Only one shallow ground temperature object can be included.
 
 Note that the ground temperatures included in full year weather files may be suitable of being used for the values in these fields – namely, the .5 m depth temperatures that are calculated for “undisturbed” soil of “typical” conditions. However, you may wish to use some other change effect – based on the weather conditions of the building location.
+
+This object may be used for objects requiring "undisturbed" ground temperatures. In these instances, the "name" input field is not required. 
 
 #### Field: Month Temperature(s) – 12 fields in all
 
@@ -2569,6 +2570,8 @@ Site:GroundTemperature:Deep are used by the Pond Ground Heat Exchanger object (i
 
 Note that the ground temperatures included in full year weather files may be suitable of being used for the values in these fields – namely, the 4 m depth temperatures that are calculated for “undisturbed” soil of “typical” conditions. However, you may wish to use some other change effect – based on the weather conditions or special knowledge of the building location.
 
+This object may be used for objects requiring "undisturbed" ground temperatures. In these instances, the "name" input field is not required. 
+
 #### Field: Month Temperature(s) – 12 fields in all
 
 Each numeric field is the monthly deep ground temperature (degrees Celsius) used for the indicated month (January=1<sup>st</sup> field, February=2<sup>nd</sup> field, etc.)
@@ -2580,39 +2583,9 @@ Site:GroundTemperature:Deep,  16,16,16,16,16,16,16,16,16,16,16,16;
 ```
 
 
-### Site:GroundDomain:Slab
+###Site:GroundTemperature:Undisturbed:FiniteDifference
 
-This section documents the input object used to simulate ground coupled heat transfer with horizontal building surfaces within EnergyPlus. Horizontal ground surfaces within EnergyPlus interact with the Site:GroundDomain object by utilizing the SurfaceProperty:OtherSideConditionsModel object. By utilizing this object, multiple horizontal surfaces can be coupled to the same Site:GroundDomain object. Each horizontal surface may also have its unique ground domain, however, runtime will be adversely affected.
-
-Generally, there are two scenarios which Site:GroundDomain is equipped to model: in-grade slabs, and on-grade slabs.
-
-![](InputOutputReference/media/image012.png)
-
-Figure 7In-grade configuration.
-
-The in-grade slab option can be used to simulate situations when the upper slab surface is near the ground surface level. For this situation, slab’s upper surface must interact with the zone via an OSCM boundary. Due to this, the FloorConstruction object for the zone floor must include a thin layer of the upper floor material. Horizontal and vertical insulation are modeled by the GroundDomain in this scenario. Horizontal insulation can be modeled as covering the full horizontal surface, or it can be limited to the perimeter regions only. In the latter case, the perimeter insulation width must be specified.
-
-![](InputOutputReference/media/image013.png)
-
-Figure 8 On-grade configuration
-
-The on-grade slab option can be used to simulate situations when the lower slab surface is near the ground surface level. In this situation, the entire floor must be included within the floor construction object. Vertical insulation is modeled by the GroundDomain in this scenario.  Horizontal insulation can only be modeled as covering the full horizontal surface.
-
-#### Field: Name
-
-Alpha field used as a unique identifier for each ground domain.
-
-#### Field: Ground Domain Depth
-
-Numeric field used to determine the depth of the simulation domain, in meters.
-
-#### Field: Aspect Ratio
-
-Numeric field used to define the height to width ratio of the slab.
-
-#### Field: Perimeter Offset
-
-Numeric field used to determine the distance from the slab perimeter to the domain perimeter, in meters.
+Site:GroundTemperature:Undisturbed:FiniteDifference may be used by all objects requiring "undisturbed" ground temperatures. The object uses a 1D finite difference heat transfer model which uses the weather file to obtain surface boundary conditions. An annual simulation is run on the model during it's initialization until the annual ground temperature profile has reached steady periodic behavior. Once steady periodic behavior is reached, the ground tempeatures are cached for retrieval during the rest of the simulation.
 
 #### Field: Soil Thermal Conductivity
 
@@ -2624,7 +2597,7 @@ The bulk density of the soil, in kg/m3.
 
 #### Field: Soil Specific Heat
 
-The specific heat of dry soil, in J/kg-K. If moisture is defined in this object, moisture and freezing effects are accounted for by varying the specific heat value.
+The specific heat of dry soil, in J/kg-K.
 
 #### Field: Soil Moisture Content Volume Fraction
 
@@ -2634,209 +2607,31 @@ A nominal value of soil moisture content to be used when evaluating soil thermal
 
 A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil.
 
-#### Field: Kusuda-Achebach Average Surface Temperature
-
-The annual average surface temperature to be applied to the Kusuda-Achenbach farfield boundary temperature correlation, in °C
-
-#### Field: Kusuda-Achebach Average Amplitude of Surface Temperature
-
-The annual mean surface temperature variation from average used in determining the farfield boundary conditions.
-
-#### Field: Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-
-The phase shift of minimum surface temperature, or the day of the year when the minimum surface temperature occurs.
-
 #### Field: Evapotranspiration Ground Cover Parameter
 
 Numeric field specifies the ground cover effects used in the evapotranspiration model at the ground surface heat balance. The values range from 0 (solid, non-permeable ground surface) to 1.5 (wild growth).
 
-#### Field: Slab Boundary Condition Model Name
+An IDF example:
 
-This is the name of the other side boundary condition model used.
-
-#### Field: Slab Location
-
-Alpha field indicates whether the slab is in-grade (top surface level with ground surface) or on-grade (bottoms surface level with ground surface). Options include “ONGRADE” and “INGRADE”.
-
-#### Field: Slab Material Name
-
-Name of the material object representing the slab material. Only applicable to in-grade situations.
-
-#### Field: Horizontal Insulation
-
-Alpha field indicates whether horizontal insulation is present. Options include “YES” and “NO”. Only applicable to in-grade situations.
-
-#### Field: Horizontal Insulation Material Name
-
-Name of material object representing the horizontal slab insulation. Optional argument only required if horizontal insulation is present.
-
-#### Field: Horizontal Insulation Extents
-
-Alpha field indicates whether the horizontal slab insulation extends to cover the full horizontal area of the slab, or only covers the slab perimeter. Optional argument only required if horizontal insulation is present. Options include “FULL” and “PERIMETER”.
-
-#### Field: Perimeter Insulation Width
-
-Numeric field indicating the width of the perimeter insulation measured from the slab edge. Valid range from &gt; 0 to &lt; half of smallest slab width.
-
-#### Field: Vertical Insulation
-
-Alpha field indicates whether vertical insulation is present. Options include “YES” and “NO”.
-
-#### Field: Vertical Insulation Name
-
-Name of material object representing the vertical slab insulation. Optional argument only required if vertical insulation is present.
-
-#### Field: Vertical Insulation Depth
-
-Numeric field indicates the depth measured in meters from the ground surface to which the vertical perimeter insulation extends. Valid range from &gt; Slab Thickness to &lt; Domain Depth.
-
-#### Field: x-direction Mesh Parameter
-
-#### Field: y-direction Mesh Parameter
-
-#### Field: z-direction Mesh Parameter
-
-#### Field: Mesh Type
-
-#### Field: Simulation Timestep
-
-Alpha field indicating whether the domain will update temperatures at each zone timestep, or at hourly intervals. Options include “timestep” and “hourly”.
-
-An IDF example of an in-grade slab.
-
-```idf
-Site:GroundDomain:Slab,
-    IngradeCoupledSlab, !- Name
-    5,                  !- Ground Domain Depth
-    1,                  !- Aspect Ratio
-    5,                  !- Domain Perimeter Offset
-    1.8,                !- Soil Thermal Conductivity
-    3200,               !- Soil Density
-    836,                !- Soil Specific Heat
-    30,   !- Soil Moisture Content Volume Fraction
-    50,   !- Soil Moisture Content Volume Fraction at Saturation
-    15.5, !- Kusuda-Achenbach Average Surface Temperature
-    12.8, !- Kusuda-Achenbach Average Amplitude of Surface Temperature
-    17.3, !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-    1,    !- Evapotranspiration Ground Cover Parameter
-    GroundCoupledOSCM,      !- Name of Floor Boundary Condition Model
-    InGrade,                !- Slab Location (InGrade/OnGrade)
-    Slab Material-In-grade, !- Slab Material Name
-    Yes,                    !- Horizontal Insulation
-    Slab Insulation,    !- Horizontal Insulation Material Name
-    Perimeter,          !- Full Horizontal or Perimeter Only
-    1,                  !- Perimeter insulation width
-    Yes,                !- Vertical Insulation
-    Slab Insulation,    !- Vertical Insulation Name
-    2,                  !- Vertical perimeter insulation depth from surface
-    6,                  !- x-direction Mesh Parameter
-    6,                  !- y-direction Mesh Parameter
-    6,                  !- z-direction Mesh Parameter
-    1.3,                !- Mesh Type (Uniform/Geometric)
-    Hourly;             !- Simulation timestep</td>
+```
+  Site:GroundTemperature:Undisturbed:FiniteDifference,
+    FDTemps,     !- Name of object
+    1.08,        !- Soil Thermal Conductivity {W/m-K}
+    962,         !- Soil Density {kg/m3}
+    2576,        !- Soil Specific Heat {J/kg-K}
+    30,          !- Soil Moisture Content Volume Fraction {percent}
+    50,          !- Soil Moisture Content Volume Fraction at Saturation {percent} 
+    0.408;       !- Evapotranspiration Ground Cover Parameter
 ```
 
-And IDF example of an on-grade slab
 
-```idf
-Site:GroundDomain:Slab,
-    OngradeCoupledSlab, !- Name
-    5,                  !- Ground Domain Depth {m}
-    1,                  !- Aspect Ratio
-    5,                  !- Domain Perimeter Offset {m}
-    1.8,                !- Soil Thermal Conductivity {W/m-K}
-    3200,               !- Soil Density {kg/m3}
-    836,                !- Soil Specific Heat {J/kg-K}
-    30,          !- Soil Moisture Content Volume Fraction
-    50,          !- Soil Moisture Content Volume Fraction at Saturation
-    15.5,        !- Kusuda-Achenbach Average Surface Temperature
-    12.8,   !- Kusuda-Achenbach Average Amplitude of Surface Temperature
-    17.3,   !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-    1,           !- Evapotranspiration Ground Cover Parameter
-    GroundCoupledOSCM,  !- Name of Floor Boundary Condition Model
-    OnGrade,            !- Slab Location (InGrade/OnGrade)
-    ,                   !- Slab Material Name
-    ,                   !- Horizontal Insulation (Yes/No)
-    ,                   !- Horizontal Insulation Material Name
-    ,                   !- Full Horizontal or Perimeter Only
-    ,                   !- Perimeter insulation width (m)
-    Yes,                !- Vertical Insulation (Yes/No)
-    Slab Insulation,    !- Vertical Insulation Name
-    2,                  !- Vertical perimeter insulation depth from surface
-    6,                  !- x-direction Mesh Parameter
-    6,                  !- y-direction Mesh Parameter
-    6,                  !- z-direction Mesh Parameter
-    1.3,                !- Mesh Type (Uniform/Geometric)
-    Hourly;             !- Simulation timestep. (Timestep/Hourly)</td>
-```
+###Site:GroundTemperature:Undisturbed:KusduaAchenbach
 
-### Site:GroundDomain Outputs
+Site:GroundTemperature:Undisturbed:KusudaAchenbach may be used by all objects requiring "undisturbed" ground temperatures. It provides an undisturbed ground temperature based on the correlation developed by Kusuda T. and P. Achenbach. 1965. The correlation uses three parameters for ground temperature at the surface to define a correlation for undisturbed ground temperatures as a function of depth and time. If one thinks of the ground temperature for a given depth as a sinusoid, the average ground temperature, amplitude (average difference between maximum ground temperature and minimum ground temperature), and the phase shift (day of minimum surface temperature) are all required to define the correlation.
 
-The following output variables are available.
+If the parameters are left blank they can be autocalculated by including soil surface temperatures in the input using the Site:GroundTemperature:Shallow object. They can also be calculated by using the CalcSoilSurfTemp preprocessor. 
 
-* Zone, Average, Zone Coupled Surface Heat Flux [W/m2]
-* Zone, Average, Zone Coupled Surface Temperature [C]</td>
-
-#### Zone Coupled Surface Heat Flux [W/m2]
-
-This is the value of the heat flux provided to the GroundDomain as a boundary condition which is determined by taking the average of all surfaces coupled to the domains OtherSideBoudaryCondition model.
-
-#### Zone Coupled Surface Temperature [C]
-
-This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the ground coupled surfaces as an outside boundary condition.
-
-### Site:GroundDomain:Basement
-
-This section documents the input object used to simulate ground coupled heat transfer with underground zones within EnergyPlus. Zone surfaces within EnergyPlus interact with the Site:GroundDomain:Basement object by utilizing the SurfaceProperty:OtherSideConditionsModel object. Two separate OSCM are required for the basement vertical and horizontal surfaces. Vertical wall surfaces will interact with the first OSCM while the horizontal floor surface will interact with the second OSCM. Basement floor and wall surfaces are constructed normally by using the BuildingSurface:Detailed object, with the outside boundary condition being the OtherSideConditionsModel for the basement floor or wall. The outside surface of the wall being the interface between the ground domain and the EnergyPlus zone. Horizontal and vertical ground insulation are simulated by the ground domain, and therefore should not be included in the wall and floor construction objects.
-
-![](InputOutputReference/media/image012.png)
-
-Figure: Basement Configuration
-
-```idf
-Site:GroundDomain:Basement,
-    CoupledBasement,         !- Name
-    10,                      !- Ground Domain Depth {m}
-    1,                       !- Aspect ratio
-    5,                       !- Perimeter offset {m}
-    1.8,                     !- Soil Thermal Conductivity {W/m-K}
-    3200,                    !- Soil Density {kg/m3}
-    836,                     !- Soil Specific Heat {J/kg-K}
-    30,                      !- Soil Moisture Content Volume Fraction {percent}
-    50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
-    15.5,                    !- Kusuda-Achenbach Average Surface Temperature {C}
-    12.8,                    !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
-    17.3,                    !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
-    1,                       !- Evapotranspiration Ground Cover Parameter
-    BasementFloorOSCM,       !- Name of Basement Floor Boundary Condition Model
-    Yes,                     !- Basement Horizontal Underfloor Insulation Present (Yes/No)
-    Basement Insulation,     !- Basement Horizontal Insulation Underfloor Material Name
-    Full,                    !- Full Horizontal or Perimeter Only (Full/Perimeter)
-    ,                        !- Perimeter width (m)
-    2.5,                     !- Depth of Basement Wall In Ground Domain {m}
-    BasementWallOSCM,        !- Name of Basement Wall Boundary Condition Model
-    Yes,                     !- Basement Wall Vertical Insulation Present(Yes/No)
-    Basement Insulation,     !- Basement Wall Vertical Insulation Material Name
-    2.5,                     !- Vertical insulation depth from surface (m)
-    Hourly;                  !- Domain Update interval. (Timestep, Hourly)
-    4;                       ! Mesh Density Parameter
-```
-
-#### Field: Name
-
-Alpha field used as a unique identifier for each basement domain. Multiple basements domains can be simulated simultaneously, however, each domain must have a unique name. Additionally, despite the ability to simulate multiple domains simultaneously, these domains do not interact with each other and are treated as independent domains with boundary conditions given by the model parameters below.
-
-#### Field: Ground Domain Depth
-
-Numeric field used to determine the depth of the simulation domain, in meters. A value of 10 meters is the default.
-
-#### Field: Aspect Ratio
-
-Numeric field, which is the ratio of basement length to width, used to determine the aspect ratio of the basement. This field along with the total basement floor area, which is taken as the combination of all surfaces connected to the floor OtherSideConditionsModel, are used to determine the size and shape of the basement domain. Aspect ratios and the inverse of aspect ratios should produce identical results. i.e. AR = 2 equals AR = 0.5. This field has units of meters/meters.
-
-#### Field: Domain Perimeter Offset
-
-Numeric field used to determine the distance from the basement perimeter to the domain perimeter, in meters. A value of 5 is default.
+Kusuda, T. and P.R. Achenbach. 1965. 'Earth Temperatures and Thermal Diffusivity at Selected Stations in the United States.' *ASHRAE Transactions*. 71(1): 61-74.
 
 #### Field: Soil Thermal Conductivity
 
@@ -2848,377 +2643,88 @@ The bulk density of the soil, in kg/m3.
 
 #### Field: Soil Specific Heat
 
-The specific heat of dry soil, in J/kg-K. If moisture is defined in this object, moisture and freezing effects are accounted for by varying the specific heat value.
+The specific heat of dry soil, in J/kg-K.
 
-#### Field: Soil Moisture Content Volume Fraction
+#### Field: Average Annual Ground Surface Temperature
 
-A nominal value of soil moisture content to be used when evaluating soil thermal properties. 
+This is the average ground surface temperature throughout the entire year, in °C.
 
-#### Field: Soil Moisture Content Volume Fraction at Saturation
+#### Field: Average Amplitude of Annual Ground Surface Temperature
 
-A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil.
+This is the average amplitude of the ground surface temperature, in °C.
 
-#### Field: Kusuda-Achebach Average Ground Surface Temperature
+#### Field: Phase Shift of Minimum Surface Temperature
 
-The annual average ground surface temperature to be applied to the Kusuda-Achenbach far-field boundary temperature correlation, in °C. This parameter and the subsequent two parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this, and the following two parameters for the simulation. In which case, this field and the following two can be left blank.
-
-#### Field: Kusuda-Achebach Average Amplitude of Ground Surface Temperature
-
-The annual mean ground surface temperature variation from average used in determining the far-field boundary conditions, in °C. This parameter, as well as the previous and following parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this parameter, as well as the previous and following parameters. In which case, this field, the previous field, and the following field can be left blank.
-
-#### Field: Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature
-
-The phase shift of minimum ground surface temperature, or the day of the year when the minimum ground surface temperature occurs. This parameter, as well as the previous two parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this parameter, as well as the previous two parameters. In which case, this field, the previous two fields can be left blank.
-
-#### Field: Evapotranspiration Ground Cover Parameter
-
-Numeric field specifies the ground cover effects used in the evapotranspiration model at the ground surface heat balance. The values range from 0 (solid, non-permeable ground surface) to 1.5 (wild growth). Model can be sensitive to variations in this parameter, especially in dry climates.
-
-#### Field: Basement Floor Boundary Condition Model Name
-
-This is the name of the other side boundary condition model used for the basement floor surface. 
-
-#### Field: Horizontal Insulation 
-
-Alpha field indicates whether horizontal insulation is present. Options include “YES” and “NO”. 
-
-#### Field: Horizontal Insulation Name
-
-Name of material object representing the horizontal underfloor basement insulation. Optional argument only required if horizontal insulation is present.
-
-#### Field: Horizontal Insulation Extents
-
-Alpha field indicates whether the horizontal underfloor insulation extends to cover the full horizontal area of the basement floor, or only covers the basement floor perimeter. Optional argument only required if horizontal insulation is present. Options include “FULL” and “PERIMETER”.
-
-#### Field: Perimeter Insulation Width
-
-Numeric field indicating the width of the perimeter insulation measured from the basement floor edge. Valid range from > 0 to < half of smallest basement floor width.
-
-#### Field: Basement Depth
-
-Depth of basement floor surface referenced from the ground surface, in meters. This domain should be the distance from the ground surface down to the basement floor surface. In cases where the ground surface is below the main above-ground building level, a separate wall surface should be employed between the basement walls and the main level walls.
-
-#### Field: Basement Wall Boundary Condition Model Name
-
-Name of the other side condition boundary model used for the basement walls.
-
-#### Field: Vertical Insulation 
-
-Alpha field indicates whether vertical insulation is present. Options include “YES” and “NO”.
-
-#### Field: Vertical Insulation Name
-
-Name of material object representing the vertical slab insulation. Optional argument only required if vertical insulation is present.
-
-#### Field: Vertical Insulation Depth
-
-Numeric field indicates the depth measured in meters from the ground surface to which the vertical perimeter insulation extends. Valid range from > 0 to < Basement Depth.
-
-#### Field: Simulation Timestep
-
-Alpha field indicating whether the domain will update temperatures at each zone timestep, or at hourly intervals. Options include “timestep” and “hourly”.
-
-#### Mesh Density Parameter
-
-Integer field indicating the density of the finite difference ground domain cells between the basement and the far field boundaries. Default value is 4. Total number of ground domain cells, insulation cells, and ground surface cells are indicated as outputs to the eio file.
-
-Site:GroundDomain:Basement Output Variables
-
-The following output variables are available.
-
-* Wall Interface Heat Flux
-
-* Wall Interface Temperature
-
-* Floor Interface Heat Flux
-
-* Floor Interface Temperature
-
-#### Wall Interface Heat Flux [W/m2]
-
-This is the value of the heat flux provided to ground domain as a boundary condition for the basement walls. Should be equal to the basement wall outside heat flux.
-
-#### Wall Interface Temperature [C]
-
-This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the basement wall surfaces as an outside boundary condition.
-
-#### Floor Interface Heat Flux [W/m2]
-
-This is the value of the heat flux provided to ground domain as a boundary condition for the basement floor. Should be equal to the basement floor outside heat flux.
-
-#### Floor Interface Temperature [C]
-
-This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the ground coupled floor surfaces as an outside boundary condition.
-
-
-
-### Site:GroundTemperature:FCfactorMethod
-
-Site:GroundTemperature:FCfactorMethod is used only by the underground walls or slabs-on-grade or underground floors defined with C-factor (Construction:CfactorUndergroundWall) and F-factor (Construction:FfactorGroundFloor) method for code compliance calculations where detailed construction layers are unknown. Only one such ground temperature object can be included. The monthly ground temperatures for this object are close to the monthly outside air temperatures delayed by three months. If user does not input this object in the IDF file, it will be defaulted to the 0.5m set of monthly ground temperatures from the weather file if they are available. Entering these will also overwrite any ground temperatures from the weather file in the F and C factor usage. If neither is available, an error will result.
-
-#### Field: Month Temperature(s) – 12 fields in all
-
-Each numeric field is the monthly ground temperature (degrees Celsius) used for the indicated month (January=1<sup>st</sup> field, February=2<sup>nd</sup> field, etc.)
-
-And, the IDF example:
-
-```idf
-Site:GroundTemperature:FCfactorMethod,  9.5, 3.5, -0.7, -1.7, -0.6, 3.6, 9.3, 14, 18.2, 22.7, 21.2, 16.8;
-```
-
-
-### Site:GroundReflectance
-
-Ground reflectance values are used to calculate the ground reflected solar amount. This fractional amount (entered monthly) is used in this equation:
-
-<div>\[{\rm{GroundReflectedSolar = (BeamSolar}} \bullet {\rm{COS(SunZenithAngle) + DiffuseSolar)}} \bullet {\rm{GroundReflectance}}\]</div>
-
-Of course, the Ground Reflected Solar is never allowed to be negative. The ground reflectance can be further modified when snow is on the ground by the Snow Ground Reflectance Modifier. To use no ground reflected solar in your simulation, enter 0.0 for each month.
-
-#### Field: Month Average Ground Reflectance(s) – 12 fields in all
-
-Each numeric field is the monthly average reflectivity of the ground used for the indicated month (January=1<sup>st</sup> field, February=2<sup>nd</sup> field, etc.)
-
-And use in an IDF:
-
-```idf
-  Site:GroundReflectance,
-     0.600,     !January Ground Reflectance
-     0.600,     !February Ground Reflectance
-     0.400,     !March Ground Reflectance
-     0.300,     !April Ground Reflectance
-     0.200,     !May Ground Reflectance
-     0.200,     !June Ground Reflectance
-     0.200,     !July Ground Reflectance
-     0.200,     !August Ground Reflectance
-     0.200,     !September Ground Reflectance
-     0.200,     !October Ground Reflectance
-     0.300,     !November Ground Reflectance
-     0.400;     !December Ground Reflectance
-```
-
-### Site:GroundReflectance:SnowModifier
-
-It is generally accepted that snow resident on the ground increases the basic ground reflectance. EnergyPlus allows the user control over the snow ground reflectance for both “normal ground reflected solar” calculations (see above) and snow ground reflected solar modified for daylighting. These are entered under this object and both default to 1 (same as normal ground reflectance – no special case for snow which is a conservative approach).
-
-#### Field: Ground Reflected Solar Modifier
-
-This field is a decimal number which is used to modified the basic monthly ground reflectance when snow is on the ground (from design day input or weather data values).
-
-<div>\[{\rm{GroundReflectanc}}{{\rm{e}}_{{\rm{used}}}} = {\rm{GroundReflectance}} \bullet Modifie{r_{Snow}}\]</div>
-
-The actual Ground Reflectance is limited to [0.0,1.0].
-
-#### Field: Daylighting Ground Reflected Solar Modifier
-
-This field is a decimal number which is used to modified the basic monthly ground reflectance when snow is on the ground (from design day input or weather data values).
-
-<div>\[{\rm{DaylightingGroundReflectanc}}{{\rm{e}}_{{\rm{used}}}} = {\rm{GroundReflectance}} \bullet Modifie{r_{Snow}}\]</div>
-
-The actual Ground Reflectance is limited to [0.0,1.0].
+This is day of the year which has the lowest ground surface temperature.
 
 An IDF example:
 
 ```idf
-  Site:GroundReflectance:SnowModifier,
-    1.0;                     !- Ground Reflected Solar Modifier
-```
-
-Outputs will show both the inputs from the above object as well as monthly values for both Snow Ground Reflectance and Snow Ground Reflectance for Daylighting.
-
-### Site:WaterMainsTemperature
-
-The Site:WaterMainsTemperature object is used to calculate water temperatures delivered  by underground water main pipes. The mains temperatures are used as default, make-up water temperature inputs for several plant objects, including:  **WaterUse:Equipment, WaterUse:Connections, WaterHeater:Mixed** and **WaterHeater:Stratified**. The mains temperatures are also used in the water systems objects to model the temperature of cold water supplies.
-
-Water mains temperatures are a function of outdoor climate conditions and vary with time of year. A correlation has been formulated to predict water mains temperatures based on two weather inputs:
-
-- average annual outdoor air temperature (dry-bulb)
-
-- maximum difference in monthly average outdoor air temperatures
-
-These values can be easily calculated from annual weather data using a spreadsheet or from the ".stat" file available with the EnergyPlus weather files at [www.energyplus.gov](http://www.energyplus.gov). Monthly statistics for dry-bulb temperatures are shown with daily averages. The daily averages are averaged to obtain the annual average. The maximum and minimum daily average are subtracted to obtain the maximum difference. For more information on the water mains temperatures correlation, see the *EnergyPlus Engineering Document*.
-
-Alternatively, the Site:WaterMainsTemperature object can read values from a schedule. This is useful for measured data or when water comes from a source other than buried pipes, e.g., a river or lake.
-
-If there is no Site:WaterMainsTemperature object in the input file, a default constant value of 10 C is assumed.
-
-#### Field: Calculation Method
-
-This field selects the calculation method and must have the keyword Schedule or Correlation.
-
-#### Field: Schedule Name
-
-If the calculation method is Schedule, the water mains temperatures are read from the schedule referenced by this field. If the calculation method is Correlation, this field is ignored.
-
-#### Field: Annual Average Outdoor Air Temperature
-
-If the calculation method is Correlation, this field is used in the calculation as the annual average outdoor air temperature (dry-bulb) [C]. If the calculation method is Schedule, this field is ignored.
-
-#### Field: Maximum Difference In Monthly Average Outdoor Air Temperatures
-
-If the calculation method is Correlation, this field is used in the calculation as the maximum difference in monthly average outdoor air temperatures [∆C]. If the calculation method is Schedule, this field is ignored.
-
-```idf
-  Site:WaterMainsTemperature,
-    Correlation,  !- Calculation Method {SCHEDULE | CORRELATION}
-    ,  !- Schedule Name
-    9.69,  !- Annual Average Outdoor Air Temperature {C}
-    28.1;  !- Maximum Difference In Monthly Average Outdoor Air Temperatures
-           !- {deltaC}
-```
-
-### Site:Precipitation
-
-The Site:Precipitation object is used to describe the amount of water precipitation at the building site over the course of the simulation run period. Precipitation includes both rain and the equivalent water content of snow. Precipitation is not yet described well enough in the many building weather data files. So this object can be used to provide the data using Schedule objects that define rates of precipitation in meters per hour.
-
-A set of schedules for site precipitation have been developed for USA weather locations and are provided with EnergyPlus in the data set called PrecipitationSchedulesUSA.idf.  The user can develop schedules however they want. The schedules in the data set were developed using EnergyPlus’ weather file (EPW) observations and the average monthly precipitation for the closest weather site provided by NOAA. EPW files for the USA that were based on TMY or TMY2 include weather observations for Light/Moderate/Heavy rainfall, however most international locations do not include these observations. The values were modeled by taking the middle of the ranges quoted in the EPW data dictionary. The assumed piecewise function is shown below.
-
-<div>\[Amount\,(m/hour) = \,\left\{ {\begin{array}{*{20}{c}}{Light = 0.0125}\\\{Moderate = 0.052}\\\{Heavy = 0.1}\end{array}} \right.\]</div>
-
-The values were inserted on hour by hour basis for the month based on the observations. Then each month was rescaled to meet the average precipitation for the month based on the 30-year average (1971-2000) provided by the NOAA/NCDC. Therefore, the flags in the EPW file match the precipitation schedules for the USA. Note that summing the average monthly precipitation values will not give you the average yearly precipitiation. The resulting value may be lower or higher than the average yearly value.
-
-Once the typical rainfall pattern and rates are scheduled, the Site:Precipitation object provides a method of shifting the total rainfall up or down for design purposes. Wetter or drier conditions can be modeled by changing the Design Annual Precipitation although the timing of precipitation throughout the year will not be changed.
-
-#### Field: Precipitation Model Type
-
-Choose rainfall modeling options. Only available option is ScheduleAndDesignLevel.
-
-#### Field: Design Level for Total Annual Precipitation
-
-Magnitude of total precipitation for an annual period to be used in the model. Value selected by the user to correspond with the amount of precipitation expected or being assumed for design purposes. The units are in meters. This field works with the following two fields to allow easily shifting the amounts without having to generate new schedules.
-
-#### Field: Precipitation Rate Schedule Name
-
-Name of a schedule defined elsewhere that describes the rate of precipitation. The precipitation rate schedule is analogous to weather file data. However, weather files for building simulation do not currently contain adequate data for such calculations. Therefore, EnergyPlus schedules are used to enter the pattern of precipitation events. The values in this schedule are the average rate of precipitation in meters per hour. The integration of these values over an annual schedule should equal the nominal annual precipitation.
-
-#### Field: Average Total Annual Precipitation
-
-Magnitude of annual precipitation associated with the rate schedule. This value is used to normalize the precipitation.
-
-IDF example:
-
-```idf
-Site:Precipitation,
-  ScheduledAndDesignLevel, !- Precipitation Model Type
-  0.75,                    !- Design Level Total Annual Precipitation {m/yr}
-  PrecipitationSchd,       !- Schedule Name for Precipitation Rates
-  0.80771;                 !- Average Total Annual Precipitation {m/yr}
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach,
+    KATemps,    !- Name of object
+    1.08,       !- Soil Thermal Conductivity {W/m-K}
+    962,        !- Soil Density {kg/m3}
+    2576,       !- Soil Specific Heat {J/kg-K}
+    15.5,       !- Average Soil Surface Temperature {C}
+    12.0,       !- Average Amplitude of Surface Temperature {deltaC}
+    21;         !- Phase Shift of Minimum Surface Temperature {days}
 ```
 
 
-### RoofIrrigation
+###Site:GroundTemperature:Undisturbed:Xing
 
-The RoofIrrigation object is used to describe the amount of irrigation on the ecoroof surface over the course of the simulation runperiod. This object is used to provide irrigation data using Schedule objects that define rates of irrigation in meters per hour. These schedules can be one of two types: Schedule, or SmartSchedule.
+Site:GroundTemperature:Undisturbed:Xing may be used by all objects requiring "undisturbed" ground temperatures. It provides an undisturbed ground temperature based on the correlation developed by Xing, 2014. The correlation is a 5 parameter, 2 harmonic model based on the work of Lord Kelvin (Thomson, 1862). The average soil surface temperature and two sets of surface temperature amplitude and phase shift must be provided. Parameters for 4000+ international locations can be found in Xing, 2014.
 
-#### Field: Irrigation Model Type
+Thomson, W. 1862. 'On the Reduction of Observations of Underground Temperature, with applications to Professor Forbes’ Edinburgh Observations and the continued Calton Hill Series.' Proceedings of the Royal Society of Edinburgh. IV: 342-346.
 
-Choose irrigation modeling options. Available options are **Schedule** and **SmartSchedule**. The **Schedule** type is used to force an irrigation schedule regardless of the current moisture state of the soil. The **SmartSchedule** type allows the precipitation schedule to be overridden if the current moisture state of the soil is greater than 40% saturated.
+Xing, L. 2014. Estimations of Undisturbed Ground Temperatures using Numerical and Analytical Modeling. Ph.D. Diss. Oklahoma State University, Stillwater, OK.
 
-#### Field: Irrigation Rate Schedule Name
+#### Field: Soil Thermal Conductivity
 
-Name of a schedule defined elsewhere that describes the rate of irrigation. The values in this schedule are the average rate of irrigation in meters per hour.
+The thermal conductivity of the soil, in W/m-K.
 
-#### Field: Irrigation Maximum Saturation Threshold
+#### Field: Soil Density
 
-Used with the SmartSchedule option in the Irrigation Model Type field to override the default 40% saturation limit for turning off the irrigation: values of 0 to 100 (percent) can be entered with 40% being the default.
+The bulk density of the soil, in kg/m3.
 
-IDF example:
+#### Field: Soil Specific Heat
 
-```idf
-RoofIrrigation,
-  Schedule, !- Irrigation Model Type
-  IrrigationSchd; !- Schedule Name for Irrigation Rates
+The specific heat of dry soil, in J/kg-K.
+
+#### Field: Average Soil Surface Temperature
+
+The average annual surface temperature of the soil, in deg C.
+
+#### Field: Soil Surface Temperature Amplitude 1
+
+First soil surface temperature amplitude parameter, in deg C.
+
+#### Field: Soil Surface Temperature Amplitude 2
+
+Second soil surface temperature amplitude parameter, in deg C.
+
+#### Field: Phase Shift of Surface Temperature Amplitude 1
+
+Phase shift of surface temperature amplitude 1, in days.
+
+#### Field: Phase Shift of Surface Temperature Amplitude 2
+
+Phase shift of surface temperature amplitude 2, in days.
+
+An IDF example:
+
 ```
-
-
-### Solar and Visible Spectrum Objects
-
-The next two objects enable users to enter solar and visible spectrum which is used to calculate the thermal and visual performance of windows if their glazings are defined with full spectral data. EnergyPlus versions 8.0 and older hard-wired the solar and visible spectrum. The solar spectrum assumes air mass 1.5 terrestrial solar global spectral irradiance values (W/m2-micron) on a 37o tilted surface, based on ISO 9845-1 and ASTM E 892; derived from Optics5 data file ISO-9845GlobalNorm.std, 10-14-99. The visible/photopic spectrum is based on CIE 1931 observer; ISO/CIE 10527, CIE Standard Calorimetric Observers; derived from Optics5 data file "CIE 1931 Color Match from E308.txt", which is the same as WINDOW4 file Cie31t.dat.
-
-### Site:SolarAndVisibleSpectrum
-
-The SolarAndVisibleSpectrum object is used to specify the solar and visible spectrum data which is used as spectral weighting function to calculate the window performance (transmittance and absorptance) in EnergyPlus. This is a unique object, if it is missing from an IDF file, the default (same as EnergyPlus version 8.0) solar and visible spectrum data will be used.
-
-#### Field: Name
-
-This field specifies the name of the SolarAndVisibleSpectrum object.
-
-#### Field: Spectrum Data Method
-
-This field specifies the method used to enter the spectrum data. Two choices are available: Default and UserDefined. The choice Default will continue to use the hard-wired spectrum data in EnergyPlus (for backward compatibility). The choice UserDefined allows users to specify custom solar and visible spectrum data. The default choice is Default.
-
-#### Field: Solar Spectrum Data Name
-
-This field is required if the Spectrum Data Method is set to UserDefined. This field references a spectrum dataset for solar.
-
-#### Field: Visible Spectrum Data Name
-
-This field is required if the Spectrum Data Method is set to UserDefined. This field references a spectrum dataset for visible.
-
-IDF example:
-
-```idf
-Site:SolarAndVisibleSpectrum,
-  LocalSpectrum,             !- Name
-  UserDefined,               !- Spectrum Data Method: Default, UserDefined
-  SolarSpectrum,             !- Solar Spectrum Data Object Name
-  VisibleSpectrum;           !- Visible Spectrum Data Object
+  Site:GroundTemperature:Undisturbed:Xing,
+    Chicago-Ohare,    !- Name of object
+    1.08,         !- Soil Thermal Conductivity {W/m-K}
+    962,          !- Soil Density {kg/m3}
+    2576,         !- Soil Specific Heat {J/kg-K}
+    11.1,         !- Average Soil Surface Tempeature {C}
+    13.4,         !- Soil Surface Temperature Amplitude 1 {deltaC}
+    0.7,          !- Soil Surface Temperature Amplitude 2 {deltaC}
+    25,           !- Phase Shift of Temperature Amplitude 1 {days}
+    30;           !- Phase Shift of Temperature Amplitude 2 {days}
 ```
-
-
-### Site:SpectrumData
-
-The Site:SpectrumData object holds the user defined solar or visible spectrum data. For solar spectrum, up to 107 pairs of (wavelength, spectrum) can be entered. For visible spectrum, up to 81 pairs can be entered.
-
-#### Field: Name
-
-This field specifies the name of the SpectrumData object. The name must be unique across all SpectrumData objects.
-
-#### Field: Spectrum Data Type
-
-This field specifies the type of spectrum data. Choices are Solar and Visible.
-
-#### Field: Wavelength &lt;n&gt;
-
-This field specifies the nth wavelength in micron.
-
-#### Field: Spectrum &lt;n&gt;
-
-This field specifies the nth spectrum corresponding to the nth wavelength.
-
-IDF example:
-
-```idf
-Site:SpectrumData,
-  SolarSpectrum,             !- Name
-  Solar,                     !- Spectrum Data Type
-  0.3,0,                     !- up to 107 pair of (wavelength, spectrum)
-  0.305,3.4,
-  0.31,15.6,
-  0.315,41.1,
-  0.32,71.2,
-  0.325,100.2,
-  0.33,152.4,
-  0.335,155.6,
-  0.34,179.4,
-  0.345,186.7,
-  0.35,212,
-  0.36,240.5,
-  0.37,324,
-  0.38,362.4,
-  ...;
-```
-
-
-### Climate Group Outputs
-
-Climate related variables appear in two places for EnergyPlus outputs. Certain objects that are invariant throughout a simulation period have lines appear in the eplusout.eio file. For descriptions of this reporting, please see the Output Details and Examples document.
-
-### Weather Data Related Outputs
-
-Variables related to ambient environment data are available at timestep and higher resolutions. Below is a variable dictionary of these variables and subsequent definitions:
-
-* Zone,Average,Site Outdoor Air Drybulb Temperature [C]
 
 
 ### Site:GroundDomain:Slab

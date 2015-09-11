@@ -38,6 +38,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
@@ -65,6 +66,7 @@
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
@@ -125,6 +127,7 @@ namespace EnergyPlus {
 		ExteriorEnergyUse::clear_state();
 		Fans::clear_state();
 		GlobalNames::clear_state();
+		GroundTemperatureManager::clear_state();
 		HeatBalanceAirManager::clear_state();
 		HeatBalanceManager::clear_state();
 		Humidifiers::clear_state();
@@ -148,6 +151,7 @@ namespace EnergyPlus {
 		SplitterComponent::clear_state();
 		VariableSpeedCoils::clear_state();
 		WaterCoils::clear_state();
+		WaterThermalTanks::clear_state();
 		WeatherManager::clear_state();
 		ZoneAirLoopEquipmentManager::clear_state();
 		ZoneEquipmentManager::clear_state();
