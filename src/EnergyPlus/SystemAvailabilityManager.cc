@@ -157,6 +157,40 @@ namespace SystemAvailabilityManager {
 	Array1D< DefineASHRAEAdaptiveOptimumStartCoeffs > ASHRAEOptSCoeffHeating;
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumSchedSysAvailMgrs = 0 ;
+		NumSchedOnSysAvailMgrs = 0 ;
+		NumSchedOffSysAvailMgrs = 0 ;
+		NumNCycSysAvailMgrs = 0 ;
+		NumDiffTSysAvailMgrs = 0 ;
+		NumHiTurnOffSysAvailMgrs = 0 ;
+		NumHiTurnOnSysAvailMgrs = 0 ;
+		NumLoTurnOffSysAvailMgrs = 0 ;
+		NumLoTurnOnSysAvailMgrs = 0 ;
+		NumNVentSysAvailMgrs = 0 ;
+		NumAvailManagerLists = 0 ;
+		GetAvailListsInput = true ;
+		GetAvailMgrInputFlag = true ;
+		GetHybridInputFlag = true ;
+		NumOptStartSysAvailMgrs = 0 ;
+		SchedSysAvailMgrData.deallocate();
+		SchedOnSysAvailMgrData.deallocate();
+		SchedOffSysAvailMgrData.deallocate();
+		NCycSysAvailMgrData.deallocate();
+		DiffTSysAvailMgrData.deallocate();
+		HiTurnOffSysAvailMgrData.deallocate();
+		HiTurnOnSysAvailMgrData.deallocate();
+		LoTurnOffSysAvailMgrData.deallocate();
+		LoTurnOnSysAvailMgrData.deallocate();
+		NVentSysAvailMgrData.deallocate();
+		HybridVentSysAvailMgrData.deallocate();
+		SysAvailMgrListData.deallocate();
+		OptStartSysAvailMgrData.deallocate();
+		ASHRAEOptSCoeffCooling.deallocate();
+		ASHRAEOptSCoeffHeating.deallocate();
+	}
 
 	void
 	ManageSystemAvailability()

@@ -112,6 +112,7 @@ namespace SetPointManager {
 	extern int NumSZOneStageHeatingSetPtMgrs; // number of singel zone one stage heating setpoint managers
 	extern int NumReturnWaterResetChWSetPtMgrs; // number of chilled-water return water reset setpoint managers
 	extern int NumReturnWaterResetHWSetPtMgrs; // number of hot-water return water reset setpoint managers
+	extern int NumSchTESSetPtMgrs; // Number of TES Scheduled Setpoint Managers found in input
 
 	extern bool ManagerOn;
 	extern bool GetInputFlag; // First time, input is "gotten"
@@ -1916,6 +1917,30 @@ namespace SetPointManager {
 
 	};
 
+	struct DefineScheduledTESSetPointManager // Derived type for Scheduled TES Setpoint Manager data
+	{
+		// Members
+		int SchedPtr;
+		int SchedPtrCharge;
+		int CtrlNodeNum;
+		Real64 NonChargeCHWTemp;
+		Real64 ChargeCHWTemp;
+		int CompOpType;
+		Real64 SetPt;
+		
+		// Default Constructor
+		DefineScheduledTESSetPointManager() :
+		SchedPtr( 0 ),
+		SchedPtrCharge( 0 ),
+		CtrlNodeNum( 0 ),
+		NonChargeCHWTemp( 0.0 ),
+		ChargeCHWTemp( 0.0 ),
+		CompOpType( 0 ),
+		SetPt( 0.0 )
+		{}
+		
+	};
+
 	// Object Data
 	extern Array1D< DataSetPointManager > AllSetPtMgr; // Array for all Setpoint Manager data(warnings)
 	extern Array1D< DefineScheduledSetPointManager > SchSetPtMgr; // Array for Scheduled Setpoint Manager data
@@ -1947,7 +1972,12 @@ namespace SetPointManager {
 	extern Array1D< DefineSZOneStageHeatingSetPointManager > SZOneStageHeatingSetPtMgr; // single zone 1 stage heat
 	extern Array1D< DefineReturnWaterChWSetPointManager > ReturnWaterResetChWSetPtMgr; // return water reset
 	extern Array1D< DefineReturnWaterHWSetPointManager > ReturnWaterResetHWSetPtMgr; // hot-water return reset
+	extern Array1D< DefineScheduledTESSetPointManager > SchTESSetPtMgr; // Array for Scheduled Setpoint Manager data
+
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	ManageSetPoints();
@@ -1967,6 +1997,9 @@ namespace SetPointManager {
 	void
 	CalcScheduledSetPoint( int & SetPtMgrNum );
 
+	void
+	CalcScheduledTESSetPoint( int & SetPtMgrNum );
+	
 	void
 	CalcScheduledDualSetPoint( int & SetPtMgrNum );
 
@@ -2084,6 +2117,16 @@ namespace SetPointManager {
 	int
 	GetHumidityRatioVariableType( int const CntrlNodeNum );
 
+	void
+	SetUpNewScheduledTESSetPtMgr(
+								 int const SchedPtr,
+								 int const SchedPtrCharge,
+								 Real64 NonChargeCHWTemp,
+								 Real64 ChargeCHWTemp,
+								 int const CompOpType,
+								 int const ControlNodeNum
+								 );
+	
 	//     NOTICE
 
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
