@@ -897,6 +897,7 @@ namespace DXCoils {
 		int IOStatus; // Input status returned from GetObjectItem
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
+		bool IsOANodeListed; // Flag for air node name listed in OutdoorAir:Node or Nodelist
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int DXHPWaterHeaterCoilNum; // Loop index for 1,NumDXHeatPumpWaterHeaterCoils
 		int CapacityStageNum; // Loop index for 1,Number of capacity stages
@@ -2957,12 +2958,22 @@ namespace DXCoils {
 				ErrorsFound = true;
 			}
 
+			//Air nodes
 			DXCoil( DXCoilNum ).AirInNode = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
 			DXCoil( DXCoilNum ).AirOutNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 5 ), Alphas( 6 ), "Air Nodes" );
 
+			//Check if the air inlet node is OA node, to justify whether the coil is placed in zone or not
+			EnergyPlus::OutAirNodeManager::CheckAndAddAirNodeNumber( DXCoil( DXCoilNum ).AirInNode, IsOANodeListed );
+			if ( IsOANodeListed ) {
+				DXCoil( DXCoilNum ).IsDXCoilInZone = false;
+			} else {
+				DXCoil( DXCoilNum ).IsDXCoilInZone = true;
+			}
+			
+			//Water nodes
 			DXCoil( DXCoilNum ).WaterInNode = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 
 			DXCoil( DXCoilNum ).WaterOutNode = GetOnlySingleNode( Alphas( 8 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
@@ -3381,11 +3392,20 @@ namespace DXCoils {
 				ErrorsFound = true;
 			}
 
+			//Air nodes
 			DXCoil( DXCoilNum ).AirInNode = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
 			DXCoil( DXCoilNum ).AirOutNode = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
+			
+			//Check if the air inlet node is OA node, to justify whether the coil is placed in zone or not
+			EnergyPlus::OutAirNodeManager::CheckAndAddAirNodeNumber( DXCoil( DXCoilNum ).AirInNode, IsOANodeListed );
+			if ( IsOANodeListed ) {
+				DXCoil( DXCoilNum ).IsDXCoilInZone = false;
+			} else {
+				DXCoil( DXCoilNum ).IsDXCoilInZone = true;
+			}
 
 			std::string const DummyCondenserInletName( "DUMMY CONDENSER INLET " + DXCoil( DXCoilNum ).Name );
 			std::string const DummyCondenserOutletName( "DUMMY CONDENSER OUTLET " + DXCoil( DXCoilNum ).Name );
@@ -5166,10 +5186,16 @@ namespace DXCoils {
 
 			else if ( Coil.DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || Coil.DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) {
 				// Setup Report Variables for Cooling Equipment
-				// CurrentModuleObject='Coil:WaterHeating:AirToWaterHeatPump:Pumped or Wrapped'
+				// CurrentModuleObject='Coil:WaterHeating:AirToWaterHeatPump:Pumped'
+				// or 'Coil:WaterHeating:AirToWaterHeatPump:Wrapped'
 				SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", Coil.TotalCoolingEnergyRate, "System", "Average", Coil.Name );
-				SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", Coil.TotalCoolingEnergy, "System", "Sum", Coil.Name ); //, &
-				//                           ResourceTypeKey='ENERGYTRANSFER',EndUseKey='COOLING',GroupKey='Plant')
+				
+				if ( Coil.IsDXCoilInZone ){
+					SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", Coil.TotalCoolingEnergy, "System", "Sum", Coil.Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+				} else {
+					SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", Coil.TotalCoolingEnergy, "System", "Sum", Coil.Name );
+				}
+				
 				SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", Coil.SensCoolingEnergyRate, "System", "Average", Coil.Name );
 				SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", Coil.SensCoolingEnergy, "System", "Sum", Coil.Name );
 				SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", Coil.LatCoolingEnergyRate, "System", "Average", Coil.Name );

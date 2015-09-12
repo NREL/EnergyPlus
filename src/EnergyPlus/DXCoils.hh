@@ -435,6 +435,7 @@ namespace DXCoils {
 		Real64 SecCoilSensibleHeatRemovalRate; // secondary zone sensible heat removal rate [W]
 		Real64 SecCoilLatentHeatRemovalRate; // secondary zone latent heat removal rate [W]
 		bool IsSecondaryDXCoilInZone; // true means secondary dx coil is zone instead of outside
+		bool IsDXCoilInZone; // true means dx coil is in zone instead of outside
 		Real64 CompressorPartLoadRatio; // compressor part load ratio of the primary DX coil
 		Array1D_int MSSecCoilSHRFT; // index to the multi speed secondary coil sensible heat ratio temperature modifier curve
 		Array1D_int MSSecCoilSHRFF; //  index to the multi speed secondary coil sensible heat ratio flow fraction modifier curve
@@ -672,6 +673,7 @@ namespace DXCoils {
 			SecCoilSensibleHeatRemovalRate( 0.0 ),
 			SecCoilLatentHeatRemovalRate( 0.0 ),
 			IsSecondaryDXCoilInZone( false ),
+			IsDXCoilInZone( false ),
 			CompressorPartLoadRatio( 0.0 ),
 			//MSSecCoilSHRFT( 0 ),
 			//MSSecCoilSHRFF( 0 ),
@@ -947,6 +949,7 @@ namespace DXCoils {
 			Real64 const SecCoilSensibleHeatRemovalRate, // secondary zone sensible heat removal rate [W]
 			Real64 const SecCoilLatentHeatRemovalRate, // secondary zone latent heat removal rate [W]
 			bool const IsSecondaryDXCoilInZone, // true means secondary dx coil is zone instead of outside
+			bool const IsDXCoilInZone, // true means dx coil is in zone instead of outside
 			Real64 const CompressorPartLoadRatio, // compressor part load ratio of the primary DX coil
 			Array1_int const & MSSecCoilSHRFT, // index to the multi speed secondary coil sensible heat ratio temperature modifier curve
 			Array1_int const & MSSecCoilSHRFF, //  index to the multi speed secondary coil sensible heat ratio flow fraction modifier curve
@@ -1219,6 +1222,7 @@ namespace DXCoils {
 			SecCoilSensibleHeatRemovalRate( SecCoilSensibleHeatRemovalRate ),
 			SecCoilLatentHeatRemovalRate( SecCoilLatentHeatRemovalRate ),
 			IsSecondaryDXCoilInZone( IsSecondaryDXCoilInZone ),
+			IsDXCoilInZone( IsDXCoilInZone ),
 			CompressorPartLoadRatio( CompressorPartLoadRatio ),
 			MSSecCoilSHRFT( MSSecCoilSHRFT ),
 			MSSecCoilSHRFF( MSSecCoilSHRFF ),

@@ -371,6 +371,7 @@ namespace VariableSpeedCoils {
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
+		bool IsOANodeListed; // Flag for air node name listed in OutdoorAir:Node or Nodelist
 		bool errFlag;
 		Real64 CurveVal; // Used to verify modifier curves equal 1 at rated conditions
 		Real64 WHInletAirTemp; // Used to pass proper inlet air temp to HPWH DX coil performance curves
@@ -1955,12 +1956,22 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil(DXCoilNum).HPWHCondPumpFracToWater = 0.0;
 			}
 
+			//Air nodes
 			VarSpeedCoil(DXCoilNum).AirInletNodeNum = GetOnlySingleNode(AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
 			VarSpeedCoil(DXCoilNum).AirOutletNodeNum = GetOnlySingleNode(AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
 			TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
 
+			//Check if the air inlet node is OA node, to justify whether the coil is placed in zone or not
+			EnergyPlus::OutAirNodeManager::CheckAndAddAirNodeNumber( VarSpeedCoil( DXCoilNum ).AirInletNodeNum, IsOANodeListed );
+			if ( IsOANodeListed ) {
+				VarSpeedCoil( DXCoilNum ).IsDXCoilInZone = false;
+			} else {
+				VarSpeedCoil( DXCoilNum ).IsDXCoilInZone = true;
+			}
+			
+			//Water nodes
 			VarSpeedCoil(DXCoilNum).WaterInletNodeNum = GetOnlySingleNode(AlphArray(7), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
 
 			VarSpeedCoil(DXCoilNum).WaterOutletNodeNum = GetOnlySingleNode(AlphArray(8), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
@@ -2264,10 +2275,15 @@ namespace VariableSpeedCoils {
 
 			// CurrentModuleObject = "Coil:Waterheating:Airtowaterheatpump:Variablespeed"
 			SetupOutputVariable("Cooling Coil Electric Energy [J]", VarSpeedCoil(DXCoilNum).Energy, "System", "Summed", VarSpeedCoil(DXCoilNum).Name, _, "Electric", "Heating", _, "System");
-			SetupOutputVariable("Cooling Coil Cooling Energy [J]", VarSpeedCoil(DXCoilNum).EnergyLoadTotal, "System", "Summed", VarSpeedCoil(DXCoilNum).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System");
 			SetupOutputVariable("Cooling Coil Sensible Cooling Energy [J]", VarSpeedCoil(DXCoilNum).EnergySensible, "System", "Summed", VarSpeedCoil(DXCoilNum).Name);
 			SetupOutputVariable("Cooling Coil Latent Cooling Energy [J]", VarSpeedCoil(DXCoilNum).EnergyLatent, "System", "Summed", VarSpeedCoil(DXCoilNum).Name);
 			SetupOutputVariable("Cooling Coil Water Side Heat Transfer Energy [J]", VarSpeedCoil(DXCoilNum).EnergySource, "System", "Summed", VarSpeedCoil(DXCoilNum).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System");
+			
+			if( VarSpeedCoil( DXCoilNum ).IsDXCoilInZone ){
+				SetupOutputVariable( "Cooling Coil Cooling Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+			} else {
+				SetupOutputVariable( "Cooling Coil Cooling Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
+			}
 
 			VarSpeedCoil(DXCoilNum).RatedCapCoolSens = AutoSize; //always auto-sized, to be determined in the sizing calculation
 		}
