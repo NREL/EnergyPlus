@@ -291,12 +291,12 @@ namespace EnergyPlus {
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteZoneSizingRecord ) {
 		sqlite_test->sqliteBegin();
-		sqlite_test->addSQLiteZoneSizingRecord( "FLOOR 1 IT HALL", "Cooling", 175, 262, 0.013, 0.019, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00", 20.7, 0.0157, 0.0033 );
+		sqlite_test->addSQLiteZoneSizingRecord( "FLOOR 1 IT HALL", "Cooling", 175, 262, 0.013, 0.019, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00", 20.7, 0.0157, 0.0033, 416.7 );
 		auto result = queryResult("SELECT * FROM ZoneSizes;", "ZoneSizes");
 		sqlite_test->sqliteCommit();
 
 		ASSERT_EQ(1ul, result.size());
-		std::vector<std::string> testResult0 {"1", "FLOOR 1 IT HALL", "Cooling", "175.0", "262.0", "0.013", "0.019", "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00", "20.7", "0.0157", "0.0033"};
+		std::vector<std::string> testResult0 {"1", "FLOOR 1 IT HALL", "Cooling", "175.0", "262.0", "0.013", "0.019", "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00", "20.7", "0.0157", "0.0033", "416.7" };
 		EXPECT_EQ(testResult0, result[0]);
 	}
 

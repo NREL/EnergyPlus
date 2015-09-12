@@ -156,6 +156,8 @@ namespace SolarShading {
 	extern Array1D< SurfaceErrorTracking > TrackBaseSubSurround;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	InitSolarCalculations();

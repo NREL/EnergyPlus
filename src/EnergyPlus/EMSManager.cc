@@ -77,6 +77,13 @@ namespace EMSManager {
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Functions
+	void
+	clear_state()
+	{
+		GetEMSUserInput = true ; 
+		ZoneThermostatActuatorsHaveBeenSetup = false ;
+		FinishProcessingUserInput = true ; 
+	}
 
 	void
 	CheckIfAnyEMS()

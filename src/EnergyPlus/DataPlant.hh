@@ -57,7 +57,8 @@ namespace DataPlant {
 		PumpOpSchemeType = 13, // Not really an OpScheme, just a placeholder
 		DemandOpSchemeType = 14, // Plcaeholder for demand side equipment such as coils
 		FreeRejectionOpSchemeType = 15, // Scheme Type for waterside economizers and the like
-		WSEconOpSchemeType = 16 // Scheme Type for waterside economizers and the like
+		WSEconOpSchemeType = 16, // Scheme Type for waterside economizers and the like
+		ThermalEnergyStorageSchemeType = 17 // Scheme Type for Simplified Thermal Energy Storage operation
 	};
 
 	// These are useful for SELECT CASE statements rather than listing all of the individual types listed above
@@ -267,6 +268,7 @@ namespace DataPlant {
 	extern int const TypeOf_CoolingTower_VarSpdMerkel;
 	extern int const TypeOf_SwimmingPool_Indoor;
 	extern int const TypeOf_GrndHtExchgSlinky;
+	extern int const TypeOf_FourPipeBeamAirTerminal;
 
 	// Parameters for General Equipment Types
 	extern int const NumGeneralEquipTypes;
@@ -2315,6 +2317,12 @@ namespace DataPlant {
 	extern Array1D< PlantCallingOrderInfoStruct > PlantCallingOrderInfo;
 
 	// Functions
+
+	// Clears the global data in DataPlant.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 
 	void
 	ScanPlantLoopsForObject(
