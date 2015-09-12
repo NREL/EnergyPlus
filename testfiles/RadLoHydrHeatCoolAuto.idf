@@ -2,7 +2,8 @@
 ! Basic file description:  1 story building divided into 3 interior conditioned zones. Roof with no plenum.
 !                          No ground contact with floor.
 !
-! Highlights:              Basic test of the hydronic radiant heating and cooling system with scalable and autosizing
+! Highlights:              Basic test of hydronic radiant heating and cooling systems with autosizing and two different
+!                          scalable sizing methods (CapacityPerFloorArea and FractionOfAutosizedHeatingCapacity)
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file

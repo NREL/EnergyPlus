@@ -1995,7 +1995,7 @@ namespace LowTempRadiantSystem {
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
 
 				if ( !IsAutoSize && !ZoneSizingRunDone ) { // simulation continue
-					if ( ElecRadSys( RadSysNum ).ScaledHeatingCapacity > 0.0 ) {
+					if ( CapSizingMethod == HeatingDesignCapacity && ElecRadSys( RadSysNum ).ScaledHeatingCapacity > 0.0 ) {
 						TempSize = ElecRadSys( RadSysNum ).ScaledHeatingCapacity;
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 					}
@@ -2062,7 +2062,7 @@ namespace LowTempRadiantSystem {
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
 
 				if ( !IsAutoSize && !ZoneSizingRunDone ) { // simulation continue
-					if ( HydrRadSys( RadSysNum ).ScaledHeatingCapacity > 0.0 ) {
+					if ( CapSizingMethod == HeatingDesignCapacity && HydrRadSys( RadSysNum ).ScaledHeatingCapacity > 0.0 ) {
 						TempSize = HydrRadSys( RadSysNum ).ScaledHeatingCapacity;
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 						DesCoilLoad = TempSize;
@@ -2176,7 +2176,7 @@ namespace LowTempRadiantSystem {
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
 
 				if ( !IsAutoSize && !ZoneSizingRunDone ) { // simulation continue
-					if ( HydrRadSys( RadSysNum ).ScaledCoolingCapacity > 0.0 ) {
+					if ( CapSizingMethod == CoolingDesignCapacity && HydrRadSys( RadSysNum ).ScaledCoolingCapacity > 0.0 ) {
 						TempSize = HydrRadSys( RadSysNum ).ScaledCoolingCapacity;
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 						DesCoilLoad = TempSize;
