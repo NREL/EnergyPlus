@@ -1384,7 +1384,7 @@ namespace FanCoilUnits {
 											ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 											ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 										}
-									TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
+										TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 									} else if ( CapSizingMethod == CapacityPerFloorArea ) {
 										if ( ZoneSizingRunDone ) {
 											PrintFlag = false;
@@ -1392,7 +1392,7 @@ namespace FanCoilUnits {
 											DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
 											RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 											ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = TempSize;
-											ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;										
+											ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 										}
 										TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 										DataScalableCapSizingON = true;
@@ -1403,17 +1403,18 @@ namespace FanCoilUnits {
 										DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
 										RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 										ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = TempSize;
-										ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;												
+										ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 										TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad * ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 										DataScalableCapSizingON = true;
 									}
-									SizingString = "Heating Design Capacity [W]";
-									PrintFlag = false;
-									RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-									DesCoilLoad = TempSize;
-									DataScalableCapSizingON = false;
-									DataFlowUsedForSizing = 0.0;
 								}
+								SizingString = "Heating Design Capacity [W]";
+								PrintFlag = false;
+								RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+								DesCoilLoad = TempSize;
+								DataScalableCapSizingON = false;
+								DataFlowUsedForSizing = 0.0;
+
 							} else {
 								SizingString = "Heating Design Capacity [W]";
 								PrintFlag = false;
