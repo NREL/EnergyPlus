@@ -55,6 +55,7 @@ namespace DataGlobals {
 	int const ksRunPeriodWeather( 3 );
 	int const ksHVACSizeDesignDay ( 4 );  // a regular design day run during HVAC Sizing Simulation
 	int const ksHVACSizeRunPeriodDesign( 5 ); // a weather period design day run during HVAC Sizing Simulation
+	int const ksReadAllWeatherData( 6 ); // a weather period for reading all weather data proir to the simulation
 
 	int const ZoneTSReporting( 1 ); // value for Zone Time Step Reporting (UpdateDataAndReport)
 	int const HVACTSReporting( 2 ); // value for HVAC Time Step Reporting (UpdateDataAndReport)

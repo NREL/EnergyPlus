@@ -93,12 +93,15 @@ namespace DataZoneEquipment {
 	int NumReturnAirPaths( 0 );
 	bool ZoneEquipInputsFilled( false );
 	bool ZoneEquipSimulatedOnce( false );
+	bool MyOneTimeFlag2( true );
 	int NumOfZoneEquipLists( 0 ); // The Number of Zone Equipment List objects
 	Array1D_int ZoneEquipAvail;
 
 	Array1D_bool CrossMixingReportFlag;
 	Array1D_bool MixingReportFlag;
 	Array1D< Real64 > VentMCP;
+	Array1D< Real64 > ZMAT;
+	Array1D< Real64 > ZHumRat; 
 
 	// Utility routines for module
 
@@ -111,6 +114,30 @@ namespace DataZoneEquipment {
 	Array1D< ReturnAir > ReturnAirPath;
 
 	// Functions
+	// Clears the global data in DataZoneEquipment.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumSupplyAirPaths = 0;
+		NumReturnAirPaths = 0 ;
+		ZoneEquipInputsFilled = false ;
+		ZoneEquipSimulatedOnce = false ;
+		NumOfZoneEquipLists = 0 ; // The Number of Zone Equipment List objects
+		ZoneEquipAvail.deallocate();
+		CrossMixingReportFlag.deallocate();
+		MixingReportFlag.deallocate();
+		VentMCP.deallocate();
+		ZMAT.deallocate();
+		ZHumRat.deallocate();
+		ZoneEquipConfig.deallocate();
+		ZoneEquipList.deallocate();
+		HeatingControlList.deallocate();
+		CoolingControlList.deallocate();
+		SupplyAirPath.deallocate();
+		ReturnAirPath.deallocate();
+	
+	}
 
 	void
 	GetZoneEquipmentData()

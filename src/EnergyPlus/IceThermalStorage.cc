@@ -418,6 +418,7 @@ namespace IceThermalStorage {
 		using DataPlant::DualSetPointDeadBand;
 		using PlantUtilities::SetComponentFlowRate;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
+		using DataGlobals::WarmupFlag;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -742,7 +743,7 @@ namespace IceThermalStorage {
 					} // ...loop iterating for the ice storage outlet temperature
 
 					// Keep track of times that the iterations got excessive
-					if ( IterNum >= MaxIterNum ) {
+					if ( IterNum >= MaxIterNum && ( !WarmupFlag )  ) {
 						++DetIceStor( IceNum ).DischargeIterErrors;
 						if ( DetIceStor( IceNum ).DischargeIterErrors <= 25 ) {
 							ShowWarningError( "Detailed Ice Storage model exceeded its internal discharging maximum iteration limit" );
