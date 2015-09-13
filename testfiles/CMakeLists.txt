@@ -295,6 +295,8 @@ ADD_SIMULATION_TEST(IDF_FILE PipeHeatTransfer_Underground.idf EPW_FILE USA_IL_Ch
 ADD_SIMULATION_TEST(IDF_FILE PipeHeatTransfer_Zone.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PipingSystem_Underground_FHX.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PipingSystem_Underground_TwoPipe.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE PipingSystem_Underground_TwoPipe_FD_GroundTemps.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE PipingSystem_Underground_TwoPipe_Xing_GroundTemps.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PlantApplicationsGuide_Example1.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PlantApplicationsGuide_Example2.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PlantApplicationsGuide_Example3.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
