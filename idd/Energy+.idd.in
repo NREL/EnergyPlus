@@ -44539,7 +44539,6 @@ Coil:Heating:DX:MultiSpeed,
        \maximum 1.0
        \note recoverable waste heat at full load and rated conditions
   A15, \field Speed 1 Waste Heat Function of Temperature Curve Name
-       \required-field
        \type object-list
        \object-list BiquadraticCurves
        \object-list BiVariateTables
@@ -44639,7 +44638,6 @@ Coil:Heating:DX:MultiSpeed,
        \maximum 1.0
        \note recoverable waste heat at full load and rated conditions
   A21, \field Speed 2 Waste Heat Function of Temperature Curve Name
-       \required-field
        \type object-list
        \object-list BiquadraticCurves
        \object-list BiVariateTables
@@ -53113,6 +53111,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
    A11, \field Heating Coil Name
         \required-field
         \type object-list
+        \object-list HeatingCoilsDXMultiSpeed
         \object-list HeatingCoilsElectricMultiStage
         \object-list HeatingCoilsGasMultiStage
    N1 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
