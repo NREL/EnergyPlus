@@ -31,7 +31,6 @@ namespace MoistureBalanceEMPDManager {
 	CalcMoistureBalanceEMPD(
 		int const SurfNum,
 		Real64 const TempSurfIn, // INSIDE SURFACE TEMPERATURE at current time step
-		Real64 const TempSurfInOld, // INSIDE SURFACE TEMPERATURE at previous time step.
 		Real64 const TempZone, // Zone temperature at current time step.
 		Real64 & TempSat // Satutare surface temperature.
 	);

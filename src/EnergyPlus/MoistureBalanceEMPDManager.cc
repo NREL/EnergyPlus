@@ -376,7 +376,6 @@ namespace MoistureBalanceEMPDManager {
 	CalcMoistureBalanceEMPD(
 		int const SurfNum,
 		Real64 const TempSurfIn, // INSIDE SURFACE TEMPERATURE at current time step
-		Real64 const TempSurfInOld, // INSIDE SURFACE TEMPERATURE at previous time step.
 		Real64 const TempZone, // Zone temperature at current time step.
 		Real64 & TempSat // Satutare surface temperature.
 	)
@@ -439,14 +438,11 @@ namespace MoistureBalanceEMPDManager {
 		Real64 PVsat; // saturation vapor pressure at the surface
 		Real64 RHSurfOld;
 		Real64 RHDeepOld;
-		Real64 dEMPD;
-		Real64 dEMPDdeep;
 		Real64 EMPDdiffusivity;
 		Real64 Rcoating;
 		Real64 RHsurface;
 		Real64 RHdeep;
-		Real64 EMPDdiffusivity2;
-				
+		
 		if ( BeginEnvrnFlag && OneTimeFlag ) {
 			InitMoistureBalanceEMPD();
 			OneTimeFlag = false;
