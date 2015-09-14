@@ -603,6 +603,8 @@ namespace CondenserLoopTowers {
 	extern Array1D< VSTowerData > VSTower; // model coefficients and specific variables for VS tower
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimTowers(
