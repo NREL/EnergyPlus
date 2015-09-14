@@ -462,7 +462,6 @@ namespace SimulationManager {
 				}
 				BeginDayFlag = true;
 				EndDayFlag = false;
-				ResetAccumulationWhenWarmupComplete();
 
 
 				if ( WarmupFlag ) {
@@ -472,6 +471,7 @@ namespace SimulationManager {
 				} else if ( DayOfSim == 1 ) {
 					DisplayString( "Starting Simulation at " + CurMnDy + " for " + EnvironmentName );
 					gio::write( OutputFileInits, Format_700 ) << NumOfWarmupDays;
+					ResetAccumulationWhenWarmupComplete();
 				} else if ( DisplayPerfSimulationFlag ) {
 					DisplayString( "Continuing Simulation at " + CurMnDy + " for " + EnvironmentName );
 					DisplayPerfSimulationFlag = false;
