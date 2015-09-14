@@ -6604,72 +6604,28 @@ namespace SetPointManager {
 		// Calculate the optimal condenser water entering temperature set point for a chiller plant.
 
 		// METHODOLOGY EMPLOYED:
-		// The “ideal” chiller-tower optimization scheme uses a search algorithm to find the ideal optimal setpoint
+		// The "ideal" chiller-tower optimization scheme uses a search algorithm to find the ideal optimal setpoint
 		// at a given timestep. This requires resimulating HVAC systems at each timestep until finding
-		// an “optimal” condenser water entering setpoint (OptSetpoint) which gives the minimum total chiller,
+		// an "optimal" condenser water entering setpoint (OptSetpoint) which gives the minimum total chiller,
 		// cooling tower, chilled water pump and condenser water pump power consumption.
 		// The OptSetpoint falls between realistic minimum and maximum boundaries, which are set by the user.
 		// The minimum boundary is determined based on the minimum lift (user input)
 		// and evaporator leaving water temperature. The maximum boundary is specified by the user.
 		// It is assumed that a single minimum point exists between these boundaries.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataPlant;
 		using DataLoopNode::Node;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Real64 CondWaterSetPoint( 0.0 ); // Condenser entering water temperature setpoint this timestep, C
-		static Real64 InitCondWaterSetPoint( 0.0 ); // Initial condenser entering water temperature setpoint this timestep, C
 		static Real64 EvapOutletTemp( 0.0 ); // Evaporator water outlet temperature (C)
 		static Real64 CondTempLimit( 0.0 ); // Condenser entering water temperature setpoint lower limit
 		static Real64 CurLoad( 0.0 ); // Current cooling load, W
-		static Real64 MinLiftTD( 0.0 ); // Minimum lift (Tcond entering - Tevap leaving) TD this timestep
-		static int ChillerTypeNum( 0 ); // Chiller type number
-		static int ChillerLoopNum( 0 ); // Chiller loop number
-		static int ChillerBranchNum( 0 ); // Chiller branch number
-		static int ChillerNum( 0 ); // Chiller number
-		static int TowerLoopNum( 0 ); // Tower loop number
-		static int CondLoopNum( 0 ); // Condenser loop number
-		static int ChilledPumpBranchNum( 0 ); // Chilled water pump branch number
-		static int ChilledPumpNum( 0 ); // Chilled water pump number
-		static int CondPumpBranchNum( 0 ); // Condenser water pump branch number
-		static int CondPumpNum( 0 ); // Condenser pump number
-		static Real64 DeltaTotEnergy( 0.0 ); // Difference between total energy consumptions at this time step
-		// and at the previous time step
-		static Real64 ChillerEnergy( 0.0 ); // Chiller energy consumption
-		static Real64 ChilledPumpEnergy( 0.0 ); // Chilled water pump energy consumption
-		static Real64 TowerFanEnergy( 0.0 ); // Cooling tower fan energy consumption
-		static Real64 CondPumpEnergy( 0.0 ); // Condenser water pump energy consumption
 		static Real64 TotEnergy( 0.0 ); // Totoal energy consumptions at this time step
 		static Real64 TotEnergyPre( 0.0 ); // Totoal energy consumptions at the previous time step
 		static bool RunSubOptCondEntTemp( false );
 		static bool RunFinalOptCondEntTemp( false );
-
-		InitCondWaterSetPoint = this->MaxCondEntTemp;
-		MinLiftTD = this->MinimumLiftTD;
-		ChillerTypeNum = this->TypeNum;
-		ChillerLoopNum = this->LoopIndexPlantSide;
-		ChillerBranchNum = this->BranchIndexPlantSide;
-		ChillerNum = this->ChillerIndexPlantSide;
-		TowerLoopNum = this->CondLoopNum;
-		CondLoopNum = this->CondLoopNum;
-		ChilledPumpBranchNum = this->ChilledPumpBranchNum;
-		ChilledPumpNum = this->ChilledPumpNum;
-		CondPumpBranchNum = this->CondPumpBranchNum;
-		CondPumpNum = this->CondPumpNum;
 
 		if ( MetersHaveBeenInitialized ) {
 			// Setup meter vars
@@ -6682,89 +6638,117 @@ namespace SetPointManager {
 		if ( MetersHaveBeenInitialized && RunOptCondEntTemp ) {
 
 			// If chiller is on
-			CurLoad = std::abs( PlantLoop( ChillerLoopNum ).LoopSide( SupplySide ).Branch( ChillerBranchNum ).Comp( ChillerNum ).MyLoad );
+			CurLoad = std::abs( PlantLoop( this->LoopIndexPlantSide ).LoopSide( SupplySide ).Branch( this->BranchIndexPlantSide ).Comp( this->ChillerIndexPlantSide ).MyLoad );
 
 			if ( CurLoad > 0 ) {
+
 				// Calculate the minimum condenser inlet temperature boundry for set point
-				if ( ChillerTypeNum == TypeOf_Chiller_Absorption || ChillerTypeNum == TypeOf_Chiller_CombTurbine || ChillerTypeNum == TypeOf_Chiller_Electric || ChillerTypeNum == TypeOf_Chiller_ElectricReformEIR || ChillerTypeNum == TypeOf_Chiller_EngineDriven ) {
-					EvapOutletTemp = Node( PlantLoop( ChillerLoopNum ).LoopSide( SupplySide ).Branch( ChillerBranchNum ).Comp( ChillerNum ).NodeNumOut ).Temp;
+				if ( this->TypeNum == TypeOf_Chiller_Absorption || this->TypeNum == TypeOf_Chiller_CombTurbine || this->TypeNum == TypeOf_Chiller_Electric || this->TypeNum == TypeOf_Chiller_ElectricReformEIR || this->TypeNum == TypeOf_Chiller_EngineDriven ) {
+					EvapOutletTemp = Node( PlantLoop( this->LoopIndexPlantSide ).LoopSide( SupplySide ).Branch( this->BranchIndexPlantSide ).Comp( this->ChillerIndexPlantSide ).NodeNumOut ).Temp;
 				} else {
 					EvapOutletTemp = 6.666;
 				}
-				CondTempLimit = MinLiftTD + EvapOutletTemp;
+				CondTempLimit = this->MinimumLiftTD + EvapOutletTemp;
 
-				// Energy consumption metered variable number = 1
+				TotEnergy = this->calculateCurrentEnergyUsage();
 
-				// Get the chiller energy consumption
-				ChillerEnergy = GetInternalVariableValue( this->ChllrVarType, this->ChllrVarIndex );
+				this->setupSetPointAndFlags( TotEnergy, TotEnergyPre, CondWaterSetPoint, CondTempLimit, RunOptCondEntTemp, RunSubOptCondEntTemp, RunFinalOptCondEntTemp );
 
-				// Get the chilled water pump energy consumption
-				ChilledPumpEnergy = GetInternalVariableValue( this->ChlPumpVarType, this->ChlPumpVarIndex );
-
-				// Get the cooling tower fan energy consumption
-				TowerFanEnergy = 0;
-				for ( int i = 1; i <= this->numTowers; i++ ) {
-					TowerFanEnergy += GetInternalVariableValue( this->ClTowerVarType( i ), this->ClTowerVarIndex( i ) );
-				}
-
-				// Get the condenser pump energy consumption
-				CondPumpEnergy = GetInternalVariableValue( this->CndPumpVarType, this->CndPumpVarIndex );
-
-				// Calculate the total energy consumption
-				TotEnergy = ChillerEnergy + ChilledPumpEnergy + TowerFanEnergy + CondPumpEnergy;
-
-				if ( TotEnergyPre != 0.0 ) {
-					DeltaTotEnergy = 0.0;
-					// Calculate the total energy consumption difference
-					DeltaTotEnergy = TotEnergyPre - TotEnergy;
-					// Search for the minimum total energy consumption
-					if ( ( DeltaTotEnergy > 0 ) && ( CondWaterSetPoint >= CondTempLimit ) && ( ! RunFinalOptCondEntTemp ) ) {
-						if ( ! RunSubOptCondEntTemp ) {
-							--CondWaterSetPoint;
-							RunOptCondEntTemp = true;
-						} else {
-							CondWaterSetPoint -= 0.2;
-							RunOptCondEntTemp = true;
-						}
-						TotEnergyPre = TotEnergy;
-						// Set smaller set point (0.2 degC) decrease
-					} else if ( ( DeltaTotEnergy < 0 ) && ( ! RunSubOptCondEntTemp ) && ( CondWaterSetPoint > CondTempLimit ) && ( ! RunFinalOptCondEntTemp ) ) {
-						CondWaterSetPoint += 0.8;
-						RunOptCondEntTemp = true;
-						RunSubOptCondEntTemp = true;
-					} else {
-						if ( ! RunFinalOptCondEntTemp ) {
-							CondWaterSetPoint += 0.2;
-							RunOptCondEntTemp = true;
-							RunSubOptCondEntTemp = false;
-							RunFinalOptCondEntTemp = true;
-						} else {
-							//CondWaterSetPoint = CondWaterSetPoint; // Self-assignment commented out
-							TotEnergyPre = 0.0;
-							RunOptCondEntTemp = false;
-							RunSubOptCondEntTemp = false;
-							RunFinalOptCondEntTemp = false;
-						}
-					}
-				} else {
-					CondWaterSetPoint = InitCondWaterSetPoint - 1.0;
-					TotEnergyPre = TotEnergy;
-					RunOptCondEntTemp = true;
-					RunSubOptCondEntTemp = false;
-				}
 			} else {
-				CondWaterSetPoint = InitCondWaterSetPoint;
+				CondWaterSetPoint = this->MaxCondEntTemp;
 				TotEnergyPre = 0.0;
 				RunOptCondEntTemp = false;
 				RunSubOptCondEntTemp = false;
 			}
 		} else {
-			CondWaterSetPoint = InitCondWaterSetPoint;
+			CondWaterSetPoint = this->MaxCondEntTemp;
 			RunOptCondEntTemp = false;
 			RunSubOptCondEntTemp = false;
 		}
 
 		this->SetPt = CondWaterSetPoint;
+
+	}
+
+	void
+	DefineIdealCondEntSetPointManager::setupSetPointAndFlags(
+		Real64 & TotEnergy,
+		Real64 & TotEnergyPre, 
+		Real64 & CondWaterSetPoint, 
+		Real64 & CondTempLimit, 
+		bool & RunOptCondEntTemp, 
+		bool & RunSubOptCondEntTemp,
+		bool & RunFinalOptCondEntTemp
+	) {
+		Real64 DeltaTotEnergy;
+		if ( TotEnergyPre != 0.0 ) {
+			// Calculate the total energy consumption difference
+			DeltaTotEnergy = TotEnergyPre - TotEnergy;
+			// Search for the minimum total energy consumption
+			if ( ( DeltaTotEnergy > 0 ) && ( CondWaterSetPoint >= CondTempLimit ) && ( ! RunFinalOptCondEntTemp ) ) {
+				if ( ! RunSubOptCondEntTemp ) {
+					--CondWaterSetPoint;
+					RunOptCondEntTemp = true;
+				} else {
+					CondWaterSetPoint -= 0.2;
+					RunOptCondEntTemp = true;
+				}
+				TotEnergyPre = TotEnergy;
+				// Set smaller set point (0.2 degC) decrease
+			} else if ( ( DeltaTotEnergy < 0 ) && ( ! RunSubOptCondEntTemp ) && ( CondWaterSetPoint > CondTempLimit ) && ( ! RunFinalOptCondEntTemp ) ) {
+				CondWaterSetPoint += 0.8;
+				RunOptCondEntTemp = true;
+				RunSubOptCondEntTemp = true;
+			} else {
+				if ( ! RunFinalOptCondEntTemp ) {
+					CondWaterSetPoint += 0.2;
+					RunOptCondEntTemp = true;
+					RunSubOptCondEntTemp = false;
+					RunFinalOptCondEntTemp = true;
+				} else {
+					//CondWaterSetPoint = CondWaterSetPoint; // Self-assignment commented out
+					TotEnergyPre = 0.0;
+					RunOptCondEntTemp = false;
+					RunSubOptCondEntTemp = false;
+					RunFinalOptCondEntTemp = false;
+				}
+			}
+		} else {
+			CondWaterSetPoint = this->MaxCondEntTemp - 1.0;
+			TotEnergyPre = TotEnergy;
+			RunOptCondEntTemp = true;
+			RunSubOptCondEntTemp = false;
+		}
+	}
+
+	Real64
+	DefineIdealCondEntSetPointManager::calculateCurrentEnergyUsage()
+	{
+
+		Real64 ChillerEnergy( 0.0 ); // Chiller energy consumption
+		Real64 ChilledPumpEnergy( 0.0 ); // Chilled water pump energy consumption
+		Real64 TowerFanEnergy( 0.0 ); // Cooling tower fan energy consumption
+		Real64 CondPumpEnergy( 0.0 ); // Condenser water pump energy consumption
+
+		// Energy consumption metered variable number = 1
+
+		// Get the chiller energy consumption
+		ChillerEnergy = GetInternalVariableValue( this->ChllrVarType, this->ChllrVarIndex );
+
+		// Get the chilled water pump energy consumption
+		ChilledPumpEnergy = GetInternalVariableValue( this->ChlPumpVarType, this->ChlPumpVarIndex );
+
+		// Get the cooling tower fan energy consumption
+		TowerFanEnergy = 0;
+		for ( int i = 1; i <= this->numTowers; i++ ) {
+			TowerFanEnergy += GetInternalVariableValue( this->ClTowerVarType( i ), this->ClTowerVarIndex( i ) );
+		}
+
+		// Get the condenser pump energy consumption
+		CondPumpEnergy = GetInternalVariableValue( this->CndPumpVarType, this->CndPumpVarIndex );
+
+		// Calculate the total energy consumption
+		return ( ChillerEnergy + ChilledPumpEnergy + TowerFanEnergy + CondPumpEnergy );
 
 	}
 

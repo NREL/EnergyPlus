@@ -1000,6 +1000,19 @@ namespace SetPointManager {
 
 		void SetupMeteredVarsForSetPt();
 
+		Real64 calculateCurrentEnergyUsage();
+
+		void
+		setupSetPointAndFlags(
+			Real64 & TotEnergy,
+			Real64 & TotEnergyPre, 
+			Real64 & CondWaterSetPoint, 
+			Real64 & CondTempLimit, 
+			bool & RunOptCondEntTemp, 
+			bool & RunSubOptCondEntTemp,
+			bool & RunFinalOptCondEntTemp
+		);
+
 	};
 
 	struct DefineSZOneStageCoolinggSetPointManager // Derived type for the Single Zone One Stage Cooling Setpoint Manager data

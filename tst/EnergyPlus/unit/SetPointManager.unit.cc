@@ -358,6 +358,76 @@ TEST_F( EnergyPlusFixture, SetPointManagerDefineCondEntSetPointManager )
 
 }
 
+TEST( SetPointManager, setupSetPointAndFlags )
+{
+
+	Real64 totEnergy = 0.0;
+	Real64 totEnergyPrevious = 0.0;
+	Real64 condenserWaterSetPoint = 0.0;
+	Real64 condenserWaterSetPointLimit = 10.0;
+	bool statusRunOptimalCondenserEnteringTemp = false;
+	bool statusRunSubOptimalCondenserEnteringTemp = false;
+	bool statusRunFinalOptimalCondenserEnteringTemp = false;
+
+	SetPointManager::DefineIdealCondEntSetPointManager thisSPM;
+	thisSPM.MaxCondEntTemp = 25;
+
+	// first pass through, leave totEnergyPrevious == 0 to kick things off but initialize current energy
+	totEnergy = 1000.0;
+	thisSPM.setupSetPointAndFlags(totEnergy, totEnergyPrevious, condenserWaterSetPoint, condenserWaterSetPointLimit, statusRunOptimalCondenserEnteringTemp, statusRunSubOptimalCondenserEnteringTemp, statusRunFinalOptimalCondenserEnteringTemp);
+	// the values should be initialized 
+	// the setpoint should be set to max - 1
+	EXPECT_NEAR(24, condenserWaterSetPoint, 0.0001);
+	// the energy should be stored in the previous energy variable
+	EXPECT_EQ(totEnergy, totEnergyPrevious);
+	// the run flag should be turned on to start simulating
+	EXPECT_TRUE(statusRunOptimalCondenserEnteringTemp);
+	// the sub run flag should be reset to false
+	EXPECT_FALSE(statusRunSubOptimalCondenserEnteringTemp);
+
+	// second pass through, continue the optimization by having it find a lower energy usage
+	totEnergy = 800.0;
+	thisSPM.setupSetPointAndFlags(totEnergy, totEnergyPrevious, condenserWaterSetPoint, condenserWaterSetPointLimit, statusRunOptimalCondenserEnteringTemp, statusRunSubOptimalCondenserEnteringTemp, statusRunFinalOptimalCondenserEnteringTemp);
+	// the optimization should decrement the setpoint and continue searching, storing this energy for next time
+	EXPECT_NEAR(23, condenserWaterSetPoint, 0.0001);
+	EXPECT_TRUE(statusRunOptimalCondenserEnteringTemp);
+	EXPECT_EQ(totEnergy, totEnergyPrevious);
+
+	// third pass through have it pass the optimal point by going higher energy
+	totEnergy = 900;
+	thisSPM.setupSetPointAndFlags(totEnergy, totEnergyPrevious, condenserWaterSetPoint, condenserWaterSetPointLimit, statusRunOptimalCondenserEnteringTemp, statusRunSubOptimalCondenserEnteringTemp, statusRunFinalOptimalCondenserEnteringTemp);
+	// the optimization should realize it passed the optimal point, back track and then set the sub-optimazation flags
+	EXPECT_NEAR(23.8, condenserWaterSetPoint, 0.0001);
+	EXPECT_TRUE(statusRunOptimalCondenserEnteringTemp);
+	EXPECT_TRUE(statusRunSubOptimalCondenserEnteringTemp);
+
+	// fourth pass through it will be doing the sub-optimization search; perform one search; energy goes down this time
+	totEnergyPrevious = 900;
+	totEnergy = 890;
+	thisSPM.setupSetPointAndFlags(totEnergy, totEnergyPrevious, condenserWaterSetPoint, condenserWaterSetPointLimit, statusRunOptimalCondenserEnteringTemp, statusRunSubOptimalCondenserEnteringTemp, statusRunFinalOptimalCondenserEnteringTemp);
+	// the optimization should realize it has yet again overshot and start trying to work downward carefully
+	EXPECT_NEAR(23.6, condenserWaterSetPoint, 0.0001);
+	EXPECT_TRUE(statusRunOptimalCondenserEnteringTemp);
+	EXPECT_TRUE(statusRunSubOptimalCondenserEnteringTemp);
+
+	// fifth pass through it will have hit the optimal point; it will set the setpoint back and set the final run flags
+	totEnergy = 895;
+	thisSPM.setupSetPointAndFlags(totEnergy, totEnergyPrevious, condenserWaterSetPoint, condenserWaterSetPointLimit, statusRunOptimalCondenserEnteringTemp, statusRunSubOptimalCondenserEnteringTemp, statusRunFinalOptimalCondenserEnteringTemp);
+	// the optimization should increment the energy back to where it was, and set the final flags
+	EXPECT_NEAR(23.8, condenserWaterSetPoint, 0.0001);
+	EXPECT_TRUE(statusRunOptimalCondenserEnteringTemp);
+	EXPECT_FALSE(statusRunSubOptimalCondenserEnteringTemp);
+	EXPECT_TRUE(statusRunFinalOptimalCondenserEnteringTemp);
+
+	// and finally, the sixth pass through when it is set to run final; totEnergy doesn't matter when that flag is true, and the sp shouldn't change
+	thisSPM.setupSetPointAndFlags(totEnergy, totEnergyPrevious, condenserWaterSetPoint, condenserWaterSetPointLimit, statusRunOptimalCondenserEnteringTemp, statusRunSubOptimalCondenserEnteringTemp, statusRunFinalOptimalCondenserEnteringTemp);
+	EXPECT_NEAR(23.8, condenserWaterSetPoint, 0.0001);
+	EXPECT_FALSE(statusRunOptimalCondenserEnteringTemp);
+	EXPECT_FALSE(statusRunSubOptimalCondenserEnteringTemp);
+	EXPECT_FALSE(statusRunFinalOptimalCondenserEnteringTemp);
+
+}
+
 TEST_F( EnergyPlusFixture, CalcScheduledTESSetPoint )
 {
 	int const CoolOpComp ( 1 ); // a component that cools only (chillers)
