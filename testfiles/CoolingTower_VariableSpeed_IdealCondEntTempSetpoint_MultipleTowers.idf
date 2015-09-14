@@ -462,14 +462,6 @@
     MAT-CLNG-1;              !- Outside Layer
 
   Construction,
-    SB-U,                    !- Name
-    MAT-SB-U;                !- Outside Layer
-
-  Construction,
-    FLOOR-1,                 !- Name
-    MAT-FLOOR-1;             !- Outside Layer
-
-  Construction,
     FLOOR-SLAB-1,            !- Name
     CC03;                    !- Outside Layer
 
@@ -565,26 +557,8 @@
     CLEAR 3MM;               !- Layer 3
 
   Construction,
-    Dbl Clr 3mm/13mm Arg,    !- Name
-    CLEAR 3MM,               !- Outside Layer
-    ARGON 13MM,              !- Layer 2
-    CLEAR 3MM;               !- Layer 3
-
-  Construction,
     Sgl Grey 3mm,            !- Name
     GREY 3MM;                !- Outside Layer
-
-  Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
-    LoE CLEAR 6MM,           !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
 
   Schedule:Compact,
     OCCUPY-1,                !- Name
@@ -3765,52 +3739,6 @@
     0.00000856589904,        !- Coefficient 26
     -0.000001516821552;      !- Coefficient 27
 
-  CoolingTowerPerformance:CoolTools,
-    CoolTools CrossFlow Default Tower Model,  !- Name
-    -1.0,                    !- Minimum Inlet Air Wet-Bulb Temperature {C}
-    26.6667,                 !- Maximum Inlet Air Wet-Bulb Temperature {C}
-    1.1111,                  !- Minimum Range Temperature {deltaC}
-    11.1111,                 !- Maximum Range Temperature {deltaC}
-    1.1111,                  !- Minimum Approach Temperature {deltaC}
-    11.1111,                 !- Maximum Approach Temperature {deltaC}
-    0.75,                    !- Minimum Water Flow Rate Ratio
-    1.25,                    !- Maximum Water Flow Rate Ratio
-    0.52049709836241,        !- Coefficient 1
-    -10.617046395344,        !- Coefficient 2
-    10.7292974722538,        !- Coefficient 3
-    -2.74988377158227,       !- Coefficient 4
-    4.73629943913743,        !- Coefficient 5
-    -8.25759700874711,       !- Coefficient 6
-    1.57640938114136,        !- Coefficient 7
-    6.51119643791324,        !- Coefficient 8
-    1.50433525206692,        !- Coefficient 9
-    -3.2888529287801,        !- Coefficient 10
-    0.0257786145353773,      !- Coefficient 11
-    0.182464289315254,       !- Coefficient 12
-    -0.0818947291400898,     !- Coefficient 13
-    -0.215010003996285,      !- Coefficient 14
-    0.0186741309635284,      !- Coefficient 15
-    0.0536824177590012,      !- Coefficient 16
-    -0.00270968955115031,    !- Coefficient 17
-    0.00112277498589279,     !- Coefficient 18
-    -0.00127758497497718,    !- Coefficient 19
-    0.0000760420796601607,   !- Coefficient 20
-    1.43600088336017,        !- Coefficient 21
-    -0.5198695909109,        !- Coefficient 22
-    0.117339576910507,       !- Coefficient 23
-    1.50492810819924,        !- Coefficient 24
-    -0.135898905926974,      !- Coefficient 25
-    -0.152577581866506,      !- Coefficient 26
-    -0.0533843828114562,     !- Coefficient 27
-    0.00493294869565511,     !- Coefficient 28
-    -0.00796260394174197,    !- Coefficient 29
-    0.000222619828621544,    !- Coefficient 30
-    -0.0543952001568055,     !- Coefficient 31
-    0.00474266879161693,     !- Coefficient 32
-    -0.0185854671815598,     !- Coefficient 33
-    0.00115667701293848,     !- Coefficient 34
-    0.000807370664460284;    !- Coefficient 35
-
 ! Fan power ratio varies nearly as the cube of air flow ratio
 
   Curve:Cubic,
@@ -3962,4 +3890,3 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
-
