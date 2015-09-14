@@ -241,6 +241,7 @@ namespace SimulationManager {
 		using PlantPipingSystemsManager::InitAndSimGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
+		using OutputProcessor::ResetAccumulationWhenWarmupComplete;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -462,6 +463,7 @@ namespace SimulationManager {
 				BeginDayFlag = true;
 				EndDayFlag = false;
 
+
 				if ( WarmupFlag ) {
 					++NumOfWarmupDays;
 					cWarmupDay = TrimSigDigits( NumOfWarmupDays );
@@ -469,6 +471,7 @@ namespace SimulationManager {
 				} else if ( DayOfSim == 1 ) {
 					DisplayString( "Starting Simulation at " + CurMnDy + " for " + EnvironmentName );
 					gio::write( OutputFileInits, Format_700 ) << NumOfWarmupDays;
+					ResetAccumulationWhenWarmupComplete();
 				} else if ( DisplayPerfSimulationFlag ) {
 					DisplayString( "Continuing Simulation at " + CurMnDy + " for " + EnvironmentName );
 					DisplayPerfSimulationFlag = false;
@@ -2785,8 +2788,8 @@ Resimulate(
 	if ( ResimHB ) {
 		// Surface simulation
 		InitSurfaceHeatBalance();
-		CalcHeatBalanceOutsideSurf();
-		CalcHeatBalanceInsideSurf();
+		HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf();
+		HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
 
 		// Air simulation
 		InitAirHeatBalance();
