@@ -665,10 +665,14 @@ ZoneAirContaminantBalance,
        \object-list ScheduleNames
 
 ZoneAirMassFlowConservation,
-       \memo Enforces the zone air mass flow balance by adjusting zone mixing object flow rates.
-       \memo The infiltration object mass flow rate may also be adjusted or may add infiltration
-       \memo air flow to the base infiltration air flow for source zones only.
+       \memo Enforces the zone air mass flow balance by adjusting zone mixing object and/or
+       \memo infiltration object mass flow rates. 
+       \memo If either mixing or infiltration is active, then the zone air mass flow
+       \memo balance calculation will attempt to enforce conservation of mass for each zone.
+       \note If mixing is "No" and infiltration is "None", then the zone air mass flow 
+       \note calculation defaults to assume self-balanced simple flow mixing and infiltration objects.
        \unique-object
+       \min-fields 3
   A1,  \field Adjust Zone Mixing For Zone Air Mass Flow Balance
        \note If Yes, Zone mixing object flow rates are adjusted to balance the zone air mass flow
        \note and additional infiltration air flow may be added if required in order to balance the
@@ -677,35 +681,30 @@ ZoneAirMassFlowConservation,
        \key Yes
        \key No
        \default No
-       \note This optional choice input field allows users triggering the zone air mass flow
-       \note balance calculation when desired. This global object has two choice KEYs: "Yes" and
-       \note "No". If this input field is specified as "Yes", then EnergyPlus attempts to enforce
-       \note the zone air mass flow conservation, or else if it is specified as "No", then EnergyPlus
-       \note calculation defaults to zone air mass flow balance that does not include zone mixing
-       \note objects and that assumes self-balanced simple flow objects per the default procedure,
-       \note which may not necessarily enforce zone mass conservation unless the user specified
-       \note a balanced flow to begin with. Mass conservation is enforced both for the receiving
-       \note and source zones if there is at least one mixing object defined. The default input
-       \note is "No". (Note that "No" input may also results in balanced flow depending on the
-       \note system specified).
-  A2;  \field Source Zone Infiltration Treatment
+  A2,  \field Infiltration Balancing Method
        \note This input field allows user to choose how zone infiltration flow is treated during
        \note the zone air mass flow balance calculation.
        \type choice
        \key AddInfiltrationFlow
        \key AdjustInfiltrationFlow
+       \key None
        \default AddInfiltrationFlow
-       \note It has two choice KEYs: "AddInfiltrationFlow" and "AdjustInfiltrationFlow".  If this
-       \note input is specified as "AddInfiltrationFlow", then energy plus adds infiltration air
-       \note mass flow on top of the base flow, which is calculated using the infiltration object
-       \note user inputs, in order to balance the zone air mass flow.  The additional infiltration
-       \note air mass flow is not self-balanced.  If this input is specified as
-       \note "AdjustInfiltrationFlow", then energy plus may adjust the base flow calculated using
-       \note the infiltration object user inputs in order to balance the zone air mass flow. If it
-       \note is not required to adjust the base infiltration air flow calculated from the user
-       \note specified infiltration object inputs, then the base infiltration air mass flow
-       \note is assumed self-balanced. If the above input field specified as "No", then this input
-       \note field has no impact on the simulation.
+       \note AddInfiltrationFlow may add infiltration to the base flow specified in the
+       \note infiltration object to balance the zone air mass flow. The additional infiltration
+       \note air mass flow is not self-balanced. The base flow is assumed to be self-balanced.
+       \note AdjustInfiltrationFlow may adjust the base flow calculated using
+       \note the base flow specified in the infiltration object to balance the zone air mass flow. If it
+       \note If no adjustment is required, then the base infiltration is assumed to be self-balanced.
+       \note None will make no changes to the base infiltration flow.
+  A3;  \field Infiltration Balancing Zones
+       \note This input field allows user to choose which zones are included in infiltration balancing.
+       \note MixingSourceZonesOnly allows infiltration balancing only in zones which as source zones for mixing
+       \note which also have an infiltration object defined.
+       \note AllZones allows infiltration balancing in any zone which has an infiltration object defined.
+       \type choice
+       \key MixingSourceZonesOnly
+       \key AllZones
+       \default MixingSourceZonesOnly
 
 ZoneCapacitanceMultiplier:ResearchSpecial,
        \unique-object
@@ -22752,6 +22751,7 @@ AirflowNetwork:MultiZone:Zone,
       \memo both exterior and interior.
   A1, \field Zone Name
       \required-field
+      \reference AirFlowNetworkMultizoneZones
       \type object-list
       \object-list ZoneNames
       \note Enter the zone name where ventilation control is required.
@@ -24188,8 +24188,8 @@ AirflowNetwork:IntraZone:Node,
       \note object.
  A3 , \field Zone Name
       \required-field
-      \type alpha
-      \object-list AirflowNetwork:MultiZone:Zone
+      \type object-list
+      \object-list AirFlowNetworkMultizoneZones
       \note Enter the name of a zone object defined in a AirflowNetwork:MultiZone:Zone
       \note object.
  N1 ; \field Node Height
@@ -40530,9 +40530,22 @@ ZoneHVAC:EquipmentConnections,
   A5 , \field Zone Air Node Name
        \required-field
        \type node
-  A6 ; \field Zone Return Air Node Name
+  A6 , \field Zone Return Air Node Name
        \required-field
        \type node
+  A7 , \field Zone Return Air Flow Rate Fraction Schedule Name
+       \note This schedule is multiplied times the base return air flow rate.
+       \note If this field is left blank, the schedule defaults to 1.0 at all times.
+       \type object-list
+       \object-list ScheduleNames
+  A8 ; \field Zone Return Air Flow Rate Basis Node or NodeList Name
+       \note The optional basis node(s) used to calculate the base return air flow
+       \note rate for this zone. The return air flow rate is the sum of the flow rates
+       \note at the basis node(s) multiplied by the Zone Return Air Flow Rate Fraction Schedule.
+       \note If this  field is blank, then the base return air flow rate is the total supply  
+       \note inlet flow rate to the zone less the total exhaust node flow rate from the zone.
+       \type node
+       
 
 \group Fans
 !*****************AIR LOOP COMPONENTS*********************
@@ -51731,7 +51744,7 @@ AirLoopHVAC:UnitarySystem,
        \object-list CoolingCoilsWaterToAirHP
        \object-list CoolingCoilsWaterToAirVSHP
        \object-list CoolingCoilsWater
-       \object-list UserDefindedCoil
+       \object-list UserDefinedCoil
        \note Enter the name of the cooling coil if included in the unitary system.
   A16, \field Use DOAS DX Cooling Coil
        \type choice

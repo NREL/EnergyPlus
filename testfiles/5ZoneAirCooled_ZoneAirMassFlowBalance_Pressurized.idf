@@ -3,14 +3,16 @@
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !
-! 5ZoneAirCooled_ZoneAirMassFlowBalance.idf
+! 5ZoneAirCooled_ZoneAirMassFlowBalance_Pressurized.idf
 !
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
-! Highlights:              Zone Air Mass Flow Conservation calculation. The interior (core) zone is connected to each of the
+! Highlights:              Zone Air Mass Flow Conservation calculation with pressurized HVAC system. 
+!                          The interior (core) zone is connected to each of the
 !                          the four perimeter zones using ZoneMixing Objects.  Zone Mixing air flow from the perimeter zones
 !                          to the core zone is driven by an exhaust fan in the core zone. Additional infiltration is drawn in
-!                          to the perimeter zones when required to balance the zone air mass flow.
+!                          to the perimeter zones when required to balance the zone air mass flow. The return air flow is
+!                          reduced by 20% to pressurize the building. This reduces infiltration flow when the system is on.
 !
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
@@ -121,8 +123,8 @@
 
   ZoneAirMassFlowConservation,
     Yes,                     !- Adjust Zone Mixing For Zone Air Mass Flow Balance
-    AddInfiltrationFlow,     !- Infiltration Balancing Method
-    MixingSourceZonesOnly;   !- Infiltration Balancing Zones  
+    AdjustInfiltrationFlow,  !- Infiltration Balancing Method
+    AllZones;                !- Infiltration Balancing Zones  
     
   SurfaceConvectionAlgorithm:Inside,Simple;
 
@@ -659,14 +661,17 @@
     For: AllDays,            !- Field 2
     Until: 24:00,117.239997864; !- Field 3
 
-                             !- Field 4
-
   Schedule:Compact,
     ShadeTransSch,           !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.0;        !- Field 3
+
+  Schedule:Constant,
+    Always-0.8,              !- Name
+    Fraction,                !- Schedule Type Limits Name
+    0.8;                     !- Hourly Value
 
   Zone,
     PLENUM-1,                !- Name
@@ -2226,7 +2231,8 @@
     SPACE1-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Node,           !- Zone Air Node Name
-    SPACE1-1 Out Node;       !- Zone Return Air Node Name
+    SPACE1-1 Out Node,       !- Zone Return Air Node Name
+    Always-0.8;              !- Zone Return Air Flow Rate Fraction Schedule Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -2234,7 +2240,8 @@
     SPACE2-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Node,           !- Zone Air Node Name
-    SPACE2-1 Out Node;       !- Zone Return Air Node Name
+    SPACE2-1 Out Node,       !- Zone Return Air Node Name
+    Always-0.8;              !- Zone Return Air Flow Rate Fraction Schedule Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
@@ -2242,7 +2249,8 @@
     SPACE3-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Node,           !- Zone Air Node Name
-    SPACE3-1 Out Node;       !- Zone Return Air Node Name
+    SPACE3-1 Out Node,       !- Zone Return Air Node Name
+    Always-0.8;              !- Zone Return Air Flow Rate Fraction Schedule Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
@@ -2250,7 +2258,8 @@
     SPACE4-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE4-1 Node,           !- Zone Air Node Name
-    SPACE4-1 Out Node;       !- Zone Return Air Node Name
+    SPACE4-1 Out Node,       !- Zone Return Air Node Name
+    Always-0.8;              !- Zone Return Air Flow Rate Fraction Schedule Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
@@ -2258,7 +2267,8 @@
     SPACE5-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     SPACE5-1 Exhaust Fan Node,  !- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Node,           !- Zone Air Node Name
-    SPACE5-1 Out Node;       !- Zone Return Air Node Name
+    SPACE5-1 Out Node,       !- Zone Return Air Node Name
+    Always-0.8;              !- Zone Return Air Flow Rate Fraction Schedule Name
 
   ZoneControl:Thermostat,
     SPACE1-1 Control,        !- Name
