@@ -35,18 +35,17 @@ set( test_src
   HeatRecovery.unit.cc
   Humidifiers.unit.cc
   HVACControllers.unit.cc
-  HVACSizingSimulationManager.unit.cc 
   HVACFourPipeBeam.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
+  HVACUnitarySystem.unit.cc
+  HVACVariableRefrigerantFlow.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
   ManageElectricPower.unit.cc
-  HVACUnitarySystem.unit.cc
-  HVACVariableRefrigerantFlow.unit.cc
   MixedAir.unit.cc
   MixerComponent.unit.cc
   PurchasedAirManager.unit.cc
