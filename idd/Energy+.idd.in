@@ -39429,7 +39429,9 @@ AirTerminal:SingleDuct:ConstantVolume:CooledBeam,
        \default 0.0145
 
 AirTerminal:SingleDuct:InletSideMixer,
-       \memo Mix 2 inlet air streams into one outlet stream.
+       \memo The inlet side mixer air terminal unit provides a means of supplying central system air 
+       \memo to the air inlet of a zone AC unit such as a four pipe fan coil. Normally the central air 
+       \memo would be ventilation air from a dedicated outdoor air system (DOAS).
    A1, \field Name
        \required-field
    A2, \field ZoneHVAC Terminal Unit Object Type   
@@ -39443,13 +39445,18 @@ AirTerminal:SingleDuct:InletSideMixer,
        \object-list DOAToZonalUnit
    A4, \field Terminal Unit Outlet Node Name
        \required-field
+       \type node
    A5, \field Terminal Unit Primary Air Inlet Node Name
        \required-field
+       \type node
    A6; \field Terminal Unit Secondary Air Inlet Node Name
        \required-field
+       \type node
 
 AirTerminal:SingleDuct:SupplySideMixer,
-       \memo Mix 2 inlet air streams into one outlet stream.
+       \memo The supply side mixer air terminal unit provides a means of supplying central system air 
+       \memo to the air outlet of a zone AC unit such as a four pipe fan coil. Normally the central air 
+       \memo would be ventilation air from a dedicated outdoor air system (DOAS).
    A1, \field Name
        \required-field
    A2, \field ZoneHVAC Terminal Unit Object Type
@@ -39463,9 +39470,13 @@ AirTerminal:SingleDuct:SupplySideMixer,
        \object-list DOAToZonalUnit
    A4, \field Terminal Unit Outlet Node Name
        \required-field
+       \type node
    A5, \field Terminal Unit Primary Air Inlet Node Name
        \required-field
+       \type node
    A6; \field Terminal Unit Secondary Air Inlet Node Name
+       \required-field
+       \type node
 
 AirTerminal:DualDuct:ConstantVolume,
        \memo Central air system terminal unit, dual duct, constant volume.
