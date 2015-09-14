@@ -4101,11 +4101,6 @@ namespace DXCoils {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 							ShowContinueError( "...not found " + cAlphaFields( 18 + ( I - 1 ) * 6 ) + "=\"" + Alphas( 18 + ( I - 1 ) * 6 ) + "\"." );
 						}
-<<<<<<< .mine
-//						ErrorsFound = true;
-=======
-						ErrorsFound = true;
->>>>>>> .theirs
 					} else {
 						// Verify Curve Object, only legal types are BiQuadratic
 						{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSWasteHeat( I ) ) );
