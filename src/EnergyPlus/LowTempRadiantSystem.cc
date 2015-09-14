@@ -1998,6 +1998,12 @@ namespace LowTempRadiantSystem {
 					if ( CapSizingMethod == HeatingDesignCapacity && ElecRadSys( RadSysNum ).ScaledHeatingCapacity > 0.0 ) {
 						TempSize = ElecRadSys( RadSysNum ).ScaledHeatingCapacity;
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						DesCoilLoad = TempSize;
+					} else if ( CapSizingMethod == CapacityPerFloorArea ) {
+						DataScalableCapSizingON = true;
+						TempSize = ElecRadSys( RadSysNum ).ScaledHeatingCapacity * Zone( ElecRadSys( RadSysNum ).ZonePtr ).FloorArea;
+						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						DesCoilLoad = TempSize;
 					}
 				} else {
 					if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
@@ -2064,6 +2070,11 @@ namespace LowTempRadiantSystem {
 				if ( !IsAutoSize && !ZoneSizingRunDone ) { // simulation continue
 					if ( CapSizingMethod == HeatingDesignCapacity && HydrRadSys( RadSysNum ).ScaledHeatingCapacity > 0.0 ) {
 						TempSize = HydrRadSys( RadSysNum ).ScaledHeatingCapacity;
+						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						DesCoilLoad = TempSize;
+					} else if ( CapSizingMethod == CapacityPerFloorArea ) {
+						DataScalableCapSizingON = true;
+						TempSize = HydrRadSys( RadSysNum ).ScaledHeatingCapacity * Zone( HydrRadSys( RadSysNum ).ZonePtr ).FloorArea;
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 						DesCoilLoad = TempSize;
 					}
@@ -2178,6 +2189,11 @@ namespace LowTempRadiantSystem {
 				if ( !IsAutoSize && !ZoneSizingRunDone ) { // simulation continue
 					if ( CapSizingMethod == CoolingDesignCapacity && HydrRadSys( RadSysNum ).ScaledCoolingCapacity > 0.0 ) {
 						TempSize = HydrRadSys( RadSysNum ).ScaledCoolingCapacity;
+						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						DesCoilLoad = TempSize;
+					} else if ( CapSizingMethod == CapacityPerFloorArea ) {
+						DataScalableCapSizingON = true;
+						TempSize = HydrRadSys( RadSysNum ).ScaledCoolingCapacity * Zone( HydrRadSys( RadSysNum ).ZonePtr ).FloorArea;
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 						DesCoilLoad = TempSize;
 					}

@@ -1872,11 +1872,11 @@ namespace ReportSizingManager {
 				if ( SELECT_CASE_var == SupplyAirFlowRate || SELECT_CASE_var == None ) {
 					ScalableSM = "User-Specified (scaled by flow / zone) ";
 				} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
-					ScalableSM = "User-Specified(scaled by flow / area) ";
+					ScalableSM = "User-Specified (scaled by flow / area) ";
 				} else if ( SELECT_CASE_var == FractionOfAutosizedCoolingAirflow || SELECT_CASE_var == FractionOfAutosizedHeatingAirflow ) {
-					ScalableSM = "User-Specified(scaled by fractional multiplier) ";
+					ScalableSM = "User-Specified (scaled by fractional multiplier) ";
 				} else if ( SELECT_CASE_var == FlowPerCoolingCapacity || SELECT_CASE_var == FlowPerHeatingCapacity ) {
-					ScalableSM = "User-Specified(scaled by flow / capacity) ";
+					ScalableSM = "User-Specified (scaled by flow / capacity) ";
 				} else {
 					ScalableSM = "Design Size ";
 				}}
@@ -1889,9 +1889,9 @@ namespace ReportSizingManager {
 				ScalableSM = "User-Specified ";
 				if ( SizingResult == AutoSize ) ScalableSM = "Design Size ";
 			} else if ( SELECT_CASE_var == CapacityPerFloorArea ) {
-				ScalableSM = "User-Specified(scaled by capacity / area) ";
+				ScalableSM = "User-Specified (scaled by capacity / area) ";
 			} else if ( SELECT_CASE_var == FractionOfAutosizedHeatingCapacity || SELECT_CASE_var == FractionOfAutosizedCoolingCapacity ) {
-				ScalableSM = "User-Specified(scaled by fractional multiplier) ";
+				ScalableSM = "User-Specified (scaled by fractional multiplier) ";
 			} else {
 				ScalableSM = "Design Size ";
 			}
