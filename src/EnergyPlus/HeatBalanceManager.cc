@@ -5080,6 +5080,7 @@ namespace HeatBalanceManager {
 		using namespace DataReportingFlags;
 		using DataGlobals::KindOfSim;
 		using DataGlobals::ksHVACSizeDesignDay;
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -5102,7 +5103,7 @@ namespace HeatBalanceManager {
 		// Time step level reporting:
 
 		ReportScheduleValues();
-		if ( ! WarmupFlag && DoOutputReporting ) {
+		if ( !WarmupFlag && DoOutputReporting ) {
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );
 			if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ) {
