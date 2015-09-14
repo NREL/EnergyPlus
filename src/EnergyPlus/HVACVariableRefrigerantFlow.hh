@@ -1404,6 +1404,11 @@ namespace HVACVariableRefrigerantFlow {
 	void
 	GetVRFInput();
 
+	void
+	GetVRFInputData(
+		bool & ErrorsFound // flag for errors in GetInput
+	);
+
 	// End of Get Input subroutines for the Module
 	//******************************************************************************
 

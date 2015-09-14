@@ -48,6 +48,8 @@ namespace PlantPressureSystem {
 	//PUBLIC GetPressureCurveTypeAndIndex
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimPressureDropSystem(

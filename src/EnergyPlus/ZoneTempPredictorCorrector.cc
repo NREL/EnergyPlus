@@ -197,7 +197,7 @@ namespace ZoneTempPredictorCorrector {
 	void
 	clear_state()
 	{
-	
+
 		NumSingleTempHeatingControls = 0;
 		NumSingleTempCoolingControls = 0;
 		NumSingleTempHeatCoolControls = 0;
@@ -2756,7 +2756,7 @@ namespace ZoneTempPredictorCorrector {
 							for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
 								RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempT1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX;
 								RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatW1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX;
-							}
+					}
 						}
 					}
 					ShortenTimeStepSysRoomAir = true;
@@ -2767,7 +2767,7 @@ namespace ZoneTempPredictorCorrector {
 						for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
 							RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempT1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTemp;
 							RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatW1 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRat;
-						}
+				}
 					}
 				}
 				TempDepZnLd( ZoneNum ) = TempDepCoef;
@@ -3311,7 +3311,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		ZoneSetPointLast( ZoneNum ) = ZoneSetPoint;
-//		TempZoneThermostatSetPoint( ZoneNum ) = ZoneSetPoint; // needed to fix Issue # 5048
+		TempZoneThermostatSetPoint( ZoneNum ) = ZoneSetPoint; // needed to fix Issue # 5048
 
 		// Save the unmultiplied zone load to a report variable
 		SNLoadPredictedRate( ZoneNum ) = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired * LoadCorrectionFactor( ZoneNum );
@@ -4115,7 +4115,7 @@ namespace ZoneTempPredictorCorrector {
 						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWM2 = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX;
 						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRat;
 //						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatW1;
-					}
+			}
 				}
 			}
 		} // zone loop

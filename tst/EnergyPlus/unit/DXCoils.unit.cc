@@ -780,6 +780,29 @@ namespace EnergyPlus {
 
 	}
 
+	TEST_F( HVACFixture, TestCalcCBF ) {
+		using DataEnvironment::StdPressureSeaLevel;
+		const std::string CoilType( "Coil:WaterHeating:AirToWaterHeatPump:Wrapped" );
+		const std::string CoilName( "The Coil" );
+		const Real64 InletDBTemp( 19.722222222222221 );
+		const Real64 InletWBTemp( 13.078173565729553 );
+		Real64 InletAirHumRat;
+		const Real64 TotalCap( 1303.5987246916557 );
+		const Real64 AirVolFlowRate( 0.085422486640000003 );
+		Real64 AirMassFlowRate;
+		const Real64 SHR( 0.88 );
+		Real64 AirPressure;
+		Real64 CBF_expected;
+		Real64 CBF_calculated;
+
+		AirPressure = StdPressureSeaLevel;
+		InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(InletDBTemp, InletWBTemp, AirPressure );
+		AirMassFlowRate = AirVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW( AirPressure, InletDBTemp, InletAirHumRat );
+		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, AirPressure );
+		CBF_expected = 0.17268167698750708;
+		EXPECT_DOUBLE_EQ( CBF_calculated, CBF_expected );
+	}
+
 	TEST_F( HVACFixture, DXCoilEvapCondPumpSizingTest ) {
 		
 		// tests autosizing evaporatively cooled condenser pump #4802

@@ -4011,79 +4011,92 @@ The temperature of the air which is discharged from the thermal chimney through 
 
 ### ZoneAirMassFlowConservation
 
-This global object allows users to trigger the zone air mass flow conservation calculation when desired. This object has two input fields; the first choice input field allows the user whether to enforce or not to enforce the zone air mass flow conservation; and the second input field allows the user to specify how infiltration object mass flow rate is calculated for zone air mass flow balance calculation.  The first input field of this object has two choice KEYs: “Yes” and “No”. If this input is specified as “Yes”, then energy plus attempts to enforce the zone mass conservation, or else if it is specified as “No”, then EnergyPlus calculation defaults to zone air flow balance calculation that does not include zone mixing objects and that assumes self-balanced simple flow objects procedure, which may not necessarily enforce zone air mass flow conservation unless the user has specified a balanced flow to begin with. The zone air mass flow conservation primarily accounts for the zonemixing objects air flow in the zone air flow mass balance calculation. In additional to the zonemixing object flow, the procedure accounts for zone exhaust fan flows by providing additional infiltration air flows when required in order to balance the zone air mass flow.  Hence, zonemixing object must to be defined to trigger zone air mass flow conservation calculation, whereas infiltration object is required only for zones which are used as a source zone of the zone mixing object.  Zone air mass flow balance calculation is enforced both for the receiving and source zones of every mixing object defined. The zone air mass flow conservation calculation uses two steps procedure.
+This global object allows users to trigger the zone air mass flow conservation calculation when desired. This object has three input fields; the first choice input field allows the user whether to adjust mixing flows to enforce the zone air mass flow conservation; and the other fields allows the user to specify how infiltration object mass flow rate is calculated for zone air mass flow balance calculation.  If adjustments for either mixing or infiltration is specified then the zone air mass balance attempts to enforce conservation. If both mixing and infiltration adjustments are off, then the zone air mass flow calculation uses the default method which does not include zone mixing objects and assumes self-balanced simple infiltration. The default method may not necessarily enforce zone air mass flow conservation unless the user has specified a balanced flow to begin with. The zone air mass flow conservation primarily accounts for the zonemixing objects air flow in the zone air flow mass balance calculation. In addition to the zonemixing object flow, the procedure accounts for zone supply, exhaust, and return flows and adjusts infiltration air flows (up or down) when required in order to balance the zone air mass flow.  Mixing and infiltration adjustments will only be made in zones which have zonemixing or infiltration objects defined in the input. For example, if a zone does not have any infiltration objects, then no infiltration adjustment will be made for that zone.
 
-First, the ZoneMixing object mass flow rate is adjusted or modified in order to balance zone air mass flow while assuming the zone infiltration object air mass flow self-balanced. This step will always results in balanced zone air mass for receiving zones of ZoneMixing object but it may not necessarily result in a balanced air mass flow for source zones.  Infiltration objects air mass flow rate defined for receiving zones are always calculated based on user inputs and assumed to be self-balanced. The infiltration mass flow rate of zones that serve only as a source zone may require adjusting base infiltration flow, which is calculated based on user inputs in the infiltration objects, in order to balance the zone air mass flow, i.e., the second calculation step replenishes the source zones with additional infiltration air mass flow when required. This second step is required in zones which serve as a source zone for zone mixing objects and when the zone mixing source mass flow rate exceeds the supply air mass flow rate.  There are two calculation procedures that users can choose from on how the infiltration flow rate is calculated for source zones that need infiltration object mass flow in order to balance the zone air mass flow.  The second optional input field “Source Zone Infiltration Treatment” provides two Key choice inputs: “**AddInfiltrationFlow**” and “**AdjustInfiltrationFlow**”.
+First, the ZoneMixing object mass flow rate is adjusted or modified in order to balance zone air mass flow while assuming any zone infiltration objects are self-balanced. This step will always results in balanced zone air mass for receiving zones of ZoneMixing object but it may not necessarily result in a balanced air mass flow for source zones.  
 
-**AddInfiltrationFlow**: Energyplus adds infiltration air mass flow rate on top of the base infiltration flow, which is calculated using the infiltration object user inputs, in order to balance the zone air mass flow.  This additional infiltration air mass flow is not self-balanced, i.e., it is always assumed incoming flow. If no infiltration air is required in order to be balance the zone air mass flow, then the additional infiltration air mass flow rate is set to zero. The base infiltration flow calculated using the infiltration object user inputs is always assumed to be self-balanced.
+Second, infiltration flow rates are adjusted accoring to the options set. Infiltration flow will be increased or decreased to balance the net flow from supply, exhaust, mixing, and return air flows. If a negative infiltration rate (exfiltration) is required to balance a zone's airflow, then the infiltration rate will be set to zero. This can happen, for example, if the total supply flow exceeds the total exahust plus return flow. 
 
-**AdjustInfiltrationFlow**: Energyplus may adjust the base flow calculated using the infiltration object user inputs if it is required in order to balance the zone air mass flow.  If it is not required to adjust the base infiltration air flow, then the base infiltration air mass flow, which is calculated from user input of the infiltration object, is retained and assumed self-balanced. The report variable “Zone Infiltration Air Mass Flow Balance Status” indicates whether the infiltration object air mass flow is adjusted or not.  If the value of this report variable is **0**, then the zone infiltration object mass flow rate is not included in the zone mass flow balance hence the infiltration air flow rate calculated based on the user specified inputs is manintained as is and assumed self-balanced for current timestep.  If the value of this report variable is 1, then the zone infiltration object mass flow rate is included in the zone mass flow balance, hence the user specified infiltration rate is modified and it is considered as incoming flow to the zone, i.e., self-balanced assumption is not valid for current time step.
-
-This object is optional, only required in the input data file if the user wishes to enforce the zone air mass flow balance calculation that includes zonemixing and infiltration objects.
+This object is optional. If it is not present in the input file, the default zone air mass flow calculastion are used which do not account for zonemixing and infiltration flows.
 
 
 
 #### Field: Adjust Zone Mixing For Zone Air Mass Flow Balance
 
-It has two choice KEYs: “Yes” and “No”.  If this input is specified as “Yes”, then Energyplus attempts to enforce the zone mass conservation, or else if it is specified as “No”, then EnergyPlus calculation defaults to the existing procedure, which may not necessarily enforce zone mass conservation unless the user specified a balanced flow to begin with.  The default input is “No”.  Note that “No” input may also results in balanced flow depending on the system specified. If this input field is specified as “No”, then the next input field it not used.
+This field has two choices: *Yes* or *No*.  When set to *Yes*, the zone air mass flow balance attempts to enforce conservation by adjusting zone mixing flow rates. When set to *No*, mixing flow rates are not adjusted; the mixing flows specified in ZoneMixing obects will be used.  The default is *No*.
 
-#### Field: Source Zone Infiltration Treatment
+#### Field: Infiltration Balancing Method
 
-It has two choice KEYs: “AddInfiltrationFlow” and “AdjustInfiltrationFlow”.  If this input is specified as “AddInfiltrationFlow”, then Energyplus adds infiltration air mass flow on top of the base infiltration flow calculated using the infiltration object user inputs in order to balance the zone air mass flow.  The additional infiltration air mass flow is not self-balanced.  If this input is specified as “AdjustInfiltrationFlow”, then Energyplus may adjust the base flow calculated using the infiltration object user inputs if it is required inorder to balance the zone air mass flow.  If it not required to adjust the base infiltration flow calculated using the user specified infiltration object inputs, then the base infiltration air mass flow is assumed self-balanced.
+This field has three choices: *AddInfiltrationFlow*, *AdjustInfiltrationFlow*, or *None*. The default is *AddInfiltrationFlow*. With all three options, the base infiltration flow rate is the flow specified in all Infiltration:\* objects for a given zone.
 
-And, a default IDF example is shown below:
+*AddInfiltrationFlow*: The base infiltration flow may be increased in order to balance the zone air mass flow.  This additional infiltration air mass flow is not self-balanced, i.e., it is always assumed to be incoming flow which leaves by exahust, mixing, or return. If no infiltration air is required in order to balance the zone air mass flow, then the additional infiltration air mass flow rate is set to zero. For this option, the base infiltration flow is always assumed to be self-balanced (i.e., exfiltration = infiltration) and is not included in the zone air mass flow balance.
+
+*AdjustInfiltrationFlow*: The base infiltration flow may be increased or decreased in order to balance the zone air mass flow. If no infiltration is required to balance the zone air flow, then the base infiltration flow rate is retained and assumed to be self-balanced (i.e., exfiltration = infiltration). If the required infiltration flow rate is negative (exfiltration), then the infiltration flow rate is set to zero and surplus flow in the zone is assumed to leave as exfiltration.
+
+*None*: The base infiltration flow is always assumed to be self-balanced (i.e., exfiltration = infiltration) and is not included in the zone air mass flow balance. No changes are made to the base infiltration flow rate.
+
+#### Field: Infiltration Balancing Zones
+This field allows user to choose which zones are included in infiltration balancing. There are two choices: *MixingSourceZoneOnly* or *AllZones*.
+
+*MixingSourceZonesOnly*: Infiltration balancing is active only in zones which are source zones for mixing and which have a base infiltration object defined.
+
+*AllZones*: Infiltration balance is active in any zone which has a base infiltration object defined.
+ 
+
+An IDF example is shown below:
 
 ```idf
 ZoneAirMassFlowConservation,
   Yes,                       !- Adjust Zone Mixing For Zone Air Mass Flow Balance
-  AdjustInfiltrationFlow;    !- Source Zone Infiltration Treatment
+  AdjustInfiltrationFlow;    !- Infiltration Balancing Method
+  AllZones;                  !- Infiltration Balancing Zones
 ```
 
 ### ZoneAirMassFlowConservation Outputs
 
-Current ZoneAirMassFlowConservation output variables:
+Current ZoneAirMassFlowConservation output variables (only applicable variables will be generated):
 
-* HVAC, Average, Zone Supply Air Mass Flow Rate [kg/s]
+* HVAC, Average, Zone Air Mass Balance Supply Mass Flow Rate [kg/s]
 
-* HVAC, Average, Zone Exhaust Air Mass Flow Rate [kg/s]
+* HVAC, Average, Zone Air Mass Balance Exhaust Mass Flow Rate [kg/s]
 
-* HVAC, Average, Zone Return Air Mass Flow Rate [kg/s]
+* HVAC, Average, Zone Air Mass Balance Return Mass Flow Rate [kg/s]
 
-* HVAC, Average, Zone Mixing Receiving Air Mass Flow Rate [kg/s]
+* HVAC, Average, Zone Air Mass Balance Mixing Receiving Mass Flow Rate [kg/s]
 
-* HVAC, Average, Zone Mixing Source Air Mass Flow Rate [kg/s]
+* HVAC, Average, Zone Air Mass Balance Mixing Source Mass Flow Rate [kg/s]
 
 * HVAC, Average, Zone Infiltration Air Mass Flow Balance Status, []
 
 * HVAC, Average, Zone Mass Balance Infiltration Air Mass Flow Rate, [kg/s]
 
-#### Zone Supply Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Supply Mass Flow Rate [kg/s]
 
 This output variable represents the total supply air mass flow rate of a zone. The value is determined by summing the supply air mass flow rates contributions from all supply air inlet nodes of a zone.
 
-#### Zone Exhaust Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Exhaust Mass Flow Rate [kg/s]
 
 This output variable represents the total exhaust air mass flow rate of a zone. The value is determined by summing the exhaust air mass flow rates contributions from all exhaust air nodes of a zone.
 
-#### Zone Return Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Return Mass Flow Rate [kg/s]
 
 This output variable represents the total return air mass flow rate of a zone. The value is determined by summing the return air mass flow rates contributions from return air nodes of a zone.
 
-#### Zone Mixing Receiving Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Mixing Receiving Mass Flow Rate [kg/s]
 
 This output variable represents the total zone mixing air mass flow rate of a receiving zone from one or more mixing objects. The value is determined by summing the air mass flow contributions from all zone mixing objects connected to a single receiving zone.
 
-#### Zone Mixing Source Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Mixing Source Mass Flow Rate [kg/s]
 
 This output variable represents the total zone mixing source air mass flow rate of a source zone feeding one or more mixing objects. The value is determined by summing the air mass flow contributions from all zone mixing objects connected to a single source zone.
 
-#### Zone Infiltration Air Mass Flow Balance Status []
+#### Zone Air Mass Balance Infiltration Status []
 
-This output variable indicates the status of the infiltration object mass flow rate use for balancing the zone mass flow at each time step. It has values of either **0** or **1**.  If the value of this report variable is **0** then the zone infiltration object mass flow rate is not used in the zone mass conservation calculation, hence the infiltration rate calculated based on the user specified inputs is manintained and the infiltration rate is assumed as self-balanced for current timestep.  If the value is 1 then the zone infiltration object mass flow rate is included in the zone air mass flow balance calculation, hence the user specified infiltration rate is modified and it is considered as incoming flow to the zone, i.e., self-balanced assumption is not valid for this zone and current time step.
+This output variable indicates the status of the infiltration object mass flow rate use for balancing the zone mass flow at each time step. It has values of either **0** or **1**.  If the value of this report variable is **0** then the zone infiltration object mass flow rate is not used in the zone mass conservation calculation, hence the infiltration rate calculated based on the user specified inputs is manintained and the infiltration rate is assumed as self-balanced for the current timestep.  If the value is 1 then the zone infiltration object mass flow rate is included in the zone air mass flow balance calculation, hence the user specified infiltration rate is modified and it is considered as incoming flow to the zone, i.e., self-balanced assumption is not valid for this zone and current time step.
 
-#### Zone Mass Balance Infiltration Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Infiltration Mass Flow Rate [kg/s]
 
-This output variable represents the zone infiltration air mass flow rate in kg/s.  This output variable is reported only for source zones and when the zone air mass flow balance flag is set to “Yes” and its value depends on the “Source Zone Infiltration Treatment” method specified.  When the infiltration treatment method selected is “AddInfiltrationFlow” this report variable represents additional infiltration air mass flow rate added on top of the base infiltration air flow calculated using the user inputs inroder to balance the zone air mass flow. In this case, the base infiltration air mass flow calculated using the user specified input is assumed self-balanced.  When the infiltration treatment method selected is “AdjustInfiltrationFlow” this report variable represents the base infiltration air mass flow calculated using the user inputs and can be adjuted as needed in roder to balance the zone air mass flow. If the value of the output variable “Zone Infiltration Air Mass Flow Balance Status” is **0**, then the infiltration air mass flow rate calculated based on the user specified inputs is manintained and the infiltration rate is assumed as self-balanced for current timestep, or else  if Zone Infiltration Air Mass Flow Balance Status” is **1**, then user specified infiltration rate is adjusted and it is considered as incoming flow to the zone, i.e., self-balanced assumption is not valid for this zone and current time step.
+This output variable represents the zone infiltration air mass flow rate in kg/s.  This output variable is reported only for source zones and when the zone air mass flow balance is active.  Its value depends on the Infiltration Balancing Method specified.  When the infiltration method is *AddInfiltrationFlow* this output represents the additional infiltration air mass flow rate added on top of the base infiltration air flow in order to balance the zone air mass flow. In this case, the base infiltration air mass flow calculated using the user specified input is assumed self-balanced.  When the infiltration method is *AdjustInfiltrationFlow* and the value of "Zone Air Mass Balance Infiltration Status" is **1**, this output represents the infiltration air mass flow rate required to balance the zone air mass flow. This value could be negative if the zone supply exceeds all other outflows. If the value of "Zone Air Mass Balance Infiltration Status" is **0**, then this output is the self-balanced base infiltration flow rate for current timestep.
 
 Group – Design Objects
 ----------------------
@@ -8319,19 +8332,13 @@ This alpha field is used as an identifying field for the pipe.
 
 This references a Material object that contains the soil properties and thickness.  Note that when defining the soil layer, the thickness should be the thickness of soil between the pipe wall and the ground surface.
 
-#### Field: Average Soil Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-If a Site:GroundTemperature:Shallow object is not given in the input, this is \#1 of 3 inputs that must be given directly.  This represents the annual average soil temperature above the pipe.  This field can be calculated in advance using the separate CalcSoilSurfTemp program.
+This is the type of undisturbed ground temperature object that is used to determine the ground temperature.
 
-#### Field: Amplitude of Soil Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-If a Site:GroundTemperature:Shallow object is not given in the input, this is \#2 of 3 inputs that must be given directly.  This represents the annual average soil temperature variation from the average temperature itself.  For example, if this were represented as a sine wave, this would simply be the amplitude of the curve.  This field can be calculated in advance using the separate CalcSoilSurfTemp program.
-
-#### Field: Phase Constant of Soil Surface Temperature
-
-If a Site:GroundTemperature:Shallow object is not given in the input, this is \#3 of 3 inputs that must be given directly.  This represents the time elapsed from the beginning of the year to the date of minimum surface temperature.  For example, if this were represented as a sine wave, this would simply be the phase shift of the curve.  This field can be calculated in advance using the separate CalcSoilSurfTemp program
-
-In order to avoid having to run the preprocessor program to generate soil temperature, the user may choose to simply input a GroundTemperatures:Surface object.  This object inputs average monthly surface temperatures.  These temperatures are then used within the model to develop average ground surface data.  This ground surface data can then be used as part of the model boundary condition set.  Without a set of surface ground temperatures, the model will require user input of the three last input fields.
+This is the name of the undisturbed ground temperature object that is used to determine the ground temperature.
 
 An example of this object in an IDF is:
 
@@ -8346,9 +8353,8 @@ Pipe:Underground,
     0.05,                               !- Pipe Inside Diameter    
     20.0,                               !- Pipe Length
     Buried Pipe Soil,                   !- Soil Material
-    13,                                 !- Average Soil Surface Temperature
-    1.5,                                !- Amplitude of Soil Surface Temperature
-    30;                                 !- Phase Constant of Soil Surface Temperature
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps;                            !- Name of Undisturbed Ground Temperature Object
 
   Construction,
     Insulated Buried Pipe,              !- Name
@@ -8485,17 +8491,13 @@ A nominal value of soil moisture content to be used when evaluating soil thermal
 
 A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil
 
-#### Field: Kusuda-Achenbach Average Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-The annual average surface temperature to be applied to the Kusuda-Achenbach farfield boundary temperature correlation.
+The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
-#### Field: Kusuda-Achenbach Average Amplitude of Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-The annual average surface temperature variation from average.  This is also used in the Kusuda-Achenbach temperature correlation.
-
-#### Field: Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-
-The phase shift of minimum surface temperature, or the day of the year when the minimum surface temperature occurs.
+The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
 #### Field: This Domain Includes Basement Surface Interaction
 
@@ -8648,9 +8650,8 @@ An example of this object in an IDF is offered here for a foundation heat exchan
     2576,                    !- GroundSpecificHeat
     30,                      !- MoistureContent
     50,                      !- MoistureContentAtSaturation
-    15.5,                    !- KusudaGroundTemp
-    12.8,                    !- KusudaGroundTempAmplitude
-    17.3,                    !- KusudaPhaseShift
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps,                 !- Name of Undisturbed Ground Temperature Object
     Yes,                     !- DomainHasBasement
     6,                       !- BasementWidthInDomain
     2.5,                     !- BasementDepthInDomain
