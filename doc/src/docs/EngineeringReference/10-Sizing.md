@@ -314,7 +314,23 @@ As described in the preceding section, the Sizing Manager initiates the zone des
 
 In module *HVACManager*, subroutine *ManageHVAC* calls *SimHVAC*. *SimHVAC* checks *ZoneSizingCalc*. If it is *true*, *SimHVAC* calls *ManageZoneEquipment* and returns, rather than simulating the actual system. In turn *ManageZoneEquipment* checks if *ZoneSizingCalc* is *true*; if it is it calls *SizeZoneEquipment* rather than *SimZoneEquipment*.
 
-*SizeZoneEquipment* assumes that each controlled zone is served by an ideal air conditioning unit. This unit supplies heating or cooling air at a fixed, user input temperature and humidity (specified in the Sizing:Zone objects). The units have infinite capacity â€“ the flow rate can be any amount. The calculation steps are as follows.
+*SizeZoneEquipment* assumes that each controlled zone is served by an ideal air conditioning unit. This unit supplies heating or cooling air at a fixed, user input temperature and humidity (specified in the Sizing:Zone objects). The units have infinite capacity: the flow rate can be any amount.
+
+Before the ideal zone load is calculated, the function checks whether the user wants to account for the heat gain or loss caused by the ventilation air from a Dedicated Outdoor Air System (DOAS). If the user has selected *Account For Dedicated Outdoor Air = Yes* the function performs an ideal DOAS calculation. The DOAS supply temperature is set according to the user's choice of 1 of 3 possible control strategies: *NeutralSupplyAir*, *NeutralDehumidifiedSupplyAir*, or *ColdSupplyAir*. The different strategies are:
+
+  - *DOAS Control Strategy = NeutralSupplyAir*. The purpose of this strategy is to cool or heat the outdoor air (OA) to keep it between the *T<sub>l</sub>* and *T<sub>h</sub>* setpoints.
+
+  - *DOAS Control Strategy = Neutral Dehumidified Supply Air*. The purpose of this strategy is to cool and dehumidify the outdoor air, then reheat it to a “neutral” temperature so that no sensible load is imposed on the space or AHU unit. The DOAS will with this strategy handle some or all of the latent load. If the outdoor air temperature is greater than *T<sub>l</sub>* the outdoor air is cooled to *T<sub>l</sub>* and reheated to *T<sub>h</sub>*. If the outdoor air temperaure is below *T<sub>l</sub>* it is heated to *T<sub>h</sub>*.
+
+  - *DOAS Control Strategy = ColdSupplyAir*. The purpose of this strategy is to provide cool, dehumidified ventilation air to the zone. In this case the DOAS can handle part of the sensible zone cooling load as well as meet part or all of the latent load. If the outdoor air temperature is below *T<sub>l</sub>* it is heated to *T<sub>h</sub>*. If it is above *T<sub>l</sub>*, it is heated to *T<sub>l</sub>*.
+
+With the DOAS supply temperature set and the air mass flow rate set to the minimum design ventilation flow rate the heat addition rate is just 
+
+<div>$${\dot Q_{doa}} = {c_{p,air}}{\dot m_{vent,min}}({T_{sup}} - {T_z})$$</div>
+
+*UpdateSSystemOutputRequired* is then invoked to adjust the load to be met by the ideal zone system.
+
+The ideal loads calculation steps are as follows.
 
 1)Â Â Â Â Loop over all the controlled zones.
 

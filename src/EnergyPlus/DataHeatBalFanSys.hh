@@ -113,7 +113,6 @@ namespace DataHeatBalFanSys {
 
 	extern Array1D_bool ZoneMassBalanceFlag;  // zone mass flow balance flag
 	extern Array1D_bool ZoneInfiltrationFlag; // Zone Infiltration flag
-	extern Array1D_bool ZoneMassBalanceRepVarFlag; // zone mass flow balance reporting flag
 	extern Array1D_int ZoneReOrder;           // zone number reordered for zone mass balance
 
 	//REAL Variables for the Heat Balance Simulation
@@ -219,6 +218,9 @@ namespace DataHeatBalFanSys {
 
 	// Object Data
 	extern Array1D< ZoneComfortControlsFangerData > ZoneComfortControlsFanger;
+
+	void
+	clear_state();
 
 } // DataHeatBalFanSys
 

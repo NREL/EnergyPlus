@@ -5826,7 +5826,7 @@ namespace SurfaceGeometry {
 			if ( ExtVentedCavity( Item ).PlenGapThick <= 0.0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + ExtVentedCavity( Item ).Name + "\", invalid ." );
 				ErrorsFound = true;
-				ShowContinueError( "...because Plenum gap must be greater than Zero=[" + TrimSigDigits( rNumericArgs( 5 ), 2 ) + "]." );
+				ShowContinueError( "...because field \"" + cNumericFieldNames( 5 ) + "\" must be greater than Zero=[" + TrimSigDigits( rNumericArgs( 5 ), 2 ) + "]." );
 				continue;
 			}
 			ExtVentedCavity( Item ).AreaRatio = rNumericArgs( 6 );

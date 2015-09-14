@@ -91,6 +91,15 @@ namespace BranchInputManager {
 
 	std::string CurrentModuleObject; // for ease in getting objects
 
+
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool GetBranchInputOneTimeFlag( true );
+	}
 	//SUBROUTINE SPECIFICATIONS FOR MODULE BranchInputManager
 	//PUBLIC  TestAirPathIntegrity
 	//PRIVATE TestSupplyAirPathIntegrity
@@ -105,6 +114,27 @@ namespace BranchInputManager {
 	Array1D< MixerData > Mixers; // Mixer Data for each Mixer
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumOfBranchLists = 0; // Number of Branch Lists found in IDF
+		NumOfBranches = 0; // Number of Branches found in IDF
+		NumOfConnectorLists = 0; // Number of Connector Lists found in IDF
+		NumSplitters = 0; // Number of Splitters found in IDF
+		NumMixers = 0; // Number of Mixers found in IDF
+		GetBranchInputFlag = true ; // Flag used to retrieve Input
+		GetBranchListInputFlag = true ; // Flag used to retrieve Input
+		GetSplitterInputFlag = true ; // Flag used to retrieve Input
+		GetMixerInputFlag = true ; // Flag used to retrieve Input
+		GetConnectorListInputFlag = true ; // Flag used to retrieve Input
+		InvalidBranchDefinitions = true ;
+		GetBranchInputOneTimeFlag = true;
+		BranchList.deallocate(); // Branch List data for each Branch List
+		Branch.deallocate(); // Branch Data for each Branch
+		ConnectorLists.deallocate(); // Connector List data for each Connector List
+		Splitters.deallocate(); // Splitter Data for each Splitter
+		Mixers.deallocate(); // Mixer Data for each Mixer
+	}
 
 	void
 	ManageBranchInput()
@@ -1571,7 +1601,9 @@ namespace BranchInputManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // Set for first time call
+		//////////// hoisted into namespace changed GetBranchInputOneTimeFlag////////////
+		// static bool GetInputFlag( true ); // Set for first time call
+		////////////////////////////////////////////////
 		int Count; // Loop Counter
 		int BCount; // Actual Num of Branches
 		int Comp; // Loop Counter
@@ -1596,7 +1628,7 @@ namespace BranchInputManager {
 		int PressureCurveType;
 		int PressureCurveIndex;
 
-		if ( GetInputFlag ) {
+		if ( GetBranchInputOneTimeFlag ) {
 			CurrentModuleObject = "Branch";
 			NumOfBranches = GetNumObjectsFound( CurrentModuleObject );
 			if ( NumOfBranches > 0 ) {
@@ -1734,7 +1766,7 @@ namespace BranchInputManager {
 					InvalidBranchDefinitions = true;
 				}
 				TestInletOutletNodes( ErrFound );
-				GetInputFlag = false;
+				GetBranchInputOneTimeFlag = false;
 			}
 		}
 
@@ -1833,6 +1865,7 @@ namespace BranchInputManager {
 		}
 		BCount = 0;
 		for ( Count = 1; Count <= NumOfBranchLists; ++Count ) {
+			CurrentModuleObject = "BranchList";
 			GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
