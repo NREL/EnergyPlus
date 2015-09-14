@@ -121,7 +121,6 @@ namespace DataHeatBalFanSys {
 
 	Array1D_bool ZoneMassBalanceFlag;  // zone mass flow balance flag
 	Array1D_bool ZoneInfiltrationFlag; // Zone Infiltration flag
-	Array1D_bool ZoneMassBalanceRepVarFlag; // zone mass flow balance reporting flag
 	Array1D_int ZoneReOrder;           // zone number reordered for zone mass balance
 
 	//REAL Variables for the Heat Balance Simulation
@@ -278,7 +277,6 @@ namespace DataHeatBalFanSys {
 		MixingMassFlowXHumRat.deallocate(); 
 		ZoneMassBalanceFlag.deallocate(); 
 		ZoneInfiltrationFlag.deallocate(); 
-		ZoneMassBalanceRepVarFlag.deallocate(); 
 		ZoneReOrder.deallocate(); 
 		QRadSysSource.deallocate();
 		TCondFDSourceNode.deallocate();

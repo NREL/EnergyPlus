@@ -1986,12 +1986,6 @@ namespace SimAirServingZones {
 
 			} // end loop over outlet branches
 
-			// sum and save the total loop return air mass flow rate
-			AirLoopFlow( AirLoopNum ).TotReturn = 0.0;
-			for ( InBranchNum = 1; InBranchNum <= AirToZoneNodeInfo( AirLoopNum ).NumReturnNodes; ++InBranchNum ) {
-				AirLoopFlow( AirLoopNum ).TotReturn += Node( AirToZoneNodeInfo( AirLoopNum ).AirLoopReturnNodeNum( InBranchNum ) ).MassFlowRate;
-			}
-
 			// [DC/LBNL] Initialize flag for current air loop
 			AirLoopControlInfo( AirLoopNum ).NewFlowRateFlag = false;
 
@@ -2027,7 +2021,7 @@ namespace SimAirServingZones {
 				for ( InNum = 1; InNum <= PrimaryAirSystem( AirLoopNum ).NumInletBranches; ++InNum ) {
 					InBranchNum = PrimaryAirSystem( AirLoopNum ).InletBranchNum( InNum );
 					NodeNumIn = PrimaryAirSystem( AirLoopNum ).Branch( InBranchNum ).NodeNumIn;
-					Node( NodeNumIn ).MassFlowRate = AirLoopFlow( AirLoopNum ).DesSupply * AirLoopFlow( AirLoopNum ).ReqSupplyFrac - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced );
+					Node( NodeNumIn ).MassFlowRate = AirLoopFlow( AirLoopNum ).DesSupply * AirLoopFlow( AirLoopNum ).ReqSupplyFrac - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment );
 				}
 			}
 

@@ -10,6 +10,7 @@
 // A to Z order
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
@@ -20,6 +21,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -38,8 +40,11 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/Humidifiers.hh>
@@ -54,10 +59,17 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
+#include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantLoopSolver.hh>
 #include <EnergyPlus/PlantManager.hh>
+#include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/OutputReportTabularAnnual.hh>
+
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -65,8 +77,10 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
@@ -102,6 +116,7 @@ namespace EnergyPlus {
 
 		// A to Z order
 		BranchInputManager::clear_state();
+		CondenserLoopTowers::clear_state();
 		CurveManager::clear_state();
 		DataAirLoop::clear_state();
 		DataBranchNodeConnections::clear_state();
@@ -111,6 +126,7 @@ namespace EnergyPlus {
 		DataGlobals::clear_state();
 		DataHeatBalance::clear_state();
 		DataHeatBalFanSys::clear_state();
+		DataHeatBalSurface::clear_state();
 		DataHVACGlobals::clear_state();
 		DataIPShortCuts::clear_state();
 		DataLoopNode::clear_state();
@@ -127,8 +143,11 @@ namespace EnergyPlus {
 		ExteriorEnergyUse::clear_state();
 		Fans::clear_state();
 		GlobalNames::clear_state();
+		GroundTemperatureManager::clear_state();
 		HeatBalanceAirManager::clear_state();
+		HeatBalanceIntRadExchange::clear_state();
 		HeatBalanceManager::clear_state();
+		HeatBalanceSurfaceManager::clear_state();
 		HeatingCoils::clear_state();
 		Humidifiers::clear_state();
 		HVACManager::clear_state();
@@ -141,22 +160,28 @@ namespace EnergyPlus {
 		OutdoorAirUnit::clear_state();
 		OutputProcessor::clear_state();
 		OutputReportPredefined::clear_state();
+		OutputReportTabularAnnual::clear_state();
 		OutsideEnergySources::clear_state();
 		PlantLoopSolver::clear_state();
+		PlantPressureSystem::clear_state();
+		Pipes::clear_state();
+		Pumps::clear_state();
 		ScheduleManager::clear_state();
+		VariableSpeedCoils::clear_state();
 		SetPointManager::clear_state();
 		SimAirServingZones::clear_state();
 		SimulationManager::clear_state();
 		SizingManager::clear_state();
 		SolarShading::clear_state();
 		SplitterComponent::clear_state();
+		SystemAvailabilityManager::clear_state();
 		VariableSpeedCoils::clear_state();
 		WaterCoils::clear_state();
+		WaterThermalTanks::clear_state();
 		WeatherManager::clear_state();
 		ZoneAirLoopEquipmentManager::clear_state();
 		ZoneEquipmentManager::clear_state();
 		ZoneTempPredictorCorrector::clear_state();
-
 
 		{ 
 			IOFlags flags; 
