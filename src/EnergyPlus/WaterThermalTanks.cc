@@ -745,7 +745,7 @@ namespace WaterThermalTanks {
 
 	}
 
-	void
+	bool
 	GetWaterThermalTankInput()
 	{
 
@@ -3702,9 +3702,9 @@ namespace WaterThermalTanks {
 													}
 												} // EquipmentTypeNum
 												if ( TankNotLowestPriority && FoundTankInList ) {
-													ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
-													ShowContinueError( "Heat pump water heaters must have lower priorities than all other equipment types in a ZoneHVAC:EquipmentList." );
-													ErrorsFound = true;
+													ShowWarningError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
+													ShowContinueError( "Heat pump water heaters should be simulated first, before other space conditioning equipment." );
+													ShowContinueError( "Poor temperature control may result if the Heating/Cooling sequence number is not 1 in the ZoneHVAC:EquipmentList." );
 												}
 												break;
 											} // ZoneEquipConfigNum .LE. NumOfZoneEquipLists
@@ -4240,6 +4240,7 @@ namespace WaterThermalTanks {
 
 		} // get input flag
 
+		return ErrorsFound;
 	}
 
 	void
@@ -10401,6 +10402,34 @@ namespace WaterThermalTanks {
 		} else {
 			return (this->SetPointTemp - this->DeadBandDeltaTemp);
 		}
+	}
+
+	void
+	clear_state()
+	{
+		ValidSourceType.deallocate();
+		MyHPSizeFlag.deallocate();
+		CheckWTTEquipName.deallocate();
+		CheckHPWHEquipName.deallocate();
+
+		NumChilledWaterMixed = 0;
+		NumChilledWaterStratified = 0;
+		NumWaterHeaterMixed = 0;
+		NumWaterHeaterStratified = 0;
+		NumWaterThermalTank = 0;
+		NumWaterHeaterDesuperheater = 0;
+		NumHeatPumpWaterHeater = 0;
+
+		HPPartLoadRatio = 0.0;
+		GetWaterThermalTankInputFlag = true;
+		MixerInletAirSchedule = 0.0;
+		MdotAir = 0.0;
+		NumWaterHeaterSizing = 0;
+		AlreadyRated.deallocate();
+
+		WaterThermalTank.deallocate();
+		HPWaterHeater.deallocate();
+		WaterHeaterDesuperheater.deallocate();
 	}
 
 

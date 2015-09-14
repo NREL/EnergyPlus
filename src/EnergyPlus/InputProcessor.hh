@@ -869,6 +869,10 @@ namespace InputProcessor {
 	std::string
 	MakeUPPERCase( std::string const & InputString ); // Input String
 
+	std::string
+	deAllCaps( std::string const & );
+
+
 	typedef char const * c_cstring;
 
 	inline

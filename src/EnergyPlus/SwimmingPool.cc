@@ -166,7 +166,7 @@ namespace SwimmingPool {
 
 		}
 
-		if ( NumSwimmingPools > 0 ) CalcHeatBalanceInsideSurf();
+		if ( NumSwimmingPools > 0 ) HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
 
 		ReportSwimmingPool();
 
