@@ -560,49 +560,6 @@ namespace MoistureBalanceEMPDManager {
 	}
 
 	void
-	SolverMoistureBalanceEMPD(
-		Real64 & VARNEW, // Value at current time step
-		Real64 const VAROLD, // Value at previous time step
-		Real64 const A, // Coefficient of time derivative in AdV/dt+BV=C
-		Real64 const B, // Coefficienct of variable
-		Real64 const C // Constant
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//   Authors:        Muthusamy Swami and Lixing Gu
-		//   Date writtenn:  August, 1999
-		//   Modified:       na
-		//   Re-engineered:  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Solve a first order ordinary differential equation, A dV/dt + B V = C
-
-		// METHODOLOGY EMPLOYED:
-		// Finite difference method
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		VARNEW = ( VAROLD + TimeStepZoneSec * C / A ) / ( 1.0 + TimeStepZoneSec * B / A );
-
-	}
-
-	void
 	CloseMoistureBalanceEMPD()
 	{
 

@@ -36,15 +36,6 @@ namespace MoistureBalanceEMPDManager {
 	);
 
 	void
-	SolverMoistureBalanceEMPD(
-		Real64 & VARNEW, // Value at current time step
-		Real64 const VAROLD, // Value at previous time step
-		Real64 const A, // Coefficient of time derivative in AdV/dt+BV=C
-		Real64 const B, // Coefficienct of variable
-		Real64 const C // Constant
-	);
-
-	void
 	CloseMoistureBalanceEMPD();
 
 	void
