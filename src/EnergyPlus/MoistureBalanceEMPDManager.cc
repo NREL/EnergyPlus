@@ -303,7 +303,6 @@ namespace MoistureBalanceEMPDManager {
 
 		if ( InitEnvrnFlag ) {
 			MoistEMPDOld.allocate( TotSurfaces );
-			MoistEMPDInt.allocate( TotSurfaces );
 			MoistEMPDNew.allocate( TotSurfaces );
 			MoistEMPDFlux.allocate( TotSurfaces );
 			RhoVapEMPD.allocate( TotSurfaces );
@@ -325,7 +324,6 @@ namespace MoistureBalanceEMPDManager {
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 			if ( ZoneAirHumRat( ZoneNum ) == 0.0 ) {
 				MoistEMPDOld(SurfNum) = ZoneAirHumRat(ZoneNum);
-				MoistEMPDInt(SurfNum) = ZoneAirHumRat(ZoneNum);
 				MoistEMPDNew(SurfNum) = ZoneAirHumRat(ZoneNum);
 				RVsurface(SurfNum) = RhoVaporAirIn(SurfNum);
 				RVsurfOld(SurfNum) = RhoVaporAirIn(SurfNum);
@@ -338,7 +336,6 @@ namespace MoistureBalanceEMPDManager {
 				FluxZone( SurfNum ) = 0.000;
 			} else {
 				MoistEMPDOld( SurfNum ) = ZoneAirHumRat( ZoneNum ); // Surface moisture level initialization
-				MoistEMPDInt( SurfNum ) = ZoneAirHumRat( ZoneNum ); // by assuming initial values be equal to ZoneAirHumRat
 				MoistEMPDNew( SurfNum ) = ZoneAirHumRat( ZoneNum );
 				RVsurface( SurfNum ) = RhoVaporAirIn( SurfNum );
 				RVsurfOld( SurfNum ) = RhoVaporAirIn( SurfNum );
@@ -623,7 +620,6 @@ namespace MoistureBalanceEMPDManager {
 		// USE STATEMENTS:
 
 		MoistEMPDOld.deallocate();
-		MoistEMPDInt.deallocate();
 		MoistEMPDNew.deallocate();
 		MoistEMPDFlux.deallocate();
 		RVsurface.deallocate();
