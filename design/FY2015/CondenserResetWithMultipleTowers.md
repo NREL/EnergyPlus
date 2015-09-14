@@ -46,10 +46,6 @@ Code changes for this new feature:
  - With the SetpointManager:CondenserEnteringReset:Ideal implementation, at a minimum the tower energy variables will need to be transformed into vectors, possibly additional work revealed during implementation and testing
  - Unit tests will be added
 
-### Additional code changes
-
- - While working on this task, I anticipate removing the dependence on the SystemReports/OutputProcessor interface, and instead rely on specific GetEnergy* functions implemented in each support object (chiller/pump/tower).
-
 ### Testing
 
  - Unit tests will be added to support the changes in the source code.
@@ -181,3 +177,17 @@ I modified the ConEntTempReset file to include a second cooling tower.  I encoun
   The loop behaves pretty much identically throughout the entire year.  The small deviation could be that the loop was out of capacity with only a single tower, I might investigate further, but not right now.  
   
 I am moving forward assuming the non-ideal condenser setpoint is working fine for multiple towers.  The optimality of the setpoint when using two towers is similar for a single tower configuration in that it is determined solely on how well the curves are defined for optimality.
+
+## Modifications and testing of the ideal condenser setpoint manager
+
+I performed the source code modifications to allow multiple towers.  The changes were as anticipated and described above.  Once implemented, I modified the test file to include multiple towers and looked at the resulting setpoint.  The setpoint varies throughout the day, and because both towers are equivalent in performance characteristics, the resulting performance-based-setpoint reset is the same:
+
+![](CondenserResetWithMultipleTowers-FigureIdealCondenserSetpoint.png)
+
+## Added unit tests
+
+Unit tests were written that provide nearly 100% code coverage for the condenser reset functions to verify that they work as designed and will be flagged if a later code change causes a change in behavior.
+
+# Complete
+
+At this point, I believe the implementation is complete.
