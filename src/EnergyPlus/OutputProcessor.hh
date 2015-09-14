@@ -1085,6 +1085,9 @@ namespace OutputProcessor {
 	UpdateMeters( int const TimeStamp ); // Current TimeStamp (for max/min)
 
 	void
+	ResetAccumulationWhenWarmupComplete();
+
+	void
 	SetMinMax(
 		Real64 const TestValue, // Candidate new value
 		int const TimeStamp, // TimeStamp to be stored if applicable

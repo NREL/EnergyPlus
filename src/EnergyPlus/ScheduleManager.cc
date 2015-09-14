@@ -95,6 +95,15 @@ namespace ScheduleManager {
 	bool ScheduleInputProcessed( false ); // This is false until the Schedule Input has been processed.
 	bool ScheduleDSTSFileWarningIssued( false );
 
+		namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool CheckScheduleValueMinMaxRunOnceOnly (true );
+	}
+
 	//Derived Types Variables
 
 	// Object Data
@@ -122,6 +131,7 @@ namespace ScheduleManager {
 		NumSchedules = 0;
 		ScheduleInputProcessed = false;
 		ScheduleDSTSFileWarningIssued = false;
+		CheckScheduleValueMinMaxRunOnceOnly = true;
 		ScheduleType.deallocate();
 		DaySchedule.deallocate();
 		WeekSchedule.deallocate();
@@ -3490,15 +3500,16 @@ namespace ScheduleManager {
 		Real64 MaxValue( 0.0 ); // For total maximum
 		bool MinValueOk;
 		bool MaxValueOk;
-		static bool RunOnceOnly( true );
-
+		/////////// hoisted into namespace CheckScheduleValueMinMaxRunOnceOnly////////////
+		//static bool RunOnceOnly( true );
+		/////////////////////////////////////////////////
 		//precompute the dayschedule max and min so that it is not in nested loop
-		if ( RunOnceOnly ) {
+		if ( CheckScheduleValueMinMaxRunOnceOnly ) {
 			for ( Loop = 0; Loop <= NumDaySchedules; ++Loop ) {
 				DaySchedule( Loop ).TSValMin = minval( DaySchedule( Loop ).TSValue );
 				DaySchedule( Loop ).TSValMax = maxval( DaySchedule( Loop ).TSValue );
 			}
-			RunOnceOnly = false;
+			CheckScheduleValueMinMaxRunOnceOnly = false;
 		}
 
 		if ( ScheduleIndex == -1 ) {

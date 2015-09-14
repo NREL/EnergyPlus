@@ -212,6 +212,7 @@ namespace OutputProcessor {
 		int LHourP( -1 ); // Helps set hours for timestamp output
 		Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
 		Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
+		bool GetMeterIndexFirstCall( true ); //trigger setup in GetMeterIndex
 	}
 
 	// All routines should be listed here whether private or not
@@ -313,6 +314,7 @@ namespace OutputProcessor {
 		LHourP = -1;
 		LStartMin = -1.0;
 		LEndMin = -1.0;
+		GetMeterIndexFirstCall = true ;
 		TimeValue.deallocate();
 		RVariableTypes.deallocate();
 		IVariableTypes.deallocate();
@@ -2968,6 +2970,93 @@ namespace OutputProcessor {
 		MeterValue = 0.0; // Ready for next update
 
 	}
+
+	void
+	ResetAccumulationWhenWarmupComplete()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Jason Glazer
+		//       DATE WRITTEN   June 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Resets the accumulating meter values. Needed after warmup period is over to
+		// reset the totals on meters so that they are not accumulated over the warmup period
+
+		// METHODOLOGY EMPLOYED:
+		// Cycle through the meters and reset all accumulating values
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Meter; // Loop Control
+		int Loop; // Loop Variable
+
+		for ( Meter = 1; Meter <= NumEnergyMeters; ++Meter ) {
+			EnergyMeters( Meter ).HRValue = 0.0;
+			EnergyMeters( Meter ).HRMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).HRMaxValDate = 0;
+			EnergyMeters( Meter ).HRMinVal = MinSetValue;
+			EnergyMeters( Meter ).HRMinValDate = 0;
+
+			EnergyMeters( Meter ).DYValue = 0.0;
+			EnergyMeters( Meter ).DYMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).DYMaxValDate = 0;
+			EnergyMeters( Meter ).DYMinVal = MinSetValue;
+			EnergyMeters( Meter ).DYMinValDate = 0;
+
+			EnergyMeters( Meter ).MNValue = 0.0;
+			EnergyMeters( Meter ).MNMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).MNMaxValDate = 0;
+			EnergyMeters( Meter ).MNMinVal = MinSetValue;
+			EnergyMeters( Meter ).MNMinValDate = 0;
+
+			EnergyMeters( Meter ).SMValue = 0.0;
+			EnergyMeters( Meter ).SMMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).SMMaxValDate = 0;
+			EnergyMeters( Meter ).SMMinVal = MinSetValue;
+			EnergyMeters( Meter ).SMMinValDate = 0;
+
+		}
+
+		for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
+			RVar >>= RVariableTypes( Loop ).VarPtr;
+			auto & rVar( RVar() );
+			if ( rVar.ReportFreq == ReportMonthly || rVar.ReportFreq == ReportSim ) {
+				rVar.StoreValue = 0.0;
+				rVar.NumStored = 0;
+			}
+		}
+
+		for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
+			IVar >>= IVariableTypes( Loop ).VarPtr;
+			auto & iVar( IVar() );
+			if ( iVar.ReportFreq == ReportMonthly || iVar.ReportFreq == ReportSim ) {
+				iVar.StoreValue = 0;
+				iVar.NumStored = 0;
+			}
+		}
+	}
+
+
+
 
 	void
 	SetMinMax(
@@ -6674,10 +6763,12 @@ GetMeterIndex( std::string const & MeterName )
 	static Array1D_string ValidMeterNames;
 	static Array1D_int iValidMeterNames;
 	static int NumValidMeters( 0 );
-	static bool FirstCall( true );
+	//////////// hoisted into namespace changed to GetMeterIndexFirstCall////////////
+	// static bool FirstCall( true );
+	////////////////////////////////////////////////
 	int Found;
 
-	if ( FirstCall || ( NumValidMeters != NumEnergyMeters ) ) {
+	if ( GetMeterIndexFirstCall || ( NumValidMeters != NumEnergyMeters ) ) {
 		NumValidMeters = NumEnergyMeters;
 		ValidMeterNames.allocate( NumValidMeters );
 		for ( Found = 1; Found <= NumValidMeters; ++Found ) {
@@ -6685,7 +6776,7 @@ GetMeterIndex( std::string const & MeterName )
 		}
 		iValidMeterNames.allocate( NumValidMeters );
 		SetupAndSort( ValidMeterNames, iValidMeterNames );
-		FirstCall = false;
+		GetMeterIndexFirstCall = false;
 	}
 
 	MeterIndex = FindItemInSortedList( MeterName, ValidMeterNames, NumValidMeters );
@@ -8178,7 +8269,7 @@ AddToOutputVariableList(
 }
 
 	//     NOTICE
-	
+
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.

@@ -4278,6 +4278,239 @@ This is the total heating output of the DX coil in Joules over the time step bei
 
 This is the runtime fraction of the DX coil compressor and condenser fan(s) for the time step being reported.
 
+### Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl
+
+This coil object is specifically designed for the physics based VRF model applicable for Fluid Temperature Control (VRF-FluidTCtrl). It describes the performance of the indoor unit coil of the VRF system operating at cooling mode. The name of this object is entered as an input to the object *ZoneHVAC:TerminalUnit:VariableRefrigerantFlow*. The outdoor unit part of the VRF system is modeled separately (refer to *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object).
+
+#### Field: Name
+
+This alpha field defines a unique user-assigned name for an instance of a VRF DX cooling coil. Any reference to this DX cooling coil by another object will use this name. This cooling coil name must be entered in the AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl object. No other system type uses this specific coil.
+
+#### Field: Availability Schedule Name
+
+This alpha field defines the name of the coil availability schedule. A name should be entered to define the availability of the coil. Schedule values of 0 denote the DX cooling coil is off. A schedule value greater than 0 indicates that the coil can operate during the time period. If this field is blank, the schedule has values of 1 for all time periods.
+
+#### Field: Coil Air Inlet Node
+
+This alpha field defines the name of the air inlet node entering the DX cooling coil.
+
+#### Field: Coil Air Outlet Node
+
+This alpha field defines the name of the air outlet node exiting the DX cooling coil.
+
+#### Field: Rated Total Cooling Capacity
+
+This numeric field defines the gross rated total cooling capacity of the DX cooling coil in watts. The total cooling capacity should be a gross , i.e., the effect of supply air fan heat NOT accounted for.
+ 
+#### Field: Rated Sensible Heat Ratio
+
+This numeric field defines the gross sensible heat ratio (sensible capacity divided by total cooling capacity) of the DX cooling coil at rated conditions. Both the sensible and total cooling capacities used to define the Rated SHR should be gross (i.e., the effect of supply air fan heat is NOT accounted for)
+	   
+#### Field: Indoor Unit Reference Superheating 
+
+This numeric field defines the reference superheating degrees of the indoor unit. If this field is blank, the default value of 5.0 C is used. 
+	   
+#### Field: Indoor Unit Evaporating Temperature Function of Superheating Curve Name    
+
+This alpha field defines the name of a quadratic performance curve that parameterizes the variation of indoor unit evaporating temperature as a function of superheating degrees. The output of this curve is the temperature difference between the coil surface air temperature and the evaporating temperature.
+   
+#### Field: Name of Water Storage Tank for Condensate Collection
+
+This field is optional. It is used to describe where condensate from the coil is collected. If blank or omitted, then any coil condensate is discarded. Enter the name of Water Storage Tank object defined elsewhere and the condensate will then be collected in that tank.
+
+Following is an example input for a Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl object.
+
+```idf
+  Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,
+    TU1 VRF DX Cooling Coil, !- Name
+    VRFAvailSched,           !- Availability Schedule Name
+    TU1 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node
+    TU1 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node
+    autosize,                !- Rated Total Cooling Capacity {W}
+    autosize,                !- Rated Sensible Heat Ratio
+    3,                       !- Indoor Unit Reference Superheating Degrees {C}    
+    IUEvapTempCurve,         !- Indoor Unit Evaporating Temperature Function of Superheating Curve Name    
+    ;                        !- Name of Water Storage Tank for Condensate Collection
+
+  Curve:Quadratic,
+    IUEvapTempCurve,         !- Name
+    0,                       !- Coefficient1 Constant
+    0.843,                   !- Coefficient2 x
+    0,                       !- Coefficient3 x**2
+    0,                       !- Minimum Value of x    
+    15,                      !- Maximum Value of x    
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature;             !- Output Unit Type
+
+```
+
+### Cooling DX Coil (VariableRefrigerantFlow:FluidTemperatureControl) Outputs
+
+* HVAC,Average, Cooling Coil Total Cooling Rate [W]
+
+* HVAC,Sum, Cooling Coil Total Cooling Energy [J]
+
+* HVAC,Average, Cooling Coil Sensible Cooling Rate [W]
+
+* HVAC,Sum, Cooling Coil Sensible Cooling Energy [J]
+
+* HVAC,Average, Cooling Coil Latent Cooling Rate [W]
+
+* HVAC,Sum, Cooling Coil Latent Cooling Energy [J]
+
+* HVAC,Average, Cooling Coil Runtime Fraction []
+
+* HVAC,Average, Cooling Coil VRF Evaporating Temperature [C]
+
+* HVAC,Average, Cooling Coil VRF Super Heating Degrees [C]
+
+Evaporative-cooled condenser:
+
+* HVAC,Average,Cooling Coil Condensate Volume Flow Rate [m3/s]
+
+* Zone,Meter,Condensate:OnSiteWater [m3]
+
+* HVAC,Sum,Cooling Coil Condensate Volume [m3]
+
+#### Cooling Coil Total Cooling Rate [W]
+
+This field is the total (sensible and latent) cooling rate output of the DX coil in Watts. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Total Cooling Energy [J]
+
+This is the total (sensible plus latent) cooling output of the DX coil in Joules over the time step being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = CoolingCoils, Group Key = System (Ref. Output:Meter objects).
+
+#### Cooling Coil Sensible Cooling Rate [W]
+
+This output is the moist air sensible cooling rate output of the DX coil in Watts. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Sensible Cooling Energy [J]
+
+This is the moist air sensible cooling output of the DX coil in Joules for the time step being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Latent Cooling Rate [W]
+
+This is the latent cooling rate output of the DX coil in Watts. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Latent Cooling Energy [J]
+
+This is the latent cooling output of the DX coil in Joules for the time step being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Runtime Fraction []
+
+This is the runtime fraction of the DX coil compressor and condenser fan(s) for the time step being reported.
+
+#### Cooling Coil VRF Evaporating Temperature [C]
+
+This is the evaporating temperature of the VRF system operating at cooling mode. This value is manipulated by the VRF system considering the load conditions of all the zones it serves. It affects the cooling coil surface temperature and thus the cooling capacity of the coil.
+
+#### Cooling Coil VRF Super Heating Degrees [C]
+
+This is the super heating degrees of the VRF system operating at cooling mode. This value is manipulated by each VRF terminal unit to adjust the cooling capacity of the coil considering the load conditions of the zone. It affects the cooling coil surface temperature and thus the cooling capacity of the coil.
+
+#### Cooling Coil Condensate Volume Flow Rate [m3/s]
+
+This is the volumetric rate of water collected as condensate from the coil. This report only appears if a water storage tank is named in the input object.
+
+#### Cooling Coil Condensate Volume [m3]
+
+This is the volume of water collected as condensate from the coil. This report only appears if a water storage tank is named in the input object.
+
+
+### Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl
+
+This coil object is specifically designed for the physics based VRF model applicable for Fluid Temperature Control (VRF-FluidTCtrl). It describes the performance of the indoor unit coil of the VRF system operating at heating mode. The name of this object is entered as an input to the object *ZoneHVAC:TerminalUnit:VariableRefrigerantFlow*. The outdoor unit part of the VRF system is modeled separately (refer to *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object).
+
+#### Field: Name
+
+This alpha field defines a unique user-assigned name for an instance of a VRF DX heating coil. Any reference to this DX heating coil by another object will use this name. This heating coil name must be entered in the AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl object. No other system type uses this specific coil.
+
+#### Field: Availability Schedule
+
+This alpha field defines the name of the schedule (ref: Schedule) that denotes whether the DX heating coil can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank the unit is always available.
+
+#### Field: Coil Air Inlet Node
+
+This alpha field defines the name of the HVAC system node from which the DX heating coil draws its inlet air.
+
+#### Field: Coil Air Outlet Node
+
+This alpha field defines the name of the HVAC system node to which the DX heating coil sends its outlet air.
+
+#### Field: Rated Total Heating Capacity
+
+This numeric field defines the total, full load gross heating capacity in watts of the DX coil unit at rated conditions. The value entered here must be greater than 0. The gross total heating capacity should not account for the effect of supply air fan heat.
+
+#### Field: Indoor Unit Reference Subcooling 
+
+This numeric field defines the reference subcooling degrees of the indoor unit. If this field is blank, the default value of 5.0 C is used. 
+       
+#### Field: Indoor Unit Condensing Temperature Function of Subcooling Curve Name 
+
+This alpha field defines the name of a quadratic performance curve that parameterizes the variation of indoor unit condensing temperature as a function of subcooling degrees. The output of this curve is the temperature difference between the condensing temperature and the coil surface air temperature.
+
+Following is an example input for a Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl object.
+
+```idf
+  Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,
+    TU1 VRF DX Heating Coil, !- Name
+    VRFAvailSched,           !- Availability Schedule
+    TU1 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node
+    TU1 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node
+    autosize,                !- Rated Total Heating Capacity {W}
+    5,                       !- Indoor Unit Reference Subcooling Degrees {C}    
+    IUCondTempCurve;         !- Indoor Unit Condensing Temperature Function of Subcooling Curve Name
+
+  Curve:Quadratic,
+    IUCondTempCurve,         !- Name
+    -1.85,                   !- Coefficient1 Constant
+    0.411,                   !- Coefficient2 x
+    0.0196,                  !- Coefficient3 x**2
+    0,                       !- Minimum Value of x    
+    20,                      !- Maximum Value of x    
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature;             !- Output Unit Type
+
+```
+
+### Heating DX Coil (VariableRefrigerantFlow) Outputs
+
+* HVAC,Average, Heating Coil Total Heating Rate [W]
+
+* HVAC,Sum, Heating Coil Total Heating Energy [J]
+
+* HVAC,Average, Heating Coil Runtime Fraction []
+
+* Heating Coil VRF Condensing Temperature [C]
+
+* Heating Coil VRF Subcooling Degrees [C]
+
+#### Heating Coil Total Heating Rate [W]
+
+This field is the total heating rate output of the DX coil in Watts. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Heating Coil Total Heating Energy [J]
+
+This is the total heating output of the DX coil in Joules over the time step being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = HeatingCoils, Group Key = System (ref. Output:Meter objects).
+
+#### Heating Coil Runtime Fraction []
+
+This is the runtime fraction of the DX coil compressor and condenser fan(s) for the time step being reported.
+
+#### Cooling Coil VRF Condensing Temperature [C]
+
+This is the condensing temperature of the VRF system operating at heating mode. This value is manipulated by the VRF system considering the load conditions of all the zones it serves. It affects the heating coil surface temperature and thus the heating capacity of the coil.
+
+#### Cooling Coil VRF Subcooling Degrees [C]
+
+This is the subcooling degrees of the VRF system operating at heating mode. This value is manipulated by each VRF terminal unit to adjust the heating capacity of the coil considering the load conditions of the zone. It affects the heating coil surface temperature and thus the heating capacity of the coil.
+
+
+
 ### Coil:Heating:Gas
 
 The gas heating coil is a simple capacity model with a user inputted gas burner efficiency. The default for the gas burner efficiency is 80%. This coil will be simpler than shown in Figure 135 since it will only have air nodes to connect it in the system. The coil can be used in the air loop simulation or in the zone equipment as a reheat coil. Depending on where it is used determines if this coil is temperature or capacity controlled. If used in the air loop simulation it will be controlled to a specified temperature scheduled from the Setpoint Manager. If it is used in zone equipment, it will be controlled from the zone thermostat by meeting the zone demand.
@@ -6819,8 +7052,6 @@ This is the electricity consumption of the DX coil compressor   s crankcase heat
 #### Heating Coil Runtime Fraction []
 
 This is the runtime fraction of the DX heating coil compressor and outdoor fan(s) for the timestep being reported.
-
-### Coil:Heating:DX:MultiSpeed
 
 ### Coil:Heating:DX:MultiSpeed
 

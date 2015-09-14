@@ -1696,7 +1696,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	static gio::Fmt Format_701( "('! <HeatTransfer/Shading/Frame/Divider_Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
 	static gio::Fmt Format_7011( "(',Construction/Transmittance Schedule,Nominal U (w/o film coefs)/Min Schedule Value,','Nominal U (with film coefs)/Max Schedule Value,Solar Diffusing,','Area (Net),Area (Gross),Area (Sunlit Calc),Azimuth,Tilt,~Width,~Height,Reveal,','<ExtBoundCondition>,<ExtConvCoeffCalc>,<IntConvCoeffCalc>,<SunExposure>,<WindExposure>,','ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides')" );
 	static gio::Fmt Format_7012( "(',#Sides')" );
-	static gio::Fmt Format_702( "('! <Units>,,,,')" );
+	static gio::Fmt Format_702( "('! <Units>,,,,,')" );
 	static gio::Fmt Format_7021( "(',{W/m2-K}/{},{W/m2-K}/{},{},{m2},{m2},{m2},{deg},{deg},{m},{m},{m},,,,,,,,,,')" );
 	static gio::Fmt Format_7022( "(',')" );
 	static gio::Fmt Format_703( "(A,',',A,',',I5)" );
