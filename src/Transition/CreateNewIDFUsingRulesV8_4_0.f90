@@ -695,6 +695,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   OutArgs(17)=InArgs(17) ! Redundant, but clear
                 endif
 
+              CASE('ZONEAIRMASSFLOWCONSERVATION')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = InArgs(1) ! no change to F1
+                if (SameString(InArgs(1), "YES")) then
+                  OutArgs(2) = InArgs(2)
+                else ! IDD validation should require either YES or NO, so this is "NO"
+                  OutArgs(2) = "None"
+                endif
+                OutArgs(3) = "MixingSourceZonesOnly"
+                CurArgs = CurArgs + 1
+
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
