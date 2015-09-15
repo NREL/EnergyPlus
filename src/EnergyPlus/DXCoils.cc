@@ -5360,12 +5360,10 @@ namespace DXCoils {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   May 2000
-		//                      Feb 2005 M. J. Witte, GARD Analytics, Inc.
-		//                        Add new coil type COIL:DX:MultiMode:CoolingEmpirical:
-		//                      July 2005 R. Raustad, FSEC
-		//                        Add new coil type COIL:DX:HEATPUMPWATERHEATER
-		//                      June 2007 L. Gu, FSEC
-		//                        Add new coil type COIL:DX:MULTISPEED:COOLING and HEATING
+		//                      Feb 2005, M. J. Witte, GARD Analytics, Inc. Add new coil type COIL:DX:MultiMode:CoolingEmpirical:
+		//                      Jul 2005, R. Raustad, FSEC. Add new coil type COIL:DX:HEATPUMPWATERHEATER
+		//                      Jun 2007, L. Gu, FSEC. Add new coil type COIL:DX:MULTISPEED:COOLING and HEATING
+		//                      Aug 2015, R. Zhang, LBNL. Add new coil types for VRF_FluidTCtrl
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -5507,7 +5505,7 @@ namespace DXCoils {
 			SizeDXCoil( DXCoilNum );
 			MySizeFlag( DXCoilNum ) = false;
 
-			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling) {
+			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling) {
 
 				Mode = 1;
 				// Check for zero capacity or zero max flow rate
@@ -5533,25 +5531,6 @@ namespace DXCoils {
 				DXCoil( DXCoilNum ).RatedCBF( Mode ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( Mode ), DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ), DXCoil( DXCoilNum ).RatedSHR( Mode ) );
 
 			}
-			
-			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling ) {  
-
-				Mode = 1;
-				// Check for zero capacity or zero max flow rate
-				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) <= 0.0 ) {
-					ShowSevereError( "Sizing: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + " has zero rated total capacity" );
-					ErrorsFound = true;
-				}
-				if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) <= 0.0 ) {
-					ShowSevereError( "Sizing: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + " has zero rated air flow rate" );
-					ErrorsFound = true;
-				}
-				if ( ErrorsFound ) {
-					ShowFatalError( "Preceding condition causes termination." );
-				}
-				DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ) = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
-			}
-
 
 			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 				for ( DehumidModeNum = 0; DehumidModeNum <= DXCoil( DXCoilNum ).NumDehumidModes; ++DehumidModeNum ) {
@@ -5586,7 +5565,7 @@ namespace DXCoils {
 
 			}
 
-			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
+			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating ) {
 
 				Mode = 1;
 				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) <= 0.0 ) {
@@ -5611,26 +5590,6 @@ namespace DXCoils {
 				}
 
 			}
-
-			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating ) { 
-
-				Mode = 1;
-				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) <= 0.0 ) {
-					ShowSevereError( "Sizing: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + " has zero rated total capacity" );
-					ErrorsFound = true;
-				}
-				if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) <= 0.0 ) {
-					ShowSevereError( "Sizing: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + " has zero rated air flow rate" );
-					ErrorsFound = true;
-				}
-				if ( ErrorsFound ) {
-					ShowFatalError( "Preceding condition causes termination." );
-				}
-				RatedHeatPumpIndoorAirTemp = 21.11; // 21.11C or 70F
-				RatedHeatPumpIndoorHumRat = 0.00881; // Humidity ratio corresponding to 70F dry bulb/60F wet bulb
-				DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ) = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) * PsyRhoAirFnPbTdbW( StdBaroPress, RatedHeatPumpIndoorAirTemp, RatedHeatPumpIndoorHumRat, RoutineName );
-			}
-
 			
 			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
 				// Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
@@ -5750,15 +5709,13 @@ namespace DXCoils {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   January 2002
-		//                      Feb 2005 M. J. Witte, GARD Analytics, Inc.
-		//                        Add new coil type COIL:DX:MultiMode:CoolingEmpirical:
-		//                      July 2005 R. Raustad, FSEC
-		//                        Add new coil type COIL:DX:HEATPUMPWATERHEATER
-		//                      June 2007 L. Gu, FSEC
-		//                        Add new coil type COIL:DX:MULTISPEED:COOLING and HEATING
-		//                      January 2011, B. Griffithn NREL. add EMS overrides for autosized fields.
-		//                      August 2013 Daeho Kang, add component sizing table entries
-		//						May 2014 R Raustad, FSEC, moved sizing calculations to common routine
+		//                      Feb 2005, M. J. Witte, GARD Analytics, Inc. Add new coil type COIL:DX:MultiMode:CoolingEmpirical.
+		//                      Jul 2005, R. Raustad, FSEC. Add new coil type COIL:DX:HEATPUMPWATERHEATER
+		//                      Jun 2007, L. Gu, FSEC. Add new coil type COIL:DX:MULTISPEED:COOLING and HEATING
+		//                      Jan 2011, B. Griffithn, NREL. add EMS overrides for autosized fields
+		//                      Aug 2013, D. Kang. add component sizing table entries
+		//                      May 2014, R. Raustad, FSEC. moved sizing calculations to common routine
+		//                      Aug 2015, R. Zhang, LBNL. Add new coil types for VRF_FluidTCtrl
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -14531,32 +14488,10 @@ Label50: ;
 				ShowFatalError( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Rated total cooling capacity is zero or less." );
 			}
 
-			if ( ! FirstHVACIteration && ! WarmupFlag && ( ( VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap( DXCT ) ) || ( VolFlowperRatedTotCap > MaxCoolVolFlowPerRatedTotCap( DXCT ) ) ) ) {
-				if ( DXCoil( DXCoilNum ).ErrIndex1 == 0 ) {
-					ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at " + RoundSigDigits( VolFlowperRatedTotCap, 3 ) + " m3/s/W." );
-					ShowContinueErrorTimeStamp( "" );
-					ShowContinueError( "...Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxCoolVolFlowPerRatedTotCap( DXCT ), 3 ) + "]" );
-					ShowContinueError( "...Possible causes include inconsistent air flow rates in system components," );
-					ShowContinueError( "...or mixing manual inputs with autosize inputs. Also check the following values and calculations." );
-					ShowContinueError( "...Volume Flow Rate per Rated Total Capacity = Volume Flow Rate / Rated Total Capacity" );
-					ShowContinueError( "...Volume Flow Rate = Air Mass Flow Rate / Air Density" );
-					ShowContinueError( "...Data used for calculations:" );
-					ShowContinueError( "...Rated Total Capacity = " + RoundSigDigits( DXCoil( DXCoilNum ).RatedTotCap( Mode ), 2 ) + " W." );
-					ShowContinueError( "...Volume Flow Rate = Air Mass Flow Rate / Air Density" );
-					ShowContinueError( "...Volume Flow Rate   = " + RoundSigDigits( AirVolumeFlowRate, 8 ) + " m3/s." );
-					ShowContinueError( "...Air Mass Flow Rate = " + RoundSigDigits( AirMassFlow, 8 ) + " kg/s." );
-					ShowContinueError( "...Air Density        = " + RoundSigDigits( PsyRhoAirFnPbTdbW( OutdoorPressure, InletAirDryBulbTemp, InletAirHumRat ), 8 ) + " kg/m3." );
-					ShowContinueError( "...Data used for air density calculation:" );
-					ShowContinueError( "...Outdoor Air Pressure     = " + RoundSigDigits( OutdoorPressure, 3 ) + " Pa." );
-					ShowContinueError( "...Inlet Air Dry-Bulb Temp  = " + RoundSigDigits( InletAirDryBulbTemp, 3 ) + " C." );
-					ShowContinueError( "...Inlet Air Humidity Ratio = " + RoundSigDigits( InletAirHumRat, 8 ) + " kgWater/kgDryAir." );
-
-				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range error continues...", DXCoil( DXCoilNum ).ErrIndex1, VolFlowperRatedTotCap, VolFlowperRatedTotCap );
-			}
-			//    Adjust coil bypass factor for actual air flow rate. Use relation CBF = exp(-NTU) where
-			//    NTU = A0/(m*cp). Relationship models the cooling coil as a heat exchanger with Cmin/Cmax = 0.
-
+			// VolFlowperRatedTotCap was checked at the initialization step
+			// No need to check VolFlowperRatedTotCap at the simulation
+			// New VRF_FluidTCtrl model implements VAV fan which can vary air flow rate during simulation
+			
 			RatedCBF = DXCoil( DXCoilNum ).RatedCBF( Mode );
 			if ( RatedCBF > 0.0 ) {
 				A0 = -std::log( RatedCBF ) * DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
@@ -14853,19 +14788,11 @@ Label50: ;
             // Check for valid air volume flow per rated total cooling capacity (200 - 600 cfm/ton)			
             AirVolumeFlowRate = AirMassFlow / PsyRhoAirFnPbTdbW( OutdoorPressure, InletAirDryBulbTemp, InletAirHumRat );
             // Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
-            VolFlowperRatedTotCap = AirVolumeFlowRate / DXCoil( DXCoilNum ).RatedTotCap( Mode );		
-            
-            // Show error if VolFlowperRatedTotCap is out of range
-            if ( ( VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap( DXCT ) ) || ( VolFlowperRatedTotCap > MaxHeatVolFlowPerRatedTotCap( DXCT ) ) ) {
-                if ( DXCoil( DXCoilNum ).ErrIndex1 == 0 ) {
-                    ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at " + RoundSigDigits( VolFlowperRatedTotCap, 3 ) + " m3/s/W." );
-                    ShowContinueErrorTimeStamp( "" );
-                    ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxHeatVolFlowPerRatedTotCap( DXCT ), 3 ) + ']' );
-                    ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
-                    ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
-                }
-                ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range error continues...", DXCoil( DXCoilNum ).ErrIndex1, VolFlowperRatedTotCap, VolFlowperRatedTotCap );
-            }
+            VolFlowperRatedTotCap = AirVolumeFlowRate / DXCoil( DXCoilNum ).RatedTotCap( Mode );
+
+			// VolFlowperRatedTotCap was checked at the initialization step
+			// No need to check VolFlowperRatedTotCap at the simulation
+			// New VRF_FluidTCtrl model implements VAV fan which can vary air flow rate during simulation
             
             AirMassFlowRatio = AirMassFlow / DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
             TotCapModFac = 1.0;
@@ -15212,7 +15139,7 @@ Label50: ;
         //
         // PURPOSE OF THIS SUBROUTINE:
         //        Analyze the VRF Indoor Unit operations given zonal loads.
-	    //        Calculated parameters includie: (1) Fan Speed Ratio, (2) SH/SC Degrees, and (3) Coil Inlet/Outlet conditions 
+	    //        Calculated parameters include: (1) Fan Speed Ratio, (2) SH/SC Degrees, and (3) Coil Inlet/Outlet conditions 
         //
         // METHODOLOGY EMPLOYED:
 		//		  A new physics based VRF model appliable for Fluid Temperature Control.
