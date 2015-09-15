@@ -859,7 +859,8 @@ namespace SurfaceGeometry {
 		bool sameSurfNormal;
 		bool izConstDiff; // differences in construction for IZ surfaces
 		bool izConstDiffMsg; // display message about hb diffs only once.
-
+		bool azimuthError;
+		bool tiltError;
 		// FLOW:
 		// Get the total number of surfaces to allocate derived type and for surface loops
 
@@ -1105,6 +1106,8 @@ namespace SurfaceGeometry {
 		// orientation of flat subsurfaces (window/door/etc) need to match base surface
 		// CR8628
 		//  ALLOCATE(TestVertex(4)) ! subsurfaces we will look at have max of 4 vertices
+		azimuthError = false;
+		tiltError = false;
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( ! SurfaceTmp( SurfNum ).HeatTransSurf ) continue;
 			// If flat surface
@@ -1126,13 +1129,20 @@ namespace SurfaceGeometry {
 					//          write(outputfiledebug,'(3f7.2)') SurfaceTmp(itmp1)%lcsy
 					//          write(outputfiledebug,'(3f7.2)') SurfaceTmp(itmp1)%lcsz
 					//          write(outputfiledebug,'(A,3f7.2)') 'subsurface surfnorm=',SurfaceTmp(itmp1)%NewellSurfaceNormalVector
-					if ( std::abs( SurfaceTmp( iTmp1 ).Azimuth - surfAzimuth ) <= 10.0 ) continue;
-					CompareTwoVectors( SurfaceTmp( SurfNum ).NewellSurfaceNormalVector, SurfaceTmp( iTmp1 ).NewellSurfaceNormalVector, sameSurfNormal, 0.001 );
-					if ( sameSurfNormal ) { // copy lcs vectors
-						SurfaceTmp( iTmp1 ).lcsx = SurfaceTmp( SurfNum ).lcsx;
-						SurfaceTmp( iTmp1 ).lcsy = SurfaceTmp( SurfNum ).lcsy;
-						SurfaceTmp( iTmp1 ).lcsy = SurfaceTmp( SurfNum ).lcsy;
-						continue;
+					if ( std::abs( SurfaceTmp( iTmp1 ).Azimuth - surfAzimuth ) > 10.0 );
+					{
+						CompareTwoVectors(SurfaceTmp(SurfNum).NewellSurfaceNormalVector, SurfaceTmp(iTmp1).NewellSurfaceNormalVector, sameSurfNormal, 0.001);
+						if (sameSurfNormal) { // copy lcs vectors
+							SurfaceTmp(iTmp1).lcsx = SurfaceTmp(SurfNum).lcsx;
+							SurfaceTmp(iTmp1).lcsy = SurfaceTmp(SurfNum).lcsy;
+							SurfaceTmp(iTmp1).lcsy = SurfaceTmp(SurfNum).lcsy;
+						}
+						else
+							azimuthError = true;
+					}
+					if (std::abs(SurfaceTmp(iTmp1).Tilt - SurfTilt) > 30)
+					{
+						tiltError = true;
 					}
 					//        IF (ABS(SurfaceTmp(itmp1)%Azimuth-360.0d0) < .01d0) THEN
 					//          SurfaceTmp(itmp1)%Azimuth=360.0d0-SurfaceTmp(itmp1)%Azimuth
@@ -1152,12 +1162,18 @@ namespace SurfaceGeometry {
 					//          CALL ShowContinueError('...use Output:Diagnostics,DisplayExtraWarnings; '//  &
 					//                   'to show more details on individual surfaces.')
 					//        ENDIF
-					if ( DisplayExtraWarnings ) {
+					if ( azimuthError && DisplayExtraWarnings ) {
 						ShowSevereError( RoutineName + "Outward facing angle [" + RoundSigDigits( SurfaceTmp( iTmp1 ).Azimuth, 3 ) + "] of subsurface=\"" + SurfaceTmp( iTmp1 ).Name + "\" significantly different than" );
 						ShowContinueError( "..facing angle [" + RoundSigDigits( SurfaceTmp( SurfNum ).Azimuth, 3 ) + "] of base surface=" + SurfaceTmp( SurfNum ).Name );
 						ShowContinueError( "..surface class of base surface=" + cSurfaceClass( SurfaceTmp( SurfNum ).Class ) );
 						//          CALL ShowContinueError('Fixes will be attempted to align subsurface with base surface.')
 					}
+					if ( tiltError && DisplayExtraWarnings) {
+						ShowSevereError(RoutineName + "Outward facing angle [" + RoundSigDigits(SurfaceTmp(iTmp1).Tilt, 3) + "] of subsurface=\"" + SurfaceTmp(iTmp1).Name + "\" significantly different than");
+						ShowContinueError("..facing angle [" + RoundSigDigits(SurfaceTmp(SurfNum).Tilt, 3) + "] of base surface=" + SurfaceTmp(SurfNum).Name);
+						ShowContinueError("..surface class of base surface=" + cSurfaceClass(SurfaceTmp(SurfNum).Class));
+					}
+
 					//        Vrt=1
 					//        testV=2
 					//        testVsave=2
@@ -1201,6 +1217,10 @@ namespace SurfaceGeometry {
 					//        ENDIF
 				}
 			}
+		}
+		if ( (azimuthError || tiltError) && !DisplayExtraWarnings) {
+			ShowSevereError(RoutineName + "Some Outward Facing angles of subsurfaces differ significantly from base surface.");
+			ShowContinueError("...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
 		}
 		//  IF (Warning5Count > 0) THEN
 		//    CALL ShowMessage(RoutineName//'There were '//TRIM(RoundSigDigits(Warning5Count))//  &
