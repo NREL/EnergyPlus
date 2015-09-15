@@ -7986,6 +7986,85 @@ namespace SetPointManager {
 	}
 
 	void
+	ResetHumidityRatioCtrlVarType(
+		int const NodeNum
+	) 
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Bereket Nigusse
+		//       DATE WRITTEN   August 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Resets setpoint control variable type to "Maximum Humidty Ratio" if control variable type
+		// is "Humidity Ratio". 
+
+		// METHODOLOGY EMPLOYED:
+		// Cycle through all setpoint managers and find if the node has a "Humidity Ratio" control 
+		// variable type. This routine is called from "GetControllerInput" routine.  This reset is
+		// just to stop false warning message due to control variable type mismatch.
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "ResetHumidityRatioCtrlVarType: " );
+
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// na
+
+		// Locals
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int SetPtMgrNum; // loop counter for each set point manager
+		int NumNode; // loop counter for each node and specific control type
+		int SetPtMgrNumPtr; // setpoint manager 
+		bool ResetCntrlVarType; // if true reset Hum Rat control var type to maxhumidity ratio
+
+		// First time called, get the input for all the setpoint managers
+		if ( GetInputFlag ) {
+			GetSetPointManagerInputs();
+			GetInputFlag = false;
+		}
+		
+		ResetCntrlVarType = false;
+
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumAllSetPtMgrs; ++SetPtMgrNum ) {
+			for ( NumNode = 1; NumNode <= AllSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++NumNode ) {
+				if ( NodeNum == AllSetPtMgr( SetPtMgrNum ).CtrlNodes( NumNode ) ) {
+					if ( AllSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_HumRat ) {
+						AllSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MaxHumRat;
+						SetPtMgrNumPtr = SetPtMgrNum;
+						ResetCntrlVarType = true;
+						goto SPMLoop_exit;
+					}
+				}
+			}
+		}
+	
+		SPMLoop_exit:;
+
+		if ( ResetCntrlVarType ) {
+			ShowWarningError( RoutineName + cValidSPMTypes( AllSetPtMgr( SetPtMgrNumPtr ).SPMType ) + "=\"" + AllSetPtMgr( SetPtMgrNumPtr ).Name + "\". " );
+			ShowContinueError( " ..Humidity ratio control variable type specified is = " + cValidCtrlTypes( iCtrlVarType_HumRat ) );
+			ShowContinueError( " ..Humidity ratio control variable type allowed with water coils is = " + cValidCtrlTypes( iCtrlVarType_MaxHumRat ) );
+			ShowContinueError( " ..Setpointmanager control variable type is reset to = " + cValidCtrlTypes( iCtrlVarType_MaxHumRat ) );
+			ShowContinueError( " ..Simulation continues. ");
+		}
+
+	}
+
+	void
 	CheckIfAnyIdealCondEntSetPoint()
 	{
 
@@ -8141,6 +8220,20 @@ namespace SetPointManager {
 				}
 			}
 		}
+		// Loop over the schedule setpoint managers
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSchSetPtMgrs; ++SetPtMgrNum ) {
+			for ( CtrlNodeIndex = 1; CtrlNodeIndex <= SchSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) {
+				if ( CntrlNodeNum == SchSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ) ) {
+					if ( SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_HumRat ) {
+						HumRatCntrlType = iCtrlVarType_HumRat;
+					} else if ( SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MaxHumRat ) {
+						HumRatCntrlType = iCtrlVarType_MaxHumRat;
+					}
+					return HumRatCntrlType;
+				}
+			}
+		}
+
 
 		return HumRatCntrlType;
 	}
