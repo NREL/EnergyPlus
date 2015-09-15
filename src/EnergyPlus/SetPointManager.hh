@@ -2107,6 +2107,11 @@ namespace SetPointManager {
 	);
 
 	void
+	ResetHumidityRatioCtrlVarType(
+		int const NodeNum
+		);
+
+	void
 	CheckIfAnyIdealCondEntSetPoint();
 
 	int
