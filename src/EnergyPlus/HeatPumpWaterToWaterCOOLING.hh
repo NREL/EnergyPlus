@@ -92,6 +92,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 		int LoadLoopSideNum; // load side plant loop side index
 		int LoadBranchNum; // load side plant loop branch index
 		int LoadCompNum; // load side plant loop component index
+		int CondMassFlowIndex; // index for criteria in PullCompInterconnectTrigger
 
 		// Default Constructor
 		GshpSpecs() :
@@ -129,7 +130,8 @@ namespace HeatPumpWaterToWaterCOOLING {
 			LoadLoopNum( 0 ),
 			LoadLoopSideNum( 0 ),
 			LoadBranchNum( 0 ),
-			LoadCompNum( 0 )
+			LoadCompNum( 0 ),
+			CondMassFlowIndex( 0 ) 
 		{}
 
 		// Member Constructor
@@ -170,7 +172,8 @@ namespace HeatPumpWaterToWaterCOOLING {
 			int const LoadLoopNum, // load side plant loop index number
 			int const LoadLoopSideNum, // load side plant loop side index
 			int const LoadBranchNum, // load side plant loop branch index
-			int const LoadCompNum // load side plant loop component index
+			int const LoadCompNum , // load side plant loop component index
+			int const CondMassFlowIndex
 		) :
 			Name( Name ),
 			WWHPPlantTypeOfNum( WWHPPlantTypeOfNum ),
@@ -208,7 +211,8 @@ namespace HeatPumpWaterToWaterCOOLING {
 			LoadLoopNum( LoadLoopNum ),
 			LoadLoopSideNum( LoadLoopSideNum ),
 			LoadBranchNum( LoadBranchNum ),
-			LoadCompNum( LoadCompNum )
+			LoadCompNum( LoadCompNum ),
+			CondMassFlowIndex( CondMassFlowIndex )
 		{}
 
 	};
