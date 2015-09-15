@@ -16,28 +16,6 @@ using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataLoopNode;
 
 
-TEST( GroundHeatExchangerTest, KAGroundTemps)
-{
-	ShowMessage( "Begin Test: GroundHeatExchangerTest, KAGroundTemps" );
-
-	// Initialization
-	GLHESlinky thisGLHE;
-
-	Real64 z = 0.0;
-	Real64 dayOfYear = 8;
-	Real64 aveGroundTemp = 15.5;
-	Real64 aveGroundTempAmplitude = 1.0;
-	Real64 phaseShiftInDays = 8;
-
-	thisGLHE.diffusivityGround = 4e-007;
-
-	DayOfSim = 8;
-
-	Real64 groundTemp = thisGLHE.getKAGrndTemp( z, dayOfYear, aveGroundTemp, aveGroundTempAmplitude, phaseShiftInDays );
-
-	EXPECT_DOUBLE_EQ( 14.5, groundTemp );
-}
-
 TEST( GroundHeatExchangerTest, Interpolate )
 {
 	ShowMessage( "Begin Test: GroundHeatExchangerTest, Interpolate" );
