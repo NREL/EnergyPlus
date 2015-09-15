@@ -303,6 +303,77 @@ namespace SetPointManager {
 	// Functions
 
 	void
+	clear_state()
+	{
+	
+		NumAllSetPtMgrs = 0 ; // Number of all Setpoint Managers found in input
+		NumSchSetPtMgrs = 0 ; // Number of Scheduled Setpoint Managers found in input
+		NumDualSchSetPtMgrs = 0 ; // Number of Scheduled Dual Setpoint Managers found in input
+		NumOutAirSetPtMgrs = 0 ; // Number of Outside Air Setpoint Managers found in input
+		NumSZRhSetPtMgrs = 0 ; // number of single zone reheat setpoint managers
+		NumSZHtSetPtMgrs = 0 ; // number of single zone heating setpoint managers
+		NumSZClSetPtMgrs = 0 ; // number of single zone cooling setpoint managers
+		NumSZMinHumSetPtMgrs = 0 ; // number of Single Zone Minimum Humidity Setpoint Managers
+		NumSZMaxHumSetPtMgrs = 0 ; // number of Single Zone Maximum Humidity Setpoint Managers
+		NumMixedAirSetPtMgrs = 0 ; // number of mixed air setpoint managers
+		NumOAPretreatSetPtMgrs = 0 ; // number of outside air pretreat setpoint managers
+		NumWarmestSetPtMgrs = 0 ; // number of Warmest setpoint managers
+		NumColdestSetPtMgrs = 0 ; // number of Coldest setpoint managers
+		NumWarmestSetPtMgrsTempFlow = 0 ; // number of Warmest Temp Flow setpoint managers
+		NumRABFlowSetPtMgrs = 0 ; // number of return air bypass temperature-based flow setpoint manager
+		NumMZClgAverageSetPtMgrs = 0 ; // number of Multizone:Cooling:Average setpoint managers
+		NumMZHtgAverageSetPtMgrs = 0 ; // number of Multizone:Heating:Average setpoint managers
+		NumMZAverageMinHumSetPtMgrs = 0 ; // number of MultiZone:MinimumHumidity:Average setpoint managers
+		NumMZAverageMaxHumSetPtMgrs = 0 ; // number of MultiZone:MaximumHumidity:Average setpoint managers
+		NumMZMinHumSetPtMgrs = 0 ; // number of MultiZone:Humidity:Minimum setpoint managers
+		NumMZMaxHumSetPtMgrs = 0 ; // number of MultiZone:Humidity:Maximum setpoint managers
+		NumFollowOATempSetPtMgrs = 0 ; // number of SetpointManager:FollowOutdoorAirTemperature setpoint managers
+		NumFollowSysNodeTempSetPtMgrs = 0 ; // number of SetpointManager:FollowSystemNodeTemperature setpoint managers
+		NumGroundTempSetPtMgrs = 0 ; // number of SetpointManager:FollowGroundTemperature setpoint managers
+		NumCondEntSetPtMgrs = 0 ; // number of Condenser Entering Reset setpoint managers
+		NumIdealCondEntSetPtMgrs = 0 ; // number of Ideal Condenser Entering Temperature setpoint managers
+		NumSZOneStageCoolingSetPtMgrs = 0 ; // number of single zone one stage cooling setpoint managers
+		NumSZOneStageHeatingSetPtMgrs = 0 ; // number of singel zone one stage heating setpoint managers
+		NumReturnWaterResetChWSetPtMgrs = 0 ; // number of return water reset setpoint managers
+		NumReturnWaterResetHWSetPtMgrs = 0 ; // number of hot-water return water reset setpoint managers
+
+		ManagerOn = false ;
+		GetInputFlag = true ; // First time, input is "gotten"
+		// Object Data
+		AllSetPtMgr.deallocate(); // Array for all Setpoint Manager data(warnings)
+		SchSetPtMgr.deallocate(); // Array for Scheduled Setpoint Manager data
+		DualSchSetPtMgr.deallocate(); // Dual Scheduled Setpoint Manager data
+		OutAirSetPtMgr.deallocate(); // Array for Outside Air Setpoint Manager data
+		SingZoneRhSetPtMgr.deallocate(); // Array for SZRH Set Pt Mgr
+		SingZoneHtSetPtMgr.deallocate(); // Array for SZ Heating Set Pt Mgr
+		SingZoneClSetPtMgr.deallocate(); // Array for SZ Cooling Set Pt Mgr
+		SZMinHumSetPtMgr.deallocate(); // Array for SZ Min Hum Set Pt Mgr
+		SZMaxHumSetPtMgr.deallocate(); // Array for SZ Max Hum Set Pt Mgr
+		MixedAirSetPtMgr.deallocate(); // Array for Mixed Air Set Pt Mgr
+		OAPretreatSetPtMgr.deallocate(); // Array for OA Pretreat Set Pt Mgr
+		WarmestSetPtMgr.deallocate(); // Array for Warmest Set Pt Mgr
+		ColdestSetPtMgr.deallocate(); // Array for Coldest Set Pt Mgr
+		WarmestSetPtMgrTempFlow.deallocate(); // Array for Warmest Set Pt Mgr
+		RABFlowSetPtMgr.deallocate(); // Array for return air bypass
+		MZAverageCoolingSetPtMgr.deallocate(); // Array for MultiZone
+		MZAverageHeatingSetPtMgr.deallocate(); // Array for MultiZone
+		MZAverageMinHumSetPtMgr.deallocate(); // Array for MultiZone
+		MZAverageMaxHumSetPtMgr.deallocate(); // Array for MultiZone
+		MZMinHumSetPtMgr.deallocate(); // Multizone min humidity rat Set Pt Mgr
+		MZMaxHumSetPtMgr.deallocate(); // Multizone max humidity rat Set Pt Mgr
+		FollowOATempSetPtMgr.deallocate(); // Array for Follow Outdoor Air
+		FollowSysNodeTempSetPtMgr.deallocate(); // Array for Follow System
+		GroundTempSetPtMgr.deallocate(); // Array for Ground Temp Setpoint
+		CondEntSetPtMgr.deallocate(); // Condenser Entering Water Set Pt Mgr
+		IdealCondEntSetPtMgr.deallocate(); // Ideal Condenser Entering Set Pt Mgr
+		SZOneStageCoolingSetPtMgr.deallocate(); // single zone 1 stage cool
+		SZOneStageHeatingSetPtMgr.deallocate(); // single zone 1 stage heat
+		ReturnWaterResetChWSetPtMgr.deallocate(); // return water reset
+		ReturnWaterResetHWSetPtMgr.deallocate(); // hot-water return water reset
+
+	}
+
+	void
 	ManageSetPoints()
 	{
 		// SUBROUTINE INFORMATION:
@@ -7909,6 +7980,85 @@ namespace SetPointManager {
 	}
 
 	void
+	ResetHumidityRatioCtrlVarType(
+		int const NodeNum
+	) 
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Bereket Nigusse
+		//       DATE WRITTEN   August 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Resets setpoint control variable type to "Maximum Humidty Ratio" if control variable type
+		// is "Humidity Ratio". 
+
+		// METHODOLOGY EMPLOYED:
+		// Cycle through all setpoint managers and find if the node has a "Humidity Ratio" control 
+		// variable type. This routine is called from "GetControllerInput" routine.  This reset is
+		// just to stop false warning message due to control variable type mismatch.
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "ResetHumidityRatioCtrlVarType: " );
+
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// na
+
+		// Locals
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int SetPtMgrNum; // loop counter for each set point manager
+		int NumNode; // loop counter for each node and specific control type
+		int SetPtMgrNumPtr; // setpoint manager 
+		bool ResetCntrlVarType; // if true reset Hum Rat control var type to maxhumidity ratio
+
+		// First time called, get the input for all the setpoint managers
+		if ( GetInputFlag ) {
+			GetSetPointManagerInputs();
+			GetInputFlag = false;
+		}
+		
+		ResetCntrlVarType = false;
+
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumAllSetPtMgrs; ++SetPtMgrNum ) {
+			for ( NumNode = 1; NumNode <= AllSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++NumNode ) {
+				if ( NodeNum == AllSetPtMgr( SetPtMgrNum ).CtrlNodes( NumNode ) ) {
+					if ( AllSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_HumRat ) {
+						AllSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MaxHumRat;
+						SetPtMgrNumPtr = SetPtMgrNum;
+						ResetCntrlVarType = true;
+						goto SPMLoop_exit;
+					}
+				}
+			}
+		}
+	
+		SPMLoop_exit:;
+
+		if ( ResetCntrlVarType ) {
+			ShowWarningError( RoutineName + cValidSPMTypes( AllSetPtMgr( SetPtMgrNumPtr ).SPMType ) + "=\"" + AllSetPtMgr( SetPtMgrNumPtr ).Name + "\". " );
+			ShowContinueError( " ..Humidity ratio control variable type specified is = " + cValidCtrlTypes( iCtrlVarType_HumRat ) );
+			ShowContinueError( " ..Humidity ratio control variable type allowed with water coils is = " + cValidCtrlTypes( iCtrlVarType_MaxHumRat ) );
+			ShowContinueError( " ..Setpointmanager control variable type is reset to = " + cValidCtrlTypes( iCtrlVarType_MaxHumRat ) );
+			ShowContinueError( " ..Simulation continues. ");
+		}
+
+	}
+
+	void
 	CheckIfAnyIdealCondEntSetPoint()
 	{
 
@@ -8064,6 +8214,20 @@ namespace SetPointManager {
 				}
 			}
 		}
+		// Loop over the schedule setpoint managers
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSchSetPtMgrs; ++SetPtMgrNum ) {
+			for ( CtrlNodeIndex = 1; CtrlNodeIndex <= SchSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) {
+				if ( CntrlNodeNum == SchSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ) ) {
+					if ( SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_HumRat ) {
+						HumRatCntrlType = iCtrlVarType_HumRat;
+					} else if ( SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MaxHumRat ) {
+						HumRatCntrlType = iCtrlVarType_MaxHumRat;
+					}
+					return HumRatCntrlType;
+				}
+			}
+		}
+
 
 		return HumRatCntrlType;
 	}

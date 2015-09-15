@@ -32,12 +32,14 @@ namespace FanCoilUnits {
 	extern int const CCoil_HXAssist;
 
 	extern int const HCoil_Water;
+	extern int const HCoil_Electric;
 
 	//capacity control method supported in this module
 	extern int const CCM_ConsFanVarFlow;
 	extern int const CCM_CycFan;
 	extern int const CCM_VarFanVarFlow;
 	extern int const CCM_VarFanConsFlow;
+	extern int const CCM_MultiSpeedFan;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -48,6 +50,10 @@ namespace FanCoilUnits {
 	extern Array1D_bool MySizeFlag;
 	extern Array1D_bool CheckEquipName;
 	extern bool GetFanCoilInputFlag; // First time, input is "gotten"
+	extern Real64 FanFlowRatio;
+	extern bool HeatingLoad; // True when zone needs heating
+	extern bool CoolingLoad; // True when zone needs cooling
+	extern Real64 const Small5WLoad; // load threshold 5.0 W
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -135,6 +141,7 @@ namespace FanCoilUnits {
 		Real64 MinHotWaterVolFlow; // m3/s
 		Real64 MinHotWaterFlow; // kg/s
 		Real64 HotControlOffset; // control tolerance
+		Real64 DesignHeatingCapacity; // size of electric heating coil [W]
 		int AvailStatus;
 		std::string AvailManagerListName; // Name of an availability manager list object
 		// addition for OA to Zone Units
@@ -147,6 +154,9 @@ namespace FanCoilUnits {
 		int ATMixerOutNode; // outlet air node number for the air terminal mixer
 		int ZonePtr; // pointer to a zone served by a fancoil unit
 		int HVACSizingIndex; // index of a HVACSizing object for a fancoil unit
+		Real64 SpeedRatio; // speed ratio when the fan is cycling between stages
+		int FanOpModeSchedPtr; // pointer to supply air fan operating mode schedule
+		int FanOpMode; // 1=cycling fan cycling coil; 2=constant fan cycling coil
 
 		// Report data
 		Real64 HeatPower; // unit heating output in watts
@@ -216,6 +226,7 @@ namespace FanCoilUnits {
 			MinHotWaterVolFlow( 0.0 ),
 			MinHotWaterFlow( 0.0 ),
 			HotControlOffset( 0.0 ),
+			DesignHeatingCapacity( 0.0 ),
 			AvailStatus( 0 ),
 			ATMixerExists( false ),
 			ATMixerIndex( 0 ),
@@ -225,6 +236,9 @@ namespace FanCoilUnits {
 			ATMixerOutNode( 0 ),
 			ZonePtr( 0 ),
 			HVACSizingIndex( 0 ),
+			SpeedRatio( 0.0 ),
+			FanOpModeSchedPtr( 0 ),
+			FanOpMode( 1 ),
 			HeatPower( 0.0 ),
 			HeatEnergy( 0.0 ),
 			TotCoolPower( 0.0 ),
@@ -235,191 +249,6 @@ namespace FanCoilUnits {
 			ElecEnergy( 0.0 ),
 			DesCoolingLoad( 0.0 ),
 			DesHeatingLoad( 0.0 )
-		{}
-
-		// Member Constructor
-		FanCoilData(
-			std::string const & Name, // name of unit
-			std::string const & UnitType, // type of unit
-			int const UnitType_Num,
-			std::string const & Sched, // availability schedule
-			int const SchedPtr, // index to schedule
-			std::string const & SchedOutAir, // outside air schedule, multipliy maximum outdoor air flow rate
-			int const SchedOutAirPtr, // index to outside air schedule
-			int const FanType_Num, // index to fan type
-			std::string const & CapCtrlMeth, // type of capacity control method
-			int const SpeedFanSel, // Speed fan selected
-			int const CapCtrlMeth_Num,
-			Real64 const PLR, // Part Load Ratio, fraction of time step fancoil is on
-			int const MaxIterIndexH, // Maximum iterations exceeded for heating
-			int const MaxIterIndexC, // Maximum iterations exceeded for cooling
-			Real64 const FanAirVolFlow, // m3/s
-			Real64 const MaxAirVolFlow, // m3/s
-			Real64 const MaxAirMassFlow, // kg/s
-			Real64 const LowSpeedRatio, // Low speed fan supply air flow ratio
-			Real64 const MedSpeedRatio, // Medium speed fan supply air flow ratio
-			Real64 const SpeedFanRatSel, // Speed fan ratio determined by fan speed selection at each timestep
-			Real64 const OutAirVolFlow, // m3/s
-			Real64 const OutAirMassFlow, // kg/s
-			int const AirInNode, // inlet air node number
-			int const AirOutNode, // outlet air node number
-			int const OutsideAirNode, // outside air node number
-			int const AirReliefNode, // relief air node number
-			int const MixedAirNode, // Mixed Air Node number
-			int const ColdControlNode, // chilled water control node
-			int const ColdPlantOutletNode, // chilled water coil outlet plant node
-			int const HotControlNode, // hot water control node
-			int const HotPlantOutletNode, // hot water coil outlet plant node
-			std::string const & OAMixName, // name of outside air mixer
-			std::string const & OAMixType, // type of outside air mixer
-			int const OAMixIndex,
-			std::string const & FanName, // name of fan
-			std::string const & FanType, // type of fan
-			int const FanIndex, // index for fan
-			std::string const & CCoilName, // name of cooling coil
-			int const CCoilName_Index, // Index for this Cooling Coil in SimWaterComp
-			std::string const & CCoilType, // type of cooling coil:
-			int const CCoilType_Num, // Numeric equivalent for type of cooling coil
-			std::string const & CCoilPlantName, // name of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
-			std::string const & CCoilPlantType, // type of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
-			int const CCoilPlantTypeOfNum,
-			int const CWLoopNum, // index for plant loop with chilled water coil
-			int const CWLoopSide, // index for plant loop side for chilled water coil
-			int const CWBranchNum, // index for plant branch for chilled water coil
-			int const CWCompNum, // index for plant component for chilled water coil
-			int const ControlCompTypeNum,
-			int const CompErrIndex,
-			Real64 const MaxColdWaterVolFlow, // m3/s
-			Real64 const MaxColdWaterFlow, // kg/s
-			Real64 const MinColdWaterVolFlow, // m3/s
-			Real64 const MinColdWaterFlow, // kg/s
-			Real64 const ColdControlOffset, // control tolerance
-			std::string const & HCoilName, // name of heating coil
-			int const HCoilName_Index,
-			std::string const & HCoilType, // type of heating coil:
-			int const HCoilType_Num, // Numeric equivalent for type of cooling coil
-			int const HCoilPlantTypeOfNum,
-			int const HWLoopNum, // index for plant loop with hot water coil
-			int const HWLoopSide, // index for plant loop side for hot water coil
-			int const HWBranchNum, // index for plant branch for hot water coil
-			int const HWCompNum, // index for plant component for hot water coil
-			Real64 const MaxHotWaterVolFlow, // m3/s
-			Real64 const MaxHotWaterFlow, // kg/s
-			Real64 const MinHotWaterVolFlow, // m3/s
-			Real64 const MinHotWaterFlow, // kg/s
-			Real64 const HotControlOffset, // control tolerance
-			int const AvailStatus,
-			std::string const & AvailManagerListName, // Name of an availability manager list object
-			bool const ATMixerExists, // True if there is an ATMixer
-			std::string const & ATMixerName, // name of air terminal mixer
-			int const ATMixerIndex, // index to the air terminal mixer
-			int const ATMixerType, // 1 = inlet side mixer, 2 = supply side mixer
-			int const ATMixerPriNode, // primary inlet air node number for the air terminal mixer
-			int const ATMixerSecNode, // secondary air inlet node number for the air terminal mixer
-			int const ATMixerOutNode, // outlet air node number for the air terminal mixer
-			int const ZonePtr, // pointer to a zone served by a fancoil unit
-			int const HVACSizingIndex, // index of a HVACSizing object for a fancoil unit
-			Real64 const HeatPower, // unit heating output in watts
-			Real64 const HeatEnergy, // unit heating output in J
-			Real64 const TotCoolPower, // unit total cooling power output in watts
-			Real64 const TotCoolEnergy, // unit total cooling energy output in joules
-			Real64 const SensCoolPower, // unit sensible cooling power output in watts
-			Real64 const SensCoolEnergy, // unit sensible cooling energy output in joules
-			Real64 const ElecPower, // unit electric power consumption in watts
-			Real64 const ElecEnergy, // unit electiric energy consumption in joules
-			Real64 const DesCoolingLoad, // used for reporting in watts
-			Real64 const DesHeatingLoad // used for reporting in watts
-		) :
-			Name( Name ),
-			UnitType( UnitType ),
-			UnitType_Num( UnitType_Num ),
-			Sched( Sched ),
-			SchedPtr( SchedPtr ),
-			SchedOutAir( SchedOutAir ),
-			SchedOutAirPtr( SchedOutAirPtr ),
-			FanType_Num( FanType_Num ),
-			CapCtrlMeth( CapCtrlMeth ),
-			SpeedFanSel( SpeedFanSel ),
-			CapCtrlMeth_Num( CapCtrlMeth_Num ),
-			PLR( PLR ),
-			MaxIterIndexH( MaxIterIndexH ),
-			MaxIterIndexC( MaxIterIndexC ),
-			FanAirVolFlow( FanAirVolFlow ),
-			MaxAirVolFlow( MaxAirVolFlow ),
-			MaxAirMassFlow( MaxAirMassFlow ),
-			LowSpeedRatio( LowSpeedRatio ),
-			MedSpeedRatio( MedSpeedRatio ),
-			SpeedFanRatSel( SpeedFanRatSel ),
-			OutAirVolFlow( OutAirVolFlow ),
-			OutAirMassFlow( OutAirMassFlow ),
-			AirInNode( AirInNode ),
-			AirOutNode( AirOutNode ),
-			OutsideAirNode( OutsideAirNode ),
-			AirReliefNode( AirReliefNode ),
-			MixedAirNode( MixedAirNode ),
-			ColdControlNode( ColdControlNode ),
-			ColdPlantOutletNode( ColdPlantOutletNode ),
-			HotControlNode( HotControlNode ),
-			HotPlantOutletNode( HotPlantOutletNode ),
-			OAMixName( OAMixName ),
-			OAMixType( OAMixType ),
-			OAMixIndex( OAMixIndex ),
-			FanName( FanName ),
-			FanType( FanType ),
-			FanIndex( FanIndex ),
-			CCoilName( CCoilName ),
-			CCoilName_Index( CCoilName_Index ),
-			CCoilType( CCoilType ),
-			CCoilType_Num( CCoilType_Num ),
-			CCoilPlantName( CCoilPlantName ),
-			CCoilPlantType( CCoilPlantType ),
-			CCoilPlantTypeOfNum( CCoilPlantTypeOfNum ),
-			CWLoopNum( CWLoopNum ),
-			CWLoopSide( CWLoopSide ),
-			CWBranchNum( CWBranchNum ),
-			CWCompNum( CWCompNum ),
-			ControlCompTypeNum( ControlCompTypeNum ),
-			CompErrIndex( CompErrIndex ),
-			MaxColdWaterVolFlow( MaxColdWaterVolFlow ),
-			MaxColdWaterFlow( MaxColdWaterFlow ),
-			MinColdWaterVolFlow( MinColdWaterVolFlow ),
-			MinColdWaterFlow( MinColdWaterFlow ),
-			ColdControlOffset( ColdControlOffset ),
-			HCoilName( HCoilName ),
-			HCoilName_Index( HCoilName_Index ),
-			HCoilType( HCoilType ),
-			HCoilType_Num( HCoilType_Num ),
-			HCoilPlantTypeOfNum( HCoilPlantTypeOfNum ),
-			HWLoopNum( HWLoopNum ),
-			HWLoopSide( HWLoopSide ),
-			HWBranchNum( HWBranchNum ),
-			HWCompNum( HWCompNum ),
-			MaxHotWaterVolFlow( MaxHotWaterVolFlow ),
-			MaxHotWaterFlow( MaxHotWaterFlow ),
-			MinHotWaterVolFlow( MinHotWaterVolFlow ),
-			MinHotWaterFlow( MinHotWaterFlow ),
-			HotControlOffset( HotControlOffset ),
-			AvailStatus( AvailStatus ),
-			AvailManagerListName( AvailManagerListName ),
-			ATMixerExists( ATMixerExists ),
-			ATMixerName( ATMixerName ),
-			ATMixerIndex( ATMixerIndex ),
-			ATMixerType( ATMixerType ),
-			ATMixerPriNode( ATMixerPriNode ),
-			ATMixerSecNode( ATMixerSecNode ),
-			ATMixerOutNode( ATMixerOutNode ),
-			ZonePtr( ZonePtr ),
-			HVACSizingIndex( HVACSizingIndex ),
-			HeatPower( HeatPower ),
-			HeatEnergy( HeatEnergy ),
-			TotCoolPower( TotCoolPower ),
-			TotCoolEnergy( TotCoolEnergy ),
-			SensCoolPower( SensCoolPower ),
-			SensCoolEnergy( SensCoolEnergy ),
-			ElecPower( ElecPower ),
-			ElecEnergy( ElecEnergy ),
-			DesCoolingLoad( DesCoolingLoad ),
-			DesHeatingLoad( DesHeatingLoad )
 		{}
 
 	};
@@ -478,7 +307,8 @@ namespace FanCoilUnits {
 		int const WLoopNum,
 		Real64 & MaxWaterVolFlowDes,
 		Real64 & DesignLoad,
-		bool & ErrorsFound);
+		bool & ErrorsFound
+	);
 
 	void
 	Sim4PipeFanCoil(
@@ -497,6 +327,25 @@ namespace FanCoilUnits {
 		bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
 		Real64 & LoadMet, // load met by unit (watts)
 		Optional< Real64 > PLR = _ // Part Load Ratio, fraction of time step fancoil is on
+	);
+
+	void
+	SimMultiStage4PipeFanCoil(
+		int & FanCoilNum, // number of the current fan coil unit being simulated
+		int const ControlledZoneNum, // index into ZoneEqupConfig
+		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+		Real64 & PowerMet // Sensible power supplied (W)
+	);
+
+	void
+	CalcMultiStage4PipeFanCoil(
+		int & FanCoilNum, // number of the current fan coil unit being simulated
+		int const ZoneNum, // number of zone being served
+		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+		Real64 const QZnReq, // current zone cooling or heating load
+		Real64 & SpeedRatio, // fan coil speed ratio
+		Real64 & PartLoadRatio, // fan coil part load ratio
+		Real64 & PowerMet // Sensible power supplied (W)
 	);
 
 	void
@@ -521,6 +370,12 @@ namespace FanCoilUnits {
 	GetFanCoilIndex(
 		std::string const & FanCoilName,
 		int & FanCoilIndex
+	);
+
+	Real64
+	CalcFanCoilLoadResidual(
+		Real64 const PartLoadRatio, // DX cooling coil part load ratio
+		Array1< Real64 > const & Par // Function parameters
 	);
 
 	//     NOTICE

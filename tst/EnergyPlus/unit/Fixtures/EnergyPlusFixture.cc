@@ -7,24 +7,86 @@
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
 #include "../TestHelpers/IdfParser.hh"
+// A to Z order
+#include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataBranchNodeConnections.hh>
+#include <EnergyPlus/DataConvergParams.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/GroundHeatExchangers.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <EnergyPlus/HeatBalanceAirManager.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
+#include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/HVACManager.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutsideEnergySources.hh>
+#include <EnergyPlus/Pipes.hh>
+#include <EnergyPlus/PlantCondLoopOperation.hh>
+#include <EnergyPlus/PlantLoadProfile.hh>
+#include <EnergyPlus/PlantLoopSolver.hh>
+#include <EnergyPlus/PlantManager.hh>
+#include <EnergyPlus/PlantPressureSystem.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/OutputReportTabularAnnual.hh>
 
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/SetPointManager.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
-
+#include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include <fstream>
 #include <algorithm>
@@ -53,25 +115,84 @@ namespace EnergyPlus {
 	}
 
 	void EnergyPlusFixture::TearDown() {
+
+		// A to Z order
+		BranchInputManager::clear_state();
+		CondenserLoopTowers::clear_state();
 		CurveManager::clear_state();
+		DataAirLoop::clear_state();
+		DataBranchNodeConnections::clear_state();
+		DataConvergParams::clear_state();
+		DataDefineEquip::clear_state();
 		DataEnvironment::clear_state();
 		DataGlobals::clear_state();
 		DataHeatBalance::clear_state();
+		DataHeatBalFanSys::clear_state();
+		DataHeatBalSurface::clear_state();
+		DataHVACGlobals::clear_state();
 		DataIPShortCuts::clear_state();
+		DataLoopNode::clear_state();
 		DataOutputs::clear_state();
+		DataPlant::clear_state();
+		DataRuntimeLanguage::clear_state();
+		DataSizing::clear_state();
 		DataSurfaces::clear_state();
 		DataZoneControls::clear_state();
+		DataZoneEnergyDemands::clear_state();
+		DataZoneEquipment::clear_state();
+		DXCoils::clear_state();
+		EMSManager::clear_state();
 		ExteriorEnergyUse::clear_state();
+		Fans::clear_state();
+		GlobalNames::clear_state();
+		GroundHeatExchangers::clear_state();
+		GroundTemperatureManager::clear_state();
+		HeatBalanceAirManager::clear_state();
+		HeatBalanceIntRadExchange::clear_state();
 		HeatBalanceManager::clear_state();
+		HeatBalanceSurfaceManager::clear_state();
+		HeatPumpWaterToWaterSimple::clear_state();
+		Humidifiers::clear_state();
+		HVACManager::clear_state();
+		HVACVariableRefrigerantFlow::clear_state();
 		InputProcessor::clear_state();
+		InternalHeatGains::clear_state();
+		MixedAir::clear_state();
+		NodeInputManager::clear_state();
+		OutAirNodeManager::clear_state();
 		OutputProcessor::clear_state();
+		OutputReportPredefined::clear_state();
+		OutputReportTabularAnnual::clear_state();
+		OutsideEnergySources::clear_state();
+		PlantCondLoopOperation::clear_state();
+		PlantLoadProfile::clear_state();
+		PlantLoopSolver::clear_state();
+		PlantPressureSystem::clear_state();
+		PlantUtilities::clear_state();
+		Pipes::clear_state();
+		Pumps::clear_state();
 		ScheduleManager::clear_state();
+		VariableSpeedCoils::clear_state();
+		SetPointManager::clear_state();
+		SimAirServingZones::clear_state();
+		SimulationManager::clear_state();
+		SizingManager::clear_state();
+		SolarShading::clear_state();
+		SplitterComponent::clear_state();
+		SystemAvailabilityManager::clear_state();
+		VariableSpeedCoils::clear_state();
+		WaterCoils::clear_state();
+		WaterThermalTanks::clear_state();
+		WeatherManager::clear_state();
+		ZoneAirLoopEquipmentManager::clear_state();
+		ZoneEquipmentManager::clear_state();
+		ZoneTempPredictorCorrector::clear_state();
 
-		{ 
-			IOFlags flags; 
+		{
+			IOFlags flags;
 			flags.DISPOSE( "DELETE" );
 			gio::close( OutputProcessor::OutputFileMeterDetails, flags );
-			gio::close( DataGlobals::OutputFileStandard, flags ); 
+			gio::close( DataGlobals::OutputFileStandard, flags );
 			gio::close( DataGlobals::OutputFileInits, flags );
 			gio::close( DataGlobals::OutputFileDebug, flags );
 			gio::close( DataGlobals::OutputFileZoneSizing, flags );
@@ -249,17 +370,17 @@ namespace EnergyPlus {
 					num_1 = FindItemInList( IDFRecords( which ).Name, ListOfObjects, NumObjectDefs );
 				}
 				if ( ObjectDef( num_1 ).NameAlpha1 && IDFRecords( which ).NumAlphas > 0 ) {
-					error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name + 
-									", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) + 
+					error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name +
+									", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) +
 									"], Object Type Preceding=" + IDFRecords( which ).Name + ", Object Name=" + IDFRecords( which ).Alphas( 1 ) + DataStringGlobals::NL;
 				} else {
-					error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name + 
-									", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) + 
+					error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name +
+									", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) +
 									"], Object Type Preceding=" + IDFRecords( which ).Name + ", Name field not recorded for Object." + DataStringGlobals::NL;
 				}
 			} else {
-				error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name + 
-								", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) + 
+				error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name +
+								", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) +
 								"], No prior Objects." + DataStringGlobals::NL;
 			}
 		}
@@ -349,7 +470,7 @@ namespace EnergyPlus {
 			}
 
 			if ( ! file_exists ) {
-				EXPECT_TRUE( file_exists ) << 
+				EXPECT_TRUE( file_exists ) <<
 					"Energy+.idd does not exist at search location." << std::endl << "IDD search location: \"" << idd_location << "\"";
 				errors_found = true;
 				return errors_found;
@@ -383,14 +504,14 @@ namespace EnergyPlus {
 		return errors_found;
 	}
 
-	bool EnergyPlusFixture::compare_idf( 
-		std::string const & name, 
-		int const num_alphas, 
-		int const num_numbers, 
-		std::vector< std::string > const & alphas, 
-		std::vector< bool > const & alphas_blank, 
-		std::vector< Real64 > const & numbers, 
-		std::vector< bool > const & numbers_blank 
+	bool EnergyPlusFixture::compare_idf(
+		std::string const & name,
+		int const num_alphas,
+		int const num_numbers,
+		std::vector< std::string > const & alphas,
+		std::vector< bool > const & alphas_blank,
+		std::vector< Real64 > const & numbers,
+		std::vector< bool > const & numbers_blank
 	)
 	{
 		using namespace InputProcessor;
@@ -403,7 +524,7 @@ namespace EnergyPlus {
 
 		EXPECT_GT( index, 0 ) << "Could not find \"" << name << "\". Make sure to run process_idf first.";
 		if ( index < 1 ) return false;
-		
+
 		index = iListOfObjects( index );
 		index = ObjectStartRecord( index );
 

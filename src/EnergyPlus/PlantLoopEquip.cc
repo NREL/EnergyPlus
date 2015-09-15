@@ -1036,6 +1036,8 @@ namespace PlantLoopEquip {
 
 			} else if ( EquipTypeNum == TypeOf_CooledBeamAirTerminal ) {
 
+			} else if ( EquipTypeNum == TypeOf_FourPipeBeamAirTerminal ) {
+
 			} else if ( EquipTypeNum == TypeOf_MultiSpeedHeatPumpRecovery ) {
 
 			} else if ( EquipTypeNum == TypeOf_UnitarySystemRecovery ) {

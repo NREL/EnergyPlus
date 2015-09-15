@@ -248,6 +248,8 @@ namespace OutputReportPredefined {
 	extern int pdchZnClPkIndHum;
 	extern int pdchZnClPkOATemp;
 	extern int pdchZnClPkOAHum;
+	extern int pdchZnClPkOAMinFlow;
+	extern int pdchZnClPkDOASHeatGain;
 	extern int pdstZoneHtSize;
 	extern int pdchZnHtCalcDesLd;
 	extern int pdchZnHtUserDesLd;
@@ -261,6 +263,8 @@ namespace OutputReportPredefined {
 	extern int pdchZnHtPkIndHum;
 	extern int pdchZnHtPkOATemp;
 	extern int pdchZnHtPkOAHum;
+	extern int pdchZnHtPkOAMinFlow;
+	extern int pdchZnHtPkDOASHeatGain;
 	extern int pdstSystemSize;
 	extern int pdchSysSizCalcClAir;
 	extern int pdchSysSizUserClAir;
@@ -403,6 +407,8 @@ namespace OutputReportPredefined {
 	extern int pdstSHGSannual;
 	extern int pdchSHGSAnHvacHt;
 	extern int pdchSHGSAnHvacCl;
+	extern int pdchSHGSAnHvacATUHt;
+	extern int pdchSHGSAnHvacATUCl;
 	extern int pdchSHGSAnSurfHt;
 	extern int pdchSHGSAnSurfCl;
 	extern int pdchSHGSAnPeoplAdd;
@@ -422,6 +428,8 @@ namespace OutputReportPredefined {
 	extern int pdchSHGSClTimePeak;
 	extern int pdchSHGSClHvacHt;
 	extern int pdchSHGSClHvacCl;
+	extern int pdchSHGSClHvacATUHt;
+	extern int pdchSHGSClHvacATUCl;
 	extern int pdchSHGSClSurfHt;
 	extern int pdchSHGSClSurfCl;
 	extern int pdchSHGSClPeoplAdd;
@@ -441,6 +449,8 @@ namespace OutputReportPredefined {
 	extern int pdchSHGSHtTimePeak;
 	extern int pdchSHGSHtHvacHt;
 	extern int pdchSHGSHtHvacCl;
+	extern int pdchSHGSHtHvacATUHt;
+	extern int pdchSHGSHtHvacATUCl;
 	extern int pdchSHGSHtSurfHt;
 	extern int pdchSHGSHtSurfCl;
 	extern int pdchSHGSHtPeoplAdd;
@@ -837,6 +847,9 @@ namespace OutputReportPredefined {
 	extern Array1D< ShadowRelateType > ShadowRelate;
 
 	// Functions
+	void
+	clear_state();
+
 
 	void
 	SetPredefinedTables();

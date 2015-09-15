@@ -91,6 +91,8 @@ namespace Pipes {
 	extern Array1D< LocalPipeData > LocalPipe; // dimension to number of pipes
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimPipes(

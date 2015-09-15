@@ -3891,7 +3891,7 @@ Wray, C.P., R.C. Diamond, and M.H. Sherman. 2005. “Rationale for Measuring Duc
 
 #### Overview
 
-The input object ZoneHVAC:FourPipeFanCoil provides a model for a 4 pipe fan coil zonal hydronic unit that can supply heating and cooling to a zone. It contains a hot water coil, a chilled water coil, and a fan. It can supply a fixed amount of outdoor air, but can not operate in an economizer mode. The fan runs at constant speed – control is achieved by throttling the hot or cold water flow. The fan coil configuration and control is rather limited. The fan position is always *blow-through*, control is always by varying the water flow, never by holding the water flow constant and cycling the fan.
+The input object ZoneHVAC:FourPipeFanCoil provides a model for a 4 pipe fan coil zonal hydronic unit that can supply heating and cooling to a zone. It contains a hot water or electric heating coil, a chilled water coil, and a fan. It can supply a fixed amount of outdoor air, but cannot operate in an economizer mode. The fan runs at constant speed – control is achieved by throttling the hot or cold water flow. The fan coil configuration and control is rather limited. The fan position is always *blow-through*, control is always by varying the water flow, never by holding the water flow constant and cycling the fan.
 
 #### Model
 
@@ -3903,13 +3903,13 @@ The 4 pipe fan coil unit is modeled as a compound component consisting of 4 sub-
 
 3.    *Coil:Cooling:Water, Coil:Cooling:Water:DetailedGeometry,* or *CoilSystem:Cooling:Water:HeatExchangerAssisted*
 
-4.    *Coil:Heating:Water*
+4.    *Coil:Heating:Water or Coil:Heating:Electric*
 
 The unit is a forward model: its inputs are defined by the state of its inlets: namely its 2 air streams – recirculated and outdoor air. The outputs of the model are the conditions of the outlet air stream: flow rate, temperature and humidity ratio. The unit data and simulation are encapsulated in the module *FanCoilUnits.*
 
 #### Inputs and Data
 
-The user describes the 4 pipe fan coil unit by inputting the names of the outdoor air mixer, the fan, the heating coil, and the cooling coil. The cooling coil type must also be specified.
+The user describes the 4 pipe fan coil unit by inputting the names of the outdoor air mixer, the fan, the heating coil, and the cooling coil. The heating and cooling coil types must also be specified.
 
 The unit is connected to the overall HVAC system by specifying node names for the unit air inlet (for recirculated air) node, air outlet node, outdoor air node, relief node, inlet hot water node, and inlet chilled water node. The individual components comprising the fan coil must also be input and connected together properly. Specifically the outdoor air mixer mixed air node must be the same as the fan inlet node; the fan outlet node must be the same as the cooling coil air inlet node; the cooling coil air outlet node must be the same as the heating coil air inlet node; and the heating coil air outlet node must be the same as the unit air outlet node; the outdoor air mixer inlet nodes must match the unit inlet nodes; and the outdoor air mixer relief node must match the unit relief node.
 
@@ -3927,7 +3927,7 @@ Given the needed inputs, the output is calculated in subroutine *Calc4PipeFanCoi
 
 3.    the cooling coil is simulated (Call *SimulateWaterCoilComponents* or *SimHXAssistedCoolingCoil*);
 
-4.    the heating coil is simulated (Call *SimulateWaterCoilComponents*).
+4.    the heating coil is simulated (Call *SimulateWaterCoilComponents or SimulateHeatingCoilComponents*).
 
 The load met (sensible cooling or heating) is calculated and passed back to the calling routine:
 
@@ -3947,9 +3947,63 @@ From the result of the zone simulation we have the current heating/cooling deman
 
 where <span>\({\dot Q_{hc}}\)</span>is the heating coil load, <span>\({\dot Q_{z,hsp}}\)</span>is the current zone load to the heating setpoint, <span>\({\dot Q_{cc}}\)</span>is the cooling coil load, and <span>\({\dot Q_{z,csp}}\)</span>is the current zone load to the cooling setpoint.
 
-If the unit is on and <span>\({\dot Q_{cc}}\)</span>&lt; 0 and the thermostat type is not “single heating setpoint”, *ControlCompOutput* is called with the control node set to the cold water inlet node. *ControlCompOutput* is a general component control routine. In this case calls *Calc4PipeFanCoil* repeatedly while varying the cold water flow rate and minimizing <span>\(({\dot Q_{sens,out}} - {\dot Q_{z,csp}})/{\dot Q_{z,csp}}\)</span>to within the cooling convergence tolerance. Similarly if the unit is on and <span>\({\dot Q_{hc}}\)</span>&gt;0 and the thermostat type is not “single cooling setpoint”, *ControlCompOutput* is called with the control node set to the hot water inlet node. *ControlCompOutput* varies the hot water flow rate to minimize <span>\(({\dot Q_{sens,out}} - {\dot Q_{z,hsp}})/{\dot Q_{z,hsp}}\)</span> to within the heating tolerance. *ControlCompOutput* executes a slow but safe interval halving algorithm to do its minimization. Once control is achieved, the total cooling/heating output is calculated:
+If the unit is on and <span>\({\dot Q_{cc}}\)</span>&lt; 0 and the thermostat type is not “single heating setpoint”, *ControlCompOutput* is called with the control node set to the cold water inlet node. *ControlCompOutput* is a general component control routine. In this case calls *Calc4PipeFanCoil* repeatedly while varying the cold water flow rate and minimizing <span>\(({\dot Q_{sens,out}} - {\dot Q_{z,csp}})/{\dot Q_{z,csp}}\)</span>to within the cooling convergence tolerance. Similarly if the unit is on and <span>\({\dot Q_{hc}}\)</span>&gt;0 and the thermostat type is not “single cooling setpoint”, *ControlCompOutput* is called with the control node set to the hot water inlet node (for hydronic heating coil only). *ControlCompOutput* varies the hot water flow rate or the electric heating coil part-load ratio is varied to minimize <span>\(({\dot Q_{sens,out}} - {\dot Q_{z,hsp}})/{\dot Q_{z,hsp}}\)</span> to within the heating tolerance. *ControlCompOutput* executes a slow but safe interval halving algorithm to do its minimization. Once control is achieved, the total cooling/heating output is calculated:
 
      <span>\({\dot Q_{tot,out}} = \dot m\cdot ({\mathop{\rm PsyHFnTdbW}\nolimits} ({T_{out}},{W_{out}}) - {\mathop{\rm PsyHFnTdbW}\nolimits} ({T_{in,}}{W_{in}})\)</span>
+
+
+##### Multi-Speed Fan In FanCoil
+
+When modeling multi-speed fan in FanCoil unit, capacity is modulated using speed ratio or part load ratio.  The supply air fan speed is varied while operating the coils at maximum water flow. When there is no system load to meet, the water control valve is fully closed. When the FanCoil fan is cycling between two consecutive fan speed levels a speed ratio is calculated, but when the FanCoil unit cycles between the minimum fan speed and off-position, then part load ratio is calculated. The fan may be off or run continuously at lowest speed to provide ventilation air depending the fan operating schedule specified. When the FanCoil is operating at the lowest fan speed (Speed = 1), the water flow rate is reported as the average for the time step by multiplying the maximum water flow by part load ratio. The speed ratio and part-load ratio are calculated such that the FanCoil unit satisfies the required system zone cooling or heating load.The set of equations used for the multi-speed fan capacity control methods in FanCoil unit are summarized next.
+
+###### Cycling Between Speeds
+
+When the supply fan is cycling between consecutive speeds, then the speed ratio (SR) and the average mass flow rate are calculated as follows:
+
+<div>$${SR_{n}} = Abs({SystemLoad} - {FullLoadOutput_{n-1}}) / Abs({FullLoadOutput_{n}} - {FullLoadOutput_{n-1}})$$</div>
+<div>$${\dot m} = {\dot m_{on, n}} {SR_{n}} + {\dot m_{on, n-1}} (1 - {SR_{n}})$$</div>
+<div>$${\dot m{w}} = {\dot m_{w, max}}$$</div>
+
+###### Cycling OnOff at Lowest Speed
+
+The average supply air flow rate calculation when the fan is running at the lowest fan speed level depends on the fan operating schedule and load. The fan coil unit part load ratio is given by:
+
+<div>$${PLR} = Abs({SystemLoad} - {NoLoadOutput}) / Abs({FullLoadOutput_{1}} - {NoLoadOutput})$$</div>
+
+
+####### Continuous Fan
+
+<div>$${\dot m} = {\dot m_{on, 1}} {PLR} + {\dot m_{off}} (1 - {PLR})$$</div>$$
+
+####### Cycling Fan:
+
+<div>$${\dot m} = {\dot m_{on, 1}} {PLR}$$</div>$$
+<div>$${\dot m{w}} = {\dot m_{w, max}} * {PLR}$$</div>$$
+
+where:
+
+{SR_{n}}		=	 speed ratio of the fan coil unit at speed n, (-)
+
+{PLR}			=	 part load ratio of the fan coil uni at speed 1, (-)
+
+{\dot m}		=	 average mass flow rate of supply air, (kg/s
+
+{\dot m_{on, n-1}}	=	mass flow rate of supply air at fan speed level n-1, (kg/s)
+
+{\dot m_{on, n}}}	=	mass flow rate of supply air at fan speed level n, (kg/s)
+
+{\dot m_{off}}	=	mass flow rate of supply air when the coils are off, (kg/s)
+
+{\dot m_{w}}	=	 average mass flow rate of chilled or hot water, (kg/s)
+
+{\dot m_{w, max}}	=	maximum or full mass flow rate of chilled or hot water, (kg/s)
+
+SystemLoad 	= system load to be met by the fan coil unit, (W)
+
+{FullLoadOutput_{n-1}} 	= fully load fan coil unit output at fan speed level n-1, (W)
+
+{FullLoadOutput_{n}} 	= fully load fan coil unit output at fan speed level n, (W)
+
 
 #### References
 

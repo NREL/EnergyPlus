@@ -1977,6 +1977,9 @@ namespace SetPointManager {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	ManageSetPoints();
 
 	void
@@ -2102,6 +2105,11 @@ namespace SetPointManager {
 		int const NodeNum,
 		int const iCtrlVarType
 	);
+
+	void
+	ResetHumidityRatioCtrlVarType(
+		int const NodeNum
+		);
 
 	void
 	CheckIfAnyIdealCondEntSetPoint();
