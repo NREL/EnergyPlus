@@ -350,8 +350,6 @@ namespace PlantPipingSystemsManager {
 		int SurfCtr( 0 );
 		Real64 ZoneTemp( 0.0 );
 		Real64 SlabArea( 0.0 );
-		Array2D< Real64 > WeightingFactor;
-		Array2D< Real64 > WeightedHeatFlux;
 		Real64 WeightingFactorTimesArea( 0.0 );
 		Real64 RunningTemp( 0.0 );
 
@@ -378,12 +376,20 @@ namespace PlantPipingSystemsManager {
 
 				DoOneTimeInitializations( DomainNum, _ );
 
+				if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
+					Xmax = ubound( PipingSystemDomains( DomainNum ).Cells, 1 );
+					Ymax = ubound( PipingSystemDomains( DomainNum ).Cells, 2 );
+					Zmax = ubound( PipingSystemDomains( DomainNum ).Cells, 3 );
+					Y = Ymax;
+					SlabArea = ( PipingSystemDomains( DomainNum ).SlabLength / 2 ) * ( PipingSystemDomains( DomainNum ).SlabWidth / 2 );
+					
+					PipingSystemDomains( DomainNum ).WeightingFactor.allocate( { 0, Xmax }, { 0, Zmax } );
+					PipingSystemDomains( DomainNum ).WeightedHeatFlux.allocate( { 0, Xmax }, { 0, Zmax } );
+				}
+
 				PipingSystemDomains( DomainNum ).BeginSimInit = false;
 				PipingSystemDomains( DomainNum ).BeginSimEnvrn = false;
 			}
-
-			if ( !BeginSimFlag ) PipingSystemDomains( DomainNum ).BeginSimInit = true;
-			if ( !BeginEnvrnFlag ) PipingSystemDomains( DomainNum ).BeginSimEnvrn = true;
 
 			// Reset the heat fluxs if domain update has been completed
 			if ( PipingSystemDomains( DomainNum ).ResetHeatFluxFlag ) {
@@ -395,17 +401,45 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Aggregate the heat flux
+			// Select run interval
+			if ( PipingSystemDomains( DomainNum ).SimTimestepFlag ) {
+
+				if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
+					PipingSystemDomains( DomainNum ).AggregateHeatFlux += GetZoneInterfaceHeatFlux( DomainNum );
+					PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
+				} else {
+					// basement walls
+					PipingSystemDomains( DomainNum ).AggregateWallHeatFlux += GetBasementWallHeatFlux( DomainNum );
+					// basement floor
+					PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux += GetBasementFloorHeatFlux( DomainNum );
+					PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
+				}
+
+				// Keep on going!
+				PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = TimeStepZoneSec;
+
+			} else if ( PipingSystemDomains( DomainNum ).SimHourlyFlag ) {
+				
+				if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
+					PipingSystemDomains( DomainNum ).AggregateHeatFlux += GetZoneInterfaceHeatFlux( DomainNum );
+					PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
+				} else {
+					// basement walls
+					PipingSystemDomains( DomainNum ).AggregateWallHeatFlux += GetBasementWallHeatFlux( DomainNum );
+					// basement floor
+					PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux += GetBasementFloorHeatFlux( DomainNum );
+					PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
+				}
+
+				// Passes by if not time to run
+				if ( TimeStep != 1 ) continue;
+				PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = SecInHour;
+			}
+
 			// Zone-coupled slab
 			if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
-				PipingSystemDomains( DomainNum ).AggregateHeatFlux += GetZoneInterfaceHeatFlux( DomainNum );
-				PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
-				PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
 
-				Xmax = ubound( PipingSystemDomains( DomainNum ).Cells, 1 );
-				Ymax = ubound( PipingSystemDomains( DomainNum ).Cells, 2 );
-				Zmax = ubound( PipingSystemDomains( DomainNum ).Cells, 3 );
-				Y = Ymax;
-				SlabArea = ( PipingSystemDomains( DomainNum ).SlabLength / 2 ) * ( PipingSystemDomains( DomainNum ).SlabWidth / 2 );
+				PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
 
 				//Set ZoneTemp equal to the average air temperature of the zones the coupled surfaces are part of.
 				for ( SurfCtr = 1; SurfCtr <= isize( PipingSystemDomains( DomainNum ).ZoneCoupledSurfaces ); ++SurfCtr ) {
@@ -414,10 +448,6 @@ namespace PlantPipingSystemsManager {
 				}
 				ZoneTemp = RunningTemp / ( SurfCtr - 1 );
 
-				WeightingFactor.allocate( { 0, Xmax }, { 0, Zmax } );
-				WeightedHeatFlux.allocate( { 0, Xmax }, { 0, Zmax } );
-				PipingSystemDomains( DomainNum ).WeightedHeatFlux.allocate( { 0, Xmax }, { 0, Zmax } );
-
 				for ( Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
 					for ( X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
 						// Zone interface cells
@@ -425,49 +455,27 @@ namespace PlantPipingSystemsManager {
 							if ( abs( ZoneTemp - PipingSystemDomains( DomainNum ).Cells( Xmax, Ymax, Zmax ).MyBase.Temperature_PrevTimeStep ) < 0.0001 ){
 								PipingSystemDomains( DomainNum ).Cells( Xmax, Ymax, Zmax ).MyBase.Temperature_PrevTimeStep = ZoneTemp - 0.0001;
 							}
-							WeightingFactor( X, Z ) = ( ( ZoneTemp - PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Temperature_PrevTimeStep ) / ( ZoneTemp - PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Temperature_PrevTimeStep ) );
-							WeightingFactorTimesArea += WeightingFactor( X, Z ) * YNormalArea( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) );
+							PipingSystemDomains( DomainNum ).WeightingFactor( X, Z ) = ( ( ZoneTemp - PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Temperature_PrevTimeStep ) / ( ZoneTemp - PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Temperature_PrevTimeStep ) );
+							WeightingFactorTimesArea += PipingSystemDomains( DomainNum ).WeightingFactor( X, Z ) * YNormalArea( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) );
 						}
 					}
 				}
 				//Get heat flux for center cell first
-				WeightedHeatFlux( Xmax, Zmax ) = PipingSystemDomains( DomainNum ).HeatFlux * SlabArea / WeightingFactorTimesArea;
+				PipingSystemDomains( DomainNum ).WeightedHeatFlux( Xmax, Zmax ) = PipingSystemDomains( DomainNum ).HeatFlux * SlabArea / WeightingFactorTimesArea;
 
 				//Then get temperature weighted heat flux for each cell
 				for ( Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
 					for ( X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
 						// Zone interface cells
 						if ( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).CellType == CellType_ZoneGroundInterface ){
-								WeightedHeatFlux( X, Z ) = WeightingFactor( X, Z ) * WeightedHeatFlux( Xmax, Zmax );
+								PipingSystemDomains( DomainNum ).WeightedHeatFlux( X, Z ) = PipingSystemDomains( DomainNum ).WeightingFactor( X, Z ) * PipingSystemDomains( DomainNum ).WeightedHeatFlux( Xmax, Zmax );
 						}
 					}
 				}
-				//Finally, assign heat flux values to PipingSystem arrays for temperture calculations for this time step
-				PipingSystemDomains( DomainNum ).WeightedHeatFlux = WeightedHeatFlux;
 
 			} else { // Coupled basement
-				// basement walls
-				PipingSystemDomains( DomainNum ).AggregateWallHeatFlux += GetBasementWallHeatFlux( DomainNum );
-				// basement floor
-				PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux += GetBasementFloorHeatFlux( DomainNum );
-
-				PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
 				PipingSystemDomains( DomainNum ).WallHeatFlux = PipingSystemDomains( DomainNum ).AggregateWallHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
 				PipingSystemDomains( DomainNum ).FloorHeatFlux = PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
-			}
-
-			// Select run interval
-			if ( PipingSystemDomains( DomainNum ).SimTimestepFlag ) {
-				// Keep on going!
-				PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = TimeStepZoneSec;
-			} else if ( PipingSystemDomains( DomainNum ).SimHourlyFlag ) {
-				// Passes by if not time to run
-				if ( TimeStep != 1 ) continue;
-				PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = SecInHour;
-			} else if ( PipingSystemDomains( DomainNum ).SimDailyFlag ) {
-				//Passes by if not time to run
-				if ( HourOfDay != 1 || TimeStep != 1 ) continue;
-				PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = SecInHour * 24;
 			}
 
 			// Shift history arrays only if necessary
@@ -1280,13 +1288,10 @@ namespace PlantPipingSystemsManager {
 					PipingSystemDomains( DomainCtr ).SimTimestepFlag = true;
 				} else if ( SameString( cAlphaArgs( 13 ), "HOURLY" ) ) {
 					PipingSystemDomains( DomainCtr ).SimHourlyFlag = true;
-				} else if ( SameString( cAlphaArgs( 13 ), "DAILY" ) ) {
-					PipingSystemDomains( DomainCtr ).SimDailyFlag = true;
 				} else {
 					ShowContinueError( "Could not determine slab simulation interval. Check input." );
 					ShowFatalError( "Preceding error causes program termination." );
 				}
-
 
 				//******* We'll first set up the domain ********
 				PipingSystemDomains( DomainCtr ).IsActuallyPartOfAHorizontalTrench = false;
@@ -1695,8 +1700,6 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainNum ).SimTimestepFlag = true;
 			} else if ( SameString( cAlphaArgs( 11 ), "HOURLY" ) ) {
 				PipingSystemDomains( DomainNum ).SimHourlyFlag = true;
-			} else if ( SameString( cAlphaArgs( 9 ), "DAILY" ) ) {
-				PipingSystemDomains( DomainNum ).SimDailyFlag = true;
 			} else {
 				ShowContinueError( "Could not determine basement simulation interval. Check input." );
 				ShowFatalError( "Preceding error causes program termination." );
@@ -2561,8 +2564,6 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).BeginSimEnvrn = false;
 
 		}
-		if ( ! BeginSimFlag ) PipingSystemDomains( DomainNum ).BeginSimInit = true;
-		if ( ! BeginEnvrnFlag ) PipingSystemDomains( DomainNum ).BeginSimEnvrn = true;
 
 		// Shift history arrays only if necessary
 		if ( std::abs( PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds - PipingSystemDomains( DomainNum ).Cur.PrevSimTimeSeconds ) > 1.0e-6 ) {

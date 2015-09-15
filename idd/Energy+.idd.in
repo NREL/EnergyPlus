@@ -2016,9 +2016,8 @@ Site:GroundDomain:Slab,
         \maximum 2
    A13; \field Simulation Timestep
         \type choice
-        \key Daily
-        \key Hourly
         \key Timestep
+        \key Hourly
         \default Hourly
         \note This field specifies the ground domain simulation timestep.
 
@@ -2143,7 +2142,6 @@ Site:GroundDomain:Basement,
         \type choice
         \key Timestep
         \key Hourly
-        \key Daily
         \default Hourly
         \note This field specifies the basement domain simulation interval.
    N13; \field Mesh Density Parameter

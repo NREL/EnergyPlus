@@ -930,6 +930,7 @@ namespace DataPlantPipingSystems {
 		int NumGroundSurfCells;
 		int NumInsulationCells;
 		int NumSlabCells;
+		Array2D< Real64 > WeightingFactor;
 		Array2D< Real64 > WeightedHeatFlux;
 
 		// Main 3D cells array
