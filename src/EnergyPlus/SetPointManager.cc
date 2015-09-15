@@ -254,7 +254,10 @@ namespace SetPointManager {
 
 	bool ManagerOn( false );
 	bool GetInputFlag( true ); // First time, input is "gotten"
-
+	namespace {
+		bool InitSetPointManagersOneTimeFlag( true );
+		bool InitSetPointManagersOneTimeFlag2( true );
+	}
 	// temperature-based flow control manager
 	// Average Cooling Set Pt Mgr
 	// Average Heating Set Pt Mgr
@@ -340,6 +343,8 @@ namespace SetPointManager {
 		ManagerOn = false ;
 		GetInputFlag = true ; // First time, input is "gotten"
 		// Object Data
+		InitSetPointManagersOneTimeFlag = true;
+		InitSetPointManagersOneTimeFlag2 = true;
 		AllSetPtMgr.deallocate(); // Array for all Setpoint Manager data(warnings)
 		SchSetPtMgr.deallocate(); // Array for Scheduled Setpoint Manager data
 		DualSchSetPtMgr.deallocate(); // Dual Scheduled Setpoint Manager data
@@ -3179,9 +3184,9 @@ namespace SetPointManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
+
 		static bool MyEnvrnFlag( true ); // flag for init once at start of environment
-		static bool MyOneTimeFlag2( true );
+
 
 		int SetZoneNum;
 		int ControlledZoneNum;
@@ -3224,7 +3229,7 @@ namespace SetPointManager {
 
 		if ( ZoneEquipInputsFilled && AirLoopInputsFilled ) { // check that the zone equipment and air loop data has been read in
 
-			if ( MyOneTimeFlag ) {
+			if ( InitSetPointManagersOneTimeFlag ) {
 
 				// Minimum humidity setpoint managers
 				cSetPointManagerType = cValidSPMTypes( iSPMType_SZMinHum );
@@ -3363,8 +3368,9 @@ namespace SetPointManager {
 						SingZoneRhSetPtMgr( SetPtMgrNum ).MixedAirNode = MixedAirNode;
 						SingZoneRhSetPtMgr( SetPtMgrNum ).AirLoopNum = AirLoopNum;
 						SingZoneRhSetPtMgr( SetPtMgrNum ).OAInNode = PrimaryAirSystem( AirLoopNum ).OAMixOAInNodeNum;
+						// this next line assumes that OA system is the first thing on the branch, what if there is a relief fan or heat recovery coil or other component in there first? does it matter?
 						SingZoneRhSetPtMgr( SetPtMgrNum ).RetNode = PrimaryAirSystem( AirLoopNum ).OASysInletNodeNum;
-						SingZoneRhSetPtMgr( SetPtMgrNum ).OAInNode = PrimaryAirSystem( AirLoopNum ).OAMixOAInNodeNum;
+
 						SingZoneRhSetPtMgr( SetPtMgrNum ).LoopInNode = LoopInNode;
 					}
 				}
@@ -3811,7 +3817,7 @@ namespace SetPointManager {
 
 			}
 
-			MyOneTimeFlag = false;
+			InitSetPointManagersOneTimeFlag = false;
 
 			if ( ErrorsFound ) {
 				ShowFatalError( "InitSetPointManagers: Errors found in getting SetPointManager input." );
@@ -3819,7 +3825,7 @@ namespace SetPointManager {
 
 		}
 
-		if ( ( BeginEnvrnFlag && MyEnvrnFlag ) || MyOneTimeFlag2 ) {
+		if ( ( BeginEnvrnFlag && MyEnvrnFlag ) || InitSetPointManagersOneTimeFlag2 ) {
 
 			ManagerOn = false;
 
@@ -4239,7 +4245,7 @@ namespace SetPointManager {
 			}
 
 			MyEnvrnFlag = false;
-			if ( ! MyOneTimeFlag ) MyOneTimeFlag2 = false;
+			if ( ! InitSetPointManagersOneTimeFlag ) InitSetPointManagersOneTimeFlag2 = false;
 
 			if ( ErrorsFound ) {
 				ShowFatalError( "InitSetPointManagers: Errors found. Program Terminates." );
@@ -4759,7 +4765,7 @@ namespace SetPointManager {
 		RetNode = SingZoneRhSetPtMgr( SetPtMgrNum ).RetNode;
 		OAMixOAInNode = SingZoneRhSetPtMgr( SetPtMgrNum ).OAInNode;
 		AirLoopNum = SingZoneRhSetPtMgr( SetPtMgrNum ).AirLoopNum;
-		OAFrac = AirLoopFlow( AirLoopNum ).OAFrac;
+		OAFrac = AirLoopFlow( AirLoopNum ).OAFrac; // changed from MinOAFrac, now updates to current oa fraction for improve deadband control
 		ZoneMassFlow = Node( ZoneInletNode ).MassFlowRate;
 		ZoneLoad = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired;
 		ZoneLoadToCoolSetPt = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToCoolingSP;
