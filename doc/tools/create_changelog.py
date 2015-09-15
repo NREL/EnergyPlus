@@ -107,7 +107,7 @@ with io.open(md_file, 'w') as f:
             out(' - [#' + pr[0] + '](' + EPlusRepoPath + '/pull/' + pr[0] + ') : ' + pr[1])
 
     out('# ChangeLog')
-    out('Consists of pull requests merged in GitHub since the last release.')
+    out('Consists of pull requests merged in since the last release.')
     out_pr_class('NewFeature', 'New Features')
     out_pr_class('Performance', 'Performance Enhancements')
     out_pr_class('Defect', 'Defects Repaired')
@@ -146,7 +146,7 @@ with io.open(html_file, 'w') as f2:
     out('}')
     out('</style>')
     out('<h1>EnergyPlus ChangeLog</h1>')
-    out('This file is auto-generated from merged pull requests on GitHub.')
+    out('This file is auto-generated from merged pull requests in the repository.')
     out_pr_class('NewFeature', 'New Features')
     out_pr_class('Performance', 'Performance Enhancements')
     out_pr_class('Defect', 'Defects Repaired')
