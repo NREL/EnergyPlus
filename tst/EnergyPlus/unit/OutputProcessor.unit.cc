@@ -9,8 +9,13 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/PurchasedAirManager.hh>
 
 #include <map>
+
+using namespace EnergyPlus::PurchasedAirManager;
+using namespace EnergyPlus::WeatherManager;
+using namespace EnergyPlus::OutputProcessor;
 
 namespace EnergyPlus {
 
@@ -517,22 +522,22 @@ namespace EnergyPlus {
 			int CurDayType = 10;
 
 			// TSMeter
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportTimeStep, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, 
+			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportTimeStep, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
 				DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay" } ) ) );
 
 			// TSMeter
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, 
+			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
 				DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay" } ) ) );
 
 			// HRMeter
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, 
+			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
 				DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay" } ) ) );
 
 			// DYMeter
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, 
+			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr,
 				PrintTimeStamp, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0,WinterDesignDay" } ) ) );
 
@@ -1074,7 +1079,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F(  SQLiteFixture, OutputProcessor_determineMeterIPUnits ) 
+		TEST_F(  SQLiteFixture, OutputProcessor_determineMeterIPUnits )
 		{
 			int ipUnits = -999999;
 			bool errorFound = false;
@@ -2332,7 +2337,7 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_determineFrequency )
 		{
-			auto const valid_options = std::map< std::string, int >({ 
+			auto const valid_options = std::map< std::string, int >({
 				{ "Detailed", -1 },
 				{ "Timestep", 0 },
 				{ "Hourly", 1 },
@@ -2751,24 +2756,24 @@ namespace EnergyPlus {
 			auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
 			std::vector< std::vector<std::string> > reportData({
-				{ "1", "1", "1", "0.0" }, 
-				{ "2", "1", "7", "4995.0" }, 
-				{ "3", "2", "2", "0.0" }, 
-				{ "4", "2", "8", "4995.0" }, 
-				{ "5", "3", "3", "0.0" }, 
-				{ "6", "3", "9", "4995.0" }, 
-				{ "7", "4", "4", "0.0" }, 
-				{ "8", "4", "10", "4995.0" }, 
+				{ "1", "1", "1", "0.0" },
+				{ "2", "1", "7", "4995.0" },
+				{ "3", "2", "2", "0.0" },
+				{ "4", "2", "8", "4995.0" },
+				{ "5", "3", "3", "0.0" },
+				{ "6", "3", "9", "4995.0" },
+				{ "7", "4", "4", "0.0" },
+				{ "8", "4", "10", "4995.0" },
 				{ "9", "5", "5", "0.0" },
 				{ "10", "5", "11", "4995.0" },
 			});
 
 			std::vector< std::vector<std::string> > reportExtendedData({
-				{ "1", "5", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" }, 
-				{ "2", "6", "4995.0", "12", "31", "24", "-9", "0", "4995.0", "12", "31", "24", "-9", "0" }, 
-				{ "3", "7", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" }, 
-				{ "4", "8", "4995.0", "12", "31", "24", "-9", "0", "4995.0", "12", "31", "24", "-9", "0" }, 
-				{ "5", "9", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" }, 
+				{ "1", "5", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" },
+				{ "2", "6", "4995.0", "12", "31", "24", "-9", "0", "4995.0", "12", "31", "24", "-9", "0" },
+				{ "3", "7", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" },
+				{ "4", "8", "4995.0", "12", "31", "24", "-9", "0", "4995.0", "12", "31", "24", "-9", "0" },
+				{ "5", "9", "0.0", "12", "31", "24", "", "0", "0.0", "12", "31", "24", "", "0" },
 				{ "6", "10", "4995.0", "12", "31", "24", "-9", "0", "4995.0", "12", "31", "24", "-9", "0" }
 			});
 
@@ -3165,6 +3170,136 @@ namespace EnergyPlus {
 				"10,7,Electricity:Facility [J] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]",
 				"11,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
 				"12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+			} ) );
+
+		}
+
+		TEST_F( EnergyPlusFixture, OutputProcessor_ResetAccumulationWhenWarmupComplete )
+		{
+			std::string const idf_objects = delimited_string( {
+				"Version,8.3;",
+				"Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,detailed;",
+				"Output:Meter:MeterFileOnly,DistrictHeating:HVAC,detailed;",
+				"Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,runperiod;",
+				"Output:Meter:MeterFileOnly,DistrictHeating:HVAC,r;",
+			} );
+
+			ASSERT_FALSE( process_idf( idf_objects ) );
+
+			// Setup so that UpdateDataandReport can be called.
+			DataGlobals::DayOfSim = 365;
+			DataGlobals::DayOfSimChr = "365";
+			DataEnvironment::Month = 12;
+			DataEnvironment::DayOfMonth = 31;
+			DataEnvironment::DSTIndicator = 0;
+			DataEnvironment::DayOfWeek = 3;
+			DataEnvironment::HolidayIndex = 0;
+			DataGlobals::HourOfDay = 24;
+			DataGlobals::NumOfDayInEnvrn = 365;
+			DataGlobals::MinutesPerTimeStep = 10;
+
+			if ( DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour ) {
+				DataGlobals::EndHourFlag = true;
+				if ( DataGlobals::HourOfDay == 24 ) {
+					DataGlobals::EndDayFlag = true;
+					if ( ( !DataGlobals::WarmupFlag ) && ( DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn ) ) {
+						DataGlobals::EndEnvrnFlag = true;
+					}
+				}
+			}
+
+			if ( DataEnvironment::DayOfMonth == WeatherManager::EndDayOfMonth( DataEnvironment::Month ) ) {
+				DataEnvironment::EndMonthFlag = true;
+			}
+			TimeValue.allocate( 2 );
+			auto timeStep = 1.0 / 6;
+			SetupTimePointers( "Zone", timeStep );
+			SetupTimePointers( "HVAC", timeStep );
+
+			TimeValue( 1 ).CurMinute = 10;
+			TimeValue( 2 ).CurMinute = 10;
+
+			DataGlobals::WarmupFlag = true;
+
+			ReportOutputFileHeaders();
+
+			GetReportVariableInput();
+			Array1D< ZonePurchasedAir > PurchAir; // Used to specify purchased air parameters
+			PurchAir.allocate( 1 );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Heating Energy [J]", PurchAir( 1 ).TotHeatEnergy, "System", "Sum", PurchAir( 1 ).Name, _, "DISTRICTHEATING", "Heating", _, "System" );
+
+			PurchAir( 1 ).TotHeatEnergy = 1.1;
+			UpdateMeterReporting();
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
+
+			PurchAir( 1 ).TotHeatEnergy = 1.3;
+			UpdateMeterReporting();
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
+
+			PurchAir( 1 ).TotHeatEnergy = 1.5;
+			UpdateMeterReporting();
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
+
+			PurchAir( 1 ).TotHeatEnergy = 1.7;
+			UpdateMeterReporting();
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
+
+			PurchAir( 1 ).TotHeatEnergy = 1.9;
+			UpdateMeterReporting();
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
+
+			PurchAir( 1 ).TotHeatEnergy = 2.2;
+			UpdateMeterReporting();
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
+
+			DataGlobals::WarmupFlag = false;
+
+			PurchAir( 1 ).TotHeatEnergy = 2.4;
+			UpdateMeterReporting();
+			UpdateDataandReport( DataGlobals::ZoneTSReporting ); //zone timestep
+
+
+			compare_eso_stream( delimited_string( {
+				"6,1,,Zone Ideal Loads Supply Air Total Heating Energy [J] !Each Call",
+				"37,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+				"2,365,12,31, 0,24,10.00,20.00,Tuesday",
+				"6,1.1",
+				"2,365,12,31, 0,24,20.00,30.00,Tuesday",
+				"6,1.3",
+				"2,365,12,31, 0,24,30.00,40.00,Tuesday",
+				"6,1.5",
+				"2,365,12,31, 0,24,40.00,50.00,Tuesday",
+				"6,1.7",
+				"2,365,12,31, 0,24,50.00,60.00,Tuesday",
+				"6,1.9",
+				"2,365,12,31, 0,24,60.00,70.00,Tuesday",
+				"6,2.2",
+				"5,365",
+				"37,9.7,1.1,12,31,24,20,2.2,12,31,24,70",
+			} ) );
+
+
+			ResetAccumulationWhenWarmupComplete( );
+
+			PurchAir( 1 ).TotHeatEnergy = 100.0;
+			UpdateMeterReporting();
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
+
+			PurchAir( 1 ).TotHeatEnergy = 200.0;
+			UpdateMeterReporting();
+			UpdateDataandReport( DataGlobals::HVACTSReporting );
+
+			PurchAir( 1 ).TotHeatEnergy = 300.0;
+			UpdateMeterReporting();
+			UpdateDataandReport( DataGlobals::ZoneTSReporting ); //zone timestep
+
+			compare_eso_stream( delimited_string( {
+				"2,365,12,31, 0,24, 0.00,10.00,Tuesday",
+				"6,100.",
+				"2,365,12,31, 0,24,10.00,20.00,Tuesday",
+				"6,200.",
+				"5,365",
+				"37,300.,100.,12,31,24,10,200.,12,31,24,20",
 			} ) );
 
 		}

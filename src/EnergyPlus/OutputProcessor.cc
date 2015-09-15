@@ -213,6 +213,7 @@ namespace OutputProcessor {
 		Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
 		Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
 		bool GetMeterIndexFirstCall( true ); //trigger setup in GetMeterIndex
+		bool InitFlag( true );
 	}
 
 	// All routines should be listed here whether private or not
@@ -315,6 +316,7 @@ namespace OutputProcessor {
 		LStartMin = -1.0;
 		LEndMin = -1.0;
 		GetMeterIndexFirstCall = true ;
+		InitFlag = true;
 		TimeValue.deallocate();
 		RVariableTypes.deallocate();
 		IVariableTypes.deallocate();
@@ -1271,8 +1273,8 @@ namespace OutputProcessor {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Array1D_string StateVariables( 3 );
-		Array1D_string NonStateVariables( 4 );
+		static Array1D_string StateVariables( 3 );
+		static Array1D_string NonStateVariables( 4 );
 		static bool Initialized( false );
 		int Item;
 
@@ -1284,6 +1286,7 @@ namespace OutputProcessor {
 			NonStateVariables( 2 ) = "NONSTATE";
 			NonStateVariables( 3 ) = "SUM";
 			NonStateVariables( 4 ) = "SUMMED";
+			Initialized = true;
 		}
 
 		ValidateVariableType = 1;
@@ -2970,6 +2973,93 @@ namespace OutputProcessor {
 		MeterValue = 0.0; // Ready for next update
 
 	}
+
+	void
+	ResetAccumulationWhenWarmupComplete()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Jason Glazer
+		//       DATE WRITTEN   June 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Resets the accumulating meter values. Needed after warmup period is over to
+		// reset the totals on meters so that they are not accumulated over the warmup period
+
+		// METHODOLOGY EMPLOYED:
+		// Cycle through the meters and reset all accumulating values
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Meter; // Loop Control
+		int Loop; // Loop Variable
+
+		for ( Meter = 1; Meter <= NumEnergyMeters; ++Meter ) {
+			EnergyMeters( Meter ).HRValue = 0.0;
+			EnergyMeters( Meter ).HRMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).HRMaxValDate = 0;
+			EnergyMeters( Meter ).HRMinVal = MinSetValue;
+			EnergyMeters( Meter ).HRMinValDate = 0;
+
+			EnergyMeters( Meter ).DYValue = 0.0;
+			EnergyMeters( Meter ).DYMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).DYMaxValDate = 0;
+			EnergyMeters( Meter ).DYMinVal = MinSetValue;
+			EnergyMeters( Meter ).DYMinValDate = 0;
+
+			EnergyMeters( Meter ).MNValue = 0.0;
+			EnergyMeters( Meter ).MNMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).MNMaxValDate = 0;
+			EnergyMeters( Meter ).MNMinVal = MinSetValue;
+			EnergyMeters( Meter ).MNMinValDate = 0;
+
+			EnergyMeters( Meter ).SMValue = 0.0;
+			EnergyMeters( Meter ).SMMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).SMMaxValDate = 0;
+			EnergyMeters( Meter ).SMMinVal = MinSetValue;
+			EnergyMeters( Meter ).SMMinValDate = 0;
+
+		}
+
+		for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
+			RVar >>= RVariableTypes( Loop ).VarPtr;
+			auto & rVar( RVar() );
+			if ( rVar.ReportFreq == ReportMonthly || rVar.ReportFreq == ReportSim ) {
+				rVar.StoreValue = 0.0;
+				rVar.NumStored = 0;
+			}
+		}
+
+		for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
+			IVar >>= IVariableTypes( Loop ).VarPtr;
+			auto & iVar( IVar() );
+			if ( iVar.ReportFreq == ReportMonthly || iVar.ReportFreq == ReportSim ) {
+				iVar.StoreValue = 0;
+				iVar.NumStored = 0;
+			}
+		}
+	}
+
+
+
 
 	void
 	SetMinMax(
@@ -7407,7 +7497,9 @@ GetVariableKeyCountandType(
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	static Array1D_int keyVarIndexes; // Array index for specific key name
 	static int curKeyVarIndexLimit; // current limit for keyVarIndexes
-	static bool InitFlag( true ); // for initting the keyVarIndexes array
+	//////////// hoisted into namespace ////////////////////////////////////////////////
+	// static bool InitFlag( true ); // for initting the keyVarIndexes array
+	////////////////////////////////////////////////////////////////////////////////////
 	int Loop; // Loop counters
 	int Loop2;
 	std::string::size_type Position; // Starting point of search string
@@ -8182,7 +8274,7 @@ AddToOutputVariableList(
 }
 
 	//     NOTICE
-	
+
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.

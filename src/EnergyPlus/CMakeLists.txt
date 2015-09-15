@@ -311,7 +311,7 @@ SET( SRC
   GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
   GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
 )
-
+ 
 SET( SRC_2
   Timer.h
   GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc
@@ -364,8 +364,12 @@ SET( SRC_2
   OutputReportPredefined.hh
   OutputReportTabular.cc
   OutputReportTabular.hh
+  OutputReportTabularAnnual.cc
+  OutputReportTabularAnnual.hh
   OutputReports.cc
   OutputReports.hh
+  OutputReportData.cc
+  OutputReportData.hh
   OutsideEnergySources.cc
   OutsideEnergySources.hh
   PackagedTerminalHeatPump.cc

@@ -7055,8 +7055,6 @@ This is the runtime fraction of the DX heating coil compressor and outdoor fan(s
 
 ### Coil:Heating:DX:MultiSpeed
 
-### Coil:Heating:DX:MultiSpeed
-
 This component models a DX heating unit with multiple discrete levels of heating capacity. Currently, this heating coil can only be referenced by a AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed compound object. The multispeed DX heating coil can have from two to four operating speeds. When the coil operates at Speed 1 (the lowest speed), its performance is very similar to the Coil:Heating:DX:SingleSpeed object where the impacts of part-load ratio can be included. When the coil operates at higher speeds (above Speed 1), the linear approximation methodology is applied. The coil outputs at two consecutive speeds are linearly interpolated to meet the required heating capacity during an HVAC system timestep. When the coil performs above the lowest speed, the user can choose if they want to include part-load ratio impacts at the higher speeds.
 
 The multispeed unit is described by specifying the performance at different operating speeds. Each speed has its own set of input specifications: full load capacity, COP and air flow rate at rated conditions, along with modifier curves to determine performance when actual operating conditions are different from the rated conditions.

@@ -14,6 +14,7 @@ set( test_src
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
   ChillerElectricEIR.unit.cc;
+  CondenserLoopTowers.unit.cc;
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
@@ -33,22 +34,25 @@ set( test_src
   HeatBalanceManager.unit.cc
   HeatRecovery.unit.cc
   Humidifiers.unit.cc
+  HVACControllers.unit.cc
   HVACFourPipeBeam.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
+  HVACUnitarySystem.unit.cc
+  HVACVariableRefrigerantFlow.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
   ManageElectricPower.unit.cc
-  HVACUnitarySystem.unit.cc
-  HVACVariableRefrigerantFlow.unit.cc
   MixedAir.unit.cc
   MixerComponent.unit.cc
   PurchasedAirManager.unit.cc
   OutputProcessor.unit.cc
+  OutputReportData.unit.cc
   OutputReportTabular.unit.cc
+  OutputReportTabularAnnual.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
@@ -64,6 +68,7 @@ set( test_src
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
   SwimmingPool.unit.cc
+  VariableSpeedCoils.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
   VentilatedSlab.unit.cc
