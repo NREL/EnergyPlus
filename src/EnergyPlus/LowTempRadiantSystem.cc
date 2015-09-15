@@ -2004,6 +2004,8 @@ namespace LowTempRadiantSystem {
 						TempSize = ElecRadSys( RadSysNum ).ScaledHeatingCapacity * Zone( ElecRadSys( RadSysNum ).ZonePtr ).FloorArea;
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 						DesCoilLoad = TempSize;
+						DataScalableCapSizingON = false;
+						ElecRadSys( RadSysNum ).MaxElecPower = TempSize;
 					}
 				} else {
 					if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
@@ -2077,6 +2079,7 @@ namespace LowTempRadiantSystem {
 						TempSize = HydrRadSys( RadSysNum ).ScaledHeatingCapacity * Zone( HydrRadSys( RadSysNum ).ZonePtr ).FloorArea;
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 						DesCoilLoad = TempSize;
+						DataScalableCapSizingON = false;
 					}
 				} else { // Autosize or hard-size with sizing run
 					if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
@@ -2117,9 +2120,9 @@ namespace LowTempRadiantSystem {
 					} else {
 						DesCoilLoad = 0.0;
 					}
-					// finally heating capacity is saved in this variable
-					HydrRadSys( RadSysNum ).ScaledHeatingCapacity = DesCoilLoad;
 				}
+				// finally heating capacity is saved in this variable
+				HydrRadSys( RadSysNum ).ScaledHeatingCapacity = DesCoilLoad;
 			}
 
 			IsAutoSize = false;
@@ -2196,6 +2199,7 @@ namespace LowTempRadiantSystem {
 						TempSize = HydrRadSys( RadSysNum ).ScaledCoolingCapacity * Zone( HydrRadSys( RadSysNum ).ZonePtr ).FloorArea;
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 						DesCoilLoad = TempSize;
+						DataScalableCapSizingON = false;
 					}
 				} else { // Autosize or hard-size with sizing run
 					if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
@@ -2237,9 +2241,9 @@ namespace LowTempRadiantSystem {
 					} else {
 						DesCoilLoad = 0.0;
 					}
-					// finally cooling capacity is saved in this variable
-					HydrRadSys( RadSysNum ).ScaledCoolingCapacity = DesCoilLoad;
 				}
+				// finally cooling capacity is saved in this variable
+				HydrRadSys( RadSysNum ).ScaledCoolingCapacity = DesCoilLoad;
 			}
 
 			IsAutoSize = false;

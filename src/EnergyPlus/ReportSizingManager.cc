@@ -432,7 +432,7 @@ namespace ReportSizingManager {
 			if ( !IsAutoSize && !SizingDesRunThisZone && !SizingDesValueFromParent ) {
 				HardSizeNoDesRun = true;
 				AutosizeUser = SizingResult;
-				if ( PrintWarningFlag && SizingResult > 0.0 ) {
+				if ( PrintWarningFlag && SizingResult > 0.0 && !DataScalableCapSizingON ) {
 					if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
 						SizingResult /= ( 1 - DataBypassFrac ); // back out bypass fraction applied in GetInput
 						ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, SizingResult );
