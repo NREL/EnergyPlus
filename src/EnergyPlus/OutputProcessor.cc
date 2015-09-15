@@ -213,6 +213,7 @@ namespace OutputProcessor {
 		Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
 		Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
 		bool GetMeterIndexFirstCall( true ); //trigger setup in GetMeterIndex
+		bool InitFlag( true );
 	}
 
 	// All routines should be listed here whether private or not
@@ -315,6 +316,7 @@ namespace OutputProcessor {
 		LStartMin = -1.0;
 		LEndMin = -1.0;
 		GetMeterIndexFirstCall = true ;
+		InitFlag = true;
 		TimeValue.deallocate();
 		RVariableTypes.deallocate();
 		IVariableTypes.deallocate();
@@ -1271,8 +1273,8 @@ namespace OutputProcessor {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Array1D_string StateVariables( 3 );
-		Array1D_string NonStateVariables( 4 );
+		static Array1D_string StateVariables( 3 );
+		static Array1D_string NonStateVariables( 4 );
 		static bool Initialized( false );
 		int Item;
 
@@ -1284,6 +1286,7 @@ namespace OutputProcessor {
 			NonStateVariables( 2 ) = "NONSTATE";
 			NonStateVariables( 3 ) = "SUM";
 			NonStateVariables( 4 ) = "SUMMED";
+			Initialized = true;
 		}
 
 		ValidateVariableType = 1;
@@ -7494,7 +7497,9 @@ GetVariableKeyCountandType(
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	static Array1D_int keyVarIndexes; // Array index for specific key name
 	static int curKeyVarIndexLimit; // current limit for keyVarIndexes
-	static bool InitFlag( true ); // for initting the keyVarIndexes array
+	//////////// hoisted into namespace ////////////////////////////////////////////////
+	// static bool InitFlag( true ); // for initting the keyVarIndexes array
+	////////////////////////////////////////////////////////////////////////////////////
 	int Loop; // Loop counters
 	int Loop2;
 	std::string::size_type Position; // Starting point of search string
