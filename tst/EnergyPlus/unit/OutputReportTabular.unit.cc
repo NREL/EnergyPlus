@@ -66,7 +66,7 @@ TEST( OutputReportTabularTest, RealToStr )
 TEST(OutputReportTabularTest, ConfirmResourceWarning)
 {
 	ShowMessage( "Begin Test: OutputReportTabularTest, ConfirmResourceWarning" );
-	
+
 	EXPECT_EQ("In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: Electricity [kWh]",
 		ResourceWarningMessage("Electricity [kWh]"));
 	EXPECT_EQ("In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: Natural Gas [kWh]",
@@ -82,7 +82,7 @@ TEST(OutputReportTabularTest, ConfirmResourceWarning)
 	EXPECT_EQ("In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: Electricity [GJ]",
 		ResourceWarningMessage("Electricity [GJ]"));
 	EXPECT_NE("In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: Gas [kWh]",
-		ResourceWarningMessage("Electricity [kWh]")); 
+		ResourceWarningMessage("Electricity [kWh]"));
 }
 
 TEST(OutputReportTabularTest, ConfirmWaterConversion)
@@ -94,5 +94,67 @@ TEST(OutputReportTabularTest, ConfirmWaterConversion)
 	EXPECT_EQ(13.756, WaterConversionFunct(481.46, 35));
 	EXPECT_EQ(-2, WaterConversionFunct(-12, 6));
 	EXPECT_NE(15, WaterConversionFunct(135, 5));
+
+}
+
+TEST( OutputReportTabularTest, GetUnitConversion )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, GetUnitConversion" );
+
+	int indexUnitConv;
+	std::string curUnits;
+	Real64 curConversionFactor;
+	Real64 curConversionOffset;
+	std::string varNameWithUnits;
+
+	SetupUnitConversions();
+
+	varNameWithUnits = "ZONE AIR SYSTEM SENSIBLE COOLING RATE[W]";
+	LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
+	GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
+	EXPECT_EQ( 70, indexUnitConv );
+	EXPECT_EQ( "ton", curUnits );
+	EXPECT_EQ( 0.0002843333, curConversionFactor );
+	EXPECT_EQ( 0.0, curConversionOffset );
+
+	varNameWithUnits = "SITE OUTDOOR AIR DRYBULB TEMPERATURE[C]";
+	LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
+	GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
+	EXPECT_EQ( 11, indexUnitConv );
+	EXPECT_EQ( "F", curUnits );
+	EXPECT_EQ( 1.8, curConversionFactor );
+	EXPECT_EQ( 32., curConversionOffset );
+
+	varNameWithUnits = "ZONE ELECTRIC EQUIPMENT ELECTRIC ENERGY[J]";
+	LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
+	GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
+	EXPECT_EQ( 20, indexUnitConv );
+	EXPECT_EQ( "kWh", curUnits );
+	EXPECT_EQ( 0.000000277778, curConversionFactor );
+	EXPECT_EQ( 0.0, curConversionOffset );
+
+	varNameWithUnits = "ZONE COOLING SETPOINT NOT MET TIME[hr]";
+	LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
+	GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
+	EXPECT_EQ( 17, indexUnitConv );
+	EXPECT_EQ( "hr", curUnits );
+	EXPECT_EQ( 1.0, curConversionFactor );
+	EXPECT_EQ( 0.0, curConversionOffset );
+
+	varNameWithUnits = "ZONE LIGHTS TOTAL HEATING ENERGY[Invalid/Undefined]";
+	LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
+	GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
+	EXPECT_EQ( 94, indexUnitConv );
+	EXPECT_EQ( "Invalid/Undefined", curUnits );
+	EXPECT_EQ( 1.0, curConversionFactor );
+	EXPECT_EQ( 0.0, curConversionOffset );
+
+	varNameWithUnits = "FICTIONAL VARIABLE[qqq]";
+	LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
+	GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
+	EXPECT_EQ( 0, indexUnitConv );
+	EXPECT_EQ( "", curUnits );
+	EXPECT_EQ( 0.0, curConversionFactor );
+	EXPECT_EQ( 0.0, curConversionOffset );
 
 }
