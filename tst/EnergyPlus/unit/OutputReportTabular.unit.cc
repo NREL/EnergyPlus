@@ -10,11 +10,13 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -25,6 +27,7 @@ using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutputReportTabular;
 using namespace EnergyPlus::ScheduleManager;
+using namespace SimulationManager;
 using namespace EnergyPlus::SurfaceGeometry;
 using namespace ObjexxFCL;
 
@@ -123,6 +126,41 @@ TEST_F( HVACFixture, OutputReportTabular_ZoneMultiplierTest )
 		" ",
 		"  Timestep, 4;",
 		" ",
+		"  Site:Location,",
+		"    Miami Intl Ap FL USA TMY3 WMO=722020E,    !- Name",
+		"    25.82,                   !- Latitude {deg}",
+		"    -80.30,                  !- Longitude {deg}",
+		"    -5.00,                   !- Time Zone {hr}",
+		"    11;                      !- Elevation {m}",
+		" ",
+		"SizingPeriod:DesignDay,",
+		" Miami Intl Ap Ann Htg 99.6% Condns DB, !- Name",
+		" 1,                        !- Month",
+		" 21,                       !- Day of Month",
+		" WinterDesignDay,          !- Day Type",
+		" 8.7,                      !- Maximum Dry - Bulb Temperature{ C }",
+		" 0.0,                      !- Daily Dry - Bulb Temperature Range{ deltaC }",
+		" ,                         !- Dry - Bulb Temperature Range Modifier Type",
+		" ,                         !- Dry - Bulb Temperature Range Modifier Day Schedule Name",
+		" Wetbulb,                  !- Humidity Condition Type",
+		" 8.7,                      !- Wetbulb or DewPoint at Maximum Dry - Bulb{ C }",
+		" ,                         !- Humidity Condition Day Schedule Name",
+		" ,                         !- Humidity Ratio at Maximum Dry - Bulb{ kgWater / kgDryAir }",
+		" ,                         !- Enthalpy at Maximum Dry - Bulb{ J / kg }",
+		" ,                         !- Daily Wet - Bulb Temperature Range{ deltaC }",
+		" 101217.,                  !- Barometric Pressure{ Pa }",
+		" 3.8,                      !- Wind Speed{ m / s }",
+		" 340,                      !- Wind Direction{ deg }",
+		" No,                       !- Rain Indicator",
+		" No,                       !- Snow Indicator",
+		" No,                       !- Daylight Saving Time Indicator",
+		" ASHRAEClearSky,           !- Solar Model Indicator",
+		" ,                         !- Beam Solar Day Schedule Name",
+		" ,                         !- Diffuse Solar Day Schedule Name",
+		" ,                         !- ASHRAE Clear Sky Optical Depth for Beam Irradiance( taub ) { dimensionless }",
+		" ,                         !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance( taud ) { dimensionless }",
+		" 0.00;                     !- Sky Clearness",
+		" ",
 		"OutputControl:Table:Style,",
 		"  HTML;                    !- Column Separator",
 		" ",
@@ -143,6 +181,21 @@ TEST_F( HVACFixture, OutputReportTabular_ZoneMultiplierTest )
 		"  ,                        !- Zone Inside Convection Algorithm",
 		"  ,                        !- Zone Outside Convection Algorithm",
 		"  Yes;                     !- Part of Total Floor Area",
+		" ",
+		"ZoneHVAC:EquipmentConnections,",
+		" Space,                    !- Zone Name",
+		" Space Eq,                 !- Zone Conditioning Equipment List Name",
+		" Space In Node,            !- Zone Air Inlet Node or NodeList Name",
+		" Space Out Node,           !- Zone Air Exhaust Node or NodeList Name",
+		" Space Node,               !- Zone Air Node Name",
+		" Space Ret Node;           !- Zone Return Air Node Name",
+		" ",
+		"ZoneHVAC:EquipmentList,",
+		" Space Eq,                 !- Name",
+		" ZoneHVAC:TerminalUnit:VariableRefrigerantFlow, !- Zone Equipment 1 Object Type",
+		" TU1,                      !- Zone Equipment 1 Name",
+		" 1,                        !- Zone Equipment 1 Cooling Sequence",
+		" 1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
 		" ",
 		"Lights,",
 		" Space Lights,             !- Name",
@@ -351,6 +404,21 @@ TEST_F( HVACFixture, OutputReportTabular_ZoneMultiplierTest )
 		"  ,                        !- Zone Outside Convection Algorithm",
 		"  Yes;                     !- Part of Total Floor Area",
 		" ",
+		"ZoneHVAC:EquipmentConnections,",
+		" Spacex10,                 !- Zone Name",
+		" Spacex10 Eq,              !- Zone Conditioning Equipment List Name",
+		" Spacex10 In Node,         !- Zone Air Inlet Node or NodeList Name",
+		" Spacex10 Out Node,        !- Zone Air Exhaust Node or NodeList Name",
+		" Spacex10 Node,            !- Zone Air Node Name",
+		" Spacex10 Ret Node;        !- Zone Return Air Node Name",
+		" ",
+		"ZoneHVAC:EquipmentList,",
+		" Spacex10 Eq,              !- Name",
+		" ZoneHVAC:TerminalUnit:VariableRefrigerantFlow, !- Zone Equipment 1 Object Type",
+		" TU1x10,                   !- Zone Equipment 1 Name",
+		" 1,                        !- Zone Equipment 1 Cooling Sequence",
+		" 1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
+		" ",
 		"ZoneGroup,",
 		" Zone Group,               !- Name",
 		" Zone List,                !- Zone List Name",
@@ -494,7 +562,15 @@ TEST_F( HVACFixture, OutputReportTabular_ZoneMultiplierTest )
 	OutputProcessor::SetupTimePointers( "Zone", DataGlobals::TimeStepZone ); // Set up Time pointer for HB/Zone Simulation
 	OutputProcessor::SetupTimePointers( "HVAC", DataHVACGlobals::TimeStepSys );
  
-	GetHeatBalanceInput();
+	DataGlobals::BeginSimFlag = true;
+	DataGlobals::DoingSizing = true;
+	SizingManager::ManageSizing();
+	DataGlobals::DoingSizing = false;
+	DataGlobals::KickOffSimulation = true;
+	DataHeatBalSurface::VMULT.deallocate();
+	DataHeatBalSurface::FractDifShortZtoZ.deallocate();
+
+	ManageSimulation();
 
 	GetBuildingData( ErrorsFound );
 	ASSERT_FALSE( ErrorsFound );
