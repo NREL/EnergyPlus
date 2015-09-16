@@ -122,6 +122,8 @@ namespace GroundHeatExchangers {
 			timeSS( 0.0 ),
 			timeSSFactor( 0.0 )
 		{}
+		void
+		clear_state();
 
 		virtual void
 		calcGFunctions()=0;

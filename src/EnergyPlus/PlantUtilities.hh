@@ -12,6 +12,8 @@ namespace EnergyPlus {
 namespace PlantUtilities {
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	InitComponentNodes(
