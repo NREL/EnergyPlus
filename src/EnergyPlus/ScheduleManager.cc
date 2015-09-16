@@ -3129,8 +3129,20 @@ namespace ScheduleManager {
 			gio::write( mMinute, hhmmFormat ) << RetMM;
 			ShowContinueError( "Until value to be used will be: " + hHour + ':' + mMinute );
 		}
-
+		if ( !isMinuteMultipleOfTimestep( RetMM, MinutesPerTimeStep)){
+			ShowWarningError( "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field value is not a multiple of the minutes for each timestep: " + stripped( FullFieldValue ) );
+			ShowContinueError( "Other errors may result. Occurred in Day Schedule=" + DayScheduleName );
+		}
 	}
+
+	bool
+	isMinuteMultipleOfTimestep( int minute, int numMinutesPerTimestep ){
+			if ( minute != 0 ){
+				return ( minute % numMinutesPerTimestep == 0 );
+			} else {
+				return true;
+			}
+		}
 
 	void
 	ProcessForDayTypes(

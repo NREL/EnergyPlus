@@ -301,6 +301,9 @@ namespace ScheduleManager {
 		std::string const & FullFieldValue // Full Input field value
 	);
 
+	bool
+	isMinuteMultipleOfTimestep( int minute, int numMinutesPerTimestep );
+
 	void
 	ProcessForDayTypes(
 		std::string const & ForDayField, // Field containing the "FOR:..."
