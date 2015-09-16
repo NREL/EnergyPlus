@@ -2729,21 +2729,17 @@ An IDF example:
 
 ### Site:GroundDomain:Slab
 
-This section documents the input object used to simulate ground coupled heat transfer with horizontal building surfaces within EnergyPlus. Horizontal ground surfaces within EnergyPlus interact with the Site:GroundDomain object by utilizing the SurfaceProperty:OtherSideConditionsModel object. By utilizing this object, multiple horizontal surfaces can be coupled to the same Site:GroundDomain object. Each horizontal surface may also have its unique ground domain, however, runtime will be adversely affected.
+The Site:GroundDomainSlab object is used to simulate ground heat transfer interaction with the zone floor. Horizontal ground surfaces within EnergyPlus interact with the Site:GroundDomain object by utilizing the SurfaceProperty:OtherSideConditionsModel object. By utilizing the other side conditions model boundary condition, multiple horizontal surfaces can be coupled to the same Site:GroundDomain:Slab object. Each horizontal surface may also have its unique ground domain, however, runtime will be adversely affected since an independent ground domain would need to be created. The total area of the number of surfaces connected to each Site:GroundDomain:Slab object is used to create a rectangular slab with equivalent surface area and with aspect ratio as specified in the input. For non-rectangular geometry, users should try matching the Area/Perimeter (A/P) ratio of their surfaces to the rectancular slab surface. A/P can be converted into the aspect ratio by the following formula.
 
-Generally, there are two scenarios which Site:GroundDomain is equipped to model: in-grade slabs, and on-grade slabs.
+<div>\mbox{Aspect Ratio} = \frac{P+\sqrt{P^2-16 A}}{P-\sqrt{P^2-16 A}}</div>
+
+The model is able simulate in-grade and on-grade slab constructions. For both construction types, the FloorConstruction object for the zone floor must include a thin layer of the floor material with the outside boundary condition (other side condition model) matching the OSCM name in the Site:GroundDomain:Slab object. This could be additional floor construction that exists above the slab, or a thin layer of the slab material itself. Horizontal and vertical insulation are modeled by the GroundDomain. Horizontal insulation can be modeled as covering the full horizontal surface, or it can be limited to the perimeter regions only. Vertical insulation can be specified from the surface down to the use specified depth. An example of this can be seen in the figure below.
+
+Ground domain boundary conditions are set by the Site:GroundTemperature:Undisturbed model specified in the object. The ground surface heat balance includes evapotranspiration, convection, and solar radiation. Snow cover, rain fall, moisture tranport are not handled.
 
 ![](media/image012.png)
 
-Figure 7In-grade configuration.
-
-The in-grade slab option can be used to simulate situations when the upper slab surface is near the ground surface level. For this situation, slab’s upper surface must interact with the zone via an OSCM boundary. Due to this, the FloorConstruction object for the zone floor must include a thin layer of the upper floor material. Horizontal and vertical insulation are modeled by the GroundDomain in this scenario. Horizontal insulation can be modeled as covering the full horizontal surface, or it can be limited to the perimeter regions only. In the latter case, the perimeter insulation width must be specified.
-
-![](media/image013.png)
-
-Figure 8 On-grade configuration
-
-The on-grade slab option can be used to simulate situations when the lower slab surface is near the ground surface level. In this situation, the entire floor must be included within the floor construction object. Vertical insulation is modeled by the GroundDomain in this scenario.  Horizontal insulation can only be modeled as covering the full horizontal surface.
+Figure: Ground Domain Configuration.
 
 #### Field: Name
 
@@ -2755,7 +2751,7 @@ Numeric field used to determine the depth of the simulation domain, in meters.
 
 #### Field: Aspect Ratio
 
-Numeric field used to define the height to width ratio of the slab.
+Numeric field used to define the length to width ratio of the slab.
 
 #### Field: Perimeter Offset
 
@@ -2781,17 +2777,13 @@ A nominal value of soil moisture content to be used when evaluating soil thermal
 
 A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil.
 
-#### Field: Kusuda-Achebach Average Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-The annual average surface temperature to be applied to the Kusuda-Achenbach farfield boundary temperature correlation, in °C
+The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
-#### Field: Kusuda-Achebach Average Amplitude of Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-The annual mean surface temperature variation from average used in determining the farfield boundary conditions.
-
-#### Field: Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-
-The phase shift of minimum surface temperature, or the day of the year when the minimum surface temperature occurs.
+The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
 #### Field: Evapotranspiration Ground Cover Parameter
 
@@ -2837,6 +2829,26 @@ Name of material object representing the vertical slab insulation. Optional argu
 
 Numeric field indicates the depth measured in meters from the ground surface to which the vertical perimeter insulation extends. Valid range from &gt; Slab Thickness to &lt; Domain Depth.
 
+#### Field: X-Direction Mesh Density Parameter
+
+This numeric integer field represents the number of cells to be placed between any two “domain partitions” during mesh development.  A domain partition may be thought of as a basement wall/floor, or a pipe.  Once these components are laid out in the domain, this field number of cells are placed between the partitions.  Further information on this is found in the engineering reference manual.
+
+#### Field: Y-Direction Mesh Density Parameter
+
+Same as previous.
+
+#### Field: Z-Direction Mesh Density Parameter
+
+Same as previous.
+
+#### Field: Mesh Type
+
+This alpha field represents the type of mesh to create when placing cells between “domain partitions.”  Two options are available: “uniform” and “geometric.”  For uniform, the cells are placed in the region with all cells having equal size.  For symmetric-geometric, the cells are compressed toward the partitions so that there are more cells on either side of the mesh region.  This can help focus computational intensity on the boundary areas where it is likely more desired.  For symmetric-geometric mesh distribution, the mesh density parameter should be an even number to provide the symmetric condition.
+
+#### Field: Geometric Coefficient
+
+This numeric field represents the compression of cell distribution if the x-direction mesh type is set to “geometric.”  If the mesh type is uniform, this field is not interpreted.  For symmetric geometric, a value in this field equal to 1 would result in a uniform distribution, while a value of 2 would provide a highly skewed distribution.
+
 #### Field: Simulation Timestep
 
 Alpha field indicating whether the domain will update temperatures at each zone timestep, or at hourly intervals. Options include “timestep” and “hourly”.
@@ -2852,12 +2864,11 @@ Site:GroundDomain:Slab,
     1.8,                !- Soil Thermal Conductivity
     3200,               !- Soil Density
     836,                !- Soil Specific Heat
-    30,   !- Soil Moisture Content Volume Fraction
-    50,   !- Soil Moisture Content Volume Fraction at Saturation
-    15.5, !- Kusuda-Achenbach Average Surface Temperature
-    12.8, !- Kusuda-Achenbach Average Amplitude of Surface Temperature
-    17.3, !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-    1,    !- Evapotranspiration Ground Cover Parameter
+    30,                 !- Soil Moisture Content Volume Fraction
+    50,                 !- Soil Moisture Content Volume Fraction at Saturation
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps,            !- Name of Undisturbed Ground Temperature Object
+    1,                  !- Evapotranspiration Ground Cover Parameter
     GroundCoupledOSCM,      !- Name of Floor Boundary Condition Model
     InGrade,                !- Slab Location (InGrade/OnGrade)
     Slab Material-In-grade, !- Slab Material Name
@@ -2868,37 +2879,12 @@ Site:GroundDomain:Slab,
     Yes,                !- Vertical Insulation
     Slab Insulation,    !- Vertical Insulation Name
     2,                  !- Vertical perimeter insulation depth from surface
-    Hourly;             !- Simulation timestep</td>
-```
-
-And IDF example of an on-grade slab
-
-```idf
-Site:GroundDomain:Slab,
-    OngradeCoupledSlab, !- Name
-    5,                  !- Ground Domain Depth {m}
-    1,                  !- Aspect Ratio
-    5,                  !- Domain Perimeter Offset {m}
-    1.8,                !- Soil Thermal Conductivity {W/m-K}
-    3200,               !- Soil Density {kg/m3}
-    836,                !- Soil Specific Heat {J/kg-K}
-    30,          !- Soil Moisture Content Volume Fraction
-    50,          !- Soil Moisture Content Volume Fraction at Saturation
-    15.5,        !- Kusuda-Achenbach Average Surface Temperature
-    12.8,   !- Kusuda-Achenbach Average Amplitude of Surface Temperature
-    17.3,   !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-    1,           !- Evapotranspiration Ground Cover Parameter
-    GroundCoupledOSCM,  !- Name of Floor Boundary Condition Model
-    OnGrade,            !- Slab Location (InGrade/OnGrade)
-    ,                   !- Slab Material Name
-    ,                   !- Horizontal Insulation (Yes/No)
-    ,                   !- Horizontal Insulation Material Name
-    ,                   !- Full Horizontal or Perimeter Only
-    ,                   !- Perimeter insulation width (m)
-    Yes,                !- Vertical Insulation (Yes/No)
-    Slab Insulation,    !- Vertical Insulation Name
-    2,                  !- Vertical perimeter insulation depth from surface
-    Hourly;             !- Simulation timestep. (Timestep/Hourly)</td>
+    4,                  !- X Direction Mesh Parameter
+    4,                  !- Y Direction Mesh Parameter
+    4,                  !- Z Direction Mesh Parameter
+    geometric,          !- Mesh Type (Uniform/Geometric)
+    1.3,                !- Geometric Coefficient
+    Hourly;             !- Simulation Timestep</td>
 ```
 
 ### Site:GroundDomain Outputs
@@ -2918,9 +2904,11 @@ This is the value of the OthersideConditionModel surface temperature. This is th
 
 ### Site:GroundDomain:Basement
 
-This section documents the input object used to simulate ground coupled heat transfer with underground zones within EnergyPlus. Zone surfaces within EnergyPlus interact with the Site:GroundDomain:Basement object by utilizing the SurfaceProperty:OtherSideConditionsModel object. Two separate OSCM are required for the basement vertical and horizontal surfaces. Vertical wall surfaces will interact with the first OSCM while the horizontal floor surface will interact with the second OSCM. Basement floor and wall surfaces are constructed normally by using the BuildingSurface:Detailed object, with the outside boundary condition being the OtherSideConditionsModel for the basement floor or wall. The outside surface of the wall being the interface between the ground domain and the EnergyPlus zone. Horizontal and vertical ground insulation are simulated by the ground domain, and therefore should not be included in the wall and floor construction objects.
+This section documents the input object used to simulate ground coupled heat transfer with underground zones within EnergyPlus. Zone surfaces within EnergyPlus interact with the Site:GroundDomain:Basement object by utilizing the SurfaceProperty:OtherSideConditionsModel object. Two separate OSCM are required for the basement vertical and horizontal surfaces. Vertical wall surfaces will interact with the first OSCM while the horizontal floor surface will interact with the second OSCM. Basement floor and wall surfaces are constructed normally by using the BuildingSurface:Detailed object, with the outside boundary condition being the OtherSideConditionsModel for the basement floor or wall. The outside surface of the wall being the interface between the ground domain and the EnergyPlus zone. Horizontal and vertical ground insulation are simulated by the ground domain, and therefore should not be included in the wall and floor construction objects. See the figure below.
 
-![](media/image012.png)
+![](media/image013.png)
+
+![](media/image014.png)
 
 Figure: Basement Configuration
 
@@ -2949,8 +2937,8 @@ Site:GroundDomain:Basement,
     Yes,                     !- Basement Wall Vertical Insulation Present(Yes/No)
     Basement Insulation,     !- Basement Wall Vertical Insulation Material Name
     2.5,                     !- Vertical insulation depth from surface (m)
+    4,                       !- Mesh Density Parameter
     Hourly;                  !- Domain Update interval. (Timestep, Hourly)
-    4;                       ! Mesh Density Parameter
 ```
 
 #### Field: Name
@@ -2989,17 +2977,13 @@ A nominal value of soil moisture content to be used when evaluating soil thermal
 
 A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil.
 
-#### Field: Kusuda-Achebach Average Ground Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-The annual average ground surface temperature to be applied to the Kusuda-Achenbach far-field boundary temperature correlation, in °C. This parameter and the subsequent two parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this, and the following two parameters for the simulation. In which case, this field and the following two can be left blank.
+The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
-#### Field: Kusuda-Achebach Average Amplitude of Ground Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-The annual mean ground surface temperature variation from average used in determining the far-field boundary conditions, in °C. This parameter, as well as the previous and following parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this parameter, as well as the previous and following parameters. In which case, this field, the previous field, and the following field can be left blank.
-
-#### Field: Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature
-
-The phase shift of minimum ground surface temperature, or the day of the year when the minimum ground surface temperature occurs. This parameter, as well as the previous two parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this parameter, as well as the previous two parameters. In which case, this field, the previous two fields can be left blank.
+The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
 #### Field: Evapotranspiration Ground Cover Parameter
 
@@ -3045,13 +3029,13 @@ Name of material object representing the vertical slab insulation. Optional argu
 
 Numeric field indicates the depth measured in meters from the ground surface to which the vertical perimeter insulation extends. Valid range from > 0 to &lt; Basement Depth.
 
-#### Field: Simulation Timestep
-
-Alpha field indicating whether the domain will update temperatures at each zone timestep, or at hourly intervals. Options include “timestep” and “hourly”.
-
 #### Mesh Density Parameter
 
 Integer field indicating the density of the finite difference ground domain cells between the basement and the far field boundaries. Default value is 4. Total number of ground domain cells, insulation cells, and ground surface cells are indicated as outputs to the eio file.
+
+#### Field: Simulation Timestep
+
+Alpha field indicating whether the domain will update temperatures at each zone timestep, or at hourly intervals. Options include “timestep” and “hourly”.
 
 Site:GroundDomain:Basement Output Variables
 

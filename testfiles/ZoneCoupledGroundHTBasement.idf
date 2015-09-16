@@ -575,7 +575,9 @@ Material,
     Yes,                     !- Basement Wall Vertical Insulation Present(Yes/No)
     Basement Insulation,     !- Basement Wall Vertical Insulation Material Name
     2.3,                     !- Vertical insulation depth from surface (m)
-    timestep;                !- Domain Update interval. (Timestep, Hourly);
+    4,                       !- Mesh Density Parameter
+    timestep;                !- Domain Update interval. (Timestep, Hourly)
+
     
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     KATemps,                 !- Name of object

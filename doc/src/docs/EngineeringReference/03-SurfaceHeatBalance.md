@@ -3957,7 +3957,7 @@ Multiple horizontal surfaces can be coupled to each ground domain object. The mo
 
 #### Boundary Conditions
 
-At the interface surface, the average surface conduction heat flux from all surfaces connected to the ground domain is imposed as a GroundDomain boundary condition at the Surface/GroundDomain interface cells. Far-field temperatures are applied as boundary temperature at the GroundDomain sides and lower surface. The ground temperature profile at the domain sides and lower surface are taken from Kusuda & Achenbach 1965. The correlation requires annual ground surface temperature data.
+At the interface surface, the average surface conduction heat flux from all surfaces connected to the ground domain is imposed as a GroundDomain boundary condition at the Surface/GroundDomain interface cells. Far-field and lower boundary conditions are applied based on the Site:GroundTemperature:Undisturbed: object specified in the input.
 
 Ground surface cells are treated as a heat balance, where long and short wave radiation, conduction, and convection are considered. Evapotranspiration is also considered. The evapotranspiration rate is calculated as a moisture loss by using the Allen et al. (2005) model, and translated into a heat loss by multiplication with the density and latent heat of evaporation of water. The evapotranspiration rate is dependent on the type of vegetation at the surface; the user can vary the surface vegetation from anywhere between a concrete surface and a fairly tall grass (about 7”).
 
@@ -3967,85 +3967,7 @@ Once the ground model has run, the updated cells with zone surface boundary cond
 
 The ground domain is updated at each zone timestep, or hourly as specified by the user. For situations when the ground domain is updated at each timestep, the domain is simulated by applying the surface heat flux boundary conditions from the previous timestep and calculating a new OthersideConditionsModeltemperature. At this point, the surface heat balance algorithms can then take the new outside surface temperatures to update their surface heat fluxes. For situations when the user has elected to have the domain update on an hourly basis, the surface heat balance for each coupled surface is aggregated and passed to the domain as an average surface heat flux from the previous hour, which will then update the outside surface temperatures for the surface heat balance’s next iteration.
 
-Both in-grade and on-grade scenarios are simulated with the GroundDomain object. The key difference being that for in-grade situations, the slab and horizontal insulation are simulated by the ground domain, whereas for the on-grade situations the slab and horizontal insulation must be included in the floor construction object. All possible insulation/slab configurations are seen in Table 18.
-
-#### Mesh Parameter Recommendations 
-
-Table 18. Possible insulation/slab configurations for Site:GroundDomain model.
-
-<table class="table table-striped">
-<tr>
-<th>Situations</th>
-<th>Vert. Ins.</th>
-<th>Horiz Ins. (Full)</th>
-<th>Horiz Ins. (Perim)</th>
-</tr>
-<tr>
-<td rowspan="6">In-Grade</td>
-<td>1</td>
-<td>X</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>2</td>
-<td>X</td>
-<td>X</td>
-<td></td>
-</tr>
-<tr>
-<td>3</td>
-<td>X</td>
-<td></td>
-<td>X</td>
-</tr>
-<tr>
-<td>4</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>5</td>
-<td></td>
-<td>X</td>
-<td></td>
-</tr>
-<tr>
-<td>6</td>
-<td></td>
-<td></td>
-<td>X</td>
-</tr>
-<tr>
-<td rowspan="4">On-Grade</td>
-<td>7</td>
-<td>X</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>8*</td>
-<td>X</td>
-<td>X</td>
-<td></td>
-</tr>
-<tr>
-<td>9</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>10*</td>
-<td></td>
-<td>X</td>
-<td></td>
-</tr>
-</table>
-\* Horizontal insulation must be included in the floor construction
-
-For the slab-in-grade scenarios, a thin surface layer must be included in the floor construction. This can be a very thin layer of the slab or other floor covering materials above the slab. This provides a zone boundary condition for the GroundDomain while still allowing 3-dimensional heat transfer effects to occur within the slab.
+Zone surfaces interact with the Site:GroundDomain:Slab object through the other side conditions model. To do this a surface layer must be included in the floor construciton object which will interact with the ground domain. This can be floor construction above the slab, or a thin layer of the slab material. The rest of the slab as well as horizontal and vertical insulation are simulated by the ground domain object.
 
 #### References
 
@@ -4070,7 +3992,7 @@ Basement wall and floor surfaces are created normally using the BuildingSurface:
 
 #### Boundary Conditions
 
-At the zone interface surfaces, the average surface conduction heat flux from all surfaces connected to the ground domain is imposed as a boundary condition at the Surface/Domain interface cells. Far-field temperatures are applied as boundary temperature at the domain sides and lower surface. The ground temperature profile at the domain sides and lower surface are taken from Kusuda & Achenbach 1965. The correlation requires annual ground surface temperature data. Ground surface temperature data can be determined by using the CalcSoilSurfTemp preprocessor; or, if the user has average monthly ground surface temperature data available, they can use the Site:GroundTemperature:Shallow object to provide the model monthly ground surface temperatures. From that, the model can then determine the ground temperature model parameters for the Kusuda & Achenbach (1965) ground temperature model.
+At the zone interface surfaces, the average surface conduction heat flux from all surfaces connected to the ground domain is imposed as a boundary condition at the Surface/Domain interface cells. Far-field and lower boundary conditions are applied based on the Site:GroundTemperature:Undisturbed: object specified in the input.
 
 Ground surface cells are treated as a heat balance, where long and short wave radiation, conduction, and convection are considered. Evapotranspiration is also considered. The evapotranspiration rate is calculated as a moisture loss by using the Allen et al. (2005) model, and translated into a heat loss by multiplication with the density and latent heat of evaporation of water. The evapotranspiration rate is dependent on the type of vegetation at the surface; the user can vary the surface vegetation from anywhere between a concrete surface and a fairly tall grass (about 7”). The model can be sensitive to variations in this parameter, especially in hot dry climates.
 
