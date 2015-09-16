@@ -3418,7 +3418,8 @@
     32,                      !- Maximum Condenser Entering Water Temperature {C}
     Tower Outlet Nodes;  !- Setpoint Node or NodeList Name
 
-  NodeList, Tower Outlet Nodes,
+  NodeList,
+    Tower Outlet Nodes,
     Condenser Tower Outlet Node,
     Condenser Tower Outlet Node 2;
 
@@ -3844,4 +3845,6 @@
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
 
-Output:Variable, Condenser Supply Outlet Node,System Node Setpoint Temperature,hourly;
+Output:Variable,Condenser Tower Outlet Node,System Node Setpoint Temperature,hourly;
+
+Output:Variable,Condenser Tower Outlet Node 2,System Node Setpoint Temperature,hourly;

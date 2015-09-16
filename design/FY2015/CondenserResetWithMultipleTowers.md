@@ -180,9 +180,27 @@ I am moving forward assuming the non-ideal condenser setpoint is working fine fo
 
 ## Modifications and testing of the ideal condenser setpoint manager
 
-I performed the source code modifications to allow multiple towers.  The changes were as anticipated and described above.  Once implemented, I modified the test file to include multiple towers and looked at the resulting setpoint.  The setpoint varies throughout the day, and because both towers are equivalent in performance characteristics, the resulting performance-based-setpoint reset is the same:
+I performed the source code modifications to allow multiple towers.  The changes were as anticipated and described above.  Once implemented, I modified the test file to include multiple towers and looked at the resulting setpoint asd well as some other values.
+
+Start with the setpoint:
 
 ![](CondenserResetWithMultipleTowers-FigureIdealCondenserSetpoint.png)
+
+Note how the setpoint differs, but overall has the same behavior during the day.  Next the tower mass flow rate:
+
+![](CondenserResetWithMultipleTowers-FigureIdealCondenserMassFlowRate.png)
+
+Note that the second tower doesn't come on until the middle of the day.  During the off-peak time, the single tower runs to meet the load.  During the peak time, both towers come to full capacity and the total adds together to be very close to the single tower.  Next the tower heat transfer rate:
+
+![](CondenserResetWithMultipleTowers-FigureIdealCondenserHeatTransfer.png)
+
+The total tower heat transfer rate is very similar during the day, with the second tower only coming on during peak hours.  Finally the tower electric power:
+
+![](CondenserResetWithMultipleTowers-FigureIdealCondenserElectricity.png)
+
+The total electricity for the two towers is lower than the single tower.  This is possibly due to a lower delta-T requirement on the towers so that the fan power can be reduced.
+
+These plots have demonstrated the difference, and that the ideal model _does_ operate multiple towers properly.
 
 ## Added unit tests
 
