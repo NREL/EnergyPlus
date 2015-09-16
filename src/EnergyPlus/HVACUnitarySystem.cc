@@ -2245,9 +2245,12 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).NumOfSpeedHeating = VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).NumOfSpeeds;
 
 			if ( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) {
-				if ( ! allocated( UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate ) ) UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
-				if ( ! allocated( UnitarySystem( UnitarySysNum ).HeatMassFlowRate ) ) UnitarySystem( UnitarySysNum ).HeatMassFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
-				if ( ! allocated( UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio ) ) UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
+//				if ( ! allocated( UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate ) ) UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
+//				if ( ! allocated( UnitarySystem( UnitarySysNum ).HeatMassFlowRate ) ) UnitarySystem( UnitarySysNum ).HeatMassFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
+//				if ( ! allocated( UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio ) ) UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
+				UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
+				UnitarySystem( UnitarySysNum ).HeatMassFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
+				UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
 			}
 
 			MulSpeedFlowScale = VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).RatedAirVolFlowRate / VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).MSRatedAirVolFlowRate( VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).NormSpedLevel );

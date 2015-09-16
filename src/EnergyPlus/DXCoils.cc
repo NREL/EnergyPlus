@@ -6092,7 +6092,7 @@ namespace DXCoils {
 					CompName = DXCoil( DXCoilNum ).Name;
 					FieldNum = 1;
 					DataTotCapCurveIndex = DXCoil ( DXCoilNum ).MSCCapFTemp ( Mode );
-					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+					TempSize = DXCoil( DXCoilNum ).MSRatedTotCap( Mode );
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedHeating ) {
 					SizingMethod = HeatingCapacitySizing;
@@ -6105,7 +6105,7 @@ namespace DXCoils {
 					SizingMethod = CoolingCapacitySizing;
 					CompName = DXCoil( DXCoilNum ).Name;
 					FieldNum = 1;
-					TempSize = DXCoil( DXCoilNum ).MSRatedTotCap( Mode );
+					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 				}
 				CompType = DXCoil( DXCoilNum ).DXCoilType;
@@ -6471,6 +6471,9 @@ namespace DXCoils {
 								} else {
 									MSRatedTotCapDes = CoolCapAtPeak;
 								}
+								if ( UnitarySysEqSizing( CurSysNum ).CoolingCapacity ) { // override capacity if parent speicifies size
+									MSRatedTotCapDes = UnitarySysEqSizing ( CurSysNum ).DesCoolingLoad;
+								}
 								if ( MSRatedTotCapDes > 0.0 ) {
 									RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) / MSRatedTotCapDes;
 								} else {
@@ -6543,6 +6546,9 @@ namespace DXCoils {
 									MSRatedTotCapDes = CoolCapAtPeak / TotCapTempModFac;
 								} else {
 									MSRatedTotCapDes = CoolCapAtPeak;
+								}
+								if ( ZoneEqSizing( CurZoneEqNum ).CoolingCapacity ) { // override capacity if parent speicifies size
+									MSRatedTotCapDes = ZoneEqSizing ( CurZoneEqNum ).DesCoolingLoad;
 								}
 								if ( MSRatedTotCapDes > 0.0 ) {
 									RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) / MSRatedTotCapDes;
