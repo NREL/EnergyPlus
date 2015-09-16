@@ -161,6 +161,8 @@ namespace SolarShading {
 	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 		bool MustAllocSolarShading( true );
+		static bool GetInputFlag( true );
+		static bool firstTime( true );
 	}
 
 	std::ofstream shd_stream; // Shading file stream
@@ -220,7 +222,10 @@ namespace SolarShading {
 	{
 
 		MustAllocSolarShading = true;
+		GetInputFlag = true;
+		firstTime = true;
 		DBZoneIntWin.deallocate();
+		ISABSF.deallocate();
 	}
 
 	void
@@ -258,8 +263,6 @@ namespace SolarShading {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		static bool GetInputFlag( true );
-		static bool firstTime( true );
 
 		// FLOW:
 #ifdef EP_Count_Calls

@@ -4392,9 +4392,9 @@ namespace OutputReportTabular {
 			//Interzone Air Transfer Heat Addition
 			//Interzone Air Transfer Heat Removal
 			if ( ZnAirRpt( iZone ).SumMCpDTzones > 0.0 ) {
-				ZonePreDefRep( iZone ).SHGSAnIzaAdd += ZnAirRpt( iZone ).SumMCpDTzones * TimeStepSys * SecInHour;
+				ZonePreDefRep( iZone ).SHGSAnIzaAdd += ZnAirRpt( iZone ).SumMCpDTzones * mult * TimeStepSys * SecInHour;
 			} else {
-				ZonePreDefRep( iZone ).SHGSAnIzaRem += ZnAirRpt( iZone ).SumMCpDTzones * TimeStepSys * SecInHour;
+				ZonePreDefRep( iZone ).SHGSAnIzaRem += ZnAirRpt( iZone ).SumMCpDTzones * mult * TimeStepSys * SecInHour;
 			}
 			//Window Heat Addition
 			//Window Heat Removal
@@ -4420,6 +4420,7 @@ namespace OutputReportTabular {
 		// HVAC annual heating by ATU
 		// HVAC annual cooling by ATU
 		for ( iunit = 1; iunit <= NumAirDistUnits; ++iunit ){
+			// HVAC equipment should already have the multipliers included, no "* mult" needed (assumes autosized or multiplied hard-sized air flow).
 			curZone = AirDistUnit( iunit ).ZoneNum;
 			if ( ( curZone > 0 ) && ( curZone <= NumOfZones ) ) {
 				ZonePreDefRep( curZone ).SHGSAnHvacATUHt += AirDistUnit( iunit ).HeatGain;
@@ -4430,6 +4431,7 @@ namespace OutputReportTabular {
 		}
 		iunit = 0;
 		for ( iunit = 1; iunit <= NumDirectAir; ++iunit ){
+			// HVAC equipment should already have the multipliers included, no "* mult" needed (assumes autosized or multiplied hard-sized air flow).
 			curZone = DirectAir( iunit ).ZoneNum;
 			if ( ( curZone > 0 ) && ( curZone <= NumOfZones ) ) {
 				ZonePreDefRep( curZone ).SHGSAnHvacATUHt += DirectAir( iunit ).HeatEnergy;
@@ -4482,6 +4484,7 @@ namespace OutputReportTabular {
 		// Opaque Surface Conduction and Other Heat Addition
 		// Opaque Surface Conduction and Other Heat Removal
 		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+			// ZonePreDefRep variables above already inlude zone list and group multipliers
 			total = ZonePreDefRep( iZone ).SHGSAnPeoplAdd + ZonePreDefRep( iZone ).SHGSAnLiteAdd + ZonePreDefRep( iZone ).SHGSAnHvacHt + ZonePreDefRep( iZone ).SHGSAnHvacCl + ZonePreDefRep( iZone ).SHGSAnIzaAdd + ZonePreDefRep( iZone ).SHGSAnIzaRem + ZonePreDefRep( iZone ).SHGSAnWindAdd + ZonePreDefRep( iZone ).SHGSAnWindRem + ZonePreDefRep( iZone ).SHGSAnInfilAdd + ZonePreDefRep( iZone ).SHGSAnInfilRem + ZonePreDefRep( iZone ).SHGSAnEquipAdd + ZonePreDefRep( iZone ).SHGSAnEquipRem + ZonePreDefRep( iZone ).SHGSAnSurfHt + ZonePreDefRep( iZone ).SHGSAnSurfCl;
 			total = -total; //want to know the negative value of the sum since the row should add up to zero
 			if ( total > 0 ) {
@@ -4495,7 +4498,9 @@ namespace OutputReportTabular {
 		//--------------------------------
 		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
 			mult = Zone( iZone ).Multiplier * Zone( iZone ).ListMultiplier;
-			if( ( ZnAirRpt( iZone ).SumMCpDTsystem + radiantHeat( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem ) > 0 ) {
+			// RR I can't get the Infiltration Heat Addition/Removal columns to add up.
+			// THis is the only suspect line, mixing MCpDt terms and a power term looks fishy.
+			if( ( ZnAirRpt( iZone ).SumMCpDTsystem + radiantHeat( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem * mult ) > 0 ) {
 				if( ( ZnAirRpt( iZone ).SumMCpDTsystem + radiantHeat( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem * mult ) > ZonePreDefRep( iZone ).htPeak ) {
 					ZonePreDefRep( iZone ).htPeak = ZnAirRpt( iZone ).SumMCpDTsystem + radiantHeat( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem * mult;
 					//determine timestamp
@@ -4508,22 +4513,24 @@ namespace OutputReportTabular {
 					ZonePreDefRep( iZone ).htPtTimeStamp = timestepTimeStamp;
 					//HVAC Input Sensible Air Heating
 					//HVAC Input Sensible Air Cooling
+					// non-HVAC ZnAirRpt variables DO NOT include zone multipliers
 					ZonePreDefRep( iZone ).SHGSHtHvacHt = ZnAirRpt( iZone ).SumMCpDTsystem + ZnAirRpt( iZone ).SumNonAirSystem * mult;
 					ZonePreDefRep( iZone ).SHGSHtHvacCl = 0.0;
 					// HVAC Input Heated Surface Heating
 					// HVAC Input Cooled Surface Cooling
-					ZonePreDefRep( iZone ).SHGSHtSurfHt = radiantHeat( iZone );
-					ZonePreDefRep( iZone ).SHGSHtSurfCl = radiantCool( iZone );
+					ZonePreDefRep( iZone ).SHGSHtSurfHt = radiantHeat( iZone ); // multipliers included above
+					ZonePreDefRep( iZone ).SHGSHtSurfCl = radiantCool( iZone ); // multipliers included above
 					// HVAC ATU Heating at Heat Peak
 					// HVAC ATU Cooling at Heat Peak
-					ZonePreDefRep( iZone ).SHGSHtHvacATUHt = ATUHeat( iZone );
-					ZonePreDefRep( iZone ).SHGSHtHvacATUCl = ATUCool( iZone );
+					ZonePreDefRep( iZone ).SHGSHtHvacATUHt = ATUHeat( iZone ); // multipliers included above
+					ZonePreDefRep( iZone ).SHGSHtHvacATUCl = ATUCool( iZone ); // multipliers included above
 					//People Sensible Heat Addition
 					ZonePreDefRep( iZone ).SHGSHtPeoplAdd = ZnRpt( iZone ).PeopleSenGainRate * mult;
 					//Lights Sensible Heat Addition
 					ZonePreDefRep( iZone ).SHGSHtLiteAdd = ZnRpt( iZone ).LtsTotGainRate * mult;
 					//Equipment Sensible Heat Addition
 					//Equipment Sensible Heat Removal
+					// non-HVAC ZnAirRpt variables DO NOT include zone multipliers
 					eqpSens = ZnRpt( iZone ).ElecRadGainRate + ZnRpt( iZone ).GasRadGainRate + ZnRpt( iZone ).HWRadGainRate + ZnRpt( iZone ).SteamRadGainRate + ZnRpt( iZone ).OtherRadGainRate + ZnRpt( iZone ).ElecConGainRate + ZnRpt( iZone ).GasConGainRate + ZnRpt( iZone ).HWConGainRate + ZnRpt( iZone ).SteamConGainRate + ZnRpt( iZone ).OtherConGainRate;
 					if ( eqpSens > 0.0 ) {
 						ZonePreDefRep( iZone ).SHGSHtEquipAdd = eqpSens * mult;
@@ -4536,12 +4543,13 @@ namespace OutputReportTabular {
 					//Window Heat Removal
 					ZonePreDefRep( iZone ).SHGSHtWindAdd = ZoneWinHeatGainRep( iZone ) * mult;
 					ZonePreDefRep( iZone ).SHGSHtWindRem = -ZoneWinHeatLossRep( iZone ) * mult;
+					// mixing object heat addition and removal
 					if ( ZnAirRpt( iZone ).SumMCpDTzones > 0.0 ) {
-						ZonePreDefRep( iZone ).SHGSHtIzaAdd = ZnAirRpt( iZone ).SumMCpDTzones;
+						ZonePreDefRep( iZone ).SHGSHtIzaAdd = ZnAirRpt( iZone ).SumMCpDTzones * mult;
 						ZonePreDefRep( iZone ).SHGSHtIzaRem = 0.0;
 					} else {
 						ZonePreDefRep( iZone ).SHGSHtIzaAdd = 0.0;
-						ZonePreDefRep( iZone ).SHGSHtIzaRem = ZnAirRpt( iZone ).SumMCpDTzones;
+						ZonePreDefRep( iZone ).SHGSHtIzaRem = ZnAirRpt( iZone ).SumMCpDTzones * mult;
 					}
 					//Infiltration Heat Addition
 					//Infiltration Heat Removal
@@ -4605,12 +4613,13 @@ namespace OutputReportTabular {
 					//Window Heat Removal
 					ZonePreDefRep( iZone ).SHGSClWindAdd = ZoneWinHeatGainRep( iZone ) * mult;
 					ZonePreDefRep( iZone ).SHGSClWindRem = -ZoneWinHeatLossRep( iZone ) * mult;
-					if ( ZnAirRpt( iZone ).SumMCpDTzones > 0.0 ) {
-						ZonePreDefRep( iZone ).SHGSClIzaAdd = ZnAirRpt( iZone ).SumMCpDTzones;
+					// mixing object cool addition and removal
+					if( ZnAirRpt( iZone ).SumMCpDTzones > 0.0 ) {
+						ZonePreDefRep( iZone ).SHGSClIzaAdd = ZnAirRpt( iZone ).SumMCpDTzones * mult;
 						ZonePreDefRep( iZone ).SHGSClIzaRem = 0.0;
 					} else {
 						ZonePreDefRep( iZone ).SHGSClIzaAdd = 0.0;
-						ZonePreDefRep( iZone ).SHGSClIzaRem = ZnAirRpt( iZone ).SumMCpDTzones;
+						ZonePreDefRep( iZone ).SHGSClIzaRem = ZnAirRpt( iZone ).SumMCpDTzones * mult;
 					}
 					//Infiltration Heat Addition
 					//Infiltration Heat Removal
@@ -4642,7 +4651,7 @@ namespace OutputReportTabular {
 		bldgClPk = 0.0;
 		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
 			mult = Zone( iZone ).Multiplier * Zone( iZone ).ListMultiplier;
-			if( ( ZnAirRpt( iZone ).SumMCpDTsystem + radiantHeat( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem ) > 0 ) {
+			if( ( ZnAirRpt( iZone ).SumMCpDTsystem + radiantHeat( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem * mult ) > 0 ) {
 				bldgHtPk += ZnAirRpt( iZone ).SumMCpDTsystem + radiantHeat( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem * mult;
 			} else {
 				bldgClPk += ZnAirRpt( iZone ).SumMCpDTsystem + radiantCool( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem * mult;
@@ -4706,10 +4715,11 @@ namespace OutputReportTabular {
 				//Window Heat Removal
 				BuildingPreDefRep.SHGSHtWindAdd += ZoneWinHeatGainRep( iZone ) * mult;
 				BuildingPreDefRep.SHGSHtWindRem -= ZoneWinHeatLossRep( iZone ) * mult;
-				if ( ZnAirRpt( iZone ).SumMCpDTzones > 0.0 ) {
-					BuildingPreDefRep.SHGSHtIzaAdd += ZnAirRpt( iZone ).SumMCpDTzones;
+				// mixing object heat addition and removal
+				if( ZnAirRpt( iZone ).SumMCpDTzones > 0.0 ) {
+					BuildingPreDefRep.SHGSHtIzaAdd += ZnAirRpt( iZone ).SumMCpDTzones * mult;
 				} else {
-					BuildingPreDefRep.SHGSHtIzaRem += ZnAirRpt( iZone ).SumMCpDTzones;
+					BuildingPreDefRep.SHGSHtIzaRem += ZnAirRpt( iZone ).SumMCpDTzones * mult;
 				}
 				//Infiltration Heat Addition
 				//Infiltration Heat Removal
@@ -4787,10 +4797,11 @@ namespace OutputReportTabular {
 				//Window Heat Removal
 				BuildingPreDefRep.SHGSClWindAdd += ZoneWinHeatGainRep( iZone ) * mult;
 				BuildingPreDefRep.SHGSClWindRem -= ZoneWinHeatLossRep( iZone ) * mult;
-				if ( ZnAirRpt( iZone ).SumMCpDTzones > 0.0 ) {
-					BuildingPreDefRep.SHGSClIzaAdd += ZnAirRpt( iZone ).SumMCpDTzones;
+				// mixing object cool addition and removal
+				if( ZnAirRpt( iZone ).SumMCpDTzones > 0.0 ) {
+					BuildingPreDefRep.SHGSClIzaAdd += ZnAirRpt( iZone ).SumMCpDTzones * mult;
 				} else {
-					BuildingPreDefRep.SHGSClIzaRem += ZnAirRpt( iZone ).SumMCpDTzones;
+					BuildingPreDefRep.SHGSClIzaRem += ZnAirRpt( iZone ).SumMCpDTzones * mult;
 				}
 				//Infiltration Heat Addition
 				//Infiltration Heat Removal

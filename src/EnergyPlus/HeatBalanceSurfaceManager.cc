@@ -4933,7 +4933,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	static Array1D< Real64 > TempInsOld; // Holds previous iteration's value for convergence check
 	Real64 TempSurfOutTmp; // Local Temporary Surface temperature for the outside surface face
 	Real64 TempSurfInSat; // Local temperary surface dew point temperature
-	static bool firstTime( true ); // Used for trapping errors or other problems
+	static bool firstTimeCalcInSurf( true ); // Used for trapping errors or other problems
 	int OtherSideSurfNum; // Surface number index for other side of an interzone partition
 	static int MinIterations; // Minimum number of iterations for the inside heat balance
 	//  CHARACTER(len=25):: ErrMsg
@@ -4962,7 +4962,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	static int TimeStepInDay( 0 ); // time step number
 
 	// FLOW:
-	if ( firstTime ) {
+	if( firstTimeCalcInSurf ) {
 		TempInsOld.allocate( TotSurfaces );
 		RefAirTemp.allocate( TotSurfaces );
 		if ( any_eq( HeatTransferAlgosUsed, UseEMPD ) ) {
@@ -5294,7 +5294,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 					} else { // Movable insulation present
 
-						if ( construct.SourceSinkPresent && firstTime ) ShowSevereError( "Movable insulation is not valid with embedded sources/sinks" );
+						if( construct.SourceSinkPresent && firstTimeCalcInSurf ) ShowSevereError( "Movable insulation is not valid with embedded sources/sinks" );
 
 						F1 = HMovInsul / ( HMovInsul + HConvIn_surf + IterDampConst );
 
@@ -5307,7 +5307,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 				} else { // Window
 
-					if ( construct.SourceSinkPresent && firstTime ) ShowSevereError( "Windows are not allowed to have embedded sources/sinks" );
+					if( construct.SourceSinkPresent && firstTimeCalcInSurf ) ShowSevereError( "Windows are not allowed to have embedded sources/sinks" );
 
 					if ( SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_TDD_Diffuser ) { // Tubular daylighting device
 						// Lookup up the TDD:DOME object
@@ -5749,7 +5749,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 	CalculateZoneMRT( ZoneToResimulate ); // Update here so that the proper value of MRT is available to radiant systems
 
-	firstTime = false;
+	firstTimeCalcInSurf = false;
 
 }
 
