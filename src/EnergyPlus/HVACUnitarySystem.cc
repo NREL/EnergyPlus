@@ -8013,7 +8013,7 @@ namespace HVACUnitarySystem {
 
 					SimDXCoilMultiSpeed( CompName, 0.0, PartLoadFrac, UnitarySystem( UnitarySysNum ).CoolingCoilIndex );
 
-				} else if ( ( CoilType_Num == CoilDX_MultiSpeedCooling ) ) {
+				} else if ( CoilType_Num == CoilDX_MultiSpeedCooling ) {
 
 					SimMultiSpeedCoils( UnitarySysNum, AirLoopNum, FirstHVACIteration, CompOn, SensibleLoad, LatentLoad, PartLoadFrac, CoolingCoil );
 

@@ -242,6 +242,7 @@ TEST( EvaporativeCoolers, SizeEvapCooler )
 	thisEvapCooler.EvapCoolerName = "MyEvapCooler";
 	DataSizing::FinalSysSizing.allocate(1);
 	DataSizing::FinalSysSizing( 1 ).DesMainVolFlow = 1.0;
+	DataSizing::FinalSysSizing( 1 ).DesOutAirVolFlow = 0.4;
 
 	// set up the structure to size the flow rates for an RDDSpecial
 	thisEvapCooler.EvapCoolerType = DataGlobalConstants::iEvapCoolerInDirectRDDSpecial;
@@ -271,6 +272,24 @@ TEST( EvaporativeCoolers, SizeEvapCooler )
 	EvaporativeCoolers::SizeEvapCooler(EvapCoolNum);
 	EXPECT_NEAR(0.333333, thisEvapCooler.PadArea, 0.0001);
 	EXPECT_NEAR(0.17382, thisEvapCooler.PadDepth, 0.0001);
+
+	// now let's try 'not' finding it on the air loop; thus it is in the OA path
+	DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).Name = "NOT-MyEvapCooler";
+
+	// set up the structure to size the flow rates for an indirect celdekpad
+	thisEvapCooler.EvapCoolerType = DataGlobalConstants::iEvapCoolerInDirectCELDEKPAD;
+	thisEvapCooler.VolFlowRate = DataSizing::AutoSize;
+	thisEvapCooler.PadArea = 0.0;
+	thisEvapCooler.PadDepth = 0.0;
+	thisEvapCooler.IndirectPadArea = 0.0;
+	thisEvapCooler.IndirectPadDepth = 0.0;
+	thisEvapCooler.IndirectVolFlowRate = DataSizing::AutoSize;
+	thisEvapCooler.IndirectVolFlowScalingFactor = 0.3;
+
+	// make the call for sizing the flow rates
+	EvaporativeCoolers::SizeEvapCooler(EvapCoolNum);
+	EXPECT_NEAR(0.5, thisEvapCooler.IndirectVolFlowRate, 0.0001);
+	EXPECT_NEAR(0.5, thisEvapCooler.VolFlowRate, 0.0001);
 
 	// clean up
 	EvaporativeCoolers::EvapCond.deallocate();
