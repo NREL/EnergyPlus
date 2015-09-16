@@ -64623,53 +64623,81 @@ GroundHeatExchanger:Vertical,
         \required-field
         \type node
   N1,   \field Design Flow Rate
-        \units m3/s
+        \required-field
+        \type real
         \minimum> 0.0
+        \units m3/s
         \ip-units gal/min
   N2,   \field Number of Bore Holes
+        \required-field
+        \type integer
         \minimum> 0.0
   N3,   \field Bore Hole Length
-        \units m
+        \required-field
+        \type real
         \minimum> 0.0
+        \units m
   N4,   \field Bore Hole Radius
-        \units m
+        \required-field
+        \type real
         \minimum> 0.0
+        \units m
   N5,   \field Ground Thermal Conductivity
-        \units W/m-K
+        \required-field
+        \type real
         \minimum> 0.0
+        \units W/m-K
   N6,   \field Ground Thermal Heat Capacity
+        \required-field
+        \type real
+        \minimum> 0.0
         \units J/m3-K
-        \minimum> 0.0
   N7,   \field Ground Temperature
+        \required-field
+        \type real
+        \minimum> 0.0
         \units C
-        \minimum> 0.0
   N8,   \field Grout Thermal Conductivity
-        \units W/m-K
+        \required-field
+        \type real
         \minimum> 0.0
+        \units W/m-K
   N9,   \field Pipe Thermal Conductivity
+        \required-field
+        \type real
+        \minimum> 0.0
         \units W/m-K
-        \minimum> 0.0
   N10,  \field Pipe Out Diameter
-        \units m
+        \required-field
+        \type real
         \minimum> 0.0
+        \units m
         \ip-units in
   N11,  \field U-Tube Distance
-        \units m
+        \required-field
+        \type real
         \minimum> 0.0
+        \units m
   N12,  \field Pipe Thickness
-        \units m
+        \required-field
+        \type real
         \minimum> 0.0
+        \units m
         \ip-units in
   N13,  \field Maximum Length of Simulation
+        \required-field
+        \type integer
+        \minimum> 0.0
         \units years
-        \minimum> 0.0
   N14,  \field G-Function Reference Ratio
+        \required-field
         \type real
-        \units dimensionless
         \minimum> 0.0
+        \units dimensionless
         \default 0.0005
   N15,  \field Number of Data Pairs of the G Function
         \required-field
+        \type integer
         \minimum> 0.0
         \maximum 100
   N16,  \field G-Function Ln(T/Ts) Value 1
