@@ -74,6 +74,9 @@ link_err ()
 chmod o+w "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/"
 
 if [ "$(id -u)" = "0" ]; then
+  # make the man page directory if it doesn't exist
+  mkdir -p /usr/local/share/man/man1
+  # then move the man page in there
   mv "${install_directory}/${package_name}/energyplus.1" /usr/local/share/man/man1/
 else
   echo "Man page installation skipped since script is executing without root privileges" 1>&2
