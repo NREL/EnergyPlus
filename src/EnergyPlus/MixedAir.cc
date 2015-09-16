@@ -3147,10 +3147,10 @@ namespace MixedAir {
 
 					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Status []", OAController( OAControllerLoop ).HeatRecoveryBypassStatus, "System", "Average", airloopName );
 
-					if ( OAController( OAControllerLoop ).HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum ) {
-						SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status []", OAController( OAControllerLoop ).HRHeatingCoilActive, "System", "Average", airloopName );
-						SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature [C]", OAController( OAControllerLoop ).MixedAirTempAtMinOAFlow, "System", "Average", airloopName );
-					}
+//					if ( OAController( OAControllerLoop ).HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum ) {
+					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status []", OAController( OAControllerLoop ).HRHeatingCoilActive, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature [C]", OAController( OAControllerLoop ).MixedAirTempAtMinOAFlow, "System", "Average", airloopName );
+//					}
 
 					SetupOutputVariable( "Air System Outdoor Air High Humidity Control Status []", OAController( OAControllerLoop ).HighHumCtrlStatus, "System", "Average", airloopName );
 
@@ -4303,8 +4303,8 @@ namespace MixedAir {
 			// set the air loop economizer and high humidity control flags.
 			if ( EconomizerOperationFlag ) {
 
-				if ( OAController( OAControllerNum ).HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum ) {
-					// Optional heat recovery bypass control flag uses additional logic to allow ERV optimization
+				if ( OAController( OAControllerNum ).Lockout == LockoutWithHeatingPossible ) {
+					// For all system types (even ones that don't set AirLoopEconoLockout) lock out economizer if unfavorable for heating
 					if ( AirLoopControlInfo( AirLoopNum ).CheckHeatRecoveryBypassStatus && AirLoopControlInfo( AirLoopNum ).OASysComponentsSimulated ) {
 
 						ReliefMassFlowAtMinOA = max( AirLoopFlow( AirLoopNum ).MinOutAir - OAController( OAControllerNum ).ExhMassFlow, 0.0 );
@@ -4316,28 +4316,31 @@ namespace MixedAir {
 							MixedAirTempAtMinOAFlow = Node( OAController( OAControllerNum ).RetNode ).Temp;
 						}
 						OAController( OAControllerNum ).MixedAirTempAtMinOAFlow = MixedAirTempAtMinOAFlow;
-						if ( OAController( OAControllerNum ).OAMassFlow > AirLoopFlow( AirLoopNum ).MinOutAir ) {
-							AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = true;
-							OAController( OAControllerNum ).HeatRecoveryBypassStatus = 1;
-						} else {
-							AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = false;
-							OAController( OAControllerNum ).HeatRecoveryBypassStatus = 0;
-						}
 						if ( MixedAirTempAtMinOAFlow <= Node( OAController( OAControllerNum ).MixNode ).TempSetPoint ) {
 							AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked = true;
 							OAController( OAControllerNum ).OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
 							AirLoopFlow( AirLoopNum ).OAFrac = OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow;
-							// MJW Why reset this?  AirLoopFlow( AirLoopNum ).OAMinFrac = AirLoopFlow( AirLoopNum ).OAFrac;
 						} else { // IF (MixedAirTempAtMinOAFlow .LE. Node(OAController(OAControllerNum)%MixNode)%TempSetPoint) THEN
 							AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked = false;
 							OAController( OAControllerNum ).HRHeatingCoilActive = 0;
 						} // IF (MixedAirTempAtMinOAFlow .LE. Node(OAController(OAControllerNum)%MixNode)%TempSetPoint) THEN
 						AirLoopControlInfo( AirLoopNum ).CheckHeatRecoveryBypassStatus = false;
 					} // IF(AirLoopControlInfo(AirLoopNum)%CheckHeatRecoveryBypassStatus .AND. &
-				} else { // IF(OAController(OAControllerNum)%HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum)THEN
-					AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = true;
-					OAController( OAControllerNum ).HeatRecoveryBypassStatus = 1;
-				} // IF(OAController(OAControllerNum)%HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum)THEN
+//				} else { // IF LockoutWithHeatingPossible
+//					AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = true;
+//					OAController( OAControllerNum ).HeatRecoveryBypassStatus = 1;
+				} // IF LockoutWithHeatingPossible
+
+				// Check heat exchanger bypass control
+				if ( OAController( OAControllerNum ).HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum ) {
+					if ( OAController( OAControllerNum ).OAMassFlow > AirLoopFlow( AirLoopNum ).MinOutAir ) {
+						AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = true;
+						OAController( OAControllerNum ).HeatRecoveryBypassStatus = 1;
+					} else {
+						AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = false;
+						OAController( OAControllerNum ).HeatRecoveryBypassStatus = 0;
+					}
+				}
 
 			} else { // IF (EconomizerOperationFlag) THEN
 				AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = false;
@@ -4350,19 +4353,20 @@ namespace MixedAir {
 			if ( AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked ) {
 				OAController( OAControllerNum ).OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
 				AirLoopFlow( AirLoopNum ).OAFrac = OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow;
-				// MJW Why reset this? AirLoopFlow( AirLoopNum ).OAMinFrac = AirLoopFlow( AirLoopNum ).OAFrac;
 			}
 
-			// turn on OA heat exchanger any time heating is active and user requests the special bypass control
-			if ( AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag && OAController( OAControllerNum ).HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum ) {
-				AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = false;
-				OAController( OAControllerNum ).HeatRecoveryBypassStatus = 0;
-				OAController( OAControllerNum ).HRHeatingCoilActive = 1;
-				// reset the OA flow to minimum
-				OAController( OAControllerNum ).OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
-				AirLoopFlow( AirLoopNum ).OAFrac = OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow;
-				// MJW Why reset this? AirLoopFlow( AirLoopNum ).OAMinFrac = AirLoopFlow( AirLoopNum ).OAFrac;
 
+//			// turn on OA heat exchanger any time heating is active and user requests the special bypass control
+//			if ( AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag && OAController( OAControllerNum ).HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum ) {
+//				AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = false;
+//				OAController( OAControllerNum ).HeatRecoveryBypassStatus = 0;
+//				OAController( OAControllerNum ).HRHeatingCoilActive = 1;
+				// reset the OA flow to minimum
+//				OAController( OAControllerNum ).OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
+//				AirLoopFlow( AirLoopNum ).OAFrac = OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow;
+
+			// MJW - Not sure if this is necessary but keeping it for now
+			if ( AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag && AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked ) {
 				// The airloop needs to be simulated again so that the heating coil & HX can be resimulated
 				if ( AirLoopControlInfo( AirLoopNum ).HeatRecoveryResimFlag && AirLoopControlInfo( AirLoopNum ).OASysComponentsSimulated ) {
 					AirLoopControlInfo( AirLoopNum ).ResimAirLoopFlag = true;
