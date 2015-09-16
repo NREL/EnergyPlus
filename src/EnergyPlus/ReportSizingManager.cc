@@ -15,6 +15,7 @@
 #include <DataHeatBalance.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
+#include <DXCoils.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <InputProcessor.hh>
@@ -906,6 +907,10 @@ namespace ReportSizingManager {
 									TotCapTempModFac = CurveValue ( DataTotCapCurveIndex, CoilInWetBulb, OutTemp );
 								} else {
 									TotCapTempModFac = 1.0;
+									
+									if( SameString( CompType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl" ) ){
+										EnergyPlus::DXCoils::CalcVRFCoilCapModFac( 0, _, CompName, CoilInTemp, _, _, _, TotCapTempModFac);
+									}
 								}
 								if (ZoneEqFanCoil) {
 									PeakCoilLoad = max( 0.0, ( StdRhoAir * DesVolFlow * ( CoilInEnth - CoilOutEnth ) ) );

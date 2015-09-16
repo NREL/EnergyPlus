@@ -1703,6 +1703,30 @@ namespace DXCoils {
 		Real64 & SCact    // actual SC
 	);
 	
+	void
+	CalcVRFCoilSenCap(
+		int const OperationMode, // mode 0 for cooling, 1 for heating
+		int const CoilNum,  // index to VRFTU cooling or heating coil 
+		Real64 const Tinlet,// dry bulb temperature of air entering the coil
+		Real64 const TeTc,  // evaporating or condensing temperature
+		Real64 const SHSC,  // SH at cooling /SC at heating
+		Real64 const BF,    // Bypass factor
+		Real64 & Q_sen,     // VRF coil sensible capacity per air mass flow rate
+		Real64 & T_coil_surf// Air temperature at coil surface
+	);
+	
+	void
+	CalcVRFCoilCapModFac(
+		int const OperationMode, // mode 0 for cooling, 1 for heating
+		Optional< int const > CoilIndex,  // index to VRFTU cooling or heating coil
+		Optional< std::string > CoilName, // name of VRFTU cooling or heating coil
+		Real64 const Tinlet,// dry bulb temperature of air entering the coil
+		Optional< Real64 const > TeTc,  // evaporating or condensing temperature
+		Optional< Real64 const > SHSC,  // SH at cooling /SC at heating
+		Optional< Real64 const > BF,    // Bypass factor
+		Real64 & CapModFac // Coil capacity modification factor
+	);
+	
 	Real64 
 	FanSpdResidualCool( 
 		Real64 const FanSpdRto, // indoor unit fan speed ratio  
