@@ -2,7 +2,7 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! CoolingTower_VariableSpeed_IdealCondEntTempSetpoint.idf
+! CoolingTower_VariableSpeed_CondEntTempReset.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
 ! Highlights:              Controls high relative humidity levels with a chilled water coil and a simple controller
@@ -103,15 +103,10 @@
 !                                 The following Tower Coefficient Models are referenced here for example
 !                                 purposes only. The coefficients in these objects are the same as the default
 !                                 for Tower Model Types "YorkCalc" and "CoolTools CrossFlow", respectively.
-! Setpoint:                  SetpointManager:CondenserEnteringReset:Ideal
-!                                 The “ideal” chiller-tower optimization scheme uses a search algorithm to find the ideal optimal setpoint
-!                                 at a given timestep. This requires resimulating HVAC systems at each timestep until finding
-!                                 an “optimal” condenser water entering setpoint (OptSetpoint) which gives the minimum total chiller,
-!                                 cooling tower, chilled water pump and condenser water pump power consumption.
-!                                 The OptSetpoint falls between realistic minimum and maximum boundaries, which are set by the user.
-!                                 The minimum boundary is determined based on the minimum lift (user input)
-!                                 and evaporator leaving water temperature. The maximum boundary is specified by the user.
-!                                 It is assumed that a single minimum point exists between these boundaries.
+! Setpoint:        SetpointManager:CondenserEnteringReset
+!                                 Reset condenser water temperature set point for a chiller plant
+!                                 with one or more chillers.  The condenser water leaving the tower should be at this temperature
+!                                 for optimal operation of the chiller plant.
 ! Tower Coefficient Models:       Cooling Tower:Variable Speed:YorkCalc Model Coefficients
 !                                 Cooling Tower:Variable Speed:CoolTools Model Coefficients
 !
@@ -192,22 +187,9 @@
   RunPeriod,
     ,                        !- Name
     1,                       !- Begin Month
-    14,                      !- Begin Day of Month
-    1,                       !- End Month
-    14,                      !- End Day of Month
-    Tuesday,                 !- Day of Week for Start Day
-    Yes,                     !- Use Weather File Holidays and Special Days
-    Yes,                     !- Use Weather File Daylight Saving Period
-    No,                      !- Apply Weekend Holiday Rule
-    Yes,                     !- Use Weather File Rain Indicators
-    Yes;                     !- Use Weather File Snow Indicators
-
-  RunPeriod,
-    ,                        !- Name
-    7,                       !- Begin Month
-    7,                       !- Begin Day of Month
-    7,                       !- End Month
-    7,                       !- End Day of Month
+    1,                      !- Begin Day of Month
+    12,                       !- End Month
+    31,                      !- End Day of Month
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -219,8 +201,8 @@
     Yes,                     !- Do Zone Sizing Calculation
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                     !- Run Simulation for Sizing Periods
+    Yes;                      !- Run Simulation for Weather File Run Periods
 
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
 
@@ -3434,78 +3416,17 @@
     Temperature,             !- Control Variable
     12,                      !- Minimum Lift {deltaC}
     32,                      !- Maximum Condenser Entering Water Temperature {C}
-    Condenser Tower Outlet Node;  !- Setpoint Node or NodeList Name
+    Tower Outlet Nodes;  !- Setpoint Node or NodeList Name
 
-  Curve:QuadLinear,
-    MinDsnWBCurveName,       !- Name
-    -3.333,                  !- Coefficient1 Constant
-    0,                       !- Coefficient2 w
-    38.9,                    !- Coefficient3 x
-    0,                       !- Coefficient4 y
-    0,                       !- Coefficient5 z
-    -30,                     !- Minimum Value of w
-    40,                      !- Maximum Value of w
-    0,                       !- Minimum Value of x
-    1,                       !- Maximum Value of x
-    10,                      !- Minimum Value of y
-    38,                      !- Maximum Value of y
-    0.00000001,              !- Minimum Value of z
-    0.00000008,              !- Maximum Value of z
-    0,                       !- Minimum Curve Output
-    38,                      !- Maximum Curve Output
-    Temperature,             !- Input Unit Type for w
-    Dimensionless,           !- Input Unit Type for x
-    Dimensionless,           !- Input Unit Type for y
-    Dimensionless;           !- Input Unit Type for z
-
-  Curve:QuadLinear,
-    MinActWBCurveName,       !- Name
-    -8.333,                  !- Coefficient1 Constant
-    2,                       !- Coefficient2 w
-    5.5556,                  !- Coefficient3 x
-    -1,                      !- Coefficient4 y
-    0,                       !- Coefficient5 z
-    0,                       !- Minimum Value of w
-    38,                      !- Maximum Value of w
-    0,                       !- Minimum Value of x
-    1,                       !- Maximum Value of x
-    10,                      !- Minimum Value of y
-    38,                      !- Maximum Value of y
-    0.00000001,              !- Minimum Value of z
-    0.00000008,              !- Maximum Value of z
-    0,                       !- Minimum Curve Output
-    43,                      !- Maximum Curve Output
-    Temperature,             !- Input Unit Type for w
-    Dimensionless,           !- Input Unit Type for x
-    Dimensionless,           !- Input Unit Type for y
-    Dimensionless;           !- Input Unit Type for z
-
-  Curve:QuadLinear,
-    OptCondEntCurveName,     !- Name
-    12.2711,                 !- Coefficient1 Constant
-    0.8,                     !- Coefficient2 w
-    6.6667,                  !- Coefficient3 x
-    0.266,                   !- Coefficient4 y
-    -6193484,                !- Coefficient5 z
-    0,                       !- Minimum Value of w
-    38,                      !- Maximum Value of w
-    0,                       !- Minimum Value of x
-    1,                       !- Maximum Value of x
-    10,                      !- Minimum Value of y
-    38,                      !- Maximum Value of y
-    0.00000001,              !- Minimum Value of z
-    0.00000008,              !- Maximum Value of z
-    0,                       !- Minimum Curve Output
-    32,                      !- Maximum Curve Output
-    Temperature,             !- Input Unit Type for w
-    Dimensionless,           !- Input Unit Type for x
-    Dimensionless,           !- Input Unit Type for y
-    Dimensionless;           !- Input Unit Type for z
+  NodeList, Tower Outlet Nodes,
+    Condenser Tower Outlet Node,
+    Condenser Tower Outlet Node 2;
 
   BranchList,
     Condenser Supply Side Branches,  !- Name
     Condenser Supply Inlet Branch,  !- Branch 1 Name
     Condenser Supply Tower Branch,  !- Branch 2 Name
+    Condenser Supply Tower Branch 2,  !- Branch 2 Name
     Condenser Supply Bypass Branch,  !- Branch 3 Name
     Condenser Supply Outlet Branch;  !- Branch 4 Name
 
@@ -3534,6 +3455,16 @@
     Central Tower,           !- Component 1 Name
     Condenser Tower Inlet Node,  !- Component 1 Inlet Node Name
     Condenser Tower Outlet Node,  !- Component 1 Outlet Node Name
+    ACTIVE;                  !- Component 1 Branch Control Type
+
+  Branch,
+    Condenser Supply Tower Branch 2,  !- Name
+    0,                       !- Maximum Flow Rate {m3/s}
+    ,                        !- Pressure Drop Curve Name
+    CoolingTower:VariableSpeed,  !- Component 1 Object Type
+    Central Tower 2,           !- Component 1 Name
+    Condenser Tower Inlet Node 2,  !- Component 1 Inlet Node Name
+    Condenser Tower Outlet Node 2,  !- Component 1 Outlet Node Name
     ACTIVE;                  !- Component 1 Branch Control Type
 
   Branch,
@@ -3651,12 +3582,14 @@
     Condenser Supply Splitter,  !- Name
     Condenser Supply Inlet Branch,  !- Inlet Branch Name
     Condenser Supply Tower Branch,  !- Outlet Branch 1 Name
+    Condenser Supply Tower Branch 2,
     Condenser Supply Bypass Branch;  !- Outlet Branch 2 Name
 
   Connector:Mixer,
     Condenser Supply Mixer,  !- Name
     Condenser Supply Outlet Branch,  !- Outlet Branch Name
     Condenser Supply Tower Branch,  !- Inlet Branch 1 Name
+    Condenser Supply Tower Branch 2,
     Condenser Supply Bypass Branch;  !- Inlet Branch 2 Name
 
   CondenserEquipmentOperationSchemes,
@@ -3674,12 +3607,38 @@
   CondenserEquipmentList,
     All Towers,              !- Name
     CoolingTower:VariableSpeed,  !- Equipment 1 Object Type
-    Central Tower;           !- Equipment 1 Name
+    Central Tower,           !- Equipment 1 Name
+    CoolingTower:VariableSpeed,  !- Equipment 1 Object Type
+    Central Tower 2;           !- Equipment 1 Name
 
   CoolingTower:VariableSpeed,
     Central Tower,           !- Name
     Condenser Tower Inlet Node,  !- Water Inlet Node Name
     Condenser Tower Outlet Node,  !- Water Outlet Node Name
+    YorkCalcUserDefined,     !- Model Type
+    YorkCalc Default Tower Model,  !- Model Coefficient Name
+    ,                        !- Design Inlet Air Wet-Bulb Temperature {C}
+    8.9,                     !- Design Approach Temperature {deltaC}
+    2.6,                     !- Design Range Temperature {deltaC}
+    autosize,                !- Design Water Flow Rate {m3/s}
+    autosize,                !- Design Air Flow Rate {m3/s}
+    autosize,                !- Design Fan Power {W}
+    CoolingTowerFanRatioCurve,  !- Fan Power Ratio Function of Air Flow Rate Ratio Curve Name
+    0.2,                     !- Minimum Air Flow Rate Ratio
+    0.125,                   !- Fraction of Tower Capacity in Free Convection Regime
+    450.0,                   !- Basin Heater Capacity {W/K}
+    4.5,                     !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    SaturatedExit,           !- Evaporation Loss Mode
+    ,                        !- Evaporation Loss Factor {percent/K}
+    0.05,                    !- Drift Loss Percent {percent}
+    ConcentrationRatio,      !- Blowdown Calculation Mode
+    4.0;                     !- Blowdown Concentration Ratio
+
+  CoolingTower:VariableSpeed,
+    Central Tower 2,           !- Name
+    Condenser Tower Inlet Node 2,  !- Water Inlet Node Name
+    Condenser Tower Outlet Node 2,  !- Water Outlet Node Name
     YorkCalcUserDefined,     !- Model Type
     YorkCalc Default Tower Model,  !- Model Coefficient Name
     ,                        !- Design Inlet Air Wet-Bulb Temperature {C}
@@ -3847,12 +3806,6 @@
 
   Output:Variable,*,Cooling Tower Make Up Water Volume,hourly;
 
-  Output:Variable,*,Chiller Electric Energy,Hourly;
-
-  Output:Variable,Condenser Tower Outlet Node,System Node Setpoint Temperature,Hourly;
-
-  Output:Variable,*,Pump Electric Energy,Hourly;
-
   Output:VariableDictionary,Regular;
 
   Output:Surfaces:Drawing,dxf;
@@ -3890,3 +3843,5 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
+
+Output:Variable, Condenser Supply Outlet Node,System Node Setpoint Temperature,hourly;
