@@ -94,6 +94,9 @@ namespace GroundHeatExchangers {
 	Real64 currentSimTime( 0.0 ); // Current simulation time in hours
 	int locHourOfDay( 0 );
 	int locDayOfSim( 0 );
+	namespace {
+		bool GetInput( true );
+	}
 
 	Array1D< Real64 > prevTimeSteps; // This is used to store only the Last Few time step's time
 	// to enable the calculation of the subhouly contribution..
@@ -111,6 +114,20 @@ namespace GroundHeatExchangers {
 	//******************************************************************************
 
 	// Functions
+	void
+	clear_state(){
+		numVerticalGLHEs = 0;
+		numSlinkyGLHEs = 0;
+		N = 1; // COUNTER OF TIME STEP
+		currentSimTime = 0.0 ; // Current simulation time in hours
+		locHourOfDay = 0;
+		locDayOfSim = 0;
+		GetInput = true;
+		prevTimeSteps.deallocate();
+		checkEquipName.deallocate();
+		verticalGLHE.deallocate();
+		slinkyGLHE.deallocate();
+	}
 
 	void
 	SimGroundHeatExchangers(
@@ -158,7 +175,7 @@ namespace GroundHeatExchangers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true );
+
 		int GLHENum;
 
 		//GET INPUT

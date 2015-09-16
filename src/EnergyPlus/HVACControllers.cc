@@ -496,11 +496,13 @@ namespace HVACControllers {
 		using WaterCoils::CheckForSensorAndSetPointNode;
 		using MixedAir::CheckForControllerWaterCoil;
 		using SetPointManager::NodeHasSPMCtrlVarType;
+		using SetPointManager::ResetHumidityRatioCtrlVarType;
 		using SetPointManager::iCtrlVarType_Temp;
 		using SetPointManager::iCtrlVarType_MaxHumRat;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::iHumidityRatioMaxSetPoint;
+
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -632,6 +634,10 @@ namespace HVACControllers {
 				}
 
 				if ( ControllerProps( Num ).SensedNode > 0 ) {
+
+					if ( ControllerProps( Num ).ControlVar == iHumidityRatio || ControllerProps( Num ).ControlVar == iTemperatureAndHumidityRatio ) {
+						ResetHumidityRatioCtrlVarType( ControllerProps( Num ).SensedNode );
+					}					
 					CheckForSensorAndSetPointNode( ControllerProps( Num ).SensedNode, ControllerProps( Num ).ControlVar, NodeNotFound );
 
 					if ( NodeNotFound ) {

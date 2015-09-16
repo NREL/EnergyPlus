@@ -32,19 +32,21 @@ set( test_src
   Furnaces.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
+  HeatPumpWaterToWaterSimple.unit.cc
   HeatRecovery.unit.cc
   Humidifiers.unit.cc
+  HVACControllers.unit.cc
   HVACFourPipeBeam.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
+  HVACUnitarySystem.unit.cc
+  HVACVariableRefrigerantFlow.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
   ManageElectricPower.unit.cc
-  HVACUnitarySystem.unit.cc
-  HVACVariableRefrigerantFlow.unit.cc
   MixedAir.unit.cc
   MixerComponent.unit.cc
   PurchasedAirManager.unit.cc
