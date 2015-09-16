@@ -39,7 +39,7 @@ namespace FanCoilUnits {
 	extern int const CCM_CycFan;
 	extern int const CCM_VarFanVarFlow;
 	extern int const CCM_VarFanConsFlow;
-	extern int const CCM_MultiStageFan;
+	extern int const CCM_MultiSpeedFan;
 
 	// DERIVED TYPE DEFINITIONS
 
