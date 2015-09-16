@@ -42013,11 +42013,11 @@ Coil:Cooling:DX:MultiSpeed,
        \note startup. Suggested value is 45; zero value means latent degradation
        \note model is disabled.
   N15, \field Speed 1 Rated Waste Heat Fraction of Power Input
-       \required-field
        \type real
        \units dimensionless
        \minimum> 0.0
        \maximum 1.0
+       \default 0.2
        \note Recoverable waste heat at full load and rated conditions
   A18, \field Speed 1 Waste Heat Function of Temperature Curve Name
        \type object-list
@@ -42169,11 +42169,11 @@ Coil:Cooling:DX:MultiSpeed,
        \note startup. Suggested value is 45; zero value means latent degradation
        \note model is disabled.
   N28, \field Speed 2 Rated Waste Heat Fraction of Power Input
-       \required-field
        \type real
        \units dimensionless
        \minimum> 0.0
        \maximum 1.0
+       \default 0.2
        \note Recoverable waste heat at full load and rated conditions
   A24, \field Speed 2 Waste Heat Function of Temperature Curve Name
        \type object-list
@@ -42321,6 +42321,7 @@ Coil:Cooling:DX:MultiSpeed,
        \units dimensionless
        \minimum> 0.0
        \maximum 1.0
+       \default 0.2
        \note Recoverable waste heat at full load and rated conditions
   A30, \field Speed 3 Waste Heat Function of Temperature Curve Name
        \type object-list
@@ -42468,6 +42469,7 @@ Coil:Cooling:DX:MultiSpeed,
        \units dimensionless
        \minimum> 0.0
        \maximum 1.0
+       \default 0.2
        \note Recoverable waste heat at full load and rated conditions
   A36, \field Speed 4 Waste Heat Function of Temperature Curve Name
        \type object-list
@@ -44568,11 +44570,11 @@ Coil:Heating:DX:MultiSpeed,
        \note cubic curve = a + b*PLR + c*PLR**2 + d*PLR**3
        \note PLR = part load ratio (sensible heating load/steady state heating capacity)
   N14, \field Speed 1 Rated Waste Heat Fraction of Power Input
-       \required-field
        \type real
        \units dimensionless
        \minimum> 0.0
        \maximum 1.0
+       \default 0.2
        \note recoverable waste heat at full load and rated conditions
   A15, \field Speed 1 Waste Heat Function of Temperature Curve Name
        \type object-list
@@ -44667,11 +44669,11 @@ Coil:Heating:DX:MultiSpeed,
        \note cubic curve = a + b*PLR + c*PLR**2 + d*PLR**3
        \note PLR = part load ratio (sensible heating load/steady state heating capacity)
   N19, \field Speed 2 Rated Waste Heat Fraction of Power Input
-       \required-field
        \type real
        \units dimensionless
        \minimum> 0.0
        \maximum 1.0
+       \default 0.2
        \note recoverable waste heat at full load and rated conditions
   A21, \field Speed 2 Waste Heat Function of Temperature Curve Name
        \type object-list
@@ -44762,6 +44764,7 @@ Coil:Heating:DX:MultiSpeed,
        \units dimensionless
        \minimum> 0.0
        \maximum 1.0
+       \default 0.2
        \note recoverable waste heat at full load and rated conditions
   A27, \field Speed 3 Waste Heat Function of Temperature Curve Name
        \type object-list
@@ -44852,6 +44855,7 @@ Coil:Heating:DX:MultiSpeed,
        \units dimensionless
        \minimum> 0.0
        \maximum 1.0
+       \default 0.2
        \note recoverable waste heat at full load and rated conditions
   A33, \field Speed 4 Waste Heat Function of Temperature Curve Name
        \type object-list

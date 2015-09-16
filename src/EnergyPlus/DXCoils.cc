@@ -4093,15 +4093,7 @@ namespace DXCoils {
 				// Read waste heat modifier curve name
 				DXCoil( DXCoilNum ).MSWasteHeat( I ) = GetCurveIndex( Alphas( 18 + ( I - 1 ) * 6 ) ); // convert curve name to number
 				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
-					if ( DXCoil( DXCoilNum ).MSWasteHeat( I ) == 0 ) {
-						if ( lAlphaBlanks( 18 + ( I - 1 ) * 6 ) ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
-							ShowContinueError( "... " + cAlphaFields( 18 + ( I - 1 ) * 6 ) + " is blank." );
-						} else {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-							ShowContinueError( "...not found " + cAlphaFields( 18 + ( I - 1 ) * 6 ) + "=\"" + Alphas( 18 + ( I - 1 ) * 6 ) + "\"." );
-						}
-					} else {
+					if ( DXCoil( DXCoilNum ).MSWasteHeat( I ) > 0 ) {
 						// Verify Curve Object, only legal types are BiQuadratic
 						{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSWasteHeat( I ) ) );
 
@@ -4607,16 +4599,7 @@ namespace DXCoils {
 				// Read waste heat modifier curve name
 				DXCoil( DXCoilNum ).MSWasteHeat( I ) = GetCurveIndex( Alphas( 15 + ( I - 1 ) * 6 ) ); // convert curve name to number
 				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
-					if ( DXCoil( DXCoilNum ).MSWasteHeat( I ) == 0 ) {
-						if ( lAlphaBlanks( 11 ) ) {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
-							ShowContinueError( "... " + cAlphaFields( 15 + ( I - 1 ) * 6 ) + " is blank." );
-						} else {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-							ShowContinueError( "...not found " + cAlphaFields( 15 + ( I - 1 ) * 6 ) + "=\"" + Alphas( 15 + ( I - 1 ) * 6 ) + "\"." );
-						}
-
-					} else {
+					if ( DXCoil( DXCoilNum ).MSWasteHeat( I ) > 0 ) {
 						// Verify Curve Object, only legal types are BiQuadratic
 						{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSWasteHeat( I ) ) );
 
@@ -5466,14 +5449,6 @@ namespace DXCoils {
 							break;
 						}
 					}
-				} else {
-					for ( SpeedNum = 1; SpeedNum <= DXCoil( DXCoilNum ).NumOfSpeeds; ++SpeedNum ) {
-						if ( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNum ) == 0 ) {
-							ShowWarningError( "GetDXCoils:" + DXCoil( DXCoilNum ).Name + ". Since the parent object does not require waste heat, the input of Waste Heat Function of Temperature Curve value is not required." );
-							break;
-						}
-					}
-
 				}
 			}
 			MyEnvrnFlag( DXCoilNum ) = false;

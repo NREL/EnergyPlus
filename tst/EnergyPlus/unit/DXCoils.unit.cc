@@ -1139,4 +1139,4 @@ namespace EnergyPlus {
 		DXCoil.deallocate( );
 
 	}
-} 
+}
