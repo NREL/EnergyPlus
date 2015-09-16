@@ -33,6 +33,8 @@ namespace PlantCondLoopOperation {
 	//PLANT EMS Utility Routines
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManagePlantLoadDistribution(
