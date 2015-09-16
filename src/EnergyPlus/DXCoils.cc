@@ -6066,6 +6066,7 @@ namespace DXCoils {
 //					DataBypassFrac = 0.0;
 //				}
 				PrintFlag = true;
+				DataTotCapCurveIndex = DXCoil ( DXCoilNum ).CCapFTemp ( Mode );
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 					SizingMethod = CoolingCapacitySizing;
 					CompName = DXCoil( DXCoilNum ).Name + ":" + DXCoil( DXCoilNum ).CoilPerformanceName( Mode );
@@ -6086,16 +6087,29 @@ namespace DXCoils {
 					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 					PrintFlag = false;
+				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedCooling ) {
+					SizingMethod = CoolingCapacitySizing;
+					CompName = DXCoil( DXCoilNum ).Name;
+					FieldNum = 1;
+					DataTotCapCurveIndex = DXCoil ( DXCoilNum ).MSCCapFTemp ( Mode );
+					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
+				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedHeating ) {
+					SizingMethod = HeatingCapacitySizing;
+					CompName = DXCoil( DXCoilNum ).Name;
+					FieldNum = 1;
+					DataTotCapCurveIndex = DXCoil ( DXCoilNum ).MSCCapFTemp ( Mode );
+					TempSize = DXCoil( DXCoilNum ).MSRatedTotCap( Mode );
+					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 				} else {
 					SizingMethod = CoolingCapacitySizing;
 					CompName = DXCoil( DXCoilNum ).Name;
 					FieldNum = 1;
-					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+					TempSize = DXCoil( DXCoilNum ).MSRatedTotCap( Mode );
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 				}
 				CompType = DXCoil( DXCoilNum ).DXCoilType;
 				DataIsDXCoil = true;
-				DataTotCapCurveIndex = DXCoil ( DXCoilNum ).CCapFTemp ( Mode );
 				DataEMSOverrideON = DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode );
 				DataEMSOverride = DXCoil( DXCoilNum ).RatedTotCapEMSOverrideValue( Mode );
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
@@ -13525,7 +13539,7 @@ Label50: ;
 			if ( ( SELECT_CASE_var == CoilDX_CoolingSingleSpeed ) || ( SELECT_CASE_var == CoilDX_CoolingTwoSpeed ) || ( SELECT_CASE_var == CoilDX_HeatingEmpirical ) || ( SELECT_CASE_var == CoilDX_CoolingTwoStageWHumControl ) ) {
 				CapFTCurveIndex = DXCoil( CoilIndex ).CCapFTemp( 1 );
 			} else if ( ( SELECT_CASE_var == CoilDX_MultiSpeedCooling ) || ( SELECT_CASE_var == CoilDX_MultiSpeedHeating ) ) {
-				CapFTCurveIndex = DXCoil( CoilIndex ).CCapFTemp( 1 );
+				CapFTCurveIndex = DXCoil( CoilIndex ).MSCCapFTemp( 1 );
 			} else {
 				//        CALL ShowSevereError('GetDXCoilCapFTCurveIndex: Could not find Coil, Type="'// &
 				//             TRIM(cAllCoilTypes(DXCoil(CoilIndex)%DXCoilType_Num))//'" Name="'//TRIM(DXCoil(CoilIndex)%Name)//  &
