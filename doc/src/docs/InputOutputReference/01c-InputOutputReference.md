@@ -205,9 +205,11 @@ This is the mass flow rate of the working fluid through the heat exchanger.
 
 This is the average temperature of the working fluid inside the heat exchanger.
 
+
+
 ### GroundHeatExchanger:Slinky
 
-The GroundHeatExchanger:Slinky use the g-functions to calculate the GHX temperature respons, similar to the GroundHeatExchanger:Vertical model, however for this model g-functions are automatically calculated by EnergyPlus without the need of external software or data.
+The GroundHeatExchanger:Slinky use the g-functions to calculate the GHX temperature response, similar to the GroundHeatExchanger:Vertical model, however for this model g-functions are automatically calculated by EnergyPlus without the need of external software or data.
 
 Horizontal slinky-loop ground heat exchangers (GHXs) consist of coiled tubing, with the individual rings spread out along the direction of the trench either horizontally or vertically, as shown in [Figure](#SlinkyIOFig1). A schematic of a slinky GHX can be seen in [Figure](#SlinkyIOFig2). Compared to conventional straight tube horizontal GHXs, slinky loops have a higher tube density; hence, with the same cooling/heating loads, slinky-loop GHXs require less land area and excavation work than straight tube HGHXs. 
 
@@ -242,9 +244,8 @@ GroundHeatExchanger:Slinky,
   40,               !- Trench Length [m]
   15,               !- Number of Parallel Trenches
   2,                !- Trench Spacing [m]
-  15.5,             !- Kusuda-Achenbach Average Surface Temp [C]
-  3.2,              !- Kusuda-Achenbach Average Surface Temp Amplitude [C]
-  8,                !- Kusuda-Achenbach Phase Shift [C]
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+  KATemps,          !- Name of Undisturbed Ground Temperature Object
   10;               !- Maximum length of simulation [years]
 ```
 
@@ -325,17 +326,13 @@ This numeric field is the number of parallel trenches. Design flow rate will be 
 
 This numeric field is the center-to-center distance in between parallel trenches, in meters.
 
-#### Field: Kusuda-Achenbach Average Annual Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-The annual average ground surface temperature to be applied to the Kusuda-Achenbach ground temperature boundary temperature correlation, in °C. This parameter and the subsequent two parameters may be determined by using the CalcSoilSurfTemp preprocessor
+The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
-#### Field: Kusuda-Achenbach Amplitude of Average Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-The annual mean ground surface temperature variation from average used in determining the far-field boundary conditions, in °C. This parameter, as well as the previous and following parameters may be determined by using the CalcSoilSurfTemp preprocessor
-
-#### Field: Kusuda-Achenbach Phase Shift
-
-The phase shift of minimum ground surface temperature, or the day of the year when the minimum ground surface temperature occurs. This parameter, as well as the previous two parameters may be determined by using the CalcSoilSurfTemp preprocessor
+The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
 #### Field: Maximum Length of Simulation
 
@@ -380,6 +377,8 @@ This is the mass flow rate of the working fluid through the heat exchanger.
 #### Ground Heat Exchanger Average Fluid Temperature [C]
 
 This is the average temperature of the working fluid inside the heat exchanger.
+
+
 
 ### GroundHeatExchanger:Pond
 
@@ -488,6 +487,8 @@ These outputs are the pond fluid inlet and outlet temperatures and mass flow rat
 #### Pond Heat Exchanger Bulk Temperature [C]
 
 This output is the pond bulk temperature.
+
+
 
 ### GroundHeatExchanger:Surface
 
@@ -626,6 +627,8 @@ This is the total surface energy exchange for the timestep.
 
 This is the surface heat exchanger source temperature.
 
+
+
 ### GroundHeatExchanger:HorizontalTrench
 
 The horizontal trench ground heat exchanger object provides an alternate interface to the detailed PipingSystem:Underground:\* objects.  The same underlying simulation algorithm is utilized, providing a transient numerical simulation of soil with buried pipes and a detailed surface heat balance.  The input syntax is much smaller and useful for simple applications.  For full flexibility, use the PipingSystem:Underground:\* objects to build a detailed simulation domain and piping circuit.  For information regarding the simulation algorithms, see the engineering reference document section covering the buried piping system objects.
@@ -702,17 +705,13 @@ This numeric field represents the volume fraction, in percent, of water content 
 
 This numeric field represents the volume fraction, in percent, of water content in the soil which results in saturation.
 
-***Field: Kusuda-Achenbach Average Surface Temperature [C]***
+#### Field: Type of Undisturbed Ground Temperature Object
 
-This numeric field is the average annual ground surface temperature, used in the Kusuda-Achenbach undisturbed ground temperature (far-field boundary) model.  This field can be inferred (left blank) if a Site:GroundTemperatures:Shallow object is provided in the input file.
+The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
-***Field: Kusuda-Achenbach Average Amplitude of Surface Temperature [C]***
+#### Field: Name of Undisturbed Ground Temperature Object
 
-This numeric field is the average annual amplitude of ground surface temperature, used in the Kusuda-Achenbach undisturbed ground temperature (far-field boundary) model.  This field can be inferred (left blank) if a Site:GroundTemperatures:Shallow object is provided in the input file.
-
-***Field: Kusuda-Achenbach Phase Shift of Minimum Surface Temperature [days]***
-
-This numeric field is the phase shift to minimum ground surface temperature, in days, since the beginning of the year, used in the Kusuda-Achenbach undisturbed ground temperature (far-field boundary) model.  This field can be inferred (left blank) if a Site:GroundTemperatures:Shallow object is provided in the input file.
+The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
 ***Field: Evapotranspiration Ground Cover Parameter [-]***
 
@@ -739,13 +738,11 @@ GroundHeatExchanger:HorizontalTrench,
    641,         !- Pipe Density {kg/m3}
    2405,        !- Pipe Specific Heat {J/kg-K}
    30,          !- Soil Moisture Content Volume Fraction {percent}
-   50,       !- Soil Moisture Content Volume Fraction at Saturation {percent}
-   15.5,        !- Kusuda-Achenbach Average Surface Temperature {C}
-   12.8,     !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
-   17.3,!- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
+   50,          !- Soil Moisture Content Volume Fraction at Saturation {percent}
+   Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+   KATemps,     !- Name of Undisturbed Ground Temperature Object
    0.408;       !- Evapotranspiration Ground Cover Parameter
 ```
-
 
 ### Horizontal Trench Ground Heat Exchanger Outputs
 
@@ -4766,6 +4763,14 @@ The conditions at this node represent the average state of the air in the zone. 
 
 The name of the return air node which attaches the zone to the return air path described above. Even if there is no return air or no return air path a unique name must be entered in this field. The conditions at this node represent the state of the air leaving the zone including any heat gain from light-heat-to-return.
 
+#### Field: Zone Return Air Flow Rate Fraction Schedule Name
+
+The name of a schedule to specify the return air flow rate as a fraction of the base return air. If the next field is blank, then the return air flow rate is the total supply inlet flow rate to the zone less the total exhaust node flow rate from the zone multiplied by this schedule name. If this field is left blank, the schedule defaults to 1.0 at all times.
+
+#### Field: Zone Return Air Flow Rate Basis Node or NodeList Name
+
+The name of a node or list of nodes (NodeList) that is used to calculate the return air flow rate for this zone. The sum of the current flow rates for this node(s) multiplied by the Zone Return Air Flow Rate Fraction Schedule determines the return air flow rate. If this field is blank, then the base return air flow rate is the total supply inlet flow rate to the zone less the total exhaust node flow rate from the zone.
+
 An example of this statement in an IDF is:
 
 ```idf
@@ -6553,7 +6558,7 @@ A unique user assigned name for a particular inlet side mixer terminal unit. Any
 
 #### Field: ZoneHVAC Terminal Unit Object Type
 
-The type of zone AC unit to which this terminal unit will be connected. Currently only ZoneHVAC:FourPipeFanCoil can be used.
+The type of zone AC unit to which this terminal unit will be connected. This is a choice field. The choices are ZoneHVAC:FourPipeFanCoil or ZoneHVAC:WaterToAirHeatPump.
 
 #### Field: ZoneHVAC Terminal Unit Name
 
@@ -6599,7 +6604,7 @@ A unique user assigned name for a particular supply side mixer terminal unit. An
 
 #### Field: ZoneHVAC Terminal Unit Object Type
 
-The type of zone AC unit to which this terminal unit will be connected. Currently only ZoneHVAC:FourPipeFanCoil can be used.
+The type of zone AC unit to which this terminal unit will be connected. This is a choice field. The choices are ZoneHVAC:FourPipeFanCoil or ZoneHVAC:WaterToAirHeatPump.
 
 #### Field: ZoneHVAC Terminal Unit Name
 
@@ -7338,7 +7343,7 @@ EnergyPlus provides 5 capacity control methods for this unit:
 
 In EnergyPlus the fan coil units are modeled as compound components. That is, they are assembled from other components. Fan coils contain an outdoor air mixer, a fan, a heating coil and a cooling coil. These components are described elsewhere in this document. The fan coil input simply requires the names of these four components, which have to be described elsewhere in the input. The input also requires the name of an availability schedule, maximum airflow rate, outdoor airflow rate, and maximum and minimum hot (for hydronic heating coil only) and cold water volumetric flow rates. The unit is connected to the zone inlet and exhaust nodes and the outdoor air by specifying unit inlet, and outlet air node names and the outdoor air mixer object name. The outdoor air mixer child object provides the outdoor air and relief air nodes names. Note that the unit air inlet node should be the same as a zone exhaust node and the unit outlet node should be the same as a zone inlet node. The fan coil unit is connected to a hot water loop through its hot water coil or with no hot water loop when using an electric coil (demand side) and to a chilled water loop (demand side) through its cooling coil.
 
-Note that the type of fan component associated with the fan coil unit depends on the type of capacity control method chosen. For *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used, for *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume*, and for *MultiStageFan* a *Fan:OnOff* should be chosen.
+Note that the type of fan component associated with the fan coil unit depends on the type of capacity control method chosen. For *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used, for *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume*, and for *MultiSpeedFan* a *Fan:OnOff* should be chosen.
 
 Fan coil units can be 4-pipe or 2-pipe. For 4-pipe units there are 2 supply pipes and 2 return pipes. For 2-pipe units there is a single supply pipe and a single return pipe and the supply is switched between hot and chilled water depending on the season. EnergyPlus models 4-pipe units, but the 4-pipe model can be used to model 2-pipe units by using the coil availability schedules to make sure that either hot or chilled water is exclusively available. Fan coil units with hydronic heat can instead be modeled using an electric heating coil if desired (i.e., replace the hydronic heating coil with an electric heating coil).
 
@@ -7352,9 +7357,9 @@ The name of the schedule (ref: Schedule) that denotes whether the fan coil unit 
 
 ***Field: Capacity Control  Method***
 
-This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are ***ConstantFanVariableFlow***, ***CyclingFan***, ***VariableFanVariableFlow***, ***VariableFanConstantFlow***, or ***MultiStageFan***. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load. For *MultiStageFan* the water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load. 
+This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are ***ConstantFanVariableFlow***, ***CyclingFan***, ***VariableFanVariableFlow***, ***VariableFanConstantFlow***, or ***MultiSpeedFan***. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load. For *MultiSpeedFan* the water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load. 
 
-***MultiStageFan:*** for a given load, the fan cycles between speeds when fan speed selected is higher than the minimum speed or the fan cycles on-off when the fan speed selected is the minimum and the fan operating schedule is cycling fan. When the fan is operating as a continuous fan, then the fan runs at minimum speed even when there is no load to meet. When the speed selected is higher than the minimum speed, then the fan cycles between consecutive speed regardless of the fan operating schdule type. The model selects at what fan speed to run depending on cooling or heating load. 
+***MultiSpeedFan:*** for a given load, the fan cycles between speeds when fan speed selected is higher than the minimum speed or the fan cycles on-off when the fan speed selected is the minimum and the fan operating schedule is cycling fan. When the fan is operating as a continuous fan, then the fan runs at minimum speed even when there is no load to meet. When the speed selected is higher than the minimum speed, then the fan cycles between consecutive speed regardless of the fan operating schdule type. The model selects at what fan speed to run depending on cooling or heating load. 
 
 #### Field: Maximum Supply Air Flow Rate
 
@@ -7392,7 +7397,7 @@ OutdoorAir:Mixer
 
 #### Field: Outdoor Air Mixer Name
 
-The name of an outdoor air mixer component (object: OutdoorAir:Mixer) which composes part of the fan coil unit. Note that the return air node of the outdoor air mixer should be the same node as the air inlet node of the fan coil unit. In addition, the outdoor air mixer’s mixed air node should be the same as the inlet air node of the fan coil unit’s fan.
+The name of an outdoor air mixer component (object:OutdoorAir:Mixer) which composes part of the fan coil unit. Note that the return air node of the outdoor air mixer should be the same node as the air inlet node of the fan coil unit. In addition, the outdoor air mixer’s mixed air node should be the same as the inlet air node of the fan coil unit’s fan.
 
 #### Field: Supply Air Fan Object Type
 
@@ -7490,7 +7495,7 @@ This optional input field is the name of a DesignSpecificationZoneHVACSizing obj
 
 #### Filed: Supply Air Fan Operating Mode Schedule Name
 This input field is the name of a schedule that controls fan operation. Schedule Name values of 0
-denote cycling fan operation (fan cycles with cooling coil). Schedule values greater than 0 denote constant fan operation (fan runs continually regardless of coil operation). The fan operating mode defaults to cycling fan operation if this field is left blank. This input field is currently used with *MultiStageFan* capacity control method only.
+denote cycling fan operation (fan cycles with cooling coil). Schedule values greater than 0 denote constant fan operation (fan runs continually regardless of coil operation). The fan operating mode defaults to cycling fan operation if this field is left blank. This input field is currently used with *MultiSpeedFan* capacity control method only.
 
 
 An example input for a fan coil unit, including its constituent components, is shown below.
@@ -7666,11 +7671,11 @@ This field is the fraction of the system timestep the fan coil unit is running f
 
 #### Fan Coil Fan Speed Level []
 
-This field is indicates the speed chosen for the fan in the *CyclingFan* and *MultiStageFan* capacity control methods.  A value of '0' means that the unit is off, '1' the fan is running at its low speed, '2' medium speed, and '3' high speed (maximum). This variable is defined only for the *CyclingFan* and *MultiStageFan* capacity control methods.
+This field is indicates the speed chosen for the fan in the *CyclingFan* and *MultiSpeedFan* capacity control methods.  A value of '0' means that the unit is off, '1' the fan is running at its low speed, '2' medium speed, and '3' high speed (maximum). This variable is defined only for the *CyclingFan* and *MultiSpeedFan* capacity control methods.
 
 #### Fan Coil Part Load Ratio []
 
-When the capacity control method is *VariableFanVariableFlow* or *VariableFanConstantFlow,* this output variable reports the unit part load ratio (ratio of unit heating / cooling output to the maximum heating / cooling output). This variable is defined only for *VariableFanVariableFlow*, *VariableFanConstantFlow* or *MultiStageFan* capacity control methods. The unit part load ratio is applicable to *MultiStageFan* only when the fan speed level selected is the minimum (Speed 1).  
+When the capacity control method is *VariableFanVariableFlow* or *VariableFanConstantFlow,* this output variable reports the unit part load ratio (ratio of unit heating / cooling output to the maximum heating / cooling output). This variable is defined only for *VariableFanVariableFlow*, *VariableFanConstantFlow* or *MultiSpeedFan* capacity control methods. The unit part load ratio is applicable to *MultiSpeedFan* only when the fan speed level selected is the minimum (Speed 1).  
 
 #### Fan Coil Availability Status []
 
@@ -14586,27 +14591,27 @@ This alpha field defines the name of a quadratic performance curve that paramete
 
 This alpha field defines the name of a quadratic performance curve that parameterizes the variation of outdoor unit condensing temperature as a function of subcooling degrees. The output of this curve is the temperature difference between the condensing temperature and the coil surface air temperature.
 
-#### Field: Diameter of main pipe connecting outdoor unit to indoor units
+#### Field: Diameter of Main Pipe Connecting Outdoor Unit to Indoor Units
 
 This numeric field defines the diameter of main pipe connecting outdoor unit to indoor units. This value is used to calculate the piping loss of the refrigerant when going through the main pipe, including the heat loss and pressure drop. If this field is blank, the default value of 0.0254m is used.
 
-#### Field: Length of main pipe connecting outdoor unit to indoor units
+#### Field: Length of Main Pipe Connecting Outdoor Unit to Indoor Units
 
 This numeric field defines the length of main pipe connecting outdoor unit to indoor units. This value is used to calculate the heat loss of the refrigerant when going through the main pipe. The value should be greater than 0. If this field is blank, the default value of 30m is used.
 
-#### Field: Equivalent length of main pipe connecting outdoor unit to indoor units
+#### Field: Equivalent Length of Main Pipe Connecting Outdoor Unit to Indoor Units
 
 This numeric field defines the equivalent length of main pipe connecting outdoor unit to indoor units. This value is used to calculate the pressure drop of the refrigerant when going through the main pipe. The value should be greater than the real pipe length specified in the above field. If this field is blank, the default value of 36m is used.
 
-#### Field: Height difference between the outdoor unit node and indoor unit node of the main pipe
+#### Field: Height Difference Between Outdoor Unit and Indoor Units
 
 This numeric field defines the height difference between the outdoor unit node and indoor unit node of the main pipe. This value is used to calculate the piping loss of the refrigerant when going through the main pipe. The value can be positive, zero, or negative. Positive means outdoor unit is higher than indoor unit, while negative means outdoor unit is lower than indoor unit.
 
-#### Field: Insulation thickness of the main pipe
+#### Field: Main Pipe Insulation Thickness
 
 This numeric field defines the insulation thickness of the main pipe. This value is used to calculate the heat loss of the refrigerant when going through the main pipe. The value should be greater than 0. If this field is blank, the default value of 0.02m is used.
 
-#### Field: Thermal conductivity of the main pipe insulation material
+#### Field: Main Pipe Insulation Thermal Conductivity
 
 This numeric field defines the thermal conductivity of the main pipe insulation material. This value is used to calculate the heat loss of the refrigerant when going through the main pipe. The value should be greater than 0. If this field is blank, the default value of 0.032 W/m-K is used.
 

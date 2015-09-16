@@ -161,8 +161,8 @@ namespace SolarShading {
 	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 		bool MustAllocSolarShading( true );
-		static bool GetInputFlag( true );
-		static bool firstTime( true );
+		bool GetInputFlag( true );
+		bool firstTime( true );
 	}
 
 	std::ofstream shd_stream; // Shading file stream
@@ -220,10 +220,67 @@ namespace SolarShading {
 	void
 	clear_state()
 	{
-
+		MaxHCV= 15;
+		MaxHCS= 1500;
+		MAXHCArrayBounds = 0;
+		MAXHCArrayIncrement = 0;
+		NVS = 0;
+		NumVertInShadowOrClippedSurface = 0;
+		CurrentSurfaceBeingShadowed = 0;
+		CurrentShadowingSurface = 0;
+		OverlapStatus = 0;
+		CTHETA.deallocate();
+		FBKSHC = 0;
+		FGSSHC = 0;
+		FINSHC = 0;
+		FRVLHC = 0;
+		FSBSHC = 0;
+		LOCHCA = 0;
+		NBKSHC = 0;
+		NGSSHC = 0;
+		NINSHC = 0;
+		NRVLHC = 0;
+		NSBSHC = 0;
+		CalcSkyDifShading = false;
+		ShadowingCalcFrequency = 0; // Frequency for Shadowing Calculations
+		ShadowingDaysLeft =0; // Days left in current shadowing period
+		debugging = false;
 		MustAllocSolarShading = true;
 		GetInputFlag = true;
 		firstTime = true;
+		HCNS.deallocate();
+		HCNV.deallocate();
+		HCA.deallocate();
+		HCB.deallocate();
+		HCC.deallocate();
+		HCX.deallocate();
+		HCY.deallocate();
+		WindowRevealStatus.deallocate();
+		HCAREA.deallocate();
+		HCT.deallocate();
+		ISABSF.deallocate();
+		SAREA.deallocate();
+		NumTooManyFigures = 0;
+		NumTooManyVertices = 0;
+		NumBaseSubSurround = 0;
+		XShadowProjection = 0.0;
+		YShadowProjection = 0.0;
+		XTEMP.deallocate();
+		XVC.deallocate();
+		XVS.deallocate();
+		YTEMP.deallocate();
+		YVC.deallocate();
+		YVS.deallocate();
+		ZVC.deallocate();
+		ATEMP.deallocate();
+		BTEMP.deallocate();
+		CTEMP.deallocate();
+		XTEMP1.deallocate();
+		YTEMP1.deallocate();
+		maxNumberOfFigures = 0;
+		TrackTooManyFigures.deallocate();
+		TrackTooManyVertices.deallocate();
+		TrackBaseSubSurround.deallocate();
 		DBZoneIntWin.deallocate();
 		ISABSF.deallocate();
 	}
@@ -262,7 +319,6 @@ namespace SolarShading {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 
 		// FLOW:
 #ifdef EP_Count_Calls
