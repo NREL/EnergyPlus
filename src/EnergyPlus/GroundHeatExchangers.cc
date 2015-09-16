@@ -1450,6 +1450,11 @@ namespace GroundHeatExchangers {
 
 				// Get Gfunction data
 				verticalGLHE( GLHENum ).NPairs = rNumericArgs( 15 );
+				if ( verticalGLHE( GLHENum ).NPairs < 1 ) {
+					ShowWarningError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).Name + "\", invalid value in field." );
+					ShowContinueError( "..." + cNumericFieldNames( 15 ) + " is less than 1." );
+					errorsFound = true;
+				}
 				verticalGLHE( GLHENum ).SubAGG = 15;
 				verticalGLHE( GLHENum ).AGG = 192;
 
