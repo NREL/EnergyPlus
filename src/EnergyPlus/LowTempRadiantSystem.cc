@@ -2212,7 +2212,7 @@ namespace LowTempRadiantSystem {
 					}
 				} else { // Autosize or hard-size with sizing run
 					// assume tube spacing of 15 cm
-					CheckZoneSizing( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name );
+					// CheckZoneSizing( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name );
 					TubeLengthDes = HydrRadSys( RadSysNum ).TotalSurfaceArea / 0.15;
 					if ( IsAutoSize ) {
 						HydrRadSys( RadSysNum ).TubeLength = TubeLengthDes;
@@ -2372,7 +2372,7 @@ namespace LowTempRadiantSystem {
 					}
 				} else {	// Autosize or hard-size with sizing run
 					// assume tube spacing of 15 cm
-					CheckZoneSizing( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name );
+					// CheckZoneSizing( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name );
 					TubeLengthDes = CFloRadSys( RadSysNum ).TotalSurfaceArea / 0.15;
 					if (IsAutoSize ) {
 						CFloRadSys( RadSysNum ).TubeLength = TubeLengthDes;

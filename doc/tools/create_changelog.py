@@ -68,6 +68,16 @@ for valid_pr_type in ValidPRTypes:
 query_args = urlencode({'access_token': github_token})
 # use the GitHub API to get pull request info
 for pr_num in pr_numbers:
+
+    # we need to skip very low numbers of pull requests, for example:
+    # - a user wants to contribute a change to E+, so they create a fork/branch
+    # - their operations result in a pull request into their own repo, so the counting starts at #1...
+    # we're at like 5000+, so if we just skip anything less than 1000, we'll be good.
+    # And look, I am even using lambdas to prove I don't hate them
+    expected_good_num = lambda n : int(pr_num) < 1000
+    if expected_good_num(pr_num):
+        continue
+    
     # set the url for this pull request
     github_url = "https://api.github.com/repos/NREL/EnergyPlus/issues/" + pr_num + '?' + query_args
 
