@@ -64698,7 +64698,7 @@ GroundHeatExchanger:Vertical,
   N15,  \field Number of Data Pairs of the G Function
         \required-field
         \type integer
-        \minimum> 0.0
+        \minimum 1
         \maximum 100
   N16,  \field G-Function Ln(T/Ts) Value 1
         \required-field

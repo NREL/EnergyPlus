@@ -1449,12 +1449,19 @@ namespace GroundHeatExchangers {
 				}
 
 				// Get Gfunction data
-				verticalGLHE( GLHENum ).NPairs = rNumericArgs( 15 );
+				indexNum = 15;
+				verticalGLHE( GLHENum ).NPairs = rNumericArgs( indexNum );
+
+				// Get Gfunc error handling
 				if ( verticalGLHE( GLHENum ).NPairs < 1 ) {
 					ShowWarningError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).Name + "\", invalid value in field." );
-					ShowContinueError( "..." + cNumericFieldNames( 15 ) + " is less than 1." );
+					ShowContinueError( "..." + cNumericFieldNames( indexNum ) + " is less than 1." );
+					errorsFound = true;
+				} else if ( numNums != ( indexNum + ( verticalGLHE( GLHENum ).NPairs * 2 ) ) ) {
+					ShowWarningError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).Name + "\", invalid number of input fields." );
 					errorsFound = true;
 				}
+
 				verticalGLHE( GLHENum ).SubAGG = 15;
 				verticalGLHE( GLHENum ).AGG = 192;
 
