@@ -32,6 +32,7 @@ set( test_src
   Furnaces.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
+  HeatPumpWaterToWaterSimple.unit.cc
   HeatRecovery.unit.cc
   Humidifiers.unit.cc
   HVACControllers.unit.cc
