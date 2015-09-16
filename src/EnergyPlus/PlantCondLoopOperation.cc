@@ -72,6 +72,11 @@ namespace PlantCondLoopOperation {
 	bool const TurnItemOn( true ); // Convenient for calling TurnPlantItemOnOff instead of hardwired true/false
 	bool const TurnItemOff( false ); // Convenient for calling TurnPlantItemOnOff instead of hardwired true/false
 
+	namespace{
+		bool GetPlantOpInput( true ); // operation Get Input flag
+		bool InitLoadDistributionOneTimeFlag( true );
+		bool LoadEquipListOneTimeFlag( true );
+	}
 	//MODULE VARIABLE DECLARATIONS:
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE  !SUBROUTINE SPECIFICATIONS FOR MODULE
@@ -90,6 +95,12 @@ namespace PlantCondLoopOperation {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state(){
+		GetPlantOpInput = true;
+		InitLoadDistributionOneTimeFlag = true;
+		LoadEquipListOneTimeFlag = true;
+	}
 
 	void
 	ManagePlantLoadDistribution(
@@ -1121,7 +1132,7 @@ namespace PlantCondLoopOperation {
 		// DERIVED TYPE DEFINITIONS
 		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
+
 		bool FoundIntendedList;
 		int Num;
 		int MachineNum;
@@ -1140,7 +1151,7 @@ namespace PlantCondLoopOperation {
 		int iIndex;
 		bool firstblank;
 
-		if ( MyOneTimeFlag ) {
+		if ( LoadEquipListOneTimeFlag ) {
 			// assemble mapping between list names and indices one time
 			PELists = GetNumObjectsFound( "PlantEquipmentList" );
 			CELists = GetNumObjectsFound( "CondenserEquipmentList" );
@@ -1227,7 +1238,7 @@ namespace PlantCondLoopOperation {
 			if ( ErrorsFound ) {
 				ShowFatalError( "LoadEquipList/GetEquipmentLists: Failed due to preceding errors." );
 			}
-			MyOneTimeFlag = false;
+			LoadEquipListOneTimeFlag = false;
 		}
 
 		FoundIntendedList = false;
@@ -1745,7 +1756,7 @@ namespace PlantCondLoopOperation {
 		int OpSchemePtr;
 		int thisSchemeNum;
 		int SchemeType;
-		static bool MyOneTimeFlag( true );
+
 		bool FoundScheme;
 		bool FoundSchemeMatch;
 		//  LOGICAL, SAVE                     :: FirstHVACInitsDone = .FALSE.
@@ -1757,7 +1768,7 @@ namespace PlantCondLoopOperation {
 		int NewNumOpSchemes;
 		int NumSearchResults;
 		bool GetInputOK; // successful Get Input
-		static bool GetPlantOpInput( true ); // successful Get Input
+
 		bool errFlag1;
 		bool errFlag2;
 		Real64 HighestRange;
@@ -1777,7 +1788,7 @@ namespace PlantCondLoopOperation {
 		}
 
 		// ONE TIME INITS
-		if ( MyOneTimeFlag ) {
+		if ( InitLoadDistributionOneTimeFlag ) {
 			// Set up 'component' to 'op scheme' pointers in Plant data structure
 			// We're looking for matches between a component on a PlantLoop.OpScheme.List()
 			// and the same component in the PlantLoop.LoopSide.Branch.Comp() data structure
@@ -1944,7 +1955,7 @@ namespace PlantCondLoopOperation {
 				} // operation scheme
 			} // loop
 
-			MyOneTimeFlag = false;
+			InitLoadDistributionOneTimeFlag = false;
 		}
 
 		if ( AnyEMSPlantOpSchemesInModel ) { // Execute any Initialization EMS program calling managers for User-Defined operation.
