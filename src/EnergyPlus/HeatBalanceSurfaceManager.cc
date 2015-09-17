@@ -117,7 +117,6 @@ namespace HeatBalanceSurfaceManager {
 	using DataMoistureBalance::HSkyFD;
 	using DataMoistureBalance::HGrndFD;
 	using DataMoistureBalance::HAirFD;
-	//unused0909USE DataMoistureBalanceEMPD, ONLY: MoistEMPDNew, MoistEMPDFlux
 
 	// Use statements for access to subroutines in other modules
 	using namespace InputProcessor;
@@ -4877,14 +4876,14 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	using DataMoistureBalance::HSkyFD;
 	using DataMoistureBalance::HGrndFD;
 	using DataMoistureBalance::HAirFD;
-	using DataMoistureBalanceEMPD::MoistEMPDNew;
-	using DataMoistureBalanceEMPD::MoistEMPDFlux;
-	using DataMoistureBalanceEMPD::FluxSurf;
-	using DataMoistureBalanceEMPD::FluxDeep;
-	using DataMoistureBalanceEMPD::HMshort;
-	using DataMoistureBalanceEMPD::MoistEMPDOld;
-	using DataMoistureBalanceEMPD::FluxZone;
-	using DataMoistureBalanceEMPD::RVsurface;
+	using DataMoistureBalanceEMPD::RVSurface;
+	using DataMoistureBalanceEMPD::HeatFluxLatent;
+	using DataMoistureBalanceEMPD::MassFluxSurfaceLayer;
+	using DataMoistureBalanceEMPD::MassFluxDeepLayer;
+	using DataMoistureBalanceEMPD::HMSurfaceLayer;
+	using DataMoistureBalanceEMPD::RVSurfaceOld;
+	using DataMoistureBalanceEMPD::MassFluxZone;
+	using DataMoistureBalanceEMPD::RVSurfLayer;
 	using DataAirflowNetwork::SimulateAirflowNetwork;
 	using DataAirflowNetwork::AirflowNetworkControlSimple;
 
@@ -5207,7 +5206,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 						TempSurfInTmp( SurfNum ) = ( CTFConstInPart( SurfNum ) + QPoolSurfNumerator( SurfNum ) + IterDampConst * TempInsOld( SurfNum ) ) / ( construct.CTFInside( 0 ) - construct.CTFCross( 0 ) + PoolHeatTransCoefs( SurfNum ) + IterDampConst ); // Constant part of conduction eq (history terms) | Pool modified terms (see non-pool equation for details) | Iterative damping term (for stability) | Conduction term (both partition sides same temp) | Pool and damping term
 					}
 					if ( surface.HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
-						TempSurfInTmp( SurfNum ) -= MoistEMPDFlux( SurfNum ) * TempDiv; // Conduction term (both partition sides same temp) | Conduction term (both partition sides same temp) | Convection and damping term
+						TempSurfInTmp( SurfNum ) -= HeatFluxLatent( SurfNum ) * TempDiv; // Conduction term (both partition sides same temp) | Conduction term (both partition sides same temp) | Convection and damping term
 						if ( TempSurfInSat > TempSurfInTmp( SurfNum ) ) {
 							TempSurfInTmp( SurfNum ) = TempSurfInSat; // Surface temp cannot be below dew point
 						}
@@ -5261,7 +5260,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 								TempSurfInTmp( SurfNum ) = ( CTFConstInPart( SurfNum ) + QPoolSurfNumerator( SurfNum ) + IterDampConst * TempInsOld( SurfNum ) + construct.CTFCross( 0 ) * TH11 ) / ( construct.CTFInside( 0 ) + PoolHeatTransCoefs( SurfNum ) + IterDampConst ); // Constant part of conduction eq (history terms) | Pool modified terms (see non-pool equation for details) | Iterative damping term (for stability) | Current conduction from | the outside surface | Coefficient for conduction (current time) | Pool and damping term
 							}
 							if ( surface.HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
-								TempSurfInTmp( SurfNum ) -= MoistEMPDFlux( SurfNum ) * TempDiv; // Coefficient for conduction (current time) | Convection and damping term
+								TempSurfInTmp( SurfNum ) -= HeatFluxLatent( SurfNum ) * TempDiv; // Coefficient for conduction (current time) | Convection and damping term
 								if ( TempSurfInSat > TempSurfInTmp( SurfNum ) ) {
 									TempSurfInTmp( SurfNum ) = TempSurfInSat; // Surface temp cannot be below dew point
 								}
@@ -5727,7 +5726,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 				// by time to get the actual amount affecting the zone volume of air.
 
 				UpdateMoistureBalanceEMPD( SurfNum );
-				RhoVaporSurfIn( SurfNum ) = MoistEMPDNew( SurfNum );
+				RhoVaporSurfIn( SurfNum ) = RVSurface( SurfNum );
 				Real64 const FD_Area_fac( HMassConvInFD( SurfNum ) * surface.Area );
 				SumHmAW( ZoneNum ) += FD_Area_fac * ( RhoVaporSurfIn( SurfNum ) - RhoVaporAirIn( SurfNum ) );
 				Real64 const MAT_zone(MAT(ZoneNum));
@@ -5833,7 +5832,6 @@ CalcOutsideSurfTemp(
 	using DataMoistureBalance::HSkyFD;
 	using DataMoistureBalance::HGrndFD;
 	using DataMoistureBalance::HAirFD;
-	//unused0909  USE DataMoistureBalanceEMPD,   ONLY: MoistEMPDNew, MoistEMPDFlux
 	using namespace DataDaylightingDevices;
 	using DaylightingDevices::FindTDDPipe;
 	using namespace Psychrometrics;

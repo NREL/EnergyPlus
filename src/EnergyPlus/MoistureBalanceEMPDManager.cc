@@ -302,50 +302,50 @@ namespace MoistureBalanceEMPDManager {
 		static bool InitEnvrnFlag( true );
 
 		if ( InitEnvrnFlag ) {
-			MoistEMPDOld.allocate( TotSurfaces );
-			MoistEMPDNew.allocate( TotSurfaces );
-			MoistEMPDFlux.allocate( TotSurfaces );
+			RVSurfaceOld.allocate( TotSurfaces );
+			RVSurface.allocate( TotSurfaces );
+			HeatFluxLatent.allocate( TotSurfaces );
 			RhoVapEMPD.allocate( TotSurfaces );
 			WSurfEMPD.allocate( TotSurfaces );
 			RHEMPD.allocate( TotSurfaces );
-			RVsurface.allocate( TotSurfaces );
-			RVsurfOld.allocate( TotSurfaces );
-			RVdeep.allocate( TotSurfaces );
+			RVSurfLayer.allocate( TotSurfaces );
+			RVSurfLayerOld.allocate( TotSurfaces );
+			RVDeepLayer.allocate( TotSurfaces );
 			RVdeepOld.allocate( TotSurfaces );
 			RVwall.allocate( TotSurfaces );
-			HMshort.allocate( TotSurfaces );
-			FluxSurf.allocate( TotSurfaces );
-			FluxDeep.allocate( TotSurfaces );
-			FluxZone.allocate( TotSurfaces );
+			HMSurfaceLayer.allocate( TotSurfaces );
+			MassFluxSurfaceLayer.allocate( TotSurfaces );
+			MassFluxDeepLayer.allocate( TotSurfaces );
+			MassFluxZone.allocate( TotSurfaces );
 		}
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			ZoneNum = Surface( SurfNum ).Zone;
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 			if ( ZoneAirHumRat( ZoneNum ) == 0.0 ) {
-				MoistEMPDOld(SurfNum) = ZoneAirHumRat(ZoneNum);
-				MoistEMPDNew(SurfNum) = ZoneAirHumRat(ZoneNum);
-				RVsurface(SurfNum) = RhoVaporAirIn(SurfNum);
-				RVsurfOld(SurfNum) = RhoVaporAirIn(SurfNum);
-				RVdeep(SurfNum) = RhoVaporAirIn(SurfNum);
+				RVSurfaceOld(SurfNum) = ZoneAirHumRat(ZoneNum);
+				RVSurface(SurfNum) = ZoneAirHumRat(ZoneNum);
+				RVSurfLayer(SurfNum) = RhoVaporAirIn(SurfNum);
+				RVSurfLayerOld(SurfNum) = RhoVaporAirIn(SurfNum);
+				RVDeepLayer(SurfNum) = RhoVaporAirIn(SurfNum);
 				RVdeepOld(SurfNum) = RhoVaporAirIn(SurfNum);
 				RVwall(SurfNum) = RhoVaporAirIn(SurfNum);
-				HMshort( SurfNum ) = 0.003;
-				FluxSurf( SurfNum ) = 0.000;
-				FluxDeep( SurfNum ) = 0.000;
-				FluxZone( SurfNum ) = 0.000;
+				HMSurfaceLayer( SurfNum ) = 0.003;
+				MassFluxSurfaceLayer( SurfNum ) = 0.000;
+				MassFluxDeepLayer( SurfNum ) = 0.000;
+				MassFluxZone( SurfNum ) = 0.000;
 			} else {
-				MoistEMPDOld( SurfNum ) = ZoneAirHumRat( ZoneNum ); // Surface moisture level initialization
-				MoistEMPDNew( SurfNum ) = ZoneAirHumRat( ZoneNum );
-				RVsurface( SurfNum ) = RhoVaporAirIn( SurfNum );
-				RVsurfOld( SurfNum ) = RhoVaporAirIn( SurfNum );
-				RVdeep( SurfNum ) = RhoVaporAirIn( SurfNum );
+				RVSurfaceOld( SurfNum ) = ZoneAirHumRat( ZoneNum ); // Surface moisture level initialization
+				RVSurface( SurfNum ) = ZoneAirHumRat( ZoneNum );
+				RVSurfLayer( SurfNum ) = RhoVaporAirIn( SurfNum );
+				RVSurfLayerOld( SurfNum ) = RhoVaporAirIn( SurfNum );
+				RVDeepLayer( SurfNum ) = RhoVaporAirIn( SurfNum );
 				RVdeepOld( SurfNum ) = RhoVaporAirIn( SurfNum );
 				RVwall( SurfNum ) = RhoVaporAirIn( SurfNum );
-				HMshort( SurfNum ) = 0.0003;
-				FluxSurf( SurfNum ) = 0.000;
-				FluxDeep( SurfNum ) = 0.000;
-				FluxZone( SurfNum ) = 0.000;
+				HMSurfaceLayer( SurfNum ) = 0.0003;
+				MassFluxSurfaceLayer( SurfNum ) = 0.000;
+				MassFluxDeepLayer( SurfNum ) = 0.000;
+				MassFluxZone( SurfNum ) = 0.000;
 			}
 		}
 		if ( ! InitEnvrnFlag ) return;
@@ -353,7 +353,7 @@ namespace MoistureBalanceEMPDManager {
 		RhoVapEMPD = 0.015;
 		WSurfEMPD = 0.015;
 		RHEMPD = 0.0;
-		MoistEMPDFlux = 0.0;
+		HeatFluxLatent = 0.0;
 
 		GetMoistureBalanceEMPDInput();
 
@@ -420,25 +420,25 @@ namespace MoistureBalanceEMPDManager {
 		int NOFITR; // Number of iterations
 		int MatNum; // Material number at interior layer
 		int ConstrNum; // Construction number
-		Real64 hm_long; // Overall deep-layer transfer coefficient
+		Real64 hm_deep_layer; // Overall deep-layer transfer coefficient
 		Real64 RSurfaceLayer; // Mass transfer resistance between actual surface and surface layer node
 		Real64 Taver; // Average zone temperature between current time and previous time
 		//    REAL(r64)    :: Waver     ! Average zone humidity ratio between current time and previous time
 		Real64 RHaver; // Average zone relative humidity {0-1} between current time and previous time
 		Real64 RVaver; // Average zone vapor density
-		Real64 AT;
+		Real64 dU_dRH;
 		int Flag; // Convergence flag (0 - converged)
 		static bool OneTimeFlag( true );
 		Real64 PVsurf; // Surface vapor pressure
-		Real64 PVsurf_layer; // Vapor pressure of surface layer
-		Real64 PVdeep_layer;
+		Real64 PV_surf_layer; // Vapor pressure of surface layer
+		Real64 PV_deep_layer;
 		Real64 PVsat; // saturation vapor pressure at the surface
-		Real64 RHSurfOld;
-		Real64 RHDeepOld;
+		Real64 RH_surf_layer_old;
+		Real64 RH_deep_layer_old;
 		Real64 EMPDdiffusivity;
 		Real64 Rcoating;
-		Real64 RHsurface;
-		Real64 RHdeep;
+		Real64 RH_surf_layer;
+		Real64 RH_deep_layer;
 		
 		if ( BeginEnvrnFlag && OneTimeFlag ) {
 			InitMoistureBalanceEMPD();
@@ -450,21 +450,21 @@ namespace MoistureBalanceEMPDManager {
 		}
 
 		auto const & surface( Surface( SurfNum ) ); // input
-		auto & moist_empd_new( MoistEMPDNew( SurfNum ) ); // input + output
-		auto const & moist_empd_old( MoistEMPDOld( SurfNum ) ); // input
+		auto & rv_surface( RVSurface( SurfNum ) ); // input + output
+		auto const & rv_surface_old( RVSurfaceOld( SurfNum ) ); // input
 		auto const & h_mass_conv_in_fd( HMassConvInFD( SurfNum ) ); // input
 		auto const & rho_vapor_air_in( RhoVaporAirIn( SurfNum ) ); // input
-		auto & flux_surf( FluxSurf( SurfNum ) ); // output
-		auto & flux_deep( FluxDeep( SurfNum ) ); // output
-		auto & flux_zone( FluxZone( SurfNum ) ); // output
-		auto & rv_surface( RVsurface( SurfNum ) ); // input + output
-		auto & hm_short( HMshort( SurfNum ) ); // output
-		auto & rv_deep( RVdeep( SurfNum ) ); // input + output
-		auto & moist_empd_flux( MoistEMPDFlux( SurfNum ) ); // output
+		auto & mass_flux_surf_layer( MassFluxSurfaceLayer( SurfNum ) ); // output
+		auto & mass_flux_deep_layer( MassFluxDeepLayer( SurfNum ) ); // output
+		auto & mass_flux_zone( MassFluxZone( SurfNum ) ); // output
+		auto & rv_surf_layer( RVSurfLayer( SurfNum ) ); // input + output
+		auto & hm_surf_layer( HMSurfaceLayer( SurfNum ) ); // output
+		auto & rv_deep_layer( RVDeepLayer( SurfNum ) ); // input + output
+		auto & heat_flux_latent( HeatFluxLatent( SurfNum ) ); // output
 		auto const & rv_deep_old( RVdeepOld( SurfNum ) ); // input
-		auto const & rv_surf_old( RVsurfOld( SurfNum ) ); // input
+		auto const & rv_surf_layer_old( RVSurfLayerOld( SurfNum ) ); // input
 		
-		moist_empd_flux = 0.0;
+		heat_flux_latent = 0.0;
 		Flag = 1;
 		NOFITR = 0;
 		if ( ! surface.HeatTransSurf ) {
@@ -475,13 +475,13 @@ namespace MoistureBalanceEMPDManager {
 
 		auto const & material( Material( MatNum ) );
 		if ( material.EMPDmu <= 0.0 ) {
-			moist_empd_new = PsyRhovFnTdbWPb( TempZone, ZoneAirHumRat( surface.Zone ), OutBaroPress );
+			rv_surface = PsyRhovFnTdbWPb( TempZone, ZoneAirHumRat( surface.Zone ), OutBaroPress );
 			return;
 		}
 
 		Taver = TempSurfIn;
 		// Calculate average vapor density [kg/m^3], and RH for use in material property calculations.
-		RVaver = ( moist_empd_new + moist_empd_old ) * 0.5;
+		RVaver = ( rv_surface + rv_surface_old ) * 0.5;
 		RHaver = RVaver * 461.52 * ( Taver + KelvinConv ) * std::exp( -23.7093 + 4111.0 / ( Taver + 237.7 ));
 
 		// Calculate the saturated vapor pressure, surface vapor pressure and dewpoint. Used to check for condensation in HeatBalanceSurfaceManager
@@ -496,7 +496,7 @@ namespace MoistureBalanceEMPDManager {
 		EMPDdiffusivity = (2.0e-7 * pow(Taver + KelvinConv, 0.81) / OutBaroPress) / material.EMPDmu * 461.52 * (Taver+KelvinConv);
 		
 		// Calculate slope of moisture sorption curve at current RH. [kg/kg-RH]
-		AT = material.MoistACoeff * material.MoistBCoeff * pow( RHaver, material.MoistBCoeff - 1 ) + material.MoistCCoeff * material.MoistCCoeff * material.MoistDCoeff * pow( RHaver, material.MoistDCoeff - 1 );
+		dU_dRH = material.MoistACoeff * material.MoistBCoeff * pow( RHaver, material.MoistBCoeff - 1 ) + material.MoistCCoeff * material.MoistCCoeff * material.MoistDCoeff * pow( RHaver, material.MoistDCoeff - 1 );
 		
 		// If coating vapor resistance factor equals 0, coating resistance is zero (avoid divide by zero). 
 		// Otherwise, calculate coating resistance with coating vapor resistance factor and thickness. [s/m]
@@ -507,55 +507,55 @@ namespace MoistureBalanceEMPDManager {
 		}
 		
 		// Calculate mass-transfer coefficient between zone air and center of surface layer. [m/s]
-		hm_short = 1.0 / ( 0.5 * material.EMPDSurfaceDepth / EMPDdiffusivity + 1.0 / h_mass_conv_in_fd + Rcoating );
+		hm_surf_layer = 1.0 / ( 0.5 * material.EMPDSurfaceDepth / EMPDdiffusivity + 1.0 / h_mass_conv_in_fd + Rcoating );
 		// Calculate mass-transfer coefficient between center of surface layer and center of deep layer. [m/s]
 		// If deep layer depth = 0, set mass-transfer coefficient to zero (simulates with no deep layer).
 		if (material.EMPDDeepDepth <= 0.0) {
-			hm_long = 0;
+			hm_deep_layer = 0;
 		} else {
-		hm_long = 2.0 * EMPDdiffusivity / ( material.EMPDDeepDepth + material.EMPDSurfaceDepth );
+		hm_deep_layer = 2.0 * EMPDdiffusivity / ( material.EMPDDeepDepth + material.EMPDSurfaceDepth );
 		}
 		// Calculate resistance between surface-layer/air interface and center of surface layer. [s/m]
 		// This is the physical surface of the material.
-		RSurfaceLayer = 1.0 / hm_short - 1.0 / h_mass_conv_in_fd - Rcoating;
+		RSurfaceLayer = 1.0 / hm_surf_layer - 1.0 / h_mass_conv_in_fd - Rcoating;
 
 		// Calculate vapor flux leaving surface layer, entering deep layer, and entering zone.
-		flux_surf = hm_short * ( rv_surface - rho_vapor_air_in ) + hm_long * ( rv_surface - rv_deep );
-		flux_deep = hm_long * ( rv_surface - rv_deep );
-		flux_zone = hm_short * ( rv_surface - rho_vapor_air_in );
+		mass_flux_surf_layer = hm_surf_layer * ( rv_surf_layer - rho_vapor_air_in ) + hm_deep_layer * ( rv_surf_layer - rv_deep_layer );
+		mass_flux_deep_layer = hm_deep_layer * ( rv_surf_layer - rv_deep_layer );
+		mass_flux_zone = hm_surf_layer * ( rv_surf_layer - rho_vapor_air_in );
 		
 		// Convert stored vapor density from previous timestep to RH.
-		RHDeepOld = PsyRhFnTdbRhov( Taver, rv_deep_old );
-		RHSurfOld = PsyRhFnTdbRhov( Taver, rv_surf_old );
+		RH_deep_layer_old = PsyRhFnTdbRhov( Taver, rv_deep_old );
+		RH_surf_layer_old = PsyRhFnTdbRhov( Taver, rv_surf_layer_old );
 		
 		// Calculate new surface layer RH using mass balance on surface layer
-		RHsurface = RHSurfOld + TimeStepZone * 3600.0 * (-flux_surf / (material.Density * material.EMPDSurfaceDepth * AT));
+		RH_surf_layer = RH_surf_layer_old + TimeStepZone * 3600.0 * (-mass_flux_surf_layer / (material.Density * material.EMPDSurfaceDepth * dU_dRH));
 		// Calculate new deep layer RH using mass balance on deep layer (unless depth <= 0).
 		if (material.EMPDDeepDepth <= 0.0) {
-			RHdeep = RHDeepOld;
+			RH_deep_layer = RH_deep_layer_old;
 		} else {
-			RHdeep = RHDeepOld + TimeStepZone * 3600.0 * flux_deep / (material.Density * material.EMPDDeepDepth * AT);
+			RH_deep_layer = RH_deep_layer_old + TimeStepZone * 3600.0 * mass_flux_deep_layer / (material.Density * material.EMPDDeepDepth * dU_dRH);
 		}
 		// Convert calculated RH back to vapor density of surface and deep layers.
-		rv_surface = PsyRhovFnTdbRh( Taver, RHsurface );
-		rv_deep = PsyRhovFnTdbRh( Taver, RHdeep );
+		rv_surf_layer = PsyRhovFnTdbRh( Taver, RH_surf_layer );
+		rv_deep_layer = PsyRhovFnTdbRh( Taver, RH_deep_layer );
 
 		// Calculate surface-layer and deep-layer vapor pressures [Pa]
-		PVsurf_layer = RHsurface * std::exp(23.7093 - 4111.0 / (Taver + 237.7));
-		PVdeep_layer = RHdeep * std::exp(23.7093 - 4111.0 / (Taver + 237.7));
+		PV_surf_layer = RH_surf_layer * std::exp(23.7093 - 4111.0 / (Taver + 237.7));
+		PV_deep_layer = RH_deep_layer * std::exp(23.7093 - 4111.0 / (Taver + 237.7));
 
 		// Calculate vapor density at physical material surface (surface-layer/air interface). This is used to calculate total moisture flow terms for each zone in HeatBalanceSurfaceManager
-		moist_empd_new = rv_surface - flux_zone * RSurfaceLayer;
+		rv_surface = rv_surf_layer - mass_flux_zone * RSurfaceLayer;
 
 		// Calculate heat flux from latent-sensible conversion due to moisture adsorption [W/m^2]
-		moist_empd_flux = flux_zone*Lam;
+		heat_flux_latent = mass_flux_zone*Lam;
 
 		// Put results in the single precision reporting variable
 		// Will add RH and W of deep layer as outputs
 		// Need to also add moisture content (kg/kg) of surface and deep layers, and moisture flow from each surface (kg/s), per Rongpeng's suggestion
-		RhoVapEMPD( SurfNum ) = rv_surface;
-		RHEMPD( SurfNum ) = RHsurface * 100.0;
-		WSurfEMPD( SurfNum ) = 0.622 * PVsurf_layer / (OutBaroPress - PVsurf_layer);
+		RhoVapEMPD( SurfNum ) = rv_surf_layer;
+		RHEMPD( SurfNum ) = RH_surf_layer * 100.0;
+		WSurfEMPD( SurfNum ) = 0.622 * PV_surf_layer / (OutBaroPress - PV_surf_layer);
 
 	}
 
@@ -576,12 +576,12 @@ namespace MoistureBalanceEMPDManager {
 
 		// USE STATEMENTS:
 
-		MoistEMPDOld.deallocate();
-		MoistEMPDNew.deallocate();
-		MoistEMPDFlux.deallocate();
-		RVsurface.deallocate();
-		RVsurfOld.deallocate();
-		RVdeep.deallocate();
+		RVSurfaceOld.deallocate();
+		RVSurface.deallocate();
+		HeatFluxLatent.deallocate();
+		RVSurfLayer.deallocate();
+		RVSurfLayerOld.deallocate();
+		RVDeepLayer.deallocate();
 		RVdeepOld.deallocate();
 
 	}
@@ -617,9 +617,9 @@ namespace MoistureBalanceEMPDManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		MoistEMPDOld( SurfNum ) = MoistEMPDNew( SurfNum );
-		RVdeepOld( SurfNum ) = RVdeep( SurfNum );
-		RVsurfOld( SurfNum ) = RVsurface( SurfNum );
+		RVSurfaceOld( SurfNum ) = RVSurface( SurfNum );
+		RVdeepOld( SurfNum ) = RVDeepLayer( SurfNum );
+		RVSurfLayerOld( SurfNum ) = RVSurfLayer( SurfNum );
 
 	}
 
