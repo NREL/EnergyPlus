@@ -3025,7 +3025,7 @@ MinSetPoint, MaxSetPoint and Offset are specified by the user as the input in ob
 
 ### Condenser Entering Water Temperature Reset
 
-The object resets the condenser entering water temperature to the optimal cooling tower water set point temperature that will result in minimum net energy consumption for the chiller and cooling tower plant. This chiller-tower optimization scheme uses one curve to determine the optimum condenser entering water temperature for a given time step and two other curves to place boundary conditions on the “optimized” set point value. The optimized condenser entering water temperature may not be valid every timestep then will be limited algorithmically by two boundary curves. The first of these boundary curves is given by:
+The object resets the condenser entering water temperature to the optimal cooling tower water set point temperature that will result in minimum net energy consumption for the chiller and cooling tower plant. This chiller-tower optimization scheme uses one curve to determine the optimum condenser entering water temperature for a given time step and two other curves to place limit conditions on the “optimized” set point value. The optimized condenser entering water temperature may not be valid every timestep then will be limited algorithmically by two boundary curves. The first of these boundary curves is given by:
 
 *MinDsnWB = C1 + C2\*OaWb + C3\*WPLR + C4\*TwrDsnWB + C5\*NF*
 
@@ -3103,9 +3103,14 @@ A graph of the curve can be depicted as follows:
 
 Figure 294. Optimum EWT vs PLR & OaWb
 
-
-
 The optimized condenser entering water temperature is calculated but is not necessarily used each timestep. If OptCondEntTemp does not fall within the bounds established by MinDsnWB and MinActualWb, then the value from the Default Condenser Entering Water Temperature Schedule is used for the Condenser Entering Water Set Point instead.
+
+#### Special Note for Multiple Towers
+
+This control scheme is available for multiple towers by following two steps:
+
+ - Use average tower conditions in the curves for the independent variables related to the towers
+ - Make sure the setpoint is applied to either the condenser supply outlet node or use a node list to apply it to each tower outlet node
 
 ### Ideal Condenser Entering Water Temperature Reset
 
