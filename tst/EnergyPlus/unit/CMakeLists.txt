@@ -34,6 +34,7 @@ set( test_src
   Humidifiers.unit.cc
   HVACSizingSimulationManager.unit.cc 
   HVACStandaloneERV.unit.cc
+  HWBaseboardRadiator.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
