@@ -40,6 +40,7 @@ using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DXCoils;
+using namespace EnergyPlus::VariableSpeedCoils;
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::HVACUnitarySystem;
@@ -1447,8 +1448,6 @@ TEST_F( HVACFixture, UnitarySystem_VSDXCoilSizing ) {
 TEST_F( HVACFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 	UnitarySystemData thisUnSys;
 
-	bool ErrorsFound( false );
-
 	std::string const idf_objects = delimited_string( {
 		"Version,8.3;",
 
@@ -2121,7 +2120,7 @@ TEST_F( HVACFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 	DataSizing::ZoneEqSizing.allocate( 1 );
 
 	GetUnitarySystemInput(); // get UnitarySystem input from object above
-	HVACUnitarySystem::GetInputFlag = false; // don't call GetInput more than once (SimUnitarySystem call below will call GetInput if this flag is not set to false)
+	HVACUnitarySystem::GetInputFlag = false; // don't call GetInput more than once
 
 	OutputReportPredefined::SetPredefinedTables();
 
@@ -2136,6 +2135,8 @@ TEST_F( HVACFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 
 	ASSERT_EQ( UnitarySystem( 1 ).DesignHeatingCapacity * 0.00005, UnitarySystem( 1 ).MaxHeatAirVolFlow );
 	ASSERT_EQ( UnitarySystem( 1 ).DesignCoolingCapacity * 0.00005, UnitarySystem( 1 ).MaxCoolAirVolFlow );
+	ASSERT_EQ( UnitarySystem( 1 ).DesignCoolingCapacity, DXCoil( UnitarySystem( 1 ).CoolingCoilIndex ).MSRatedTotCap( UnitarySystem( 1 ).NumOfSpeedCooling ) );
+	ASSERT_EQ( UnitarySystem( 1 ).DesignHeatingCapacity, VarSpeedCoil( UnitarySystem( 1 ).HeatingCoilIndex ).RatedCapHeat );
 
 }
 
