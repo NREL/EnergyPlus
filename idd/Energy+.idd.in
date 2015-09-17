@@ -32483,6 +32483,7 @@ ZoneHVAC:FourPipeFanCoil,
         \min-fields 24
    A1 , \field Name
         \required-field
+        \reference DOAToZonalUnit 
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -32495,7 +32496,7 @@ ZoneHVAC:FourPipeFanCoil,
         \key CyclingFan
         \key VariableFanVariableFlow
         \key VariableFanConstantFlow
-        \key MultiStageFan
+        \key MultiSpeedFan
    N1 , \field Maximum Supply Air Flow Rate
         \required-field
         \autosizable
@@ -33033,6 +33034,7 @@ ZoneHVAC:WaterToAirHeatPump,
    A1,  \field Name
         \required-field
         \type alpha
+        \reference DOAToZonalUnit 
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -36627,6 +36629,7 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
         \units m
         \minimum> 0
         \autosizable
+        \default autosize
    A5 , \field Temperature Control Type
         \note (Temperature on which unit is controlled)
         \type choice
@@ -36784,6 +36787,7 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
         \units m
         \minimum> 0
         \autosizable
+        \default autosize
    A5 , \field Temperature Control Type
         \note Temperature used to control system
         \type choice
@@ -39565,33 +39569,54 @@ AirTerminal:SingleDuct:ConstantVolume:CooledBeam,
        \default 0.0145
 
 AirTerminal:SingleDuct:InletSideMixer,
-       \memo Mix 2 inlet air streams into one outlet stream.
+       \memo The inlet side mixer air terminal unit provides a means of supplying central system air 
+       \memo to the air inlet of a zone AC unit such as a four pipe fan coil. Normally the central air 
+       \memo would be ventilation air from a dedicated outdoor air system (DOAS).
    A1, \field Name
        \required-field
-   A2, \field ZoneHVAC Terminal Unit Object Type
+   A2, \field ZoneHVAC Terminal Unit Object Type   
        \required-field
+       \type choice
+       \key ZoneHVAC:FourPipeFanCoil
+       \key ZoneHVAC:WaterToAirHeatPump
    A3, \field ZoneHVAC Terminal Unit Name
        \required-field
+       \type object-list
+       \object-list DOAToZonalUnit
    A4, \field Terminal Unit Outlet Node Name
        \required-field
+       \type node
    A5, \field Terminal Unit Primary Air Inlet Node Name
        \required-field
+       \type node
    A6; \field Terminal Unit Secondary Air Inlet Node Name
        \required-field
+       \type node
 
 AirTerminal:SingleDuct:SupplySideMixer,
-       \memo Mix 2 inlet air streams into one outlet stream.
+       \memo The supply side mixer air terminal unit provides a means of supplying central system air 
+       \memo to the air outlet of a zone AC unit such as a four pipe fan coil. Normally the central air 
+       \memo would be ventilation air from a dedicated outdoor air system (DOAS).
    A1, \field Name
        \required-field
    A2, \field ZoneHVAC Terminal Unit Object Type
        \required-field
+       \type choice
+       \key ZoneHVAC:FourPipeFanCoil
+       \key ZoneHVAC:WaterToAirHeatPump
    A3, \field ZoneHVAC Terminal Unit Name
        \required-field
+       \type object-list
+       \object-list DOAToZonalUnit
    A4, \field Terminal Unit Outlet Node Name
        \required-field
+       \type node
    A5, \field Terminal Unit Primary Air Inlet Node Name
        \required-field
+       \type node
    A6; \field Terminal Unit Secondary Air Inlet Node Name
+       \required-field
+       \type node
 
 AirTerminal:DualDuct:ConstantVolume,
        \memo Central air system terminal unit, dual duct, constant volume.
@@ -42010,11 +42035,11 @@ Coil:Cooling:DX:MultiSpeed,
        \note startup. Suggested value is 45; zero value means latent degradation
        \note model is disabled.
   N15, \field Speed 1 Rated Waste Heat Fraction of Power Input
-       \required-field
        \type real
        \units dimensionless
        \minimum> 0.0
        \maximum 1.0
+       \default 0.2
        \note Recoverable waste heat at full load and rated conditions
   A18, \field Speed 1 Waste Heat Function of Temperature Curve Name
        \type object-list
@@ -42166,11 +42191,11 @@ Coil:Cooling:DX:MultiSpeed,
        \note startup. Suggested value is 45; zero value means latent degradation
        \note model is disabled.
   N28, \field Speed 2 Rated Waste Heat Fraction of Power Input
-       \required-field
        \type real
        \units dimensionless
        \minimum> 0.0
        \maximum 1.0
+       \default 0.2
        \note Recoverable waste heat at full load and rated conditions
   A24, \field Speed 2 Waste Heat Function of Temperature Curve Name
        \type object-list
@@ -42318,6 +42343,7 @@ Coil:Cooling:DX:MultiSpeed,
        \units dimensionless
        \minimum> 0.0
        \maximum 1.0
+       \default 0.2
        \note Recoverable waste heat at full load and rated conditions
   A30, \field Speed 3 Waste Heat Function of Temperature Curve Name
        \type object-list
@@ -42465,6 +42491,7 @@ Coil:Cooling:DX:MultiSpeed,
        \units dimensionless
        \minimum> 0.0
        \maximum 1.0
+       \default 0.2
        \note Recoverable waste heat at full load and rated conditions
   A36, \field Speed 4 Waste Heat Function of Temperature Curve Name
        \type object-list
@@ -44565,11 +44592,11 @@ Coil:Heating:DX:MultiSpeed,
        \note cubic curve = a + b*PLR + c*PLR**2 + d*PLR**3
        \note PLR = part load ratio (sensible heating load/steady state heating capacity)
   N14, \field Speed 1 Rated Waste Heat Fraction of Power Input
-       \required-field
        \type real
        \units dimensionless
        \minimum> 0.0
        \maximum 1.0
+       \default 0.2
        \note recoverable waste heat at full load and rated conditions
   A15, \field Speed 1 Waste Heat Function of Temperature Curve Name
        \type object-list
@@ -44664,11 +44691,11 @@ Coil:Heating:DX:MultiSpeed,
        \note cubic curve = a + b*PLR + c*PLR**2 + d*PLR**3
        \note PLR = part load ratio (sensible heating load/steady state heating capacity)
   N19, \field Speed 2 Rated Waste Heat Fraction of Power Input
-       \required-field
        \type real
        \units dimensionless
        \minimum> 0.0
        \maximum 1.0
+       \default 0.2
        \note recoverable waste heat at full load and rated conditions
   A21, \field Speed 2 Waste Heat Function of Temperature Curve Name
        \type object-list
@@ -44759,6 +44786,7 @@ Coil:Heating:DX:MultiSpeed,
        \units dimensionless
        \minimum> 0.0
        \maximum 1.0
+       \default 0.2
        \note recoverable waste heat at full load and rated conditions
   A27, \field Speed 3 Waste Heat Function of Temperature Curve Name
        \type object-list
@@ -44849,6 +44877,7 @@ Coil:Heating:DX:MultiSpeed,
        \units dimensionless
        \minimum> 0.0
        \maximum 1.0
+       \default 0.2
        \note recoverable waste heat at full load and rated conditions
   A33, \field Speed 4 Waste Heat Function of Temperature Curve Name
        \type object-list
