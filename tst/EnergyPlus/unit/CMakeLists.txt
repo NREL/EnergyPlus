@@ -43,6 +43,7 @@ set( test_src
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
   ManageElectricPower.unit.cc
+  MoistureBalanceEMPD.unit.cc
   HVACUnitarySystem.unit.cc
   HVACVariableRefrigerantFlow.unit.cc
   MixedAir.unit.cc

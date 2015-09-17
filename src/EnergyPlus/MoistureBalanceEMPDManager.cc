@@ -449,20 +449,20 @@ namespace MoistureBalanceEMPDManager {
 			OneTimeFlag = true;
 		}
 
-		auto const & surface( Surface( SurfNum ) );
-		auto & moist_empd_new( MoistEMPDNew( SurfNum ) );		
-		auto & moist_empd_old( MoistEMPDOld( SurfNum ) );
-		auto const & h_mass_conv_in_fd( HMassConvInFD( SurfNum ) );
-		auto const & rho_vapor_air_in( RhoVaporAirIn( SurfNum ) );
-		auto & flux_surf( FluxSurf( SurfNum ) );
-		auto & flux_deep( FluxDeep( SurfNum ) );
-		auto & flux_zone( FluxZone( SurfNum ) );
-		auto & rv_surface( RVsurface( SurfNum ) );
-		auto & hm_short( HMshort( SurfNum ) );
-		auto & rv_deep( RVdeep( SurfNum ) );
-		auto & moist_empd_flux( MoistEMPDFlux( SurfNum ) );
-		auto const & rv_deep_old( RVdeepOld( SurfNum ) );
-		auto const & rv_surf_old( RVsurfOld( SurfNum ) );
+		auto const & surface( Surface( SurfNum ) ); // input
+		auto & moist_empd_new( MoistEMPDNew( SurfNum ) ); // input + output
+		auto const & moist_empd_old( MoistEMPDOld( SurfNum ) ); // input
+		auto const & h_mass_conv_in_fd( HMassConvInFD( SurfNum ) ); // input
+		auto const & rho_vapor_air_in( RhoVaporAirIn( SurfNum ) ); // input
+		auto & flux_surf( FluxSurf( SurfNum ) ); // output
+		auto & flux_deep( FluxDeep( SurfNum ) ); // output
+		auto & flux_zone( FluxZone( SurfNum ) ); // output
+		auto & rv_surface( RVsurface( SurfNum ) ); // input + output
+		auto & hm_short( HMshort( SurfNum ) ); // output
+		auto & rv_deep( RVdeep( SurfNum ) ); // input + output
+		auto & moist_empd_flux( MoistEMPDFlux( SurfNum ) ); // output
+		auto const & rv_deep_old( RVdeepOld( SurfNum ) ); // input
+		auto const & rv_surf_old( RVsurfOld( SurfNum ) ); // input
 		
 		moist_empd_flux = 0.0;
 		Flag = 1;
@@ -545,7 +545,7 @@ namespace MoistureBalanceEMPDManager {
 		PVdeep_layer = RHdeep * std::exp(23.7093 - 4111.0 / (Taver + 237.7));
 
 		// Calculate vapor density at physical material surface (surface-layer/air interface). This is used to calculate total moisture flow terms for each zone in HeatBalanceSurfaceManager
-		moist_empd_new = rv_surface - flux_zone*RSurfaceLayer;
+		moist_empd_new = rv_surface - flux_zone * RSurfaceLayer;
 
 		// Calculate heat flux from latent-sensible conversion due to moisture adsorption [W/m^2]
 		moist_empd_flux = flux_zone*Lam;
