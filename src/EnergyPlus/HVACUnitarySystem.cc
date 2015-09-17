@@ -252,6 +252,37 @@ namespace HVACUnitarySystem {
 	// Functions
 
 	void
+	clear_state()
+	{
+		GetInputFlag = true;
+		EconomizerFlag = false;
+		HeatingLoad = false;
+		CoolingLoad = false;
+		MoistureLoad = 0.0;
+		SuppHeatingCoilFlag = false;
+		NumUnitarySystem = 0;
+		NumDesignSpecMultiSpeedHP = 0;
+		CompOnMassFlow = 0.0;
+		CompOffMassFlow = 0.0;
+		CompOnFlowRatio = 0.0;
+		CompOffFlowRatio = 0.0;
+		FanSpeedRatio = 0.0;
+		CoolHeatPLRRat = 1.0;
+		OnOffAirFlowRatioSave = 0.0;
+		QToCoolSetPt = 0.0;
+		QToHeatSetPt = 0.0;
+		TempSteamIn = 100.0;
+
+		CheckEquipName.deallocate();
+		MultiOrVarSpeedHeatCoil.deallocate();
+		MultiOrVarSpeedCoolCoil.deallocate();
+
+		DesignSpecMSHP.deallocate();
+		UnitarySystem.deallocate();
+		UnitarySystemNumericFields.deallocate();
+	}
+
+	void
 	SimUnitarySystem(
 		std::string const & UnitarySystemName, // Name of Unitary System object
 		bool const FirstHVACIteration, // True when first HVAC iteration
@@ -2245,12 +2276,9 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).NumOfSpeedHeating = VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).NumOfSpeeds;
 
 			if ( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) {
-//				if ( ! allocated( UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate ) ) UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
-//				if ( ! allocated( UnitarySystem( UnitarySysNum ).HeatMassFlowRate ) ) UnitarySystem( UnitarySysNum ).HeatMassFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
-//				if ( ! allocated( UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio ) ) UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
-				UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
-				UnitarySystem( UnitarySysNum ).HeatMassFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
-				UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
+				if ( ! allocated( UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate ) ) UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
+				if ( ! allocated( UnitarySystem( UnitarySysNum ).HeatMassFlowRate ) ) UnitarySystem( UnitarySysNum ).HeatMassFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
+				if ( ! allocated( UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio ) ) UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
 			}
 
 			MulSpeedFlowScale = VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).RatedAirVolFlowRate / VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).MSRatedAirVolFlowRate( VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).NormSpedLevel );
