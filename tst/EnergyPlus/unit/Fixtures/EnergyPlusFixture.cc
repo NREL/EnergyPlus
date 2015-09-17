@@ -49,6 +49,7 @@
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HVACManager.hh>
+#include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
@@ -154,6 +155,7 @@ namespace EnergyPlus {
 		HeatPumpWaterToWaterSimple::clear_state();
 		Humidifiers::clear_state();
 		HVACManager::clear_state();
+		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
 		InputProcessor::clear_state();
 		InternalHeatGains::clear_state();
