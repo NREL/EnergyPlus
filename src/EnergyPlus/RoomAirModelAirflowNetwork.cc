@@ -281,14 +281,10 @@ namespace RoomAirModelAirflowNetwork {
 					// calculate volume of air in node's control volume
 					RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).AirVolume = Zone( LoopZone ).Volume * RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).ZoneVolumeFraction;
 
-					SetupOutputVariable( "RoomAirflowNetwork Node NonAirSystemResponse [W]", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).NonAirSystemResponse,
-						"HVAC", "Average", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).Name );
-					SetupOutputVariable( "RoomAirflowNetwork Node SysDepZoneLoadsLagged [W]", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).SysDepZoneLoadsLagged,
-						"HVAC", "Average", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).Name );
-					SetupOutputVariable( "RoomAirflowNetwork Node SumIntSensibleGain [W]", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).SumIntSensibleGain,
-						"HVAC", "Average", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).Name );
-					SetupOutputVariable( "RoomAirflowNetwork Node SumIntLatentGain [W]", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).SumIntLatentGain,
-						"HVAC", "Average", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).Name );
+					SetupOutputVariable( "RoomAirflowNetwork Node NonAirSystemResponse [W]", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).NonAirSystemResponse, "HVAC", "Average", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).Name );
+					SetupOutputVariable( "RoomAirflowNetwork Node SysDepZoneLoadsLagged [W]", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).SysDepZoneLoadsLagged, "HVAC", "Average", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).Name );
+					SetupOutputVariable( "RoomAirflowNetwork Node SumIntSensibleGain [W]", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).SumIntSensibleGain, "HVAC", "Average", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).Name );
+					SetupOutputVariable( "RoomAirflowNetwork Node SumIntLatentGain [W]", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).SumIntLatentGain, "HVAC", "Average", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).Name );
 				}
 			}
 			MyOneTimeFlag = false;
@@ -369,10 +365,8 @@ namespace RoomAirModelAirflowNetwork {
 									break;
 								}
 							}
-							SetupOutputVariable( "RoomAirflowNetwork Node HVAC Supply Fraction []", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).SupplyFraction,
-								"HVAC", "Average", RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).Name);
-							SetupOutputVariable("RoomAirflowNetwork Node HVAC Return Fraction []", RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).ReturnFraction,
-								"HVAC", "Average", RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).Name);
+							SetupOutputVariable( "RoomAirflowNetwork Node HVAC Supply Fraction []", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).SupplyFraction, "HVAC", "Average", RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).Name);
+							SetupOutputVariable("RoomAirflowNetwork Node HVAC Return Fraction []", RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).ReturnFraction, "HVAC", "Average", RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).Name);
 						}
 					}
 					// Count node with.TRUE.
