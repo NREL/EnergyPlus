@@ -53,6 +53,7 @@
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -68,6 +69,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/OutputReportTabularAnnual.hh>
 
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -158,6 +160,7 @@ namespace EnergyPlus {
 		InputProcessor::clear_state();
 		InternalHeatGains::clear_state();
 		MixedAir::clear_state();
+		MixerComponent::clear_state();
 		NodeInputManager::clear_state();
 		OutAirNodeManager::clear_state();
 		OutputProcessor::clear_state();
@@ -180,6 +183,7 @@ namespace EnergyPlus {
 		SolarShading::clear_state();
 		SplitterComponent::clear_state();
 		SystemAvailabilityManager::clear_state();
+		ThermalComfort::clear_state();
 		VariableSpeedCoils::clear_state();
 		WaterCoils::clear_state();
 		WaterThermalTanks::clear_state();

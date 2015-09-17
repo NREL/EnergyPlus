@@ -98,6 +98,7 @@ namespace Fans {
 	int const ExhaustFanCoupledToAvailManagers( 150 );
 	int const ExhaustFanDecoupledFromAvailManagers( 151 );
 	static std::string const BlankString;
+	static bool MyOneTimeFlag( true );
 
 	//na
 
@@ -944,7 +945,6 @@ namespace Fans {
 		int OutletNode;
 		//unused0909  Integer             :: InNode
 		int OutNode;
-		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		static Array1D_bool MyEnvrnFlag;
 		int Loop;
@@ -3338,6 +3338,7 @@ namespace Fans {
 		GetFanInputFlag = true;
 		LocalTurnFansOn = false;
 		LocalTurnFansOff = false;
+		MyOneTimeFlag = true;
 
 		CheckEquipName.deallocate();
 		MySizeFlag.deallocate();
