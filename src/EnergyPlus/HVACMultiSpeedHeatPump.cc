@@ -525,6 +525,7 @@ namespace HVACMultiSpeedHeatPump {
 		using FluidProperties::GetSatDensityRefrig;
 		using ZoneTempPredictorCorrector::NumStageCtrZone;
 		using DataZoneControls::StageControlledZone;
+		using DXCoils::SetMSHPDXCoilHeatRecoveryFlag;
 
 		// Locals
 		// PARAMETERS
@@ -1217,6 +1218,10 @@ namespace HVACMultiSpeedHeatPump {
 					ErrorsFound = true;
 				}
 				TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 16 ), Alphas( 17 ), "MSHP Heat receovery Nodes" );
+				SetMSHPDXCoilHeatRecoveryFlag( MSHeatPump( MSHPNum ).DXCoolCoilIndex );
+				if ( MSHeatPump( MSHPNum ).DXHeatCoilIndex > 0 ) {
+					SetMSHPDXCoilHeatRecoveryFlag( MSHeatPump( MSHPNum ).DXHeatCoilIndex );
+				}
 			} else {
 				MSHeatPump( MSHPNum ).HeatRecActive = false;
 				MSHeatPump( MSHPNum ).DesignHeatRecMassFlowRate = 0.0;
