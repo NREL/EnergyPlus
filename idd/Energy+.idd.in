@@ -1989,31 +1989,7 @@ Site:GroundDomain:Slab,
         \minimum> 0.0
         \note Only used when including vertical insulation
         \note This field specifies the depth of the vertical insulation
-   N12, \field X-direction Mesh Density Parameter
-        \type integer
-        \default 4
-        \minimum 2
-   N13, \field Y-direction (vertical) Mesh Density Parameter
-        \type integer
-        \default 4
-        \minimum 2
-   N14, \field Z-direction Mesh Density Parameter
-        \type integer
-        \default 4
-        \minimum 2
-   A12, \field Mesh Type
-        \required-field
-        \type choice
-        \key Uniform
-        \key Geometric
-        \default Geometric
-   N15, \field Geometric Coefficient
-        \note optional
-        \type real
-        \minimum 1
-        \default 1.7
-        \maximum 2
-   A13; \field Simulation Timestep
+   A12; \field Simulation Timestep
         \type choice
         \key Timestep
         \key Hourly
@@ -2137,10 +2113,6 @@ Site:GroundDomain:Basement,
         \units m
         \minimum> 0.0
         \note Depth measured from the ground surface.
-   N13, \field Mesh Density Parameter
-        \type integer
-        \default 4
-        \minimum 2
    A11; \field Simulation Timestep
         \type choice
         \key Timestep

@@ -245,11 +245,6 @@
     Yes,                !- Vertical Insulation (Yes/No)
     Slab Insulation,    !- Vertical Insulation Name
     2,                  !- Vertical perimeter insulation depth from surface (m)
-    4,                  ! - x direction mesh parameter
-    4,                  ! - y direction mesh parameter
-    4,                  ! - z direction mesh parameter
-    geometric,          ! - Mesh Type (Uniform/Geometric)
-    1.7,                ! - Geometric coefficient
     Timestep;           !- Domain Simulation Interval. (Timestep/Hourly)
     
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,

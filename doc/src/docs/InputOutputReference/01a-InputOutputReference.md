@@ -2829,26 +2829,6 @@ Name of material object representing the vertical slab insulation. Optional argu
 
 Numeric field indicates the depth measured in meters from the ground surface to which the vertical perimeter insulation extends. Valid range from &gt; Slab Thickness to &lt; Domain Depth.
 
-#### Field: X-Direction Mesh Density Parameter
-
-This numeric integer field represents the number of cells to be placed between any two “domain partitions” during mesh development.  A domain partition may be thought of as a basement wall/floor, or a pipe.  Once these components are laid out in the domain, this field number of cells are placed between the partitions.  Further information on this is found in the engineering reference manual.
-
-#### Field: Y-Direction Mesh Density Parameter
-
-Same as previous.
-
-#### Field: Z-Direction Mesh Density Parameter
-
-Same as previous.
-
-#### Field: Mesh Type
-
-This alpha field represents the type of mesh to create when placing cells between “domain partitions.”  Two options are available: “uniform” and “geometric.”  For uniform, the cells are placed in the region with all cells having equal size.  For symmetric-geometric, the cells are compressed toward the partitions so that there are more cells on either side of the mesh region.  This can help focus computational intensity on the boundary areas where it is likely more desired.  For symmetric-geometric mesh distribution, the mesh density parameter should be an even number to provide the symmetric condition.
-
-#### Field: Geometric Coefficient
-
-This numeric field represents the compression of cell distribution if the x-direction mesh type is set to “geometric.”  If the mesh type is uniform, this field is not interpreted.  For symmetric geometric, a value in this field equal to 1 would result in a uniform distribution, while a value of 2 would provide a highly skewed distribution.
-
 #### Field: Simulation Timestep
 
 Alpha field indicating whether the domain will update temperatures at each zone timestep, or at hourly intervals. Options include “timestep” and “hourly”.
@@ -2879,11 +2859,6 @@ Site:GroundDomain:Slab,
     Yes,                !- Vertical Insulation
     Slab Insulation,    !- Vertical Insulation Name
     2,                  !- Vertical perimeter insulation depth from surface
-    4,                  !- X Direction Mesh Parameter
-    4,                  !- Y Direction Mesh Parameter
-    4,                  !- Z Direction Mesh Parameter
-    geometric,          !- Mesh Type (Uniform/Geometric)
-    1.3,                !- Geometric Coefficient
     Hourly;             !- Simulation Timestep</td>
 ```
 
@@ -2937,7 +2912,6 @@ Site:GroundDomain:Basement,
     Yes,                     !- Basement Wall Vertical Insulation Present(Yes/No)
     Basement Insulation,     !- Basement Wall Vertical Insulation Material Name
     2.5,                     !- Vertical insulation depth from surface (m)
-    4,                       !- Mesh Density Parameter
     Hourly;                  !- Domain Update interval. (Timestep, Hourly)
 ```
 
@@ -3028,10 +3002,6 @@ Name of material object representing the vertical slab insulation. Optional argu
 #### Field: Vertical Insulation Depth
 
 Numeric field indicates the depth measured in meters from the ground surface to which the vertical perimeter insulation extends. Valid range from > 0 to &lt; Basement Depth.
-
-#### Mesh Density Parameter
-
-Integer field indicating the density of the finite difference ground domain cells between the basement and the far field boundaries. Default value is 4. Total number of ground domain cells, insulation cells, and ground surface cells are indicated as outputs to the eio file.
 
 #### Field: Simulation Timestep
 

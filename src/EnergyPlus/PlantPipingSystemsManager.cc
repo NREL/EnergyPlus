@@ -1284,9 +1284,9 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).PerimeterOffset = Domain( ZoneCoupledDomainCtr ).PerimeterOffset;
 
 				// Set simulation interval flag
-				if ( SameString( cAlphaArgs( 13 ), "TIMESTEP" ) ) {
+				if ( SameString( cAlphaArgs( 12 ), "TIMESTEP" ) ) {
 					PipingSystemDomains( DomainCtr ).SimTimestepFlag = true;
-				} else if ( SameString( cAlphaArgs( 13 ), "HOURLY" ) ) {
+				} else if ( SameString( cAlphaArgs( 12 ), "HOURLY" ) ) {
 					PipingSystemDomains( DomainCtr ).SimHourlyFlag = true;
 				} else {
 					ShowContinueError( "Could not determine slab simulation interval. Check input." );
@@ -1344,28 +1344,21 @@ namespace PlantPipingSystemsManager {
 				// Get mesh parameters
 
 				// Mesh inputs
-				{ auto const meshDistribution( uppercased( cAlphaArgs( 12 ) ) );
-				if ( meshDistribution == "UNIFORM" ) {
-					PipingSystemDomains( DomainCtr ).Mesh.X.MeshDistribution = MeshDistribution_Uniform;
-					PipingSystemDomains( DomainCtr ).Mesh.Y.MeshDistribution = MeshDistribution_Uniform;
-					PipingSystemDomains( DomainCtr ).Mesh.Z.MeshDistribution = MeshDistribution_Uniform;
-				}
-				else if ( meshDistribution == "GEOMETRIC" ) {
-					PipingSystemDomains( DomainCtr ).Mesh.X.MeshDistribution = MeshDistribution_Geometric;
-					PipingSystemDomains( DomainCtr ).Mesh.Y.MeshDistribution = MeshDistribution_Geometric;
-					PipingSystemDomains( DomainCtr ).Mesh.Z.MeshDistribution = MeshDistribution_Geometric;
+				PipingSystemDomains( DomainCtr ).Mesh.X.MeshDistribution = MeshDistribution_Geometric;
+				PipingSystemDomains( DomainCtr ).Mesh.Y.MeshDistribution = MeshDistribution_Geometric;
+				PipingSystemDomains( DomainCtr ).Mesh.Z.MeshDistribution = MeshDistribution_Geometric;
 
-					PipingSystemDomains( DomainCtr ).Mesh.X.GeometricSeriesCoefficient = rNumericArgs( 15 );
-					PipingSystemDomains( DomainCtr ).Mesh.Y.GeometricSeriesCoefficient = rNumericArgs( 15 );
-					PipingSystemDomains( DomainCtr ).Mesh.Z.GeometricSeriesCoefficient = rNumericArgs( 15 );
-				}
-				else {
-					IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Slab, cAlphaArgs( 1 ), cAlphaFieldNames( 12 ), cAlphaArgs( 12 ), "Use a choice from the available mesh type keys.", ErrorsFound );
-				}}
+				Real64 MeshCoefficient = 1.7;
 
-				PipingSystemDomains( DomainCtr ).Mesh.X.RegionMeshCount = rNumericArgs( 12 );
-				PipingSystemDomains( DomainCtr ).Mesh.Y.RegionMeshCount = rNumericArgs( 13 );
-				PipingSystemDomains( DomainCtr ).Mesh.Z.RegionMeshCount = rNumericArgs( 14 );
+				PipingSystemDomains( DomainCtr ).Mesh.X.GeometricSeriesCoefficient = MeshCoefficient;
+				PipingSystemDomains( DomainCtr ).Mesh.Y.GeometricSeriesCoefficient = MeshCoefficient;
+				PipingSystemDomains( DomainCtr ).Mesh.Z.GeometricSeriesCoefficient = MeshCoefficient;
+
+				int MeshCount = 4;
+
+				PipingSystemDomains( DomainCtr ).Mesh.X.RegionMeshCount = MeshCount;
+				PipingSystemDomains( DomainCtr ).Mesh.Y.RegionMeshCount = MeshCount;
+				PipingSystemDomains( DomainCtr ).Mesh.Z.RegionMeshCount = MeshCount;
 
 				// Soil properties
 				PipingSystemDomains( DomainCtr ).GroundProperties.Conductivity = Domain( ZoneCoupledDomainCtr ).SoilConductivity;
@@ -1606,12 +1599,7 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).Moisture.GroundCoverCoefficient = rNumericArgs( 9 );
 
 			// assign the mesh count
-			int meshCount;
-			if ( lNumericFieldBlanks( 13 ) ) {
-				meshCount = 4;
-			} else {
-				meshCount = rNumericArgs( 13 );
-			}
+			int meshCount = 4;
 
 			PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount = meshCount;
 			PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount = meshCount;

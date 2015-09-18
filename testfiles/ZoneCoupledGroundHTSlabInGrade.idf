@@ -479,11 +479,6 @@ SurfaceProperty:OtherSideConditionsModel,
     Yes,        !- Vertical Insulation (Yes/No)
     Insulation, !- Vertical Insulation Name
     1.5,        !- Vertical perimeter insulation depth from surface (m)
-    4,          ! - x direction mesh parameter
-    4,          ! - y direction mesh parameter
-    4,          ! - z direction mesh parameter
-    geometric,  ! - Mesh Type (Uniform/Geometric)
-    1.7,        ! - Geometric coefficient
     Hourly;     !- Domain Simulation Interval. (Timestep/Hourly)
     
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
