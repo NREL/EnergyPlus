@@ -1369,6 +1369,15 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).Moisture.Theta_liq = Domain( ZoneCoupledDomainCtr ).MoistureContent / 100.0;
 				PipingSystemDomains( DomainCtr ).Moisture.Theta_sat = Domain( ZoneCoupledDomainCtr ).SaturationMoistureContent / 100.0;
 
+				//Determine number of slab cells in slab-in-grade configuration - set minimum slab cell thickness of 1 in
+				PipingSystemDomains( DomainCtr ).NumSlabCells = PipingSystemDomains( DomainCtr ).SlabThickness / 0.0254;
+				if ( PipingSystemDomains( DomainCtr ).NumSlabCells > PipingSystemDomains( DomainCtr ).Mesh.Y.RegionMeshCount ) {
+					PipingSystemDomains( DomainCtr ).NumSlabCells = PipingSystemDomains( DomainCtr ).Mesh.Y.RegionMeshCount;
+				}
+				if ( PipingSystemDomains( DomainCtr ).NumSlabCells < 1 ) {
+					PipingSystemDomains( DomainCtr ).NumSlabCells = 1;
+				}
+
 				// Farfield model
 				PipingSystemDomains( DomainCtr ).Farfield.groundTempModel = Domain( ZoneCoupledDomainCtr ).groundTempModel;
 
@@ -6278,29 +6287,25 @@ namespace PlantPipingSystemsManager {
 				++SubIndex;  // SubIndex should be incremented here - After RetVal (SubIndex) is assigned a value. -SA
 			}
 
-		}
-
-		else if ( ThisMesh.MeshDistribution == MeshDistribution_Geometric ) {
+		} else if ( ThisMesh.MeshDistribution == MeshDistribution_Geometric ) {
 
 			NumCells = ThisMesh.RegionMeshCount;
 
-			if ( g.RegionType == RegionType_XDirection || g.RegionType == RegionType_ZDirection )
-			{
+			if ( g.RegionType == RegionType_XDirection || g.RegionType == RegionType_ZDirection ) {
 				//'calculate geometric series
 				SummationTerm = 0.0;
 				for ( I = 1; I <= NumCells; ++I ) {
 					SummationTerm += std::pow( ThisMesh.GeometricSeriesCoefficient, I - 1 );
 				}
 				CellWidth = GridWidth / SummationTerm;
-				if ( g.Min == 0 ){
+				if ( g.Min == 0 ) {
 					//Ground region to the left of the slab will have cells expanding to the left
 					RetVal( NumCells - 1 ) = CellWidth;
 					for ( I = NumCells - 2; I >= 0; --I ) {
 						CellWidth *= ThisMesh.GeometricSeriesCoefficient;
 						RetVal( I ) = CellWidth;
 					}
-				}
-				else{
+				} else {
 					//Slab region will have cells expanding to the right
 					RetVal( 0 ) = CellWidth;
 					for ( I = 1; I <= NumCells - 1; ++I ) {
@@ -6308,10 +6313,9 @@ namespace PlantPipingSystemsManager {
 						RetVal( I ) = CellWidth;
 					}
 				}
-			}
-			else if ( g.RegionType == RegionType_YDirection ) {
+			} else if ( g.RegionType == RegionType_YDirection ) {
 				//Assign uniform cell thickness to the slab cells.
-				if ( g.Max == PipingSystemDomains( DomainNum ).Extents.Ymax ){
+				if ( g.Max == PipingSystemDomains( DomainNum ).Extents.Ymax ) {
 					NumCells = PipingSystemDomains( DomainNum ).NumSlabCells;
 					if ( allocated( RetVal ) ) RetVal.deallocate( );
 					RetVal.allocate( { 0, NumCells - 1 } );
@@ -6322,8 +6326,7 @@ namespace PlantPipingSystemsManager {
 					for ( I = 0; I <= NumCells - 1; ++I ) {
 						RetVal( I ) = CellWidth;
 					}
-				}
-				else{
+				} else {
 					//'calculate geometric series
 					SummationTerm = 0.0;
 					for ( I = 1; I <= NumCells; ++I ) {
