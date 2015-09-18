@@ -2350,7 +2350,7 @@
     UNTIL: 5:00,0,           !- Field 3
     UNTIL: 7:00,0.003,       !- Field 5
     UNTIL: 13:00,0,          !- Field 7
-    UNTIL: 13:10,0.001,      !- Field 9
+    UNTIL: 13:15,0.001,      !- Field 9
     UNTIL: 18:00,0,          !- Field 11
     UNTIL: 18:30,0.003,      !- Field 13
     UNTIL: 24:00,0;          !- Field 15
@@ -4566,7 +4566,7 @@ Schedule:Constant,
    SSBWaterTempSchedule,   !- Name
    TEMPERATURE,            !- Schedule Type
    43.333333333333336;     !- TimeStep Value
-   
+
 WaterUse:Connections,
    Domestic Hot Water,         !- Name
    Water Demand Inlet Node,    !- Inlet Node Name
@@ -4629,7 +4629,7 @@ Pipe:Adiabatic,
    DHW Supply Outlet Pipe,              !- Name
    DHW Supply Outlet Pipe Inlet Node,   !- Inlet Node Name
    DHW Supply Outlet Node;              !- Outlet Node Name
-   
+
 BranchList,
    DHW Demand Branches,       !- Branch List Name
    DHW Demand Inlet Branch,   !- Branch 1 Name
@@ -4641,7 +4641,7 @@ BranchList,
    Mains Inlet Branch,         !- Branch 1 Name
    Water Heater Branch,        !- Branch 2 Name
    DHW Supply Outlet Branch;   !- Branch 4 Name
-   
+
 Branch,
    DHW Demand Inlet Branch,             !- Branch Name
    autosize,                            !- Maximum Flow Rate {m^3/s}
@@ -4676,7 +4676,7 @@ ConnectorList,
    DHW Demand Splitter,     !- Name of Connector 1
    Connector:Mixer,         !- Type of Connector 2
    DHW Demand Mixer;        !- Name of Connector 2]
-   
+
 PlantLoop,
    DHW Loop,                 !- Name
    Water,                    !- Fluid Type
@@ -4709,7 +4709,7 @@ PlantEquipmentOperationSchemes,
    PlantEquipmentOperation:HeatingLoad,   !- Control Scheme 1 Object Type
    DHW Control Scheme,                    !- Control Scheme 1 Name
    AlwaysOn;                              !- Control Scheme 1 Schedule Name
-   
+
 Schedule:Constant,
    AlwaysOn,   !- Name
    FRACTION,   !- Schedule Type
@@ -4740,7 +4740,7 @@ Branch,
    Mains Pressure,               !- Component 1 Name
    Mains Inlet Node,             !- Component 1 Inlet Node Name
    Mains Pressure Outlet Node;   !- Component 1 Outlet Node Name
-   
+
 Pump:VariableSpeed,
    Mains Pressure,               !- Name
    Mains Inlet Node,             !- Inlet Node Name
