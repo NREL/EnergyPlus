@@ -11,6 +11,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SolarShading;
@@ -19,6 +20,7 @@ using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataSystemVariables;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataBSDFWindow;
+using namespace EnergyPlus::DataVectorTypes;
 using namespace ObjexxFCL;
 
 TEST( SolarShadingTest, CalcPerSolarBeamTest )
@@ -144,4 +146,46 @@ TEST( SolarShadingTest, SurfaceScheduledSolarInc )
 	EXPECT_EQ( 0, SurfSolIncPtr );
 
 	SurfIncSolSSG.deallocate();
+}
+
+TEST( SolarShadingTest, polygon_contains_point )
+{
+	ShowMessage( "Begin Test: SolarShadingTest, polygon_contains_point" );
+
+	unsigned int numSides = 4;
+	Array1A< Vector > Rectangle3d;
+
+	Rectangle3d.dim( numSides );
+
+	Rectangle3d( 1 ).x = 0.;
+	Rectangle3d( 1 ).y = 0.;
+	Rectangle3d( 1 ).z = 0.;
+
+	Rectangle3d( 2 ).x = 10.;
+	Rectangle3d( 2 ).y = 0.;
+	Rectangle3d( 2 ).z = 0.;
+
+	Rectangle3d( 3 ).x = 10.;
+	Rectangle3d( 3 ).y = 10.;
+	Rectangle3d( 3 ).z = 0.;
+
+	Rectangle3d( 4 ).x = 0.;
+	Rectangle3d( 4 ).y = 10.;
+	Rectangle3d( 4 ).z = 0.;
+
+	Vector PointInside;
+
+	PointInside.x = 5.;
+	PointInside.y = 5.;
+	PointInside.z = 0.;
+
+	Vector PointOutside;
+
+	PointOutside.x = 20.;
+	PointOutside.y = 20.;
+	PointOutside.z = 0.;
+
+	EXPECT_TRUE(polygon_contains_point( numSides, Rectangle3d, PointInside, false, false, false ) );
+	EXPECT_FALSE( polygon_contains_point( numSides, Rectangle3d, PointOutside, false, false, false ) );
+
 }
