@@ -85,7 +85,8 @@ namespace DataZoneEquipment {
 	extern Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
 	extern Array1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
 	extern Array1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
-
+	extern Array1D< Real64 > ZMAT; // Zone air temperature for zone air mixing
+	extern Array1D< Real64 > ZHumRat; // Zone air humidity ratio zone air mixing
 	// Utility routines for module
 
 	// Types
@@ -274,9 +275,12 @@ namespace DataZoneEquipment {
 		int ReturnAirNode;
 		int NumInletNodes;
 		int NumExhaustNodes;
+		int NumReturnFlowBasisNodes; // number of return air flow basis nodes
+		int ReturnFlowSchedPtrNum; // return air flow fraction schedule pointer
 		bool FlowError; // flow error flag
 		Array1D_int InletNode; // zone supply air inlet nodes
 		Array1D_int ExhaustNode; // zone air exhaust nodes
+		Array1D_int ReturnFlowBasisNode; // return air flow basis nodes
 		int ReturnZonePlenumCondNum; // number of the zone's return air plenum
 		int AirLoopNum; // the air loop index for this controlled zone
 		int FanOpMode; // =0 if no central sys;
@@ -314,6 +318,8 @@ namespace DataZoneEquipment {
 			ReturnAirNode( 0 ),
 			NumInletNodes( 0 ),
 			NumExhaustNodes( 0 ),
+			NumReturnFlowBasisNodes( 0 ),
+			ReturnFlowSchedPtrNum( 0 ),
 			FlowError( false ),
 			ReturnZonePlenumCondNum( 0 ),
 			AirLoopNum( 0 ),
@@ -484,7 +490,7 @@ namespace DataZoneEquipment {
 	extern Array1D< ReturnAir > ReturnAirPath;
 
 	// Functions
-		// Clears the global data in DataZoneEquipment.
+	// Clears the global data in DataZoneEquipment.
 	// Needed for unit tests, should not be normally called.
 	void
 	clear_state();
