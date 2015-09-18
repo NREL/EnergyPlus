@@ -1594,15 +1594,6 @@ public: // Modifier
 		return *this;
 	}
 
-	// Assign Default Value to all Elements
-	inline
-	Array1 &
-	to_default()
-	{
-		Super::to_default();
-		return *this;
-	}
-
 	// Normalize to Unit Length
 	inline
 	Array1 &

@@ -426,6 +426,8 @@ namespace Pumps {
 	extern Array1D< ReportVars > PumpEquipReport;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimPumps(

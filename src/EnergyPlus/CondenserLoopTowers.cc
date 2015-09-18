@@ -132,7 +132,8 @@ namespace CondenserLoopTowers {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumSimpleTowers( 0 ); // Number of similar towers
-
+	bool GetInput( true );
+	bool InitTowerOneTimeFlag( true );
 	//? The following block of variables are used to carry model results for a tower instance
 	//   across sim, update, and report routines.  Simulation manager must be careful
 	//   in models with multiple towers.
@@ -174,6 +175,29 @@ namespace CondenserLoopTowers {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumSimpleTowers = 0; 
+		GetInput = true;
+		InitTowerOneTimeFlag = true;
+		InletWaterTemp = 0.0; 
+		OutletWaterTemp = 0.0;
+		WaterInletNode = 0;
+		WaterOutletNode = 0;
+		WaterMassFlowRate = 0.0;
+		Qactual = 0.0; 
+		CTFanPower = 0.0;
+		AirFlowRateRatio = 0.0;
+		BasinHeaterPower = 0.0;
+		WaterUsage = 0.0;
+		FanCyclingRatio = 0.0; 
+		CheckEquipName.deallocate();
+		SimpleTower.deallocate();
+		SimpleTowerInlet.deallocate(); 
+		SimpleTowerReport.deallocate();
+		VSTower.deallocate();
+	}
 
 	void
 	SimTowers(
@@ -226,7 +250,7 @@ namespace CondenserLoopTowers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true );
+
 		int TowerNum;
 
 		//GET INPUT
@@ -2125,7 +2149,7 @@ namespace CondenserLoopTowers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Flag if input data errors are found
-		static bool MyOneTimeFlag( true );
+
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool OneTimeFlagForEachTower;
 		//  LOGICAL                                 :: FatalError
@@ -2137,13 +2161,13 @@ namespace CondenserLoopTowers {
 		Real64 rho; // local density of fluid
 
 		// Do the one time initializations
-		if ( MyOneTimeFlag ) {
+		if ( InitTowerOneTimeFlag ) {
 			MyEnvrnFlag.allocate( NumSimpleTowers );
 			OneTimeFlagForEachTower.allocate( NumSimpleTowers );
 
 			OneTimeFlagForEachTower = true;
 			MyEnvrnFlag = true;
-			MyOneTimeFlag = false;
+			InitTowerOneTimeFlag = false;
 
 		}
 
@@ -4206,6 +4230,16 @@ namespace CondenserLoopTowers {
 			return;
 		}
 
+		if ( std::abs( MyLoad ) <= SmallLoad ) {
+		// tower doesn't need to do anything
+			OutletWaterTemp = Node( WaterInletNode ).Temp;
+			CTFanPower = 0.0;
+			AirFlowRateRatio = 0.0;
+			Qactual = 0.0;
+			CalcBasinHeaterPower( SimpleTower( TowerNum ).BasinHeaterPowerFTempDiff, SimpleTower( TowerNum ).BasinHeaterSchedulePtr, SimpleTower( TowerNum ).BasinHeaterSetPointTemp, BasinHeaterPower );
+			return;
+		}
+
 		// first find free convection cooling rate
 		UAdesignPerCell = SimpleTower( TowerNum ).FreeConvTowerUA / SimpleTower( TowerNum ).NumCell;
 		AirFlowRatePerCell = SimpleTower( TowerNum ).FreeConvAirFlowRate / SimpleTower( TowerNum ).NumCell;
@@ -4215,7 +4249,10 @@ namespace CondenserLoopTowers {
 
 		FreeConvQdot = WaterMassFlowRate * CpWater * ( Node( WaterInletNode ).Temp - OutletWaterTempOFF );
 		CTFanPower = 0.0;
+
 		if ( std::abs( MyLoad ) <= FreeConvQdot ) { // can meet load with free convection and fan off
+
+
 			OutletWaterTemp = OutletWaterTempOFF;
 			AirFlowRateRatio = 0.0;
 			Qactual = FreeConvQdot;

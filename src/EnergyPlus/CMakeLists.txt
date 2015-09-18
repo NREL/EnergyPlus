@@ -18,6 +18,7 @@ SET( SRC
   AirflowNetworkBalanceManager.hh
   AirflowNetworkSolver.cc
   AirflowNetworkSolver.hh
+  AirTerminalUnit.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
   BaseboardRadiator.cc
@@ -238,6 +239,11 @@ SET( SRC
   GlobalNames.hh
   GroundHeatExchangers.cc
   GroundHeatExchangers.hh
+  GroundTemperatureModeling/BaseGroundTemperatureModel.hh
+  GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.cc
+  GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh
+  GroundTemperatureModeling/GroundTemperatureModelManager.cc
+  GroundTemperatureModeling/GroundTemperatureModelManager.hh
   HVACControllers.cc
   HVACControllers.hh
   HVACCooledBeam.cc
@@ -248,6 +254,8 @@ SET( SRC
   HVACDXSystem.hh
   HVACDuct.cc
   HVACDuct.hh
+  HVACFourPipeBeam.cc
+  HVACFourPipeBeam.hh
   HVACHXAssistedCoolingCoil.cc
   HVACHXAssistedCoolingCoil.hh
   HVACInterfaceManager.cc
@@ -300,10 +308,22 @@ SET( SRC
   HighTempRadiantSystem.hh
   Humidifiers.cc
   Humidifiers.hh
+  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
+  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
 )
-
+ 
 SET( SRC_2
   Timer.h
+  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc
+  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh
+  GroundTemperatureModeling/SiteDeepGroundTemperatures.cc
+  GroundTemperatureModeling/SiteDeepGroundTemperatures.hh
+  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.cc
+  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh
+  GroundTemperatureModeling/SiteShallowGroundTemperatures.cc
+  GroundTemperatureModeling/SiteShallowGroundTemperatures.hh
+  GroundTemperatureModeling/XingGroundTemperatureModel.cc
+  GroundTemperatureModeling/XingGroundTemperatureModel.hh
   ICEngineElectricGenerator.cc
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc
@@ -344,8 +364,12 @@ SET( SRC_2
   OutputReportPredefined.hh
   OutputReportTabular.cc
   OutputReportTabular.hh
+  OutputReportTabularAnnual.cc
+  OutputReportTabularAnnual.hh
   OutputReports.cc
   OutputReports.hh
+  OutputReportData.cc
+  OutputReportData.hh
   OutsideEnergySources.cc
   OutsideEnergySources.hh
   PackagedTerminalHeatPump.cc
@@ -374,6 +398,7 @@ SET( SRC_2
   PlantHeatExchangerFluidToFluid.hh
   PlantLoadProfile.cc
   PlantLoadProfile.hh
+  PlantLocation.hh
   PlantLoopEquip.cc
   PlantLoopEquip.hh
   PlantLoopSolver.cc

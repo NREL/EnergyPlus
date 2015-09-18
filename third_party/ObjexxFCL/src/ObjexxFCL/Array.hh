@@ -1712,16 +1712,6 @@ public: // Modifier
 		return *this;
 	}
 
-	// Assign Default Value to all Elements
-	inline
-	virtual
-	Array &
-	to_default()
-	{
-		if ( data_ ) std::fill_n( data_, size_, Traits::initial_array_value() );
-		return *this;
-	}
-
 	// Assign Zero to all Elements
 	//  Can't be virtual (for covariant return) or will try to instantiate for all value types
 	inline

@@ -174,7 +174,7 @@ namespace EnergyPlus {
 			"	ZoneHVAC:FourPipeFanCoil,",
 			"	Zone1FanCoil, !- Name",
 			"	FanAndCoilAvailSched, !- Availability Schedule Name",
-			"	MultiStageFan, !- Capacity Control Method",
+			"	MultiSpeedFan, !- Capacity Control Method",
 			"	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
 			"	0.3, !- Low Speed Supply Air Flow Ratio",
 			"	0.6, !- Medium Speed Supply Air Flow Ratio",
@@ -211,7 +211,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( DataHVACGlobals::FanType_SimpleOnOff, Fan( 1 ).FanType_Num );
 
 		GetFanCoilUnits();
-		EXPECT_EQ( "MULTISTAGEFAN", FanCoil( 1 ).CapCtrlMeth );
+		EXPECT_EQ( "MULTISPEEDFAN", FanCoil( 1 ).CapCtrlMeth );
 		EXPECT_EQ( "OUTDOORAIR:MIXER", FanCoil( 1 ).OAMixType );
 		EXPECT_EQ( "FAN:ONOFF", FanCoil( 1 ).FanType );
 		EXPECT_EQ( "COIL:COOLING:WATER", FanCoil( 1 ).CCoilType );
@@ -486,7 +486,7 @@ namespace EnergyPlus {
 			"	ZoneHVAC:FourPipeFanCoil,",
 			"	Zone1FanCoil, !- Name",
 			"	FanAndCoilAvailSched, !- Availability Schedule Name",
-			"	MultiStageFan, !- Capacity Control Method",
+			"	MultiSpeedFan, !- Capacity Control Method",
 			"	0.5, !- Maximum Supply Air Flow Rate { m3 / s }",
 			"	0.3, !- Low Speed Supply Air Flow Ratio",
 			"	0.6, !- Medium Speed Supply Air Flow Ratio",
@@ -523,7 +523,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( DataHVACGlobals::FanType_SimpleOnOff, Fan( 1 ).FanType_Num );
 
 		GetFanCoilUnits();
-		EXPECT_EQ( "MULTISTAGEFAN", FanCoil( 1 ).CapCtrlMeth );
+		EXPECT_EQ( "MULTISPEEDFAN", FanCoil( 1 ).CapCtrlMeth );
 		EXPECT_EQ( "OUTDOORAIR:MIXER", FanCoil( 1 ).OAMixType );
 		EXPECT_EQ( "FAN:ONOFF", FanCoil( 1 ).FanType );
 		EXPECT_EQ( "COIL:COOLING:WATER", FanCoil( 1 ).CCoilType );

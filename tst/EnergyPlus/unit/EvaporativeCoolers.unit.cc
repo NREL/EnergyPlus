@@ -5,7 +5,10 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
@@ -213,4 +216,85 @@ TEST( EvaporativeCoolers, IndEvapCoolerPower )
 
 	EvaporativeCoolers::EvapCond.deallocate();
 	PerfCurve.deallocate();
+}
+
+TEST( EvaporativeCoolers, SizeEvapCooler )
+{
+
+	// one-time setup of evap cooler instance
+	int const EvapCoolNum( 1 );
+	EvaporativeCoolers::EvapCond.allocate( EvapCoolNum );
+	auto & thisEvapCooler = EvaporativeCoolers::EvapCond( EvapCoolNum );
+
+	// set up sizing stuff
+	DataSizing::SysSizingRunDone = true;
+	DataSizing::ZoneSizingRunDone = false;
+	DataSizing::CurSysNum = 1;
+	DataSizing::NumSysSizInput = 1;
+	DataSizing::SysSizInput.allocate( 1 );
+	DataSizing::SysSizInput( 1 ).AirLoopNum = 1;
+	DataAirSystems::PrimaryAirSystem.allocate( 1 );
+	DataAirSystems::PrimaryAirSystem( 1 ).NumBranches = 1;
+	DataAirSystems::PrimaryAirSystem( 1 ).Branch.allocate( 1 );
+	DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).TotalComponents = 1;
+	DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).Comp.allocate( 1 );
+	DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).Name = "MyEvapCooler";
+	thisEvapCooler.EvapCoolerName = "MyEvapCooler";
+	DataSizing::FinalSysSizing.allocate(1);
+	DataSizing::FinalSysSizing( 1 ).DesMainVolFlow = 1.0;
+	DataSizing::FinalSysSizing( 1 ).DesOutAirVolFlow = 0.4;
+
+	// set up the structure to size the flow rates for an RDDSpecial
+	thisEvapCooler.EvapCoolerType = DataGlobalConstants::iEvapCoolerInDirectRDDSpecial;
+	thisEvapCooler.VolFlowRate = DataSizing::AutoSize;
+	thisEvapCooler.PadArea = 0.0;
+	thisEvapCooler.PadDepth = 0.0;
+	thisEvapCooler.IndirectPadArea = 0.0;
+	thisEvapCooler.IndirectPadDepth = 0.0;
+	thisEvapCooler.IndirectVolFlowRate = DataSizing::AutoSize;
+	thisEvapCooler.IndirectVolFlowScalingFactor = 0.3;
+
+	// make the call for sizing the flow rates
+	EvaporativeCoolers::SizeEvapCooler(EvapCoolNum);
+	EXPECT_NEAR(0.3, thisEvapCooler.IndirectVolFlowRate, 0.0001);
+	EXPECT_NEAR(1.0, thisEvapCooler.VolFlowRate, 0.0001);
+
+	// now let's try to size some of the pad properties
+	thisEvapCooler.EvapCoolerType = DataGlobalConstants::iEvapCoolerDirectCELDEKPAD;
+	thisEvapCooler.VolFlowRate = 1.0;
+	thisEvapCooler.PadArea = DataSizing::AutoSize;
+	thisEvapCooler.PadDepth = DataSizing::AutoSize;
+	thisEvapCooler.IndirectPadArea = 0.0;
+	thisEvapCooler.IndirectPadDepth = 0.0;
+	thisEvapCooler.IndirectVolFlowRate = 1.0;
+
+	// make the call for sizing the pad properties
+	EvaporativeCoolers::SizeEvapCooler(EvapCoolNum);
+	EXPECT_NEAR(0.333333, thisEvapCooler.PadArea, 0.0001);
+	EXPECT_NEAR(0.17382, thisEvapCooler.PadDepth, 0.0001);
+
+	// now let's try 'not' finding it on the air loop; thus it is in the OA path
+	DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).Name = "NOT-MyEvapCooler";
+
+	// set up the structure to size the flow rates for an indirect celdekpad
+	thisEvapCooler.EvapCoolerType = DataGlobalConstants::iEvapCoolerInDirectCELDEKPAD;
+	thisEvapCooler.VolFlowRate = DataSizing::AutoSize;
+	thisEvapCooler.PadArea = 0.0;
+	thisEvapCooler.PadDepth = 0.0;
+	thisEvapCooler.IndirectPadArea = 0.0;
+	thisEvapCooler.IndirectPadDepth = 0.0;
+	thisEvapCooler.IndirectVolFlowRate = DataSizing::AutoSize;
+	thisEvapCooler.IndirectVolFlowScalingFactor = 0.3;
+
+	// make the call for sizing the flow rates
+	EvaporativeCoolers::SizeEvapCooler(EvapCoolNum);
+	EXPECT_NEAR(0.5, thisEvapCooler.IndirectVolFlowRate, 0.0001);
+	EXPECT_NEAR(0.5, thisEvapCooler.VolFlowRate, 0.0001);
+
+	// clean up
+	EvaporativeCoolers::EvapCond.deallocate();
+	DataSizing::FinalSysSizing.deallocate();
+	DataAirSystems::PrimaryAirSystem.deallocate();
+	DataSizing::SysSizInput.deallocate();
+
 }

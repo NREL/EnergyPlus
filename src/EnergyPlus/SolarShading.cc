@@ -154,6 +154,17 @@ namespace SolarShading {
 	int ShadowingCalcFrequency( 0 ); // Frequency for Shadowing Calculations
 	int ShadowingDaysLeft( 0 ); // Days left in current shadowing period
 	bool debugging( false );
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool MustAllocSolarShading( true );
+		bool GetInputFlag( true );
+		bool firstTime( true );
+	}
+
 	std::ofstream shd_stream; // Shading file stream
 	Array1D_int HCNS; // Surface number of back surface HC figures
 	Array1D_int HCNV; // Number of vertices of each HC figure
@@ -206,6 +217,72 @@ namespace SolarShading {
 	// MODULE SUBROUTINES:
 
 	// Functions
+	void
+	clear_state()
+	{
+		MaxHCV= 15;
+		MaxHCS= 1500;
+		MAXHCArrayBounds = 0;
+		MAXHCArrayIncrement = 0;
+		NVS = 0;
+		NumVertInShadowOrClippedSurface = 0;
+		CurrentSurfaceBeingShadowed = 0;
+		CurrentShadowingSurface = 0;
+		OverlapStatus = 0;
+		CTHETA.deallocate();
+		FBKSHC = 0;
+		FGSSHC = 0;
+		FINSHC = 0;
+		FRVLHC = 0;
+		FSBSHC = 0;
+		LOCHCA = 0;
+		NBKSHC = 0;
+		NGSSHC = 0;
+		NINSHC = 0;
+		NRVLHC = 0;
+		NSBSHC = 0;
+		CalcSkyDifShading = false;
+		ShadowingCalcFrequency = 0; // Frequency for Shadowing Calculations
+		ShadowingDaysLeft =0; // Days left in current shadowing period
+		debugging = false;
+		MustAllocSolarShading = true;
+		GetInputFlag = true;
+		firstTime = true;
+		HCNS.deallocate();
+		HCNV.deallocate();
+		HCA.deallocate();
+		HCB.deallocate();
+		HCC.deallocate();
+		HCX.deallocate();
+		HCY.deallocate();
+		WindowRevealStatus.deallocate();
+		HCAREA.deallocate();
+		HCT.deallocate();
+		ISABSF.deallocate();
+		SAREA.deallocate();
+		NumTooManyFigures = 0;
+		NumTooManyVertices = 0;
+		NumBaseSubSurround = 0;
+		XShadowProjection = 0.0;
+		YShadowProjection = 0.0;
+		XTEMP.deallocate();
+		XVC.deallocate();
+		XVS.deallocate();
+		YTEMP.deallocate();
+		YVC.deallocate();
+		YVS.deallocate();
+		ZVC.deallocate();
+		ATEMP.deallocate();
+		BTEMP.deallocate();
+		CTEMP.deallocate();
+		XTEMP1.deallocate();
+		YTEMP1.deallocate();
+		maxNumberOfFigures = 0;
+		TrackTooManyFigures.deallocate();
+		TrackTooManyVertices.deallocate();
+		TrackBaseSubSurround.deallocate();
+		DBZoneIntWin.deallocate();
+	}
 
 	void
 	InitSolarCalculations()
@@ -241,9 +318,6 @@ namespace SolarShading {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		static bool GetInputFlag( true );
-		static bool firstTime( true );
 
 		// FLOW:
 #ifdef EP_Count_Calls
@@ -4944,7 +5018,9 @@ namespace SolarShading {
 		// window with horizontally-slatted blind into zone at current time (m2)
 		static Array1D< Real64 > WinTransDifSolarSky; // Factor for exterior sky diffuse solar transmitted through
 		// window with horizontally-slatted blind into zone at current time (m2)
-		static bool MustAlloc( true ); // True when local arrays must be allocated
+		/////////// hoisted into namespace renamed to ////////////
+		//static bool MustAlloc( true ); // True when local arrays must be allocated
+		////////////////////////
 		Real64 TBmDenom; // TBmDenominator
 
 		Real64 TBmBmShBlSc; // Beam-beam transmittance for window with shade, blind, screen, or switchable glazing
@@ -4993,7 +5069,7 @@ namespace SolarShading {
 		int iSSG; // scheduled surface gains counter
 		Real64 SolarIntoZone; // Solar radiation into zone to current surface
 
-		if ( MustAlloc ) {
+		if ( MustAllocSolarShading ) {
 			DBZoneIntWin.allocate( NumOfZones );
 			IntBeamAbsByShadFac.allocate( TotSurfaces );
 			ExtBeamAbsByShadFac.allocate( TotSurfaces );
@@ -5001,7 +5077,7 @@ namespace SolarShading {
 			WinTransDifSolar.allocate( TotSurfaces );
 			WinTransDifSolarGnd.allocate( TotSurfaces );
 			WinTransDifSolarSky.allocate( TotSurfaces );
-			MustAlloc = false;
+			MustAllocSolarShading = false;
 		}
 
 #ifdef EP_Count_Calls

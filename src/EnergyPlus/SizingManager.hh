@@ -54,6 +54,8 @@ namespace SizingManager {
 	};
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageSizing();

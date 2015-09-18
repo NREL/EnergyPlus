@@ -1804,12 +1804,9 @@ namespace RoomAirModelManager {
 				if ( RoomAirflowNetworkZoneInfo( ZoneNum ).IsUsed ) {
 					if ( RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes > 0 ) {
 						for ( Loop = 1; Loop <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++Loop ) {
-							SetupOutputVariable( "RoomAirflowNetwork Node Temperature [C]", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).AirTemp,
-								"HVAC", "Average", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).Name );
-							SetupOutputVariable( "RoomAirflowNetwork Node Humidity Ratio [kgWater/kgDryAir]", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).HumRat,
-								"HVAC", "Average", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).Name );
-							SetupOutputVariable( "RoomAirflowNetwork Node Relative Humidity [%]", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).RelHumidity,
-								"HVAC", "Average", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).Name );
+							SetupOutputVariable( "RoomAirflowNetwork Node Temperature [C]", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).AirTemp, "HVAC", "Average", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).Name );
+							SetupOutputVariable( "RoomAirflowNetwork Node Humidity Ratio [kgWater/kgDryAir]", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).HumRat, "HVAC", "Average", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).Name );
+							SetupOutputVariable( "RoomAirflowNetwork Node Relative Humidity [%]", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).RelHumidity, "HVAC", "Average", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).Name );
 						}
 					}
 				}
