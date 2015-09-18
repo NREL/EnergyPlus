@@ -3952,7 +3952,9 @@ namespace SimAirServingZones {
 						if ( SysSizInput( SysSizNum ).SystemOAMethod == SOAM_ZoneSum ) { // ZoneSum Method
 							MinOAFlow += FinalZoneSizing( CtrlZoneNum ).MinOA;
 							ZoneOAFracCooling = 0.0;
-						} else if ( SysSizInput( SysSizNum ).SystemOAMethod == SOAM_VRP ) { // Ventilation Rate Procedure
+							SysOAUnc += FinalZoneSizing( CtrlZoneNum ).MinOA;
+							VbzByZone( CtrlZoneNum ) = FinalZoneSizing( CtrlZoneNum ).MinOA;
+						} else if( SysSizInput( SysSizNum ).SystemOAMethod == SOAM_VRP ) { // Ventilation Rate Procedure
 							ZoneOAUnc = PopulationDiversity * FinalZoneSizing( CtrlZoneNum ).TotalOAFromPeople + FinalZoneSizing( CtrlZoneNum ).TotalOAFromArea;
 
 							//save for Standard 62 tabular report
@@ -4076,7 +4078,9 @@ namespace SimAirServingZones {
 								if ( SysSizInput( SysSizNum ).SystemOAMethod == SOAM_ZoneSum ) { // ZoneSum Method
 									MinOAFlow += FinalZoneSizing( CtrlZoneNum ).MinOA;
 									ZoneOAFracHeating = 0.0;
-								} else if ( SysSizInput( SysSizNum ).SystemOAMethod == SOAM_VRP ) { // Ventilation Rate Procedure
+									SysOAUnc += FinalZoneSizing( CtrlZoneNum ).MinOA;
+									VbzByZone( CtrlZoneNum ) = FinalZoneSizing( CtrlZoneNum ).MinOA;
+								} else if( SysSizInput( SysSizNum ).SystemOAMethod == SOAM_VRP ) { // Ventilation Rate Procedure
 									ZoneOAUnc = PopulationDiversity * FinalZoneSizing( CtrlZoneNum ).TotalOAFromPeople + FinalZoneSizing( CtrlZoneNum ).TotalOAFromArea;
 
 									//save for Standard 62 tabular report
@@ -4265,7 +4269,7 @@ namespace SimAirServingZones {
 
 		// write predefined standard 62.1 report data
 		for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
-			if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) {
+//			if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) {
 				NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
 				//System Ventilation Requirements for Cooling
 				PreDefTableEntry( pdchS62svrClSumVpz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VpzClgSumBySys( AirLoopNum ), 3 ); //Vpz-sum
@@ -4411,7 +4415,7 @@ namespace SimAirServingZones {
 				PreDefTableEntry( pdchS62shdVpz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VpzHtgSumBySys( AirLoopNum ) ); //Vpz-sum
 				PreDefTableEntry( pdchS62shdVdz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VdzHtgSum ); //Vdz-sum
 				PreDefTableEntry( pdchS62shdVozhtg, FinalSysSizing( AirLoopNum ).AirPriLoopName, VozHtgSum, 4 ); //Voz-htg
-			}
+//			}
 		}
 
 	}
@@ -4904,7 +4908,9 @@ namespace SimAirServingZones {
 					if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_ZoneSum ) {
 						SysSizing( CurOverallSimDay, AirLoopNum ).DesCoolVolFlow = SysSizing( CurOverallSimDay, AirLoopNum ).CoinCoolMassFlow / StdRhoAir;
 						SysSizing( CurOverallSimDay, AirLoopNum ).DesHeatVolFlow = SysSizing( CurOverallSimDay, AirLoopNum ).CoinHeatMassFlow / StdRhoAir;
-					} else if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) { // Ventilation Rate Procedure
+						VotClgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).SysUncOA;
+						VotHtgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).SysUncOA;
+					} else if( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) { // Ventilation Rate Procedure
 						// cooling
 						SysSizing( CurOverallSimDay, AirLoopNum ).DesCoolVolFlow = SysSizing( CurOverallSimDay, AirLoopNum ).CoinCoolMassFlow / StdRhoAir;
 						if ( SysSizing( CurOverallSimDay, AirLoopNum ).DesCoolVolFlow > 0 ) {
@@ -5122,7 +5128,9 @@ namespace SimAirServingZones {
 					if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_ZoneSum ) {
 						SysSizing( CurOverallSimDay, AirLoopNum ).DesCoolVolFlow = SysSizing( CurOverallSimDay, AirLoopNum ).NonCoinCoolMassFlow / StdRhoAir;
 						SysSizing( CurOverallSimDay, AirLoopNum ).DesHeatVolFlow = SysSizing( CurOverallSimDay, AirLoopNum ).NonCoinHeatMassFlow / StdRhoAir;
-					} else if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) { // Ventilation Rate Procedure
+						VotClgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).SysUncOA;
+						VotHtgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).SysUncOA;
+					} else if( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) { // Ventilation Rate Procedure
 						// cooling
 						SysSizing( CurOverallSimDay, AirLoopNum ).DesCoolVolFlow = SysSizing( CurOverallSimDay, AirLoopNum ).NonCoinCoolMassFlow / StdRhoAir;
 						if ( SysSizing( CurOverallSimDay, AirLoopNum ).DesCoolVolFlow > 0 ) {
@@ -6007,7 +6015,7 @@ namespace SimAirServingZones {
 
 			// write predefined standard 62.1 report data
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
-				if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) {
+//				if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) {
 					//system ventilation requirements for cooling table
 					PreDefTableEntry( pdchS62svrClVps, FinalSysSizing( AirLoopNum ).AirPriLoopName, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, 3 ); //Vps
 					PreDefTableEntry( pdchS62svrClXs, FinalSysSizing( AirLoopNum ).AirPriLoopName, XsBySysCool( AirLoopNum ), 3 ); //Xs
@@ -6068,7 +6076,7 @@ namespace SimAirServingZones {
 							PreDefTableEntry( pdchS62zhdEp, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFractionHtg, 3 ); //Ep
 						}
 					}
-				}
+//				}
 			}
 
 		}}
