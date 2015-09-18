@@ -39,12 +39,9 @@ set( test_src
   HVACFourPipeBeam.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
-<<<<<<< HEAD
-  HWBaseboardRadiator.unit.cc
-=======
   HVACUnitarySystem.unit.cc
   HVACVariableRefrigerantFlow.unit.cc
->>>>>>> develop
+  HWBaseboardRadiator.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
