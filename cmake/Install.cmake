@@ -400,7 +400,7 @@ set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_BINARY_DIR}/CMakeCPackOptions.cmake")
 
 if (NOT PACKAGE_BUILT_DOCS)
   # remote files.  All of these should eventually be generated from content in the EnergyPlusTeam project.
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/Acknowledgments.pdf" "./Documentation")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/Acknowledgements.pdf" "./Documentation")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/AuxiliaryPrograms.pdf" "./Documentation")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/EMS_Application_Guide.pdf" "./Documentation")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/EngineeringReference.pdf" "./Documentation")
