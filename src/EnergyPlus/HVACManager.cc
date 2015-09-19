@@ -147,13 +147,29 @@ namespace HVACManager {
 	//Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
 	//Array1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
 	//Array1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
-
+	
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool SimHVACIterSetup( false );
+	}
 	//SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 	// and zone equipment simulations
 
 	// MODULE SUBROUTINES:
 
 	// Functions
+	void
+	clear_state()
+	{
+		HVACManageIteration = 0;
+		RepIterAir = 0;
+		SimHVACIterSetup = false;
+	}
+
 
 	void
 	ManageHVAC()
@@ -628,8 +644,9 @@ namespace HVACManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool FirstHVACIteration; // True when solution technique on first iteration
-
-		static bool IterSetup( false ); // Set to TRUE after the variable is setup for Output Reporting
+		/////////// hoisted into namespace SimHVACIterSetup ////////////
+		//static bool IterSetup( false ); // Set to TRUE after the variable is setup for Output Reporting
+		/////////////////////////
 		static int ErrCount( 0 ); // Number of times that the maximum iterations was exceeded
 		static bool MySetPointInit( true );
 		std::string CharErrOut; // a character string equivalent of ErrCount
@@ -688,7 +705,7 @@ namespace HVACManager {
 		PlantManageSubIterations = 0;
 		PlantManageHalfLoopCalls = 0;
 		SetAllPlantSimFlagsToValue( true );
-		if ( ! IterSetup ) {
+		if ( ! SimHVACIterSetup ) {
 			SetupOutputVariable( "HVAC System Solver Iteration Count []", HVACManageIteration, "HVAC", "Sum", "SimHVAC" );
 			SetupOutputVariable( "Air System Solver Iteration Count []", RepIterAir, "HVAC", "Sum", "SimHVAC" );
 			ManageSetPoints(); //need to call this before getting plant loop data so setpoint checks can complete okay
@@ -710,7 +727,7 @@ namespace HVACManager {
 					InitOneTimePlantSizingInfo( LoopNum );
 				}
 			}
-			IterSetup = true;
+			SimHVACIterSetup = true;
 		}
 
 		if ( ZoneSizingCalc ) {

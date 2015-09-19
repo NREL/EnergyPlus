@@ -32,13 +32,14 @@ namespace FanCoilUnits {
 	extern int const CCoil_HXAssist;
 
 	extern int const HCoil_Water;
+	extern int const HCoil_Electric;
 
 	//capacity control method supported in this module
 	extern int const CCM_ConsFanVarFlow;
 	extern int const CCM_CycFan;
 	extern int const CCM_VarFanVarFlow;
 	extern int const CCM_VarFanConsFlow;
-	extern int const CCM_MultiStageFan;
+	extern int const CCM_MultiSpeedFan;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -140,6 +141,7 @@ namespace FanCoilUnits {
 		Real64 MinHotWaterVolFlow; // m3/s
 		Real64 MinHotWaterFlow; // kg/s
 		Real64 HotControlOffset; // control tolerance
+		Real64 DesignHeatingCapacity; // size of electric heating coil [W]
 		int AvailStatus;
 		std::string AvailManagerListName; // Name of an availability manager list object
 		// addition for OA to Zone Units
@@ -224,6 +226,7 @@ namespace FanCoilUnits {
 			MinHotWaterVolFlow( 0.0 ),
 			MinHotWaterFlow( 0.0 ),
 			HotControlOffset( 0.0 ),
+			DesignHeatingCapacity( 0.0 ),
 			AvailStatus( 0 ),
 			ATMixerExists( false ),
 			ATMixerIndex( 0 ),
@@ -297,7 +300,7 @@ namespace FanCoilUnits {
 	SizeFanCoilUnit( int const FanCoilNum );
 
 	void
-	SizeCoilWaterFlowRate(
+		SizeCoilWaterFlowRate(
 		std::string const & WaterCoilType,
 		std::string const & WaterCoilName,
 		int const WaterCoilType_Num,
@@ -367,6 +370,12 @@ namespace FanCoilUnits {
 	GetFanCoilIndex(
 		std::string const & FanCoilName,
 		int & FanCoilIndex
+	);
+
+	Real64
+	CalcFanCoilLoadResidual(
+		Real64 const PartLoadRatio, // DX cooling coil part load ratio
+		Array1< Real64 > const & Par // Function parameters
 	);
 
 	//     NOTICE

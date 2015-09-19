@@ -378,6 +378,27 @@ protected: // Creation
 		operator []( 3 ) = v.w;
 	}
 
+	// Iterator Range Constructor Template
+	template< class Iterator, typename = decltype( *std::declval< Iterator & >(), void(), ++std::declval< Iterator & >(), void() ) >
+	inline
+	Array( Iterator const beg, Iterator const end ) :
+	 capacity_( end - beg ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+	 data_( new T[ capacity_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
+	 size_( capacity_ ),
+	 owner_( true ),
+	 shift_( 0 ),
+	 sdata_( nullptr )
+	{
+		size_type j( 0u );
+		for ( Iterator i = beg; i != end; ++i, ++j ) {
+			operator []( j ) = *i;
+		}
+	}
+
 	// Default Proxy Constructor
 	inline
 	Array( ProxySentinel const & ) :
@@ -1688,16 +1709,6 @@ public: // Modifier
 		size_ = 0u;
 		shift_ = 0;
 		sdata_ = nullptr;
-		return *this;
-	}
-
-	// Assign Default Value to all Elements
-	inline
-	virtual
-	Array &
-	to_default()
-	{
-		if ( data_ ) std::fill_n( data_, size_, Traits::initial_array_value() );
 		return *this;
 	}
 

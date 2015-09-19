@@ -806,6 +806,8 @@ namespace VariableSpeedCoils {
 	extern Array1D< VariableSpeedCoilData > VarSpeedCoil;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimVariableSpeedCoils(

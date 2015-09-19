@@ -29,6 +29,8 @@ namespace HeatBalanceIntRadExchange {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceIntRadExchange
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	CalcInteriorRadExchange(
