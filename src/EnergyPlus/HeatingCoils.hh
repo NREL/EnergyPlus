@@ -468,7 +468,7 @@ namespace HeatingCoils {
 		bool & ErrorsFound // set to true if problem
 	);
 
-	// Clears the global data in OutdoorAirUnit.
+	// Clears the global data in HeatingCoils.
 	// Needed for unit tests, should not be normally called.
 	void
 	clear_state();

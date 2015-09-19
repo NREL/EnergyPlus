@@ -107,13 +107,23 @@ namespace Fans {
 	int NumFans( 0 ); // The Number of Fans found in the Input
 	int NumNightVentPerf( 0 ); // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
 	bool GetFanInputFlag( true ); // Flag set to make sure you get input once
-	bool MyOneTimeFlag( true );
-	Array1D_bool MyEnvrnFlag;
-	Array1D_bool CheckEquipName;
 	bool LocalTurnFansOn( false ); // If True, overrides fan schedule and cycles ZoneHVAC component fans on
 	bool LocalTurnFansOff( false ); // If True, overrides fan schedule and LocalTurnFansOn and
 	// forces ZoneHVAC comp fans off
-	static Array1D_bool MySizeFlag;
+
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this module should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool MyOneTimeFlag( true );
+		bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
+
+		Array1D_bool MySizeFlag;
+		Array1D_bool MyEnvrnFlag;
+		Array1D_bool CheckEquipName;
+	}
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -944,9 +954,7 @@ namespace Fans {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int InletNode;
 		int OutletNode;
-		//unused0909  Integer             :: InNode
 		int OutNode;
-		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
 
 		// FLOW:
@@ -3339,6 +3347,7 @@ namespace Fans {
 		LocalTurnFansOn = false;
 		LocalTurnFansOff = false;
 		MyOneTimeFlag = true;
+		ZoneEquipmentListChecked = false;
 
 		CheckEquipName.deallocate();
 		MySizeFlag.deallocate();

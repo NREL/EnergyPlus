@@ -105,7 +105,7 @@ namespace HeatingCoils {
 	Array1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
 	bool GetCoilsInputFlag( true ); // Flag set to make sure you get input once
 	bool CoilIsSuppHeater( false ); // Flag set to indicate the heating coil is a supplemental heater
-	bool MyOneTimeFlag( true ); // one time flag
+	bool MyOneTimeFlag( true ); // one time initialization flag
 	Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
@@ -3237,7 +3237,7 @@ namespace HeatingCoils {
 		return NumberOfStages;
 
 	}
-
+ 
 	// Clears the global data in HeatingCoils.
 	// Needed for unit tests, should not be normally called.
 	void
