@@ -58,6 +58,7 @@
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
@@ -154,6 +155,7 @@ namespace EnergyPlus {
 		HeatBalanceIntRadExchange::clear_state();
 		HeatBalanceManager::clear_state();
 		HeatBalanceSurfaceManager::clear_state();
+		HeatingCoils::clear_state();
 		HeatPumpWaterToWaterSimple::clear_state();
 		HeatingCoils::clear_state();
 		Humidifiers::clear_state();
@@ -165,6 +167,7 @@ namespace EnergyPlus {
 		MixedAir::clear_state();
 		NodeInputManager::clear_state();
 		OutAirNodeManager::clear_state();
+		OutdoorAirUnit::clear_state();
 		OutputProcessor::clear_state();
 		OutputReportPredefined::clear_state();
 		OutputReportTabularAnnual::clear_state();
