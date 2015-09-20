@@ -148,6 +148,8 @@ namespace PlantLoadProfile {
 	extern Array1D< PlantProfileData > PlantProfile;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimulatePlantProfile(

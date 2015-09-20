@@ -5048,7 +5048,7 @@ namespace OutputReportTabular {
 				if ( lineType == AshStdDes2Line ) lineType = AshStdDes3Line;
 				if ( lineType == AshStdDes1Line ) lineType = AshStdDes2Line;
 				if ( lineType == AshStdLine ) lineType = AshStdDes1Line;
-				if ( has( lineIn, "ASHRAE Standards" ) ) lineType = AshStdLine;
+				if ( has( lineIn, "ASHRAE Standard" ) ) lineType = AshStdLine;
 
 				{ auto const SELECT_CASE_var( lineType );
 				if ( SELECT_CASE_var == StatisticsLine ) { // Statistics for USA_CA_San.Francisco_TMY2
@@ -5395,7 +5395,7 @@ namespace OutputReportTabular {
 					}
 				} else if ( ( SELECT_CASE_var == AshStdLine ) || ( SELECT_CASE_var == AshStdDes1Line ) || ( SELECT_CASE_var == AshStdDes2Line ) || ( SELECT_CASE_var == AshStdDes3Line ) ) {
 					//  - Climate type "1A" (ASHRAE Standards 90.1-2004 and 90.2-2004 Climate Zone)**
-					if ( has( lineIn, "Standards" ) ) {
+					if ( has( lineIn, "Standard" ) ) {
 						ashZone = lineIn.substr( 16, 2 );
 						if ( ashZone[ 1 ] == '"' ) ashZone[ 1 ] = ' ';
 						PreDefTableEntry( pdchWthrVal, "ASHRAE Climate Zone", ashZone );
@@ -5748,9 +5748,9 @@ namespace OutputReportTabular {
 			//annual
 			// PreDefTableEntry( pdchSHGSAnHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacHt * convertJtoGJ, 3 );
 			// PreDefTableEntry( pdchSHGSAnHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacCl * convertJtoGJ, 3 );
-			PreDefTableEntry( pdchSHGSAnHvacHt, Zone( iZone ).Name, ( ZonePreDefRep( iZone ).SHGSAnHvacHt - 
+			PreDefTableEntry( pdchSHGSAnHvacHt, Zone( iZone ).Name, ( ZonePreDefRep( iZone ).SHGSAnHvacHt -
 				ZonePreDefRep( iZone ).SHGSAnHvacATUHt ) * convertJtoGJ, 3 );
-			PreDefTableEntry( pdchSHGSAnHvacCl, Zone( iZone ).Name, ( ZonePreDefRep( iZone ).SHGSAnHvacCl - 
+			PreDefTableEntry( pdchSHGSAnHvacCl, Zone( iZone ).Name, ( ZonePreDefRep( iZone ).SHGSAnHvacCl -
 				ZonePreDefRep( iZone ).SHGSAnHvacATUCl ) * convertJtoGJ, 3 );
 			PreDefTableEntry( pdchSHGSAnHvacATUHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacATUHt * convertJtoGJ, 3 );
 			PreDefTableEntry( pdchSHGSAnHvacATUCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacATUCl * convertJtoGJ, 3 );

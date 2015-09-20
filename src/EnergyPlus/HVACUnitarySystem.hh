@@ -80,6 +80,7 @@ namespace HVACUnitarySystem {
 
 	// Allocatable types
 	extern Array1D_bool CheckEquipName;
+	extern Array1D_bool MyEnvrnFlag;
 	extern Array1D_bool MultiOrVarSpeedHeatCoil;
 	extern Array1D_bool MultiOrVarSpeedCoolCoil;
 
@@ -1305,6 +1306,7 @@ namespace HVACUnitarySystem {
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
 		int const AirLoopNum, // Primary air loop number
 		bool const FirstHVACIteration, // True when first HVAC iteration
+		int & CompOn, // compressor on/off control
 		Optional< Real64 const > OAUCoilOutTemp = _, // the coil inlet temperature of OutdoorAirUnit
 		Optional_bool HXUnitOn = _ // Flag to control HX for HXAssisted Cooling Coil
 	);
@@ -1402,14 +1404,16 @@ namespace HVACUnitarySystem {
 		int const UnitarySysNum, // index to Unitary System
 		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration, // First HVAC iteration flag
-		bool & HXUnitOn // flag to enable heat exchanger heat recovery
+		bool & HXUnitOn, // flag to enable heat exchanger heat recovery
+		int & CompOp // compressor on/off control
 	);
 
 	void
 	ControlHeatingSystem(
 		int const UnitarySysNum, // index to Unitary System
 		int const AirLoopNum, // index to air loop
-		bool const FirstHVACIteration // First HVAC iteration flag
+		bool const FirstHVACIteration, // First HVAC iteration flag
+		int & CompOn // compressor on/off control
 	);
 
 	void
@@ -1440,6 +1444,7 @@ namespace HVACUnitarySystem {
 		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
 		int const AirLoopNum, // Index to air loop
 		bool const FirstHVACIteration, // True when first HVAC iteration
+		int & CompOn, // compressor on/off control
 		bool const SensibleLoad,
 		bool const LatentLoad,
 		Real64 const PartLoadFrac,
@@ -1639,6 +1644,11 @@ namespace HVACUnitarySystem {
 
 	int
 	GetUnitarySystemDXCoolingCoilIndex( std::string const & UnitarySystemName ); // Name of Unitary System object
+
+	// Clears the global data in HVACUnitarySystem.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 } // HVACUnitarySystem
 
