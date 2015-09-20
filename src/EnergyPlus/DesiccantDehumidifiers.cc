@@ -2282,7 +2282,7 @@ namespace DesiccantDehumidifiers {
 						CalcNonDXHeatingCoils( DesicDehumNum, FirstHVACIteration, QRegen_OASysFanAdjust );
 					}
 
-					SimHeatRecovery( DesicDehum( DesicDehumNum ).HXName, FirstHVACIteration, DesicDehum( DesicDehumNum ).CompIndex, ContFanCycCoil, 1.0, true, CompanionCoilIndexNum, DesicDehum( DesicDehumNum ).RegenInletIsOutsideAirNode );
+					SimHeatRecovery( DesicDehum( DesicDehumNum ).HXName, FirstHVACIteration, DesicDehum( DesicDehumNum ).CompIndex, ContFanCycCoil, 1.0, 1.0, true, CompanionCoilIndexNum, DesicDehum( DesicDehumNum ).RegenInletIsOutsideAirNode );
 
 					//       calculate desiccant part-load ratio
 					if ( Node( DesicDehum( DesicDehumNum ).ProcAirInNode ).HumRat != Node( DesicDehum( DesicDehumNum ).ProcAirOutNode ).HumRat ) {
