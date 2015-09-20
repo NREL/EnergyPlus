@@ -556,6 +556,8 @@ namespace MixedAir {
 		OAHeatingCoil = false;
 		OACoolingCoil = false;
 		OAHX = false;
+		Real64 AirloopPLR;
+		int FanOpMode;
 
 		{ auto const SELECT_CASE_var( CompTypeNum );
 
@@ -646,7 +648,17 @@ namespace MixedAir {
 		} else if ( SELECT_CASE_var == HeatXchngr ) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent',
 			// 'HeatExchanger:Desiccant:BalancedFlow'
 			if ( Sim ) {
-				SimHeatRecovery( CompName, FirstHVACIteration, CompIndex, ContFanCycCoil, _, _, _, _, AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass, AirLoopControlInfo( AirLoopNum ).HighHumCtrlActive );
+				if( DataAirLoop::LoopOnOffFanPartLoadRatio > 0.0 ) {
+					AirloopPLR = DataAirLoop::LoopOnOffFanPartLoadRatio;
+				} else {
+					AirloopPLR = 1.0;
+				}
+				if( AirLoopControlInfo( AirLoopNum ).FanOpMode == DataHVACGlobals::CycFanCycCoil ) {
+					FanOpMode = DataHVACGlobals::CycFanCycCoil;
+				} else {
+					FanOpMode = DataHVACGlobals::ContFanCycCoil;
+				}
+				SimHeatRecovery( CompName, FirstHVACIteration, CompIndex, FanOpMode, AirloopPLR, _, _, _, AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass, AirLoopControlInfo( AirLoopNum ).HighHumCtrlActive );
 			}
 			OAHX = true;
 

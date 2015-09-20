@@ -251,7 +251,7 @@ namespace HeatRecovery {
 
 		} else if ( SELECT_CASE_var == HX_AIRTOAIR_GENERIC ) {
 
-			CalcAirToAirGenericHeatExch( HeatExchNum, HXUnitOn, FirstHVACIteration, EconomizerFlag, HighHumCtrlFlag );
+			CalcAirToAirGenericHeatExch( HeatExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag, HXPartLoadRatio );
 
 		} else if ( SELECT_CASE_var == HX_DESICCANT_BALANCED ) {
 
@@ -1741,8 +1741,10 @@ namespace HeatRecovery {
 		int const ExNum, // number of the current heat exchanger being simulated
 		bool const HXUnitOn, // flag to simulate heat exchanger heat recovery
 		bool const FirstHVACIteration, // first HVAC iteration flag
+		int const FanOpMode, // Supply air fan operating mode (1=cycling, 2=constant)
 		Optional_bool_const EconomizerFlag, // economizer flag pass by air loop or OA sys
-		Optional_bool_const HighHumCtrlFlag // high humidity control flag passed by airloop or OA sys
+		Optional_bool_const HighHumCtrlFlag, // high humidity control flag passed by airloop or OA sys
+		Optional < Real64 const > HXPartLoadRatio // 
 	)
 	{
 
@@ -1773,7 +1775,7 @@ namespace HeatRecovery {
 		//   School Advanced Ventilation Engineering Software http://www.epa.gov/iaq/schooldesign/saves.html
 
 		// USE STATEMENTS:
-		// na
+		using DataHVACGlobals::CycFanCycCoil;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1823,6 +1825,7 @@ namespace HeatRecovery {
 		Real64 TotHeatRecRate; // total heat recovery rate to supply air (heating +, cooling -)
 		bool EconomizerActiveFlag; // local representing the economizer status when PRESENT
 		bool HighHumCtrlActiveFlag; // local representing high humidity control when PRESENT
+		Real64 AirSidePLR;
 
 		// Initialize local variables
 		UnitOn = true;
@@ -1880,6 +1883,25 @@ namespace HeatRecovery {
 
 		if ( UnitOn ) {
 			// Unit is on.
+			if( present( HXPartLoadRatio ) && FanOpMode == DataHVACGlobals::CycFanCycCoil ) {
+				if( HXPartLoadRatio > 0 ) {
+					AirSidePLR = HXPartLoadRatio;
+				} else {
+					AirSidePLR = 1.0;
+				}
+			} else {
+				AirSidePLR = 1.0;
+			}
+
+			if( FanOpMode == DataHVACGlobals::CycFanCycCoil ) {
+				ExchCond( ExNum ).SupInMassFlow /= AirSidePLR;
+				ExchCond( ExNum ).SupOutMassFlow /= AirSidePLR;
+				ExchCond( ExNum ).SecInMassFlow /= AirSidePLR;
+				ExchCond( ExNum ).SecOutMassFlow /= AirSidePLR;
+				ExchCond( ExNum ).SupBypassMassFlow /= AirSidePLR;
+				ExchCond( ExNum ).SecBypassMassFlow /= AirSidePLR;
+			}
+
 			// In the future, use actual node pressures in the following air density calls
 			RhoStd = PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
 			HXSupAirVolFlowRate = ExchCond( ExNum ).SupOutMassFlow / RhoStd; // volume flow using standard density
@@ -2068,7 +2090,23 @@ namespace HeatRecovery {
 
 			} //ENDIF for "IF(ExchCond(ExNum)%ControlToTemperatureSetPoint .AND... THEN, ELSE"
 
-			if ( ( ExchCond( ExNum ).FrostControlType == "MINIMUMEXHAUSTTEMPERATURE" && ExchCond( ExNum ).SecOutTemp < ExchCond( ExNum ).ThresholdTemperature ) || ( ExchCond( ExNum ).FrostControlType == "EXHAUSTAIRRECIRCULATION" && ExchCond( ExNum ).SupInTemp <= ExchCond( ExNum ).ThresholdTemperature ) || ( ExchCond( ExNum ).FrostControlType == "EXHAUSTONLY" && ExchCond( ExNum ).SupInTemp <= ExchCond( ExNum ).ThresholdTemperature ) ) {
+			if( FanOpMode == DataHVACGlobals::CycFanCycCoil ) {
+				ExchCond( ExNum ).SupInMassFlow *= AirSidePLR;
+				ExchCond( ExNum ).SupOutMassFlow *= AirSidePLR;
+				ExchCond( ExNum ).SecInMassFlow *= AirSidePLR;
+				ExchCond( ExNum ).SecOutMassFlow *= AirSidePLR;
+				ExchCond( ExNum ).SupBypassMassFlow *= AirSidePLR;
+				ExchCond( ExNum ).SecBypassMassFlow *= AirSidePLR;
+			} else if( FanOpMode == DataHVACGlobals::ContFanCycCoil ) {
+				ExchCond( ExNum ).SupOutTemp = ExchCond( ExNum ).SupOutTemp * AirSidePLR + ExchCond( ExNum ).SupInTemp * ( 1.0 - AirSidePLR );
+				ExchCond( ExNum ).SupOutHumRat = ExchCond( ExNum ).SupOutHumRat * AirSidePLR + ExchCond( ExNum ).SupInHumRat * ( 1.0 - AirSidePLR );
+				ExchCond( ExNum ).SupOutEnth = ExchCond( ExNum ).SupOutEnth * AirSidePLR + ExchCond( ExNum ).SupOutEnth * ( 1.0 - AirSidePLR );
+				ExchCond( ExNum ).SecOutTemp = ExchCond( ExNum ).SecOutTemp * AirSidePLR + ExchCond( ExNum ).SecInTemp * ( 1.0 - AirSidePLR );
+				ExchCond( ExNum ).SecOutHumRat = ExchCond( ExNum ).SecOutHumRat * AirSidePLR + ExchCond( ExNum ).SecInHumRat * ( 1.0 - AirSidePLR );
+				ExchCond( ExNum ).SecOutEnth = ExchCond( ExNum ).SecOutEnth * AirSidePLR + ExchCond( ExNum ).SecOutEnth * ( 1.0 - AirSidePLR );
+			}
+
+			if( ( ExchCond( ExNum ).FrostControlType == "MINIMUMEXHAUSTTEMPERATURE" && ExchCond( ExNum ).SecOutTemp < ExchCond( ExNum ).ThresholdTemperature ) || ( ExchCond( ExNum ).FrostControlType == "EXHAUSTAIRRECIRCULATION" && ExchCond( ExNum ).SupInTemp <= ExchCond( ExNum ).ThresholdTemperature ) || ( ExchCond( ExNum ).FrostControlType == "EXHAUSTONLY" && ExchCond( ExNum ).SupInTemp <= ExchCond( ExNum ).ThresholdTemperature ) ) {
 				FrostControl( ExNum );
 				FrostControlFlag = true;
 			}
