@@ -197,10 +197,8 @@ namespace MoistureBalanceEMPDManager {
 			material.EMPDmuCoating = MaterialProps( 9 );
 
 			if ( material.EMPDDeepDepth <= material.EMPDSurfaceDepth && material.EMPDDeepDepth != 0.0 ) {
-				ShowSevereError( cCurrentModuleObject + ": material=\"" + material.Name + "\"");
-				ShowContinueError( "Deep-layer penetration depth must be zero or greater than the surface-layer penetration depth." );
-				ShowContinueError( "Setting deep-layer depth to zero and continuing." );
-				material.EMPDDeepDepth = 0.0;
+				ShowWarningError( cCurrentModuleObject + ": material=\"" + material.Name + "\"");
+				ShowContinueError( "Deep-layer penetration depth should be zero or greater than the surface-layer penetration depth." );
 			}
 		}
 

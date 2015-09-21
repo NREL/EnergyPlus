@@ -17,7 +17,7 @@
 
 using namespace EnergyPlus;
 
-TEST_F( HVACFixture, CheckEMPD )
+TEST_F( HVACFixture, CheckEMPDCalc )
 {
 	std::string const idf_objects = delimited_string({
 		"Version, 8.3;",
@@ -39,9 +39,9 @@ TEST_F( HVACFixture, CheckEMPD )
 		"0,                       !- Moisture Equation Coefficient c {dimensionless} (MoistCCoeff)",
 		"1,                       !- Moisture Equation Coefficient d {dimensionless} (MoistDCoeff)",
 		"0.006701,                    !- Surface-layer penetrtion depth {m} (dEMPD)",
-		"0.0,                    !- Deep-layer penetration depth {m} (dEPMDdeep)",
+		"0.013402,                    !- Deep-layer penetration depth {m} (dEPMDdeep)",
 		"0,                       !- Coating layer permability {m} (CoatingThickness)",
-		"1;                       !- Coating layer water vapor diffusion resistance factor {dimensionless} (muCoating)	});"
+		"1;                       !- Coating layer water vapor diffusion resistance factor {dimensionless} (muCoating)"
 	});
 
 	ASSERT_FALSE( process_idf(idf_objects) );
@@ -94,11 +94,11 @@ TEST_F( HVACFixture, CheckEMPD )
 
 	auto const & report_vars = MoistureBalanceEMPDManager::EMPDREportVars(1);
 	EXPECT_DOUBLE_EQ(6.3445188238394508, Tsat);
-	EXPECT_DOUBLE_EQ(0.0072030790357129866, DataMoistureBalanceEMPD::RVSurface(1));
-	EXPECT_DOUBLE_EQ(0.0, report_vars.mass_flux_deep);
+	EXPECT_DOUBLE_EQ(0.0071762141417078054, DataMoistureBalanceEMPD::RVSurface(1));
+	EXPECT_DOUBLE_EQ(0.00000076900234067835945, report_vars.mass_flux_deep);
 	EXPECT_DOUBLE_EQ(-0.00000019077843350248091, report_vars.mass_flux_zone);
-	EXPECT_DOUBLE_EQ(0.0070455149199232948, DataMoistureBalanceEMPD::RVSurfLayer(1));
-	EXPECT_DOUBLE_EQ(0.0051334905162138695, DataMoistureBalanceEMPD::RVDeepLayer(1));
+	EXPECT_DOUBLE_EQ(0.0070186500259181136, DataMoistureBalanceEMPD::RVSurfLayer(1));
+	EXPECT_DOUBLE_EQ(0.0051469229632164605, DataMoistureBalanceEMPD::RVDeepLayer(1));
 	EXPECT_DOUBLE_EQ(-0.47694608375620229, DataMoistureBalanceEMPD::HeatFluxLatent(1));
 
 	// Clean up
