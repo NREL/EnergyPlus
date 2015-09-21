@@ -6,7 +6,7 @@
 // EnergyPlus Headers
 #include "Fixtures/HVACFixture.hh"
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
-#include <EnergyPlus/HeatBalancemanager.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/InputProcessor.hh>
