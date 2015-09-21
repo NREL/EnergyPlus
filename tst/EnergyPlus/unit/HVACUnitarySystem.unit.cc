@@ -27,14 +27,11 @@
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
-
-#include <EnergyPlus/VariableSpeedCoils.hh>
-#include <SizingManager.hh>
-#include <SimulationManager.hh>
-#include <OutputReportPredefined.hh>
 
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::DataZoneEnergyDemands;
@@ -2523,7 +2520,6 @@ TEST_F( HVACFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 	ASSERT_EQ( UnitarySystem( 1 ).DesignHeatingCapacity * 0.00005, UnitarySystem( 1 ).MaxHeatAirVolFlow );
 	ASSERT_EQ( UnitarySystem( 1 ).DesignCoolingCapacity * 0.00005, UnitarySystem( 1 ).MaxCoolAirVolFlow );
 	ASSERT_EQ( UnitarySystem( 1 ).DesignCoolingCapacity, DXCoil( UnitarySystem( 1 ).CoolingCoilIndex ).MSRatedTotCap( UnitarySystem( 1 ).NumOfSpeedCooling ) );
-	ASSERT_EQ( UnitarySystem( 1 ).DesignHeatingCapacity, VarSpeedCoil( UnitarySystem( 1 ).HeatingCoilIndex ).RatedCapHeat );
 
 }
 
