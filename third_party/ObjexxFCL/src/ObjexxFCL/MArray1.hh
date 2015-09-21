@@ -1113,17 +1113,6 @@ public: // Inspector
 
 public: // Modifier
 
-	// Assign Default Value to all Elements
-	inline
-	MArray1 &
-	to_default()
-	{
-		for ( int i = 1, e = u(); i <= e; ++i ) {
-			operator ()( i ) = Traits::initial_value();
-		}
-		return *this;
-	}
-
 	// Normalize to Unit Length
 	inline
 	MArray1 &

@@ -2554,7 +2554,7 @@ This is a choice field of Continuous or Intermittent. A variable speed pump is d
 
 #### Field: Pump Flow Rate Schedule Name
 
-The schedule values modify the value for Rated Flow Rate of the pump on a time basis. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field: Pump Curve Name
 
@@ -2738,7 +2738,7 @@ This is a choice field of Continuous or Intermittent. The operation of a constan
 
 #### Field: Pump Flow Rate Schedule Name
 
-The schedule values modify the Rated Flow Rate of the pump on a time basis. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field:Pump Curve Name
 
@@ -2917,7 +2917,7 @@ This numeric field contains the fourth coefficient in the part load ratio curve.
 
 #### Field: Pump Flow Rate Schedule Name
 
-The schedule values modify the Rated Flow Rate of the pump on a time basis the default is that the pump is ON and runs according to its other operational requirements specified above. The schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field: Zone Name
 
@@ -3078,7 +3078,7 @@ This is a choice field of Continuous or Intermittent. The operation of a constan
 
 #### Field: Pump Flow Rate Schedule Name
 
-The schedule values modify the Total Rated Flow Rate of the pump on a time basis. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field: Zone Name
 
@@ -3253,7 +3253,7 @@ This is a choice field of Continuous or Intermittent. A variable speed pump bank
 
 #### Field: Pump Flow Rate Schedule Name
 
-Modifies the Rated Volumetric Flow Rate of the pump on a time basis. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field: Zone Name
 
@@ -5589,22 +5589,22 @@ Following is an example IDF use of the object:
 
 ```idf
 Coil:Cooling:DX:TwoStageWithHumidityControlMode,
-   DOAS Cooling Coil,                                   !- Name
-   HVACTemplate-Always 1,                           !- Availability Schedule Name
-   DOAS Supply Fan Outlet,                         !- Air Inlet Node Name
-   DOAS Cooling Coil Outlet,                     !- Air Outlet Node Name
-   ,                                                                     !- Crankcase Heater Capacity
-   ,                                                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater
-   2,                                                                   !- Number of Capacity Stages
-   1,                                                                   !- Number of Enhanced Dehumidification Modes
+   DOAS Cooling Coil,                          !- Name
+   HVACTemplate-Always 1,                      !- Availability Schedule Name
+   DOAS Supply Fan Outlet,                     !- Air Inlet Node Name
+   DOAS Cooling Coil Outlet,                   !- Air Outlet Node Name
+   ,                                           !- Crankcase Heater Capacity
+   ,                                           !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater
+   2,                                          !- Number of Capacity Stages
+   1,                                          !- Number of Enhanced Dehumidification Modes
    CoilPerformance:DX:Cooling,                 !- Normal Mode Stage 1 Coil Performance Object Type
-   DOAS Standard Perf 1,                             !- Normal Mode Stage 1 Coil Performance Name
+   DOAS Standard Perf 1,                       !- Normal Mode Stage 1 Coil Performance Name
    CoilPerformance:DX:Cooling,                 !- Normal Mode Stage 1+2 Coil Performance Object Type
-   DOAS Standard Perf 1+2,                         !- Normal Mode Stage 1+2 Coil Performance Name
+   DOAS Standard Perf 1+2,                     !- Normal Mode Stage 1+2 Coil Performance Name
    CoilPerformance:DX:Cooling,                 !- Dehumidification Mode 1 Stage 1 Coil Performance Object Type
-   DOAS Dehumid Perf 1,                               !- Dehumidification Mode 1 Stage 1 Coil Performance Name
+   DOAS Dehumid Perf 1,                        !- Dehumidification Mode 1 Stage 1 Coil Performance Name
    CoilPerformance:DX:Cooling,                 !- Dehumidification Mode 1 Stage 1+2 Coil Performance Object Type
-   DOAS Dehumid Perf 1+2;                           !- Dehumidification Mode 1 Stage 1+2 Coil Performance Name
+   DOAS Dehumid Perf 1+2;                      !- Dehumidification Mode 1 Stage 1+2 Coil Performance Name
 ```
 
 ### Coil:Cooling:DX:MultiSpeed
@@ -5639,7 +5639,7 @@ This optional alpha field specifies the outdoor air node name used to define the
 
 #### Field: Condenser Type
 
-#### The type of condenser used by the multispeed DX cooling coil. Valid choices for this input field areAirCooled orEvaporativelyCooled. The default for this field isAirCooled.
+The type of condenser used by the multispeed DX cooling coil. Valid choices for this input field are AirCooled or EvaporativelyCooled. The default for this field is AirCooled.
 
 #### Field: Supply Water Storage Tank Name
 
@@ -5767,7 +5767,7 @@ The fraction of energy input to the cooling coil that is available as recoverabl
 
 #### Field: Speed &lt;x&gt; Waste Heat Function of Temperature Curve Name
 
-The name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of the waste heat recovery as a function of outdoor dry-bulb temperature and the entering coil dry-bulb temperature at Speed &lt;x&gt;. The output of this curve is multiplied by the rated waste heat fraction at specific temperature operating conditions (i.e., at temperatures different from the rating point). The curve is normalized to a value of 1.0 at the rating point. When the fuel type is electricity, this field can remain blank since it is ignored by the program in this instance.
+The name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of the waste heat recovery as a function of outdoor dry-bulb temperature and the entering coil dry-bulb temperature at Speed &lt;x&gt;. The output of this curve is multiplied by the rated waste heat fraction at specific temperature operating conditions (i.e., at temperatures different from the rating point). The curve is normalized to a value of 1.0 at the rating point. When the fuel type is electricity, this field can remain blank since it is ignored by the program in this instance. When the fuel type is not electricity and the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed does not require waste heat calculations, this field is ignored. If the field is blank, a warning will be issued and simulation continues. When the fuel type is not electricity and the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed requires waste heat calculations, if this field is left blank, the program assumes a constant value of 1 to make simulation continue and a warning will be issued.   
 
 #### Field: Speed &lt;x&gt; Evaporative Condenser Effectiveness
 
@@ -7203,7 +7203,7 @@ The fraction of heat input to heating that is available as recoverable waste hea
 
 #### Field: Speed &lt;x&gt; Waste Heat Function of Temperature Curve Name
 
-The name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the waste heat recovery as a function of outdoor dry-bulb temperature and the entering coil dry-bulb temperature for Speed &lt;x&gt;. The output of this curve is multiplied by the rated recoverable waste heat at specific temperature operating conditions (i.e., at temperatures different from the rating point). The curve is normalized to a value of 1.0 at the rating point. When the fuel type is electricity, the field is either left blank or ignored by the program.
+The name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the waste heat recovery as a function of outdoor dry-bulb temperature and the entering coil dry-bulb temperature for Speed &lt;x&gt;. The output of this curve is multiplied by the rated recoverable waste heat at specific temperature operating conditions (i.e., at temperatures different from the rating point). The curve is normalized to a value of 1.0 at the rating point. When the fuel type is electricity, the field is either left blank or ignored by the program. When the fuel type is not electricity and the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed does not require waste heat calculations, this field is ignored. If the field is blank, a warning will be issued and simulation continues. When the fuel type is not electricity and the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed requires waste heat calculations, if this field is left blank, the program assumes a constant value of 1 to make simulation continue and a warning will be issued. 
 
 #### Field: Zone Name for Evaporator Placement
 

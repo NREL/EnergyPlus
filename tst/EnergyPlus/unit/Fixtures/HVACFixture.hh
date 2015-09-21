@@ -20,6 +20,7 @@
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
 namespace EnergyPlus {
