@@ -79,9 +79,32 @@ namespace MoistureBalanceEMPDManager {
 
 	// Data
 	// MODULE VARIABLE and Function DECLARATIONs
-	Array1D< Real64 > RhoVapEMPD; // Inside Surface Vapor Density Reporting variable
-	Array1D< Real64 > WSurfEMPD; // Inside Surface Humidity Ratio Reporting variable
-	Array1D< Real64 > RHEMPD; // Inside Surface Relative Humidity Reporting variable
+	struct EMPDReportVarsData {
+		Real64 rv_surface;
+		Real64 RH_surface_layer;
+		Real64 RH_deep_layer;
+		Real64 w_surface_layer;
+		Real64 w_deep_layer;
+		Real64 mass_flux_zone;
+		Real64 mass_flux_deep;
+		Real64 u_surface_layer;
+		Real64 u_deep_layer;
+
+		// Default constructor
+		EMPDReportVarsData() :
+			rv_surface( 0.015 ),
+			RH_surface_layer( 0.0 ),
+			RH_deep_layer( 0.0 ),
+			w_surface_layer( 0.015 ),
+			w_deep_layer( 0.015 ),
+			mass_flux_zone( 0.0 ),
+			mass_flux_deep( 0.0 ),
+			u_surface_layer( 0.0 ),
+			u_deep_layer( 0.0 )
+		{}
+	};
+
+	Array1D< EMPDReportVarsData > EMPDREportVars; // Array of structs that hold the empd report vars data, one for each surface.
 
 	// SUBROUTINE SPECIFICATION FOR MODULE MoistureBalanceEMPDManager
 
@@ -297,7 +320,6 @@ namespace MoistureBalanceEMPDManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
-		int Loop;
 		int SurfNum;
 		static bool InitEnvrnFlag( true );
 
@@ -305,9 +327,7 @@ namespace MoistureBalanceEMPDManager {
 			RVSurfaceOld.allocate( TotSurfaces );
 			RVSurface.allocate( TotSurfaces );
 			HeatFluxLatent.allocate( TotSurfaces );
-			RhoVapEMPD.allocate( TotSurfaces );
-			WSurfEMPD.allocate( TotSurfaces );
-			RHEMPD.allocate( TotSurfaces );
+			EMPDREportVars.allocate( TotSurfaces );
 			RVSurfLayer.allocate( TotSurfaces );
 			RVSurfLayerOld.allocate( TotSurfaces );
 			RVDeepLayer.allocate( TotSurfaces );
@@ -350,19 +370,23 @@ namespace MoistureBalanceEMPDManager {
 		}
 		if ( ! InitEnvrnFlag ) return;
 		//Initialize the report variable
-		RhoVapEMPD = 0.015;
-		WSurfEMPD = 0.015;
-		RHEMPD = 0.0;
-		HeatFluxLatent = 0.0;
 
 		GetMoistureBalanceEMPDInput();
 
-		for ( Loop = 1; Loop <= TotSurfaces; ++Loop ) {
-			if ( ! Surface( Loop ).HeatTransSurf ) continue;
-			if ( Surface( Loop ).Class == SurfaceClass_Window ) continue;
-			SetupOutputVariable( "EMPD Surface Inside Face Water Vapor Density [kg/m3]", RhoVapEMPD( Loop ), "Zone", "State", Surface( Loop ).Name );
-			SetupOutputVariable( "EMPD Surface Inside Face Humidity Ratio [kgWater/kgDryAir]", WSurfEMPD( Loop ), "Zone", "State", Surface( Loop ).Name );
-			SetupOutputVariable( "EMPD Surface Inside Face Relative Humidity [%]", RHEMPD( Loop ), "Zone", "State", Surface( Loop ).Name );
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
+			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) continue;
+			EMPDReportVarsData & rvd = EMPDREportVars( SurfNum );
+			const std::string surf_name = Surface( SurfNum ).Name;
+			SetupOutputVariable( "EMPD Surface Inside Face Water Vapor Density [kg/m^3]", rvd.rv_surface, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Layer Moisture Content [kg/m^3]", rvd.u_surface_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Moisture Content [kg/m^3]", rvd.u_deep_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Layer Equivalent Relative Humidity [%]", rvd.RH_surface_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Equivalent Relative Humidity [%]", rvd.RH_deep_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Layer Equivalent Humidity Ratio [kgWater/kgDryAir]", rvd.w_surface_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Equivalent Humidity Ratio [kgWater/kgDryAir]", rvd.w_deep_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Moisture Flux to Zone [kg/m^2-s]", rvd.mass_flux_zone, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Moisture Flux [kg/m^2-s]", rvd.mass_flux_deep, "Zone", "State", surf_name );
 		}
 
 		if ( InitEnvrnFlag ) InitEnvrnFlag = false;
@@ -548,14 +572,21 @@ namespace MoistureBalanceEMPDManager {
 		rv_surface = rv_surf_layer - mass_flux_zone * RSurfaceLayer;
 
 		// Calculate heat flux from latent-sensible conversion due to moisture adsorption [W/m^2]
-		heat_flux_latent = mass_flux_zone*Lam;
+		heat_flux_latent = mass_flux_zone * Lam;
 
-		// Put results in the single precision reporting variable
+		// Put results in the reporting variables
 		// Will add RH and W of deep layer as outputs
 		// Need to also add moisture content (kg/kg) of surface and deep layers, and moisture flow from each surface (kg/s), per Rongpeng's suggestion
-		RhoVapEMPD( SurfNum ) = rv_surf_layer;
-		RHEMPD( SurfNum ) = RH_surf_layer * 100.0;
-		WSurfEMPD( SurfNum ) = 0.622 * PV_surf_layer / (OutBaroPress - PV_surf_layer);
+		EMPDReportVarsData & rvd = EMPDREportVars( SurfNum );
+		rvd.rv_surface = rv_surface;
+		rvd.RH_surface_layer = RH_surf_layer * 100.0;
+		rvd.RH_deep_layer = RH_deep_layer * 100.0;
+		rvd.w_surface_layer = 0.622 * PV_surf_layer / ( OutBaroPress - PV_surf_layer );
+		rvd.w_deep_layer = 0.622 * PV_deep_layer / ( OutBaroPress - PV_deep_layer );
+		rvd.mass_flux_zone = mass_flux_zone;
+		rvd.mass_flux_deep = mass_flux_deep_layer;
+		rvd.u_surface_layer = material.MoistACoeff * pow( RH_surf_layer, material.MoistBCoeff ) + material.MoistCCoeff * pow( RH_surf_layer, material.MoistDCoeff );
+		rvd.u_deep_layer = material.MoistACoeff * pow( RH_deep_layer, material.MoistBCoeff ) + material.MoistCCoeff * pow( RH_deep_layer, material.MoistDCoeff );
 
 	}
 

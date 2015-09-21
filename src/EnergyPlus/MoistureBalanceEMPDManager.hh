@@ -13,9 +13,6 @@ namespace MoistureBalanceEMPDManager {
 
 	// Data
 	// MODULE VARIABLE and Function DECLARATIONs
-	extern Array1D< Real64 > RhoVapEMPD; // Inside Surface Vapor Density Reporting variable
-	extern Array1D< Real64 > WSurfEMPD; // Inside Surface Humidity Ratio Reporting variable
-	extern Array1D< Real64 > RHEMPD; // Inside Surface Relative Humidity Reporting variable
 
 	// SUBROUTINE SPECIFICATION FOR MODULE MoistureBalanceEMPDManager
 
