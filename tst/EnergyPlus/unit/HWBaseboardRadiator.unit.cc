@@ -60,10 +60,10 @@ TEST(HWBaseboardRadiator, CalcHWBaseboard)
 	
 	CalcHWBaseboard( BBNum, LoadMet );
 
-	EXPECT_DOUBLE_EQ( 14746.226690452937, HWBaseboard( 1 ).TotPower);
-	EXPECT_DOUBLE_EQ( 50.349854486072232, HWBaseboard( 1 ).AirOutletTemp );
-	EXPECT_DOUBLE_EQ( 73.224991258180438, HWBaseboard( 1 ).WaterOutletTemp );
-	EXPECT_DOUBLE_EQ( 0.5, HWBaseboard( 1 ).AirMassFlowRate );
+	EXPECT_NEAR( 14746.226690452937, HWBaseboard( 1 ).TotPower, 0.000001);
+	EXPECT_NEAR( 50.349854486072232, HWBaseboard( 1 ).AirOutletTemp, 0.000001 );
+	EXPECT_NEAR( 73.224991258180438, HWBaseboard( 1 ).WaterOutletTemp, 0.000001 );
+	EXPECT_NEAR( 0.5, HWBaseboard( 1 ).AirMassFlowRate, 0.000001 );
 	
 	Node.deallocate();
 	HWBaseboard.deallocate();
@@ -73,5 +73,3 @@ TEST(HWBaseboardRadiator, CalcHWBaseboard)
 	QBBRadSource.deallocate();
 	
 }
-  
-  
