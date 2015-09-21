@@ -2633,7 +2633,7 @@
     units_gr_lf Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
     AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
 
-  SetpointManager:SingleZone:Reheat,
+  SetpointManager:SingleZone:Cooling,
     SupAirTemp Mngrunits_gr_lf,  !- Name
     Temperature,             !- Control Variable
     10.0,                    !- Minimum Supply Air Temperature {C}
@@ -3163,7 +3163,7 @@
     units_gr_rt Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
     AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
 
-  SetpointManager:SingleZone:Reheat,
+  SetpointManager:SingleZone:Cooling,
     SupAirTemp Mngrunits_gr_rt,  !- Name
     Temperature,             !- Control Variable
     10.0,                    !- Minimum Supply Air Temperature {C}
@@ -3519,7 +3519,7 @@
     unit_s_g Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
     AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
 
-  SetpointManager:SingleZone:Reheat,
+  SetpointManager:SingleZone:Cooling,
     SupAirTemp Mngrunit_s_g, !- Name
     Temperature,             !- Control Variable
     10.0,                    !- Minimum Supply Air Temperature {C}
@@ -3875,7 +3875,7 @@
     unit_n_g Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
     AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
 
-  SetpointManager:SingleZone:Reheat,
+  SetpointManager:SingleZone:Cooling,
     SupAirTemp Mngrunit_n_g, !- Name
     Temperature,             !- Control Variable
     10.0,                    !- Minimum Supply Air Temperature {C}
