@@ -4910,6 +4910,24 @@ namespace SimAirServingZones {
 						SysSizing( CurOverallSimDay, AirLoopNum ).DesHeatVolFlow = SysSizing( CurOverallSimDay, AirLoopNum ).CoinHeatMassFlow / StdRhoAir;
 						VotClgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).SysUncOA;
 						VotHtgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).SysUncOA;
+						for( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
+							if( FinalZoneSizing( ZonesCooledNum ).ZoneADEffCooling < EvzMinBySysCool( AirLoopNum ) ) EvzMinBySysCool( AirLoopNum ) = FinalZoneSizing( ZonesCooledNum ).ZoneADEffCooling;
+							if( FinalZoneSizing( ZonesCooledNum ).ZoneADEffHeating < EvzMinBySysHeat( AirLoopNum ) ) EvzMinBySysHeat( AirLoopNum ) = FinalZoneSizing( ZonesCooledNum ).ZoneADEffHeating;
+						}
+						for( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
+							if( FinalZoneSizing( ZonesHeatedNum ).ZoneADEffCooling < EvzMinBySysCool( AirLoopNum ) ) EvzMinBySysCool( AirLoopNum ) = FinalZoneSizing( ZonesHeatedNum ).ZoneADEffCooling;
+							if( FinalZoneSizing( ZonesHeatedNum ).ZoneADEffHeating < EvzMinBySysHeat( AirLoopNum ) ) EvzMinBySysHeat( AirLoopNum ) = FinalZoneSizing( ZonesHeatedNum ).ZoneADEffHeating;
+						}
+						if( SysSizing( CurOverallSimDay, AirLoopNum ).DesCoolVolFlow > 0 ) {
+							XsBySysCool( AirLoopNum ) = min( 1.0, FinalSysSizing( AirLoopNum ).SysUncOA / SysSizing( CurOverallSimDay, AirLoopNum ).DesCoolVolFlow );
+						} else {
+							XsBySysCool( AirLoopNum ) = 0.0;
+						}
+						if( SysSizing( CurOverallSimDay, AirLoopNum ).DesHeatVolFlow > 0 ) {
+							XsBySysHeat( AirLoopNum ) = min( 1.0, FinalSysSizing( AirLoopNum ).SysUncOA / SysSizing( CurOverallSimDay, AirLoopNum ).DesHeatVolFlow );
+						} else {
+							XsBySysHeat( AirLoopNum ) = 0.0;
+						}
 					} else if( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) { // Ventilation Rate Procedure
 						// cooling
 						SysSizing( CurOverallSimDay, AirLoopNum ).DesCoolVolFlow = SysSizing( CurOverallSimDay, AirLoopNum ).CoinCoolMassFlow / StdRhoAir;
@@ -5130,6 +5148,24 @@ namespace SimAirServingZones {
 						SysSizing( CurOverallSimDay, AirLoopNum ).DesHeatVolFlow = SysSizing( CurOverallSimDay, AirLoopNum ).NonCoinHeatMassFlow / StdRhoAir;
 						VotClgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).SysUncOA;
 						VotHtgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).SysUncOA;
+						for( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
+							if( FinalZoneSizing( ZonesCooledNum ).ZoneADEffCooling < EvzMinBySysCool( AirLoopNum ) ) EvzMinBySysCool( AirLoopNum ) = FinalZoneSizing( ZonesCooledNum ).ZoneADEffCooling;
+							if( FinalZoneSizing( ZonesCooledNum ).ZoneADEffHeating < EvzMinBySysHeat( AirLoopNum ) ) EvzMinBySysHeat( AirLoopNum ) = FinalZoneSizing( ZonesCooledNum ).ZoneADEffHeating;
+						}
+						for( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
+							if( FinalZoneSizing( ZonesHeatedNum ).ZoneADEffCooling < EvzMinBySysCool( AirLoopNum ) ) EvzMinBySysCool( AirLoopNum ) = FinalZoneSizing( ZonesHeatedNum ).ZoneADEffCooling;
+							if( FinalZoneSizing( ZonesHeatedNum ).ZoneADEffHeating < EvzMinBySysHeat( AirLoopNum ) ) EvzMinBySysHeat( AirLoopNum ) = FinalZoneSizing( ZonesHeatedNum ).ZoneADEffHeating;
+						}
+						if( SysSizing( CurOverallSimDay, AirLoopNum ).DesCoolVolFlow > 0 ) {
+							XsBySysCool( AirLoopNum ) = min( 1.0, FinalSysSizing( AirLoopNum ).SysUncOA / SysSizing( CurOverallSimDay, AirLoopNum ).DesCoolVolFlow );
+						} else {
+							XsBySysCool( AirLoopNum ) = 0.0;
+						}
+						if( SysSizing( CurOverallSimDay, AirLoopNum ).DesHeatVolFlow > 0 ) {
+							XsBySysHeat( AirLoopNum ) = min( 1.0, FinalSysSizing( AirLoopNum ).SysUncOA / SysSizing( CurOverallSimDay, AirLoopNum ).DesHeatVolFlow );
+						} else {
+							XsBySysHeat( AirLoopNum ) = 0.0;
+						}
 					} else if( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) { // Ventilation Rate Procedure
 						// cooling
 						SysSizing( CurOverallSimDay, AirLoopNum ).DesCoolVolFlow = SysSizing( CurOverallSimDay, AirLoopNum ).NonCoinCoolMassFlow / StdRhoAir;
@@ -6026,14 +6062,14 @@ namespace SimAirServingZones {
 					PreDefTableEntry( pdchS62svrHtEv, FinalSysSizing( AirLoopNum ).AirPriLoopName, EvzMinBySysHeat( AirLoopNum ), 3 ); //Ev
 					PreDefTableEntry( pdchS62svrHtVot, FinalSysSizing( AirLoopNum ).AirPriLoopName, VotHtgBySys( AirLoopNum ), 4 ); //Vot
 					if ( FinalSysSizing( AirLoopNum ).DesHeatVolFlow != 0.0 ) { // Move here from other routine
-						PreDefTableEntry( pdchS62svrHtPercOA, FinalSysSizing( AirLoopNum ).AirPriLoopName, VotHtgBySys( AirLoopNum ) / FinalSysSizing( AirLoopNum ).DesHeatVolFlow ); //%OA
+						PreDefTableEntry( pdchS62svrHtPercOA, FinalSysSizing( AirLoopNum ).AirPriLoopName, 100.0 * VotHtgBySys( AirLoopNum ) / FinalSysSizing( AirLoopNum ).DesHeatVolFlow ); //%OA
 					}
 					//system ventilation calculations for cooling table
 					PreDefTableEntry( pdchS62scdVps, FinalSysSizing( AirLoopNum ).AirPriLoopName, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, 3 ); //Vps
 					PreDefTableEntry( pdchS62scdEvz, FinalSysSizing( AirLoopNum ).AirPriLoopName, EvzMinBySysCool( AirLoopNum ), 3 ); //Evz-min
 					PreDefTableEntry( pdchS62svrClVot, FinalSysSizing( AirLoopNum ).AirPriLoopName, VotClgBySys( AirLoopNum ), 4 ); //Vot
 					if ( FinalSysSizing( AirLoopNum ).DesCoolVolFlow != 0.0 ) { // Move here
-						PreDefTableEntry( pdchS62svrClPercOA, FinalSysSizing( AirLoopNum ).AirPriLoopName, VotClgBySys( AirLoopNum ) / FinalSysSizing( AirLoopNum ).DesCoolVolFlow ); //%OA
+						PreDefTableEntry( pdchS62svrClPercOA, FinalSysSizing( AirLoopNum ).AirPriLoopName, 100.0 * VotClgBySys( AirLoopNum ) / FinalSysSizing( AirLoopNum ).DesCoolVolFlow ); //%OA
 					}
 
 					//system ventilation calculations for heating table
