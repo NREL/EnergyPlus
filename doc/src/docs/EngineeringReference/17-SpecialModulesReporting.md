@@ -2497,5 +2497,8 @@ The ComputeDelayedComponents routine applies the decay curve to the load compone
 
 5. Store the estimated values in a sequence to be later averaged over the averaging window.
 
+Output:Table:Annual
+-------------------
 
+No special algorithms were employed to implement the Output:Table:Annual object.
 

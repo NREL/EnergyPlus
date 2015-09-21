@@ -978,8 +978,8 @@ namespace HighTempRadiantSystem {
 			DistributeHTRadGains();
 
 			// Now "simulate" the system by recalculating the heat balances
-			CalcHeatBalanceOutsideSurf( ZoneNum );
-			CalcHeatBalanceInsideSurf( ZoneNum );
+			HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
+			HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
 
 			// First determine whether or not the unit should be on
 			// Determine the proper temperature on which to control
@@ -1019,8 +1019,8 @@ namespace HighTempRadiantSystem {
 					DistributeHTRadGains();
 
 					// Now "simulate" the system by recalculating the heat balances
-					CalcHeatBalanceOutsideSurf( ZoneNum );
-					CalcHeatBalanceInsideSurf( ZoneNum );
+					HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
+					HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
 
 					// Redetermine the current value of the controlling temperature
 					{ auto const SELECT_CASE_var( HighTempRadSys( RadSysNum ).ControlType );
@@ -1149,8 +1149,8 @@ namespace HighTempRadiantSystem {
 
 			// Now "simulate" the system by recalculating the heat balances
 			ZoneNum = HighTempRadSys( RadSysNum ).ZonePtr;
-			CalcHeatBalanceOutsideSurf( ZoneNum );
-			CalcHeatBalanceInsideSurf( ZoneNum );
+			HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
+			HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
 		}}
 
 		if ( QHTRadSource( RadSysNum ) <= 0.0 ) {

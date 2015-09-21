@@ -14,11 +14,13 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // C++ Headers
+#include <algorithm>
 #include <climits>
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
 #include <iomanip>
+#include <locale>
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -128,7 +130,7 @@ struct Binary_num_put : std::num_put< char >
 		return binary_do_put( out, str, fill, v );
 	}
 
-private: // Static Methods
+private: // Methods
 
 	inline
 	static
@@ -263,7 +265,7 @@ public: // Custom methods
 		E_ = E;
 	}
 
-private: // Static Methods
+private: // Methods
 
 	inline
 	static
@@ -445,7 +447,7 @@ public: // Custom methods
 		e_ = e;
 	}
 
-private: // Static Methods
+private: // Methods
 
 	inline
 	static
@@ -599,7 +601,7 @@ public: // Custom methods
 		e_ = e;
 	}
 
-private: // Static Methods
+private: // Methods
 
 	inline
 	static

@@ -1745,26 +1745,6 @@ TEST( Array2Test, ModifierClear )
 	EXPECT_FALSE( A3.initializer_active() );
 }
 
-TEST( Array2Test, ModifierToDefault )
-{
-	// Changes nothing about an empty array
-	Array2D_int A1;
-	A1.to_default();
-	EXPECT_TRUE( eq( Array2D_int(), A1 ) );
-
-	// Zeroes out an uninitialized array
-	Array2D_int A2( 2, 3 );
-	EXPECT_FALSE( A2.initializer_active() );
-	A2.to_default(); // Default value assigned depends on macros
-	EXPECT_FALSE( A2.initializer_active() );
-
-	// Zeroes out (not initializes) an initialized array
-	Array2D_int A3( 2, 3, 31459 );
-	EXPECT_TRUE( A3.initializer_active() );
-	A3.to_default(); // Default value assigned depends on macros
-	EXPECT_TRUE( A3.initializer_active() );
-}
-
 TEST( Array2Test, ModifierZero )
 {
 	// Changes nothing about an empty array

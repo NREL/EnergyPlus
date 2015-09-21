@@ -448,14 +448,10 @@ namespace ZoneAirLoopEquipmentManager {
 
 			} //End of Air Dist Do Loop
 			for ( AirDistUnitNum = 1; AirDistUnitNum <= NumAirDistUnits; ++AirDistUnitNum ) {
-				SetupOutputVariable( "Zone Air Terminal Sensible Heating Energy [J]", AirDistUnit( AirDistUnitNum ).HeatGain,
-					"System", "Sum", AirDistUnit( AirDistUnitNum ).Name );
-				SetupOutputVariable( "Zone Air Terminal Sensible Cooling Energy [J]", AirDistUnit( AirDistUnitNum ).CoolGain,
-					"System", "Sum", AirDistUnit( AirDistUnitNum ).Name );
-				SetupOutputVariable( "Zone Air Terminal Sensible Heating Rate [W]", AirDistUnit( AirDistUnitNum ).HeatRate,
-					"System", "Sum", AirDistUnit( AirDistUnitNum ).Name );
-				SetupOutputVariable( "Zone Air Terminal Sensible Cooling Rate [W]", AirDistUnit( AirDistUnitNum ).CoolRate,
-					"System", "Sum", AirDistUnit( AirDistUnitNum ).Name );
+				SetupOutputVariable( "Zone Air Terminal Sensible Heating Energy [J]", AirDistUnit( AirDistUnitNum ).HeatGain, "System", "Sum", AirDistUnit( AirDistUnitNum ).Name );
+				SetupOutputVariable( "Zone Air Terminal Sensible Cooling Energy [J]", AirDistUnit( AirDistUnitNum ).CoolGain, "System", "Sum", AirDistUnit( AirDistUnitNum ).Name );
+				SetupOutputVariable( "Zone Air Terminal Sensible Heating Rate [W]", AirDistUnit( AirDistUnitNum ).HeatRate, "System", "Sum", AirDistUnit( AirDistUnitNum ).Name );
+				SetupOutputVariable( "Zone Air Terminal Sensible Cooling Rate [W]", AirDistUnit( AirDistUnitNum ).CoolRate, "System", "Sum", AirDistUnit( AirDistUnitNum ).Name );
 			}
 		}
 		if ( ErrorsFound ) {

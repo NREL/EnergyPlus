@@ -539,21 +539,6 @@ public: // Inspector
 		return array_.isize2();
 	}
 
-public: // Modifier
-
-	// Assign Default Value to all Elements
-	inline
-	MArray2 &
-	to_default()
-	{
-		for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-			for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
-				operator ()( i1, i2 ) = Traits::initial_value();
-			}
-		}
-		return *this;
-	}
-
 public: // MArray Generators
 
 	// Template Helpers
