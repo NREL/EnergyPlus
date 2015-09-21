@@ -4093,16 +4093,7 @@ namespace DXCoils {
 				// Read waste heat modifier curve name
 				DXCoil( DXCoilNum ).MSWasteHeat( I ) = GetCurveIndex( Alphas( 18 + ( I - 1 ) * 6 ) ); // convert curve name to number
 				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
-					if ( DXCoil( DXCoilNum ).MSWasteHeat( I ) == 0 ) {
-						if ( lAlphaBlanks( 18 + ( I - 1 ) * 6 ) ) {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
-							ShowContinueError( "...required " + cAlphaFields( 18 + ( I - 1 ) * 6 ) + " is blank." );
-						} else {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-							ShowContinueError( "...not found " + cAlphaFields( 18 + ( I - 1 ) * 6 ) + "=\"" + Alphas( 18 + ( I - 1 ) * 6 ) + "\"." );
-						}
-						ErrorsFound = true;
-					} else {
+					if ( DXCoil( DXCoilNum ).MSWasteHeat( I ) > 0 ) {
 						// Verify Curve Object, only legal types are BiQuadratic
 						{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSWasteHeat( I ) ) );
 
@@ -4608,16 +4599,7 @@ namespace DXCoils {
 				// Read waste heat modifier curve name
 				DXCoil( DXCoilNum ).MSWasteHeat( I ) = GetCurveIndex( Alphas( 15 + ( I - 1 ) * 6 ) ); // convert curve name to number
 				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
-					if ( DXCoil( DXCoilNum ).MSWasteHeat( I ) == 0 ) {
-						if ( lAlphaBlanks( 11 ) ) {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
-							ShowContinueError( "...required " + cAlphaFields( 15 + ( I - 1 ) * 6 ) + " is blank." );
-						} else {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-							ShowContinueError( "...not found " + cAlphaFields( 15 + ( I - 1 ) * 6 ) + "=\"" + Alphas( 15 + ( I - 1 ) * 6 ) + "\"." );
-						}
-						ErrorsFound = true;
-					} else {
+					if ( DXCoil( DXCoilNum ).MSWasteHeat( I ) > 0 ) {
 						// Verify Curve Object, only legal types are BiQuadratic
 						{ auto const SELECT_CASE_var( GetCurveType( DXCoil( DXCoilNum ).MSWasteHeat( I ) ) );
 
@@ -5411,6 +5393,7 @@ namespace DXCoils {
 		int DXCoilNumTemp; // Counter for crankcase heater report variable DO loop
 		int AirInletNode; // Air inlet node number
 		int SecZoneAirNodeNum; // secondary DX coil inlet node number ( secondary zone air node)
+		int SpeedNum; // Speed number for multispeed coils
 
 		if ( MyOneTimeFlag ) {
 			// initialize the environment and sizing flags
@@ -5452,6 +5435,20 @@ namespace DXCoils {
 
 			Real64 const RatedAirMassFlowRateSeaLevel = DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) * PsyRhoAirFnPbTdbW( StdPressureSeaLevel, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, RoutineName );
 			DXCoil( DXCoilNum ).RatedCBF( 1 ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( 1 ), RatedAirMassFlowRateSeaLevel, DXCoil( DXCoilNum ).RatedSHR( 1 ), StdPressureSeaLevel );
+			MyEnvrnFlag( DXCoilNum ) = false;
+		}
+
+		if ( ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedCooling || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedHeating ) && MyEnvrnFlag( DXCoilNum ) ) {
+			if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
+				if (DXCoil( DXCoilNum ).MSHPHeatRecActive ) {
+					for ( SpeedNum = 1; SpeedNum <= DXCoil( DXCoilNum ).NumOfSpeeds; ++SpeedNum ) {
+						if ( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNum ) == 0 ) {
+							ShowWarningError( "GetDXCoils:" + DXCoil( DXCoilNum ).Name + ". The value of Waste Heat Function of Temperature Curve is assumed to be 1. Simulation continues. " );
+							break;
+						}
+					}
+				}
+			}
 			MyEnvrnFlag( DXCoilNum ) = false;
 		}
 
@@ -10695,11 +10692,20 @@ Label50: ;
 				HeatReclaimDXCoil( DXCoilNum ).AvailCapacity = DXCoil( DXCoilNum ).TotalCoolingEnergyRate + DXCoil( DXCoilNum ).ElecCoolingPower;
 
 				// Waste heat calculation
-				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
-					WasteHeatLS = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS );
-					WasteHeatHS = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumHS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumHS );
+				if ( DXCoil( DXCoilNum ).MSHPHeatRecActive ) {
+					if ( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ) == 0 ) {
+						WasteHeatLS = DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS );
+					} else {
+						WasteHeatLS = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS );
+					}
+					if ( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumHS ) == 0 ) {
+						WasteHeatHS = DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumHS );
+					} else {
+						WasteHeatHS = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumHS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumHS );
+					}
 					MSHPWasteHeat = ( SpeedRatio * WasteHeatHS + ( 1.0 - SpeedRatio ) * WasteHeatLS ) * DXCoil( DXCoilNum ).ElecCoolingPower;
 				}
+
 				// Energy use for other fuel types
 				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
 					DXCoil( DXCoilNum ).FuelUsed = DXCoil( DXCoilNum ).ElecCoolingPower;
@@ -10876,8 +10882,12 @@ Label50: ;
 				EvapCondPumpElecPower = DXCoil( DXCoilNum ).MSEvapCondPumpElecNomPower( SpeedNumLS ) * DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction;
 
 				// Waste heat
-				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
-					MSHPWasteHeat = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS ) * DXCoil( DXCoilNum ).ElecCoolingPower;
+				if ( DXCoil( DXCoilNum ).MSHPHeatRecActive ) {
+					if ( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ) == 0 ) {
+						MSHPWasteHeat = DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS ) * DXCoil( DXCoilNum ).ElecCoolingPower;
+					} else {
+						MSHPWasteHeat = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS ) * DXCoil( DXCoilNum ).ElecCoolingPower;
+					}
 				}
 				// Energy use for other fuel types
 				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
@@ -11334,12 +11344,21 @@ Label50: ;
 				}
 
 				// Waste heat calculation
-				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
-					WasteHeatLS = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS );
-					WasteHeatHS = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumHS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumHS );
+				if (  DXCoil( DXCoilNum ).MSHPHeatRecActive ) {
+					if ( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ) == 0 ) {
+						WasteHeatLS = DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS );
+					} else {
+						WasteHeatLS = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS );
+					}
+					if ( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumHS ) == 0 ) {
+						WasteHeatHS = DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumHS );
+					} else {
+						WasteHeatHS = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumHS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumHS );
+					}
 					MSHPWasteHeat = ( SpeedRatio * WasteHeatHS + ( 1.0 - SpeedRatio ) * WasteHeatLS ) * DXCoil( DXCoilNum ).ElecHeatingPower;
 				}
 				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
+
 					DXCoil( DXCoilNum ).FuelUsed = DXCoil( DXCoilNum ).ElecHeatingPower;
 					DXCoil( DXCoilNum ).ElecHeatingPower = 0.0;
 				}
@@ -11525,10 +11544,15 @@ Label50: ;
 					OutletAirEnthalpy = InletAirEnthalpy + DXCoil( DXCoilNum ).TotalHeatingEnergyRate / DXCoil( DXCoilNum ).InletAirMassFlowRate;
 					OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
 				}
-				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
-					MSHPWasteHeat = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS ) * DXCoil( DXCoilNum ).ElecHeatingPower;
+				if ( DXCoil( DXCoilNum ).MSHPHeatRecActive ) {
+					if ( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ) == 0 ) {
+						MSHPWasteHeat = DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS ) * DXCoil( DXCoilNum ).ElecHeatingPower;
+					} else {
+						MSHPWasteHeat = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS ) * DXCoil( DXCoilNum ).ElecHeatingPower;
+					}
 				}
 				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
+
 					DXCoil( DXCoilNum ).FuelUsed = DXCoil( DXCoilNum ).ElecHeatingPower;
 					DXCoil( DXCoilNum ).ElecHeatingPower = 0.0;
 				}
@@ -15128,7 +15152,8 @@ Label50: ;
 		Real64 & TcIn,    // coil inlet temperature, after fan
 		Real64 & SHact,   // actual SH
 		Real64 & SCact    // actual SC
-	){
+	)
+	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Xiufeng Pang, LBNL
 		//       DATE WRITTEN   Feb 2013
@@ -15434,7 +15459,8 @@ Label50: ;
 		Real64 const BF,    // Bypass factor
 		Real64 & Q_sen,     // VRF coil sensible capacity per air mass flow rate
 		Real64 & T_coil_surf// Air temperature at coil surface
-	){ 
+	)
+	{ 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rongpeng Zhang, LBNL
 		//       DATE WRITTEN   Jul 2015
@@ -15520,7 +15546,8 @@ Label50: ;
 		Optional< Real64 const > SHSC,  // SH at cooling /SC at heating
 		Optional< Real64 const > BF,    // Bypass factor
 		Real64 & CapModFac // Coil capacity modification factor
-	){
+	)
+	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rongpeng Zhang, LBNL
 		//       DATE WRITTEN   Jul 2015
@@ -15732,6 +15759,48 @@ Label50: ;
 		return FanSpdResidualHeat;
 	}
 	
+	void
+	SetMSHPDXCoilHeatRecoveryFlag( int const DXCoilNum ) // 
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         L. Gu
+		//       DATE WRITTEN   Sep. 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Set the heat recovery flag true when the parent object requests heat recovery.
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
+			DXCoil( DXCoilNum ).MSHPHeatRecActive = true;
+		}
+
+	}
+
 	// Clears the global data in DXCoils.
 	// Needed for unit tests, should not be normally called.
 	void
