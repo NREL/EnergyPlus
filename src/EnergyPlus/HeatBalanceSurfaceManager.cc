@@ -4878,11 +4878,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	using DataMoistureBalance::HAirFD;
 	using DataMoistureBalanceEMPD::RVSurface;
 	using DataMoistureBalanceEMPD::HeatFluxLatent;
-	using DataMoistureBalanceEMPD::MassFluxSurfaceLayer;
-	using DataMoistureBalanceEMPD::MassFluxDeepLayer;
-	using DataMoistureBalanceEMPD::HMSurfaceLayer;
 	using DataMoistureBalanceEMPD::RVSurfaceOld;
-	using DataMoistureBalanceEMPD::MassFluxZone;
 	using DataMoistureBalanceEMPD::RVSurfLayer;
 	using DataAirflowNetwork::SimulateAirflowNetwork;
 	using DataAirflowNetwork::AirflowNetworkControlSimple;

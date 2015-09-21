@@ -35,10 +35,6 @@ namespace DataMoistureBalanceEMPD {
 	extern Array1D< Real64 > RVSurfLayer;
 	extern Array1D< Real64 > RVDeepLayer;
 	extern Array1D< Real64 > RVwall;
-	extern Array1D< Real64 > MassFluxSurfaceLayer;
-	extern Array1D< Real64 > MassFluxDeepLayer;
-	extern Array1D< Real64 > MassFluxZone;
-	extern Array1D< Real64 > HMSurfaceLayer;
 
 } // DataMoistureBalanceEMPD
 

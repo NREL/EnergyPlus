@@ -43,10 +43,6 @@ namespace DataMoistureBalanceEMPD {
 	Array1D< Real64 > RVSurfLayer;
 	Array1D< Real64 > RVDeepLayer;
 	Array1D< Real64 > RVwall;
-	Array1D< Real64 > MassFluxSurfaceLayer;
-	Array1D< Real64 > MassFluxDeepLayer;
-	Array1D< Real64 > MassFluxZone;
-	Array1D< Real64 > HMSurfaceLayer;
 
 	//     NOTICE
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois

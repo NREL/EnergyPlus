@@ -92,13 +92,12 @@ TEST_F( HVACFixture, CheckEMPD )
 	Real64 Tsat(0.0);
 	MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD( 1, 19.907302679986064, 19.901185713164697, Tsat );
 
+	auto const & report_vars = MoistureBalanceEMPDManager::EMPDREportVars(1);
 	EXPECT_DOUBLE_EQ(6.3445188238394508, Tsat);
 	EXPECT_DOUBLE_EQ(0.0072030790357129866, DataMoistureBalanceEMPD::RVSurface(1));
-	EXPECT_DOUBLE_EQ(-0.00000019077843350248091, DataMoistureBalanceEMPD::MassFluxSurfaceLayer(1));
-	EXPECT_DOUBLE_EQ(0.0, DataMoistureBalanceEMPD::MassFluxDeepLayer(1));
-	EXPECT_DOUBLE_EQ(-0.00000019077843350248091, DataMoistureBalanceEMPD::MassFluxZone(1));
+	EXPECT_DOUBLE_EQ(0.0, report_vars.mass_flux_deep);
+	EXPECT_DOUBLE_EQ(-0.00000019077843350248091, report_vars.mass_flux_zone);
 	EXPECT_DOUBLE_EQ(0.0070455149199232948, DataMoistureBalanceEMPD::RVSurfLayer(1));
-	EXPECT_DOUBLE_EQ(0.00070413228834764112, DataMoistureBalanceEMPD::HMSurfaceLayer(1));
 	EXPECT_DOUBLE_EQ(0.0051334905162138695, DataMoistureBalanceEMPD::RVDeepLayer(1));
 	EXPECT_DOUBLE_EQ(-0.47694608375620229, DataMoistureBalanceEMPD::HeatFluxLatent(1));
 

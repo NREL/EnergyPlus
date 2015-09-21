@@ -79,35 +79,9 @@ namespace MoistureBalanceEMPDManager {
 
 	// Data
 	// MODULE VARIABLE and Function DECLARATIONs
-	struct EMPDReportVarsData {
-		Real64 rv_surface;
-		Real64 RH_surface_layer;
-		Real64 RH_deep_layer;
-		Real64 w_surface_layer;
-		Real64 w_deep_layer;
-		Real64 mass_flux_zone;
-		Real64 mass_flux_deep;
-		Real64 u_surface_layer;
-		Real64 u_deep_layer;
-
-		// Default constructor
-		EMPDReportVarsData() :
-			rv_surface( 0.015 ),
-			RH_surface_layer( 0.0 ),
-			RH_deep_layer( 0.0 ),
-			w_surface_layer( 0.015 ),
-			w_deep_layer( 0.015 ),
-			mass_flux_zone( 0.0 ),
-			mass_flux_deep( 0.0 ),
-			u_surface_layer( 0.0 ),
-			u_deep_layer( 0.0 )
-		{}
-	};
-
 	Array1D< EMPDReportVarsData > EMPDREportVars; // Array of structs that hold the empd report vars data, one for each surface.
 
 	// SUBROUTINE SPECIFICATION FOR MODULE MoistureBalanceEMPDManager
-
 	//******************************************************************************
 
 	// Functions
@@ -333,10 +307,6 @@ namespace MoistureBalanceEMPDManager {
 			RVDeepLayer.allocate( TotSurfaces );
 			RVdeepOld.allocate( TotSurfaces );
 			RVwall.allocate( TotSurfaces );
-			HMSurfaceLayer.allocate( TotSurfaces );
-			MassFluxSurfaceLayer.allocate( TotSurfaces );
-			MassFluxDeepLayer.allocate( TotSurfaces );
-			MassFluxZone.allocate( TotSurfaces );
 		}
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
@@ -350,10 +320,6 @@ namespace MoistureBalanceEMPDManager {
 				RVDeepLayer(SurfNum) = RhoVaporAirIn(SurfNum);
 				RVdeepOld(SurfNum) = RhoVaporAirIn(SurfNum);
 				RVwall(SurfNum) = RhoVaporAirIn(SurfNum);
-				HMSurfaceLayer( SurfNum ) = 0.003;
-				MassFluxSurfaceLayer( SurfNum ) = 0.000;
-				MassFluxDeepLayer( SurfNum ) = 0.000;
-				MassFluxZone( SurfNum ) = 0.000;
 			} else {
 				RVSurfaceOld( SurfNum ) = ZoneAirHumRat( ZoneNum ); // Surface moisture level initialization
 				RVSurface( SurfNum ) = ZoneAirHumRat( ZoneNum );
@@ -362,10 +328,6 @@ namespace MoistureBalanceEMPDManager {
 				RVDeepLayer( SurfNum ) = RhoVaporAirIn( SurfNum );
 				RVdeepOld( SurfNum ) = RhoVaporAirIn( SurfNum );
 				RVwall( SurfNum ) = RhoVaporAirIn( SurfNum );
-				HMSurfaceLayer( SurfNum ) = 0.0003;
-				MassFluxSurfaceLayer( SurfNum ) = 0.000;
-				MassFluxDeepLayer( SurfNum ) = 0.000;
-				MassFluxZone( SurfNum ) = 0.000;
 			}
 		}
 		if ( ! InitEnvrnFlag ) return;
@@ -478,11 +440,11 @@ namespace MoistureBalanceEMPDManager {
 		auto const & rv_surface_old( RVSurfaceOld( SurfNum ) ); // input
 		auto const & h_mass_conv_in_fd( HMassConvInFD( SurfNum ) ); // input
 		auto const & rho_vapor_air_in( RhoVaporAirIn( SurfNum ) ); // input
-		auto & mass_flux_surf_layer( MassFluxSurfaceLayer( SurfNum ) ); // output
-		auto & mass_flux_deep_layer( MassFluxDeepLayer( SurfNum ) ); // output
-		auto & mass_flux_zone( MassFluxZone( SurfNum ) ); // output
+		Real64 mass_flux_surf_layer;
+		Real64 mass_flux_deep_layer;
+		Real64 mass_flux_zone;
 		auto & rv_surf_layer( RVSurfLayer( SurfNum ) ); // input + output
-		auto & hm_surf_layer( HMSurfaceLayer( SurfNum ) ); // output
+		Real64 hm_surf_layer;
 		auto & rv_deep_layer( RVDeepLayer( SurfNum ) ); // input + output
 		auto & heat_flux_latent( HeatFluxLatent( SurfNum ) ); // output
 		auto const & rv_deep_old( RVdeepOld( SurfNum ) ); // input
