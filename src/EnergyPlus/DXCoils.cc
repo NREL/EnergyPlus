@@ -2966,12 +2966,7 @@ namespace DXCoils {
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 5 ), Alphas( 6 ), "Air Nodes" );
 
 			//Check if the air inlet node is OA node, to justify whether the coil is placed in zone or not
-			EnergyPlus::OutAirNodeManager::CheckAndAddAirNodeNumber( DXCoil( DXCoilNum ).AirInNode, IsOANodeListed );
-			if ( IsOANodeListed ) {
-				DXCoil( DXCoilNum ).IsDXCoilInZone = false;
-			} else {
-				DXCoil( DXCoilNum ).IsDXCoilInZone = true;
-			}
+			DXCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( DXCoil( DXCoilNum ).AirInNode );
 			
 			//Water nodes
 			DXCoil( DXCoilNum ).WaterInNode = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
@@ -3400,12 +3395,7 @@ namespace DXCoils {
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
 			
 			//Check if the air inlet node is OA node, to justify whether the coil is placed in zone or not
-			EnergyPlus::OutAirNodeManager::CheckAndAddAirNodeNumber( DXCoil( DXCoilNum ).AirInNode, IsOANodeListed );
-			if ( IsOANodeListed ) {
-				DXCoil( DXCoilNum ).IsDXCoilInZone = false;
-			} else {
-				DXCoil( DXCoilNum ).IsDXCoilInZone = true;
-			}
+			DXCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( DXCoil( DXCoilNum ).AirInNode );
 
 			std::string const DummyCondenserInletName( "DUMMY CONDENSER INLET " + DXCoil( DXCoilNum ).Name );
 			std::string const DummyCondenserOutletName( "DUMMY CONDENSER OUTLET " + DXCoil( DXCoilNum ).Name );

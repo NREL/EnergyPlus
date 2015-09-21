@@ -915,4 +915,56 @@ namespace EnergyPlus {
 		// clear
 		DXCoil.deallocate();
 	}
+	
+	TEST_F( HVACFixture, TestDXCoilIndoorOrOutdoor ) {
+		
+		//Test whether the coil is placed indoor or outdoor, by checking the air inlet node location
+		
+		using namespace DXCoils;
+		using NodeInputManager::GetOnlySingleNode;
+		using OutAirNodeManager::CheckOutAirNodeNumber;
+
+		// Common Inputs
+		int NumCoils; // total number of coils 
+		int DXCoilNum; // index to the current coil 
+
+		// Allocate
+		NumCoils = 3;
+		DXCoil.allocate( NumCoils );
+			
+		// IDF snippets
+		std::string const idf_objects = delimited_string({
+			"Version,8.3;                                          ", 
+			"OutdoorAir:Node,                                      ",
+			"   Outside Air Inlet Node 1; !- Name                  ",
+			"OutdoorAir:NodeList,                                  ",
+			"   OutsideAirInletNodes;    !- Node or NodeList Name 1",
+			"NodeList,                                             ",
+			"   OutsideAirInletNodes,    !- Name                   ",
+			"   Outside Air Inlet Node 2;!- Node 1 Name            ",
+		});
+		
+		ASSERT_FALSE( process_idf( idf_objects ) );
+		
+		// Run
+		DXCoilNum = 1;  
+		DXCoil(DXCoilNum).AirInNode = 1; // "Outside Air Inlet Node 1"
+		DXCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( DXCoil( DXCoilNum ).AirInNode );
+		
+		DXCoilNum = 2;  
+		DXCoil(DXCoilNum).AirInNode = 2; // "Outside Air Inlet Node 2"
+		DXCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( DXCoil( DXCoilNum ).AirInNode );
+		
+		DXCoilNum = 3; // "Inside Air Inlet Node"
+		DXCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( DXCoil( DXCoilNum ).AirInNode );
+		
+		// Check
+		EXPECT_FALSE( DXCoil( 1 ).IsDXCoilInZone );
+		EXPECT_FALSE( DXCoil( 2 ).IsDXCoilInZone );
+		EXPECT_TRUE( DXCoil( 3 ).IsDXCoilInZone );
+
+		// Clean up
+		DXCoil.deallocate( ); 
+	}
+	
 }

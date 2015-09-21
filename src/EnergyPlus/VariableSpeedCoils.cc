@@ -1964,12 +1964,7 @@ namespace VariableSpeedCoils {
 			TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
 
 			//Check if the air inlet node is OA node, to justify whether the coil is placed in zone or not
-			EnergyPlus::OutAirNodeManager::CheckAndAddAirNodeNumber( VarSpeedCoil( DXCoilNum ).AirInletNodeNum, IsOANodeListed );
-			if ( IsOANodeListed ) {
-				VarSpeedCoil( DXCoilNum ).IsDXCoilInZone = false;
-			} else {
-				VarSpeedCoil( DXCoilNum ).IsDXCoilInZone = true;
-			}
+			VarSpeedCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( VarSpeedCoil( DXCoilNum ).AirInletNodeNum );
 			
 			//Water nodes
 			VarSpeedCoil(DXCoilNum).WaterInletNodeNum = GetOnlySingleNode(AlphArray(7), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
