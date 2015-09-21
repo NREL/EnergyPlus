@@ -40,11 +40,16 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/HVACUnitarySystem.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
@@ -53,13 +58,17 @@
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/Pipes.hh>
+#include <EnergyPlus/PlantCondLoopOperation.hh>
+#include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantLoopSolver.hh>
 #include <EnergyPlus/PlantManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
+#include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -140,25 +149,34 @@ namespace EnergyPlus {
 		ExteriorEnergyUse::clear_state();
 		Fans::clear_state();
 		GlobalNames::clear_state();
+		GroundHeatExchangers::clear_state();
 		GroundTemperatureManager::clear_state();
 		HeatBalanceAirManager::clear_state();
 		HeatBalanceIntRadExchange::clear_state();
 		HeatBalanceManager::clear_state();
 		HeatBalanceSurfaceManager::clear_state();
+		HeatingCoils::clear_state();
+		HeatPumpWaterToWaterSimple::clear_state();
+		HeatingCoils::clear_state();
 		Humidifiers::clear_state();
 		HVACManager::clear_state();
+		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
 		InputProcessor::clear_state();
 		InternalHeatGains::clear_state();
 		MixedAir::clear_state();
 		NodeInputManager::clear_state();
 		OutAirNodeManager::clear_state();
+		OutdoorAirUnit::clear_state();
 		OutputProcessor::clear_state();
 		OutputReportPredefined::clear_state();
 		OutputReportTabularAnnual::clear_state();
 		OutsideEnergySources::clear_state();
+		PlantCondLoopOperation::clear_state();
+		PlantLoadProfile::clear_state();
 		PlantLoopSolver::clear_state();
 		PlantPressureSystem::clear_state();
+		PlantUtilities::clear_state();
 		Pipes::clear_state();
 		Pumps::clear_state();
 		ScheduleManager::clear_state();

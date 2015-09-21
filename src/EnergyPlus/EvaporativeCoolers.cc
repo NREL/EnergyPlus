@@ -1033,7 +1033,7 @@ namespace EvaporativeCoolers {
 				if ( CoolerOnMainAirLoop ) {
 					IndirectVolFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 				} else if ( CoolerOnOApath ) {
-					IndirectVolFlowRateDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+					IndirectVolFlowRateDes = max( FinalSysSizing( CurSysNum ).DesOutAirVolFlow, 0.5*FinalSysSizing( CurSysNum ).DesMainVolFlow );
 				}
 				// apply scaling factor the secondary air fan flow rate
 				if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial ) {

@@ -222,6 +222,8 @@ namespace DataZoneEquipment {
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using DataGlobals::NumOfZones;
+		using DataGlobals::ScheduleAlwaysOn;
+		using namespace ScheduleManager;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -248,6 +250,7 @@ namespace DataZoneEquipment {
 		int IOStat;
 		std::string InletNodeListName;
 		std::string ExhaustNodeListName;
+		std::string ReturnFlowBasisNodeListName;
 		Array1D_string AlphArray;
 		Array1D< Real64 > NumArray;
 		int MaxAlphas;
@@ -305,6 +308,7 @@ namespace DataZoneEquipment {
 
 		ExhaustNodeListName = "";
 		InletNodeListName = "";
+		ReturnFlowBasisNodeListName = "";
 
 		// Look in the input file for zones with air loop and zone equipment attached
 
@@ -434,6 +438,16 @@ namespace DataZoneEquipment {
 					ErrorsFound = true;
 				}
 			}
+			if ( lAlphaBlanks( 7 ) ) {
+				ZoneEquipConfig( ControlledZoneNum ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
+			} else {
+				ZoneEquipConfig( ControlledZoneNum ).ReturnFlowSchedPtrNum = GetScheduleIndex( AlphArray( 7 ) );
+				if ( ZoneEquipConfig( ControlledZoneNum ).ReturnFlowSchedPtrNum == 0 ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields( 7 ) + " entered =" + AlphArray( 7 ) + " for " + cAlphaFields( 1 ) + '=' + AlphArray( 1 ) );
+					ErrorsFound = true;
+				}
+			}
+			ReturnFlowBasisNodeListName = AlphArray( 8 );
 
 			// Read in the equipment type, name and sequence information
 			// for each equipment list
@@ -692,6 +706,23 @@ namespace DataZoneEquipment {
 				ShowContinueError( "Invalid exhaust node or NodeList name in ZoneHVAC:EquipmentConnections object, for Zone=" + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
 				ErrorsFound = true;
 			}
+
+			NodeListError = false;
+			GetNodeNums( ReturnFlowBasisNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Air, "ZoneHVAC:EquipmentConnections", ZoneEquipConfig( ControlledZoneNum ).ZoneName, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+
+			if ( !NodeListError ) {
+				ZoneEquipConfig( ControlledZoneNum ).NumReturnFlowBasisNodes = NumNodes;
+
+				ZoneEquipConfig( ControlledZoneNum ).ReturnFlowBasisNode.allocate( NumNodes );
+
+				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
+					ZoneEquipConfig( ControlledZoneNum ).ReturnFlowBasisNode( NodeNum ) = NodeNums( NodeNum );
+				}
+			} else {
+				ShowContinueError( "Invalid return air flow rate basis node or NodeList name in ZoneHVAC:EquipmentConnections object, for Zone=" + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+				ErrorsFound = true;
+			}
+			
 		} // end loop over controlled zones
 
 		if ( ErrorsFound ) {

@@ -30,7 +30,6 @@ TEST( ArrayTest, DefaultConstruction )
 	EXPECT_EQ( 0u, A.size() );
 	A.zero(); // Now safe against VC Checked Iterators
 	EXPECT_EQ( 0u, A.size() );
-	EXPECT_TRUE( eq( A.to_default(), B ) ); // Now safe against VC Checked Iterators
 }
 
 TEST( ArrayTest, Construction2DIndexRangeInitializerList )
