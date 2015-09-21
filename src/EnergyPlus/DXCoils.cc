@@ -4934,7 +4934,7 @@ namespace DXCoils {
 				ErrorsFound = true;
 			} else {
 				{ auto const SELECT_CASE_var( GetCurveType( indexSHCurve ) );
-            
+
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						DXCoil( DXCoilNum ).C1Te = EnergyPlus::CurveManager::PerfCurve( indexSHCurve ).Coeff1;
 						DXCoil( DXCoilNum ).C2Te = EnergyPlus::CurveManager::PerfCurve( indexSHCurve ).Coeff2;
@@ -5022,7 +5022,7 @@ namespace DXCoils {
 				ErrorsFound = true;
 			} else {
 				{ auto const SELECT_CASE_var( GetCurveType( indexSCCurve ) );
-            
+
 					if ( SELECT_CASE_var == "QUADRATIC" ) {
 						DXCoil( DXCoilNum ).C1Tc = EnergyPlus::CurveManager::PerfCurve( indexSCCurve ).Coeff1;
 						DXCoil( DXCoilNum ).C2Tc = EnergyPlus::CurveManager::PerfCurve( indexSCCurve ).Coeff2;
@@ -5058,9 +5058,9 @@ namespace DXCoils {
 				SetupOutputVariable( "Cooling Coil Electric Power [W]", Coil.ElecCoolingPower, "System", "Average", Coil.Name );
 				SetupOutputVariable( "Cooling Coil Electric Energy [J]", Coil.ElecCoolingConsumption, "System", "Sum", Coil.Name, _, "Electric", "COOLING", _, "System" );
 				SetupOutputVariable( "Cooling Coil Runtime Fraction []", Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name );
-                if ( Coil.IsSecondaryDXCoilInZone ) {
-                    SetupOutputVariable( "Secondary Coil Heat Rejection Rate [W]", Coil.SecCoilSensibleHeatGainRate, "System", "Average", Coil.Name );
-                }
+				if ( Coil.IsSecondaryDXCoilInZone ) {
+					SetupOutputVariable( "Secondary Coil Heat Rejection Rate [W]", Coil.SecCoilSensibleHeatGainRate, "System", "Average", Coil.Name );
+				}
 
 				// do we report these even if no storage tank?
 				if ( Coil.CondensateCollectMode == CondensateToTank ) {
@@ -5110,13 +5110,13 @@ namespace DXCoils {
 				SetupOutputVariable( "Heating Coil Crankcase Heater Electric Power [W]", Coil.CrankcaseHeaterPower, "System", "Average", Coil.Name );
 				SetupOutputVariable( "Heating Coil Crankcase Heater Electric Energy [J]", Coil.CrankcaseHeaterConsumption, "System", "Sum", Coil.Name, _, "Electric", "HEATING", _, "System" );
 				SetupOutputVariable( "Heating Coil Runtime Fraction []", Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name );
-                if ( Coil.IsSecondaryDXCoilInZone ) {
-                    SetupOutputVariable( "Secondary Coil Total Heat Removal Rate [W]", Coil.SecCoilTotalHeatRemovalRate, "System", "Average", Coil.Name );
-                    SetupOutputVariable( "Secondary Coil Sensible Heat Removal Rate [W]", Coil.SecCoilSensibleHeatRemovalRate, "System", "Average", Coil.Name );
-                    SetupOutputVariable( "Secondary Coil Latent Heat Removal Rate [W]", Coil.SecCoilLatentHeatRemovalRate, "System", "Average", Coil.Name );
-                    SetupOutputVariable( "Secondary Coil Sensible Heat Ratio []", Coil.SecCoilSHR, "System", "Average", Coil.Name );
-                    SetupOutputVariable( "Secondary Coil Compressor Part Load Ratio []", Coil.CompressorPartLoadRatio, "System", "Average", Coil.Name );
-                }
+				if ( Coil.IsSecondaryDXCoilInZone ) {
+					SetupOutputVariable( "Secondary Coil Total Heat Removal Rate [W]", Coil.SecCoilTotalHeatRemovalRate, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Secondary Coil Sensible Heat Removal Rate [W]", Coil.SecCoilSensibleHeatRemovalRate, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Secondary Coil Latent Heat Removal Rate [W]", Coil.SecCoilLatentHeatRemovalRate, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Secondary Coil Sensible Heat Ratio []", Coil.SecCoilSHR, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Secondary Coil Compressor Part Load Ratio []", Coil.CompressorPartLoadRatio, "System", "Average", Coil.Name );
+				}
 			}
 
 			else if ( Coil.DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
@@ -5131,9 +5131,9 @@ namespace DXCoils {
 				SetupOutputVariable( "Cooling Coil Electric Power [W]", Coil.ElecCoolingPower, "System", "Average", Coil.Name );
 				SetupOutputVariable( "Cooling Coil Electric Energy [J]", Coil.ElecCoolingConsumption, "System", "Sum", Coil.Name, _, "Electric", "COOLING", _, "System" );
 				SetupOutputVariable( "Cooling Coil Runtime Fraction []", Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name );
-                if ( Coil.IsSecondaryDXCoilInZone ) {
-                    SetupOutputVariable( "Secondary Coil Heat Rejection Rate [W]", Coil.SecCoilSensibleHeatGainRate, "System", "Average", Coil.Name );
-                }
+				if ( Coil.IsSecondaryDXCoilInZone ) {
+					SetupOutputVariable( "Secondary Coil Heat Rejection Rate [W]", Coil.SecCoilSensibleHeatGainRate, "System", "Average", Coil.Name );
+				}
 
 				if ( Coil.ReportEvapCondVars ) {
 					SetupOutputVariable( "Cooling Coil Condenser Inlet Temperature [C]", Coil.CondInletTemp, "System", "Average", Coil.Name );
@@ -5205,9 +5205,9 @@ namespace DXCoils {
 						SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy [J]", Coil.BasinHeaterConsumption, "System", "Sum", Coil.Name, _, "Electric", "COOLING", _, "System" );
 					}
 				}
-                if (Coil.IsSecondaryDXCoilInZone) {
-                    SetupOutputVariable("Secondary Coil Heat Rejection Rate [W]", Coil.SecCoilSensibleHeatGainRate, "System", "Average", Coil.Name);
-                }
+				if ( Coil.IsSecondaryDXCoilInZone ) {
+					SetupOutputVariable( "Secondary Coil Heat Rejection Rate [W]", Coil.SecCoilSensibleHeatGainRate, "System", "Average", Coil.Name );
+				}
 
 			}
 
@@ -5236,12 +5236,12 @@ namespace DXCoils {
 				SetupOutputVariable( "Heating Coil Crankcase Heater Electric Energy [J]", Coil.CrankcaseHeaterConsumption, "System", "Sum", Coil.Name, _, "Electric", "HEATING", _, "System" );
 				SetupOutputVariable( "Heating Coil Runtime Fraction []", Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name );
 
-                if (Coil.IsSecondaryDXCoilInZone) {
-                    SetupOutputVariable("Secondary Coil Total Heat Removal Rate [W]", Coil.SecCoilTotalHeatRemovalRate, "System", "Average", Coil.Name);
-                    SetupOutputVariable("Secondary Coil Sensible Heat Removal Rate [W]", Coil.SecCoilSensibleHeatRemovalRate, "System", "Average", Coil.Name);
-                    SetupOutputVariable("Secondary Coil Latent Heat Removal Rate [W]", Coil.SecCoilLatentHeatRemovalRate, "System", "Average", Coil.Name);
-                    SetupOutputVariable("Secondary Coil Sensible Heat Ratio []", Coil.SecCoilSHR, "System", "Average", Coil.Name);
-                }
+				if ( Coil.IsSecondaryDXCoilInZone ) {
+					SetupOutputVariable( "Secondary Coil Total Heat Removal Rate [W]", Coil.SecCoilTotalHeatRemovalRate, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Secondary Coil Sensible Heat Removal Rate [W]", Coil.SecCoilSensibleHeatRemovalRate, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Secondary Coil Latent Heat Removal Rate [W]", Coil.SecCoilLatentHeatRemovalRate, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Secondary Coil Sensible Heat Ratio []", Coil.SecCoilSHR, "System", "Average", Coil.Name );
+				}
 			}
 
 			// VRF cooling coil report variables
@@ -15842,29 +15842,29 @@ Label50: ;
 
 	}
 
-    //     NOTICE
-    
-    //     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-    //     and The Regents of the University of California through Ernest Orlando Lawrence
-    //     Berkeley National Laboratory.  All rights reserved.
-    
-    //     Portions of the EnergyPlus software package have been developed and copyrighted
-    //     by other individuals, companies and institutions.  These portions have been
-    //     incorporated into the EnergyPlus software package under license.   For a complete
-    //     list of contributors, see "Notice" located in main.cc.
-    
-    //     NOTICE: The U.S. Government is granted for itself and others acting on its
-    //     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-    //     reproduce, prepare derivative works, and perform publicly and display publicly.
-    //     Beginning five (5) years after permission to assert copyright is granted,
-    //     subject to two possible five year renewals, the U.S. Government is granted for
-    //     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-    //     worldwide license in this data to reproduce, prepare derivative works,
-    //     distribute copies to the public, perform publicly and display publicly, and to
-    //     permit others to do so.
-    
-    //     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
-    
+	//     NOTICE
+
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
+	//     and The Regents of the University of California through Ernest Orlando Lawrence
+	//     Berkeley National Laboratory.  All rights reserved.
+
+	//     Portions of the EnergyPlus software package have been developed and copyrighted
+	//     by other individuals, companies and institutions.  These portions have been
+	//     incorporated into the EnergyPlus software package under license.   For a complete
+	//     list of contributors, see "Notice" located in main.cc.
+
+	//     NOTICE: The U.S. Government is granted for itself and others acting on its
+	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
+	//     reproduce, prepare derivative works, and perform publicly and display publicly.
+	//     Beginning five (5) years after permission to assert copyright is granted,
+	//     subject to two possible five year renewals, the U.S. Government is granted for
+	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
+	//     worldwide license in this data to reproduce, prepare derivative works,
+	//     distribute copies to the public, perform publicly and display publicly, and to
+	//     permit others to do so.
+
+	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+
 } // DXCoils
 
 } // EnergyPlus
