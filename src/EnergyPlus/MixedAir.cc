@@ -3192,8 +3192,13 @@ namespace MixedAir {
 						ZoneNum = vent_mech.Zone( ZoneIndex );
 
 						// ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
-						int OAFlowMethod = OARequirements( vent_mech.ZoneDesignSpecOAObjIndex( ZoneIndex ) ).OAFlowMethod;
-						if ( OAFlowMethod == OAFlowPPer || OAFlowMethod == OAFlowSum || OAFlowMethod == OAFlowMax ) {
+						if( vent_mech.ZoneDesignSpecOAObjIndex(ZoneIndex) > 0 ) {
+							int OAFlowMethod = OARequirements( vent_mech.ZoneDesignSpecOAObjIndex( ZoneIndex ) ).OAFlowMethod;
+							if ( OAFlowMethod == OAFlowPPer || OAFlowMethod == OAFlowSum || OAFlowMethod == OAFlowMax ) {
+								TotalPeopleOAFlow += ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * vent_mech.ZoneOAPeopleRate( ZoneIndex );
+							}
+						} else {
+							// use default value if design specification object is missing
 							TotalPeopleOAFlow += ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * vent_mech.ZoneOAPeopleRate( ZoneIndex );
 						}
 					}
@@ -3711,7 +3716,7 @@ namespace MixedAir {
 								ZoneOABZ = 0.0;
 							}}
 						} else {
-							ZoneOABZ = 0.0;
+							ZoneOABZ = ZoneOAPeople;
 						}
 
 						if ( VentilationMechanical( VentMechObjectNum ).SystemOAMethod == SOAM_ZoneSum ) {
