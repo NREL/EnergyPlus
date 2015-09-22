@@ -161,6 +161,7 @@ namespace EnergyPlus {
 
 		// Save current environment so we can revert back when done
 		int Envrn_reset = Envrn;
+		int KindOfSim_reset = KindOfSim;
 		int TimeStep_reset = TimeStep;
 		int HourOfDay_reset = HourOfDay;
 		bool BeginEnvrnFlag_reset = BeginEnvrnFlag;
@@ -303,6 +304,7 @@ namespace EnergyPlus {
 		// Reset Envrionment when done reading data
 		--NumOfEnvrn; // May need better way of eliminating the extra envrionment that was added to read the data
 		--TotRunPers;
+		KindOfSim = KindOfSim_reset;
 		RPReadAllWeatherData = false;
 		Environment.redimension( NumOfEnvrn );
 		RunPeriodInput.redimension( TotRunPers );

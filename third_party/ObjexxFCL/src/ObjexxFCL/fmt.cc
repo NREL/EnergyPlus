@@ -19,6 +19,16 @@
 namespace ObjexxFCL {
 namespace fmt {
 
+// Globals
+fmt::Binary_num_put * binary_num_put( new fmt::Binary_num_put );
+fmt::Exponent_num_put * exponent_num_put( new fmt::Exponent_num_put );
+fmt::Engineering_num_put * engineering_num_put( new fmt::Engineering_num_put );
+fmt::Scientific_num_put * scientific_num_put( new fmt::Scientific_num_put );
+std::locale const binary_locale( std::locale(), binary_num_put );
+std::locale const exponent_locale( std::locale(), exponent_num_put );
+std::locale const engineering_locale( std::locale(), engineering_num_put );
+std::locale const scientific_locale( std::locale(), scientific_num_put );
+
 // Input /////
 
 // Input a Skip from Stream

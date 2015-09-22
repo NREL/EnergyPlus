@@ -2554,7 +2554,7 @@ This is a choice field of Continuous or Intermittent. A variable speed pump is d
 
 #### Field: Pump Flow Rate Schedule Name
 
-The schedule values modify the value for Rated Flow Rate of the pump on a time basis. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field: Pump Curve Name
 
@@ -2738,7 +2738,7 @@ This is a choice field of Continuous or Intermittent. The operation of a constan
 
 #### Field: Pump Flow Rate Schedule Name
 
-The schedule values modify the Rated Flow Rate of the pump on a time basis. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field:Pump Curve Name
 
@@ -2917,7 +2917,7 @@ This numeric field contains the fourth coefficient in the part load ratio curve.
 
 #### Field: Pump Flow Rate Schedule Name
 
-The schedule values modify the Rated Flow Rate of the pump on a time basis the default is that the pump is ON and runs according to its other operational requirements specified above. The schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field: Zone Name
 
@@ -3078,7 +3078,7 @@ This is a choice field of Continuous or Intermittent. The operation of a constan
 
 #### Field: Pump Flow Rate Schedule Name
 
-The schedule values modify the Total Rated Flow Rate of the pump on a time basis. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field: Zone Name
 
@@ -3253,7 +3253,7 @@ This is a choice field of Continuous or Intermittent. A variable speed pump bank
 
 #### Field: Pump Flow Rate Schedule Name
 
-Modifies the Rated Volumetric Flow Rate of the pump on a time basis. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field: Zone Name
 
