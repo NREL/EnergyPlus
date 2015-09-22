@@ -1381,7 +1381,7 @@ namespace HeatRecovery {
 		Real64 NomSupAirVolFlowDes;		// Autosized supply air flow rate for reproting
 		Real64 NomSupAirVolFlowUser;	// Hard-sized supply air flow rate for reproting
 		Real64 NomSecAirVolFlowDes;		// Autosized secondary air flow rate for reporting
-		Real64 NomSecAirVolFlowUser;	// Hard
+		Real64 NomSecAirVolFlowUser;	// Hard-sized secondary air flow rate for reporting
 
 		IsAutoSize = false;
 		NomSupAirVolFlowDes = 0.0;

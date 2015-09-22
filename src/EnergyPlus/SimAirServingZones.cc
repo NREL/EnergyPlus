@@ -511,9 +511,6 @@ namespace SimAirServingZones {
 			return;
 		}
 
-		// initialize on off fan PLR to 1 for those systems that do not set this variable
-		DataAirLoop::LoopOnOffFanPartLoadRatio = 1.0;
-
 		// Loop through the primary air systems and obtain the data for each system
 		for ( AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum ) {
 			NumOASysControllers = 0;
@@ -526,6 +523,7 @@ namespace SimAirServingZones {
 			PrimaryAirSystem( AirSysNum ).NumOAHeatCoils = 0;
 			PrimaryAirSystem( AirSysNum ).NumOACoolCoils = 0;
 			AirLoopControlInfo( AirSysNum ).FanOpMode = DataHVACGlobals::ContFanCycCoil; // initialize to constant fan mode for all air loops
+			AirLoopFlow( AirSysNum ).FanPLR = 1.0; // initialize to 1 for all air loops
 
 			CurrentModuleObject = "AirLoopHVAC";
 
@@ -2909,7 +2907,7 @@ namespace SimAirServingZones {
 			// Heat recovery
 		} else if ( SELECT_CASE_var == HeatXchngr ) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent'
 			// 'HeatExchanger:Desiccant:BalancedFlow'
-			SimHeatRecovery( CompName, FirstHVACIteration, CompIndex, AirLoopControlInfo( AirLoopNum ).FanOpMode, DataAirLoop::LoopOnOffFanPartLoadRatio, _, _, _, AirLoopControlInfo( AirLoopNum ).EconoActive, AirLoopControlInfo( AirLoopNum ).HighHumCtrlActive );
+			SimHeatRecovery( CompName, FirstHVACIteration, CompIndex, AirLoopControlInfo( AirLoopNum ).FanOpMode, AirLoopFlow( AirLoopNum ).FanPLR, _, _, _, AirLoopControlInfo( AirLoopNum ).EconoActive, AirLoopControlInfo( AirLoopNum ).HighHumCtrlActive );
 
 			// Ducts
 		} else if ( SELECT_CASE_var == Duct ) { // 'Duct'

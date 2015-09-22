@@ -648,15 +648,19 @@ namespace MixedAir {
 		} else if ( SELECT_CASE_var == HeatXchngr ) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent',
 			// 'HeatExchanger:Desiccant:BalancedFlow'
 			if ( Sim ) {
-				if( DataAirLoop::LoopOnOffFanPartLoadRatio > 0.0 ) {
-					AirloopPLR = DataAirLoop::LoopOnOffFanPartLoadRatio;
-				} else {
-					AirloopPLR = 1.0;
-				}
 				if( AirLoopControlInfo( AirLoopNum ).FanOpMode == DataHVACGlobals::CycFanCycCoil ) {
 					FanOpMode = DataHVACGlobals::CycFanCycCoil;
 				} else {
 					FanOpMode = DataHVACGlobals::ContFanCycCoil;
+				}
+				if( FanOpMode == DataHVACGlobals::CycFanCycCoil ) {
+					// HX's in the OA system can be troublesome given that the OA flow rate is not necessarily proportional to air loop PLR
+					// adding that user input for branch flow rate, HX nominal flow rate, OA system min/max flow rate will not necessarily be perfectly input,
+					// a compromise is used for OA sys HX's as the ratio of flow to max. Issue #4298.
+//					AirloopPLR = AirLoopFlow( AirLoopNum ).FanPLR;
+					AirloopPLR = OAController( OASysNum ).OAMassFlow / OAController( OASysNum ).MaxOAMassFlowRate;
+				} else {
+					AirloopPLR = 1.0;
 				}
 				SimHeatRecovery( CompName, FirstHVACIteration, CompIndex, FanOpMode, AirloopPLR, _, _, _, AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass, AirLoopControlInfo( AirLoopNum ).HighHumCtrlActive );
 			}
