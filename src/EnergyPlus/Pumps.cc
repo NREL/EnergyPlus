@@ -106,6 +106,7 @@ namespace Pumps {
 	int NumPumps( 0 ); // Num Pumps (used in pump bank)
 	int NumPumpsRunning( 0 ); // Num of pumps ON (used in pump bank)
 	int NumPumpsFullLoad( 0 ); // Num pumps running at full load (used in pump bank)
+	bool GetInputFlag( true ); // Get input once and once only
 	//  INTEGER       :: NumPumpsPartLoad                   = 0    !Num pumps running at part load (used in pump bank)
 
 	//simulation and reporting variables
@@ -126,6 +127,20 @@ namespace Pumps {
 	//*************************************************************************!
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumPumps = 0;
+		NumPumpsRunning = 0;
+		NumPumpsFullLoad = 0;
+		GetInputFlag = true;
+		PumpMassFlowRate = 0.0 ;
+		PumpHeattoFluid= 0.0 ; 
+		Power= 0.0 ;
+		ShaftPower= 0.0 ;
+		PumpEquip.deallocate();
+		PumpEquipReport.deallocate();
+	}
 
 	void
 	SimPumps(
@@ -160,7 +175,7 @@ namespace Pumps {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // Get input once and once only
+
 		int PumpNum; // Pump index within PumpEquip derived type
 
 		// Get input from IDF one time

@@ -102,6 +102,8 @@ namespace DataAirflowNetwork {
 	int NumOfNodesDistribution( 0 ); // Number of nodes for distribution system calculation
 	int NumOfLinksMultiZone( 0 ); // Number of links for multizone calculation
 	int NumOfLinksDistribution( 0 ); // Number of links for distribution system calculation
+	int NumOfNodesIntraZone( 0 ); // Number of nodes for intrazone calculation
+	int NumOfLinksIntraZone( 0 ); // Number of links for intrazone calculation
 
 	int AirflowNetworkNumOfNodes( 0 ); // Number of nodes for AirflowNetwork calculation
 	// = NumOfNodesMultiZone+NumOfNodesDistribution
@@ -175,6 +177,8 @@ namespace DataAirflowNetwork {
 	Array1D< DeltaCpProp > DeltaCp;
 	Array1D< DeltaCpProp > EPDeltaCP;
 	Array1D< MultizoneCompExhaustFanProp > MultizoneCompExhaustFanData;
+	Array1D< IntraZoneNodeProp > IntraZoneNodeData;
+	Array1D< IntraZoneLinkageProp > IntraZoneLinkageData;
 	Array1D< DisSysNodeProp > DisSysNodeData;
 	Array1D< DisSysCompLeakProp > DisSysCompLeakData;
 	Array1D< DisSysCompELRProp > DisSysCompELRData;

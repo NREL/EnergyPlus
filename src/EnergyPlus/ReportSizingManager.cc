@@ -432,7 +432,7 @@ namespace ReportSizingManager {
 			if ( !IsAutoSize && !SizingDesRunThisZone && !SizingDesValueFromParent ) {
 				HardSizeNoDesRun = true;
 				AutosizeUser = SizingResult;
-				if ( PrintWarningFlag && SizingResult > 0.0 ) {
+				if ( PrintWarningFlag && SizingResult > 0.0 && !DataScalableCapSizingON ) {
 					if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
 						SizingResult /= ( 1 - DataBypassFrac ); // back out bypass fraction applied in GetInput
 						ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, SizingResult );
@@ -1572,8 +1572,10 @@ namespace ReportSizingManager {
 				} else if ( SizingType == HeatingCapacitySizing ) {
 					DataFracOfAutosizedHeatingCapacity = 1.0;
 					if (CurOASysNum > 0) {
-						if (OASysEqSizing(CurOASysNum).HeatingAirFlow) {
+						if (OASysEqSizing(CurOASysNum).AirFlow) {
 							DesVolFlow = OASysEqSizing(CurOASysNum).AirVolFlow;
+						} else if (OASysEqSizing(CurOASysNum).HeatingAirFlow) {
+							DesVolFlow = OASysEqSizing(CurOASysNum).HeatingAirVolFlow;
 						} else {
 							DesVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
 						}
@@ -1859,7 +1861,7 @@ namespace ReportSizingManager {
 			if ( DataEMSOverrideON ) {
 				SizingResult = DataEMSOverride;
 			} else {
-				SizingResult = AutosizeDes;
+				AutosizeUser = SizingResult;
 			}
 		} else {
 			AutosizeUser = SizingResult;
@@ -1870,11 +1872,11 @@ namespace ReportSizingManager {
 				if ( SELECT_CASE_var == SupplyAirFlowRate || SELECT_CASE_var == None ) {
 					ScalableSM = "User-Specified (scaled by flow / zone) ";
 				} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
-					ScalableSM = "User-Specified(scaled by flow / area) ";
+					ScalableSM = "User-Specified (scaled by flow / area) ";
 				} else if ( SELECT_CASE_var == FractionOfAutosizedCoolingAirflow || SELECT_CASE_var == FractionOfAutosizedHeatingAirflow ) {
-					ScalableSM = "User-Specified(scaled by fractional multiplier) ";
+					ScalableSM = "User-Specified (scaled by fractional multiplier) ";
 				} else if ( SELECT_CASE_var == FlowPerCoolingCapacity || SELECT_CASE_var == FlowPerHeatingCapacity ) {
-					ScalableSM = "User-Specified(scaled by flow / capacity) ";
+					ScalableSM = "User-Specified (scaled by flow / capacity) ";
 				} else {
 					ScalableSM = "Design Size ";
 				}}
@@ -1887,9 +1889,9 @@ namespace ReportSizingManager {
 				ScalableSM = "User-Specified ";
 				if ( SizingResult == AutoSize ) ScalableSM = "Design Size ";
 			} else if ( SELECT_CASE_var == CapacityPerFloorArea ) {
-				ScalableSM = "User-Specified(scaled by capacity / area) ";
+				ScalableSM = "User-Specified (scaled by capacity / area) ";
 			} else if ( SELECT_CASE_var == FractionOfAutosizedHeatingCapacity || SELECT_CASE_var == FractionOfAutosizedCoolingCapacity ) {
-				ScalableSM = "User-Specified(scaled by fractional multiplier) ";
+				ScalableSM = "User-Specified (scaled by fractional multiplier) ";
 			} else {
 				ScalableSM = "Design Size ";
 			}
@@ -1970,12 +1972,23 @@ namespace ReportSizingManager {
 						}
 					}
 				} else {
-					if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag ) {
+					if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag && !( DataScalableSizingON || DataScalableCapSizingON ) ) {
 						ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( AutosizeDes - AutosizeUser ) / AutosizeUser ) > AutoVsHardSizingThreshold ) {
 								ShowMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
 								ShowContinueError( "User-Specified " + SizingString + " = " + RoundSigDigits( AutosizeUser, 5 ) );
+								ShowContinueError( "differs from Design Size " + SizingString + " = " + RoundSigDigits( AutosizeDes, 5 ) );
+								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+							}
+						}
+					} else if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag && ( DataScalableSizingON || DataScalableCapSizingON ) ) {
+						ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, AutosizeDes, ScalableSM + SizingString, AutosizeUser );
+						if ( DisplayExtraWarnings ) {
+							if ( ( std::abs( AutosizeDes - AutosizeUser ) / AutosizeUser ) > AutoVsHardSizingThreshold ) {
+								ShowMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
+								ShowContinueError( ScalableSM + SizingString + " = " + RoundSigDigits( AutosizeUser, 5 ) );
 								ShowContinueError( "differs from Design Size " + SizingString + " = " + RoundSigDigits( AutosizeDes, 5 ) );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );

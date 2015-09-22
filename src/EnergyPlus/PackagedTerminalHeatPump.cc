@@ -372,7 +372,7 @@ namespace PackagedTerminalHeatPump {
 		OnOffFanPartLoadFraction = 1.0;
 
 		if ( UnitOn ) {
-			if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 0 ) {
+			if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 				SimVariableSpeedHP( PTUnitNum, ZoneNum, FirstHVACIteration, QZnReq, QLatReq, OnOffAirFlowRatio, OpMode, HXUnitOn );
 			} else {
 				ControlPTUnitOutput( PTUnitNum, FirstHVACIteration, OpMode, QZnReq, ZoneNum, PartLoadFrac, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
@@ -389,7 +389,7 @@ namespace PackagedTerminalHeatPump {
 		// calculate delivered capacity
 		AirMassFlow = Node( InletNode ).MassFlowRate;
 
-		if ( PTUnit( PTUnitNum ).NumOfSpeedCooling == 0 ) {
+		if ( ! PTUnit( PTUnitNum ).useVSCoilModel ) {
 			CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadFrac, QSensUnitOut, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 		} else {
 			// calculate delivered capacity
@@ -404,7 +404,7 @@ namespace PackagedTerminalHeatPump {
 		QSensUnitOutNoATM = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
 		QTotUnitOut = AirMassFlow * ( Node( OutletNode ).Enthalpy - Node( InletNode ).Enthalpy );
 
-		if ( PTUnit( PTUnitNum ).NumOfSpeedCooling == 0 ) {
+		if ( ! PTUnit( PTUnitNum ).useVSCoilModel ) {
 			// report variables
 			if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 				PTUnit( PTUnitNum ).CompPartLoadRatio = PartLoadFrac;
@@ -884,6 +884,7 @@ namespace PackagedTerminalHeatPump {
 			if ( Alphas( 9 ) == "COIL:HEATING:DX:VARIABLESPEED" && Alphas( 11 ) == "COIL:COOLING:DX:VARIABLESPEED" ) {
 				if ( PTUnit( PTUnitNum ).DXHeatCoilIndex > 0 && PTUnit( PTUnitNum ).DXCoolCoilIndexNum > 0 ) {
 					SetVarSpeedCoilData( PTUnit( PTUnitNum ).DXCoolCoilIndexNum, ErrorsFound, _, PTUnit( PTUnitNum ).DXHeatCoilIndex );
+					PTUnit( PTUnitNum ).useVSCoilModel = true;
 				}
 			}
 
@@ -1758,6 +1759,7 @@ namespace PackagedTerminalHeatPump {
 			if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
 				errFlag = false;
 				PTUnit( PTUnitNum ).DesignCoolingCapacity = GetCoilCapacityVariableSpeed( PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, errFlag );
+				PTUnit( PTUnitNum ).useVSCoilModel = true;
 				if ( errFlag ) {
 					ShowContinueError( "...occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 					ErrorsFound = true;
@@ -2035,6 +2037,7 @@ namespace PackagedTerminalHeatPump {
 			} else if ( Alphas( 9 ) == "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" && Alphas( 11 ) == "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) {
 				if ( PTUnit( PTUnitNum ).DXHeatCoilIndex > 0 && PTUnit( PTUnitNum ).DXCoolCoilIndexNum > 0 ) {
 					SetVarSpeedCoilData( PTUnit( PTUnitNum ).DXCoolCoilIndexNum, ErrorsFound, _, PTUnit( PTUnitNum ).DXHeatCoilIndex );
+					PTUnit( PTUnitNum ).useVSCoilModel = true;
 				}
 			} else {
 				ShowContinueError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"" );
@@ -2919,7 +2922,7 @@ namespace PackagedTerminalHeatPump {
 			MySizeFlag( PTUnitNum ) = false;
 		}
 
-		if ( ( PTUnit( PTUnitNum ).DXCoolCoilType_Num == Coil_CoolingWaterToAirHPVSEquationFit || PTUnit( PTUnitNum ).DXCoolCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) && ( 0 == PTUnit( PTUnitNum ).NumOfSpeedCooling ) ) {
+		if ( PTUnit( PTUnitNum ).useVSCoilModel && PTUnit( PTUnitNum ).NumOfSpeedCooling == 0 && ! MySizeFlag( PTUnitNum ) ) {
 
 			SimVariableSpeedCoils( "", PTUnit( PTUnitNum ).DXCoolCoilIndexNum, 0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
 			PTUnit( PTUnitNum ).NumOfSpeedCooling = VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).NumOfSpeeds;
@@ -3012,7 +3015,7 @@ namespace PackagedTerminalHeatPump {
 			PartLoadFrac = 0.0;
 		}
 
-		if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 0 ) { //BoS, variable-speed water source hp
+		if ( PTUnit( PTUnitNum ).useVSCoilModel && PTUnit( PTUnitNum ).NumOfSpeedCooling > 0 && ! MySizeFlag( PTUnitNum ) ) { //BoS, variable-speed water source hp
 			//PTUnit(PTUnitNum)%IdleMassFlowRate = RhoAir*PTUnit(PTUnitNum)%IdleVolumeAirRate
 			NumOfSpeedCooling = PTUnit( PTUnitNum ).NumOfSpeedCooling;
 			NumOfSpeedHeating = PTUnit( PTUnitNum ).NumOfSpeedHeating;
@@ -3206,7 +3209,7 @@ namespace PackagedTerminalHeatPump {
 		if ( ( PTUnit( PTUnitNum ).OpMode == ContFanCycCoil || PTUnit( PTUnitNum ).ATMixerExists ) && GetCurrentScheduleValue( PTUnit( PTUnitNum ).SchedPtr ) > 0.0 && ( ( GetCurrentScheduleValue( PTUnit( PTUnitNum ).FanAvailSchedPtr ) > 0.0 || ZoneCompTurnFansOn ) && ! ZoneCompTurnFansOff ) ) {
 
 			SupHeaterLoad = 0.0;
-			if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+			if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 				CalcVarSpeedHeatPump( PTUnitNum, ZoneNum, FirstHVACIteration, Off, 1, 0.0, 0.0, NoCompOutput, LatentOutput, QZnReq, 0.0, OnOffAirFlowRatio, SupHeaterLoad, false );
 			} else {
 				CalcPTUnit( PTUnitNum, FirstHVACIteration, 0.0, NoCompOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, false );
@@ -3229,7 +3232,7 @@ namespace PackagedTerminalHeatPump {
 						HeatingLoad = true;
 					}
 					PartLoadFrac = 1.0;
-					if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+					if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 						//CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, &
 						//      ZoneEquipConfig(ZoneNum)%AirLoopNum, OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
 						SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
@@ -3243,7 +3246,7 @@ namespace PackagedTerminalHeatPump {
 						QZnReq = 0.0;
 						HeatingLoad = false;
 						PartLoadFrac = 0.0;
-						if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+						if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 							SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 							//CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
 							//       OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
@@ -3256,7 +3259,7 @@ namespace PackagedTerminalHeatPump {
 					QZnReq = 0.0;
 					CoolingLoad = false;
 					PartLoadFrac = 0.0;
-					if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+					if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 						SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 						//CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
 						//         OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
@@ -3277,7 +3280,7 @@ namespace PackagedTerminalHeatPump {
 					}
 					HeatingLoad = false;
 					PartLoadFrac = 1.0;
-					if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+					if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 						SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 						// CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
 						//     OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
@@ -3292,7 +3295,7 @@ namespace PackagedTerminalHeatPump {
 						QZnReq = 0.0;
 						CoolingLoad = false;
 						PartLoadFrac = 0.0;
-						if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+						if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 							SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 							//CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
 							//      OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
@@ -3305,7 +3308,7 @@ namespace PackagedTerminalHeatPump {
 					QZnReq = 0.0;
 					HeatingLoad = false;
 					PartLoadFrac = 0.0;
-					if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+					if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 						SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 						//CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
 						//     OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)

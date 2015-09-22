@@ -323,6 +323,9 @@ namespace DataConvergParams {
 	extern Array1D< HVACAirLoopIterationConvergenceStruct > AirLoopConvergence;
 	extern Array1D< PlantIterationConvergenceStruct > PlantConvergence;
 
+	void
+	clear_state();
+
 } // DataConvergParams
 
 } // EnergyPlus

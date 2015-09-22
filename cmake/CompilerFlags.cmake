@@ -24,7 +24,7 @@ IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++
     ADD_CXX_DEFINITIONS("/nologo")
     ADD_CXX_DEFINITIONS("/EHsc")
     ADD_CXX_DEFINITIONS("/MP") # Enables multi-processor compilation of source within a single project
-    ADD_CXX_DEFINITIONS("/W1") # Increase to /W2 then /W3 as more serious warnings are addressed
+    STRING (REGEX REPLACE "/W3" "/W1" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}") # Increase to /W2 then /W3 as more serious warnings are addressed (using regex to avoid VC override warnings)
 
     ADD_CXX_DEFINITIONS("/wd4068 /wd4101 /wd4102 /wd4244 /wd4258 /wd4355 /wd4996") # Disables warning messages listed above
     ADD_CXX_DEFINITIONS("/DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
@@ -40,29 +40,36 @@ IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++
 ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # g++/Clang
     option(ENABLE_THREAD_SANITIZER "Enable thread sanitizer testing in gcc/clang" FALSE)
     set(LINKER_FLAGS "")
-    if(ENABLE_THREAD_SANITIZER)
-      ADD_CXX_DEFINITIONS(-fsanitize=thread )
-      add_definitions(-ggdb -fno-omit-frame-pointer)
+    if (ENABLE_THREAD_SANITIZER)
+      ADD_CXX_DEFINITIONS("-fsanitize=thread")
+      ADD_DEFINITIONS("-ggdb -fno-omit-frame-pointer")
       set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=thread -ggdb")
     endif()
 
     option(ENABLE_ADDRESS_SANITIZER "Enable address sanitizer testing in gcc/clang" FALSE)
-    if(ENABLE_ADDRESS_SANITIZER)
-      ADD_CXX_DEFINITIONS(-fsanitize=address)
-      add_definitions(-ggdb -fno-omit-frame-pointer)
+    if (ENABLE_ADDRESS_SANITIZER)
+      ADD_CXX_DEFINITIONS("-fsanitize=address")
+      ADD_DEFINITIONS("-ggdb -fno-omit-frame-pointer")
       set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address -ggdb")
     endif()
 
+    option(ENABLE_MEMORY_SANITIZER "Enable reads of unintialized memory sanitizer testing in gcc/clang" FALSE)
+    if (ENABLE_MEMORY_SANITIZER)
+      ADD_CXX_DEFINITIONS("-fsanitize=memory")
+      ADD_DEFINITIONS("-ggdb -fno-omit-frame-pointer")
+      set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=memory -ggdb")
+    endif()
+
     option(ENABLE_UNDEFINED_SANITIZER "Enable undefined behavior sanitizer testing in gcc/clang" FALSE)
-    if(ENABLE_UNDEFINED_SANITIZER)
-      ADD_CXX_DEFINITIONS(-fsanitize=undefined )
-      add_definitions(-ggdb -fno-omit-frame-pointer)
+    if (ENABLE_UNDEFINED_SANITIZER)
+      ADD_CXX_DEFINITIONS("-fsanitize=undefined")
+      ADD_DEFINITIONS("-ggdb -fno-omit-frame-pointer")
       set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=undefined -ggdb")
     endif()
 
     option(ENABLE_COVERAGE "Enable Coverage Reporting in GCC" FALSE)
-    if(ENABLE_COVERAGE)
-      add_definitions(--coverage -O0)
+    if (ENABLE_COVERAGE)
+      ADD_DEFINITIONS("--coverage -O0")
       set(LINKER_FLAGS "${LINKER_FLAGS} --coverage")
     endif()
 
@@ -71,7 +78,7 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     if(CMAKE_HOST_UNIX)
       if(NOT APPLE)
         set(LINKER_FLAGS "${LINKER_FLAGS} -pthread")
-        add_definitions(-pthread)
+        ADD_DEFINITIONS("-pthread")
       endif()
     endif()
 
@@ -86,7 +93,7 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     ADD_CXX_DEFINITIONS("-ffor-scope")
     ADD_CXX_DEFINITIONS("-Wall -Wextra") # Turn on warnings
     ADD_CXX_DEFINITIONS("-Wno-unknown-pragmas")
-    if( CMAKE_COMPILER_IS_GNUCXX ) # g++
+    if ( CMAKE_COMPILER_IS_GNUCXX ) # g++
       ADD_CXX_DEFINITIONS("-Wno-unused-but-set-parameter -Wno-unused-but-set-variable") # Suppress unused-but-set warnings until more serious ones are addressed
       ADD_CXX_DEFINITIONS("-Wno-maybe-uninitialized")
     elseif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
@@ -97,8 +104,9 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     if ( CMAKE_COMPILER_IS_GNUCXX ) # g++
       ADD_CXX_DEBUG_DEFINITIONS("-ffloat-store") # Improve debug run solution stability
       ADD_CXX_DEBUG_DEFINITIONS("-fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
-    endif ()
-  
+      ADD_CXX_DEBUG_DEFINITIONS("-D_GLIBCXX_DEBUG") # Standard container debug mode (bounds checking, ...)
+    endif()
+
   ADD_CXX_DEBUG_DEFINITIONS("-ggdb") # Produces debugging information specifically for gdb
 
 ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
@@ -106,6 +114,7 @@ ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     # Disabled Warnings: Enable some of these as more serious warnings are addressed
     #   177 Variable declared but never referenced
     #   488 Template parameter not used ...
+    #   809 Exception specification consistency warnings that fire in gtest code
     #   869 Parameter never referenced
     #  1786 Use of deprecated items
     #  2259 Non-pointer conversions may lose significant bits
@@ -118,7 +127,7 @@ ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     ADD_CXX_DEFINITIONS("/Qcxx-features") # Enables standard C++ features without disabling Microsoft extensions
     ADD_CXX_DEFINITIONS("/Wall") # Enable "all" warnings
     ADD_CXX_DEFINITIONS("/Wp64") # 64-bit warnings
-    ADD_CXX_DEFINITIONS("/Qdiag-disable:177,488,869,1786,2259,3280,11074,11075") # Disable warnings listed above
+    ADD_CXX_DEFINITIONS("/Qdiag-disable:177,488,809,869,1786,2259,3280,11074,11075") # Disable warnings listed above
     ADD_CXX_DEFINITIONS("/DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
     ADD_CXX_DEFINITIONS("/DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
 
@@ -150,6 +159,7 @@ ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     # Disabled Warnings: Enable some of these as more serious warnings are addressed
     #   177 Variable declared but never referenced
     #   488 Template parameter not used ...
+    #   809 Exception specification consistency warnings that fire in gtest code
     #   869 Parameter never referenced
     #  1786 Use of deprecated items
     #  2259 Non-pointer conversions may lose significant bits
@@ -161,7 +171,7 @@ ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     ADD_CXX_DEFINITIONS("-std=c++11") # Specify C++11 language
     ADD_CXX_DEFINITIONS("-Wall") # Enable "all" warnings
     ADD_CXX_DEFINITIONS("-Wp64") # 64-bit warnings
-    ADD_CXX_DEFINITIONS("-diag-disable:177,488,869,1786,2259,3280,11074,11075") # Disable warnings listed above
+    ADD_CXX_DEFINITIONS("-diag-disable:177,488,809,869,1786,2259,3280,11074,11075") # Disable warnings listed above
 
     IF(NOT APPLE)
       ADD_CXX_DEFINITIONS(-pthread)

@@ -981,7 +981,7 @@ The ZoneControl:ContaminantController object is used for any of the following tw
 
 1)      To control a zone to a specified indoor level of contaminants. When this zone is served by an AirLoopHVAC, the other zones served by the same AirLoopHVAC will have the same specified indoor level, if no objects in the other zones served by the same AirLoop are specified. Currently, the available contaminant controls are carbon dioxide and generic contaminant controls. The specified carbon dioxide setpoint is used to calculate the required outdoor airflow rate through the HVAC system to reach the setpoint. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = IndoorAirQualityProcedure.The specified generic contaminant setpoint is used to calculate the required outdoor airflow rate through the HVAC system to reach the setpoint. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = IndoorAirQualityProcedure-GenericContaminant.
 
-2)      To specify minimum CO2 concentration schedule name for a zone. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = ProportionalControl.    Carbon Dioxide Control Availability Schedule Name    determines the availability of    ProportionalControl   .
+2)      To specify minimum CO2 concentration schedule name for a zone. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy.    Carbon Dioxide Control Availability Schedule Name determines the availability of    ProportionalControl   .
 
 For the first purpose above, when multiple zones are served by an AirLoop, those zones that do not have a contaminant controller object specified in the input data file are automatically assigned a carbon dioxide setpoint. Zone objects entered in the input data file are internally assigned an index number from 1 to n (first defined Zone object = 1, next Zone object defined in the input file = 2, etc.). For zones served by an AirLoop that do not have a contaminant controller specified, the zone   s carbon dioxide setpoint will be the same as the zone with the next highest zone index number that has a contaminant controller specified. If a zone with a higher index number and contaminant controller specified does not exist, then the zone with the next lowest zone   index number that has a contaminant controller specified will be used. For example, assume an AirLoop serves zones 1 through 5, but one ZoneControl:ContaminantController object is specified for zone 2, a second ZoneControl:ContaminantController object is specified for zone 4, and no ZoneControl:ContaminantController objects are specified for zones 1, 3 and 5. In this case, zone 1 will be assigned the carbon dioxide setpoint schedule that was specified for zone 2, and zones 3 and 5 will be assigned the carbon dioxide setpoint schedule that was specified for zone 4.
 
@@ -1003,7 +1003,7 @@ This field contains the name of a schedule that contains the zone carbon dioxide
 
 #### Field:Minimum Carbon Dioxide Concentration Schedule Name
 
-This field contains the name of a schedule that contains the minimum zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. This field is used when the field    System Outdoor Air Method    = ProportionalControl in the Controller:MechanicalVentilation object.
+This field contains the name of a schedule that contains the minimum zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. This field is used when the field    System Outdoor Air Method    = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy in the Controller:MechanicalVentilation object.
 
 #### Field: Generic Contaminant Control Availability Schedule Name
 
@@ -2554,7 +2554,7 @@ This is a choice field of Continuous or Intermittent. A variable speed pump is d
 
 #### Field: Pump Flow Rate Schedule Name
 
-The schedule values modify the value for Rated Flow Rate of the pump on a time basis. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field: Pump Curve Name
 
@@ -2738,7 +2738,7 @@ This is a choice field of Continuous or Intermittent. The operation of a constan
 
 #### Field: Pump Flow Rate Schedule Name
 
-The schedule values modify the Rated Flow Rate of the pump on a time basis. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field:Pump Curve Name
 
@@ -2917,7 +2917,7 @@ This numeric field contains the fourth coefficient in the part load ratio curve.
 
 #### Field: Pump Flow Rate Schedule Name
 
-The schedule values modify the Rated Flow Rate of the pump on a time basis the default is that the pump is ON and runs according to its other operational requirements specified above. The schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field: Zone Name
 
@@ -3078,7 +3078,7 @@ This is a choice field of Continuous or Intermittent. The operation of a constan
 
 #### Field: Pump Flow Rate Schedule Name
 
-The schedule values modify the Total Rated Flow Rate of the pump on a time basis. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field: Zone Name
 
@@ -3253,7 +3253,7 @@ This is a choice field of Continuous or Intermittent. A variable speed pump bank
 
 #### Field: Pump Flow Rate Schedule Name
 
-Modifies the Rated Volumetric Flow Rate of the pump on a time basis. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field: Zone Name
 
@@ -4277,6 +4277,239 @@ This is the total heating output of the DX coil in Joules over the time step bei
 #### Heating Coil Runtime Fraction []
 
 This is the runtime fraction of the DX coil compressor and condenser fan(s) for the time step being reported.
+
+### Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl
+
+This coil object is specifically designed for the physics based VRF model applicable for Fluid Temperature Control (VRF-FluidTCtrl). It describes the performance of the indoor unit coil of the VRF system operating at cooling mode. The name of this object is entered as an input to the object *ZoneHVAC:TerminalUnit:VariableRefrigerantFlow*. The outdoor unit part of the VRF system is modeled separately (refer to *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object).
+
+#### Field: Name
+
+This alpha field defines a unique user-assigned name for an instance of a VRF DX cooling coil. Any reference to this DX cooling coil by another object will use this name. This cooling coil name must be entered in the AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl object. No other system type uses this specific coil.
+
+#### Field: Availability Schedule Name
+
+This alpha field defines the name of the coil availability schedule. A name should be entered to define the availability of the coil. Schedule values of 0 denote the DX cooling coil is off. A schedule value greater than 0 indicates that the coil can operate during the time period. If this field is blank, the schedule has values of 1 for all time periods.
+
+#### Field: Coil Air Inlet Node
+
+This alpha field defines the name of the air inlet node entering the DX cooling coil.
+
+#### Field: Coil Air Outlet Node
+
+This alpha field defines the name of the air outlet node exiting the DX cooling coil.
+
+#### Field: Rated Total Cooling Capacity
+
+This numeric field defines the gross rated total cooling capacity of the DX cooling coil in watts. The total cooling capacity should be a gross , i.e., the effect of supply air fan heat NOT accounted for.
+ 
+#### Field: Rated Sensible Heat Ratio
+
+This numeric field defines the gross sensible heat ratio (sensible capacity divided by total cooling capacity) of the DX cooling coil at rated conditions. Both the sensible and total cooling capacities used to define the Rated SHR should be gross (i.e., the effect of supply air fan heat is NOT accounted for)
+	   
+#### Field: Indoor Unit Reference Superheating 
+
+This numeric field defines the reference superheating degrees of the indoor unit. If this field is blank, the default value of 5.0 C is used. 
+	   
+#### Field: Indoor Unit Evaporating Temperature Function of Superheating Curve Name    
+
+This alpha field defines the name of a quadratic performance curve that parameterizes the variation of indoor unit evaporating temperature as a function of superheating degrees. The output of this curve is the temperature difference between the coil surface air temperature and the evaporating temperature.
+   
+#### Field: Name of Water Storage Tank for Condensate Collection
+
+This field is optional. It is used to describe where condensate from the coil is collected. If blank or omitted, then any coil condensate is discarded. Enter the name of Water Storage Tank object defined elsewhere and the condensate will then be collected in that tank.
+
+Following is an example input for a Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl object.
+
+```idf
+  Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,
+    TU1 VRF DX Cooling Coil, !- Name
+    VRFAvailSched,           !- Availability Schedule Name
+    TU1 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node
+    TU1 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node
+    autosize,                !- Rated Total Cooling Capacity {W}
+    autosize,                !- Rated Sensible Heat Ratio
+    3,                       !- Indoor Unit Reference Superheating Degrees {C}    
+    IUEvapTempCurve,         !- Indoor Unit Evaporating Temperature Function of Superheating Curve Name    
+    ;                        !- Name of Water Storage Tank for Condensate Collection
+
+  Curve:Quadratic,
+    IUEvapTempCurve,         !- Name
+    0,                       !- Coefficient1 Constant
+    0.843,                   !- Coefficient2 x
+    0,                       !- Coefficient3 x**2
+    0,                       !- Minimum Value of x    
+    15,                      !- Maximum Value of x    
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature;             !- Output Unit Type
+
+```
+
+### Cooling DX Coil (VariableRefrigerantFlow:FluidTemperatureControl) Outputs
+
+* HVAC,Average, Cooling Coil Total Cooling Rate [W]
+
+* HVAC,Sum, Cooling Coil Total Cooling Energy [J]
+
+* HVAC,Average, Cooling Coil Sensible Cooling Rate [W]
+
+* HVAC,Sum, Cooling Coil Sensible Cooling Energy [J]
+
+* HVAC,Average, Cooling Coil Latent Cooling Rate [W]
+
+* HVAC,Sum, Cooling Coil Latent Cooling Energy [J]
+
+* HVAC,Average, Cooling Coil Runtime Fraction []
+
+* HVAC,Average, Cooling Coil VRF Evaporating Temperature [C]
+
+* HVAC,Average, Cooling Coil VRF Super Heating Degrees [C]
+
+Evaporative-cooled condenser:
+
+* HVAC,Average,Cooling Coil Condensate Volume Flow Rate [m3/s]
+
+* Zone,Meter,Condensate:OnSiteWater [m3]
+
+* HVAC,Sum,Cooling Coil Condensate Volume [m3]
+
+#### Cooling Coil Total Cooling Rate [W]
+
+This field is the total (sensible and latent) cooling rate output of the DX coil in Watts. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Total Cooling Energy [J]
+
+This is the total (sensible plus latent) cooling output of the DX coil in Joules over the time step being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = CoolingCoils, Group Key = System (Ref. Output:Meter objects).
+
+#### Cooling Coil Sensible Cooling Rate [W]
+
+This output is the moist air sensible cooling rate output of the DX coil in Watts. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Sensible Cooling Energy [J]
+
+This is the moist air sensible cooling output of the DX coil in Joules for the time step being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Latent Cooling Rate [W]
+
+This is the latent cooling rate output of the DX coil in Watts. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Latent Cooling Energy [J]
+
+This is the latent cooling output of the DX coil in Joules for the time step being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Cooling Coil Runtime Fraction []
+
+This is the runtime fraction of the DX coil compressor and condenser fan(s) for the time step being reported.
+
+#### Cooling Coil VRF Evaporating Temperature [C]
+
+This is the evaporating temperature of the VRF system operating at cooling mode. This value is manipulated by the VRF system considering the load conditions of all the zones it serves. It affects the cooling coil surface temperature and thus the cooling capacity of the coil.
+
+#### Cooling Coil VRF Super Heating Degrees [C]
+
+This is the super heating degrees of the VRF system operating at cooling mode. This value is manipulated by each VRF terminal unit to adjust the cooling capacity of the coil considering the load conditions of the zone. It affects the cooling coil surface temperature and thus the cooling capacity of the coil.
+
+#### Cooling Coil Condensate Volume Flow Rate [m3/s]
+
+This is the volumetric rate of water collected as condensate from the coil. This report only appears if a water storage tank is named in the input object.
+
+#### Cooling Coil Condensate Volume [m3]
+
+This is the volume of water collected as condensate from the coil. This report only appears if a water storage tank is named in the input object.
+
+
+### Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl
+
+This coil object is specifically designed for the physics based VRF model applicable for Fluid Temperature Control (VRF-FluidTCtrl). It describes the performance of the indoor unit coil of the VRF system operating at heating mode. The name of this object is entered as an input to the object *ZoneHVAC:TerminalUnit:VariableRefrigerantFlow*. The outdoor unit part of the VRF system is modeled separately (refer to *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object).
+
+#### Field: Name
+
+This alpha field defines a unique user-assigned name for an instance of a VRF DX heating coil. Any reference to this DX heating coil by another object will use this name. This heating coil name must be entered in the AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl object. No other system type uses this specific coil.
+
+#### Field: Availability Schedule
+
+This alpha field defines the name of the schedule (ref: Schedule) that denotes whether the DX heating coil can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank the unit is always available.
+
+#### Field: Coil Air Inlet Node
+
+This alpha field defines the name of the HVAC system node from which the DX heating coil draws its inlet air.
+
+#### Field: Coil Air Outlet Node
+
+This alpha field defines the name of the HVAC system node to which the DX heating coil sends its outlet air.
+
+#### Field: Rated Total Heating Capacity
+
+This numeric field defines the total, full load gross heating capacity in watts of the DX coil unit at rated conditions. The value entered here must be greater than 0. The gross total heating capacity should not account for the effect of supply air fan heat.
+
+#### Field: Indoor Unit Reference Subcooling 
+
+This numeric field defines the reference subcooling degrees of the indoor unit. If this field is blank, the default value of 5.0 C is used. 
+       
+#### Field: Indoor Unit Condensing Temperature Function of Subcooling Curve Name 
+
+This alpha field defines the name of a quadratic performance curve that parameterizes the variation of indoor unit condensing temperature as a function of subcooling degrees. The output of this curve is the temperature difference between the condensing temperature and the coil surface air temperature.
+
+Following is an example input for a Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl object.
+
+```idf
+  Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,
+    TU1 VRF DX Heating Coil, !- Name
+    VRFAvailSched,           !- Availability Schedule
+    TU1 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node
+    TU1 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node
+    autosize,                !- Rated Total Heating Capacity {W}
+    5,                       !- Indoor Unit Reference Subcooling Degrees {C}    
+    IUCondTempCurve;         !- Indoor Unit Condensing Temperature Function of Subcooling Curve Name
+
+  Curve:Quadratic,
+    IUCondTempCurve,         !- Name
+    -1.85,                   !- Coefficient1 Constant
+    0.411,                   !- Coefficient2 x
+    0.0196,                  !- Coefficient3 x**2
+    0,                       !- Minimum Value of x    
+    20,                      !- Maximum Value of x    
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature;             !- Output Unit Type
+
+```
+
+### Heating DX Coil (VariableRefrigerantFlow) Outputs
+
+* HVAC,Average, Heating Coil Total Heating Rate [W]
+
+* HVAC,Sum, Heating Coil Total Heating Energy [J]
+
+* HVAC,Average, Heating Coil Runtime Fraction []
+
+* Heating Coil VRF Condensing Temperature [C]
+
+* Heating Coil VRF Subcooling Degrees [C]
+
+#### Heating Coil Total Heating Rate [W]
+
+This field is the total heating rate output of the DX coil in Watts. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
+
+#### Heating Coil Total Heating Energy [J]
+
+This is the total heating output of the DX coil in Joules over the time step being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = HeatingCoils, Group Key = System (ref. Output:Meter objects).
+
+#### Heating Coil Runtime Fraction []
+
+This is the runtime fraction of the DX coil compressor and condenser fan(s) for the time step being reported.
+
+#### Cooling Coil VRF Condensing Temperature [C]
+
+This is the condensing temperature of the VRF system operating at heating mode. This value is manipulated by the VRF system considering the load conditions of all the zones it serves. It affects the heating coil surface temperature and thus the heating capacity of the coil.
+
+#### Cooling Coil VRF Subcooling Degrees [C]
+
+This is the subcooling degrees of the VRF system operating at heating mode. This value is manipulated by each VRF terminal unit to adjust the heating capacity of the coil considering the load conditions of the zone. It affects the heating coil surface temperature and thus the heating capacity of the coil.
+
+
 
 ### Coil:Heating:Gas
 
@@ -5356,22 +5589,22 @@ Following is an example IDF use of the object:
 
 ```idf
 Coil:Cooling:DX:TwoStageWithHumidityControlMode,
-   DOAS Cooling Coil,                                   !- Name
-   HVACTemplate-Always 1,                           !- Availability Schedule Name
-   DOAS Supply Fan Outlet,                         !- Air Inlet Node Name
-   DOAS Cooling Coil Outlet,                     !- Air Outlet Node Name
-   ,                                                                     !- Crankcase Heater Capacity
-   ,                                                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater
-   2,                                                                   !- Number of Capacity Stages
-   1,                                                                   !- Number of Enhanced Dehumidification Modes
+   DOAS Cooling Coil,                          !- Name
+   HVACTemplate-Always 1,                      !- Availability Schedule Name
+   DOAS Supply Fan Outlet,                     !- Air Inlet Node Name
+   DOAS Cooling Coil Outlet,                   !- Air Outlet Node Name
+   ,                                           !- Crankcase Heater Capacity
+   ,                                           !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater
+   2,                                          !- Number of Capacity Stages
+   1,                                          !- Number of Enhanced Dehumidification Modes
    CoilPerformance:DX:Cooling,                 !- Normal Mode Stage 1 Coil Performance Object Type
-   DOAS Standard Perf 1,                             !- Normal Mode Stage 1 Coil Performance Name
+   DOAS Standard Perf 1,                       !- Normal Mode Stage 1 Coil Performance Name
    CoilPerformance:DX:Cooling,                 !- Normal Mode Stage 1+2 Coil Performance Object Type
-   DOAS Standard Perf 1+2,                         !- Normal Mode Stage 1+2 Coil Performance Name
+   DOAS Standard Perf 1+2,                     !- Normal Mode Stage 1+2 Coil Performance Name
    CoilPerformance:DX:Cooling,                 !- Dehumidification Mode 1 Stage 1 Coil Performance Object Type
-   DOAS Dehumid Perf 1,                               !- Dehumidification Mode 1 Stage 1 Coil Performance Name
+   DOAS Dehumid Perf 1,                        !- Dehumidification Mode 1 Stage 1 Coil Performance Name
    CoilPerformance:DX:Cooling,                 !- Dehumidification Mode 1 Stage 1+2 Coil Performance Object Type
-   DOAS Dehumid Perf 1+2;                           !- Dehumidification Mode 1 Stage 1+2 Coil Performance Name
+   DOAS Dehumid Perf 1+2;                      !- Dehumidification Mode 1 Stage 1+2 Coil Performance Name
 ```
 
 ### Coil:Cooling:DX:MultiSpeed
@@ -5406,7 +5639,7 @@ This optional alpha field specifies the outdoor air node name used to define the
 
 #### Field: Condenser Type
 
-#### The type of condenser used by the multispeed DX cooling coil. Valid choices for this input field areAirCooled orEvaporativelyCooled. The default for this field isAirCooled.
+The type of condenser used by the multispeed DX cooling coil. Valid choices for this input field are AirCooled or EvaporativelyCooled. The default for this field is AirCooled.
 
 #### Field: Supply Water Storage Tank Name
 
@@ -5534,7 +5767,7 @@ The fraction of energy input to the cooling coil that is available as recoverabl
 
 #### Field: Speed &lt;x&gt; Waste Heat Function of Temperature Curve Name
 
-The name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of the waste heat recovery as a function of outdoor dry-bulb temperature and the entering coil dry-bulb temperature at Speed &lt;x&gt;. The output of this curve is multiplied by the rated waste heat fraction at specific temperature operating conditions (i.e., at temperatures different from the rating point). The curve is normalized to a value of 1.0 at the rating point. When the fuel type is electricity, this field can remain blank since it is ignored by the program in this instance.
+The name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of the waste heat recovery as a function of outdoor dry-bulb temperature and the entering coil dry-bulb temperature at Speed &lt;x&gt;. The output of this curve is multiplied by the rated waste heat fraction at specific temperature operating conditions (i.e., at temperatures different from the rating point). The curve is normalized to a value of 1.0 at the rating point. When the fuel type is electricity, this field can remain blank since it is ignored by the program in this instance. When the fuel type is not electricity and the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed does not require waste heat calculations, this field is ignored. If the field is blank, a warning will be issued and simulation continues. When the fuel type is not electricity and the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed requires waste heat calculations, if this field is left blank, the program assumes a constant value of 1 to make simulation continue and a warning will be issued.   
 
 #### Field: Speed &lt;x&gt; Evaporative Condenser Effectiveness
 
@@ -6822,8 +7055,6 @@ This is the runtime fraction of the DX heating coil compressor and outdoor fan(s
 
 ### Coil:Heating:DX:MultiSpeed
 
-### Coil:Heating:DX:MultiSpeed
-
 This component models a DX heating unit with multiple discrete levels of heating capacity. Currently, this heating coil can only be referenced by a AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed compound object. The multispeed DX heating coil can have from two to four operating speeds. When the coil operates at Speed 1 (the lowest speed), its performance is very similar to the Coil:Heating:DX:SingleSpeed object where the impacts of part-load ratio can be included. When the coil operates at higher speeds (above Speed 1), the linear approximation methodology is applied. The coil outputs at two consecutive speeds are linearly interpolated to meet the required heating capacity during an HVAC system timestep. When the coil performs above the lowest speed, the user can choose if they want to include part-load ratio impacts at the higher speeds.
 
 The multispeed unit is described by specifying the performance at different operating speeds. Each speed has its own set of input specifications: full load capacity, COP and air flow rate at rated conditions, along with modifier curves to determine performance when actual operating conditions are different from the rated conditions.
@@ -6972,7 +7203,7 @@ The fraction of heat input to heating that is available as recoverable waste hea
 
 #### Field: Speed &lt;x&gt; Waste Heat Function of Temperature Curve Name
 
-The name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the waste heat recovery as a function of outdoor dry-bulb temperature and the entering coil dry-bulb temperature for Speed &lt;x&gt;. The output of this curve is multiplied by the rated recoverable waste heat at specific temperature operating conditions (i.e., at temperatures different from the rating point). The curve is normalized to a value of 1.0 at the rating point. When the fuel type is electricity, the field is either left blank or ignored by the program.
+The name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the waste heat recovery as a function of outdoor dry-bulb temperature and the entering coil dry-bulb temperature for Speed &lt;x&gt;. The output of this curve is multiplied by the rated recoverable waste heat at specific temperature operating conditions (i.e., at temperatures different from the rating point). The curve is normalized to a value of 1.0 at the rating point. When the fuel type is electricity, the field is either left blank or ignored by the program. When the fuel type is not electricity and the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed does not require waste heat calculations, this field is ignored. If the field is blank, a warning will be issued and simulation continues. When the fuel type is not electricity and the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed requires waste heat calculations, if this field is left blank, the program assumes a constant value of 1 to make simulation continue and a warning will be issued. 
 
 #### Field: Zone Name for Evaporator Placement
 
@@ -16294,7 +16525,7 @@ SetpointManager:FollowGroundTemperature,
 
 ### SetpointManager:CondenserEnteringReset
 
-The object resets the condenser entering water temperature setpoint to the optimal setpoint temperature that will result in minimum net energy consumption for the chiller and cooling tower plant. This chiller-tower optimization scheme uses one curve to determine the optimum condenser entering water temperature for a given time step and two other curves to place boundary conditions on the    optimized    setpoint value. Note that this object will work with only one cooling tower object in a plant loop.
+The object resets the condenser entering water temperature setpoint to the optimal setpoint temperature that will result in minimum net energy consumption for the chiller and cooling tower plant. This chiller-tower optimization scheme uses one curve to determine the optimum condenser entering water temperature for a given time step and two other curves to place limit conditions on the optimized setpoint value. Note that this object will work with only one cooling tower object in a plant loop.
 
 #### Field: Name
 
@@ -16306,7 +16537,7 @@ The type of variable that will be controlled. The only valid choice for this set
 
 #### Field: Default Condenser Entering Water Temperature Schedule Name
 
-This schedule should define the default condenser entering water temperature setpoint. This scheduled setpoint value is only used in a given time step if the    optimized    setpoint value (see the Optimized Condenser Entering Water Temperature Curve Name field) does not fall within its prescribed boundary conditions.
+This schedule should define the default condenser entering water temperature setpoint. This scheduled setpoint value is only used in a given time step if the optimized setpoint value (see the Optimized Condenser Entering Water Temperature Curve Name field) does not fall within its prescribed boundary conditions.
 
 #### Field: Minimum Design Wetbulb Temperature Curve Name
 
@@ -16342,7 +16573,7 @@ NF = Normalized condenser water flow per unit of tower capacity, m3/s-W
 
 #### Field: Optimized Condenser Entering Temperature Curve Name
 
-The curve name associated with the coefficients in the optimized condenser entering water temperature equation. The value from this curve is used to calculate the optimized condenser entering water temperature for each timestep. If this    optimized    setpoint does not fall within the bounds established by the two boundary conditions, then the value from the Default Condenser Entering Water Temperature Schedule is used for the Condenser Entering Water Setpoint for that timestep.   This curve must be quad-linear (Curve:QuadLinear) and is defined as:
+The curve name associated with the coefficients in the optimized condenser entering water temperature equation. The value from this curve is used to calculate the optimized condenser entering water temperature for each timestep. If this optimized setpoint does not fall within the bounds established by the two boundary conditions, then the value from the Default Condenser Entering Water Temperature Schedule is used for the Condenser Entering Water Setpoint for that timestep.  This curve must be quad-linear (Curve:QuadLinear) and is defined as:
 
 <div>\[T = {C_1} + {C_2}OaWb + {C_3}WPLR + {C_4}TwrWb + {C_5}NF\]</div>
 
@@ -16358,7 +16589,7 @@ NF = Normalized condenser water flow per unit of tower capacity, m3/s-W
 
 #### Field: Minimum Lift
 
-This field establishes the minimum Lift allowed.   Lift is generally thought of as the difference between condenser refrigerant pressure and the evaporator refrigerant pressure. Using defined pressure and temperature relationships, lift also can be related to the difference between the leaving chilled water and the leaving condenser water temperature. Further, when the leaving condenser water temperature and condenser water flow are constant, the entering condenser temperature can be used as a proxy for lift. Because most condenser water systems are designed for constant flow, entering condenser temperature is the most common metric for lift, and that is what meant here. If the calculated Condenser Entering Water Setpoint falls below (TEvapLvgWater+ MinimumLift), then the Condenser Entering Water Setpoint is reset to equal TEvapLvgWater+ MinimumLift. The units for this field are deg C TD. Default is 11.1 ˚C (20 F).
+This field establishes the minimum Lift allowed.  Lift is generally thought of as the difference between condenser refrigerant pressure and the evaporator refrigerant pressure. Using defined pressure and temperature relationships, lift also can be related to the difference between the leaving chilled water and the leaving condenser water temperature. Further, when the leaving condenser water temperature and condenser water flow are constant, the entering condenser temperature can be used as a proxy for lift. Because most condenser water systems are designed for constant flow, entering condenser temperature is the most common metric for lift, and that is what meant here. If the calculated Condenser Entering Water Setpoint falls below (TEvapLvgWater+ MinimumLift), then the Condenser Entering Water Setpoint is reset to equal TEvapLvgWater+ MinimumLift. The units for this field are deg C TD. Default is 11.1 ˚C (20 F).
 
 #### Field: Maximum Condenser Entering Temperature
 
@@ -17029,9 +17260,9 @@ The name of a schedule whose values are greater than 0 when mechanical ventilati
 
 This field indicates whether the air loop is capable of doing demand controlled ventilation (DCV) to vary the amount of outdoor air based on actual number of occupants in spaces. Two choices: Yes and No. Default is No.
 
-#### Field: System Outdoor Air   Method
+#### Field: System Outdoor Air Method
 
-The method used to calculate the system minimum outdoor air flow. Several choices are allowed: **ZoneSum**, **VentilationRateProcedure,** **IndoorAirQualityProcedure,   ProportionalControl,** and **IndoorAirQualityProcedureGenericContaminant**.   ZoneSum sums the outdoor air flows across all zones served by the system. VentilationRateProcedure (VRP) uses the multi-zone equations defined in 62.1-2007 to calculate the system outdoor air flow. VRP considers zone air distribution effectiveness and zone diversification of outdoor air fractions. IndoorAirQualityProcedure (IAQP) is the other procedure defined in ASHRAE Standard 62.1-2007 for calculate the amount of outdoor air necessary to maintain the levels of indoor air carbon dioxide at or below the setpoint defined in the ZoneControl:ContaminantController object. Appendix A of the ASHRAE 62.1-2010 user   s manual discusses another method for implementing CO<sub>2</sub>-based DCV in a single zone system. This method (Proportional Control) calculates the required outdoor air flow rate which varies in proportion to the percentage of the CO<sub>2</sub> signal range. The IndoorAirQualityProcedure-GenericContaminant method calculates the amount of outdoor air necessary to maintain the levels of indoor air generic contaminant at or below the setpoint defined in the ZoneControl:ContaminantController object.
+The method used to calculate the system minimum outdoor air flow. Several choices are allowed: **ZoneSum**, **VentilationRateProcedure,** **IndoorAirQualityProcedure, ProportionalControlBasedonOccupancySchedule,** **ProportionalControlBasedonDesignOccupancy,** and **IndoorAirQualityProcedureGenericContaminant**.   ZoneSum sums the outdoor air flows across all zones served by the system. VentilationRateProcedure (VRP) uses the multi-zone equations defined in 62.1-2007 to calculate the system outdoor air flow. VRP considers zone air distribution effectiveness and zone diversification of outdoor air fractions. IndoorAirQualityProcedure (IAQP) is the other procedure defined in ASHRAE Standard 62.1-2007 for calculate the amount of outdoor air necessary to maintain the levels of indoor air carbon dioxide at or below the setpoint defined in the ZoneControl:ContaminantController object. Appendix A of the ASHRAE 62.1-2010 user's manual discusses another method for implementing CO<sub>2</sub>-based DCV in a single zone system. This method (Proportional Control) calculates the required outdoor air flow rate which varies in proportion to the percentage of the CO<sub>2</sub> signal range and has two choices to calculate occupancy-based outdoor air rate. The ProportionalControlBasedonOccupancySchedule choice uses the real occupancy at the current time step to calculate outdoor air rate, while the ProportionalControlBasedonDesignOccupancy uses the design occupancy level to calculate outdoor air rate. The former choice is a good approach to estimate outdoor air rate.  However, for practical applications, the zone controller usually does not have the real time occupancy information, and  the design occupancy level is assumed. The latter choice is used in the design stage. The IndoorAirQualityProcedure-GenericContaminant method calculates the amount of outdoor air necessary to maintain the levels of indoor air generic contaminant at or below the setpoint defined in the ZoneControl:ContaminantController object.
 
 Note: When System Outdoor Air Method = IndoorAirQualityProcedure or IndoorAirQualityProcedureGenericContaminant is specified, only the Zone &lt;x&gt; Name fields are used. The other field inputs described below are not used.
 

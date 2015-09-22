@@ -91,10 +91,7 @@ namespace WeatherManager {
 	extern Real64 WeatherFileTimeZone;
 	extern Real64 WeatherFileElevation;
 	extern int WeatherFileUnitNumber; // File unit number for the weather file
-	extern Array1D< Real64 > GroundTemps; // Bldg Surface
-	extern Array1D< Real64 > GroundTempsFC; // F or C factor method
-	extern Array1D< Real64 > SurfaceGroundTemps; // Surface
-	extern Array1D< Real64 > DeepGroundTemps; // Deep
+	extern Array1D< Real64 > GroundTempsFCFromEPWHeader; // F or C factor method
 	extern Array1D< Real64 > GroundReflectances; // User Specified Ground Reflectances
 	extern Real64 SnowGndRefModifier; // Modifier to ground reflectance during snow
 	extern Real64 SnowGndRefModifierForDayltg; // Modifier to ground reflectance during snow for daylighting
@@ -204,6 +201,7 @@ namespace WeatherManager {
 	extern bool DatesShouldBeReset; // True when weekdays should be reset
 	extern bool StartDatesCycleShouldBeReset; // True when start dates on repeat should be reset
 	extern bool Jan1DatesShouldBeReset; // True if Jan 1 should signal reset of dates
+	extern bool RPReadAllWeatherData; // True if need to read all weather data prior to simulation
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WeatherManager
 	//PUBLIC  ProcessDateString
@@ -592,6 +590,7 @@ namespace WeatherManager {
 	{
 		// Members
 		int DayOfYear; // Day of year for weather data
+		int DayOfYear_Schedule; //Day of year in schedule
 		int Year; // Year of weather data
 		int Month; // Month of weather data
 		int DayOfMonth; // Day of month for weather data
@@ -605,6 +604,7 @@ namespace WeatherManager {
 		// Default Constructor
 		DayWeatherVariables() :
 			DayOfYear( 0 ),
+			DayOfYear_Schedule( 0 ),
 			Year( 0 ),
 			Month( 0 ),
 			DayOfMonth( 0 ),
@@ -615,32 +615,6 @@ namespace WeatherManager {
 			CosSolarDeclinAngle( 0.0 ),
 			EquationOfTime( 0.0 )
 		{}
-
-		// Member Constructor
-		DayWeatherVariables(
-			int const DayOfYear, // Day of year for weather data
-			int const Year, // Year of weather data
-			int const Month, // Month of weather data
-			int const DayOfMonth, // Day of month for weather data
-			int const DayOfWeek, // Day of week for weather data
-			int const DaylightSavingIndex, // Daylight Saving Time Period indicator (0=no,1=yes)
-			int const HolidayIndex, // Holiday indicator (0=no holiday, non-zero=holiday type)
-			Real64 const SinSolarDeclinAngle, // Sine of the solar declination angle
-			Real64 const CosSolarDeclinAngle, // Cosine of the solar declination angle
-			Real64 const EquationOfTime // Value of the equation of time formula
-		) :
-			DayOfYear( DayOfYear ),
-			Year( Year ),
-			Month( Month ),
-			DayOfMonth( DayOfMonth ),
-			DayOfWeek( DayOfWeek ),
-			DaylightSavingIndex( DaylightSavingIndex ),
-			HolidayIndex( HolidayIndex ),
-			SinSolarDeclinAngle( SinSolarDeclinAngle ),
-			CosSolarDeclinAngle( CosSolarDeclinAngle ),
-			EquationOfTime( EquationOfTime )
-		{}
-
 	};
 
 	struct SpecialDayData
@@ -1170,6 +1144,8 @@ namespace WeatherManager {
 	extern Array1D< DataPeriodData > DataPeriods;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageWeather();
