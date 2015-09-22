@@ -5250,6 +5250,7 @@ namespace InputProcessor {
 		static std::string const MeterCustomDecrement( "METER:CUSTOMDECREMENT" );
 		static std::string const MeterCustomDifference( "METER:CUSTOMDIFFERENCE" );
 		static std::string const OutputTableMonthly( "OUTPUT:TABLE:MONTHLY" );
+		static std::string const OutputTableAnnual( "OUTPUT:TABLE:ANNUAL" );
 		static std::string const OutputTableTimeBins( "OUTPUT:TABLE:TIMEBINS" );
 		static std::string const OutputTableSummaries( "OUTPUT:TABLE:SUMMARYREPORTS" );
 		static std::string const EMSSensor( "ENERGYMANAGEMENTSYSTEM:SENSOR" );
@@ -5356,6 +5357,15 @@ namespace InputProcessor {
 				AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( Loop ) );
 			}
 			CurrentRecord = FindNextRecord( OutputTableMonthly, CurrentRecord );
+		}
+
+		CurrentRecord = FindFirstRecord( OutputTableAnnual );
+		while ( CurrentRecord != 0 ) {
+			for ( Loop = 5; Loop <= IDFRecords( CurrentRecord ).NumAlphas; Loop += 2 ) {
+				if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) continue;
+				AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( Loop ) );
+			}
+			CurrentRecord = FindNextRecord( OutputTableAnnual, CurrentRecord );
 		}
 
 		CurrentRecord = FindFirstRecord( OutputTableSummaries ); // summary tables, not all add to variable structure

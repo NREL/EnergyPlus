@@ -9,6 +9,7 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
+#include <DataEnvironment.hh>
 
 namespace EnergyPlus {
 
@@ -17,6 +18,7 @@ namespace DXCoils {
 	// Using/Aliasing
 	using DataHVACGlobals::AirCooled;
 	using DataHVACGlobals::DryBulbIndicator;
+	using DataEnvironment::StdBaroPress;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -399,6 +401,7 @@ namespace DXCoils {
 		Array1D< Real64 > MSFanPowerPerEvapAirFlowRate;
 		Real64 FuelUsed; // Energy used, in addition to electricity [W]
 		Real64 FuelConsumed; // Energy consumed, in addition to electricity [J]
+		bool MSHPHeatRecActive; // True when entered Heat Rec Vol Flow Rate > 0
 		// End of multispeed DX coil input
 		// VRF system variables used for sizing
 		bool CoolingCoilPresent; // FALSE if coil not present
@@ -643,6 +646,7 @@ namespace DXCoils {
 			NumOfSpeeds( 0 ),
 			PLRImpact( false ),
 			LatentImpact( false ),
+			MSHPHeatRecActive( false ),
 			CoolingCoilPresent( true ),
 			HeatingCoilPresent( true ),
 			ISHundredPercentDOASDXCoil( false ),
@@ -918,6 +922,7 @@ namespace DXCoils {
 			Array1< Real64 > const & MSFanPowerPerEvapAirFlowRate,
 			Real64 const FuelUsed, // Energy used, in addition to electricity [W]
 			Real64 const FuelConsumed, // Energy consumed, in addition to electricity [J]
+			bool const MSHPHeatRecActive, // True when entered Heat Rec Vol Flow Rate > 0
 			bool const CoolingCoilPresent, // FALSE if coil not present
 			bool const HeatingCoilPresent, // FALSE if coil not present
 			bool const ISHundredPercentDOASDXCoil, // FALSE if coil is regular dx coil
@@ -1190,6 +1195,7 @@ namespace DXCoils {
 			MSFanPowerPerEvapAirFlowRate( MSFanPowerPerEvapAirFlowRate ),
 			FuelUsed( FuelUsed ),
 			FuelConsumed( FuelConsumed ),
+			MSHPHeatRecActive( MSHPHeatRecActive ),
 			CoolingCoilPresent( CoolingCoilPresent ),
 			HeatingCoilPresent( HeatingCoilPresent ),
 			ISHundredPercentDOASDXCoil( ISHundredPercentDOASDXCoil ),
@@ -1401,7 +1407,8 @@ namespace DXCoils {
 		Real64 const InletAirHumRat, // inlet air humidity ratio [kg water / kg dry air]
 		Real64 const TotCap, // total cooling  capacity [Watts]
 		Real64 const AirMassFlowRate, // the air mass flow rate at the given capacity [kg/s]
-		Real64 const SHR // sensible heat ratio at the given capacity and flow rate
+		Real64 const SHR, // sensible heat ratio at the given capacity and flow rate
+		Real64 const BaroPress=StdBaroPress // Barometric pressure [Pa]
 	);
 
 	Real64
@@ -1713,6 +1720,9 @@ namespace DXCoils {
 	);
 	// End of Methods for New VRF Model: Fluid Temperature Control
 	// *****************************************************************************
+
+	void
+	SetMSHPDXCoilHeatRecoveryFlag( int const DXCoilNum ); // must match coil names for the coil type
 
 	// Clears the global data in DXCoils.
 	// Needed for unit tests, should not be normally called.

@@ -161,6 +161,8 @@ namespace SolarShading {
 	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 		bool MustAllocSolarShading( true );
+		bool GetInputFlag( true );
+		bool firstTime( true );
 	}
 
 	std::ofstream shd_stream; // Shading file stream
@@ -218,8 +220,67 @@ namespace SolarShading {
 	void
 	clear_state()
 	{
-
+		MaxHCV= 15;
+		MaxHCS= 1500;
+		MAXHCArrayBounds = 0;
+		MAXHCArrayIncrement = 0;
+		NVS = 0;
+		NumVertInShadowOrClippedSurface = 0;
+		CurrentSurfaceBeingShadowed = 0;
+		CurrentShadowingSurface = 0;
+		OverlapStatus = 0;
+		CTHETA.deallocate();
+		FBKSHC = 0;
+		FGSSHC = 0;
+		FINSHC = 0;
+		FRVLHC = 0;
+		FSBSHC = 0;
+		LOCHCA = 0;
+		NBKSHC = 0;
+		NGSSHC = 0;
+		NINSHC = 0;
+		NRVLHC = 0;
+		NSBSHC = 0;
+		CalcSkyDifShading = false;
+		ShadowingCalcFrequency = 0; // Frequency for Shadowing Calculations
+		ShadowingDaysLeft =0; // Days left in current shadowing period
+		debugging = false;
 		MustAllocSolarShading = true;
+		GetInputFlag = true;
+		firstTime = true;
+		HCNS.deallocate();
+		HCNV.deallocate();
+		HCA.deallocate();
+		HCB.deallocate();
+		HCC.deallocate();
+		HCX.deallocate();
+		HCY.deallocate();
+		WindowRevealStatus.deallocate();
+		HCAREA.deallocate();
+		HCT.deallocate();
+		ISABSF.deallocate();
+		SAREA.deallocate();
+		NumTooManyFigures = 0;
+		NumTooManyVertices = 0;
+		NumBaseSubSurround = 0;
+		XShadowProjection = 0.0;
+		YShadowProjection = 0.0;
+		XTEMP.deallocate();
+		XVC.deallocate();
+		XVS.deallocate();
+		YTEMP.deallocate();
+		YVC.deallocate();
+		YVS.deallocate();
+		ZVC.deallocate();
+		ATEMP.deallocate();
+		BTEMP.deallocate();
+		CTEMP.deallocate();
+		XTEMP1.deallocate();
+		YTEMP1.deallocate();
+		maxNumberOfFigures = 0;
+		TrackTooManyFigures.deallocate();
+		TrackTooManyVertices.deallocate();
+		TrackBaseSubSurround.deallocate();
 		DBZoneIntWin.deallocate();
 	}
 
@@ -257,9 +318,6 @@ namespace SolarShading {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		static bool GetInputFlag( true );
-		static bool firstTime( true );
 
 		// FLOW:
 #ifdef EP_Count_Calls
@@ -2806,36 +2864,37 @@ namespace SolarShading {
 				} else {
 					HFunct = XTEMP1_S * HCA_E + YTEMP1_S * HCB_E + HCC_E;
 					if ( HFunct <= 0.0 ) { // Test vertex is not in the clipping plane
+						if ( NVTEMP < 2 * ( MaxVerticesPerSurface + 1 )){  // avoid assigning to element outside of XTEMP array size
+							KK = NVTEMP;
+							++NVTEMP;
+							Real64 const ATEMP_S( ATEMP( S ) );
+							Real64 const BTEMP_S( BTEMP( S ) );
+							Real64 const CTEMP_S( CTEMP( S ) );
+							W = HCB_E * ATEMP_S - HCA_E * BTEMP_S;
+							if ( W != 0.0 ) {
+								Real64 const W_inv( 1.0 / W );
+								XTEMP( NVTEMP ) = nint64( ( HCC_E * BTEMP_S - HCB_E * CTEMP_S ) * W_inv );
+								YTEMP( NVTEMP ) = nint64( ( HCA_E * CTEMP_S - HCC_E * ATEMP_S ) * W_inv );
+							}
+							else {
+								XTEMP( NVTEMP ) = SafeDivide( HCC_E * BTEMP_S - HCB_E * CTEMP_S, W );
+								YTEMP( NVTEMP ) = SafeDivide( HCA_E * CTEMP_S - HCC_E * ATEMP_S, W );
+							}
+							INTFLAG = true;
 
-						KK = NVTEMP;
-						++NVTEMP;
-						Real64 const ATEMP_S( ATEMP( S ) );
-						Real64 const BTEMP_S( BTEMP( S ) );
-						Real64 const CTEMP_S( CTEMP( S ) );
-						W = HCB_E * ATEMP_S - HCA_E * BTEMP_S;
-						if ( W != 0.0 ) {
-							Real64 const W_inv( 1.0 / W );
-							XTEMP( NVTEMP ) = nint64( ( HCC_E * BTEMP_S - HCB_E * CTEMP_S ) * W_inv );
-							YTEMP( NVTEMP ) = nint64( ( HCA_E * CTEMP_S - HCC_E * ATEMP_S ) * W_inv );
-						} else {
-							XTEMP( NVTEMP ) = SafeDivide( HCC_E * BTEMP_S - HCB_E * CTEMP_S, W );
-							YTEMP( NVTEMP ) = SafeDivide( HCA_E * CTEMP_S - HCC_E * ATEMP_S, W );
-						}
-						INTFLAG = true;
-
-						if ( E == NV2 ) { // Remove near-duplicates on last edge
-							if ( KK != 0 ) {
-								auto const x( XTEMP( NVTEMP ) );
-								auto const y( YTEMP( NVTEMP ) );
-								for ( int K = 1; K <= KK; ++K ) {
-									if ( std::abs( x - XTEMP( K ) ) > 2.0 ) continue;
-									if ( std::abs( y - YTEMP( K ) ) > 2.0 ) continue;
-									NVTEMP = KK;
-									break; // K loop
+							if ( E == NV2 ) { // Remove near-duplicates on last edge
+								if ( KK != 0 ) {
+									auto const x( XTEMP( NVTEMP ) );
+									auto const y( YTEMP( NVTEMP ) );
+									for ( int K = 1; K <= KK; ++K ) {
+										if ( std::abs( x - XTEMP( K ) ) > 2.0 ) continue;
+										if ( std::abs( y - YTEMP( K ) ) > 2.0 ) continue;
+										NVTEMP = KK;
+										break; // K loop
+									}
 								}
 							}
 						}
-
 					}
 				}
 				S = P;

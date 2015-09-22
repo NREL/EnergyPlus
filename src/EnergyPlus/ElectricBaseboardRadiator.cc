@@ -799,8 +799,8 @@ namespace ElectricBaseboardRadiator {
 				// Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
 				DistributeBBElecRadGains();
 				// Now "simulate" the system by recalculating the heat balances
-				CalcHeatBalanceOutsideSurf( ZoneNum );
-				CalcHeatBalanceInsideSurf( ZoneNum );
+				HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
+				HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
 				// Here an assumption is made regarding radiant heat transfer to people.
 				// While the radiant heat transfer to people array will be used by the thermal comfort
 				// routines, the energy transfer to people would get lost from the perspective

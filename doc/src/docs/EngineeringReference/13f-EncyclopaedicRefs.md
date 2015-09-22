@@ -3958,7 +3958,7 @@ If the unit is on and <span>\({\dot Q_{cc}}\)</span>&lt; 0 and the thermostat ty
 
 When modeling multi-speed fan in FanCoil unit, capacity is modulated using speed ratio or part load ratio.  The supply air fan speed is varied while operating the coils at maximum water flow. When there is no system load to meet, the water control valve is fully closed. When the FanCoil fan is cycling between two consecutive fan speed levels a speed ratio is calculated, but when the FanCoil unit cycles between the minimum fan speed and off-position, then part load ratio is calculated. The fan may be off or run continuously at lowest speed to provide ventilation air depending the fan operating schedule specified. When the FanCoil is operating at the lowest fan speed (Speed = 1), the water flow rate is reported as the average for the time step by multiplying the maximum water flow by part load ratio. The speed ratio and part-load ratio are calculated such that the FanCoil unit satisfies the required system zone cooling or heating load.The set of equations used for the multi-speed fan capacity control methods in FanCoil unit are summarized next.
 
-###### Cycling Between Stages
+###### Cycling Between Speeds
 
 When the supply fan is cycling between consecutive speeds, then the speed ratio (SR) and the average mass flow rate are calculated as follows:
 
@@ -3966,7 +3966,7 @@ When the supply fan is cycling between consecutive speeds, then the speed ratio 
 <div>$${\dot m} = {\dot m_{on, n}} {SR_{n}} + {\dot m_{on, n-1}} (1 - {SR_{n}})$$</div>
 <div>$${\dot m{w}} = {\dot m_{w, max}}$$</div>
 
-###### Cycling OnOff at Lowest Stage
+###### Cycling OnOff at Lowest Speed
 
 The average supply air flow rate calculation when the fan is running at the lowest fan speed level depends on the fan operating schedule and load. The fan coil unit part load ratio is given by:
 
