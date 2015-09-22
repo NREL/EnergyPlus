@@ -897,7 +897,6 @@ namespace DXCoils {
 		int IOStatus; // Input status returned from GetObjectItem
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		bool IsOANodeListed; // Flag for air node name listed in OutdoorAir:Node or Nodelist
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int DXHPWaterHeaterCoilNum; // Loop index for 1,NumDXHeatPumpWaterHeaterCoils
 		int CapacityStageNum; // Loop index for 1,Number of capacity stages

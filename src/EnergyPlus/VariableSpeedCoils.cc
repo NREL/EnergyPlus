@@ -371,7 +371,6 @@ namespace VariableSpeedCoils {
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		bool IsOANodeListed; // Flag for air node name listed in OutdoorAir:Node or Nodelist
 		bool errFlag;
 		Real64 CurveVal; // Used to verify modifier curves equal 1 at rated conditions
 		Real64 WHInletAirTemp; // Used to pass proper inlet air temp to HPWH DX coil performance curves
