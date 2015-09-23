@@ -13,6 +13,7 @@
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
@@ -125,6 +126,7 @@ namespace EnergyPlus {
 		CondenserLoopTowers::clear_state();
 		CurveManager::clear_state();
 		DataAirLoop::clear_state();
+		DataAirSystems::clear_state();
 		DataBranchNodeConnections::clear_state();
 		DataConvergParams::clear_state();
 		DataDefineEquip::clear_state();

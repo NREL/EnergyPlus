@@ -50306,7 +50306,7 @@ Coil:Cooling:DX:SingleSpeed:ThermalStorage,
 EvaporativeCooler:Direct:CelDekPad,
        \memo Direct evaporative cooler with rigid media evaporative pad and recirculating water
        \memo pump. This model has no controls other than its availability schedule.
-       \min-fields 4
+       \min-fields 7   
   A1 , \field Name
        \type alpha
        \reference EvapCoolerNames
@@ -50316,21 +50316,26 @@ EvaporativeCooler:Direct:CelDekPad,
        \type object-list
        \object-list ScheduleNames
   N1 , \field Direct Pad Area
+       \required-field
        \units m2
        \minimum 0.0
        \autosizable
        \default Autosize
   N2 , \field Direct Pad Depth
+       \required-field
        \units m
        \minimum 0.0
        \autosizable
        \default Autosize
   N3 , \field Recirculating Water Pump Power Consumption
+       \required-field
        \units W
        \ip-units W
   A3 , \field Air Inlet Node Name
+       \required-field
        \type node
   A4 , \field Air Outlet Node Name
+       \required-field
        \type node
   A5 , \field Control Type
        \note This field is not currently used and can be left blank
@@ -50342,7 +50347,7 @@ EvaporativeCooler:Indirect:CelDekPad,
        \memo Indirect evaporative cooler with rigid media evaporative pad, recirculating water
        \memo pump, and secondary air fan. This model has no controls other than its availability
        \memo schedule.
-       \min-fields 4
+       \min-fields 14 
   A1 , \field Name
        \required-field
        \type alpha
@@ -50353,35 +50358,48 @@ EvaporativeCooler:Indirect:CelDekPad,
        \type object-list
        \object-list ScheduleNames
   N1 , \field Direct Pad Area
+       \required-field
+       \type real   
        \units m2
        \minimum 0.0
        \autosizable
        \default Autosize
   N2 , \field Direct Pad Depth
+       \required-field
+       \type real
        \units m
        \minimum 0.0
        \autosizable
        \default Autosize
   N3 , \field Recirculating Water Pump Power Consumption
+       \required-field
+       \type real
        \units W
        \ip-units W
-  N4 , \field Secondary Fan Flow Rate
+  N4 , \field Secondary Air Fan Flow Rate
+       \required-field
+       \type real
        \units m3/s
        \minimum 0.0
-  N5 , \field Secondary Fan Total Efficiency
+  N5 , \field Secondary Air Fan Total Efficiency
        \type real
        \minimum> 0.0
        \maximum 1.0
-  N6 , \field Secondary Fan Delta Pressure
+  N6 , \field Secondary Air Fan Delta Pressure
+       \required-field
+       \type real
        \units Pa
        \minimum 0.0
        \ip-units inH2O
   N7 , \field Indirect Heat Exchanger Effectiveness
+       \required-field
        \type real
        \minimum 0.0
   A3 , \field Primary Air Inlet Node Name
+       \required-field
        \type node
   A4 , \field Primary Air Outlet Node Name
+       \required-field
        \type node
   A5 , \field Control Type
        \note This field is not currently used and can be left blank
@@ -50395,7 +50413,9 @@ EvaporativeCooler:Indirect:CelDekPad,
 EvaporativeCooler:Indirect:WetCoil,
        \memo Indirect evaporative cooler with wetted coil, recirculating water pump, and secondary
        \memo air fan. This model has no controls other than its availability schedule.
+       \min-fields 13 
   A1 , \field Name
+       \required-field   
        \type alpha
        \reference EvapCoolerNames
   A2 , \field Availability Schedule Name
@@ -50404,28 +50424,35 @@ EvaporativeCooler:Indirect:WetCoil,
        \type object-list
        \object-list ScheduleNames
   N1 , \field Coil Maximum Efficiency
+       \required-field   
        \type real
        \minimum 0.0
        \maximum 1.0
   N2 , \field Coil Flow Ratio
        \type real
   N3 , \field Recirculating Water Pump Power Consumption
+       \required-field   
        \units W
        \ip-units W
-  N4 , \field Secondary Fan Flow Rate
+  N4 , \field Secondary Air Fan Flow Rate
+       \required-field  
        \units m3/s
        \minimum 0.0
-  N5 , \field Secondary Fan Total Efficiency
+  N5 , \field Secondary Air Fan Total Efficiency
+       \required-field  
        \type real
        \minimum> 0.0
        \maximum 1.0
-  N6 , \field Secondary Fan Delta Pressure
+  N6 , \field Secondary Air Fan Delta Pressure
+       \required-field  
        \units Pa
        \minimum 0.0
        \ip-units inH2O
   A3 , \field Primary Air Inlet Node Name
+       \required-field  
        \type node
   A4 , \field Primary Air Outlet Node Name
+       \required-field  
        \type node
   A5 , \field Control Type
        \note This field is not currently used and can be left blank
@@ -50433,6 +50460,7 @@ EvaporativeCooler:Indirect:WetCoil,
        \type object-list
        \object-list WaterStorageTankNames
   A7 ; \field Secondary Air Inlet Node Name
+       \required-field
        \type node
        \note Enter the name of an outdoor air node
 
@@ -50440,6 +50468,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \memo Indirect evaporative cooler with user-specified effectiveness (can represent rigid pad
        \memo or wetted coil), recirculating water pump, and secondary air fan. This model is
        \memo controlled to meet the primary air outlet temperature setpoint.
+       \min-fields 21    
   A1 , \field Name
        \type alpha
        \reference EvapCoolerNames
@@ -50449,6 +50478,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \type object-list
        \object-list ScheduleNames
   N1 , \field Cooler Wetbulb Design Effectiveness
+       \required-field
        \type real
        \note wet operation effectiveness with respect to wetbulb depression
        \note this is the nominal design wetbulb effectiveness at design air flow rates and water rate 
@@ -50457,7 +50487,8 @@ EvaporativeCooler:Indirect:ResearchSpecial,
   A3 , \field Wetbulb Effectiveness Flow Ratio Modifier Curve Name
        \note this curve modifies the wetbulb effectiveness in the previous field (eff_wb_design)
        \note by multiplying the value by the result of this curve, eff_wb = eff_wb_design * func(HXFlowRatio)
-       \note x = HXFlowRatio = sum of the primary and secondary flow rates divided by the sum of the design flow rates
+       \note x = HXFlowRatio = sum of the primary and secondary flow rates divided by the sum of the design flow
+       \note rates. If this input field is left blank, constant cooler wetbulb effectiveness is assumed.
        \type object-list
        \object-list AllCurves
        \note Any curve or table with one independent variable can be used:
@@ -50473,7 +50504,8 @@ EvaporativeCooler:Indirect:ResearchSpecial,
   A4 , \field Drybulb Effectiveness Flow Ratio Modifier Curve Name
        \note this curve modifies the drybulb effectiveness in the previous field (eff_db_design)
        \note by multiplying the value by the result of this curve, eff_db = eff_db_design * f(HXFlowRatio)
-       \note x = HXFlowRatio = sum of the primary and secondary flow rates divided by the sum of the design flow rates
+       \note x = HXFlowRatio = sum of the primary and secondary flow rates divided by the sum of the design flow
+       \note rates. If this input field is left blank, constant cooler drybulb effectiveness is assumed.   
        \type object-list
        \object-list AllCurves
        \note Any curve or table with one independent variable can be used:
@@ -50490,10 +50522,16 @@ EvaporativeCooler:Indirect:ResearchSpecial,
   N4 , \field Water Pump Power Sizing Factor
        \type real
        \units W/(m3/s)
-       \note this field is used when the previous field is set to autosize. The pump power is scaled with Secondary Design Air Flow Rate
+       \default 90.0   
+       \note This field is used when the previous field is set to autosize. The pump power is scaled with Secondary Air 
+       \note Design Air Flow Rate. This value was backed out from inputs in energy plus example files. Average Pump Power 
+       \note sizing factor was estimated from pump power and secondary air design flow rates inputs from energyplus example
+       \note files is about 90.0 [W/(m3/s)] (=90.0 ~ Pump Power / Secondary Air Design Flow Rate). The factor ranges from 
+       \note 55.0 to 150.0 [W/(m3/s)] were noted. 
   A5 , \field Water Pump Power Modifier Curve Name
        \note this curve modifies the pump power in the previous field by multiplying the design power by the result of this curve.
-       \note x = ff = flow fraction on the secondary side, secondary air flow rate during operation divided by Secondary Design Air Flow Rate 
+       \note x = ff = flow fraction on the secondary side, secondary air flow rate during operation divided by Secondary Air 
+       \note Design Air Flow Rate. If this input field is left blank, pump power is assumed to be proportional to part load ratio. 
        \type object-list
        \object-list AllCurves
        \note Any curve or table with one independent variable can be used:
@@ -50509,22 +50547,25 @@ EvaporativeCooler:Indirect:ResearchSpecial,
   N6 , \field Secondary Air Flow Scaling Factor
        \type real
        \units dimensionless
+       \default 1.0     
        \note This field is used when the previous field is set to autoize.  The Primary Design Air Flow Rate is scaled using this factor
        \note to calculate the secondary design air flow rate.  
   N7 , \field Secondary Air Fan Design Power
        \type real
        \units W
-       \note This is the fan power at Secondary Design Air Flow Rate
-       \note this is the nominal design power at full speed. 
+       \note This is the fan design power at Secondary Design Air Flow Rate. This is the nominal design power at full speed. 
        \autosizable
   N8 , \field Secondary Air Fan Sizing Specific Power
        \type real
        \units W/(m3/s)
-       \note this field is used when the previous field is set to autosize. The fan power is scaled with Secondary Design Air Flow Rate
+       \default 250.0     
+       \note This field is used when the previous field is set to autosize. The fan power is scaled with Secondary Air Design Flow Rate.
+       \note The default value is estimated from 125 Pa fan total pressure and fan total efficiency of 50.0% (250.0 = 125/0.5).
   A6 , \field Secondary Air Fan Power Modifier Curve Name
        \note this curve modifies the design fan power in the previous field by multiplying the value by the result
        \note of this curve.  It should have a value of 1.0 at a x = 1.0. 
-       \note x = ff = flow fraction on the secondary side, secondary air flow rate during operation divided by Secondary Design Air Flow Rate 
+       \note x = ff = flow fraction on the secondary side, secondary air flow rate during operation divided by Secondary Air Design Air 
+       \note Flow Rate. If this input field is left blank, the secondary fan power is assumed to be proportional to part load ratio. 
        \type object-list
        \object-list AllCurves
        \note Any curve or table with one independent variable can be used:
@@ -50533,20 +50574,27 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \note Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay,
        \note Table:OneIndependentVariable
   A7 , \field Primary Air Inlet Node Name
+       \required-field 
        \type node
   A8 , \field Primary Air Outlet Node Name
+       \required-field 
        \type node
-  N9 , \field Primary Design Air Flow Rate
+  N9 , \field Primary Air Design Flow Rate  
        \type real
        \units m3/s
        \minimum> 0.0
        \autosizable
   N10, \field Dewpoint Effectiveness Factor
+       \type real
+       \minimum 0.0
   A9 , \field Secondary Air Inlet Node Name
+       \required-field 
        \type node
   A10, \field Secondary Air Outlet Node Name
+       \required-field 
        \type node
   A11, \field Sensor Node Name
+       \required-field 
        \type node
   A12, \field Relief Air Inlet Node Name
        \type node
@@ -50556,7 +50604,9 @@ EvaporativeCooler:Indirect:ResearchSpecial,
   N11, \field Drift Loss Fraction
        \type real
        \minimum 0.0
-       \note Rate of drift loss as a fraction of evaporated water flow rate
+       \note Rate of drift loss as a fraction of evaporated water flow rate. 
+       \note If this input field is left blank, then zero drift loss is assumed. 
+       \default 0.0   
   N12, \field Blowdown Concentration Ratio
        \type real
        \minimum 2.0
@@ -50605,6 +50655,7 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \memo Direct evaporative cooler with user-specified effectiveness (can represent rigid pad
        \memo or similar media), and recirculating water pump, and secondary air fan. This model is
        \memo controlled to meet the primary air outlet temperature setpoint.
+       \min-fields 11    
   A1 , \field Name
        \type alpha
        \reference EvapCoolerNames
@@ -50631,20 +50682,30 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \note Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1,
        \note Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay,
        \note Table:OneIndependentVariable   
-  N2 , \field Recirculating Water Pump Design Power
+  N2 , \field Primary Air Design Flow Rate  
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \autosizable
+  N3 , \field Recirculating Water Pump Design Power
        \units W
        \ip-units W
        \minimum 0.0
        \note This is the design water pump or spray for evaporation at the primary air design air flow rates
        \note and cooler design effectiveness
        \autosizable
-  N3 , \field Water Pump Power Sizing Factor
+  N4 , \field Water Pump Power Sizing Factor
        \type real
        \units W/(m3/s)
-       \note this field is used when the previous field is set to autosize. The pump power is scaled with Primary Air Design Air Flow Rate
+       \default 90.0   
+       \note This field is used when the previous field is set to autosize. The pump power is scaled with Secondary Air 
+       \note Design Air Flow Rate. This value was backed out from inputs in energy plus example files. Average Pump Power 
+       \note sizing factor was estimated from pump power and primary air design flow rates inputs from energyplus example
+       \note files is about 90.0 [W/(m3/s)] (=90.0 ~ Pump Power / Primary Air Design Flow Rate). The factor ranges from 
+       \note 55.0 to 150.0 [W/(m3/s)].
   A4 , \field Water Pump Power Modifier Curve Name
        \note this curve modifies the pump power in the previous field by multiplying the design power by the result of this curve.
-       \note x = ff = flow fraction on the primary air.  The flow fraction is the secondary air flow rate during current operation divided
+       \note x = ff = flow fraction on the primary air. The flow fraction is the secondary air flow rate during current operation divided
        \note by Primary Air Design Flow Rate
        \type object-list
        \object-list AllCurves
@@ -50654,19 +50715,22 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \note Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay,
        \note Table:OneIndependentVariable
   A5 , \field Air Inlet Node Name
+       \required-field 
        \type node
   A6 , \field Air Outlet Node Name
+       \required-field 
        \type node
   A7 , \field Sensor Node Name
+       \required-field 
        \type node
   A8 , \field Water Supply Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
-  N4 , \field Drift Loss Fraction
+  N5 , \field Drift Loss Fraction
        \type real
        \minimum 0.0
        \note Rate of drift loss as a fraction of evaporated water flow rate
-  N5 , \field Blowdown Concentration Ratio
+  N6 , \field Blowdown Concentration Ratio
        \type real
        \minimum 2.0
        \note Characterizes the rate of blowdown in the evaporative cooler.
@@ -50674,7 +50738,7 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \note of solids in the water that would otherwise occur because of evaporation.
        \note Ratio of solids in the blowdown water to solids in the make up water.
        \note A typical value is 3. If left blank then there is no blowdown.
-  N6 , \field Evaporative Operation Minimum Drybulb Temperature
+  N7 , \field Evaporative Operation Minimum Drybulb Temperature
        \type real
        \minimum -99.0
        \note This numeric field defines the evaporative cooler air inlet node drybulb temperature minimum  
@@ -50682,7 +50746,7 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \note air inlet node dry-bulb temperature falls below this limit. The typical minimum value is 16degC. Users 
        \note are allowed to specify their own limits. If this field is left blank, then there is no drybulb lower
        \note temperature limit for evaporative cooler operation.
-  N7 , \field Evaporative Operation Maximum Limit Wetbulb Temperature
+  N8 , \field Evaporative Operation Maximum Limit Wetbulb Temperature
        \type real
        \note when outdoor wetbulb temperature rises above this limit the cooler shuts down.
        \note This numeric field defines the evaporative cooler air inlet node wet-bulb temperature maximum 
@@ -50690,7 +50754,7 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \note air inlet node wet-bulb temperature exceeds this limit. The typical maximum value is 24degC. Users 
        \note are allowed to specify their own limits. If this field is left blank, then there is no upper 
        \note wetbulb temperature limit for evaporative cooler operation.
-  N8 ; \field Evaporative Operation Maximum Limit Drybulb Temperature
+  N9 ; \field Evaporative Operation Maximum Limit Drybulb Temperature
        \type real
        \note This numeric field defines the evaporative cooler air inlet node dry-bulb temperature maximum 
        \note limit in degrees Celsius. The evaporative cooler will be turned off when its air inlet node 
