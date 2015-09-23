@@ -2554,7 +2554,7 @@ This is a choice field of Continuous or Intermittent. A variable speed pump is d
 
 #### Field: Pump Flow Rate Schedule Name
 
-The schedule values modify the value for Rated Flow Rate of the pump on a time basis. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field: Pump Curve Name
 
@@ -2738,7 +2738,7 @@ This is a choice field of Continuous or Intermittent. The operation of a constan
 
 #### Field: Pump Flow Rate Schedule Name
 
-The schedule values modify the Rated Flow Rate of the pump on a time basis. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field:Pump Curve Name
 
@@ -2917,7 +2917,7 @@ This numeric field contains the fourth coefficient in the part load ratio curve.
 
 #### Field: Pump Flow Rate Schedule Name
 
-The schedule values modify the Rated Flow Rate of the pump on a time basis the default is that the pump is ON and runs according to its other operational requirements specified above. The schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field: Zone Name
 
@@ -3078,7 +3078,7 @@ This is a choice field of Continuous or Intermittent. The operation of a constan
 
 #### Field: Pump Flow Rate Schedule Name
 
-The schedule values modify the Total Rated Flow Rate of the pump on a time basis. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field: Zone Name
 
@@ -3253,7 +3253,7 @@ This is a choice field of Continuous or Intermittent. A variable speed pump bank
 
 #### Field: Pump Flow Rate Schedule Name
 
-Modifies the Rated Volumetric Flow Rate of the pump on a time basis. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, **not the actual flow rate at that time**.  The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations.  For additional control over pump flow, EMS actuators can be employed.
 
 #### Field: Zone Name
 
@@ -17568,13 +17568,21 @@ This field specifies the effectiveness at design flow rate that is applied to th
 
 This curve modifies the effectiveness design value specified the previous field by multiplying the value by the result of this curve.  The modifying curve is a function of flow fraction, which is the ratio of the current primary air flow rates divided by the design primary air flow rates. If this input field is left blank, the effectiveness is assumed to be constant. Any curve or table with one independent variable can be used. Any curve or table with one independent variable can be used: Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Quartic, Curve:Exponent, Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1, Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay, and Table:OneIndependentVariable.
 
+#### Field:Primary Design Air Flow Rate  
+
+This numeric input field is the primary air design air flow rate in m3/s. This input field is autosizable. If the evaporative cooler is on main air loop branch, the design flow rate is the same as branch design flow rate, or else if it is on outdoor air system it will be the maximum of the the outdoor air design flow rate 
+and the half of the primary air flow rate on the main air loop branch. 
+
 #### Field: Recirculationg Water Pump Design Power
 
-This numeric input field is the recirculating and spray pump electric power at Secondary Design Air Flow Rate in W. This is the nominal water recirculating and spray pump power of evaporative cooler at primary air design flow rates and cooler design effectiveness.  This input field is autosizable.
+This numeric input field is the recirculating and spray pump electric power at Secondary Design Air Flow Rate in W. This is the nominal water recirculating and spray pump power of evaporative cooler at primary air design flow rates and cooler design effectiveness.  This input field is autosizable. Average Pump Power 
+sizing factor was estimated from pump power and primary air design flow rates inputs from energyplus example
+files is about 90.0 [W/(m3/s)] (=90.0 ~ Pump Power / Primary Air Design Flow Rate). The factor ranges from 
+55.0 to 150.0 [W/(m3/s)].
 
 #### Field: Water Pump Power Sizing Factor
 
-This numeric input field value is recirculating water pump sizing factor in W/(m3/s). This field is used when the previous field is set to autosize. The pump design electric power is scaled with Secondary Design Air Flow Rate.
+This numeric input field value is recirculating water pump sizing factor in W/(m3/s). This field is used when the previous field is set to autosize. The pump design electric power is scaled with Secondary Design Air Flow Rate. This input field is autosizable. Average Pump Power sizing factor was estimated from pump power and primary air design flow rates inputs from energyplus example files is about 90.0 [W/(m3/s)] (=90.0 ~ Pump Power / Primary Air Design Flow Rate). The factor ranges from 55.0 to 150.0 [W/(m3/s)].
 
 #### Field: Water Pump Power Modifier Curve Name
 
@@ -17721,9 +17729,9 @@ The depth of the evaporative pad in meters. The pad depth is used to determine t
 
 This field is used to specify the power consumed by the evaporative cooler recirculating pump in Watts.
 
-#### Field: Secondary Fan Flow Rate
+#### Field: Secondary Air Fan Flow Rate
 
-This field is used to specify the secondary fan flow rate and is specified in m<sup>3</sup>/sec.
+This field is used to specify the secondary air fan flow rate and is specified in m<sup>3</sup>/sec.
 
 #### Field: Secondary Fan Total Efficiency
 
@@ -17766,7 +17774,7 @@ And an IDF example showing how this object is specified:
        0.6,                                         !- Direct Pad Area {m2}
        0.2,                                         !- Direct Pad Depth {m}
        225.,                                       !- Recirculating Water Pump Power Consumption {W}
-       1.0,                                         !- Secondary Fan Flow Rate {m3/s}
+       1.0,                                         !- Secondary Air Fan Flow Rate {m3/s}
        0.7,                                         !- Secondary Fan Total Efficiency
        200.0,                                     !- Secondary Fan Delta Pressure {Pa}
        0.67,                                       !- Indirect Heat Exchanger Effectiveness
@@ -17869,15 +17877,15 @@ The Coil Flow Ratio is determined from performance data. The Coil Flow Ratio tel
 
 This field is used to specify the power consumed by the evaporative cooler recirculating pump in Watts.
 
-#### Field: Secondary Fan Flow Rate
+#### Field: Secondary Air Fan Flow Rate
 
-This field is used to specify the secondary fan flow rate and is specified in m<sup>3</sup>/sec.
+This field is used to specify the secondary air fan flow rate and is specified in m<sup>3</sup>/sec.
 
-#### Field: Secondary Fan Total Efficiency
+#### Field: Secondary Air Fan Total Efficiency
 
 This value is the overall efficiency of the fan, i.e., the ratio of the power delivered to the fluid to the electrical input power. It is the product of the motor efficiency and the impeller efficiency. The motor efficiency is the power delivered to the shaft divided by the electrical power input to the motor. The impeller efficiency is power delivered to the fluid (air) divided by the shaft power. The power delivered to the fluid is the mass flow rate of the air multiplied by the pressure rise divided by the air density. This input value must be between 0 and 1..
 
-#### Field: Secondary Fan Delta Pressure
+#### Field: Secondary Air Fan Delta Pressure
 
 This field is used to specify the delta pressure across the secondary stage of the evaporative cooler in Pascals.
 
@@ -17918,9 +17926,9 @@ EvaporativeCooler:Indirect:WetCoil,
        0.8,                                         !- Coil Maximum Efficiency
        0.16,                                       !- Coil Flow Ratio
        225.,                                       !- Recirculating Water Pump Power Consumption {W}
-       1.0,                                         !- Secondary Fan Flow Rate {m3/s}
-       0.7,                                         !- Secondary Fan Total Efficiency
-       200.0,                                     !- Secondary Fan Delta Pressure {Pa}
+       1.0,                                         !- Secondary Air Fan Flow Rate {m3/s}
+       0.7,                                         !- Secondary Air Fan Total Efficiency
+       200.0,                                     !- Secondary Air Fan Delta Pressure {Pa}
        EvapCoolerIndirectInletAirNode,   !- Primary Air Inlet Node Name
        EvapCoolerDirectInletAirNode,   !- Primary Air Outlet Node Name
        ,                                               !- Control Type
@@ -18016,7 +18024,7 @@ This numeric input field is the recirculating pump electric power at Secondary D
 
 #### Field: Water Pump Power Sizing Factor
 
-This numeric input field value is recirculating water pump sizing factor in W/(m3/s). This field is used when the previous field is set to autosize. The pump design electric power is scaled with Secondary Design Air Flow Rate.
+This numeric input field value is recirculating water pump sizing factor in W/(m3/s). This field is used when the previous field is set to autosize. The pump design electric power is scaled with Secondary Design Air Flow Rate. Average Pump Power sizing factor was estimated from pump power and secondary air design flow rates inputs from energyplus example files is about 90.0 [W/(m3/s)] (=90.0 ~ Pump Power / Secondary Air Design Flow Rate). The factor ranges from 55.0 to 150.0 [W/(m3/s)].
 
 #### Field: Water Pump Power Modifier Curve Name
 
@@ -18024,7 +18032,7 @@ This alpha input field is the name of a dimensionless normalized pump power modi
 
 #### Field: Secondary Air Design Flow Rate
 
-This field is used to specify the secondary fan flow rate and is specified in m<sup>3</sup>/s. This flow rate would typically be similar in magnitude to the flow through the primary side. This field can be autosized. When it is autosized, the program detects if the component is in the main air loop or on an outdoor air path.   If it is on the main air loop, then the flow rate is set to the AirLoopHVAC system   s design supply air flow rate (which is the maximum required for heating and cooling).   If it is on the outdoor air path, then the flow rate is set to the larger of either the design minimum outdoor air flow rate or one-half of the main air loop design flow rate. The flow rate is used to determine parasitic fan energy and cooler effectiveness. The flow rate (and fan power) is effectively reduced by cycling when the amount of cooling needs to be restricted for control purpose.  This field can be autosized. When this input is autosized, the program calculates by scaling the Primary Air Design Flow Rate using secondary air scaling factor specified in the input field below.
+This field is used to specify the secondary air fan flow rate and is specified in m<sup>3</sup>/s. This flow rate would typically be similar in magnitude to the flow through the primary side. This field can be autosized. When it is autosized, the program detects if the component is in the main air loop or on an outdoor air path.   If it is on the main air loop, then the flow rate is set to the AirLoopHVAC system   s design supply air flow rate (which is the maximum required for heating and cooling).   If it is on the outdoor air path, then the flow rate is set to the larger of either the design minimum outdoor air flow rate or one-half of the main air loop design flow rate. The flow rate is used to determine parasitic fan energy and cooler effectiveness. The flow rate (and fan power) is effectively reduced by cycling when the amount of cooling needs to be restricted for control purpose.  This field can be autosized. When this input is autosized, the program calculates by scaling the Primary Air Design Flow Rate using secondary air scaling factor specified in the input field below.
 
 #### Field: Secondary Air Flow Scaling Factor
 
@@ -18052,7 +18060,8 @@ The name of the air outlet node for the primary air flow path through the cooler
 
 #### Field:Primary Design Air Flow Rate  
 
-This numeric input field is the primary air design air flow rate in m3/s. This is the design primary air flow rate.  This input field is autosizable. If the evaporative cooler is on main air loop branch, the design flow rate is the same as branch design flow rate, or else if it is on outdoor air system it will be the same as the outdoor air design flow rate. 
+This numeric input field is the primary air design air flow rate in m3/s. This input field is autosizable. If the evaporative cooler is on main air loop branch, the design flow rate is the same as branch design flow rate, or else if it is on outdoor air system it will be the maximum of the the outdoor air design flow rate 
+and the half of the primary air flow rate on the main air loop branch. 
 
 #### Field: Dewpoint Effectiveness Factor
 
@@ -18072,7 +18081,7 @@ This field specifies the name of a node that will provide system air temperature
 
 #### Field: Relief Air Inlet Node Name
 
-This field is optional, but can be used to feed two sources of secondary air into the wet side of the cooler. Typical use is to run the air system relief air into the system. The model first uses all of the air flow available from this node and then adds the air flow from the secondary air inlet node to make up the total defined by Secondary Fan Flow Rate.
+This field is optional, but can be used to feed two sources of secondary air into the wet side of the cooler. Typical use is to run the air system relief air into the system. The model first uses all of the air flow available from this node and then adds the air flow from the secondary air inlet node to make up the total defined by Secondary air Fan Flow Rate.
 
 #### Field: Water Supply Storage Tank Name
 
