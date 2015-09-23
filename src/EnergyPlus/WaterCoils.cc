@@ -5288,6 +5288,74 @@ Label10: ;
 
 	}
 
+	Real64
+	GetWaterCoilDesAirFlow(
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
+		bool & ErrorsFound // set to true if problem
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   May 2009
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This routine is designed to set the design air volume flow rate in the
+		// water coil data structure. Some of the coil types do not have this datum as
+		// an input parameter and it is needed for calculating capacity for output reporting.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItem;
+		using InputProcessor::SameString;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int WhichCoil; // index to coil
+		Real64 CoilDesAirFlow;
+
+		CoilDesAirFlow = 0.0;
+
+		if ( GetWaterCoilsInputFlag ) { //First time subroutine has been entered
+			GetWaterCoilInput();
+			GetWaterCoilsInputFlag = false;
+		}
+
+		if ( SameString( CoilType, "Coil:Cooling:Water" ) ) {
+			WhichCoil = FindItem( CoilName, WaterCoil );
+			if ( WhichCoil != 0 ) {
+				CoilDesAirFlow = WaterCoil( WhichCoil ).DesAirVolFlowRate;
+			} else {
+				ShowSevereError( "GetWaterCoilDesAirFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
+				ErrorsFound = true;
+			}
+		} else {
+			ShowSevereError( "GetWaterCoilDesAirFlowRate: Funciton not valid for Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
+			ErrorsFound = true;
+		}
+
+		return CoilDesAirFlow;
+	}
+
 	void
 	CheckActuatorNode(
 		int const ActuatorNodeNum, // input actuator node number

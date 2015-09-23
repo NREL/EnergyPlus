@@ -643,7 +643,7 @@ namespace ScheduleManager {
 				ErrorsFound = true;
 			}
 
-			ProcessIntervalFields( Alphas( {4,_} ), Numbers, NumFields, NumNumbers, MinuteValue, SetMinuteValue, ErrorsFound, Alphas( 1 ), CurrentModuleObject );
+			ProcessIntervalFields( Alphas( { 4, _ } ), Numbers, NumFields, NumNumbers, MinuteValue, SetMinuteValue, ErrorsFound, Alphas( 1 ), CurrentModuleObject, (Alphas( 3 ) == "YES") );
 			// Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
 			if ( Alphas( 3 ) != "NO" && Alphas( 3 ) != "YES" ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "Invalid value for \"" + cAlphaFields( 3 ) + "\" field=\"" + Alphas( 3 ) + "\"" );
@@ -1171,7 +1171,7 @@ namespace ScheduleManager {
 					if ( NumNumbers > 0 ) {
 						NumFields = NumNumbers;
 						ErrorHere = false;
-						ProcessIntervalFields( Alphas( {UntilFld,_} ), Numbers, NumFields, NumNumbers, MinuteValue, SetMinuteValue, ErrorHere, DaySchedule( AddDaySch ).Name, CurrentModuleObject + " DaySchedule Fields" );
+						ProcessIntervalFields( Alphas( { UntilFld, _ } ), Numbers, NumFields, NumNumbers, MinuteValue, SetMinuteValue, ErrorHere, DaySchedule( AddDaySch ).Name, CurrentModuleObject + " DaySchedule Fields", DaySchedule( AddDaySch ).IntervalInterpolated );
 						// Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
 						if ( ErrorHere ) {
 							ShowContinueError( "ref " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"" );
@@ -2875,8 +2875,9 @@ namespace ScheduleManager {
 		Array2A_bool SetMinuteValue,
 		bool & ErrorsFound,
 		std::string const & DayScheduleName, // Name (used for errors)
-		std::string const & ErrContext // Context (used for errors)
-	)
+		std::string const & ErrContext, // Context (used for errors)
+		bool useInterpolation  // flag if interpolation is allowed and if warning is issued then if timesteps do not match up
+		)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -2949,9 +2950,9 @@ namespace ScheduleManager {
 				} else {
 					sFld = 5;
 				}
-				DecodeHHMMField( Untils( Count ).substr( sFld ), HHField, MMField, ErrorsFound, DayScheduleName, Untils( Count ) );
+				DecodeHHMMField( Untils( Count ).substr( sFld ), HHField, MMField, ErrorsFound, DayScheduleName, Untils( Count ), useInterpolation );
 			} else if ( Pos == std::string::npos ) {
-				DecodeHHMMField( Untils( Count ), HHField, MMField, ErrorsFound, DayScheduleName, Untils( Count ) );
+				DecodeHHMMField( Untils( Count ), HHField, MMField, ErrorsFound, DayScheduleName, Untils( Count ), useInterpolation );
 			} else { // Until found but wasn't first field
 				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils( Count ) );
 				ShowContinueError( "Occurred in Day Schedule=" + DayScheduleName );
@@ -3038,7 +3039,8 @@ namespace ScheduleManager {
 		int & RetMM, // Returned "minute"
 		bool & ErrorsFound, // True if errors found in this field
 		std::string const & DayScheduleName, // originating day schedule name
-		std::string const & FullFieldValue // Full Input field value
+		std::string const & FullFieldValue, // Full Input field value
+		bool useInterpolation  // flag if interpolation is allowed and if warning is issued then if timesteps do not match up
 	)
 	{
 
@@ -3129,8 +3131,22 @@ namespace ScheduleManager {
 			gio::write( mMinute, hhmmFormat ) << RetMM;
 			ShowContinueError( "Until value to be used will be: " + hHour + ':' + mMinute );
 		}
-
+		if ( !useInterpolation ){
+				if ( !isMinuteMultipleOfTimestep( RetMM, MinutesPerTimeStep ) ){
+				ShowWarningError( "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field value is not a multiple of the minutes for each timestep: " + stripped( FullFieldValue ) );
+				ShowContinueError( "Other errors may result. Occurred in Day Schedule=" + DayScheduleName );
+			}
+		}
 	}
+
+	bool
+	isMinuteMultipleOfTimestep( int minute, int numMinutesPerTimestep ){
+			if ( minute != 0 ){
+				return ( minute % numMinutesPerTimestep == 0 );
+			} else {
+				return true;
+			}
+		}
 
 	void
 	ProcessForDayTypes(
