@@ -7,9 +7,12 @@
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -28,6 +31,8 @@ using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataZoneEnergyDemands;
+using namespace EnergyPlus::HeatBalanceManager;
+using namespace EnergyPlus::SizingManager;
 
 namespace EnergyPlus {
 
@@ -489,16 +494,136 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 0.0194359, OAController( 1 ).OAMassFlow, 0.00001 );
 		EXPECT_NEAR( 0.009527, OAController( 1 ).MinOAFracLimit, 0.00001 );
 
-		People.deallocate( );
-		AirLoopControlInfo.deallocate( );
-		OARequirements.deallocate( );
-		ZoneAirDistribution.deallocate( );
-		Zone.deallocate( );
-		AirLoopFlow.deallocate( );
-		ZoneAirCO2.deallocate( );
-		ZoneCO2GainFromPeople.deallocate( );
-		ZoneEquipConfig.deallocate( );
-		Node.deallocate( );
-		ZoneSysEnergyDemand.deallocate( );
+		ZoneAirCO2.deallocate();
+		ZoneCO2GainFromPeople.deallocate();
+	}
+
+	TEST_F( HVACFixture, MissingDesignOccupancyTest )
+	{
+
+		bool ErrorsFound( false );
+		
+		std::string const idf_objects = delimited_string( {
+			"Version,8.3;",
+
+			"Zone,",
+			"  WEST ZONE,              !- Name",
+			"  0,                      !- Direction of Relative North{ deg }",
+			"  0,                      !- X Origin{ m }",
+			"  0,                      !- Y Origin{ m }",
+			"  0,                      !- Z Origin{ m }",
+			"  1,                      !- Type",
+			"  1,                      !- Multiplier",
+			"  autocalculate,          !- Ceiling Height{ m }",
+			"  autocalculate;          !- Volume{ m3 }",
+
+			"Sizing:Zone,",
+			"  WEST ZONE,              !- Zone or ZoneList Name",
+			"  SupplyAirTemperature,   !- Zone Cooling Design Supply Air Temperature Input Method",
+			"  14,                     !- Zone Cooling Design Supply Air Temperature{ C }",
+			"  ,                       !- Zone Cooling Design Supply Air Temperature Difference{ deltaC }",
+			"  SupplyAirTemperature,   !- Zone Heating Design Supply Air Temperature Input Method",
+			"  40,                     !- Zone Heating Design Supply Air Temperature{ C }",
+			"  ,                       !- Zone Heating Design Supply Air Temperature Difference{ deltaC }",
+			"  0.0085,                 !- Zone Cooling Design Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+			"  0.008,                  !- Zone Heating Design Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+			"  ,                       !- Design Specification Outdoor Air Object Name",
+			"  ,                       !- Zone Heating Sizing Factor",
+			"  ,                       !- Zone Cooling Sizing Factor",
+			"  DesignDay,              !- Cooling Design Air Flow Method",
+			"  0,                      !- Cooling Design Air Flow Rate{ m3 / s }",
+			"  0.000762,               !- Cooling Minimum Air Flow per Zone Floor Area{ m3 / s - m2 }",
+			"  0,                      !- Cooling Minimum Air Flow{ m3 / s }",
+			"  0,                      !- Cooling Minimum Air Flow Fraction",
+			"  DesignDay,              !- Heating Design Air Flow Method",
+			"  0,                      !- Heating Design Air Flow Rate{ m3 / s }",
+			"  0.002032,               !- Heating Maximum Air Flow per Zone Floor Area{ m3 / s - m2 }",
+			"  0.1415762,              !- Heating Maximum Air Flow{ m3 / s }",
+			"  0.3,                    !- Heating Maximum Air Flow Fraction",
+			"  West Zone Design Spec Zone Air Dist; !- Design Specification Zone Air Distribution Object Name",
+
+			"  OutdoorAir:Node,",
+			"    Outside Air Inlet Node; !- Name",
+			"  Schedule:Constant,",
+			"    VentSchedule,           !- Name",
+			"     ,                      !- Schedule Type Limits Name",
+			"     1;                     !- Hourly value",
+			"  Schedule:Constant,",
+			"    ZoneADEffSch,           !- Name",
+			"     ,                      !- Schedule Type Limits Name",
+			"     1;                     !- Hourly value",
+			"  Schedule:Constant,",
+			"    OAFractionSched,        !- Name",
+			"     ,                      !- Schedule Type Limits Name",
+			"     1;                     !- Hourly value",
+			"  Schedule:Constant,",
+			"    CO2AvailSchedule,       !- Name",
+			"     ,                      !- Schedule Type Limits Name",
+			"     1.0;                   !- Hourly value",
+
+			"  Controller:OutdoorAir,",
+			"    OA Controller 1,        !- Name",
+			"    Relief Air Outlet Node, !- Relief Air Outlet Node Name",
+			"    Outdoor Air Mixer Inlet Node, !- Return Air Node Name",
+			"    Mixed Air Node,         !- Mixed Air Node Name",
+			"    Outside Air Inlet Node, !- Actuator Node Name",
+			"    0.0,                    !- Minimum Outdoor Air Flow Rate{ m3 / s }",
+			"    1.7,                    !- Maximum Outdoor Air Flow Rate{ m3 / s }",
+			"    NoEconomizer,           !- Economizer Control Type",
+			"    ModulateFlow,           !- Economizer Control Action Type",
+			"    ,                       !- Economizer Maximum Limit Dry - Bulb Temperature{ C }",
+			"    ,                       !- Economizer Maximum Limit Enthalpy{ J / kg }",
+			"    ,                       !- Economizer Maximum Limit Dewpoint Temperature{ C }",
+			"    ,                       !- Electronic Enthalpy Limit Curve Name",
+			"    ,                       !- Economizer Minimum Limit Dry - Bulb Temperature{ C }",
+			"    NoLockout,              !- Lockout Type",
+			"    FixedMinimum,           !- Minimum Limit Type",
+			"    OAFractionSched,        !- Minimum Outdoor Air Schedule Name",
+			"    ,                       !- Minimum Fraction of Outdoor Air Schedule Name",
+			"    ,                       !- Maximum Fraction of Outdoor Air Schedule Name",
+			"    DCVObject;              !- Mechanical Ventilation Controller Name",
+
+			"  Controller:MechanicalVentilation,",
+			"    DCVObject, !- Name",
+			"    VentSchedule, !- Availability Schedule Name",
+			"    Yes, !- Demand Controlled Ventilation",
+			"    ZoneSum, !- System Outdoor Air Method",
+			"     , !- Zone Maximum Outdoor Air Fraction{ dimensionless }",
+			"    WEST ZONE, !- Zone 1 Name",
+			"    , !- Design Specification Outdoor Air Object Name 1",
+			"    West Zone Design Spec Zone Air Dist; !- Design Specification Zone Air Distribution Object Name 1",
+
+			"DesignSpecification:ZoneAirDistribution,",
+			"  West Zone Design Spec Zone Air Dist, !- Name",
+			"  1, !- Zone Air Distribution Effectiveness in Cooling Mode{ dimensionless }",
+			"  1; !- Zone Air Distribution Effectiveness in Heating Mode{ dimensionless }",
+		} );
+
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		AirLoopControlInfo.allocate( 1 );
+		AirLoopControlInfo( 1 ).LoopFlowRateSet = true;
+		OARequirements.allocate( 1 );
+		ZoneAirDistribution.allocate( 1 );
+		ZoneAirDistribution( 1 ).Name = "CM DSZAD WEST ZONE";
+		ZoneAirDistribution( 1 ).ZoneADEffSchPtr = 4;
+
+		AirLoopFlow.allocate( 1 );
+		AirLoopFlow( 1 ).OAFrac = 0.01; // DataAirLoop variable (AirloopHVAC)
+		AirLoopFlow( 1 ).OAMinFrac = 0.01; // DataAirLoop variable (AirloopHVAC)
+
+		GetZoneData( ErrorsFound ); // read zone data
+		EXPECT_FALSE( ErrorsFound ); // expect no errors
+		GetZoneAirDistribution();
+		GetZoneSizingInput();
+		DataGlobals::DoZoneSizing = true;
+		GetOAControllerInputs();
+
+		EXPECT_EQ( 0.00944, VentilationMechanical( 1 ).ZoneOAPeopleRate( 1 ) );
+		EXPECT_EQ( 0.00, VentilationMechanical( 1 ).ZoneOAAreaRate( 1 ) );
+		EXPECT_EQ( 0.00, VentilationMechanical( 1 ).ZoneOAFlow( 1 ) );
+		EXPECT_EQ( 0.00, VentilationMechanical( 1 ).ZoneOAACH( 1 ) );
+
 	}
 }

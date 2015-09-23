@@ -15,6 +15,7 @@
 #include <DataHeatBalance.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
+#include <DXCoils.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <InputProcessor.hh>
@@ -904,6 +905,8 @@ namespace ReportSizingManager {
 								CoilOutEnth = PsyHFnTdbW ( CoilOutTemp, CoilOutHumRat );
 								if ( DataTotCapCurveIndex > 0 ) {
 									TotCapTempModFac = CurveValue ( DataTotCapCurveIndex, CoilInWetBulb, OutTemp );
+								} else if ( DataTotCapCurveValue > 0 ) {
+									TotCapTempModFac = DataTotCapCurveValue;
 								} else {
 									TotCapTempModFac = 1.0;
 								}
