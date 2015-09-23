@@ -905,12 +905,10 @@ namespace ReportSizingManager {
 								CoilOutEnth = PsyHFnTdbW ( CoilOutTemp, CoilOutHumRat );
 								if ( DataTotCapCurveIndex > 0 ) {
 									TotCapTempModFac = CurveValue ( DataTotCapCurveIndex, CoilInWetBulb, OutTemp );
+								} else if ( DataTotCapCurveValue > 0 ) {
+									TotCapTempModFac = DataTotCapCurveValue;
 								} else {
 									TotCapTempModFac = 1.0;
-									
-									if( SameString( CompType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl" ) ){
-										EnergyPlus::DXCoils::CalcVRFCoilCapModFac( 0, _, CompName, CoilInTemp, _, _, _, TotCapTempModFac);
-									}
 								}
 								if (ZoneEqFanCoil) {
 									PeakCoilLoad = max( 0.0, ( StdRhoAir * DesVolFlow * ( CoilInEnth - CoilOutEnth ) ) );

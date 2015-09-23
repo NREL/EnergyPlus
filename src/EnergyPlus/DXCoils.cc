@@ -6040,6 +6040,13 @@ namespace DXCoils {
 					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 					PrintFlag = false;
+				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling ) {
+					SizingMethod = CoolingCapacitySizing;
+					CompName = DXCoil( DXCoilNum ).Name;
+					FieldNum = 1;
+					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
+					CalcVRFCoilCapModFac( 0, _, CompName, FinalZoneSizing ( CurZoneEqNum ).DesCoolCoilInTemp, _, _, _, DataTotCapCurveValue);
 				} else {
 					SizingMethod = CoolingCapacitySizing;
 					CompName = DXCoil( DXCoilNum ).Name;
@@ -6062,6 +6069,7 @@ namespace DXCoils {
 				DataEMSOverride = 0.0;
 				DataConstantUsedForSizing = 0.0;
 				DataFractionUsedForSizing = 0.0;
+				DataTotCapCurveValue = 0.0;
 
 				// Cooling coil capacity
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling ) {
@@ -15641,10 +15649,10 @@ Label50: ;
 				SHSC_real = SC_rate;
 			}
 			
-			// Coil caparicty at rated conditions
+			// Coil capacity at rated conditions
 			CalcVRFCoilSenCap( FlagHeatMode, CoilNum, 20, Tc_rate, SC_rate, BFH_rate, Q_rate, Ts );
 			
-			// Coil caparicty at given conditions
+			// Coil capacity at given conditions
 			CalcVRFCoilSenCap( FlagHeatMode, CoilNum, Tinlet, TeTc_real, SHSC_real, BF_real, Q_real, Ts );
 			
 			if( Q_rate > 0 ){
