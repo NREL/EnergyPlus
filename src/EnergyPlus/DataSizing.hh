@@ -160,6 +160,7 @@ namespace DataSizing {
 	extern int NumTimeStepsInAvg; // number of time steps in the averaging window for the design flow and load sequences
 	extern int SaveNumPlantComps; // Number of components using water as an energy source or sink (e.g. water coils)
 	extern int DataTotCapCurveIndex; // index to total capacity as a function of temperature curve
+	extern Real64 DataTotCapCurveValue; // value of total capacity as a function of temperature curve for CoilVRF_FluidTCtrl_*
 	extern int DataPltSizCoolNum; // index to cooling plant sizing data
 	extern int DataPltSizHeatNum; // index to heating plant sizing data
 	extern int DataWaterLoopNum; // index to plant water loop

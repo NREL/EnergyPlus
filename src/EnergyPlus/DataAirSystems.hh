@@ -832,6 +832,10 @@ namespace DataAirSystems {
 	extern Array1D< ConnectAirSysSubComp > AirSysSubCompToPlant; // Connections between loops
 	extern Array1D< ConnectAirSysSubSubComp > AirSysSubSubCompToPlant; // Connections between loops
 
+	//Functions
+	void
+	clear_state();
+
 } // DataAirSystems
 
 } // EnergyPlus
