@@ -342,6 +342,23 @@ The above solutions are implemented in the Correct Zone Air Humidity Ratio step 
 
 When the HAMT (Combined Heat And Moisture Finite Element) defined in the HeatBalanceAlgorithm object is applied, the moisture update equations are also the same as the equations used in the effective moisture penetration depth (EMPD) with conduction transfer function solution algorithm.
 
+### Which moisture buffering model is best?
+
+The 'correct' moisture buffering model depends on the questions being answered by the building energy simulation. Previous research (Woods et al., 2013a) has shown that using the effective capacitance model to account for moisture buffering of materials will provide a good estimate of energy use when humidity is not being actively controlled. See the InputOutput Reference for additional information on the object ZoneCapacitanceMultiplier:ResearchSpecial. This model has some limitations (Woods et al., 2013b):
+- it will not accurately predict indoor humidity (or thermal comfort),
+- it will not accurately predict energy use when humidity is being actively controlled, and
+- it will not provide insight into the moisture content and potential moisture problems associated with a specific wall construction.
+
+The effective moisture penetration depth (EMPD) model will address the first two concerns above: it can accurately predict indoor humidity, and can accurately predict energy use associated with controlling humidity. The EMPD model requires more user input than the effective capacitance model, specifically  some of the moisture properties of the materials in the building. For more information, see the Effective Moisture Penetration Depth Model section in this document.
+
+Like the EMPD model, the combined heat, air, and moisture transfer (HAMT) model addresses the first two issues discussed above for the effective capacitance model. It also addresses the third, by providing temperature and moisture profiles through composite building walls, and helping to identify surfaces with high surface humidity. The HAMT model requires a few more user inputs on moisture properties of materials than the EMPD model, and this model also increases the required simulation time by an order of magnitude. For more information on this model, see the Combined Heat and Moisture Transfer (HAMT) Model section in this document.
+
+Note that the models above ensure accurate *calculations* of the effect of moisture buffering, but it will only be accurate relative to reality when given appropriate inputs for the material properties.
+
+Woods, J., J. Winkler, D. Christensen, [*Moisture modeling: Effective moisture penetration depth versus effective capacitance*](http://www.techstreet.com/products/1868073), in Thermal Performance of the Exterior Envelopes of Whole Buildings XII International Conference. 2013a: Clearwater, FL.
+
+Woods, J., Winkler, J, and Christensen, D. [*Evaluation of the Effective Moisture Penetration Depth Model for Estimating Moisture Buffering in Buildings*](http://www.nrel.gov/docs/fy13osti/57441.pdf), NREL/TP-5500-57441, 2013b.
+
 Carbon Dioxide Predictor-Corrector
 ----------------------------------
 

@@ -4435,119 +4435,179 @@ Material:AirGap,B1 - AIRSPACE RESISTANCE,  ! Material Name
   0.1603675    ;  ! Resistance {M**2K/W}
 ```
 
-
-
 ### MaterialProperty:MoisturePenetrationDepth:Settings
 
-This material is used to describe the five moisture material properties that are used in the EMPD (Effective Moisture Penetration Depth) heat balance solution algorithm (known there as MoisturePenetrationDepthConductionTransferFunction). The EMPD algorithm is a simplified, lumped moisture model that simulates moisture storage and release from interior surfaces. The model uses "actual" convective mass transfer coefficients that are determined by existing heat and mass transfer relationships, e.g. the Lewis relation. An effective moisture penetration depth may be determined from either experimental or detailed simulation data by using actual surface areas and moisture sorption isotherms.
+This material is used to describe the nine moisture material properties that are used in the EMPD (Effective Moisture Penetration Depth) heat balance solution algorithm. The EMPD algorithm is a simplified, lumped moisture model that simulates moisture storage and release from interior surfaces. The model uses "actual" convective mass transfer coefficients that are determined by existing heat and mass transfer relationships, e.g. the Lewis relation. The EMPD model includes two fictitious layers of material with uniform moisture content: a surface layer, which accounts for short-term moisture buffering, and a deep layer, which accounts for more slowly responding moisture buffering. The model calculates the moisture transfer between the air and the surface layer and between the surface layer and the deep layer. This moisture transfer impacts the zone humidity, and also impacts the zone temperature through latent-to-sensible conversion from the heat of adsorption.
 
-This moisture model will be used when the appropriate EMPD moisture materials are specified and the Solution Algorithm parameter is set to EMPD.
+This moisture model will be used when the appropriate EMPD moisture materials are specified and the Solution Algorithm parameter is set to MoisturePenetrationDepthConductionTransferFunction.
 
 #### Field: Name
 
 This field is a unique reference name that the user assigns to a particular material. This name can then be referred to by other input data (ref: Construction object).
 
-#### Field: Moisture Penetration Depth
+#### Field: Vapor diffusion resistance factor
 
-This field is used to enter the effective moisture penetration depth of the material layer. Units for this parameter are (m).
+The vapor diffusion resistance factor is the resistance to water vapor diffusion *relative* to the resistance to water vapor diffusion in stagnant air. In other words, $\mu$ equals 1 for air, and is generally greater than 1 for building materials.
 
-#### Field: Constants to Define Moisture Equilibrium Equation
+The equation for $\mu$ is:
 
-The next four fields, coefficients “a”, “b”, “c”, and “d”, help define the sorption isotherm curve used for building materials under equilibrium conditions. They are used to define the relationship between the material’s moisture content and the surface air relative humidity (ref: Effective Moisture Penetration Depth (EMPD) Model in the Engineering Reference):
+$$ \mu = \frac {\delta_{perm,air}} {\delta_{perm}} $$
 
-<div>\[U = a{\varphi ^b} + c{\varphi ^d}\]</div>
+where $\delta_{perm,air}$ is the permeability of water vapor in air [kg/m-s-Pa], and $\delta_{perm}$ is the permeability of water vapor in the material. The permeability of water vapor in air can be estimated as:
+
+$$ \delta_{perm,air} = \frac {2 \times 10^{-7} \cdot T^{0.81}} {P_{ambient}} $$
+
+where $T$ is the temperature and $P_{ambient}$ the ambient atmospheric pressure.
+
+#### Fields: Moisture equilibrium constants
+
+The next four fields, coefficients “a”, “b”, “c”, and “d”, help define the sorption isotherm curve used for building materials under equilibrium conditions. They are
+used to define the relationship between the material’s moisture content and the surface air relative humidity (ref: Effective Moisture Penetration Depth (EMPD)
+Model in the Engineering Reference):
+
+$$ u = a \cdot \phi^b + c \cdot \phi^d $$ 
 
 where
 
-a,b,c,d               = Coefficients to define the relationship between the material’s moisture content and the surface air relative humidity
+$a,b,c,d$ = Coefficients to define the relationship between the material’s moisture content and the surface air relative humidity
 
-U                      = Moisture content defined as the mass fraction of water contained in a material [kg/kg]
+$u$ = Moisture content defined as the mass fraction of water contained in a material [kg/kg]
 
-<span>\(\varphi \)</span>                    = Surface air relative humidity [0 to 1]
+$\phi$ = Surface air relative humidity [0 to 1],
 
-#### The next four fields are dimensionless coefficients:
+#### Field: Surface-layer penetration depth
 
-#### Field: Moisture Equation Coefficient a
+The surface-layer penetration depth is the fictitious thickness of the surface layer, and is used to calculate the volume of material that participates in short-term moisture transfer and storage. This layer has a uniform moisture content, and can be considered a *lumped-capacitance*. The penetration depth is based on the amount of material that interacts with the zone air when subject to a cyclic relative humidity variation. The surface penetration depth can be estimated with the following equation:
 
-#### Field: Moisture Equation Coefficient b
+$$ d_{EMPD,surf} = \sqrt{\frac{\delta_{perm} P_{sat} \tau_{surf}}{\rho_{material} \frac{du}{d\phi} \pi}} $$
 
-#### Field: Moisture Equation Coefficient c
+where
 
-#### Field: Moisture Equation Coefficient d
+$\delta_{perm}$ = water vapor permeability in the material, kg/m-s-Pa (see Vapor diffusion resistance factor above)
 
-Ann IDF example showing how it is used in conjunction with Material in synchronous pairs:
+$P_{sat}$ = saturated vapor pressure at some nominal temperature, Pa
 
+$\tau_{surf}$ = cycle period of typical RH variations, s. 24 hours (87600 s) is often used.
 
+$\rho_{material}$ = dry density of material, kg/m^3
+
+$\frac{du}{d\phi}$ = slope of moisture soprtion curve, $a b  \phi^{b-1} + c d \phi^{d-1}$
+
+#### Field: Deep-layer penetration depth
+
+The deep-layer penetration depth is the fictitious thickness of the deep layer, and is used to calculate the volume of material that participates in long-term moisture transfer and storage. This layer has a uniform moisture content, and can be considered a *lumped-capacitance*. The deep penetration depth is based on the amount of material that interacts with the surface layer when subject to cyclic relative humidity variation. The deep penetration depth can be estimated with the following equation:
+
+$$ d_{EMPD,deep} = \sqrt{\frac{\delta_{perm} P_{sat} \tau_{deep}} {\rho_{material} \frac{du}{d\phi} \pi}} $$
+
+where each term is the same as the surface layer, except that the cycle period is different. This is usually on the order of weeks for the deep layer.
+
+#### Field: Coating layer thickness
+The coating layer thickness adds an additional resistance between the surface layer and the zone and represents a thin coating, such as paint, plaster, or other wall coverings.
+
+This input is optional, and an input of zero implies no coating.
+
+#### Field: Coating vapor diffusion resistance factor
+
+The vapor diffusion resistance factor of the coating is the coating's resistance to water vapor diffusion *relative* to the resistance to water vapor diffusion in stagnant air (see Vapor diffusion resistance factor section above).
+
+This input is optional, and an input of zero implies no coating.
+
+Below are two IDF examples:
+
+This set of inputs can be used for aerated concrete (assuming linear sorption curve). Density, input elsewhere, is :
 
 ```idf
-  Material,
-    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name
-    Smooth,                  !- Roughness
-    1.9050000E-02,           !- Thickness {m}
-    0.7264224,               !- Conductivity {W/m-K}
-    1601.846,                !- Density {kg/m3}
-    836.8000,                !- Specific Heat {J/kg-K}
-    0.9000000,               !- Thermal Absorptance
-    0.9200000,               !- Solar Absorptance
-    0.9200000;               !- Visible Absorptance
-
-
-
-
- MaterialProperty:MoisturePenetrationDepth:Settings,
-    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name
-    0.004,                   !- Effective Moisture Penetration Depth {m}
-    0.072549,           !- Moisture Equation Coefficient a {dimensionless}
-    0.397173,           !- Moisture Equation Coefficient b {dimensionless}
-    0.007774,           !- Moisture Equation Coefficient c {dimensionless}
-    11.7057;            !- Moisture Equation Coefficient d {dimensionless}
-
-
-  Material,
-    C10 - 8 IN HW CONCRETE,  !- Name
-    MediumRough,             !- Roughness
-    0.2033016,               !- Thickness {m}
-    1.729577,                !- Conductivity {W/m-K}
-    2242.585,                !- Density {kg/m3}
-    836.8000,                !- Specific Heat {J/kg-K}
-    0.9000000,               !- Thermal Absorptance
-    0.6500000,               !- Solar Absorptance
-    0.6500000;               !- Visible Absorptance
-
-
- MaterialProperty:MoisturePenetrationDepth:Settings,
-    C10 - 8 IN HW CONCRETE,  !- Name
-    0.004,                   !- Effective Moisture Penetration Depth {m}
-    0.018062,             !- Moisture Equation Coefficient a {dimensionless}
-    0.451879,             !- Moisture Equation Coefficient b {dimensionless}
-    0.026178,             !- Moisture Equation Coefficient c {dimensionless}
-    10.8356;              !- Moisture Equation Coefficient d {dimensionless}
+MaterialProperty:MoisturePenetrationDepth:Settings,
+    Concrete,            !- Name
+    6.55,                !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.066,               !- Moisture Equation Coefficient a {dimensionless}
+    1,                   !- Moisture Equation Coefficient b {dimensionless}
+    0,                   !- Moisture Equation Coefficient c {dimensionless}
+    1,                   !- Moisture Equation Coefficient d {dimensionless}
+    0.007,              !- Surface-layer penetration depth {m}
+    0.024,               !- Deep-layer penetration depth {m}
+    0,                   !- Coating layer thickness {m}
+    1;                   !- Coating layer water vapor diffusion resistance factor {dimensionless}
 ```
 
+This set of inputs is for gypsum board with density 750 kg/m^3. This also assumes 2 coats of latex paint:
+
+```idf
+MaterialProperty:MoisturePenetrationDepth:Settings,
+    Concrete,            !- Name
+    6.0,                 !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.0065,              !- Moisture Equation Coefficient a {dimensionless}
+    0.65,                !- Moisture Equation Coefficient b {dimensionless}
+    0.022,               !- Moisture Equation Coefficient c {dimensionless}
+    10,                  !- Moisture Equation Coefficient d {dimensionless}
+    0.021,               !- Surface-layer penetration depth {m}
+    0.08,                !- Deep-layer penetration depth {m}
+    0.0003,              !- Coating layer thickness {m}
+    6000;                !- Coating layer water vapor diffusion resistance factor {dimensionless}
+```
+
+Finally, here are values representing the empirical whole-house inputs from Woods et al., 2014 (see Engineering Reference). Density is kg/m^3:
+
+```idf
+MaterialProperty:MoisturePenetrationDepth:Settings,
+    Concrete,            !- Name
+    8.0,                 !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.012,               !- Moisture Equation Coefficient a {dimensionless}
+    1,                   !- Moisture Equation Coefficient b {dimensionless}
+    0,                   !- Moisture Equation Coefficient c {dimensionless}
+    1,                   !- Moisture Equation Coefficient d {dimensionless}
+    0.019,               !- Surface-layer penetration depth {m}
+    0.113,               !- Deep-layer penetration depth {m}
+    0,                   !- Coating layer thickness {m}
+    1;                   !- Coating layer water vapor diffusion resistance factor {dimensionless}
+```
+
+Other materials inputs can be estimated using the equations above and material properties from a variety of sources, such as [*Kumaran, 1996*](http://www.iea-ebc.org/fileadmin/user_upload/images/Pictures/EBC_Annex_24_Report_3.pdf), the [*WUFI*](http://WUFI.de/en/) simulation software, or the [*ASHRAE 1018-RP*](http://www.techstreet.com/products/1719052) report.
 
 ### Moisture Penetration Depth (EMPD) Outputs
 
-Output variables applicable to heat transfer surfaces using EMPD model:
+#### EMPD surface inside face water vapor density [kg/m^3]
 
-* Zone,Average,EMPD Surface Inside Face Water Vapor Density [kg/m3]
+The vapor density at the inside face of the surface, where the EMPD moisture balance solution algorithm is applied. This is the *actual* surface, separated from the zone air only by the convective mass transfer coefficient.
 
-* Zone,Average,EMPD Surface Inside Face Humidity Ratio [kgWater/kgDryAir]
+Units are kg of water per cubic meter of air.
 
-* Zone,Average,EMPD Surface Inside Face Relative Humidity [%]
+#### EMPD surface layer moisture content [kg/m^3]
 
-The following variables apply only to surfaces, where the material assigned to the inside layers is MaterialProperty:MoisturePenetrationDepth:Settings. The EMPD (Effective Moisture Penetration Depth) moisture balance solution algorithm is used to calculate the inside surface moisture levels.
+The moisture content, *u*, of the fictitious surface layer. The surface layer node is not at the actual surface, but is instead at the center of surface layer, which has a uniform moisture content. This node is separated from the inside face of the surface by a diffusive resistance, as described in the Engineering Reference.
 
-#### EMPD Surface Inside Face Water Vapor Density [kg/m3]
+Units are kg of water per cubic meter of solid material (e.g., gypsum).
 
-The vapor density at the inside surface, where the EMPD moisture balance solution algorithm is applied.
+#### EMPD deep layer moisture content [kg/m^3]
 
-#### EMPD Surface Inside Face Humidity Ratio [kgWater/kgDryAir]
+The moisture content, *u*, of the fictitious deep layer. The deep layer node interacts only with the surface layer node through a diffusive resistance.
 
-The humidity ratio at the inside surface, where the EMPD moisture balance solution algorithm is applied.
+Units are kg of water per cubic meter of solid material.
 
-#### EMPD Surface Inside Face Relative Humidity [%]
+#### EMPD surface layer equivalent relative humidity
 
-The relative humidity at the inside surface, where the EMPD moisture balance solution algorithm is applied.
+The equivalent relative humidity of the surface layer, converted from the surface-layer moisture content discussed above and the surface temperature. The moisture content is related to the relative humidity through the slope of the moisture curve, the surface penetration depth, and the material density, as discussed in the engineering reference.
+
+#### EMPD deep layer equivalent relative humidity
+
+The equivalent relative humidity of the deep layer, converted from the deep-layer moisture content discussed above and the surface temperature.
+
+#### EMPD surface layer equivalent humidity ratio
+
+The equivalent humidity ratio of the surface layer. Units are kg of water per kg of dry air.
+
+#### EMPD deep layer equivalent humidity ratio
+
+The equivalent humidity ratio of the deep layer. Units are kg of water per kg of dry air.
+
+#### EMPD zone mass flux [kg/m^2-s]
+
+The mass flux of water vapor from the surface layer of a specific surface to the zone air. A positive mass flux is from the surface to the zone.
+
+
+#### EMPD deep layer moisture flux [kg/m^2-s]
+
+The mass flux of water vapor from the deep layer of a specific surface to the surface layer of that surface. A positive flux is from the surface layer to the deep layer.
 
 ### MaterialProperty:PhaseChange
 

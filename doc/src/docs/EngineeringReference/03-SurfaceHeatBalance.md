@@ -622,143 +622,160 @@ Kumar Kumaran, M. (1996) IEA ANNEX 24, Final Report, Volume 3
 WUFI (1999) version 2.2 Simultaneous Heat and Moisture Transport in Building components. Fraunhofer IBP, Holzkirchen, Germany
 
 Effective Moisture Penetration Depth (EMPD) Model
----------------------------------------------------------------------------
+-------------------------------------------------
 
 ### Overview
 
-Moisture has little effect on heating system performance, but a profound effect on the performance of air conditioning systems.  In order to accurately describe building performance during periods when cooling is needed, it is very important to know the moisture conditions of the building.  If one assumes that all building moisture is contained in the room air, then one ignores the fact that the materials that bound the room (e.g. wall surfaces, furnishings, linens, etc.) store and release moisture.  Thus, to assume that the only moisture that effects cooling system performance is contained in the room air is a false, and it can lead to significant error in the prediction of room moisture conditions and cooling system loads.
+The Effective Moisture Penetration Depth (EMPD) model estimates moisture adsorption and desorption from building surfaces and calculates the effect of this adsorption/desorption on each zone. The EMPD model is a simplified, lumped approach that simulates the effect of the materials on the zone humidity with two fictitious layers of material with uniform moisture content: a surface layer, which accounts for short-term moisture buffering, and a deep layer, which accounts for more slowly responding moisture buffering. The model calculates the moisture transfer between the air and the surface layer and between the surface layer and the deep layer. This moisture transfer impacts the zone humidity, and also impacts the zone temperature through latent-to-sensible conversion from the heat of adsorption.
 
-The EMPD (Effective Moisture Penetration Depth) model is a simplified, lumped approach to simulate surface moisture adsorption and desorption.
+### EMPD model description
 
-### EMPD Model Description
+The EMPD concept is based on the assumption of cyclical variations in humidity, and therefore material moisture content, $u$. In other words, the following constraint must be met:
 
-The EMPD concept assumes that a thin layer (δ<sub>M</sub>) close to the wall surface behaves dynamically and exchanges moisture with the air domain when exposed to cyclic air moisture pulses.  For short periods where the cyclic integral of the total moisture adsorption and desorption is near zero (i.e. there is no net moisture storage), the EMPD concept has been shown to be a reasonable approximation of reality (Kerestecioglu et al, 1989).  In other words, the following constraint must be met:
+$$ \int_{{t_1}}^{{t_2}} {\frac{{du}}{{dt }}} dt  = 0 $$
 
-<div>$$\int_{{\tau_1}}^{{\tau_2}} {\frac{{dU}}{{d\tau }}} d\tau  = 0$$</div>
+This is generally a reasonable assumption for buildings, with daily internal latent gains. The EMPD model uses a thin material layer of constant thickness at each material surface. The moisture content is assumed constant across this thickness, termed the *surface penetration depth* ($d_{EMPD,surf}$). For most building materials, the equilibrium moisture sorption isotherm can be defined by the following general equation (Kerestecioglu et al. 1988):
 
-where, τ<sub>2</sub>-τ<sub>1</sub> denotes the finite time interval over which the equation holds.  The EMPD model assumes no spatial distribution of moisture content across the thickness (L) of the solid; rather, a thin layer (δ<sub>M</sub>) of uniform moisture content (U) is assumed to represent the total moisture content of the solid. This may be mathematically stated as:
+$$ u = a \cdot \phi^b + c \cdot \phi^d $$ 
 
-<div>$$\int_0^L {U(x)dx = U{\delta_M}} $$</div>
+where $a$, $b$, $c$, and $d$ are fitting parameters and phi is relative humidity.
 
-For most building materials, the equilibrium moisture sorption isotherm can be defined by the following general equation (Kerestecioglu et al. 1988):
+This surface layer exchanges moisture with the zone air based on the difference between the zone air vapor density and the material vapor density. The model converts the surface layer moisture content to a vapor density ($\rho_v$) through the material's sorption curve:
 
-<div>$$U = a{\varphi ^b} + c{\varphi ^d}$$</div>
-
-where
-
-<div>$$\varphi  \approx \frac{{{W^*}}}{{{W_{sat}}^*}}$$</div>
-
-and
-
-<div>$${W_{sat}}^* = \frac{1}{{{R_v}{\rho_a}{T^*}}}\exp \left( {23.7093 - \frac{{4111}}{{{T^*} - 35.45}}} \right)$$</div>
-
- Given that U=U(W<sup>\*</sup>,T<sup>\*</sup>), the moisture content may be differentiated with respect to time in the following manner:
-
-<div>$$\frac{{du}}{{d\tau }} = \frac{{\partial U}}{{\partial {W^*}}}\frac{{d{W^*}}}{{d\tau }} + \frac{{\partial U}}{{\partial {T^*}}}\frac{{d{T^*}}}{{d\tau }} = {A_T}\frac{{d{W^*}}}{{d\tau }} - {B_\rho }\frac{{d{T^*}}}{{d\tau }}$$</div>
-
-where A<sub>T</sub> and B<sub>ρ</sub> are the isothermal moisture capacity and thermo-gradient coefficient, respectively.  From Eqs. , and , they can be expressed as:
-
-<div>$${A_T} = \frac{{ab{\varphi ^b} + cd{\varphi ^d}}}{{{W^*}}}$$</div>
-
-and
-
-<div>$${B_\rho } =  - \left[ {\frac{1}{{{T^*}}} - \frac{{4111}}{{{{({T^*} - 35.45)}^2}}}} \right]*(ab{\varphi ^b} + cd{\varphi ^d})$$</div>
-
-The lumped mass transfer equation for the i-th solid domain may be written as
-
-<div>$${(A{\rho_b}{\delta_M})_i}\frac{{d{U_i}}}{{d\tau }} = {h_{M,i}}{A_i}({W_r} - {W_i}^*)$$</div>
-
-Using Eqs. , , and , one obtains the final equation needed for closure moisture transfer at internal surface.
-
-<div>$${({A_i}{\rho_b}{\delta_M}{A_T})_i}\frac{{d{W_i}^*}}{{d\tau }} = {h_{M,i}}{A_i}({W_r} - {W_i}^*) + {(A{\rho_b}{\delta_M}{B_\rho })_i}\frac{{d{T_i}^*}}{{d\tau }}$$</div>
-
-The energy equation for the envelope contains the surface temperature and is given by the conduction equation
-
-<div>$$\rho {C_p}\frac{{dT}}{{d\tau }} = \nabla  \cdot (k\nabla T)$$</div>
-
-with the boundary conditions at interior surface
-
-<div>$$ - k\nabla T =  - {q_T}`` + {h_T}({T^*} - {T_r}) + \lambda {h_M}({W^*} - {W_r})$$</div>
-
-A more detailed account of the numerical solution procedure can be found in Kerestecioglu et al. (1988).
-
-### EMPD Value Determination
-
-An effective moisture penetration depth may be determined from either experimental or detailed simulation data by using actual surface areas and moisture vapor diffusivity.  An empirical function derived from the detailed simulation may be used to determine the EMPD value (Kerestecioglu et al, 1989):
-
-<div>$${\delta_M} = 12.567024 - 12.21373*\exp \left( { - 267.0211*{D_v}^{0.7}*{\xi ^{ - 0.7}}} \right)$$</div>
+$$ rho_{v,surflayer} = \frac {rho_{air} \cdot 0.622 \cdot u_{surflayer}} {\frac{du}{d\phi} \frac{P}{P_{sat}} - u_{surflayer}} $$
 
 where
 
-<div>$$\xi  = \left| {\frac{{\Delta \varphi }}{{\Delta \tau }}} \right|$$</div>
+$\frac{du}{d\phi}$ = slope of the moisture sorption curve, kg/kg-RH
 
-Figure 17 gives the EMPD values to be used for various vapor diffusivities evaluated at different ambient excitations.
+$P_{sat}$ = saturated vapor pressure
 
-![](media/image241.svg.png)
+$\rho_{air}$ = dry-air density
 
-Figure 17. Limit of Effective Penetration Depth Values for Various Vapor Diffusivities at Different Ambient Excitations.
+The moisture flux between the material and the zone air is the difference in vapor densities divided by the overall mass transfer resistance, which is the sum of the diffusive resistance of the surface layer, the diffusive resistance of any coating, and the convective resistance of the air boundary layer:
+
+$$ Flux_{zone} = \frac{\rho_{v,surflayer} - \rho_{v,zoneair}}{R_{MT,surflayer} + R_{MT,coating} + R_{MT,BL}} $$
+
+The surface layer resistance is calculated with:
+
+$$ R_{MT,surflayer} = \frac{d_{EMPD,surf}} {2 \bar R_{water} T \delta_{perm}} $$
+
+where
+
+$\bar R_{water}$ = universal gas constant for water (461.52 J/kg-K)
+
+$T$ = temperature, K
+
+$\delta_{perm}$ = water vapor permeability of the material, kg/m-s-Pa
+
+The coating resistance is:
+
+$$ R_{MT,coating} = \frac {t_{coating} P_{ambient}} {\delta_{perm,coating} \bar R_{water} T} $$
+
+where
+
+$t_{coating}$ = coating thickness, m
+
+$P_{ambient}$ = ambient pressure, Pa
+
+$\delta_{perm,coating}$ = permeability of the coating, kg/m-s-Pa.
+
+Finally, the boundary layer mass-transfer resistance is calculated by converting the heat-transfer coefficient to mass transfer with the Lewis relation:
+
+$$ R_{MT,BL} = \frac{\rho_{air} Cp_{air}}{h_{conv}} $$
+
+Behind the surface layer is a deep layer of thickness $d_{EMPD,deep}$. The surface layer accounts for buffering of high-frequency changes in the zone air humidity, while the deep layer accounts for the material's response to longer term changes in the zone air humidity. The model calculates the moisture flux between the surface and deep layers with:
+
+$$ Flux_{deep} = \frac {\rho_{v,surflayer} - \rho_{v,deeplayer}} {R_{MT,deeplayer}} $$
+
+where $R_{MT,deeplayer}$ is:
+
+$$ R_{MT,deeplayer} = \frac {d_{EMPD,surf} + d_{EMPD,deep}} {2 \bar R_{water} T \delta_{perm} } $$
+
+These moisture fluxes are used to update the moisture content (or equivalent RH, $\phi$) of the surface and deep layers:
+
+$$ \phi_{surflayer}(t) = \frac {\phi_{surflayer}(t-TimeStep) - Flux_{surf} \cdot TimeStep} {\rho_{matl} d_{EMPD,surf} \frac{du}{d\phi}} $$
+
+$$ \phi_{deeplayer}(t) = \frac {\phi_{deeplayer}(t-TimeStep) + Flux_{deep} \cdot TimeStep} {\rho_{matl} d_{EMPD,deep} \frac {du}{d\phi}} $$
+
+where
+
+$\rho_{matl}$ = Material dry density, kg/m^3
+
+$TimeStep$ = Simulation timestep, s
+
+$\frac {du}{d\phi}$ = slope of moisture curve (change in moisture content / change in RH), kg/m^3-RH
+
+The equivalent RH and equivalent vapor density are related with:
+
+$$ \phi_{surflayer} = \frac {\rho_{v,surflayer} \bar R_{water}} {P_{sat}(T)} $$
+
+$$ \phi_{deeplayer} = \frac {\rho_{v,deeplayer} \bar R_{water}} {P_{sat}(T)} $$
+
+The zone flux is used, along with the area of the particular surface, to update the zone humidity ratio, as discussed in (*Moisture Predictor-Corrector* section).
+
+The zone flux is also used to calculate the sensible heat released (during adsorption) or absorbed (during desorption) at the material surface:
+
+$$ Q_{flux} = Flux_{zone} h_{fg} $$
+
+where $h_{fg}$ is the enthalpy of vaporization of water, assumed to be 2500 kJ/kg. This is added to the heat balance calculations at the interior surface.
+
+For further information on the EMPD model, see References below.
 
 ### EMPD Nomenclature
 
-A                = Area [m<sup>2</sup>]
+$A$ = surface area, m<sup>2</sup>
 
-A<sub>T</sub>               = Isothermal moisture capacity [m<sup>3</sup>/kg]
+$d$ = penetration depth, m
 
-B<sub>ρ</sub>               = Thermo-gradient coefficient [kg/kg-K]
+$Flux$ = water mass flux, kg/m<sup>2</sup>-s
 
-C<sub>p</sub>               = Specific heat [J/kg.K]
+$ \bar R_{water}$  = universal gas constant for water, 452.61 J/kg-K
 
-h<sub>M</sub>               = Convective mass transfer coeff. [kg/m<sup>2</sup>-s]
+$T$ = temperature, K
 
-h<sub>T</sub>               = Convective heat transfer coeff. [W/m<sup>2</sup>-K]
-
-k                = Thermal conductivity [W/m-K]
-
-L                = Length [m]
-
-q"<sub>T</sub>              = Imposed heat flux [W/m<sup>2</sup>]
-
-R<sub>v</sub>               = Ideal gas constant [461.52 J/kg-K]
-
-T                = Temperature [K]
-
-U                = Moisture content [kg/kg]
-
-W               = Humidity ratio [kg/kg]
+$u$ = moisture content, kg/m<sup>3</sup>
 
 #### Greek letters
 
-δ<sub>M</sub>              = Effective penetration depth for moisture equation [m]
+$\delta$ = permeability, kg/m-s-Pa
 
-λ                = Heat of vaporization [J/kg]
+$\phi$ = relative humidity
 
-ρ                = Density [kg/m<sup>3</sup>]
+$\rho$ = density, kg/m<sup>3</sup>
 
-τ                 = Time [s]
-
-φ                = Relative humidity [0 to 1]
-
-ξ                 = Ambient moisture excitation rate [1/h]
+$\rho_v$ = vapor density, kg/m<sup>3</sup>
 
 
+#### Subscripts
 
-#### Subscripts and superscripts
+surflayer = surface layer node
 
-a                = Air
+deeplayer = deep layer node
 
-b                = Bulk
+surface = at the surface-air interface
 
-\*                 = Surface
+MT = mass transfer
 
-i                 = i-th surface
+BL = boundary layer
 
 ### References
 
-Kerestecioglu, A., Swami, M., Dabir, R., Razzaq, N., and Fairey, P., 1988, "Theoretical and Computational Investigation of Algorithms for Simultaneous Heat and Moisture Transport in Buildings," FSEC-CR-191-88, Florida Solar Energy Center, Cape Canaveral, FL.
+Cunningham, M.J., [*The moisture performance of framed structures - a mathematical model*](http://www.sciencedirect.com/science/article/pii/0360132388900261), Build. Environ. 23 (1988) 123-35.
 
-Kerestecioglu, A., M. Swami and A. Kamel, 1989, "Theoretical and Computational Investigation of Simultaneous Heat and Moisture Transfer in Buildings: Effective Penetration Depth Theory."  ASHRAE Winter Meeting, Atlanta, GA.
+Kerestecioglu, A., M. Swami, R. Dabir, N. Razzaq, P. Fairey, [*Theoretical and Computational Investigation of Algorithms for Simultaneous Heat and Moisture Transport in Buildings*](http://www.fsec.ucf.edu/en/publications/pdf/FSEC-CR-191-88.pdf). Florida Solar Energy Center, DOE/SF/16305-2, 1988.
 
-Kerestecioglu, A., M. V. Swami, P. Brahma, L. Gu, P. Fairey, and S. Chandra, 1989, “FSEC 1.1 User’s Manual,” Florida Solar Energy Center, Cape Canaveral, FL
+Cunningham, M.J., [*Effective penetration depth and effective resistance in moisture transfer*](http://www.sciencedirect.com/science/article/pii/036013239290037P), Build. Environ. 27 (1992) 379-86
+
+Janssen, H. and S. Roels, [*Qualitative and quantitative assessment of interior moisture buffering by enclosures*](http://www.sciencedirect.com/science/article/pii/S0378778808002387), Energ. Buildings. 41 (2009) 382-94.
+
+Abadie, M.O. and K.C. Mendonca, [*Moisture performance of building materials: From material characterization to building simulation using the Moisture Buffer Value concept*](http://www.sciencedirect.com/science/article/pii/S0360132308000528), Build. Environ. 44 (2009) 388-401.
+
+Vereecken, E., S. Roels, H. Janssen, [*In situ determination of the moisture buffer potential of room enclosures*](http://jen.sagepub.com/content/34/3/223.abstract), J. Build. Phys. 34 (2011) 223-46.
+
+Woods, J., Winkler, J, and Christensen, D. [*Evaluation of the Effective Moisture Penetration Depth Model for Estimating Moisture Buffering in Buildings*](http://www.nrel.gov/docs/fy13osti/57441.pdf), NREL/TP-5500-57441, 2013.
+
+Woods, J., J. Winkler, D. Christensen, E. Hancock, [*Using Whole-House Field Tests to Empirically Derive Moisture Buffering Model Inputs*](http://www.nrel.gov/docs/fy14osti/62456.pdf). NREL/TP-5500-62456, 2014.
 
 Outside Surface Heat Balance
 ----------------------------
