@@ -2864,36 +2864,37 @@ namespace SolarShading {
 				} else {
 					HFunct = XTEMP1_S * HCA_E + YTEMP1_S * HCB_E + HCC_E;
 					if ( HFunct <= 0.0 ) { // Test vertex is not in the clipping plane
+						if ( NVTEMP < 2 * ( MaxVerticesPerSurface + 1 )){  // avoid assigning to element outside of XTEMP array size
+							KK = NVTEMP;
+							++NVTEMP;
+							Real64 const ATEMP_S( ATEMP( S ) );
+							Real64 const BTEMP_S( BTEMP( S ) );
+							Real64 const CTEMP_S( CTEMP( S ) );
+							W = HCB_E * ATEMP_S - HCA_E * BTEMP_S;
+							if ( W != 0.0 ) {
+								Real64 const W_inv( 1.0 / W );
+								XTEMP( NVTEMP ) = nint64( ( HCC_E * BTEMP_S - HCB_E * CTEMP_S ) * W_inv );
+								YTEMP( NVTEMP ) = nint64( ( HCA_E * CTEMP_S - HCC_E * ATEMP_S ) * W_inv );
+							}
+							else {
+								XTEMP( NVTEMP ) = SafeDivide( HCC_E * BTEMP_S - HCB_E * CTEMP_S, W );
+								YTEMP( NVTEMP ) = SafeDivide( HCA_E * CTEMP_S - HCC_E * ATEMP_S, W );
+							}
+							INTFLAG = true;
 
-						KK = NVTEMP;
-						++NVTEMP;
-						Real64 const ATEMP_S( ATEMP( S ) );
-						Real64 const BTEMP_S( BTEMP( S ) );
-						Real64 const CTEMP_S( CTEMP( S ) );
-						W = HCB_E * ATEMP_S - HCA_E * BTEMP_S;
-						if ( W != 0.0 ) {
-							Real64 const W_inv( 1.0 / W );
-							XTEMP( NVTEMP ) = nint64( ( HCC_E * BTEMP_S - HCB_E * CTEMP_S ) * W_inv );
-							YTEMP( NVTEMP ) = nint64( ( HCA_E * CTEMP_S - HCC_E * ATEMP_S ) * W_inv );
-						} else {
-							XTEMP( NVTEMP ) = SafeDivide( HCC_E * BTEMP_S - HCB_E * CTEMP_S, W );
-							YTEMP( NVTEMP ) = SafeDivide( HCA_E * CTEMP_S - HCC_E * ATEMP_S, W );
-						}
-						INTFLAG = true;
-
-						if ( E == NV2 ) { // Remove near-duplicates on last edge
-							if ( KK != 0 ) {
-								auto const x( XTEMP( NVTEMP ) );
-								auto const y( YTEMP( NVTEMP ) );
-								for ( int K = 1; K <= KK; ++K ) {
-									if ( std::abs( x - XTEMP( K ) ) > 2.0 ) continue;
-									if ( std::abs( y - YTEMP( K ) ) > 2.0 ) continue;
-									NVTEMP = KK;
-									break; // K loop
+							if ( E == NV2 ) { // Remove near-duplicates on last edge
+								if ( KK != 0 ) {
+									auto const x( XTEMP( NVTEMP ) );
+									auto const y( YTEMP( NVTEMP ) );
+									for ( int K = 1; K <= KK; ++K ) {
+										if ( std::abs( x - XTEMP( K ) ) > 2.0 ) continue;
+										if ( std::abs( y - YTEMP( K ) ) > 2.0 ) continue;
+										NVTEMP = KK;
+										break; // K loop
+									}
 								}
 							}
 						}
-
 					}
 				}
 				S = P;

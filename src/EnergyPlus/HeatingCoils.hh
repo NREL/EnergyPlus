@@ -468,6 +468,11 @@ namespace HeatingCoils {
 		bool & ErrorsFound // set to true if problem
 	);
 
+	// Clears the global data in HeatingCoils.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	//        End of Utility subroutines for the HeatingCoil Module
 
 	// *****************************************************************************

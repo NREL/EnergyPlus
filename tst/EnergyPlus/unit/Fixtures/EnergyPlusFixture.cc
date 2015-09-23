@@ -13,6 +13,7 @@
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
@@ -47,6 +48,9 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/HVACUnitarySystem.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
@@ -55,6 +59,7 @@
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
@@ -121,6 +126,7 @@ namespace EnergyPlus {
 		CondenserLoopTowers::clear_state();
 		CurveManager::clear_state();
 		DataAirLoop::clear_state();
+		DataAirSystems::clear_state();
 		DataBranchNodeConnections::clear_state();
 		DataConvergParams::clear_state();
 		DataDefineEquip::clear_state();
@@ -151,15 +157,19 @@ namespace EnergyPlus {
 		HeatBalanceIntRadExchange::clear_state();
 		HeatBalanceManager::clear_state();
 		HeatBalanceSurfaceManager::clear_state();
+		HeatingCoils::clear_state();
 		HeatPumpWaterToWaterSimple::clear_state();
+		HeatingCoils::clear_state();
 		Humidifiers::clear_state();
 		HVACManager::clear_state();
+		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
 		InputProcessor::clear_state();
 		InternalHeatGains::clear_state();
 		MixedAir::clear_state();
 		NodeInputManager::clear_state();
 		OutAirNodeManager::clear_state();
+		OutdoorAirUnit::clear_state();
 		OutputProcessor::clear_state();
 		OutputReportPredefined::clear_state();
 		OutputReportTabularAnnual::clear_state();
