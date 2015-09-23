@@ -217,6 +217,28 @@ namespace MixedAir {
 		bool InitOAControllerOneTimeFlag( true );
 		bool InitOAControllerSetPointCheckFlag( true );
 		bool InitOAControllerSetUpAirLoopHVACVariables( true );
+		Array1D_string DesignSpecOAObjName; // name of the design specification outdoor air object
+		Array1D_int DesignSpecOAObjIndex; // index of the design specification outdoor air object
+		Array1D_string VentMechZoneName; // Zone or Zone List to apply mechanical ventilation rate
+		Array1D< Real64 > VentMechZoneOAAreaRate; // Mechanical ventilation rate (m3/s/m2) for zone or zone list
+		Array1D< Real64 > VentMechZoneOAPeopleRate; // Mechanical ventilation rate (m3/s/person) for zone or zone list
+		Array1D< Real64 > VentMechZoneOAFlow; // Mechanical ventilation rate (m3/s/person) for zone or zone list
+		Array1D< Real64 > VentMechZoneOAACH; // Mechanical ventilation rate (m3/s/person) for zone or zone list
+
+		Array1D< Real64 > VentMechZoneADEffCooling; // Zone air distribution effectiveness in cooling mode
+		// for each zone or zone list
+		Array1D< Real64 > VentMechZoneADEffHeating; // Zone air distribution effectiveness in heating mode
+		// for each zone or zone list
+		Array1D_int VentMechZoneADEffSchPtr; // Pointer to the zone air distribution effectiveness schedule
+		// for each zone or zone list
+		Array1D_string VentMechZoneADEffSchName; // Zone air distribution effectiveness
+		//  schedule name for each zone or zone list
+
+		Array1D< Real64 > VentMechZoneSecondaryRecirculation; // Zone air secondary recirculation ratio
+		//  for each zone or zone list
+		Array1D_string DesignSpecZoneADObjName; // name of the design specification zone air
+		//  distribution object for each zone or zone list
+		Array1D_int DesignSpecZoneADObjIndex; // index of the design specification zone air distribution object
 	}
 	//SUBROUTINE SPECIFICATIONS FOR MODULE MixedAir
 	// Driver/Manager Routines
@@ -307,6 +329,21 @@ namespace MixedAir {
 		OAController.deallocate();
 		OAMixer.deallocate();
 		VentilationMechanical.deallocate();
+		VentMechZoneName.deallocate();
+		DesignSpecOAObjName.deallocate();
+		DesignSpecOAObjIndex.deallocate();
+		VentMechZoneOAFlow.deallocate();
+		VentMechZoneOAACH.deallocate();
+		VentMechZoneOAAreaRate.deallocate();
+		VentMechZoneOAPeopleRate.deallocate();
+		VentMechZoneADEffSchName.deallocate();
+		VentMechZoneADEffCooling.deallocate();
+		VentMechZoneADEffHeating.deallocate();
+		VentMechZoneADEffSchPtr.deallocate();
+		VentMechZoneADEffSchName.deallocate();
+		VentMechZoneSecondaryRecirculation.deallocate();
+		DesignSpecZoneADObjName.deallocate();
+		DesignSpecZoneADObjIndex.deallocate();
 	}
 
 	void
@@ -1258,29 +1295,6 @@ namespace MixedAir {
 		static int Num( 0 ); // Index used to loop through controllers in list
 		static int SysNum( 0 ); // Index used to loop through OA systems
 		static Real64 DesSupplyVolFlowRate( 0.0 ); // Temporary variable for design supply volumetric flow rate for air loop (m3/s)
-		Array1D_string DesignSpecOAObjName; // name of the design specification outdoor air object
-		Array1D_int DesignSpecOAObjIndex; // index of the design specification outdoor air object
-		Array1D_string VentMechZoneName; // Zone or Zone List to apply mechanical ventilation rate
-		Array1D< Real64 > VentMechZoneOAAreaRate; // Mechanical ventilation rate (m3/s/m2) for zone or zone list
-		Array1D< Real64 > VentMechZoneOAPeopleRate; // Mechanical ventilation rate (m3/s/person) for zone or zone list
-		Array1D< Real64 > VentMechZoneOAFlow; // Mechanical ventilation rate (m3/s/person) for zone or zone list
-		Array1D< Real64 > VentMechZoneOAACH; // Mechanical ventilation rate (m3/s/person) for zone or zone list
-
-		Array1D< Real64 > VentMechZoneADEffCooling; // Zone air distribution effectiveness in cooling mode
-		// for each zone or zone list
-		Array1D< Real64 > VentMechZoneADEffHeating; // Zone air distribution effectiveness in heating mode
-		// for each zone or zone list
-		Array1D_int VentMechZoneADEffSchPtr; // Pointer to the zone air distribution effectiveness schedule
-		// for each zone or zone list
-		Array1D_string VentMechZoneADEffSchName; // Zone air distribution effectiveness
-		//  schedule name for each zone or zone list
-
-		Array1D< Real64 > VentMechZoneSecondaryRecirculation; // Zone air secondary recirculation ratio
-		//  for each zone or zone list
-		Array1D_string DesignSpecZoneADObjName; // name of the design specification zone air
-		//  distribution object for each zone or zone list
-		Array1D_int DesignSpecZoneADObjIndex; // index of the design specification zone air distribution object
-
 		static int ObjIndex( 0 );
 		static int EquipListIndex( 0 );
 		static int EquipNum( 0 );
