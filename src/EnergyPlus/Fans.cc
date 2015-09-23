@@ -105,6 +105,9 @@ namespace Fans {
 	//MODULE VARIABLE DECLARATIONS:
 	int NumFans( 0 ); // The Number of Fans found in the Input
 	int NumNightVentPerf( 0 ); // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
+	bool GetFanInputFlag( true ); // Flag set to make sure you get input once
+	bool LocalTurnFansOn( false ); // If True, overrides fan schedule and cycles ZoneHVAC component fans on
+	bool LocalTurnFansOff( false ); // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
 
 	namespace {
 	// These were static variables within different functions. They were pulled out into the namespace
@@ -114,9 +117,6 @@ namespace Fans {
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 		bool MyOneTimeFlag( true ); // used for allocation in Init
 		bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
-		bool GetFanInputFlag( true ); // Flag set to make sure you get input once
-		bool LocalTurnFansOn( false ); // If True, overrides fan schedule and cycles ZoneHVAC component fans on
-		bool LocalTurnFansOff( false ); // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
 
 		Array1D_bool MySizeFlag;
 		Array1D_bool MyEnvrnFlag;

@@ -119,8 +119,8 @@ namespace DataZoneEquipment {
 	void
 	clear_state()
 	{
-		NumSupplyAirPaths = 0;
-		NumReturnAirPaths = 0;
+		NumSupplyAirPaths = 0 ;
+		NumReturnAirPaths = 0 ;
 		ZoneEquipInputsFilled = false ;
 		ZoneEquipSimulatedOnce = false ;
 		NumOfZoneEquipLists = 0 ; // The Number of Zone Equipment List objects
