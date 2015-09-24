@@ -15,7 +15,6 @@
 #include <DataHeatBalance.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
-#include <DXCoils.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <InputProcessor.hh>

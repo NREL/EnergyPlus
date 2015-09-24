@@ -68,6 +68,13 @@ namespace ZoneAirLoopEquipmentManager {
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	bool GetAirDistUnitsFlag( true ); // If TRUE, Air Distribution Data has not been read in yet
+	bool MyOneTimeFlag( true );
+
+	namespace {
+
+		Array1D_bool EachOnceFlag;
+
+	}
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -81,7 +88,11 @@ namespace ZoneAirLoopEquipmentManager {
 	void
 	clear_state()
 	{
+
 		GetAirDistUnitsFlag = true;
+		EachOnceFlag = true;
+		MyOneTimeFlag = true;
+
 	}
 
 	void
@@ -498,9 +509,8 @@ namespace ZoneAirLoopEquipmentManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
-		// int ZoneEqNum;
-		static Array1D_bool EachOnceFlag;
+		// na
+
 		// Do the Begin Simulation initializations
 		if ( MyOneTimeFlag ) {
 			EachOnceFlag.allocate( NumAirDistUnits );
