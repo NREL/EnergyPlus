@@ -482,6 +482,7 @@ namespace SwimmingPool {
 		}
 
 		// Set up the output variables for swimming pools
+		// CurrentModuleObject = "SwimmingPool:Indoor"
 		for ( Item = 1; Item <= NumSwimmingPools; ++Item ) {
 			SetupOutputVariable( "Indoor Pool Makeup Water Rate [m3/s]", Pool(Item).MakeUpWaterVolFlowRate, "System", "Average", Pool(Item).Name);
 			SetupOutputVariable( "Indoor Pool Makeup Water Volume [m3]", Pool( Item ).MakeUpWaterVol, "System", "Sum", Pool( Item ).Name, _, "MainsWater", "Heating", _, "System");

@@ -282,6 +282,7 @@ namespace SolarShading {
 		TrackTooManyVertices.deallocate();
 		TrackBaseSubSurround.deallocate();
 		DBZoneIntWin.deallocate();
+		ISABSF.deallocate();
 	}
 
 	void

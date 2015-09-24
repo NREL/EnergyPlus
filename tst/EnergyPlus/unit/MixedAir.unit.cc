@@ -121,6 +121,253 @@ namespace EnergyPlus {
 
 	}
 
+	TEST_F( HVACFixture, MixedAir_HXBypassOptionTest )
+	{
+		std::string const idf_objects = delimited_string( {
+			"Version,8.3;",
+			"  OutdoorAir:Node,",
+			"    Outside Air Inlet Node 1; !- Name",
+			"  Controller:OutdoorAir,",
+			"    OA Controller 1,         !- Name",
+			"    Relief Air Outlet Node 1, !- Relief Air Outlet Node Name",
+			"    VAV Sys 1 Inlet Node,    !- Return Air Node Name",
+			"    Mixed Air Node 1,        !- Mixed Air Node Name",
+			"    Outside Air Inlet Node 1, !- Actuator Node Name",
+			"    0.2,                !- Minimum Outdoor Air Flow Rate {m3/s}",
+			"    1.0,                !- Maximum Outdoor Air Flow Rate {m3/s}",
+			"    DifferentialDryBulb,     !- Economizer Control Type", // Economizer should open for this one, so OA flow should be > min OA
+			"    ModulateFlow,            !- Economizer Control Action Type",
+			"    ,                        !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+			"    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}",
+			"    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
+			"    ,                        !- Electronic Enthalpy Limit Curve Name",
+			"    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+			"    NoLockout,               !- Lockout Type", // No lockout
+			"    ProportionalMinimum,     !- Minimum Limit Type",
+			"    ,                        !- Minimum Outdoor Air Schedule Name",
+			"    ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
+			"    ,                        !- Maximum Fraction of Outdoor Air Schedule Name",
+			"    ,                        !- Mechanical Ventilation Controller Name",
+			"    ,                        !- Time of Day Economizer Control Schedule Name",
+			"    No,                      !- High Humidity Control",
+			"    ,                        !- Humidistat Control Zone Name",
+			"    ,                        !- High Humidity Outdoor Air Flow Ratio",
+			"    Yes,                     !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
+			"    BypassWhenWithinEconomizerLimits;  !- Heat Recovery Bypass Control Type", // HX bypass should be true
+			"  Controller:OutdoorAir,",
+			"    OA Controller 2,         !- Name",
+			"    Relief Air Outlet Node 2, !- Relief Air Outlet Node Name",
+			"    VAV Sys 2 Inlet Node,    !- Return Air Node Name",
+			"    Mixed Air Node 2,        !- Mixed Air Node Name",
+			"    Outside Air Inlet Node 2, !- Actuator Node Name",
+			"    0.2,                !- Minimum Outdoor Air Flow Rate {m3/s}",
+			"    1.0,                !- Maximum Outdoor Air Flow Rate {m3/s}",
+			"    DifferentialDryBulb,     !- Economizer Control Type", // Economizer should be locked out for this one, so OA flow should = min OA
+			"    ModulateFlow,            !- Economizer Control Action Type",
+			"    ,                        !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+			"    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}",
+			"    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
+			"    ,                        !- Electronic Enthalpy Limit Curve Name",
+			"    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+			"    LockoutWithHeating,               !- Lockout Type", // Lockout with heating is on
+			"    ProportionalMinimum,     !- Minimum Limit Type",
+			"    ,                        !- Minimum Outdoor Air Schedule Name",
+			"    ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
+			"    ,                        !- Maximum Fraction of Outdoor Air Schedule Name",
+			"    ,                        !- Mechanical Ventilation Controller Name",
+			"    ,                        !- Time of Day Economizer Control Schedule Name",
+			"    No,                      !- High Humidity Control",
+			"    ,                        !- Humidistat Control Zone Name",
+			"    ,                        !- High Humidity Outdoor Air Flow Ratio",
+			"    Yes,                     !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
+			"    BypassWhenWithinEconomizerLimits;  !- Heat Recovery Bypass Control Type", // HX bypass should be false because economizer is locked out
+			"  Controller:OutdoorAir,",
+			"    OA Controller 3,         !- Name",
+			"    Relief Air Outlet Node 3, !- Relief Air Outlet Node Name",
+			"    VAV Sys 3 Inlet Node,    !- Return Air Node Name",
+			"    Mixed Air Node 3,        !- Mixed Air Node Name",
+			"    Outside Air Inlet Node 3, !- Actuator Node Name",
+			"    0.2,                !- Minimum Outdoor Air Flow Rate {m3/s}",
+			"    1.0,                !- Maximum Outdoor Air Flow Rate {m3/s}",
+			"    DifferentialDryBulb,     !- Economizer Control Type", // Economizer should open for this one, so OA flow should be > min OA
+			"    ModulateFlow,            !- Economizer Control Action Type",
+			"    ,                        !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+			"    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}",
+			"    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
+			"    ,                        !- Electronic Enthalpy Limit Curve Name",
+			"    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+			"    NoLockout,               !- Lockout Type",
+			"    ProportionalMinimum,     !- Minimum Limit Type",
+			"    ,                        !- Minimum Outdoor Air Schedule Name",
+			"    ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
+			"    ,                        !- Maximum Fraction of Outdoor Air Schedule Name",
+			"    ,                        !- Mechanical Ventilation Controller Name",
+			"    ,                        !- Time of Day Economizer Control Schedule Name",
+			"    No,                      !- High Humidity Control",
+			"    ,                        !- Humidistat Control Zone Name",
+			"    ,                        !- High Humidity Outdoor Air Flow Ratio",
+			"    Yes,                     !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
+			"    BypassWhenOAFlowGreaterThanMinimum;  !- Heat Recovery Bypass Control Type", // HX bypass should be true because economizer has opened up
+			"  Controller:OutdoorAir,",
+			"    OA Controller 4,         !- Name",
+			"    Relief Air Outlet Node 4, !- Relief Air Outlet Node Name",
+			"    VAV Sys 4 Inlet Node,    !- Return Air Node Name",
+			"    Mixed Air Node 4,        !- Mixed Air Node Name",
+			"    Outside Air Inlet Node 4, !- Actuator Node Name",
+			"    0.2,                !- Minimum Outdoor Air Flow Rate {m3/s}",
+			"    1.0,                !- Maximum Outdoor Air Flow Rate {m3/s}",
+			"    DifferentialDryBulb,     !- Economizer Control Type", // Economizer should not open for this one - lowered the outdoor dry bulb temp for Case 4
+			"    ModulateFlow,            !- Economizer Control Action Type",
+			"    ,                        !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+			"    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}",
+			"    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
+			"    ,                        !- Electronic Enthalpy Limit Curve Name",
+			"    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+			"    NoLockout,               !- Lockout Type",
+			"    ProportionalMinimum,     !- Minimum Limit Type",
+			"    ,                        !- Minimum Outdoor Air Schedule Name",
+			"    ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
+			"    ,                        !- Maximum Fraction of Outdoor Air Schedule Name",
+			"    ,                        !- Mechanical Ventilation Controller Name",
+			"    ,                        !- Time of Day Economizer Control Schedule Name",
+			"    No,                      !- High Humidity Control",
+			"    ,                        !- Humidistat Control Zone Name",
+			"    ,                        !- High Humidity Outdoor Air Flow Ratio",
+			"    Yes,                     !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
+			"    BypassWhenOAFlowGreaterThanMinimum;  !- Heat Recovery Bypass Control Type" // HX bypass should be true because economizer has opened up
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+		GetOAControllerInputs( );
+		EXPECT_EQ( 2, OAController( 1 ).OANode );
+		EXPECT_TRUE( OutAirNodeManager::CheckOutAirNodeNumber( OAController( 1 ).OANode ) );
+
+		EXPECT_EQ( 6, OAController( 2 ).OANode );
+		EXPECT_FALSE( OutAirNodeManager::CheckOutAirNodeNumber( OAController( 2 ).OANode ) );
+
+		int OAControllerNum;
+		int AirLoopNum;
+
+		AirLoopControlInfo.allocate( 4 ); // will be deallocated by MixedAir::clear_state(); in HVACFixture
+		AirLoopFlow.allocate( 4 ); // will be deallocated by MixedAir::clear_state(); in HVACFixture
+		Node.allocate( 16 ); // will be deallocated by DataLoopNode::clear_state(); in HVACFixture
+
+		// Initialize common AirLoop data
+		for ( AirLoopNum = 1; AirLoopNum <=4; ++AirLoopNum ) {
+			AirLoopControlInfo( AirLoopNum ).EconoLockout = false;
+			AirLoopControlInfo( AirLoopNum ).NightVent = false;
+			AirLoopControlInfo( AirLoopNum ).FanOpMode = DataHVACGlobals::ContFanCycCoil;
+			AirLoopControlInfo( AirLoopNum ).LoopFlowRateSet = false;
+			AirLoopControlInfo( AirLoopNum ).CheckHeatRecoveryBypassStatus = true;
+			AirLoopControlInfo( AirLoopNum ).OASysComponentsSimulated = true;
+			AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked = false;
+			AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = false;
+			AirLoopControlInfo( AirLoopNum ).HeatRecoveryResimFlag = false; // Need this to avoid resetting hxbypass, saying this has already been simulated
+			AirLoopFlow( AirLoopNum ).DesSupply = 1.0;
+		}
+
+		StdBaroPress = StdPressureSeaLevel;
+		StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW( StdBaroPress, 20.0, 0.0 );
+
+		// Initialize common OA controller and node data
+		for ( OAControllerNum = 1; OAControllerNum <= 4; ++OAControllerNum ) {
+			OAController( OAControllerNum ).MinOAMassFlowRate = OAController( OAControllerNum ).MinOA * StdRhoAir;
+			OAController( OAControllerNum ).MaxOAMassFlowRate = OAController( OAControllerNum ).MaxOA * StdRhoAir;
+			OAController( OAControllerNum ).InletNode = OAController( OAControllerNum ).OANode;
+			OAController( OAControllerNum ).RetTemp = 24.0;
+			OAController( OAControllerNum ).InletTemp = 20.0; // This is the same as the outdoor air dry bulb for these tests
+			OAController( OAControllerNum ).OATemp = 20.0;
+			OAController( OAControllerNum ).MixSetTemp = 22.0;
+			OAController( OAControllerNum ).ExhMassFlow = 0.0;
+			// OAController( OAControllerNum ).InletEnth = needs to be initialized if an enthalpy economizer is tested
+			// OAController( OAControllerNum ).RetEnth = needs to be initialized if an enthalpy economizer is tested
+			OAController( OAControllerNum ).MixMassFlow = 0.5; // Note this is 50% of design flow set above
+			Node( OAControllerNum * 4 ).MassFlowRate = OAController( OAControllerNum ).MixMassFlow; // Return air nodes
+			Node( OAControllerNum * 4 ).Temp = OAController( OAControllerNum ).RetTemp; // Return air nodes
+			Node( OAControllerNum * 4 ).Enthalpy = Psychrometrics::PsyHFnTdbW( OAController( OAControllerNum ).RetTemp, 0.0 ); // Return air nodes, dry air
+			Node( OAControllerNum * 4 - 3 ).TempSetPoint = OAController( OAControllerNum ).MixSetTemp; // Mixed air nodes
+			Node( OAControllerNum * 4 - 2).Enthalpy = Psychrometrics::PsyHFnTdbW( OAController( OAControllerNum ).InletTemp, 0.0 );; // OA inlet (actuated) air nodes, dry air
+		}
+
+		Real64 expectedOAflow( 0.0 );
+		Real64 expectedMinOAflow( 0.0 );
+
+		//Case 1 - economizer active, NoLockout, BypassWhenWithinEconomizerLimits
+		// economizer should open to meet the mixed air setpoint assuming dry air to make it simple, HXbypass true
+		//   OAFlow = MixFlow*(MixTemp - RetTemp)/(InletTemp - RetTemp)
+		AirLoopNum = 1;
+		OAControllerNum = 1;
+		AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag = true;
+		CalcOAController( OAControllerNum, AirLoopNum );
+
+		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
+		expectedOAflow = OAController( OAControllerNum ).MixMassFlow * ( OAController( OAControllerNum ).MixSetTemp - OAController( OAControllerNum ).RetTemp ) / ( OAController( OAControllerNum ).InletTemp - OAController( OAControllerNum ).RetTemp );
+		EXPECT_NEAR( expectedOAflow, OAController( OAControllerNum ).OAMassFlow, 0.00001 );
+		EXPECT_NEAR( OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow, AirLoopFlow( AirLoopNum ).OAFrac, 0.00001 );
+		EXPECT_EQ( expectedMinOAflow, AirLoopFlow( AirLoopNum ).MinOutAir );
+		EXPECT_EQ( expectedMinOAflow / OAController( OAControllerNum ).MixMassFlow, AirLoopFlow( AirLoopNum ).OAMinFrac );
+		EXPECT_TRUE( AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass );
+		EXPECT_EQ( 1, OAController( OAControllerNum ).HeatRecoveryBypassStatus );
+
+		//Case 2 - economizer active, LockoutWithHeating, BypassWhenWithinEconomizerLimits
+		// economizer should be locked out, OA flow at minimum, HXbypass false
+		AirLoopNum = 2;
+		OAControllerNum = 2;
+		AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag = true;
+		OAController( OAControllerNum ).InletTemp = 0.0; // This is the same as the outdoor air dry bulb for these tests
+		OAController( OAControllerNum ).OATemp = 0.0;
+
+		CalcOAController( OAControllerNum, AirLoopNum );
+
+		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
+		expectedOAflow = expectedMinOAflow;
+		EXPECT_NEAR( expectedOAflow, OAController( OAControllerNum ).OAMassFlow, 0.00001 );
+		EXPECT_NEAR( OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow, AirLoopFlow( AirLoopNum ).OAFrac, 0.00001 );
+		EXPECT_EQ( expectedMinOAflow, AirLoopFlow( AirLoopNum ).MinOutAir );
+		EXPECT_EQ( expectedMinOAflow / OAController( OAControllerNum ).MixMassFlow, AirLoopFlow( AirLoopNum ).OAMinFrac );
+		EXPECT_FALSE( AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass );
+		EXPECT_EQ( 0, OAController( OAControllerNum ).HeatRecoveryBypassStatus );
+
+		//Case 3 - economizer active, NoLockout, BypassWhenOAFlowGreaterThanMinimum (should be same result as Case 1)
+		// economizer should open to meet the mixed air setpoint assuming dry air to make it simple, HXbypass true
+		//   OAFlow = MixFlow*(MixTemp - RetTemp)/(InletTemp - RetTemp)
+		AirLoopNum = 3;
+		OAControllerNum = 3;
+		AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag = true;
+		OAController( OAControllerNum ).InletTemp = 20.0; // This is the same as the outdoor air dry bulb for these tests
+		OAController( OAControllerNum ).OATemp = 20.0;
+		CalcOAController( OAControllerNum, AirLoopNum );
+
+		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
+		expectedOAflow = OAController( OAControllerNum ).MixMassFlow * ( OAController( OAControllerNum ).MixSetTemp - OAController( OAControllerNum ).RetTemp ) / ( OAController( OAControllerNum ).InletTemp - OAController( OAControllerNum ).RetTemp );
+		EXPECT_NEAR( expectedOAflow, OAController( OAControllerNum ).OAMassFlow, 0.00001 );
+		EXPECT_NEAR( OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow, AirLoopFlow( AirLoopNum ).OAFrac, 0.00001 );
+		EXPECT_EQ( expectedMinOAflow, AirLoopFlow( AirLoopNum ).MinOutAir );
+		EXPECT_EQ( expectedMinOAflow / OAController( OAControllerNum ).MixMassFlow, AirLoopFlow( AirLoopNum ).OAMinFrac );
+		EXPECT_TRUE( AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass );
+		EXPECT_EQ( 1, OAController( OAControllerNum ).HeatRecoveryBypassStatus );
+
+		//Case 4 - economizer active, NoLockout, BypassWhenOAFlowGreaterThanMinimum
+		// economizer should be at minimum due to cold outdoor temp, OA flow at minimum, HXbypass false
+		AirLoopNum = 4;
+		OAControllerNum = 4;
+		AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag = true;
+		OAController( OAControllerNum ).InletTemp = 0.0; // This is the same as the outdoor air dry bulb for these tests
+		OAController( OAControllerNum ).OATemp = 0.0;
+
+		CalcOAController( OAControllerNum, AirLoopNum );
+
+		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
+		expectedOAflow = expectedMinOAflow;
+		EXPECT_NEAR( expectedOAflow, OAController( OAControllerNum ).OAMassFlow, 0.00001 );
+		EXPECT_NEAR( OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow, AirLoopFlow( AirLoopNum ).OAFrac, 0.00001 );
+		EXPECT_EQ( expectedMinOAflow, AirLoopFlow( AirLoopNum ).MinOutAir );
+		EXPECT_EQ( expectedMinOAflow / OAController( OAControllerNum ).MixMassFlow, AirLoopFlow( AirLoopNum ).OAMinFrac );
+		EXPECT_FALSE( AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass );
+		EXPECT_EQ( 0, OAController( OAControllerNum ).HeatRecoveryBypassStatus );
+
+	}
+
 	TEST_F( HVACFixture, CO2ControlDesignOccupancyTest )
 	{
 		Contaminant.CO2Simulation = true;

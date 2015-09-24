@@ -70,9 +70,11 @@ TEST_F( HeatRecoveryTest, HRTest)
 	bool FirstHVACIteration = false;
 	bool EconomizerFlag = false;
 	bool HighHumCtrlFlag = false;
+	int FanOpMode = 2; // 1 = cycling fan, 2 = constant fan
 	Real64 Toutlet = 0.0;
 	Real64 Tnode = 0.0;
 	Real64 SetPointTemp = 19.0;
+	Real64 PartLoadRatio = 0.25;
 
 	CurZoneEqNum = 0;
 	CurSysNum = 0;
@@ -114,7 +116,7 @@ TEST_F( HeatRecoveryTest, HRTest)
 
 	// HXUnitOn is false so expect outlet = inlet
 	InitHeatRecovery( ExchNum, CompanionCoilNum );
-	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, EconomizerFlag, HighHumCtrlFlag );
+	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	Toutlet = ExchCond( ExchNum ).SupInTemp;
 	Tnode = ExchCond( ExchNum ).SupOutTemp;
@@ -127,7 +129,7 @@ TEST_F( HeatRecoveryTest, HRTest)
 	HXUnitOn = true;
 	ExchCond( ExchNum ).ExchConfigNum = Plate;
 	InitHeatRecovery( ExchNum, CompanionCoilNum );
-	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, EconomizerFlag, HighHumCtrlFlag );
+	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	Toutlet = ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) );
 	Tnode = ExchCond( ExchNum ).SupOutTemp;
@@ -136,7 +138,7 @@ TEST_F( HeatRecoveryTest, HRTest)
 	ExchCond( ExchNum ).ExchConfigNum = Rotary;
 	HXUnitOn = true;
 	InitHeatRecovery( ExchNum, CompanionCoilNum );
-	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, EconomizerFlag, HighHumCtrlFlag );
+	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	Toutlet = ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) );
 	Tnode = ExchCond( ExchNum ).SupOutTemp;
@@ -149,7 +151,7 @@ TEST_F( HeatRecoveryTest, HRTest)
 	HXUnitOn = true;
 	ExchCond( ExchNum ).ExchConfigNum = Plate;
 	InitHeatRecovery( ExchNum, CompanionCoilNum );
-	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, EconomizerFlag, HighHumCtrlFlag );
+	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	Toutlet = SetPointTemp;
 	Tnode = ExchCond( ExchNum ).SupOutTemp;
@@ -158,7 +160,7 @@ TEST_F( HeatRecoveryTest, HRTest)
 	ExchCond( ExchNum ).ExchConfigNum = Rotary;
 	HXUnitOn = true;
 	InitHeatRecovery( ExchNum, CompanionCoilNum );
-	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, EconomizerFlag, HighHumCtrlFlag );
+	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	Toutlet = Node( ExchCond( ExchNum ).SupOutletNode ).TempSetPoint;
 	Tnode = Node( ExchCond( ExchNum ).SupOutletNode ).Temp;
@@ -184,7 +186,7 @@ TEST_F( HeatRecoveryTest, HRTest)
 	// HXUnitOn is false so expect outlet = inlet
 	HXUnitOn = false;
 	InitHeatRecovery( ExchNum, CompanionCoilNum );
-	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, EconomizerFlag, HighHumCtrlFlag );
+	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( ExchCond( ExchNum ).SupInTemp, Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
 
@@ -195,14 +197,14 @@ TEST_F( HeatRecoveryTest, HRTest)
 	HXUnitOn = true;
 	ExchCond( ExchNum ).ExchConfigNum = Plate;
 	InitHeatRecovery( ExchNum, CompanionCoilNum );
-	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, EconomizerFlag, HighHumCtrlFlag );
+	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) ), Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
 
 	ExchCond( ExchNum ).ExchConfigNum = Rotary;
 	HXUnitOn = true;
 	InitHeatRecovery( ExchNum, CompanionCoilNum );
-	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, EconomizerFlag, HighHumCtrlFlag );
+	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) ), Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
 
@@ -213,16 +215,26 @@ TEST_F( HeatRecoveryTest, HRTest)
 	HXUnitOn = true;
 	ExchCond( ExchNum ).ExchConfigNum = Plate;
 	InitHeatRecovery( ExchNum, CompanionCoilNum );
-	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, EconomizerFlag, HighHumCtrlFlag );
+	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( Node( ExchCond( ExchNum ).SupOutletNode ).TempSetPoint, Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
 
 	ExchCond( ExchNum ).ExchConfigNum = Rotary;
 	HXUnitOn = true;
 	InitHeatRecovery( ExchNum, CompanionCoilNum );
-	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, EconomizerFlag, HighHumCtrlFlag );
+	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( Node( ExchCond( ExchNum ).SupOutletNode ).TempSetPoint, Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
+
+	// test cycling fan case
+	FanOpMode = DataHVACGlobals::CycFanCycCoil;
+	Node( ExchCond( ExchNum ).SupInletNode ).MassFlowRate = ExchCond( ExchNum ).SupInMassFlow / 4.0;
+	Node( ExchCond( ExchNum ).SecInletNode ).MassFlowRate = ExchCond( ExchNum ).SecInMassFlow / 4.0;
+	ExchCond( ExchNum ).ControlToTemperatureSetPoint = false;
+	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag, PartLoadRatio );
+	UpdateHeatRecovery( ExchNum );
+	EXPECT_DOUBLE_EQ( ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) ), Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
 
 	// Close and delete eio output file
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }

@@ -69952,12 +69952,13 @@ EnergyManagementSystem:MeteredOutputVariable,
        \key SolarWaterHeating
        \key SolarAirHeating
   A6 , \field Group Type
-       \note choose a general classification, building (internal services), HVAC (air systems), or plant (hydronic systems)
+       \note choose a general classification, building (internal services), HVAC (air systems), or plant (hydronic systems), or system
        \type choice
        \required-field
        \key Building
        \key HVAC
        \key Plant
+       \key System
   A7 , \field End-Use Category
        \note choose how the metered output should be classified for end-use category
        \required-field
@@ -69976,6 +69977,13 @@ EnergyManagementSystem:MeteredOutputVariable,
        \key WaterSystems
        \key Refrigeration
        \key OnSiteGeneration
+       \key HeatingCoils
+       \key CoolingCoils
+       \key Chillers
+       \key Boilers
+       \key Baseboard
+       \key HeatRecoveryForCooling
+       \key HeatRecoveryForHeating
   A8 , \field End-Use Subcategory
        \type alpha
        \note enter a user-defined subcategory for this metered output
