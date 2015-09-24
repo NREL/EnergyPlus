@@ -7899,7 +7899,8 @@ namespace Furnaces {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
+		Real64 ratio;
+		Real64 OnOffRatio;
 
 		// Report the Furnace Fan Part Load Ratio
 		if ( Furnace( FurnaceNum ).NumOfSpeedCooling < 1 ) {
@@ -7915,6 +7916,19 @@ namespace Furnaces {
 		LoopSystemOffMassFlowrate = CompOffMassFlow;
 		LoopFanOperationMode = Furnace( FurnaceNum ).OpMode;
 		LoopOnOffFanPartLoadRatio = Furnace( FurnaceNum ).FanPartLoadRatio;
+		OnOffRatio = LoopOnOffFanPartLoadRatio;
+		if ( Furnace( FurnaceNum ).FurnaceType_Num == UnitarySys_HeatPump_AirToAir ) {
+			LoopOnOffFanPartLoadRatio = max( Furnace( FurnaceNum ).FanPartLoadRatio, Furnace( FurnaceNum ).HeatPartLoadRatio, Furnace( FurnaceNum ).CoolPartLoadRatio );
+			LoopOnOffFanPartLoadRatio = min( 1.0, LoopOnOffFanPartLoadRatio );
+		}
+		if ( Furnace( FurnaceNum ).FurnaceType_Num == UnitarySys_HeatCool ) {
+			if ( Furnace( FurnaceNum ).HeatPartLoadRatio == 0.0 && Furnace( FurnaceNum ).CoolPartLoadRatio == 0.0 && Furnace( FurnaceNum ).FanPartLoadRatio > 0.0 ) {
+				if ( CompOnMassFlow < max( Furnace( FurnaceNum ).MaxCoolAirMassFlow, Furnace( FurnaceNum ).MaxHeatAirMassFlow ) && CompOnMassFlow  > 0.0 ) {
+					ratio = max( Furnace( FurnaceNum ).MaxCoolAirMassFlow, Furnace( FurnaceNum ).MaxHeatAirMassFlow ) / CompOnMassFlow;
+					LoopOnOffFanPartLoadRatio = LoopOnOffFanPartLoadRatio * ratio;
+				}
+			}
+		}
 
 	}
 
