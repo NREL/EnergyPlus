@@ -847,17 +847,6 @@ TEST( Array1Test, Append )
 	EXPECT_EQ( 6, A( 6 ) );
 }
 
-TEST( Array1Test, Push_Back_Empty )
-{
-	Array1D_int A;
-	A.push_back( 1 );
-	EXPECT_EQ( 1, A.l() );
-	EXPECT_EQ( 1, A.u() );
-	EXPECT_EQ( 1u, A.size() );
-	EXPECT_EQ( 1u, A.capacity() );
-	EXPECT_EQ( 1, A( 1 ) );
-}
-
 TEST( Array1Test, Push_Back )
 {
 	Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
@@ -868,6 +857,51 @@ TEST( Array1Test, Push_Back )
 	EXPECT_EQ( 10u, A.capacity() );
 	EXPECT_EQ( 1, A( 1 ) );
 	EXPECT_EQ( 6, A( 6 ) );
+}
+
+TEST( Array1Test, Push_Back_Empty )
+{
+	Array1D_int A;
+	A.push_back( 1 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 1, A.u() );
+	EXPECT_EQ( 1u, A.size() );
+	EXPECT_EQ( 1u, A.capacity() );
+	EXPECT_EQ( 1, A[ 0 ] );
+	EXPECT_EQ( 1, A( 1 ) );
+}
+
+TEST( Array1Test, Push_Back_Aggregate )
+{
+	struct agg { int a, b; };
+	Array1D< agg > A;
+	A.push_back( { 11, 22 } );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 1, A.u() );
+	EXPECT_EQ( 1u, A.size() );
+	EXPECT_EQ( 1u, A.capacity() );
+	EXPECT_EQ( 11, A[ 0 ].a );
+	EXPECT_EQ( 22, A( 1 ).b );
+}
+
+TEST( Array1Test, Resize )
+{
+	Array1D_int A;
+	A.reserve( 6u );
+	A.allocate( 6 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 6, A.u() );
+	EXPECT_EQ( 6u, A.size() );
+}
+
+TEST( Array1Test, Emplace_Back )
+{
+	Array1D_int A( { 1 } );
+	EXPECT_EQ( 1u, A.size() );
+	EXPECT_EQ( 1, A( 1 ) );
+	A.emplace_back( 2 );
+	EXPECT_EQ( 2u, A.size() );
+	EXPECT_EQ( 2, A( 2 ) );
 }
 
 TEST( Array1Test, Pop_Back )

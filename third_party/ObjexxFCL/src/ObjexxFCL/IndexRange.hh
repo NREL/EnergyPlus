@@ -483,7 +483,8 @@ public: // Modifier
 	{
 		assert( n >= 0 );
 		assert( u_ <= u_max - n );
-		u_ = clean_u( u_ + n );
+		assert( u_ >= l_ - 1 );
+		u_ += n;
 		size_ = computed_size();
 		return *this;
 	}

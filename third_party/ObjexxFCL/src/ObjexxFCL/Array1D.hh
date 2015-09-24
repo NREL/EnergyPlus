@@ -97,7 +97,9 @@ public: // Creation
 	// Default Constructor
 	inline
 	Array1D()
-	{}
+	{
+		setup_real();
+	}
 
 	// Copy Constructor
 	inline
@@ -1570,34 +1572,33 @@ public: // Modifier
 		return *this;
 	}
 
-	// Append Value: Grow Capacity
+	// Append Value by Copy
 	inline
 	Array1D &
 	push_back( T const & t )
 	{
 		Base::grow_capacity();
 		I_.grow();
-		setup_real();
 		operator ()( I_.u() ) = t;
 		return *this;
 	}
 
-	// Append Value: Grow Capacity
+	// Append Value by Move
 	inline
 	Array1D &
 	push_back( T && t )
 	{
 		Base::grow_capacity();
 		I_.grow();
-		setup_real();
 		operator ()( I_.u() ) = std::move( t );
 		return *this;
 	}
 
-	// Construct and Append Value: Grow Capacity
-	template< class... Args >
+	// Append Value Constructed in Place
+	template< typename... Args >
+	inline
 	Array1D &
-	emplace_back( Args&&... args )
+	emplace_back( Args &&... args )
 	{
 		Base::grow_capacity();
 		operator ()( I_.grow().u() ) = T( std::forward< Args >( args )... );
@@ -1655,7 +1656,6 @@ public: // Modifier
 	reserve( size_type const n )
 	{
 		Base::reserve_capacity( n );
-		setup_real();
 		return *this;
 	}
 

@@ -2848,6 +2848,8 @@ protected: // Methods
 			size_ = capacity_ = size;
 			data_ = new_array< T >(); // Allocate even if size==0 for consistency with Fortran
 #endif
+		} else {
+			size_ = size;
 		}
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
 		if ( ! initializer_active() ) std::fill_n( data_, size_, Traits::initial_array_value() );
@@ -2875,6 +2877,7 @@ protected: // Methods
 #endif
 			capacity_ = n;
 			data_ = new_data;
+			sdata_ = data_ - shift_;
 		}
 	}
 
@@ -2888,7 +2891,7 @@ protected: // Methods
 		size_type const new_size( size_ + n );
 		if ( capacity_ < new_size ) {
 			size_type const lim_size( std::min( new_size, npos >> 1 ) );
-			size_type new_capacity( std::max( capacity_, size_type( 1u ) ) );
+			size_type new_capacity( std::max( capacity_ << 1, size_type( 1u ) ) );
 			while( new_capacity < lim_size ) new_capacity <<= 1;
 			if ( new_capacity < new_size ) new_capacity = max_size;
 #ifdef OBJEXXFCL_ARRAY_NOALIGN
@@ -2904,6 +2907,7 @@ protected: // Methods
 #endif
 			capacity_ = new_capacity;
 			data_ = new_data;
+			sdata_ = data_ - shift_;
 		}
 		size_ = new_size;
 	}
