@@ -14395,6 +14395,33 @@ Coil:UserDefined,
      Main Cooling Coil 1 Water Outlet Node; !- Plant Connection Outlet Node Name
 ```
 
+Note that the Coil:UserDefined needs to be specifically configured in EnergyManagementSystem:MeteredOutputVariable, in order to be included in the meters such as HeatingCoils:EnergyTransfer.
+
+An example of this input object follows.
+
+```idf
+  EnergyManagementSystem:Program,
+    MainHWCoil1_ModelOuput,  !- Name
+    Set HWcoil1_Water_MdotRequest = Water_MdotRequest,  !- Program Line 1
+    Set HWcoil1_Air_Tout          = Air_Tout,  !- Program Line 2
+    Set HWcoil1_Air_Wout          = Air_Wout,  !- <none>
+    Set HWcoil1_tot_heat_Power    = Tot_heat_Power,  !- <none>
+    Set HWcoil1_tot_heat_Energy   = Tot_heat_Power * SystemTimestep * 3600,  !- <none>
+    Set HWcoil1_Air_MdotOut       = Air_Mdot,  !- <none>
+    Set HWcoil1_Water_Tout        = Water_Tout;!- <none>
+
+  EnergyManagementSystem:MeteredOutputVariable,
+    HWcoil1 tot heat Energy, !- Name
+    HWcoil1_tot_heat_Energy, !- EMS Variable Name
+    SystemTimestep,          !- Update Frequency
+    MainHWCoil1_ModelOuput,  !- EMS Program or Subroutine Name
+    ENERGYTRANSFER,          !- Resource Type
+    System,                  !- Group Type
+    HEATINGCOILS,            !- End-Use Category
+    ,                        !- End-Use Subcategory
+    J;                       !- Units
+```
+
 ### PlantComponent:UserDefined
 
 This object is used to define a generic plant component for custom component models.   This object can connect to up to four different plant loops.   There is an optional air connection that can be used as an air-based source or heat rejection connection.   Water storage tanks can be connected for supply or collection.   An ambient zone can be connected for skin losses to be treated as separate internal gains.
