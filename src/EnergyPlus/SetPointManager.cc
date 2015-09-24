@@ -5745,6 +5745,7 @@ namespace SetPointManager {
 		TotSupFlow = Node( MixerOutNode ).MassFlowRate;
 		TempRAB = Node( MixerRABInNode ).Temp;
 		RABFlow = ( TotSupFlow * TempSetPtMod - SupFlow * TempSup ) / max( TempRAB, 1.0 );
+		RABFlow = min( RABFlow, TotSupFlow );
 		RABFlow = max( 0.0, RABFlow );
 		this->FlowSetPt = RABFlow;
 
