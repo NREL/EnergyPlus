@@ -28,9 +28,9 @@ Coupling EnergyPlus with the Building Controls Virtual Test Bed
 
 The process in which at least two simulators solve initial-value differential equations that are coupled to each other is called co-simulation. Various algorithms are possible for the data exchange. In the BCVTB, data are exchanged between its client programs, including EnergyPlus, using a fixed synchronization time step. There is no iteration between the clients. In the co-simulation literature, this coupling scheme is referred to as *quasi-dynamic coupling*, *loose coupling* or *ping-pong coupling* (Hensen 1999, Zhai and Chen 2005).
 
-The algorithm for exchanging data is as follows: Suppose we have a system with two clients, with client 1 being EnergyPlus and client 2 being, for example, the Simulink program from Mathworks. Suppose each client solves an initial-value ordinary differential equation that is coupled to the differential equation of the other client. Let <span>\(N\in\mathbf{N}\)</span> denote the number of time steps and let <span>\(k\in\left\\{1,...,N\right\\}\)</span> denote the time steps. We will use the subscripts *1* and *2* to denote the state variable and the function that computes the next state variable of the simulator *1* and *2*, respectively.
+The algorithm for exchanging data is as follows: Suppose we have a system with two clients, with client 1 being EnergyPlus and client 2 being, for example, the Simulink program from Mathworks. Suppose each client solves an initial-value ordinary differential equation that is coupled to the differential equation of the other client. Let <span>\(N\in\mathbf{N}\)</span> denote the number of time steps and let <span>\(k\in\left\{1,...,N\right\}\)</span> denote the time steps. We will use the subscripts *1* and *2* to denote the state variable and the function that computes the next state variable of the simulator *1* and *2*, respectively.
 
-The simulator *1* computes, for <span>\(k\in\left\\{1,...,N-1\right\\}\)</span> the sequence
+The simulator *1* computes, for <span>\(k\in\left\{1,...,N-1\right\}\)</span> the sequence
 
 *x<sub>1</sub>(k+1) = f<sub>1</sub>(x<sub>1</sub>(k), x<sub>2</sub>(k))*
 
@@ -764,9 +764,9 @@ dx<sub>1</sub>/dt = f<sub>1</sub>(x<sub>1</sub>, x<sub>2</sub>), with x<sub>1</s
 
 dx<sub>2</sub>/dt = f<sub>2</sub>(x<sub>2</sub>, x<sub>1</sub>), with x<sub>2</sub>(0) = x<sub>2,0\\ .</sub>
 
-Let <span>\(N\in\textbf{N}\)</span> denote the number of time steps and let *t<sub>k</sub>* with <span>\(k\in\left\\{1,...,N\right\\}\)</span> denote the time steps. We will use the subscripts *1* and *2* to denote the variables and the functions that compute the next state variable of the simulator *1* and *2*, respectively.
+Let <span>\(N\in\textbf{N}\)</span> denote the number of time steps and let *t<sub>k</sub>* with <span>\(k\in\left\{1,...,N\right\}\)</span> denote the time steps. We will use the subscripts *1* and *2* to denote the variables and the functions that compute the next state variable of the simulator *1* and *2*, respectively.
 
-The first system computes, for <span>\(k\in\left\\{0,...,N-1\right\\}\)</span> and some <span>\(\tilde{F}_1\)</span>: ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ x ℝ → ℝ<sup>n</sup>, the sequence
+The first system computes, for <span>\(k\in\left\{0,...,N-1\right\}\)</span> and some <span>\(\tilde{F}_1\)</span>: ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ x ℝ → ℝ<sup>n</sup>, the sequence
 
 x<sub>1</sub>(t<sub>k+1</sub>) = <span>\(\tilde{F}_1\)</span>(x<sub>1</sub>(t<sub>k</sub>), x<sub>2</sub>(t<sub>k</sub>), t<sub>k</sub>, t<sub>k+1</sub>)
 
@@ -786,9 +786,9 @@ dx<sub>1</sub>/dt = g<sub>1</sub>(x<sub>1</sub>, x<sub>2</sub>), with x<sub>1</s
 
 0 = g<sub>2</sub>(x<sub>2</sub>, x<sub>1</sub>).
 
-Let <span>\(N\in\mathbf{N}\)</span> denote the number of time steps and let *t<sub>k</sub>* with <span>\(k\in\left\\{1,...,N\right\\}\)</span> denote the time steps. We use the same subscripts *1* and *2* as for the first case to denote the variable and the function that computes the next variable of the simulator *1* and *2*, respectively.
+Let <span>\(N\in\mathbf{N}\)</span> denote the number of time steps and let *t<sub>k</sub>* with <span>\(k\in\left\{1,...,N\right\}\)</span> denote the time steps. We use the same subscripts *1* and *2* as for the first case to denote the variable and the function that computes the next variable of the simulator *1* and *2*, respectively.
 
-The first system computes, for <span>\(k\in\left\\{0,...,N-1\right\\}\)</span> and some <span>\(\tilde{G}_1\)</span>: ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ x ℝ → ℝ<sup>n</sup>, the sequence
+The first system computes, for <span>\(k\in\left\{0,...,N-1\right\}\)</span> and some <span>\(\tilde{G}_1\)</span>: ℝ<sup>n</sup> x ℝ<sup>m</sup> x ℝ x ℝ → ℝ<sup>n</sup>, the sequence
 
 x<sub>1</sub>(t<sub>k+1</sub>) = <span>\(\tilde{G}_1\)</span>(x<sub>1</sub>(t<sub>k</sub>), x<sub>2</sub>(t<sub>k</sub>), t<sub>k</sub>, t<sub>k+1</sub>)
 
