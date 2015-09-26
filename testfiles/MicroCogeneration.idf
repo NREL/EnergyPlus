@@ -74,7 +74,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes
 
-  Version,8.3;
+  Version,8.4;
 
   Timestep,6;
 
@@ -4587,13 +4587,6 @@
     MICROCHP SENERTECH Demand Outlet Pipe,  !- Name
     MICROCHP SENERTECH Demand Mixer-MICROCHP SENERTECH Demand Outlet Pipe,  !- Inlet Node Name
     MICROCHP SENERTECH Demand Outlet Node;  !- Outlet Node Name
-
-  Output:PreprocessorMessage,
-    EPXMLPreProc2,           !- Preprocessor Name
-    warning,                 !- Error Severity
-    Problem with the width for requested floor area and,  !- Message Line 1
-    perimeter depth.  Reduced perimeter depth from 4.57,  !- Message Line 2
-    to 3.656 to accomodate perimeter and core layout;  !- Message Line 3
 
   Exterior:FuelEquipment,
     Equipment_SimpleRefrigeration,  !- Name
