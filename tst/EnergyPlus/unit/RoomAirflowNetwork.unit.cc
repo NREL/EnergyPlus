@@ -73,6 +73,10 @@ public:
 		TempSurfInTmp.allocate( NumOfSurfaces );
 		RVSurface.allocate( NumOfSurfaces );
 		RVSurfaceOld.allocate( NumOfSurfaces );
+		RVDeepLayer.allocate( NumOfSurfaces );
+		RVdeepOld.allocate( NumOfSurfaces );
+		RVSurfLayerOld.allocate( NumOfSurfaces );
+		RVSurfLayer.allocate( NumOfSurfaces );
 		RhoVaporSurfIn.allocate( NumOfSurfaces );
 		RhoVaporAirIn.allocate( NumOfSurfaces );
 		HMassConvInFD.allocate( NumOfSurfaces );
@@ -102,6 +106,10 @@ public:
 		TempSurfInTmp.clear( );
 		RVSurface.clear( );
 		RVSurfaceOld.clear( );
+		RVDeepLayer.clear( );
+		RVdeepOld.clear( );
+		RVSurfLayerOld.clear( );
+		RVSurfLayer.clear( );
 		RhoVaporSurfIn.clear( );
 		RhoVaporAirIn.clear( );
 		HMassConvInFD.clear( );
