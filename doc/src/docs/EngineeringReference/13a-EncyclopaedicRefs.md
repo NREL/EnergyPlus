@@ -463,13 +463,7 @@ No specific references.
 The four pipe beam air terminal units are ceiling-mounted, beam-type units that are provided with primary air from a central system and additional heating or cooling by inducing room air to flow over a hydronic convector.  They are called *four pipe* because the units are connected with two pipes for chilled water supply and return and another two pipes for hot water supply and return.  A simple empirical model is used to enable using input data derived from manufacturer’s catalog data.  
 
 ####Model Description
-The model assumes that the total conditioning power, 
-<span>\( {\dot Q_{Tot}} \)</span>
-, is the sum of the conditioning provided by the primary air,
-<span>\( {\dot Q_{SA}} \)</span>
-, and the conditioning provided by the beam convector,
-<span>\( {\dot Q_{Beam}} \)</span>
-.
+The model assumes that the total conditioning power, <span>$ {\dot Q_{Tot}} $</span>, is the sum of the conditioning provided by the primary air, <span>$ {\dot Q_{SA}} $</span>, and the conditioning provided by the beam convector, <span>$ {\dot Q_{Beam}} $</span>.
 
 <div>$$ {\dot Q_{Tot}} = {{\dot Q_{SA}} + {\dot Q_{Beam}}} $$</div>
 
@@ -477,211 +471,132 @@ The primary air contribution is easily determined using
 
 <div>$$ {\dot Q_{SA}} = {{\dot m_{SA}}\cdot ({c_{p,SA}} \cdot {T_{SA}} - {c_{p,Z}} \cdot {T_{Z}})} $$</div>
 
-The convector power
-<span>\( {\dot Q_{Beam}} \)</span>
-is coupled directly to the zone air heat balance (using a source code term called *NonAirSysOutput*) in a way that provides only sensible heat transfer directly to the zone air node.  We therefore assume that the air terminal’s convector is always dry during cooling. Many of the terms used in the performance calculations are normalized by the total length of beam in zones,
-<span>\( {L} \)</span>
-.
+The convector power <span>$ {\dot Q_{Beam}} $</span> is coupled directly to the zone air heat balance (using a source code term called *NonAirSysOutput*) in a way that provides only sensible heat transfer directly to the zone air node.  We therefore assume that the air terminal’s convector is always dry during cooling. Many of the terms used in the performance calculations are normalized by the total length of beam in zones, <span>$ {L} $</span>.
 
 When the unit is operated in cooling mode, the convector power is determined using the rated normalized cooling capacity that is modified by three separate functions.
 
 <div>$$ {\dot Q_{Beam, cool}} = { \dot q_{cool,rated} \cdot f_{ \Delta T_{cool,mod} }() \cdot f_{\dot m_{SA,cool,mod}}() \cdot f_{\dot m_{CW,mod}}() \cdot L }$$</div>
 
-The modification factor 
-<span>\( {f_{ \Delta T_{cool,mod}} }()} \)</span>
-describes how the cooling capacity is adjusted to account for the temperature difference between the zone air and the chilled water entering the convector.  This empirical correction factor is intended to account for how heat transfer between the chilled water and induced room air flow depends on the temperature difference, both in terms of surface convection heat transfer and the rate of induced air flow. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current temperature difference,
-<span>\( {\Delta T_{air-CW}} \)<span>
-, and the temperature difference used to rate beam performance,
-<span>\( {\Delta T_{air-CW,rated}} \)<span>
-.
+The modification factor <span>$ {f_{ \Delta T_{cool,mod} }() } $</span> describes how the cooling capacity is adjusted to account for the temperature difference between the zone air and the chilled water entering the convector.  This empirical correction factor is intended to account for how heat transfer between the chilled water and induced room air flow depends on the temperature difference, both in terms of surface convection heat transfer and the rate of induced air flow. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current temperature difference, <span>$ {\Delta T_{air-CW}} $</span>, and the temperature difference used to rate beam performance, <span>$ {\Delta T_{air-CW,rated}} $</span>.
 
-<div>$$ {f_{ \Delta T_{cool,mod} }() = f_{ \Delta T_{cool,mod} }\left(\frac{\Delta T_{air-CW}}{\Delta T_{air-CW,rated}}\right)  $$</div>
+<div>$$ {f_{ \Delta T_{cool,mod} }() }= f_{ \Delta T_{cool,mod} }\left(\frac{\Delta T_{air-CW}}{\Delta T_{air-CW,rated}}\right)  $$</div>
 
 <div>$$ {\Delta T_{air-CW}} = {T_{Z}}-{T_{CW,in}}  $$</div>
 
-The modification factor
-<span>\( f_{\dot m_{SA,cool,mod}}() \)</span>
-describes how the cooling capacity is adjusted to account for the primary air flow rate.  This empirical correction factor is intended to account for how varying primary air flow rates will impact the rate that room air is induced to flow across the convector. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current normalized primary air flow rate,
-<span>\( {\dot m_{SA}} \) </span>
-, and the normalized flow rate used to rate beam performance,
-<span>\( {\dot m_{SA,rated}} \) </span>
-.  Flow rates are normalized by dividing the total length of all the beam units in the zone.  The ratio is calculated using air mass flow rates with the rated flow rate assumed to be for standard temperature and pressure at sea level so that elevation effects appear only in the numerator when the function is evaluated.
+The modification factor <span>$ {f_{\dot m_{SA,cool,mod}}()} $</span> describes how the cooling capacity is adjusted to account for the primary air flow rate.  This empirical correction factor is intended to account for how varying primary air flow rates will impact the rate that room air is induced to flow across the convector. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current normalized primary air flow rate, <span>$ {\dot m_{SA}} $</span>, and the normalized flow rate used to rate beam performance, <span>$ {\dot m_{SA,rated}} $</span>.  Flow rates are normalized by dividing the total length of all the beam units in the zone.  The ratio is calculated using air mass flow rates with the rated flow rate assumed to be for standard temperature and pressure at sea level so that elevation effects appear only in the numerator when the function is evaluated.
 
-<div>$${f_{\dot m_{SA,cool,mod}}() = f_{\dot m_{SA,cool,mod}}\left(\frac{{\dot m_{SA}}}{{\dot m_{SA,rated}} }\right)  $$</div>
+<div>$${f_{\dot m_{SA,cool,mod}}()} = f_{\dot m_{SA,cool,mod}}\left(\frac{{\dot m_{SA}}}{{\dot m_{SA,rated}} }\right)  $$</div>
 <div>$${\dot m_{SA}} = \frac{\dot M_{SA}}{L}  $$</div>
 <div>$${\dot m_{SA,rated}} = {\dot v_{SA,rated}} \cdot {\rho_{air,STP}} $$</div>
 
-The modification factor
-<span>\( f_{\dot m_{CW,mod}}() \)</span>
-describes how the cooling capacity is adjusted to account for the flow rate of chilled water through the convector.  This empirical correction factor is intended to account for how varying chilled water flow rates will impact the velocity of fluid inside the pipes and the corresponding impact on the rate of surface convection heat transfer inside the convector.  The function can be described using any of the single-variable curves or a lookup table.  The single independent variable is the ratio between the current normalized chilled water flow rate,
-<span>\( {\dot m_{CW}} \) </span>
-, and the normalized chilled water flow rate at the rating point,
-<span>\( {\dot m_{CW,rated}} \) </span>
-.
+The modification factor <span>$ f_{\dot m_{CW,mod}}() $</span> describes how the cooling capacity is adjusted to account for the flow rate of chilled water through the convector.  This empirical correction factor is intended to account for how varying chilled water flow rates will impact the velocity of fluid inside the pipes and the corresponding impact on the rate of surface convection heat transfer inside the convector.  The function can be described using any of the single-variable curves or a lookup table.  The single independent variable is the ratio between the current normalized chilled water flow rate, <span>$ {\dot m_{CW}} $</span>, and the normalized chilled water flow rate at the rating point, <span>$ {\dot m_{CW,rated}} $</span>.
  
-<div>$$ f_{\dot m_{CW,mod}}() = f_{\dot m_{CW,mod}}\left(\frac{{\dot m_{CW}}}{{\dot m_{CW,rated}}}\right) $$</div>
+<div>$$ {f_{\dot m_{CW,mod}}()} = f_{\dot m_{CW,mod}}\left(\frac{{\dot m_{CW}}}{{\dot m_{CW,rated}}}\right) $$</div>
 <div>$${\dot m_{CW}} = \frac{\dot M_{CW}}{L}$$</div>
 <div>$${\dot m_{CW,rated}} = {\dot v_{CW,rated}} \cdot {\rho_{CW}}$$</div>
  
 The model for when the unit is operated in heating mode is very similar. The convector power is determined using the rated normalized heating capacity that is modified by three separate functions.
-<div>$${\dot Q_{Beam, heat}} = {\dot q_{heat,rated}\cdot f_{ \Delta T_{heat,mod} }() \cdot f_{\dot m_{SA,heat,mod}}()\cdot f_{\dot m_{HW,mod}}() \cdot L $$</div>
 
-The modification factor 
-<span>\(f_{ \Delta T_{heat,mod} }() \) </span>
-describes how the heating capacity is adjusted to account for the temperature difference between the hot water and the zone air entering the convector.  Notice that for heating the temperature difference is defined different from cooling operation so that positive difference values are the result.  This empirical correction factor is intended to account for how heat transfer between the hot water and induced room air flow depends on the temperature difference, both in terms of surface convection heat transfer and induced air flow rates. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current temperature difference,
-<span>\( \Delta T_{HW-air} \)<span>
-, and the temperature difference used to rate beam performance,
-<span>\( \Delta T_{HW-air,rated} \)<span>
-.
-<div>$${f_{ \Delta T_{heat,mod} }() = f_{ \Delta T_{heat,mod} }\left(\frac{\Delta T_{HW-air}}{\Delta T_{HW-air,rated}}\right)  $$</div>
+<div>$${\dot Q_{Beam, heat}} = {\dot q_{heat,rated}}\cdot f_{ \Delta T_{heat,mod} }() \cdot f_{\dot m_{SA,heat,mod}}()\cdot f_{\dot m_{HW,mod}}() \cdot L $$</div>
+
+The modification factor <span>$ f_{ \Delta T_{heat,mod} }() $</span> describes how the heating capacity is adjusted to account for the temperature difference between the hot water and the zone air entering the convector.  Notice that for heating the temperature difference is defined different from cooling operation so that positive difference values are the result.  This empirical correction factor is intended to account for how heat transfer between the hot water and induced room air flow depends on the temperature difference, both in terms of surface convection heat transfer and induced air flow rates. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current temperature difference, <span>$ \Delta T_{HW-air} $</span>, and the temperature difference used to rate beam performance, <span>$ \Delta T_{HW-air,rated} $</span>.
+
+<div>$${f_{ \Delta T_{heat,mod} }()} = f_{ \Delta T_{heat,mod} }\left(\frac{\Delta T_{HW-air}}{\Delta T_{HW-air,rated}}\right)  $$</div>
 
 <div>$$ {\Delta T_{HW-air}} = {T_{HW,in}} -{T_{Z}} $$</div>
 
-The modification factor
-<span>\(f_{\dot m_{SA,heat,mod}}()\)<span>
-describes how the heating capacity is adjusted to account for the primary supply air flow rate.  This empirical correction factor is intended to account for how varying primary air flow rates will impact the rate that room air is induced to flow across the convector. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the same ratio described above for cooling and it is assumed that the unit can be rated using the same primary air flow rate for both heating and cooling operation of the four pipe unit.  Flow rates are normalized by dividing the total length of all the beam units in the zone.  The ratio is calculated using air mass flow rates with the rated flow rate assumed to be for standard temperature and pressure at sea level so that elevation effects appear only in the numerator when the function is evaluated.
+The modification factor <span>$ f_{\dot m_{SA,heat,mod}}() $</span> describes how the heating capacity is adjusted to account for the primary supply air flow rate.  This empirical correction factor is intended to account for how varying primary air flow rates will impact the rate that room air is induced to flow across the convector. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the same ratio described above for cooling and it is assumed that the unit can be rated using the same primary air flow rate for both heating and cooling operation of the four pipe unit.  Flow rates are normalized by dividing the total length of all the beam units in the zone.  The ratio is calculated using air mass flow rates with the rated flow rate assumed to be for standard temperature and pressure at sea level so that elevation effects appear only in the numerator when the function is evaluated.
 
-<div>$${f_{\dot m_{SA,heat,mod}}() = f_{\dot m_{SA,heat,mod}}\left(\frac{{\dot m_{SA}}}{{\dot m_{SA,rated}} }\right)  $$</div>
+<div>$${f_{\dot m_{SA,heat,mod}}()} = f_{\dot m_{SA,heat,mod}}\left(\frac{{\dot m_{SA}}}{{\dot m_{SA,rated}} }\right)  $$</div>
   
-The modification factor
-<span>\(f_{\dot m_{HW,mod}}()\)<span>
-describes how the heating capacity is adjusted to account for the flow rate of hot water through the convector.  This empirical correction factor is intended to account for how varying hot water flow rates will impact the velocity of fluid inside the pipes and the corresponding impact on the rate of surface convection heat transfer inside the convector.  The function can be described using any of the single-variable curves or a lookup table.  The single independent variable is the ratio between the current normalized hot water flow rate,
-<span>\( {\dot m_{HW}} \) </span>
-, and the normalized hot water flow rate at the rating point,
-<span>\( {\dot m_{HW,rated}} \) </span>
-. 
+The modification factor <span>$ f_{\dot m_{HW,mod}}() $</span> describes how the heating capacity is adjusted to account for the flow rate of hot water through the convector.  This empirical correction factor is intended to account for how varying hot water flow rates will impact the velocity of fluid inside the pipes and the corresponding impact on the rate of surface convection heat transfer inside the convector.  The function can be described using any of the single-variable curves or a lookup table.  The single independent variable is the ratio between the current normalized hot water flow rate, <span>$ {\dot m_{HW}} $</span>, and the normalized hot water flow rate at the rating point,
+<span>$ {\dot m_{HW,rated}} $</span>. 
+
 <div>$$ f_{\dot m_{HW,mod}}() = f_{\dot m_{HW,mod}}\left(\frac{{\dot m_{HW}}}{{\dot m_{HW,rated}}}\right) $$</div>
 <div>$${\dot m_{HW}} = \frac{\dot M_{HW}}{L}$$</div>
 <div>$${\dot m_{HW,rated}} = {\dot v_{HW,rated}} \cdot {\rho_{HW}}$$</div>
 
 Where,
 	
-<span>\( {c_{p,SA}} \) </span>
-Specific heat of primary air entering through the air terminal unit, in J/kg-K.
+<span>$ {c_{p,SA}} $</span>  Specific heat of primary air entering through the air terminal unit, in J/kg-K.
 	
-<span>\( {c_{p,Z}} \) </span>
-Specific heat of zone air, in J/kg-K.
+<span>$ {c_{p,Z}} $</span>  Specific heat of zone air, in J/kg-K.
 	
-<span>\( {c_{p,CW}} \) </span>
-Specific heat of zone air, in J/kg-K.
+<span>$ {c_{p,CW}} $</span>  Specific heat of zone air, in J/kg-K.
 	
-<span>\( {f_{\dot m_{CW,mod}}()} \) </span>
-Cooling capacity modification factor function of chilled water flow rate
+<span>$ {f_{\dot m_{CW,mod}}()} $</span>  Cooling capacity modification factor function of chilled water flow rate
 	
-<span>\( {f_{ \Delta T_{cool,mod} }()} \) </span>
-Cooling capacity modification factor function of air-water temperature difference
+<span>$ {f_{ \Delta T_{cool,mod} }()} $</span>  Cooling capacity modification factor function of air-water temperature difference
 	
-<span>\({f_{\dot m_{SA,cool,mod}}()} \) </span>	
-Cooling capacity modification factor function of primary air flow rate
+<span>$ {f_{\dot m_{SA,cool,mod}}()} $</span>  Cooling capacity modification factor function of primary air flow rate
 	
-<span>\( {f_{\dot m_{HW,mod}}()} \) </span>
-Heating capacity modification factor function of hot water flow rate
+<span>$ {f_{\dot m_{HW,mod}}()} $</span>  Heating capacity modification factor function of hot water flow rate
 	
-<span>\( {f_{ \Delta T_{heat,mod} }()} \) </span>
-Heating capacity modification factor function of water - air temperature difference
+<span>$ {f_{ \Delta T_{heat,mod} }()} $</span>  Heating capacity modification factor function of water - air temperature difference
 	
-<span>\( {f_{\dot m_{SA,heat,mod}}()} \) </span>
-Heating capacity modification factor function of primary air flow rate
+<span>$ {f_{\dot m_{SA,heat,mod}}()} $</span>  Heating capacity modification factor function of primary air flow rate
 	
-<span>\( {L} \) </span>
-Total length of all beam units serving the zone, in m
+<span>$ {L} $</span>  Total length of all beam units serving the zone, in m
 	
-<span>\( {\dot m_{CW}} \) </span>
-Mass flow rate of chilled water per meter of length, in kg/s-m
+<span>$ {\dot m_{CW}} $</span>  Mass flow rate of chilled water per meter of length, in kg/s-m
 	
-<span>\( {\dot m_{CW,rated}} \) </span>
-Mass flow rate of chilled water per meter of length at rating point, in kg/s-m
+<span>$ {\dot m_{CW,rated}} $</span>  Mass flow rate of chilled water per meter of length at rating point, in kg/s-m
 	
-<span>\( {\dot m_{HW}} \) </span>
-Mass flow rate of hot water per meter of length, in kg/s-m
+<span>$ {\dot m_{HW}} $</span>  Mass flow rate of hot water per meter of length, in kg/s-m
 	
-<span>\( {\dot m_{HW,rated}} \) </span>
-Mass flow rate of hot water per meter of length at rating point, in kg/s-m
+<span>$ {\dot m_{HW,rated}} $</span>  Mass flow rate of hot water per meter of length at rating point, in kg/s-m
 	
-<span>\( {\dot m_{SA}} \) </span>
-Mass flow rate of primary air per meter of length, in kg/s-m
+<span>$ {\dot m_{SA}} $</span>  Mass flow rate of primary air per meter of length, in kg/s-m
 	
-<span>\( {\dot m_{SA,rated}} \) </span>
-Mass flow rate of primary air per meter of length at rating point, kg/s-m
+<span>$ {\dot m_{SA,rated}} $</span>  Mass flow rate of primary air per meter of length at rating point, kg/s-m
 	
-<span>\( {\dot M_{SA}} \) </span>
-Mass flow rate of primary air entering the zone through the air terminal unit, in kg/s
+<span>$ {\dot M_{SA}} $</span>  Mass flow rate of primary air entering the zone through the air terminal unit, in kg/s
 	
-<span>\( {\dot M_{CW}} \) </span>
-Mass flow rate of chilled water, kg/s
+<span>$ {\dot M_{CW}} $</span>  Mass flow rate of chilled water, kg/s
 	
-<span>\( {\dot M_{HW}} \) </span>
-Mass flow rate of hot water, kg/s
+<span>$ {\dot M_{HW}} $</span>  Mass flow rate of hot water, kg/s
 	
-<span>\( {\dot q_{cool,rated}}\) </span>
-Rated beam cooling capacity per meter of length, in W/m.
+<span>$ {\dot q_{cool,rated}} $</span>  Rated beam cooling capacity per meter of length, in W/m.
 	 
-<span>\( {\dot q_{heat,rated}} \) </span>
-Rated beam heating capacity per meter of length, in W/m.
+<span>$ {\dot q_{heat,rated}} $</span>  Rated beam heating capacity per meter of length, in W/m.
 	
-<span>\( {\dot Q_{Beam}} \) </span>
-Conditioning power delivered to the zone by the beam convector, in W.
+<span>$ {\dot Q_{Beam}} $</span>  Conditioning power delivered to the zone by the beam convector, in W.
 	
-<span>\( {\dot Q_{SA}} \) </span>
-Conditioning power delivered to the zone by the primary air mass flow, in W.
+<span>$ {\dot Q_{SA}} $</span>  Conditioning power delivered to the zone by the primary air mass flow, in W.
 	
-<span>\( {\dot Q_{Tot}} \) </span>
-Total (net) conditioning power delivered to zone by the air terminal unit, in W.
+<span>$ {\dot Q_{Tot}} $</span>  Total (net) conditioning power delivered to zone by the air terminal unit, in W.
 	
-<span>\( {\rho_{air,STP}} \) </span>
-Density of air at standard conditions (sea level), in kg/m3
+<span>$ {\rho_{air,STP}} $</span>  Density of air at standard conditions (sea level), in kg/m<sup>3</sup>
 	
-<span>\( {\rho_{air}} \) </span>
-Density of air at standard conditions adjusted for elevation), in kg/m3
+<span>$ {\rho_{air}} $</span>  Density of air at standard conditions adjusted for elevation), in kg/m<sup>3</sup>
 	
-<span>\( {\rho_{CW}} \) </span>
-Density of chilled water, in kg/m3
+<span>$ {\rho_{CW}} $</span>  Density of chilled water, in kg/m<sup>3</sup>
 	
-<span>\( {T_{SA}} \) </span>
-Dryblub temperature of the (central) primary air entering the air terminal unit, in degrees C.
+<span>$ {T_{SA}} $</span>  Dryblub temperature of the (central) primary air entering the air terminal unit, in degrees C.
 	
-<span>\( {T_{Z}} \) </span>
-Dryblub temperature of the zone air, in degrees C.
+<span>$ {T_{Z}} $</span>  Dryblub temperature of the zone air, in degrees C.
 	
-<span>\( {T_{CW,in}} \) </span>
-Temperature of chilled water entering the convector, in degrees C.
+<span>$ {T_{CW,in}} $</span>  Temperature of chilled water entering the convector, in degrees C.
 	
-<span>\( {\Delta T_{air-CW}} \) </span>
-Difference between the zone air temperature and chilled water entering the convector, delta degrees C.
+<span>$ {\Delta T_{air-CW}} $</span>  Difference between the zone air temperature and chilled water entering the convector, delta degrees C.
 	
-<span>\( {\Delta T_{HW-air}} \) </span>
-Difference between the water and zone air temperature entering the convector, delta degrees C.
+<span>$ {\Delta T_{HW-air}} $</span>  Difference between the water and zone air temperature entering the convector, delta degrees C.
 	
-<span>\( {\Delta T_{air-CW,rated}} \) </span>
-Value of
-<span>\( {\Delta T_{air-CW}} \) </span>
-at rating conditions for cooling performance, delta degrees C.
+<span>$ {\Delta T_{air-CW,rated}} $</span>  Value of <span>$ {\Delta T_{air-CW}} $</span> at rating conditions for cooling performance, delta degrees C.
 	
-<span>\( {\Delta T_{HW-air,rated}} \) </span>
-Value of
-<span>\( {\Delta T_{HW-air}} \) </span>
-at rating conditions for heating performance, delta degrees C.
+<span>$ {\Delta T_{HW-air,rated}} $</span>  Value of <span>$ {\Delta T_{HW-air}} $</span> at rating conditions for heating performance, delta degrees C.
 	
-<span>\( {\dot v_{SA,rated}} \) </span>
-Volume flow rate of air per meter length at rating point, in m^3/s-m.
+<span>$ {\dot v_{SA,rated}} $</span>  Volume flow rate of air per meter length at rating point, in m<sup>3</sup>/s-m.
 	
-<span>\( {\dot v_{CW,rated}} \) </span>
-Volume flow rate of chilled water per meter length at rating point, in m^3/s-m.
+<span>$ {\dot v_{CW,rated}} $</span>  Volume flow rate of chilled water per meter length at rating point, in m<sup>3</sup>/s-m.
 	
-<span>\( {\dot v_{HW,rated}} \) </span>
-Volume flow rate of hot water per meter length at rating point, in m^3/s-m.
+<span>$ {\dot v_{HW,rated}} $</span>  Volume flow rate of hot water per meter length at rating point, in m<sup>3</sup>/s-m.
 
-The performance capacity model described above is controlled to modulate water flow through the beam's convector using the non-linear numerical solver in EnergyPlus called Solve Regula Falsi.  The predicted zone load to setpoint
-<span>\( {\dot Q_{Zone, Required}} \) </span>
-is adjusted by 
-<span>\( {\dot Q_{SA}} \) </span>
-to determine the required beam load.
+The performance capacity model described above is controlled to modulate water flow through the beam's convector using the non-linear numerical solver in EnergyPlus called Solve Regula Falsi.  The predicted zone load to setpoint <span>$ {\dot Q_{Zone, Required}} $</span> is adjusted by <span>$ {\dot Q_{SA}} $</span> to determine the required beam load.
 
 <div>$$ {\dot Q_{Beam, Required}} = {\dot Q_{Zone, Required}} - {\dot Q_{SA}} $$</div>
 
-When 
-<span>\( {\dot Q_{Zone, Required}} \) </span>
-is negative the beams need to provide cooling and when it is positive the beams need to provide heating. The the solver iterates the water flow rate to find a flow rate that will meet the load. 
+When <span>$ {\dot Q_{Zone, Required}} $</span> is negative the beams need to provide cooling and when it is positive the beams need to provide heating. The the solver iterates the water flow rate to find a flow rate that will meet the load. 
 
 When cooling, the result for beam capacity (negative for cooling) is used to calculate the leaving temperature of the chilled water using,
 
@@ -690,32 +605,28 @@ When cooling, the result for beam capacity (negative for cooling) is used to cal
 However, to protect from a non-physical result the leaving chilled water temperature is constrained to be no warmer than a 1.0 C approach temperature compared to the zone air or the primary supply air.  If the above result is too warm the leaving temperature and beam cooling capacity are adjusted using the following equations, and a recurring warning is issued to alert the user that there may be a problem with the cooliong performance input data.
 
 <div>$$ {T_{CW,out}} = { max( {T_{SA}} , {T_{Z}}) - 1.0 } $$</div>
-<div>$$ {\dot Q_{Beam}} = {\dot m_{CW}} \cdot {c_{p,CW}} $$</div> \cdot ( {T_{CW,in}} - {T_{CW,out}}) } $$</div>
+<div>$$ {\dot Q_{Beam}} = {\dot m_{CW}} \cdot {c_{p,CW}} \cdot {( {T_{CW,in}} - {T_{CW,out}}) } $$</div>
 
-Similiarly when heating, the result for beam capacity (positive for heating) is used the calculate the leaving temperature of the hot water using, 
+Similarly when heating, the result for beam capacity (positive for heating) is used the calculate the leaving temperature of the hot water using, 
 
 <div>$$ {T_{HW,out}} = {T_{HW,in}} - \frac{{\dot Q_{Beam}}}{{\dot m_{HW}} \cdot {c_{p,HW}} } $$</div>
 
 To protect from a non-physical result the leaving hot water temperature is constrained to be no cooler than a 1.0 C approach temperature compared to the zone air or the primary supply air.  If the above result is too cool the leaving temperature and beam heating capacity are adjusted using the following equations, and a recurring warning is issued to alert the user that there may be a problem with the heating performance input data.
 
 <div>$$ {T_{HW,out}} = { min( {T_{SA}} , {T_{Z}}) + 1.0 } $$</div>
-<div>$$ {\dot Q_{Beam}} = {\dot m_{CW}} \cdot {c_{p,CW}} $$</div> \cdot ( {T_{HW,in}} - {T_{HW,out}}) } $$</div>
+<div>$$ {\dot Q_{Beam}} = {\dot m_{CW}} \cdot {c_{p,CW}} \cdot {( {T_{HW,in}} - {T_{HW,out}}) } $$</div>
 
 ####Four Pipe Beam Sizing
 
 The four pipe beam model has four inputs that can be autosized:
 	
-<span>\({L}\) </span>
-Total length of all beam units serving the zone, in m
+<span>$ {L} $</span>  Total length of all beam units serving the zone, in m
 	
-<span>\( {\dot V_{SA,Des}}\) </span>
-design primary supply air volume flow rate, in m^3/s
+<span>$ {\dot V_{SA,Des}} $</span>  Design primary supply air volume flow rate, in m<sup>3</sup>/s
 
-<span>\( {\dot V_{CW,Des}}\) </span>
-design chilled water volume flow rate, in m^3/s
+<span>$ {\dot V_{CW,Des}} $</span>  Design chilled water volume flow rate, in m<sup>3</sup>/s
 
-<span>\( {\dot V_{HW,Des}}\) </span>
-design hot water volume flow rate, in m^3/s
+<span>$ {\dot V_{HW,Des}} $</span>  Design hot water volume flow rate, in m<sup>3</sup>/s
 
 Because of the way the model is formulated with defaulted inputs for rated, normalized performance data, we can link the four inputs together to ensure an internally consistent set of sizes.  If any one of these four inputs is not autosized (given a fixed value at input) then the other three can be computed using the normalized, rated performance data which are either input or have default values. If the total beam length is input, then the following equations are used
 
@@ -735,52 +646,37 @@ If the hot water flow rate is input, then the beam length can be determined as f
 
 <div>$$ {L} = {\frac{{\dot V_{HW,Des}}}{{\dot v_{HW,rated}}}  } $$</div>
 
-When all four inputs are autosized, which is the usual case, there is no simple way anchor the sizes and we need to use the results from the zone and system sizing calculations to determine sizes for the four pipe beam unit. The following design data from the zone and system sizing calculations are used when sizing the four pipe beam:
+When all four inputs are autosized, which is the usual case, there is no simple way to anchor the sizes and we need to use the results from the zone and system sizing calculations to determine sizes for the four pipe beam unit. The following design data from the zone and system sizing calculations are used when sizing the four pipe beam:
 
-<span>(\ {\dot V_{TU,Z,final,cool} } \)</span>
-final zone terminal unit design volume flow rate for cooling, in m^3/s  
+<span>$ {\dot V_{TU,Z,final,cool} } $</span>  Final zone terminal unit design volume flow rate for cooling, in m<sup>3</sup>/s  
 	
-<span>(\ {\dot V_{TU,Z,final,heat} } \)</span>
-final zone terminal unit design volume flow rate for heating, in m^3/s  
+<span>$ {\dot V_{TU,Z,final,heat} } $</span>  Final zone terminal unit design volume flow rate for heating, in m<sup>3</sup>/s  
 	
-<span>(\ {\dot V_{Z,final,OA} } \)</span>
-final zone design volume flow rate for minimum outdoor air mechanical ventilation, in m^3/s.  
+<span>$ {\dot V_{Z,final,OA} } $</span>  Final zone design volume flow rate for minimum outdoor air mechanical ventilation, in m<sup>3</sup>/s.  
 	
-<span>\( {T_{SA,cool,design } } \)</span>
-final design zone terminal unit inlet supply air temperature at cooling peak, in degrees C.
+<span>$ {T_{SA,cool,design } } $</span>  Final design zone terminal unit inlet supply air temperature at cooling peak, in degrees C.
 	
-<span>\( {w_{SA,cool,design } } \)</span>
-final design zone terminal unit inlet supply air humidity ratio at cooling peak, in kg_H2O/kg_dryair.
+<span>$ {w_{SA,cool,design } } $</span>  Final design zone terminal unit inlet supply air humidity ratio at cooling peak, in kg_H2O/kg_dryair.
 	
-<span>\( {T_{Z,cool,design } } \)</span>
-final design zone air temperature at cooling peak, in degrees C.
+<span>$ {T_{Z,cool,design } } $</span>  Final design zone air temperature at cooling peak, in degrees C.
 	
-<span>\( {w_{Z,cool,design } } \)</span>
-final design zone air humidity ratio at cooling peak, in kg_H2O/kg_dryair.
+<span>$ {w_{Z,cool,design } } $</span>  Final design zone air humidity ratio at cooling peak, in kg_H2O/kg_dryair.
 	
-<span>\( {\dot Q_{Z,cool,design } } \)</span>
-final design zone cooling load at cooling peak, in W.
+<span>$ {\dot Q_{Z,cool,design } } $</span>  Final design zone cooling load at cooling peak, in W.
 	
-<span>\( {T_{CW,design}} \)</span>
-the chilled water plant loop supply side design exit temperature, in degrees C.
+<span>$ {T_{CW,design}} $</span>  Chilled water plant loop supply side design exit temperature, in degrees C.
 
-<span>\( {T_{SA,heat,design } } \)</span>
-final design zone terminal unit inlet supply air temperature at heating peak, in degrees C. 
+<span>$ {T_{SA,heat,design } } $</span>  Final design zone terminal unit inlet supply air temperature at heating peak, in degrees C. 
 	
-<span>\( {w_{SA,heat,design } } \)</span>
-final design zone terminal unit inlet supply air humidity ratio at heating peak, in kg_H2O/kg_dryair.
+<span>$ {w_{SA,heat,design } } $</span>  Final design zone terminal unit inlet supply air humidity ratio at heating peak, in kg_H2O/kg_dryair.
 	
-<span>\( {T_{Z,heat,design } } \)</span>
-final design zone air temperature at heating peak, in degrees C.
+<span>$ {T_{Z,heat,design } } $</span>  Final design zone air temperature at heating peak, in degrees C.
 	
-<span>\( {w_{Z,heat,design } } \)</span>
-final design zone air humidity ratio at heating peak, in kg_H2O/kg_dryair.
+<span>$ {w_{Z,heat,design } } $</span>  Final design zone air humidity ratio at heating peak, in kg_H2O/kg_dryair.
 	
-<span>\( {\dot Q_{Z,heat,design } } \)</span>
-final design zone heating load at heating peak, in W.
+<span>$ {\dot Q_{Z,heat,design } } $</span>  Final design zone heating load at heating peak, in W.
 
-<span>\( {T_{HW,design}} \)</span>
-the hot water plant loop supply side design exit temperature, in degrees C.
+<span>$ {T_{HW,design}} $</span>  Hot water plant loop supply side design exit temperature, in degrees C.
 
 Overhead beam type air terminals induce room air to flow over the convector by the directing primary supply air through special nozzles. Therefore, the cooling and heating capacity of the beam's convector is not separable from the primary flow rate, varying the primary flow rate varies the beam capacity. The design primary flow rate is chosen to be largest value that satisfies three requirements:  (1) the ventilation requirement, (2) the design cooling load (if cooling is present), (3) and the design heating load (if heating is present).
 
@@ -795,11 +691,9 @@ When sizing for the cooling design load, the following design values are set for
 <div>$$ {c_{p,Z}} = {PsyCpAirFnWTdb ({w_{Z,cool,design } },  {T_{Z,cool,design } }  ) }$$</div>
 <div>$$ {c_{p,SA}} = {PsyCpAirFnWTdb ( {w_{SA,cool,design } },  {T_{SA,cool,design } }   ) }$$</div>
 <div>$$ {\dot Q_{Zone, Required}} = -1.0 \cdot {\dot Q_{Z,cool,design } } $$</div>
-<div>$$ {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,cool,design } }}{{c_{p,SA}} \cdot ( {T_{Z,cool,design } - {T_{SA,cool,design } } ) } \right) }
-or if 
-<span>\( ( {T_{Z,cool,design } - {T_{SA,cool,design } } ) < 2.0 \)</span>
-then
-<div>$$ {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,cool,design } }}{{c_{p,SA}} \cdot 2.0 } \right) }
+<div>$$ {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,cool,design } }}{{c_{p,SA}} \cdot {( {T_{Z,cool,design } } - {T_{SA,cool,design } } )}}  \right) } $$</div>
+or if <span>$ ( {T_{Z,cool,design }} - {T_{SA,cool,design } } ) < 2.0 $</span> then
+<div>$$ {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,cool,design } }}{{c_{p,SA}} \cdot 2.0 } \right) } $$</div>
 <div>$$ {\dot m_{SA,min limit}} = min( {\dot V_{Z,final,OA} }, \frac{{\dot m_{SA,max limit}}}{3.0}, max({\dot V_{TU,Z,final,heat} } , {\dot V_{TU,Z,final,cool} }) ) $$</div>
 
 When sizing for the heating design load, the following design values are set for use in the model calculations:
@@ -811,15 +705,13 @@ When sizing for the heating design load, the following design values are set for
 <div>$$ {c_{p,Z}} = {PsyCpAirFnWTdb ({w_{Z,heat,design } },  {T_{Z,heat,design } }  ) }$$</div>
 <div>$$ {c_{p,SA}} = {PsyCpAirFnWTdb ( {w_{SA,heat,design } },  {T_{SA,heat,design } }   ) }$$</div>
 <div>$$ {\dot Q_{Zone, Required}} = {\dot Q_{Z,heat,design } } $$</div>
-<div>$$ {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,heat,design } }}{{c_{p,SA}} \cdot ( {T_{SA,heat,design } } - {T_{Z,heat,design } ) } \right) }
-or if 
-<span>\( ( {T_{SA,heat,design } } - {T_{Z,heat,design } ) < 2.0 \)</span>
-then
+<div>$$ {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,heat,design } }}{{c_{p,SA}} \cdot ( {T_{SA,heat,design } } - {T_{Z,heat,design }} ) } \right) } $$</div>
+or if <span>$ ( {T_{SA,heat,design } } - {T_{Z,heat,design } }) < 2.0 $</span> then
 <div>$$ {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,heat,design } }}{{c_{p,SA}} \cdot 2.0 } \right) }$$</div>
 <div>$$ {\dot m_{SA,min limit}} = {0.0} $$</div>
 
  The trial value for design primary supply air flow rate is used to calculate design values for length, chilled water flow, and hot water flow.
-<div>$$ {\dot V_{SA,Des}} = { \left(\frac{ {\dot m_{SA,trial}} }{{\rho_{air}} } \right) }
+<div>$$ {\dot V_{SA,Des}} = { \left(\frac{ {\dot m_{SA,trial}} }{{\rho_{air}} } \right) } $$</div>
 <div>$$ {L} = {\frac{{\dot V_{SA,Des}}}{{\dot v_{SA,rated}}}  } $$</div>
 <div>$$ {\dot V_{CW,Des}} = {{\dot v_{CW,rated}} \cdot {L} } $$</div>
 <div>$$ {\dot V_{HW,Des}} = {{\dot v_{HW,rated}} \cdot {L} } $$</div>
@@ -833,13 +725,13 @@ After the solvers have run and the final sizes for the four pipe beam have been 
 
 An example is presented showing how manufacturer’s data can be converted into the input data for the proposed model.  The following example is for a Trox active DID632A product with a type “H” nozzle, where the rating point has been chosen based on a 6 foot active length and 140 CFM primary rate with other rating conditions as listed in the catalog data.  The EnergyPlus IDF input for this example is show as the example in the in the Input Output reference description of the four pipe beam. 
 
-![FourPipeBeam/tableData] (media/TroxDID632A_Tabledata.png)
+![FourPipeBeam/tableData](media/TroxDID632A_Tabledata.png)
 
 Snippet of catalog data for capacity and primary air flow rate dependence (Trox DID632A)
  
-Choosing a 6 foot beam (with Nozzle type H) at 140 CFM as the rating point, we get 3726 Btu/h = 1092 W, 6 ft = 1.83 m, and 1092/1.83= 597 W/m for normalized beam cooling capacity at rating point.  The associated primary air flow rate of 140 ft^3/min = 0.066 m^3/s and 0.066/1.83 = 0.036 m^2/s is the normalized beam primary air flow rate at the rating point.  Note that because the flow rate is normalized by beam length, the units are m3/s/m (which reduces to m2/s).
-The rating heating capacity is listed as a “net” heating rate but since this is not well defined in the catalog we go ahead and assume that this represents the beam heating rate where the associated cooling provided by the primary air has already been subtracted.  The net heating capacity is 7411 Btu/h = 2172 W.  This value need to be increased by the primary cooling provided by 55 F = 12.7 C air entering a zone at 70 F = 21 C.  The catalog does not completely define the moist air state of the zone nor the primary air so we assume nominal average moist air density of 1.2 kg/m3 and a specific heat of 1000.0 J/kg-C so that the primary air cooling rate is (21 – 12.7) * 0.066 * 1.2 * 1000 = 660 W.  The beam heating rate is therefore 2172 + 660 = 2832 W.  Then normalizing for beam length 2832/1.83 = 1548 W/m is the rated beam heating capacity.  
-The catalog includes two more data points for capacity at different flow rates, one for 100 ft^3/min and the other for 180 ft^3/min.  These are processed in the same way as the rating point data and used to create the modification curves that describe performance as a function of primary air flow rate.  
+Choosing a 6 foot beam (with Nozzle type H) at 140 CFM as the rating point, we get 3726 Btu/h = 1092 W, 6 ft = 1.83 m, and 1092/1.83= 597 W/m for normalized beam cooling capacity at rating point.  The associated primary air flow rate of 140 ft<sup>3</sup>/min = 0.066 m^3/s and 0.066/1.83 = 0.036 m<sup>2</sup>/s is the normalized beam primary air flow rate at the rating point.  Note that because the flow rate is normalized by beam length, the units are m<sup>3</sup>/s/m (which reduces to m<sup>2</sup>/s).
+The rating heating capacity is listed as a “net” heating rate but since this is not well defined in the catalog we go ahead and assume that this represents the beam heating rate where the associated cooling provided by the primary air has already been subtracted.  The net heating capacity is 7411 Btu/h = 2172 W.  This value need to be increased by the primary cooling provided by 55 F = 12.7 C air entering a zone at 70 F = 21 C.  The catalog does not completely define the moist air state of the zone nor the primary air so we assume nominal average moist air density of 1.2 kg/m<sup>3</sup> and a specific heat of 1000.0 J/kg-C so that the primary air cooling rate is (21 – 12.7) * 0.066 * 1.2 * 1000 = 660 W.  The beam heating rate is therefore 2172 + 660 = 2832 W.  Then normalizing for beam length 2832/1.83 = 1548 W/m is the rated beam heating capacity.  
+The catalog includes two more data points for capacity at different flow rates, one for 100 ft<sup>3</sup>/min and the other for 180 ft<sup>3</sup>/min.  These are processed in the same way as the rating point data and used to create the modification curves that describe performance as a function of primary air flow rate.  
 
 ### Cooled Beam Unit (AirTerminal:SingleDuct:ConstantVolume:CooledBeam)
 
