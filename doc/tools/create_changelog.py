@@ -96,8 +96,7 @@ for pr_num in pr_numbers:
     title = j['title']
     labels = j['labels']
     if len(labels) != 1:
-        print(" +++ AutoDocs: %s,%s,Pull request has wrong number of labels (%i)...expected 1" % (
-            pr_num, title, len(labels)))
+        print(" +++ AutoDocs: %s,%s,Pull request has wrong number of labels (%i)...expected 1" % (pr_num, title, len(labels)))
     else:
         key = 'Unknown'
         first_label_name = labels[0]['name']
