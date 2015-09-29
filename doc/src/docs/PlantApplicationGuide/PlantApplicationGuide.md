@@ -1,8 +1,7 @@
-
 ![](media/ep.gif)
 
 <br/>
-<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
 <hr>
 <h1>Application Guide for Plant Loops</h1>
 <h2>User Guide for Modeling Plant Systems</h2>

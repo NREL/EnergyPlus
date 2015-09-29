@@ -1,7 +1,7 @@
 ![](media/ep.gif)
 
 <br/>
-<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
 <hr>
 <h1>External Interface(s) Application Guide</h1>
 <h2>Guide for using EnergyPlus with External Interface(s)</h2>

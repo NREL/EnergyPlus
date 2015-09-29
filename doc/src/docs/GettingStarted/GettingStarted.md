@@ -1,8 +1,7 @@
-
 ![](media/ep.gif)
 
 <br/>
-<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
 <hr>
 <h1>Getting Started with EnergyPlus</h1>
 <h2>Basic Concepts Manual - Essential Information You Need about Running EnergyPlus</h2>
