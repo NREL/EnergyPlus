@@ -518,81 +518,82 @@ The modification factor <span>$ f_{\dot m_{HW,mod}}() $</span> describes how the
 
 Where,
 	
-<span>$ {c_{p,SA}} $</span>  Specific heat of primary air entering through the air terminal unit, in J/kg-K.
+<span>$ {c_{p,SA}} $</span> Specific heat of primary air entering through the air terminal unit, in J/kg-K.
 	
-<span>$ {c_{p,Z}} $</span>  Specific heat of zone air, in J/kg-K.
+<span>$ {c_{p,Z}} $</span> Specific heat of zone air, in J/kg-K.
 	
-<span>$ {c_{p,CW}} $</span>  Specific heat of zone air, in J/kg-K.
+<span>$ {c_{p,CW}} $</span> Specific heat of zone air, in J/kg-K.
 	
-<span>$ {f_{\dot m_{CW,mod}}()} $</span>  Cooling capacity modification factor function of chilled water flow rate
+<span>$ {f_{\dot m_{CW,mod}}()} $</span> Cooling capacity modification factor function of chilled water flow rate
 	
-<span>$ {f_{ \Delta T_{cool,mod} }()} $</span>  Cooling capacity modification factor function of air-water temperature difference
+<span>$ {f_{ \Delta T_{cool,mod} }()} $</span> Cooling capacity modification factor function of air-water temperature difference
 	
-<span>$ {f_{\dot m_{SA,cool,mod}}()} $</span>  Cooling capacity modification factor function of primary air flow rate
+<span>$ {f_{\dot m_{SA,cool,mod}}()} $</span> Cooling capacity modification factor function of primary air flow rate
 	
-<span>$ {f_{\dot m_{HW,mod}}()} $</span>  Heating capacity modification factor function of hot water flow rate
+<span>$ {f_{\dot m_{HW,mod}}()} $</span> Heating capacity modification factor function of hot water flow rate
 	
-<span>$ {f_{ \Delta T_{heat,mod} }()} $</span>  Heating capacity modification factor function of water - air temperature difference
+<span>$ {f_{ \Delta T_{heat,mod} }()} $</span> Heating capacity modification factor function of water - air temperature difference
 	
-<span>$ {f_{\dot m_{SA,heat,mod}}()} $</span>  Heating capacity modification factor function of primary air flow rate
+<span>$ {f_{\dot m_{SA,heat,mod}}()} $</span> Heating capacity modification factor function of primary air flow rate
 	
-<span>$ {L} $</span>  Total length of all beam units serving the zone, in m
+<span>$ {L} $</span> Total length of all beam units serving the zone, in m
 	
-<span>$ {\dot m_{CW}} $</span>  Mass flow rate of chilled water per meter of length, in kg/s-m
+<span>$ {\dot m_{CW}} $</span> Mass flow rate of chilled water per meter of length, in kg/s-m
 	
-<span>$ {\dot m_{CW,rated}} $</span>  Mass flow rate of chilled water per meter of length at rating point, in kg/s-m
+<span>$ {\dot m_{CW,rated}} $</span> Mass flow rate of chilled water per meter of length at rating point, in kg/s-m
 	
-<span>$ {\dot m_{HW}} $</span>  Mass flow rate of hot water per meter of length, in kg/s-m
+<span>$ {\dot m_{HW}} $</span> Mass flow rate of hot water per meter of length, in kg/s-m
 	
-<span>$ {\dot m_{HW,rated}} $</span>  Mass flow rate of hot water per meter of length at rating point, in kg/s-m
+<span>$ {\dot m_{HW,rated}} $</span> Mass flow rate of hot water per meter of length at rating point, in kg/s-m
 	
-<span>$ {\dot m_{SA}} $</span>  Mass flow rate of primary air per meter of length, in kg/s-m
+<span>$ {\dot m_{SA}} $</span> Mass flow rate of primary air per meter of length, in kg/s-m
 	
-<span>$ {\dot m_{SA,rated}} $</span>  Mass flow rate of primary air per meter of length at rating point, kg/s-m
+<span>$ {\dot m_{SA,rated}} $</span> Mass flow rate of primary air per meter of length at rating point, kg/s-m
 	
-<span>$ {\dot M_{SA}} $</span>  Mass flow rate of primary air entering the zone through the air terminal unit, in kg/s
+<span>$ {\dot M_{SA}} $</span> Mass flow rate of primary air entering the zone through the air terminal unit, in kg/s
 	
-<span>$ {\dot M_{CW}} $</span>  Mass flow rate of chilled water, kg/s
+<span>$ {\dot M_{CW}} $</span> Mass flow rate of chilled water, kg/s
 	
-<span>$ {\dot M_{HW}} $</span>  Mass flow rate of hot water, kg/s
+<span>$ {\dot M_{HW}} $</span> Mass flow rate of hot water, kg/s
 	
-<span>$ {\dot q_{cool,rated}} $</span>  Rated beam cooling capacity per meter of length, in W/m.
+<span>$ {\dot q_{cool,rated}} $</span> Rated beam cooling capacity per meter of length, in W/m.
 	 
-<span>$ {\dot q_{heat,rated}} $</span>  Rated beam heating capacity per meter of length, in W/m.
+<span>$ {\dot q_{heat,rated}} $</span> Rated beam heating capacity per meter of length, in W/m.
 	
-<span>$ {\dot Q_{Beam}} $</span>  Conditioning power delivered to the zone by the beam convector, in W.
+<span>$ {\dot Q_{Beam}} $</span> Conditioning power delivered to the zone by the beam convector, in W.
 	
-<span>$ {\dot Q_{SA}} $</span>  Conditioning power delivered to the zone by the primary air mass flow, in W.
+<span>$ {\dot Q_{SA}} $</span> Conditioning power delivered to the zone by the primary air mass flow, in W.
 	
-<span>$ {\dot Q_{Tot}} $</span>  Total (net) conditioning power delivered to zone by the air terminal unit, in W.
+<span>$ {\dot Q_{Tot}} $</span> Total (net) conditioning power delivered to zone by the air terminal unit, in W.
 	
-<span>$ {\rho_{air,STP}} $</span>  Density of air at standard conditions (sea level), in kg/m<sup>3</sup>
+<span>$ {\rho_{air,STP}} $</span> Density of air at standard conditions (sea level), in kg/m<sup>3</sup>
 	
-<span>$ {\rho_{air}} $</span>  Density of air at standard conditions adjusted for elevation), in kg/m<sup>3</sup>
+<span>$ {\rho_{air}} $</span> Density of air at standard conditions adjusted for elevation), in kg/m<sup>3</sup>
 	
-<span>$ {\rho_{CW}} $</span>  Density of chilled water, in kg/m<sup>3</sup>
+<span>$ {\rho_{CW}} $</span> Density of chilled water, in kg/m<sup>3</sup>
 	
-<span>$ {T_{SA}} $</span>  Dryblub temperature of the (central) primary air entering the air terminal unit, in degrees C.
+<span>$ {T_{SA}} $</span> Dryblub temperature of the (central) primary air entering the air terminal unit, in degrees C.
 	
-<span>$ {T_{Z}} $</span>  Dryblub temperature of the zone air, in degrees C.
+<span>$ {T_{Z}} $</span> Dryblub temperature of the zone air, in degrees C.
 	
-<span>$ {T_{CW,in}} $</span>  Temperature of chilled water entering the convector, in degrees C.
+<span>$ {T_{CW,in}} $</span> Temperature of chilled water entering the convector, in degrees C.
 	
-<span>$ {\Delta T_{air-CW}} $</span>  Difference between the zone air temperature and chilled water entering the convector, delta degrees C.
+<span>$ {\Delta T_{air-CW}} $</span> Difference between the zone air temperature and chilled water entering the convector, delta degrees C.
 	
-<span>$ {\Delta T_{HW-air}} $</span>  Difference between the water and zone air temperature entering the convector, delta degrees C.
+<span>$ {\Delta T_{HW-air}} $</span> Difference between the water and zone air temperature entering the convector, delta degrees C.
 	
-<span>$ {\Delta T_{air-CW,rated}} $</span>  Value of <span>$ {\Delta T_{air-CW}} $</span> at rating conditions for cooling performance, delta degrees C.
+<span>$ {\Delta T_{air-CW,rated}} $</span> Value of <span>$ {\Delta T_{air-CW}} $</span> at rating conditions for cooling performance, delta degrees C.
 	
-<span>$ {\Delta T_{HW-air,rated}} $</span>  Value of <span>$ {\Delta T_{HW-air}} $</span> at rating conditions for heating performance, delta degrees C.
+<span>$ {\Delta T_{HW-air,rated}} $</span> Value of <span>$ {\Delta T_{HW-air}} $</span> at rating conditions for heating performance, delta degrees C.
 	
-<span>$ {\dot v_{SA,rated}} $</span>  Volume flow rate of air per meter length at rating point, in m<sup>3</sup>/s-m.
+<span>$ {\dot v_{SA,rated}} $</span> Volume flow rate of air per meter length at rating point, in m<sup>3</sup>/s-m.
 	
-<span>$ {\dot v_{CW,rated}} $</span>  Volume flow rate of chilled water per meter length at rating point, in m<sup>3</sup>/s-m.
+<span>$ {\dot v_{CW,rated}} $</span> Volume flow rate of chilled water per meter length at rating point, in m<sup>3</sup>/s-m.
 	
-<span>$ {\dot v_{HW,rated}} $</span>  Volume flow rate of hot water per meter length at rating point, in m<sup>3</sup>/s-m.
+<span>$ {\dot v_{HW,rated}} $</span> Volume flow rate of hot water per meter length at rating point, in m<sup>3</sup>/s-m.
 
-The performance capacity model described above is controlled to modulate water flow through the beam's convector using the non-linear numerical solver in EnergyPlus called Solve Regula Falsi.  The predicted zone load to setpoint <span>$ {\dot Q_{Zone, Required}} $</span> is adjusted by <span>$ {\dot Q_{SA}} $</span> to determine the required beam load.
+The performance capacity model described above is controlled to modulate water flow through the beam's convector using the non-linear numerical solver in EnergyPlus called Solve Regula Falsi.  The predicted zone load to setpoint <span>$ {\dot Q_{Zone, Required}} $</span> is adjusted by 
+<span>$ {\dot Q_{SA}} $</span> to determine the required beam load.
 
 <div>$$ {\dot Q_{Beam, Required}} = {\dot Q_{Zone, Required}} - {\dot Q_{SA}} $$</div>
 
@@ -620,13 +621,13 @@ To protect from a non-physical result the leaving hot water temperature is const
 
 The four pipe beam model has four inputs that can be autosized:
 	
-<span>$ {L} $</span>  Total length of all beam units serving the zone, in m
+<span>$ {L} $</span> Total length of all beam units serving the zone, in m
 	
-<span>$ {\dot V_{SA,Des}} $</span>  Design primary supply air volume flow rate, in m<sup>3</sup>/s
+<span>$ {\dot V_{SA,Des}} $</span> design primary supply air volume flow rate, in m<sup>3</sup>/s
 
-<span>$ {\dot V_{CW,Des}} $</span>  Design chilled water volume flow rate, in m<sup>3</sup>/s
+<span>$ {\dot V_{CW,Des}} $</span> design chilled water volume flow rate, in m<sup>3</sup>/s
 
-<span>$ {\dot V_{HW,Des}} $</span>  Design hot water volume flow rate, in m<sup>3</sup>/s
+<span>$ {\dot V_{HW,Des}} $</span> design hot water volume flow rate, in m<sup>3</sup>/s
 
 Because of the way the model is formulated with defaulted inputs for rated, normalized performance data, we can link the four inputs together to ensure an internally consistent set of sizes.  If any one of these four inputs is not autosized (given a fixed value at input) then the other three can be computed using the normalized, rated performance data which are either input or have default values. If the total beam length is input, then the following equations are used
 
@@ -648,35 +649,35 @@ If the hot water flow rate is input, then the beam length can be determined as f
 
 When all four inputs are autosized, which is the usual case, there is no simple way to anchor the sizes and we need to use the results from the zone and system sizing calculations to determine sizes for the four pipe beam unit. The following design data from the zone and system sizing calculations are used when sizing the four pipe beam:
 
-<span>$ {\dot V_{TU,Z,final,cool} } $</span>  Final zone terminal unit design volume flow rate for cooling, in m<sup>3</sup>/s  
+<span>$ {\dot V_{TU,Z,final,cool} } $</span> final zone terminal unit design volume flow rate for cooling, in m<sup>3</sup>/s  
 	
-<span>$ {\dot V_{TU,Z,final,heat} } $</span>  Final zone terminal unit design volume flow rate for heating, in m<sup>3</sup>/s  
+<span>$ {\dot V_{TU,Z,final,heat} } $</span> final zone terminal unit design volume flow rate for heating, in m<sup>3</sup>/s  
 	
-<span>$ {\dot V_{Z,final,OA} } $</span>  Final zone design volume flow rate for minimum outdoor air mechanical ventilation, in m<sup>3</sup>/s.  
+<span>$ {\dot V_{Z,final,OA} } $</span> final zone design volume flow rate for minimum outdoor air mechanical ventilation, in m<sup>3</sup>/s.  
 	
-<span>$ {T_{SA,cool,design } } $</span>  Final design zone terminal unit inlet supply air temperature at cooling peak, in degrees C.
+<span>$ {T_{SA,cool,design } } $</span> final design zone terminal unit inlet supply air temperature at cooling peak, in degrees C.
 	
-<span>$ {w_{SA,cool,design } } $</span>  Final design zone terminal unit inlet supply air humidity ratio at cooling peak, in kg_H2O/kg_dryair.
+<span>$ {w_{SA,cool,design } } $</span> final design zone terminal unit inlet supply air humidity ratio at cooling peak, in kg_H2O/kg_dryair.
 	
-<span>$ {T_{Z,cool,design } } $</span>  Final design zone air temperature at cooling peak, in degrees C.
+<span>$ {T_{Z,cool,design } } $</span> final design zone air temperature at cooling peak, in degrees C.
 	
-<span>$ {w_{Z,cool,design } } $</span>  Final design zone air humidity ratio at cooling peak, in kg_H2O/kg_dryair.
+<span>$ {w_{Z,cool,design } } $</span> final design zone air humidity ratio at cooling peak, in kg_H2O/kg_dryair.
 	
-<span>$ {\dot Q_{Z,cool,design } } $</span>  Final design zone cooling load at cooling peak, in W.
+<span>$ {\dot Q_{Z,cool,design } } $</span> final design zone cooling load at cooling peak, in W.
 	
-<span>$ {T_{CW,design}} $</span>  Chilled water plant loop supply side design exit temperature, in degrees C.
+<span>$ {T_{CW,design}} $</span> the chilled water plant loop supply side design exit temperature, in degrees C.
 
-<span>$ {T_{SA,heat,design } } $</span>  Final design zone terminal unit inlet supply air temperature at heating peak, in degrees C. 
+<span>$ {T_{SA,heat,design } } $</span> final design zone terminal unit inlet supply air temperature at heating peak, in degrees C. 
 	
-<span>$ {w_{SA,heat,design } } $</span>  Final design zone terminal unit inlet supply air humidity ratio at heating peak, in kg_H2O/kg_dryair.
+<span>$ {w_{SA,heat,design } } $</span> final design zone terminal unit inlet supply air humidity ratio at heating peak, in kg_H2O/kg_dryair.
 	
-<span>$ {T_{Z,heat,design } } $</span>  Final design zone air temperature at heating peak, in degrees C.
+<span>$ {T_{Z,heat,design } } $</span> final design zone air temperature at heating peak, in degrees C.
 	
-<span>$ {w_{Z,heat,design } } $</span>  Final design zone air humidity ratio at heating peak, in kg_H2O/kg_dryair.
+<span>$ {w_{Z,heat,design } } $</span> final design zone air humidity ratio at heating peak, in kg_H2O/kg_dryair.
 	
-<span>$ {\dot Q_{Z,heat,design } } $</span>  Final design zone heating load at heating peak, in W.
+<span>$ {\dot Q_{Z,heat,design } } $</span> final design zone heating load at heating peak, in W.
 
-<span>$ {T_{HW,design}} $</span>  Hot water plant loop supply side design exit temperature, in degrees C.
+<span>$ {T_{HW,design}} $</span> the hot water plant loop supply side design exit temperature, in degrees C.
 
 Overhead beam type air terminals induce room air to flow over the convector by the directing primary supply air through special nozzles. Therefore, the cooling and heating capacity of the beam's convector is not separable from the primary flow rate, varying the primary flow rate varies the beam capacity. The design primary flow rate is chosen to be largest value that satisfies three requirements:  (1) the ventilation requirement, (2) the design cooling load (if cooling is present), (3) and the design heating load (if heating is present).
 
@@ -691,8 +692,8 @@ When sizing for the cooling design load, the following design values are set for
 <div>$$ {c_{p,Z}} = {PsyCpAirFnWTdb ({w_{Z,cool,design } },  {T_{Z,cool,design } }  ) }$$</div>
 <div>$$ {c_{p,SA}} = {PsyCpAirFnWTdb ( {w_{SA,cool,design } },  {T_{SA,cool,design } }   ) }$$</div>
 <div>$$ {\dot Q_{Zone, Required}} = -1.0 \cdot {\dot Q_{Z,cool,design } } $$</div>
-<div>$$ {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,cool,design } }}{{c_{p,SA}} \cdot {( {T_{Z,cool,design } } - {T_{SA,cool,design } } )}}  \right) } $$</div>
-or if <span>$ ( {T_{Z,cool,design }} - {T_{SA,cool,design } } ) < 2.0 $</span> then
+<div>$$ {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,cool,design } }}{{c_{p,SA}} \cdot ( {T_{Z,cool,design } - {T_{SA,cool,design } } ) } \right) } $$</div>
+or if <span>$ ( {T_{Z,cool,design } - {T_{SA,cool,design } } ) < 2.0 $</span> then
 <div>$$ {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,cool,design } }}{{c_{p,SA}} \cdot 2.0 } \right) } $$</div>
 <div>$$ {\dot m_{SA,min limit}} = min( {\dot V_{Z,final,OA} }, \frac{{\dot m_{SA,max limit}}}{3.0}, max({\dot V_{TU,Z,final,heat} } , {\dot V_{TU,Z,final,cool} }) ) $$</div>
 
