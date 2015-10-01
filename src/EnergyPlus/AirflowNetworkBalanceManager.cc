@@ -5898,9 +5898,9 @@ namespace AirflowNetworkBalanceManager {
 			AirflowNetworkZnRpt( i ).MixMass = ( AirflowNetworkExchangeData( i ).SumMMCp / CpAir ) * ReportingConstant;
 			//save values for predefined report
 			if ( ZonePreDefRep( i ).isOccupied ) {
-				ZonePreDefRep( i ).AFNInfilVolTotal += AirflowNetworkZnRpt( i ).InfilVolume;
+				ZonePreDefRep( i ).AFNInfilVolTotal += AirflowNetworkZnRpt( i ).InfilVolume * Zone( i ).Multiplier * Zone( i ).ListMultiplier;
 				if ( AirflowNetworkZnRpt( i ).InfilVolume < ZonePreDefRep( i ).AFNInfilVolMin ) {
-					ZonePreDefRep( i ).AFNInfilVolMin = AirflowNetworkZnRpt( i ).InfilVolume;
+					ZonePreDefRep( i ).AFNInfilVolMin = AirflowNetworkZnRpt( i ).InfilVolume * Zone( i ).Multiplier * Zone( i ).ListMultiplier;
 				}
 			}
 		} // ... end of zone loads report variable update loop.

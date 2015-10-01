@@ -992,7 +992,6 @@ namespace EnergyPlus {
 		GetZoneData( ErrorsFound ); // read zone data
 		EXPECT_FALSE( ErrorsFound ); 
 
-		Fans::GetFanInputFlag = true; // remove this when clear_state gets added to Fans
 		DXCoils::GetCoilsInputFlag = true; // remove this when clear_state gets added to DXCoils
 		GlobalNames::NumCoils = 0; // remove this when clear_state gets added to GlobalNames
 		GlobalNames::CoilNames.deallocate(); // remove this when clear_state gets added to GlobalNames
