@@ -353,7 +353,7 @@ namespace PlantComponentTemperatureSources {
 		if ( WaterSource( SourceNum ).MyFlag ) {
 			// Locate the component on the plant loops for later usage
 			errFlag = false;
-			ScanPlantLoopsForObject( WaterSource( SourceNum ).Name, TypeOf_WaterSource, WaterSource( SourceNum ).Location.LoopNum, WaterSource( SourceNum ).Location.LoopSideNum, WaterSource( SourceNum ).Location.BranchNum, WaterSource( SourceNum ).Location.CompNum, _, _, _, WaterSource( SourceNum ).InletNodeNum, _, errFlag );
+			ScanPlantLoopsForObject( WaterSource( SourceNum ).Name, TypeOf_WaterSource, WaterSource( SourceNum ).Location.loopNum, WaterSource( SourceNum ).Location.loopSideNum, WaterSource( SourceNum ).Location.branchNum, WaterSource( SourceNum ).Location.compNum, _, _, _, WaterSource( SourceNum ).InletNodeNum, _, errFlag );
 			if ( errFlag ) {
 				ShowFatalError( RoutineName + ": Program terminated due to previous condition(s)." );
 			}
@@ -363,9 +363,9 @@ namespace PlantComponentTemperatureSources {
 		//Initialize critical Demand Side Variables at the beginning of each environment
 		if ( WaterSource( SourceNum ).MyEnvironFlag && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidName, InitConvTemp, PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidName, InitConvTemp, PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidIndex, RoutineName );
 			WaterSource( SourceNum ).MassFlowRateMax = WaterSource( SourceNum ).DesVolFlowRate * rho;
-			InitComponentNodes( 0.0, WaterSource( SourceNum ).MassFlowRateMax, WaterSource( SourceNum ).InletNodeNum, WaterSource( SourceNum ).OutletNodeNum, WaterSource( SourceNum ).Location.LoopNum, WaterSource( SourceNum ).Location.LoopSideNum, WaterSource( SourceNum ).Location.BranchNum, WaterSource( SourceNum ).Location.CompNum );
+			InitComponentNodes( 0.0, WaterSource( SourceNum ).MassFlowRateMax, WaterSource( SourceNum ).InletNodeNum, WaterSource( SourceNum ).OutletNodeNum, WaterSource( SourceNum ).Location.loopNum, WaterSource( SourceNum ).Location.loopSideNum, WaterSource( SourceNum ).Location.branchNum, WaterSource( SourceNum ).Location.compNum );
 
 			WaterSource( SourceNum ).MyEnvironFlag = false;
 		}
@@ -381,7 +381,7 @@ namespace PlantComponentTemperatureSources {
 		}
 
 		// Calculate specific heat
-		cp = GetSpecificHeatGlycol( PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidName, WaterSource( SourceNum ).BoundaryTemp, PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidIndex, RoutineName );
+		cp = GetSpecificHeatGlycol( PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidName, WaterSource( SourceNum ).BoundaryTemp, PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidIndex, RoutineName );
 
 		// Calculate deltaT
 		Real64 delta_temp = WaterSource( SourceNum ).BoundaryTemp - WaterSource( SourceNum ).InletTemp;
@@ -420,7 +420,7 @@ namespace PlantComponentTemperatureSources {
 			}
 		}
 
-		SetComponentFlowRate( WaterSource( SourceNum ).MassFlowRate, WaterSource( SourceNum ).InletNodeNum, WaterSource( SourceNum ).OutletNodeNum, WaterSource( SourceNum ).Location.LoopNum, WaterSource( SourceNum ).Location.LoopSideNum, WaterSource( SourceNum ).Location.BranchNum, WaterSource( SourceNum ).Location.CompNum );
+		SetComponentFlowRate( WaterSource( SourceNum ).MassFlowRate, WaterSource( SourceNum ).InletNodeNum, WaterSource( SourceNum ).OutletNodeNum, WaterSource( SourceNum ).Location.loopNum, WaterSource( SourceNum ).Location.loopSideNum, WaterSource( SourceNum ).Location.branchNum, WaterSource( SourceNum ).Location.compNum );
 
 		// at this point the mass flow rate, inlet temp, and boundary temp structure vars have been updated
 		// the calc routine will update the outlet temp and heat transfer rate/energies
@@ -481,7 +481,7 @@ namespace PlantComponentTemperatureSources {
 		tmpVolFlowRate = WaterSource( SourceNum ).DesVolFlowRate;
 		DesVolFlowRateUser = 0.0;
 
-		PltSizNum = PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).PlantSizNum;
+		PltSizNum = PlantLoop( WaterSource( SourceNum ).Location.loopNum ).PlantSizNum;
 
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
@@ -592,7 +592,7 @@ namespace PlantComponentTemperatureSources {
 
 		if ( WaterSource( SourceNum ).MassFlowRate > 0.0 ) {
 			WaterSource( SourceNum ).OutletTemp = WaterSource( SourceNum ).BoundaryTemp;
-			Cp = GetSpecificHeatGlycol( PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidName, WaterSource( SourceNum ).BoundaryTemp, PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidIndex, RoutineName );
+			Cp = GetSpecificHeatGlycol( PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidName, WaterSource( SourceNum ).BoundaryTemp, PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidIndex, RoutineName );
 			WaterSource( SourceNum ).HeatRate = WaterSource( SourceNum ).MassFlowRate * Cp * ( WaterSource( SourceNum ).OutletTemp - WaterSource( SourceNum ).InletTemp );
 			WaterSource( SourceNum ).HeatEnergy = WaterSource( SourceNum ).HeatRate * TimeStepSys * SecInHour;
 		} else {

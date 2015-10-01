@@ -39,6 +39,12 @@ namespace Pipes {
 	// Object Data
 	Array1D< std::shared_ptr< LocalPipeData > > LocalPipe; // dimension to number of pipes
 
+	void
+	clear_state()
+	{
+		LocalPipe.deallocate();
+	}
+
 	std::shared_ptr<PlantComponent> 
 	LocalPipeData::pipeFactory( int objectType, std::string objectName ) {
 

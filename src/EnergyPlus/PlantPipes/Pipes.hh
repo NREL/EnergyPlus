@@ -53,6 +53,7 @@ namespace Pipes {
 	};
 
 	extern Array1D< std::shared_ptr< LocalPipeData > > LocalPipe; // dimension to number of pipes
+	void clear_state();
 
 	//     NOTICE
 

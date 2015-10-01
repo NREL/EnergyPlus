@@ -29,6 +29,7 @@
 #include <OutputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
+#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 
 namespace EnergyPlus {
 
@@ -64,6 +65,7 @@ namespace PipeHeatTransfer {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
+	using namespace GroundTemperatureManager;
 
 	// MODULE PARAMETER DEFINITIONS
 	static std::string const BlankString;
@@ -418,45 +420,12 @@ namespace PipeHeatTransfer {
 					thisPipe->dSregular = thisPipe->DomainDepth / ( thisPipe->NumDepthNodes - 1 );
 				}
 
-				// Now we need to see if average annual temperature data is brought in here
-				if ( NumNumbers >= 3 ) {
-					thisPipe->AvgAnnualManualInput = 1;
-
-					//If so, we need to read in the data
-					// N3,  \field Average soil surface temperature
-					thisPipe->AvgGroundTemp = rNumericArgs( 3 );
-
-					// N4,  \field Amplitude of soil surface temperature
-					if ( NumNumbers >= 4 ) {
-						thisPipe->AvgGndTempAmp = rNumericArgs( 4 );
-						if ( thisPipe->AvgGndTempAmp < 0.0 ) {
-							ShowSevereError( "Invalid " + cNumericFieldNames( 4 ) + '=' + General::RoundSigDigits( thisPipe->AvgGndTempAmp, 2 ) );
-							ShowContinueError( "Found in " + cCurrentModuleObject + '=' + thisPipe->Name );
-							ErrorsFound = true;
-						}
-					}
-
-					// N5;  \field Phase constant of soil surface temperature
-					if ( NumNumbers >= 5 ) {
-						thisPipe->PhaseShiftDays = rNumericArgs( 5 );
-						if ( thisPipe->PhaseShiftDays < 0 ) {
-							ShowSevereError( "Invalid " + cNumericFieldNames( 5 ) + '=' + General::RoundSigDigits( thisPipe->PhaseShiftDays ) );
-							ShowContinueError( "Found in " + cCurrentModuleObject + '=' + thisPipe->Name );
-							ErrorsFound = true;
-						}
-					}
-
-					if ( NumNumbers >= 3 && NumNumbers < 5 ) {
-						ShowSevereError( cCurrentModuleObject + '=' + thisPipe->Name );
-						ShowContinueError( "If any one annual ground temperature item is entered, all 3 items must be entered" );
-						ErrorsFound = true;
-					}
-
-				}
-
 				if ( thisPipe->ConstructionNum != 0 ) {
 					thisPipe->validatePipeConstruction();
 				}
+
+				// Get ground temperature model
+				thisPipe->groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 7 ), cAlphaArgs( 8 ) );
 
 				// Select number of pipe sections.  Hanby's optimal number of 20 section is selected.
 				thisPipe->NumSections = NumPipeSections;
@@ -609,51 +578,10 @@ namespace PipeHeatTransfer {
 	int
 	PipeHTData::performOneTimeInit( const PlantLocation & EP_UNUSED(calledFromLocation) ) {
 
-		int const MonthsInYear( 12 ); // Number of months in the year
-		int const AvgDaysInMonth( 30 ); // Average days in a month
-		Real64 const LargeNumber( 9999.9 ); // Large number (compared to temperature values)
-
 		bool errFlag = false;
 		DataPlant::ScanPlantLoopsForObject( this->Name, this->compType, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag );
 
-		//If there are any underground buried pipes, we must bring in data
-		if ( this->EnvironmentPtr == GroundEnv ) {
 
-			//If ground temp data was not brought in manually in GETINPUT,
-			// then we must get it from the surface ground temperatures
-			if ( this->AvgAnnualManualInput == 0 ) {
-
-				if ( ! DataEnvironment::PubGroundTempSurfFlag ) {
-					ShowFatalError( "No Site:GroundTemperature:Shallow object found.  This is required for a Pipe:Underground object." );
-				}
-
-				//Calculate Average Ground Temperature for all 12 months of the year:
-				this->AvgGroundTemp = 0.0;
-				for ( int MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					this->AvgGroundTemp += DataEnvironment::PubGroundTempSurface( MonthIndex );
-				}
-				this->AvgGroundTemp /= MonthsInYear;
-
-				//Calculate Average Amplitude from Average:
-				this->AvgGndTempAmp = 0.0;
-				for ( int MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					this->AvgGndTempAmp += std::abs( DataEnvironment::PubGroundTempSurface( MonthIndex ) - this->AvgGroundTemp );
-				}
-				this->AvgGndTempAmp /= MonthsInYear;
-
-				//Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
-				this->MonthOfMinSurfTemp = 0;
-				this->MinSurfTemp = LargeNumber; //Set high so that the first months temp will be lower and actually get updated
-				for ( int MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					if ( DataEnvironment::PubGroundTempSurface( MonthIndex ) <= this->MinSurfTemp ) {
-						this->MonthOfMinSurfTemp = MonthIndex;
-						this->MinSurfTemp = DataEnvironment::PubGroundTempSurface( MonthIndex );
-					}
-				}
-				this->PhaseShiftDays = this->MonthOfMinSurfTemp * AvgDaysInMonth;
-				
-			} //End manual ground data input structure
-		}
 		if ( errFlag ) {
 			ShowFatalError( "InitPipesHeatTransfer: Program terminated due to previous condition(s)." );
 			return 1;
@@ -1476,12 +1404,8 @@ namespace PipeHeatTransfer {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine uses the Kusuda-Achenbach correlation to return a farfield ground temperature
-
-		return this->AvgGroundTemp - this->AvgGndTempAmp * 
-				std::exp( -z * std::sqrt( DataGlobals::Pi / ( 365.0 * this->SoilDiffusivityPerDay ) ) ) * 
-				std::cos( ( 2.0 * DataGlobals::Pi / 365.0 ) * ( DayOfSim - this->PhaseShiftDays - ( z / 2.0 ) * std::sqrt( 365.0 / ( DataGlobals::Pi * this->SoilDiffusivityPerDay ) ) ) );
+		Real64 curSimTime = DayOfSim * DataGlobals::SecsInDay;
+		return this->groundTempModel->getGroundTempAtTimeInSeconds( z, curSimTime );
 	}
 
 	//     NOTICE

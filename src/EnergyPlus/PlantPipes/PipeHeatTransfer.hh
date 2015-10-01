@@ -15,10 +15,13 @@
 #include <DataGlobals.hh>
 #include <PlantLocation.hh>
 #include <PlantComponent.hh>
+#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 
 namespace EnergyPlus {
 
 namespace PipeHeatTransfer {
+
+	using namespace GroundTemperatureManager;
 
 	extern int const None;
 	extern int const ZoneEnv;
@@ -96,9 +99,6 @@ namespace PipeHeatTransfer {
 		std::string SoilMaterial; // name of soil material:regular object
 		int SoilMaterialNum; // soil material index in material data structure
 		int MonthOfMinSurfTemp; // month of minimum ground surface temperature
-		Real64 AvgGroundTemp; // annual average ground temperature [C]
-		Real64 AvgGndTempAmp; // annual average amplitude of gnd temp [C]
-		int PhaseShiftDays; // shift of minimum gnd surf temp from 1/1  [days]
 		Real64 MinSurfTemp; // minimum annual surface temperature [C]
 		Real64 SoilDensity; // density of soil [kg/m3]
 		Real64 SoilDepth; // thickness of soil [m]
@@ -114,7 +114,6 @@ namespace PipeHeatTransfer {
 		Real64 FourierDS; // soil Fourier number based on grid spacing
 		Real64 SoilDiffusivity; // soil thermal diffusivity [m2/s]
 		Real64 SoilDiffusivityPerDay; // soil thermal diffusivity [m2/day]
-		int AvgAnnualManualInput; // flag for method of bringing in annual avg data yes-1 no-0
 		Array4D< Real64 > T; // soil temperature array
 		bool SolarExposed; // Flag to determine if solar is included at ground surface
 		Real64 SumTK; // Sum of thickness/conductivity over all material layers
@@ -124,6 +123,7 @@ namespace PipeHeatTransfer {
 		int BranchNum; // ..LoopSide%Branch index where this pipe lies
 		int CompNum; // ..Branch%Comp index where this pipe lies
 		Real64 EnvironmentTemp; // environmental temperature (surrounding pipe)
+		std::shared_ptr< BaseGroundTempsModel > groundTempModel;
 		// Report data
 		Real64 FluidInletTemp; // inlet temperature [C]
 		Real64 FluidOutletTemp; // outlet temperature [C]
@@ -181,9 +181,6 @@ namespace PipeHeatTransfer {
 			OutdoorConvCoef( 0.0 ),
 			SoilMaterialNum( 0 ),
 			MonthOfMinSurfTemp( 0 ),
-			AvgGroundTemp( 0.0 ),
-			AvgGndTempAmp( 0.0 ),
-			PhaseShiftDays( 0 ),
 			MinSurfTemp( 0.0 ),
 			SoilDensity( 0.0 ),
 			SoilDepth( 0.0 ),
@@ -199,7 +196,6 @@ namespace PipeHeatTransfer {
 			FourierDS( 0.0 ),
 			SoilDiffusivity( 0.0 ),
 			SoilDiffusivityPerDay( 0.0 ),
-			AvgAnnualManualInput( 0 ),
 			SolarExposed( true ),
 			SumTK( 0.0 ),
 			ZoneHeatGainRate( 0.0 ),
