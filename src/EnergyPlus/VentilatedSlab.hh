@@ -734,6 +734,13 @@ namespace VentilatedSlab {
 	);
 
 	void
+	CalcVentilatedSlabCoilOutput(
+		int const Item, // system index in ventilated slab array
+		Real64 & PowerMet, // power supplied (W)
+		Real64 & LatOutputProvided // latent capacity supplied (kg/s)
+	);
+
+	void
 	CalcVentilatedSlabRadComps(
 		int const Item, // System index in ventilated slab array
 		bool const FirstHVACIteration // flag for 1st HVAV iteration in the time step !unused1208
@@ -769,7 +776,7 @@ namespace VentilatedSlab {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

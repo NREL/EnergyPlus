@@ -30,6 +30,7 @@
 #include <ObjexxFCL/TypeTraits.hh>
 #include <ObjexxFCL/Vector2.hh>
 #include <ObjexxFCL/Vector3.hh>
+#include <ObjexxFCL/Vector4.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -332,8 +333,8 @@ protected: // Creation
 	 shift_( 0 ),
 	 sdata_( nullptr )
 	{
-		operator []( 0 ) = v[ 0 ];
-		operator []( 1 ) = v[ 1 ];
+		operator []( 0 ) = v.x;
+		operator []( 1 ) = v.y;
 	}
 
 	// Vector3 Constructor Template
@@ -351,9 +352,51 @@ protected: // Creation
 	 shift_( 0 ),
 	 sdata_( nullptr )
 	{
-		operator []( 0 ) = v[ 0 ];
-		operator []( 1 ) = v[ 1 ];
-		operator []( 2 ) = v[ 2 ];
+		operator []( 0 ) = v.x;
+		operator []( 1 ) = v.y;
+		operator []( 2 ) = v.z;
+	}
+
+	// Vector4 Constructor Template
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
+	inline
+	Array( Vector4< U > const & v ) :
+	 capacity_( 4 ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+	 data_( new T[ capacity_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
+	 size_( capacity_ ),
+	 owner_( true ),
+	 shift_( 0 ),
+	 sdata_( nullptr )
+	{
+		operator []( 0 ) = v.x;
+		operator []( 1 ) = v.y;
+		operator []( 2 ) = v.z;
+		operator []( 3 ) = v.w;
+	}
+
+	// Iterator Range Constructor Template
+	template< class Iterator, typename = decltype( *std::declval< Iterator & >(), void(), ++std::declval< Iterator & >(), void() ) >
+	inline
+	Array( Iterator const beg, Iterator const end ) :
+	 capacity_( end - beg ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+	 data_( new T[ capacity_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
+	 size_( capacity_ ),
+	 owner_( true ),
+	 shift_( 0 ),
+	 sdata_( nullptr )
+	{
+		size_type j( 0u );
+		for ( Iterator i = beg; i != end; ++i, ++j ) {
+			operator []( j ) = *i;
+		}
 	}
 
 	// Default Proxy Constructor
@@ -494,7 +537,6 @@ protected: // Assignment: Array
 	void
 	operator =( std::initializer_list< U > const l )
 	{
-		assert( size_bounded() );
 		assert( size_ == l.size() );
 		std::copy( l.begin(), l.end(), data_ );
 	}
@@ -505,7 +547,6 @@ protected: // Assignment: Array
 	void
 	operator =( std::array< U, s > const & a )
 	{
-		assert( size_bounded() );
 		assert( size_ == s );
 		std::copy( a.begin(), a.end(), data_ );
 	}
@@ -516,7 +557,6 @@ protected: // Assignment: Array
 	void
 	operator =( std::vector< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == v.size() );
 		std::copy( v.begin(), v.end(), data_ );
 	}
@@ -527,10 +567,9 @@ protected: // Assignment: Array
 	void
 	operator =( Vector2< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 2u );
-		operator []( 0 ) = v[ 0 ];
-		operator []( 1 ) = v[ 1 ];
+		operator []( 0 ) = v.x;
+		operator []( 1 ) = v.y;
 	}
 
 	// Vector3 Assignment Template
@@ -539,11 +578,23 @@ protected: // Assignment: Array
 	void
 	operator =( Vector3< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 3u );
-		operator []( 0 ) = v[ 0 ];
-		operator []( 1 ) = v[ 1 ];
-		operator []( 2 ) = v[ 2 ];
+		operator []( 0 ) = v.x;
+		operator []( 1 ) = v.y;
+		operator []( 2 ) = v.z;
+	}
+
+	// Vector4 Assignment Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator =( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		operator []( 0 ) = v.x;
+		operator []( 1 ) = v.y;
+		operator []( 2 ) = v.z;
+		operator []( 3 ) = v.w;
 	}
 
 	// += Array
@@ -695,7 +746,6 @@ protected: // Assignment: Array
 	void
 	operator +=( std::initializer_list< U > const l )
 	{
-		assert( size_bounded() );
 		assert( size_ == l.size() );
 		auto r( l.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++r ) {
@@ -709,7 +759,6 @@ protected: // Assignment: Array
 	void
 	operator -=( std::initializer_list< U > const l )
 	{
-		assert( size_bounded() );
 		assert( size_ == l.size() );
 		auto r( l.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++r ) {
@@ -723,7 +772,6 @@ protected: // Assignment: Array
 	void
 	operator *=( std::initializer_list< U > const l )
 	{
-		assert( size_bounded() );
 		assert( size_ == l.size() );
 		auto r( l.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++r ) {
@@ -737,7 +785,6 @@ protected: // Assignment: Array
 	void
 	operator /=( std::initializer_list< U > const l )
 	{
-		assert( size_bounded() );
 		assert( size_ == l.size() );
 		auto r( l.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++r ) {
@@ -752,7 +799,6 @@ protected: // Assignment: Array
 	void
 	operator +=( std::array< U, s > const & a )
 	{
-		assert( size_bounded() );
 		assert( size_ == s );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] += a[ i ];
@@ -765,7 +811,6 @@ protected: // Assignment: Array
 	void
 	operator -=( std::array< U, s > const & a )
 	{
-		assert( size_bounded() );
 		assert( size_ == s );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] -= a[ i ];
@@ -778,7 +823,6 @@ protected: // Assignment: Array
 	void
 	operator *=( std::array< U, s > const & a )
 	{
-		assert( size_bounded() );
 		assert( size_ == s );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] *= a[ i ];
@@ -791,7 +835,6 @@ protected: // Assignment: Array
 	void
 	operator /=( std::array< U, s > const & a )
 	{
-		assert( size_bounded() );
 		assert( size_ == s );
 		for ( size_type i = 0; i < size_; ++i ) {
 			assert( a[ i ] != T( 0 ) );
@@ -805,7 +848,6 @@ protected: // Assignment: Array
 	void
 	operator +=( std::vector< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == v.size() );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] += v[ i ];
@@ -818,7 +860,6 @@ protected: // Assignment: Array
 	void
 	operator -=( std::vector< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == v.size() );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] -= v[ i ];
@@ -831,7 +872,6 @@ protected: // Assignment: Array
 	void
 	operator *=( std::vector< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == v.size() );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] *= v[ i ];
@@ -844,7 +884,6 @@ protected: // Assignment: Array
 	void
 	operator /=( std::vector< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == v.size() );
 		for ( size_type i = 0; i < size_; ++i ) {
 			assert( v[ i ] != T( 0 ) );
@@ -858,10 +897,9 @@ protected: // Assignment: Array
 	void
 	operator +=( Vector2< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 2u );
-		data_[ 0 ] += v[ 0 ];
-		data_[ 1 ] += v[ 1 ];
+		data_[ 0 ] += v.x;
+		data_[ 1 ] += v.y;
 	}
 
 	// -= Vector2 Template
@@ -870,10 +908,9 @@ protected: // Assignment: Array
 	void
 	operator -=( Vector2< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 2u );
-		data_[ 0 ] -= v[ 0 ];
-		data_[ 1 ] -= v[ 1 ];
+		data_[ 0 ] -= v.x;
+		data_[ 1 ] -= v.y;
 	}
 
 	// *= Vector2 Template
@@ -882,10 +919,9 @@ protected: // Assignment: Array
 	void
 	operator *=( Vector2< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 2u );
-		data_[ 0 ] *= v[ 0 ];
-		data_[ 1 ] *= v[ 1 ];
+		data_[ 0 ] *= v.x;
+		data_[ 1 ] *= v.y;
 	}
 
 	// /= Vector2 Template
@@ -894,12 +930,11 @@ protected: // Assignment: Array
 	void
 	operator /=( Vector2< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 2u );
-		assert( v[ 0 ] != T( 0 ) );
-		assert( v[ 1 ] != T( 0 ) );
-		data_[ 0 ] /= v[ 0 ];
-		data_[ 1 ] /= v[ 1 ];
+		assert( v.x != T( 0 ) );
+		assert( v.y != T( 0 ) );
+		data_[ 0 ] /= v.x;
+		data_[ 1 ] /= v.y;
 	}
 
 	// += Vector3 Template
@@ -908,11 +943,10 @@ protected: // Assignment: Array
 	void
 	operator +=( Vector3< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 3u );
-		data_[ 0 ] += v[ 0 ];
-		data_[ 1 ] += v[ 1 ];
-		data_[ 2 ] += v[ 2 ];
+		data_[ 0 ] += v.x;
+		data_[ 1 ] += v.y;
+		data_[ 2 ] += v.z;
 	}
 
 	// -= Vector3 Template
@@ -921,11 +955,10 @@ protected: // Assignment: Array
 	void
 	operator -=( Vector3< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 3u );
-		data_[ 0 ] -= v[ 0 ];
-		data_[ 1 ] -= v[ 1 ];
-		data_[ 2 ] -= v[ 2 ];
+		data_[ 0 ] -= v.x;
+		data_[ 1 ] -= v.y;
+		data_[ 2 ] -= v.z;
 	}
 
 	// *= Vector3 Template
@@ -934,11 +967,10 @@ protected: // Assignment: Array
 	void
 	operator *=( Vector3< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 3u );
-		data_[ 0 ] *= v[ 0 ];
-		data_[ 1 ] *= v[ 1 ];
-		data_[ 2 ] *= v[ 2 ];
+		data_[ 0 ] *= v.x;
+		data_[ 1 ] *= v.y;
+		data_[ 2 ] *= v.z;
 	}
 
 	// /= Vector3 Template
@@ -947,14 +979,69 @@ protected: // Assignment: Array
 	void
 	operator /=( Vector3< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 3u );
-		assert( v[ 0 ] != T( 0 ) );
-		assert( v[ 1 ] != T( 0 ) );
-		assert( v[ 2 ] != T( 0 ) );
-		data_[ 0 ] /= v[ 0 ];
-		data_[ 1 ] /= v[ 1 ];
-		data_[ 2 ] /= v[ 2 ];
+		assert( v.x != T( 0 ) );
+		assert( v.y != T( 0 ) );
+		assert( v.z != T( 0 ) );
+		data_[ 0 ] /= v.x;
+		data_[ 1 ] /= v.y;
+		data_[ 2 ] /= v.z;
+	}
+
+	// += Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator +=( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		data_[ 0 ] += v.x;
+		data_[ 1 ] += v.y;
+		data_[ 2 ] += v.z;
+		data_[ 3 ] += v.w;
+	}
+
+	// -= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator -=( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		data_[ 0 ] -= v.x;
+		data_[ 1 ] -= v.y;
+		data_[ 2 ] -= v.z;
+		data_[ 3 ] -= v.w;
+	}
+
+	// *= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator *=( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		data_[ 0 ] *= v.x;
+		data_[ 1 ] *= v.y;
+		data_[ 2 ] *= v.z;
+		data_[ 3 ] *= v.w;
+	}
+
+	// /= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator /=( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		assert( v.x != T( 0 ) );
+		assert( v.y != T( 0 ) );
+		assert( v.z != T( 0 ) );
+		assert( v.w != T( 0 ) );
+		data_[ 0 ] /= v.x;
+		data_[ 1 ] /= v.y;
+		data_[ 2 ] /= v.z;
+		data_[ 3 ] /= v.w;
 	}
 
 public: // Assignment: Value
@@ -1112,7 +1199,6 @@ protected: // Assignment: Logical
 	void
 	and_equals( std::initializer_list< U > const l )
 	{
-		assert( size_bounded() );
 		assert( size_ == l.size() );
 		auto r( l.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++r ) {
@@ -1126,7 +1212,6 @@ protected: // Assignment: Logical
 	void
 	or_equals( std::initializer_list< U > const l )
 	{
-		assert( size_bounded() );
 		assert( size_ == l.size() );
 		auto r( l.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++r ) {
@@ -1140,7 +1225,6 @@ protected: // Assignment: Logical
 	void
 	and_equals( std::array< U, s > const & a )
 	{
-		assert( size_bounded() );
 		assert( size_ == s );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = data_[ i ] && a[ i ];
@@ -1153,7 +1237,6 @@ protected: // Assignment: Logical
 	void
 	or_equals( std::array< U, s > const & a )
 	{
-		assert( size_bounded() );
 		assert( size_ == s );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = data_[ i ] || a[ i ];
@@ -1166,7 +1249,6 @@ protected: // Assignment: Logical
 	void
 	and_equals( std::vector< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == v.size() );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = data_[ i ] && v[ i ];
@@ -1179,7 +1261,6 @@ protected: // Assignment: Logical
 	void
 	or_equals( std::vector< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == v.size() );
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = data_[ i ] || v[ i ];
@@ -1192,10 +1273,9 @@ protected: // Assignment: Logical
 	void
 	and_equals( Vector2< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 2u );
-		data_[ 0 ] = data_[ 0 ] && v[ 0 ];
-		data_[ 1 ] = data_[ 1 ] && v[ 1 ];
+		data_[ 0 ] = data_[ 0 ] && v.x;
+		data_[ 1 ] = data_[ 1 ] && v.y;
 	}
 
 	// ||= Vector2 Template
@@ -1204,10 +1284,9 @@ protected: // Assignment: Logical
 	void
 	or_equals( Vector2< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 2u );
-		data_[ 0 ] = data_[ 0 ] || v[ 0 ];
-		data_[ 1 ] = data_[ 1 ] || v[ 1 ];
+		data_[ 0 ] = data_[ 0 ] || v.x;
+		data_[ 1 ] = data_[ 1 ] || v.y;
 	}
 
 	// &&= Vector3 Template
@@ -1216,11 +1295,10 @@ protected: // Assignment: Logical
 	void
 	and_equals( Vector3< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 3u );
-		data_[ 0 ] = data_[ 0 ] && v[ 0 ];
-		data_[ 1 ] = data_[ 1 ] && v[ 1 ];
-		data_[ 2 ] = data_[ 2 ] && v[ 2 ];
+		data_[ 0 ] = data_[ 0 ] && v.x;
+		data_[ 1 ] = data_[ 1 ] && v.y;
+		data_[ 2 ] = data_[ 2 ] && v.z;
 	}
 
 	// ||= Vector3 Template
@@ -1229,11 +1307,36 @@ protected: // Assignment: Logical
 	void
 	or_equals( Vector3< U > const & v )
 	{
-		assert( size_bounded() );
 		assert( size_ == 3u );
-		data_[ 0 ] = data_[ 0 ] || v[ 0 ];
-		data_[ 1 ] = data_[ 1 ] || v[ 1 ];
-		data_[ 2 ] = data_[ 2 ] || v[ 2 ];
+		data_[ 0 ] = data_[ 0 ] || v.x;
+		data_[ 1 ] = data_[ 1 ] || v.y;
+		data_[ 2 ] = data_[ 2 ] || v.z;
+	}
+
+	// &&= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	and_equals( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		data_[ 0 ] = data_[ 0 ] && v.x;
+		data_[ 1 ] = data_[ 1 ] && v.y;
+		data_[ 2 ] = data_[ 2 ] && v.z;
+		data_[ 3 ] = data_[ 3 ] && v.w;
+	}
+
+	// ||= Vector4 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	or_equals( Vector4< U > const & v )
+	{
+		assert( size_ == 4u );
+		data_[ 0 ] = data_[ 0 ] || v.x;
+		data_[ 1 ] = data_[ 1 ] || v.y;
+		data_[ 2 ] = data_[ 2 ] || v.z;
+		data_[ 3 ] = data_[ 3 ] || v.w;
 	}
 
 public: // Subscript
@@ -1609,16 +1712,6 @@ public: // Modifier
 		return *this;
 	}
 
-	// Assign Default Value to all Elements
-	inline
-	virtual
-	Array &
-	to_default()
-	{
-		if ( data_ ) std::fill_n( data_, size_, Traits::initial_array_value() );
-		return *this;
-	}
-
 	// Assign Zero to all Elements
 	//  Can't be virtual (for covariant return) or will try to instantiate for all value types
 	inline
@@ -1676,8 +1769,8 @@ public: // Modifier
 public: // Comparison: Predicate
 
 	// Array == Value
-	inline
 	friend
+	inline
 	bool
 	eq( Array const & a, T const & t )
 	{
@@ -1690,8 +1783,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value == Array
-	inline
 	friend
+	inline
 	bool
 	eq( T const & t, Array const & a )
 	{
@@ -1699,8 +1792,8 @@ public: // Comparison: Predicate
 	}
 
 	// Array != Value
-	inline
 	friend
+	inline
 	bool
 	ne( Array const & a, T const & t )
 	{
@@ -1708,8 +1801,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value != Array
-	inline
 	friend
+	inline
 	bool
 	ne( T const & t, Array const & a )
 	{
@@ -1717,8 +1810,8 @@ public: // Comparison: Predicate
 	}
 
 	// Array < Value
-	inline
 	friend
+	inline
 	bool
 	lt( Array const & a, T const & t )
 	{
@@ -1731,8 +1824,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value < Array
-	inline
 	friend
+	inline
 	bool
 	lt( T const & t, Array const & a )
 	{
@@ -1745,8 +1838,8 @@ public: // Comparison: Predicate
 	}
 
 	// Array <= Value
-	inline
 	friend
+	inline
 	bool
 	le( Array const & a, T const & t )
 	{
@@ -1759,8 +1852,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value <= Array
-	inline
 	friend
+	inline
 	bool
 	le( T const & t, Array const & a )
 	{
@@ -1773,8 +1866,8 @@ public: // Comparison: Predicate
 	}
 
 	// Array > Value
-	inline
 	friend
+	inline
 	bool
 	gt( Array const & a, T const & t )
 	{
@@ -1782,8 +1875,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value > Array
-	inline
 	friend
+	inline
 	bool
 	gt( T const & t, Array const & a )
 	{
@@ -1791,8 +1884,8 @@ public: // Comparison: Predicate
 	}
 
 	// Array >= Value
-	inline
 	friend
+	inline
 	bool
 	ge( Array const & a, T const & t )
 	{
@@ -1800,8 +1893,8 @@ public: // Comparison: Predicate
 	}
 
 	// Value >= Array
-	inline
 	friend
+	inline
 	bool
 	ge( T const & t, Array const & a )
 	{
@@ -1811,8 +1904,8 @@ public: // Comparison: Predicate
 public: // Comparison: Predicate: Any
 
 	// Any Array == Value
-	inline
 	friend
+	inline
 	bool
 	any_eq( Array const & a, T const & t )
 	{
@@ -1825,8 +1918,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value == Array
-	inline
 	friend
+	inline
 	bool
 	any_eq( T const & t, Array const & a )
 	{
@@ -1834,8 +1927,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Array != Value
-	inline
 	friend
+	inline
 	bool
 	any_ne( Array const & a, T const & t )
 	{
@@ -1843,8 +1936,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value != Array
-	inline
 	friend
+	inline
 	bool
 	any_ne( T const & t, Array const & a )
 	{
@@ -1852,8 +1945,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Array < Value
-	inline
 	friend
+	inline
 	bool
 	any_lt( Array const & a, T const & t )
 	{
@@ -1866,8 +1959,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value < Array
-	inline
 	friend
+	inline
 	bool
 	any_lt( T const & t, Array const & a )
 	{
@@ -1880,8 +1973,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Array <= Value
-	inline
 	friend
+	inline
 	bool
 	any_le( Array const & a, T const & t )
 	{
@@ -1894,8 +1987,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value <= Array
-	inline
 	friend
+	inline
 	bool
 	any_le( T const & t, Array const & a )
 	{
@@ -1908,8 +2001,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Array > Value
-	inline
 	friend
+	inline
 	bool
 	any_gt( Array const & a, T const & t )
 	{
@@ -1917,8 +2010,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value > Array
-	inline
 	friend
+	inline
 	bool
 	any_gt( T const & t, Array const & a )
 	{
@@ -1926,8 +2019,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Array >= Value
-	inline
 	friend
+	inline
 	bool
 	any_ge( Array const & a, T const & t )
 	{
@@ -1935,8 +2028,8 @@ public: // Comparison: Predicate: Any
 	}
 
 	// Any Value >= Array
-	inline
 	friend
+	inline
 	bool
 	any_ge( T const & t, Array const & a )
 	{
@@ -1946,8 +2039,8 @@ public: // Comparison: Predicate: Any
 public: // Comparison: Predicate: All
 
 	// All Array == Value
-	inline
 	friend
+	inline
 	bool
 	all_eq( Array const & a, T const & t )
 	{
@@ -1955,8 +2048,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value == Array
-	inline
 	friend
+	inline
 	bool
 	all_eq( T const & t, Array const & a )
 	{
@@ -1964,8 +2057,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Array != Value
-	inline
 	friend
+	inline
 	bool
 	all_ne( Array const & a, T const & t )
 	{
@@ -1973,8 +2066,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value != Array
-	inline
 	friend
+	inline
 	bool
 	all_ne( T const & t, Array const & a )
 	{
@@ -1982,8 +2075,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Array < Value
-	inline
 	friend
+	inline
 	bool
 	all_lt( Array const & a, T const & t )
 	{
@@ -1991,8 +2084,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value < Array
-	inline
 	friend
+	inline
 	bool
 	all_lt( T const & t, Array const & a )
 	{
@@ -2000,8 +2093,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Array <= Value
-	inline
 	friend
+	inline
 	bool
 	all_le( Array const & a, T const & t )
 	{
@@ -2009,8 +2102,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value <= Array
-	inline
 	friend
+	inline
 	bool
 	all_le( T const & t, Array const & a )
 	{
@@ -2018,8 +2111,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Array > Value
-	inline
 	friend
+	inline
 	bool
 	all_gt( Array const & a, T const & t )
 	{
@@ -2027,8 +2120,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value > Array
-	inline
 	friend
+	inline
 	bool
 	all_gt( T const & t, Array const & a )
 	{
@@ -2036,8 +2129,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Array >= Value
-	inline
 	friend
+	inline
 	bool
 	all_ge( Array const & a, T const & t )
 	{
@@ -2045,8 +2138,8 @@ public: // Comparison: Predicate: All
 	}
 
 	// All Value >= Array
-	inline
 	friend
+	inline
 	bool
 	all_ge( T const & t, Array const & a )
 	{
@@ -2056,8 +2149,8 @@ public: // Comparison: Predicate: All
 public: // Comparison: Count
 
 	// Count Array == Value
-	inline
 	friend
+	inline
 	size_type
 	count_eq( Array const & a, T const & t )
 	{
@@ -2071,8 +2164,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value == Array
-	inline
 	friend
+	inline
 	size_type
 	count_eq( T const & t, Array const & a )
 	{
@@ -2080,8 +2173,8 @@ public: // Comparison: Count
 	}
 
 	// Count Array != Value
-	inline
 	friend
+	inline
 	size_type
 	count_ne( Array const & a, T const & t )
 	{
@@ -2095,8 +2188,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value != Array
-	inline
 	friend
+	inline
 	size_type
 	count_ne( T const & t, Array const & a )
 	{
@@ -2104,8 +2197,8 @@ public: // Comparison: Count
 	}
 
 	// Count Array < Value
-	inline
 	friend
+	inline
 	size_type
 	count_lt( Array const & a, T const & t )
 	{
@@ -2119,8 +2212,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value < Array
-	inline
 	friend
+	inline
 	size_type
 	count_lt( T const & t, Array const & a )
 	{
@@ -2128,8 +2221,8 @@ public: // Comparison: Count
 	}
 
 	// Count Array <= Value
-	inline
 	friend
+	inline
 	size_type
 	count_le( Array const & a, T const & t )
 	{
@@ -2143,8 +2236,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value <= Array
-	inline
 	friend
+	inline
 	size_type
 	count_le( T const & t, Array const & a )
 	{
@@ -2152,8 +2245,8 @@ public: // Comparison: Count
 	}
 
 	// Count Array > Value
-	inline
 	friend
+	inline
 	size_type
 	count_gt( Array const & a, T const & t )
 	{
@@ -2167,8 +2260,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value > Array
-	inline
 	friend
+	inline
 	size_type
 	count_gt( T const & t, Array const & a )
 	{
@@ -2176,8 +2269,8 @@ public: // Comparison: Count
 	}
 
 	// Count Array >= Value
-	inline
 	friend
+	inline
 	size_type
 	count_ge( Array const & a, T const & t )
 	{
@@ -2191,8 +2284,8 @@ public: // Comparison: Count
 	}
 
 	// Count Value >= Array
-	inline
 	friend
+	inline
 	size_type
 	count_ge( T const & t, Array const & a )
 	{
@@ -2202,8 +2295,8 @@ public: // Comparison: Count
 protected: // Comparison: Predicate
 
 	// Array == Array
-	inline
 	friend
+	inline
 	bool
 	eq( Array const & a, Array const & b )
 	{
@@ -2217,8 +2310,8 @@ protected: // Comparison: Predicate
 	}
 
 	// Array != Array
-	inline
 	friend
+	inline
 	bool
 	ne( Array const & a, Array const & b )
 	{
@@ -2226,8 +2319,8 @@ protected: // Comparison: Predicate
 	}
 
 	// Array < Array
-	inline
 	friend
+	inline
 	bool
 	lt( Array const & a, Array const & b )
 	{
@@ -2241,8 +2334,8 @@ protected: // Comparison: Predicate
 	}
 
 	// Array <= Array
-	inline
 	friend
+	inline
 	bool
 	le( Array const & a, Array const & b )
 	{
@@ -2256,8 +2349,8 @@ protected: // Comparison: Predicate
 	}
 
 	// Array > Array
-	inline
 	friend
+	inline
 	bool
 	gt( Array const & a, Array const & b )
 	{
@@ -2265,8 +2358,8 @@ protected: // Comparison: Predicate
 	}
 
 	// Array >= Array
-	inline
 	friend
+	inline
 	bool
 	ge( Array const & a, Array const & b )
 	{
@@ -2276,8 +2369,8 @@ protected: // Comparison: Predicate
 protected: // Comparison: Predicate: Any
 
 	// Any Array == Array
-	inline
 	friend
+	inline
 	bool
 	any_eq( Array const & a, Array const & b )
 	{
@@ -2292,8 +2385,8 @@ protected: // Comparison: Predicate: Any
 	}
 
 	// Any Array != Array
-	inline
 	friend
+	inline
 	bool
 	any_ne( Array const & a, Array const & b )
 	{
@@ -2301,8 +2394,8 @@ protected: // Comparison: Predicate: Any
 	}
 
 	// Any Array < Array
-	inline
 	friend
+	inline
 	bool
 	any_lt( Array const & a, Array const & b )
 	{
@@ -2317,8 +2410,8 @@ protected: // Comparison: Predicate: Any
 	}
 
 	// Any Array <= Array
-	inline
 	friend
+	inline
 	bool
 	any_le( Array const & a, Array const & b )
 	{
@@ -2333,8 +2426,8 @@ protected: // Comparison: Predicate: Any
 	}
 
 	// Any Array > Array
-	inline
 	friend
+	inline
 	bool
 	any_gt( Array const & a, Array const & b )
 	{
@@ -2342,8 +2435,8 @@ protected: // Comparison: Predicate: Any
 	}
 
 	// Any Array >= Array
-	inline
 	friend
+	inline
 	bool
 	any_ge( Array const & a, Array const & b )
 	{
@@ -2353,8 +2446,8 @@ protected: // Comparison: Predicate: Any
 protected: // Comparison: Predicate: All
 
 	// All Array == Array
-	inline
 	friend
+	inline
 	bool
 	all_eq( Array const & a, Array const & b )
 	{
@@ -2362,8 +2455,8 @@ protected: // Comparison: Predicate: All
 	}
 
 	// All Array != Array
-	inline
 	friend
+	inline
 	bool
 	all_ne( Array const & a, Array const & b )
 	{
@@ -2371,8 +2464,8 @@ protected: // Comparison: Predicate: All
 	}
 
 	// All Array < Array
-	inline
 	friend
+	inline
 	bool
 	all_lt( Array const & a, Array const & b )
 	{
@@ -2380,8 +2473,8 @@ protected: // Comparison: Predicate: All
 	}
 
 	// All Array <= Array
-	inline
 	friend
+	inline
 	bool
 	all_le( Array const & a, Array const & b )
 	{
@@ -2389,8 +2482,8 @@ protected: // Comparison: Predicate: All
 	}
 
 	// All Array > Array
-	inline
 	friend
+	inline
 	bool
 	all_gt( Array const & a, Array const & b )
 	{
@@ -2398,8 +2491,8 @@ protected: // Comparison: Predicate: All
 	}
 
 	// All Array >= Array
-	inline
 	friend
+	inline
 	bool
 	all_ge( Array const & a, Array const & b )
 	{
@@ -2409,8 +2502,8 @@ protected: // Comparison: Predicate: All
 protected: // Comparison: Count
 
 	// Count Array == Array
-	inline
 	friend
+	inline
 	size_type
 	count_eq( Array const & a, Array const & b )
 	{
@@ -2426,8 +2519,8 @@ protected: // Comparison: Count
 	}
 
 	// Count Array != Array
-	inline
 	friend
+	inline
 	size_type
 	count_ne( Array const & a, Array const & b )
 	{
@@ -2443,8 +2536,8 @@ protected: // Comparison: Count
 	}
 
 	// Count Array < Array
-	inline
 	friend
+	inline
 	size_type
 	count_lt( Array const & a, Array const & b )
 	{
@@ -2460,8 +2553,8 @@ protected: // Comparison: Count
 	}
 
 	// Count Array <= Array
-	inline
 	friend
+	inline
 	size_type
 	count_le( Array const & a, Array const & b )
 	{
@@ -2477,8 +2570,8 @@ protected: // Comparison: Count
 	}
 
 	// Count Array > Array
-	inline
 	friend
+	inline
 	size_type
 	count_gt( Array const & a, Array const & b )
 	{
@@ -2486,8 +2579,8 @@ protected: // Comparison: Count
 	}
 
 	// Count Array >= Array
-	inline
 	friend
+	inline
 	size_type
 	count_ge( Array const & a, Array const & b )
 	{
@@ -2497,8 +2590,8 @@ protected: // Comparison: Count
 protected: // Comparison: Elemental
 
 	// Array == Array
-	inline
 	friend
+	inline
 	void
 	eq_elemental( Array const & a, Array const & b, Array< bool > & r )
 	{
@@ -2510,8 +2603,8 @@ protected: // Comparison: Elemental
 	}
 
 	// Array != Array
-	inline
 	friend
+	inline
 	void
 	ne_elemental( Array const & a, Array const & b, Array< bool > & r )
 	{
@@ -2523,8 +2616,8 @@ protected: // Comparison: Elemental
 	}
 
 	// Array < Array
-	inline
 	friend
+	inline
 	void
 	lt_elemental( Array const & a, Array const & b, Array< bool > & r )
 	{
@@ -2536,8 +2629,8 @@ protected: // Comparison: Elemental
 	}
 
 	// Array <= Array
-	inline
 	friend
+	inline
 	void
 	le_elemental( Array const & a, Array const & b, Array< bool > & r )
 	{
@@ -2549,8 +2642,8 @@ protected: // Comparison: Elemental
 	}
 
 	// Array > Array
-	inline
 	friend
+	inline
 	void
 	gt_elemental( Array const & a, Array const & b, Array< bool > & r )
 	{
@@ -2562,8 +2655,8 @@ protected: // Comparison: Elemental
 	}
 
 	// Array >= Array
-	inline
 	friend
+	inline
 	void
 	ge_elemental( Array const & a, Array const & b, Array< bool > & r )
 	{
@@ -2575,8 +2668,8 @@ protected: // Comparison: Elemental
 	}
 
 	// Array == Value
-	inline
 	friend
+	inline
 	void
 	eq_elemental( Array const & a, T const & t, Array< bool > & r )
 	{
@@ -2587,8 +2680,8 @@ protected: // Comparison: Elemental
 	}
 
 	// Array != Value
-	inline
 	friend
+	inline
 	void
 	ne_elemental( Array const & a, T const & t, Array< bool > & r )
 	{
@@ -2599,8 +2692,8 @@ protected: // Comparison: Elemental
 	}
 
 	// Array < Value
-	inline
 	friend
+	inline
 	void
 	lt_elemental( Array const & a, T const & t, Array< bool > & r )
 	{
@@ -2611,8 +2704,8 @@ protected: // Comparison: Elemental
 	}
 
 	// Array <= Value
-	inline
 	friend
+	inline
 	void
 	le_elemental( Array const & a, T const & t, Array< bool > & r )
 	{
@@ -2623,8 +2716,8 @@ protected: // Comparison: Elemental
 	}
 
 	// Array > Value
-	inline
 	friend
+	inline
 	void
 	gt_elemental( Array const & a, T const & t, Array< bool > & r )
 	{
@@ -2635,8 +2728,8 @@ protected: // Comparison: Elemental
 	}
 
 	// Array >= Value
-	inline
 	friend
+	inline
 	void
 	ge_elemental( Array const & a, T const & t, Array< bool > & r )
 	{
@@ -2647,8 +2740,8 @@ protected: // Comparison: Elemental
 	}
 
 	// Value == Array
-	inline
 	friend
+	inline
 	void
 	eq_elemental( T const & t, Array const & b, Array< bool > & r )
 	{
@@ -2659,8 +2752,8 @@ protected: // Comparison: Elemental
 	}
 
 	// Value != Array
-	inline
 	friend
+	inline
 	void
 	ne_elemental( T const & t, Array const & b, Array< bool > & r )
 	{
@@ -2671,8 +2764,8 @@ protected: // Comparison: Elemental
 	}
 
 	// Value < Array
-	inline
 	friend
+	inline
 	void
 	lt_elemental( T const & t, Array const & b, Array< bool > & r )
 	{
@@ -2683,8 +2776,8 @@ protected: // Comparison: Elemental
 	}
 
 	// Value <= Array
-	inline
 	friend
+	inline
 	void
 	le_elemental( T const & t, Array const & b, Array< bool > & r )
 	{
@@ -2695,8 +2788,8 @@ protected: // Comparison: Elemental
 	}
 
 	// Value > Array
-	inline
 	friend
+	inline
 	void
 	gt_elemental( T const & t, Array const & b, Array< bool > & r )
 	{
@@ -2707,8 +2800,8 @@ protected: // Comparison: Elemental
 	}
 
 	// Value >= Array
-	inline
 	friend
+	inline
 	void
 	ge_elemental( T const & t, Array const & b, Array< bool > & r )
 	{

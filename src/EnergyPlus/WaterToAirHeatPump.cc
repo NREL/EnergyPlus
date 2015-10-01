@@ -172,7 +172,7 @@ namespace WaterToAirHeatPump {
 		}
 
 		if ( CompIndex == 0 ) {
-			HPNum = FindItemInList( CompName, WatertoAirHP.Name(), NumWatertoAirHPs );
+			HPNum = FindItemInList( CompName, WatertoAirHP );
 			if ( HPNum == 0 ) {
 				ShowFatalError( "WaterToAir HP not found=" + CompName );
 			}
@@ -320,7 +320,7 @@ namespace WaterToAirHeatPump {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), WatertoAirHP.Name(), HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), WatertoAirHP, HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -395,14 +395,12 @@ namespace WaterToAirHeatPump {
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Water Nodes" );
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 6 ), AlphArray( 7 ), "Air Nodes" );
 
+			// Setup Report variables for the detailed cooling Heat Pump
+			// CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation"
 			SetupOutputVariable( "Cooling Coil Electric Energy [J]", WatertoAirHP( HPNum ).Energy, "System", "Summed", WatertoAirHP( HPNum ).Name, _, "Electric", "Cooling", _, "System" );
-
 			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", WatertoAirHP( HPNum ).EnergyLoadTotal, "System", "Summed", WatertoAirHP( HPNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-
 			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", WatertoAirHP( HPNum ).EnergySensible, "System", "Summed", WatertoAirHP( HPNum ).Name );
-
 			SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", WatertoAirHP( HPNum ).EnergyLatent, "System", "Summed", WatertoAirHP( HPNum ).Name );
-
 			SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Energy [J]", WatertoAirHP( HPNum ).EnergySource, "System", "Summed", WatertoAirHP( HPNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
 
 			// save the design source side flow rate for use by plant loop sizing algorithms
@@ -429,7 +427,7 @@ namespace WaterToAirHeatPump {
 			IsNotOK = false;
 			IsBlank = false;
 
-			VerifyName( AlphArray( 1 ), WatertoAirHP.Name(), HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), WatertoAirHP, HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -499,10 +497,9 @@ namespace WaterToAirHeatPump {
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Water Nodes" );
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 6 ), AlphArray( 7 ), "Air Nodes" );
 
+			// CurrentModuleObject = "Coil:Heating:WaterToAirHeatPump:ParameterEstimation"
 			SetupOutputVariable( "Heating Coil Electric Energy [J]", WatertoAirHP( HPNum ).Energy, "System", "Summed", WatertoAirHP( HPNum ).Name, _, "Electric", "Heating", _, "System" );
-
 			SetupOutputVariable( "Heating Coil Heating Energy [J]", WatertoAirHP( HPNum ).EnergyLoadTotal, "System", "Summed", WatertoAirHP( HPNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-
 			SetupOutputVariable( "Heating Coil Source Side Heat Transfer Energy [J]", WatertoAirHP( HPNum ).EnergySource, "System", "Summed", WatertoAirHP( HPNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
 
 			// save the design source side flow rate for use by plant loop sizing algorithms
@@ -2330,7 +2327,7 @@ namespace WaterToAirHeatPump {
 			GetCoilsInputFlag = false;
 		}
 
-		IndexNum = FindItemInList( CoilName, WatertoAirHP.Name(), NumWatertoAirHPs );
+		IndexNum = FindItemInList( CoilName, WatertoAirHP );
 
 		if ( IndexNum == 0 ) {
 			ShowSevereError( "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
@@ -2397,7 +2394,7 @@ namespace WaterToAirHeatPump {
 		}
 
 		if ( SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) || SameString( CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) ) {
-			WhichCoil = FindItemInList( CoilName, WatertoAirHP.Name(), NumWatertoAirHPs );
+			WhichCoil = FindItemInList( CoilName, WatertoAirHP );
 			if ( WhichCoil != 0 ) {
 				if ( SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) ) {
 					CoilCapacity = WatertoAirHP( WhichCoil ).HeatingCapacity;
@@ -2473,7 +2470,7 @@ namespace WaterToAirHeatPump {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, WatertoAirHP.Name(), NumWatertoAirHPs );
+		WhichCoil = FindItemInList( CoilName, WatertoAirHP );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = WatertoAirHP( WhichCoil ).AirInletNodeNum;
 		}
@@ -2542,7 +2539,7 @@ namespace WaterToAirHeatPump {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, WatertoAirHP.Name(), NumWatertoAirHPs );
+		WhichCoil = FindItemInList( CoilName, WatertoAirHP );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = WatertoAirHP( WhichCoil ).AirOutletNodeNum;
 		}

@@ -62,7 +62,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 Version,
-    8.3; !- Version Identifier
+    8.4; !- Version Identifier
 
 
 !- =========== ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
@@ -562,10 +562,9 @@ Material,
     836,                     !- Soil Specific Heat {J/kg-K}
     30,                      !- Soil Moisture Content Volume Fraction {percent}
     50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
-    15.5, !- Kusuda-Achenbach Average Surface Temperature {C}
-    12.8, !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
-    17.3, !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
-    0.5,  !- Evapotranspiration Ground Cover Parameter
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach,    !- Type of Undisturbed Ground Temperature Model
+    KATemps,                 !- Name of Undisturbed Ground Temperature Model
+    0.5,                     !- Evapotranspiration Ground Cover Parameter
     BasementFloorOSCM,       !- Name of Basement Floor Boundary Condition Model
     Yes,                     !- Basement Horizontal Underfloor Insulation Present (Yes/No)
     Basement Insulation,     !- Basement Horizontal Insulation Underfloor Material Name
@@ -577,6 +576,15 @@ Material,
     Basement Insulation,     !- Basement Wall Vertical Insulation Material Name
     2.3,                     !- Vertical insulation depth from surface (m)
     timestep;                !- Domain Update interval. (Timestep, Hourly);
+    
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach,
+    KATemps,                 !- Name of object
+    1.8,                     !- Soil Thermal Conductivity {W/m-K}
+    3200,                    !- Soil Density {kg/m3}
+    836,                     !- Soil Specific Heat {J/kg-K}
+    15.5,                    !- Annual average surface temperature {C}
+    12.8,                    !- Annual amplitude of surface temperature {delta C}
+    17.3;                    !- Phase shift of minimum surface temperature {days}
 
 !- =========== ALL OBJECTS IN CLASS: OUTPUT:VARIABLEDICTIONARY ===========
 

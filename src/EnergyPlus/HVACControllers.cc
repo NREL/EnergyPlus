@@ -288,7 +288,7 @@ namespace HVACControllers {
 		}
 
 		if ( ControllerIndex == 0 ) {
-			ControlNum = FindItemInList( ControllerName, ControllerProps.ControllerName(), NumControllers );
+			ControlNum = FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
 			if ( ControlNum == 0 ) {
 				ShowFatalError( "ManageControllers: Invalid controller=" + ControllerName + ". The only valid controller type for an AirLoopHVAC is Controller:WaterCoil." );
 			}
@@ -496,11 +496,13 @@ namespace HVACControllers {
 		using WaterCoils::CheckForSensorAndSetPointNode;
 		using MixedAir::CheckForControllerWaterCoil;
 		using SetPointManager::NodeHasSPMCtrlVarType;
+		using SetPointManager::ResetHumidityRatioCtrlVarType;
 		using SetPointManager::iCtrlVarType_Temp;
 		using SetPointManager::iCtrlVarType_MaxHumRat;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::iHumidityRatioMaxSetPoint;
+
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -581,7 +583,7 @@ namespace HVACControllers {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), ControllerProps.ControllerName(), Num - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), ControllerProps, &ControllerPropsType::ControllerName, Num - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -632,6 +634,10 @@ namespace HVACControllers {
 				}
 
 				if ( ControllerProps( Num ).SensedNode > 0 ) {
+
+					if ( ControllerProps( Num ).ControlVar == iHumidityRatio || ControllerProps( Num ).ControlVar == iTemperatureAndHumidityRatio ) {
+						ResetHumidityRatioCtrlVarType( ControllerProps( Num ).SensedNode );
+					}					
 					CheckForSensorAndSetPointNode( ControllerProps( Num ).SensedNode, ControllerProps( Num ).ControlVar, NodeNotFound );
 
 					if ( NodeNotFound ) {
@@ -3364,7 +3370,7 @@ Label100: ;
 					for ( ContrlNum = 1; ContrlNum <= PrimaryAirSystem( AirSysNum ).NumControllers; ++ContrlNum ) {
 						if ( SameString( PrimaryAirSystem( AirSysNum ).ControllerType( ContrlNum ), "CONTROLLER:WATERCOIL" ) ) {
 							++SensedNodeIndex;
-							foundControl = FindItemInList( PrimaryAirSystem( AirSysNum ).ControllerName( ContrlNum ), ControllerProps.ControllerName(), NumControllers );
+							foundControl = FindItemInList( PrimaryAirSystem( AirSysNum ).ControllerName( ContrlNum ), ControllerProps, &ControllerPropsType::ControllerName );
 							if ( foundControl > 0 ) {
 								ContrlSensedNodeNums( 1, SensedNodeIndex ) = ControllerProps( foundControl ).SensedNode;
 							}
@@ -3513,7 +3519,7 @@ Label100: ;
 		}
 
 		NodeNotFound = true;
-		ControlNum = FindItemInList( ControllerName, ControllerProps.ControllerName(), NumControllers );
+		ControlNum = FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
 		if ( ControlNum > 0 && ControlNum <= NumControllers ) {
 			WaterInletNodeNum = ControllerProps( ControlNum ).ActuatedNode;
 			NodeNotFound = false;
@@ -3525,7 +3531,7 @@ Label100: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

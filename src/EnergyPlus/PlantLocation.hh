@@ -6,10 +6,10 @@ namespace EnergyPlus {
 struct PlantLocation
 {
 	// Members
-	int LoopNum;
-	int LoopSideNum;
-	int BranchNum;
-	int CompNum;
+	int loopNum;
+	int loopSideNum;
+	int branchNum;
+	int compNum;
 
 	// Default Constructor
 	PlantLocation() :
@@ -17,21 +17,14 @@ struct PlantLocation
 		LoopSideNum( 0 ),
 		BranchNum( 0 ),
 		CompNum( 0 )
-	{}
 
-	// Member Constructor
-	PlantLocation(
-		int const LoopNum,
-		int const LoopSideNum,
-		int const BranchNum,
-		int const CompNum
-	) :
-		LoopNum( LoopNum ),
-		LoopSideNum( LoopSideNum ),
-		BranchNum( BranchNum ),
-		CompNum( CompNum )
+	// Default Constructor
+	PlantLocation() :
+		loopNum( 0 ),
+		loopSideNum( 0 ),
+		branchNum( 0 ),
+		compNum( 0 )
 	{}
-
 };
 
 }

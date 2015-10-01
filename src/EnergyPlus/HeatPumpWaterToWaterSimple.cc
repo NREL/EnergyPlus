@@ -82,7 +82,10 @@ namespace HeatPumpWaterToWaterSimple {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumGSHPs( 0 ); // Number of GSHPs specified in input
-
+	namespace {
+		bool GetInputFlag( true ); // then TRUE, calls subroutine to read input file.
+		bool InitWatertoWaterHPOneTimeFlag( true );
+	}
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Driver/Manager Routines
@@ -102,6 +105,14 @@ namespace HeatPumpWaterToWaterSimple {
 	// MODULE SUBROUTINES:
 
 	// Functions
+	void
+	clear_state(){
+		NumGSHPs = 0;
+		GetInputFlag = true;
+		InitWatertoWaterHPOneTimeFlag = true;
+		GSHP.deallocate();
+		GSHPReport.deallocate();
+	}
 
 	void
 	SimHPWatertoWaterSimple(
@@ -152,7 +163,6 @@ namespace HeatPumpWaterToWaterSimple {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // then TRUE, calls subroutine to read input file.
 
 		//Get input from IDF
 		if ( GetInputFlag ) {
@@ -161,7 +171,7 @@ namespace HeatPumpWaterToWaterSimple {
 		}
 
 		if ( InitLoopEquip ) {
-			GSHPNum = FindItemInList( GSHPName, GSHP.Name(), NumGSHPs );
+			GSHPNum = FindItemInList( GSHPName, GSHP );
 			if ( GSHPNum != 0 ) { // if 0, fall through to next
 				if ( GSHPTypeNum == TypeOf_HPWaterEFCooling ) {
 					MinCap = 0.0;
@@ -296,7 +306,7 @@ namespace HeatPumpWaterToWaterSimple {
 			GetObjectItem( HPEqFitCoolingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			IsNotOK = false;
 			IsBlank = true;
-			VerifyName( AlphArray( 1 ), GSHP.Name(), HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
+			VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -348,7 +358,7 @@ namespace HeatPumpWaterToWaterSimple {
 			GetObjectItem( HPEqFitHeatingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			IsNotOK = false;
 			IsBlank = true;
-			VerifyName( AlphArray( 1 ), GSHP.Name(), HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
+			VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -408,6 +418,10 @@ namespace HeatPumpWaterToWaterSimple {
 			errFlag = false;
 			ScanPlantLoopsForObject( GSHP( GSHPNum ).Name, GSHP( GSHPNum ).WWHPPlantTypeOfNum, GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).SourceLoopSideNum, GSHP( GSHPNum ).SourceBranchNum, GSHP( GSHPNum ).SourceCompNum, _, _, _, GSHP( GSHPNum ).SourceSideInletNodeNum, _, errFlag );
 			ScanPlantLoopsForObject( GSHP( GSHPNum ).Name, GSHP( GSHPNum ).WWHPPlantTypeOfNum, GSHP( GSHPNum ).LoadLoopNum, GSHP( GSHPNum ).LoadLoopSideNum, GSHP( GSHPNum ).LoadBranchNum, GSHP( GSHPNum ).LoadCompNum, _, _, _, GSHP( GSHPNum ).LoadSideInletNodeNum, _, errFlag );
+
+			if ( ! errFlag ) {
+				PlantUtilities::InterConnectTwoPlantLoopSides( GSHP( GSHPNum ).LoadLoopNum,  GSHP( GSHPNum ).LoadLoopSideNum,  GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).SourceLoopSideNum, GSHP( GSHPNum ).WWHPPlantTypeOfNum, true );
+			}
 
 			if ( errFlag ) {
 				ShowFatalError( "GetWatertoWaterHPInput: Program terminated on scan for loop data" );
@@ -480,15 +494,15 @@ namespace HeatPumpWaterToWaterSimple {
 		static Real64 CurrentSimTime( 0.0 ); // Current Simulation Time
 		static Real64 PrevSimTime( 0.0 ); // Previous Simulation Time
 		static Array1D_bool MyPlanScanFlag;
-		static bool MyOneTimeFlag( true );
+
 		int LoopNum;
 		int LoopSideNum;
 		Real64 rho; // local fluid density
 
-		if ( MyOneTimeFlag ) {
+		if ( InitWatertoWaterHPOneTimeFlag ) {
 			MyPlanScanFlag.allocate( NumGSHPs );
 			MyEnvrnFlag.allocate( NumGSHPs );
-			MyOneTimeFlag = false;
+			InitWatertoWaterHPOneTimeFlag = false;
 			MyEnvrnFlag = true;
 			MyPlanScanFlag = true;
 		}
@@ -577,7 +591,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 			SetComponentFlowRate( GSHPReport( GSHPNum ).LoadSideMassFlowRate, GSHP( GSHPNum ).LoadSideInletNodeNum, GSHP( GSHPNum ).LoadSideOutletNodeNum, GSHP( GSHPNum ).LoadLoopNum, GSHP( GSHPNum ).LoadLoopSideNum, GSHP( GSHPNum ).LoadBranchNum, GSHP( GSHPNum ).LoadCompNum );
 			SetComponentFlowRate( GSHPReport( GSHPNum ).SourceSideMassFlowRate, GSHP( GSHPNum ).SourceSideInletNodeNum, GSHP( GSHPNum ).SourceSideOutletNodeNum, GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).SourceLoopSideNum, GSHP( GSHPNum ).SourceBranchNum, GSHP( GSHPNum ).SourceCompNum );
-
+			PlantUtilities::PullCompInterconnectTrigger( GSHP( GSHPNum ).LoadLoopNum, GSHP( GSHPNum ).LoadLoopSideNum, GSHP( GSHPNum ).LoadBranchNum, GSHP( GSHPNum ).LoadCompNum , GSHP( GSHPNum ).CondMassFlowIndex, GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).LoadLoopSideNum, DataPlant::CriteriaType_MassFlowRate, GSHPReport( GSHPNum ).SourceSideMassFlowRate );
 			// Set flows if the heat pump is running
 		} else { // the heat pump must run
 
@@ -595,9 +609,10 @@ namespace HeatPumpWaterToWaterSimple {
 
 				SetComponentFlowRate( GSHPReport( GSHPNum ).LoadSideMassFlowRate, GSHP( GSHPNum ).LoadSideInletNodeNum, GSHP( GSHPNum ).LoadSideOutletNodeNum, GSHP( GSHPNum ).LoadLoopNum, GSHP( GSHPNum ).LoadLoopSideNum, GSHP( GSHPNum ).LoadBranchNum, GSHP( GSHPNum ).LoadCompNum );
 				SetComponentFlowRate( GSHPReport( GSHPNum ).SourceSideMassFlowRate, GSHP( GSHPNum ).SourceSideInletNodeNum, GSHP( GSHPNum ).SourceSideOutletNodeNum, GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).SourceLoopSideNum, GSHP( GSHPNum ).SourceBranchNum, GSHP( GSHPNum ).SourceCompNum );
-
+				PlantUtilities::PullCompInterconnectTrigger( GSHP( GSHPNum ).LoadLoopNum, GSHP( GSHPNum ).LoadLoopSideNum, GSHP( GSHPNum ).LoadBranchNum, GSHP( GSHPNum ).LoadCompNum , GSHP( GSHPNum ).CondMassFlowIndex, GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).LoadLoopSideNum, DataPlant::CriteriaType_MassFlowRate, GSHPReport( GSHPNum ).SourceSideMassFlowRate );
 				return;
 			}
+			PlantUtilities::PullCompInterconnectTrigger( GSHP( GSHPNum ).LoadLoopNum, GSHP( GSHPNum ).LoadLoopSideNum, GSHP( GSHPNum ).LoadBranchNum, GSHP( GSHPNum ).LoadCompNum , GSHP( GSHPNum ).CondMassFlowIndex, GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).LoadLoopSideNum, DataPlant::CriteriaType_MassFlowRate, GSHPReport( GSHPNum ).SourceSideMassFlowRate );
 		}
 
 		// Get inlet temps

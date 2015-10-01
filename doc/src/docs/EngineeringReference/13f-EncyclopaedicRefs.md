@@ -506,11 +506,11 @@ Table 81.  Nomenclature list for Fanger model
 
 Fanger developed the model based on the research he performed at Kansas State University and the Technical University of Denmark. Fanger used the seven-point form of a thermal sensation scale along with numerous experiments involving human subjects in various environments. He related the subjects in response to the variables, which influence the condition of thermal comfort. Fanger's model is based upon an energy analysis that takes into account all the modes of energy loss (L) from the body, including: the convection and radiant heat loss from the outer surface of the clothing, the heat loss by water vapor diffusion through the skin, the heat loss by evaporation of sweat from the skin surface, the latent and dry respiration heat loss and the heat transfer from the skin to the outer surface of the clothing. The model assumes that the person is thermally at steady state with his environment.
 
-<span>$M = L$</span>                                                                                     W/m<sup>2</sup>
+<span>\(M = L\)</span>                                                                                     W/m<sup>2</sup>
 
-<span>$L = {Q_{res}} + {Q_{dry}} + {E_{sk}} + W$</span>                                                         W/m<sup>2</sup>
+<span>\(L = {Q_{res}} + {Q_{dry}} + {E_{sk}} + W\)</span>                                                         W/m<sup>2</sup>
 
-<span>${Q_{res}} = {E_{res}} + {C_{res}} = 0.0023M(44 - {P_a}) + 0.0014M(34 - {T_a})$</span>     W/m<sup>2</sup>
+<span>\({Q_{res}} = {E_{res}} + {C_{res}} = 0.0023M(44 - {P_a}) + 0.0014M(34 - {T_a})\)</span>     W/m<sup>2</sup>
 
 LatRespHeatLoss = 0.0023\*ActLevel\*(44. - VapPress)
 
@@ -518,11 +518,11 @@ DryRespHeatLoss = 0.0014\*ActLevel\*(34.- AirTemp)
 
 RespHeatLoss = LatRespHeatLoss + DryRespHeatLoss
 
-<span>${Q_c} = {h_c} \times {f_{cl}}({T_{cl}} - {T_a})$</span>                                                               W/m<sup>2</sup>
+<span>\({Q_c} = {h_c} \times {f_{cl}}({T_{cl}} - {T_a})\)</span>                                                               W/m<sup>2</sup>
 
-<span>${Q_r} = {f_{eff}}{f_{cl}}\varepsilon \sigma ({T_{cla}}^4 - {T_{ra}}^4)$</span>                                                       W/m<sup>2</sup>
+<span>\({Q_r} = {f_{eff}}{f_{cl}}\varepsilon \sigma ({T_{cla}}^4 - {T_{ra}}^4)\)</span>                                                       W/m<sup>2</sup>
 
-<span>${Q_{dry}} = {Q_c} + {Q_r}$</span>                                                                         W/m<sup>2</sup>
+<span>\({Q_{dry}} = {Q_c} + {Q_r}\)</span>                                                                         W/m<sup>2</sup>
 
 ConvHeatLos = CloBodyRat\*Hc\*(CloSurfTemp - AirTemp)
 
@@ -532,13 +532,13 @@ RadHeatLoss = RadSurfEff\*CloBodyRat\*SkinEmiss\*StefanBoltz &
 
 DryHeatLoss = ConvHeatLoss + RadHeatLoss
 
-For<span>$H > 58.2$</span>, <span>${E_{rsw}} = 0.42(H - 58.2)$</span>                                      W/m<sup>2</sup>
+For<span>\(H > 58.2\)</span>, <span>\({E_{rsw}} = 0.42(H - 58.2)\)</span>                                      W/m<sup>2</sup>
 
-For <span>$H \le 58.2$</span>, <span>${E_{rsw}} = 0$</span>                                                           W/m<sup>2</sup>
+For <span>\(H \le 58.2\)</span>, <span>\({E_{rsw}} = 0\)</span>                                                           W/m<sup>2</sup>
 
-<span>${E_{diff}} = 0.68 \times 0.61({P_{sk}} - {P_a}) = 0.4148({P_{sk}} - {P_a})$</span>                        W/m<sup>2</sup>
+<span>\({E_{diff}} = 0.68 \times 0.61({P_{sk}} - {P_a}) = 0.4148({P_{sk}} - {P_a})\)</span>                        W/m<sup>2</sup>
 
-<span>${E_{sk}} = {E_{rsw}} + {E_{diff}}$</span>                                                                      W/m<sup>2</sup>
+<span>\({E_{sk}} = {E_{rsw}} + {E_{diff}}\)</span>                                                                      W/m<sup>2</sup>
 
 EvapHeatLossRegComf = 0.42\*(IntHeatProd - ActLevelConv)
 
@@ -556,11 +556,11 @@ Where,
 
 P<sub>sk</sub> is the saturated water vapor pressure at the skin temperature required to achieve the thermal comfort
 
-<span>${P_{sk}} = 1.92{T_{skr}} - 25.3$</span>                                                                Torr
+<span>\({P_{sk}} = 1.92{T_{skr}} - 25.3\)</span>                                                                Torr
 
 SatSkinVapPress = 1.92\*SkinTempComf - 25.3
 
-<span>${T_{skr}} = 35.7 - 0.028H$</span>                                                               °C
+<span>\({T_{skr}} = 35.7 - 0.028H\)</span>                                                               °C
 
 SkinTempComf = 35.7 - 0.028\*IntHeatProd
 
@@ -1018,11 +1018,11 @@ SkinMassRat = 0.0417737 + 0.7451832/(SkinBloodFlow + 0.585417)
 
 Furthermore, the model takes into account the deviations of the core, skin, and mean body temperature weighted by alpha from their respective setpoints. Thermoregulatory effector mechanisms (Regulatory sweating, skin blood flow, and shivering) are defined in terms of thermal signals from the core, skin and body (Doherty and Arens 1988).
 
-<span>$SI{G_{cr}} = {T_{cr}} - 36.8$</span>                                                                    °C
+<span>\(SI{G_{cr}} = {T_{cr}} - 36.8\)</span>                                                                    °C
 
-<span>$SI{G_{sk}} = {T_{sk}} - 33.7$</span>                                                                    °C
+<span>\(SI{G_{sk}} = {T_{sk}} - 33.7\)</span>                                                                    °C
 
-<span>$SI{G_b} = {T_b} - 36.49$</span>                                                                    °C
+<span>\(SI{G_b} = {T_b} - 36.49\)</span>                                                                    °C
 
 SkinThermSigWarm = SkinTemp - SkinTempSet
 
@@ -1036,7 +1036,7 @@ BodyThermSigWarm = AvgBodyTemp - AvgBodyTempSet
 
 BodyThermSigCold = AvgBodyTempSet-AvgBodyTemp
 
-<span>$SKBF = (6.3 + C{}_{dil} \times SI{G_{cr}})/(1 + {S_{tr}} \times ( - SI{G_{sk}}))$</span>                      L/hr•m<sup>2</sup>
+<span>\(SKBF = (6.3 + C{}_{dil} \times SI{G_{cr}})/(1 + {S_{tr}} \times ( - SI{G_{sk}}))\)</span>                      L/hr•m<sup>2</sup>
 
 VasodilationFac = SkinBloodFlowConst\*CoreWarmDelTemp
 
@@ -1044,11 +1044,11 @@ VasoconstrictFac = Str\*SkinColdDelTemp
 
 SkinBloodFlow = (6.3 + VasodilationFac)/(1. + VasoconstrictFac)
 
-<span>$S{W_{reg}} = {C_{sw}}SI{G_b}{e^{(SI{G_{sk}}/10.7)}}$</span>                                                       g/hr•m<sup>2</sup>
+<span>\(S{W_{reg}} = {C_{sw}}SI{G_b}{e^{(SI{G_{sk}}/10.7)}}\)</span>                                                       g/hr•m<sup>2</sup>
 
 RegSweat = SweatContConst\*BodyWarmDelTemp\*EXP(SkinWarmDelTemp/10.7)
 
-<span>${M_{shiv}} = 19.4( - SI{G_{cr}})( - SI{G_{sk}})$</span>                                                 W/m<sup>2</sup>
+<span>\({M_{shiv}} = 19.4( - SI{G_{cr}})( - SI{G_{sk}})\)</span>                                                 W/m<sup>2</sup>
 
 ShivResponse = 19.4\*SkinThermSigCold\*CoreThermSigCold
 
@@ -1056,13 +1056,13 @@ The latest version of the Pierce model (Fountain and Huizenga 1997) discusses th
 
 In the latest version of the model it is suggested that the classical Fanged PMV be modified by using ET\* or SET\* instead of the operative temperature. This gives a new index PMV\* which is proposed for dry or humid environments. It is also suggested that PMV\* is very responsive to the changes in vapor permeation efficiency of the occupants clothing.
 
-<span>$M = {M_{act}} + {M_{shiv}}$</span>                                                                     W/m<sup>2</sup>
+<span>\(M = {M_{act}} + {M_{shiv}}\)</span>                                                                     W/m<sup>2</sup>
 
 ActLevel = ActLevel + ActShiv
 
-<span>$L = {Q_{res}} + {Q_{dry}} + {E_{sk}} + W$</span>                                                         W/m<sup>2</sup>
+<span>\(L = {Q_{res}} + {Q_{dry}} + {E_{sk}} + W\)</span>                                                         W/m<sup>2</sup>
 
-<span>$\begin{array}{l}{Q_{res}} = {E_{res}} + {C_{res}} = 0.0023M(44 - {P_{a(torr)}}) + 0.0014M(34 - {T_a})\\ = 0.017251M(5.8662 - {P_{a(kPa)}}) + 0.0014M(34 - {T_a})\end{array}$</span>W/m<sup>2</sup>
+<span>\(\begin{array}{l}{Q_{res}} = {E_{res}} + {C_{res}} = 0.0023M(44 - {P_{a(torr)}}) + 0.0014M(34 - {T_a})\\ = 0.017251M(5.8662 - {P_{a(kPa)}}) + 0.0014M(34 - {T_a})\end{array}\)</span>W/m<sup>2</sup>
 
 LatRespHeatLoss = 0.017251\*ActLevel\*(5.8662 - VapPress)
 
@@ -1070,19 +1070,19 @@ DryRespHeatLoss = 0.0014\*ActLevel\*(34.- AirTemp)
 
 RespHeatLoss = LatRespHeatLoss + DryRespHeatLoss
 
-<span>${Q_c} = {h_c} \times {f_{cl}}({T_{cl}} - {T_a})$</span>                                                               W/m<sup>2</sup>
+<span>\({Q_c} = {h_c} \times {f_{cl}}({T_{cl}} - {T_a})\)</span>                                                               W/m<sup>2</sup>
 
-<span>${Q_r} = {h_r} \times {f_{cl}}({T_{cl}} - {T_r})$</span>                                                               W/m<sup>2</sup>
+<span>\({Q_r} = {h_r} \times {f_{cl}}({T_{cl}} - {T_r})\)</span>                                                               W/m<sup>2</sup>
 
-<span>${Q_{dry}} = {Q_c} + {Q_r}$</span>                                                                         W/m<sup>2</sup>
+<span>\({Q_{dry}} = {Q_c} + {Q_r}\)</span>                                                                         W/m<sup>2</sup>
 
 DryHeatLoss = CloBodyRat\*(Hc\*(CloSurfTemp - AirTemp) + Hr\*(CloSurfTemp - RadTemp))
 
 In Pierce model, the convective heat transfer coefficient, h<sub>c</sub>, varies with the air velocity around body and metabolic rate. The model uses the maximum value of following equations.
 
-<span>${h_c} = 8.6 \times {v^{_{0.53}}}$</span>                                                                           W/m<sup>2</sup>°C
+<span>\({h_c} = 8.6 \times {v^{_{0.53}}}\)</span>                                                                           W/m<sup>2</sup>°C
 
-<span>${h_c} = 5.66{(M/58.2 - 0.85)^{0.39}}$</span>                                                  W/m<sup>2</sup>°C
+<span>\({h_c} = 5.66{(M/58.2 - 0.85)^{0.39}}\)</span>                                                  W/m<sup>2</sup>°C
 
 Hc = 8.6\*AirVel\*\*0.53
 
@@ -1090,13 +1090,13 @@ HcAct = 5.66\*(ActMet - 0.85)\*\*0.39
 
 Also, in the model, the radiant heat transfer coefficient, h<sub>r</sub>, is defined by following equation (Doherty and Arens 1988):
 
-<span>${h_r} = 4. \times {f_{eff}}\varepsilon \sigma {(({T_{cl}} + {T_r})/2 + 273.15)^3}$</span>                                    W/m<sup>2</sup>°C
+<span>\({h_r} = 4. \times {f_{eff}}\varepsilon \sigma {(({T_{cl}} + {T_r})/2 + 273.15)^3}\)</span>                                    W/m<sup>2</sup>°C
 
 Hr = 4.\*RadSurfEff\*StefanBoltz\*((CloSurfTemp + RadTemp)/2. + TAbsConv)\*\*3
 
 In the Pierce model, T<sub>cl</sub> is estimated by each iteration using following equation:
 
-<span>${T_{cl}} = ({T_{sk}}/{I_{cl}} + {f_{cl}}({h_c}{T_a} - {h_r}{T_r}))/(1/{I_{cl}} + {f_{cl}}({h_c} + {h_r}))$</span>              °C
+<span>\({T_{cl}} = ({T_{sk}}/{I_{cl}} + {f_{cl}}({h_c}{T_a} - {h_r}{T_r}))/(1/{I_{cl}} + {f_{cl}}({h_c} + {h_r}))\)</span>              °C
 
 CloSurfTemp = (CloCond\*SkinTemp + CloBodyRat\*(Hc\*AirTemp &
 
@@ -1104,13 +1104,13 @@ CloSurfTemp = (CloCond\*SkinTemp + CloBodyRat\*(Hc\*AirTemp &
 
 Total evaporative heat loss from the skin, E<sub>sk</sub>, includes evaporation of water produced by regulatory sweating, E<sub>rsw</sub>, and evaporation of water vapor that diffuses through the skin surface, E<sub>diff</sub>.
 
-<span>${E_{sk}} = {E_{rsw}} + {E_{diff}}$</span>                                                                      W/m<sup>2</sup>
+<span>\({E_{sk}} = {E_{rsw}} + {E_{diff}}\)</span>                                                                      W/m<sup>2</sup>
 
 EvapHeatLoss = EvapHeatLossRegSweat + EvapHeatLossRegDiff
 
-<span>${E_{rsw}} = 0.68 \times S{W_{reg}}$</span>                                                                  W/m<sup>2</sup>
+<span>\({E_{rsw}} = 0.68 \times S{W_{reg}}\)</span>                                                                  W/m<sup>2</sup>
 
-<span>${E_{diff}} = {w_{diff}} \times {E_{\max }}$</span>                                                                    W/m<sup>2</sup>
+<span>\({E_{diff}} = {w_{diff}} \times {E_{\max }}\)</span>                                                                    W/m<sup>2</sup>
 
 RegHeatLoss = 0.68\*RegSweat
 
@@ -1124,7 +1124,7 @@ and,
 
 <div>$${w_{diff}} = 0.06(1 - {w_{rsw}})$$</div>
 
-<span>${E_{\max }} = {h_e}'({P_{sk}} - {P_a})$</span>                                                                 W/m<sup>2</sup>
+<span>\({E_{\max }} = {h_e}'({P_{sk}} - {P_a})\)</span>                                                                 W/m<sup>2</sup>
 
 <div>$${w_{rsw}} = {E_{rsw}}/{E_{\max }}$$</div>
 
@@ -1136,7 +1136,7 @@ SkinWetSweat = EvapHeatLossRegSweat/MaxEvapHeatLoss
 
 The Pierce model has one additional heat flow term describing the heat transfer between the internal core compartment and the outer skin shell (Doherty and Arens 1988).
 
-<span>${Q_{crsk}} = (5.28 + 1.163SKBF)({T_{cr}} - {T_{sk}})$</span>                                     W/m<sup>2</sup>
+<span>\({Q_{crsk}} = (5.28 + 1.163SKBF)({T_{cr}} - {T_{sk}})\)</span>                                     W/m<sup>2</sup>
 
 HeatFlow = (CoreTemp-SkinTemp)\*(5.28 + 1.163\*SkinBloodFlow)
 
@@ -1148,11 +1148,11 @@ Where
 
 Thus, individual heat balance equations for core and skin compartments are expressed using this term, Q<sub>c-s</sub>. New temperatures of core, skin and body are calculated by each iteration from rates of heat storage in the core and skin.
 
-<span>${S_{sk}} = {Q_{c - s}} - {Q_c} - {Q_r} - {E_{sk}}$</span>                                                        W/m<sup>2</sup>°C
+<span>\({S_{sk}} = {Q_{c - s}} - {Q_c} - {Q_r} - {E_{sk}}\)</span>                                                        W/m<sup>2</sup>°C
 
 SkinHeatStorage = HeatFlow - DryHeatLoss - EvapHeatLoss
 
-<span>${S_{cr}} = M - W - {Q_{res}} - {Q_{c - s}}$</span>                                                        W/m<sup>2</sup>°C
+<span>\({S_{cr}} = M - W - {Q_{res}} - {Q_{c - s}}\)</span>                                                        W/m<sup>2</sup>°C
 
 CoreHeatStorage = IntHeatProd - RespHeatLoss  - HeatFlow
 
@@ -1174,13 +1174,13 @@ PMVSET = ThermSensTransCoef\*(IntHeatProd - EvapHeatLossDiff  &
 
 Besides PMV\*, the Pierce Two Node Model uses the indices TSENS and DISC as predictors of thermal comfort. Where TSENS is the classical index used by the Pierce foundation, and is a function of the mean body temperature. DISC is defined as the relative thermoregulatory strain that is needed to bring about a state of comfort and thermal equilibrium. DISC is a function of the heat stress and heat strain in hot environments and equal to TSENS in cold environments. In summary, the Pierce Model, for our purposes, uses four thermal comfort indices; PMVET-a function of ET\*, PMVSET- a function of SET\*, TSENS and DISC.
 
-<span>${T_{b - c}} = (0.185/58.2)(M - W) + 36.313$</span>                                    °C
+<span>\({T_{b - c}} = (0.185/58.2)(M - W) + 36.313\)</span>                                    °C
 
-<span>${T_{b - h}} = (0.359/58.2)(M - W) + 36.664$</span>                                    °C
+<span>\({T_{b - h}} = (0.359/58.2)(M - W) + 36.664\)</span>                                    °C
 
-<span>$TSEN{S_c} = 0.68175({T_b} - {T_{b - c}})$</span>                                                  <span>${T_b} \le {T_{b - c}}$</span>
+<span>\(TSEN{S_c} = 0.68175({T_b} - {T_{b - c}})\)</span>                                                  <span>\({T_b} \le {T_{b - c}}\)</span>
 
-<span>$TSEN{S_h} = 4.7({T_b} - {T_{b - c}})/({T_{b - h}} - {T_{b - c}})$</span>                                      <span>${T_b} > {T_{b - c}}$</span>
+<span>\(TSEN{S_h} = 4.7({T_b} - {T_{b - c}})/({T_{b - h}} - {T_{b - c}})\)</span>                                      <span>\({T_b} > {T_{b - c}}\)</span>
 
 <div>$$DISC = 5.({E_{rsw}} - {E_{rsw - comf}})/({E_{\max }} - {E_{rsw - comf}} - {E_{diff}})$$</div>
 
@@ -1520,13 +1520,13 @@ The KSU two-node model is based on the changes that occur in the thermal conduct
 
 In this model metabolic heat production is generated in the core which exchanges energy with the environment by respiration and the skin exchanges energy by convection and radiation. In addition, body heat is dissipated through evaporation of sweat and/or water vapor diffusion through the skin. These principles are used in following passive system equations.
 
-<span>${W_{cr}}{C_{cr}}d{T_{cr}}/dt = M - W - {Q_{res}} - KS({T_{cr}} - {T_{sk}})$</span>                         W/m<sup>2</sup>
+<span>\({W_{cr}}{C_{cr}}d{T_{cr}}/dt = M - W - {Q_{res}} - KS({T_{cr}} - {T_{sk}})\)</span>                         W/m<sup>2</sup>
 
-<span>${W_{sk}}{C_{sk}}d{T_{sk}}/dt = KS({T_{cr}} - {T_{sk}}) - {Q_{dry}} - {E_{sk}}$</span>                               W/m<sup>2</sup>
+<span>\({W_{sk}}{C_{sk}}d{T_{sk}}/dt = KS({T_{cr}} - {T_{sk}}) - {Q_{dry}} - {E_{sk}}\)</span>                               W/m<sup>2</sup>
 
 Where
 
-<span>${Q_{res}} = {E_{res}} + {C_{res}} = 0.0023M(44 - {P_{a(torr)}}) + 0.0014M(34 - {T_a})$</span>               W/m<sup>2</sup>
+<span>\({Q_{res}} = {E_{res}} + {C_{res}} = 0.0023M(44 - {P_{a(torr)}}) + 0.0014M(34 - {T_a})\)</span>               W/m<sup>2</sup>
 
 LatRespHeatLoss = 0.0023\*ActLevelTot\*(44. - VapPress)
 
@@ -1534,15 +1534,15 @@ DryRespHeatLoss = 0.0014\*ActLevelTot\*(34. - AirTemp)
 
 RespHeatLoss = LatRespHeatLoss + DryRespHeatLoss
 
-<span>${Q_{dry}} = {Q_c} + {Q_r} = {h_{}}{f_{cl}}{F_{cl}}({T_{sk}} - {T_o})$</span>                                           W/m<sup>2</sup>
+<span>\({Q_{dry}} = {Q_c} + {Q_r} = {h_{}}{f_{cl}}{F_{cl}}({T_{sk}} - {T_o})\)</span>                                           W/m<sup>2</sup>
 
 DryHeatLoss = H\*CloBodyRat\*CloThermEff\*(SkinTemp - OpTemp)
 
-<span>$h = {h_c} + {h_r}$</span>                                                                               W/m<sup>2</sup>°C
+<span>\(h = {h_c} + {h_r}\)</span>                                                                               W/m<sup>2</sup>°C
 
-<span>${h_c} = 8.3\sqrt v $</span>                                                                              W/m<sup>2</sup>°C
+<span>\({h_c} = 8.3\sqrt v \)</span>                                                                              W/m<sup>2</sup>°C
 
-<span>${h_r} = 3.87 + 0.031{T_r}$</span>                                                                  W/m<sup>2</sup>°C
+<span>\({h_r} = 3.87 + 0.031{T_r}\)</span>                                                                  W/m<sup>2</sup>°C
 
 H = Hc + Hr
 
@@ -1550,19 +1550,19 @@ Hc = 8.3\*SQRT(AirVel)
 
 Hr = 3.87 + 0.031\*RadTemp
 
-<span>${T_o} = ({h_c}{T_a} + {h_r}{T_r})/({h_c} + {h_r})$</span>                                                      °C
+<span>\({T_o} = ({h_c}{T_a} + {h_r}{T_r})/({h_c} + {h_r})\)</span>                                                      °C
 
 OpTemp = (Hc\*AirTemp + Hr\*RadTemp)/H
 
 and
 
-For <span>${E_{sw}} \le {E_{\max }}$</span>, <span>${E_{sk}} = {E_{sw}} + (1 - {w_{rsw}}){E_{diff}}$</span>                               W/m<sup>2</sup>
+For <span>\({E_{sw}} \le {E_{\max }}\)</span>, <span>\({E_{sk}} = {E_{sw}} + (1 - {w_{rsw}}){E_{diff}}\)</span>                               W/m<sup>2</sup>
 
-For <span>${E_{sw}} > {E_{\max }}$</span>, <span>${E_{sk}} = {E_{\max }}$</span>                                                      W/m<sup>2</sup>
+For <span>\({E_{sw}} > {E_{\max }}\)</span>, <span>\({E_{sk}} = {E_{\max }}\)</span>                                                      W/m<sup>2</sup>
 
-<span>${E_{diff}} = 0.408({P_{sk}} - {P_a})$</span>                                                             W/m<sup>2</sup>
+<span>\({E_{diff}} = 0.408({P_{sk}} - {P_a})\)</span>                                                             W/m<sup>2</sup>
 
-<span>${E_{\max }} = 2.2{h_c}{F_{pcl}}({P_{sk}} - {P_a})$</span>                                                        W/m<sup>2</sup>
+<span>\({E_{\max }} = 2.2{h_c}{F_{pcl}}({P_{sk}} - {P_a})\)</span>                                                        W/m<sup>2</sup>
 
 EvapHeatLoss = SkinWetSweat\*EvapHeatLossMax+(1. - SkinWetSweat)\*EvapHeatLossDiff
 
@@ -1598,15 +1598,15 @@ DrySweatRate = ((WeighFac\*CoreSignalSweatMax &
 
 Where
 
-<span>$\phi  = 1.0$</span>                                                                                    <span>$w \le 0.4$</span>
+<span>\(\phi  = 1.0\)</span>                                                                                    <span>\(w \le 0.4\)</span>
 
-<span>$\phi  = 0.5 + 0.5\exp [ - 5.6(w - 0.4)]$</span>                                              <span>$w > 0.4$</span>
+<span>\(\phi  = 0.5 + 0.5\exp [ - 5.6(w - 0.4)]\)</span>                                              <span>\(w > 0.4\)</span>
 
 SweatSuppFac = 1.
 
 SweatSuppFac = 0.5 + 0.5\*EXP(-5.6\*SkinWetSignal)
 
-<span>${M_{shiv}} = 20(36.9 - {T_{cr}})(32.5 - {T_{sk}}) + 5(32.5 - {T_{sk}})$</span>                     W/m<sup>2</sup>
+<span>\({M_{shiv}} = 20(36.9 - {T_{cr}})(32.5 - {T_{sk}}) + 5(32.5 - {T_{sk}})\)</span>                     W/m<sup>2</sup>
 
 ShivResponse = 20.\*CoreSignalShivMax\*SkinSignalShivMax + 5.\*SkinSignalShivMax
 
@@ -1660,7 +1660,7 @@ In ASHRAE Standard 55, the monthly mean outdoor air temperature, used in the ada
 
 The model defines two comfort regions: 80% Acceptability, and 90% Acceptability. If the monthly mean outdoor air temperature is not within the specified domain, the model is not applicable.
 
-![](EngineeringReference/media/image6814.png)
+![](media/image6814.png)
 
 Figure 302. Acceptable operative temperature ranges for naturally conditioned spaces (ASHRAE Standard 55-2010)
 
@@ -1702,13 +1702,13 @@ The EN15251-2007 is similar to ASHRAE 55-2010, but with slightly different curve
 
 This weighted running average is calculated from a full annual weather file that must be specified for the simulation. This is used as an index for occupant adaptation to outdoor conditions, and determines the acceptability of indoor conditions. The model also accounts for people’s clothing adaptation in naturally conditioned spaces by relating the acceptable range of indoor temperatures to the outdoor climate, so it is not necessary to estimate the clothing values for the space. No humidity or air-speed limits are required when this option is used. The model defines three comfort regions: Category I (90%) Acceptability, Category II (80%) Acceptability, and Category III (65%) Acceptability. If T<sub>rm</sub> is not within the specified domain, the model is not applicable.
 
-![](EngineeringReference/media/image6819.png)
+![](media/image6819.png)
 
 Figure 303. Categories for European Standard EN15251-2007
 
 
 
-![](EngineeringReference/media/image6820.png)
+![](media/image6820.png)
 
 Figure 304. Acceptable operative temperature ranges for naturally conditioned spaces (CEN EN15251-2007)
 
@@ -1746,17 +1746,17 @@ In most building energy simulations, thermal comfort condition is calculated bas
 
 The model proposed to ASHRAE 55 is described below.
 
-For t<sub>a(out,6) </sub> &lt; -5°C, <span>${I_{cl}} = 1$</span>.00
+For t<sub>a(out,6) </sub> &lt; -5°C, <span>\({I_{cl}} = 1\)</span>.00
 
-For -5°C ≤ t<sub>a(out,6)</sub> &lt; 5°C, <span>${I_{cl}} = 0.818 - 0.0364{\rm{*}}{t_{a\left( {out,6} \right)}}$</span>
+For -5°C ≤ t<sub>a(out,6)</sub> &lt; 5°C, <span>\({I_{cl}} = 0.818 - 0.0364{\rm{*}}{t_{a\left( {out,6} \right)}}\)</span>
 
-For 5°C ≤ t<sub>a(out,6)</sub> &lt; 26°C <span>${I_{cl}} = {10^{\left( { - 0.1635 - 0.0066{\rm{*}}{t_{a\left( {out,6} \right)}}} \right)}}$</span>
+For 5°C ≤ t<sub>a(out,6)</sub> &lt; 26°C <span>\({I_{cl}} = {10^{\left( { - 0.1635 - 0.0066{\rm{*}}{t_{a\left( {out,6} \right)}}} \right)}}\)</span>
 
-or t<sub>a(out,6)</sub> ≥ 26°C <span>${I_{cl}} = 0.46$</span>
+or t<sub>a(out,6)</sub> ≥ 26°C <span>\({I_{cl}} = 0.46\)</span>
 
 Where, *I<sub>cl</sub>* is the clothing insulation value, *t<sub>a(out,\\ 6)</sub>* is the outdoor air temperature measured at 6 o’clock in the morning. The following figure illustrates the proposed clothing insulation model.
 
-![](EngineeringReference/media/image6825.png)
+![](media/image6825.png)
 
 Figure 305. Clothing Schedule Illustration
 
@@ -1764,7 +1764,7 @@ In the figure above, clothing insulation schedule for a fixed model (blue) typic
 
 The following figure illustrates the new clothing insulation model.
 
-![](EngineeringReference/media/image6826.png)
+![](media/image6826.png)
 
 Figure 306. Graphical representation of the proposed clothing insulation model
 
@@ -1907,7 +1907,7 @@ To simulate the Trombe wall, a very narrow zone is coupled to the desired surfac
 
 
 
-![](EngineeringReference/media/image6830.png)
+![](media/image6830.png)
 
 Figure 307. Building with Trombe Wall
 
@@ -1929,13 +1929,13 @@ An input file (PassiveTrombeWall.idf) is provided to demonstrate a sample sealed
 
 The resulting temperature profiles for winter and summer design days are plotted below.
 
-![](EngineeringReference/media/image6831.png)
+![](media/image6831.png)
 
 Figure 308. Passive Trombe Wall Winter
 
 
 
-![](EngineeringReference/media/image6832.png)
+![](media/image6832.png)
 
 Figure 309. Passive Trombe Wall Summer
 
@@ -1963,7 +1963,7 @@ An input file (ActiveTrombeWall.idf) is provided to demonstrate a sample active 
 
 The resulting temperature profile for the winter design day is plotted below.  The plot for the summer design day is not shown because it is identical to Figure 309 above since the fan is not scheduled to operate in the summer.
 
-![](EngineeringReference/media/image6833.png)
+![](media/image6833.png)
 
 Figure 310. Active Trombe Wall Winter
 
@@ -2044,13 +2044,13 @@ where
 
 *e<sub>use</sub>* = heat exchanger effectiveness for the use side plant connections
 
-<span>${\dot m_{use}}$</span>= mass flow rate for the use side plant connections
+<span>\({\dot m_{use}}\)</span>= mass flow rate for the use side plant connections
 
 *T<sub>use</sub>* = inlet fluid temperature of the use side plant connections
 
 *e<sub>source</sub>* = heat exchanger effectiveness for the source side plant connections
 
-<span>${\dot m_{source}}$</span>= mass flow rate for the source side plant connections
+<span>\({\dot m_{source}}\)</span>= mass flow rate for the source side plant connections
 
 *T<sub>source</sub>* = inlet fluid temperature of the use side plant connections
 
@@ -2112,7 +2112,7 @@ An illustration of how the control algorithm cycles on and off is shown below. 
 
 Although the instantaneous tank water temperature may vary considerably within a timestep (due to cycling, etc.), only the average temperature over the timestep is reported.  The model calculates the average by piece-wise integration of the area under the instantaneous temperature curve for each unique set of conditions.  The instantaneous temperature is preserved internally by the program and is propogated from the end of one timestep to the beginning of the next.
 
-![](EngineeringReference/media/image6852.png)
+![](media/image6852.png)
 
 Figure 311. Water Heater Cycle Control Algorithm
 
@@ -2172,19 +2172,67 @@ Under certain input parameters, the rating method will not succeed and a warning
 
 #### Overview
 
-The input object WaterHeater:HeatPump provides a model for a heat pump water heater (HPWH) that is a compound object consisting of a water heater tank (e.g., WaterHeater:Mixed or WaterHeater:Stratified), a direct expansion (DX) “coil” (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source.
+The input objects `WaterHeater:HeatPump:*` provide models for a heat pump water heater (HPWH) that is a compound object consisting of a water heater tank (e.g., `WaterHeater:Mixed` or `WaterHeater:Stratified`), a direct expansion (DX) “coil” (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source.
+
+There are two types of heat pump water heater models available:
+
+1. `WaterHeater:HeatPump:PumpedCondenser`: This model is used to represent a heat pump water heater where water is removed from the tank, pumped through a condenser, and returned to the tank at a higher temperature. 
+2. `WaterHeater:HeatPump:WrappedCondenser`: This model is used for heat pump water heaters that are more typical in the residential building context where the heating coil is wrapped around or submerged in the tank.
+
+Each type of `WaterHeater:HeatPump:*` object is compatible with certain `Coil:WaterHeating:AirToWaterHeatPump:*` objects as shown in the following table:
+
+<table class="table table-striped">
+  <tr>
+    <th>WaterHeater:HeatPump:*</th>
+    <th>Coil:WaterHeating:AirToWaterHeatPump:*</th>
+  </tr>
+  <tr>
+    <td rowspan="2">PumpedCondenser</td>
+    <td>Pumped</td>
+  </tr>
+  <tr>
+    <td>VariableSpeed</td>
+  </tr>
+  <tr>
+    <td>WrappedCondenser</td>
+    <td>Wrapped</td>
+  </tr>
+</table>
+
+Additionally the `WaterHeater:HeatPump:WrappedCondenser` object is only compatible with stratified tanks. Therefore `WaterHeater:HeatPump:*` has the following tank compatibility matrix:
+
+<table class="table table-striped">
+  <tr>
+    <th rowspan="2">WaterHeater:HeatPump:*</th>
+    <th colspan="2">WaterHeater:*<br></th>
+  </tr>
+  <tr>
+    <th>Mixed</th>
+    <th>Stratified</th>
+  </tr>
+  <tr>
+    <td>Pumped</td>
+    <td>X</td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>Wrapped</td>
+    <td></td>
+    <td>X</td>
+  </tr>
+</table>
 
 Numerous configurations of tank location, inlet air source, and DX coil compressor location can be modeled. The DX coil compressor may be located in a zone, outdoors, or the ambient temperature surrounding the compressor may be scheduled. The location of the compressor controls the operation of its crankcase heater. The water heater tank location is specified in the water heater tank object and is independent of the compressor location. In addition, the inlet air configuration may be specified in one of several ways. The heat pump water heater air coil and fan assembly may draw its inlet air from the zone and outdoor air using an optional mixer and splitter assembly as shown in the first figure below. When used, the mixer and splitter air streams are controlled by a single inlet air mixer schedule. When the HPWH draws its inlet air solely from a zone, the mixer/splitter assembly is not required as shown in the second figure below. In this case, the inlet air to the evaporator and fan assembly is made up entirely of zone air and the heat pump outlet air is directed back to the zone. The final figure illustrates a HPWH that draws its inlet air solely from outdoors and exhausts its outlet air outdoors as well. Each of these configurations may also be connected to a plant hot water loop (via the water heater tank use nodes).
 
-![HPWHSchematic\_EAplusOA](EngineeringReference/media/image6855.png)
+![HPWHSchematic\_EAplusOA](media/image6855.png)
 
 Figure 312. Schematic of a heat pump water heater using optional mixer/splitter nodes
 
-![HPWH](EngineeringReference/media/image6856.png)
+![HPWH](media/image6856.png)
 
 Figure 313. Schematic of a Heat Pump Water Heater with Inlet Air from a Zone
 
-![HPWHSchematic\_outdoors](EngineeringReference/media/image6857.png)
+![HPWHSchematic\_outdoors](media/image6857.png)
 
 Figure 314. Schematic of a Heat Pump Water Heater with Inlet Air from Outdoors
 
@@ -2198,11 +2246,11 @@ The heat pump water heater input requires a compressor setpoint temperature sche
 
 where:
 
-<span>${T_{HP,\,cut - in}}$</span>     = Cut-in temperature for the heat pump compressor (°C)
+<span>\({T_{HP,\,cut - in}}\)</span>     = Cut-in temperature for the heat pump compressor (°C)
 
-<span>${T_{HP,set\,point}}$</span>   = Heat pump compressor setpoint temperature (°C)
+<span>\({T_{HP,set\,point}}\)</span>   = Heat pump compressor setpoint temperature (°C)
 
-<span>${T_{HP,dead\,band}}$</span> = Heat pump compressor dead band temperature difference (°C)
+<span>\({T_{HP,dead\,band}}\)</span> = Heat pump compressor dead band temperature difference (°C)
 
 In this model, the heat pump water heater’s DX compression system is considered the primary heat source and the water tank’s heater (element or burner) provides supplemental heat as necessary. Therefore, the cut-in temperature for the heat pump compressor (setpoint minus dead band temperature difference) is usually higher than the setpoint temperature for the heater (element or burner) in the associated water heater tank object. At times when the water heater tank setpoint temperature is greater than the cut-in temperature of the heat pump compressor, the heat pump compressor is disabled and the tank’s heater is used to heat the water.
 
@@ -2216,19 +2264,19 @@ The simulation starts by first calculating the air conditions entering the air c
 
 where:
 
-<span>$Frac$</span> = current value of the inlet air mixer schedule (fraction of outdoor air, 0-1)
+<span>\(Frac\)</span> = current value of the inlet air mixer schedule (fraction of outdoor air, 0-1)
 
-<span>${T_{inlet}}$</span> = inlet air dry-bulb temperature to the HPWH evaporator/fan assembly (°C)
+<span>\({T_{inlet}}\)</span> = inlet air dry-bulb temperature to the HPWH evaporator/fan assembly (°C)
 
-<span>${T_{outdoor}}$</span> = outdoor air dry-bulb temperature (°C)
+<span>\({T_{outdoor}}\)</span> = outdoor air dry-bulb temperature (°C)
 
-<span>${T_{zone}}$</span>  = zone (exhaust) air dry-bulb temperature (°C)
+<span>\({T_{zone}}\)</span>  = zone (exhaust) air dry-bulb temperature (°C)
 
-<span>${\omega_{inlet}}$</span> = inlet air humidity ratio to the HPWH evaporator/fan assembly (kg/kg)
+<span>\({\omega_{inlet}}\)</span> = inlet air humidity ratio to the HPWH evaporator/fan assembly (kg/kg)
 
-<span>${\omega_{outdoor}}$</span>= outdoor air humidity ratio (kg/kg)
+<span>\({\omega_{outdoor}}\)</span>= outdoor air humidity ratio (kg/kg)
 
-<span>${\omega_{zone}}$</span>  = zone (exhaust) air humidity ratio (kg/kg)
+<span>\({\omega_{zone}}\)</span>  = zone (exhaust) air humidity ratio (kg/kg)
 
 When the heat pump water heater draws its inlet air solely from the zone (i.e., Inlet Air Configuration = Zone Air Only), the inlet air conditions to the evaporator/fan assembly are simply set equal to the zone (exhaust) air conditions. If the heat pump water heater draws its inlet air solely from outdoors (i.e., Inlet Air Configuration = Outdoor Air Only), the inlet air conditions to the evaporator/fan assembly are simply set equal to the outdoor air conditions. When the inlet air to the heat pump water heater evaporator and fan assembly is scheduled (i.e., Inlet Air Configuration = Schedule), the inlet air conditions are determined directly from the user-supplied schedules as follows.
 
@@ -2240,11 +2288,11 @@ When the heat pump water heater draws its inlet air solely from the zone (i.e., 
 
 where:
 
-<span>$R{H_{inlet}}$</span>= inlet air relative humidity to heat pump water heater evaporator/fan assembly (0-1)
+<span>\(R{H_{inlet}}\)</span>= inlet air relative humidity to heat pump water heater evaporator/fan assembly (0-1)
 
-<span>$PsyWFnTdbRhPb$</span>= psychrometric function returning air humidity ratio given dry-bulb temperature, relative humidity, and barometric pressure
+<span>\(PsyWFnTdbRhPb\)</span>= psychrometric function returning air humidity ratio given dry-bulb temperature, relative humidity, and barometric pressure
 
-<span>$OutBaroPress$</span>= outdoor barometric pressure (Pa)
+<span>\(OutBaroPress\)</span>= outdoor barometric pressure (Pa)
 
 For each simulation time step, the heat pump water heating capacity, energy use, and air-side/water-side mass flow rates are set to zero and the water heater tank is simulated with the heat pump compressor disabled when any of the following conditions apply:
 
@@ -2258,7 +2306,7 @@ For each simulation time step, the heat pump water heating capacity, energy use,
 
 Otherwise, simulation of the heat pump water heater is based on its current mode of operation. This mode of operation is either floating (heat pump compressor is off and tank water temperature has not fallen below the heat pump compressor cut-in temperature) or heating (tank water temperature dropped below the compressor cut-in temperature on a previous time step but was unable to reach the compressor setpoint temperature). Each mode is handled differently and they will be discussed separately.
 
-If the heat pump water heater is using the stratified tank model, then there is more than one value for the tank temperature.  The model includes input for where the heat pump controls detect the temperature in the form of six options for keyword choices:  Heater1, Heater2, SourceInlet, SourceOutlet, UseInlet, and UseOutlet.  The input data in the associated WaterHeater:Stratified includes the heights of these locations and the nearest stratified tank node is identified based on these heights.  When the heat pump model needs to evaluate the tank temperature of a stratified tank, it evaluates the temperature at the tank node associated with these locations.
+If the heat pump water heater is using the stratified tank model, then there is more than one value for the tank temperature.  The model includes input for where the heat pump controls detect the temperature. The input data in the associated WaterHeater:Stratified includes up to two heights in the tank where the temperature is measured and a weight associated with each. The associated stratified tank nodes are selected based on these heights. When the heat pump model needs to evaluate the tank temperature of a stratified tank, it evaluates the temperature at the tank nodes associated with these locations.
 
 #### Float Mode
 
@@ -2268,13 +2316,13 @@ When the heat pump water heater tank temperature is floating between the heat pu
 
 where:
 
-<span>$PLR$</span>         = part-load ratio of the heat pump water heater compressor
+<span>\(PLR\)</span>         = part-load ratio of the heat pump water heater compressor
 
-<span>$Ttank,float$</span>    = tank temperature in float mode when heating capacity is set to zero(°C)
+<span>\(Ttank,float\)</span>    = tank temperature in float mode when heating capacity is set to zero(°C)
 
-<span>${T_{tank,initial}}$</span>    = tank temperature at the beginning of the simulation time step (°C)
+<span>\({T_{tank,initial}}\)</span>    = tank temperature at the beginning of the simulation time step (°C)
 
-Since the pump and fan are assumed to cycle on and off with the heat pump compressor, the average condenser water and evaporator air mass flow rates for the simulation time step are calculated based on the PLR calculated above:
+Since the pump and fan are assumed to cycle on and off with the heat pump compressor, the average condenser water (for pumped condensers only) and evaporator air mass flow rates for the simulation time step are calculated based on the PLR calculated above:
 
 <div>$${\dot m_{water,avg}} = \dot Vwater\left( {{\rho_{water}}} \right)\left( {PLR} \right)$$</div>
 
@@ -2282,23 +2330,23 @@ Since the pump and fan are assumed to cycle on and off with the heat pump compre
 
 where:
 
-<span>$\dot mwater,avg$</span>       = average condenser water mass flow rate for the time step (kg/s)
+<span>\(\dot mwater,avg\)</span>       = average condenser water mass flow rate for the time step (kg/s)
 
-<span>$\dot Vwater$</span>            = condenser water volumetric flow rate, user input (m<sup>3</sup>/s)
+<span>\(\dot Vwater\)</span>            = condenser water volumetric flow rate, user input (m<sup>3</sup>/s)
 
-<span>${\rho_{water}}$</span>            = density of condenser inlet water (kg/m<sup>3</sup>)
+<span>\({\rho_{water}}\)</span>            = density of condenser inlet water (kg/m<sup>3</sup>)
 
-<span>$\dot mair,avg$</span>         = average evaporator/fan air mass flow rate for the time step (kg/s)
+<span>\(\dot mair,avg\)</span>         = average evaporator/fan air mass flow rate for the time step (kg/s)
 
-<span>$\dot Vair$</span>               = evaporator/fan air volumetric flow rate, user input (m<sup>3</sup>/s)
+<span>\(\dot Vair\)</span>               = evaporator/fan air volumetric flow rate, user input (m<sup>3</sup>/s)
 
-<span>${\rho_{air}}$</span>              = density of evaporator/fan inlet air (kg/m<sup>3</sup>)
+<span>\({\rho_{air}}\)</span>              = density of evaporator/fan inlet air (kg/m<sup>3</sup>)
 
 The water tank temperature is then calculated based on heat pump operation at the part-load ratio estimated above and with the water tank’s heating element enabled. If the resulting water tank temperature is above the heat pump compressor’s setpoint (cut-out) temperature, then the part-load ratio is reduced and the water heater tank is simulated again. The process is performed iteratively until the part-load ratio of the heat pump compressor achieves the desired setpoint temperature (to the extent possible).
 
 #### Heating Mode
 
-When the HPWH is in heating mode at the end of the previous simulation time step (i.e., the heat pump compressor operated during the previous simulation time step but was unable to achieve the setpoint temperature), both the heat pump compressor and the water heater tank’s heating element are enabled. The part-load ratio of the heat pump compressor is set to 1, and the condenser water and evaporator air mass flow rates are set to their maximum flow rates.
+When the HPWH is in heating mode at the end of the previous simulation time step (i.e., the heat pump compressor operated during the previous simulation time step but was unable to achieve the setpoint temperature), both the heat pump compressor and the water heater tank’s heating element are enabled. The part-load ratio of the heat pump compressor is set to 1, and the condenser water (for pumped condensers) and evaporator air mass flow rates are set to their maximum flow rates.
 
 <div>$${\dot m_{water,avg}} = {\dot V_{water}}\left( {{\rho_{water}}} \right)$$</div>
 
@@ -2316,15 +2364,15 @@ After completing the float mode or heating mode calculations and the final part-
 
 <div>$$Heat\,Pump\,Water\,Heater\,\,On{\rm{ - }}Cycle\,Parasitic\,Electric\,Power\,(W)\,\, = \,\,{P_{parasitic,on}}\left( {PLR} \right)$$</div>
 
-<span>$Heat\,Pump\,Water\,Heater\,\,On{\rm{ - }}Cycle\,Parasitic\,Electric\,Consumption\,(J)\,\, = \,\,{P_{parasitic,on}}\left( {PLR} \right)\left( {3600} \right){t_{sys}}$</span><span>$Heat\,Pump\,Water\,Heater\,\,Off{\rm{ - }}Cycle\,Parasitic\,Electric\,Power\,(W)\,\, = \,\,{P_{parasitic,off}}\left( {1 - PLR} \right)$</span><span>$Heat\,Pump\,Water\,Heater\,\,Off{\rm{ - }}Cycle\,Parasitic\,Electric\,Consumption\,(J)\,\, = \,\,{P_{parasitic,off}}\left( {1 - PLR} \right)\left( {3600} \right)\left( {{t_{sys}}} \right)$</span>
+<span>\(Heat\,Pump\,Water\,Heater\,\,On{\rm{ - }}Cycle\,Parasitic\,Electric\,Consumption\,(J)\,\, = \,\,{P_{parasitic,on}}\left( {PLR} \right)\left( {3600} \right){t_{sys}}\)</span><span>\(Heat\,Pump\,Water\,Heater\,\,Off{\rm{ - }}Cycle\,Parasitic\,Electric\,Power\,(W)\,\, = \,\,{P_{parasitic,off}}\left( {1 - PLR} \right)\)</span><span>\(Heat\,Pump\,Water\,Heater\,\,Off{\rm{ - }}Cycle\,Parasitic\,Electric\,Consumption\,(J)\,\, = \,\,{P_{parasitic,off}}\left( {1 - PLR} \right)\left( {3600} \right)\left( {{t_{sys}}} \right)\)</span>
 
 where:
 
-<span>${P_{parasitic,on}}$</span>   = on-cycle parasitic electric load, user input (W)
+<span>\({P_{parasitic,on}}\)</span>   = on-cycle parasitic electric load, user input (W)
 
-<span>${P_{parasitic,off}}$</span>  = off-cycle parasitic electric load, user input (W)
+<span>\({P_{parasitic,off}}\)</span>  = off-cycle parasitic electric load, user input (W)
 
-<span>${t_{sys}}$</span>             = HVAC system simulation time step (hours)
+<span>\({t_{sys}}\)</span>             = HVAC system simulation time step (hours)
 
 Note: All heat pump water heater output variables, including off-cycle ancillary electric power and consumption, equal 0 when the heat pump water heater availability schedule equals 0 (i.e., the heat pump water heater is scheduled OFF).
 
@@ -2394,15 +2442,17 @@ where
 
 *q<sub>oncycloss,n</sub>* and *q<sub>offcycloss,n</sub>* are defined as:
 
-<div>$${q_{oncycloss,n}} = U{A_{oncyc,n}}({T_{amb}} - {T_n})$$</div>
+<div>$${q_{oncycloss,n}} = ({UA_{tank}} + UA_add,n)({T_{amb}} - {T_n})$$</div>
 
-<div>$${q_{offcycloss,n}} = U{A_{offcyc,n}}({T_{amb}} - {T_n})$$</div>
+<div>$${q_{offcycloss,n}} = ({UA_{tank} + UA_{flue}})({T_{amb}} - {T_n})$$</div>
 
 where
 
-*UA<sub>oncyc,n</sub>* = on-cycle loss coefficient to ambient environment (zero when off)
+*UA<sub>tank</sub>* = loss coefficient to ambient environment for the tank
 
-*UA<sub>offcyc,n</sub>* = off-cycle loss coefficient to ambient environment (zero when on)
+*UA<sub>add,n</sub>* = additional node loss coefficient
+
+*UA<sub>flue</sub>* = additional off-cycle flue loss coefficient to ambient environment  (zero when on)
 
 *T<sub>amb</sub>* = temperature of ambient environment
 
@@ -2436,13 +2486,13 @@ where
 
 *e<sub>use</sub>* = heat exchanger effectiveness for the use side plant connections
 
-<span>${\dot m_{use}}$</span>= mass flow rate for the use side plant connections
+<span>\({\dot m_{use}}\)</span>= mass flow rate for the use side plant connections
 
 *T<sub>use</sub>* = inlet fluid temperature of the use side plant connections
 
 *e<sub>source</sub>* = heat exchanger effectiveness for the source side plant connections
 
-<span>${\dot m_{source}}$</span>= mass flow rate for the source side plant connections
+<span>\({\dot m_{source}}\)</span>= mass flow rate for the source side plant connections
 
 *T<sub>source</sub>* = inlet fluid temperature of the source side plant connections
 
@@ -2452,9 +2502,9 @@ where
 
 where
 
-<span>${\dot m_{n + 1}}$</span>= mass flow rate from node *n+1*
+<span>\({\dot m_{n + 1}}\)</span>= mass flow rate from node *n+1*
 
-<span>${\dot m_{n - 1}}$</span>= mass flow rate from node *n-1*
+<span>\({\dot m_{n - 1}}\)</span>= mass flow rate from node *n-1*
 
 *q<sub>invmix,n</sub>* is defined as:
 
@@ -2462,9 +2512,9 @@ where
 
 where
 
-<span>${\dot m_{invmix,n + 1}}$</span>= mass flow rate from node *n+1* due to temperature inversion mixing
+<span>\({\dot m_{invmix,n + 1}}\)</span>= mass flow rate from node *n+1* due to temperature inversion mixing
 
-<span>${\dot m_{invmix,n - 1}}$</span>= mass flow rate from node *n-1* due to temperature inversion mixing
+<span>\({\dot m_{invmix,n - 1}}\)</span>= mass flow rate from node *n-1* due to temperature inversion mixing
 
 Inversion mixing occurs when the node below is warmer than the node above.  The difference in temperatures drives a difference in density that causes the nodes to mix.  Usually inversion mixing occurs very rapidly.  In this algorithm, the inversion mixing rate is selected to be the maximum value that will provide a stable solution given the node mass and the substep interval:
 
@@ -2524,7 +2574,7 @@ Some inputs for water heaters can be autosized using the input object WaterHeate
 
 The volume a water heater can be sized in the following ways depending on the design method chosen by the user.
 
-·        Peak Draw.  The volume is determined from the loop design flow rate.  The water heater is positioned on the supply side of a plant loop.  After the plant sizing routines have run, the model  obtains the design flow rate for all components on the demand side.  The tank volume is then: <span>$V = {\dot V_{loop.des}}*{t_{draw}}$</span>,
+·        Peak Draw.  The volume is determined from the loop design flow rate.  The water heater is positioned on the supply side of a plant loop.  After the plant sizing routines have run, the model  obtains the design flow rate for all components on the demand side.  The tank volume is then: <span>\(V = {\dot V_{loop.des}}*{t_{draw}}\)</span>,
 
 ·        Residential HUD-FHA Minimum.  The volume is determined from a set of rules defined by the table below.  This is from Chapter 48 of 1999 ASHRAE Handbook HVAC Applications, Americal Society of Heating Refrigeration and Air-conditioning Engineeers, Atlanta GA.  (also used in the Building America Benchmark).
 
@@ -2664,7 +2714,7 @@ The heater capacity can be sized in the following ways depending on the design m
 
 ·        Peak Draw.  The heater capacity is determined from the tank volume, assumed start and finish temperatures and a user defined time for recovery.  The heater capacity is then
 
-<div>$$$$</div><span>${q_{heat}} = V\rho \,{c_p}({T_{finish}} - {T_{start}})$</span>
+<div>$$$$</div><span>\({q_{heat}} = V\rho \,{c_p}({T_{finish}} - {T_{start}})\)</span>
 
 where,
 
@@ -2680,7 +2730,7 @@ where,
 
 ·        Per Floor Area.  The heater capacity is determined by summing the floor area in all the zones in the model and using a user-entered factor for recovery capacity per floor area.  The heater capacity is then:
 
-<div>$$$$</div><span>${q_{heat}} = \frac{{{A_{floors}}{f_{{\mathop{\rm Re}\nolimits} {\mathop{\rm cov}} eryPerFloorArea}}({T_{finish}} - {T_{start}})\rho \,{c_p}}}{{3600}}$</span>
+<div>$$$$</div><span>\({q_{heat}} = \frac{{{A_{floors}}{f_{{\mathop{\rm Re}\nolimits} {\mathop{\rm cov}} eryPerFloorArea}}({T_{finish}} - {T_{start}})\rho \,{c_p}}}{{3600}}\)</span>
 
 ·        Per Unit.  The heater capacity is determined from a user-entered Recovery Capacity per unit and a user-entered number of units.  The heater capacity is then:
 
@@ -2704,15 +2754,15 @@ where
 
 *V* = volume of the tank
 
-<span>${t_{{\mathop{\rm Re}\nolimits} {\mathop{\rm cov}} er}}$</span> = User parameter for the time it takes for the tank to recover from assumed starting temperature to an assumed setpoint temperature.  For water heaters, the starting temperature is 14.4ºC and the final assumed setpoint temperature is 57.2ºC.  For chilled water tanks, the starting temperature is 14.4 ºC and the final temperature is 9.0ºC.
+<span>\({t_{{\mathop{\rm Re}\nolimits} {\mathop{\rm cov}} er}}\)</span> = User parameter for the time it takes for the tank to recover from assumed starting temperature to an assumed setpoint temperature.  For water heaters, the starting temperature is 14.4ºC and the final assumed setpoint temperature is 57.2ºC.  For chilled water tanks, the starting temperature is 14.4 ºC and the final temperature is 9.0ºC.
 
-<span>$\varepsilon $</span> = *e<sub>use</sub>*   or *e<sub>source</sub>*
+<span>\(\varepsilon \)</span> = *e<sub>use</sub>*   or *e<sub>source</sub>*
 
-<span>${T_{PlantDesign}}$</span>= the exit temperature specified in the Plant Sizing object
+<span>\({T_{PlantDesign}}\)</span>= the exit temperature specified in the Plant Sizing object
 
-<span>${T_{setpo{\mathop{\rm int}} }}$</span> =  the final tank temperature of 57.2ºC for heaters and 9.0ºC for chilled water tanks.
+<span>\({T_{setpo{\mathop{\rm int}} }}\)</span> =  the final tank temperature of 57.2ºC for heaters and 9.0ºC for chilled water tanks.
 
-<span>${T_{start}}$</span> = the initial tank temperature of 14.4ºC
+<span>\({T_{start}}\)</span> = the initial tank temperature of 14.4ºC
 
 If the demand side connections are autosized and a water heater’s tank volume is autosized, then the problem cannot be readily solved in EnergyPlus because the demand side connection flows need to be reported earlier in the simulation and the tank volume is not yet available.  This situation is resolved by using an interim, nominal tank volume for sizing the connections and the actual volume is calculated later in the simulation.
 
@@ -2769,7 +2819,7 @@ For the Chicago-O'Hare TMY2 weather file, T<sub>out,avg</sub> = 9.69 C and ΔT<s
 
 
 
-![](EngineeringReference/media/image6936.png)
+![](media/image6936.png)
 
 #### References
 
@@ -2791,23 +2841,23 @@ The WaterUse:Equipment object simulates all different types of water end uses. 
 
 Common water equipment, such as sinks and showers, requires mixing of hot and cold water to provide a desired temperature at the tap.  Water use equipment that is simulated in "unconnected" mode, i.e., without being referenced by a WaterUse:Connections object, presents a relatively simple modeling problem illustrated by the diagram below:
 
-![Water Use Connections ENG Diagram 1](EngineeringReference/media/image6937.png)
+![Water Use Connections ENG Diagram 1](media/image6937.png)
 
 Figure 315. Hot and Cold Water Mixing
 
 The variables are defined as:
 
-<span>${\dot m_{hot}}$</span>= hot water supply mass flow rate
+<span>\({\dot m_{hot}}\)</span>= hot water supply mass flow rate
 
-<span>${T_{hot}}$</span>= hot water supply temperature
+<span>\({T_{hot}}\)</span>= hot water supply temperature
 
-<span>${\dot m_{cold}}$</span>= cold water supply mass flow rate
+<span>\({\dot m_{cold}}\)</span>= cold water supply mass flow rate
 
-<span>${T_{cold}}$</span>= cold water supply temperature
+<span>\({T_{cold}}\)</span>= cold water supply temperature
 
-<span>${\dot m_{target}}$</span>= target mass flow rate at the tap
+<span>\({\dot m_{target}}\)</span>= target mass flow rate at the tap
 
-<span>${T_{target}}$</span>= target temperature at the tap
+<span>\({T_{target}}\)</span>= target temperature at the tap
 
 The basic physics of the problem are described by two equations representing conservation of mass and conservation of energy respectively:
 
@@ -2815,7 +2865,7 @@ The basic physics of the problem are described by two equations representing con
 
 <div>$${\dot m_{target}}{T_{target}} = {\dot m_{hot}}{T_{hot}} + {\dot m_{cold}}{T_{cold}}$$</div>
 
-The hot and cold water supply temperatures, <span>${T_{hot}}$</span> and <span>${T_{cold}}$</span>, are specified by the user with schedules (or indirectly from the water mains temperatures).  The target flow rate and target temperature, <span>${\dot m_{target}}$</span> and <span>${T_{target}}$</span>, at the tap are also specified with schedules.  The target conditions can be thought of as a way to simulate occupant behavior; a person at a sink will adjust the hot and cold flow rates to get the overall water flow and temperature that is desired.
+The hot and cold water supply temperatures, <span>\({T_{hot}}\)</span> and <span>\({T_{cold}}\)</span>, are specified by the user with schedules (or indirectly from the water mains temperatures).  The target flow rate and target temperature, <span>\({\dot m_{target}}\)</span> and <span>\({T_{target}}\)</span>, at the tap are also specified with schedules.  The target conditions can be thought of as a way to simulate occupant behavior; a person at a sink will adjust the hot and cold flow rates to get the overall water flow and temperature that is desired.
 
 The two equations above are easily solved to calculate the necessary hot and cold flow rates needed to attain the target conditions.
 
@@ -2823,7 +2873,7 @@ The two equations above are easily solved to calculate the necessary hot and col
 
 <div>$${\dot m_{cold}} = {\dot m_{target}} - {\dot m_{hot}}$$</div>
 
-Even though hot and cold flow rates are unlimited in "unconnected" mode, it is still possible to fail to meet the target conditions if <span>${T_{target}}$</span> &gt; <span>${T_{hot}}$</span>.  In this case, the actual mixed water temperature at the tap, <span>${T_{mixed}}$</span>, is set equal to <span>${T_{hot}}$</span>.  The target flow rate is always met.
+Even though hot and cold flow rates are unlimited in "unconnected" mode, it is still possible to fail to meet the target conditions if <span>\({T_{target}}\)</span> &gt; <span>\({T_{hot}}\)</span>.  In this case, the actual mixed water temperature at the tap, <span>\({T_{mixed}}\)</span>, is set equal to <span>\({T_{hot}}\)</span>.  The target flow rate is always met.
 
 Water equipment that omits schedules for the target temperature and/or hot water suppy temperature implies that no hot water is needed.  The result is all cold water at the target flow rate.
 
@@ -2835,13 +2885,13 @@ For "unconnected" water equipment, the heating rate and energy that is required 
 
 where
 
-<span>$Q$</span>= heating rate
+<span>\(Q\)</span>= heating rate
 
-<span>${c_p}$</span>= specific heat of water
+<span>\({c_p}\)</span>= specific heat of water
 
-<span>$\Delta E$</span>= heating energy
+<span>\(\Delta E\)</span>= heating energy
 
-<span>$\Delta t$</span>= time step interval
+<span>\(\Delta t\)</span>= time step interval
 
 All heating is assigned to "Purchased Heating".
 
@@ -2865,7 +2915,7 @@ A second set of variables is tied to the specifics of the water equipment which 
 
 The approach taken here is to utilize the first set of initial condition variables and forego the overly-complex second set.  The initial conditions can be used to calculate a maximum possible change in sensible and latent energy between the entering water conditions and the leaving water conditions at an infinite time later.  Sensible and latent energy are calculated separately and represent the maximum heat gain, respectively, that could be added to the zone air.  The user simply specifies a fraction of the maximum heat gain for sensible and latent that is actually added to the zone air.  The fraction is specified with a schedule to account for different modes of operation.  The split between sensible and latent will vary depending on the type of equipment that is to be modeled.  Typically, both fractions should be small numbers.
 
-![Water Use Connections ENG Diagram 2](EngineeringReference/media/image6962.png)
+![Water Use Connections ENG Diagram 2](media/image6962.png)
 
 Figure 316.  Zone Heat Gain from Water Use Equipment
 
@@ -2877,21 +2927,21 @@ The maximum sensible heat gain rate is calculated by assuming that all of the wa
 
 where
 
-<span>${Q_{sens}}$</span> = sensible heat gain rate
+<span>\({Q_{sens}}\)</span> = sensible heat gain rate
 
-<span>${f_{sens}}$</span> = user fraction of maximum sensible heat
+<span>\({f_{sens}}\)</span> = user fraction of maximum sensible heat
 
-<span>${\dot m_{target}}$</span>= target mass flow rate at the tap
+<span>\({\dot m_{target}}\)</span>= target mass flow rate at the tap
 
-<span>${c_p}$</span>= specific heat of water
+<span>\({c_p}\)</span>= specific heat of water
 
-<span>${T_{target}}$</span>= target temperature at the tap
+<span>\({T_{target}}\)</span>= target temperature at the tap
 
-<span>${T_{zone}}$</span> = zone dry-bulb air temperature
+<span>\({T_{zone}}\)</span> = zone dry-bulb air temperature
 
-<span>$\Delta {E_{sens}}$</span>= sensible heat gain
+<span>\(\Delta {E_{sens}}\)</span>= sensible heat gain
 
-<span>$\Delta t$</span>= time step interval
+<span>\(\Delta t\)</span>= time step interval
 
 The maximum latent heat gain rate is calculated by assuming that the maximum amount of water is evaporated into the zone air during the time step.  The actual latent zone heat gain rate is found by multiplying the maximum by the user fraction.
 
@@ -2911,35 +2961,35 @@ The maximum latent heat gain rate is calculated by assuming that the maximum amo
 
 where
 
-<span>${m_{evap,zonemax}}$</span>= mass of water that can be absorbed by the zone air in one timestep
+<span>\({m_{evap,zonemax}}\)</span>= mass of water that can be absorbed by the zone air in one timestep
 
-<span>${W_{sat}}$</span>= fully-saturated zone humidity ratio (function of air temperature and pressure)
+<span>\({W_{sat}}\)</span>= fully-saturated zone humidity ratio (function of air temperature and pressure)
 
-<span>${W_{zone}}$</span> = zone humidity ratio
+<span>\({W_{zone}}\)</span> = zone humidity ratio
 
-<span>${\rho_{zone}}$</span> = zone dry-air density (function of air temperature and pressure)
+<span>\({\rho_{zone}}\)</span> = zone dry-air density (function of air temperature and pressure)
 
-<span>${V_{zone}}$</span> = zone air volume
+<span>\({V_{zone}}\)</span> = zone air volume
 
-<span>${m_{evap,flowmax}}$</span>= mass of water available in the flow in one timestep
+<span>\({m_{evap,flowmax}}\)</span>= mass of water available in the flow in one timestep
 
-<span>${\dot m_{target}}$</span>= target mass flow rate at the tap
+<span>\({\dot m_{target}}\)</span>= target mass flow rate at the tap
 
-<span>$\Delta t$</span>= time step interval
+<span>\(\Delta t\)</span>= time step interval
 
-<span>${m_{evap,max}}$</span>= maximum mass of water that can be evaporated
+<span>\({m_{evap,max}}\)</span>= maximum mass of water that can be evaporated
 
-<span>${m_{evap}}$</span>= actual mass of water evaporated into the zone air
+<span>\({m_{evap}}\)</span>= actual mass of water evaporated into the zone air
 
-<span>${f_{lat}}$</span> = user fraction of maximum latent heat
+<span>\({f_{lat}}\)</span> = user fraction of maximum latent heat
 
-<span>${\dot m_{evap}}$</span>= mass rate of water evaporation into the zone air
+<span>\({\dot m_{evap}}\)</span>= mass rate of water evaporation into the zone air
 
-<span>${Q_{lat}}$</span> = latent heat gain rate
+<span>\({Q_{lat}}\)</span> = latent heat gain rate
 
-<span>${h_{fg}}$</span>= heat of vaporization for water
+<span>\({h_{fg}}\)</span>= heat of vaporization for water
 
-<span>$\Delta {E_{lat}}$</span>= latent heat gain
+<span>\(\Delta {E_{lat}}\)</span>= latent heat gain
 
 Sensible and latent heat gains to the zone are lagged by one zone time step.
 
@@ -2953,21 +3003,21 @@ A related result of any zone heat and moisture gain is that the water undergoes 
 
 where
 
-<span>${\dot m_{drain}}$</span>= drainwater mass flow rate at the drain
+<span>\({\dot m_{drain}}\)</span>= drainwater mass flow rate at the drain
 
-<span>${\dot m_{target}}$</span>= target mass flow rate at the tap
+<span>\({\dot m_{target}}\)</span>= target mass flow rate at the tap
 
-<span>${\dot m_{evap}}$</span>= mass rate of water evaporation into the zone air
+<span>\({\dot m_{evap}}\)</span>= mass rate of water evaporation into the zone air
 
-<span>${T_{drain}}$</span>= water temperature at the drain
+<span>\({T_{drain}}\)</span>= water temperature at the drain
 
-<span>${c_p}$</span>= specific heat of water
+<span>\({c_p}\)</span>= specific heat of water
 
-<span>${T_{target}}$</span>= target temperature at the tap
+<span>\({T_{target}}\)</span>= target temperature at the tap
 
-<span>${Q_{sens}}$</span> = sensible heat gain rate
+<span>\({Q_{sens}}\)</span> = sensible heat gain rate
 
-<span>${Q_{lat}}$</span> = latent heat gain rate
+<span>\({Q_{lat}}\)</span> = latent heat gain rate
 
 The change in leaving water conditions has implications for drainwater heat recovery and storage tank conditions.
 
@@ -2981,29 +3031,29 @@ The WaterUse:Connections object overrides the hot and cold water supply temperat
 
 Solving the water subsystem described by the WaterUse:Connections object is appreciably more difficult than solving a single, unconnected piece of water use equipment.  The subsystem is illustrated below.
 
-![Water Use Connections ENG Diagram 3](EngineeringReference/media/image7005.png)
+![Water Use Connections ENG Diagram 3](media/image7005.png)
 
 Figure 317. Water Use Connections Subsystem
 
 The nomenclature here uses uppercase letters to indicate variables related to the connections object and lowercase letters to indicate variables related to the equipment objects.  The variables are defined as:
 
-<span>${\dot M_{hot}}$</span>= hot water supply mass flow rate
+<span>\({\dot M_{hot}}\)</span>= hot water supply mass flow rate
 
-<span>${T_{hot}}$</span>= hot water supply temperature
+<span>\({T_{hot}}\)</span>= hot water supply temperature
 
-<span>${\dot M_{cold}}$</span>= cold water supply mass flow rate
+<span>\({\dot M_{cold}}\)</span>= cold water supply mass flow rate
 
-<span>${T_{cold}}$</span>= cold water supply temperature
+<span>\({T_{cold}}\)</span>= cold water supply temperature
 
-<span>${\dot M_{drain}}$</span>= drainwater mass flow rate at the drain
+<span>\({\dot M_{drain}}\)</span>= drainwater mass flow rate at the drain
 
-<span>${T_{drain}}$</span>= water temperature at the drain
+<span>\({T_{drain}}\)</span>= water temperature at the drain
 
-<span>${T_{waste}}$</span>= wastewater temperature after the drain
+<span>\({T_{waste}}\)</span>= wastewater temperature after the drain
 
-<span>${\dot M_{return}}$</span>= return water mass flow rate back to the plant loop
+<span>\({\dot M_{return}}\)</span>= return water mass flow rate back to the plant loop
 
-<span>${T_{return}}$</span>= return temperature of makeup water back to the plant loop
+<span>\({T_{return}}\)</span>= return temperature of makeup water back to the plant loop
 
 ### Water Use Equipment Calculations
 
@@ -3019,17 +3069,17 @@ The solution method proceeds in steps:
 
 #### Initialize Connections Temperatures
 
-Initializes the hot and cold supply water temperatures, <span>${T_{hot}}$</span> and <span>${T_{cold}}$</span>, for the common supply to all the equipment.  If plant-coupled, <span>${T_{hot}}$</span> is taken from the plant loop inlet node.  If stand-alone, <span>${T_{hot}}$</span> is taken from the schedule.
+Initializes the hot and cold supply water temperatures, <span>\({T_{hot}}\)</span> and <span>\({T_{cold}}\)</span>, for the common supply to all the equipment.  If plant-coupled, <span>\({T_{hot}}\)</span> is taken from the plant loop inlet node.  If stand-alone, <span>\({T_{hot}}\)</span> is taken from the schedule.
 
-<span>${T_{cold}}$</span> is taken from the supply water storage tank, if specified.  Otherwise <span>${T_{cold}}$</span> is taken from the schedule.  If a schedule is not specified, <span>${T_{cold}}$</span> is taken from the water mains.
+<span>\({T_{cold}}\)</span> is taken from the supply water storage tank, if specified.  Otherwise <span>\({T_{cold}}\)</span> is taken from the schedule.  If a schedule is not specified, <span>\({T_{cold}}\)</span> is taken from the water mains.
 
 #### Calculate Connections Flow Rates
 
-First calls on each piece of equipment to simulate itself with the given supply water temperatures <span>${T_{hot}}$</span> and <span>${T_{cold}}$</span>.  The desired hot and cold flow rates for <span>${\dot m_{hot,i}}$</span> and <span>${\dot m_{cold,i}}$</span> are calculated (as described earlier) and passed back to the connections object.  The total flow rates for <span>${\dot M_{hot}}$</span> and <span>${\dot M_{cold}}$</span> are then calculated:
+First calls on each piece of equipment to simulate itself with the given supply water temperatures <span>\({T_{hot}}\)</span> and <span>\({T_{cold}}\)</span>.  The desired hot and cold flow rates for <span>\({\dot m_{hot,i}}\)</span> and <span>\({\dot m_{cold,i}}\)</span> are calculated (as described earlier) and passed back to the connections object.  The total flow rates for <span>\({\dot M_{hot}}\)</span> and <span>\({\dot M_{cold}}\)</span> are then calculated:
 
-<span>${\dot M_{hot}} = \mathop \sum \limits_i {\dot m_{hot,i}}$</span>           <span>${\dot M_{cold}} = \mathop \sum \limits_i {\dot m_{cold,i}}$</span>
+<span>\({\dot M_{hot}} = \mathop \sum \limits_i {\dot m_{hot,i}}\)</span>           <span>\({\dot M_{cold}} = \mathop \sum \limits_i {\dot m_{cold,i}}\)</span>
 
-If plant-coupled, <span>${\dot M_{hot}}$</span> is compared to the maximum flow rate available in the plant loop (after the first HVAC iteration).  If <span>${\dot M_{hot}}$</span> &gt; <span>${\dot M_{hot,max}}$</span>, the actual flow rate is reset to equal the maximum:  <span>${\dot M_{hot}}$</span> = <span>${\dot M_{hot,max}}$</span>.  New hot and cold flow rates, <span>${\dot m'_{hot,i}}$</span> and <span>${\dot m'_{cold,i}}$</span>, at the equipment level are then recalculated, decreasing the hot flow rate and increasing the cold flow rate in order to still meet the target flow rate.
+If plant-coupled, <span>\({\dot M_{hot}}\)</span> is compared to the maximum flow rate available in the plant loop (after the first HVAC iteration).  If <span>\({\dot M_{hot}}\)</span> &gt; <span>\({\dot M_{hot,max}}\)</span>, the actual flow rate is reset to equal the maximum:  <span>\({\dot M_{hot}}\)</span> = <span>\({\dot M_{hot,max}}\)</span>.  New hot and cold flow rates, <span>\({\dot m'_{hot,i}}\)</span> and <span>\({\dot m'_{cold,i}}\)</span>, at the equipment level are then recalculated, decreasing the hot flow rate and increasing the cold flow rate in order to still meet the target flow rate.
 
 <div>$$\alpha  = \frac{{{{\dot M}_{hot,max}}}}{{{{\dot M}_{hot}}}}$$</div>
 
@@ -3045,13 +3095,13 @@ Although water storage tanks can also have a maximum flow rate on the cold side,
 
 At this point zone heat gains are calculated for all equipment in zones.  The final drainwater temperatures and flow rates are determined for each piece of equipment by subtracting the lost heat and moisture (see above).  The total drainwater temperature and flow rate for the subsystem are calculated:
 
-<span>${\dot M_{drain}} = \mathop \sum \limits_i {\dot m_{drain,i}}$</span>           <span>${T_{drain}} = \frac{{\mathop \sum \limits_i {{\dot m}_{drain,i}}{t_{drain,i}}}}{{{{\dot M}_{drain}}}}$</span>
+<span>\({\dot M_{drain}} = \mathop \sum \limits_i {\dot m_{drain,i}}\)</span>           <span>\({T_{drain}} = \frac{{\mathop \sum \limits_i {{\dot m}_{drain,i}}{t_{drain,i}}}}{{{{\dot M}_{drain}}}}\)</span>
 
-In the case of no drainwater heat recovery, the subsystem wastewater temperature, <span>${T_{waste}}$</span>, is equal to the drainwater temperature, <span>${T_{drain}}$</span>.  (For drainwater heat recovery, see below.)  The wastewater temperature and flow rate are propogated to the reclamation water storage tank, if specified.
+In the case of no drainwater heat recovery, the subsystem wastewater temperature, <span>\({T_{waste}}\)</span>, is equal to the drainwater temperature, <span>\({T_{drain}}\)</span>.  (For drainwater heat recovery, see below.)  The wastewater temperature and flow rate are propogated to the reclamation water storage tank, if specified.
 
 #### Update Connections Nodes
 
-Finally, if plant-coupled, the return water temperature, <span>${T_{return}}$</span>, is passed on to the plant outlet node.  <span>${T_{return}}$</span> is taken from the cold water supply schedule or the water mains.  The return flow rate is equal to the hot water supply flow rate in order to preserve a closed plant loop:  <span>${\dot M_{return}}$</span> = <span>${\dot M_{hot}}$</span>.
+Finally, if plant-coupled, the return water temperature, <span>\({T_{return}}\)</span>, is passed on to the plant outlet node.  <span>\({T_{return}}\)</span> is taken from the cold water supply schedule or the water mains.  The return flow rate is equal to the hot water supply flow rate in order to preserve a closed plant loop:  <span>\({\dot M_{return}}\)</span> = <span>\({\dot M_{hot}}\)</span>.
 
 For "connected" water equipment, the heating rate and energy that is required to supply the hot water for individual water equipment is calculated by the following equations. 
 
@@ -3061,13 +3111,13 @@ For "connected" water equipment, the heating rate and energy that is required to
 
 where
 
-<span>$Q$</span>= heating rate
+<span>\(Q\)</span>= heating rate
 
-<span>${c_p}$</span>= specific heat of water
+<span>\({c_p}\)</span>= specific heat of water
 
-<span>$\Delta E$</span>= heating energy
+<span>\(\Delta E\)</span>= heating energy
 
-<span>$\Delta t$</span>= time interval
+<span>\(\Delta t\)</span>= time interval
 
 The heating rate and energy for the WaterUse:Connections is the sum of the values for its constituent water equipment objects.  If the WaterUse:Connections object is stand-alone, all heating is assigned to "Purchased Heating" by the individual water equipment objects.  If the WaterUse:Connections object is coupled to a plant loop, all heating is supplied by the plant loop equipment.
 
@@ -3079,17 +3129,17 @@ The heat exchanger can be modeled as "ideal", "counterflow", or "crossflow".  O
 
 The destination of the preheated makeup water can be plumbed in three possible configurations:  "plant", "equipment", "plant and equipment".  In the "plant" configuration, all preheated water flow is returned to the plant loop to match the makeup water for the hot water supply flow.  In the "equipment" configuration, all preheated water flow is directed internally within the WaterUse:Connections object to provide the makeup water for the cold water supply flow for the local water use equipment.  In the "plant and equipment" configuration, the preheated water is split between both of the previous configurations.  This is the only configuration where the flow rate is equal on both sides of the heat exchanger.
 
-![Water Use Connections ENG Diagram 4](EngineeringReference/media/image7054.png)
+![Water Use Connections ENG Diagram 4](media/image7054.png)
 
 Figure 318. Water Use Connections Subsystem with Drainwater Heat Recovery
 
 The new variables added here are defined as:
 
-<span>${\dot M_{recovery}}$</span>= makeup water mass flow rate in the heat exchanger
+<span>\({\dot M_{recovery}}\)</span>= makeup water mass flow rate in the heat exchanger
 
-<span>${T_{recovery}}$</span>= water temperature leaving the heat exchanger
+<span>\({T_{recovery}}\)</span>= water temperature leaving the heat exchanger
 
-<span>${T_{makeup}}$</span>= cold makeup water temperature supplied to various flows
+<span>\({T_{makeup}}\)</span>= cold makeup water temperature supplied to various flows
 
 Another subroutine is inserted into the solution method:
 
@@ -3107,9 +3157,9 @@ For the "equipment" and "plant and equipment" configurations, the solution requi
 
 #### Calculate Connections Heat Recovery
 
-Based on the selected configuration, the flow rate through the heat exchanger is first determined.  For the "plant" configuration, <span>${\dot M_{recovery}} = {\dot M_{hot}}$</span>.  For the "equipment" configuration, <span>${\dot M_{recovery}} = {\dot M_{cold}}$</span>.  For the "plant and equipment" configuration, <span>${\dot M_{recovery}} = {\dot M_{hot}} + {\dot M_{cold}}$</span>.
+Based on the selected configuration, the flow rate through the heat exchanger is first determined.  For the "plant" configuration, <span>\({\dot M_{recovery}} = {\dot M_{hot}}\)</span>.  For the "equipment" configuration, <span>\({\dot M_{recovery}} = {\dot M_{cold}}\)</span>.  For the "plant and equipment" configuration, <span>\({\dot M_{recovery}} = {\dot M_{hot}} + {\dot M_{cold}}\)</span>.
 
-The heat capacity rates on both sides of the heat exchanger are calculated and the minimum and maximum heat capacity rates, <span>${C_{min}}$</span> and <span>${C_{max}}$</span>, are determined.
+The heat capacity rates on both sides of the heat exchanger are calculated and the minimum and maximum heat capacity rates, <span>\({C_{min}}\)</span> and <span>\({C_{max}}\)</span>, are determined.
 
 <div>$${C_{drain}} = {\dot M_{drain}}{c_p}$$</div>
 
@@ -3121,9 +3171,9 @@ The heat capacity rates on both sides of the heat exchanger are calculated and t
 
 <div>$${R_c} = \frac{{{C_{min}}}}{{{C_{max}}}}$$</div>
 
-where <span>${R_c}$</span> = the heat capacity ratio.
+where <span>\({R_c}\)</span> = the heat capacity ratio.
 
-The effectiveness <span>$\varepsilon $</span> is then calculated for the given type of heat exchanger.  For the "ideal" heat exchanger, <span>$\varepsilon  = 1$</span>.
+The effectiveness <span>\(\varepsilon \)</span> is then calculated for the given type of heat exchanger.  For the "ideal" heat exchanger, <span>\(\varepsilon  = 1\)</span>.
 
 For the "counterflow" and "crossflow" heat exchangers, the effectiveness is calculated using the effectiveness-NTU method, where:
 
@@ -3131,9 +3181,9 @@ For the "counterflow" and "crossflow" heat exchangers, the effectiveness is calc
 
 For the "counterflow" heat exchanger:
 
-<span>$\varepsilon  = \frac{{NTU}}{{1 + NTU}}$</span>, if <span>${R_c}$</span> = 1
+<span>\(\varepsilon  = \frac{{NTU}}{{1 + NTU}}\)</span>, if <span>\({R_c}\)</span> = 1
 
-<span>$\varepsilon  = \frac{{1 - EXP\left( { - NTU\left( {1 - {R_c}} \right)} \right)}}{{1 - {R_c}EXP\left( { - NTU\left( {1 - {R_c}} \right)} \right)}}$</span>, if <span>${R_c}$</span> &lt; 1
+<span>\(\varepsilon  = \frac{{1 - EXP\left( { - NTU\left( {1 - {R_c}} \right)} \right)}}{{1 - {R_c}EXP\left( { - NTU\left( {1 - {R_c}} \right)} \right)}}\)</span>, if <span>\({R_c}\)</span> &lt; 1
 
 For the "crossflow" heat exchanger:
 
@@ -3149,11 +3199,11 @@ The outlet water temperatures can then be calculated for both sides of the heat 
 
 <div>$${T_{waste}} = {T_{drain}} - \frac{{{Q_{recovery}}}}{{{{\dot M}_{drain}}{c_p}}}$$</div>
 
-At each iteration the difference between <span>${T_{recovery}}$</span> and <span>${T_{cold}}$</span>is compared and checked for convergence.
+At each iteration the difference between <span>\({T_{recovery}}\)</span> and <span>\({T_{cold}}\)</span>is compared and checked for convergence.
 
 <div>$$\Delta {T_{error}} = \left| {{T_{recovery}} - {T_{cold}}} \right|$$</div>
 
-Once the temperatures have converged, the solution is complete.  <span>${T_{waste}}$</span> is then passed on to a storage tank, if specified.
+Once the temperatures have converged, the solution is complete.  <span>\({T_{waste}}\)</span> is then passed on to a storage tank, if specified.
 
 Zone Controls <a name="ZoneControls"></a>
 -------------
@@ -3396,19 +3446,19 @@ CASE (DualSetPointWithDeadBand)
 
 The input object ZoneControl:Thermostat:OperativeTemperature provides a model where the behavior of the zone thermostats described above can be modified to accommodate operative temperature control. The ZoneControl:Thermostat:OperativeTemperature input object is used to modify the behavior of any of the thermostatic control types described above.  When this object is used, the zone can be controlled by a weighted mixture of radiant and air temperatures (rather than just zone air temperatures).
 
-In EnergyPlus, operative temperature, <span>${T_{OP}}$</span>, is defined as ,
+In EnergyPlus, operative temperature, <span>\({T_{OP}}\)</span>, is defined as ,
 
 <div>$${T_{OP}} = \gamma {T_{MRT}} + (1 - \gamma ){T_{drybulb}}$$</div>
 
 where,
 
-<span>$\gamma $</span>  is the radiative fraction,
+<span>\(\gamma \)</span>  is the radiative fraction,
 
-<span>${T_{MRT}}$</span> is the mean radiant temperature for the thermal zone, and
+<span>\({T_{MRT}}\)</span> is the mean radiant temperature for the thermal zone, and
 
-<span>${T_{drybulb}}$</span>is the mean zone air temperature.
+<span>\({T_{drybulb}}\)</span>is the mean zone air temperature.
 
-The radiative fraction <span>$\gamma $</span> is selected by the user and can be scheduled to vary during the simulation.  A typical value is 0.5.  The maximum value needs to be less than 0.9 and the minimum is 0.0.  A value of 0.0 is the same as controlling on only zone air temperature.  If air velocities are higher than 0.2 m/s, then lower values for radiative fraction might apply.  Niu and Burnett (1998) cite International Standard ISO 77300 in recommending the values for this fraction listed in the following table.
+The radiative fraction <span>\(\gamma \)</span> is selected by the user and can be scheduled to vary during the simulation.  A typical value is 0.5.  The maximum value needs to be less than 0.9 and the minimum is 0.0.  A value of 0.0 is the same as controlling on only zone air temperature.  If air velocities are higher than 0.2 m/s, then lower values for radiative fraction might apply.  Niu and Burnett (1998) cite International Standard ISO 77300 in recommending the values for this fraction listed in the following table.
 
 Table 86.  Operative Temperature - Radiative Fraction vs Air Velocity
 
@@ -3420,7 +3470,7 @@ Table 86.  Operative Temperature - Radiative Fraction vs Air Velocity
 <td>0.6 to 1.0</td>
 </tr>
 <tr>
-<td><span>$\gamma $</span></td>
+<td><span>\(\gamma \)</span></td>
 <td>0.5</td>
 <td>0.4</td>
 <td>0.3</td>
@@ -3430,7 +3480,7 @@ Table 86.  Operative Temperature - Radiative Fraction vs Air Velocity
 
 The control is accomplished using the load to setpoint formulation that is fundamental to HVAC system control in EnergyPlus. Although real systems will not know the loads and operate on temperature-based control, EnergyPlus needs to be able to function at zone timesteps up to one hour and this is too long of a timeframe for true temperature-based zone control.  Load-based control is an important method of determining the average HVAC system response to zone conditions over the time step.  For operative temperature control, the same methods and routines are used for calculating loads to setpoints but the setpoints are shifted to emulate operative temperature control rather than air temperature control.
 
-The user-defined setpoint for <span>${T_{OP}}$</span> is an input in degrees Celsius. <span>${T_{MRT}}$</span> is continually modeled by the full zone heat balance method and includes all the interactions between thermal loads and HVAC systems.  A new setpoint for the zone’s <span>${T_{drybulb}}$</span> is obtained for each zone timestep by rearranging the definition of <span>${T_{OP}}$</span> to put <span>${T_{drybulb}}$</span> on the left hand side.
+The user-defined setpoint for <span>\({T_{OP}}\)</span> is an input in degrees Celsius. <span>\({T_{MRT}}\)</span> is continually modeled by the full zone heat balance method and includes all the interactions between thermal loads and HVAC systems.  A new setpoint for the zone’s <span>\({T_{drybulb}}\)</span> is obtained for each zone timestep by rearranging the definition of <span>\({T_{OP}}\)</span> to put <span>\({T_{drybulb}}\)</span> on the left hand side.
 
 <div>$${T_{drybulb,setpo{\mathop{\rm int}} }} = \frac{{{T_{OP,setpo{\mathop{\rm int}} }} - \gamma {T_{MRT}}}}{{(1 - \gamma )}}$$</div>
 
@@ -3452,11 +3502,11 @@ The overcool range limits the extent of the zone air temperature reduction below
 
 where,
 
-<span>$\Delta {T_{OvercoolRange,MAX}}$</span>= maximum overcool range for the zone air (°C)
+<span>\(\Delta {T_{OvercoolRange,MAX}}\)</span>= maximum overcool range for the zone air (°C)
 
-<span>$\Delta {T_{OvercoolRange}}$</span>= overcool range for the zone air (°C).  User input.
+<span>\(\Delta {T_{OvercoolRange}}\)</span>= overcool range for the zone air (°C).  User input.
 
-<span>$\Delta {T_{Setpoints}}$</span>= temperature difference between the cooling and heating setpoints (°C)
+<span>\(\Delta {T_{Setpoints}}\)</span>= temperature difference between the cooling and heating setpoints (°C)
 
 If a single cooling setpoint thermostat is being modified by this control, the maximum overcool range is equal to the user-defined overcool range.
 
@@ -3464,25 +3514,25 @@ The extent that the zone air relative humidity exceeds the user-entered dehumidi
 
 <div>$$\Delta \phi  = MAX\left( {0.0,{\phi_{ZoneLagged}} - {\phi_{CSP}}} \right)$$</div>
 
-The actual cooling setpoint reduction (overcooling) is calculated for the condition when the zone air relative humidity exceeds the dehumidifying setpoint (i.e., <span>$\Delta \phi $</span>&gt;0), as described below:
+The actual cooling setpoint reduction (overcooling) is calculated for the condition when the zone air relative humidity exceeds the dehumidifying setpoint (i.e., <span>\(\Delta \phi \)</span>&gt;0), as described below:
 
 <div>$$\begin{array}{l}IF\,\,(\Delta \phi \, > \,0)\,\,THEN\\ ,\,\,\,\,\Delta {T_{Overcool,Actual}} = MIN\left( {\Delta {T_{OvercoolRange,MAX}},\,{{\Delta \phi } \mathord{\left/ {\vphantom {{\Delta \phi } {\Delta {\phi_{adjust}}}}} \right. } {\Delta {\phi_{adjust}}}}} \right)\\ELSE\\ ,\,\,\,\,\Delta {T_{Overcool,Actual}} = 0\\ENDIF\end{array}$$</div>
 
 The cooling setpoint temperature is then adjustedas follows:
 
-<span>${T_{CSP,adj}} = \left( {{T_{CSP}} - \Delta {T_{Overcool,Actual}}} \right)$</span>where,
+<span>\({T_{CSP,adj}} = \left( {{T_{CSP}} - \Delta {T_{Overcool,Actual}}} \right)\)</span>where,
 
-<span>${T_{CSP,adj}}$</span>= adjusted cooling setpoint temperature (°C)
+<span>\({T_{CSP,adj}}\)</span>= adjusted cooling setpoint temperature (°C)
 
-<span>${T_{CSP}}$</span>= zone air cooling setpoint temperature for the current time step (°C).  User input.
+<span>\({T_{CSP}}\)</span>= zone air cooling setpoint temperature for the current time step (°C).  User input.
 
-<span>$\Delta {\phi_{adjust}}$</span>= user-defined overcool control ratio (%/K)
+<span>\(\Delta {\phi_{adjust}}\)</span>= user-defined overcool control ratio (%/K)
 
-<span>$\Delta \phi $</span>= difference between the zone air relative humidity and the user-defined dehumidifying setpoint (%)
+<span>\(\Delta \phi \)</span>= difference between the zone air relative humidity and the user-defined dehumidifying setpoint (%)
 
-<span>${\phi_{ZoneLagged}}$</span> = zone air relative humidity calculated at the last system time step (%)
+<span>\({\phi_{ZoneLagged}}\)</span> = zone air relative humidity calculated at the last system time step (%)
 
-<span>${\varphi_{CSP}}$</span>= dehumidifying relative humidity setpoint at the current time step (%).  User input.
+<span>\({\varphi_{CSP}}\)</span>= dehumidifying relative humidity setpoint at the current time step (%).  User input.
 
 This adjusted cooling setpoint temperature is made every timestep for every zone immediately after the original thermostat setpoint is obtained from the user-defined setpoint schedule.
 
@@ -3673,7 +3723,7 @@ The following equations for the mixing of two moist air streams are used:
 
 <div>$${\dot m_{da1}}{W_1} + {\dot m_{da2}}{W_2} = {\dot m_{da3}}{W_3}$$</div>
 
-where <span>${\dot m_{da}}$</span>is dry air mass flow rate in kg/s, *h* is specific enthalpy in J/kg, and W is humidity ratio in (kg of water)/(kg of dry air).
+where <span>\({\dot m_{da}}\)</span>is dry air mass flow rate in kg/s, *h* is specific enthalpy in J/kg, and W is humidity ratio in (kg of water)/(kg of dry air).
 
 In this case, the outlet air mass flow rate has been set by the zonal unit. The air mass flow rate of one of the inlets - the primary air from the central system - is also known. So the air mass balance equation is used to obtain the secondary air mass flow rate.
 
@@ -3713,7 +3763,7 @@ Given the needed inputs, the output is calculated in subroutine *CalcATMixer*. T
 
 <div>$${\dot m_{da1}}{W_1} + {\dot m_{da2}}{W_2} = {\dot m_{da3}}{W_3}$$</div>
 
-where <span>${\dot m_{da}}$</span>is dry air mass flow rate in kg/s, *h* is specific enthalpy in J/kg, and W is humidity ratio in (kg of water)/(kg of dry air).
+where <span>\({\dot m_{da}}\)</span>is dry air mass flow rate in kg/s, *h* is specific enthalpy in J/kg, and W is humidity ratio in (kg of water)/(kg of dry air).
 
 #### Simulation and Control
 
@@ -3799,37 +3849,37 @@ The various zone mass flow rates are related in the following manner.
 
 <div>$${\dot m_{lk,us}} = Fra{c_{us}} \cdot {\dot m_{s,us,max}}$$</div>
 
-<span>${\dot m_{lk,ds}} = Fra{c_{ds}} \cdot {\dot m_{tu}}$</span>                                                                                <span>$$</span>
+<span>\({\dot m_{lk,ds}} = Fra{c_{ds}} \cdot {\dot m_{tu}}\)</span>                                                                                <span>\(\)</span>
 
 Here
 
-<span>${\dot m_{s,us}}$</span>is the constant zone supply air mass flow rate upstream of the leaks [kg/s];
+<span>\({\dot m_{s,us}}\)</span>is the constant zone supply air mass flow rate upstream of the leaks [kg/s];
 
-<span>${\dot m_{tu}}$</span>is the air mass flow rate through the terminal unit [kg/s];
+<span>\({\dot m_{tu}}\)</span>is the air mass flow rate through the terminal unit [kg/s];
 
-<span>${\dot m_{lk,us}}$</span>is the upstream leakage air mass flow rate [kg/s];
+<span>\({\dot m_{lk,us}}\)</span>is the upstream leakage air mass flow rate [kg/s];
 
-<span>${\dot m_{lk,ds}}$</span>is the downstream leakage air mass flow rate [kg/s];
+<span>\({\dot m_{lk,ds}}\)</span>is the downstream leakage air mass flow rate [kg/s];
 
-<span>${\dot m_{s,us,max}}$</span>is the maximum upstream supply air mass flow rate (program input) [kg/s];
+<span>\({\dot m_{s,us,max}}\)</span>is the maximum upstream supply air mass flow rate (program input) [kg/s];
 
-<span>${\dot m_{s,z}}$</span>is the supply air mass flow rate delivered to the zone [kg/s];
+<span>\({\dot m_{s,z}}\)</span>is the supply air mass flow rate delivered to the zone [kg/s];
 
-<span>$Fra{c_{us}}$</span>is the design upstream leakage fraction (program input);
+<span>\(Fra{c_{us}}\)</span>is the design upstream leakage fraction (program input);
 
-<span>$Fra{c_{ds}}$</span>is the constant downstream leakage fraction (program input);
+<span>\(Fra{c_{ds}}\)</span>is the constant downstream leakage fraction (program input);
 
-<span>${\dot m_{tu}}$</span>is calculated in the VAV terminal unit model in the usual manner: the mass flow rate is varied to meet the zone load. The limits on the mass flow rate variation are set by the <span>${\dot m_{MaxAvail}}$</span> and <span>${\dot m_{MinAvail}}$</span>values stored at the terminal unit’s air inlet node. To account for upstream leakage the maximum air mass flow rate available is reset to:
+<span>\({\dot m_{tu}}\)</span>is calculated in the VAV terminal unit model in the usual manner: the mass flow rate is varied to meet the zone load. The limits on the mass flow rate variation are set by the <span>\({\dot m_{MaxAvail}}\)</span> and <span>\({\dot m_{MinAvail}}\)</span>values stored at the terminal unit’s air inlet node. To account for upstream leakage the maximum air mass flow rate available is reset to:
 
 <div>$${\dot m'_{MaxAvail}} = {\dot m_{MaxAvail}} - {\dot m_{lk,us}}$$</div>
 
-Downstream leakage must also be accounted for because not all of <span>${\dot m_{tu}}$</span>will reach the zone. This is done by having <span>${\dot m_{tu}}$</span>meet an adjusted zone load:
+Downstream leakage must also be accounted for because not all of <span>\({\dot m_{tu}}\)</span>will reach the zone. This is done by having <span>\({\dot m_{tu}}\)</span>meet an adjusted zone load:
 
 <div>$${\dot Q_{z,adjusted}} = \frac{1}{{1 - Fra{c_{ds}}}}{\dot Q_z}$$</div>
 
-Here <span>${\dot Q_z}$</span>[watts] is the actual zone load (met by <span>${\dot m_{s,z}}$</span>) and <span>${\dot Q_{z,adjusted}}$</span>is the load used in the VAV terminal unit model to obtain <span>${\dot m_{tu}}$</span>.
+Here <span>\({\dot Q_z}\)</span>[watts] is the actual zone load (met by <span>\({\dot m_{s,z}}\)</span>) and <span>\({\dot Q_{z,adjusted}}\)</span>is the load used in the VAV terminal unit model to obtain <span>\({\dot m_{tu}}\)</span>.
 
-Once <span>${\dot m_{tu}}$</span> is known, all the other flow rates can be calculated. <span>${\dot m_{s,us}}$</span>is assigned to the air distribution unit’s air inlet node and <span>${\dot m_{s,z}}$</span>is assigned to the unit’s air outlet node. Thus, air mass flow is not conserved through the unit: the two air leakage flow rates disappear. These two vanished flow rates are stored in the air distribution unit data structure. When the downstream return air plenum mass and energy balances are calculated, the leakage flow rate data is accessed and added back in as inlets to the return air plenum. Thus, the overall air system preserves a mass balance.
+Once <span>\({\dot m_{tu}}\)</span> is known, all the other flow rates can be calculated. <span>\({\dot m_{s,us}}\)</span>is assigned to the air distribution unit’s air inlet node and <span>\({\dot m_{s,z}}\)</span>is assigned to the unit’s air outlet node. Thus, air mass flow is not conserved through the unit: the two air leakage flow rates disappear. These two vanished flow rates are stored in the air distribution unit data structure. When the downstream return air plenum mass and energy balances are calculated, the leakage flow rate data is accessed and added back in as inlets to the return air plenum. Thus, the overall air system preserves a mass balance.
 
 #### References
 
@@ -3843,7 +3893,7 @@ Wray, C.P., R.C. Diamond, and M.H. Sherman. 2005. “Rationale for Measuring Duc
 
 #### Overview
 
-The input object ZoneHVAC:FourPipeFanCoil provides a model for a 4 pipe fan coil zonal hydronic unit that can supply heating and cooling to a zone. It contains a hot water coil, a chilled water coil, and a fan. It can supply a fixed amount of outdoor air, but can not operate in an economizer mode. The fan runs at constant speed – control is achieved by throttling the hot or cold water flow. The fan coil configuration and control is rather limited. The fan position is always *blow-through*, control is always by varying the water flow, never by holding the water flow constant and cycling the fan.
+The input object ZoneHVAC:FourPipeFanCoil provides a model for a 4 pipe fan coil zonal hydronic unit that can supply heating and cooling to a zone. It contains a hot water or electric heating coil, a chilled water coil, and a fan. It can supply a fixed amount of outdoor air, but cannot operate in an economizer mode. The fan runs at constant speed – control is achieved by throttling the hot or cold water flow. The fan coil configuration and control is rather limited. The fan position is always *blow-through*, control is always by varying the water flow, never by holding the water flow constant and cycling the fan.
 
 #### Model
 
@@ -3855,13 +3905,13 @@ The 4 pipe fan coil unit is modeled as a compound component consisting of 4 sub-
 
 3.    *Coil:Cooling:Water, Coil:Cooling:Water:DetailedGeometry,* or *CoilSystem:Cooling:Water:HeatExchangerAssisted*
 
-4.    *Coil:Heating:Water*
+4.    *Coil:Heating:Water or Coil:Heating:Electric*
 
 The unit is a forward model: its inputs are defined by the state of its inlets: namely its 2 air streams – recirculated and outdoor air. The outputs of the model are the conditions of the outlet air stream: flow rate, temperature and humidity ratio. The unit data and simulation are encapsulated in the module *FanCoilUnits.*
 
 #### Inputs and Data
 
-The user describes the 4 pipe fan coil unit by inputting the names of the outdoor air mixer, the fan, the heating coil, and the cooling coil. The cooling coil type must also be specified.
+The user describes the 4 pipe fan coil unit by inputting the names of the outdoor air mixer, the fan, the heating coil, and the cooling coil. The heating and cooling coil types must also be specified.
 
 The unit is connected to the overall HVAC system by specifying node names for the unit air inlet (for recirculated air) node, air outlet node, outdoor air node, relief node, inlet hot water node, and inlet chilled water node. The individual components comprising the fan coil must also be input and connected together properly. Specifically the outdoor air mixer mixed air node must be the same as the fan inlet node; the fan outlet node must be the same as the cooling coil air inlet node; the cooling coil air outlet node must be the same as the heating coil air inlet node; and the heating coil air outlet node must be the same as the unit air outlet node; the outdoor air mixer inlet nodes must match the unit inlet nodes; and the outdoor air mixer relief node must match the unit relief node.
 
@@ -3879,29 +3929,83 @@ Given the needed inputs, the output is calculated in subroutine *Calc4PipeFanCoi
 
 3.    the cooling coil is simulated (Call *SimulateWaterCoilComponents* or *SimHXAssistedCoolingCoil*);
 
-4.    the heating coil is simulated (Call *SimulateWaterCoilComponents*).
+4.    the heating coil is simulated (Call *SimulateWaterCoilComponents or SimulateHeatingCoilComponents*).
 
 The load met (sensible cooling or heating) is calculated and passed back to the calling routine:
 
-   <span>${\dot Q_{sens,out}} = {\dot m_{tot}}\cdot ({\mathop{\rm PsyHFnTdbW}\nolimits} ({T_{out}}{\rm{,}}{{\rm{W}}_{{\rm{in}}}}{\rm{) - }}{\mathop{\rm PsyHFnTdbW}\nolimits} ({T_{in}},{W_{in}}))$</span>
+   <span>\({\dot Q_{sens,out}} = {\dot m_{tot}}\cdot ({\mathop{\rm PsyHFnTdbW}\nolimits} ({T_{out}}{\rm{,}}{{\rm{W}}_{{\rm{in}}}}{\rm{) - }}{\mathop{\rm PsyHFnTdbW}\nolimits} ({T_{in}},{W_{in}}))\)</span>
 
 where *PsyHFnTdbW* is the EnergyPlus function for calculating the specific enthalpy of air given the drybulb temperature and the humidity ratio. The subscript *in* indicates the conditions at the inlet recirculated air node.
 
 #### Simulation and Control
 
-From the result of the zone simulation we have the current heating/cooling demand on the unit <span>${\dot Q_{z,req}}$</span>. The first step is to decide whether the unit is on for the current time step. If the load is less than 1 watt or the flow rate is less than .001 kg/s, the unit is off. If the availability schedule is off, the mass flow rate is set to zero, so the second condition holds. When the unit is off there will be no air flow through the unit and outlet conditions will be equal to inlet conditions.
+From the result of the zone simulation we have the current heating/cooling demand on the unit <span>\({\dot Q_{z,req}}\)</span>. The first step is to decide whether the unit is on for the current time step. If the load is less than 1 watt or the flow rate is less than .001 kg/s, the unit is off. If the availability schedule is off, the mass flow rate is set to zero, so the second condition holds. When the unit is off there will be no air flow through the unit and outlet conditions will be equal to inlet conditions.
 
-<span>${\dot Q_{z,req}}$</span> is not the demand on the heating or cooling coil. To obtain the actual coil load, we need to calculate the unit output with no heating or cooling by the coils (<span>${\dot Q_{unit,no{\rm{ }}hc}}$</span>). We obtain this by calling *Calc4PipeFanCoil* with the water flow rates set to zero. Then the coil loads are calculated:
+<span>\({\dot Q_{z,req}}\)</span> is not the demand on the heating or cooling coil. To obtain the actual coil load, we need to calculate the unit output with no heating or cooling by the coils (<span>\({\dot Q_{unit,no{\rm{ }}hc}}\)</span>). We obtain this by calling *Calc4PipeFanCoil* with the water flow rates set to zero. Then the coil loads are calculated:
 
 <div>$${\dot Q_{hc}} = {\dot Q_{z,hsp}} - {\dot Q_{unit,no{\rm{ }}hc}}$$</div>
 
 <div>$${\dot Q_{cc}} = {\dot Q_{z,csp}} - {\dot Q_{unit,no{\rm{ }}hc}}$$</div>
 
-where <span>${\dot Q_{hc}}$</span>is the heating coil load, <span>${\dot Q_{z,hsp}}$</span>is the current zone load to the heating setpoint, <span>${\dot Q_{cc}}$</span>is the cooling coil load, and <span>${\dot Q_{z,csp}}$</span>is the current zone load to the cooling setpoint.
+where <span>\({\dot Q_{hc}}\)</span>is the heating coil load, <span>\({\dot Q_{z,hsp}}\)</span>is the current zone load to the heating setpoint, <span>\({\dot Q_{cc}}\)</span>is the cooling coil load, and <span>\({\dot Q_{z,csp}}\)</span>is the current zone load to the cooling setpoint.
 
-If the unit is on and <span>${\dot Q_{cc}}$</span>&lt; 0 and the thermostat type is not “single heating setpoint”, *ControlCompOutput* is called with the control node set to the cold water inlet node. *ControlCompOutput* is a general component control routine. In this case calls *Calc4PipeFanCoil* repeatedly while varying the cold water flow rate and minimizing <span>$({\dot Q_{sens,out}} - {\dot Q_{z,csp}})/{\dot Q_{z,csp}}$</span>to within the cooling convergence tolerance. Similarly if the unit is on and <span>${\dot Q_{hc}}$</span>&gt;0 and the thermostat type is not “single cooling setpoint”, *ControlCompOutput* is called with the control node set to the hot water inlet node. *ControlCompOutput* varies the hot water flow rate to minimize <span>$({\dot Q_{sens,out}} - {\dot Q_{z,hsp}})/{\dot Q_{z,hsp}}$</span> to within the heating tolerance. *ControlCompOutput* executes a slow but safe interval halving algorithm to do its minimization. Once control is achieved, the total cooling/heating output is calculated:
+If the unit is on and <span>\({\dot Q_{cc}}\)</span>&lt; 0 and the thermostat type is not “single heating setpoint”, *ControlCompOutput* is called with the control node set to the cold water inlet node. *ControlCompOutput* is a general component control routine. In this case calls *Calc4PipeFanCoil* repeatedly while varying the cold water flow rate and minimizing <span>\(({\dot Q_{sens,out}} - {\dot Q_{z,csp}})/{\dot Q_{z,csp}}\)</span>to within the cooling convergence tolerance. Similarly if the unit is on and <span>\({\dot Q_{hc}}\)</span>&gt;0 and the thermostat type is not “single cooling setpoint”, *ControlCompOutput* is called with the control node set to the hot water inlet node (for hydronic heating coil only). *ControlCompOutput* varies the hot water flow rate or the electric heating coil part-load ratio is varied to minimize <span>\(({\dot Q_{sens,out}} - {\dot Q_{z,hsp}})/{\dot Q_{z,hsp}}\)</span> to within the heating tolerance. *ControlCompOutput* executes a slow but safe interval halving algorithm to do its minimization. Once control is achieved, the total cooling/heating output is calculated:
 
-     <span>${\dot Q_{tot,out}} = \dot m\cdot ({\mathop{\rm PsyHFnTdbW}\nolimits} ({T_{out}},{W_{out}}) - {\mathop{\rm PsyHFnTdbW}\nolimits} ({T_{in,}}{W_{in}})$</span>
+     <span>\({\dot Q_{tot,out}} = \dot m\cdot ({\mathop{\rm PsyHFnTdbW}\nolimits} ({T_{out}},{W_{out}}) - {\mathop{\rm PsyHFnTdbW}\nolimits} ({T_{in,}}{W_{in}})\)</span>
+
+
+##### Multi-Speed Fan In FanCoil
+
+When modeling multi-speed fan in FanCoil unit, capacity is modulated using speed ratio or part load ratio.  The supply air fan speed is varied while operating the coils at maximum water flow. When there is no system load to meet, the water control valve is fully closed. When the FanCoil fan is cycling between two consecutive fan speed levels a speed ratio is calculated, but when the FanCoil unit cycles between the minimum fan speed and off-position, then part load ratio is calculated. The fan may be off or run continuously at lowest speed to provide ventilation air depending the fan operating schedule specified. When the FanCoil is operating at the lowest fan speed (Speed = 1), the water flow rate is reported as the average for the time step by multiplying the maximum water flow by part load ratio. The speed ratio and part-load ratio are calculated such that the FanCoil unit satisfies the required system zone cooling or heating load.The set of equations used for the multi-speed fan capacity control methods in FanCoil unit are summarized next.
+
+###### Cycling Between Speeds
+
+When the supply fan is cycling between consecutive speeds, then the speed ratio (SR) and the average mass flow rate are calculated as follows:
+
+<div>$${SR_{n}} = Abs({SystemLoad} - {FullLoadOutput_{n-1}}) / Abs({FullLoadOutput_{n}} - {FullLoadOutput_{n-1}})$$</div>
+<div>$${\dot m} = {\dot m_{on, n}} {SR_{n}} + {\dot m_{on, n-1}} (1 - {SR_{n}})$$</div>
+<div>$${\dot m{w}} = {\dot m_{w, max}}$$</div>
+
+###### Cycling OnOff at Lowest Speed
+
+The average supply air flow rate calculation when the fan is running at the lowest fan speed level depends on the fan operating schedule and load. The fan coil unit part load ratio is given by:
+
+<div>$${PLR} = Abs({SystemLoad} - {NoLoadOutput}) / Abs({FullLoadOutput_{1}} - {NoLoadOutput})$$</div>
+
+
+####### Continuous Fan
+
+<div>$${\dot m} = {\dot m_{on, 1}} {PLR} + {\dot m_{off}} (1 - {PLR})$$</div>$$
+
+####### Cycling Fan:
+
+<div>$${\dot m} = {\dot m_{on, 1}} {PLR}$$</div>$$
+<div>$${\dot m{w}} = {\dot m_{w, max}} * {PLR}$$</div>$$
+
+where:
+
+{SR_{n}}		=	 speed ratio of the fan coil unit at speed n, (-)
+
+{PLR}			=	 part load ratio of the fan coil uni at speed 1, (-)
+
+{\dot m}		=	 average mass flow rate of supply air, (kg/s
+
+{\dot m_{on, n-1}}	=	mass flow rate of supply air at fan speed level n-1, (kg/s)
+
+{\dot m_{on, n}}}	=	mass flow rate of supply air at fan speed level n, (kg/s)
+
+{\dot m_{off}}	=	mass flow rate of supply air when the coils are off, (kg/s)
+
+{\dot m_{w}}	=	 average mass flow rate of chilled or hot water, (kg/s)
+
+{\dot m_{w, max}}	=	maximum or full mass flow rate of chilled or hot water, (kg/s)
+
+SystemLoad 	= system load to be met by the fan coil unit, (W)
+
+{FullLoadOutput_{n-1}} 	= fully load fan coil unit output at fan speed level n-1, (W)
+
+{FullLoadOutput_{n}} 	= fully load fan coil unit output at fan speed level n, (W)
+
 
 #### References
 
@@ -3947,13 +4051,13 @@ For draw-through fan position, the simulation order of the fan and coil is rever
 
 #### Simulation and Control
 
-From the result of the zone simulation we have the heating/cooling demand on the unit <span>${\dot Q_{z,req}}$</span>. The first step is to decide whether the unit is on for the current time step. For a unit with a cycling fan, the entire unit is assumed to be off if there is no cooling load, the cooling load is very small (less than 1 watt), the unit is scheduled off, or the zone temperature is in the deadband. For a unit with a continuous flow the fan operates if the unit is scheduled on, whether or not there is a cooling demand. The coil however only operates if there is a cooling demand and the zone temperature is not in the deadband.
+From the result of the zone simulation we have the heating/cooling demand on the unit <span>\({\dot Q_{z,req}}\)</span>. The first step is to decide whether the unit is on for the current time step. For a unit with a cycling fan, the entire unit is assumed to be off if there is no cooling load, the cooling load is very small (less than 1 watt), the unit is scheduled off, or the zone temperature is in the deadband. For a unit with a continuous flow the fan operates if the unit is scheduled on, whether or not there is a cooling demand. The coil however only operates if there is a cooling demand and the zone temperature is not in the deadband.
 
 If the unit is determined to be on, the next step is to find the unit part load fraction that will satisfy the cooling load. This is done in *ControlCycWindACOutput*. In this routine *CalcCyclingWindowAC*  is first called with part load fraction equal to 0, then with part load fraction equal to 1. These calls establish the minimum and maximum cooling output possible by the unit given the current conditions. An initial estimate of the part load fraction is then made:
 
 <div>$$PLF = ({\dot Q_{z,req}} - {\dot Q_{out,min}})/|{\dot Q_{out,max}} - {\dot Q_{out,min}}|$$</div>
 
-Since the unit’s cooling output is a nonlinear function of the part load fraction, this *PLF* will not give exactly the desired <span>${\dot Q_{z,req}}$</span>. To obtain the exact *PLF* that will give <span>${\dot Q_{z,req}}$</span>, it is necessary to iteratively call *CalcCyclingWindowAC*, varying *PLF* until the desired cooling output is obtained, within the error tolerance specified by the user in the input.
+Since the unit’s cooling output is a nonlinear function of the part load fraction, this *PLF* will not give exactly the desired <span>\({\dot Q_{z,req}}\)</span>. To obtain the exact *PLF* that will give <span>\({\dot Q_{z,req}}\)</span>, it is necessary to iteratively call *CalcCyclingWindowAC*, varying *PLF* until the desired cooling output is obtained, within the error tolerance specified by the user in the input.
 
 Once *PLF* is determined, *ControlCycWindACOutput* is exited. One last call to *CalcCyclingWindowAC* is made to establish the final outlet conditions at the unit’s air outlet node. Finally, the inlet and outlet node conditions are used to calculate the reporting variables: sensible and total cooling output.
 
@@ -3975,7 +4079,7 @@ No specific references.
 
 The input object ZoneHVAC:PackagedTerminalAirConditioner provides a model for a packaged terminal air conditioner (PTAC) that is a compound object made up of other components. Each PTAC consists of an outdoor air mixer, direct expansion (DX) cooling coil, heating coil (gas, electric, hot water, or steam) and a supply air fan. While the figure below shows the PTAC with draw through fan placement, blow through fan placement can also be modeled by positioning the supply air fan between the outdoor air mixer and DX cooling coil. The packaged terminal air conditioner coordinates the operation of these components and is modeled as a type of zone equipment (Ref. ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections).
 
-![PTAC\_Drawthrough](EngineeringReference/media/image7172.png)
+![PTAC\_Drawthrough](media/image7172.png)
 
 Figure 319. Schematic of a Packaged Terminal Air Conditioner with Draw Through Fan Placement
 
@@ -4001,9 +4105,9 @@ If EnergyPlus determines that the air conditioner must supply cooling to the zon
 
 where:
 
-<span>${\mathop Q\limits^ \bullet_{cooling,\,max\,}}$</span> = maximum PTAC sensible cooling rate with cooling coil ON, W
+<span>\({\mathop Q\limits^ \bullet_{cooling,\,max\,}}\)</span> = maximum PTAC sensible cooling rate with cooling coil ON, W
 
-<span>${\mathop m\limits^ \bullet_{\,SA,full\,\,load}}$</span> = supply air mass flow rate at full-load (steady-state) conditions, kg/s
+<span>\({\mathop m\limits^ \bullet_{\,SA,full\,\,load}}\)</span> = supply air mass flow rate at full-load (steady-state) conditions, kg/s
 
 *h<sub>out,\\ full\\ load</sub>* = enthalpy of air exiting the PTAC at full-load conditions, J/kg
 
@@ -4011,9 +4115,9 @@ where:
 
 *HR<sub>min</sub>        =* enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the PTAC exiting air or the zone (exhaust) air
 
-<span>${\mathop Q\limits^ \bullet_{cooling,\,min\,}}$</span>  = minimum PTAC sensible cooling rate with cooling coil OFF, W
+<span>\({\mathop Q\limits^ \bullet_{cooling,\,min\,}}\)</span>  = minimum PTAC sensible cooling rate with cooling coil OFF, W
 
-<span>${\mathop m\limits^ \bullet_{\,SA,coil\,\,off}}$</span>   = supply air mass flow rate with the cooling coil OFF, kg/s
+<span>\({\mathop m\limits^ \bullet_{\,SA,coil\,\,off}}\)</span>   = supply air mass flow rate with the cooling coil OFF, kg/s
 
 *h<sub>out,\\ coil\\ off</sub>*  = enthalpy of air exiting the PTAC with the cooling coil OFF, J/kg
 
@@ -4025,9 +4129,9 @@ With the calculated PTAC sensible cooling rates and the zone sensible cooling lo
 
 where:
 
-<span>$PartLoadRatio$</span>= compressor part-load ratio required to meet the zone load
+<span>\(PartLoadRatio\)</span>= compressor part-load ratio required to meet the zone load
 
-<span>${\mathop Q\limits^ \bullet_{zone,cooling}}$</span> = required zone sensible cooling rate to meet setpoint, W
+<span>\({\mathop Q\limits^ \bullet_{zone,cooling}}\)</span> = required zone sensible cooling rate to meet setpoint, W
 
 Since the part-load performance of the DX cooling coil is frequently non-linear (Ref: DX Cooling Coil Model), and the supply air fan heat varies based on cooling coil operation for the case of cycling fan/cycling coil (AUTO fan), the actual part-load ratio for the cooling coil compressor and fan are determined through iterative calculations (successive modeling of the individual PTAC component models) until the PTAC’s cooling output (including on/off cycling effects) matches the zone cooling load requirement.
 
@@ -4043,9 +4147,9 @@ Calculations of the PTAC’s sensible heating rate delivered to the zone at full
 
 where:
 
-<span>${\mathop Q\limits^ \bullet_{heating,\,max\,}}$</span> = maximum PTAC sensible heating rate with heating coil ON, W
+<span>\({\mathop Q\limits^ \bullet_{heating,\,max\,}}\)</span> = maximum PTAC sensible heating rate with heating coil ON, W
 
-<span>${\mathop Q\limits^ \bullet_{heating,\,min\,}}$</span>  = minimum PTAC sensible heating rate with heating coil OFF, W
+<span>\({\mathop Q\limits^ \bullet_{heating,\,min\,}}\)</span>  = minimum PTAC sensible heating rate with heating coil OFF, W
 
 
 
@@ -4055,9 +4159,9 @@ With the calculated PTAC sensible heating rates and the zone sensible heating lo
 
 where:
 
-<span>$PartLoadRatio$</span>= heating coil part-load ratio required to meet the zone load
+<span>\(PartLoadRatio\)</span>= heating coil part-load ratio required to meet the zone load
 
-<span>${\mathop Q\limits^ \bullet_{zone,heating}}$</span>             = required zone sensible heating rate to meet setpoint, W
+<span>\({\mathop Q\limits^ \bullet_{zone,heating}}\)</span>             = required zone sensible heating rate to meet setpoint, W
 
 
 
@@ -4075,19 +4179,19 @@ The average supply air and outdoor air mass flow rates through the air condition
 
 where:
 
-<span>$\mathop m\limits^ \bullet  {\,_{SA,\,\,avg}}$</span>      = average supply air mass flow rate during the time step, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{SA,\,\,avg}}\)</span>      = average supply air mass flow rate during the time step, kg/s
 
-<span>$\mathop m\limits^ \bullet  {\,_{SA,coil\,\,on}}$</span>   = supply air mass flow rate when the coil is ON, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{SA,coil\,\,on}}\)</span>   = supply air mass flow rate when the coil is ON, kg/s
 
 *PartLoadRatio* = part-load ratio of the coil (heating or cooling)
 
-<span>$\mathop m\limits^ \bullet  {\,_{SA,\,\,coil\,\,off}}$</span>  = supply air mass flow rate when the coil is OFF, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{SA,\,\,coil\,\,off}}\)</span>  = supply air mass flow rate when the coil is OFF, kg/s
 
-<span>$\mathop m\limits^ \bullet  {\,_{OA,\,\,avg\,\,}}$</span>    = average outdoor air mass flow rate during the time step, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{OA,\,\,avg\,\,}}\)</span>    = average outdoor air mass flow rate during the time step, kg/s
 
-<span>$\mathop m\limits^ \bullet  {\,_{OA,\,\,coil\,\,on}}$</span>  = average outdoor air mass flow rate when the coil is ON, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{OA,\,\,coil\,\,on}}\)</span>  = average outdoor air mass flow rate when the coil is ON, kg/s
 
-<span>$\mathop m\limits^ \bullet  {\,_{OA,\,\,coil\,\,off}}$</span>  = average outdoor air mass flow rate when the coil is OFF, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{OA,\,\,coil\,\,off}}\)</span>  = average outdoor air mass flow rate when the coil is OFF, kg/s
 
 
 
@@ -4115,13 +4219,13 @@ At the end of each HVAC simulation time step, this compound object reports the h
 
 where:
 
-<sub><span>${\mathop Q\limits^ \bullet_{Total}}$</span>           </sub>= total energy transfer rate to the zone, W
+<sub><span>\({\mathop Q\limits^ \bullet_{Total}}\)</span>           </sub>= total energy transfer rate to the zone, W
 
-<sub><span>${\mathop Q\limits^ \bullet_{Sensible}}$</span>        </sub>= sensible energy transfer rate to the zone, W
+<sub><span>\({\mathop Q\limits^ \bullet_{Sensible}}\)</span>        </sub>= sensible energy transfer rate to the zone, W
 
-<sub><span>${\mathop Q\limits^ \bullet_{Latent}}$</span>        </sub>= latent energy transfer rate to the zone, W
+<sub><span>\({\mathop Q\limits^ \bullet_{Latent}}\)</span>        </sub>= latent energy transfer rate to the zone, W
 
-<span>$\mathop m\limits^ \bullet  {\,_{SA,\,\,avg}}$</span>      = average mass flow rate of the supply air stream, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{SA,\,\,avg}}\)</span>      = average mass flow rate of the supply air stream, kg/s
 
 *h<sub>out,avg</sub>*       = enthalpy of the air being supplied to the zone, J/kg
 
@@ -4129,25 +4233,25 @@ where:
 
 Since each of these energy transfer rates can be calculated as positive or negative values, individual reporting variables are established for cooling and heating and only positive values are reported. The following calculations are representative of what is done for each of the energy transfer rates:
 
-IF (<span>${\mathop Q\limits^ \bullet_{Total}}$</span>* &lt; 0.0 )*THEN
+IF (<span>\({\mathop Q\limits^ \bullet_{Total}}\)</span>* &lt; 0.0 )*THEN
 
-                  <span>${\mathop Q\limits^ \bullet_{TotalCooling}}$</span> =  ABS (<span>${\mathop Q\limits^ \bullet_{Total}}$</span>)
+                  <span>\({\mathop Q\limits^ \bullet_{TotalCooling}}\)</span> =  ABS (<span>\({\mathop Q\limits^ \bullet_{Total}}\)</span>)
 
-                  <span>${\mathop Q\limits^ \bullet_{TotalHeating}}$</span><sub> </sub> =  *0.0*
+                  <span>\({\mathop Q\limits^ \bullet_{TotalHeating}}\)</span><sub> </sub> =  *0.0*
 
 ELSE
 
-                  <span>${\mathop Q\limits^ \bullet_{TotalCooling}}$</span><sub> </sub> =  *0.0*
+                  <span>\({\mathop Q\limits^ \bullet_{TotalCooling}}\)</span><sub> </sub> =  *0.0*
 
-                  <span>${\mathop Q\limits^ \bullet_{TotalHeating}}$</span><sub> </sub> =  <span>${\mathop Q\limits^ \bullet_{Total}}$</span>
+                  <span>\({\mathop Q\limits^ \bullet_{TotalHeating}}\)</span><sub> </sub> =  <span>\({\mathop Q\limits^ \bullet_{Total}}\)</span>
 
 
 
 where:
 
-<sub><span>${\mathop Q\limits^ \bullet_{TotalCooling}}$</span>   </sub>= output variable ‘Packaged Terminal Air Conditioner Total Zone Cooling Rate, W’
+<sub><span>\({\mathop Q\limits^ \bullet_{TotalCooling}}\)</span>   </sub>= output variable ‘Packaged Terminal Air Conditioner Total Zone Cooling Rate, W’
 
-<sub><span>${\mathop Q\limits^ \bullet_{TotalHeating}}$</span>   </sub>= output variable ‘Packaged Terminal Air Conditioner Total Zone Heating Rate, W’
+<sub><span>\({\mathop Q\limits^ \bullet_{TotalHeating}}\)</span>   </sub>= output variable ‘Packaged Terminal Air Conditioner Total Zone Heating Rate, W’
 
 
 
@@ -4157,7 +4261,7 @@ In addition to heating and cooling rates, the heating and cooling energy supplie
 
 where:
 
-<sub><span>${Q_{TotalCooling}}$</span>   </sub>= output variable ‘Packaged Terminal Air Conditioner Total Zone Cooling Energy, J’
+<sub><span>\({Q_{TotalCooling}}\)</span>   </sub>= output variable ‘Packaged Terminal Air Conditioner Total Zone Cooling Energy, J’
 
 *TimeStepSys* = HVAC system simulation time step, hr
 
@@ -4167,7 +4271,7 @@ where:
 
 The input object ZoneHVAC:PackagedTerminalHeatPump provides a model for a packaged terminal heat pump (PTHP) that is a compound object made up of other components. Each PTHP consists of an outdoor air mixer, direct expansion (DX) cooling coil, DX heating coil, supply air fan, and a supplemental heating coil. While the figure below shows the PTHP with draw through fan placement, blow through fan placement can also be modeled by moving the supply air fan before the DX cooling coil. The packaged terminal heat pump coordinates the operation of these components and is modeled as a type of zone equipment (Ref. ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections).
 
-![PTHP](EngineeringReference/media/image7215.png)
+![PTHP](media/image7215.png)
 
 Figure 320.  Schematic of a Packaged Terminal Heat Pump (Draw Through Fan Placement)
 
@@ -4193,9 +4297,9 @@ If EnergyPlus determines that the heat pump must supply cooling to the zone in o
 
 where:
 
-<span>${\mathop Q\limits^ \bullet_{cooling,\,max\,}}$</span> = maximum PTHP sensible cooling rate with cooling coil ON, W
+<span>\({\mathop Q\limits^ \bullet_{cooling,\,max\,}}\)</span> = maximum PTHP sensible cooling rate with cooling coil ON, W
 
-<span>${\mathop m\limits^ \bullet_{\,SA,full\,\,load}}$</span> = supply air mass flow rate at full-load (steady-state) conditions, kg/s
+<span>\({\mathop m\limits^ \bullet_{\,SA,full\,\,load}}\)</span> = supply air mass flow rate at full-load (steady-state) conditions, kg/s
 
 *h<sub>out,\\ full\\ load</sub>*   = enthalpy of air exiting the PTHP at full-load conditions, J/kg
 
@@ -4203,9 +4307,9 @@ where:
 
 *HR<sub>min</sub>        =* enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the PTHP exiting air or the zone (exhaust) air
 
-<span>${\mathop Q\limits^ \bullet_{cooling,\,min\,}}$</span>  = minimum PTHP sensible cooling rate with cooling coil OFF, W
+<span>\({\mathop Q\limits^ \bullet_{cooling,\,min\,}}\)</span>  = minimum PTHP sensible cooling rate with cooling coil OFF, W
 
-<span>${\mathop m\limits^ \bullet_{\,SA,coil\,\,off}}$</span>   = supply air mass flow rate with the cooling coil OFF, kg/s
+<span>\({\mathop m\limits^ \bullet_{\,SA,coil\,\,off}}\)</span>   = supply air mass flow rate with the cooling coil OFF, kg/s
 
 *h<sub>out,\\ coil\\ off</sub>*    = enthalpy of air exiting the PTHP with the cooling coil OFF, J/kg
 
@@ -4215,9 +4319,9 @@ With the calculated PTHP sensible cooling rates and the zone sensible cooling lo
 
 where:
 
-<span>$PartLoadRatio$</span>= compressor part-load ratio required to meet the zone load
+<span>\(PartLoadRatio\)</span>= compressor part-load ratio required to meet the zone load
 
-<span>${\mathop Q\limits^ \bullet_{zone,cooling}}$</span> = required zone sensible cooling rate to meet setpoint, W
+<span>\({\mathop Q\limits^ \bullet_{zone,cooling}}\)</span> = required zone sensible cooling rate to meet setpoint, W
 
 Since the part-load performance of the DX cooling coil is frequently non-linear (Ref: DX Cooling Coil Model), and the supply air fan heat varies based on cooling coil operation for the case of cycling fan/cycling coil (AUTO fan), the actual part-load ratio for the cooling coil compressor and fan are determined through iterative calculations (successive modeling of the individual PTHP component models) until the PTHP’s cooling output (including on/off cycling effects) matches the zone cooling load requirement within the cooling convergence tolerance that is specified.
 
@@ -4233,9 +4337,9 @@ Calculations of the PTHP’s sensible heating rate delivered to the zone at full
 
 where:
 
-<span>${\mathop Q\limits^ \bullet_{heating,\,max\,}}$</span> = maximum PTHP sensible heating rate with DX heating coil ON, W
+<span>\({\mathop Q\limits^ \bullet_{heating,\,max\,}}\)</span> = maximum PTHP sensible heating rate with DX heating coil ON, W
 
-<span>${\mathop Q\limits^ \bullet_{heating,\,min\,}}$</span>  = minimum PTHP sensible heating rate with DX heating coil OFF, W
+<span>\({\mathop Q\limits^ \bullet_{heating,\,min\,}}\)</span>  = minimum PTHP sensible heating rate with DX heating coil OFF, W
 
 With the calculated PTHP sensible heating rates and the zone sensible heating load to be met, the compressor part-load ratio for the PTHP is approximately equal to:
 
@@ -4243,9 +4347,9 @@ With the calculated PTHP sensible heating rates and the zone sensible heating lo
 
 where:
 
-<span>$PartLoadRatio$</span>= compressor part-load ratio required to meet the zone load
+<span>\(PartLoadRatio\)</span>= compressor part-load ratio required to meet the zone load
 
-<span>${\mathop Q\limits^ \bullet_{zone,heating}}$</span>             = required zone sensible heating rate to meet setpoint, W
+<span>\({\mathop Q\limits^ \bullet_{zone,heating}}\)</span>             = required zone sensible heating rate to meet setpoint, W
 
 Iterative calculations (successive modeling of the individual PTHP component models) are used to determine the final heating part-load ratio to account for the non-linear performance of the DX heating coil at part-load conditions and the variation in supply air fan heat for the case of cycling fan/cycling coil (AUTO fan). If DX heating coil operating at full load is unable to meet the entire zone heating load (e.g., the DX heating coil capacity is insufficient or the coil is scheduled OFF, or the outdoor temperature is below the PTHP’s minimum outdoor dry-bulb temperature for compressor operation), the supplemental heating coil is activated to meet the remaining zone heating load to the extent possible.
 
@@ -4261,19 +4365,19 @@ The average supply air and outdoor air mass flow rates through the heat pump for
 
 where:
 
-<span>$\dot m{\,_{SA,\,\,avg}}$</span>      = average supply air mass flow rate during the time step, kg/s
+<span>\(\dot m{\,_{SA,\,\,avg}}\)</span>      = average supply air mass flow rate during the time step, kg/s
 
-<span>$\dot m{\,_{SA,comp\,\,on}}$</span>  = supply air mass flow rate when the DX coil compressor is ON, kg/s
+<span>\(\dot m{\,_{SA,comp\,\,on}}\)</span>  = supply air mass flow rate when the DX coil compressor is ON, kg/s
 
 *PartLoadRatio* = part-load ratio of the DX coil compressor (heating or cooling)
 
-<span>$\dot m{\,_{SA,\,\,comp\,\,off}}$</span>            = supply air mass flow rate when the DX coil compressor is OFF, kg/s
+<span>\(\dot m{\,_{SA,\,\,comp\,\,off}}\)</span>            = supply air mass flow rate when the DX coil compressor is OFF, kg/s
 
-<span>$\dot m{\,_{OA,\,\,avg\,\,}}$</span>    = average outdoor air mass flow rate during the time step, kg/s
+<span>\(\dot m{\,_{OA,\,\,avg\,\,}}\)</span>    = average outdoor air mass flow rate during the time step, kg/s
 
-<span>$\dot m{\,_{OA,\,\,comp\,\,on}}$</span> = average outdoor air mass flow rate when the DX coil compressor is ON, kg/s
+<span>\(\dot m{\,_{OA,\,\,comp\,\,on}}\)</span> = average outdoor air mass flow rate when the DX coil compressor is ON, kg/s
 
-<span>$\dot m{\,_{OA,\,\,comp\,\,off}}$</span>= average outdoor air mass flow rate when the DX coil compressor is OFF, kg/s
+<span>\(\dot m{\,_{OA,\,\,comp\,\,off}}\)</span>= average outdoor air mass flow rate when the DX coil compressor is OFF, kg/s
 
 The supply air and outdoor air flow rates when the DX cooling or DX heating coil compressor is ON are specified by the user (e.g., supply air volumetric flow rate during cooling operation, supply air volumetric flow rate during heating operation, outdoor air volumetric air flow rate during cooling operation, and outdoor air volumetric air flow rate during heating operation) and are converted from volumetric to mass flow rate. If the user has specified cycling fan operation (supply air fan operating mode schedule value = 0), then the supply air and outdoor air mass flow rates when the DX compressor is OFF are zero. If the user has specified constant fan operation (supply air fan operating mode schedule value &gt; 0), then the user-defined air flow rates when no cooling or heating is needed are used when the DX compressor is OFF.
 
@@ -4299,35 +4403,35 @@ At the end of each HVAC simulation time step, this compound object reports the h
 
 where:
 
-<sub><span>${\dot Q_{Total}}$</span>           </sub>= total energy transfer rate to the zone, W
+<sub><span>\({\dot Q_{Total}}\)</span>           </sub>= total energy transfer rate to the zone, W
 
-<sub><span>${\dot Q_{Sensible}}$</span>       </sub>= sensible energy transfer rate to the zone, W
+<sub><span>\({\dot Q_{Sensible}}\)</span>       </sub>= sensible energy transfer rate to the zone, W
 
-<sub><span>${\dot Q_{Latent}}$</span>          </sub>= latent energy transfer rate to the zone, W
+<sub><span>\({\dot Q_{Latent}}\)</span>          </sub>= latent energy transfer rate to the zone, W
 
-<span>$\dot m{\,_{SA,\,\,avg}}$</span>      = average mass flow rate of the supply air stream, kg/s
+<span>\(\dot m{\,_{SA,\,\,avg}}\)</span>      = average mass flow rate of the supply air stream, kg/s
 
 *h<sub>out,avg</sub>*         = enthalpy of the air being supplied to the zone, J/kg
 
 Since each of these energy transfer rates can be calculated as positive or negative values, individual reporting variables are established for cooling and heating and only positive values are reported. The following calculations are representative of what is done for each of the energy transfer rates:
 
-IF (<span>${\dot Q_{Total}}$</span>*&lt; 0.0 )*THEN
+IF (<span>\({\dot Q_{Total}}\)</span>*&lt; 0.0 )*THEN
 
-                  <span>${\dot Q_{TotalCooling}}$</span> =  ABS (<span>${\dot Q_{Total}}$</span>)
+                  <span>\({\dot Q_{TotalCooling}}\)</span> =  ABS (<span>\({\dot Q_{Total}}\)</span>)
 
-                  <span>${\dot Q_{TotalHeating}}$</span><sub> </sub> =  *0.0*
+                  <span>\({\dot Q_{TotalHeating}}\)</span><sub> </sub> =  *0.0*
 
 ELSE
 
-                  <span>${\dot Q_{TotalCooling}}$</span><sub> </sub> =  *0.0*
+                  <span>\({\dot Q_{TotalCooling}}\)</span><sub> </sub> =  *0.0*
 
-                  <span>${\dot Q_{TotalHeating}}$</span><sub> </sub> =  <span>${\dot Q_{Total}}$</span>
+                  <span>\({\dot Q_{TotalHeating}}\)</span><sub> </sub> =  <span>\({\dot Q_{Total}}\)</span>
 
 where:
 
-<sub><span>${\dot Q_{TotalCooling}}$</span>         </sub>= output variable ‘Packaged Terminal Heat Pump Total Zone Cooling Rate, W’
+<sub><span>\({\dot Q_{TotalCooling}}\)</span>         </sub>= output variable ‘Packaged Terminal Heat Pump Total Zone Cooling Rate, W’
 
-<sub><span>${\dot Q_{TotalHeating}}$</span>         </sub>= output variable ‘Packaged Terminal Heat Pump Total Zone Heating Rate, W’
+<sub><span>\({\dot Q_{TotalHeating}}\)</span>         </sub>= output variable ‘Packaged Terminal Heat Pump Total Zone Heating Rate, W’
 
 In addition to heating and cooling rates, the heating and cooling energy supplied to the zone is also calculated for the time step being reported. The following example for total zone cooling energy is representative of what is done for the sensible and latent energy as well as the heating counterparts.
 
@@ -4335,7 +4439,7 @@ In addition to heating and cooling rates, the heating and cooling energy supplie
 
 where:
 
-<sub><span>${Q_{TotalCooling}}$</span>   </sub>= output variable ‘Packaged Terminal Heat Pump Total Zone Cooling Energy, J’
+<sub><span>\({Q_{TotalCooling}}\)</span>   </sub>= output variable ‘Packaged Terminal Heat Pump Total Zone Cooling Energy, J’
 
 *TimeStepSys* = HVAC system simulation time step, hr
 
@@ -4347,7 +4451,7 @@ where:
 
 The input object ZoneHVAC:WaterToAirHeatPump provides a zone equipment model for a water-to-air heat pump that is a “virtual” component consisting of an on/off fan component, a water-to-air heat pump cooling coil, a water-to-air heat pump heating coil, and a gas or electric supplemental heating coil. The specific configuration of the blowthru heat pump is shown in the following figure. For a drawthru heat pump, the fan is located between the water-to-air heat pump heating coil and the supplemental heating coil. In addition, a water-to-air heat pump has a water loop connection on its source side. The water loop can be served by a condenser loop (like GHE for Ground source systems), or by a cooling tower/ boiler plant loop (for water loop systems).
 
-![Schematic\_ZoneWSHP](EngineeringReference/media/image7258.png)
+![Schematic\_ZoneWSHP](media/image7258.png)
 
 Figure 321.  Source Side and Load Side Configuration of a Zone WaterToAir Heat Pump
 
@@ -4381,37 +4485,37 @@ Assuming no losses, the source side heat transfer rate for cooling and heating m
 
 where:
 
-<span>$A1 - F5$</span>     = Equation fit coefficients for the cooling and heating mode
+<span>\(A1 - F5\)</span>     = Equation fit coefficients for the cooling and heating mode
 
-<span>${{T_{ref}}}$</span>            = 283K
+<span>\({{T_{ref}}}\)</span>            = 283K
 
-<span>${{T_{w,in}}}$</span>           = Entering water temperature, K
+<span>\({{T_{w,in}}}\)</span>           = Entering water temperature, K
 
-<span>${{T_{db}}}$</span>             = Entering air dry-bulb temperature, K
+<span>\({{T_{db}}}\)</span>             = Entering air dry-bulb temperature, K
 
-<span>${{T_{wb}}}$</span>            = Entering air wet-bulb temperature, K
+<span>\({{T_{wb}}}\)</span>            = Entering air wet-bulb temperature, K
 
-<span>${{{\dot V}_{air}}}$</span>            = Load side air volumetric flow rate, m<sup>3</sup>/s
+<span>\({{{\dot V}_{air}}}\)</span>            = Load side air volumetric flow rate, m<sup>3</sup>/s
 
-<span>${{{\dot V}_{w}}}$</span>                         = Source side water volumetric flow rate, m<sup>3</sup>/s
+<span>\({{{\dot V}_{w}}}\)</span>                         = Source side water volumetric flow rate, m<sup>3</sup>/s
 
-<span>${{Q_{total}}}$</span>          = Total cooling capacity, W
+<span>\({{Q_{total}}}\)</span>          = Total cooling capacity, W
 
-<span>${{Q_{sens}}}$</span>          = Sensible cooling capacity, W
+<span>\({{Q_{sens}}}\)</span>          = Sensible cooling capacity, W
 
-<span>${Powe{r_c}}$</span>     = Power consumption (cooling mode), W
+<span>\({Powe{r_c}}\)</span>     = Power consumption (cooling mode), W
 
-<span>${{Q_{source,c}}}$</span>      = Source side heat transfer rate (cooling mode), W
+<span>\({{Q_{source,c}}}\)</span>      = Source side heat transfer rate (cooling mode), W
 
-<span>${{Q_{h}}}$</span>                         = Total heating capacity, W
+<span>\({{Q_{h}}}\)</span>                         = Total heating capacity, W
 
-<span>${Powe{r_h}}$</span>     = Power consumption (heating mode), W
+<span>\({Powe{r_h}}\)</span>     = Power consumption (heating mode), W
 
-<span>${{Q_{source,h}}}$</span>      = Source side heat transfer rate (heating mode), W
+<span>\({{Q_{source,h}}}\)</span>      = Source side heat transfer rate (heating mode), W
 
-The inlet conditions or variables are divided by the reference conditions. This formulation allows the coefficients to fall into smaller range of values. Moreover, the value of the coefficient indirectly represents the sensitivity of the output to that particular inlet variable. The reference conditions used when generating the performance coefficients must be the same as the reference conditions used later in the model. The reference temperature <span>${{T_{ref}}}$</span>is fixed at 283K. Temperature unit of Kelvin is used instead of Celsius to keep the ratio of the water inlet temperature and reference temperature positive should the water inlet temperature drop below the freezing point.
+The inlet conditions or variables are divided by the reference conditions. This formulation allows the coefficients to fall into smaller range of values. Moreover, the value of the coefficient indirectly represents the sensitivity of the output to that particular inlet variable. The reference conditions used when generating the performance coefficients must be the same as the reference conditions used later in the model. The reference temperature <span>\({{T_{ref}}}\)</span>is fixed at 283K. Temperature unit of Kelvin is used instead of Celsius to keep the ratio of the water inlet temperature and reference temperature positive should the water inlet temperature drop below the freezing point.
 
-For cooling mode, the reference conditions; reference load side air volumetric flow rate <span>$\left( {{{\dot V}_{air,ref}}} \right)$</span>,reference source side water volumetric flow rate<span>$\left( {{{\dot V}_{w,ref}}} \right)$</span>,reference sensible capacity <span>$\left( {{Q_{sens,ref}}} \right)$</span> and reference power input <span>$\left( {Powe{r_{c,ref}}} \right)$</span> are the conditions when the heat pump is operating at the highest cooling capacity or reference cooling capacity<span>$\left( {{Q_{total,ref}}} \right)$</span> indicated in the manufacturer’s catalog. Note that the reference conditions for heating mode might differ from the reference conditions specified for the cooling mode.
+For cooling mode, the reference conditions; reference load side air volumetric flow rate <span>\(\left( {{{\dot V}_{air,ref}}} \right)\)</span>,reference source side water volumetric flow rate<span>\(\left( {{{\dot V}_{w,ref}}} \right)\)</span>,reference sensible capacity <span>\(\left( {{Q_{sens,ref}}} \right)\)</span> and reference power input <span>\(\left( {Powe{r_{c,ref}}} \right)\)</span> are the conditions when the heat pump is operating at the highest cooling capacity or reference cooling capacity<span>\(\left( {{Q_{total,ref}}} \right)\)</span> indicated in the manufacturer’s catalog. Note that the reference conditions for heating mode might differ from the reference conditions specified for the cooling mode.
 
 #### Coefficient estimation procedure:
 
@@ -4419,7 +4523,7 @@ The generalized least square method is used to generate the coefficients. This m
 
 
 
-![](EngineeringReference/media/image7286.png)
+![](media/image7286.png)
 
 Figure 322. Information Flow Chart for Water-to-Air Heat Pump Equation Fit Model (Tang 2005)
 
@@ -4429,7 +4533,7 @@ Figure 322. Information Flow Chart for Water-to-Air Heat Pump Equation Fit Model
 
 This model, object name ZoneHVAC:Dehumidifier:DX, simulates the thermal performance and electric power consumption of conventional mechanical dehumidifiers. These systems use a direct expansion (DX) cooling coil to cool and dehumidify an airstream. Heat from the DX system’s condenser section is rejected into the cooled/dehumidified airstream, resulting in warm dry air being supplied from the unit. In EnergyPlus, this object is modeled as a type of zone equipment (ref. ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections).
 
-![Dehumidifier\_Schematic](EngineeringReference/media/image7287.png)
+![Dehumidifier\_Schematic](media/image7287.png)
 
 Figure 323. Mechanical Dehumidifier Schematic
 
@@ -4493,11 +4597,11 @@ For any simulation time step when there is a water removal load to be met, the d
 
 where
 
-<span>${\dot m_{_{water,ss}}}$</span>  =  dehumidifier steady-state water removal rate, kg/s
+<span>\({\dot m_{_{water,ss}}}\)</span>  =  dehumidifier steady-state water removal rate, kg/s
 
-<span>${\rho_{water}}$</span> = density of water, kg/m<sup>3</sup>
+<span>\({\rho_{water}}\)</span> = density of water, kg/m<sup>3</sup>
 
-<span>${\dot V_{_{water,rated}}}$</span>  = rated water removal rate (user input), L/day
+<span>\({\dot V_{_{water,rated}}}\)</span>  = rated water removal rate (user input), L/day
 
 The Zone Dehumidifier Part-Load Ratio (output variable) is then calculated, with the result constrained to be from 0.0 to 1.0:
 
@@ -4509,15 +4613,15 @@ The steady-state and average electrical power consumed by the dehumidifier are c
 
 where
 
-<span>${P_{dehumid,ss}}$</span>= dehumidifier steady-state electric power, W
+<span>\({P_{dehumid,ss}}\)</span>= dehumidifier steady-state electric power, W
 
-<span>${P_{dehumid,avg}}$</span>= Zone Dehumidifier Electric Power, W (output variable)
+<span>\({P_{dehumid,avg}}\)</span>= Zone Dehumidifier Electric Power, W (output variable)
 
 <div>$$RTF = \frac{{PLR}}{{PLF}}\, = \,Zone Dehumidifier\,\,Runtime\,\,Fraction (output variable)$$</div>
 
-<span>$E{F_{rated}}$</span>  = rated energy factor (user input), L/kWh
+<span>\(E{F_{rated}}\)</span>  = rated energy factor (user input), L/kWh
 
-<span>${P_{off - cycle}}$</span>  = off-cycle parasitic electric load (user input), W
+<span>\({P_{off - cycle}}\)</span>  = off-cycle parasitic electric load (user input), W
 
 If the dehumidifier is unavailable to operate for the time period (via the specified availability schedule) then Zone Dehumidifier Electric Power is set equal to zero.
 
@@ -4543,11 +4647,11 @@ p=101325\*(1-2.25577E-05\*Z)\*\*5.2559  where p=pressure in Pa and Z=altitude i
 
 where
 
-<span>${\dot m_{_{air,avg}}}$</span>= average air mass flow rate through dehumidifier, kg/s
+<span>\({\dot m_{_{air,avg}}}\)</span>= average air mass flow rate through dehumidifier, kg/s
 
-<span>${\dot V_{_{air,rated}}}$</span>= rated air flow rate (user input), m<sup>3</sup>/s
+<span>\({\dot V_{_{air,rated}}}\)</span>= rated air flow rate (user input), m<sup>3</sup>/s
 
-<span>${\rho_{air}}$</span> = density of air at 26.7°C , 60% RH and local barometric pressure, kg/m<sup>3</sup>
+<span>\({\rho_{air}}\)</span> = density of air at 26.7°C , 60% RH and local barometric pressure, kg/m<sup>3</sup>
 
 The dry-bulb temperature and humidity ratio of the air leaving the dehumidifier are calculated as follows:
 
@@ -4561,7 +4665,7 @@ outlet air temperature when the dehumidifier is operating.
 
 *T<sub>in</sub>* = inlet air dry-bulb temperature, C
 
-<span>${C_p}$</span>= heat capacity of air, J/kg
+<span>\({C_p}\)</span>= heat capacity of air, J/kg
 
 *w<sub>in</sub>* = inlet air humidity ratio, kg/kg
 
@@ -4601,15 +4705,15 @@ where
 
 *m<sub>water</sub>*= output variable ‘Zone Dehumidifier Removed Water Mass [kg]’
 
-<span>${\dot V_{_{water,avg}}}$</span>*<sub> </sub>*= output variable ‘Zone Dehumidifier Condensate Volume Flow Rate [m<sup>3</sup>/s]’
+<span>\({\dot V_{_{water,avg}}}\)</span>*<sub> </sub>*= output variable ‘Zone Dehumidifier Condensate Volume Flow Rate [m<sup>3</sup>/s]’
 
-<span>${V_{_{water}}}$</span>  = output variable ‘Zone Dehumidifier Condensate Volume [m<sup>3</sup>]’
+<span>\({V_{_{water}}}\)</span>  = output variable ‘Zone Dehumidifier Condensate Volume [m<sup>3</sup>]’
 
 ### Energy Recovery Ventilator
 
 The input object ZoneHVAC:EnergyRecoveryVentilator provides a model for a stand alone energy recovery ventilator (ERV) that is a single-zone HVAC component used for exhaust air heat recovery (see figure below). This compound object consists of three required components: a generic air-to-air heat exchanger (see object HeatExchanger:AirToAir:SensibleAndLatent), a supply air fan, and an exhaust air fan (see object Fan:OnOff). An optional controller (see object  ZoneHVAC:EnergyRecoveryVentilator:Controller) may be used to simulate economizer (free cooling) operation.
 
-![Schematic\_StandAloneERV](EngineeringReference/media/image7321.png)
+![Schematic\_StandAloneERV](media/image7321.png)
 
 Figure 324. Schematic of the Energy Recovery Ventilator:Stand Alone compound object
 
@@ -4643,7 +4747,7 @@ During each simulation time step, the air mass flow rate at the supply air and e
 
 IF (availability schedule value &gt; 0) THEN
 
- <span>${\mathop m\limits^ \bullet_{Supply}} = \rho {\mathop V\limits^ \bullet_{Supply}}$</span>
+ <span>\({\mathop m\limits^ \bullet_{Supply}} = \rho {\mathop V\limits^ \bullet_{Supply}}\)</span>
 
 <div>$${\mathop m\limits^ \bullet_{Exhaust}} = \rho {\mathop V\limits^ \bullet_{Exhaust}}$$</div>
 
@@ -4653,15 +4757,15 @@ ELSE
 
 *where*:
 
-<span>${\mathop m\limits^ \bullet_{Supply}}$</span>             = mass flow rate of the supply air stream, kg/s
+<span>\({\mathop m\limits^ \bullet_{Supply}}\)</span>             = mass flow rate of the supply air stream, kg/s
 
-<span>${\mathop m\limits^ \bullet_{Exhaust}}$</span>            = mass flow rate of the exhaust air stream, kg/s
+<span>\({\mathop m\limits^ \bullet_{Exhaust}}\)</span>            = mass flow rate of the exhaust air stream, kg/s
 
-<span>$\rho $</span>                    = density of dry air at local barometric pressure (adjusted for altitude)        and 20 ºC, kg/m<sup>3</sup>
+<span>\(\rho \)</span>                    = density of dry air at local barometric pressure (adjusted for altitude)        and 20 ºC, kg/m<sup>3</sup>
 
-<span>${\mathop V\limits^ \bullet_{Supply}}$</span>             = volumetric flow rate of the supply air stream, m<sup>3</sup>/s
+<span>\({\mathop V\limits^ \bullet_{Supply}}\)</span>             = volumetric flow rate of the supply air stream, m<sup>3</sup>/s
 
-<span>${\mathop V\limits^ \bullet_{Exhaust}}$</span>            = volumetric flow rate of the exhaust air stream, m<sup>3</sup>/s
+<span>\({\mathop V\limits^ \bullet_{Exhaust}}\)</span>            = volumetric flow rate of the exhaust air stream, m<sup>3</sup>/s
 
 With the supply and exhaust inlet air mass flow rates set, the compound object then calls the generic air-to-air heat exchanger model to determine its supply air and exhaust air exiting conditions based on the inputs specified in the heat exchanger object. The supply air and exhaust air fans are then modeled to determine the final conditions of the air streams exiting the stand alone energy recovery ventilator. The heat exchanger and fan models are described in detail elsewhere in this document (reference: HeatExchanger:AirToAir:SensibleAndLatent and Fan:OnOff).
 
@@ -4671,9 +4775,9 @@ The sensible heat transfer rate to the zone by the stand alone ventilator is the
 
  where:
 
-<sub><span>${\mathop Q\limits^ \bullet_{Sensible}}$</span>        </sub>= sensible energy transfer rate to the zone, W
+<sub><span>\({\mathop Q\limits^ \bullet_{Sensible}}\)</span>        </sub>= sensible energy transfer rate to the zone, W
 
-<span>${\mathop m\limits^ \bullet_{Supply}}$</span>       = mass flow rate of the supply air stream, kg/s
+<span>\({\mathop m\limits^ \bullet_{Supply}}\)</span>       = mass flow rate of the supply air stream, kg/s
 
 *h<sub>SupplyOutlet</sub>*   = enthalpy of the air being supplied to the zone, J/kg
 
@@ -4697,13 +4801,13 @@ At the end of each HVAC simulation time step, this compound object reports the h
 
  where:
 
-<sub><span>${\dot Q_{Total}}$</span>           </sub>= total energy transfer rate to the zone, W
+<sub><span>\({\dot Q_{Total}}\)</span>           </sub>= total energy transfer rate to the zone, W
 
-<sub><span>${\dot Q_{Sensible}}$</span>        </sub>= sensible energy transfer rate to the zone, W
+<sub><span>\({\dot Q_{Sensible}}\)</span>        </sub>= sensible energy transfer rate to the zone, W
 
-<sub><span>${\dot Q_{Latent}}$</span>        </sub>= latent energy transfer rate to the zone, W
+<sub><span>\({\dot Q_{Latent}}\)</span>        </sub>= latent energy transfer rate to the zone, W
 
-<span>${\mathop m\limits^ \bullet_{Supply}}$</span>       = mass flow rate of the supply air stream, kg/s
+<span>\({\mathop m\limits^ \bullet_{Supply}}\)</span>       = mass flow rate of the supply air stream, kg/s
 
 *h<sub>SupplyOutlet</sub>*   = enthalpy of the air being supplied to the zone, J/kg
 
@@ -4717,25 +4821,25 @@ At the end of each HVAC simulation time step, this compound object reports the h
 
 Since each of these energy transfer rates can be calculated as positive or negative values, individual reporting variables are established for cooling and heating and only positive values are reported. The following calculations are representative of what is done for each of the energy transfer rates:
 
-IF (<span>${\dot Q_{Total}}$</span>* &lt; 0.0 )*THEN
+IF (<span>\({\dot Q_{Total}}\)</span>* &lt; 0.0 )*THEN
 
-                  <span>${\dot Q_{TotalCooling}}$</span> =  ABS (<span>${\dot Q_{Total}}$</span>)
+                  <span>\({\dot Q_{TotalCooling}}\)</span> =  ABS (<span>\({\dot Q_{Total}}\)</span>)
 
-                  <span>${\dot Q_{TotalHeating}}$</span><sub> </sub> =  *0.0*
+                  <span>\({\dot Q_{TotalHeating}}\)</span><sub> </sub> =  *0.0*
 
 ELSE
 
-                  <span>${\dot Q_{TotalCooling}}$</span><sub> </sub> =  *0.0*
+                  <span>\({\dot Q_{TotalCooling}}\)</span><sub> </sub> =  *0.0*
 
-                  <span>${\dot Q_{TotalHeating}}$</span><sub> </sub> =  <span>${\dot Q_{Total}}$</span>
+                  <span>\({\dot Q_{TotalHeating}}\)</span><sub> </sub> =  <span>\({\dot Q_{Total}}\)</span>
 
 
 
 where:
 
-<sub><span>${\dot Q_{TotalCooling}}$</span>   </sub>= output variable ‘Zone Ventilator Total Cooling Rate, W’
+<sub><span>\({\dot Q_{TotalCooling}}\)</span>   </sub>= output variable ‘Zone Ventilator Total Cooling Rate, W’
 
-<sub><span>${\dot Q_{TotalHeating}}$</span>   </sub>= output variable ‘Zone Ventilator Total Heating Rate, W’
+<sub><span>\({\dot Q_{TotalHeating}}\)</span>   </sub>= output variable ‘Zone Ventilator Total Heating Rate, W’
 
 
 
@@ -4745,7 +4849,7 @@ In addition to heating and cooling rates, the heating and cooling energy supplie
 
 where:
 
-<sub><span>${\dot Q_{TotalCooling}}$</span>   </sub>= output variable ‘Zone Ventilator Total Cooling Energy, J’
+<sub><span>\({\dot Q_{TotalCooling}}\)</span>   </sub>= output variable ‘Zone Ventilator Total Cooling Energy, J’
 
 *TimeStepSys* = HVAC system simulation time step, hr
 
@@ -4757,33 +4861,33 @@ The input object ZoneHVAC:EvaporativeCoolerUnit provides a zone equipment model 
 
 There are three choices for control methods.
 
-**ZoneTemperatureDeadbandOnOffCycling**. This control method operates the cooler unit in a manner similar to how a normal, real-world themostat operates.  The control uses input for throttling temperature range, <span>$\Delta {T_{throttle}}$</span>, the most recent result for zone air node temperature, <span>${T_{zone}}$</span>, and the current cooling setpoint temperature, <span>${T_{set}}$</span>.  The controller also stores the history of whether or not the unit was operating during the previous timestep to model hysteresis control where the unit retains its mode when it passes through the throttling range (to avoid short cycling).
+**ZoneTemperatureDeadbandOnOffCycling**. This control method operates the cooler unit in a manner similar to how a normal, real-world themostat operates.  The control uses input for throttling temperature range, <span>\(\Delta {T_{throttle}}\)</span>, the most recent result for zone air node temperature, <span>\({T_{zone}}\)</span>, and the current cooling setpoint temperature, <span>\({T_{set}}\)</span>.  The controller also stores the history of whether or not the unit was operating during the previous timestep to model hysteresis control where the unit retains its mode when it passes through the throttling range (to avoid short cycling).
 
 The following algorithm is used to determine if the unit will operate.
 
-If <span>$\left[ {{T_{zone}} < \left( {{T_{set}} - 0.5*\Delta {T_{throttle}}} \right)} \right]$</span> is true, then do not operate cooler unit.
+If <span>\(\left[ {{T_{zone}} &lt; \left( {{T_{set}} - 0.5*\Delta {T_{throttle}}} \right)} \right]\)</span> is true, then do not operate cooler unit.
 
-If <span>$\left[ {{T_{zone}} > \left( {{T_{set}} + 0.5*\Delta {T_{throttle}}} \right)} \right]$</span> is true, then operate the cooler unit (at full speed).
+If <span>\(\left[ {{T_{zone}} > \left( {{T_{set}} + 0.5*\Delta {T_{throttle}}} \right)} \right]\)</span> is true, then operate the cooler unit (at full speed).
 
-If zone air temperature is within the throttling range, <span>$\left[ {\left( {{T_{set}} - 0.5*\Delta {T_{throttle}}} \right) < {T_{zone}} < \left( {{T_{set}} + 0.5*\Delta {T_{throttle}}} \right)} \right]$</span>, then continue to operate the cooler if it was running during the previous timestep and do not operate the cooler if it was not running during the previous timestep.
-
-Whenever the unit is operating, it runs at the full design air mass flow rate regardless if the fan is constant or variable speed.
-
-**ZoneCoolingLoadOnOffCycling.** This control method operates the cooler similar to how a thermostat would behave, but instead of using temperatures it uses the predicted zone load to cooling setpoint.  The control uses input for the threshold value for a load that is considered a significant, <span>${\dot Q_{thresh}}$</span>, and the result from the Predictor for the zone’s load to cooling setpoint, <span>${\dot Q_{CoolLoad}}$</span>. The following algorithm is used to determine if the unit will operate.
-
-If <span>$\left[ {{{\dot Q}_{CoolLoad}} \le {{\dot Q}_{thresh}}} \right]$</span> is true, then do not operate cooler unit.
-
-If <span>$\left[ {{{\dot Q}_{CoolLoad}} > {{\dot Q}_{thresh}}} \right]$</span> is true, then operate the cooler unit (at full speed).
+If zone air temperature is within the throttling range, <span>\(\left[ {\left( {{T_{set}} - 0.5*\Delta {T_{throttle}}} \right) &lt; {T_{zone}} &lt; \left( {{T_{set}} + 0.5*\Delta {T_{throttle}}} \right)} \right]\)</span>, then continue to operate the cooler if it was running during the previous timestep and do not operate the cooler if it was not running during the previous timestep.
 
 Whenever the unit is operating, it runs at the full design air mass flow rate regardless if the fan is constant or variable speed.
 
-**ZoneCoolingLoadVariableSpeedFan.** This control method also operates the cooler using the predicted zone load to cooling setpoint but instead of on/off cycling, it modulates the fan speed to meet the cooling load.  This control method is only applicable to cooler units with variable speed supply fans. The control uses input for the threshold value for a load that is considered a significant, <span>${\dot Q_{thresh}}$</span>, and the result from the Predictor for the zone’s cooling load to setpoint, <span>${\dot Q_{CoolLoad}}$</span>. The following algorithm is used to determine if the unit will operate.
+**ZoneCoolingLoadOnOffCycling.** This control method operates the cooler similar to how a thermostat would behave, but instead of using temperatures it uses the predicted zone load to cooling setpoint.  The control uses input for the threshold value for a load that is considered a significant, <span>\({\dot Q_{thresh}}\)</span>, and the result from the Predictor for the zone’s load to cooling setpoint, <span>\({\dot Q_{CoolLoad}}\)</span>. The following algorithm is used to determine if the unit will operate.
 
-If <span>$\left[ {{{\dot Q}_{CoolLoad}} \le {{\dot Q}_{thresh}}} \right]$</span> is true, then do not operate cooler unit.
+If <span>\(\left[ {{{\dot Q}_{CoolLoad}} \le {{\dot Q}_{thresh}}} \right]\)</span> is true, then do not operate cooler unit.
 
-If <span>$\left[ {{{\dot Q}_{CoolLoad}} > {{\dot Q}_{thresh}}} \right]$</span> is true, then operate the cooler unit.
+If <span>\(\left[ {{{\dot Q}_{CoolLoad}} > {{\dot Q}_{thresh}}} \right]\)</span> is true, then operate the cooler unit (at full speed).
 
-When the unit operates, the model first operates the unit at the highest fan speed, a fan speed ratio of 1.0, and determines the sensible cooling provided by the unit to the zone, <span>${\dot Q_{FullOutput}}$</span>.  If <span>${\dot Q_{FullOutput}} \le {\dot Q_{CoolLoad}}$</span>then the unit operates at full fan speed because the cooler cannot meet the entire zone cooling load.  If <span>${\dot Q_{FullOutput}} > {\dot Q_{CoolLoad}}$</span> then the model solves for a fan speed ratio between 0.0 and 1.0 that satisifies <span>$ABS\left( {\dot Q{}_{Output} - {{\dot Q}_{CoolLoad}}} \right) < 0.01$</span> using the non-linear numerical method called regula falsi.
+Whenever the unit is operating, it runs at the full design air mass flow rate regardless if the fan is constant or variable speed.
+
+**ZoneCoolingLoadVariableSpeedFan.** This control method also operates the cooler using the predicted zone load to cooling setpoint but instead of on/off cycling, it modulates the fan speed to meet the cooling load.  This control method is only applicable to cooler units with variable speed supply fans. The control uses input for the threshold value for a load that is considered a significant, <span>\({\dot Q_{thresh}}\)</span>, and the result from the Predictor for the zone’s cooling load to setpoint, <span>\({\dot Q_{CoolLoad}}\)</span>. The following algorithm is used to determine if the unit will operate.
+
+If <span>\(\left[ {{{\dot Q}_{CoolLoad}} \le {{\dot Q}_{thresh}}} \right]\)</span> is true, then do not operate cooler unit.
+
+If <span>\(\left[ {{{\dot Q}_{CoolLoad}} > {{\dot Q}_{thresh}}} \right]\)</span> is true, then operate the cooler unit.
+
+When the unit operates, the model first operates the unit at the highest fan speed, a fan speed ratio of 1.0, and determines the sensible cooling provided by the unit to the zone, <span>\({\dot Q_{FullOutput}}\)</span>.  If <span>\({\dot Q_{FullOutput}} \le {\dot Q_{CoolLoad}}\)</span>then the unit operates at full fan speed because the cooler cannot meet the entire zone cooling load.  If <span>\({\dot Q_{FullOutput}} > {\dot Q_{CoolLoad}}\)</span> then the model solves for a fan speed ratio between 0.0 and 1.0 that satisifies <span>\(ABS\left( {\dot Q{}_{Output} - {{\dot Q}_{CoolLoad}}} \right) &lt; 0.01\)</span> using the non-linear numerical method called regula falsi.
 
 ### Unit Heater
 
@@ -4849,7 +4953,7 @@ Note: the unit ventilator controls are strictly temperature based and do not fac
 
 Variable refrigerant flow zone terminal units are used exclusively with variable refrigerant flow (VRF) air conditioning systems (ref: AirConditioner:VariableRefrigerantFlow and ZoneTerminalUnitList). The terminal units operate to satisfy a heating or cooling load in a zone based on a zone thermostat temperature set point. A direct-expansion (DX) cooling and/or DX heating coil is specified depending on the operating mode required. Outdoor ventilation air is modeled with the use of an outside air mixer object. Outside air may be provided to the zone only when the coil is operating or can be supplied continuously even when the coil is not operating. A supply air fan is also required and can be modeled as either draw through as shown in the figure below or as blow through where the fan inlet node would be connected to the outside air mixer mixed air node. If an outside air mixer is not used, the fan inlet node would be connected to the zone exhaust node.
 
-![](EngineeringReference/media/image7369.png)
+![](media/image7369.png)
 
 Figure 325. Zone Terminal Unit Schematic
 
@@ -4881,19 +4985,19 @@ The average supply air and outdoor air mass flow rates through the terminal unit
 
 where:
 
-<span>$\mathop m\limits^ \bullet  {\,_{SA,\,\,avg}}$</span>      = average supply air mass flow rate during the time step, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{SA,\,\,avg}}\)</span>      = average supply air mass flow rate during the time step, kg/s
 
-<span>$\mathop m\limits^ \bullet  {\,_{SA,coil\,\,on}}$</span>   = supply air mass flow rate when the coil is ON, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{SA,coil\,\,on}}\)</span>   = supply air mass flow rate when the coil is ON, kg/s
 
 *CyclingRatio* = cycling ratio of the heat pump condenser (heating or cooling)
 
-<span>$\mathop m\limits^ \bullet  {\,_{SA,\,\,coil\,\,off}}$</span>  = supply air mass flow rate when the coil is OFF, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{SA,\,\,coil\,\,off}}\)</span>  = supply air mass flow rate when the coil is OFF, kg/s
 
-<span>$\mathop m\limits^ \bullet  {\,_{OA,\,\,avg\,\,}}$</span>    = average outside air mass flow rate during the time step, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{OA,\,\,avg\,\,}}\)</span>    = average outside air mass flow rate during the time step, kg/s
 
-<span>$\mathop m\limits^ \bullet  {\,_{OA,\,\,coil\,\,on}}$</span>  = average outside air mass flow rate when the coil is ON, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{OA,\,\,coil\,\,on}}\)</span>  = average outside air mass flow rate when the coil is ON, kg/s
 
-<span>$\mathop m\limits^ \bullet  {\,_{OA,\,\,coil\,\,off}}$</span>  = average outside air mass flow rate when the coil is OFF, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{OA,\,\,coil\,\,off}}\)</span>  = average outside air mass flow rate when the coil is OFF, kg/s
 
 The supply air and outside air flow rates when the DX cooling coil or the DX heating coil is ON are specified by the user (i.e., supply air volumetric flow rate during cooling operation, supply air volumetric flow rate during heating operation, outside air volumetric air flow rate during cooling operation, and outside air volumetric air flow rate during heating operation) and are converted from volumetric to mass flow rate. If the user has specified cycling fan/cycling coil operation (i.e. supply air fan operating mode schedule value is equal to 0), then the supply air and outside air mass flow rates when the coil is OFF are zero. If the user has specified constant fan/cycling coil operation (i.e. supply air fan operating mode schedule value is greater than 0), then the user-defined air flow rates when no cooling or heating is needed are used when the coil is OFF.
 
@@ -4917,13 +5021,13 @@ At the end of each HVAC simulation time step, this compound object reports the h
 
 where:
 
-<sub><span>${\dot Q_{Total}}$</span>                 </sub> = total energy transfer rate to the zone, W
+<sub><span>\({\dot Q_{Total}}\)</span>                 </sub> = total energy transfer rate to the zone, W
 
-<sub><span>${\dot Q_{Sensible}}$</span>            </sub> = sensible energy transfer rate to the zone, W
+<sub><span>\({\dot Q_{Sensible}}\)</span>            </sub> = sensible energy transfer rate to the zone, W
 
-<sub><span>${\dot Q_{Latent}}$</span>             </sub> = latent energy transfer rate to the zone, W
+<sub><span>\({\dot Q_{Latent}}\)</span>             </sub> = latent energy transfer rate to the zone, W
 
-<span>$\mathop m\limits^ \bullet  {\,_{SA,\,\,avg}}$</span>= average mass flow rate of the supply air stream, kg/s
+<span>\(\mathop m\limits^ \bullet  {\,_{SA,\,\,avg}}\)</span>= average mass flow rate of the supply air stream, kg/s
 
 *h<sub>out,avg</sub>*          = enthalpy of the air being supplied to the zone, J/kg
 
@@ -4931,25 +5035,25 @@ The terminal unit’s energy transfer rate is used by the program in the zone ai
 
 Since each of these energy transfer rates can be calculated as positive or negative values, individual reporting variables are established for cooling and heating and only positive values are reported. The following calculations are representative of what is done for each of the energy transfer rates:
 
-IF (<span>${\dot Q_{Total}}$</span>* &lt; 0.0 )* THEN
+IF (<span>\({\dot Q_{Total}}\)</span>* &lt; 0.0 )* THEN
 
-      <span>${\dot Q_{TotalCooling}}$</span> =  ABS (<span>${\dot Q_{Total}}$</span>)
+      <span>\({\dot Q_{TotalCooling}}\)</span> =  ABS (<span>\({\dot Q_{Total}}\)</span>)
 
-      <span>${\dot Q_{TotalHeating}}$</span><sub> </sub> =  *0.0*
+      <span>\({\dot Q_{TotalHeating}}\)</span><sub> </sub> =  *0.0*
 
 ELSE
 
-      <span>${\dot Q_{TotalCooling}}$</span><sub> </sub> =  *0.0*
+      <span>\({\dot Q_{TotalCooling}}\)</span><sub> </sub> =  *0.0*
 
-      <span>${\dot Q_{TotalHeating}}$</span><sub> </sub> =  <span>${\dot Q_{Total}}$</span>
+      <span>\({\dot Q_{TotalHeating}}\)</span><sub> </sub> =  <span>\({\dot Q_{Total}}\)</span>
 
 ENDIF
 
 where:
 
-<sub><span>${\dot Q_{TotalCooling}}$</span>    </sub> = output variable ‘Zone VRF Air Terminal Total Cooling Rate, W’
+<sub><span>\({\dot Q_{TotalCooling}}\)</span>    </sub> = output variable ‘Zone VRF Air Terminal Total Cooling Rate, W’
 
-<sub><span>${\dot Q_{TotalHeating}}$</span>    </sub> = output variable ‘Zone VRF Air Terminal Total Heating Rate, W’
+<sub><span>\({\dot Q_{TotalHeating}}\)</span>    </sub> = output variable ‘Zone VRF Air Terminal Total Heating Rate, W’
 
 In addition to heating and cooling rates, the heating and cooling energy supplied to the zone is also calculated for the time step being reported. The following example for total zone cooling energy is representative of what is done for the sensible and latent energy as well as the heating counterparts.
 
@@ -4957,7 +5061,7 @@ In addition to heating and cooling rates, the heating and cooling energy supplie
 
 where:
 
-<sub><span>${\dot Q_{TotalCooling}}$</span>      </sub> = output variable ‘Zone VRF Air Terminal Total Cooling Energy, J’
+<sub><span>\({\dot Q_{TotalCooling}}\)</span>      </sub> = output variable ‘Zone VRF Air Terminal Total Cooling Energy, J’
 
 *TimeStepSys* = HVAC system simulation time step, hr
 
@@ -4967,7 +5071,7 @@ where:
 
 The input object ZoneHVAC:VentilatedSlab provides a model for ventilated slab systems that in general use outdoor air to “precool” slabs with colder nighttime air. This method of precooling the thermal mass of a space can be very effective when nighttime temperatures are low and the mass of the system is high enough to provide a significant amount of cooling potential during the day to counteract internal heat gains within a zone. Nearly all ventilated slabs are simple systems such as that shown in the right side of Figure 326. The fan is shown in a blow through position, but the model will allow either a blow or draw through configuration.
 
-![Slide1](EngineeringReference/media/image7396.png)
+![Slide1](media/image7396.png)
 
 Figure 326. Basic System for the Ventilated Slab Module
 
@@ -4975,15 +5079,15 @@ It should be noted that in Figure 326 the use of “unit ventilator” and “lo
 
 The ventilated slab system has been implemented in a fashion that is similar to the “unit ventilator” system in EnergyPlus. The unit ventilator is a system that allows the user to bring in outdoor air (ventilation) that may or may not be tempered with a heating or cooling coil as shown the left side of Figure 326. The air can be delivered to the slab only (Figure 327), to the slab then to the space(Figure 328), and to several slabs in different areas in series (Figure 329). The model essentially combines the functionality of the low temperature radiant system (using air as a transport medium rather than water) and the unit ventilator. In some cases, the system may not meet all the zone heating and cooling load because it is operated not by setpoint of the zone but control temperature range and coil outlet air temperature set by user input.**Note that no coils are shown in Figure 329 for diagram simplicity but the implementation of the system shown in Figure 329 includes coils as in Figure 327 and Figure 328.
 
-![Slide2](EngineeringReference/media/image7397.png)
+![Slide2](media/image7397.png)
 
 Figure 327. Model with Air Delivered to Slab. (Slab Only Mode)
 
-![Slide3](EngineeringReference/media/image7398.png)
+![Slide3](media/image7398.png)
 
 Figure 328. Zone Supply Model using Ventilated Slab (Slab and Zone mode)
 
-![Slide4](EngineeringReference/media/image7399.png)
+![Slide4](media/image7399.png)
 
 Figure 329. Multiple Slabs model with Several Zones (Series Slabs Mode)
 
@@ -5003,7 +5107,7 @@ The Cool Tower (object ZoneCoolTower:Shower) is available for modeling a cooltow
 
 The shower cooling tower shown in figure below is controlled by a schedule and the specification of maximum water flow rate and volume flow rate as well as minimum indoor temperature. The actual flow rate of water and air can be controlled as users specify the fractions of water loss and flow schedule. The required input fields include effective tower height and exit area to obtain the temperature and flow rate of the air exiting the tower. A schedule and rated power for the water pump are also required to determine the power consumed. The component typically has a stand-alone water system that is not added to the water consumption from mains. However, users are required to specify the water source through an optional field, the name of water supply storage tank, in case any water comes from a water main.
 
-![cooltower config](EngineeringReference/media/image7400.svg.png)
+![cooltower config](media/image7400.svg.png)
 
 Figure 330. Typical Cooltower Configuration
 
@@ -5049,7 +5153,7 @@ This cooltower model allows the user to specify water loss due to drift or blow 
 
 <div>$${Q_{actual}} = Q(1.0 - Fraction)$$</div>
 
-The model then determines the exit humidity ratio (<span>${\omega_{out}}$</span>) from the relation of mass balances below.
+The model then determines the exit humidity ratio (<span>\({\omega_{out}}\)</span>) from the relation of mass balances below.
 
 <div>$${\omega_{in}}({\dot m_{air}} + {\dot m_{water}}) = {\omega_{out}} \cdot {\dot m_{air}}$$</div>
 
@@ -5063,13 +5167,13 @@ In this case, actual mass flow rate at the inlet and outlet of cooltower cannot 
 
 <div>$${\dot m_{air}} = {\rho_{initia{l_{air}}}} \cdot {Q_{actual}}$$</div>
 
-where <span>${\omega_{initial}}$</span>and <span>${\rho_{initial}}$</span> are the humidity ratio and air density of the initialized air and <span>${\omega_{in}}$</span>is the humidity ratio of outdoor air.
+where <span>\({\omega_{initial}}\)</span>and <span>\({\rho_{initial}}\)</span> are the humidity ratio and air density of the initialized air and <span>\({\omega_{in}}\)</span>is the humidity ratio of outdoor air.
 
-Therefore, the humidity ratio of exit air, <span>${\omega_{out}}$</span>, is
+Therefore, the humidity ratio of exit air, <span>\({\omega_{out}}\)</span>, is
 
 <div>$${\omega_{out}} = \frac{{{\omega_{in}}({{\dot m}_{air}} + {{\dot m}_{water}})}}{{{{\dot m}_{air}}}}$$</div>
 
-Once the humidity ratio at the exit is determined, the model can obtain the actual density (<span>${\rho_{air}}$</span>), specific heat (<span>${c_p}_{,air}$</span>), and mass flow rate (<span>${\dot m_{cooltower}}$</span>) of the air leaving cooltower by using EnergyPlus psychrometric function and following equation.
+Once the humidity ratio at the exit is determined, the model can obtain the actual density (<span>\({\rho_{air}}\)</span>), specific heat (<span>\({c_p}_{,air}\)</span>), and mass flow rate (<span>\({\dot m_{cooltower}}\)</span>) of the air leaving cooltower by using EnergyPlus psychrometric function and following equation.
 
 <div>$${c_p}_{,air} = PsyCpAirFnWtdb({\omega_{out}},{T_{out}})$$</div>
 
@@ -5532,7 +5636,7 @@ The ZoneThermalChimney input object is available for modeling a thermal chimney 
 
 * The discharged amount of interior air induced by the thermal chimney is replaced by the outdoor air infiltration.
 
-![Thermal Chimney](EngineeringReference/media/image7454.png)
+![Thermal Chimney](media/image7454.png)
 
 Figure 331. Basic Composition of Thermal Chimney
 
@@ -5570,7 +5674,7 @@ Where, *C<sub>d</sub>* is the discharge coefficient, *A<sub>o</sub>* and *A<sub>
 
 Since multiple inlets are merged into a single inlet in the beginning, the air flow rate passing through each inlet due to the existence of the thermal chimney can be finally determined as follows:
 
-<span>${Q_1} = Q{r_1}$</span>,    <span>${Q_2} = Q{r_2}$</span>,    <span>${Q_3} = Q{r_3}$</span>,    ∙∙∙,    <span>${Q_n} = Q{r_n}$</span>
+<span>\({Q_1} = Q{r_1}\)</span>,    <span>\({Q_2} = Q{r_2}\)</span>,    <span>\({Q_3} = Q{r_3}\)</span>,    ∙∙∙,    <span>\({Q_n} = Q{r_n}\)</span>
 
 Where, *Q<sub>n</sub>* is the air flow rate passing through nth inlet (m<sup>3</sup>/s) and *r<sub>n</sub>* is the relative ratio of air flow rate passing through nth inlet.
 
@@ -5761,7 +5865,7 @@ M. M. Aboulnaga and S. N. Abdrabboh, Improving Night Ventilation into Low-rise B
 
 The zone outdoor air unit (object ZoneHVAC:OutdoorAirUnit) is intended to model systems such as zone make-up air units and dedicated outside air systems.  These components are “zone equipment” meaning that they do not require an air loop but serve a zone directly.  The system is comprised of a supply fan (in either draw through or blow through configuration), an optional exhaust fan, and a variety of components such as heating coils, cooling coils, heat recovery, etc.  The object of the zone outdoor air unit is to bring in additional ventilation air into a zone.  These might be used for high ventilation spaces such as kitchens or laboratories where another system is primarily responsible for space conditioning while the zone outside air unit is primarily responsible for fresh air delivery to the zone.  Most of the information necessary to configure a zone outdoor air unit is contained in the EnergyPlus Input/Output Reference.  A diagram of the zone outdoor air unit is shown below.  As this system is relatively simple and does not contain any unique operating algorithm or equations, the discussion here is limited to the application of the user defined controls and how it relates to the operation of the device.
 
-![](EngineeringReference/media/image7466.png)
+![](media/image7466.png)
 
 Figure 332. Zone Outdoor Air Unit Schematic
 
@@ -5783,7 +5887,7 @@ It should be noted that to avoid excessive iteration that the zone mean air temp
 
 ***Temperature Control***.  If the user selects temperature control, the intent is to limit the outlet temperature of the unit for either heating or cooling or both or perhaps to provide unconditioned air to the space.  The algorithm used to determine the outlet temperature of the unit is as follows.  When the outdoor air temperature is at or below the low air temperature control schedule value, the outlet temperature is set to the low air temperature control schedule value and any heating equipment included in the unit description and available will attempt to provide enough heating to produce an outlet temperature equal to the low temperature schedule value.  When the outdoor air temperature is at or above the high air temperature control schedule value, the outlet temperature of the unit is set to the high air temperature control schedule value and any cooling equipment included in the unit description and available will attempt to provide enough cooling to produce an outlet air temperature equal to the high temperature schedule value.  When the outdoor air temperature is between the high and low temperature values, the unit will not provide any conditioning of outdoor air and will simply deliver it to the zone.  Mathematically, this can be summarized as:
 
-<div>$${T_{out}} = \left\{ {\begin{array}{*{20}{c}}{{T_{high}}\;if\;{T_{oa}} \ge {T_{high}}}\\ {{T_{oa}}\;if\;{T_{low}} < {T_{oa}} < {T_{high}}}\\ {{T_{low}}\;if\;{T_{oa}} \le {T_{low}}}\end{array}} \right.$$</div>
+<div>$${T_{out}} = \left\{ {\begin{array}{*{20}{c}}{{T_{high}}\;if\;{T_{oa}} \ge {T_{high}}}\\ {{T_{oa}}\;if\;{T_{low}} &lt; {T_{oa}} &lt; {T_{high}}}\\ {{T_{low}}\;if\;{T_{oa}} \le {T_{low}}}\end{array}} \right.$$</div>
 
 where:
 
@@ -5801,7 +5905,7 @@ If the user wishes to provide “unconditioned” air all of the time, the high 
 
 The zone exhaust fan (Fan:ZoneExhaust) is a simple model to account for the fan electric energy use and impact on central air handlers from bathroom and hood exhaust.  Because the fan only extracts air from the zone, it doesn’t directly impact the zone itself.
 
-The fan flow rate is either constant or variable depending on if the user input a flow fraction modifier schedule.   The value entered for maximum volume flow rate is converted to a design mass flow rate using standard (altitude-adjusted) density and used as the design flow rate.  If a flow fraction schedule is used, then its values, <span>${f_{Fract}}$</span>, are multiplied by the design flow rate to obtain the current mass flow.
+The fan flow rate is either constant or variable depending on if the user input a flow fraction modifier schedule.   The value entered for maximum volume flow rate is converted to a design mass flow rate using standard (altitude-adjusted) density and used as the design flow rate.  If a flow fraction schedule is used, then its values, <span>\({f_{Fract}}\)</span>, are multiplied by the design flow rate to obtain the current mass flow.
 
 <div>$${\dot m_{Des}} = {\dot V_{Max}}{\rho_{air,std}}$$</div>
 
@@ -5819,5 +5923,5 @@ The exhaust fan model is similar to, but simpler than, the models used for air s
 
 The controls for determining if the the exhaust fan will operate can be based on a number of factors including: an on/off availability schedule, interaction with system availability managers, minimum zone air temperature control limits and a variable flow fraction schedule.  When the fan is coupled to the system availability managers then it will operate if either the local availability schedule or the system availability manager’s indicate that the fan should run.  When the fan is not coupled to the system availability manager, then it only uses the local availability schedule and ignores availability managers.  If using the flow fraction schedule and the resulting flow is zero, then fan will not run.  If using the minimum zone temperature limit schedule then the fan will only run if the fan inlet temperature is warmer than the limit.
 
-The exhaust fan’s interaction with the air system depends on the value, <span>${f_{Bal}}$</span>, of the schedule for the fraction of the exhaust that is balanced.  The model tracks the exhaust flows in two ways, balanced and unbalanced. Balanced exhaust air flow is considered to have been made up from simple airflow from infiltration, ventilation or zone mixing.  Unbalanced exhaust air flow is considered to not be balanced by simple air flows and needs to be balanced by the air system operation.  Both of these types of flow are summed at the zone and whole air system level.   In a zone, the return air node flow rate is reduced from what it would be with no exhaust by the portion of the zone’s exhaust flow that is unbalanced.  In an air handler with an outdoor air system, the outdoor air flow rate may be increased so as to be sufficient to provide all the unbalanced exhaust air for all the zones on the air handler (when possible).
+The exhaust fan’s interaction with the air system depends on the value, <span>\({f_{Bal}}\)</span>, of the schedule for the fraction of the exhaust that is balanced.  The model tracks the exhaust flows in two ways, balanced and unbalanced. Balanced exhaust air flow is considered to have been made up from simple airflow from infiltration, ventilation or zone mixing.  Unbalanced exhaust air flow is considered to not be balanced by simple air flows and needs to be balanced by the air system operation.  Both of these types of flow are summed at the zone and whole air system level.   In a zone, the return air node flow rate is reduced from what it would be with no exhaust by the portion of the zone’s exhaust flow that is unbalanced.  In an air handler with an outdoor air system, the outdoor air flow rate may be increased so as to be sufficient to provide all the unbalanced exhaust air for all the zones on the air handler (when possible).
 

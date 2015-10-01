@@ -160,7 +160,7 @@ namespace HVACCooledBeam {
 
 		// Get the  unit index
 		if ( CompIndex == 0 ) {
-			CBNum = FindItemInList( CompName, CoolBeam.Name(), NumCB );
+			CBNum = FindItemInList( CompName, CoolBeam );
 			if ( CBNum == 0 ) {
 				ShowFatalError( "SimCoolBeam: Cool Beam Unit not found=" + CompName );
 			}
@@ -294,7 +294,7 @@ namespace HVACCooledBeam {
 			CBNum = CBIndex;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), CoolBeam.Name(), CBNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), CoolBeam, CBNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -348,6 +348,7 @@ namespace HVACCooledBeam {
 			TestCompSet( CurrentModuleObject, CoolBeam( CBNum ).Name, NodeID( CoolBeam( CBNum ).CWInNode ), NodeID( CoolBeam( CBNum ).CWOutNode ), "Water Nodes" );
 
 			//Setup the Cooled Beam reporting variables
+			//CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:CooledBeam"
 			SetupOutputVariable( "Zone Air Terminal Beam Sensible Cooling Energy [J]", CoolBeam( CBNum ).BeamCoolingEnergy, "System", "Sum", CoolBeam( CBNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Zone Air Terminal Beam Chilled Water Energy [J]", CoolBeam( CBNum ).BeamCoolingEnergy, "System", "Sum", CoolBeam( CBNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Zone Air Terminal Beam Sensible Cooling Rate [W]", CoolBeam( CBNum ).BeamCoolingRate, "System", "Average", CoolBeam( CBNum ).Name );
@@ -1257,7 +1258,7 @@ namespace HVACCooledBeam {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

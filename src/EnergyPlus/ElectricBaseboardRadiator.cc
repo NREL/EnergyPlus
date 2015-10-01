@@ -144,7 +144,7 @@ namespace ElectricBaseboardRadiator {
 
 		// Find the correct Baseboard Equipment
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( EquipName, ElecBaseboard.EquipName(), NumElecBaseboards );
+			BaseboardNum = FindItemInList( EquipName, ElecBaseboard, &ElecBaseboardParams::EquipName );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "SimElectricBaseboard: Unit not found=" + EquipName );
 			}
@@ -210,7 +210,6 @@ namespace ElectricBaseboardRadiator {
 		using InputProcessor::SameString;
 		using InputProcessor::FindItemInList;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using GlobalNames::VerifyUniqueBaseboardName;
 		using General::RoundSigDigits;
 		using ScheduleManager::GetScheduleIndex;
@@ -275,7 +274,7 @@ namespace ElectricBaseboardRadiator {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ElecBaseboard.EquipName(), BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ElecBaseboard, &ElecBaseboardParams::EquipName, BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				continue;
@@ -417,7 +416,7 @@ namespace ElectricBaseboardRadiator {
 			AllFracsSummed = ElecBaseboard( BaseboardNum ).FracDistribPerson;
 			for ( SurfNum = 1; SurfNum <= ElecBaseboard( BaseboardNum ).TotSurfToDistrib; ++SurfNum ) {
 				ElecBaseboard( BaseboardNum ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 3 );
-				ElecBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 3 ), Surface.Name(), TotSurfaces );
+				ElecBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 3 ), Surface );
 				ElecBaseboard( BaseboardNum ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 6 );
 				if ( ElecBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFieldNames( SurfNum + 3 ) + "=\"" + cAlphaArgs( SurfNum + 3 ) + "\" invalid - not found." );
@@ -800,8 +799,8 @@ namespace ElectricBaseboardRadiator {
 				// Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
 				DistributeBBElecRadGains();
 				// Now "simulate" the system by recalculating the heat balances
-				CalcHeatBalanceOutsideSurf( ZoneNum );
-				CalcHeatBalanceInsideSurf( ZoneNum );
+				HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
+				HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
 				// Here an assumption is made regarding radiant heat transfer to people.
 				// While the radiant heat transfer to people array will be used by the thermal comfort
 				// routines, the energy transfer to people would get lost from the perspective
@@ -1008,7 +1007,6 @@ namespace ElectricBaseboardRadiator {
 		using DataHeatBalFanSys::MaxRadHeatFlux;
 		using General::RoundSigDigits;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using DataZoneEquipment::ZoneEquipConfig;
 
 		// Locals
@@ -1182,7 +1180,7 @@ namespace ElectricBaseboardRadiator {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

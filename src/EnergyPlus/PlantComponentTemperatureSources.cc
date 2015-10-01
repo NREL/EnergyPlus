@@ -132,7 +132,7 @@ namespace PlantComponentTemperatureSources {
 
 		// Find the correct Chiller
 		if ( CompIndex == 0 ) {
-			SourceNum = FindItemInList( SourceName, WaterSource.Name(), NumSources );
+			SourceNum = FindItemInList( SourceName, WaterSource );
 			if ( SourceNum == 0 ) {
 				ShowFatalError( "SimWaterSource: Specified heat exchanger not one of Valid heat exchangers=" + SourceName );
 			}
@@ -241,7 +241,7 @@ namespace PlantComponentTemperatureSources {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), WaterSource.Name(), SourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), WaterSource, SourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";

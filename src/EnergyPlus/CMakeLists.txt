@@ -18,6 +18,7 @@ SET( SRC
   AirflowNetworkBalanceManager.hh
   AirflowNetworkSolver.cc
   AirflowNetworkSolver.hh
+  AirTerminalUnit.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
   BaseboardRadiator.cc
@@ -238,6 +239,11 @@ SET( SRC
   GlobalNames.hh
   GroundHeatExchangers.cc
   GroundHeatExchangers.hh
+  GroundTemperatureModeling/BaseGroundTemperatureModel.hh
+  GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.cc
+  GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh
+  GroundTemperatureModeling/GroundTemperatureModelManager.cc
+  GroundTemperatureModeling/GroundTemperatureModelManager.hh
   HVACControllers.cc
   HVACControllers.hh
   HVACCooledBeam.cc
@@ -248,6 +254,8 @@ SET( SRC
   HVACDXSystem.hh
   HVACDuct.cc
   HVACDuct.hh
+  HVACFourPipeBeam.cc
+  HVACFourPipeBeam.hh
   HVACHXAssistedCoolingCoil.cc
   HVACHXAssistedCoolingCoil.hh
   HVACInterfaceManager.cc
@@ -300,10 +308,22 @@ SET( SRC
   HighTempRadiantSystem.hh
   Humidifiers.cc
   Humidifiers.hh
+  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
+  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
 )
-
+ 
 SET( SRC_2
   Timer.h
+  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc
+  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh
+  GroundTemperatureModeling/SiteDeepGroundTemperatures.cc
+  GroundTemperatureModeling/SiteDeepGroundTemperatures.hh
+  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.cc
+  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh
+  GroundTemperatureModeling/SiteShallowGroundTemperatures.cc
+  GroundTemperatureModeling/SiteShallowGroundTemperatures.hh
+  GroundTemperatureModeling/XingGroundTemperatureModel.cc
+  GroundTemperatureModeling/XingGroundTemperatureModel.hh
   ICEngineElectricGenerator.cc
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc
@@ -344,8 +364,12 @@ SET( SRC_2
   OutputReportPredefined.hh
   OutputReportTabular.cc
   OutputReportTabular.hh
+  OutputReportTabularAnnual.cc
+  OutputReportTabularAnnual.hh
   OutputReports.cc
   OutputReports.hh
+  OutputReportData.cc
+  OutputReportData.hh
   OutsideEnergySources.cc
   OutsideEnergySources.hh
   PackagedTerminalHeatPump.cc
@@ -360,6 +384,8 @@ SET( SRC_2
   PlantPipes/PipeHeatTransfer.hh
   PlantPipes/Pipes.cc
   PlantPipes/Pipes.hh
+  PierceSurface.cc
+  PierceSurface.hh
   PlantCentralGSHP.cc
   PlantCentralGSHP.hh
   PlantChillers/ChillerBase.hh
@@ -409,6 +435,8 @@ SET( SRC_2
   ReportSizingManager.hh
   ReturnAirPathManager.cc
   ReturnAirPathManager.hh
+  RoomAirModelAirflowNetwork.cc
+  RoomAirModelAirflowNetwork.hh
   RoomAirModelManager.cc
   RoomAirModelManager.hh
   RoomAirModelUserTempPattern.cc
@@ -549,7 +577,7 @@ endif()
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport DElight )
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport DElight jsoncpp )
 if(UNIX AND NOT APPLE)
   target_link_libraries( energypluslib dl )
 endif()

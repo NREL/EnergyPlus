@@ -50,6 +50,8 @@ private: // Friend
 public: // Types
 
 	typedef  TypeTraits< T >  Traits;
+	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
+	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
 
 	// STL Style
 	typedef  T  value_type;
@@ -193,7 +195,7 @@ public: // Creation
 	inline
 	CArrayP(
 	 size_type const size,
-	 T const & t
+	 Tc t
 	) :
 	 size_( size ),
 	 data_( size_ > 0u ? new T[ size_ ] : nullptr ),
@@ -332,7 +334,7 @@ public: // Assignment
 	// Uniform Value Assignment
 	inline
 	CArrayP &
-	operator =( T const & t )
+	operator =( Tc t )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = t;
@@ -419,14 +421,14 @@ public: // Assignment
 	CArrayP &
 	assign(
 	 size_type const size,
-	 T const & value
+	 Tc t
 	)
 	{
 		if ( size_ != size ) { // Set to new array with uniform values
 			assert( owner_ );
-			CArrayP( size, value ).swap( *this );
+			CArrayP( size, t ).swap( *this );
 		} else { // Set to uniform value
-			(*this) = value;
+			(*this) = t;
 		}
 		return *this;
 	}
@@ -460,7 +462,7 @@ public: // Assignment
 	// += Value
 	inline
 	CArrayP &
-	operator +=( T const & t )
+	operator +=( Tc t )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] += t;
@@ -471,7 +473,7 @@ public: // Assignment
 	// -= Value
 	inline
 	CArrayP &
-	operator -=( T const & t )
+	operator -=( Tc t )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] -= t;
@@ -482,7 +484,7 @@ public: // Assignment
 	// *= Value
 	inline
 	CArrayP &
-	operator *=( T const & t )
+	operator *=( Tc t )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] *= t;
@@ -579,7 +581,7 @@ public: // Inspector
 
 	// First Element
 	inline
-	T const &
+	Tr
 	front() const
 	{
 		assert( size_ > 0u );
@@ -588,7 +590,7 @@ public: // Inspector
 
 	// Last Element
 	inline
-	T const &
+	Tr
 	back() const
 	{
 		assert( size_ > 0u );
@@ -659,7 +661,7 @@ public: // Modifier
 	CArrayP &
 	resize(
 	 size_type const size,
-	 T const & fill = T()
+	 Tc fill = T()
 	)
 	{
 		assert( owner_ );
@@ -746,7 +748,7 @@ public: // Subscript
 
 	// CArrayP( i ) const: 1-Based Indexing
 	inline
-	T const &
+	Tr
 	operator ()( size_type const i ) const
 	{
 		assert( ( i > 0u ) && ( i <= size_ ) );
@@ -1065,7 +1067,7 @@ operator >( CArrayP< T > const & a, CArrayP< T > const & b )
 template< typename T >
 inline
 bool
-operator ==( CArrayP< T > const & a, T const & t )
+operator ==( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( a[ i ] != t ) return false;
@@ -1077,7 +1079,7 @@ operator ==( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator !=( CArrayP< T > const & a, T const & t )
+operator !=( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	return !( a == t );
 }
@@ -1086,7 +1088,7 @@ operator !=( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator <( CArrayP< T > const & a, T const & t )
+operator <( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( a[ i ] < t ) ) return false;
@@ -1098,7 +1100,7 @@ operator <( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator <=( CArrayP< T > const & a, T const & t )
+operator <=( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( a[ i ] <= t ) ) return false;
@@ -1110,7 +1112,7 @@ operator <=( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator >=( CArrayP< T > const & a, T const & t )
+operator >=( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( a[ i ] >= t ) ) return false;
@@ -1122,7 +1124,7 @@ operator >=( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator >( CArrayP< T > const & a, T const & t )
+operator >( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( a[ i ] > t ) ) return false;
@@ -1134,7 +1136,7 @@ operator >( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 bool
-operator ==( T const & t, CArrayP< T > const & a )
+operator ==( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	return ( a == t );
 }
@@ -1143,7 +1145,7 @@ operator ==( T const & t, CArrayP< T > const & a )
 template< typename T >
 inline
 bool
-operator !=( T const & t, CArrayP< T > const & a )
+operator !=( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	return !( t == a );
 }
@@ -1152,7 +1154,7 @@ operator !=( T const & t, CArrayP< T > const & a )
 template< typename T >
 inline
 bool
-operator <( T const & t, CArrayP< T > const & a )
+operator <( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( t < a[ i ] ) ) return false;
@@ -1164,7 +1166,7 @@ operator <( T const & t, CArrayP< T > const & a )
 template< typename T >
 inline
 bool
-operator <=( T const & t, CArrayP< T > const & a )
+operator <=( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( t <= a[ i ] ) ) return false;
@@ -1176,7 +1178,7 @@ operator <=( T const & t, CArrayP< T > const & a )
 template< typename T >
 inline
 bool
-operator >=( T const & t, CArrayP< T > const & a )
+operator >=( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( t >= a[ i ] ) ) return false;
@@ -1188,7 +1190,7 @@ operator >=( T const & t, CArrayP< T > const & a )
 template< typename T >
 inline
 bool
-operator >( T const & t, CArrayP< T > const & a )
+operator >( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
 		if ( !( t > a[ i ] ) ) return false;
@@ -1235,7 +1237,7 @@ operator -( CArrayP< T > const & a, CArrayP< T > const & b )
 template< typename T >
 inline
 CArrayP< T >
-operator +( CArrayP< T > const & a, T const & t )
+operator +( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	CArrayP< T > r( a );
 	r += t;
@@ -1246,7 +1248,7 @@ operator +( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 CArrayP< T >
-operator +( T const & t, CArrayP< T > const & a )
+operator +( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	CArrayP< T > r( a );
 	r += t;
@@ -1257,7 +1259,7 @@ operator +( T const & t, CArrayP< T > const & a )
 template< typename T >
 inline
 CArrayP< T >
-operator -( CArrayP< T > const & a, T const & t )
+operator -( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	CArrayP< T > r( a );
 	r -= t;
@@ -1268,7 +1270,7 @@ operator -( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 CArrayP< T >
-operator -( T const & t, CArrayP< T > const & a )
+operator -( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	CArrayP< T > r( -a );
 	r += t;
@@ -1279,7 +1281,7 @@ operator -( T const & t, CArrayP< T > const & a )
 template< typename T >
 inline
 CArrayP< T >
-operator *( CArrayP< T > const & a, T const & t )
+operator *( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	CArrayP< T > r( a );
 	r *= t;
@@ -1290,7 +1292,7 @@ operator *( CArrayP< T > const & a, T const & t )
 template< typename T >
 inline
 CArrayP< T >
-operator *( T const & t, CArrayP< T > const & a )
+operator *( typename CArrayP< T >::Tc t, CArrayP< T > const & a )
 {
 	CArrayP< T > r( a );
 	r *= t;
@@ -1301,7 +1303,7 @@ operator *( T const & t, CArrayP< T > const & a )
 template< typename T >
 inline
 CArrayP< T >
-operator /( CArrayP< T > const & a, T const & t )
+operator /( CArrayP< T > const & a, typename CArrayP< T >::Tc t )
 {
 	CArrayP< T > r( a );
 	r /= t;

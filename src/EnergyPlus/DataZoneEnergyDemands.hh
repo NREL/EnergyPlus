@@ -146,6 +146,9 @@ namespace DataZoneEnergyDemands {
 	extern Array1D< ZoneSystemDemandData > ZoneSysEnergyDemand;
 	extern Array1D< ZoneSystemMoistureDemand > ZoneSysMoistureDemand;
 
+	void
+	clear_state();
+
 } // DataZoneEnergyDemands
 
 } // EnergyPlus

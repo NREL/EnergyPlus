@@ -732,12 +732,19 @@ namespace EcoRoofManager {
 			if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).EcoRoofCalculationMethod == 2 ) {
 				Real64 const depth_limit( depth_fac * std::pow( TopDepth + RootDepth, 2.07 ) );
 				for ( index1 = 1; index1 <= 20; ++index1 ) {
-					if ( double( MinutesPerTimeStep / index1 ) <= depth_limit ) break; //Autodesk RootDepth was used uninitialized here
+					if ( double( MinutesPerTimeStep / index1 ) <= depth_limit ) break;
 				}
 				if ( index1 > 1 ) {
-					ShowSevereError( "CalcEcoRoof: Too few time steps per hour for stability." );
-					ShowContinueError( "...Entered Timesteps per hour=[" + RoundSigDigits( NumOfTimeStepInHour ) + "], Change to some value greater than [" + RoundSigDigits( 60 * index1 / MinutesPerTimeStep ) + "] for assured stability." );
-					//      CALL ShowFatalError('Program terminates due to previous condition.')
+					ShowWarningError( "CalcEcoRoof: Too few time steps per hour for stability." );
+					if ( ceil( 60 * index1 / MinutesPerTimeStep ) <= 60 ) {
+						ShowContinueError( "...Entered Timesteps per hour=[" + RoundSigDigits( NumOfTimeStepInHour ) + "], Change to some value greater than or equal to [" + RoundSigDigits( 60 * index1 / MinutesPerTimeStep ) + "] for assured stability." );
+						ShowContinueError( "...Note that EnergyPlus has a maximum of 60 timesteps per hour" );
+						ShowContinueError( "...The program will continue, but if the simulation fails due to too low/high temperatures, instability here could be the reason." );
+					} else {
+						ShowContinueError( "...Entered Timesteps per hour=[" + RoundSigDigits( NumOfTimeStepInHour ) + "], however the required frequency for stability [" + RoundSigDigits( 60 * index1 / MinutesPerTimeStep ) + "] is over the EnergyPlus maximum of 60." );
+						ShowContinueError( "...Consider using the simple moisture diffusion calculation method for this application" );
+						ShowContinueError( "...The program will continue, but if the simulation fails due to too low/high temperatures, instability here could be the reason." );
+					}
 				}
 			}
 
@@ -1036,7 +1043,7 @@ namespace EcoRoofManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

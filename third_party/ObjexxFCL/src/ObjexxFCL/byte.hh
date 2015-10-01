@@ -189,8 +189,8 @@ public: // Math
 	}
 
 	// byte + byte
-	inline
 	friend
+	inline
 	byte
 	operator +( byte const & i, byte const & j )
 	{
@@ -198,8 +198,8 @@ public: // Math
 	}
 
 	// byte - byte
-	inline
 	friend
+	inline
 	byte
 	operator -( byte const & i, byte const & j )
 	{
@@ -207,8 +207,8 @@ public: // Math
 	}
 
 	// byte * byte
-	inline
 	friend
+	inline
 	byte
 	operator *( byte const & i, byte const & j )
 	{
@@ -216,8 +216,8 @@ public: // Math
 	}
 
 	// byte / byte
-	inline
 	friend
+	inline
 	byte
 	operator /( byte const & i, byte const & j )
 	{
@@ -295,8 +295,8 @@ public: // Bitwise Logical
 	}
 
 	// byte & byte
-	inline
 	friend
+	inline
 	byte
 	operator &( byte const & i, byte const & j )
 	{
@@ -304,8 +304,8 @@ public: // Bitwise Logical
 	}
 
 	// byte | byte
-	inline
 	friend
+	inline
 	byte
 	operator |( byte const & i, byte const & j )
 	{
@@ -313,8 +313,8 @@ public: // Bitwise Logical
 	}
 
 	// byte ^ byte
-	inline
 	friend
+	inline
 	byte
 	operator ^( byte const & i, byte const & j )
 	{
@@ -324,8 +324,8 @@ public: // Bitwise Logical
 public: // Comparison
 
 	// byte == byte
-	inline
 	friend
+	inline
 	bool
 	operator ==( byte const & i, byte const & j )
 	{
@@ -333,8 +333,8 @@ public: // Comparison
 	}
 
 	// byte != byte
-	inline
 	friend
+	inline
 	bool
 	operator !=( byte const & i, byte const & j )
 	{
@@ -342,8 +342,8 @@ public: // Comparison
 	}
 
 	// byte < byte
-	inline
 	friend
+	inline
 	bool
 	operator <( byte const & i, byte const & j )
 	{
@@ -351,8 +351,8 @@ public: // Comparison
 	}
 
 	// byte <= byte
-	inline
 	friend
+	inline
 	bool
 	operator <=( byte const & i, byte const & j )
 	{
@@ -360,8 +360,8 @@ public: // Comparison
 	}
 
 	// byte > byte
-	inline
 	friend
+	inline
 	bool
 	operator >( byte const & i, byte const & j )
 	{
@@ -369,8 +369,8 @@ public: // Comparison
 	}
 
 	// byte >= byte
-	inline
 	friend
+	inline
 	bool
 	operator >=( byte const & i, byte const & j )
 	{
@@ -380,8 +380,8 @@ public: // Comparison
 public: // I/O
 
 	// Stream >> byte
-	inline
 	friend
+	inline
 	std::istream &
 	operator >>( std::istream & stream, byte & b )
 	{
@@ -394,8 +394,8 @@ public: // I/O
 	}
 
 	// Stream << byte
-	inline
 	friend
+	inline
 	std::ostream &
 	operator <<( std::ostream & stream, byte const & b )
 	{

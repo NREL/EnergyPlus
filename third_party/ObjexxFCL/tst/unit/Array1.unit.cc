@@ -201,6 +201,23 @@ TEST( Array1Test, ConstructionVector3 )
 	EXPECT_EQ( 33, v( 3 ) );
 }
 
+TEST( Array1Test, ConstructionIterator )
+{
+	std::vector< int > v{ { 11, 22, 33 } };
+	Array1D_int a( v.begin(), v.end() );
+	EXPECT_EQ( 3u, a.size() );
+	EXPECT_EQ( 3u, a.size1() );
+	EXPECT_EQ( 1, a.l() );
+	EXPECT_EQ( 1, a.l1() );
+	EXPECT_EQ( 3, a.u() );
+	EXPECT_EQ( 3, a.u1() );
+	EXPECT_EQ( Array1D_int::IR( 1, 3 ), a.I() );
+	EXPECT_EQ( Array1D_int::IR( 1, 3 ), a.I1() );
+	EXPECT_EQ( 11, a( 1 ) );
+	EXPECT_EQ( 22, a( 2 ) );
+	EXPECT_EQ( 33, a( 3 ) );
+}
+
 static void initializer_function( Array1D_string & a )
 {
 	a( 1 ) = "This";

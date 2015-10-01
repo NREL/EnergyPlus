@@ -179,7 +179,7 @@ namespace ChillerAbsorption {
 
 		// Find the correct Chiller
 		if ( CompIndex == 0 ) {
-			ChillNum = FindItemInList( AbsorberName, BLASTAbsorber.Name(), NumBLASTAbsorbers );
+			ChillNum = FindItemInList( AbsorberName, BLASTAbsorber );
 			if ( ChillNum == 0 ) {
 				ShowFatalError( "SimBLASTAbsorber: Specified Absorber not one of Valid Absorption Chillers=" + AbsorberName );
 			}
@@ -322,7 +322,7 @@ namespace ChillerAbsorption {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), BLASTAbsorber.Name(), AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), BLASTAbsorber, AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";

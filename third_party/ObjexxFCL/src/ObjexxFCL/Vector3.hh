@@ -1,7 +1,7 @@
 #ifndef ObjexxFCL_Vector3_hh_INCLUDED
 #define ObjexxFCL_Vector3_hh_INCLUDED
 
-// Vector3: Fast Three-Element Vector
+// Vector3: Fast 3-Element Vector
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
@@ -31,7 +31,10 @@
 
 namespace ObjexxFCL {
 
-// Vector3: Fast Three-Element Vector
+// Vector3: Fast 3-Element Vector
+// . Heap-free and loop-free for speed
+// . Provides direct element access via .x style lookup
+// . Use std::array< T, 3 > instead in array/vectorization context
 template< typename T >
 class Vector3
 {
@@ -41,6 +44,10 @@ private: // Friends
 	template< typename > friend class Vector3;
 
 public: // Types
+
+	typedef  TypeTraits< T >  Traits;
+	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
+	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
 
 	// STL Style
 	typedef  T  value_type;
@@ -64,10 +71,13 @@ public: // Creation
 
 	// Default Constructor
 	inline
-	Vector3() :
-	 x( T() ),
-	 y( T() ),
-	 z( T() )
+	Vector3()
+#if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
+	 :
+	 x( Traits::initial_array_value() ),
+	 y( Traits::initial_array_value() ),
+	 z( Traits::initial_array_value() )
+#endif
 	{}
 
 	// Copy Constructor
@@ -90,7 +100,7 @@ public: // Creation
 	// Uniform Value Constructor
 	inline
 	explicit
-	Vector3( T const & t ) :
+	Vector3( Tc t ) :
 	 x( t ),
 	 y( t ),
 	 z( t )
@@ -99,9 +109,9 @@ public: // Creation
 	// Value Constructor
 	inline
 	Vector3(
-	 T const & x_,
-	 T const & y_,
-	 T const & z_
+	 Tc x_,
+	 Tc y_,
+	 Tc z_
 	) :
 	 x( x_ ),
 	 y( y_ ),
@@ -152,7 +162,7 @@ public: // Creation
 	inline
 	static
 	Vector3
-	x_vector( T const & tar_length = T( 1 ) )
+	x_vector( Tc tar_length = T( 1 ) )
 	{
 		return Vector3( tar_length, T( 0 ), T( 0 ) );
 	}
@@ -161,7 +171,7 @@ public: // Creation
 	inline
 	static
 	Vector3
-	y_vector( T const & tar_length = T( 1 ) )
+	y_vector( Tc tar_length = T( 1 ) )
 	{
 		return Vector3( T( 0 ), tar_length, T( 0 ) );
 	}
@@ -170,7 +180,7 @@ public: // Creation
 	inline
 	static
 	Vector3
-	z_vector( T const & tar_length = T( 1 ) )
+	z_vector( Tc tar_length = T( 1 ) )
 	{
 		return Vector3( T( 0 ), T( 0 ), tar_length );
 	}
@@ -179,9 +189,9 @@ public: // Creation
 	inline
 	static
 	Vector3
-	uniform_vector( T const & tar_length = T( 1 ) )
+	uniform_vector( Tc tar_length = T( 1 ) )
 	{
-		return Vector3( std::sqrt( ( tar_length * tar_length ) / T( 3 ) ) );
+		return Vector3( tar_length / std::sqrt( T( 3 ) ) );
 	}
 
 	// Destructor
@@ -411,7 +421,7 @@ public: // Assignment
 	// = Value
 	inline
 	Vector3 &
-	operator =( T const & t )
+	operator =( Tc t )
 	{
 		x = y = z = t;
 		return *this;
@@ -420,7 +430,7 @@ public: // Assignment
 	// += Value
 	inline
 	Vector3 &
-	operator +=( T const & t )
+	operator +=( Tc t )
 	{
 		x += t;
 		y += t;
@@ -431,7 +441,7 @@ public: // Assignment
 	// -= Value
 	inline
 	Vector3 &
-	operator -=( T const & t )
+	operator -=( Tc t )
 	{
 		x -= t;
 		y -= t;
@@ -442,7 +452,7 @@ public: // Assignment
 	// *= Value
 	inline
 	Vector3 &
-	operator *=( T const & t )
+	operator *=( Tc t )
 	{
 		x *= t;
 		y *= t;
@@ -481,9 +491,9 @@ public: // Assignment
 	inline
 	Vector3 &
 	assign(
-	 T const & x_,
-	 T const & y_,
-	 T const & z_
+	 Tc x_,
+	 Tc y_,
+	 Tc z_
 	)
 	{
 		x = x_;
@@ -498,7 +508,7 @@ public: // Assignment: Scaled
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Vector3 &
-	scaled_assign( T const & t, Vector3< U > const & v )
+	scaled_assign( Tc t, Vector3< U > const & v )
 	{
 		x = t * v.x;
 		y = t * v.y;
@@ -510,7 +520,7 @@ public: // Assignment: Scaled
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Vector3 &
-	scaled_add( T const & t, Vector3< U > const & v )
+	scaled_add( Tc t, Vector3< U > const & v )
 	{
 		x += t * v.x;
 		y += t * v.y;
@@ -522,7 +532,7 @@ public: // Assignment: Scaled
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Vector3 &
-	scaled_sub( T const & t, Vector3< U > const & v )
+	scaled_sub( Tc t, Vector3< U > const & v )
 	{
 		x -= t * v.x;
 		y -= t * v.y;
@@ -534,7 +544,7 @@ public: // Assignment: Scaled
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Vector3 &
-	scaled_mul( T const & t, Vector3< U > const & v )
+	scaled_mul( Tc t, Vector3< U > const & v )
 	{
 		x *= t * v.x;
 		y *= t * v.y;
@@ -546,7 +556,7 @@ public: // Assignment: Scaled
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Vector3 &
-	scaled_div( T const & t, Vector3< U > const & v )
+	scaled_div( Tc t, Vector3< U > const & v )
 	{
 		assert( t != T( 0 ) );
 		assert( v.x != T( 0 ) );
@@ -562,7 +572,7 @@ public: // Subscript
 
 	// Vector3[ i ] const: 0-Based Index
 	inline
-	T const &
+	Tr
 	operator []( size_type const i ) const
 	{
 		assert( i <= 2 );
@@ -580,7 +590,7 @@ public: // Subscript
 
 	// Vector3( i ) const: 1-Based Index
 	inline
-	T const &
+	Tr
 	operator ()( size_type const i ) const
 	{
 		assert( ( 1 <= i ) && ( i <= 3 ) );
@@ -649,10 +659,26 @@ public: // Properties: General
 		return std::sqrt( ( x * x ) + ( y * y ) + ( z * z ) );
 	}
 
+	// Magnitude
+	inline
+	T
+	mag() const
+	{
+		return std::sqrt( ( x * x ) + ( y * y ) + ( z * z ) );
+	}
+
 	// Magnitude Squared
 	inline
 	T
 	magnitude_squared() const
+	{
+		return ( x * x ) + ( y * y ) + ( z * z );
+	}
+
+	// Magnitude Squared
+	inline
+	T
+	mag_squared() const
 	{
 		return ( x * x ) + ( y * y ) + ( z * z );
 	}
@@ -681,7 +707,7 @@ public: // Properties: General
 		return ObjexxFCL::max( std::abs( x ), std::abs( y ), std::abs( z ) );
 	}
 
-	// Distance
+	// Distance to a Vector3
 	inline
 	T
 	distance( Vector3 const & v ) const
@@ -689,7 +715,7 @@ public: // Properties: General
 		return std::sqrt( square( x - v.x ) + square( y - v.y ) + square( z - v.z ) );
 	}
 
-	// Distance Squared
+	// Distance Squared to a Vector3
 	inline
 	T
 	distance_squared( Vector3 const & v ) const
@@ -697,7 +723,7 @@ public: // Properties: General
 		return square( x - v.x ) + square( y - v.y ) + square( z - v.z );
 	}
 
-	// Dot Product
+	// Dot Product with a Vector3
 	inline
 	T
 	dot( Vector3 const & v ) const
@@ -705,7 +731,7 @@ public: // Properties: General
 		return ( x * v.x ) + ( y * v.y ) + ( z * v.z );
 	}
 
-	// Dot Product
+	// Dot Product with an Array
 	template< typename A, class = typename std::enable_if< std::is_assignable< T&, typename A::value_type >::value >::type >
 	inline
 	T
@@ -715,7 +741,7 @@ public: // Properties: General
 		return ( x * a[ 0 ] ) + ( y * a[ 1 ] ) + ( z * a[ 2 ] );
 	}
 
-	// Cross Product
+	// Cross Product with a Vector3
 	inline
 	Vector3
 	cross( Vector3 const & v ) const
@@ -727,7 +753,7 @@ public: // Properties: General
 		);
 	}
 
-	// Cross Product
+	// Cross Product with an Array
 	template< typename A, class = typename std::enable_if< std::is_assignable< T&, typename A::value_type >::value >::type >
 	inline
 	Vector3
@@ -743,7 +769,7 @@ public: // Properties: General
 
 	// Alias for Element 1
 	inline
-	T const &
+	Tr
 	x1() const
 	{
 		return x;
@@ -759,7 +785,7 @@ public: // Properties: General
 
 	// Alias for Element 2
 	inline
-	T const &
+	Tr
 	x2() const
 	{
 		return y;
@@ -775,7 +801,7 @@ public: // Properties: General
 
 	// Alias for Element 3
 	inline
-	T const &
+	Tr
 	x3() const
 	{
 		return z;
@@ -814,7 +840,7 @@ public: // Modifiers
 	// Normalize to a Length
 	inline
 	Vector3 &
-	normalize( T const & tar_length = T( 1 ) )
+	normalize( Tc tar_length = T( 1 ) )
 	{
 		T const cur_length( length() );
 		assert( cur_length != T ( 0 ) );
@@ -828,7 +854,7 @@ public: // Modifiers
 	// Normalize to a Length: Zero Vector3 if Length is Zero
 	inline
 	Vector3 &
-	normalize_zero( T const & tar_length = T( 1 ) )
+	normalize_zero( Tc tar_length = T( 1 ) )
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -845,7 +871,7 @@ public: // Modifiers
 	// Normalize to a Length: Uniform Vector3 if Length is Zero
 	inline
 	Vector3 &
-	normalize_uniform( T const & tar_length = T( 1 ) )
+	normalize_uniform( Tc tar_length = T( 1 ) )
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -862,7 +888,7 @@ public: // Modifiers
 	// Normalize to a Length: x Vector3 if Length is Zero
 	inline
 	Vector3 &
-	normalize_x( T const & tar_length = T( 1 ) )
+	normalize_x( Tc tar_length = T( 1 ) )
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -880,7 +906,7 @@ public: // Modifiers
 	// Normalize to a Length: y Vector3 if Length is Zero
 	inline
 	Vector3 &
-	normalize_y( T const & tar_length = T( 1 ) )
+	normalize_y( Tc tar_length = T( 1 ) )
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -898,7 +924,7 @@ public: // Modifiers
 	// Normalize to a Length: z Vector3 if Length is Zero
 	inline
 	Vector3 &
-	normalize_z( T const & tar_length = T( 1 ) )
+	normalize_z( Tc tar_length = T( 1 ) )
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -935,7 +961,18 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Sum In a Vector3
+	// Add a Vector3
+	inline
+	Vector3 &
+	add( Vector3 const & v )
+	{
+		x += v.x;
+		y += v.y;
+		z += v.z;
+		return *this;
+	}
+
+	// Sum a Vector3
 	inline
 	Vector3 &
 	sum( Vector3 const & v )
@@ -946,10 +983,21 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Subtract Out a Vector3
+	// Subtract a Vector3
 	inline
 	Vector3 &
 	sub( Vector3 const & v )
+	{
+		x -= v.x;
+		y -= v.y;
+		z -= v.z;
+		return *this;
+	}
+
+	// Subtract a Vector3
+	inline
+	Vector3 &
+	subtract( Vector3 const & v )
 	{
 		x -= v.x;
 		y -= v.y;
@@ -1004,7 +1052,7 @@ public: // Generators
 	// Normalized to a Length
 	inline
 	Vector3
-	normalized( T const & tar_length = T( 1 ) ) const
+	normalized( Tc tar_length = T( 1 ) ) const
 	{
 		T const cur_length( length() );
 		assert( cur_length != T ( 0 ) );
@@ -1019,7 +1067,7 @@ public: // Generators
 	// Normalized to a Length: Zero Vector3 if Length is Zero
 	inline
 	Vector3
-	normalized_zero( T const & tar_length = T( 1 ) ) const
+	normalized_zero( Tc tar_length = T( 1 ) ) const
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -1037,7 +1085,7 @@ public: // Generators
 	// Normalized to a Length: Uniform Vector3 if Length is Zero
 	inline
 	Vector3
-	normalized_uniform( T const & tar_length = T( 1 ) ) const
+	normalized_uniform( Tc tar_length = T( 1 ) ) const
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -1055,7 +1103,7 @@ public: // Generators
 	// Normalized to a Length: x Vector3 if Length is Zero
 	inline
 	Vector3
-	normalized_x( T const & tar_length = T( 1 ) ) const
+	normalized_x( Tc tar_length = T( 1 ) ) const
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -1073,7 +1121,7 @@ public: // Generators
 	// Normalized to a Length: y Vector3 if Length is Zero
 	inline
 	Vector3
-	normalized_y( T const & tar_length = T( 1 ) ) const
+	normalized_y( Tc tar_length = T( 1 ) ) const
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -1091,7 +1139,7 @@ public: // Generators
 	// Normalized to a Length: z Vector3 if Length is Zero
 	inline
 	Vector3
-	normalized_z( T const & tar_length = T( 1 ) ) const
+	normalized_z( Tc tar_length = T( 1 ) ) const
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
@@ -1104,301 +1152,6 @@ public: // Generators
 		} else { // Return z vector
 			return Vector3( tar_length, T( 0 ), T( 0 ), tar_length );
 		}
-	}
-
-	// Vector3 + Vector3
-	friend
-	inline
-	Vector3
-	operator +( Vector3 const & a, Vector3 const & b )
-	{
-		return Vector3( a.x + b.x, a.y + b.y, a.z + b.z );
-	}
-
-	// Vector3 + Value
-	friend
-	inline
-	Vector3
-	operator +( Vector3 const & v, T const & t )
-	{
-		return Vector3( v.x + t, v.y + t, v.z + t );
-	}
-
-	// Value + Vector3
-	friend
-	inline
-	Vector3
-	operator +( T const & t, Vector3 const & v )
-	{
-		return Vector3( t + v.x, t + v.y, t + v.z );
-	}
-
-	// Vector3 - Vector3
-	friend
-	inline
-	Vector3
-	operator -( Vector3 const & a, Vector3 const & b )
-	{
-		return Vector3( a.x - b.x, a.y - b.y, a.z - b.z );
-	}
-
-	// Vector3 - Value
-	friend
-	inline
-	Vector3
-	operator -( Vector3 const & v, T const & t )
-	{
-		return Vector3( v.x - t, v.y - t, v.z - t );
-	}
-
-	// Value - Vector3
-	friend
-	inline
-	Vector3
-	operator -( T const & t, Vector3 const & v )
-	{
-		return Vector3( t - v.x, t - v.y, t - v.z );
-	}
-
-	// Vector3 * Vector3
-	friend
-	inline
-	Vector3
-	operator *( Vector3 const & a, Vector3 const & b )
-	{
-		return Vector3( a.x * b.x, a.y * b.y, a.z * b.z );
-	}
-
-	// Vector3 * Value
-	friend
-	inline
-	Vector3
-	operator *( Vector3 const & v, T const & t )
-	{
-		return Vector3( v.x * t, v.y * t, v.z * t );
-	}
-
-	// Value * Vector3
-	friend
-	inline
-	Vector3
-	operator *( T const & t, Vector3 const & v )
-	{
-		return Vector3( t * v.x, t * v.y, t * v.z );
-	}
-
-	// Vector3 / Vector3
-	friend
-	inline
-	Vector3
-	operator /( Vector3 const & a, Vector3 const & b )
-	{
-		assert( b.x != T( 0 ) );
-		assert( b.y != T( 0 ) );
-		assert( b.z != T( 0 ) );
-		return Vector3( a.x / b.x, a.y / b.y, a.z / b.z );
-	}
-
-	// Vector3 / Value
-	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
-	friend
-	inline
-	Vector3
-	operator /( Vector3 const & v, U const & u )
-	{
-		assert( u != U( 0 ) );
-		U const inv_u( U ( 1 ) / u );
-		return Vector3( v.x * inv_u, v.y * inv_u, v.z * inv_u );
-	}
-
-	// Vector3 / Value
-	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
-	friend
-	inline
-	Vector3
-	operator /( Vector3 const & v, U const & u )
-	{
-		assert( u != U( 0 ) );
-		return Vector3( v.x / u, v.y / u, v.z / u );
-	}
-
-	// Value / Vector3
-	friend
-	inline
-	Vector3
-	operator /( T const & t, Vector3 const & v )
-	{
-		assert( v.x != T( 0 ) );
-		assert( v.y != T( 0 ) );
-		assert( v.z != T( 0 ) );
-		return Vector3( t / v.x, t / v.y, t / v.z );
-	}
-
-	// Minimum of Two Vector3s
-	friend
-	inline
-	Vector3
-	min( Vector3 const & a, Vector3 const & b )
-	{
-		return Vector3(
-		 ( a.x <= b.x ? a.x : b.x ),
-		 ( a.y <= b.y ? a.y : b.y ),
-		 ( a.z <= b.z ? a.z : b.z )
-		);
-	}
-
-	// Minimum of Three Vector3s
-	friend
-	inline
-	Vector3
-	min( Vector3 const & a, Vector3 const & b, Vector3 const & c )
-	{
-		return Vector3(
-		 ObjexxFCL::min( a.x, b.x, c.x ),
-		 ObjexxFCL::min( a.y, b.y, c.y ),
-		 ObjexxFCL::min( a.z, b.z, c.z )
-		);
-	}
-
-	// Minimum of Four Vector3s
-	friend
-	inline
-	Vector3
-	min( Vector3 const & a, Vector3 const & b, Vector3 const & c, Vector3 const & d )
-	{
-		return Vector3(
-		 ObjexxFCL::min( a.x, b.x, c.x, d.x ),
-		 ObjexxFCL::min( a.y, b.y, c.y, d.y ),
-		 ObjexxFCL::min( a.z, b.z, c.z, d.z )
-		);
-	}
-
-	// Maximum of Two Vector3s
-	friend
-	inline
-	Vector3
-	max( Vector3 const & a, Vector3 const & b )
-	{
-		return Vector3(
-		 ( a.x >= b.x ? a.x : b.x ),
-		 ( a.y >= b.y ? a.y : b.y ),
-		 ( a.z >= b.z ? a.z : b.z )
-		);
-	}
-
-	// Maximum of Three Vector3s
-	friend
-	inline
-	Vector3
-	max( Vector3 const & a, Vector3 const & b, Vector3 const & c )
-	{
-		return Vector3(
-		 ObjexxFCL::max( a.x, b.x, c.x ),
-		 ObjexxFCL::max( a.y, b.y, c.y ),
-		 ObjexxFCL::max( a.z, b.z, c.z )
-		);
-	}
-
-	// Maximum of Four Vector3s
-	friend
-	inline
-	Vector3
-	max( Vector3 const & a, Vector3 const & b, Vector3 const & c, Vector3 const & d )
-	{
-		return Vector3(
-		 ObjexxFCL::max( a.x, b.x, c.x, d.x ),
-		 ObjexxFCL::max( a.y, b.y, c.y, d.y ),
-		 ObjexxFCL::max( a.z, b.z, c.z, d.z )
-		);
-	}
-
-	// Sum of Two Vector3s
-	friend
-	inline
-	Vector3
-	sum( Vector3 const & a, Vector3 const & b )
-	{
-		return Vector3( a.x + b.x, a.y + b.y, a.z + b.z );
-	}
-
-	// Sum of Three Vector3s
-	friend
-	inline
-	Vector3
-	sum( Vector3 const & a, Vector3 const & b, Vector3 const & c )
-	{
-		return Vector3( a.x + b.x + c.x, a.y + b.y + c.y, a.z + b.z + c.z );
-	}
-
-	// Sum of Four Vector3s
-	friend
-	inline
-	Vector3
-	sum( Vector3 const & a, Vector3 const & b, Vector3 const & c, Vector3 const & d )
-	{
-		return Vector3( a.x + b.x + c.x + d.x, a.y + b.y + c.y + d.y, a.z + b.z + c.z + d.z );
-	}
-
-	// Subtract of Two Vector3s
-	friend
-	inline
-	Vector3
-	sub( Vector3 const & a, Vector3 const & b )
-	{
-		return Vector3( a.x - b.x, a.y - b.y, a.z - b.z );
-	}
-
-	// Midpoint of Two Vector3s
-	friend
-	inline
-	Vector3
-	mid( Vector3 const & a, Vector3 const & b )
-	{
-		return Vector3(
-		 T( 0.5 * ( a.x + b.x ) ),
-		 T( 0.5 * ( a.y + b.y ) ),
-		 T( 0.5 * ( a.z + b.z ) )
-		);
-	}
-
-	// Center of Two Vector3s
-	friend
-	inline
-	Vector3
-	cen( Vector3 const & a, Vector3 const & b )
-	{
-		return Vector3(
-		 T( 0.5 * ( a.x + b.x ) ),
-		 T( 0.5 * ( a.y + b.y ) ),
-		 T( 0.5 * ( a.z + b.z ) )
-		);
-	}
-
-	// Center of Three Vector3s
-	friend
-	inline
-	Vector3
-	cen( Vector3 const & a, Vector3 const & b, Vector3 const & c )
-	{
-		static long double const third( 1.0 / 3.0 );
-		return Vector3(
-		 T( third * ( a.x + b.x + c.x ) ),
-		 T( third * ( a.y + b.y + c.y ) ),
-		 T( third * ( a.z + b.z + c.z ) )
-		);
-	}
-
-	// Center of Four Vector3s
-	friend
-	inline
-	Vector3
-	cen( Vector3 const & a, Vector3 const & b, Vector3 const & c, Vector3 const & d )
-	{
-		return Vector3(
-		 T( 0.25 * ( a.x + b.x + c.x + d.x ) ),
-		 T( 0.25 * ( a.y + b.y + c.y + d.y ) ),
-		 T( 0.25 * ( a.z + b.z + c.z + d.z ) )
-		);
 	}
 
 	// Projected Normal to a Vector3
@@ -1421,355 +1174,13 @@ public: // Generators
 		return Vector3( c * v.x, c * v.y, c * v.z );
 	}
 
-public: // Friends: Comparison
-
-	// Vector3 == Vector3
-	friend
-	inline
-	bool
-	operator ==( Vector3 const & a, Vector3 const & b )
-	{
-		return ( a.x == b.x ) && ( a.y == b.y ) && ( a.z == b.z );
-	}
-
-	// Vector3 != Vector3
-	friend
-	inline
-	bool
-	operator !=( Vector3 const & a, Vector3 const & b )
-	{
-		return ( a.x != b.x ) || ( a.y != b.y ) || ( a.z != b.z );
-	}
-
-	// Vector3 < Vector3: Lexicographic
-	friend
-	inline
-	bool
-	operator <( Vector3 const & a, Vector3 const & b )
-	{
-		return (
-		 ( a.x < b.x ? true :
-		 ( b.x < a.x ? false : // a.x == b.x
-		 ( a.y < b.y ? true :
-		 ( b.y < a.y ? false : // a.y == b.y
-		 ( a.z < b.z ) ) ) ) )
-		);
-	}
-
-	// Vector3 <= Vector3: Lexicographic
-	friend
-	inline
-	bool
-	operator <=( Vector3 const & a, Vector3 const & b )
-	{
-		return (
-		 ( a.x < b.x ? true :
-		 ( b.x < a.x ? false : // a.x == b.x
-		 ( a.y < b.y ? true :
-		 ( b.y < a.y ? false : // a.y == b.y
-		 ( a.z <= b.z ) ) ) ) )
-		);
-	}
-
-	// Vector3 >= Vector3: Lexicographic
-	friend
-	inline
-	bool
-	operator >=( Vector3 const & a, Vector3 const & b )
-	{
-		return (
-		 ( a.x > b.x ? true :
-		 ( b.x > a.x ? false : // a.x == b.x
-		 ( a.y > b.y ? true :
-		 ( b.y > a.y ? false : // a.y == b.y
-		 ( a.z >= b.z ) ) ) ) )
-		);
-	}
-
-	// Vector3 > Vector3: Lexicographic
-	friend
-	inline
-	bool
-	operator >( Vector3 const & a, Vector3 const & b )
-	{
-		return (
-		 ( a.x > b.x ? true :
-		 ( b.x > a.x ? false : // a.x == b.x
-		 ( a.y > b.y ? true :
-		 ( b.y > a.y ? false : // a.y == b.y
-		 ( a.z > b.z ) ) ) ) )
-		);
-	}
-
-	// Vector3 < Vector3: Element-wise
-	friend
-	inline
-	bool
-	lt( Vector3 const & a, Vector3 const & b )
-	{
-		return ( a.x < b.x ) && ( a.y < b.y ) && ( a.z < b.z );
-	}
-
-	// Vector3 <= Vector3: Element-wise
-	friend
-	inline
-	bool
-	le( Vector3 const & a, Vector3 const & b )
-	{
-		return ( a.x <= b.x ) && ( a.y <= b.y ) && ( a.z <= b.z );
-	}
-
-	// Vector3 >= Vector3: Element-wise
-	friend
-	inline
-	bool
-	ge( Vector3 const & a, Vector3 const & b )
-	{
-		return ( a.x >= b.x ) && ( a.y >= b.y ) && ( a.z >= b.z );
-	}
-
-	// Vector3 > Vector3: Element-wise
-	friend
-	inline
-	bool
-	gt( Vector3 const & a, Vector3 const & b )
-	{
-		return ( a.x > b.x ) && ( a.y > b.y ) && ( a.z > b.z );
-	}
-
-	// Vector3 == Value
-	friend
-	inline
-	bool
-	operator ==( Vector3 const & v, T const & t )
-	{
-		return ( v.x == t ) && ( v.y == t ) && ( v.z == t );
-	}
-
-	// Vector3 != Value
-	friend
-	inline
-	bool
-	operator !=( Vector3 const & v, T const & t )
-	{
-		return ( v.x != t ) || ( v.y != t ) || ( v.z != t );
-	}
-
-	// Vector3 < Value
-	friend
-	inline
-	bool
-	operator <( Vector3 const & v, T const & t )
-	{
-		return ( v.x < t ) && ( v.y < t ) && ( v.z < t );
-	}
-
-	// Vector3 <= Value
-	friend
-	inline
-	bool
-	operator <=( Vector3 const & v, T const & t )
-	{
-		return ( v.x <= t ) && ( v.y <= t ) && ( v.z <= t );
-	}
-
-	// Vector3 >= Value
-	friend
-	inline
-	bool
-	operator >=( Vector3 const & v, T const & t )
-	{
-		return ( v.x >= t ) && ( v.y >= t ) && ( v.z >= t );
-	}
-
-	// Vector3 > Value
-	friend
-	inline
-	bool
-	operator >( Vector3 const & v, T const & t )
-	{
-		return ( v.x > t ) && ( v.y > t ) && ( v.z > t );
-	}
-
-	// Value == Vector3
-	friend
-	inline
-	bool
-	operator ==( T const & t, Vector3 const & v )
-	{
-		return ( t == v.x ) && ( t == v.y ) && ( t == v.z );
-	}
-
-	// Value != Vector3
-	friend
-	inline
-	bool
-	operator !=( T const & t, Vector3 const & v )
-	{
-		return ( t != v.x ) || ( t != v.y ) || ( t != v.z );
-	}
-
-	// Value < Vector3
-	friend
-	inline
-	bool
-	operator <( T const & t, Vector3 const & v )
-	{
-		return ( t < v.x ) && ( t < v.y ) && ( t < v.z );
-	}
-
-	// Value <= Vector3
-	friend
-	inline
-	bool
-	operator <=( T const & t, Vector3 const & v )
-	{
-		return ( t <= v.x ) && ( t <= v.y ) && ( t <= v.z );
-	}
-
-	// Value >= Vector3
-	friend
-	inline
-	bool
-	operator >=( T const & t, Vector3 const & v )
-	{
-		return ( t >= v.x ) && ( t >= v.y ) && ( t >= v.z );
-	}
-
-	// Value > Vector3
-	friend
-	inline
-	bool
-	operator >( T const & t, Vector3 const & v )
-	{
-		return ( t > v.x ) && ( t > v.y ) && ( t > v.z );
-	}
-
-	// Equal Length?
-	friend
-	inline
-	bool
-	equal_length( Vector3 const & a, Vector3 const & b )
-	{
-		return ( a.length_squared() == b.length_squared() );
-	}
-
-	// Not Equal Length?
-	friend
-	inline
-	bool
-	not_equal_length( Vector3 const & a, Vector3 const & b )
-	{
-		return ( a.length_squared() != b.length_squared() );
-	}
-
-public: // Friends
-
-	// Distance
-	friend
-	inline
-	T
-	distance( Vector3 const & a, Vector3 const & b )
-	{
-		return std::sqrt( square( a.x - b.x ) + square( a.y - b.y ) + square( a.z - b.z ) );
-	}
-
-	// Distance Squared
-	friend
-	inline
-	T
-	distance_squared( Vector3 const & a, Vector3 const & b )
-	{
-		return square( a.x - b.x ) + square( a.y - b.y ) + square( a.z - b.z );
-	}
-
-	// Dot Product
-	friend
-	inline
-	T
-	dot( Vector3 const & a, Vector3 const & b )
-	{
-		return ( a.x * b.x ) + ( a.y * b.y ) + ( a.z * b.z );
-	}
-
-	// Cross Product
-	friend
-	inline
-	Vector3
-	cross( Vector3 const & a, Vector3 const & b )
-	{
-		return Vector3(
-		 ( a.y * b.z ) - ( a.z * b.y ),
-		 ( a.z * b.x ) - ( a.x * b.z ),
-		 ( a.x * b.y ) - ( a.y * b.x )
-		);
-	}
-
-	// Angle Between Two Vector3s (in Radians on [0,pi])
-	friend
-	inline
-	T
-	angle( Vector3 const & a, Vector3 const & b )
-	{
-		T const axb( a.cross( b ).magnitude() );
-		T const adb( a.dot( b ) );
-		return ( ( axb != T( 0 ) ) || ( adb != T( 0 ) ) ? bump_up_angle( std::atan2( axb, adb ) ) : T( 0 ) ); // More accurate than dot-based for angles near 0 and Pi
-	}
-
-	// Angle abc Formed by Three Vector3s (in Radians on [0,pi])
-	friend
-	inline
-	T
-	angle( Vector3 const & a, Vector3 const & b, Vector3 const & c )
-	{
-		return angle( a - b, c - b );
-	}
-
-	// Cosine of Angle Between Two Vector3s
-	friend
-	inline
-	T
-	cos( Vector3 const & a, Vector3 const & b )
-	{
-		T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
-		return ( mag > T( 0 ) ? sin_cos_range( a.dot( b ) / mag ) : T( 1 ) );
-	}
-
-	// Cosine of Angle abc Formed by Three Vector3s
-	friend
-	inline
-	T
-	cos( Vector3 const & a, Vector3 const & b, Vector3 const & c )
-	{
-		return cos( a - b, c - b );
-	}
-
-	// Sine of Angle Between Two Vector3s
-	friend
-	inline
-	T
-	sin( Vector3 const & a, Vector3 const & b )
-	{
-		T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
-		return ( mag > T( 0 ) ? std::abs( sin_cos_range( a.cross( b ).magnitude() / mag ) ) : T( 0 ) );
-	}
-
-	// Sine of Angle abc Formed by Three Vector3s
-	friend
-	inline
-	T
-	sin( Vector3 const & a, Vector3 const & b, Vector3 const & c )
-	{
-		return sin( a - b, c - b );
-	}
-
-private: // Methods
+public: // Static Methods
 
 	// Square of a value
 	inline
 	static
 	T
-	square( T const & t )
+	square( Tc t )
 	{
 		return t * t;
 	}
@@ -1778,7 +1189,7 @@ private: // Methods
 	inline
 	static
 	T
-	sin_cos_range( T const & t )
+	sin_cos_range( Tc t )
 	{
 		return std::min( std::max( t, T( -1 ) ), T( 1 ) );
 	}
@@ -1787,7 +1198,7 @@ private: // Methods
 	inline
 	static
 	T
-	bump_up_angle( T const & t )
+	bump_up_angle( Tc t )
 	{
 		static T const Two_Pi( T( 2 ) * std::acos( -1.0 ) );
 		return ( t >= T( 0 ) ? t : Two_Pi + t );
@@ -1798,6 +1209,700 @@ public: // Data
 	T x, y, z; // Elements
 
 }; // Vector3
+
+// Length
+template< typename T >
+inline
+T
+length( Vector3< T > const & v )
+{
+	return v.length();
+}
+
+// Length Squared
+template< typename T >
+inline
+T
+length_squared( Vector3< T > const & v )
+{
+	return v.length_squared();
+}
+
+// Magnitude
+template< typename T >
+inline
+T
+magnitude( Vector3< T > const & v )
+{
+	return v.magnitude();
+}
+
+// Magnitude
+template< typename T >
+inline
+T
+mag( Vector3< T > const & v )
+{
+	return v.mag();
+}
+
+// Magnitude Squared
+template< typename T >
+inline
+T
+magnitude_squared( Vector3< T > const & v )
+{
+	return v.magnitude_squared();
+}
+
+// Magnitude Squared
+template< typename T >
+inline
+T
+mag_squared( Vector3< T > const & v )
+{
+	return v.mag_squared();
+}
+
+// Vector3 == Vector3
+template< typename T >
+inline
+bool
+operator ==( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return ( a.x == b.x ) && ( a.y == b.y ) && ( a.z == b.z );
+}
+
+// Vector3 != Vector3
+template< typename T >
+inline
+bool
+operator !=( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return ( a.x != b.x ) || ( a.y != b.y ) || ( a.z != b.z );
+}
+
+// Vector3 < Vector3: Lexicographic
+template< typename T >
+inline
+bool
+operator <( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return (
+	 ( a.x < b.x ? true :
+	 ( b.x < a.x ? false : // a.x == b.x
+	 ( a.y < b.y ? true :
+	 ( b.y < a.y ? false : // a.y == b.y
+	 ( a.z < b.z ) ) ) ) )
+	);
+}
+
+// Vector3 <= Vector3: Lexicographic
+template< typename T >
+inline
+bool
+operator <=( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return (
+	 ( a.x < b.x ? true :
+	 ( b.x < a.x ? false : // a.x == b.x
+	 ( a.y < b.y ? true :
+	 ( b.y < a.y ? false : // a.y == b.y
+	 ( a.z <= b.z ) ) ) ) )
+	);
+}
+
+// Vector3 >= Vector3: Lexicographic
+template< typename T >
+inline
+bool
+operator >=( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return (
+	 ( a.x > b.x ? true :
+	 ( b.x > a.x ? false : // a.x == b.x
+	 ( a.y > b.y ? true :
+	 ( b.y > a.y ? false : // a.y == b.y
+	 ( a.z >= b.z ) ) ) ) )
+	);
+}
+
+// Vector3 > Vector3: Lexicographic
+template< typename T >
+inline
+bool
+operator >( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return (
+	 ( a.x > b.x ? true :
+	 ( b.x > a.x ? false : // a.x == b.x
+	 ( a.y > b.y ? true :
+	 ( b.y > a.y ? false : // a.y == b.y
+	 ( a.z > b.z ) ) ) ) )
+	);
+}
+
+// Vector3 < Vector3: Element-wise
+template< typename T >
+inline
+bool
+lt( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return ( a.x < b.x ) && ( a.y < b.y ) && ( a.z < b.z );
+}
+
+// Vector3 <= Vector3: Element-wise
+template< typename T >
+inline
+bool
+le( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return ( a.x <= b.x ) && ( a.y <= b.y ) && ( a.z <= b.z );
+}
+
+// Vector3 >= Vector3: Element-wise
+template< typename T >
+inline
+bool
+ge( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return ( a.x >= b.x ) && ( a.y >= b.y ) && ( a.z >= b.z );
+}
+
+// Vector3 > Vector3: Element-wise
+template< typename T >
+inline
+bool
+gt( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return ( a.x > b.x ) && ( a.y > b.y ) && ( a.z > b.z );
+}
+
+// Vector3 == Value
+template< typename T >
+inline
+bool
+operator ==( Vector3< T > const & v, typename Vector3< T >::Tc t )
+{
+	return ( v.x == t ) && ( v.y == t ) && ( v.z == t );
+}
+
+// Vector3 != Value
+template< typename T >
+inline
+bool
+operator !=( Vector3< T > const & v, typename Vector3< T >::Tc t )
+{
+	return ( v.x != t ) || ( v.y != t ) || ( v.z != t );
+}
+
+// Vector3 < Value
+template< typename T >
+inline
+bool
+operator <( Vector3< T > const & v, typename Vector3< T >::Tc t )
+{
+	return ( v.x < t ) && ( v.y < t ) && ( v.z < t );
+}
+
+// Vector3 <= Value
+template< typename T >
+inline
+bool
+operator <=( Vector3< T > const & v, typename Vector3< T >::Tc t )
+{
+	return ( v.x <= t ) && ( v.y <= t ) && ( v.z <= t );
+}
+
+// Vector3 >= Value
+template< typename T >
+inline
+bool
+operator >=( Vector3< T > const & v, typename Vector3< T >::Tc t )
+{
+	return ( v.x >= t ) && ( v.y >= t ) && ( v.z >= t );
+}
+
+// Vector3 > Value
+template< typename T >
+inline
+bool
+operator >( Vector3< T > const & v, typename Vector3< T >::Tc t )
+{
+	return ( v.x > t ) && ( v.y > t ) && ( v.z > t );
+}
+
+// Value == Vector3
+template< typename T >
+inline
+bool
+operator ==( typename Vector3< T >::Tc t, Vector3< T > const & v )
+{
+	return ( t == v.x ) && ( t == v.y ) && ( t == v.z );
+}
+
+// Value != Vector3
+template< typename T >
+inline
+bool
+operator !=( typename Vector3< T >::Tc t, Vector3< T > const & v )
+{
+	return ( t != v.x ) || ( t != v.y ) || ( t != v.z );
+}
+
+// Value < Vector3
+template< typename T >
+inline
+bool
+operator <( typename Vector3< T >::Tc t, Vector3< T > const & v )
+{
+	return ( t < v.x ) && ( t < v.y ) && ( t < v.z );
+}
+
+// Value <= Vector3
+template< typename T >
+inline
+bool
+operator <=( typename Vector3< T >::Tc t, Vector3< T > const & v )
+{
+	return ( t <= v.x ) && ( t <= v.y ) && ( t <= v.z );
+}
+
+// Value >= Vector3
+template< typename T >
+inline
+bool
+operator >=( typename Vector3< T >::Tc t, Vector3< T > const & v )
+{
+	return ( t >= v.x ) && ( t >= v.y ) && ( t >= v.z );
+}
+
+// Value > Vector3
+template< typename T >
+inline
+bool
+operator >( typename Vector3< T >::Tc t, Vector3< T > const & v )
+{
+	return ( t > v.x ) && ( t > v.y ) && ( t > v.z );
+}
+
+// Equal Length?
+template< typename T >
+inline
+bool
+equal_length( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return ( a.length_squared() == b.length_squared() );
+}
+
+// Not Equal Length?
+template< typename T >
+inline
+bool
+not_equal_length( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return ( a.length_squared() != b.length_squared() );
+}
+
+// Vector3 + Vector3
+template< typename T >
+inline
+Vector3< T >
+operator +( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return Vector3< T >( a.x + b.x, a.y + b.y, a.z + b.z );
+}
+
+// Vector3 + Value
+template< typename T >
+inline
+Vector3< T >
+operator +( Vector3< T > const & v, typename Vector3< T >::Tc t )
+{
+	return Vector3< T >( v.x + t, v.y + t, v.z + t );
+}
+
+// Value + Vector3
+template< typename T >
+inline
+Vector3< T >
+operator +( typename Vector3< T >::Tc t, Vector3< T > const & v )
+{
+	return Vector3< T >( t + v.x, t + v.y, t + v.z );
+}
+
+// Vector3 - Vector3
+template< typename T >
+inline
+Vector3< T >
+operator -( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return Vector3< T >( a.x - b.x, a.y - b.y, a.z - b.z );
+}
+
+// Vector3 - Value
+template< typename T >
+inline
+Vector3< T >
+operator -( Vector3< T > const & v, typename Vector3< T >::Tc t )
+{
+	return Vector3< T >( v.x - t, v.y - t, v.z - t );
+}
+
+// Value - Vector3
+template< typename T >
+inline
+Vector3< T >
+operator -( typename Vector3< T >::Tc t, Vector3< T > const & v )
+{
+	return Vector3< T >( t - v.x, t - v.y, t - v.z );
+}
+
+// Vector3 * Vector3
+template< typename T >
+inline
+Vector3< T >
+operator *( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return Vector3< T >( a.x * b.x, a.y * b.y, a.z * b.z );
+}
+
+// Vector3 * Value
+template< typename T >
+inline
+Vector3< T >
+operator *( Vector3< T > const & v, typename Vector3< T >::Tc t )
+{
+	return Vector3< T >( v.x * t, v.y * t, v.z * t );
+}
+
+// Value * Vector3
+template< typename T >
+inline
+Vector3< T >
+operator *( typename Vector3< T >::Tc t, Vector3< T > const & v )
+{
+	return Vector3< T >( t * v.x, t * v.y, t * v.z );
+}
+
+// Vector3 / Vector3
+template< typename T >
+inline
+Vector3< T >
+operator /( Vector3< T > const & a, Vector3< T > const & b )
+{
+	assert( b.x != T( 0 ) );
+	assert( b.y != T( 0 ) );
+	assert( b.z != T( 0 ) );
+	return Vector3< T >( a.x / b.x, a.y / b.y, a.z / b.z );
+}
+
+// Vector3 / Value
+template< typename T, typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
+inline
+Vector3< T >
+operator /( Vector3< T > const & v, U const & u )
+{
+	assert( u != U( 0 ) );
+	U const inv_u( U ( 1 ) / u );
+	return Vector3< T >( v.x * inv_u, v.y * inv_u, v.z * inv_u );
+}
+
+// Vector3 / Value
+template< typename T, typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
+inline
+Vector3< T >
+operator /( Vector3< T > const & v, U const & u )
+{
+	assert( u != U( 0 ) );
+	return Vector3< T >( v.x / u, v.y / u, v.z / u );
+}
+
+// Value / Vector3
+template< typename T >
+inline
+Vector3< T >
+operator /( typename Vector3< T >::Tc t, Vector3< T > const & v )
+{
+	assert( v.x != T( 0 ) );
+	assert( v.y != T( 0 ) );
+	assert( v.z != T( 0 ) );
+	return Vector3< T >( t / v.x, t / v.y, t / v.z );
+}
+
+// Minimum of Two Vector3s
+template< typename T >
+inline
+Vector3< T >
+min( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return Vector3< T >(
+	 ( a.x <= b.x ? a.x : b.x ),
+	 ( a.y <= b.y ? a.y : b.y ),
+	 ( a.z <= b.z ? a.z : b.z )
+	);
+}
+
+// Minimum of Three Vector3s
+template< typename T >
+inline
+Vector3< T >
+min( Vector3< T > const & a, Vector3< T > const & b, Vector3< T > const & c )
+{
+	return Vector3< T >(
+	 ObjexxFCL::min( a.x, b.x, c.x ),
+	 ObjexxFCL::min( a.y, b.y, c.y ),
+	 ObjexxFCL::min( a.z, b.z, c.z )
+	);
+}
+
+// Minimum of Four Vector3s
+template< typename T >
+inline
+Vector3< T >
+min( Vector3< T > const & a, Vector3< T > const & b, Vector3< T > const & c, Vector3< T > const & d )
+{
+	return Vector3< T >(
+	 ObjexxFCL::min( a.x, b.x, c.x, d.x ),
+	 ObjexxFCL::min( a.y, b.y, c.y, d.y ),
+	 ObjexxFCL::min( a.z, b.z, c.z, d.z )
+	);
+}
+
+// Maximum of Two Vector3s
+template< typename T >
+inline
+Vector3< T >
+max( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return Vector3< T >(
+	 ( a.x >= b.x ? a.x : b.x ),
+	 ( a.y >= b.y ? a.y : b.y ),
+	 ( a.z >= b.z ? a.z : b.z )
+	);
+}
+
+// Maximum of Three Vector3s
+template< typename T >
+inline
+Vector3< T >
+max( Vector3< T > const & a, Vector3< T > const & b, Vector3< T > const & c )
+{
+	return Vector3< T >(
+	 ObjexxFCL::max( a.x, b.x, c.x ),
+	 ObjexxFCL::max( a.y, b.y, c.y ),
+	 ObjexxFCL::max( a.z, b.z, c.z )
+	);
+}
+
+// Maximum of Four Vector3s
+template< typename T >
+inline
+Vector3< T >
+max( Vector3< T > const & a, Vector3< T > const & b, Vector3< T > const & c, Vector3< T > const & d )
+{
+	return Vector3< T >(
+	 ObjexxFCL::max( a.x, b.x, c.x, d.x ),
+	 ObjexxFCL::max( a.y, b.y, c.y, d.y ),
+	 ObjexxFCL::max( a.z, b.z, c.z, d.z )
+	);
+}
+
+// Sum of Two Vector3s
+template< typename T >
+inline
+Vector3< T >
+sum( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return Vector3< T >( a.x + b.x, a.y + b.y, a.z + b.z );
+}
+
+// Sum of Three Vector3s
+template< typename T >
+inline
+Vector3< T >
+sum( Vector3< T > const & a, Vector3< T > const & b, Vector3< T > const & c )
+{
+	return Vector3< T >( a.x + b.x + c.x, a.y + b.y + c.y, a.z + b.z + c.z );
+}
+
+// Sum of Four Vector3s
+template< typename T >
+inline
+Vector3< T >
+sum( Vector3< T > const & a, Vector3< T > const & b, Vector3< T > const & c, Vector3< T > const & d )
+{
+	return Vector3< T >( a.x + b.x + c.x + d.x, a.y + b.y + c.y + d.y, a.z + b.z + c.z + d.z );
+}
+
+// Subtract of Two Vector3s
+template< typename T >
+inline
+Vector3< T >
+sub( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return Vector3< T >( a.x - b.x, a.y - b.y, a.z - b.z );
+}
+
+// Subtract of Two Vector3s
+template< typename T >
+inline
+Vector3< T >
+subtract( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return Vector3< T >( a.x - b.x, a.y - b.y, a.z - b.z );
+}
+
+// Midpoint of Two Vector3s
+template< typename T >
+inline
+Vector3< T >
+mid( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return Vector3< T >(
+	 T( 0.5 * ( a.x + b.x ) ),
+	 T( 0.5 * ( a.y + b.y ) ),
+	 T( 0.5 * ( a.z + b.z ) )
+	);
+}
+
+// Center of Two Vector3s
+template< typename T >
+inline
+Vector3< T >
+cen( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return Vector3< T >(
+	 T( 0.5 * ( a.x + b.x ) ),
+	 T( 0.5 * ( a.y + b.y ) ),
+	 T( 0.5 * ( a.z + b.z ) )
+	);
+}
+
+// Center of Three Vector3s
+template< typename T >
+inline
+Vector3< T >
+cen( Vector3< T > const & a, Vector3< T > const & b, Vector3< T > const & c )
+{
+	static long double const third( 1.0 / 3.0 );
+	return Vector3< T >(
+	 T( third * ( a.x + b.x + c.x ) ),
+	 T( third * ( a.y + b.y + c.y ) ),
+	 T( third * ( a.z + b.z + c.z ) )
+	);
+}
+
+// Center of Four Vector3s
+template< typename T >
+inline
+Vector3< T >
+cen( Vector3< T > const & a, Vector3< T > const & b, Vector3< T > const & c, Vector3< T > const & d )
+{
+	return Vector3< T >(
+	 T( 0.25 * ( a.x + b.x + c.x + d.x ) ),
+	 T( 0.25 * ( a.y + b.y + c.y + d.y ) ),
+	 T( 0.25 * ( a.z + b.z + c.z + d.z ) )
+	);
+}
+
+// Distance
+template< typename T >
+inline
+T
+distance( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return std::sqrt( Vector3< T >::square( a.x - b.x ) + Vector3< T >::square( a.y - b.y ) + Vector3< T >::square( a.z - b.z ) );
+}
+
+// Distance Squared
+template< typename T >
+inline
+T
+distance_squared( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return Vector3< T >::square( a.x - b.x ) + Vector3< T >::square( a.y - b.y ) + Vector3< T >::square( a.z - b.z );
+}
+
+// Dot Product
+template< typename T >
+inline
+T
+dot( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return ( a.x * b.x ) + ( a.y * b.y ) + ( a.z * b.z );
+}
+
+// Cross Product
+template< typename T >
+inline
+Vector3< T >
+cross( Vector3< T > const & a, Vector3< T > const & b )
+{
+	return Vector3< T >(
+	 ( a.y * b.z ) - ( a.z * b.y ),
+	 ( a.z * b.x ) - ( a.x * b.z ),
+	 ( a.x * b.y ) - ( a.y * b.x )
+	);
+}
+
+// Angle Between Two Vector3s (in Radians on [0,pi])
+template< typename T >
+inline
+T
+angle( Vector3< T > const & a, Vector3< T > const & b )
+{
+	T const axb( a.cross( b ).magnitude() );
+	T const adb( a.dot( b ) );
+	return ( ( axb != T( 0 ) ) || ( adb != T( 0 ) ) ? Vector3< T >::bump_up_angle( std::atan2( axb, adb ) ) : T( 0 ) ); // More accurate than dot-based for angles near 0 and Pi
+}
+
+// Angle abc Formed by Three Vector3s (in Radians on [0,pi])
+template< typename T >
+inline
+T
+angle( Vector3< T > const & a, Vector3< T > const & b, Vector3< T > const & c )
+{
+	return angle( a - b, c - b );
+}
+
+// Cosine of Angle Between Two Vector3s
+template< typename T >
+inline
+T
+cos( Vector3< T > const & a, Vector3< T > const & b )
+{
+	T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
+	return ( mag > T( 0 ) ? Vector3< T >::sin_cos_range( a.dot( b ) / mag ) : T( 1 ) );
+}
+
+// Cosine of Angle abc Formed by Three Vector3s
+template< typename T >
+inline
+T
+cos( Vector3< T > const & a, Vector3< T > const & b, Vector3< T > const & c )
+{
+	return cos( a - b, c - b );
+}
+
+// Sine of Angle Between Two Vector3s
+template< typename T >
+inline
+T
+sin( Vector3< T > const & a, Vector3< T > const & b )
+{
+	T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
+	return ( mag > T( 0 ) ? std::abs( Vector3< T >::sin_cos_range( a.cross( b ).magnitude() / mag ) ) : T( 0 ) );
+}
+
+// Sine of Angle abc Formed by Three Vector3s
+template< typename T >
+inline
+T
+sin( Vector3< T > const & a, Vector3< T > const & b, Vector3< T > const & c )
+{
+	return sin( a - b, c - b );
+}
 
 // Stream << Vector3 output operator
 template< typename T >

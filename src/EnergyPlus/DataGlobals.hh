@@ -33,6 +33,7 @@ namespace DataGlobals {
 	extern int const ksRunPeriodWeather;
 	extern int const ksHVACSizeDesignDay; // a regular design day run during HVAC Sizing Simulation
 	extern int const ksHVACSizeRunPeriodDesign; // a weather period design day run during HVAC Sizing Simulation
+	extern int const ksReadAllWeatherData; // a weather period for reading all weather data proir to the simulation
 
 	extern int const ZoneTSReporting; // value for Zone Time Step Reporting (UpdateDataAndReport)
 	extern int const HVACTSReporting; // value for HVAC Time Step Reporting (UpdateDataAndReport)
@@ -171,6 +172,11 @@ namespace DataGlobals {
 	extern int Progress;
 	extern void ( *fProgressPtr )( int const );
 	extern void ( *fMessagePtr )( std::string const & );
+
+	// Clears the global data in DataGlobals.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 } // DataGlobals
 

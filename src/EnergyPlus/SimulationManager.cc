@@ -156,6 +156,13 @@ namespace SimulationManager {
 	// MODULE SUBROUTINES:
 
 	// Functions
+	void
+	clear_state()
+	{
+		RunPeriodsInInput = false ;
+		RunControlInInput = false ;
+	}
+
 
 	void
 	ManageSimulation()
@@ -230,10 +237,11 @@ namespace SimulationManager {
 		using DataSystemVariables::FullAnnualRun;
 		using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
 		using Psychrometrics::InitializePsychRoutines;
-		using namespace FaultsManager;
+		using FaultsManager::CheckAndReadFaults;
 		using PlantPipingSystemsManager::InitAndSimGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
+		using OutputProcessor::ResetAccumulationWhenWarmupComplete;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -300,12 +308,12 @@ namespace SimulationManager {
 		CheckIfAnyBasements();
 		CheckIfAnyIdealCondEntSetPoint();
 
-		CheckAndReadFaults();
-
 		ManageBranchInput(); // just gets input and returns.
 
 		DoingSizing = true;
 		ManageSizing();
+
+		CheckAndReadFaults();
 
 		BeginFullSimFlag = true;
 		SimsDone = false;
@@ -455,6 +463,7 @@ namespace SimulationManager {
 				BeginDayFlag = true;
 				EndDayFlag = false;
 
+
 				if ( WarmupFlag ) {
 					++NumOfWarmupDays;
 					cWarmupDay = TrimSigDigits( NumOfWarmupDays );
@@ -462,6 +471,7 @@ namespace SimulationManager {
 				} else if ( DayOfSim == 1 ) {
 					DisplayString( "Starting Simulation at " + CurMnDy + " for " + EnvironmentName );
 					gio::write( OutputFileInits, Format_700 ) << NumOfWarmupDays;
+					ResetAccumulationWhenWarmupComplete();
 				} else if ( DisplayPerfSimulationFlag ) {
 					DisplayString( "Continuing Simulation at " + CurMnDy + " for " + EnvironmentName );
 					DisplayPerfSimulationFlag = false;
@@ -2480,7 +2490,7 @@ namespace SimulationManager {
 		std::string ErrorMessage;
 
 		gio::close( CacheIPErrorFile );
-		gio::open( CacheIPErrorFile, "eplusout.iperr" );
+		gio::open( CacheIPErrorFile, DataStringGlobals::outputIperrFileName );
 		iostatus = 0;
 		while ( iostatus == 0 ) {
 			{ IOFlags flags; gio::read( CacheIPErrorFile, fmtA, flags ) >> ErrorMessage; iostatus = flags.ios(); }
@@ -2778,8 +2788,8 @@ Resimulate(
 	if ( ResimHB ) {
 		// Surface simulation
 		InitSurfaceHeatBalance();
-		CalcHeatBalanceOutsideSurf();
-		CalcHeatBalanceInsideSurf();
+		HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf();
+		HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
 
 		// Air simulation
 		InitAirHeatBalance();
@@ -2804,7 +2814,7 @@ Resimulate(
 }
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted
