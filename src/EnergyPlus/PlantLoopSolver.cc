@@ -12,6 +12,7 @@
 #include <PlantLoopSolver.hh>
 #include <DataBranchAirLoopPlant.hh>
 #include <DataConvergParams.hh>
+#include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
@@ -179,6 +180,10 @@ namespace PlantLoopSolver {
 
 		// Do pressure system initialize if this is the demand side (therefore once per whole loop)
 		if ( ThisSide == DemandSide ) SimPressureDropSystem( LoopNum, FirstHVACIteration, PressureCall_Init );
+
+		if ( LoopNum == 3 && LoopSideNum == 2 &&  DataEnvironment::Month == 7 && DataGlobals::HourOfDay == 11 ) {
+			int j = 0;
+		}
 
 		// First thing is to setup mass flow request information
 		SetupLoopFlowRequest( LoopNum, ThisSide, OtherSide, ThisLoopSideFlow );

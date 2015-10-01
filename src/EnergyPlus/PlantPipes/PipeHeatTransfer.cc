@@ -743,7 +743,7 @@ namespace PipeHeatTransfer {
 	}
 
 	int
-	PipeHTData::performInitLoopEquip( const PlantLocation & calledFromLocation ) {
+	PipeHTData::performInitLoopEquip( const PlantLocation & EP_UNUSED(calledFromLocation) ) {
 		// nothing here
 		return 0;
 	}

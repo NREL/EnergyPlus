@@ -109,7 +109,7 @@ namespace Pipes {
 		return 0;
 	}
 
-	int LocalPipeData::performInitLoopEquip( const PlantLocation & calledFromLocation ) {
+	int LocalPipeData::performInitLoopEquip( const PlantLocation & EP_UNUSED(calledFromLocation) ) {
 		// nothing here
 		return 0;
 	}
