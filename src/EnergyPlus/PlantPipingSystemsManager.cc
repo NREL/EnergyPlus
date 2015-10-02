@@ -380,9 +380,7 @@ namespace PlantPipingSystemsManager {
 					Xmax = ubound( PipingSystemDomains( DomainNum ).Cells, 1 );
 					Ymax = ubound( PipingSystemDomains( DomainNum ).Cells, 2 );
 					Zmax = ubound( PipingSystemDomains( DomainNum ).Cells, 3 );
-					Y = Ymax;
-					SlabArea = ( PipingSystemDomains( DomainNum ).SlabLength / 2 ) * ( PipingSystemDomains( DomainNum ).SlabWidth / 2 );
-					
+										
 					PipingSystemDomains( DomainNum ).WeightingFactor.allocate( { 0, Xmax }, { 0, Zmax } );
 					PipingSystemDomains( DomainNum ).WeightedHeatFlux.allocate( { 0, Xmax }, { 0, Zmax } );
 				}
@@ -439,6 +437,12 @@ namespace PlantPipingSystemsManager {
 			// Zone-coupled slab
 			if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
 
+				Xmax = ubound(PipingSystemDomains(DomainNum).Cells, 1);
+				Ymax = ubound(PipingSystemDomains(DomainNum).Cells, 2);
+				Zmax = ubound(PipingSystemDomains(DomainNum).Cells, 3);
+				Y = Ymax;
+				SlabArea = (PipingSystemDomains(DomainNum).SlabLength / 2) * (PipingSystemDomains(DomainNum).SlabWidth / 2);
+
 				PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
 
 				//Set ZoneTemp equal to the average air temperature of the zones the coupled surfaces are part of.
@@ -455,7 +459,7 @@ namespace PlantPipingSystemsManager {
 							if ( abs( ZoneTemp - PipingSystemDomains( DomainNum ).Cells( Xmax, Ymax, Zmax ).MyBase.Temperature_PrevTimeStep ) < 0.0001 ){
 								PipingSystemDomains( DomainNum ).Cells( Xmax, Ymax, Zmax ).MyBase.Temperature_PrevTimeStep = ZoneTemp - 0.0001;
 							}
-							PipingSystemDomains( DomainNum ).WeightingFactor( X, Z ) = ( ( ZoneTemp - PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Temperature_PrevTimeStep ) / ( ZoneTemp - PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Temperature_PrevTimeStep ) );
+							PipingSystemDomains( DomainNum ).WeightingFactor( X, Z ) = abs ( ( ZoneTemp - PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Temperature_PrevTimeStep ) / ( ZoneTemp - PipingSystemDomains( DomainNum ).Cells( Xmax, Ymax, Zmax ).MyBase.Temperature_PrevTimeStep ) );
 							WeightingFactorTimesArea += PipingSystemDomains( DomainNum ).WeightingFactor( X, Z ) * YNormalArea( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) );
 						}
 					}
@@ -1348,13 +1352,13 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).Mesh.Y.MeshDistribution = MeshDistribution_Geometric;
 				PipingSystemDomains( DomainCtr ).Mesh.Z.MeshDistribution = MeshDistribution_Geometric;
 
-				Real64 MeshCoefficient = 1.7;
+				Real64 MeshCoefficient = 1.6;
 
 				PipingSystemDomains( DomainCtr ).Mesh.X.GeometricSeriesCoefficient = MeshCoefficient;
 				PipingSystemDomains( DomainCtr ).Mesh.Y.GeometricSeriesCoefficient = MeshCoefficient;
 				PipingSystemDomains( DomainCtr ).Mesh.Z.GeometricSeriesCoefficient = MeshCoefficient;
 
-				int MeshCount = 4;
+				int MeshCount = 5;
 
 				PipingSystemDomains( DomainCtr ).Mesh.X.RegionMeshCount = MeshCount;
 				PipingSystemDomains( DomainCtr ).Mesh.Y.RegionMeshCount = MeshCount;
@@ -7340,7 +7344,7 @@ namespace PlantPipingSystemsManager {
 				Numerator += Beta * HeatFlux * Width( cell ) * Depth( cell );
 			} else if ( cell.CellType ==  CellType_ZoneGroundInterface ) {
 				// Get the average slab heat flux and add it to the tally
-				HeatFlux = PipingSystemDomains( DomainNum ).HeatFlux;
+				HeatFlux = PipingSystemDomains(DomainNum).WeightedHeatFlux(cell.X_index, cell.Z_index);
 				Numerator += Beta * HeatFlux * Width( cell ) * Depth( cell );
 			}
 
