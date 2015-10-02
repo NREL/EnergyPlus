@@ -436,7 +436,6 @@ namespace PlantPipingSystemsManager {
 
 			// Zone-coupled slab
 			if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
-
 				Xmax = ubound(PipingSystemDomains(DomainNum).Cells, 1);
 				Ymax = ubound(PipingSystemDomains(DomainNum).Cells, 2);
 				Zmax = ubound(PipingSystemDomains(DomainNum).Cells, 3);
@@ -7344,7 +7343,7 @@ namespace PlantPipingSystemsManager {
 				Numerator += Beta * HeatFlux * Width( cell ) * Depth( cell );
 			} else if ( cell.CellType ==  CellType_ZoneGroundInterface ) {
 				// Get the average slab heat flux and add it to the tally
-				HeatFlux = PipingSystemDomains(DomainNum).WeightedHeatFlux(cell.X_index, cell.Z_index);
+				HeatFlux = PipingSystemDomains( DomainNum ).WeightedHeatFlux( cell.X_index, cell.Z_index );
 				Numerator += Beta * HeatFlux * Width( cell ) * Depth( cell );
 			}
 
