@@ -1492,8 +1492,7 @@ namespace WaterThermalTanks {
 
 	void
 	CalcWaterThermalTankStratified(
-		int const WaterThermalTankNum, // Water Heater being simulated
-		Real64 const HeatPumpPartLoadRatio = 1.0 // Optional heat pump part load ratio for heat pump water heaters
+		int const WaterThermalTankNum // Water Heater being simulated
 	);
 
 	Real64
