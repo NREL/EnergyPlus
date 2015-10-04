@@ -413,14 +413,12 @@ namespace WaterToAirHeatPumpSimple {
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Water Nodes" );
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Air Nodes" );
 
+			// Setup Report variables for the cooling coil
+			// CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:EquationFit"
 			SetupOutputVariable( "Cooling Coil Electric Energy [J]", SimpleWatertoAirHP( HPNum ).Energy, "System", "Summed", SimpleWatertoAirHP( HPNum ).Name, _, "Electric", "Cooling", _, "System" );
-
 			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", SimpleWatertoAirHP( HPNum ).EnergyLoadTotal, "System", "Summed", SimpleWatertoAirHP( HPNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-
 			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", SimpleWatertoAirHP( HPNum ).EnergySensible, "System", "Summed", SimpleWatertoAirHP( HPNum ).Name );
-
 			SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", SimpleWatertoAirHP( HPNum ).EnergyLatent, "System", "Summed", SimpleWatertoAirHP( HPNum ).Name );
-
 			SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Energy [J]", SimpleWatertoAirHP( HPNum ).EnergySource, "System", "Summed", SimpleWatertoAirHP( HPNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
 
 			//create predefined report entries
@@ -481,10 +479,9 @@ namespace WaterToAirHeatPumpSimple {
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Water Nodes" );
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Air Nodes" );
 
+			// CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:EquationFit"
 			SetupOutputVariable( "Heating Coil Electric Energy [J]", SimpleWatertoAirHP( HPNum ).Energy, "System", "Summed", SimpleWatertoAirHP( HPNum ).Name, _, "Electric", "Heating", _, "System" );
-
 			SetupOutputVariable( "Heating Coil Heating Energy [J]", SimpleWatertoAirHP( HPNum ).EnergyLoadTotal, "System", "Summed", SimpleWatertoAirHP( HPNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-
 			SetupOutputVariable( "Heating Coil Source Side Heat Transfer Energy [J]", SimpleWatertoAirHP( HPNum ).EnergySource, "System", "Summed", SimpleWatertoAirHP( HPNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
 
 			//create predefined report entries

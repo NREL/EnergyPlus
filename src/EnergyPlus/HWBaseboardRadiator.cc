@@ -1122,9 +1122,8 @@ namespace HWBaseboardRadiator {
 		WaterMassFlowRate = Node( HWBaseboard( BaseboardNum ).WaterInletNode ).MassFlowRate;
 
 		if ( QZnReq > SmallLoad && ! CurDeadBandOrSetback( ZoneNum ) && ( GetCurrentScheduleValue( HWBaseboard( BaseboardNum ).SchedPtr ) > 0 ) && ( WaterMassFlowRate > 0.0 ) ) {
-			// Assume the air mass flow rate is twice the water mass flow rate
 			// Calculate air mass flow rate
-			AirMassFlowRate = HWBaseboard( BaseboardNum ).AirMassFlowRateStd * ( WaterMassFlowRate / HWBaseboard( BaseboardNum ).WaterMassFlowRateStd );
+			AirMassFlowRate = HWBaseboard( BaseboardNum ).AirMassFlowRateStd * ( WaterMassFlowRate / HWBaseboard( BaseboardNum ).WaterMassFlowRateMax );
 			CapacitanceAir = PsyCpAirFnWTdb( HWBaseboard( BaseboardNum ).AirInletHumRat, AirInletTemp ) * AirMassFlowRate;
 			Cp = GetSpecificHeatGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, WaterInletTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 

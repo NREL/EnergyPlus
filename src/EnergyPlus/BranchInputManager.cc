@@ -127,7 +127,7 @@ namespace BranchInputManager {
 		GetSplitterInputFlag = true ; // Flag used to retrieve Input
 		GetMixerInputFlag = true ; // Flag used to retrieve Input
 		GetConnectorListInputFlag = true ; // Flag used to retrieve Input
-		InvalidBranchDefinitions = true ;
+		InvalidBranchDefinitions = false ;
 		GetBranchInputOneTimeFlag = true;
 		BranchList.deallocate(); // Branch List data for each Branch List
 		Branch.deallocate(); // Branch Data for each Branch
