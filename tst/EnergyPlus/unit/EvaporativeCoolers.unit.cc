@@ -218,8 +218,6 @@ namespace EnergyPlus {
 
 	TEST_F( HVACFixture, EvapCoolers_SizeIndEvapCoolerTest ) {
 
-		ShowMessage( "Begin Test: HVACFixture, EvapCoolers_SizeIndEvapCoolerTest" );
-
 		int const EvapCoolNum( 1 );
 		Real64 PrimaryAirDesignFlow( 0.0 );
 		Real64 SecondaryAirDesignFlow( 0.0 );
@@ -312,8 +310,6 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( HVACFixture, EvapCoolers_SizeDirEvapCoolerTest ) {
-
-		ShowMessage( "Begin Test: HVACFixture, EvapCoolers_SizeDirEvapCoolerTest" );
 		
 		int const EvapCoolNum( 1 );
 		Real64 PrimaryAirDesignFlow( 0.0 );

@@ -358,7 +358,15 @@ namespace EnergyPlus {
 			process_idd( idd, errors_found );
 		}
 
-		if ( errors_found ) return errors_found;
+		if ( errors_found ) {
+			compare_eso_stream( "" );
+			compare_mtr_stream( "" );
+			compare_echo_stream( "" );
+			compare_err_stream( "" );
+			compare_cout_stream( "" );
+			compare_cerr_stream( "" );
+			return errors_found;
+		}
 
 		auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf ) );
 		NumLines = 0;
@@ -470,6 +478,13 @@ namespace EnergyPlus {
 			EXPECT_TRUE( found_version ) << "Unknown IDF Version, expected version is \"" + DataStringGlobals::MatchVersion + "\"";
 			errors_found = true;
 		}
+
+		compare_eso_stream( "" );
+		compare_mtr_stream( "" );
+		compare_echo_stream( "" );
+		compare_err_stream( "" );
+		compare_cout_stream( "" );
+		compare_cerr_stream( "" );
 
 		if ( errors_found ) return errors_found;
 

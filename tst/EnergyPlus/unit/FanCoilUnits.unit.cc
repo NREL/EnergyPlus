@@ -54,8 +54,6 @@ using General::JulianDay;
 namespace EnergyPlus {
 	TEST_F( HVACFixture, MultiStage4PipeFanCoilHeatingTest ) {
 
-		ShowMessage( "Begin Test: HVACFixture, MultiStage4PipeFanCoilHeatingTest" );
-
 		int FanCoilNum( 1 );
 		int ZoneNum( 1 );
 		bool FirstHVACIteration( false );
@@ -363,8 +361,6 @@ namespace EnergyPlus {
 		CoilNames.deallocate();
 	}
 	TEST_F( HVACFixture, MultiStage4PipeFanCoilCoolingTest ) {
-
-		ShowMessage( "Begin Test: HVACFixture, MultiStage4PipeFanCoilCoolingTest" );
 
 		int FanCoilNum( 1 );
 		int ZoneNum( 1 );
