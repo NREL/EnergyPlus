@@ -271,6 +271,23 @@ EnergyPlusPgm( std::string const & filepath )
 	CreateCurrentDateTimeString( CurrentDateTime );
 	VerString += "," + CurrentDateTime;
 
+	OutputStandardError = GetNewUnitNumber();
+	{
+		IOFlags flags;
+		flags.ACTION( "write" );
+		flags.STATUS( "UNKNOWN" );
+		gio::open( OutputStandardError, outputErrFileName, flags );
+		int write_stat = flags.ios();
+		if ( write_stat != 0 ) {
+			if (write_stat == 600) {
+				DisplayString( "ERROR: Could not open file " + outputErrFileName + " for output (write). Write permission denied in output directory." );
+				std::exit( EXIT_FAILURE );
+			}
+			ShowFatalError( "ShowErrorMessage: Could not open file " + outputErrFileName + " for output (write)." );
+		}
+	}
+	err_stream = gio::out_stream( OutputStandardError );
+
 	get_environment_variable( DDOnlyEnvVar, cEnvValue );
 	DDOnly = env_var_on( cEnvValue ); // Yes or True
 	if (DDOnlySimulation)

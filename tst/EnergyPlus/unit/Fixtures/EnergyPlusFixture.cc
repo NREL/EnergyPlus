@@ -109,16 +109,20 @@ namespace EnergyPlus {
 		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->mtr_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->echo_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
+		this->err_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 
 		DataGlobals::eso_stream = this->eso_stream.get();
 		DataGlobals::mtr_stream = this->mtr_stream.get();
 		InputProcessor::echo_stream = this->echo_stream.get();
+		DataGlobals::err_stream = this->err_stream.get();
 
 		m_cout_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		m_redirect_cout = std::unique_ptr< RedirectCout >( new RedirectCout( m_cout_buffer ) );
 
 		m_cerr_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		m_redirect_cerr = std::unique_ptr< RedirectCerr >( new RedirectCerr( m_cerr_buffer ) );
+
+		UtilityRoutines::outputErrorHeader = false;
 	}
 
 	void EnergyPlusFixture::TearDown() {
@@ -285,6 +289,14 @@ namespace EnergyPlus {
 		EXPECT_EQ( expected_string, stream_str );
 		bool are_equal = ( expected_string == stream_str );
 		if ( reset_stream ) this->echo_stream->str( std::string() );
+		return are_equal;
+	}
+
+	bool EnergyPlusFixture::compare_err_stream( std::string const & expected_string, bool reset_stream ) {
+		auto const stream_str = this->err_stream->str();
+		EXPECT_EQ( expected_string, stream_str );
+		bool are_equal = ( expected_string == stream_str );
+		if ( reset_stream ) this->err_stream->str( std::string() );
 		return are_equal;
 	}
 
