@@ -489,6 +489,18 @@ public: // Modifier
 		return *this;
 	}
 
+	// Shrink Upper
+	inline
+	IndexRange &
+	shrink( int const n = 1 )
+	{
+		assert( n >= 0 );
+		assert( u_ >= l_ - 1 );
+		u_ = clean_u( u_ - n );
+		size_ = computed_size();
+		return *this;
+	}
+
 	// Expand to Contain an Index
 	inline
 	IndexRange &
