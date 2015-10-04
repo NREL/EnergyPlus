@@ -24,8 +24,10 @@ namespace EnergyPlus {
 		}
 		return lines;
 	}
-	
 
+	TEST_F( DataSetFixture, AirCooledChiller ) {
+		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( "../../../datasets/AirCooledChiller.idf" ) ) ) );
+	}
 	TEST_F( DataSetFixture, ASHRAE_2005_HOF_Materials ) {
 		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( "../../../datasets/ASHRAE_2005_HOF_Materials.idf" ) ) ) );
 	}
