@@ -1,6 +1,8 @@
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src/EnergyPlus )
 
+CONFIGURE_FILE( Datasets.unit.cc.in "${CMAKE_CURRENT_BINARY_DIR}/Datasets.unit.cc" )
+
 set( test_src
   TestHelpers/IdfParser.cc
   TestHelpers/IdfParser.hh
@@ -10,7 +12,6 @@ set( test_src
   Fixtures/IdfParserFixture.hh
   Fixtures/InputProcessorFixture.hh
   Fixtures/SQLiteFixture.hh
-  Datasets.unit.cc
   AdvancedAFN.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
@@ -18,6 +19,7 @@ set( test_src
   CondenserLoopTowers.unit.cc;
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
+  "${CMAKE_CURRENT_BINARY_DIR}/Datasets.unit.cc"
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
   DOASEffectOnZoneSizing.unit.cc

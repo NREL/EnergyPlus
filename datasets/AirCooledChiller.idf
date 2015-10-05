@@ -146,7 +146,7 @@
 !    8.0;                    !- Version Identifier
 
   Chiller:Electric:EIR,
-  !  ElectricEIRChiller McQuay AGZ010BS 34.5kW/2.67COP,  !- Name
+    ElectricEIRChiller McQuay AGZ010BS 34.5kW/2.67COP,  !- Name
     34465,                   !- Reference Capacity {W}
     2.67,                    !- Reference COP {W/W}
     6.67,                    !- Reference Leaving Chilled Water Temperature {C}
