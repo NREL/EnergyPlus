@@ -202,6 +202,7 @@ namespace SimulationManager {
 		using OutputReportTabular::WriteTabularReports;
 		using OutputReportTabular::OpenOutputTabularFile;
 		using OutputReportTabular::CloseOutputTabularFile;
+		using OutputReportTabular::ResetTabularReports;
 		using DataErrorTracking::AskForConnectionsReport;
 		using DataErrorTracking::ExitDuringSimulations;
 		using OutputProcessor::SetupTimePointers;
@@ -475,6 +476,11 @@ namespace SimulationManager {
 				} else if ( DisplayPerfSimulationFlag ) {
 					DisplayString( "Continuing Simulation at " + CurMnDy + " for " + EnvironmentName );
 					DisplayPerfSimulationFlag = false;
+				}
+				// for simulations that last longer than a week, identify when the last year of the simulation is started
+				if ( ( DayOfSim > 365 ) && ( (NumOfDayInEnvrn - DayOfSim) == 364 ) && !WarmupFlag ){
+					DisplayString( "Starting last  year of environment at:  " + DayOfSimChr );
+					ResetTabularReports();
 				}
 
 				for ( HourOfDay = 1; HourOfDay <= 24; ++HourOfDay ) { // Begin hour loop ...

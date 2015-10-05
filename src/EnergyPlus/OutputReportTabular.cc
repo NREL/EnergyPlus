@@ -13111,6 +13111,91 @@ namespace OutputReportTabular {
 	//======================================================================================================================
 	//======================================================================================================================
 
+	//    ROUTINES TO RESET GATHERED VALUES TO ZERO
+
+	//======================================================================================================================
+	//======================================================================================================================
+
+	void
+	ResetTabularReports()
+	{
+		// Jason Glazer - October 2015
+		// Reset all gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		gatherElapsedTimeBEPS = 0.0;
+		ResetMonthlyGathering();
+	//	OutputReportTabularAnnual::ResetAnnualGathering();
+	//	ResetBinGathering(  );
+	//	ResetBEPSGathering(  );
+	//	ResetSourceEnergyEndUseGathering(  );
+	//	ResetPeakDemandGathering(  );
+	//	ResetHeatGainGathering(  );
+	}
+
+	void
+	ResetMonthlyGathering(){
+		// Jason Glazer - October 2015
+		// Reset all monthly gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		int iInput;
+		int jTable;
+		int kColumn;
+		int curTable;
+		int curCol;
+		int curFirstColumn;
+		static Real64 BigNum( 0.0 );
+
+		for ( iInput = 1; iInput <= MonthlyInputCount; ++iInput ) {
+			for ( jTable = 1; jTable <= MonthlyInput( iInput ).numTables; ++jTable ) {
+				curTable = jTable + MonthlyInput( iInput ).firstTable - 1;
+				for ( kColumn = 1; kColumn <= MonthlyTables( curTable ).numColumns; ++kColumn ) {
+					curCol = kColumn + MonthlyTables( curTable ).firstColumn - 1;
+					MonthlyColumns( curCol ).timeStamp = 0;
+					MonthlyColumns( curCol ).duration = 0.0;
+					if ( MonthlyColumns( curCol ).aggType == aggTypeMaximum || MonthlyColumns( curCol ).aggType == aggTypeMaximumDuringHoursShown ){
+						MonthlyColumns( curCol ).reslt = -huge( BigNum );
+					}
+					else if ( MonthlyColumns( curCol ).aggType == aggTypeMinimum || MonthlyColumns( curCol ).aggType == aggTypeMinimumDuringHoursShown ){
+						MonthlyColumns( curCol ).reslt = huge( BigNum );
+					}
+					else {
+						MonthlyColumns( curCol ).reslt = 0.0;
+					}
+				}
+			}
+		}
+	}
+
+	void
+	ResetBinGathering(){
+
+	}
+
+	void
+	ResetBEPSGathering(){
+
+	}
+
+	void
+	ResetSourceEnergyEndUseGathering(){
+
+	}
+
+	void
+	ResetPeakDemandGathering(){
+
+	}
+
+	void
+	ResetHeatGainGathering(){
+
+	}
+
+
+
+	//======================================================================================================================
+	//======================================================================================================================
+
 	//    ROUTINES RELATED TO IF VALUE IS IN A RANGE
 
 	//======================================================================================================================
