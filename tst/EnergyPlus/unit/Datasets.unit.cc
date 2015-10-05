@@ -92,17 +92,11 @@ namespace EnergyPlus {
 	TEST_F( DataSetFixture, PerfCurves ) {
 		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/PerfCurves.idf" ) ) ) );
 	}
-	TEST_F( DataSetFixture, PrecipitationSchedulesUSA_fullset_Release ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/PrecipitationSchedulesUSA-fullset_Release.idf" ) ) ) );
-	}
 	TEST_F( DataSetFixture, PrecipitationSchedulesUSA ) {
 		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/PrecipitationSchedulesUSA.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, RefrigerationCasesDataSet ) {
 		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" ) ) ) );
-	}
-	TEST_F( DataSetFixture, RefrigerationCases ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCases.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, RefrigerationCasesSetNumberOne ) {
 		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesSetNumberOne.idf" ) ) ) );
