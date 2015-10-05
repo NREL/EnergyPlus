@@ -28,6 +28,11 @@ namespace DataAirLoop {
 	// MODULE VARIABLE DECLARATIONS:
 
 	extern int NumOASystems; // Number of Outdoor Air Systems
+	extern bool AirLoopInputsFilled; // Set to TRUE after first pass through air loop
+
+	// Variables specific to AirflowNetwork simulations.
+	// Avoid using these for other purposes since these variables are only reset to 0 within AirflowNetworkBalanceManager, line 322.
+	// Non-AFN simulations may have multiple air loops and use of these variables may yield unintended results.
 	extern int LoopFanOperationMode; // OnOff fan operation mode
 	extern Real64 LoopSystemOnMassFlowrate; // Loop mass flow rate during on cycle using an OnOff fan
 	extern Real64 LoopSystemOffMassFlowrate; // Loop mass flow rate during off cycle using an OnOff fan
@@ -36,7 +41,6 @@ namespace DataAirLoop {
 	extern Real64 LoopOnOffFanRTF; // OnOff fan run time fraction in an HVAC Air Loop
 	extern Real64 LoopDXCoilRTF; // OnOff fan run time fraction in an HVAC Air Loop
 	extern Real64 LoopCompCycRatio; // Loop compressor cycling ratio for multispeed heat pump
-	extern bool AirLoopInputsFilled; // Set to TRUE after first pass through air loop
 
 	// Types
 

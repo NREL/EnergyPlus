@@ -41,6 +41,7 @@ set( test_src
   HVACStandaloneERV.unit.cc
   HVACUnitarySystem.unit.cc
   HVACVariableRefrigerantFlow.unit.cc
+  HWBaseboardRadiator.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
@@ -58,6 +59,7 @@ set( test_src
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
+  ScheduleManager.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
   SiteBuildingSurfaceGroundTemperatures.unit.cc

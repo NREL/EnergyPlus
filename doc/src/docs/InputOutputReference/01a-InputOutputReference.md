@@ -1,24 +1,12 @@
-
 ![](media/ep.gif)
 
 <br/>
-<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
 <hr>
 <h1>Input Output Reference</h1>
 <h2>The Encyclopedic Reference to EnergyPlus Input and Output</h2>
 <br/>
 <p><i>(the ins and outs of EnergyPlus)</i></p>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
 <br/>
 <p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
 <p style="page-break-after:always;"></p>
@@ -2779,11 +2767,11 @@ A nominal value of soil moisture content when the soil is saturated, this is use
 
 #### Field: Type of Undisturbed Ground Temperature Object
 
-The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
+This is the type of undisturbed ground temperature object that is used to determine the ground temperature.
 
 #### Field: Name of Undisturbed Ground Temperature Object
 
-The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
+This is the name of the undisturbed ground temperature object that is used to determine the ground temperature.
 
 #### Field: Evapotranspiration Ground Cover Parameter
 
@@ -2860,6 +2848,7 @@ Site:GroundDomain:Slab,
     Slab Insulation,    !- Vertical Insulation Name
     2,                  !- Vertical perimeter insulation depth from surface
     Hourly;             !- Simulation Timestep</td>
+
 ```
 
 ### Site:GroundDomain Outputs
@@ -2881,9 +2870,7 @@ This is the value of the OthersideConditionModel surface temperature. This is th
 
 This section documents the input object used to simulate ground coupled heat transfer with underground zones within EnergyPlus. Zone surfaces within EnergyPlus interact with the Site:GroundDomain:Basement object by utilizing the SurfaceProperty:OtherSideConditionsModel object. Two separate OSCM are required for the basement vertical and horizontal surfaces. Vertical wall surfaces will interact with the first OSCM while the horizontal floor surface will interact with the second OSCM. Basement floor and wall surfaces are constructed normally by using the BuildingSurface:Detailed object, with the outside boundary condition being the OtherSideConditionsModel for the basement floor or wall. The outside surface of the wall being the interface between the ground domain and the EnergyPlus zone. Horizontal and vertical ground insulation are simulated by the ground domain, and therefore should not be included in the wall and floor construction objects. See the figure below.
 
-![](media/image013.png)
-
-![](media/image014.png)
+![](media/image900.png)
 
 Figure: Basement Configuration
 
@@ -2898,9 +2885,8 @@ Site:GroundDomain:Basement,
     836,                     !- Soil Specific Heat {J/kg-K}
     30,                      !- Soil Moisture Content Volume Fraction {percent}
     50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
-    15.5,                    !- Kusuda-Achenbach Average Surface Temperature {C}
-    12.8,                    !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
-    17.3,                    !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps;                 !- Name of Undisturbed Ground Temperature Object
     1,                       !- Evapotranspiration Ground Cover Parameter
     BasementFloorOSCM,       !- Name of Basement Floor Boundary Condition Model
     Yes,                     !- Basement Horizontal Underfloor Insulation Present (Yes/No)
@@ -2953,11 +2939,11 @@ A nominal value of soil moisture content when the soil is saturated, this is use
 
 #### Field: Type of Undisturbed Ground Temperature Object
 
-The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
+This is the type of undisturbed ground temperature object that is used to determine the ground temperature.
 
 #### Field: Name of Undisturbed Ground Temperature Object
 
-The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
+This is the name of the undisturbed ground temperature object that is used to determine the ground temperature.
 
 #### Field: Evapotranspiration Ground Cover Parameter
 

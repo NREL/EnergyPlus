@@ -119,7 +119,7 @@ namespace DataZoneEquipment {
 	void
 	clear_state()
 	{
-		NumSupplyAirPaths = 0;
+		NumSupplyAirPaths = 0 ;
 		NumReturnAirPaths = 0 ;
 		ZoneEquipInputsFilled = false ;
 		ZoneEquipSimulatedOnce = false ;
