@@ -1592,6 +1592,59 @@ public: // Modifier
 		return *this;
 	}
 
+	// Set Initializer Value
+	inline
+	Array1D &
+	initializer( T const & t )
+	{
+		initializer_ = t;
+		return *this;
+	}
+
+	// Set Initializer Function
+	inline
+	Array1D &
+	initializer( InitializerFunction const & fxn )
+	{
+		initializer_ = fxn;
+		return *this;
+	}
+
+	// Clear Initializer
+	inline
+	Array1D &
+	initializer_clear()
+	{
+		initializer_.clear();
+		return *this;
+	}
+
+	// Initialize
+	inline
+	Array1D &
+	initialize()
+	{
+		if ( initializer_.is_active() ) {
+			if ( initializer_.is_value() ) {
+				initialize( initializer_.value() );
+			} else if ( initializer_.is_function() ) {
+				initializer_.function()( *this );
+			}
+		}
+		return *this;
+	}
+
+	// Swap
+	inline
+	Array1D &
+	swap( Array1D & v )
+	{
+		using std::swap;
+		swap1( v );
+		swap( initializer_, v.initializer_ );
+		return *this;
+	}
+
 public: // std::vector-like API
 
 	// First Value
@@ -1635,8 +1688,8 @@ public: // std::vector-like API
 	Array1D &
 	push_back( T const & t )
 	{
-		Base::do_push_back_copy( t );
 		I_.grow();
+		Base::do_push_back_copy( t );
 		return *this;
 	}
 
@@ -1646,8 +1699,8 @@ public: // std::vector-like API
 	Array1D &
 	push_back( T && t )
 	{
-		Base::do_push_back_move( std::move( t ) );
 		I_.grow();
+		Base::do_push_back_move( std::move( t ) );
 		return *this;
 	}
 
@@ -1728,8 +1781,8 @@ public: // std::vector-like API
 	Array1D &
 	emplace_back( Args &&... args )
 	{
-		Base::do_emplace_back( std::forward< Args >( args )... );
 		I_.grow();
+		Base::do_emplace_back( std::forward< Args >( args )... );
 		return *this;
 	}
 
@@ -1766,59 +1819,6 @@ public: // std::vector-like API
 	shrink_to_fit()
 	{
 		Base::shrink_capacity();
-		return *this;
-	}
-
-	// Set Initializer Value
-	inline
-	Array1D &
-	initializer( T const & t )
-	{
-		initializer_ = t;
-		return *this;
-	}
-
-	// Set Initializer Function
-	inline
-	Array1D &
-	initializer( InitializerFunction const & fxn )
-	{
-		initializer_ = fxn;
-		return *this;
-	}
-
-	// Clear Initializer
-	inline
-	Array1D &
-	initializer_clear()
-	{
-		initializer_.clear();
-		return *this;
-	}
-
-	// Initialize
-	inline
-	Array1D &
-	initialize()
-	{
-		if ( initializer_.is_active() ) {
-			if ( initializer_.is_value() ) {
-				initialize( initializer_.value() );
-			} else if ( initializer_.is_function() ) {
-				initializer_.function()( *this );
-			}
-		}
-		return *this;
-	}
-
-	// Swap
-	inline
-	Array1D &
-	swap( Array1D & v )
-	{
-		using std::swap;
-		swap1( v );
-		swap( initializer_, v.initializer_ );
 		return *this;
 	}
 

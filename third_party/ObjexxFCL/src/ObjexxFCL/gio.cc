@@ -589,11 +589,11 @@ inquire( Unit const unit, IOFlags & flags )
 		flags.name( Stream_p->name() );
 		flags.exists( Stream_p->is_open() ? true : std::ifstream( Stream_p->name() ).good() );
 		flags.open( Stream_p->is_open() );
-		flags.read( Stream_p->read() );
-		flags.write( Stream_p->write() );
-		flags.binary( Stream_p->binary() );
-		flags.append( Stream_p->append() );
-		flags.asis( Stream_p->asis() );
+		flags.status( Stream_p->status() );
+		flags.access( Stream_p->access() );
+		flags.action( Stream_p->action() );
+		flags.form( Stream_p->form() );
+		flags.positioning( Stream_p->positioning() );
 		if ( Stream_p->is_open() ) {
 			flags.size( Stream_p->size() );
 			flags.pos( Stream_p->pos() );
@@ -618,11 +618,11 @@ inquire( Name const & name, IOFlags & flags )
 		flags.unit( streams().unit( name ) );
 		flags.exists( Stream_p->is_open() ? true : std::ifstream( name ).good() );
 		flags.open( Stream_p->is_open() );
-		flags.read( Stream_p->read() );
-		flags.write( Stream_p->write() );
-		flags.binary( Stream_p->binary() );
-		flags.append( Stream_p->append() );
-		flags.asis( Stream_p->asis() );
+		flags.status( Stream_p->status() );
+		flags.access( Stream_p->access() );
+		flags.action( Stream_p->action() );
+		flags.form( Stream_p->form() );
+		flags.positioning( Stream_p->positioning() );
 		if ( Stream_p->is_open() ) {
 			flags.size( Stream_p->size() );
 			flags.pos( Stream_p->pos() );

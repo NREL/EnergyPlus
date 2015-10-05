@@ -68,7 +68,9 @@ public: // Creation
 	 l_( 1 ),
 	 u_( clean_u( u ) ),
 	 size_( u_ )
-	{}
+	{
+		assert( legal() );
+	}
 
 	// Index Range Constructor
 	inline
@@ -76,7 +78,9 @@ public: // Creation
 	 l_( l ),
 	 u_( clean_u( u ) ),
 	 size_( computed_size() )
-	{}
+	{
+		assert( legal() );
+	}
 
 	// Initializer List of Integer Constructor
 	template< typename U, class = typename std::enable_if< std::is_constructible< int, U >::value >::type >
@@ -104,6 +108,7 @@ public: // Creation
 			break;
 		}
 		size_ = computed_size();
+		assert( legal() );
 	}
 
 	// Initializer List of Index Constructor
@@ -131,6 +136,7 @@ public: // Creation
 			break;
 		}
 		size_ = computed_size();
+		assert( legal() );
 	}
 
 	// Omit Constructor
@@ -155,7 +161,9 @@ public: // Creation
 	 l_( u + 2 ),
 	 u_( u ),
 	 size_( npos )
-	{}
+	{
+		assert( legal() );
+	}
 
 	// Omit + Omit Constructor
 	inline
@@ -516,6 +524,7 @@ public: // Modifier
 				u_ = l_ - 2; // Reset u_ to maintain unbounded state
 			}
 		}
+		assert( legal() );
 		return *this;
 	}
 
