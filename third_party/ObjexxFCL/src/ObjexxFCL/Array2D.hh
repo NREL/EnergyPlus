@@ -79,6 +79,7 @@ public: // Types
 	using Super::isize2;
 	using Super::l1;
 	using Super::l2;
+	using Super::move_if;
 	using Super::operator ();
 	using Super::operator [];
 	using Super::resize;
@@ -944,7 +945,7 @@ public: // Modifier
 		for ( int i1 = b1; i1 <= e1; ++i1, l_beg += z2_, m_beg += s2 ) {
 			l = l_beg; m = m_beg;
 			for ( int i2 = b2; i2 <= e2; ++i2, ++l, ++m ) {
-				o[ m ] = operator []( l );
+				o[ m ] = move_if( operator []( l ) );
 			}
 		}
 		return swap( o );
@@ -965,7 +966,7 @@ public: // Modifier
 		for ( int i1 = b1; i1 <= e1; ++i1, l_beg += z2_, m_beg += s2 ) {
 			l = l_beg; m = m_beg;
 			for ( int i2 = b2; i2 <= e2; ++i2, ++l, ++m ) {
-				o[ m ] = operator []( l );
+				o[ m ] = move_if( operator []( l ) );
 			}
 		}
 		return swap( o );
@@ -987,7 +988,7 @@ public: // Modifier
 		for ( int i1 = b1; i1 <= e1; ++i1, l_beg += z2_, m_beg += s2 ) {
 			l = l_beg; m = m_beg;
 			for ( int i2 = b2; i2 <= e2; ++i2, ++l, ++m ) {
-				o[ m ] = operator []( l );
+				o[ m ] = move_if( operator []( l ) );
 			}
 		}
 		return swap( o );
@@ -1009,7 +1010,7 @@ public: // Modifier
 		for ( int i1 = b1; i1 <= e1; ++i1, l_beg += z2_, m_beg += s2 ) {
 			l = l_beg; m = m_beg;
 			for ( int i2 = b2; i2 <= e2; ++i2, ++l, ++m ) {
-				o[ m ] = operator []( l );
+				o[ m ] = move_if( operator []( l ) );
 			}
 		}
 		return swap( o );
