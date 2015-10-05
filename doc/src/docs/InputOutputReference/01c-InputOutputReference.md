@@ -1782,7 +1782,11 @@ The impact of using outside air/mechanical ventilation is described in the secti
 
 ### AirLoopHVAC:OutdoorAirSystem:EquipmentList
 
-Used to specify the components in the outdoor air system. The components will be simulated in the order in which they occur in the list.
+Used to specify the components in the outdoor air system. The components will be simulated in the order in which they occur in the list. 
+
+The following HVAC equipment types are allowed as outdoor air system equipment. The component matrix shows which coils and fans are allowed with which equipment models.
+
+![](media/OASysComponentMatrix.png)
 
 #### Field: Name
 
@@ -4783,6 +4787,9 @@ ZoneHVAC:EquipmentConnections,
     SPACE3-1 Out Node;     !- Zone Return Air Node Name
 ```
 
+The following HVAC equipment types are allowed as zone equipment. The component matrix shows which coils and fans are allowed with which equipment models.
+
+![](media/ZoneComponentMatrix.png)
 
 ### ZoneHVAC:EquipmentList
 
@@ -7003,7 +7010,7 @@ The latent heat recovery effectiveness, where effectiveness is defined as the ch
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Heating Air Flow Rate and Maximum Cooling Air Flow Rate in a Ideal Load Air System zone HVAC object. The scaled maximum heating and cooling air flow rates are used to size the heating and cooling capacities.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Heating Air Flow Rate and Maximum Cooling Air Flow Rate in a Ideal Load Air System zone HVAC object. The scaled maximum heating and cooling air flow rates are used to size the heating and cooling capacities.
 
 
 
@@ -7491,7 +7498,7 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Four Pipe FanCoil zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Four Pipe FanCoil zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 #### Filed: Supply Air Fan Operating Mode Schedule Name
 This input field is the name of a schedule that controls fan operation. Schedule Name values of 0
@@ -7849,7 +7856,7 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Unit Ventilator zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Unit Ventilator zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 
 
@@ -8086,7 +8093,7 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields *Maximum Supply Air Flow Rate* in this Unit Heater zone HVAC object. The scaled maximum supply air flow rates is used to size Maximum Hot Water or Steam Flow Rate if specified as autosize. The scaled Maximum Air Flow Rate in turn is used to size heating capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields *Maximum Supply Air Flow Rate* in this Unit Heater zone HVAC object. The scaled maximum supply air flow rates is used to size Maximum Hot Water or Steam Flow Rate if specified as autosize. The scaled Maximum Air Flow Rate in turn is used to size heating capacity of the unit.
 
 
 
@@ -8261,7 +8268,7 @@ This optional alpha input field defines the user-defined name of the second evap
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object defined elsewhere. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input field *Design Supply Air Flow Rate* in Evaportaive Cooler zone HVAC object. The scaled design supply air flow rates in turn is used to size capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object defined elsewhere. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input field *Design Supply Air Flow Rate* in Evaportaive Cooler zone HVAC object. The scaled design supply air flow rates in turn is used to size capacity of the unit.
 
 
 
@@ -8683,7 +8690,7 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Window Air Conditioner zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Window Air Conditioner zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling capacity of the unit.
 
 
 
@@ -8936,7 +8943,7 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this Packaged Terminal Air Conditioner  zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this Packaged Terminal Air Conditioner  zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 As shown in the example below, correct specification of the packaged terminal air conditioner requires the following objects in addition to the compound object itself:
 
@@ -9286,7 +9293,7 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this PTHP zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this PTHP zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 As shown in the example below, correct specification of the packaged terminal heat pump requires the following objects in addition to the compound object itself:
 
@@ -9756,7 +9763,7 @@ This field specifies the way in which water flow through the heat pump coils wil
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object.  A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this Water To Air Heat Pump zone HVAC object.  The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object.  A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this Water To Air Heat Pump zone HVAC object.  The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 
 
@@ -10597,7 +10604,7 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this VRF terminal unit zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this VRF terminal unit zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 
 
@@ -10737,268 +10744,6 @@ This output field is the electricity consumption of the zone terminal unit in Jo
 
 This is the availability status of the Zone Terminal Unit fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the Zone Terminal Unit object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:\* Outputs). For multiple availability managers in an Availability Manager Assignment List along with Hybrid Ventilation Manager, rules to determine fan availability status are described in the section ‘Group – System Availability Managers’. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the “detailed” reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
-### DesignSpecification:ZoneHVAC:Sizing
-
-This object is used to describe general sizing and scalable sizing methods which are referenced by zone HVAC equipment objects. It is optional input field in zone HVAC objects. If a name of this optional input is not specified or is blank then the sizing method or input specified in the parent object is used.  If the name of this object is entered, then the values or method specified overrides the sizing method in the parent zone HVAC objects. This object is meant to provide scalable sizing method to users. The name of this object is an optional input field in the zoneHVAC objects. When this name in not specified in the zone HVAC object the sizing method or the value specified in the zone HVAC object will be used.
-
-
-
-List of zoneHVAC objects than can reference this object include:
-
-* ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
-
-* ZoneHVAC:PackagedTerminalAirConditioner
-
-* ZoneHVAC:PackagedTerminalHeatPump
-
-* ZoneHVAC:WaterToAirHeatPump
-
-* ZoneHVAC:WindowAirConditioner
-
-* ZoneHVAC:UnitHeater
-
-* ZoneHVAC:UnitVentilator
-
-* ZoneHVAC:FourPipeFanCoil
-
-* ZoneHVAC:VentilatedSlab
-
-* ZoneHVAC:EvaporativeCoolerUnit
-
-* ZoneHVAC:IdealLoadsAirSystem
-
-
-
-The sizing methods input fields available in this objects are for supply air flow and capacity for heating and cooling operating modes. Some zone HVAC equipment has single supply air flow rate input field that serves both cooling and heating operating modes.  So entering either of the cooling or heating scalable sizing input field is sufficient.  When there are separate input fields for cooling, heating, no-cooling, and no-heating operating modes, the corresponding input fields are specified.  The child components supply air flow rate are also sized using scalable sizing methods specified in the parent objects. The methods allow users to enter a fixed or hard sized values, autosizable, or scalable sizing methods.  Methods allowed for sizing supply air flow rates include: *SupplyAirFlowRate*, *FractionOfAutosizedCoolingAirflow*, *FractionOfAutosizedHeatingAirflow*, *FlowPerFloorArea, FlowPerCoolingCapacity*, and *FlowPerHeatingCapacity*.  The different sizing options are defined as follows:
-
-* **SupplyAirFlowRate**: entered when it is intended that the user specified either hard value or the simulation engine autosize the supply air flow rates for cooling, heating, and no-cooling or no-heating operating modes.
-
-* **FlowPerFloorArea**: entered when it is intended that the simulation engine determine the supply air flow rates from the user specified *supply air flow rates per unit floor area* and the zone floor area of the zone served by the zone HVAC equipment.
-
-* **FractionOfAutosizedCoolingAirflow**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *flow fraction* and *autosized cooling design supply air flow rate*.
-
-* **FractionOfAutosizedHeatingAirflow**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *flow fraction* and *autosized heating design supply air flow rate*.
-
-* **FlowPerCoolingCapacity**: entered when it is intended t that he simulation engine determines the supply air flow rates from the user specified *supply air flow per cooling capacity value* and *autosized cooling design capacity*.
-
-* **FlowPerHeatingCapacity**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *supply air flow per heating capacity value* and *autosized heating design capacity*.
-
-The  Design Specification ZoneHVAC Sizing object also has input fields for sizing or scalable sizing of cooling and heating capacity. However, most of the parent zone HVAC objects do not have input fields for sizing capacities. So, the capacity scalable sizing fields in the parent objects are used for sizing child components capacity sizings.  The scalable capacity sizing may be indirectly impacted by the scalable supply air flow rates sizing values. Moreover, the autosized cold water, hot water and steam flow rates in the parent zone HVAC objects (e.g. FanCoils, UnitHeaters, UnitVentilators, and VentilatedSlabs) and capacity in child components are determined using the scalable sizing methods.  Sizing methods allowed for cooling and heating capacity include: *CoolingDesignCapacity, HeatingDesignCapacity*, *CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity*, *FractionOfAutosizedHeatingCapacity*.
-
-* **CoolingDesignCapacity**: entered when it is intended that user specifies either a hard sized cooling capacity value or the simulation engine autosizes cooling capacity value for the cooling design capacity.
-
-* **HeatingDesignCapacity**: entered when it is intended that user specifies either a hard sized heating capacity value or the simulation engine autosized heating capacity value for the heating design capacity.
-
-* **CapacityPerFloorArea**: is entered when it is intended that the simulation engine determines the cooling or heating capacity from user specified capacity per floor area value and the floor area of the zone served by the zone HVAC equipment.
-
-* **FractionOfAutosizedCoolingCapacity**: entered when it is intended that the simulation engine sizes the cooling capacity from the user specified *capacity fraction* and *autosized cooling design capacity* value.
-
-* **FractionOfAutosizedHeatingCapacity**: entered when it is intended that the simulation engine sizes the heating capacity from the user specified *capacity fraction* and *autosized heating design capacity* value.
-
-Description of the input fields of the design specification zone HVAC sizing object “DesignSpecification:ZoneHVAC:Sizing”:
-
-#### Field: Name
-
-Unique identifier name of the DesignSpecification:ZoneHVAC:Sizing object. This sizing specification object referenced by a zone HVAC equipment whose design calculation will be made using the input data of this object.
-
-#### Field: Cooling Design Air Flow Method
-
-The input of this field must be the method used to determine the cooling supply air volume flow rate. Input allowed is either *None*, *SupplyAirFlowRate*, *FlowPerFloorArea*, *FractionOfAutosizedCoolingAirflow*, or *FlowPerCoolingCapacity*.  None means cooling coil is not included in the zone HVAC equipment or this field may be left blank. *SupplyAirFlowRate* means the user specifies the magnitude of supply air flow rate or the program calculates the design cooling supply air volume flow rate if autosize is specified. *FlowPerFloorArea* means the program calculates the cooling supply air volume flow rate from zone floor area served by the zone HVAC unit and user specified *Flow Per Floor Area* value. *FractionOfAutosizedCoolingAirflow* means the program calculates the cooling supply air volume flow rate from user specified fraction and the autosized design cooling supply air volume flow rate value determined by the simulation. FlowPerCoolingCapacity means the supply air volume is calculated from user specified flow per cooling capacity and design cooling capacity determined by the simulation. The default method is *SupplyAirFlowRate*.
-
-#### Field: Cooling Design Supply Air Flow Rate {m3/s}
-
-Enter the magnitude of the cooling supply air volume flow rate in m3/s. This input is an alternative to using the program auto-calculated value. This input is a required field when the Cooling Design air Flow Method is *SupplyAirFlowRate*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment. This input field is also autosizable.
-
-#### Field: Cooling Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
-
-Enter the cooling supply air volume flow rate per zone conditioned floor area in m3/s-m2. This field is required field when the Cooling Design air Flow Method is *FlowPerFloorArea*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design Air Flow Method is not *FlowPerFloorArea*. The program calculates the cooling supply air volume flow rate from the zone conditioned floor area served by the zone HVAC equipment and the flow per unit area value specified by the user. Zone sizing object (Sizing:Zone) is not required.
-
-#### Field: Fraction of Autosized Cooling Design Supply Air Flow Rate {-}
-
-Enter the cooling supply air volume flow rate as a fraction of the autosized cooling supply air flow rate. This input field is required when the Cooling Design air Flow Method is *FractionOfAutosizedCoolingAirflow*. This input field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design air Flow Method is not *FractionOfAutosizedCoolingAirflow*. The program calculates the cooling supply air volume flow rate from the design autosized cooling supply air flow rate and user specified fraction. Zone sizing object (Sizing:Zone) is required.
-
-#### Field: Cooling Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-
-Enter the cooling supply air volume flow rate per unit cooling capacity in m3/s-W. This input field is required when the Cooling Design air Flow Method is *FlowPerCoolingCapacity*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design air Flow Method is not *FlowPerCoolingCapacity*. The program calculates the cooling supply air volume flow rate from the design autosized cooling capacity and user specified flow per cooling capacity value. Zone sizing object (Sizing:Zone) is required.
-
-#### Field: Supply Air Flow Rate Method When No Cooling or Heating is Required
-
-Enter the method used to determine the supply air volume flow rate when No Cooling or Heating is required. Inputs allowed are *None*, *SupplyAirFlowRate*, *FlowPerFloorArea*, *FractionOfAutosizedCoolingAirflow*, and *FractionOfAutosizedHeatingAirflow.* *None* is used when a cooling or heating coil is not included in the zone HVAC equipment or this field may be left blank. *SupplyAirFlowRate* means user specifies the magnitude of supply air flow rate or the program calculates the design supply air volume flow rate if autosize is specified. *FlowPerFloorArea* means the program calculates the supply air volume flow rate from the zone floor area served by the zone HVAC unit and Flow Per Floor Area value specified by user. *FractionOfAutosizedCoolingAirflow* means the program calculates the supply air volume flow rate from user specified fraction and autosized design cooling supply air volume flow rate value determined by the program. FractionOfAutosizedHeatingAirflow means the program calculates the supply air volume flow rate from user specified fraction and autosized heating supply air flow rate value determined by the program. The default method is *SupplyAirFlowRate*.
-
-#### Field: Supply Air Flow Rate When No Cooling or Heating is Required {m3/s}
-
-Enter the magnitude of the supply air volume flow rate when no cooling or heating is required in m3/s. This input is an alternative to using the program auto-calculated value. This input is a required field when the Supply Air Flow Rate Method When No Cooling or Heating is Required is *SupplyAirFlowRate*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment. This input field is also autosizable.
-
-#### Field: Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required  {m3/s-m2}
-
-Enter the magnitude of supply air volume flow rate per zone floor area in m3/s-m2. This input is a required field when Supply Air  Flow Rate Method When No Cooling or Heating is Required is *FlowPerFloorArea*. The program calculates the supply air flow rate when no cooling or heating is required from user specified flow per floor area and the zone area served by current zoneHVAC equipment.
-
-####  Field: Fraction of Design Cooling Supply Air Flow Rate When No Clg or Htg Required {-}
-
-Enter the fraction of supply air volume flow rate as a fraction of the autosized cooling supply air flow rate. This input field is required field when Supply Air Flow Rate Method When No Cooling or Heating is Required is *FractionOfAutosizedCoolingAirflow*.  The program calculates the supply air flow rate when no cooling or heating is required from user specified fraction and the design cooling autosized supply air flow rate.
-
-#### Field: Fraction of Design Heating Supply Air Flow Rate When No Clg or Htg Required {-}
-
-Enter the fraction of supply air volume flow rate as a fraction of the autosized cooling supply air flow rate. This input field is required field when Supply Air Flow Rate Method When No Cooling or Heating is Required is *FractionOfAutosizedHeatingAirflow*.  The program calculates the supply air flow rate when no cooling or heating is required from user specified fraction and the design heating autosized supply air flow rate.
-
-#### Field: Heating Design Air Flow Method
-
-The input of this field must be the method used to determine the heating supply air volume flow rate. Input allowed is either *None*, *SupplyAirFlowRate*, *FlowPerFloorArea*, *FractionOfAutosizedCoolingAirflow*, or *FlowPerCoolingCapacity*.  *None* means heating coil is not included in the zone HVAC equipment or this field may be left blank. *SupplyAirFlowRate* means the user specifies the magnitude of supply air flow rate or the program calculates the design heating supply air volume flow rate if autosize is specified. *FlowPerFloorArea* means the program calculates the heating supply air volume flow rate from zone floor area served by the zone HVAC unit and user specified *Flow Per Floor Area* value. *FractionOfAutosizedHeatingAirflow* means the program calculates the heating supply air volume flow rate from user specified fraction and the autosized design heating supply air volume flow rate value determined by the simulation. *FlowPerHeatingCapacity* means the supply air volume is calculated from user specified flow per heating capacity and design heating capacity determined by the simulation. The default method is *SupplyAirFlowRate*.
-
-#### Field: Heating Design Supply Air Flow Rate {m3/s}
-
-Enter the magnitude of the heating supply air volume flow rate in m3/s. This input is an alternative to using the program auto-calculated value. This input is a required field when the Heating Design air Flow Method is *SupplyAirFlowRate*. This field may be left blank if a heating coil is not included in the zone HVAC equipment. This input field is also autosizable.
-
-#### Field: Heating Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
-
-Enter the heating supply air volume flow rate per zone conditioned floor area in m3/s-m2. This field is required field when the Heating Design air Flow Method is *FlowPerFloorArea*. This field may be left blank if a heating coil is not included in the zone HVAC equipment or the Heating Design Air Flow Method is not *FlowPerFloorArea*. The program calculates the heating supply air volume flow rate from the zone conditioned floor area served by the zone HVAC equipment and the flow per unit area value specified by the user.
-
-#### Field: Fraction of Autosized Heating Design Supply Air Flow Rate {-}
-
-Enter the heating supply air volume flow rate as a fraction of the autosized heating supply air flow rate. This input field is required when the Heating Design air Flow Method is *FractionOfAutosizedHeatingAirflow*. This input field may be left blank if a heating coil is not included in the zone HVAC equipment or the Heating Design air Flow Method is not *FractionOfAutosizedHeatingAirflow*. The program calculates the heating supply air volume flow rate from the design autosized heating supply air flow rate and user specified fraction.
-
-#### Field: Heating Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-
-Enter the heating supply air volume flow rate per unit heating capacity in m3/s-W. This input field is required when the Heating Design air Flow Method is *FlowPerHeatingCapacity*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Heating Design air Flow Method is not *FlowPerHeatingCapacity*. The program calculates the heating supply air volume flow rate from the design autosized heating capacity and user specified flow per unit heating capacity value.
-
-#### Field Cooling Design Capacity Method
-
-Enter the method used to determine the cooling design capacity for scalable sizing. Input allowed is either *None*, *CoolingDesignCapacity*, *CapacityPerFloorArea*, and *FractionOfAutosizedCoolingCapacity*. None is used when a cooling coil is not included in the Zone HVAC equipment or this field may be left blank. If this input field is left blank, then the design cooling capacity is set to zero. *CoolingDesignCapacity* means user specifies the magnitude of cooling capacity or the program calculates the design cooling capacity if autosize is specified. *CapacityPerFloorArea* means the program calculates the design cooling capacity from user specified cooling capacity per floor area and floor area of the zone served by the HVAC unit. *FractionOfAutosizedCoolingCapacity* means the program calculates the design cooling capacity from user specified fraction and the auto-sized design cooling capacity. The default method is *CoolingDesignCapacity*.
-
-#### Field: Cooling Design Capacity {W}
-
-Enter the magnitude of the cooling capacity in Watts. This input is an alternative to using the program auto-calculated cooling capacity value. This input is a required field when the Cooling Design Capacity Method is *CoolingDesignCapacity*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or alternative method is specified. This input field is autosizable. Design day sizing run must be specified.
-
-#### Field: Cooling Design Capacity Per Floor Area {W/m2}
-
-Enter the cooling capacity per unit floor area in m3/s-m2. This field is required field when the Cooling Design Capacity Method is *CapacityPerFloorArea*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design Capacity Method is not *CapacityPerFloorArea*. The program calculates the cooling capacity from floor area of the zone served by the zone HVAC equipment and the cooling capacity per unit floor area value specified by the user.
-
-#### Field: Fraction of Autosized Cooling Design Capacity {-}
-
-Enter the cooling capacity as a fraction of the autosized cooling capacity. This input field is required when the Cooling Design Capacity Method is *FractionOfAutosizedCoolingCapacity*. This input field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design Capacity Method is not *FractionOfAutosizedCoolingCapacity*. The program calculates the cooling capacity from the design autosized cooling capacity and user specified fraction. Design day sizing run must be specified.
-
-#### Field: Heating Design Capacity Method
-
-Enter the method used to determine the heating design capacity for scalable sizing. Input allowed is either *None*, *HeatingDesignCapacity*, *CapacityPerFloorArea*, and *FractionOfAutosizedHeatingCapacity*. None is used when a heating coil is not included in the Zone HVAC equipment or this field may be left blank. If this input field is left blank, then the design heating capacity is set to zero. *HeatingDesignCapacity* means user specifies the magnitude of heating capacity or the program calculates the design heating capacity if autosize is specified. *CapacityPerFloorArea* means the program calculates the design heating capacity from user specified heating capacity per floor area and floor area of the zone served by the HVAC unit. *FractionOfAutosizedHeatingCapacity* means the program calculates the design heating capacity from user specified fraction and the auto-sized design heating capacity. The default method is *HeatingDesignCapacity*.
-
-#### Field: Heating Design Capacity {W}
-
-Enter the magnitude of the heating capacity in Watts. This input is an alternative to using the program auto-calculated heating capacity value. This input is a required field when the Heating Design Capacity Method is *HeatingDesignCapacity*. This field may be left blank if a heating coil is not included in the zone HVAC equipment or alternative method is specified. This input field is autosizable. Design day sizing run must be specified.
-
-#### Field: Heating Design Capacity Per Floor Area {W/m2}
-
-Enter the heating capacity per unit floor area in m3/s-m2. This field is required field when the Heating Design Capacity Method is *CapacityPerFloorArea*. This field may be left blank if a heating coil is not included in the zone HVAC equipment or the Heating Design Capacity Method is not *CapacityPerFloorArea*. The program calculates the heating capacity from floor area of the zone served by the zone HVAC equipment and the heating capacity per unit floor area value specified by the user.
-
-#### Field: Fraction of Autosized Heating Design Capacity {-}
-
-Enter the heating capacity as a fraction of the autosized heating capacity. This input field is required when the Heating Design Capacity Method is *FractionOfAutosizedHeatingCapacity*. This input field may be left blank if a heating coil is not included in the zone HVAC equipment or the Heating Design Capacity Method is not *FractionOfAutosizedHeatingCapacity*. The program calculates the heating capacity from the design autosized cooling capacity and user specified fraction. Design day sizing run must be specified.
-
-```idf
-  DesignSpecification:ZoneHVAC:Sizing,
-    VRFDesignSpec1,          !- Name
-    SupplyAirFlowRate,       !- Cooling Design Air Flow Method
-    autosize,                !- Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                     !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                     !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-    SupplyAirFlowRate,       !- Heating Design Air Flow Method
-    autosize,                !- Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-
-  DesignSpecification:ZoneHVAC:Sizing,
-    VRFDesignSpec2,          !- Name
-    FlowPerFloorArea,        !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Supply Air Flow Rate
-    3.6311418E-03,           !- Cooling Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-    FlowPerFloorArea,        !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required
-    3.6311418E-03,           !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                     !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                     !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-    FlowPerFloorArea,        !- Heating Design Air Flow Method
-    ,                        !- Heating Design Supply Air Flow Rate
-    3.6311418E-03,           !- Heating Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-
-DesignSpecification:ZoneHVAC:Sizing,
-    VRFDesignSpec3,          !- Name
-    FractionOfAutosizedCoolingAirflow,  !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-    0.5,                     !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-  FractionOfAutosizedCoolingAirflow, !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    0.5,                 !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                    !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-    FractionOfAutosizedHeatingAirflow,  !- Heating Design Air Flow Method
-    ,                        !- Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-    0.5,                     !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-
-DesignSpecification:ZoneHVAC:Sizing,
-    VRFDesignSpec4,          !- Name
-    FlowPerCoolingCapacity,  !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    2.9541628E-05,           !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-  FractionOfAutosizedHeatingAirflow, !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                    !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    0.413231177,         !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-    FlowPerHeatingCapacity,  !- Heating Design Air Flow Method
-    ,                        !- Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    2.9541628E-05,           !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-```
-
 Group – Unitary Equipment
 -------------------------
 
@@ -11021,6 +10766,10 @@ The components
 * AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed
 
 are compound components usually placed in the primary air loop as the sole component. On the zone equipment side they are usually connected to one or more zones through uncontrolled terminal units (i.e., AirTerminal:SingleDuct:Uncontrolled objects). The maximum or design air flow rate through the furnace or unitary system should usually be set equal to the sum of the maximum air flow rates through the terminal unit objects. However, the simulation program can usually account for unequal air flows if the user wishes to model this scenario.
+
+The following HVAC equipment types are allowed in the air loop. The component matrix shows which coils and fans are allowed with which equipment models.
+
+![](media/AirLoopComponentMatrix.png)
 
 ### AirLoopHVAC:UnitarySystem
 
@@ -16913,7 +16662,7 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Ventilated Slab zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the coils.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Ventilated Slab zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the coils.
 
 An example IDF with a ventilated slab is shown below.
 ```idf

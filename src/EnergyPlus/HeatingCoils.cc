@@ -105,6 +105,7 @@ namespace HeatingCoils {
 	Array1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
 	bool GetCoilsInputFlag( true ); // Flag set to make sure you get input once
 	bool CoilIsSuppHeater( false ); // Flag set to indicate the heating coil is a supplemental heater
+	bool MyOneTimeFlag( true ); // one time initialization flag
 	Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
@@ -436,6 +437,7 @@ namespace HeatingCoils {
 			HeatingCoil( CoilNum ).TempSetPointNodeNum = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 
 			// Setup Report variables for the Electric Coils
+			// CurrentModuleObject = "Coil:Heating:Electric"
 			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", HeatingCoil( CoilNum ).HeatingCoilLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", HeatingCoil( CoilNum ).HeatingCoilRate, "System", "Average", HeatingCoil( CoilNum ).Name );
 			SetupOutputVariable( "Heating Coil Electric Energy [J]", HeatingCoil( CoilNum ).ElecUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Electric", "Heating", _, "System" );
@@ -503,6 +505,7 @@ namespace HeatingCoils {
 			HeatingCoil( CoilNum ).TempSetPointNodeNum = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 
 			// Setup Report variables for the Electric Coils
+			// CurrentModuleObject = "Coil:Heating:Electric:MultiStage"
 			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", HeatingCoil( CoilNum ).HeatingCoilLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", HeatingCoil( CoilNum ).HeatingCoilRate, "System", "Average", HeatingCoil( CoilNum ).Name );
 			SetupOutputVariable( "Heating Coil Electric Energy [J]", HeatingCoil( CoilNum ).ElecUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Electric", "Heating", _, "System" );
@@ -568,6 +571,7 @@ namespace HeatingCoils {
 			HeatingCoil( CoilNum ).ParasiticGasCapacity = Numbers( 4 );
 
 			// Setup Report variables for the Gas Coils
+			// CurrentModuleObject = "Coil:Heating:Gas"
 			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", HeatingCoil( CoilNum ).HeatingCoilLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", HeatingCoil( CoilNum ).HeatingCoilRate, "System", "Average", HeatingCoil( CoilNum ).Name );
 			SetupOutputVariable( "Heating Coil Gas Energy [J]", HeatingCoil( CoilNum ).GasUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Gas", "Heating", _, "System" );
@@ -651,6 +655,7 @@ namespace HeatingCoils {
 			//parasitic gas load associated with the gas heating coil (standing pilot light)
 
 			// Setup Report variables for the Gas Coils
+			// CurrentModuleObject = "Coil:Heating:Gas:MultiStage"
 			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", HeatingCoil( CoilNum ).HeatingCoilLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", HeatingCoil( CoilNum ).HeatingCoilRate, "System", "Average", HeatingCoil( CoilNum ).Name );
 			SetupOutputVariable( "Heating Coil Gas Energy [J]", HeatingCoil( CoilNum ).GasUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Gas", "Heating", _, "System" );
@@ -787,6 +792,7 @@ namespace HeatingCoils {
 			}
 
 			// Setup Report variables for the Desuperheater Heating Coils
+			// CurrentModuleObject = "Coil:Heating:Desuperheater"
 			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", HeatingCoil( CoilNum ).HeatingCoilLoad, "HVAC", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", HeatingCoil( CoilNum ).HeatingCoilRate, "HVAC", "Average", HeatingCoil( CoilNum ).Name );
 			SetupOutputVariable( "Heating Coil Electric Energy [J]", HeatingCoil( CoilNum ).ElecUseLoad, "HVAC", "Sum", HeatingCoil( CoilNum ).Name, _, "Electricity", "Heating", _, "System" );
@@ -899,7 +905,6 @@ namespace HeatingCoils {
 		int DXCoilNum; // Index to DX cooling coil
 		static int ValidSourceTypeCounter( 0 ); // Counter used to determine if desuperheater source name is valid
 		static bool HeatingCoilFatalError( false ); // used for error checking
-		static bool MyOneTimeFlag( true ); // one time flag
 		static Array1D_bool MySPTestFlag; // used for error checking
 		static Array1D_bool ShowSingleWarning; // Used for single warning message for desuperheater coil
 		static Array1D_bool MyEnvrnFlag; // one time environment flag
@@ -3235,6 +3240,25 @@ namespace HeatingCoils {
 		}
 
 		return NumberOfStages;
+
+	}
+ 
+	// Clears the global data in HeatingCoils.
+	// Needed for unit tests, should not be normally called.
+	void
+		clear_state()
+	{
+
+		NumHeatingCoils = 0;
+		GetCoilsInputFlag = true;
+		CoilIsSuppHeater = false;
+		MyOneTimeFlag = true;
+
+		MySizeFlag.deallocate();
+		ValidSourceType.deallocate();
+		CheckEquipName.deallocate();
+		HeatingCoil.deallocate();
+		HeatingCoilNumericFields.deallocate();
 
 	}
 

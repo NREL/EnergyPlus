@@ -372,6 +372,9 @@ namespace ThermalComfort {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	ManageThermalComfort( bool const InitializeOnly ); // when called from ZTPC and calculations aren't needed
 
 	void

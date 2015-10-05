@@ -864,6 +864,13 @@ namespace WaterCoils {
 		bool & ErrorsFound // set to true if problem
 	);
 
+	Real64
+	GetWaterCoilDesAirFlow(
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
+		bool & ErrorsFound // set to true if problem
+	);
+
 	void
 	CheckActuatorNode(
 		int const ActuatorNodeNum, // input actuator node number

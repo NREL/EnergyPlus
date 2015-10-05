@@ -522,6 +522,8 @@ namespace SimAirServingZones {
 			PrimaryAirSystem( AirSysNum ).OASysOutletNodeNum = 0;
 			PrimaryAirSystem( AirSysNum ).NumOAHeatCoils = 0;
 			PrimaryAirSystem( AirSysNum ).NumOACoolCoils = 0;
+			AirLoopControlInfo( AirSysNum ).FanOpMode = DataHVACGlobals::ContFanCycCoil; // initialize to constant fan mode for all air loops
+			AirLoopFlow( AirSysNum ).FanPLR = 1.0; // initialize to 1 for all air loops
 
 			CurrentModuleObject = "AirLoopHVAC";
 
@@ -2905,7 +2907,7 @@ namespace SimAirServingZones {
 			// Heat recovery
 		} else if ( SELECT_CASE_var == HeatXchngr ) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent'
 			// 'HeatExchanger:Desiccant:BalancedFlow'
-			SimHeatRecovery( CompName, FirstHVACIteration, CompIndex, ContFanCycCoil, _, _, _, _, AirLoopControlInfo( AirLoopNum ).EconoActive, AirLoopControlInfo( AirLoopNum ).HighHumCtrlActive );
+			SimHeatRecovery( CompName, FirstHVACIteration, CompIndex, AirLoopControlInfo( AirLoopNum ).FanOpMode, AirLoopFlow( AirLoopNum ).FanPLR, _, _, _, AirLoopControlInfo( AirLoopNum ).EconoActive, AirLoopControlInfo( AirLoopNum ).HighHumCtrlActive );
 
 			// Ducts
 		} else if ( SELECT_CASE_var == Duct ) { // 'Duct'

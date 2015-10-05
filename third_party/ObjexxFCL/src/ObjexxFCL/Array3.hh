@@ -1483,15 +1483,6 @@ public: // Modifier
 		return *this;
 	}
 
-	// Assign Default Value to all Elements
-	inline
-	Array3 &
-	to_default()
-	{
-		Super::to_default();
-		return *this;
-	}
-
 public: // MArray Generators
 
 	// Template Helpers

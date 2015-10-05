@@ -25,6 +25,7 @@ using namespace DataSizing;
 using namespace CurveManager;
 using namespace OutputReportPredefined;
 using namespace ScheduleManager;
+using namespace DataEnvironment;
 
 namespace EnergyPlus {
 
@@ -915,13 +916,73 @@ namespace EnergyPlus {
 		// clear
 		DXCoil.deallocate();
 	}
+	
+	TEST_F( HVACFixture, TestDXCoilIndoorOrOutdoor ) {
+		
+		//Test whether the coil is placed indoor or outdoor, by checking the air inlet node location
+		
+		using namespace DXCoils;
+		using NodeInputManager::GetOnlySingleNode;
+		using OutAirNodeManager::CheckOutAirNodeNumber;
 
+		// Common Inputs
+		int NumCoils; // total number of coils 
+		int DXCoilNum; // index to the current coil 
+
+		// Allocate
+		NumCoils = 3;
+		DXCoil.allocate( NumCoils );
+			
+		// IDF snippets
+		std::string const idf_objects = delimited_string({
+			"Version,8.3;                                          ", 
+			"OutdoorAir:Node,                                      ",
+			"   Outside Air Inlet Node 1; !- Name                  ",
+			"OutdoorAir:NodeList,                                  ",
+			"   OutsideAirInletNodes;    !- Node or NodeList Name 1",
+			"NodeList,                                             ",
+			"   OutsideAirInletNodes,    !- Name                   ",
+			"   Outside Air Inlet Node 2;!- Node 1 Name            ",
+		});
+		
+		ASSERT_FALSE( process_idf( idf_objects ) );
+		
+		// Run
+		DXCoilNum = 1;  
+		DXCoil(DXCoilNum).AirInNode = 1; // "Outside Air Inlet Node 1"
+		DXCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( DXCoil( DXCoilNum ).AirInNode );
+		
+		DXCoilNum = 2;  
+		DXCoil(DXCoilNum).AirInNode = 2; // "Outside Air Inlet Node 2"
+		DXCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( DXCoil( DXCoilNum ).AirInNode );
+		
+		DXCoilNum = 3; // "Inside Air Inlet Node"
+		DXCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( DXCoil( DXCoilNum ).AirInNode );
+		
+		// Check
+		EXPECT_FALSE( DXCoil( 1 ).IsDXCoilInZone );
+		EXPECT_FALSE( DXCoil( 2 ).IsDXCoilInZone );
+		EXPECT_TRUE( DXCoil( 3 ).IsDXCoilInZone );
+
+		// Clean up
+		DXCoil.deallocate( ); 
+	}
+	
 	TEST_F( HVACFixture, TestMultiSpeedWasteHeat )
 	{
-		// Test that the waste heat function #4536
+		// Test the waste heat function #4536
+
+		using Psychrometrics::PsyTwbFnTdbWPb;
+		using Psychrometrics::PsyHFnTdbW;
 
 		std::string const idf_objects = delimited_string( {
 			"Version,8.3;",
+			" Schedule:Compact,",
+			"	FanAndCoilAvailSched, !- Name",
+			"	Fraction,             !- Schedule Type Limits Name",
+			"	Through: 12/31,       !- Field 1",
+			"	For: AllDays,         !- Field 2",
+			"	Until: 24:00, 1.0;    !- Field 3",
 			" OutdoorAir:Node,",
 			"	Outdoor Condenser Air Node, !- Name",
 			"	1.0;                     !- Height Above Ground{ m }",
@@ -1080,11 +1141,53 @@ namespace EnergyPlus {
 
 		ASSERT_FALSE( process_idf( idf_objects ) );
 
+		// Case 1 test
 		GetDXCoils( );
 
 		EXPECT_EQ( FuelTypeElectricity, DXCoil( 1 ).FuelType );
 		EXPECT_EQ( 0, DXCoil( 1 ).MSWasteHeat( 2 ) );
 
-	}
+		// Test calculations of the waste heat function #5162
 
+		// Case 2 test waste heat is zero when the parent has not heat recovery inputs
+		DXCoil( 1 ).FuelType = FuelTypeNaturalGas;
+		DXCoil( 1 ).MSHPHeatRecActive = false;
+
+		OutDryBulbTemp = 35;
+		OutHumRat = 0.0128;
+		OutBaroPress = 101325;
+		OutWetBulbTemp = PsyTwbFnTdbWPb( OutDryBulbTemp, OutHumRat, OutBaroPress);
+
+		DXCoil( 1 ).MSRatedAirMassFlowRate( 1 ) = DXCoil( 1 ).MSRatedAirVolFlowRate( 1 ) * 1.2;
+		DXCoil( 1 ).MSRatedAirMassFlowRate( 2 ) = DXCoil( 1 ).MSRatedAirVolFlowRate( 2 ) * 1.2;
+		DXCoil( 1 ).InletAirMassFlowRate = DXCoil( 1 ).MSRatedAirMassFlowRate( 2 );
+		MSHPMassFlowRateLow = DXCoil( 1 ).MSRatedAirMassFlowRate( 1 );
+		MSHPMassFlowRateHigh = DXCoil( 1 ).MSRatedAirMassFlowRate( 2 );
+
+		DXCoil( 1 ).InletAirTemp = 25.0;
+		DXCoil( 1 ).InletAirHumRat = 0.005;
+		DXCoil( 1 ).InletAirEnthalpy = PsyHFnTdbW( 25.0, 0.005 );
+
+		DXCoil( 1 ).SchedPtr = 1;
+		Schedule( DXCoil( 1 ).SchedPtr ).CurrentValue = 1.0; // enable the VRF condenser
+		DXCoil( 1 ).MSRatedCBF( 1 ) = 0.1262;
+		DXCoil( 1 ).MSRatedCBF( 2 ) = 0.0408;
+
+		CalcMultiSpeedDXCoilCooling( 1, 1, 1, 2, 1, 1 );
+		
+		EXPECT_EQ( 0, MSHPWasteHeat );
+
+		// Case 3 heat recovery is true and no waste heat function cuvre
+		DXCoil( 1 ).MSWasteHeat( 1 ) = 0;
+		DXCoil( 1 ).MSWasteHeat( 2 ) = 0;
+		DXCoil( 1 ).MSHPHeatRecActive = true;
+
+		CalcMultiSpeedDXCoilCooling( 1, 1, 1, 2, 1, 1 );
+
+		EXPECT_NEAR( 1303.4304, MSHPWasteHeat, 0.001 );
+
+		// clear
+		DXCoil.deallocate( );
+
+	}
 }

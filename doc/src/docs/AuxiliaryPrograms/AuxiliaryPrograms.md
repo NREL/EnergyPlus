@@ -1,26 +1,12 @@
 ![](media/ep.gif)
 
 <br/>
-<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
 <hr>
 <h1>Auxiliary EnergyPlus Programs</h1>
 <h2>Extra programs for EnergyPlus</h2>
 <br/>
 <p><i>(Extra! Extra! Read all about it!)</i></p>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
 <br/>
 <p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
 <p style="page-break-after:always;"></p>
@@ -7074,7 +7060,7 @@ IDF Version Updater
 
 The transition programs have been written as console applications similar to EnergyPlus. However, that may not be the easiest for users who want to transition several versions or several files at one time. Thus the IDF Version Updater GUI application was created.
 
-The IDF Version Updater lives in the folder with the multiple transition programs -- see **Error! Reference source not found.**. Note that this application is also available from the EP-Launch Utilities tab (utility: IDFVersionUpdater). If you need to convert files from older than V6.0, the transition program set will need to be downloaded before use.  Once "IDF Version Updater" is selected from the Utilities pulldown list, click on the "Run IDF Version Updater" box and the single window shown below appears:
+The IDF Version Updater lives in the folder with the multiple transition programs -- see Figure 29. Note that this application is also available from the EP-Launch Utilities tab (utility: IDFVersionUpdater). If you need to convert files from older than V6.0, the transition program set will need to be downloaded before use.  Once "IDF Version Updater" is selected from the Utilities pulldown list, click on the "Run IDF Version Updater" box and the single window shown below appears:
 
 
 
@@ -7112,7 +7098,7 @@ Transition Console Program Details
 
 For those who are interested, this is the detailed description of the Transition console applications including the current one. There are methods to use the program set from the command line; those details are not included in this document but available from EnergyPlus Support group.
 
-TransitionV6-0-0-to-V7-0-0.exe is the current transition program that is distributed with the V7.0 release. It uses several important files that are included in the main "EnergyPlus" folder.
+TransitionVA-B-C-to-VD-E-F.exe is the transition program that converts files from version "A-B-C" to "D-E-F", and is distributed in the "D-E-F" installer package. It uses several important files that are included in the "EnergyPlus" installation folder, in the PreProcess/IDFVersionUpdator subdirectory.
 
 Table 28. Transition files for current release
 
@@ -7122,24 +7108,24 @@ Table 28. Transition files for current release
 <th>Description</th>
 </tr>
 <tr>
-<td>TransitionV6-0-0-to-V7-0-0.exe</td>
+<td>TransitionVA-B-C-to-VD-E-F.exe</td>
 <td>The executable program</td>
 </tr>
 <tr>
-<td>V6-0-0-Energy+.idd</td>
-<td>Version 6.0.0.037 release Energy+.idd file</td>
+<td>VA-B-C-Energy+.idd</td>
+<td>Base, starting, version Energy+.idd file</td>
 </tr>
 <tr>
-<td>V7-0-0-Energy+.idd</td>
-<td>Identical to Energy+.idd when distributed</td>
+<td>VD-E-F-Energy+.idd</td>
+<td>Target, new idd file; Identical to Energy+.idd when distributed</td>
 </tr>
 <tr>
-<td>Report Variables 6-0-0-023 to 7-0-0.csv</td>
+<td>Report Variables A-B-C to D-E-F.csv</td>
 <td>Report variable name changes</td>
 </tr>
 </table>
 
- Another file "Rules6-0-0-to-7-0-0.xls" is not used directly by the program but contains the "rules" for translating objects from version 6.0 release to the 7.0 release. The ObjectStatus file can also be viewed - it will show if deleted objects are automatically transitioned to the new input file versions.
+ Another file "RulesA-B-C-to-D-E-F.xls" is not used directly by the program but contains the "rules" for translating objects from version A-B-C release to the D-E-F release. The ObjectStatus file can also be viewed - it will show if deleted objects are automatically transitioned to the new input file versions.
 
 There are several methods to executing the transition program - these methods give you the most flexibility in changing files from one version to the next. The easiest transition is through the EP-Launch program which can detect if the input file about to be run is of the same version as the IDD or not and suggest transitioning. You can also manually transition from the file menu in EP-Launch. (To have this feature, you must also have the files from the preceding table in the same folder as EP-Launch - which is usually the folder that also has the EnergyPlus.exe program).
 
@@ -10686,8 +10672,8 @@ As installed, the RunEPlus is ready to run the sample files that are included. I
 Running EnergyPlus by Hand
 --------------------------
 
-EnergyPlus runs as a console application with optional command line arguments. The arguments may be listed by typing energyplus --help (Windows OS) or man energyplus (Linux OS). For more information about the command line interface, see https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md. The remainder of this section describes running EnergyPlus in legacy mode (i.e. no command-line arguments) on Windows OS.
- 
+EnergyPlus runs as a console application with optional command line arguments. The arguments may be listed by typing `energyplus --help` (on any operating system) and `man energyplus` (on Unix-based operating systems, Mac OS X and Linux). For more information about the command line interface, see https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md. The remainder of this section describes running EnergyPlus in legacy mode (i.e. no command-line arguments) on Windows OS.
+
 To run the program bring up the command prompt and "cd" to the directory containing the executable. Assume that the executable is called *EnergyPlus.exe*. In the same directory EnergyPlus expects *in.idf*, the input data file; *Energy+.idd*, the data dictionary file; *in.epw*, the weather file (needed only if there is a RunPeriod in the input); and optionally *Energy+.ini*, the initialization file. Typing "EnergyPlus" (and hitting the *Enter* key) will execute the program. EnergyPlus will write messages to the command window as it runs. A simulation with two design days and one run period looks like:
 
 ```

@@ -14,6 +14,7 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // C++ Headers
+#include <cassert>
 #include <cstdlib>
 #include <ios>
 #include <string>
@@ -31,6 +32,15 @@ public: // Types
 	typedef  std::streamsize  Size;
 	typedef  std::streampos  Pos;
 
+	enum class Status { Old, New, Scratch, Replace, Unknown };
+	enum class Access { Sequential, Direct, Stream };
+	enum class Action { Read, Write, ReadWrite };
+	enum class Form { Formatted, Unformatted, Binary };
+	enum class Positioning { AsIs, Rewind, Append };
+	enum class Blank { Null, Zero };
+	enum class Advance { Yes, No };
+	enum class Dispose { Keep, Delete };
+
 public: // Creation
 
 	// Default Constructor
@@ -38,20 +48,16 @@ public: // Creation
 	IOFlags() :
 	 unit_( 0 ),
 	 exists_( false ),
-	 new_( false ),
-	 old_( false ),
-	 scratch_( false ),
-	 unknown_( false ),
 	 open_( false ),
-	 read_( false ),
-	 write_( false ),
-	 binary_( false ),
-	 append_( false ),
+	 status_( Status::Unknown ),
+	 access_( Access::Sequential ),
+	 action_( Action::ReadWrite ),
+	 form_( Form::Formatted ),
+	 positioning_( Positioning::AsIs ),
 	 truncate_( false ),
-	 asis_( true ),
-	 bz_( false ),
-	 nad_( false ),
-	 del_( false ),
+	 blank_( Blank::Null ),
+	 advance_( Advance::Yes ),
+	 dispose_( Dispose::Keep ),
 	 her_( false ),
 	 size_( 0u ),
 	 pos_( 0 ),
@@ -85,7 +91,7 @@ public: // Creation
 		return flags;
 	}
 
-public: // Properties
+public: // Unit
 
 	// Unit
 	inline
@@ -103,6 +109,8 @@ public: // Properties
 		unit_ = unit;
 		return *this;
 	}
+
+public: // Name
 
 	// Name
 	inline
@@ -126,8 +134,10 @@ public: // Properties
 	bool
 	named() const
 	{
-		return ! name_.empty();
+		return !name_.empty();
 	}
+
+public: // Exists
 
 	// Exists?
 	inline
@@ -181,165 +191,7 @@ public: // Properties
 		return *this;
 	}
 
-	// New?
-	inline
-	bool
-	New() const
-	{
-		return new_;
-	}
-
-	// New Set
-	inline
-	IOFlags &
-	New( bool const new_a )
-	{
-		new_ = new_a;
-		if ( new_ ) {
-			old_ = false;
-			scratch_ = false;
-			unknown_ = false;
-		}
-		return *this;
-	}
-
-	// New On
-	inline
-	IOFlags &
-	New_on()
-	{
-		new_ = true;
-		old_ = false;
-		scratch_ = false;
-		unknown_ = false;
-		return *this;
-	}
-
-	// New On
-	inline
-	IOFlags &
-	new_on()
-	{
-		new_ = true;
-		old_ = false;
-		scratch_ = false;
-		unknown_ = false;
-		return *this;
-	}
-
-	// Old?
-	inline
-	bool
-	old() const
-	{
-		return old_;
-	}
-
-	// Old Set
-	inline
-	IOFlags &
-	old( bool const old )
-	{
-		old_ = old;
-		if ( old_ ) {
-			new_ = false;
-			scratch_ = false;
-			unknown_ = false;
-		}
-		return *this;
-	}
-
-	// Old On
-	inline
-	IOFlags &
-	old_on()
-	{
-		old_ = true;
-		new_ = false;
-		scratch_ = false;
-		unknown_ = false;
-		return *this;
-	}
-
-	// Scratch?
-	inline
-	bool
-	scratch() const
-	{
-		return scratch_;
-	}
-
-	// Scratch Set
-	inline
-	IOFlags &
-	scratch( bool const scratch )
-	{
-		scratch_ = scratch;
-		if ( scratch_ ) {
-			new_ = false;
-			old_ = false;
-			unknown_ = false;
-		}
-		return *this;
-	}
-
-	// Scratch On
-	inline
-	IOFlags &
-	scratch_on()
-	{
-		scratch_ = true;
-		new_ = false;
-		old_ = false;
-		unknown_ = false;
-		return *this;
-	}
-
-	// Unknown?
-	inline
-	bool
-	unknown() const
-	{
-		return unknown_;
-	}
-
-	// Unknown Set
-	inline
-	IOFlags &
-	unknown( bool const unknown )
-	{
-		unknown_ = unknown;
-		if ( unknown_ ) {
-			new_ = false;
-			old_ = false;
-			scratch_ = false;
-		}
-		return *this;
-	}
-
-	// Unknown On
-	inline
-	IOFlags &
-	unknown_on()
-	{
-		unknown_ = true;
-		new_ = false;
-		old_ = false;
-		scratch_ = false;
-		return *this;
-	}
-
-	// Status String
-	inline
-	std::string
-	STATUS() const
-	{
-		return ( new_ ? "NEW" : ( old_ ? "OLD" : ( scratch_ ? "SCRATCH" : ( unknown_ ? "UNKNOWN" : "" ) ) ) );
-	}
-
-	// Status String Set
-	IOFlags &
-	STATUS( std::string const & status );
+public: // Open
 
 	// Open?
 	inline
@@ -358,106 +210,159 @@ public: // Properties
 		return *this;
 	}
 
-	// Read?
-	inline
-	bool
-	read() const
+public: // Status
+
+	// Status
+	Status
+	status() const
 	{
-		return read_;
+		return status_;
 	}
 
-	// Read Set
-	inline
+	// Status Set
 	IOFlags &
-	read( bool const read )
+	status( Status const new_status )
 	{
-		read_ = read;
+		assert( new_status <= Status::Unknown );
+		status_ = new_status;
 		return *this;
 	}
 
-	// Read On
-	inline
-	IOFlags &
-	read_on()
-	{
-		read_ = true;
-		return *this;
-	}
-
-	// Read-Only?
-	inline
-	bool
-	readonly() const
-	{
-		return read_ && ! write_;
-	}
-
-	// Read Only On
-	inline
-	IOFlags &
-	readonly_on()
-	{
-		read_ = true;
-		write_ = false;
-		return *this;
-	}
-
-	// Read String
+	// Status String
 	inline
 	std::string
-	READ() const
+	STATUS() const
 	{
-		return ( read_ ? "YES" : ( write_ ? "NO" : "UNKNOWN" ) );
+		switch ( status_ ) {
+		case Status::Old:
+			return "OLD";
+		case Status::New:
+			return "NEW";
+		case Status::Scratch:
+			return "SCRATCH";
+		case Status::Replace:
+			return "REPLACE";
+		case Status::Unknown:
+			return "UNKNOWN";
+		default:
+			assert( false );
+			return "UNKNOWN";
+		}
 	}
 
-	// Write?
+	// Status String Set
+	IOFlags &
+	STATUS( std::string const & status );
+
+	// Old?
 	inline
 	bool
-	write() const
+	old() const
 	{
-		return write_;
+		return status_ == Status::Old;
 	}
 
-	// Write Set
+	// Old On
 	inline
 	IOFlags &
-	write( bool const write )
+	old_on()
 	{
-		write_ = write;
+		status_ = Status::Old;
 		return *this;
 	}
 
-	// Write On
+	// New?
+	inline
+	bool
+	New() const
+	{
+		return status_ == Status::New;
+	}
+
+	// New?
+	inline
+	bool
+	new_status() const
+	{
+		return status_ == Status::New;
+	}
+
+	// New On
 	inline
 	IOFlags &
-	write_on()
+	new_on()
 	{
-		write_ = true;
+		status_ = Status::New;
 		return *this;
 	}
 
-	// Write String
-	inline
-	std::string
-	WRITE() const
-	{
-		return ( write_ ? "YES" : ( read_ ? "NO" : "UNKNOWN" ) );
-	}
-
-	// Read+Write?
+	// Scratch?
 	inline
 	bool
-	rw() const
+	scratch() const
 	{
-		return read_ && write_;
+		return status_ == Status::Scratch;
 	}
 
-	// Read-Write String
+	// Scratch On
 	inline
-	std::string
-	READWRITE() const
+	IOFlags &
+	scratch_on()
 	{
-		return ( read_ && write_ ? "YES" : "NO" );
+		status_ = Status::Scratch;
+		return *this;
+	}
+
+	// Replace?
+	inline
+	bool
+	replace() const
+	{
+		return status_ == Status::Replace;
+	}
+
+	// Replace On
+	inline
+	IOFlags &
+	replace_on()
+	{
+		status_ = Status::Replace;
+		return *this;
+	}
+
+	// Unknown?
+	inline
+	bool
+	unknown() const
+	{
+		return status_ == Status::Unknown;
+	}
+
+	// Unknown On
+	inline
+	IOFlags &
+	unknown_on()
+	{
+		status_ = Status::Unknown;
+		return *this;
+	}
+
+public: // Access
+
+	// Access
+	Access
+	access() const
+	{
+		return access_;
+	}
+
+	// Access Set
+	IOFlags &
+	access( Access const new_access )
+	{
+		assert( new_access <= Access::Stream );
+		access_ = new_access;
+		return *this;
 	}
 
 	// Access String
@@ -465,52 +370,363 @@ public: // Properties
 	std::string
 	ACCESS() const
 	{
-		return "SEQUENTIAL"; // Only sequential supported
+		switch ( access_ ) {
+		case Access::Sequential:
+			return "SEQUENTIAL";
+		case Access::Direct:
+			return "DIRECT";
+		case Access::Stream:
+			return "STREAM";
+		default:
+			assert( false );
+			return "SEQUENTIAL";
+		}
 	}
 
 	// Access String Set
 	IOFlags &
 	ACCESS( std::string const & access );
 
+	// Sequential?
+	inline
+	bool
+	sequential() const
+	{
+		return access_ == Access::Sequential;
+	}
+
+	// Sequential On
+	inline
+	IOFlags &
+	sequential_on()
+	{
+		access_ = Access::Sequential;
+		return *this;
+	}
+
+	// Direct?
+	inline
+	bool
+	direct() const
+	{
+		return access_ == Access::Direct;
+	}
+
+	// Direct On
+	inline
+	IOFlags &
+	direct_on()
+	{
+		access_ = Access::Direct;
+		return *this;
+	}
+
+	// Stream?
+	inline
+	bool
+	stream() const
+	{
+		return access_ == Access::Stream;
+	}
+
+	// Stream On
+	inline
+	IOFlags &
+	stream_on()
+	{
+		access_ = Access::Stream;
+		return *this;
+	}
+
+public: // Action
+
+	// Action
+	Action
+	action() const
+	{
+		return action_;
+	}
+
+	// Action Set
+	IOFlags &
+	action( Action const new_action )
+	{
+		assert( new_action <= Action::ReadWrite );
+		action_ = new_action;
+		return *this;
+	}
+
 	// Action String
 	inline
 	std::string
 	ACTION() const
 	{
-		return ( read_ ? ( write_ ? "READWRITE" : "READ" ) : ( write_ ? "WRITE" : "UNDEFINED" ) );
+		switch ( action_ ) {
+		case Action::Read:
+			return "READ";
+		case Action::Write:
+			return "WRITE";
+		case Action::ReadWrite:
+			return "READWRITE";
+		default:
+			assert( false );
+			return "READWRITE";
+		}
 	}
 
 	// Action String Set
 	IOFlags &
 	ACTION( std::string const & action );
 
-	// Position String
+	// Read?
 	inline
-	std::string
-	POSITION() const
+	bool
+	read() const
 	{
-		return ( append_ ? "APPEND" : ( asis_ ? "ASIS" : "REWIND" ) );
+		return action_ == Action::Read;
 	}
 
-	// Position String Set
+	// Read-Only?
+	inline
+	bool
+	readonly() const
+	{
+		return action_ == Action::Read;
+	}
+
+	// Read-Only?
+	inline
+	bool
+	read_only() const
+	{
+		return action_ == Action::Read;
+	}
+
+	// Read On
+	inline
 	IOFlags &
-	POSITION( std::string const & position );
+	read_on()
+	{
+		action_ = Action::Read;
+		return *this;
+	}
+
+	// Read-Only On
+	inline
+	IOFlags &
+	readonly_on()
+	{
+		action_ = Action::Read;
+		return *this;
+	}
+
+	// Read-Only On
+	inline
+	IOFlags &
+	read_only_on()
+	{
+		action_ = Action::Read;
+		return *this;
+	}
+
+	// Readable?
+	inline
+	bool
+	readable() const
+	{
+		return ( action_ == Action::Read ) || ( action_ == Action::ReadWrite );
+	}
+
+	// Write?
+	inline
+	bool
+	write() const
+	{
+		return action_ == Action::Write;
+	}
+
+	// Write-Only?
+	inline
+	bool
+	writeonly() const
+	{
+		return action_ == Action::Write;
+	}
+
+	// Write-Only?
+	inline
+	bool
+	write_only() const
+	{
+		return action_ == Action::Write;
+	}
+
+	// Write On
+	inline
+	IOFlags &
+	write_on()
+	{
+		action_ = Action::Write;
+		return *this;
+	}
+
+	// Write-Only On
+	inline
+	IOFlags &
+	writeonly_on()
+	{
+		action_ = Action::Write;
+		return *this;
+	}
+
+	// Write-Only On
+	inline
+	IOFlags &
+	write_only_on()
+	{
+		action_ = Action::Write;
+		return *this;
+	}
+
+	// Writable?
+	inline
+	bool
+	writable() const
+	{
+		return ( action_ == Action::Write ) || ( action_ == Action::ReadWrite );
+	}
+
+	// Read-Write?
+	inline
+	bool
+	rw() const
+	{
+		return action_ == Action::ReadWrite;
+	}
+
+	// Read-Write?
+	inline
+	bool
+	readwrite() const
+	{
+		return action_ == Action::ReadWrite;
+	}
+
+	// Read-Write?
+	inline
+	bool
+	read_write() const
+	{
+		return action_ == Action::ReadWrite;
+	}
+
+	// Read-Write On
+	inline
+	IOFlags &
+	rW_on()
+	{
+		action_ = Action::ReadWrite;
+		return *this;
+	}
+
+	// Read-Write On
+	inline
+	IOFlags &
+	readwrite_on()
+	{
+		action_ = Action::ReadWrite;
+		return *this;
+	}
+
+	// Read-Write On
+	inline
+	IOFlags &
+	read_write_on()
+	{
+		action_ = Action::ReadWrite;
+		return *this;
+	}
+
+public: // Form
+
+	// Form
+	Form
+	form() const
+	{
+		return form_;
+	}
+
+	// Form Set
+	IOFlags &
+	form( Form const new_form )
+	{
+		assert( new_form <= Form::Binary );
+		form_ = new_form;
+		return *this;
+	}
+
+	// Form String
+	inline
+	std::string
+	FORM() const
+	{
+		switch ( form_ ) {
+		case Form::Formatted:
+			return "FORMATTED";
+		case Form::Unformatted:
+			return "UNFORMATTED";
+		case Form::Binary:
+			return "BINARY";
+		default:
+			assert( false );
+			return "FORMATTED";
+		}
+	}
+
+	// Form String Set
+	IOFlags &
+	FORM( std::string const & form );
+
+	// Formatted?
+	inline
+	bool
+	formatted() const
+	{
+		return form_ == Form::Formatted;
+	}
+
+	// Formatted On
+	inline
+	IOFlags &
+	formatted_on()
+	{
+		form_ = Form::Formatted;
+		return *this;
+	}
+
+	// Unformatted?
+	inline
+	bool
+	unformatted() const
+	{
+		return form_ == Form::Unformatted;
+	}
+
+	// Unformatted On
+	inline
+	IOFlags &
+	unformatted_on()
+	{
+		form_ = Form::Unformatted;
+		return *this;
+	}
 
 	// Binary?
 	inline
 	bool
 	binary() const
 	{
-		return binary_;
-	}
-
-	// Binary Set
-	inline
-	IOFlags &
-	binary( bool const binary )
-	{
-		binary_ = binary;
-		return *this;
+		return form_ == Form::Binary;
 	}
 
 	// Binary On
@@ -518,37 +734,105 @@ public: // Properties
 	IOFlags &
 	binary_on()
 	{
-		binary_ = true;
+		form_ = Form::Binary;
 		return *this;
 	}
 
-	// Binary String
-	inline
-	std::string
-	BINARY() const
+public: // Positioning
+
+	// Positioning
+	Positioning
+	positioning() const
 	{
-		return ( binary_ ? "YES" : "NO" );
+		return positioning_;
 	}
 
-	// Binary String Set
+	// Positioning Set
 	IOFlags &
-	BINARY( std::string const & binary );
+	positioning( Positioning const new_positioning )
+	{
+		assert( new_positioning <= Positioning::Append );
+		positioning_ = new_positioning;
+		return *this;
+	}
+
+	// Position String
+	inline
+	std::string
+	POSITION() const
+	{
+		switch ( positioning_ ) {
+		case Positioning::AsIs:
+			return "ASIS";
+		case Positioning::Rewind:
+			return "REWIND";
+		case Positioning::Append:
+			return "APPEND";
+		default:
+			assert( false );
+			return "ASIS";
+		}
+	}
+
+	// Positioning String Set
+	IOFlags &
+	POSITION( std::string const & position );
+
+	// AsIs?
+	inline
+	bool
+	asis() const
+	{
+		return positioning_ == Positioning::AsIs;
+	}
+
+	// AsIs On
+	inline
+	IOFlags &
+	asis_on()
+	{
+		positioning_ = Positioning::AsIs;
+		return *this;
+	}
+
+	// AsIs Compatible?
+	inline
+	bool
+	asis_compatible( IOFlags const & flags ) const
+	{
+		if ( action_ != flags.action_ ) {
+			return false;
+		} else if ( form_ != flags.form_ ) {
+			return false;
+		} else if ( scratch() != flags.scratch() ) {
+			return false;
+		}
+		return true;
+	}
+
+	// Rewind?
+	inline
+	bool
+	rewind() const
+	{
+		return positioning_ == Positioning::Rewind;
+	}
+
+	// Rewind On
+	inline
+	IOFlags &
+	rewind_on()
+	{
+		positioning_ = Positioning::Rewind;
+		return *this;
+	}
 
 	// Append?
 	inline
 	bool
 	append() const
 	{
-		return append_;
-	}
-
-	// Append Set
-	inline
-	IOFlags &
-	append( bool const append )
-	{
-		append_ = append;
-		return *this;
+		return positioning_ == Positioning::Append;
 	}
 
 	// Append On
@@ -556,22 +840,11 @@ public: // Properties
 	IOFlags &
 	append_on()
 	{
-		append_ = true;
-		asis_ = false;
+		positioning_ = Positioning::Append;
 		return *this;
 	}
 
-	// Append String
-	inline
-	std::string
-	APPEND() const
-	{
-		return ( append_ ? "YES" : "NO" );
-	}
-
-	// Append String Set
-	IOFlags &
-	APPEND( std::string const & append );
+public: // Truncate
 
 	// Truncate?
 	inline
@@ -599,154 +872,34 @@ public: // Properties
 		return *this;
 	}
 
-	// AsIs?
-	inline
-	bool
-	asis() const
-	{
-		return asis_;
-	}
+public: // Blank
 
-	// AsIs Set
+	// Blank String
 	inline
-	IOFlags &
-	asis( bool const asis )
+	std::string
+	BLANK() const
 	{
-		asis_ = asis;
-		if ( asis_ ) append_ = false;
-		return *this;
-	}
-
-	// AsIs On
-	inline
-	IOFlags &
-	asis_on()
-	{
-		asis_ = true;
-		append_ = false;
-		return *this;
-	}
-
-	// AsIs Compatible?
-	inline
-	bool
-	asis_compatible( IOFlags const & flags ) const
-	{
-		if ( read_ != flags.read_ ) {
-			return false;
-		} else if ( write_ != flags.write_ ) {
-			return false;
-		} else if ( binary_ != flags.binary_ ) {
-			return false;
-		} else if ( scratch_ != flags.scratch_ ) {
-			return false;
+		switch ( blank_ ) {
+		case Blank::Null:
+			return "NULL";
+		case Blank::Zero:
+			return "ZERO";
+		default:
+			assert( false );
+			return "NULL";
 		}
-		return true;
 	}
 
-	// Rewind?
-	inline
-	bool
-	rewind() const
-	{
-		return ! ( asis_ || append_ );
-	}
-
-	// Rewind On
-	inline
+	// Blank String Set
 	IOFlags &
-	rewind_on()
-	{
-		append_ = false;
-		asis_ = false;
-		return *this;
-	}
-
-	// Form String
-	inline
-	std::string
-	FORM() const
-	{
-		return ( binary_ ? "BINARY" : "FORMATTED" );
-	}
-
-	// Form String Set
-	IOFlags &
-	FORM( std::string const & form );
-
-	// Formatted String
-	inline
-	std::string
-	FORMATTED() const
-	{
-		return ( binary_ ? "NO" : "YES" );
-	}
-
-	// Unformatted String
-	inline
-	std::string
-	UNFORMATTED() const
-	{
-		return "NO"; // Unformatted files not supported
-	}
-
-	// Sequential String
-	inline
-	std::string
-	SEQUENTIAL() const
-	{
-		return "YES"; // Only sequential supported
-	}
-
-	// Treat Blanks in Numeric Inputs as Zero?
-	inline
-	bool
-	bz() const
-	{
-		return bz_;
-	}
-
-	// Treat Blanks in Numeric Inputs as Zero?
-	inline
-	bool
-	blank_zero() const
-	{
-		return bz_;
-	}
-
-	// Blank Zero Set
-	inline
-	IOFlags &
-	bz( bool const blank_zero )
-	{
-		bz_ = blank_zero;
-		return *this;
-	}
-
-	// Blank Zero Set
-	inline
-	IOFlags &
-	blank_zero( bool const blank_zero )
-	{
-		bz_ = blank_zero;
-		return *this;
-	}
-
-	// Blank Zero On
-	inline
-	IOFlags &
-	bz_on()
-	{
-		bz_ = true;
-		return *this;
-	}
+	BLANK( std::string const & blank );
 
 	// Treat Blanks in Numeric Inputs as Null?
 	inline
 	bool
 	bn() const
 	{
-		return ! bz_;
+		return blank_ == Blank::Null;
 	}
 
 	// Treat Blanks in Numeric Inputs as Null?
@@ -754,25 +907,7 @@ public: // Properties
 	bool
 	blank_null() const
 	{
-		return ! bz_;
-	}
-
-	// Blank Null Set
-	inline
-	IOFlags &
-	bn( bool const blank_null )
-	{
-		bz_ = ! blank_null;
-		return *this;
-	}
-
-	// Blank Null Set
-	inline
-	IOFlags &
-	blank_null( bool const blank_null )
-	{
-		bz_ = ! blank_null;
-		return *this;
+		return blank_ == Blank::Null;
 	}
 
 	// Blank Null On
@@ -780,28 +915,81 @@ public: // Properties
 	IOFlags &
 	bn_on()
 	{
-		bz_ = false;
+		blank_ = Blank::Null;
 		return *this;
 	}
 
-	// Blank String
+	// Blank Null On
 	inline
-	std::string
-	BLANK() const
+	IOFlags &
+	blank_null_on()
 	{
-		return ( bz_ ? "ZERO" : "NULL" );
+		blank_ = Blank::Null;
+		return *this;
 	}
 
-	// Blank String Set
+	// Treat Blanks in Numeric Inputs as Zero?
+	inline
+	bool
+	bz() const
+	{
+		return blank_ == Blank::Zero;
+	}
+
+	// Treat Blanks in Numeric Inputs as Zero?
+	inline
+	bool
+	blank_zero() const
+	{
+		return blank_ == Blank::Zero;
+	}
+
+	// Blank Zero On
+	inline
 	IOFlags &
-	BLANK( std::string const & blank );
+	bz_on()
+	{
+		blank_ = Blank::Zero;
+		return *this;
+	}
+
+	// Blank Zero On
+	inline
+	IOFlags &
+	blank_zero_on()
+	{
+		blank_ = Blank::Zero;
+		return *this;
+	}
+
+public: // Advancing I/O
+
+	// Advance String
+	inline
+	std::string
+	ADVANCE() const
+	{
+		switch ( advance_ ) {
+		case Advance::Yes:
+			return "YES";
+		case Advance::No:
+			return "NO";
+		default:
+			assert( false );
+			return "YES";
+		}
+	}
+
+	// Advancing I/O String Set
+	IOFlags &
+	ADVANCE( std::string const & advance );
 
 	// Advancing I/O?
 	inline
 	bool
 	advance() const
 	{
-		return ! nad_;
+		return advance_ == Advance::Yes;
 	}
 
 	// Advancing I/O?
@@ -809,7 +997,24 @@ public: // Properties
 	bool
 	advancing() const
 	{
-		return ! nad_;
+		return advance_ == Advance::Yes;
+	}
+
+	// Advancing I/O On
+	inline
+	IOFlags &
+	advancing_on()
+	{
+		advance_ = Advance::Yes;
+		return *this;
+	}
+
+	// Non-Advancing I/O?
+	inline
+	bool
+	na() const
+	{
+		return advance_ == Advance::No;
 	}
 
 	// Non-Advancing I/O?
@@ -817,34 +1022,7 @@ public: // Properties
 	bool
 	non_advancing() const
 	{
-		return nad_;
-	}
-
-	// Advancing I/O Set
-	inline
-	IOFlags &
-	advance( bool const advance )
-	{
-		nad_ = ! advance;
-		return *this;
-	}
-
-	// Advancing I/O Set
-	inline
-	IOFlags &
-	advancing( bool const advancing )
-	{
-		nad_ = ! advancing;
-		return *this;
-	}
-
-	// Non-Advancing I/O Set
-	inline
-	IOFlags &
-	non_advancing( bool const non_advancing )
-	{
-		nad_ = non_advancing;
-		return *this;
+		return advance_ == Advance::No;
 	}
 
 	// Non-Advancing I/O On
@@ -852,29 +1030,81 @@ public: // Properties
 	IOFlags &
 	na_on()
 	{
-		nad_ = true;
+		advance_ = Advance::No;
 		return *this;
 	}
 
-	// Advancing I/O String Set
+	// Non-Advancing I/O On
+	inline
 	IOFlags &
-	ADVANCE( std::string const & advance );
+	non_advancing_on()
+	{
+		advance_ = Advance::No;
+		return *this;
+	}
+
+public: // Dispose
+
+	// Dispose String
+	inline
+	std::string
+	DISPOSE() const
+	{
+		switch ( dispose_ ) {
+		case Dispose::Keep:
+			return "KEEP";
+		case Dispose::Delete:
+			return "DELETE";
+		default:
+			assert( false );
+			return "KEEP";
+		}
+	}
+
+	// Dispose String Set
+	IOFlags &
+	DISPOSE( std::string const & dispose );
+
+	// Keep?
+	inline
+	bool
+	keep() const
+	{
+		return dispose_ == Dispose::Keep;
+	}
+
+	// Keep On
+	inline
+	IOFlags &
+	keep_on()
+	{
+		dispose_ = Dispose::Keep;
+		return *this;
+	}
+
+	// Save?
+	inline
+	bool
+	save() const
+	{
+		return dispose_ == Dispose::Keep;
+	}
+
+	// Save On
+	inline
+	IOFlags &
+	save_on()
+	{
+		dispose_ = Dispose::Keep;
+		return *this;
+	}
 
 	// Delete?
 	inline
 	bool
 	del() const
 	{
-		return del_;
-	}
-
-	// Delete Set
-	inline
-	IOFlags &
-	del( bool const del )
-	{
-		del_ = del;
-		return *this;
+		return dispose_ == Dispose::Delete;
 	}
 
 	// Delete On
@@ -882,21 +1112,20 @@ public: // Properties
 	IOFlags &
 	del_on()
 	{
-		del_ = true;
+		dispose_ = Dispose::Delete;
 		return *this;
 	}
 
-	// Dispose String
+	// Delete On
 	inline
-	std::string
-	DISPOSE() const
+	IOFlags &
+	delete_on()
 	{
-		return ( del_ ? "DELETE" : "KEEP" );
+		dispose_ = Dispose::Delete;
+		return *this;
 	}
 
-	// Dispose String Set
-	IOFlags &
-	DISPOSE( std::string const & dispose );
+public: // Size
 
 	// Size
 	inline
@@ -915,6 +1144,8 @@ public: // Properties
 		return *this;
 	}
 
+public: // Position
+
 	// Position
 	inline
 	Pos
@@ -931,6 +1162,8 @@ public: // Properties
 		pos_ = pos;
 		return *this;
 	}
+
+public: // Line Terminator
 
 	// Terminator
 	inline
@@ -1051,6 +1284,8 @@ public: // Properties
 #endif
 		return *this;
 	}
+
+public: // Error Handling
 
 	// Error?
 	inline
@@ -1200,24 +1435,20 @@ public: // Methods
 		unit_ = 0;
 		name_.clear();
 		exists_ = false;
-		new_ = false;
-		old_ = false;
-		scratch_ = false;
-		unknown_ = false;
 		open_ = false;
-		read_ = false;
-		write_ = false;
-		binary_ = false;
-		append_ = false;
+		status_ = Status::Unknown;
+		access_ = Access::Sequential;
+		action_ = Action::ReadWrite;
+		form_ = Form::Formatted;
+		positioning_ = Positioning::AsIs;
 		truncate_ = false;
-		asis_ = true;
+		blank_ = Blank::Null;
+		advance_ = Advance::Yes;
+		dispose_ = Dispose::Keep;
+		her_ = false;
 		size_ = 0u;
 		pos_ = 0;
 		ter_ = default_ter();
-		bz_ = false;
-		nad_ = false;
-		del_ = false;
-		her_ = false;
 		err_ = false;
 		end_ = false;
 		eor_ = false;
@@ -1249,7 +1480,7 @@ public: // Methods
 			ios_ = -1; // Negative => End of File
 			msg_ = "I/O Error: End of file";
 			if ( her_ ) error();
-		} else if ( ! stream ) {
+		} else if ( !stream ) {
 			err_ = true;
 			ios_ = 1; // Positive => Error other than End of File
 			msg_ = "I/O Error";
@@ -1274,7 +1505,7 @@ public: // Methods
 	asis_update( IOFlags const & flags )
 	{
 		// Update fields that AsIs open can modify
-		bz_ = flags.bz_;
+		blank_ = flags.blank_;
 		err_ = flags.err_;
 		end_ = flags.end_;
 		eor_ = flags.eor_;
@@ -1329,20 +1560,16 @@ private: // Data
 	int unit_; // Unit
 	Name name_; // Name
 	bool exists_; // Exists?
-	bool new_; // New?
-	bool old_; // Old?
-	bool scratch_; // Scratch?
-	bool unknown_; // Unknown?
 	bool open_; // Open?
-	bool read_; // Read?
-	bool write_; // Write?
-	bool binary_; // Binary?
-	bool append_; // Append?
+	Status status_; // Status flag
+	Access access_; // Access flag
+	Action action_; // Action flag
+	Form form_; // Form flag
+	Positioning positioning_; // Positioning flag
 	bool truncate_; // Truncate?
-	bool asis_; // AsIs?
-	bool bz_; // Treat blanks as zero on numeric input?
-	bool nad_; // Non-advancing i/o?
-	bool del_; // Delete?
+	Blank blank_; // Blanks in numeric input flag
+	Advance advance_; // Advancing i/o flag
+	Dispose dispose_; // Dispose on close flag
 	bool her_; // Handle Errors?
 	Size size_; // Size
 	Pos pos_; // Position

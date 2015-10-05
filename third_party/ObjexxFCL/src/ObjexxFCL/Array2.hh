@@ -1292,15 +1292,6 @@ public: // Modifier
 		return *this;
 	}
 
-	// Assign Default Value to all Elements
-	inline
-	Array2 &
-	to_default()
-	{
-		Super::to_default();
-		return *this;
-	}
-
 	// Set to the Identity Matrix
 	inline
 	Array2 &

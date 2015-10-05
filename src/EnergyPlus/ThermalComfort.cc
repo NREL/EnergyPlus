@@ -94,6 +94,11 @@ namespace ThermalComfort {
 	//Use statements for access to subroutines in other modules
 	using Psychrometrics::PsyRhFnTdbWPb;
 
+	namespace {
+		// clear_state variables
+		static bool FirstTimeFlag( true ); // Flag set to make sure you get input once
+	}
+
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 	Real64 const TAbsConv( KelvinConv ); // Converter for absolute temperature
@@ -209,6 +214,11 @@ namespace ThermalComfort {
 	Array1D< AngleFactorData > AngleFactorList; // Angle Factor List data for each Angle Factor List
 
 	// Functions
+	void
+	clear_state()
+	{
+		FirstTimeFlag = true;
+	}
 
 	void
 	ManageThermalComfort( bool const InitializeOnly ) // when called from ZTPC and calculations aren't needed
@@ -245,7 +255,6 @@ namespace ThermalComfort {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool FirstTimeFlag( true ); // Flag set to make sure you get input once
 		static bool ASH55Flag( false );
 		static bool CEN15251Flag( false );
 

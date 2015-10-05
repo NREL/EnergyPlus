@@ -55,7 +55,7 @@ install(FILES "${DOCS_OUT}/ExampleFiles-ObjectsLink.html" DESTINATION "./Example
 # Better to move this condition into the install CODE.
 if(NOT "$ENV{GITHUB_TOKEN}" STREQUAL "")
   install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/create_changelog.py\" \"${CMAKE_SOURCE_DIR}\" \"${DOCS_OUT}/changelog.md\" \"${DOCS_OUT}/changelog.html\" \"${GIT_EXECUTABLE}\" \"$ENV{GITHUB_TOKEN}\" \"${PREV_RELEASE_SHA}\")")
-  install(FILES "${DOCS_OUT}/changelog.html" DESTINATION "./")
+  install(FILES "${DOCS_OUT}/changelog.html" DESTINATION "./" OPTIONAL)
 else()
   message(WARNING "No GITHUB_TOKEN found in environment; package won't be complete")
 endif()
@@ -400,7 +400,7 @@ set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_BINARY_DIR}/CMakeCPackOptions.cmake")
 
 if (NOT PACKAGE_BUILT_DOCS)
   # remote files.  All of these should eventually be generated from content in the EnergyPlusTeam project.
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/Acknowledgments.pdf" "./Documentation")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/Acknowledgements.pdf" "./Documentation")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/AuxiliaryPrograms.pdf" "./Documentation")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/EMS_Application_Guide.pdf" "./Documentation")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/docs/pdf/EngineeringReference.pdf" "./Documentation")
