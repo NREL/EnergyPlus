@@ -1581,6 +1581,7 @@ namespace PackagedThermalStorageCoil {
 		for ( item = 1; item <= NumTESCoils; ++item ) {
 			SetupOutputVariable( "Cooling Coil Operating Mode Index []", TESCoil( item ).CurControlMode, "System", "Average", TESCoil( item ).Name );
 
+			// cCurrentModuleObject = "Coil:Cooling:DX:SingleSpeed:ThermalStorage"
 			SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", TESCoil( item ).EvapTotCoolingRate, "System", "Average", TESCoil( item ).Name );
 			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", TESCoil( item ).EvapTotCoolingEnergy, "System", "Sum", TESCoil( item ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", TESCoil( item ).EvapSensCoolingRate, "System", "Average", TESCoil( item ).Name );
@@ -4907,6 +4908,71 @@ namespace PackagedThermalStorageCoil {
 			} else {
 				CoilCoolCapacity = 0.0;
 			}
+		}
+
+	}
+
+	void
+	GetTESCoilCoolingAirFlowRate(
+		std::string const & CoilName,
+		Real64 & CoilCoolAirFlow,
+		bool & ErrorsFound,
+		std::string const CurrentModuleObject
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   September 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine gets a given TES Cooling Coil's evaporator air flow rate -- issues error message if that
+		// coil is not a legal TES Cooling Coil and sets air flow to 0, otherwise, returns cooling air flow rate.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItem;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int CoilIndex;
+
+		// Obtains and allocates TESCoil related parameters from input file
+		if ( GetTESInputFlag ) { // First time subroutine has been called, get input data
+			GetTESCoilInput();
+			GetTESInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
+		}
+
+		if ( NumTESCoils > 0 ) {
+			CoilIndex = FindItem( CoilName, TESCoil.Name(), NumTESCoils );
+		} else {
+			CoilIndex = 0;
+		}
+
+		if ( CoilIndex == 0 ) {
+			ShowSevereError( CurrentModuleObject + ", GetTESCoilCoolingCapacity: TES Cooling Coil not found=" + CoilName );
+			ErrorsFound = true;
+			CoilCoolAirFlow = 0.0;
+		} else {
+			CoilCoolAirFlow = TESCoil( CoilIndex ).RatedEvapAirVolFlowRate;
 		}
 
 	}

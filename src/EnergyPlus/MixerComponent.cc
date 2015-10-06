@@ -75,6 +75,14 @@ namespace MixerComponent {
 	// Functions
 
 	void
+		clear_state()
+	{
+		NumMixers = 0; // The Number of Mixers found in the Input
+		GetInputFlag = true; // Flag set to make sure you get input once
+		CheckEquipName.deallocate();
+	}
+
+	void
 	SimAirMixer(
 		std::string const & CompName,
 		int & CompIndex
