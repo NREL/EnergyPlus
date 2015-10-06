@@ -62,6 +62,7 @@ namespace MixerComponent {
 	int LoopInletNode( 0 );
 	int LoopOutletNode( 0 );
 	bool GetInputFlag( true ); // Flag set to make sure you get input once
+	bool GetZoneMixerInputFlag( true ); // Flag set to make sure you get input once
 	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Mixers
@@ -73,6 +74,15 @@ namespace MixerComponent {
 	//*************************************************************************
 
 	// Functions
+
+	void
+		clear_state()
+	{
+		NumMixers = 0; // The Number of Mixers found in the Input
+		GetInputFlag = true; // Flag set to make sure you get input once
+		GetZoneMixerInputFlag = true; // Flag set to make sure you get input once
+		CheckEquipName.deallocate();
+	}
 
 	void
 	SimAirMixer(
@@ -118,7 +128,6 @@ namespace MixerComponent {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int MixerNum; // The Mixer that you are currently loading input into
-		static bool GetInputFlag( true ); // Flag set to make sure you get input once
 
 		// FLOW:
 
@@ -668,9 +677,9 @@ namespace MixerComponent {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
-		if ( GetInputFlag ) { //First time subroutine has been entered
+		if ( GetZoneMixerInputFlag ) { //First time subroutine has been entered
 			GetMixerInput();
-			GetInputFlag = false;
+			GetZoneMixerInputFlag = false;
 		}
 
 		MixerIndex = FindItemInList( MixerName, MixerCond, &MixerConditions::MixerName );

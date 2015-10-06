@@ -1358,11 +1358,13 @@ namespace LowTempRadiantSystem {
 		}
 
 		// Set up the output variables for low temperature radiant systems
+		// ZoneHVAC:LowTemperatureRadiant:VariableFlow (HydrRadSys)
 		for ( Item = 1; Item <= NumOfHydrLowTempRadSys; ++Item ) {
 			SetupOutputVariable( "Zone Radiant HVAC Heating Rate [W]", HydrRadSys( Item ).HeatPower, "System", "Average", HydrRadSys( Item ).Name );
 			SetupOutputVariable( "Zone Radiant HVAC Heating Energy [J]", HydrRadSys( Item ).HeatEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Zone Radiant HVAC Heating Fluid Energy [J]", HydrRadSys( Item ).HeatEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Zone Radiant HVAC Cooling Rate [W]", HydrRadSys( Item ).CoolPower, "System", "Average", HydrRadSys( Item ).Name );
+
 			SetupOutputVariable( "Zone Radiant HVAC Cooling Energy [J]", HydrRadSys( Item ).CoolEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Zone Radiant HVAC Cooling Fluid Energy [J]", HydrRadSys( Item ).CoolEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Zone Radiant HVAC Mass Flow Rate [kg/s]", HydrRadSys( Item ).WaterMassFlowRate, "System", "Average", HydrRadSys( Item ).Name );
@@ -1376,6 +1378,8 @@ namespace LowTempRadiantSystem {
 			}
 		}
 
+		// Set up the output variables for low temperature radiant systems
+		// ZoneHVAC:LowTemperatureRadiant:ConstantFlow (CFloRadSys)
 		for ( Item = 1; Item <= NumOfCFloLowTempRadSys; ++Item ) {
 			SetupOutputVariable( "Zone Radiant HVAC Heating Rate [W]", CFloRadSys( Item ).HeatPower, "System", "Average", CFloRadSys( Item ).Name );
 			SetupOutputVariable( "Zone Radiant HVAC Heating Energy [J]", CFloRadSys( Item ).HeatEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
@@ -1402,6 +1406,8 @@ namespace LowTempRadiantSystem {
 		}
 
 		for ( Item = 1; Item <= NumOfElecLowTempRadSys; ++Item ) {
+			// Set up the output variables for low temperature radiant systems
+			// ZoneHVAC:LowTemperatureRadiant:Electric (ElecRadSys)
 			SetupOutputVariable( "Zone Radiant HVAC Electric Power [W]", ElecRadSys( Item ).ElecPower, "System", "Average", ElecRadSys( Item ).Name );
 			SetupOutputVariable( "Zone Radiant HVAC Electric Energy [J]", ElecRadSys( Item ).ElecEnergy, "System", "Sum", ElecRadSys( Item ).Name, _, "ELECTRICITY", "Heating", _, "System" );
 			SetupOutputVariable( "Zone Radiant HVAC Heating Rate [W]", ElecRadSys( Item ).HeatPower, "System", "Average", ElecRadSys( Item ).Name );

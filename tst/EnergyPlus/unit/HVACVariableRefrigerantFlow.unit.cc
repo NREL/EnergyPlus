@@ -992,7 +992,6 @@ namespace EnergyPlus {
 		GetZoneData( ErrorsFound ); // read zone data
 		EXPECT_FALSE( ErrorsFound ); 
 
-		Fans::GetFanInputFlag = true; // remove this when clear_state gets added to Fans
 		DXCoils::GetCoilsInputFlag = true; // remove this when clear_state gets added to DXCoils
 		GlobalNames::NumCoils = 0; // remove this when clear_state gets added to GlobalNames
 		GlobalNames::CoilNames.deallocate(); // remove this when clear_state gets added to GlobalNames
@@ -1691,6 +1690,7 @@ namespace EnergyPlus {
 
 		std::string const idf_objects = delimited_string( {
 			"Version,8.3;",
+			" BUILDING, VRFTest_SysCurve_WaterCooled, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",
 			" ",
 			"AirConditioner:VariableRefrigerantFlow,",
 			"  VRF Water Cooled HP,     !- Heat Pump Name",

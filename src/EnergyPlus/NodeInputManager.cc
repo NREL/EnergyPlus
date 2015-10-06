@@ -81,6 +81,7 @@ namespace NodeInputManager {
 	int MaxCheckNodes( 0 ); // Current "max" unique nodes in check
 	bool NodeVarsSetup( false ); // Setup indicator of node vars for reporting (also that all nodes have been entered)
 	Array1D_bool NodeWetBulbRepReq;
+	bool MyOneTimeFlag( true ); // one time flag
 
 	// Object Data
 	Array1D< NodeListDef > NodeLists; // Node Lists
@@ -105,8 +106,8 @@ namespace NodeInputManager {
 		NumCheckNodes = 0;
 		MaxCheckNodes = 0;
 		NodeVarsSetup = false;
-		NodeWetBulbRepReq.deallocate();
 		NodeLists.deallocate();
+		MyOneTimeFlag = true;
 	}
 
 	void
@@ -1084,7 +1085,6 @@ namespace NodeInputManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iNode; // node loop index
 		int iReq; // requested report variables loop index
-		static bool MyOneTimeFlag( true ); // one time flag
 		static Real64 RhoAirStdInit;
 		static Real64 RhoWaterStdInit;
 		static Array1D_int NodeWetBulbSchedPtr;

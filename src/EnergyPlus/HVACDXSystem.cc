@@ -83,7 +83,6 @@ namespace HVACDXSystem {
 	int const DehumidControl_None( 0 );
 	int const DehumidControl_Multimode( 1 );
 	int const DehumidControl_CoolReheat( 2 );
-	bool GetInputFlag( true ); // Flag to get input only once
 
 	//packaged TES modes
 	int const OffMode( 0 );
@@ -98,6 +97,7 @@ namespace HVACDXSystem {
 	//MODULE VARIABLE DECLARATIONS:
 	int NumDXSystem( 0 ); // The Number of DXCoolingSystems found in the Input
 	bool EconomizerFlag( false ); // holds air loop economizer status
+	bool GetInputFlag( true ); // Flag to get input only once
 
 	// Make this type allocatable
 	Array1D_bool CheckEquipName;
@@ -116,6 +116,17 @@ namespace HVACDXSystem {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state() {
+
+	NumDXSystem = 0;
+	EconomizerFlag = false;
+	GetInputFlag = true;
+
+	CheckEquipName.deallocate();
+	DXCoolingSystem.deallocate();
+
+	}
 
 	void
 	SimDXCoolingSystem(

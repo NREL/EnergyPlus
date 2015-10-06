@@ -3652,7 +3652,7 @@ namespace EvaporativeCoolers {
 		for ( UnitLoop = 1; UnitLoop <= NumZoneEvapUnits; ++UnitLoop ) {
 
 			SetupOutputVariable( "Zone Evaporative Cooler Unit Total Cooling Rate [W]", ZoneEvapUnit( UnitLoop ).UnitTotalCoolingRate, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
-			SetupOutputVariable( "Zone Evaporative Cooler Unit Total Cooling Energy [J]", ZoneEvapUnit( UnitLoop ).UnitTotalCoolingEnergy, "System", "Sum", ZoneEvapUnit( UnitLoop ).Name );
+			SetupOutputVariable( "Zone Evaporative Cooler Unit Total Cooling Energy [J]", ZoneEvapUnit( UnitLoop ).UnitTotalCoolingEnergy, "System", "Sum", ZoneEvapUnit( UnitLoop ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Zone Evaporative Cooler Unit Sensible Cooling Rate [W]", ZoneEvapUnit( UnitLoop ).UnitSensibleCoolingRate, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
 			SetupOutputVariable( "Zone Evaporative Cooler Unit Sensible Cooling Energy [J]", ZoneEvapUnit( UnitLoop ).UnitSensibleCoolingEnergy, "System", "Sum", ZoneEvapUnit( UnitLoop ).Name );
 			SetupOutputVariable( "Zone Evaporative Cooler Unit Latent Heating Rate [W]", ZoneEvapUnit( UnitLoop ).UnitLatentHeatingRate, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );

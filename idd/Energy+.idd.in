@@ -66143,51 +66143,51 @@ WaterHeater:Stratified,
        \default 0.0
   N34, \field Node 1 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N35, \field Node 2 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N36, \field Node 3 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N37, \field Node 4 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N38, \field Node 5 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N39, \field Node 6 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N40, \field Node 7 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N41, \field Node 8 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N42, \field Node 9 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N43, \field Node 10 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N44, \field Node 11 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N45, \field Node 12 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   A21, \field Source Side Flow Control Mode
        \type choice
@@ -67154,43 +67154,43 @@ ThermalStorage:ChilledWater:Stratified,
        \default 0.0
   N20, \field Node 1 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N21, \field Node 2 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N22, \field Node 3 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N23, \field Node 4 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N24, \field Node 5 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N25, \field Node 6 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N26, \field Node 7 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N27, \field Node 8 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N28, \field Node 9 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
   N29; \field Node 10 Additional Loss Coefficient
        \type real
-       \units W/m2-K
+       \units W/K
        \default 0.0
 
 \group Plant-Condenser Loops
@@ -69932,12 +69932,13 @@ EnergyManagementSystem:MeteredOutputVariable,
        \key SolarWaterHeating
        \key SolarAirHeating
   A6 , \field Group Type
-       \note choose a general classification, building (internal services), HVAC (air systems), or plant (hydronic systems)
+       \note choose a general classification, building (internal services), HVAC (air systems), or plant (hydronic systems), or system
        \type choice
        \required-field
        \key Building
        \key HVAC
        \key Plant
+       \key System
   A7 , \field End-Use Category
        \note choose how the metered output should be classified for end-use category
        \required-field
@@ -69956,6 +69957,13 @@ EnergyManagementSystem:MeteredOutputVariable,
        \key WaterSystems
        \key Refrigeration
        \key OnSiteGeneration
+       \key HeatingCoils
+       \key CoolingCoils
+       \key Chillers
+       \key Boilers
+       \key Baseboard
+       \key HeatRecoveryForCooling
+       \key HeatRecoveryForHeating
   A8 , \field End-Use Subcategory
        \type alpha
        \note enter a user-defined subcategory for this metered output

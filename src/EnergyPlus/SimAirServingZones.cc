@@ -157,6 +157,8 @@ namespace SimAirServingZones {
 		int TestUniqueNodesNum( 0 );
 		bool SizeAirLoopsOneTimeFlag( true );
 		bool InitAirLoopsBranchSizingFlag( true );
+		Array1D< Real64 > FaByZoneCool; // triggers allocation in UpdateSysSizing
+		Array1D< Real64 > SensCoolCapTemp; // triggers allocation in UpdateSysSizing
 	}
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -182,6 +184,8 @@ namespace SimAirServingZones {
 		InitAirLoopsBranchSizingFlag = true;
 		NumOfTimeStepInDay = 0;
 		TestUniqueNodesNum = 0;
+		FaByZoneCool.deallocate(); // triggers allocation in UpdateSysSizing
+		SensCoolCapTemp.deallocate(); // triggers allocation in UpdateSysSizing
 	}
 
 	void
@@ -522,6 +526,8 @@ namespace SimAirServingZones {
 			PrimaryAirSystem( AirSysNum ).OASysOutletNodeNum = 0;
 			PrimaryAirSystem( AirSysNum ).NumOAHeatCoils = 0;
 			PrimaryAirSystem( AirSysNum ).NumOACoolCoils = 0;
+			AirLoopControlInfo( AirSysNum ).FanOpMode = DataHVACGlobals::ContFanCycCoil; // initialize to constant fan mode for all air loops
+			AirLoopFlow( AirSysNum ).FanPLR = 1.0; // initialize to 1 for all air loops
 
 			CurrentModuleObject = "AirLoopHVAC";
 
@@ -2905,7 +2911,7 @@ namespace SimAirServingZones {
 			// Heat recovery
 		} else if ( SELECT_CASE_var == HeatXchngr ) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent'
 			// 'HeatExchanger:Desiccant:BalancedFlow'
-			SimHeatRecovery( CompName, FirstHVACIteration, CompIndex, ContFanCycCoil, _, _, _, _, AirLoopControlInfo( AirLoopNum ).EconoActive, AirLoopControlInfo( AirLoopNum ).HighHumCtrlActive );
+			SimHeatRecovery( CompName, FirstHVACIteration, CompIndex, AirLoopControlInfo( AirLoopNum ).FanOpMode, AirLoopFlow( AirLoopNum ).FanPLR, _, _, _, AirLoopControlInfo( AirLoopNum ).EconoActive, AirLoopControlInfo( AirLoopNum ).HighHumCtrlActive );
 
 			// Ducts
 		} else if ( SELECT_CASE_var == Duct ) { // 'Duct'
@@ -4526,13 +4532,14 @@ namespace SimAirServingZones {
 		Real64 ZoneOARatio; // ratio of zone OA flow to zone design cooling or heating flow
 		Real64 RetTempRise; // difference between zone return temperature and zone temperature [delta K]
 		Real64 SysCoolingEv; // System level ventilation effectiveness for cooling mode
-		static Array1D< Real64 > EvBySysCool; // saved value of SysCoolingEv used in 62.1 tabular report
 		Real64 SysHeatingEv; // System level ventilation effectiveness for heating mode
+		// moved to anonymous namespace for unit testing
+		static Array1D< Real64 > EvBySysCool; // saved value of SysCoolingEv used in 62.1 tabular report
 		static Array1D< Real64 > EvBySysHeat; // saved value of SysHeatingEv used in 62.1 tabular report
 		static Real64 Ep( 1.0 ); // zone primary air fraction
 		static Real64 Er( 0.0 ); // zone secondary recirculation fraction
 		static Real64 Fa( 1.0 ); // temporary variable used in multi-path VRP calc
-		static Array1D< Real64 > FaByZoneCool; // saved value of Fa used in 62.1 tabular report
+//		static Array1D< Real64 > FaByZoneCool; // saved value of Fa used in 62.1 tabular report // MOVED TO ANONYMOUS NAMESAPCE TO ENABLE UNIT TESTING
 		static Array1D< Real64 > FaByZoneHeat; // saved value of Fa used in 62.1 tabular report
 		static Real64 Fb( 1.0 ); // temporary variable used in multi-path VRP calc
 		static Array1D< Real64 > FbByZoneCool; // saved value of Fb used in 62.1 tabular report
@@ -4552,7 +4559,7 @@ namespace SimAirServingZones {
 		static Array1D< Real64 > VozSumClgBySys; // saved value of cooling ventilation required at clg zones
 		static Array1D< Real64 > VozSumHtgBySys; // saved value of cooling ventilation required at htg zones
 		static Array1D< Real64 > TotCoolCapTemp; // scratch variable used for calulating peak load [W]
-		static Array1D< Real64 > SensCoolCapTemp; // scratch variable used for calulating peak load [W]
+//		static Array1D< Real64 > SensCoolCapTemp; // scratch variable used for calulating peak load [W] // MOVED TO ANONYMOUS NAMESAPCE TO ENABLE UNIT TESTING
 		static Real64 MinHeatingEvz( 1.0 ); // minimum zone ventilation efficiency for heating (to be used as system efficiency)
 		static Array1D< Real64 > EvzMinBySysHeat; // saved value of EvzMin used in 62.1 tabular report
 		static Real64 MinCoolingEvz( 1.0 ); // minimum zone ventilation efficiency for cooling (to be used as system efficiency)

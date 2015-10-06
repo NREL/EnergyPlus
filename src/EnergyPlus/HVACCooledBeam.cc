@@ -348,6 +348,7 @@ namespace HVACCooledBeam {
 			TestCompSet( CurrentModuleObject, CoolBeam( CBNum ).Name, NodeID( CoolBeam( CBNum ).CWInNode ), NodeID( CoolBeam( CBNum ).CWOutNode ), "Water Nodes" );
 
 			//Setup the Cooled Beam reporting variables
+			//CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:CooledBeam"
 			SetupOutputVariable( "Zone Air Terminal Beam Sensible Cooling Energy [J]", CoolBeam( CBNum ).BeamCoolingEnergy, "System", "Sum", CoolBeam( CBNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Zone Air Terminal Beam Chilled Water Energy [J]", CoolBeam( CBNum ).BeamCoolingEnergy, "System", "Sum", CoolBeam( CBNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Zone Air Terminal Beam Sensible Cooling Rate [W]", CoolBeam( CBNum ).BeamCoolingRate, "System", "Average", CoolBeam( CBNum ).Name );
