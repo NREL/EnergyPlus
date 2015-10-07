@@ -13125,11 +13125,12 @@ namespace OutputReportTabular {
 		gatherElapsedTimeBEPS = 0.0;
 		ResetMonthlyGathering();
 	//	OutputReportTabularAnnual::ResetAnnualGathering();
-	//	ResetBinGathering(  );
-	//	ResetBEPSGathering(  );
-	//	ResetSourceEnergyEndUseGathering(  );
-	//	ResetPeakDemandGathering(  );
-	//	ResetHeatGainGathering(  );
+		ResetBinGathering();
+		ResetBEPSGathering();
+		ResetSourceEnergyEndUseGathering();
+		ResetPeakDemandGathering();
+		ResetHeatGainGathering();
+	// reset other reports that gather in various routines
 	}
 
 	void
@@ -13168,26 +13169,188 @@ namespace OutputReportTabular {
 
 	void
 	ResetBinGathering(){
+		// Jason Glazer - October 2015
+		// Reset all timebins gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		Real64 const bigVal( 0.0 ); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
 
+		// clear the binning arrays to zeros
+		BinResults.mnth() = 0.0;
+		BinResultsBelow.mnth() = 0.0;
+		BinResultsAbove.mnth() = 0.0;
+		BinResults.hrly() = 0.0;
+		BinResultsBelow.hrly() = 0.0;
+		BinResultsAbove.hrly() = 0.0;
+
+		// re-initialize statistics counters
+		BinStatistics.minimum() = huge( bigVal );
+		BinStatistics.maximum() = -huge( bigVal );
+		BinStatistics.n() = 0;
+		BinStatistics.sum() = 0.0;
+		BinStatistics.sum2() = 0.0;
 	}
 
 	void
 	ResetBEPSGathering(){
-
+		// Jason Glazer - October 2015
+		// Reset all ABUPS gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		gatherTotalsBEPS = 0.0;
+		gatherEndUseBEPS = 0.0;
+		gatherEndUseSubBEPS = 0.0;
+		gatherTotalsSource = 0.0;
+		// reset the specific componenents being gathered
+		gatherPowerFuelFireGen = 0.0;
+		gatherPowerPV = 0.0;
+		gatherPowerWind = 0.0;
+		gatherPowerHTGeothermal = 0.0;
+		gatherElecProduced = 0.0;
+		gatherElecPurchased = 0.0;
+		gatherElecSurplusSold = 0.0;
+		gatherWaterHeatRecovery = 0.0;
+		gatherAirHeatRecoveryCool = 0.0;
+		gatherAirHeatRecoveryHeat = 0.0;
+		gatherHeatHTGeothermal = 0.0;
+		gatherHeatSolarWater = 0.0;
+		gatherHeatSolarAir = 0.0;
+		gatherRainWater = 0.0;
+		gatherCondensate = 0.0;
+		gatherWellwater = 0.0;
+		gatherMains = 0.0;
+		gatherWaterEndUseTotal = 0.0;
 	}
 
 	void
 	ResetSourceEnergyEndUseGathering(){
-
+		// Jason Glazer - October 2015
+		// Reset all source energy end use table gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		gatherTotalsBySourceBEPS = 0.0;
+		gatherEndUseBySourceBEPS = 0.0;
 	}
 
 	void
 	ResetPeakDemandGathering(){
+		// Jason Glazer - October 2015
+		// Reset all demand end use components table gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		gatherDemandTotal = 0.0;
+		gatherDemandTimeStamp = 0;
+		gatherDemandEndUse = 0.0;
+		gatherDemandEndUseSub = 0.0;
 
 	}
 
 	void
 	ResetHeatGainGathering(){
+		// Jason Glazer - October 2015
+		// Reset all sensible heat gas summary report gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		using DataHeatBalance::ZonePreDefRep;
+		using DataHeatBalance::BuildingPreDefRep;
+		int iZone;
+		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+			ZonePreDefRep( iZone ).SHGSAnPeoplAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnLiteAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnHvacHt = 0.;
+			ZonePreDefRep( iZone ).SHGSAnHvacCl = 0.;
+			ZonePreDefRep( iZone ).SHGSAnIzaAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnIzaRem = 0.;
+			ZonePreDefRep( iZone ).SHGSAnWindAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnWindRem = 0.;
+			ZonePreDefRep( iZone ).SHGSAnInfilAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnInfilRem = 0.;
+			ZonePreDefRep( iZone ).SHGSAnEquipAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnEquipRem = 0.;
+			ZonePreDefRep( iZone ).SHGSAnHvacATUHt = 0.;
+			ZonePreDefRep( iZone ).SHGSAnHvacATUCl = 0.;
+			ZonePreDefRep( iZone ).SHGSAnSurfHt = 0.;
+			ZonePreDefRep( iZone ).SHGSAnSurfCl = 0.;
+			ZonePreDefRep( iZone ).SHGSAnOtherAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnOtherRem = 0.;
+			ZonePreDefRep( iZone ).htPeak = 0.;
+			ZonePreDefRep( iZone ).htPtTimeStamp = 0;
+			ZonePreDefRep( iZone ).SHGSHtHvacHt = 0.;
+			ZonePreDefRep( iZone ).SHGSHtHvacCl = 0.;
+			ZonePreDefRep( iZone ).SHGSHtSurfHt = 0.;
+			ZonePreDefRep( iZone ).SHGSHtSurfCl = 0.;
+			ZonePreDefRep( iZone ).SHGSHtHvacATUHt = 0.;
+			ZonePreDefRep( iZone ).SHGSHtHvacATUCl = 0.;
+			ZonePreDefRep( iZone ).SHGSHtPeoplAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtLiteAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtEquipAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtEquipRem = 0.;
+			ZonePreDefRep( iZone ).SHGSHtWindAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtWindRem = 0.;
+			ZonePreDefRep( iZone ).SHGSHtIzaAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtIzaRem = 0.;
+			ZonePreDefRep( iZone ).SHGSHtInfilAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtInfilRem = 0.;
+			ZonePreDefRep( iZone ).SHGSHtOtherAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtOtherRem = 0.;
+			ZonePreDefRep( iZone ).clPeak = 0.;
+			ZonePreDefRep( iZone ).clPtTimeStamp = 0;
+			ZonePreDefRep( iZone ).SHGSClHvacHt = 0.;
+			ZonePreDefRep( iZone ).SHGSClHvacCl = 0.;
+			ZonePreDefRep( iZone ).SHGSClSurfHt = 0.;
+			ZonePreDefRep( iZone ).SHGSClSurfCl = 0.;
+			ZonePreDefRep( iZone ).SHGSClHvacATUHt = 0.;
+			ZonePreDefRep( iZone ).SHGSClHvacATUCl = 0.;
+			ZonePreDefRep( iZone ).SHGSClPeoplAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClLiteAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClEquipAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClEquipRem = 0.;
+			ZonePreDefRep( iZone ).SHGSClWindAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClWindRem = 0.;
+			ZonePreDefRep( iZone ).SHGSClIzaAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClIzaRem = 0.;
+			ZonePreDefRep( iZone ).SHGSClInfilAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClInfilRem = 0.;
+			ZonePreDefRep( iZone ).SHGSClOtherAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClOtherRem = 0.;
+		}
+
+		BuildingPreDefRep.htPeak = 0.;
+		BuildingPreDefRep.htPtTimeStamp = 0;
+		BuildingPreDefRep.SHGSHtHvacHt = 0.0;
+		BuildingPreDefRep.SHGSHtHvacCl = 0.0;
+		BuildingPreDefRep.SHGSHtHvacATUHt = 0.0;
+		BuildingPreDefRep.SHGSHtHvacATUCl = 0.0;
+		BuildingPreDefRep.SHGSHtSurfHt = 0.0;
+		BuildingPreDefRep.SHGSHtSurfCl = 0.0;
+		BuildingPreDefRep.SHGSHtPeoplAdd = 0.0;
+		BuildingPreDefRep.SHGSHtLiteAdd = 0.0;
+		BuildingPreDefRep.SHGSHtEquipAdd = 0.0;
+		BuildingPreDefRep.SHGSHtWindAdd = 0.0;
+		BuildingPreDefRep.SHGSHtIzaAdd = 0.0;
+		BuildingPreDefRep.SHGSHtInfilAdd = 0.0;
+		BuildingPreDefRep.SHGSHtOtherAdd = 0.0;
+		BuildingPreDefRep.SHGSHtEquipRem = 0.0;
+		BuildingPreDefRep.SHGSHtWindRem = 0.0;
+		BuildingPreDefRep.SHGSHtIzaRem = 0.0;
+		BuildingPreDefRep.SHGSHtInfilRem = 0.0;
+		BuildingPreDefRep.SHGSHtOtherRem = 0.0;
+
+		BuildingPreDefRep.clPeak = 0.;
+		BuildingPreDefRep.clPtTimeStamp = 0;
+		BuildingPreDefRep.SHGSClHvacHt = 0.0;
+		BuildingPreDefRep.SHGSClHvacCl = 0.0;
+		BuildingPreDefRep.SHGSClSurfHt = 0.0;
+		BuildingPreDefRep.SHGSClSurfCl = 0.0;
+		BuildingPreDefRep.SHGSClHvacATUHt = 0.0;
+		BuildingPreDefRep.SHGSClHvacATUCl = 0.0;
+		BuildingPreDefRep.SHGSClPeoplAdd = 0.0;
+		BuildingPreDefRep.SHGSClLiteAdd = 0.0;
+		BuildingPreDefRep.SHGSClEquipAdd = 0.0;
+		BuildingPreDefRep.SHGSClWindAdd = 0.0;
+		BuildingPreDefRep.SHGSClIzaAdd = 0.0;
+		BuildingPreDefRep.SHGSClInfilAdd = 0.0;
+		BuildingPreDefRep.SHGSClOtherAdd = 0.0;
+		BuildingPreDefRep.SHGSClEquipRem = 0.0;
+		BuildingPreDefRep.SHGSClWindRem = 0.0;
+		BuildingPreDefRep.SHGSClIzaRem = 0.0;
+		BuildingPreDefRep.SHGSClInfilRem = 0.0;
+		BuildingPreDefRep.SHGSClOtherRem = 0.0;
 
 	}
 
