@@ -316,7 +316,11 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
-	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_idd_cache ) {
+	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions, bool use_idd_cache ) {
+		if ( idf_snippet.empty() ) {
+			if ( use_assertions ) EXPECT_FALSE( idf_snippet.empty() ) << "IDF snippet is empty.";
+			return true;
+		}
 		using namespace InputProcessor;
 
 		// Parse idf snippet to look for Building and GlobalGeometryRules. If not present then this adds a default implementation
@@ -325,7 +329,7 @@ namespace EnergyPlus {
 		IdfParser parser;
 		bool success = false;
 		auto const parsed_idf = parser.decode( idf_snippet, success );
-		EXPECT_TRUE( success ) << "IDF snippet didn't parse properly. Assuming Building and GlobalGeometryRules are not in snippet.";
+		if ( use_assertions ) EXPECT_TRUE( success ) << "IDF snippet didn't parse properly. Assuming Building and GlobalGeometryRules are not in snippet.";
 		bool found_building = false;
 		bool found_global_geo = false;
 		if ( success ) {
@@ -341,7 +345,7 @@ namespace EnergyPlus {
 				}
 			}
 		}
-		std::string idf = idf_snippet;
+		std::string idf = parser.encode( parsed_idf );
 		if ( ! found_building ) {
 			idf += "Building,Bldg,0.0,Suburbs,.04,.4,FullExterior,25,6;" + DataStringGlobals::NL;
 		}
@@ -359,12 +363,14 @@ namespace EnergyPlus {
 		}
 
 		if ( errors_found ) {
-			compare_eso_stream( "" );
-			compare_mtr_stream( "" );
-			compare_echo_stream( "" );
-			compare_err_stream( "" );
-			compare_cout_stream( "" );
-			compare_cerr_stream( "" );
+			if ( use_assertions ) {
+				compare_eso_stream( "" );
+				compare_mtr_stream( "" );
+				compare_echo_stream( "" );
+				compare_err_stream( "" );
+				compare_cout_stream( "" );
+				compare_cerr_stream( "" );
+			}
 			return errors_found;
 		}
 
@@ -418,10 +424,10 @@ namespace EnergyPlus {
 								"], No prior Objects." + DataStringGlobals::NL;
 			}
 		}
-		EXPECT_EQ( 0, count_err ) << error_string;
+		if ( use_assertions ) EXPECT_EQ( 0, count_err ) << error_string;
 
 		if ( NumIDFRecords == 0 ) {
-			EXPECT_GT( NumIDFRecords, 0 ) << "The IDF file has no records.";
+			if ( use_assertions ) EXPECT_GT( NumIDFRecords, 0 ) << "The IDF file has no records.";
 			++NumMiscErrorsFound;
 			errors_found = true;
 		}
@@ -429,33 +435,33 @@ namespace EnergyPlus {
 		for ( auto const obj_def : ObjectDef ) {
 			if ( ! obj_def.RequiredObject ) continue;
 			if ( obj_def.NumFound > 0 ) continue;
-			EXPECT_GT( obj_def.NumFound, 0 ) << "Required Object=\"" + obj_def.Name + "\" not found in IDF.";
+			if ( use_assertions ) EXPECT_GT( obj_def.NumFound, 0 ) << "Required Object=\"" + obj_def.Name + "\" not found in IDF.";
 			++NumMiscErrorsFound;
 			errors_found = true;
 		}
 
 		if ( TotalAuditErrors > 0 ) {
-			EXPECT_EQ( 0, TotalAuditErrors ) << "Note -- Some missing fields have been filled with defaults.";
+			if ( use_assertions ) EXPECT_EQ( 0, TotalAuditErrors ) << "Note -- Some missing fields have been filled with defaults.";
 			errors_found = true;
 		}
 
 		if ( NumOutOfRangeErrorsFound > 0 ) {
-			EXPECT_EQ( 0, NumOutOfRangeErrorsFound ) << "Out of \"range\" values found in input";
+			if ( use_assertions ) EXPECT_EQ( 0, NumOutOfRangeErrorsFound ) << "Out of \"range\" values found in input";
 			errors_found = true;
 		}
 
 		if ( NumBlankReqFieldFound > 0 ) {
-			EXPECT_EQ( 0, NumBlankReqFieldFound ) << "Blank \"required\" fields found in input";
+			if ( use_assertions ) EXPECT_EQ( 0, NumBlankReqFieldFound ) << "Blank \"required\" fields found in input";
 			errors_found = true;
 		}
 
 		if ( NumMiscErrorsFound > 0 ) {
-			EXPECT_EQ( 0, NumMiscErrorsFound ) << "Other miscellaneous errors found in input";
+			if ( use_assertions ) EXPECT_EQ( 0, NumMiscErrorsFound ) << "Other miscellaneous errors found in input";
 			errors_found = true;
 		}
 
 		if ( OverallErrorFlag ) {
-			EXPECT_FALSE( OverallErrorFlag ) << "Error processing IDF snippet.";
+			if ( use_assertions ) EXPECT_FALSE( OverallErrorFlag ) << "Error processing IDF snippet.";
 
 			// check if IDF version matches IDD version
 			// this really shouldn't be an issue but i'm keeping it just in case a unit test is written against a specific IDF version
@@ -471,20 +477,22 @@ namespace EnergyPlus {
 						bad_version = ( DataStringGlobals::MatchVersion == idf_record.Alphas( 1 ) );
 					}
 					found_version = true;
-					EXPECT_FALSE( bad_version ) << "Version in IDF=\"" + idf_record.Alphas( 1 ) + "\" not the same as expected=\"" + DataStringGlobals::MatchVersion + "\"";
+					if ( use_assertions ) EXPECT_FALSE( bad_version ) << "Version in IDF=\"" + idf_record.Alphas( 1 ) + "\" not the same as expected=\"" + DataStringGlobals::MatchVersion + "\"";
 					break;
 				}
 			}
-			EXPECT_TRUE( found_version ) << "Unknown IDF Version, expected version is \"" + DataStringGlobals::MatchVersion + "\"";
+			if ( use_assertions ) EXPECT_TRUE( found_version ) << "Unknown IDF Version, expected version is \"" + DataStringGlobals::MatchVersion + "\"";
 			errors_found = true;
 		}
 
-		compare_eso_stream( "" );
-		compare_mtr_stream( "" );
-		compare_echo_stream( "" );
-		compare_err_stream( "" );
-		compare_cout_stream( "" );
-		compare_cerr_stream( "" );
+		if ( use_assertions ) {
+			compare_eso_stream( "" );
+			compare_mtr_stream( "" );
+			compare_echo_stream( "" );
+			compare_err_stream( "" );
+			compare_cout_stream( "" );
+			compare_cerr_stream( "" );
+		}
 
 		if ( errors_found ) return errors_found;
 
