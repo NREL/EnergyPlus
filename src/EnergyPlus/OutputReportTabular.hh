@@ -993,7 +993,8 @@ namespace OutputReportTabular {
 	void
 	ResetHeatGainGathering();
 
-
+	void
+	ResetRemainingPredefinedEntries();
 
 
 	//======================================================================================================================

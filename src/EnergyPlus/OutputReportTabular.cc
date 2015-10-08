@@ -13130,6 +13130,7 @@ namespace OutputReportTabular {
 		ResetSourceEnergyEndUseGathering();
 		ResetPeakDemandGathering();
 		ResetHeatGainGathering();
+		ResetRemainingPredefinedEntries();
 	// reset other reports that gather in various routines
 	}
 
@@ -13352,6 +13353,47 @@ namespace OutputReportTabular {
 		BuildingPreDefRep.SHGSClInfilRem = 0.0;
 		BuildingPreDefRep.SHGSClOtherRem = 0.0;
 
+	}
+
+	void
+	ResetRemainingPredefinedEntries(){
+		// Jason Glazer - October 2015
+		// Reset all entries that are added to the predefined reports in the FillRemainingPredefinedEntries() function to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		using DataHeatBalance::TotLights;
+		using DataHeatBalance::Lights;
+		using ExteriorEnergyUse::ExteriorLights;
+		using ExteriorEnergyUse::NumExteriorLights;
+		using DataHeatBalance::Zone;
+		using DataHeatBalance::ZonePreDefRep;
+
+		Real64 const bigVal( 0.0 ); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
+		int iLight;
+		int iZone;
+
+		for ( iLight = 1; iLight <= TotLights; ++iLight ) {
+			Lights( iLight ).SumTimeNotZeroCons = 0.;
+			Lights( iLight ).SumConsumption = 0.;
+		}
+		for ( iLight = 1; iLight <= NumExteriorLights; ++iLight ) {
+			ExteriorLights( iLight ).SumTimeNotZeroCons = 0.;
+			ExteriorLights( iLight ).SumConsumption = 0.;
+		}
+		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+			if ( Zone( iZone ).SystemZoneNodeNumber >= 0 ) { //conditioned zones only
+				if ( Zone( iZone ).isNominalOccupied ) {
+					ZonePreDefRep( iZone ).MechVentVolTotal = 0.;
+					ZonePreDefRep( iZone ).MechVentVolMin = huge( bigVal );
+					ZonePreDefRep( iZone ).InfilVolTotal = 0.;
+					ZonePreDefRep( iZone ).InfilVolMin = huge( bigVal );
+					ZonePreDefRep( iZone ).AFNInfilVolTotal = 0.;
+					ZonePreDefRep( iZone ).AFNInfilVolMin = huge( bigVal );
+					ZonePreDefRep( iZone ).SimpVentVolTotal = 0.;
+					ZonePreDefRep( iZone ).SimpVentVolMin = huge( bigVal );
+					ZonePreDefRep( iZone ).TotTimeOcc = 0.;
+				}
+			}
+		}
 	}
 
 
