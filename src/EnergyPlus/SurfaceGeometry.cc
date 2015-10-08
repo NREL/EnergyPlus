@@ -8378,7 +8378,6 @@ namespace SurfaceGeometry {
 		// Object Data
 		PlaneEq BasePlane;
 		Vector TVect;
-		Vector TVect2;
 		Vector CoordinateTransVector;
 
 		ErrorInSurface = false;
@@ -8440,8 +8439,8 @@ namespace SurfaceGeometry {
 			BaseZLLC = Surface( ThisSurf ).Vertex( 2 ).z;
 			TVect = Surface( ThisSurf ).Vertex( 3 ) - Surface( ThisSurf ).Vertex( 2 );
 			ThisWidth = VecLength( TVect );
-			TVect2 = Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 1 );
-			ThisHeight = VecLength( TVect2 );
+			TVect = Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 1 );
+			ThisHeight = VecLength( TVect );
 			Surface( ThisSurf ).Width = ThisWidth;
 			Surface( ThisSurf ).Height = ThisHeight; // For a horizontal surface this is actually length!
 			if ( Surface( ThisSurf ).Sides == 3 ) {
@@ -8523,7 +8522,7 @@ namespace SurfaceGeometry {
 				Surface( ThisSurf ).Height = ThisHeight;
 
 				// Test for rectangularity
-				if ( isRectangle( ThisSurf ) ) {
+				if ( ! isRectangle( ThisSurf ) ) {
 					ShowSevereError( RoutineName + "Suspected 4-sided but non-rectangular Window, Door or GlassDoor:" );
 					ShowContinueError( "Surface=" + Surface( ThisSurf ).Name );
 					ErrorInSurface = true;
