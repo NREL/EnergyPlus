@@ -311,6 +311,11 @@ namespace SurfaceGeometry {
 		int const NSides // Number of sides to figure
 	);
 
+	bool
+	isRectangle(
+		int const ThisSurf // Current surface number
+	);
+		
 	//     NOTICE
 
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois

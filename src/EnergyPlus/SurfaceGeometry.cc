@@ -8369,14 +8369,11 @@ namespace SurfaceGeometry {
 		Real64 DivArea; // Divider area for exterior windows (m2)
 		Real64 DivFrac; // Fraction of divider area without overlaps
 		bool ErrorInSurface; // false/true, depending on pass through routine
-		Real64 Diagonal1; // Length of diagonal of 4-sided figure (m)
-		Real64 Diagonal2; // Length of diagonal of 4-sided figure (m)
 		bool SError;
 		bool HeatTransSurf;
 		bool IsCoPlanar;
 		Real64 OutOfLine;
 		int LastVertexInError;
-		Real64 DotProd; // Dot product of two adjacent sides - to test for right angle
 
 		// Object Data
 		PlaneEq BasePlane;
@@ -8447,23 +8444,16 @@ namespace SurfaceGeometry {
 			ThisHeight = VecLength( TVect2 );
 			Surface( ThisSurf ).Width = ThisWidth;
 			Surface( ThisSurf ).Height = ThisHeight; // For a horizontal surface this is actually length!
-			if ( Surface( ThisSurf ).Sides == 3 ) Surface( ThisSurf ).Shape = Triangle;
-			if ( Surface( ThisSurf ).Sides == 4 ) {
-				Diagonal1 = VecLength( Surface( ThisSurf ).Vertex( 1 ) - Surface( ThisSurf ).Vertex( 3 ) );
-				Diagonal2 = VecLength( Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 4 ) );
+			if ( Surface( ThisSurf ).Sides == 3 ) {
+				Surface( ThisSurf ).Shape = Triangle;
+			} else if ( Surface( ThisSurf ).Sides == 4 ) {
 				// Test for rectangularity
-				if ( std::abs( Diagonal1 - Diagonal2 ) < 0.020 ) { // This tolerance may need to be tightened?
-					DotProd = dot( TVect, TVect2 );
-					if ( abs( DotProd ) < 0.0001 ) { // Not sure yet how tight this tolerance should be?
-						Surface( ThisSurf ).Shape = Rectangle;
-					} else {
-						Surface( ThisSurf ).Shape = Quadrilateral;
-					}
+				if ( isRectangle( ThisSurf ) ) {
+					Surface( ThisSurf ).Shape = Rectangle;
 				} else {
 					Surface( ThisSurf ).Shape = Quadrilateral;
 				}
-			}
-			if ( Surface( ThisSurf ).Sides > 4 ) {
+			} else { // Surface( ThisSurf ).Sides > 4 
 				Surface( ThisSurf ).Shape = Polygonal;
 				if ( std::abs( ThisHeight * ThisWidth - Surface( ThisSurf ).GrossArea ) > 0.001 ) {
 					Surface( ThisSurf ).Width = std::sqrt( Surface( ThisSurf ).GrossArea );
@@ -8531,13 +8521,11 @@ namespace SurfaceGeometry {
 				ThisHeight = VecLength( TVect );
 				Surface( ThisSurf ).Width = ThisWidth;
 				Surface( ThisSurf ).Height = ThisHeight;
-				Diagonal1 = VecLength( Surface( ThisSurf ).Vertex( 1 ) - Surface( ThisSurf ).Vertex( 3 ) );
-				Diagonal2 = VecLength( Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 4 ) );
 
 				// Test for rectangularity
-				if ( std::abs( Diagonal1 - Diagonal2 ) > 0.020 ) {
+				if ( isRectangle( ThisSurf ) ) {
 					ShowSevereError( RoutineName + "Suspected 4-sided but non-rectangular Window, Door or GlassDoor:" );
-					ShowContinueError( "Surface=" + Surface( ThisSurf ).Name + ", Diagonal1=" + TrimSigDigits( Diagonal1, 3 ) + ", Diagonal2=" + TrimSigDigits( Diagonal2, 3 ) );
+					ShowContinueError( "Surface=" + Surface( ThisSurf ).Name );
 					ErrorInSurface = true;
 				}
 
@@ -10605,6 +10593,43 @@ namespace SurfaceGeometry {
 
 	}
 
+	bool
+	isRectangle(
+		int const ThisSurf // Surface number
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         M.J. Witte
+		//       DATE WRITTEN   October 2015
+
+		// PURPOSE: Check if a 4-sided surface is a rectangle
+
+		using namespace Vectors;
+
+		Real64 Diagonal1; // Length of diagonal of 4-sided figure from vertex 1 to vertex 3 (m)
+		Real64 Diagonal2; // Length of diagonal of 4-sided figure from vertex 2 to vertex 4 (m)
+		Real64 DotProd; // Dot product of two adjacent sides - to test for right angle
+		Vector Vect32; // vector from vertex 3 to vertex 2
+		Vector Vect21; // vector from vertex 2 to vertex 1
+
+		Diagonal1 = VecLength( Surface( ThisSurf ).Vertex( 1 ) - Surface( ThisSurf ).Vertex( 3 ) );
+		Diagonal2 = VecLength( Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 4 ) );
+		// Test for rectangularity
+		if ( std::abs( Diagonal1 - Diagonal2 ) < 0.020 ) { // This tolerance based on coincident vertex tolerance of 0.01
+			Vect32 = Surface( ThisSurf ).Vertex( 3 ) - Surface( ThisSurf ).Vertex( 2 );
+			Vect21 = Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 1 );
+			DotProd = dot( Vect32, Vect21 );
+			if ( abs( DotProd ) < 0.0001 ) { 
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+
+	}
 	//     NOTICE
 
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
