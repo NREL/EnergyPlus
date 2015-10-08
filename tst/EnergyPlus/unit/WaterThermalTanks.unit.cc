@@ -758,6 +758,7 @@ TEST_F( HVACFixture, HPWHEnergyBalance )
 	// Add back in the energy that was lost to ambient
 	TankEnergySum -= Tank.LossRate * TimeStepSys * 3600;
 
-	EXPECT_NEAR( HeatFromCoil, TankEnergySum, 1.0 );
+	const Real64 ErrorBound = HeatFromCoil * 0.0001; // Within 0.01% of each other
+	EXPECT_NEAR( HeatFromCoil, TankEnergySum, ErrorBound );
 
 }

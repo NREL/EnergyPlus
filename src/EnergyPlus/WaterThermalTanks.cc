@@ -7821,6 +7821,16 @@ namespace WaterThermalTanks {
 			}
 
 		}
+
+		// Call the tank one more time with the final PLR
+		if ( HeatPump.TankTypeNum == MixedWaterHeater ) {
+			CalcWaterThermalTankMixed( WaterThermalTankNum );
+		} else if ( HeatPump.TankTypeNum == StratifiedWaterHeater ) {
+			CalcWaterThermalTankStratified( WaterThermalTankNum );
+		} else {
+			assert(0);
+		}
+
 		// set HPWH outlet node equal to the outlet air splitter node conditions if outlet air splitter node exists
 		if ( OutletAirSplitterNode > 0 ) {
 			Node( HPAirOutletNode ) = Node( OutletAirSplitterNode );
