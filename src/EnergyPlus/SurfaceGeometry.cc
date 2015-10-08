@@ -856,11 +856,11 @@ namespace SurfaceGeometry {
 		//  REAL(r64) :: testY
 		Real64 surfAzimuth;
 		//  LOGICAL :: Located
-		bool sameSurfNormal;
+		bool sameSurfNormal(true);
 		bool izConstDiff; // differences in construction for IZ surfaces
 		bool izConstDiffMsg; // display message about hb diffs only once.
-		bool azimuthError;
-		bool tiltError;
+		bool azimuthError(false);
+		bool tiltError(false);
 		// FLOW:
 		// Get the total number of surfaces to allocate derived type and for surface loops
 
@@ -1129,20 +1129,11 @@ namespace SurfaceGeometry {
 					//          write(outputfiledebug,'(3f7.2)') SurfaceTmp(itmp1)%lcsy
 					//          write(outputfiledebug,'(3f7.2)') SurfaceTmp(itmp1)%lcsz
 					//          write(outputfiledebug,'(A,3f7.2)') 'subsurface surfnorm=',SurfaceTmp(itmp1)%NewellSurfaceNormalVector
-					if ( std::abs( SurfaceTmp( iTmp1 ).Azimuth - surfAzimuth ) > 10.0 );
-					{
-						CompareTwoVectors(SurfaceTmp(SurfNum).NewellSurfaceNormalVector, SurfaceTmp(iTmp1).NewellSurfaceNormalVector, sameSurfNormal, 0.001);
-						if (sameSurfNormal) { // copy lcs vectors
-							SurfaceTmp(iTmp1).lcsx = SurfaceTmp(SurfNum).lcsx;
-							SurfaceTmp(iTmp1).lcsy = SurfaceTmp(SurfNum).lcsy;
-							SurfaceTmp(iTmp1).lcsy = SurfaceTmp(SurfNum).lcsy;
-						}
-						else
-							azimuthError = true;
-					}
-					if (std::abs(SurfaceTmp(iTmp1).Tilt - SurfTilt) > 30)
-					{
-						tiltError = true;
+					checkSurfAzTiltNorm( SurfaceTmp( SurfNum ), SurfaceTmp( iTmp1 ), azimuthError, tiltError, sameSurfNormal );
+					if (sameSurfNormal && !azimuthError) { // copy lcs vectors
+						SurfaceTmp(iTmp1).lcsx = SurfaceTmp(SurfNum).lcsx;
+						SurfaceTmp(iTmp1).lcsy = SurfaceTmp(SurfNum).lcsy;
+						SurfaceTmp(iTmp1).lcsy = SurfaceTmp(SurfNum).lcsy;
 					}
 					//        IF (ABS(SurfaceTmp(itmp1)%Azimuth-360.0d0) < .01d0) THEN
 					//          SurfaceTmp(itmp1)%Azimuth=360.0d0-SurfaceTmp(itmp1)%Azimuth
@@ -1163,14 +1154,14 @@ namespace SurfaceGeometry {
 					//                   'to show more details on individual surfaces.')
 					//        ENDIF
 					if ( azimuthError && DisplayExtraWarnings ) {
-						ShowSevereError( RoutineName + "Outward facing angle [" + RoundSigDigits( SurfaceTmp( iTmp1 ).Azimuth, 3 ) + "] of subsurface=\"" + SurfaceTmp( iTmp1 ).Name + "\" significantly different than" );
-						ShowContinueError( "..facing angle [" + RoundSigDigits( SurfaceTmp( SurfNum ).Azimuth, 3 ) + "] of base surface=" + SurfaceTmp( SurfNum ).Name );
+						ShowSevereError( RoutineName + "Outward facing azimuth angle [" + RoundSigDigits( SurfaceTmp( iTmp1 ).Azimuth, 3 ) + "] of subsurface=\"" + SurfaceTmp( iTmp1 ).Name + "\" significantly different than" );
+						ShowContinueError( "..facing azimuth angle [" + RoundSigDigits( SurfaceTmp( SurfNum ).Azimuth, 3 ) + "] of base surface=" + SurfaceTmp( SurfNum ).Name  );
 						ShowContinueError( "..surface class of base surface=" + cSurfaceClass( SurfaceTmp( SurfNum ).Class ) );
 						//          CALL ShowContinueError('Fixes will be attempted to align subsurface with base surface.')
 					}
 					if ( tiltError && DisplayExtraWarnings) {
-						ShowSevereError(RoutineName + "Outward facing angle [" + RoundSigDigits(SurfaceTmp(iTmp1).Tilt, 3) + "] of subsurface=\"" + SurfaceTmp(iTmp1).Name + "\" significantly different than");
-						ShowContinueError("..facing angle [" + RoundSigDigits(SurfaceTmp(SurfNum).Tilt, 3) + "] of base surface=" + SurfaceTmp(SurfNum).Name);
+						ShowSevereError(RoutineName + "Outward facing tilt angle [" + RoundSigDigits(SurfaceTmp(iTmp1).Tilt, 3) + "] of subsurface=\"" + SurfaceTmp(iTmp1).Name + "\" significantly different than");
+						ShowContinueError( "..facing tilt angle [" + RoundSigDigits( SurfaceTmp( SurfNum ).Tilt, 3 ) + "] of base surface=" + SurfaceTmp( SurfNum ).Name  );
 						ShowContinueError("..surface class of base surface=" + cSurfaceClass(SurfaceTmp(SurfNum).Class));
 					}
 
@@ -2010,6 +2001,30 @@ namespace SurfaceGeometry {
 			ShowFatalError( RoutineName + "Errors discovered, program terminates." );
 		}
 
+	}
+
+	bool
+	isAzimuthDifferent( Real64 azimuth1, Real64 azimuth2 )
+	{
+		return ( std::abs( azimuth1 - azimuth2 ) > 10.0 );
+	}
+
+	bool
+	isTiltDifferent( Real64 tilt1, Real64 tilt2 )
+	{
+		return ( std::abs( tilt1 - tilt2 ) > 30 );
+	}
+
+	void
+	checkSurfAzTiltNorm( SurfaceData & surface1, SurfaceData & surface2, bool & azimuthError, bool & tiltError, bool & sameSurfNormal )
+	{
+		sameSurfNormal = true;
+		azimuthError = isAzimuthDifferent( surface1.Azimuth, surface2.Azimuth );
+		if ( azimuthError )
+		{
+			Vectors::CompareTwoVectors( surface1.NewellSurfaceNormalVector, surface2.NewellSurfaceNormalVector, sameSurfNormal, 0.001 );
+		}
+		tiltError = isTiltDifferent( surface1.Tilt, surface2.Tilt );
 	}
 
 	void

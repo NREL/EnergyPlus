@@ -67,6 +67,15 @@ namespace SurfaceGeometry {
 	void
 	GetSurfaceData( bool & ErrorsFound ); // If errors found in input
 
+	bool
+	isAzimuthDifferent( Real64 azimuth1, Real64 azimuth2 );
+
+	bool
+	isTiltDifferent( Real64 tilt1, Real64 tilt2 );
+
+	void
+	checkSurfAzTiltNorm( SurfaceData & surface1, SurfaceData & surface2, bool & azimuthError, bool & tiltError, bool & sameSurfNormal );
+
 	void
 	GetGeometryParameters( bool & ErrorsFound ); // set to true if errors found during input
 
