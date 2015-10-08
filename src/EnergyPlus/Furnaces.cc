@@ -4290,6 +4290,7 @@ namespace Furnaces {
 			// Pass the fan cycling schedule index up to the air loop. Set the air loop unitary system flag.
 			AirLoopControlInfo( AirLoopNum ).CycFanSchedPtr = Furnace( FurnaceNum ).FanSchedPtr;
 			AirLoopControlInfo( AirLoopNum ).UnitarySys = true;
+			// RR this is wrong, Op mode needs to be updated each time atep
 			AirLoopControlInfo( AirLoopNum ).FanOpMode = Furnace( FurnaceNum ).OpMode;
 
 			//Check that heat pump heating capacity is within 20% of cooling capacity
@@ -4609,6 +4610,9 @@ namespace Furnaces {
 				Furnace( FurnaceNum ).OpMode = CycFanCycCoil;
 			} else {
 				Furnace( FurnaceNum ).OpMode = ContFanCycCoil;
+			}
+			if( AirLoopNum > 0 ) {
+				AirLoopControlInfo( AirLoopNum ).FanOpMode = Furnace( FurnaceNum ).OpMode;
 			}
 		}
 
@@ -7895,7 +7899,8 @@ namespace Furnaces {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
+		Real64 ratio;
+		Real64 OnOffRatio;
 
 		// Report the Furnace Fan Part Load Ratio
 		if ( Furnace( FurnaceNum ).NumOfSpeedCooling < 1 ) {
@@ -7911,6 +7916,19 @@ namespace Furnaces {
 		LoopSystemOffMassFlowrate = CompOffMassFlow;
 		LoopFanOperationMode = Furnace( FurnaceNum ).OpMode;
 		LoopOnOffFanPartLoadRatio = Furnace( FurnaceNum ).FanPartLoadRatio;
+		OnOffRatio = LoopOnOffFanPartLoadRatio;
+		if ( Furnace( FurnaceNum ).FurnaceType_Num == UnitarySys_HeatPump_AirToAir ) {
+			LoopOnOffFanPartLoadRatio = max( Furnace( FurnaceNum ).FanPartLoadRatio, Furnace( FurnaceNum ).HeatPartLoadRatio, Furnace( FurnaceNum ).CoolPartLoadRatio );
+			LoopOnOffFanPartLoadRatio = min( 1.0, LoopOnOffFanPartLoadRatio );
+		}
+		if ( Furnace( FurnaceNum ).FurnaceType_Num == UnitarySys_HeatCool ) {
+			if ( Furnace( FurnaceNum ).HeatPartLoadRatio == 0.0 && Furnace( FurnaceNum ).CoolPartLoadRatio == 0.0 && Furnace( FurnaceNum ).FanPartLoadRatio > 0.0 ) {
+				if ( CompOnMassFlow < max( Furnace( FurnaceNum ).MaxCoolAirMassFlow, Furnace( FurnaceNum ).MaxHeatAirMassFlow ) && CompOnMassFlow  > 0.0 ) {
+					ratio = max( Furnace( FurnaceNum ).MaxCoolAirMassFlow, Furnace( FurnaceNum ).MaxHeatAirMassFlow ) / CompOnMassFlow;
+					LoopOnOffFanPartLoadRatio = LoopOnOffFanPartLoadRatio * ratio;
+				}
+			}
+		}
 
 	}
 

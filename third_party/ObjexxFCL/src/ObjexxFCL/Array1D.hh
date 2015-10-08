@@ -77,6 +77,7 @@ public: // Types
 	using Super::initialize;
 	using Super::isize1;
 	using Super::l;
+	using Super::move_if;
 	using Super::operator ();
 	using Super::operator [];
 	using Super::resize;
@@ -97,7 +98,9 @@ public: // Creation
 	// Default Constructor
 	inline
 	Array1D()
-	{}
+	{
+		shift_set( 1 ); // For std::vector-like API
+	}
 
 	// Copy Constructor
 	inline
@@ -1471,7 +1474,7 @@ public: // Modifier
 		Array1D o( I );
 		int const b( std::max( I.l(), l() ) ), e( std::min( I.u(), u() ) );
 		for ( int i = b; i <= e; ++i ) {
-			o( i ) = operator ()( i );
+			o( i ) = move_if( operator ()( i ) );
 		}
 		return swap( o );
 	}
@@ -1495,7 +1498,7 @@ public: // Modifier
 		}
 		if ( l_max_ <= u_min_ ) { // Ranges overlap
 			for ( int i = l_max_; i <= u_min_; ++i ) { // Copy array data in overlap
-				o( i ) = operator ()( i );
+				o( i ) = move_if( operator ()( i ) );
 			}
 		}
 		if ( u_ < I_u_ ) {
@@ -1515,7 +1518,7 @@ public: // Modifier
 		Array1D o( a.I_ );
 		int const b( std::max( a.l(), l() ) ), e( std::min( a.u(), u() ) );
 		for ( int i = b; i <= e; ++i ) {
-			o( i ) = operator ()( i );
+			o( i ) = move_if( operator ()( i ) );
 		}
 		return swap( o );
 	}
@@ -1541,7 +1544,7 @@ public: // Modifier
 		}
 		if ( l_max_ <= u_min_ ) { // Ranges overlap
 			for ( int i = l_max_; i <= u_min_; ++i ) { // Copy array data in overlap
-				o( i ) = operator ()( i );
+				o( i ) = move_if( operator ()( i ) );
 			}
 		}
 		if ( u_ < I_u_ ) {
@@ -1560,111 +1563,32 @@ public: // Modifier
 		if ( capacity_ == size_ ) { // Grow by 1
 			Array1D o( IndexRange( l(), u() + 1 ) );
 			for ( int i = l(), e = u(); i <= e; ++i ) {
-				o( i ) = operator ()( i );
+				o( i ) = move_if( operator ()( i ) );
 			}
 			swap( o );
 		} else {
-			I_.u( u() + 1 );
+			I_.grow();
 		}
 		operator ()( u() ) = t;
 		return *this;
 	}
 
-	// Append Value: Grow Capacity
+	// Append Value: Grow by 1
+	template< typename U = T, class = typename std::enable_if< std::is_move_assignable< U >::value >::type >
 	inline
 	Array1D &
-	push_back( T const & t )
+	append( T && t )
 	{
-		Base::grow_capacity();
-		I_.grow();
-		setup_real();
-		operator ()( I_.u() ) = t;
-		return *this;
-	}
-
-	// Append Value: Grow Capacity
-	inline
-	Array1D &
-	push_back( T && t )
-	{
-		Base::grow_capacity();
-		I_.grow();
-		setup_real();
-		operator ()( I_.u() ) = std::move( t );
-		return *this;
-	}
-
-	// Construct and Append Value: Grow Capacity
-	template< class... Args >
-	Array1D &
-	emplace_back( Args&&... args )
-	{
-		Base::grow_capacity();
-		operator ()( I_.grow().u() ) = T( std::forward< Args >( args )... );
-		return *this;
-	}
-
-	// Remove Last Value
-	inline
-	Array1D &
-	pop_back()
-	{
-		if ( size_ > 0u ) --size_;
-		return *this;
-	}
-
-	// First Value
-	inline
-	T const &
-	front() const
-	{
-		assert( size_ > 0u );
-		return operator []( 0u );
-	}
-
-	// First Value
-	inline
-	T &
-	front()
-	{
-		assert( size_ > 0u );
-		return operator []( 0u );
-	}
-
-	// Last Value
-	inline
-	T const &
-	back() const
-	{
-		assert( size_ > 0u );
-		return operator []( size_ - 1 );
-	}
-
-	// Last Value
-	inline
-	T &
-	back()
-	{
-		assert( size_ > 0u );
-		return operator []( size_ - 1 );
-	}
-
-	// Reserve Capacity
-	inline
-	Array1D &
-	reserve( size_type const n )
-	{
-		Base::reserve_capacity( n );
-		setup_real();
-		return *this;
-	}
-
-	// Shrink Capacity to Size
-	inline
-	Array1D &
-	shrink_to_fit()
-	{
-		Base::shrink_capacity();
+		if ( capacity_ == size_ ) { // Grow by 1
+			Array1D o( IndexRange( l(), u() + 1 ) );
+			for ( int i = l(), e = u(); i <= e; ++i ) {
+				o( i ) = std::move( operator ()( i ) );
+			}
+			swap( o );
+		} else {
+			I_.grow();
+		}
+		operator ()( u() ) = std::move( t );
 		return *this;
 	}
 
@@ -1718,6 +1642,183 @@ public: // Modifier
 		using std::swap;
 		swap1( v );
 		swap( initializer_, v.initializer_ );
+		return *this;
+	}
+
+public: // std::vector-like API
+
+	// First Value
+	inline
+	T const &
+	front() const
+	{
+		assert( size_ > 0u );
+		return operator []( 0u );
+	}
+
+	// First Value
+	inline
+	T &
+	front()
+	{
+		assert( size_ > 0u );
+		return operator []( 0u );
+	}
+
+	// Last Value
+	inline
+	T const &
+	back() const
+	{
+		assert( size_ > 0u );
+		return operator []( size_ - 1 );
+	}
+
+	// Last Value
+	inline
+	T &
+	back()
+	{
+		assert( size_ > 0u );
+		return operator []( size_ - 1 );
+	}
+
+	// Append Value by Copy
+	inline
+	Array1D &
+	push_back( T const & t )
+	{
+		I_.grow();
+		Base::do_push_back_copy( t );
+		return *this;
+	}
+
+	// Append Value by Move
+	template< typename U = T, class = typename std::enable_if< std::is_move_assignable< U >::value >::type >
+	inline
+	Array1D &
+	push_back( T && t )
+	{
+		I_.grow();
+		Base::do_push_back_move( std::move( t ) );
+		return *this;
+	}
+
+	// Remove Last Value
+	inline
+	Array1D &
+	pop_back()
+	{
+		if ( size_ > 0u ) --size_;
+		return *this;
+	}
+
+	// Insert Value by Copy
+	inline
+	iterator
+	insert( const_iterator pos, T const & t )
+	{
+		I_.grow();
+		return Base::do_insert_copy( pos, t );
+	}
+
+	// Insert Value by Move
+	template< typename U = T, class = typename std::enable_if< std::is_move_assignable< U >::value >::type >
+	inline
+	iterator
+	insert( const_iterator pos, T && t )
+	{
+		I_.grow();
+		return Base::do_insert_move( pos, std::move( t ) );
+	}
+
+	// Insert Multiples of a Value by Copy
+	inline
+	iterator
+	insert( const_iterator pos, size_type n, T const & t )
+	{
+		I_.grow( static_cast< int >( n ) );
+		return Base::do_insert_n_copy( pos, n, t );
+	}
+
+	// Insert Iterator Range
+	template< typename Iterator, class = typename std::enable_if<
+	 std::is_same< typename std::iterator_traits< Iterator >::iterator_category, std::input_iterator_tag >::value ||
+	 std::is_same< typename std::iterator_traits< Iterator >::iterator_category, std::forward_iterator_tag >::value ||
+	 std::is_same< typename std::iterator_traits< Iterator >::iterator_category, std::bidirectional_iterator_tag >::value ||
+	 std::is_same< typename std::iterator_traits< Iterator >::iterator_category, std::random_access_iterator_tag >::value
+	 >::type >
+	inline
+	iterator
+	insert( const_iterator pos, Iterator first, Iterator last )
+	{
+		I_.grow( std::distance( first, last ) );
+		return Base::do_insert_iterator( pos, first, last );
+	}
+
+	// Insert Initializer List
+	inline
+	iterator
+	insert( const_iterator pos, std::initializer_list< T > il )
+	{
+		I_.grow( static_cast< int >( il.size() ) );
+		return Base::do_insert_initializer_list( pos, il );
+	}
+
+	// Insert Value Constructed in Place
+	template< typename... Args >
+	inline
+	iterator
+	emplace( const_iterator pos, Args &&... args )
+	{
+		I_.grow();
+		return Base::do_emplace( pos, std::forward< Args >( args )... );
+	}
+
+	// Append Value Constructed in Place
+	template< typename... Args >
+	inline
+	Array1D &
+	emplace_back( Args &&... args )
+	{
+		I_.grow();
+		Base::do_emplace_back( std::forward< Args >( args )... );
+		return *this;
+	}
+
+	// Erase Iterator
+	inline
+	iterator
+	erase( const_iterator pos )
+	{
+		I_.shrink();
+		return Base::do_erase( pos );
+	}
+
+	// Erase Iterator Range
+	inline
+	iterator
+	erase( const_iterator first, const_iterator last )
+	{
+		I_.shrink( std::distance( first, last ) );
+		return Base::do_erase_iterator( first, last );
+	}
+
+	// Reserve Capacity
+	inline
+	Array1D &
+	reserve( size_type const n )
+	{
+		Base::reserve_capacity( n );
+		return *this;
+	}
+
+	// Shrink Capacity to Size
+	inline
+	Array1D &
+	shrink_to_fit()
+	{
+		Base::shrink_capacity();
 		return *this;
 	}
 

@@ -376,6 +376,7 @@ namespace SteamCoils {
 		for ( CoilNum = 1; CoilNum <= NumStmHeat; ++CoilNum ) {
 
 			//Setup the Simple Heating Coil reporting variables
+			//CurrentModuleObject = "Coil:Heating:Steam"
 			SetupOutputVariable( "Heating Coil Heating Energy [J]", SteamCoil( CoilNum ).TotSteamHeatingCoilEnergy, "System", "Sum", SteamCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Heating Rate [W]", SteamCoil( CoilNum ).TotSteamHeatingCoilRate, "System", "Average", SteamCoil( CoilNum ).Name );
 			SetupOutputVariable( "Heating Coil Steam Mass Flow Rate [Kg/s]", SteamCoil( CoilNum ).OutletSteamMassFlowRate, "System", "Average", SteamCoil( CoilNum ).Name );
