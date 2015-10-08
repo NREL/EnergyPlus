@@ -123,6 +123,8 @@ namespace EnergyPlus {
 		m_redirect_cerr = std::unique_ptr< RedirectCerr >( new RedirectCerr( m_cerr_buffer ) );
 
 		UtilityRoutines::outputErrorHeader = false;
+
+		Psychrometrics::InitializePsychRoutines();
 	}
 
 	void EnergyPlusFixture::TearDown() {
@@ -187,6 +189,7 @@ namespace EnergyPlus {
 		PlantPressureSystem::clear_state();
 		PlantUtilities::clear_state();
 		Pipes::clear_state();
+		Psychrometrics::clear_state();
 		Pumps::clear_state();
 		ScheduleManager::clear_state();
 		VariableSpeedCoils::clear_state();
@@ -211,6 +214,7 @@ namespace EnergyPlus {
 			flags.DISPOSE( "DELETE" );
 			gio::close( OutputProcessor::OutputFileMeterDetails, flags );
 			gio::close( DataGlobals::OutputFileStandard, flags );
+			gio::close( DataGlobals::OutputStandardError, flags );
 			gio::close( DataGlobals::OutputFileInits, flags );
 			gio::close( DataGlobals::OutputFileDebug, flags );
 			gio::close( DataGlobals::OutputFileZoneSizing, flags );

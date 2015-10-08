@@ -14,13 +14,15 @@
 #include <DataPlant.hh>
 #include <DataLoopNode.hh>
 #include <ScheduleManager.hh>
-#include "Fixtures/HVACFixture.hh"
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <HeatBalanceManager.hh>
 #include <DataHeatBalance.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <DataAirSystems.hh>
 #include <DataZoneEquipment.hh>
+#include <Psychrometrics.hh>
+#include <DataAirLoop.hh>
+#include <NodeInputManager.hh>
 
 using namespace EnergyPlus;
  
@@ -485,7 +487,7 @@ TEST_F( EnergyPlusFixture, CalcScheduledTESSetPoint )
 
 }
 
-TEST_F( HVACFixture, SZRHOAFractionImpact ) {
+TEST_F( EnergyPlusFixture, SZRHOAFractionImpact ) {
 		std::string const idf_objects = delimited_string( { 
 		"Version,8.4;",
 		"SetpointManager:SingleZone:Reheat,",
