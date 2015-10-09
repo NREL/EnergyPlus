@@ -48,6 +48,7 @@
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <SQLiteProcedures.hh>
+#include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
 #include <VentilatedSlab.hh>
 #include <ZonePlenum.hh>
@@ -3276,6 +3277,7 @@ namespace OutputReportTabular {
 		static std::string const Component_Cost_Economics_Summary( "Component Cost Economics Summary" );
 		static std::string const Component_Sizing_Summary( "Component Sizing Summary" );
 		static std::string const Surface_Shadowing_Summary( "Surface Shadowing Summary" );
+		static std::string const Adaptive_Comfort_Summary( "Adaptive Comfort Summary" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3323,6 +3325,9 @@ namespace OutputReportTabular {
 				}
 				if ( displaySurfaceShadowing ) {
 					tbl_stream << "<br><a href=\"#" << MakeAnchorName( Surface_Shadowing_Summary, Entire_Facility ) << "\">Surface Shadowing Summary</a>\n";
+				}
+				if ( displayAdaptiveComfort ){
+					tbl_stream << "<br><a href=\"#" << MakeAnchorName( Adaptive_Comfort_Summary, Entire_Facility ) << "\">Adaptive Comfort Summary</a>\n";
 				}
 				for ( kReport = 1; kReport <= numReportName; ++kReport ) {
 					if ( reportName( kReport ).show ) {
@@ -13122,16 +13127,21 @@ namespace OutputReportTabular {
 		// Jason Glazer - October 2015
 		// Reset all gathering arrays to zero for multi-year simulations
 		// so that only last year is reported in tabular reports
+		using ThermalComfort::ResetThermalComfortSimpleASH55;
+		using ThermalComfort::ResetSetPointMet;
+
 		gatherElapsedTimeBEPS = 0.0;
 		ResetMonthlyGathering();
-	//	OutputReportTabularAnnual::ResetAnnualGathering();
+		OutputReportTabularAnnual::ResetAnnualGathering();
 		ResetBinGathering();
 		ResetBEPSGathering();
 		ResetSourceEnergyEndUseGathering();
 		ResetPeakDemandGathering();
 		ResetHeatGainGathering();
 		ResetRemainingPredefinedEntries();
-	// reset other reports that gather in various routines
+		ResetThermalComfortSimpleASH55();
+		ResetSetPointMet();
+		ResetAdaptiveComfort();
 	}
 
 	void
@@ -13396,6 +13406,29 @@ namespace OutputReportTabular {
 		}
 	}
 
+	void
+	ResetAdaptiveComfort()
+	{
+	// Jason Glazer - October 2015
+	// Reset accumulation variable for adaptive comfort report to zero for multi-year simulations
+	// so that only last year is reported in tabular reports
+		using DataHeatBalance::People;
+		using DataHeatBalance::TotPeople;
+		int i;
+		if ( displayAdaptiveComfort && TotPeople > 0 ) {
+			for ( i = 1; i <= TotPeople; ++i ) {
+				if ( People( i ).AdaptiveASH55 ) {
+					People( i ).TimeNotMetASH5590 = 0.;
+					People( i ).TimeNotMetASH5580 = 0.;
+				}
+				if ( People( i ).AdaptiveCEN15251 ) {
+					People( i ).TimeNotMetCEN15251CatI = 0.;
+					People( i ).TimeNotMetCEN15251CatII = 0.;
+					People( i ).TimeNotMetCEN15251CatIII = 0.;
+				}
+			}
+		}
+	}
 
 
 	//======================================================================================================================
