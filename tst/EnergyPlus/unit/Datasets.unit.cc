@@ -110,12 +110,9 @@ namespace EnergyPlus {
 	TEST_F( DataSetFixture, RefrigerationCompressorCurvesOK ) {
 		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurvesOK.idf" ) ) ) );
 	}
-	// The ResidentialACsAndHPsPerfCurves dataset file includes a large number of normalized curves, and stubbed out coil objects to reference these curves
-	// However, the coil objects themselves are missing *many* \required parameters for the IDD.  As such, trying to pass it through the input processor leads to failures.
-	// I'm just going to comment this out unless we later decide to add more dummy stubs to the datasets to get it passing the input processor directly
-	//TEST_F( DataSetFixture, ResidentialACsAndHPsPerfCurves ) {
-	//	ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/ResidentialACsAndHPsPerfCurves.idf" ) ) ) );
-	//}
+	TEST_F( DataSetFixture, ResidentialACsAndHPsPerfCurves ) {
+		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/ResidentialACsAndHPsPerfCurves.idf" ) ) ) );
+	}
 	TEST_F( DataSetFixture, RooftopPackagedHeatPump ) {
 		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RooftopPackagedHeatPump.idf" ) ) ) );
 	}
