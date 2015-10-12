@@ -3,7 +3,7 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -175,7 +175,7 @@ TEST( OutputReportTabularTest, GetUnitConversion )
 }
 
 
-TEST_F( HVACFixture, OutputReportTabular_ZoneMultiplierTest )
+TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 {
 	// AUTHOR: R. Raustad, FSEC
 	// DATE WRITTEN: Sep 2015
