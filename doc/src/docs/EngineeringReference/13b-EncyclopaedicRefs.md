@@ -6858,8 +6858,7 @@ In case that the user requests autosizing the rated capacity, the model employs 
 
 where <span>\({q_{design}}\)</span> is the design heating load estimated by EnergyPlus in the zone.
 
-Similarly, the model estimates the air outlet temperature assuming the air mass flow rate is twice the rated water mass flow rate as
-
+Similarly, the model estimates the air outlet temperature using the air mass flow rate calculated above:
 
 <div>$${T_{a,out}} = \frac{{{q_{design}}}}{{\dot m_{a,std} {c_{p,a}}}} + {T_{a,in}}$$</div>
 
@@ -6867,7 +6866,7 @@ Temperatures at the nodes are now known and the UA value is determined in the sa
 
 Once the UA value is determined, the model employs an effectiveness-NTU heat exchanger method to determine the heat transfer between the water and the zone air as convection-only model does (see “Hot Water Baseboard Heater with Only Convection” model). During this calculation the air mass flow rate is proportioned to the water mass flow rate:
 
-<div>$${\dot m_a} = {{\dot m_{a,std}} \frac{\dot m_w}{\dot {m_w,max}}}$$div
+<div>$${\dot m_a} = {{\dot m_{a,std}} \frac{\dot m_w}{\dot m_{w,max}}}$$<div>
 
 The model then determines the radiant heat addition by
 
