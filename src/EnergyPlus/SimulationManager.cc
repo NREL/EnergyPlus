@@ -243,6 +243,7 @@ namespace SimulationManager {
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
 		using OutputProcessor::ResetAccumulationWhenWarmupComplete;
+		using OutputProcessor::isFinalYear;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -445,6 +446,9 @@ namespace SimulationManager {
 			DayOfSim = 0;
 			DayOfSimChr = "0";
 			NumOfWarmupDays = 0;
+			if ( NumOfDayInEnvrn <= 365 ){
+				isFinalYear = true;
+			}
 
 			ManageEMS( emsCallFromBeginNewEvironment ); // calling point
 

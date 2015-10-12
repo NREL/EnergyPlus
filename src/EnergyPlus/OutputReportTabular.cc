@@ -13129,6 +13129,7 @@ namespace OutputReportTabular {
 		// so that only last year is reported in tabular reports
 		using ThermalComfort::ResetThermalComfortSimpleASH55;
 		using ThermalComfort::ResetSetPointMet;
+		using OutputProcessor::isFinalYear;
 
 		gatherElapsedTimeBEPS = 0.0;
 		ResetMonthlyGathering();
@@ -13142,6 +13143,7 @@ namespace OutputReportTabular {
 		ResetThermalComfortSimpleASH55();
 		ResetSetPointMet();
 		ResetAdaptiveComfort();
+		isFinalYear = true;
 	}
 
 	void
