@@ -3052,6 +3052,12 @@ namespace OutputProcessor {
 			EnergyMeters( Meter ).SMMinVal = MinSetValue;
 			EnergyMeters( Meter ).SMMinValDate = 0;
 
+			EnergyMeters( Meter ).FinYrSMValue = 0.0;
+			EnergyMeters( Meter ).FinYrSMMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).FinYrSMMaxValDate = 0;
+			EnergyMeters( Meter ).FinYrSMMinVal = MinSetValue;
+			EnergyMeters( Meter ).FinYrSMMinValDate = 0;
+
 		}
 
 		for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
