@@ -40,8 +40,8 @@ TEST( GioTest, BasicLF )
 	inquire( unit1, flags );
 	EXPECT_TRUE( flags.exists() );
 	EXPECT_TRUE( flags.open() );
-	EXPECT_TRUE( flags.read() );
-	EXPECT_TRUE( flags.write() );
+	EXPECT_TRUE( flags.readable() );
+	EXPECT_TRUE( flags.writable() );
 	EXPECT_TRUE( flags.asis() );
 	EXPECT_EQ( unit1, flags.unit() );
 	EXPECT_EQ( name1, flags.name() );
@@ -75,8 +75,8 @@ TEST( GioTest, BasicCRLF )
 	inquire( unit1, flags );
 	EXPECT_TRUE( flags.exists() );
 	EXPECT_TRUE( flags.open() );
-	EXPECT_TRUE( flags.read() );
-	EXPECT_TRUE( flags.write() );
+	EXPECT_TRUE( flags.readable() );
+	EXPECT_TRUE( flags.writable() );
 	EXPECT_TRUE( flags.asis() );
 	EXPECT_EQ( unit1, flags.unit() );
 	EXPECT_EQ( name1, flags.name() );
@@ -110,8 +110,8 @@ TEST( GioTest, BasicEOF )
 	inquire( unit1, flags );
 	EXPECT_TRUE( flags.exists() );
 	EXPECT_TRUE( flags.open() );
-	EXPECT_TRUE( flags.read() );
-	EXPECT_TRUE( flags.write() );
+	EXPECT_TRUE( flags.readable() );
+	EXPECT_TRUE( flags.writable() );
 	EXPECT_TRUE( flags.asis() );
 	EXPECT_EQ( unit1, flags.unit() );
 	EXPECT_EQ( name1, flags.name() );
@@ -148,8 +148,8 @@ TEST( GioTest, InquireByName )
 	inquire( unit1, flags );
 	EXPECT_TRUE( flags.exists() );
 	EXPECT_TRUE( flags.open() );
-	EXPECT_TRUE( flags.read() );
-	EXPECT_TRUE( flags.write() );
+	EXPECT_TRUE( flags.readable() );
+	EXPECT_TRUE( flags.writable() );
 	EXPECT_TRUE( flags.asis() );
 	EXPECT_EQ( unit1, flags.unit() );
 	EXPECT_EQ( name1, flags.name() );
