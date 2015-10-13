@@ -88,7 +88,7 @@ public:
 	gatherForTimestep( int kindOfTypeStep );
 
 	void
-	AnnualTable::resetGathering();
+	resetGathering();
 
 	void
 	writeTable( int unitsStyle );

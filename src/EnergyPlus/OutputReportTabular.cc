@@ -13156,7 +13156,6 @@ namespace OutputReportTabular {
 		int kColumn;
 		int curTable;
 		int curCol;
-		int curFirstColumn;
 		static Real64 BigNum( 0.0 );
 
 		for ( iInput = 1; iInput <= MonthlyInputCount; ++iInput ) {
