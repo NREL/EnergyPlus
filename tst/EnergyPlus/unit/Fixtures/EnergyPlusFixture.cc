@@ -500,7 +500,8 @@ namespace EnergyPlus {
 
 		if ( errors_found ) return errors_found;
 
-		PreScanReportingVariables();
+		// This can fatal error within it, which will cause the unit test to fail and exit.
+		SimulationManager::PostIPProcessing();
 
 		return errors_found;
 	}
