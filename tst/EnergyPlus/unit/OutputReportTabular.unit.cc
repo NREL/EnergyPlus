@@ -997,7 +997,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering )
 	DataGlobals::TimeStepZone = 0.25;
 
 	GetInputTabularMonthly();
-	EXPECT_EQ( MonthlyInputCount, 1u );
+	EXPECT_EQ( MonthlyInputCount, 1 );
 	InitializeTabularMonthly();
 
 	extLitUse = 1.01;
