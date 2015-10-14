@@ -95,21 +95,21 @@ The first 2 inputs are used to set a minimum supply flow rate for a zone even if
 
 The third input - *Cooling Minimum Air Flow Fraction* - if entered by the user- can be picked up and used for defaulting the minimum flow fraction for VAV terminal units. This input is currently used along with the two previous inputs to set *FinalZoneSizing().DesCoolVolFlowMin* in *UpdateZoneSizing* in *ZoneEquipmentManager*. If *Cooling Minimum Air Flow Fraction* is input it will very likely set the value for *FinalZoneSizing().DesCoolVolFlowMin*.
 
-    FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = max( &
-     FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow, &
-     FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2, &
-     FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * &
+    FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = max( 
+     FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow, 
+     FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2, 
+     FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * 
      FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac );
   where
   
-    FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2 = &
-     FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowPerArea * &
-     Zone( ZoneIndex ).FloorArea * Zone( ZoneIndex ).Multiplier * &
+    FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2 = 
+     FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowPerArea * 
+     Zone( ZoneIndex ).FloorArea * Zone( ZoneIndex ).Multiplier * 
      Zone( ZoneIndex ).ListMultiplier;
 
 *FinalZoneSizing().DesCoolVolFlowMin* is used in *SimAirServingZones* in the Std 62.1 cooling ventilation calculations. It is also summed into *FinalSysSizing().DesCoolVolFlowMin* :
 
-     FinalSysSizing( AirLoopNum ).DesCoolVolFlowMin += &
+     FinalSysSizing( AirLoopNum ).DesCoolVolFlowMin += 
       FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin;
 but *FinalSysSizing().DesCoolVolFlowMin* is never used. It was intended to set the minimum air flow rate for system fans.
 
