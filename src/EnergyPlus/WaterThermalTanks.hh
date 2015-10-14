@@ -796,6 +796,8 @@ namespace WaterThermalTanks {
 		Real64 ControlSensor2Height; // location from bottom of tank of control sensor 2
 		int ControlSensor2Node; // Node number of control sensor 2
 		Real64 ControlSensor2Weight; // weight of control sensor 2
+		Real64 ControlTempAvg; // Measured control temperature for the heat pump, average over timestep, for reporting
+		Real64 ControlTempFinal; // Measured control temperature at the end of the timestep, for reporting
 		bool AllowHeatingElementAndHeatPumpToRunAtSameTime; // if false, if the heating element kicks on, it will recover with that before turning the heat pump back on.
 		//variables for variable-speed HPWH
 		int NumofSpeed; //number of speeds for VS HPWH
@@ -901,6 +903,8 @@ namespace WaterThermalTanks {
 			ControlSensor2Height( -1.0 ),
 			ControlSensor2Node( 2 ),
 			ControlSensor2Weight( 0.0 ),
+			ControlTempAvg( 0.0 ),
+			ControlTempFinal( 0.0 ),
 			AllowHeatingElementAndHeatPumpToRunAtSameTime( true ),
 			NumofSpeed( 0 ),
 			HPWHAirVolFlowRate( MaxSpedLevels, 0.0 ),
@@ -1005,15 +1009,17 @@ namespace WaterThermalTanks {
 			bool const ShowSetPointWarning, // Warn when set point is greater than max tank temp limit
 			Real64 const HPWaterHeaterSensibleCapacity, // sensible capacity delivered when HPWH is attached to a zone (W)
 			Real64 const HPWaterHeaterLatentCapacity, // latent capacity delivered when HPWH is attached to a zone (kg/s)
-			Real64 WrappedCondenserBottomLocation,
-			Real64 WrappedCondenserTopLocation,
-			Real64 ControlSensor1Height, // location from bottom of tank of control sensor 1
-			int ControlSensor1Node,
-			Real64 ControlSensor1Weight, // weight of control sensor 1
-			Real64 ControlSensor2Height, // location from bottom of tank of control sensor 2
-			int ControlSensor2Node,
-			Real64 ControlSensor2Weight, // weight of control sensor 2
-			bool AllowHeatingElementAndHeatPumpToRunAtSameTime,
+			Real64 const WrappedCondenserBottomLocation,
+			Real64 const WrappedCondenserTopLocation,
+			Real64 const ControlSensor1Height, // location from bottom of tank of control sensor 1
+			int const ControlSensor1Node,
+			Real64 const ControlSensor1Weight, // weight of control sensor 1
+			Real64 const ControlSensor2Height, // location from bottom of tank of control sensor 2
+			int const ControlSensor2Node,
+			Real64 const ControlSensor2Weight, // weight of control sensor 2
+			Real64 const ControlTempAvg,
+			Real64 const ControlTempFinal,
+			bool const AllowHeatingElementAndHeatPumpToRunAtSameTime,
 			int const NumofSpeed,
 			Array1< Real64 > const & HPWHAirVolFlowRate,
 			Array1< Real64 > const & HPWHAirMassFlowRate,
@@ -1122,6 +1128,8 @@ namespace WaterThermalTanks {
 			ControlSensor2Height( ControlSensor2Height ),
 			ControlSensor2Node( ControlSensor2Node ),
 			ControlSensor2Weight( ControlSensor2Weight ),
+			ControlTempAvg( ControlTempAvg ),
+			ControlTempFinal( ControlTempFinal ),
 			AllowHeatingElementAndHeatPumpToRunAtSameTime( AllowHeatingElementAndHeatPumpToRunAtSameTime ),
 			NumofSpeed( NumofSpeed ),
 			HPWHAirVolFlowRate( MaxSpedLevels, HPWHAirVolFlowRate ),
@@ -1589,7 +1597,7 @@ namespace WaterThermalTanks {
 	ReportCWTankInits( int const WaterThermalTankNum );
 
 	Real64
-	FindStratifiedTankSensedTemp( WaterThermalTankData const & Tank );
+	FindStratifiedTankSensedTemp( WaterThermalTankData const & Tank, bool UseAverage = false );
 
 	void
 	SetVSHPWHFlowRates(

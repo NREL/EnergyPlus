@@ -4112,11 +4112,14 @@ namespace WaterThermalTanks {
 
 						if ( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum > 0 ) {
 							//CurrentModuleObject='WaterHeater:HeatPump:PumpedCondenser'
-							SetupOutputVariable( "Water Heater Compressor Part Load Ratio []", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).HeatingPLR, "System", "Average", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name );
-							SetupOutputVariable( "Water Heater Off Cycle Ancillary Electric Power [W]", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).OffCycParaFuelRate, "System", "Average", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name );
-							SetupOutputVariable( "Water Heater Off Cycle Ancillary Electric Energy [J]", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).OffCycParaFuelEnergy, "System", "Sum", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name, _, "Electric", "DHW", "Water Heater Parasitic", "Plant" );
-							SetupOutputVariable( "Water Heater On Cycle Ancillary Electric Power [W]", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).OnCycParaFuelRate, "System", "Average", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name );
-							SetupOutputVariable( "Water Heater On Cycle Ancillary Electric Energy [J]", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).OnCycParaFuelEnergy, "System", "Sum", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name, _, "Electric", "DHW", "Water Heater Parasitic", "Plant" );
+							HeatPumpWaterHeaterData & HPWH = HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum );
+							SetupOutputVariable( "Water Heater Compressor Part Load Ratio []", HPWH.HeatingPLR, "System", "Average", HPWH.Name );
+							SetupOutputVariable( "Water Heater Off Cycle Ancillary Electric Power [W]", HPWH.OffCycParaFuelRate, "System", "Average", HPWH.Name );
+							SetupOutputVariable( "Water Heater Off Cycle Ancillary Electric Energy [J]", HPWH.OffCycParaFuelEnergy, "System", "Sum", HPWH.Name, _, "Electric", "DHW", "Water Heater Parasitic", "Plant" );
+							SetupOutputVariable( "Water Heater On Cycle Ancillary Electric Power [W]", HPWH.OnCycParaFuelRate, "System", "Average", HPWH.Name );
+							SetupOutputVariable( "Water Heater On Cycle Ancillary Electric Energy [J]", HPWH.OnCycParaFuelEnergy, "System", "Sum", HPWH.Name, _, "Electric", "DHW", "Water Heater Parasitic", "Plant" );
+							SetupOutputVariable( "Water Heater Heat Pump Control Tank Temperature [C]",  HPWH.ControlTempAvg, "System", "Average", HPWH.Name );
+							SetupOutputVariable( "Water Heater Heat Pump Control Tank Final Temperature [C]", HPWH.ControlTempFinal, "System", "Average", HPWH.Name );
 						}
 
 						if ( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum > 0 ) {
@@ -7849,6 +7852,15 @@ namespace WaterThermalTanks {
 		HeatPump.OnCycParaFuelEnergy = HeatPump.OnCycParaFuelRate * TimeStepSys * SecInHour;
 		HeatPump.OffCycParaFuelRate = HeatPump.OffCycParaLoad * ( 1.0 - HPPartLoadRatio );
 		HeatPump.OffCycParaFuelEnergy = HeatPump.OffCycParaFuelRate * TimeStepSys * SecInHour;
+		if ( HeatPump.TankTypeNum == MixedWaterHeater ) {
+			HeatPump.ControlTempAvg = Tank.TankTempAvg;
+			HeatPump.ControlTempFinal = Tank.TankTemp;
+		} else if ( HeatPump.TankTypeNum == StratifiedWaterHeater ) {
+			HeatPump.ControlTempAvg = FindStratifiedTankSensedTemp( Tank, true );
+			HeatPump.ControlTempFinal = FindStratifiedTankSensedTemp( Tank );
+		} else {
+			assert(0);
+		}
 
 		{ auto const SELECT_CASE_var( HeatPump.InletAirConfiguration );
 
@@ -10356,7 +10368,7 @@ namespace WaterThermalTanks {
 	}
 
 	Real64
-	FindStratifiedTankSensedTemp( WaterThermalTankData const & Tank )
+	FindStratifiedTankSensedTemp( WaterThermalTankData const & Tank, bool UseAverage )
 	{
 
 		// FUNCTION INFORMATION:
@@ -10394,9 +10406,16 @@ namespace WaterThermalTanks {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		HeatPumpWaterHeaterData const & HPWH = HPWaterHeater( Tank.HeatPumpNum );
+		Real64 ControlSensor1Temp;
+		Real64 ControlSensor2Temp;
 
-		Real64 ControlSensor1Temp = Tank.Node( HPWH.ControlSensor1Node ).Temp;
-		Real64 ControlSensor2Temp = Tank.Node( HPWH.ControlSensor2Node ).Temp;
+		if ( UseAverage ) {
+			ControlSensor1Temp = Tank.Node( HPWH.ControlSensor1Node ).TempAvg;
+			ControlSensor2Temp = Tank.Node( HPWH.ControlSensor2Node ).TempAvg;
+		} else {
+			ControlSensor1Temp = Tank.Node( HPWH.ControlSensor1Node ).Temp;
+			ControlSensor2Temp = Tank.Node( HPWH.ControlSensor2Node ).Temp;
+		}
 
 		SensedTemp = ControlSensor1Temp * HPWH.ControlSensor1Weight + ControlSensor2Temp * HPWH.ControlSensor2Weight;
 
