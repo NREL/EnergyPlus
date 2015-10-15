@@ -92,6 +92,8 @@ list( LENGTH VERSIONS VERSIONS_SIZE)
 
 math(EXPR end "${VERSIONS_SIZE} - 1")
 
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
+
 FOREACH( i RANGE 1 ${end} )
 
 math(EXPR ii "${i} - 1")
@@ -114,11 +116,36 @@ SET(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${LAST_NAME} )
 ADD_EXECUTABLE( "${LAST_NAME}" ${SRC} )
 TARGET_LINK_LIBRARIES( "${LAST_NAME}" TransitionLib )
 
-#SET_PROPERTY( TARGET "${LAST_NAME}"
-#              PROPERTY COMPILE_DEFINITIONS "V${NEW_VERSION}" )
+install_and_fixup_exe_target( "${LAST_NAME}" PreProcess/IDFVersionUpdater )
 
 ENDFOREACH()
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-install_and_fixup_exe_target( "${LAST_NAME}" PreProcess/IDFVersionUpdater )
-
+# then install all the support files
+install( FILES "SupportFiles/Report Variables 1-0-0-023 to 1-0-1.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 1-0-1-042 to 1-0-2.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 1-0-2-008 to 1-0-3.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 1-0-3-019 to 1-1-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 1-1-0-020 to 1-1-1.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 1-1-1-012 to 1-2-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 1-2-0-029 to 1-2-1.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 1-2-1-012 to 1-2-2.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 1-2-2-030 to 1-2-3.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 1-2-3-031 to 1-3-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 1-3-0-018 to 1-4-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 1-4-0-025 to 2-0-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 2-0-0-025 to 2-1-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 2-1-0-023 to 2-2-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 2-2-0-023 to 3-0-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/V3-0-0-ObjectRenames.txt" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 3-0-0-028 to 3-1-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 3-1-0-027 to 4-0-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 4-0-0-024 to 5-0-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 5-0-0-031 to 6-0-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 6-0-0-023 to 7-0-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 7-0-0-036 to 7-1-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 7-1-0-012 to 7-2-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 7-2-0-006 to 8-0-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 8-0-0-007 to 8-1-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 8-1-0-009 to 8-2-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 8-2-0 to 8-3-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 8-3-0 to 8-4-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )

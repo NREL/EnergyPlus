@@ -148,6 +148,7 @@ if( BUILD_TESTING )
 endif()
 
 # E+ required libraries
+ADD_SUBDIRECTORY(idd)
 ADD_SUBDIRECTORY(third_party/SQLite)
 ADD_SUBDIRECTORY(third_party/ObjexxFCL)
 ADD_SUBDIRECTORY(third_party/BCVTB)
