@@ -3,7 +3,7 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <AirTerminalUnit.hh>
 #include <HVACFourPipeBeam.hh>
 #include <DataHeatBalance.hh>
@@ -26,7 +26,7 @@
 namespace EnergyPlus {
 
 
-	TEST_F( HVACFixture, Beam_FactoryAllAutosize ) {
+	TEST_F( EnergyPlusFixture, Beam_FactoryAllAutosize ) {
 		std::string const idf_objects = delimited_string( { 
 		"Version,8.4;",
 		"AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,",
@@ -148,7 +148,7 @@ namespace EnergyPlus {
 	}
 
 
-	TEST_F( HVACFixture, Beam_sizeandSimulateOneZone ) 
+	TEST_F( EnergyPlusFixture, Beam_sizeandSimulateOneZone ) 
 	{
 			std::string const idf_objects = delimited_string( { 
 		"    SimulationControl,",

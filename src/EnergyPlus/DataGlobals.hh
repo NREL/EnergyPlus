@@ -115,6 +115,8 @@ namespace DataGlobals {
 	extern bool WarmupFlag; // True during the warmup portion of a simulation
 	extern int OutputFileStandard; // Unit number for the standard output file (hourly data only)
 	extern std::ostream * eso_stream; // Internal stream used for eso output (used for performance)
+	extern int OutputStandardError; // Unit number for the standard error output file
+	extern std::ostream * err_stream; // Internal stream used for err output (used for performance)
 	extern int StdOutputRecordCount; // Count of Standard output records
 	extern int OutputFileInits; // Unit number for the standard Initialization output file
 	extern int OutputFileDebug; // Unit number for debug outputs

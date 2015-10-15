@@ -3,7 +3,7 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <CondenserLoopTowers.hh>
 #include <OutputProcessor.hh>
 #include <SimulationManager.hh>
@@ -15,7 +15,7 @@
 
 namespace EnergyPlus {
 
-	TEST_F( HVACFixture, CondenserLoopTowers_MerkelNoCooling ) {
+	TEST_F( EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling ) {
 		std::string const idf_objects = delimited_string({
 		"  Site:Location,",
 		"    USA IL-CHICAGO-OHARE,    !- Name",

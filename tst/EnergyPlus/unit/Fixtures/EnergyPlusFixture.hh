@@ -187,6 +187,13 @@ namespace EnergyPlus {
 		// Will return true if string matches the stream and false if it does not
 		bool compare_echo_stream( std::string const & expected_string, bool reset_stream = true );
 
+		// Compare an expected string against the ERR stream. The default is to reset the ERR stream after every call.
+		// It is easier to test successive functions if the ERR stream is 'empty' before the next call.
+		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
+		// if it makes sense for the unit test to continue after returning from function.
+		// Will return true if string matches the stream and false if it does not
+		bool compare_err_stream( std::string const & expected_string, bool reset_stream = true );
+
 		// Compare an expected string against the COUT stream. The default is to reset the COUT stream after every call.
 		// It is easier to test successive functions if the COUT stream is 'empty' before the next call.
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
@@ -222,6 +229,13 @@ namespace EnergyPlus {
 			return this->echo_stream->str().size() > 0;
 		}
 
+		// Check if ERR stream has any output. Useful to make sure there are or are not outputs to ERR.
+		inline
+		bool has_err_output()
+		{
+			return this->err_stream->str().size() > 0;
+		}
+
 		// Check if COUT stream has any output. Useful to make sure there are or are not outputs to COUT.
 		inline
 		bool has_cout_output()
@@ -242,7 +256,7 @@ namespace EnergyPlus {
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
 		// if it makes sense for the unit test to continue after returning from function.
 		// Will return false if no errors found and true if errors found
-		bool process_idf( std::string const & idf_snippet, bool use_idd_cache = true );
+		bool process_idf( std::string const & idf_snippet, bool use_assertions = true, bool use_idd_cache = true );
 
 		// This is a helper function to easily compare an expected IDF data structure with the actual IDFRecords data structure
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
@@ -278,6 +292,7 @@ namespace EnergyPlus {
 		std::unique_ptr< std::ostringstream > eso_stream;
 		std::unique_ptr< std::ostringstream > mtr_stream;
 		std::unique_ptr< std::ostringstream > echo_stream;
+		std::unique_ptr< std::ostringstream > err_stream;
 		std::unique_ptr< std::ostringstream > m_cout_buffer;
 		std::unique_ptr< std::ostringstream > m_cerr_buffer;
 		std::unique_ptr< RedirectCout > m_redirect_cout;
