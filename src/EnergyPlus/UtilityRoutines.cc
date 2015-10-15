@@ -1563,7 +1563,6 @@ ShowErrorMessage(
 	}
 
 	if ( ! DoingInputProcessing ) {
-		++TotalErrors;
 		if ( err_stream ) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
 	} else {
 		gio::write( CacheIPErrorFile, fmtA ) << ErrorMessage;
