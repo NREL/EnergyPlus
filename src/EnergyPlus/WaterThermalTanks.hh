@@ -1530,6 +1530,18 @@ namespace WaterThermalTanks {
 		bool const FirstHVACIteration // TRUE if First iteration of simulation
 	);
 
+	void
+	CalcWaterThermalTank( int const WaterThermalTankNum );
+
+	Real64
+	GetHPWHSensedTankTemp( WaterThermalTankData const & Tank );
+
+	void
+	ConvergeSingleSpeedHPWHCoilAndTank(
+		int const WaterThermalTankNum,
+		Real64 const PartLoadRatio
+	);
+
 	Real64
 	PLRResidualIterSpeed(
 		Real64 const SpeedRatio, // speed ratio between two speed levels
@@ -1543,9 +1555,9 @@ namespace WaterThermalTanks {
 	);
 
 	Real64
-	PLRResidualStratifiedTank(
-		Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Array1< Real64 > const & Par // par(1) = HP set point temperature [C]
+	PLRResidualHPWH(
+		Real64 const HPPartLoadRatio,
+		Array1< Real64 > const & Par
 	);
 
 	Real64
