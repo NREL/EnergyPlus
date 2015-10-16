@@ -36,6 +36,8 @@
 !               Beginning of Single Speed Air Conditioners Performance Curves
 ! *******************************************************************************************
 
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
 ! The coil objects in this idf are entered generically with many required fields purposely removed.  These objects are left in the file as comments to show how to use the curves defined in this file, which remain uncommented to allow including the curves in a particular idf, by macro, for example.
 
 !  Coil:Cooling:DX:SingleSpeed,
