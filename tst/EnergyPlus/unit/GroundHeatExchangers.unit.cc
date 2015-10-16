@@ -294,7 +294,7 @@ TEST_F( EnergyPlusFixture, VerticalGLHEBadIDF_1 )
 		"6.73;                    !- G-Function G Value 16",
 	});
 
-	process_idf( idf_objects, false );
+	EXPECT_TRUE( process_idf( idf_objects, false ) );
 
 	EXPECT_DEATH( GetGroundHeatExchangerInput(), "" );
 
@@ -358,7 +358,7 @@ TEST_F( EnergyPlusFixture, VerticalGLHEBadIDF_2 )
 		"3.5;                     !- G-Function Ln(T/Ts) Value 17 ---EXTRA UNBALANCED FIELD---",
 	});
 
-	process_idf( idf_objects, false );
+	EXPECT_TRUE( process_idf( idf_objects, false ) );
 
 	EXPECT_DEATH( GetGroundHeatExchangerInput(), "" );
 
