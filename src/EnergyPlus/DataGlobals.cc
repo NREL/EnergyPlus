@@ -137,6 +137,8 @@ namespace DataGlobals {
 	bool WarmupFlag( false ); // True during the warmup portion of a simulation
 	int OutputFileStandard( 0 ); // Unit number for the standard output file (hourly data only)
 	std::ostream * eso_stream( nullptr ); // Internal stream used for eso output (used for performance)
+	int OutputStandardError( 0 ); // Unit number for the standard error output file
+	std::ostream * err_stream( nullptr ); // Internal stream used for err output (used for performance)
 	int StdOutputRecordCount( 0 ); // Count of Standard output records
 	int OutputFileInits( 0 ); // Unit number for the standard Initialization output file
 	int OutputFileDebug( 0 ); // Unit number for debug outputs
@@ -226,6 +228,7 @@ namespace DataGlobals {
 		TimeStepZone = 0.0;
 		WarmupFlag = false;
 		OutputFileStandard = 0;
+		OutputStandardError = 0;
 		StdOutputRecordCount = 0;
 		OutputFileInits = 0;
 		OutputFileDebug = 0;
@@ -281,6 +284,7 @@ namespace DataGlobals {
 		Progress = 0;
 		eso_stream = nullptr;
 		mtr_stream = nullptr;
+		err_stream = nullptr;
 	}
 
 	//     NOTICE

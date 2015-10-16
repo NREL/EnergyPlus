@@ -11,7 +11,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataGlobals.hh>
 
-#include "Fixtures/HVACFixture.hh"
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;

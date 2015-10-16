@@ -151,6 +151,15 @@ namespace SimulationManager {
 	bool RunPeriodsInInput( false );
 	bool RunControlInInput( false );
 
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of SimulationManager should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool PreP_Fatal( false );
+	}
+
 	// SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
 
 	// MODULE SUBROUTINES:
@@ -159,8 +168,9 @@ namespace SimulationManager {
 	void
 	clear_state()
 	{
-		RunPeriodsInInput = false ;
-		RunControlInInput = false ;
+		RunPeriodsInInput = false;
+		RunControlInInput = false;
+		PreP_Fatal = false;
 	}
 
 
@@ -2389,7 +2399,9 @@ namespace SimulationManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool PreP_Fatal( false ); // True if a preprocessor flags a fatal error
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool PreP_Fatal( false ); // True if a preprocessor flags a fatal error
+		////////////////////////////////////////////////////////////////////////////////////
 
 		DoingInputProcessing = false;
 
