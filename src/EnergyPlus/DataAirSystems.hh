@@ -357,6 +357,7 @@ namespace DataAirSystems {
 		Array1D_int OutletBranchNum; // branch numbers of system outlets
 		int NumInletBranches;
 		Array1D_int InletBranchNum; // branch number of system inlets
+		bool CentralHeatCoilExists; // true if there are central heating coils
 		bool OASysExists; // true if there is an Outside Air Sys
 		int OASysInletNodeNum; // node number of return air inlet to OA sys
 		int OASysOutletNodeNum; // node number of mixed air outlet of OA sys
@@ -385,6 +386,7 @@ namespace DataAirSystems {
 			OutletBranchNum( 3, 0 ),
 			NumInletBranches( 0 ),
 			InletBranchNum( 3, 0 ),
+			CentralHeatCoilExists( false ),
 			OASysExists( false ),
 			OASysInletNodeNum( 0 ),
 			OASysOutletNodeNum( 0 ),
@@ -422,6 +424,7 @@ namespace DataAirSystems {
 			Array1_int const & OutletBranchNum, // branch numbers of system outlets
 			int const NumInletBranches,
 			Array1_int const & InletBranchNum, // branch number of system inlets
+			bool const CentralHeatCoilExists, // true if there are central heating coils
 			bool const OASysExists, // true if there is an Outside Air Sys
 			int const OASysInletNodeNum, // node number of return air inlet to OA sys
 			int const OASysOutletNodeNum, // node number of mixed air outlet of OA sys
@@ -456,6 +459,7 @@ namespace DataAirSystems {
 			OutletBranchNum( 3, OutletBranchNum ),
 			NumInletBranches( NumInletBranches ),
 			InletBranchNum( 3, InletBranchNum ),
+			CentralHeatCoilExists( CentralHeatCoilExists ),
 			OASysExists( OASysExists ),
 			OASysInletNodeNum( OASysInletNodeNum ),
 			OASysOutletNodeNum( OASysOutletNodeNum ),

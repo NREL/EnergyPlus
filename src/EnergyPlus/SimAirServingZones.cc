@@ -1379,6 +1379,7 @@ namespace SimAirServingZones {
 		int SupFanIndex;
 		int RetFanIndex;
 		bool FoundOASys;
+		bool FoundCentralHeatCoil;
 		static int TUInNode( 0 ); // inlet node number of a terminal unit
 		static Real64 MassFlowSetToler;
 		static Array1D_int CtrlZoneNumsCool;
@@ -1840,6 +1841,30 @@ namespace SimAirServingZones {
 
 				PrimaryAirSystem(AirLoopNum).SupFanNum = SupFanIndex;
 				PrimaryAirSystem(AirLoopNum).RetFanNum = RetFanIndex;
+
+			} // end of AirLoop loop
+
+			// Check whether there are central heating coils
+			//@@ May need further checks to assure they are "central" heating coils, not "preheat" or "reheat" coils
+			for( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+
+				FoundCentralHeatCoil = false;
+
+				for( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) {
+
+					for( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
+
+						CompTypeNum = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num;
+
+						if( CompTypeNum == WaterCoil_SimpleHeat || CompTypeNum == Coil_ElectricHeat || CompTypeNum == Coil_GasHeat ) {
+							FoundCentralHeatCoil = true;
+						}
+
+					} // end of component loop
+
+				} // end of Branch loop
+			
+				PrimaryAirSystem( AirLoopNum ).CentralHeatCoilExists = FoundCentralHeatCoil;
 
 			} // end of AirLoop loop
 
