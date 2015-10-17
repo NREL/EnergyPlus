@@ -370,6 +370,7 @@ namespace DataAirSystems {
 		int OtherSplitOutNode; // node num of nonRAB splitter outlet
 		int NumOACoolCoils; // number of cooling coils in the outside air system
 		int NumOAHeatCoils; // number of heating coils in the outside air system
+		int NumOAHXs; // number of heat exchangers in the outside air system
 		bool SizeAirloopCoil; // simulates air loop coils before calling controllers
 		int SupFanNum; // index of the supply fan in the Fan data structure
 		int RetFanNum; // index of the return fan in the Fan data structure
@@ -396,6 +397,7 @@ namespace DataAirSystems {
 			OtherSplitOutNode( 0 ),
 			NumOACoolCoils( 0 ),
 			NumOAHeatCoils( 0 ),
+			NumOAHXs( 0 ),
 			SizeAirloopCoil( true ),
 			SupFanNum( 0 ),
 			RetFanNum( 0 ),
@@ -432,6 +434,7 @@ namespace DataAirSystems {
 			int const OtherSplitOutNode, // node num of nonRAB splitter outlet
 			int const NumOACoolCoils, // number of cooling coils in the outside air system
 			int const NumOAHeatCoils, // number of heating coils in the outside air system
+			int const NumOAHXs, // number of heat exchangers in the outside air system
 			bool const SizeAirloopCoil, // simulates air loop coils before calling controllers
 			int const SupFanNum, // index of the supply fan in the Fan data structure
 			int const RetFanNum, // index of the return fan in the Fan data structure
@@ -465,6 +468,7 @@ namespace DataAirSystems {
 			OtherSplitOutNode( OtherSplitOutNode ),
 			NumOACoolCoils( NumOACoolCoils ),
 			NumOAHeatCoils( NumOAHeatCoils ),
+			NumOAHXs( NumOAHXs ),
 			SizeAirloopCoil( SizeAirloopCoil ),
 			SupFanNum( SupFanNum ),
 			RetFanNum( RetFanNum ),

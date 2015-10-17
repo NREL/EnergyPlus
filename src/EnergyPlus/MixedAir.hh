@@ -872,6 +872,9 @@ namespace MixedAir {
 	GetOASysNumHeatingCoils( int const OASysNumber ); // OA Sys Number
 
 	int
+	GetOASysNumHXs( int const OASysNumber ); // OA Sys Number
+
+	int
 	GetOASysNumCoolingCoils( int const OASysNumber ); // OA Sys Number
 
 	int

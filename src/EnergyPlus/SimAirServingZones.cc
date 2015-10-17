@@ -338,6 +338,7 @@ namespace SimAirServingZones {
 		using MixedAir::GetOASysNumSimpControllers;
 		using MixedAir::GetOASysNumCoolingCoils;
 		using MixedAir::GetOASysNumHeatingCoils;
+		using MixedAir::GetOASysNumHXs;
 		using MixedAir::GetOACompListNumber;
 		using MixedAir::GetOACompName;
 		using MixedAir::GetOACompType;
@@ -752,6 +753,7 @@ namespace SimAirServingZones {
 							NumOASysSimpControllers = GetOASysNumSimpControllers( OANum );
 							PrimaryAirSystem( AirSysNum ).NumOAHeatCoils = GetOASysNumHeatingCoils( OANum );
 							PrimaryAirSystem( AirSysNum ).NumOACoolCoils = GetOASysNumCoolingCoils( OANum );
+							PrimaryAirSystem( AirSysNum ).NumOAHXs = GetOASysNumHXs( OANum );
 							OASysContListNum = GetOASysControllerListIndex( OANum );
 							OAMixNum = FindOAMixerMatchForOASystem( OANum );
 							if ( OAMixNum > 0 ) {

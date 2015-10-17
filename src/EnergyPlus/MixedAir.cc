@@ -5372,6 +5372,76 @@ namespace MixedAir {
 	}
 
 	int
+	GetOASysNumHXs( int const OASysNumber ) // OA Sys Number
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Fred Buhl, Rongpeng Zhang
+		//       DATE WRITTEN   Oct. 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// After making sure get input is done, the number of heat recovery exchangers in the
+		// OA System is returned.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+
+		// Return value
+		int NumHX; // number of heat exchangers in this OA System
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		std::string CompType;
+		std::string CompName;
+		bool Sim;
+		bool FirstHVACIteration;
+		bool OAHeatingCoil;
+		bool OACoolingCoil;
+		int CompNum;
+		int AirLoopNum;
+		bool OAHX;
+
+		if( GetOASysInputFlag ) {
+			GetOutsideAirSysInputs();
+			GetOASysInputFlag = false;
+		}
+
+		Sim = false;
+		FirstHVACIteration = false;
+		AirLoopNum = 0;
+		NumHX = 0;
+		for( CompNum = 1; CompNum <= OutsideAirSys( OASysNumber ).NumComponents; ++CompNum ) {
+			CompType = OutsideAirSys( OASysNumber ).ComponentType( CompNum );
+			CompName = OutsideAirSys( OASysNumber ).ComponentName( CompNum );
+			SimOAComponent( CompType, CompName, OutsideAirSys( OASysNumber ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNumber ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNumber, OAHeatingCoil, OACoolingCoil, OAHX );
+			if( OAHX ) {
+				++NumHX;
+			}
+		}
+
+		return NumHX;
+
+	}
+
+	int
 	GetOASysNumCoolingCoils( int const OASysNumber ) // OA Sys Number
 	{
 
