@@ -7412,14 +7412,11 @@ namespace WaterThermalTanks {
 
 		// Select mode of operation (float mode or heat mode) from last iteration.
 		// Determine if heating will occur this iteration and get an estimate of the PLR
-		switch (HeatPump.Mode) {
-		case HeatMode:
+		if ( HeatPump.Mode == HeatMode ) {
 			// HPWH was heating last iteration and will continue to heat until the set point is reached
-
 			HPPartLoadRatio = 1.0;
-			break;
-
-		case FloatMode:
+		} else {
+			assert( HeatPump.Mode == FloatMode );
 			// HPWH was floating last iteration and will continue to float until the cut-in temperature is reached
 
 			// set the condenser inlet node temperature and full mass flow rate prior to calling the HPWH DX coil
@@ -7442,13 +7439,14 @@ namespace WaterThermalTanks {
 
 			// Check tank temperature by setting source inlet mass flow rate to zero.
 
-			 // disables heat pump for stratified tanks
-
 			// Disable the tank's internal heating element to find PLR of the HPWH using floating temperatures.
 			Tank.MaxCapacity = 0.0;
 			Tank.MinCapacity = 0.0;
 			Tank.SourceMassFlowRate = 0.0; // disables heat pump for mixed tanks
+			Real64 const SourceEffectivenessBackup = Tank.SourceEffectiveness;
+			Tank.SourceEffectiveness = 0.0; // disables heat pump for stratified tanks
 			CalcWaterThermalTank( WaterThermalTankNum );
+			Tank.SourceEffectiveness = SourceEffectivenessBackup;
 			NewTankTemp = GetHPWHSensedTankTemp( Tank );
 
 			// Reset the tank's internal heating element capacity.
@@ -7464,19 +7462,8 @@ namespace WaterThermalTanks {
 				// Reset the water heater's mode (call above may have changed modes)
 				Tank.Mode = HeatPump.SaveWHMode;
 
-				// Estimate portion of time step that the HP operates based on a linear interpolation of the tank temperature decay
-				// assuming that all heating sources are off.
-				if ( TankTemp != NewTankTemp ) {
-					HPPartLoadRatio = max( 0.0, min( 1.0, ( ( SetPointTemp - DeadBandTempDiff ) - NewTankTemp ) / ( TankTemp - NewTankTemp ) ) );
-				} else {
-					HPPartLoadRatio = 1.0;
-				}
+				HPPartLoadRatio = 1.0;
 			}
-			break;
-
-		default:
-			// Never gets here, only allowed modes for HPWH are float and heat
-			assert( false );
 		}
 
 		// If the HPWH was in heating mode during the last timestep or if it was determined that
@@ -7490,6 +7477,7 @@ namespace WaterThermalTanks {
 			Node( HPWaterInletNode ).MassFlowRate = MdotWater * HPPartLoadRatio;
 			Tank.SourceMassFlowRate = MdotWater * HPPartLoadRatio;
 
+			// Do the coil and tank calculations at full PLR to see if it overshoots setpoint.
 			if ( MaxSpeedNum > 0 ) { // lowest speed of VS HPWH coil
 				SpeedRatio = 1.0;
 				HPPartLoadRatio = 1.0;
@@ -8123,13 +8111,17 @@ namespace WaterThermalTanks {
 		// Par(3) = water heater num
 		// Par(4) = FirstHVACIteration
 		// Par(5) = MdotWater
-		bool FirstHVACIteration;
 		int const WaterThermalTankNum = int( Par(3) );
 		WaterThermalTankData & Tank = WaterThermalTank( WaterThermalTankNum );
+		HeatPumpWaterHeaterData & HPWH = HPWaterHeater( Tank.HeatPumpNum );
+		bool const isVariableSpeed = ( HPWH.NumofSpeed > 0 );
 		Tank.Mode = int( Par(2) );
 		Tank.SourceMassFlowRate = Par(5) * HPPartLoadRatio;
-		FirstHVACIteration = ( Par(4) == 1.0 );
-		CalcWaterThermalTank( WaterThermalTankNum );
+		if ( isVariableSpeed ) {
+			CalcWaterThermalTank( WaterThermalTankNum );
+		} else {
+			ConvergeSingleSpeedHPWHCoilAndTank( WaterThermalTankNum, HPPartLoadRatio );
+		}
 		Real64 const NewTankTemp = GetHPWHSensedTankTemp( Tank );
 		return Par(1) - NewTankTemp;
 
