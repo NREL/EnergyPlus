@@ -20,6 +20,7 @@
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataReportingFlags.hh>
+#include <DataSurfaces.hh>
 #include <DataSystemVariables.hh>
 #include <DisplayRoutines.hh>
 #include <EMSManager.hh>
@@ -299,6 +300,8 @@ namespace WeatherManager {
 	static gio::Fmt fmtA( "(A)" );
 	static gio::Fmt fmtAN( "(A,$)" );
 
+	std::vector< UnderwaterBoundary > underwaterBoundaries;
+	
 	// MODULE SUBROUTINES:
 
 	// Functions
@@ -532,7 +535,9 @@ namespace WeatherManager {
 		WPSkyTemperature.deallocate();
 		SpecialDays.deallocate();
 		DataPeriods.deallocate();
-	
+
+		underwaterBoundaries.clear();
+
 	} //clear_state, for unit tests
 
 	void
@@ -601,32 +606,71 @@ namespace WeatherManager {
 		// counter (used by GetNextEnvironment) is reset before SetupSimulation or
 		// Simulating.  May not be necessary, but just in case.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
 		Envrn = 0;
 
+	}
+
+	bool
+	CheckIfAnyUnderwaterBoundaries()
+	{
+	    bool errorsFound = false;
+	    int NumAlpha = 0, NumNumber = 0, IOStat = 0;
+	    DataIPShortCuts::cCurrentModuleObject = "SurfaceProperty:Underwater";
+	    int Num = InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
+	    for ( int i = 1; i <= Num; i++ ) {
+		underwaterBoundaries.push_back( UnderwaterBoundary() );
+		InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, i, 
+					       DataIPShortCuts::cAlphaArgs, 
+					       NumAlpha, 
+					       DataIPShortCuts::rNumericArgs, 
+					       NumNumber, 
+					       IOStat, 
+					       DataIPShortCuts::lNumericFieldBlanks, 
+					       DataIPShortCuts::lAlphaFieldBlanks, 
+					       DataIPShortCuts::cAlphaFieldNames, 
+					       DataIPShortCuts::cNumericFieldNames );
+		underwaterBoundaries[ i-1 ].Name = DataIPShortCuts::cAlphaArgs( 1 );
+		underwaterBoundaries[ i-1 ].distanceFromLeadingEdge = DataIPShortCuts::rNumericArgs( 1 );
+		underwaterBoundaries[ i-1 ].OSCMIndex = InputProcessor::FindItemInList( underwaterBoundaries[ i-1 ].Name, DataSurfaces::OSCM );
+		if ( underwaterBoundaries[ i-1 ].OSCMIndex <= 0 ) {
+		    ShowSevereError( "Could not match underwater boundary condition object with an Other Side Conditions Model input object." );
+		    errorsFound = true;
+		}
+		underwaterBoundaries[ i-1 ].WaterTempScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 2 ) );
+		if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
+		    ShowSevereError( "Water temperature schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
+		    errorsFound = true;
+		}
+		underwaterBoundaries[ i-1 ].VelocityScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 3 ) );
+		if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
+		    ShowSevereError( "Free streawm velocity schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
+		    errorsFound = true;
+		}
+	    }
+	    if ( errorsFound ) {
+		ShowFatalError( "Previous input problems cause program termination" );
+	    }
+	    return ( Num > 0 );
+	}
+
+	void
+	UpdateUnderwaterBoundaries()
+	{
+	    Real64 const waterKinematicViscosity = 1e-6; // m2/s
+	    Real64 const waterPrandtlNumber = 6; // -
+	    Real64 const waterThermalConductivity = 0.6; // W/mK
+	    for ( auto & thisBoundary : underwaterBoundaries ) {
+		Real64 const curWaterTemp = ScheduleManager::GetCurrentScheduleValue( thisBoundary.WaterTempScheduleIndex ); // C
+		Real64 const freeStreamVelocity = ScheduleManager::GetCurrentScheduleValue( thisBoundary.VelocityScheduleIndex ); // m/s
+		Real64 const thisDistance = thisBoundary.distanceFromLeadingEdge;
+		Real64 const localReynoldsNumber = freeStreamVelocity * thisDistance / waterKinematicViscosity;
+		Real64 const localNusseltNumber = 0.0296 * pow( localReynoldsNumber, 0.8 ) * pow( waterPrandtlNumber, 1.0/3.0 );
+		Real64 const localConvectionCoeff = localNusseltNumber * waterThermalConductivity / thisDistance;
+		DataSurfaces::OSCM( thisBoundary.OSCMIndex ).TConv = curWaterTemp;
+		DataSurfaces::OSCM( thisBoundary.OSCMIndex ).HConv = localConvectionCoeff;
+		DataSurfaces::OSCM( thisBoundary.OSCMIndex ).TRad = curWaterTemp;
+		DataSurfaces::OSCM( thisBoundary.OSCMIndex ).HRad = 0.0;
+	    }
 	}
 
 	void

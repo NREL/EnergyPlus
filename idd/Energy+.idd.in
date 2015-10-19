@@ -16135,6 +16135,7 @@ SurfaceProperty:OtherSideConditionsModel,
       \key GapConvectionRadiation
       \key UndergroundPipingSystemSurface
       \key GroundCoupledSurface
+      \key ConvectiveUnderwater
       \note GapConvectionRadiation provides boundary conditions for convection
       \note  and linearized thermal radiation across a gap or cavity
       \note  on the other side of the surface that are modeled separately.
@@ -16142,7 +16143,32 @@ SurfaceProperty:OtherSideConditionsModel,
       \note  surfaces in contact with PipingSystem:Underground domains
       \note GroundCoupledSurface provides boundary conditions for surfaces
       \note  in contact with GroundDomain objects
+      \note ConvectiveUnderwater provides a connection between a surface and
+      \note  an underwater boundary condition defined using a
+      \note  SurfaceProperty:Underwater object
       \default GapConvectionRadiation
+
+SurfaceProperty:Underwater,
+       \memo This object sets up a convective boundary condition for a surface
+       \memo The free stream velocity is determined from the SiteLocation:Varying object
+  A1,  \field Name
+       \required-field
+       \reference SurfacePropUnderWaterNames
+       \type alpha
+  N1,  \field Distance from surface centroid to leading edge of building or ship
+       \note This is the distance from the leading edge of the boundary layer development 
+       \note  to the centroid of the surface of interest.  The value of this field is used
+       \note  as the distance in the Reynolds number for evaluating the local convection coefficient.
+       \type real
+       \units m
+  A2,  \field Free Stream (water) Temperature Schedule
+       \type object-list
+       \object-list ScheduleNames
+       \units C
+  A3;  \field Free Stream (water) Velocity Schedule
+       \type object-list
+       \object-list ScheduleNames
+       \units m/s
 
 SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,
        \unique-object

@@ -242,6 +242,7 @@ namespace SimulationManager {
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
 		using OutputProcessor::ResetAccumulationWhenWarmupComplete;
+		using WeatherManager::CheckIfAnyUnderwaterBoundaries;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -259,11 +260,8 @@ namespace SimulationManager {
 		static bool TerminalError( false );
 		bool SimsDone;
 		bool ErrFound;
-		//  REAL(r64) :: t0,t1,st0,st1
-
-		//  CHARACTER(len=70) :: tdstring
-		//  CHARACTER(len=138) :: tdstringlong
-
+		bool oneTimeUnderwaterBoundaryCheck = true;
+		bool AnyUnderwaterBoundaries = false;
 		int EnvCount;
 
 		// Formats
@@ -487,6 +485,10 @@ namespace SimulationManager {
 							InitAndSimGroundDomains();
 						}
 
+						if ( AnyUnderwaterBoundaries ) {
+						    WeatherManager::UpdateUnderwaterBoundaries();
+						}
+
 						BeginTimeStepFlag = true;
 						ExternalInterfaceExchangeVariables();
 
@@ -518,6 +520,11 @@ namespace SimulationManager {
 							if ( GetNumRangeCheckErrorsFound() > 0 ) {
 								ShowFatalError( "Out of \"range\" values found in input" );
 							}
+						}
+
+						if ( oneTimeUnderwaterBoundaryCheck ) {
+						    AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
+						    oneTimeUnderwaterBoundaryCheck = false;
 						}
 
 						BeginHourFlag = false;
