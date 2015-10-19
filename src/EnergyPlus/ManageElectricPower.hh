@@ -507,6 +507,7 @@ namespace ManageElectricPower {
 		Real64 DecrementedEnergyStored; // [J] this is the negative of StoredEnergy
 		Real64 DrawnPower; // [W]
 		Real64 DrawnEnergy; // [J]
+		Real64 DecrementDrawnEnergy; //[J]
 		Real64 ThermLossRate; // [W]
 		Real64 ThermLossEnergy; // [J]
 		int StorageMode; // [ ] mode of operation 0 for idle, 1 for discharging, 2 for charging
@@ -571,6 +572,7 @@ namespace ManageElectricPower {
 			DecrementedEnergyStored( 0.0 ),
 			DrawnPower( 0.0 ),
 			DrawnEnergy( 0.0 ),
+			DecrementDrawnEnergy( 0.0 ),
 			ThermLossRate( 0.0 ),
 			ThermLossEnergy( 0.0 ),
 			StorageMode( 0 ),
@@ -641,6 +643,7 @@ namespace ManageElectricPower {
 			Real64 const DecrementedEnergyStored, // [J] this is the negative of StoredEnergy
 			Real64 const DrawnPower, // [W]
 			Real64 const DrawnEnergy, // [J]
+			Real64 const DecrementDrawnEnergy, // [J]
 			Real64 const ThermLossRate, // [W]
 			Real64 const ThermLossEnergy, // [J]
 			int const StorageMode, // [ ] mode of operation 0 for idle, 1 for discharging, 2 for charging
@@ -708,6 +711,7 @@ namespace ManageElectricPower {
 			DecrementedEnergyStored( DecrementedEnergyStored ),
 			DrawnPower( DrawnPower ),
 			DrawnEnergy( DrawnEnergy ),
+			DecrementDrawnEnergy( DecrementDrawnEnergy ),
 			ThermLossRate( ThermLossRate ),
 			ThermLossEnergy( ThermLossEnergy ),
 			StorageMode( StorageMode ),
