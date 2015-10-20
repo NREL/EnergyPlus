@@ -1,5 +1,6 @@
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src/EnergyPlus )
+INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 set( test_src
   TestHelpers/IdfParser.cc
@@ -16,6 +17,7 @@ set( test_src
   CondenserLoopTowers.unit.cc;
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
+  Datasets.unit.cc
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
   DOASEffectOnZoneSizing.unit.cc
