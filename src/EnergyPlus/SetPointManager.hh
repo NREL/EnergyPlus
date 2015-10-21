@@ -1266,6 +1266,10 @@ namespace SetPointManager {
 								 int const CompOpType,
 								 int const ControlNodeNum
 								 );
+
+	Real64
+	CalcSetPoint(Real64 OutLowTemp, Real64 OutHighTemp, Real64 OutDryBulbTemp, Real64 SetTempAtOutLow, Real64 SetTempAtOutHigh);
+
 	
 	//     NOTICE
 

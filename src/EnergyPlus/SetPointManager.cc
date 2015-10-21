@@ -4639,8 +4639,21 @@ namespace SetPointManager {
 			SetTempAtOutHigh = this->OutHighSetPt1;
 		}
 
-		if ( OutLowTemp < OutHighTemp && SetTempAtOutLow > SetTempAtOutHigh ) {
+		SetPt = CalcSetPoint(OutLowTemp, OutHighTemp, OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh);
 
+		if ( present( InitFlag ) ) {
+			Node( NodeNum ).TempSetPoint = SetPt; //Setpoint for Initial Routine
+		} else {
+			this->SetPt = SetPt; //Setpoint for Calc Routine
+		}
+
+	}
+
+	Real64
+	CalcSetPoint(Real64 OutLowTemp, Real64 OutHighTemp, Real64 OutDryBulbTemp, Real64 SetTempAtOutLow, Real64 SetTempAtOutHigh)
+	{
+		Real64 SetPt;
+		if ( OutLowTemp < OutHighTemp) { // && SetTempAtOutLow > SetTempAtOutHigh 
 			if ( OutDryBulbTemp <= OutLowTemp ) {
 				SetPt = SetTempAtOutLow;
 			} else if ( OutDryBulbTemp >= OutHighTemp ) {
@@ -4652,13 +4665,7 @@ namespace SetPointManager {
 		} else {
 			SetPt = 0.5 * ( SetTempAtOutLow + SetTempAtOutHigh );
 		}
-
-		if ( present( InitFlag ) ) {
-			Node( NodeNum ).TempSetPoint = SetPt; //Setpoint for Initial Routine
-		} else {
-			this->SetPt = SetPt; //Setpoint for Calc Routine
-		}
-
+		return SetPt;
 	}
 
 	void
