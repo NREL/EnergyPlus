@@ -181,7 +181,7 @@ namespace CoolingPanelSimple {
 
 		// Find the correct Baseboard Equipment
 		if ( CompIndex == 0 ) {
-			CoolingPanelNum = FindItemInList( EquipName, CoolingPanel.EquipID(), NumCoolingPanels );
+			CoolingPanelNum = FindItemInList( EquipName, CoolingPanel, &CoolingPanelParams::EquipID, NumCoolingPanels );
 			if ( CoolingPanelNum == 0 ) {
 				ShowFatalError( "SimCoolingPanelSimple: Unit not found=" + EquipName );
 			}
@@ -276,8 +276,6 @@ namespace CoolingPanelSimple {
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using General::RoundSigDigits;
-		using DataSizing::AutoSize;
-		using DataSizing::FinalZoneSizing;
 		using namespace DataIPShortCuts;
 
 		// Locals
@@ -343,7 +341,7 @@ namespace CoolingPanelSimple {
 			GetObjectItem( cCMO_CoolingPanel_Simple, CoolingPanelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), CoolingPanel.EquipID(), CoolingPanelNum, IsNotOK, IsBlank, cCMO_CoolingPanel_Simple + " Name" );
+			VerifyName( cAlphaArgs( 1 ), CoolingPanel, &CoolingPanelParams::EquipID, CoolingPanelNum, IsNotOK, IsBlank, cCMO_CoolingPanel_Simple + " Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -609,10 +607,8 @@ namespace CoolingPanelSimple {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::BeginSimFlag;
 		using DataGlobals::NumOfZones;
 		using DataLoopNode::Node;
-		using DataEnvironment::StdRhoAir;
 		using PlantUtilities::InitComponentNodes;
 		using DataPlant::ScanPlantLoopsForObject;
 
@@ -1049,9 +1045,9 @@ namespace CoolingPanelSimple {
 				// Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
 				DistributeCoolingPanelRadGains();
 				// Now "simulate" the system by recalculating the heat balances
-				CalcHeatBalanceOutsideSurf( ZoneNum );
+				HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
 				
-				CalcHeatBalanceInsideSurf( ZoneNum );
+				HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
 				
 				// Here an assumption is made regarding radiant heat transfer to people.
 				// While the radiant heat transfer to people array will be used by the thermal comfort
