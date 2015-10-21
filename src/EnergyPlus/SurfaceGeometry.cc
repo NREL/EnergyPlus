@@ -10609,17 +10609,18 @@ namespace SurfaceGeometry {
 		Real64 Diagonal1; // Length of diagonal of 4-sided figure from vertex 1 to vertex 3 (m)
 		Real64 Diagonal2; // Length of diagonal of 4-sided figure from vertex 2 to vertex 4 (m)
 		Real64 DotProd; // Dot product of two adjacent sides - to test for right angle
-		Vector Vect32; // vector from vertex 3 to vertex 2
-		Vector Vect21; // vector from vertex 2 to vertex 1
+		Real64 const cos89deg = std::cos( 89.0 * DegToRadians ); // tolerance for right angle
+		Vector Vect32; // normalized vector from vertex 3 to vertex 2
+		Vector Vect21; // normalized vector from vertex 2 to vertex 1
 
 		Diagonal1 = VecLength( Surface( ThisSurf ).Vertex( 1 ) - Surface( ThisSurf ).Vertex( 3 ) );
 		Diagonal2 = VecLength( Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 4 ) );
 		// Test for rectangularity
 		if ( std::abs( Diagonal1 - Diagonal2 ) < 0.020 ) { // This tolerance based on coincident vertex tolerance of 0.01
-			Vect32 = Surface( ThisSurf ).Vertex( 3 ) - Surface( ThisSurf ).Vertex( 2 );
-			Vect21 = Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 1 );
+			Vect32 = VecNormalize( Surface( ThisSurf ).Vertex( 3 ) - Surface( ThisSurf ).Vertex( 2 ) );
+			Vect21 = VecNormalize( Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 1 ) );
 			DotProd = dot( Vect32, Vect21 );
-			if ( abs( DotProd ) < 0.0001 ) { 
+			if ( abs( DotProd ) <= cos89deg ) { 
 				return true;
 			} else {
 				return false;
