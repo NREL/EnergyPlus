@@ -8116,11 +8116,30 @@ namespace WaterThermalTanks {
 		HeatPumpWaterHeaterData & HPWH = HPWaterHeater( Tank.HeatPumpNum );
 		bool const isVariableSpeed = ( HPWH.NumofSpeed > 0 );
 		Tank.Mode = int( Par(2) );
-		Tank.SourceMassFlowRate = Par(5) * HPPartLoadRatio;
-		if ( isVariableSpeed ) {
-			CalcWaterThermalTank( WaterThermalTankNum );
+		// Apply the PLR
+		if ( Tank.TypeNum == MixedWaterHeater ) {
+			// For a mixed tank, the PLR is applied to the source mass flow rate.
+			Tank.SourceMassFlowRate = Par(5) * HPPartLoadRatio;
+			CalcWaterThermalTankMixed( WaterThermalTankNum );
 		} else {
-			ConvergeSingleSpeedHPWHCoilAndTank( WaterThermalTankNum, HPPartLoadRatio );
+			assert( Tank.TypeNum == StratifiedWaterHeater );
+			// For a stratified tank, the PLR is applied to the Coil.TotalHeatingEnergyRate
+			// whether that's a VarSpeedCoil or DXCoil.
+			// Here we create a pointer to the TotalHeatingEnergyRate for the appropriate coil type.
+			Real64 *CoilTotalHeatingEnergyRatePtr;
+			if ( isVariableSpeed ) {
+				CoilTotalHeatingEnergyRatePtr = &VariableSpeedCoils::VarSpeedCoil( HPWH.DXCoilNum ).TotalHeatingEnergyRate;
+			} else {
+				CoilTotalHeatingEnergyRatePtr = &DXCoils::DXCoil( HPWH.DXCoilNum ).TotalHeatingEnergyRate;
+			}
+			// Copy the value of the total heating energy rate
+			Real64 const CoilTotalHeatingEnergyRateBackup = *CoilTotalHeatingEnergyRatePtr;
+			// Apply the PLR
+			*CoilTotalHeatingEnergyRatePtr *= HPPartLoadRatio;
+			// Tank Calculation
+			CalcWaterThermalTankStratified( WaterThermalTankNum );
+			// Restore the original value
+			*CoilTotalHeatingEnergyRatePtr = CoilTotalHeatingEnergyRateBackup;
 		}
 		Real64 const NewTankTemp = GetHPWHSensedTankTemp( Tank );
 		return Par(1) - NewTankTemp;
